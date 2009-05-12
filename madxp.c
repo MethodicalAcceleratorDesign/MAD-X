@@ -224,7 +224,7 @@ double act_value(int pos, struct name_list* chunks)
 
 char* alias(char* par_string) /* returns main parameter for alias */
 {
-  if (my_strcmp(par_string, "filename") == 0)  return file_string;
+  if (strcmp(par_string, "filename") == 0)  return file_string;
   else return par_string;
 }
 
@@ -260,7 +260,7 @@ int aperture_count(struct sequence* sequ)
     {
       while(aperture_types[i][0] != ' ')
       {
-        if (my_strcmp(p, aperture_types[i]) == 0)
+        if (strcmp(p, aperture_types[i]) == 0)
         {
           if (n < aperture_npar[i]) n = aperture_npar[i];
           break;
@@ -278,12 +278,12 @@ int belongs_to_class(struct element* el, char* class)
   /* returns 1 if an element belongs to a class, else 0 */
 {
   int in = 0;
-  if (my_strcmp(el->name, class) == 0) in = 1;
+  if (strcmp(el->name, class) == 0) in = 1;
   else
   {
     while (el->parent != el)
     {
-      if (my_strcmp(el->parent->name, class) == 0)
+      if (strcmp(el->parent->name, class) == 0)
       {
         in = 1; break;
       }
@@ -390,14 +390,14 @@ int cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
       if (k == cnt)  break;
       if (*cmd_match_base[j] == '@')
       {
-        if (my_strcmp(cmd_match_base[j], "@cmd") == 0)
+        if (strcmp(cmd_match_base[j], "@cmd") == 0)
         {
           if ((lp = name_list_pos(toks[k],
                                   defined_commands->list)) < 0) break;
         }
         else if (isalpha(*toks[k]) == 0) break;
       }
-      else if (my_strcmp(cmd_match_base[j], toks[k]) != 0)  break;
+      else if (strcmp(cmd_match_base[j], toks[k]) != 0)  break;
       k++;
     }
 
@@ -426,7 +426,7 @@ double command_par_special(char* parameter, struct element* el)
 {
   double val = zero;
 
-  if (my_strcmp(parameter, "tilt") == 0)
+  if (strcmp(parameter, "tilt") == 0)
   {
     if ((val = command_par_value("tilt", el->def)) == zero)
     {
@@ -505,32 +505,32 @@ void control(struct in_cmd* cmd)
 {
   char** toks = cmd->tok_list->p;
   int k = cmd->decl_start - 1;
-  if      (my_strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
-  else if (my_strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
-  else if (my_strcmp(toks[k], "call")        == 0) exec_call(cmd);
-  else if (my_strcmp(toks[k], "option")      == 0) exec_option();
-  else if (my_strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
-  else if (my_strcmp(toks[k], "save")        == 0) exec_save(cmd);
+  if      (strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
+  else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
+  else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
+  else if (strcmp(toks[k], "option")      == 0) exec_option();
+  else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
+  else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
 #ifdef _FULL
-  else if (my_strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
-  else if (my_strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
-  else if (my_strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
-  else if (my_strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
-  else if (my_strcmp(toks[k], "threader")    == 0) store_threader(cmd);
-  else if (my_strcmp(toks[k], "use")         == 0) use_sequ(cmd);
-  else if (my_strcmp(toks[k], "write")       == 0) exec_dump(cmd);
-  else if (my_strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
-  else if (my_strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
-  else if (my_strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
-  else if (my_strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
-  else if (my_strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
-  else if (my_strcmp(toks[k], "extract")       == 0) exec_extract(cmd);
-  else if (my_strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
-  else if (my_strcmp(toks[k], "print")       == 0) exec_print(cmd);
-  else if (my_strcmp(toks[k], "readtable")   == 0) read_table(cmd);
-  else if (my_strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
-  else if (my_strcmp(toks[k], "select")      == 0) store_select(cmd);
-  else if (my_strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
+  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
+  else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
+  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
+  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
+  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
+  else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
+  else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
+  else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
+  else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
+  else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
+  else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
+  else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
+  else if (strcmp(toks[k], "extract")       == 0) exec_extract(cmd);
+  else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
+  else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
+  else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
+  else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
+  else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
 #endif
 #ifndef _FULL
   puts("++++++++++++++ command skipped in parser version");
@@ -564,14 +564,14 @@ int decode_command () /* compares command with templates, fills this_cmd
     case 0:
       if (n > 1 && *toks[1] == ':') /* label is (protected) key */ return -2;
       this_cmd->cmd_def = defined_commands->commands[cmd_pos];
-      if (my_strcmp(toks[0], "endsequence") == 0)
+      if (strcmp(toks[0], "endsequence") == 0)
       {
         if (sequ_is_on == 0) return -1;
         this_cmd->type = 3;
         sequ_is_on = 0;
       }
-      else if (my_strcmp(this_cmd->cmd_def->module, "element") == 0
-               || my_strcmp(this_cmd->cmd_def->module, "sequence") == 0) return -1;
+      else if (strcmp(this_cmd->cmd_def->module, "element") == 0
+               || strcmp(this_cmd->cmd_def->module, "sequence") == 0) return -1;
       else this_cmd->type = 0;
       break;
     case 1:
@@ -581,11 +581,11 @@ int decode_command () /* compares command with templates, fills this_cmd
       this_cmd->cmd_def = defined_commands->commands[cmd_pos];
       this_cmd->type = 0;
       this_cmd->label = permbuff(toks[aux_pos]);
-      if (my_strcmp(this_cmd->cmd_def->module, "element") == 0)
+      if (strcmp(this_cmd->cmd_def->module, "element") == 0)
         this_cmd->type = 1; /* element definition */
-      else if (my_strcmp(this_cmd->cmd_def->module, "sequence") == 0)
+      else if (strcmp(this_cmd->cmd_def->module, "sequence") == 0)
       {
-        if (my_strcmp(toks[aux_pos+2], "sequence") == 0)
+        if (strcmp(toks[aux_pos+2], "sequence") == 0)
         {
           this_cmd->type = 3;
           sequ_is_on = 1;
@@ -601,8 +601,8 @@ int decode_command () /* compares command with templates, fills this_cmd
       }
       else if (group_is_on)
       {
-        if (my_strcmp(none, this_cmd->cmd_def->group) != 0
-            && my_strcmp(current_link_group, this_cmd->cmd_def->group) != 0)
+        if (strcmp(none, this_cmd->cmd_def->group) != 0
+            && strcmp(current_link_group, this_cmd->cmd_def->group) != 0)
           return -1; /* command does not belong to this group */
         if (type == 2)
         {
@@ -649,8 +649,8 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
       {
         if (i+2 < number && *toks[i+1] == '=')
         {
-          if     (my_strcmp(toks[i+2], "true") == 0)  ival = 1;
-          else if(my_strcmp(toks[i+2], "false") == 0) ival = 0;
+          if     (strcmp(toks[i+2], "true") == 0)  ival = 1;
+          else if(strcmp(toks[i+2], "false") == 0) ival = 0;
           else return -i;
           end = i+2;
         }
@@ -905,7 +905,7 @@ double element_value(struct node* node, char* par)
 {
   double e_val;
   struct element* el = node->p_elem;
-  if (my_strcmp(par, "mad8_type") == 0) e_val = el->def->mad8_type;
+  if (strcmp(par, "mad8_type") == 0) e_val = el->def->mad8_type;
   else  e_val = el_par_value(par, el);
   return e_val;
 }
@@ -952,36 +952,36 @@ double el_par_value(char* par, struct element* el)
   int k = 0, n;
   char tmp[8];
   double val = zero, angle = zero, l, vec[100];
-  double fact = my_strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
-  int mult = my_strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
-  int mark = my_strcmp(el->base_type->name, "marker") == 0 ? 1 : 0;
-  if (fact != zero || my_strcmp(el->base_type->name, "sbend") == 0) /* bend */
+  double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
+  int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
+  int mark = strcmp(el->base_type->name, "marker") == 0 ? 1 : 0;
+  if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
   {
     if ((l = command_par_value("l", el->def)) == zero)
       fatal_error("bend with zero length:",el->name);
     angle = command_par_value("angle", el->def);
-    if (my_strcmp(par, "angle") == 0)  val = angle;
-    else if (my_strcmp(par, "tilt") == 0)
+    if (strcmp(par, "angle") == 0)  val = angle;
+    else if (strcmp(par, "tilt") == 0)
       val = command_par_value("tilt", el->def);
-    else if (my_strcmp(par, "k0") == 0) val = command_par_value("k0", el->def);
-    else if (my_strcmp(par, "k0s") == 0) val = command_par_value("k0s", el->def);
-    else if (my_strcmp(par, "l") == 0)
+    else if (strcmp(par, "k0") == 0) val = command_par_value("k0", el->def);
+    else if (strcmp(par, "k0s") == 0) val = command_par_value("k0s", el->def);
+    else if (strcmp(par, "l") == 0)
     {
       if (fact != zero && get_option("rbarc") && angle != zero)
         val = l * angle / (two * sin(angle/two));
       else val = l;
     }
-    else if (my_strcmp(par, "e1") == 0)
+    else if (strcmp(par, "e1") == 0)
       val = command_par_value("e1", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
-    else if (my_strcmp(par, "e2") == 0)
+    else if (strcmp(par, "e2") == 0)
       val = command_par_value("e2", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
-    else if (my_strcmp(par, "rhoinv") == 0) val = angle / l;
-    else if (my_strcmp(par, "blen") == 0) val = l;
+    else if (strcmp(par, "rhoinv") == 0) val = angle / l;
+    else if (strcmp(par, "blen") == 0) val = l;
     else val = command_par_value(par, el->def);
   }
   /* all elements except bends */
-  else if (my_strcmp(par, "rhoinv") == 0) val = zero;
-  else if (my_strcmp(par, "blen") == 0) val = zero;
+  else if (strcmp(par, "rhoinv") == 0) val = zero;
+  else if (strcmp(par, "blen") == 0) val = zero;
   else if (mark) /* marker */
   {
     if ((l = command_par_value("l", el->def)) != zero)
@@ -990,7 +990,7 @@ double el_par_value(char* par, struct element* el)
   }
   else if (mult)  /* multipole */
   {
-    if (my_strcmp(par, "l") == 0) val = zero;
+    if (strcmp(par, "l") == 0) val = zero;
     else if (par[0] == 'k' && isdigit(par[1]) && par[strlen(par)-1] == 'l')
       /* single component requested for multipole */
     {
@@ -1003,18 +1003,18 @@ double el_par_value(char* par, struct element* el)
   }
   else val = command_par_special(par, el);
   /* extra code for kickers */
-  if (val == zero && my_strcmp(el->base_type->name, "hkicker") == 0)
+  if (val == zero && strcmp(el->base_type->name, "hkicker") == 0)
   {
-    if (my_strcmp(par,"hkick") == 0)
+    if (strcmp(par,"hkick") == 0)
       val = command_par_value("kick", el->def);
-    else if (my_strcmp(par,"kick") == 0)
+    else if (strcmp(par,"kick") == 0)
       val = command_par_value("hkick", el->def);
   }
-  else if (val == zero && my_strcmp(el->base_type->name, "vkicker") == 0)
+  else if (val == zero && strcmp(el->base_type->name, "vkicker") == 0)
   {
-    if (my_strcmp(par,"vkick") == 0)
+    if (strcmp(par,"vkick") == 0)
       val = command_par_value("kick", el->def);
-    else if (my_strcmp(par,"kick") == 0)
+    else if (strcmp(par,"kick") == 0)
       val = command_par_value("vkick", el->def);
   }
   return val;
@@ -1061,7 +1061,7 @@ void enter_element(struct in_cmd* cmd)
     cmd->clone = clone_command(cmd->cmd_def);
     strcpy(cmd->clone->name, toks[0]);
     scan_in_cmd(cmd);
-    if (k == 0 || my_strcmp(toks[0], toks[2]) == 0) el = parent;
+    if (k == 0 || strcmp(toks[0], toks[2]) == 0) el = parent;
     else
     {
       if ((el = make_element(toks[0], parent->name,
@@ -1090,7 +1090,7 @@ void enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   struct command_parameter_list* pl = cmd->clone->par;
   int i, pos, k = 1;
   double at;
-  if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
   if (nl->inform[name_list_pos("at", nl)] == 0)
@@ -1119,8 +1119,8 @@ void enter_sequence(struct in_cmd* cmd)
   char** toks = cmd->tok_list->p;
   struct element* el;
   struct command* clone;
-  aux_pos = my_strcmp(toks[0], "shared") == 0 ? 1 : 0;
-  if (my_strcmp(toks[0], "endsequence") == 0)
+  aux_pos = strcmp(toks[0], "shared") == 0 ? 1 : 0;
+  if (strcmp(toks[0], "endsequence") == 0)
   {
     pos = name_list_pos("marker", defined_commands->list);
     clone = clone_command(defined_commands->commands[pos]);
@@ -1133,16 +1133,16 @@ void enter_sequence(struct in_cmd* cmd)
     current_sequ->start->previous = current_sequ->end;
     current_sequ->end->next = current_sequ->start;
   }
-  else if (my_strcmp(toks[aux_pos+2], "sequence") == 0)
+  else if (strcmp(toks[aux_pos+2], "sequence") == 0)
   {
     for (i = aux_pos+3; i < cmd->tok_list->curr; i++)
     {
-      if (my_strcmp(toks[i], "refer") == 0)
+      if (strcmp(toks[i], "refer") == 0)
       {
         if (i+2 < cmd->tok_list->curr)
         {
-          if (my_strcmp(toks[i+2], "entry") == 0)  k = 1;
-          else if (my_strcmp(toks[i+2], "exit") == 0)  k = -1;
+          if (strcmp(toks[i+2], "entry") == 0)  k = 1;
+          else if (strcmp(toks[i+2], "exit") == 0)  k = -1;
         }
         break;
       }
@@ -1348,7 +1348,7 @@ void exec_assign(struct in_cmd* cmd)
   if (nl->inform[pos])
   {
     p = pl->parameters[pos]->string; strcpy(tmp, p);
-    if (my_strcmp(stolower(tmp), "terminal") == 0)  prt_file = stdout;
+    if (strcmp(stolower(tmp), "terminal") == 0)  prt_file = stdout;
     else
     {
       if (assign_start == 0)
@@ -1439,7 +1439,7 @@ void exec_command()
 
   if (p->cmd_def != NULL)
   {
-    while (my_strcmp(p->cmd_def->name, "exec") == 0)
+    while (strcmp(p->cmd_def->name, "exec") == 0)
     {
       if ((pos = name_list_pos(p->tok_list->p[p->decl_start],
                                macro_list->list)) > -1)
@@ -1453,23 +1453,23 @@ void exec_command()
     this_cmd = p;
     toks = p->tok_list->p;
     cmd_name = p->cmd_def->name;
-    if (my_strcmp(cmd_name, "stop") == 0 || my_strcmp(cmd_name, "quit") == 0
-        || my_strcmp(cmd_name, "exit") == 0)
+    if (strcmp(cmd_name, "stop") == 0 || strcmp(cmd_name, "quit") == 0
+        || strcmp(cmd_name, "exit") == 0)
     {
       madx_finish(); stop_flag = 1; return;
     }
-    else if (my_strcmp(cmd_name, "help") == 0) exec_help(p);
-    else if (my_strcmp(cmd_name, "show") == 0) exec_show(p);
-    else if (my_strcmp(cmd_name, "return") == 0)  return_flag = 1;
-    else if (my_strcmp(cmd_name, "value") == 0)
+    else if (strcmp(cmd_name, "help") == 0) exec_help(p);
+    else if (strcmp(cmd_name, "show") == 0) exec_show(p);
+    else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
+    else if (strcmp(cmd_name, "value") == 0)
     {
       print_value(p);
     }
-    else if (my_strcmp(cmd_name, "system") == 0)
+    else if (strcmp(cmd_name, "system") == 0)
       ret = system(noquote(toks[p->decl_start]));
-    else if (my_strcmp(cmd_name, "title") == 0)
+    else if (strcmp(cmd_name, "title") == 0)
       title = permbuff(noquote(toks[p->decl_start]));
-    else if (my_strcmp(cmd_name, "resplot") == 0)
+    else if (strcmp(cmd_name, "resplot") == 0)
     {
       plot_options = delete_command(plot_options);
       set_defaults("setplot");
@@ -1478,14 +1478,14 @@ void exec_command()
     {
       if (get_option("trace")) time_stamp(cmd_name);
       /* clones with defaults for most commands */
-      if (my_strcmp(cmd_name, "option") == 0
+      if (strcmp(cmd_name, "option") == 0
           && options != NULL)
       {
         set_option("tell", &izero); /* reset every time */
         p->clone = options; p->clone_flag = 1;
       }
 #ifdef _FULL
-      else if (my_strcmp(cmd_name, "setplot") == 0
+      else if (strcmp(cmd_name, "setplot") == 0
                && plot_options != NULL)
       {
         p->clone = plot_options; p->clone_flag = 1;
@@ -1494,39 +1494,39 @@ void exec_command()
       else p->clone = clone_command(p->cmd_def);
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
-      if (my_strcmp(p->cmd_def->module, "control") == 0) control(p);
+      if (strcmp(p->cmd_def->module, "control") == 0) control(p);
 #ifdef _FULL
-      else if (my_strcmp(p->cmd_def->module, "c6t") == 0) conv_sixtrack(p);
-      else if (my_strcmp(p->cmd_def->module, "edit") == 0) seq_edit_main(p);
-      else if (my_strcmp(p->cmd_def->module, "ibs") == 0)
+      else if (strcmp(p->cmd_def->module, "c6t") == 0) conv_sixtrack(p);
+      else if (strcmp(p->cmd_def->module, "edit") == 0) seq_edit_main(p);
+      else if (strcmp(p->cmd_def->module, "ibs") == 0)
       {
         current_ibs = p->clone;
         pro_ibs(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "aperture") == 0)
+      else if (strcmp(p->cmd_def->module, "aperture") == 0)
       {
         pro_aperture(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "touschek") == 0)
+      else if (strcmp(p->cmd_def->module, "touschek") == 0)
       {
         current_touschek = p->clone;
         pro_touschek(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "makethin") == 0) makethin(p);
-      else if (my_strcmp(p->cmd_def->module, "match") == 0)
+      else if (strcmp(p->cmd_def->module, "makethin") == 0) makethin(p);
+      else if (strcmp(p->cmd_def->module, "match") == 0)
       {
         current_match = p->clone; /* OB 23.1.2002 */
         pro_match(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "correct") == 0)
+      else if (strcmp(p->cmd_def->module, "correct") == 0)
       {
         pro_correct(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "emit") == 0)
+      else if (strcmp(p->cmd_def->module, "emit") == 0)
       {
         pro_emit(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "sdds") == 0)
+      else if (strcmp(p->cmd_def->module, "sdds") == 0)
       {
 #ifdef _ONLINE
         pro_sdds(p);
@@ -1534,12 +1534,12 @@ void exec_command()
         warning("ignored, only available in ONLINE model:", "SDDS conversion");
 #endif
       }
-      else if (my_strcmp(p->cmd_def->module, "error") == 0)
+      else if (strcmp(p->cmd_def->module, "error") == 0)
       {
         current_error = p->clone;
         pro_error(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
       {
         if (match_is_on == kMatch_PTCknobs)
         {
@@ -1552,12 +1552,12 @@ void exec_command()
         }
       }
       /* export XML */
-      else if (my_strcmp(p->cmd_def->module, "ptc_export_xml") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0)
       {
 	/* command with parameters, decoded by dedicated function in madxn.c */
 	pro_ptc_export_xml(p);
       }      
-      else if (my_strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
       {
         if (match_is_on == kMatch_PTCknobs)
         {
@@ -1572,15 +1572,15 @@ void exec_command()
             exec_delete_table("ptc_twiss");*/
         }
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
       {
         w_ptc_move_to_layout_();
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_align") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
       {
         w_ptc_align_();
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_twiss") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
       {
 
         if (match_is_on == kMatch_PTCknobs)
@@ -1593,7 +1593,7 @@ void exec_command()
           pro_ptc_twiss();
         }
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_normal") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
       {
         if (match_is_on == kMatch_PTCknobs)
         {
@@ -1604,124 +1604,124 @@ void exec_command()
           w_ptc_normal_();
         }
       }
-      else if (my_strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
+      else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
       {
         select_ptc_normal(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_trackline") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)
       {
         pro_ptc_trackline(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
       {
         ptc_dumpmaps(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_oneturnmap") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_oneturnmap") == 0)
       {
         ptc_oneturnmap(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_track") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
       {
         pro_ptc_track(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
       {
         pro_ptc_setswitch(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_select") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_select") == 0)
       {
         pro_ptc_select(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_moments") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_moments") == 0)
       {
         pro_ptc_moments(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_select_moment") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_select_moment") == 0)
       {
         pro_ptc_select_moment(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
       {
         pro_ptc_printparametric(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_knob") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
       {
         pro_ptc_knob(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_varyknob") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_varyknob") == 0)
       {
         pro_ptc_varyknob(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
       {
         pro_ptc_setknobvalue(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0)
       {
         w_ptc_refreshtables();
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
       {
         pro_ptc_setfieldcomp(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "rviewer") == 0)
+      else if (strcmp(p->cmd_def->module, "rviewer") == 0)
       {
         w_ptc_rviewer();
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_printframes") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
       {
         pro_ptc_printframes(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_eplacement") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_eplacement") == 0)
       {
         pro_ptc_eplacement(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_script") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_script") == 0)
       {
         pro_ptc_script(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_open_gino") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_open_gino") == 0)
       {
         pro_ptc_open_gino(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
       {
         pro_ptc_enforce6d(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_observe") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)
       {
         ptc_track_observe(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_start") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_start") == 0)
       {
         track_is_on = 1;
         track_start(p->clone);
         p->clone_flag = 1;
         /* w_ptc_start_(); */
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_track_end") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_track_end") == 0)
       {
         ptc_track_end();
       }
-      else if (my_strcmp(p->cmd_def->module, "ptc_end") == 0)
+      else if (strcmp(p->cmd_def->module, "ptc_end") == 0)
       {
         if(track_is_on) ptc_track_end();
         w_ptc_end_();
       }
-      else if (my_strcmp(p->cmd_def->module, "sxf") == 0)
+      else if (strcmp(p->cmd_def->module, "sxf") == 0)
       {
         pro_sxf(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "survey") == 0)
+      else if (strcmp(p->cmd_def->module, "survey") == 0)
       {
         current_survey = p->clone;
         pro_survey(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "track") == 0)
+      else if (strcmp(p->cmd_def->module, "track") == 0)
       {
         pro_track(p);
       }
-      else if (my_strcmp(p->cmd_def->module, "twiss") == 0)
+      else if (strcmp(p->cmd_def->module, "twiss") == 0)
       {
         current_twiss = p->clone;
         pro_twiss();
@@ -1921,7 +1921,7 @@ void exec_save(struct in_cmd* cmd)
     while (c_node != NULL)
     {
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
-          && my_strcmp(el->base_type->name, "drift") != 0)
+          && strcmp(el->base_type->name, "drift") != 0)
       {
         while (el->base_type != el)
         {
@@ -1988,13 +1988,13 @@ void exec_show(struct in_cmd* cmd)
   int i, pos, n = cmd->tok_list->curr;
   for (i = 1; i < n; i++)
   {
-    if (my_strcmp(toks[i],","))
+    if (strcmp(toks[i],","))
     {
       if (strncmp(toks[i], "beam", 4) == 0) show_beam(toks[i]);
       else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1)
       {
-        if (my_strcmp(toks[i], "option") == 0) dump_command(options);
-        else if (my_strcmp(toks[i], "eoption") == 0 && current_eopt != NULL)
+        if (strcmp(toks[i], "option") == 0) dump_command(options);
+        else if (strcmp(toks[i], "eoption") == 0 && current_eopt != NULL)
           dump_command(current_eopt);
         else dump_command(defined_commands->commands[pos]);
       }
@@ -2140,7 +2140,7 @@ struct sequence* extract_sequence(char* name, struct sequence* sequ,
     else
       fatal_error("node has neither element nor sequence reference:", q->next->name);
     q = q->next;
-    if (q->p_elem && my_strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
+    if (q->p_elem && strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
         find_element(q->p_elem->name, current_sequ->cavities) == NULL)
       add_to_el_list(&q->p_elem, 0, current_sequ->cavities, 0);
     from_cond = 0;
@@ -2221,7 +2221,7 @@ struct node* expand_node(struct node* node, struct sequence* top_sequ,
   while (p != NULL)
   {
     if (q == nodesequ->end) break;
-    if (my_strcmp(p->base_name, "rfcavity") == 0 &&
+    if (strcmp(p->base_name, "rfcavity") == 0 &&
         find_element(p->p_elem->name, top_sequ->cavities) == NULL)
       add_to_el_list(&p->p_elem, 0, top_sequ->cavities, 0);
     p->next = clone_node(q->next, 0);
@@ -2582,7 +2582,7 @@ int get_option(char* str)
   if (options != NULL
       && (i = name_list_pos(c_dum->c, options->par_names)) > -1)
     return (k = options->par->parameters[i]->double_value);
-  else if (my_strcmp(c_dum->c, "warn") == 0) return init_warn;
+  else if (strcmp(c_dum->c, "warn") == 0) return init_warn;
   else return 0;
 }
 
@@ -2677,7 +2677,7 @@ int get_string(char* name, char* par, char* string)
   char* p;
   int length = 0;
   mycpy(c_dum->c, name);
-  if (my_strcmp(c_dum->c, "beam") == 0)
+  if (strcmp(c_dum->c, "beam") == 0)
   {
     mycpy(c_dum->c, par);
     if ((p = command_par_string(c_dum->c, current_beam)) != NULL)
@@ -2685,7 +2685,7 @@ int get_string(char* name, char* par, char* string)
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (my_strcmp(c_dum->c, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
   {
     mycpy(c_dum->c, par);
     if ((p = command_par_string(c_dum->c, probe_beam)) != NULL)
@@ -2693,7 +2693,7 @@ int get_string(char* name, char* par, char* string)
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (my_strcmp(c_dum->c, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
   {
     mycpy(c_dum->c, par);
     if (current_survey != NULL) nl = current_survey->par_names;
@@ -2705,7 +2705,7 @@ int get_string(char* name, char* par, char* string)
       }
     }
   }
-  /*else if (my_strcmp(c_dum->c, "ptc") == 0)
+  /*else if (strcmp(c_dum->c, "ptc") == 0)
     {
     mycpy(c_dum->c, par);
     if (current_ptc != NULL) nl = current_ptc->par_names;
@@ -2717,7 +2717,7 @@ int get_string(char* name, char* par, char* string)
     }
     }
     }  */
-  else if (my_strcmp(c_dum->c, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
   {
     mycpy(c_dum->c, par);
     if (current_twiss != NULL) nl = current_twiss->par_names;
@@ -2729,19 +2729,19 @@ int get_string(char* name, char* par, char* string)
       }
     }
   }
-  else if (my_strcmp(c_dum->c, "sequence") == 0)
+  else if (strcmp(c_dum->c, "sequence") == 0)
   {
     mycpy(c_dum->c, par);
-    if (current_sequ != NULL && my_strcmp(c_dum->c, "name") == 0)
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
     {
       p = current_sequ->name;
       strcpy(string, p); length = strlen(p);
     }
   }
-  else if (my_strcmp(c_dum->c, "element") == 0)
+  else if (strcmp(c_dum->c, "element") == 0)
   {
     mycpy(c_dum->c, par);
-    if (current_sequ != NULL && my_strcmp(c_dum->c, "name") == 0)
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
     {
       p = current_node->p_elem->name;
       strcpy(string, p); length = strlen(p);
@@ -2756,7 +2756,7 @@ int get_string(char* name, char* par, char* string)
     {
       if (current_command != NULL)
       {
-        if ( my_strcmp(c_dum->c, current_command->name) == 0)
+        if ( strcmp(c_dum->c, current_command->name) == 0)
         {
           cmd = current_command;
         }
@@ -2862,9 +2862,9 @@ double get_beam_value(char* name, char* par)
   struct command* cmd;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (my_strcmp(c_dum->c, "current") == 0 && current_beam != NULL)
+  if (strcmp(c_dum->c, "current") == 0 && current_beam != NULL)
     return get_value("beam", par);
-  else if (my_strcmp(c_dum->c, "default") == 0)
+  else if (strcmp(c_dum->c, "default") == 0)
   {
     cmd = find_command("default_beam", beam_list);
     return command_par_value(aux_buff->c, cmd);
@@ -2882,34 +2882,34 @@ double get_value(char* name, char* par)
   struct name_list* nl = NULL;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (my_strcmp(c_dum->c, "beam") == 0)
+  if (strcmp(c_dum->c, "beam") == 0)
     return command_par_value(aux_buff->c, current_beam);
-  else if (my_strcmp(c_dum->c, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
     return command_par_value(aux_buff->c, probe_beam);
-  else if (my_strcmp(c_dum->c, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
   {
     if (current_survey != NULL) nl = current_survey->par_names;
     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
       return command_par_value(aux_buff->c, current_survey);
     else return zero;
   }
-  else if (my_strcmp(c_dum->c, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
   {
     if (current_twiss != NULL) nl = current_twiss->par_names;
     if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
       return command_par_value(aux_buff->c, current_twiss);
     else return zero;
   }
-  else if (my_strcmp(c_dum->c, "sequence") == 0)
+  else if (strcmp(c_dum->c, "sequence") == 0)
   {
-    if (my_strcmp(aux_buff->c, "l") == 0) return sequence_length(current_sequ);
-    else if (my_strcmp(aux_buff->c, "range_start") == 0)
+    if (strcmp(aux_buff->c, "l") == 0) return sequence_length(current_sequ);
+    else if (strcmp(aux_buff->c, "range_start") == 0)
       return (current_sequ->range_start->position
               - 0.5 * current_sequ->range_start->length);
     else return INVALID;
   }
   else if (current_command != NULL
-           && my_strcmp(c_dum->c, current_command->name) == 0)
+           && strcmp(c_dum->c, current_command->name) == 0)
     return command_par_value(aux_buff->c, current_command);
   else return INVALID;
 }
@@ -3277,7 +3277,7 @@ struct element* make_element(char* name, char* parent,
 /*  double length; */
   struct element* el = new_element(name);
   el->def = def;
-  if (my_strcmp(name, parent) == 0)  /* basic element type like drift etc. */
+  if (strcmp(name, parent) == 0)  /* basic element type like drift etc. */
   {
     add_to_el_list(&el, def->mad8_type, base_type_list, 1);
     el->parent = el->base_type = el;
@@ -3450,15 +3450,15 @@ double node_value(char* par)
   double value;
   char lpar[NAME_L];
   mycpy(lpar, par);
-  if (my_strcmp(lpar, "l") == 0) value = current_node->length;
-/*  else if (my_strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
-  else if (my_strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
-  else if (my_strcmp(lpar, "chkick") == 0) value = current_node->chkick;
-  else if (my_strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
-  else if (my_strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
-  else if (my_strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
-  else if (my_strcmp(lpar, "enable") == 0) value = current_node->enable;
-  else if (my_strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
+  if (strcmp(lpar, "l") == 0) value = current_node->length;
+/*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
+  else if (strcmp(lpar, "other_bv") == 0) value = current_node->other_bv;
+  else if (strcmp(lpar, "chkick") == 0) value = current_node->chkick;
+  else if (strcmp(lpar, "cvkick") == 0) value = current_node->cvkick;
+  else if (strcmp(lpar, "obs_point") == 0) value = current_node->obs_point;
+  else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
+  else if (strcmp(lpar, "enable") == 0) value = current_node->enable;
+  else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
   else value =  element_value(current_node, lpar);
   return value;
 }
@@ -4170,7 +4170,7 @@ void save_beam(struct sequence* sequ, FILE* file)
     {
       if (comm->par_names->inform[i])
       {
-        if (my_strcmp(comm->par_names->names[i], "sequence") != 0
+        if (strcmp(comm->par_names->names[i], "sequence") != 0
             || def == 0)
           export_comm_par(comm->par->parameters[i], beam_buff);
       }
@@ -4234,7 +4234,7 @@ int scan_expr(int c_item, char** item)   /* split input */
       while (strlen(functs[lp]))
       {
         lx = lp;
-        if (my_strcmp(item[i], functs[lp]) == 0)  break;
+        if (strcmp(item[i], functs[lp]) == 0)  break;
         lp++;
       }
       if (lx == lp)    /* function found */
@@ -4243,7 +4243,7 @@ int scan_expr(int c_item, char** item)   /* split input */
         if (l_cat == func->max)  grow_int_array(func);
         cat->i[l_cat] = 5;
         func->i[l_cat++] = lp;
-        if (my_strcmp("exist", functs[lp]) == 0  /* special function */
+        if (strcmp("exist", functs[lp]) == 0  /* special function */
             && i+3 < c_item && *item[i+1] == '(' && *item[i+3] == ')')
         {
           if (find_variable(item[i+2], variable_list) == NULL)
@@ -4387,24 +4387,24 @@ void set_defaults(char* string) /* reset options, beam etc. to defaults */
 
   if ((pos = name_list_pos(string, defined_commands->list)) > -1)
   {
-    if (my_strcmp(string, "option") == 0)
+    if (strcmp(string, "option") == 0)
     {
       if (options != NULL) delete_command(options);
       options = clone_command(defined_commands->commands[pos]);
     }
-    else if (my_strcmp(string, "set") == 0)
+    else if (strcmp(string, "set") == 0)
       store_set(defined_commands->commands[pos], 0);
-    else if (my_strcmp(string, "setplot") == 0)
+    else if (strcmp(string, "setplot") == 0)
     {
       if (plot_options != NULL) delete_command(plot_options);
       plot_options = clone_command(defined_commands->commands[pos]);
     }
-    else if (my_strcmp(string, "threader") == 0)
+    else if (strcmp(string, "threader") == 0)
     {
       if (threader_par != NULL)  delete_command(threader_par);
       threader_par = clone_command(defined_commands->commands[pos]);
     }
-    else if (my_strcmp(string, "beam") == 0)
+    else if (strcmp(string, "beam") == 0)
     {
       if (current_beam == NULL)
         current_beam = clone_command(defined_commands->commands[pos]);
@@ -4615,7 +4615,7 @@ char* spec_join(char** it_list, int n)
     p = (char**) mymalloc(rout_name,n*sizeof(char*));
     for (j = 0; j < n; j++) p[j] = it_list[j];
     for (j = 0; j < n; j++)
-      if (my_strcmp(p[j], "table") == 0 && j+3 < n
+      if (strcmp(p[j], "table") == 0 && j+3 < n
           && (var = find_variable(p[j+2], variable_list)) != NULL)
         p[j+2] = var->string;
     for (j = 0; j < n; j++) strcat(c_join->c, p[j]);
@@ -4644,7 +4644,7 @@ void store_command_def(char* cmd_string)  /* processes command definition */
 
 /*
   printf("skowrondebug: store_command_def.c command name %s\n",cmd->name);
-  if (my_strcmp(cmd->name,"twcavity") == 0)
+  if (strcmp(cmd->name,"twcavity") == 0)
   {
   printf("skowrondebug: store_command_def.c I have got TWCAVITY\n");
   }
@@ -4669,7 +4669,7 @@ void store_command_def(char* cmd_string)  /* processes command definition */
       b_s = r_end + 1;
     }
   }
-  if (my_strcmp(toks->p[2], "element") == 0)
+  if (strcmp(toks->p[2], "element") == 0)
     el = make_element(toks->p[0], toks->p[0], cmd, 0);
   delete_in_cmd(tmp_cmd);
 }
@@ -4696,7 +4696,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
       jj = 0;
       for (j = 0; j <= mymin((end - start),2); j++)
       {
-        if (my_strcmp(toks[start+j], "true") == 0)  pl[jj]->double_value = 1;
+        if (strcmp(toks[start+j], "true") == 0)  pl[jj]->double_value = 1;
         jj++; j++; /* skip , */
       }
       break;
@@ -4751,7 +4751,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
           {
             if (*toks[ss_end] == ',') break;
           }
-          if (my_strcmp(toks[start], none) != 0)
+          if (strcmp(toks[start], none) != 0)
           {
             if (ss_end == start+1) pl[0]->string = permbuff(toks[start]);
             else pl[0]->string = permbuff(join(&toks[start], ss_end-start));
@@ -4759,7 +4759,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
           if (ss_end < end)
           {
             start = ss_end + 1; /* skip , */
-            if (my_strcmp(toks[start], none) != 0)
+            if (strcmp(toks[start], none) != 0)
               pl[1]->string = permbuff(toks[start]);
           }
         }
@@ -4771,7 +4771,7 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
           for (j = 0; j < pl[0]->m_string->max; j++)
           {
             if (*toks[s_start+j] != ',' &&
-                my_strcmp(toks[s_start+j], none) != 0)
+                strcmp(toks[s_start+j], none) != 0)
               pl[0]->m_string->p[i++] = permbuff(toks[s_start+j]);
           }
           pl[0]->m_string->curr = i;
@@ -4802,27 +4802,27 @@ void store_node_value(char* par, double* value)
   struct element* el = current_node->p_elem;
 
   mycpy(lpar, par);
-  if (my_strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
-  else if (my_strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
-/*  else if (my_strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;*/
-  else if (my_strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
-  else if (my_strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
-  else if (my_strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
-  else if (my_strcmp(lpar, "enable") == 0) current_node->enable = *value;
+  if (strcmp(lpar, "chkick") == 0) current_node->chkick = *value;
+  else if (strcmp(lpar, "cvkick") == 0) current_node->cvkick = *value;
+/*  else if (strcmp(lpar, "dipole_bv") == 0) current_node->dipole_bv = *value;*/
+  else if (strcmp(lpar, "other_bv") == 0) current_node->other_bv = *value;
+  else if (strcmp(lpar, "obs_point") == 0) current_node->obs_point = *value;
+  else if (strcmp(lpar, "sel_sector") == 0) current_node->sel_sector = *value;
+  else if (strcmp(lpar, "enable") == 0) current_node->enable = *value;
 
   /* added by E. T. d'Amico 27 feb 2004 */
 
-  else if (my_strcmp(lpar, "e1") == 0) store_comm_par_value("e1",*value,el->def);
-  else if (my_strcmp(lpar, "e2") == 0) store_comm_par_value("e2",*value,el->def);
-  else if (my_strcmp(lpar, "angle") == 0) store_comm_par_value("angle",*value,el->def);
+  else if (strcmp(lpar, "e1") == 0) store_comm_par_value("e1",*value,el->def);
+  else if (strcmp(lpar, "e2") == 0) store_comm_par_value("e2",*value,el->def);
+  else if (strcmp(lpar, "angle") == 0) store_comm_par_value("angle",*value,el->def);
 
   /* added by E. T. d'Amico 12 may 2004 */
 
-  else if (my_strcmp(lpar, "h1") == 0) store_comm_par_value("h1",*value,el->def);
-  else if (my_strcmp(lpar, "h2") == 0) store_comm_par_value("h2",*value,el->def);
-  else if (my_strcmp(lpar, "fint") == 0) store_comm_par_value("fint",*value,el->def);
-  else if (my_strcmp(lpar, "fintx") == 0) store_comm_par_value("fintx",*value,el->def);
-  else if (my_strcmp(lpar, "hgap") == 0) store_comm_par_value("hgap",*value,el->def);
+  else if (strcmp(lpar, "h1") == 0) store_comm_par_value("h1",*value,el->def);
+  else if (strcmp(lpar, "h2") == 0) store_comm_par_value("h2",*value,el->def);
+  else if (strcmp(lpar, "fint") == 0) store_comm_par_value("fint",*value,el->def);
+  else if (strcmp(lpar, "fintx") == 0) store_comm_par_value("fintx",*value,el->def);
+  else if (strcmp(lpar, "hgap") == 0) store_comm_par_value("hgap",*value,el->def);
 
   /* end of additions */
 }
@@ -4936,7 +4936,7 @@ double table_value()
         else if(ntok == 2)
 	{
           strncpy(temp, toks[1], NAME_L);
-          if (my_strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
+          if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
 	}
       }
     }
@@ -4958,7 +4958,7 @@ int tab_name_code(char* name, char* t_name)
   {
     strcat(tmp, ":"); strcat(tmp, n);
   }
-  return (my_strcmp(tmp, t_name) == 0 ? 1 : 0);
+  return (strcmp(tmp, t_name) == 0 ? 1 : 0);
 }
 
 void time_stamp(char* place)
@@ -5043,7 +5043,7 @@ void update_beam(struct command* comm)
     }
   }
   else name = pl->parameters[pos]->string;
-  if (my_strcmp(name, "ion") == 0)
+  if (strcmp(name, "ion") == 0)
   {
     pos = name_list_pos("mass", nlc);
     if (nlc->inform[pos]) mass = command_par_value("mass", comm);
@@ -5220,7 +5220,7 @@ void update_element(struct element* el, struct command* update)
           e_par->double_value = par->double_value;
           e_par->expr = clone_expression(par->expr);
           /* fix for bv flag start */
-          if (my_strcmp(e_par->name, "bv") == 0)
+          if (strcmp(e_par->name, "bv") == 0)
             el->bv = e_par->double_value;
           /* fix for bv flag end */
           break;

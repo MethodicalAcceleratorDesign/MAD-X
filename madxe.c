@@ -8,7 +8,7 @@
 void pro_error(struct in_cmd* cmd)
 {
 
- if (my_strcmp(cmd->tok_list->p[0], "eoption") == 0)
+ if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
      {
       error_eoption(cmd);
       cmd->clone_flag = 1; /* do not drop */
@@ -25,27 +25,27 @@ void pro_error(struct in_cmd* cmd)
 
  if (error_select->curr > 0) set_selected_errors();
 
- if (my_strcmp(cmd->tok_list->p[0], "ealign") == 0)
+ if (strcmp(cmd->tok_list->p[0], "ealign") == 0)
           {
            error_ealign(cmd);
           }
- else if (my_strcmp(cmd->tok_list->p[0], "efield") == 0)
+ else if (strcmp(cmd->tok_list->p[0], "efield") == 0)
           {
            error_efield(cmd);
           }
- else if (my_strcmp(cmd->tok_list->p[0], "efcomp") == 0)
+ else if (strcmp(cmd->tok_list->p[0], "efcomp") == 0)
           {
            error_efcomp(cmd);
           }
- else if (my_strcmp(cmd->tok_list->p[0], "eprint") == 0)
+ else if (strcmp(cmd->tok_list->p[0], "eprint") == 0)
           {
            error_eprint(cmd);
           }
- else if (my_strcmp(cmd->tok_list->p[0], "seterr") == 0)
+ else if (strcmp(cmd->tok_list->p[0], "seterr") == 0)
           {
            error_seterr(cmd);
           }
- else if (my_strcmp(cmd->tok_list->p[0], "esave") == 0)
+ else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
           {
            error_esave(cmd);
           }
@@ -147,7 +147,7 @@ void error_seterr(struct in_cmd* cmd)
              printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); 
 */
        
-             if(my_strcmp(slname,slnname) == 0) {
+             if(strcmp(slname,slnname) == 0) {
 
 /*              printf("O.K.:  %s in sequence and input table\n",slname); */
                 /*
@@ -390,7 +390,7 @@ void error_efcomp(struct in_cmd* cmd)
     i = 0;
     while((cmd->tok_list->p[i]) != NULL) {
       for(k=0;k<4;k++) {
-          if(my_strcmp(cmd->tok_list->p[i],attv[k]) == 0) {
+          if(strcmp(cmd->tok_list->p[i],attv[k]) == 0) {
              iattv[k] = 1;
           }
       }
@@ -495,7 +495,7 @@ void error_efcomp(struct in_cmd* cmd)
            if (get_option("debug"))
            fprintf(prt_file, "original length is %f\n",nlength);
 
-         if(my_strcmp(nextnode->base_name,"multipole") == 0) {
+         if(strcmp(nextnode->base_name,"multipole") == 0) {
            if(rrr > 0 ) {
               get_node_vector("knl",&lvec,nvec);
            } else {
@@ -510,7 +510,7 @@ void error_efcomp(struct in_cmd* cmd)
            fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
            ref_str = nvec[n];
            ref_strn = fabs(ref_str);
-         } else if (my_strcmp(nextnode->base_name,"sbend") == 0) {
+         } else if (strcmp(nextnode->base_name,"sbend") == 0) {
            nvec0 = node_value("k0");
            if (get_option("debug")) {
               fprintf(prt_file, "original field0 is %f\n",nvec0);
@@ -518,7 +518,7 @@ void error_efcomp(struct in_cmd* cmd)
            }
            ref_str = nvec0*nlength;
            ref_strn = fabs(nvec0);
-         } else if (my_strcmp(nextnode->base_name,"rbend") == 0) {
+         } else if (strcmp(nextnode->base_name,"rbend") == 0) {
            nvec0 = node_value("k0");
            if (get_option("debug")) {
               fprintf(prt_file, "original field0 is %f\n",nvec0);
@@ -526,7 +526,7 @@ void error_efcomp(struct in_cmd* cmd)
            }
            ref_str = nvec0*nlength;
            ref_strn = fabs(nvec0);
-         } else if (my_strcmp(nextnode->base_name,"quadrupole") == 0) {
+         } else if (strcmp(nextnode->base_name,"quadrupole") == 0) {
            nvec1 = node_value("k1");
            if (get_option("debug")) {
               fprintf(prt_file, "original field1 is %f\n",nvec1);
@@ -534,7 +534,7 @@ void error_efcomp(struct in_cmd* cmd)
            }
            ref_str = nvec1*nlength;
            ref_strn = fabs(nvec1);
-         } else if (my_strcmp(nextnode->base_name,"sextupole") == 0) {
+         } else if (strcmp(nextnode->base_name,"sextupole") == 0) {
            nvec2 = node_value("k2");
            if (get_option("debug")) {
               fprintf(prt_file, "original field2 is %f\n",nvec2);
@@ -542,7 +542,7 @@ void error_efcomp(struct in_cmd* cmd)
            }
            ref_str = nvec2*nlength;
            ref_strn = fabs(nvec2);
-         } else if (my_strcmp(nextnode->base_name,"octupole") == 0) {
+         } else if (strcmp(nextnode->base_name,"octupole") == 0) {
            nvec3 = node_value("k3");
            if (get_option("debug")) {
               fprintf(prt_file, "original field3 is %f\n",nvec3);
@@ -692,10 +692,10 @@ void error_eoption(struct in_cmd* cmd)
   
   i = 0;
   while(cmd->tok_list->p[i] != NULL) {
-     if(my_strcmp("add",cmd->tok_list->p[i]) == 0) {
+     if(strcmp("add",cmd->tok_list->p[i]) == 0) {
           ia = 1;
      }
-     if(my_strcmp("seed",cmd->tok_list->p[i]) == 0) {
+     if(strcmp("seed",cmd->tok_list->p[i]) == 0) {
           is = 1;
      }
      i++;

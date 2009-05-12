@@ -206,7 +206,7 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
     return;
   }
 
-  if (my_strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
+  if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
 
   if (t->num_cols > t->org_cols)  add_vars_to_table(t);
 
@@ -421,7 +421,7 @@ void complete_twiss_table(struct table* t)
   if (t == NULL) return;
   i = t->curr;
   c_node = current_node;
-  mult = my_strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
+  mult = strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
   t->s_cols[0][i] = tmpbuff(c_node->name);
   t->s_cols[1][i] = tmpbuff(c_node->base_name);
   t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
@@ -429,10 +429,10 @@ void complete_twiss_table(struct table* t)
   {
     el = c_node->length;
     strcpy(tmp, twiss_table_cols[j]);
-    myrbend = (my_strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
-    if (my_strcmp(twiss_table_cols[j], "l") == 0) val = el;
-    else if (my_strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if (my_strcmp(tmp, "e1") == 0 || my_strcmp(tmp, "e2") == 0)
+    myrbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
+    if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
+    else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
     {
       if(myrbend)
       {
@@ -444,9 +444,9 @@ void complete_twiss_table(struct table* t)
         val =  el_par_value(tmp, c_node->p_elem);
       }
     }
-    else if (my_strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if (my_strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if (my_strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {
       if(j<=twiss_mult_end)
@@ -470,18 +470,18 @@ void complete_twiss_table(struct table* t)
       val = el_par_value(tmp, c_node->p_elem);
       if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
         val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
-      else if (strstr(tmp, "kick") || my_strcmp(tmp, "angle") == 0 ||
-               my_strcmp(tmp, "ks") == 0 || my_strcmp(tmp, "ksi") == 0 ||
-               my_strcmp(tmp, "volt") == 0 )
+      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
+               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
+               strcmp(tmp, "volt") == 0 )
         val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
       if (el != zero)
       {
-        if (strstr(tmp,"kick") == NULL && my_strcmp(tmp, "angle")
-            && my_strcmp(tmp, "tilt") && my_strcmp(tmp, "e1") && my_strcmp(tmp, "e2")
-            && my_strcmp(tmp, "h1") && my_strcmp(tmp, "h2") && my_strcmp(tmp, "hgap")
-            && my_strcmp(tmp, "fint") && my_strcmp(tmp, "fintx")
-            && my_strcmp(tmp, "volt") && my_strcmp(tmp, "lag")
-            && my_strcmp(tmp, "freq") && my_strcmp(tmp, "harmon")) val *= el;
+        if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
+            && strcmp(tmp, "tilt") && strcmp(tmp, "e1") && strcmp(tmp, "e2")
+            && strcmp(tmp, "h1") && strcmp(tmp, "h2") && strcmp(tmp, "hgap")
+            && strcmp(tmp, "fint") && strcmp(tmp, "fintx")
+            && strcmp(tmp, "volt") && strcmp(tmp, "lag")
+            && strcmp(tmp, "freq") && strcmp(tmp, "harmon")) val *= el;
       }
     }
     t->d_cols[j][i] = val;
@@ -641,7 +641,7 @@ int result_from_normal(char* name_var, int* order, double* val)
   {
     k = string_from_table("normal_results","name", &row, string);
     if (k != 0) return k;
-    if (my_strcmp(string,n_var) == 0)
+    if (strcmp(string,n_var) == 0)
     {
       found = 1;
       k = double_from_table("normal_results","order1", &row, &d_val);
@@ -982,7 +982,7 @@ void gnuplot_append(char *gplfilename, char *psfilename){
 
 void exec_plot(struct in_cmd* cmd)
 {
-  int i, j, k, ierr, pos, nt = my_strcmp(title,"no-title") == 0 ? 1 : 0;
+  int i, j, k, ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
   int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0;
   int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
@@ -1027,7 +1027,7 @@ void exec_plot(struct in_cmd* cmd)
     {
       if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
         haxis_name = pl_plot->parameters[pos]->call_def->string;
-      s_haxis = my_strcmp(haxis_name,"s");
+      s_haxis = strcmp(haxis_name,"s");
     }
 
     /* get table_name & track_flag */
@@ -1039,7 +1039,7 @@ void exec_plot(struct in_cmd* cmd)
       if ((table_name = pl_plot->parameters[pos]->string) == NULL)
         table_name = pl_plot->parameters[pos]->call_def->string;
 
-      if(my_strcmp(table_name,"track") == 0)
+      if(strcmp(table_name,"track") == 0)
         track_flag = 1;
     }
     else
@@ -1050,9 +1050,9 @@ void exec_plot(struct in_cmd* cmd)
     if(nointerp == 0 && s_haxis == 0)
     {
       last_twiss_table = current_sequ->tw_table->name;
-      if (my_strcmp(table_name,"aperture") != 0 )
+      if (strcmp(table_name,"aperture") != 0 )
       {
-        if(my_strcmp(table_name,last_twiss_table) != 0)
+        if(strcmp(table_name,last_twiss_table) != 0)
         {
           printf("Only allowed table attribute in plot command is \"aperture\". Else, table name is automatically changed to %s \n",last_twiss_table );
           if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
@@ -1118,9 +1118,9 @@ void exec_plot(struct in_cmd* cmd)
     track_cols_length = sizeof(track_table_cols)/sizeof(uintptr_t) - 1;
     for (j = 0; j < track_cols_length; j++)
     {
-      if(my_strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
+      if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
         haxis_idx = j + 1;
-      if(my_strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
+      if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
         vaxis_idx = j + 1;
     }
 
@@ -1262,7 +1262,7 @@ void exec_savebeta()
     {
       pos = name_list_pos("sequence", nl);
       if (nl->inform[pos] == 0
-          || my_strcmp(pl->parameters[pos]->string, current_sequ->name) == 0)
+          || strcmp(pl->parameters[pos]->string, current_sequ->name) == 0)
       {
         pos = name_list_pos("place", nl);
         if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
@@ -1532,7 +1532,7 @@ void select_ptc_normal(struct in_cmd* cmd)
       }
       else
       {
-        if(((my_strcmp(names[j], "dq1") == zero)|| (my_strcmp(names[j], "dq2") == zero)) && order[0] == zero) order[0]=one;
+        if(((strcmp(names[j], "dq1") == zero)|| (strcmp(names[j], "dq2") == zero)) && order[0] == zero) order[0]=one;
         string_to_table("normal_results", "name", names[j]);
         double_to_table("normal_results", "order1", &order[0]);
         double_to_table("normal_results", "order2", &order[1]);
@@ -1784,7 +1784,7 @@ void fill_beta0(struct command* beta0, struct node* node)
       pl->parameters[i]->double_value = twiss_table->d_cols[i+3][pos];
 /*      if (strstr(nl->names[i], "mu")) pl->parameters[i]->double_value *= twopi; frs 19.10.2006*/
     }
-    while (my_strcmp(nl->names[i], "energy") != 0);
+    while (strcmp(nl->names[i], "energy") != 0);
   }
 }
 
@@ -2290,8 +2290,8 @@ void get_node_vector(char* par, int* length, double* vector)
 {
   char lpar[NAME_L];
   mycpy(lpar, par);
-  if (my_strcmp(lpar, "orbit0") == 0) copy_double(orbit0, vector, 6);
-  else if (my_strcmp(lpar, "obs_orbit") == 0)
+  if (strcmp(lpar, "orbit0") == 0) copy_double(orbit0, vector, 6);
+  else if (strcmp(lpar, "obs_orbit") == 0)
   {
     if (current_node->obs_orbit)
     {
@@ -2300,7 +2300,7 @@ void get_node_vector(char* par, int* length, double* vector)
     }
     else *length = 0;
   }
-  else if (my_strcmp(lpar, "orbit_ref") == 0)
+  else if (strcmp(lpar, "orbit_ref") == 0)
   {
     if (current_node->orbit_ref)
     {
@@ -2395,7 +2395,7 @@ int get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
       c_node = sequ->range_start;
       while(c_node)
       {
-        if (my_strcmp(c_node->name, tmp) == 0) break;
+        if (strcmp(c_node->name, tmp) == 0) break;
         if ((c_node = c_node->next) == sequ->range_end)
         {
           warning("illegal expand range ignored:", range);
@@ -2529,7 +2529,7 @@ int get_vector(char* name, char* par, double* vector)
 {
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (my_strcmp(c_dum->c, "threader") == 0)
+  if (strcmp(c_dum->c, "threader") == 0)
     return command_par_vector(aux_buff->c, threader_par, vector);
   else return 0;
 }
@@ -2612,7 +2612,7 @@ struct node* install_one(struct element* el, char* from_name, double at_value,
 {
   struct node* node;
   int i, occ = 1;
-  if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, edit_sequ->cavities, 0);
   if ((i = name_list_pos(el->name, occ_list)) < 0)
@@ -2652,8 +2652,8 @@ int interp_node(int *nint)
   first_node = current_node;
   el = first_node->p_elem;
   elem_name = el->base_type->name;
-  rbend = (my_strcmp(elem_name, "rbend") == 0);
-  bend_flag = (my_strcmp(elem_name, "sbend")*(rbend-1) == 0);
+  rbend = (strcmp(elem_name, "rbend") == 0);
+  bend_flag = (strcmp(elem_name, "sbend")*(rbend-1) == 0);
 
 /*  bv = node_value("dipole_bv");*/
   bvk = node_value("other_bv");
@@ -2773,7 +2773,7 @@ double line_nodes(struct char_p_array* flat)
   {
     if ((el = find_element(flat->p[j], element_list)) == NULL)
       fatal_error("line contains unknown element:", flat->p[j]);
-    if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+    if (strcmp(el->base_type->name, "rfcavity") == 0 &&
         find_element(el->name, current_sequ->cavities) == NULL)
       add_to_el_list(&el, 0, current_sequ->cavities, 0);
     val = el_par_value("l", el);
@@ -3286,7 +3286,7 @@ void pro_aperture(struct in_cmd* cmd)
     return;
   }
   aper_trim_ws(tw_name, NAME_L);
-  while (my_strcmp(tw_name,current_node->name))
+  while (strcmp(tw_name,current_node->name))
   {
     tw_cnt++;
     if (tw_cnt > tw_cp->curr)
@@ -3321,7 +3321,7 @@ void pro_aperture(struct in_cmd* cmd)
       aper_header(aperture_table, *limit_node);
       out_table(table, aperture_table, file);
     }
-    if (my_strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
+    if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
   }
   else warning("Could not run aperture command.","Aperture command ignored");
 
@@ -3505,11 +3505,11 @@ void pro_match(struct in_cmd* cmd)
   /* OB 12.2.2002: changed the sequence of if statements so that MAD
      can go through the whole matching sequence */
 
-  if (my_strcmp(cmd->tok_list->p[0], "match") == 0)
+  if (strcmp(cmd->tok_list->p[0], "match") == 0)
   {
     match_match(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "cell") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "cell") == 0)
   {
     warning("CELL command no longer valid, ","use MATCH");
     return;
@@ -3519,62 +3519,62 @@ void pro_match(struct in_cmd* cmd)
     warning("no MATCH command seen,","ignored");
     return;
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "endmatch") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "endmatch") == 0)
   {
     match_end(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
-           my_strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
-           my_strcmp(cmd->tok_list->p[0], "jacobian") == 0 ||
-           my_strcmp(cmd->tok_list->p[0], "simplex") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
+           strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
+           strcmp(cmd->tok_list->p[0], "jacobian") == 0 ||
+           strcmp(cmd->tok_list->p[0], "simplex") == 0)
   {
     match_action(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "constraint") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "constraint") == 0)
   {
     match_constraint(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "couple") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "couple") == 0)
   {
     match_couple(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "fix") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "fix") == 0)
   {
     match_fix(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "global") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
   {
     match_global(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "level") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "level") == 0)
   {
     match_level(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "vary") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "vary") == 0)
   {
     match_vary(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "weight") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "weight") == 0)
   {
     match_weight(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "gweight") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "gweight") == 0)
   {
     match_gweight(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "rmatrix") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "rmatrix") == 0)
   {
     match_rmatrix(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "tmatrix") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "tmatrix") == 0)
   {
     match_tmatrix(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "global") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
   {
     match_global(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "use_macro") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "use_macro") == 0)
   {
     match2_macro(cmd);
   }
@@ -3631,31 +3631,31 @@ void pro_track(struct in_cmd* cmd)
     warning("TRACK, but no active sequence:", "ignored");
     return;
   }
-  if (my_strcmp(cmd->tok_list->p[0], "track") == 0)
+  if (strcmp(cmd->tok_list->p[0], "track") == 0)
   {
     track_track(cmd);
   }
-  if (my_strcmp(cmd->tok_list->p[0], "dynap") == 0)
+  if (strcmp(cmd->tok_list->p[0], "dynap") == 0)
   {
     track_dynap(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "endtrack") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "endtrack") == 0)
   {
     track_end(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "observe") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "observe") == 0)
   {
     track_observe(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "run") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "run") == 0)
   {
     track_run(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "ripple") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "ripple") == 0)
   {
     track_ripple(cmd);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "start") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "start") == 0)
   {
     track_start(cmd->clone);
     cmd->clone_flag = 1;
@@ -4719,7 +4719,7 @@ struct table* read_table(struct in_cmd* cmd)
     if (*cc == '@')
     {
       if ((tmp = strtok(NULL, " \"\n")) != NULL
-          && my_strcmp(tmp, "TYPE") == 0)
+          && strcmp(tmp, "TYPE") == 0)
       {
         if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
         {
@@ -4727,7 +4727,7 @@ struct table* read_table(struct in_cmd* cmd)
             type = permbuff(stolower(name));
         }
       }
-      else if (my_strcmp(tmp, "NAME") == 0)
+      else if (strcmp(tmp, "NAME") == 0)
       {
         if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
         {
@@ -4752,9 +4752,9 @@ struct table* read_table(struct in_cmd* cmd)
       while ((tmp = strtok(NULL, " \"\n")) != NULL)
       {
         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-        if (my_strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-        else if (my_strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
-        else if (my_strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+        if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+        else if (strcmp(tmp, "%d") == 0)  tnl->inform[tcpa->curr] = 1;
+        else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
         else                              tnl->inform[tcpa->curr] = 2;
         tcpa->p[tcpa->curr++] = permbuff(tmp);
       }
@@ -4802,12 +4802,12 @@ struct table* read_table(struct in_cmd* cmd)
       {
         if (t->curr == t->max) grow_table(t);
         tmp = tcpa->p[i];
-        if (my_strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-        else if (my_strcmp(tmp,"%d") == 0)
+        if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+        else if (strcmp(tmp,"%d") == 0)
         {
           sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
         }
-        else if (my_strcmp(tmp,"%hd") == 0)
+        else if (strcmp(tmp,"%hd") == 0)
         {
           sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
         }
@@ -4880,7 +4880,7 @@ struct table* read_his_table(struct in_cmd* cmd)
     if (*cc == '@')
     {
       if ((tmp = strtok(NULL, " \"\n")) != NULL
-          && my_strcmp(tmp, "TYPE") == 0)
+          && strcmp(tmp, "TYPE") == 0)
       {
         if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
         {
@@ -4905,8 +4905,8 @@ struct table* read_his_table(struct in_cmd* cmd)
       while ((tmp = strtok(NULL, " \"\n")) != NULL)
       {
         if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-        if (my_strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-        else if (my_strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+        if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+        else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
         else                              tnl->inform[tcpa->curr] = 2;
         tcpa->p[tcpa->curr++] = permbuff(tmp);
       }
@@ -4948,9 +4948,9 @@ struct table* read_his_table(struct in_cmd* cmd)
       {
         if (t->curr == t->max) grow_table(t);
         tmp = tcpa->p[i];
-        if (my_strcmp(tmp,"%s") == 0)
+        if (strcmp(tmp,"%s") == 0)
           t->s_cols[i][t->curr] = tmpbuff(stolower(cc));
-        else if (my_strcmp(tmp,"%d") == 0 || my_strcmp(tmp,"%hd") == 0)
+        else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
         {
           sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
         }
@@ -5023,7 +5023,7 @@ void replace_one(struct node* node, struct element* el)
   node->p_elem = el;
   node->base_name = el->base_type->name;
   node->length = el->length;
-  if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, edit_sequ->cavities, 0);
 }
@@ -5042,7 +5042,7 @@ void replace_lines(struct macro* org, int replace, char** reps)
     for (i = 0; i < line->tokens->curr; i++)
     {
       p = line->tokens->p[i];
-      if (isalpha(*p) && my_strcmp(line->formal->p[j], p) == 0)
+      if (isalpha(*p) && strcmp(line->formal->p[j], p) == 0)
         line->tokens->p[i] = reps[j];
     }
   }
@@ -5129,7 +5129,7 @@ int reset_interpolation(int *nint)
 
   /* resets angle and saves e1 if the element is a bending magnet */
 
-  bend_flag = my_strcmp(current_node->p_elem->base_type->name, "sbend") == 0 || rbend;
+  bend_flag = strcmp(current_node->p_elem->base_type->name, "sbend") == 0 || rbend;
   if (bend_flag)
   {
     angle = numint*node_value("angle");
@@ -5250,7 +5250,7 @@ double rfc_slope()
   do
   {
     el = c_node->p_elem;
-    if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+    if (strcmp(el->base_type->name, "rfcavity") == 0 &&
         (harmon = command_par_value("harmon", el->def)) > zero)
     {
       volt = command_par_value("volt", el->def);
@@ -5359,17 +5359,17 @@ void seq_edit_main(struct in_cmd* cmd)
 {
   int k = cmd->decl_start - 1;
   char** toks = cmd->tok_list->p;
-  if (my_strcmp(toks[k], "seqedit") == 0)  seq_edit(cmd);
+  if (strcmp(toks[k], "seqedit") == 0)  seq_edit(cmd);
   else if(edit_is_on)
   {
-    if (my_strcmp(toks[k], "install") == 0)  seq_install(cmd);
-    else if (my_strcmp(toks[k], "move") == 0)  seq_move(cmd);
-    else if (my_strcmp(toks[k], "remove") == 0)  seq_remove(cmd);
-    else if (my_strcmp(toks[k], "cycle") == 0)  seq_cycle(cmd);
-    else if (my_strcmp(toks[k], "flatten") == 0)  seq_flatten(edit_sequ);
-    else if (my_strcmp(toks[k], "reflect") == 0)  seq_reflect(cmd);
-    else if (my_strcmp(toks[k], "replace") == 0)  seq_replace(cmd);
-    else if (my_strcmp(toks[k], "endedit") == 0)  seq_end(cmd);
+    if (strcmp(toks[k], "install") == 0)  seq_install(cmd);
+    else if (strcmp(toks[k], "move") == 0)  seq_move(cmd);
+    else if (strcmp(toks[k], "remove") == 0)  seq_remove(cmd);
+    else if (strcmp(toks[k], "cycle") == 0)  seq_cycle(cmd);
+    else if (strcmp(toks[k], "flatten") == 0)  seq_flatten(edit_sequ);
+    else if (strcmp(toks[k], "reflect") == 0)  seq_reflect(cmd);
+    else if (strcmp(toks[k], "replace") == 0)  seq_replace(cmd);
+    else if (strcmp(toks[k], "endedit") == 0)  seq_end(cmd);
   }
   else warning("seqedit command outside edit", "ignored");
 }
@@ -5456,7 +5456,7 @@ void seq_install(struct in_cmd* cmd)
   if (nl->inform[pos])
   {
     from_name = pl->parameters[pos]->string;
-    if (my_strcmp(from_name, "selected") == 0)
+    if (strcmp(from_name, "selected") == 0)
     {
       if (seqedit_select->curr == 0)
       {
@@ -5525,7 +5525,7 @@ void seq_move(struct in_cmd* cmd)
   int pos = name_list_pos("element", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
-    if (my_strcmp(name, "selected") == 0)
+    if (strcmp(name, "selected") == 0)
     {
       if (seqedit_select->curr == 0)
       {
@@ -5663,7 +5663,7 @@ void seq_remove(struct in_cmd* cmd)
   int pose = name_list_pos("element", nl);
   if (nl->inform[pose] && (name = pl->parameters[pose]->string) != NULL)
   {
-    if (my_strcmp(name, "selected") == 0)
+    if (strcmp(name, "selected") == 0)
     {
       if (seqedit_select->curr == 0)
       {
@@ -5725,7 +5725,7 @@ void seq_replace(struct in_cmd* cmd)
   int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
   {
-    if (my_strcmp(name, "selected") == 0)
+    if (strcmp(name, "selected") == 0)
     {
       if (seqedit_select->curr == 0)
       {
@@ -5865,16 +5865,16 @@ void set_value(char* name, char* par, double* value)
 {
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  if (my_strcmp(c_dum->c, "beam") == 0)
+  if (strcmp(c_dum->c, "beam") == 0)
     set_command_par_value(aux_buff->c, current_beam, *value);
-  else if (my_strcmp(c_dum->c, "probe") == 0)
+  else if (strcmp(c_dum->c, "probe") == 0)
     set_command_par_value(aux_buff->c, probe_beam, *value);
-  else if (my_strcmp(c_dum->c, "survey") == 0)
+  else if (strcmp(c_dum->c, "survey") == 0)
     set_command_par_value(aux_buff->c, current_survey, *value);
-  else if (my_strcmp(c_dum->c, "twiss") == 0)
+  else if (strcmp(c_dum->c, "twiss") == 0)
     set_command_par_value(aux_buff->c, current_twiss, *value);
   else if (current_command != NULL
-           && my_strcmp(c_dum->c, current_command->name) == 0)
+           && strcmp(c_dum->c, current_command->name) == 0)
     set_command_par_value(aux_buff->c, current_command, *value);
 }
 
@@ -5944,7 +5944,7 @@ int set_enable(char* type, struct in_cmd* cmd)
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
     name = pl->parameters[pos]->string;
-    status = my_strcmp(name, "on") == 0 ? 1 : 0;
+    status = strcmp(name, "on") == 0 ? 1 : 0;
   }
   else status = 1;
   pos = name_list_pos("range", nl);
@@ -6004,7 +6004,7 @@ void set_selected_columns(struct table* t, struct command_list* select)
       {
         for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
         {
-          if (my_strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
+          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
@@ -6016,7 +6016,7 @@ void set_selected_columns(struct table* t, struct command_list* select)
               }
             }
           }
-          else if (my_strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
@@ -6028,7 +6028,7 @@ void set_selected_columns(struct table* t, struct command_list* select)
               }
             }
           }
-          else if (my_strcmp(pl->parameters[pos]->m_string->p[j],
+          else if (strcmp(pl->parameters[pos]->m_string->p[j],
                           "apertype") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
@@ -6207,19 +6207,19 @@ void store_deselect(struct in_cmd* cmd)
     warning("no FLAG specified", "ignored");
     return;
   }
-  if (my_strcmp(flag_name, "seqedit") == 0)
+  if (strcmp(flag_name, "seqedit") == 0)
   {
   }
-  else if (my_strcmp(flag_name, "error") == 0)
+  else if (strcmp(flag_name, "error") == 0)
   {
   }
-  else if (my_strcmp(flag_name, "makethin") == 0)
+  else if (strcmp(flag_name, "makethin") == 0)
   {
   }
-  else if (my_strcmp(flag_name, "save") == 0)
+  else if (strcmp(flag_name, "save") == 0)
   {
   }
-  else if (my_strcmp(flag_name, "sectormap") == 0)
+  else if (strcmp(flag_name, "sectormap") == 0)
   {
   }
   else /* store deselect for all tables */
@@ -6291,7 +6291,7 @@ void store_select(struct in_cmd* cmd)
     warning("no FLAG specified", "ignored");
     return;
   }
-  if (my_strcmp(flag_name, "seqedit") == 0)
+  if (strcmp(flag_name, "seqedit") == 0)
   {
     if (log_val("clear", cmd->clone))
     {
@@ -6308,7 +6308,7 @@ void store_select(struct in_cmd* cmd)
       cmd->clone_flag = 1; /* do not drop */
     }
   }
-  else if (my_strcmp(flag_name, "error") == 0)
+  else if (strcmp(flag_name, "error") == 0)
   {
     if (log_val("clear", cmd->clone))
     {
@@ -6326,7 +6326,7 @@ void store_select(struct in_cmd* cmd)
       cmd->clone_flag = 1; /* do not drop */
     }
   }
-  else if (my_strcmp(flag_name, "sdds") == 0)
+  else if (strcmp(flag_name, "sdds") == 0)
 #ifdef _ONLINE
   {
     if (log_val("clear", cmd->clone))
@@ -6353,7 +6353,7 @@ void store_select(struct in_cmd* cmd)
   }
 #endif
 
-  else if (my_strcmp(flag_name, "makethin") == 0)
+  else if (strcmp(flag_name, "makethin") == 0)
   {
     if (log_val("clear", cmd->clone))
     {
@@ -6367,7 +6367,7 @@ void store_select(struct in_cmd* cmd)
       cmd->clone_flag = 1; /* do not drop */
     }
   }
-  else if (my_strcmp(flag_name, "save") == 0)
+  else if (strcmp(flag_name, "save") == 0)
   {
     if (log_val("clear", cmd->clone))
     {
@@ -6381,7 +6381,7 @@ void store_select(struct in_cmd* cmd)
       cmd->clone_flag = 1; /* do not drop */
     }
   }
-  else if (my_strcmp(flag_name, "sectormap") == 0)
+  else if (strcmp(flag_name, "sectormap") == 0)
   {
     if (sector_ranges == NULL)   sector_ranges = new_node_list(10000);
     if (log_val("clear", cmd->clone))
@@ -6425,8 +6425,8 @@ void store_node_vector(char* par, int* length, double* vector)
 {
   char lpar[NAME_L];
   mycpy(lpar, par);
-  if (my_strcmp(lpar, "orbit0") == 0)  copy_double(vector, orbit0, 6);
-  else if (my_strcmp(lpar, "orbit_ref") == 0)
+  if (strcmp(lpar, "orbit0") == 0)  copy_double(vector, orbit0, 6);
+  else if (strcmp(lpar, "orbit_ref") == 0)
   {
     if (current_node->orbit_ref)
     {
@@ -6480,7 +6480,7 @@ void string_to_table(char* table, char* name, char* string)
       && t->columns->inform[pos] == 3)
   {
     mycpy(c_dum->c, string);
-    if (my_strcmp(c_dum->c, "name") == 0)
+    if (strcmp(c_dum->c, "name") == 0)
       t->s_cols[pos][t->curr] = tmpbuff(current_node->name);
     else t->s_cols[pos][t->curr] = tmpbuff(c_dum->c);
   }
@@ -7186,7 +7186,7 @@ void pro_ptc_printframes(struct in_cmd* cmd)
   conv_char(filename,filenameIA);
 
 
-  if (my_strcmp(format,"rootmacro") == 0)
+  if (strcmp(format,"rootmacro") == 0)
   {
     w_ptc_printlayout_rootm(filenameIA->i);
   }
@@ -7277,12 +7277,12 @@ void pro_ptc_eplacement(struct in_cmd* cmd)
     {
       /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
 
-      if ( my_strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
+      if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
       {
         refframe = 1;
       }
 
-      if ( my_strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
+      if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
       {
         refframe = 2;
       }
@@ -7923,7 +7923,7 @@ int makemomentstables()
 
     for(j=0; tables[j] != 0x0 ;j++)
     {
-      if ((my_strcmp(tables[j],tabname) == 0)) break;
+      if ((strcmp(tables[j],tabname) == 0)) break;
     }
     /*printf(" index of this table is %d \n",j);*/
 
@@ -8203,7 +8203,7 @@ void track_tables_dump()
   for (j = 0; j < table_register->names->curr; j++)
   {
     if (strstr(table_register->names->names[j], "track.obs")
-        || my_strcmp(table_register->names->names[j], "trackone") == 0)
+        || strcmp(table_register->names->names[j], "trackone") == 0)
     {
       strcpy(l_wrk->c, track_filename);
       strcat(l_wrk->c, &table_register->names->names[j][5]);
@@ -8316,7 +8316,7 @@ int twiss_input(struct command* tw)
           nl->inform[name_list_pos(nl->names[i], nl)] = 1;
         }
       }
-      while (my_strcmp(nl->names[i], "energy") != 0);
+      while (strcmp(nl->names[i], "energy") != 0);
     }
     else ret = -1;
   }
@@ -8342,7 +8342,7 @@ void update_node_constraints(struct node* c_node, struct constraint_list* cl)
     k = -1;
     for (i = 0; i < c_node->cl->curr; i++)
     {
-      if (my_strcmp(cl->constraints[j]->name,
+      if (strcmp(cl->constraints[j]->name,
                  c_node->cl->constraints[i]->name) == 0) k = i;
     }
     if (k < 0)
@@ -8365,7 +8365,7 @@ void update_sequ_constraints(struct sequence* sequ, struct constraint_list* cl)
     k = -1;
     for (i = 0; i < sequ->cl->curr; i++)
     {
-      if (my_strcmp(cl->constraints[j]->name,
+      if (strcmp(cl->constraints[j]->name,
                  sequ->cl->constraints[i]->name) == 0) k = i;
     }
     if (k < 0)

@@ -21,11 +21,11 @@ void set_selected_rows_tab(struct table* t, struct command_list* select,
 void pro_sdds(struct in_cmd* cmd)
 {
   int   i;
-  if (my_strcmp(cmd->tok_list->p[0], "sddsin") == 0)
+  if (strcmp(cmd->tok_list->p[0], "sddsin") == 0)
     {
      i = sdds_ior(cmd);
     }
-  else if (my_strcmp(cmd->tok_list->p[0], "sddsout") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "sddsout") == 0)
     {
      i = sdds_iow(cmd);
     }
@@ -534,9 +534,9 @@ for(j=0; j < t->header->curr; j++) {
 /*
       SDDS_DefineParameter(SDDS_table, head_buf->p[1], NULL, NULL, NULL, NULL, SDDS_STRING, head_buf->p[3]);
 */
-      if(my_strcmp(head_buf->p[2],"%le") == 0) {
+      if(strcmp(head_buf->p[2],"%le") == 0) {
       SDDS_DefineParameter(SDDS_table, head_buf->p[1], NULL, NULL, NULL, NULL, SDDS_DOUBLE, NULL);
-      } else if(my_strcmp(head_buf->p[2],"%ld") == 0) {
+      } else if(strcmp(head_buf->p[2],"%ld") == 0) {
       SDDS_DefineParameter(SDDS_table, head_buf->p[1], NULL, NULL, NULL, NULL, SDDS_LONG, NULL);
       } else {
       SDDS_DefineParameter(SDDS_table, head_buf->p[1], NULL, NULL, NULL, NULL, SDDS_STRING, NULL);
@@ -576,14 +576,14 @@ for(j=0; j < t->header->curr; j++) {
     for(k=0; k < head_buf->curr; k++) {
       if (get_option("debug")) printf("for set header: %d %s ", k,  head_buf->p[k]);
 
-      if(my_strcmp(head_buf->p[2],"%ld") == 0) {
+      if(strcmp(head_buf->p[2],"%ld") == 0) {
         sscanf(head_buf->p[3],"%ld",&lbuf);
         if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
                              head_buf->p[1], lbuf, NULL)) {
            SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
            exit(1);
         }
-      } else if(my_strcmp(head_buf->p[2],"%le") == 0) {
+      } else if(strcmp(head_buf->p[2],"%le") == 0) {
         sscanf(head_buf->p[3],"%le",&dbuf);
         if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
                              head_buf->p[1], dbuf, NULL)) {

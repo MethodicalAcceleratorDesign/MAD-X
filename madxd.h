@@ -1,10 +1,5 @@
 #ifndef WIN32
 
-/* optimization of string comparisons on which MAD-X relies heavily */
-inline int my_strcmp(const char * s1, const char * s2){
-  return ((*s1) != (*s2) ? (*s1)-(*s2) : strcmp(s1,s2));
-}
-
 /* should work unchanged on _win32 using Lahey */
 #define advance_node          advance_node_
 #define advance_to_pos        advance_to_pos_

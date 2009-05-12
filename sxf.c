@@ -30,13 +30,13 @@ void pro_sxf(struct in_cmd* cmd)
       filename = pl->parameters[pos]->call_def->string;
   }
   if (filename == NULL) filename = permbuff("dummy");
-  if (my_strcmp(cmd->tok_list->p[0], "sxfread") == 0)
+  if (strcmp(cmd->tok_list->p[0], "sxfread") == 0)
   {
     if (down_unit(filename) == 0)  return;
     sxf_read(cmd->clone);
     fclose(in->input_files[in->curr--]);
   }
-  else if (my_strcmp(cmd->tok_list->p[0], "sxfwrite") == 0)
+  else if (strcmp(cmd->tok_list->p[0], "sxfwrite") == 0)
   {
     if ((inout = fopen(filename, "w")) == NULL)
     {
@@ -119,7 +119,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   ntok = join_prefix("-", ntok, toks);
   if (count == 0)
   {
-    if (ntok < 2 || my_strcmp(toks[1], "sequence") != 0) return -1;
+    if (ntok < 2 || strcmp(toks[1], "sequence") != 0) return -1;
     else current_sequ = new_sequence(toks[0], 0);
     if (occ_list == NULL)
       occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
@@ -138,7 +138,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     }
     ntok -= 3;
   }
-  else if (my_strcmp(toks[0], "endsequence") == 0)
+  else if (strcmp(toks[0], "endsequence") == 0)
   {
     current_sequ->length = find_value("at", ntok, toks);
     pos = name_list_pos("marker", defined_commands->list);
@@ -157,10 +157,10 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   clone = clone_command(defined_commands->commands[pos]);
   sxf_fill_command(clone, ntok, toks);
   el = make_element(toks[0], toks[1], clone, sequ_is_on+1);
-  if (my_strcmp(el->base_type->name, "rfcavity") == 0 &&
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
-  if (my_strcmp(el->base_type->name, "crabcavity") == 0 &&
+  if (strcmp(el->base_type->name, "crabcavity") == 0 &&
       find_element(el->name, current_sequ->crabcavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->crabcavities, 0);
   add_to_name_list(el->name, 1, occ_list);
@@ -170,7 +170,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
   else sxf_suml = at;
   sxf_suml += el->length / 2;
   current_node->at_value = at;
-  for (n = 0; n < ntok; n++)  if(my_strcmp("align.dev", toks[n]) == 0) break;
+  for (n = 0; n < ntok; n++)  if(strcmp("align.dev", toks[n]) == 0) break;
   if (n < ntok)
   {
     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
@@ -180,7 +180,7 @@ int sxf_decin(char* p, int count) /* decode one SXF input item, store */
     current_node->p_al_err->curr = n;
     for (j = 0; j < n; j++) current_node->p_al_err->a[j] = vec[j];
   }
-  for (n = 0; n < ntok; n++)  if(my_strcmp("body.dev", toks[n]) == 0) break;
+  for (n = 0; n < ntok; n++)  if(strcmp("body.dev", toks[n]) == 0) break;
   if (n < ntok)
   {
     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
@@ -200,7 +200,7 @@ int join_prefix(char* prefix, int ntok, char** toks)
   int j, k;
   for (j = 0; j < ntok; j++)
   {
-    if (my_strcmp(toks[j], prefix) == 0 && j+1 < ntok)
+    if (strcmp(toks[j], prefix) == 0 && j+1 < ntok)
     {
       strcat(toks[j], toks[j+1]);
       for (k = j+1; k < ntok-1; k++)  toks[k] = toks[k+1];
@@ -228,7 +228,7 @@ void sxf_fill_command(struct command* comm, int ntok, char** toks)
     if (length == INVALID) length = zero;
     pl->parameters[pos]->double_value = length;
   }
-  for (n = 0; n < ntok; n++)  if(my_strcmp("body", toks[n]) == 0) break;
+  for (n = 0; n < ntok; n++)  if(strcmp("body", toks[n]) == 0) break;
   if (n < ntok)
   {
     get_bracket_t_range(toks, '{', '}', n, ntok, &rs, &re);
@@ -241,7 +241,7 @@ int sxf_align_fill(int start, int end, int ntok, char** toks, double* vec)
 {
   int cnt = 0, j, rss, res;
 
-  if (my_strcmp(toks[start+1], "al") == 0)
+  if (strcmp(toks[start+1], "al") == 0)
   {
     get_bracket_t_range(toks, '[', ']', start+3, ntok, &rss, &res);
     if (rss == start+3)  /* square bracket found */
@@ -262,8 +262,8 @@ int sxf_field_fill(int start, int end, int ntok, char** toks, double* vec)
     cnt[k] = 0;
     for (i = start+1; i < end; i++)
     {
-      if ((k == 0 && my_strcmp(toks[i], "kl") == 0) ||
-          (k == 1 && my_strcmp(toks[i], "kls") == 0))
+      if ((k == 0 && strcmp(toks[i], "kl") == 0) ||
+          (k == 1 && strcmp(toks[i], "kls") == 0))
       {
         get_bracket_t_range(toks, '[', ']', i+2, ntok, &rss, &res);
         if (rss == i+2)  /* square bracket found */
@@ -294,8 +294,8 @@ void sxf_body_fill(struct command* comm, int start, int end, int ntok,
   {
     for (k = start+1; k < end; k++)
     {
-      if      (skew == 0 && my_strcmp("kl", toks[k]) == 0)  break;
-      else if (skew == 1 && my_strcmp("kls", toks[k]) == 0) break;
+      if      (skew == 0 && strcmp("kl", toks[k]) == 0)  break;
+      else if (skew == 1 && strcmp("kls", toks[k]) == 0) break;
     }
     if (k < end)
     {
@@ -474,7 +474,7 @@ int all_blank(char* s)
 
 void pro_elem_sxf(FILE* out)
 {
-  if (my_strcmp(current_node->base_name, "drift") == 0)  return; /* skip drifts */
+  if (strcmp(current_node->base_name, "drift") == 0)  return; /* skip drifts */
   write_elstart(out);
   write_body(out); sxf_elem_cnt++;
   if (current_node->p_fd_err && current_node->p_fd_err->curr > 0)
@@ -550,7 +550,7 @@ char* tag_spec(char* intype)
 
   for (j = 0; j < tag_cnt; j++)
   {
-    if (my_strcmp(intype, tag_type[j]) == 0)  return tag_code[j];
+    if (strcmp(intype, tag_type[j]) == 0)  return tag_code[j];
   }
   return NULL;
 }
@@ -628,9 +628,9 @@ void write_body(FILE* out)
   {
     /* nm printf("  i = %d, %s, value = %e\n", i, eldef->par_names->names[i], node_value(eldef->par_names->names[i])); */
     double v = node_value(eldef->par_names->names[i]);
-    if(v == 0.0 && my_strcmp(eldef->par_names->names[i], "knl") != 0) continue;
+    if(v == 0.0 && strcmp(eldef->par_names->names[i], "knl") != 0) continue;
     /* nm printf("  i = %d, %s, angle = %e\n", i, eldef->par_names->names[i], angle); */
-    if (my_strcmp(eldef->par_names->names[i], "l") != 0
+    if (strcmp(eldef->par_names->names[i], "l") != 0
         && (pos = name_list_pos(eldef->par_names->names[i], sxf_list)) > -1)
     {
       /*
@@ -650,7 +650,7 @@ void write_body(FILE* out)
   }
 
 
-  if (my_strcmp(current_node->base_name, "beambeam") == 0)
+  if (strcmp(current_node->base_name, "beambeam") == 0)
   {
     if (set++ == 0)
     {
@@ -695,10 +695,10 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
     if (val[0] != zero)  return 1;
     else return 0;
   }
-  else if (*name == 'k' && my_strcmp(name, "ks") != 0)
+  else if (*name == 'k' && strcmp(name, "ks") != 0)
   {
     *flag = 1;
-    if (my_strcmp(name, "knl") == 0 || my_strcmp(name, "ksl") == 0)
+    if (strcmp(name, "knl") == 0 || strcmp(name, "ksl") == 0)
     {
       if (strchr(name, 's') == NULL)  strcpy(out_name, "kl");
       else                            strcpy(out_name, "kls");
@@ -718,7 +718,7 @@ int kl_trans(char* name, char* out_name, double* val, int* flag)
   {
     strcpy(out_name, name);
     val[0] = node_value(name);
-    if (my_strcmp(name, "e1") == 0 || my_strcmp(name, "e2") == 0)
+    if (strcmp(name, "e1") == 0 || strcmp(name, "e2") == 0)
       val[0] = command_par_value(name, current_node->p_elem->def);
     else val[0] = node_value(name);
     if (val[0] != zero)  return 1;
@@ -744,7 +744,7 @@ int version_header (char* line)            /* processes and checks header */
   if(get_token_list(line, token_list, 10) != 4) return 0;
   for (j = 0; j < 3; j++)
   {
-    if (my_strcmp(header[j], stolower(token_list[j])) != 0) return 0;
+    if (strcmp(header[j], stolower(token_list[j])) != 0) return 0;
   }
   return 1;
 }
