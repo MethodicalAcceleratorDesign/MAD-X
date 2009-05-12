@@ -34,6 +34,7 @@ inline int my_strcmp(const char * s1, const char * s2){
 #define madx                  madx_
 #define madx_init             madx_init_
 #define madx_start            madx_start_
+#define el_par_vector         el_par_vector_
 #define f_ctof                f_ctof_
 #define get_disp0             get_disp0_
 #define get_node_vector       get_node_vector_
@@ -183,6 +184,7 @@ inline int my_strcmp(const char * s1, const char * s2){
 #define madx                  MADX
 #define madx_init             MADX_INIT
 #define madx_start            MADX_START
+#define el_par_vector         EL_PAR_VECTOR
 #define f_ctof                F_CTOF
 #define get_disp0             GET_DISP0
 #define get_node_vector       GET_NODE_VECTOR
@@ -387,6 +389,7 @@ void   type_ofCall double_to_table(char*, char*, double*);
 void   type_ofCall double_to_table_row(char*, char*, int*, double*); /* ETDA 11 nov 2004 */
 int    type_ofCall result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
 void make_map_table(int*); /* KZ 28.06.2005 table for maps */
+int el_par_vector(int*, double*);
 void element_name(char*, int*);
 void node_name(char* name, int* l);
 double frndm();
@@ -1371,10 +1374,10 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.00.19";
+char myversion[] = "MAD-X 4.00.20";
 /* char version_type[] = "DEBUG Version - use at own risk!"; */
 char version_type[] = "       Production Version       ";
-char code_mod_date[] = "Code Modification Date: 04.05.2009";
+char code_mod_date[] = "Code Modification Date: 12.05.2009";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

@@ -441,8 +441,7 @@ subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      endif
      if (err.lt.cotol) then
         save_opt=get_option('keeporbit ')
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,&
-             &0)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,0)
         opt_fun0(9 )=orbit0(1)
         opt_fun0(10)=orbit0(2)
         opt_fun0(11)=orbit0(3)
@@ -474,7 +473,6 @@ subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   print *, 'Singular matrix occurred during closed orbit search.'
   eflag = 1
 999 end subroutine tmclor
-
 
 subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      &thr_on)
@@ -1023,6 +1021,7 @@ subroutine twcpgo(rt)
   include 'twiss0.fi'
   include 'twissl.fi'
   include 'twissc.fi'
+  include 'twiss_elp.fi'
   include 'twissotm.fi'
   logical fmap,cplxy,cplxt,dorad,sector_sel,mycentre_cptk
   integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
@@ -1031,6 +1030,7 @@ subroutine twcpgo(rt)
        &te(6,6,6),el,orbit(6),betas,gammas,                 &
        &al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
        &one,two
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0)
   character*130 msg
   !---- Initialization
@@ -1098,12 +1098,13 @@ subroutine twcpgo(rt)
 10 continue
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
-  el = node_value('l ')
   bvk = node_value('other_bv ')
-  opt_fun(70) = node_value('kmax ')
-  opt_fun(71) = node_value('kmin ')
-  opt_fun(72) = node_value('calib ')
-  opt_fun(73) = node_value('polarity ')
+  elpar_vl = el_par_vector(g_polarity, g_elpar)
+  el = g_elpar(g_el)
+  opt_fun(70) = g_elpar(g_kmax)
+  opt_fun(71) = g_elpar(g_kmin)
+  opt_fun(72) = g_elpar(g_calib)
+  opt_fun(73) = g_elpar(g_polarity)
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
      call tmali1(orbit,al_errors,betas,gammas,orbit,re)
@@ -2139,6 +2140,7 @@ subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   include 'twissl.fi'
   include 'twtrr.fi'
+  include 'twiss_elp.fi'
   logical ftrk,fmap,cplxy,dorad
   integer nd,n_ferr,node_fd_errors,code
   double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
@@ -2147,6 +2149,7 @@ subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
        &st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
        &el0,orbit0(6),zero,one,two,three
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
@@ -2164,31 +2167,33 @@ subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
   if (fmap) then
      call dzero(f_errors,maxferr+1)
      n_ferr = node_fd_errors(f_errors)
+  !-- get element parameters
+     elpar_vl = el_par_vector(b_k3s, g_elpar)
      bvk = node_value('other_bv ')
      arad = get_value('probe ','arad ')
      deltap = get_value('probe ','deltap ')
      gamma = get_value('probe ','gamma ')
      dorad = get_value('probe ','radiate ') .ne. zero
-     an = bvk * node_value('angle ') * el/node_value('l ')
-     tilt = node_value('tilt ')
-     e1 = node_value('e1 ')
-     e2 = node_value('e2 ')
+     an = bvk * g_elpar(b_angle) * el/g_elpar(g_el)
+     tilt = g_elpar(b_tilt)
+     e1 = g_elpar(b_e1)
+     e2 = g_elpar(b_e2)
 
      if(code.eq.2) then
-        e1 = e1 + bvk * node_value('angle ') / two
-        e2 = e2 + bvk * node_value('angle ') / two
+        e1 = e1 + bvk * g_elpar(b_angle) / two
+        e2 = e2 + bvk * g_elpar(b_angle) / two
      endif
 
      !---  bvk also applied further down
 
-     sk1 = node_value('k1 ')
-     sk2 = node_value('k2 ')
-     h1 = node_value('h1 ')
-     h2 = node_value('h2 ')
-     hgap = node_value('hgap ')
-     fint = node_value('fint ')
-     fintx = node_value('fintx ')
-     sks = node_value('k1s ')
+     sk1 = g_elpar(b_k1)
+     sk2 = g_elpar(b_k2)
+     h1 = g_elpar(b_h1)
+     h2 = g_elpar(b_h2)
+     hgap = g_elpar(b_hgap)
+     fint = g_elpar(b_fint)
+     fintx = g_elpar(b_fintx)
+     sks = g_elpar(b_k1s)
      h = an / el
 
      !---- Apply field errors and change coefficients using DELTAP.
@@ -3164,6 +3169,7 @@ subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   include 'twissl.fi'
   include 'twtrr.fi'
+  include 'twiss_elp.fi'
   logical fsec,ftrk,fmap,cplxy,dorad
   integer i,j,n_ferr,node_fd_errors
   double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
@@ -3171,6 +3177,7 @@ subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
        &octr,octi,posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,    &
        &field(2,0:3),el0,orbit0(6),zero,one,two,three,four,six
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
 
   !---- Initialize.
@@ -3180,6 +3187,8 @@ subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   call dzero(f_errors,maxferr+1)
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
+  !-- get element parameters
+  elpar_vl = el_par_vector(o_k3s, g_elpar)
   !---- Set up half octupole strength.
   if (ftrk) then
      !---- Field error.
@@ -3193,8 +3202,8 @@ subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
      gamma = get_value('probe ','gamma ')
      deltap = get_value('probe ','deltap ')
      dorad = get_value('probe ','radiate ') .ne. zero
-     sk3 = bvk * node_value('k3 ')
-     sk3s = bvk * node_value('k3s ')
+     sk3 = bvk * g_elpar(o_k3)
+     sk3s = bvk * g_elpar(o_k3s)
      sk3 = sk3 + bvk * field(1,3)/el
      sk3s = sk3s + bvk * field(2,3)/el
      tilt4 = -4*node_value('tilt ')
@@ -3648,6 +3657,7 @@ subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   include 'twissl.fi'
   include 'twtrr.fi'
+  include 'twiss_elp.fi'
   logical fsec,ftrk,fmap,cplxy,dorad
   integer i,j,n_ferr,node_fd_errors
   double precision ct, st, tmp
@@ -3655,6 +3665,7 @@ subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
        &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
        &bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
@@ -3672,12 +3683,14 @@ subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
      enddo
   enddo
   if (n_ferr .gt. 0) call dcopy(f_errors, field, min(4,n_ferr))
+  !-- element paramters
+  elpar_vl = el_par_vector(q_k1s, g_elpar)
   bvk = node_value('other_bv ')
-  sk1 = bvk * node_value('k1 ')
-  sk1s = bvk * node_value('k1s ')
+  sk1 = bvk * g_elpar(q_k1)
+  sk1s = bvk * g_elpar(q_k1s)
   sk1 = sk1 + bvk * field(1,1)/el
   sk1s = sk1s + bvk * field(2,1)/el
-  tilt = node_value('tilt ')
+  tilt = g_elpar(q_tilt)
   if(sk1s.ne.zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
      sk1 = sqrt(sk1**2 + sk1s**2)
@@ -3869,12 +3882,14 @@ subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   include 'twissl.fi'
+  include 'twiss_elp.fi'
   logical fsec,ftrk,fmap,cplxy
   double precision ct, st, tmp
   double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
        &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
        &get_value,zero,one,two,ten3m
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
 
   !---- Initialize.
@@ -3887,11 +3902,13 @@ subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   fmap = el .ne. zero
   if (.not. fmap) return
-  !---- Strength and tilt.
   if (ftrk) then
-     exfld = node_value('ex ')
-     eyfld = node_value('ey ')
-     tilt = node_value('tilt ')
+  !-- get element parameters
+  elpar_vl = el_par_vector(e_ey, g_elpar)
+  !---- Strength and tilt.
+     exfld = g_elpar(e_ex)
+     eyfld = g_elpar(e_ey)
+     tilt = g_elpar(e_tilt)
      if(eyfld.ne.zero) then
         tilt = -atan2(eyfld, exfld) + tilt
      endif
@@ -4072,6 +4089,7 @@ subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !----------------------------------------------------------------------*
   include 'twissl.fi'
   include 'twtrr.fi'
+  include 'twiss_elp.fi'
   logical fsec,ftrk,fmap,cplxy,dorad
   integer i,j,n_ferr,node_fd_errors
   double precision ct, st, tmp
@@ -4079,6 +4097,7 @@ subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
        &re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
        &bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
 
   !---- Initialize.
@@ -4096,9 +4115,11 @@ subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      enddo
   enddo
   if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+  !-- get element parameters
+  elpar_vl = el_par_vector(s_k2s, g_elpar)
   bvk = node_value('other_bv ')
-  sk2 = bvk * node_value('k2 ')
-  sk2s = bvk * node_value('k2s ')
+  sk2 = bvk * g_elpar(s_k2)
+  sk2s = bvk * g_elpar(s_k2s)
   sk2 = sk2 + bvk * field(1,2)/el
   sk2s = sk2s + bvk * field(2,2)/el
   tilt = node_value('tilt ')
@@ -4647,12 +4668,14 @@ subroutine tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   include 'twissl.fi'
+  include 'twiss_elp.fi'
   logical fsec,ftrk,fmap
   double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
        &rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
        &c1,c2,ek0(6),ten6p,clight,node_value,get_value,twopi,get_variable,&
        &zero,one,two,half,ten3m,bvk
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer elpar_vl, el_par_vector
   parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
        &ten3m=1d-3)
 
@@ -4662,13 +4685,15 @@ subroutine tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   call dzero(tw,216)
   clight=get_variable('clight ')
   twopi=get_variable('twopi ')
+  !-- get element parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
 
   !---- BV flag
   bvk = node_value('other_bv ')
   !---- Fetch data.
-  rfv = bvk*node_value('volt ')
-  rff = node_value('freq ')
-  rfl = node_value('lag ')
+  rfv = bvk*g_elpar(r_volt)
+  rff = g_elpar(r_freq)
+  rfl = g_elpar(r_lag)
   deltap = get_value('probe ','deltap ')
   pc = get_value('probe ','pc ')
   !---- Cavity is excited, use full map.

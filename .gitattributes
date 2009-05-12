@@ -155,6 +155,8 @@ testing/mad_install -text
 /tunes.fi -text
 /twiss.f90 -text
 /twiss0.fi -text
+/twiss_elp.fi -text
+/twiss_map.fi -text
 /twissa.fi -text
 /twissc.fi -text
 /twissl.fi -text

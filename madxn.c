@@ -3893,7 +3893,8 @@ void pro_twiss()
   char *sector_table_name = "dummy"; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k = 1, ks, w_file, beta_def;
+  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 0, k = 1, k_sect, 
+      w_file, beta_def;
   int chrom_flg;
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
@@ -3953,17 +3954,19 @@ void pro_twiss()
   {
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
+    k_save = 1;
   }
   else if((pos = name_list_pos("save", nl)) > -1 &&
           nl->inform[pos]) /* save name specified */
   {
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
+    k_save = 1;
   }
   else table_name = "twiss";
-  if ((ks = get_value(current_command->name,"sectormap")) != 0)
+  if ((k_sect = get_value(current_command->name,"sectormap")) != 0)
   {
-    set_option("twiss_sector", &k);
+    set_option("twiss_sector", &k_sect);
     /* sector_table - start */
     pos = name_list_pos("sectortable",nl);
     if (nl->inform[pos]) {
@@ -4078,7 +4081,7 @@ void pro_twiss()
   set_option("twiss_inval", &beta_def);
   set_option("twiss_summ", &k);
   set_option("twiss_chrom", &chrom_flg);
-  set_option("twiss_save", &k);
+  set_option("twiss_save", &k_save);
   set_twiss_deltas(current_twiss);
   adjust_beam();
   probe_beam = clone_command(current_beam);
@@ -4136,12 +4139,15 @@ void pro_twiss()
       pos = name_list_pos("q2", summ_table->columns);
       q2_val_p = summ_table->d_cols[pos][i];
     }
-    twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                             twiss_table_types, current_sequ->n_nodes);
-    twiss_table->dynamic = 1; /* flag for table row access to current row */
-    add_to_table_list(twiss_table, table_register);
-    current_sequ->tw_table = twiss_table;
-    twiss_table->org_sequ = current_sequ;
+    if (k_save)
+    {
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                               twiss_table_types, current_sequ->n_nodes);
+      twiss_table->dynamic = 1; /* flag for table row access to current row */
+      add_to_table_list(twiss_table, table_register);
+      current_sequ->tw_table = twiss_table;
+      twiss_table->org_sequ = current_sequ;
+    }
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;
@@ -4165,9 +4171,9 @@ void pro_twiss()
       }
       if (get_option("keeporbit"))  copy_double(orbit0,
                                                 current_sequ->orbits->vectors[k_orb]->a, 6);
-      fill_twiss_header(twiss_table);
+      if (k_save) fill_twiss_header(twiss_table);
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-      if (w_file) out_table(table_name, twiss_table, filename);
+      if (k_save && w_file) out_table(table_name, twiss_table, filename);
     }
     else
     {
