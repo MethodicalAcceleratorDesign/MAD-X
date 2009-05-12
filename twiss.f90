@@ -3886,7 +3886,7 @@ subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   logical fsec,ftrk,fmap,cplxy
   double precision ct, st, tmp
   double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
-       &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
+       &deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld, &
        &get_value,zero,one,two,ten3m
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   integer elpar_vl, el_par_vector
