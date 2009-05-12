@@ -2711,7 +2711,7 @@ int name_list_pos(char *p, struct name_list* vlist){
 	  if (num>0) { 
 	    low = mid+1;
 	  } else {
-	    // num == 0
+	    /* num == 0 */
 	    return vlist->index[mid];
 	  }
 	}
