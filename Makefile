@@ -5,9 +5,9 @@
 #######################################################################
 
 CC=gcc
-f95=f95
+f95=lf95
 ARCH=32
-DEBUG=YES
+DEBUG=NO
 ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
