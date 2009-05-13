@@ -1020,28 +1020,6 @@ double el_par_value(char* par, struct element* el)
   return val;
 }
 
-int el_par_vector(int* total, double* vect)
-/* returns a complete vector of element parameters for current node */
-/* the integer return value is the length */
-{
-  struct command* elc = current_node->p_elem->def;
-  struct command_parameter_list* parl = elc->par;
-  struct command_parameter* cp;
-  int i, len = 0;
-  double val;
-  for (i = 0; i < *total; i++)
-    {
-     cp = parl->parameters[i];
-     if (cp->type < 3)
-       {
-        if (cp->expr == NULL)  val = cp->double_value;
-        else val = expression_value(cp->expr, 2);
-        vect[len++] = val;
-       }
-    }
-  return len;
-}
-
 void enter_element(struct in_cmd* cmd)
   /* enters an element in the list (and the sequence if applicable) */
 {
@@ -3130,7 +3108,7 @@ void madx_finish()
     }
     if (get_option("trace")) time_stamp("end");
     printf("\n  +++++++++++++++++++++++++++++++++++\n");
-    printf("  + %s Finished normally +\n", myversion);
+    printf("  + %s finished normally +\n", myversion);
     printf("  +++++++++++++++++++++++++++++++++++\n");
   }
 }
