@@ -563,7 +563,7 @@ CONTAINS
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
              call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k01 ',key%list%b0)
+             call double_to_table('errors_dipole ', 'k0l ',key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
@@ -618,7 +618,7 @@ CONTAINS
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
              call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k01 ',key%list%b0)
+             call double_to_table('errors_dipole ', 'k0l ',key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
