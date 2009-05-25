@@ -1127,6 +1127,7 @@ contains
     REAL(DP) B_SOL,r(3),d(3)
     integer f0
 
+    f0=0
     READ(MF,*) LINE
     READ(MF,*) M%KIND,M%NAME,M%VORNAME
     CALL CONTEXT(M%NAME);
@@ -1425,7 +1426,7 @@ contains
     character*200 line
     character*5 ch
 
-    READ(mf,'(a120)') LINE(1:120)
+    READ(mf,'(a120)') LINE
 
     CALL CONTEXT(LINE)
 
