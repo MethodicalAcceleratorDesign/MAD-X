@@ -76,8 +76,8 @@ class updateTokensThread(threading.Thread):
             except:
                 notify('jean-luc','Automatic message (PROBLEM)',\
                        'failed to refresh tokens!')
-            # for sec in range(1,21600+1): # sleep 6 hours
-            for sec in range(1,7200+1): # sleep 2 hours               
+            for sec in range(1,21600+1): # sleep 6 hours
+            #for sec in range(1,7200+1): # sleep 2 hours               
                 time.sleep(1) # 1 sec
                 if self.killed == True:
                     return
