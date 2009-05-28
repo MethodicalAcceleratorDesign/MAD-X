@@ -90,6 +90,15 @@ os.chdir(sys.path[0]) # change to Python script's directory
 # ???
 currentDir= os.getcwd()
 
+# temporary: for the Intel compiler, lines split after the 80th character
+# unless we set up a specific environment variable to set the line length
+# note that this variable will be transmitted to the child processes
+# launched through os.sytem() calls.
+# all 'madx < input > output' calls where madx is compiled with the ifort
+# Intel compiler will take FORT_FMT_RECL into account.
+os.putenv('FORT_FMT_RECL','256') # lines split after 256 chars instead of
+# the default 80
+
 reportFile = open(rootDir+"/MadBuildAndTest_Report.txt","w")
 now = time.ctime()
 reportFile.write("MadBuildAndTest.py report from "+now+"\n")
