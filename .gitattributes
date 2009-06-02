@@ -67,6 +67,7 @@
 /m_real_polymorph.f90 -text
 /mad_recl.fi -text
 /madx.h -text
+/madx_main.F90 -text
 /madx_main.f90 -text
 /madx_ptc_distrib.f90 -text
 /madx_ptc_distrib.inc -text
