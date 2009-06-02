@@ -98,6 +98,7 @@ LDOPT=-static $(M32)
 # Compiler special treatment
 #######################################################################
 
+
 ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
     f95_FLAGS= --o2 --tp -c -Wa,--32
@@ -115,6 +116,11 @@ ifeq ($(f95),f95)
     LDOPT= -Bstatic
   endif
 endif
+
+ifeq ($(f95),ifort)
+    f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
+endif
+
 
 ifeq ($(f95),g95)
   ifeq ($(ARCH),32)
@@ -344,7 +350,7 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 run_madx.o: madx_ptc_module.o run_madx.f90
-madx_main.o: run_madx.o madx_main.f90
+madx_main.o: run_madx.o madx_main.F90
 
 # implicit rule to compile with C
 %.o : %.c

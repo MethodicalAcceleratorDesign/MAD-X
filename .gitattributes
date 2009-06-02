@@ -65,6 +65,7 @@
 /librpnlib.a -text svneol=unset#unset
 /libz.a -text svneol=unset#unset
 /m_real_polymorph.f90 -text
+/mad_recl.fi -text
 /madx.h -text
 /madx_main.f90 -text
 /madx_ptc_distrib.f90 -text
