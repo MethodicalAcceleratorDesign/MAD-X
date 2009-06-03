@@ -3106,7 +3106,7 @@ int log_val(char* name, struct command* cmd)
 }
 
 void madx_finish()
-  /* write the termination message */
+  /* write the termination message, pass madx.ps through ps2ps */
 {
   int nwarnings = warn_numb+warn_numbf;
   /* should work with Lahey on windows 24.03.2004 */
@@ -3121,6 +3121,12 @@ void madx_finish()
     if (plots_made)
     {
       gxterm_();
+      if(system("which ps2ps > tmp_plot.ps") == 0)
+	{
+         system("cp madx.ps tmp_plot.ps");
+         system("ps2ps tmp_plot.ps madx.ps");
+	}
+      system("rm tmp_plot.ps");
     }
 #endif
     printf("\n  Number of warnings: %d\n",nwarnings);
