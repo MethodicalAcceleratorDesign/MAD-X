@@ -23,6 +23,8 @@
 #define embedded_plot         embedded_plot_
 /* end additions */
 
+#define copy_twiss_data       copy_twiss_data_
+#define current_node_name     current_node_name_
 #define element_name          element_name_
 #define node_name             node_name_
 #define frndm                 frndm_
@@ -36,6 +38,7 @@
 #define get_option            get_option_
 #define get_string            get_string_
 #define get_title             get_title_
+#define get_twiss_data        get_twiss_data_
 #define get_variable          get_variable_
 #define get_varstring         get_varstring_
 #define get_vector            get_vector_
@@ -47,6 +50,7 @@
 #define intrac                intrac_
 #define mtcond                mtcond_
 #define next_constraint       next_constraint_
+#define next_constr_namepos   next_constr_namepos_
 #define next_global           next_global_
 #define getnumberoftracks     getnumberoftracks_
 #define next_start            next_start_
@@ -158,6 +162,8 @@
 #define augmentcountmomtabs   AUGMENTCOUNTMOMTABS
 #define char_from_table       CHAR_FROM_TABLE  /* OB 2.4.2002 */
 #define comment_to_table      COMMENT_TO_TABLE
+#define copy_twiss_data       COPY_TWISS_DATA
+#define current_node_name     CURRENT_NODE_NAME
 #define comm_para             COMM_PARA
 #define double_from_table     DOUBLE_FROM_TABLE
 #define string_from_table     STRING_FROM_TABLE  /* ETDA 8 nov 2004 */
@@ -186,6 +192,7 @@
 #define get_option            GET_OPTION
 #define get_string            GET_STRING
 #define get_title             GET_TITLE
+#define get_twiss_data        GET_TWISS_DATA
 #define get_variable          GET_VARIABLE
 #define get_varstring         GET_VARSTRING
 #define get_vector            GET_VECTOR
@@ -197,6 +204,7 @@
 #define intrac                INTRAC
 #define mtcond                MTCOND
 #define next_constraint       NEXT_CONSTRAINT
+#define next_constr_namepos   NEXT_CONSTR_NAMEPOS
 #define next_global           NEXT_GLOBAL
 #define getnumberoftracks     GETNUMBEROFTRACKS
 #define next_start            NEXT_START
@@ -384,6 +392,8 @@ void   type_ofCall double_to_table(char*, char*, double*);
 void   type_ofCall double_to_table_row(char*, char*, int*, double*); /* ETDA 11 nov 2004 */
 int    type_ofCall result_from_normal(char*, int*, double*); /* ETDA 11 nov 2004 */
 void make_map_table(int*); /* KZ 28.06.2005 table for maps */
+void copy_twiss_data(double*);
+void current_node_name(char*, int*);
 int el_par_vector(int*, double*);
 void element_name(char*, int*);
 void node_name(char* name, int* l);
@@ -394,6 +404,7 @@ void get_disp0(double*);
 void get_node_vector(char*, int*, double*);
 int get_option(char*);
 int get_string(char*, char*, char*);
+void get_twiss_data(double*);
 void get_title(char*, int*);
 double get_value(char*, char*);
 double get_beam_value(char*, char*);
@@ -405,6 +416,7 @@ double grndm();
 void headvalue(char*, char*, double*);
 int intrac();
 int next_constraint(char*, int*, int*, double*, double*, double*, double*);
+int next_constr_namepos(char*);
 int next_global(char*, int*, int*, double*, double*, double*, double*);
 int next_start(double*,double*,double*,double*,double*,double*,double*,
                double*,double*,double*,double*,double*);
@@ -1369,10 +1381,10 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.00.21";
-/* char version_type[] = "DEBUG Version - use at own risk!"; */
-char version_type[] = "       Production Version       ";
-char code_mod_date[] = "Code Modification Date: 13.05.2009";
+char myversion[] = "MAD-X 4.00.22";
+char version_type[] = "DEBUG Version - use at own risk!";
+/*   char version_type[] = "       Production Version       "; */
+char code_mod_date[] = "Code Modification Date: 02.06.2009";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

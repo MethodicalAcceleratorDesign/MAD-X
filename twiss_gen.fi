@@ -1,0 +1,7 @@
+!---------beam constants--------------------
+
+      common / twiss_beam / t_beta, t_gamma, t_arad, t_charge, t_npart, &
+     &                    t_deltap, t_radiate, t_dtbyds
+
+      double precision    t_beta, t_gamma, t_arad, t_charge, t_npart,   &
+     &                    t_deltap, t_radiate, t_dtbyds

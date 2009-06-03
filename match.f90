@@ -109,28 +109,44 @@
       implicit none
 
 
-      logical fprt,local,psum
+      logical fprt,local,psum, slow_match
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
      &char_from_table,name_l
       parameter(name_l=24)
       double precision fsum,fvect(*),val,value,c_min,c_max,weight,f_val
       include 'name_len.fi'
+      include 'twiss0.fi'
+      include 'twissc.fi'
       character*(name_len) name,node_name
+      integer n_pos, next_constr_namepos
 
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
       psum=get_option('match_summary ') .ne. 0
+      slow_match = get_option('slow_match ') .ne. 0
       call table_range('twiss ','#s/#e ',range)
       if(local) then
         j=restart_sequ()
         do pos=range(1),range(2)
           j=advance_to_pos('twiss ',pos)
+          if (.not. slow_match) call get_twiss_data(opt_fun)
  20       continue
           i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
           if(i.ne.0)  then
-            flag=char_from_table('twiss ','name ',pos,node_name)
-            flag=double_from_table('twiss ',name,pos,val)
+             n_pos = next_constr_namepos(name)
+             if (n_pos .eq. 0)  then
+               print *, ' +-+-+- fatal error'
+               print *, 'match - collect: illegal name = ', name
+               stop
+             endif
+             if (slow_match) then
+               flag=char_from_table('twiss ','name ',pos,node_name)
+               flag=double_from_table('twiss ',name,pos,val)
+             else
+               val = opt_fun(n_pos)
+               call current_node_name(node_name, name_l);
+            endif
             if (type.eq.1) then
               f_val =weight*dim(c_min,val)
               if(fprt) write(*,880) name,weight,val,c_min,f_val**2

@@ -15,6 +15,7 @@ void match_action(struct in_cmd* cmd)
 {
   int i;
   int iseed, iprint;
+  int izero = 0;
 
   if (match_is_on == kMatch_PTCknobs)
   {
@@ -27,6 +28,7 @@ void match_action(struct in_cmd* cmd)
   {
     warning("no vary command seen,","match command terminated");
     match_is_on = 0;
+    set_option("match_is_on", &izero);
     return;
   }
   total_vars = stored_match_var->curr;
@@ -317,6 +319,7 @@ void match_end(struct in_cmd* cmd)
 {
   int i;
   struct node* c_node;
+  int izero = 0;
 
   if (match_is_on==kMatch_UseMacro) {
     match2_end(cmd);
@@ -401,6 +404,7 @@ void match_end(struct in_cmd* cmd)
   }
   vary_cnt = 0;
   match_is_on = 0;
+  set_option("match_is_on", &izero);
   match_sequs->curr = 0;
   current_call_lim = 0;
   current_calls = 0;
@@ -484,10 +488,9 @@ void match_match(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   struct sequence* sequ;
-  int i, j, pos, n, tpos, chrom_flg;
-  int izero = 0;
+  int i, j, pos, n, spos, tpos, chrom_flg;
+  int izero = 0, ione = 1, slow;
   /* RDM 19/12/2005*/
-  int ione = 1;
   char *dpp;
   /* RDM 19/12/2005*/
 
@@ -496,6 +499,7 @@ void match_match(struct in_cmd* cmd)
     warning("already inside match:", "ignored");
     return;
   }
+  set_option("match_is_on", &ione);
   keep_tw_print = get_option("twiss_print");
   set_option("twiss_print", &izero);
 
@@ -553,6 +557,14 @@ void match_match(struct in_cmd* cmd)
   if(nl->inform[pos]) i = pl->parameters[pos]->double_value;
   else i = 0;
   set_option("varylength", &i);
+
+  /* START SLOW-CHECK; HG 30.5.2009 */
+  pos = name_list_pos("slow", nl);
+  if(nl->inform[pos]) slow = pl->parameters[pos]->double_value;
+  else slow = 0;
+  set_option("slow_match", &slow);
+  /* END SLOW-CHECK; HG 30.5.2009 */
+
   /* START CHK-SEQ; OB 1.2.2002 */
   current_match = cmd->clone;
   pos = name_list_pos("sequence", nl);
@@ -579,6 +591,12 @@ void match_match(struct in_cmd* cmd)
         tpos = name_list_pos("sequence", tnl);
         local_twiss[i]->cmd_def->par->parameters[tpos]->string = match_seqs[i];
         local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+        if (slow)
+	  {
+           tpos = name_list_pos("save", tnl);
+           local_twiss[i]->cmd_def->par->parameters[tpos]->string = NULL;
+           local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
+	  }
         /* END defining a TWISS input command for each sequence */
       }
       else
@@ -600,7 +618,13 @@ void match_match(struct in_cmd* cmd)
     tpos = name_list_pos("sequence", tnl);
     local_twiss[0]->cmd_def->par->parameters[tpos]->string = current_sequ->name;
     local_twiss[0]->cmd_def->par_names->inform[tpos] = 1;
-    /* END defining a TWISS input command for default sequence */
+    if (slow)
+      {
+       tpos = name_list_pos("save", tnl);
+       local_twiss[0]->cmd_def->par->parameters[tpos]->string = NULL;
+       local_twiss[0]->cmd_def->par_names->inform[tpos] = 1;
+      }
+     /* END defining a TWISS input command for default sequence */
   }
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
@@ -615,7 +639,10 @@ void match_match(struct in_cmd* cmd)
     {
       tnl = local_twiss[i]->cmd_def->par_names;
       tpos = name_list_pos("sequence", tnl);
-      if (j != tpos) local_twiss[i]->cmd_def->par_names->inform[j] = 0;
+      if (slow) spos = name_list_pos("save", tnl);
+      else      spos = -1;
+      if (j != tpos  && j != spos) 
+      local_twiss[i]->cmd_def->par_names->inform[j] = 0;
     }
   }
 

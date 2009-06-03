@@ -239,7 +239,6 @@ void add_to_macro_list( /* adds macro to alphabetic macro list */
   /* RDM new matching*/
 }
 
-
 int add_to_name_list(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
@@ -430,6 +429,14 @@ int count_nodes(struct sequence* sequ)
     count++;
   }
   return count;
+}
+
+void current_node_name(char* name, int* lg)
+/* returns node_name blank padded up to lg */
+{
+  int i;
+  strncpy(name, current_node->name, *lg);
+  for (i = strlen(current_node->name); i < *lg; i++)  name[i] = ' ';
 }
 
 void set_vars_from_table(struct table* t)
@@ -755,6 +762,16 @@ void copy_double(double* source, double* target, int n)
 {
   int j;
   for (j = 0; j < n; j++)  target[j] = source[j];
+}
+
+void copy_twiss_data(double* twiss_data)
+{
+  copy_double(twiss_data, current_node->match_data, 32);
+}
+
+void get_twiss_data(double* twiss_data)
+{
+  copy_double(current_node->match_data, twiss_data, 32);
 }
 
 void copy_name_list(struct name_list* out, struct name_list* in)
@@ -2691,31 +2708,15 @@ void myrepl(char* in, char* out, char* string_in, char* string_out)
   strcpy(string_out, string_in);
 }
 
-int name_list_pos(char *p, struct name_list* vlist){
-  int num, mid, low = 0, high = vlist->curr-1;
-
-  while (low <= high) {
+int name_list_pos(char* p, struct name_list* vlist)
+{
+  int num, mid, low = 0, high = vlist->curr - 1;
+  while (low <= high)
+  {
     mid = (low + high) / 2;
-    /* optimization: compare first character before invoking strcmp */
-    if ( (*p) < (*(vlist->names[vlist->index[mid]])) ) { 
-      high = mid-1;
-    } else { 
-      /* optimization: compare first character before invoking strcmp */
-      if ( (*p) > (*(vlist->names[vlist->index[mid]])) ) { 
-	low = mid+1;
-      } else {
-	if ((num=strcmp(p,vlist->names[vlist->index[mid]]))<0) {
-	  high = mid-1;
-	} else { 
-	  if (num>0) { 
-	    low = mid+1;
-	  } else {
-	    /* num == 0 */
-	    return vlist->index[mid];
-	  }
-	}
-      }
-    }
+    if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
+    else if ( num > 0) low  = mid + 1;
+    else               return vlist->index[mid];
   }
   return -1;
 }
