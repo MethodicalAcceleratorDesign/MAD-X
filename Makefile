@@ -5,17 +5,17 @@
 #######################################################################
 
 CC=gcc
-f95=lf95
-ARCH=32
+f95=ifort
+ARCH=64
 DEBUG=NO
 ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=YES
+SLC4=NO
 SLC5=NO
 FC8=NO
-FC10=NO
+FC10=YES
 NTPSA=YES
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
@@ -156,9 +156,9 @@ ifeq ($(DEBUG),YES)
     GCCP_FLAGS+= -Wall -pedantic
   endif
 else
-  GCCP_FLAGS+= -O4
+  GCCP_FLAGS+= -O3
   ifneq ($(f95),lf95)
-    f95_FLAGS+= -O4
+    f95_FLAGS+= -O3
   endif
 endif
 
