@@ -5,17 +5,17 @@
 #######################################################################
 
 CC=gcc
-f95=ifort
-ARCH=64
+f95=lf95
+ARCH=32
 DEBUG=NO
 ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=NO
+SLC4=YES
 SLC5=NO
 FC8=NO
-FC10=YES
+FC10=NO
 NTPSA=YES
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
