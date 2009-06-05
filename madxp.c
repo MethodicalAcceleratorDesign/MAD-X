@@ -1031,12 +1031,16 @@ int el_par_vector(int* total, double* vect)
   double val;
   for (i = 0; i < *total; i++)
     {
-     cp = parl->parameters[i];
-     if (cp->type < 3)
+     if (i < elc->par->curr)
        {
-        if (cp->expr == NULL)  val = cp->double_value;
-        else val = expression_value(cp->expr, 2);
-        vect[len++] = val;
+        cp = parl->parameters[i];
+        if (cp->type < 3)
+         {
+          if (cp->expr == NULL)  val = cp->double_value;
+          else val = expression_value(cp->expr, 2);
+          vect[len++] = val;
+	 }
+        else val = 0;
        }
     }
   return len;
@@ -3095,7 +3099,7 @@ int logic_expr(int nit, char* toks[])
 }
 
 int log_val(char* name, struct command* cmd)
-  /* returns 0 = flase, 1 = true for a logical command parameter */
+  /* returns 0 = false, 1 = true for a logical command parameter */
 {
   struct name_list* nl = cmd->par_names;
   struct command_parameter_list* pl = cmd->par;

@@ -1206,13 +1206,6 @@ void exec_plot(struct in_cmd* cmd)
   {
     embedded_twiss_cmd = cmd;
 
-    /* <JMJ 7/11/2002> The following ifndef exclusion is a quick fix so that
-       the WIN32 version
-       does not try to do X11 graphics. However this has the consequence that
-       the program will not make Postscript files.  HG needs to separate these things.
-       </JMJ 7/11/2002> */
-    /*FS 27.03.2004 works now on Windows using gxx11ps.F and gxx11psc.c courtesy HG */
-
     if (nt && current_sequ != NULL) title = current_sequ->name;
     pesopt_(&ierr);
     if (ierr == 0)
@@ -3949,7 +3942,7 @@ void pro_twiss()
   char *sector_table_name = "dummy"; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 0, k = 1, k_sect, 
+  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
       w_file, beta_def;
   int chrom_flg;
   int keep_info = get_option("info");
@@ -3981,6 +3974,9 @@ void pro_twiss()
   nl = current_twiss->par_names;
   pl = current_twiss->par;
 
+  if (match_is_on)  k_save = 0;  /* match gets its own variable transfer -
+				    this can be overridden with option "slow"
+                                    on match command */
 
   /*
     start command decoding
@@ -4010,14 +4006,13 @@ void pro_twiss()
   {
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
-    k_save = 1;
   }
   else if((pos = name_list_pos("save", nl)) > -1 &&
           nl->inform[pos]) /* save name specified */
   {
+    k_save = 1;
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
-    k_save = 1;
   }
   else table_name = "twiss";
   if ((k_sect = get_value(current_command->name,"sectormap")) != 0)
@@ -4119,6 +4114,7 @@ void pro_twiss()
   }
   pos = name_list_pos("chrom", nl);
   chrom_flg = command_par_value("chrom", current_twiss);
+  if((pos = name_list_pos("notable", nl)) > -1 &&nl->inform[pos]) k_save = 0;
   /*
     end of command decoding
   */
