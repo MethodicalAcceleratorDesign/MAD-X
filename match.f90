@@ -119,34 +119,22 @@
       include 'twiss0.fi'
       include 'twissc.fi'
       character*(name_len) name,node_name
-      integer n_pos, next_constr_namepos
+      integer n_pos, next_constr_namepos, advance_node
 
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
       psum=get_option('match_summary ') .ne. 0
       slow_match = get_option('slow_match ') .ne. 0
-      call table_range('twiss ','#s/#e ',range)
-      if(local) then
+      if(local .and. slow_match) then
+        call table_range('twiss ','#s/#e ',range)
         j=restart_sequ()
         do pos=range(1),range(2)
           j=advance_to_pos('twiss ',pos)
-          if (.not. slow_match) call get_twiss_data(opt_fun)
  20       continue
           i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
           if(i.ne.0)  then
-             n_pos = next_constr_namepos(name)
-             if (n_pos .eq. 0)  then
-               print *, ' +-+-+- fatal error'
-               print *, 'match - collect: illegal name = ', name
-               stop
-             endif
-             if (slow_match) then
-               flag=char_from_table('twiss ','name ',pos,node_name)
-               flag=double_from_table('twiss ',name,pos,val)
-             else
-               val = opt_fun(n_pos)
-               call current_node_name(node_name, name_l);
-            endif
+             flag=char_from_table('twiss ','name ',pos,node_name)
+             flag=double_from_table('twiss ',name,pos,val)
             if (type.eq.1) then
               f_val =weight*dim(c_min,val)
               if(fprt) write(*,880) name,weight,val,c_min,f_val**2
@@ -174,6 +162,48 @@
             goto 20
           endif
         enddo
+      else if(local) then
+        j=restart_sequ()
+ 21     continue
+        call get_twiss_data(opt_fun)
+ 22     continue
+        i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
+        if(i.ne.0)  then
+          n_pos = next_constr_namepos(name)
+          if (n_pos .eq. 0)  then
+            print *, ' +-+-+- fatal error'
+            print *, 'match - collect: illegal name = ', name
+            stop
+          endif
+          val = opt_fun(n_pos)
+          call current_node_name(node_name, name_l);
+          if (type.eq.1) then
+              f_val =weight*dim(c_min,val)
+              if(fprt) write(*,880) name,weight,val,c_min,f_val**2
+          elseif(type.eq.2) then
+              f_val=weight*dim(val,c_max)
+              if(fprt) write(*,890) name,weight,val,c_max,f_val**2
+          elseif(type.eq.3) then
+              f_val=weight*dim(c_min,val)+weight*dim(val,c_max)
+              if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
+          elseif(type.eq.4) then
+              f_val=weight*(val-value)
+              if(fprt) write(*,840) name,weight,val,value,value,f_val**2
+          endif
+          ncon=ncon+1
+          fvect(ncon)=f_val
+          fsum=fsum+f_val**2
+          if(psum .and. type.eq.4)                                    &
+     &write(*,830) node_name,name,type,value,val,f_val**2
+          if(psum .and. type.eq.2)                                    &
+     &write(*,830) node_name,name,type,c_max,val,f_val**2
+          if(psum .and. type.eq.1)                                    &
+     &write(*,830) node_name,name,type,c_min,val,f_val**2
+          if(psum .and. type.eq.3)                                    &
+     &write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
+          goto 22
+        endif
+      if(advance_node() .ne. 0) goto 21
       endif
  30   continue
       i=next_global(name,name_l,type,value,c_min,c_max,weight)
