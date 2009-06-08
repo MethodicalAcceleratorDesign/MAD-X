@@ -156,9 +156,9 @@ ifeq ($(DEBUG),YES)
     GCCP_FLAGS+= -Wall -pedantic
   endif
 else
-  GCCP_FLAGS+= -O3
+  GCCP_FLAGS+= -O4
   ifneq ($(f95),lf95)
-    f95_FLAGS+= -O3
+    f95_FLAGS+= -O4
   endif
 endif
 
