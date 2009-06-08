@@ -9,7 +9,7 @@
 
 //! \brief Automatic Differentiation Test
 //! \file tpsa.cpp
-//! \version $Id: tpsa.cpp,v 1.3 2009-04-17 08:29:34 frs Exp $
+//! \version $Id: tpsa.cpp,v 1.4 2009-06-08 10:48:43 frs Exp $
 //! \author Lingyun Yang, http://www.lingyunyang.com/
 
 #include <iostream>
@@ -402,7 +402,7 @@ void ad_init(const TNVND* nvar, const TNVND* nord)
     TNVND nd = *nord;
 
  #ifdef DEBUG
-    std::cout << "Initialize nv= " << *nvar << " nd= " << *nord << std::endl;
+    std::cerr << "Initialize nv= " << *nvar << " nd= " << *nord << std::endl;
  #endif
     advecpool = NULL;
     gnv = nv; // assign to global nv
@@ -432,7 +432,8 @@ void ad_init(const TNVND* nvar, const TNVND* nord)
 }
 
 /** \brief Reset the base vectors.
- * To avoid confusions when starting a new set of TPSA calculations, do this before a new ad_init().
+ * To avoid confusions when starting a new set of TPSA calculations, call this before a new ad_init().
+ * with nv from ad_nvar(nv).
  */
 #ifdef MSVC_DLL
 _declspec(dllexport) void _stdcall ad_resetvars(const TNVND* nvar)
@@ -442,10 +443,13 @@ void ad_resetvars(const TNVND* nvar)
 {
     if (!vec) return;
     if (*nvar > gnv) {
-        std::cerr << "ERROR: Reset more base vectors than earlier initialization. "
-                  << std::endl;
+        //std::cerr << "ERROR: Reset more base vectors than earlier initialization. "
+        //          << std::endl;
+        //std::cerr << "   global nv = " << gnv << "  input= " << *nvar << std::endl;
+        for (TNVND i = 0; i < gnv; ++i) vec[i] = 0;
+    } else {
+        for (TNVND i = 0; i < *nvar; ++i) vec[i] = 0;
     }
-    for (TNVND i = 0; i < *nvar; ++i) vec[i] = 0;
     nvec = 0;
 }
 
