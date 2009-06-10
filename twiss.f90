@@ -1,5 +1,5 @@
 !     FS 15.03.2004: correcting warning printout
-subroutine twiss(rt,disp0,tab_name,sector_tab_name)
+SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -148,8 +148,8 @@ subroutine twiss(rt,disp0,tab_name,sector_tab_name)
   call set_option('twiss_success ', ione)
   goto 9999
 900 call set_option('twiss_success ', izero)
-9999 end subroutine twiss
-subroutine tmrefe(rt)
+9999 end SUBROUTINE twiss
+SUBROUTINE tmrefe(rt)
   implicit none
 
   !----------------------------------------------------------------------*
@@ -165,8 +165,8 @@ subroutine tmrefe(rt)
   call dzero(orbit0,6)
   !---- Get transfer matrix.
   call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,0)
-end subroutine tmrefe
-subroutine tmrefo(kobs,orbit0,orbit,rt)
+end SUBROUTINE tmrefe
+SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
 
 
   implicit none
@@ -192,8 +192,8 @@ subroutine tmrefo(kobs,orbit0,orbit,rt)
   call set_option('bbd_flag ', ione)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,0)
   call set_option('bbd_flag ', izero)
-end subroutine tmrefo
-subroutine twinifun(opt_fun0,rt)
+end SUBROUTINE tmrefo
+SUBROUTINE twinifun(opt_fun0,rt)
 
   implicit none
 
@@ -290,8 +290,8 @@ subroutine twinifun(opt_fun0,rt)
      enddo
   endif
 
-end subroutine twinifun
-subroutine twprep(save,case,opt_fun,position,flag)
+end SUBROUTINE twinifun
+SUBROUTINE twprep(save,case,opt_fun,position,flag)
 
   implicit none
 
@@ -345,8 +345,8 @@ subroutine twprep(save,case,opt_fun,position,flag)
         opt_fun(24)= opt24
      endif
   endif
-end subroutine twprep
-subroutine twfill(case,opt_fun,position,flag)
+end SUBROUTINE twprep
+SUBROUTINE twfill(case,opt_fun,position,flag)
 
   implicit none
 
@@ -389,8 +389,8 @@ subroutine twfill(case,opt_fun,position,flag)
      !---- Augment table twiss
      call augment_count(table_name)
   endif
-end subroutine twfill
-subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
+end SUBROUTINE twfill
+SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
 
   implicit none
@@ -508,9 +508,9 @@ subroutine tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 820 continue
   print *, 'Singular matrix occurred during closed orbit search.'
   eflag = 1
-999 end subroutine tmclor
+999 end SUBROUTINE tmclor
 
-subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
+SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      &thr_on)
   implicit none
 
@@ -724,9 +724,9 @@ subroutine tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      goto 10
   endif
   bbd_flag=0
-end subroutine tmfrst
+end SUBROUTINE tmfrst
 
-subroutine tmpart(guess,fsec,ftrk,rt,tt,eflag)
+SUBROUTINE tmpart(guess,fsec,ftrk,rt,tt,eflag)
 
 
   implicit none
@@ -772,9 +772,9 @@ subroutine tmpart(guess,fsec,ftrk,rt,tt,eflag)
      print '(''end values: '', 1p,6e14.6)', orbit
   endif
 
-end subroutine tmpart
+end SUBROUTINE tmpart
 
-subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
+SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   implicit none
 
   !----------------------------------------------------------------------*
@@ -853,8 +853,8 @@ subroutine tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   endif
   node = node -1
   error = 0
-999 end subroutine tmthrd
-subroutine twcpin(rt,disp0,r0mat,eflag)
+999 end SUBROUTINE tmthrd
+SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1001,8 +1001,8 @@ subroutine twcpin(rt,disp0,r0mat,eflag)
        &', cosmux = ',f12.6,', cosmuy = ',f12.6)
 920 format('Both modes are unstable for delta(p)/p = ',f12.6,         &
        &', cosmux = ',f12.6,', cosmuy = ',f12.6)
-end subroutine twcpin
-subroutine twdisp(rt,vect,disp)
+end SUBROUTINE twcpin
+SUBROUTINE twdisp(rt,vect,disp)
 
   implicit none
 
@@ -1042,8 +1042,8 @@ subroutine twdisp(rt,vect,disp)
      call dzero(disp,4)
   endif
 
-end subroutine twdisp
-subroutine twcpgo(rt)
+end SUBROUTINE twdisp
+SUBROUTINE twcpgo(rt)
 
 
   implicit none
@@ -1136,7 +1136,7 @@ subroutine twcpgo(rt)
   code = node_value('mad8_type ')
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
-  el = g_elpar(g_el)
+  el = node_value('l ')
   opt_fun(70) = g_elpar(g_kmax)
   opt_fun(71) = g_elpar(g_kmin)
   opt_fun(72) = g_elpar(g_calib)
@@ -1259,8 +1259,8 @@ subroutine twcpgo(rt)
        &'only to find the closed orbit, for optical calculations it ',    &
        &'ignores both.')
 
-end subroutine twcpgo
-subroutine twcptk(re,orbit)
+end SUBROUTINE twcpgo
+SUBROUTINE twcptk(re,orbit)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1398,8 +1398,8 @@ subroutine twcptk(re,orbit)
      if(rmatrix) call dcopy(rw0,rw,36)
   endif
 
-end subroutine twcptk
-subroutine twbtin(rt,tt)
+end SUBROUTINE twcptk
+SUBROUTINE twbtin(rt,tt)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -1514,8 +1514,8 @@ subroutine twbtin(rt,tt)
   opt_fun0(27)=ddisp(3)
   opt_fun0(28)=ddisp(4)
 
-end subroutine twbtin
-subroutine twchgo
+end SUBROUTINE twbtin
+SUBROUTINE twchgo
 
   implicit none
   !----------------------------------------------------------------------*
@@ -1670,8 +1670,8 @@ subroutine twchgo
        &'only to find the closed orbit, for optical calculations it ',    &
        &'ignores both.')
 
-end subroutine twchgo
-subroutine twbttk(re,te)
+end SUBROUTINE twchgo
+SUBROUTINE twbttk(re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -1862,8 +1862,8 @@ subroutine twbttk(re,te)
      synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
   endif
 
-end subroutine twbttk
-subroutine tw_summ(rt,tt)
+end SUBROUTINE twbttk
+SUBROUTINE tw_summ(rt,tt)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -2008,8 +2008,8 @@ subroutine tw_summ(rt,tt)
   call double_to_table('summ ','synch_4 ' ,synch_4)
   call double_to_table('summ ','synch_5 ' ,synch_5)
 
-end subroutine tw_summ
-subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
+end SUBROUTINE tw_summ
+SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -2155,8 +2155,8 @@ subroutine tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
   !---- End of element calculation;
 500 continue
-end subroutine tmmap
-subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmmap
+SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
 
   implicit none
@@ -2344,8 +2344,8 @@ subroutine tmbend(ftrk,orbit,fmap,el,ek,re,te)
   rhoinv = h
   blen = el
 
-end subroutine tmbend
-subroutine tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+end SUBROUTINE tmbend
+SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
 
 
   implicit none
@@ -2576,8 +2576,8 @@ subroutine tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      endif
   endif
 
-end subroutine tmsect
-subroutine tmsymm(t)
+end SUBROUTINE tmsect
+SUBROUTINE tmsymm(t)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2598,8 +2598,8 @@ subroutine tmsymm(t)
      enddo
   enddo
 
-end subroutine tmsymm
-subroutine tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
+end SUBROUTINE tmsymm
+SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2652,8 +2652,8 @@ subroutine tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
      call tmsymm(te)
   endif
 
-end subroutine tmfrng
-subroutine tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
+end SUBROUTINE tmfrng
+SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2755,8 +2755,8 @@ subroutine tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
   call dcopy(ew,ed,6)
   call dcopy(rw,rd,36)
 
-end subroutine tmcat1
-subroutine tmtilt(fsec,tilt,ek,r,t)
+end SUBROUTINE tmcat1
+SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2837,8 +2837,8 @@ subroutine tmtilt(fsec,tilt,ek,r,t)
      endif
   enddo
 
-end subroutine tmtilt
-subroutine tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmtilt
+SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -2950,8 +2950,8 @@ subroutine tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
-end subroutine tmcorr
-subroutine tmmult(fsec,ftrk,orbit,fmap,re,te)
+end SUBROUTINE tmcorr
+SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -3183,8 +3183,8 @@ subroutine tmmult(fsec,ftrk,orbit,fmap,re,te)
      call dcopy(te00,te,216)
   endif
 
-end subroutine tmmult
-subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmmult
+SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -3367,8 +3367,8 @@ subroutine tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
-end subroutine tmoct
-subroutine tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
+end SUBROUTINE tmoct
+SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3670,8 +3670,8 @@ subroutine tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-end subroutine tmarb
-subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmarb
+SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3797,8 +3797,8 @@ subroutine tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
      orbit(4) = ct * orbit(4) + st * tmp
   endif
 
-end subroutine tmquad
-subroutine qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+end SUBROUTINE tmquad
+SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -3896,8 +3896,8 @@ subroutine qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
-end subroutine qdbody
-subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE qdbody
+SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -3996,8 +3996,8 @@ subroutine tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(4) = ct * orbit(4) + st * tmp
   endif
 
-end subroutine tmsep
-subroutine spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+end SUBROUTINE tmsep
+SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
 
 
 
@@ -4100,8 +4100,8 @@ subroutine spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
-end subroutine spbody
-subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE spbody
+SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
 
 
@@ -4230,8 +4230,8 @@ subroutine tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(4) = ct * orbit(4) + st * tmp
   endif
 
-end subroutine tmsext
-subroutine sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
+end SUBROUTINE tmsext
+SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
 
 
@@ -4310,8 +4310,8 @@ subroutine sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   !---- Apply tilt.
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
-end subroutine sxbody
-subroutine tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE sxbody
+SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4357,8 +4357,8 @@ subroutine tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
-end subroutine tmsol
-subroutine tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmsol
+SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4466,8 +4466,8 @@ subroutine tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-end subroutine tmsol0
-subroutine tmsrot(ftrk,orbit,fmap,ek,re,te)
+end SUBROUTINE tmsol0
+SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4526,8 +4526,8 @@ subroutine tmsrot(ftrk,orbit,fmap,ek,re,te)
      call dcopy(re00,re,36)
      call dcopy(te00,te,216)
   endif
-end subroutine tmsrot
-subroutine tmyrot(ftrk,orbit,fmap,ek,re,te)
+end SUBROUTINE tmsrot
+SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4588,8 +4588,8 @@ subroutine tmyrot(ftrk,orbit,fmap,ek,re,te)
      call dcopy(te00,te,216)
   endif
 
-end subroutine tmyrot
-subroutine tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+end SUBROUTINE tmyrot
+SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4641,8 +4641,8 @@ subroutine tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-end subroutine tmdrf0
-subroutine tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+end SUBROUTINE tmdrf0
+SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4684,8 +4684,8 @@ subroutine tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   endif
   call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
-end subroutine tmdrf
-subroutine tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+end SUBROUTINE tmdrf
+SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4784,8 +4784,8 @@ subroutine tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
-end subroutine tmrf
-subroutine tmcat(fsec,rb,tb,ra,ta,rd,td)
+end SUBROUTINE tmrf
+SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4845,8 +4845,8 @@ subroutine tmcat(fsec,rb,tb,ra,ta,rd,td)
   call dcopy(rw,rd,36)
   call dcopy(tw,td,216)
 
-end subroutine tmcat
-subroutine tmtrak(ek,re,te,orb1,orb2)
+end SUBROUTINE tmcat
+SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -4884,8 +4884,8 @@ subroutine tmtrak(ek,re,te,orb1,orb2)
   !---- Symplectify transfer matrix.
   if(get_option('sympl ').ne.0) call tmsymp(re)
 
-end subroutine tmtrak
-subroutine tmsymp(r)
+end SUBROUTINE tmtrak
+SUBROUTINE tmsymp(r)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4921,8 +4921,8 @@ subroutine tmsymp(r)
   enddo
   call m66div(a,b,r,eflag)
 
-end subroutine tmsymp
-subroutine tmali1(orb1, errors, betas, gammas, orb2, rm)
+end SUBROUTINE tmsymp
+SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4982,8 +4982,8 @@ subroutine tmali1(orb1, errors, betas, gammas, orb2, rm)
   orb2(5) = orbt(5) - s2 / betas
   orb2(6) = orbt(6)
 
-end subroutine tmali1
-subroutine tmali2(el, orb1, errors, betas, gammas, orb2, rm)
+end SUBROUTINE tmali1
+SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5055,8 +5055,8 @@ subroutine tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   orbt(6) = orb1(6)
   call m66byv(rm, orbt, orb2)
 
-end subroutine tmali2
-subroutine tmbb(fsec,ftrk,orbit,fmap,re,te)
+end SUBROUTINE tmali2
+SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -5119,8 +5119,8 @@ subroutine tmbb(fsec,ftrk,orbit,fmap,re,te)
        &fk)
   if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
        &re,te,fk)
-end subroutine tmbb
-subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
+end SUBROUTINE tmbb
+SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   implicit none
   include 'twissl.fi'
@@ -5339,8 +5339,8 @@ subroutine tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
 
-end subroutine tmbb_gauss
-subroutine tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
+end SUBROUTINE tmbb_gauss
+SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   implicit none
   include 'twissl.fi'
   include 'bb.fi'
@@ -5518,8 +5518,8 @@ subroutine tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
   !
-end subroutine tmbb_flattop
-subroutine tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
+end SUBROUTINE tmbb_flattop
+SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   implicit none
   include 'twissl.fi'
   include 'bb.fi'
@@ -5696,8 +5696,8 @@ subroutine tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
   !
-end subroutine tmbb_hollowparabolic
-subroutine tmbb_old(fsec,ftrk,orbit,fmap,re,te)
+end SUBROUTINE tmbb_hollowparabolic
+SUBROUTINE tmbb_old(fsec,ftrk,orbit,fmap,re,te)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -5935,8 +5935,8 @@ subroutine tmbb_old(fsec,ftrk,orbit,fmap,re,te)
      endif
   endif
 
-end subroutine tmbb_old
-subroutine ccperrf(xx, yy, wx, wy)
+end SUBROUTINE tmbb_old
+SUBROUTINE ccperrf(xx, yy, wx, wy)
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
@@ -6014,7 +6014,7 @@ subroutine ccperrf(xx, yy, wx, wy)
      if(xx .lt. zero) wy = -wy
   endif
 
-end subroutine ccperrf
+end SUBROUTINE ccperrf
 double precision function gauss_erf(x)
   !---- returns the value of the Gauss error integral:
   !     1/sqrt(2*pi) Int[-inf, x] exp(-x**2/2) dx
@@ -6026,7 +6026,7 @@ double precision function gauss_erf(x)
   call ccperrf(zero,xx,re,im)
   gauss_erf = one - half * exp(-xx**2) * re
 end function gauss_erf
-subroutine twwmap(pos, orbit)
+SUBROUTINE twwmap(pos, orbit)
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Save concatenated sectormap (kick, rmatrix, tmatrix)             *
@@ -6079,8 +6079,8 @@ subroutine twwmap(pos, orbit)
   call m66one(srmat)
   call dzero(stmat, 216)
 
-end subroutine twwmap
-subroutine tmdpdg(ftrk,orbit,fmap,rw)
+end SUBROUTINE twwmap
+SUBROUTINE tmdpdg(ftrk,orbit,fmap,rw)
   implicit none
   !----------------------------------------------------------------------*
   !     dipedge element                                                  *
@@ -6117,8 +6117,8 @@ subroutine tmdpdg(ftrk,orbit,fmap,rw)
      orbit(4) = orbit(4) + rw(4,3) * orbit(3)
   endif
   return
-end subroutine tmdpdg
-subroutine tmsol_th(ftrk,orbit,fmap,ek,re,te)
+end SUBROUTINE tmdpdg
+SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   !     Stolen from trrun.F courtesy Alex Koschick
   implicit none
   !----------------------------------------------------------------------*
@@ -6183,4 +6183,4 @@ subroutine tmsol_th(ftrk,orbit,fmap,ek,re,te)
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-end subroutine tmsol_th
+end SUBROUTINE tmsol_th
