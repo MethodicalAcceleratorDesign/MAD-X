@@ -5,7 +5,7 @@
 ! *
 ! * Please get permission from Lingyun Yang before you redistribute this file.
 ! *
-! * Version: $Id: c_tpsa_interface.F90,v 1.10 2009-05-10 11:09:19 frs Exp $
+! * Version: $Id: c_tpsa_interface.F90,v 1.11 2009-06-10 21:03:35 frs Exp $
 ! */
 
 
@@ -47,9 +47,12 @@ contains
   subroutine daini(nd,nv,k)
     implicit none
     !    integer, intent(in) :: nd,nv,nd2,k
-    integer nd,nv,k
+    integer nd,nv,k,last_nv
     if(lingyun_yang) then !%%%%
-       if(last_tpsa==1.and.lielib_print(10)==0) call ad_resetvars(nv)
+       if(last_tpsa==1.and.lielib_print(10)==0) then
+          call ad_var(last_nv)
+          call ad_resetvars(last_nv)
+       endif
        call danum0(nd,nv)
        call ad_init(nv, nd)
        call ad_reserve(lda)
