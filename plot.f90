@@ -164,7 +164,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
         !--- avoid identical points
 
         if ((xreal(npt) - xval(j))**2 +                               &
-             &(yreal(npt) - yval(j))**2 .gt. xmd) then
+             &(yreal(npt) - yval(j))**2 .gt. xmd .and. yval(j).ne. 0) then ! hbu skip 0 points
+!            &(yreal(npt) - yval(j))**2 .gt. xmd) then !hbu no skipping
            npt        = npt + 1
            xreal(npt) = xval(j)
            yreal(npt) = yval(j)
