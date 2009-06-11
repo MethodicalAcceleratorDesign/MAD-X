@@ -69,12 +69,15 @@ class windowsReleaseClient:
         data = s.recv(1024) # blocking on reception (what about the time out???)
         s.close()
         print 'Received', repr(data)
-    
 
     def checkCompileOutcome(self):
         pass
 
     def generateHtmlOutput(self):
+        # move MAD-X fresh executable to the AFS web folder
+        # (it has already been put into MAD-X-WINDOWS/madX by the Windows host)
+        os.system('cp /user/nougaret/MAD-X-WINDOWS/madX/madx.exe '+\
+                 '/afs/cern.ch/user/n/nougaret/www/mad/windows-binaries/madx.exe' ) # hard-coded!
         pass
 
     def release(self,tag):
