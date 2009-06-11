@@ -141,6 +141,7 @@ testing/MadTrigWindowsCompilation.pl -text
 testing/MadWindowsCompileClient.pl -text
 testing/MadWindowsCompileClient.py -text
 testing/MadWindowsCompileServer.pl -text
+testing/MadWindowsCompileServer.py -text
 testing/MadWorkBetweenReleases.pl -text
 testing/MadWorkReport.pl -text
 testing/Makefile -text
