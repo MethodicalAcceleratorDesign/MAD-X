@@ -139,6 +139,7 @@ testing/MadTrigTest.pl -text
 testing/MadTrigTest.py -text
 testing/MadTrigWindowsCompilation.pl -text
 testing/MadWindowsCompileClient.pl -text
+testing/MadWindowsCompileClient.py -text
 testing/MadWindowsCompileServer.pl -text
 testing/MadWorkBetweenReleases.pl -text
 testing/MadWorkReport.pl -text

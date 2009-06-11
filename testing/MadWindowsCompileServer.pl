@@ -79,7 +79,7 @@ while (<$receiving>){
 	    print "(for the time-being, skip compilation)\n";
 	    # invoke compilation of madx.exe, madxp.exe and pars.exe
 # monday 29 september 2009: comment/uncomment the following:
-	    system("Makefile.bat");
+	    system("MakefileIntel.bat");
 	    # moving these files to the proper AFS web folder is left to the calling
 	    # Linux-side Perl script...
 	    # (an e-mail will be sent to observers of the Windows distribution of MAD-X)

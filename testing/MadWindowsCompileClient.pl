@@ -9,7 +9,10 @@
 # immediately trigger the compilation, the later meaning the program will listen
 # to port 7075 for a request emanating from the automatic build and test procedure.
 
-$debug = 'no'; # global variable also used by notify() subroutine and others
+#$debug = 'no'; # global variable also used by notify() subroutine and others
+# this program only for tests => set $debug='yes' from 10 June 2009
+$debug = 'yes';
+
 
 if ($#ARGV!=0){
     die "expect one argument: 'now' or 'wait-for-trigger'\n";
