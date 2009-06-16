@@ -385,7 +385,19 @@ contains
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
-
+    ! check that deltap-dependency selected iff icase=5, which stands for
+    ! 4 dimensions and deltap/p as an external parameter.
+    ! indeed the simplified formulas we applied for derivation w.r.t deltap assume
+    ! that deltap is an externally supplied constant parameter, which is no longer
+    ! the case when icase = 6 as deltap then becomes a phase-space state-variable.
+    ! and for icase=4, there is no dispersion.	
+    
+    deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
+    
+    if (deltap_dependency .and. .not.(icase.eq.5)) then
+    	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap assume deltap is fixed parameter')
+	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap therefore assume icase=5')
+    endif
 
     x(:)=zero
     if(mytime) then
@@ -539,7 +551,7 @@ contains
     endif
 
     slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
-    deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
+    
 
     if (.not. slice_magnets) then
 
