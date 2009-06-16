@@ -5,7 +5,7 @@
 #######################################################################
 
 CC=gcc
-f95=lf95
+f95=ifort
 ARCH=32
 DEBUG=NO
 ONLINE=NO
@@ -16,6 +16,7 @@ SLC4=YES
 SLC5=NO
 FC8=NO
 FC10=NO
+FC11=NO
 NTPSA=YES
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
@@ -39,6 +40,7 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   SLC5=NO
   FC8=NO
   FC10=NO
+  FC11=NO
 endif
 
 #######################################################################
@@ -203,6 +205,10 @@ endif
 
 ifeq ($(FC10),YES)
   LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh -lgfortran -lstdc++
+endif
+
+ifeq ($(FC11),YES)
+  LIBX= -lX11 -lxcb -lXau -lXdmcp -lstdc++
 endif
 
 ifeq ($(MEMLEAKS),YES)
