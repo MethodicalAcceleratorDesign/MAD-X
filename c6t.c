@@ -281,7 +281,7 @@ int           block_count = 0,     /* current block count for naming */
   mult_auto_off = 1,   /* if 1 code does not process zero value
                           multipoles;
                           if 0 process up to order max_mult_ord */
-  max_mult_ord = 11,   /* Process up to this order for mult_auto_off = 0 */
+  max_mult_ord = 20,   /* Process up to this order for mult_auto_off = 0 */
   multi_type = -1,     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */
 
