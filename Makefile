@@ -208,7 +208,11 @@ ifeq ($(FC10),YES)
 endif
 
 ifeq ($(FC11),YES)
-  LIBX= -lX11 -lxcb -lXau -lXdmcp -lstdc++
+  ifeq ($(ARCH),64)
+    LIBX= -lX11 -lxcb -lXau -lXdmcp -lstdc++
+  else
+    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i586-redhat-linux/4.4.0/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.0/32/ -lgcc_eh
+  endif
 endif
 
 ifeq ($(MEMLEAKS),YES)
