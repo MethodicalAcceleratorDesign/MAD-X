@@ -1040,7 +1040,7 @@ contains
              ENDIF
           endif
           IF(stat%TIME) THEN
-             XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+             XDIX=XDIX+c%mag%P%LD/c%BETA0
           ELSE
              XDIX=XDIX+c%mag%P%LD
           ENDIF
@@ -1252,7 +1252,7 @@ contains
                 freq=c%magp%freq
              ENDIF
           endif
-          XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+          XDIX=XDIX+c%mag%P%LD/c%BETA0
           c=>c%next
           i=i+1
        enddo
