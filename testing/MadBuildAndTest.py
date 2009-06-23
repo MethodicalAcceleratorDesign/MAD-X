@@ -144,15 +144,25 @@ try:
             try:
                 # delete any pre-existing directory
                 os.chdir(rootDir)
+                # 23 june 2009: all the following can be removed as it's MadBuildPy.pl which creates ./MadCvsExtract
                 os.system('rm -rf ./temporary_MadCvsExtract')
                 os.mkdir('./temporary_MadCvsExtract')
                 os.chdir('./temporary_MadCvsExtract')
                 command = 'cvs -d :gserver:isscvs.cern.ch/local/reps/madx checkout -r ' + options.specified_ver + ' madX'
+                notify('jean-luc','CVS extract command','under "'+os.getcwd()+'", issue: '+command)
                 os.system(command)
                 release = options.specified_ver
                 # did the checkout succeed?
+                # 23 june 2009: actually this CVS extract is useless, as MadBuilPy.pl carries-out its on extract
+                # => such check-out could be removed eventually. but for test purpose, it still should work !!!
+
+                # must go back to rootDir
+                os.chdir(rootDir)
+                os.system('rm -rf ./MadCvsExtract') # clean-up. directory will be recreated by MadBuildPy.pl
+                
             except:
                 print("failed to extract the specified release from the CVS ("+options.specified_ver+")")
+                notify('jean-luc','failed to extract '+options.specified_ver,'failed to extract specified release from CVS')
             pass
         else:
             raise MadBuildAndTestException("incorrect version specified")
@@ -164,6 +174,8 @@ try:
         runTest = trigTest.getWhatToDo()
         release = trigTest.getRelease() # the tag with which to extract the CVS
         pass # for the time-being
+        # DOES NOT WORK YET
+     
     
 #else:    
 except:
@@ -206,7 +218,7 @@ try:
                      release+"\n")
         os.chdir(rootDir)
         os.system("./MadBuildPy.pl "+ release) # MadBuildPy.pl instead of MadBuild.pl for time-being
-        reportFile.write("MadBuild.pl completed\n")
+        reportFile.write("MadBuildPy.pl completed\n")
 
         # no MadTest for the time-being
         reportFile.write("entering MadTest.pl\n")
@@ -216,7 +228,7 @@ try:
         #os.system("./MadTest.pl ./MadCvsExtract/madX")
         # WARNING: MadTestPy.pl should replace MadTest.pl to avoid sending
         # e-mail - instead, notification should take place within Python.
-        notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX debug=c6t')
+        notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX')
         # os.system("./MadTestPy.pl ./MadCvsExtract/madX debug=c6t")
         if options.silent:
             os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
