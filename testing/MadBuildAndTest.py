@@ -143,22 +143,24 @@ try:
             # extract the version from the CVS at the specified tag in a local mirror under ./MadCvsExtract
             try:
                 # delete any pre-existing directory
-                os.chdir(rootDir)
+                #os.chdir(rootDir)
                 # 23 june 2009: all the following can be removed as it's MadBuildPy.pl which creates ./MadCvsExtract
-                os.system('rm -rf ./temporary_MadCvsExtract')
-                os.mkdir('./temporary_MadCvsExtract')
-                os.chdir('./temporary_MadCvsExtract')
-                command = 'cvs -d :gserver:isscvs.cern.ch/local/reps/madx checkout -r ' + options.specified_ver + ' madX'
-                notify('jean-luc','CVS extract command','under "'+os.getcwd()+'", issue: '+command)
-                os.system(command)
+                #os.system('rm -rf ./temporary_MadCvsExtract')
+                #os.mkdir('./temporary_MadCvsExtract')
+                #os.chdir('./temporary_MadCvsExtract')
+                #command = 'cvs -d :gserver:isscvs.cern.ch/local/reps/madx checkout -r ' + options.specified_ver + ' madX'
+                #notify('jean-luc','CVS extract command','under "'+os.getcwd()+'", issue: '+command)
+                #os.system(command)
+                
                 release = options.specified_ver
+
                 # did the checkout succeed?
                 # 23 june 2009: actually this CVS extract is useless, as MadBuilPy.pl carries-out its on extract
                 # => such check-out could be removed eventually. but for test purpose, it still should work !!!
 
                 # must go back to rootDir
-                os.chdir(rootDir)
-                os.system('rm -rf ./MadCvsExtract') # clean-up. directory will be recreated by MadBuildPy.pl
+                #os.chdir(rootDir)
+                #os.system('rm -rf ./MadCvsExtract') # clean-up. directory will be recreated by MadBuildPy.pl
                 
             except:
                 print("failed to extract the specified release from the CVS ("+options.specified_ver+")")
@@ -217,6 +219,7 @@ try:
         reportFile.write("entering MadBuild.pl, with release-tag "+\
                      release+"\n")
         os.chdir(rootDir)
+        os.system("rm -rf ./MadCvsExtract")
         os.system("./MadBuildPy.pl "+ release) # MadBuildPy.pl instead of MadBuild.pl for time-being
         reportFile.write("MadBuildPy.pl completed\n")
 
