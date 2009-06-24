@@ -1066,6 +1066,18 @@ contains
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,pos=POS)
+       !       do i=1,3
+       !        call clean_real_8(bpa(i),bpa(i),1.d-8)
+       !        call clean_real_8(bpe(i),bpe(i),1.d-8)
+       !        write(6,*) i
+       !        write(6,*) " B field "
+       !        call print(b(i),6)
+       !        write(6,*) " parallel "
+       !        call print(bpa(i),6)
+       !        write(6,*) " perpendicular "
+       !        call print(bpe(i),6)
+       !        pause 12
+       !       enddo
        IF(k%TIME) THEN
           DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ELSE
@@ -2827,7 +2839,8 @@ contains
 
 
     ! The chart frame of reference is located here implicitely
-    IF((PATCHG==1).or.(PATCHG==3)) THEN
+    !    fake frontal spin snake PATCHG==5
+    IF((PATCHG==1).or.(PATCHG==3).or.(PATCHG==5)) THEN
        CALL PATCH_SPIN(C,P,MY_TRUE)
     ENDIF
 
@@ -2863,7 +2876,8 @@ contains
 
 
     ! The chart frame of reference is located here implicitely
-    IF((PATCHG==1).or.(PATCHG==3)) THEN
+    !    fake frontal spin snake PATCHG==5
+    IF((PATCHG==1).or.(PATCHG==3).or.(PATCHG==5)) THEN
        CALL PATCH_SPIN(C,P,MY_TRUE)
     ENDIF
 
@@ -2919,7 +2933,8 @@ contains
     CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
 
 
-    IF((PATCHG==2).or.(PATCHG==3)) THEN
+    !    fake back spin snake PATCHG==6
+    IF((PATCHG==2).or.(PATCHG==3).or.(PATCHG==6)) THEN
        CALL PATCH_SPIN(C,P,MY_FALSE)
     ENDIF
 
@@ -2967,7 +2982,8 @@ contains
     CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
 
 
-    IF((PATCHG==2).or.(PATCHG==3)) THEN
+    !    fake back spin snake PATCHG==6
+    IF((PATCHG==2).or.(PATCHG==3).or.(PATCHG==6)) THEN
        CALL PATCH_SPIN(C,P,MY_FALSE)
     ENDIF
 
@@ -3228,7 +3244,10 @@ contains
     !         ENDDO
 
 
-    call get_spin_nx(S,theta0r,FIX%s(1)%x)
+
+    call get_spin_n0(S,theta0r,FIX%s(1)%x)
+    FIX%s(2)%x=FIX%s(1)%x
+    FIX%s(3)%x=FIX%s(1)%x
     if(present(theta0)) theta0=theta0r
 
     !        call kill(xs)
@@ -3340,7 +3359,7 @@ contains
              ENDIF
           endif
           IF(stat%TIME) THEN
-             XDIX=XDIX+c%mag%P%LD/c%mag%P%BETA0
+             XDIX=XDIX+c%mag%P%LD/c%BETA0
           ELSE
              XDIX=XDIX+c%mag%P%LD
           ENDIF
@@ -3580,16 +3599,16 @@ contains
 
   END SUBROUTINE find_ENVELOPE
 
-  SUBROUTINE stroboscopic_average(ring,xs0,xst,x0,xst_closest,eps,pos,mstate0,nturn,kp,n)
+  SUBROUTINE stroboscopic_average(ring,xs0,xst,x0,pos,mstate0,nturn,kp,n)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: RING
-    type(probe) , intent(inout) :: xs0,xst,xst_closest
+    type(probe) , intent(inout) :: xs0,xst
     real(dp), intent(in) ::x0(6)
     TYPE(INTERNAL_STATE) mstate0,mstate
     integer, intent(in) :: kp,pos,nturn
     integer i,k,imax,nd2
     type(spinor) n
-    real(dp) norm,norm0,eps,n0(3),theta0
+    real(dp) norm,norm0,n0(3),theta0
 
 
     mstate=mstate0+spin0
@@ -3602,19 +3621,6 @@ contains
        do i=1,3
           xst%s(i)%x=xs0%s(i)%x+xst%s(i)%x
        enddo
-       norm0=zero
-       do i=1,nd2/2
-          norm0=norm0+abs(xs0%x(2*i-1)-x0(2*i-1))
-       enddo
-
-       if(norm0<eps) then
-          xst_closest=xs0
-          eps=norm0
-          write(6,*) "luccio ",k,eps
-          call get_spin_nx(xs0,theta0,n0)
-          write(17,'(4(1x,E15.8))') norm0,n0
-          write(6,'(4(1x,E15.8))') norm0,n0
-       endif
 
        if(mod(k,kp)==0) then  ! kp
           write(6,*) k,"$$$$$$$$$$$$$$$$$$$$$$$$$"

@@ -995,6 +995,10 @@ contains
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,kind22)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
     case(kind3)
+       IF(.NOT.ASSOCIATED(el%B_SOL)) then
+          ALLOCATE(el%B_SOL)
+          el%B_SOL=zero
+       endif
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        READ(MF,"(a255)") LINE
        if(index(line,"patch_edge")/=0) then
@@ -1126,7 +1130,6 @@ contains
     CHARACTER*21 SOL
     REAL(DP) B_SOL,r(3),d(3)
     integer f0
-
     f0=0
     READ(MF,*) LINE
     READ(MF,*) M%KIND,M%NAME,M%VORNAME
@@ -1426,6 +1429,7 @@ contains
     character*200 line
     character*5 ch
 
+    !    READ(mf,'(a120)') LINE(1:120)
     READ(mf,'(a120)') LINE
 
     CALL CONTEXT(LINE)

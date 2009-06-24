@@ -19,19 +19,21 @@ module tree_element_MODULE
   private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8
 
   private find_ar
-  private find_ap
-  private  find_n_thetar,find_n_thetap
+  private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor
+  private  find_n_thetar,find_n_thetap,read_spinor_8
   !  private smatp,smatmulp
   private inv_asr,inv_asp !,inv_as
   PRIVATE EQUAL_DAmapSPIN_int,daddsc,scdadd,EQUAL_PROBE8_PROBE8,PRINT_probe8
   PRIVATE concat,assmap,EQUAL_damapspin,CUTORDER,assprobe_8,POWMAP,cmul,addm,mmul,spin8_mul_map
   private read_probe8,ALLOC_33t,ALLOC_33p,KILL_33t,KILL_33p,zero_33t
   private purge_transverse
-  private get_spin_nx_r,get_spin_nx_t,get_spin_nx_rd,get_spin_nx_probe
+  private get_spin_nx_r,get_spin_nx_t,get_spin_nx_rd,get_spin_nx_probe,get_spin_nx_spinor_8
   private scdaddo,daddsco,damapspin_spinor8_mul,damapspin_spinor_mul,eval_spinor_8
   private real_8REAL6,REAL6real_8,real_8REAL_8,PRINT6
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
+  integer :: clockwise=1
+  logical(lp) :: force_positive=.false.
 
   INTERFACE assignment (=)
      !
@@ -79,6 +81,11 @@ module tree_element_MODULE
      MODULE PROCEDURE CUTORDER
   END  INTERFACE
 
+  INTERFACE OPERATOR (.dot.)
+     MODULE PROCEDURE dot_spinor
+     MODULE PROCEDURE dot_spinor_8
+  END  INTERFACE
+
   INTERFACE operator (+)
      MODULE PROCEDURE scdadd
      MODULE PROCEDURE daddsc
@@ -88,7 +95,8 @@ module tree_element_MODULE
   END  INTERFACE
 
 
-  INTERFACE find_n_theta   ! (s0(3,3),n0(3))
+
+  INTERFACE find_n0   ! (s0(3,3),n0(3))
      MODULE PROCEDURE find_n_thetar  ! finds n0 the naive way
      MODULE PROCEDURE find_n_thetap
   END INTERFACE
@@ -104,11 +112,12 @@ module tree_element_MODULE
      MODULE PROCEDURE inv_asp
   END INTERFACE
 
-  INTERFACE get_spin_nx  ! (S,theta0,n0)
+  INTERFACE get_spin_n0  ! (S,theta0,n0)
      MODULE PROCEDURE get_spin_nx_r  ! real s(3,3) = exp(theta0 n0.L)
-     MODULE PROCEDURE get_spin_nx_rd  ! takes DS (damapspin but return real)
-     MODULE PROCEDURE get_spin_nx_t
-     MODULE PROCEDURE get_spin_nx_probe
+     MODULE PROCEDURE get_spin_nx_rd  ! takes DS (damapspin but returns real)
+     MODULE PROCEDURE get_spin_nx_t   ! takes DS (damapspin but returns real_8)
+     MODULE PROCEDURE get_spin_nx_probe ! takes probe (damapspin but returns real)
+     MODULE PROCEDURE get_spin_nx_spinor_8
   END INTERFACE
 
 
@@ -117,6 +126,7 @@ module tree_element_MODULE
 !!!!
      MODULE PROCEDURE PRINT_DASPIN
      MODULE PROCEDURE PRINT_probe8
+     MODULE PROCEDURE PRINT_spinor_8
   END INTERFACE
 
   INTERFACE daPRINT
@@ -127,6 +137,7 @@ module tree_element_MODULE
   INTERFACE READ
      MODULE PROCEDURE READ_DASPIN
      MODULE PROCEDURE read_probe8   ! a bit illegal : reading polymorphs as taylor...
+     MODULE PROCEDURE read_spinor_8
   END INTERFACE
 
   INTERFACE ALLOC
@@ -1221,24 +1232,6 @@ CONTAINS
 
   END    subroutine EQUAL_IDENTITY_probe_8
 
-  !  subroutine EQUAL_SPINOR8_RAY8(S,R)
-  !    implicit none
-  !    TYPE(SPINOR_8), INTENT(INOUT) :: S
-  !!    TYPE(probe_8), INTENT(IN) :: R
-  !
-  !    S=R%S(0)
-  !     S%G=R%S%G
-  !
-  !  END    subroutine EQUAL_SPINOR8_RAY8
-
-  !  subroutine EQUAL_RAY8_SPINOR8(R,S)
-  !    implicit none
-  !    TYPE(SPINOR_8), INTENT(IN) :: S
-  !    TYPE(probe_8), INTENT(INOUT) :: R
-  !    R%S(0)=S
-  !    !     R%S%G=S%G
-
-  !  END    subroutine EQUAL_RAY8_SPINOR8
 
   subroutine EQUAL_SPINOR8_SPINOR8(R,S)
     implicit none
@@ -1530,23 +1523,56 @@ CONTAINS
     !       call print(ds%s(0)%x(i),mf)
     !    enddo
     WRITE(MF,*) " SPIN X "
-    do i=1,3
-       write(mf,*) ' Spin Variable ',i
-       call print(ds%s(1)%x(i),mf)
-    enddo
+    call print(ds%s(1),mf)
+    !    do i=1,3
+    !       write(mf,*) ' Spin Variable ',i
+    !       call print(ds%s(1)%x(i),mf)
+    !    enddo
     WRITE(MF,*) " SPIN Y "
-    do i=1,3
-       write(mf,*) ' Spin Variable ',i
-       call print(ds%s(2)%x(i),mf)
-    enddo
+    call print(ds%s(2),mf)
+    !    do i=1,3
+    !       write(mf,*) ' Spin Variable ',i
+    !       call print(ds%s(2)%x(i),mf)
+    !    enddo
     WRITE(MF,*) " SPIN Z "
-    do i=1,3
-       write(mf,*) ' Spin Variable ',i
-       call print(ds%s(3)%x(i),mf)
-    enddo
+    call print(ds%s(3),mf)
+    !    do i=1,3
+    !       write(mf,*) ' Spin Variable ',i
+    !       call print(ds%s(3)%x(i),mf)
+    !    enddo
 
 
   END subroutine print_probe8
+
+  subroutine print_spinor_8(S,MF)
+    implicit none
+    TYPE(spinor_8), INTENT(INOUT) :: s
+    INTEGER MF,I
+
+    do i=1,3
+       write(mf,*) ' Spin Variable ',i
+       call print(s%x(i),mf)
+    enddo
+
+  END subroutine print_spinor_8
+
+  subroutine read_spinor_8(S,MF)
+    implicit none
+    TYPE(spinor_8), INTENT(INOUT) :: s
+    INTEGER MF,I
+    character*255 line
+    type(taylor) t
+    call alloc(t)
+
+    do i=1,3
+       read(mf,'(a255)') line
+       call read(t,mf)
+       s%x(i)=morph(t)
+    enddo
+
+    call kill(t)
+
+  END subroutine read_spinor_8
 
   subroutine READ_DASPIN(DS,MF,file)
     implicit none
@@ -1608,11 +1634,9 @@ CONTAINS
        call read(t,mf)
        ds%x(i)=morph(t)
     enddo
-    read(mf,*) line
-    do i=1,3
-       read(mf,*) line
-       call read(t,mf)
-       ds%s(I)%x(i)=morph(t)
+    do i=ISPIN0R,ISPIN1R
+       read(mf,'(a120)') line
+       call read(ds%s(i),mf)
     enddo
 
     call kill(t)
@@ -1652,9 +1676,8 @@ CONTAINS
     implicit none
     real(dp),intent(in) :: s0(3,3)
     real(dp)  theta0,n0(3)
-    real(dp)  det,ss(3,3)
-    real(dp) sc,scmax
-    integer i,j,is
+    real(dp)  det,ss(3,3),detm
+    integer i,is,j
 
 
 
@@ -1668,33 +1691,35 @@ CONTAINS
 
 
 
-    scmax=zero
     do i=1,3
-       sc=ss(i,i)
-       sc=abs(sc)
-       if(sc>scmax) then
-          is=i
-          scmax=sc
-       endif
        ss(i,i)=ss(i,i)-one
     enddo
+    det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
+    is=1
 
+    detm=(ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1))
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=2
+    endif
+    detm=(ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1))
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=3
+    endif
+
+    n0(is)=one
     if(is==1) then
-       n0(is)=one
-       det=ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2)
        n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
-       n0(3)=(-ss(1,1)*ss(3,1)+ss(3,2)*ss(2,1))/det
+       n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
     elseif(is==2) then
-       n0(is)=one
-       det=ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1)
        n0(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
        n0(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
     else
-       n0(is)=one
-       det=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
-       n0(1)=(-ss(2,2)*ss(1,3)+ss(3,1)*ss(1,2))/det
+       n0(1)=(-ss(2,2)*ss(1,3)+ss(2,3)*ss(1,2))/det
        n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
     endif
+
 
     theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
 
@@ -1704,11 +1729,6 @@ CONTAINS
 
 
 
-    if(n0(spin_normal_position)<zero) then
-       do i=1,3
-          n0(i)=-n0(i)
-       enddo
-    endif
 
   end subroutine find_n_thetar
 
@@ -1716,16 +1736,13 @@ CONTAINS
     implicit none
     type(real_8),intent(in) :: s0(3,3)
     type(real_8)  theta0,n0(3)
-    type(real_8)  det,ss(3,3)
-    !    type(taylor),intent(in) :: s0(3,3)
-    !    type(taylor)  theta0,n0(3)
-    !    type(taylor)  det,ss(3,3)
-    real(dp) sc,scmax
-    integer i,j,is
+    type(real_8)  det,ss(3,3),detm
+    integer i,is,j
 
 
 
     call alloc(det)
+    call alloc(detm)
     call alloc(theta0)
     call alloc_33(ss)
 
@@ -1738,31 +1755,34 @@ CONTAINS
 
 
 
-    scmax=zero
     do i=1,3
-       sc=ss(i,i)
-       sc=abs(sc)
-       if(sc>scmax) then
-          is=i
-          scmax=sc
-       endif
        ss(i,i)=ss(i,i)-one
     enddo
 
+    det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
+    is=1
+    detm=(ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1))
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=2
+    endif
+    detm=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=3
+    endif
+
+
+
+    n0(is)=one
     if(is==1) then
-       n0(is)=one
-       det=ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2)
        n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
-       n0(3)=(-ss(1,1)*ss(3,1)+ss(3,2)*ss(2,1))/det
+       n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
     elseif(is==2) then
-       n0(is)=one
-       det=ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1)
        n0(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
        n0(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
     else
-       n0(is)=one
-       det=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
-       n0(1)=(-ss(2,2)*ss(1,3)+ss(3,1)*ss(1,2))/det
+       n0(1)=(-ss(2,2)*ss(1,3)+ss(2,3)*ss(1,2))/det
        n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
     endif
 
@@ -1774,13 +1794,9 @@ CONTAINS
 
 
 
-    if((n0(spin_normal_position).sub.'0')<zero) then
-       do i=1,3
-          n0(i)=-n0(i)
-       enddo
-    endif
 
     call kill(det)
+    call kill(detm)
     call kill(theta0)
     call kill_33(ss)
 
@@ -1819,12 +1835,14 @@ CONTAINS
     n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
     n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
 
-    !     write(6,*) n1
-    !     write(6,*) n2
-    !    write(6,*) n3
+    n=zero
+    do i=1,3
+       n=n3(i)**2+n
+    enddo
+    n3=n3/sqrt(n)
     ! spin_normal_position
 
-    a=zero
+    !    a=zero
     if(spin_normal_position==2) then
        a(:,1)=n1
        a(:,2)=n2
@@ -1846,6 +1864,8 @@ CONTAINS
     implicit none
     type(real_8)  n2(3),n1(3),n3(3)
     type(real_8)  a(3,3),s,n
+    real(dp) aa(3,3)
+    integer j
     integer i,is
     call alloc(n1,3)
     call alloc(n3,3)
@@ -1881,12 +1901,14 @@ CONTAINS
     n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
     n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
 
-    !    write(6,*) n1
-    !    write(6,*) n2
-    !    write(6,*) n3
-    ! spin_normal_position
+    n=zero
+    do i=1,3
+       n=n3(i)**2+n
+    enddo
+    do i=1,3
+       n3(i)=n3(i)/sqrt(n)
+    enddo
 
-    !a=zero
     if(spin_normal_position==2) then
        do i=1,3
           a(i,1)=n1(i)
@@ -1894,14 +1916,19 @@ CONTAINS
           a(i,3)=n3(i)
        enddo
     elseif(spin_normal_position==3) then
-       a(i,2)=n1(i)
-       a(i,3)=n2(i)
-       a(i,1)=n3(i)
+       do i=1,3
+          a(i,2)=n1(i)
+          a(i,3)=n2(i)
+          a(i,1)=n3(i)
+       enddo
     else
-       a(i,3)=n1(i)
-       a(i,1)=n2(i)
-       a(i,2)=n3(i)
+       do i=1,3
+          a(i,3)=n1(i)
+          a(i,1)=n2(i)
+          a(i,2)=n3(i)
+       enddo
     endif
+
 
     call kill(n1,3)
     call kill(n3,3)
@@ -2356,6 +2383,17 @@ CONTAINS
 
 
 !!!!!!!!!!!!!!!!   new stuff
+  subroutine get_spin_nx_spinor_8(DS,theta0,n0)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    type(real_8), intent(inout) :: theta0
+    type(spinor_8), intent(inout) :: n0
+
+    call get_spin_n0(DS,theta0,n0%x)
+
+  end subroutine get_spin_nx_spinor_8
+
+
   subroutine get_spin_nx_t(DS,theta0,n0)
     implicit none
     TYPE(damapspin), INTENT(INout) :: DS
@@ -2371,7 +2409,7 @@ CONTAINS
     call alloc_33(ai)
     call alloc(a11,a13)
 
-    call find_n_theta(ds%s,n0)
+    call find_n0(ds%s,n0)
 
     !     call print(theta0,6)
 
@@ -2388,8 +2426,8 @@ CONTAINS
     a11=(s(1,1))
     a13=(s(1,3))
 
-    theta0=atan2(a13,a11)
-
+    theta0=clockwise*atan2(a13,a11)
+    if(force_positive.and.theta0<zero) theta0 = theta0 + twopi    !!!! allow negative theta0
 
     ! at this stage the spin map is:
 
@@ -2420,15 +2458,19 @@ CONTAINS
     real(dp) a(3,3),ai(3,3)
     real(dp),  INTENT(INout) :: S(3,3)
 
+    call find_n0(s,n0)
 
-    call find_n_theta(s,n0)
+
+
+
 
     call find_a(n0,a)
     call inv_as(a,ai)
     ai=matmul(ai,s)    !
     s=matmul(ai,a)    !
 
-    theta0=atan2(s(1,3),s(1,1))
+    theta0=clockwise*atan2(s(1,3),s(1,1))
+    if(force_positive.and.theta0<zero)  theta0 = theta0 + twopi   !!!! allow negative theta0
 
 
   end subroutine get_spin_nx_r
@@ -2446,7 +2488,7 @@ CONTAINS
        enddo
     enddo
 
-    call  get_spin_nx(S,theta0,n0)
+    call  get_spin_n0(S,theta0,n0)
 
 
   end subroutine get_spin_nx_probe
@@ -2465,14 +2507,15 @@ CONTAINS
        enddo
     enddo
 
-    call find_n_theta(s,n0)
+    call find_n0(s,n0)
 
     call find_a(n0,a)
     call inv_as(a,ai)
     ai=matmul(ai,s)    !
     s=matmul(ai,a)    !
 
-    theta0=atan2(s(1,3),s(1,1))
+    theta0=clockwise*atan2(s(1,3),s(1,1))
+    if(force_positive.and.theta0<zero)  theta0 = theta0 + twopi   !!!! allow negative theta0
 
 
 
@@ -2529,6 +2572,49 @@ CONTAINS
     master=localmaster
 
   END FUNCTION POWMAP
+
+  FUNCTION dot_spinor( S1, S2 )
+    implicit none
+    real(dp) dot_spinor
+    TYPE (SPINOR), INTENT (IN) :: S1,S2
+
+    INTEGER I
+
+    dot_spinor=ZERO
+
+    DO I=1,3
+       dot_spinor=dot_spinor+s1%x(i)*s2%x(i)
+    ENDDO
+
+
+
+  END FUNCTION dot_spinor
+
+  FUNCTION dot_spinor_8( S1, S2 )
+    implicit none
+    TYPE (real_8) dot_spinor_8
+    TYPE (SPINOR_8), INTENT (IN) :: S1,S2
+
+    INTEGER I
+    integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+
+    !    call checkdamap(s1)
+
+    call ass(dot_spinor_8)
+
+    dot_spinor_8=ZERO
+
+    DO I=1,3
+       dot_spinor_8=dot_spinor_8+s1%x(i)*s2%x(i)
+    ENDDO
+
+
+    master=localmaster
+
+  END FUNCTION dot_spinor_8
 
   FUNCTION concat(S2,S1)
     implicit none
@@ -2900,6 +2986,8 @@ CONTAINS
     type(taylor) nn
     !    type(taylor) s(3,3),a(3,3),ai(3,3)
     type(real_8) a11,a13
+    integer i,j
+    real(dp) ss(3,3)
 
     call alloc(a1i)
     call alloc(ds0)
@@ -2930,7 +3018,7 @@ CONTAINS
     call clean_orbital_33(ds0%s,s%s)
     ! at this stage s is the spin map  without dependence on orbital
 
-    call find_n_theta(s%s,ns%n0)
+    call find_n0(s%s,ns%n0)
 
     call find_a(ns%n0,a%s)
 
@@ -2938,10 +3026,21 @@ CONTAINS
 
     s=(ai*s)*a
 
+    !write(6,*) " diagonal "
+    !    do i=1,3
+    !    do j=1,3
+    !    ss(i,j)=s%s(i,j)
+    !    enddo
+    !    write(6,*) ss(i,1:3)
+    !    enddo
+
+    !pause 777
+
     a11=s%s(1,1)
     a13=s%s(1,3)
 
-    ns%theta0=atan2(a13,a11)
+    ns%theta0=clockwise*atan2(a13,a11)
+    if(force_positive.and.ns%theta0<zero)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
 
     ns%as=ns%as*a
 
@@ -3133,7 +3232,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(clockwise*i_*ns%theta0))
           omr(1)=omr(1)+ (denom.mono.jc)
        endif
     enddo
@@ -3150,7 +3249,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(clockwise*i_*ns%theta0))
           omr(1)=omr(1)+ I_*(denom.mono.jc)
        endif
     enddo
@@ -3169,7 +3268,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(clockwise*i_*ns%theta0))
           omr(1)=omr(1)+ i_*(denom.mono.jc)
        endif
     enddo
@@ -3186,7 +3285,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(clockwise*i_*ns%theta0))
           omr(1)=omr(1)-(denom.mono.jc)
        endif
     enddo
@@ -3205,7 +3304,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(-i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(-clockwise*i_*ns%theta0))
           omr(3)=omr(3)+ (denom.mono.jc)
        endif
     enddo
@@ -3222,7 +3321,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(-i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(-clockwise*i_*ns%theta0))
           omr(3)=omr(3)+ I_*(denom.mono.jc)
        endif
     enddo
@@ -3241,7 +3340,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(-i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(-clockwise*i_*ns%theta0))
           omr(3)=omr(3)+ i_*(denom.mono.jc)
        endif
     enddo
@@ -3258,7 +3357,7 @@ CONTAINS
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-exp(-i_*ns%theta0))
+          denom=value/(exp(-i_*ang)-exp(-clockwise*i_*ns%theta0))
           omr(3)=omr(3)-(denom.mono.jc)
        endif
     enddo
@@ -3609,6 +3708,7 @@ CONTAINS
     !    a13=(s(1,3))
 
     theta0=atan2(nc%s(1,3),nc%s(1,1))
+    if((theta0.sub.'0')<zero) theta0 = theta0 + twopi
 
     theta0r=theta0
 
@@ -3658,5 +3758,40 @@ CONTAINS
     call kill(gam)
 
   end subroutine normal_thetaH
+
+  ! remove small numbers
+
+  SUBROUTINE  clean_damapspin(S1,S2,prec)
+    implicit none
+    type (damapspin),INTENT(INOUT)::S2
+    type (damapspin), intent(INOUT):: s1
+    real(dp) prec
+    integer i,j
+
+    call clean_damap(s1%m,s2%m,prec)
+    do i=1,3
+       do j=1,3
+          call clean_real_8(s1%s(i,j),s2%s(i,j),prec)
+       enddo
+    enddo
+
+
+  END SUBROUTINE clean_damapspin
+
+  SUBROUTINE  clean_spinor_8(S1,S2,prec)
+    implicit none
+    type (spinor_8),INTENT(INOUT)::S2
+    type (spinor_8), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,3
+       call clean_real_8(s1%x(i),s2%x(i),prec)
+    enddo
+
+
+  END SUBROUTINE clean_spinor_8
+
+
 
 end module tree_element_MODULE

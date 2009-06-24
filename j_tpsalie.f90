@@ -2782,4 +2782,20 @@ contains
     !   endif
   END SUBROUTINE radEQUAL
 
+  ! remove small numbers
+
+  SUBROUTINE  clean_damap(S1,S2,prec)
+    implicit none
+    type (damap),INTENT(INOUT)::S2
+    type (damap), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,c_%nd2
+       call clean_taylor(s1%v(i),s2%v(i),prec)
+    enddo
+
+
+  END SUBROUTINE clean_damap
+
 end module tpsalie

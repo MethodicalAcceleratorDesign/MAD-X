@@ -11,6 +11,7 @@ module accel_ptc
   integer :: slope_sign=1,slope_flip=1
   logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
   real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0,b0_table,p0c_table
+  real(dp) :: last_synchr_time=zero
   TYPE fibre_array
      type(fibre), pointer :: p
      integer, pointer :: pos
@@ -102,6 +103,7 @@ contains
     !write(6,*) size(accel)
 
     tr=time/clight*1000
+    last_synchr_time=tr
     if(tr-time_0>dtime.and.use_time) must_stop=.true.
     ti=int(tr)
     !write(6,*) tr,ti,accel(ti)%p0c
@@ -433,9 +435,11 @@ SUBROUTINE ptc_synchronous_set(i_node)
      read(MF,*) w1_ORBIT
      read(MF,*) w2_ORBIT
      read(MF,*) my_ORBIT_LATTICE%state
+     read(mf,*) last_synchr_time
      CLOSE(MF)
      call accel_ORBIT_up_grade_mag_all
-     time_0=x_orbit_sync(6)/clight*1000
+     time_0=last_synchr_time
+     write(6,*) " time_0 ",time_0
      return
   elseif(i_node==-3) then
      stop 553
@@ -473,7 +477,8 @@ SUBROUTINE ptc_synchronous_after(i_node)
         my_ORBIT_LATTICE%ORBIT_OMEGA=my_ORBIT_LATTICE%orbit_omega_after
         my_ORBIT_LATTICE%ORBIT_gamma=one/w2_ORBIT%gamma0i
         my_ORBIT_LATTICE%ORBIT_P0C=p_orbit%mag%P%P0C
-        my_ORBIT_LATTICE%ORBIT_BETA0=p_orbit%mag%P%BETA0
+        !        my_ORBIT_LATTICE%ORBIT_BETA0=p_orbit%mag%P%BETA0
+        my_ORBIT_LATTICE%ORBIT_BETA0=p_orbit%BETA0
         my_ORBIT_LATTICE%orbit_kinetic=w2_ORBIT%kinetic
         my_ORBIT_LATTICE%orbit_energy=w2_ORBIT%energy
         my_ORBIT_LATTICE%orbit_brho=w2_ORBIT%brho
@@ -508,6 +513,8 @@ SUBROUTINE ptc_synchronous_after(i_node)
      WRITE(MF,*) w1_ORBIT
      WRITE(MF,*) w2_ORBIT
      WRITE(MF,*) my_ORBIT_LATTICE%state
+     WRITE(MF,*) last_synchr_time, " time in  msec "
+
      CLOSE(MF)
      return
   endif

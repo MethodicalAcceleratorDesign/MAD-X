@@ -1025,6 +1025,7 @@ CONTAINS
        ALLOCATE(EL%K3%thin_h_angle);EL%K3%thin_h_angle=0
        ALLOCATE(EL%K3%thin_v_angle);EL%K3%thin_v_angle=0
        ALLOCATE(EL%K3%patch);EL%K3%patch=my_false
+       EL%K3%B_SOL=>EL%B_SOL
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -1479,6 +1480,7 @@ CONTAINS
        ALLOCATE(EL%K3%thin_h_angle);CALL ALLOC(EL%K3%thin_h_angle);EL%K3%thin_h_angle=ZERO
        ALLOCATE(EL%K3%thin_v_angle);CALL ALLOC(EL%K3%thin_v_angle);EL%K3%thin_v_angle=ZERO
        ALLOCATE(EL%K3%patch);EL%K3%patch=my_false
+       EL%K3%B_SOL=>EL%B_SOL
     CASE(KIND4)
        if(.not.ASSOCIATED(EL%C4)) THEN
           ALLOCATE(EL%C4)
@@ -2716,6 +2718,9 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
+       if(.not.ASSOCIATED(ELP%B_SOL)) ALLOCATE(ELP%B_SOL       )
+       CALL ALLOC( ELP%B_SOL)
+       ELP%B_SOL = EL%B_SOL
        CALL SETFAMILY(ELP)
        ELP%K3%hf=EL%K3%hf
        ELP%K3%vf=EL%K3%vf
@@ -2973,6 +2978,8 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
+       if(.not.ASSOCIATED(ELP%B_SOL)) ALLOCATE(ELP%B_SOL       )
+       ELP%B_SOL = EL%B_SOL
        CALL SETFAMILY(ELP)
        ELP%K3%hf=EL%K3%hf
        ELP%K3%vf=EL%K3%vf
@@ -3224,6 +3231,8 @@ CONTAINS
     IF(EL%KIND==KIND3) THEN
        if(.not.ASSOCIATED(ELP%K3)) ALLOCATE(ELP%K3)
        ELP%K3=0
+       if(.not.ASSOCIATED(ELP%B_SOL)) ALLOCATE(ELP%B_SOL       )
+       ELP%B_SOL = EL%B_SOL
        CALL SETFAMILY(ELP)
        ELP%K3%hf=EL%K3%hf
        ELP%K3%vf=EL%K3%vf
@@ -3446,6 +3455,7 @@ CONTAINS
        CALL resetpoly_R31(ELP%K3%thin_v_foc)
        CALL resetpoly_R31(ELP%K3%thin_h_angle )
        CALL resetpoly_R31(ELP%K3%thin_v_angle)
+       CALL resetpoly_R31(ELP%B_SOL)
     ENDIF
 
     IF(ELP%KIND==KIND21) THEN

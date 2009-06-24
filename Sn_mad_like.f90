@@ -2532,7 +2532,7 @@ CONTAINS
        S2%phas=S1%lag
     endif
 
-    if(s1%kind==kind5.or.s1%kind==kind17) then
+    if(s1%kind==kind3.or.s1%kind==kind5.or.s1%kind==kind17) then
        ALLOCATE(S2%B_SOL);
        S2%B_SOL=S1%BSOL
     endif

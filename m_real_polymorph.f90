@@ -6606,4 +6606,42 @@ contains
     end select
   END FUNCTION sinHX_Xt
 
+  ! remove small numbers
+
+  SUBROUTINE  clean_real_8(S1,S2,prec)
+    implicit none
+    type (real_8),INTENT(INOUT)::S2
+    type (real_8), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+    type(real_8) t
+
+    call alloc(t)
+    t=s1
+
+    select case(s1%kind)
+    case(m1)
+       if(abs(t%r)<prec) t%r=zero
+    case(m2)
+       call clean_taylor(t%t,t%t,prec)
+    case(m3)
+       Write(6,*) " cannot clean a knob "
+       stop 601
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in POW "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       call write_e(0)
+    end select
+    s2=t
+    call kill(t)
+
+
+  END SUBROUTINE clean_real_8
+
+
 end module  polymorphic_taylor

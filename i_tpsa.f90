@@ -3101,6 +3101,7 @@ CONTAINS
 
 
 
+
   SUBROUTINE  REFILL_UNI(S1,S2)
     implicit none
     type (UNIVERSAL_TAYLOR),INTENT(IN)::S2
@@ -3513,7 +3514,36 @@ CONTAINS
   end subroutine ASS0
 
 
-  ! Assignments Routines
+  ! remove small numbers
+
+  SUBROUTINE  clean_taylor(S1,S2,prec)
+    implicit none
+    type (TAYLOR),INTENT(INOUT)::S2
+    type (TAYLOR), intent(INOUT):: s1
+    real(dp) prec
+    INTEGER ipresent,k,n,I,illa
+    real(dp) value
+    INTEGER, allocatable :: j(:)
+    type (TAYLOR) t
+
+    call alloc(t)
+    t=zero
+    ipresent=1
+    call dacycle(S1%I,ipresent,value,n)
+
+    allocate(j(c_%nv))
+
+    do i=1,N
+       call dacycle(S1%I,i,value,illa,j)
+       if(abs(value)>prec) then
+          t=t+(value.mono.j)
+       endif
+    ENDDO
+    s2=t
+    deallocate(j)
+    call kill(t)
+
+  END SUBROUTINE clean_taylor
 
 
 END MODULE  tpsa

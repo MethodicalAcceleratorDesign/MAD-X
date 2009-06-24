@@ -1899,8 +1899,9 @@ contains
     TYPE(WORM),OPTIONAL,INTENT(INOUT):: MID
     TYPE(KICKT3),INTENT(IN):: EL
     real(dp) X1,X3,BBYTW,BBXTW,BBYTWT,pz,alfh
-    INTEGER J
+    INTEGER J,I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) myCOS,mySIN,ANG,XT(6)
 
 
 
@@ -1947,6 +1948,40 @@ contains
        X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     ENDIF
 
+!!!!!!!!!!!   solenoid
+
+    if(k%TIME) then   ! bug 2006.1.8
+       ANG=EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
+    else
+       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
+    endif
+    myCOS=COS(ANG)
+    mySIN=SIN(ANG)
+    ! NO EXACT EL%EXACT
+
+    XT(1)=myCOS*X(1)+mySIN*X(3)
+    XT(2)=myCOS*X(2)+mySIN*X(4)
+    XT(3)=myCOS*X(3)-mySIN*X(1)
+    XT(4)=myCOS*X(4)-mySIN*X(2)
+
+    if(k%TIME) then
+       X(6)=X(6)+ANG*(one/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(one+two*X(5)/EL%P%beta0+x(5)**2)
+    else
+       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(one+X(5))
+    endif
+    DO I=1,4
+       X(I)=XT(I)
+    ENDDO
+
+
+    !  end of solenoid
+
+
+
+
+
     if(el%patch) then
        alfh=-EL%thin_h_angle/two
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
@@ -1963,8 +1998,9 @@ contains
     TYPE(KICKT3P),INTENT(IN):: EL
     TYPE(REAL_8) X1,X3,BBYTW,BBXTW,BBYTWT
     TYPE(REAL_8) pz
-    INTEGER J
+    INTEGER J,i
     real(dp) alfh
+    TYPE(REAL_8) myCOS,mySIN,ANG,XT(6)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(X1)
@@ -1972,6 +2008,9 @@ contains
     CALL ALLOC(BBYTW)
     CALL ALLOC(BBXTW)
     CALL ALLOC(BBYTWT)
+    CALL ALLOC(myCOS,mySIN,ANG)
+    CALL ALLOC(XT)
+
 
 
     X1=X(1)
@@ -1993,45 +2032,12 @@ contains
        BBXTW=zero
     ENDIF
 
-    !    IF(PRESENT(MID)) THEN
-    !       CALL XMID(MID,X,0)
-    !       if(k%TIME) then
-    !          call alloc(pz)
-    !          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
-    !          call kill(pz)
-    !       else
-    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
-    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
-    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
-    !       endif
-    !      X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
-    !       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
-    !
-    !!       CALL XMID(MID,X,1)
-    !
-    !       if(k%TIME) then
-    !          call alloc(pz)
-    !          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)*HALF  ! highly illegal additions by frs
-    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz*HALF
-    !          call kill(pz)
-    !       else
-    !          X(2)=X(2)-EL%thin_h_foc*x1*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)*HALF  ! highly illegal additions by frs
-    !          X(4)=X(4)-EL%thin_v_foc*x3*HALF +EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)*HALF  ! highly illegal additions by frs
-    !          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*HALF
-    !       endif
-    !       X(2)=X(2)-EL%P%DIR*EL%P%CHARGE*BBYTW*HALF
-    !       X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW*HALF
-    !!       CALL XMID(MID,X,1)
-    !    ELSE
+
     if(el%patch) then
        alfh=-EL%thin_h_angle/two
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
+
     if(k%TIME) then
        call alloc(pz)
        PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
@@ -2049,6 +2055,39 @@ contains
     X(4)=X(4)+EL%P%DIR*EL%P%CHARGE*BBXTW     ! BACKWARDS
     !    ENDIF
 
+!!!!!!!!!!!   solenoid
+
+    if(k%TIME) then   ! bug 2006.1.8
+       ANG=EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
+    else
+       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
+    endif
+    myCOS=COS(ANG)
+    mySIN=SIN(ANG)
+    ! NO EXACT EL%EXACT
+
+    XT(1)=myCOS*X(1)+mySIN*X(3)
+    XT(2)=myCOS*X(2)+mySIN*X(4)
+    XT(3)=myCOS*X(3)-mySIN*X(1)
+    XT(4)=myCOS*X(4)-mySIN*X(2)
+
+    if(k%TIME) then
+       X(6)=X(6)+ANG*(one/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(one+two*X(5)/EL%P%beta0+x(5)**2)
+    else
+       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(one+X(5))
+    endif
+    DO I=1,4
+       X(I)=XT(I)
+    ENDDO
+
+
+    !  end of solenoid
+
+
+
+
     if(el%patch) then
        alfh=-EL%thin_h_angle/two
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
@@ -2056,6 +2095,8 @@ contains
 
 
 
+    CALL KILL(myCOS,mySIN,ANG)
+    CALL KILL(XT)
     CALL KILL(X1)
     CALL KILL(X3)
     CALL KILL(BBYTW)
