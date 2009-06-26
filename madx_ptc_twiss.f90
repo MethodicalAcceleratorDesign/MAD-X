@@ -330,7 +330,7 @@ contains
     type(fibre), POINTER    :: current
     type(work)              :: startfen !Fibre energy at the start
     real(dp)                :: r,re(6,6),dt
-    logical(lp)             :: initial_matrix_manual, initial_matrix_table
+    logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
@@ -701,28 +701,33 @@ contains
       implicit none
       integer  :: double_from_table
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
+      integer  :: mmap 
       real(dp) dt
-
+      
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
       mman  = get_value('ptc_twiss ','initial_matrix_manual ')
       mtab  = get_value('ptc_twiss ','initial_matrix_table ')
       mascr = get_value('ptc_twiss ','initial_ascript_manual ')
       mdistr = get_value('ptc_twiss ','initial_moments_manual ')
+      mmap = get_value('ptc_twiss ','initial_map_manual ') ! 25 June 2009
 
+      
       momentumCompactionToggle = .false. ! set to true in the case the map
       ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
 
       initial_matrix_manual = mman .ne. 0
+      initial_map_manual = mmap .ne. 0
       initial_matrix_table = mtab .ne. 0
       initial_ascript_manual = mascr .ne. 0
 
 
-      if ( (mman + mtab + mascr + mdistr) > 1) then
+      if ( (mman + mtab + mascr + mdistr + mmap) > 1) then
          call seterrorflag(11,"ptc_twiss ","Ambigous command options");
          print*, "Only one of the following switches might be on:"
          print*, "initial_matrix_manual  = ", initial_matrix_manual
+	 print*, "initial_map_manual     = ", initial_map_manual
          print*, "initial_matrix_table   = ", initial_matrix_table
          print*, "initial_ascript_manual = ", initial_ascript_manual
          print*, "initial_moments_manual = ", mdistr
@@ -759,6 +764,16 @@ contains
             return
          endif
 
+      ! 24 June 2009 - can read initial map from pre-existing fort.18 file 
+      elseif(initial_map_manual) then
+          if (getdebug() > 1) then
+            print*,"Initializing map with initial_map_manual=true"
+         endif
+         call readinitialmap()
+         if (geterrorflag() /= 0) then
+            return
+         endif
+	 
       elseif(initial_matrix_manual) then
 
          if (getdebug() > 1) then
@@ -1288,6 +1303,22 @@ contains
 
       deallocate(j)
     end subroutine readmatrixfromtable
+    
+    	!_________________________________________________________________
+    	subroutine readinitialmap ! from fort.18 file
+      	!reads initial map elements from MAD-X ptc_twiss command parameters
+      		implicit none
+		type(damap) :: map
+		! call readMapFromFort18(y)
+		call alloc(map)		! couldn't deallocate it. But may be on the stack?
+		call dainput(map,18) ! read map from file a damap (not possible to read real_8 directly)
+		y = map
+		! call daprint(y,41) ! for icase=5, 5 parts, one per each phase-space var while 18 has 6
+		call maptoascript()
+		call reademittance() ! do we need this one ?
+	end subroutine readinitialmap
+    	!_________________________________________________________________
+	
     !_________________________________________________________________
 
     subroutine readinitialmatrix
@@ -2049,7 +2080,7 @@ contains
     if ((c_%npara ==5) .or. (c_%ndpt /= 0)) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
           ! enter here for DeltaDependency example
-          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020') ! derivating a term in deltap^2 yields a term in 2*deltap
+          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020') ! derivating term in deltap^2 yields term in 2*deltap
        enddo
     elseif (c_%nd2 ==6) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
@@ -2090,6 +2121,7 @@ subroutine trackBetaExtrema(i,j,value)
   endif
 end subroutine trackBetaExtrema
 ! --- end of set of routines
+
 
 end module madx_ptc_twiss_module
 

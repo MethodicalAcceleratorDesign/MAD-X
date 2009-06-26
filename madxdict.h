@@ -517,6 +517,7 @@ char command_def[] =
 "rmatrix  = [l, false, true], "
 "initial_matrix_table = [l, false, true], "
 "initial_matrix_manual = [l, false, true], "
+"initial_map_manual = [l, false, true], "
 "initial_ascript_manual = [l, false, true], "
 "re11     = [r, 1], re12     = [r, 0], re13     = [r, 0], "
 "re14     = [r, 0], re15     = [r, 0], re16     = [r, 0], "
