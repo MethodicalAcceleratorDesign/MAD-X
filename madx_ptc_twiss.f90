@@ -710,7 +710,7 @@ contains
       mtab  = get_value('ptc_twiss ','initial_matrix_table ')
       mascr = get_value('ptc_twiss ','initial_ascript_manual ')
       mdistr = get_value('ptc_twiss ','initial_moments_manual ')
-      mmap = get_value('ptc_twiss ','initial_map_manual ') ! 25 June 2009
+      mmap = get_value('ptc_twiss ','initial_map_manual ')
 
       
       momentumCompactionToggle = .false. ! set to true in the case the map
@@ -764,7 +764,6 @@ contains
             return
          endif
 
-      ! 24 June 2009 - can read initial map from pre-existing fort.18 file 
       elseif(initial_map_manual) then
           if (getdebug() > 1) then
             print*,"Initializing map with initial_map_manual=true"
@@ -1306,16 +1305,15 @@ contains
     
     	!_________________________________________________________________
     	subroutine readinitialmap ! from fort.18 file
-      	!reads initial map elements from MAD-X ptc_twiss command parameters
       		implicit none
 		type(damap) :: map
 		! call readMapFromFort18(y)
-		call alloc(map)		! couldn't deallocate it. But may be on the stack?
-		call dainput(map,18) ! read map from file a damap (not possible to read real_8 directly)
+		call alloc(map)
+		call dainput(map,18)
 		y = map
-		! call daprint(y,41) ! for icase=5, 5 parts, one per each phase-space var while 18 has 6
+		call kill(map)
 		call maptoascript()
-		call reademittance() ! do we need this one ?
+		call reademittance()
 	end subroutine readinitialmap
     	!_________________________________________________________________
 	
