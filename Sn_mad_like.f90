@@ -834,6 +834,7 @@ CONTAINS
        BLTILT%LC=zero
 
        BLTILT%KIND=kind3
+       BLTILT%BSOL=LIST%bsol
        BLTILT%nmul=LIST%NMUL
        COUNT=.TRUE.
 

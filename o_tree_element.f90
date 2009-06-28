@@ -31,6 +31,9 @@ module tree_element_MODULE
   private scdaddo,daddsco,damapspin_spinor8_mul,damapspin_spinor_mul,eval_spinor_8
   private real_8REAL6,REAL6real_8,real_8REAL_8,PRINT6
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
+  private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
+  private find_perp_basisp,find_exponentp
+
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
   logical(lp) :: force_positive=.false.
@@ -71,6 +74,8 @@ module tree_element_MODULE
      MODULE PROCEDURE spin8_mul_map   ! spinor_8=spinor_8 o damap
      MODULE PROCEDURE eval_spinor_8   ! spinor=spinor_8 * xp(lnv)
      MODULE PROCEDURE concatxp   !  damapspin=damapspin*xp(lnv)
+     MODULE PROCEDURE spin8_scal8_map  ! real_8*spinor_8
+     MODULE PROCEDURE mul_spin8_spin8
   END  INTERFACE
 
   INTERFACE OPERATOR (**)
@@ -92,15 +97,29 @@ module tree_element_MODULE
      MODULE PROCEDURE scdaddo
      MODULE PROCEDURE daddsco
      MODULE PROCEDURE addm
+     MODULE PROCEDURE add_spin8_spin8
   END  INTERFACE
 
-
+  INTERFACE operator (-)
+     MODULE PROCEDURE sub_spin8_spin8
+  END  INTERFACE
 
   INTERFACE find_n0   ! (s0(3,3),n0(3))
      MODULE PROCEDURE find_n_thetar  ! finds n0 the naive way
-     MODULE PROCEDURE find_n_thetap
+     MODULE PROCEDURE find_n_thetap !(s0(3,3),n0(3), spinor_8 optional)
   END INTERFACE
 
+  INTERFACE find_axis   ! (ds,spinor_8)
+     MODULE PROCEDURE find_axisp    ! s= exp(spinor_8.dot.L)
+  END INTERFACE
+
+  INTERFACE find_perp_basis   !
+     MODULE PROCEDURE find_perp_basisp    !
+  END INTERFACE
+
+  INTERFACE find_exponent   !
+     MODULE PROCEDURE find_exponentp    !
+  END INTERFACE
 
   INTERFACE find_a    ! (n(3),a(3,3))  if you have n you get a(3,3)
      MODULE PROCEDURE find_ar  ! such that ai.s.a = exp(theta L_y)
@@ -1735,10 +1754,10 @@ CONTAINS
   subroutine find_n_thetap(s0,n0)
     implicit none
     type(real_8),intent(in) :: s0(3,3)
+
     type(real_8)  theta0,n0(3)
     type(real_8)  det,ss(3,3),detm
     integer i,is,j
-
 
 
     call alloc(det)
@@ -1786,6 +1805,7 @@ CONTAINS
        n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
     endif
 
+
     theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
 
     do i=1,3
@@ -1801,6 +1821,148 @@ CONTAINS
     call kill_33(ss)
 
   end subroutine find_n_thetap
+
+  !  find exponent of rotation routines
+  subroutine find_axisp(ds,H_axis)  !
+    implicit none
+    type(damapspin),intent(in) :: ds
+    type(spinor_8),intent(inout) :: H_axis
+
+    type(real_8)  theta0,n0(3)
+    type(real_8)  det,ss(3,3),detm
+    integer i,is,j
+
+
+    call alloc(det)
+    call alloc(detm)
+    call alloc(theta0)
+    call alloc_33(ss)
+    call alloc(n0)
+
+
+    do i=1,3
+       do j=1,3
+          ss(i,j)=ds%s(i,j)
+       enddo
+    enddo
+
+
+
+    do i=1,3
+       ss(i,i)=ss(i,i)-one
+    enddo
+
+    det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
+    is=1
+    detm=(ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1))
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=2
+    endif
+    detm=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=3
+    endif
+
+
+
+    n0(is)=one
+    if(is==1) then
+       n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
+       n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
+    elseif(is==2) then
+       n0(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
+       n0(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
+    else
+       n0(1)=(-ss(2,2)*ss(1,3)+ss(2,3)*ss(1,2))/det
+       n0(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
+    endif
+
+    theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
+
+    do i=1,3
+       n0(i)=n0(i)/theta0
+    enddo
+
+    h_axis%x(1)=n0(1);  h_axis%x(2)=n0(2) ; h_axis%x(3)=n0(3);
+
+
+
+
+
+    call kill(det)
+    call kill(detm)
+    call kill(theta0)
+    call kill_33(ss)
+    call kill(n0)
+
+  end subroutine find_axisp
+
+  subroutine find_perp_basisp(y_axis,x_axis,z_axis)  !
+    implicit none
+    type(spinor_8),intent(inout) :: y_axis,x_axis,z_axis
+    integer i,is
+    type(real_8) norm
+
+    call alloc(norm)
+
+    is=1
+    if(abs(y_axis%x(is))>abs(y_axis%x(2))) then
+       is=2
+    endif
+    if(abs(y_axis%x(is))>abs(y_axis%x(3))) then
+       is=3
+    endif
+
+    !  now is = smallest
+
+    x_axis=is
+
+    x_axis=x_axis-(x_axis.dot.y_axis)*y_axis
+
+    norm=sqrt(x_axis.dot.x_axis)
+    x_axis=(1.d0/norm)*x_axis
+
+    norm=sqrt(z_axis.dot.z_axis)
+    z_axis=x_axis*y_axis
+    z_axis=(1.d0/norm)*z_axis
+
+
+
+    call kill(norm)
+
+  end subroutine find_perp_basisp
+
+  subroutine find_exponentp(ds,y_axis,x_axis,z_axis,h_axis)  !
+    implicit none
+    type(damapspin),intent(inout) :: ds
+    type(spinor_8),intent(inout) :: y_axis,x_axis,z_axis,h_axis
+    type(spinor_8) s
+    type(real_8) cos,sin,theta
+
+    call alloc(s)
+    call alloc(cos,sin,theta)
+
+    call find_axis(ds,y_axis)
+    call find_perp_basis(y_axis,x_axis,z_axis)
+
+    s=ds*x_axis
+
+    cos=s.dot.x_axis
+    sin=-(s.dot.z_axis)
+
+    theta=clockwise*atan2(sin,cos)
+    !if(force_positive.and.theta<zero) theta = theta + twopi    !!!! allow negative theta
+
+    h_axis=(clockwise*theta)*y_axis
+
+    call kill(cos,sin,theta)
+    call kill(s)
+  end subroutine find_exponentp
+
+  ! end of  find exponent of rotation routines
+
 
   subroutine find_ar(n2,a)
     implicit none
@@ -2818,6 +2980,115 @@ CONTAINS
 
   END FUNCTION spin8_mul_map
 
+  FUNCTION spin8_scal8_map(S1,S2)  ! transforms spinor_8 s2 with damap s1
+    implicit none
+    type(spinor_8) spin8_scal8_map
+    TYPE (real_8), INTENT (IN) :: S1
+    type(spinor_8), INTENT (IN) :: S2
+    integer i
+    integer localmaster
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call assp_master(spin8_scal8_map%x(1))
+    call assp_no_master(spin8_scal8_map%x(2))
+    call assp_no_master(spin8_scal8_map%x(3))
+
+    spin8_scal8_map%x(1)=zero
+    spin8_scal8_map%x(2)=zero
+    spin8_scal8_map%x(3)=zero
+
+    do i=1,3
+       spin8_scal8_map%x(i)=s1*S2%x(i)
+    enddo
+
+    master=localmaster
+
+  END FUNCTION spin8_scal8_map
+
+
+  FUNCTION add_spin8_spin8(S1,S2)  ! transforms spinor_8 s2 with damap s1
+    implicit none
+    type(spinor_8) add_spin8_spin8
+    type(spinor_8), INTENT (IN) :: S1,S2
+    integer i
+    integer localmaster
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call assp_master(add_spin8_spin8%x(1))
+    call assp_no_master(add_spin8_spin8%x(2))
+    call assp_no_master(add_spin8_spin8%x(3))
+
+    add_spin8_spin8%x(1)=zero
+    add_spin8_spin8%x(2)=zero
+    add_spin8_spin8%x(3)=zero
+
+    do i=1,3
+       add_spin8_spin8%x(i)=s1%x(i)+S2%x(i)
+    enddo
+
+    master=localmaster
+
+  END FUNCTION add_spin8_spin8
+
+  FUNCTION mul_spin8_spin8(S1,S2)  ! transforms spinor_8 s2 with damap s1
+    implicit none
+    type(spinor_8) mul_spin8_spin8
+    type(spinor_8), INTENT (IN) :: S1,S2
+    integer i
+    integer localmaster
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call assp_master(mul_spin8_spin8%x(1))
+    call assp_no_master(mul_spin8_spin8%x(2))
+    call assp_no_master(mul_spin8_spin8%x(3))
+
+    mul_spin8_spin8%x(1)=zero
+    mul_spin8_spin8%x(2)=zero
+    mul_spin8_spin8%x(3)=zero
+
+    mul_spin8_spin8%x(1)=s1%x(2)*S2%x(3)-s1%x(3)*S2%x(2)
+    mul_spin8_spin8%x(2)=s1%x(3)*S2%x(1)-s1%x(1)*S2%x(3)
+    mul_spin8_spin8%x(3)=s1%x(1)*S2%x(2)-s1%x(2)*S2%x(1)
+
+    master=localmaster
+
+  END FUNCTION mul_spin8_spin8
+
+  FUNCTION sub_spin8_spin8(S1,S2)  ! transforms spinor_8 s2 with damap s1
+    implicit none
+    type(spinor_8) sub_spin8_spin8
+    type(spinor_8), INTENT (IN) :: S1,S2
+    integer i
+    integer localmaster
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call assp_master(sub_spin8_spin8%x(1))
+    call assp_no_master(sub_spin8_spin8%x(2))
+    call assp_no_master(sub_spin8_spin8%x(3))
+
+    sub_spin8_spin8%x(1)=zero
+    sub_spin8_spin8%x(2)=zero
+    sub_spin8_spin8%x(3)=zero
+
+    do i=1,3
+       sub_spin8_spin8%x(i)=s1%x(i)-S2%x(i)
+    enddo
+
+    master=localmaster
+
+  END FUNCTION sub_spin8_spin8
+
   function eval_spinor_8(s,x)
     implicit none
     TYPE(spinor) eval_spinor_8
@@ -2956,8 +3227,9 @@ CONTAINS
     CALL alloc(D%as)
     CALL alloc(D%a1)
     CALL alloc(D%ar)
-    !    D%NRES=0
-    !    D%M=0
+    D%NRES=0
+    D%M=0
+    D%Ms=0
 
 
   END    subroutine alloc_normal_spin
@@ -3225,7 +3497,8 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%cos,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,clockwise,nd,doit)
+
 
        if(doit) then
           ang=zero
@@ -3242,7 +3515,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%SIN,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3261,7 +3534,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%cos,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3278,7 +3551,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%SIN,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3297,7 +3570,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%cos,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3314,7 +3587,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%SIN,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3333,7 +3606,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%cos,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3350,7 +3623,7 @@ CONTAINS
     do i=1,n
        call taylor_cycle(t%SIN,ii=i,value=value,j=jc)
 
-       !    call test_jc(jc,nd,doit)
+       call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
           ang=zero
@@ -3399,18 +3672,58 @@ CONTAINS
 
     if(.not.doit) return
 
-    k=1
-    l=1
     do j=1,ns%n%nres
+       k=0
+       l=0
        do i=1,nd
           k=iabs(jc(i*2-1)-jc(i*2)-ns%n%m(i,j))+k
           l=iabs(jc(i*2-1)-jc(i*2)+ns%n%m(i,j))+l
        enddo
+       if(k==0.or.l==0) then
+          doit=.false.
+          exit
+       endif
     enddo
 
-    if(k==0.or.l==0) doit=.false.
 
   end subroutine test_jc
+
+  subroutine test_jc_spin(ns,jc,is,nd,doit)
+    implicit none
+    logical doit
+    integer i,nd,k,l,j,is
+    integer  jc(:)
+    TYPE(normal_spin), INTENT(INout) :: ns
+
+    doit=.true.
+
+    !    write(6,*) jc(1:4),is
+    !    write(6,*) ns%m(1,1),ns%m(2,1),ns%ms(1)
+
+    do j=1,ns%nres
+       k=0
+       l=0
+       do i=1,nd
+          k=iabs(jc(i*2-1)-jc(i*2)-ns%m(i,j))+k
+          l=iabs(jc(i*2-1)-jc(i*2)+ns%m(i,j))+l
+       enddo
+       k=k+iabs(is-ns%ms(j))
+       l=l+iabs(is+ns%ms(j))
+       if(k==0.or.l==0) then
+          doit=.false.
+          exit
+       endif
+    enddo
+    if(.not.doit) then
+       write(6,*) jc(1:4),is
+       write(6,*) ns%m(1,1),ns%m(2,1),ns%ms(1)
+    endif
+
+    !    write(6,*) doit
+
+    !    pause 313
+
+  end subroutine test_jc_spin
 
   subroutine normalise_spin(ns,DS_in)
     implicit none

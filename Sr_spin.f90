@@ -2650,7 +2650,8 @@ contains
        !call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_false,k,C%POS_IN_FIBRE-2)
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       CALL TRACK_FRINGE_spin(C,XS,K)
+       if(.not.C%PARENT_FIBRE%MAG%P%KILL_ENT_FRINGE.and.c%cas==case1) CALL TRACK_FRINGE_spin(C,XS,K)
+       if(.not.C%PARENT_FIBRE%MAG%P%KILL_exi_FRINGE.and.c%cas==case2) CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
@@ -2696,7 +2697,8 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       CALL TRACK_FRINGE_spin(C,XS,K)
+       if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE.and.c%cas==case1) CALL TRACK_FRINGE_spin(C,XS,K)
+       if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE.and.c%cas==case2) CALL TRACK_FRINGE_spin(C,XS,K)
        !        CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else

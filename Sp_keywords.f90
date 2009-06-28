@@ -131,7 +131,12 @@ contains
        BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("SOLENOID       ")
        if(sixtrack_compatible) stop 1
-       BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       if(KEY%LIST%L/=zero) then
+          BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       else
+          write(6,*) "switch solenoid to dubious thin multipole "
+          BLANK=MULTIPOLE_BLOCK(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       endif
     CASE("QUADRUPOLE     ")
        BLANK=QUADRUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("SEXTUPOLE     ")

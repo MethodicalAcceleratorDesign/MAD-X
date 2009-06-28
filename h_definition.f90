@@ -264,6 +264,7 @@ module definition
      type(damapspin) a_t
      ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
 !!!  extra info
+     integer M(NDIM,NRESO),MS(NRESO),NRES
      type(real_8) n0(3)
      type(real_8) theta0
   end type normal_spin
