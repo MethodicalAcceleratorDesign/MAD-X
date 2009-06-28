@@ -779,12 +779,9 @@ CONTAINS
           ksi=bvk*node_value('ksi ')
           if(ksi.eq.zero)then
              key%magnet="marker"
-             print*,"Thin solenoid: ",name," not implemented in PTC - set to marker"
+             print*,"Thin solenoid: ",name," has no strength - set to marker"
           else
-             key%list%l=c_1d_9
-             l_machine=l_machine+c_1d_9
-             key%list%bsol=ksi/c_1d_9
-             print*,"Thin solenoid: ",name," not implemented in PTC"//"Attempting a fake solenoid" 
+             key%list%bsol=ksi
           endif
        endif
        !VK
