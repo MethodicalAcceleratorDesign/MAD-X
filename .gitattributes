@@ -2,6 +2,7 @@
 /Makefile -text
 /Makefile.bat -text
 /MakefileIntel.bat -text
+/SDDS.h -text
 /SDDStypes.h -text
 /Sa_extend_poly.f90 -text
 /Sb_sagan_pol_arbitrary.f90 -text
