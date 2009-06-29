@@ -40,7 +40,7 @@
 */
 
 #ifdef _ONLINE
-#include "sdds.h"
+#include "SDDS.h"
 #endif
 
 /* JMJ 7/11/2002 moved this here from c6t.c */
