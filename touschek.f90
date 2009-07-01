@@ -43,6 +43,8 @@ subroutine cavtouschek (um,uloss,iflag)
   i = restart_sequ()
 10 continue
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   ! cavity
   if (code .eq. 10) then
      lg = get_string('element ', 'name ', el_name)
@@ -362,9 +364,13 @@ end function ftousch
 
 ! *********************************************************************
 !
-! $Id: touschek.f90,v 1.2 2009-04-06 23:30:07 frs Exp $
+! $Id: touschek.f90,v 1.3 2009-07-01 17:50:07 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.2  2009/04/06 23:30:07  frs
+! Fortran Clean-up: indenting, remove potentially uninitialized variable and
+! also remove unused variables
+!
 ! Revision 1.1  2009/03/27 09:37:53  frs
 ! New files needed for MAD-X Version 4
 !
@@ -481,9 +487,13 @@ END FUNCTION DGAUSS
 
 !********************************************************************
 !
-! $Id: touschek.f90,v 1.2 2009-04-06 23:30:07 frs Exp $
+! $Id: touschek.f90,v 1.3 2009-07-01 17:50:07 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.2  2009/04/06 23:30:07  frs
+! Fortran Clean-up: indenting, remove potentially uninitialized variable and
+! also remove unused variables
+!
 ! Revision 1.1  2009/03/27 09:37:53  frs
 ! New files needed for MAD-X Version 4
 !

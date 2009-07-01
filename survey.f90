@@ -63,6 +63,8 @@
       j = restart_sequ()
  10   continue
       code = node_value('mad8_type ')
+      if(code.eq.39) code=15
+      if(code.eq.38) code=24
 !      print *,"code   ", code
 !**** el is the arc length for all bends  ********
       el = node_value('l ')
@@ -189,6 +191,8 @@
       call double_to_table('survey ', 'globaltilt ',globaltilt)
 
       code = node_value('mad8_type ')
+      if(code.eq.39) code=15
+      if(code.eq.38) code=24
       if(code.eq.2.or.code.eq.3) then
         ang = node_value('angle ')*node_value('other_bv ')
       else if(code.eq.8) then

@@ -371,6 +371,8 @@ CONTAINS
     key%list%l=l
     l_machine=l_machine+l
     code=node_value('mad8_type ')
+    if(code.eq.39) code=15
+    if(code.eq.38) code=24
     call element_name(name,name_len)
     key%list%name=name
 

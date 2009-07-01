@@ -525,6 +525,8 @@ subroutine pefill(ierr)
 
      if (itbv .eq. 1)  then
         currtyp = node_value('mad8_type ')
+        if(currtyp.eq.39) currtyp=15
+        if(currtyp.eq.38) currtyp=24
         if (currtyp .le. mtype) pltyp = ilist(currtyp)
 
         !--- get element parameters & build up plytp (to be used by the routine peschm)

@@ -111,6 +111,8 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
 10 continue
   bbd_pos=i
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   el = node_value('l ')
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
@@ -462,7 +464,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   go to (500,  20,  30, 500,  50,  60,  70,  80, 500, 100,          &
        &500, 500, 500, 140, 150, 160, 500, 500, 500, 500,                 &
        &500, 500, 500, 500, 500, 500, 500, 500, 500, 500,                 &
-       &500, 500, 500, 500, 500, 500, 500, 500, 500, 500), code
+       &500, 500, 500, 500, 500, 500, 500, 500, 150, 500), code
   go to 500
 
   !---- Dipole.
@@ -795,7 +797,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
           &ferror(1))
      ykick=zero
-  else if(code.eq.15) then
+  else if(code.eq.15.or.code.eq.39) then
      xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
           &ferror(1))
      ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &

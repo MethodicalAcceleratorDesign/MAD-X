@@ -91,7 +91,7 @@
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 29          /* no. of valid element types */
+#define N_TYPES 31          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -235,7 +235,9 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "hkicker      5       5       5       1       0       3",
  "hmonitor     0       1       1       1       0       0",
  "instrument   0       1       1       1       0       0",
+ "placeholder  0       1       1       1       0       0",
  "kicker       6       6       6       1       0       3",
+ "tkicker      6       6       6       1       0       3",
  "lcavity      3       3       3       0       0       2",
  "marker       4       0       0       0       0       0",
  "matrix       2       2       2       0       0       0",
@@ -442,6 +444,7 @@ void assign_att()
         else if (strcmp(el->base_name, "ecollimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "hkicker") == 0) att_hkicker(el);
         else if (strcmp(el->base_name, "kicker") == 0) att_kicker(el);
+        else if (strcmp(el->base_name, "tkicker") == 0) att_kicker(el);
         else if (strcmp(el->base_name, "lcavity") == 0) att_lcavity(el);
         else if (strcmp(el->base_name, "marker") == 0) att_marker(el);
         else if (strcmp(el->base_name, "matrix") == 0) att_matrix(el);
@@ -1016,6 +1019,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
       (strcmp(p->base_name,"octupole") == 0)   ||
       (strcmp(p->base_name,"vkicker") == 0)    ||
       (strcmp(p->base_name,"hkicker") == 0)    ||
+      (strcmp(p->base_name,"tkicker") == 0)    ||
       (strcmp(p->base_name,"kicker") == 0))
   {
     c6t_elem = new_c6t_element(20,t_name,p->base_name);
@@ -1167,6 +1171,7 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
   }
   else if ((strcmp(p->base_name,"marker") == 0)   ||
            (strcmp(p->base_name,"instrument") == 0)    ||
+           (strcmp(p->base_name,"placeholder") == 0)    ||
            (strcmp(p->base_name,"hmonitor") == 0) ||
            (strcmp(p->base_name,"vmonitor") == 0) ||
            (strcmp(p->base_name,"monitor") == 0))
@@ -1998,7 +2003,7 @@ void pro_elem(struct node* cnode)
   else if (strcmp(cnode->base_name, "sextupole") == 0) mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0) mod_rfcavity(current_element);
   else if (strcmp(cnode->base_name, "crabcavity") == 0) mod_crabcavity(current_element);
-  if (strstr(cnode->base_name, "kicker"))
+  if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
   {
     if (cnode->p_elem)
     {

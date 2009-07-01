@@ -584,6 +584,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
 10 continue
   bbd_pos=node
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   if (code .ge. ccode-1 .and. code .le. ccode+1)  then
      !---  kicker
      if (thr_on .gt. 0)  then
@@ -819,6 +821,8 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   endif
   node = node - 1
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   if (code .eq. itp .or. code .eq. both)  then
      icorr = icorr + 1
      ncorr = node
@@ -1134,6 +1138,8 @@ SUBROUTINE twcpgo(rt)
 10 continue
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
@@ -1589,6 +1595,8 @@ SUBROUTINE twchgo
 10 continue
   el = node_value('l ')
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
@@ -2192,6 +2200,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   ct=zero
   st=zero
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   deltap=zero
   call dzero(ek0,6)
   call m66one(rw)
@@ -2889,6 +2899,8 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
      !---- Original setting.
      code = node_value('mad8_type ')
+     if(code.eq.39) code=15
+     if(code.eq.38) code=24
      if(code.eq.14) then
         xkick=bvk*(node_value('kick ')+node_value('chkick ')+         &
              &field(1)/div)

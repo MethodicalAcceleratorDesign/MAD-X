@@ -1594,6 +1594,8 @@ subroutine suelem(el, ve, we,tilt)
   tilt = zero
   angle = zero
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
        &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
        &210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &

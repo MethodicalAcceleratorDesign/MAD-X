@@ -177,6 +177,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      bbd_pos=j
      if (turn .eq. 1)  then
         code = node_value('mad8_type ')
+        if(code.eq.39) code=15
+        if(code.eq.38) code=24
         el = node_value('l ')
         code_buf(nlm+1) = code
         l_buf(nlm+1) = el
@@ -1392,6 +1394,8 @@ subroutine ttcorr(el,track,ktrack)
   gammas = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   call dzero(f_errors, maxferr+1)
   n_ferr = node_fd_errors(f_errors)
   dorad = get_value('probe ','radiate ') .ne. 0
@@ -2881,6 +2885,8 @@ subroutine trclor(orbit0)
 
      bbd_pos = j
      code    = node_value('mad8_type ')
+     if(code.eq.39) code=15
+     if(code.eq.38) code=24
      el      = node_value('l ')
 
      if (itra .eq. 1)  then

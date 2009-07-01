@@ -89,6 +89,8 @@ subroutine cavprt()
   i = restart_sequ()
 10 continue
   code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
   if (code .eq. 10) then      ! cavity
      lg = get_string('element ', 'name ', el_name)
      el = node_value('l ')
