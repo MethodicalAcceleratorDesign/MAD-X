@@ -13,6 +13,37 @@
  *
  * Michael Borland, 1993
  $Log: not supported by cvs2svn $
+ Revision 1.85  2009/06/02 18:17:15  soliday
+ Updated so that the MPI functions will be visable from shared libraries.
+
+ Revision 1.84  2009/06/01 20:57:55  soliday
+ Updated to work with SDDS_MPI_IO=0
+
+ Revision 1.83  2009/05/08 16:05:18  shang
+ added MPI non native writing routines
+
+ Revision 1.82  2008/11/11 21:05:18  soliday
+ Updated to fix an issue on vxWorks.
+
+ Revision 1.81  2008/09/18 20:15:07  soliday
+ Added SDDS_SetColumnFromFloats and SDDS_GetColumnInFloats
+
+ Revision 1.80  2008/08/04 14:04:57  shang
+ added collective_io to MPI_DATASET structure
+
+ Revision 1.79  2008/07/21 14:45:28  shang
+
+ redefined SDDS_MPI_TotalRowsCount
+
+ Revision 1.78  2008/04/14 18:36:57  shang
+ now includes the definition of parallel SDDS.
+
+ Revision 1.77  2007/10/12 18:03:44  shang
+ added titleBuffer member to SDDS_DATASET
+
+ Revision 1.76  2007/09/27 14:25:53  shang
+ added SDDS_Parallel_InitializeOutput
+
  Revision 1.75  2006/12/07 16:40:54  soliday
  Added SDDS_GetToken2 and SDDS_ScanData2 which are now used when reading
  ascii array data.
@@ -266,6 +297,41 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+
+#define SDDS_READMODE 1
+#define SDDS_WRITEMODE 2
+#define SDDS_MEMMODE 3
+
+#define SDDS_MPI_READ_ONLY 0x0001UL
+#define SDDS_MPI_WRITE_ONLY 0x0002UL
+#define SDDS_MPI_READ_WRITE  0x0004UL
+#define SDDS_MPI_STRING_COLUMN_LEN 16
+
+#if SDDS_MPI_IO
+#include "mpi.h"
+#include "mdb.h"
+
+extern char SDDS_mpi_error_str[MPI_MAX_ERROR_STRING];
+extern int32_t SDDS_mpi_error_str_len;
+extern char *SDDS_MPI_FILE_TYPE[];
+
+typedef struct {
+  MPI_File	        MPI_file;	/*MPIO file handle			*/
+  MPI_Comm	        comm;		/*communicator				*/
+  MPI_Info	        File_info;	/*file information			*/
+  int32_t               myid;           /* This process's rank                  */
+  int32_t               n_processors;   /* Total number of processes        */
+  MPI_Offset            file_offset, file_size, column_offset;  /* number of bytes in one row for row major order*/
+  short                 collective_io;
+  int32_t               n_page;         /* index of current page*/
+  int32_t               n_rows;         /* number of rows that current processor holds */
+  int32_t               total_rows;     /* the total number of rows that all processor hold*/
+  int32_t               end_of_file;    /* flag for end of MPI_file */
+  int32_t               master_read;   /*determine if master processor read the page data or not*/
+  int32_t               start_row, end_row; /* the start row and end row that current processor's data that is going to be written to output or read from input */
+} MPI_DATASET;
+#endif
+
 #if defined(zLib)
 #include "zlib.h"
 #endif
@@ -289,7 +355,15 @@ typedef unsigned __int32 uint32_t;
 #define SCNu32 "lu"
 #define INT32_MAX (2147483647)
 #else
+#if defined(vxWorks)
+#define PRId32 "ld"
+#define SCNd32 "ld"
+#define PRIu32 "lu"
+#define SCNu32 "lu"
+#define INT32_MAX (2147483647)
+#else
 #include <inttypes.h>
+#endif
 #endif
 
 #undef epicsShareFuncSDDS
@@ -312,6 +386,7 @@ typedef unsigned __int32 uint32_t;
 
 #define SDDS_BINARY 1
 #define SDDS_ASCII  2
+#define SDDS_PARALLEL 3
 #define SDDS_NUM_DATA_MODES 2
 
   /*
@@ -420,9 +495,10 @@ typedef struct {
 #define SDDS_FILEBUFFER_SIZE  262144
 
 typedef struct {
-    SDDS_LAYOUT layout, original_layout;
-    short swapByteOrder;
-    SDDS_FILEBUFFER fBuffer;
+  SDDS_LAYOUT layout, original_layout;
+  short swapByteOrder;
+  SDDS_FILEBUFFER fBuffer;
+  SDDS_FILEBUFFER titleBuffer;
     int32_t page_number;
 
     short mode; /*file mode*/
@@ -443,7 +519,7 @@ typedef struct {
                             */
     short autoRecover;
     short autoRecovered;
-    
+  short parallel_io;        /*flag for parallel SDDS */
     int32_t n_of_interest;
     int32_t *column_order;          /* column_order[i] = internal index of user's ith column */
     int32_t *column_flag;           /* column_flag[i] indicates whether internal ith column has been selected */
@@ -464,6 +540,10 @@ typedef struct {
      * the type-name is "char *".
      */
     void **data;
+  short column_major;
+#if SDDS_MPI_IO
+  MPI_DATASET *MPI_dataset;
+#endif
     } SDDS_DATASET;
 
 typedef SDDS_DATASET SDDS_TABLE;
@@ -471,6 +551,8 @@ typedef SDDS_DATASET SDDS_TABLE;
 /* prototypes for routines to prepare and write SDDS files */
 epicsShareFuncSDDS extern int32_t SDDS_InitializeOutput(SDDS_DATASET *SDDS_dataset, int32_t data_mode,
 						     int32_t lines_per_row, char *description,
+						     char *contents, char *filename);
+epicsShareFuncSDDS extern int32_t SDDS_Parallel_InitializeOutput(SDDS_DATASET *SDDS_dataset, char *description,
 						     char *contents, char *filename);
 epicsShareFuncSDDS extern int32_t SDDS_InitializeAppend(SDDS_DATASET *SDDS_dataset, char *filename);
 epicsShareFuncSDDS extern int32_t SDDS_InitializeAppendToPage(SDDS_DATASET *SDDS_dataset, char *filename, 
@@ -561,6 +643,7 @@ epicsShareFuncSDDS extern int32_t SDDS_UpdatePage(SDDS_DATASET *SDDS_dataset, ui
 epicsShareFuncSDDS extern int32_t SDDS_SyncDataSet(SDDS_DATASET *SDDS_dataset);
 epicsShareFuncSDDS extern int32_t SDDS_SetColumn(SDDS_DATASET *SDDS_dataset, int32_t mode, void *data, int32_t rows, ...);
 epicsShareFuncSDDS extern int32_t SDDS_SetColumnFromDoubles(SDDS_DATASET *SDDS_dataset, int32_t mode, double *data, int32_t rows, ...);
+epicsShareFuncSDDS extern int32_t SDDS_SetColumnFromFloats(SDDS_DATASET *SDDS_dataset, int32_t mode, float *data, int32_t rows, ...);
 epicsShareFuncSDDS extern int32_t SDDS_SetColumnFromLongs(SDDS_DATASET *SDDS_dataset, int32_t mode, int32_t *data, int32_t rows, ...);
 epicsShareFuncSDDS extern int32_t SDDS_SetParametersFromDoubles(SDDS_DATASET *SDDS_dataset, int32_t mode, ...);
 
@@ -580,6 +663,7 @@ epicsShareFuncSDDS extern int32_t SDDS_SetDefaultIOBufferSize(int32_t bufferSize
 /* prototypes for routines to read and use SDDS files  */
 epicsShareFuncSDDS extern int32_t SDDS_InitializeInputFromSearchPath(SDDS_DATASET *SDDSin, char *file);
 epicsShareFuncSDDS extern int32_t SDDS_InitializeInput(SDDS_DATASET *SDDS_dataset, char *filename);
+epicsShareFuncSDDS extern int32_t SDDS_ReadLayout(SDDS_DATASET *SDDS_dataset, FILE *fp);
 epicsShareFuncSDDS extern int32_t SDDS_InitializeHeaderlessInput(SDDS_DATASET *SDDS_dataset, char *filename);
 epicsShareFuncSDDS extern int32_t SDDS_GetRowLimit();
 epicsShareFuncSDDS extern int32_t SDDS_SetRowLimit(int32_t limit);
@@ -659,6 +743,7 @@ epicsShareFuncSDDS extern int32_t SDDS_FilterRowsByNumScan(SDDS_DATASET *SDDS_da
 epicsShareFuncSDDS extern void *SDDS_GetColumn(SDDS_DATASET *SDDS_dataset, char *column_name);
 epicsShareFuncSDDS extern void *SDDS_GetInternalColumn(SDDS_DATASET *SDDS_dataset, char *column_name);
 epicsShareFuncSDDS extern double *SDDS_GetColumnInDoubles(SDDS_DATASET *SDDS_dataset, char *column_name);
+epicsShareFuncSDDS extern float *SDDS_GetColumnInFloats(SDDS_DATASET *SDDS_dataset, char *column_name);
 epicsShareFuncSDDS extern int32_t *SDDS_GetColumnInLong(SDDS_DATASET *SDDS_dataset, char *column_name);
 epicsShareFuncSDDS extern short *SDDS_GetColumnInShort(SDDS_DATASET *SDDS_dataset, char *column_name);
 epicsShareFuncSDDS extern void *SDDS_GetNumericColumn(SDDS_DATASET *SDDS_dataset, char *column_name, int32_t desiredType);
@@ -915,6 +1000,76 @@ int32_t SDDS_WriteNonNativeBinaryString(char *string, FILE *fp, SDDS_FILEBUFFER 
 int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FILEBUFFER *fBuffer);
 #endif
 
+#if SDDS_MPI_IO
+  /* SDDSmpi_output.c */
+  char *BlankToNull(char *string);
+  epicsShareFuncSDDS extern void SDDS_MPI_BOMB(char *text, MPI_File *mpi_file);
+  void SDDS_MPI_GOTO_ERROR(FILE *fp, char *str, int32_t mpierror, int32_t exit);
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_File_Open(MPI_DATASET *MPI_dataset, char *filename, unsigned long flags);
+  char *SDDS_CreateNamelistField(char *name, char *value);
+  char *SDDS_CreateDescription(char *text, char *contents);
+  char *SDDS_CreateParameterDefinition(PARAMETER_DEFINITION *parameter_definition);
+  char *SDDS_CreateColumnDefinition(COLUMN_DEFINITION *column_definition);
+  char *SDDS_CreateArrayDefinition(ARRAY_DEFINITION *array_definition);
+  char *SDDS_CreateAssociateDefinition(ASSOCIATE_DEFINITION *associate_definition);
+  char *SDDS_CreateDataMode(DATA_MODE *data_mode);
+#define SDDS_MPI_WriteTable(a) SDDS_MPI_WritePage(a)
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_WriteLayout(SDDS_DATASET *MPI_dataset);
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_WritePage(SDDS_DATASET *MPI_dataset);
+  MPI_Datatype Convert_SDDStype_To_MPItype(int32_t SDDS_type);
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_Terminate(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_InitializeOutput(SDDS_DATASET *MPI_dataset, char *description, char *contents, char *filename, unsigned long flags, short column_major);
+  int32_t SDDS_MPI_InitializeCopy(SDDS_DATASET *MPI_dataset_target, SDDS_DATASET *SDDS_source, char *filename, short column_major);
+  
+  /*SDDS_MPI_binary.c writing data*/
+  int32_t SDDS_CheckStringTruncated(void);
+  void SDDS_StringTuncated(void);
+  int32_t SDDS_SetDefaultStringLength(int32_t newValue);
+  int32_t SDDS_MPI_WriteBinaryPage(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteBinaryString(SDDS_DATASET *MPI_dataset, char *string);
+  int32_t SDDS_MPI_WriteBinaryParameters(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteBinaryArrays(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row);
+   int32_t SDDS_MPI_WriteNonNativeBinaryPage(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteNonNativeBinaryString(SDDS_DATASET *MPI_dataset, char *string);
+  int32_t SDDS_MPI_WriteNonNativeBinaryParameters(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteNonNativeBinaryArrays(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_WriteNonNativeBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row);
+  MPI_Offset SDDS_MPI_Get_Column_Size(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_CollectiveWriteByRow(SDDS_DATASET *SDDS_dataset);
+  int32_t SDDS_MPI_Get_Title_Size(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_BufferedWrite(void *target, size_t targetSize, SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_FlushBuffer(SDDS_DATASET *MPI_Dataset);
+  int32_t SDDS_MPI_GetTotalRows(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_CountRowsOfInterest(SDDS_DATASET *SDDS_dataset, int32_t start_row, int32_t end_row);
+  int32_t SDDS_MPI_WriteContinuousBinaryPage(SDDS_DATASET *MPI_dataset);
+  MPI_Offset SDDS_MPI_GetTitleOffset(SDDS_DATASET *MPI_dataset);
+  /*SDDS_MPI_binary.c reading data*/
+  int32_t SDDS_MPI_BufferedRead(void *target, size_t targetSize, SDDS_DATASET *MPI_dataset, SDDS_FILEBUFFER *fBuffer);
+  int32_t SDDS_MPI_ReadBinaryPage(SDDS_DATASET *MPI_dataset);
+  char *SDDS_MPI_ReadNonNativeBinaryString(SDDS_DATASET *MPI_dataset, SDDS_FILEBUFFER *fBuffer, int32_t skip);
+  int32_t SDDS_MPI_ReadBinaryParameters(SDDS_DATASET *MPI_dataset, SDDS_FILEBUFFER *fBuffer);
+  int32_t SDDS_MPI_ReadBinaryArrays(SDDS_DATASET *MPI_dataset, SDDS_FILEBUFFER *fBuffer);
+  int32_t SDDS_MPI_ReadBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row, int32_t skip);
+  int32_t SDDS_MPI_ReadNonNativeBinaryParameters(SDDS_DATASET *SDDS_dataset);
+  int32_t SDDS_MPI_ReadNonNativeBinaryArrays(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_ReadNonNativeBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row, int32_t skip);
+  int32_t SDDS_MPI_ReadBinaryPage(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_ReadNonNativePage(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_ReadNonNativePageSparse(SDDS_DATASET *MPI_dataset, uint32_t mode);
+  int32_t SDDS_MPI_ReadNonNativeBinaryPage(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_MPI_ReadNonNativeBinaryRow(SDDS_DATASET *MPI_dataset, int32_t row, int32_t skip);
+  int32_t SDDS_MPI_BufferedReadBinaryTitle(SDDS_DATASET *MPI_dataset);
+  int32_t SDDS_SetDefaultTitleBufferSize(int32_t newSize);
+  int32_t SDDS_MPI_WriteBinaryPageByColumn(SDDS_DATASET *MPI_dataset);
+  epicsShareFuncSDDS extern void SDDS_MPI_Setup(SDDS_DATASET *SDDS_dataset, int32_t parallel_io, int32_t n_processors, int32_t myid, MPI_Comm comm, short master_read);
+  
+  /*SDDSmpi_input.c */
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_ReadPage(SDDS_DATASET *MPI_dataset);
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_InitializeInput(SDDS_DATASET *MPI_dataset, char *filename);
+  epicsShareFuncSDDS extern int32_t SDDS_MPI_InitializeInputFromSearchPath(SDDS_DATASET *MPI_dataset, char *file);
+ #define SDDS_MPI_TotalRowCount(SDDS_DATASET) ((SDDS_DATASET)->MPI_dataset->total_rows) 
+#endif
 
 #ifdef __cplusplus
 }
