@@ -117,7 +117,7 @@ struct  table  *tfstab;
 /* convert SDDS to TFS types */
 int tfs_sdds_types[] =
 {
-  -1, MADX_DOUBLE, MADX_DOUBLE, MADX_LONG, MADX_LONG, MADX_STRING
+  -1, MADX_DOUBLE, MADX_DOUBLE, MADX_LONG, MADX_LONG, MADX_LONG, MADX_LONG, MADX_STRING
 };
 
 if(sdds_pat != NULL) {
