@@ -245,6 +245,8 @@ int twiss_table_types[] =
   2, 2, 2, 2,
   /* derivatives of dispersion w.r.t. delta_p */
   2, 2, 2, 2,
+  2, 2, 2, 2, /* second order derivatives */
+  2, 2, 2, 2, /* third order derivatives */
   /* end of dispersion derivatives w.r.t. delta_p */
   2, 2, 2, /* mu1, mu2, mu3 */
   2, 2, 2, 2, 2, 2,
@@ -309,6 +311,8 @@ char* twiss_table_cols[] =
   "disp1", "disp2", "disp3","disp4",
   /* derivatives of dispersion w.r.t. delta_p */
   "disp1p", "disp2p", "disp3p", "disp4p",
+  "disp1p2", "disp2p2", "disp3p2", "disp4p2", /* second order derivatives */
+  "disp1p3", "disp2p3", "disp3p3", "disp4p3", /* third order derivatives */
   /* end of dispersion derivatives w.r.t. delta_p */
   "mu1", "mu2", "mu3",
   "eign11", "eign12", "eign13", "eign14", "eign15", "eign16",

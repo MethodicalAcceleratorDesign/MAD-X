@@ -35,6 +35,8 @@ module madx_ptc_twiss_module
      real(dp), dimension(3)   ::  mu
      real(dp), dimension(6)   ::  disp
      real(dp), dimension(6)   ::  disp_p ! derivatives of the dispersion w.r.t delta_p
+     real(dp), dimension(6)   ::  disp_p2 ! second derivatives of the dispersion w.r.t delta_p
+     real(dp), dimension(6)   ::  disp_p3 ! third order derivatives of dispersion w.r.t delta_p
      real(dp), dimension(3)   ::  tune
      real(dp), dimension(6,6) ::  eigen
   end type twiss
@@ -271,6 +273,8 @@ contains
     s1%mu(:)=zero
     s1%disp(:)=zero
     s1%disp_p(:)=zero
+    s1%disp_p2(:)=zero
+    s1%disp_p3(:)=zero 
     s1%tune(:)=zero
     s1%eigen(:,:)=zero
   end subroutine killtwiss
@@ -298,6 +302,8 @@ contains
        s1%mu(:)=zero
        s1%disp(:)=zero
        s1%disp_p(:)=zero
+       s1%disp_p2(:)=zero
+       s1%disp_p3(:)=zero       
        s1%tune(:)=zero
        s1%eigen(:,:)=zero
        dicu(:)=zero
@@ -398,7 +404,7 @@ contains
     	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap assume deltap is fixed parameter')
 	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap therefore assume icase=5')
     endif
-
+    
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -468,12 +474,13 @@ contains
     Y=X
 
     call alloc(transfermap)
-    
+     
     if ( getnpushes() > 0 .or. rmatrix > 0) then
       tracktm = my_true
     else
       tracktm = my_false
     endif  
+    
     
     if (tracktm) then
        transfermap = npara
@@ -615,6 +622,7 @@ contains
              maps(i)%name = current%mag%name
           endif
 
+	  ! compute the Twiss parameters
           tw=y
           
           call puttwisstable(transfermap) 
@@ -671,7 +679,7 @@ contains
   !  if (tracktm) then
        CALL kill(transfermap)
   !  endif
-
+  
     do i=1,6
        call kill(unimap(i))
     enddo
@@ -980,7 +988,7 @@ contains
 
 
 
-      opt_fun(beta11)= tw%beta(1,1) * deltae
+      opt_fun(beta11)= tw%beta(1,1) * deltae	! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * deltae
       opt_fun(beta13)= tw%beta(1,3) * deltae
       opt_fun(beta21)= tw%beta(2,1) * deltae
@@ -1048,6 +1056,7 @@ contains
       opt_fun(mu1)=tw%mu(1) !* deltae
       opt_fun(mu2)=tw%mu(2) !* deltae
       opt_fun(mu3)=tw%mu(3) !* deltae
+      
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
       opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
@@ -1055,15 +1064,26 @@ contains
 
       ! 9 march 2009: add 4 items
       
-      opt_fun(disp1p) = tw%disp_p(1)
-      opt_fun(disp2p) = tw%disp_p(2)
-      opt_fun(disp3p) = tw%disp_p(3)
-      opt_fun(disp4p) = tw%disp_p(4)
-
+      if (deltap_dependency) then
+      		opt_fun(disp1p) = tw%disp_p(1)
+		opt_fun(disp2p) = tw%disp_p(2)
+		opt_fun(disp3p) = tw%disp_p(3)
+		opt_fun(disp4p) = tw%disp_p(4)
+		! 20 july 2009: add 8 items for second derivatives w.r.t deltap
+		opt_fun(disp1p2) = tw%disp_p2(1)
+		opt_fun(disp2p2) = tw%disp_p2(2)
+		opt_fun(disp3p2) = tw%disp_p2(3)
+		opt_fun(disp4p2) = tw%disp_p2(4)
+		opt_fun(disp1p3) = tw%disp_p3(1)
+		opt_fun(disp2p3) = tw%disp_p3(2)
+		opt_fun(disp3p3) = tw%disp_p3(3)
+		opt_fun(disp4p3) = tw%disp_p3(4)		
+	endif
+            
       ! JLUC TODO
       ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
       ! jluc: left the following umodified, except 36->62
-      opt_fun(62+4)=zero ! was 36 instead of 62 => on 9 march add 4
+      opt_fun(62+4+8)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4
       do i1=1,c_%nd2
          if(i1.le.4) then
             i1a=i1
@@ -1080,13 +1100,15 @@ contains
             else
                i2a=5
             endif
-            ii=(62+4)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62
+            ii=(62+4+8)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
+	    ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
       enddo
 
       if (getdebug() > 2)  then
+      	! this part of the code is out of sync with the rest
          write(6,'(a,1(f8.4,1x))') current%MAG%name,suml
          write(6,'(a,1(f10.8,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
@@ -1101,7 +1123,8 @@ contains
       !write(28,'(a,1(f8.4,1x))') current%MAG%name,suml
       ! jluc debug - end
 
-      ioptfun=81+4 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
+      ! on July 3rd 2009, add another 4 for second derivatives of dispersions w.r.t. deltap
+      ioptfun=81+4+8 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
       ! actually 3*21+6 (???) elements from beta11 to include up to disp6p
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
       call augment_count(table_name)
@@ -2077,11 +2100,26 @@ contains
     endif
     if ((c_%npara ==5) .or. (c_%ndpt /= 0)) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
-          ! enter here for DeltaDependency example
-          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020') ! derivating term in deltap^2 yields term in 2*deltap
+	  ! in 5D case, coefficients are those of the Taylor series development of deltap (factorial)
+	  ! disp = disp0 + sigma (1/n!) disp_pn
+          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
+	  if (no.gt.2) then
+		  s1%disp_p2(i) = 3.0*2.0*(y(i)%t.sub.'000030') ! assume at least order 3 for the map
+	  else
+	  	call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+	  endif
+	  if (no.gt.3) then
+		  s1%disp_p3(i) = 4.0*3.0*2.0*(y(i)%t.sub.'000040') 
+		  ! assume at least order 4 for the map
+	  else
+	  	call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+	  endif 
        enddo
     elseif (c_%nd2 ==6) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
+       	! finally never enter here: these differentiation formulas turned-out not to apply to the case 
+	! where deltap is a phase-space state-variable rather than an externally supplied
+	! parameter.
           ! u'v+uv' 
           s1%disp_p(i) = & 
                2.0*(y(i)%t.sub.'000020')*(y(6)%t.sub.'000001')+&
@@ -2098,7 +2136,7 @@ contains
     ! checked the above yields non-zero value...
 
   end subroutine computeDeltapDependency
-
+  
 ! --- a set of routines to track extremas of Twiss functions
 subroutine trackBetaExtrema(i,j,value)
   implicit none

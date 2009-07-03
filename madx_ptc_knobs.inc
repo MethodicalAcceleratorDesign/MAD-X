@@ -130,21 +130,34 @@ integer, parameter                ::   disp2p = 60
 integer, parameter                ::   disp3p = 61
 integer, parameter                ::   disp4p = 62
 
-integer, parameter                ::   mu1=63
-integer, parameter                ::   mu2=64
-integer, parameter                ::   mu3=65
+! second derivatives of dispersion
+integer, parameter		  ::   disp1p2 = 63
+integer, parameter		  ::   disp2p2 = 64
+integer, parameter 		  ::   disp3p2 = 65
+integer, parameter                ::   disp4p2 = 66
+! third order derivatives of dispersion
+integer, parameter		  ::   disp1p3 = 67
+integer, parameter		  ::   disp2p3 = 68
+integer, parameter                ::   disp3p3 = 69
+integer, parameter                ::   disp4p3 = 70
 
-integer, parameter                ::   kn_x  =70 !kn prefix is added to limit crashes with the other modules name space
-integer, parameter                ::   kn_px =71
-integer, parameter                ::   kn_y  =72
-integer, parameter                ::   kn_py =73
-integer, parameter                ::   kn_t  =74
-integer, parameter                ::   kn_dp =75
+
+integer, parameter                ::   mu1=71 ! 63+8 dispersion derivatives
+integer, parameter                ::   mu2=72
+integer, parameter                ::   mu3=73 ! 65+8 dispersion derivatives
+
+integer, parameter                ::   kn_x  =74 !kn prefix is added to limit crashes with the other modules name space
+integer, parameter                ::   kn_px =75
+integer, parameter                ::   kn_y  =76
+integer, parameter                ::   kn_py =77
+integer, parameter                ::   kn_t  =78
+integer, parameter                ::   kn_dp =79 ! btw nothing to do with ntwisses
 
 
 
-integer, parameter                ::   ntwisses = 71 ! increased from 40 to 67, then 71 to accomodate Twiss derivatives w.r.t delta
-integer, parameter                ::   ninparams = 27 !possible initial conditions as parameters (jluc: do we need to modify this?)
+integer, parameter                ::   ntwisses = 79 ! 73 till mu3 + 6 phase-space variables
+integer, parameter                ::   ninparams = 27 	!possible initial conditions as parameters
+							! (unused)
 
 
 
@@ -170,6 +183,8 @@ CHARACTER*(7), parameter          ::   twissnames(ntwisses) = (/ &
      'gama31p','gama32p','gama33p',&
      'disp1  ','disp2  ','disp3  ','disp4  ',&
      'disp1p ','disp2p ','disp3p ','disp4p ',&
+     'disp1p2','disp2p2','disp3p2','disp4p2',&
+     'disp1p3','disp2p3','disp3p3','disp4p3',&
      'mu1    ','mu2    ','mu3    ',&
      'x      ','px     ',&
      'y      ','py     ',&
