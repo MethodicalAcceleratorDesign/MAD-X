@@ -1123,7 +1123,7 @@ contains
       !write(28,'(a,1(f8.4,1x))') current%MAG%name,suml
       ! jluc debug - end
 
-      ! on July 3rd 2009, add another 4 for second derivatives of dispersions w.r.t. deltap
+      ! on July 3rd 2009, add another 8 for second/third derivatives of dispersions w.r.t. deltap
       ioptfun=81+4+8 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
       ! actually 3*21+6 (???) elements from beta11 to include up to disp6p
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
@@ -2100,7 +2100,8 @@ contains
     endif
     if ((c_%npara ==5) .or. (c_%ndpt /= 0)) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
-	  ! in 5D case, coefficients are those of the Taylor series development of deltap (factorial)
+	  ! in 4D+deltap case, coefficients are those of the Taylor series development 
+	  ! of deltap (factorial)
 	  ! disp = disp0 + sigma (1/n!) disp_pn
           s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
 	  if (no.gt.2) then
