@@ -225,7 +225,7 @@ endif
 
 ifeq ($(ONLINE),YES)
   GCCP_FLAGS+= -D_ONLINE
-  LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libz.a
+  LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libgsl.a libz.a
 endif
 
 ifeq ($(PROFILE),YES)
