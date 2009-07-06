@@ -191,12 +191,20 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   endif
 endif
 
-ifeq ($(SLC5),YES)
-  LIBX= libX11.a -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh -lstdc++ -L/usr/lib -lpthread
+ifeq ($(SLC4),YES)
+  ifeq ($(ARCH),32)
+    LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
+  else
+    LIBX= -L/usr/X11R6/lib64 -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
+  endif
 endif
 
-ifeq ($(SLC4),YES)
-  LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread /afs/cern.ch/sw/lcg/contrib/gcc/4.3.2/slc4_ia32_gcc34/lib/libstdc++.a /afs/cern.ch/sw/lcg/contrib/gcc/4.3.2/slc4_ia32_gcc34/lib/gcc/i686-pc-linux-gnu/4.3.2/libgcc_eh.a
+ifeq ($(SLC5),YES)
+  ifeq ($(ARCH),32)
+    LIBX= libX11.a -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh -lstdc++ -L/usr/lib -lpthread
+  else
+    LIBX= libX11_64.a -lstdc++
+  endif
 endif
 
 ifeq ($(FC8),YES)
