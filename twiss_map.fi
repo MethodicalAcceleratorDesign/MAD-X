@@ -1,4 +1,0 @@
-!----------------------------------------------------------------------*
-      common / twiss_map / clight, twopi, gamma, tw_radiate
-      double precision clight, twopi, gamma
-      logical tw_radiate
