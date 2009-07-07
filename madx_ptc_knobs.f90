@@ -12,6 +12,7 @@ module madx_ptc_knobs_module
   implicit none
 
   include "madx_ptc_knobs.inc"
+  include "twiss0.fi"
   save
   private
   !============================================================================================
@@ -318,7 +319,7 @@ contains
     integer              :: nelems !iterator
     integer, parameter   :: fillntwisses  = disp4 - beta11 + 1
     integer, parameter   :: ntwissesde = gama33 - beta11 + 1
-    real(kind(1d0))      :: opt_fun(72)
+    real(kind(1d0))      :: opt_fun(fundim)
     type(universal_taylor), pointer :: t
 
     if (.not. ALLOCATED(results)) then
