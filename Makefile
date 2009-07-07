@@ -12,8 +12,8 @@ ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=YES
-SLC5=NO
+SLC4=NO
+SLC5=YES
 FC8=NO
 FC10=NO
 FC11=NO
@@ -194,16 +194,28 @@ endif
 ifeq ($(SLC4),YES)
   ifeq ($(ARCH),32)
     LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
+    ifneq ($(f95),ifort)
+      LIBX+= /usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/32/libgcc_eh.a
+    endif
   else
     LIBX= -L/usr/X11R6/lib64 -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
+    ifneq ($(f95),ifort)
+      LIBX+= /usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/libgcc_eh.a
+    endif
   endif
 endif
 
 ifeq ($(SLC5),YES)
   ifeq ($(ARCH),32)
     LIBX= libX11.a  -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lstdc++
+    ifneq ($(f95),ifort)
+      LIBX+= /usr/lib/gcc/x86_64-redhat-linux6E/4.3.2/32/libgcc_eh.a
+    endif
   else
     LIBX= libX11_64.a -lstdc++
+    ifneq ($(f95),ifort)
+      LIBX+= /usr/lib/gcc/x86_64-redhat-linux6E/4.3.2/libgcc_eh.a
+    endif
   endif
 endif
 
