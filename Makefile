@@ -201,7 +201,7 @@ endif
 
 ifeq ($(SLC5),YES)
   ifeq ($(ARCH),32)
-    LIBX= libX11.a -L/usr/lib/ -lc -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lgcc_eh -lstdc++ -L/usr/lib -lpthread
+    LIBX= libX11.a  -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lstdc++
   else
     LIBX= libX11_64.a -lstdc++
   endif
