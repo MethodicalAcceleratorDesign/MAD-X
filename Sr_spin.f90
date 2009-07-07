@@ -37,6 +37,8 @@ module ptc_spin
   PRIVATE TRACK_NODE_LAYOUT_FLAG_pr_t12_R,TRACK_NODE_LAYOUT_FLAG_pr_t12_P
   private TRACK_LAYOUT_FLAG_spint12r_x,TRACK_LAYOUT_FLAG_spint12p_x,alloc_temporal_beam
   private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin
+  private TRACK_rotate_spin_r,TRACK_rotate_spin_p,TRACK_rotate_spin
+  private TRACK_FRINGE_multipole_r,TRACK_FRINGE_multipole_p,TRACK_FRINGE_multipole
   !REAL(DP) :: AG=A_ELECTRON
   REAL(DP) :: bran_init=pi
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
@@ -143,6 +145,11 @@ module ptc_spin
      MODULE PROCEDURE GET_BE_CAVP
   END INTERFACE
 
+  INTERFACE TRACK_rotate_spin
+     MODULE PROCEDURE TRACK_rotate_spin_r
+     MODULE PROCEDURE TRACK_rotate_spin_p
+  END INTERFACE
+
   INTERFACE rot_spin_x
      MODULE PROCEDURE rot_spin_xr
      MODULE PROCEDURE rot_spin_xp
@@ -156,6 +163,13 @@ module ptc_spin
   INTERFACE rot_spin_z
      MODULE PROCEDURE rot_spin_zr
      MODULE PROCEDURE rot_spin_zp
+  END INTERFACE
+
+
+
+  INTERFACE TRACK_FRINGE_multipole
+     MODULE PROCEDURE TRACK_FRINGE_multipole_r
+     MODULE PROCEDURE TRACK_FRINGE_multipole_p
   END INTERFACE
 
   INTERFACE TRACK_FRINGE_spin
@@ -938,7 +952,7 @@ contains
           DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
 
-       OM(2)=P%b0
+       if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,E,EB,pos=POS)
        IF(k%TIME) THEN
@@ -960,7 +974,7 @@ contains
        ELSE
           DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
-       OM(2)=P%b0
+       if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
        STOP 123   !  PATCH PROBLEMS???? CONVERTING TO PX ????
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,pos=POS)
@@ -1020,6 +1034,19 @@ contains
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    !  TESTBUG SATEESH
+    !       TYPE(REAL_8) XS(6)
+    !       TYPE(DAMAP) ID
+    !       REAL(DP) CLO(6)
+
+    !     CALL ALLOC(XS)
+    !     CALL ALLOC(ID)
+    !     CLO=X
+    !     XS=X
+    !     ID=1
+    !     X=CLO+ID
+
+
     CALL ALLOC(B,3)
     CALL ALLOC(E,3)
     CALL ALLOC(EB,3)
@@ -1049,7 +1076,7 @@ contains
        ELSE
           DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
-       OM(2)=P%b0
+       if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,E,EB,pos=POS)
        IF(k%TIME) THEN
@@ -1083,7 +1110,7 @@ contains
        ELSE
           DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
-       OM(2)=P%b0
+       if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,pos=POS)
        if(k%time) then
@@ -1120,6 +1147,7 @@ contains
     OM(1)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(1) + (ONE+p%AG)*BPA(1) )
     OM(2)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(2) + (ONE+p%AG)*BPA(2) )+OM(2)
     OM(3)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(3) + (ONE+p%AG)*BPA(3) )
+
     !     DO I=1,3
     !       write(30,*) 'b, bpe and bpa',i,el%name,el%kind
     !       call print(b(i),30)
@@ -1134,6 +1162,23 @@ contains
        B2=BPE(1)**2+BPE(2)**2+BPE(3)**2
        !        B2=-CRADF(EL%P)*(one+X(5))**3*B2*DLDS
     ENDIF
+
+    !    WRITE(24,*) C%PARENT_FIBRE%MAG%NAME
+    !    WRITE(24,*) C%POS, C%S(1)
+    !    WRITE(24,*) " B FIELD "
+    !    DO I=1,3
+    !     call clean_real_8(b(i),b(i),1.d-7)
+    !     CALL PRINT(B(I),24)
+    !    ENDDO
+    !    WRITE(24,*) " OMEGA "
+    !    DO I=1,3
+    !     call clean_real_8(om(i),om(i),1.d-7)
+    !     CALL PRINT(OM(I),24)
+    !    ENDDO
+    !    WRITE(24,*) " $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$  "
+
+    !    X=XS
+
     CALL KILL(B,3)
     CALL KILL(E,3)
     CALL KILL(EB,3)
@@ -1141,6 +1186,10 @@ contains
     CALL KILL(BPE,3)
     CALL KILL(D1,D2,GAMMA)
     CALL KILL(XPA,2)
+
+    !  TESTBUG SATEESH
+    !    CALL KILL(XS)
+    !     CALL KILL(ID)
 
   end subroutine get_omega_spinp
 
@@ -1267,8 +1316,8 @@ contains
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)=-(2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
-       B(2)=-(2*Pos+3)*EL%B_SOL*half*x(3);
+       B(1)=  (2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)=  (2*Pos+3)*EL%B_SOL*half*x(3);
        B(3)=zero;
     else
        b(1)=zero
@@ -1287,8 +1336,8 @@ contains
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)=-(2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
-       B(2)=-(2*Pos+3)*EL%B_SOL*half*x(3);
+       B(1)= (2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)= (2*Pos+3)*EL%B_SOL*half*x(3);
        B(3)=zero;
     else
        b(1)=zero
@@ -2644,14 +2693,11 @@ contains
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
-       !call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_true,k,C%POS_IN_FIBRE-3)
        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
-       !call PUSH_SPIN(c%parent_fibre%mag,ds,FAC,XS%S%X,XS%X,my_false,k,C%POS_IN_FIBRE-2)
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       if(.not.C%PARENT_FIBRE%MAG%P%KILL_ENT_FRINGE.and.c%cas==case1) CALL TRACK_FRINGE_spin(C,XS,K)
-       if(.not.C%PARENT_FIBRE%MAG%P%KILL_exi_FRINGE.and.c%cas==case2) CALL TRACK_FRINGE_spin(C,XS,K)
+       CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
@@ -2697,9 +2743,8 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE.and.c%cas==case1) CALL TRACK_FRINGE_spin(C,XS,K)
-       if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE.and.c%cas==case2) CALL TRACK_FRINGE_spin(C,XS,K)
-       !        CALL TRACK_FRINGE_spin(C,XS,K)
+       CALL TRACK_FRINGE_spin(C,XS,K)
+       !        CALL  (C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
@@ -2728,23 +2773,56 @@ contains
     TYPE(ELEMENT), POINTER :: EL
     integer pos
     el=>C%PARENT_FIBRE%MAG
-    SELECT CASE(EL%KIND)
-    CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
-    case(KIND2)
-    case(KIND4)
-    case(KIND5,KIND17)
+
+    if(C%PARENT_FIBRE%dir==1) then
        IF(C%CAS==CASE1) THEN
-          pos=-2
-          !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
-          call PUSH_SPIN_fake_fringe(c,p,k,pos)
-       elseif(C%CAS==CASE2) then
-          pos=-1
-          !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
-          call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          call TRACK_rotate_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+       else
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_rotate_spin(C,p,K)
        endif
-    case(KIND6)
-    case(KIND7)
-    case(KIND10)
+    else
+       stop 888
+    endif
+  end SUBROUTINE TRACK_FRINGE_spin_R
+
+  SUBROUTINE TRACK_FRINGE_spin_p(C,p,K)
+    IMPLICIT NONE
+    TYPE(probe_8), INTENT(INOUT)::p
+    !    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENTP), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAGp
+
+
+    if(C%PARENT_FIBRE%dir==1) then
+       IF(C%CAS==CASE1) THEN
+          call TRACK_rotate_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+       else
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_rotate_spin(C,p,K)
+       endif
+    else
+       stop 888
+    endif
+
+  end SUBROUTINE TRACK_FRINGE_spin_p
+
+  SUBROUTINE TRACK_rotate_spin_R(C,p,K)
+    IMPLICIT NONE
+    !    real(dp), INTENT(INOUT):: X(6),S(3)
+    type(probe), INTENT(INOUT):: p
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENT), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAG
+
+    SELECT CASE(EL%KIND)
     case(KIND16)
        IF(C%CAS==CASE1) THEN
           CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
@@ -2758,6 +2836,70 @@ contains
           CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
        ENDIF
 
+    END SELECT
+
+
+  END SUBROUTINE TRACK_rotate_spin_R
+
+  SUBROUTINE TRACK_rotate_spin_p(C,p,K)
+    IMPLICIT NONE
+    TYPE(probe_8), INTENT(INOUT)::p
+    !    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENTP), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAGP
+
+    SELECT CASE(EL%KIND)
+    case(KIND16)
+       IF(C%CAS==CASE1) THEN
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+       ELSE
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+       ENDIF
+    case(KIND20)
+       IF(C%CAS==CASE1) THEN
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       ELSE
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       ENDIF
+
+    END SELECT
+
+
+  END SUBROUTINE TRACK_rotate_spin_p
+
+
+
+  SUBROUTINE TRACK_FRINGE_multipole_R(C,p,K)
+    IMPLICIT NONE
+    !    real(dp), INTENT(INOUT):: X(6),S(3)
+    type(probe), INTENT(INOUT):: p
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENT), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAG
+    SELECT CASE(EL%KIND)
+    CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
+    case(KIND2)
+    case(KIND4)
+    case(KIND5,KIND17)
+       IF(C%CAS==CASE1) THEN
+          pos=-2
+          !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
+          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+       elseif(C%CAS==CASE2) then
+          pos=-1
+          !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
+          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+       endif
+    case(KIND6)
+    case(KIND7)
+    case(KIND10)
+    case(KIND16)
+    case(KIND20)
     case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
@@ -2767,9 +2909,9 @@ contains
     END SELECT
 
 
-  END SUBROUTINE TRACK_FRINGE_spin_R
+  END SUBROUTINE TRACK_FRINGE_multipole_R
 
-  SUBROUTINE TRACK_FRINGE_spin_P(C,p,K)
+  SUBROUTINE TRACK_FRINGE_multipole_p(C,p,K)
     IMPLICIT NONE
     TYPE(probe_8), INTENT(INOUT)::p
     !    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
@@ -2786,29 +2928,18 @@ contains
     case(KIND5,KIND17)
        IF(C%CAS==CASE1) THEN
           pos=-2
-          call PUSH_SPIN_fake_fringe(c,p,k,pos)
           !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
+          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
           !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
-          call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        endif
     case(KIND6)
     case(KIND7)
     case(KIND10)
     case(KIND16)
-       IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
-       ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
-       ENDIF
     case(KIND20)
-       IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
-       ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
-       ENDIF
-
     case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
@@ -2818,7 +2949,7 @@ contains
     END SELECT
 
 
-  END SUBROUTINE TRACK_FRINGE_spin_P
+  END SUBROUTINE TRACK_FRINGE_multipole_p
 
   SUBROUTINE TRACK_SPIN_FRONTR(C,P)
     implicit none

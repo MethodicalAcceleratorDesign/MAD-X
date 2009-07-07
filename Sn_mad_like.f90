@@ -1202,13 +1202,11 @@ CONTAINS
        SOLTILT%KIND=KIND0
     ELSE
        SOLTILT%K(2)=KQ !/FAC(2)    ! MAD FACTOR
-       if(madkind2==kind2) then
-          SOLTILT%KIND=KIND5
-       else
-          SOLTILT%KIND=KIND17
-          !          SOLTILT%nmul=2
-          !          SOLTILT%METHOD=2
-       endif
+       !       if(madkind2==kind2) then
+       SOLTILT%KIND=KIND5
+       !       else
+       !          SOLTILT%KIND=KIND17
+       !       endif
     ENDIF
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN

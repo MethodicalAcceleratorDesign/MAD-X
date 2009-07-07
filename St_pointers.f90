@@ -971,13 +971,6 @@ contains
                 p%magp%s5%hgap=hgap
                 nscan=nscan+1
              endif
-             if(associated(p%mag%s17)) then
-                p%mag%s17%fint=fint
-                p%mag%s17%hgap=hgap
-                p%magp%s17%fint=fint
-                p%magp%s17%hgap=hgap
-                nscan=nscan+1
-             endif
              p=>p%next
           enddo
           Write(6,*) " Found ",nscan," Solenoids"

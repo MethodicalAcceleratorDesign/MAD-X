@@ -1933,6 +1933,7 @@ contains
           if(doit) then
              xl=C%MAG%L
              RHOI=zero
+             QUAD=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -1943,7 +1944,7 @@ contains
                 QUAD=zero
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four
+                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
              endif
 
              DOBEND=MY_FALSE
@@ -2023,6 +2024,7 @@ contains
           if(doit) then
              xl=C%MAG%L
              RHOI=zero
+             QUAD=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -2033,7 +2035,7 @@ contains
                 QUAD=zero
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four
+                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
              endif
 
              DOBEND=MY_FALSE
@@ -2123,6 +2125,7 @@ contains
           if(doit) then
              xl=C%MAG%L
              RHOI=zero
+             QUAD=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -2133,7 +2136,7 @@ contains
                 QUAD=zero
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four
+                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
              endif
 
              DOBEND=MY_FALSE

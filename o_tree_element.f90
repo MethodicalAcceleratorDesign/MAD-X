@@ -16,10 +16,10 @@ module tree_element_MODULE
   private alloc_normal_spin,kill_normal_spin,EQUAL_IDENTITY_probe
   private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
-  private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8
+  private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8,exp_spinor_8
 
   private find_ar
-  private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor
+  private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor,print_res_spinor_8
   private  find_n_thetar,find_n_thetap,read_spinor_8
   !  private smatp,smatmulp
   private inv_asr,inv_asp !,inv_as
@@ -33,6 +33,7 @@ module tree_element_MODULE
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
   private find_perp_basisp,find_exponentp
+  private alloc_res_SPINOR_8,KILL_res_SPINOR_8
 
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
@@ -104,6 +105,14 @@ module tree_element_MODULE
      MODULE PROCEDURE sub_spin8_spin8
   END  INTERFACE
 
+  INTERFACE exp   !  damapspin = exp(spinor_8)
+     MODULE PROCEDURE exp_spinor_8  ! finds n0 the naive way
+  END INTERFACE
+
+  INTERFACE texp   !  damapspin = exp(spinor_8)
+     MODULE PROCEDURE exp_spinor_8  ! finds n0 the naive way
+  END INTERFACE
+
   INTERFACE find_n0   ! (s0(3,3),n0(3))
      MODULE PROCEDURE find_n_thetar  ! finds n0 the naive way
      MODULE PROCEDURE find_n_thetap !(s0(3,3),n0(3), spinor_8 optional)
@@ -146,6 +155,7 @@ module tree_element_MODULE
      MODULE PROCEDURE PRINT_DASPIN
      MODULE PROCEDURE PRINT_probe8
      MODULE PROCEDURE PRINT_spinor_8
+     MODULE PROCEDURE print_res_spinor_8
   END INTERFACE
 
   INTERFACE daPRINT
@@ -165,6 +175,7 @@ module tree_element_MODULE
      MODULE PROCEDURE ALLOC_daspin
      MODULE PROCEDURE A_OPT_damap
      MODULE PROCEDURE alloc_normal_spin
+     MODULE PROCEDURE alloc_res_SPINOR_8
   END INTERFACE
 
   INTERFACE KILL
@@ -173,6 +184,7 @@ module tree_element_MODULE
      MODULE PROCEDURE KILL_DASPIN
      MODULE PROCEDURE K_OPT_damap
      MODULE PROCEDURE KILL_normal_spin
+     MODULE PROCEDURE KILL_res_SPINOR_8
   END INTERFACE
 
   INTERFACE ALLOC_33
@@ -1575,6 +1587,18 @@ CONTAINS
 
   END subroutine print_spinor_8
 
+  subroutine print_res_spinor_8(S,MF)
+    implicit none
+    TYPE(res_spinor_8), INTENT(INOUT) :: s
+    INTEGER MF,I
+
+    do i=1,3
+       write(mf,*) ' Spin Variable ',i
+       call print(s%x(i),mf)
+    enddo
+
+  END subroutine print_res_spinor_8
+
   subroutine read_spinor_8(S,MF)
     implicit none
     TYPE(spinor_8), INTENT(INOUT) :: s
@@ -1960,6 +1984,80 @@ CONTAINS
     call kill(cos,sin,theta)
     call kill(s)
   end subroutine find_exponentp
+
+  subroutine daexplogp(h_axis,ds)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    TYPE(spinor_8), INTENT(IN) :: h_axis
+    integer  nmax
+    integer i
+    TYPE(damapspin) dh,dhn,dr
+    real(dp) c,eps,norm1,norm2
+    logical check
+
+    check=.true.
+    eps=1.d-5
+    nmax=1000
+
+    call alloc(dh)
+    call alloc(dhn)
+    call alloc(dr)
+
+    !  this only works with a da-map
+    ds=1
+    dh%m=1
+    dh%s(2,1)=h_axis%x(3)
+    dh%s(1,3)=h_axis%x(2)
+    dh%s(3,2)=h_axis%x(1)
+    dh%s(1,2)=-h_axis%x(3)
+    dh%s(3,1)=-h_axis%x(2)
+    dh%s(2,3)=-h_axis%x(1)
+    dhn=1
+    c=one
+    norm1=mybig
+    do i=1,nmax
+       dhn=dhn*dh
+       c=c/i
+       dr=ds
+       ds=ds+c*dhn
+       dr=ds+(-one)*dr
+       call norm_damapspin(dr,norm2)
+       if(check) then
+          if(norm2<eps) then
+             check=.false.
+          endif
+       else
+          if(norm2>=norm1) exit
+       endif
+       norm1=norm2
+    enddo
+
+    if(i>nmax-10) then
+       write(6,*) "no convergence in daexplogp "
+       stop 1066
+    endif
+
+    call kill(dh)
+    call kill(dhn)
+    call kill(dr)
+
+  end subroutine daexplogp
+
+  subroutine norm_damapspin(ds,norm)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    real(dp) norm
+    integer i,j
+
+    norm=zero
+
+    do i=1,3
+       do j=1,3
+          norm=norm+full_abs( ds%s(i,j) )
+       enddo
+    enddo
+
+  end subroutine norm_damapspin
 
   ! end of  find exponent of rotation routines
 
@@ -2494,6 +2592,14 @@ CONTAINS
     !     S%G=A_PARTICLE
   END    subroutine ALLOC_SPINOR_8
 
+  subroutine ALLOC_res_SPINOR_8(S)
+    implicit none
+    TYPE(RES_SPINOR_8), INTENT(INOUT) :: S
+
+    CALL ALLOC(S%X,3)
+    !     S%G=A_PARTICLE
+  END    subroutine ALLOC_res_SPINOR_8
+
   subroutine ALLOC_probe_8(R)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
@@ -2511,6 +2617,14 @@ CONTAINS
 
 
   END    subroutine ALLOC_probe_8
+
+  subroutine KILL_res_SPINOR_8(S)
+    implicit none
+    TYPE(RES_SPINOR_8), INTENT(INOUT) :: S
+
+    CALL KILL(S%X,3)
+    !     S%G=A_PARTICLE
+  END    subroutine KILL_res_SPINOR_8
 
   subroutine KILL_SPINOR_8(S)
     implicit none
@@ -2916,6 +3030,7 @@ CONTAINS
 
   END FUNCTION damapspin_spinor8_mul
 
+
   FUNCTION damapspin_spinor_mul(S1,S2) ! transform spin part with spinor_8 s2 and returns spinor_8
     implicit none
     type(spinor_8) damapspin_spinor_mul
@@ -2947,6 +3062,26 @@ CONTAINS
 
 
   END FUNCTION damapspin_spinor_mul
+
+  FUNCTION exp_spinor_8(S1)  ! transform spin part with damap s2
+    implicit none
+    TYPE (damapspin) exp_spinor_8
+    TYPE (spinor_8), INTENT (IN) :: S1
+    !    integer i,j,k
+    integer localmaster
+
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    call ass(exp_spinor_8)
+
+    call daexplogp(S1,exp_spinor_8)
+
+    master=localmaster
+
+  END FUNCTION exp_spinor_8
+
 
   FUNCTION spin8_mul_map(S2,S1)  ! transforms spinor_8 s2 with damap s1
     implicit none
@@ -3714,14 +3849,11 @@ CONTAINS
           exit
        endif
     enddo
-    if(.not.doit) then
-       write(6,*) jc(1:4),is
-       write(6,*) ns%m(1,1),ns%m(2,1),ns%ms(1)
-    endif
+    !    if(.not.doit) then
+    !     write(6,*) jc(1:4),is
+    !     write(6,*) ns%m(1,1),ns%m(2,1),ns%ms(1)
+    !    endif
 
-    !    write(6,*) doit
-
-    !    pause 313
 
   end subroutine test_jc_spin
 
@@ -3972,7 +4104,40 @@ CONTAINS
 
   end subroutine check_fix
 
+  subroutine INTO_RES_SPIN8(H,H_RES)
+    implicit none
+    TYPE(spinor_8), INTENT(in) :: h
+    TYPE(res_spinor_8), INTENT(inout) :: H_RES
+    type(taylorresonance) tr,ti
 
+    call alloc( tr)
+    call alloc( ti)
+
+
+    H_RES%X(1)= H%X(1)-i_*H%X(3)
+    H_RES%X(3)= H%X(1)+i_*H%X(3)
+    H_RES%X(2)= H%X(2)
+
+    tr=H_RES%X(2)%t%r
+
+    H_RES%X(2)= tr%cos + i_*tr%sin
+
+    tr=H_RES%X(1)%t%r
+    ti=H_RES%X(1)%t%i
+
+    H_RES%X(1)=tr%cos + i_*tr%sin + i_* (ti%cos + i_*ti%sin)
+
+    tr=H_RES%X(3)%t%r
+    ti=H_RES%X(3)%t%i
+
+    H_RES%X(3)=tr%cos + i_*tr%sin + i_* (ti%cos + i_*ti%sin)
+
+
+    call kill( tr)
+    call kill( ti)
+
+
+  END SUBROUTINE INTO_RES_SPIN8
 !!!!!!!!!!    normal form on theta into theta(H) !!!!!!!!!!!!!!!!
 
   subroutine normal_thetaH(ds,ns)

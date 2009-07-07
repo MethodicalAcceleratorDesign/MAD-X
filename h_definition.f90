@@ -107,9 +107,11 @@ module definition
 
   type spinor_8
      type(real_8) x(3)
-     !   type(real_8) m(3,3)
-     ! real(dp) G
   end type spinor_8
+
+  type res_spinor_8
+     type(double_complex) x(3)
+  end type res_spinor_8
 
   !    scratch levels of DA using linked list
 

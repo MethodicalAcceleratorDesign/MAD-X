@@ -178,7 +178,8 @@ CONTAINS
     CASE(KIND16,KIND20)
        call TRACK(EL%K16,X,k,MID)
     CASE(KIND17)
-       call TRACK(EL%S17,X,k,MID)
+       STOP 17
+       !       call TRACK(EL%S17,X,k,MID)
     CASE(KIND18)
        call TRACK(EL%RCOL18,X,k,MID)
     CASE(KIND19)
@@ -242,7 +243,8 @@ CONTAINS
     CASE(KIND16,KIND20)
        call TRACK(EL%K16,X,k)
     CASE(KIND17)
-       call TRACK(EL%S17,X,k)
+       STOP 17
+       !       call TRACK(EL%S17,X,k)
     CASE(KIND18)
        call TRACK(EL%RCOL18,X,k)
     CASE(KIND19)
@@ -1283,34 +1285,7 @@ CONTAINS
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
-       call SET_IN
-       IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1X,A72))'
-          w_p%c(1)=" ERROR IN SETFAMILYR "
-          write(w_p%c(2),'(A42,1x,I4)') " EXACT BEND OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
-       ENDIF
-       if(.not.ASSOCIATED(EL%S17)) THEN
-          ALLOCATE(EL%S17)
-          el%S17=0
-       ELSE
-          el%S17=-1
-          el%S17=0
-       ENDIF
-       EL%S17%P=>EL%P
-       EL%S17%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,2)
-       EL%S17%AN=>EL%AN
-       EL%S17%BN=>EL%BN
-       EL%S17%FINT=>EL%FINT
-       EL%S17%HGAP=>EL%HGAP
-       EL%S17%H1=>EL%H1
-       EL%S17%H2=>EL%H2
-       EL%S17%B_SOL=>EL%B_SOL
-       nullify(EL%S17%MAT);ALLOCATE(EL%S17%MAT(4,4));
-       nullify(EL%S17%LXY);ALLOCATE(EL%S17%LXY(0:10));
+       STOP 117
     CASE(KIND18)
        if(.not.ASSOCIATED(EL%RCOL18)) THEN
           ALLOCATE(EL%RCOL18)
@@ -1738,34 +1713,7 @@ CONTAINS
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
     CASE(KIND17)
-       call SET_IN
-       IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,A72,/,1X,A72))'
-          w_p%c(1)=" ERROR IN SETFAMILYP "
-          write(w_p%c(2),'(A42,1x,I4)') " EXACT BEND OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
-       ENDIF
-       if(.not.ASSOCIATED(EL%S17)) THEN
-          ALLOCATE(EL%S17)
-          el%S17=0
-       ELSE
-          el%S17=-1
-          el%S17=0
-       ENDIF
-       EL%S17%P=>EL%P
-       EL%S17%L=>EL%L
-       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,2)
-       EL%S17%AN=>EL%AN
-       EL%S17%BN=>EL%BN
-       EL%S17%FINT=>EL%FINT
-       EL%S17%HGAP=>EL%HGAP
-       EL%S17%H1=>EL%H1
-       EL%S17%H2=>EL%H2
-       EL%S17%B_SOL=>EL%B_SOL
-       nullify(EL%S17%MAT);ALLOCATE(EL%S17%MAT(4,4));
-       nullify(EL%S17%LXY);ALLOCATE(EL%S17%LXY(0:10));
+       STOP 817
     CASE(KIND18)
        if(.not.ASSOCIATED(EL%RCOL18)) THEN
           ALLOCATE(EL%RCOL18)
@@ -1987,8 +1935,7 @@ CONTAINS
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
     case(kind17)
-       EL%S17%AN=>EL%AN
-       EL%S17%BN=>EL%BN
+       STOP 217
        !       end select
     CASE(KIND7)
        EL%T7%AN=>EL%AN
@@ -2107,9 +2054,7 @@ CONTAINS
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
     case(kind17)
-       EL%S17%AN=>EL%AN
-       EL%S17%BN=>EL%BN
-       !       end select
+       STOP 217
     CASE(KIND7)
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
@@ -2184,7 +2129,6 @@ CONTAINS
     nullify(EL%S5);
     nullify(EL%T6);
     !    nullify(EL%M22);
-    nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
     nullify(EL%S9);
@@ -2234,7 +2178,6 @@ CONTAINS
     nullify(EL%S5);
     nullify(EL%T6);
     !    nullify(EL%M22);
-    nullify(EL%S17);
     nullify(EL%T7);
     nullify(EL%S8);
     nullify(EL%S9);
@@ -2313,10 +2256,6 @@ CONTAINS
        !          EL%M22=-1
        !          DEALLOCATE(EL%M22)   ! thick sixtrack
        !       ENDIF
-       IF(ASSOCIATED(EL%S17)) THEN
-          EL%S17=-1
-          DEALLOCATE(EL%S17)   ! thick sixtrack
-       ENDIF
        IF(ASSOCIATED(EL%T7)) THEN
           EL%T7=-1
           DEALLOCATE(EL%T7)   ! thick
@@ -2508,10 +2447,6 @@ CONTAINS
        !          EL%M22=-1
        !          DEALLOCATE(EL%M22)       ! INTEGRATOR
        !       endif
-       IF(ASSOCIATED(EL%S17)) then
-          EL%S17=-1
-          DEALLOCATE(EL%S17)       ! INTEGRATOR
-       endif
        IF(ASSOCIATED(EL%T7)) then
           EL%T7=-1
           DEALLOCATE(EL%T7)       ! INTEGRATOR

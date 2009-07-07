@@ -604,7 +604,7 @@ CONTAINS
        case(KIND16,KIND20)
           CALL fringe_STREX(EL%K16,X,k,T%CAS)
        case(KIND17)
-          CALL TRACK_FRINGE(EL17=EL%S17,X=X,k=k,J=T%CAS)
+          STOP 317
        case(KIND21)
           CALL FRINGE_CAV_TRAV(EL%CAV21,X=X,k=k,J=T%CAS)
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
@@ -659,7 +659,7 @@ CONTAINS
        case(KIND16,KIND20)
           CALL TRACK_SLICE(EL%K16,X,K,t%POS_IN_FIBRE-2)
        case(KIND17)
-          CALL TRACK_SLICE(EL%S17,X,K)
+          STOP 317
        case(KIND18)
           call RCOLLIMATORI(EL%RCOL18,X,k,t%POS_IN_FIBRE-2)
        case(KIND19)
@@ -749,7 +749,7 @@ CONTAINS
        case(KIND16,KIND20)
           CALL fringe_STREX(EL%K16,X,k,T%CAS)
        case(KIND17)
-          CALL TRACK_FRINGE(EL17=EL%S17,X=X,k=k,J=T%CAS)
+          STOP 317
        case(KIND21)
           CALL FRINGE_CAV_TRAV(EL%CAV21,X=X,k=k,J=T%CAS)
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
@@ -826,7 +826,7 @@ CONTAINS
        case(KIND16,KIND20)
           CALL TRACK_SLICE(EL%K16,X,K,t%POS_IN_FIBRE-2)
        case(KIND17)
-          CALL TRACK_SLICE(EL%S17,X,K)
+          STOP 317
        case(KIND18)
           call RCOLLIMATORI(EL%RCOL18,X,k,t%POS_IN_FIBRE-2)
           !          CALL TRACK_SLICE(EL%RCOL18,X,K)
