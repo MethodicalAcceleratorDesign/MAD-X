@@ -1,7 +1,7 @@
 /* makethin.c
-   Thick to thin lens converter. Helmut Burkhardt
-   Early versions in 2001, 2002 by Mark Hayes
-*/
+ Thick to thin lens converter. Helmut Burkhardt
+ Early versions in 2001, 2002 by Mark Hayes
+ */
 
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
@@ -26,23 +26,23 @@ double at_shift(int ,int );
 double q_shift(int ,int );
 
 /* this structure is used to store a lookup table of thick to thin
-   element conversions already done */
+ element conversions already done */
 struct thin_lookup
 {
-    struct element *thick_elem;
-    struct element *thin_elem;
-    int slice;
-    struct thin_lookup *next;
+  struct element *thick_elem;
+  struct element *thin_elem;
+  int slice;
+  struct thin_lookup *next;
 };
 struct thin_lookup *my_list = NULL;
 
 /* this structure is used to store a lookup table of thick to thin
-   sequence conversions already done */
+ sequence conversions already done */
 struct thin_sequ_lookup
 {
-    struct sequence *thick_sequ;
-    struct sequence *thin_sequ;
-    struct thin_sequ_lookup *next;
+  struct sequence *thick_sequ;
+  struct sequence *thin_sequ;
+  struct thin_sequ_lookup *next;
 };
 struct thin_sequ_lookup *my_sequ_list = NULL;
 
@@ -56,9 +56,9 @@ struct el_list *thin_select_list = NULL;
 
 void force_consistent_slices(void)
 /* hbu 10/2005
-   loop over all elements and check that #slices of child and parent agree
-   if not, use the maximum for both
-*/
+ loop over all elements and check that #slices of child and parent agree
+ if not, use the maximum for both
+ */
 {
   struct element* el_i;
   struct command_parameter *child,*parent;
@@ -219,8 +219,8 @@ char* make_thin_name(char* e_name, int slice)
 struct expression* compound_expr(struct expression* e1, double v1,
                                  char* oper, struct expression* e2, double v2)
 /* make one out of two expressions, using oper to connect them
-   hbu 9/2005 moved from madxn.c to makethin.c as only used here
-   and increased precision   sprintf(tmp, "%e"  ->   sprintf(tmp, "%.14g" */
+ hbu 9/2005 moved from madxn.c to makethin.c as only used here
+ and increased precision   sprintf(tmp, "%e"  ->   sprintf(tmp, "%.14g" */
 {
   char** toks = tmp_l_array->p;
   struct expression* expr = NULL;
@@ -280,7 +280,7 @@ struct command_parameter* return_param(char* par, struct element* elem)
   int index;
   /* don't return base type definitions */
   if (elem==elem->parent) return NULL;
-
+  
   if ((index = name_list_pos(par,elem->def->par_names))>-1
       && elem->def->par_names->inform[index] > 0)
     return elem->def->par->parameters[index];
@@ -292,7 +292,7 @@ struct command_parameter* return_param_recurse(char* par, struct element* elem)
 {
   struct command_parameter* param;
   param = return_param(par,elem);
-
+  
   if (param) return param;
   if (elem!=elem->parent)
     return return_param_recurse(par,elem->parent);
@@ -336,7 +336,7 @@ struct command_parameter* scale_and_slice(struct command_parameter *kn_param,
   struct expression *kn_i_expr;
   double kn_i_val;
   if (kn_param == NULL) return NULL;
-
+  
   for (i=0; i<kn_param->expr_list->curr; i++)
   {
     kn_i_expr = kn_param->expr_list->list[i];
@@ -386,12 +386,12 @@ int translate_k(struct command_parameter* *kparam,
                 struct command_parameter *ks_param)
 {
   int i,angle_conversion=0;
-/*    char *zero[1]; */
-/*    zero[0] = buffer("0"); */
-
+  /*    char *zero[1]; */
+  /*    zero[0] = buffer("0"); */
+  
   if ((kparam == NULL) && (ksparam == NULL))
     fatal_error("translate_k: no kparams to convert","");
-
+  
   /* if we have a angle we ignore any given k0 */
   if (angle_param)
   {
@@ -403,7 +403,7 @@ int translate_k(struct command_parameter* *kparam,
     }
     kparam[0]->double_value = angle_param->double_value;
   }
-
+  
   for (i=0; i<4; i++)
   {
     /* zero all the parameters */
@@ -430,7 +430,7 @@ int translate_k(struct command_parameter* *kparam,
     kn_param->expr_list->curr++; kn_param->double_array->curr++;
     ks_param->expr_list->curr++; ks_param->double_array->curr++;
   }
-
+  
   return angle_conversion;
 }
 
@@ -451,7 +451,7 @@ void seq_diet_add(struct node* node, struct sequence* sequ)
     sequ->end = node;
   }
   add_to_node_list(node, 0, sequ->nodes);
-
+  
   return;
 }
 
@@ -497,17 +497,17 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   int angle_conversion = 0;
   int slices, minimizefl;
   int knl_flag = 0,ksl_flag = 0;
-
+  
   /* next is new to handle parent with possibly different slice number than child */
   slices = get_slices_from_elem(thick_elem);
   at_param = return_param("at",thick_elem);
-
+  
   if (thick_elem == thick_elem->parent) return NULL; /* no further parent to consider */
   else
   {
     thin_elem_parent = create_thin_multipole(thick_elem->parent,slice_no); /* slice also the parent */
   }
-
+  
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
@@ -517,11 +517,11 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   {
     slice_no=1;
   }
-
+  
   /* check to see if we've already done this one */
   thin_elem = get_thin(thick_elem,slice_no);
   if (thin_elem) return thin_elem;
-
+  
   /* issue a warning in case of element parameter combinations not suitable for slicing */
   fint_param   = return_param_recurse("fint",thick_elem);
   if(fint_param)
@@ -529,7 +529,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
     printf("    *** warning %s is a thick %s with fringe fields. These will be lost in the translation to a multipole. Use dipedge.\n",
            thick_elem->name,thick_elem->parent->name);
   }
-
+  
   length_param = return_param_recurse("l",thick_elem);
   angle_param  = return_param_recurse("angle",thick_elem);
   kparam[0]    = return_param_recurse("k0",thick_elem);
@@ -544,7 +544,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   ks_param     = return_param_recurse("ksl",thick_elem);
   if (kn_param) {kn_param = clone_command_parameter(kn_param); knl_flag++;}
   if (ks_param) {ks_param = clone_command_parameter(ks_param); ksl_flag++;}
-
+  
   /* translate k0,k1,k2,k3,angle */
   if ((kparam[0] || kparam[1] || kparam[2] || kparam[3] || angle_param
        || ksparam[0] || ksparam[1] || ksparam[2] || ksparam[3])
@@ -558,7 +558,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
     ks_param->double_array = new_double_array(10);
     angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
   }
-
+  
   kn_param = scale_and_slice(kn_param,length_param,slices,slice_no,
                              angle_conversion,knl_flag+ksl_flag);
   ks_param = scale_and_slice(ks_param,length_param,slices,slice_no,
@@ -590,7 +590,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   {
     thin_name = make_thin_name(thick_elem->name,slice_no);
   }
-
+  
   if (thin_elem_parent)
   {
     thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
@@ -617,7 +617,7 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   struct command* cmd;
   char *thin_name;
   int slices,minimizefl;
-
+  
   if (thick_elem == thick_elem->parent) return NULL;
   else
   {
@@ -630,19 +630,19 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   length_param  = return_param_recurse("l",thick_elem);
   ks_param      = return_param_recurse("ks",thick_elem);
   at_param      = return_param("at",thick_elem);
-
+  
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
   }
-
+  
   /* set up new solenoid command */
   cmd = new_command(buffer("thin_solenoid"), 11, 11, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */  /*hbu trial */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
-
-
+  
+  
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -703,7 +703,7 @@ struct element* create_thin_elseparator(struct element* thick_elem, int slice_no
   struct command* cmd;
   char *thin_name;
   int slices,minimizefl;
-
+  
   if (thick_elem == thick_elem->parent) return NULL;
   else
   {
@@ -718,19 +718,19 @@ struct element* create_thin_elseparator(struct element* thick_elem, int slice_no
   ey_param      = return_param_recurse("ey",thick_elem);
   tilt_param    = return_param_recurse("tilt",thick_elem);
   at_param      = return_param("at",thick_elem);
-
+  
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
   }
-
+  
   /* set up new solenoid command */
   cmd = new_command(buffer("thin_elseparator"), 11, 11, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 11); /* 0 is link, elseparator is 11 */  /*hbu trial */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
-
-
+  
+  
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -809,11 +809,11 @@ struct node* new_marker(struct node *thick_node, double at, struct expression *a
 {
   struct node* node=NULL;
   struct element* elem=NULL;
-
+  
   int pos;
   struct command* p;
   struct command* clone;
-
+  
   if (thick_node->p_elem)
   {
     pos = name_list_pos("marker", defined_commands->list);
@@ -843,7 +843,7 @@ struct node* new_marker(struct node *thick_node, double at, struct expression *a
   {
     fatal_error("Oh dear, this is not an element!",thick_node->name);
   }
-
+  
   return node;
 }
 
@@ -857,7 +857,7 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
   double length = 0, at = 0;
   int i,middle=-1,slices = 1;
   char* old_thin_style;
-
+  
   old_thin_style = NULL;
   if (strstr(node->base_name,"collimator"))
   {
@@ -878,27 +878,27 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
     elem = create_thin_multipole(node->p_elem,1); /* get info from first slice */
   }
   slices = get_slices_from_elem(node->p_elem); /*hbu June 2005 */
-
+  
   at_param = return_param_recurse("at",elem);
   length_param = return_param_recurse("l",node->p_elem); /*get original length*/
   if (length_param) l_expr  = length_param->expr;
   if (at_param)     at_expr = at_param->expr;
-
+  
   at     = el_par_value_recurse("at", elem);
   length = el_par_value_recurse("l",node->p_elem);
-
+  
   if (node->at_expr) at_expr = node->at_expr;
   if (node->at_value != zero) at = node->at_value;
   if (node->length   != zero) length = node->length;
   /* note that a properly created clone node will contain the length of the element */
   /* this will override all other definitions and hence the already sliced element length
-     is irrelevant */
-
+   is irrelevant */
+  
   if (slices>1)
   { /* sets after which element I should put the marker */
     middle = abs(slices/2);
   }
-
+  
   for (i=0; i<slices; i++)
   {
     if (strstr(node->base_name,"collimator"))
@@ -925,8 +925,8 @@ void seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
       if (at_expr || l_expr)
       {
         thin_node->at_expr =
-          compound_expr(at_expr,at,"+",scale_expr(l_expr,at_shift(slices,i+1)),
-                        length*at_shift(slices,i+1));
+        compound_expr(at_expr,at,"+",scale_expr(l_expr,at_shift(slices,i+1)),
+                      length*at_shift(slices,i+1));
       }
     }
     else
@@ -949,7 +949,7 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
   struct command_parameter*  length_param= NULL;
   int length_i = -1,lrad_i = -1,slices=1;
   char* thin_name = NULL;
-
+  
   if (thick_elem == thick_elem->parent)
   {
     return NULL;
@@ -958,11 +958,11 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
   {
     thin_elem_parent = create_thin_obj(thick_elem->parent,slice_no);
   }
-
+  
   /* check to see if we've already done this one */
   thin_elem = get_thin(thick_elem,slice_no);
   if (thin_elem) return thin_elem;
-
+  
   /* set up new multipole command */
   cmd = clone_command(thick_elem->def);
   length_param = return_param_recurse("l",thick_elem);
@@ -979,7 +979,7 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
         if (cmd->par->parameters[lrad_i]->expr)
           delete_expression(cmd->par->parameters[lrad_i]->expr);
         cmd->par->parameters[lrad_i]->expr =
-          clone_expression(cmd->par->parameters[length_i]->expr);
+        clone_expression(cmd->par->parameters[length_i]->expr);
       }
     }
     else
@@ -993,12 +993,12 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
         cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param);
         add_to_name_list("lrad",1,cmd->par_names);
         cmd->par->parameters[name_list_pos("lrad",cmd->par_names)]->expr =
-          clone_expression(cmd->par->parameters[length_i]->expr);
+        clone_expression(cmd->par->parameters[length_i]->expr);
         cmd->par->curr++;
       }
     }
   }
-
+  
   if (length_i > -1)
   {
     cmd->par->parameters[length_i]->double_value = 0;
@@ -1016,7 +1016,7 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
   {
     thin_name=make_thin_name(thick_elem->name,slice_no);
   }
-
+  
   if (thin_elem_parent)
   {
     thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
@@ -1027,30 +1027,30 @@ struct element* create_thin_obj(struct element* thick_elem, int slice_no)
   }
   thin_elem->length = 0;
   thin_elem->bv = el_par_value("bv",thin_elem);
-
+  
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
 }
 
 /* this copies an element node and sets the length to zero
-   and radiation length to the length
-   to be used for "copying" optically neutral elements */
+ and radiation length to the length
+ to be used for "copying" optically neutral elements */
 struct node* copy_thin(struct node* thick_node)
 {
   struct node* thin_node = NULL;
-
+  
   thin_node = clone_node(thick_node, 0);
   thin_node->length=0;
   thin_node->p_elem->length=0;
   /* if we have a non zero length then an lrad has to be created */
   if (el_par_value("l",thick_node->p_elem)>zero)
     thin_node->p_elem = create_thin_obj(thick_node->p_elem,1);
-
+  
   return thin_node;
 }
 
 /* this decides how to split an individual node and
-   sends it onto the thin_sequ builder */
+ sends it onto the thin_sequ builder */
 void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
 {
   struct node* thin_node;
@@ -1066,54 +1066,52 @@ void seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
     }
     else
     { /* we have to slim it down a bit...*/
-      if (strcmp(thick_node->base_name,"marker") == 0    ||
+      if (strcmp(thick_node->base_name,"marker") == 0      ||
           strcmp(thick_node->base_name,"instrument") == 0  ||
+          strcmp(thick_node->base_name,"placeholder") == 0 ||
           strcmp(thick_node->base_name,"hmonitor") == 0    ||
           strcmp(thick_node->base_name,"vmonitor") == 0    ||
           strcmp(thick_node->base_name,"monitor") == 0     ||
           strcmp(thick_node->base_name,"vkicker") == 0     ||
           strcmp(thick_node->base_name,"hkicker") == 0     ||
           strcmp(thick_node->base_name,"kicker") == 0      ||
+          strcmp(thick_node->base_name,"tkicker") == 0     ||
           strcmp(thick_node->base_name,"rfcavity") == 0    ||
-	  strcmp(thick_node->base_name,"crabcavity") == 0
-        )
+          strcmp(thick_node->base_name,"crabcavity") == 0
+          )
       {
         seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
-        /*   delete_node(thick_node); */
         /* special cavity list stuff */
         if (strcmp(thin_node->p_elem->base_type->name, "rfcavity") == 0 &&
             find_element(thin_node->p_elem->name, thin_sequ->cavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->cavities, 0);
-	/* special crab cavity list stuff */
+        /* special crab cavity list stuff */
         if (strcmp(thin_node->p_elem->base_type->name, "crabcavity") == 0 &&
             find_element(thin_node->p_elem->name, thin_sequ->crabcavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->crabcavities, 0);
       }
-      else if (strcmp(thick_node->base_name,"rbend") == 0 ||
+      else if (strcmp(thick_node->base_name,"rbend") == 0       ||
                strcmp(thick_node->base_name,"sbend") == 0       ||
                strcmp(thick_node->base_name,"quadrupole") == 0  ||
                strcmp(thick_node->base_name,"sextupole") == 0   ||
                strcmp(thick_node->base_name,"octupole") == 0    ||
                strcmp(thick_node->base_name,"solenoid") == 0    || /*hbu */
-               strcmp(thick_node->base_name,"multipole") == 0
-               || /* special spliting required. */
+               strcmp(thick_node->base_name,"multipole") == 0   || /* special spliting required. */
                strcmp(thick_node->base_name,"rcollimator") == 0 ||
                strcmp(thick_node->base_name,"ecollimator") == 0 ||
                strcmp(thick_node->base_name,"elseparator") == 0
-        )
+               )
       {
         seq_diet_add_elem(thick_node,thin_sequ);
-        /*   delete_node(thick_node); */
       }
       else if (strcmp(thick_node->base_name,"drift") == 0)
       {
         /* ignore this as it makes no sense to slice */
       }
-      else
+      else /* new elements not yet implemented for slicing - write a message and do a reasonable default action */
       {
         fprintf(prt_file, "Found unknown basename %s, doing copy with length set to zero.\n",thick_node->base_name);
         seq_diet_add(copy_thin(thick_node),thin_sequ);
-        /*        delete_node(thick_node); */
       }
     }
   }
@@ -1135,10 +1133,10 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   struct sequence* thin_sequ;
   char name[128];
   int pos;
-
+  
   /* first check to see if it had been already sliced */
   if ((thin_sequ=get_thin_sequ(thick_sequ))) return thin_sequ;
-
+  
   strcpy(name,thick_sequ->name);
   fprintf(prt_file, "makethin: slicing sequence : %s\n",name);
   thin_sequ = new_sequence(name, thick_sequ->ref_flag);
@@ -1163,7 +1161,7 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
   }
   thin_sequ->end->next = thin_sequ->start;
   /* now we have to move the pointer in the sequences list
-     to point to our thin sequence */
+   to point to our thin sequence */
   if ((pos = name_list_pos(name, sequences->list)) < 0)
   {
     fatal_error("unknown sequence sliced:", name);
@@ -1173,16 +1171,16 @@ struct sequence* seq_diet(struct sequence* thick_sequ)
     sequences->sequs[pos]= thin_sequ;
     /* delete_sequence(thick_sequ) */
   }
-
+  
   /* add to list of sequences sliced */
   put_thin_sequ(thick_sequ,thin_sequ);
-
+  
   return thin_sequ;
 }
 
 /* This converts the MAD-X command to something I can use
-   if a file has been specified we send the command to exec_save
-   which writes the file for us */
+ if a file has been specified we send the command to exec_save
+ which writes the file for us */
 void makethin(struct in_cmd* cmd)
 {
   struct sequence *thick_sequ = NULL ,*thin_sequ = NULL;
@@ -1191,18 +1189,18 @@ void makethin(struct in_cmd* cmd)
   char *name = NULL;
   int pos,pos2;
   int k=0;
-/*    time_t start; */
-
-/*    start = time(NULL); */
+  /*    time_t start; */
+  
+  /*    start = time(NULL); */
   pos = name_list_pos("style", nl);
   if (nl->inform[pos] && (name = pl->parameters[pos]->string))
   {
     thin_style = buffer(pl->parameters[pos]->string);
     fprintf(prt_file, "makethin: style chosen : %s\n",thin_style);
   }
-
+  
   /* first check makethin parameters which influence the selection */
-
+  
   pos = name_list_pos("minimizeparents", nl);
   /* k = true; */  /* Use this to set minimizeparents to true by default. */
   if( pos > -1 && nl->inform[pos])
@@ -1210,14 +1208,14 @@ void makethin(struct in_cmd* cmd)
     k=pl->parameters[pos]->double_value;
   }
   set_option("minimizeparents", &k);
-
+  
   pos = name_list_pos("makeconsistent", nl);
   if( pos > -1 && nl->inform[pos])
   {
     k=pl->parameters[pos]->double_value;
     set_option("makeconsistent", &k);
   }
-
+  
   if (slice_select->curr > 0)
   {
     set_selected_elements(); /* makethin selection */
@@ -1247,7 +1245,7 @@ void makethin(struct in_cmd* cmd)
     else warning("unknown sequence ignored:", name);
   }
   else warning("makethin without sequence:", "ignored");
-
+  
   /* fprintf(prt_file, "makethin: finished in %f seconds.\n",difftime(time(NULL),start)); */
   thin_select_list = NULL;
 }
@@ -1378,8 +1376,8 @@ void set_selected_elements()
   struct node* c_node;    /* for range check.  current node */
   struct node* nodes[2];  /* for range check.  first and last in range */
   /* Init curr and list->curr in global el_list structure.  selected_elements is passed to add_to_el_list and used at the end as thin_select_list
-     selected_elements  is only used in makethin (set here and read in and could be named thin_select_list
-  */
+   selected_elements  is only used in makethin (set here and read in and could be named thin_select_list
+   */
   selected_elements->curr = 0;
   selected_elements->list->curr = 0;  /* Reset list->curr in global el_list structure.   selected_elements is passed to add_to_el_list */
   if (current_sequ == NULL || current_sequ->ex_start == NULL) /* check that there is an active sequence, otherwise crash in get_ex_range */
