@@ -5,6 +5,8 @@ import re
 
 import Notify
 
+global representative
+representative = "madxd.h"
 
 def byDecreasingReleaseNumber(a,b): # passed to the Python sort list function
     aNumbers = a.split('_')
@@ -27,6 +29,10 @@ class MadTestTrigger:
     def __init__(self):
         self.whatToDo = "don't know"
         self.release = "don't know"
+        self.debugMode = False
+
+    def setDebugMode(self,mode):
+        self.debugMode=mode
 
     def getWhatToDo(self):
         return self.whatToDo
@@ -51,7 +57,7 @@ class MadTestTrigger:
 
         lastTest = tests[0]
 
-
+#        print "lastTest="+lastTest
         # completion
         self.release = "madX-"+lastRelease
         if lastTest == lastRelease:
@@ -59,10 +65,14 @@ class MadTestTrigger:
         else:
             # SHOULD TAG THE CVS HERE (if mode != debug)
             # should also record work
+            global representative
+            newTestTag = "test-"+lastRelease
+            command = "cvs tag " + newTestTag + " " + representative
+            if not self.debugMode:
+                os.system(command)
+            else:
+                print "skip command '"+command+"' in debug-mode"
             self.whatToDo = "run-test"
-            pass
-
-        
         
     def extractCVS(self,rootDir):
         # do we need to check-out or could we rely on FesaBuild.pl instead?
@@ -73,7 +83,7 @@ class MadTestTrigger:
         try:
             os.mkdir(extractDir)
         except OSError:
-            print "OS error (should be instance errno 17)"
+#            print "OS error (should be instance errno 17)"
             os.system('rm -rf ./'+extractDir) # dangerous
             os.mkdir(extractDir)
         os.chdir(extractDir)
@@ -91,7 +101,7 @@ class MadTestTrigger:
         testRevision = {}
         
         os.chdir(extractDir)
-        representative = 'madxd.h'
+        global representative
         log = os.system('cvs log '+representative+' > tempfile')
         tempfile = open('tempfile','r')
         lines = tempfile.readlines()
@@ -105,8 +115,8 @@ class MadTestTrigger:
                 releaseRevision[release] = m.group(4)
                 releases.append(release)
                 
-            patternTest = re.compile(r'^[\s\t]*test\-(\d+)_(\d+)(\d+)[\s\t]*:[\s\t]*([\d\.]+)[\s\t]*$')
-            m = pattern.match(line)
+            patternTest = re.compile(r'^[\s\t]*test\-(\d+)_(\d+)_(\d+)[\s\t]*:[\s\t]*([\d\.]+)[\s\t]*$')
+            m = patternTest.match(line)
             if m:
                 test = m.group(1)+"_"+m.group(2)+"_"+m.group(3)
                 testRevision[test] = m.group(4)
@@ -119,6 +129,7 @@ class MadTestTrigger:
 if __name__ == "__main__":
     print("test program")
     testTrigger = MadTestTrigger()
+    testTrigger.setDebugMode(True)
     testTrigger.run("./") # local directory
     what = testTrigger.getWhatToDo()
     release = testTrigger.getRelease()
