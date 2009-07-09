@@ -72,6 +72,8 @@ $buildReport = "<table width=\"75%\" border=\"0\">\n";
 # note: we must do the clean-up everywhere, up to TestScenario.xml...
 @targets = ("madx");
 
+$compilationOK = 'true'; # default
+
 foreach $makefile (@makefiles){
 
     TARGETS: foreach $target (@targets){ # this loop now useless
@@ -129,6 +131,7 @@ foreach $makefile (@makefiles){
 	}
 	else { 
 	    $compilationOutcome{$target} = 'failure';
+	    $compilationOK = 'false';
 	}
 	$detailedBuildReport .= "<tr class =\"$compilationOutcome{$target}\"><td colspan=\"2\">$target</td><td>$compilationOutcome{$target}</td></tr>\n";
 	$detailedBuildReport .= "<tr><td>$makeResult</td><tr>\n";
@@ -167,16 +170,18 @@ createWebPage("build.htm",$buildReport, $startTime, $endTime ); # main page
 
 
 
-# then send an e-mail
-  $msg = MIME::Lite->new(
-			 From       => 'Jean-Luc.Nougaret@cern.ch', # if "" instead of '', '@'->'\@'
-			 'Reply-To' => 'mad-automation-admin@cern.ch',
-			 To         => 'mad-automation-admin@cern.ch', # for good
+# then send an e-mail, in case a compilation trouble encountered
+if ($compilationOK eq 'false'){
+    $msg = MIME::Lite->new(
+			   From       => 'Jean-Luc.Nougaret@cern.ch', # if "" instead of '', '@'->'\@'
+			   'Reply-To' => 'mad-automation-admin@cern.ch',
+			   To         => 'mad-automation-admin@cern.ch', # for good
 #			 To         => 'Jean-Luc.Nougaret@cern.ch', # for test
-			 Subject    => "Automated MAD Build $compilationOutcome{'madx'} for madx, $compilationOutcome{'madxp'} for madxp",
-			 Data       => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation/build.htm"
-			);
-#  $msg->send;
+			   Subject    => "Automated MAD Build did not succeed",
+			   Data       => "This is an automated e-mail. Check report on\nhttp://test-mad-automation.web.cern.ch/test-mad-automation/build.htm"
+			   );
+    $msg->send;
+}
 
  print REPORT_FILE "MadBuild.pl completed\n";
  close REPORT_FILE;
