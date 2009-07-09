@@ -183,6 +183,9 @@ if ($compilationOK eq 'false'){
     $msg->send;
 }
 
+# return status output, to be processed by the calling MadBuildAndTest.py
+print $compilationOK; # either 'true' or 'false'
+
  print REPORT_FILE "MadBuild.pl completed\n";
  close REPORT_FILE;
 
