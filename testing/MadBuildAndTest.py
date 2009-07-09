@@ -229,7 +229,22 @@ try:
                      release+"\n")
         os.chdir(rootDir)
         os.system("rm -rf ./MadCvsExtract")
-        os.system("./MadBuildPy.pl "+ release) # MadBuildPy.pl instead of MadBuild.pl for time-being
+        try:
+            os.system("rm -rf ./tempfile")
+        except:
+            pass
+        os.system("./MadBuildPy.pl "+ release + ">./tempfile") # MadBuildPy.pl instead of MadBuild.pl
+        tempfile = open('./tempfile','r')
+        templines = tempfile.readlines()
+        if templines[0]=='false': # the return status indicating a compilation failure
+            if options.manual:
+                notify('jean-luc','stop test','because compilation did not succeed.')
+            else:
+                notify('admin','stop test','because compilation did not succeed.')
+            # shall we kill the thread as well?
+            th.kill()
+            sys.exit()
+        
         reportFile.write("MadBuildPy.pl completed\n")
 
         # no MadTest for the time-being
