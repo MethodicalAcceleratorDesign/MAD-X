@@ -11,6 +11,8 @@ import re
 import traceback
 import optparse
 
+global debugMode
+
 threadList = []
 
 rootDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation"
@@ -29,6 +31,8 @@ class updateTokensThread(threading.Thread):
     def setDebugMode(self,mode):
         self.debugMode = mode
     def run(self):
+        global debugMode
+        
         origin = datetime.datetime.now() # return string
         duration = 0 # init
         keytabDir = '/extra/home/nougaret/MadTestScriptAuth'
@@ -69,9 +73,11 @@ class updateTokensThread(threading.Thread):
                 # must provide path to cope with reduced acron environment
                 os.system('/usr/bin/aklog')
 
-                notify('jean-luc','Kerberos / AFS ticket','ran for ' \
-                       +str((now-origin).days)+' days\n\n'\
-                       + 'kinit reply:\n\n'+ msg+'\n\nklist output:\n\n'+msg2)
+                if debugMode:
+                    notify('jean-luc','Kerberos / AFS ticket','ran for ' \
+                           +str((now-origin).days)+' days\n\n'\
+                           + 'kinit reply:\n\n'+ msg+'\n\nklist output:\n\n'+\
+                           msg2)
                 
             except:
                 notify('jean-luc','Automatic message (PROBLEM)',\
@@ -196,7 +202,9 @@ try:
     if runTest == 'do-nothing':
         reportFile.write("No new release detected => no neet to run "+\
                          "the test-suite\n")
-        notify('jean-luc','no new release detected','last release = '+release)
+        global debugMode
+        if debugMode:
+            notify('jean-luc','no new release detected','last release = '+release)
         
         #reportFile.close()
     elif not runTest == 'run-test':
@@ -254,8 +262,9 @@ try:
         msg =''
         for line in lines:
             msg = msg + line + '\n'
-        notify('jean-luc','Very Last Message',\
-               'Contents of '+directory+'\n'+\
+        if debugMode:
+            notify('jean-luc','Very Last Message',\
+                   'Contents of '+directory+'\n'+\
                msg)              
         os.system('rm '+directory+'theFile')
         # end of final test
