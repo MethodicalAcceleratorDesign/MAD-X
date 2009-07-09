@@ -6,6 +6,7 @@
 # output: prints 'success','quasi-success', 'warning' or 'failure' of the comparison to stdout
 
 my $tolerance = 0.001; # for time-being, hard-code maximum incertitude as 0.1%, i.e. 0.001
+my $absoluteTolerance = 10e-15;
 my $maxWidth = 360; # different lines may appear as identical after truncation
 # for instance numerical discrepancies may not show up until width is increased
 # to say 360 or so. In many cases 180 or so would be sufficient.
@@ -168,7 +169,7 @@ foreach $line (@lines) {
 				# and also have to add "\" before the right-anchor "$"
 				# ... to be clarified...
 				# try to replace " by '
-				$numPattern = '^[\+\-]?\d*.\d+[eE]?[\+\-]?\d*$'; # account for various formats found with Mad
+				$numPattern = '^[\+\-]?\d+\.?\d*[eE]?[\+\-]?\d*$'; # account for various formats found with Mad
 				if (($leftChunk =~ /$numPattern/) && ($rightChunk =~ /$numPattern/)) {
 				    $leftValue = $leftChunk;
 				    $rightValue = $rightChunk;
@@ -182,21 +183,32 @@ foreach $line (@lines) {
 					}
 				    }
 				    else {
-					# define tolerance as the maximum incertitude between the two values
+					# define relative tolerance as the maximum incertitude between the two values
 					$mean = ($leftValue+$rightValue)/2.0;
 					if ($mean != 0.0){
 					    if ( (abs($leftValue-$rightValue)/abs($mean)) < $tolerance ) {
 						$numericalMatch = 1;
 					    } else {
-						$numericalMatch = 0 ;
-						# force to leave the for-loop
-						$i = scalar(@leftChunks); 
+						# still need to compare with absolute tolerance
+						if ((abs($leftValue)<$absoluteTolerance) && (abs($rightValue)<$absoluteTolerance)) {
+						    $numericalMatch = 1;
+						}
+						else {
+						    $numericalMatch = 0 ;
+						    # force to leave the for-loop
+						    $i = scalar(@leftChunks);
+						} 
 					    }
 					} else { # mean == 0.0 - special case
 					    if (abs($leftValue) > ($tolerance/2.0)){
-						$numericalMatch = 0;
-						# force to leave the for-loop
-						$i = scalar(@leftChunks);
+						# still need to compare with absolute tolerance
+						if (abs($leftValue)<$absoluteTolerance){
+						    $numericalMatch = 1;
+						} else {
+						    $numericalMatch = 0;
+						    # force to leave the for-loop
+						    $i = scalar(@leftChunks);
+						}
 					    } else {
 						$numericalMatch = 1;
 					    }
@@ -364,7 +376,8 @@ $html .="<p>Legend:</p>\n";
 $html .="<table>\n";
 $html .="<tr class=\"identical\"><td>Lines match</td></tr>\n";
 my $tolPercent = $tolerance * 100.0;
-$html .="<tr class=\"numerical-match\"><td>Numerical data match within $tolPercent% tolerance</td></tr>\n";
+my $tolAbsolute = $absoluteTolerance;
+$html .="<tr class=\"numerical-match\"><td>Numerical data match within $tolPercent% relative tolerance, or $tolAbsolute absolute tolerance</td></tr>\n";
 $html .="<tr class=\"different-warning\"><td>Lines differ expectedly</td></tr>\n";
 $html .="<tr class=\"different-failure\"><td>Lines differ unexpectedly</td></tr>\n";
 $html .="<tr class=\"only-left\"><td>Part present in one file, absent of the other</td></tr>\n";
