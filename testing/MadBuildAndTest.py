@@ -172,13 +172,11 @@ try:
         # retreive the release number from the CVS
         # (idem as MadTrigTest.pl)
         trigTest = MadTrigTest.MadTestTrigger()
+        trigTest.setDebugMode(options.debug) # if false, won't tag the CVS with 'test-XX_YY_ZZ'
         trigTest.run(rootDir)
         runTest = trigTest.getWhatToDo()
         release = trigTest.getRelease() # the tag with which to extract the CVS
-        pass # for the time-being
-        # DOES NOT WORK YET
      
-    
 #else:    
 except:
     print("failed to parse the command line. exit.")
@@ -206,7 +204,7 @@ try:
         #reportFile.close()
     else:
         reportFile.write("now about to release "+release+"\n")
-        notify('jean-luc','new release detected','new release = '+release)       
+        notify('admin','new release detected','new release = '+release)       
 
         # leave the try statement (go to finally if any)
         #th.kill()
@@ -238,7 +236,7 @@ try:
         else:
             os.system("./MadTestPy.pl ./MadCvsExtract/madX") 
         reportFile.write("MadTestPy.pl completed\n")
-        notify('jean-luc','Completed test','MadTestPy.pl completed')
+        notify('admin','Completed test','MadTestPy.pl completed')
 
 
         # final debug test to check we still have access to AFS
