@@ -7,6 +7,8 @@ def notify(recipient,subject,message):
 
     if recipient == 'jean-luc':
         toAdrs = 'Jean-Luc.Nougaret@cern.ch'
+    elif recipient == 'admin':
+        toAdrs = 'mad-automation-admin@cern.ch'
     else:
         toAdrs = 'Jean-Luc.Nougaret@cern.ch'
     
@@ -15,7 +17,7 @@ def notify(recipient,subject,message):
     msg = MIMEText(TEXT)
     
     msg['Subject'] = subject   
-    msg['To'] = 'Jean-Luc.Nougaret@cern.ch'
+    msg['To'] = toAdrs
     # if above missing, message still gets delivered
     # but with 'undisclosed recipients'
 
