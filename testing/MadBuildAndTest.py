@@ -212,7 +212,10 @@ try:
         #reportFile.close()
     else:
         reportFile.write("now about to release "+release+"\n")
-        notify('admin','new release detected','new release = '+release)       
+        if options.manual:
+            notify('jean-luc','manual release','new release = '+release)
+        else:
+            notify('admin','new release detected','new release = '+release)       
 
         # leave the try statement (go to finally if any)
         #th.kill()
