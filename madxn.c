@@ -3027,6 +3027,24 @@ int next_constr_namepos(char* name)
           if      (name[2] == 'x') pos = 16;
           else if (name[2] == 'y') pos = 18;
 	}
+      else if (name[1] == 'm')
+        {
+          if      (name[3] == 'x') pos = 21;
+          else if (name[3] == 'y') pos = 24;
+        }
+      else if (name[1] == 'd')
+	{
+	  if	  (name[2] == 'x') pos = 25;
+	  else if (name[2] == 'y') pos = 27;
+	  else if (name[2] == 'p')
+	    {
+	      if      (name[3] == 'x') pos = 26;
+	      else if (name[3] == 'y') pos = 28;
+	    }
+	}
+      break;
+    case 'e':
+      pos = 33;
       break;
     case 'm':
       if      (name[2] == 'x') pos = 5;
@@ -3036,6 +3054,11 @@ int next_constr_namepos(char* name)
       if      (name[1] == 'x') pos = 10;
       else if (name[1] == 'y') pos = 12;
       else if (name[1] == 't') pos = 14;
+      else if (name[1] == 'h') pos = 14;
+        {
+	  if      (name[3] == 'x') pos = 20;
+	  else if (name[3] == 'y') pos = 23;
+	}
       break;
     case 'r':
       if      (name[1] == '1')
@@ -3051,6 +3074,10 @@ int next_constr_namepos(char* name)
       break;
     case 't':
       pos = 13;
+      break;
+    case 'w':
+      if      (name[1] == 'x') pos = 19;
+      else if (name[1] == 'y') pos = 22;
       break;
     case 'x':
       pos = 9;
