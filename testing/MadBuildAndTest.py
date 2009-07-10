@@ -260,7 +260,8 @@ try:
         #os.system("./MadTest.pl ./MadCvsExtract/madX")
         # WARNING: MadTestPy.pl should replace MadTest.pl to avoid sending
         # e-mail - instead, notification should take place within Python.
-        notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX')
+        if options.debug: # or global debugMode
+            notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX')
         # os.system("./MadTestPy.pl ./MadCvsExtract/madX debug=c6t")
         if options.silent:
             os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
