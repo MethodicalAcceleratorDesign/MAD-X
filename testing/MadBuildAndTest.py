@@ -187,6 +187,7 @@ try:
         trigTest.run(rootDir)
         runTest = trigTest.getWhatToDo()
         release = trigTest.getRelease() # the tag with which to extract the CVS
+        os.chdir(rootDir) # changed in between
      
 #else:    
 except:
