@@ -362,8 +362,7 @@ CONTAINS
     j=j+1
     nt=nt+1
     if(nt==nt0) then
-       print*,'More than the maximum number: ',nt0,' of elements in the structure==> Program stops'
-       stop
+       call fort_warn("Potential problem for very large structure: ","More than 20'000 elements found")
     endif
     icount=0
     l=zero
@@ -553,8 +552,8 @@ CONTAINS
                 write(6,*) " with the exit face."
                 write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
                 write(6,*) " Make sure that this is what you want!!! "
-!                write(6,*) " CHANGE YOUR LATTICE FILRE."
-!                stop 666
+                !                write(6,*) " CHANGE YOUR LATTICE FILRE."
+                !                stop 666
                 key%list%t2=zero
              endif
           else
