@@ -28,6 +28,7 @@ class updateTokensThread(threading.Thread):
         threading.Thread.__init__(self)
         self.killed = False
         threadList.append(self)
+        self.fileTokens = open('MadBuildAndTest.trace','w')
     def setDebugMode(self,mode):
         self.debugMode = mode
     def run(self):
@@ -80,6 +81,7 @@ class updateTokensThread(threading.Thread):
                            msg2)
                 
             except:
+                traceback.print_tb(self.fileTokens)
                 notify('jean-luc','Automatic message (PROBLEM)',\
                        'failed to refresh tokens!')
             for sec in range(1,21600+1): # sleep 6 hours
@@ -90,7 +92,7 @@ class updateTokensThread(threading.Thread):
             
     def kill(self):
         self.killed = True # work-around: not yet able to kill Python threads
-        
+        close(self.fileTokens)
 
 os.chdir(sys.path[0]) # change to Python script's directory
 # ???
@@ -139,6 +141,9 @@ try:
     # check it all selected options are compatible
     if options.automatic and options.manual:
         raise MadBuildAndTestException("options -a and -m are mutually exclusive")
+
+    global debugMode
+    debugMode = options.debug
 
     if options.manual:
         # is it a well formed release tag?
@@ -198,9 +203,8 @@ else:
 th.start()
 
 try:
-
     if runTest == 'do-nothing':
-        reportFile.write("No new release detected => no neet to run "+\
+        reportFile.write("No new release detected => no need to run "+\
                          "the test-suite\n")
         global debugMode
         if debugMode:
@@ -233,7 +237,7 @@ try:
             os.system("rm -rf ./tempfile")
         except:
             pass
-        os.system("./MadBuildPy.pl "+ release + ">./tempfile") # MadBuildPy.pl instead of MadBuild.pl
+        os.system("./MadBuildPy.pl "+ release + " > ./tempfile") # MadBuildPy.pl instead of MadBuild.pl
         tempfile = open('./tempfile','r')
         templines = tempfile.readlines()
         if templines[0]=='false': # the return status indicating a compilation failure
