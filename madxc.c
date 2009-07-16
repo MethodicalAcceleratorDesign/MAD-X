@@ -365,7 +365,9 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   
   double ounits;
 
+/*
   static char atm[6][4] = {"hmon","vmon","moni","hkic","vkic","kick"};
+*/
 
 /* Get access to tables, for orbit and model the default is twiss_table */
 
@@ -446,8 +448,8 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
-    if((strncmp(atm[iplane+2],b1->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[5],       b1->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atc[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[2],       b1->p_nodes[j]->base_name,4) == 0))  {
 /*    printf("1c: %s %ld\n", b1->p_nodes[j]->name, b1->p_nodes[j]->name); */
       if(strstr(b1->p_nodes[j]->name,".b1") != NULL) {
         cor_l1->id_ttb[0] = j;
@@ -487,8 +489,8 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 /*      printf("Removed: %s\n",b2->p_nodes[j]->name); */
       }
     }
-    if((strncmp(atm[iplane+2],b2->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[5],       b2->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atc[iplane-1],b2->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[2],       b2->p_nodes[j]->base_name,4) == 0))  {
 /*    printf("2c: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
       if(strstr(b2->p_nodes[j]->name,".b2") != NULL) {
         cor_l2->id_ttb[0] = -1;
@@ -533,8 +535,8 @@ int  pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
-    if((strncmp(atm[iplane+2],b1->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[5],       b1->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atc[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[2],       b1->p_nodes[j]->base_name,4) == 0))  {
 /*    printf("12c: %s \n", b1->p_nodes[j]->name);     */
       if((strstr(b1->p_nodes[j]->name,".b1") == NULL)  &&
          (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
@@ -1443,7 +1445,9 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
 
   double ounits;
 
+/*
   static char atm[6][4] = {"hmon","vmon","moni","hkic","vkic","kick"};
+*/
 
 /* Get access to tables, for orbit and model the default is twiss_table */
 
@@ -1594,8 +1598,8 @@ int  pro_correct_gettables(int iplane, struct in_cmd* cmd)
       mon_l->next++; mon_l++;
       cntm++;
     }
-    if((strncmp(atm[iplane+2],ttb->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[5],       ttb->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atc[iplane-1],ttb->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[2],       ttb->p_nodes[j]->base_name,4) == 0))  {
       cor_l->id_ttb = j;
       cor_l->enable = ttb->p_nodes[j]->enable;
       cor_l->p_node = ttb->p_nodes[j];
@@ -2284,7 +2288,10 @@ void pro_correct_make_corr_table()
 {
   struct table *ttb;
   int j;
+
+/*
   static char atm[5][4] = {"hmon","vmon","hkic","vkic","kick"};
+*/
 
 /*
   ttb = orbin_table;
@@ -2292,9 +2299,9 @@ void pro_correct_make_corr_table()
   ttb = model_table;
 
   for (j=0; j < ttb->curr; j++) {
-    if((strncmp(atm[2],ttb->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[3],ttb->p_nodes[j]->base_name,4) == 0) ||
-       (strncmp(atm[4],ttb->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atc[0],ttb->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[1],ttb->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atc[2],ttb->p_nodes[j]->base_name,4) == 0))  {
       string_to_table("corr","name",ttb->p_nodes[j]->name);
       augment_count("corr");
     }
@@ -2304,14 +2311,17 @@ void pro_correct_make_corr_table()
 void pro_correct2_make_corr_table()
 {
   struct id_mic2 *ttb;
+
+/*
   static char atm[5][4] = {"hmon","vmon","hkic","vkic","kick"};
+*/
 
   ttb = correct_orbit12->cor_table;
 
   while(ttb != NULL) {
-    if((strncmp(atm[2],ttb->p_node->base_name,4) == 0) ||
-       (strncmp(atm[3],ttb->p_node->base_name,4) == 0) ||
-       (strncmp(atm[4],ttb->p_node->base_name,4) == 0))  {
+    if((strncmp(atc[0],ttb->p_node->base_name,4) == 0) ||
+       (strncmp(atc[1],ttb->p_node->base_name,4) == 0) ||
+       (strncmp(atc[2],ttb->p_node->base_name,4) == 0))  {
        if(ttb->id_ttb[0] > 0) {
          string_to_table("corr1","name",ttb->p_node->name);
          augment_count("corr1");
@@ -2330,7 +2340,10 @@ void pro_correct_make_mon_table()
 {
   struct table *ttb;
   int j;
+
+/*
   static char atm[3][4] = {"hmon","vmon","moni"};
+*/
 
   ttb = model_table;
 
@@ -2347,7 +2360,9 @@ void pro_correct_make_mon_table()
 void pro_correct2_make_mon_table()
 {
   struct id_mic2 *ttb;
+/*
   static char atm[3][4] = {"hmon","vmon","moni"};
+*/
 
   ttb = correct_orbit12->mon_table;
 

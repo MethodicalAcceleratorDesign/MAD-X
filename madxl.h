@@ -679,3 +679,21 @@ char names[PTC_NAMES_L][5]=
 {
   "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"
 };
+
+
+char atm[3][4] = 
+{
+ "hmon","vmon","moni"
+};
+
+char atc[3][4] = 
+{
+ "hkic","vkic","kick"
+};
+
+
+char *atc_type = (char *)NULL;
+int   atc_flag = 0;
+
+char *atm_type = (char *)NULL;
+int   atm_flag = 0;
