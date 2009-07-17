@@ -12,10 +12,8 @@ ONLINE=NO
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=YES
-SLC5=NO
-FC8=NO
-FC10=NO
+SLC4=NO
+SLC5=YES
 FC11=NO
 NTPSA=YES
 
@@ -38,8 +36,6 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   PROFILE=NO
   SLC4=NO
   SLC5=NO
-  FC8=NO
-  FC10=NO
   FC11=NO
 endif
 
@@ -217,14 +213,6 @@ ifeq ($(SLC5),YES)
       LIBX+= /usr/lib/gcc/x86_64-redhat-linux6E/4.3.2/libgcc_eh.a
     endif
   endif
-endif
-
-ifeq ($(FC8),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux/4.1.2 -lgcc_eh /usr/local/lib/libgfortran.a -lstdc++
-endif
-
-ifeq ($(FC10),YES)
-  LIBX= -lX11 -lxcb -lxcb-xlib -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.3.2 -lgcc_eh -lgfortran -lstdc++
 endif
 
 ifeq ($(FC11),YES)
