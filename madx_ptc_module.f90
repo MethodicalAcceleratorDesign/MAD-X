@@ -783,6 +783,7 @@ CONTAINS
              print*,"Thin solenoid: ",name," has no strength - set to marker"
           else
              key%list%bsol=ksi
+             key%list%ls=node_value('lrad ')
           endif
        endif
        !VK

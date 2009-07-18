@@ -187,23 +187,20 @@ module definition
      type (vecfield) VECTOR
      type (pbfield)  pb
   END TYPE ONELIEEXPONENT
+  !@3 ---------------------------------------------</br>
 
-  !&5
-
-  !&3
   TYPE normalform
      type (damap) A_t   ! Total A  :  A_t= A1 o A_rest
-     type (damap) A1    ! Dispersion
-     type (reversedragtfinn) A  ! Linear A_t and nonlinear A_t
-     type (dragtfinn) NORMAL    ! Normal is the Normal Form R
-     type (damap) DHDJ  ! Contains the tunes in convenient form: extracted from NORMAL (=R)
-     real(dp) TUNE(NDIM),DAMPING(NDIM)  ! linear tune and linear damping
-     integer nord,jtune                 ! nord=1 A1 first order in parameters
-     integer NRES,M(NDIM,NRESO),PLANE(NDIM)
+     type (damap) A1    !@1 Dispersion
+     type (reversedragtfinn) A  !@1 Linear A_t and nonlinear A_t
+     type (dragtfinn) NORMAL    !@1 Normal is the Normal Form R
+     type (damap) DHDJ  !@1 Contains the tunes in convenient form: extracted from NORMAL (=R)
+     real(dp) TUNE(NDIM),DAMPING(NDIM)  !@1 linear tune and linear damping
+     integer nord,jtune                 !@1 nord=1 A1 first order in parameters
+     integer NRES,M(NDIM,NRESO),PLANE(NDIM) !@1 NRES,M(NDIM,NRESO) -> resonances left in the map
      logical(lp) AUTO
   END TYPE normalform
-  !&3
-
+  !@3 ---------------------------------------------</br>
   TYPE genfield
      type (taylor) h
      type (damap) m
@@ -218,6 +215,7 @@ module definition
      integer no_cut   !@1 Original map is not symplectic on and above no_cut
   END TYPE genfield
 
+  !@3 ---------------------------------------------</br>
 
 
   TYPE pbresonance

@@ -59,7 +59,7 @@ module Mad_like
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
      real(dp) FINT,hgap,h1,h2,X_COL,Y_COL
-     real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf  ! highly illegal additions by frs
+     real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf,ls  ! highly illegal additions by frs
      CHARACTER(120) file
      CHARACTER(120) file_rev
      CHARACTER(nlp) NAME
@@ -685,6 +685,7 @@ CONTAINS
        s2%h2=zero
        s2%hf=zero
        s2%vf=zero
+       s2%ls=one
        s2%thin_h_foc=zero
        s2%thin_v_foc=zero
        s2%thin_h_angle=zero
@@ -1199,7 +1200,7 @@ CONTAINS
     SOLTILT%BSOL=K11
     SOLTILT%nmul=2
     IF(L1==zero) THEN
-       SOLTILT%KIND=KIND0
+       SOLTILT%KIND=KIND3    ! used to be kind0
     ELSE
        SOLTILT%K(2)=KQ !/FAC(2)    ! MAD FACTOR
        !       if(madkind2==kind2) then
@@ -2635,6 +2636,7 @@ CONTAINS
        IF(S2%KIND==KIND3) THEN
           s2%K3%hf=s1%hf
           s2%K3%vf=s1%vf
+          s2%K3%ls=s1%ls
           s2%K3%thin_h_foc=s1%thin_h_foc
           s2%K3%thin_v_foc=s1%thin_v_foc
           s2%K3%thin_h_angle=s1%thin_h_angle

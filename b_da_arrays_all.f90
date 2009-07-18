@@ -337,12 +337,12 @@ contains
     real(dp),dimension(nmx,nmx)::a,ai
     real(dp),dimension(nmax,nmax)::aw
     !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
 
     aw(1:n,1:n) = a(1:n,1:n)
 
@@ -383,12 +383,12 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmax)::vv
     !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     ier=0
     d=one
     do i=1,n
@@ -472,12 +472,12 @@ contains
     real(dp),dimension(np,np)::a
     real(dp),dimension(nmx)::b
     !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     ii = 0
     do i=1,n
        ll = indx(i)

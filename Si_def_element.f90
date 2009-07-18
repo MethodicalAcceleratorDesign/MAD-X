@@ -1020,6 +1020,7 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
+       ALLOCATE(EL%K3%ls);EL%K3%ls=one
        ALLOCATE(EL%K3%hf);EL%K3%hf=0
        ALLOCATE(EL%K3%vf);EL%K3%vf=0
        ALLOCATE(EL%K3%thin_h_foc);EL%K3%thin_h_foc=0
@@ -1448,6 +1449,7 @@ CONTAINS
        IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        EL%K3%AN=>EL%AN
        EL%K3%BN=>EL%BN
+       ALLOCATE(EL%K3%ls);EL%K3%ls=1
        ALLOCATE(EL%K3%hf);CALL ALLOC(EL%K3%hf);EL%K3%hf=ZERO
        ALLOCATE(EL%K3%vf);CALL ALLOC(EL%K3%vf);EL%K3%vf=ZERO
        ALLOCATE(EL%K3%thin_h_foc);CALL ALLOC(EL%K3%thin_h_foc);EL%K3%thin_h_foc=ZERO
@@ -2664,6 +2666,7 @@ CONTAINS
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
        ELP%K3%patch=EL%K3%patch
+       ELP%K3%ls=EL%K3%ls
     ENDIF
 
 
@@ -2923,6 +2926,7 @@ CONTAINS
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
        ELP%K3%patch=EL%K3%patch
+       ELP%K3%ls=EL%K3%ls
     ENDIF
 
 
@@ -3176,6 +3180,7 @@ CONTAINS
        ELP%K3%thin_h_angle=EL%K3%thin_h_angle
        ELP%K3%thin_v_angle=EL%K3%thin_v_angle
        ELP%K3%patch=EL%K3%patch
+       ELP%K3%ls=EL%K3%ls
     ENDIF
 
 

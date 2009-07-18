@@ -37,6 +37,7 @@ TYPE KICKT3
    real(dp),   POINTER:: hf,vf  ! highly illegal additions by frs for fringe
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
    real(dp), POINTER ::B_SOL
+   real(dp),   POINTER::  ls
 END  TYPE KICKT3
 
 TYPE KICKT3P
@@ -46,6 +47,7 @@ TYPE KICKT3P
    TYPE(REAL_8),   POINTER:: hf,vf  ! highly illegal additions by frs for fringe
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
    TYPE(REAL_8), POINTER ::B_SOL
+   real(dp),   POINTER::  ls
 END  TYPE KICKT3P
 
 TYPE CAV4

@@ -6632,7 +6632,7 @@ contains
        w_p%nc=2
        w_p%fc='((1X,A72,/,1x,a72))'
        w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in POW "
+       w_p%c(1)= " trouble in clean_real_8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
        call write_e(0)

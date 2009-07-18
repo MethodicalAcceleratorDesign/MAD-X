@@ -1858,10 +1858,10 @@ contains
 !!!!!!!!!!!   solenoid
 
     if(k%TIME) then   ! bug 2006.1.8
-       ANG=EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)
+       ANG=EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
-       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
@@ -1883,6 +1883,20 @@ contains
     ENDDO
 
 
+    myCOS=(EL%B_SOL*EL%P%CHARGE)**2*el%ls
+
+    if(k%TIME) then
+       mySIN=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
+       X(2)=X(2)-(myCOS)*X(1)/four/mySIN
+       X(4)=X(4)-(myCOS)*X(3)/four/mySIN
+       X(6)=X(6)+(one/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/eight/mySIN**3
+    else
+       X(2)=X(2)-(myCOS)*X(1)/four/(one+X(5))
+       X(4)=X(4)-(myCOS)*X(3)/four/(one+X(5))
+       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/eight/(one+X(5))**2
+    endif
+
+
     !  end of solenoid
 
 
@@ -1897,6 +1911,7 @@ contains
 
 
   END SUBROUTINE KICKTR
+
 
   SUBROUTINE KICKTP(EL,X,k)
     IMPLICIT NONE
@@ -1965,10 +1980,10 @@ contains
 !!!!!!!!!!!   solenoid
 
     if(k%TIME) then   ! bug 2006.1.8
-       ANG=EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+       ANG=EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
-       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))
+       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
@@ -1991,6 +2006,20 @@ contains
 
 
     !  end of solenoid
+
+
+    myCOS=(EL%B_SOL*EL%P%CHARGE)**2*el%ls
+
+    if(k%TIME) then
+       mySIN=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
+       X(2)=X(2)-(myCOS)*X(1)/four/mySIN
+       X(4)=X(4)-(myCOS)*X(3)/four/mySIN
+       X(6)=X(6)+(one/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/eight/mySIN**3
+    else
+       X(2)=X(2)-(myCOS)*X(1)/four/(one+X(5))
+       X(4)=X(4)-(myCOS)*X(3)/four/(one+X(5))
+       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/eight/(one+X(5))**2
+    endif
 
 
 
@@ -11093,6 +11122,7 @@ contains
           deallocate(EL%thin_v_foc)
           deallocate(EL%thin_h_angle)
           deallocate(EL%thin_v_angle)
+          deallocate(EL%ls)
           deallocate(EL%patch)
        endif
     elseif(i==0)       then          ! nullifies
@@ -11102,6 +11132,7 @@ contains
        NULLIFY(EL%thin_h_foc)
        NULLIFY(EL%thin_v_foc)
        NULLIFY(EL%thin_h_angle)
+       NULLIFY(EL%ls)
        NULLIFY(EL%thin_v_angle)
        NULLIFY(EL%patch)
     endif
@@ -11129,6 +11160,7 @@ contains
           deallocate(EL%thin_h_angle)
           deallocate(EL%thin_v_angle)
           deallocate(EL%patch)
+          deallocate(EL%ls)
        endif
     elseif(i==0)       then          ! nullifies
 
@@ -11139,6 +11171,7 @@ contains
        NULLIFY(EL%thin_h_angle)
        NULLIFY(EL%thin_v_angle)
        NULLIFY(EL%patch)
+       NULLIFY(EL%ls)
     endif
 
   END SUBROUTINE ZEROP_KICKT3

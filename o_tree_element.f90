@@ -17,6 +17,7 @@ module tree_element_MODULE
   private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
   private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8,exp_spinor_8
+  private INTO_RES_SPIN8_eq,INTO_SPIN8_from_RES_eq
 
   private find_ar
   private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor,print_res_spinor_8
@@ -33,7 +34,7 @@ module tree_element_MODULE
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
   private find_perp_basisp,find_exponentp
-  private alloc_res_SPINOR_8,KILL_res_SPINOR_8
+  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst
 
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
@@ -64,11 +65,13 @@ module tree_element_MODULE
      MODULE PROCEDURE     EQUAL_SPINOR_SPINOR8
      MODULE PROCEDURE     EQUAL_PROBE_PROBE8
      MODULE PROCEDURE     normalise_spin
-
+     MODULE PROCEDURE     INTO_RES_SPIN8_eq !@
+     MODULE PROCEDURE     INTO_SPIN8_from_RES_eq
   end  INTERFACE
+
   INTERFACE OPERATOR (*)
-     MODULE PROCEDURE concat  !! damapspin= damapspin o damapspin
-     MODULE PROCEDURE cmul
+     MODULE PROCEDURE concat  !@ damapspin= damapspin o damapspin
+     MODULE PROCEDURE cmul    ! damapspin%s= real(dp) * damapspin%s=
      MODULE PROCEDURE mmul  ! damapspin%s=damapspin%s o damap
      MODULE PROCEDURE damapspin_spinor_mul  ! spinor_8%s(i)= damapspin%s(i,j) * spinor%s(j)
      MODULE PROCEDURE damapspin_spinor8_mul ! spinor_8%s(i)= damapspin%s(i,j) * spinor_8%s(j)
@@ -76,7 +79,7 @@ module tree_element_MODULE
      MODULE PROCEDURE eval_spinor_8   ! spinor=spinor_8 * xp(lnv)
      MODULE PROCEDURE concatxp   !  damapspin=damapspin*xp(lnv)
      MODULE PROCEDURE spin8_scal8_map  ! real_8*spinor_8
-     MODULE PROCEDURE mul_spin8_spin8
+     MODULE PROCEDURE mul_spin8_spin8  !  mul_spin8_spin8= spin8 X spin8  cross product
   END  INTERFACE
 
   INTERFACE OPERATOR (**)
@@ -97,8 +100,8 @@ module tree_element_MODULE
      MODULE PROCEDURE daddsc
      MODULE PROCEDURE scdaddo
      MODULE PROCEDURE daddsco
-     MODULE PROCEDURE addm
-     MODULE PROCEDURE add_spin8_spin8
+     MODULE PROCEDURE addm    !    damapspin%s  + damapspin%s
+     MODULE PROCEDURE add_spin8_spin8   ! spinor_8 = spinor_8 + spinor_8
   END  INTERFACE
 
   INTERFACE operator (-)
@@ -106,11 +109,11 @@ module tree_element_MODULE
   END  INTERFACE
 
   INTERFACE exp   !  damapspin = exp(spinor_8)
-     MODULE PROCEDURE exp_spinor_8  ! finds n0 the naive way
+     MODULE PROCEDURE exp_spinor_8  !
   END INTERFACE
 
   INTERFACE texp   !  damapspin = exp(spinor_8)
-     MODULE PROCEDURE exp_spinor_8  ! finds n0 the naive way
+     MODULE PROCEDURE exp_spinor_8  !
   END INTERFACE
 
   INTERFACE find_n0   ! (s0(3,3),n0(3))
@@ -147,6 +150,15 @@ module tree_element_MODULE
      MODULE PROCEDURE get_spin_nx_probe ! takes probe (damapspin but returns real)
      MODULE PROCEDURE get_spin_nx_spinor_8
   END INTERFACE
+
+  INTERFACE find_exponent_jet  !
+     MODULE PROCEDURE find_exponent_jet_p
+  end interface
+
+  INTERFACE full_abs  !
+     MODULE PROCEDURE full_abst
+  END INTERFACE   !
+
 
 
   INTERFACE PRINT
@@ -952,6 +964,23 @@ CONTAINS
 
 
 
+
+  FUNCTION FULL_ABST( S1 )
+    implicit none
+    REAL(DP) FULL_ABST
+    TYPE (damapspin), INTENT (IN) :: S1
+    integer i,j
+
+    FULL_ABST=ZERO
+
+    do i=1,3
+       do j=1,3
+          FULL_ABST=FULL_ABS(S1%s(i,j))+FULL_ABST
+       enddo
+    enddo
+
+
+  END FUNCTION FULL_ABST
 
   FUNCTION CUTORDER( S1, S2 )
     implicit none
@@ -1948,8 +1977,10 @@ CONTAINS
     norm=sqrt(x_axis.dot.x_axis)
     x_axis=(1.d0/norm)*x_axis
 
-    norm=sqrt(z_axis.dot.z_axis)
+
+
     z_axis=x_axis*y_axis
+    norm=sqrt(z_axis.dot.z_axis)
     z_axis=(1.d0/norm)*z_axis
 
 
@@ -1958,20 +1989,85 @@ CONTAINS
 
   end subroutine find_perp_basisp
 
-  subroutine find_exponentp(ds,y_axis,x_axis,z_axis,h_axis)  !
+  subroutine find_exponent_jet_p(ds,h_axis)  !
+    implicit none
+    type(damapspin),intent(inout) :: ds
+    type(spinor_8),intent(inout) :: h_axis
+    type(damapspin) s,sf,st,SA
+    integer i,nmax
+    real(dp) eps1,EPS0
+    LOGICAL DONOT
+    nmax=1000
+    call alloc(s,sf,st,SA)
+
+    DONOT=.FALSE.
+    EPS0=MYBIG
+
+    st=1
+    s=ds
+    s%m=1
+    sf=0
+    do i=1,3
+       s%s(i,i)=s%s(i,i)-one
+    enddo
+
+    st=s
+    do i=1,nmax
+       SA=SF
+       sf=sf + (one/i)*st
+       st=(-one)*(s*st)
+       SA=SA+((-one)*SF)
+       eps1=FULL_ABS(SA)
+
+       IF(EPS1>deps_tracking) THEN
+          EPS0=EPS1
+       ELSE
+          IF(EPS1>=EPS0.or.EPS1<=PUNY) THEN
+             DONOT=.TRUE.
+          ELSE
+             EPS0=EPS1
+          ENDIF
+       ENDIF
+
+       IF(DONOT) EXIT
+
+    enddo
+
+    if(i>nmax-2) then
+       write(6,*) "Did not converge in find_exponent_jet_p"
+       stop 666
+    endif
+    h_axis%x(1)=sf%s(3,2)
+    h_axis%x(2)=sf%s(1,3)
+    h_axis%x(3)=sf%s(2,1)
+
+    !etienne
+
+
+
+    call kill(s,sf,st,SA)
+  end subroutine find_exponent_jet_p
+
+  subroutine find_exponentp(ds,y_axis,x_axis,z_axis,h_axis,spin_tune)  !
     implicit none
     type(damapspin),intent(inout) :: ds
     type(spinor_8),intent(inout) :: y_axis,x_axis,z_axis,h_axis
     type(spinor_8) s
     type(real_8) cos,sin,theta
+    type(real_8) , optional :: spin_tune
 
     call alloc(s)
     call alloc(cos,sin,theta)
 
     call find_axis(ds,y_axis)
+    !  etienne
+
     call find_perp_basis(y_axis,x_axis,z_axis)
 
+
+
     s=ds*x_axis
+
 
     cos=s.dot.x_axis
     sin=-(s.dot.z_axis)
@@ -1980,6 +2076,10 @@ CONTAINS
     !if(force_positive.and.theta<zero) theta = theta + twopi    !!!! allow negative theta
 
     h_axis=(clockwise*theta)*y_axis
+
+    if(present(spin_tune)) then
+       spin_tune=(one/twopi)*theta
+    endif
 
     call kill(cos,sin,theta)
     call kill(s)
@@ -3634,7 +3734,6 @@ CONTAINS
 
        call test_jc_spin(ns,jc,clockwise,nd,doit)
 
-
        if(doit) then
           ang=zero
           do j=1,nd
@@ -4104,6 +4203,13 @@ CONTAINS
 
   end subroutine check_fix
 
+  subroutine INTO_RES_SPIN8_eq(H_RES,H)
+    implicit none
+    TYPE(spinor_8), INTENT(in) :: h
+    TYPE(res_spinor_8), INTENT(inout) :: H_RES
+    call   INTO_RES_SPIN8(H,H_RES)
+  end subroutine INTO_RES_SPIN8_eq
+
   subroutine INTO_RES_SPIN8(H,H_RES)
     implicit none
     TYPE(spinor_8), INTENT(in) :: h
@@ -4115,22 +4221,22 @@ CONTAINS
 
 
     H_RES%X(1)= H%X(1)-i_*H%X(3)
-    H_RES%X(3)= H%X(1)+i_*H%X(3)
-    H_RES%X(2)= H%X(2)
+    H_RES%X(2)= H%X(1)+i_*H%X(3)
+    H_RES%X(3)= H%X(2)
 
-    tr=H_RES%X(2)%t%r
+    tr=H_RES%X(3)%t%r
 
-    H_RES%X(2)= tr%cos + i_*tr%sin
+    H_RES%X(3)= tr%cos + i_*tr%sin
 
     tr=H_RES%X(1)%t%r
     ti=H_RES%X(1)%t%i
 
     H_RES%X(1)=tr%cos + i_*tr%sin + i_* (ti%cos + i_*ti%sin)
 
-    tr=H_RES%X(3)%t%r
-    ti=H_RES%X(3)%t%i
+    tr=H_RES%X(2)%t%r
+    ti=H_RES%X(2)%t%i
 
-    H_RES%X(3)=tr%cos + i_*tr%sin + i_* (ti%cos + i_*ti%sin)
+    H_RES%X(2)=tr%cos + i_*tr%sin + i_* (ti%cos + i_*ti%sin)
 
 
     call kill( tr)
@@ -4138,6 +4244,44 @@ CONTAINS
 
 
   END SUBROUTINE INTO_RES_SPIN8
+
+  subroutine INTO_SPIN8_from_RES_eq(H,H_RES)
+    implicit none
+    TYPE(spinor_8), INTENT(inout) :: h
+    TYPE(res_spinor_8), INTENT(in) :: H_RES
+    type(taylorresonance) tr
+    type(taylor) t
+    type(complextaylor) c
+
+    call alloc( tr)
+    call alloc( t)
+    call alloc( c)
+
+    tr%cos=H_RES%X(3)%t%r
+    tr%sin=H_RES%X(3)%t%i
+    t=tr
+    H%X(2)=morph(t)
+    c=(H_RES%X(1)+H_RES%X(2))/two
+
+    tr%cos=c%r
+    tr%sin=c%i
+    t=tr
+    H%X(1)=morph(t)
+
+    c=i_*(H_RES%X(1)-H_RES%X(2))/two
+
+    tr%cos=c%r
+    tr%sin=c%i
+    t=tr
+    H%X(3)=morph(t)
+
+    call kill( c)
+    call kill( t)
+    call kill( tr)
+
+
+  END SUBROUTINE INTO_SPIN8_from_RES_eq
+
 !!!!!!!!!!    normal form on theta into theta(H) !!!!!!!!!!!!!!!!
 
   subroutine normal_thetaH(ds,ns)
@@ -4267,8 +4411,20 @@ CONTAINS
        call clean_real_8(s1%x(i),s2%x(i),prec)
     enddo
 
-
   END SUBROUTINE clean_spinor_8
+
+  SUBROUTINE  clean_res_spinor_8(S1,S2,prec)
+    implicit none
+    type (res_spinor_8),INTENT(INOUT)::S2
+    type (res_spinor_8), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,3
+       call clean_double_complex(s1%x(i),s2%x(i),prec)
+    enddo
+
+  END SUBROUTINE clean_res_spinor_8
 
 
 
