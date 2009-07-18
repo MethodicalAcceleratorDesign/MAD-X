@@ -778,11 +778,11 @@ CONTAINS
           key%list%bsol=bvk*node_value('ks ')
        else
           ksi=bvk*node_value('ksi ')
-          if(ksi.eq.zero)then
+          if(ksi.eq.zero.or.node_value('lrad ').eq.zero)then
              key%magnet="marker"
              print*,"Thin solenoid: ",name," has no strength - set to marker"
           else
-             key%list%bsol=ksi
+             key%list%bsol=ksi/node_value('lrad ')
              key%list%ls=node_value('lrad ')
           endif
        endif
