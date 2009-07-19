@@ -494,11 +494,6 @@ CONTAINS
 
     !      Call Initialize_kinematics_and_orbit ! removed subr.
 
-    IF (radiation_model1_FZ .OR. Space_Charge ) element_by_element=.TRUE.
-    ! make element-by-element tracking (default=.false.),
-    ! not one turn tracking
-    ! PTC_radiation is not included, it is inherent to PTC, and is done with
-    !                                tracking over the total ring
 
     c_%watch_user=.true.
 
@@ -725,11 +720,36 @@ CONTAINS
       Radiation_PTC = get_value('ptc_track ','radiation ') .ne. 0
 
       radiation_model1_FZ = get_value('ptc_track ','radiation_model1 ') .ne. 0
+
+      IF ( Radiation_PTC .AND. radiation_model1_FZ ) THEN
+         radiation_model1_FZ=.FALSE.
+         Print *, ' '
+         Print *, '===================================================================='
+         Print *,'Both options RADIATION and RADIATION_MODEL1 are entered as TRUE !? '
+         Print *,'RADIATION has a higher priority. RADIATION_MODEL1 set to be OFF.'
+         call fort_warn(' RADIATION_MODEL1',' has been switched OFF by the code')
+         Print *, '===================================================================='
+         Print *, ' '        
+      ENDIF
+
       Radiation_Energy_Loss = get_value('ptc_track ','radiation_energy_loss ') .ne. 0
 
       Radiation_Quad = get_value('ptc_track ','radiation_quad ') .ne. 0
 
       Space_Charge = get_value('ptc_track ','space_charge ') .ne. 0
+
+     IF (radiation_model1_FZ .OR. Space_Charge ) THEN 
+      IF(.NOT.element_by_element) THEN
+        element_by_element=.TRUE.
+         Print *, ' '
+         Print *, '===================================================================='
+         call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
+         Print *,'     Only element-by-element tracking can be performed with  '
+         Print *,'     the options RADIATION_MODEL1 or SPACE_CHARGE.'
+         Print *, '===================================================================='
+         Print *, ' '        
+      ENDIF
+     ENDIF
 
       beam_envelope = get_value('ptc_track ','beam_envelope ') .ne. 0
       ! 'dump ' is done in c-code
