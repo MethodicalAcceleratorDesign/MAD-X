@@ -1,2 +1,0 @@
-integer mad_record_length
-parameter (mad_record_length=240)

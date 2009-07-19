@@ -1,3 +1,0 @@
-      double precision qx, qy, qs, cg,sum,sumu0
-      common /emdata/   qx, qy, qs, cg, sum(3), sumu0
-      save   /emdata/
