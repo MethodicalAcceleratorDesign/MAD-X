@@ -2504,8 +2504,10 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
         if (switch.gt.1) then
            do k = 1, 6
               z(k,j+1) = z(k,j)
+              coords(k,0,j+1) = z(k,j+1)
            enddo
            z(1,j+1) = z(1,j) + deltax
+           coords(1,0,j+1) = z(1,j+1)
         endif
      endif
      goto 1
