@@ -121,6 +121,7 @@ void att_rbend(struct c6t_element*);
 void att_rfcavity(struct c6t_element*);
 void att_crabcavity(struct c6t_element*);
 void att_dipedge(struct c6t_element*);
+void att_solenoid(struct c6t_element*);
 void att_sbend(struct c6t_element*);
 void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
@@ -165,6 +166,7 @@ void mod_rbend(struct c6t_element*);
 void mod_rfcavity(struct c6t_element*);
 void mod_crabcavity(struct c6t_element*);
 void mod_dipedge(struct c6t_element*);
+void mod_solenoid(struct c6t_element*);
 void mod_sextupole(struct c6t_element*);
 void multi_loop();
 struct c6t_element* new_c6t_element(int, char*, char*);
@@ -250,11 +252,11 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "rfcavity     3       3       3       0       0       2",
  "sbend        2       1       1       0       1       1",
  "sextupole    2       2       2       0       1       2",
- "solenoid     0       1       1       2       1       0",
  "vkicker      5       5       5       1       0       3",
  "vmonitor     0       1       1       1       0       0",
  "crabcavity   3       3       3       0       0       2",
  "dipedge      2       2       2       0       0       0",
+ "solenoid     2       2       2       0       0       0",
 };
 
 char keep_these[MM_KEEP][24] = {"ip", "mt_"};
@@ -456,6 +458,7 @@ void assign_att()
         else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
         else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
         else if (strcmp(el->base_name, "dipedge") == 0) att_dipedge(el);
+	else if (strcmp(el->base_name, "solenoid") == 0) att_solenoid(el);
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
@@ -670,6 +673,14 @@ void att_dipedge(struct c6t_element* el)
     el->out_3 = 0;
   }
   el->out_4 = 0;
+}
+
+void att_solenoid(struct c6t_element* el)
+{
+  el->out_1 = 25;
+  el->out_2 = el->value[2]*0.5;
+  el->out_3 = el->value[3]*0.5;
+  el->out_4 = el->value[0];
 }
 
 void att_sbend(struct c6t_element* el)
@@ -1169,6 +1180,15 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[8] = el_par_value_recurse("hgap",p->p_elem);
     c6t_elem->value[9] = el_par_value_recurse("fint",p->p_elem);
   }
+  else if ((strcmp(p->base_name,"solenoid") == 0))
+  {
+    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[2] = el_par_value_recurse("ks",p->p_elem);
+    c6t_elem->value[3] = el_par_value_recurse("ksi",p->p_elem);
+  }
   else if ((strcmp(p->base_name,"marker") == 0)   ||
            (strcmp(p->base_name,"instrument") == 0)    ||
            (strcmp(p->base_name,"placeholder") == 0)    ||
@@ -1216,14 +1236,6 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
   else if (strcmp(p->base_name,"drift") == 0)
   {
     c6t_elem = new_c6t_element(0,t_name,p->base_name);
-    clean_c6t_element(c6t_elem);
-    strcpy(c6t_elem->org_name,t_name);
-    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
-  }
-  else if (strcmp(p->base_name,"solenoid") == 0)
-  {
-    warning("Solenoid converted as drift :",t_name);
-    c6t_elem = new_c6t_element(0,t_name,"drift");
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
