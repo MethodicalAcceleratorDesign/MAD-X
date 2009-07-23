@@ -678,8 +678,8 @@ void att_dipedge(struct c6t_element* el)
 void att_solenoid(struct c6t_element* el)
 {
   el->out_1 = 25;
-  el->out_2 = el->value[2]*0.5;
-  el->out_3 = el->value[3]*0.5;
+  el->out_2 = el->value[2];
+  el->out_3 = el->value[3];
   el->out_4 = el->value[0];
 }
 
