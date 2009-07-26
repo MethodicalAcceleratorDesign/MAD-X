@@ -152,7 +152,7 @@ CONTAINS
     real(dp) fint,fintx,div,muonfactor,edge,rhoi,hgap,corr,tanedg,secedg,psip
     real(dp) sk1,sk1s,sk2,sk2s,sk3,sk3s,tilt,dum1,dum2
     REAL(dp) ::  normal_0123(0:3), skew_0123(0:3) ! <= knl(1), ksl(1)
-    real(dp) gammatr,ksi
+    real(dp) gammatr,ks,ksi
     real(kind(1d0)) get_value,node_value
     character(name_len) name
     character(name_len) aptype
@@ -774,16 +774,19 @@ CONTAINS
        endif
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
+       ks=node_value('ks ')
        if(l.ne.zero) then
-          key%list%bsol=bvk*node_value('ks ')
+          key%list%bsol=bvk*ks
        else
           ksi=bvk*node_value('ksi ')
-          if(ksi.eq.zero.or.node_value('lrad ').eq.zero)then
+          lrad=node_value('lrad ')
+          if(lrad.eq.zero.and.ks.ne.zero) lrad=ksi/ks
+          if(ksi.eq.zero.or.lrad.eq.zero) then
              key%magnet="marker"
              print*,"Thin solenoid: ",name," has no strength - set to marker"
           else
-             key%list%bsol=ksi/node_value('lrad ')
-             key%list%ls=node_value('lrad ')
+             key%list%bsol=ksi/lrad
+             key%list%ls=lrad
           endif
        endif
        !VK
