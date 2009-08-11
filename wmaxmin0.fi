@@ -1,2 +1,0 @@
-      double precision wxmax,wxmin,wymax,wymin,wxymax,wxymin
-      common / wmaxmin0 / wxmax,wxmin,wymax,wymin,wxymax,wxymin
