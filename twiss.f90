@@ -2220,7 +2220,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      deltap = get_value('probe ','deltap ')
      gamma = get_value('probe ','gamma ')
      dorad = get_value('probe ','radiate ') .ne. zero
-     an = bvk * g_elpar(b_angle) * el/g_elpar(g_el)
+     an = bvk * g_elpar(b_angle)
      tilt = g_elpar(b_tilt)
      e1 = g_elpar(b_e1)
      e2 = g_elpar(b_e2)
