@@ -26,8 +26,11 @@ while True:
         if m:
             # copy contents of /user/nougaret/MAD-X-WINDOWS/madX into C:/madXCompilationSandbox, after cleaning the later
             currentDir = os.getcwd()
-            print("now in "+currentDir)       
-            shutil.rmtree('C:\\madXCompilationSandbox')
+            print("now in "+currentDir)
+            try:
+                shutil.rmtree('C:\\madXCompilationSandbox')
+            except:
+                print("no compilation sandbox had to be deleted")
             shutil.copytree('Y:\\MAD-X-WINDOWS\\madX','C:\\madXCompilationSandbox')
         
             # invoke the compilation
