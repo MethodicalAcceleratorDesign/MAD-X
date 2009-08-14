@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- MAD regression test scenario -->
 <test-scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="TestScenario.xsd">
+   <target name="aperture" responsible="Bernard.Jeanneret@cern.ch">
+        <test input="lhccell.madx" output="lhccell.out"/>
+   </target>
    <target name="c6t" responsible="Frank.Schmidt@cern.ch">
         <test input="convert_example_rhic.madx" output="convert_example_rhic.out" subdir="RHIC"/>
 	<test input="convert_example_lhc.madx" output="convert_example_lhc.out" subdir="LHC"/>
