@@ -1,7 +1,0 @@
-      character*48 table_name
-      character*48 sectorTableName
-      character*48 charconv
-      logical match_is_on
-      common/twissa/table_name
-      common/twissa/sectorTableName
-      common/twissa/match_is_on
