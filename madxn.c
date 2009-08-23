@@ -1115,7 +1115,7 @@ void exec_plot(struct in_cmd* cmd)
 
     /* find the column numbers corresponding to haxis_name & vaxis_name */
 
-    track_cols_length = sizeof(track_table_cols)/sizeof(uintptr_t) - 1;
+    track_cols_length = sizeof(track_table_cols)/4 - 1;
     for (j = 0; j < track_cols_length; j++)
     {
       if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
@@ -5407,7 +5407,7 @@ void seq_cycle(struct in_cmd* cmd)
     if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
     {
       node = edit_sequ->nodes->nodes[pos];
-      sprintf(c_dum->c, "%s%s_p_", edit_sequ->name,strip(node->name));
+      sprintf(c_dum->c, "%s_p_",strip(node->name));
       if (strstr(node->previous->name, "_p_") == NULL)
       {
         clone = clone_node(node, 0);

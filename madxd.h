@@ -1381,7 +1381,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.01.01";
+char myversion[] = "MAD-X 4.01.02";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
 char code_mod_date[] = "Code Modification Date: 11.08.2009";
