@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define NAME_L 24           /* internal name length */
+#define NAME_L 48           /* internal name length */
 #define FIELD_MAX 42        /* field error array length */ /*defined in madxl.h*/
 
 /* IA */
