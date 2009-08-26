@@ -81,6 +81,10 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
        &kf, kl, npt, j, iecub
   integer   istyl, ipbar, isave(20)
   character symloc*1
+  
+  double precision get_value !hbu
+  logical zero_suppr !hbu
+
 
   !--- Initialisation of local variables
 
@@ -88,6 +92,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   save act
 
   iecub = 0
+  
+  zero_suppr=get_value('plot ','zero_suppr ').ne.0 !hbu
 
   !--- Output initialisation
 
@@ -164,8 +170,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
         !--- avoid identical points
 
         if ((xreal(npt) - xval(j))**2 +                               &
-             &(yreal(npt) - yval(j))**2 .gt. xmd .and. yval(j).ne. 0) then ! hbu skip 0 points
-!            &(yreal(npt) - yval(j))**2 .gt. xmd) then !hbu no skipping
+			(yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
+			 ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
            npt        = npt + 1
            xreal(npt) = xval(j)
            yreal(npt) = yval(j)
@@ -392,7 +398,6 @@ subroutine pefill(ierr)
   marker_plot=get_value('plot ','marker_plot ').ne.zero
   range_plot=get_value('plot ','range_plot ').ne.zero
  
-
  !--- Output initialisation
 
   ierr = 0

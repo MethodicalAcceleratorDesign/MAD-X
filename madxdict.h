@@ -263,6 +263,7 @@ char command_def[] =
 "ptc  = [l, false, true], "
 "marker_plot = [l, false, true], "
 "range_plot = [l, false, true], "
+"zero_suppr = [l, false, true], " /*hbu */
 "table    = [s, twiss], "
 "ptc_table    = [s, ptc_twiss], "
 "title    = [s, none], "
