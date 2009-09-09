@@ -1832,7 +1832,7 @@ void fill_orbit_table(struct table* t_out, struct table* t_in)
 void fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 39; /* change adding header lines ! */
+  int i, pos, h_length = 39+2; /* change adding header lines ! */
   double dtmp;
   struct table* s;
   char tmp[16];
@@ -1992,7 +1992,7 @@ void fill_twiss_header(struct table* t)
 void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39; /* change adding header lines ! */
+  int i, h_length = 39+1; /* change adding header lines ! */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];
@@ -2065,7 +2065,28 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     /* returnStatus should always be equal to zero */
     sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
+    
+    /* momentum compaction factor first order derivative w.r.t delta-p/p */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P        %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    
+    
+     /* WARNING when restoring the following two lines don't forget to replace 39+1  by 39+2 for h_length */
+     /* momentum compaction factor second order derivative w.r.t delta-p/p */
+     /* uncomment the following once computation of alpha_c_p2 is reliable
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P2       %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c); */ 
+    
+     /* WARNING when restoring the following two lines don't forget to replace 39+2  by 39+3 for h_length */
+    /* momentum compaction factor third order derivative w.r.t delta-p/p */
+    /* uncomment the following once computation of alpha_c_p3 is reliable
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p3", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P3       %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);     
+    */
+       
     returnStatus = double_from_table("ptc_twiss_summary","eta_c", &row, &dtmp);
     sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
@@ -2073,7 +2094,7 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     returnStatus = double_from_table("ptc_twiss_summary","gamma_tr", &row, &dtmp);
     sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
+    
     /* tunes and chromaticities */
     returnStatus = double_from_table("ptc_twiss_summary","q1", &row, &dtmp);
     sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
