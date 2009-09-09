@@ -1645,6 +1645,8 @@ contains
       implicit none
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
+      real(dp) :: alpha_c_p ! first order derivative w.r.t delta-p/p
+      real(dp) :: alpha_c_p2 ! second order derivative w.r.t delta-p/p
       real(dp) :: gamma_tr ! gamma_transition, or "transition energy" above which the particles' arrival time
       !  with respect to other particles is determined by its path length instead of by its velocity 
       real(dp) :: deltap
@@ -1656,6 +1658,7 @@ contains
       real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: sd ! as in twiss.F
       type(real_8) :: oneTurnMap(6)
+      type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
       integer, dimension(6,6) :: coeffSelector = &
            reshape( (/1,0,0,0,0,0, &
            0,1,0,0,0,0, &
@@ -1665,9 +1668,16 @@ contains
            0,0,0,0,0,1/), (/6,6/))
       type(normalform) theNormalForm
       real(dp) :: dispersion(4)
+      real(dp) :: dispersion_p(4) ! derivative of the dispersion w.r.t delta-p/p
+      real(dp) :: dispersion_p2(4) ! second order of the dispersion w.r.t delta-p/p
+      real(dp) :: dispersion_p3(4) ! third order of the dispersion w.r.t delta-p/p
       integer :: debugFiles
       integer :: icase
-
+      integer :: order
+      real(dp) :: dpathlength, dpathlength_p ! 6th coordinate and derivative w.r.t deltap
+      
+      order = get_value('ptc_twiss ', 'no ')
+      
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
       debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
@@ -1683,8 +1693,8 @@ contains
 
       ! 2. retreive the relativistic parameters beta and gamma
       ! (beta=v/c, gamma=E/mc^2 and gamma=1/sqrt(1-beta^2))
-      betaRelativistic = get_value('probe','beta');
-      gammaRelativistic = get_value('probe','gamma');
+      betaRelativistic = get_value('probe ','beta ');
+      gammaRelativistic = get_value('probe ','gamma ');
 
       ! 3. need the one-turn map's coefficients to reproduce twiss.F formulas for momentum compaction
 
@@ -1758,7 +1768,7 @@ contains
       dispersion(2) = theNormalForm%A1%v(2).sub.'000010'
       dispersion(3) = theNormalForm%A1%v(3).sub.'000010'
       dispersion(4) = theNormalForm%A1%v(4).sub.'000010'
-
+            
       if (debugFiles .eq. 1) then
          do i=1,4
             write(21,*) "dispersion(",i,")=", dispersion(i)
@@ -1768,13 +1778,184 @@ contains
       ! 5. apply formulas from twiss.F: sd = r(5,6)+r(5,1)*disp(1)+...+r(5,4)*disp(4)
       sd = - oneTurnMap(6).sub.coeffSelector(5,:) ! 5/6 swap MADX/PTC
       do i=1,4
-         sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i) !???
+         sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i)
       enddo
-
+      
+      dpathlength = -sd ! added 18 august 2009 for latter reuse of the map's six coordinate
+      ! dpathlength is the derivative of the pathlength w.r.t deltap
+      
       eta_c = -sd * betaRelativistic**2 / suml
       alpha_c = one / gammaRelativistic**2 + eta_c
       gamma_tr = one / sqrt(alpha_c)
 
+      ! compute delta-p/p dependency of alpha_c
+      ! first order derivatives of the dispersions
+      ! assuming icase=5
+      !call daprint(oneTurnMap,88)
+      if (icase.eq.5) then
+      	
+      	! always assume time=false, so that the fifth phase-space variable is deltap instead of pt!
+	! otherwise should issue a warning or an error!
+ 	
+      	call alloc(theAscript)
+        ! proceed slightly differently to retreive the dispersion's derivatives
+	! (so far only managed to get the dispersion on the normal form, but not its derivatives)
+       	theAscript = state + theNormalForm%a_t
+	
+	! note: should reuse information computed previously than redo this...
+	
+      	! if icase=5, Taylor series expansion disp = disp + delta_p
+	do i=1,4
+		! apparently, we are up by a factor two
+      		dispersion_p(i) = 2.0*(theAscript(i)%t.sub.'000020') ! as usual in this file
+	enddo
+
+	! compute derivative of the formula for eta_c
+
+	sd = 0.0
+	! first dr65/ddeltap
+	sd = sd		- 1.0*(oneTurnMap(6).sub.'100010')*dispersion(1) &
+	&		- 1.0*(oneTurnMap(6).sub.'010010')*dispersion(2) & 
+	&		- 1.0*(oneTurnMap(6).sub.'001010')*dispersion(3) &
+	&		- 1.0*(oneTurnMap(6).sub.'000110')*dispersion(4) &
+	&		- 2.0*(oneTurnMap(6).sub.'000020') &
+	! new
+	&		- 1.0*(oneTurnMap(6).sub.'000011')*(oneTurnMap(6).sub.'000001') &
+	! then terms dr6i/ddeltap*dispersion(i)
+	&		- 2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)**2 &
+	&		- (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
+	&		- (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
+	&		- (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
+	! new
+	&		- (oneTurnMap(6).sub.'100010')*dispersion(1) &
+	! dr62/ddeltap*disperion(2)
+	&		- (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
+	&		- 2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)**2 &
+	&		- (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
+	&		- (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
+	! new
+	&		- (oneTurnMap(6).sub.'010010')*dispersion(2) &
+	! dr63/ddeltap*dispersion(3)
+	&		- (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
+	&		- (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
+	&		- 2.0*(oneTurnMap(6).sub.'002000')*dispersion(3)**2 &
+	&		- (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
+	! new
+	&		- 1*(oneTurnMap(6).sub.'001010')*dispersion(3) &
+	! dr64/ddeltap*dispersion(4)
+	&		- (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
+	&		- (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
+	&		- (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
+	&		- 2.0*(oneTurnMap(6).sub.'000200')*dispersion(4)**2 &
+	! new
+	&		- 1*(oneTurnMap(6).sub.'000110')*dispersion(4)
+
+	! terms involving derivatives of the dispersions
+	do i=1,4
+		sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion_p(i)
+	enddo
+	
+	dpathlength_p = sd ! for later reuse of the sixth coordinate of the map
+	dpathlength_p = 0.0
+	
+	alpha_c_p = sd * (betaRelativistic**2) / suml
+	
+	! now compute second order derivatives alpha_c_p2 (assumes map of order 3 at least)
+	! to this end, we first need to compute second order derivatives of the dispersion
+	! extrapolated from how we retreive the first order derivative...
+	if (order.lt.3) then
+		alpha_c_p2 = 0.0
+         	call fort_warn('ptc_twiss:','order too low to compute alpha_c_p2 (should be >=3)')	
+	else
+		do i=1,4
+      			dispersion_p2(i) = 3.0*2.0*(theAscript(i)%t.sub.'000030') ! to be checked
+		enddo
+		
+		sd = 0.0
+		! derivative of -2.0*oneTurnMap(6).sub.'100010'*dispersion(1)
+		sd = 		- 1.0 * (&
+		! negative factor out of the parenthesis
+! DO NOT REMOVE TAG BELOW
+!----- INSERT CODE --- START
+! code start insert on Tue Sep  1 16:08:16 2009
+! warning: did not check yet that the following formula is correct
+! at the moment, there's a numerical discrepancy with the finite-difference approximation of this derivative
+& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
+& +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
+& +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1)*0.5*2.0 &
+& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2)*0.5*2.0 &
+& +6.0*(oneTurnMap(6).sub.'000030')*0.5*2.0 &
+& +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*2.0*dispersion(1)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*2.0*dispersion(1)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'200010')*0.5*2.0*dispersion(1)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+& +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
+& +2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'110000')*dispersion(2)*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
+& +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*dispersion(1)*2.0*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*dispersion(1)*2.0*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'200010')*0.5*dispersion(1)*2.0*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
+& +2.0*(oneTurnMap(6).sub.'100020')*dispersion_p(1) &
+& +(oneTurnMap(6).sub.'100000')*dispersion_p2(1) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion(2) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+& +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*2.0*dispersion(2)*dispersion(2) &
+& +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*2.0*dispersion(2)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'020010')*0.5*2.0*dispersion(2)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion(2) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
+& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
+& +(oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)*dispersion_p(2) &
+& +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion_p(2) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
+& +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*dispersion(2)*2.0*dispersion_p(2) &
+& +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*dispersion(2)*2.0*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'020010')*0.5*dispersion(2)*2.0*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion_p(2) &
+& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion_p(2) &
+& +2.0*(oneTurnMap(6).sub.'010020')*dispersion_p(2) &
+& +(oneTurnMap(6).sub.'010000')*dispersion_p2(2) &
+! code end insert on Tue Sep  1 16:08:16 2009
+!----- INSERT CODE --- END
+! DO NOT REMOVE TAG ABOVE
+		& 		)
+		alpha_c_p2 = sd * betaRelativistic**2 / suml
+	endif
+			
+	call kill(theAscript)
+      else
+      	alpha_c_p = 0.0 ! exactly zero means failure to compute the actual value
+	alpha_c_p2 = 0.0
+      endif ! if (icase.eq.5)
+      
       ! also output the tune ...
       fractionalTunes = theNormalForm%tune
       ! the above is exactly equivalent to the following two lines (i.e. returns frac.tune)
@@ -1809,8 +1990,11 @@ contains
       deltap = get_value('ptc_twiss ','deltap ')
 
       ! write the data into the ptc_twiss_summary table
+      ! warning: must preserve the order EXACTLY
       call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
       call double_to_table( summary_table_name, 'alpha_c ', alpha_c ) ! momemtum compaction factor
+      call double_to_table( summary_table_name, 'alpha_c_p ', alpha_c_p) ! derivative w.r.t delta-p/p
+      call double_to_table( summary_table_name, 'alpha_c_p2 ', alpha_c_p2) ! 2nd order derivative
       call double_to_table( summary_table_name, 'eta_c ', eta_c ) ! associated phase-slip factor
       call double_to_table( summary_table_name, 'gamma_tr ', gamma_tr) ! associated transition energy
       call double_to_table( summary_table_name, 'q1 ', fractionalTunes(1))
