@@ -1832,7 +1832,7 @@ void fill_orbit_table(struct table* t_out, struct table* t_in)
 void fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 39+2; /* change adding header lines ! */
+  int i, pos, h_length = 39; /* change adding header lines ! */
   double dtmp;
   struct table* s;
   char tmp[16];
