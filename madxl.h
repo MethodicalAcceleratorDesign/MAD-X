@@ -4,7 +4,7 @@
 #define EFIELD_TAB 42       /* field error array length for ESAVE table */
 #define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
-#define NAME_L 24           /* internal name length */
+#define NAME_L 48           /* internal name length */
 #define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode (ETDA 24/06/2004) */
 #define PTC_NAMES_L 13      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004)(FRS 06/12/2005) (FRS/VK 20/04/2006) */
 #define MAX_ROWS 101        /* Initial size of ptc_normal table */
@@ -57,7 +57,8 @@ char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
 
 const char op_string[] = "-+*/^";
 char file_string[] = "file"; /* to avoid local in routine alias */
-
+char vrai[] = "true";        /* to avoid local in routine alias */
+char faux[] = "false";       /* to avoid local in routine alias */
 const int n_match = 17; /* # of match token lists in cmd_match_base */
 const int s_match[] = /* position of first token of command below */
 {0, 1, 4, 8, 13, 17, 22, 25, 29, 32, 36, 39, 43, 45, 48, 50, 52, 56};

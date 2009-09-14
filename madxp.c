@@ -225,6 +225,8 @@ double act_value(int pos, struct name_list* chunks)
 char* alias(char* par_string) /* returns main parameter for alias */
 {
   if (strcmp(par_string, "filename") == 0)  return file_string;
+  else if(strcmp(par_string, "true_") == 0) return vrai;
+  else if(strcmp(par_string, "false_") == 0) return faux;
   else return par_string;
 }
 
@@ -649,8 +651,8 @@ int decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
       {
         if (i+2 < number && *toks[i+1] == '=')
         {
-          if     (strcmp(toks[i+2], "true") == 0)  ival = 1;
-          else if(strcmp(toks[i+2], "false") == 0) ival = 0;
+          if     (strncmp(toks[i+2], "true", 4) == 0)  ival = 1;
+          else if(strncmp(toks[i+2], "false", 5) == 0) ival = 0;
           else return -i;
           end = i+2;
         }
@@ -2268,11 +2270,10 @@ void expand_sequence(struct sequence* sequ, int flag)
   sequ->ex_end->next = sequ->ex_start;
   sequ->ex_start->previous = sequ->ex_end;
   p = sequ->ex_start;
-  while (p)
+  while (p != sequ->ex_end)
   {
     if (strstr(p->base_name, "kicker") ||strstr(p->base_name, "monitor"))
       p->enable = 1; /* flag for orbit correction module */
-    if (p == sequ->ex_end) break;
     p = p->next;
   }
 }
@@ -4329,6 +4330,10 @@ void scan_in_cmd(struct in_cmd* cmd)
         break;
       }
       cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
+      if (strcmp(cmd->tok_list->p[i], "true_") == 0
+          || strcmp(cmd->tok_list->p[i], "false_") == 0)
+         cmd->cmd_def->par->parameters[k]->double_value =
+	   cmd->clone->par->parameters[k]->double_value;
     }
     i++;
   }
@@ -4706,7 +4711,8 @@ struct command_parameter* store_comm_par_def(char* toks[], int start, int end)
       jj = 0;
       for (j = 0; j <= mymin((end - start),2); j++)
       {
-        if (strcmp(toks[start+j], "true") == 0)  pl[jj]->double_value = 1;
+        if (strcmp(toks[start+j], "true") == 0
+            )  pl[jj]->double_value = 1;
         jj++; j++; /* skip , */
       }
       break;
