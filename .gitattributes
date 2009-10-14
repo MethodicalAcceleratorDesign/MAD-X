@@ -123,7 +123,6 @@
 /rplot.c -text
 /rplot.h -text
 /run_madx.f90 -text
-/sdds.h -text
 /sodd.f90 -text
 /survey.f90 -text
 /sxf.c -text
