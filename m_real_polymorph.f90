@@ -6248,7 +6248,8 @@ contains
     implicit none
     type (beamenvelope),INTENT(inout)::S2
     type (radtaylor) S1(ndim2)
-    type (ENV_8),INTENT(IN)::SENV_8(ndim2)
+    !    type (ENV_8),INTENT(IN)::SENV_8(ndim2)
+    type (ENV_8),INTENT(IN)::SENV_8(6)
 
     call alloc(s1,nd2)
 

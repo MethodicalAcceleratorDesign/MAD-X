@@ -161,7 +161,7 @@ module precision_constants
   !Initialized numbers
   real(dp)::eps=1e-38_dp
   real(dp)::EPSdol=1e-37_dp
-  LOGICAL(lp),parameter  :: s_aperture_CHECK=.TRUE.
+  LOGICAL(lp),target  :: s_aperture_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
   LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
@@ -240,7 +240,7 @@ module precision_constants
      integer,pointer :: np_pol     ! parameters produced through pol_block
      logical(lp),pointer :: knob
      logical(lp),pointer :: OTHER_PROGRAM
-     integer, pointer :: NDPT_OTHER
+     !     integer, pointer :: NDPT_OTHER
      logical(lp), pointer :: setknob
      REAL(dp),pointer     :: da_absolute_aperture  ! in case one tracks with da.
      !
@@ -250,6 +250,7 @@ module precision_constants
      logical(lp),pointer  :: CHECK_STABLE !=.TRUE. particle status
      logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
      logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done (default)
+     logical(lp),pointer  :: s_aperture_CHECK       !=.TRUE. aperture checks globally done (default)
      logical(lp),pointer  :: check_iteration       ! checks iteration in fitted magnet for symplectic tracking (not used)
      logical(lp),pointer  :: check_interpolate_x       ! check if lost by being outside the interpolation region
      logical(lp),pointer  :: check_interpolate_y      ! check if lost by being outside the interpolation region

@@ -10,7 +10,7 @@ module lielib_yang_berz
   implicit none
   public
   !  private
-  PUBLIC DLIE,FILT,DFILT,XGAM,XGBM,REXT  !,FILTRES
+  PUBLIC XGAM,XGBM  !,FILTRES
   PUBLIC LIEPEEK,INITPERT,HYPER,MAPFLOL
   PUBLIC ETALL1,TAKE,ETALL,DAPEK0,ETINI,DACLRD,DACOPD,DIFD
   PUBLIC INTD,ETCCT,TRXFLO,TRX,FACFLOD,EXPFLO,DALIND,ETINV
@@ -19,13 +19,13 @@ module lielib_yang_berz
   PUBLIC LIEINIT,PERTPEEK,FLOWPARA,COMCFU
   PUBLIC DAPOK0,FACFLO,EXPFLOD,gofix
   public getcct,GETINV,gtrx,eig6
-  private respoke
+  private DFILT,DLIE,FILT,REXT,respoke
   private etallnom,simil
   private dapokzer,davar0,taked,daread,daprid,daflo,daflod,fexpo,etcom,etpoi
   private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
-  private ctord,rtocd,resvec,reelflo,compcjg,midbflo,mulnd2,movearou,movemul,cpart
-  private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3
-  integer,public,parameter::ndim=3,nreso=100
+  private ctord,rtocd,resvec,reelflo,midbflo,mulnd2,movearou,movemul,cpart
+  private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3  !,flip
+  integer,public,parameter::ndim=4,nreso=100
   integer,public::no,nv,nd,nd2,ndpt
   integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres !,idpr
   integer, private,dimension(ndim)::nplane,idsta,ista
@@ -39,16 +39,30 @@ module lielib_yang_berz
   !  integer,private,parameter::ndim2=2*ndim,ntt=100
   character(120), private :: line
   logical :: frankheader=.true.
-
-
+  logical :: new_ndpt = .true.
+  integer,private :: nt_pos,npt_pos
+  logical :: perform_flip = .true.
+  integer time_plane
+  real(dp), private :: stmem(ndim)
 contains
 
-  subroutine lieinit(no1,nv1,nd1,ndpt1,iref1)   !,nis
+
+
+
+  subroutine lieinit(no1,nv1,nd1,ndpt1,time_pos)   !,nis
     implicit none
     !! Lieinit initializes AD Package and Lielib
-    integer i,iref1,nd1,ndc1,ndpt1,no1,nv1      !,nis
+    integer i,nd1,ndc1,ndpt1,no1,nv1      !,nis
     real(dp),dimension(ndim)::ang,ra,st
+    integer, optional :: time_pos
     integer ipause,mypauses
+
+    if(present(time_pos)) then
+       time_plane=time_pos
+    else
+       time_plane=0
+       if(ndpt1==0.and.(nd1==3.or.nd1==4) ) time_plane=3
+    endif
 
     do i=1,ndim
        nplane(i)=2*i-1
@@ -65,20 +79,48 @@ contains
     !    enddo
     call daini(no,nv,0)
     !    if(nis.gt.0)call etallnom(is,nis,'$$IS      ')
+
     if(ndpt1.eq.0) then
        ndpt=0
        ndt=0
        ndc1=0
     else
-       ndpt=ndpt1
-       ndc1=1
-       if(ndpt.eq.nd2) then
-          ndt=nd2-1
+       if(.not.new_ndpt) then
+          ndpt=ndpt1
+          ndc1=1
+          if(ndpt.eq.nd2) then
+             ndt=nd2-1
+          else
+             ndt=nd2
+             if(ndpt.ne.nd2-1) then
+                line=' LETHAL ERROR IN LIEINIT'
+                write(6,*) line
+                stop
+             endif
+          endif
        else
-          ndt=nd2
-          if(ndpt.ne.nd2-1) then
+          if(mod(ndpt1,2)==0) then
+             ndpt=nd2
+             ndt=nd2-1
+          else
+             ndpt=nd2-1
+             ndt=nd2
+          endif
+          npt_pos=ndpt1
+          ndc1=1
+          if(mod(npt_pos,2)==0) then
+             nt_pos=npt_pos-1
+          else
+             nt_pos=npt_pos+1
+          endif
+          if(nt_pos==nd2.or.nt_pos==nd2-1) then
+             perform_flip=.false.
+          else
+             perform_flip=.true.
+          endif
+          if(npt_pos<3.or.npt_pos>nd2) then
              line=' LETHAL ERROR IN LIEINIT'
-             ipause=mypauses(1,line)
+             write(6,*) line
              stop
           endif
        endif
@@ -87,13 +129,14 @@ contains
     ndc2=2*ndc1
     iref=0
     call initpert(st,ang,ra)
-    iref=iref1
-    if(iref1.eq.0) then
-       itu=0
-    else
-       itu=1
-    endif
-    if(iref1.eq.0) iref=-1
+    !    iref=iref1
+    !    if(iref1.eq.0) then
+    itu=0
+    !    else
+    !       itu=1
+    !    endif
+    ! if(iref1.eq.0)
+    iref=-1
 
     if(lielib_print(1)==1) then
        write(6,'(a17,4(1x,i4))') ' no,nv,nd,ndpt = ',no1,nv1,nd1,ndpt1
@@ -402,6 +445,7 @@ contains
     call dadal(yi,nd2)
     return
   end subroutine trxflo
+
   subroutine simil(a,x,ai,y)
     implicit none
     !  Y= AoXoAI
@@ -421,6 +465,7 @@ contains
     call dadal(w,nd2)
     return
   end subroutine simil
+
   subroutine etini(x)
     implicit none
     !  X=IDENTITY
@@ -433,6 +478,7 @@ contains
     enddo
     return
   end subroutine etini
+
   subroutine etinv(x,y)
     implicit none
     ! Y=X^-1
@@ -468,6 +514,7 @@ contains
     endif
     return
   end subroutine etinv
+
   subroutine etpin(x,y,jj)
     implicit none
 
@@ -504,6 +551,7 @@ contains
     endif
     return
   end subroutine etpin
+
   subroutine getinv(x,y,n)
     implicit none
     ! Y=X^-1
@@ -541,6 +589,7 @@ contains
     endif
     return
   end subroutine getinv
+
   subroutine dapek0(v,x,jj)
     implicit none
 
@@ -558,6 +607,7 @@ contains
     enddo
     return
   end subroutine dapek0
+
   subroutine dapok0(v,x,jj)
     implicit none
     integer i,jj
@@ -574,6 +624,7 @@ contains
     enddo
     return
   end subroutine dapok0
+
   subroutine dapokzer(v,jj)
     implicit none
     integer i,jj
@@ -589,6 +640,7 @@ contains
     enddo
     return
   end subroutine dapokzer
+
   subroutine davar0(v,x,jj)
     implicit none
     integer i,jj
@@ -601,13 +653,24 @@ contains
     enddo
     return
   end subroutine davar0
+
   subroutine comcfu(b,f1,f2,c)
     implicit none
     ! Complex dacfu
-    integer,dimension(:)::b,c
+    integer,dimension(2)::b,c
     integer,dimension(4)::t
     real(dp),external::f1,f2
+    logical doflip
     if(.not.c_%stable_da) return
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flip_i(b(1),b(1),1)
+       call flip_i(b(2),b(2),1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
 
     call etall(t,4)
 
@@ -619,6 +682,13 @@ contains
     call dasub(t(1),t(4),c(1))
     call daadd(t(2),t(3),c(2))
     call dadal(t,4)
+    if(doflip) then
+       call flip_i(b(1),b(1),-1)
+       call flip_i(b(2),b(2),-1)
+       if(c(1)/=b(1).and.c(1)/=b(2)) call flip_i(c(1),c(1),-1)
+       if(c(2)/=b(1).and.c(2)/=b(2).and.c(2)/=c(1)) call flip_i(c(2),c(2),-1)
+       perform_flip=.true.
+    endif
     return
   end subroutine comcfu
 
@@ -677,6 +747,7 @@ contains
     call dadal1(b1)
     return
   end subroutine take
+
   subroutine taked(h,m,ht)
     implicit none
     !  \VEC{HT}= \VEC{H_M}  (TAKES M^th DEGREE PIECE ALL VARIABLES INCLUDED)
@@ -703,6 +774,7 @@ contains
     call dadal1(b1)
     return
   end subroutine taked
+
   subroutine daclrd(h)
     implicit none
     ! clear a map : a vector of nd2 polynomials
@@ -715,6 +787,7 @@ contains
     enddo
     return
   end subroutine daclrd
+
   subroutine dacopd(h,ht)
     implicit none
     !    H goes into HT  (nd2 array)
@@ -1351,19 +1424,53 @@ contains
 
     return
   end subroutine mapnorm
+
   subroutine gettura(psq,radsq)
     implicit none
-    integer ik
-    real(dp),dimension(ndim)::psq,radsq
+    integer ik,j1,j2
+    real(dp),dimension(ndim)::psq,radsq,st
     if(.not.c_%stable_da) return
 
-    do ik=1,nd
-       psq(ik)=ps(ik)
-       radsq(ik)=rads(ik)
-    enddo
-
+    if(new_ndpt) then
+       if(ndpt/=0) then
+          if(mod(ndpt,2)==0) then
+             j1=ndpt/2
+             j2=npt_pos/2
+          else
+             j1=(ndpt+1)/2
+             j2=(npt_pos+1)/2
+          endif
+       endif
+       do ik=1,nd
+          psq(ik)=ps(ik)
+          radsq(ik)=rads(ik)
+          st(ik)=stmem(ik)
+       enddo
+       if(ndpt/=0) then
+          psq(j2)   = ps(j1)
+          psq(j1)   = ps(j2)
+          radsq(j2) = rads(j1)
+          radsq(j1) = rads(j2)
+          st(j2) = stmem(j1)
+          st(j1) = stmem(j2)
+       endif
+       do ik=1,nd
+          if(ik/=time_plane) then
+             if(st(ik)+c_1d_3.gt.one.and.psq(ik).lt.zero) psq(ik)=psq(ik)+one
+          endif
+       enddo
+       if(time_plane>0) then
+          if(st(time_plane)+c_1d_3.gt.one.and.psq(time_plane).lt.-half) psq(time_plane)=psq(time_plane)+one
+       endif
+    else
+       do ik=1,nd
+          psq(ik)=ps(ik)
+          radsq(ik)=rads(ik)
+       enddo
+    endif
     return
   end subroutine gettura
+
   subroutine setidpr(nplan)
     implicit none
     integer ik
@@ -1384,13 +1491,23 @@ contains
   !
   !    return
   !  end subroutine idprset
+  !   CALL MAPNORMF(junk%V%i,s2%a%nonlinear%v%i,s2%a%linear%v%i,&
+  !        & s2%A1%v%i,s2%normal%linear%v%i,s2%normal%nonlinear%v%i,s2%NORD,s2%jtune)
   subroutine mapnormf(x,ft,a2,a1,xy,h,nord,isi)
     implicit none
     integer ij,isi,nord
     integer,dimension(ndim2)::a1i,a2i
     integer,dimension(:)::x,a1,a2,ft,xy,h
     real(dp),dimension(ndim)::angle,rad,st,p
+    logical doflip
     if(.not.c_%stable_da) return
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flip(x,x)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     call etallnom(a1i,nd2) !  ,'A1I       ')
     call etallnom(a2i,nd2) !  ,'A2I       ')
@@ -1418,6 +1535,7 @@ contains
     do ij=1,nd-ndc
        p(ij)=angle(ij)*(st(ij)*(twopii-one)+one)
     enddo
+    stmem=st
     if(ndc.eq.1) p(nd)=angle(nd)
     if(lielib_print(4)==1) then
        w_p=1
@@ -1451,24 +1569,207 @@ contains
     call orderflo(h,ft,xy,angle,rad)
     do ij=1,nd-ndc
        p(ij)=angle(ij)
-       if(angle(ij).gt.pi.and.st(ij).gt.zero.and.itu.eq.1)then
-          p(ij)=angle(ij)-twopi
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,A72))'
-          write(w_p%c(1),'(i4,a27,g20.14)') ij,' TH TUNE MODIFIED IN H2 TO ',p(ij)*twopii
-          CALL WRITE_a
-       endif
+       !       if(angle(ij).gt.pi.and.st(ij).gt.zero)  then  !.and.itu.eq.1)then
+       !          p(ij)=angle(ij)-twopi
+       !          w_p=0
+       !          w_p%nc=1
+       !          w_p%fc='((1X,A72))'
+       !          write(w_p%c(1),'(i4,a27,g20.14)') ij,' TH TUNE MODIFIED IN H2 TO ',p(ij)*twopii
+       !          CALL WRITE_a
+       !       endif
     enddo
     call h2pluflo(h,p,rad)
     !      CALL TAKED(A2I,1,XY)
     call taked(a2i,1,a1i)
     call etcct(xy,a1i,xy)
 
+    if(doflip) then
+       call flip(x,x)
+       call flip(a2,a2)
+       call flip(a1,a1)
+       call flip(xy,xy)
+       call flipflo(ft,ft,-1)
+       call flipflo(h,h,-1)
+       perform_flip=.true.
+    endif
     call dadal(a2i,nd2)
     call dadal(a1i,nd2)
     return
   end subroutine mapnormf
+
+  subroutine get_flip_info(nt_pos1,npt_pos1)
+    implicit none
+    integer nt_pos1,npt_pos1
+    nt_pos1=nt_pos
+    npt_pos1=npt_pos
+  end   subroutine get_flip_info
+
+  subroutine flip(xy,xyf)
+    implicit none
+    integer i,nord
+    integer,dimension(:):: xy,xyf
+    integer,dimension(ndim2)::x,xi
+    if(.not.c_%stable_da) return
+
+    if(nt_pos>=nd2-1) return
+
+
+    call etallnom(x,nd2)
+    call etallnom(xi,nd2)
+
+    call etini(x)
+
+    call davar(x(npt_pos),zero,ndpt)
+    call davar(x(nt_pos),zero,ndt)
+    call davar(x(ndpt),zero,npt_pos)
+    call davar(x(ndt),zero,nt_pos)
+    call etinv(x,xi)
+
+    call simil(x,xy,xi,xyf)
+
+    !       call davar(x(ndpt),zero,ndpt)
+
+
+    call dadal(xi,nd2)
+    call dadal(x,nd2)
+
+  end subroutine flip
+
+  subroutine flip_real_array(xy,xyf,i)
+    implicit none
+    integer i
+    real(dp),dimension(:):: xy,xyf
+    real(dp),dimension(ndim)::x
+    if(.not.c_%stable_da) return
+
+    if(nt_pos>=nd2-1) return
+    x=zero
+    x(1:nd) = xy(1:nd)
+    xyf(1:nd) = xy(1:nd)
+    if(mod(ndpt,2)==0) then
+       if(i==1) then
+          xyf(ndpt/2)=x(npt_pos/2)
+          xyf(npt_pos/2)=x(ndpt/2)
+       else
+          xyf(npt_pos/2)=x(ndpt/2)
+          xyf(ndpt/2)=x(npt_pos/2)
+       endif
+    else
+       if(i==1) then
+          xyf((ndpt+1)/2)=x((npt_pos+1)/2)
+          xyf((npt_pos+1)/2)=x((ndpt+1)/2)
+       else
+          xyf((npt_pos+1)/2)=x((ndpt+1)/2)
+          xyf((ndpt+1)/2)=x((npt_pos+1)/2)
+       endif
+    endif
+
+
+  end subroutine flip_real_array
+
+  subroutine flip_resonance(xy,xyf,i)
+    implicit none
+    integer i,NRES,j
+    integer,dimension(:,:):: xy,xyf
+    integer,dimension(NDIM,NRESO) ::x
+    if(.not.c_%stable_da) return
+
+    if(nt_pos>=nd2-1) return
+    x=0
+    x = xy
+    xyf  = xy
+    if(mod(ndpt,2)==0) then
+       do j=1,nreso
+          if(i==1) then
+             xyf(ndpt/2,j)=x(npt_pos/2,j)
+             xyf(npt_pos/2,j)=x(ndpt/2,j)
+          else
+             xyf(npt_pos/2,j)=x(ndpt/2,j)
+             xyf(ndpt/2,j)=x(npt_pos/2,j)
+          endif
+       enddo
+    else
+       do j=1,nreso
+          if(i==1) then
+             xyf((ndpt+1)/2,j)=x((npt_pos+1)/2,j)
+             xyf((npt_pos+1)/2,j)=x((ndpt+1)/2,j)
+          else
+             xyf((npt_pos+1)/2,j)=x((ndpt+1)/2,j)
+             xyf((ndpt+1)/2,j)=x((npt_pos+1)/2,j)
+          endif
+       enddo
+    endif
+
+
+  end subroutine flip_resonance
+
+  subroutine flipflo(xy,xyf,i)
+    implicit none
+    integer i
+    integer,dimension(:):: xy,xyf
+    integer,dimension(ndim2)::x,xi
+    if(.not.c_%stable_da) return
+
+    if(nt_pos>=nd2-1) return
+
+
+    call etallnom(x,nd2)
+    call etallnom(xi,nd2)
+
+    call etini(x)
+
+    call davar(x(npt_pos),zero,ndpt)
+    call davar(x(nt_pos),zero,ndt)
+    call davar(x(ndpt),zero,npt_pos)
+    call davar(x(ndt),zero,nt_pos)
+    call etinv(x,xi)
+
+    if(i==1) then
+       call trxflo(xy,xyf,xi)
+    else
+       call trxflo(xy,xyf,x)
+    endif
+
+
+    call dadal(xi,nd2)
+    call dadal(x,nd2)
+
+  end subroutine flipflo
+
+  subroutine flip_i(xy,xyf,i)
+    implicit none
+    integer i,nord
+    integer  xy,xyf
+    integer,dimension(ndim2)::x,xi
+    if(.not.c_%stable_da) return
+
+    if(nt_pos>=nd2-1) return
+
+
+    call etallnom(x,nd2)
+    call etallnom(xi,nd2)
+
+    call etini(x)
+
+    call davar(x(npt_pos),zero,ndpt)
+    call davar(x(nt_pos),zero,ndt)
+    call davar(x(ndpt),zero,npt_pos)
+    call davar(x(ndt),zero,nt_pos)
+    call etinv(x,xi)
+
+    if(i==1) then
+       call trx(xy,xyf,xi)
+    else
+       call trx(xy,xyf,x)
+    endif
+
+
+    call dadal(xi,nd2)
+    call dadal(x,nd2)
+
+  end subroutine flip_i
+
+
   subroutine gofix(xy,a1,a1i,nord)
     implicit none
     ! GETTING TO THE FIXED POINT AND CHANGING TIME APPROPRIATELY IN THE
@@ -1482,14 +1783,27 @@ contains
     integer,dimension(:)::xy,a1,a1i
     integer,dimension(ndim2)::x,w,v,rel
     real(dp) xic
+    logical doflip
     if(.not.c_%stable_da) return
+
+
 
     call etallnom(x,nd2) !  ,  'X         ')
     call etallnom(w,nd2) !  ,  'W         ')
     call etallnom(v,nd2) !  ,  'V         ')
     call etallnom(rel,nd2) !  ,'REL       ')
 
+
     ! COMPUTATION OF A1 AND A1I USING DAINV
+
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flip(xy,xy)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
     call etini(rel)
 
     !    call danot(nord)
@@ -1556,6 +1870,13 @@ contains
        call datruncd(a1i,nord+1,a1i)
 
     endif
+    if(doflip) then
+       call flip(xy,xy)
+       call flip(a1,a1)
+       call flip(a1i,a1i)
+       perform_flip=.true.
+    endif
+
 
     !    call danot(no)
 
@@ -1565,22 +1886,8 @@ contains
     call dadal(x,nd2)
     return
   end subroutine gofix
-  real(dp) function transver(j)
-    implicit none
-    ! USED IN A DACFU CALL OF GOFIX
-    integer i,ic
-    !      INTEGER J(NTT)
-    integer,dimension(:)::j
-    if(.not.c_%stable_da) return
 
-    transver=one
-    ic=0
-    do i=1,nd2-ndc2
-       ic=ic+j(i)
-    enddo
-    if(ic.ne.1) transver=zero
-    return
-  end function transver
+
   subroutine orderflo(h,ft,x,ang,ra)
     implicit none
     !-   NONLINEAR NORMALIZATION PIECE OF MAPNORMF
@@ -1700,6 +2007,7 @@ contains
 
     return
   end subroutine nuanaflo
+
   real(dp) function xgam(j)
     implicit none
     ! XGAM AND XGBM ARE THE EIGENVALUES OF THE OPERATOR NEWANAFLO
@@ -1849,10 +2157,20 @@ contains
   subroutine dhdjflo(h,t)
     implicit none
     ! CONVENIENT TUNE SHIFT FINDED FOR SYMPLECTIC CASE (NU,DL)(H)=T
-    integer i,bb1,bb2
+    integer i,bb1,bb2,j1,j2
     integer,dimension(:)::h,t
-    integer,dimension(ndim2)::b1,b2
+    integer,dimension(ndim2)::b1,b2,temp
+    logical doflip
     if(.not.c_%stable_da) return
+
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flipflo(h,h,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
 
     call etall(b1,nd2)
     call etall(b2,nd2)
@@ -1873,6 +2191,34 @@ contains
     if(ndpt.ne.0) then
        call dacop(h(ndt),t(nd))
        call dacop(b1(ndt),t(nd2))
+    endif
+
+    if(doflip) then
+       call flipflo(h,h,-1)
+       call etall(temp,nd2)
+       do i=1,nd2
+          call flip_i(t(i),temp(i),-1)
+       enddo
+
+       if(mod(ndpt,2)==0) then
+          j1=ndpt/2
+          j2=npt_pos/2
+       else
+          j1=(ndpt+1)/2
+          j2=(npt_pos+1)/2
+       endif
+
+       do i=1,nd2
+          call dacop(temp(i),t(i))
+       enddo
+
+       call dacop(temp(j1),t(j2))
+       call dacop(temp(j1+nd),t(j2+nd))
+       call dacop(temp(j2),t(j1))
+       call dacop(temp(j2+nd),t(j1+nd))
+
+       call dadal(temp,nd2)
+       perform_flip=.true.
     endif
 
     call dadal1(bb2)
@@ -1930,6 +2276,7 @@ contains
     endif
     return
   end subroutine h2pluflo
+
   subroutine rotflo(ro,ang,ra)
     implicit none
     ! CREATES R AND R^-1 USING THE EXISTING ANGLES AND DAMPING
@@ -2040,6 +2387,7 @@ contains
 
     return
   end subroutine rotiflo
+
   subroutine hyper(a,ch,sh)
     implicit none
     real(dp) a,ch,sh,x,xi
@@ -2051,23 +2399,43 @@ contains
     sh=(x-xi)/two
     return
   end subroutine hyper
+
   subroutine ctor(c1,r2,i2)
     implicit none
     ! CHANGES OF BASIS
     !   C1------> R2+I R1
     integer c1,r2,i2,b1,b2
     integer,dimension(ndim2)::x
+    logical doflip
     if(.not.c_%stable_da) return
+
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flip_i(c1,c1,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     call etall1(b1)
     call etall1(b2)
     call etallnom(x,nd2) !  ,'X         ')
+
 
     call ctoi(c1,b1)
     call etcjg(x)
     call trx(b1,b2,x)
     call dalin(b1,half,b2,half,r2)
     call dalin(b1,half,b2,-half,i2)
+
+    if(doflip) then
+       call flip_i(c1,c1,-1)
+       if(r2/=c1) call flip_i(r2,r2,-1)
+       if(i2/=c1.and.i2/=r2) call flip_i(i2,i2,-1)
+       perform_flip=.true.
+    endif
+
+
     call dadal(x,nd2)
     call dadal1(b2)
     call dadal1(b1)
@@ -2077,13 +2445,32 @@ contains
     implicit none
     !  INVERSE OF CTOR
     integer c2,r1,i1,b1
+    logical doflip
     if(.not.c_%stable_da) return
+
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flip_i(r1,r1,1)
+       call flip_i(i1,i1,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     call etall1(b1)
 
     call daadd(r1,i1,b1)
     call itoc(b1,c2)
     call dadal1(b1)
+
+
+    if(doflip) then
+       call flip_i(r1,r1,-1)
+       if(i1/=r1) call flip_i(i1,i1,-1)
+       if(c2/=r1.and.c2/=i1) call flip_i(c2,c2,-1)
+       perform_flip=.true.
+    endif
+
     return
   end subroutine rtoc
   subroutine ctorflo(c,dr,di)
@@ -2093,7 +2480,7 @@ contains
     if(.not.c_%stable_da) return
 
     call ctord(c,dr,di)
-    call resvec(dr,di,dr,di)
+    call resvec(dr,di)
 
     return
   end subroutine ctorflo
@@ -2141,13 +2528,22 @@ contains
     enddo
     return
   end subroutine rtocd
-  subroutine resvec(cr,ci,dr,di)
+  subroutine resvec(cr,ci)
     implicit none
     ! DOES THE SPINOR PART IN CTORFLO
     integer i
-    integer,dimension(:)::dr,di,ci,cr
+    integer,dimension(:)::ci,cr
     integer,dimension(2)::tr,ti
+    logical doflip
     if(.not.c_%stable_da) return
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flipflo(cr,cr,1)
+       call flipflo(ci,ci,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     call etall(tr,2)
     call etall(ti,2)
@@ -2158,38 +2554,55 @@ contains
           call daadd(ci(2*i-1),cr(2*i),ti(1))
           call daadd(cr(2*i-1),ci(2*i),tr(2))
           call dasub(ci(2*i-1),cr(2*i),ti(2))
-          call dacop(tr(1),dr(2*i-1))
-          call dacop(tr(2),dr(2*i))
-          call dacop(ti(1),di(2*i-1))
-          call dacop(ti(2),di(2*i))
+          call dacop(tr(1),cr(2*i-1))
+          call dacop(tr(2),cr(2*i))
+          call dacop(ti(1),ci(2*i-1))
+          call dacop(ti(2),ci(2*i))
        else
           call daadd(cr(2*i-1),cr(2*i),tr(1))
           call daadd(ci(2*i-1),ci(2*i),ti(1))
           call dasub(cr(2*i-1),cr(2*i),tr(2))
           call dasub(ci(2*i-1),ci(2*i),ti(2))
-          call dacop(tr(1),dr(2*i-1))
-          call dacop(tr(2),dr(2*i))
-          call dacop(ti(1),di(2*i-1))
-          call dacop(ti(2),di(2*i))
+          call dacop(tr(1),cr(2*i-1))
+          call dacop(tr(2),cr(2*i))
+          call dacop(ti(1),ci(2*i-1))
+          call dacop(ti(2),ci(2*i))
        endif
     enddo
 
-    do i=nd2-ndc2+1,nd2
-       call dacop(cr(i),dr(i))
-       call dacop(ci(i),di(i))
-    enddo
+    !    do i=nd2-ndc2+1,nd2
+    !       call dacop(cr(i),dr(i))
+    !       call dacop(ci(i),di(i))
+    !    enddo
+
+    if(doflip) then
+       call flipflo(cr,cr,-1)
+       call flipflo(ci,ci,-1)
+       perform_flip=.true.
+    endif
 
     call dadal(tr,2)
     call dadal(ti,2)
     return
   end subroutine resvec
+
   subroutine reelflo(c,ci,f,fi)
     implicit none
     ! DOES THE SPINOR PART IN RTOCFLO
     integer i
     integer,dimension(:)::c,ci,f,fi
     integer,dimension(ndim2)::e,ei
+    logical doflip
     if(.not.c_%stable_da) return
+
+    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
+       perform_flip=.false.
+       call flipflo(c,c,1)
+       call flipflo(ci,ci,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     call etall(e,nd2)
     call etall(ei,nd2)
@@ -2216,25 +2629,21 @@ contains
 
     call dadal(e,nd2)
     call dadal(ei,nd2)
+
+    if(doflip) then
+       call flipflo(c,c,-1)
+       call flipflo(ci,ci,-1)
+       if(c(1)/=f(1).and.ci(1)/=f(1)) then
+          call flipflo(f,f,-1)
+       endif
+       if(c(1)/=fi(1).and.ci(1)/=fi(1)) then
+          call flipflo(fi,fi,-1)
+       endif
+       perform_flip=.true.
+    endif
+
     return
   end subroutine reelflo
-  subroutine compcjg(cr,ci,dr,di)
-    implicit none
-    ! TAKES THE COMPLEX CONJUGATE IN RESONANCE BASIS OF A POLYNOMIAL
-    integer dr,di,ci,cr
-    integer,dimension(ndim2)::x
-    if(.not.c_%stable_da) return
-
-    call etall(x,nd2)
-
-    call etcjg(x)
-    call trx(cr,dr,x)
-    call trx(ci,di,x)
-    call dacmu(di,-one,di)
-
-    call dadal(x,nd2)
-    return
-  end subroutine compcjg
   subroutine midbflo(c,a2,a2i,q,a,st)
     implicit none
     ! LINEAR EXACT NORMALIZATION USING EIGENVALUE PACKAGE OF NERI
@@ -2296,8 +2705,23 @@ contains
        endif
     enddo
     if(ndc.eq.0) then
-       if(st(3)+c_1d_3.gt.one.and.nd.eq.3.and.q(nd).gt.half) q(3)=q(3)-twopi
+       if(new_ndpt) then
+          !       do i=1,nd
+          !         write(6,*) i,q(i)/twopi
+          !        if(st(i)+c_1d_3.gt.one.and.q(i).gt.pi) q(i)=q(i)-twopi
+          !          write(6,*) i,q(i)/twopi
+          !          pause 77
+          !      enddo
+          if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+       else
+          if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+       endif
     else
+       if(new_ndpt) then
+          !       do i=1,nd-1
+          !        if(st(i)+c_1d_3.gt.one.and.q(i).gt.pi) q(i)=q(i)-twopi
+          !       enddo
+       endif
        q(nd)=cr(ndt,ndpt)
     endif
 
@@ -2341,6 +2765,7 @@ contains
           s1(i,j)=zero
        enddo
     enddo
+
     !     frank/etienne
     do i=1,ndim
        n(i)=0
@@ -2512,7 +2937,7 @@ contains
           sa(i,l)=sai(i,l)
        enddo
     enddo
-    call matinv(sai,sa,nd2,6,ier)
+    call matinv(sai,sa,nd2,ndim2,ier)
 
     call mulnd2(sai,cm)
     do i=1,nd2
@@ -2558,55 +2983,136 @@ contains
     !      integer ipause, mypause
     integer i,ic,j
     real(dp) xr,xrold
-    real(dp),dimension(ndim2,ndim2)::rt,rto,xy,xz,yz,xyz,xzy,s
+    real(dp),dimension(ndim2,ndim2)::rt,rto,s
+    real(dp),dimension(ndim2,ndim2):: xt,yt,zt,xy,xz,yz
+    real(dp),dimension(ndim2,ndim2):: xyz,xzy,xyt,yxt,yzt,zyt,xzt,zxt
+    real(dp),dimension(ndim2,ndim2):: xyzt,xytz,xzyt,xzty,xtzy,xtyz
+
     if(.not.c_%stable_da) return
 
     do i=1,nd2
        do j=1,nd2
           s(i,j)=zero
           s(i,i)=one
-          xy(i,j)=zero
-          xz(i,j)=zero
-          yz(i,j)=zero
-          xyz(i,j)=zero
-          xzy(i,j)=zero
        enddo
     enddo
+    xt=zero;yt=zero;zt=zero;xy=zero;xz=zero;yz=zero;
+    xyzt=zero;xytz=zero;xzyt=zero;xzty=zero;xtzy=zero;xtyz=zero;
+    xyz=zero;xzy=zero;xyt=zero;yxt=zero;yzt=zero;zyt=zero;xzt=zero;zxt=zero;
 
-    xy(1,3)=one
-    xy(3,1)=one
-    xy(2,4)=one
-    xy(4,2)=one
-    xy(5,5)=one
-    xy(6,6)=one
+    do i=0,1
 
-    xz(1,5)=one
-    xz(5,1)=one
-    xz(2,6)=one
-    xz(6,2)=one
-    xz(3,3)=one
-    xz(4,4)=one
+       xy(1+i,3+i)=one
+       xy(3+i,1+i)=one
+       xy(5+i,5+i)=one
+       xy(7+i,7+i)=one
 
-    yz(3,5)=one
-    yz(5,3)=one
-    yz(4,6)=one
-    yz(6,4)=one
-    yz(1,1)=one
-    yz(2,2)=one
+       xz(1+i,5+i)=one
+       xz(5+i,1+i)=one
+       xz(3+i,3+i)=one
+       xz(7+i,7+i)=one
 
-    xyz(1,3)=one
-    xyz(3,5)=one
-    xyz(5,1)=one
-    xyz(2,4)=one
-    xyz(4,6)=one
-    xyz(6,2)=one
+       xt(1+i,7+i)=one
+       xt(7+i,1+i)=one
+       xt(3+i,3+i)=one
+       xt(5+i,5+i)=one
 
-    xzy(1,5)=one
-    xzy(5,3)=one
-    xzy(3,1)=one
-    xzy(2,6)=one
-    xzy(6,4)=one
-    xzy(4,2)=one
+       yz(3+i,5+i)=one
+       yz(5+i,3+i)=one
+       yz(1+i,1+i)=one
+       yz(7+i,7+i)=one
+
+       yt(3+i,7+i)=one
+       yt(7+i,3+i)=one
+       yt(1+i,1+i)=one
+       yt(5+i,5+i)=one
+
+       zt(5+i,7+i)=one
+       zt(7+i,5+i)=one
+       zt(1+i,1+i)=one
+       zt(3+i,3+i)=one
+
+       xyz(1+i,3+i)=one
+       xyz(3+i,5+i)=one
+       xyz(5+i,1+i)=one
+       xyz(7+i,7+i)=one
+
+       xyz(1+i,3+i)=one
+       xyz(3+i,5+i)=one
+       xyz(5+i,1+i)=one
+       xyz(7+i,7+i)=one
+
+       xzy(1+i,5+i)=one
+       xzy(5+i,3+i)=one
+       xzy(3+i,1+i)=one
+       xzy(7+i,7+i)=one
+
+       xyt(1+i,3+i)=one
+       xyt(3+i,7+i)=one
+       xyt(7+i,1+i)=one
+       xyt(5+i,5+i)=one
+
+       yxt(3+i,1+i)=one
+       yxt(1+i,7+i)=one
+       yxt(7+i,3+i)=one
+       yxt(5+i,5+i)=one
+
+       yzt(3+i,5+i)=one
+       yzt(5+i,7+i)=one
+       yzt(7+i,3+i)=one
+       yzt(1+i,1+i)=one
+
+       zyt(5+i,3+i)=one
+       zyt(3+i,7+i)=one
+       zyt(7+i,5+i)=one
+       zyt(1+i,1+i)=one
+
+       xzt(1+i,5+i)=one
+       xzt(5+i,7+i)=one
+       xzt(7+i,1+i)=one
+       xzt(3+i,3+i)=one
+
+       zxt(5+i,1+i)=one
+       zxt(1+i,7+i)=one
+       zxt(7+i,5+i)=one
+       zxt(3+i,3+i)=one
+
+       xyzt(1+i,3+i)=one
+       xyzt(3+i,5+i)=one
+       xyzt(5+i,7+i)=one
+       xyzt(7+i,1+i)=one
+
+       xytz(1+i,3+i)=one
+       xytz(3+i,7+i)=one
+       xytz(7+i,5+i)=one
+       xytz(5+i,1+i)=one
+
+       xzyt(1+i,5+i)=one
+       xzyt(5+i,3+i)=one
+       xzyt(3+i,7+i)=one
+       xzyt(7+i,1+i)=one
+
+       xzty(1+i,5+i)=one
+       xzty(5+i,7+i)=one
+       xzty(7+i,3+i)=one
+       xzty(3+i,1+i)=one
+
+       xtzy(1+i,7+i)=one
+       xtzy(7+i,5+i)=one
+       xtzy(5+i,3+i)=one
+       xtzy(3+i,1+i)=one
+
+       xtyz(1+i,7+i)=one
+       xtyz(7+i,3+i)=one
+       xtyz(3+i,5+i)=one
+       xtyz(5+i,1+i)=one
+    enddo
+
+    !do i=1,8
+    !write(6,100) (rt(i,j),j=1,8)
+    !enddo
+    !write(6,*) " "
+    !100  FORMAT(8(1x, E12.6))
 
     ic=0
     xrold=c_1d9
@@ -2616,7 +3122,7 @@ contains
        xrold=xr
     endif
 
-    if(nd.ge.2) then
+    if(nd>=2) then
        call movemul(rt,xy,rto,xr)
        if(xr.lt.xrold) then
           xrold=xr
@@ -2624,7 +3130,7 @@ contains
        endif
     endif
 
-    if(nd.eq.3) then
+    if(nd>=3) then
        call movemul(rt,xz,rto,xr)
        if(xr.lt.xrold) then
           xrold=xr
@@ -2646,6 +3152,88 @@ contains
           ic=5
        endif
     endif
+
+    if(nd.eq.4) then
+       call movemul(rt,xt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=6
+       endif
+       call movemul(rt,yt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=7
+       endif
+       call movemul(rt,zt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=8
+       endif
+
+       call movemul(rt,xyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=9
+       endif
+       call movemul(rt,yxt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=10
+       endif
+       call movemul(rt,yzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=11
+
+       endif
+       call movemul(rt,zyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=12
+       endif
+       call movemul(rt,xzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=13
+       endif
+       call movemul(rt,zxt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=14
+       endif
+       call movemul(rt,xyzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=15
+       endif
+       call movemul(rt,xytz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=16
+       endif
+       call movemul(rt,xzyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=17
+       endif
+       call movemul(rt,xzty,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=18
+       endif
+       call movemul(rt,xtzy,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=19
+       endif
+       call movemul(rt,xtyz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=20
+       endif
+    endif
+
+
     w_p=0
     i=0
     if(ic.eq.0) then
@@ -2672,11 +3260,42 @@ contains
        call movemul(rt,xzy,rto,xr)
        i=i+1
        w_p%c(i)=  " x-z-y permuted"
+    elseif(ic.eq.6) then
+       call movemul(rt,xt,rto,xr)
+    elseif(ic.eq.7) then
+       call movemul(rt,yt,rto,xr)
+    elseif(ic.eq.8) then
+       call movemul(rt,zt,rto,xr)
+    elseif(ic.eq.9) then
+       call movemul(rt,xyt,rto,xr)
+    elseif(ic.eq.10) then
+       call movemul(rt,yxt,rto,xr)
+    elseif(ic.eq.11) then
+       call movemul(rt,yzt,rto,xr)
+    elseif(ic.eq.12) then
+       call movemul(rt,zyt,rto,xr)
+    elseif(ic.eq.13) then
+       call movemul(rt,xzt,rto,xr)
+    elseif(ic.eq.14) then
+       call movemul(rt,zxt,rto,xr)
+    elseif(ic.eq.15) then
+       call movemul(rt,xyzt,rto,xr)
+    elseif(ic.eq.16) then
+       call movemul(rt,xytz,rto,xr)
+    elseif(ic.eq.17) then
+       call movemul(rt,xzyt,rto,xr)
+    elseif(ic.eq.18) then
+       call movemul(rt,xzty,rto,xr)
+    elseif(ic.eq.19) then
+       call movemul(rt,xtzy,rto,xr)
+    elseif(ic.eq.20) then
+       call movemul(rt,xtyz,rto,xr)
     endif
-    !    if(idpr.gt.-101) then
-    !       w_p%nc=i
-    !       call write_i
-    !    endif
+
+
+
+
+
     do i=1,nd2
        do j=1,nd2
           rt(i,j)=rto(i,j)
@@ -2783,6 +3402,7 @@ contains
     enddo
     return
   end subroutine initpert
+
   real(dp) function dlie(j)
     implicit none
     integer i
@@ -2798,7 +3418,8 @@ contains
     dlie=one/dlie
     return
   end function dlie
-  real(dp) function rext(j)
+
+  real(dp) function rext(j) ! no flip needed
     implicit none
     integer i,lie,mo
     integer,dimension(:)::j
@@ -2828,7 +3449,7 @@ contains
     !      return
     !frs
   end function rext
-  subroutine cpart(h,ch)
+  subroutine cpart(h,ch)  ! no flip needed
     implicit none
     integer h,ch
     if(.not.c_%stable_da) return
@@ -2836,7 +3457,8 @@ contains
     call dacfu(h,rext,ch)
     return
   end subroutine cpart
-  subroutine ctoi(f1,f2)
+
+  subroutine ctoi(f1,f2) ! no flip needed
     implicit none
     integer f1,f2,b1
     integer,dimension(ndim2)::x
@@ -2852,7 +3474,8 @@ contains
     call dadal1(b1)
     return
   end subroutine ctoi
-  subroutine itoc(f1,f2)
+
+  subroutine itoc(f1,f2) ! no flip needed
     implicit none
     integer f1,f2,b1
     integer,dimension(ndim2)::x
@@ -2868,7 +3491,8 @@ contains
     call dadal1(b1)
     return
   end subroutine itoc
-  subroutine etrtc(x)
+
+  subroutine etrtc(x) ! no flip needed
     implicit none
     integer i
     integer,dimension(:)::x
@@ -2886,7 +3510,8 @@ contains
     call dadal(rel,nd2)
     return
   end subroutine etrtc
-  subroutine etctr(x)
+
+  subroutine etctr(x) ! no flip needed
     implicit none
     integer i
     integer,dimension(:)::x
@@ -2904,7 +3529,8 @@ contains
     call dadal(rel,nd2)
     return
   end subroutine etctr
-  subroutine etcjg(x)
+
+  subroutine etcjg(x) ! no flip needed
     implicit none
     integer i
     integer,dimension(:)::x

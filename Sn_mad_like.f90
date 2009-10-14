@@ -2044,12 +2044,19 @@ CONTAINS
 
   END FUNCTION INSTRUMEN
 
-  FUNCTION  mark(NAME)
+  FUNCTION  mark(NAME,LIST)
     implicit none
     type (EL_LIST) mark
     CHARACTER(*), INTENT(IN):: NAME
+    type (EL_LIST),OPTIONAL,INTENT(IN):: LIST
 
-    mark=0
+
+    if(present(list)) then
+       mark=list
+    else
+       mark=0
+    endif
+
     IF(LEN(NAME)>nlp) THEN
        w_p=0
        w_p%nc=2
@@ -2532,7 +2539,7 @@ CONTAINS
        S2%phas=S1%lag
     endif
 
-    if(s1%kind==kind3.or.s1%kind==kind5.or.s1%kind==kind17) then
+    if(s1%kind==kind3.or.s1%kind==kind5) then   !.or.s1%kind==kind17) then
        ALLOCATE(S2%B_SOL);
        S2%B_SOL=S1%BSOL
     endif
@@ -2549,7 +2556,11 @@ CONTAINS
        S2%KIND=KIND16
     endif
 
-    if((S2%KIND==KIND6.or.S2%KIND==KIND7).AND.EXACT_MODEL.AND.S2%P%B0/=zero) then
+    if((S2%KIND==KIND6.or.S2%KIND==KIND7.or.S2%KIND==KIND17).AND.EXACT_MODEL.AND.S2%P%B0/=zero) then
+       if(S2%KIND==KIND17) then
+          write(6,*) " kind17 not permitted here in madlike "
+          stop 17
+       endif
        S2%KIND=KIND16
        THICKKICKTEMP=.TRUE.
     endif
@@ -2727,6 +2738,8 @@ CONTAINS
     implicit none
     logical(lp) crotte
 
+    write(6,*) " Clean_up disable: no worry "
+    return
     crotte=superkill
     superkill=my_true
     call kill(mad_list)
@@ -2742,7 +2755,7 @@ CONTAINS
     c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
     c_%x_prime => x_prime
-    c_%NDPT_OTHER => NDPT_OTHER
+    !    c_%NDPT_OTHER => NDPT_OTHER
 
     c_%CAVITY_TOTALPATH => CAVITY_TOTALPATH
     c_%wherelost => wherelost

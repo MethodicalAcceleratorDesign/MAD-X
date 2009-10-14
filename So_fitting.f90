@@ -1769,8 +1769,13 @@ contains
     TYPE (fibre), POINTER :: C
     logical(lp),optional :: even
     type(layout), pointer :: L
+    logical f1,f2
+
+    f1=.false.
+    f2=.false.
 
     if(associated(r%parent_universe)) then
+       f1=.true.
        l=>r%parent_universe%start
        do ii=1,r%parent_universe%n
           call kill(l%t)
@@ -1778,6 +1783,7 @@ contains
        enddo
     else
        call kill(r%t)
+       f2=.true.
     endif
     !    logical(lp) doneit
     nullify(C)
@@ -2265,6 +2271,15 @@ contains
           THI=R%THIN
           !          limit(1)=limit0(1)
           !          limit(2)=limit0(2)
+          if(f1) then
+             l=>r%parent_universe%start
+             do ii=1,r%parent_universe%n
+                call make_node_layout(l)
+                l=>l%next
+             enddo
+          elseif(f2) then
+             call make_node_layout(l)
+          endif
           RETURN
        ELSE
           GOTO 1001
@@ -2723,6 +2738,13 @@ contains
                 p%magp%bn(j)=-p%magp%bn(j)
                 p%magp%an(j)=-p%magp%an(j)
              enddo
+             if(abs(abs(p%mag%bn(1))-abs(p%mag%p%b0)).gt.c_1d_11.or. &
+                  abs(p%mag%p%b0).lt.c_1d_11) then
+                p%mag%bn(1)=-p%magp%bn(1)
+                p%mag%an(1)=-p%magp%an(1)
+                p%magp%bn(1)=-p%magp%bn(1)
+                p%magp%an(1)=-p%magp%an(1)
+             endif
              if(p%mag%p%nmul>0) call add(p,1,1,zero)
           endif
           if(associated(p%mag%volt)) p%mag%volt=-p%mag%volt
@@ -2731,7 +2753,6 @@ contains
        P=>P%next
     ENDDO
   end SUBROUTINE REVERSE_BEAM_LINE
-
 
   SUBROUTINE PUTFRINGE(R, changeanbn )
     IMPLICIT NONE

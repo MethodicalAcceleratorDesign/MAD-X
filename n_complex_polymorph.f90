@@ -978,6 +978,7 @@ contains
     c_%CHECK_MADX_APERTURE => CHECK_MADX_APERTURE
     c_%ROOT_CHECK => ROOT_CHECK
     c_%APERTURE_FLAG => APERTURE_FLAG
+    c_%s_aperture_CHECK => s_aperture_CHECK
     c_%absolute_aperture => absolute_aperture
     c_%check_x_min => check_x_min
     c_%check_x_max => check_x_max

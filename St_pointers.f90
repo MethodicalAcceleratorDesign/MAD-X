@@ -125,7 +125,7 @@ contains
     type(fibre),pointer ::p
     ! TRACKING RAYS
     INTEGER IBN,N_name
-    REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESTLA,CUR1,CUR2
+    REAL(DP) X(6),DT(3),x_ref(6),sc,NLAM,A1,B1,HPHA,B_TESLA,CUR1,CUR2
     REAL(DP)VOLT,PHASE
     INTEGER HARMONIC_NUMBER
     ! changing magnet
@@ -141,7 +141,14 @@ contains
     TYPE(WORK) W
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
-    REAL(DP) XA,YA,DXA,DYA
+    REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac
+    logical :: log_estate=.true.
+
+    if(log_estate) then
+       nullify(my_estate)
+       nullify(my_old_state)
+       log_estate=.false.
+    endif
 
     if(associated(my_estate)) my_old_state=>my_estate
     my_default=default
@@ -229,6 +236,8 @@ contains
           ! Orbit stuff
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
+       case('PUTORBITSTATE','USEORBITSTATE')
+          my_estate=my_ORBIT_LATTICE%state
        case('PRINTHERD','OPENHERD')
           IF(MF_HERD/=0) THEN
              WRITE(6,*) " CANNOT OPEN HERD FILE TWICE "
@@ -629,6 +638,110 @@ contains
           ENDDO
           Write(6,*) " Number of parameters = ",np
           Write(6,*) " Number of polymorphic blocks = ",NPOL
+
+       case('READFAMILIESANBN')
+          read(mf,*) filename
+          call kanalnummer(mfr,filename)
+          READ(MFR,*) II
+          DO J=1,II
+             read(mfr,'(a120)') title
+             READ(title,*) NAME,VORNAME
+             call move_to( my_ering,p,name,VORNAME,pos)
+
+             call context(title)
+             do while(.true.)
+                read(mfr,'(a120)') title
+                name_root=title
+                call context(name_root)
+                if(name_root(1:3)=='END') exit
+                read(title,*) n,r_in
+                call add(p,n,0,r_in)
+             enddo
+
+          ENDDO
+
+          close(mfr)
+
+       case('PRINTFAMILIESANBN')
+          read(mf,*) filename
+          call kanalnummer(mfr,filename)
+          write(MFR,*) NPOL
+          DO J=1,NPOL
+             my_ering=pol_(J)
+          ENDDO
+
+          p=>my_ering%start
+
+          do j=1,my_ering%n
+             if(p%magp%knob) then
+                write(mfr,*)  p%magp%name, p%magp%vorname
+                do ii=1,p%magp%p%nmul
+                   if(p%magp%bn(ii)%kind==3) then
+                      write(mfr,*)ii, p%magp%bn(ii)%r
+                   endif
+                   if(p%magp%an(ii)%kind==3) then
+                      write(mfr,*)-ii, p%magp%an(ii)%r
+                   endif
+                enddo
+                write(mfr,*) "end of data"
+             endif
+             p=>p%next
+          enddo
+          call kill_para(my_ering)
+          close(mfr)
+       case('MODULATE','ACMAGNET')
+          READ(MF,*) NAME
+
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+          READ(MF,*)  DC_ac,A_ac,theta_ac
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+                write(6,*) " slow ac magnet found ",P%MAG%name
+                if(.not.associated(P%MAG%DC_ac)) then
+                   allocate(P%MAG%DC_ac)
+                   allocate(P%MAG%A_ac)
+                   allocate(P%MAG%theta_ac)
+
+                   allocate(P%MAGP%DC_ac)
+                   allocate(P%MAGP%A_ac)
+                   allocate(P%MAGP%theta_ac)
+                   CALL alloc(P%MAGP%DC_ac)
+                   CALL alloc(P%MAGP%A_ac)
+                   CALL alloc(P%MAGP%theta_ac)
+
+                   P%MAG%DC_ac=DC_ac
+                   P%MAG%A_ac=A_ac
+                   P%MAG%theta_ac=theta_ac*twopi
+                   P%MAGP%DC_ac=DC_ac
+                   P%MAGP%A_ac=A_ac
+                   P%MAGP%theta_ac=theta_ac*twopi
+                   P%MAG%slow_ac=.true.
+                   P%MAGP%slow_ac=.true.
+                ENDIF
+             ENDIF
+
+
+             p=>p%next
+          enddo
+
+
+
+
        case('SETAPERTURE')
           READ(MF,*) KINDA,NAME
 
@@ -725,7 +838,8 @@ contains
                 ENDIF
                 call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
                 write(title,*) 'tunes =',targ_tune
-                I3=I3+1; call create_name(name_root,i3,suffix,filename);
+                I3=I3+1
+                call create_name(name_root,i3,suffix,filename)
                 write(6,*)" printing in "
                 write(6,*)filename
                 call print_bn_an(my_ering,2,title,filename)
@@ -834,13 +948,13 @@ contains
           allocate(resu(nscan,4))
           do i1=1,nscan
              write(6,*) " CASE NUMBER ",i1
-             call create_name(name_root,i1,suffix,filename);
+             call create_name(name_root,i1,suffix,filename)
              call READ_bn_an(my_ering,filename)
-             call create_name(name_root_res,i1,SUFFIX_res,filename);
+             call create_name(name_root_res,i1,SUFFIX_res,filename)
              COMT=name_root_res(1:len_trim(name_root_res))//"_resonance"
-             call create_name(COMT,i1,SUFFIX_res,filetune);
+             call create_name(COMT,i1,SUFFIX_res,filetune)
              COMT=name_root_res(1:len_trim(name_root_res))//"_SMEAR"
-             call create_name(COMT,i1,SUFFIX_res,FILESMEAR);
+             call create_name(COMT,i1,SUFFIX_res,FILESMEAR)
              if(i1/=1) ib=2
              emit(1:2)=EMIT0
              CALL track_aperture(my_ering,my_estate,beta,dbeta,tune,ib,ITMAX,emit,aper,pos,nturn,FILENAME,filetune,FILESMEAR,resmax)
@@ -882,7 +996,7 @@ contains
 
           READ(MF,*) POS, IBN
 
-          if (pos > my_ering%n) stop;
+          if (pos > my_ering%n) stop
 
           p=>my_ering%start
           do ii=1,pos
@@ -1062,23 +1176,35 @@ contains
              stop 555
           endif
        case('POWERHELICALDIPOLE','POWERHELICAL')
+
+          !SRM DEBUG ... typo
+          !B_TESLA --> B_TESLA
+
           READ(MF,*)name, VORNAME   !,POS
           READ(MF,*) A1,B1    !  A1,B1
           READ(MF,*) NLAM     ! NUMBER OF WAVES
           READ(MF,*) HPHA     ! PHASE
-          READ(MF,*) CUR2,CUR1,B_TESTLA   ! ACTUAL CURRENT, REF CURRENT, b FIELD
+          READ(MF,*) CUR2,CUR1,B_TESLA   ! ACTUAL CURRENT, REF CURRENT, b FIELD
           READ(MF,*) I1,I2    ! NST,METHOD
           call move_to(my_ering,p,name,VORNAME,POS)
           if(pos/=0) then
              W=P
-             B_TESTLA=CUR2/CUR1*B_TESTLA/w%brho
+             B_TESLA=CUR2/CUR1*B_TESLA/w%brho
 
-             p%mag%bn(1)=B_TESTLA+B1
-             p%magp%bn(1)=B_TESTLA+B1
-             p%mag%an(1)=-B_TESTLA+A1
-             p%magp%an(1)=-B_TESTLA+A1
-             p%mag%freq=twopi/p%mag%l/NLAM
+             p%mag%bn(1)=B_TESLA+B1
+             p%magp%bn(1)=B_TESLA+B1
+             p%mag%an(1)=-B_TESLA+A1
+             p%magp%an(1)=-B_TESLA+A1
+
+             !SRM DEBUG ... phase
+             p%mag%phas=twopi*HPHA
+             p%magp%phas=p%mag%phas
+
+             !SRM DEBUG ... multiply NLAM
+             !             p%mag%freq=twopi/p%mag%l/NLAM
+             p%mag%freq=twopi/p%mag%l*NLAM
              p%magp%freq=p%mag%freq
+
              p%mag%p%nst=I1
              p%mag%p%method=I2
              p%magp%p%nst=I1
@@ -1509,7 +1635,7 @@ contains
     TYPE(LAYOUT) R
 
     REAL(DP) X(6),m,as(6,6),energy,deltap
-    TYPE(ENV_8) YS(6)
+    TYPE(ENV_8) YS(6)   !
     type(beamenvelope) env
     CHARACTER(*) FILE1,FILE2
     type(normalform) normal
@@ -1531,10 +1657,12 @@ contains
 
     if(present(mat0)) then
        state=(estate-nocavity0)+radiation0
-       x=0.d0;
+       x=0.d0
        CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
        CALL INIT(state,1,0)
-       CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(id);  ! ALLOCATE VARIABLES
+       CALL ALLOC(Y)
+       CALL ALLOC(NORMAL)
+       call alloc(id)  ! ALLOCATE VARIABLES
        id=1
        y=id+x
        CALL TRACK_PROBE_x(r,y,state, fibre1=loc)
@@ -1545,11 +1673,13 @@ contains
        write(6,*) "symplectic tunes "
        write(6,*) normal%tune
 
-       CALL kill(Y);CALL kill(NORMAL);call kill(id);  ! ALLOCATE VARIABLES
+       CALL kill(Y)
+       CALL kill(NORMAL)
+       call kill(id)  ! ALLOCATE VARIABLES
 
     endif
     state=(estate-nocavity0)+radiation0
-    x=0.d0;
+    x=0.d0
 
     CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
     WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
@@ -1583,7 +1713,10 @@ contains
     write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
 
     CALL INIT(state,2,0,BERZ,ND2,NPARA)
-    CALL ALLOC(Y);CALL ALLOC(NORMAL);call alloc(ys);call alloc(env);  ! ALLOCATE VARIABLES
+    CALL ALLOC(Y)
+    CALL ALLOC(NORMAL)
+    call alloc(ys)
+    call alloc(env)  ! ALLOCATE VARIABLES
     !Y=NPARA
     CALL ALLOC(ID)
     ID=1
@@ -1591,6 +1724,10 @@ contains
     ys=y
 
     CALL TRACK(R,YS,loc,state)
+    call kanalnummer(npara,'junkys.txt')
+    write(6,*) loc
+    call print(ys,npara)
+    close(npara)
     if(.not.check_stable) write(6,*) " unstable tracking envelope "
     env%stochastic=.true.
     env=ys
@@ -1703,10 +1840,12 @@ contains
          (as(5,5)**2+as(5,6)**2)*e(3)
     av(3,5)=(as(3,1)*as(5,1)+as(3,2)*as(5,2))*e(1)+(as(3,3)*as(5,3)+as(3,4)*as(5,4))*e(2)+ &
          (as(3,5)*as(5,5)+as(3,6)*as(5,6))*e(3)
-    n1=1;n2=3;
+    n1=1
+    n2=3
     av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
          (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
-    n1=3;n2=6;
+    n1=3
+    n2=6
     av(n1,n2)=(as(n1,1)*as(n2,1)+as(n1,2)*as(n2,2))*e(1)+(as(n1,3)*as(n2,3)+as(n1,4)*as(n2,4))*e(2)+ &
          (as(n1,5)*as(n2,5)+as(n1,6)*as(n2,6))*e(3)
 
@@ -1727,12 +1866,14 @@ contains
     write(mf1,*) " <y delta> exact and alex "
     write(mf1,*) m/2.d0
     write(mf1,*) av(3,5)
-    n1=1;n2=3;
+    n1=1
+    n2=3
     m=env%sij0.sub.'101000'
     write(mf1,*) " <x y> exact and alex "
     write(mf1,*) m/2.d0
     write(mf1,*) av(n1,n2)
-    n1=3;n2=6;
+    n1=3
+    n2=6
     m=env%sij0.sub.'001001'
     write(mf1,*) " <y L> exact and alex "
     write(mf1,*) m/2.d0
@@ -1740,14 +1881,17 @@ contains
 
 
 
-    CALL KILL(Y);CALL KILL(Ys);CALL KILL(NORMAL);CALL KILL(env);
+    CALL KILL(Y)
+    CALL KILL(Ys)
+    CALL KILL(NORMAL)
+    CALL KILL(env)
 
     ! compute map with radiation minus the cavity!
     ! cavity must be at the end and only one cavity
 
     if(no>0) then
        CALL INIT(STATE,no,0,BERZ,ND2,NPARA)
-       CALL ALLOC(Y);  ! ALLOCATE VARIABLES
+       CALL ALLOC(Y)  ! ALLOCATE VARIABLES
        write(17,*) x(1),x(2),x(3)
        write(17,*) x(4),x(5),x(6)
        Y=NPARA
@@ -1865,7 +2009,7 @@ end  subroutine read_ptc_command77
 !Piotr says:
 !I have implemented for you MAD-X command ptc_script.
 !It has one parameter named "file". Hence, you call sth like
-!ptc_script, file="directptctweaks.ptc";
+!ptc_script, file="directptctweaks.ptc"
 !It executes subroutine execscript in file madx_ptc_script.f90.
 
 subroutine gino_ptc_command77(gino_command)

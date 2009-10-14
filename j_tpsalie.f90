@@ -2798,4 +2798,12 @@ contains
 
   END SUBROUTINE clean_damap
 
+  SUBROUTINE  flip_damap(S1,S2)
+    implicit none
+    type (damap),INTENT(INOUT)::S2
+    type (damap), intent(INOUT):: s1
+
+    call flip(S1%v%i,S2%v%i)
+
+  end SUBROUTINE  flip_damap
 end module tpsalie

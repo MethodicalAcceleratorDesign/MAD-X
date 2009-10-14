@@ -440,7 +440,7 @@ CONTAINS
   END SUBROUTINE GEO_ROTA_no_vec
 
   SUBROUTINE GEO_ROTA(ENT,A,ANG,I,basis)
-    ! Rotates frame ENT by A(3) in the PTC or reverse PTC order
+    ! Rotates frame ENT by Ang(3) in the PTC or reverse PTC order
     !using global frame for angle definition
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3),A(3)

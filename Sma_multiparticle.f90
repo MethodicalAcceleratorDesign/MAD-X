@@ -880,7 +880,24 @@ CONTAINS
 
   end SUBROUTINE MAKE_NODE_LAYOUT
 
+  SUBROUTINE sum_ds_ac( R,ds_ac_tot) !
+    ! computes the total length for AC-modulation
+    implicit none
+    TYPE (LAYOUT), TARGET :: R
+    TYPE (NODE_LAYOUT), pointer :: L
+    INTEGER I
+    TYPE(INTEGRATION_NODE), POINTER :: T
+    REAL(DP), intent(inout) :: ds_ac_tot
 
+    t=>r%t%start
+    ds_ac_tot=zero
+    do i=1,r%t%n
+
+       ds_ac_tot=ds_ac_tot+t%ds_ac
+
+       t=>t%next
+    enddo
+  end SUBROUTINE sum_ds_ac
 
   SUBROUTINE MAKE_NODE_LAYOUT_2( R,L ) !
     ! Creates a thin layout.
@@ -933,7 +950,7 @@ CONTAINS
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
        L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;    ! s(1) total ld
-       L%END%S(5)=zero;
+       L%END%S(5)=zero;L%END%DS_AC=zero;
        T1=>L%END                            ! s(2) local integration distance
        ! s(3) total integration distance
        L%END%CAS=CASEP1                       ! s(4) end of step =  DL
@@ -944,7 +961,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
        L%END%CAS=CASE1
        L%END%pos_in_fibre=2
        L%END%pos=k;k=k+1;
@@ -954,7 +971,7 @@ CONTAINS
        DO J=1,P%MAG%P%NST
           CALL APPEND_EMPTY_THIN( L )
           L%END%TEAPOT_LIKE=TEAPOT_LIKE
-          L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=DL;L%END%S(5)=DLD;
+          L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=DL;L%END%S(5)=DLD;L%END%ds_ac=DLD;
           L%END%CAS=CASE0
           L%END%pos_in_fibre=J+2
           L%END%pos=k;k=k+1;
@@ -972,7 +989,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
        L%END%CAS=CASE2
        L%END%pos_in_fibre=P%MAG%P%NST+3
        L%END%pos=k;k=k+1;
@@ -980,7 +997,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
        L%END%CAS=CASEP2
        L%END%pos_in_fibre=P%MAG%P%NST+4
        L%END%pos=k;k=k+1;

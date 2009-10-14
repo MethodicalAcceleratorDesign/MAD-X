@@ -17,7 +17,7 @@ module tree_element_MODULE
   private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
   private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8,exp_spinor_8
-  private INTO_RES_SPIN8_eq,INTO_SPIN8_from_RES_eq
+  private INTO_RES_SPIN8_eq,INTO_SPIN8_from_RES_eq,ALLOC_rf_phasor_8,KILL_rf_phasor_8
 
   private find_ar
   private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor,print_res_spinor_8
@@ -34,11 +34,13 @@ module tree_element_MODULE
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
   private find_perp_basisp,find_exponentp
-  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst
-
+  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8
+  PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8
+  private flip  ! flip in lielib
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
   logical(lp) :: force_positive=.false.
+  logical(lp) :: use_ptc_ac_position=.false.
 
   INTERFACE assignment (=)
      !
@@ -67,11 +69,14 @@ module tree_element_MODULE
      MODULE PROCEDURE     normalise_spin
      MODULE PROCEDURE     INTO_RES_SPIN8_eq !@
      MODULE PROCEDURE     INTO_SPIN8_from_RES_eq
+     MODULE PROCEDURE     EQUAL_RF8_RF8
+     MODULE PROCEDURE     EQUAL_RF8_RF
+     MODULE PROCEDURE     EQUAL_RF_RF8
   end  INTERFACE
 
   INTERFACE OPERATOR (*)
      MODULE PROCEDURE concat  !@ damapspin= damapspin o damapspin
-     MODULE PROCEDURE cmul    ! damapspin%s= real(dp) * damapspin%s=
+     MODULE PROCEDURE cmul    ! damapspin%s= real(dp) * damapspin%s     orbital unchanged
      MODULE PROCEDURE mmul  ! damapspin%s=damapspin%s o damap
      MODULE PROCEDURE damapspin_spinor_mul  ! spinor_8%s(i)= damapspin%s(i,j) * spinor%s(j)
      MODULE PROCEDURE damapspin_spinor8_mul ! spinor_8%s(i)= damapspin%s(i,j) * spinor_8%s(j)
@@ -100,7 +105,7 @@ module tree_element_MODULE
      MODULE PROCEDURE daddsc
      MODULE PROCEDURE scdaddo
      MODULE PROCEDURE daddsco
-     MODULE PROCEDURE addm    !    damapspin%s  + damapspin%s
+     MODULE PROCEDURE addm    !    (damapspin1%m, damapspin1%s  + damapspin2%s)
      MODULE PROCEDURE add_spin8_spin8   ! spinor_8 = spinor_8 + spinor_8
   END  INTERFACE
 
@@ -168,6 +173,7 @@ module tree_element_MODULE
      MODULE PROCEDURE PRINT_probe8
      MODULE PROCEDURE PRINT_spinor_8
      MODULE PROCEDURE print_res_spinor_8
+     MODULE PROCEDURE print_rf_phasor_8
   END INTERFACE
 
   INTERFACE daPRINT
@@ -188,6 +194,7 @@ module tree_element_MODULE
      MODULE PROCEDURE A_OPT_damap
      MODULE PROCEDURE alloc_normal_spin
      MODULE PROCEDURE alloc_res_SPINOR_8
+     MODULE PROCEDURE ALLOC_rf_phasor_8
   END INTERFACE
 
   INTERFACE KILL
@@ -197,6 +204,7 @@ module tree_element_MODULE
      MODULE PROCEDURE K_OPT_damap
      MODULE PROCEDURE KILL_normal_spin
      MODULE PROCEDURE KILL_res_SPINOR_8
+     MODULE PROCEDURE KILL_rf_phasor_8
   END INTERFACE
 
   INTERFACE ALLOC_33
@@ -959,6 +967,10 @@ CONTAINS
        !       s1%x(i)%i=0
     enddo
 
+    do i=1,2  !
+       call assp_no_master(s1%AC%x(i))
+    enddo
+
 
   end subroutine assprobe_8
 
@@ -997,11 +1009,11 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          CUTORDER%s(i,j)=s1%s(i,j).cut.s2
+          CUTORDER%s(i,j)=s1%s(i,j).cut.(s2-1)
        enddo
     enddo
 
-    CUTORDER%m=s1%m.cut.(s2+1)
+    CUTORDER%m=s1%m.cut.s2
 
     master=localmaster
 
@@ -1170,6 +1182,10 @@ CONTAINS
     DO I=1,6
        P%X(i)=X(i)
     enddo
+
+    P%AC%X(1)=ZERO
+    P%AC%X(2)=ZERO
+
   END    subroutine EQUAL_PROBE8_REAL6
 
   subroutine EQUAL_PROBE8_PROBE8(P8,P)
@@ -1192,10 +1208,54 @@ CONTAINS
     DO I=1,3
        P8%S(i)=P%S(i)
     enddo
+    P8%AC=P%AC
 
     P8%u=P%u
 
   END subroutine EQUAL_PROBE8_PROBE8
+
+
+
+  subroutine EQUAL_RF8_RF8(P8,P)
+    implicit none
+    TYPE(rf_phasor_8), INTENT(IN) :: P
+    TYPE(rf_phasor_8), INTENT(INOUT) :: P8
+    INTEGER I
+
+    DO I=1,2
+       P8%X(I)=P%X(I)
+    ENDDO
+    P8%om=P%om
+
+  END subroutine EQUAL_RF8_RF8
+
+  subroutine EQUAL_RF8_RF(P8,P)
+    implicit none
+    TYPE(rf_phasor_8), INTENT(INOUT) :: P8
+    TYPE(rf_phasor), INTENT(IN) :: P
+    INTEGER I
+
+    DO I=1,2
+       P8%X(I)=P%X(I)
+    ENDDO
+    P8%om=P%om
+
+  END subroutine EQUAL_RF8_RF
+
+  subroutine EQUAL_RF_RF8(P,P8)
+    implicit none
+    TYPE(rf_phasor), INTENT(INOUT) :: P
+    TYPE(rf_phasor_8), INTENT(IN) :: P8
+    INTEGER I
+
+    DO I=1,2
+       P%X(I)=P8%X(I)
+    ENDDO
+    P%om=P8%om
+
+  END subroutine EQUAL_RF_RF8
+
+
 
   subroutine EQUAL_PROBE8_PROBE (P8,P)
     implicit none
@@ -1214,6 +1274,7 @@ CONTAINS
     do I=1,ISPIN1R
        P8%S(I)=P%s(I)
     enddo
+
 
     P8%u=P%u
     P8%e_ij=zero
@@ -1334,14 +1395,20 @@ CONTAINS
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damapspin), INTENT(INOUT) :: DS
     real(dp) s(3,3)
-    INTEGER I,J
-    ! if(C_%ND2/=6) then
-    !  write(6,*) " not implemented in EQUAL_DASPIN_RAY8"
-    !  stop
-    ! endif
+    INTEGER I,J,nd2t
 
-    DO I=1,C_%ND2
+    nd2t=C_%ND2
+    if(doing_ac_modulation_in_ptc) then
+       nd2t=C_%ND2-2
+    endif
+
+
+
+    DO I=1,nd2t
        DS%M%V(I)=R%X(I)
+    ENDDO
+    DO I=nd2t+1,C_%ND2
+       DS%M%V(I)=R%ac%x(i-nd2t)
     ENDDO
 
     DO I=1,3
@@ -1434,18 +1501,31 @@ CONTAINS
     TYPE (probe_8) scdadd
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
-    integer localmaster,i,j
+    integer localmaster,i,j,nd2t,dc
     type(taylor) d
 
 
-
-
-    !   call ass(scdadd)
     scdadd%u=my_false
     scdadd%E_ij=zero
 
+    if(doing_ac_modulation_in_ptc) then
+       dc=2
+    else
+       dc=0
+    endif
+    if(c_%ndpt/=0) then                       ! delta-l without cavity
+       nd2t=6
+    elseif(c_%ndpt==0.and.c_%nd2==4+dc) then     !  no delta-l maybe delta as a parameter
+       nd2t=4
+    elseif(c_%ndpt==0.and.c_%nd2==6+dc) then      !   delta-l with cavity
+       nd2t=6
+    else
+       write(6,*) " internal PTC error in scdadd o_tree_element.f90 "
+       stop 666
+    endif
+
     call alloc(d)
-    do i=1,c_%nd2
+    do i=1,nd2t                 !   from 1-4 or 1-6 (if ndpt=0)
        localmaster=master
        call ass(scdadd%x(i))
        !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
@@ -1453,19 +1533,35 @@ CONTAINS
        master=localmaster
     enddo
 
-    do i=c_%nd2+1,6
+    do i=nd2t+1,6
        localmaster=master
        call ass(scdadd%x(i))
-       if(c_%nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
-          scdadd%x(i)=s2%x(i)+(one.mono.'00001')
+       if((c_%npara==5+dc).AND.I==5) then   ! npr
+          scdadd%x(i)=s2%x(i)+(one.mono.c_%npara)
        else
           scdadd%x(i)=s2%x(i)
        endif
        master=localmaster
     enddo
 
+    if(doing_ac_modulation_in_ptc) then   ! useless now
+       localmaster=master
+       call ass(scdadd%AC%x(1))
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       scdadd%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+       master=localmaster
+       localmaster=master
+       call ass(scdadd%AC%x(2))
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       scdadd%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+       master=localmaster
+       localmaster=master
+       call ass(scdadd%AC%om)
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       scdadd%AC%om=s2%AC%om
+       master=localmaster
+    endif
 
-    !    if(C_%SPIN_POS/=0) then
     DO I=1,3
        !          call ass(scdadd%s%x(i))
        DO J=1,3
@@ -1474,14 +1570,8 @@ CONTAINS
           scdadd%s(J)%x(i)=S1%S(I,J)
           master=localmaster
        ENDDO
-       !          localmaster=master
-       !          call ass(scdadd%s(0)%x(i))
-       !          scdadd%s(0)%x(i)=S2%S(0)%X(I)
-       !          master=localmaster
 
     ENDDO
-    !    endif
-
 
 
   END FUNCTION scdadd
@@ -1492,7 +1582,7 @@ CONTAINS
     TYPE (probe_8) daddsc
     TYPE (damapspin), INTENT (IN) :: S1
     type(probe) , INTENT (IN) :: S2
-    integer localmaster,i,j
+    integer localmaster,i,j,nd2t,dc
     type(taylor) d
 
 
@@ -1502,45 +1592,70 @@ CONTAINS
     daddsc%u=my_false
     daddsc%E_ij=zero
 
+    if(doing_ac_modulation_in_ptc) then
+       dc=2
+    else
+       dc=0
+    endif
+    if(c_%ndpt/=0) then                       ! delta-l without cavity
+       nd2t=6
+    elseif(c_%ndpt==0.and.c_%nd2==4+dc) then     !  no delta-l maybe delta as a parameter
+       nd2t=4
+    elseif(c_%ndpt==0.and.c_%nd2==6+dc) then      !   delta-l with cavity
+       nd2t=6
+    else
+       write(6,*) " internal PTC error in daddsc o_tree_element.f90 "
+       stop 666
+    endif
+
     call alloc(d)
-    do i=1,c_%nd2
+    do i=1,nd2t                 !   from 1-4 or 1-6 (if ndpt=0)
        localmaster=master
        call ass(daddsc%x(i))
-       !       daddsc%x(i)=s1%m%v(i)+s2%x(i)
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
        daddsc%x(i)=s1%M%V(i)+s2%x(i)-(s1%M%V(i).sub.'0')
        master=localmaster
     enddo
 
-    do i=c_%nd2+1,6
+    do i=nd2t+1,6
        localmaster=master
        call ass(daddsc%x(i))
-       if(c_%nd2==4.and.(c_%npara==5.or.c_%npara==8).AND.I==5) then   ! npr
-          daddsc%x(i)=s2%x(i)+(one.mono.'00001')
+       if((c_%npara==5+dc).AND.I==5) then   ! npr
+          daddsc%x(i)=s2%x(i)+(one.mono.c_%npara)
        else
           daddsc%x(i)=s2%x(i)
        endif
        master=localmaster
     enddo
 
+    if(doing_ac_modulation_in_ptc) then   ! useless now
+       localmaster=master
+       call ass(daddsc%AC%x(1))
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       daddsc%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+       master=localmaster
+       localmaster=master
+       call ass(daddsc%AC%x(2))
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       daddsc%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+       master=localmaster
+       localmaster=master
+       call ass(daddsc%AC%om)
+       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+       daddsc%AC%om=s2%AC%om
+       master=localmaster
+    endif
 
-    !    if(C_%SPIN_POS/=0) then
     DO I=1,3
-       !          call ass(daddsc%s%x(i))
-
+       !          call ass(scdadd%s%x(i))
        DO J=1,3
           localmaster=master
           call ass(daddsc%s(J)%x(i))
           daddsc%s(J)%x(i)=S1%S(I,J)
           master=localmaster
        ENDDO
-       !          localmaster=master
-       !          call ass(daddsc%s(0)%x(i))
-       !          daddsc%s(0)%x(i)=S2%S(0)%X(I)
-       !          master=localmaster
-
 
     ENDDO
-    !    endif
 
 
 
@@ -1551,19 +1666,23 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: DS
     real(dp), optional :: prec
     INTEGER MF,I,J
+    logical(lp) spin_in
 
     !    WRITE(MF,*) " ORBIT "
     !     WRITE(MF,*) DS%X(1:3)
     !     WRITE(MF,*) DS%X(4:6)
     WRITE(MF,*) c_%nd2 ," DIMENSIONAL ORBITAL MAP "
     CALL PRINT(DS%M,MF,prec)
-    WRITE(MF,*) " SPIN MATRIX "
-    DO I=1,3
-       DO J=1,3
-          WRITE(MF,*) " SPIN MATRIX COMPONENT ",I,J
-          CALL PRINT(DS%S(I,J),MF,prec)
+    call check_spin(DS,spin_in)
+    if(spin_in) then
+       WRITE(MF,*) " SPIN MATRIX "
+       DO I=1,3
+          DO J=1,3
+             WRITE(MF,*) " SPIN MATRIX COMPONENT ",I,J
+             CALL PRINT(DS%S(I,J),MF,prec)
+          ENDDO
        ENDDO
-    ENDDO
+    endif
 
   END subroutine print_DASPIN
 
@@ -1601,8 +1720,25 @@ CONTAINS
     !       call print(ds%s(3)%x(i),mf)
     !    enddo
 
+    if(doing_ac_modulation_in_ptc) call print(ds%ac,mf)
+
 
   END subroutine print_probe8
+
+  subroutine print_rf_phasor_8(S,MF)
+    implicit none
+    TYPE(rf_phasor_8), INTENT(INOUT) :: s
+    INTEGER MF,I
+
+    write(mf,*) '  '
+    write(mf,*) ' AC INFORMATION '
+    call print(s%om,mf)
+    do i=1,2
+       call print(s%x(i),mf)
+    enddo
+
+  END subroutine print_rf_phasor_8
+
 
   subroutine print_spinor_8(S,MF)
     implicit none
@@ -2015,10 +2151,10 @@ CONTAINS
     do i=1,nmax
        SA=SF
        sf=sf + (one/i)*st
-       st=(-one)*(s*st)
+       st= s*st
+       st=(-one)*st
        SA=SA+((-one)*SF)
        eps1=FULL_ABS(SA)
-
        IF(EPS1>deps_tracking) THEN
           EPS0=EPS1
        ELSE
@@ -2037,12 +2173,12 @@ CONTAINS
        write(6,*) "Did not converge in find_exponent_jet_p"
        stop 666
     endif
+
     h_axis%x(1)=sf%s(3,2)
     h_axis%x(2)=sf%s(1,3)
     h_axis%x(3)=sf%s(2,1)
 
     !etienne
-
 
 
     call kill(s,sf,st,SA)
@@ -2714,9 +2850,22 @@ CONTAINS
     DO I=1,3
        R%S(I)=0
     ENDDO
+    CALL ALLOC(R%ac)
 
 
   END    subroutine ALLOC_probe_8
+
+  subroutine ALLOC_rf_phasor_8(R)
+    implicit none
+    TYPE(rf_phasor_8), INTENT(INOUT) :: R
+    INTEGER I  !,J
+
+    DO I=1,2
+       CALL alloc(R%X(I))
+    ENDDO
+    CALL alloc(R%om)
+
+  END    subroutine ALLOC_rf_phasor_8
 
   subroutine KILL_res_SPINOR_8(S)
     implicit none
@@ -2746,14 +2895,21 @@ CONTAINS
     ENDDO
     CALL KILL(R%X,6)
 
-
-    !  DO I=1,6
-    !  DO J=1,6
-    !   CALL KILL(R%E_IJ(I,J))
-    !  ENDDO
-    !  ENDDO
+    CALL KILL(R%ac)
 
   END    subroutine KILL_probe_8
+
+  subroutine kill_rf_phasor_8(R)
+    implicit none
+    TYPE(rf_phasor_8), INTENT(INOUT) :: R
+    INTEGER I  !,J
+
+    DO I=1,2
+       CALL KILL(R%X(I))
+    ENDDO
+    CALL KILL(R%om)
+
+  END    subroutine kill_rf_phasor_8
 
 
 
@@ -3060,6 +3216,8 @@ CONTAINS
     localmaster=master
 
     call ass(cmul)
+
+    if(c_%nd2/=0) cmul%m=s1%m
 
 
 
@@ -3415,7 +3573,21 @@ CONTAINS
     TYPE (real_8), intent(inout) :: s(3,3),sf(3,3)
     integer i,j
     type(taylor) t
+    logical doflip
     call alloc(t)
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       perform_flip=.false.
+       do i=1,3
+          do j=1,3
+             if(s(i,j)%kind==2) call fliptaylor(s(i,j)%t,s(i,j)%t,1)
+          enddo
+       enddo
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
     do i=1,3
        do j=1,3
           if(s(i,j)%kind==2) then
@@ -3428,26 +3600,20 @@ CONTAINS
     enddo
     call kill(t)
 
+    if(doflip) then
+       do i=1,3
+          do j=1,3
+             if(s(i,j)%kind==2) call fliptaylor(s(i,j)%t,s(i,j)%t,-1)
+             if(s(i,j)%kind==2.and.s(i,j)%t%i/=sf(i,j)%t%i) then
+                call fliptaylor(sf(i,j)%t,sf(i,j)%t,-1)
+             endif
+          enddo
+       enddo
+       perform_flip=.true.
+    endif
+
+
   end  subroutine clean_orbital_33
-
-  subroutine clean_orbital_3(s,sf)
-    implicit none
-    TYPE (taylor), intent(inout) :: s(3),sf(3)
-    integer i
-
-    do i=1,3
-       call cfu(s(i),purge_transverse,sf(i))
-    enddo
-
-  end  subroutine clean_orbital_3
-
-  subroutine clean_orbital(s,sf)
-    implicit none
-    TYPE (taylor), intent(inout) :: s,sf
-
-    call cfu(s,purge_transverse,sf)
-
-  end  subroutine clean_orbital
 
 !!!!!!!!!!  Normal form !!!!!!!!!!!!!!!
 
@@ -3484,10 +3650,11 @@ CONTAINS
   END    subroutine KILL_normal_spin
 
 !!!!!!!!!!!!!!!!   new stuff
-  subroutine Go_to_closed(ns,DS)
+  subroutine Go_to_closed(ns,DS,spin_in)
     implicit none
     TYPE(normal_spin), INTENT(INOUT) :: ns
     TYPE(damapspin), INTENT(INout) :: DS
+    logical(lp), INTENT(IN) :: spin_in
     type(damapspin) a1i,ds0
     type(damapspin)s ,a ,ai
     type(taylor) nn
@@ -3525,37 +3692,44 @@ CONTAINS
     call clean_orbital_33(ds0%s,s%s)
     ! at this stage s is the spin map  without dependence on orbital
 
-    call find_n0(s%s,ns%n0)
+    if(spin_in) then           !!!!  spin in
+       call find_n0(s%s,ns%n0)
 
-    call find_a(ns%n0,a%s)
+       call find_a(ns%n0,a%s)
 
-    ai=a**(-1)
+       ai=a**(-1)
 
-    s=(ai*s)*a
+       s=(ai*s)*a
 
-    !write(6,*) " diagonal "
-    !    do i=1,3
-    !    do j=1,3
-    !    ss(i,j)=s%s(i,j)
-    !    enddo
-    !    write(6,*) ss(i,1:3)
-    !    enddo
+       !write(6,*) " diagonal "
+       !    do i=1,3
+       !    do j=1,3
+       !    ss(i,j)=s%s(i,j)
+       !    enddo
+       !    write(6,*) ss(i,1:3)
+       !    enddo
 
-    !pause 777
+       !pause 777
 
-    a11=s%s(1,1)
-    a13=s%s(1,3)
+       a11=s%s(1,1)
+       a13=s%s(1,3)
 
-    ns%theta0=clockwise*atan2(a13,a11)
-    if(force_positive.and.ns%theta0<zero)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
+       ns%theta0=clockwise*atan2(a13,a11)
+       if(force_positive.and.ns%theta0<zero)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
 
-    ns%as=ns%as*a
+       ns%as=ns%as*a
 
-    ns%ar=1
-    ns%ar%m=ns%as%m**(-1)*ns%n%a_t
+       ns%ar=1
+       ns%ar%m=ns%as%m**(-1)*ns%n%a_t
+    else
+       ns%ar=1
+       ns%ar%m=ns%as%m**(-1)*ns%n%a_t
 
-!!!!   as=(A1,A_spin)
-!!!!   ar=(Ar,I)
+       ns%theta0=zero  ! arbitrary junk
+       ns%n0(1)=zero   ! arbitrary junk
+       ns%n0(2)=one    ! arbitrary junk
+       ns%n0(3)=zero   ! arbitrary junk
+    endif
 
     call kill(a1i)
     call kill(ds0)
@@ -3665,9 +3839,24 @@ CONTAINS
     TYPE(complextaylor) omr(3),omc(3)
     integer N,i,nd,j
     integer, allocatable :: jc(:)
-    real(dp) value,ang
+    real(dp) value,ang,tune(4)
     complex(dp) denom
-    logical doit
+    logical doit,doflip
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       perform_flip=.false.
+       call fliptaylor(om(1),om(1),1)
+       call fliptaylor(om(2),om(2),1)
+       call fliptaylor(om(3),om(3),1)
+       call flip_real_array(ns%n%tune,ns%n%tune,1)
+       if(use_ptc_ac_position) then
+          call flip_resonance(ns%m,ns%m,1)
+       endif
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
 
     nd=c_%nd2/2
     if(c_%ndpt/=0) nd=nd-1
@@ -3882,6 +4071,20 @@ CONTAINS
        oma(i)=t
     enddo
 
+    if(doflip) then
+       call flip_real_array(ns%n%tune,ns%n%tune,-1)
+       call fliptaylor(om(1),om(1),-1)
+       call fliptaylor(om(2),om(2),-1)
+       call fliptaylor(om(3),om(3),-1)
+       call fliptaylor(oma(1),oma(1),-1)
+       call fliptaylor(oma(2),oma(2),-1)
+       call fliptaylor(oma(3),oma(3),-1)
+       if(use_ptc_ac_position) then
+          call flip_resonance(ns%m,ns%m,-1)
+       endif
+       perform_flip=.true.
+    endif
+
     deallocate(jc)
     call kill(t)
     call kill(omr,3)
@@ -3948,13 +4151,32 @@ CONTAINS
           exit
        endif
     enddo
-    !    if(.not.doit) then
-    !     write(6,*) jc(1:4),is
-    !     write(6,*) ns%m(1,1),ns%m(2,1),ns%ms(1)
-    !    endif
 
 
   end subroutine test_jc_spin
+
+  subroutine check_spin(DS,spin_in)
+    implicit none
+    logical(lp), INTENT(INout) :: spin_in
+    TYPE(damapspin), INTENT(IN) :: DS
+    integer i,j
+    real(dp) norm
+
+    spin_in=.true.
+    norm=zero
+    do i=1,3
+       do j=1,3
+          norm=norm+full_abs(DS%s(i,j))
+       enddo
+    enddo
+    norm=abs(norm-three)
+
+    if(norm<=eps_tpsalie) then
+       write(6,*) " Spin Map is identity : not printed "
+       spin_in=.false.
+    endif
+
+  end  subroutine check_spin
 
   subroutine normalise_spin(ns,DS_in)
     implicit none
@@ -3964,6 +4186,7 @@ CONTAINS
     TYPE(damap)  r0
     type(taylor) om(3),oma(3)
     integer i
+    logical(lp) spin_in
 
     call alloc(ds)
     call alloc(dst)
@@ -3972,11 +4195,13 @@ CONTAINS
     call alloc(r0)
     call alloc(om)
     call alloc(oma)
+    spin_in=.false.
 
+    call check_spin(DS_in,spin_in)
     ds=ds_in
     ! step 1
     !  Normalize to the parameter dependent n0 of the theory
-    call Go_to_closed(ns,DS)
+    call Go_to_closed(ns,DS,spin_in)
 
     ! step 2
     ! Apply the transformation found in step 1 to ds
@@ -3989,24 +4214,26 @@ CONTAINS
 
     ns%a_t=1
     r0=ns%n%normal
+    if(spin_in) then
 
-    do i=1,c_%no+1
+       do i=1,c_%no+1
 
-       dst=ds*ds0**(-1)    ! ds=exp(small)*ds0
-       ! dst=exp(small)
+          dst=ds*ds0**(-1)    ! ds=exp(small)*ds0
+          ! dst=exp(small)
 
-       call dalog(DSt,om)  ! small=log(dst)  finite # of steps
+          call dalog(DSt,om)  ! small=log(dst)  finite # of steps
 
-       call get_kernel(ns,om,oma)
+          call get_kernel(ns,om,oma)
 
-       call daexplog(oma,dsi)     ! dsi=exp(oma(i)*L_i)
-       ns%a_t=ns%a_t*dsi          ! updated a_t= a_t*dsi
+          call daexplog(oma,dsi)     ! dsi=exp(oma(i)*L_i)
+          ns%a_t=ns%a_t*dsi          ! updated a_t= a_t*dsi
 
-       ds=ds*dsi                  ! ds=dsi**(-1) ds * dsi
-       dsi=dsi**(-1)              ! eventually ds is normalized
-       ds=dsi*ds
-    enddo                       ! keep going
+          ds=ds*dsi                  ! ds=dsi**(-1) ds * dsi
+          dsi=dsi**(-1)              ! eventually ds is normalized
+          ds=dsi*ds
+       enddo                       ! keep going
 
+    endif
     ns%a_t=ns%as*ns%ar*ns%a_t
 
 
@@ -4021,7 +4248,6 @@ CONTAINS
     ns%as=ns%as*dsi%m**(-1)
     ns%ar=1
     ns%ar%m=dsi%m       ! a_t= a1 o A_s o A_r
-
     call kill(ds)
     call kill(dst)
     call kill(dsi)
@@ -4101,9 +4327,23 @@ CONTAINS
     real(dp) value
     logical doit
     TYPE(damap) atemp
+    logical doflip
 
     call alloc(atemp)
     allocate(jc(c_%nv))
+
+
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       !    write(6,*) " flipping ",c_%ndpt,c_%nd2-1
+       !    pause 7123
+
+       perform_flip=.false.
+       call flip_damap(a_t,a_t)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
 
     atemp=1
     do k=1,c_%nd2
@@ -4176,6 +4416,13 @@ CONTAINS
     a_nl=atemp**(-1)*a_l
     a_l=atemp
 
+    if(doflip) then
+       call flip_damap(a_t,a_t)
+       call flip_damap(a_nl,a_nl)
+       call flip_damap(a_l,a_l)
+       call flip_damap(a_f,a_f)
+       perform_flip=.true.
+    endif
 
     deallocate(jc)
     call kill(atemp)

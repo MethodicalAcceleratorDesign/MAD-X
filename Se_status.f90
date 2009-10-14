@@ -63,7 +63,7 @@ module S_status
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
   INTEGER, target :: SECTOR_NMUL = 4
-  INTEGER, TARGET :: NDPT_OTHER = 0
+  !  INTEGER, TARGET :: NDPT_OTHER = 0
   real(dp) CRAD,CFLUC
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   !  real(dp),PARAMETER::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
@@ -88,7 +88,7 @@ module S_status
   TYPE(INTERNAL_STATE), target ::  DEFAULT
   TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME, &
        EXACTMIS,STOCHASTIC
-  TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,SPIN_ONLY
+  TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,MODULATION
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,f,f,3)
@@ -112,7 +112,7 @@ module S_status
        &(0,f,f,t,f,f,f,f,t,t,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN0   = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,t,F,3)
-  TYPE (INTERNAL_STATE), PARAMETER :: SPIN_ONLY0   = INTERNAL_STATE &
+  TYPE (INTERNAL_STATE), PARAMETER :: MODULATION0   = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,f,t,3)
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
@@ -127,7 +127,6 @@ module S_status
   CHARACTER(24) MYTYPE(-100:100)
   private check_S_APERTURE_r,check_S_APERTURE_out_r
   private check_S_APERTURE_p,check_S_APERTURE_out_p
-
 
 
   INTERFACE OPERATOR (.min.)
@@ -371,13 +370,15 @@ CONTAINS
     DEALLOCATE(A)
   END SUBROUTINE  KILL_S_APERTURE
 
-  SUBROUTINE  ALLOC_S_APERTURE(A,N)
+  SUBROUTINE  ALLOC_S_APERTURE(A,N,APERTURE)
     implicit none
     TYPE(S_APERTURE), POINTER :: A(:)
+    TYPE(MADX_APERTURE), OPTIONAL :: APERTURE
     INTEGER I,N
     ALLOCATE(A(N))
     DO I=1,SIZE(A)
        CALL ALLOC(A(I)%APERTURE)
+       IF(PRESENT(APERTURE))A(I)%APERTURE=APERTURE
     ENDDO
   END SUBROUTINE  ALLOC_S_APERTURE
 
@@ -546,6 +547,7 @@ CONTAINS
           !   STOP 223
        END SELECT
     ENDIF
+
 
   END SUBROUTINE  CHECK_APERTURE_R
 
@@ -728,7 +730,7 @@ CONTAINS
     ONLY_4D=ONLY_4d0
     DELTA=DELTA0
     SPIN=SPIN0
-    SPIN_ONLY=SPIN_ONLY0
+    MODULATION=MODULATION0
   end subroutine clear_states  !%nxyz
 
   subroutine print_s(S,MF)
@@ -769,7 +771,7 @@ CONTAINS
     write(mf,'((1X,a20,1x,a5))' ) "      ONLY_4D     = ", CONV(S%ONLY_4D   )
     write(mf,'((1X,a20,1x,a5))' ) "      DELTA       = ", CONV(S%DELTA    )
     write(mf,'((1X,a20,1x,a5))' ) "      SPIN        = ", CONV(S%SPIN    )
-    write(mf,'((1X,a20,1x,a5))' ) "      SPIN_ONLY   = ", CONV(S%SPIN_ONLY    )
+    write(mf,'((1X,a20,1x,a5))' ) "      MODULATION   = ", CONV(S%MODULATION    )
     write(mf,'((1X,a20,1x,I4))' ) " SPIN DIMENSION   = ", S%SPIN_DIM
     !   CALL WRITE_I
   end subroutine print_s
@@ -824,7 +826,7 @@ CONTAINS
 
     SPIN= SPIN+DEFAULT
 
-    SPIN_ONLY= SPIN_ONLY+DEFAULT
+    MODULATION= MODULATION+DEFAULT
 
   END  SUBROUTINE update_STATES
 
@@ -845,7 +847,7 @@ CONTAINS
     S2%ONLY_4D=      S1%ONLY_4D
     S2%DELTA=       S1%DELTA
     S2%SPIN=       S1%SPIN
-    S2%SPIN_ONLY=       S1%SPIN_ONLY
+    S2%MODULATION=       S1%MODULATION
     S2%spin_dim=       S1%spin_dim
   END SUBROUTINE EQUALt
 
@@ -870,7 +872,7 @@ CONTAINS
     add%ONLY_4D  =       S1%ONLY_4D.OR.S2%ONLY_4D
     add%DELTA  =       S1%DELTA.OR.S2%DELTA
     add%SPIN  =       S1%SPIN.OR.S2%SPIN
-    add%SPIN_ONLY  =       S1%SPIN_ONLY.OR.S2%SPIN_ONLY
+    add%MODULATION  =       S1%MODULATION.OR.S2%MODULATION
     add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN.or.ALWAYS_knobs
     add%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(add%stochastic) THEN
@@ -910,7 +912,7 @@ CONTAINS
     sub%ONLY_4D  =       S1%ONLY_4D.min.S2%ONLY_4D
     sub%DELTA  =       S1%DELTA.min.S2%DELTA
     sub%SPIN  =       S1%SPIN.min.S2%SPIN
-    sub%SPIN_ONLY  = S1%SPIN_ONLY.min.S2%SPIN_ONLY
+    sub%MODULATION  = S1%MODULATION.min.S2%MODULATION
     sub%PARA_IN  =       (S1%PARA_IN.MIN.S2%PARA_IN).or.ALWAYS_knobs
     sub%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(sub%stochastic) THEN
@@ -951,7 +953,7 @@ CONTAINS
     INTEGER,optional :: ND2,NPARA
     INTEGER  ND2l,NPARAl
     LOGICAL(lp) package
-
+    doing_ac_modulation_in_ptc=.false.
     package=my_true
     if(present(pack))     package=my_true
 
@@ -972,7 +974,7 @@ CONTAINS
        ELSE
           ND1=3
           NDEL=0
-          NDPT1=5+C_%NDPT_OTHER
+          NDPT1=5  !+C_%NDPT_OTHER
           !         MAPINT=6
        ENDIF
     ELSE              ! CAVITY IN RING
@@ -981,6 +983,13 @@ CONTAINS
        !       MAPINT=6
     ENDIF
 
+    IF(STATE%modulation)  then
+       doing_ac_modulation_in_ptc=.true.
+       ND1=ND1+1
+    endif
+
+    !    write(6,*) NO1,ND1,NP1,NDEL,NDPT1
+    !pause 678
     CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
 
     ND2l=ND1*2

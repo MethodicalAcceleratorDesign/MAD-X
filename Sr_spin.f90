@@ -10,7 +10,7 @@ module ptc_spin
   public
   PRIVATE get_fieldR !,get_field
   PRIVATE get_BfieldR,get_BfieldP,get_Bfield,get_fieldp
-  private GETMULB_TEAPOTR,GETMULB_TEAPOTP,get_Bfieldt
+  private GETMULB_TEAPOTR,GETMULB_TEAPOTP,GETMULB_TEAPOT
   private B_PANCAkEr,B_PANCAkEp,B_PANCAkE
   PRIVATE DIRECTION_VR,DIRECTION_VP,DIRECTION_V
   PRIVATE  B_PARA_PERP_r,B_PARA_PERP_p,B_PARA_PERP
@@ -26,7 +26,7 @@ module ptc_spin
   private DTILTR_SPIN,DTILTP_SPIN,DTILT_SPIN
   PRIVATE TRACK_SPIN_FRONTR,TRACK_SPIN_FRONTP,TRACK_SPIN_FRONT
   PRIVATE TRACK_SPIN_BACKR,TRACK_SPIN_BACKP,TRACK_SPIN_BACK
-  private PUSH_SPIN_RAY8
+  !  private PUSH_SPIN_RAY8
   private radiate_2p,radiate_2r,radiate_2
   private TRACK_NODE_FLAG_probe_R,TRACK_NODE_FLAG_probe_p,TRACK_NODE_LAYOUT_FLAG_spinr_x
   private FIND_ORBIT_LAYOUT_noda,TRACK_NODE_LAYOUT_FLAG_spinp_x
@@ -36,11 +36,15 @@ module ptc_spin
   private PUSH_SPIN_fake_fringer,PUSH_SPIN_fake_fringep,PUSH_SPIN_fake_fringe
   PRIVATE TRACK_NODE_LAYOUT_FLAG_pr_t12_R,TRACK_NODE_LAYOUT_FLAG_pr_t12_P
   private TRACK_LAYOUT_FLAG_spint12r_x,TRACK_LAYOUT_FLAG_spint12p_x,alloc_temporal_beam
-  private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin
+  private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin,GET_BZ_fringe,GET_BZ_fringer,GET_BZ_fringep
   private TRACK_rotate_spin_r,TRACK_rotate_spin_p,TRACK_rotate_spin
   private TRACK_FRINGE_multipole_r,TRACK_FRINGE_multipole_p,TRACK_FRINGE_multipole
+  PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
+  private TRACK_wedge_spin_R,TRACK_wedge_spin_p,TRACK_wedge_spin
+  PRIVATE MODULATE_R,MODULATE_P
   !REAL(DP) :: AG=A_ELECTRON
   REAL(DP) :: bran_init=pi
+  LOGICAL(lp) :: ALLOW_MODULATION=.true.
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
 
   INTERFACE alloc
@@ -150,6 +154,12 @@ module ptc_spin
      MODULE PROCEDURE TRACK_rotate_spin_p
   END INTERFACE
 
+  INTERFACE TRACK_wedge_spin
+     MODULE PROCEDURE TRACK_wedge_spin_R
+     MODULE PROCEDURE TRACK_wedge_spin_p
+  END INTERFACE
+
+
   INTERFACE rot_spin_x
      MODULE PROCEDURE rot_spin_xr
      MODULE PROCEDURE rot_spin_xp
@@ -180,7 +190,7 @@ module ptc_spin
   INTERFACE PUSH_SPIN
      MODULE PROCEDURE PUSH_SPINR
      MODULE PROCEDURE PUSH_SPINP
-     MODULE PROCEDURE PUSH_SPIN_RAY8
+     !     MODULE PROCEDURE PUSH_SPIN_RAY8
   END INTERFACE
 
   INTERFACE get_omega_spin
@@ -203,6 +213,11 @@ module ptc_spin
      MODULE PROCEDURE get_fieldp
   END INTERFACE
 
+  INTERFACE GET_BZ_fringe
+     MODULE PROCEDURE GET_BZ_fringer   ! get fringe for multipoles
+     MODULE PROCEDURE GET_BZ_fringep
+  END INTERFACE
+
   INTERFACE get_Bfield
      MODULE PROCEDURE get_BfieldR   ! MID DEFINED AS 1/2 L
      MODULE PROCEDURE get_BfieldP   ! MID DEFINED AS 1/2 L
@@ -219,7 +234,7 @@ module ptc_spin
   END INTERFACE
 
 
-  INTERFACE get_Bfieldt
+  INTERFACE GETMULB_TEAPOT
      MODULE PROCEDURE GETMULB_TEAPOTR   ! MID DEFINED AS 1/2 L
      MODULE PROCEDURE GETMULB_TEAPOTP
   END INTERFACE
@@ -227,6 +242,16 @@ module ptc_spin
   INTERFACE B_PANCAkE
      MODULE PROCEDURE B_PANCAkEr   ! MID DEFINED AS 1/2 L
      MODULE PROCEDURE B_PANCAkEp
+  END INTERFACE
+
+  INTERFACE TRACK_MODULATION
+     MODULE PROCEDURE TRACK_MODULATION_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
+     MODULE PROCEDURE TRACK_MODULATION_P   !
+  END INTERFACE
+
+  INTERFACE MODULATE
+     MODULE PROCEDURE MODULATE_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
+     MODULE PROCEDURE MODULATE_P   !
   END INTERFACE
 
 contains
@@ -356,21 +381,21 @@ contains
 
   END subroutine rot_spin_zp
 
-  subroutine PUSH_SPIN_RAY8(c,DS,FAC,S,before,k,POS)
-    implicit none
-    TYPE(integration_node), POINTER::c
-    TYPE(ELEMENTP), POINTER::EL
-    INTEGER,OPTIONAL,INTENT(IN) ::POS
-    TYPE(REAL_8), INTENT(INout) :: DS
-    REAL(DP), INTENT(IN) :: FAC
-    type(probe_8),INTENT(INOUT) ::S
-    LOGICAL(LP),intent(in) :: before
-    type(internal_state) k
-    el=>c%parent_fibre%magp
-    if(EL%kind<=kind1) return
-    call PUSH_SPIN(c,DS,FAC,S,S%E_IJ,before,k,POS)
+  !  subroutine PUSH_SPIN_RAY8(c,DS,FAC,S,before,k,POS)
+  !    implicit none
+  !    TYPE(integration_node), POINTER::c
+  !    TYPE(ELEMENTP), POINTER::EL
+  !    INTEGER,OPTIONAL,INTENT(IN) ::POS
+  !    TYPE(REAL_8), INTENT(INout) :: DS
+  !    REAL(DP), INTENT(IN) :: FAC
+  !    type(probe_8),INTENT(INOUT) ::S
+  !    LOGICAL(LP),intent(in) :: before
+  !    type(internal_state) k
+  !    el=>c%parent_fibre%magp
+  !    if(EL%kind<=kind1) return
+  !    call PUSH_SPIN(c,DS,FAC,S,S%E_IJ,before,k,POS)
 
-  end subroutine PUSH_SPIN_RAY8
+  !  end subroutine PUSH_SPIN_RAY8
 
   !  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
   subroutine radiate_2r(c,DS,FAC,X,b2,dlds,before,k,POS)
@@ -823,14 +848,14 @@ contains
   END subroutine PUSH_SPIN_fake_fringep
 
 
-  subroutine PUSH_SPINP(c,DS,FAC,P,E_IJ,before,k,POS)
+  subroutine PUSH_SPINP(c,DS,FAC,P,before,k,POS) !,E_IJ
     implicit none
     TYPE(integration_node), POINTER::c
     TYPE(ELEMENTP), POINTER::EL
     INTEGER,OPTIONAL,INTENT(IN) ::POS
     TYPE(PROBE_8),INTENT(INOUT) ::P
     !    TYPE(REAL_8),INTENT(INOUT) :: X(6),S(3)
-    real(dp),INTENT(INOUT) :: E_IJ(6,6)
+    !    real(dp),INTENT(INOUT) :: E_IJ(6,6)
     TYPE(REAL_8), INTENT(INout) :: DS
     REAL(DP), INTENT(IN) :: FAC
     TYPE(REAL_8) OM(3),CO(3),SI(3),B2,XP(2)
@@ -853,7 +878,8 @@ contains
     CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
     if(k%radiation.AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
-       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,P%E_IJ,b2,dlds,XP,before,k,POS)
+       !       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
 
     endif
 
@@ -902,7 +928,8 @@ contains
     endif
     if(k%radiation.AND.(.NOT.BEFORE)) then
        !if(el%p%radiation.AND.(.NOT.BEFORE)) then
-       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
+       call radiate_2(c,DS,FAC,P%X,P%E_IJ,b2,dlds,XP,before,k,POS)
+       !       call radiate_2(c,DS,FAC,P%X,E_IJ,b2,dlds,XP,before,k,POS)
     endif
 
     CALL KILL(OM,3)
@@ -1209,7 +1236,7 @@ contains
     case(KIND2,kind5:kind7,KIND16:kind17,KIND20) ! Straight for all practical purposes
        if(present(pos)) then
           IF(POS<0) THEN
-             call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+             call get_Bfield_fringe(EL,B,X,pos,k)   ! fringe effect
           ELSE
              call get_Bfield(EL,B,X)   ! fringe effect
           ENDIF
@@ -1217,7 +1244,15 @@ contains
           CALL get_Bfield(EL,B,X)
        endif
     case(kind10)     ! TEAPOT real curvilinear
-       CALL get_Bfieldt(EL%TP10,B,X)
+       if(present(pos)) then
+          IF(POS<0) THEN
+             call get_Bfield_fringe(EL,B,X,pos,k)   ! fringe effect
+          ELSE
+             CALL GETMULB_TEAPOT(EL%TP10,B,X)
+          ENDIF
+       else
+          CALL GETMULB_TEAPOT(EL%TP10,B,X)
+       endif
     case(KINDPA)     ! fitted field for real magnet
        CALL B_PANCAkE(EL%PA,B,X,POS)
     case(KINDWIGGLER)
@@ -1270,7 +1305,7 @@ contains
     case(KIND2,kind5:kind7,KIND16:kind17,KIND20) ! Straight for all practical purposes
        if(present(pos)) then
           IF(POS<0) THEN
-             call get_Bfield_fringe(EL,B,X,pos)   ! fringe effect
+             call get_Bfield_fringe(EL,B,X,pos,k)   ! fringe effect
           ELSE
              call get_Bfield(EL,B,X)   ! fringe effect
           ENDIF
@@ -1278,8 +1313,15 @@ contains
           CALL get_Bfield(EL,B,X)
        endif
     case(kind10)     ! TEAPOT real curvilinear
-       CALL get_Bfieldt(EL%TP10,B,X)
-       !     WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
+       if(present(pos)) then
+          IF(POS<0) THEN
+             call get_Bfield_fringe(EL,B,X,pos,k)   ! fringe effect
+          ELSE
+             CALL GETMULB_TEAPOT(EL%TP10,B,X)
+          ENDIF
+       else
+          CALL GETMULB_TEAPOT(EL%TP10,B,X)
+       endif
     case(KINDPA)     ! fitted field for real magnet
        CALL B_PANCAkE(EL%PA,B,X,POS)
     case(KINDWIGGLER)
@@ -1308,11 +1350,12 @@ contains
 
   end subroutine get_fieldp
 
-  SUBROUTINE get_Bfield_fringe_R(EL,B,X,pos)
+  SUBROUTINE get_Bfield_fringe_R(EL,B,X,pos,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6),B(3)
     TYPE(ELEMENT),INTENT(IN):: EL
     INTEGER pos
+    TYPE(INTERNAL_STATE) K
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
@@ -1325,15 +1368,29 @@ contains
        b(3)=zero
     ENDIF
 
+    select case(el%kind)
+    case(kind2,kind6,kind7,kind10) ! Not exact and Teapot (kind10)
+       b(2)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       if(.not.EL%p%exact) then
+          b(1)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+       endif
+    case(kind20)  !! likemad=true
+       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+    case(kind16)  ! likemad=false
+    end select
+
+    call GET_BZ_fringe(EL,X,B(3),pos,k)
+
   END SUBROUTINE get_Bfield_fringe_R
 
 
-  SUBROUTINE get_Bfield_fringe_p(EL,B,X,pos)
+  SUBROUTINE get_Bfield_fringe_p(EL,B,X,pos,k)
     IMPLICIT NONE
     type(REAL_8),INTENT(INOUT):: X(6),B(3)
     TYPE(ELEMENTP),INTENT(IN):: EL
     INTEGER pos
-
+    TYPE(INTERNAL_STATE) K
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
        B(1)= (2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
@@ -1345,7 +1402,132 @@ contains
        b(3)=zero
     ENDIF
 
+    select case(el%kind)
+    case(kind2,kind6,kind7,kind10) ! Not exact and Teapot (kind10)
+       b(2)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       if(.not.EL%p%exact) then
+          b(1)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+       endif
+    case(kind20)  !! likemad=true
+       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+    case(kind16)  ! likemad=false
+    end select
+
+    call GET_BZ_fringe(EL,X,B(3),pos,k)
+
   END SUBROUTINE get_Bfield_fringe_p
+
+  SUBROUTINE GET_BZ_fringeR(EL,X,bz,pos,k)
+    IMPLICIT NONE
+    TYPE(ELEMENT),INTENT(IN):: EL
+    integer, intent(in) :: pos
+    real(dp),INTENT(INOUT):: X(6),Bz
+    real(dp) X1,X3,BBYTW,BBXTW,BBYTWT
+    INTEGER J,jmax
+    real(dp), allocatable :: an(:),bn(:)
+    TYPE(INTERNAL_STATE) K
+
+    bz=zero
+    IF(EL%P%BEND_FRINGE) then
+       bz=-(2*Pos+3)*X(3)*EL%BN(1)
+    endif
+
+
+    IF(.not.(k%FRINGE.or.el%p%permfringe)) return
+
+    X1=X(1)
+    X3=X(3)
+    jmax=MIN(EL%p%NMUL,HIGHEST_FRINGE)+1
+
+    allocate(an(jmax),bn(jmax))
+    an(1)=zero
+    bn(1)=zero
+    do j=2,jmax
+       IF(J==2.AND.EL%P%BEND_FRINGE) then
+          an(j)=zero
+          bn(j)= EL%AN(j-1)/(j-1)
+       else
+          an(j)=-EL%BN(j-1)/(j-1)
+          bn(j)= EL%AN(j-1)/(j-1)
+       endif
+    enddo
+
+    BBYTW=BN(jmax)
+    BBXTW=AN(jmax)
+
+
+    DO  J=jmax-1,1,-1
+       BBYTWT=X1*BBYTW-X3*BBXTW+BN(J)
+       BBXTW=X3*BBYTW+X1*BBXTW+AN(J)
+       BBYTW=BBYTWT
+    ENDDO
+
+    BZ=-(2*Pos+3)*BBYTW+bz
+    deallocate(an,bn)
+  END SUBROUTINE GET_BZ_fringeR
+
+  SUBROUTINE GET_BZ_fringep(EL,X,bz,pos,k)
+    IMPLICIT NONE
+    TYPE(ELEMENTP),INTENT(IN):: EL
+    integer, intent(in) :: pos
+    type(real_8),INTENT(INOUT):: X(6),Bz
+    type(real_8) X1,X3,BBYTW,BBXTW,BBYTWT
+    INTEGER J,jmax
+    type(real_8), allocatable :: an(:),bn(:)
+    TYPE(INTERNAL_STATE) K
+
+    bz=zero
+    IF(EL%P%BEND_FRINGE) then
+       bz=-(2*Pos+3)*X(3)*EL%BN(1)
+    endif
+
+
+    IF(.not.(k%FRINGE.or.el%p%permfringe)) return
+    call alloc(X1,X3,BBYTW,BBXTW,BBYTWT)
+
+    X1=X(1)
+    X3=X(3)
+    jmax=MIN(EL%p%NMUL,HIGHEST_FRINGE)+1
+
+    allocate(an(jmax),bn(jmax))
+    do j=1,jmax
+       call alloc(an(j))
+       call alloc(bn(j))
+    enddo
+    an(1)=zero
+    bn(1)=zero
+    do j=2,jmax
+       IF(J==2.AND.EL%P%BEND_FRINGE) then
+          an(j)=zero
+          bn(j)= EL%AN(j-1)/(j-1)
+       else
+          an(j)=-EL%BN(j-1)/(j-1)
+          bn(j)= EL%AN(j-1)/(j-1)
+       endif
+    enddo
+
+    BBYTW=BN(jmax)
+    BBXTW=AN(jmax)
+
+
+    DO  J=jmax-1,1,-1
+       BBYTWT=X1*BBYTW-X3*BBXTW+BN(J)
+       BBXTW=X3*BBYTW+X1*BBXTW+AN(J)
+       BBYTW=BBYTWT
+    ENDDO
+
+    BZ=-(2*Pos+3)*BBYTW+bz
+    do j=1,jmax
+       call kill(an(j))
+       call kill(bn(j))
+    enddo
+    deallocate(an,bn)
+    call kill(X1,X3,BBYTW,BBXTW,BBYTWT)
+
+  END SUBROUTINE GET_BZ_fringep
+
+
 
   SUBROUTINE get_BfieldR(EL,B,X)
     IMPLICIT NONE
@@ -2668,6 +2850,99 @@ contains
 
   !  FUNDAMENTAL TRACKING ROUTINES
 
+  SUBROUTINE TRACK_MODULATION_R(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    real(dp) xt
+    real(dp),pointer :: beta0
+
+    if(k%time) then
+       beta0=>C%PARENT_FIBRE%beta0
+       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    else
+       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    endif
+
+  END   SUBROUTINE TRACK_MODULATION_R
+
+  SUBROUTINE TRACK_MODULATION_P(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe_8), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(REAL_8) xt
+    real(dp),pointer :: beta0
+
+    CALL ALLOC(XT)
+
+    if(k%time) then
+       beta0=>C%PARENT_FIBRE%beta0
+       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    else
+       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    endif
+
+    CALL KILL(XT)
+
+  END   SUBROUTINE TRACK_MODULATION_P
+
+  SUBROUTINE MODULATE_R(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(ELEMENT),POINTER :: EL
+    TYPE(ELEMENTP),POINTER :: ELp
+    REAL(DP) v
+
+
+    EL=>C%PARENT_FIBRE%MAG
+    ELP=>C%PARENT_FIBRE%MAGP
+
+    IF(K%MODULATION) THEN
+       V=EL%DC_ac+EL%A_ac*(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+    else
+       V=EL%DC_ac
+    endif
+    call transfer_ANBN(EL,ELP,1,VR=V)
+
+  END   SUBROUTINE MODULATE_R
+
+  SUBROUTINE MODULATE_P(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe_8), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(ELEMENT),POINTER :: EL
+    TYPE(ELEMENTP),POINTER :: ELP
+    TYPE(REAL_8) V
+
+    EL=>C%PARENT_FIBRE%MAG
+    ELP=>C%PARENT_FIBRE%MAGP
+
+    CALL ALLOC(V)
+
+    IF(K%MODULATION) THEN
+       V=ELP%DC_ac+ELP%A_ac*(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
+    else
+       V=EL%DC_ac
+    endif
+
+    call transfer_ANBN(EL,ELP,2,VP=V)
+    CALL KILL(V)
+
+
+  END   SUBROUTINE MODULATE_P
 
 
 
@@ -2690,6 +2965,12 @@ contains
     !      ag=xs%s%g
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
+
+    if(ALLOW_MODULATION.AND.c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K)
+    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       CALL TRACK_MODULATION(C,XS,K)
+    ENDIF
+
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
@@ -2708,6 +2989,10 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
     endif
+    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,1)
+    ENDIF
+
     xs%u=.not.check_stable
     if(xs%u) xs%lost_node=>c
 
@@ -2729,6 +3014,12 @@ contains
     C%PARENT_FIBRE%MAGP%P%ag => C%PARENT_FIBRE%ag
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
+
+    if(ALLOW_MODULATION.AND.c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K)
+    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       CALL TRACK_MODULATION(C,XS,K)
+    ENDIF
+
 
     CALL ALLOC(DS)
 
@@ -2755,6 +3046,9 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     endif
 
+    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,2)
+    ENDIF
 
     call kill(ds)
     xs%u=.not.check_stable
@@ -2770,19 +3064,24 @@ contains
     type(probe), INTENT(INOUT):: p
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE), POINTER :: C
-    TYPE(ELEMENT), POINTER :: EL
+    !    TYPE(ELEMENT), POINTER :: EL
     integer pos
-    el=>C%PARENT_FIBRE%MAG
+    if(.not.(k%SPIN)) return
+
+    !    el=>C%PARENT_FIBRE%MAG
 
     if(C%PARENT_FIBRE%dir==1) then
        IF(C%CAS==CASE1) THEN
           call TRACK_rotate_spin(C,p,K)
           call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_wedge_spin(C,p,K)
        else
+          call TRACK_wedge_spin(C,p,K)
           call TRACK_FRINGE_multipole(C,p,K)
           call TRACK_rotate_spin(C,p,K)
        endif
     else
+       write(6,*) " TRACK_FRINGE_spin_R "
        stop 888
     endif
   end SUBROUTINE TRACK_FRINGE_spin_R
@@ -2793,26 +3092,114 @@ contains
     !    TYPE(REAL_8), INTENT(INOUT):: X(6),S(3)
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE), POINTER :: C
-    TYPE(ELEMENTP), POINTER :: EL
+    !    TYPE(ELEMENTP), POINTER :: EL
     integer pos
-    el=>C%PARENT_FIBRE%MAGp
+    if(.not.(k%SPIN)) return
+    !    el=>C%PARENT_FIBRE%MAGp
 
 
     if(C%PARENT_FIBRE%dir==1) then
        IF(C%CAS==CASE1) THEN
           call TRACK_rotate_spin(C,p,K)
           call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_wedge_spin(C,p,K)
        else
+          call TRACK_wedge_spin(C,p,K)
           call TRACK_FRINGE_multipole(C,p,K)
           call TRACK_rotate_spin(C,p,K)
        endif
     else
+       write(6,*) " TRACK_FRINGE_spin_p "
        stop 888
     endif
 
   end SUBROUTINE TRACK_FRINGE_spin_p
 
-  SUBROUTINE TRACK_rotate_spin_R(C,p,K)
+  SUBROUTINE TRACK_wedge_spin_R(C,p,K)
+    IMPLICIT NONE
+    !  this is a fake wedge.....
+    type(probe), INTENT(INOUT):: p
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENT), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAG
+
+    SELECT CASE(EL%KIND)
+    case(KIND10)
+
+       IF(C%CAS==CASE1) THEN
+          CALL rot_spin_y(p,-C%PARENT_FIBRE%MAG%P%EDGE(1))
+       ELSE
+          CALL rot_spin_y(p,-C%PARENT_FIBRE%MAG%P%EDGE(2))
+       ENDIF
+
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+       !       ENDIF
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+       !       ENDIF
+       !    case(KIND20)
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       !       ENDIF
+
+    END SELECT
+
+
+  END SUBROUTINE TRACK_wedge_spin_R
+
+
+  SUBROUTINE TRACK_wedge_spin_p(C,p,K)
+    IMPLICIT NONE
+    !  this is a fake wedge.....
+    type(probe_8), INTENT(INOUT):: p
+    TYPE(INTERNAL_STATE) K
+    TYPE (INTEGRATION_NODE), POINTER :: C
+    TYPE(ELEMENTP), POINTER :: EL
+    integer pos
+    el=>C%PARENT_FIBRE%MAGp
+
+    SELECT CASE(EL%KIND)
+    case(KIND10)
+
+       IF(C%CAS==CASE1) THEN
+          CALL rot_spin_y(p,-C%PARENT_FIBRE%MAGp%P%EDGE(1))
+       ELSE
+          CALL rot_spin_y(p,-C%PARENT_FIBRE%MAGp%P%EDGE(2))
+       ENDIF
+
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+       !       ENDIF
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+       !       ENDIF
+       !    case(KIND20)
+       !       IF(C%CAS==CASE1) THEN
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       !       ELSE
+       !          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+       !       ENDIF
+
+    END SELECT
+
+
+  END SUBROUTINE TRACK_wedge_spin_p
+
+
+  SUBROUTINE TRACK_rotate_spin_r(C,p,K)
     IMPLICIT NONE
     !    real(dp), INTENT(INOUT):: X(6),S(3)
     type(probe), INTENT(INOUT):: p
@@ -2823,7 +3210,7 @@ contains
     el=>C%PARENT_FIBRE%MAG
 
     SELECT CASE(EL%KIND)
-    case(KIND16)
+    case(KIND16,KIND10)
        IF(C%CAS==CASE1) THEN
           CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
@@ -2852,7 +3239,7 @@ contains
     el=>C%PARENT_FIBRE%MAGP
 
     SELECT CASE(EL%KIND)
-    case(KIND16)
+    case(KIND16,KIND10)
        IF(C%CAS==CASE1) THEN
           CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
@@ -2881,25 +3268,27 @@ contains
     TYPE(ELEMENT), POINTER :: EL
     integer pos
     el=>C%PARENT_FIBRE%MAG
+    !    IF(.not.(k%FRINGE.or.el%p%permfringe)) return
+
     SELECT CASE(EL%KIND)
     CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
-    case(KIND2)
+       !    case(KIND2)
     case(KIND4)
-    case(KIND5,KIND17)
+    case(KIND2,kind5:kind7,KIND16:kind17,KIND20,KIND10) ! Straight for all practical purposes
        IF(C%CAS==CASE1) THEN
           pos=-2
           !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
-          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          if(.not.el%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
           !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
-          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          if(.not.el%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        endif
-    case(KIND6)
-    case(KIND7)
-    case(KIND10)
-    case(KIND16)
-    case(KIND20)
+       !    case(KIND6)
+       !    case(KIND7)
+       !    case(KIND10)
+       !    case(KIND16)
+       !    case(KIND20)
     case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
@@ -2921,25 +3310,27 @@ contains
     integer pos
 
     el=>C%PARENT_FIBRE%MAGP
+    !    IF(.not.(k%FRINGE.or.el%p%permfringe)) return
+
     SELECT CASE(EL%KIND)
     CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
-    case(KIND2)
+       !    case(KIND2)
     case(KIND4)
-    case(KIND5,KIND17)
+    case(KIND2,kind5:kind7,KIND16:kind17,KIND20,KIND10) ! Straight for all practical purposes
        IF(C%CAS==CASE1) THEN
           pos=-2
           !          call PUSH_SPIN_fake_fringe(c,p,my_true,k,pos)
-          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          if(.not.el%P%KILL_ENT_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        elseif(C%CAS==CASE2) then
           pos=-1
           !          call PUSH_SPIN_fake_fringe(c,p,my_false,k,pos)
-          if(.not.C%PARENT_FIBRE%MAGP%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
+          if(.not.el%P%KILL_exi_FRINGE) call PUSH_SPIN_fake_fringe(c,p,k,pos)
        endif
-    case(KIND6)
-    case(KIND7)
-    case(KIND10)
-    case(KIND16)
-    case(KIND20)
+       !    case(KIND6)
+       !    case(KIND7)
+       !    case(KIND10)
+       !    case(KIND16)
+       !    case(KIND20)
     case(KIND21,kind22)
     case(KINDWIGGLER)
     case(KINDPA)
@@ -3327,7 +3718,8 @@ contains
 
   END SUBROUTINE DTILTP_SPIN
 
-  SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin(RING,FIX,STATE,eps,TURNS,fibre1,node1,theta0) ! Finds orbit without TPSA in State or compatible state
+  SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin(RING,FIX,STATE,eps,TURNS,fibre1,node1,theta0)
+    ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: RING
     type(probe) , intent(inOUT) :: FIX
@@ -3347,7 +3739,7 @@ contains
     stat=state
     call find_orbit_x(RING,x0,STATE,eps,TURNS,fibre1,node1)
 
-    stat=state+spin0+spin_only0
+    stat=state+spin0 !+spin_only0
 
     FIX=x0
 
@@ -3467,12 +3859,9 @@ contains
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1)=" No Cavity in the Line "
-          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          call write_e(112)
+          write(6,*) " No Cavity in the Line "
+          write(6,*) " FIND_ORBIT_LAYOUT will crash "
+          stop 456
        ENDIF
     endif
 101 continue
@@ -4178,4 +4567,97 @@ contains
     enddo
     !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
   end SUBROUTINE TRACK_beam
+
+!!! extract moments using initial moment and the probe_8 containing fluctuations and map
+  subroutine extract_moments(p8,s_ij_in,s_ij_out)
+    implicit none
+    real(dp), intent(in) :: s_ij_in(6,6)
+    real(dp), intent(out) :: s_ij_out(6,6)
+    type(probe_8), intent(inout) ::p8
+    type(damap) m
+    real(dp) mat(6,6)
+
+    call alloc(m)
+
+    m=p8%x
+    mat=m
+
+    s_ij_out=zero
+    s_ij_out=s_ij_in + p8%e_ij
+    s_ij_out=matmul(mat,s_ij_out)
+    mat=transpose(mat)
+    s_ij_out=matmul(s_ij_out,mat)
+
+
+    call kill(m)
+  end subroutine extract_moments
+
+!!! extract moments using initial moment and the probe_8 containing fluctuations and map
+  subroutine normalize_moments(s_ij_in,crash,a)
+    implicit none
+    integer ipause, mypause
+    real(dp), intent(in) :: s_ij_in(:,:)
+    real(dp), intent(out) :: a(:,:)
+    type(damap) id
+    integer i,j,i1,i2
+    type(pbfield) h
+    type(normalform) n
+    real(dp) norm,crash,sca,e1
+
+    call alloc(h)
+    call alloc(id)
+    call alloc(n)
+    do i=1,c_%nd
+       do j=1,c_%nd
+          i1=2*i-1
+          i2=2*j-1
+          h%h=h%h+ s_ij_in(i1,i2)*(one.mono.(i1+1))*(one.mono.(i2+1))
+          i1=2*i
+          i2=2*j
+          h%h=h%h+ s_ij_in(i1,i2)*(one.mono.(i1-1))*(one.mono.(i2-1))
+          i1=2*i-1
+          i2=2*j
+          h%h=h%h-s_ij_in(i1,i2)*(one.mono.(i1+1))*(one.mono.(i2-1))
+          i1=2*i
+          i2=2*j-1
+          h%h=h%h- s_ij_in(i1,i2)*(one.mono.(i1-1))*(one.mono.(i2+1))
+       enddo
+    enddo
+    call print(h%h,6)
+    ipause=mypause(0)
+    norm=full_abs(h%h)
+    write(6,*) " norm ",norm
+
+    sca=one/ten
+
+    h%h=sca/norm*h%h
+
+    i=2
+    h%h=crash*( (one.mono.(2*i-1))**2+(one.mono.(2*i))**2 ) + h%h
+
+    id=1
+
+    id=texp(h,id).sub.1
+
+    !  n%auto=.false.
+    n=id
+    n%a_t=n%a_t.sub.1
+
+
+
+    a=n%a_t
+
+    id=n%a_t**(-1)*id*n%a_t
+
+    e1=asin((id%v(1).sub.'01')/(id%v(1).sub.'1'))
+    write(6,*) e1*norm/sca/2
+    e1=asin((id%v(5).sub.'000001')/(id%v(5).sub.'00001'))
+    write(6,*) e1*norm/sca/2
+
+    call kill(n)
+    call kill(id)
+    call kill(h)
+  end subroutine normalize_moments
+
+
 end module ptc_spin

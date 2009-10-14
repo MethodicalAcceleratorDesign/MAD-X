@@ -479,15 +479,16 @@ CONTAINS
   END SUBROUTINE WORK_FIBRE
   !  S-aperture
 
-  SUBROUTINE  alloc_s_aperture(S1)  ! copy full fibre
+  SUBROUTINE  alloc_s_aperture(S1,APERTURE)  ! copy full fibre
     IMPLICIT NONE
+    TYPE(MADX_APERTURE), OPTIONAL :: APERTURE
     TYPE (FIBRE),target,INTENT(INout):: S1
 
     if(associated(S1%mag%p%a)) call kill(S1%mag%p%a)
     if(associated(S1%magp%p%a)) call kill(S1%magp%p%a)
 
-    call alloc(S1%mag%p%a,S1%mag%p%nst+1)
-    call alloc(S1%magp%p%a,S1%magp%p%nst+1)
+    call alloc(S1%mag%p%a,S1%mag%p%nst+1,APERTURE)
+    call alloc(S1%magp%p%a,S1%magp%p%nst+1,APERTURE)
 
   END SUBROUTINE alloc_s_aperture
 

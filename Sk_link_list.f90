@@ -360,7 +360,6 @@ CONTAINS
 
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
-
     foundit=.false.
     S1NAME=name
     CALL CONTEXT(S1name)
@@ -385,6 +384,7 @@ CONTAINS
        l%last=>current
     else
        pos=0
+       WRITE(6,*) " Fibre not found in move_to_name_old "
     endif
   END SUBROUTINE move_to_name_old
 
@@ -465,6 +465,8 @@ CONTAINS
        l%last=>current
     else
        pos=0
+       WRITE(6,*) " Did not find in move_to_name_FIRSTNAME"
+       WRITE(6,*) s1name,s2name
     endif
   END SUBROUTINE move_to_name_FIRSTNAME
 
@@ -1747,7 +1749,7 @@ CONTAINS
     m_u%lastpos=1
   end SUBROUTINE TIE_MAD_UNIVERSE
 
-  SUBROUTINE move_to_name( m_u,current,name,pos)
+  SUBROUTINE move_to_name( m_u,current,name,pos,next)
     ! moves to next one in list called name in tied universe
     implicit none
     TYPE (fibre), POINTER :: Current
@@ -1756,6 +1758,8 @@ CONTAINS
     character(*), intent(in):: name
     CHARACTER(nlp) S1NAME
     integer i
+    logical(lp), optional :: next
+    logical(lp) ne
 
     logical(lp) foundit,b
     TYPE (fibre), POINTER :: p
@@ -1765,6 +1769,8 @@ CONTAINS
     !   locates magnet with name "name"
     ! it searches back and forth
 
+    ne=.true.
+    if(present(next)) ne=next
     foundit=.false.
     b=.false.
     S1NAME=name
@@ -1776,6 +1782,14 @@ CONTAINS
     pa=>p%n
     if(.not.associated(p)) goto 100
     do i=1,m_u%nf/2+1
+       if(i==1.and..not.ne) then
+          if(p%mag%name==s1name) then
+             foundit=.true.
+             b=.true.
+             pb=>p
+             goto 100
+          endif
+       endif
        if(pb%mag%name==s1name) then
           foundit=.true.
           b=.true.
@@ -1801,6 +1815,7 @@ CONTAINS
        m_u%last=>current
     else
        pos=0
+       write(6,*) " did not find ",S1name, "in tied universe "
     endif
   END SUBROUTINE move_to_name
 
@@ -1839,6 +1854,7 @@ CONTAINS
     CALL NULL_THIN(CURRENT)
 
     ALLOCATE(CURRENT%S(5))
+    ALLOCATE(CURRENT%ds_ac)
     ALLOCATE(CURRENT%lost)
     ALLOCATE(CURRENT%delta_rad_in)
     ALLOCATE(CURRENT%delta_rad_out)
@@ -1847,6 +1863,7 @@ CONTAINS
     CURRENT%ref=zero
     CURRENT%delta_rad_in=zero
     CURRENT%delta_rad_out=zero
+    CURRENT%ds_ac=zero
     !    ALLOCATE(CURRENT%ORBIT(6))
     ALLOCATE(CURRENT%pos_in_fibre)
     ALLOCATE(CURRENT%pos)
@@ -2003,6 +2020,7 @@ CONTAINS
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
     IF(ASSOCIATED(T%exi)) DEALLOCATE(T%exi)
     IF(ASSOCIATED(T%S)) DEALLOCATE(T%S)
+    IF(ASSOCIATED(T%DS_ac)) DEALLOCATE(T%DS_ac)
     IF(ASSOCIATED(T%lost)) DEALLOCATE(T%lost)
     !    IF(ASSOCIATED(T%ORBIT)) DEALLOCATE(T%ORBIT)
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)

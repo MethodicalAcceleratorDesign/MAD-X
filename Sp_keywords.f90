@@ -188,7 +188,7 @@ contains
           BLANK=MONITOR(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST) ;BLANK%KIND=KIND14;
        endif
     CASE("MARKER         ")
-       BLANK=MARKER(KEY%LIST%NAME)
+       BLANK=MARKER(KEY%LIST%NAME,list=KEY%LIST)
     CASE("CHANGEREF      ")
        if(sixtrack_compatible) stop 5
        BLANK=CHANGEREF(KEY%LIST%NAME,KEY%LIST%ANG,KEY%LIST%T,KEY%LIST%PATCHG)

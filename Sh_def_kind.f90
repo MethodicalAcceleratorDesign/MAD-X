@@ -10819,8 +10819,16 @@ contains
        if(ASSOCIATED(EL%RLX)) then
           deallocate(EL%RLX)
        endif
+       if(ASSOCIATED(EL%dx)) then
+          deallocate(EL%dx)
+       endif
+       if(ASSOCIATED(EL%dy)) then
+          deallocate(EL%dy)
+       endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%dx)
+       NULLIFY(EL%dy)
        NULLIFY(EL%F)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
@@ -10886,10 +10894,17 @@ contains
           ENDDO
           deallocate(EL%RLX)
        endif
+       if(ASSOCIATED(EL%dx)) then
+          deallocate(EL%dx)
+       endif
+       if(ASSOCIATED(EL%dy)) then
+          deallocate(EL%dy)
+       endif
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%F)
+       NULLIFY(EL%dx)
+       NULLIFY(EL%dy)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
        NULLIFY(EL%LX)
@@ -12847,7 +12862,8 @@ contains
        do j=1,3
           do kk=1,3
              if(present(d)) d(j,kk)=da(j,kk)
-             call kill(da(j,kk))
+             !SRM DEBUG ... mmy
+             !             call kill(da(j,kk))
           enddo
        enddo
 
@@ -12864,6 +12880,17 @@ contains
        B(2)=DA(1,3)-DA(3,1)
        B(3)=DA(2,1)-DA(1,2)
     ENDIF
+
+    !SRM DEBUG ... alloc/kill mmy
+    IF(PRESENT(B).or.present(d)) THEN
+       do j=1,3
+          do kk=1,3
+             call kill(da(j,kk))
+          enddo
+       enddo
+    ENDIF
+
+
     !int_x2_f_by_x= (x1**3*(35*k**4*Y1**4+840*k**2*Y1**2+6720)+x1**5*(42*k**4*Y1**2+504 &
     !            *k**2)+15*k**4*x1**7)/20160.0_dp
 

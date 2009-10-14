@@ -327,6 +327,7 @@ contains
     s2%normal%linear=(s2%normal%linear).sub.1
     S2%normal%pb=S2%normal%nonlinear
     S2%a%pb=S2%a%nonlinear
+
     CALL DHDJFLO(S2%NORMAL%NONLINEAR%V%i,S2%DHDJ%V%i)
     call GETTURA(s2%TUNE,S2%DAMPING)
     !    else
@@ -1293,7 +1294,7 @@ contains
     NV=ND2+NP
     newprint=.false.
     ! if(old) then
-    call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
+    call LIEINIT(NO1,NV,ND1,NDPT1)   !,0
     w_p=0
     w_p%nc=1
     w_p=(/" Berz's Package  "/)
@@ -1407,7 +1408,7 @@ contains
 
     ! if(old) then
     call RESET_APERTURE_FLAG
-    call LIEINIT(NO1,NV,ND1,NDPT1,0)   !,0
+    call LIEINIT(NO1,NV,ND1,NDPT1)   !,0
     w_p=0
     w_p%nc=1
     w_p=(/" Berz's Package  "/)
@@ -1682,6 +1683,20 @@ contains
 
     ENDIF
 
+    do i=1,nd2
+       do j=i,nd2
+          jj=0
+          jj(i)=1
+          jj(j)=1+jj(j)
+          call pek(s2%sij0,jj,s2%s_ij0(i,j))
+          if(i/=j) then
+             s2%s_ij0(i,j)=s2%s_ij0(i,j)/2.d0
+             s2%s_ij0(j,i)=s2%s_ij0(i,j)
+          endif
+       enddo
+    enddo
+
+
     call killdas(tc,2)
     call kill(bijn)
     call kill(bijnout)
@@ -1694,7 +1709,6 @@ contains
           call kill(trt(i,j))
        enddo
     enddo
-
 
 
 

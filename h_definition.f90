@@ -41,6 +41,7 @@ module definition
   integer,private,parameter::n_max=10   ! sagan stuff
   INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2  !,CASE3=3
   INTEGER,PARAMETER  :: ISPIN0R=1,ISPIN1R=3
+  logical(lp) :: doing_ac_modulation_in_ptc=.false.
 
   !
   TYPE sub_taylor
@@ -237,6 +238,7 @@ module definition
      type (damap) transpose    ! Transpose of map which acts on polynomials
      type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
      TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
+     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
      type (taylor) sij0  !  equilibrium beam sizes
      real(dp) emittance(3),tune(3),damping(3)
      logical(lp) AUTO,STOCHASTIC
@@ -275,9 +277,20 @@ module definition
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
 
+  type rf_phasor
+     real(dp) x(2)
+     real(dp) om
+  end type rf_phasor
+
+  type rf_phasor_8
+     type(real_8)  x(2)
+     type(real_8) om
+  end type rf_phasor_8
+
   type probe
      real(dp) x(6)
      type(spinor) s(ISPIN0R:ISPIN1R)
+     type(rf_phasor) AC
      logical u
      type(integration_node),pointer :: lost_node
   end type probe
@@ -285,10 +298,8 @@ module definition
   type probe_8
      type(real_8) x(6)
      type(spinor_8) s(ISPIN0R:ISPIN1R)
-     !     type(spinor_8) sy
-     !     type(spinor_8) sz
-     !  type (REAL_8) E_ij(ndim2,ndim2)
-     real(dp) E_ij(ndim2,ndim2)
+     type(rf_phasor_8) AC
+     real(dp) E_ij(6,6)
      logical u
      type(integration_node),pointer :: lost_node
   end type probe_8

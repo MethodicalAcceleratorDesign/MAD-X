@@ -634,7 +634,6 @@ MODULE TPSA
      MODULE PROCEDURE full_absT
   END INTERFACE
 
-
   !  INTERFACE daread
   !     MODULE PROCEDURE rea
   !  END INTERFACE
@@ -688,6 +687,13 @@ MODULE TPSA
 
 
 CONTAINS
+
+  subroutine fliptaylor(xy,xyf,i)
+    implicit none
+    type(taylor), intent(inout) ::  xy,xyf
+    integer i
+    call flip_i(xy%i,xyf%i,i)
+  end subroutine fliptaylor
 
 
   SUBROUTINE  change_default_tpsa(i)
