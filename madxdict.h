@@ -1928,6 +1928,7 @@ char command_def[] =
 "calib    = [r, 0], "
 "polarity = [r, 0], "
 "tilt     = [r, 0],  "
+"lrad     = [r, 0],  "
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}],  "
 "aper_tol = [r, {0, 0, 0}], "
