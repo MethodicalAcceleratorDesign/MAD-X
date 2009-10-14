@@ -81,9 +81,9 @@ module madx_ptc_twiss_module
        (/6,6/) )
 
   logical :: slice_magnets, deltap_dependency, momentumCompactionToggle
- 
+
   real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
-  real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table) 
+  real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
 
   !============================================================================================
   !  PRIVATE
@@ -98,7 +98,7 @@ contains
   subroutine equaltwiss(s1,Y)
     implicit none
     type(twiss), intent(inout)::s1
-    type(real_8), intent(in)::Y(ndd)
+    type(real_8), intent(in)::Y(6)
     integer jj,i,k, ndel, n
     real(dp) :: lat(0:6,6,3)
     real(dp) :: test, dph
@@ -132,19 +132,19 @@ contains
     enddo
 
 
-! in 4D we get following formulas for Twiss parameters. They can be derived to compute deltap dependency
-! beta[ 1 1 ]=(Y(1)%t.sub.100000)*(Y(1)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(1)%t.sub.010000)
-! alpha[ 1 1 ]=-(Y(1)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(2)%t.sub.010000)
-! gamma[ 1 1 ]=(Y(2)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(2)%t.sub.010000)*(Y(2)%t.sub.010000)
-! beta[ 2 1 ]=(Y(3)%t.sub.100000)*(Y(3)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(3)%t.sub.010000)
-! alpha[ 2 1 ]=-(Y(3)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(4)%t.sub.010000)
-! gamma[ 2 1 ]=(Y(4)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(4)%t.sub.010000)*(Y(4)%t.sub.010000)
-! beta[ 1 2 ]=(Y(1)%t.sub.001000)*(Y(1)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(1)%t.sub.000100)
-! alpha[ 1 2 ]=-(Y(1)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(2)%t.sub.000100)
-! gamma[ 1 2 ]=(Y(2)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(2)%t.sub.000100)*(Y(2)%t.sub.000100)
-! beta[ 2 2 ]=(Y(3)%t.sub.001000)*(Y(3)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(3)%t.sub.000100)
-! alpha[ 2 2 ]=-(Y(3)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(4)%t.sub.000100)
-! gamma[ 2 2 ]=(Y(4)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(4)%t.sub.000100)*(Y(4)%t.sub.000100)
+    ! in 4D we get following formulas for Twiss parameters. They can be derived to compute deltap dependency
+    ! beta[ 1 1 ]=(Y(1)%t.sub.100000)*(Y(1)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(1)%t.sub.010000)
+    ! alpha[ 1 1 ]=-(Y(1)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(2)%t.sub.010000)
+    ! gamma[ 1 1 ]=(Y(2)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(2)%t.sub.010000)*(Y(2)%t.sub.010000)
+    ! beta[ 2 1 ]=(Y(3)%t.sub.100000)*(Y(3)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(3)%t.sub.010000)
+    ! alpha[ 2 1 ]=-(Y(3)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(4)%t.sub.010000)
+    ! gamma[ 2 1 ]=(Y(4)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(4)%t.sub.010000)*(Y(4)%t.sub.010000)
+    ! beta[ 1 2 ]=(Y(1)%t.sub.001000)*(Y(1)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(1)%t.sub.000100)
+    ! alpha[ 1 2 ]=-(Y(1)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(2)%t.sub.000100)
+    ! gamma[ 1 2 ]=(Y(2)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(2)%t.sub.000100)*(Y(2)%t.sub.000100)
+    ! beta[ 2 2 ]=(Y(3)%t.sub.001000)*(Y(3)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(3)%t.sub.000100)
+    ! alpha[ 2 2 ]=-(Y(3)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(4)%t.sub.000100)
+    ! gamma[ 2 2 ]=(Y(4)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(4)%t.sub.000100)*(Y(4)%t.sub.000100)
 
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
@@ -230,7 +230,7 @@ contains
     call trackBetaExtrema(1,1,s1%beta(1,1))
     call trackBetaExtrema(2,2,s1%beta(2,2))
     !---
-   
+
     s1%mu=phase
 
     do k=1,c_%nd
@@ -274,7 +274,7 @@ contains
     s1%disp(:)=zero
     s1%disp_p(:)=zero
     s1%disp_p2(:)=zero
-    s1%disp_p3(:)=zero 
+    s1%disp_p3(:)=zero
     s1%tune(:)=zero
     s1%eigen(:,:)=zero
   end subroutine killtwiss
@@ -303,7 +303,7 @@ contains
        s1%disp(:)=zero
        s1%disp_p(:)=zero
        s1%disp_p2(:)=zero
-       s1%disp_p3(:)=zero       
+       s1%disp_p3(:)=zero
        s1%tune(:)=zero
        s1%eigen(:,:)=zero
        dicu(:)=zero
@@ -335,14 +335,14 @@ contains
     type(twiss)             :: tw
     type(fibre), POINTER    :: current
     type(work)              :: startfen !Fibre energy at the start
-    real(dp)                :: r,re(6,6),dt
+    real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform, tracktm
     character*48            :: summary_table_name
-    
+
     skipnormalform = my_false
 
     !all zeroing
@@ -396,15 +396,15 @@ contains
     ! indeed the simplified formulas we applied for derivation w.r.t deltap assume
     ! that deltap is an externally supplied constant parameter, which is no longer
     ! the case when icase = 6 as deltap then becomes a phase-space state-variable.
-    ! and for icase=4, there is no dispersion.	
-    
+    ! and for icase=4, there is no dispersion.
+
     deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
-    
+
     if (deltap_dependency .and. .not.(icase.eq.5)) then
-    	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap assume deltap is fixed parameter')
-	call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap therefore assume icase=5')
+       call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap assume deltap is fixed parameter')
+       call fort_warn('ptc_twiss: ','derivation formulas w.r.t deltap therefore assume icase=5')
     endif
-    
+
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -474,14 +474,14 @@ contains
     Y=X
 
     call alloc(transfermap)
-     
+
     if ( getnpushes() > 0 .or. rmatrix > 0) then
-      tracktm = my_true
+       tracktm = my_true
     else
-      tracktm = my_false
-    endif  
-    
-    
+       tracktm = my_false
+    endif
+
+
     if (tracktm) then
        transfermap = npara
        transfermap = X
@@ -558,7 +558,7 @@ contains
     endif
 
     slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
-    
+
 
     if (.not. slice_magnets) then
 
@@ -622,11 +622,11 @@ contains
              maps(i)%name = current%mag%name
           endif
 
-	  ! compute the Twiss parameters
+          ! compute the Twiss parameters
           tw=y
-          
-          call puttwisstable(transfermap) 
-          
+
+          call puttwisstable(transfermap)
+
           if (tracktm) then
              call putusertable(i,current%mag%name,suml,getdeltae(),transfermap,y)
           endif
@@ -676,10 +676,10 @@ contains
     call kill(tw)
     CALL kill(y)
 
-  !  if (tracktm) then
-       CALL kill(transfermap)
-  !  endif
-  
+    !  if (tracktm) then
+    CALL kill(transfermap)
+    !  endif
+
     do i=1,6
        call kill(unimap(i))
     enddo
@@ -709,9 +709,9 @@ contains
       implicit none
       integer  :: double_from_table
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
-      integer  :: mmap 
+      integer  :: mmap
       real(dp) dt
-      
+
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
       mman  = get_value('ptc_twiss ','initial_matrix_manual ')
@@ -720,7 +720,7 @@ contains
       mdistr = get_value('ptc_twiss ','initial_moments_manual ')
       mmap = get_value('ptc_twiss ','initial_map_manual ')
 
-      
+
       momentumCompactionToggle = .false. ! set to true in the case the map
       ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
@@ -735,7 +735,7 @@ contains
          call seterrorflag(11,"ptc_twiss ","Ambigous command options");
          print*, "Only one of the following switches might be on:"
          print*, "initial_matrix_manual  = ", initial_matrix_manual
-	 print*, "initial_map_manual     = ", initial_map_manual
+         print*, "initial_map_manual     = ", initial_map_manual
          print*, "initial_matrix_table   = ", initial_matrix_table
          print*, "initial_ascript_manual = ", initial_ascript_manual
          print*, "initial_moments_manual = ", mdistr
@@ -773,14 +773,14 @@ contains
          endif
 
       elseif(initial_map_manual) then
-          if (getdebug() > 1) then
+         if (getdebug() > 1) then
             print*,"Initializing map with initial_map_manual=true"
          endif
          call readinitialmap()
          if (geterrorflag() /= 0) then
             return
          endif
-	 
+
       elseif(initial_matrix_manual) then
 
          if (getdebug() > 1) then
@@ -899,7 +899,7 @@ contains
       implicit none
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(150),myx ! opt_fun(72) -> opt_fun(81) 
+      real(kind(1d0))   :: opt_fun(150),myx ! opt_fun(72) -> opt_fun(81)
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
       real(kind(1d0))   :: deltae
       type(real_8), target :: transfermap(6)
@@ -937,7 +937,7 @@ contains
       ioptfun=6
       call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
 
-      
+
       opt_fun(1) = transfermap(1).sub.fo(1,:)
       opt_fun(2) = transfermap(1).sub.fo(2,:)
       opt_fun(3) = transfermap(1).sub.fo(3,:)
@@ -988,7 +988,7 @@ contains
 
 
 
-      opt_fun(beta11)= tw%beta(1,1) * deltae	! beta11=1
+      opt_fun(beta11)= tw%beta(1,1) * deltae ! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * deltae
       opt_fun(beta13)= tw%beta(1,3) * deltae
       opt_fun(beta21)= tw%beta(2,1) * deltae
@@ -1056,30 +1056,30 @@ contains
       opt_fun(mu1)=tw%mu(1) !* deltae
       opt_fun(mu2)=tw%mu(2) !* deltae
       opt_fun(mu3)=tw%mu(3) !* deltae
-      
+
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
       opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
       opt_fun(disp4)=tw%disp(4) ! was 34 instead of 60
 
       ! 9 march 2009: add 4 items
-      
+
       if (deltap_dependency) then
-      		opt_fun(disp1p) = tw%disp_p(1)
-		opt_fun(disp2p) = tw%disp_p(2)
-		opt_fun(disp3p) = tw%disp_p(3)
-		opt_fun(disp4p) = tw%disp_p(4)
-		! 20 july 2009: add 8 items for second derivatives w.r.t deltap
-		opt_fun(disp1p2) = tw%disp_p2(1)
-		opt_fun(disp2p2) = tw%disp_p2(2)
-		opt_fun(disp3p2) = tw%disp_p2(3)
-		opt_fun(disp4p2) = tw%disp_p2(4)
-		opt_fun(disp1p3) = tw%disp_p3(1)
-		opt_fun(disp2p3) = tw%disp_p3(2)
-		opt_fun(disp3p3) = tw%disp_p3(3)
-		opt_fun(disp4p3) = tw%disp_p3(4)		
-	endif
-            
+         opt_fun(disp1p) = tw%disp_p(1)
+         opt_fun(disp2p) = tw%disp_p(2)
+         opt_fun(disp3p) = tw%disp_p(3)
+         opt_fun(disp4p) = tw%disp_p(4)
+         ! 20 july 2009: add 8 items for second derivatives w.r.t deltap
+         opt_fun(disp1p2) = tw%disp_p2(1)
+         opt_fun(disp2p2) = tw%disp_p2(2)
+         opt_fun(disp3p2) = tw%disp_p2(3)
+         opt_fun(disp4p2) = tw%disp_p2(4)
+         opt_fun(disp1p3) = tw%disp_p3(1)
+         opt_fun(disp2p3) = tw%disp_p3(2)
+         opt_fun(disp3p3) = tw%disp_p3(3)
+         opt_fun(disp4p3) = tw%disp_p3(4)
+      endif
+
       ! JLUC TODO
       ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
       ! jluc: left the following umodified, except 36->62
@@ -1102,13 +1102,13 @@ contains
             endif
             ii=(62+4+8)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
-	    ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
+            ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
          enddo
       enddo
 
       if (getdebug() > 2)  then
-      	! this part of the code is out of sync with the rest
+         ! this part of the code is out of sync with the rest
          write(6,'(a,1(f8.4,1x))') current%MAG%name,suml
          write(6,'(a,1(f10.8,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
@@ -1325,21 +1325,21 @@ contains
 
       deallocate(j)
     end subroutine readmatrixfromtable
-    
-    	!_________________________________________________________________
-    	subroutine readinitialmap ! from fort.18 file
-      		implicit none
-		type(damap) :: map
-		! call readMapFromFort18(y)
-		call alloc(map)
-		call dainput(map,18)
-		y = map
-		call kill(map)
-		call maptoascript()
-		call reademittance()
-	end subroutine readinitialmap
-    	!_________________________________________________________________
-	
+
+    !_________________________________________________________________
+    subroutine readinitialmap ! from fort.18 file
+      implicit none
+      type(damap) :: map
+      ! call readMapFromFort18(y)
+      call alloc(map)
+      call dainput(map,18)
+      y = map
+      call kill(map)
+      call maptoascript()
+      call reademittance()
+    end subroutine readinitialmap
+    !_________________________________________________________________
+
     !_________________________________________________________________
 
     subroutine readinitialmatrix
@@ -1383,8 +1383,8 @@ contains
     subroutine initmapfrommatrix
       !initializes Y(6) from re(6,6)
       implicit none
-      real(dp),dimension(6)::reval,aieval
-      real(dp),dimension(6,6)::revec,aievec
+      real(dp),dimension(ndim2)::reval,aieval
+      real(dp),dimension(ndim2,ndim2)::revec,aievec
 
       call liepeek(iia,icoast)
       if (getdebug() > 1) then
@@ -1648,11 +1648,11 @@ contains
       real(dp) :: alpha_c_p ! first order derivative w.r.t delta-p/p
       real(dp) :: alpha_c_p2 ! second order derivative w.r.t delta-p/p
       real(dp) :: gamma_tr ! gamma_transition, or "transition energy" above which the particles' arrival time
-      !  with respect to other particles is determined by its path length instead of by its velocity 
+      !  with respect to other particles is determined by its path length instead of by its velocity
       real(dp) :: deltap
       real(dp) :: betaRelativistic, gammaRelativistic
       real(dp) :: suml ! cumulative length along the ring
-      real(dp) :: fractionalTunes(3)
+      real(dp) :: fractionalTunes(ndim)
       real(dp) :: chromaticities(2)
       integer :: i,j
       real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
@@ -1675,9 +1675,9 @@ contains
       integer :: icase
       integer :: order
       real(dp) :: dpathlength, dpathlength_p ! 6th coordinate and derivative w.r.t deltap
-      
+
       order = get_value('ptc_twiss ', 'no ')
-      
+
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
       debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
@@ -1754,7 +1754,7 @@ contains
 
       ! 4. retreive the dispersion coefficients
       ! (may be the coefficient of delta of the map?)
-      ! decompose the map via a normal form to get the dispersion...   
+      ! decompose the map via a normal form to get the dispersion...
       call alloc(theNormalForm)
       theNormalForm = oneTurnMap
       if (debugFiles .eq. 1) then
@@ -1768,7 +1768,7 @@ contains
       dispersion(2) = theNormalForm%A1%v(2).sub.'000010'
       dispersion(3) = theNormalForm%A1%v(3).sub.'000010'
       dispersion(4) = theNormalForm%A1%v(4).sub.'000010'
-            
+
       if (debugFiles .eq. 1) then
          do i=1,4
             write(21,*) "dispersion(",i,")=", dispersion(i)
@@ -1780,10 +1780,10 @@ contains
       do i=1,4
          sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i)
       enddo
-      
+
       dpathlength = -sd ! added 18 august 2009 for latter reuse of the map's six coordinate
       ! dpathlength is the derivative of the pathlength w.r.t deltap
-      
+
       eta_c = -sd * betaRelativistic**2 / suml
       alpha_c = one / gammaRelativistic**2 + eta_c
       gamma_tr = one / sqrt(alpha_c)
@@ -1793,169 +1793,169 @@ contains
       ! assuming icase=5
       !call daprint(oneTurnMap,88)
       if (icase.eq.5) then
-      	
-      	! always assume time=false, so that the fifth phase-space variable is deltap instead of pt!
-	! otherwise should issue a warning or an error!
- 	
-      	call alloc(theAscript)
-        ! proceed slightly differently to retreive the dispersion's derivatives
-	! (so far only managed to get the dispersion on the normal form, but not its derivatives)
-       	theAscript = state + theNormalForm%a_t
-	
-	! note: should reuse information computed previously than redo this...
-	
-      	! if icase=5, Taylor series expansion disp = disp + delta_p
-	do i=1,4
-		! apparently, we are up by a factor two
-      		dispersion_p(i) = 2.0*(theAscript(i)%t.sub.'000020') ! as usual in this file
-	enddo
 
-	! compute derivative of the formula for eta_c
+         ! always assume time=false, so that the fifth phase-space variable is deltap instead of pt!
+         ! otherwise should issue a warning or an error!
 
-	sd = 0.0
-	! first dr65/ddeltap
-	sd = sd		- 1.0*(oneTurnMap(6).sub.'100010')*dispersion(1) &
-	&		- 1.0*(oneTurnMap(6).sub.'010010')*dispersion(2) & 
-	&		- 1.0*(oneTurnMap(6).sub.'001010')*dispersion(3) &
-	&		- 1.0*(oneTurnMap(6).sub.'000110')*dispersion(4) &
-	&		- 2.0*(oneTurnMap(6).sub.'000020') &
-	! new
-	&		- 1.0*(oneTurnMap(6).sub.'000011')*(oneTurnMap(6).sub.'000001') &
-	! then terms dr6i/ddeltap*dispersion(i)
-	&		- 2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)**2 &
-	&		- (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
-	&		- (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
-	&		- (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
-	! new
-	&		- (oneTurnMap(6).sub.'100010')*dispersion(1) &
-	! dr62/ddeltap*disperion(2)
-	&		- (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
-	&		- 2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)**2 &
-	&		- (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
-	&		- (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
-	! new
-	&		- (oneTurnMap(6).sub.'010010')*dispersion(2) &
-	! dr63/ddeltap*dispersion(3)
-	&		- (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
-	&		- (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
-	&		- 2.0*(oneTurnMap(6).sub.'002000')*dispersion(3)**2 &
-	&		- (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
-	! new
-	&		- 1*(oneTurnMap(6).sub.'001010')*dispersion(3) &
-	! dr64/ddeltap*dispersion(4)
-	&		- (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
-	&		- (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
-	&		- (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
-	&		- 2.0*(oneTurnMap(6).sub.'000200')*dispersion(4)**2 &
-	! new
-	&		- 1*(oneTurnMap(6).sub.'000110')*dispersion(4)
+         call alloc(theAscript)
+         ! proceed slightly differently to retreive the dispersion's derivatives
+         ! (so far only managed to get the dispersion on the normal form, but not its derivatives)
+         theAscript = state + theNormalForm%a_t
 
-	! terms involving derivatives of the dispersions
-	do i=1,4
-		sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion_p(i)
-	enddo
-	
-	dpathlength_p = sd ! for later reuse of the sixth coordinate of the map
-	dpathlength_p = 0.0
-	
-	alpha_c_p = sd * (betaRelativistic**2) / suml
-	
-	! now compute second order derivatives alpha_c_p2 (assumes map of order 3 at least)
-	! to this end, we first need to compute second order derivatives of the dispersion
-	! extrapolated from how we retreive the first order derivative...
-	if (order.lt.3) then
-		alpha_c_p2 = 0.0
-         	call fort_warn('ptc_twiss:','order too low to compute alpha_c_p2 (should be >=3)')	
-	else
-		do i=1,4
-      			dispersion_p2(i) = 3.0*2.0*(theAscript(i)%t.sub.'000030') ! to be checked
-		enddo
-		
-		sd = 0.0
-		! derivative of -2.0*oneTurnMap(6).sub.'100010'*dispersion(1)
-		sd = 		- 1.0 * (&
-		! negative factor out of the parenthesis
-! DO NOT REMOVE TAG BELOW
-!----- INSERT CODE --- START
-! code start insert on Tue Sep  1 16:08:16 2009
-! warning: did not check yet that the following formula is correct
-! at the moment, there's a numerical discrepancy with the finite-difference approximation of this derivative
-& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
-& +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
-& +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1)*0.5*2.0 &
-& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2)*0.5*2.0 &
-& +6.0*(oneTurnMap(6).sub.'000030')*0.5*2.0 &
-& +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*2.0*dispersion(1)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*2.0*dispersion(1)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'200010')*0.5*2.0*dispersion(1)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
-& +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
-& +2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'110000')*dispersion(2)*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
-& +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*dispersion(1)*2.0*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*dispersion(1)*2.0*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'200010')*0.5*dispersion(1)*2.0*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
-& +2.0*(oneTurnMap(6).sub.'100020')*dispersion_p(1) &
-& +(oneTurnMap(6).sub.'100000')*dispersion_p2(1) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion(2) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
-& +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*2.0*dispersion(2)*dispersion(2) &
-& +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*2.0*dispersion(2)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'020010')*0.5*2.0*dispersion(2)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion(2) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
-& +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
-& +(oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)*dispersion_p(2) &
-& +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion_p(2) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
-& +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*dispersion(2)*2.0*dispersion_p(2) &
-& +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*dispersion(2)*2.0*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'020010')*0.5*dispersion(2)*2.0*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion_p(2) &
-& +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion_p(2) &
-& +2.0*(oneTurnMap(6).sub.'010020')*dispersion_p(2) &
-& +(oneTurnMap(6).sub.'010000')*dispersion_p2(2) &
-! code end insert on Tue Sep  1 16:08:16 2009
-!----- INSERT CODE --- END
-! DO NOT REMOVE TAG ABOVE
-		& 		)
-		alpha_c_p2 = sd * betaRelativistic**2 / suml
-	endif
-			
-	call kill(theAscript)
+         ! note: should reuse information computed previously than redo this...
+
+         ! if icase=5, Taylor series expansion disp = disp + delta_p
+         do i=1,4
+            ! apparently, we are up by a factor two
+            dispersion_p(i) = 2.0*(theAscript(i)%t.sub.'000020') ! as usual in this file
+         enddo
+
+         ! compute derivative of the formula for eta_c
+
+         sd = 0.0
+         ! first dr65/ddeltap
+         sd = sd  - 1.0*(oneTurnMap(6).sub.'100010')*dispersion(1) &
+              &  - 1.0*(oneTurnMap(6).sub.'010010')*dispersion(2) &
+              &  - 1.0*(oneTurnMap(6).sub.'001010')*dispersion(3) &
+              &  - 1.0*(oneTurnMap(6).sub.'000110')*dispersion(4) &
+              &  - 2.0*(oneTurnMap(6).sub.'000020') &
+                                ! new
+              &  - 1.0*(oneTurnMap(6).sub.'000011')*(oneTurnMap(6).sub.'000001') &
+                                ! then terms dr6i/ddeltap*dispersion(i)
+              &  - 2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)**2 &
+              &  - (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
+              &  - (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
+              &  - (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
+                                ! new
+              &  - (oneTurnMap(6).sub.'100010')*dispersion(1) &
+                                ! dr62/ddeltap*disperion(2)
+              &  - (oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion(2) &
+              &  - 2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)**2 &
+              &  - (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
+              &  - (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
+                                ! new
+              &  - (oneTurnMap(6).sub.'010010')*dispersion(2) &
+                                ! dr63/ddeltap*dispersion(3)
+              &  - (oneTurnMap(6).sub.'101000')*dispersion(1)*dispersion(3) &
+              &  - (oneTurnMap(6).sub.'011000')*dispersion(2)*dispersion(3) &
+              &  - 2.0*(oneTurnMap(6).sub.'002000')*dispersion(3)**2 &
+              &  - (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
+                                ! new
+              &  - 1*(oneTurnMap(6).sub.'001010')*dispersion(3) &
+                                ! dr64/ddeltap*dispersion(4)
+              &  - (oneTurnMap(6).sub.'100100')*dispersion(1)*dispersion(4) &
+              &  - (oneTurnMap(6).sub.'010100')*dispersion(2)*dispersion(4) &
+              &  - (oneTurnMap(6).sub.'001100')*dispersion(3)*dispersion(4) &
+              &  - 2.0*(oneTurnMap(6).sub.'000200')*dispersion(4)**2 &
+                                ! new
+              &  - 1*(oneTurnMap(6).sub.'000110')*dispersion(4)
+
+         ! terms involving derivatives of the dispersions
+         do i=1,4
+            sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion_p(i)
+         enddo
+
+         dpathlength_p = sd ! for later reuse of the sixth coordinate of the map
+         dpathlength_p = 0.0
+
+         alpha_c_p = sd * (betaRelativistic**2) / suml
+
+         ! now compute second order derivatives alpha_c_p2 (assumes map of order 3 at least)
+         ! to this end, we first need to compute second order derivatives of the dispersion
+         ! extrapolated from how we retreive the first order derivative...
+         if (order.lt.3) then
+            alpha_c_p2 = 0.0
+            call fort_warn('ptc_twiss:','order too low to compute alpha_c_p2 (should be >=3)')
+         else
+            do i=1,4
+               dispersion_p2(i) = 3.0*2.0*(theAscript(i)%t.sub.'000030') ! to be checked
+            enddo
+
+            sd = 0.0
+            ! derivative of -2.0*oneTurnMap(6).sub.'100010'*dispersion(1)
+            sd =   - 1.0 * (&
+                                ! negative factor out of the parenthesis
+                                ! DO NOT REMOVE TAG BELOW
+                                !----- INSERT CODE --- START
+                                ! code start insert on Tue Sep  1 16:08:16 2009
+                                ! warning: did not check yet that the following formula is correct
+                                ! at the moment, there's a numerical discrepancy with the finite-difference approximation of this derivative
+                 & +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
+                 & +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
+                 & +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1)*0.5*2.0 &
+                 & +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2)*0.5*2.0 &
+                 & +6.0*(oneTurnMap(6).sub.'000030')*0.5*2.0 &
+                 & +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*2.0*dispersion(1)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*2.0*dispersion(1)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200010')*0.5*2.0*dispersion(1)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'100020')*dispersion(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200000')*dispersion(1)*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion(2)*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'100010')*dispersion_p(1) &
+                 & +6.0*(oneTurnMap(6).sub.'300000')*dispersion(1)*0.5*dispersion(1)*2.0*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(2)*0.5*dispersion(1)*2.0*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200010')*0.5*dispersion(1)*2.0*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200000')*dispersion_p(1)*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(2)*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(2)*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion_p(2)*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'200010')*dispersion(1)*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(2)*dispersion_p(1) &
+                 & +2.0*(oneTurnMap(6).sub.'100020')*dispersion_p(1) &
+                 & +(oneTurnMap(6).sub.'100000')*dispersion_p2(1) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion(2) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*2.0*dispersion(2)*dispersion(2) &
+                 & +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*2.0*dispersion(2)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020010')*0.5*2.0*dispersion(2)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion(2) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion(2) &
+                 & +2.0*(oneTurnMap(6).sub.'010020')*dispersion(2) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion(1)*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020000')*dispersion(2)*dispersion_p(2) &
+                 & +(oneTurnMap(6).sub.'010010')*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'210000')*dispersion(1)*dispersion(1)*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(2)*dispersion(1)*dispersion_p(2) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
+                 & +(oneTurnMap(6).sub.'110000')*dispersion_p(1)*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'120000')*dispersion(1)*0.5*dispersion(2)*2.0*dispersion_p(2) &
+                 & +6.0*(oneTurnMap(6).sub.'030000')*dispersion(2)*0.5*dispersion(2)*2.0*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020010')*0.5*dispersion(2)*2.0*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020000')*dispersion_p(2)*dispersion_p(2) &
+                 & +(oneTurnMap(6).sub.'110010')*dispersion(1)*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'020010')*dispersion(2)*dispersion_p(2) &
+                 & +2.0*(oneTurnMap(6).sub.'010020')*dispersion_p(2) &
+                 & +(oneTurnMap(6).sub.'010000')*dispersion_p2(2) &
+                                ! code end insert on Tue Sep  1 16:08:16 2009
+                                !----- INSERT CODE --- END
+                                ! DO NOT REMOVE TAG ABOVE
+                 &   )
+            alpha_c_p2 = sd * betaRelativistic**2 / suml
+         endif
+
+         call kill(theAscript)
       else
-      	alpha_c_p = 0.0 ! exactly zero means failure to compute the actual value
-	alpha_c_p2 = 0.0
+         alpha_c_p = 0.0 ! exactly zero means failure to compute the actual value
+         alpha_c_p2 = 0.0
       endif ! if (icase.eq.5)
-      
+
       ! also output the tune ...
       fractionalTunes = theNormalForm%tune
       ! the above is exactly equivalent to the following two lines (i.e. returns frac.tune)
@@ -2069,15 +2069,15 @@ contains
       initialThinLensPos = fibrePtr%t1%pos ! t1 points to the first integration node
       nodePtr => fibrePtr%t1 ! t1 points to the first integration node
 
-      do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1 
+      do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1
          ! "t" is the child thin-lens layout according to "type layout" definition
 
          s = nodePtr%next%s(3) ! s(1) is the total arc-length, s(3) the total integration-distance
          ! From Etienne:
          ! nodePtr%s(1) is the total arc length (LD)
          ! nodePtr%s(3) is the total integration distance.... ( LC)  LC=LD unless exact=true and true rbends are present.
-         ! nodePtr%s(4) is the local LC. 
-         ! nodePtr%s(5) is the local LD. 
+         ! nodePtr%s(4) is the local LC.
+         ! nodePtr%s(5) is the local LD.
 
 
          ! in  a closed-ring, s evaluates to zero when we reach my_ring%t%n+initialThinLensPos -1
@@ -2085,7 +2085,7 @@ contains
          if ((s .eq. 0d0) .and. (thinLensPos .eq. (my_ring%t%n+initialThinLensPos-1))) then
             s = nodePtr%s(3) + nodePtr%next%s(5) ! s of previous node + local offset
          endif
-       
+
          ! following part is cut/pasted from the equivalent reference
          ! code that successively evaluates Twiss at elements' ends
          if (knobsNumber > 0) then
@@ -2102,7 +2102,7 @@ contains
             !write(27,*) "beta new=", (theTransferMap(1).sub.'1')**2+(theTransferMap(1).sub.'01')**2
             if (getnpushes() > 0) then ! try to understand this part later-on
                call track_probe_x(my_ring,theTransferMap,default, &
-                    & node1=thinLensPos,node2=thinLensPos+1)             
+                    & node1=thinLensPos,node2=thinLensPos+1)
             endif
          endif
 
@@ -2133,12 +2133,12 @@ contains
 
          call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
 
-         if (getnpushes() > 0) then ! !writes user selected map coeffs to user created tables. See ptc_select 
-                                      !also saves twiss parameters and used defined variables as Taylor series 
-                                      !             in function of knobs. See ptc_knob
+         if (getnpushes() > 0) then ! !writes user selected map coeffs to user created tables. See ptc_select
+            !also saves twiss parameters and used defined variables as Taylor series
+            !             in function of knobs. See ptc_knob
             ! presently, do not enter here anyway
-            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, theAscript) 
-         endif                                                                                 
+            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, theAscript)
+         endif
 
 
          if (associated(nodePtr,fibrePtr%t1)) then
@@ -2170,14 +2170,15 @@ contains
     end subroutine TrackAlongInnerSlices
 
     subroutine TrackAlongMagnets()
+      implicit none
       ! should cut/paste the tracking part of the ptctwiss main subroutine
     end subroutine TrackAlongMagnets
-  
+
   END subroutine ptc_twiss
 
   subroutine computeDeltapDependency(y,s1)
     implicit none
-    type(real_8), intent(in)  :: y(ndd)
+    type(real_8), intent(in)  :: y(6)
     type(twiss),  intent(inout)  :: s1
     integer :: k,i
     integer :: J(lnv) ! the map's coefficient selector, as usual
@@ -2216,63 +2217,63 @@ contains
                - (Y(2*k-1).sub.Jderiv)*(Y(2*k).sub.J) - (Y(2*k-1).sub.J)*(Y(2*k).sub.Jderiv)
           s1%gama_p(k,i)= s1%gama_p(k,i) &
                + (Y(2*k).sub.Jderiv)*(Y(2*k).sub.J)+(Y(2*k).sub.J)*(Y(2*k).sub.Jderiv)
-          J(2*i)=0 
+          J(2*i)=0
        enddo
     enddo
 
-! the computations above match the following formulas, obtained by derivation of the Twiss parameters using the chain-rule
-! beta derivatives w.r.t delta_p
-!    beta11 = two * (y(1)%t.sub.'100000')*(y(1)%t.sub.'100010') + two * (y(1)%t.sub.'010000')*(y(1)%t.sub.'010010')
-!    beta12 = two * (y(1)%t.sub.'001000')*(y(1)%t.sub.'001010') + two * (y(1)%t.sub.'000100')*(y(1)%t.sub.'000110')
-!    beta21 = two * (y(3)%t.sub.'100000')*(y(3)%t.sub.'100010') + two * (y(3)%t.sub.'010000')*(y(3)%t.sub.'010010')
-!    beta22 = two * (y(3)%t.sub.'001000')*(y(3)%t.sub.'001010') + two * (y(3)%t.sub.'000100')*(y(3)%t.sub.'000110')
-! alpha derivatives w.r.t delta_p
-!    alfa11 = -((y(1)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(1)%t.sub.'100000')*(y(2).sub.'100010')+&
-!         (y(1)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(1)%t.sub.'010000')*(y(2)%t.sub.'010010'))
-!    alfa12 = -((y(1)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(1)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
-!         (y(1)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(1)%t.sub.'000100')*(y(2)%t.sub.'000110'))
-!    alfa21 = -((y(3)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(3)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
-!         (y(3)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(3)%t.sub.'010000')*(y(4)%t.sub.'010010'))
-!    alfa22 = -((y(3)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(3)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
-!         (y(3)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(3)%t.sub.'000100')*(y(4)%t.sub.'000110'))
-! gamma derivatives w.r.t delta_p
-!    gama11 = (y(2)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(2)%t.sub.'100000')*(y(2)%t.sub.'100010')+&
-!         (y(2)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(2)%t.sub.'010000')*(y(2)%t.sub.'010010')
-!    gama12 = (y(2)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(2)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
-!         (y(2)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(2)%t.sub.'000100')*(y(2)%t.sub.'000110')
-!    gama21 = (y(4)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(4)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
-!         (y(4)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(4)%t.sub.'010000')*(y(4)%t.sub.'010010')
-!    gama22 = (y(4)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(4)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
-!         (y(4)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(4)%t.sub.'000100')*(y(4)%t.sub.'000110')
+    ! the computations above match the following formulas, obtained by derivation of the Twiss parameters using the chain-rule
+    ! beta derivatives w.r.t delta_p
+    !    beta11 = two * (y(1)%t.sub.'100000')*(y(1)%t.sub.'100010') + two * (y(1)%t.sub.'010000')*(y(1)%t.sub.'010010')
+    !    beta12 = two * (y(1)%t.sub.'001000')*(y(1)%t.sub.'001010') + two * (y(1)%t.sub.'000100')*(y(1)%t.sub.'000110')
+    !    beta21 = two * (y(3)%t.sub.'100000')*(y(3)%t.sub.'100010') + two * (y(3)%t.sub.'010000')*(y(3)%t.sub.'010010')
+    !    beta22 = two * (y(3)%t.sub.'001000')*(y(3)%t.sub.'001010') + two * (y(3)%t.sub.'000100')*(y(3)%t.sub.'000110')
+    ! alpha derivatives w.r.t delta_p
+    !    alfa11 = -((y(1)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(1)%t.sub.'100000')*(y(2).sub.'100010')+&
+    !         (y(1)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(1)%t.sub.'010000')*(y(2)%t.sub.'010010'))
+    !    alfa12 = -((y(1)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(1)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
+    !         (y(1)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(1)%t.sub.'000100')*(y(2)%t.sub.'000110'))
+    !    alfa21 = -((y(3)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(3)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
+    !         (y(3)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(3)%t.sub.'010000')*(y(4)%t.sub.'010010'))
+    !    alfa22 = -((y(3)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(3)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
+    !         (y(3)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(3)%t.sub.'000100')*(y(4)%t.sub.'000110'))
+    ! gamma derivatives w.r.t delta_p
+    !    gama11 = (y(2)%t.sub.'100010')*(y(2)%t.sub.'100000')+(y(2)%t.sub.'100000')*(y(2)%t.sub.'100010')+&
+    !         (y(2)%t.sub.'010010')*(y(2)%t.sub.'010000')+(y(2)%t.sub.'010000')*(y(2)%t.sub.'010010')
+    !    gama12 = (y(2)%t.sub.'001010')*(y(2)%t.sub.'001000')+(y(2)%t.sub.'001000')*(y(2)%t.sub.'001010')+&
+    !         (y(2)%t.sub.'000110')*(y(2)%t.sub.'000100')+(y(2)%t.sub.'000100')*(y(2)%t.sub.'000110')
+    !    gama21 = (y(4)%t.sub.'100010')*(y(4)%t.sub.'100000')+(y(4)%t.sub.'100000')*(y(4)%t.sub.'100010')+&
+    !         (y(4)%t.sub.'010010')*(y(4)%t.sub.'010000')+(y(4)%t.sub.'010000')*(y(4)%t.sub.'010010')
+    !    gama22 = (y(4)%t.sub.'001010')*(y(4)%t.sub.'001000')+(y(4)%t.sub.'001000')*(y(4)%t.sub.'001010')+&
+    !         (y(4)%t.sub.'000110')*(y(4)%t.sub.'000100')+(y(4)%t.sub.'000100')*(y(4)%t.sub.'000110')
 
-! now compute deltap dependencies of the dispersion
+    ! now compute deltap dependencies of the dispersion
 
-! code to be differentiated, as in subroutine 'equaltwiss'
-!    J=0
-!    !here ND2=4 and delta is present      nd2=6 and delta is a constant
-!    !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
-!    if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
-!       !when there is no cavity it gives us dispersions
-!       do i=1,4
-!          lat(0,i,1)=(Y(i)%t.sub.J5)
-!       enddo
-!    elseif (c_%nd2 == 6) then
-!       do i=1,4
-!          lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6)
-!          lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5)
-!       enddo
-!    else
-!       do i=1,4
-!          lat(0,i,1)=zero
-!       enddo
-!    endif
-!
-!    ...
-!
-!    !when there is no cavity it gives us dispersions
-!    do i=1,c_%nd2-2*ndel
-!       s1%disp(i)=lat(0,i,1)
-!    enddo
+    ! code to be differentiated, as in subroutine 'equaltwiss'
+    !    J=0
+    !    !here ND2=4 and delta is present      nd2=6 and delta is a constant
+    !    !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
+    !    if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
+    !       !when there is no cavity it gives us dispersions
+    !       do i=1,4
+    !          lat(0,i,1)=(Y(i)%t.sub.J5)
+    !       enddo
+    !    elseif (c_%nd2 == 6) then
+    !       do i=1,4
+    !          lat(0,i,1) =              (Y(i)%t.sub.J5)*(Y(6)%t.sub.J6)
+    !          lat(0,i,1) = lat(0,i,1) + (Y(i)%t.sub.J6)*(Y(5)%t.sub.J5)
+    !       enddo
+    !    else
+    !       do i=1,4
+    !          lat(0,i,1)=zero
+    !       enddo
+    !    endif
+    !
+    !    ...
+    !
+    !    !when there is no cavity it gives us dispersions
+    !    do i=1,c_%nd2-2*ndel
+    !       s1%disp(i)=lat(0,i,1)
+    !    enddo
 
 
 
@@ -2284,29 +2285,29 @@ contains
     endif
     if ((c_%npara ==5) .or. (c_%ndpt /= 0)) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
-	  ! in 4D+deltap case, coefficients are those of the Taylor series development 
-	  ! of deltap (factorial)
-	  ! disp = disp0 + sigma (1/n!) disp_pn
+          ! in 4D+deltap case, coefficients are those of the Taylor series development
+          ! of deltap (factorial)
+          ! disp = disp0 + sigma (1/n!) disp_pn
           s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
-	  if (no.gt.2) then
-		  s1%disp_p2(i) = 3.0*2.0*(y(i)%t.sub.'000030') ! assume at least order 3 for the map
-	  else
-	  	call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
-	  endif
-	  if (no.gt.3) then
-		  s1%disp_p3(i) = 4.0*3.0*2.0*(y(i)%t.sub.'000040') 
-		  ! assume at least order 4 for the map
-	  else
-	  	call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
-	  endif 
+          if (no.gt.2) then
+             s1%disp_p2(i) = 3.0*2.0*(y(i)%t.sub.'000030') ! assume at least order 3 for the map
+          else
+             call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+          endif
+          if (no.gt.3) then
+             s1%disp_p3(i) = 4.0*3.0*2.0*(y(i)%t.sub.'000040')
+             ! assume at least order 4 for the map
+          else
+             call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+          endif
        enddo
     elseif (c_%nd2 ==6) then
        do i=1,c_%nd2-2*ndel ! should it be 1 to 4?
-       	! finally never enter here: these differentiation formulas turned-out not to apply to the case 
-	! where deltap is a phase-space state-variable rather than an externally supplied
-	! parameter.
-          ! u'v+uv' 
-          s1%disp_p(i) = & 
+          ! finally never enter here: these differentiation formulas turned-out not to apply to the case
+          ! where deltap is a phase-space state-variable rather than an externally supplied
+          ! parameter.
+          ! u'v+uv'
+          s1%disp_p(i) = &
                2.0*(y(i)%t.sub.'000020')*(y(6)%t.sub.'000001')+&
                (y(i)%t.sub.'000010')*(y(6)%t.sub.'000011')+&
                (y(i)%t.sub.'000011')*(y(5)%t.sub.'000010')+&
@@ -2321,29 +2322,27 @@ contains
     ! checked the above yields non-zero value...
 
   end subroutine computeDeltapDependency
-  
-! --- a set of routines to track extremas of Twiss functions
-subroutine trackBetaExtrema(i,j,value)
-  implicit none
-  logical, save :: firstTime(3,3) = .true.
-  integer :: i,j
-  real(dp) :: value
-  if (firstTime(i,j)) then
-     firstTime(i,j) = .false.
-     minBeta(i,j) = value
-     maxBeta(i,j) = value
-!     write(80,*) 'first time in trackBetaExtrema for ',i,j
-  else
-     if (minBeta(i,j) .gt. value) then
-        minBeta(i,j) = value
-     elseif (maxBeta(i,j) .lt. value) then
-        maxBeta(i,j) = value
-     endif
-  endif
-end subroutine trackBetaExtrema
-! --- end of set of routines
+
+  ! --- a set of routines to track extremas of Twiss functions
+  subroutine trackBetaExtrema(i,j,value)
+    implicit none
+    logical, save :: firstTime(3,3) = .true.
+    integer :: i,j
+    real(dp) :: value
+    if (firstTime(i,j)) then
+       firstTime(i,j) = .false.
+       minBeta(i,j) = value
+       maxBeta(i,j) = value
+       !     write(80,*) 'first time in trackBetaExtrema for ',i,j
+    else
+       if (minBeta(i,j) .gt. value) then
+          minBeta(i,j) = value
+       elseif (maxBeta(i,j) .lt. value) then
+          maxBeta(i,j) = value
+       endif
+    endif
+  end subroutine trackBetaExtrema
+  ! --- end of set of routines
 
 
 end module madx_ptc_twiss_module
-
-

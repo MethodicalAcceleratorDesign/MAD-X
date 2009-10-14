@@ -150,7 +150,7 @@ contains
                    index1(1,2) = indexa(3) - indexa(4)
                    n%m(1,1)= index1(1,1)
                    n%m(2,1)= index1(1,2)
-                   if(ndim2.eq.6) n%m(3,1)= indexa(3)
+                   if(c_%nd2.eq.6) n%m(3,1)= indexa(3)
                    nres = 1
                    starti = 2
                 endif
@@ -177,7 +177,7 @@ contains
                       index1(nres,2) = n2
                       n%m(1,nres)= n1
                       n%m(2,nres)= n2
-                      if(ndim2.eq.6) n%m(3,nres)= indexa(3)
+                      if(c_%nd2.eq.6) n%m(3,nres)= indexa(3)
 100                   continue
                    enddo
                 endif
