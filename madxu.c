@@ -31,8 +31,9 @@ int add_drifts(struct node* c_node, struct node* end)
     dl = c_node->position - el2 - pos;
     if (dl + ten_m_6 < zero)
     {
-      sprintf(c_dum->c, "%s, length %e", c_node->name, dl);
-      fatal_error("negative drift in front of", c_dum->c);
+      sprintf(c_dum->c, " %s and %s, length %e", c_node->previous->name,
+              c_node->name, dl);
+      fatal_error("negative drift between elements", c_dum->c);
     }
     else if (dl > ten_m_6)
     {
