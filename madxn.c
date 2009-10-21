@@ -992,6 +992,7 @@ void exec_plot(struct in_cmd* cmd)
   char* particle_list;
   struct name_list* nl_plot = NULL;
   struct command_parameter_list* pl_plot = NULL;
+  struct table* p_table;
   char *table_name, *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
@@ -1060,6 +1061,11 @@ void exec_plot(struct in_cmd* cmd)
         }
       }
     }
+
+    /* HG 21.10.09 allow plot from external table, part1 */
+    pos = name_list_pos(table_name, table_register->names);
+    p_table = table_register->tables[pos];
+    /* HG 21.10.09 allow plot from external table, end part1 */
 
     /* get file_name */
 
@@ -1205,20 +1211,25 @@ void exec_plot(struct in_cmd* cmd)
 
   {
     embedded_twiss_cmd = cmd;
-
-    if (nt && current_sequ != NULL) title = current_sequ->name;
+    /* HG 21.10.09 allow plot from external table, part 2 */
+    if (p_table->origin) title = p_table->name;
+    else if (nt && current_sequ != NULL) title = current_sequ->name;
     pesopt_(&ierr);
     if (ierr == 0)
     {
-      adjust_beam();
-      probe_beam = clone_command(current_beam);
-      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      if (p_table->origin == 0)
+      {
+       adjust_beam();
+       probe_beam = clone_command(current_beam);
+       adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+       adjust_rfc(); /* sets freq in rf-cavities from probe */
+      }
       pefill_(&ierr);
       pemima_();
       plotit_(&plots_made);
       plots_made = 1;
     }
+    /* HG 21.10.09 allow plot from external table, end part 2 */
     if (nt) title = pt;
   }
 
