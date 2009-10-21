@@ -1381,10 +1381,10 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.01.07";
+char myversion[] = "MAD-X 4.01.08";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
-char code_mod_date[] = "Code Modification Date: 14.10.2009";
+char code_mod_date[] = "Code Modification Date: 21.10.2009";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
