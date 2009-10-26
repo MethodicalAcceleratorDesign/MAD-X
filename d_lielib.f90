@@ -2705,16 +2705,18 @@ contains
        endif
     enddo
     if(ndc.eq.0) then
-       if(new_ndpt) then
-          !       do i=1,nd
-          !         write(6,*) i,q(i)/twopi
-          !        if(st(i)+c_1d_3.gt.one.and.q(i).gt.pi) q(i)=q(i)-twopi
-          !          write(6,*) i,q(i)/twopi
-          !          pause 77
-          !      enddo
-          if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
-       else
-          if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+       if(time_plane.gt.zero) then
+          if(new_ndpt) then
+             !       do i=1,nd
+             !         write(6,*) i,q(i)/twopi
+             !        if(st(i)+c_1d_3.gt.one.and.q(i).gt.pi) q(i)=q(i)-twopi
+             !          write(6,*) i,q(i)/twopi
+             !          pause 77
+             !      enddo
+             if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+          else
+             if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+          endif
        endif
     else
        if(new_ndpt) then

@@ -510,54 +510,60 @@ CONTAINS
        key%list%ks(3)=node_value('k2s ')+ key%list%ks(3)
        key%list%ks(4)=node_value('k3s ')+ key%list%ks(4)
 
-       ! Gymnastic needed since PTC expects MAD8 convention
-       key%list%t1=node_value('e1 ')
-       key%list%t2=node_value('e2 ')
-       key%list%hgap=node_value('hgap ')
-       !       key%list%fint=node_value('fint ')
-       fint=node_value('fint ')
-       fintx=node_value('fintx ')
-       if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
-          print*," The fint and fintx must be the same at each end or each might be zero"
-          stop
-       endif
-       if(fint.gt.zero) then
-          key%list%fint=fint
-          if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
+       if(EXACT_MODEL.and.(node_value('angle ').eq.zero)) then
+          key%magnet="quadrupole"
+          key%tiltd=node_value('tilt ')
        else
-          if(fintx.gt.zero) then
-             key%list%fint=fintx
-             key%list%kill_ent_fringe=my_true
-          else
-             key%list%fint=zero
+
+          ! Gymnastic needed since PTC expects MAD8 convention
+          key%list%t1=node_value('e1 ')
+          key%list%t2=node_value('e2 ')
+          key%list%hgap=node_value('hgap ')
+          !       key%list%fint=node_value('fint ')
+          fint=node_value('fint ')
+          fintx=node_value('fintx ')
+          if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
+             print*," The fint and fintx must be the same at each end or each might be zero"
+             stop
           endif
-       endif
-       key%list%h1=node_value('h1 ')
-       key%list%h2=node_value('h2 ')
-       key%tiltd=node_value('tilt ')
-       if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
-       ptcrbend=node_value('ptcrbend ').ne.0
-       if(ptcrbend) then
-          call context(key%list%name)
-          truerbend=node_value('truerbend ').ne.0
-          if(truerbend) then
-             key%magnet="TRUERBEND"
-             if(key%list%t2/=zero) then
-                write(6,*) " The true parallel face bend "
-                write(6,*) " only accepts the total angle and e1 as an input "
-                write(6,*) " if e1=0, then the pipe angle to the entrance face is "
-                write(6,*) " angle/2. It is a normal rbend."
-                write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
-                write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
-                write(6,*) " with the exit face."
-                write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
-                write(6,*) " Make sure that this is what you want!!! "
-                !                write(6,*) " CHANGE YOUR LATTICE FILRE."
-                !                stop 666
-                key%list%t2=zero
-             endif
+          if(fint.gt.zero) then
+             key%list%fint=fint
+             if(fintx.eq.zero) key%list%kill_exi_fringe=my_true
           else
-             key%magnet="WEDGRBEND"
+             if(fintx.gt.zero) then
+                key%list%fint=fintx
+                key%list%kill_ent_fringe=my_true
+             else
+                key%list%fint=zero
+             endif
+          endif
+          key%list%h1=node_value('h1 ')
+          key%list%h2=node_value('h2 ')
+          key%tiltd=node_value('tilt ')
+          if(tempdp.gt.0) key%tiltd=key%tiltd + atan2(skew_0123(0),normal_0123(0))
+          ptcrbend=node_value('ptcrbend ').ne.0
+          if(ptcrbend) then
+             call context(key%list%name)
+             truerbend=node_value('truerbend ').ne.0
+             if(truerbend) then
+                key%magnet="TRUERBEND"
+                if(key%list%t2/=zero) then
+                   write(6,*) " The true parallel face bend "
+                   write(6,*) " only accepts the total angle and e1 as an input "
+                   write(6,*) " if e1=0, then the pipe angle to the entrance face is "
+                   write(6,*) " angle/2. It is a normal rbend."
+                   write(6,*) " If e1/=0, then the pipe angle to the entrance face is "
+                   write(6,*) ' angle/2+e1 and the exit pipe makes an angle "angle/2-e1" '
+                   write(6,*) " with the exit face."
+                   write(6,*) " The offending non-zero t2 = (e2 - angle/2) is set to zero! "
+                   write(6,*) " Make sure that this is what you want!!! "
+                   !                write(6,*) " CHANGE YOUR LATTICE FILRE."
+                   !                stop 666
+                   key%list%t2=zero
+                endif
+             else
+                key%magnet="WEDGRBEND"
+             endif
           endif
        endif
        if(errors_out) then
