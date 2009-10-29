@@ -8,7 +8,8 @@ CC=gcc
 f95=ifort
 ARCH=32
 DEBUG=NO
-ONLINE=YES
+#Presently the ONLINE flag cannot be used due to a library conflict
+#ONLINE=
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
@@ -38,6 +39,10 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   SLC5=NO
   FC11=NO
 endif
+
+#Temporary locking of ONLINE to NO
+ONLINE=NO
+
 
 #######################################################################
 # Compilers
