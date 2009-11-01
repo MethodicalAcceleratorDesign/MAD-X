@@ -8,8 +8,7 @@ CC=gcc
 f95=ifort
 ARCH=32
 DEBUG=NO
-#Presently the ONLINE flag cannot be used due to a library conflict
-#ONLINE=
+ONLINE=YES
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
@@ -39,10 +38,6 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   SLC5=NO
   FC11=NO
 endif
-
-#Temporary locking of ONLINE to NO
-ONLINE=NO
-
 
 #######################################################################
 # Compilers
@@ -238,6 +233,9 @@ endif
 
 ifeq ($(ONLINE),YES)
   GCCP_FLAGS+= -D_ONLINE
+  ifeq ($(f95),ifort)
+    LIBX+= -limf
+  endif
   LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libgsl.a libz.a
 endif
 
