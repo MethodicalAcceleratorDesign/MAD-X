@@ -84,7 +84,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   
   double precision get_value !hbu
   logical zero_suppr !hbu
-
+  logical marker_plot !hg
 
   !--- Initialisation of local variables
 
@@ -94,7 +94,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   iecub = 0
   
   zero_suppr=get_value('plot ','zero_suppr ').ne.0 !hbu
-
+  marker_plot = get_value('plot ','marker_plot ').ne.0 !hg
   !--- Output initialisation
 
   ierr = 0
@@ -169,9 +169,9 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
 
         !--- avoid identical points
 
-        if ((xreal(npt) - xval(j))**2 +                               &
-			(yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
-			 ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
+        if (marker_plot .or. (xreal(npt) - xval(j))**2 +      &
+            (yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
+	    ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
            npt        = npt + 1
            xreal(npt) = xval(j)
            yreal(npt) = yval(j)
@@ -602,11 +602,7 @@ subroutine pefill(ierr)
            endif
         endif
      endif
-     if(marker_plot) then
-        mystep=0
-     else
-        mystep=0.1d0 * step
-     endif
+     mystep=0.1d0 * step
      do l = 1, nivvar
         if (nqval(l) .eq. maxseql)  then
            print *, 'Warning: plot buffer full, plot truncated'
@@ -621,7 +617,7 @@ subroutine pefill(ierr)
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
         elseif (itbv .eq. 0 .or. currpos - qhval(nqval(l),l)          &
-             .gt. mystep) then
+             .gt. mystep .or. (marker_plot .and. currtyp .eq. 25)) then
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
            k = double_from_table(tabname, sname(l), j, d_val)
