@@ -131,6 +131,21 @@ contains
        enddo
     enddo
 
+
+    ! in 4D we get following formulas for Twiss parameters. They can be derived to compute deltap dependency
+    ! beta[ 1 1 ]=(Y(1)%t.sub.100000)*(Y(1)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(1)%t.sub.010000)
+    ! alpha[ 1 1 ]=-(Y(1)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(1)%t.sub.010000)*(Y(2)%t.sub.010000)
+    ! gamma[ 1 1 ]=(Y(2)%t.sub.100000)*(Y(2)%t.sub.100000)+(Y(2)%t.sub.010000)*(Y(2)%t.sub.010000)
+    ! beta[ 2 1 ]=(Y(3)%t.sub.100000)*(Y(3)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(3)%t.sub.010000)
+    ! alpha[ 2 1 ]=-(Y(3)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(3)%t.sub.010000)*(Y(4)%t.sub.010000)
+    ! gamma[ 2 1 ]=(Y(4)%t.sub.100000)*(Y(4)%t.sub.100000)+(Y(4)%t.sub.010000)*(Y(4)%t.sub.010000)
+    ! beta[ 1 2 ]=(Y(1)%t.sub.001000)*(Y(1)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(1)%t.sub.000100)
+    ! alpha[ 1 2 ]=-(Y(1)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(1)%t.sub.000100)*(Y(2)%t.sub.000100)
+    ! gamma[ 1 2 ]=(Y(2)%t.sub.001000)*(Y(2)%t.sub.001000)+(Y(2)%t.sub.000100)*(Y(2)%t.sub.000100)
+    ! beta[ 2 2 ]=(Y(3)%t.sub.001000)*(Y(3)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(3)%t.sub.000100)
+    ! alpha[ 2 2 ]=-(Y(3)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(3)%t.sub.000100)*(Y(4)%t.sub.000100)
+    ! gamma[ 2 2 ]=(Y(4)%t.sub.001000)*(Y(4)%t.sub.001000)+(Y(4)%t.sub.000100)*(Y(4)%t.sub.000100)
+
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
     !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
