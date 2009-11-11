@@ -1663,7 +1663,6 @@ contains
       integer :: order
 
       order = get_value('ptc_twiss ', 'no ')
-      write(0,*) 'DEBUG: order is set to ',order
 
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
