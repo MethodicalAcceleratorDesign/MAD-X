@@ -78,12 +78,11 @@ int  sdds_iow(struct in_cmd* cmd)
 int sdds_readt(char *filename, char *tfsname)
 {
 
-int     i1, i2, i3, i4, i5;
-int     j1, j2, j3, j4, j5;
+int     i1, i2, i3, i5;
+int     j1, j2;
 
-long    la, lb, lc;
+long    lb;
 long    narr, nall;
-long    npar;
 long    arrdim[MAX_TFS_COL];
 long    arrtyp[MAX_TFS_COL];
 long    arrele[MAX_TFS_COL];
@@ -98,14 +97,9 @@ char    **datstr[MAX_TFS_COL];
 char    **c0;
 char    *c1[MAX_TFS_COL];
 
-int     numbrows;
-int     arrsel;
 
-SDDS_TABLE SDDS_table1;
 SDDS_TABLE SDDS_table;
-SDDS_TABLE SDDS_table2;
 
-SDDS_ARRAY memp;
 SDDS_ARRAY *arr;
 
 char*   tfs_table_cols[500];
@@ -143,7 +137,7 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
     /*   */
     c0 = SDDS_GetArrayNames(&SDDS_table,(int32_t *)&nall);
 
-    if (get_option("debug")) printf("Found %d arrays in total\n",nall);
+    if (get_option("debug")) printf("Found %ld arrays in total\n",nall);
 
     narr = 0;
 
@@ -153,13 +147,13 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
            for(i2=0; i2 < sdds_pat->curr; i2++) {
              if (get_option("debug")) printf("Check pattern %s %s\n",sdds_pat->p[i2],c0[i1]);
              if(myregex(sdds_pat->p[i2],c0[i1]) == 0) {
-                if (get_option("debug")) printf("found now %s %s %d\n",sdds_pat->p[i2],c0[i1],narr);
+                if (get_option("debug")) printf("found now %s %s %ld\n",sdds_pat->p[i2],c0[i1],narr);
                 c1[narr++] = c0[i1];
-                if (get_option("debug")) printf("found now %s %s %d\n",sdds_pat->p[i2],c0[i1],narr);
+                if (get_option("debug")) printf("found now %s %s %ld\n",sdds_pat->p[i2],c0[i1],narr);
              }
            }
          } else {
-                if (get_option("debug")) printf("no check, use %s %d\n",c0[i1],narr);
+                if (get_option("debug")) printf("no check, use %s %ld\n",c0[i1],narr);
                 c1[narr++] = c0[i1];
          }
       }
@@ -186,9 +180,9 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
          fatal_error("Array is 2-Dimensional: ",c1[i1]);
       }
       if(i1 > 0) {
-         if (get_option("debug")) printf("===> %d %d %d\n",i1,arrele[i1],arrele[i1-1]);
+         if (get_option("debug")) printf("===> %d %ld %ld\n",i1,arrele[i1],arrele[i1-1]);
          if(arrele[i1] != arrele[i1-1]) {
-            printf("found two arrays with different lengths: %d %d\n",arrele[i1-1],arrele[i1]);
+            printf("found two arrays with different lengths: %ld %ld\n",arrele[i1-1],arrele[i1]);
             fatal_error("Two arrays with different length, ", "conversion aborted");
          }
       }
@@ -202,7 +196,7 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
          datmps = (short *)arr->data;   
          datmpf = (float *)arr->data;   
          if (get_option("debug")) {
-           if(arrtyp[i1] != SDDS_STRING) printf("data: %le %d \n",(double)datmp[i3],datmp[i3]);
+           if(arrtyp[i1] != SDDS_STRING) printf("data: %le %le \n",(double)datmp[i3],datmp[i3]);
            if(arrtyp[i1] == SDDS_STRING) printf("data: %s \n",datstr[i1][i3]);
          }
          if(arrtyp[i1] == SDDS_DOUBLE) datd[i1][i3] = (double)datmp[i3];     
@@ -213,7 +207,7 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
          if(arrtyp[i1] == SDDS_SHORT)  datd[i1][i3] = datmps[i3];     
       }
       if (get_option("debug")) {
-         printf("For TFS table: %s %d %d %d\n",c1[i1],arrdim[i1],arrtyp[i1],tfs_sdds_types[arrtyp[i1]]);
+         printf("For TFS table: %s %ld %ld %d\n",c1[i1],arrdim[i1],arrtyp[i1],tfs_sdds_types[arrtyp[i1]]);
       }
       if(arrdim[i1] != 1 )     {
          warning("Array is 2-Dimensional",c1[i1]);
@@ -345,10 +339,9 @@ int   i2, npar;
 int sdds_writet_sel(char *filename, struct table *tfstab)
 {
 
-int     i1, i2, i3, i4, i5;
-int     j1, j2, j3, j4, j5;
+int     i1;
+int     j1, j2;
 
-double *px, *py;
 
 double  **da1;
 char    ***sa1;
@@ -356,8 +349,6 @@ char    ***sa1;
 int     pos[1000];
 
 long    *pl;
-double  *pd;
-char    *pstr;
 
 SDDS_TABLE SDDS_table;
 
