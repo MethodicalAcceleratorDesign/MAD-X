@@ -16,6 +16,8 @@ void match_action(struct in_cmd* cmd)
   int i;
   int iseed, iprint;
   int izero = 0;
+  int local_calls;
+  int local_call_lim;
 
   if (match_is_on == kMatch_PTCknobs)
   {
@@ -45,6 +47,9 @@ void match_action(struct in_cmd* cmd)
 
   current_call_lim += match_calls;
 
+  local_call_lim = command_par_value("calls", cmd->clone);
+  local_calls = 0;
+	
   if (strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars > total_const)
   {
     print_match_summary = 0;
@@ -66,7 +71,7 @@ void match_action(struct in_cmd* cmd)
     match_work[9] = new_double_array(total_vars);
     fprintf(prt_file, "START LMDIF:\n\n");
     mtlmdf_(&total_const, &total_vars,
-            &match_tol, &current_calls, &current_call_lim,
+            &match_tol, &local_calls, &local_call_lim,
             vary_vect->a, vary_dvect->a, fun_vect->a, match_work[0]->a,
             match_work[1]->a, match_work[2]->a, match_work[3]->a,
             match_work[4]->a, match_work[5]->a, match_work[6]->a,
@@ -75,6 +80,7 @@ void match_action(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "jacobian") == 0)
   {
     print_match_summary = 0;
+	
     jac_strategy = command_par_value("strategy", cmd->clone);
     jac_cool = command_par_value("cool", cmd->clone);
     jac_repeat = command_par_value("repeat", cmd->clone);
@@ -91,7 +97,7 @@ void match_action(struct in_cmd* cmd)
     mtjac_(&total_const, &total_vars,
            &jac_strategy, &jac_cool,&jac_balance, &jac_random,
            &jac_repeat,&jac_bisec,&jac_cond,&match_is_on,
-           &match_tol, &current_calls, &current_call_lim,
+           &match_tol, &local_calls, &local_call_lim,
            vary_vect->a, vary_dvect->a, fun_vect->a,
            match_work[0]->a,match_work[1]->a,match_work[2]->a,
            match_work[3]->a,match_work[4]->a);
@@ -114,7 +120,7 @@ void match_action(struct in_cmd* cmd)
     match_work[7] = new_double_array(total_vars);
     fprintf(prt_file, "START MIGRAD:\n\n");
     mtmigr_(&total_const, &total_vars, &mig_strategy,
-            &match_tol, &current_calls, &current_call_lim,
+            &match_tol, &local_calls, &local_call_lim,
             vary_vect->a, vary_dvect->a, fun_vect->a,
             match_work[0]->a, match_work[1]->a, match_work[2]->a,
             match_work[3]->a, match_work[4]->a, match_work[5]->a,
@@ -128,7 +134,7 @@ void match_action(struct in_cmd* cmd)
     match_work[2] = new_double_array(4*total_vars);
     fprintf(prt_file, "START SIMPLEX:\n\n");
     mtsimp_(&total_const, &total_vars,
-            &match_tol, &current_calls, &current_call_lim,
+            &match_tol, &local_calls, &local_call_lim,
             vary_vect->a, vary_dvect->a, fun_vect->a,
             match_work[0]->a, match_work[1]->a, match_work[2]->a);
   }
@@ -146,7 +152,7 @@ void match_action(struct in_cmd* cmd)
     match_work[6] = new_double_array(total_vars+1);
     fprintf(prt_file, "START SIMAN:\n\n");
     mtsa_(&total_const, &total_vars,
-          &match_tol, &current_calls, &current_call_lim,
+          &match_tol, &local_calls, &local_call_lim,
           vary_vect->a, fun_vect->a,&iseed,&iprint,
           match_work[0]->a, match_i_work[1]->i, match_work[2]->a,
           match_work[3]->a, match_work[4]->a, match_work[5]->a,
@@ -320,7 +326,13 @@ void match_end(struct in_cmd* cmd)
   int i;
   struct node* c_node;
   int izero = 0;
+  if (fun_vect == NULL )
+  {
+    fprintf(prt_file, "WARNING: No matching method selected.\n");
+    return;
+  }
 
+  
   if (match_is_on==kMatch_UseMacro) {
     match2_end(cmd);
     return;
