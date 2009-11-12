@@ -183,3 +183,4 @@ testing/mad_install -text
 /wrap.f90 -text
 /wrap_C_calls.py -text
 /wrap_fortran_calls.pl -text
+/wrap_fortran_calls.py -text
