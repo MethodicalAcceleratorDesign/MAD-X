@@ -269,8 +269,7 @@ madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c s
 
 # automatically generated code
 fortran_wrappers.h:
-	perl wrap_fortran_calls.pl 	# creates fortran_wrappers.c, fortran_prototypes.h
-                                        # and fortran_wrappers_prototypes.h
+	python wrap_fortran_calls.py # creates fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
 
 c_wrappers.h:
 	python wrap_C_calls.py	
@@ -400,8 +399,7 @@ clean:
 	rm -f *.mod
 	rm -f core
 	rm -f *~
-	rm -f fortran_wrappers.c fortran_wrappers.h
-	rm -f fortran_prototypes.h fortran_wrappers_prototypes.h
+	python wrap_fortran_calls.py --clean
 	rm -f c_wrappers.c c_wrappers.h
 	rm -f c_prototypes.h c_wrappers_prototypes.h
 
