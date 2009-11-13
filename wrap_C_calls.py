@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import re
+import optparse
 
 # struct handling could be removed, as there is actually no C function called from Fortran, with a struct in its signature
 
@@ -128,7 +129,7 @@ class Wrapper:
             # print "Fortran calls C function: " + func.returnType +' ' + func.name + "(" + argStr + ")"
 
     def generateWrapperCode(self):
-        f = open("c_wrappers.c","w")
+        f = open(c_wrappers_c_file,"w")      
         header = []
         code = []
         nFunc = len(self.fortranCalls)
@@ -187,7 +188,7 @@ class Wrapper:
         f.close()
 
     def generateWrapperHeader(self):
-        f = open("c_wrappers.h","w")
+        f = open(c_wrappers_h_file,"w")      
         code = []
         code.append('#ifndef _C_WRAPPERS_H\n')
         code.append('#define _C_WRAPPERS_H\n')
@@ -203,7 +204,7 @@ class Wrapper:
         f.close()
 
     def generateWrapperPrototypes(self):
-        f = open("c_wrappers_prototypes.h","w")
+        f = open(c_wrappers_prototypes_h_file,"w")   
         header = []
         code = []
         header.append('/* to avoid conflicting implicit declarations from code calling functions below*/\n')
@@ -243,7 +244,7 @@ class Wrapper:
         f.close()
         
     def generatePrototypes(self): # this function could easily be combined with generateWrapperPrototypes as they share most of code
-        f = open("c_prototypes.h","w")
+        f = open( c_prototypes_h_file,"w")       
         header = []
         code = []
         header.append('/* to avoid warnings of implicit declarations from c_wrappers.c */\n')
@@ -292,17 +293,13 @@ class Wrapper:
         # until we can rely on the subprocess library from Python 2.5 ...
         # no way to get the output of a system call but through a file
         command = 'ls -l *.' + suffix + ' > files.out'
-        os.system(command)
-        f = open("files.out",'r')
-        lines = f.readlines()
+
         files = []
-        for line in lines:
-            m = re.match(r'.+[\s\t]+([\w\.]+)[\s\t]*$',line)
-            if m:
-                file = m.group(1)
-                #print("found file '"+file+"'")
+        allFiles = os.listdir('.')
+        for file in allFiles:
+            if file[-((len(suffix))+1):] == ('.'+suffix):
                 files.append(file)
-        os.system('rm files.out') # clean-up
+
         return files
 
 def wrapFortranCallingC():
@@ -314,9 +311,32 @@ def wrapFortranCallingC():
         wrapper.generateWrapperHeader()
         wrapper.generateWrapperPrototypes()
         wrapper.generatePrototypes()
-        # print("Completed.")
+        if options.verbose:
+            print("Completed.")
     except WrapperException, we: # from Python 2.6, should restate as 'except WrapperException as we:'
         we.printout()
         
 if __name__ == "__main__":
-    wrapFortranCallingC()
+
+    c_wrappers_c_file = "c_wrappers.c"
+    c_wrappers_h_file = "c_wrappers.h"
+    c_prototypes_h_file = "c_prototypes.h"
+    c_wrappers_prototypes_h_file = "c_wrappers_prototypes.h"
+
+    files = [c_wrappers_c_file, c_wrappers_h_file, c_prototypes_h_file, c_wrappers_prototypes_h_file]
+    
+    usage = '%prog [options]'
+    parser = optparse.OptionParser(usage)
+    parser.add_option('-c','--clean',help='deletes all files created by this script',action='store_true')
+    parser.add_option('-v','--verbose',help='display messages that may be useful for debugging',action='store_true')
+    (options,args) = parser.parse_args()
+
+    if options.clean:
+        for file in files:
+            try:
+                os.remove(file)
+                print("delete " + file)                          
+            except:
+                pass
+    else:
+        wrapFortranCallingC()
