@@ -404,8 +404,7 @@ clean:
 	rm -f core
 	rm -f *~
 	python wrap_fortran_calls.py --clean
-	rm -f c_wrappers.c c_wrappers.h
-	rm -f c_prototypes.h c_wrappers_prototypes.h
+	python wrap_C_calls.py --clean
 
 info:
 	@echo default C compiler CC "    " = $(CC)
