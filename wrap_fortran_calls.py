@@ -141,9 +141,9 @@ targetFiles = [wrapper_filename, wrapper_header_filename, prototypes_filename,wr
 
 if options.clean:
     for file in targetFiles:
-        print("delete " + file)
         try:
             os.remove(file)
+            print("delete " + file)            
         except:
             pass
     sys.exit()
