@@ -981,7 +981,7 @@ CONTAINS
           LI=LI+DL
           SL=SL+P%DIR*DL
           IF(MOD(P%MAG%P%NST,2)==0) THEN
-             IF(J==P%MAG%P%NST/2+1) TM=>L%END
+             IF(J==P%MAG%P%NST/2) TM=>L%END
           ELSE
              IF(J==1) TM=>T1
           ENDIF
