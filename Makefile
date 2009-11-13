@@ -236,7 +236,11 @@ ifeq ($(ONLINE),YES)
   ifeq ($(f95),ifort)
     LIBX+= -limf
   endif
-  LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libgsl.a libz.a
+  ifeq ($(ARCH),32)
+    LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libgsl.a libz.a
+  else
+    LIBX+= libSDDS1c64.a libSDDS164.a librpnlib64.a libmdbmth64.a libmdblib64.a libgsl64.a libz64.a
+  endif
 endif
 
 ifeq ($(PROFILE),YES)
