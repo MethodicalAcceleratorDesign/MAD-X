@@ -368,12 +368,15 @@ contains
     suml=zero
 
     icase = get_value('ptc_twiss ','icase ')
+
     deltap0 = get_value('ptc_twiss ','deltap ')
 
     rmatrix = get_value('ptc_twiss ','rmatrix ')
 
     deltap = zero
+
     call my_state(icase,deltap,deltap0)
+
     CALL UPDATE_STATES
 
     ! check that deltap-dependency selected iff icase=5, which stands for
@@ -431,7 +434,6 @@ contains
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
 
-
     mynd2 = 0
     npara = 0
     no = get_value('ptc_twiss ','no ')
@@ -483,7 +485,6 @@ contains
           return
        endif
     endif
-
 
     call setknobs(my_ring)
 
@@ -543,7 +544,6 @@ contains
     endif
 
     slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
-
 
     if (.not. slice_magnets) then
 
@@ -637,7 +637,6 @@ contains
     call print(y,mf2)
     close(mf2)
     ! relocated here to avoid side-effect
-
 
     if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
        ! only makes sense if the lattice is a ring (skipped for a line lattice)
@@ -1775,6 +1774,7 @@ contains
       ! first order derivatives of the dispersions
       ! assuming icase=5
       !call daprint(oneTurnMap,88)
+
       if (icase.eq.5) then
 
          ! always assume time=false, so that the fifth phase-space variable is deltap instead of pt!
@@ -1886,15 +1886,16 @@ contains
 
          call kill(yy)
       
-      else ! icase neither 5 nor 56: can't compute the derivatives of the pathlength
+      elseif(icase.eq.6) then
+         alpha_c_p = 0.0
+         alpha_c_p2 = 0.0
+         alpha_c_p3 = 0.0
+      else ! icase not in 5,56 or 56: can't compute the derivatives of the pathlength
          alpha_c_p  = 0.0 ! exactly zero means failure to compute the actual value
          alpha_c_p2 = 0.0 ! exactly zero means failure to compute the actual value
          alpha_c_p3 = 0.0
       endif
-      ! what about when icase=6?
 
-      
-      
       ! also output the tune ...
       fractionalTunes = theNormalForm%tune
       ! the above is exactly equivalent to the following two lines (i.e. returns frac.tune)
@@ -1904,9 +1905,15 @@ contains
       ! => no, not with a map...
 
       ! ... as well as the chromaticities
-      chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
-      chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
+      if (icase.eq.5 .or. icase.eq.56) then
+         chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
+         chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
       ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
+      else
+         ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
+         chromaticities(1) = 0.0
+         chromaticities(2) = 0.0
+      endif
 
       ! for debug: check the values by printing the map
       if (debugFiles .eq. 1) then
@@ -1986,6 +1993,7 @@ contains
       call make_node_layout(my_ring) ! essential: the way to look inside the magnets
 
       state = 0.d0
+
       call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
 
       call alloc(theTransferMap) ! transfer map between two successive inner slices
