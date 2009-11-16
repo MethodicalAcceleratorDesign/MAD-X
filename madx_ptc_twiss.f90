@@ -1843,6 +1843,10 @@ contains
          ! eventually, one could differentiate the above formula to obtain alpha_c_p2
          ! but for the time-being, expect icase to be 56 to compute alpha_c_p2 and alpha_c_p3.
 
+         alpha_c_p2 = 0.0
+         alpha_c_p3 = 0.0
+
+
          call kill(theAscript)
 
       elseif (icase.eq.56) then ! here one may obtain the pathlength derivatives from the map
@@ -1885,6 +1889,7 @@ contains
       else ! icase neither 5 nor 56: can't compute the derivatives of the pathlength
          alpha_c_p  = 0.0 ! exactly zero means failure to compute the actual value
          alpha_c_p2 = 0.0 ! exactly zero means failure to compute the actual value
+         alpha_c_p3 = 0.0
       endif
       ! what about when icase=6?
 
