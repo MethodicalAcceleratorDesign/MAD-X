@@ -1363,7 +1363,7 @@ subroutine tthacdip(track,ktrack,turn)
       turn4 = node_value('ramp4 ')
 !---- Set up.
       omega = rff * twopi
-      vrf   = rfv * ten3m / pc0
+      vrf   = 300 * rfv * ten3m / pc0
       phirf = rfl * twopi
 
       if (turn .lt. turn1)  then
@@ -1426,7 +1426,7 @@ subroutine ttvacdip(track,ktrack,turn)
       turn4 = node_value('ramp4 ')
 !---- Set up.
       omega = rff * twopi
-      vrf   = rfv * ten3m / pc0
+      vrf   = 300 * rfv * ten3m / pc0
       phirf = rfl * twopi
 
 

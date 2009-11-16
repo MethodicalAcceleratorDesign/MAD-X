@@ -122,6 +122,8 @@ void att_rfcavity(struct c6t_element*);
 void att_crabcavity(struct c6t_element*);
 void att_dipedge(struct c6t_element*);
 void att_solenoid(struct c6t_element*);
+void att_hacdipole(struct c6t_element*);
+void att_vacdipole(struct c6t_element*);
 void att_sbend(struct c6t_element*);
 void att_sextupole(struct c6t_element*);
 void att_vkicker(struct c6t_element*);
@@ -167,6 +169,8 @@ void mod_rfcavity(struct c6t_element*);
 void mod_crabcavity(struct c6t_element*);
 void mod_dipedge(struct c6t_element*);
 void mod_solenoid(struct c6t_element*);
+void mod_hacdipole(struct c6t_element*);
+void mod_vacdipole(struct c6t_element*);
 void mod_sextupole(struct c6t_element*);
 void multi_loop();
 struct c6t_element* new_c6t_element(int, char*, char*);
@@ -257,6 +261,8 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "crabcavity   3       3       3       0       0       2",
  "dipedge      2       2       2       0       0       0",
  "solenoid     2       2       2       0       0       0",
+ "hacdipole    2       2       2       0       0       0",
+ "vacdipole    2       2       2       0       0       0",
 };
 
 char keep_these[MM_KEEP][24] = {"ip", "mt_"};
@@ -459,6 +465,8 @@ void assign_att()
         else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
         else if (strcmp(el->base_name, "dipedge") == 0) att_dipedge(el);
 	else if (strcmp(el->base_name, "solenoid") == 0) att_solenoid(el);
+	else if (strcmp(el->base_name, "hacdipole") == 0) att_hacdipole(el);
+	else if (strcmp(el->base_name, "vacdipole") == 0) att_vacdipole(el);
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
@@ -681,6 +689,22 @@ void att_solenoid(struct c6t_element* el)
   el->out_2 = el->value[2];
   el->out_3 = el->value[3];
   el->out_4 = el->value[0];
+}
+
+void att_hacdipole(struct c6t_element* el)
+{
+  el->out_1 = 16;
+  el->out_2 = el->value[2];
+  el->out_3 = el->value[3];
+  el->out_4 = el->value[4];
+}
+
+void att_vacdipole(struct c6t_element* el)
+{
+  el->out_1 = -16;
+  el->out_2 = el->value[2];
+  el->out_3 = el->value[3];
+  el->out_4 = el->value[4];
 }
 
 void att_sbend(struct c6t_element* el)
@@ -1188,6 +1212,24 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("ks",p->p_elem);
     c6t_elem->value[3] = el_par_value_recurse("ksi",p->p_elem);
+  }
+  else if ((strcmp(p->base_name,"hacdipole") == 0))
+  {
+    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[2] = el_par_value_recurse("volt",p->p_elem);
+    c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
+    c6t_elem->value[4] = el_par_value_recurse("lag",p->p_elem);
+  }
+  else if ((strcmp(p->base_name,"vacdipole") == 0))
+  {
+    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[2] = el_par_value_recurse("volt",p->p_elem);
+    c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
+    c6t_elem->value[4] = el_par_value_recurse("lag",p->p_elem);
   }
   else if ((strcmp(p->base_name,"marker") == 0)   ||
            (strcmp(p->base_name,"instrument") == 0)    ||
