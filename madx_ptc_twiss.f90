@@ -2020,6 +2020,21 @@ contains
       do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1
          ! "t" is the child thin-lens layout according to "type layout" definition
 
+         if (nodePtr%cas/=case0) then
+            ! this is not an inner node (nodePtr%cas==case0 for inner nodes)
+            ! instead, this is either one of the first or last two nodes (extremity and fringe)
+            ! which we shall discard
+            nodePtr => nodePtr%next
+            if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
+               write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
+               fibrePtr => fibrePtr%next
+               ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
+               ! so that the element name on the far left displays correctly
+               returnedInteger = advance_node()
+            endif
+            cycle ! next in loop
+         endif
+
          s = nodePtr%next%s(3) ! s(1) is the total arc-length, s(3) the total integration-distance
          ! From Etienne:
          ! nodePtr%s(1) is the total arc length (LD)
