@@ -1994,6 +1994,10 @@ contains
       type(real_8) :: theAscript(6) ! the phase-advance
       integer :: returnedInteger
 
+      character(200) :: msg
+      integer :: countSkipped
+      countSkipped = 0
+
       knobsNumber = nda ! nda is a semi-global variable !!!
 
       call make_node_layout(my_ring) ! essential: the way to look inside the magnets
@@ -2097,8 +2101,12 @@ contains
          endif
 
          if (at_center_only .and. associated(nodePtr,fibrePtr%tm)) then
-            !write(0,*) 'DEBUG invoke puttwisstable at center of element',fibrePtr%mag%name,",s=",s
-            call puttwisstable(transfermap)            
+            if (mod(fibrePtr%mag%p%nst,2)/=0) then
+               countSkipped = countSkipped + 1
+               !write(0,*) 'number of elements for which middle element incorrect du to uneven nst =',countSkipped
+            else
+               call puttwisstable(transfermap)
+            endif
          endif
 
 
@@ -2132,6 +2140,12 @@ contains
       enddo ! for the successive slices / thin-lenses in the magnets' sequence
 
 200   continue
+
+      ! print warnings if any
+      if (countSkipped.gt.0) then
+         write(msg,*) "'center' option expects magnets split in the middle, assuming an even number of slices. Discarded elements with an odd number of slices:",countSkipped
+         call fort_warn('ptc_twiss ',msg)
+      endif
 
       call kill(theTransferMap)
       call kill(theAscript)
