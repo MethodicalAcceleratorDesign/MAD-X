@@ -33,6 +33,8 @@ MODULE madx_ptc_module
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
   integer, private, allocatable :: J(:)
   logical(lp)             :: savemaps=.false.
+  logical(lp) :: resplit,even
+  real(dp) my_thin,xbend
 
   type mapbuffer
      type(universal_taylor)  :: unimap(6)
@@ -995,6 +997,15 @@ CONTAINS
 
     doneit=.true.
     call ring_l(my_ring,doneit)
+
+    resplit=get_value('ptc_create_layout ','resplit ').ne.0
+    if(resplit) then
+       my_thin = get_value('ptc_create_layout ','thin ')
+       xbend = get_value('ptc_create_layout ','xbend ')
+       even = get_value('ptc_create_layout ','even ').ne.0
+       resplit_cutting=2
+       CALL THIN_LENS_resplit(my_ring,THIN=my_thin,even=even,xbend=xbend)
+    endif
 
     if(errors_in) call fill_errors(my_ring)
 
