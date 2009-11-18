@@ -97,6 +97,7 @@
       <test input = "diamond.madx" output="diamond.out" subdir="Example5"/>
       <test input = "lhc.madx" output="lhc.out" subdir="Example6"/>
       <test input = "slice.madx" output="slice.out" subdir="SliceMagnets"/>
+      <test input = "center.madx" output="center.out" subdir="SliceMagnets"/>
       <test input = "deltaDependency.madx" output="deltaDependency.out" subdir="DeltaDependency"/>
    </target>
    <target name="special_features" responsible="Frank.Schmidt@cern.ch">
