@@ -610,7 +610,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   go to 500
   !---- Multipole
 80 continue
-  call ttmult(track,ktrack,dxt,dyt)
+  call ttmult(track,ktrack,dxt,dyt,turn)
   go to 500
   !---- Solenoid.
 90 continue
@@ -707,7 +707,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   return
 end subroutine ttmap
 
-subroutine ttmult(track, ktrack,dxt,dyt)
+subroutine ttmult(track, ktrack,dxt,dyt,turn)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -722,17 +722,20 @@ subroutine ttmult(track, ktrack,dxt,dyt)
   include 'track.fi'
   logical first
   integer iord,jtrk,nd,nord,ktrack,j,n_ferr,nn,ns,node_fd_errors,   &
-       get_option
+       get_option,turn
   double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
        pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
        f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
        ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-       skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt
+       skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt,npeak,  &
+       nlag, ntune, temp,noise
 
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
+  
   save first,ordinv
   data first / .true. /
-
+  
+  
   !---- Precompute reciprocals of orders.
   if (first) then
      do iord = 1, maxmul
@@ -745,6 +748,7 @@ subroutine ttmult(track, ktrack,dxt,dyt)
   bvk = node_value('other_bv ')
   !---- Multipole length for radiation.
   elrad = node_value('lrad ')
+  noise = node_value('noise ')
   !---- Multipole components.
   call dzero(normal,maxmul+1)
   call dzero(skew,maxmul+1)
@@ -752,12 +756,33 @@ subroutine ttmult(track, ktrack,dxt,dyt)
   call get_node_vector('ksl ',ns,skew)
   nd = 2 * max(nn, ns)
   call dzero(vals,2*(maxmul+1))
-  do iord = 0, nn
+  
+  if(noise .eq. 1)   then
+   npeak = node_value('npeak ')
+   ntune = node_value('ntune ')
+   nlag = node_value('nlag ')
+   temp = npeak * sin(nlag + ntune * turn)
+   do iord = 0, nn
+     vals(1,iord) = normal(iord) * (1+temp)
+   enddo
+   do iord = 0, ns
+     vals(2,iord) = skew(iord) * (1+temp)
+   enddo
+  else
+   do iord = 0, nn
      vals(1,iord) = normal(iord)
-  enddo
-  do iord = 0, ns
+   enddo
+   do iord = 0, ns
      vals(2,iord) = skew(iord)
-  enddo
+   enddo
+  endif
+  
+!  do iord = 0, nn
+!     vals(1,iord) = normal(iord)
+!  enddo
+!  do iord = 0, ns
+!     vals(2,iord) = skew(iord)
+!  enddo
   !---- Field error vals.
   call dzero(field,2*(maxmul+1))
   if (n_ferr .gt. 0) then

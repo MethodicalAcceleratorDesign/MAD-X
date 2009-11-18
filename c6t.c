@@ -91,7 +91,7 @@
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 31          /* no. of valid element types */
+#define N_TYPES 33          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -261,8 +261,8 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "crabcavity   3       3       3       0       0       2",
  "dipedge      2       2       2       0       0       0",
  "solenoid     2       2       2       0       0       0",
- "hacdipole    2       2       2       0       0       0",
- "vacdipole    2       2       2       0       0       0",
+ "hacdipole    3       3       3       0       0       2",
+ "vacdipole    3       3       3       0       0       2",
 };
 
 char keep_these[MM_KEEP][24] = {"ip", "mt_"};
