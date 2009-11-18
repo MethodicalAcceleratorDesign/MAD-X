@@ -80,7 +80,7 @@ module madx_ptc_twiss_module
        0,0,0,0,0,1 /), &
        (/6,6/) )
 
-  logical :: slice_magnets, deltap_dependency, momentumCompactionToggle
+  logical :: slice_magnets, center_magnets, deltap_dependency, momentumCompactionToggle
 
   real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
   real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
@@ -544,8 +544,9 @@ contains
     endif
 
     slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
+    center_magnets = get_value('ptc_twiss ','center_magnets ') .ne. 0
 
-    if (.not. slice_magnets) then
+    if ((.not. slice_magnets) .and. (.not. center_magnets)) then
 
        ! choice is to go one element after the other, instead of through the magnets' inner slices
        ! option is either absent or set to 'elements'
@@ -623,8 +624,12 @@ contains
        enddo
 100    continue
 
-    else ! choice is to track along successive inner slices of the magnets
-       call TrackAlongInnerSlices() ! for time-being, instead of the above
+    elseif (slice_magnets) then ! choice is to track along successive inner slices of the magnets
+       call TrackAlongInnerSlices(at_center_only=.false.) ! for time-being, instead of the above
+    elseif (center_magnets) then
+       call TrackAlongInnerSlices(at_center_only=.true.)
+    else
+       write(0,*) "should never reach this point"
     endif
 
 
@@ -1970,13 +1975,14 @@ contains
     end subroutine oneTurnSummary
 
 
-    subroutine TrackAlongInnerSlices()
+    subroutine TrackAlongInnerSlices(at_center_only)
 
       ! the ptc_twiss shall feature an additional flag to decide
       ! whether or not one evaluate the Twiss functions inside the elements
       ! or solely at the middle.
 
       implicit none
+      logical :: at_center_only
       integer :: initialThinLensPos, thinLensPos
       type(integration_node), pointer :: nodePtr
       type(fibre), pointer :: fibrePtr
@@ -2020,22 +2026,8 @@ contains
       do thinLensPos = initialThinLensPos, my_ring%t%n+initialThinLensPos-1
          ! "t" is the child thin-lens layout according to "type layout" definition
 
-         if (nodePtr%cas/=case0) then
-            ! this is not an inner node (nodePtr%cas==case0 for inner nodes)
-            ! instead, this is either one of the first or last two nodes (extremity and fringe)
-            ! which we shall discard
-            nodePtr => nodePtr%next
-            if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
-               write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
-               fibrePtr => fibrePtr%next
-               ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
-               ! so that the element name on the far left displays correctly
-               returnedInteger = advance_node()
-            endif
-            cycle ! next in loop
-         endif
-
-         s = nodePtr%next%s(3) ! s(1) is the total arc-length, s(3) the total integration-distance
+         ! 18 nov 2009: change (3) by (1) in the following
+         s = nodePtr%next%s(1) ! s(1) is the total arc-length, s(3) the total integration-distance
          ! From Etienne:
          ! nodePtr%s(1) is the total arc length (LD)
          ! nodePtr%s(3) is the total integration distance.... ( LC)  LC=LD unless exact=true and true rbends are present.
@@ -2046,7 +2038,9 @@ contains
          ! in  a closed-ring, s evaluates to zero when we reach my_ring%t%n+initialThinLensPos -1
          ! let's omit such final value in case of a closed-ring
          if ((s .eq. 0d0) .and. (thinLensPos .eq. (my_ring%t%n+initialThinLensPos-1))) then
-            s = nodePtr%s(3) + nodePtr%next%s(5) ! s of previous node + local offset
+            ! s = nodePtr%s(3) + nodePtr%next%s(5) ! s of previous node + local offset
+            ! 18 nov 2009: change (3) in the above by (1) in the following
+            s = nodePtr%s(1) + nodePtr%next%s(5) ! s of previous node + local offset
          endif
 
          ! following part is cut/pasted from the equivalent reference
@@ -2094,7 +2088,19 @@ contains
          suml = s ! another global!!! to be updated later-on with the actual s within the magnet
          ! suml is used internally to puttwisstable to save the curvilign abciss...
 
-         call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
+
+         ! call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
+
+         if (nodePtr%next%cas==case0 .and. (.not. at_center_only)) then
+            ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded 
+            call puttwisstable(transfermap)
+         endif
+
+         if (at_center_only .and. associated(nodePtr,fibrePtr%tm)) then
+            !write(0,*) 'DEBUG invoke puttwisstable at center of element',fibrePtr%mag%name,",s=",s
+            call puttwisstable(transfermap)            
+         endif
+
 
          if (getnpushes() > 0) then ! !writes user selected map coeffs to user created tables. See ptc_select
             !also saves twiss parameters and used defined variables as Taylor series
