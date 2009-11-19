@@ -638,7 +638,13 @@ contains
     read77=.false.
 
     call kanalnummer(mf2)
-    open(unit=mf2,file='end.map')
+    ! avoid file name conflict between slice.madx and center.madx
+    ! which are located under same testing directory
+    if (get_value('ptc_twiss ','center_magnets ').ne.0) then
+       open(unit=mf2,file='end_center.map')
+    else
+       open(unit=mf2,file='end.map')
+    endif
     call print(y,mf2)
     close(mf2)
     ! relocated here to avoid side-effect
@@ -1995,8 +2001,18 @@ contains
       integer :: returnedInteger
 
       character(200) :: msg
+      
+      integer :: debugFileIndex
+
       integer :: countSkipped
       countSkipped = 0
+
+      ! avoid conflict in fort.xx name created by slice.madx and center.madx in the same dir
+      if (at_center_only) then
+         debugFileIndex = 25
+      else
+         debugFileIndex = 24
+      endif
 
       knobsNumber = nda ! nda is a semi-global variable !!!
 
@@ -2102,9 +2118,18 @@ contains
 
          if (at_center_only .and. associated(nodePtr,fibrePtr%tm)) then
             if (mod(fibrePtr%mag%p%nst,2)/=0) then
-               countSkipped = countSkipped + 1
-               !write(0,*) 'number of elements for which middle element incorrect du to uneven nst =',countSkipped
-            else
+               if (fibrePtr%mag%L==0) then
+                  ! this is a zero-length marker or monitor or equivalent
+                  ! keep it
+                  call puttwisstable(transfermap)
+               elseif (fibrePtr%mag%kind==31) then ! this is a DRIFT
+                  ! write(0,*) 'SKIP a drift of length',fibrePtr%mag%L,'was cut into an odd number of slices: ',fibrePtr%mag%p%nst
+                  countSkipped = countSkipped + 1
+               else ! neither a zero-length element, nor a drift
+                  ! write(0,*) 'SKIP element of name',fibrePtr%mag%name,'and kind',fibrePtr%mag%kind
+                  countSkipped = countSkipped + 1
+               endif
+            else ! this element has an even number of slices
                call puttwisstable(transfermap)
             endif
          endif
@@ -2119,10 +2144,10 @@ contains
 
 
          if (associated(nodePtr,fibrePtr%t1)) then
-            write(24,*) s, thinLensPos, "located at the beginning of ", fibrePtr%mag%name
+            write(debugFileIndex,*) s, thinLensPos, "located at the beginning of ", fibrePtr%mag%name
          endif
          if (associated(nodePtr,fibrePtr%tm)) then
-            write(24,*) s, thinLensPos, "located at the middle of ", fibrePtr%mag%name
+            write(debugFileIndex,*) s, thinLensPos, "located at the middle of ", fibrePtr%mag%name
             ! if option is to evaluate Twiss parameters at the middle, then invoke computation here
          endif
          ! Note: sometime looks like beginning is immediately followed by the middle
@@ -2130,7 +2155,7 @@ contains
          nodePtr => nodePtr%next
 
          if (associated(nodePtr,fibrePtr%t2)) then ! t2 is last integration node along the fibre
-            write(24,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
+            write(debugFileIndex,*) s, thinLensPos, "located at the end of ", fibrePtr%mag%name
             fibrePtr => fibrePtr%next
             ! indicate the complete_twiss_table code in madxn.c that we moved to the next element
             ! so that the element name on the far left displays correctly
