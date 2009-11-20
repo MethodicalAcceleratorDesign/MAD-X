@@ -52,15 +52,10 @@ REM on windows, set the path to contain C:\Python26\
 python.exe wrap_fortran_calls.py
 ECHO Wrap C calls from Fortran to prevent garbled output.
 python.exe wrap_C_calls.py
-REM the above will work iff all Linux-specific calls are replaced by portable ones across the two systems
 
-REM not yet ready to handle C wrappers => comment the following line and replace it by the one right after
 SET WRAP_FLAG=-D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS
-SET WRAP_FLAG=-D_WRAP_FORTRAN_CALLS
 
-REM not yet ready to handle C wrappers => comment the following line and replace it by the one right after
-REM SET WRAPPERS_OBJ=fortran_wrappers.obj fortran_flush.obj c_wrappers.obj
-SET WRAPPERS_OBJ=fortran_wrappers.obj fortran_flush.obj
+SET WRAPPERS_OBJ=fortran_wrappers.obj fortran_flush.obj c_wrappers.obj
 
 ) ELSE (
 ECHO No wrapper generated. MAD executable's redirected outputs might be garbled up.
@@ -75,7 +70,7 @@ cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 -D_INTEL_IFORT_FLUSH %MADX%\fortran_flush.F90
 REM in the above, removing /assume:underscore did not help _call_fortran_flush_ and _flush unresolved
 REM for the time-being, comment the following as not yet ready to wrap C calls yet
-REM cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\c_wrappers.c
+cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\c_wrappers.c
 )
 
 
