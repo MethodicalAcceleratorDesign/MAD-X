@@ -2,8 +2,12 @@
 import os
 import re
 import optparse
+import sys
 
 # struct handling could be removed, as there is actually no C function called from Fortran, with a struct in its signature
+
+linuxFiles = ['gxx11c.c'] # a list of files which should be considered only on Linux, not on windows
+
 
 class WrapperException:
     def __init__(self,message):
@@ -23,6 +27,10 @@ class Wrapper:
         cFiles = self.collectFiles('C')
         cFunctions = []
         for file in cFiles:
+            if not sys.platform[0:5]=='linux':
+                if file in linuxFiles:
+                    print("C call wrapper skips file '"+file+"' on Windows")
+                    continue
             f = open(file,'r')
             lines = f.readlines()
             # preprocessing: remove all comments
