@@ -2168,7 +2168,8 @@ contains
 
       ! print warnings if any
       if (countSkipped.gt.0) then
-         write(msg,*) "'center' option expects magnets split in the middle, assuming an even number of slices. Discarded elements with an odd number of slices:",countSkipped
+         write(msg,*) "'center' option expects magnets split in the middle,"//&
+              &" assuming an even number of slices. Discarded elements with an odd number of slices:",countSkipped
          call fort_warn('ptc_twiss ',msg)
       endif
 
