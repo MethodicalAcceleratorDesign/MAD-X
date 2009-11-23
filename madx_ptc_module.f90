@@ -27,14 +27,14 @@ MODULE madx_ptc_module
   integer,external :: mypause
   real(kind(1d0)) get_value,node_value
   type(layout),pointer :: MY_RING
-  type(mad_universe) m_u
+  type(mad_universe),target ::  m_u
   integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
   integer, private, allocatable :: J(:)
   logical(lp)             :: savemaps=.false.
   logical(lp) :: resplit,even
-  real(dp) my_thin,xbend
+  real(dp) my_thin,my_xbend
 
   type mapbuffer
      type(universal_taylor)  :: unimap(6)
@@ -723,6 +723,8 @@ CONTAINS
        call dzero(skew,maxmul+1)
        call get_node_vector('knl ',nn,normal)
        call get_node_vector('ksl ',ns,skew)
+       if(nn.ge.NMAX) nn=NMAX-1
+       if(ns.ge.NMAX) ns=NMAX-1
        do i=1,NMAX
           key%list%k(i)=zero
           key%list%ks(i)=zero
@@ -1001,10 +1003,10 @@ CONTAINS
     resplit=get_value('ptc_create_layout ','resplit ').ne.0
     if(resplit) then
        my_thin = get_value('ptc_create_layout ','thin ')
-       xbend = get_value('ptc_create_layout ','xbend ')
+       my_xbend = get_value('ptc_create_layout ','xbend ')
        even = get_value('ptc_create_layout ','even ').ne.0
        resplit_cutting=2
-       CALL THIN_LENS_resplit(my_ring,THIN=my_thin,even=even,xbend=xbend)
+       CALL THIN_LENS_resplit(my_ring,THIN=my_thin,even=even,xbend=my_xbend)
     endif
 
     if(errors_in) call fill_errors(my_ring)
@@ -2129,8 +2131,8 @@ CONTAINS
     include 'twtrr.fi'
     include 'name_len.fi'
     type(layout),target :: lhc1
-    integer i,k,pos,nfac(maxmul+1),flag,string_from_table,double_from_table
-    real(dp) d(2*maxmul+2),b(maxmul+1),a(maxmul+1)
+    integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
+    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab
     character(name_len) name,name2
     type(fibre),pointer :: p
     character*4 :: mag_index1(10)=(/'k0l ','k1l ','k2l ','k3l ','k4l ','k5l ','k6l ','k7l ','k8l ','k9l '/)
@@ -2140,7 +2142,7 @@ CONTAINS
          'k17sl ','k18sl ','k19sl ','k20sl '/)
 
     nfac(1)=1
-    do i=2,maxmul+1
+    do i=2,maxmul
        nfac(i)=nfac(i-1)*(i-1)
     enddo
 
@@ -2152,10 +2154,13 @@ CONTAINS
     p=>lhc1%start
     do while(.true.)
        i=i+1
+       a(:)=zero
+       b(:)=zero
+       d(:)=zero
        name2=" "
        flag = string_from_table('errors_read ', 'name ',i,name2)
        if(flag.ne.0) goto 100
-       do k=1,maxmul+1
+       do k=1,maxmul
           if(k<=10) then
              flag = double_from_table('errors_read ',mag_index1(k),i,d(2*k-1))
              flag = double_from_table('errors_read ',mag_index2(k),i,d(2*k))
@@ -2165,7 +2170,7 @@ CONTAINS
           endif
        enddo
        if(flag.ne.0) goto 100
-       do k=1,maxmul+1
+       do k=1,maxmul
           b(k)=d(2*k-1)/nfac(k)
           a(k)=d(2*k)/nfac(k)
        enddo
@@ -2173,14 +2178,28 @@ CONTAINS
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
        call move_to(lhc1,p,name,pos)
+       tilt=-p%mag%p%tiltd
        if(pos/=0.and.p%mag%parent_fibre%dir==1) then
           if(p%mag%l/=zero) then
-             b=b/p%mag%l
-             a=a/p%mag%l
+             do k=1,maxmul
+                b(k)=b(k)/p%mag%l
+                a(k)=a(k)/p%mag%l
+             enddo
           endif
-          do k=maxmul+1,1,-1
+          if(tilt/=zero) then
+             do k=1,maxmul
+                ab=b(k)
+                b(k)=b(k)*cos(tilt*k)+a(k)*sin(tilt*k)
+                a(k)=-ab*sin(tilt*k)+a(k)*cos(tilt*k)
+             enddo
+          endif
+          do k=NMAX,1,-1
              if(b(k)/=zero) then
-                call add(p,k,0,b(k))
+                if(k==2.and.p%mag%name(:4)=="MQT.") then
+                   print*," WARNING special CERN feature: Quad error of trim quads MQT ignored"
+                else
+                   call add(p,k,0,b(k))
+                endif
              endif
              if(a(k)/=zero) then
                 call add(p,-k,0,a(k))
