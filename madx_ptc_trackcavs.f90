@@ -546,6 +546,8 @@ contains
 
              !print*, p%mag%name, p%mag%P%KILL_ENT_FRINGE, p%mag%P%KILL_EXI_FRINGE,  &
              !        p%mag%P%BEND_FRINGE,  p%mag%p%PERMFRINGE, p%mag%PERMFRINGE
+             
+             !print*, p%mag%name
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
 
              call track(my_ring,x,e,e+1,getintstate())
@@ -615,7 +617,9 @@ contains
                 goto 100 !take next track
                 
              endif
-             p=>p%next
+
+             if (e .lt. my_ring%n) p=>p%next
+
           enddo !over elements
 
           if (apertflag/=0) then
@@ -623,8 +627,9 @@ contains
           endif
 
        enddo !loop over turns
-       !                     npart,turn,elno,elna,spos,stat,x,xini,e,mf
-       fen = p%previous;
+       !           npart,turn,elno,elna,spos,stat,x,xini,e,mf
+       
+       fen = p;
        t = t - 1
        print*, t 
        call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
