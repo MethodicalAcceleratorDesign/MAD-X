@@ -141,6 +141,7 @@ testing/MadBuildAndTest.py -text
 testing/MadBuildPy.pl -text
 testing/MadDiff.pl -text
 testing/MadTest.pl -text
+testing/MadTest.py -text
 testing/MadTestExceptions.py -text
 testing/MadTestOverwrite.pl -text
 testing/MadTestPy.pl -text
