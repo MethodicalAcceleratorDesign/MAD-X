@@ -1582,6 +1582,10 @@ void exec_command()
       {
         w_ptc_move_to_layout_();
       }
+      else if (strcmp(p->cmd_def->module, "ptc_read_errors") == 0)
+      {
+        w_ptc_read_errors_();
+      }
       else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
       {
         w_ptc_align_();

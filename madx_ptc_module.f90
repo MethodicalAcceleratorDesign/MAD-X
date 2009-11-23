@@ -168,7 +168,7 @@ CONTAINS
     integer             method0,method1
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bvk
-    logical(lp):: ptcrbend,truerbend,errors_in,errors_out
+    logical(lp):: ptcrbend,truerbend,errors_out
     !  Etienne helical
     character(nlp) heli(100)
     integer mheli,helit,ihelit
@@ -345,9 +345,7 @@ CONTAINS
     j=0
     l_machine=zero
 
-    errors_in = get_value('ptc_create_layout ','errors_in ').ne.0
     errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
-    if(errors_in) errors_out=my_false
     magnet_name=" "
     if(errors_out) mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
 
@@ -1008,8 +1006,6 @@ CONTAINS
        resplit_cutting=2
        CALL THIN_LENS_resplit(my_ring,THIN=my_thin,even=even,xbend=my_xbend)
     endif
-
-    if(errors_in) call fill_errors(my_ring)
 
     if (getdebug() > 0) then
        write(6,*) "------------------------------------ PTC Survey ------------------------------------"
@@ -2126,20 +2122,23 @@ CONTAINS
   !_________________________________________________________________
 
 
-  SUBROUTINE fill_errors(lhc1)
+  SUBROUTINE ptc_read_errors()
     implicit none
     include 'twtrr.fi'
     include 'name_len.fi'
-    type(layout),target :: lhc1
     integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
     real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab
     character(name_len) name,name2
     type(fibre),pointer :: p
+    logical(lp) :: overwrite
+    real(kind(1d0)) get_value
     character*4 :: mag_index1(10)=(/'k0l ','k1l ','k2l ','k3l ','k4l ','k5l ','k6l ','k7l ','k8l ','k9l '/)
     character*5 :: mag_index2(10)=(/'k0sl ','k1sl ','k2sl ','k3sl ','k4sl ','k5sl ','k6sl ','k7sl ','k8sl ','k9sl '/)
     character*5 :: mag_index3(11)=(/'k10l ','k11l ','k12l ','k13l ','k14l ','k15l ','k16l ','k17l ','k18l ','k19l ','k20l '/)
     character*6 :: mag_index4(11)=(/'k10sl ','k11sl ','k12sl ','k13sl ','k14sl ','k15sl ','k16sl ', &
          'k17sl ','k18sl ','k19sl ','k20sl '/)
+
+    overwrite = get_value('ptc_read_errors ','overwrite ').ne.0
 
     nfac(1)=1
     do i=2,maxmul
@@ -2151,7 +2150,7 @@ CONTAINS
     if(flag.ne.0) call aafail('fill_errors reports: ',' The >>> errors_read <<< table is empty ')
     i=0
 
-    p=>lhc1%start
+    p=>my_ring%start
     do while(.true.)
        i=i+1
        a(:)=zero
@@ -2177,7 +2176,7 @@ CONTAINS
        name=" "
        name(:len_trim(name2)-1)=name2(:len_trim(name2)-1)
        call context(name)
-       call move_to(lhc1,p,name,pos)
+       call move_to(my_ring,p,name,pos)
        tilt=-p%mag%p%tiltd
        if(pos/=0.and.p%mag%parent_fibre%dir==1) then
           if(p%mag%l/=zero) then
@@ -2195,14 +2194,18 @@ CONTAINS
           endif
           do k=NMAX,1,-1
              if(b(k)/=zero) then
-                if(k==2.and.p%mag%name(:4)=="MQT.") then
-                   print*," WARNING special CERN feature: Quad error of trim quads MQT ignored"
-                else
+                if(overwrite) then
                    call add(p,k,0,b(k))
+                else     
+                   call add(p,k,1,b(k))
                 endif
              endif
              if(a(k)/=zero) then
-                call add(p,-k,0,a(k))
+                if(overwrite) then
+                   call add(p,-k,0,a(k))
+                else
+                   call add(p,-k,1,a(k))
+                endif
              endif
           enddo
        else
@@ -2212,6 +2215,6 @@ CONTAINS
 100 continue
     return
 
-  end SUBROUTINE fill_errors
+  end SUBROUTINE ptc_read_errors
 
 END MODULE madx_ptc_module

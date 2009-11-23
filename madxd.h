@@ -89,6 +89,7 @@
 #define w_ptc_create_layout     w_ptc_create_layout_
 #define w_ptc_export_xml        w_ptc_export_xml_
 #define w_ptc_move_to_layout    w_ptc_move_to_layout_
+#define w_ptc_read_errors       w_ptc_read_errors_
 #define w_ptc_input             w_ptc_input_
 #define w_ptc_align             w_ptc_align_
 #define w_ptc_twiss             w_ptc_twiss_
@@ -242,6 +243,7 @@
 #define w_ptc_create_layout     W_PTC_CREATE_LAYOUT
 #define w_ptc_export_xml        W_PTC_EXPORT_XML
 #define w_ptc_move_to_layout    W_PTC_MOVE_TO_LAYOUT
+#define w_ptc_read_errors       W_PTC_READ_ERRORS
 #define w_ptc_input             W_PTC_INPUT
 #define w_ptc_align             W_PTC_ALIGN
 #define w_ptc_twiss             W_PTC_TWISS
@@ -949,6 +951,7 @@ void w_ptc_create_universe();
 void w_ptc_create_layout();
 void w_ptc_export_xml(int * filename);
 void w_ptc_move_to_layout();
+void w_ptc_read_errors();
 void w_ptc_input();
 void w_ptc_align();
 void w_ptc_twiss(int * twiss_table, int * summary_table);
@@ -1381,7 +1384,7 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.01.14";
+char myversion[] = "MAD-X 4.01.15";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
 char code_mod_date[] = "Code Modification Date: 23.11.2009";

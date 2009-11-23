@@ -23,6 +23,12 @@ subroutine w_ptc_move_to_layout()
   call ptc_move_to_layout()
 end subroutine w_ptc_move_to_layout
 
+subroutine w_ptc_read_errors()
+  use madx_ptc_module
+  implicit none
+  call ptc_read_errors()
+end subroutine w_ptc_read_errors
+
 subroutine w_ptc_input()
   use madx_ptc_module
   implicit none
