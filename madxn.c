@@ -6444,7 +6444,6 @@ void store_select(struct in_cmd* cmd)
     {
       if (get_option("debug")) printf("here CLEAR all selected arrays\n");
       if(sdds_pat != NULL) sdds_pat = delete_char_p_array(sdds_pat, 1);
-      if (get_option("debug")) printf("ptr after clear: %d\n",(int)sdds_pat);
     }
     else
     {
