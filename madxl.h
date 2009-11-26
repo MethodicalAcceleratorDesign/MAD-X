@@ -427,7 +427,7 @@ char* twiss_sector_table_cols[] = {
 int ptc_twiss_summary_table_types[] =
   {
     2, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 2,
+    2, 2, 2, 2, 2,
     2, 2, 2, 2,
     2,
     2,2,2,
@@ -435,7 +435,7 @@ int ptc_twiss_summary_table_types[] =
   };
 char* ptc_twiss_summary_table_cols[] = {
   "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", 
-  "q1", "q2", "dq1", "dq2",
+  "q1", "q2", "dq1", "dq2", "qs",
   "beta_x_min","beta_x_max","beta_y_min","beta_y_max",
   "deltap",
   "orbit_x","orbit_px","orbit_y",
