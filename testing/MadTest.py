@@ -9,6 +9,7 @@ import os
 import shutil
 import re
 import Notify
+import time
 
 class State: # the state of a test
     pass
@@ -59,16 +60,22 @@ class Resource:
         if options.verbose:
             print("create resource '"+name+"' retreived from '"+source+"'")
 
-    def lookForDependantResources(test,filename,lvl=0): # returns a list of filenames with absolute path
+    def lookForDependantResources(test,filename,lvl=0,leafDir=0):
+        # returns a list of filenames with absolute path
 
         resources = [] # list to be returned
         
         if lvl==0:
             source = filename
             name = source[source.rfind('/')+1:]
+            parts = source.split('/')
+            leafDir =  parts[-2]
+            print("leafDir="+leafDir)
+            # the leaf directory that contain the example and that should be renamed by test.testcaseDir
             destinations = []
             for m in makefiles:
                 destination = source.replace(rootDir,testingDir+'/'+m) # replace prefix between source and destination
+                destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/')
                 destinations.append(destination)            
             resource = Resource(name,source,destinations)  # primary resource is the MAD-X input file itself
             resources.append(resource)
@@ -99,18 +106,20 @@ class Resource:
                             pass
 
                         # the short name of the resource is obtained by removing the complete path prefix
-                        name = source[source.rfind('/')+1:]
+                        name = source[source.rfind('/')+1:]                       
                         # for each source, there are three destinations as there are 3 different makefiles
                         destinations = []
                         for m in makefiles:
                             destination = source.replace(rootDir,testingDir+'/'+m) # replace prefix between source and destination
+                            destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/')
                             destinations.append(destination)
                           
                         resource = Resource(name,source,destinations)
                         resources.append(resource)
                         
                         # now dig further
-                        additionalResources = Resource.lookForDependantResources(test,source,lvl+1)                     
+                        additionalResources = Resource.lookForDependantResources(test,source,lvl+1,\
+                                                                                 leafDir)                     
                         for a in additionalResources:
                             resources.append(a)
 
@@ -164,7 +173,7 @@ class Test:
         
         Target.registerTest(name, self)
 
-        if subdirectory == 0:
+        if subdirectory == 0 or subdirectory == '':
             self.testcaseDir = "test_"+str(len(Target.targetsDict[name].tests))
         else:
             self.testcaseDir = "test_"+str(len(Target.targetsDict[name].tests))+"_"+subdirectory
@@ -262,6 +271,8 @@ class Tester:
 
     def run(self):
 
+        page = WebPage(mainHtmlPage)
+        
         # first extract examples from the repository
         if not options.keep_data:
             rep = Repository()
@@ -321,6 +332,8 @@ class Tester:
             except:
                 pass # directory absent
 
+            page.output() # refresh the web page
+
             # now populate testingDir with all sources and associated resources
             for t in Test.tests:
                 t.copyResourcesToTestingDir()
@@ -328,15 +341,14 @@ class Tester:
             # now run the tests
             for t in Test.tests:
                 t.run()
-
+                page.output() # refresh the web page
+                
             # notify module keepers if required
             if options.notify:
                 Notify.notify("jean-luc","test completion","test completed.") # for the time-being
 
-        page = WebPage(mainHtmlPage)
-        page.output()
-        if not options.quiet:
-            page.display()
+            page.output() # refresh the web page for the last time
+
 
 class WebPage:
     
@@ -348,12 +360,14 @@ class WebPage:
         self.contents += '<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n'
         self.contents += '<html>\n'
         self.contents += '<head>\n'
+        self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
         self.contents += '<title>MAD testing main page</title>'
         self.contents += '<link rel=stylesheet href="./MadTestWebStyle.css" type="text/css">'
         self.contents += '</head>'
         
     def body(self):
         self.contents += '<body>\n'
+        self.contents += str(time.time())
         self.contents += '<table>\n'
         for target in Target.targets:
             self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>'  
