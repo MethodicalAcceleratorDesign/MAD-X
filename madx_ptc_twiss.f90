@@ -80,7 +80,7 @@ module madx_ptc_twiss_module
        0,0,0,0,0,1 /), &
        (/6,6/) )
 
-  logical :: slice_magnets, center_magnets, deltap_dependency, momentumCompactionToggle
+  logical :: slice_magnets, center_magnets, deltap_dependency, isRing
 
   real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
   real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
@@ -649,13 +649,18 @@ contains
     close(mf2)
     ! relocated here to avoid side-effect
 
-    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
-       ! only makes sense if the lattice is a ring (skipped for a line lattice)
-       call oneTurnSummary()
-       call set_option('ptc_twiss_summary ', 1)
-    else
-       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
-    endif
+
+! 26 november 2009    
+    call oneTurnSummary(isRing)
+    call set_option('ptc_twiss_summary ',1)
+! 26 november 2009: comment the following and replace by the above
+!    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
+!       ! only makes sense if the lattice is a ring (skipped for a line lattice)
+!       call oneTurnSummary()
+!       call set_option('ptc_twiss_summary ', 1)
+!    else
+!       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
+!    endif
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -716,7 +721,10 @@ contains
       mmap = get_value('ptc_twiss ','initial_map_manual ')
 
 
-      momentumCompactionToggle = .false. ! set to true in the case the map
+      isRing = .false. ! set to true in the case the map
+
+      
+
       ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
 
@@ -819,7 +827,7 @@ contains
             call print(y,6)
          endif
 
-         momentumCompactionToggle = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
+         isRing = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
 
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -1051,6 +1059,8 @@ contains
       opt_fun(mu1)=tw%mu(1) !* deltae
       opt_fun(mu2)=tw%mu(2) !* deltae
       opt_fun(mu3)=tw%mu(3) !* deltae
+
+      ! write(0,*),"DEBUG = ", tw%mu(3) ! should give Qs
 
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
@@ -1635,9 +1645,10 @@ contains
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
-    subroutine oneTurnSummary()
+    subroutine oneTurnSummary(isRing)
 
       implicit none
+      logical :: isRing ! true for rings, false for lines
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
       real(dp) :: alpha_c_p ! first order derivative w.r.t delta-p/p
@@ -1712,19 +1723,26 @@ contains
       endif
       ! end of added part
 
-      call find_orbit(my_ring,state,1,default)
+      if (isRing) then
 
-      ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
+         call find_orbit(my_ring,state,1,default)
 
-      if (.not.c_%stable_da) then
-         call fort_warn('ptc_twiss:','DA got unstable in momentum-compaction routine')
-         call seterrorflag(10,"ptc_twiss","DA got unstable in momentum-compaction routine")
-         stop
-         return
-      endif
+         ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
 
-      if (debugFiles .eq. 1) then
-         write(21,*) "Closed orbit state=", state(1:6)
+         if (.not.c_%stable_da) then
+            call fort_warn('ptc_twiss:','DA got unstable in momentum-compaction routine')
+            call seterrorflag(10,"ptc_twiss","DA got unstable in momentum-compaction routine")
+            stop
+            return
+         endif
+
+         if (debugFiles .eq. 1) then
+            write(21,*) "Closed orbit state=", state(1:6)
+         endif
+      else
+         ! 26 november 2009
+         ! in case of  a line, what is the initial state of the beam, for the time-being, assume zero
+         state = state
       endif
 
 
@@ -1859,9 +1877,9 @@ contains
 
 
          call kill(theAscript)
-
+           
       elseif (icase.eq.56) then ! here one may obtain the pathlength derivatives from the map
-         
+
          call alloc(yy)
          do i=1,c_%nd2 ! c_%nd2 is 6 when icase is 56 or 6 (but 4 when icase=5)
             yy%v(i) = oneTurnMap(i)%t
@@ -1896,8 +1914,9 @@ contains
          ! call daprint(yy%v,22) ! prints a map of order 2, without the expected coefficients
 
          call kill(yy)
-      
+        
       elseif(icase.eq.6) then
+         ! my_state in madx_ptc_module.f90 resets overwrites icase to 56 when there is no cavity
          alpha_c_p = 0.0
          alpha_c_p2 = 0.0
          alpha_c_p3 = 0.0
@@ -1912,6 +1931,13 @@ contains
       ! the above is exactly equivalent to the following two lines (i.e. returns frac.tune)
       fractionalTunes(1) = theNormalForm%DHDJ%v(1).sub.'0000' ! as in So_fitting.f90
       fractionalTunes(2) = theNormalForm%DHDJ%v(2).sub.'0000' ! as in So_fitting.f90
+      ! 26 november 2009
+      if (icase.eq.6) then
+          fractionalTunes(3) = - theNormalForm%DHDJ%v(3).sub.'0000' ! always yields 0 => does not work as I would have expected
+          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)' computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
+      else
+         fractionalTunes(3) = 0.0
+      endif
       ! Q: is it possible to get the actual total tune, as returned by twiss.F?
       ! => no, not with a map...
 
@@ -1959,6 +1985,8 @@ contains
       call double_to_table( summary_table_name, 'q2 ', fractionalTunes(2))
       call double_to_table( summary_table_name, 'dq1 ', chromaticities(1))
       call double_to_table( summary_table_name, 'dq2 ', chromaticities(2))
+      ! 26 november 2009
+      call double_to_table( summary_table_name, 'qs ', fractionalTunes(3))
       ! write the extremas of the Twiss functions
       ! for the time-being, do not bother about the coupling terms
       call double_to_table( summary_table_name, 'beta_x_min ', minBeta(1,1))
