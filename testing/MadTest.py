@@ -1,8 +1,14 @@
 #!/usr/bin/python
+
+# currently works with following invocation:
+# MadTest.py -k -m Makefile -t aperture
+# MadTest.py -k -m Makefile -t ptc_twiss -c example1.madx
+# MadTest.py -k -m Makefile -t ptc_twiss
 import optparse
 import os
 import shutil
 import re
+import Notify
 
 class State: # the state of a test
     pass
@@ -310,7 +316,10 @@ class Tester:
                         print("failed to parse line "+testinfo)
 
             # cleanup the TESTING directory structure
-            shutil.rmtree(testingDir)
+            try:
+                shutil.rmtree(testingDir)
+            except:
+                pass # directory absent
 
             # now populate testingDir with all sources and associated resources
             for t in Test.tests:
@@ -319,6 +328,10 @@ class Tester:
             # now run the tests
             for t in Test.tests:
                 t.run()
+
+            # notify module keepers if required
+            if options.notify:
+                Notify.notify("jean-luc","test completion","test completed.") # for the time-being
 
         page = WebPage(mainHtmlPage)
         page.output()
@@ -378,15 +391,24 @@ if __name__ == "__main__":
                       dest="singleCase")
     parser.add_option("--keep_data","-k",help="keep old data without extracting repository",action="store_true")
     parser.add_option("--quiet","-q",help="does not produce a web page",action="store_true")
-    parser.add_option("--makefile","-m",help="single Makefile (skip the develop and nag Makefiles)",action="store_true")
+    parser.add_option("--makefile","-m",help="select Makefile (Makefile, Makefile_develop or nag Makefiles), none if unspeficied"\
+                      ,dest="makefile")
+    parser.add_option("--notify","-n",help="notify module keepers",action="store_true")
+    
     (options, args) = parser.parse_args()
 
     if options.singleCase and not options.singleTarget:
         print("option --case assumes option --target is selected as well")
 
     if options.makefile:
-        makefiles = [makefiles[0]] # discard makefiles[1] and makefiles[2]
-        
+        found = False # default
+        for m in makefiles:
+            if m == options.makefile:
+                makefiles = [m]
+                found = True
+        if not found:
+            raise('option --makefile or -m expect a valid makefile')
+                
     tester = Tester()
     tester.run()
     if options.verbose:
