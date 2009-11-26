@@ -56,6 +56,13 @@ class Resource:
         # for a given resource, there are 3 destinations, i.e. one for each Makefile
         self.name = name
         self.source = source # the expanded filename of the file from CVS
+        # check the resource indeed exists. If not this a temp file meant to be created at runtime
+        if not os.path.exists(source):
+            self.type = 'runtime'
+            if options.verbose:
+                print("WARNING resource file "+source+" is probably meant to be created at runtime")
+        else:
+            self.type = 'static'
         self.destinations = destinations # the expanded filename of the file in local work directory
         if options.verbose:
             print("create resource '"+name+"' retreived from '"+source+"'")
@@ -218,6 +225,9 @@ class Test:
 
     def copyResourcesToTestingDir(self):
         for r in self.resources:
+            if r.type == 'runtime':
+                # this resource is meant to be created at run time => do not attempt to copy as it does not exists yet
+                continue
             if options.verbose:
                 print("now to copy '"+r.source+"'")
             for d in r.destinations: # a single resource has several destinations, i.e. one per Makefile
