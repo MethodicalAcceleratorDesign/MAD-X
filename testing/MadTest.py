@@ -393,8 +393,14 @@ class Tester:
         f.close()
         os.remove('./outfile')
         for target in targets:
+
             target = target.rstrip('\n')
-            
+
+            if options.skippedTarget:
+                if target == options.skippedTarget:
+                    print("skip "+options.skippedTarget)
+                    continue
+                
             if options.singleTarget and not options.singleTarget == target:
                 continue # skip this test
             
@@ -529,6 +535,7 @@ if __name__ == "__main__":
     parser.add_option("--makefile","-m",help="select Makefile (Makefile, Makefile_develop or nag Makefiles), none if unspeficied"\
                       ,dest="makefile")
     parser.add_option("--notify","-n",help="notify module keepers",action="store_true")
+    parser.add_option("--skip","-s",help="skip a particular target causing trouble, to proceed with debugging",dest='skippedTarget')
     
     (options, args) = parser.parse_args()
 
