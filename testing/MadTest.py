@@ -10,6 +10,7 @@ import shutil
 import re
 import Notify
 import time
+import datetime
 
 class State: # the state of a test
     pass
@@ -82,7 +83,15 @@ class Resource:
             destinations = []
             for m in makefiles:
                 destination = source.replace(rootDir,testingDir+'/'+m) # replace prefix between source and destination
-                destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/')
+                match = re.match(r'^test_\d+(_.+)?$',test.testcaseDir)
+                if not match:
+                    raise("pattern should always match")
+                if match.lastindex == 1: # testcaseDir like test_1_LHC
+                    destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/') # testcaseDir like test_1_LHC                    
+                else:
+                    destination = destination.replace('/'+leafDir+'/','/'+leafDir+'/'+test.testcaseDir+'/') # testcaseDir like test_1
+                    
+                print("destination="+destination+" for source="+source+", leafDir="+leafDir)
                 destinations.append(destination)            
             resource = Resource(name,source,destinations)  # primary resource is the MAD-X input file itself
             resources.append(resource)
@@ -118,7 +127,13 @@ class Resource:
                         destinations = []
                         for m in makefiles:
                             destination = source.replace(rootDir,testingDir+'/'+m) # replace prefix between source and destination
-                            destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/')
+                            match = re.match(r'^test_\d+(_.+)?$',test.testcaseDir)
+                            if not match:
+                                raise("pattern should always match")
+                            if match.lastindex == 1: # testcaseDir like test_1_LHC
+                                destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/') # testcaseDir like test_1_LHC
+                            else:
+                                destination = destination.replace('/'+leafDir+'/','/'+leafDir+'/'+test.testcaseDir+'/') # testcaseDir like test_1
                             destinations.append(destination)
                           
                         resource = Resource(name,source,destinations)
@@ -242,6 +257,7 @@ class Test:
         for i,m in enumerate(makefiles):
             # retreive the name of the directory in which the madx input is located (first resource)            
             script = self.resources[0].destinations[i]
+            print("looking for /test_1/: script is '"+script+"'")            
             scriptDir = script[:script.rfind('/')]
             os.chdir(scriptDir)
             command = madxDir+'/madx_'+m+' <'+self.input +'>'+self.output
@@ -261,14 +277,14 @@ class Test:
                     continue
                 type = output # default                
                 for r in self.resources:
-                    print("compare "+scriptDir+"/"+f+" with "+r.destinations[i])
+                    # print("compare "+scriptDir+"/"+f+" with "+r.destinations[i])
+
                     if scriptDir+"/"+f == r.destinations[i]: # this is an (input) resource file
                         type = input
                 if type == input:
                     shutil.move(f,'./input')
                 else:
                     shutil.move(f,'./output')
-
             
             os.chdir(currentDir) # back to the initial work directory
             
@@ -350,7 +366,10 @@ class Tester:
 
             # now run the tests
             for t in Test.tests:
+                t.state = running
+                page.output() # to mark the current test as running
                 t.run()
+                t.state = completed # or aborted?
                 page.output() # refresh the web page
                 
             # notify module keepers if required
@@ -364,37 +383,47 @@ class WebPage:
     
     def __init__(self,name):
         self.name = name
-        self.contents = ''
 
     def header(self):
         self.contents += '<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n'
         self.contents += '<html>\n'
         self.contents += '<head>\n'
         self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
+        # this tag should only be present while the test is running, and be absent when completed.
         self.contents += '<title>MAD testing main page</title>'
         self.contents += '<link rel=stylesheet href="./MadTestWebStyle.css" type="text/css">'
         self.contents += '</head>'
         
     def body(self):
         self.contents += '<body>\n'
-        self.contents += str(time.time())
+        self.contents += (datetime.datetime.now()).ctime()
         self.contents += '<table>\n'
         for target in Target.targets:
-            self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>'  
+            self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>\n'  
             for i,t in enumerate(target.tests):
                 self.contents += '<tr class="test_case"><td width=\"80%\">'+t.testcaseDir+\
                                  ': '+t.program +'&lt;'+t.input+'&gt;'+t.output+\
                                  '</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>'+\
                                  'DEVRES'+'NAGRES'+\
-                                 '</tr></table></td></tr>\n'; 
-                for r in t.resources:
-                    self.contents += '<tr><td>'+r.name+'</td></tr>'
+                                 '</tr></table></td></tr>\n';
+                if t.state == init or t.state == incomplete:                
+                    for r in t.resources:
+                        self.contents += '<tr><td>'+r.name+'</td></tr>\n'
+                elif t.state == running:
+                    self.contents += '<tr><td>RUNNING...</td></tr>\n'
+                elif t.state == completed or t.state == aborted:
+                    self.contents +=  '<tr><td>FINISHED - should list outputs.</td></tr>\n'
+                else:
+                    raise("should never reach this point")
+                    
+                    
         self.contents += '<table>\n'
         self.contents += '<body>\n'
     def footer(self):
         self.contents += '</html>\n'
 
     def output(self):
+        self.contents = ""
         self.header()
         self.body()
         self.footer()
