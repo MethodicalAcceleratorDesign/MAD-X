@@ -99,9 +99,9 @@ class Resource:
         try:
             f = open(filename,'r')
             # regex to input a file (not anchored as an instruction may precede)
-            commonPatterns = (re.compile(r'readmytable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\d/]+)[\"\']?[\s\t]*;'),\
-                              re.compile(r'call,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\d/]+)[\"\']?[\s\t]*;'),\
-                              re.compile(r'readtable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\d/]+)[\"\']?[\s\t]*;'))
+            commonPatterns = (re.compile(r'readmytable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'),\
+                              re.compile(r'call,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'),\
+                              re.compile(r'readtable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'))
             for line in f.readlines():
                 line = line.rstrip('\n')
                 if len(line.lstrip())>=1 and line.lstrip()[0]=='!': # if line is a comment discard it
@@ -385,7 +385,7 @@ class Tester:
             rep = Repository()
             rep.checkout()
 
-        testinfoPattern = re.compile(r'^[\s\t]*(.+)[\s\t]*<[\s\t]*(.+)[\s\t]*>[\s\t]*([\w\.\d]+)[\s\t]*,?[\s\t]*'+\
+        testinfoPattern = re.compile(r'^[\s\t]*(.+)[\s\t]*<[\s\t]*(.+)[\s\t]*>[\s\t]*([\w\.\d\-\_]+)[\s\t]*,?[\s\t]*'+\
                                      '(subdirectory=)?[\s\t]*(.*)[\s\t]*$')
         # e.g. ./madx < touschek.lhcinjection.madx >  touschek.lhcinjection.out, subdirectory=LHC_injection
         # or ./madx < lep.madx  >  lep.out
