@@ -181,9 +181,10 @@ class Target: # a named "module" holding on or several tests
     registerTest = staticmethod(registerTest)
 
 class Output:
-    def __init__(self,name,outcome):
+    def __init__(self,name,outcome,pageLink):
         self.name = name
         self.outcome = outcome
+        self.weblink = pageLink
 
 class Test: # a test case
     tests = []
@@ -317,8 +318,15 @@ class Test: # a test case
 
                 #print("name of createdFile="+createdFile)
                 #print("name of referenceFile="+referenceFile)
+
+                # specific case when the HTML file name is of the form XX.map or XX.map.htm
+                # webserver will fail to display the HTML although one can open it from the webfolder...
+                # to overcome this limitation, we need to juggle with the HTML file name
+                fname = fname.replace('map','maAap')
             
                 htmlFile = "./temp.html" # output HTML file, to be delivered to the web site...
+                weblink = "./DiffResult_" + self.name + "_" + self.testcaseDir + "_" + fname + ".htm" # again test.name stands for the target
+                htmlFile = htmlRootDir+"/details/"+weblink
 
                 os.system('./MadDiff.pl '+createdFile+' '+referenceFile+' ' +htmlFile+' > ./tempfile')
 
@@ -348,7 +356,7 @@ class Test: # a test case
                 outcome = 'omit'
 
             # store the short name of the output file, together with the outcome of the comparison
-            out = Output(fname,outcome)
+            out = Output(fname,outcome,weblink)
             self.outputs.append(out)
 
             # store output file information in the test object for subsequent reuse
@@ -485,7 +493,7 @@ class WebPage:
                 elif t.state == completed or t.state == aborted:
                     for o in t.outputs:
                         self.contents += '<tr class="'+o.outcome+'"><td width=\"80%\">'+o.name+\
-                                         '</td><td width=\"20%\">'+o.outcome+'</td></tr>\n';
+                                         '<td width="30%"><a href="./details/'+o.weblink+'">'+o.outcome+'</a></td></tr>\n'
 
                 else:
                     raise("should never reach this point")
