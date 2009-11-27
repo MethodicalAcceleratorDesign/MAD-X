@@ -180,16 +180,22 @@ class Target: # a named "module" holding on or several tests
                     t.tests.append(test)
     registerTest = staticmethod(registerTest)
 
-class Test:
+class Output:
+    def __init__(self,name,outcome):
+        self.name = name
+        self.outcome = outcome
+
+class Test: # a test case
     tests = []
 
     def __init__(self,name,program,input,output,subdirectory):
 
         self.name = name # the target
         self.program = program
-        self.input = input
-        self.output = output
-        self.resources = []
+        self.input = input # the main input file
+        self.output = output # the main output file
+        self.resources = [] # secondary inputs
+        self.outputs = [] # secondary outputs
         self.missing_resources = []
         self.state = init # initial state
         
@@ -204,8 +210,9 @@ class Test:
             self.subdirectory = subdirectory
         else:
             self.subdirectory = ''
-            
+
         Test.tests.append(self) # irrespective of whether the tests has access to all resources it requires
+
 
         if self.collectResources():
             if options.verbose:
@@ -259,6 +266,7 @@ class Test:
             script = self.resources[0].destinations[i]
             print("looking for /test_1/: script is '"+script+"'")            
             scriptDir = script[:script.rfind('/')]
+            self.topDir = scriptDir # for future reuse when comparing the output with the reference
             os.chdir(scriptDir)
             command = madxDir+'/madx_'+m+' <'+self.input +'>'+self.output
             print("now to execute "+command+" under "+scriptDir)
@@ -287,6 +295,66 @@ class Test:
                     shutil.move(f,'./output')
             
             os.chdir(currentDir) # back to the initial work directory
+
+    def compareOutputWithReference(self):
+        # only for the main Makefile
+        # must pick-up all files under the /output directory and compare them with the reference
+        outputDir = self.topDir+'/output'
+        print "outputDir="+outputDir
+        files = os.listdir(outputDir)
+        
+        for fname in files: # the short name of the file without its path prefix
+            try:
+                os.remove('./tempfile')
+            except:
+                pass
+
+            createdFile = outputDir + '/' + fname  # fname with adequate prefix
+            referenceFile = self.resources[0].source[:self.resources[0].source.rfind('/')] +'/'+ fname # fname with adequate prefix -> take the madx input host directory in the CVS and add the filename
+
+            # make sure the reference file exists, otherwise we shall omit to look for differences
+            if os.path.exists(referenceFile):
+
+                #print("name of createdFile="+createdFile)
+                #print("name of referenceFile="+referenceFile)
+            
+                htmlFile = "./temp.html" # output HTML file, to be delivered to the web site...
+
+                os.system('./MadDiff.pl '+createdFile+' '+referenceFile+' ' +htmlFile+' > ./tempfile')
+
+                tf = open("./tempfile","r")
+                outcome = tf.readlines()[0] # single line
+
+                if outcome == 'failure':
+                    pass
+                    #print("this is a failure")
+                elif outcome == 'warning':
+                    pass
+                    #print("this is a warning")
+                elif outcome == 'quasi-success':
+                    pass
+                    #print("this is a quasi-sucess")
+                elif outcome == 'success':
+                    pass
+                    #print("this is a success")
+                else:
+                    raise("should never reach this point, outcome = "+outcome)
+
+                tf.close()
+
+                os.remove('./tempfile')
+
+            else:
+                outcome = 'omit'
+
+            # store the short name of the output file, together with the outcome of the comparison
+            out = Output(fname,outcome)
+            self.outputs.append(out)
+
+            # store output file information in the test object for subsequent reuse
+            # by the web page output
+            
+
             
 class Tester:
 
@@ -347,34 +415,36 @@ class Tester:
                         continue
                 
                     test = Test(target,program,input,output,subdirectory)
-
+                    
                 else:
                     if options.verbose:
                         print("failed to parse line "+testinfo)
 
-            # cleanup the TESTING directory structure
-            try:
-                shutil.rmtree(testingDir)
-            except:
-                pass # directory absent
+        try:
+            shutil.rmtree(testingDir)
+        except:
+            pass # directory absent
 
+        page.output() # refresh the web page
+
+        # now populate testingDir with all sources and associated resources
+        for t in Test.tests:
+            t.copyResourcesToTestingDir()
+
+
+        # now run the tests
+        for t in Test.tests:
+
+            t.state = running
+            page.output() # to mark the current test as running
+            t.run()
+            t.compareOutputWithReference()
+            t.state = completed # or aborted?
             page.output() # refresh the web page
 
-            # now populate testingDir with all sources and associated resources
-            for t in Test.tests:
-                t.copyResourcesToTestingDir()
-
-            # now run the tests
-            for t in Test.tests:
-                t.state = running
-                page.output() # to mark the current test as running
-                t.run()
-                t.state = completed # or aborted?
-                page.output() # refresh the web page
-                
-            # notify module keepers if required
-            if options.notify:
-                Notify.notify("jean-luc","test completion","test completed.") # for the time-being
+        # notify module keepers if required
+        if options.notify:
+            Notify.notify("jean-luc","test completion","test completed.") # for the time-being
 
             page.output() # refresh the web page for the last time
 
@@ -388,7 +458,8 @@ class WebPage:
         self.contents += '<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n'
         self.contents += '<html>\n'
         self.contents += '<head>\n'
-        self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
+        # remove the auto refresh and rely on the user to refresh on demand
+        #self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
         # this tag should only be present while the test is running, and be absent when completed.
         self.contents += '<title>MAD testing main page</title>'
         self.contents += '<link rel=stylesheet href="./MadTestWebStyle.css" type="text/css">'
@@ -410,9 +481,12 @@ class WebPage:
                     for r in t.resources:
                         self.contents += '<tr><td>'+r.name+'</td></tr>\n'
                 elif t.state == running:
-                    self.contents += '<tr><td>RUNNING...</td></tr>\n'
+                    self.contents += '<tr><td><center><img src="underConstruction.gif" width="134" height="139"></center></td></tr>\n' # image showing running job
                 elif t.state == completed or t.state == aborted:
-                    self.contents +=  '<tr><td>FINISHED - should list outputs.</td></tr>\n'
+                    for o in t.outputs:
+                        self.contents += '<tr class="'+o.outcome+'"><td width=\"80%\">'+o.name+\
+                                         '</td><td width=\"20%\">'+o.outcome+'</td></tr>\n';
+
                 else:
                     raise("should never reach this point")
                     
