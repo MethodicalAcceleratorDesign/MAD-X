@@ -356,11 +356,16 @@ class Test: # a test case
                 outcome = 'omit'
 
             # store the short name of the output file, together with the outcome of the comparison
-            out = Output(fname,outcome,weblink)
-            self.outputs.append(out)
 
-            # store output file information in the test object for subsequent reuse
-            # by the web page output
+            # skip .ps and .eps files
+            if fname[-3:]=='.ps' or fname[-4:]=='.eps':
+                pass # skip
+            else:
+                out = Output(fname,outcome,weblink)
+                self.outputs.append(out)
+
+                # store output file information in the test object for subsequent reuse
+                # by the web page output
             
 
             
