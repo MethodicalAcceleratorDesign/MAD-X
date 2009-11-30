@@ -207,6 +207,11 @@ class Test: # a test case
         self.outputs = [] # secondary outputs
         self.missing_resources = []
         self.state = init # initial state
+
+        # following information only relevant when --dev or --nag option
+        self.dev_tag = "undefined"
+        self.nag_tag = "undefined"
+
         
         Target.registerTest(name, self)
 
@@ -278,7 +283,12 @@ class Test: # a test case
             scriptDir = script[:script.rfind('/')]
             self.topDir = scriptDir # for future reuse when comparing the output with the reference
             os.chdir(scriptDir)
-            command = madxDir+'/madx_'+m+' <'+self.input +'>'+self.output
+            if m == 'Makefile':
+                command = madxDir+'/madx_'+m+' <'+self.input +'>'+self.output
+            else: # Makefile_develop or Makefile_nag
+                stderrfile = './stderr_redirected'
+                command = '('+madxDir+'/madx_'+m+' <'+self.input +'>'+self.output + ')' + ">& " + stderrfile
+                
             print("now to execute "+command+" under "+scriptDir)
             os.system(command)
 
@@ -303,6 +313,32 @@ class Test: # a test case
                     shutil.move(f,'./input')
                 else:
                     shutil.move(f,'./output')
+
+            if m == 'Makefile_develop' or m == 'Makefile_nag':             
+                # then create a web page to store the contents of stderr
+                if os.path.exists('./output/stderr_redirected'):
+                    print("create error page")
+                    ferror = open('./output/stderr_redirected','r')
+                    lines = ferror.readlines()
+                    if len(lines)==0:
+                        # stderr is empty
+                        print("stderr_redirected is empty")
+                        if m == 'Makefile_develop':
+                            self.dev_tag = 'success'
+                        if m == 'Makefile_nag':
+                            self.nag_tag = 'success'                           
+                    else:
+                        if m == 'Makefile_develop':
+                            self.dev_tag = 'failure' # for the time-being, do not distinguish between a failure and a warning
+                        if m == 'Makefile_nag':
+                            self.nag_tag = 'failure' # for the time-being, do not distinguish between a failure and a warning     
+                        for l in lines:
+                            print("in stderr_redirected: "+ l)
+                    errorPage = ErrorWebPage("/user/nougaret/MAD-X/madX/testing/bidonErrorPage.html",ferror)
+                    errorPage.output()
+                    ferror.close()
+                else:
+                    print("error: expected to find redirected stderr")
             
             os.chdir(currentDir) # back to the initial work directory
 
@@ -331,7 +367,7 @@ class Test: # a test case
                 # specific case when the HTML file name is of the form XX.map or XX.map.htm
                 # webserver will fail to display the HTML although one can open it from the webfolder...
                 # to overcome this limitation, we need to juggle with the HTML file name
-                fname = fname.replace('map','maAap')
+                fname = fname.replace('.map','.maAap')
             
                 htmlFile = "./temp.html" # output HTML file, to be delivered to the web site...
                 weblink = "./DiffResult_" + self.name + "_" + self.testcaseDir + "_" + fname + ".htm" # again test.name stands for the target
@@ -361,20 +397,24 @@ class Test: # a test case
 
                 os.remove('./tempfile')
 
+                # store the short name of the output file, together with the outcome of the comparison
+
+                # skip .ps and .eps files
+                if fname[-3:]=='.ps' or fname[-4:]=='.eps':
+                    pass # skip
+                else:
+
+                    out = Output(fname,outcome,weblink)
+                    self.outputs.append(out)
+
+                    # store output file information in the test object for subsequent reuse
+                    # by the web page output
+
+
             else:
                 outcome = 'omit'
 
-            # store the short name of the output file, together with the outcome of the comparison
 
-            # skip .ps and .eps files
-            if fname[-3:]=='.ps' or fname[-4:]=='.eps':
-                pass # skip
-            else:
-                out = Output(fname,outcome,weblink)
-                self.outputs.append(out)
-
-                # store output file information in the test object for subsequent reuse
-                # by the web page output
             
 
             
@@ -407,11 +447,18 @@ class Tester:
                   ' TestScenario.xml > ./outfile')
         f = open('./outfile','r')
         targets = f.readlines()
+        for i,target in enumerate(targets):
+            targets[i] = target.strip('\n')
         f.close()
         os.remove('./outfile')
+
+        if options.singleTarget:
+            if not options.singleTarget in targets:
+                raise("specified target '"+options.singleTarget+"' does not exists in " + str(targets))
+        
         for target in targets:
 
-            target = target.rstrip('\n')
+            #target = target.rstrip('\n')
 
             if options.skippedTarget:
                 if target == options.skippedTarget:
@@ -429,6 +476,8 @@ class Tester:
             testinfos = f.readlines()
             f.close()
             os.remove('./outfile')
+            if options.singleCase:
+                recognizedSingleCase = False # default, must be set to True if valid
             for testinfo in testinfos:
                 testinfo = testinfo.rstrip('\n')
                 
@@ -444,12 +493,17 @@ class Tester:
 
                     if options.singleCase and not options.singleCase  == input:
                         continue
+                    elif options.singleCase and options.singleCase == input:
+                        recognizedSingleCase = True
                 
                     test = Test(target,program,input,output,subdirectory)
                     
                 else:
                     if options.verbose:
                         print("failed to parse line "+testinfo)
+
+        if options.singleCase and not recognizedSingleCase:
+            raise("specified single case '"+options.singleCase+"' does not exist.")
 
         try:
             shutil.rmtree(testingDir)
@@ -506,11 +560,26 @@ class WebPage:
             for target in Target.targets:
                 self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>\n'
                 for i,t in enumerate(target.tests):
+                    if not options.dev:
+                        devClass = "test_case" # for the time being
+                        devLink =  'dev'
+                    else:
+                        pass # will be either failure, warning or success
+                        devClass = t.dev_tag
+                        devLink =  '<a href="./details/Error_dev_aperture_test_1.htm">dev</a>'
+                    if not options.nag:
+                        nagClass = "test_case" # for the time being
+                        nagLink = 'nag'
+                    else:
+                        pass # will be either failure, warning or success
+                        nagClass = t.nag_tag
+                        nagLink = '<a href="./details/Error_nag_aperture_test_1.htm">nag</a>'
+                        
                     self.contents += '<tr class="test_case"><td width=\"80%\">'+t.testcaseDir+\
                                      ': '+t.program +'&lt;'+t.input+'&gt;'+t.output+\
-                                     '</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>'+\
-                                     '<td class="success"><a href="./details/Error_dev_aperture_test_1.htm">dev</a></td>'+\
-                                     '<td class="warning"><a href="./details/Error_nag_aperture_test_1.htm">nag</a></td>'+\
+                                     '</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>' +\
+                                     '<td class="'+devClass+'">'+devLink+'</td>'+\
+                                     '<td class="'+nagClass+'">'+nagLink+'</td>'+\
                                      '</tr></table></td></tr>\n';
                     if t.state == init or t.state == incomplete:                
                         for r in t.resources:
@@ -547,6 +616,16 @@ class WebPage:
     def display(self):
         os.system('firefox ' + self.name+ '&')
 
+class ErrorWebPage(WebPage):
+    def __init__(self,name,stderr_file):
+        self.name = name
+        self.stderr_file = stderr_file
+    def body(self):
+        
+        for l in self.stderr_file.readlines():
+            pass
+        pass
+
 if __name__ == "__main__":
     usage = "%prog [options]"
     parser = optparse.OptionParser(usage)
@@ -559,7 +638,7 @@ if __name__ == "__main__":
     parser.add_option("--mail","-m",help="notify module keepers be e-mail",action="store_true")
     parser.add_option("--skip","-s",help="skip a particular target causing trouble, to proceed with debugging",dest='skippedTarget')
 
-    parser.add_option("--develop","-d",help="compiles and runs with Makefile_develop",action="store_true")
+    parser.add_option("--dev","-d",help="compiles and runs with Makefile_develop",action="store_true")
     parser.add_option("--nag","-n",help="compiles and runs with Makefile_nag",action="store_true")
     
     (options, args) = parser.parse_args()
@@ -569,7 +648,12 @@ if __name__ == "__main__":
 
     # for the time-being do not bother about the --dev and --nag options
     makefiles = ['Makefile']
+    
+    if options.dev:
+        makefiles.append('Makefile_develop')
 
+    if options.nag:
+        makefiles.append('Makefile_nag')
                 
     tester = Tester()
     tester.run()
