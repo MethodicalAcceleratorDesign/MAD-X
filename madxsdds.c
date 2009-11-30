@@ -14,6 +14,9 @@
 
 /* define SDDS routine */
 int  treat_tfs_header(SDDS_TABLE *sd,  struct table* t);
+int  treat_tfs_header_define(SDDS_TABLE *sd,  struct table* t);
+int  treat_tfs_header_set(SDDS_TABLE *sd,  struct table* t);
+int sdds_get_parm(SDDS_TABLE *sd, struct table *tfs_table);
 void sel_table(char* tname, struct table* t);
 void set_selected_rows_tab(struct table* t, struct command_list* select,
                        struct command_list* deselect);
@@ -126,7 +129,7 @@ if(SDDS_InitializeInput(&SDDS_table, filename) != 1) {
 }
 
 /* read and process each data table in the data set */ 
-while (lb = SDDS_ReadTable(&SDDS_table)>0) { 
+while ((lb = SDDS_ReadTable(&SDDS_table))>0) { 
     /* set all rows and all columns to initially be "of interest" */ 
     SDDS_SetColumnFlags(&SDDS_table, 1); 
     SDDS_SetRowFlags(&SDDS_table, 1);
@@ -196,7 +199,7 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
          datmps = (short *)arr->data;   
          datmpf = (float *)arr->data;   
          if (get_option("debug")) {
-           if(arrtyp[i1] != SDDS_STRING) printf("data: %le %le \n",(double)datmp[i3],datmp[i3]);
+           if(arrtyp[i1] != SDDS_STRING) printf("data: %e %e \n",(double)datmp[i3],datmp[i3]);
            if(arrtyp[i1] == SDDS_STRING) printf("data: %s \n",datstr[i1][i3]);
          }
          if(arrtyp[i1] == SDDS_DOUBLE) datd[i1][i3] = (double)datmp[i3];     
@@ -234,7 +237,7 @@ while (lb = SDDS_ReadTable(&SDDS_table)>0) {
      if (get_option("debug")) {
          for(j1=0;j1<narr; j1++){
             for(j2=0;j2<arr->elements; j2++){
-               printf("data: %d %d %le\n",j1,j2,datd[j1][j2]);
+               printf("data: %d %d %e\n",j1,j2,datd[j1][j2]);
             }
          }
      }
@@ -313,8 +316,8 @@ int   i2, npar;
        }
        if(pardef->type == SDDS_FLOAT) {
          parvalf = (float *)parval;
-         if (get_option("debug")) printf("Parameter: %s, value: %le\n",cpar[i2],(double)*parvalf);
-         sprintf(s_dum, v_format("@ %-16s %%le  %le"), cpar[i2],(double)*parvalf);
+         if (get_option("debug")) printf("Parameter: %s, value: %e\n",cpar[i2],(double)*parvalf);
+         sprintf(s_dum, v_format("@ %-16s %%e  %e"), cpar[i2],(double)*parvalf);
          tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
        }
        if(pardef->type == SDDS_DOUBLE) {
@@ -446,8 +449,8 @@ if (get_option("debug")) {
         /* pd = (double *)da1[pos[j1]]; */
         for(j2=0;j2<tfstab->curr; j2++) {
           if (get_option("debug")) {
-               printf(" %le\n",da1[pos[j1]][j2]);
-               printf("FILLING ? %s %d %le\n",sa1[pos[0]][j2],row->i[j2],da1[pos[j1]][j2]);
+               printf(" %e\n",da1[pos[j1]][j2]);
+               printf("FILLING ? %s %d %e\n",sa1[pos[0]][j2],row->i[j2],da1[pos[j1]][j2]);
           }
           /* for row->i[j2] == 1  ==> row is selected, not implemented */
         }
