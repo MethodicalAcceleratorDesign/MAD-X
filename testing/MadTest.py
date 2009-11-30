@@ -12,9 +12,16 @@ import Notify
 import time
 import datetime
 
+# on 30 november 2009, experienced strange problem:
+# pathname of files contained paths with /afs/cern/.../si/slap/share....
+def checkname(name):
+    if name.find('/si/slap/share/')>-1:
+        raise('found name:'+name)
+
 class State: # the state of a test
     pass
 
+extacting = State()
 init = State()
 incomplete = State() # missing resources
 ready = State() # all resources present
@@ -54,6 +61,7 @@ class Repository: # wrapper on CVS or SVN repository for examples
 
 class Resource:
     def __init__(self,name,source,destinations): # the name is not unique, as this is within scope of a testcase
+        checkname(source)
         # for a given resource, there are 3 destinations, i.e. one for each Makefile
         self.name = name
         self.source = source # the expanded filename of the file from CVS
@@ -188,7 +196,7 @@ class Output:
 
 class Test: # a test case
     tests = []
-
+    extracting = False # true when tests are being currently extracted from the CVS
     def __init__(self,name,program,input,output,subdirectory):
 
         self.name = name # the target
@@ -229,7 +237,6 @@ class Test: # a test case
 
     def collectResources(self):
         for entry in os.walk(rootDir,topdown=True): # walk file and directory structure under root
-
             foundDirectory = False
 
             if not self.subdirectory == '':
@@ -252,9 +259,11 @@ class Test: # a test case
                 # this resource is meant to be created at run time => do not attempt to copy as it does not exists yet
                 continue
             if options.verbose:
-                print("now to copy '"+r.source+"'")
+                print("now to copy '"+r.source+"'"),
             for d in r.destinations: # a single resource has several destinations, i.e. one per Makefile
                 destinationDir = d[:d.rfind('/')]
+                if options.verbose:
+                    print("to: '"+r.source+"'")
                 if not os.path.exists(destinationDir): # output directory does not exist => create it before copying file
                     os.makedirs(destinationDir) # also create all intermediate-level directories to contain the leaf directory
                         
@@ -383,7 +392,10 @@ class Tester:
         # first extract examples from the repository
         if not options.keep_data:
             rep = Repository()
+            Test.extracting = True
+            page.output()
             rep.checkout()
+            Test.extracting = False
 
         testinfoPattern = re.compile(r'^[\s\t]*(.+)[\s\t]*<[\s\t]*(.+)[\s\t]*>[\s\t]*([\w\.\d\-\_]+)[\s\t]*,?[\s\t]*'+\
                                      '(subdirectory=)?[\s\t]*(.*)[\s\t]*$')
@@ -462,7 +474,7 @@ class Tester:
             page.output() # refresh the web page
 
         # notify module keepers if required
-        if options.notify:
+        if options.mail:
             Notify.notify("jean-luc","test completion","test completed.") # for the time-being
 
             page.output() # refresh the web page for the last time
@@ -488,26 +500,33 @@ class WebPage:
         self.contents += '<body>\n'
         self.contents += (datetime.datetime.now()).ctime()
         self.contents += '<table>\n'
-        for target in Target.targets:
-            self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>\n'  
-            for i,t in enumerate(target.tests):
-                self.contents += '<tr class="test_case"><td width=\"80%\">'+t.testcaseDir+\
-                                 ': '+t.program +'&lt;'+t.input+'&gt;'+t.output+\
-                                 '</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>'+\
-                                 'DEVRES'+'NAGRES'+\
-                                 '</tr></table></td></tr>\n';
-                if t.state == init or t.state == incomplete:                
-                    for r in t.resources:
-                        self.contents += '<tr><td>'+r.name+'</td></tr>\n'
-                elif t.state == running:
-                    self.contents += '<tr><td width="80%"><center><b>The script is now busy running this test.</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
-                elif t.state == completed or t.state == aborted:
-                    for o in t.outputs:
-                        self.contents += '<tr class="'+o.outcome+'"><td width=\"80%\">'+o.name+\
-                                         '<td width="30%"><a href="./details/'+o.weblink+'">'+o.outcome+'</a></td></tr>\n'
-
-                else:
-                    raise("should never reach this point")
+        if Test.extracting:
+            self.contents += '<tr><td width="80%"><center><b>The script is now busy extracting the repository.</center></td><td width="20%"><center><img src="repository.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
+        else:
+            for target in Target.targets:
+                self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>\n'
+                for i,t in enumerate(target.tests):
+                    self.contents += '<tr class="test_case"><td width=\"80%\">'+t.testcaseDir+\
+                                     ': '+t.program +'&lt;'+t.input+'&gt;'+t.output+\
+                                     '</td><td width=\"20%\"><table width=\"100%\" style=\"text-align: center\"><tr>'+\
+                                     '<td class="success"><a href="./details/Error_dev_aperture_test_1.htm">dev</a></td>'+\
+                                     '<td class="warning"><a href="./details/Error_nag_aperture_test_1.htm">nag</a></td>'+\
+                                     '</tr></table></td></tr>\n';
+                    if t.state == init or t.state == incomplete:                
+                        for r in t.resources:
+                            self.contents += '<tr><td>'+r.name+'</td></tr>\n'                  
+                    elif t.state == running:
+                        self.contents += '<tr><td width="80%"><center><b>The script is now busy running this test.</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
+                    elif t.state == completed or t.state == aborted:
+                        for o in t.outputs:
+                            if not o.outcome == 'omit':
+                                self.contents += '<tr class="'+o.outcome+'"><td width=\"80%\">'+o.name+\
+                                                 '<td width="30%"><a href="./details/'+o.weblink+'">'+o.outcome+'</a></td></tr>\n'
+                            else:
+                                self.contents += '<tr class="'+o.outcome+'"><td width=\"80%\">'+o.name+\
+                                                 '<td width="30%">no file for reference</td></tr>\n'                                
+                    else:
+                        raise("should never reach this point")
                     
                     
         self.contents += '<table>\n'
@@ -537,24 +556,20 @@ if __name__ == "__main__":
                       dest="singleCase")
     parser.add_option("--keep_data","-k",help="keep old data without extracting repository",action="store_true")
     parser.add_option("--quiet","-q",help="does not produce a web page",action="store_true")
-    parser.add_option("--makefile","-m",help="select Makefile (Makefile, Makefile_develop or nag Makefiles), none if unspeficied"\
-                      ,dest="makefile")
-    parser.add_option("--notify","-n",help="notify module keepers",action="store_true")
+    parser.add_option("--mail","-m",help="notify module keepers be e-mail",action="store_true")
     parser.add_option("--skip","-s",help="skip a particular target causing trouble, to proceed with debugging",dest='skippedTarget')
+
+    parser.add_option("--develop","-d",help="compiles and runs with Makefile_develop",action="store_true")
+    parser.add_option("--nag","-n",help="compiles and runs with Makefile_nag",action="store_true")
     
     (options, args) = parser.parse_args()
 
     if options.singleCase and not options.singleTarget:
         print("option --case assumes option --target is selected as well")
 
-    if options.makefile:
-        found = False # default
-        for m in makefiles:
-            if m == options.makefile:
-                makefiles = [m]
-                found = True
-        if not found:
-            raise('option --makefile or -m expect a valid makefile')
+    # for the time-being do not bother about the --dev and --nag options
+    makefiles = ['Makefile']
+
                 
     tester = Tester()
     tester.run()
