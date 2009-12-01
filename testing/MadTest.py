@@ -294,6 +294,17 @@ class Test: # a test case
             os.system(command)
             endTime = (datetime.datetime.now()).ctime()
 
+            # check if the program finished normally
+            finishedNormally = False # default
+            if os.path.exists(self.output): # output exists
+                f = open(self.output,'r')
+                finishedNormallyPattern = re.compile(r'\+[\s\t]+MAD-X[\s\t]+([\d\.]+)[\s\t]+finished normally[\s\t]+\+')
+                for l in f.readlines():
+                    if finishedNormallyPattern.search(l):
+                        finishedNormally = True
+                        # print("FINISHED NORMALLY")
+                f.close()
+
             # now create two subdirectories, input and output to store the outcome
             os.mkdir('./input')
             os.mkdir('./output')
@@ -324,8 +335,8 @@ class Test: # a test case
                     print("create error page")
                     ferror = open('./output/stderr_redirected','r')
                     lines = ferror.readlines()
-                    if len(lines)==0:
-                        # stderr is empty
+                    if len(lines)==0 and finishedNormally:
+                        # stderr is empty and the program finished normally
                         stderrReturnStatus = 'success'
                         print("stderr_redirected is empty")
                         if m == 'Makefile_develop':
@@ -335,15 +346,20 @@ class Test: # a test case
                             whichTag = 'nag' # needed here?
                             self.nag_tag = 'success'
                     else:
-                        stderrReturnStatus = 'warning' # for the time being
-                        for l in lines:
-                            print("error file contains line: "+l)
+                        # distinguish between an ERROR and WARNING stderrReturnStatus
+                        # WARNING when the program finished normally, as seen in the madx output file, but with stderr
+                        # ERROR when
+                        if finishedNormally:
+                            stderrReturnStatus = 'warning'
+                        else:
+                            stderrReturnStatus = 'failure'
+        
                         if m == 'Makefile_develop':
                             whichTag = 'dev'
-                            self.dev_tag = 'warning' # for the time-being, do not distinguish between a failure and a warning
+                            self.dev_tag = stderrReturnStatus
                         if m == 'Makefile_nag':
                             whichTag = 'nag'
-                            self.nag_tag = 'warning' # for the time-being, do not distinguish between a failure and a warning     
+                            self.nag_tag = stderrReturnStatus    
                         for l in lines:
                             print("in stderr_redirected: "+ l)
                     htmlFile = htmlRootDir+"/details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
