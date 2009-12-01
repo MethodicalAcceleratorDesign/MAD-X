@@ -322,19 +322,35 @@ class Test: # a test case
                     lines = ferror.readlines()
                     if len(lines)==0:
                         # stderr is empty
+                        stderrReturnStatus = 'success'
                         print("stderr_redirected is empty")
                         if m == 'Makefile_develop':
+                            whichTag = 'dev' # needed here?
                             self.dev_tag = 'success'
                         if m == 'Makefile_nag':
-                            self.nag_tag = 'success'                           
+                            whichTag = 'nag' # needed here?
+                            self.nag_tag = 'success'
                     else:
+                        stderrReturnStatus = 'warning' # for the time being
+                        for l in lines:
+                            print("error file contains line: "+l)
                         if m == 'Makefile_develop':
-                            self.dev_tag = 'failure' # for the time-being, do not distinguish between a failure and a warning
+                            whichTag = 'dev'
+                            self.dev_tag = 'warning' # for the time-being, do not distinguish between a failure and a warning
                         if m == 'Makefile_nag':
-                            self.nag_tag = 'failure' # for the time-being, do not distinguish between a failure and a warning     
+                            whichTag = 'nag'
+                            self.nag_tag = 'warning' # for the time-being, do not distinguish between a failure and a warning     
                         for l in lines:
                             print("in stderr_redirected: "+ l)
-                    errorPage = ErrorWebPage("/user/nougaret/MAD-X/madX/testing/bidonErrorPage.html",ferror)
+                    htmlFile = htmlRootDir+"/details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
+                    if whichTag == 'nag':
+                        self.nag_link = "./details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
+                    elif whichTag == 'dev':
+                        self.dev_link = "./details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
+                    else:
+                        raise("should never reach this point")
+                    errorPage = ErrorWebPage(htmlFile,lines,stderrReturnStatus) 
+                    #errorPage = ErrorWebPage("/user/nougaret/MAD-X/madX/testing/bidonErrorPage.html",lines)
                     errorPage.output()
                     ferror.close()
                 else:
@@ -546,9 +562,9 @@ class WebPage:
         # remove the auto refresh and rely on the user to refresh on demand
         #self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
         # this tag should only be present while the test is running, and be absent when completed.
-        self.contents += '<title>MAD testing main page</title>'
-        self.contents += '<link rel=stylesheet href="./MadTestWebStyle.css" type="text/css">'
-        self.contents += '</head>'
+        self.contents += '<title>MAD testing main page</title>\n'
+        self.contents += '<link rel=stylesheet href="./MadTestWebStyle.css" type="text/css">\n'
+        self.contents += '</head>\n'
         
     def body(self):
         self.contents += '<body>\n'
@@ -562,18 +578,25 @@ class WebPage:
                 for i,t in enumerate(target.tests):
                     if not options.dev:
                         devClass = "test_case" # for the time being
-                        devLink =  'dev'
+                        devLink =  'dev' # actually no link
                     else:
                         pass # will be either failure, warning or success
                         devClass = t.dev_tag
-                        devLink =  '<a href="./details/Error_dev_aperture_test_1.htm">dev</a>'
+                        if not devClass == 'undefined':
+                            devLink =  '<a href="'+t.dev_link+'">dev</a>'
+                        else:
+                            devLink = 'dev' # actually  no link
                     if not options.nag:
                         nagClass = "test_case" # for the time being
-                        nagLink = 'nag'
+                        nagLink = 'nag' # actually no link
                     else:
                         pass # will be either failure, warning or success
                         nagClass = t.nag_tag
-                        nagLink = '<a href="./details/Error_nag_aperture_test_1.htm">nag</a>'
+                        if not nagClass == 'undefined':
+                            nagLink = '<a href="./details/Error_nag_aperture_test_1.htm">nag</a>'
+                            nagLink = '<a href="'+t.nag_link+'">nag</a>'
+                        else:
+                            nagLink = 'nag' # actually no link
                         
                     self.contents += '<tr class="test_case"><td width=\"80%\">'+t.testcaseDir+\
                                      ': '+t.program +'&lt;'+t.input+'&gt;'+t.output+\
@@ -617,15 +640,33 @@ class WebPage:
         os.system('firefox ' + self.name+ '&')
 
 class ErrorWebPage(WebPage):
-    def __init__(self,name,stderr_file):
+    def __init__(self,name,stderr_lines,stderrReturnStatus):
         self.name = name
-        self.stderr_file = stderr_file
+        self.stderr_lines = stderr_lines
+        self.stderr_return_status = stderrReturnStatus
+        for l in self.stderr_lines:
+            print("in ErrorWebPage __init__: error file contains line: "+l)
+    def header(self):
+        self.contents += '<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n'
+        self.contents += '<html>\n'
+        self.contents += '<head>\n'
+        # remove the auto refresh and rely on the user to refresh on demand
+        #self.contents += '<meta http-equiv="refresh" content="5" >' # page reloads itself every 5 seconds
+        # this tag should only be present while the test is running, and be absent when completed.
+        self.contents += '<title>MAD testing main page</title>\n'
+        self.contents += '<link rel=stylesheet href="../MadTestWebStyle.css" type="text/css">\n'
+        self.contents += '</head>\n'            
     def body(self):
+        self.contents += '<body>\n'        
+        self.contents += '<table width="75%" border="0">\n'
+        # top coloured banner
+        self.contents += '<tr class='+self.stderr_return_status+'><td width="80%">Contents of stderr</td><td width="20%">'+\
+                         self.stderr_return_status+"</td></tr>\n"
+        for l in self.stderr_lines:
+            self.contents += '<tr><td colspan="2">'+l.rstrip("\n")+'</td></tr>\n'
+        self.contents += "</table>\n"
+        self.contents += '</body>\n'
         
-        for l in self.stderr_file.readlines():
-            pass
-        pass
-
 if __name__ == "__main__":
     usage = "%prog [options]"
     parser = optparse.OptionParser(usage)
