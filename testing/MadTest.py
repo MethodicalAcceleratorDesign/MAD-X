@@ -211,7 +211,6 @@ class Test: # a test case
         # following information only relevant when --dev or --nag option
         self.dev_tag = "undefined"
         self.nag_tag = "undefined"
-
         
         Target.registerTest(name, self)
 
@@ -288,9 +287,12 @@ class Test: # a test case
             else: # Makefile_develop or Makefile_nag
                 stderrfile = './stderr_redirected'
                 command = '('+madxDir+'/madx_'+m+' <'+self.input +'>'+self.output + ')' + ">& " + stderrfile
-                
+
             print("now to execute "+command+" under "+scriptDir)
+            
+            startTime = (datetime.datetime.now()).ctime()            
             os.system(command)
+            endTime = (datetime.datetime.now()).ctime()
 
             # now create two subdirectories, input and output to store the outcome
             os.mkdir('./input')
@@ -314,6 +316,8 @@ class Test: # a test case
                 else:
                     shutil.move(f,'./output')
 
+            whichTag = 'standard' # refers to the standard Makefile
+                    
             if m == 'Makefile_develop' or m == 'Makefile_nag':             
                 # then create a web page to store the contents of stderr
                 if os.path.exists('./output/stderr_redirected'):
@@ -349,7 +353,8 @@ class Test: # a test case
                         self.dev_link = "./details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
                     else:
                         raise("should never reach this point")
-                    errorPage = ErrorWebPage(htmlFile,lines,stderrReturnStatus) 
+                    
+                    errorPage = ErrorWebPage(htmlFile,lines,stderrReturnStatus,startTime,endTime) 
                     #errorPage = ErrorWebPage("/user/nougaret/MAD-X/madX/testing/bidonErrorPage.html",lines)
                     errorPage.output()
                     ferror.close()
@@ -640,10 +645,12 @@ class WebPage:
         os.system('firefox ' + self.name+ '&')
 
 class ErrorWebPage(WebPage):
-    def __init__(self,name,stderr_lines,stderrReturnStatus):
+    def __init__(self,name,stderr_lines,stderrReturnStatus,startTime,endTime):
         self.name = name
         self.stderr_lines = stderr_lines
         self.stderr_return_status = stderrReturnStatus
+        self.startTime = startTime
+        self.endTime = endTime
         for l in self.stderr_lines:
             print("in ErrorWebPage __init__: error file contains line: "+l)
     def header(self):
@@ -657,7 +664,8 @@ class ErrorWebPage(WebPage):
         self.contents += '<link rel=stylesheet href="../MadTestWebStyle.css" type="text/css">\n'
         self.contents += '</head>\n'            
     def body(self):
-        self.contents += '<body>\n'        
+        self.contents += '<body>\n'
+        self.contents += '<p>Test started '+self.startTime+', ended '+self.endTime+'</p>\n'
         self.contents += '<table width="75%" border="0">\n'
         # top coloured banner
         self.contents += '<tr class='+self.stderr_return_status+'><td width="80%">Contents of stderr</td><td width="20%">'+\
