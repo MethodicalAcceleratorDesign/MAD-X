@@ -629,7 +629,10 @@ class WebPage:
                         for r in t.resources:
                             self.contents += '<tr><td>'+r.name+'</td></tr>\n'                  
                     elif t.state == running:
-                        self.contents += '<tr><td width="80%"><center><b>The script is now busy running this test.</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
+                        when = (datetime.datetime.now()).ctime()
+                        self.contents += '<tr><td width="80%"><center><b>Script busy running this test since '+\
+                                         when+'.</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center>'+\
+                                         '</td></tr>\n' # image showing running job
                     elif t.state == completed or t.state == aborted:
                         for o in t.outputs:
                             if not o.outcome == 'omit':
