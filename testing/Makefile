@@ -3,14 +3,14 @@
 PERL_SCRIPTS = MadBuild.pl MadTest.pl MadDiff.pl MadBuildAndTest.pl \
 	MadTrigTest.pl MadWorkReport.pl MadWorkBetweenReleases.pl \
 	MadWindowsCompileServer.pl MadTrigRelease.pl
- 
+
 PERL_ADMIN_TOOLS = MadTestOverwrite.pl
 
 PYTHON_SCRIPTS = MadBuildAndTest.py Notify.py MadTrigTest.py \
 	MadTestExceptions.py \
-	MadBuildPy.pl MadTestPy.pl \
+	MadBuildPy.pl MadTestPy.pl MadTest.py \
 	MadDiff.pl 
-
+# when possible, MadTestPy.pl should be replaced by MadTest.py
 
 XML_DOCS = TestScenario.xml ProcessScenario.xsl
 HTML_DOCS = MadTestWebStyle.css index.htm
