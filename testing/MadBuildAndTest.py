@@ -261,19 +261,19 @@ try:
         # WARNING: MadTestPy.pl should replace MadTest.pl to avoid sending
         # e-mail - instead, notification should take place within Python.
         if options.debug: # or global debugMode
-            notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX')
+            notify('jean-luc','Start test','invoke ./MadTest.py')
         # os.system("./MadTestPy.pl ./MadCvsExtract/madX debug=c6t")
         if options.silent:
             # December 2nd, 2009: invoke the latest MadTest.py
             #os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
-            os.system("./MadTest.py --silent") # assumes the path to the MadCvsExtract/madX is known ...
+            os.system("./MadTest.py --dev --nag --silent") # assumes the path to the MadCvsExtract/madX is known ...
             # currently the '--silent' option is recognized but not taken into account by MadTest.py
         else:
             # December 2nd, 2009: invoke the latest MadTest.py
             #os.system("./MadTestPy.pl ./MadCvsExtract/madX")
-            os.system("./MadTest.py") # assumes the path  to the MadCvsExtract/madX is known by MadTest.py
-        reportFile.write("MadTestPy.pl completed\n")
-        notify('admin','Completed test','MadTestPy.pl completed')
+            os.system("./MadTest.py --dev --nag") # assumes the path  to the MadCvsExtract/madX is known by MadTest.py
+        reportFile.write("MadTestPy.py completed\n")
+        notify('admin','Completed test','MadTest.py completed')
 
 
         # final debug test to check we still have access to AFS
