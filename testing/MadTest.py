@@ -29,9 +29,9 @@ running = State()
 aborted = State()
 completed = State()
 
-rootDir = "/afs/cern.ch/user/n/nougaret/scratch0/mad-automation/madX-examples/REF"
+rootDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation/madX-examples/REF"
 
-topDir = "/afs/cern.ch/user/n/nougaret/scratch0/mad-automation"
+topDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation"
 testingDir = topDir + "/TESTING"
 repositoryDir = topDir + "/madX-examples"
 madxDir = topDir + "/MadCvsExtract/madX"
