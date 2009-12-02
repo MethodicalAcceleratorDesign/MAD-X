@@ -8,7 +8,7 @@ PERL_ADMIN_TOOLS = MadTestOverwrite.pl
 
 PYTHON_SCRIPTS = MadBuildAndTest.py Notify.py MadTrigTest.py \
 	MadTestExceptions.py \
-	MadBuildPy.pl MadTestPy.pl MadTest.py \
+	MadBuildPy.pl MadTest.py \
 	MadDiff.pl 
 # when possible, MadTestPy.pl should be replaced by MadTest.py
 
