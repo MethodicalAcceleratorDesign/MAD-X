@@ -264,9 +264,14 @@ try:
             notify('jean-luc','Start test','invoke ./MadTestPy.pl ./MadCvsExtract/madX')
         # os.system("./MadTestPy.pl ./MadCvsExtract/madX debug=c6t")
         if options.silent:
-            os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
+            # December 2nd, 2009: invoke the latest MadTest.py
+            #os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
+            os.system("./MadTest.py --silent") # assumes the path to the MadCvsExtract/madX is known ...
+            # currently the '--silent' option is recognized but not taken into account by MadTest.py
         else:
-            os.system("./MadTestPy.pl ./MadCvsExtract/madX") 
+            # December 2nd, 2009: invoke the latest MadTest.py
+            #os.system("./MadTestPy.pl ./MadCvsExtract/madX")
+            os.system("./MadTest.py") # assumes the path  to the MadCvsExtract/madX is known by MadTest.py
         reportFile.write("MadTestPy.pl completed\n")
         notify('admin','Completed test','MadTestPy.pl completed')
 
