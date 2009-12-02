@@ -404,10 +404,10 @@ class Test: # a test case
                 # specific case when the HTML file name is of the form XX.map or XX.map.htm
                 # webserver will fail to display the HTML although one can open it from the webfolder...
                 # to overcome this limitation, we need to juggle with the HTML file name
-                fname = fname.replace('.map','.maAap')
+                sublinkname = fname.replace('.map','.maAap')
             
                 htmlFile = "./temp.html" # output HTML file, to be delivered to the web site...
-                weblink = "./DiffResult_" + self.name + "_" + self.testcaseDir + "_" + fname + ".htm" # again test.name stands for the target
+                weblink = "./DiffResult_" + self.name + "_" + self.testcaseDir + "_" + sublinkname + ".htm" # again test.name stands for the target
                 htmlFile = htmlRootDir+"/details/"+weblink
 
                 os.system('./MadDiff.pl '+createdFile+' '+referenceFile+' ' +htmlFile+' > ./tempfile')
