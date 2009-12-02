@@ -162,6 +162,8 @@ testing/ProcessScenario.xsl -text
 testing/TestScenario.xml -text
 testing/index.htm -text
 testing/mad_install -text
+testing/repository.gif -text svneol=unset#unset
+testing/underConstruction.gif -text svneol=unset#unset
 /timel.c -text
 /timest.f90 -text
 /timex.f90 -text
