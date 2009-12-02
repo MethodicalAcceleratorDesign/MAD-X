@@ -86,7 +86,8 @@ class Resource:
             name = source[source.rfind('/')+1:]
             parts = source.split('/')
             leafDir =  parts[-2]
-            print("leafDir="+leafDir)
+            if options.verbose:
+                print("leafDir="+leafDir)
             # the leaf directory that contain the example and that should be renamed by test.testcaseDir
             destinations = []
             for m in makefiles:
@@ -98,8 +99,8 @@ class Resource:
                     destination = destination.replace('/'+leafDir+'/','/'+test.testcaseDir+'/') # testcaseDir like test_1_LHC                    
                 else:
                     destination = destination.replace('/'+leafDir+'/','/'+leafDir+'/'+test.testcaseDir+'/') # testcaseDir like test_1
-                    
-                print("destination="+destination+" for source="+source+", leafDir="+leafDir)
+                if options.verbose:    
+                    print("destination="+destination+" for source="+source+", leafDir="+leafDir)
                 destinations.append(destination)            
             resource = Resource(name,source,destinations)  # primary resource is the MAD-X input file itself
             resources.append(resource)
@@ -156,7 +157,8 @@ class Resource:
             f.close()
         except: # failed to open the file: this may be a temporary file to be created at run time, any way one should
             # mark the resource as missing
-            print("caught exception")
+            if options.verbose:
+                print("caught exception - probably reference to a runtime resource not available at the start of the script")
             test.missing_resources.append(filename)
             if test.state == init:
                 test.state = incomplete;
@@ -277,8 +279,7 @@ class Test: # a test case
         currentDir = os.getcwd()
         for i,m in enumerate(makefiles):
             # retreive the name of the directory in which the madx input is located (first resource)            
-            script = self.resources[0].destinations[i]
-            print("looking for /test_1/: script is '"+script+"'")            
+            script = self.resources[0].destinations[i]            
             scriptDir = script[:script.rfind('/')]
             self.topDir = scriptDir # for future reuse when comparing the output with the reference
             os.chdir(scriptDir)
@@ -288,7 +289,8 @@ class Test: # a test case
                 stderrfile = './stderr_redirected'
                 command = '('+madxDir+'/madx_'+m+' <'+self.input +'>'+self.output + ')' + ">& " + stderrfile
 
-            print("now to execute "+command+" under "+scriptDir)
+            if options.verbose:
+                print("now to execute "+command+" under "+scriptDir)
             
             startTime = (datetime.datetime.now()).ctime()            
             os.system(command)
@@ -332,13 +334,13 @@ class Test: # a test case
             if m == 'Makefile_develop' or m == 'Makefile_nag':             
                 # then create a web page to store the contents of stderr
                 if os.path.exists('./output/stderr_redirected'):
-                    print("create error page")
                     ferror = open('./output/stderr_redirected','r')
                     lines = ferror.readlines()
                     if len(lines)==0 and finishedNormally:
                         # stderr is empty and the program finished normally
                         stderrReturnStatus = 'success'
-                        print("stderr_redirected is empty")
+                        if options.verbose:
+                            print("stderr_redirected is empty")
                         if m == 'Makefile_develop':
                             whichTag = 'dev' # needed here?
                             self.dev_tag = 'success'
@@ -359,9 +361,7 @@ class Test: # a test case
                             self.dev_tag = stderrReturnStatus
                         if m == 'Makefile_nag':
                             whichTag = 'nag'
-                            self.nag_tag = stderrReturnStatus    
-                        for l in lines:
-                            print("in stderr_redirected: "+ l)
+                            self.nag_tag = stderrReturnStatus
                     htmlFile = htmlRootDir+"/details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
                     if whichTag == 'nag':
                         self.nag_link = "./details/"+"Error_"+whichTag+"_"+self.name+"_"+self.testcaseDir+".htm"
@@ -375,7 +375,8 @@ class Test: # a test case
                     errorPage.output()
                     ferror.close()
                 else:
-                    print("error: expected to find redirected stderr")
+                    if options.verbose:
+                        print("error: expected to find redirected stderr")
             
             os.chdir(currentDir) # back to the initial work directory
 
@@ -383,7 +384,8 @@ class Test: # a test case
         # only for the main Makefile
         # must pick-up all files under the /output directory and compare them with the reference
         outputDir = self.topDir+'/output'
-        print "outputDir="+outputDir
+        if options.verbose:
+            print "outputDir="+outputDir
         files = os.listdir(outputDir)
         
         for fname in files: # the short name of the file without its path prefix
@@ -497,9 +499,10 @@ class Tester:
 
             #target = target.rstrip('\n')
 
-            if options.skippedTarget:
-                if target == options.skippedTarget:
-                    print("skip "+options.skippedTarget)
+            if options.omit:
+                if target == options.omit:
+                    if options.verbose:
+                        print("skip "+options.omit)
                     continue
                 
             if options.singleTarget and not options.singleTarget == target:
@@ -589,10 +592,11 @@ class WebPage:
         
     def body(self):
         self.contents += '<body>\n'
-        self.contents += (datetime.datetime.now()).ctime()
+        when = (datetime.datetime.now()).ctime()
+        self.contents += when
         self.contents += '<table>\n'
         if Test.extracting:
-            self.contents += '<tr><td width="80%"><center><b>The script is now busy extracting the repository.</center></td><td width="20%"><center><img src="repository.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
+            self.contents += '<tr><td width="80%"><center><b>Script extracting the repository since '+when+' ...</center></td><td width="20%"><center><img src="repository.gif" width="134" height="139"></b></center></td></tr>\n' # image showing running job
         else:
             for target in Target.targets:
                 self.contents += '<tr class="test_target"><td colspan="2"><div align="center"><strong>'+target.name+'</strong></div></td></tr>\n'
@@ -630,8 +634,8 @@ class WebPage:
                             self.contents += '<tr><td>'+r.name+'</td></tr>\n'                  
                     elif t.state == running:
                         when = (datetime.datetime.now()).ctime()
-                        self.contents += '<tr><td width="80%"><center><b>Script busy running this test since '+\
-                                         when+'.</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center>'+\
+                        self.contents += '<tr><td width="80%"><center><b>Script running this test since '+\
+                                         when+' ...</center></td><td width="20%"><center><img src="underConstruction.gif" width="134" height="139"></b></center>'+\
                                          '</td></tr>\n' # image showing running job
                     elif t.state == completed or t.state == aborted:
                         for o in t.outputs:
@@ -670,8 +674,7 @@ class ErrorWebPage(WebPage):
         self.stderr_return_status = stderrReturnStatus
         self.startTime = startTime
         self.endTime = endTime
-        for l in self.stderr_lines:
-            print("in ErrorWebPage __init__: error file contains line: "+l)
+
     def header(self):
         self.contents += '<DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">\n'
         self.contents += '<html>\n'
@@ -704,10 +707,12 @@ if __name__ == "__main__":
     parser.add_option("--keep_data","-k",help="keep old data without extracting repository",action="store_true")
     parser.add_option("--quiet","-q",help="does not produce a web page",action="store_true")
     parser.add_option("--mail","-m",help="notify module keepers be e-mail",action="store_true")
-    parser.add_option("--skip","-s",help="skip a particular target causing trouble, to proceed with debugging",dest='skippedTarget')
+    parser.add_option("--omit","-o",help="omit particular target causing trouble, for debugging",dest='omit')
 
     parser.add_option("--dev","-d",help="compiles and runs with Makefile_develop",action="store_true")
     parser.add_option("--nag","-n",help="compiles and runs with Makefile_nag",action="store_true")
+
+    parser.add_option("--silent","-s",help="no e-mail (currently has no effect)",action="store_true") # currently has no effect
     
     (options, args) = parser.parse_args()
 
