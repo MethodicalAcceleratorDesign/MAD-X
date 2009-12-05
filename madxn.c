@@ -1044,8 +1044,10 @@ void exec_plot(struct in_cmd* cmd)
         track_flag = 1;
     }
     else
+    {
+      printf("Plot - default table plotted: twiss\n");
       table_name = "twiss";
-
+    }
     /* check if table name is the same of the last twiss call if haxis is "s" and no interpolation */
 
     if(nointerp == 0 && s_haxis == 0)
@@ -1063,8 +1065,12 @@ void exec_plot(struct in_cmd* cmd)
     }
 
     /* HG 21.10.09 allow plot from external table, part1 */
-    pos = name_list_pos(table_name, table_register->names);
-    p_table = table_register->tables[pos];
+    if ((pos = name_list_pos(table_name, table_register->names)) > -1)
+        p_table = table_register->tables[pos];
+    else
+      {
+       fatal_error("Plot - non-existing table:", table_name); return;
+      }
     /* HG 21.10.09 allow plot from external table, end part1 */
 
     /* get file_name */
