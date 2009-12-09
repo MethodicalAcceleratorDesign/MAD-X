@@ -131,7 +131,17 @@ try:
                       default=False,\
                       help="no e-mail sent to module keepers")
 
+    # 4 december 2009
+    parser.add_option("-d","--dev",action="store_true",help="build and test also with the 'Makefile_develop' Lahey Fortran compiler")
+    parser.add_option("-n","--nag",action="store_true",help="build and test also with the 'Makefile_nag' NAG f95 compiler")
+    
     (options,args) = parser.parse_args()
+
+    additionalCompilers = ''
+    if options.nag:
+        additionalCompilers += ' --nag '
+    if options.dev:
+        additionalCompilers += ' --dev '
 
     # check if all the command line arguments could be processed as options
 
@@ -238,10 +248,17 @@ try:
             os.system("rm -rf ./tempfile")
         except:
             pass
-        os.system("./MadBuildPy.pl "+ release + " > ./tempfile") # MadBuildPy.pl instead of MadBuild.pl
+        # 4 decembre 2009: invoke MadBuild.py instead of MadBuildPy.pl
+        # os.system("./MadBuildPy.pl "+ release + " > ./tempfile") # MadBuildPy.pl instead of MadBuild.pl
+        try:
+            os.system("./MadBuild.py "+additionalCompilers + " --release " + release + "> ./tempfile")
+            notify('jean-luc','here','managed to launch '+"./MadBuild.py "+additionalCompilers+  " --release " + release + "> ./tempfile")           
+        except:
+            notify('jean-luc','here','failed to launch '+"./MadBuild.py "+additionalCompilers+ release + "> ./tempfile")
+            raise("forward exception")
         tempfile = open('./tempfile','r')
         templines = tempfile.readlines()
-        if templines[0]=='false': # the return status indicating a compilation failure
+        if templines[0]=='False': # the return status indicating a compilation failure
             if options.manual:
                 notify('jean-luc','stop test','because compilation did not succeed.')
             else:
@@ -266,16 +283,19 @@ try:
         if options.silent:
             # December 2nd, 2009: invoke the latest MadTest.py
             #os.system("./MadTestPy.pl ./MadCvsExtract/madX silent") # no e-mail
-            os.system("./MadTest.py --dev --nag --silent") # assumes the path to the MadCvsExtract/madX is known ...
+            os.system("./MadTest.py "+additionalCompilers+" --silent") # assumes the path to the MadCvsExtract/madX is known ...
             # currently the '--silent' option is recognized but not taken into account by MadTest.py
         else:
             # December 2nd, 2009: invoke the latest MadTest.py
             #os.system("./MadTestPy.pl ./MadCvsExtract/madX")
-            os.system("./MadTest.py --dev --nag") # assumes the path  to the MadCvsExtract/madX is known by MadTest.py
+            os.system("./MadTest.py "+additionalCompilers) # assumes the path  to the MadCvsExtract/madX is known by MadTest.py
         reportFile.write("MadTestPy.py completed\n")
-        notify('admin','Completed test','MadTest.py completed')
 
-
+        if options.manual:
+            notify('jean-luc','Completed test','MadTest.py completed')
+        else:
+            notify('admin','Completed test','MadTest.py completed')
+            
         # final debug test to check we still have access to AFS
         # make sure still the script still has access to AFS
         # by listing the examples directory
@@ -302,12 +322,12 @@ try:
         #   reportFile.close()
 
 except:
-    reportFile.write("exception caught when trying Perl scripts in:\n"+\
+    reportFile.write("exception caught when trying Python scripts in:\n"+\
                      currentDir+"\n")
     traceback.print_exc(file=reportFile)
 
     notify('jean-luc','Failure',\
-           "exception caught when trying the successive Perl scripts in:\n"+\
+           "exception caught when trying the successive Python scripts in:\n"+\
            currentDir)
 
 th.kill()
