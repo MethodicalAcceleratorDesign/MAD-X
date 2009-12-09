@@ -362,8 +362,9 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
        get_option
   double precision apx,apy,apr,el,sum,node_value,track(6,*),        &
        last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
-       aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),     &
-       st,theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*)
+       aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),st,  &
+       theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),offset(2), &
+       offx,offy
   character*(name_len) aptype
   parameter(zero = 0.d0, one=1d0)
 
@@ -450,6 +451,10 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      call node_string('apertype ',aptype,nn)
      call dzero(aperture,maxnaper)
      call get_node_vector('aperture ',nn,aperture)
+     call get_node_vector('aper_offset ',nn,offset)
+     
+     offx = offset(1)
+     offy = offset(2)
      !        print *, " TYPE ",aptype &
      !       "values  x y lhc",aperture(1),aperture(2),aperture(3)
      !------------  ellipse case ----------------------------------
@@ -457,7 +462,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track, ktrack,al_errors)
+             last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
         !------------  circle case ----------------------------------
      else if(aptype.eq.'circle') then
         apx = aperture(1)
@@ -469,20 +474,20 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         apy = apx
         !        print *,"circle, radius= ",apx
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !------------  rectangle case ----------------------------------
      else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
      else if(aptype.eq.'racetrack') then
         apx = aperture(1)
         apy = aperture(2)
         apr = aperture(3)
         call trcoll1(4, apx, apy, turn, sum, part_id, last_turn,      &
-             last_pos, last_orbit, track,ktrack,al_errors, apr)
+             last_pos,last_orbit,track,ktrack,al_errors,apr,offx,offy)
         !------------  LHC screen case ----------------------------------
      else if(aptype.eq.'lhcscreen') then
         !        print *, "LHC screen start, Xrect= ",
@@ -493,7 +498,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     this tests whether the particle is outside the circumscribing
         !JMJ!     circle.
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-             &last_pos, last_orbit, track,ktrack,al_errors)
+             &last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !JMJ!
         !JMJ!     This tests whether particles are outside the space bounded by
         !JMJ!     two or four lines intersecting the circle.
@@ -511,26 +516,26 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         if(aperture(1).gt.0.) apx = aperture(1)
         if(aperture(2).gt.0.) apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !        print *, "LHC screen end"
         !------------  marguerite case ----------------------------------
      else if(aptype.eq.'marguerite') then
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !------------  rectellipse case ----------------------------------
      else if(aptype.eq.'rectellipse') then
         !*****         test ellipse
         apx = aperture(3)
         apy = aperture(4)
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !*****         test rectangle
         apx = aperture(1)
         apy = aperture(2)
         call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
-             last_pos, last_orbit, track,ktrack,al_errors)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !       print*, " test apertures"
         !       print*, "      apx=",apx, " apy=",apy," apxell=",apxell,
         !              " apyell=",apyell
@@ -2458,7 +2463,7 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call augment_count(table)
 end subroutine tt_puttab
 subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
-     last_pos, last_orbit, z, ntrk,al_errors)
+     last_pos, last_orbit, z, ntrk,al_errors,offx,offy)
 
   implicit none
   !----------------------------------------------------------------------*
@@ -2483,13 +2488,16 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
   include 'name_len.fi'
   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
   double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-       one,al_errors(align_max)
+       one,al_errors(align_max),offx,offy
   parameter(one=1d0)
   character*(name_len) aptype
 
   n = 1
 10 continue
   do i = n, ntrk
+  
+     z(1,i) = z(1,i) + offx/2
+     z(3,i) = z(3,i) + offy/2
      !---- Is particle outside aperture?
      if (flag .eq. 1.and.((z(1,i)-al_errors(11))/apx)**2             &
           +((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
@@ -2517,7 +2525,7 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
 end subroutine trcoll
 
 subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
-     last_pos, last_orbit, z, ntrk,al_errors, apr)
+     last_pos, last_orbit, z, ntrk,al_errors, apr,offx,offy)
   !----------------------------------------------------------------------*
   ! Similar with trcoll, for racetrack type aperture
   !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
@@ -2528,13 +2536,16 @@ subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
   include 'name_len.fi'
   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
   double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-       one,al_errors(align_max),apr
+       one,al_errors(align_max),apr,offx,offy
   parameter(one=1d0)
   character*(name_len) aptype
 
   n = 1
 10 continue
   do i = n, ntrk
+  
+     z(1,i) = z(1,i) + offx/2
+     z(3,i) = z(3,i) + offy/2
      !---- Is particle outside aperture?
      if (flag .eq. 4                                                 &
           .and. (abs(z(1,i)-al_errors(11))) .gt. (apr+apx)                  &
