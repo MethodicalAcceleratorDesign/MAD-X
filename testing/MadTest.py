@@ -37,7 +37,7 @@ repositoryDir = topDir + "/madX-examples"
 madxDir = topDir + "/MadCvsExtract/madX"
 
 htmlRootDir = "/afs/cern.ch/user/n/nougaret/www/mad"
-mainHtmlPage = htmlRootDir + "/test_new.htm"
+mainHtmlPage = htmlRootDir + "/test.htm"
 
 makefiles = ['Makefile','Makefile_develop','Makefile_nag']
     
