@@ -819,13 +819,14 @@ struct node* new_marker(struct node *thick_node, double at, struct expression *a
     pos = name_list_pos("marker", defined_commands->list);
     /* clone = clone_command(defined_commands->commands[pos]); */
     p = defined_commands->commands[pos];
-    clone = new_command(p->name, 10, 10, p->module, p->group, p->link_type,p->mad8_type);
-    /* 10 is the maximum number of par names and parvalues */
+    clone = new_command(p->name, 20, 20, p->module, p->group, p->link_type,p->mad8_type);
+    /* 20 is the maximum number of par names and parvalues */
     add_cmd_parameter_clone(clone,return_param_recurse("at",      thick_node->p_elem),"at",      1);
     add_cmd_parameter_clone(clone,return_param_recurse("from",    thick_node->p_elem),"from",    1);
     add_cmd_parameter_clone(clone,return_param_recurse("apertype",thick_node->p_elem),"apertype",1);
     add_cmd_parameter_clone(clone,return_param_recurse("aperture",thick_node->p_elem),"aperture",1);
     add_cmd_parameter_clone(clone,return_param_recurse("aper_tol",thick_node->p_elem),"aper_tol",1);
+    add_cmd_parameter_clone(clone,return_param_recurse("aper_offset",thick_node->p_elem),"aper_offset",1);
     add_cmd_parameter_clone(clone,return_param_recurse("kmax",    thick_node->p_elem),"kmax",    1);
     add_cmd_parameter_clone(clone,return_param_recurse("kmin",    thick_node->p_elem),"kmin",    1);
     add_cmd_parameter_clone(clone,return_param_recurse("calib",   thick_node->p_elem),"calib",   1);
