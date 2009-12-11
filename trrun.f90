@@ -2496,21 +2496,19 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
 10 continue
   do i = n, ntrk
   
-     z(1,i) = z(1,i) + offx/2
-     z(3,i) = z(3,i) + offy/2
      !---- Is particle outside aperture?
-     if (flag .eq. 1.and.((z(1,i)-al_errors(11))/apx)**2             &
-          +((z(3,i)-al_errors(12)) / apy)**2 .gt. one) then
+     if (flag .eq. 1.and.((z(1,i)-al_errors(11)- offx)/apx)**2             &
+          +((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one) then
         go to 99
      else if(flag .eq. 2                                             &
-          .and. (abs(z(1,i)-al_errors(11)) .gt. apx                         &
-          .or. abs(z(3,i)-al_errors(12)) .gt. apy)) then
+          .and. (abs(z(1,i)-al_errors(11)- offx) .gt. apx                         &
+          .or. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
         go to 99
         !***  Introduction of marguerite : two ellipses
-     else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)) / apx)**2      &
-          + ((z(3,i)-al_errors(12)) / apy)**2 .gt. one .and.                &
-          ((z(1,i)-al_errors(11)) / apy)**2 +                               &
-          ((z(3,i)-al_errors(12)) / apx)**2 .gt. one) then
+     else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)- offx) / apx)**2      &
+          + ((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one .and.                &
+          ((z(1,i)-al_errors(11)- offx) / apy)**2 +                               &
+          ((z(3,i)-al_errors(12)- offy) / apx)**2 .gt. one) then
         go to 99
      endif
      go to 98
@@ -2544,16 +2542,14 @@ subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
 10 continue
   do i = n, ntrk
   
-     z(1,i) = z(1,i) + offx/2
-     z(3,i) = z(3,i) + offy/2
      !---- Is particle outside aperture?
      if (flag .eq. 4                                                 &
-          .and. (abs(z(1,i)-al_errors(11))) .gt. (apr+apx)                  &
-          .or. abs(z(3,i)-al_errors(12)) .gt. (apy+apr) .or.                &
-          ((((abs(z(1,i)-al_errors(11))-apx)**2+                            &
-          (abs(z(3,i)-al_errors(12))-apy)**2) .gt. apr**2)                  &
-          .and. (abs(z(1,i)-al_errors(11))) .gt. apx                        & 
-          .and. abs(z(3,i)-al_errors(12)) .gt. apy)) then
+          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. (apr+apx)                  &
+          .or. abs(z(3,i)-al_errors(12)- offy) .gt. (apy+apr) .or.                &
+          ((((abs(z(1,i)-al_errors(11)- offx)-apx)**2+                            &
+          (abs(z(3,i)-al_errors(12)- offy)-apy)**2) .gt. apr**2)                  &
+          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. apx                        & 
+          .and. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
         go to 99
      endif
      go to 98
