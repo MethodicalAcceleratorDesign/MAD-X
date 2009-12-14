@@ -116,7 +116,17 @@ class Resource:
             #commonPatterns.append(\
             #    re.compile(r'sxfread[\s\t]*,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;')\
             #    )
+            
             commonPatterns.append(re.compile(r'sxfread, file = "(fv9\.sxf)";'))
+
+            # another - rare - instruction that calls a script available in the input directory
+            # along the other input files. Such script must be copied locally along the other files.
+            # This is for instance the case for the read.magnet.errors perl-script in twiss/test_5/ or foot
+            scriptInvocationPattern = [re.compile(r'[Ss][Yy][Ss][Tt][Ee][Mm][\s\t]*,?'+\
+                                                  '[\s\t]*[\"\']([\w\.\_\-\d]+)[\s\t]*'+\
+                                                  '<?[\s\t]*([\w\.\_\-\d\/]*)[\s\t]*>?(.*)[\"\']')]
+            
+            
             for line in f.readlines():
                 #print("line="+line)
                 line = line.rstrip('\n')
@@ -126,16 +136,30 @@ class Resource:
                 if not k == -1:
                     # put to lower case everything in front of the equal sign to simply patterns
                     line = line[0:k].lower() +"="+ line[k+1:]
-                for p in commonPatterns:
+                for i,p in enumerate(commonPatterns + scriptInvocationPattern):
+                    if i == len(commonPatterns + scriptInvocationPattern)-1:
+                        scriptInvocation = True
+                    else:
+                        scriptInvocation = False # the most usual case, as in call, file...
                     m = p.search(line)
                     if m:
-                        #print("matched pattern for line "+line)
-                        source = m.group(1)
+
+                        if scriptInvocation:
+                            command = m.group(1)
+                            if command == 'perl' or command == 'python' or command == 'gnuplot':
+                                source = m.group(2)
+                            elif not (command == 'mkdir' or command == 'ls' or command == 'cat' or command == 'rm' or command == 'grep' or \
+                                      command == 'echo' or command == 'ln' or command == 'cp'):
+                                source = m.group(1) # source is a script
+                            else:
+                                continue # the for-loop
+                        else:
+                            source = m.group(1) # the general case, as in call, file...
+                            
                         if not source[0] == '/': # relative path to be converted to absolute
                             dirPrefix = filename[0:filename.rfind('/')]                      
                             source = dirPrefix+'/'+source
                             source = os.path.normpath(source) # normalize the pathname
-                            #print("matched source file is"+source)
                         else:
                             pass
 
@@ -283,6 +307,7 @@ class Test: # a test case
                     os.makedirs(destinationDir) # also create all intermediate-level directories to contain the leaf directory
                         
                 shutil.copyfile(r.source,d)
+                shutil.copymode(r.source,d) # also copy permissions from source to destination
 
     def run(self):
         currentDir = os.getcwd()
