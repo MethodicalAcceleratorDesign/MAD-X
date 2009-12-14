@@ -305,9 +305,15 @@ class Test: # a test case
                     print("to: '"+r.source+"'")
                 if not os.path.exists(destinationDir): # output directory does not exist => create it before copying file
                     os.makedirs(destinationDir) # also create all intermediate-level directories to contain the leaf directory
-                        
-                shutil.copyfile(r.source,d)
-                shutil.copymode(r.source,d) # also copy permissions from source to destination
+
+                try: # try to copy file as well as permissions from source to destination
+                    # this is required for executable scripts called by an input madx file
+                    shutil.copyfile(r.source,d)
+                    shutil.copymode(r.source,d) # will fail for yet unidentified reasons
+                except:
+                    shutil.copyfile(r.source,d)
+                    # only copy the file - forget about permissions
+
 
     def run(self):
         currentDir = os.getcwd()
