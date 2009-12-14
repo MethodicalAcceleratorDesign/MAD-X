@@ -116,7 +116,7 @@ class Resource:
             #commonPatterns.append(\
             #    re.compile(r'sxfread[\s\t]*,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;')\
             #    )
-            #commonPatterns.append(re.compile(r'sxfread, file = "fv9.sxf";'))
+            commonPatterns.append(re.compile(r'sxfread, file = "(fv9\.sxf)";'))
             for line in f.readlines():
                 #print("line="+line)
                 line = line.rstrip('\n')
@@ -129,12 +129,13 @@ class Resource:
                 for p in commonPatterns:
                     m = p.search(line)
                     if m:
-                        # print("matched pattern for line "+line)
+                        #print("matched pattern for line "+line)
                         source = m.group(1)
                         if not source[0] == '/': # relative path to be converted to absolute
                             dirPrefix = filename[0:filename.rfind('/')]                      
                             source = dirPrefix+'/'+source
                             source = os.path.normpath(source) # normalize the pathname
+                            #print("matched source file is"+source)
                         else:
                             pass
 
