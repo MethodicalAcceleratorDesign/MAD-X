@@ -1677,8 +1677,6 @@ contains
       type(normalform) theNormalForm
       real(dp) :: dispersion(4)
       real(dp) :: dispersion_p(4) ! derivative of the dispersion w.r.t delta-p/p
-      real(dp) :: dispersion_p2(4) ! second order of the dispersion w.r.t delta-p/p
-      real(dp) :: dispersion_p3(4) ! third order of the dispersion w.r.t delta-p/p
       integer :: debugFiles
       integer :: icase
       integer :: order
