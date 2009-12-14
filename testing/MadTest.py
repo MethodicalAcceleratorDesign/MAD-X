@@ -105,13 +105,20 @@ class Resource:
             resource = Resource(name,source,destinations)  # primary resource is the MAD-X input file itself
             resources.append(resource)
             
-        try:
+        try:       
             f = open(filename,'r')
             # regex to input a file (not anchored as an instruction may precede)
-            commonPatterns = (re.compile(r'readmytable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'),\
+            commonPatterns = [re.compile(r'readmytable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*'),\
                               re.compile(r'call,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'),\
-                              re.compile(r'readtable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;'))
+                              re.compile(r'readtable,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\.\_\-\d/]+)[\"\']?[\s\t]*;')]
+
+            # another - rare - instruction that calls a file from another (in sxf/sxfread.madx)
+            #commonPatterns.append(\
+            #    re.compile(r'sxfread[\s\t]*,?[\s\t]*file[\s\t]*=[\s\t]*[\"\']?([\w\._\-\d\/]+)[\"\']?[\s\t]*;')\
+            #    )
+            #commonPatterns.append(re.compile(r'sxfread, file = "fv9.sxf";'))
             for line in f.readlines():
+                #print("line="+line)
                 line = line.rstrip('\n')
                 if len(line.lstrip())>=1 and line.lstrip()[0]=='!': # if line is a comment discard it
                     continue
@@ -122,6 +129,7 @@ class Resource:
                 for p in commonPatterns:
                     m = p.search(line)
                     if m:
+                        # print("matched pattern for line "+line)
                         source = m.group(1)
                         if not source[0] == '/': # relative path to be converted to absolute
                             dirPrefix = filename[0:filename.rfind('/')]                      
