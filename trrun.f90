@@ -725,17 +725,19 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   !----------------------------------------------------------------------*
   include 'twtrr.fi'
   include 'track.fi'
+  include 'name_len.fi'
   logical first
   integer iord,jtrk,nd,nord,ktrack,j,n_ferr,nn,ns,node_fd_errors,   &
-       get_option,turn
+       get_option,turn,noisemax,nn1,in
   double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
        pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
        f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
        ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-       skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt,npeak,  &
-       nlag, ntune, temp,noise
+       skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt,        &
+       npeak(100), nlag(100), ntune(100), temp,noise
 
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
+  character*(name_len) aptype
   
   save first,ordinv
   data first / .true. /
@@ -763,10 +765,22 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   call dzero(vals,2*(maxmul+1))
   
   if(noise .eq. 1)   then
-   npeak = node_value('npeak ')
-   ntune = node_value('ntune ')
-   nlag = node_value('nlag ')
-   temp = npeak * sin(nlag + ntune * turn)
+     nn1=name_len
+     noisemax = node_value('noisemax ')
+     call dzero(npeak,noisemax)
+     call dzero(ntune,noisemax)
+     call dzero(nlag,noisemax)
+     call get_node_vector('npeak ',nn1,npeak)
+     call get_node_vector('ntune ',nn1,ntune)
+     call get_node_vector('nlag ',nn1,nlag)
+     
+    temp = 0
+    do in = 1, noisemax 
+    temp = temp + npeak(in) * sin(nlag(in) + ntune(in) * turn)
+    enddo
+     
+     
+!   temp = npeak * sin(nlag + ntune * turn)
    do iord = 0, nn
      vals(1,iord) = normal(iord) * (1+temp)
    enddo
