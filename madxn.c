@@ -1169,7 +1169,7 @@ void exec_plot(struct in_cmd* cmd)
 
     /* build-up the gnuplot command file */
     mycpy(track_plot_filename,file_name);
-    sprintf(ps_file_name,track_plot_filename);
+    sprintf(ps_file_name,"%s",track_plot_filename);
     strcat(ps_file_name,".ps");
 
     gpu = fopen("gnu_plot.cmd","w");
@@ -7878,7 +7878,7 @@ int pro_ptc_select_moment(struct in_cmd* cmd)
   int mdefi[6];
   char* mdefin, *pchar;
   char  tablename[48];
-  char  colname[8];
+  char  colname[9];
   int   clen = 0;
   struct int_array*              tabIA      = 0x0;
   struct int_array*              mdefIA      = 0x0;
