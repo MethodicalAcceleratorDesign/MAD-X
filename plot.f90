@@ -169,7 +169,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
 
         !--- avoid identical points
 
-        if (marker_plot .or. (xreal(npt) - xval(j))**2 +      &
+        if ( (marker_plot.and..not.zero_suppr)   &
+		   .or. (xreal(npt) - xval(j))**2 +      &
             (yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
 	    ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
            npt        = npt + 1
