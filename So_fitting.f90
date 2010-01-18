@@ -375,6 +375,88 @@ contains
 
   end SUBROUTINE FILL_BETA
 
+  SUBROUTINE comp_longitudinal_accel(r,my_state,no,h,filename)
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    TYPE(internal_state) state
+    real(dp) closed(6),l1,l2,p0c
+    type(DAMAP) ID
+    TYPE(NORMALFORM) NORM
+    TYPE(REAL_8) Y(6)
+    integer no,mf,i,h
+    CHARACTER(*) FILENAME
+    integer, allocatable :: j(:)
+    TYPE(internal_state), intent(in):: my_state
+    TYPE(fibre), pointer :: p
+    logical first
+    type(work) w
+    p=> r%start
+
+    l1=0.d0
+    l2=0.d0
+    first=.true.
+    w=p
+    p0c=w%p0c
+
+    call kanalnummer(mf,filename)
+
+    write(6,*)h,w%mass,w%p0c,w%beta0
+    write(mf,*) h
+    write(mf,*) w%mass,w%p0c,w%beta0
+
+    do i=1,r%n
+       if(p%mag%kind/=kind4) then
+          if(first) then
+             l1=l1+p%mag%p%ld
+          else
+             l2=l2+p%mag%p%ld
+          endif
+       else
+          if(.not.first) stop 111
+          l1=l1+p%mag%p%ld/2
+          l2=p%mag%p%ld/2
+          first=.false.
+       endif
+       p=>p%next
+    enddo
+    write(6,*) l1,l2
+    write(mf,*) l1,l2
+
+
+    STATE=my_state+nocavity0
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+
+    CALL INIT(STATE,no,0)
+
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,STATE)
+    NORM=Y
+
+    allocate(j(c_%nv))
+    j=0
+    do i=1,no
+       j(5)=i
+       write(6,*) norm%dhdj%v(3).sub.j
+       write(mf,*) norm%dhdj%v(3).sub.j
+    enddo
+
+    deallocate(j)
+
+    CALL kill(NORM)
+    CALL kill(Y)
+    call kill(id)
+    close(mf)
+
+  end SUBROUTINE comp_longitudinal_accel
+
+
   SUBROUTINE comp_linear2(r,my_state,a,ai,mat,closed)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r

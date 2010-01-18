@@ -39,7 +39,8 @@ module definition
   integer ::  knob_i =0
   INTEGER,PARAMETER::NMAX=20
   integer,private,parameter::n_max=10   ! sagan stuff
-  INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2  !,CASE3=3
+  INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2
+  INTEGER, PARAMETER :: CASET=3,CASETF1=4,CASETF2=5
   INTEGER,PARAMETER  :: ISPIN0R=1,ISPIN1R=3
   logical(lp) :: doing_ac_modulation_in_ptc=.false.
 
@@ -249,6 +250,7 @@ module definition
 
   type  tree_element   !@1  USED FOR FAST TRACKING IN O_TREE_ELEMENT.F90
      real(dp) ,  DIMENSION(:), POINTER :: CC
+     real(dp) ,  DIMENSION(:), POINTER :: fix
      integer,  DIMENSION(:), POINTER :: JL,JV
      INTEGER,POINTER :: N,ND2,no
   end  type tree_element

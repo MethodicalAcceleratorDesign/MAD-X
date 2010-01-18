@@ -8,7 +8,7 @@ module accel_ptc
   !  integer n_cav_accel
   integer, parameter :: nvolt=20
   integer  :: NHARMON=1
-  integer :: slope_sign=1,slope_flip=1
+  integer :: slope_sign=1,slope_flip=1,itime
   logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
   real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0,b0_table,p0c_table
   real(dp) :: last_synchr_time=zero
@@ -18,24 +18,63 @@ module accel_ptc
   END TYPE fibre_array
   type(fibre_array), allocatable ::cavity_location(:)
   TYPE accel_data
+     real(dp), pointer :: freq
      real(dp), pointer :: p0c
+     real(dp), pointer :: v0
+     real(dp), pointer :: dt0
+     real(dp), pointer :: b0
      real(dp), pointer :: volt(:)
      real(dp), pointer :: phase(:)
   END TYPE accel_data
   type(accel_data), allocatable :: accel(:)
-
-
+  real(dp)::  dt0_s=zero
+  real(dp)::  t_now=zero, t_then=zero ,dt0_now=zero ,dt0_then=zero
+  real(dp)::  freq_now=zero, freq_then=zero,v0_now=one
+  logical(lp) :: compute_table=.false.
 contains
 
   !!  common to both methods
   !call make_table(w1%p0c,"ACCWAVE_40kV_280kV_350ms.DAT")
 
-  subroutine make_table(filename)
+  subroutine print_table(filename)
     implicit none
     character*(*) filename
     real(dp)  x
     real(dp) p0c,b0
-    integer k,i,mf,mode,t,j,imax
+    integer k,i,mf,mode,j,imax,mfo
+    character*255 line
+
+    call kanalnummer(mf)
+
+
+    open(unit=mf,file=filename)
+
+    !mode=1
+    write(mf,*) " 2 1 2 "
+    write(mf,*) " 1 "
+    do i=0,itime
+       !       write(line,* ) i,accel(i)%b0,( accel(i)%volt(j)/1.e-3_dp,accel(i)%phase(j),j=1,size(accel(i)%volt)),accel(i)%dt0,accel(i)%freq
+       accel(i)%v0=accel(i)%volt(1)*accel(i)%v0
+       write(line,* ) i,accel(i)%b0,accel(i)%phase(1),( accel(i)%volt(j)/ accel(i)%volt(1),accel(i)%phase(j),j=2,size(accel(i)%volt))
+       call context(line,1)
+       write(mf,'(a255)') line
+       write(line,* ) accel(i)%dt0,accel(i)%freq,accel(i)%v0/1.e-3_dp
+       call context(line,1)
+       write(mf,'(a255)') line
+
+    enddo
+
+    !    close(mfo)
+    close(mf)
+
+  end subroutine print_table
+
+  subroutine make_table(filename)
+    implicit none
+    character*(*) filename
+    real(dp)  x
+    real(dp) p0c,b0,f1
+    integer k,i,mf,mode,t,j,imax,mfo,kr
     integer, allocatable :: imode(:)
     character*120 line
 
@@ -44,21 +83,28 @@ contains
     call kanalnummer(mf)
 
     open(unit=mf,file=filename)
+    !    call kanalnummer(mfo)
+    !    open(unit=mfo,file="junk.dat")
 
-    k=0
+    kr=0
     do i=1,1000000
        read(mf,*,end=1) x
-       k=k+1
+       kr=kr+1
     enddo
 1   continue
-    write(6,*)  k ," lines"
+    write(6,*)  kr ," lines"
 
     close(mf)
 
+    if(compute_table) then
+       k=kr
+    else
+       k=kr/2
+    endif
     allocate(accel(0:k-2))
-
     open(unit=mf,file=filename)
     read(mf,'(a120)') line
+    !    write(mfo,'(a120)') line
     read(line,*) mode
     allocate(imode(mode))
     imode=0
@@ -67,16 +113,36 @@ contains
     do i=1,mode
        if(imode(i)>imax) imax=imode(i)
     enddo
+    if(.not.compute_table) read(mf,*) f1
 
     NHARMON=IMAX
     !mode=1
     do i=0,k-2
+       allocate(accel(i)%dt0)
        allocate(accel(i)%p0c)
+       allocate(accel(i)%b0)
+       allocate(accel(i)%v0)
        allocate(accel(i)%volt(imax))
        allocate(accel(i)%phase(imax))
+       allocate(accel(i)%freq)
        accel(i)%volt=zero
        accel(i)%phase=zero
-       read(mf,* ) t,accel(i)%p0c,( accel(i)%volt(imode(j)),accel(i)%phase(imode(j)),j=1,mode)
+       if(compute_table) then
+          read(mf,* ) t,accel(i)%p0c,( accel(i)%volt(imode(j)),accel(i)%phase(imode(j)),j=1,mode)
+          accel(i)%dt0=0.d0
+          accel(i)%freq=0.d0
+          !         accel(i)%volt(2)=1.1d0*accel(i)%volt(2)
+       else
+          read(mf,* ) t,accel(i)%p0c,accel(i)%phase(imode(1)),( accel(i)%volt(imode(j)),accel(i)%phase(imode(j)),j=2,mode)
+          read(mf,* ) accel(i)%dt0,accel(i)%freq,accel(i)%v0
+          accel(i)%volt(1)=f1
+       endif
+       accel(i)%b0=accel(i)%p0c
+       accel(i)%phase(:)=zero
+       !       write(line,*) t,accel(i)%b0,( accel(i)%volt(imode(j)),0,j=1,mode)
+       !       write(mfo,'(a120)') line
+       !       call context(line,1)
+       !       write(mfo,'(a120)') line
 
        if(i==0) b0=accel(i)%p0c
        accel(i)%p0c=accel(i)%p0c/b0*p0c
@@ -86,6 +152,7 @@ contains
 
     enddo
 
+    !    close(mfo)
     close(mf)
     deallocate(imode)
     b0_table=b0
@@ -93,16 +160,19 @@ contains
 
   end subroutine make_table
 
-  subroutine get_from_table_volt(time,p0,vo,ph)
+  subroutine get_from_table_volt(time,p0,v0_computed,vo,ph,dt0_computed,freqf_computed)
     implicit none
     integer ti,i
-    real(dp) tr,time,p0,vo(nvolt),ph(nvolt)
+    real(dp) tr,time,p0,vo(nvolt),ph(nvolt),dt0_computed,freqf_computed,v0_computed
 
     vo=zero
     ph=zero
+    dt0_computed=zero
+    freqf_computed=zero
     !write(6,*) size(accel)
-
+    !t_now=zero, t_then=zero
     tr=time/clight*1000
+    t_now=tr
     last_synchr_time=tr
     if(tr-time_0>dtime.and.use_time) must_stop=.true.
     ti=int(tr)
@@ -113,13 +183,19 @@ contains
     vo(1)= (tr-ti)*(accel(ti+1)%volt(1)-accel(ti)%volt(1)) + accel(ti)%volt(1)
     ph(1)= (tr-ti)*(accel(ti+1)%phase(1)-accel(ti)%phase(1)) + accel(ti)%phase(1)
     p0= (tr-ti)*(accel(ti+1)%p0c -accel(ti)%p0c) + accel(ti)%p0c
+    !       ph(1)=0.d0
 
 
     do i=2,size(accel(1)%volt(:))
        vo(i)= (tr-ti)*(accel(ti+1)%volt(i)-accel(ti)%volt(i)) + accel(ti)%volt(i)
        ph(i)= (tr-ti)*(accel(ti+1)%phase(i)-accel(ti)%phase(i)) + accel(ti)%phase(i)
+       !       ph(i)=0.d0
     enddo
-
+    if(.not.compute_table) then
+       dt0_computed= (tr-ti)*(accel(ti+1)%dt0 -accel(ti)%dt0) + accel(ti)%dt0
+       freqf_computed= (tr-ti)*(accel(ti+1)%freq -accel(ti)%freq) + accel(ti)%freq
+       v0_computed= (tr-ti)*(accel(ti+1)%v0 -accel(ti)%v0) + accel(ti)%v0
+    endif
 
   end subroutine get_from_table_volt
 
@@ -199,7 +275,8 @@ contains
     real(dp) sig0(6),x(6)
     integer mf,mfp
     character(*) filetable
-
+    t_then=0.d0
+    t_now=0.d0
     sig0=1.e-6
 
     CALL create_beam(RAYS,npart,two,SIG0)
@@ -264,7 +341,28 @@ contains
 
        do i=0,my_ORBIT_LATTICE%ORBIT_N_NODE-1
 
+          t_then=t_now
           call ptc_synchronous_set(i)
+
+          if(compute_table) then
+             if(my_ORBIT_LATTICE%ORBIT_NODES(i+1)%CAVITY)then
+                ! write(6,*) t_then,t_now
+                accel(itime)%v0=v0_now
+                if(nint(t_then)>=t_then.and.nint(t_now)<t_now) then
+                   itime=nint(t_then)
+                   accel(itime)%dt0=dt0_then+(dt0_now-dt0_then)/(t_now-t_then)*(itime-t_then)
+                   accel(itime)%freq=freq_then+(freq_now-freq_then)/(t_now-t_then)*(itime-t_then)
+                   write(6,*) itime,my_ORBIT_LATTICE%ORBIT_OMEGA*accel(itime)%dt0,accel(itime)%freq
+                endif
+                if(j==1) then
+                   accel(0)%dt0=dt0_now
+                   accel(0)%freq=freq_now
+                   write(6,*) accel(0)%dt0,my_ORBIT_LATTICE%ORBIT_OMEGA*dt0_now
+                endif
+             endif
+          endif     !(compute_table)
+
+
           do k=1,rays%n
 
 
@@ -281,7 +379,10 @@ contains
           X(5)=rays%x(kk,6)+my_ORBIT_LATTICE%ORBIT_P0C
           X(6)=x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000
           x(1)=X(5)/p0c_table*b0_table
-          write(mfp,'(1x,E25.17,1x,i8,1x,1(1x,E25.17),1x,1(1x,E25.17))') x(6),j,x(5),x(1)     !rays%x(kk,1:6)
+          write(mfp,'(1x,E25.17,1x,i8,1x,1(1x,E25.17),1x,3(1x,E25.17))') x(6),j,x(5),x(1),dt0_s, &
+               my_ORBIT_LATTICE%ORBIT_OMEGA* dt0_s    !rays%x(kk,1:6)
+          if(mod(j ,100)==0)write(6,'(1x,E18.10,1x,i8,1x,1(1x,E18.10),1x,3(1x,E18.10))') &
+               x(6),j,x(5),x(1),dt0_s ,my_ORBIT_LATTICE%ORBIT_OMEGA* dt0_s    !rays%x(kk,1:6)
        ENDDO
        ! endif
        if(must_stop) exit
@@ -320,7 +421,8 @@ SUBROUTINE ptc_synchronous_set(i_node)
   INTEGER  i_node
   INTEGER  i_node1,i,mf,j,nf
   type(internal_state) state
-  real(dp) p0,dphat,freqf,dt0,x6,vo(nvolt),ph(nvolt)
+  real(dp) p0,dphat,freqf,dt0,x6,vo(nvolt),ph(nvolt),dt0_computed,freqf_computed
+  real(dp) v0_computed
 
 
   i_node1 = i_node + 1
@@ -351,15 +453,16 @@ SUBROUTINE ptc_synchronous_set(i_node)
         my_ORBIT_LATTICE%orbit_deltae=zero
         w1_orbit=p_orbit
         w2_orbit=0
-        !         write(6,*) "x_orbit_sync(6) ",x_orbit_sync(6)
-        call get_from_table_volt(x_orbit_sync(6),p0,vo,ph)
+        call get_from_table_volt(x_orbit_sync(6),p0,v0_computed,vo,ph,dt0_computed,freqf_computed)
         call find_energy(w2_orbit,p0c=p0)
         my_ORBIT_LATTICE%orbit_deltae=(w2_orbit%energy-w1_orbit%energy)
         freqf=w1_orbit%beta0*my_ORBIT_LATTICE%ORBIT_harmonic*clight/my_ORBIT_LATTICE%ORBIT_L
+        freq_then=p_orbit%mag%freq
         p_orbit%mag%freq=freqf
 
         call compute_phase(x_orbit_sync,my_ORBIT_LATTICE%state, &
-             my_ORBIT_LATTICE%orbit_deltae,vo,ph,dt0)
+             my_ORBIT_LATTICE%orbit_deltae,v0_computed,vo,ph,dt0,dt0_computed,freqf,freqf_computed,w1_orbit%beta0)
+        p_orbit%mag%freq=freqf ! changed perhaps by compute_phase
         x6=x_orbit_sync(6)
 
         x_orbit_sync(5)=x_orbit_sync(5)+my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c
@@ -524,12 +627,12 @@ SUBROUTINE ptc_synchronous_after(i_node)
 END SUBROUTINE  ptc_synchronous_after
 
 
-SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
+SUBROUTINE compute_phase(x,state,deltae,v0_computed,v,ph,dt0,dt0_computed,freqf,freqf_computed,beta0)
   USE accel_ptc    !,vrff=>vrf,freqf=>freq
   IMPLICIT NONE
-  real(dp) x(6),o,dl,driv,dt0,dtp0
+  real(dp) x(6),o,dl,driv,dt0,dtp0,dt0_computed,freqf_computed,freqf,beta0,v0_computed
   real(dp) v(nvolt),ph(nvolt)
-  real(dp) normb,norm,deltae
+  real(dp) normb,norm,deltae,dom
   integer n,i,k,j,no
   TYPE(CAV4),pointer :: EL
   TYPE(CAV4p),pointer :: ELp
@@ -538,7 +641,6 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
   logical doit,conti
   integer po(1)
   local_state=state-totalpath0
-
   el=>p_orbit%mag%c4
   elp=>p_orbit%magp%c4
   n=size(p_orbit%mag%c4%f)
@@ -552,30 +654,43 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
      write(6,*) "  NOT ENOUGH HARMONICS IN FLAT FILE"
      stop 547
   endif
-  if(p_orbit%mag%l/=zero) then
-     p_orbit%mag%volt=v(1)/p_orbit%mag%l*slope_flip
-     p_orbit%magp%volt=v(1)/p_orbit%mag%l*slope_flip
-     el%f(1)=one
-     elp%f(1)=one
-     el%ph(1)=ph(1)
-     elp%ph(1)=ph(1)
-     dl=p_orbit%mag%l
-  else
-     p_orbit%mag%volt=v(1)*slope_flip
-     p_orbit%magp%volt=v(1)*slope_flip
-     el%f(1)=one
-     elp%f(1)=one
-     el%ph(1)=ph(1)
-     elp%ph(1)=ph(1)
-     dl=one
-  endif
+  if(compute_table) then
+     if(p_orbit%mag%l/=zero) then
+        p_orbit%mag%volt=v(1)/p_orbit%mag%l*slope_flip
+        p_orbit%magp%volt=v(1)/p_orbit%mag%l*slope_flip
+        el%f(1)=one
+        elp%f(1)=one
+        el%ph(1)=ph(1)
+        elp%ph(1)=ph(1)
+        dl=p_orbit%mag%l
+        v0_computed=p_orbit%mag%l*slope_flip
+     else
+        p_orbit%mag%volt=v(1)*slope_flip
+        p_orbit%magp%volt=v(1)*slope_flip
+        el%f(1)=one
+        elp%f(1)=one
+        el%ph(1)=ph(1)
+        elp%ph(1)=ph(1)
+        v0_computed=slope_flip
+        dl=one
+     endif
 
-  do i=2,n
-     el%f(i)=v(i)/v(1)
-     elp%f(i)=v(i)/v(1)
-     el%ph(i)=ph(i)
-     elp%ph(i)=ph(i)
-  enddo
+     do i=2,n
+        el%f(i)=v(i)/v(1)
+        elp%f(i)=v(i)/v(1)
+        el%ph(i)=ph(i)
+        elp%ph(i)=ph(i)
+     enddo
+  else
+     p_orbit%mag%volt=v0_computed
+     p_orbit%magp%volt=v0_computed
+     do i=1,n
+        el%f(i)=v(i)
+        elp%f(i)=v(i)
+        el%ph(i)=ph(i)
+        elp%ph(i)=ph(i)
+     enddo
+  endif
 
   O=twopi*p_orbit%mag%freq/CLIGHT
   el%phase0=zero
@@ -584,7 +699,9 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
   elp%phas=zero
   el%t=zero
   elp%t=zero
-  dt0=zero
+  dt0=dt0_s
+  dt0_then= dt0_s
+
   dtp0=zero
   norm=1.e38_dp
   normb=1.e38_dp
@@ -592,79 +709,96 @@ SUBROUTINE compute_phase(x,state,deltae,v,ph,dt0)
   conti=.true.
   k=0
   no=1
-  if(abs(el%f(1)+2*el%f(2))<1.e-1) no=3
-  po(1)=no
-  call init(no,1)
-  call alloc(y)
+  if(compute_table) then
+     if(abs(el%f(1)+2*el%f(2))<1.e-1.and.dt0_s==zero) then
+        no=3
+        !  else
+        !  write(6,*) el%f(1),el%f(2),el%f(1)+2*el%f(2)
+        !  pause 123
+     endif
+     po(1)=no
+     call init(no,1)
+     call alloc(y)
 
-  do while(conti.and.k<100)
-     k=k+1
-     do j=1,5
-        y(j)=x(j)
+     do while(conti.and.k<100)
+        k=k+1
+        do j=1,5
+           y(j)=x(j)
+        enddo
+
+        y(6)=dt0+(one.mono.1)
+        call track(p_orbit,y,local_state)
+
+        driv=y(5).sub.po
+        !        e(1)=y(5)
+        !        e(2)=y(6)*p_orbit%mag%p%p0c
+        !             write(6,*) e
+        !             write(6,*) (y(5).sub.'0'),driv,deltae,p_orbit%mag%p%p0c
+        !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
+
+        !             pause 777
+        if(slope_sign*driv<0.and.autoflip) then  !!!!
+           slope_flip=-slope_flip
+           EL%volt=-EL%volt
+           ELp%volt=-ELp%volt
+           write(6,*) " flipped voltage "
+        else  !!!!
+           if(no==1) then
+              normb=abs(o*(dt0-dtp0))
+              dtp0=dt0
+              !           dt0=(my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
+              dt0=(deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
+              norm=abs(o*(dt0-dtp0))
+              if(norm<1.e-9_dp.and.doit) then
+                 doit=.false.
+              elseif(.not.doit)then
+                 if(normb<=norm) conti=.false.
+              endif
+
+           else
+              dt0=one
+              if( ( deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'3')<0) dt0=-dt0
+              dt0=dt0*abs((deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'3'))**(one/three)
+              dt0=dt0/2.d0
+              no=1
+           endif
+        endif
+
      enddo
 
-     y(6)=dt0+(one.mono.1)
-     call track(p_orbit,y,local_state)
-
-     driv=y(5).sub.po
-     !        e(1)=y(5)
-     !        e(2)=y(6)*p_orbit%mag%p%p0c
-     !             write(6,*) e
-     !             write(6,*) (y(5).sub.'0'),driv,deltae,p_orbit%mag%p%p0c
-     !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
-
-     !             pause 777
-     if(slope_sign*driv<0.and.autoflip) then  !!!!
-        slope_flip=-slope_flip
-        EL%volt=-EL%volt
-        ELp%volt=-ELp%volt
-        write(6,*) " flipped voltage "
-     else  !!!!
-        if(no==1) then
-           normb=abs(o*(dt0-dtp0))
-           dtp0=dt0
-           !           dt0=(my_ORBIT_LATTICE%orbit_deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
-           dt0=(deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'1')+dt0
-           norm=abs(o*(dt0-dtp0))
-           if(norm<1.e-9_dp.and.doit) then
-              doit=.false.
-           elseif(.not.doit)then
-              if(normb<=norm) conti=.false.
-           endif
-
-        else
-           dt0=one
-           if( ( deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'3')<0) dt0=-dt0
-           dt0=dt0*abs((deltae/p_orbit%mag%p%p0c-(y(5).sub.'0'))/(y(5).sub.'3'))**(one/three)
-           no=1
-        endif
+     !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees ",deltae/p_orbit%mag%p%p0c
+     call kill(y)
+     if(k>100) then
+        write(6,*) " did not converge in compute_phase "
+        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
+        norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
+        write(6,*) " Norm of DE ",norm
+        write(6,*) " Normb  ",normb
+        stop 100
      endif
+     if(abs(o*(dt0))>maximum_phase) then
+        write(6,*) "phase shift is huge ",abs(o*(dt0))*rad_to_deg_ ," degrees "
+        norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
+        write(6,*) " Norm of DE ",norm
+        write(6,*) " Normb  ",normb
+        stop 101
+     endif
+     !      pause 888
+     dom=-o*dt0_now/(my_ORBIT_LATTICE%ORBIT_L/beta0)
+     dt0=(o+dom)/o*dt0
+     freqf=CLIGHT*(o+dom)/twopi
+  else
+     dt0=dt0_computed
+     freqf=freqf_computed
+  endif  !(compute_phase)
 
-  enddo
-
-  !        write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees ",deltae/p_orbit%mag%p%p0c
-  call kill(y)
-  if(k>100) then
-     write(6,*) " did not converge in compute_phase "
-     write(6,*) "phase shift is  ",abs(o*(dt0))*rad_to_deg_ ," degrees "
-     norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
-     write(6,*) " Norm of DE ",norm
-     write(6,*) " Normb  ",normb
-     stop 100
-  endif
-  if(abs(o*(dt0))>maximum_phase) then
-     write(6,*) "phase shift is huge ",abs(o*(dt0))*rad_to_deg_ ," degrees "
-     norm=deltae/p_orbit%mag%p%p0c-(y(5).sub.'0')
-     write(6,*) " Norm of DE ",norm
-     write(6,*) " Normb  ",normb
-     stop 101
-  endif
-  !      pause 888
 
   el%t=x(6)-dt0
   elp%t=x(6)-dt0
-
-
+  dt0_s=dt0
+  dt0_now=dt0_s
+  freq_now=freqf
+  v0_now=v0_computed
 end SUBROUTINE compute_phase
 
 SUBROUTINE compute_phase1(x,state,deltae,v,ph,dt0)
@@ -797,7 +931,7 @@ SUBROUTINE compute_phase1(x,state,deltae,v,ph,dt0)
 
   el%t=x(6)-dt0
   elp%t=x(6)-dt0
-
+  dt0_s=dt0
 
 end SUBROUTINE compute_phase1
 

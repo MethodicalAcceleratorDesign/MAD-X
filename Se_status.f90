@@ -60,9 +60,7 @@ module S_status
   LOGICAL(lp), target :: EXACT_MODEL = .false.
   INTEGER, target:: NSTD,METD
   ! TYPE(B_CYL) SECTOR_B
-  INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
-  INTEGER, target :: SECTOR_NMUL = 4
   !  INTEGER, TARGET :: NDPT_OTHER = 0
   real(dp) CRAD,CFLUC
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
@@ -676,6 +674,9 @@ CONTAINS
        tilt%tilt(i)=pih/i
     enddo
     !  SECTOR_B AND SECTOR_NMUL FOR TYPE TEAPOT
+
+    change_sector=my_false
+
     IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
        !  verb=global_verbose
        !  global_verbose=.false.

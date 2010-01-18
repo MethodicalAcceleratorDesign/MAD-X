@@ -7,7 +7,7 @@ module tree_element_MODULE
   public
   integer,private,parameter::ndd=6
 
-  PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N
+  PRIVATE track_TREE,track_TREEP,KILL_TREE,KILL_TREE_N,SET_TREE
   PRIVATE track_TREE_G,track_TREEP_g
   PRIVATE ALLOC_SPINOR_8,ALLOC_probe_8
   PRIVATE KILL_SPINOR_8,KILL_probe_8,KILL_DASPIN
@@ -195,6 +195,7 @@ module tree_element_MODULE
      MODULE PROCEDURE alloc_normal_spin
      MODULE PROCEDURE alloc_res_SPINOR_8
      MODULE PROCEDURE ALLOC_rf_phasor_8
+     MODULE PROCEDURE SET_TREE
   END INTERFACE
 
   INTERFACE KILL
@@ -438,11 +439,11 @@ CONTAINS
 
     !IF(N==0) RETURN
 
-    ALLOCATE(T%CC(N),T%JL(N),T%JV(N),T%N,T%ND2,T%no)
+    ALLOCATE(T%CC(N),T%fix(nd2),T%JL(N),T%JV(N),T%N,T%ND2,T%no)
     T%N=N
     T%ND2=ND2
     T%no=0
-
+    T%fix=zero
   END SUBROUTINE ALLOC_TREE
 
   SUBROUTINE SET_TREE(T,MA)
@@ -597,7 +598,7 @@ CONTAINS
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
 
-    IF(ASSOCIATED(T%CC))   DEALLOCATE(T%CC,T%JL,T%JV,T%N,T%ND2,T%No)
+    IF(ASSOCIATED(T%CC))   DEALLOCATE(T%CC,T%fix,T%JL,T%JV,T%N,T%ND2,T%No)
 
 
   END SUBROUTINE KILL_TREE
@@ -625,7 +626,7 @@ CONTAINS
     integer n1,k
     REAL(DP) XT(lno),XF(6),XM(lno+1),XX
     INTEGER JC,I,IV
-
+    xi(1:t%nd2)=xi(1:t%nd2)-t%fix
     n1=1
     if(present(n)) n1=n
     do k=1,n1

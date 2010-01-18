@@ -1174,6 +1174,14 @@ contains
     OM(1)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(1) + (ONE+p%AG)*BPA(1) )
     OM(2)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(2) + (ONE+p%AG)*BPA(2) )+OM(2)
     OM(3)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(3) + (ONE+p%AG)*BPA(3) )
+    !     write(16,*) " bpe "
+    !     do i=1,3
+    !      call print(bpe(i),16)
+    !     enddo
+    !     write(16,*) " bpa "
+    !     do i=1,3
+    !      call print(bpa(i),16)
+    !     enddo
 
     !     DO I=1,3
     !       write(30,*) 'b, bpe and bpa',i,el%name,el%kind

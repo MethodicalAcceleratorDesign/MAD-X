@@ -2528,6 +2528,8 @@ contains
     D(3,3)= TIME_FAC/PZ
 
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
+    !    FI0=(XP/(one+yp**2))
+    !    FI0= ATAN(FI0)-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
     FI0= ATAN((XP/(one+yp**2)))-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
     CO2=B/COS(FI0)**2
     CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
@@ -7809,6 +7811,7 @@ contains
     BX= BX+BTX+EL%BF_X(k1)  !+X3
     BY= BY+BTY+EL%BF_Y(k1)  !+X3
     ! etienne
+
     IF(EL%P%NMUL>SECTOR_NMUL) THEN
        BtY=EL%BN(EL%P%NMUL)
        BtX=EL%AN(EL%P%NMUL)
@@ -7826,8 +7829,9 @@ contains
           BtY =BtYT
        ENDDO
 
-       BX= BX-BTX
-       BY= BY+BTY
+       BX= BX-BTy
+       BY= BY+BTx
+       ! 2010 january 4
 
     ENDIF
 
@@ -7838,7 +7842,6 @@ contains
     ENDIF
 
   END SUBROUTINE SKICKR
-
 
 
   SUBROUTINE SKICKP(EL,YL,X,k)
@@ -7929,8 +7932,9 @@ contains
           BtY =BtYT
        ENDDO
 
-       BX= BX-BTX
-       BY= BY+BTY
+       BX= BX-BTy
+       BY= BY+BTx
+       ! 2010 january 4
 
     ENDIF
 !!!!!!!!!!!!!!!!!
@@ -11240,18 +11244,20 @@ contains
   SUBROUTINE ALLOCTEAPOT(EL)
     IMPLICIT NONE
     TYPE(TEAPOTP), INTENT(INOUT)::EL
-
-    CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
-    CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
-
+    CALL ALLOC(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)
+    CALL ALLOC(EL%bf_Y,S_B(SECTOR_NMUL)%N_MONO)
+    !    CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
+    !    CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
+    ! 2010 January 6
   END SUBROUTINE ALLOCTEAPOT
 
   SUBROUTINE KILLTEAPOT(EL)
     IMPLICIT NONE
     TYPE(TEAPOTP), INTENT(INOUT)::EL
 
-    CALL KILL(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
-    CALL KILL(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
+    CALL KILL(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)
+    CALL KILL(EL%bf_Y,S_B(SECTOR_NMUL)%N_MONO)
+    ! 2010 January 6
 
   END SUBROUTINE KILLTEAPOT
 

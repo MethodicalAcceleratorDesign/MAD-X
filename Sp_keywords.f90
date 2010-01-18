@@ -450,6 +450,7 @@ contains
     character*255 lineg
     real(dp) p0c,MASSF,ag0
     type(internal_state) original
+    logical ttt,uuu
 
     RING_IT=MY_TRUE
 
@@ -491,18 +492,9 @@ contains
     read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
-    if(SECTOR_NMUL_MAX/=se1) then
-       write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX
-       write(6,*) " to ",se1
-       write(6,*) " Watch out : GLOBAL VARIABLE "
-    endif
-    if(SECTOR_NMUL/=se2) then
-       write(6,*) " SECTOR_NMUL is changed from ",SECTOR_NMUL
-       write(6,*) " to ",se2
-       write(6,*) " Watch out : GLOBAL VARIABLE "
-    endif
-    SECTOR_NMUL_MAX=se1
-    SECTOR_NMUL=se2
+    call input_sector(se2,se1)
+
+
     read(MF,*) wedge_coeff
     read(MF,*) MAD8_WEDGE
     read(MF,'(a255)') line
@@ -1597,7 +1589,7 @@ contains
     type(internal_state) original
     integer,optional :: mf1
     integer res
-
+    integer se1,se2
 
     RING_IT=MY_TRUE
 
@@ -1642,11 +1634,12 @@ contains
     !    read(MF,*) MASSF,p0c
     read(MF,*) phase0,stoch_in_rec,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
-    read(MF,*) SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
+    read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     read(MF,*) wedge_coeff
     read(MF,*) MAD8_WEDGE
     read(MF,'(a120)') line
     original=default
+    call input_sector(se2,se1)
     if(allocated(s_b)) then
        firsttime_coef=.true.
        deallocate(s_b)

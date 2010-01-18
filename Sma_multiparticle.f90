@@ -510,8 +510,10 @@ CONTAINS
     CALL TRACK_NODE_SINGLE(T,V%reference_ray,K)
 
     IF(.NOT.CHECK_STABLE)   V%U(2)=.TRUE.
-    IF(V%U(1).OR.V%U(2)) RETURN
-
+    IF(V%U(1).OR.V%U(2)) then
+       write(6,*) " Unstable in TRACKV_NODE_SINGLE ", V%U
+       RETURN
+    endif
     IF(.NOT.ASSOCIATED(T%B)) THEN
        WRITE(6,*) " NO FRAMES IN INTEGRATION NODES "
        STOP 101
@@ -673,17 +675,25 @@ CONTAINS
           CALL TRACK_SLICE(EL%WI,X,k,t%POS_IN_FIBRE-2)
        case(KINDPA)
           CALL TRACK_SLICE(EL%PA,X,k,T%POS_IN_FIBRE-2)
+
+
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
+
+
+
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
-
        ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
+
+    case(CASET,CASETF1,CASETF2)
+       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
     END SELECT
+
     !    T%PARENT_FIBRE%MAG=DEFAULT
     if(wherelost==2.and.(.not.check_stable)) then
        t%lost=t%lost+1
@@ -850,6 +860,11 @@ CONTAINS
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
 
+    case(CASET,CASETF1,CASETF2)
+
+       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+
+
 
     END SELECT
 
@@ -981,7 +996,7 @@ CONTAINS
           LI=LI+DL
           SL=SL+P%DIR*DL
           IF(MOD(P%MAG%P%NST,2)==0) THEN
-             IF(J==P%MAG%P%NST/2) TM=>L%END
+             IF(J==P%MAG%P%NST/2) TM=>L%END    !+1
           ELSE
              IF(J==1) TM=>T1
           ENDIF
@@ -1236,6 +1251,7 @@ CONTAINS
     aper=APERTURE_FLAG
     APERTURE_FLAG=.FALSE.
 
+    if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
 
     CALL  allocate_node_frame( R)
 
@@ -1249,7 +1265,11 @@ CONTAINS
     do k=1,r%n
        x=zero
        CALL TRACK(r,x,k,k+1,default,vers)
-
+       if(.not.check_stable) then
+          Write(6,*) " fake instability at ",c%mag%name, " ",k
+          check_stable=.true.
+          CALL RESET_APERTURE_FLAG
+       endif
 
        t=>c%t1
        j=-6

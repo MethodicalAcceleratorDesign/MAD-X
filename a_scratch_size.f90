@@ -196,6 +196,9 @@ module precision_constants
 
   integer   lielib_print(10)
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0/
+  INTEGER,TARGET :: SECTOR_NMUL_MAX=10
+  INTEGER, target :: SECTOR_NMUL = 4
+  logical(lp) :: change_sector=my_true
 
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
@@ -382,6 +385,33 @@ contains
 
   END SUBROUTINE MAKE_YOSHIDA
 
+  SUBROUTINE input_sector(se2,se1)
+    implicit none
+    logical ttt,t1,t2
+    integer se1,se2
+
+    !    if(.not.change_sector) return
+
+    t1=(SECTOR_NMUL_MAX/=se1)
+    t2=(SECTOR_NMUL/=se2)
+
+    ttt=t1.or.t2
+
+    if(ttt) then
+       if(change_sector) then
+          write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX," to ",se1
+          write(6,*) " SECTOR_NMUL is changed from ",SECTOR_NMUL," to ",se2
+          write(6,*) " GLOBAL VARIABLES that can no longer be changed"
+          SECTOR_NMUL_MAX=se1
+          SECTOR_NMUL=se2
+       else
+          if(t1) write(6,*) " sector_nmul_max CANNOT be changed from ",SECTOR_NMUL_MAX," to ",se1
+          if(t2) write(6,*) " sector_nmul CANNOT be changed from ",SECTOR_NMUL," to ",se2
+          write(6,*) " Watch out : The are GLOBAL VARIABLES "
+       endif
+    endif
+
+  end subroutine input_sector
 
   !  Printing routines for screen
 
@@ -871,22 +901,33 @@ CONTAINS
   END SUBROUTINE ReportOpenFiles
 
 
-  SUBROUTINE CONTEXT( STRING )
+  SUBROUTINE CONTEXT( STRING, nb )
     IMPLICIT NONE
     CHARACTER(*) STRING
     CHARACTER(1) C1
-    integer I,J,K
+    integer, optional :: nb
+    integer I,J,K,nb0,count
+    nb0=0
+    if(present(nb)) nb0=1
     J = 0
+    count=0
     DO I = 1, LEN (STRING)
        C1 = STRING(I:I)
        STRING(I:I) = ' '
        IF( C1 .NE. ' ' ) THEN
+          if(count/=0.and.nb0==1) then
+             J = J + 1
+             STRING(J:J) = ' '
+             count=0
+          endif
           J = J + 1
           K = ICHAR( C1 )
           IF( K .GE. ICHAR('a') .AND. K .LE. ICHAR('z') ) THEN
              C1 = CHAR( K - ICHAR('a') + ICHAR('A') )
           ENDIF
           STRING(J:J) = C1
+       else
+          count=count+1
        ENDIF
     ENDDO
     string=string(1:len_trim(string))

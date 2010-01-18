@@ -2705,7 +2705,7 @@ contains
        endif
     enddo
     if(ndc.eq.0) then
-       if(time_plane.gt.zero) then
+       if(time_plane>0) then
           if(new_ndpt) then
              !       do i=1,nd
              !         write(6,*) i,q(i)/twopi

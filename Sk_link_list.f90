@@ -384,7 +384,7 @@ CONTAINS
        l%last=>current
     else
        pos=0
-       WRITE(6,*) " Fibre not found in move_to_name_old "
+       WRITE(6,*) " Fibre not found in move_to_name_old ",S1name
     endif
   END SUBROUTINE move_to_name_old
 
@@ -767,7 +767,7 @@ CONTAINS
     nullify(Current%AG);
     nullify(Current%CHARGE);
 
-    nullify(current% P,current%N);
+    nullify(current%P,current%N);
 
     !    nullify(current%PARENT_CHART);nullify(current%PARENT_MAG);
   END SUBROUTINE NULL_FIBRE
@@ -902,8 +902,10 @@ CONTAINS
           deallocate(c%CHARGE);
        ENDIF
 
-       IF(ASSOCIATED(C%N)) nullify(C%N)
-       IF(ASSOCIATED(C%P)) nullify(C%P)
+       !       IF(ASSOCIATED(C%N)) nullify(C%N)
+       !       IF(ASSOCIATED(C%P)) nullify(C%P)
+       nullify(C%N)
+       nullify(C%P)
 
        IF(ASSOCIATED(C%T1)) THEN
           if(associated(C%T1,C%TM)) nullify(C%TM)
@@ -990,8 +992,10 @@ CONTAINS
        !      IF(ASSOCIATED(c%CHARGE)) THEN
        deallocate(c%CHARGE);
        !      ENDIF
-       IF(ASSOCIATED(C%N)) nullify(C%N)
-       IF(ASSOCIATED(C%P)) nullify(C%P)
+       !       IF(ASSOCIATED(C%N)) nullify(C%N)
+       !       IF(ASSOCIATED(C%P)) nullify(C%P)
+       nullify(C%N)
+       nullify(C%P)
 
        IF(ASSOCIATED(C%T1)) THEN
           deallocate(C%T1);
@@ -1179,7 +1183,30 @@ CONTAINS
 
   END SUBROUTINE CHECK_NEED_PATCH
 
+  SUBROUTINE remove_patch(r,geometry,energy) ! check need of  PATCHES
+    IMPLICIT NONE
+    TYPE (layout), target ::  r
+    TYPE (FIBRE), pointer ::  p
+    integer i
+    logical(lp), optional :: geometry,energy
+    logical(lp) g,e
 
+    g=my_true
+    e=my_true
+
+    if(present(energy)) e=energy
+    if(present(geometry)) g=geometry
+
+    p=>r%start
+
+    do i=1,r%n
+       if(g) p%patch%patch=0
+       if(e) p%patch%energy=0
+       p=>p%next
+    enddo
+
+
+  end SUBROUTINE remove_patch
 
   SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
@@ -1840,6 +1867,7 @@ CONTAINS
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
     NULLIFY(T%BB)
+    NULLIFY(T%T)
     !    NULLIFY(T%WORK)
     !    NULLIFY(T%USE_TPSA_MAP)
     !    NULLIFY(T%TPSA_MAP)
@@ -2029,6 +2057,10 @@ CONTAINS
     IF(ASSOCIATED(T%BB)) THEN
        CALL KILL(T%BB)
        DEALLOCATE(T%BB)
+    ENDIF
+    IF(ASSOCIATED(T%T)) THEN
+       CALL KILL(T%T)
+       DEALLOCATE(T%T)
     ENDIF
     !    IF(ASSOCIATED(T%TPSA_MAP)) THEN
     !       CALL KILL(T%TPSA_MAP)
