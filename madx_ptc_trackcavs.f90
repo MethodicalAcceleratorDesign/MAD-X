@@ -11,6 +11,7 @@ module madx_ptc_trackline_module
 
   ! flag for debugging ranges from 0 (no debug printout) to 10 (the most detailed)
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
+  logical(lp)          :: onetable
 
   !********************************************************************************************
   !********************************************************************************************
@@ -41,8 +42,9 @@ contains
     integer              :: e, ni
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
-    type(internal_state)  :: intstate
+    type(internal_state) :: intstate
     real(kind(1d0))      :: get_value
+    integer              :: get_option
     integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
          advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
@@ -76,7 +78,8 @@ contains
             'Putting number of turns to 1!')
        nturns = 1
     endif
-
+    
+    onetable = get_option('onetable ') .ne. 0
 
     gcs = get_value('ptc_trackline ','gcs ') .ne. 0
 
@@ -353,12 +356,11 @@ contains
     !hbu
     real(dp) :: x,px,y,py,t,pt
     real(dp) :: spos,e
-    integer :: get_option
     !hbu
     data table_puttab / 'track.obs$$$$.p$$$$' /
     data table        / 'trackone           ' /
 
-    if ( get_option('onetable ') .ne. 0 ) then
+    if ( onetable ) then
        table='trackone'
        table(9:9)= achar(0)
     else
@@ -430,8 +432,9 @@ contains
     !    integer              :: rplotno
     integer              :: obspointnumber ! observation point number in c-code
     integer              :: getnumberoftracks !function
-    type(internal_state)  :: intstate
+    type(internal_state) :: intstate
     real(kind(1d0))      :: get_value
+    integer              :: get_option
     integer, external    :: restart_sequ, & !  restart beamline and return number of beamline node
          advance_node    !  advance to the next node in expanded sequence
     !                    !  =0 (end of range), =1 (else)
@@ -441,7 +444,7 @@ contains
     !------------------------------------------------------
     !initialization
     npart = 1
-    n = 1
+    n = 1 
     t = 1
     !------------------------------------------------------
 
@@ -464,6 +467,7 @@ contains
        nturns = 1
     endif
 
+    onetable = get_option('onetable ') .ne. 0
 
     gcs = get_value('ptc_trackline ','gcs ') .ne. 0
 
@@ -522,8 +526,8 @@ contains
        call newrplot()
     endif
 
-    call kanalnummer(mf)
-    open(unit=mf,file='ptctracklinestatus.txt',POSITION='APPEND' , STATUS='UNKNOWN')
+!    call kanalnummer(mf)
+!    open(unit=mf,file='ptctracklinestatus.txt',POSITION='APPEND' , STATUS='UNKNOWN')
 
     n=1
     npart = getnumberoftracks()
@@ -556,7 +560,7 @@ contains
                 call seterrorflag(10,"ptc_trackline ","DA got unstable ");
                 fen = p;
                 
-                call putinstatustable(n,t,e,p%MAG%name,pathlegth,3,x,xini,fen%energy,mf)
+                !call putinstatustable(n,t,e,p%MAG%name,pathlegth,3,x,xini,fen%energy,mf)
                 goto 100 !for the time being lets try next particle, 
                          !but most probably we will need to stop tracking and reinit 
 	     !goto 101
@@ -612,7 +616,7 @@ contains
                 call seterrorflag(10,"ptc_twiss: ",whymsg);
                 
                 fen = p;
-                call putinstatustable(n,t,e,p%MAG%name,pathlegth,1,x,xini,fen%energy,mf)
+                !call putinstatustable(n,t,e,p%MAG%name,pathlegth,1,x,xini,fen%energy,mf)
                 
                 goto 100 !take next track
                 
@@ -631,8 +635,7 @@ contains
        
        fen = p;
        t = t - 1
-       print*, t 
-       call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
+       !call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
       
 100    continue!take next track
        
@@ -644,7 +647,7 @@ contains
     if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
 
-    close(mf)
+    !close(mf)
 
     c_%x_prime=.false.
 

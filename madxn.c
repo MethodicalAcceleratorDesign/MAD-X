@@ -6980,6 +6980,10 @@ void pro_ptc_trackline(struct in_cmd* cmd)
   int pos, one;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
+  int parexist = -1;
+  double value = 0;
+  int ivalue = 0;
+  
 
   pos = name_list_pos("file", nl);
 
@@ -7024,17 +7028,27 @@ void pro_ptc_trackline(struct in_cmd* cmd)
     printf("Now is %f\n", command_par_value("onetable",cmd->clone));
   }
 
+  
+  parexist = command_par_value2("onetable",cmd->clone,&value);
+  
+  if (parexist)
+   { 
+     ivalue = (int)value;
+     set_option("onetable", &ivalue);
+   }
+   
+
   track_tables_create(cmd);
-
-
+  
+  
   if (command_par_value("everystep",cmd->clone) != 0)
   {
-    printf("Calling PTC track line every step\n");
+    /*printf("Calling PTC track line every step\n");*/
     w_ptc_track_everystep(&curr_obs_points);
   }
   else
   {
-    printf("Calling STD PTC track line\n");
+    /*printf("Calling STD PTC track line\n");*/
     w_ptc_trackline(&curr_obs_points);
   }
 
