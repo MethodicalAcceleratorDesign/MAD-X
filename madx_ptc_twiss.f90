@@ -1793,9 +1793,9 @@ contains
          sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i)
       enddo
 
-      eta_c = -sd * betaRelativistic**2 / suml
+      eta_c = -sd * betaRelativistic**2 / suml ! overwritten later if icase.eq.56
       alpha_c = one / gammaRelativistic**2 + eta_c
-      gamma_tr = one / sqrt(alpha_c)
+      gamma_tr = one / sqrt(alpha_c) ! overwritten later if icase.eq.56
 
       ! compute delta-p/p dependency of alpha_c
       ! first order derivatives of the dispersions
@@ -1885,7 +1885,11 @@ contains
          yy = theNormalForm%A1**(-1)*yy*theNormalForm%A1 ! takes away all dispersion dependency
          !write(0,*) 'for yy, c_%nd2 is ',c_%nd2 ! 0 is stderr
          alpha_c    = (yy%v(6).sub.'000010')/suml
-         alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml      
+         gamma_tr = one / sqrt(alpha_c)! overwrite the value obtained from the Twiss formula
+         !alpha_c = one / gammaRelativistic**2 + eta_c
+         eta_c = alpha_c - one / gammaRelativistic**2
+ 
+         alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
  
          if (order.ge.3) then
             alpha_c_p2 = 3.0*2.0*(yy%v(6).sub.'000030')/suml
