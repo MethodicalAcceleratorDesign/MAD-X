@@ -14,7 +14,7 @@ PROFILE=NO
 PLUGIN_SUPPORT=NO
 SLC4=YES
 SLC5=NO
-FC11=NO
+FC12=NO
 NTPSA=YES
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
@@ -36,7 +36,7 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   PROFILE=NO
   SLC4=NO
   SLC5=NO
-  FC11=NO
+  FC12=NO
 endif
 
 #######################################################################
@@ -216,11 +216,11 @@ ifeq ($(SLC5),YES)
   endif
 endif
 
-ifeq ($(FC11),YES)
+ifeq ($(FC12),YES)
   ifeq ($(ARCH),64)
     LIBX= -lX11 -lxcb -lXau -lXdmcp -lstdc++
   else
-    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i586-redhat-linux/4.4.1/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.1/32/ -lgcc_eh
+    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.2/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.2/32/ -lgcc_eh
   endif
 endif
 

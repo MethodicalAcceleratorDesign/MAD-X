@@ -3916,7 +3916,8 @@ void pro_ptc_twiss()
   ptc_twiss_summary_table = make_table(summary_table_name, "twiss summary",
                                        ptc_twiss_summary_table_cols, ptc_twiss_summary_table_types,
                                        5); /* only one  row would be enough  */
-  /*  18 january 2010 static table - ptc_twiss_summary_table->dynamic = 1; /* actually static for time-being */
+  /*  18 january 2010 static table - ptc_twiss_summary_table->dynamic = 1; */
+ /* actually static for time-being */
   add_to_table_list( ptc_twiss_summary_table, table_register );
   /* --- */
 
