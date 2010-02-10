@@ -81,6 +81,8 @@ module madx_ptc_twiss_module
        (/6,6/) )
 
   logical :: slice_magnets, center_magnets, deltap_dependency, isRing
+  
+  logical :: resetBetaExtrema(3,3);
 
   real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
   real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
@@ -328,6 +330,8 @@ contains
     logical(lp)             :: skipnormalform, tracktm
     character*48            :: summary_table_name
 
+    call resetBetaExtremas()
+    
     skipnormalform = my_false
 
     !all zeroing
@@ -2364,13 +2368,20 @@ contains
   end subroutine computeDeltapDependency
 
   ! --- a set of routines to track extremas of Twiss functions
+  subroutine resetBetaExtremas()
+  	integer i,j
+  	do i=1,3
+		do j=1,3
+			resetBetaExtrema(i,j) = .true.
+		enddo
+	enddo
+  end subroutine resetBetaExtremas
   subroutine trackBetaExtrema(i,j,value)
     implicit none
-    logical, save :: firstTime(3,3) = .true.
     integer :: i,j
     real(dp) :: value
-    if (firstTime(i,j)) then
-       firstTime(i,j) = .false.
+    if (resetBetaExtrema(i,j)) then
+       resetBetaExtrema(i,j) = .false.
        minBeta(i,j) = value
        maxBeta(i,j) = value
        !     write(80,*) 'first time in trackBetaExtrema for ',i,j
