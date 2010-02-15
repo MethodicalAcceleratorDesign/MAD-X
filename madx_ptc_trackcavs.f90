@@ -123,6 +123,7 @@ contains
     if (getdebug() > 0) print *, 'reading tracks starting posiotions from table ....'
 
     call gettrack(1,x(1),x(2),x(3),x(4),x(6),x(5))
+    x(6) = -x(6)
 
     if (getdebug() > 0) print *, 'reading.... Done'
 
@@ -311,6 +312,7 @@ contains
     write(mf,*) npart,spos,turn,elno,elna,xini, x, e,stat
     
     !"number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
+
     doublenum = npart
     call double_to_table(table, 'number ' , doublenum)
     doublenum = turn
@@ -323,7 +325,7 @@ contains
     call double_to_table(table, 'y ' , doublenum)
     doublenum = x(4)
     call double_to_table(table, 'py ' , doublenum)
-    doublenum = x(6)
+    doublenum = -x(6)
     call double_to_table(table, 't ' , doublenum)
     doublenum = x(5)
     call double_to_table(table, 'pt ' , doublenum)
@@ -372,6 +374,11 @@ contains
 
     tt = turn
 
+    doublenum = nobs
+    call double_to_table(table, 'number ' , doublenum)
+
+    doublenum = npart
+    call double_to_table(table, 'number ' , doublenum)
 
     call double_to_table(table, 'turn ', tt)
     doublenum = x
@@ -386,7 +393,7 @@ contains
     doublenum = py
     call double_to_table(table, 'py ', doublenum)
 
-    doublenum = t
+    doublenum = -t
     call double_to_table(table, 't ' , doublenum)
 
     doublenum = pt
@@ -539,7 +546,7 @@ contains
        if (getdebug() > 3 ) print *, 'Getting track ',n
 
        call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
-
+       x(6) = -x(6)
        if (getdebug() > 0 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
        xini = x
        do t=1, nturns
