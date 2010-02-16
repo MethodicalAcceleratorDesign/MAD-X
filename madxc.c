@@ -1797,7 +1797,10 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
   int    tosy = -1;
   int    tospx, tospy;
 
-  int    jjx;
+  int dbk = 0;
+  int yok;
+
+  int    jjx, jjy, jj;
 
   ttb = orbin_table;
   da1 = ttb->d_cols;
@@ -1872,14 +1875,22 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
     }
   }
 
+  jj = 0;
   while(m) {
+
 
     strcpy(l1name,m->p_node->name);
     stolower(l1name);
     strcpy(l2name,strip(l1name));
     supp_tb(l2name);
 
+     if (dbk ==1) printf("monitor name: %s\n",l2name);
+
     jjx = -1;
+    jjy = -1;
+    jj++;
+    yok = 0;
+
     for (j=1; j < (ttb->curr)+1; j++) {
       i = str_from_tablet(ttb, "name", &j, name);
       strcpy(l3name,name);
@@ -1887,23 +1898,44 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
       strcpy(l4name,strip(l3name));
       supp_tb(l4name);
       if(strlen(l4name) == strlen(l2name)) {
-         if(strncmp(l4name,l2name,strlen(l2name)) == 0) jjx = j-1;
+         if(strncmp(l4name,l2name,strlen(l2name)) == 0) {
+              jjx = j-1;
+              jjy = jj-1;
+              yok = 1;
+           if(dbk ==1) printf("monitor names found: %s %s %d %d\n",l2name,l4name,strlen(l2name),yok);
+             }
       }
     }
+     if(dbk ==1) printf("jjx,jjy %d %d\n",jjx,jjy);
 
 /* If correction to target orbit, subtract the wanted orbit ... */
 
-    if(jjx >= 0) {
+    if((jjy >= 0) && (yok == 1)) { 
+/*  if(jjx >= 0)  {  */
      if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
-       m->val.before[0] =  da1[posx][jjx] - da2[tosx][jjx];
-       m->val.before[1] =  da1[posy][jjx] - da2[tosy][jjx];
-       m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjx])*1000.*correct_orbit->units;
-       m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjx])*1000.*correct_orbit->units;
+if(dbk == 1) {
+       printf("x ==> %d %d %e %e\n",jjx,m->id_ttb,da1[posx][jjx],da2[tosx][jjy]);
+       printf("y ==> %e %e\n",da1[posy][jjx],da2[tosy][jjy]);
+}
+       m->val.before[0] =  da1[posx][jjx] - da2[tosx][jjy];
+       m->val.before[1] =  da1[posy][jjx] - da2[tosy][jjy];
+       m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjy])*1000.*correct_orbit->units;
+       m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjy])*1000.*correct_orbit->units;
+if(dbk == 1) {
+       printf("bxy ==> %s %d %e %e\n",m->p_node->name,jjx,m->val.before[0],m->val.before[1]);
+}
      } else {
+if(dbk == 1) {
+       printf("x ==> %e %e\n",da1[posx][jjx],da2[tosx][jjx]);
+       printf("y ==> %e %e\n",da1[posy][jjx],da2[tosy][jjx]);
+}
        m->val.before[0] = da1[posx][jjx];
        m->val.before[1] = da1[posy][jjx];
        m->val.before[0] = da1[posx][jjx]*1000.*correct_orbit->units;
        m->val.before[1] = da1[posy][jjx]*1000.*correct_orbit->units;
+if(dbk == 1) {
+       printf("bxy ==> %s %d %e %e\n",m->p_node->name,jjx,m->val.before[0],m->val.before[1]);
+}
      }
 
     pos = name_list_pos("monon", nl);
