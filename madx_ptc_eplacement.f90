@@ -181,8 +181,14 @@ contains
 
     autoplace = get_value('ptc_eplacement ','autoplacedownstream ') .ne. 0
     if (autoplace) then
+       if (getdebug() > 2) then
+          print*,"ptc_eplacement: autoplacedownstream=true: running survey"
+       endif
        call survey(my_ring,j+1,my_ring%n)
     else
+       if (getdebug() > 2) then
+          print*,"ptc_eplacement: autoplacedownstream=false: finding patch"
+       endif
        CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
     endif
 
@@ -200,6 +206,9 @@ contains
 
     surveyall = get_value('ptc_eplacement ','surveyall ') .ne. 0
     if (surveyall) then
+       if (getdebug() > 2) then
+          print*,"ptc_eplacement: surveyall=true"
+       endif
        call survey(my_ring)
     endif
 
@@ -316,12 +325,17 @@ contains
 
        !print*, i,p%mag%name
        if (getdebug() > 2) then
-          print*, i,p%mag%name
+          print*, i,p%mag%name,' of kind ',p%mag%kind
           print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
        endif
 
+
        if (p%mag%l == zero) then
-          !       print*, i,p%mag%name
+          !print*, i,p%mag%name(1:3), p%mag%kind
+          if(p%mag%name(1:3) == 'M__') then
+            call drawtube(p,mf,1.0_dp,lgrey)
+          endif
+
           goto 100;
        endif
 
