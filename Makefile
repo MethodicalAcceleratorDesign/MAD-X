@@ -17,15 +17,19 @@ SLC5=NO
 FC12=NO
 NTPSA=YES
 
-ifeq ($(findstring arwin, $(OSTYPE)),arwin)
+ONMAC=NO
 
+ifeq ($(findstring arwin, $(OSTYPE)),arwin)
+  ONMAC=YES
 # Presently g95 is no longer the default for Darwin since
 # gfortran is more available. The latter comes automatically
 # with gcc. Special LIBX is needed for g95 (see below)
 # ATTENTION: gfortran is broken in gcc4.4 on Darwin therefore 
 # back to g95 
-  f95=g95
-#  f95=gfortran
+#  f95=g95
+  f95=gfortran
+#  for darwin go now by default to 64 bit executables
+  ARCH=64
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # DON'T TOUCH FOR DARWIN !!!
@@ -75,7 +79,9 @@ endif
 ifeq ($(ARCH),32)
   M32= -m32
 else
-  M32=
+  ifeq ($(findstring arwin, $(OSTYPE)),arwin)
+    M32= -m64
+  endif
 endif
 
 # Production: C compiler flag options
@@ -124,7 +130,7 @@ ifeq ($(f95),g95)
   ifeq ($(ARCH),32)
     f95_FLAGS+= -Wa,--32 -fno-second-underscore
   else
-    f95_FLAGS+= -fno-second-underscore
+    f95_FLAGS+= -Wa,--64 -fno-second-underscore
   endif
 endif
 
@@ -155,8 +161,11 @@ ifeq ($(DEBUG),YES)
   endif
 else
   GCCP_FLAGS+= -O4
+  # use level 4 optimization, except for lf95 or on MAC
   ifneq ($(f95),lf95)
-    f95_FLAGS+= -O4
+    ifeq ($(ONMAC),NO)
+      f95_FLAGS+= -O4
+	endif
   endif
 endif
 
@@ -218,7 +227,7 @@ endif
 
 ifeq ($(FC12),YES)
   ifeq ($(ARCH),64)
-    LIBX= -lX11 -lxcb -lXau -lXdmcp -lstdc++
+    LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -lstdc++
   else
     LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.2/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.2/32/ -lgcc_eh
   endif
@@ -261,7 +270,10 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
 # include headers for gxx11c
   GCCP_FLAGS += -I /usr/X11R6/include/
   ifeq ($(f95),g95)
-    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore
+    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore $(M32)
+  endif
+  ifeq ($(f95),gfortran)
+    f95_FLAGS += $(M32)
   endif
   LDOPT= $(M32)
 endif
