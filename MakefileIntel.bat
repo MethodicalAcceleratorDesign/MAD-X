@@ -33,7 +33,8 @@ REM goto :link
 REM pause
 
 REM /ML option for single-thread NO LONGER AVAILABLE
-SET MULTITHREADING=/MT
+REM SET MULTITHREADING=/MT
+SET MULTITHREADING=
 REM /ML option does not seem to be recognized!!!
 REM MULTITHREADING=/MT
 cl /c /EHsc %MULTITHREADING% /Tp .\tpsa.cpp
