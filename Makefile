@@ -107,7 +107,7 @@ ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
     f95_FLAGS= --o2 --tp -c -Wa,--32
   else
-    f95_FLAGS= --o2 --tp
+    f95_FLAGS= --o2 --tp -c
   endif
 endif
 
