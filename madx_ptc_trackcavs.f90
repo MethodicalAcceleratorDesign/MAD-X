@@ -447,7 +447,7 @@ contains
     !                    !  =0 (end of range), =1 (else)
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
     integer              :: mf
-    type(work)           :: fen      ! Fibre ENergy
+    !type(work)           :: fen      ! Fibre ENergy
     !------------------------------------------------------
     !initialization
     npart = 1
@@ -565,9 +565,6 @@ contains
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
                 call fort_warn('ptc_trackline: ','DA got unstable')
                 call seterrorflag(10,"ptc_trackline ","DA got unstable ");
-                fen = p;
-                
-                !call putinstatustable(n,t,e,p%MAG%name,pathlegth,3,x,xini,fen%energy,mf)
                 goto 100 !for the time being lets try next particle, 
                          !but most probably we will need to stop tracking and reinit 
 	     !goto 101
@@ -622,9 +619,6 @@ contains
                 call fort_warn('ptc_twiss: ',whymsg)
                 call seterrorflag(10,"ptc_twiss: ",whymsg);
                 
-                fen = p;
-                !call putinstatustable(n,t,e,p%MAG%name,pathlegth,1,x,xini,fen%energy,mf)
-                
                 goto 100 !take next track
                 
              endif
@@ -640,7 +634,7 @@ contains
        enddo !loop over turns
        !           npart,turn,elno,elna,spos,stat,x,xini,e,mf
        
-       fen = p;
+       !fen = p;
        t = t - 1
        !call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
       
