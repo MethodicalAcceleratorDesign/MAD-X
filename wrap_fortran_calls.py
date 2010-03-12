@@ -209,8 +209,8 @@ for file in Csourcefiles:
 
 for file in FortranSourceFiles:
     f = open(file,'r')
-    if options.verbose:
-        print("currently scanning file "+file);
+    #if options.verbose:
+    #    print("currently scanning file "+file);
     subroutineResIndex =re.compile(r'^[\s\t]*subroutine[\s\t]+res_index\(skew,mynorder,myn1,myn2,indexa,mynres\)')
     subroutinePattern = re.compile(r'^[\s\t]*[sS][uU][bB][rR][oO][uU][tT][iI][nN][eE][\s\t]*(.+)\((.*)\)$')
     # WARNING: sometime we can have: subroutine SUBNAME only! (i.e. no parenthesis afterwards)
