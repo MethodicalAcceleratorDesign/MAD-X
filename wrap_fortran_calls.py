@@ -209,6 +209,8 @@ for file in Csourcefiles:
 
 for file in FortranSourceFiles:
     f = open(file,'r')
+    if options.verbose:
+        print("currently scanning file "+file);
     subroutineResIndex =re.compile(r'^[\s\t]*subroutine[\s\t]+res_index\(skew,mynorder,myn1,myn2,indexa,mynres\)')
     subroutinePattern = re.compile(r'^[\s\t]*[sS][uU][bB][rR][oO][uU][tT][iI][nN][eE][\s\t]*(.+)\((.*)\)$')
     # WARNING: sometime we can have: subroutine SUBNAME only! (i.e. no parenthesis afterwards)
@@ -235,7 +237,7 @@ for file in FortranSourceFiles:
                 concatenatedLines.append(concatenatedLine)                
                 nextState = firstLine
         elif state == nextLine:
-            if line[0] == '&':
+            if line[0] == '&' or True: # 12 March 2009 line continuation change: the following line does not need to start with a '&'
                 if line[-1] == '&': # continues further
                     concatenatedLine += line.lstrip('&').rstrip(' &')
                     nextState = nextLine
@@ -279,6 +281,13 @@ for file in FortranSourceFiles:
                 res_index.registerArgumentType('int','indexa') # THIS ONE SHOULD BE "int indexa[4][1000]" => handled in codegen routines
                 res_index.registerArgumentType('int*','mynres')
                 continue # next in the for-loop
+
+            # Some very special cases of subroutines that cause problem with argument parsing and that we want to discard alltogether
+            skippedSubroutine = re.compile('subroutine trrun')
+            m = skippedSubroutine.match(line);
+            if m:
+                continue # next in the for loop
+
             
                     
             m = subroutinePattern.match(line) # no longer line.lower()
@@ -380,7 +389,7 @@ for file in FortranSourceFiles:
                           m.group(1)+\
                           "' in file '"+\
                           file+\
-                          "' before being able to parse parameters")
+                          "' before being able to parse parameters of "+newSubroutine.name)
                 
             if newSubroutine.parsed():
                 state = lookForSubroutine # now ready to look for the next subroutine in the current file
@@ -458,6 +467,7 @@ fPrototypes.close()
 
 fWrappersPrototypes.write('#endif\n')
 fWrappersPrototypes.close()
+
 
 if options.verbose:
     print('completed.')
