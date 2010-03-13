@@ -107,7 +107,7 @@ ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
     f95_FLAGS= --o2 --tp -c -Wa,--32
   else
-    f95_FLAGS= --o2 --tp -c
+    f95_FLAGS= --o2 -c
   endif
 endif
 
@@ -142,7 +142,9 @@ ifeq ($(DEBUG),YES)
   ifeq ($(f95),lf95)
     # Replace Makefile_develop
     # lff95 compiler options with severe lf95/Fujitsu flags
-    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
+#    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
+    f95_FLAGS+= --chk a,e,f,o,s,x -g --trace --info -pca --ap --chkglobal -f95 --lst --sav --wo --xref -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -Hesu -a -e0 -E iu -Am --pca --private --trap
+
     GCCP_FLAGS+= -Wall -pedantic
   endif
   ifeq ($(f95),f95)
@@ -300,20 +302,21 @@ c_wrappers.o: c_wrappers.c
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
 
 # fortran code dependencies on header files fi
-dynap.o: dynap.f90 deltra.fi dyntab.fi wmaxmin0.fi tunes.fi
-emit.o: emit.f90 twiss0.fi bb.fi emit.fi twtrr.fi
-ibsdb.o: ibsdb.f90 ibsdb.fi name_len.fi physcons.fi
-match.o: match.f90 name_len.fi match.fi
-matchjc.o: matchjc.f90 name_len.fi match.fi
-matchsa.o: matchsa.f90 name_len.fi match.fi
-plot.o: plot.f90 plot.fi plot_b.fi plot_c.fi plot_math.fi
-resindex.o: resindex.f90 resindex.fi
+util.o: util.f90
+dynap.o: util.o dynap.f90
+emit.o: util.o emit.f90
+ibsdb.o: util.o ibsdb.f90
+match.o: util.o match.f90
+matchjc.o: util.o matchjc.f90
+matchsa.o: util.o matchsa.f90
+gxx11.o: util.o gxx11.f90
+plot.o: plot.f90
+resindex.o: util.o resindex.f90
 sodd.o: sodd.f90
-survey.o: survey.f90 twtrr.fi
-touschek.o: touschek.f90 touschek.fi name_len.fi physcons.fi
-trrun.o: trrun.f90 twiss0.fi name_len.fi track.fi bb.fi twtrr.fi
-twiss.o: twiss.f90 twiss0.fi twissa.fi twissl.fi twissc.fi twissotm.fi track.fi bb.fi name_len.fi twtrr.fi twiss_elp.fi twiss_map.fi
-util.o: util.f90 twiss0.fi twtrr.fi
+survey.o: survey.f90
+touschek.o: util.o touschek.f90
+trrun.o: util.o trrun.f90
+twiss.o: util.o twiss.f90
 
 # f90 dependencies
 a_scratch_size.o: a_scratch_size.f90
@@ -366,18 +369,18 @@ Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
 Sqb_accel_ptc.o: Sq_orbit_ptc.o Sqb_accel_ptc.f90
 Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
 Sra_fitting.o: Sr_spin.o Sra_fitting.f90
-madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o twtrr.fi name_len.fi twiss0.fi madx_ptc_module.f90
+madx_ptc_module.o: util.o Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90
 St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
-madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o name_len.fi bb.fi madx_ptc_track_run.f90
+madx_ptc_track_run.o: util.o Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
-madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o name_len.fi madx_ptc_trackcavs.f90
-madx_ptc_setcavs.o  : Sp_keywords.o madx_ptc_intstate.o name_len.fi madx_ptc_setcavs.f90
-madx_ptc_script.o  : Sp_keywords.o twissa.fi madx_ptc_script.f90
-madx_ptc_knobs.o : Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc twissa.fi madx_ptc_knobs.f90 
-madx_ptc_eplacement.o  : Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o twissa.fi madx_ptc_eplacement.f90
+madx_ptc_trackcavs.o: util.o Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
+madx_ptc_setcavs.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_setcavs.f90
+madx_ptc_script.o: util.o Sp_keywords.o madx_ptc_script.f90
+madx_ptc_knobs.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc madx_ptc_knobs.f90 
+madx_ptc_eplacement.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
-madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_knobs.inc madx_ptc_distrib.inc twissa.fi madx_ptc_twiss.f90
-madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.inc twissa.fi madx_ptc_distrib.f90
+madx_ptc_twiss.o: util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_knobs.inc madx_ptc_distrib.inc madx_ptc_twiss.f90
+madx_ptc_distrib.o: util.o madx_ptc_module.o madx_ptc_distrib.inc madx_ptc_distrib.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
@@ -408,7 +411,7 @@ madx_objects += $(filter-out $(FILT_TP_OUT_F90),$(patsubst %.F90,%.o,$(wildcard 
 
 madx: $(madx_objects)
 	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
-	strip madx
+#	strip madx
 
 clean:
 	rm -f *.o
