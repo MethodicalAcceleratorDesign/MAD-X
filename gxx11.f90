@@ -1,4 +1,5 @@
 subroutine gvfa(np, x, y)
+  use gxx11_common
   implicit none
   integer i,icol,ierr,np
   real fx,fy,xs,ys
@@ -12,56 +13,6 @@ subroutine gvfa(np, x, y)
   !                                              last mod: Nov. 30, 1993
   !***********************************************************************
   real x(*), y(*)
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
 
   real w(4), v(4)
 
@@ -90,6 +41,7 @@ subroutine gvfa(np, x, y)
   iclear = 1
 end subroutine gvfa
 subroutine gvpl(np, x, y)
+  use gxx11_common
   implicit none
   integer i,icol,ierr,iloop,ilow,n,np,nup
   real fx,fy,xs,ys
@@ -103,56 +55,6 @@ subroutine gvpl(np, x, y)
   !                                           last mod: May 13, 1993
   !***********************************************************************
   real x(*), y(*)
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
 
   real w(4), v(4)
   !--- set proper colour index
@@ -186,6 +88,7 @@ subroutine gvpl(np, x, y)
   iclear = 1
 end subroutine gvpl
 subroutine gvpm(np, x, y)
+  use gxx11_common
   implicit none
   integer i,icol,ierr,iloop,n,np,nup
   real fx,fy,xs,ys
@@ -199,56 +102,6 @@ subroutine gvpm(np, x, y)
   !                                           last mod: May 13, 1993
   !***********************************************************************
   real x(*), y(*)
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
 
   real w(4), v(4)
 
@@ -281,7 +134,8 @@ subroutine gvpm(np, x, y)
   !--- set flag for clear permission
   iclear = 1
 end subroutine gvpm
-subroutine gvtx(x, y, s)
+subroutine gvtx(x, y, sss)
+  use gxx11_common
   implicit none
   integer i,icol,ierr
   real chh,chux,chuy,fx,fy,hfac,x,xs,y,ys
@@ -294,57 +148,7 @@ subroutine gvtx(x, y, s)
   !   Author: H. Grote / CERN                        date: Nov. 18, 1992
   !                                           last mod: May 13, 1993
   !***********************************************************************
-  character * (*) s
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
+  character(*) sss
 
   real w(4), v(4)
 
@@ -375,7 +179,7 @@ subroutine gvtx(x, y, s)
   call jschh(hfac * chh)
   xvp(1) = w(1) + xs * (vploc(1) + fx * (x - w(1)))
   yvp(1) = w(3) + ys * (vploc(3) + fy * (y - w(3)))
-  call gtx(xvp(1), yvp(1), s)
+  call gtx(xvp(1), yvp(1), sss)
   call jschh(chh)
   !--- set flag for clear permission
   iclear = 1
@@ -428,6 +232,7 @@ subroutine gxarng(nopt,rmini,rmaxi,rmin,rmax,nint)
   endif
 end subroutine gxarng
 subroutine gxasku
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -439,52 +244,6 @@ subroutine gxasku
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
   logical intrac
 
   call gxundf
@@ -494,6 +253,7 @@ subroutine gxasku
   endif
 end subroutine gxasku
 subroutine gxask1
+  use gxx11_common
   implicit none
   integer ierr
   !***********************************************************************
@@ -506,52 +266,6 @@ subroutine gxask1
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
   character sline*80
   logical affirm
 
@@ -583,6 +297,7 @@ subroutine gxask1
 10010 format(/' Do you want to plot on your terminal ? (<CR> = yes>:'/)
 999 end subroutine gxask1
 subroutine gxask2
+  use gxx11_common
   implicit none
   integer iamx,iamy,ierr,ifirst,ilast
   real xax,yax
@@ -596,54 +311,8 @@ subroutine gxask2
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
   character sline*80
-  character * 60 gxform, sform
+  character(60) gxform, sform
   logical affirm
 
   if (lpseps .ne. lundef)  then
@@ -667,10 +336,10 @@ subroutine gxask2
                  smetnm = 'gxx11'
                  call gxpnbl(smetnm, ifirst, ilast)
                  write(iounit,10100) smetnm(ifirst:ilast),               &
-                      &smetnm(ifirst:ilast)
+                      smetnm(ifirst:ilast)
                  call gxrdtx(inunit,sline,ierr)
                  if(sline(1:1).ne.' ')                                   &
-                      &call gxsvar('SMETNM',0,0.,sline)
+                      call gxsvar('SMETNM',0,0.,sline)
                  lmetnm = lundef
               endif
            endif
@@ -725,25 +394,24 @@ subroutine gxask2
   write(iounit,*) ' Error on Input, stop.'
   stop
 10040 format(/' Do you want to write a .ps file <1>, .eps files <2>,',  &
-       &' or none <CR>:'/)
+       ' or none <CR>:'/)
 10050 format                                                            &
-       &(/' specify bounding box size (default:',i3,                      &
-       &'(x) by', i3, '(y) cm)?'/' (<CR>=no):'/)
+       (/' specify bounding box size (default:',i3,                      &
+       '(x) by', i3, '(y) cm)?'/' (<CR>=no):'/)
 10070 format(/' enter bounding box x size in cm:'/)
 10080 format(/' enter bounding box y size in cm:'/)
 10100 format(/' enter postscript or eps file name (leading part)' /     &
-       &' (<CR> gives "',a,'.ps" resp. "',a,'nn.eps"):'/)
+       ' (<CR> gives "',a,'.ps" resp. "',a,'nn.eps"):'/)
 999 end subroutine gxask2
-subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
-     &iparm,ierr)
+subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,iparm,ierr)
   implicit none
   integer i,ia,ialow,iaup,iaxort,ie,ierr,ietick,ifircl,ifirst,ifont,&
-       &ifs,ilabl,ilast,ilbort,ils,impfl,in,intrep,intv,ipos,irf,iscloc,  &
-       &islbl,islpc,isp,ispchl,isradc,itext,itick,ival,k1,k2,l,l1,l2,     &
-       &naxal,nchct,nlines
+       ifs,ilabl,ilast,ilbort,ils,impfl,in,intrep,intv,ipos,irf,iscloc,  &
+       islbl,islpc,isp,ispchl,isradc,itext,itick,ival,k1,k2,l,l1,l2,     &
+       naxal,nchct,nlines
   real a1,a1b,a2,alp,amxx,axlow,axpos,axup,chhigh,chwdth,cthigh,    &
-       &cuhigh,diff,diffe,diffn,fcw,fwc,hxf,pfact,ptick,sgspac,sk,space,  &
-       &sphlin,sphlog,spmlog,spwlin,spwlog,tickl,wbused,wsused
+       cuhigh,diff,diffe,diffn,fcw,fwc,hxf,pfact,ptick,sgspac,sk,space,  &
+       sphlin,spmlog,spwlin,spwlog,tickl,wbused,wsused
   !***********************************************************************
   !
   !   Purpose: plots an axis with tick marks, numbers, and title
@@ -817,13 +485,13 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
   !                                           last mod: Feb. 3, 1993
   !
   !***********************************************************************
-  character*(*)  textin,fmt,type,sepchr
+  character(*)  textin,fmt,type,sepchr
   integer iparm(*)
   character   stext*240,text*240,sltext*40,                         &
-       &fmtloc*60,stsep*1,slog(9)*1
+       fmtloc*60,stsep*1,slog(9)*1
   integer isave(20),ihoral(2,2,2),iveral(2,2,2)
   real atext(4),tick(4),alabl(4),cnt(4),rsave(20),tetick(4),        &
-       &alogv(10)
+       alogv(10)
   logical xaxis,linscl, labflg
   save alogv, ifircl, ihoral, iveral, slog
   !--- horizontal and vertical alignment as function of orientation (I),
@@ -945,7 +613,7 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
         cnt(k2)=axpos
      endif
      call jswn(isave(1),0.,1.,0.,1.)
-     call jselnt(isave(1))
+     !     call jselnt(isave(1))
   else
      fcw=1.
      fwc=1.
@@ -1043,13 +711,11 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
         if(iaxort.eq.ilbort) then
            sphlin=chhigh
            spwlin=chwdth*ival
-           sphlog=chhigh
            spwlog=2.5*chwdth
            spmlog=chwdth
         else
            spwlin=chhigh
            sphlin=chwdth*ival
-           sphlog=2.5*chwdth
            spwlog=chhigh
            spmlog=chhigh
         endif
@@ -1063,7 +729,7 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
         endif
         !--- set text alignment
         call jstxal(ihoral(ilbort,ilabl,iaxort),                      &
-             &iveral(ilbort,ilabl,iaxort))
+             iveral(ilbort,ilabl,iaxort))
         if(linscl)  then
            !--- linear scale
            intrep=spwlin/diffn+.99999
@@ -1117,7 +783,7 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
                     a1b=alp+wbused
                  else
                     if(islbl.ne.0.and.alp.ge.a1+wsused .and.alp.le.       &
-                         &a2-wsused) then
+                         a2-wsused) then
                        !--- minor label (at 2, 3, ..., 9)
                        call gxstx(alabl(1),alabl(3),slog(i))
                        a1=a1+wsused
@@ -1126,7 +792,7 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
                        impfl=1
                        !--- plot power of ten between first and second minor label
                        alabl(k1)=alabl(k1)                                 &
-                            &+.5*(min(axup,alp+alogv(i+1))-alp)*fwc
+                            +.5*(min(axup,alp+alogv(i+1))-alp)*fwc
                        call gxppow(alabl,ia)
                        a1=a1+spwlog
                     endif
@@ -1177,10 +843,10 @@ subroutine gxaxis(type,axlow,axup,axpos,ipos,fmt,textin,sepchr,   &
      endif
      if(itext.eq.2)  then
         atext(k2)=max(tick(k2),tick(k2+1),alabl(k2),alabl(k2+1))      &
-             &+space
+             +space
      else
         atext(k2)=min(tick(k2),tick(k2+1),alabl(k2),alabl(k2+1))      &
-             &- 2.5 * space
+             - 2.5 * space
      endif
      !--- get number of separation characters
      call gxchct(text(ifirst:ilast),stsep,nchct)
@@ -1268,6 +934,7 @@ subroutine gxchct(stext,sch,n)
   endif
 end subroutine gxchct
 subroutine gxclos
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -1277,52 +944,6 @@ subroutine gxclos
   !                                           last mod: Feb. 26, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
   call gxundf
   if(lacttm.eq.lundef)  then
      if(interm.gt.0)  then
@@ -1333,6 +954,7 @@ subroutine gxclos
   endif
 end subroutine gxclos
 subroutine gxclrw
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -1342,52 +964,6 @@ subroutine gxclrw
   !                                           last mod: March 2, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
 
   call gxundf
   if(iclear .ne. 0) then
@@ -1435,7 +1011,7 @@ subroutine gxcubi(npoint,xx,yy,yy1d,yy2d,ierror)
   !***********************************************************************
   dimension xx(*),yy(*),yy1d(*),yy2d(*)
   double precision zero,half,one,three,third,dfac,dx1,dx2,dy1,dy2,  &
-       &dd,dyx1,dyx2,divdif,alf,bet
+       dd,dyx1,dyx2,divdif,alf,bet
   save zero,half,one,three
   data zero,half,one,three/0.d0,0.5d0,1.d0,3.d0/
   third=one/three
@@ -1595,8 +1171,8 @@ function gxcubv(x,npoint,xx,yy,yy1d,yy2d)
      !   second    "      "  "  = H6*DX+H4
   endif
 end function gxcubv
-subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
-     &window,actwin,ierr)
+subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,window,actwin,ierr)
+  use gxx11_common
   implicit none
   integer ibar,ic,ierr,isplin,isym,j,kset,line,nset,mark
   real dum1,dum2,fsx,fsy,xs,ys
@@ -1632,57 +1208,12 @@ subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
   !                                           last mod: Dec. 9, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*),ipxval(*),ipyval(*),icvref(*)
   real xval(*),yval(*),window(4,*),actwin(4,*)
   real wn(4),ac(4),xx(2),yy(2),rsave(20)
   integer isave(20)
-  character s*1
+  character sss*1
   !
   !--- get current user settings and keep them
   call gxsave(isave,rsave,ierr)
@@ -1709,7 +1240,7 @@ subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
         wn(j)=window(j,kset)
      enddo
      call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
-     call jselnt(inormt)
+     !     call jselnt(inormt)
      !
      !--- plot curves
      !
@@ -1727,7 +1258,7 @@ subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
         else
            !   smooth with a third order spline
            call gxplt1(nptval(ic),xval(ipxval(ic)),yval(ipyval(ic)),   &
-                &ac)
+                ac)
         endif
      endif
      if(mark.ne.0) then
@@ -1753,24 +1284,24 @@ subroutine gxcrv1(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
         !--- set character height
         call gxschf(1,1,0.001*icvpar(10,kset),dum1,dum2)
         !--- get plot character
-        s=splotc(kset:kset)
+        sss=splotc(kset:kset)
         !--- set ndc because of character sizes  (curves with different scales)
         call jswn(inormt,0.,1.,0.,1.)
-        call jselnt(inormt)
+        !        call jselnt(inormt)
         fsx=1./(wn(2)-wn(1))
         fsy=1./(wn(4)-wn(3))
         do j=0,nptval(ic)-1
            xs=fsx*(xval(ipxval(ic)+j)-wn(1))
            ys=fsy*(yval(ipyval(ic)+j)-wn(3))
-           call gxtx1(xs,ys,s,ac)
+           call gxtx1(xs,ys,sss,ac)
         enddo
      endif
   enddo
   !--- restore previous settings
   call gxrest(isave,rsave)
 999 end subroutine gxcrv1
-subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
-     &window,ierr)
+subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,window,ierr)
+  use gxx11_common
   implicit none
   integer ibar,ic,ierr,isplin,isym,j,kset,line,nset,mark
   real dum1,dum2,fsx,fsy,xs,ys
@@ -1804,57 +1335,12 @@ subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
   !                                           last mod: March 7, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*),ipxval(*),ipyval(*),icvref(*)
   real xval(*),yval(*),window(4,*)
   real wn(4),xx(2),yy(2),rsave(20)
   integer isave(20)
-  character s*1
+  character sss*1
   !
   !--- get current user settings and keep them
   call gxsave(isave,rsave,ierr)
@@ -1880,7 +1366,7 @@ subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
         wn(j)=window(j,kset)
      enddo
      call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
-     call jselnt(inormt)
+     !     call jselnt(inormt)
      !
      !--- plot curves
      !
@@ -1923,16 +1409,16 @@ subroutine gxcurv(nset,nptval,ipxval,ipyval,icvref,xval,yval,     &
         !--- set character height
         call gxschf(1,1,0.001*icvpar(10,kset),dum1,dum2)
         !--- get plot character
-        s=splotc(kset:kset)
+        sss=splotc(kset:kset)
         !--- set ndc because of character sizes  (curves with different scales)
         call jswn(inormt,0.,1.,0.,1.)
-        call jselnt(inormt)
+        !        call jselnt(inormt)
         fsx=1./(wn(2)-wn(1))
         fsy=1./(wn(4)-wn(3))
         do j=0,nptval(ic)-1
            xs=fsx*(xval(ipxval(ic)+j)-wn(1))
            ys=fsy*(yval(ipyval(ic)+j)-wn(3))
-           call gxstx(xs,ys,s)
+           call gxstx(xs,ys,sss)
         enddo
      endif
   enddo
@@ -1965,7 +1451,7 @@ subroutine gxdfmt(axlow,axup,intv,ival,iscal,fmt)
   integer iv(mform),ic(mform)
   save form, iv, ic, up
   data form/'(G10.4)','(F6.1)','(F6.2)','(F5.2)','(F6.3)', '(F7.4)',&
-       &'(F8.5)','(F9.6)'/
+       '(F8.5)','(F9.6)'/
   data iv/10,6,6,5,6,7,8,9/
   data ic/4,1,2,2,3,4,5,6/
   data up/999./
@@ -1990,7 +1476,7 @@ subroutine gxdfmt(axlow,axup,intv,ival,iscal,fmt)
      step = y / intv
      do  i1 = 0, 4
         if (step .ge. 0.99                                            &
-             &.and. step - int(step + 0.5) .lt. 0.01)  goto 2
+             .and. step - int(step + 0.5) .lt. 0.01)  goto 2
         step = 10. * step
      enddo
 2    step = y / intv + abs(axl) - int(abs(axl))
@@ -2001,7 +1487,7 @@ subroutine gxdfmt(axlow,axup,intv,ival,iscal,fmt)
 4    i = max(i1, i2)
      ii = abs(log10(x)) + 1.001
      if (axl .lt. 0.)                                                &
-          &ii = max( max(log10(x), log10(-axl) + 1.) + 1.001, 2.001)
+          ii = max( max(log10(x), log10(-axl) + 1.) + 1.001, 2.001)
      if (i + ii .ge. 9)  then
         i = 1
         goto 30
@@ -2047,8 +1533,8 @@ subroutine gxdfvm(sin,sout,nml)
   !                                           last mod: April 7, 1988
   !
   !***********************************************************************
-  character *(*)  sin,sout
-  character*20 sloc
+  character(*)  sin,sout
+  character(20) sloc
   call gxpnbl(sin,i1,i2)
   if(i1.eq.0)  then
      !--- user Input is totally blank
@@ -2115,6 +1601,7 @@ subroutine gxdint(axlow,axup,intv)
   intv=10
 999 end subroutine gxdint
 subroutine gxeopn(string,number)
+  use gxx11_common
   implicit none
   integer number
   !***********************************************************************
@@ -2130,52 +1617,7 @@ subroutine gxeopn(string,number)
   !   Author: H. Grote / CERN                        date: Dec. 21, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   character string *(*),sloc *4
   call gxundf
   sloc=string
@@ -2190,7 +1632,7 @@ end subroutine gxeopn
 subroutine gxfchr(imode, ch, ifont, width, np, ipen, x, y, ierr)
   implicit none
   integer i,ierr,ifont,imode,ip,ipos,isel,istr,iwid,j,k,kbit,kword, &
-       &lx,ly,np
+       lx,ly,np
   real width
   !***********************************************************************
   !
@@ -2209,261 +1651,259 @@ subroutine gxfchr(imode, ch, ifont, width, np, ipen, x, y, ierr)
   !   ierr     =0: OK, =1: wrong font, =2: character not found
   !
   !***********************************************************************
-  character * 1 ch
+  character(1) ch
   real x(*), y(*)
   integer ipen(*)
   integer nchinf(2), ichinf(95,2), ichcod(652,2)
-  character * 100 chstr(2)
+  character(100) chstr(2)
   save chstr, nchinf, ichinf, ichcod
   data nchinf / 95, 91 /
   data chstr /                                                      &
-       &' !"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[/]^_&
-       &`abcdefghijklmnopqrstuvwxyz{|}~',                                 &
-       &' !"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIKLMNOPRSTUVWXYZ[/]^_`a&
-       &bcdefghiklmnoprstuvwxyz{|}~' /
+       ' !"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[/]^_`abcdefghijklmnopqrstuvwxyz{|}~',&
+       ' !"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIKLMNOPRSTUVWXYZ[/]^_`abcdefghiklmnoprstuvwxyz{|}~' /
   data (ichinf(j,1), j = 1,  95) /  541065217, 556276737, 574633992,&
-       &592715798, 609247262, 627078198, 644384851, 656940149, 674769020, &
-       &691546246, 708843664, 728240278, 740827290, 761792674, 774378660, &
-       &794298537, 810566827, 827330748, 844118208, 860896462, 877663453, &
-       &894452962, 911236339, 927994122, 944796942, 961568043, 975710530, &
-       &992490828,1012927833,1030230364,1046482272,1061703011,1080862070, &
-       &1095244191,1112823205,1129597370,1146370508,1162617306,1179130338,&
-       &1196709352,1213733373,1226836483,1245719045,1263802895,1279529493,&
-       &1298145817,1314396705,1331189287,1347695164,1364745800,1381251679,&
-       &1397772909,1413485185,1431841413,1447563919,1465918099,1481642651,&
-       &1497896607,1515199140,1530403498,1549273776,1563957938,1582829240,&
-       &1600654011,1613242045,1632387780,1649165012,1665678052,1682719474,&
-       &1699235586,1714429715,1733056282,1749821231,1763712824,1781017407,&
-       &1799625545,1814039375,1836598097,1850484577,1867269994,1884046203,&
-       &1900823435,1916018587,1933854626,1949310899,1967925178,1983910851,&
-       &2002265031,2017727439,2034246611,2051283931,2067290081,2082474998,&
-       &2100844536,2120232973/
+       592715798, 609247262, 627078198, 644384851, 656940149, 674769020, &
+       691546246, 708843664, 728240278, 740827290, 761792674, 774378660, &
+       794298537, 810566827, 827330748, 844118208, 860896462, 877663453, &
+       894452962, 911236339, 927994122, 944796942, 961568043, 975710530, &
+       992490828,1012927833,1030230364,1046482272,1061703011,1080862070, &
+       1095244191,1112823205,1129597370,1146370508,1162617306,1179130338,&
+       1196709352,1213733373,1226836483,1245719045,1263802895,1279529493,&
+       1298145817,1314396705,1331189287,1347695164,1364745800,1381251679,&
+       1397772909,1413485185,1431841413,1447563919,1465918099,1481642651,&
+       1497896607,1515199140,1530403498,1549273776,1563957938,1582829240,&
+       1600654011,1613242045,1632387780,1649165012,1665678052,1682719474,&
+       1699235586,1714429715,1733056282,1749821231,1763712824,1781017407,&
+       1799625545,1814039375,1836598097,1850484577,1867269994,1884046203,&
+       1900823435,1916018587,1933854626,1949310899,1967925178,1983910851,&
+       2002265031,2017727439,2034246611,2051283931,2067290081,2082474998,&
+       2100844536,2120232973/
   data (ichinf(j,2), j = 1,  95) /  541065217, 556276737, 574633992,&
-       &592715798, 609247262, 627078198, 644122707, 656940149, 674769020, &
-       &691546246, 708843664, 727978134, 740827290, 761530530, 774378660, &
-       &794298537, 810566827, 827330748, 844118208, 860896462, 877663453, &
-       &894452962, 911236339, 927994122, 944796942, 961568043, 975710530, &
-       &992490828,1012927833,1029968220,1046482272,1061703011,1080862070, &
-       &1095244191,1112823205,1129320890,1145575870,1162617284,1179667916,&
-       &1195643359,1213733347,1226836457,1263802859,1279791601,1298145781,&
-       &1314396669,1330659843,1347951123,1381249561,1397235237,1413485100,&
-       &1431852592,1447577157,1465401942,1481120358,1498963564,1515199107,&
-       &1530403465,1549273743,1563957905,1582829207,1600391834,1613242012,&
-       &1632918179,1649177273,1665675989,1682464481,1698711288,1717064457,&
-       &1733050141,1750091564,1764500285,1799897925,1816141653,1834240860,&
-       &1850225518,1868322682,1884826511,1917340569,1934641067,1951407036,&
-       &1967409090,1984970707,2002537442,2017487860,2035574798,2050774056,&
-       &2067289149,2082474066,2100843604,2120233065, 4 * 0/
+       592715798, 609247262, 627078198, 644122707, 656940149, 674769020, &
+       691546246, 708843664, 727978134, 740827290, 761530530, 774378660, &
+       794298537, 810566827, 827330748, 844118208, 860896462, 877663453, &
+       894452962, 911236339, 927994122, 944796942, 961568043, 975710530, &
+       992490828,1012927833,1029968220,1046482272,1061703011,1080862070, &
+       1095244191,1112823205,1129320890,1145575870,1162617284,1179667916,&
+       1195643359,1213733347,1226836457,1263802859,1279791601,1298145781,&
+       1314396669,1330659843,1347951123,1381249561,1397235237,1413485100,&
+       1431852592,1447577157,1465401942,1481120358,1498963564,1515199107,&
+       1530403465,1549273743,1563957905,1582829207,1600391834,1613242012,&
+       1632918179,1649177273,1665675989,1682464481,1698711288,1717064457,&
+       1733050141,1750091564,1764500285,1799897925,1816141653,1834240860,&
+       1850225518,1868322682,1884826511,1917340569,1934641067,1951407036,&
+       1967409090,1984970707,2002537442,2017487860,2035574798,2050774056,&
+       2067289149,2082474066,2100843604,2120233065, 4 * 0/
   data (ichcod(j,1), j = 1, 117) /   43336327,  42091009,1115702017,&
-       &1115816725,1117012498,1108361871,1125139089, 102057364,1158825232,&
-       &1167017488,1167132057,1111951513,1162281484,1225523590,1216742425,&
-       &1145308697,1178863762,1200899605,1142243988,1100104080,1108230797,&
-       &1133266570,1200179208,1216759939,1199654400,1140867713,1099106965,&
-       &1098908693,1158890769,1150239630,1116619152,1100104212,1125467157,&
-       &1158956691,1209223572,1251281031,1199982340,1191331840,1224755713,&
-       &1250118277,1233602695, 193743757,1259227790,1242384779,1216759683,&
-       &1182877056,1132479105,1107444100,1099317768,1116292621,1183729424,&
-       &1192380052,1167410324,1142047760,1150109066,1208174849,1241533184,&
-       &1266764674,  51724948,1108492816,1116685072,1116800409,1150763924,&
-       &1116750347,1107772034,1136805061,1170669977,1117209492,1150305547,&
-       &1158104194,1136804549,1103561749,1141440914,1183581842,1099695762,&
-       &1182794249,1258881793,1115701761,1115833089,1128350403,1111753225,&
-       &1258881666,1107378816,1124156034, 169427271,  76890900,1108427148,&
-       &1099514372,1124156544,1166034689,1208240265,1217153041,1192510869,&
-       &1150616337,1142048149,1166017040,1108427411,1125401621,1175799572,&
-       &1200834577,1208960909,1183465856,1216348821,1209353485,1183664012,&
-       &1208699016,1216759811,1191265664,1140867713,1107444100, 110444935,&
-       &1225197205,1182795669,1117078028,1116554254,1166952205,1208699016/
+       1115816725,1117012498,1108361871,1125139089, 102057364,1158825232,&
+       1167017488,1167132057,1111951513,1162281484,1225523590,1216742425,&
+       1145308697,1178863762,1200899605,1142243988,1100104080,1108230797,&
+       1133266570,1200179208,1216759939,1199654400,1140867713,1099106965,&
+       1098908693,1158890769,1150239630,1116619152,1100104212,1125467157,&
+       1158956691,1209223572,1251281031,1199982340,1191331840,1224755713,&
+       1250118277,1233602695, 193743757,1259227790,1242384779,1216759683,&
+       1182877056,1132479105,1107444100,1099317768,1116292621,1183729424,&
+       1192380052,1167410324,1142047760,1150109066,1208174849,1241533184,&
+       1266764674,  51724948,1108492816,1116685072,1116800409,1150763924,&
+       1116750347,1107772034,1136805061,1170669977,1117209492,1150305547,&
+       1158104194,1136804549,1103561749,1141440914,1183581842,1099695762,&
+       1182794249,1258881793,1115701761,1115833089,1128350403,1111753225,&
+       1258881666,1107378816,1124156034, 169427271,  76890900,1108427148,&
+       1099514372,1124156544,1166034689,1208240265,1217153041,1192510869,&
+       1150616337,1142048149,1166017040,1108427411,1125401621,1175799572,&
+       1200834577,1208960909,1183465856,1216348821,1209353485,1183664012,&
+       1208699016,1216759811,1191265664,1140867713,1107444100, 110444935,&
+       1225197205,1182795669,1117078028,1116554254,1166952205,1208699016/
   data (ichcod(j,1),j= 118, 234) / 1216759811,1191265664,1140867713,&
-       &1107444100, 135415700,1175799061,1133789841,1108099591,1115898753,&
-       &1157645696,1191266307,1216759943,1208633100,1166886157,1133265546,&
-       &1107757205,1132462485,1217725461,1117012498,1108361870,1133331852,&
-       &1191921673,1216825476,1208108929,1174422528,1115767298,1099186567,&
-       &1107903243,1150043789,1200506896,1209157524,1175798805, 135153547,&
-       &1183401224,1149780745,1108033934,1099907602,1125401749,1159022228,&
-       &1200769038,1208567684,1182876928,1140867713,1107493518,1108165260,&
-       &1124942478,  42091009,1115702017,1115816590,1108165260,1124942478,&
-       &50414208,1107378818,1124156225,1120092740, 168968713,1241514508,  &
-       &1259078150,1258684946,1242120704,  26231185,1108558484,1133856149,&
-       &1184122643,1200703375,1192052364,1149912199,  75645953,1149256961,&
-       &1149372685,1217349520,1175471375,1150174219,1141392518,1166362373,&
-       &1216760072, 152062214,1233472133,1267158026,1275874191,1259424275,&
-       &1226065813,1175798932,1133724305,1108296076,1099514374,1115964290,&
-       &1149322752,1199589633,1241664131,  76890240,  76892288,  34031367,&
-       &34947584,  34948757,1209288851,1225869583,1217218572,1183515147,  &
-       &1183533066,1216956679,1225017474,1208043136,1107298576,1217546132,&
-       &1184187541,1133789842,1108361613,1099448837,1115898753,1149257344,&
-       &1199655043,1225064981,1107296789,1167410964,1209157776,1225607432/
+       1107444100, 135415700,1175799061,1133789841,1108099591,1115898753,&
+       1157645696,1191266307,1216759943,1208633100,1166886157,1133265546,&
+       1107757205,1132462485,1217725461,1117012498,1108361870,1133331852,&
+       1191921673,1216825476,1208108929,1174422528,1115767298,1099186567,&
+       1107903243,1150043789,1200506896,1209157524,1175798805, 135153547,&
+       1183401224,1149780745,1108033934,1099907602,1125401749,1159022228,&
+       1200769038,1208567684,1182876928,1140867713,1107493518,1108165260,&
+       1124942478,  42091009,1115702017,1115816590,1108165260,1124942478,&
+       50414208,1107378818,1124156225,1120092740, 168968713,1241514508,  &
+       1259078150,1258684946,1242120704,  26231185,1108558484,1133856149,&
+       1184122643,1200703375,1192052364,1149912199,  75645953,1149256961,&
+       1149372685,1217349520,1175471375,1150174219,1141392518,1166362373,&
+       1216760072, 152062214,1233472133,1267158026,1275874191,1259424275,&
+       1226065813,1175798932,1133724305,1108296076,1099514374,1115964290,&
+       1149322752,1199589633,1241664131,  76890240,  76892288,  34031367,&
+       34947584,  34948757,1209288851,1225869583,1217218572,1183515147,  &
+       1183533066,1216956679,1225017474,1208043136,1107298576,1217546132,&
+       1184187541,1133789842,1108361613,1099448837,1115898753,1149257344,&
+       1199655043,1225064981,1107296789,1167410964,1209157776,1225607432/
   data (ichcod(j,1),j= 235, 351) / 1216694275,1191265664,1107296789,&
-       &1107296789,1217724939,1175126528,1216348693,1107296789,1217724939,&
-       &1175128336,1217546132,1184187541,1133789842,1108361613,1099448837,&
-       &1115898753,1149257344,1199655043,1225083144, 109594888,  34947584,&
-       &152389888,  34294027,  34947584, 102057477,1166165249,1140867840, &
-       &1107378562,1090863367,  34947584, 152388103,  76302592,  34947584,&
-       &33572864,  34947584,  34948608, 169166336, 169167360,  34947584,  &
-       &34949376, 152389888,  76891028,1116881424,1099776392,1107640963,  &
-       &1132545152,1182812033,1216563461,1233668493,1225803922,1200899733,&
-       &1150616085,1107296789,1184188436,1217612049,1225672844,1208698506,&
-       &1107952789,1133789842,1108361613,1099448837,1115898753,1149257344,&
-       &1199655043,1225083272,1233996048,1217546132,1184187541, 100944194,&
-       &34947584,  34948757,1209288851,1225869583,1217218572,1183531531,  &
-       &93014272, 143804308,1175798805,1117012370,1099973134,1116554124,  &
-       &1183467401,1208502406,1216563073,1174422528,1115767171,  68502528,&
-       &9783189,  34947590,1115898753,1157645824,1199655043,1225148693,   &
-       &9782400, 144000128,  18170752, 102056832, 102058112, 185944192,   &
-       &26560640, 143999360,   9782411,1149241493,1149962389,1098908053,  &
-       &1217724800,1216348697,1111949849,1167655495,1170669849,1246168345,&
-       &1162281369,1159266759,1162281351,1166821767,  37964611,  34554512/
+       1107296789,1217724939,1175126528,1216348693,1107296789,1217724939,&
+       1175128336,1217546132,1184187541,1133789842,1108361613,1099448837,&
+       1115898753,1149257344,1199655043,1225083144, 109594888,  34947584,&
+       152389888,  34294027,  34947584, 102057477,1166165249,1140867840, &
+       1107378562,1090863367,  34947584, 152388103,  76302592,  34947584,&
+       33572864,  34947584,  34948608, 169166336, 169167360,  34947584,  &
+       34949376, 152389888,  76891028,1116881424,1099776392,1107640963,  &
+       1132545152,1182812033,1216563461,1233668493,1225803922,1200899733,&
+       1150616085,1107296789,1184188436,1217612049,1225672844,1208698506,&
+       1107952789,1133789842,1108361613,1099448837,1115898753,1149257344,&
+       1199655043,1225083272,1233996048,1217546132,1184187541, 100944194,&
+       34947584,  34948757,1209288851,1225869583,1217218572,1183531531,  &
+       93014272, 143804308,1175798805,1117012370,1099973134,1116554124,  &
+       1183467401,1208502406,1216563073,1174422528,1115767171,  68502528,&
+       9783189,  34947590,1115898753,1157645824,1199655043,1225148693,   &
+       9782400, 144000128,  18170752, 102056832, 102058112, 185944192,   &
+       26560640, 143999360,   9782411,1149241493,1149962389,1098908053,  &
+       1217724800,1216348697,1111949849,1167655495,1170669849,1246168345,&
+       1162281369,1159266759,1162281351,1166821767,  37964611,  34554512/
   data (ichcod(j,1),j= 352, 468) / 1125270292,1117078036,1116931982,&
-       &1199572875,1183663502,1141785357,1108033928,1099317763,1124156416,&
-       &1166034561,1199768085,1107296779,1124942862,1166952077,1200310280,&
-       &1208371075,1182877056,1140867841,1107494795,1183663502,1141785357,&
-       &1108033928,1099317763,1124156416,1166034561,1199769493,1199572875,&
-       &1183663502,1141785357,1108033928,1099317763,1124156416,1166034561,&
-       &1199767944,1200113546,1191986829,1166951438,1124942347,1099448710,&
-       &1107510017,1140868480,1182877571,  85279765,1125401233,1115685134,&
-       &1150158734,1203914565,1187399111,1145520966, 126568077,1166951438,&
-       &1124942347,1099448710,1107510017,1140868480,1182877571,  34947584,&
-       &34227085,1150174734,1192052618,1199571349,1108624021,1108754837,  &
-       &34488832,  43336468,1133855510,1117061902,1128481478,1103577287,  &
-       &34947584, 118374916,  67651456,  34947584,  34488832,  34227085,  &
-       &1150174734,1192052618,1199572874,1225607694,1267616909,1292520704,&
-       &34488832,  34227085,1150174734,1192052618,1199571982,1124942347,  &
-       &1099448710,1107510017,1140868480,1182877571,1208371208,1200309901,&
-       &1166951438,  34488903,  34292493,1141785998,1183664011,1208502278,&
-       &1199785601,1166033920,1124155907, 126764999, 126568077,1166951438,&
-       &1124942347,1099448710,1107510017,1140868480,1182877571,  34488832,&
-       &34095755,1133331598,1175324427,1183663374,1133396493,1099645449/
+       1199572875,1183663502,1141785357,1108033928,1099317763,1124156416,&
+       1166034561,1199768085,1107296779,1124942862,1166952077,1200310280,&
+       1208371075,1182877056,1140867841,1107494795,1183663502,1141785357,&
+       1108033928,1099317763,1124156416,1166034561,1199769493,1199572875,&
+       1183663502,1141785357,1108033928,1099317763,1124156416,1166034561,&
+       1199767944,1200113546,1191986829,1166951438,1124942347,1099448710,&
+       1107510017,1140868480,1182877571,  85279765,1125401233,1115685134,&
+       1150158734,1203914565,1187399111,1145520966, 126568077,1166951438,&
+       1124942347,1099448710,1107510017,1140868480,1182877571,  34947584,&
+       34227085,1150174734,1192052618,1199571349,1108624021,1108754837,  &
+       34488832,  43336468,1133855510,1117061902,1128481478,1103577287,  &
+       34947584, 118374916,  67651456,  34947584,  34488832,  34227085,  &
+       1150174734,1192052618,1199572874,1225607694,1267616909,1292520704,&
+       34488832,  34227085,1150174734,1192052618,1199571982,1124942347,  &
+       1099448710,1107510017,1140868480,1182877571,1208371208,1200309901,&
+       1166951438,  34488903,  34292493,1141785998,1183664011,1208502278,&
+       1199785601,1166033920,1124155907, 126764999, 126568077,1166951438,&
+       1124942347,1099448710,1107510017,1140868480,1182877571,  34488832,&
+       34095755,1133331598,1175324427,1183663374,1133396493,1099645449/
   data (ichcod(j,1),j= 469, 585) / 1124615559,1183205124,1191396993,&
-       &1157645184,1107378563,  43336324,1124156416,1157628174,1150157326,&
-       &1107575425,1132479744,1174488964, 126764928,  17712128, 118375424,&
-       &26100608,  93209472,  93210496, 160319360,  26101504, 118374784,  &
-       &17712128, 118375424,1128546886,1095188679, 118374784,  26101518,  &
-       &25184000,  77153176,1125597845,1116947217,1133528078,1141654282,  &
-       &1107903240,1141261316,1132610305,1119961795,1128612806,1153892889,&
-       &1111949977,1134052375,1150633107,1141982096,1125008140,1141523721,&
-       &1141392134,1124352898,1140933825,1153647685,1137066695,  25575816,&
-       &1108034316,1141654795,1191659526,1225148935,1250577036,  76891028,&
-       &1116881424,1099776392,1107640963,1132545152,1182812033,1216563461,&
-       &1233668493,1225803922,1200899733,1150615746,1251410569,1191772427,&
-       &1267400966,1267073296,1267728644,1266942219,1267400978,1267859723,&
-       &1108165390,1166952077,1200310144, 126437128,1174881160,1116225926,&
-       &1090797827,1098990208,1174423297,1199702549,1107378816,1132463633,&
-       &1175602580,1150632853,1117012498,1108361870,1133266187,1175012999,&
-       &1183139331,1157694221,1108033929,1099383301,1124287618,1166034498,&
-       &1178879430,1153909703,1120289348,1111688341,1082131605,1216348679,&
-       &1191641368,1100431896,1100562712, 119031703,1209550745,1192756373,&
-       &1133789842,1108361613,1099448837,1115898753,1149257344,1199655043/
+       1157645184,1107378563,  43336324,1124156416,1157628174,1150157326,&
+       1107575425,1132479744,1174488964, 126764928,  17712128, 118375424,&
+       26100608,  93209472,  93210496, 160319360,  26101504, 118374784,  &
+       17712128, 118375424,1128546886,1095188679, 118374784,  26101518,  &
+       25184000,  77153176,1125597845,1116947217,1133528078,1141654282,  &
+       1107903240,1141261316,1132610305,1119961795,1128612806,1153892889,&
+       1111949977,1134052375,1150633107,1141982096,1125008140,1141523721,&
+       1141392134,1124352898,1140933825,1153647685,1137066695,  25575816,&
+       1108034316,1141654795,1191659526,1225148935,1250577036,  76891028,&
+       1116881424,1099776392,1107640963,1132545152,1182812033,1216563461,&
+       1233668493,1225803922,1200899733,1150615746,1251410569,1191772427,&
+       1267400966,1267073296,1267728644,1266942219,1267400978,1267859723,&
+       1108165390,1166952077,1200310144, 126437128,1174881160,1116225926,&
+       1090797827,1098990208,1174423297,1199702549,1107378816,1132463633,&
+       1175602580,1150632853,1117012498,1108361870,1133266187,1175012999,&
+       1183139331,1157694221,1108033929,1099383301,1124287618,1166034498,&
+       1178879430,1153909703,1120289348,1111688341,1082131605,1216348679,&
+       1191641368,1100431896,1100562712, 119031703,1209550745,1192756373,&
+       1133789842,1108361613,1099448837,1115898753,1149257344,1199655043/
   data (ichcod(j,1),j= 586, 652) / 1225083272,1233996048,1217546132,&
-       &1184187541,  35144343,1125663385,1108871192,1217874200,1218005016,&
-       &34947590,1115898753,1157645824,1199655043,1225148693,  43533079,  &
-       &1134052121,1117259672,1209485464,1209616280, 126764928, 126568077,&
-       &1166951438,1124942347,1099448710,1107510017,1140868480,1182877571,&
-       &34947732,1125466774,1108674069,1184122645,1184253461,  68043533,  &
-       &1108033928,1099317763,1124156416,1166034561,1199785990,1208502155,&
-       &1183663502,1141768725,1117012757,1117143573, 110446356,1200965398,&
-       &1184170510,1107575425,1132479744,1174488964, 126764928,  43336468,&
-       &1133855510,1117062677,1184122645,1184253461,  60113556,1108427264,&
-       &60114069,1167345170,1175471502,1150092173,1166886540,1200244743,  &
-       &1208371075,1182877056,1149256449,1115881472/
+       1184187541,  35144343,1125663385,1108871192,1217874200,1218005016,&
+       34947590,1115898753,1157645824,1199655043,1225148693,  43533079,  &
+       1134052121,1117259672,1209485464,1209616280, 126764928, 126568077,&
+       1166951438,1124942347,1099448710,1107510017,1140868480,1182877571,&
+       34947732,1125466774,1108674069,1184122645,1184253461,  68043533,  &
+       1108033928,1099317763,1124156416,1166034561,1199785990,1208502155,&
+       1183663502,1141768725,1117012757,1117143573, 110446356,1200965398,&
+       1184170510,1107575425,1132479744,1174488964, 126764928,  43336468,&
+       1133855510,1117062677,1184122645,1184253461,  60113556,1108427264,&
+       60114069,1167345170,1175471502,1150092173,1166886540,1200244743,  &
+       1208371075,1182877056,1149256449,1115881472/
   data (ichcod(j,2),j=   1, 117) /   43336327,  42091009,1115702017,&
-       &1115816725,1117012498,1108361871,1125139089, 102057364,1158825232,&
-       &1167017488,1167132057,1111951513,1162281484,1225523590,1216742425,&
-       &1145308697,1178863762,1200899605,1142243988,1100104080,1108230797,&
-       &1133266570,1200179208,1216759939,1199654400,1140867713,1099106965,&
-       &1098908693,1158890769,1150239630,1116619152,1100104212,1125467157,&
-       &1158956691,1209223572,1251281031,1199982340,1191331840,1224755713,&
-       &1250118277,1233602695, 193743757,1259227790,1242384779,1216759683,&
-       &1182877056,1132479105,1107444100,1099317768,1116292621,1183729424,&
-       &1192380052,1167410324,1142047760,1150109066,1208174849,1241533184,&
-       &1266764674,  51724948,1108492816,1116685072,1116800409,1150763924,&
-       &1116750347,1107772034,1136805061,1170669977,1117209492,1150305547,&
-       &1158104194,1136804549,1103561749,1141440914,1183581842,1099695762,&
-       &1182794249,1258881793,1115701761,1115833089,1128350403,1111753225,&
-       &1258881666,1107378816,1124156034, 169427271,  76890900,1108427148,&
-       &1099514372,1124156544,1166034689,1208240265,1217153041,1192510869,&
-       &1150616337,1142048149,1166017040,1108427411,1125401621,1175799572,&
-       &1200834577,1208960909,1183465856,1216348821,1209353485,1183664012,&
-       &1208699016,1216759811,1191265664,1140867713,1107444100, 110444935,&
-       &1225197205,1182795669,1117078028,1116554254,1166952205,1208699016/
+       1115816725,1117012498,1108361871,1125139089, 102057364,1158825232,&
+       1167017488,1167132057,1111951513,1162281484,1225523590,1216742425,&
+       1145308697,1178863762,1200899605,1142243988,1100104080,1108230797,&
+       1133266570,1200179208,1216759939,1199654400,1140867713,1099106965,&
+       1098908693,1158890769,1150239630,1116619152,1100104212,1125467157,&
+       1158956691,1209223572,1251281031,1199982340,1191331840,1224755713,&
+       1250118277,1233602695, 193743757,1259227790,1242384779,1216759683,&
+       1182877056,1132479105,1107444100,1099317768,1116292621,1183729424,&
+       1192380052,1167410324,1142047760,1150109066,1208174849,1241533184,&
+       1266764674,  51724948,1108492816,1116685072,1116800409,1150763924,&
+       1116750347,1107772034,1136805061,1170669977,1117209492,1150305547,&
+       1158104194,1136804549,1103561749,1141440914,1183581842,1099695762,&
+       1182794249,1258881793,1115701761,1115833089,1128350403,1111753225,&
+       1258881666,1107378816,1124156034, 169427271,  76890900,1108427148,&
+       1099514372,1124156544,1166034689,1208240265,1217153041,1192510869,&
+       1150616337,1142048149,1166017040,1108427411,1125401621,1175799572,&
+       1200834577,1208960909,1183465856,1216348821,1209353485,1183664012,&
+       1208699016,1216759811,1191265664,1140867713,1107444100, 110444935,&
+       1225197205,1182795669,1117078028,1116554254,1166952205,1208699016/
   data (ichcod(j,2),j= 118, 234) / 1216759811,1191265664,1140867713,&
-       &1107444100, 135415700,1175799061,1133789841,1108099591,1115898753,&
-       &1157645696,1191266307,1216759943,1208633100,1166886157,1133265546,&
-       &1107757205,1132462485,1217725461,1117012498,1108361870,1133331852,&
-       &1191921673,1216825476,1208108929,1174422528,1115767298,1099186567,&
-       &1107903243,1150043789,1200506896,1209157524,1175798805, 135153547,&
-       &1183401224,1149780745,1108033934,1099907602,1125401749,1159022228,&
-       &1200769038,1208567684,1182876928,1140867713,1107493518,1108165260,&
-       &1124942478,  42091009,1115702017,1115816590,1108165260,1124942478,&
-       &50414208,1107378818,1124156225,1120092740, 168968713,1241514508,  &
-       &1259078150,1258684946,1242120704,  26231185,1108558484,1133856149,&
-       &1184122643,1200703375,1192052364,1149912199,  75645953,1149256961,&
-       &1149372685,1217349520,1175471375,1150174219,1141392518,1166362373,&
-       &1216760072, 152062214,1233472133,1267158026,1275874191,1259424275,&
-       &1226065813,1175798932,1133724305,1108296076,1099514374,1115964290,&
-       &1149322752,1199589633,1241664131,  76890240,  76892288,  34031367,&
-       &34947584,  34948757,1209288851,1225869583,1217218572,1183515147,  &
-       &1183533066,1216956679,1225017474,1208043136,1107296661,1216348544,&
-       &1217725589,1082131605,1216348288,1216348693,1107296789,1217724939,&
-       &1175126528,1216349461,1157628944,1116684814,1099710857,1107772038/
+       1107444100, 135415700,1175799061,1133789841,1108099591,1115898753,&
+       1157645696,1191266307,1216759943,1208633100,1166886157,1133265546,&
+       1107757205,1132462485,1217725461,1117012498,1108361870,1133331852,&
+       1191921673,1216825476,1208108929,1174422528,1115767298,1099186567,&
+       1107903243,1150043789,1200506896,1209157524,1175798805, 135153547,&
+       1183401224,1149780745,1108033934,1099907602,1125401749,1159022228,&
+       1200769038,1208567684,1182876928,1140867713,1107493518,1108165260,&
+       1124942478,  42091009,1115702017,1115816590,1108165260,1124942478,&
+       50414208,1107378818,1124156225,1120092740, 168968713,1241514508,  &
+       1259078150,1258684946,1242120704,  26231185,1108558484,1133856149,&
+       1184122643,1200703375,1192052364,1149912199,  75645953,1149256961,&
+       1149372685,1217349520,1175471375,1150174219,1141392518,1166362373,&
+       1216760072, 152062214,1233472133,1267158026,1275874191,1259424275,&
+       1226065813,1175798932,1133724305,1108296076,1099514374,1115964290,&
+       1149322752,1199589633,1241664131,  76890240,  76892288,  34031367,&
+       34947584,  34948757,1209288851,1225869583,1217218572,1183515147,  &
+       1183533066,1216956679,1225017474,1208043136,1107296661,1216348544,&
+       1217725589,1082131605,1216348288,1216348693,1107296789,1217724939,&
+       1175126528,1216349461,1157628944,1116684814,1099710857,1107772038/
   data (ichcod(j,2),j= 235, 351) / 1141196293,1199982599,1216956556,&
-       &1208895375,1175471120,  34947584,  34949141,  34947584, 152389888,&
-       &34294027,  34947584,  34947584, 152388103,  76302592,  76890240,  &
-       &76892288,  34947584,  34948608, 169166336, 169167360,  34947584,  &
-       &34949376, 152389888,  25183104,1107771787,1099907602,1125401749,  &
-       &1167410964,1209157775,1217087495,1182812288,  34947584, 152389888,&
-       &34949397,  34947584,  34948757,1209288851,1225869582,1217153035,  &
-       &1183465994,  18171019,1090519317,1209336064,1207960597,1140850837,&
-       &1200948373,1133789842,1108361613,1099448837,1115898753,1149257344,&
-       &1199655043,1225083272,1233996048,1217546132,1184187541,  17842450,&
-       &1100235285,1125467028,1142047886,1149241360,1209157524,1192576533,&
-       &1167344914,1150158229,1166016783,1099907598,1116357384,1132938502,&
-       &1174816647,1208502410,1225673103,1242497301,1209336587,1175126272,&
-       &1207960725,1133789842,1108361613,1099448837,1115898753,1149257344,&
-       &1199655043,1225083272,1233996048,1217546132,1184187541,  67847947,&
-       &143999360,  26560661,  25184384,  35209799,  35210649,  38225351, &
-       &18434631,  85542215,  26821913,  29836615,  25642380,1233584707,  &
-       &1262682639,1116750610,1125401237,1108624019,  76432269,1116422665,&
-       &1099317635,1107378944,1140868353,1183074183,1217087758,  76432782,&
-       &1175275147,1199785985,1216366848, 102057236,1142047502,1116422663/
+       1208895375,1175471120,  34947584,  34949141,  34947584, 152389888,&
+       34294027,  34947584,  34947584, 152388103,  76302592,  76890240,  &
+       76892288,  34947584,  34948608, 169166336, 169167360,  34947584,  &
+       34949376, 152389888,  25183104,1107771787,1099907602,1125401749,  &
+       1167410964,1209157775,1217087495,1182812288,  34947584, 152389888,&
+       34949397,  34947584,  34948757,1209288851,1225869582,1217153035,  &
+       1183465994,  18171019,1090519317,1209336064,1207960597,1140850837,&
+       1200948373,1133789842,1108361613,1099448837,1115898753,1149257344,&
+       1199655043,1225083272,1233996048,1217546132,1184187541,  17842450,&
+       1100235285,1125467028,1142047886,1149241360,1209157524,1192576533,&
+       1167344914,1150158229,1166016783,1099907598,1116357384,1132938502,&
+       1174816647,1208502410,1225673103,1242497301,1209336587,1175126272,&
+       1207960725,1133789842,1108361613,1099448837,1115898753,1149257344,&
+       1199655043,1225083272,1233996048,1217546132,1184187541,  67847947,&
+       143999360,  26560661,  25184384,  35209799,  35210649,  38225351, &
+       18434631,  85542215,  26821913,  29836615,  25642380,1233584707,  &
+       1262682639,1116750610,1125401237,1108624019,  76432269,1116422665,&
+       1099317635,1107378944,1140868353,1183074183,1217087758,  76432782,&
+       1175275147,1199785985,1216366848, 102057236,1142047502,1116422663/
   data (ichcod(j,2),j= 352, 468) / 1098989895, 102057749,1209223184,&
-       &1200506637,1175209100,  76301707,1183401735,1191462530,1174488320,&
-       &1140867841,1115832837,  17711630,1124877893,1195853895, 143542284,&
-       &1191789122,1095057607,  93209614,1124942347,1099448709,1107444353,&
-       &1132479616,1166100099,1191593737,1183597966,1150305298,1142178965,&
-       &1167410836,1200752268,1175274766,1133396621,1116422921,1149764744,&
-       &1116160389,1099121153,1124091008,1166100099,  67977996,1107968391,&
-       &1099186690,1115767680,1157645953,1208174854,1233734028,1217283982,&
-       &1183597960,1149453127,   9126285,1116619534,1141720204,1158235397,&
-       &1149241486,1208698761,1149256644,1128726666,1091322382,1125008269,&
-       &1133200135,1107297031,1141589261,1175340814,1208764425,1199851079,&
-       &51266055,1099121025,1107313408,1140999300,  51265792, 135088014,  &
-       &1192117773,1141457672,1116209800,1132938246,1157711232,1174423169,&
-       &9781653,1117012755,1191183374,1090519950,1086784266,1116029570,   &
-       &1132479616,1166100099,1200031886,1200047875,1191266176,1216366978,&
-       &1241776526,1125008008,1107509632, 135153547,1191790086,1149453057,&
-       &1098908686,1124942346,1099383172,1107378816,1132479617,1166280200,&
-       &1166296577,1182812032,1216432516,1241991690,1233996046,  76432000,&
-       &118376328,1208174720,  17515021,1133398542,  34095621,1115833089, &
-       &1140868352,1174488835,1199982473,1191986829,1166951566,1133331083/
+       1200506637,1175209100,  76301707,1183401735,1191462530,1174488320,&
+       1140867841,1115832837,  17711630,1124877893,1195853895, 143542284,&
+       1191789122,1095057607,  93209614,1124942347,1099448709,1107444353,&
+       1132479616,1166100099,1191593737,1183597966,1150305298,1142178965,&
+       1167410836,1200752268,1175274766,1133396621,1116422921,1149764744,&
+       1116160389,1099121153,1124091008,1166100099,  67977996,1107968391,&
+       1099186690,1115767680,1157645953,1208174854,1233734028,1217283982,&
+       1183597960,1149453127,   9126285,1116619534,1141720204,1158235397,&
+       1149241486,1208698761,1149256644,1128726666,1091322382,1125008269,&
+       1133200135,1107297031,1141589261,1175340814,1208764425,1199851079,&
+       51266055,1099121025,1107313408,1140999300,  51265792, 135088014,  &
+       1192117773,1141457672,1116209800,1132938246,1157711232,1174423169,&
+       9781653,1117012755,1191183374,1090519950,1086784266,1116029570,   &
+       1132479616,1166100099,1200031886,1200047875,1191266176,1216366978,&
+       1241776526,1125008008,1107509632, 135153547,1191790086,1149453057,&
+       1098908686,1124942346,1099383172,1107378816,1132479617,1166280200,&
+       1166296577,1182812032,1216432516,1241991690,1233996046,  76432000,&
+       118376328,1208174720,  17515021,1133398542,  34095621,1115833089, &
+       1140868352,1174488835,1199982473,1191986829,1166951566,1133331083/
   data (ichcod(j,2),j= 469, 570) / 1107836999, 151929870,1124942347,&
-       &1099448709,1107444353,1132479616,1166100099,1191593737,1183598093,&
-       &1158546830,1140850955,1108165518,1225655310,1124942347,1099448709,&
-       &1107444353,1132479616,1166100099,1191593737,1183598093,1158562830,&
-       &9060620,1108230926,1133331339,1116029570,1132479616,1174488835,   &
-       &1208436875,1217267733,1145503882,1091322382,1125008269,1133200134,&
-       &1124287361,1149257088,1191266307,1225148939,1250821397,1142178707,&
-       &1133659153,1167083280,  93340687,1125008012,1116357512,1158104583,&
-       &84361990,1107640707,1098990273,1153647940,1162232903,1128726666,  &
-       &1091322382,1125008269,1133200134,1124287361,1140868352,1174488836,&
-       &1199982601,1217284241,1209288469,1175799187,1167148558,1191921673,&
-       &1233585429,1142178707,1133659153,1167083280, 118506766,1133265417,&
-       &1099317636,1107444480,1153582404,1162233031,1137132357,  77153176,&
-       &1125597845,1116947217,1133528078,1141654282,1107903240,1141261316,&
-       &1132610305,1119961795,1128612806,1153892889,1111949977,1134052375,&
-       &1150633107,1141982096,1125008140,1141523721,1141392134,1124352898,&
-       &1140933825,1153647685,1137066695,  25575816,1108034316,1141654795,&
-       &1191659526,1225148935,1250577036/
+       1099448709,1107444353,1132479616,1166100099,1191593737,1183598093,&
+       1158546830,1140850955,1108165518,1225655310,1124942347,1099448709,&
+       1107444353,1132479616,1166100099,1191593737,1183598093,1158562830,&
+       9060620,1108230926,1133331339,1116029570,1132479616,1174488835,   &
+       1208436875,1217267733,1145503882,1091322382,1125008269,1133200134,&
+       1124287361,1149257088,1191266307,1225148939,1250821397,1142178707,&
+       1133659153,1167083280,  93340687,1125008012,1116357512,1158104583,&
+       84361990,1107640707,1098990273,1153647940,1162232903,1128726666,  &
+       1091322382,1125008269,1133200134,1124287361,1140868352,1174488836,&
+       1199982601,1217284241,1209288469,1175799187,1167148558,1191921673,&
+       1233585429,1142178707,1133659153,1167083280, 118506766,1133265417,&
+       1099317636,1107444480,1153582404,1162233031,1137132357,  77153176,&
+       1125597845,1116947217,1133528078,1141654282,1107903240,1141261316,&
+       1132610305,1119961795,1128612806,1153892889,1111949977,1134052375,&
+       1150633107,1141982096,1125008140,1141523721,1141392134,1124352898,&
+       1140933825,1153647685,1137066695,  25575816,1108034316,1141654795,&
+       1191659526,1225148935,1250577036/
   data (ichcod(j,2),j= 571,652) / 82 * 0 /
 
   chstr(1)(61:61) = '\\'
@@ -2514,7 +1954,7 @@ subroutine gxfchr(imode, ch, ifont, width, np, ipen, x, y, ierr)
      endif
   endif
 999 end subroutine gxfchr
-character*60 function gxform(string)
+character(60) function gxform(string)
   implicit none
   integer i,ipt,kmant,l,n
   !
@@ -2596,9 +2036,9 @@ character*60 function gxform(string)
            if(stemp.eq.'.') then
               !--- could be floating, or logical
               if(index(string(i:),'.T.').eq.1.or.                       &
-                   &index(string(i:),'.F.').eq.1.or.                                  &
-                   &index(string(i:),'.TRUE.').eq.1.or.                               &
-                   &index(string(i:),'.FALSE.').eq.1) then
+                   index(string(i:),'.F.').eq.1.or.                                  &
+                   index(string(i:),'.TRUE.').eq.1.or.                               &
+                   index(string(i:),'.FALSE.').eq.1) then
 
                  sfchar='L'
               elseif(index('0123456789',string(i+1:i+1)).ne.0) then
@@ -2630,10 +2070,10 @@ character*60 function gxform(string)
   if(ipt.ge.4)  form(ipt:ipt)=')'
 20 gxform=form
 end function gxform
-subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
-     &window,ierr)
+subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,window,ierr)
+  use gxx11_common
   implicit none
-  integer i,iaxr,iayr,ierr,ix,j,jc,kset,ncurv
+  integer i,iaxr,iayr,ierr,j,jc,kset,ncurv
   real axpos,d,fx,fy
   !***********************************************************************
   !
@@ -2665,56 +2105,11 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*),ipxval(*),ipyval(*),icvref(*)
   real xval(*),yval(*),window(4,*)
   integer ixax(mxaxs),iyax(myaxs),ixaref(maxset),iyaref(maxset),    &
-       &ilpar(30)
+       ilpar(30)
   real wn(4)
   !
   do i=1,30
@@ -2745,10 +2140,10 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   enddo
   !--- get all window values for x
   call gxprwn(1,ncurv,icvref,nptval,ipxval,ipxval,xval,xval,        &
-       &mxaxs,ixaref,ixapar,rangex,axwndx)
+       mxaxs,ixaref,ixapar,rangex,axwndx)
   !--- get all window values for y
   call gxprwn(2,ncurv,icvref,nptval,ipxval,ipyval,xval,yval,        &
-       &myaxs,iyaref,iyapar,rangey,axwndy)
+       myaxs,iyaref,iyapar,rangey,axwndy)
   !--- get the window in NDC into which the plot has to fit, depending on
   !   axis positions, labels, tick marks, etc.
   call gxmarg(ixaref,iyaref,axwndx,axwndy,actwnd)
@@ -2762,19 +2157,18 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   fx=1./(actwnd(2)-actwnd(1))
   fy=1./(actwnd(4)-actwnd(3))
   !--- loop over curve sets, plot axes
-  ix=0
   do kset=1,maxset
      iaxr=ixaref(kset)
      if(iaxr.eq.0) goto 100
      !--- get window according to margin
      wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
      wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
-          &(1,kset))*fx
+          (1,kset))*fx
      wn(3)=(actwnd(4)*axwndy(1,kset)-actwnd(3)*axwndy(2,kset))*fy
      wn(4)=((1.-actwnd(3))*axwndy(2,kset)- (1.-actwnd(4))*axwndy     &
-          &(1,kset))*fy
+          (1,kset))*fy
      call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
-     call jselnt(inormt)
+     !     call jselnt(inormt)
      !--- keep
      do j=1,4
         window(j,kset)=wn(j)
@@ -2796,7 +2190,7 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
               enddo
               ilpar(2)=ixapar(19,i)
               call gxaxis('X',axwndx(1,kset), axwndx(2,kset),axpos,     &
-                   &1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
+                   1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
               if(ierr.ne.0) goto 999
            endif
         endif
@@ -2820,7 +2214,7 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
-                   &1,syform(i), sytext(i),sdefnl,ilpar,ierr)
+                   1,syform(i), sytext(i),sdefnl,ilpar,ierr)
 
               if(ierr.ne.0) goto 999
            endif
@@ -2829,10 +2223,10 @@ subroutine gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
 100  continue
   enddo
 999 end subroutine gxfram
-subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
-     &window,actwin,ierr)
+subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,window,actwin,ierr)
+  use gxx11_common
   implicit none
-  integer i,iaxr,iayr,ierr,ix,j,jc,kset,ncurv
+  integer i,iaxr,iayr,ierr,j,jc,kset,ncurv
   !***********************************************************************
   !
   !   Purpose: plots one frame with several axes, returns GKS and active
@@ -2866,56 +2260,11 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*),ipxval(*),ipyval(*),icvref(*)
   real xval(*),yval(*),window(4,*),actwin(4,*)
   integer ixax(mxaxs),iyax(myaxs),ixaref(maxset),iyaref(maxset),    &
-       &ilpar(30)
+       ilpar(30)
   real wn(4),axpos,d,fx,fy
   !
   do i=1,30
@@ -2946,10 +2295,10 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   enddo
   !--- get all window values for x
   call gxprwn(1,ncurv,icvref,nptval,ipxval,ipxval,xval,xval,        &
-       &mxaxs,ixaref,ixapar,rangex,axwndx)
+       mxaxs,ixaref,ixapar,rangex,axwndx)
   !--- get all window values for y
   call gxprwn(2,ncurv,icvref,nptval,ipxval,ipyval,xval,yval,        &
-       &myaxs,iyaref,iyapar,rangey,axwndy)
+       myaxs,iyaref,iyapar,rangey,axwndy)
   !--- get the window in NDC into which the plot has to fit, depending on
   !   axis positions, labels, tick marks, etc.
   call gxmarg(ixaref,iyaref,axwndx,axwndy,actwnd)
@@ -2963,19 +2312,18 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   fx=1./(actwnd(2)-actwnd(1))
   fy=1./(actwnd(4)-actwnd(3))
   !--- loop over curve sets, plot axes
-  ix=0
   do kset=1,maxset
      iaxr=ixaref(kset)
      if(iaxr.eq.0) goto 100
      !--- get window according to margin
      wn(1)=(actwnd(2)*axwndx(1,kset)-actwnd(1)*axwndx(2,kset))*fx
      wn(2)=((1.-actwnd(1))*axwndx(2,kset)- (1.-actwnd(2))*axwndx     &
-          &(1,kset))*fx
+          (1,kset))*fx
      wn(3)=(actwnd(4)*axwndy(1,kset)-actwnd(3)*axwndy(2,kset))*fy
      wn(4)=((1.-actwnd(3))*axwndy(2,kset)- (1.-actwnd(4))*axwndy     &
-          &(1,kset))*fy
+          (1,kset))*fy
      call jswn(inormt,wn(1),wn(2),wn(3),wn(4))
-     call jselnt(inormt)
+     !     call jselnt(inormt)
      !--- keep
      do j=1,4
         window(j,kset)=wn(j)
@@ -3002,7 +2350,7 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
               enddo
               ilpar(2)=ixapar(19,i)
               call gxaxis('X',axwndx(1,kset), axwndx(2,kset),axpos,     &
-                   &1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
+                   1,sxform(i),sxtext(i),sdefnl,ilpar,ierr)
               if(ierr.ne.0) goto 999
            endif
         endif
@@ -3026,7 +2374,7 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
               enddo
               ilpar(2)=iyapar(19,i)
               call gxaxis('Y',axwndy(1,kset),axwndy(2,kset), axpos,     &
-                   &1,syform(i), sytext(i),sdefnl,ilpar,ierr)
+                   1,syform(i), sytext(i),sdefnl,ilpar,ierr)
 
               if(ierr.ne.0) goto 999
            endif
@@ -3036,6 +2384,7 @@ subroutine gxfrm1(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   enddo
 999 end subroutine gxfrm1
 subroutine gxinit
+  use gxx11_common
   implicit none
   integer ierr
   !***********************************************************************
@@ -3054,70 +2403,7 @@ subroutine gxinit
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   if (ltotin .ne. lundef)  then
      print '(/'' GXPLOT-X11 '',F5.2,'' initialized''/)',versio
   endif
@@ -3199,7 +2485,7 @@ subroutine gxinit
   !--- set flag that GXINIT has been called
   ltotin=lundef
 10000 format(//' GKS error number =',i4,' returned for terminal',       &
-       &' device =',i8,'  STOP')
+       ' device =',i8,'  STOP')
 end subroutine gxinit
 subroutine gxival(string,ivalex)
   implicit none
@@ -3217,7 +2503,7 @@ subroutine gxival(string,ivalex)
   !                                           last mod: Sept. 8, 1987
   !
   !***********************************************************************
-  character *(*) string
+  character(*) string
   character snumer*10
   save snumer
   data snumer/'0123456789'/
@@ -3234,11 +2520,12 @@ subroutine gxival(string,ivalex)
   enddo
 999 end subroutine gxival
 subroutine gxmarg(ixref,iyref,wnx,wny,active)
+  use gxx11_common
   implicit none
   integer i,iax,iaxr,ifirst,ilast,ind,intv,iscal,ival,j,k,kset,nax, &
-       &nchct,nint,nref
+       nchct,nint,nref
   real add,ahi,alo,fact,gap,gapt,hgap,hgapt,hwid,hwidt,txf,vgap,    &
-       &vgapt,vwid,vwidt,xf
+       vgapt,vwid,vwidt,xf
   !***********************************************************************
   !
   !   Purpose: calculates window margins from axes specifications
@@ -3255,52 +2542,7 @@ subroutine gxmarg(ixref,iyref,wnx,wny,active)
   !                                           last mod: March 3, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer ixref(*),iyref(*)
   real wnx(2,*),wny(2,*)
   real active(4),bmin(2)
@@ -3392,10 +2634,10 @@ subroutine gxmarg(ixref,iyref,wnx,wny,active)
                  if(ival.eq.0) then
                     if(iax.eq.1)  then
                        call gxscal(wnx(1,kset),wnx(2,kset),alo,ahi,        &
-                            &nint)
+                            nint)
                     else
                        call gxscal(wny(1,kset),wny(2,kset),alo,ahi,        &
-                            &nint)
+                            nint)
                     endif
                     intv = iapar(2)
                     if (intv .le. 0)  call gxdint(alo,ahi,intv)
@@ -3431,7 +2673,7 @@ subroutine gxmarg(ixref,iyref,wnx,wny,active)
            !--- text - always parallel to axis
            call gxpnbl(text,ifirst,ilast)
            if(iapar(6).ne.0.and.mod(iapar(6),2).eq.ind                 &
-                &.and.ifirst.ne.0)  then
+                .and.ifirst.ne.0)  then
               !--- add space for one line and extra space for each line separator
               call gxchct(text(ifirst:ilast),sdefnl,nchct)
               if(iax.eq.1) then
@@ -3459,6 +2701,7 @@ subroutine gxmarg(ixref,iyref,wnx,wny,active)
   enddo
 999 end subroutine gxmarg
 subroutine gxopen
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -3468,52 +2711,7 @@ subroutine gxopen
   !                                           last mod: Feb. 26, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   call gxundf
   if(lacttm.ne.lundef)  then
      if(interm.gt.0)  then
@@ -3525,6 +2723,7 @@ subroutine gxopen
   endif
 end subroutine gxopen
 subroutine gxopps(iun, ityp)
+  use gxx11_common
   implicit none
   integer imun,ityp,iun
   !***********************************************************************
@@ -3540,57 +2739,12 @@ subroutine gxopps(iun, ityp)
   !                                           last mod: Apr. 27, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   imun = abs(iun)
   call gxwpep(imun, ityp)
 end subroutine gxopps
-subroutine gxplot(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
-     &ierr)
+subroutine gxplot(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,ierr)
+  use gxx11_common
   implicit none
   integer ierr,ncurv
   !***********************************************************************
@@ -3621,52 +2775,7 @@ subroutine gxplot(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*),ipxval(*),ipyval(*),icvref(*)
   real xval(*),yval(*)
   !
@@ -3680,16 +2789,17 @@ subroutine gxplot(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,    &
   if(iclflg.gt.0)  call gxclrw
   !--- plot frame
   call gxfram(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,          &
-       &cvwnwd,ierr)
+       cvwnwd,ierr)
   !--- plot curves
   call gxcurv(ncurv,nptval,ipxval,ipyval,icvref,xval,yval,          &
-       &cvwnwd,ierr)
+       cvwnwd,ierr)
   !
   !--- wait for <CR> if interactive
   !
   call gxwait
 999 end subroutine gxplot
-subroutine gxplts(np,xp,yp)
+subroutine gxplts(np,xp1,yp1)
+  use gxx11_common
   implicit none
   integer i,ierror,j,k,nextra,np
   real d,gxcubv,screen,selem,sg,sl,step,xmax,xmin
@@ -3699,28 +2809,15 @@ subroutine gxplts(np,xp,yp)
   !
   !--- Input
   !   np         number of points
-  !   xp         x values
-  !   yp         y values
+  !   xp1        x values
+  !   yp1        y values
   !
   !   Author: H. Grote / CERN                        date: June 16, 1987
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  real xp(*),yp(*)
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  real p,s,yy1d,yy2d
-  common/gxcax1/p(madim1,2),s(madim1),yy1d(madim1,2),yy2d(madim1,2)
-  save /gxcax1/
+  real xp1(*),yp1(*)
+
   logical curlfl
   save screen, selem
   !--- screen is the dimension of a reasonable screen, SELEM the length
@@ -3728,14 +2825,14 @@ subroutine gxplts(np,xp,yp)
   data screen/30./, selem/.2/
   !
   if(np.le.2.or.np.gt.madim1) goto 70
-  xmin=xp(1)
-  xmax=xp(1)
+  xmin=xp1(1)
+  xmax=xp1(1)
   curlfl=.false.
-  sg=sign(1.,xp(2)-xp(1))
+  sg=sign(1.,xp1(2)-xp1(1))
   do i=2,np
-     curlfl=curlfl.or.sg*xp(i).le.sg*xp(i-1)
-     xmin=min(xmin,xp(i))
-     xmax=max(xmax,xp(i))
+     curlfl=curlfl.or.sg*xp1(i).le.sg*xp1(i-1)
+     xmin=min(xmin,xp1(i))
+     xmax=max(xmax,xp1(i))
   enddo
   if(xmax.eq.xmin) goto 999
   if(curlfl)  then
@@ -3743,17 +2840,17 @@ subroutine gxplts(np,xp,yp)
      !   as function of s
      s(1)=0.
      do i=2,np
-        s(i)=s(i-1)+sqrt((xp(i)-xp(i-1))**2+(yp(i)-yp(i-1))**2)
+        s(i)=s(i-1)+sqrt((xp1(i)-xp1(i-1))**2+(yp1(i)-yp1(i-1))**2)
      enddo
      !--- step at which extra points should occur
      step=s(np)*selem/screen
-     call gxcubi(np,s,xp,yy1d(1,1),yy2d(1,1),ierror)
+     call gxcubi(np,s,xp1,yy1d(1,1),yy2d(1,1),ierror)
      if(ierror.ne.0) goto 70
-     call gxcubi(np,s,yp,yy1d(1,2),yy2d(1,2),ierror)
+     call gxcubi(np,s,yp1,yy1d(1,2),yy2d(1,2),ierror)
      if(ierror.ne.0) goto 70
      k=1
-     p(1,1)=xp(1)
-     p(1,2)=yp(1)
+     p(1,1)=xp1(1)
+     p(1,2)=yp1(1)
      do i=2,np
         !--- number of extra points to be plotted
         nextra=(s(i)-s(i-1))/step
@@ -3761,33 +2858,33 @@ subroutine gxplts(np,xp,yp)
         do j=1,nextra
            k=k+1
            sl=s(i-1)+j*d
-           p(k,1)=gxcubv(sl,np,s,xp,yy1d(1,1),yy2d(1,1))
-           p(k,2)=gxcubv(sl,np,s,yp,yy1d(1,2),yy2d(1,2))
+           p(k,1)=gxcubv(sl,np,s,xp1,yy1d(1,1),yy2d(1,1))
+           p(k,2)=gxcubv(sl,np,s,yp1,yy1d(1,2),yy2d(1,2))
         enddo
         k=k+1
-        p(k,1)=xp(i)
-        p(k,2)=yp(i)
+        p(k,1)=xp1(i)
+        p(k,2)=yp1(i)
      enddo
   else
      !--- step at which extra points should occur
      step=(xmax-xmin)*selem/screen
-     call gxcubi(np,xp,yp,yy1d,yy2d,ierror)
+     call gxcubi(np,xp1,yp1,yy1d,yy2d,ierror)
      if(ierror.ne.0) goto 70
      k=1
-     p(1,1)=xp(1)
-     p(1,2)=yp(1)
+     p(1,1)=xp1(1)
+     p(1,2)=yp1(1)
      do i=2,np
         !--- number of extra points to be plotted
-        nextra=abs(xp(i)-xp(i-1))/step
-        d=(xp(i)-xp(i-1))/(nextra+1)
+        nextra=abs(xp1(i)-xp1(i-1))/step
+        d=(xp1(i)-xp1(i-1))/(nextra+1)
         do j=1,nextra
            k=k+1
-           p(k,1)=xp(i-1)+j*d
-           p(k,2)=gxcubv(p(k,1),np,xp,yp,yy1d,yy2d)
+           p(k,1)=xp1(i-1)+j*d
+           p(k,2)=gxcubv(p(k,1),np,xp1,yp1,yy1d,yy2d)
         enddo
         k=k+1
-        p(k,1)=xp(i)
-        p(k,2)=yp(i)
+        p(k,1)=xp1(i)
+        p(k,2)=yp1(i)
      enddo
   endif
   call gvpl(k,p(1,1),p(1,2))
@@ -3796,11 +2893,12 @@ subroutine gxplts(np,xp,yp)
   !
   !--- error condition - not enough, too many, or identical points
   !
-  call gvpl(np,xp,yp)
+  call gvpl(np,xp1,yp1)
 999 end subroutine gxplts
-subroutine gxplt1(np,xp,yp,ac)
+subroutine gxplt1(np,xp1,yp1,ac)
+  use gxx11_common
   implicit none
-  integer i,ierror,j,k,k1,nextra,np
+  integer i,ierror,j,k,nextra,np
   real d,gxcubv,screen,selem,sg,sl,step,xmax,xmin
   !***********************************************************************
   !
@@ -3808,29 +2906,16 @@ subroutine gxplt1(np,xp,yp,ac)
   !
   !--- Input
   !   np         number of points
-  !   xp         x values
-  !   yp         y values
+  !   xp1         x values
+  !   yp1         y values
   !   ac         active window for clipping ---> routine GXPL
   !
   !   Author: H. Grote / CERN                        date: Dec. 9, 1988
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  real xp(*),yp(*),ac(4)
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  real p,s,yy1d,yy2d
-  common/gxcax1/p(madim1,2),s(madim1),yy1d(madim1,2),yy2d(madim1,2)
-  save /gxcax1/
+  real xp1(*),yp1(*),ac(4)
+
   logical curlfl
   save screen, selem
   !--- screen is the dimension of a reasonable screen, SELEM the length
@@ -3838,14 +2923,14 @@ subroutine gxplt1(np,xp,yp,ac)
   data screen/30./, selem/.2/
   !
   if(np.le.2.or.np.gt.madim1) goto 70
-  xmin=xp(1)
-  xmax=xp(1)
+  xmin=xp1(1)
+  xmax=xp1(1)
   curlfl=.false.
-  sg=sign(1.,xp(2)-xp(1))
+  sg=sign(1.,xp1(2)-xp1(1))
   do i=2,np
-     curlfl=curlfl.or.sg*xp(i).le.sg*xp(i-1)
-     xmin=min(xmin,xp(i))
-     xmax=max(xmax,xp(i))
+     curlfl=curlfl.or.sg*xp1(i).le.sg*xp1(i-1)
+     xmin=min(xmin,xp1(i))
+     xmax=max(xmax,xp1(i))
   enddo
   if(xmax.eq.xmin) goto 999
   if(curlfl)  then
@@ -3853,17 +2938,17 @@ subroutine gxplt1(np,xp,yp,ac)
      !   as function of s
      s(1)=0.
      do i=2,np
-        s(i)=s(i-1)+sqrt((xp(i)-xp(i-1))**2+(yp(i)-yp(i-1))**2)
+        s(i)=s(i-1)+sqrt((xp1(i)-xp1(i-1))**2+(yp1(i)-yp1(i-1))**2)
      enddo
      !--- step at which extra points should occur
      step=s(np)*selem/screen
-     call gxcubi(np,s,xp,yy1d(1,1),yy2d(1,1),ierror)
+     call gxcubi(np,s,xp1,yy1d(1,1),yy2d(1,1),ierror)
      if(ierror.ne.0) goto 70
-     call gxcubi(np,s,yp,yy1d(1,2),yy2d(1,2),ierror)
+     call gxcubi(np,s,yp1,yy1d(1,2),yy2d(1,2),ierror)
      if(ierror.ne.0) goto 70
      k=1
-     p(1,1)=xp(1)
-     p(1,2)=yp(1)
+     p(1,1)=xp1(1)
+     p(1,2)=yp1(1)
      do i=2,np
         !--- number of extra points to be plotted
         nextra=(s(i)-s(i-1))/step
@@ -3871,42 +2956,40 @@ subroutine gxplt1(np,xp,yp,ac)
         do j=1,nextra
            k=k+1
            sl=s(i-1)+j*d
-           p(k,1)=gxcubv(sl,np,s,xp,yy1d(1,1),yy2d(1,1))
-           p(k,2)=gxcubv(sl,np,s,yp,yy1d(1,2),yy2d(1,2))
+           p(k,1)=gxcubv(sl,np,s,xp1,yy1d(1,1),yy2d(1,1))
+           p(k,2)=gxcubv(sl,np,s,yp1,yy1d(1,2),yy2d(1,2))
         enddo
         k=k+1
-        p(k,1)=xp(i)
-        p(k,2)=yp(i)
+        p(k,1)=xp1(i)
+        p(k,2)=yp1(i)
      enddo
   else
      !--- step at which extra points should occur
      step=(xmax-xmin)*selem/screen
-     call gxcubi(np,xp,yp,yy1d,yy2d,ierror)
+     call gxcubi(np,xp1,yp1,yy1d,yy2d,ierror)
      if(ierror.ne.0) goto 70
      k = 1
-     k1 = 1
-     p(1,1)=xp(1)
-     p(1,2)=yp(1)
+     p(1,1)=xp1(1)
+     p(1,2)=yp1(1)
      do i=2,np
         !--- number of extra points to be plotted
-        nextra=abs(xp(i)-xp(i-1))/step
-        d=(xp(i)-xp(i-1))/(nextra+1)
+        nextra=abs(xp1(i)-xp1(i-1))/step
+        d=(xp1(i)-xp1(i-1))/(nextra+1)
         do j=1,nextra
            k=k+1
-           p(k,1)=xp(i-1)+j*d
-           p(k,2)=gxcubv(p(k,1),np,xp,yp,yy1d,yy2d)
+           p(k,1)=xp1(i-1)+j*d
+           p(k,2)=gxcubv(p(k,1),np,xp1,yp1,yy1d,yy2d)
         enddo
         if (k .eq. madim1)  then
            !--- flush buffer
            call gxpl(k, p(1,1), p(1,2), ac)
-           k1 = k
            p(1,1) = p(k,1)
            p(1,2) = p(k,2)
            k = 1
         endif
         k=k+1
-        p(k,1)=xp(i)
-        p(k,2)=yp(i)
+        p(k,1)=xp1(i)
+        p(k,2)=yp1(i)
      enddo
   endif
   if (k .gt. 1)  call gxpl(k,p(1,1),p(1,2),ac)
@@ -3915,9 +2998,10 @@ subroutine gxplt1(np,xp,yp,ac)
   !
   !--- error condition - not enough, too many, or identical points
   !
-  call gxpl(np,xp,yp,ac)
+  call gxpl(np,xp1,yp1,ac)
 999 end subroutine gxplt1
 subroutine gxpl(n,x,y,ac)
+  use gxx11_common
   implicit none
   integer i,ilow,j,k,n
   real xtol,ytol
@@ -3936,21 +3020,6 @@ subroutine gxpl(n,x,y,ac)
   !
   !***********************************************************************
   real x(*),y(*),ac(4)
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
 
   xtol = toleps * (ac(2) - ac(1))
   ytol = toleps * (ac(4) - ac(3))
@@ -4003,17 +3072,8 @@ subroutine gxplxx(xin, yin, ac, xout,yout, kp)
   !                                           last mod: Dec. 3, 1992
   !
   !***********************************************************************
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
+  real toleps
+  parameter (toleps = 1.e-5)
   real ac(4), xin(2), yin(2), xout(2), yout(2)
   real x(2), y(2), xr(4), yr(4)
 
@@ -4108,6 +3168,7 @@ subroutine gxplxx(xin, yin, ac, xout,yout, kp)
   endif
 end subroutine gxplxx
 subroutine gxpm(n,x,y,ac)
+  use gxx11_common
   implicit none
   integer i,iloop,k,n,nup
   real xerr,yerr
@@ -4126,21 +3187,7 @@ subroutine gxpm(n,x,y,ac)
   !
   !***********************************************************************
   real x(*),y(*),ac(4)
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  real xp,xvp,yp,yvp
-  common/gxcax2/xp(madim2+1),yp(madim2+1), xvp(madim2+1),           &
-       &yvp(madim2+1)
-  save /gxcax2/
+
   xerr=1.e-3*(ac(2)-ac(1))
   yerr=1.e-3*(ac(4)-ac(3))
   do  iloop=1,n,madim2
@@ -4199,7 +3246,7 @@ subroutine gxpnbl(string,ifirst,ilast)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  character *(*)  string
+  character(*)  string
   ifirst=0
   ilast=0
   do i=1,len(string)
@@ -4245,11 +3292,11 @@ subroutine gxppow(alabl,ipower)
      call gxtx(alabl(1),alabl(3),'10<!>'//sdumm(i1:i2)//'<!>')
   endif
 end subroutine gxppow
-subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,   &
-     &nax,iaref,iapar,range,wn)
+subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,nax,iaref,iapar,range,wn)
+  use gxx11_common
   implicit none
   integer i,iadd,iauto,iaxr,ic,icurv,ifl,ip,ipc,iscalf,ixy,j,k,kset,&
-       &nax,ncrv,nextop,npint,npt,nref,nx
+       nax,ncrv,nextop,npint,npt,nref,nx
   real rmax,rmaxi,rmaxt,rmin,rmini,rmint,tolo
   !***********************************************************************
   !
@@ -4276,54 +3323,9 @@ subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,   &
   !                                           last mod: Nov. 18, 1994
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   integer nptval(*), ipcval(*), ipval(*), iaref(*), iapar(mpaxs,*), &
-       &icvref(*)
+       icvref(*)
   real cval(*), val(*), range(2,*), wn(2,*)
   real rng(2)
   integer iref(mxaxs+myaxs)
@@ -4391,8 +3393,8 @@ subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,   &
                  tolo = toleps * (axwndx(2,kset) - axwndx(1,kset))
                  do  j = 0, npt - 1
                     if (cval(ipc+j) .ge. axwndx(1, kset) - tolo           &
-                         &.and. cval(ipc+j) .le. axwndx(2, kset) + tolo)                    &
-                         &then
+                         .and. cval(ipc+j) .le. axwndx(2, kset) + tolo)                    &
+                         then
                        iadd = j
                        goto 32
                     endif
@@ -4409,7 +3411,7 @@ subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,   &
                     rmini=min(rmini,val(ip+j))
                     rmaxi=max(rmaxi,val(ip+j))
                  elseif (cval(ipc+j) .ge. axwndx(1, kset)                &
-                      &.and. cval(ipc+j) .le. axwndx(2, kset))  then
+                      .and. cval(ipc+j) .le. axwndx(2, kset))  then
                     rmini=min(rmini,val(ip+j))
                     rmaxi=max(rmaxi,val(ip+j))
                  endif
@@ -4471,6 +3473,7 @@ subroutine gxprwn(ixy,ncrv,icvref,nptval,ipcval,ipval,cval,val,   &
   enddo
 999 end subroutine gxprwn
 subroutine gxqaxs(type,naxis,npar,ipar,range,stext,sform)
+  use gxx11_common
   implicit none
   integer i,naxis,npar
   !***********************************************************************
@@ -4494,53 +3497,8 @@ subroutine gxqaxs(type,naxis,npar,ipar,range,stext,sform)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  character *(*)  type,stext,sform
+
+  character(*)  type,stext,sform
   integer ipar(*)
   real range(2)
   npar=0
@@ -4571,6 +3529,7 @@ subroutine gxqaxs(type,naxis,npar,ipar,range,stext,sform)
   endif
 end subroutine gxqaxs
 subroutine gxqcrv(nset,npar,ipar,symb)
+  use gxx11_common
   implicit none
   integer i,npar,nset
   !***********************************************************************
@@ -4588,53 +3547,8 @@ subroutine gxqcrv(nset,npar,ipar,symb)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  character*1 symb
+
+  character(1) symb
   integer ipar(*)
   npar=0
   if(nset.gt.0.and.nset.le.maxset)  then
@@ -4673,6 +3587,7 @@ subroutine gxqrvp(xf)
   endif
 999 end subroutine gxqrvp
 subroutine gxqvar(name,intv,realv,charv)
+  use gxx11_common
   implicit none
   integer intv
   real realv
@@ -4734,72 +3649,9 @@ subroutine gxqvar(name,intv,realv,charv)
   !                                           last mod: May 12, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character *(*) name,charv
-  character*6 code
+
+  character(*) name,charv
+  character(6) code
   code=name
   if    (code.eq.'ITERMT')  then
      intv=itermt
@@ -4846,6 +3698,7 @@ subroutine gxqvar(name,intv,realv,charv)
   endif
 end subroutine gxqvar
 subroutine gxqwac(wact)
+  use gxx11_common
   implicit none
   integer i
   !***********************************************************************
@@ -4859,52 +3712,7 @@ subroutine gxqwac(wact)
   !                                           last mod: Dec 17, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   real wact(4)
   do i=1,4
      wact(i)=actwnd(i)
@@ -4971,7 +3779,7 @@ subroutine gxrest(isave,rsave)
   real    rsave(*)
   !
   if(isave(1).ne.0)  then
-     call jselnt(isave(1))
+     !     call jselnt(isave(1))
      call jswn(isave(1),rsave(1),rsave(2),rsave(3),rsave(4))
   endif
   call jsln(isave(2))
@@ -4981,15 +3789,15 @@ subroutine gxrest(isave,rsave)
   call jspmci(isave(8))
   call jsplci(isave(9))
   call jsmk(isave(10))
-  call jstxp(isave(11))
+  !  call jstxp(isave(11))
   call jsfais(isave(12))
-  call jsfasi(isave(13))
+  !  call jsfasi(isave(13))
   !
   call jschh(rsave(9))
   call jschup(rsave(10),rsave(11))
   call jslwsc(rsave(12))
   call jsmksc(rsave(13))
-  call jschsp(rsave(14))
+  !  call jschsp(rsave(14))
   call jschxp(rsave(15))
 999 end subroutine gxrest
 subroutine gxsave(isave,rsave,ierr)
@@ -5046,11 +3854,11 @@ subroutine gxsave(isave,rsave,ierr)
   if(ierr.ne.0) goto 999
   call jqmk(ierr,isave(10))
   if(ierr.ne.0) goto 999
-  call jqtxp(ierr,isave(11))
+  !  call jqtxp(ierr,isave(11))
   if(ierr.ne.0) goto 999
   call jqfais(ierr,isave(12))
   if(ierr.ne.0) goto 999
-  call jqfasi(ierr,isave(13))
+  !  call jqfasi(ierr,isave(13))
   if(ierr.ne.0) goto 999
   !
   call jqnt(isave(1),ierr,rsave(1),rsave(5))
@@ -5063,12 +3871,13 @@ subroutine gxsave(isave,rsave,ierr)
   if(ierr.ne.0) goto 999
   call jqmksc(ierr,rsave(13))
   if(ierr.ne.0) goto 999
-  call jqchsp(ierr,rsave(14))
+  !  call jqchsp(ierr,rsave(14))
   if(ierr.ne.0) goto 999
   call jqchxp(ierr,rsave(15))
   if(ierr.ne.0) goto 999
 999 end subroutine gxsave
 subroutine gxsaxs(type,naxis,npar,ipar,range,stext,sform)
+  use gxx11_common
   implicit none
   integer i,naxis,npar
   !***********************************************************************
@@ -5092,53 +3901,8 @@ subroutine gxsaxs(type,naxis,npar,ipar,range,stext,sform)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  character *(*)  type,stext,sform
+
+  character(*)  type,stext,sform
   integer ipar(*)
   real range(2)
   if(type.eq.'X')  then
@@ -5192,11 +3956,11 @@ subroutine gxscal(xmin,xmax,xlo,xhi,nint)
   integer iv(mrange+1)
   double precision rangl(mrange+1)
   double precision xhigh,xlow,ztol1,err1,dist,distl,distn,          &
-       &distr,sdist
+       distr,sdist
   save iv, rangl, err1
   data iv/10,12,8,10,10,12,8,10,12,8,10/
   data rangl/1.d0,1.2d0,1.6d0,2.d0,2.5d0,3.d0,4.d0,5.d0,            &
-       &6.d0,8.d0,10.d0/
+       6.d0,8.d0,10.d0/
   data ztol1,err1/5.d-4,1.d-8/
   !
   !--- prepare Input data: consider only the case of at least one positive
@@ -5334,6 +4098,7 @@ subroutine gxschf(imode,iort,ch,chret,chwid)
   endif
 999 end subroutine gxschf
 subroutine gxscol(icol)
+  use gxx11_common
   implicit none
   integer icol
   !***********************************************************************
@@ -5347,24 +4112,7 @@ subroutine gxscol(icol)
   !                                           last mod: Apr. 7, 1995
   !
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   character chst * 16
   icucol = max(1, mod(icol - 1, mcolor) + 1)
   chst = colour(icucol)
@@ -5372,6 +4120,7 @@ subroutine gxscol(icol)
   call wsetci(chst)
 end subroutine gxscol
 subroutine gxscrv(nset,npar,ipar,symb)
+  use gxx11_common
   implicit none
   integer i,npar,nset
   !***********************************************************************
@@ -5388,53 +4137,8 @@ subroutine gxscrv(nset,npar,ipar,symb)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  character*1 symb
+
+  character(1) symb
   integer ipar(*)
   if(nset.gt.0.and.nset.le.maxset)  then
      do i=1,min(npar,mpcurv)
@@ -5444,6 +4148,7 @@ subroutine gxscrv(nset,npar,ipar,symb)
   endif
 end subroutine gxscrv
 subroutine gxsdef(sitem,item)
+  use gxx11_common
   implicit none
   integer i,i1,i2,item,j,k
   !***********************************************************************
@@ -5466,71 +4171,8 @@ subroutine gxsdef(sitem,item)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character *(*)  sitem
+
+  character(*)  sitem
   character titem*50,sxtdef*60,sytdef*60,sxfdef*20,syfdef*20
   character spldef*(maxset)
   integer ixadef(mpaxs), iyadef(mpaxs), icvdef(mpcurv)
@@ -5539,19 +4181,19 @@ subroutine gxsdef(sitem,item)
   character col(mcolor) * 16
   logical defaul,xaxis,yaxis
   save spldef, sxtdef, sxfdef, vp, ixadef, iyadef, icvdef,          &
-       &rxdef, rydef, rgb, col
+       rxdef, rydef, rgb, col
   data rgb /3*0., 1.,0.,0., 0.,1.,0., 1.,0.,1., 0.,1.,1., 1.,1.,0./
   data col / 'black', 'red', 'green', 'blue', 'cyan',               &
-       &'magenta' /
+       'magenta' /
   data spldef/'********************'/
   data sxtdef/' '/, sytdef/' '/
   data sxfdef/' '/, syfdef/' '/
   data vp / 0., 1., 0., 1. /
   data  vpdef/ 0.05, 0.95 ,0.05, 0.95 /
   data ixadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0,                   &
-       &-99,0,0/
+       -99,0,0/
   data iyadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0,                   &
-       &-99,0,0/
+       -99,0,0/
   data icvdef/1,1,1,1,0,1,0,0,0,10/
   data rxdef/0.,0./, rydef/0.,0./
 
@@ -5671,7 +4313,7 @@ subroutine gxsdef(sitem,item)
      !------------------------------------------------
   elseif(titem(:6).eq.'DEVICE') then
      !--- set normalization transformation
-     call jselnt(inormt)
+     !     call jselnt(inormt)
      do  i = 1, 4
         vptdef(i) = vpdef(i)
      enddo
@@ -5750,6 +4392,7 @@ subroutine gxsdef(sitem,item)
   endif
 end subroutine gxsdef
 subroutine gxsfop(fnparm,status,ierr)
+  use gxx11_common
   implicit none
   integer ierr,ifirst,lgth
   !***********************************************************************
@@ -5771,71 +4414,8 @@ subroutine gxsfop(fnparm,status,ierr)
   !                                           last mod: May 12, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character *(*) fnparm,status
+
+  character(*) fnparm,status
   character smlocn * 80, sub*3, stat*7
   call gxundf
   sub=fnparm
@@ -5926,6 +4506,7 @@ subroutine gxspmt
   call jsmksc(.5)
 end subroutine gxspmt
 subroutine gxsvar(name,intv,realv,charv)
+  use gxx11_common
   implicit none
   integer intv
   real realv
@@ -5991,72 +4572,9 @@ subroutine gxsvar(name,intv,realv,charv)
   !                                           last mod: May 24, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character *(*) name,charv
-  character*6 code
+
+  character(*) name,charv
+  character(6) code
   call gxundf
   code=name
   if    (code.eq.'ITERMT')  then
@@ -6133,6 +4651,7 @@ subroutine gxsvar(name,intv,realv,charv)
   endif
 end subroutine gxsvar
 subroutine gxstep
+  use gxx11_common
   implicit none
   integer ierr
   !***********************************************************************
@@ -6143,52 +4662,6 @@ subroutine gxstep
   !                                           last mod: May 12, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
 
   if (iepsop .eq. -1)  then
      call gxsfop('PSFILE','UNKNOWN',ierr)
@@ -6198,11 +4671,12 @@ subroutine gxstep
   call gxopps(imetun, ipstyp)
 end subroutine gxstep
 subroutine gxstx(xpch, ypch, ch)
+  use gxx11_common
   implicit none
   integer i,ich,ie,ierr,ifont,ifttmp,ihort,inttmp,iprec,ipstmp,     &
-       &ivert,k,lch,np
+       ivert,k,lch,np
   real chsize,chux,chuy,cosa,enorm,exfact,sina,wid,width,xcoord,    &
-       &xmult,xpch,xshift,ycoord,ymult,ypch,yshift
+       xmult,xpch,xshift,ycoord,ymult,ypch,yshift
   !***********************************************************************
   !
   !   Purpose: writes a software character string for fonts 1, -13
@@ -6215,61 +4689,16 @@ subroutine gxstx(xpch, ypch, ch)
   !   Author: H. Grote / CERN                        date: Dec. 14, 1990
   !                                           last mod: May 13, 1993
   !**********************************************************************
-  character * (*) ch
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  real xp(200), yp(200), xpl(200), ypl(200), rsave(20)
+  character(*) ch
+
+  real xp1(200), yp1(200), xpl(200), ypl(200), rsave(20)
   integer isave(20), ipen(200)
   real yfact(5)
   data yfact / 1.185, 1.,0.5, 0., -0.315 /
   wid=0.
   do i=1,200
-     xp(i)=0.
-     yp(i)=0.
+     xp1(i)=0.
+     yp1(i)=0.
      xpl(i)=0.
      ypl(i)=0.
   enddo
@@ -6324,7 +4753,7 @@ subroutine gxstx(xpch, ypch, ch)
   width = 0.
   ierr = 0
   do ich = 1, lch
-     call gxfchr(0, ch(ich:ich), ifont, wid, np, ipen, xp, yp, ie)
+     call gxfchr(0, ch(ich:ich), ifont, wid, np, ipen, xp1, yp1, ie)
      ierr = ierr + ie
      width = width + wid
   enddo
@@ -6332,8 +4761,8 @@ subroutine gxstx(xpch, ypch, ch)
      xshift = 0.5 * (1 - ihort) * width * xmult
      yshift = - chsize * yfact(ivert)
      do ich = 1, lch
-        call gxfchr(1, ch(ich:ich), ifont, wid, np, ipen, xp, yp,     &
-             &ierr)
+        call gxfchr(1, ch(ich:ich), ifont, wid, np, ipen, xp1, yp1,     &
+             ierr)
         k = 0
         do i = 1, np
            if (ipen(i) .eq. 0)  then
@@ -6343,8 +4772,8 @@ subroutine gxstx(xpch, ypch, ch)
            else
               k = k + 1
            endif
-           xcoord = xmult * xp(i) + xshift
-           ycoord = ymult * yp(i) + yshift
+           xcoord = xmult * xp1(i) + xshift
+           ycoord = ymult * yp1(i) + yshift
            xpl(k) = xpch + cosa * xcoord - sina * ycoord
            ypl(k) = ypch + cosa * ycoord + sina * xcoord
         enddo
@@ -6358,6 +4787,7 @@ subroutine gxstx(xpch, ypch, ch)
   call gxrest(isave, rsave)
 999 end subroutine gxstx
 subroutine gxsvpt(vp)
+  use gxx11_common
   implicit none
   integer i
   real fdx,fdy
@@ -6379,52 +4809,7 @@ subroutine gxsvpt(vp)
   !                                           last mod: Nov 5, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   real vp(4)
   fdx = vptdef(2) - vptdef(1)
   fdy = vptdef(4) - vptdef(3)
@@ -6437,6 +4822,7 @@ subroutine gxsvpt(vp)
   call jsvp(1, vploc(1), vploc(2), vploc(3), vploc(4))
 end subroutine gxsvpt
 subroutine gxswnd(window)
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -6448,58 +4834,12 @@ subroutine gxswnd(window)
   !                                           last mod: June 16, 1987
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   real window(4)
   call jswn(inormt,window(1),window(2),window(3),window(4))
 end subroutine gxswnd
 subroutine gxterm
-
-
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -6509,52 +4849,6 @@ subroutine gxterm
   !                                           last mod: May 13, 1993
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
 
   call gxundf
   if(ltotin.eq.lundef)  then
@@ -6576,76 +4870,14 @@ subroutine gxterm
   endif
 end subroutine gxterm
 subroutine gxtint
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
   !   set defaults for a few variables - first routine to call
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   integer i, j
   do i = 1, maxset
      do j = 1, 2
@@ -6679,9 +4911,9 @@ end subroutine gxtint
 subroutine gxtx(xt,yt,text)
   implicit none
   integer i,ierr,ifdef,ifloc,ifont,igts,ihor,ihoru,in,ip,ipass,ipk, &
-       &iprec,ivert,ivertu,k,kfpos,l,last,ln,lnk,mchar,mfont,ms
+       iprec,ivert,ivertu,k,kfpos,l,last,ln,lnk,mchar,mfont,ms
   real ax,axup,ay,ayup,cang,chf,chh,chux,chuy,chxp,crf,ctf,cwf,cxl, &
-       &cyl,f,falign,sang,sq,t,x,xlift,xt,y,ylift,yt
+       cyl,f,falign,sang,sq,t,x,xlift,xt,y,ylift,yt
   !***********************************************************************
   !
   !   Purpose: plots mixture of Roman and Greek text, superscripts
@@ -6716,29 +4948,28 @@ subroutine gxtx(xt,yt,text)
   data chf/1.5/
   !--- list all possible keybord characters
   data schar/                                                       &
-       &' 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@&
-       &#$%~&*()_+-={}[]:"|;''$><,.?,./'/
+       ' 1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%~&*()_+-={}[]:"|;''$><,.?,./'/
   !--- character widths for Roman and Greek fonts.
   data chgtsw/.7273,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,&
-       &.9091,.9091,.8182,.9545,.9545,.9545,.8636,.8182,.9545,1.,.3636,   &
-       &.7273,.9545,.7727,1.0909,1.,1.,.9545,1.,.9545,.9091,              &
-       &.7273,1.,.8182,1.0909,.9091,.8182,.9091,.8636,.8636,.8182,        &
-       &.8636,.8182,.5455,.8636,.8636,.3636,.4545,.7727,.3636,1.3636,     &
-       &.8636,.8636,.8636,.8636,.5909,.7727,.5455,.8636,.7273,1.,         &
-       &.7727,.7273,.7727,.4545,1.2273,.9545,.9091,1.0909,1.,1.1818,      &
-       &.7273,.6364,.6364,1.1818,1.1818,1.1818,1.1818,.6364,.6364,.6364,  &
-       &.6364,.4545,.7273,.3636,.4545,.4545,1.,1.0909,1.0909,.4545,       &
-       &.4545,.8182,.4545,.4545,1.,                                       &
-       &.7273,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,      &
-       &.9091,.8182,.9545,.9091,.8182,.8636,.9091,.7727,1.,.3636,         &
-       &.6818,.9545,.8182,1.0909,1.,.9091,1.,.6818,.9545,.8182,           &
-       &.7273,1.,.8182,1.,.8182,1.,.9091,.9545,.8636,.8182,               &
-       &.8182,.7273,1.,.8636,.9091,.5000,.6818,.8182,.7273,.9545,         &
-       &.8182,1.0455,1.,.6818,.8182,.9091,.9091,.7727,.9091,1.0455,       &
-       &.7273,.9545,.6818,.4545,1.2273,.9545,.9091,1.0909,1.,1.1364,      &
-       &.7273,.6364,.6364,1.1364,1.1364,1.1364,1.1364,.6364,.6364,.6364,  &
-       &.6364,.4545,.7273,.3636,.4545,.4545,1.,1.0909,1.0909,.4545,       &
-       &.4545,.8182,.4545,.4545,1./
+       .9091,.9091,.8182,.9545,.9545,.9545,.8636,.8182,.9545,1.,.3636,   &
+       .7273,.9545,.7727,1.0909,1.,1.,.9545,1.,.9545,.9091,              &
+       .7273,1.,.8182,1.0909,.9091,.8182,.9091,.8636,.8636,.8182,        &
+       .8636,.8182,.5455,.8636,.8636,.3636,.4545,.7727,.3636,1.3636,     &
+       .8636,.8636,.8636,.8636,.5909,.7727,.5455,.8636,.7273,1.,         &
+       .7727,.7273,.7727,.4545,1.2273,.9545,.9091,1.0909,1.,1.1818,      &
+       .7273,.6364,.6364,1.1818,1.1818,1.1818,1.1818,.6364,.6364,.6364,  &
+       .6364,.4545,.7273,.3636,.4545,.4545,1.,1.0909,1.0909,.4545,       &
+       .4545,.8182,.4545,.4545,1.,                                       &
+       .7273,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,.9091,      &
+       .9091,.8182,.9545,.9091,.8182,.8636,.9091,.7727,1.,.3636,         &
+       .6818,.9545,.8182,1.0909,1.,.9091,1.,.6818,.9545,.8182,           &
+       .7273,1.,.8182,1.,.8182,1.,.9091,.9545,.8636,.8182,               &
+       .8182,.7273,1.,.8636,.9091,.5000,.6818,.8182,.7273,.9545,         &
+       .8182,1.0455,1.,.6818,.8182,.9091,.9091,.7727,.9091,1.0455,       &
+       .7273,.9545,.6818,.4545,1.2273,.9545,.9091,1.0909,1.,1.1364,      &
+       .7273,.6364,.6364,1.1364,1.1364,1.1364,1.1364,.6364,.6364,.6364,  &
+       .6364,.4545,.7273,.3636,.4545,.4545,1.,1.0909,1.0909,.4545,       &
+       .4545,.8182,.4545,.4545,1./
   stemp = '\\'
   schar(87:87) = stemp
   lnk=999
@@ -6910,11 +5141,12 @@ subroutine gxtx1(x,y,s,ac)
   !
   !***********************************************************************
   real ac(4)
-  character *(*)  s
+  character(*)  s
   if(x.ge.ac(1).and.x.le.ac(2).and.y.ge.ac(3).and.y.le.ac(4))       &
-       &call gxstx(x,y,s)
+       call gxstx(x,y,s)
 end subroutine gxtx1
 subroutine gxundf
+  use gxx11_common
   implicit none
   integer ifirst
   !***********************************************************************
@@ -6925,52 +5157,7 @@ subroutine gxundf
   !                                           last mod: April 7, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   save ifirst
   data ifirst/0/
   if(ifirst.eq.0)  then
@@ -6983,6 +5170,7 @@ subroutine gxundf
   endif
 end subroutine gxundf
 subroutine gxwait
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -6993,52 +5181,7 @@ subroutine gxwait
   !                                           last mod: Feb. 26, 1988
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
+
   call gxundf
   if(interm.gt.0.and.iwtflg.gt.0.and.lacttm.eq.lundef) then
      call wwait
@@ -7046,6 +5189,7 @@ subroutine gxwait
   endif
 end subroutine gxwait
 subroutine gxwclr()
+  use gxx11_common
   implicit none
   !***********************************************************************
   !
@@ -7059,70 +5203,7 @@ subroutine gxwclr()
   !                                                last mod: Apr. 27, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   write(iutlps, '(a)')  'gs showpage gr'
   ! Flush in portable way
   endfile(iutlps)
@@ -7133,6 +5214,7 @@ subroutine gxwclr()
   istotx = 20
 end subroutine gxwclr
 subroutine gxwpep(iun, ityp)
+  use gxx11_common
   implicit none
   integer i,iday,ihour,iii,imonth,isec,ittp,ityp,iun,iyear,l,minute
   real fsc
@@ -7149,112 +5231,49 @@ subroutine gxwpep(iun, ityp)
   !                                           last mod: Apr. 27, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character * (mlpro) pspro(mpspro), eppro(meppro), psdict(mdict),  &
-       &psepi(mpsep), epepi(mepep)
+
+  character(mlpro) pspro(mpspro), eppro(meppro), psdict(mdict),  &
+       psepi(mpsep), epepi(mepep)
   character orient(2) * 12, head(mhead) * 60
   save ittp, orient, head, eppro, pspro, epepi, psepi, psdict
   data head / '$GX11psBegin',                                       &
-       &'0 setlinecap 0 setlinejoin', '<scale> ', ' ' /
+       '0 setlinecap 0 setlinejoin', '<scale> ', ' ' /
   data orient / 'Portrait', 'Landscape' /
   data pspro / '%!PS-Adobe-2.0', '%%Title: ',                       &
-       &'%%Creator: gx11 version nnnn',                                   &
-       &'%%CreationDate: dd/mm/yy hh:mm',                                 &
-       &'%%Orientation: Landscape', '%%BoundingBox: nnn nnn nnn nnn',     &
-       &'%%Pages: (atend)', '%%EndComments' /
+       '%%Creator: gx11 version nnnn',                                   &
+       '%%CreationDate: dd/mm/yy hh:mm',                                 &
+       '%%Orientation: Landscape', '%%BoundingBox: nnn nnn nnn nnn',     &
+       '%%Pages: (atend)', '%%EndComments' /
   data psepi / '%%Trailer', 'end', '%%EOF' /
   data eppro /'%!PS-Adobe-2.0 EPSF-2.0', '%%Title: filename',       &
-       &'%%Creator: gx11 version nnnn',                                   &
-       &'%%CreationDate: dd/mm/yy hh:mm',                                 &
-       &'%%Orientation: Landscape', '%%BoundingBox: nnn nnn nnn nnn',     &
-       &'%%Pages: 0', '%%EndComments' /
+       '%%Creator: gx11 version nnnn',                                   &
+       '%%CreationDate: dd/mm/yy hh:mm',                                 &
+       '%%Orientation: Landscape', '%%BoundingBox: nnn nnn nnn nnn',     &
+       '%%Pages: 0', '%%EndComments' /
   data epepi / '$GX11psEnd showpage', '%%EOF' /
   data psdict / '/$GX11psDict 200 dict def', '$GX11psDict begin',   &
-       &'$GX11psDict /mtrx matrix put /l {lineto} bind def',              &
-       &'/m {moveto} bind def /s {stroke} bind def',                      &
-       &'/n {newpath} bind def /gs {gsave} bind def',                     &
-       &'/gr {grestore} bind def /clp {closepath} bind def',              &
-       &'/t {translate} bind def /sd {setdash} bind def',                 &
-       &'/fft {findfont} bind def /col-1 {} def /r {rotate} bind def',    &
-       &'/sf {scalefont setfont} bind def /sw {stringwidth} bind def',    &
-       &'/stwn { /fs exch def /fn exch def /text exch def fn findfont ',  &
-       &'fs sf text sw pop xs add /xs exch def} bind def',                &
-       &'/black {0 0 0 setrgbcolor} bind def',                            &
-       &'/blue {0 0 1 setrgbcolor} bind def',                             &
-       &'/green {0 1 0 setrgbcolor} bind def',                            &
-       &'/cyan {0 1 1 setrgbcolor} bind def',                             &
-       &'/red {1 0 0 setrgbcolor} bind def',                              &
-       &'/magenta {1 0 1 setrgbcolor} bind def',                          &
-       &'/yellow {1 1 0 setrgbcolor} bind def',                           &
-       &'/white {1 1 1 setrgbcolor} bind def',                            &
-       &'        end',                                                    &
-       &'/$GX11psBegin',                                                  &
-       &'     {$GX11psDict begin /$GX11psEnteredState save def} def',     &
-       &'/$GX11psEnd {$GX11psEnteredState restore end} def',              &
-       &'%%EndProlog' /
+       '$GX11psDict /mtrx matrix put /l {lineto} bind def',              &
+       '/m {moveto} bind def /s {stroke} bind def',                      &
+       '/n {newpath} bind def /gs {gsave} bind def',                     &
+       '/gr {grestore} bind def /clp {closepath} bind def',              &
+       '/t {translate} bind def /sd {setdash} bind def',                 &
+       '/fft {findfont} bind def /col-1 {} def /r {rotate} bind def',    &
+       '/sf {scalefont setfont} bind def /sw {stringwidth} bind def',    &
+       '/stwn { /fs exch def /fn exch def /text exch def fn findfont ',  &
+       'fs sf text sw pop xs add /xs exch def} bind def',                &
+       '/black {0 0 0 setrgbcolor} bind def',                            &
+       '/blue {0 0 1 setrgbcolor} bind def',                             &
+       '/green {0 1 0 setrgbcolor} bind def',                            &
+       '/cyan {0 1 1 setrgbcolor} bind def',                             &
+       '/red {1 0 0 setrgbcolor} bind def',                              &
+       '/magenta {1 0 1 setrgbcolor} bind def',                          &
+       '/yellow {1 1 0 setrgbcolor} bind def',                           &
+       '/white {1 1 1 setrgbcolor} bind def',                            &
+       '        end',                                                    &
+       '/$GX11psBegin',                                                  &
+       '     {$GX11psDict begin /$GX11psEnteredState save def} def',     &
+       '/$GX11psEnd {$GX11psEnteredState restore end} def',              &
+       '%%EndProlog' /
 
   if (iun .gt. 0)  then
      !--- prologue
@@ -7271,18 +5290,18 @@ subroutine gxwpep(iun, ityp)
         eppro(2)(10:) = spsnam
         write(eppro(3)(25:28), '(f4.2)')  versio
         write(eppro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
-             &iyear, imonth, iday
+             iyear, imonth, iday
         write(eppro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
-             &ihour, minute
+             ihour, minute
         eppro(5)(16:24) = orient(iorips)
         write(eppro(6)(15:30), '(4i4)')  ibbox
      else
         pspro(2)(10:) = spsnam
         write(pspro(3)(25:28), '(f4.2)')  versio
         write(pspro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
-             &iyear, imonth, iday
+             iyear, imonth, iday
         write(pspro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
-             &ihour, minute
+             ihour, minute
         pspro(5)(16:24) = orient(iorips)
         write(pspro(6)(15:30), '(4i4)')  ibbox
      endif
@@ -7332,7 +5351,8 @@ subroutine gxwpep(iun, ityp)
      endif
   endif
 end subroutine gxwpep
-subroutine gxwpl(np, xp, yp, ifill)
+subroutine gxwpl(np, xp1, yp1, ifill)
+  use gxx11_common
   implicit none
   integer i,i1,i2,ierr,ifill,iforl,iii,k,kadd,l,np
   real f1,f2,r,v1,v2
@@ -7342,83 +5362,20 @@ subroutine gxwpl(np, xp, yp, ifill)
   !
   !--- Input
   !   np      number of points
-  !   xp      x coordinates
-  !   yp      y coordinates
+  !   xp1      x coordinates
+  !   yp1      y coordinates
   !   ifill   fill area request: 0 = no, 1 = yes
   !
   !   Author: H. Grote / CERN                        date: Apr. 27, 1995
   !                                              last mod: May  23, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  real xp(*), yp(*)
+
+  real xp1(*), yp1(*)
   character eloc * 40, sline * (mline), style(4) * 24,              &
-       &formt1 * 24, formt2 * 24
+       formt1 * 24, formt2 * 24
   data style / '[] 0 sd', '[20] 0 sd', '[2 10] 0 sd',               &
-       &'[20 10 2 10] 0 sd' /
+       '[20 10 2 10] 0 sd' /
   data eloc / 'col-1 s' /
   data formt1 /'('' n'', 2ix, '' m'')'/
   data formt2 /'(2ix, '' l'')'/
@@ -7428,13 +5385,13 @@ subroutine gxwpl(np, xp, yp, ifill)
      istotx = 0
   endif
   if (iorips .eq. 1)  then
-     v1 = xp(1) - rx11pr(1)
-     v2 = yp(1) - rx11pr(3)
+     v1 = xp1(1) - rx11pr(1)
+     v2 = yp1(1) - rx11pr(3)
      f1 = msfact * (ibbox(3) - ibbox(1)) / (rx11pr(2) - rx11pr(1))
      f2 = msfact * (ibbox(4) - ibbox(2)) / (rx11pr(4) - rx11pr(3))
   else
-     v1 = xp(1) - rx11pr(1)
-     v2 = yp(1) - rx11pr(3)
+     v1 = xp1(1) - rx11pr(1)
+     v2 = yp1(1) - rx11pr(3)
      f1 = msfact * (ibbox(4) - ibbox(2)) / (rx11pr(2) - rx11pr(1))
      f2 = msfact * (ibbox(3) - ibbox(1)) / (rx11pr(4) - rx11pr(3))
   endif
@@ -7452,16 +5409,16 @@ subroutine gxwpl(np, xp, yp, ifill)
   call jqln(ierr, i)
   i = max(1, min(i,4))
   write(iutlps, '(f6.3, a, a)')  0.75 * r,                          &
-       &' setlinewidth ', style(i)
+       ' setlinewidth ', style(i)
   iforl =                                                           &
-       &max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
+       max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
   write(formt1(10:10), '(i1)') iforl
   kadd = 2 * (iforl + 2)
   write(sline(k+1:k+kadd), formt1)  i1, i2
   k = k + kadd
   do  i = 2, np
-     v1 = xp(i) - rx11pr(1)
-     v2 = yp(i) - rx11pr(3)
+     v1 = xp1(i) - rx11pr(1)
+     v2 = yp1(i) - rx11pr(3)
 
      if (k + 16 .gt. mline)  then
         call gxpnbl(sline, iii, l)
@@ -7478,7 +5435,7 @@ subroutine gxwpl(np, xp, yp, ifill)
         i1 = msfact * ibbox(3) - i1
      endif
      iforl =                                                         &
-          &max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
+          max(log10(float(abs(i1)+1))+3., log10(float(abs(i2)+1))+3.)
      write(formt2(4:4), '(i1)') iforl
      kadd = 2 * (iforl + 1)
      write(sline(k+1:k+kadd), formt2)  i1, i2
@@ -7494,117 +5451,55 @@ subroutine gxwpl(np, xp, yp, ifill)
      write(iutlps, '(a)')  'fill ' // eloc
   endif
 end subroutine gxwpl
-subroutine gxwpm(np, xp, yp)
+subroutine gxwpm(np, xp1, yp1)
+  use gxx11_common
   implicit none
   integer i,ifill,ip,is,j,n,np
   real sq21,xf,xmf,xms,xmsm,xmsq,xmsqm,xpsf,xs,xsm,xsq,xsqm,yf,ymf, &
-       &yms,ymsm,ymsq,ymsqm,ys,ysm,ysq,ysqm
+       yms,ymsm,ymsq,ymsqm,ys,ysm,ysq,ysqm
   !***********************************************************************
   !
   !   Purpose: plot marker symbol on display and/or PostScript output
   !
   !--- Input
   !   np      number of marker symbols
-  !   xp      x coordinates
-  !   yp      y coordinates
+  !   xp1      x coordinates
+  !   yp1      y coordinates
   !
   !   Author: H. Grote / CERN                        date: July 6, 1995
   !                                              last mod: July 6, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   parameter (xs = 0.005, ys = 0.005, sq21 = 0.4142135,              &
-       &xms = -xs, yms = -ys,                                             &
-       &xsm = 0.1 * xs, ysm = 0.1 * ys,                                   &
-       &xmsm = -xsm, ymsm = -ysm,                                         &
-       &xsq = xs * sq21, ysq = ys * sq21,                                 &
-       &xmsq = -xsq, ymsq = -ysq,                                         &
-       &xsqm = xsm * sq21, ysqm = ysm * sq21,                             &
-       &xmsqm = -xsqm, ymsqm = -ysqm )
-  real xp(*), yp(*)
+       xms = -xs, yms = -ys,                                             &
+       xsm = 0.1 * xs, ysm = 0.1 * ys,                                   &
+       xmsm = -xsm, ymsm = -ysm,                                         &
+       xsq = xs * sq21, ysq = ys * sq21,                                 &
+       xmsq = -xsq, ymsq = -ysq,                                         &
+       xsqm = xsm * sq21, ysqm = ysm * sq21,                             &
+       xmsqm = -xsqm, ymsqm = -ysqm )
+  real xp1(*), yp1(*)
   real xsym(9,4,5), ysym(9,4,5), xlps(9), yloc(9), xlwd(9)
   integer nsym(4,5)
-  character * 1 dum
+  character(1) dum
   data xsym /                                                       &
-       &xmsm, xmsm, xmsqm, xsqm, xsm, xsm, xsqm, xmsqm, xmsm, 27 * 0.,    &
-       &xms, xs, 7*0., 0., 0., 7*0., 18 * 0.,                             &
-       &xms, xs, 7*0., 0., 0., 7*0., xms, xs, 7*0., xms, xs, 7*0.,        &
-       &xms, xms, xmsq, xsq, xs, xs, xsq, xmsq, xms, 27 * 0.,             &
-       &xms, xs, 7*0., xms, xs, 7*0., 18 * 0. /
+       xmsm, xmsm, xmsqm, xsqm, xsm, xsm, xsqm, xmsqm, xmsm, 27 * 0.,    &
+       xms, xs, 7*0., 0., 0., 7*0., 18 * 0.,                             &
+       xms, xs, 7*0., 0., 0., 7*0., xms, xs, 7*0., xms, xs, 7*0.,        &
+       xms, xms, xmsq, xsq, xs, xs, xsq, xmsq, xms, 27 * 0.,             &
+       xms, xs, 7*0., xms, xs, 7*0., 18 * 0. /
   data ysym /                                                       &
-       &ymsqm, ysqm, ysm, ysm, ysqm, ymsqm, ymsm, ymsm, ymsqm, 27 * 0.,   &
-       &0., 0., 7*0., ys, yms, 7*0., 18 * 0.,                             &
-       &0., 0., 7*0., ys, yms, 7*0., yms, ys, 7*0., ys, yms, 7*0.,        &
-       &ymsq, ysq, ys, ys, ysq, ymsq, yms, yms, ymsq, 27 * 0.,            &
-       &yms, ys, 7*0., ys, yms, 7*0, 18 * 0. /
+       ymsqm, ysqm, ysm, ysm, ysqm, ymsqm, ymsm, ymsm, ymsqm, 27 * 0.,   &
+       0., 0., 7*0., ys, yms, 7*0., 18 * 0.,                             &
+       0., 0., 7*0., ys, yms, 7*0., yms, ys, 7*0., ys, yms, 7*0.,        &
+       ymsq, ysq, ys, ys, ysq, ymsq, yms, yms, ymsq, 27 * 0.,            &
+       yms, ys, 7*0., ys, yms, 7*0, 18 * 0. /
   data nsym / 9, 0, 0, 0,                                           &
-       &2, 2, 0, 0,                                                       &
-       &2, 2, 2, 2,                                                       &
-       &9, 0, 0, 0,                                                       &
-       &2, 2, 0, 0 /
+       2, 2, 0, 0,                                                       &
+       2, 2, 2, 2,                                                       &
+       9, 0, 0, 0,                                                       &
+       2, 2, 0, 0 /
 
   call gxqvar('XMETAF', i, xmf, dum)
   call gxqvar('YMETAF', i, ymf, dum)
@@ -7626,9 +5521,9 @@ subroutine gxwpm(np, xp, yp)
         n = nsym(i,is)
         if (n .gt. 0)  then
            do  j = 1, n
-              xlwd(j) = xp(ip) + xf * xsym(j,i,is)
-              yloc(j) = yp(ip) + yf * ysym(j,i,is)
-              xlps(j) = xp(ip) + xpsf * xf * xsym(j,i,is)
+              xlwd(j) = xp1(ip) + xf * xsym(j,i,is)
+              yloc(j) = yp1(ip) + yf * ysym(j,i,is)
+              xlps(j) = xp1(ip) + xpsf * xf * xsym(j,i,is)
            enddo
            if (interm .gt. 0)  then
               if (ifill .eq. 0) then
@@ -7642,99 +5537,37 @@ subroutine gxwpm(np, xp, yp)
      enddo
   enddo
 end subroutine gxwpm
-subroutine gxwtx(xp, yp, txin)
+subroutine gxwtx(xp1, yp1, txin)
+  use gxx11_common
   implicit none
   integer i,i1,i11,i2,i22,ia,iang1,iangle,ie,ifont,ifos,ihl,iii,    &
-       &iprec,ivl,k,lf,lint,lt,lt1,lt2,lt3,mltx,mltx2
-  real chh,f1,f2,v1,v2,x,xp,xup,y,yp,yup
+       iprec,ivl,k,lf,lint,lt,lt1,lt2,lt3,mltx,mltx2
+  real chh,f1,f2,v1,v2,x,xp1,xup,y,yp1,yup
   !***********************************************************************
   !
   !   Purpose: write text with predefined font .ps or .eps file
   !
   !--- Input
-  !   xp      x coordinate
-  !   yp      y coordinate
+  !   xp1      x coordinate
+  !   yp1      y coordinate
   !   txin    text
   !
   !   Author: H. Grote / CERN                        date: May 10, 1995
   !                                              last mod: May 10, 1995
   !
   !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   parameter (mltx = 120, mltx2 = 2 * mltx)
   character txin * (*)
   character sline * (mline), txlc * (mltx2)
-  character * 24 tloc1, tloc2, tloc3, sfont(mtfont)
+  character(24) tloc1, tloc2, tloc3, sfont(mtfont)
   integer ifosiz(mtfont)
   data sfont / '/Times-Italic', '/Times-Bold', '/Times-BoldItalic', &
-       &'/Helvetica', '/Helvetica-Oblique', '/Helvetica-Bold',            &
-       &'/Helvetica-BoldOblique', '/Courier', '/Courier-Oblique',         &
-       &'/Courier-Bold',  '/Courier-BoldOblique', '/Symbol' /
+       '/Helvetica', '/Helvetica-Oblique', '/Helvetica-Bold',            &
+       '/Helvetica-BoldOblique', '/Courier', '/Courier-Oblique',         &
+       '/Courier-Bold',  '/Courier-BoldOblique', '/Symbol' /
   data ifosiz / 1030, 1000, 1025, 930, 930,                         &
-       &930, 930, 1205, 1205, 1170, 1165, 1005 /
+       930, 930, 1205, 1205, 1170, 1165, 1005 /
 
   if (istotx .gt. 0)  then
      write(iutlps, '(a)')  stortx(:istotx)
@@ -7760,7 +5593,7 @@ subroutine gxwtx(xp, yp, txin)
   iang1 = atan2(-xup, yup) * 45. / atan(1.) + 0.5
   iangle = iang1 + (iorips - 1) * 90 + 0.5
   ifos = msfact * ifosiz(ifont) * chh / (rx11pr(4) - rx11pr(3))     &
-       &+ 0.5
+       + 0.5
   if (ihl .eq. 2)  then
      tloc1 = ' xs 2 div'
      lt1 = 9
@@ -7773,8 +5606,8 @@ subroutine gxwtx(xp, yp, txin)
   tloc3 = ' t 0 0 m'
   lt3 = 8
   call gxpnbl(sfont(ifont), iii, lf)
-  x = xp
-  y = yp - 0.25 * (5 - ivl) * chh
+  x = xp1
+  y = yp1 - 0.25 * (5 - ivl) * chh
   if (iorips .eq. 1)  then
      v1 = x - rx11pr(1)
      v2 = y - rx11pr(3)
@@ -7812,13 +5645,13 @@ subroutine gxwtx(xp, yp, txin)
   k = k + 2
   if (ihl .gt. 1)  then
      sline(k+1:) =                                                   &
-          &tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
+          tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
      k = k + lt1 + lt2 + lt3
   endif
   sline(k+1:) = ' 0 0 m'
   write(iutlps, '(a)')  sline(:k)
   write(iutlps, '(a, a, i6, a)')  sfont(ifont)(:lf), ' fft ',       &
-       &ifos, ' sf 0 0 m'
+       ifos, ' sf 0 0 m'
   write(iutlps, '(a, a, a)')  '(', txlc(:lt), ')'
   sline = 'show'
   k = 4
@@ -7826,7 +5659,7 @@ subroutine gxwtx(xp, yp, txin)
   lt2 = 2
   if (ihl .gt. 1)  then
      sline(k+1:) =                                                   &
-          &tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
+          tloc1(:lt1) // tloc2(:lt2) // tloc3(:lt3)
      k = k + lt1 + lt2 + lt3
   endif
   ia = -iangle
@@ -7842,219 +5675,197 @@ subroutine gxwtx(xp, yp, txin)
   k = k + 2
   write(iutlps, '(a)')  sline(:k)
 end subroutine gxwtx
-subroutine gxzhgz(string,ar1,ar2,i1,i2,r1,r2,r3,r4)
+subroutine jqmk(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
   implicit none
-  integer i,ierr,iz
-  !***********************************************************************
-  !
-  !   Purpose: contains entries for set and inquire routines
-  !
-  !   Author: H. Grote / CERN                        date: April 30, 1993
-  !                                           last mod: April 30, 1993
-  !
-  !***********************************************************************
-  integer iclear,iclflg,icvpar,iczebr,idinit,iepscf,iepsop,ierrun,  &
-       &imetps,imetun,inmeta,inormt,interm,inunit,iounit,ipage,ipctct,    &
-       &ipseps,ipstyp,isfflg,isqflg,istotx,itermt,itseop,iwtflg,ixapar,   &
-       &iyapar,lacttm,lclflg,ldefnl,ldinit,lerrnm,lerrop,lerrun,lmetax,   &
-       &lmetay,lmetnm,lmetop,lmetun,lmpict,lnmeta,lnormt,lnterm,lnunit,   &
-       &lounit,lpseps,lsfflg,lsqflg,ltermt,ltotin,ltseop,lttime,lundef,   &
-       &lwtflg
-  real actwnd,axwndx,axwndy,cvwnwd,rangex,rangey,vpfacx,vpfacy,     &
-       &vploc,vptdef,wfact,wttime,wxfact,wyfact,xmetaf,xsterm,ymetaf,     &
-       &ysterm
-  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,  &
-       &mnormt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
-       &mxsize,myaxs,mypix,mysize
-  real toleps,versio
-  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,         &
-       &maxset = 20, mtterm = 1, mmetat = 4,                              &
-       &mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,    &
-       &mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,             &
-       &madim1 = 500, toleps = 1.e-5,                                     &
-       &merrun = 10, miunit = 5, mounit = 6, versio = 1.50)
-  parameter (mnormt = 2, madim2 = 100)
-  !
-  common / gxcomi /                                                 &
-       &itermt, interm, inmeta, ierrun, imetun, inunit, iounit, ipage,    &
-       &isfflg, isqflg, iwtflg, iclflg, inormt, ipseps, iepsop, itseop,   &
-       &iepscf, imetps, ipctct, iczebr, idinit, ipstyp, iclear, istotx,   &
-       &lmpict, ltermt, lnterm, lnmeta, lerrun, lmetun, lnunit, lounit,   &
-       &lsfflg, lsqflg, lwtflg, lclflg, lnormt, lmetax, lmetay, lmetnm,   &
-       &lerrnm, ldefnl, lerrop, lmetop, ltotin, lacttm, lpseps, lundef,   &
-       &lttime, ldinit, ltseop,                                           &
-       &ixapar(mpaxs,mxaxs), iyapar(mpaxs,myaxs), icvpar(mpcurv,maxset)
-  save /gxcomi/
-  common / gxcomr /                                                 &
-       &xmetaf, ymetaf, xsterm, ysterm, wfact, wttime, wxfact, wyfact,    &
-       &vpfacx, vpfacy,                                                   &
-       &vptdef(4), vploc(4), actwnd(4), rangex(2,mxaxs), rangey(2,myaxs), &
-       &cvwnwd(4,maxset), axwndx(2,maxset), axwndy(2,maxset)
-  save /gxcomr/
-  common / gxcomc /                                                 &
-       &smetnm, serrnm, sxtext(mxaxs), sytext(myaxs), sxform(mxaxs),      &
-       &syform(myaxs), splotc, stortx, sdefnl
-  !
-  character smetnm*256, serrnm*256, sxtext*300, sytext*300,         &
-       &sxform*20, syform*20, splotc*(maxset), stortx * 20,               &
-       &sdefnl*1
-  save /gxcomc/
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  real    ar1(*), ar2(*)
-  integer i1, i2, ivals(14)
-  real    r1, r2, r3, r4, rvals(14)
-  save    ivals, rvals
-  character *(*) string
-  character * 100 strloc
-  data ivals / 0, 0, 0, 0, 1, 2, 0, 0, 0, 0,                        &
-       &0, 1, 1, 0 /
-  !   ivals(1)       marker type
-  !     (2)       fill area interior style
-  !     (3)       horizontal text alignment
-  !     (4)       vertical text alignment
-  !     (5)       text font
-  !     (6)       text precision
-  !     (7)       marker colour index
-  !     (8)       metafile status (0 closed, 1 open)
-  !     (9)       text colour index
-  !    (10)       free
-  !    (11)       polyline colour index
-  !    (12)       polyline style
-  !    (13)       current normalisation transformation number
-  !    (14)       last call type: 0 undef., 1 line, 2 text, 3 marker
-
-  data rvals / 0., 1., 0.01, 0., 1., 0., 1., 0., 1., 0.,            &
-       &1., 1., 1., 1. /
-  !   rvals(1-2)  chup vector
-  !     3         character height
-  !     4-7       window
-  !     8-11      viewport
-  !     12        character expansion factor
-  !     13        line width scale factor
-  !     14        marker scale factor
-  entry jselnt(i1)
-  entry jsfasi(i1)
-  entry jswkwn(i1, r1, r2, r3, r4)
-  entry jswkvp(i1, r1, r2, r3, r4)
-  goto 999
-  entry jqmk(ierr, i1)
+  integer ierr,i1
   ierr = 0
   i1 = ivals(1)
-  goto 999
-  entry jqfais(ierr, i1)
+end subroutine jqmk
+subroutine jqfais(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1
   ierr = 0
   i1 = ivals(2)
-  goto 999
-  entry jqtxal(ierr, i1, i2)
+end subroutine jqfais
+subroutine jqtxal(ierr, i1, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr, i1,i2
   ierr = 0
   i1 = ivals(3)
   i2 = ivals(4)
-  goto 999
-  entry jqtxfp(ierr, i1, i2)
+end subroutine jqtxal
+subroutine jqtxfp(ierr, i1, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr, i1,i2
   ierr = 0
   i1 = ivals(5)
   i2 = ivals(6)
-  goto 999
-  entry jqpmci(ierr, i1)
+end subroutine jqtxfp
+subroutine jqpmci(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr, i1
   ierr = 0
   i1 = ivals(7)
-  goto 999
-  entry jswks(i1)
+end subroutine jqpmci
+subroutine jswks(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(8) = i1
-  goto 999
-  entry jqwks(i1, ierr, i2)
+end subroutine jswks
+subroutine jqwks(i1, ierr, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr, i1,i2
   ierr = 0
   i2 = ivals(8)
-  goto 999
-  entry jqchup(ierr, r1, r2)
+end subroutine jqwks
+subroutine jqchup(ierr, r1, r2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr
+  real r1,r2
   ierr = 0
   r1 = rvals(1)
   r2 = rvals(2)
-  goto 999
-  entry jqchh(ierr, r1)
+end subroutine jqchup
+subroutine jqchh(ierr, r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr
+  real r1
   ierr = 0
   r1 = rvals(3)
-  goto 999
-  entry jqtxci(ierr, i1)
+end subroutine jqchh
+subroutine jqtxci(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1
   ierr = 0
   i1 = ivals(9)
-  goto 999
-  entry jqnt(i1, ierr, ar1, ar2)
+end subroutine jqtxci
+subroutine jqnt(i1, ierr, ar1, ar2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1,i
+  real ar1(4), ar2(4)
   ierr = 0
   do  i = 1, 4
      ar1(i) = rvals(i+3)
      ar2(i) = rvals(i+7)
   enddo
-  goto 999
-  entry gqmksc(ierr, r1)
-  entry jqmksc(ierr, r1)
+end subroutine jqnt
+subroutine jqmksc(ierr, r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr
+  real r1
   ierr = 0
   r1 = rvals(14)
-  goto 999
-  entry jsvp(i1, r1, r2, r3, r4)
+end subroutine jqmksc
+subroutine jsvp(i1, r1, r2, r3, r4)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
+  real r1,r2,r3,r4
   rvals(8) = r1
   rvals(9) = r2
   rvals(10) = r3
   rvals(11) = r4
-  goto 999
-  entry jqplci(ierr, i1)
+end subroutine jsvp
+subroutine jqplci(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1
   ierr = 0
   i1 = ivals(11)
-  goto 999
-  entry jschxp(r1)
+end subroutine jqplci
+subroutine jschxp(r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1
   rvals(12) = r1
-  goto 999
-  entry jqchxp(ierr, r1)
+end subroutine jschxp
+subroutine jqchxp(ierr, r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr
+  real r1
   ierr = 0
   r1 = rvals(12)
-  goto 999
-  entry jqlwsc(ierr, r1)
+end subroutine jqchxp
+subroutine jqlwsc(ierr, r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr
+  real r1
   ierr = 0
   r1 = rvals(13)
-  goto 999
-  entry jqln(ierr, i1)
+end subroutine jqlwsc
+subroutine jqln(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1
   ierr = 0
   i1 = ivals(12)
-  goto 999
-  entry jqcntn(ierr, i1)
+end subroutine jqln
+subroutine jqcntn(ierr, i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer ierr,i1
   ierr = 0
   i1 = ivals(13)
-  !--- dummies
-  entry jqtxp(i1, i2)
-  entry jqchsp(i1, r1)
-  entry jqfasi(i1, i2)
-  entry jstxp(i1)
-  entry jschsp(r1)
-  goto 999
-  entry gclrwk(i1, i2)
+end subroutine jqcntn
+subroutine gclrwk(i1, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1,i2
   if (interm .gt. 0)  call wclrwk(i1, i2)
   if (ipseps .eq. 1)  call gxwclr()
-  goto 999
-  entry gtx(r1, r2, string)
+end subroutine gclrwk
+subroutine gtx(r1, r2, string)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1,r2
+  character(*) string
   if (interm .gt. 0)  then
      strloc = string
      call wtx(r1, r2, strloc)
   endif
   if (ipseps .ne. 0)  call gxwtx(r1, r2, string)
-  goto 999
-  entry gfa(i1, ar1, ar2)
+end subroutine gtx
+subroutine gfa(i1, ar1, ar2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
+  real ar1(*),ar2(*)
   if (interm .gt. 0)  then
      if (ivals(2) .eq. 0)  then
         call wpl(i1, ar1, ar2)
@@ -8063,52 +5874,97 @@ subroutine gxzhgz(string,ar1,ar2,i1,i2,r1,r2,r3,r4)
      endif
   endif
   if (ipseps .ne. 0)  call gxwpl(i1, ar1, ar2, ivals(2))
-  goto 999
-  entry gpl(i1, ar1, ar2)
+end subroutine gfa
+subroutine gpl(i1, ar1, ar2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
+  real ar1(*),ar2(*)
   if (interm .gt. 0)  call wpl(i1, ar1, ar2)
   if (ipseps .ne. 0)  call gxwpl(i1, ar1, ar2, 0)
-  goto 999
-  entry jsmk(i1)
+end subroutine gpl
+subroutine jsmk(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(1) = i1
   ix11pr(4) = i1
-  goto 999
-  entry jsfais(i1)
+end subroutine jsmk
+subroutine jsfais(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(2) = i1
-  goto 999
-  entry jstxal(i1, i2)
+end subroutine jsfais
+subroutine jstxal(i1, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1,i2
   ivals(3) = i1
   ivals(4) = i2
   ix11pr(1) = i1
   ix11pr(2) = i2
-  goto 999
-  entry jstxfp(i1, i2)
+end subroutine jstxal
+subroutine jstxfp(i1, i2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1,i2
   ivals(5) = i1
   ivals(6) = i2
-  goto 999
-  entry jspmci(i1)
+end subroutine jstxfp
+subroutine jspmci(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(7) = i1
   ivals(14) = 0
-  goto 999
-  entry jschup(r1, r2)
+end subroutine jspmci
+subroutine jschup(r1, r2)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1,r2
   rvals(1) = r1
   rvals(2) = r2
   rx11pr(5) = r1
   rx11pr(6) = r2
-  goto 999
-  entry schh(r1)
-  entry jschh(r1)
+end subroutine jschup
+subroutine jschh(r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1
   rvals(3) = r1
   rx11pr(7) = r1
-  goto 999
-  entry jstxci(i1)
+end subroutine jschh
+subroutine jstxci(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(9) = i1
   ivals(14) = 0
-  goto 999
-  entry jsmksc(r1)
+end subroutine jstxci
+subroutine jsmksc(r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1
   rvals(14) = r1
   rx11pr(8) = r1
-  goto 999
-  entry jswn(i1, r1, r2, r3, r4)
+end subroutine jsmksc
+subroutine jswn(i1, r1, r2, r3, r4)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
+  real r1,r2,r3,r4
   rvals(4) = r1
   rvals(5) = r2
   rvals(6) = r3
@@ -8128,27 +5984,47 @@ subroutine gxzhgz(string,ar1,ar2,i1,i2,r1,r2,r3,r4)
      fypix = 1.
   endif
   if (interm .gt. 0)  call wswn(r1, fxpix, r3, fypix)
-  goto 999
-  entry jsplci(i1)
+end subroutine jswn
+subroutine jsplci(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(11) = i1
   ivals(14) = 0
-  goto 999
-  entry jslwsc(r1)
+end subroutine jsplci
+subroutine jslwsc(r1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  real r1
   rvals(13) = r1
-  goto 999
-  entry jsln(i1)
+end subroutine jslwsc
+subroutine jsln(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1,iz
   ivals(12) = i1
   iz = i1 - 1
   if (interm .gt. 0)  call wsetls(iz)
-  goto 999
-  entry jslctp(i1)
+end subroutine jsln
+subroutine jslctp(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   ivals(14) = i1
-  goto 999
-  entry jqlctp(i1)
+end subroutine jslctp
+subroutine jqlctp(i1)
+  use gxx11_common
+  use gxx11_aux
+  implicit none
+  integer i1
   i1 = ivals(14)
-  goto 999
-999 end subroutine gxzhgz
+end subroutine jqlctp
 subroutine wacwk(iw)
+  use gxx11_common
   implicit none
   integer iw
   !***********************************************************************
@@ -8160,24 +6036,7 @@ subroutine wacwk(iw)
   !   Author: H. Grote / CERN                        date: Jan. 25, 1994
   !                                           last mod: Jan. 25, 1994
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   if (iw .gt. 0 .and. iw .le. mx11tf)  then
      ix11tf(iw) = 1
   endif
@@ -8193,6 +6052,7 @@ subroutine wclks
   !***********************************************************************
 end subroutine wclks
 subroutine wclwk(iw)
+  use gxx11_common
   implicit none
   integer iw
   !***********************************************************************
@@ -8204,24 +6064,7 @@ subroutine wclwk(iw)
   !   Author: H. Grote / CERN                        date: Jan. 25, 1994
   !                                           last mod: Jan. 25, 1994
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   if (iw .gt. 0 .and. iw .le. mx11tf)  then
      if (ix11op(iw) .gt. 0)  then
         call wclose
@@ -8231,6 +6074,7 @@ subroutine wclwk(iw)
   endif
 end subroutine wclwk
 subroutine wdawk(iw)
+  use gxx11_common
   implicit none
   integer iw
   !***********************************************************************
@@ -8242,29 +6086,13 @@ subroutine wdawk(iw)
   !   Author: H. Grote / CERN                        date: Jan. 25, 1994
   !                                           last mod: Jan. 25, 1994
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   if (iw .gt. 0 .and. iw .le. mx11tf)  then
      ix11tf(iw) = 0
   endif
 end subroutine wdawk
 subroutine wopks
+  use gxx11_common
   implicit none
   integer i
   !***********************************************************************
@@ -8277,24 +6105,7 @@ subroutine wopks
   !   Author: H. Grote / CERN                        date: Jan. 25, 1994
   !                                           last mod: Jan. 25, 1994
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
+
   !--- preset workstations to inactive and closed
   do  i = 1, mx11tf
      ix11tf(i) = 0
@@ -8303,10 +6114,11 @@ subroutine wopks
 end subroutine wopks
 logical function affirm(sus)
   implicit none
-  character * 1 sus
+  character(1) sus
   affirm = sus.eq.'y'.or.sus.eq.'Y'.or.sus.eq.'o'.or.sus.eq.'O'
 end function affirm
 subroutine wopwk(iw)
+  use gxx11_common
   implicit none
   integer iw,ix,iy
   real r
@@ -8321,25 +6133,8 @@ subroutine wopwk(iw)
   !   Author: H. Grote / CERN                        date: Jan. 25, 1994
   !                                           last mod: Jan. 25, 1994
   !***********************************************************************
-  integer ibbox,icucol,iorips,iutlps,ix11op,ix11pr,ix11tf,lxpix,    &
-       &lypix,mcolor,mdict,mepep,meppro,mhead,mlbb1,mlbb2,mline,mlpro,    &
-       &mpsep,mpspro,msfact,mtfont,mubb1,mubb2,mwid1,mwid2,mx11pr,mx11tf, &
-       &mxxpix,mxypix,nxpix,nypix
-  real fxpix,fypix,rgbcol,rx11pr
-  parameter (mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
-       &mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,       &
-       &mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,          &
-       &mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,    &
-       &mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
-  common / gx11i / nxpix, nypix, lxpix, lypix, icucol, iorips,      &
-       &iutlps, ibbox(4), ix11pr(mx11pr), ix11tf(mx11tf), ix11op(mx11tf)
-  save / gx11i /
-  common / gx11r / fxpix, fypix, rx11pr(mx11pr), rgbcol(3,mcolor)
-  save / gx11r /
-  common / gx11c / spsnam, colour(mcolor), pshead(mhead)
-  character spsnam * 256, colour * 16, pshead * 60
-  save / gx11c /
-  character * 4  c
+
+  character(4)  c
   if (iw .gt. 0 .and. iw .le. mx11tf)  then
      if (ix11op(iw) .eq. 0)  then
         call gxqvar('NXPIX', ix, r, c)
