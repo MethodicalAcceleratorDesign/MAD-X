@@ -1,5 +1,8 @@
 subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
-     &nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp)
+     nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp)
+  use bbfi
+  use twiss0fi
+  use emitfi
   implicit none
 
 
@@ -26,9 +29,6 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
   !---- Communication area for radiation damping.
-  include 'twiss0.fi'
-  include 'bb.fi'
-  include 'emit.fi'
   double precision orbit0(6), orbit(6), em(6,6), rd(6,6), reval(6)
   double precision aival(6), rt(6,6), orbit1(6), ek(6)
   double precision emit_v(3), nemit_v(3), tunes(3), sig_v(4)
@@ -67,14 +67,14 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   else
      call ladeig(rt, reval, aival, em)
      stabt = reval(5)**2 + aival(5)**2 .le. tol  .and.               &
-          &reval(6)**2 + aival(6)**2 .le. tol
+          reval(6)**2 + aival(6)**2 .le. tol
      !        print '('' Static map, eigenvalues:'',(/1X,2E15.8))',
      !     +    (reval(i), aival(i), i = 1, 6)
   endif
   stabx = reval(1)**2 + aival(1)**2 .le. tol  .and.                 &
-       &reval(2)**2 + aival(2)**2 .le. tol
+       reval(2)**2 + aival(2)**2 .le. tol
   staby = reval(3)**2 + aival(3)**2 .le. tol  .and.                 &
-       &reval(4)**2 + aival(4)**2 .le. tol
+       reval(4)**2 + aival(4)**2 .le. tol
 
   !---- Maximum extents.
   do j = 1, 3
@@ -176,10 +176,11 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   if (qs .lt. zero) qs = - qs
   !---- Summary output.
   call emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,tunes,   &
-       &sig_v,pdamp)
+       sig_v,pdamp)
 end subroutine emit
 subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
-     &tunes,sig_v,pdamp)
+     tunes,sig_v,pdamp)
+  use emitfi
   implicit none
 
 
@@ -201,7 +202,6 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   !   pdamp      (real)   damping partition numbers
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
-  include 'emit.fi'
   integer j,j1,j2,k,k1,k2,iqpr2
   double precision arad,gammas,clg,etpr,expr,eypr,f0,sal,en0
   double precision amass, clight, hbar, freq0, u0, betas
@@ -255,7 +255,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
      pdamp(3) = alj(3) * sal
      !---- Emittances.
      clg = ((55.d0 * hbar * clight) / (96.d0 * sqrt(three)))         &
-          &* ((arad * gammas**5) / amass)
+          * ((arad * gammas**5) / amass)
      ex = clg * sum(1) / alj(1)
      ey = clg * sum(2) / alj(2)
      et = clg * sum(3) / alj(3)
@@ -319,20 +319,20 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
      write (iqpr2, 930) qx, qy, qs
      if (frad) write (iqpr2, 940) tune
      write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3),          &
-          &((gstar(j,k), j = 1, 3), k = 1, 3),                               &
-          &((bmax(j,k), j = 1, 3), k = 1, 3),                                &
-          &((gmax(j,k), j = 1, 3), k = 1, 3)
+          ((gstar(j,k), j = 1, 3), k = 1, 3),                               &
+          ((bmax(j,k), j = 1, 3), k = 1, 3),                                &
+          ((gmax(j,k), j = 1, 3), k = 1, 3)
      if (frad) then
         write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3),            &
-             &expr, eypr, etpr
+             expr, eypr, etpr
      endif
   else
      write (iqpr2, 920) 1, 2
      write (iqpr2, 930) qx, qy
      write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2),          &
-          &((gstar(j,k), j = 1, 2), k = 1, 2),                               &
-          &((bmax(j,k), j = 1, 2), k = 1, 2),                                &
-          &((gmax(j,k), j = 1, 2), k = 1, 2)
+          ((gstar(j,k), j = 1, 2), k = 1, 2),                               &
+          ((bmax(j,k), j = 1, 2), k = 1, 2),                                &
+          ((gmax(j,k), j = 1, 2), k = 1, 2)
   endif
 
   !---- RF system.
@@ -343,21 +343,21 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
 930 format(' Fractional tunes',t30,'undamped',t42,3f20.8)
 940 format(' ',t30,'damped',t42,3f20.8)
 950 format(' '/' beta* [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/    &
-       &t30,'t',t42,3e20.8/                                               &
-       &' '/' gamma* [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/      &
-       &t30,'pt',t42,3e20.8/                                              &
-       &' '/' beta(max) [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/       &
-       &t30,'t',t42,3e20.8/                                               &
-       &' '/' gamma(max) [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/  &
-       &t30,'pt',t42,3e20.8)
+       t30,'t',t42,3e20.8/                                               &
+       ' '/' gamma* [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/      &
+       t30,'pt',t42,3e20.8/                                              &
+       ' '/' beta(max) [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/       &
+       t30,'t',t42,3e20.8/                                               &
+       ' '/' gamma(max) [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/  &
+       t30,'pt',t42,3e20.8)
 960 format(' '/' Damping partition numbers',t42,3f20.8/               &
-       &' Damping constants [1/s]',t46,3e20.8/                            &
-       &' Damping times [s]',t46,3e20.8/                                  &
-       &' Emittances [pi micro m]',t42,3e20.8)
+       ' Damping constants [1/s]',t46,3e20.8/                            &
+       ' Damping times [s]',t46,3e20.8/                                  &
+       ' Emittances [pi micro m]',t42,3e20.8)
 970 format(' '/' beta* [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/    &
-       &' '/' gamma* [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8/      &
-       &' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
-       &' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
+       ' '/' gamma* [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8/      &
+       ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
+       ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
 
 end subroutine emsumm
 subroutine emce2i(stabt, em, ex, ey, et, sigma)
@@ -380,16 +380,19 @@ subroutine emce2i(stabt, em, ex, ey, et, sigma)
   do j = 1, 6
      do k = 1, 6
         sigma(j,k) =                                                  &
-             &ex * (em(j,1) * em(k,1) + em(j,2) * em(k,2)) +                    &
-             &ey * (em(j,3) * em(k,3) + em(j,4) * em(k,4))
+             ex * (em(j,1) * em(k,1) + em(j,2) * em(k,2)) +                    &
+             ey * (em(j,3) * em(k,3) + em(j,4) * em(k,4))
         if (stabt) then
            sigma(j,k) = sigma(j,k) +                                   &
-                &et * (em(j,5) * em(k,5) + em(j,6) * em(k,6))
+                et * (em(j,5) * em(k,5) + em(j,6) * em(k,6))
         endif
      enddo
   enddo
 end subroutine emce2i
 subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
+  use twiss0fi
+  use emitfi
+  use twtrrfi
   implicit none
 
 
@@ -407,8 +410,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   !   RE(6,6)   (real)    Transfer matrix for the element; changed on   *
   !                       output to contain damping.                    *
   !---------------------------------------------------------------------*
-  include 'twiss0.fi'
-  include 'emit.fi'
   integer code
   double precision deltap
   double precision em1(6,6), em2(6,6), orb1(6), orb2(6), re(6,6)
@@ -419,7 +420,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   parameter         (one   = 1.0d0,  two   = 2.0d0)
   parameter         (three = 3.0d0,  twelve = 12.d0)
   parameter         (four  = 4.0d0,  six   = 6.0d0)
-  include 'twtrr.fi'
   integer i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
   integer node_fd_errors
   double precision  rw(6,6), tw(6,6,6), ferror(2)
@@ -462,9 +462,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   bvk = node_value('other_bv ')
   !---- Switch on element type.
   go to (500,  20,  30, 500,  50,  60,  70,  80, 500, 100,          &
-       &500, 500, 500, 140, 150, 160, 500, 500, 500, 500,                 &
-       &500, 500, 500, 500, 500, 500, 500, 500, 500, 500,                 &
-       &500, 500, 500, 500, 500, 500, 500, 500, 150, 500), code
+       500, 500, 500, 140, 150, 160, 500, 500, 500, 500,                 &
+       500, 500, 500, 500, 500, 500, 500, 500, 500, 500,                 &
+       500, 500, 500, 500, 500, 500, 500, 500, 150, 500), code
   go to 500
 
   !---- Dipole.
@@ -550,7 +550,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   h1 = sqrt(hx**2 + hy**2)
   hcb1 = h1**3
   hcbs1 = three*h1 *                                                &
-       &(hx * (hxx*px1 + hxy*py1) + hy * (hxy*px1 + hyy*py1))
+       (hx * (hxx*px1 + hxy*py1) + hy * (hxy*px1 + hyy*py1))
 
   tedg1  = tan(edg1)
   fact1  = (one + h*x1) * (one - tedg1*x1)
@@ -568,7 +568,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   h2 = sqrt(hx**2 + hy**2)
   hcb2 = h2**3
   hcbs2 = three*h2 *                                                &
-       &(hx * (hxx*px2 + hxy*py2) + hy * (hxy*px2 + hyy*py2))
+       (hx * (hxx*px2 + hxy*py2) + hy * (hxy*px2 + hyy*py2))
 
   tedg2  = tan(edg2)
   fact2  = (one + h*x2) * (one - tedg2*x2)
@@ -588,9 +588,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      e5sq1 = e1(5,ir)**2 + e1(5,ii)**2
      e5sq2 = e2(5,ir)**2 + e2(5,ii)**2
      e5sqs1 = two * (e1(5,ir) * (bi2gi2*e1(6,ir) - hbi*e1(1,ir))     &
-          &+ e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
+          + e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
      e5sqs2 = two * (e2(5,ir) * (bi2gi2*e2(6,ir) - hbi*e2(1,ir))     &
-          &+ e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
+          + e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
 
      !---- Integrand and its derivative w.r.t. S.
      f1 = hcb1 * e5sq1
@@ -600,7 +600,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
      !---- Actual integration.
      sum(i) = sum(i) + half * el * (f1 + f2) -                       &
-          &el**2 * (f2s - f1s) / twelve
+          el**2 * (f2s - f1s) / twelve
   enddo
   go to 77
 
@@ -654,11 +654,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   fh1 = half * el * h1**3
   fh2 = half * el * h2**3
   sum(1) = sum(1) + fh1 * (e1(5,1)**2 + e1(5,2)**2)                 &
-       &+ fh2 * (e2(5,1)**2 + e2(5,2)**2)
+       + fh2 * (e2(5,1)**2 + e2(5,2)**2)
   sum(2) = sum(2) + fh1 * (e1(5,3)**2 + e1(5,4)**2)                 &
-       &+ fh2 * (e2(5,3)**2 + e2(5,4)**2)
+       + fh2 * (e2(5,3)**2 + e2(5,4)**2)
   sum(3) = sum(3) + fh1 * (e1(5,5)**2 + e1(5,6)**2)                 &
-       &+ fh2 * (e2(5,5)**2 + e2(5,6)**2)
+       + fh2 * (e2(5,5)**2 + e2(5,6)**2)
 
   !---- Damping matrices.
   !     Code common to bending magnet and pure multipoles.
@@ -721,7 +721,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   do iord = 0, nd/2
      do j = 1, 2
         field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-             &/ (one + deltap)
+             / (one + deltap)
         if (field(j,iord) .ne. zero)  nord = iord
      enddo
   enddo
@@ -743,11 +743,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   h  = sqrt(dr**2 + di**2) / el
   hcb = half * el * h**3
   sum(1)  = sum(1) + hcb *                                          &
-       &(em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
+       (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
   sum(2)  = sum(2) + hcb *                                          &
-       &(em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
+       (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
   sum(3)  = sum(3) + hcb *                                          &
-       &(em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
+       (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
 
   !---- Damping matrix, is the same at both ends.
   rfac  = cg * (dr**2 + di**2) / el
@@ -795,17 +795,17 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   if (n_ferr .gt. 0) call dcopy(f_errors, ferror, min(2, n_ferr))
   if(code.eq.14) then
      xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
-          &ferror(1))
+          ferror(1))
      ykick=zero
   else if(code.eq.15.or.code.eq.39) then
      xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
-          &ferror(1))
+          ferror(1))
      ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &
-          &ferror(2))
+          ferror(2))
   else if(code.eq.16) then
      xkick=zero
      ykick=bvk*(node_value('kick ')+node_value('cvkick ')+           &
-          &ferror(2))
+          ferror(2))
   else
      xkick=zero
      ykick=zero
@@ -822,11 +822,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   !---- Trapezoidal integration over h**3*E(k,5)*E*(k,5).
   fh = half * el * sqrt(hx**2 + hy**2)**3
   sum(1) = sum(1) + fh *                                            &
-       &(em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
+       (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
   sum(2) = sum(2) + fh *                                            &
-       &(em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
+       (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
   sum(3) = sum(3) + fh *                                            &
-       &(em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
+       (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
 
   !---- Damping matrices.
   call m66one(rw)

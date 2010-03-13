@@ -1,4 +1,7 @@
 subroutine pecat1(rb, ra, rd)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   ! purpose:
   !   concatenate two transport maps
@@ -8,7 +11,6 @@ subroutine pecat1(rb, ra, rd)
   ! output:
   !   rd(6,6) result map.
   !----------------------------------------------------------------------*
-  implicit none
 
   !--- type definition of the routine arguments
 
@@ -23,15 +25,19 @@ subroutine pecat1(rb, ra, rd)
   do k = 1, 6
      do j = 1, 6
         rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
-             &+ rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
-             &+ rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+             + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
+             + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
      enddo
   enddo
 end subroutine pecat1
 !***********************************************************************
 
 subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
-     &np, xval, yval, window, actwin, ierr)
+     np, xval, yval, window, actwin, ierr)
+
+  use plotfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Plot one curve
@@ -59,10 +65,6 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   ! it is called by the routine peplot in this file.
   !----------------------------------------------------------------------*
 
-  implicit none
-
-  include 'plot.fi'
-
   !--- type definition of the routine arguments
 
   integer  ncc, np, ierr, ippar(*)
@@ -78,10 +80,10 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   real xreal(maxpnt), yreal(maxpnt)
   real xmd
   integer isymb, icolr, ilb, ispli, kft, klt, kact,                 &
-       &kf, kl, npt, j, iecub
+       kf, kl, npt, j, iecub
   integer   istyl, ipbar, isave(20)
   character symloc*1
-  
+
   double precision get_value !hbu
   logical zero_suppr !hbu
   logical marker_plot !hg
@@ -92,7 +94,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
   save act
 
   iecub = 0
-  
+
   zero_suppr=get_value('plot ','zero_suppr ').ne.0 !hbu
   marker_plot = get_value('plot ','marker_plot ').ne.0 !hg
   !--- Output initialisation
@@ -170,9 +172,9 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
         !--- avoid identical points
 
         if ( (marker_plot.and..not.zero_suppr)   &
-		   .or. (xreal(npt) - xval(j))**2 +      &
-            (yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
-	    ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
+             .or. (xreal(npt) - xval(j))**2 +      &
+             (yreal(npt) - yval(j))**2 .gt. xmd   .and.                &
+             ( yval(j).ne. 0 .or. .not.zero_suppr) ) then ! hbu optionally skip 0 points
            npt        = npt + 1
            xreal(npt) = xval(j)
            yreal(npt) = yval(j)
@@ -182,8 +184,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
            !--- plot - get first curve annotation position
 
            if (ilb .eq. 0)                                             &
-                &call pegacn(ncc, window, act, xreal, yreal, npt, usex,            &
-                &xwpos, xpos, ypos, ilb)
+                call pegacn(ncc, window, act, xreal, yreal, npt, usex,            &
+                xwpos, xpos, ypos, ilb)
            if (interf .eq. 0 .or. npt .eq. 2 .or. ispli .ne. 0) then
 
               !--- no spline
@@ -194,8 +196,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
                  !--- get y pos. on curve for label
 
                  ywpos = yreal(ilb - 1) + (yreal(ilb) - yreal(ilb-1))    &
-                      &* (xwpos  - xreal(ilb - 1))                                       &
-                      &/ (xreal(ilb) - xreal(ilb - 1))
+                      * (xwpos  - xreal(ilb - 1))                                       &
+                      / (xreal(ilb) - xreal(ilb - 1))
                  ilb = -2
               endif
            else
@@ -284,8 +286,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
            xaux = wsclx * (xval(j) - window(1))
            yaux = wscly * (yval(j) - window(3))
            if (xaux .gt. act(1) .and. xaux .lt. act(2)                 &
-                &.and. yaux .gt. act(3) .and. yaux .lt. act(4))                    &
-                &call gxtx (xaux, yaux, symloc)
+                .and. yaux .gt. act(3) .and. yaux .lt. act(4))                    &
+                call gxtx (xaux, yaux, symloc)
         enddo
      endif
   endif
@@ -347,6 +349,12 @@ end subroutine pecurv
 
 subroutine pefill(ierr)
 
+  use plotfi
+  use plot_bfi
+  use plot_cfi
+  use plot_mathfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   fill plot arrays with coordinate values, set up machine plot
@@ -361,20 +369,13 @@ subroutine pefill(ierr)
   ! it is called by the routine exec_plot in file madxn.c after pesopt.
   !----------------------------------------------------------------------*
 
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
-  include 'plot_c.fi'
-  include 'plot_math.fi'
-
   integer ierr
   integer i,j,k,l,new1,new2,currtyp,crow,pltyp,pos_flag
   integer ilist(mtype), p(mxplot), proc_n(2, mxcurv)
   integer nint
   double precision fact, d_val, d_val1, get_value
   double precision currpos, currleng, currtilt, currk1l, currk1sl,  &
-       &currk2l, currk2sl, currk3l, currk3sl
+       currk2l, currk2sl, currk3l, currk3sl
   real tval, step, mystep
   logical machp, rselect, marker_plot, range_plot
   character*120 msg
@@ -389,17 +390,17 @@ subroutine pefill(ierr)
   !--- codes see in peschm
 
   data ilist /                                                      &
-       &0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
-       &6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
-       &0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
-       &20 * 0 /
+       0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
+       6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
+       0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
+       20 * 0 /
 
-! Initialize marker_plot logical
+  ! Initialize marker_plot logical
 
   marker_plot=get_value('plot ','marker_plot ').ne.zero
   range_plot=get_value('plot ','range_plot ').ne.zero
- 
- !--- Output initialisation
+
+  !--- Output initialisation
 
   ierr = 0
 
@@ -468,7 +469,7 @@ subroutine pefill(ierr)
         print *, 'Warning: table ', tabname, ' not found'
      elseif (k .eq. -2)  then
         print *, 'Warning: hor. variable ', horname,                  &
-             &' not in table ', tabname
+             ' not in table ', tabname
      else
         print *, 'Warning: table ', tabname, ' is empty'
      endif
@@ -484,8 +485,8 @@ subroutine pefill(ierr)
      k = double_from_table(tabname, sname(l), 1, d_val)
      if (k .lt. 0)  then
         print *, 'Warning: vertical variable: ',                      &
-             &sname(l)(:lastnb(sname(l))), ' not in table ',                    &
-             &tabname
+             sname(l)(:lastnb(sname(l))), ' not in table ',                    &
+             tabname
         ierr = 1
         goto 999
      endif
@@ -526,7 +527,7 @@ subroutine pefill(ierr)
   do j = nrrang(1), nrrang(2)
      crow = j
      if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
-          &goto 10
+          goto 10
      k = double_from_table(tabname, horname, j, currpos)
 
      if (itbv .eq. 1)  then
@@ -539,7 +540,7 @@ subroutine pefill(ierr)
 
         currleng = node_value('l ')
         if (currleng .gt. 0.d0 .and. currtyp .gt. 1                   &
-             &.and. currtyp .lt. 8) then
+             .and. currtyp .lt. 8) then
            currtilt = node_value('tilt ')
            k = double_from_table(tabname, 'k1l ' , j, currk1l)
            currk1l = currk1l/currleng
@@ -558,22 +559,22 @@ subroutine pefill(ierr)
         !--- sbend, rbend
 
         if (mod(pltyp,20) .eq. 1 .and. currtilt .ne. zero)            &
-             &pltyp = pltyp + 6
+             pltyp = pltyp + 6
 
         !--- quad
 
         if (pltyp .eq. 2 .and. min(currk1l, currk1sl) .lt. zero)      &
-             &pltyp = 3
+             pltyp = 3
 
         !--- sext
 
         if (pltyp .eq. 10 .and. min(currk2l, currk2sl) .lt. zero)     &
-             &pltyp = 11
+             pltyp = 11
 
         !--- oct
 
         if (pltyp .eq. 12 .and. min(currk3l, currk3sl) .lt. zero)     &
-             &pltyp = 13
+             pltyp = 13
 
         !--- Compute the start & end position
 
@@ -587,8 +588,8 @@ subroutine pefill(ierr)
         !--- Interpolation if required
 
         if (machp .and. j .gt. nrrang(1) .and. currleng .gt. zero     &
-             &.and. interf .gt. 0 .and. step .gt. zero .and. .not. ptc_flag)    &
-             &then
+             .and. interf .gt. 0 .and. step .gt. zero .and. .not. ptc_flag)    &
+             then
 
            nint = currleng / step
            if (nint .lt. 2) nint = 2
@@ -639,12 +640,16 @@ subroutine pefill(ierr)
   fpmach = machp .and. nelmach .gt. 0 .and. noline .eq. 0
 999 continue
 910 format('Interpolation is not compatible with the',                &
-       &' Twiss centre option')
+       ' Twiss centre option')
 end subroutine pefill
 !***********************************************************************
 
 subroutine pegacn(ncc, window, act, xreal, yreal, np, usex,       &
-     &xwpos, xpos, ypos, ilb)
+     xwpos, xpos, ypos, ilb)
+
+  use plotfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Find suitable position for the curve annotation
@@ -667,10 +672,6 @@ subroutine pegacn(ncc, window, act, xreal, yreal, np, usex,       &
   !
   ! it is called by the routine pecurv in this file.
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
 
   !--- type definition of the routine arguments
 
@@ -729,9 +730,9 @@ subroutine pegacn(ncc, window, act, xreal, yreal, np, usex,       &
      !--- annot. pos. in NDC
 
      xpos = act(1) +                                                 &
-          &0.125 * usex * (iposx - .5) * (act(2) - act(1))
+          0.125 * usex * (iposx - .5) * (act(2) - act(1))
      ypos = act(4) -                                                 &
-          &usex * (0.05 * (act(4) - act(3)) + 0.03 * (iposy - 1))
+          usex * (0.05 * (act(4) - act(3)) + 0.03 * (iposy - 1))
 
      !---- annot. position in world coord.
 
@@ -762,14 +763,14 @@ subroutine pegacn(ncc, window, act, xreal, yreal, np, usex,       &
         if (xwpos .gt. xreal(i-1) .and. xwpos .le. xreal(i)) ilb = i
         do j = 1, 2
            d = (xdiag(2,j) - xdiag(1,j)) * (yreal(i-1) - yreal(i)) -   &
-                &(ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
+                (ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
            if (abs(d) .lt. eps) goto 30
            t = (xreal(i-1) - xdiag(1,j)) * (yreal(i-1) - yreal(i)) -   &
-                &(yreal(i-1) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
+                (yreal(i-1) - ydiag(1,j)) * (xreal(i-1) - xreal(i))
            t = t / d
            if (t .lt. 0. .or. t .gt. 1.) goto 30
            t = (xdiag(2,j) - xdiag(1,j)) * (yreal(i-1) - ydiag(1,j)) - &
-                &(ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xdiag(1,j))
+                (ydiag(2,j) - ydiag(1,j)) * (xreal(i-1) - xdiag(1,j))
            t = t / d
            if (t .ge. 0. .and. t .le. 1.) goto 20
 30         continue
@@ -790,6 +791,9 @@ end subroutine pegacn
 !***********************************************************************
 
 subroutine pegaxn (nax, vax, sax, ns)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Returns compound vertical axis annotation
@@ -804,8 +808,6 @@ subroutine pegaxn (nax, vax, sax, ns)
   !
   ! it is called by the routine pemima in this file.
   !----------------------------------------------------------------------*
-
-  implicit none
 
   !--- type definition of the routine arguments
 
@@ -856,6 +858,11 @@ end subroutine pegaxn
 !***********************************************************************
 
 subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
+
+  use plotfi
+  use plot_bfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Finds variable, dependent variables, axis and curve annotations    *
@@ -878,11 +885,6 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
   ! it is called by the routines pemima, peplot and pesopt in this file. *
   !----------------------------------------------------------------------*
 
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
-
   !--- type definition of the routine arguments
 
   integer iflag, it, ipflg(2)
@@ -904,359 +906,359 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
   !--- Initialisation of local variables
 
   data (svname(j), j = 1, 32) /                                     &
-       &'s', 'size', 'deltap',                                            &
-       &'qs', 'x', 'y', 'xsize', 'ysize',                                 &
-       &'dt', 'xn', 'yn', 'pxn', 'pyn',                                   &
-       &'gammatr', 'xrms', 'yrms',                                        &
-       &'xmax', 'ymax', 'bxmax',                                          &
-       &'bymax', 'dxmax', 'dymax',                                        &
-       &'tn', 't', 'turns', 'particle', 'alfa',                           &
-       &'ptn', 'wt', 'phit',                                              &
-       &'rbxmax',                                                         &
-       &'rbymax' /
+       's', 'size', 'deltap',                                            &
+       'qs', 'x', 'y', 'xsize', 'ysize',                                 &
+       'dt', 'xn', 'yn', 'pxn', 'pyn',                                   &
+       'gammatr', 'xrms', 'yrms',                                        &
+       'xmax', 'ymax', 'bxmax',                                          &
+       'bymax', 'dxmax', 'dymax',                                        &
+       'tn', 't', 'turns', 'particle', 'alfa',                           &
+       'ptn', 'wt', 'phit',                                              &
+       'rbxmax',                                                         &
+       'rbymax' /
   data (svname(j), j = 33, mnvar) /                                 &
-       &'betx', 'rbetx',                                                  &
-       &'alfx', 'mux', 'dx',                                              &
-       &'dpx', 'qx', 'px', 'wx',                                          &
-       &'phix', 'dmux',                                                   &
-       &'ddx', 'ddpx', 'iwx',                                             &
-       &'xix',                                                            &
-       &'bety', 'rbety',                                                  &
-       &'alfy', 'muy', 'dy',                                              &
-       &'dpy', 'qy', 'py', 'wy',                                          &
-       &'phiy', 'dmuy',                                                   &
-       &'ddy', 'ddpy', 'iwy',                                             &
-       &'xiy', 'xns', 'pxns', 'wxs',                                      &
-       &'yns', 'pyns', 'wys',                                             &
-       &'energy', 'spintune',                                             &
-       &'poltotal', 'poldiffx', 'poldiffy', 'poldiffs' /
+       'betx', 'rbetx',                                                  &
+       'alfx', 'mux', 'dx',                                              &
+       'dpx', 'qx', 'px', 'wx',                                          &
+       'phix', 'dmux',                                                   &
+       'ddx', 'ddpx', 'iwx',                                             &
+       'xix',                                                            &
+       'bety', 'rbety',                                                  &
+       'alfy', 'muy', 'dy',                                              &
+       'dpy', 'qy', 'py', 'wy',                                          &
+       'phiy', 'dmuy',                                                   &
+       'ddy', 'ddpy', 'iwy',                                             &
+       'xiy', 'xns', 'pxns', 'wxs',                                      &
+       'yns', 'pyns', 'wys',                                             &
+       'energy', 'spintune',                                             &
+       'poltotal', 'poldiffx', 'poldiffy', 'poldiffs' /
 
   data (svlabl(j), j = 1, 32) /                                     &
-       &'s (m)', 'n<G>s<G> (mm)', '<G>d<G><?>E<?>/p<?>0<?>c',             &
-       &'Q<?>s<?>', 'x (m)', 'y (m)', 'n<G>s<G> (mm)', 'n<G>s<G> (mm)',   &
-       &'ct (m)', 'x<?>n<?>', 'y<?>n<?>', 'p<?>xn<?>', 'p<?>yn<?>',       &
-       &'<G>g<G><?>tr<?>', 'X<?>rms<?> (m)', 'Y<?>rms<?> (m)',            &
-       &'X<?>max<?> (m)', 'Y<?>max<?> (m)', '<G>b<G><?>x_max<?> (m)',     &
-       &'<G>b<G><?>y_max<?> (m)', 'D<?>x_max<?> (m)', 'D<?>y_max<?> (m)', &
-       &'t<?>n<?>', 'ct (m)', 'turns', 'particle', '<G>a<G>',             &
-       &'p<?>t_n<?>', 'W<?>t<?>', '<G>F<G><?>t<?> (rad/2<G>p<G>)',        &
-       &'<G>b<G><?>x_max<?><!>1/2<!> (m<!>1/2<!>)',                       &
-       &'<G>b<G><?>y_max<?><!>1/2<!> (m<!>1/2<!>)' /
+       's (m)', 'n<G>s<G> (mm)', '<G>d<G><?>E<?>/p<?>0<?>c',             &
+       'Q<?>s<?>', 'x (m)', 'y (m)', 'n<G>s<G> (mm)', 'n<G>s<G> (mm)',   &
+       'ct (m)', 'x<?>n<?>', 'y<?>n<?>', 'p<?>xn<?>', 'p<?>yn<?>',       &
+       '<G>g<G><?>tr<?>', 'X<?>rms<?> (m)', 'Y<?>rms<?> (m)',            &
+       'X<?>max<?> (m)', 'Y<?>max<?> (m)', '<G>b<G><?>x_max<?> (m)',     &
+       '<G>b<G><?>y_max<?> (m)', 'D<?>x_max<?> (m)', 'D<?>y_max<?> (m)', &
+       't<?>n<?>', 'ct (m)', 'turns', 'particle', '<G>a<G>',             &
+       'p<?>t_n<?>', 'W<?>t<?>', '<G>F<G><?>t<?> (rad/2<G>p<G>)',        &
+       '<G>b<G><?>x_max<?><!>1/2<!> (m<!>1/2<!>)',                       &
+       '<G>b<G><?>y_max<?><!>1/2<!> (m<!>1/2<!>)' /
   data (svlabl(j), j = 33, mnvar) /                                 &
-       &'<G>b<G><?>x<?> (m)', '<G>b<G><?>x<?><!>1/2<!> (m<!>1/2<!>)',     &
-       &'<G>a<G><?>x<?>', '<G>m<G><?>x<?> (rad/2<G>p<G>)', 'D<?>x<?> (m)',&
-       &'D<?>px<?>', 'Q<?>x<?>', 'p<?>x<?>/p<?>0<?>', 'W<?>x<?>',         &
-       &'<G>F<G><?>x<?> (rad/2<G>p<G>)', 'd<G>m<G><?>x<?>/d<G>d<G>',      &
-       &'dD<?>x<?>/d<G>d<D> (m)', 'dD<?>px<?>/d<G>d<G>', 'W<?>x<?> (m)',  &
-       &'XI<?>x<?>',                                                      &
-       &'<G>b<G><?>y<?> (m)', '<G>b<G><?>y<?><!>1/2<!> (m<!>1/2<!>)',     &
-       &'<G>a<G><?>y<?>', '<G>m<G><?>y<?> (rad/2<G>p<G>)', 'D<?>y<?> (m)',&
-       &'D<?>py<?>', 'Q<?>y<?>', 'p<?>y<?>/p<?>0<?>', 'W<?>y<?>',         &
-       &'<G>F<G><?>y<?> (rad/2<G>p<G>)', 'd<G>m<G><?>y<?>/d<G>d<G>',      &
-       &'dD<?>y<?>/d<G>d<D> (m)', 'dD<?>py<?>/d<G>d<G>', 'W<?>y<?> (m)',  &
-       &'XI<?>y<?>', 'x<?>ns<?>', 'p<?>x_ns<?>', 'W<?>xs<?>',             &
-       &'y<?>ns<?>', 'p<?>y_ns<?>', 'W<?>ys<?>',                          &
-       &'E[GeV]', 'spintune',                                             &
-       &'polarization','polarization','polarization','polarization' /
+       '<G>b<G><?>x<?> (m)', '<G>b<G><?>x<?><!>1/2<!> (m<!>1/2<!>)',     &
+       '<G>a<G><?>x<?>', '<G>m<G><?>x<?> (rad/2<G>p<G>)', 'D<?>x<?> (m)',&
+       'D<?>px<?>', 'Q<?>x<?>', 'p<?>x<?>/p<?>0<?>', 'W<?>x<?>',         &
+       '<G>F<G><?>x<?> (rad/2<G>p<G>)', 'd<G>m<G><?>x<?>/d<G>d<G>',      &
+       'dD<?>x<?>/d<G>d<D> (m)', 'dD<?>px<?>/d<G>d<G>', 'W<?>x<?> (m)',  &
+       'XI<?>x<?>',                                                      &
+       '<G>b<G><?>y<?> (m)', '<G>b<G><?>y<?><!>1/2<!> (m<!>1/2<!>)',     &
+       '<G>a<G><?>y<?>', '<G>m<G><?>y<?> (rad/2<G>p<G>)', 'D<?>y<?> (m)',&
+       'D<?>py<?>', 'Q<?>y<?>', 'p<?>y<?>/p<?>0<?>', 'W<?>y<?>',         &
+       '<G>F<G><?>y<?> (rad/2<G>p<G>)', 'd<G>m<G><?>y<?>/d<G>d<G>',      &
+       'dD<?>y<?>/d<G>d<D> (m)', 'dD<?>py<?>/d<G>d<G>', 'W<?>y<?> (m)',  &
+       'XI<?>y<?>', 'x<?>ns<?>', 'p<?>x_ns<?>', 'W<?>xs<?>',             &
+       'y<?>ns<?>', 'p<?>y_ns<?>', 'W<?>ys<?>',                          &
+       'E[GeV]', 'spintune',                                             &
+       'polarization','polarization','polarization','polarization' /
 
   data (svanno(j), j = 1, 32) /                                     &
-       &'s', 'n<G>s<G>', '<G>d<G>',                                       &
-       &'Q<?>s<?>', 'x', 'y', 'n<G>s<G><?>x<?>', 'n<G>s<G><?>y<?>',       &
-       &'ct', 'x<?>n<?>', 'y<?>n<?>', 'p<?>xn<?>', 'p<?>yn<?>',           &
-       &'<G>g<G><?>tr<?>', 'X<?>rms<?>', 'Y<?>rms<?>',                    &
-       &'X<?>max<?>', 'Y<?>max<?>', '<G>b<G><?>x_max<?>',                 &
-       &'<G>b<G><?>y_max<?>', 'D<?>x_max<?>', 'D<?>y_max<?>',             &
-       &'t<?>n<?>', 't', 'turns', 'particle', '<G>a<G>',                  &
-       &'p<?>t_n<?>', 'W<?>t<?>', '<G>F<G><?>t<?>',                       &
-       &'<G>b<G><?>x_max<?><!>1/2<!>',                                    &
-       &'<G>b<G><?>y_max<?><!>1/2<!>' /
+       's', 'n<G>s<G>', '<G>d<G>',                                       &
+       'Q<?>s<?>', 'x', 'y', 'n<G>s<G><?>x<?>', 'n<G>s<G><?>y<?>',       &
+       'ct', 'x<?>n<?>', 'y<?>n<?>', 'p<?>xn<?>', 'p<?>yn<?>',           &
+       '<G>g<G><?>tr<?>', 'X<?>rms<?>', 'Y<?>rms<?>',                    &
+       'X<?>max<?>', 'Y<?>max<?>', '<G>b<G><?>x_max<?>',                 &
+       '<G>b<G><?>y_max<?>', 'D<?>x_max<?>', 'D<?>y_max<?>',             &
+       't<?>n<?>', 't', 'turns', 'particle', '<G>a<G>',                  &
+       'p<?>t_n<?>', 'W<?>t<?>', '<G>F<G><?>t<?>',                       &
+       '<G>b<G><?>x_max<?><!>1/2<!>',                                    &
+       '<G>b<G><?>y_max<?><!>1/2<!>' /
   data (svanno(j), j = 33, mnvar) /                                 &
-       &'<G>b<G><?>x<?>', '<G>b<G><?>x<?><!>1/2<!>',                      &
-       &'<G>a<G><?>x<?>', '<G>m<G><?>x<?>', 'D<?>x<?>',                   &
-       &'D<?>px<?>', 'Q<?>x<?>', 'p<?>x<?>', 'W<?>x<?>',                  &
-       &'<G>F<G><?>x<?>', '<G>m<G><?>x<?>''',                             &
-       &'D<?>x<?>''', 'D<?>px<?>''', 'W<?>x<?>',                          &
-       &'XI<?>x<?>',                                                      &
-       &'<G>b<G><?>y<?>', '<G>b<G><?>y<?><!>1/2<!>',                      &
-       &'<G>a<G><?>y<?>', '<G>m<G><?>y<?>', 'D<?>y<?>',                   &
-       &'D<?>py<?>', 'Q<?>y<?>', 'p<?>y<?>', 'W<?>y<?>',                  &
-       &'<G>F<G><?>y<?>', '<G>m<G><?>y<?>''',                             &
-       &'D<?>y<?>''', 'D<?>py<?>''', 'W<?>y<?>',                          &
-       &'XI<?>y<?>', 'x<?>ns<?>', 'p<?>x_ns<?>', 'W<?>xs<?>',             &
-       &'y<?>ns<?>', 'p<?>y_ns<?>', 'W<?>ys<?>',                          &
-       &'E', ' ',                                                         &
-       &'p<?>tot<?>', 'p<?>diff_x<?>', 'p<?>diff_y<?>', 'p<?>diff_s<?>'/
+       '<G>b<G><?>x<?>', '<G>b<G><?>x<?><!>1/2<!>',                      &
+       '<G>a<G><?>x<?>', '<G>m<G><?>x<?>', 'D<?>x<?>',                   &
+       'D<?>px<?>', 'Q<?>x<?>', 'p<?>x<?>', 'W<?>x<?>',                  &
+       '<G>F<G><?>x<?>', '<G>m<G><?>x<?>''',                             &
+       'D<?>x<?>''', 'D<?>px<?>''', 'W<?>x<?>',                          &
+       'XI<?>x<?>',                                                      &
+       '<G>b<G><?>y<?>', '<G>b<G><?>y<?><!>1/2<!>',                      &
+       '<G>a<G><?>y<?>', '<G>m<G><?>y<?>', 'D<?>y<?>',                   &
+       'D<?>py<?>', 'Q<?>y<?>', 'p<?>y<?>', 'W<?>y<?>',                  &
+       '<G>F<G><?>y<?>', '<G>m<G><?>y<?>''',                             &
+       'D<?>y<?>''', 'D<?>py<?>''', 'W<?>y<?>',                          &
+       'XI<?>y<?>', 'x<?>ns<?>', 'p<?>x_ns<?>', 'W<?>xs<?>',             &
+       'y<?>ns<?>', 'p<?>y_ns<?>', 'W<?>ys<?>',                          &
+       'E', ' ',                                                         &
+       'p<?>tot<?>', 'p<?>diff_x<?>', 'p<?>diff_y<?>', 'p<?>diff_s<?>'/
 
   data (iproc(j,1), j = 1, 32) /                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 2, 3, 4, 5,                                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &6, 0, 0, 0, 0,                                                    &
-       &7, 8, 9,                                                          &
-       &1,                                                                &
-       &1 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 2, 3, 4, 5,                                                    &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       6, 0, 0, 0, 0,                                                    &
+       7, 8, 9,                                                          &
+       1,                                                                &
+       1 /
 
   data (iproc(j,1), j = 33, mnvar) /                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 14, 15, 16,                                                    &
-       &17, 18, 19,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0,                                                       &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0,                                                       &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 14, 15, 16,                                                    &
+       17, 18, 19,                                                       &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (iproc(j,2), j = 1, 32) /                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 2, 3, 4, 5,                                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &6, 0, 0, 0, 0,                                                    &
-       &7, 8, 9,                                                          &
-       &1,                                                                &
-       &1 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 2, 3, 4, 5,                                                    &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       6, 0, 0, 0, 0,                                                    &
+       7, 8, 9,                                                          &
+       1,                                                                &
+       1 /
 
   data (iproc(j,2), j = 33, mnvar) /                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 10,                                                      &
-       &11, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 12,                                                      &
-       &13, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0, 14, 15, 16,                                                    &
-       &17, 18, 19,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 10,                                                      &
+       11, 0,                                                            &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 12,                                                      &
+       13, 0,                                                            &
+       0, 0, 0,                                                          &
+       0, 14, 15, 16,                                                    &
+       17, 18, 19,                                                       &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (iproc(j,3), j = 1, 32) /                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 2, 3, 4, 5,                                                    &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &6, 0, 0, 0, 0,                                                    &
-       &7, 8, 9,                                                          &
-       &1,                                                                &
-       &1 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 2, 3, 4, 5,                                                    &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       6, 0, 0, 0, 0,                                                    &
+       7, 8, 9,                                                          &
+       1,                                                                &
+       1 /
 
   data (iproc(j,3), j = 33, mnvar) /                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 10,                                                      &
-       &11, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 1,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 12,                                                      &
-       &13, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0, 14, 15, 16,                                                    &
-       &17, 18, 19,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 10,                                                      &
+       11, 0,                                                            &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 1,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 12,                                                      &
+       13, 0,                                                            &
+       0, 0, 0,                                                          &
+       0, 14, 15, 16,                                                    &
+       17, 18, 19,                                                       &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (intpo(j), j = 1, 32) / 32 * 0 /
   !--- in INTPO, n+100 means: take SQRT of var. n
   data (intpo(j), j = 33, mnvar) /                                  &
-       &1, 101,                                                           &
-       &2, 3, 4,                                                          &
-       &5, 0, 0, 0,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &6, 106,                                                           &
-       &7, 8, 9,                                                          &
-       &10, 0, 0, 0,                                                      &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0,                                                       &
-       &0, 0, 0,                                                          &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       1, 101,                                                           &
+       2, 3, 4,                                                          &
+       5, 0, 0, 0,                                                       &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       6, 106,                                                           &
+       7, 8, 9,                                                          &
+       10, 0, 0, 0,                                                      &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0,                                                       &
+       0, 0, 0,                                                          &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (ivdep(j,1,1), j = 1, 32) /                                  &
-       &1, 2, 3,                                                          &
-       &4, 5, 6, 7, 8,                                                    &
-       &9, 5, 6, 5, 6,                                                    &
-       &14, 15, 16,                                                       &
-       &17, 18, 19,                                                       &
-       &20, 21, 22,                                                       &
-       &24, 24, 25, 26, 27,                                               &
-       &3, 3, 3,                                                          &
-       &19,                                                               &
-       &20 /
+       1, 2, 3,                                                          &
+       4, 5, 6, 7, 8,                                                    &
+       9, 5, 6, 5, 6,                                                    &
+       14, 15, 16,                                                       &
+       17, 18, 19,                                                       &
+       20, 21, 22,                                                       &
+       24, 24, 25, 26, 27,                                               &
+       3, 3, 3,                                                          &
+       19,                                                               &
+       20 /
   data (ivdep(j,2,1), j = 1, 32) /                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 0, 0, 40, 55,                                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 24, 24,                                                        &
-       &0,                                                                &
-       &0 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 0, 0, 40, 55,                                                  &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 24, 24,                                                        &
+       0,                                                                &
+       0 /
   data (ivdep(j,1,1), j = 33, mnvar) /                              &
-       &33, 33,                                                           &
-       &35, 36, 37,                                                       &
-       &38, 39, 40, 41,                                                   &
-       &42, 43,                                                           &
-       &44, 45, 46,                                                       &
-       &47,                                                               &
-       &48, 48,                                                           &
-       &50, 51, 52,                                                       &
-       &53, 54, 55, 56,                                                   &
-       &57, 58,                                                           &
-       &59, 60, 61,                                                       &
-       &62, 5, 5, 5,                                                      &
-       &6, 6, 6,                                                          &
-       &69, 70,                                                           &
-       &71, 72, 73, 74 /
+       33, 33,                                                           &
+       35, 36, 37,                                                       &
+       38, 39, 40, 41,                                                   &
+       42, 43,                                                           &
+       44, 45, 46,                                                       &
+       47,                                                               &
+       48, 48,                                                           &
+       50, 51, 52,                                                       &
+       53, 54, 55, 56,                                                   &
+       57, 58,                                                           &
+       59, 60, 61,                                                       &
+       62, 5, 5, 5,                                                      &
+       6, 6, 6,                                                          &
+       69, 70,                                                           &
+       71, 72, 73, 74 /
   data (ivdep(j,2,1), j = 33, mnvar) /                              &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0,                                                       &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 40, 40,                                                     &
-       &0, 55, 55,                                                        &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0,                                                       &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0,                                                       &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 40, 40,                                                     &
+       0, 55, 55,                                                        &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (ivdep(j,1,2), j = 1, 32) /                                  &
-       &1, 2, 3,                                                          &
-       &4, 5, 6, 7, 8,                                                    &
-       &9, 5, 6, 5, 6,                                                    &
-       &14, 15, 16,                                                       &
-       &17, 18, 19,                                                       &
-       &20, 21, 22,                                                       &
-       &24, 24, 25, 26, 27,                                               &
-       &3, 3, 3,                                                          &
-       &19,                                                               &
-       &20 /
+       1, 2, 3,                                                          &
+       4, 5, 6, 7, 8,                                                    &
+       9, 5, 6, 5, 6,                                                    &
+       14, 15, 16,                                                       &
+       17, 18, 19,                                                       &
+       20, 21, 22,                                                       &
+       24, 24, 25, 26, 27,                                               &
+       3, 3, 3,                                                          &
+       19,                                                               &
+       20 /
   data (ivdep(j,2,2), j = 1, 32) /                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 0, 0, 40, 55,                                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 24, 24,                                                        &
-       &0,                                                                &
-       &0 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 0, 0, 40, 55,                                                  &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 24, 24,                                                        &
+       0,                                                                &
+       0 /
   data (ivdep(j,1,2), j = 33, mnvar) /                              &
-       &33, 33,                                                           &
-       &35, 36, 37,                                                       &
-       &38, 39, 40, 5,                                                    &
-       &5, 43,                                                            &
-       &44, 45, 46,                                                       &
-       &47,                                                               &
-       &48, 48,                                                           &
-       &50, 51, 52,                                                       &
-       &53, 54, 55, 6,                                                    &
-       &6, 58,                                                            &
-       &59, 60, 61,                                                       &
-       &62, 5, 5, 5,                                                      &
-       &6, 6, 6,                                                          &
-       &69, 70,                                                           &
-       &71, 72, 73, 74 /
+       33, 33,                                                           &
+       35, 36, 37,                                                       &
+       38, 39, 40, 5,                                                    &
+       5, 43,                                                            &
+       44, 45, 46,                                                       &
+       47,                                                               &
+       48, 48,                                                           &
+       50, 51, 52,                                                       &
+       53, 54, 55, 6,                                                    &
+       6, 58,                                                            &
+       59, 60, 61,                                                       &
+       62, 5, 5, 5,                                                      &
+       6, 6, 6,                                                          &
+       69, 70,                                                           &
+       71, 72, 73, 74 /
   data (ivdep(j,2,2), j = 33, mnvar) /                              &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 40,                                                      &
-       &40, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 55,                                                      &
-       &55, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0, 0, 40, 40,                                                     &
-       &0, 55, 55,                                                        &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 40,                                                      &
+       40, 0,                                                            &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 55,                                                      &
+       55, 0,                                                            &
+       0, 0, 0,                                                          &
+       0, 0, 40, 40,                                                     &
+       0, 55, 55,                                                        &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   data (ivdep(j,1,3), j = 1, 32) /                                  &
-       &1, 2, 3,                                                          &
-       &4, 5, 6, 7, 8,                                                    &
-       &9, 5, 6, 5, 6,                                                    &
-       &14, 15, 16,                                                       &
-       &17, 18, 19,                                                       &
-       &20, 21, 22,                                                       &
-       &24, 24, 25, 26, 27,                                               &
-       &3, 3, 3,                                                          &
-       &19,                                                               &
-       &20 /
+       1, 2, 3,                                                          &
+       4, 5, 6, 7, 8,                                                    &
+       9, 5, 6, 5, 6,                                                    &
+       14, 15, 16,                                                       &
+       17, 18, 19,                                                       &
+       20, 21, 22,                                                       &
+       24, 24, 25, 26, 27,                                               &
+       3, 3, 3,                                                          &
+       19,                                                               &
+       20 /
   data (ivdep(j,2,3), j = 1, 32) /                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 0, 0, 40, 55,                                                  &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 0, 0,                                                    &
-       &0, 24, 24,                                                        &
-       &0,                                                                &
-       &0 /
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 0, 0, 40, 55,                                                  &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0,                                                          &
+       0, 0, 0, 0, 0,                                                    &
+       0, 24, 24,                                                        &
+       0,                                                                &
+       0 /
   data (ivdep(j,1,3), j = 33, mnvar) /                              &
-       &33, 33,                                                           &
-       &35, 36, 37,                                                       &
-       &38, 39, 40, 5,                                                    &
-       &5, 43,                                                            &
-       &44, 45, 46,                                                       &
-       &47,                                                               &
-       &48, 48,                                                           &
-       &50, 51, 52,                                                       &
-       &53, 54, 55, 6,                                                    &
-       &6, 58,                                                            &
-       &59, 60, 61,                                                       &
-       &62, 5, 5, 5,                                                      &
-       &6, 6, 6,                                                          &
-       &69, 70,                                                           &
-       &71, 72, 73, 74 /
+       33, 33,                                                           &
+       35, 36, 37,                                                       &
+       38, 39, 40, 5,                                                    &
+       5, 43,                                                            &
+       44, 45, 46,                                                       &
+       47,                                                               &
+       48, 48,                                                           &
+       50, 51, 52,                                                       &
+       53, 54, 55, 6,                                                    &
+       6, 58,                                                            &
+       59, 60, 61,                                                       &
+       62, 5, 5, 5,                                                      &
+       6, 6, 6,                                                          &
+       69, 70,                                                           &
+       71, 72, 73, 74 /
   data (ivdep(j,2,3), j = 33, mnvar) /                              &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 40,                                                      &
-       &40, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0,                                                                &
-       &0, 0,                                                             &
-       &0, 0, 0,                                                          &
-       &0, 0, 0, 55,                                                      &
-       &55, 0,                                                            &
-       &0, 0, 0,                                                          &
-       &0, 0, 40, 40,                                                     &
-       &0, 55, 55,                                                        &
-       &0, 0,                                                             &
-       &0, 0, 0, 0 /
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 40,                                                      &
+       40, 0,                                                            &
+       0, 0, 0,                                                          &
+       0,                                                                &
+       0, 0,                                                             &
+       0, 0, 0,                                                          &
+       0, 0, 0, 55,                                                      &
+       55, 0,                                                            &
+       0, 0, 0,                                                          &
+       0, 0, 40, 40,                                                     &
+       0, 55, 55,                                                        &
+       0, 0,                                                             &
+       0, 0, 0, 0 /
 
   !--- Routine body
 
@@ -1328,6 +1330,9 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
   !***********************************************************************
 
 subroutine peiact(kact, np, x, y, ac, kf, kl)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Return first and last point of curve inside active window
@@ -1342,7 +1347,6 @@ subroutine peiact(kact, np, x, y, ac, kf, kl)
   !   KL          (int)   last  point inside, or 0
   !
   !----------------------------------------------------------------------*
-  implicit none
 
   !--- type definition of the routine arguments
 
@@ -1388,6 +1392,11 @@ end subroutine peiact
 
 subroutine peintp(crow, nint, proc, length, ierr)
 
+  use plotfi
+  use plot_bfi
+  use plot_mathfi
+  implicit none
+
   !----------------------------------------------------------------------*
   !     purpose:
   !     interpolate variables plotted against s
@@ -1408,12 +1417,6 @@ subroutine peintp(crow, nint, proc, length, ierr)
   !
   !     it is called by the routine pefill in this file.
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
-  include 'plot_math.fi'
 
   !---  type definition of the routine arguments
 
@@ -1516,35 +1519,35 @@ subroutine peintp(crow, nint, proc, length, ierr)
   k = embedded_twiss()
   do i = 1, nint
      k = double_from_table('embedded_twiss_table ',                  &
-          &'x ', i, tw1(11))
+          'x ', i, tw1(11))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'px ', i, tw1(12))
+          'px ', i, tw1(12))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'betx ', i, tw1(1))
+          'betx ', i, tw1(1))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'alfx ', i, tw1(2))
+          'alfx ', i, tw1(2))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'mux ', i, tw1(3))
+          'mux ', i, tw1(3))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'dx ', i, tw1(4))
+          'dx ', i, tw1(4))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'dpx ', i, tw1(5))
+          'dpx ', i, tw1(5))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'y ', i, tw1(13))
+          'y ', i, tw1(13))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'py ', i, tw1(14))
+          'py ', i, tw1(14))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'bety ', i, tw1(6))
+          'bety ', i, tw1(6))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'alfy ', i, tw1(7))
+          'alfy ', i, tw1(7))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'muy ', i, tw1(8))
+          'muy ', i, tw1(8))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'dy ', i, tw1(9))
+          'dy ', i, tw1(9))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'dpy ', i, tw1(10))
+          'dpy ', i, tw1(10))
      k = double_from_table('embedded_twiss_table ',                  &
-          &'s ', i, s_incr)
+          's ', i, s_incr)
      s = s_elem + s_incr
      ex = get_value('beam ','ex ')
      ey = get_value('beam ','ey ')
@@ -1606,6 +1609,11 @@ subroutine peintp(crow, nint, proc, length, ierr)
   !***********************************************************************
 
 subroutine pemima
+
+  use plotfi
+  use plot_bfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Constrain axis reference, find minima and maxima of coordinates,   *
@@ -1615,11 +1623,6 @@ subroutine pemima
   !                                                                      *
   ! it is called by the routine exec_plot in file madxn.c after pefill.  *
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
 
   !--- type definitions of local variables
 
@@ -1715,6 +1718,11 @@ end subroutine pemima
 
 subroutine peplot
 
+  use plotfi
+  use plot_bfi
+  use plot_mathfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Plot all types of graphs from MAD.
@@ -1729,12 +1737,6 @@ subroutine peplot
   !
   ! it is called by the routine plotit in this file.
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
-  include 'plot_math.fi'
 
   !--- type definitions of local variables
   !--- strings:
@@ -1759,7 +1761,7 @@ subroutine peplot
   integer ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4)
   integer lastnb, iaxseq(4)
   integer idum, k1dum, k2dum, k3dum, i, npar, ivvar, nvax, ivax,    &
-       &ierr, vdum(2), j, k
+       ierr, vdum(2), j, k
 
   !--- definitions of function primitives
 
@@ -1808,7 +1810,7 @@ subroutine peplot
         call headvalue(tabname,'deltap ', deltap)
         if(deltap.eq.1d+12) then
            call aawarn('PEPLOT: ',                                     &
-                &'deltap is not part of the twiss header')
+                'deltap is not part of the twiss header')
            deltap=zero
         endif
      endif
@@ -1816,7 +1818,7 @@ subroutine peplot
      call headvalue(tabname,'deltap ', deltap)
      if(deltap.eq.1d+12) then
         call aawarn('PEPLOT: ',                                       &
-             &'deltap is not part of the ptc_twiss header')
+             'deltap is not part of the ptc_twiss header')
         deltap=zero
      endif
   endif
@@ -2027,7 +2029,7 @@ subroutine peplot
   !--- plot frame, keep windows for curves + clipping
 
   call gxfrm1 (numax, nptval, ipxval, ipyval, icvref, xax, yax,     &
-       &window, actwin, ierr)
+       window, actwin, ierr)
   if (ierr .ne. 0) goto 120
 
   !--- now loop over vertical variables for real curve plotting
@@ -2060,8 +2062,8 @@ subroutine peplot
      !--- call curve plot routine with simple arrays and flags
 
      call pecurv (ivvar, slocn, chh, qascl,                          &
-          &symch * qsscl, ipparm(1,ivvar), nqval(ivvar), qhval(1,ivvar),     &
-          &qvval(1,ivvar), window(1,nvax), actwin(1,nvax), ierr)
+          symch * qsscl, ipparm(1,ivvar), nqval(ivvar), qhval(1,ivvar),     &
+          qvval(1,ivvar), window(1,nvax), actwin(1,nvax), ierr)
      if (ierr .ne. 0) goto 150
   enddo
   if (fpmach)  then
@@ -2087,6 +2089,10 @@ end subroutine peplot
 !***********************************************************************
 
 subroutine peschm (nel, ityp, hr, es, ee, actwin)
+
+  use plotfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Plot schema
@@ -2119,10 +2125,6 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   ! it is called by the routine peplot in this file.
   !----------------------------------------------------------------------*
 
-  implicit none
-
-  include 'plot.fi'
-
   !--- type definition of the routine arguments
 
   integer nel, ityp(*)
@@ -2138,48 +2140,48 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   !--- Initialisation of local variables
 
   data npst   / 1,  6, 11, 16, 21,                                  &
-       &33, 43, 48,                                                       &
-       &50,                                                               &
-       &64, 69, 74, 79, 84 /
+       33, 43, 48,                                                       &
+       50,                                                               &
+       64, 69, 74, 79, 84 /
   data npnd   / 5, 10, 15, 20, 32,                                  &
-       &42, 47, 49,                                                       &
-       &63,                                                               &
-       &68, 73, 78, 83, 88 /
+       42, 47, 49,                                                       &
+       63,                                                               &
+       68, 73, 78, 83, 88 /
   data npsl   /5 * 1, 5 * 1, 5 * 1, 5 * 3, 5 * 1, 0, 4 * 1, 0, 1,   &
-       &1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 5 * 1, 2 * 1,                       &
-       &6 * 1, 0, 5 * 1, 0, 1,                                            &
-       &5 * 1, 5 * 1, 5 * 1, 5 * 1, 5 * 1 /
+       1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 5 * 1, 2 * 1,                       &
+       6 * 1, 0, 5 * 1, 0, 1,                                            &
+       5 * 1, 5 * 1, 5 * 1, 5 * 1, 5 * 1 /
   data typz   / 2 * 0. /
   data shapex /0., 1., 1., 0., 0.,                                  &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,                   &
-       &0., 1., 0.5, 0.5, 0., 1., 0.5, 0.5, 0., 1.,                       &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 0.,                                                           &
-       &0., 0.25, 0.25, 0.75, 0.75, 1.,                                   &
-       &0., 0.25, 0.25, 0.75, 0.75, 1., 0., 1.,                           &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0.,                                               &
-       &0., 1., 1., 0., 0. /
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 0., 1.,                   &
+       0., 1., 0.5, 0.5, 0., 1., 0.5, 0.5, 0., 1.,                       &
+       0., 1., 1., 0., 0.,                                               &
+       0., 0.,                                                           &
+       0., 0.25, 0.25, 0.75, 0.75, 1.,                                   &
+       0., 0.25, 0.25, 0.75, 0.75, 1., 0., 1.,                           &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0.,                                               &
+       0., 1., 1., 0., 0. /
   data shapey /0.6, 0.6, -0.6, -0.6, 0.6,                           &
-       &0., 0., 0.8, 0.8, 0.,                                             &
-       &0., 0., -0.8, -0.8, 0.,                                           &
-       &0.6, 0.6, -0.6, -0.6, 0.6,                                        &
-       &0.8, 0.8, 0.4, 0.4, 0.8, -0.8, -0.8, -0.4, -0.4, -0.8, 0., 0.,    &
-       &0.4, 0.4, 0.8, 0.4, -0.4, -0.4, -0.8, -0.4, 0., 0.,               &
-       &0.5, 0.5, -0.5, -0.5, 0.5,                                        &
-       &0.5, -0.5,                                                        &
-       &0.2, 0.2, 0.8, 0.8, 0.2, 0.2,                                     &
-       &-0.2, -0.2, -0.8, -0.8, -0.2, -0.2, 0., 0.,                       &
-       &0., 0., 0.5, 0.5, 0.,                                             &
-       &0., 0., -0.5, -0.5, 0.,                                           &
-       &0., 0., 0.25, 0.25, 0.,                                           &
-       &0., 0., -0.25, -0.25, 0.,                                         &
-       &0.2, 0.2, -0.2, -0.2, 0.2 /
+       0., 0., 0.8, 0.8, 0.,                                             &
+       0., 0., -0.8, -0.8, 0.,                                           &
+       0.6, 0.6, -0.6, -0.6, 0.6,                                        &
+       0.8, 0.8, 0.4, 0.4, 0.8, -0.8, -0.8, -0.4, -0.4, -0.8, 0., 0.,    &
+       0.4, 0.4, 0.8, 0.4, -0.4, -0.4, -0.8, -0.4, 0., 0.,               &
+       0.5, 0.5, -0.5, -0.5, 0.5,                                        &
+       0.5, -0.5,                                                        &
+       0.2, 0.2, 0.8, 0.8, 0.2, 0.2,                                     &
+       -0.2, -0.2, -0.8, -0.8, -0.2, -0.2, 0., 0.,                       &
+       0., 0., 0.5, 0.5, 0.,                                             &
+       0., 0., -0.5, -0.5, 0.,                                           &
+       0., 0., 0.25, 0.25, 0.,                                           &
+       0., 0., -0.25, -0.25, 0.,                                         &
+       0.2, 0.2, -0.2, -0.2, 0.2 /
 
   !--- Routine body
 
@@ -2239,6 +2241,10 @@ end subroutine peschm
 
 subroutine pesopt(ierr)
 
+  use plotfi
+  use plot_bfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Stores plot options and values, checks
@@ -2251,11 +2257,6 @@ subroutine pesopt(ierr)
   !
   ! it is called by the routine exec_plot in file madxn.c
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
 
   integer ierr
 
@@ -2343,33 +2344,33 @@ subroutine pesopt(ierr)
   !--- ptc flag setting
 
   call comm_para('ptc ', nint, ndble, k, int_arr, d_arr,            &
-       &char_a, char_l)
+       char_a, char_l)
   if (nint .gt. 0 .and. int_arr(1) .eq. 1) ptc_flag = .true.
 
   !--- Get notitle
 
   call comm_para('notitle ', nint, ndble, k, int_arr, d_arr,        &
-       &char_a, char_l)
+       char_a, char_l)
   if (nint .gt. 0) notitle = int_arr(1)
 
   !--- get noversi
 
   call comm_para('noversion ', nint, ndble, k, int_arr, d_arr,      &
-       &char_a, char_l)
+       char_a, char_l)
   if (nint .gt. 0) noversi = int_arr(1)
 
   !--- if ptc flag is on look for the ptc_table
 
   if(ptc_flag) then
      call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr,    &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0) tabname = char_a
   else
 
      !--- else normal twiss treatment : any table - for hor = s plot machine
 
      call comm_para('table ', nint, ndble, k, int_arr, d_arr,        &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0) tabname = char_a
   endif
 
@@ -2377,7 +2378,7 @@ subroutine pesopt(ierr)
 
   char_a = ' '
   call comm_para( 'haxis ', nint, ndble, k, int_arr, d_arr,         &
-       &char_a, char_l)
+       char_a, char_l)
   if (k .eq. 0)  then
      print *, 'no horizontal variable'
      ierr = 1
@@ -2393,7 +2394,7 @@ subroutine pesopt(ierr)
   if (notitle .eq. 0)  then
      char_a = ' '
      call comm_para('title ', nint, ndble, k, int_arr, d_arr,        &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .eq. 0) then
         call get_title(char_a, k)
      else
@@ -2418,7 +2419,7 @@ subroutine pesopt(ierr)
 
   char_a = ' '
   call comm_para('range ', nint, ndble, k, int_arr, d_arr,          &
-       &char_a, char_l)
+       char_a, char_l)
   call table_range(tabname, char_a, nrrang)
   if (nrrang(1) .eq. 0 .and. nrrang(2) .eq. 0)  then
      print *, 'unknown table or illegal range, skipped'
@@ -2429,26 +2430,26 @@ subroutine pesopt(ierr)
   char_a = ' '
 
   call comm_para('noline ', nint, ndble, k, int_arr, d_arr,         &
-       &char_a, char_l)
+       char_a, char_l)
   if (nint .gt. 0) noline = int_arr(1)
 
   call comm_para('hmin ', nint, ndble, k, int_arr, d_arr,           &
-       &char_a, char_l)
+       char_a, char_l)
   if (ndble .gt. 0) hrange(1) = d_arr(1)
 
   call comm_para('hmax ', nint, ndble, k, int_arr, d_arr,           &
-       &char_a, char_l)
+       char_a, char_l)
   if (ndble .gt. 0) hrange(2) = d_arr(1)
 
   call comm_para('vmin ', nint, ndble, k, int_arr, d_arr,           &
-       &char_a, char_l)
+       char_a, char_l)
 
   do i = 1, ndble
      vrange(1,i) = d_arr(i)
   enddo
 
   call comm_para('vmax ', nint, ndble, k, int_arr, d_arr,           &
-       &char_a, char_l)
+       char_a, char_l)
 
   do i = 1, ndble
      vrange(2,i) = d_arr(i)
@@ -2457,12 +2458,11 @@ subroutine pesopt(ierr)
   !--- Check that STYLE & SYMBOL are both non zero
 
   call comm_para('style ', nint, ndble, k, plot_style, d_arr,       &
-       &char_a, char_l)
+       char_a, char_l)
   call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,     &
-       &char_a, char_l)
+       char_a, char_l)
   if (plot_style(1) + plot_symbol(1) .eq. 0) then
-     print *,'Warning: style & symbol attributes will make plot invis&
-          &ible. Thus style is set to 1.'
+     print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
   endif
   ipparm(1,1) = plot_style(1)
@@ -2470,10 +2470,10 @@ subroutine pesopt(ierr)
 
   char_a = ' '
   call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,       &
-       &char_a, char_l)
+       char_a, char_l)
 
   call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr,     &
-       &char_a, char_l)
+       char_a, char_l)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
 
@@ -2483,15 +2483,14 @@ subroutine pesopt(ierr)
 
   if (.not. ptc_flag) then
      call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr,       &
-          &char_a,char_l)
-     if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action t&
-          &aken, use interpolate attribute instead.'
+          char_a,char_l)
+     if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
 
      ipparm(2,1) = 0
      inter_setplot = plot_option('interpolate ')
      if (inter_setplot .eq. 0) then
         call comm_para('interpolate ', nint, ndble, k, ipparm(2,1),   &
-             &d_arr,char_a, char_l)
+             d_arr,char_a, char_l)
      else
         ipparm(2,1) = inter_setplot
      endif
@@ -2503,7 +2502,7 @@ subroutine pesopt(ierr)
 
   char_a = ' '
   call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,          &
-       &char_a, char_l)
+       char_a, char_l)
   if (k .gt. 0)  then
      nivaxs = 1
      nivvar = min(k, mxcurv)
@@ -2514,7 +2513,7 @@ subroutine pesopt(ierr)
   else
      char_a = ' '
      call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,       &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2530,7 +2529,7 @@ subroutine pesopt(ierr)
      endif
      char_a = ' '
      call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,       &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2545,7 +2544,7 @@ subroutine pesopt(ierr)
      endif
      char_a = ' '
      call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,       &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2560,7 +2559,7 @@ subroutine pesopt(ierr)
      endif
      char_a = ' '
      call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,       &
-          &char_a, char_l)
+          char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2590,7 +2589,7 @@ subroutine pesopt(ierr)
 
   do j = 1, nivvar
      call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j),       &
-          &sdum(1))
+          sdum(1))
      if (slabl(j) .eq. 'rbetx')  then
         sname(j) = 'betx'
         proc_flag(1,j) = 1
@@ -2606,6 +2605,9 @@ subroutine pesopt(ierr)
   !***********************************************************************
 
 subroutine pesplit(n_str, char_a, char_l, char_buff)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   !
   !   Utility routine
@@ -2619,8 +2621,6 @@ subroutine pesplit(n_str, char_a, char_l, char_buff)
   !   cahr_buf   sub_strings
   !
   !----------------------------------------------------------------------*
-
-  implicit none
 
   !--- type definition of the routine arguments
 
@@ -2647,6 +2647,10 @@ end subroutine pesplit
 
 subroutine plginit
 
+  use plotfi
+  use plot_bfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Overall initialization
@@ -2659,11 +2663,6 @@ subroutine plginit
   !
   ! it is called by the routine plotit in this file.
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
 
   !--- type definitions of local variables
 
@@ -2690,7 +2689,7 @@ subroutine plginit
   char_a = ' '
   tmp_a = 'file '
   call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
-       &char_a, char_l)
+       char_a, char_l)
   if (k .gt. 0) then
      plfnam = char_a(:char_l(1))
   else
@@ -2733,6 +2732,11 @@ end subroutine plginit
 !***********************************************************************
 
 subroutine plotit(initfl)
+
+  use plotfi
+  use plot_bfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Plots on screen and/or file
@@ -2743,11 +2747,6 @@ subroutine plotit(initfl)
   !
   ! it is called by the routine exec_plot in file madxn.c after pemima.
   !----------------------------------------------------------------------*
-
-  implicit none
-
-  include 'plot.fi'
-  include 'plot_b.fi'
 
   !--- type definition of the routine arguments
 
@@ -2793,6 +2792,9 @@ end subroutine plotit
 !***********************************************************************
 
 subroutine pupnbl(string,ifirst,ilast)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   !
   !   Utility routine
@@ -2808,8 +2810,6 @@ subroutine pupnbl(string,ifirst,ilast)
   !                                             last mod: Sept. 13, 2001
   !
   !----------------------------------------------------------------------*
-
-  implicit none
 
   !--- type definition of the routine arguments
 
@@ -2845,6 +2845,9 @@ subroutine pupnbl(string,ifirst,ilast)
   !***********************************************************************
 
 integer function iucomp(comp, arr, n)
+
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Utility function
   ! Purpose:
@@ -2857,8 +2860,6 @@ integer function iucomp(comp, arr, n)
   !
   !  returns 0 if not found, else position in arr
   !----------------------------------------------------------------------*
-
-  implicit none
 
   !--- type definition of the routine arguments
 

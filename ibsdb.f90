@@ -1,5 +1,6 @@
 ! **********************************************************
 subroutine enprem
+  use ibsdbfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -9,24 +10,24 @@ subroutine enprem
   !----------------------------------------------------------------------*
   double precision ten3p,ten6p
   parameter(ten6p=1d6,ten3p=1d3)
-  include 'ibsdb.fi'
 
   !---- Emittances and sigmas.
   write (*, 910) ten6p * ex, ten3p * sigx,                          &
-       &ten6p * ey, ten3p * sigy,                                         &
-       &ten6p * et, ten3p * sigt, ten3p * sige
+       ten6p * ey, ten3p * sigy,                                         &
+       ten6p * et, ten3p * sigt, ten3p * sige
 
 910 format(' '/' Emittances:'/' '/                                    &
-       &t6,'Ex',t16,e16.6,' pi*mm*mrad',t48,'sigx',t58,f14.6,' mm'/       &
-       &t6,'Ey',t16,e16.6,' pi*mm*mrad',t48,'sigy',t58,f14.6,' mm'/       &
-       &t6,'Et',t16,e16.6,' pi*mm*mrad',t48,'sigt',t58,f14.6,' mm',       &
-       &t88,'sigE',t96,f14.6,' 1/1000')
+       t6,'Ex',t16,e16.6,' pi*mm*mrad',t48,'sigx',t58,f14.6,' mm'/       &
+       t6,'Ey',t16,e16.6,' pi*mm*mrad',t48,'sigy',t58,f14.6,' mm'/       &
+       t6,'Et',t16,e16.6,' pi*mm*mrad',t48,'sigt',t58,f14.6,' mm',       &
+       t88,'sigE',t96,f14.6,' 1/1000')
 
 end subroutine enprem
 
 ! **********************************************************
 
 subroutine enprgl
+  use ibsdbfi
   implicit none
 
 
@@ -40,7 +41,6 @@ subroutine enprgl
   integer n1
   double precision eta,gamtr,t0,get_value,zero,one
   parameter(zero=0d0,one=1d0)
-  include 'ibsdb.fi'
 
   n1 = get_value('probe ','radiate ')
   frad = n1.ne.0
@@ -58,31 +58,31 @@ subroutine enprgl
   eta = alfa - one / gamma**2
 
   write (*, 910) frad, circ, freq0, t0, alfa,                       &
-       &eta, gamtr, currnt, bunch, parnum, en0, gamma, beta
+       eta, gamtr, currnt, bunch, parnum, en0, gamma, beta
 
 
 
 910 format(' '/' Global parameters for the machine: ',//,             &
-       &'radiate = ',l1,':'/' '/                                          &
-       &t6,'C',t16,f14.6,' m',t46,'f0',t56,f14.6,' MHz',                  &
-       &t86,'T0',t96,f14.6,' microseconds'/                               &
-       &t6,'alfa',t16,e18.6,t46,'eta',t56,e18.6,                          &
-       &t86,'gamma(tr)',t96,f14.6/                                        &
-       &t6,'Bcurrent',t16,f14.6,' A/bunch',t46,'Kbunch',t56,I6,           &
-       &t86,'Npart',t96,e18.6,' per bunch'/                               &
-       &t6,'E',t16,f14.6,' GeV',t46,'gamma',t56,f14.6,                    &
-       &t86,'beta',t96,f14.6)
+       'radiate = ',l1,':'/' '/                                          &
+       t6,'C',t16,f14.6,' m',t46,'f0',t56,f14.6,' MHz',                  &
+       t86,'T0',t96,f14.6,' microseconds'/                               &
+       t6,'alfa',t16,e18.6,t46,'eta',t56,e18.6,                          &
+       t86,'gamma(tr)',t96,f14.6/                                        &
+       t6,'Bcurrent',t16,f14.6,' A/bunch',t46,'Kbunch',t56,I6,           &
+       t86,'Npart',t96,e18.6,' per bunch'/                               &
+       t6,'E',t16,f14.6,' GeV',t46,'gamma',t56,f14.6,                    &
+       t86,'beta',t96,f14.6)
 
 end subroutine enprgl
 ! *************************************************************
 subroutine cavprt()
 
+  use name_lenfi
   implicit none
 
   integer i,lg,code,get_string,restart_sequ,advance_node
   double precision get_value,node_value,el,rfv,rff,rfl,deltap
-  include 'name_len.fi'
-  character * (name_len) sequ_name,el_name
+  character(name_len) sequ_name,el_name
 
   lg = get_string('sequence ', 'name ', sequ_name)
   if (lg .gt. 0) print *, 'sequence name: ', sequ_name(:lg)
@@ -105,6 +105,8 @@ end subroutine cavprt
 
 ! *********************************************************************
 subroutine twclog(bxbar, bybar, const)
+  use ibsdbfi
+  use physconsfi
   implicit none
 
 
@@ -123,13 +125,11 @@ subroutine twclog(bxbar, bybar, const)
   logical fbch
   integer n
   double precision get_value,bgam,bxbar,bybar,cbunch,const,coulog,  &
-       &debyel,densty,etrans,pnbtot,qion,rmax,rmin,rmincl,rminqm,sigtcm,  &
-       &sigxcm,sigycm,tempev,vol,pi,get_variable,zero,two,four,eight,ot2, &
-       &ft8,ot5,ttm3,fac1,fac2
+       debyel,densty,etrans,pnbtot,qion,rmax,rmin,rmincl,rminqm,sigtcm,  &
+       sigxcm,sigycm,tempev,vol,pi,get_variable,zero,two,four,eight,ot2, &
+       ft8,ot5,ttm3,fac1,fac2
   parameter(zero=0d0,two=2d0,four=4d0,eight=8d0,ot2=1d2,ft8=5d8,    &
-       &ot5=1d5,ttm3=2d-3,fac1=743.4d0,fac2=1.44d-7)
-  include 'ibsdb.fi'
-  include 'physcons.fi'
+       ot5=1d5,ttm3=2d-3,fac1=743.4d0,fac2=1.44d-7)
 
   pi=get_variable('pi ')
   ! **************************** DB *********************
@@ -172,11 +172,11 @@ subroutine twclog(bxbar, bybar, const)
   qion   = abs(charge)
   if (fbch) then
      const = parnum * coulog * arad**2 * clight / (eight * pi * betas&
-          &**3 * gammas**4 * ex * ey * sige * sigt)
+          **3 * gammas**4 * ex * ey * sige * sigt)
      cbunch = qion * parnum * qelect * betas * clight / circ
   else
      const = currnt * coulog * arad**2 /                             &
-          &(four * sqrt(pi) * qion * qelect * bgam**4 * ex * ey * sige)
+          (four * sqrt(pi) * qion * qelect * bgam**4 * ex * ey * sige)
   endif
   write (*, 910) const
 
@@ -187,7 +187,7 @@ subroutine twclog(bxbar, bybar, const)
   !     the equilibrium value.
   if (coulog .lt. zero) then
      call aawarn('TWCLOG', 'Coulomb logarithm gives invalid'         &
-          &// ' result --- check input parameters.')
+          // ' result --- check input parameters.')
   endif
 
   write (*, 940) ex, ey
@@ -200,22 +200,24 @@ subroutine twclog(bxbar, bybar, const)
 
 910 format(' '/5x,'CONST               = ',1p,e14.6)
 920 format(' '/5x,'ENERGY              = ',f14.6,' GeV'/              &
-       &5x,'BETA                = ',f14.6/                                &
-       &5x,'GAMMA               = ',f14.3/                                &
-       &5x,'COULOMB LOG         = ',f14.3)
+       5x,'BETA                = ',f14.6/                                &
+       5x,'GAMMA               = ',f14.3/                                &
+       5x,'COULOMB LOG         = ',f14.3)
 940 format(' '/5x,'X-emittance         = ',1p,e14.6,' m*rad'/         &
-       &5x,'Y-emittance         = ',   e14.6,' m*rad')
+       5x,'Y-emittance         = ',   e14.6,' m*rad')
 950 format(' '/5x,'Momentum spread     = ',1p,e14.6/                  &
-       &5x,'Bunch length        = ',0p,f14.6,' m'/' '/                    &
-       &5x,'Particles per bunch = ',1p,e14.6/                             &
-       &5x,'Bunch current       = ',1p,e14.6,' A')
+       5x,'Bunch length        = ',0p,f14.6,' m'/' '/                    &
+       5x,'Particles per bunch = ',1p,e14.6/                             &
+       5x,'Bunch current       = ',1p,e14.6,' A')
 960 format(' '/5x,'Momentum spread     = ',1p,e14.6/' '/              &
-       &5x,'Current             = ',0p,f14.6,' A'/' ')
+       5x,'Current             = ',0p,f14.6,' A'/' ')
 
 end subroutine twclog
 ! *********************************************************************
 subroutine ibs
 
+  use ibsdbfi
+  use physconsfi
   implicit none
 
 
@@ -229,18 +231,16 @@ subroutine ibs
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
   integer step,i,j,flag,range(2),n,get_option,double_from_table,    &
-       &restart_sequ,advance_to_pos
+       restart_sequ,advance_to_pos
   double precision tol,alx,alxbar,alxwtd,aly,alybar,ax1,ax2,ay1,ay2,&
-       &betax,betay,beteff,bx1,bx2,bxbar,bxinv,by1,by2,bybar,byinv,bywtd, &
-       &const,dels,dpx,dpx1,dpx2,dpxbr,dpxwtd,dx,dx1,dx2,dxbar,dxwtd,     &
-       &hscrpt,hscwtd,s1,s2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
-       &sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
-       &tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
-       &get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
-       &hscwtdy,sdpyb,sdyb,dpy,dpy1,dpy2,dpybr,dpywtd,beteffy,alywtd
+       betax,betay,beteff,bx1,bx2,bxbar,bxinv,by1,by2,bybar,byinv,bywtd, &
+       const,dels,dpx,dpx1,dpx2,dpxbr,dpxwtd,dx,dx1,dx2,dxbar,dxwtd,     &
+       hscrpt,hscwtd,s1,s2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
+       sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
+       tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
+       get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
+       hscwtdy,sdpyb,sdyb,dpy,dpy1,dpy2,dpybr,dpywtd,beteffy,alywtd
   parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0)
-  include 'ibsdb.fi'
-  include 'physcons.fi'
 
   !---- Universal physical constants.
 
@@ -447,16 +447,16 @@ subroutine ibs
         alxwtd = alxwtd + dels * alx
         alywtd = alywtd + dels * aly
         hscrpt = betax * dpx**2 + two * alx * dx * dpx +              &
-             &(one + alx**2) * dx**2 / betax
+             (one + alx**2) * dx**2 / betax
         hscrpty = betay * dpy**2 + two * aly * dy * dpy +             &
-             &(one + aly**2) * dy**2 / betay
+             (one + aly**2) * dy**2 / betay
         hscwtd = hscwtd + dels * sqrt(hscrpt)
         hscwtdy = hscwtdy + dels * sqrt(hscrpty)
      endif
 
      !---- TWSINT calculates the Bjorken/Mtingwa integral.
      call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,           &
-          &txidc, tyidc, tlidc)
+          txidc, tyidc, tlidc)
 
      !---- Accumulate contributions.
      tavlc = tavlc + tlidc * dels
@@ -531,19 +531,19 @@ subroutine ibs
 
   !---- Integral for averaged quantities.
   call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr,               &
-       &dybar,dpybr,txbar,tybar,tlbar)
+       dybar,dpybr,txbar,tybar,tlbar)
 
   !---- Integral for effective quantities.
   call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd,            &
-       &dywtd,dpywtd,txwtd,tywtd,tlwtd)
+       dywtd,dpywtd,txwtd,tywtd,tlwtd)
 
   !---- Calculate the Coulomb logarithm.
   call twclog(bxbar, bybar, const)
 
   !---- Output (weighted) average values.
   write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar,        &
-       &dpxbr, dpybr,                                                     &
-       &bxinv, byinv
+       dpxbr, dpybr,                                                     &
+       bxinv, byinv
 
   !---- Output averaged values.
   tavl   = tavlc * const / s2
@@ -558,29 +558,31 @@ subroutine ibs
 
 910 format(' '/' Particle beam: ',a,10x,a,'bunched.')
 920 format(' '/' Individual lattice point lifetimes'/' '/             &
-       &26x,'TLI/const',10x,'TXI/const',10x,'TYI/const'/                  &
-       &27x,'(1/sec)',12x,'(1/sec)',12x,'(1/sec)'/' ')
+       26x,'TLI/const',10x,'TXI/const',10x,'TYI/const'/                  &
+       27x,'(1/sec)',12x,'(1/sec)',12x,'(1/sec)'/' ')
 930 format(1x,i8,2x,a8,3x,3(1pe15.6,3x))
 940 format(' '/' Ring average values (m)'/' '/ 5x,'betx   = ',        &
-       &1pe13.5,4x, 'bety   = ',1pe13.5,4x,'Dx  = ',1pe12.5,              &
-       &4x,'Dy  = ',1pe12.5/                                              &
-       &5x,'alfx   = ',1pe13.5,4x,'alfy   = ',1pe13.5,4x,'Dpx = ',        &
-       &1pe12.5/5x,'Dpy = ',                                              &
-       &1pe12.5/5x,'1/betx = ',1pe13.5,4x,'1/bety = ',1pe13.5)
+       1pe13.5,4x, 'bety   = ',1pe13.5,4x,'Dx  = ',1pe12.5,              &
+       4x,'Dy  = ',1pe12.5/                                              &
+       5x,'alfx   = ',1pe13.5,4x,'alfy   = ',1pe13.5,4x,'Dpx = ',        &
+       1pe12.5/5x,'Dpy = ',                                              &
+       1pe12.5/5x,'1/betx = ',1pe13.5,4x,'1/bety = ',1pe13.5)
 950 format(' '/5x,'(Weighted) average rates (1/sec):'/                &
-       &5x,'Longitudinal= ',1p,e15.6/                                     &
-       &5x,'Horizontal  = ',   e15.6/                                     &
-       &5x,'Vertical    = ',   e15.6/                                     &
-       &' '/5x,'(Weighted) average lifetimes (sec):'/                     &
-       &5x,'Longitudinal= ',1p,e15.6/                                     &
-       &5x,'Horizontal  = ',   e15.6/                                     &
-       &5x,'Vertical    = ',   e15.6/' ')
+       5x,'Longitudinal= ',1p,e15.6/                                     &
+       5x,'Horizontal  = ',   e15.6/                                     &
+       5x,'Vertical    = ',   e15.6/                                     &
+       ' '/5x,'(Weighted) average lifetimes (sec):'/                     &
+       5x,'Longitudinal= ',1p,e15.6/                                     &
+       5x,'Horizontal  = ',   e15.6/                                     &
+       5x,'Vertical    = ',   e15.6/' ')
 
 end subroutine ibs
 ! *********************************************************************
 subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
-     &txi, tyi, tli)
+     txi, tyi, tli)
 
+  use ibsdbfi
+  use physconsfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -622,15 +624,13 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   integer iiz,iloop,maxdec,ns
   parameter(maxdec=30,ns=50)
   double precision a,al(31),alam,aloop,alx,am,b,betax,betay,bl(30), &
-       &c1,c2,c3,ccy,chklog,cl,coeff(2),cof,cprime,cscale,cx,cy,dpx,dx,f, &
-       &func,h,phi,polyl,polyx,polyy,r1,suml,sumx,sumy,td1,td2,term,tl1,  &
-       &tl2,tli,tmpl,tmpx,tmpy,tx1,tx2,txi,ty1,ty2,tyi,zintl,zintx,zinty, &
-       &zero,one,two,three,six,tstlog,power,ten,test,dy,dpy,aly,phiy,c1y, &
-       &c2y,chy,four,onetominus20
+       c1,c2,c3,ccy,chklog,cl,coeff(2),cof,cprime,cscale,cx,cy,dpx,dx,f, &
+       func,h,phi,polyl,polyx,polyy,r1,suml,sumx,sumy,td1,td2,term,tl1,  &
+       tl2,tli,tmpl,tmpx,tmpy,tx1,tx2,txi,ty1,ty2,tyi,zintl,zintx,zinty, &
+       zero,one,two,three,six,tstlog,power,ten,test,dy,dpy,aly,phiy,c1y, &
+       c2y,chy,four,onetominus20
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,tstlog=74d0, &
-       &power=-two/three,ten=1d1,test=1d-7,four=4d0,onetominus20=1d-20)
-  include 'ibsdb.fi'
-  include 'physcons.fi'
+       power=-two/three,ten=1d1,test=1d-7,four=4d0,onetominus20=1d-20)
   data coeff / 2d0, 4d0 /
 
   phi    = dpx + (alx * dx / betax)
@@ -674,22 +674,22 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   tl1    = (two * a - cy - c3) / cprime
   tl2    = (b - two * c3 * cy + c1y * (c3+cy) ) / cprime
   ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 -                 &
-       &two*gammas**2/sige**2) + two * chy * (cx +chy)/cy )               &
-       &/ cprime
+       two*gammas**2/sige**2) + two * chy * (cx +chy)/cy )               &
+       / cprime
   ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax          &
-       &/(betay*ex))                                                      &
-       &*gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
-       &(betay*ex))*                                                      &
-       &cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
-       &-c2y*(cy+c3+chy)) / cprime - r1 / cscale
+       /(betay*ex))                                                      &
+       *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
+       (betay*ex))*                                                      &
+       cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
+       -c2y*(cy+c3+chy)) / cprime - r1 / cscale
   tx1    = (two * a * (cx - c3) - cy * cx -                         &
-       &c3 * (cy - cl - two * c3 )) / cprime
+       c3 * (cy - cl - two * c3 )) / cprime
   tx2    = (c3 + cx) * ((b + c3 * cy) / cprime)-                    &
-       &six / cscale + three * c3 * cy * (cl / cprime)                    &
-       &+ (- six*(c3*c2*cy) + six*c3*cy*c1y                               &
-       &+ (betay/ey+betax/ex)*chy*cx +                                    &
-       &chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*           &
-       &c2y ) / cprime
+       six / cscale + three * c3 * cy * (cl / cprime)                    &
+       + (- six*(c3*c2*cy) + six*c3*cy*c1y                               &
+       + (betay/ey+betax/ex)*chy*cx +                                    &
+       chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*           &
+       c2y ) / cprime
 
   al(1)  = zero
 
@@ -703,10 +703,10 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
      !     The integrand is calculated in the loop itself
      if (abs(cy+aloop).gt.onetominus20) then
         term = sqrt((cy+aloop)*ccy)*sqrt(                             &
-             &(aloop*ccy*aloop+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
+             (aloop*ccy*aloop+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
      else
         term = sqrt((cy+aloop)*ccy)*sqrt(                             &
-             &(aloop*ccy*aloop+td1*aloop+td2))
+             (aloop*ccy*aloop+td1*aloop+td2))
      endif
      func = sqrt(aloop) / term**3
      polyl = tl1 * aloop + tl2
@@ -722,10 +722,10 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
         cof = coeff(mod(iiz,2)+1)
         if (abs(cy+alam).gt.onetominus20) then
            term = sqrt((cy+alam)*ccy)*sqrt(                            &
-                &(alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
+                (alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
         else
            term = sqrt((cy+alam)*ccy)*sqrt(                            &
-                &(alam*ccy*alam+td1*alam+td2))
+                (alam*ccy*alam+td1*alam+td2))
         endif
         f = sqrt(alam) / term**3
         polyl = tl1 * alam + tl2
@@ -749,13 +749,13 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
 
      !---- Test to see if integral has converged.
      if (abs(tmpl/zintl) .lt. test .and.                             &
-          &abs(tmpx/zintx) .lt. test .and.                                   &
-          &abs(tmpy/zinty) .lt. test) goto 100
+          abs(tmpx/zintx) .lt. test .and.                                   &
+          abs(tmpy/zinty) .lt. test) goto 100
   enddo
   write (*, *) tmpl,zintl, tmpx,zintx, tmpy,zinty, test
   write (*, 910) maxdec
 910 format('Bjorken/Mtingwa integrals did not converge in ',          &
-       &i3,' decades.')
+       i3,' decades.')
   call aawarn('TWSINT: ', 'Problem with TWSINT, program stopped ')
   stop
 100 continue

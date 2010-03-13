@@ -1,7 +1,12 @@
 subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
 
+  use bbfi
+  use twiss0fi
+  use name_lenfi
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !          Interface RUN and DYNAP command to tracking routine         *
@@ -24,10 +29,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   code_buf    int(nelem)  local mad-8 code storage                   *
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
-  include 'twiss0.fi'
-  include 'name_len.fi'
-  include 'track.fi'
-  include 'bb.fi'
   logical onepass,onetable,last_out,info,aperflag,doupdate
   integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
        nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
@@ -39,14 +40,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
        zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap
   parameter(zero=0d0,one=1d0)
-  character*12 tol_a, char_a
+  character(12) tol_a, char_a
   !hbu
   double precision spos
   !hbu
-  character*4 vec_names(7)
+  character(4) vec_names(7)
   !hbu
-  character*(name_len) el_name
-  character*120 msg
+  character(name_len) el_name
+  character(120) msg
   data tol_a,char_a / 'maxaper ', ' ' /
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
@@ -194,7 +195,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
            print*,"MAKETHIN will save you"
            print*," "
            print*," "
-           !           Better to use stop. If use return, irrelevant tracking output 
+           !           Better to use stop. If use return, irrelevant tracking output
            !           is printed
            stop
            !            call aafail('TRRUN',                                          &
@@ -340,7 +341,11 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
 subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
-     onepass)                                                          
+     onepass)
+
+  use twtrrfi
+  use twiss0fi
+  use name_lenfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -354,9 +359,6 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !   NUMBER(*) (integer) Number of current track.                       *
   !   KTRACK    (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  include 'twiss0.fi'
-  include 'name_len.fi'
-  include 'twtrr.fi'
   logical aperflag,fmap,onepass
   integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
        get_option
@@ -365,7 +367,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
        aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),st,  &
        theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),offset(2), &
        offx,offy
-  character*(name_len) aptype
+  character(name_len) aptype
   parameter(zero = 0.d0, one=1d0)
 
   fmap=.false.
@@ -413,7 +415,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      go to 500
   endif
 
-  !---- Special colllimator aperture check taken out AK 20071211      
+  !---- Special colllimator aperture check taken out AK 20071211
   !!---- Collimator with elliptic aperture.
   !      if(code.eq.20) then
   !        apx = node_value('xsize ')
@@ -452,7 +454,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      call dzero(aperture,maxnaper)
      call get_node_vector('aperture ',nn,aperture)
      call get_node_vector('aper_offset ',nn,offset)
-     
+
      offx = offset(1)
      offy = offset(2)
      !        print *, " TYPE ",aptype &
@@ -498,7 +500,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     this tests whether the particle is outside the circumscribing
         !JMJ!     circle.
         call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
-             &last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+             last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !JMJ!
         !JMJ!     This tests whether particles are outside the space bounded by
         !JMJ!     two or four lines intersecting the circle.
@@ -544,7 +546,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      endif
      !      else
      !!---- Check on collimator xsize/ysize even if user did not use 'aperture'
-     !!---- option in track command. This simulates roughly the old MAD-X 
+     !!---- option in track command. This simulates roughly the old MAD-X
      !!---- behaviour.      	
      !!---- Collimator with elliptic aperture.
      !      if(code.eq.20) then
@@ -571,7 +573,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      !          apy=maxaper(3)
      !        endif
      !        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-     !     &last_pos, last_orbit, track, ktrack,al_errors)
+     !      last_pos, last_orbit, track, ktrack,al_errors)
      !        go to 500
      !      endif      	
   endif
@@ -582,10 +584,10 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !-- 500 has been specified at the relevant places in go to below
   !-- code =1 for drift, treated above, go to 500 directly
   !      print *,"   CODE    ",code
-      go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
-     &110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
-     &500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
-     &330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
+  go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
+       110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
+       500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
+       330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
   !
   !---- Make sure that nothing is execute if element is not known
   go to 500
@@ -683,11 +685,11 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 370 continue
   call ttcrabrf(track,ktrack)
   go to 500
-!---- h ac dipole.
+  !---- h ac dipole.
 400 continue
   call tthacdip(track,ktrack,turn)
   go to 500
-!---- v ac dipole.
+  !---- v ac dipole.
 410 continue
   call ttvacdip(track,ktrack,turn)
   go to 500
@@ -713,7 +715,12 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 end subroutine ttmap
 
 subroutine ttmult(track, ktrack,dxt,dyt,turn)
+
+  use twtrrfi
+  use name_lenfi
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !    Track particle through a general thin multipole.                  *
@@ -723,9 +730,6 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   !   dxt       (double)  local buffer                                   *
   !   dyt       (double)  local buffer                                   *
   !----------------------------------------------------------------------*
-  include 'twtrr.fi'
-  include 'track.fi'
-  include 'name_len.fi'
   logical first
   integer iord,jtrk,nd,nord,ktrack,j,n_ferr,nn,ns,node_fd_errors,   &
        get_option,turn,noisemax,nn1,in
@@ -737,12 +741,12 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
        npeak(100), nlag(100), ntune(100), temp,noise
 
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
-  character*(name_len) aptype
-  
+  character(name_len) aptype
+
   save first,ordinv
   data first / .true. /
-  
-  
+
+
   !---- Precompute reciprocals of orders.
   if (first) then
      do iord = 1, maxmul
@@ -763,7 +767,7 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   call get_node_vector('ksl ',ns,skew)
   nd = 2 * max(nn, ns)
   call dzero(vals,2*(maxmul+1))
-  
+
   if(noise .eq. 1)   then
      nn1=name_len
      noisemax = node_value('noisemax ')
@@ -773,35 +777,35 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
      call get_node_vector('npeak ',nn1,npeak)
      call get_node_vector('ntune ',nn1,ntune)
      call get_node_vector('nlag ',nn1,nlag)
-     
-    temp = 0
-    do in = 1, noisemax 
-    temp = temp + npeak(in) * sin(nlag(in) + ntune(in) * turn)
-    enddo
-     
-     
-!   temp = npeak * sin(nlag + ntune * turn)
-   do iord = 0, nn
-     vals(1,iord) = normal(iord) * (1+temp)
-   enddo
-   do iord = 0, ns
-     vals(2,iord) = skew(iord) * (1+temp)
-   enddo
+
+     temp = 0
+     do in = 1, noisemax
+        temp = temp + npeak(in) * sin(nlag(in) + ntune(in) * turn)
+     enddo
+
+
+     !   temp = npeak * sin(nlag + ntune * turn)
+     do iord = 0, nn
+        vals(1,iord) = normal(iord) * (1+temp)
+     enddo
+     do iord = 0, ns
+        vals(2,iord) = skew(iord) * (1+temp)
+     enddo
   else
-   do iord = 0, nn
-     vals(1,iord) = normal(iord)
-   enddo
-   do iord = 0, ns
-     vals(2,iord) = skew(iord)
-   enddo
+     do iord = 0, nn
+        vals(1,iord) = normal(iord)
+     enddo
+     do iord = 0, ns
+        vals(2,iord) = skew(iord)
+     enddo
   endif
-  
-!  do iord = 0, nn
-!     vals(1,iord) = normal(iord)
-!  enddo
-!  do iord = 0, ns
-!     vals(2,iord) = skew(iord)
-!  enddo
+
+  !  do iord = 0, nn
+  !     vals(1,iord) = normal(iord)
+  !  enddo
+  !  do iord = 0, ns
+  !     vals(2,iord) = skew(iord)
+  !  enddo
   !---- Field error vals.
   call dzero(field,2*(maxmul+1))
   if (n_ferr .gt. 0) then
@@ -974,6 +978,7 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
 
 end subroutine ttmult
 subroutine trphot(el,curv,rfac,deltap)
+
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1002,7 +1007,7 @@ subroutine trphot(el,curv,rfac,deltap)
        three,five,twelve,fac1
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,five=5d0,twelve=12d0,&
        fac1=3.256223d0)
-  character*20 text
+  character(20) text
   data (taby(i), i = 1, 52)                                         &
        / -1.14084005d0,  -0.903336763d0, -0.769135833d0, -0.601840854d0, &
        -0.448812515d0, -0.345502228d0, -0.267485678d0, -0.204837948d0,   &
@@ -1112,7 +1117,10 @@ subroutine trphot(el,curv,rfac,deltap)
 end subroutine trphot
 
 subroutine ttsrot(track,ktrack)
+
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Coordinate change due to rotation about s axis                     *
@@ -1120,7 +1128,6 @@ subroutine ttsrot(track,ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.        tmsrot      *
   !----------------------------------------------------------------------*
-  include 'track.fi'
   integer itrack,ktrack,j
   double precision track(6,*),psi,node_value,ct,st,trb(4)
   psi = node_value('angle ')
@@ -1139,7 +1146,10 @@ end subroutine ttsrot
 
 
 subroutine ttyrot(track,ktrack)
+
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Coordinate change due to rotation about s axis                     *
@@ -1147,7 +1157,6 @@ subroutine ttyrot(track,ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.        tmsrot      *
   !----------------------------------------------------------------------*
-  include 'track.fi'
   integer itrack,ktrack,j
   double precision track(6,*),theta,node_value,ct,st,trb(6)
   theta = node_value('angle ')
@@ -1165,7 +1174,10 @@ subroutine ttyrot(track,ktrack)
 end subroutine ttyrot
 
 subroutine ttdrf(el,track,ktrack)
+
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particle through a drift space.                     *
@@ -1175,7 +1187,6 @@ subroutine ttdrf(el,track,ktrack)
   ! Output:                                                              *
   !   EL        (double)    Length of quadrupole.                        *
   !----------------------------------------------------------------------*
-  include 'track.fi'
   integer itrack,ktrack
   double precision el,pt,px,py,track(6,*),ttt,one,two
   parameter(one=1d0,two=2d0)
@@ -1326,6 +1337,7 @@ end subroutine ttrf
 subroutine ttcrabrf(track,ktrack)
 
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin crab cavity (zero l.)   *
@@ -1357,7 +1369,7 @@ subroutine ttcrabrf(track,ktrack)
   omega = rff * (ten6p * twopi / clight)
   vrf   = rfv * ten3m / pc0
   phirf = rfl * twopi
-  do itrack = 1, ktrack 
+  do itrack = 1, ktrack
      px  = track(2,itrack)                                           &
           + vrf * sin(phirf - omega * track(5,itrack))
      pt = track(6,itrack)                                            &
@@ -1374,133 +1386,139 @@ subroutine ttcrabrf(track,ktrack)
 end subroutine ttcrabrf
 subroutine tthacdip(track,ktrack,turn)
 
-      implicit none
-!----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track a set of trajectories through a thin h ac dipole (zero l.)   *
-! Input/output:                                                        *
-!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
-!   KTRACK    (integer) number of surviving tracks.                    *
-!----------------------------------------------------------------------*
-! Added by Yipeng SUN on 11 Nov 2009                                   *
-!----------------------------------------------------------------------*
-      integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
-     &get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
-!      double precision px,py,ttt,beti,el1
-      parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
+  implicit none
 
-!---- Initialize
-      clight=get_variable('clight ')
-      twopi=get_variable('twopi ')
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Track a set of trajectories through a thin h ac dipole (zero l.)   *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  ! Added by Yipeng SUN on 11 Nov 2009                                   *
+  !----------------------------------------------------------------------*
+  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
+  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
+       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
+  !      double precision px,py,ttt,beti,el1
+  parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
 
-!---- Fetch data.
-      rfv = node_value('volt ')
-      rff = node_value('freq ')
-      rfl = node_value('lag ')
-      pc0 = get_value('beam ','pc ')
-      
-      turn1 = node_value('ramp1 ')
-      turn2 = node_value('ramp2 ')
-      turn3 = node_value('ramp3 ')
-      turn4 = node_value('ramp4 ')
-!---- Set up.
-      omega = rff * twopi
-      vrf   = 300 * rfv * ten3m / pc0
-      phirf = rfl * twopi
+  !---- Initialize
+  clight=get_variable('clight ')
+  twopi=get_variable('twopi ')
 
-      if (turn .lt. turn1)  then
-        vrf = 0
-      else if (turn .ge. turn1 .and. turn .lt. turn2) then
-        vrf = (turn-turn1) * vrf / (turn2-turn1)
-      else if (turn .ge. turn2 .and. turn .lt. turn3) then
-        vrf = vrf
-      else if (turn .ge. turn3 .and. turn .lt. turn4) then
-        vrf = (turn4-turn) * vrf / (turn4-turn3)
-      else
-        vrf = 0
-      endif
-!      if (turn .le. 10 .or. turn .gt. 1990) then
-!       print*," turn: ",turn, " vrf: ", vrf
-!      endif   
-      do itrack = 1, ktrack 
-        px  = track(2,itrack)                                           &
-     &+ vrf * sin(phirf + omega * turn)
+  !---- Fetch data.
+  rfv = node_value('volt ')
+  rff = node_value('freq ')
+  rfl = node_value('lag ')
+  pc0 = get_value('beam ','pc ')
 
-!---- track(2,jtrk) = track(2,jtrk)
-!        pt = track(6,itrack)
-!        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+  turn1 = node_value('ramp1 ')
+  turn2 = node_value('ramp2 ')
+  turn3 = node_value('ramp3 ')
+  turn4 = node_value('ramp4 ')
+  !---- Set up.
+  omega = rff * twopi
+  vrf   = 300 * rfv * ten3m / pc0
+  phirf = rfl * twopi
 
-        track(2,itrack) = px
-      enddo
-end subroutine tthacdip     
+  if (turn .lt. turn1)  then
+     vrf = 0
+  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+     vrf = (turn-turn1) * vrf / (turn2-turn1)
+  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+     vrf = vrf
+  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+     vrf = (turn4-turn) * vrf / (turn4-turn3)
+  else
+     vrf = 0
+  endif
+  !      if (turn .le. 10 .or. turn .gt. 1990) then
+  !       print*," turn: ",turn, " vrf: ", vrf
+  !      endif
+  do itrack = 1, ktrack
+     px  = track(2,itrack)                                           &
+          + vrf * sin(phirf + omega * turn)
+
+     !---- track(2,jtrk) = track(2,jtrk)
+     !        pt = track(6,itrack)
+     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+
+     track(2,itrack) = px
+  enddo
+end subroutine tthacdip
 subroutine ttvacdip(track,ktrack,turn)
 
-      implicit none
-!----------------------------------------------------------------------*
-! Purpose:                                                             *
-!   Track a set of trajectories through a thin v ac dipole (zero l.)   *
-! Input/output:                                                        *
-!   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
-!   KTRACK    (integer) number of surviving tracks.                    *
-!----------------------------------------------------------------------*
-! Added by Yipeng SUN on 11 Nov 2009                                   *
-!----------------------------------------------------------------------*
-      integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-      double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-     &gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
-     &get_variable,node_value,get_value,one,two,half,ten3m,ten6p,py
-!      double precision px,py,ttt,beti,el1
-      parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
-
-!---- Initialize
-      clight=get_variable('clight ')
-      twopi=get_variable('twopi ')
-
-!---- Fetch data.
-      rfv = node_value('volt ')
-      rff = node_value('freq ')
-      rfl = node_value('lag ')
-      pc0 = get_value('beam ','pc ')
-      
-      turn1 = node_value('ramp1 ')
-      turn2 = node_value('ramp2 ')
-      turn3 = node_value('ramp3 ')
-      turn4 = node_value('ramp4 ')
-!---- Set up.
-      omega = rff * twopi
-      vrf   = 300 * rfv * ten3m / pc0
-      phirf = rfl * twopi
-
-
-      if (turn .lt. turn1)  then
-        vrf = 0
-      else if (turn .ge. turn1 .and. turn .lt. turn2) then
-        vrf = (turn-turn1) * vrf / (turn2-turn1)
-      else if (turn .ge. turn2 .and. turn .lt. turn3) then
-        vrf = vrf
-      else if (turn .ge. turn3 .and. turn .lt. turn4) then
-        vrf = (turn4-turn) * vrf / (turn4-turn3)
-      else
-        vrf = 0
-      endif
-!      if (turn .le. 10 .or. turn .gt. 1990) then
-!       print*," turn: ",turn, " vrf: ", vrf
-!      endif  
-      do itrack = 1, ktrack 
-        py  = track(4,itrack)                                           &
-     &+ vrf * sin(phirf + omega * turn)
-
-!---- track(2,jtrk) = track(2,jtrk)
-!        pt = track(6,itrack)
-!        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-
-        track(4,itrack) = py
-      enddo
-end subroutine ttvacdip 
-subroutine ttsep(el,track,ktrack)
   implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Track a set of trajectories through a thin v ac dipole (zero l.)   *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  ! Added by Yipeng SUN on 11 Nov 2009                                   *
+  !----------------------------------------------------------------------*
+  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
+  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
+       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,py
+  !      double precision px,py,ttt,beti,el1
+  parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
+
+  !---- Initialize
+  clight=get_variable('clight ')
+  twopi=get_variable('twopi ')
+
+  !---- Fetch data.
+  rfv = node_value('volt ')
+  rff = node_value('freq ')
+  rfl = node_value('lag ')
+  pc0 = get_value('beam ','pc ')
+
+  turn1 = node_value('ramp1 ')
+  turn2 = node_value('ramp2 ')
+  turn3 = node_value('ramp3 ')
+  turn4 = node_value('ramp4 ')
+  !---- Set up.
+  omega = rff * twopi
+  vrf   = 300 * rfv * ten3m / pc0
+  phirf = rfl * twopi
+
+
+  if (turn .lt. turn1)  then
+     vrf = 0
+  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+     vrf = (turn-turn1) * vrf / (turn2-turn1)
+  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+     vrf = vrf
+  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+     vrf = (turn4-turn) * vrf / (turn4-turn3)
+  else
+     vrf = 0
+  endif
+  !      if (turn .le. 10 .or. turn .gt. 1990) then
+  !       print*," turn: ",turn, " vrf: ", vrf
+  !      endif
+  do itrack = 1, ktrack
+     py  = track(4,itrack)                                           &
+          + vrf * sin(phirf + omega * turn)
+
+     !---- track(2,jtrk) = track(2,jtrk)
+     !        pt = track(6,itrack)
+     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+
+     track(4,itrack) = py
+  enddo
+end subroutine ttvacdip
+subroutine ttsep(el,track,ktrack)
+
+  use twtrrfi
+  use trackfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   ! ttsep tracks particle through an electrostatic separator with an     *
@@ -1512,8 +1530,6 @@ subroutine ttsep(el,track,ktrack)
   ! Input/Output:                                                        *
   !   TRACK(6,*) (double)     Track coordinantes: (X, PX, Y, PY, T, PT)  *
   !----------------------------------------------------------------------*
-  include 'track.fi'
-  include 'twtrr.fi'
   integer ktrack,itrack
   double precision track(6,*),node_value,get_value
   double precision el,ex,ey,tilt,charge,mass,pc,beta,deltap,kick0
@@ -1543,7 +1559,11 @@ subroutine ttsep(el,track,ktrack)
 
 end subroutine ttsep
 subroutine ttcorr(el,track,ktrack)
+
+  use twtrrfi
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track particle through an orbit corrector.                         *
@@ -1554,8 +1574,6 @@ subroutine ttcorr(el,track,ktrack)
   ! Output:                                                              *
   !   EL        (double)    Length of quadrupole.                        *
   !----------------------------------------------------------------------*
-  include 'track.fi'
-  include 'twtrr.fi'
   !      logical dorad,dodamp,dorand
   integer itrack,ktrack,n_ferr,node_fd_errors,code,bvk,i,get_option
   double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
@@ -1743,7 +1761,9 @@ subroutine ttcorr(el,track,ktrack)
 
 end subroutine ttcorr
 subroutine dpoissn (amu,n,ierror)
+
   implicit none
+
   !----------------------------------------------------------------------*
   !    POISSON GENERATOR                                                 *
   !    CODED FROM LOS ALAMOS REPORT      LA-5061-MS                      *
@@ -1781,6 +1801,7 @@ subroutine dpoissn (amu,n,ierror)
 subroutine ttbb(track,ktrack,parvec)
 
   implicit none
+
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
   !   track a set of particle through a beam-beam interaction region.    *
@@ -1801,8 +1822,8 @@ subroutine ttbb(track,ktrack,parvec)
   parameter(zero=0.0d0,one=1.0d0,two=2.0d0)
   !     if x > explim, exp(-x) is outside machine limits.
 
-  !---- Calculate momentum deviation and according changes 
-  !     of the relativistic factor beta0 
+  !---- Calculate momentum deviation and according changes
+  !     of the relativistic factor beta0
   dp  = get_variable('track_deltap ')
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
@@ -1835,13 +1856,14 @@ subroutine ttbb(track,ktrack,parvec)
 end subroutine ttbb
 subroutine ttbb_gauss(track,ktrack,fk)
 
+  use bbfi
   implicit none
+
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having a Gaussian perpendicular shape                       *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  include 'bb.fi'
   logical bborbit
   integer ktrack,itrack,ipos,get_option
   double precision track(6,*),pi,sx,sy,xm,ym,sx2,sy2,xs,            &
@@ -1960,13 +1982,14 @@ subroutine ttbb_gauss(track,ktrack,fk)
 end subroutine ttbb_gauss
 subroutine ttbb_flattop(track,ktrack,fk)
 
+  use bbfi
   implicit none
+
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having an trapezoidal and, so flat top radial profile       *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  include 'bb.fi'
   logical bborbit,first
   integer ktrack,itrack,ipos,get_option
   double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
@@ -2043,13 +2066,14 @@ subroutine ttbb_flattop(track,ktrack,fk)
 end subroutine ttbb_flattop
 subroutine ttbb_hollowparabolic(track,ktrack,fk)
 
+  use bbfi
   implicit none
+
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having a hollow-parabolic perpendicular shape               *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  include 'bb.fi'
   logical bborbit,first
   integer ktrack,itrack,ipos,get_option
   double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
@@ -2128,7 +2152,9 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
 end subroutine ttbb_hollowparabolic
 subroutine ttbb_old(track,ktrack,parvec)
 
+  use bbfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
   !   track a set of particle through a beam-beam interaction region.    *
@@ -2138,7 +2164,6 @@ subroutine ttbb_old(track,ktrack,parvec)
   !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
   !   ktrack    (integer) number of tracks.                              *
   !----------------------------------------------------------------------*
-  include 'bb.fi'
   logical bborbit
   integer ktrack,itrack,ipos,get_option
   double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
@@ -2264,17 +2289,17 @@ end subroutine ttbb_old
 subroutine trkill(n, turn, sum, jmax, part_id,                    &
      last_turn, last_pos, last_orbit, z, aptype)
 
-  !hbu--- kill particle:  print, modify part_id list
+  use name_lenfi
   implicit none
-  include 'name_len.fi'
 
+  !hbu--- kill particle:  print, modify part_id list
   logical recloss
   integer i,j,n,turn,part_id(*),jmax,last_turn(*),get_option
   double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
        torb(6) !, theta, node_value, st, ct, tmp
-  character*(name_len) aptype
+  character(name_len) aptype
   !hbu
-  character*(name_len) el_name
+  character(name_len) el_name
 
   recloss = get_option('recloss ') .ne. 0
 
@@ -2324,8 +2349,10 @@ end subroutine trkill
 
 subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 
-  !hbu added spos
+  use name_lenfi
   implicit none
+
+  !hbu added spos
   !----------------------------------------------------------------------*
   !--- purpose: enter lost particle coordinates in table                 *
   !    input:                                                            *
@@ -2335,16 +2362,15 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
   !    orbit  (double array)  particle orbit                             *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  include 'name_len.fi'
   integer npart,turn,j
   double precision orbit(6),tmp,tt,tn
   double precision energy,get_value
-  character*36 table
-  character*(name_len) el_name
+  character(36) table
+  character(name_len) el_name
   !hbu
   double precision spos
   !hbu
-  character*4 vec_names(7)
+  character(4) vec_names(7)
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
   data table / 'trackloss' /
@@ -2377,8 +2403,10 @@ end subroutine tt_ploss
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
      spos,ielem,el_name)
 
-  !hbu added spos, ielem, el_name
+  use name_lenfi
   implicit none
+
+  !hbu added spos, ielem, el_name
   !----------------------------------------------------------------------*
   !--- purpose: enter all particle coordinates in one table              *
   !    input:                                                            *
@@ -2390,19 +2418,18 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   !    z (double (6,*))       particle orbits                            *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  include 'name_len.fi'
   integer i,j,npart,turn,tot_segm,segment,part_id(*),length
   double precision z(6,*),orbit0(6),tmp,tt,ss
   !hbu was *36 allow longer info
-  character*80 table,comment
+  character(80) table,comment
   !hbu
   integer ielem
   !hbu name of element
-  character*(name_len) el_name
+  character(name_len) el_name
   !hbu
   double precision spos
   !hbu
-  character*4 vec_names(7)
+  character(4) vec_names(7)
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
   data table / 'trackone' /
@@ -2433,8 +2460,9 @@ end subroutine tt_putone
 
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
 
-  !hbu added spos
   implicit none
+
+  !hbu added spos
   !----------------------------------------------------------------------*
   !--- purpose: enter particle coordinates in table                      *
   !    input:                                                            *
@@ -2447,11 +2475,11 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   integer npart,turn,j,nobs
   double precision orbit(6),orbit0(6),tmp,tt,tn
   double precision energy, get_value
-  character*36 table
+  character(36) table
   !hbu
   double precision spos
   !hbu
-  character*4 vec_names(7)
+  character(4) vec_names(7)
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
   data table / 'track.obs$$$$.p$$$$' /
@@ -2479,7 +2507,10 @@ end subroutine tt_puttab
 subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
      last_pos, last_orbit, z, ntrk,al_errors,offx,offy)
 
+  use twiss0fi
+  use name_lenfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   test for collimator aperture limits.                               *
@@ -2498,18 +2529,16 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
   !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
   !   ntrk      (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  include 'twiss0.fi'
-  include 'name_len.fi'
   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
   double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
        one,al_errors(align_max),offx,offy
   parameter(one=1d0)
-  character*(name_len) aptype
+  character(name_len) aptype
 
   n = 1
 10 continue
   do i = n, ntrk
-  
+
      !---- Is particle outside aperture?
      if (flag .eq. 1.and.((z(1,i)-al_errors(11)- offx)/apx)**2             &
           +((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one) then
@@ -2538,31 +2567,32 @@ end subroutine trcoll
 
 subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
      last_pos, last_orbit, z, ntrk,al_errors, apr,offx,offy)
+
+  use twiss0fi
+  use name_lenfi
+  implicit none
+
   !----------------------------------------------------------------------*
   ! Similar with trcoll, for racetrack type aperture
   !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
   !----------------------------------------------------------------------*
-  implicit none
-
-  include 'twiss0.fi'
-  include 'name_len.fi'
   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
   double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
        one,al_errors(align_max),apr,offx,offy
   parameter(one=1d0)
-  character*(name_len) aptype
+  character(name_len) aptype
 
   n = 1
 10 continue
   do i = n, ntrk
-  
+
      !---- Is particle outside aperture?
      if (flag .eq. 4                                                 &
           .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. (apr+apx)                  &
           .or. abs(z(3,i)-al_errors(12)- offy) .gt. (apy+apr) .or.                &
           ((((abs(z(1,i)-al_errors(11)- offx)-apx)**2+                            &
           (abs(z(3,i)-al_errors(12)- offy)-apy)**2) .gt. apr**2)                  &
-          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. apx                        & 
+          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. apx                        &
           .and. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
         go to 99
      endif
@@ -2578,7 +2608,11 @@ subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
 end subroutine trcoll1
 
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
+
+  use bbfi
+  use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Define initial conditions for all particles to be tracked          *
@@ -2593,8 +2627,6 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   !   z(6,jend) - Transformed cartesian coordinates incl. c.o.           *
   !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
   !----------------------------------------------------------------------*
-  include 'track.fi'
-  include 'bb.fi'
   logical zgiv,zngiv
   integer j,jend,k,kp,kq,next_start,itype(23),switch,turns,jt
   double precision phi,track(12),zstart(12),twopi,z(6,*),zn(6),     &
@@ -2602,7 +2634,7 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
        ft,phit,get_value,get_variable,zero,deltax,coords(6,0:turns,*)
   double precision deltap,one
   parameter(zero=0d0,one=1d0)
-  character*120 msg(2)
+  character(120) msg(2)
 
   deltap = get_variable('track_deltap ')
   !---- Initialise orbit, emittances and eigenvectors etc.
@@ -2704,7 +2736,9 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   !      endif
 end subroutine trinicmd
 subroutine trbegn(rt,eigen)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Initialize tracking mode; TRACK command execution.                 *
@@ -2729,7 +2763,9 @@ subroutine trbegn(rt,eigen)
   endif
 end subroutine trbegn
 subroutine ttdpdg(track, ktrack)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose: computes the effect of the dipole edge                      *
   ! Input/Output:  ktrack , number of surviving trajectories             *
@@ -2761,7 +2797,9 @@ subroutine ttdpdg(track, ktrack)
 end subroutine ttdpdg
 
 subroutine trsol(track,ktrack)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particles through a thin solenoid.                  *
@@ -2841,7 +2879,9 @@ subroutine trsol(track,ktrack)
 end subroutine trsol
 
 subroutine tttrans(track,ktrack)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Translation of a set of particles.                                 *
@@ -2879,7 +2919,9 @@ subroutine tttrans(track,ktrack)
 end subroutine tttrans
 
 subroutine tttrak(ek,re,track,ktrack)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particle with a given TRANSPORT map.                *
@@ -2914,7 +2956,9 @@ subroutine tttrak(ek,re,track,ktrack)
 end subroutine tttrak
 
 subroutine trupdate(turn)
+
   implicit none
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Update global turnnumber-VARIABLE,                                 *
@@ -2923,16 +2967,20 @@ subroutine trupdate(turn)
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
   integer           turn
-  character*50      cmd
+  character(50)      cmd
 
   !---- call pro_input('TR$TURN := turn;')
   write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
   call pro_input(cmd)
   write(cmd, '(''exec, tr$macro($tr$turni) ; '')')
-  call pro_input(cmd)      
+  call pro_input(cmd)
 end subroutine trupdate
 
 subroutine trclor(orbit0)
+
+  use twiss0fi
+  use name_lenfi
+  use trackfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -2944,19 +2992,13 @@ subroutine trclor(orbit0)
   !   ORBIT0(6) (double)  Closed Orbit Coordinates @ sequence start      *
   !                       (X, PX, Y, PY, T, PT)                          *
   !----------------------------------------------------------------------*
-
-  include 'twiss0.fi'
-  include 'name_len.fi'
-  include 'track.fi'
-  !      include 'bb.fi'
-
   double precision zero, one
-  parameter(zero=0d0,one=1d0)           
+  parameter(zero=0d0,one=1d0)
   double precision orbit0(6), z(6,7), z0(6,7), a(6,7),deltap,ddd(6)
   integer itra, itmax, j, bbd_pos, j_tot
   integer code
   double precision el,dxt(200),dyt(200)
-  integer restart_sequ 
+  integer restart_sequ
   integer advance_node, get_option, node_al_errors
   double precision node_value, get_value, get_variable
   integer n_align
@@ -2966,10 +3008,10 @@ subroutine trclor(orbit0)
   logical aperflag, onepass
   integer pmax, turn, turnmax, part_id(1),last_turn(1)
   double precision sum, orbit(6)
-  double precision last_pos(6),last_orbit(6,1),maxaper(6) 
+  double precision last_pos(6),last_orbit(6,1),maxaper(6)
 
   integer nint, ndble, nchar, int_arr(1), char_l
-  character*12 char_a
+  character(12) char_a
 
   integer i,k, irank
 
@@ -2991,34 +3033,34 @@ subroutine trclor(orbit0)
   itmax   = 10
   pmax    = 7
   sum     = zero
-  aperflag  = .false. 
+  aperflag  = .false.
   onepass   = .true.
 
   do k=1,7
      call dcopy(orbit0,z(1,k),6)
   enddo
 
-  !      ddd(1) = orbit0(1)/100000      
-  !      ddd(2) = orbit0(2)/100000     
-  !      ddd(3) = orbit0(3)/100000          
-  !      ddd(4) = orbit0(4)/100000    
-  !      ddd(5) = orbit0(5)/100000         
-  !      ddd(6) = orbit0(6)/100000   
+  !      ddd(1) = orbit0(1)/100000
+  !      ddd(2) = orbit0(2)/100000
+  !      ddd(3) = orbit0(3)/100000
+  !      ddd(4) = orbit0(4)/100000
+  !      ddd(5) = orbit0(5)/100000
+  !      ddd(6) = orbit0(6)/100000
 
   ! for on momentum pt =0
-  !      ddd(1) = 1e-15         
-  !      ddd(2) = 1e-15      
-  !      ddd(3) = 1e-15           
-  !      ddd(4) = 1e-15    
-  !      ddd(5) = 1e-15       
-  !      ddd(6) = 1e-15  
+  !      ddd(1) = 1e-15
+  !      ddd(2) = 1e-15
+  !      ddd(3) = 1e-15
+  !      ddd(4) = 1e-15
+  !      ddd(5) = 1e-15
+  !      ddd(6) = 1e-15
   !--------------------------------------
-  ddd(1) = 1e-15         
-  ddd(2) = 1e-15      
-  ddd(3) = 1e-15           
-  ddd(4) = 1e-15    
-  ddd(5) = 1e-15       
-  ddd(6) = 1e-15      
+  ddd(1) = 1e-15
+  ddd(2) = 1e-15
+  ddd(3) = 1e-15
+  ddd(4) = 1e-15
+  ddd(5) = 1e-15
+  ddd(6) = 1e-15
 
   !      do k=1,6
   !        z(k,k+1) = z(k,k+1) + ddd(k)
@@ -3151,7 +3193,7 @@ subroutine trclor(orbit0)
      !      print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''    &
      !     ,                                                                 &
      !     1p,e14.6)',itra,err,deltap
-     !          print '(''orbit: '', 1p,6e14.6)', z0      
+     !          print '(''orbit: '', 1p,6e14.6)', z0
 
      !      goto 110
 
@@ -3180,13 +3222,13 @@ subroutine trclor(orbit0)
   !      print *," Iteration maximum reached. NO convergence."
   goto 110
 
-100 continue      
+100 continue
   print *," Singular matrix occurred during closed orbit search."
 
-110 continue  
-  print *, ' '    
+110 continue
+  print *, ' '
   print *, '6D closed orbit found by subroutine trclor '
   print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '',1p,e14.6)',itra,err,deltap
-  print '(''orbit: '', 1p,6e14.6)', orbit0     
+  print '(''orbit: '', 1p,6e14.6)', orbit0
 
 end subroutine trclor

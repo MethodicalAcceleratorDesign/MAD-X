@@ -1,24 +1,24 @@
 ! *********************************************************************
 subroutine cavtouschek (um,uloss,iflag)
 
+  use name_lenfi
+  use touschekfi
   implicit none
 
   integer i,lg,code,get_string,restart_sequ,advance_node,           &
-       &double_from_table,flag,iflag
+       double_from_table,flag,iflag
   double precision get_value,node_value,el,rfv,rff,rfl,             &
-       &um,harmonl,get_variable,pi,                                       &
-       &phirf, c0, vrf, pc, omega, orbit5,                                &
-       &twopi, ten3m,                                                     &
-       &ten6p, zero, one, two, half, eta,                                 &
-       &qover, fq, uloss, vrfsum, harmonlm,                               &
-       &umt,synch_2
+       um,harmonl,get_variable,pi,                                       &
+       phirf, c0, vrf, pc, omega, orbit5,                                &
+       twopi, ten3m,                                                     &
+       ten6p, zero, one, two, half, eta,                                 &
+       qover, fq, uloss, vrfsum, harmonlm,                               &
+       umt,synch_2
 
-  include 'name_len.fi'
-  include 'touschek.fi'
 
-  character * (name_len) sequ_name,el_name
+  character(name_len) sequ_name,el_name
   parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
-       &ten3m=1d-3)
+       ten3m=1d-3)
 
   !---- Initialize.
   qover = zero
@@ -81,7 +81,7 @@ subroutine cavtouschek (um,uloss,iflag)
 
   if (uloss.ne.zero) then
      fq = two*(sqrt(one-one/qover**2)*vrfsum*harmonlm                &
-          &-uloss*acos(one/qover))
+          -uloss*acos(one/qover))
      um = ten3m/(harmonlm*eta*pi)*fq/(pc*(one+deltap))
   else
      um = umt
@@ -95,6 +95,9 @@ END subroutine cavtouschek
 ! *********************************************************************
 subroutine touschek
 
+  use name_lenfi
+  use physconsfi
+  use touschekfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -106,24 +109,21 @@ subroutine touschek
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
   integer i,j,flag,range(2),n,get_option,double_from_table,lp,      &
-       &restart_sequ,char_from_table,advance_to_pos,get_string,iflag
+       restart_sequ,char_from_table,advance_to_pos,get_string,iflag
   double precision get_value,get_variable,                          &
-       &ccost,rr,bx,by,ax,ay,dx,dpx,dy,dpy,pi,                            &
-       &sigx2,sigy2,ddx2,ddy2,disigh2,sigh2,fact,                         &
-       &um,DGAUSS,piwint,litousch,tlitouschek,litouschw,                  &
-       &dels,s1,s2,dx1,dx2,dpx1,dpx2,ax1,                                 &
-       &ax2,bx1,bx2,beta2,gamma2,tol,fa0,fa1,fa2,                         &
-       &dy1,dy2,dpy1,dpy2,ay1,ay2,by1,by2,sdum, half,                     &
-       &tltouschek, tltouschekhr,pi2,km,ftousch,uloss
+       ccost,rr,bx,by,ax,ay,dx,dpx,dy,dpy,pi,                            &
+       sigx2,sigy2,ddx2,ddy2,disigh2,sigh2,fact,                         &
+       um,DGAUSS,piwint,litousch,tlitouschek,litouschw,                  &
+       dels,s1,s2,dx1,dx2,dpx1,dpx2,ax1,                                 &
+       ax2,bx1,bx2,beta2,gamma2,tol,fa0,fa1,fa2,                         &
+       dy1,dy2,dpy1,dpy2,ay1,ay2,by1,by2,sdum, half,                     &
+       tltouschek, tltouschekhr,pi2,km,ftousch,uloss
 
-  include 'name_len.fi'
-  include 'physcons.fi'
-  include 'touschek.fi'
 
   external ftousch,dgauss
 
   parameter(half=5d-1)
-  character*(name_len) name,sequ_name
+  character(name_len) name,sequ_name
 
   pi=get_variable('pi ')
   tlitouschek=0d0
@@ -254,8 +254,7 @@ subroutine touschek
      ddx2 = (dpx*bx+dx*ax)**2
      ddy2 = (dpy*by+dy*ay)**2
 
-     disigh2 = (1d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2&
-          &)
+     disigh2 = (1d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2)
      sigh2 = (1d0/disigh2)
      fact = sqrt(sigh2)*bx*by/(sigt*sige*sigx2*sigy2)
      fa0 = 2d0*beta2*gamma2
@@ -263,8 +262,8 @@ subroutine touschek
      fa2 = (by**2/sigy2)*(1d0-sigh2*ddy2/sigy2)
      fb1 = (fa1 + fa2)/fa0
      fb2 = sqrt(fb1**2-( bx**2*by**2*sigh2/(beta2*beta2*gamma2       &
-          &*gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)                 &
-          &+(dy**2/sigy2))))
+          *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)                 &
+          +(dy**2/sigy2))))
 
      call cavtouschek(um,uloss,iflag)
      um1 = um
@@ -329,14 +328,14 @@ end subroutine touschek
 ! ***************************************************************
 double precision function ftousch(k)
 
+  use physconsfi
+  use touschekfi
   implicit none
 
   double precision  k, pi, get_variable,z,aftoush
   double precision ZR,ZI,BJOR,BJOI,BJIR,BJII,                       &
-       &BYOR,BYOI,BYIR,BYII
+       BYOR,BYOI,BYIR,BYII
 
-  include 'touschek.fi'
-  include 'physcons.fi'
   integer  iflag
 
   z = TAN(k)**2
@@ -346,17 +345,17 @@ double precision function ftousch(k)
   ZR = 0.
 
   call CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                            &
-       &BYOR,BYOI,BYIR,BYII,IFLAG)
+       BYOR,BYOI,BYIR,BYII,IFLAG)
 
   aftoush = 2d0*( ((2d0*z+1d0)**2*(z/um1/(1d0+z)-1d0)/z)+z-         &
-       &sqrt(z*um1*(1d0+z))-(2d0+1d0/(2d0*z))*log(z/um1/(1d0+z)) )        &
-       &*sqrt(1d0+z)
+       sqrt(z*um1*(1d0+z))-(2d0+1d0/(2d0*z))*log(z/um1/(1d0+z)) )        &
+       *sqrt(1d0+z)
 
   if (iflag.eq.0) then
      ftousch = aftoush*exp(-fb1*z)*BJOR
   else
      ftousch = aftoush*BJOR*(exp(-(fb1-fb2)*z)+                      &
-          &exp(-(fb1+fb2)*z))/2.d0
+          exp(-(fb1+fb2)*z))/2.d0
   end if
 
   return
@@ -364,9 +363,14 @@ end function ftousch
 
 ! *********************************************************************
 !
-! $Id: touschek.f90,v 1.3 2009-07-01 17:50:07 frs Exp $
+! $Id: touschek.f90,v 1.4 2010-03-13 02:25:54 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.3  2009/07/01 17:50:07  frs
+! Introducing elements:
+! placeholder 38 equivalent with instrument 24
+! tkicker 39 equivalent with kicker 15
+!
 ! Revision 1.2  2009/04/06 23:30:07  frs
 ! Fortran Clean-up: indenting, remove potentially uninitialized variable and
 ! also remove unused variables
@@ -414,30 +418,30 @@ DOUBLE PRECISION FUNCTION DGAUSS(F,A,B,EPS)
   !
   !
   DATA W / 0.1012285362903762591525313543D0,                        &
-       &0.2223810344533744705443559944D0,                                 &
-       &0.3137066458778872873379622020D0,                                 &
-       &0.3626837833783619829651504493D0,                                 &
-       &0.2715245941175409485178057246D-1,                                &
-       &0.6225352393864789286284383699D-1,                                &
-       &0.9515851168249278480992510760D-1,                                &
-       &0.1246289712555338720524762822D0,                                 &
-       &0.1495959888165767320815017305D0,                                 &
-       &0.1691565193950025381893120790D0,                                 &
-       &0.1826034150449235888667636680D0,                                 &
-       &0.1894506104550684962853967232D0/
+       0.2223810344533744705443559944D0,                                 &
+       0.3137066458778872873379622020D0,                                 &
+       0.3626837833783619829651504493D0,                                 &
+       0.2715245941175409485178057246D-1,                                &
+       0.6225352393864789286284383699D-1,                                &
+       0.9515851168249278480992510760D-1,                                &
+       0.1246289712555338720524762822D0,                                 &
+       0.1495959888165767320815017305D0,                                 &
+       0.1691565193950025381893120790D0,                                 &
+       0.1826034150449235888667636680D0,                                 &
+       0.1894506104550684962853967232D0/
   !
   DATA X / 0.9602898564975362316835608686D0,                        &
-       &0.7966664774136267395915539365D0,                                 &
-       &0.5255324099163289858177390492D0,                                 &
-       &0.1834346424956498049394761424D0,                                 &
-       &0.9894009349916499325961541735D0,                                 &
-       &0.9445750230732325760779884155D0,                                 &
-       &0.8656312023878317438804678977D0,                                 &
-       &0.7554044083550030338951011948D0,                                 &
-       &0.6178762444026437484466717640D0,                                 &
-       &0.4580167776572273863424194430D0,                                 &
-       &0.2816035507792589132304605015D0,                                 &
-       &0.9501250983763744018531933543D-1/
+       0.7966664774136267395915539365D0,                                 &
+       0.5255324099163289858177390492D0,                                 &
+       0.1834346424956498049394761424D0,                                 &
+       0.9894009349916499325961541735D0,                                 &
+       0.9445750230732325760779884155D0,                                 &
+       0.8656312023878317438804678977D0,                                 &
+       0.7554044083550030338951011948D0,                                 &
+       0.6178762444026437484466717640D0,                                 &
+       0.4580167776572273863424194430D0,                                 &
+       0.2816035507792589132304605015D0,                                 &
+       0.9501250983763744018531933543D-1/
   !
   !     ******************************************************************
   !
@@ -487,9 +491,14 @@ END FUNCTION DGAUSS
 
 !********************************************************************
 !
-! $Id: touschek.f90,v 1.3 2009-07-01 17:50:07 frs Exp $
+! $Id: touschek.f90,v 1.4 2010-03-13 02:25:54 frs Exp $
 !
 ! $Log: not supported by cvs2svn $
+! Revision 1.3  2009/07/01 17:50:07  frs
+! Introducing elements:
+! placeholder 38 equivalent with instrument 24
+! tkicker 39 equivalent with kicker 15
+!
 ! Revision 1.2  2009/04/06 23:30:07  frs
 ! Fortran Clean-up: indenting, remove potentially uninitialized variable and
 ! also remove unused variables
@@ -521,7 +530,7 @@ SUBROUTINE KERSET(ERCODE,LGFILE,LIMITM,LIMITR)
 
   INTEGER KOUNTE,L,I,LIMITM,LIMITR,LOG,LOGF,LGFILE
   PARAMETER(KOUNTE  =  27)
-  CHARACTER*6         ERCODE,   CODE(KOUNTE)
+  CHARACTER(6)        ERCODE,   CODE(KOUNTE)
   LOGICAL             MFLAG,    RFLAG
   INTEGER             KNTM(KOUNTE),       KNTR(KOUNTE)
   DATA      LOGF      /  0  /
@@ -598,10 +607,10 @@ SUBROUTINE KERSET(ERCODE,LGFILE,LIMITM,LIMITR)
   ENDIF
   RETURN
 1000 FORMAT(' KERNLIB LIBRARY ERROR. ' /                               &
-       &' ERROR CODE ',A6,' NOT RECOGNIZED BY KERMTR',                    &
-       &' ERROR MONITOR. RUN ABORTED.')
+       ' ERROR CODE ',A6,' NOT RECOGNIZED BY KERMTR',                    &
+       ' ERROR MONITOR. RUN ABORTED.')
 1001 FORMAT(/' ***** RUN TERMINATED BY CERN LIBRARY ERROR ',           &
-       &'CONDITION ',A6)
+       'CONDITION ',A6)
 1002 FORMAT(/' ***** CERN LIBRARY ERROR CONDITION ',A6)
 END SUBROUTINE KERSET
 
@@ -616,30 +625,30 @@ END SUBROUTINE KERSET
 !_________________________________________________
 
 SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
-     &BYOR,BYOI,BYIR,BYII,IFLAG)
+     BYOR,BYOI,BYIR,BYII,IFLAG)
 
   IMPLICIT NONE
 
   INTEGER iflag,k,j,l,n,m
   DOUBLE PRECISION ZR,ZI,BJOR,BJOI,BJIR,BJII,                       &
-       &BYOR,BYOI,BYIR,BYII,zmag,angz,cang,                               &
-       &cangz,sang,sangz,aabs,cterm0,cterm2,                              &
-       &ang,u,ui,angu,ur,szi,zzi,hcosx,hsinx,                             &
-       &zimag,sxir,cxir,sxor,cxor,ti,t,zir,zor,                           &
-       &z2mag,angt,psi,fk,rk,cterm,cterm1,                                &
-       &bjiit,byort,byoit,byirt,byiit,pi2,gam,tyr,                        &
-       &tyi,sum1,sum0,cmu0,cmu1,tk2,s,smag,                               &
-       &spor,spir,spii,sqor,sqoi,sqir,sqii,                               &
-       &por,poi,spoi,pii,pi4,htanx,byiti,byitr,                           &
-       &bjiti,bjitr,byoti,byotr,bjoti,bjotr,                              &
-       &sii,sir,cii,cir,soi,sor,coi,cor,z1,qii,                           &
-       &bjirt,rl,angs,tr,pir,qor,qoi,qir,sink
+       BYOR,BYOI,BYIR,BYII,zmag,angz,cang,                               &
+       cangz,sang,sangz,aabs,cterm0,cterm2,                              &
+       ang,u,ui,angu,ur,szi,zzi,hcosx,hsinx,                             &
+       zimag,sxir,cxir,sxor,cxor,ti,t,zir,zor,                           &
+       z2mag,angt,psi,fk,rk,cterm,cterm1,                                &
+       bjiit,byort,byoit,byirt,byiit,pi2,gam,tyr,                        &
+       tyi,sum1,sum0,cmu0,cmu1,tk2,s,smag,                               &
+       spor,spir,spii,sqor,sqoi,sqir,sqii,                               &
+       por,poi,spoi,pii,pi4,htanx,byiti,byitr,                           &
+       bjiti,bjitr,byoti,byotr,bjoti,bjotr,                              &
+       sii,sir,cii,cir,soi,sor,coi,cor,z1,qii,                           &
+       bjirt,rl,angs,tr,pir,qor,qoi,qir,sink
 
   DOUBLE PRECISION CJOR(18),CJOI(18),CJIR(18),CJII(18),             &
-       &CYOR(18),CYOI(18),CYIR(18),CYII(18),CPO(12),                      &
-       &CPI(12),CQO(12),CQI(12),CPOR(12),CPOI(12),                        &
-       &CPIR(12),CPII(12),CQOR(12),CQOI(12),                              &
-       &CQIR(12),CQII(12)
+       CYOR(18),CYOI(18),CYIR(18),CYII(18),CPO(12),                      &
+       CPI(12),CQO(12),CQI(12),CPOR(12),CPOI(12),                        &
+       CPIR(12),CPII(12),CQOR(12),CQOI(12),                              &
+       CQIR(12),CQII(12)
 
   !---- Initialize.
   call dzero(CJOR,18)
@@ -694,47 +703,47 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
      CYII(K)=CTERM2*SANG
   enddo
   BJOR=(((((((((((((((((CJOR(18)*T+CJOR(17))*T+                     &
-       &CJOR(16))*T+CJOR(15))*T+CJOR(14))*T+CJOR(13))*T                   &
-       &+CJOR(12))*T+CJOR(11))*T+CJOR(10))*T+CJOR(9))*T                   &
-       &+CJOR(8))*T+CJOR(7))*T+CJOR(6))*T+CJOR(5))*T+                     &
-       &CJOR(4))*T+CJOR(3))*T+CJOR(2))*T+CJOR(1))*T+                      &
-       &.1D+01
+       CJOR(16))*T+CJOR(15))*T+CJOR(14))*T+CJOR(13))*T                   &
+       +CJOR(12))*T+CJOR(11))*T+CJOR(10))*T+CJOR(9))*T                   &
+       +CJOR(8))*T+CJOR(7))*T+CJOR(6))*T+CJOR(5))*T+                     &
+       CJOR(4))*T+CJOR(3))*T+CJOR(2))*T+CJOR(1))*T+                      &
+       .1D+01
   BJOI=(((((((((((((((((CJOI(18)*T+CJOI(17))*T+                     &
-       &CJOI(16))*T+CJOI(15))*T+CJOI(14))*T+CJOI(13))*T                   &
-       &+CJOI(12))*T+CJOI(11))*T+CJOI(10))*T+CJOI(9))*T                   &
-       &+CJOI(8))*T+CJOI(7))*T+CJOI(6))*T+CJOI(5))*T+                     &
-       &CJOI(4))*T+CJOI(3))*T+CJOI(2))*T+CJOI(1))*T
+       CJOI(16))*T+CJOI(15))*T+CJOI(14))*T+CJOI(13))*T                   &
+       +CJOI(12))*T+CJOI(11))*T+CJOI(10))*T+CJOI(9))*T                   &
+       +CJOI(8))*T+CJOI(7))*T+CJOI(6))*T+CJOI(5))*T+                     &
+       CJOI(4))*T+CJOI(3))*T+CJOI(2))*T+CJOI(1))*T
   BJIRT=(((((((((((((((((CJIR(18)*T+CJIR(17))*T+                    &
-       &CJIR(16))*T+CJIR(15))*T+CJIR(14))*T+CJIR(13))*T                   &
-       &+CJIR(12))*T+CJIR(11))*T+CJIR(10))*T+CJIR(9))*T                   &
-       &+CJIR(8))*T+CJIR(7))*T+CJIR(6))*T+CJIR(5))*T+                     &
-       &CJIR(4))*T+CJIR(3))*T+CJIR(2))*T+CJIR(1))*T+                      &
-       &.1D+01
+       CJIR(16))*T+CJIR(15))*T+CJIR(14))*T+CJIR(13))*T                   &
+       +CJIR(12))*T+CJIR(11))*T+CJIR(10))*T+CJIR(9))*T                   &
+       +CJIR(8))*T+CJIR(7))*T+CJIR(6))*T+CJIR(5))*T+                     &
+       CJIR(4))*T+CJIR(3))*T+CJIR(2))*T+CJIR(1))*T+                      &
+       .1D+01
   BJIIT=(((((((((((((((((CJII(18)*T+CJII(17))*T+CJII(16))           &
-       &*T+CJII(15))*T+CJII(14))*T+CJII(13))*T+CJII(12))*T                &
-       &+CJII(11))*T+CJII(10))*T+CJII(9))*T+CJII(8))*T+                   &
-       &CJII(7))*T+CJII(6))*T+CJII(5))*T+CJII(4))*T+                      &
-       &CJII(3))*T+CJII(2))*T+CJII(1))*T
+       *T+CJII(15))*T+CJII(14))*T+CJII(13))*T+CJII(12))*T                &
+       +CJII(11))*T+CJII(10))*T+CJII(9))*T+CJII(8))*T+                   &
+       CJII(7))*T+CJII(6))*T+CJII(5))*T+CJII(4))*T+                      &
+       CJII(3))*T+CJII(2))*T+CJII(1))*T
   BYORT=(((((((((((((((((CYOR(18)*T+CYOR(17))*T+CYOR(16))           &
-       &*T+CYOR(15))*T+CYOR(14))*T+CYOR(13))*T+CYOR(12))*T+               &
-       &CYOR(11))*T+CYOR(10))*T+CYOR(9))*T+CYOR(8))*T+                    &
-       &CYOR(7))*T+CYOR(6))*T+CYOR(5))*T+CYOR(4))*T+CYOR(3))              &
-       &*T+CYOR(2))*T+CYOR(1))*T
+       *T+CYOR(15))*T+CYOR(14))*T+CYOR(13))*T+CYOR(12))*T+               &
+       CYOR(11))*T+CYOR(10))*T+CYOR(9))*T+CYOR(8))*T+                    &
+       CYOR(7))*T+CYOR(6))*T+CYOR(5))*T+CYOR(4))*T+CYOR(3))              &
+       *T+CYOR(2))*T+CYOR(1))*T
   BYOIT=(((((((((((((((((CYOI(18)*T+CYOI(17))*T+CYOI(16))*T         &
-       &+CYOI(15))*T+CYOI(14))*T+CYOI(13))*T+CYOI(12))*T+                 &
-       &CYOI(11))*T+CYOI(10))*T+CYOI(9))*T+CYOI(8))*T+CYOI(7)             &
-       &)*T+CYOI(6))*T+CYOI(5))*T+CYOI(4))*T+CYOI(3))*                    &
-       &T+CYOI(2))*T+CYOI(1))*T
+       +CYOI(15))*T+CYOI(14))*T+CYOI(13))*T+CYOI(12))*T+                 &
+       CYOI(11))*T+CYOI(10))*T+CYOI(9))*T+CYOI(8))*T+CYOI(7)             &
+       )*T+CYOI(6))*T+CYOI(5))*T+CYOI(4))*T+CYOI(3))*                    &
+       T+CYOI(2))*T+CYOI(1))*T
   BYIRT=(((((((((((((((((CYIR(18)*T+CYIR(17))*T+CYIR(16))*T+        &
-       &CYIR(15))*T+CYIR(14))*T+CYIR(13))*T+CYIR(12))*T+                  &
-       &CYIR(11))*T+CYIR(10))*T+CYIR(9))*T+CYIR(8))*T+CYIR(7)             &
-       &)*T+CYIR(6))*T+CYIR(5))*T+CYIR(4))*T+CYIR(3))*T+                  &
-       &CYIR(2))*T+CYIR(1))*T+.5D+00
+       CYIR(15))*T+CYIR(14))*T+CYIR(13))*T+CYIR(12))*T+                  &
+       CYIR(11))*T+CYIR(10))*T+CYIR(9))*T+CYIR(8))*T+CYIR(7)             &
+       )*T+CYIR(6))*T+CYIR(5))*T+CYIR(4))*T+CYIR(3))*T+                  &
+       CYIR(2))*T+CYIR(1))*T+.5D+00
   BYIIT=(((((((((((((((((CYII(18)*T+CYII(17))*T+CYII(16))*T         &
-       &+CYII(15))*T+CYII(14))*T+CYII(13))*T+CYII(12))*T+                 &
-       &CYII(11))*T+CYII(10))*T+CYII(9))*T+CYII(8))*T+CYII(7)             &
-       &)*T+CYII(6))*T+CYII(5))*T+CYII(4))*T+CYII(3))*T+                  &
-       &CYII(2))*T+CYII(1))*T
+       +CYII(15))*T+CYII(14))*T+CYII(13))*T+CYII(12))*T+                 &
+       CYII(11))*T+CYII(10))*T+CYII(9))*T+CYII(8))*T+CYII(7)             &
+       )*T+CYII(6))*T+CYII(5))*T+CYII(4))*T+CYII(3))*T+                  &
+       CYII(2))*T+CYII(1))*T
   CANGZ=COS(ANGZ)
   SANGZ=SIN(ANGZ)
   BJIR=(ZR*BJIRT-ZI*BJIIT)/.2D+01
@@ -746,7 +755,7 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
   BYOR=(TYR*BJOR-TYI*BJOI-BYORT)/PI2
   BYOI=(TYI*BJOR+TYR*BJOI-BYOIT)/PI2
   BYIR=(TYR*BJIR-TYI*BJII-CANGZ/ZMAG-(BYIRT*ZR-                     &
-       &BYIIT*ZI)/.2D+01)/PI2
+       BYIIT*ZI)/.2D+01)/PI2
   BYII=(TYI*BJIR+TYR*BJII+SANGZ/ZMAG-(BYIIT*ZR+BYIRT*ZI)/.2D+01)/   &
        &PI2
   RETURN
@@ -810,29 +819,29 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
      CQII(L)=CQI(L)*SANG
   enddo
   SPOR=(((((((((((CPOR(12)*S+CPOR(11))*S+CPOR(10))*S+               &
-       &CPOR(9))*S+CPOR(8))*S+CPOR(7))*S+CPOR(6))*S+CPOR(5))              &
-       &*S+CPOR(4))*S+CPOR(3))*S+CPOR(2))*S+CPOR(1))*S
+       CPOR(9))*S+CPOR(8))*S+CPOR(7))*S+CPOR(6))*S+CPOR(5))              &
+       *S+CPOR(4))*S+CPOR(3))*S+CPOR(2))*S+CPOR(1))*S
   SPOI=(((((((((((CPOI(12)*S+CPOI(11))*S+CPOI(10))*S+               &
-       &CPOI(9))*S+CPOI(8))*S+CPOI(7))*S+CPOI(6))*S+CPOI(5))              &
-       &*S+CPOI(4))*S+CPOI(3))*S+CPOI(2))*S+CPOI(1))*S
+       CPOI(9))*S+CPOI(8))*S+CPOI(7))*S+CPOI(6))*S+CPOI(5))              &
+       *S+CPOI(4))*S+CPOI(3))*S+CPOI(2))*S+CPOI(1))*S
   SPIR=(((((((((((CPIR(12)*S+CPIR(11))*S+CPIR(10))*S+               &
-       &CPIR(9))*S+CPIR(8))*S+CPIR(7))*S+CPIR(6))*S+CPIR(5))              &
-       &*S+CPIR(4))*S+CPIR(3))*S+CPIR(2))*S+CPIR(1))*S
+       CPIR(9))*S+CPIR(8))*S+CPIR(7))*S+CPIR(6))*S+CPIR(5))              &
+       *S+CPIR(4))*S+CPIR(3))*S+CPIR(2))*S+CPIR(1))*S
   SPII=(((((((((((CPII(12)*S+CPII(11))*S+CPII(10))*S+               &
-       &CPII(9))*S+CPII(8))*S+CPII(7))*S+CPII(6))*S+CPII(5))              &
-       &*S+CPII(4))*S+CPII(3))*S+CPII(2))*S+CPII(1))*S
+       CPII(9))*S+CPII(8))*S+CPII(7))*S+CPII(6))*S+CPII(5))              &
+       *S+CPII(4))*S+CPII(3))*S+CPII(2))*S+CPII(1))*S
   SQOR=(((((((((((CQOR(12)*S+CQOR(11))*S+CQOR(10))*S+               &
-       &CQOR(9))*S+CQOR(8))*S+CQOR(7))*S+CQOR(6))*S+CQOR(5))              &
-       &*S+CQOR(4))*S+CQOR(3))*S+CQOR(2))*S+CQOR(1))*S
+       CQOR(9))*S+CQOR(8))*S+CQOR(7))*S+CQOR(6))*S+CQOR(5))              &
+       *S+CQOR(4))*S+CQOR(3))*S+CQOR(2))*S+CQOR(1))*S
   SQOI=(((((((((((CQOI(12)*S+CQOI(11))*S+CQOI(10))*S+               &
-       &CQOI(9))*S+CQOI(8))*S+CQOI(7))*S+CQOI(6))*S+CQOI(5))              &
-       &*S+CQOI(4))*S+CQOI(3))*S+CQOI(2))*S+CQOI(1))*S
+       CQOI(9))*S+CQOI(8))*S+CQOI(7))*S+CQOI(6))*S+CQOI(5))              &
+       *S+CQOI(4))*S+CQOI(3))*S+CQOI(2))*S+CQOI(1))*S
   SQIR=(((((((((((CQIR(12)*S+CQIR(11))*S+CQIR(10))*S+               &
-       &CQIR(9))*S+CQIR(8))*S+CQIR(7))*S+CQIR(6))*S+CQIR(5))              &
-       &*S+CQIR(4))*S+CQIR(3))*S+CQIR(2))*S+CQIR(1))*S
+       CQIR(9))*S+CQIR(8))*S+CQIR(7))*S+CQIR(6))*S+CQIR(5))              &
+       *S+CQIR(4))*S+CQIR(3))*S+CQIR(2))*S+CQIR(1))*S
   SQII=(((((((((((CQII(12)*S+CQII(11))*S+CQII(10))*S+               &
-       &CQII(9))*S+CQII(8))*S+CQII(7))*S+CQII(6))*S+CQII(5))              &
-       &*S+CQII(4))*S+CQII(3))*S+CQII(2))*S+CQII(1))*S
+       CQII(9))*S+CQII(8))*S+CQII(7))*S+CQII(6))*S+CQII(5))              &
+       *S+CQII(4))*S+CQII(3))*S+CQII(2))*S+CQII(1))*S
   T=.8D+01*ZMAG
   ANGT=ANGZ
   TR=T*COS(ANGT)
