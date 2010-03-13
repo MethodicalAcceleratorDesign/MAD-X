@@ -3,6 +3,8 @@
      &tol,calls,call_lim,                                               &
      &vect,dvect,fun_vec,                                               &
      &w_ifjac,w_iwa4,fval,xstart,xold)
+
+      use matchfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -37,7 +39,6 @@
       double precision fval(*),xold(*),xstart(*)
       double precision random,cool,balance,cond
       integer bisec,match_mode
-      include 'match.fi'
       external mtfcn
 
       fval(1)=0
@@ -70,6 +71,8 @@
      &x,fvec,epsfcn,                                                    &
      &fjac,wa4,                                                         &
      &xstart,xold,cool,balance,random,bisec,cond,match_mode)
+
+      use matchfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -106,7 +109,6 @@
       double precision fjac(m,n),wa4(m),zero,one,two
       double precision epsil,epsmch,cool,balance,random
       parameter(zero=0d0,one=1d0,two=2d0, epsil=1d-9,epsmch=1d-16)
-      include 'match.fi'
       external fcn, mtcond
 
 !      double precision xdiff(n)
@@ -490,6 +492,7 @@
 
       subroutine jacob_print(n,match_mode)
 
+      use name_lenfi
       implicit none
 
       integer n,ivar,nvar,match_mode
@@ -499,7 +502,6 @@
 !      integer double_from_table
       parameter(name_l=24)
       double precision value,c_min,c_max,weight
-      include 'name_len.fi'
       character*(name_len) namevar,name,node_name
       integer next_vary,slope
       double precision step,opt
@@ -564,13 +566,13 @@
       end
 
       subroutine mtmove(vect,varinfo,dir,balance)
+      use name_lenfi
       implicit none
       integer j,next_vary,name_l,slope
       integer varinfo,effvar
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
       double precision val,dir,balance
-      include 'name_len.fi'
       character*(name_len) name
 
       effvar=0
@@ -592,12 +594,12 @@
 
 
       subroutine mtcool(vect,cool,balance,xopt)
+      use name_lenfi
       implicit none
       integer j,next_vary,name_l,slope
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
       double precision val,xopt(*),cool,balance
-      include 'name_len.fi'
       character*(name_len) name
 
       if (cool.gt.0) then
@@ -621,12 +623,12 @@
       end
 
       subroutine mtrandom(vect,random)
+      use name_lenfi
       implicit none
       integer j,next_vary,name_l,slope
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
       double precision val,random,frndm
-      include 'name_len.fi'
       character*(name_len) name
 
  1    continue
@@ -640,6 +642,7 @@
 
       subroutine mtslope(x,xstart)
 
+      use name_lenfi
       implicit none
 
 
@@ -647,7 +650,6 @@
       parameter(name_l=24)
       double precision x(*),xstart(*),c_min,c_max,step,opt
       double precision diff
-      include 'name_len.fi'
       character*(name_len) name
 
  1    continue
@@ -669,6 +671,7 @@
 
       subroutine mtvarinfo(x,xstart,varinfo,effvar)
 
+      use name_lenfi
       implicit none
 
 
@@ -676,7 +679,6 @@
       parameter(name_l=24)
       double precision x(*),xstart(*),c_min,c_max,step,opt
       double precision diff,val,oldval
-      include 'name_len.fi'
       character*(name_len) name
 
       effvar=0

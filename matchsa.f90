@@ -1,5 +1,6 @@
       subroutine mtsa(ncon,nvar,tol,calls,call_lim,vect,fun_vect,iseed  &
      &,iprint,lb,nacp,ub,xopt,c,vm,xp)
+!     use name_lenfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -27,7 +28,6 @@
       logical logmax,psum
       common/forsa/m
       parameter(name_l=24)
-!     include 'name_len.fi'
 !     character*(name_len) name !uncomment when name_len.fi present
       character*(name_l) name   !clear
       n=nvar

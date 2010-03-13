@@ -16,10 +16,11 @@
       end
 
       subroutine mtgeti(vect,dvect)
+      use name_lenfi
+      implicit none
 ! This subroutine should only be called from Fortran.  There is an
 ! equivalent mtgetc for the occasions when it needs to be called from C.
 ! Modified at 10:38:56 on 8 Apr 2003 by JMJ
-      implicit none
 
 
       logical psum
@@ -30,7 +31,6 @@
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
-      include 'name_len.fi'
       character*(name_len) name
 
       psum=get_option('match_summary ') .ne. 0
@@ -67,6 +67,7 @@
 
       subroutine mtlimit(vect,ireset)
 
+      use name_lenfi
       implicit none
 
 
@@ -77,7 +78,6 @@
       parameter(s_fact=5d-1)
       parameter(eps = 1.0d-10,eps2 = 1.0d-1,stplim = 2.0d-1)
       parameter(vmax=1.e+20,vmin=-1.e+20)
-      include 'name_len.fi'
       character*(name_len) name
 
  1    continue
@@ -106,6 +106,9 @@
 
       subroutine collect(ncon,fsum,fvect)
 
+      use name_lenfi
+      use twiss0fi
+      use twisscfi
       implicit none
 
 
@@ -115,9 +118,6 @@
      &char_from_table,name_l
       parameter(name_l=24)
       double precision fsum,fvect(*),val,value,c_min,c_max,weight,f_val
-      include 'name_len.fi'
-      include 'twiss0.fi'
-      include 'twissc.fi'
       character*(name_len) name,node_name
       integer n_pos, next_constr_namepos, advance_node
 
@@ -273,6 +273,7 @@
  9999 end
       subroutine mtputi(vect)
 
+      use name_lenfi
       implicit none
 
 
@@ -280,7 +281,6 @@
       parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,s_fact,opt
       parameter(s_fact=5d-1)
-      include 'name_len.fi'
       character*(name_len) name
 
  1    continue
@@ -292,6 +292,8 @@
       end
       subroutine mtlmdf(ncon,nvar,tol,calls,call_lim,vect,dvect,fun_vec,&
      &diag,w_ifjac,w_ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
+
+      use matchfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -314,7 +316,6 @@
      &w_ifjac(*),w_qtf(*),w_iwa1(*),w_iwa2(*),w_iwa3(*),w_iwa4(*),one,  &
      &xold(*),w_ipvt(*)
       parameter(one=1d0)
-      include 'match.fi'
       external mtfcn
 
       icovar = 0
@@ -330,6 +331,7 @@
       subroutine lmdif(fcn,m,n,calls,call_lim,x,fvec,epsfcn,diag,factor,&
      &fjac,ldfjac,ipvt,qtf,wa1,wa2,wa3,wa4,xold)
 
+      use matchfi
       implicit none
 
 
@@ -431,7 +433,6 @@
      &p0001,epsil,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,p1=0.1d0,p5=0.5d0,p25=0.25d0,  &
      &p75=0.75d0,p90=0.9d0,p0001=0.0001d0,epsil=1d-8,epsmch=1d-16)
-      include 'match.fi'
       external fcn, mtcond
 
       ireset = 0
@@ -1304,6 +1305,7 @@
      &dvect,fun_vect,w_iwa1,w_iwa2,w_iwa3,w_iwa4,w_iwa5,w_iwa6,w_iwa7,  &
      &w_iwa8)
 
+      use matchfi
       implicit none
 
 
@@ -1327,7 +1329,6 @@
       double precision tol,vect(*),dvect(*),fun_vect(*),w_iwa1(*),      &
      &w_iwa2(*),w_iwa3(*),w_iwa4(*),w_iwa5(*),w_iwa6(*),w_iwa7(*),      &
      &w_iwa8(*)
-      include 'match.fi'
       external mtfcn
 
       icovar = 0
@@ -1348,6 +1349,8 @@
  9999 end
       subroutine mtmig1(fcn,nf,nx,strategy,tol,calls,call_lim,x,dx,fvec,&
      &covar, wa,work_1,work_2,work_3,work_4,work_5,work_6)
+
+      use matchfi
       implicit none
 
 
@@ -1378,7 +1381,6 @@
      &eps1,eps2
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,epsmch=1d-16,       &
      &eps1=1d-3,eps2=1d-4)
-      include 'match.fi'
       external fcn
 
 !---- Initialize penalty function.
@@ -1583,6 +1585,7 @@
       subroutine mthess(fcn,nf,nx,calls,covar,x,grd,g2,fvec,wa,work_1,  &
      &work_2,work_3,work_4,work_5,work_6)
 
+      use matchfi
       implicit none
 
 
@@ -1614,7 +1617,6 @@
      &work_2(nx),work_3(nx),work_4(*),work_5(*),work_6(*),zero,one,two, &
      &half,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,epsmch=1d-16)
-      include 'match.fi'
       external fcn
 
       eps = sqrt(epsmch)
@@ -1682,6 +1684,7 @@
       end
       subroutine mtderi(fcn,nf,nx,calls,x,grd,g2,fvec)
 
+      use matchfi
       implicit none
 
 
@@ -1707,7 +1710,6 @@
       double precision eps,f1,f2,fvec(nf),g2(nx),grd(nx),vdot,x(nx),    &
      &xsave,xstep,zero,one,two,half,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,epsmch=1d-16)
-      include 'match.fi'
       external fcn
 
       eps = sqrt(epsmch)
@@ -1784,6 +1786,7 @@
       end
       subroutine mtline(fcn,nf,nx,calls,x,dx,fvec,xsave,iflag)
 
+      use matchfi
       implicit none
 
 
@@ -1811,7 +1814,6 @@
      &p100,p1000,epsmch
       parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0,tol8=5d-2,alpha=2d0,&
      &slambg=5d0,p100=1d2,p1000=1d3,epsmch=1d-16)
-      include 'match.fi'
       external fcn
 
 !---- Initialize.
@@ -1961,6 +1963,7 @@
       subroutine mtsimp(ncon,nvar,tol,calls,call_lim,vect,dvect,        &
      &fun_vect,w_iwa1,w_iwa2,w_iwa3)
 
+      use matchfi
       implicit none
 
 
@@ -1974,7 +1977,6 @@
 ! ilevel: print level
       double precision tol,vect(*),dvect(*),fun_vect(*),w_iwa1(*),      &
      &w_iwa2(*),w_iwa3(*)
-      include 'match.fi'
       external mtfcn
 
       icovar = 0
@@ -1996,6 +1998,8 @@
 
       subroutine mtsim1(fcn,nf,nx,calls,call_lim,tol,x,dx,fvec,psim,    &
      &fsim,wa)
+
+      use matchfi
       implicit none
 
 
@@ -2028,7 +2032,6 @@
       parameter(alpha=1d0,beta=0.5d0,gamma=2d0,rhomin=4d0,rhomax=8d0,   &
      &rho1=1d0+alpha,rho2=rho1+alpha*gamma,zero=0d0,two=2d0,three=3d0,  &
      &half=5d-1,p01=1d-1,eps=1d-8,epsmch=1d-16)
-      include 'match.fi'
       external fcn
 
       izero = 0
@@ -2301,6 +2304,8 @@
   830 format('call:',I8,3x,'Penalty function = ',e16.8)
       end
       subroutine mtrazz(nvrr,fnew,pnew,fsim,psim,jh,jl)
+
+      use matchfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -2322,7 +2327,6 @@
       double precision fnew,fsim(0:nvrr),pnew(nvrr),psim(nvrr,0:nvrr),  &
      &ten
       parameter(ten=1d1)
-      include 'match.fi'
 
 !---- Replace vertex with highest function value.
       do i = 1, nvrr
