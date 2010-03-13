@@ -1,18 +1,442 @@
+module bbfi
+  implicit none
+  public
+  integer bbd_max
+  parameter(bbd_max=350)
+  integer :: bbd_loc(bbd_max)=0,bbd_cnt=0,bbd_flag=0,bbd_pos=0
+  double precision :: bb_kick(2,bbd_max)=0.d0
+end module bbfi
+module deltrafi
+  implicit none
+  public
+  logical :: dorad=.false.,dodamp=.false.,dorand=.false.,fastune=.false.
+  double precision :: deltax=0.d0
+end module deltrafi
+module dyntabfi
+  implicit none
+  public
+  double precision :: dynapfrac=0.d0,dktrturns=0.d0,xend=0.d0,pxend=0.d0,&
+       yend=0.d0,pyend=0.d0,tend=0.d0,ptend=0.d0,smear=0.d0,yapunov=0.d0
+end module dyntabfi
+module wmaxmin0fi
+  implicit none
+  public
+  double precision :: wxmax=0.d0,wxmin=0.d0,wymax=0.d0,wymin=0.d0,&
+       wxymax=0.d0,wxymin=0.d0
+end module wmaxmin0fi
+module tunesfi
+  implicit none
+  public
+  double precision :: x0=0.d0,y0=0.d0,tunx=0.d0,tuny=0.d0,dtune=0.d0
+end module tunesfi
+module twiss0fi
+  implicit none
+  public
+  integer align_max,fundim
+  parameter(align_max=14,fundim = 74)
+end module twiss0fi
+module twissafi
+  implicit none
+  public
+  character(48) :: table_name=' ',sectorTableName=' '
+  logical :: match_is_on=.false.
+end module twissafi
+module twisslfi
+  implicit none
+  public
+  logical ::  centre=.false.,centre_cptk=.false.,centre_bttk=.false.,first,&
+       rmatrix=.false.,sectormap=.false.
+end module twisslfi
+module twisscfi
+  use twiss0fi
+  implicit none
+  public
+  double precision :: opt_fun0(fundim)=0.d0,opt_fun(fundim)=0.d0,disp(6)=0.d0,&
+       ddisp(6)=0.d0,rmat(2,2)=0.d0,betx=0.d0,alfx=0.d0,amux=0.d0,bety=0.d0,&
+       alfy=0.d0,amuy=0.d0,bxmax=0.d0,dxmax=0.d0,bymax=0.d0,dymax=0.d0,&
+       xcomax=0.d0,ycomax=0.d0,sigxco=0.d0,sigyco=0.d0,sigdx=0.d0,sigdy=0.d0,&
+       wgt=0.d0,cosmux=0.d0,cosmuy=0.d0,wx=0.d0,phix=0.d0,dmux=0.d0,wy=0.d0,&
+       phiy=0.d0,dmuy=0.d0,synch_1=0.d0,synch_2=0.d0,synch_3=0.d0,synch_4=0.d0,&
+       synch_5=0.d0,suml=0.d0,circ=0.d0,eta=0.d0,alfa=0.d0,gamtr=0.d0,qx=0.d0,&
+       qy=0.d0,sinmux=0.d0,sinmuy=0.d0,xix=0.d0,xiy=0.d0,currpos=0.d0
+end module twisscfi
+module twissotmfi
+  implicit none
+  public
+  double precision :: rotm(6,6)=0.d0,rw(6,6)=0.d0,skick(6)=0.d0,sorb(6)=0.d0,&
+       srmat(6,6)=0.d0,stmat(6,6,6)=0.d0
+end module twissotmfi
+module twiss_elpfi
+  implicit none
+  public
+  !---fixed positions for element parameters-----------------------------*
+  double precision :: g_elpar(50)=0.d0
+  !-general--------------------------------------------------------------*
+  integer    g_el, g_kmax, g_kmin, g_calib, g_polarity
+  parameter (g_el = 2, g_kmax = 3, g_kmin = 4, g_calib = 5, g_polarity = 6)
+  !-bend-----------------------------------------------------------------*
+  integer    b_angle , b_tilt , b_k0 , b_k0s ,                      &
+       b_k1 , b_k1s , b_e1 , b_e2 , b_k2 ,                    &
+       b_k2s , b_h1 , b_h2 , b_hgap ,                         &
+       b_fint , b_fintx , b_k3 , b_k3s
+  parameter (b_angle = 7, b_tilt = 8, b_k0 = 9, b_k0s = 10,         &
+       b_k1 = 11, b_k1s = 12, b_e1 = 13 , b_e2 = 14, b_k2 =15,&
+       b_k2s = 16, b_h1 = 17, b_h2 = 18, b_hgap = 19,         &
+       b_fint = 20, b_fintx = 21, b_k3 = 22, b_k3s = 23)
+  !-quad-----------------------------------------------------------------*
+  integer    q_tilt, q_k1 , q_k1s
+  parameter (q_tilt = 7, q_k1 = 8, q_k1s = 9)
+  !-sext-----------------------------------------------------------------*
+  integer    s_tilt, s_k2 , s_k2s
+  parameter (s_tilt = 7, s_k2 = 8, s_k2s = 9)
+  !-oct------------------------------------------------------------------*
+  integer    o_tilt, o_k3 , o_k3s
+  parameter (o_tilt = 7, o_k3 = 8, o_k3s = 9)
+  !-mult-----------------------------------------------------------------*
+  integer    m_tilt, m_lrad
+  parameter (m_tilt = 7, m_lrad = 8)
+  !-sol------------------------------------------------------------------*
+  integer    so_lrad, so_ks, so_ksi
+  parameter (so_lrad = 7, so_ks = 8, so_ksi = 9)
+  !-rfc------------------------------------------------------------------*
+  integer    r_volt, r_lag , r_freq
+  parameter (r_volt = 7, r_lag = 8, r_freq = 9)
+  !-elsep----------------------------------------------------------------*
+  integer    e_tilt, e_ex , e_ey
+  parameter (e_tilt = 7, e_ex = 8, e_ey = 9)
+  !-hkick----------------------------------------------------------------*
+  integer    h_tilt, h_lrad , h_kick, h_hkick, h_chkick
+  parameter (h_tilt = 7, h_lrad = 8, h_kick = 9, h_hkick = 10,       &
+       h_chkick = 11)
+  !-hkick----------------------------------------------------------------*
+  integer    v_tilt, v_lrad , v_kick, v_vkick, v_cvkick
+  parameter (v_tilt = 7, v_lrad = 8, v_kick = 9, v_vkick = 10,       &
+       v_cvkick = 11)
+  !-kick-----------------------------------------------------------------*
+  integer    k_tilt, k_lrad , k_hkick, k_vkick, k_chkick,            &
+       k_cvkick
+  parameter (k_tilt = 7, k_lrad = 8, k_hkick = 9, k_vkick = 10,      &
+       k_chkick = 11, k_cvkick = 12)
+end module twiss_elpfi
+module emitfi
+  implicit none
+  public
+  double precision :: qx=0.d0,qy=0.d0,qs=0.d0,cg=0.d0,sum(3)=0.d0,sumu0=0.d0
+  save qx, qy, qs, cg,sum,sumu0
+end module emitfi
+module twtrrfi
+  implicit none
+  public
+  !---- maxmul is the maximum multipole order both in twiss and trrun
+  integer maxmul,maxferr,maxnaper
+  parameter(maxmul=20,maxferr=50,maxnaper=100)
+end module twtrrfi
+module ibsdbfi
+  implicit none
+  public
+  integer :: bunch=0
+  double precision :: circ=0.d0,clight=0.d0,arad=0.d0,freq0=0.d0,alpha=0.d0,&
+       amass=0.d0,charge=0.d0,en0=0.d0,gammas=0.d0,gamma=0.d0,ex=0.d0,ey=0.d0,&
+       et=0.d0,sigt=0.d0,sige=0.d0,betas=0.d0,beta=0.d0,parnum=0.d0,&
+       currnt=0.d0,sigx=0.d0,sigy=0.d0,alfa=0.d0
+end module ibsdbfi
+module matchfi
+  implicit none
+  public
+  integer :: icovar=0,ilevel=0
+  double precision :: edm=0.d0,fmin=0.d0
+end module matchfi
+module name_lenfi
+  implicit none
+  public
+  integer name_len
+  parameter(name_len=24)
+end module name_lenfi
+module physconsfi
+  implicit none
+  public
+  double precision :: amu0=0.d0,elamda=0.d0,emass=0.d0,eps0=0.d0,erad=0.d0,&
+       hbar=0.d0,plamda=0.d0,pmass=0.d0,prad=0.d0,qelect=0.d0,mumass=0.d0
+end module physconsfi
+module touschekfi
+  implicit none
+  public
+  integer :: bunch=0
+  double precision :: circ=0.d0,clight=0.d0,arad=0.d0,freq0=0.d0,amass=0.d0,&
+       charge=0.d0,en0=0.d0,gammas=0.d0,gamma=0.d0,ex=0.d0,ey=0.d0,et=0.d0,&
+       sigt=0.d0,sige=0.d0,betas=0.d0,beta=0.d0,parnum=0.d0,currnt=0.d0,&
+       alfa=0.d0,um1=0.d0,deltap=0.d0,fb1=0.d0,fb2=0.d0
+end module touschekfi
+module trackfi
+  implicit none
+  public
+  double precision :: arad=0.d0,betas=0.d0,beti=0.d0,gammas=0.d0,dtbyds=0.d0,&
+       deltas=0.d0,bet0=0.d0,bet0i=0.d0
+  logical :: dodamp=.false.,dorad=.false.,dorand=.false.,fsecarb=.false.
+end module trackfi
+module plotfi
+  implicit none
+  public
+  !--- m_adble is the number of different types of elements
+  integer mtype, m_adble
+  parameter (mtype = 50, m_adble = 20)
+
+  integer mcnam, maxpnt
+  parameter (mcnam = 16, maxpnt = 500)
+
+  !--- szcompar is the size of the arrays returned by the routine comm_para
+  integer szcompar
+  parameter (szcompar = 100)
+
+  !--- szchara is the size of the character strings char_a & version in
+  !--- the routine pesopt
+  integer szchara
+  parameter (szchara = 400)
+
+  !--- character sizes:
+  !   MLSIZE    label character height
+  !   MTSIZE    text   - " -
+  !   MASIZE    annotation - " -
+  integer mlsize, mtsize, masize
+  parameter  (mlsize = 13,mtsize = 13,masize = 20)
+
+  !--- parameters used in the routine pegacn in file plot.F
+
+  integer mposx, mposy, mpost
+  parameter (mposx = 8, mposy = 3, mpost = mposx * mposy)
+
+  !--- parameters used in the routine peschm in file plot.F
+
+  integer mobj, msize
+  parameter (mobj = 14, msize = 88)
+
+  integer mtitl, mxlabl, mnvar, mxdep, mqadd, mntmax, mksmax, mplred, mplout
+
+  parameter (mtitl  = 128, mxlabl = 160)
+  parameter (mnvar = 74, mxdep = 2)
+  parameter (mqadd = 100000)
+  parameter (mntmax = 20, mksmax = 10)
+  parameter (mplred = 46, mplout = 47)
+
+  integer maxseql, mtwcol, mpparm, mxcurv, mopt, mfile, marg, maxarg, mxdp, mxplot
+
+  parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
+       mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
+       mxdp = 25, mxplot = 100)
+
+  integer mintpl
+  parameter (mintpl = 18)
+
+  !--- Definition of common / peaddi /
+  !--- itbv set in routine pesopt, used in routines pemima, peplot
+  !---      and pesopt.
+  !--- nivvar set in routine pesopt, used in routines pefill, peintp,
+  !---        pemima, peplot and pesopt.
+  !--- nelmach set in routine pefill, used in routines pefill, peplot.
+  !--- numax set in routine pemima, used in routines pemima, peplot.
+  !--- interf set in routine pesopt, used in routines pecurv, pefill.
+  !--- noline set in routine pesopt, used in routines pefill, pesopt.
+  !--- nqval set in routine pefill and peintp, used in routines pefill,
+  !---        peintp, pemima and peplot.
+  !--- nvvar set in routine pesopt and pemima, used in routine pemima.
+  !--- nrrang set in routine pefill, used in routine pesopt and pefill.
+  !--- proc_flag set in routine pesopt, used in routine pefill, peintp
+  !---           and pesopt.
+  !--- ipparm set in routine peintp and pesopt, used in routine peplot
+  !---           and pesopt.
+  !--- naxref set in routine pemima and pesopt, used in routine pemima
+  !---           and pesopt.
+  !--- ieltyp set in routine pefill, used in routine psplot.
+
+  integer :: itbv=0,nivvar=0,nelmach=0,numax=0,interf=0,noline=0, &
+       nqval(mxcurv)=0,nvvar(4)=0,nrrang(2)=0,                         &
+       proc_flag(2,mxcurv)=0,ipparm(mpparm,mxcurv)=0,                  &
+       naxref(mxcurv)=0,ieltyp(maxseql)=0
+
+  !--- Definition of common / peaddr /
+  !--- qascl set in routine pesopt, used in routine peplot.
+  !--- qlscl set in routine pesopt, used in routine peplot.
+  !--- qsscl set in routine pesopt, used in routine peplot.
+  !--- qtscl set in routine pesopt, used in routine peplot.
+  !--- hrange set in routine pesopt, used in routines pefill, peplot.
+  !--- vrange set in routine pesopt, used in routine peplot.
+  !--- hmima set in routines pesopt and pemima,
+  !---       used in routines peplot, pesopt and pemima.
+  !--- vmima set in routines pesopt and pemima,
+  !---       used in routines peplot and pemima.
+  !--- qhval set in routines pefill and peintp,
+  !---       used in routines peplot, pefill and pemima.
+  !--- qvval set in routines pefill and peintp,
+  !---       used in routines peplot, pefill and pemima.
+  !--- estart set in routine pefill, and peintp,
+  !---        used in routines peplot and pefill.
+  !--- eend set in routine pefill, used in routine peplot.
+
+  real :: qascl=0.,qlscl=0.,qsscl=0.,qtscl=0.,                    &
+       hrange(2)=0.,vrange(2,4)=0.,hmima(2)=0.,vmima(2,4)=0.,          &
+       qhval(maxseql,mxcurv)=0.,qvval(maxseql,mxcurv)=0.,              &
+       estart(maxseql)=0.,eend(maxseql)=0.
+
+  !--- Definition of common / peaddc /
+  !--- horname set in routine pesopt,
+  !---         used in routines pefill, peplot and pesopt.
+  !--- tabname set in routine pesopt,
+  !---         used in routines pefill, peintp, pelfill and pesopt.
+  !--- toptitle set in routine pesopt, used in routine peplot.
+  !--- plfnam set in routine plginit, used in routines plotit and plginit.
+  !--- axlabel set in routine pemima, used in routine peplot.
+  !--- sname set in routine pesopt,
+  !---         used in routines pefill and pesopt.
+  !--- slabl set in routine pesplit,
+  !---         used in routines peplot, pemima and pesopt.
+
+  character(mfile) :: plfnam=' '
+  character(mcnam) :: horname=' ',tabname=' ',sname(mxcurv)=' ',slabl(mxcurv)=' '
+  character(mxlabl) :: axlabel(4)=' '
+  character(mtitl) :: toptitle=' '
+
+  save itbv,nivvar,nelmach,numax,interf,noline,nqval,nvvar,nrrang,proc_flag,&
+       ipparm,naxref,ieltyp,qascl,qlscl,qsscl,qtscl,hrange,vrange,hmima,&
+       vmima,qhval,qvval,estart,eend,horname,tabname,toptitle,plfnam,axlabel,&
+       sname,slabl
+end module plotfi
+module plot_bfi
+  implicit none
+  public
+  !--- Definition of common / peotcl /
+  !--- fpmach set in routines pesopt and pefill, used in routine peplot
+  !--- ddp_flag set in routine pefill, used in routine peplot
+  !--- ptc_flag set in routines pesopt, used in routine pefill
+
+  logical :: fpmach=.false.,dpp_flag=.false.,ptc_flag=.false.
+  save fpmach,dpp_flag,ptc_flag
+end module plot_bfi
+module plot_cfi
+  implicit none
+  public
+  !--- Definition of common / e2save /
+  !--- e2s initialised in routine pefill, used in routine peelma
+
+  double precision :: e2s=0.d0
+end module plot_cfi
+module plot_mathfi
+  implicit none
+  public
+  !--- Definitions of mathematical constants
+
+  double precision pi, zero, eps, one, two, twopi, half
+  parameter         (pi = 3.1415926535898d0)
+  parameter         (zero = 0.d0, half = 0.5d0, eps = 1.d-5)
+  parameter         (one = 1.d0, two = 2.d0, twopi = two * pi)
+end module plot_mathfi
+module resindexfi
+  implicit none
+  public
+  integer mnres,mymorder
+  parameter (mnres=1000,mymorder=20)
+end module resindexfi
+module gxx11_common
+  implicit none
+  public
+  !
+  integer madim1,madim2,maxset,mconid,merrun,metaun,miunit,mmetat,&
+       normt,mounit,mpaxs,mpcurv,mtermt,mtick,mtmeta,mtterm,mxaxs,mxpix,&
+       mxsize,myaxs,mypix,mysize,mnormt,mx11pr,mx11tf,mxxpix,mxypix,&
+       mcolor,mpspro,meppro,mdict,mlpro,&
+       mpsep,mepep,mhead,mline,msfact,mlbb1,mlbb2,mubb1,mubb2,mtfont,&
+       mwid1,mwid2
+  real toleps,versio
+  parameter (mxaxs = 4, myaxs = 4, mpaxs = 23, mpcurv = 10,&
+       maxset = 20, mtterm = 1, mmetat = 4,&
+       mtermt = 101, mtmeta = 2, mconid = 7, mtick = 10, metaun = 11,&
+       mxpix = 1000, mypix = 1000, mxsize = 27, mysize = 19,&
+       madim1 = 500, toleps = 1.e-5,&
+       merrun = 10, miunit = 5, mounit = 6, versio = 1.50,&
+       mx11pr = 10, mx11tf = 10, mxxpix = 1200, mxypix = 1000,&
+       mcolor = 6, mpspro = 8, meppro = 8, mdict = 24, mlpro = 68,&
+       mpsep = 3, mepep = 2, mhead = 4, mline = 72, msfact = 4,&
+       mlbb1 = 17, mlbb2 = 30, mubb1 = 573, mubb2 = 790, mtfont = 12,&
+       mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2 )
+  parameter (mnormt = 2, madim2 = 100)
+  !
+  integer :: &
+       itermt=0, interm=0, inmeta=0, ierrun=0, imetun=0, inunit=0, iounit=0, ipage=0,&
+       isfflg=0, isqflg=0, iwtflg=0, iclflg=0, inormt=0, ipseps=0, iepsop=0, itseop=0,&
+       iepscf=0, imetps=0, ipctct=0, iczebr=0, idinit=0, ipstyp=0, iclear=0, istotx=0,&
+       lmpict=0, ltermt=0, lnterm=0, lnmeta=0, lerrun=0, lmetun=0, lnunit=0, lounit=0,&
+       lsfflg=0, lsqflg=0, lwtflg=0, lclflg=0, lnormt=0, lmetax=0, lmetay=0, lmetnm=0,&
+       lerrnm=0, ldefnl=0, lerrop=0, lmetop=0, ltotin=0, lacttm=0, lpseps=0, lundef=0,&
+       lttime=0, ldinit=0, ltseop=0,&
+       ixapar(mpaxs,mxaxs)=0, iyapar(mpaxs,myaxs)=0, icvpar(mpcurv ,maxset)=0
+  !
+  integer :: &
+       nxpix=0, nypix=0, lxpix=0, lypix=0, icucol=0, iorips=0,      &
+       iutlps=0, ibbox(4)=0, ix11pr(mx11pr)=0, ix11tf(mx11tf)=0, ix11op(mx11tf)=0  !
+  !
+  real :: &
+       fxpix=0., fypix=0., rx11pr(mx11pr)=0., rgbcol(3,mcolor)=0.
+  !
+  real :: &
+       xmetaf=0., ymetaf=0., xsterm=0., ysterm=0., wfact=0., wttime=0., wxfact=0., wyfact=0.,&
+       vpfacx=0., vpfacy=0.,&
+       vptdef(4)=0., vploc(4)=0., actwnd(4)=0., rangex(2,mxaxs)=0., rangey(2 ,myaxs)=0.,&
+       cvwnwd(4,maxset)=0., axwndx(2,maxset), axwndy(2,maxset)=0.
+  !
+  character :: &
+       smetnm*256=" ", serrnm*256=" ", sxtext(mxaxs)*300=" ", sytext(myaxs)*300=" ",&
+       sxform(mxaxs)*20=" ", syform(myaxs)*20=" ", splotc*(maxset)=" ", stortx * 20=" ",&
+       sdefnl*1=" ",spsnam * 256=" ", colour(mcolor) * 16=" ", pshead(mhead) * 60=" "
+  !
+  real :: xp(madim2+1)=0.,xvp(madim2+1)=0,yp(madim2+1)=0.,yvp(madim2+1)=0
+  !
+  real :: p(madim1,2)=0.,s(madim1)=0.,yy1d(madim1,2)=0.,yy2d(madim1,2)=0.
+end module gxx11_common
+module gxx11_aux
+  implicit none
+  public
+  !
+  character(100) strloc
+  integer, dimension(14) :: ivals=(/ 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 1, 0 /)
+  !   ivals(1)       marker type
+  !     (2)       fill area interior style
+  !     (3)       horizontal text alignment
+  !     (4)       vertical text alignment
+  !     (5)       text font
+  !     (6)       text precision
+  !     (7)       marker colour index
+  !     (8)       metafile status (0 closed, 1 open)
+  !     (9)       text colour index
+  !    (10)       free
+  !    (11)       polyline colour index
+  !    (12)       polyline style
+  !    (13)       current normalisation transformation number
+  !    (14)       last call type: 0 undef., 1 line, 2 text, 3 marker
+
+  real, dimension(14) :: rvals=(/ 0., 1., 0.01, 0., 1., 0., 1., 0., 1., 0., 1., 1., 1., 1. /)
+  !   rvals(1-2)  chup vector
+  !     3         character height
+  !     4-7       window
+  !     8-11      viewport
+  !     12        character expansion factor
+  !     13        line width scale factor
+  !     14        marker scale factor
+  save    ivals, rvals
+end module gxx11_aux
 subroutine fort_info(t1, t2)
   implicit none
 
 
-  character *(*) t1, t2
+  character(*) t1, t2
   integer get_option
   if (get_option('info ') .ne. 0 .and. get_option('warn ') .ne. 0)  &
-       &print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
+       print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
 end subroutine fort_info
 subroutine fort_warn(t1, t2)
   implicit none
 
 
 
-  character *(*) t1, t2
+  character(*) t1, t2
   integer get_option
   if (get_option('warn ') .ne. 0) then
      print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
@@ -32,9 +456,9 @@ subroutine getclor(orbit0, rt, tt, error)
   !   tt(6,6,6)   (real)  one-turn second-order map
   !   error       (int)   error flag (0: OK, else != 0)
   !----------------------------------------------------------------------*
+  use twiss0fi
   implicit none
 
-  include 'twiss0.fi'
   double precision orbit0(6), rt(6,6), tt(6,6,6)
   double precision opt(fundim)
   integer error
@@ -161,8 +585,7 @@ subroutine m66exp(source,target,eflag)
   !----------------------------------------------------------------------*
   logical eflag
   integer i,j
-  double precision b(6,6),c(6,6),source(6,6),target(6,6),one,two,   &
-       &twelve
+  double precision b(6,6),c(6,6),source(6,6),target(6,6),one,two,twelve
   parameter(one=1d0,two=2d0,twelve=12d0)
 
   call m66mpy(source,source,b)
@@ -655,7 +1078,7 @@ subroutine symeig(a,nd,n,eigen,nval,work)
   integer i,it,j,k,l,m,n,nd,nval,itmax
   parameter(itmax=15)
   double precision b,c,f,g,h,p,r,s,work(nd),a(nd,nd),eigen(nd),zero,&
-       &one,two,four,big,eps
+       one,two,four,big,eps
   parameter(zero=0d0,one=1d0,two=2d0,four=4d0,big=1d10,eps=1d-20)
 
   !---- Matrix is 1 * 1.
@@ -820,7 +1243,7 @@ subroutine aawarn(rout,text)
   !   ROUT      (char)    Calling routine name.                          *
   !   TEXT      (char)    Message.                                       *
   !----------------------------------------------------------------------*
-  character*(*) rout,text
+  character(*) rout,text
 
   print *,  '++++++ warning: ',rout,text
   call augmentfwarn()
@@ -835,7 +1258,7 @@ subroutine aafail(rout,text)
   !   ROUT      (char)    Calling routine name.                          *
   !   TEXT      (char)    Message.                                       *
   !----------------------------------------------------------------------*
-  character*(*) rout,text
+  character(*) rout,text
   print *,' '
   print *,  '+-+-+- fatal: ',rout,text
   print *,' '
@@ -858,7 +1281,7 @@ double precision function proxim(x,y)
   proxim = x+twopi*anint((y-x)/twopi)
 
 end function proxim
-character * 48 function charconv(tint)
+character(48) function charconv(tint)
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
   !   converts integer array to string (based on ascii)                  *
@@ -869,9 +1292,9 @@ character * 48 function charconv(tint)
   integer tint(*)
   integer i, j, m, n
   parameter (m = 128)
-  character *(m) letter
-  data letter /                                                     &
-       &'                                !"#$%&''()*+,-./0123456789:;<=>?@&
+  character(m) letter
+  data letter / &
+       '                                !"#$%&''()*+,-./0123456789:;<=>?@&
        &ABCDEFGHIJKLMNOPQRSTUVWXYZ[ ]^_`abcdefghijklmnopqrstuvwxyz{|}~'/
   charconv = ' '
   n = tint(1)
@@ -894,7 +1317,7 @@ subroutine laseig(fm,reeig,aieig,am)
   !----------------------------------------------------------------------*
   integer i,ihi,ilo,info,ipind,iqind,j,k,mdim,nn,kpnt(6)
   double precision fm(6,6),reeig(6),aieig(6),am(6,6),aival(6),big,c,&
-       &d(6),dx,dy,pb,reval(6),s,tm(6,6),zero,one
+       d(6),dx,dy,pb,reval(6),s,tm(6,6),zero,one
   parameter(zero=0d0,one=1d0,ilo=1,ihi=4,mdim=6,nn=4)
 
   !---- Compute eigenvalues and vectors.
@@ -905,8 +1328,7 @@ subroutine laseig(fm,reeig,aieig,am)
   call hqr2(mdim,nn,ilo,ihi,tm,reval,aival,am,info)
   if (info .ne. 0) then
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
-910  format('Unable to find eigenvalues for matrix:'/                &
-          &(6f12.6))
+910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
      call aafail('LASEIG',' Unable to find eigenvalues for matrix')
      go to 999
   endif
@@ -915,8 +1337,7 @@ subroutine laseig(fm,reeig,aieig,am)
      pb = zero
      do ipind = 2, 6, 2
         iqind = ipind - 1
-        pb = pb + am(iqind,k) * am(ipind,k+1)                         &
-             &- am(ipind,k) * am(iqind,k+1)
+        pb = pb + am(iqind,k) * am(ipind,k+1) - am(ipind,k) * am(iqind,k+1)
      enddo
      s = sqrt(abs(pb))
      if (pb .lt. zero) then
@@ -988,7 +1409,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   !----------------------------------------------------------------------*
   integer i,ihi,ilo,info,j,k,mdim,nn,kpnt(6)
   double precision fm(6,6),reeig(6),aieig(6),am(6,6),aival(6),big,c,&
-       &d(6),dt,dx,dy,pb,reval(6),s,tm(6,6),zero
+       d(6),dt,dx,dy,pb,reval(6),s,tm(6,6),zero
   parameter(zero=0d0,ilo=1,ihi=6,mdim=6,nn=6)
 
   !---- Compute eigenvalues and eigenvectors.
@@ -998,8 +1419,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   call hqr2(mdim,nn,ilo,ihi,tm,reval,aival,am,info)
   if (info .ne. 0) then
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
-910  format('Unable to find eigenvalues for matrix:'/                &
-          &(6f12.6))
+910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
      call aafail('LADEIG',' Unable to find eigenvalues for matrix')
      go to 9999
   endif
@@ -1007,8 +1427,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   do k = 1, 5, 2
      pb = zero
      do i = 1, 5, 2
-        pb = pb + am(i,k) * am(i+1,k+1)                               &
-             &- am(i+1,k) * am(i,k+1)
+        pb = pb + am(i,k) * am(i+1,k+1) - am(i+1,k) * am(i,k+1)
      enddo
      s = sqrt(abs(pb))
      if (pb .lt. zero) then
@@ -1227,10 +1646,9 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
   !----------------------------------------------------------------------*
   integer i,ien,ierr,ilow,its,iupp,j,k,l,m,n,na,ndim
   double precision den,h(ndim,n),hnorm,p,q,r,ra,s,sa,t,temp,tempi,  &
-       &tempr,vecs(ndim,n),vi,vr,w,wi(n),wr(n),x,y,z,epsmch,zero,one,two, &
-       &triqua,fac1
-  parameter(epsmch=1d-16,zero=0d0,one=1d0,two=2d0,triqua=.75d0,     &
-       &fac1=.4375d0)
+       tempr,vecs(ndim,n),vi,vr,w,wi(n),wr(n),x,y,z,epsmch,zero,one,two, &
+       triqua,fac1
+  parameter(epsmch=1d-16,zero=0d0,one=1d0,two=2d0,triqua=.75d0,fac1=.4375d0)
 
   !Initialize
   z=zero
@@ -1256,8 +1674,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
      !---- Next iteration; look for single small sub-diagonal element.
 70   continue
      do l = ien, ilow + 1, -1
-        if (abs(h(l,l-1)) .le.                                        &
-             &epsmch * (abs(h(l-1,l-1)) + abs(h(l,l)))) go to 100
+        if (abs(h(l,l-1)) .le. epsmch * (abs(h(l-1,l-1)) + abs(h(l,l)))) go to 100
      enddo
      l = ilow
 100  continue
@@ -1296,7 +1713,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
         r = r / s
         if (m .eq. l) go to 150
         if (abs(h(m,m-1)) * (abs(q) + abs(r)) .le. epsmch * abs(p)    &
-             &* (abs(h(m-1,m-1)) + abs(z) + abs(h(m+1,m+1)))) go to 150
+             * (abs(h(m-1,m-1)) + abs(z) + abs(h(m+1,m+1)))) go to 150
      enddo
 150  continue
      h(m+2,m) = zero
@@ -1505,7 +1922,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
                  vi = two * (wr(i) - p) * q
                  if (vr .eq. zero  .and.  vi .eq. zero) then
                     vr = epsmch * hnorm                                   &
-                         &* (abs(w) + abs(q) + abs(x) + abs(y) + abs(z))
+                         * (abs(w) + abs(q) + abs(x) + abs(y) + abs(z))
                  endif
                  tempr = x * r - z * ra + q * sa
                  tempi = x * s - z * sa - q * ra
@@ -1565,6 +1982,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
 
 subroutine suelem(el, ve, we,tilt)
 
+  use twtrrfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1584,11 +2002,10 @@ subroutine suelem(el, ve, we,tilt)
   ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
   !   Added LCAVITY element at ISP 27                                    *
   !----------------------------------------------------------------------*
-  include 'twtrr.fi'
   integer code,nn
   double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-       &ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
-       &,zero,one
+       ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
+       ,zero,one
   parameter(zero=0d0,one=1d0)
   !---- Branch on subprocess code.
   tilt = zero
@@ -1597,9 +2014,9 @@ subroutine suelem(el, ve, we,tilt)
   if(code.eq.39) code=15
   if(code.eq.38) code=24
   go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
-       &110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
-       &210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
-       &310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
+       110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
+       210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
+       310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
 
   !---- elements without tilt attribute
   !---- Drift space.
@@ -1725,9 +2142,9 @@ subroutine suelem(el, ve, we,tilt)
      dx = el * (cos(angle)-one)/angle
      ds = el * sin(angle)/angle
   endif
-  !      print *,"SUELEM dipole : tilt =",tilt," length= ",
-  !     &el," angv = ",angv," bv =",node_value('dipole_bv ')
-  !     &el," angv = ",angv," bv =",node_value('other_bv ')
+  !      print *,"SUELEM dipole : tilt =",tilt," length= ",&
+  !     el," angv = ",angv," bv =",node_value('dipole_bv ')
+  !     el," angv = ",angv," bv =",node_value('other_bv ')
   go to 490
 
   !---- Rotation around S-axis. SPECIAL CASE
@@ -1803,8 +2220,7 @@ subroutine sumtrx(the, phi, psi, w)
   ! Output:                                                              *
   !   W(3,3)    (real)    Rotation matrix.                               *
   !----------------------------------------------------------------------*
-  double precision cosphi,cospsi,costhe,phi,psi,sinphi,sinpsi,      &
-       &sinthe,the,w(3,3)
+  double precision cosphi,cospsi,costhe,phi,psi,sinphi,sinpsi,sinthe,the,w(3,3)
 
   costhe = cos(the)
   sinthe = sin(the)
@@ -1869,7 +2285,7 @@ integer function lastnb(t)
   !----------------------------------------------------------------------*
   implicit none
 
-  character *(*) t
+  character(*) t
   integer i
   do i = len(t), 1, -1
      if (t(i:i) .ne. ' ') goto 20
@@ -1892,9 +2308,9 @@ subroutine tmfoc(el,sk1,c,s,d,f)
   !   f         (double)  integral of dispersion function.  f(k,l)       *
   !----------------------------------------------------------------------*
   double precision c,d,el,f,qk,qkl,qkl2,s,sk1,zero,one,two,six,     &
-       &twelve,twty,thty,foty2
+       twelve,twty,thty,foty2
   parameter(zero=0d0,one=1d0,two=2d0,six=6d0,twelve=12d0,twty=20d0, &
-       &thty=30d0,foty2=42d0)
+       thty=30d0,foty2=42d0)
 
   !---- Initialize.
   qk = sqrt(abs(sk1))
@@ -1924,17 +2340,15 @@ subroutine f77flush(i,option)
   integer i,ios
   real a
   logical ostat, fexist,option
-  character*20 faccess,fform
-  character*255 fname
-  character*1 c
+  character(20) faccess,fform
+  character(255) fname
+  character(1) c
   inquire(err=5,iostat=ios,unit=i,opened=ostat,exist=fexist)
   if (.not.ostat.or..not.fexist) return
-  inquire(err=6,iostat=ios,unit=i,access=faccess,                   &
-       &form=fform,name=fname)
+  inquire(err=6,iostat=ios,unit=i,access=faccess,form=fform,name=fname)
   close (unit=i,err=7,iostat=ios)
   !     write (*,*) 'Re-opening ',i,' ',faccess,fform,fname
-  open(err=8,iostat=ios,unit=i,access=faccess,form=fform,           &
-       &file=fname,status='old')
+  open(err=8,iostat=ios,unit=i,access=faccess,form=fform,file=fname,status='old')
   if (option) then
      if (fform.eq.'FORMATTED') then
 3       read (i,100,err=9,iostat=ios,end=4) c
@@ -1948,24 +2362,17 @@ subroutine f77flush(i,option)
   endif
   return
 100 format (a1)
-5 write (*,*)                                                       &
-       &' F77FLUSH 1st INQUIRE FAILED with IOSTAT ',ios,' on UNIT ',i
+5 write (*,*) ' F77FLUSH 1st INQUIRE FAILED with IOSTAT ',ios,' on UNIT ',i
   stop
-6 write (*,*)                                                       &
-       &' F77FLUSH 2nd INQUIRE FAILED with IOSTAT ', ios,' on UNIT ',i
+6 write (*,*) ' F77FLUSH 2nd INQUIRE FAILED with IOSTAT ', ios,' on UNIT ',i
   stop
-7 write (*,*)                                                       &
-       &' F77FLUSH CLOSE FAILED with IOSTAT ',ios,' on UNIT ',i
+7 write (*,*) ' F77FLUSH CLOSE FAILED with IOSTAT ',ios,' on UNIT ',i
   stop
-8 write (*,*)                                                       &
-       &' F77FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
+8 write (*,*) ' F77FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
   stop
-9 write (*,*)                                                       &
-       &' F77FLUSH FORMATTED READ FAILED with IOSTAT ',ios,' on UNIT ',i
+9 write (*,*) ' F77FLUSH FORMATTED READ FAILED with IOSTAT ',ios,' on UNIT ',i
   stop
-10 write (*,*)                                                       &
-       &' F77FLUSH UNFORMATTED READ FAILED with IOSTAT ',ios,             &
-       &' on UNIT ',i
+10 write (*,*) ' F77FLUSH UNFORMATTED READ FAILED with IOSTAT ',ios,' on UNIT ',i
   stop
 end subroutine f77flush
 
@@ -1982,8 +2389,8 @@ subroutine seterrorflag(errorcode,from,descr)
   !----------------------------------------------------------------------*
   implicit none
   integer :: errorcode
-  character* (*) :: from
-  character* (*) :: descr
+  character(*) :: from
+  character(*) :: descr
   integer  n,m
 
   n = LEN(from)
