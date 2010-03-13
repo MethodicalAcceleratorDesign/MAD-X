@@ -293,8 +293,8 @@ contains
 
 
   subroutine putinstatustable (npart,turn,elno,elna,spos,stat,x,xini,e,mf)
+    use name_lenfi
     implicit none
-    include 'name_len.fi'
  !   integer  :: npart,turn,nobs,stat,mf,elno
     integer  :: npart,turn,stat,mf,elno
 !    real(kind(1d0)) :: tt

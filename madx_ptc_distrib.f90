@@ -64,13 +64,14 @@ contains
 
 
   subroutine addmoment(x,px,y,py,t,dp,tableIA, columnIA, parametric )
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer               :: x,px,y,py,dp,t
     integer               :: columnIA(*)
     integer               :: tableIA(*)
     integer               :: parametric
     integer, parameter    :: zeroasciicode = IACHAR ( '0' )
+    character(48) charconv
     ! name of the column corresponds to MADX nomenclature (5 col is dp/p)
     ! iarray corresponds to
 

@@ -9,10 +9,10 @@ module madx_ptc_knobs_module
   ! - setknobs sets the configured previously knobs on a layout
   use madx_keywords
   use madx_ptc_intstate_module, only : getdebug
+  use twiss0fi
   implicit none
 
   include "madx_ptc_knobs.inc"
-  include "twiss0.fi"
   save
   private
   !============================================================================================
@@ -419,8 +419,8 @@ contains
 
 
   subroutine addpush(table,column,element,monomial)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer   table(*)
     integer   column(*)
     integer   element
@@ -428,6 +428,7 @@ contains
     logical   addtable
     logical   parametric
     real(kind(1d0))            :: get_value
+    character(48) charconv
 
 
     parametric = get_value('ptc_select ','parametric ') .ne. 0
@@ -515,10 +516,11 @@ contains
 
   !____________________________________________________________________________________________
   subroutine addknobi(nameIA)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer     :: nameIA(*)
     character(48)              :: name
+    character(48) charconv
 
     if (nknobi >= maxnpolblocks) then
        call fort_warn("addknob","Can not add more knobs, array with initial knobs if full")
@@ -560,8 +562,8 @@ contains
   end subroutine addknobi
   !____________________________________________________________________________________________
   subroutine addknob(fibrenameIA)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer     :: fibrenameIA(*)
     character(48)              :: fibrename
     integer     :: nint, ndble, k, int_arr(nmax), char_l(nmax), i
@@ -570,6 +572,7 @@ contains
     type (pol_block), pointer  :: pb
     logical(lp) :: exactmatch
     real(kind(1d0))            :: get_value
+    character(48) charconv
 
 
     if (npolblocks >= maxnpolblocks) then
@@ -634,11 +637,12 @@ contains
   !____________________________________________________________________________________________
 
   subroutine setknobs(alayout)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     type(layout),target      :: alayout
     type (pol_block), pointer  :: pb
     integer     :: i,j,k
+    character(48) charconv
 
 !    if (.not. associated(alayout)) then
 !       call fort_warn("setknobs","Passed pointer to a layout is not associated")
@@ -1387,8 +1391,8 @@ contains
 
   !_________________________________________________________________________________
   subroutine writeparresults(filenameIA)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer   filenameIA(*)
     integer       :: mf !macro file descriptor
     character(48) :: filename
@@ -1399,6 +1403,7 @@ contains
     character(length)          :: name
     integer                    :: get_string
     integer                    :: restart_sequ,advance_node
+    character(48) charconv
 
     if (.not. ALLOCATED(results)) then
        call fort_warn("writeparresults","Array with parametric results is not present.")
@@ -1508,8 +1513,8 @@ contains
   !____________________________________________________________________________________________
 
   subroutine setknobvalue(fibrenameIA)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer                    :: fibrenameIA(*)
     character(48)              :: fibrename
     integer                    :: i
@@ -1517,6 +1522,7 @@ contains
     real                       :: v
     real(kind(1d0))            :: get_value
     logical(lp)                :: refreshtables
+    character(48) charconv
     par = -1
     fibrename = charconv(fibrenameIA)
 

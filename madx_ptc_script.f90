@@ -24,10 +24,11 @@ contains
   !____________________________________________________________________________________________
 
   subroutine execscript(scriptname)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer   scriptname(*)
     character(48) scriptfilename
+    character(48) charconv
 
     scriptfilename = charconv(scriptname)
     print*, "I am in execsript: Script name is ", scriptfilename
@@ -37,9 +38,10 @@ contains
   end subroutine execscript
 
   subroutine execginoscript(scriptname)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer   scriptname(*)
+    character(48) charconv
     character(48) scriptfilename
 
     scriptfilename = charconv(scriptname)

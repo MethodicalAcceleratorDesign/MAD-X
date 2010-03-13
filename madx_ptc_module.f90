@@ -136,10 +136,10 @@ CONTAINS
   !_________________________________________________________________
 
   subroutine ptc_input()
+    use twtrrfi
+    use twiss0fi
+    use name_lenfi
     implicit none
-    include 'twtrr.fi'
-    include 'name_len.fi'
-    include 'twiss0.fi'
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
     !    integer get_option
@@ -1051,10 +1051,10 @@ CONTAINS
   !_________________________________________________________________
 
   SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123, skew_0123,ord_max)
+    use twtrrfi ! integer, maxmul,maxferr,maxnaper
     implicit none
     ! 1) read multipole coeff. and errors for a current thick element
     ! 2) fill the error and multiploes arrays of data-bases
-    include 'twtrr.fi' ! integer, maxmul,maxferr,maxnaper
     REAL(dp), INTENT(IN) :: l
     type(keywords), INTENT(INOUT) ::  key
     REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;
@@ -1287,8 +1287,8 @@ CONTAINS
   !----------------------------------------------------------------
 
   subroutine ptc_align()
+    use twiss0fi
     implicit none
-    include 'twiss0.fi'
     integer j,n_align,node_al_errors
     integer restart_sequ,advance_node
     real(dp) al_errors(align_max)
@@ -2123,9 +2123,9 @@ CONTAINS
 
 
   SUBROUTINE ptc_read_errors()
+    use twtrrfi
+    use name_lenfi
     implicit none
-    include 'twtrr.fi'
-    include 'name_len.fi'
     integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
     real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab
     character(name_len) name,name2

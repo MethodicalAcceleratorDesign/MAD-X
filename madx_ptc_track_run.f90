@@ -157,12 +157,12 @@ MODULE madx_ptc_track_run_module
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
+  use name_lenfi
   implicit none
   SAVE
   PRIVATE
 
   PUBLIC :: ptc_track_run ! Subroutine inside the module
-  include 'name_len.fi'
 
   !------------------------------------------------------------------!
   !  Variables from input files and probably corrected by this code: !
@@ -273,20 +273,19 @@ CONTAINS
 
     USE Inf_NaN_Detection !VK20070328 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
+    use bbfi                ! integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max;
+    !                       !uses bbd_pos                parameter(bbd_max=200)
+    !                       !real(dp) bb_kick
+    !                       ! common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos
+    !                       !common/bbr/bb_kick(2,bbd_max)
+    use name_lenfi   ! integer name_len;  parameter(name_len=24)
+
     IMPLICIT NONE
 
     integer, intent (IN) :: max_obs ! the maximum number of observation points >=1
     !                               ! one point at the end (beginning)+
     !                               ! points given in input file by the command
     !                               ! "ptc_observe,place=mark";
-
-    include 'name_len.fi'   ! integer name_len;  parameter(name_len=24)
-
-    include 'bb.fi'         ! integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max;
-    !                       !uses bbd_pos                parameter(bbd_max=200)
-    !                       !real(dp) bb_kick
-    !                       ! common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos
-    !                       !common/bbr/bb_kick(2,bbd_max)
 
 
     integer ::flag_index_ptc_aperture, why_ptc_aperture(9)
@@ -2761,7 +2760,7 @@ CONTAINS
       !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
       !----------------------------------------------------------------------*
 
-      !k      include 'bb.fi': --------------------------------------!
+      !k      use bbfi: ---------------------------------------------!
       !k      integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max       !
       !k      parameter(bbd_max=200)                                 !
       !k      real(dp) bb_kick                                       !

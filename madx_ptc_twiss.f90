@@ -305,8 +305,8 @@ contains
   !_________________________________________________________________
 
   subroutine ptc_twiss(tab_name,summary_tab_name)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     logical(lp)             :: closed_orbit,beta_flg
     integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
@@ -329,6 +329,7 @@ contains
     real(dp)                :: emi(3)
     logical(lp)             :: skipnormalform, tracktm
     character*48            :: summary_table_name
+    character(48) charconv
 
     call resetBetaExtremas()
     

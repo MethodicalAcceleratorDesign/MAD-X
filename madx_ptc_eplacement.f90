@@ -223,8 +223,8 @@ contains
   !____________________________________________________________________________________________
 
   subroutine printlayout_rootm(filenameIA)
+    use twissafi
     implicit none
-    include 'twissa.fi'
     integer   filenameIA(*)
     integer       :: i  !iterator + tmp
     integer       :: mf !macro file descriptor
@@ -235,6 +235,7 @@ contains
     type(fibre), pointer :: p
     real(dp)     :: a(3)
     integer      :: nmul
+    character(48) charconv
 
     r=>my_ring
 
