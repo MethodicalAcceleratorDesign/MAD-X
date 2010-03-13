@@ -121,37 +121,6 @@
 /sodd.f90 -text
 /survey.f90 -text
 /sxf.c -text
-testing/MadBuild.pl -text
-testing/MadBuild.py -text
-testing/MadBuildAndTest.pl -text
-testing/MadBuildAndTest.py -text
-testing/MadBuildPy.pl -text
-testing/MadDiff.pl -text
-testing/MadRelease.py -text
-testing/MadTest.pl -text
-testing/MadTest.py -text
-testing/MadTestExceptions.py -text
-testing/MadTestOverwrite.pl -text
-testing/MadTestPy.pl -text
-testing/MadTestWebStyle.css -text
-testing/MadTrigRelease.pl -text
-testing/MadTrigTest.pl -text
-testing/MadTrigTest.py -text
-testing/MadTrigWindowsCompilation.pl -text
-testing/MadWindowsCompileClient.pl -text
-testing/MadWindowsCompileClient.py -text
-testing/MadWindowsCompileServer.pl -text
-testing/MadWindowsCompileServer.py -text
-testing/MadWorkBetweenReleases.pl -text
-testing/MadWorkReport.pl -text
-testing/Makefile -text
-testing/Notify.py -text
-testing/ProcessScenario.xsl -text
-testing/TestScenario.xml -text
-testing/index.htm -text
-testing/mad_install -text
-testing/repository.gif -text svneol=unset#unset
-testing/underConstruction.gif -text svneol=unset#unset
 /timel.c -text
 /timest.f90 -text
 /timex.f90 -text
