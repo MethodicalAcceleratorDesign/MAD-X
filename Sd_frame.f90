@@ -772,7 +772,13 @@ CONTAINS
     CALL COMPUTE_SCALAR(T1,2,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
 
-    A(1)=ATAN2(-S_IJ,S_JJ)
+    if(S_IJ==zero.and.S_JJ==zero) then
+       A(1)=zero
+    else
+       A(1)=ATAN2(-S_IJ,S_JJ)
+    endif
+
+    !   A(1)=ATAN2(-S_IJ,S_JJ)
     AT=ZERO;AT(1)=A(1);
 
     CALL GEO_ROT(T1,T1,AT,T2)
@@ -781,7 +787,13 @@ CONTAINS
     CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
 
-    A(2)=ATAN2(-S_IJ,S_JJ)
+    if(S_IJ==zero.and.S_JJ==zero) then
+       A(2)=zero
+    else
+       A(2)=ATAN2(-S_IJ,S_JJ)
+    endif
+
+    !    A(2)=ATAN2(-S_IJ,S_JJ)
     AT=ZERO;AT(2)=A(2);
 
     CALL GEO_ROT(T1,T1,AT,T2)
@@ -790,7 +802,12 @@ CONTAINS
     CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
     CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
 
-    A(3)=ATAN2(S_IJ,S_JJ)
+    if(S_IJ==zero.and.S_JJ==zero) then
+       A(3)=zero
+    else
+       A(3)=ATAN2(S_IJ,S_JJ)
+    endif
+    !    A(3)=ATAN2(S_IJ,S_JJ)
     AT=ZERO;AT(3)=A(3);
 
     CALL GEO_ROT(T1,T1,AT,T2)
@@ -825,6 +842,7 @@ CONTAINS
     REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)
 
     CALL COMPUTE_ENTRANCE_ANGLE(ENT,EXI,ANG)
+
 
     D=B-A;   CALL CHANGE_BASIS(D,GLOBAL_FRAME,D,EXI);
 

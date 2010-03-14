@@ -846,6 +846,11 @@ contains
                 write(6,*)" PRINTED "
              enddo
           enddo
+       case('FITSEX')
+          read(mf,*) epsf
+          read(mf,*) targ_chrom
+          read(mf,*)i1
+          call lattice_fit_CHROM_gmap1(my_ering,my_estate,EPSF,pol_,NPOL,targ_chrom,NP,i1,mf)
        case('FITCHROMATICITY')
           read(mf,*) epsf
           read(mf,*) targ_chrom

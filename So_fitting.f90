@@ -750,6 +750,172 @@ contains
 
   end subroutine lattice_fit_CHROM_gmap
 
+  subroutine lattice_fit_CHROM_gmap1(R,my_state,EPSF,POLY,NPOLY,TARG,NP,n_extra,mf)
+    IMPLICIT NONE
+    integer ipause, mypause
+    TYPE(layout),target, intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,NP
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq=2, no=3,nt,j,it,n_extra,mf
+    type(damap) id
+    type(vecresonance) vr
+    type(pbresonance) fr
+    type(gmap) g
+    TYPE(TAYLOR)t
+    real(dp) epsf,epsr,epsnow,CHROM(2)
+    integer, allocatable:: res(:,:),jt(:)
+
+
+    allocate(res(n_extra,4))
+    allocate(jt(5))
+    res=0
+    do i=1,n_extra
+       read(mf,*) res(i,:)
+    enddo
+    !    EPSF=.0001
+    epsr=abs(epsf)
+    neq=neq+2*n_extra
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP,BERZ)
+
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    CLOSED(:)=zero
+    it=0
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit ", CHECK_STABLE
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP,BERZ)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id)
+    call alloc(vr)
+    call alloc(fr)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+    NORM=Y
+    vr=norm%a%nonlinear
+    fr=norm%a%pb
+    !    call print(vr%cos%v(2),6)
+    !    call print(vr%sin%v(2),6)
+    !    pause 1
+    call print(fr%cos,6)
+    call print(fr%sin,6)
+    ipause=mypause(2)
+
+
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2), CHECK_STABLE
+    CHROM(1)=(NORM%dhdj%v(1)).SUB.'00001'
+    CHROM(2)=(NORM%dhdj%v(2)).SUB.'00001'
+    write(6,*) " CHROM ",CHROM
+
+    eq(1)=       ((NORM%dhdj%v(1)).par.'00001')-targ(1)
+    eq(2)=       ((NORM%dhdj%v(2)).par.'00001')-targ(2)
+    do i=1,n_extra
+       jt=0
+       jt(1:4)=res(i,:)
+       jt(1)=jt(1)-1
+       eq(2+2*i-1)=       ((vr%cos%v(2)).par.jt)
+       eq(2+2*i)=       ((vr%sin%v(2)).par.jt)
+    enddo
+
+    epsnow=zero
+    do i=1,neq
+       epsnow=abs(eq(i))+epsnow
+    enddo
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(id)
+    CALL KILL(vr)
+    CALL KILL(fr)
+    CALL KILL(EQ)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+    deallocate(res)
+    deallocate(jt)
+
+  end subroutine lattice_fit_CHROM_gmap1
+
   subroutine lattice_fit_tune_CHROM_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
     IMPLICIT NONE
     TYPE(layout),target, intent(inout):: R
