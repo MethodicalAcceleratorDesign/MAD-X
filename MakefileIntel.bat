@@ -7,6 +7,9 @@ SET PTC=.
 REM MAD-X proper code
 SET MADX=.
 
+set INCLUDE="."
+REM specifies the directory path for the include files and module files referenced by a USE Fortran statement
+
 REM for some reasons, add to insert the following after some linkage problems occurred for unknown reason with ImageHlp.lib
 set lib=%LIB%;"C:\Program Files\Microsoft SDKs\Windows\v6.0A\Lib"
 
