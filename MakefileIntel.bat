@@ -21,6 +21,7 @@ REM Visual C++ set up
 if exist "C:\Program Files\Microsoft Visual Studio 9.0\VC\bin" set VCROOT="C:\Program Files\Microsoft Visual Studio 9.0\VC\bin"
 if exist "C:\Program Files\Microsoft Visual Studio 9.0\VC\lib" set VCLIB="C:\Program Files\Microsoft Visual Studio 9.0\VC\lib"
 
+REM --- FOLLOWING FOR 32 BITS
 if not exist %VCROOT%\vcvars32.bat (
 echo %VCROOT%\vcvars32.bat not found. 
 echo exit
@@ -29,8 +30,21 @@ exit
 ) else (
 echo Using Visual C++ in %VCROOT%\vcvars32.bat
 )
-
 call %VCROOT%\vcvars32.bat
+REM --- ABOVE FOR 32 BITS
+
+REM --- FOLLOWING FOR 64 BITS
+REM if not exist %VCROOT%vcvarsall.bat (
+REM echo %VCROOT%\vcvarsall.bat not found.
+REM echo exit
+REM goto :end
+REM exit
+REM ) else (
+REM echo using Visual C++ in %VCROOT%\vcvarsall.bat 
+REM )
+REM call %VCROOT%vcvarsall.bat "itanium"
+REM --- or "amd64" for x64
+REM --- ABOVE FOR 64 BITS
 
 REM goto :link
 REM pause
