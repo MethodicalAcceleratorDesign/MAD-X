@@ -18,7 +18,14 @@ REM My Computer's Properties.
 REM set INCLUDE="C:\Program Files\Microsoft Visual Studio\VC98\include";%INCLUDE%
 
 REM Visual C++ set up
-if exist "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC" set VCROOT="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC"
+REM Microsoft Visual Studio 8 (2005) 32bit PC
+if exist "C:\Program Files\Microsoft Visual Studio 8.0\VC"    set VCROOT="C:\Program Files\Microsoft Visual Studio 8.0\VC"
+if exist "C:\Program Files\Microsoft Visual Studio 8.0\VC\lib" set VCLIB="C:\Program Files\Microsoft Visual Studio 8.0\VC\lib"
+REM Microsoft Visual Studio 9 (2008) 32bit PC
+if exist "C:\Program Files\Microsoft Visual Studio 9.0\VC"    set VCROOT="C:\Program Files\Microsoft Visual Studio 9.0\VC"
+if exist "C:\Program Files\Microsoft Visual Studio 9.0\VC\lib" set VCLIB="C:\Program Files\Microsoft Visual Studio 9.0\VC\lib"
+REM Microsoft Visual Studio 10 (2010) 64bit PC
+if exist "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC"    set VCROOT="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC"
 if exist "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib" set VCLIB="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib"
 
 REM goto :64bit
