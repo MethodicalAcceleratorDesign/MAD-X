@@ -142,8 +142,8 @@ ifeq ($(DEBUG),YES)
   ifeq ($(f95),lf95)
     # Replace Makefile_develop
     # lff95 compiler options with severe lf95/Fujitsu flags
-#    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap
-    f95_FLAGS+= --chk a,e,f,o,s,x -g --trace --info -pca --ap --chkglobal -f95 --lst --sav --wo --xref -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -Hesu -a -e0 -E iu -Am --pca --private --trap
+    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap 
+#    f95_FLAGS+= --chk a,e,f,o,s,x -g --trace --info -pca --ap --chkglobal -f95 --lst --sav --wo --xref -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -Hesu -a -e0 -E iu -Am --pca --private --trap
 
     GCCP_FLAGS+= -Wall -pedantic
   endif
@@ -231,7 +231,7 @@ ifeq ($(FC12),YES)
   ifeq ($(ARCH),64)
     LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -lstdc++
   else
-    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.2/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.2/32/ -lgcc_eh
+    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.3/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32/ -lgcc_eh
   endif
 endif
 
