@@ -12,8 +12,8 @@ ONLINE=YES
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=YES
-SLC5=NO
+SLC4=NO
+SLC5=YES
 FC12=NO
 NTPSA=YES
 
@@ -215,14 +215,14 @@ endif
 
 ifeq ($(SLC5),YES)
   ifeq ($(ARCH),32)
-    LIBX= libX11.a  -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.6 -lstdc++
+    LIBX= -L/usr/lib -lX11 -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux6E/4.4.0 -lstdc++
     ifneq ($(f95),ifort)
-      LIBX+= /usr/lib/gcc/x86_64-redhat-linux6E/4.3.2/32/libgcc_eh.a
+      LIBX+= -L/usr/lib/gcc/i386-redhat-linux6E/4.4.0 -lgcc_eh
     endif
   else
-    LIBX= libX11_64.a -lstdc++
+    LIBX= -L/usr/lib64 -lX11 -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
     ifneq ($(f95),ifort)
-      LIBX+= /usr/lib/gcc/x86_64-redhat-linux6E/4.3.2/libgcc_eh.a
+      LIBX+= -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lgcc_eh
     endif
   endif
 endif
