@@ -215,14 +215,14 @@ endif
 
 ifeq ($(SLC5),YES)
   ifeq ($(ARCH),32)
-    LIBX= -L/usr/lib -lX11 -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i386-redhat-linux6E/4.4.0 -lstdc++
+    LIBX= -L/usr/lib -lX11 -lXau -lXdmcp -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0/32 -lstdc++
     ifneq ($(f95),ifort)
-      LIBX+= -L/usr/lib/gcc/i386-redhat-linux6E/4.4.0 -lgcc_eh
+      LIBX+= -lc -lgcc_eh
     endif
   else
-    LIBX= -L/usr/lib64 -lX11 -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
+    LIBX= -L/usr/lib64 -lX11 -lXau -lXdmcp -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
     ifneq ($(f95),ifort)
-      LIBX+= -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lgcc_eh
+      LIBX+= -lc -lgcc_eh
     endif
   endif
 endif
@@ -231,7 +231,7 @@ ifeq ($(FC12),YES)
   ifeq ($(ARCH),64)
     LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -lstdc++
   else
-    LIBX= -L/usr/lib/ -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.3/ -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32/ -lgcc_eh
+    LIBX= -L/usr/lib -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.3 -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32 -lgcc_eh
   endif
 endif
 
