@@ -2009,7 +2009,7 @@ void fill_twiss_header(struct table* t)
 void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39+3+1+1; /* change when adding header lines ! */
+  int i, h_length = 39+3+1+1+6; /* change when adding header lines ! - last 6 for the closed orbit */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];
@@ -2158,6 +2158,30 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
+    /* now for the 6 closed orbits */
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_x", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_X          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_px", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PX         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_y", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_Y          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_py", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PY         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_pt", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PT         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_-cT", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
   }
 }
