@@ -2009,7 +2009,7 @@ void fill_twiss_header(struct table* t)
 void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39+3+1; /* change when adding header lines ! */
+  int i, h_length = 39+3+1+1; /* change when adding header lines ! */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];
@@ -2076,6 +2076,13 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     /* now retreive all pieces of information from the ptc_twiss*/
 
     row = 1; /* this particular table has only one row filled-in */
+
+    /* length of the machine */
+    returnStatus = double_from_table("ptc_twiss_summary","length",&row,&dtmp);
+    /* returnStatus should always be equal to zero */
+    sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
 
     /* momentum compaction factor, phase-slip factor and energy transition */
     returnStatus = double_from_table("ptc_twiss_summary","alpha_c", &row, &dtmp);
