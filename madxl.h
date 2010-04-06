@@ -431,7 +431,9 @@ int ptc_twiss_summary_table_types[] =
     2, 2, 2, 2,
     2,
     2,2,2,
-    2,2,2
+    2,2,2,
+    2,2,2,2,
+    2,2,2,2
   };
 char* ptc_twiss_summary_table_cols[] = {
   "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", 
@@ -440,6 +442,8 @@ char* ptc_twiss_summary_table_cols[] = {
   "deltap",
   "orbit_x","orbit_px","orbit_y",
   "orbit_py","orbit_pt","orbit_-cT",
+  "xcorms","ycorms","pxcorms","pycorms",
+  "xcomax","ycomax","pxcomax","pycomax",
   " " /* blank terminates */
 };
 

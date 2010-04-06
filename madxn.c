@@ -2009,7 +2009,7 @@ void fill_twiss_header(struct table* t)
 void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 39+3+1+1+6; /* change when adding header lines ! - last 6 for the closed orbit */
+  int i, h_length = 39+3+1+1+6+4; /* change when adding header lines ! - last 6 for the closed orbit */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];
@@ -2181,6 +2181,40 @@ void fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 
     returnStatus = double_from_table("ptc_twiss_summary","orbit_-cT", &row, &dtmp);
     sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+/* orbits RMS */
+    returnStatus = double_from_table("ptc_twiss_summary","xcorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pxcorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PXCORMS          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","ycorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pycorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PYCORMS          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+/* orbits MAX */
+    returnStatus = double_from_table("ptc_twiss_summary","xcomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pxcomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PXCOMAX          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","ycomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pycomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PYCOMAX          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
   }

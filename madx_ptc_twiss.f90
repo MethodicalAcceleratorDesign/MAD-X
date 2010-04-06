@@ -637,6 +637,7 @@ contains
        write(0,*) "should never reach this point"
     endif
 
+    call orbitRms(summary_table_name) ! this function fills the summary table and header with the closed orbits RMS and extrema
 
     ! relocated the following here to avoid side-effect
     print77=.false.
@@ -919,6 +920,7 @@ contains
          write(mf1,*) ""
          call print(y,mf1)
       endif
+
 
       deltae = getdeltae()
 
@@ -2395,6 +2397,80 @@ contains
     endif
   end subroutine trackBetaExtrema
   ! --- end of set of routines
+
+
+subroutine orbitRms(summary_table_name)
+	implicit none
+	character*48	:: summary_table_name
+
+	real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
+	real(dp)	:: x(6) ! the 6 dimensional state space
+	real(dp)	:: xrms(6)
+	real(dp)	:: xcomax, pxcomax, ycomax, pycomax
+	integer		:: i, j
+
+	real(kind(1d0))         :: get_value
+
+	if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
+		! for a line or if we don't mention the closed_orbit, xcorms makes no sense
+		call double_to_table(summary_table_name,'xcorms ',0.0)
+		call double_to_table(summary_table_name,'pxcorms ',0.0)
+		call double_to_table(summary_table_name,'ycorms ',0.0)
+		call double_to_table(summary_table_name,'pycorms ',0.0)	
+		call double_to_table(summary_table_name,'xcomax ',0.0)
+		call double_to_table(summary_table_name,'pxcomax ',0.0)
+		call double_to_table(summary_table_name,'ycomax ',0.0)
+		call double_to_table(summary_table_name,'pycomax ',0.0)		
+	else
+
+
+		call make_node_layout(my_ring) ! essential: the way to look inside the magnets
+		state = 0.d0
+		call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
+
+		xcomax = state(1)
+		pxcomax = state(2)
+		ycomax = state(3)
+		pycomax = state(4)
+
+		x=state
+		xrms = 0
+		do i=1,my_ring%n
+			!call find_orbit(my_ring,state,i,default,1.d-5) ! i for the ith element?
+			call track(my_ring,x,i,i+1,default) ! track x directly!
+			! write(0,*) "xco(find_orbit)=",state(1),"xco(tracked)=",x(1)
+			do j=1,6
+				xrms(j) = xrms(j) + x(j)*x(j)
+			enddo
+			if (x(1)>xcomax) then
+				xcomax = x(1)
+			endif
+			if (x(2)>pxcomax) then
+				pxcomax = x(2)
+			endif
+			if (x(3)>ycomax) then
+				ycomax = x(3)
+			endif
+			if (x(4)>pycomax) then
+				pycomax = x(4)
+			endif
+		enddo		
+
+		xrms = sqrt(xrms / my_ring%n)
+
+		call double_to_table(summary_table_name,'xcorms ',xrms(1))
+		call double_to_table(summary_table_name,'pxcorms ',xrms(2))
+		call double_to_table(summary_table_name,'ycorms ',xrms(3))
+		call double_to_table(summary_table_name,'pycorms ',xrms(4))
+		call double_to_table(summary_table_name,'xcomax ',xcomax)
+		call double_to_table(summary_table_name,'pxcomax ',pxcomax)
+		call double_to_table(summary_table_name,'ycomax ',ycomax)
+		call double_to_table(summary_table_name,'pycomax ',pycomax)
+
+
+	endif
+
+end subroutine orbitRms
 
 
 end module madx_ptc_twiss_module
