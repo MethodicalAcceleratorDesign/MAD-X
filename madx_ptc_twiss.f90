@@ -1943,7 +1943,8 @@ contains
       ! 26 november 2009
       if (icase.eq.6) then
           fractionalTunes(3) = - theNormalForm%DHDJ%v(3).sub.'0000' ! always yields 0 => does not work as I would have expected
-          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)' computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
+          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)' 
+          ! computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
       else
          fractionalTunes(3) = 0.0
       endif
@@ -2405,27 +2406,27 @@ subroutine orbitRms(summary_table_name)
 
 	real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
 	real(dp)	:: x(6) ! the 6 dimensional state space
-	real(dp)	:: xrms(6)
-	real(dp)	:: xcomax, pxcomax, ycomax, pycomax
+	real(kind(1d0)) :: xrms(6)
+	real(kind(1d0)) :: xcomax, pxcomax, ycomax, pycomax
 	integer		:: i, j
 
 	real(kind(1d0))         :: get_value
 
 	if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
 		! for a line or if we don't mention the closed_orbit, xcorms makes no sense
-		call double_to_table(summary_table_name,'xcorms ',0.0)
-		call double_to_table(summary_table_name,'pxcorms ',0.0)
-		call double_to_table(summary_table_name,'ycorms ',0.0)
-		call double_to_table(summary_table_name,'pycorms ',0.0)	
-		call double_to_table(summary_table_name,'xcomax ',0.0)
-		call double_to_table(summary_table_name,'pxcomax ',0.0)
-		call double_to_table(summary_table_name,'ycomax ',0.0)
-		call double_to_table(summary_table_name,'pycomax ',0.0)		
+		call double_to_table(summary_table_name,'xcorms ',0d0)
+		call double_to_table(summary_table_name,'pxcorms ',0d0)
+		call double_to_table(summary_table_name,'ycorms ',0d0)
+		call double_to_table(summary_table_name,'pycorms ',0d0)	
+		call double_to_table(summary_table_name,'xcomax ',0d0)
+		call double_to_table(summary_table_name,'pxcomax ',0d0)
+		call double_to_table(summary_table_name,'ycomax ',0d0)
+		call double_to_table(summary_table_name,'pycomax ',0d0)		
 	else
 
 
 		call make_node_layout(my_ring) ! essential: the way to look inside the magnets
-		state = 0.d0
+		state = zero
 		call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
 
 		xcomax = state(1)
@@ -2434,7 +2435,7 @@ subroutine orbitRms(summary_table_name)
 		pycomax = state(4)
 
 		x=state
-		xrms = 0
+		xrms = zero
 		do i=1,my_ring%n
 			!call find_orbit(my_ring,state,i,default,1.d-5) ! i for the ith element?
 			call track(my_ring,x,i,i+1,default) ! track x directly!
