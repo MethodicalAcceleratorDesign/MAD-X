@@ -113,8 +113,8 @@ endif
 
 ifeq ($(f95),f95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= -gline -c -Wc,-m32 -Wl,-m32 -maxcontin=100 -ieee=full -D_NAG
-    LDOPT= -Bstatic -Wl,-m32
+    f95_FLAGS= -gline -c -Wc,-m32 -Wl,-m32 -abi=32 -maxcontin=100 -ieee=full -D_NAG
+    LDOPT= -Bstatic -Wl,-m32 -abi=32
   else
     f95_FLAGS= -gline -c -maxcontin=100 -ieee=full -D_NAG
     LDOPT= -Bstatic
