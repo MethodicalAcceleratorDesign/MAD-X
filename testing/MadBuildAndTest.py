@@ -278,7 +278,7 @@ try:
         # WARNING: MadTestPy.pl should replace MadTest.pl to avoid sending
         # e-mail - instead, notification should take place within Python.
         if options.debug: # or global debugMode
-            notify('jean-luc','Start test','invoke ./MadTest.py')
+            notify('jean-luc','Start test','invoke ./MadTest.py '+additionalCompilers)
         # os.system("./MadTestPy.pl ./MadCvsExtract/madX debug=c6t")
         if options.silent:
             # December 2nd, 2009: invoke the latest MadTest.py
