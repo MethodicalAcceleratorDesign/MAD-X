@@ -25,7 +25,9 @@ class Logger: # in more recent versions, Python features a logger
 
 website =   "/afs/cern.ch/user/n/nougaret/www/mad"
 reportDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation"
-currentDir = os.getcwd()
+# 12 april 2009 fix the directory in which to extract MAD-X
+#currentDir = os.getcwd()
+currentDir = reportDir
 extractDir = currentDir+'/MadCvsExtract'
 
 notify('jean-luc','MadCvsExtract','MadCvsExtract will be created as ' + extractDir)
