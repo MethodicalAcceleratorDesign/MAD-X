@@ -21,7 +21,7 @@ def checkname(name):
 class State: # the state of a test
     pass
 
-extacting = State()
+extracting = State()
 init = State()
 incomplete = State() # missing resources
 ready = State() # all resources present
@@ -741,8 +741,8 @@ if __name__ == "__main__":
     usage = "%prog [options]"
     parser = optparse.OptionParser(usage)
     parser.add_option("--verbose","-v",help="display messages useful for debug", action="store_true")
-    parser.add_option("--target","-t",help="select a specific target to run the test",dest="singleTarget")
-    parser.add_option("--case","-c",help="select a specific test-case to run the test, in combination with --target",\
+    parser.add_option("--target","-t",help="select a specific target to run the test (e.g.ptc_twiss)",dest="singleTarget")
+    parser.add_option("--case","-c",help="select a specific test-case to run the test, in combination with --target (e.g. example1.madx)",\
                       dest="singleCase")
     parser.add_option("--keep_data","-k",help="keep old data without extracting repository",action="store_true")
     parser.add_option("--quiet","-q",help="does not produce a web page",action="store_true")
