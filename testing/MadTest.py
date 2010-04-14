@@ -313,8 +313,8 @@ class Test: # a test case
                     shutil.copymode(r.source,d) # will fail for yet unidentified reasons
                 except:
                     # 14 april 2010
-                    if r.source[:rsource.rfind('/')]==destinationDir:
-                        print 'WARNING do not copy '+r.source+' to '+destinationDir
+                    if r.source[:r.source.rfind('/')]==destinationDir:
+                        print 'WARNING do not copy '+r.source+' to its own directory '+destinationDir
                     else:
                         shutil.copyfile(r.source,d)
                         # only copy the file - forget about permissions
