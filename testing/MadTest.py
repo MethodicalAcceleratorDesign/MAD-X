@@ -301,6 +301,7 @@ class Test: # a test case
                 print("now to copy '"+r.source+"'"),
             for d in r.destinations: # a single resource has several destinations, i.e. one per Makefile
                 destinationDir = d[:d.rfind('/')]
+                
                 if options.verbose:
                     print("to: '"+destinationDir+"'")
                 if not os.path.exists(destinationDir): # output directory does not exist => create it before copying file
@@ -311,8 +312,12 @@ class Test: # a test case
                     shutil.copyfile(r.source,d)
                     shutil.copymode(r.source,d) # will fail for yet unidentified reasons
                 except:
-                    shutil.copyfile(r.source,d)
-                    # only copy the file - forget about permissions
+                    # 14 april 2010
+                    if r.source[:rsource.rfind('/')]==destinationDir:
+                        print 'WARNING do not copy '+r.source+' to '+destinationDir
+                    else:
+                        shutil.copyfile(r.source,d)
+                        # only copy the file - forget about permissions
 
 
     def run(self):
