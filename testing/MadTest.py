@@ -302,7 +302,7 @@ class Test: # a test case
             for d in r.destinations: # a single resource has several destinations, i.e. one per Makefile
                 destinationDir = d[:d.rfind('/')]
                 if options.verbose:
-                    print("to: '"+r.source+"'")
+                    print("to: '"+destinationDir+"'")
                 if not os.path.exists(destinationDir): # output directory does not exist => create it before copying file
                     os.makedirs(destinationDir) # also create all intermediate-level directories to contain the leaf directory
 
