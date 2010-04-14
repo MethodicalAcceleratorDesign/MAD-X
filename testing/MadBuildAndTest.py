@@ -61,7 +61,7 @@ class updateTokensThread(threading.Thread):
                 os.system('rm '+outfile)
 
                 # must provide path to cope with reduced acron environment
-                os.system('/usr/sue/bin/klist > ' + outfile)             
+                os.system('/usr/kerberos/bin/klist > ' + outfile)             
                 f = open(outfile,'r')             
                 lines = f.readlines()               
                 msg2 = ''
