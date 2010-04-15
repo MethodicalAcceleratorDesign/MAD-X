@@ -61,7 +61,7 @@ def main():
 # all 'madx < input > output' calls where madx is compiled with the ifort
 # Intel compiler will take FORT_FMT_RECL into account.
     os.environ['FORT_FMT_RECL']='256' # lines split after 256 chars instead of
-# THIS DOES NOT SEEM TO WORK 13 april 2010
+# THIS DOES NOT SEEM TO WORK 13 april 2010 - force the variable when invoking the makefile instead
 # the default 80    
          
     LOG_FILENAME = reportDir + "/MadBuild_Report.txt"
@@ -136,7 +136,7 @@ def main():
 
         #print("now to compile "+m+" in " + os.getcwd())
         if m == 'Makefile':
-            invocation = "make f95=/opt/intel/Compiler/11.0/081/bin/ia32/ifort DEBUG=NO madx"
+            invocation = "make f95=/opt/intel/Compiler/11.0/081/bin/ia32/ifort DEBUG=NO FORT_FMT_RECL=256 madx"
         elif m == 'Makefile_develop':
             invocation = "make f95=lf95 DEBUG=YES madx" # the Lahey Fortran compiler
         elif m == 'Makefile_nag':
