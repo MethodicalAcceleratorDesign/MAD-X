@@ -229,9 +229,9 @@ endif
 
 ifeq ($(FC12),YES)
   ifeq ($(ARCH),64)
-    LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -lstdc++
+    LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3 -lstdc++ -lgcc_eh
   else
-    LIBX= -L/usr/lib -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/i686-redhat-linux/4.4.3 -lstdc++ -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32 -lgcc_eh
+    LIBX= -L/usr/lib -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32 -lstdc++ -lgcc_eh
   endif
 endif
 
