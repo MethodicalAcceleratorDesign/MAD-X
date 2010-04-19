@@ -1902,7 +1902,7 @@ int pro_correct_getorbit_ext(struct in_cmd* cmd)
               jjx = j-1;
               jjy = jj-1;
               yok = 1;
-           if(dbk ==1) printf("monitor names found: %s %s %d %d\n",l2name,l4name,strlen(l2name),yok);
+           if(dbk ==1) printf("monitor names found: %s %s %d\n",l2name,l4name,yok);
              }
       }
     }
