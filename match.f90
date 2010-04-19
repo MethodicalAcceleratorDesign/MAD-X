@@ -24,8 +24,7 @@
 
 
       logical psum
-      integer j,next_vary,get_option,name_l,slope
-      parameter(name_l=24)
+      integer j,next_vary,get_option,slope
       double precision get_variable,vect(*),dvect(*),c_min,c_max,step,  &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin, opt
       parameter(s_fact=5d-1)
@@ -35,7 +34,7 @@
 
       psum=get_option('match_summary ') .ne. 0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = get_variable(name)
         if (val .ge. c_max) then
@@ -59,8 +58,8 @@
         goto 1
       endif
 !  830 format(a23,1x,1p,'=',e16.8,';!',2x,e16.8,2x,e16.8)
-  830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
-  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
+  830 format(a48,1x,1p,e16.8,3x,e16.8,3x,e16.8)
+  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
       end
 
 
@@ -71,8 +70,7 @@
       implicit none
 
 
-      integer j,next_vary,name_l,ireset,slope
-      parameter(name_l=24)
+      integer j,next_vary,ireset,slope
       double precision vect(*),c_min,c_max,step,                        &
      &dval,val,s_fact,valold,eps,eps2,stplim, vmax, vmin, opt
       parameter(s_fact=5d-1)
@@ -81,7 +79,7 @@
       character*(name_len) name
 
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = vect(j)
         if (val .ge. c_max) then
@@ -100,7 +98,7 @@
         vect(j) = val
         goto 1
       endif
-  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
       end
 
 
@@ -115,8 +113,7 @@
       logical fprt,local,psum, slow_match
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
-     &char_from_table,name_l
-      parameter(name_l=24)
+     &char_from_table
       double precision fsum,fvect(*),val,value,c_min,c_max,weight,f_val
       character*(name_len) name,node_name
       integer n_pos, next_constr_namepos, advance_node
@@ -131,7 +128,7 @@
         do pos=range(1),range(2)
           j=advance_to_pos('twiss ',pos)
  20       continue
-          i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
+          i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
           if(i.ne.0)  then
              flag=char_from_table('twiss ','name ',pos,node_name)
              flag=double_from_table('twiss ',name,pos,val)
@@ -167,7 +164,7 @@
  21     continue
         call get_twiss_data(opt_fun)
  22     continue
-        i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
+        i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
         if(i.ne.0)  then
           n_pos = next_constr_namepos(name)
           if (n_pos .eq. 0)  then
@@ -176,7 +173,7 @@
             stop
           endif
           val = opt_fun(n_pos)
-          call current_node_name(node_name, name_l);
+          call current_node_name(node_name, name_len);
           if (type.eq.1) then
               f_val =weight*dim(c_min,val)
               if(fprt) write(*,880) name,weight,val,c_min,f_val**2
@@ -206,7 +203,7 @@
       if(advance_node() .ne. 0) goto 21
       endif
  30   continue
-      i=next_global(name,name_l,type,value,c_min,c_max,weight)
+      i=next_global(name,name_len,type,value,c_min,c_max,weight)
       if(i.ne.0)  then
         pos=1
         flag=double_from_table('summ ',name,pos,val)
@@ -234,8 +231,8 @@
         goto 30
       endif
 !      if (psum) write(*,831) fsum
-  830 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
-  832 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
+  830 format(a48,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
+  832 format(a48,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
   831 format(//,'Final Penalty Function = ',e16.8,//)
   840 format(a10,3x,1p,5e16.6)
   880 format(a10,3x,1p,3e16.6,16x,e16.6)
@@ -277,14 +274,13 @@
       implicit none
 
 
-      integer j,next_vary,name_l,slope
-      parameter(name_l=24)
+      integer j,next_vary,slope
       double precision vect(*),c_min,c_max,step,s_fact,opt
       parameter(s_fact=5d-1)
       character*(name_len) name
 
  1    continue
-      j=next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j=next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if(j.ne.0)  then
         call set_variable(name,vect(j))
         goto 1

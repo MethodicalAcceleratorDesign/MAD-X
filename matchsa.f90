@@ -1,6 +1,6 @@
       subroutine mtsa(ncon,nvar,tol,calls,call_lim,vect,fun_vect,iseed  &
      &,iprint,lb,nacp,ub,xopt,c,vm,xp)
-!     use name_lenfi
+        use name_lenfi
       implicit none
 !----------------------------------------------------------------------*
 ! Purpose:                                                             *
@@ -23,19 +23,18 @@
       double precision tol,t,vect(*),fun_vect(*),fopt,vmod
       double precision rt,lb(*),ub(*),xopt(*),c(*),                     &
      &vm(*),xp(*),fstar(neps)
-      integer j,next_vary,get_option,name_l,slope
+      integer j,next_vary,get_option,slope
       double precision get_variable,val,c_min,c_max,step,opt
       logical logmax,psum
       common/forsa/m
-      parameter(name_l=24)
 !     character*(name_len) name !uncomment when name_len.fi present
-      character*(name_l) name   !clear
+      character*(name_len) name   !clear
       n=nvar
       m=ncon
 !     include 'match.fi'         !not used here i guess
       psum=get_option('match_summary ') .ne. 0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = get_variable(name)
         lb(j)=c_min
@@ -46,7 +45,7 @@
         vect(j) = val
         goto 1
       endif
-  830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
+  830 format(a48,1x,1p,e16.8,3x,e16.8,3x,e16.8)
 ! Choose SA parameters next:
 ! The value of rt and ns as suggested by Corana
       rt=0.85d0

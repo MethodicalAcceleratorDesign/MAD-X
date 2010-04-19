@@ -498,9 +498,8 @@
       integer n,ivar,nvar,match_mode
       logical local
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
-     &flag,get_option,restart_sequ,advance_to_pos,name_l,char_from_table
+     &flag,get_option,restart_sequ,advance_to_pos,char_from_table
 !      integer double_from_table
-      parameter(name_l=24)
       double precision value,c_min,c_max,weight
       character*(name_len) namevar,name,node_name
       integer next_vary,slope
@@ -520,7 +519,7 @@
           do pos=range(1),range(2)
             j=advance_to_pos('twiss ',pos)
  20         continue
-            i=next_constraint(name,name_l,type,value,c_min,c_max,weight)
+            i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
             if(i.ne.0)  then
               if (pos.ne.oldpos) then
                 nnode=nnode+1
@@ -529,7 +528,7 @@
               endif
               flag=char_from_table('twiss ','name ',pos,node_name)
               do nvar=1,n
- 22             ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,   &
+ 22             ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,   &
      &opt)
                 if (ivar.eq.0) then
                   goto 22
@@ -543,11 +542,11 @@
         endif
         nnode=nnode+1
  30     continue
-        i=next_global(name,name_l,type,value,c_min,c_max,weight)
+        i=next_global(name,name_len,type,value,c_min,c_max,weight)
         if(i.ne.0)  then
           pos=1
           do nvar=1,n
- 32         ivar=next_vary(namevar,name_l,c_min,c_max,step,slope,opt)
+ 32         ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,opt)
             if (ivar.eq.0) then
               goto 32
             endif
@@ -568,16 +567,15 @@
       subroutine mtmove(vect,varinfo,dir,balance)
       use name_lenfi
       implicit none
-      integer j,next_vary,name_l,slope
+      integer j,next_vary,slope
       integer varinfo,effvar
-      parameter(name_l=24)
       double precision vect(*),c_min,c_max,step,opt
       double precision val,dir,balance
       character*(name_len) name
 
       effvar=0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         if (varinfo(j).eq.0) then
           effvar=effvar+1
@@ -596,8 +594,7 @@
       subroutine mtcool(vect,cool,balance,xopt)
       use name_lenfi
       implicit none
-      integer j,next_vary,name_l,slope
-      parameter(name_l=24)
+      integer j,next_vary,slope
       double precision vect(*),c_min,c_max,step,opt
       double precision val,xopt(*),cool,balance
       character*(name_len) name
@@ -606,7 +603,7 @@
         write(*,'(4a16)') "name","oldvalue","opt value","new value"
       endif
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         if (opt.gt.0) then
           xopt(j)=opt
@@ -625,14 +622,13 @@
       subroutine mtrandom(vect,random)
       use name_lenfi
       implicit none
-      integer j,next_vary,name_l,slope
-      parameter(name_l=24)
+      integer j,next_vary,slope
       double precision vect(*),c_min,c_max,step,opt
       double precision val,random,frndm
       character*(name_len) name
 
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         val = (1+ random *( frndm() - 0.5) ) * vect(j)
         vect(j) = val
@@ -646,14 +642,13 @@
       implicit none
 
 
-      integer j,next_vary,name_l,slope
-      parameter(name_l=24)
+      integer j,next_vary,slope
       double precision x(*),xstart(*),c_min,c_max,step,opt
       double precision diff
       character*(name_len) name
 
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
         if (slope.ne.0) then
           diff=x(j)-xstart(j)
@@ -665,7 +660,7 @@
         endif
         goto 1
       endif
-  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
       end
 
 
@@ -675,15 +670,14 @@
       implicit none
 
 
-      integer j,next_vary,name_l,slope,varinfo(*),effvar
-      parameter(name_l=24)
+      integer j,next_vary,slope,varinfo(*),effvar
       double precision x(*),xstart(*),c_min,c_max,step,opt
       double precision diff,val,oldval
       character*(name_len) name
 
       effvar=0
  1    continue
-      j = next_vary(name,name_l,c_min,c_max,step,slope,opt)
+      j = next_vary(name,name_len,c_min,c_max,step,slope,opt)
       if (j .ne. 0)  then
 !        varinfo(j)=0
         effvar=effvar+1
@@ -709,7 +703,7 @@
         endif
         goto 1
       endif
-  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
       end
 
 !  TODO
