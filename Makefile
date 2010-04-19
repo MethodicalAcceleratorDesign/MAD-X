@@ -215,12 +215,12 @@ endif
 
 ifeq ($(SLC5),YES)
   ifeq ($(ARCH),32)
-    LIBX= -L/usr/lib -lX11 -lXau -lXdmcp -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0/32 -lstdc++
+    LIBX= libX11.a -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0/32 -lstdc++
     ifneq ($(f95),ifort)
       LIBX+= -lc -lgcc_eh
     endif
   else
-    LIBX= -L/usr/lib64 -lX11 -lXau -lXdmcp -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
+    LIBX= libX11_64.a -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
     ifneq ($(f95),ifort)
       LIBX+= -lc -lgcc_eh
     endif
