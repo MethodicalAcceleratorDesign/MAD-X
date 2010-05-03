@@ -34,7 +34,7 @@ rootDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation/madX-examples/RE
 topDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation"
 testingDir = topDir + "/TESTING"
 repositoryDir = topDir + "/madX-examples"
-madxDir = topDir + "/MadCvsExtract/madX"
+madxDir = topDir + "/MadSvnExtract/madX"
 
 htmlRootDir = "/afs/cern.ch/user/n/nougaret/www/mad"
 mainHtmlPage = htmlRootDir + "/test.htm"
@@ -55,7 +55,8 @@ class Repository: # wrapper on CVS or SVN repository for examples
         currentDir = os.getcwd()
         os.mkdir(repositoryDir)
         os.chdir(topDir)
-        checkoutCommand = "cvs -d :gserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples";
+        #checkoutCommand = "cvs -d :gserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples";
+        checkoutCommand = "svn co svn+ssh://svn.cern.ch/reps/madx-examples/trunk/madX-examples" + " " + repositoryDir
         os.system(checkoutCommand)
         os.chdir(currentDir)
 
