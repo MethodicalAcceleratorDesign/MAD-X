@@ -28,16 +28,16 @@ reportDir = "/afs/cern.ch/user/n/nougaret/scratch1/mad-automation"
 # 12 april 2009 fix the directory in which to extract MAD-X
 #currentDir = os.getcwd()
 currentDir = reportDir
-extractDir = currentDir+'/MadCvsExtract'
+extractDir = currentDir+'/MadSvnExtract'
 
-notify('jean-luc','MadCvsExtract','MadCvsExtract will be created as ' + extractDir)
+notify('jean-luc','MadSvnExtract','MadSvnExtract will be created as ' + extractDir)
 
 class Repository:
-    repoDir = ":gserver:isscvs.cern.ch:/local/reps/madx"
     def __init__(self):
         pass
     def checkout(self,releaseTag):
-        command = "cvs -d " + Repository.repoDir + " checkout -r" + releaseTag + " madX"
+#        command = "cvs -d " + Repository.repoDir + " checkout -r" + releaseTag + " madX"
+        command = "svn co svn+ssh://svn.cern.ch/reps/madx/tags/" + releaseTag + " " + extractDir
         os.system(command)
 
 class Build:
@@ -117,10 +117,11 @@ def main():
     if os.path.exists(extractDir):
         shutil.rmtree(extractDir)
     # now create the directory in which to extract the CVS    
-    os.mkdir(extractDir)
-    os.chdir(extractDir)
+    #os.mkdir(extractDir)
+    #os.chdir(extractDir)
     repo = Repository()
-    repo.checkout(options.releaseTag)
+    repo.checkout(options.releaseTag) # creates or overwrites extractDir
+    os.chdir(extractDir)
     os.chdir('./madX')
 
     for m in makefiles:
