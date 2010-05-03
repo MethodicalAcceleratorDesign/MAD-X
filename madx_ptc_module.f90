@@ -2107,7 +2107,7 @@ goto 100 ! skip the code that was in place until 29 March 2010
 ! note that the order in which the coefficients appear in the map_table slightly
 ! differ from the order in which they appear in fort.18
 100	do i=1,c_%npara ! distribute exponents over 6 variables, knowing their sum
-           do no=1,order
+           do no=0,order
               if (c_%npara.eq.6) then
                  do i1=no,0,-1
                     do i2=no-i1,0,-1
@@ -2135,7 +2135,7 @@ goto 100 ! skip the code that was in place until 29 March 2010
                                          map_coor(8)=j(4)
                                          map_coor(9)=j(5)
                                          map_coor(10)=j(6)
-                                         call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                         !call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
                                          call augment_count("map_table ")
                                       endif
                                       !write(0,*) 'write coef', coef

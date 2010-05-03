@@ -1305,10 +1305,25 @@ contains
     end subroutine readinitialdistrib
     !_________________________________________________________________
 
-    subroutine readmatrixfromtable
+    subroutine readmatrixfromtable ! 26 april 2010: changed this routine
+      ! because the format of the map_table has now changed to contain all terms,
+      ! and not only the zeroth and first order ones...
       implicit none
       integer  :: double_from_table
 
+      ! following added 26 april 2010
+      integer :: i1,i2,i3,i4,i5,i6
+      integer :: order
+      integer :: nx, nxp, ny, nyp, ndeltap, nt, index
+      real(dp):: coeff
+      character(6) :: selector
+      integer, dimension(6) :: jj ! 3 may 2010
+
+      real(dp) :: oldv
+      type(taylor)::newtoset
+
+
+goto 200 ! skip code that was used before 26 april 2010
       x(:)=zero
       allocate(j(c_%npara))
       j(:)=0
@@ -1332,10 +1347,79 @@ contains
             j(ii)=0
          enddo
       enddo
-
-      call maptoascript()
-
       deallocate(j)
+
+200   order = get_value('ptc_twiss ','no ')
+
+      ! call daprint(y,27) ! check the map is empty
+
+      row = 1 ! starts at one
+
+      do while(k.eq.0) ! k=0 when read okay. k=-3 when the table has no row
+         k = double_from_table("map_table ","coef ", row,doublenum)
+         !write(0,*) 'k=',k
+         !write(0,*) 'coef=',doublenum
+         coeff=doublenum
+         k = double_from_table("map_table ","n_vector ",row,doublenum)
+         index = int(doublenum)
+         k = double_from_table("map_table ","nx ",row,doublenum)
+         nx = int(doublenum)
+         !write(0,*) 'index=',index
+         !write(0,*) 'nx=',nx
+         k = double_from_table("map_table ","nxp ",row,doublenum)
+         nxp = int(doublenum)
+         !write(0,*) 'nxp=',nxp
+         k = double_from_table("map_table ","ny ",row,doublenum)
+         ny = int(doublenum)
+         !write(0,*) 'ny=',ny
+         k = double_from_table("map_table ","nyp ",row,doublenum)
+         nyp = int(doublenum)
+         !write(0,*) 'nyp=',nyp
+         k = double_from_table("map_table ","ndeltap ",row,doublenum)    
+         ndeltap = int(doublenum)
+         !write(0,*) 'ndeltap=',ndeltap
+         k = double_from_table("map_table ","nt ",row,doublenum)
+         nt = int(doublenum)
+         !write(0,*) 'nt=',nt
+
+         !      y(index)%T.sub.j=coeff ! are we able to do this? NO
+
+         ! code proposed by piotr to achieve the equivalent of y(1).sub.'12345'=4.0
+         !oldv = Y(1).sub.'12345'
+         !newtoset = (4 - oldv).mono.'12345'
+         !Y(1) = Y(1) + newtoset
+
+         ! code proposed by etienne to achieve the same
+         !call pok(y(1),j,4.d0)
+
+         if (k.eq.0) then
+            jj(1)=nx
+            jj(2)=nxp
+            jj(3)=ny
+            jj(4)=nyp
+            jj(5)=ndeltap
+            jj(6)=nt
+            call pok(y(index)%T,jj,coeff)
+            ! the following gives the same result as the above
+            !oldv = y(index).sub.jj
+            !newtoset = (coeff - oldv).mono.jj ! mono for monomial
+            !y(index)%t=y(index)%t+newtoset
+            ! failed to compile the following work in one line
+            !Y(index) = Y(index) + ((coeff-(Y(index).sub.jj)).mono.jj)
+         endif
+
+
+
+
+         row = row+1
+
+      enddo
+
+      ! call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
+
+      call maptoascript() 
+
+
     end subroutine readmatrixfromtable
 
     !_________________________________________________________________
