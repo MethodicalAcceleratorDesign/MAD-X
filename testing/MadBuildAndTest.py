@@ -243,7 +243,7 @@ try:
         reportFile.write("entering MadBuild.pl, with release-tag "+\
                      release+"\n")
         os.chdir(rootDir)
-        os.system("rm -rf ./MadCvsExtract")
+        os.system("rm -rf ./MadSvnExtract")
         try:
             os.system("rm -rf ./tempfile")
         except:
