@@ -61,6 +61,7 @@
 /libSDDS1c.a -text svneol=unset#unset
 /libSDDS1c64.a -text svneol=unset#unset
 /libX11.a -text svneol=unset#unset
+/libX11_64.a -text
 /libgsl.a -text svneol=unset#unset
 /libgsl64.a -text svneol=unset#unset
 /libmdblib.a -text svneol=unset#unset
