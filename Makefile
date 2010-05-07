@@ -6,26 +6,18 @@
 
 CC=gcc
 f95=ifort
-ARCH=32
+ARCH=64
 DEBUG=NO
 ONLINE=YES
 MEMLEAKS=NO
 PROFILE=NO
 PLUGIN_SUPPORT=NO
-SLC4=NO
-SLC5=YES
-FC12=NO
 NTPSA=YES
 
 ONMAC=NO
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   ONMAC=YES
-# Presently g95 is no longer the default for Darwin since
-# gfortran is more available. The latter comes automatically
-# with gcc. Special LIBX is needed for g95 (see below)
-# ATTENTION: gfortran is broken in gcc4.4 on Darwin therefore 
-# back to g95 
 #  f95=g95
   f95=gfortran
 #  for darwin go now by default to 64 bit executables
@@ -38,39 +30,19 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   DEBUG=NO
   MEMLEAKS=NO
   PROFILE=NO
-  SLC4=NO
-  SLC5=NO
-  FC12=NO
 endif
 
 #######################################################################
-# Compilers
+# Compilers for MAD-X
 #######################################################################
 
-#!!!!!!!!!!!!!!!!!!
-# C compilers
-#!!!!!!!!!!!!!!!!!!
 # CC=gcc
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # FORTRAN90 compilers proven to work
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-# Production: Lahey
-# f95=lf95
-
-# GNU g95
-# f95=g95
-
-# For gfortran the version of gcc has to be > 4.3.2 not standard for SLC4
-# GNU gfortran
-# f95=gfortran
-
-# NAG f95
-# f95=f95
-
-# Intel ifort
-# f95=ifort
+#
+#             Intel     Lahey   Andy Vaught      GNU       NAG
+# Default     Linux                             Darwin
+# f95=        ifort     lf95       g95         gfortran    f95
 
 #######################################################################
 # Compile flags
@@ -171,67 +143,16 @@ else
   endif
 endif
 
-ifeq ($(SLC4),YES)
-  ifeq ($(f95),gfortran)
-    # Needed on SLC4
-    #
-    # works on SLC4 genuine 32bit
-    #
-    # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/i686/setup.csh
-    # GF_HOME=/afs/cern.ch/sw/lcg/contrib/gcc/4.3/i686/bin/
-    #
-    # works on SLC4 lxplus 64bit needed for 32bit
-    #
-    # source /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/setup.csh
-    GF_HOME= /afs/cern.ch/sw/lcg/contrib/gcc/4.3/slc4_amd64_gcc43/bin/
-     CC=$(GF_HOME)gcc
-    f95=$(GF_HOME)gfortran
-    f95_FLAGS+= $(M32)
-  endif
+ifeq ($(ARCH),32)
+  LIBX= libX11.a -lpthread -lstdc++ -lc -lgcc_eh
+else
+  LIBX= libX11_64.a -lpthread -lstdc++ -lc -lgcc_eh
 endif
-
-LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -lstdc++
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   ONLINE=NO
   ifeq ($(f95),g95)
     LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/sw/lib/gcc4.4/lib -lstdc++ -L/sw/lib/gcc4.4/lib/gcc/i686-apple-darwin9/4.4.0 -lgcc_eh  
-  endif
-endif
-
-ifeq ($(SLC4),YES)
-  ifeq ($(ARCH),32)
-    LIBX= -L/usr/X11R6/lib -lX11 -L/usr/lib -lpthread -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
-    ifneq ($(f95),ifort)
-      LIBX+= /usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/32/libgcc_eh.a
-    endif
-  else
-    LIBX= -L/usr/X11R6/lib64 -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lstdc++
-    ifneq ($(f95),ifort)
-      LIBX+= /usr/lib/gcc/x86_64-redhat-linux5E/4.1.2/libgcc_eh.a
-    endif
-  endif
-endif
-
-ifeq ($(SLC5),YES)
-  ifeq ($(ARCH),32)
-    LIBX= libX11.a -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0/32 -lstdc++
-    ifneq ($(f95),ifort)
-      LIBX+= -lc -lgcc_eh
-    endif
-  else
-    LIBX= libX11_64.a -L/usr/lib/gcc/x86_64-redhat-linux6E/4.4.0 -lstdc++
-    ifneq ($(f95),ifort)
-      LIBX+= -lc -lgcc_eh
-    endif
-  endif
-endif
-
-ifeq ($(FC12),YES)
-  ifeq ($(ARCH),64)
-    LIBX= -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3 -lstdc++ -lgcc_eh
-  else
-    LIBX= -L/usr/lib -lX11 -lxcb -lXau -lXdmcp -lpthread -L/usr/lib/gcc/x86_64-redhat-linux/4.4.3/32 -lstdc++ -lgcc_eh
   endif
 endif
 
