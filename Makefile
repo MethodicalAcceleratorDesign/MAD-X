@@ -108,6 +108,9 @@ endif
 
 ifeq ($(f95),gfortran)
   f95_FLAGS+= -fno-range-check
+  ifeq ($(ARCH),32)
+     f95_FLAGS+=$(M32)
+  endif 
 endif
 
 ifeq ($(DEBUG),YES)
