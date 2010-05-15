@@ -2033,7 +2033,7 @@ CONTAINS
     real(kind(1d0))   :: get_value
     !    type(universal_taylor) :: ut
 
-!    write(0,*) "MAP_TABLE"
+    !    write(0,*) "MAP_TABLE"
 
     map_term=42
     call  make_map_table(map_term)
@@ -2045,47 +2045,47 @@ CONTAINS
     ja(:)    = 0
     j(:)     = 0
 
-goto 100 ! skip the code that was in place until 29 March 2010
-	
-    	do iii=1,c_%npara
-       		coef = y(iii)%T.sub.j
-		! following works
-		!coef = y(iii)%T.sub.mapSelector5variables(1)
-       		map_coor(1)=coef
-       		map_coor(2)=iii
-       		map_coor(3)=c_%npara
-       		map_coor(4)=0
-       		map_coor(5)=ja(1)
-       		map_coor(6)=ja(2)
-       		map_coor(7)=ja(3)
-       		map_coor(8)=ja(4)
-       		map_coor(9)=ja(5)
-       		map_coor(10)=ja(6)
-       		call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
-       		call augment_count("ptc_normal ")
-    	enddo
+    goto 100 ! skip the code that was in place until 29 March 2010
 
-    	do i = 1,c_%npara
+    do iii=1,c_%npara
+       coef = y(iii)%T.sub.j
+       ! following works
+       !coef = y(iii)%T.sub.mapSelector5variables(1)
+       map_coor(1)=coef
+       map_coor(2)=iii
+       map_coor(3)=c_%npara
+       map_coor(4)=0
+       map_coor(5)=ja(1)
+       map_coor(6)=ja(2)
+       map_coor(7)=ja(3)
+       map_coor(8)=ja(4)
+       map_coor(9)=ja(5)
+       map_coor(10)=ja(6)
+       call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
+       call augment_count("ptc_normal ")
+    enddo
 
-       		do ii = 1,c_%npara
-          		j(ii) = 1
-          		ja(ii) = j(ii)
-          		coef = y(i)%T.sub.j
-          		map_coor(1)=coef
-          		map_coor(2)=i
-          		map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-          		map_coor(4)=sum(ja(:))
-          		map_coor(5)=ja(1)
-          		map_coor(6)=ja(2)
-          		map_coor(7)=ja(3)
-          		map_coor(8)=ja(4)
-          		map_coor(9)=ja(5)
-          		map_coor(10)=ja(6)
-          		call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
-          		call augment_count("ptc_normal ")
-          		j(:)  = 0
-          		ja(ii) = j(ii)
-       		enddo
+    do i = 1,c_%npara
+
+       do ii = 1,c_%npara
+          j(ii) = 1
+          ja(ii) = j(ii)
+          coef = y(i)%T.sub.j
+          map_coor(1)=coef
+          map_coor(2)=i
+          map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
+          map_coor(4)=sum(ja(:))
+          map_coor(5)=ja(1)
+          map_coor(6)=ja(2)
+          map_coor(7)=ja(3)
+          map_coor(8)=ja(4)
+          map_coor(9)=ja(5)
+          map_coor(10)=ja(6)
+          call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
+          call augment_count("ptc_normal ")
+          j(:)  = 0
+          ja(ii) = j(ii)
+       enddo
 
        !           ut = y(i)
        !           do ii = 1,ut%n
@@ -2102,118 +2102,118 @@ goto 100 ! skip the code that was in place until 29 March 2010
        !           enddo
 
 
-    	enddo
+    enddo
 
-! note that the order in which the coefficients appear in the map_table slightly
-! differ from the order in which they appear in fort.18
-100	do i=1,c_%npara ! distribute exponents over 6 variables, knowing their sum
-           do no=0,order
-              if (c_%npara.eq.6) then
-                 do i1=no,0,-1
-                    do i2=no-i1,0,-1
-                       do i3=no-i1-i2,0,-1
-                          do i4=no-i1-i2-i3,0,-1
-                             do i5=no-i1-i2-i3-i4,0,-1
-                                do i6=no-i1-i2-i3-i4-i5,0,-1
-                                   if (i1+i2+i3+i4+i5+i6==no) then
-                                      !write(0,'(6(i4))'), i1,i2,i3,i4,i5,i6
-                                      j(1)=i1
-                                      j(2)=i2
-                                      j(3)=i3
-                                      j(4)=i4
-                                      j(5)=i5
-                                      j(6)=i6
-                                      coef = y(i)%T.sub.j
-                                      if (coef.ne.zero) then
-                                         map_coor(1)=coef
-                                         map_coor(2)=i
-                                         map_coor(3)=c_%npara
-                                         map_coor(4)=no
-                                         map_coor(5)=j(1)
-                                         map_coor(6)=j(2)
-                                         map_coor(7)=j(3)
-                                         map_coor(8)=j(4)
-                                         map_coor(9)=j(5)
-                                         map_coor(10)=j(6)
-                                         !call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-                                         call augment_count("map_table ")
-                                      endif
-                                      !write(0,*) 'write coef', coef
-                                   endif
-                                enddo
-                             enddo
-                          enddo
-                       enddo
-                    enddo
-                 enddo
-              elseif (c_%npara.eq.5) then ! distribute exponents over 5 variables, knowing their sum
-                 do i1=no,0,-1
-                    do i2=no-i1,0,-1
-                       do i3=no-i1-i2,0,-1
-                          do i4=no-i1-i2-i3,0,-1
-                             do i5=no-i1-i2-i3-i4,0,-1
-                                if (i1+i2+i3+i4+i5==no) then
-                                   j(1)=i1
-                                   j(2)=i2
-                                   j(3)=i3
-                                   j(4)=i4
-                                   j(5)=i5
-                                   coef = y(i)%T.sub.j
-                                   if (coef.ne.zero) then
-                                      map_coor(1)=coef
-                                      map_coor(2)=i
-                                      map_coor(3)=c_%npara
-                                      map_coor(4)=no
-                                      map_coor(5)=j(1)
-                                      map_coor(6)=j(2)
-                                      map_coor(7)=j(3)
-                                      map_coor(8)=j(4)
-                                      map_coor(9)=j(5)
-                                      map_coor(10) = 0 
-                                      call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-                                      call augment_count("map_table ")                                                                   
-                                   endif
-                                endif
-                             enddo
-                          enddo
-                       enddo
-                    enddo
-                 enddo
-              elseif (c_%npara.eq.4) then ! distribute exponents over 4 variables, knowing their sum
-                 do i1=no,0,-1
-                    do i2=no-i1,0,-1
-                       do i3=no-i1-i2,0,-1
-                          do i4=no-i1-i2-i3,0,-1
-                             if (i1+i2+i3+i4==no) then
-                                j(1)=i1
-                                j(2)=i2
-                                j(3)=i3
-                                j(4)=i4
-                                coef = y(i)%T.sub.j
-                                if (coef.ne.zero) then
-                                   map_coor(1)=coef
-                                   map_coor(2)=i
-                                   map_coor(3)=c_%npara
-                                   map_coor(4)=no
-                                   map_coor(5)=j(1)
-                                   map_coor(6)=j(2)
-                                   map_coor(7)=j(3)
-                                   map_coor(8)=j(4)
-                                   map_coor(9)=0
-                                   map_coor(10)=0
-                                   call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
-                                   call augment_count("map_table ")   
-                                endif
-                             endif
-                          enddo
-                       enddo
-                    enddo
-                 enddo
-              else
-                 call fort_warn('ptc_normal ','map output expects 4,5 or 6 variables')
-              endif
-           enddo
-	enddo
+    ! note that the order in which the coefficients appear in the map_table slightly
+    ! differ from the order in which they appear in fort.18
+100 do i=1,c_%npara ! distribute exponents over 6 variables, knowing their sum
+       do no=0,order
+          if (c_%npara.eq.6) then
+             do i1=no,0,-1
+                do i2=no-i1,0,-1
+                   do i3=no-i1-i2,0,-1
+                      do i4=no-i1-i2-i3,0,-1
+                         do i5=no-i1-i2-i3-i4,0,-1
+                            do i6=no-i1-i2-i3-i4-i5,0,-1
+                               if (i1+i2+i3+i4+i5+i6==no) then
+                                  !write(0,'(6(i4))'), i1,i2,i3,i4,i5,i6
+                                  j(1)=i1
+                                  j(2)=i2
+                                  j(3)=i3
+                                  j(4)=i4
+                                  j(5)=i5
+                                  j(6)=i6
+                                  coef = y(i)%T.sub.j
+                                  if (coef.ne.zero) then
+                                     map_coor(1)=coef
+                                     map_coor(2)=i
+                                     map_coor(3)=c_%npara
+                                     map_coor(4)=no
+                                     map_coor(5)=j(1)
+                                     map_coor(6)=j(2)
+                                     map_coor(7)=j(3)
+                                     map_coor(8)=j(4)
+                                     map_coor(9)=j(5)
+                                     map_coor(10)=j(6)
+                                     !call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                     call augment_count("map_table ")
+                                  endif
+                                  !write(0,*) 'write coef', coef
+                               endif
+                            enddo
+                         enddo
+                      enddo
+                   enddo
+                enddo
+             enddo
+          elseif (c_%npara.eq.5) then ! distribute exponents over 5 variables, knowing their sum
+             do i1=no,0,-1
+                do i2=no-i1,0,-1
+                   do i3=no-i1-i2,0,-1
+                      do i4=no-i1-i2-i3,0,-1
+                         do i5=no-i1-i2-i3-i4,0,-1
+                            if (i1+i2+i3+i4+i5==no) then
+                               j(1)=i1
+                               j(2)=i2
+                               j(3)=i3
+                               j(4)=i4
+                               j(5)=i5
+                               coef = y(i)%T.sub.j
+                               if (coef.ne.zero) then
+                                  map_coor(1)=coef
+                                  map_coor(2)=i
+                                  map_coor(3)=c_%npara
+                                  map_coor(4)=no
+                                  map_coor(5)=j(1)
+                                  map_coor(6)=j(2)
+                                  map_coor(7)=j(3)
+                                  map_coor(8)=j(4)
+                                  map_coor(9)=j(5)
+                                  map_coor(10) = 0
+                                  call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                  call augment_count("map_table ")
+                               endif
+                            endif
+                         enddo
+                      enddo
+                   enddo
+                enddo
+             enddo
+          elseif (c_%npara.eq.4) then ! distribute exponents over 4 variables, knowing their sum
+             do i1=no,0,-1
+                do i2=no-i1,0,-1
+                   do i3=no-i1-i2,0,-1
+                      do i4=no-i1-i2-i3,0,-1
+                         if (i1+i2+i3+i4==no) then
+                            j(1)=i1
+                            j(2)=i2
+                            j(3)=i3
+                            j(4)=i4
+                            coef = y(i)%T.sub.j
+                            if (coef.ne.zero) then
+                               map_coor(1)=coef
+                               map_coor(2)=i
+                               map_coor(3)=c_%npara
+                               map_coor(4)=no
+                               map_coor(5)=j(1)
+                               map_coor(6)=j(2)
+                               map_coor(7)=j(3)
+                               map_coor(8)=j(4)
+                               map_coor(9)=0
+                               map_coor(10)=0
+                               call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                               call augment_count("map_table ")
+                            endif
+                         endif
+                      enddo
+                   enddo
+                enddo
+             enddo
+          else
+             call fort_warn('ptc_normal ','map output expects 4,5 or 6 variables')
+          endif
+       enddo
+    enddo
 
 
 
@@ -2324,7 +2324,7 @@ goto 100 ! skip the code that was in place until 29 March 2010
              if(b(k)/=zero) then
                 if(overwrite) then
                    call add(p,k,0,b(k))
-                else     
+                else
                    call add(p,k,1,b(k))
                 endif
              endif
