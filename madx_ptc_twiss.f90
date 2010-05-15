@@ -81,7 +81,7 @@ module madx_ptc_twiss_module
        (/6,6/) )
 
   logical :: slice_magnets, center_magnets, deltap_dependency, isRing
-  
+
   logical :: resetBetaExtrema(3,3);
 
   real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
@@ -332,7 +332,7 @@ contains
     character(48) charconv
 
     call resetBetaExtremas()
-    
+
     skipnormalform = my_false
 
     !all zeroing
@@ -656,17 +656,17 @@ contains
     ! relocated here to avoid side-effect
 
 
-! 26 november 2009    
+    ! 26 november 2009
     call oneTurnSummary(isRing)
     call set_option('ptc_twiss_summary ',1)
-! 26 november 2009: comment the following and replace by the above
-!    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
-!       ! only makes sense if the lattice is a ring (skipped for a line lattice)
-!       call oneTurnSummary()
-!       call set_option('ptc_twiss_summary ', 1)
-!    else
-!       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
-!    endif
+    ! 26 november 2009: comment the following and replace by the above
+    !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
+    !       ! only makes sense if the lattice is a ring (skipped for a line lattice)
+    !       call oneTurnSummary()
+    !       call set_option('ptc_twiss_summary ', 1)
+    !    else
+    !       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
+    !    endif
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -729,7 +729,7 @@ contains
 
       isRing = .false. ! set to true in the case the map
 
-      
+
 
       ! is calculated over a ring, about the closed orbit. Later-on in the same subroutine.
 
@@ -1323,7 +1323,7 @@ contains
       type(taylor)::newtoset
 
 
-goto 200 ! skip code that was used before 26 april 2010
+      goto 200 ! skip code that was used before 26 april 2010
       x(:)=zero
       allocate(j(c_%npara))
       j(:)=0
@@ -1375,7 +1375,7 @@ goto 200 ! skip code that was used before 26 april 2010
          k = double_from_table("map_table ","nyp ",row,doublenum)
          nyp = int(doublenum)
          !write(0,*) 'nyp=',nyp
-         k = double_from_table("map_table ","ndeltap ",row,doublenum)    
+         k = double_from_table("map_table ","ndeltap ",row,doublenum)
          ndeltap = int(doublenum)
          !write(0,*) 'ndeltap=',ndeltap
          k = double_from_table("map_table ","nt ",row,doublenum)
@@ -1417,7 +1417,7 @@ goto 200 ! skip code that was used before 26 april 2010
 
       ! call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
 
-      call maptoascript() 
+      call maptoascript()
 
 
     end subroutine readmatrixfromtable
@@ -1957,7 +1957,7 @@ goto 200 ! skip code that was used before 26 april 2010
          enddo
 
          alpha_c_p = sd * (betaRelativistic**2) / suml
-	 
+
          ! eventually, one could differentiate the above formula to obtain alpha_c_p2
          ! but for the time-being, expect icase to be 56 to compute alpha_c_p2 and alpha_c_p3.
 
@@ -1966,7 +1966,7 @@ goto 200 ! skip code that was used before 26 april 2010
 
 
          call kill(theAscript)
-           
+
       elseif (icase.eq.56) then ! here one may obtain the pathlength derivatives from the map
 
          call alloc(yy)
@@ -1979,9 +1979,9 @@ goto 200 ! skip code that was used before 26 april 2010
          gamma_tr = one / sqrt(alpha_c)! overwrite the value obtained from the Twiss formula
          !alpha_c = one / gammaRelativistic**2 + eta_c
          eta_c = alpha_c - one / gammaRelativistic**2
- 
+
          alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
- 
+
          if (order.ge.3) then
             alpha_c_p2 = 3.0*2.0*(yy%v(6).sub.'000030')/suml
          else
@@ -2003,11 +2003,11 @@ goto 200 ! skip code that was used before 26 april 2010
          !write(0,*) 'alpha_c_p =',alpha_c_p
          !write(0,*) 'alpha_c_p2 =',alpha_c_p2
          !write(0,*) 'alpha_c_p3 =',alpha_c_p3
-         
+
          ! call daprint(yy%v,22) ! prints a map of order 2, without the expected coefficients
 
          call kill(yy)
-        
+
       elseif(icase.eq.6) then
          ! my_state in madx_ptc_module.f90 resets overwrites icase to 56 when there is no cavity
          alpha_c_p = 0.0
@@ -2026,9 +2026,9 @@ goto 200 ! skip code that was used before 26 april 2010
       fractionalTunes(2) = theNormalForm%DHDJ%v(2).sub.'0000' ! as in So_fitting.f90
       ! 26 november 2009
       if (icase.eq.6) then
-          fractionalTunes(3) = - theNormalForm%DHDJ%v(3).sub.'0000' ! always yields 0 => does not work as I would have expected
-          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)' 
-          ! computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
+         fractionalTunes(3) = - theNormalForm%DHDJ%v(3).sub.'0000' ! always yields 0 => does not work as I would have expected
+         ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)'
+         ! computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
       else
          fractionalTunes(3) = 0.0
       endif
@@ -2039,7 +2039,7 @@ goto 200 ! skip code that was used before 26 april 2010
       if (icase.eq.5 .or. icase.eq.56) then
          chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
          chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
-      ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
+         ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
          chromaticities(1) = 0.0
@@ -2123,7 +2123,7 @@ goto 200 ! skip code that was used before 26 april 2010
       integer :: returnedInteger
 
       character(200) :: msg
-      
+
       integer :: debugFileIndex
 
       integer :: countSkipped
@@ -2234,7 +2234,7 @@ goto 200 ! skip code that was used before 26 april 2010
          ! call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
 
          if (nodePtr%next%cas==case0 .and. (.not. at_center_only)) then
-            ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded 
+            ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded
             call puttwisstable(transfermap)
          endif
 
@@ -2457,12 +2457,12 @@ goto 200 ! skip code that was used before 26 april 2010
 
   ! --- a set of routines to track extremas of Twiss functions
   subroutine resetBetaExtremas()
-  	integer i,j
-  	do i=1,3
-		do j=1,3
-			resetBetaExtrema(i,j) = .true.
-		enddo
-	enddo
+    integer i,j
+    do i=1,3
+       do j=1,3
+          resetBetaExtrema(i,j) = .true.
+       enddo
+    enddo
   end subroutine resetBetaExtremas
   subroutine trackBetaExtrema(i,j,value)
     implicit none
@@ -2484,78 +2484,78 @@ goto 200 ! skip code that was used before 26 april 2010
   ! --- end of set of routines
 
 
-subroutine orbitRms(summary_table_name)
-	implicit none
-	character*48	:: summary_table_name
+  subroutine orbitRms(summary_table_name)
+    implicit none
+    character*48	:: summary_table_name
 
-	real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
-	real(dp)	:: x(6) ! the 6 dimensional state space
-	real(kind(1d0)) :: xrms(6)
-	real(kind(1d0)) :: xcomax, pxcomax, ycomax, pycomax
-	integer		:: i, j
+    real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
+    real(dp)	:: x(6) ! the 6 dimensional state space
+    real(kind(1d0)) :: xrms(6)
+    real(kind(1d0)) :: xcomax, pxcomax, ycomax, pycomax
+    integer		:: i, j
 
-	real(kind(1d0))         :: get_value
+    real(kind(1d0))         :: get_value
 
-	if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
-		! for a line or if we don't mention the closed_orbit, xcorms makes no sense
-		call double_to_table(summary_table_name,'xcorms ',0d0)
-		call double_to_table(summary_table_name,'pxcorms ',0d0)
-		call double_to_table(summary_table_name,'ycorms ',0d0)
-		call double_to_table(summary_table_name,'pycorms ',0d0)	
-		call double_to_table(summary_table_name,'xcomax ',0d0)
-		call double_to_table(summary_table_name,'pxcomax ',0d0)
-		call double_to_table(summary_table_name,'ycomax ',0d0)
-		call double_to_table(summary_table_name,'pycomax ',0d0)		
-	else
-
-
-		call make_node_layout(my_ring) ! essential: the way to look inside the magnets
-		state = zero
-		call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
-
-		xcomax = state(1)
-		pxcomax = state(2)
-		ycomax = state(3)
-		pycomax = state(4)
-
-		x=state
-		xrms = zero
-		do i=1,my_ring%n
-			!call find_orbit(my_ring,state,i,default,1.d-5) ! i for the ith element?
-			call track(my_ring,x,i,i+1,default) ! track x directly!
-			! write(0,*) "xco(find_orbit)=",state(1),"xco(tracked)=",x(1)
-			do j=1,6
-				xrms(j) = xrms(j) + x(j)*x(j)
-			enddo
-			if (x(1)>xcomax) then
-				xcomax = x(1)
-			endif
-			if (x(2)>pxcomax) then
-				pxcomax = x(2)
-			endif
-			if (x(3)>ycomax) then
-				ycomax = x(3)
-			endif
-			if (x(4)>pycomax) then
-				pycomax = x(4)
-			endif
-		enddo		
-
-		xrms = sqrt(xrms / my_ring%n)
-
-		call double_to_table(summary_table_name,'xcorms ',xrms(1))
-		call double_to_table(summary_table_name,'pxcorms ',xrms(2))
-		call double_to_table(summary_table_name,'ycorms ',xrms(3))
-		call double_to_table(summary_table_name,'pycorms ',xrms(4))
-		call double_to_table(summary_table_name,'xcomax ',xcomax)
-		call double_to_table(summary_table_name,'pxcomax ',pxcomax)
-		call double_to_table(summary_table_name,'ycomax ',ycomax)
-		call double_to_table(summary_table_name,'pycomax ',pycomax)
+    if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
+       ! for a line or if we don't mention the closed_orbit, xcorms makes no sense
+       call double_to_table(summary_table_name,'xcorms ',0d0)
+       call double_to_table(summary_table_name,'pxcorms ',0d0)
+       call double_to_table(summary_table_name,'ycorms ',0d0)
+       call double_to_table(summary_table_name,'pycorms ',0d0)	
+       call double_to_table(summary_table_name,'xcomax ',0d0)
+       call double_to_table(summary_table_name,'pxcomax ',0d0)
+       call double_to_table(summary_table_name,'ycomax ',0d0)
+       call double_to_table(summary_table_name,'pycomax ',0d0)		
+    else
 
 
-	endif
+       call make_node_layout(my_ring) ! essential: the way to look inside the magnets
+       state = zero
+       call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
 
-end subroutine orbitRms
+       xcomax = state(1)
+       pxcomax = state(2)
+       ycomax = state(3)
+       pycomax = state(4)
+
+       x=state
+       xrms = zero
+       do i=1,my_ring%n
+          !call find_orbit(my_ring,state,i,default,1.d-5) ! i for the ith element?
+          call track(my_ring,x,i,i+1,default) ! track x directly!
+          ! write(0,*) "xco(find_orbit)=",state(1),"xco(tracked)=",x(1)
+          do j=1,6
+             xrms(j) = xrms(j) + x(j)*x(j)
+          enddo
+          if (x(1)>xcomax) then
+             xcomax = x(1)
+          endif
+          if (x(2)>pxcomax) then
+             pxcomax = x(2)
+          endif
+          if (x(3)>ycomax) then
+             ycomax = x(3)
+          endif
+          if (x(4)>pycomax) then
+             pycomax = x(4)
+          endif
+       enddo
+
+       xrms = sqrt(xrms / my_ring%n)
+
+       call double_to_table(summary_table_name,'xcorms ',xrms(1))
+       call double_to_table(summary_table_name,'pxcorms ',xrms(2))
+       call double_to_table(summary_table_name,'ycorms ',xrms(3))
+       call double_to_table(summary_table_name,'pycorms ',xrms(4))
+       call double_to_table(summary_table_name,'xcomax ',xcomax)
+       call double_to_table(summary_table_name,'pxcomax ',pxcomax)
+       call double_to_table(summary_table_name,'ycomax ',ycomax)
+       call double_to_table(summary_table_name,'pycomax ',pycomax)
+
+
+    endif
+
+  end subroutine orbitRms
 
 
 end module madx_ptc_twiss_module
