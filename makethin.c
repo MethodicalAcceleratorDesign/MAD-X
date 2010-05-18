@@ -564,7 +564,7 @@ struct element* create_thin_multipole(struct element* thick_elem, int slice_no)
   ks_param = scale_and_slice(ks_param,length_param,slices,slice_no,
                              angle_conversion,knl_flag+ksl_flag);
   /* set up new multipole command */
-  cmd = new_command(buffer("thin_multipole"), 11, 11, /* max num names, max num param */
+  cmd = new_command(buffer("thin_multipole"), 20, 20, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
   if(!minimizefl)
@@ -638,8 +638,8 @@ struct element* create_thin_solenoid(struct element* thick_elem, int slice_no)
   }
   
   /* set up new solenoid command */
-  cmd = new_command(buffer("thin_solenoid"), 11, 11, /* max num names, max num param */
-                    buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */  /*hbu trial */
+  cmd = new_command(buffer("thin_solenoid"), 20, 20, /* max num names, max num param */
+                    buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
   
   
@@ -726,8 +726,8 @@ struct element* create_thin_elseparator(struct element* thick_elem, int slice_no
   }
   
   /* set up new solenoid command */
-  cmd = new_command(buffer("thin_elseparator"), 11, 11, /* max num names, max num param */
-                    buffer("element"), buffer("none"), 0, 11); /* 0 is link, elseparator is 11 */  /*hbu trial */
+  cmd = new_command(buffer("thin_elseparator"), 20, 20, /* max num names, max num param */
+                    buffer("element"), buffer("none"), 0, 11); /* 0 is link, elseparator is 11 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
   
   
