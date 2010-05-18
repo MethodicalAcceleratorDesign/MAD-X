@@ -4,16 +4,26 @@
 #
 #######################################################################
 
+# C compiler
 CC=gcc
+# Fortran90 compiler
 f95=ifort
+# architecture 32/64bit
 ARCH=32
+# Debugging compiler flags
 DEBUG=NO
+# Online version - mostly SDDS IO
 ONLINE=YES
+# Memory leak search version
 MEMLEAKS=NO
+# profiling version
 PROFILE=NO
+# Piotr's pluggins "root" etc 
 PLUGIN_SUPPORT=NO
+# Alternative DA package in C++
 NTPSA=YES
 
+# Mac version
 ONMAC=NO
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
