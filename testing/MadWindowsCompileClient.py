@@ -37,16 +37,18 @@ class windowsReleaseClient:
         self.endTimeStr = ''# defined in remoteCompile()
         pass
     
-    def extractCVS(self,tag): # populate /user/nougaret/MAD-X-WINDOWS
+    def extractSVN(self,tag): # populate /user/nougaret/MAD-X-WINDOWS
 
         currentDir = os.getcwd()
 
         os.chdir('/user/nougaret/MAD-X-WINDOWS')
 
         shutil.rmtree('madX',ignore_errors=True) # clean-up
-        cmd = 'cvs -d :gserver:isscvs.cern.ch:/local/reps/madx '+\
-                  'checkout -r '+tag+' '+\
-                  'madX'
+        #cmd = 'cvs -d :gserver:isscvs.cern.ch:/local/reps/madx '+\
+        #          'checkout -r '+tag+' '+\
+        #          'madX'
+        cmd = 'svn co svn+ssh://svn.cern.ch/reps/madx/tags/' +\
+              tag +'/madX'+ ' madX'        
         print cmd
         os.system(cmd)
         os.chdir(currentDir) # back to initial location
@@ -195,8 +197,8 @@ class windowsReleaseClient:
             self.version = major + '.' + medium + '.' + minor
         else:
             raise('ill-formed release tag')
-        # first extract the CVS on NFS
-        self.extractCVS(tag)
+        # first extract the SVN on NFS
+        self.extractSVN(tag)
         # then remote invoke compilation on the Windows machine
         self.remoteCompile()
         # control the outcome of the compilation
