@@ -1,11 +1,12 @@
 #!/usr/bin/python
 import os
+import shutil
 
-tag = "madX_4-01-23"
+tag = "madX-4_01_23"
 
-currentdir = os.getcwd();
+currentDir = os.getcwd();
 os.chdir('/user/nougaret/MAD-X-WINDOWS')
 shutil.rmtree('madX',ignore_errors=True);
-cmd = 'svn co svn+ssh://svn.cern.ch/reps/madx/tags/' + tag
+cmd = 'svn co svn+ssh://svn.cern.ch/reps/madx/tags/' + tag +'/madX'+ ' madX'
 os.system(cmd)
 os.chdir(currentDir) # back to initial location
