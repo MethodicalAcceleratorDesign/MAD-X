@@ -110,6 +110,7 @@ cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\gxx11psc.c
 cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\rplot.c
 cl -c /Zm1000 -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\matchptcknobs.c
 
+ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\util.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\plot.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\sodd.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\gxx11ps.f90
@@ -124,7 +125,6 @@ ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IF
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\poisson.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\survey.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\trrun.f90
-ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\util.f90
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 %MADX%\orbf.f90
 REM ifort /c /names:lowercase /assume:underscore /fpp /O2 %MADX%\ptc_dummy.f90
 REM the above fails - ignored
