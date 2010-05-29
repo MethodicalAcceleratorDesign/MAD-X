@@ -1584,7 +1584,7 @@ void exec_command()
       }
       else if (strcmp(p->cmd_def->module, "ptc_read_errors") == 0)
       {
-        w_ptc_read_errors_();
+        pro_ptc_read_errors();
       }
       else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
       {

@@ -842,6 +842,7 @@ void pro_track(struct in_cmd*);
 void pro_twiss();
 void pro_ptc_twiss();
 void pro_ptc_create_layout();
+void pro_ptc_read_errors();
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);

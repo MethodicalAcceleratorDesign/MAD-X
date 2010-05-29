@@ -570,7 +570,7 @@ CONTAINS
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
              call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k0l ',key%list%b0)
+             call double_to_table('errors_dipole ', 'k0l ',bvk*key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
@@ -625,7 +625,7 @@ CONTAINS
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
              call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k0l ',key%list%b0)
+             call double_to_table('errors_dipole ', 'k0l ',bvk*key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
@@ -766,14 +766,14 @@ CONTAINS
              i=2*maxmul+2
              myfield(:) = zero
              do kk=1,nd+1
-                myfield(2*kk-1) = bvk*field(1,kk-1)
-                myfield(2*kk)   = bvk*field(2,kk-1)
+                myfield(2*kk-1) = field(1,kk-1)
+                myfield(2*kk)   = field(2,kk-1)
              enddo
              call vector_to_table('errors_field ', 'k0l ', i, myfield(1))
              myfield(:) = zero
              do kk=1,nd+1
-                myfield(2*kk-1) = bvk*key%list%k(kk)
-                myfield(2*kk)   = bvk*key%list%ks(kk)
+                myfield(2*kk-1) = key%list%k(kk)
+                myfield(2*kk)   = key%list%ks(kk)
              enddo
              call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
              call augment_count('errors_field ')
@@ -2255,7 +2255,7 @@ CONTAINS
     use name_lenfi
     implicit none
     integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
-    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab
+    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk
     character(name_len) name,name2
     type(fibre),pointer :: p
     logical(lp) :: overwrite
@@ -2267,6 +2267,7 @@ CONTAINS
          'k17sl ','k18sl ','k19sl ','k20sl '/)
 
     overwrite = get_value('ptc_read_errors ','overwrite ').ne.0
+    bvk=get_value('probe ','bv ')
 
     nfac(1)=1
     do i=2,maxmul
@@ -2320,6 +2321,10 @@ CONTAINS
                 a(k)=-ab*sin(tilt*k)+a(k)*cos(tilt*k)
              enddo
           endif
+          do k=1,maxmul
+             b(k)=bvk*b(k)
+             a(k)=bvk*a(k)
+          enddo
           do k=NMAX,1,-1
              if(b(k)/=zero) then
                 if(overwrite) then
