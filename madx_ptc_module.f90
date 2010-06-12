@@ -2267,7 +2267,7 @@ CONTAINS
     use name_lenfi
     implicit none
     integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
-    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk,bvk_conv(maxmul)
+    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk
     character(name_len) name,name2
     type(fibre),pointer :: p
     logical(lp) :: overwrite
@@ -2321,17 +2321,15 @@ CONTAINS
        tilt=-p%mag%p%tiltd
        if(pos/=0.and.p%mag%parent_fibre%dir==1) then
           if(p%mag%l/=zero) then
-             if(bvk.eq.-1) then
-                do k=1,maxmul
-                   b(k)=(-1)**(k+1)*b(k)
-                   a(k)=(-1)**k*a(k)
-                enddo
-             endif
              do k=1,maxmul
                 b(k)=b(k)/p%mag%l
                 a(k)=a(k)/p%mag%l
              enddo
           endif
+          do k=1,maxmul
+             b(k)=bvk*b(k)
+             a(k)=bvk*a(k)
+          enddo
           if(tilt/=zero) then
              do k=1,maxmul
                 ab=b(k)
