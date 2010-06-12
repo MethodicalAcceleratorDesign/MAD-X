@@ -863,7 +863,7 @@ CONTAINS
        if(code.eq.14) then
           key%magnet="hkicker"
           key%list%k(1)=(node_value('kick ')+node_value('chkick ')+fieldk(1)/div)
-       else if(code.eq.15) then
+      else if(code.eq.15) then
           key%magnet="kicker"
           key%list%k(1)=(node_value('hkick ')+node_value('chkick ')+fieldk(1)/div)
           key%list%ks(1)=(node_value('vkick ')+node_value('cvkick ')+fieldk(2)/div)
@@ -872,6 +872,18 @@ CONTAINS
           key%list%ks(1)=(node_value('kick ')+node_value('cvkick ')+fieldk(2)/div)
        else
           key%magnet="marker"
+       endif
+       i=2*maxmul+2
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             myfield(:) = zero
+             myfield(1)=-key%list%k(1)
+             myfield(2)=key%list%ks(1)
+             call string_to_table('errors_total ', 'name ',key%list%name)
+             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call augment_count('errors_total ')
+          endif
        endif
        key%tiltd=node_value('tilt ')
     case(17)
@@ -967,12 +979,12 @@ CONTAINS
        stop
     end select
 100 continue
-    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
+!    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
        do i=1,NMAX
           key%list%k(i)=bvk*key%list%k(i)
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo
-    endif
+!    endif
     call create_fibre(my_ring%end,key,EXCEPTION)
 
     if(advance_node().ne.0)  goto 10
@@ -2255,7 +2267,7 @@ CONTAINS
     use name_lenfi
     implicit none
     integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
-    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk
+    real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk,bvk_conv(maxmul)
     character(name_len) name,name2
     type(fibre),pointer :: p
     logical(lp) :: overwrite
@@ -2309,6 +2321,12 @@ CONTAINS
        tilt=-p%mag%p%tiltd
        if(pos/=0.and.p%mag%parent_fibre%dir==1) then
           if(p%mag%l/=zero) then
+             if(bvk.eq.-1) then
+                do k=1,maxmul
+                   b(k)=(-1)**(k+1)*b(k)
+                   a(k)=(-1)**k*a(k)
+                enddo
+             endif
              do k=1,maxmul
                 b(k)=b(k)/p%mag%l
                 a(k)=a(k)/p%mag%l
@@ -2321,10 +2339,6 @@ CONTAINS
                 a(k)=-ab*sin(tilt*k)+a(k)*cos(tilt*k)
              enddo
           endif
-          do k=1,maxmul
-             b(k)=bvk*b(k)
-             a(k)=bvk*a(k)
-          enddo
           do k=NMAX,1,-1
              if(b(k)/=zero) then
                 if(overwrite) then
