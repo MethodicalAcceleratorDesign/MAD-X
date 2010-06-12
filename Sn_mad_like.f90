@@ -634,7 +634,6 @@ CONTAINS
 
 
 
-
   SUBROUTINE  EL_0(S2,S1)
     implicit none
     type (EL_LIST),INTENT(OUT):: S2
@@ -656,7 +655,7 @@ CONTAINS
        DO I=1,NMAX
           S2%K(I)=zero;S2%KS(I)=zero
        ENDDO
-       do i=1,3
+       do i=1,3              ! needed???
           S2%ang(i)=zero
           S2%t(i)=zero
           S2%angi(i)=zero
@@ -677,8 +676,8 @@ CONTAINS
        s2%hgap=zero
        s2%h1=zero
        s2%h2=zero
-       s2%X_COL=zero
-       s2%Y_COL=zero
+       s2%X_COL=zero    !!!! missing !!!
+       s2%Y_COL=zero   !!!! missing !!!
        s2%thin_h_foc=zero
        s2%thin_v_foc=zero
        s2%thin_h_angle=zero
@@ -696,8 +695,8 @@ CONTAINS
        S2%method=metd
        s2%APERTURE_ON=my_false
        s2%APERTURE_KIND=0
-       S2%APERTURE_R(1)=absolute_aperture
-       S2%APERTURE_R(2)=absolute_aperture
+       S2%APERTURE_R(1)=absolute_aperture  !!! just in case !!!
+       S2%APERTURE_R(2)=absolute_aperture  !!! just in case !!!
        S2%APERTURE_X=absolute_aperture
        S2%APERTURE_Y=absolute_aperture
        s2%KILL_ENT_FRINGE=my_false
@@ -711,6 +710,78 @@ CONTAINS
 
     ENDIF
   END SUBROUTINE EL_0
+
+  !  SUBROUTINE  EL_0(S2,S1)
+  !    implicit none
+  !    type (EL_LIST),INTENT(OUT):: S2
+  !    INTEGER,INTENT(IN):: S1
+  !    INTEGER I
+  !
+  !    if(.not.setmad) then
+  !       w_p=0
+  !       w_p%nc=1
+  !       w_p%fc='((1X,a72))'
+  !       w_p%c(1) =  " Run the Set_mad routine first "
+  !       call write_e(-1)
+  !    endif
+  !
+  !    IF(S1==0) THEN
+  !       S2%ang=zero
+  !       S2%t=zero
+  !       S2%angi=zero
+  !       S2%ti=zero
+  !       S2%patchg=0
+  !       S2%L=zero
+  !       S2%LD=zero
+  !       S2%LC=zero
+  !       S2%TILT=zero
+  !       DO I=1,NMAX
+  !          S2%K(I)=zero;S2%KS(I)=zero
+  !       ENDDO
+  !       S2%T1=zero
+  !       S2%T2=zero
+  !       S2%B0=zero
+  !       S2%BSOL=zero
+  !       S2%volt=zero
+  !       S2%freq0=zero
+  !       S2%harmon=one
+  !       S2%DELTA_E=zero
+  !       S2%lag=zero
+  !       S2%KIND=0
+  !       S2%nmul=0
+  !       S2%method=metd
+  !       S2%nst=nstd
+  !       s2%NAME=' '
+  !       s2%VORNAME=' '
+  !       s2%file=' '
+  !       s2%file_rev=' '
+  !       s2%FINT=half
+  !       s2%hgap=zero
+  !       s2%h1=zero
+  !       s2%h2=zero
+  !       s2%hf=zero
+  !       s2%vf=zero
+  !       s2%ls=one
+  !       s2%thin_h_foc=zero
+  !       s2%thin_v_foc=zero
+  !       s2%thin_h_angle=zero
+  !       s2%thin_v_angle=zero
+  !       s2%APERTURE_ON=.FALSE.
+  !       s2%KILL_ENT_FRINGE=.FALSE.
+  !       s2%KILL_EXI_FRINGE=.FALSE.
+  !       s2%BEND_FRINGE=.FALSE.
+  !       s2%PERMFRINGE=.FALSE.
+  !       s2%DPHAS=ZERO
+  !       s2%dvds=ZERO
+  !       s2%PSI=ZERO
+  !       s2%N_BESSEL=0
+  !
+  !       s2%APERTURE_KIND=0
+  !       S2%APERTURE_R=absolute_aperture
+  !       S2%APERTURE_X=absolute_aperture
+  !       S2%APERTURE_Y=absolute_aperture
+  !    ENDIF
+  !  END SUBROUTINE EL_0
 
   !  DEFINING ELEMEMTS
 

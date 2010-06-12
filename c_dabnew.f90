@@ -565,12 +565,12 @@ contains
     logical(lp) incnda
     integer ind,ndanum,no,nv,ic,ipause,mypauses
     character(10) c,ccc
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     !
     no=nomax
     nv=nvmax
@@ -674,12 +674,12 @@ contains
     integer i,ind,l,ndanum,no,nv,ipause,mypauses
     integer,dimension(:)::ic
     character(10) c,ccc
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     !
     ind = 1
     do i=1,l
@@ -785,12 +785,12 @@ contains
     logical(lp) incnda
     integer ic,ind,ndanum,no,nv,ipause,mypauses
     character(10) c,ccc
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     !
     ind = 1
     if(ic.gt.0.and.ic.le.nda_dab) then
@@ -895,12 +895,12 @@ contains
     ccc='         '
     no=nomax
     nv=nvmax
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     !
     ind = 1
     if(ic.gt.0.and.ic.le.nda_dab) then
@@ -1002,12 +1002,12 @@ contains
     integer i,l,ipause,mypauses
     integer,dimension(:)::idal
     !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     do i=l,1,-1
        if(idal(i).le.nomax+2.or.idal(i).gt.nda_dab) then
           write(line,'(a38,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL(I),NDA = ',idal(i),nda_dab
@@ -1041,12 +1041,12 @@ contains
     !
     integer idal,ipause,mypauses
     !
-    if((.not.C_%STABLE_DA)) then
-       if(c_%watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
-       endif
-       return
-    endif
+    !    if((.not.C_%STABLE_DA)) then
+    !       if(c_%watch_user) then
+    !          write(6,*) "big problem in dabnew ", sqrt(crash)
+    !       endif
+    !       return
+    !    endif
     if(idal.le.nomax+2.or.idal.gt.nda_dab) then
        write(line,'(a35,i8,1x,i8)') 'ERROR IN ROUTINE DADAL, IDAL,NDA = ',idal,nda_dab
        ipause=mypauses(14,line)
@@ -2336,7 +2336,7 @@ contains
     if(ckon==zero) then
        if(check_da) then
           C_%STABLE_DA=.false.
-          c_%message='constant part zero in dacdi'
+          messagelost='constant part zero in dacdi'
           return
        else
           write(line,'(a38)')  'ERROR IN DACDI  CKON IS ZERO'
@@ -2379,7 +2379,7 @@ contains
     ipoa = idapo(ina)
     if(cc(ipoa)==zero) then
        if(check_da) C_%STABLE_DA=.false.
-       c_%message='constant part zero in dadic'
+       messagelost='constant part zero in dadic'
        return
     endif
     if(nomax.eq.1) then
@@ -2783,8 +2783,9 @@ contains
        !        1/(A0+P) = 1/A0*(1-(P/A0)+(P/A0)**2-...)
        if(a0.eq.0) then
           if(check_da) then
-             c_%message="a0.eq.0 for INV in dafun"
+             messagelost="a0.eq.0 for INV in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2806,8 +2807,9 @@ contains
        !        SQRT(A0+P) = SQRT(A0)*(1+1/2(P/A0)-1/8*(P/A0)**2+...)
        if(a0.le.0) then
           if(check_da) then
-             c_%message="a0.le.0 for SQRT in dafun"
+             messagelost="a0.le.0 for SQRT in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2831,8 +2833,9 @@ contains
        !        EXP(A0+P) = EXP(A0)*(1+P+P**2/2!+...)
        if(a0>hyperbolic_aperture) then
           if(check_da) then
-             c_%message="a0>hyperbolic_aperture for EXP in dafun"
+             messagelost="a0>hyperbolic_aperture for EXP in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2855,8 +2858,9 @@ contains
        !        LOG(A0+P) = LOG(A0) + (P/A0) - 1/2*(P/A0)**2 + 1/3*(P/A0)**3 - ...)
        if(a0.le.0) then
           if(check_da) then
-             c_%message="a0.le.0 for LOG in dafun"
+             messagelost="a0.le.0 for LOG in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2901,8 +2905,9 @@ contains
        !    elseif(cf.eq.'SINH') then
        if(a0>hyperbolic_aperture) then
           if(check_da) then
-             c_%message="a0>hyperbolic_aperture for SINH in dafun"
+             messagelost="a0>hyperbolic_aperture for SINH in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -2925,8 +2930,9 @@ contains
        !    elseif(cf.eq.'COSH') then
        if(a0>hyperbolic_aperture) then
           if(check_da) then
-             c_%message="a0>hyperbolic_aperture for COSH in dafun"
+             messagelost="a0>hyperbolic_aperture for COSH in dafun"
              C_%STABLE_DA=.false.
+             C_%check_stable=.false.
              call dadal1(iscr)
              call dadal1(inon)
              call dadal1(ipow)
@@ -3692,7 +3698,7 @@ contains
     if(ier.eq.132) then
        if(check_da) then
           C_%STABLE_DA=.false.
-          c_%message='ERROR IN ROUTINE DAINV, ier=132 in matinv'
+          messagelost='ERROR IN ROUTINE DAINV, ier=132 in matinv'
           call dadal(ml,ia)
           call dadal(ms,ia)
           return
@@ -3716,7 +3722,7 @@ contains
              write(6,*) " abs(prod) > c_100*epsmac in dainvt",abs(prod), c_100*epsmac
              if(check_da) then
                 C_%STABLE_DA=.false.
-                c_%message='ERROR IN ROUTINE DAINV, abs(prod).gt.c_100*epsmac '
+                messagelost='ERROR IN ROUTINE DAINV, abs(prod).gt.c_100*epsmac '
                 call dadal(ml,ia)
                 call dadal(ms,ia)
                 return

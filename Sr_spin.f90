@@ -53,29 +53,27 @@ module ptc_spin
   END INTERFACE
 
   INTERFACE TRACK_PROBE2
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_R  !#2  ! probe from node i1 to i2
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_P
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_R  !#2  ! probe from node i1 to i2 (R,xs,k,I1,I2)
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_P  ! Tracks probe from integer node i1 to i2 in state k
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_R  !#6 USING NODE1 TO NODE2 AS OBJECT
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P  ! (xs,k,fibre1,fibre2,node1,node2)
   END INTERFACE
 
   INTERFACE TRACK_PROBE
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_PROBE_spin12R  !#3  ! probe from FIBRE
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_PROBE_spin12P    !
+     MODULE PROCEDURE TRACK_LAYOUT_FLAG_PROBE_spin12P  ! (r,xS,k,fibre1,fibre2,node1,node2) ! integer fibre i1 to i2
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_R  !#6 USING NODE1 TO NODE2 AS OBJECT
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P  ! (xs,k,fibre1,fibre2,node1,node2)
   END INTERFACE
 
-  INTERFACE TRACK_NODE_PROBE                  ! track probe in a node t
+  INTERFACE TRACK_NODE_PROBE                  ! (C,XS,K)  track probe in a node t
      MODULE PROCEDURE TRACK_NODE_FLAG_PROBE_R   ! #1
      MODULE PROCEDURE TRACK_NODE_FLAG_PROBE_p   ! #1p
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_R  !#6 USING NODE1 TO NODE2 AS OBJECT
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P
   END INTERFACE
 
   INTERFACE TRACK_node_x                !
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_spinr_x  !#4 ! TRACK X THROUGH INTEGRATION_NODE T
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_spinp_x
+     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_spinp_x  !(T,x,k)
   END INTERFACE
 
   INTERFACE TRACK_node_v
@@ -90,12 +88,10 @@ module ptc_spin
 
 
   INTERFACE TRACK_probe_x
-     !     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spinr_x  ! fibre i1 to i2
-     !     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spinp_x
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_spin12r_x    !#7
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spin12p_x
+     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spin12p_x  ! (r,x,k,u,t, fibre1,fibre2,node1,node2)  integer routine
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_spint12r_x
-     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spint12p_x
+     MODULE PROCEDURE TRACK_LAYOUT_FLAG_spint12p_x  !(x,k,u,t, fibre1,fibre2,node1,node2)  pointer routine
   END INTERFACE
 
   INTERFACE FIND_ORBIT_x
@@ -2291,13 +2287,15 @@ contains
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE),optional, POINTER :: node1,node2
     TYPE (fibre),optional, POINTER :: fibre1,fibre2
-    TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2
+    TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2,last
     !    INTEGER,TARGET :: CHARGE
 
     !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
     !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
     CALL RESET_APERTURE_FLAG
+    nullify(n1)
+    nullify(n2)
 
 
     xs%u=my_false
@@ -2309,16 +2307,35 @@ contains
 
     c=>n1
 
+    if(associated(n2)) then
+       nullify(last)
+    else
+       if(n1%parent_fibre%parent_layout%closed) then
+          last=>n1%previous
+          n2  =>last
+       else
+          last=>n1%parent_fibre%parent_layout%t%end
+          n2  =>n1%parent_fibre%parent_layout%t%end
+       endif
+    endif
 
 
     DO  WHILE(.not.ASSOCIATED(C,n2))
 
        CALL TRACK_NODE_PROBE(C,XS,K)
+       if(.not.check_stable) exit
 
        C=>C%NEXT
     ENDDO
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    if(associated(last).and.check_stable) then
+       CALL TRACK_NODE_PROBE(last,XS,K)
+    endif
+
+    C_%STABLE_DA=.true.
+
+
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
   END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_t12_R
 
@@ -2328,13 +2345,15 @@ contains
     TYPE(INTERNAL_STATE) K
     TYPE (INTEGRATION_NODE),optional, POINTER :: node1,node2
     TYPE (fibre),optional, POINTER :: fibre1,fibre2
-    TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2
+    TYPE (INTEGRATION_NODE), POINTER :: C,n1,n2,last
     !    INTEGER,TARGET :: CHARGE
 
     !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
     !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
     CALL RESET_APERTURE_FLAG
+    nullify(n1)
+    nullify(n2)
 
 
     xs%u=my_false
@@ -2346,22 +2365,40 @@ contains
 
     c=>n1
 
+    if(associated(n2)) then
+       nullify(last)
+    else
+       if(n1%parent_fibre%parent_layout%closed) then
+          last=>n1%previous
+          n2  =>last
+       else
+          last=>n1%parent_fibre%parent_layout%t%end
+          n2  =>n1%parent_fibre%parent_layout%t%end
+       endif
+    endif
 
 
     DO  WHILE(.not.ASSOCIATED(C,n2))
 
        CALL TRACK_NODE_PROBE(C,XS,K)
+       if(.not.check_stable) exit
 
        C=>C%NEXT
     ENDDO
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    if(associated(last).and.check_stable) then
+       CALL TRACK_NODE_PROBE(last,XS,K)
+    endif
+
+    C_%STABLE_DA=.true.
+
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
   END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_t12_P
 
 
 
-  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_s12_R(R,xs,k,I1,I2) ! Tracks double from i1 to i2 in state k
+  SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_s12_R(R,xs,k,I1,I2) ! Tracks probe from integer node i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     type(probe), INTENT(INOUT):: XS
@@ -2370,7 +2407,7 @@ contains
     INTEGER J,i22
     TYPE (INTEGRATION_NODE), POINTER :: C
 
-    CALL RESET_APERTURE_FLAG
+    ! CALL RESET_APERTURE_FLAG
     xs%u=my_false
 
     CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
@@ -2388,11 +2425,15 @@ contains
 
        CALL TRACK_NODE_PROBE(C,XS,K)
 
+       if(.not.check_stable) exit
+
+
        C=>C%NEXT
        J=J+1
     ENDDO
+    C_%STABLE_DA=.true.
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
   END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_s12_R
 
@@ -2407,7 +2448,8 @@ contains
     TYPE (INTEGRATION_NODE), POINTER :: C
 
 
-    CALL RESET_APERTURE_FLAG
+    !    CALL RESET_APERTURE_FLAG
+
     xs%u=my_false
 
     CALL move_to_INTEGRATION_NODE( R%T,C,I1 )
@@ -2426,17 +2468,20 @@ contains
 
        CALL TRACK_NODE_PROBE(C,XS,K)  !,R%charge)
 
+       if(.not.check_stable) exit
+
        C=>C%NEXT
        J=J+1
     ENDDO
+    C_%STABLE_DA=.true.
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
 
   END SUBROUTINE TRACK_NODE_LAYOUT_FLAG_pr_s12_P
 
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_probe_spin12r(r,xS,k,fibre1,fibre2,node1,node2) ! fibre i1 to i2
+  SUBROUTINE TRACK_LAYOUT_FLAG_probe_spin12r(r,xS,k,fibre1,fibre2,node1,node2) ! integer fibre i1 to i2
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     type(probe),intent(INOUT) :: xs
@@ -2544,8 +2589,6 @@ contains
     xs%u=my_false
     XS=X
     if(present(t)) THEN
-       !    ALLOCATE(xs%lost_node)
-       !    t=>xs%lost_node
        nullify(t)
     ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
@@ -2555,7 +2598,6 @@ contains
     X=XS%X
     if(present(t)) THEN
        t=>xs%lost_node
-       ! deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
 
@@ -2586,6 +2628,7 @@ contains
     if(present(u)) u=xs%u
     if(present(t)) THEN
        t=>xs%lost_node
+
        !       deallocate(xs%lost_node)
        NULLIFY(xs%lost_node)
     ENDIF
@@ -2822,7 +2865,7 @@ contains
     real(dp),intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
 
-    if(.not.check_stable) return
+    !    if(.not.check_stable) return
     xs%u=my_false
     XS=X
 
@@ -2841,7 +2884,7 @@ contains
     type(real_8),intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
 
-    if(.not.check_stable) return
+    !    if(.not.check_stable) return
     xs%u=my_false
     XS%x=X
 
@@ -2961,8 +3004,12 @@ contains
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC,DS
 
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+       return
+    endif
 
-    if(xs%u) return
+    !    if(xs%u) return
     C%PARENT_FIBRE%MAG%P%DIR    => C%PARENT_FIBRE%DIR
     C%PARENT_FIBRE%MAG%P%beta0  => C%PARENT_FIBRE%beta0
     C%PARENT_FIBRE%MAG%P%GAMMA0I=> C%PARENT_FIBRE%GAMMA0I
@@ -3002,8 +3049,11 @@ contains
     ENDIF
 
     xs%u=.not.check_stable
-    if(xs%u) xs%lost_node=>c
-
+    if(xs%u) then
+       xs%lost_node=>c
+       lost_fibre=>c%parent_fibre
+       lost_node=>c
+    endif
   END SUBROUTINE TRACK_NODE_FLAG_probe_R
 
   SUBROUTINE TRACK_NODE_FLAG_probe_P(C,XS,K)
@@ -3013,7 +3063,14 @@ contains
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC
     type(real_8) ds
-    if(xs%u) return
+
+    !   if(xs%u) return
+
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+       return
+    endif
+
     C%PARENT_FIBRE%MAGp%P%DIR    => C%PARENT_FIBRE%DIR
     C%PARENT_FIBRE%MAGp%P%beta0  => C%PARENT_FIBRE%beta0
     C%PARENT_FIBRE%MAGp%P%GAMMA0I=> C%PARENT_FIBRE%GAMMA0I
@@ -3060,7 +3117,11 @@ contains
 
     call kill(ds)
     xs%u=.not.check_stable
-    if(xs%u) xs%lost_node=>c
+    if(xs%u) then
+       xs%lost_node=>c
+       lost_fibre=>c%parent_fibre
+       lost_node=>c
+    endif
 
   END SUBROUTINE TRACK_NODE_FLAG_probe_P
 
@@ -3807,6 +3868,8 @@ contains
     TYPE (integration_node), POINTER :: t
     logical(lp) APERTURE
     INTEGER TURNS0,trackflag
+
+    !    fixed_found=my_true
     !!    type(probe) xs
     if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
     !!    xs%x=zero
@@ -3836,6 +3899,7 @@ contains
     tiny=c_1d_40
     xdix0=c_1d4*DEPS_tracking
     NO1=1
+
     if(.not.present(STATE)) then
        IF(default%NOCAVITY) THEN
           !    ND1=2
@@ -3855,7 +3919,7 @@ contains
           w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
           call write_e(101)
        ENDIF
-    else
+    else   ! (.not.present(STATE)) t
        IF(STATE%NOCAVITY) THEN
           ND2=4
           STAT=STATE+only_4d0
@@ -3936,7 +4000,6 @@ contains
 
 
 
-
     ITEM=0
 3   continue
     ITEM=ITEM+1
@@ -3947,6 +4010,12 @@ contains
        !       trackflag=TRACK_flag(RING,X,LOC,STAT)
        !!       xs%x=x
        call TRACK_probe_X(Ring,x,stat,fibre1=fibre1,node1=node1)
+       if(.not.check_stable) then
+          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
+          c_%APERTURE_FLAG=APERTURE
+          return
+       endif
+       !     write(6,*) item,check_stable
        !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
        !!       x=xs%x
        !       if(trackflag/=0) then
@@ -3959,13 +4028,18 @@ contains
 
     mx=zero
     DO J=1,ND2
-
        Y=FIX
        Y(J)=FIX(J)+EPS
        DO I=1,TURNS0
           !          CALL TRACK(RING,Y,LOC,STAT)
           !!       xs%x=y
           call TRACK_probe_X(Ring,Y,stat,fibre1=fibre1,node1=node1)
+          if(.not.check_stable) then
+             messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking small rays around the guessed orbit "
+             !   fixed_found=my_false
+             c_%APERTURE_FLAG=APERTURE
+             return
+          endif
           !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
           !!       y=xs%x
           !          if(.not.check_stable) then
@@ -4038,19 +4112,23 @@ contains
     endif
 
     if(iteM>=MAX_FIND_ITER)  then
-       C_%stable_da=.FALSE.
-       IF(iteM==MAX_FIND_ITER+100) THEN
-          write(6,*) " Unstable in find_orbit without TPSA"
-       ELSE
-          write(6,*) " maximum number of iterations in find_orbit without TPSA"
-       ENDIF
+       !   C_%stable_da=.FALSE.
+       !      IF(iteM==MAX_FIND_ITER+100) THEN
+       !        write(6,*) " Unstable in find_orbit without TPSA"
+       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       xlost=fix
+       check_stable=my_false
+       !     ENDIF
        ITE=0
     endif
+    !   write(6,*) item,xdix,xdix0,tiny
 
     if(ite.eq.1)  then
        GOTO 3
 
     endif
+
+
     !    FIX(6)=FIX(6)+freq*turns0
     c_%APERTURE_FLAG=APERTURE
 

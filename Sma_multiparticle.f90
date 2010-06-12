@@ -500,6 +500,16 @@ CONTAINS
     type(three_d_info),intent(INOUT) ::  v
     TYPE(INTEGRATION_NODE),POINTER:: mag_in,mag_out
 
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+       return
+    endif
+
+    if(abs(x(1))+abs(x(3))>absolute_aperture) then
+       xlost=x
+       CHECK_STABLE=.false.
+    endif
+
     x=V%X
     reference_ray=V%reference_ray
 
@@ -554,8 +564,13 @@ CONTAINS
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
 
-    ! call cpu_time(ttime0)
-    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+    endif
+
+    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       xlost=x
        CHECK_STABLE=.false.
     endif
 
@@ -579,6 +594,9 @@ CONTAINS
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
        if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
     CASE(CASEP2)
+       !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
+       !       CHECK_STABLE=.false.
+       !    endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -714,6 +732,14 @@ CONTAINS
     logical(lp) CHECK_KNOB
     logical(lp), pointer,dimension(:)::AN,BN
 
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+    endif
+
+    if(abs(x(1))+abs(x(3))>absolute_aperture) then
+       xlost=x
+       CHECK_STABLE=.false.
+    endif
 
     !   T%PARENT_FIBRE%MAGP=K
     IF(K%PARA_IN ) KNOB=.TRUE.
@@ -732,6 +758,9 @@ CONTAINS
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
        if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
     CASE(CASEP2)
+       !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
+       !       CHECK_STABLE=.false.
+       !    endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)

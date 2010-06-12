@@ -2622,12 +2622,19 @@ contains
     TYPE (complextaylor) temp
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    real(dp) a0
     localmaster=master
-
     call ass(dasintt)
     call alloc(temp)
 
     temp%r=s1
+    a0=abs(temp%r)
+    if(a0>one) then
+       check_stable=.false.
+       stable_da=.false.
+       messagelost= " Not defined in dasintt of complex_taylor "
+    endif
+
     temp=asin(temp)
     dasintt=temp%r
     call kill(temp)
@@ -2662,12 +2669,21 @@ contains
     TYPE (complextaylor) temp
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
+    real(dp) a0
     localmaster=master
 
     call ass(dacostt)
     call alloc(temp)
 
     temp%r=s1
+
+    a0=abs(temp%r)
+    if(a0>one) then
+       check_stable=.false.
+       stable_da=.false.
+       messagelost= " Not defined in dacostt of complex_taylor "
+    endif
+
     temp=acos(temp)
     dacostt=temp%r
     call kill(temp)

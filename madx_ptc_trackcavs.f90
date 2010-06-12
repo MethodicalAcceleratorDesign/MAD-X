@@ -614,7 +614,7 @@ contains
 
                 call ANALYSE_APERTURE_FLAG(apertflag,why)
                 Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
-                Write(6,*) "Message: ",c_%message
+                Write(6,*) "Message: ",messagelost
                 write(whymsg,*) 'APERTURE error: ',why
                 call fort_warn('ptc_twiss: ',whymsg)
                 call seterrorflag(10,"ptc_twiss: ",whymsg);

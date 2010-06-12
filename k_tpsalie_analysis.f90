@@ -1252,6 +1252,7 @@ contains
     implicit none
     integer NO1,ND1,NP1,NDPT1
     LOGICAL(lp) log1,present_tpsa
+    nb_=0
     !    if(first_time) then
     !       first_time=.false.
     !       w_p=0
@@ -1378,6 +1379,7 @@ contains
     !    endif
 
     !    if(.not.first_time) then
+    nb_=0
     present_tpsa=lingyun_yang
     if(last_tpsa==1) then
        lingyun_yang=.true.

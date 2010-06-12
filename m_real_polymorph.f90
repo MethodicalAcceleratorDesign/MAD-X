@@ -2549,7 +2549,7 @@ contains
 
     select case(s1%kind)
     case(m1)
-       dlogt%r=log(s1%r)
+       dlogt%r=loge(s1%r)
        dlogt%kind=1
     case(m2)
        localmaster=master
@@ -2587,7 +2587,8 @@ contains
 
     select case(s1%kind)
     case(m1)
-       dsqrtt%r=SQRT(s1%r)
+       !       dsqrtt%r=SQRT(s1%r)
+       dsqrtt%r=root(s1%r)
        dsqrtt%kind=1
     case(m2)
        localmaster=master
@@ -2602,7 +2603,8 @@ contains
           dsqrtt%t= SQRT(varf1)
           master=localmaster
        else
-          dsqrtt%r= SQRT(S1%r)
+          !          dsqrtt%r= SQRT(S1%r)
+          dsqrtt%r= root(S1%r)
           dsqrtt%kind=1
        endif
     case default
@@ -4422,6 +4424,8 @@ contains
     s2%kind=1
     s2%r=zero
     s2%i=0
+    s2%g=0
+    s2%nb=0
     s2%s=one
 
   END SUBROUTINE allocpoly
@@ -5751,20 +5755,21 @@ contains
     implicit none
     TYPE (real_8) dasint
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (complextaylor) w
+    TYPE (taylor) w
     integer localmaster
 
     select case(s1%kind)
     case(m1)
-       dasint%r=asin(s1%r)
+       dasint%r=arcsin(s1%r)
+       !       dasint%r=asin(s1%r)
        dasint%kind=1
     case(m2)
        localmaster=master
        call ass(dasint)
        call alloc(w)
-       w%r=s1%t
+       w=s1%t
        w= asin(w)
-       dasint%t=w%r
+       dasint%t=w
        call kill(w)
        master=localmaster
     case(m3)
@@ -5773,9 +5778,9 @@ contains
           call ass(dasint)
           call alloc(w)
           call varfk1(S1)
-          w%r=varf1
+          w=varf1
           w= asin(w)
-          dasint%t=w%r
+          dasint%t=w
           call kill(w)
           master=localmaster
        else
@@ -5790,20 +5795,20 @@ contains
     implicit none
     TYPE (real_8) dacost
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (complextaylor) w
+    TYPE (taylor) w
     integer localmaster
 
     select case(s1%kind)
     case(m1)
-       dacost%r=acos(s1%r)
+       dacost%r=arccos(s1%r)
        dacost%kind=1
     case(m2)
        localmaster=master
        call ass(dacost)
        call alloc(w)
-       w%r=s1%t
+       w=s1%t
        w= acos(w)
-       dacost%t=w%r
+       dacost%t=w
        call kill(w)
        master=localmaster
     case(m3)
@@ -5812,9 +5817,9 @@ contains
           call ass(dacost)
           call alloc(w)
           call varfk1(S1)
-          w%r=varf1
+          w=varf1
           w= acos(w)
-          dacost%t=w%r
+          dacost%t=w
           call kill(w)
           master=localmaster
        else
@@ -6272,9 +6277,16 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
+       if(nb_==0) then
+          varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
+       elseif(s2%nb==nb_) then
+          varf1=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
+       else
+          varf1=S2%R
+       endif
     else ! Not a knob
-       varf1=(/S2%R,zero/).var.0
+       stop 333
+       varf1=(/S2%R,zero/).var.0  ! this is a buggy line never used
     endif
 
 
@@ -6286,9 +6298,16 @@ contains
     type (real_8),INTENT(IN)::  S2
 
     if(knob) then
-       varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
+       if(nb_==0) then
+          varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp)
+       elseif(s2%nb==nb_) then
+          varf2=(/S2%R,S2%S/).var.(s2%i+npara_fpp-s2%g+1)
+       else
+          varf2=S2%R
+       endif
     else ! Not a knob
-       varf2=(/S2%R,zero/).var.0
+       stop 334
+       varf2=(/S2%R,zero/).var.0   ! this is a buggy line never used
     endif
 
 

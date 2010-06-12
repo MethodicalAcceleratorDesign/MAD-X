@@ -28,7 +28,7 @@ MODULE S_DEF_KIND
   PRIVATE NEWFACER,NEWFACEP
   PRIVATE EDGE_TRUE_PARALLELR,EDGE_TRUE_PARALLELP
 
-  PRIVATE ZEROR_KTK,ZEROP_KTK,ZEROR_STREX,ZEROP_STREX,ZEROR_CAV4,ZEROP_CAV4
+  PRIVATE ZEROR_KTK,ZEROP_KTK,ZEROR_STREX,ZEROP_STREX,ZEROR_CAV4,ZEROP_CAV4,ZEROr_enge,ZEROp_enge
   PRIVATE ZEROR_KICKT3,ZEROP_KICKT3
   PRIVATE ALLOCKTK,KILLKTK
   PRIVATE GETMATR,GETMATD !,GETMAT
@@ -130,6 +130,7 @@ MODULE S_DEF_KIND
   private ZEROr_DKD2,ZEROp_DKD2
   !include "def_all_kind.f90"
   ! New home for element and elementp
+  integer, parameter :: N_ENGE=5
 
   INTERFACE TRACK_SLICE
      MODULE PROCEDURE INTER_CAV4
@@ -488,6 +489,8 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE ZEROP_PANCAKE                  ! need upgrade
      MODULE PROCEDURE ZEROR_HE22
      MODULE PROCEDURE ZEROP_HE22
+     MODULE PROCEDURE ZEROr_enge
+     MODULE PROCEDURE ZEROp_enge
   END INTERFACE
 
 
@@ -10823,16 +10826,16 @@ contains
        if(ASSOCIATED(EL%RLX)) then
           deallocate(EL%RLX)
        endif
-       if(ASSOCIATED(EL%dx)) then
-          deallocate(EL%dx)
-       endif
-       if(ASSOCIATED(EL%dy)) then
-          deallocate(EL%dy)
-       endif
+       !       if(ASSOCIATED(EL%dx)) then
+       !          deallocate(EL%dx)
+       !       endif
+       !       if(ASSOCIATED(EL%dy)) then
+       !          deallocate(EL%dy)
+       !       endif
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%dx)
-       NULLIFY(EL%dy)
+       !       NULLIFY(EL%dx)
+       !       NULLIFY(EL%dy)
        NULLIFY(EL%F)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
@@ -10898,17 +10901,17 @@ contains
           ENDDO
           deallocate(EL%RLX)
        endif
-       if(ASSOCIATED(EL%dx)) then
-          deallocate(EL%dx)
-       endif
-       if(ASSOCIATED(EL%dy)) then
-          deallocate(EL%dy)
-       endif
+       !       if(ASSOCIATED(EL%dx)) then
+       !          deallocate(EL%dx)
+       !       endif
+       !       if(ASSOCIATED(EL%dy)) then
+       !          deallocate(EL%dy)
+       !       endif
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%dx)
-       NULLIFY(EL%dy)
+       !       NULLIFY(EL%dx)
+       !       NULLIFY(EL%dy)
        NULLIFY(EL%MATX)
        NULLIFY(EL%MATY)
        NULLIFY(EL%LX)
@@ -13516,64 +13519,68 @@ contains
     CALL KILL(A,3)
   END SUBROUTINE DRIFTP_HE
 
-  !  SUBROUTINE computeR_f(EL,X,Z,DA,B,A)
-  !    IMPLICIT NONE
-  !    TYPE(HELICAL_DIPOLE), INTENT(INOUT)::EL
-  !    real(dp),  INTENT(IN)::X(6),Z
-  !    real(dp),  INTENT(INOUT)::DA(3,3),B(3),A(2)
-  !    REAL(DP) R2,DF,AR,PHIR,PHIZ,PHASE ,DFR,DFR2,co,si,F,FR
-  !    INTEGER I
-  !
-  !    R2=X(1)**2+X(3)**2
-  !
-  !    F=ONE
-  !    DF=ONE
-  !    DFR=ZERO
-  !    DFR2=zero
-  !
-  !    DO I=0,EL%N_BESSEL-1
-  !     DF=DF*EL%FREQ**2/FOUR/(I+ONE)/(I+TWO)
-  !
-  !      DFR=DFR+DF*TWO*(I+ONE)
-  !      DFR2=DFR2+DF*TWO*(I+ONE)*(TWO*I+ONE)
-  !
-  !     DF=DF*R2
-  !     F=F+DF
-  !    ENDDO
-  !
-  !    PHASE=EL%FREQ*Z+EL%PHAS
-  !    CO=COS(PHASE)
-  !    SI=SIN(PHASE)
-  !    PHIR=EL%BN(1)*X(1)*SI +EL%AN(1)*X(3)*CO
-  !    AR=EL%FREQ*F*PHIR
-  !    A(1)=X(1)*AR
-  !    A(2)=X(3)*AR
-  !
-  !    DA(1,1)=EL%FREQ*F*(EL%BN(1)*X(1)*SI +PHIR) &
-  !            +X(1)**2*EL%FREQ*PHIR*DFR
-  !    DA(1,2)=EL%FREQ*F*(EL%AN(1)*X(1)*CO ) &
-  !            +X(1)*X(3)*EL%FREQ*PHIR*DFR
-  !    DA(2,1)=EL%FREQ*F*(EL%BN(1)*X(1)*SI ) &
-  !            +X(1)*X(3)*EL%FREQ*PHIR*DFR
-  !    DA(2,2)=EL%FREQ*F*(EL%AN(1)*X(3)*CO +PHIR) &
-  !            +X(3)**2*EL%FREQ*PHIR*DFR
-  !    PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
-  !
-  !    DA(1,3)=-EL%FREQ**2*PHIZ*F*X(1)
-  !    DA(2,3)=-EL%FREQ**2*PHIZ*F*X(3)
-  !
-  !    DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
-  !    DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
-  !
-  !    B(1)=DA(3,2)-DA(2,3)
-  !    B(2)=DA(1,3)-DA(3,1)
-  !    B(3)=DA(2,1)-DA(1,2)
-  !
-  !
-  !
-  !  END SUBROUTINE computeR_f
+!!!!   Enge function
+  SUBROUTINE enge_f(EL,z0)
+    IMPLICIT NONE
+    type(enge), intent(inout) :: el
+    real(dp), intent(inout) :: z0
+    type(my_1D_taylor)z,dz
+    integer i
 
+    EL%F=zero
+    z=z0
+    dz=one
+    z%a(1)=one
 
+    do i=0,N_ENGE
+       EL%F=EL%F+EL%A(I)*DZ
+       dz=dz*(Z-EL%L/TWO)/EL%D
+    enddo
+    EL%F=ONE/(ONE+EXP(EL%F))
+  end subroutine enge_f
 
+  SUBROUTINE ZEROr_enge(EL,I)
+    IMPLICIT NONE
+    TYPE(ENGE), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%D)) then
+          deallocate(EL%D)
+          deallocate(EL%A)
+          deallocate(EL%NBESSEL)
+          deallocate(EL%F)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%D)
+       NULLIFY(EL%NBESSEL)
+       NULLIFY(EL%A)
+       NULLIFY(EL%F)
+    endif
+
+  END SUBROUTINE ZEROr_enge
+
+  SUBROUTINE ZEROP_enge(EL,I)
+    IMPLICIT NONE
+    TYPE(ENGEP), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !    integer k
+    IF(I==-1) THEN
+       if(ASSOCIATED(EL%D)) then
+          deallocate(EL%D)
+          deallocate(EL%A)
+          deallocate(EL%NBESSEL)
+          deallocate(EL%F)
+       endif
+    elseif(i==0)       then          ! nullifies
+
+       NULLIFY(EL%D)
+       NULLIFY(EL%NBESSEL)
+       NULLIFY(EL%A)
+       NULLIFY(EL%F)
+    endif
+
+  END SUBROUTINE ZEROP_enge
 
 END MODULE S_DEF_KIND

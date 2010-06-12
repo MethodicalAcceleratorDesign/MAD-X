@@ -508,7 +508,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE
+    INTEGER I,SCRATCHFILE, MF
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
@@ -516,7 +516,7 @@ contains
     type(damap) id
     type(gmap) g
     TYPE(TAYLOR)t
-    real(dp) epsf,epsr,epsnow
+    real(dp) epsf,epsr,epsnow,gam(2)
     !    EPSF=.0001
     epsr=abs(epsf)
 
@@ -553,6 +553,13 @@ contains
 
     CALL TRACK(R,Y,1,+STATE)
     NORM=Y
+    gam(1)=(norm%a_t%v(2).sub.'1')**2+(norm%a_t%v(2).sub.'01')**2
+    gam(2)=(norm%a_t%v(4).sub.'001')**2+(norm%a_t%v(4).sub.'0001')**2
+    write(6,*) "  Gamma= ",GAM
+    !      CALL KANALNUMMER(MF)
+    OPEN(UNIT=1111,FILE='GAMMA.TXT')
+    WRITE(1111,*) "  Gamma= ",GAM
+
     write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2)
 
     eq(1)=       ((NORM%dhdj%v(1)).par.'0000')-targ(1)
@@ -597,6 +604,7 @@ contains
     CALL KILL(t)
 
     g=g.oo.(-1)
+    tpsafit=zero
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -724,6 +732,7 @@ contains
     CALL KILL(t)
 
     g=g.oo.(-1)
+    tpsafit=zero
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -750,6 +759,220 @@ contains
 
   end subroutine lattice_fit_CHROM_gmap
 
+  subroutine lattice_fit_CHROM_gmap2(R,my_state,EPSF,POLY,NPOLY,TARG,np,n_extra,mf)
+    IMPLICIT NONE
+    integer ipause, mypause
+    TYPE(layout),target, intent(inout):: R
+    TYPE(POL_BLOCK), intent(inout),dimension(:)::POLY
+    INTEGER, intent(in):: NPOLY,np
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6),co
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer ::  neq,no=3,nt,j,it,n_extra,mf
+    type(damap) id
+    type(vecresonance) vr
+    type(pbresonance) fr
+    type(gmap) g
+    TYPE(TAYLOR)t
+    real(dp) epsf,epsr,epsnow,CHROM(2)
+    integer, allocatable:: res(:,:),jt(:),je(:)
+    real(dp), allocatable :: mat(:,:),v0(:)
+    integer kb,kbmax,kpos,npi,ier
+
+
+    neq=2
+    allocate(res(n_extra,4))
+    allocate(jt(5))
+    res=0
+    do i=1,n_extra
+       read(mf,*) res(i,:)
+    enddo
+    !    EPSF=.0001
+    epsr=abs(epsf)
+    neq=neq+2*n_extra
+
+    allocate(eq(neq))
+
+    nt=neq+np
+    allocate(mat(nt,nt),v0(nt))
+
+    kbmax=0
+
+    DO I=1,NPOLY
+       if(POLY(i)%nb>kbmax)  kbmax= POLY(i)%nb
+    ENDDO
+    SET_TPSAFIT=.FALSE.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+
+
+    it=0
+100 continue
+    it=it+1
+    mat=zero
+    v0=zero
+    do i=1,np
+       mat(i,i)=one
+    enddo
+
+    do kb=1,kbmax
+       STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
+
+       DO I=1,NPOLY
+          if(POLY(i)%nb==kb) then
+             npi=POLY(i)%np
+             kpos=POLY(i)%g-1
+             exit
+          endif
+       ENDDO
+
+       write(6,*) " np in batch ",kb," = ",npi
+       !         pause 1
+
+       CLOSED(:)=zero
+
+       CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+       write(6,*) "closed orbit ", CHECK_STABLE
+       write(6,*) CLOSED
+
+
+       CALL INIT(STATE,no,NPi,BERZ)
+       nb_=kb
+       CALL ALLOC(NORM)
+       CALL ALLOC(Y)
+       CALL ALLOC(EQ)
+       call alloc(id)
+       call alloc(vr)
+       call alloc(fr)
+
+       id=1
+       Y=CLOSED+id
+
+       CALL TRACK(R,Y,1,+STATE)
+       NORM=Y
+       vr=norm%a%nonlinear
+       fr=norm%a%pb
+       !    call print(vr%cos%v(2),6)
+       !    call print(vr%sin%v(2),6)
+       !    pause 1
+       ! call print(fr%cos,6)
+       ! call print(fr%sin,6)
+       ! pause 2
+
+
+       write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2), CHECK_STABLE
+       CHROM(1)=(NORM%dhdj%v(1)).SUB.'00001'
+       CHROM(2)=(NORM%dhdj%v(2)).SUB.'00001'
+       write(6,*) " CHROM ",CHROM
+
+       eq(1)=       ((NORM%dhdj%v(1)).par.'00001')-targ(1)
+       eq(2)=       ((NORM%dhdj%v(2)).par.'00001')-targ(2)
+       do i=1,n_extra
+          jt=0
+          jt(1:4)=res(i,:)
+          jt(1)=jt(1)-1
+          eq(2+2*i-1)=       ((vr%cos%v(2)).par.jt)
+          eq(2+2*i)=       ((vr%sin%v(2)).par.jt)
+       enddo
+
+       epsnow=zero
+       do i=1,neq
+          epsnow=abs(eq(i))+epsnow
+          if(kb==1) then
+             co=eq(i)
+             if(i<=2) then
+                co=co+targ(i)
+             endif
+             write(6,*) i,co
+          endif
+       enddo
+       write(6,*) "epsnow ", epsnow
+       ipause=mypause(123321)
+       call kanalnummer(SCRATCHFILE)
+       OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+       rewind scratchfile
+       allocate(je(c_%nv))
+       !    write(6,*) nt,neq,np,kpos,npi
+       je=0
+       do i=1,neq
+          eq(i)=eq(i)<=c_%npara
+          v0(i+np)=-(eq(i).sub.'0')
+          do j=1,npi
+             je(j)=1
+             co=eq(i).sub.je
+             mat(np+i,j+kpos)=co
+             mat(j+kpos,np+i)=co
+             je(j)=0
+          enddo
+       enddo
+       deallocate(je)
+       do i=1,neq
+          call daprint(eq(i),scratchfile)
+       enddo
+       close(SCRATCHFILE)
+       CALL KILL(NORM)
+       CALL KILL(Y)
+       CALL KILL(id)
+       CALL KILL(vr)
+       CALL KILL(fr)
+       CALL KILL(EQ)
+       !    pause 888
+    enddo ! kbmax
+    write(6,*) "Iteration # ",it
+
+    !    pause 2000
+    !    do i=1,nt
+    !    do j=1,nt
+    !    if(mat(i,j)/=zero) write(6,*) i,j,mat(i,j)
+    !    enddo
+    !    enddo
+    call  matinv(mat,mat,nt,nt,ier)
+    if(ier/=0 ) then
+       write(6,*) ier
+       write(6,*) " inversion error "
+
+       stop
+    endif
+    !    pause 2001
+
+    v0=matmul(mat,v0)
+    tpsafit=zero
+    tpsafit(1:nt)=v0
+
+    SET_TPSAFIT=.true.
+
+    DO I=1,NPOLY
+       R=POLY(i)
+    ENDDO
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(mat)
+    deallocate(eq)
+    deallocate(res)
+    deallocate(jt)
+
+  end subroutine lattice_fit_CHROM_gmap2
+
   subroutine lattice_fit_CHROM_gmap1(R,my_state,EPSF,POLY,NPOLY,TARG,NP,n_extra,mf)
     IMPLICIT NONE
     integer ipause, mypause
@@ -773,6 +996,7 @@ contains
     real(dp) epsf,epsr,epsnow,CHROM(2)
     integer, allocatable:: res(:,:),jt(:)
 
+    neq=2
 
     allocate(res(n_extra,4))
     allocate(jt(5))
@@ -788,9 +1012,9 @@ contains
     nt=neq+np
     STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
 
-    CALL INIT(STATE,no,NP,BERZ)
+    !    CALL INIT(STATE,no,NP,BERZ)
 
-    SET_TPSAFIT=.FALSE.
+    !    SET_TPSAFIT=.FALSE.
 
     DO I=1,NPOLY
        R=POLY(i)
@@ -901,6 +1125,7 @@ contains
 
     !    write(6,*) " more "
     !    read(5,*) more
+    ipause=mypause(777)
     if(it>=max_fit_iter) goto 101
     if(epsnow<=epsr) goto 102
     GOTO 100
@@ -925,7 +1150,7 @@ contains
     real(dp) CLOSED(6)
     TYPE(INTERNAL_STATE), intent(IN):: my_STATE
     TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE
+    INTEGER I,SCRATCHFILE, MF
     TYPE(TAYLOR), allocatable:: EQ(:)
     TYPE(REAL_8) Y(6)
     TYPE(NORMALFORM) NORM
@@ -933,7 +1158,7 @@ contains
     type(damap) id
     type(gmap) g
     TYPE(TAYLOR)t
-    real(dp) epsf,epsr,epsnow,tune(2),CHROM(2)
+    real(dp) epsf,epsr,epsnow,tune(2),CHROM(2),gam(2)
     !    EPSF=.0001
     epsr=abs(epsf)
 
@@ -970,6 +1195,13 @@ contains
 
     CALL TRACK(R,Y,1,+STATE)
     NORM=Y
+    gam(1)=(norm%a_t%v(2).sub.'1')**2+(norm%a_t%v(2).sub.'01')**2
+    gam(2)=(norm%a_t%v(4).sub.'001')**2+(norm%a_t%v(4).sub.'0001')**2
+    write(6,*) "  Gamma= ",GAM
+    !      CALL KANALNUMMER(MF)
+    OPEN(UNIT=1111,FILE='GAMMA.TXT')
+    WRITE(1111,*) "  Gamma= ",GAM
+
     write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2), CHECK_STABLE
     tune(1)=(NORM%dhdj%v(1)).SUB.'0000'
     tune(2)=(NORM%dhdj%v(2)).SUB.'0000'
@@ -1210,13 +1442,15 @@ contains
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
     TYPE (fibre), POINTER :: C
-    logical(lp) APERTURE,c_da
+    logical(lp)  c_da,s_da
     INTEGER TURNS0
-    c_%stable_da=.true.
+    s_da=c_%stable_da
     c_da=c_%check_da
+    !   APERTURE=c_%APERTURE_FLAG
+
+    !  c_%APERTURE_FLAG=.false.
+    c_%stable_da=.true.
     c_%check_da=.true.
-    APERTURE=c_%APERTURE_FLAG
-    c_%APERTURE_FLAG=.false.
     TURNS0=1
     freq=zero
     IF(PRESENT(TURNS)) TURNS0=TURNS
@@ -1341,6 +1575,7 @@ contains
           w_p%nc=1
           w_p%fc='((1X,a72))'
           write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",1
+          messagelost(len_trim(messagelost)+1:255)=" -> Lost in Fixed Point Searcher "
           call write_i
 
           return
@@ -1394,7 +1629,10 @@ contains
     CALL KILL(SXI)
     CALL KILL(IS)
     c_%check_da=c_da
-    c_%APERTURE_FLAG=APERTURE
+    !  c_%APERTURE_FLAG=APERTURE
+    c_%stable_da=s_da
+
+    !  write(6,*) " 2 ",APERTURE,APERTURE_FLAG
 
   END SUBROUTINE FIND_ORBIT_LAYOUT
 
@@ -1428,6 +1666,7 @@ contains
        else
           call FIND_ORBIT_LAYOUT(RING,FIX,LOC,STATE,TURNS=TURNS0)
        endif
+       c_%APERTURE_FLAG=APERTURE
        return
     endif
 
@@ -1529,13 +1768,11 @@ contains
 
     DO I=1,TURNS0
        !       CALL TRACK(RING,X,LOC,STAT)
-       trackflag=TRACK_flag(RING,X,LOC,STAT)
-       if(trackflag/=0) then
-          !          CALL RESET_APERTURE_FLAG
-          !          c_%APERTURE_FLAG=APERTURE
-          !          write(6,*) " Unstable in find_orbit without TPSA"
-          !          return
-          ITEM=MAX_FIND_ITER+100
+       call TRACK(RING,X,LOC,STAT)
+       if(.not.check_stable) then
+          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
+          c_%APERTURE_FLAG=APERTURE
+          return
        endif
        !       if(.not.check_stable) then
        !          w_p=0
@@ -1558,15 +1795,12 @@ contains
        Y(J)=FIX(J)+EPS
        DO I=1,TURNS0
           CALL TRACK(RING,Y,LOC,STAT)
-          !          if(.not.check_stable) then
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='((1X,a72))'
-          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
-          !             call write_i
-
-          !             return
-          !          endif
+          if(.not.check_stable) then
+             messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking small rays around the guessed orbit "
+             !   fixed_found=my_false
+             c_%APERTURE_FLAG=APERTURE
+             return
+          endif
        ENDDO
        y(6)=y(6)-freq*turns0
 
@@ -1630,12 +1864,13 @@ contains
     endif
 
     if(iteM>=MAX_FIND_ITER)  then
-       C_%stable_da=.FALSE.
-       IF(iteM==MAX_FIND_ITER+100) THEN
-          write(6,*) " Unstable in find_orbit without TPSA"
-       ELSE
-          write(6,*) " maximum number of iterations in find_orbit without TPSA"
-       ENDIF
+       !   C_%stable_da=.FALSE.
+       !      IF(iteM==MAX_FIND_ITER+100) THEN
+       !        write(6,*) " Unstable in find_orbit without TPSA"
+       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       xlost=fix
+       check_stable=my_false
+       !     ENDIF
        ITE=0
     endif
 
@@ -2938,13 +3173,13 @@ contains
        P%MAG%p%aperture%r    = R
        P%MAG%p%aperture%x    = X
        P%MAG%p%aperture%y    = y
-       P%MAG%p%aperture%x    = dX
-       P%MAG%p%aperture%y    = dy
+       P%MAG%p%aperture%dx    = dX
+       P%MAG%p%aperture%dy    = dy
        P%MAGP%p%aperture%r    = R
        P%MAGP%p%aperture%x    = X
        P%MAGP%p%aperture%y    = y
-       P%MAGP%p%aperture%x    = dX
-       P%MAGP%p%aperture%y    = dy
+       P%MAGP%p%aperture%dx    = dX
+       P%MAGP%p%aperture%dy    = dy
     endif
 
   end SUBROUTINE assign_one_aperture
@@ -3231,6 +3466,118 @@ contains
 
   end SUBROUTINE dyn_aper
 
+
+
+  SUBROUTINE dyn_aperalex(L,x_in,del_in,dx,dlam,pos,nturn,ite,state,mf,targ_tune,fixp)
+    IMPLICIT NONE
+    type(layout),target, intent(inout) :: L
+    real(dp) x(6)
+    REAL(DP) x_in,del_in,closed(6),r(6),rt(6),targ_tune(2)
+    REAL(DP) lamT,lams,lamu,dlam,DLAMT,DX,ang,ang_in,ang_out
+    integer pos,nturn,i,st,ite,ic,mf,n_in,j_in
+    TYPE(INTERNAL_STATE) STATE
+    logical(lp) fixp
+    !
+    !    TYPE(REAL_8) Y(6)
+    !    TYPE(DAMAP) ID
+    !    TYPE(NORMALFORM) NORM
+
+    closed=zero
+    !    STATE=STATE+NOCAVITY0
+
+    !    if(state%nocavity)
+    closed(5)=del_in
+    if(fixp) then
+       CALL FIND_ORBIT(L,CLOSED,pos,STATE,c_1d_5)
+       write(6,*) "closed orbit "
+       write(6,*) CLOSED
+    else
+       closed(1:4)=zero
+       closed(6)=zero
+    endif
+    !    write(mf,201) closed
+    n_in=1
+    ang_in=pi/four
+    ang_out=pi/four
+    ang= (ang_out-ang_in)/n_in
+    lamt=one
+    j_in=0
+    !  do j_in=0,n_in
+
+    x=zero
+    x(1)=x_in*cos(j_in*ang+ang_in)
+    x(3)=x_in*sin(j_in*ang+ang_in)
+    !       x(5)=del_in
+
+
+
+    r=zero;rt=zero;
+    lams=zero
+    lamu=ZERO
+
+    DLAMT=DX
+
+    !    lamt=ONE
+    ic=0
+    do while(DLAMT>dlam.and.ic<ite)
+
+       ic=ic+1
+       R=ZERO;
+       r(1:4)=lamt*x(1:4)
+       if(state%nocavity) then
+          if(fixp) then
+             rt=r+closed
+          else
+             rt(1:4)=r(1:4)
+             rt(6)=zero
+             rt(5)=del_in
+          endif
+       else
+          if(fixp) then
+             rt=r+closed
+             rt(5)=rt(5)+del_in
+          else
+             rt=r
+             rt(5)=rt(5)+del_in
+          endif
+       endif
+
+       !   write(6,*) rt
+       do i=1,nturn
+          st=track_flag(L,rt,pos,state)
+          if(st/=0) exit
+       enddo
+       !   write(6,*) i,check_stable
+       !   write(6,*) rt
+       !   pause
+       if(st/=0) then
+          lamu=lamt
+          lamt=(lams+lamt)/two
+          !  write(mf,*) "unstable ",lamt
+
+       else
+          lams=lamt
+          IF(LAMU<DX) THEN
+             lamt=DX+lamt
+          ELSE
+             lamt=(lamu+lamt)/two
+          ENDIF
+          !  write(mf,*) "stable ",lamt
+
+       endif
+       DLAMT=sqrt(x(1)**2+x(3)**2)*ABS(LAMU-LAMS)
+       !              write(mf,*) "dlamt ",dlamt,sqrt(x(1)**2+x(3)**2)
+
+    enddo
+    write(6,*) ic,lamS*x(1)   !,lamS*x(3),(j_in*ang+ang_in)/twopi
+
+    write(mf,202) targ_tune,lamS*x(1)      !,lamS*x(3),lamS*x(1)+closed(1),lamS*x(3)+closed(3),DLAMT
+    lamt=lamt*0.8_dp
+    !    enddo
+201 FORMAT(6(1X,D18.11))
+202 FORMAT(3(1X,D18.11))
+
+  end SUBROUTINE dyn_aperalex
 
 
 

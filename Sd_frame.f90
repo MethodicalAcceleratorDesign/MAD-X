@@ -447,16 +447,18 @@ CONTAINS
     real(dp), INTENT(IN):: ANG(3)
     INTEGER, INTENT(IN):: I
     real(dp), optional, INTENT(IN):: basis(3,3)
-    REAL(DP) AT(3)
+    REAL(DP) AT(3),AA(3),ent0(3,3)
     INTEGER J
 
     ! PTC order X first, than y and finally Z , here defined on global variables
+    aa=a
+    ent0=ent
     IF(I==1) THEN
-       CALL GEO_ROT(ENT,ENT,A,A,ANG,basis)
+       CALL GEO_ROT(ENT0,ENT,Aa,A,ANG,basis)
     ELSE
        DO J=1,3
           AT=ZERO;AT(J)=-ANG(J);
-          CALL GEO_ROT(ENT,ENT,A,A,AT,basis)
+          CALL GEO_ROT(ENT0,ENT,Aa,A,AT,basis)
        ENDDO
     ENDIF
 
@@ -468,13 +470,14 @@ CONTAINS
     implicit none
     real(dp), INTENT(INOUT):: ENT(3,3),exi(3,3)
     real(dp), INTENT(IN):: ANG(3)
-    real(dp) v(3)
+    real(dp) v(3),vv(3)
     real(dp), optional, INTENT(IN):: basis(3,3)
 
 
     v=zero
+    vv=zero
 
-    CALL GEO_ROT(ENT,Exi,V,V,ANG,basis)    !A_X2,A_X1,A_xy,
+    CALL GEO_ROT(ENT,Exi,VV,V,ANG,basis)    !A_X2,A_X1,A_xy,
 
   END SUBROUTINE GEO_ROTAB_no_vec
 
@@ -762,10 +765,11 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: ENTL(3,3), ENTB(3,3)
     REAL(DP), INTENT(OUT) :: A(3)
-    REAL(DP) D(3),T1(3,3),T2(3,3),S_IJ,S_JJ
+    REAL(DP) D(3),T1(3,3),T10(3,3),T2(3,3),S_IJ,S_JJ
     REAL(DP) AT(3)
 
     T1=ENTL
+    T10=ENTL
     T2=ENTL
     D=ZERO
 
@@ -781,8 +785,9 @@ CONTAINS
     !   A(1)=ATAN2(-S_IJ,S_JJ)
     AT=ZERO;AT(1)=A(1);
 
-    CALL GEO_ROT(T1,T1,AT,T2)
+    CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
+    T10=T1
 
     CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
@@ -796,8 +801,9 @@ CONTAINS
     !    A(2)=ATAN2(-S_IJ,S_JJ)
     AT=ZERO;AT(2)=A(2);
 
-    CALL GEO_ROT(T1,T1,AT,T2)
+    CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
+    T10=T1
 
     CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
     CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
@@ -810,8 +816,9 @@ CONTAINS
     !    A(3)=ATAN2(S_IJ,S_JJ)
     AT=ZERO;AT(3)=A(3);
 
-    CALL GEO_ROT(T1,T1,AT,T2)
+    CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
+
     !   write(16,*) t2-entb
 
 
@@ -840,11 +847,14 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP), INTENT(INOUT):: ENT(3,3),EXI(3,3)
     REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)
+    REAL(DP) dd(3)
 
     CALL COMPUTE_ENTRANCE_ANGLE(ENT,EXI,ANG)
 
 
-    D=B-A;   CALL CHANGE_BASIS(D,GLOBAL_FRAME,D,EXI);
+    D=B-A
+    dd=d
+    CALL CHANGE_BASIS(Dd,GLOBAL_FRAME,D,EXI)
 
 
   END SUBROUTINE FIND_PATCH_B

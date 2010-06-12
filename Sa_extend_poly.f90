@@ -33,6 +33,7 @@ CONTAINS
 
 
 
+
   SUBROUTINE ANALYSE_APERTURE_FLAG(I,R)
     IMPLICIT NONE
     INTEGER I,B,K
@@ -52,57 +53,6 @@ CONTAINS
     ENDDO
 
   END   SUBROUTINE ANALYSE_APERTURE_FLAG
-
-  SUBROUTINE PRODUCE_APERTURE_FLAG(I)
-    IMPLICIT NONE
-    INTEGER I,B
-    I=0
-    B=1
-    IF(.NOT.c_%CHECK_STABLE) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    IF(.NOT.c_%CHECK_MADX_APERTURE) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    !frs 10.03.2006    IF(.NOT.c_%check_iteration) THEN
-    !frs 10.03.2006       I=B+I
-    !frs 10.03.2006    ENDIF
-    B=B*2
-    !frs 10.03.2006    IF(.NOT.c_%check_interpolate_x) THEN
-    !frs 10.03.2006       I=B+I
-    !frs 10.03.2006    ENDIF
-    B=B*2
-    !frs 10.03.2006    IF(.NOT.c_%check_interpolate_y) THEN
-    !frs 10.03.2006       I=B+I
-    !frs 10.03.2006    ENDIF
-    B=B*2
-    IF(.NOT.c_%check_x_min) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    IF(.NOT.c_%check_x_max) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    IF(.NOT.c_%check_y_min) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    IF(.NOT.c_%check_y_max) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-    IF(.not.c_%stable_da) THEN
-       I=B+I
-    ENDIF
-    B=B*2
-
-    ALLOW_TRACKING=.TRUE.
-
-  END   SUBROUTINE PRODUCE_APERTURE_FLAG
-
 
 
 
@@ -401,13 +351,14 @@ contains
     type (complextaylor), ALLOCATABLE,dimension(:,:)::F
     type(taylor), ALLOCATABLE,dimension(:)::a,b
     type(taylor), ALLOCATABLE,dimension(:,:)::da,db
-    real(dp), ALLOCATABLE,dimension(:,:)::MA,MB
+    real(dp), ALLOCATABLE,dimension(:,:)::MA,MB,MC
     complex(dp) z0
     type(b_cyl) b_sol
 
 
     allocate(MA(no,no))
     allocate(MB(no,no))
+    allocate(MC(no,no))
     allocate(F(no,no))
     allocate(Fs(no))
     allocate(a(no))
@@ -487,8 +438,8 @@ contains
        enddo
 
     enddo
-
-    call matinv(MA,MA,no,no,result)
+    MC=MA
+    call matinv(MC,MA,no,no,result)
 
     if(result/=0) then
        w_p=0
@@ -497,7 +448,8 @@ contains
        w_p%c(1)= " failed inversion in curvebend part 1"
        CALL WRITE_E(result)
     endif
-    call matinv(MB,MB,no,no,result)
+    MC=MB
+    call matinv(MC,MB,no,no,result)
 
     if(result/=0) then
        w_p=0
@@ -637,6 +589,24 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) ="MB DID NOT EXIST (curvebend)"
+       CALL WRITE_E(103)
+    ENDIF
+    IF (ALLOCATED(MC)) THEN
+       DEALLOCATE (MC, STAT = error)
+       IF(ERROR==0) THEN
+          ! WRITE(6,*) " MB ARRAY DEALLOCATED "
+       ELSE
+          w_p=0
+          w_p%nc=1
+          w_p%fc='(1((1X,a72)))'
+          w_p%c(1) =" MC ARRAY not DEALLOCATED : PROBLEMS"
+          CALL WRITE_E(102)
+       ENDIF
+    ELSE
+       w_p=0
+       w_p%nc=1
+       w_p%fc='(1((1X,a72)))'
+       w_p%c(1) ="MC DID NOT EXIST (curvebend)"
        CALL WRITE_E(103)
     ENDIF
     IF (ALLOCATED(F)) THEN

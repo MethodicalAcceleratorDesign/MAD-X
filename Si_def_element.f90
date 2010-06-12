@@ -37,7 +37,6 @@ MODULE S_DEF_ELEMENT
   logical(lp),target :: recirculator_cheat=my_false
   PRIVATE TRACKR,TRACKP
   logical(lp),TARGET :: other_program=.false.
-  integer j_global
 
   ! Old home for element and elementp, now in sh_def_kind
 
@@ -163,7 +162,7 @@ CONTAINS
        CALL TRACK(EL%S5,X,k,MID)
     case(KIND6)
        CALL TRACK(EL%T6,X,k,MID)
-    case(KIND7,KIND17)
+    case(KIND7)
        CALL TRACK(EL%T7,X,k,MID)
     case(KIND8)
        CALL TRACK(EL%S8,X,k,MID)
@@ -225,7 +224,7 @@ CONTAINS
        CALL TRACK(EL%S5,X,k)
     case(KIND6)
        CALL TRACK(EL%T6,X,k)
-    case(KIND7,KIND17)
+    case(KIND7)
        CALL TRACK(EL%T7,X,k)
     case(KIND8)
        CALL TRACK(EL%S8,X,k)
@@ -530,6 +529,9 @@ CONTAINS
     S2%IPHAS=0
     S2%IB_SOL=0
     s2%npara=S1
+    s2%g=0
+    s2%np=0
+    s2%nb=0
     !     s2%NMUL=0
     s2%NAME=' '
     s2%N_NAME=0
@@ -740,6 +742,8 @@ CONTAINS
           s2%AN(I)%I=S1%IAN(I)+S1%NPARA
           s2%AN(I)%S=S1%SAN(I)
           s2%AN(I)%KIND=3
+          s2%AN(I)%g=S1%g
+          s2%AN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%aN(I)%R=s2%aN(I)%R+scale_tpsafit*s2%AN(I)%S*s1%TPSAFIT(S1%IAN(I))
@@ -752,6 +756,8 @@ CONTAINS
           s2%BN(I)%I=S1%IBN(I)+S1%NPARA
           s2%BN(I)%S=S1%SBN(I)
           s2%BN(I)%KIND=3
+          s2%BN(I)%g=S1%g
+          s2%BN(I)%nb=S1%nb
           DONEIT=.TRUE.
           IF(S1%SET_TPSAFIT) THEN
              s2%BN(I)%R=s2%BN(I)%R+scale_tpsafit*s2%BN(I)%S*s1%TPSAFIT(S1%IBN(I))
@@ -770,6 +776,8 @@ CONTAINS
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
           s2%VOLT%KIND=3
+          s2%VOLT%g=S1%g
+          s2%VOLT%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           IF(S1%SET_TPSAFIT) THEN
@@ -782,6 +790,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
+          s2%FREQ%g=S1%g
+          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -796,6 +806,8 @@ CONTAINS
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
           s2%PHAS%KIND=3
+          s2%PHAS%g=S1%g
+          s2%PHAS%nb=S1%nb
           DONEIT=.TRUE.
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           IF(S1%SET_TPSAFIT) THEN
@@ -811,6 +823,8 @@ CONTAINS
        IF(S1%IVOLT>0) THEN
           s2%VOLT%I=S1%IVOLT+S1%NPARA
           s2%VOLT%S=S1%SVOLT
+          s2%PHAS%g=S1%g
+          s2%PHAS%nb=S1%nb
           s2%VOLT%KIND=3
           if(S1%IVOLT>c_%np_pol) c_%np_pol=S1%IVOLT
           DONEIT=.TRUE.
@@ -824,6 +838,8 @@ CONTAINS
        IF(S1%IFREQ>0) THEN
           s2%FREQ%I=S1%IFREQ+S1%NPARA
           s2%FREQ%S=S1%SFREQ
+          s2%FREQ%g=S1%g
+          s2%FREQ%nb=S1%nb
           s2%FREQ%KIND=3
           if(S1%IFREQ>c_%np_pol) c_%np_pol=S1%IFREQ
           IF(S1%SET_TPSAFIT) THEN
@@ -837,6 +853,8 @@ CONTAINS
        IF(S1%IPHAS>0) THEN
           s2%PHAS%I=S1%IPHAS+S1%NPARA
           s2%PHAS%S=S1%SPHAS
+          s2%PHAS%g=S1%g
+          s2%PHAS%nb=S1%nb
           s2%PHAS%KIND=3
           if(S1%IPHAS>c_%np_pol) c_%np_pol=S1%IPHAS
           DONEIT=.TRUE.
@@ -853,6 +871,8 @@ CONTAINS
        IF(S1%IB_SOL>0) THEN
           s2%B_SOL%I=S1%IB_SOL+S1%NPARA
           s2%B_SOL%S=S1%SB_SOL
+          s2%B_SOL%g=S1%g
+          s2%B_SOL%nb=S1%nb
           s2%B_SOL%KIND=3
           DONEIT=.TRUE.
           if(S1%IB_SOL>c_%np_pol) c_%np_pol=S1%IB_SOL
@@ -1137,7 +1157,7 @@ CONTAINS
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
        nullify(EL%T6%LY);ALLOCATE(EL%T6%LY(3));
-    CASE(KIND7,kind17)
+    CASE(KIND7)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
           w_p=0
           w_p%nc=2
@@ -1177,10 +1197,6 @@ CONTAINS
        nullify(EL%T7%RMATY);ALLOCATE(EL%T7%RMATY(2,3));
        nullify(EL%T7%RLX);ALLOCATE(EL%T7%RLX(3));
        IF(GEN) call GETMAT7(EL%T7)
-       if(EL%KIND==kind17) then
-          nullify(EL%T7%dx);  allocate(EL%T7%dx(EL%p%nst));EL%T7%dx=zero;
-          nullify(EL%T7%dy);  allocate(EL%T7%dy(EL%p%nst));EL%T7%dy=zero;
-       endif
     CASE(KIND8)
        if(.not.ASSOCIATED(EL%S8))ALLOCATE(EL%S8)
        EL%S8%P=>EL%P
@@ -1283,6 +1299,23 @@ CONTAINS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
+    CASE(KIND17)
+       if(.not.ASSOCIATED(EL%ENGE17)) THEN
+          ALLOCATE(EL%ENGE17)
+          el%ENGE17=0
+       ELSE
+          el%ENGE17=-1
+          el%ENGE17=0
+       ENDIF
+       EL%ENGE17%P=>EL%P
+       EL%ENGE17%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%ENGE17%AN=>EL%AN
+       EL%ENGE17%BN=>EL%BN
+       NULLIFY(EL%ENGE17%F);ALLOCATE(EL%ENGE17%F);EL%ENGE17%F=ONE;
+       NULLIFY(EL%ENGE17%D);ALLOCATE(EL%ENGE17%D);EL%ENGE17%D=ONE;
+       NULLIFY(EL%ENGE17%A);ALLOCATE(EL%ENGE17%A(0:N_ENGE));EL%ENGE17%A=ZERO;
+       NULLIFY(EL%ENGE17%nbessel);ALLOCATE(EL%ENGE17%nbessel);EL%ENGE17%nbessel=0;
     CASE(KIND18)
        if(.not.ASSOCIATED(EL%RCOL18)) THEN
           ALLOCATE(EL%RCOL18)
@@ -1567,7 +1600,7 @@ CONTAINS
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
        nullify(EL%T6%LY);ALLOCATE(EL%T6%LY(3));
-    CASE(KIND7,KIND17)
+    CASE(KIND7)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
           w_p=0
           w_p%nc=2
@@ -1608,10 +1641,6 @@ CONTAINS
        nullify(EL%T7%RLX);   ALLOCATE(EL%T7%RLX(3));
        CALL ALLOC(EL%T7)
        IF(GEN) call GETMAT7(EL%T7)
-       if(EL%KIND==kind17) then
-          nullify(EL%T7%dx);allocate(EL%T7%dx(EL%p%nst));EL%T7%dx=zero;
-          nullify(EL%T7%dy);allocate(EL%T7%dy(EL%p%nst));EL%T7%dy=zero;
-       endif
     CASE(KIND8)
        if(.not.ASSOCIATED(EL%S8))ALLOCATE(EL%S8)
        EL%S8%P=>EL%P
@@ -1714,6 +1743,23 @@ CONTAINS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
+    CASE(KIND17)
+       if(.not.ASSOCIATED(EL%ENGE17)) THEN
+          ALLOCATE(EL%ENGE17)
+          el%ENGE17=0
+       ELSE
+          el%ENGE17=-1
+          el%ENGE17=0
+       ENDIF
+       EL%ENGE17%P=>EL%P
+       EL%ENGE17%L=>EL%L
+       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
+       EL%ENGE17%AN=>EL%AN
+       EL%ENGE17%BN=>EL%BN
+       NULLIFY(EL%ENGE17%F);ALLOCATE(EL%ENGE17%F);EL%ENGE17%F=one;
+       NULLIFY(EL%ENGE17%D);ALLOCATE(EL%ENGE17%D);EL%ENGE17%D=ONE;
+       NULLIFY(EL%ENGE17%A);ALLOCATE(EL%ENGE17%A(0:N_ENGE));EL%ENGE17%A=ZERO;
+       NULLIFY(EL%ENGE17%nbessel);ALLOCATE(EL%ENGE17%nbessel);EL%ENGE17%nbessel=0;
     CASE(KIND18)
        if(.not.ASSOCIATED(EL%RCOL18)) THEN
           ALLOCATE(EL%RCOL18)
@@ -1882,7 +1928,7 @@ CONTAINS
           if(el%kind==kind10) then
              call GETANBN(EL%TP10)
           endif
-          if(el%kind==kind7.or.el%kind==kind17) then
+          if(el%kind==kind7) then
              call GETMAT7(EL%T7)
           endif
           if(associated(EL%b_sol)) EL%b_sol= vR*ELp%b_sol
@@ -1894,7 +1940,7 @@ CONTAINS
           if(el%kind==kind10) then
              call GETANBN(ELp%TP10)
           endif
-          if(el%kind==kind7.or.el%kind==kind17) then
+          if(el%kind==kind7) then
              call GETMAT7(ELp%T7)
           endif
           if(associated(ELp%b_sol)) ELp%b_sol= vP*EL%b_sol
@@ -1922,7 +1968,7 @@ CONTAINS
           if(el%kind==kind10) then
              call GETANBN(EL%TP10)
           endif
-          if(el%kind==kind7.or.el%kind==kind17) then
+          if(el%kind==kind7) then
              call GETMAT7(EL%T7)
           endif
           if(associated(EL%b_sol)) EL%b_sol= ELp%b_sol
@@ -1938,7 +1984,7 @@ CONTAINS
           if(el%kind==kind10) then
              call GETANBN(ELp%TP10)
           endif
-          if(el%kind==kind7.or.el%kind==kind17) then
+          if(el%kind==kind7) then
              call GETMAT7(ELp%T7)
           endif
        endif
@@ -1973,7 +2019,7 @@ CONTAINS
        if(el%kind==kind10) then
           call GETANBN(EL%TP10)
        endif
-       if(el%kind==kind7.or.el%kind==kind17) then
+       if(el%kind==kind7) then
           call GETMAT7(EL%T7)
        endif
        RETURN
@@ -2025,7 +2071,7 @@ CONTAINS
     case(kind6)
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
-    CASE(KIND7,kind17)
+    CASE(KIND7)
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
        call GETMAT7(EL%T7)
@@ -2046,6 +2092,9 @@ CONTAINS
        !    CASE(KINDuser2)
        !       EL%U2%AN=>EL%AN
        !       EL%U2%BN=>EL%BN
+    CASE(kind17)
+       EL%ENGE17%AN=>EL%AN
+       EL%ENGE17%BN=>EL%BN
     CASE(KINDWIGGLER)
        EL%WI%AN=>EL%AN
        EL%WI%BN=>EL%BN
@@ -2091,7 +2140,7 @@ CONTAINS
        if(el%kind==kind10) then
           call GETANBN(EL%TP10)
        endif
-       if(el%kind==kind7.or.el%kind==kind17) then
+       if(el%kind==kind7) then
           call GETMAT7(EL%T7)     !etienne
        endif
        RETURN
@@ -2141,7 +2190,7 @@ CONTAINS
     case(kind6)
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
-    CASE(KIND7,kind17)
+    CASE(KIND7)
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
        call GETMAT7(EL%T7)
@@ -2162,6 +2211,9 @@ CONTAINS
        !    CASE(KINDuser2)
        !       EL%U2%AN=>EL%AN
        !       EL%U2%BN=>EL%BN
+    CASE(kind17)
+       EL%ENGE17%AN=>EL%AN
+       EL%ENGE17%BN=>EL%BN
     case(kind22)
        EL%HE22%AN=>EL%AN
        EL%HE22%BN=>EL%BN
@@ -2890,7 +2942,7 @@ CONTAINS
     !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
     !    ENDIF
 
-    IF(EL%KIND==KIND7.or.EL%KIND==kind17) THEN         !
+    IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
@@ -2907,10 +2959,6 @@ CONTAINS
           ENDDO
        ENDIF !.NOT.GEN
        GEN=.TRUE.
-       if(EL%KIND==kind17) then
-          elp%t7%dx=el%t7%dx
-          elp%t7%dy=el%t7%dy
-       endif
     ENDIF
 
     IF(EL%KIND==KIND8) CALL SETFAMILY(ELP)
@@ -3157,7 +3205,7 @@ CONTAINS
     !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
     !    ENDIF
 
-    IF(EL%KIND==KIND7.or.EL%KIND==kind17) THEN         !
+    IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
@@ -3174,10 +3222,6 @@ CONTAINS
           ENDDO
        ENDIF !.NOT.GEN
        GEN=.TRUE.
-       if(EL%KIND==kind17) then
-          elp%t7%dx=el%t7%dx
-          elp%t7%dy=el%t7%dy
-       endif
 
     ENDIF
 
@@ -3431,7 +3475,7 @@ CONTAINS
     !       if(associated(EL%M22%T_rad_REV)) CALL COPY_TREE(EL%M22%T_rad_REV,ELP%M22%T_rad_REV)
     !    ENDIF
 
-    IF(EL%KIND==KIND7.or.EL%KIND==kind17) THEN         !
+    IF(EL%KIND==KIND7) THEN         !
        GEN=.FALSE.
        CALL SETFAMILY(ELP)
        IF(.NOT.GEN) THEN !.NOT.GEN
@@ -3448,10 +3492,6 @@ CONTAINS
           ENDDO
        ENDIF !.NOT.GEN
        GEN=.TRUE.
-       if(EL%KIND==kind17) then
-          elp%t7%dx=el%t7%dx
-          elp%t7%dy=el%t7%dy
-       endif
     ENDIF
 
 

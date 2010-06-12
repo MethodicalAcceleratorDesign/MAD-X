@@ -92,11 +92,12 @@ contains
     real(dp) targ_RES(4)
     !  END FITTING FAMILIES
     real(dp),pointer :: beta(:,:,:)
-    REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL
+    REAL(DP) DBETA,tune(3),tunenew(2),CHROM(2),DEL,dtune(3)
+    integer ntune(2)
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
     integer nstep(2),i1,i2,I3,n_bessel
-    LOGICAL(LP) STRAIGHT,skip
+    LOGICAL(LP) STRAIGHT,skip,fixp
     ! end
     ! TRACK 4D NORMALIZED
     INTEGER POS,NTURN,resmax
@@ -119,7 +120,7 @@ contains
     TYPE(integration_node), POINTER :: TL
     type(internal_state),target :: my_default
     ! DYN APERTURE
-    REAL(DP) r_in,del_in,DLAM,ang_in,ang_out
+    REAL(DP) r_in,del_in,DLAM,ang_in,ang_out,dx,targ_tune_alex(2)
     INTEGER ITE,n_in,POSR
     logical(lp) found_it
     type(fibre),pointer ::p
@@ -142,6 +143,7 @@ contains
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac
+    integer icnmin,icnmax
     logical :: log_estate=.true.
 
     if(log_estate) then
@@ -610,7 +612,7 @@ contains
           do_beam_beam=my_true
        case('NOBEAMBEAM')
           do_beam_beam=my_false
-       case('SETFAMILIES')
+       case('SETFAMILIES','SETGFAMILIES')
           np=0
           READ(MF,*) NPOL
           ALLOCATE(pol_(NPOL))
@@ -627,7 +629,11 @@ contains
              POL_(J)%NAME=NAME
              POL_(J)%N_NAME=N_NAME
              DO K=1,NMUL
-                READ(MF,*) N,ICN
+                IF(COM=='SETGFAMILIES') THEN
+                   READ(MF,*) N,ICN,POL_(J)%G,POL_(J)%NB,POL_(J)%NP  !     integer g,np,nb   !  group index  number of blocks
+                ELSE
+                   READ(MF,*) N,ICN
+                ENDIF
                 if(icn>np) np=icn
                 IF(N>0) THEN
                    POL_(J)%IBN(N)=ICN
@@ -636,6 +642,55 @@ contains
                 ENDIF
              ENDDO
           ENDDO
+          Write(6,*) " Number of parameters = ",np
+          Write(6,*) " Number of polymorphic blocks = ",NPOL
+
+       case('SETGFAMILIESN')
+          np=0
+          READ(MF,*) NPOL
+          ALLOCATE(pol_(NPOL))
+          kindaper=0
+          n_in=0
+2010      continue
+          READ(MF,*) kinda
+          kindaper=kindaper+kinda
+          n_in=n_in+1
+          icnmin=100000
+          icnmax=0
+          DO J=kindaper-kinda+1,kindaper
+             READ(MF,*) NMUL,NAME
+             CALL CONTEXT(NAME)
+             N_NAME=0
+             IF(NAME(1:2)=='NO') THEN
+                READ(MF,*) NAME
+                call context(name)
+                N_NAME=len_trim(name)
+             ENDIF
+             POL_(J)=0
+             POL_(J)%NAME=NAME
+             POL_(J)%N_NAME=N_NAME
+             DO K=1,NMUL
+                IF(COM=='SETGFAMILIES') THEN
+                   READ(MF,*) N,ICN,POL_(J)%G,POL_(J)%NB,POL_(J)%NP  !     integer g,np,nb   !  group index  number of blocks
+                ELSE
+                   READ(MF,*) N,ICN
+                   POL_(J)%NB=n_in
+                ENDIF
+                if(icn>np) np=icn
+                if(icn<icnmin) icnmin=icn
+                if(icn>icnmax) icnmax=icn
+                IF(N>0) THEN
+                   POL_(J)%IBN(N)=ICN
+                ELSE
+                   POL_(J)%IAN(-N)=ICN
+                ENDIF
+             ENDDO
+          ENDDO
+          DO J=kindaper-kinda+1,kindaper
+             POL_(J)%g=icnmin
+             POL_(J)%NP=icnmax-icnmin+1
+          enddo
+          if(kindaper<npol) goto 2010
           Write(6,*) " Number of parameters = ",np
           Write(6,*) " Number of polymorphic blocks = ",NPOL
 
@@ -800,6 +855,112 @@ contains
        case('DEALLOCATEFAMILIES')
           call kill_para(my_ering)
           deallocate(POL_)
+       case('FITTUNESCAN','SEARCHAPERTUREX=Y')
+          read(mf,*) epsf
+          read(mf,*) ntune
+          read(mf,*) tune(1:2)
+          read(mf,*) dtune(1:2),targ_RES(3:4)
+          if(com=='SEARCHAPERTUREX=Y') then
+             READ(MF,*) r_in,del_in,dx,DLAM,fixp
+             READ(MF,*) POS,NTURN,ITE,FILENAME,name
+             call context(name)
+             if(name(1:11)/='NONAMEGIVEN') then
+                posr=pos
+                call move_to( my_ering,p,name,posR,POS)
+                if(pos==0) then
+                   write(6,*) name, " not found "
+                   stop
+                endif
+             endif
+             call kanalnummer(mfr,filename)
+          endif
+
+
+
+
+          do i2=0,ntune(2)
+             do i1=0,ntune(1)
+
+                if(ntune(1)/=0) then
+                   targ_tune(1)=tune(1)+((dtune(1)-tune(1))*i1)/(ntune(1))
+                else
+                   targ_tune(1)=tune(1)
+                endif
+                if(ntune(2)/=0) then
+                   targ_tune(2)=tune(2)+((dtune(2)-tune(2))*i2)/(ntune(2))
+                else
+                   targ_tune(2)=tune(2)
+                endif
+                if(abs(targ_RES(3))>999) then
+                   call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
+                else
+                   targ_RES(1:2)=targ_tune(1:2)
+                   call lattice_fit_tune_CHROM_gmap(my_ering,my_estate,EPSF,pol_,NPOL,targ_RES,NP)
+                endif
+                if(com=='SEARCHAPERTUREX=Y') then
+                   ! write(mfr,*) targ_tune(1:2)
+                   CALL dyn_aperalex(my_ering,r_in,del_in,dx,dlam,pos,nturn,ite,my_estate,MFR,targ_tune,fixp)
+                endif
+             enddo
+          enddo
+          if(com=='SEARCHAPERTUREX=Y') close(mfr)
+
+       case('ALEXFITTUNESCAN','ALEXSEARCHAPERTUREX=Y')
+          read(mf,*) epsf
+          read(mf,*) ntune
+          read(mf,*) tune(1:2)
+          read(mf,*) dtune(1:2),targ_RES(3:4)
+          if(com=='ALEXSEARCHAPERTUREX=Y') then
+             READ(MF,*) r_in,del_in,dx,DLAM,fixp
+             READ(MF,*) POS,NTURN,ITE,FILENAME,name
+             call context(name)
+             if(name(1:11)/='NONAMEGIVEN') then
+                posr=pos
+                call move_to( my_ering,p,name,posR,POS)
+                if(pos==0) then
+                   write(6,*) name, " not found "
+                   stop
+                endif
+             endif
+             call kanalnummer(mfr,filename)
+          endif
+
+          sc=1.d0
+
+
+          do i2=0,ntune(2)
+             do i1=0,ntune(1)
+
+                if(ntune(1)/=0) then
+                   targ_tune(1)=tune(1)+((dtune(1)-tune(1))*i1)/(ntune(1))
+                else
+                   targ_tune(1)=tune(1)
+                endif
+                if(ntune(2)/=0) then
+                   targ_tune(2)=tune(2)+((dtune(2)-tune(2))*i2)/(ntune(2))
+                else
+                   targ_tune(2)=tune(2)
+                endif
+                targ_tune_alex(1)=22.0_dp+targ_tune(1)
+                targ_tune_alex(2)=20.0_dp+targ_tune(2)
+
+                if(abs(targ_RES(3))>999) then
+
+                   CALL special_alex_main_ring_auto(my_ering,3,targ_tune_alex,sc,epsf)
+                   call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
+                else
+                   CALL special_alex_main_ring_auto(my_ering,3,targ_tune_alex,sc,epsf)
+                   targ_RES(1:2)=targ_tune(1:2)
+                   call lattice_fit_tune_CHROM_gmap(my_ering,my_estate,EPSF,pol_,NPOL,targ_RES,NP)
+                endif
+                if(com=='ALEXSEARCHAPERTUREX=Y') then
+                   ! write(mfr,*) targ_tune(1:2)
+                   CALL dyn_aperalex(my_ering,r_in,del_in,dx,dlam,pos,nturn,ite,my_estate,MFR,targ_tune,fixp)
+                endif
+             enddo
+          enddo
+          if(com=='ALEXSEARCHAPERTUREX=Y') close(mfr)
+
        case('FITTUNE')
           read(mf,*) epsf
           read(mf,*) targ_tune
@@ -850,7 +1011,12 @@ contains
           read(mf,*) epsf
           read(mf,*) targ_chrom
           read(mf,*)i1
-          call lattice_fit_CHROM_gmap1(my_ering,my_estate,EPSF,pol_,NPOL,targ_chrom,NP,i1,mf)
+          call lattice_fit_CHROM_gmap1(my_ering,my_estate,EPSF,pol_,NPOL,targ_chrom,np,i1,mf)
+       case('FITSEXLINEAR')
+          read(mf,*) epsf
+          read(mf,*) targ_chrom
+          read(mf,*)i1
+          call lattice_fit_CHROM_gmap2(my_ering,my_estate,EPSF,pol_,NPOL,targ_chrom,np,i1,mf)
        case('FITCHROMATICITY')
           read(mf,*) epsf
           read(mf,*) targ_chrom
@@ -977,7 +1143,7 @@ contains
           deallocate(resu)
           close(mfr)
 205       FORMAT(1x,i4,4(1X,D18.11))
-       case('SEARCHAPERTUREALONGLINE')
+       case('SEARCHAPERTURE')
 
           READ(MF,*) r_in,n_in,ang_in,ang_out,del_in,DLAM
           READ(MF,*) POS,NTURN,ITE,FILENAME,name
@@ -1250,6 +1416,12 @@ contains
           READ(MF,*) targ_tune(1:2),sc
 
           CALL special_alex_main_ring(my_ering,i1,targ_tune,sc)
+
+       case('SPECIALALEXAUTO')
+          READ(MF,*) I1,epsf
+          READ(MF,*) targ_tune(1:2),sc
+
+          CALL special_alex_main_ring_auto(my_ering,i1,targ_tune,sc,epsf)
 
 
        case default

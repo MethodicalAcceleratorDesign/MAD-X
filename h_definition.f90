@@ -7,6 +7,7 @@ module definition
   use scratch_size
   use DABNEW
   use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
+  USE my_own_1D_TPSA
   !  use newda
   !  USE LIELIB_ETIENNE
   implicit none
@@ -43,7 +44,7 @@ module definition
   INTEGER, PARAMETER :: CASET=3,CASETF1=4,CASETF2=5
   INTEGER,PARAMETER  :: ISPIN0R=1,ISPIN1R=3
   logical(lp) :: doing_ac_modulation_in_ptc=.false.
-
+  integer, target :: nb_ =0   ! global group index
   !
   TYPE sub_taylor
      INTEGER j(lnv)
@@ -79,6 +80,7 @@ module definition
      INTEGER I   !@1   USED FOR KNOBS AND SPECIAL KIND=0
      REAL(DP) S   !@1   SCALING FOR KNOBS AND SPECIAL KIND=0
      LOGICAL(lp) :: ALLOC  !@1 IF TAYLOR IS ALLOCATED IN DA-PACKAGE
+     integer g,nb  !  group index, number in group
      !&2
   END TYPE REAL_8
   !@3 ---------------------------------------------</br>
@@ -89,6 +91,7 @@ module definition
      integer kind
      integer i,j
      complex(dp) s
+     integer g,nb  !  group index
   END TYPE double_complex
 
   type(taylor)        varf1,varf2
@@ -279,6 +282,9 @@ module definition
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
 
+  type(fibre), pointer :: lost_fibre
+  type(integration_node), pointer :: lost_node
+
   type rf_phasor
      real(dp) x(2)
      real(dp) om
@@ -319,5 +325,201 @@ module definition
      type(integration_node),pointer :: c   ! pointer close to a(3)
      type(internal_state)  state
   END type TEMPORAL_BEAM
+
+contains
+
+  SUBROUTINE RESET_APERTURE_FLAG(complete)
+    IMPLICIT NONE
+    logical(lp), optional :: complete
+    logical(lp)  comp
+    !    IF(c_%WATCH_USER) THEN
+    !       IF(.NOT.ALLOW_TRACKING) THEN
+    !          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
+    !          WRITE(6,*) "  YOU DID NOT CHECK THE APERTURE STATUS"
+    !          WRITE(6,*) "  USING A CALL TO PRODUCE_APERTURE_FLAG"
+    !          WRITE(6,*) "  BEFORE CALLING A TRACKING FUNCTION"
+    !          STOP 666
+    !       ENDIF
+    !       IF(.NOT.c_%check_stable) THEN
+    !          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
+    !          WRITE(6,*) " CODE MOST LIKELY DIED IN PURE DA/TPSA/LIE OPERATIONS  "
+    !          STOP 667
+    !       ENDIF
+    !    ENDIF
+    comp=.true.
+    if(present(complete)) comp=complete
+    c_%STABLE_DA =.TRUE.
+    c_%CHECK_STABLE =.TRUE.
+    c_%CHECK_MADX_APERTURE =.TRUE.
+    c_%stable_da =.true.
+    if(comp) then
+       xlost=zero
+       messagelost=" Aperture has been reset "
+       nullify(lost_fibre)
+       nullify(lost_node)
+
+    endif
+  END   SUBROUTINE RESET_APERTURE_FLAG
+
+  SUBROUTINE PRODUCE_APERTURE_FLAG(I)
+    IMPLICIT NONE
+    INTEGER I
+    I=0
+    IF(.NOT.c_%CHECK_STABLE) THEN
+       I=1
+    ENDIF
+
+
+    !    ALLOW_TRACKING=.TRUE.
+
+  END   SUBROUTINE PRODUCE_APERTURE_FLAG
+
+  ! moved here from sa_extend_poly.f90
+
+  REAL(DP) FUNCTION  ROOT(X)  ! REPLACES SQRT(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       ROOT=ONE
+       return
+    endif
+
+    IF((X<ZERO).AND.c_%ROOT_CHECK) THEN
+       ROOT=ONE
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Root undefined "
+    ELSEIF(X>=ZERO) THEN
+       ROOT=SQRT(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ROOT=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ROOT
+
+  REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       ARCSIN=ZERO
+       return
+    endif
+    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
+       ARCSIN=ZERO
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Arcsin undefined "
+    ELSEIF(ABS(X)<=ONE) THEN
+       ARCSIN=ASIN(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ARCSIN=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ARCSIN
+
+  REAL(DP) FUNCTION  ARCCOS(X)  ! REPLACES ACOS(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       ARCCOS=ZERO
+       return
+    endif
+    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
+       ARCCOS=ZERO
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Arccos undefined "
+    ELSEIF(ABS(X)<=ONE) THEN
+       ARCCOS=ACOS(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       ARCCOS=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION ARCCOS
+
+  REAL(DP) FUNCTION  LOGE(X)  ! REPLACES ACOS(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       LOGE=ZERO
+       return
+    endif
+
+    IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
+       LOGE=ZERO
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Log undefined "
+    ELSE
+       LOGE=LOG(X)
+    ENDIF
+
+  END FUNCTION LOGE
+
+
+
+  REAL(DP) FUNCTION  COSEH(X) ! REPLACES COSH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       COSEH=ONE
+       return
+    endif
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       COSEH=ONE
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Coseh undefined "
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       COSEH=COSH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       COSEH=ONE
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION COSEH
+
+  REAL(DP) FUNCTION  SINEH(X) ! REPLACES SINH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       SINEH=ZERO
+       return
+    endif
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       SINEH=ZERO
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Sineh undefined "
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       SINEH=SINH(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       SINEH=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION SINEH
+
+  REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN)::X
+    IF(.NOT.c_%CHECK_STABLE) then
+       arctan=ZERO
+       return
+    endif
+
+    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
+       arctan=ZERO
+       c_%CHECK_STABLE=.FALSE.
+       messagelost="Arctan undefined "
+    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
+       arctan=atan(X)
+    ELSE      !  IF X IS NOT A NUMBER
+       arctan=ZERO
+       c_%CHECK_STABLE=.FALSE.
+    ENDIF
+
+  END FUNCTION arctan
+
+
 
 end module definition

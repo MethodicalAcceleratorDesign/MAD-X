@@ -165,13 +165,10 @@ module precision_constants
   LOGICAL(lp),TARGET  :: ROOT_CHECK=.TRUE.
   LOGICAL(lp),TARGET  :: CHECK_STABLE=.TRUE.
   LOGICAL(lp),TARGET  :: WATCH_USER=.FALSE.
-  LOGICAL(lp) :: ALLOW_TRACKING=.true.
+  !  LOGICAL(lp) :: ALLOW_TRACKING=.true.
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
-  LOGICAL(lp),TARGET  :: check_x_min  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_x_max  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_y_min  =.true.   ! check if lost by aperture fitted now
-  LOGICAL(lp),TARGET  :: check_y_max  =.true.   ! check if lost by aperture fitted now
+
   REAL(dp),TARGET   :: absolute_aperture=c_1d3
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
@@ -199,7 +196,9 @@ module precision_constants
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   INTEGER, target :: SECTOR_NMUL = 4
   logical(lp) :: change_sector=my_true
-
+  real(dp) :: xlost(6)=zero
+  character(255) :: messagelost
+  !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
   !  lielib_print(3)=1   Shows details in flofacg
@@ -257,10 +256,7 @@ module precision_constants
      logical(lp),pointer  :: check_iteration       ! checks iteration in fitted magnet for symplectic tracking (not used)
      logical(lp),pointer  :: check_interpolate_x       ! check if lost by being outside the interpolation region
      logical(lp),pointer  :: check_interpolate_y      ! check if lost by being outside the interpolation region
-     logical(lp),pointer  :: check_x_min     ! check if lost by aperture fitted now
-     logical(lp),pointer  :: check_x_max     ! check if lost by aperture fitted now
-     logical(lp),pointer  :: check_y_min     ! check if lost by aperture fitted now
-     logical(lp),pointer  :: check_y_max     ! check if lost by aperture fitted now
+
 
      logical(lp),pointer  :: WATCH_USER     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
 
@@ -312,7 +308,6 @@ module precision_constants
      real(dp),pointer :: phase0 ! default phase in cavity
      logical(lp), pointer :: global_verbose
      logical(lp), pointer :: no_hyperbolic_in_normal_form ! unstable produces exception
-     character*120 message
   end type CONTROL
 
   type(control) c_
@@ -559,177 +554,41 @@ contains
     read(5,*) (iex(i),i=1,n)
   END SUBROUTINE read_d_a
 
-  ! moved here from sa_extend_poly.f90
-
-  REAL(DP) FUNCTION  ROOT(X)  ! REPLACES SQRT(X)
+!!!!!!!!!!!!!!!!!! old   special for lielib: others in sa_extend_poly
+  REAL(DP) FUNCTION  ARCCOS_lielib(X)  ! REPLACES ACOS(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ROOT=ONE
-       return
-    endif
-
-    IF((X<ZERO).AND.c_%ROOT_CHECK) THEN
-       ROOT=ONE
-       c_%CHECK_STABLE=.FALSE.
-    ELSEIF(X>=ZERO) THEN
-       ROOT=SQRT(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       ROOT=ONE
-       c_%CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION ROOT
-
-  REAL(DP) FUNCTION  ARCSIN(X)  ! REPLACES ASIN(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) then
-       ARCSIN=ZERO
+       ARCCOS_lielib=ZERO
        return
     endif
     IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
-       ARCSIN=ZERO
+       ARCCOS_lielib=ZERO
        c_%CHECK_STABLE=.FALSE.
     ELSEIF(ABS(X)<=ONE) THEN
-       ARCSIN=ASIN(X)
+       ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
-       ARCSIN=ZERO
+       ARCCOS_lielib=ZERO
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
-  END FUNCTION ARCSIN
+  END FUNCTION ARCCOS_lielib
 
-  REAL(DP) FUNCTION  ARCCOS(X)  ! REPLACES ACOS(X)
+  REAL(DP) FUNCTION  LOGE_lielib(X)  ! REPLACES ACOS(X)
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ARCCOS=ZERO
-       return
-    endif
-    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
-       ARCCOS=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=ONE) THEN
-       ARCCOS=ACOS(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       ARCCOS=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION ARCCOS
-
-  REAL(DP) FUNCTION  LOGE(X)  ! REPLACES ACOS(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) then
-       LOGE=ZERO
        return
     endif
 
     IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
-       LOGE=ZERO
+       LOGE_lielib=ZERO
        c_%CHECK_STABLE=.FALSE.
     ELSE
-       LOGE=LOG(X)
+       LOGE_lielib=LOG(X)
     ENDIF
 
-  END FUNCTION LOGE
-
-
-
-  REAL(DP) FUNCTION  COSEH(X) ! REPLACES COSH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) then
-       COSEH=ONE
-       return
-    endif
-
-    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       COSEH=ONE
-       c_%CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
-       COSEH=COSH(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       COSEH=ONE
-       c_%CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION COSEH
-
-  REAL(DP) FUNCTION  SINEH(X) ! REPLACES SINH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) then
-       SINEH=ZERO
-       return
-    endif
-
-    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       SINEH=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
-       SINEH=SINH(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       SINEH=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION SINEH
-
-  REAL(DP) FUNCTION  arctan(X) ! REPLACES SINH(X)
-    IMPLICIT NONE
-    REAL(DP),INTENT(IN)::X
-    IF(.NOT.c_%CHECK_STABLE) then
-       arctan=ZERO
-       return
-    endif
-
-    IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       arctan=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
-       arctan=atan(X)
-    ELSE      !  IF X IS NOT A NUMBER
-       arctan=ZERO
-       c_%CHECK_STABLE=.FALSE.
-    ENDIF
-
-  END FUNCTION arctan
-
-
-
-
-  SUBROUTINE RESET_APERTURE_FLAG
-    IMPLICIT NONE
-    IF(c_%WATCH_USER) THEN
-       IF(.NOT.ALLOW_TRACKING) THEN
-          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
-          WRITE(6,*) "  YOU DID NOT CHECK THE APERTURE STATUS"
-          WRITE(6,*) "  USING A CALL TO PRODUCE_APERTURE_FLAG"
-          WRITE(6,*) "  BEFORE CALLING A TRACKING FUNCTION"
-          STOP 666
-       ENDIF
-       IF(.NOT.c_%check_stable) THEN
-          WRITE(6,*) "  EXECUTION OF THE CODE MUST BE INTERRUPTED AT YOUR REQUEST"
-          WRITE(6,*) " CODE MOST LIKELY DIED IN PURE DA/TPSA/LIE OPERATIONS  "
-          STOP 667
-       ENDIF
-    ENDIF
-    c_%STABLE_DA =.TRUE.
-    c_%CHECK_STABLE =.TRUE.
-    c_%CHECK_MADX_APERTURE =.TRUE.
-    !frs 10.03.2006    c_%check_iteration =.TRUE.
-    !frs 10.03.2006    c_%check_interpolate_x =.TRUE.
-    !frs 10.03.2006    c_%check_interpolate_y =.TRUE.
-    c_%check_x_min =.TRUE.
-    c_%check_x_max =.TRUE.
-    c_%check_y_min =.TRUE.
-    c_%check_y_max =.TRUE.
-    c_%stable_da =.true.
-
-  END   SUBROUTINE RESET_APERTURE_FLAG
+  END FUNCTION LOGE_lielib
 
 end module precision_constants
 
@@ -962,7 +821,7 @@ module my_own_1D_TPSA
   integer :: n_tpsa_exp = 10
   integer, parameter :: N_my_1D_taylor=9  ! SHOULD BE AS ENGE_N
 
-  private mul,dmulsc,dscmul
+  private mul,dmulsc,dscmul,INV
   private div,ddivsc,dscdiv,Idivsc
   private add,unaryADD,daddsc,dscadd
   private subs,unarySUB,dsubsc,dscsub,POW

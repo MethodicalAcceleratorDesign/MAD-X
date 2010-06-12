@@ -8,7 +8,8 @@ MODULE S_TRACKING
   IMPLICIT NONE
   public
   logical(lp),TARGET :: ALWAYS_EXACT_PATCHING=.TRUE.
-  type(fibre), pointer :: lost_fibre
+  !  type(fibre), pointer :: lost_fibre
+  !  type(integration_node), pointer :: lost_node
 
   ! linked
   PRIVATE TRACK_LAYOUT_FLAG_R,TRACK_LAYOUT_FLAG_P
@@ -18,6 +19,7 @@ MODULE S_TRACKING
   PRIVATE TRACK_FIBRE_R,TRACK_FIBRE_P
   PRIVATE TRACK_LAYOUT_FLAG_R1f,TRACK_LAYOUT_FLAG_P1f
   PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf
+  private TRACK_fibre_based_R,TRACK_fibre_based_P
   ! old Sj_elements
   logical(lp),TARGET :: x_prime=.false.
   ! END old Sj_elements
@@ -39,10 +41,17 @@ MODULE S_TRACKING
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_P1
      MODULE PROCEDURE TRACK_FIBRE_R
      MODULE PROCEDURE TRACK_FIBRE_P
+     MODULE PROCEDURE TRACK_fibre_based_R
+     MODULE PROCEDURE TRACK_fibre_based_P
      ! old Sj_elements
      ! END old Sj_elements
   END INTERFACE
 
+
+  INTERFACE TRACK_FIBRE_SINGLE
+     MODULE PROCEDURE TRACK_FIBRE_R
+     MODULE PROCEDURE TRACK_FIBRE_P
+  END INTERFACE
 
   INTERFACE TRACK_FLAG
      MODULE PROCEDURE TRACK_LAYOUT_FLAG_R1f
@@ -80,7 +89,7 @@ contains
 
     call track(R,X,II1,k,X_IN)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_R1f)
-
+    call RESET_APERTURE_FLAG(my_false)
   end  function TRACK_LAYOUT_FLAG_R1f
 
   !  recursive
@@ -94,6 +103,7 @@ contains
 
     call track(R,X,II1,k)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_P1f)
+    call RESET_APERTURE_FLAG(my_false)
 
   end  function TRACK_LAYOUT_FLAG_P1f
 
@@ -107,7 +117,7 @@ contains
     INTEGER, INTENT(IN):: II1
     INTEGER II2
 
-    CALL RESET_APERTURE_FLAG
+    !    CALL RESET_APERTURE_FLAG
 
     IF(R%CLOSED) THEN
        II2=II1+R%N
@@ -116,7 +126,7 @@ contains
     ENDIF
 
     CALL TRACK(R,X,II1,II2,k,X_IN)
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
   END SUBROUTINE TRACK_LAYOUT_FLAG_R1
 
   !  recursive
@@ -129,7 +139,7 @@ contains
     INTEGER, INTENT(IN):: II1
     INTEGER II2
 
-    CALL RESET_APERTURE_FLAG
+    !    CALL RESET_APERTURE_FLAG
 
     IF(R%CLOSED) THEN
        II2=II1+R%N
@@ -138,7 +148,7 @@ contains
     ENDIF
 
     CALL TRACK(R,X,II1,II2,k)
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_P1
 
@@ -169,7 +179,103 @@ contains
 
   end  function TRACK_LAYOUT_FLAG_Pf
 
-  !  recursive
+
+
+
+  SUBROUTINE TRACK_fibre_based_R(X,k,fibre1,fibre2) ! Tracks double from i1 to i2 in state k
+    IMPLICIT NONE
+    real(dp), INTENT(INOUT):: X(6)
+    TYPE(INTERNAL_STATE) K
+    TYPE (fibre), POINTER :: fibre1
+    TYPE (fibre), optional, POINTER :: fibre2
+    TYPE (fibre), POINTER :: C,c1,c2,last
+
+    c1=>fibre1
+    if(present(fibre2)) then
+       c2=>fibre2
+       nullify(last)
+    else
+       if(fibre1%parent_layout%closed) then
+          last=>fibre1%previous
+          c2=>last
+       else
+          last=>fibre1%parent_layout%end
+          c2=>fibre1%parent_layout%end
+       endif
+    endif
+
+
+    c=>c1
+
+
+
+    DO  WHILE(.not.ASSOCIATED(C,c2))
+
+       CALL TRACK(C,X,K)
+       if(.not.check_stable) exit
+
+       C=>C%NEXT
+    ENDDO
+
+    if(associated(last).and.check_stable) then
+       CALL TRACK(last,X,K)
+    endif
+
+    C_%STABLE_DA=.true.
+
+
+
+  END SUBROUTINE TRACK_fibre_based_R
+
+
+  SUBROUTINE TRACK_fibre_based_p(X,k,fibre1,fibre2) ! Tracks double from i1 to i2 in state k
+    IMPLICIT NONE
+    type(real_8), INTENT(INOUT):: X(6)
+    TYPE(INTERNAL_STATE) K
+    TYPE (fibre), POINTER :: fibre1
+    TYPE (fibre), optional, POINTER :: fibre2
+    TYPE (fibre), POINTER :: C,c1,c2,last
+
+    c1=>fibre1
+    if(present(fibre2)) then
+       c2=>fibre2
+       nullify(last)
+    else
+       if(fibre1%parent_layout%closed) then
+          last=>fibre1%previous
+          c2=>last
+       else
+          last=>fibre1%parent_layout%end
+          c2=>fibre1%parent_layout%end
+       endif
+    endif
+
+
+    c=>c1
+
+
+
+    DO  WHILE(.not.ASSOCIATED(C,c2))
+
+       CALL TRACK(C,X,K)
+       if(.not.check_stable) exit
+
+       C=>C%NEXT
+    ENDDO
+
+    if(associated(last).and.check_stable) then
+       CALL TRACK(last,X,K)
+    endif
+
+    C_%STABLE_DA=.true.
+
+
+  END SUBROUTINE TRACK_fibre_based_p
+
+
+
+
+
   SUBROUTINE TRACK_LAYOUT_FLAG_R(R,X,I1,I2,k,X_IN) ! Tracks double from i1 to i2 in state k
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: R
@@ -181,7 +287,7 @@ contains
     TYPE (fibre), POINTER :: C
 
 
-    CALL RESET_APERTURE_FLAG
+    ! CALL RESET_APERTURE_FLAG
 
 
 
@@ -197,13 +303,17 @@ contains
     J=I1
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
-       j_global=j
        CALL TRACK(C,X,K,X_IN=X_IN)  !,C%CHARGE
        !       CALL TRACK(C,X,K,R%CHARGE,X_IN)
+
+       if(.not.check_stable) exit
 
        C=>C%NEXT
        J=J+1
     ENDDO
+
+    C_%STABLE_DA=.true.
+
     !    else
     !       J=I1
     !
@@ -221,7 +331,7 @@ contains
     !    endif
 
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_R
 
@@ -238,7 +348,7 @@ contains
     TYPE (FIBRE), POINTER :: C
 
 
-    CALL RESET_APERTURE_FLAG
+    !  CALL RESET_APERTURE_FLAG
 
     call move_to(r,c,I1)
 
@@ -252,14 +362,15 @@ contains
     J=I1
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
-       j_global=j
        CALL TRACK(C,X,K)  !,C%CHARGE
        !       CALL TRACK(C,X,K,R%CHARGE)
+       if(.not.check_stable) exit
 
        C=>C%NEXT
        J=J+1
     ENDDO
 
+    C_%STABLE_DA=.true.
 
     !    else
     !       J=I1
@@ -277,7 +388,7 @@ contains
 
     !    endif
 
-    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
+    !    if(c_%watch_user) ALLOW_TRACKING=.FALSE.
 
     ! PATCHES
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
@@ -302,7 +413,9 @@ contains
     !INTEGER, POINTER :: CHARGE
 
 
-    IF(.NOT.CHECK_STABLE) return
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+    endif
     !    C%MAG%P%p0c=>c%p0c
     C%MAG%P%beta0=>c%beta0
     C%MAG%P%GAMMA0I=>c%GAMMA0I
@@ -407,6 +520,10 @@ contains
     endif
 
     CALL TRACK(C%MAG,X,K,X_IN)
+    !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
+    !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+    !       CHECK_STABLE=.false.
+    !    else   ! new 2010
 
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,X_IN%nst+1)
@@ -465,44 +582,15 @@ contains
        ENDIF
     ENDIF
 
-    !    if(c_%x_prime) then
-    !       P0=>C%MAG%P%P0C
-    !       B0=>C%MAG%P%BETA0
-    !       IF(C%MAG%P%exact)THEN
-    !          IF(k%TIME)THEN
-    !             xp=root(one+two*X(5)/B0+X(5)**2)*x(2)/root(one+x(2)**2+x(4)**2)
-    !             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)/root(one+x(2)**2+x(4)**2)
-    !             x(2)=xp
-    !          else
-    !             xp=(one+x(5))*x(2)/root(one+x(2)**2+x(4)**2)
-    !             x(4)=(one+x(5))*x(4)/root(one+x(2)**2+x(4)**2)
-    !             x(2)=xp
-    !          endif
-    !       else
-    !          IF(k%TIME)THEN
-    !             x(2)=root(one+two*X(5)/B0+X(5)**2)*x(2)
-    !             x(4)=root(one+two*X(5)/B0+X(5)**2)*x(4)
-    !          else
-    !             x(2)=(one+x(5))*x(2)
-    !             x(4)=(one+x(5))*x(4)
-    !          endif
-    !       endif
-    !    endif
+    !    endif ! new 2010
 
-
-    !   C%MAG=DEFAULT
-    !    nullify(C%MAG%P%DIR)
-    !    nullify(C%MAG%P%CHARGE)
-    !    nullify(C%MAG%P%beta0)
-    !    nullify(C%MAG%P%GAMMA0I)
-    !    nullify(C%MAG%P%GAMBET)
-    !    nullify(C%MAG%P%CHARGE)
-
-    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
-       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       xlost=x
        CHECK_STABLE=.false.
     endif
-    lost_fibre=>c
+    if(.not.check_stable ) lost_fibre=>c
+
   END SUBROUTINE TRACK_FIBRE_R
 
   !  recursive
@@ -520,7 +608,9 @@ contains
     TYPE (FIBRE), POINTER :: CN
     REAL(DP), POINTER :: P0,B0
 
-    IF(.NOT.CHECK_STABLE) return
+    IF(.NOT.CHECK_STABLE) then
+       CALL RESET_APERTURE_FLAG
+    endif
     !    C%MAGp%P%p0c=>c%p0c
     C%MAGp%P%beta0=>c%beta0
     C%MAGp%P%GAMMA0I=>c%GAMMA0I
@@ -530,58 +620,10 @@ contains
     if(present(charge)) then
        C%MAGP%P%CHARGE=>CHARGE
     endif
-    !    C%MAGP=K
-
-    !    if(c_%x_prime) then
-    !       call alloc(xp)  ! deallocated below
-    !       P0=>C%MAGP%P%P0C
-    !       B0=>C%MAGP%P%BETA0
-    !       IF(C%MAGP%P%exact)THEN
-    !          IF(k%TIME)THEN
-    !             xp=x(2)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-    !             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2-x(2)**2-x(4)**2)
-    !             x(2)=xp
-    !          else
-    !             xp=x(2)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
-    !             x(4)=x(4)/sqrt((one+x(5))**2-x(2)**2-x(4)**2)
-    !             x(2)=xp
-    !          endif
-    !       else
-    !          IF(k%TIME)THEN
-    !             x(2)=x(2)/sqrt(one+two*X(5)/B0+X(5)**2)
-    !             x(4)=x(4)/sqrt(one+two*X(5)/B0+X(5)**2)
-    !          else
-    !             x(2)=x(2)/(one+x(5))
-    !             x(4)=x(4)/(one+x(5))
-    !          endif
-    !       endif
-    !    endif
-
-
-    !    IF(PRESENT(X_IN)) then
-    !      X_IN%F=>c ; X_IN%E%F=>C; X_IN%NST=>X_IN%E%NST;
-    !   endif
 
     ! NEW STUFF WITH KIND=3: KNOB OF FPP IS SET TO TRUE IF NECESSARY
     IF(K%PARA_IN ) KNOB=.TRUE.
-    ! END NEW STUFF WITH KIND=3
-
-    ! DIRECTIONAL VARIABLE AND CHARGE IS PASSED TO THE ELEMENT
-
-    !
-
-    ! PASSING THE STATE K TO THE ELEMENT
-    !FRONTAL PATCH
-    !    IF(ASSOCIATED(C%PATCH)) THEN
     PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
-    !    ELSE
-    !       PATCHT=0 ; PATCHE=0 ;PATCHG=0;
-    !    ENDIF
-    ! ENERGY PATCH
-    !    IF(PRESENT(X_IN)) then
-    !       CALL XMID(X_IN,X,-6)
-    !       X_IN%POS(1)=X_IN%nst
-    !    endif
     IF(PATCHE/=0.AND.PATCHE/=2) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
@@ -626,20 +668,13 @@ contains
        OU = K%EXACTMIS.OR.ALWAYS_EXACTMIS
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-    !    IF(PRESENT(X_IN)) then
-    !       CALL XMID(X_IN,X,-1)
-    !       X_IN%POS(2)=X_IN%nst
-    !    endif
-    ! ************************************************************************
-    !  THE ACTUAL MAGNET PROPAGATOR AS IT WOULD APPEAR IN A STANDARD CODE
 
     CALL TRACK(C%MAGP,X,K)
-    !
-    ! ************************************************************************
-    !    IF(PRESENT(X_IN)) then
-    !       CALL XMID(X_IN,X,X_IN%nst+1)
-    !       X_IN%POS(3)=X_IN%nst
-    !    endif
+    !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
+    !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_P"
+    !       CHECK_STABLE=.false.
+    !    else ! new 2010
+
 
 
     ! MISALIGNMENTS AT THE EXIT
@@ -682,55 +717,7 @@ contains
           X(5)=(ONE+X(5))*C%MAGP%P%P0C/P0-ONE
        ENDIF
     ENDIF
-
-    !    IF(PRESENT(X_IN)) then
-    !      CALL XMID(X_IN,X,X_IN%nst+1)
-    !      X_IN%POS(4)=X_IN%nst
-    !    endif
-
-    !    IF(PRESENT(X_IN))  THEN
-    !       IF(X_IN%E%DO_SURVEY) THEN
-    !          CALL G_FRAME(X_IN%E,ENT,A,-7)
-    !          CALL  SURVEY(C,ENT,A,E_IN=X_IN%E)
-    !       ELSE
-    !          CALL SURVEY_INNER_MAG(X_IN%E)
-    !       ENDIF
-    !   ENDIF
-
-    !    if(c_%x_prime) then
-    !       P0=>C%MAGP%P%P0C
-    !       B0=>C%MAGP%P%BETA0
-    !       IF(C%MAGP%P%exact)THEN
-    !          IF(k%TIME)THEN
-    !             xp=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)/sqrt(one+x(2)**2+x(4)**2)
-    !             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)/sqrt(one+x(2)**2+x(4)**2)
-    !             x(2)=xp
-    !          else
-    !             xp=(one+x(5))*x(2)/sqrt(one+x(2)**2+x(4)**2)
-    !             x(4)=(one+x(5))*x(4)/sqrt(one+x(2)**2+x(4)**2)
-    !             x(2)=xp
-    !          endif
-    !       else
-    !          IF(k%TIME)THEN
-    !             x(2)=sqrt(one+two*X(5)/B0+X(5)**2)*x(2)
-    !             x(4)=sqrt(one+two*X(5)/B0+X(5)**2)*x(4)
-    !          else
-    !             x(2)=(one+x(5))*x(2)
-    !             x(4)=(one+x(5))*x(4)
-    !          endif
-    !       endif
-    !       call kill(xp)
-    !    endif
-
-    ! ELEMENT IS RESTAURED TO THE DEFAULT STATE
-    !    C%MAGP=DEFAULT
-    ! DIRECTIONAL VARIABLE AND CHARGE ARE ELIMINATED
-    !    NULLIFY(C%MAGP%P%DIR)
-    !    NULLIFY(C%MAGP%P%CHARGE)
-    !    nullify(C%MAGp%P%beta0)
-    !    nullify(C%MAGp%P%GAMMA0I)
-    !    nullify(C%MAGp%P%GAMBET)
-    !    nullify(C%MAGp%P%CHARGE)
+    !   endif ! new 2010
 
 
     ! KNOB IS RETURNED TO THE PTC DEFAULT
@@ -738,11 +725,13 @@ contains
     KNOB=ALWAYS_knobs
     ! END NEW STUFF WITH KIND=3
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
-       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_P"
+    ! new 2010
+    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       xlost=x
        CHECK_STABLE=.false.
     endif
-    lost_fibre=>c
+    if(.not.check_stable ) lost_fibre=>c
 
   END SUBROUTINE TRACK_FIBRE_P
 

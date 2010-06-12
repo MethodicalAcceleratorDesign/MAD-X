@@ -658,6 +658,7 @@ CONTAINS
 
        if(abs(xi(1))>c_%absolute_aperture.or.abs(xi(3))>c_%absolute_aperture) then
           c_%CHECK_STABLE=.FALSE.
+          xlost=xi
        endif
     enddo
 

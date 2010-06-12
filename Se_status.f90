@@ -83,10 +83,6 @@ module S_status
   !  !  include "a_def_user1.inc"
   !  !!  include "a_def_arbitrary.inc"
   !  !  include "a_def_user2.inc"
-  TYPE(INTERNAL_STATE), target ::  DEFAULT
-  TYPE(INTERNAL_STATE), target ::  TOTALPATH,RADIATION,NOCAVITY,FRINGE,TIME, &
-       EXACTMIS,STOCHASTIC
-  TYPE(INTERNAL_STATE), target ::  ONLY_4D,DELTA,SPIN,MODULATION
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,f,f,3)
@@ -112,6 +108,19 @@ module S_status
        &(0,f,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: MODULATION0   = INTERNAL_STATE &
        &(0,f,f,f,f,f,f,f,f,f,f,t,3)
+  TYPE(INTERNAL_STATE), target ::  DEFAULT=DEFAULT0
+  TYPE(INTERNAL_STATE), target ::  TOTALPATH=TOTALPATH0
+  TYPE(INTERNAL_STATE), target ::  RADIATION=RADIATION0
+  TYPE(INTERNAL_STATE), target ::  NOCAVITY=NOCAVITY0
+  TYPE(INTERNAL_STATE), target ::  FRINGE=FRINGE0
+  TYPE(INTERNAL_STATE), target ::  TIME=TIME0
+  TYPE(INTERNAL_STATE), target ::  EXACTMIS=EXACTMIS0
+  TYPE(INTERNAL_STATE), target ::  STOCHASTIC=STOCHASTIC0
+  TYPE(INTERNAL_STATE), target ::  ONLY_4D=ONLY_4D0
+  TYPE(INTERNAL_STATE), target ::  DELTA=DELTA0
+  TYPE(INTERNAL_STATE), target ::  SPIN=SPIN0
+  TYPE(INTERNAL_STATE), target ::  MODULATION=MODULATION0
+
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   LOGICAL(lp), target :: stoch_in_rec = .false.
@@ -496,6 +505,8 @@ CONTAINS
     REAL(DP), INTENT(IN):: X(6)
     !    real(dp) xx,yy,dx,dy,ex,ey
 
+    !  real(dp) :: xlost(6)=zero
+    !  character(120) :: messagelost
 
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
 
@@ -504,29 +515,43 @@ CONTAINS
           IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
+             STABLE_DA=.false.
+             xlost=zero
+             xlost(1)=x(1)
+             xlost(3)=x(3)
+             messagelost="Lost in real kind=1 elliptic Aperture"
           ENDIF
        CASE(2)  ! rectangle
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
-             !             xx=X(1)-E%DX
-             !             yy=X(3)-E%DY
-             !             dx=E%DX
-             !             dy=E%DY
-             !             ex=E%X
-             !             ey=E%y
+             STABLE_DA=.false.
+             xlost=zero
+             xlost(1)=x(1)
+             xlost(3)=x(3)
+             messagelost="Lost in real kind=2 rectangular Aperture"
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
+             STABLE_DA=.false.
+             xlost=zero
+             xlost(1)=x(1)
+             xlost(3)=x(3)
+             messagelost="Lost in real kind=3 rect-ellipse Aperture"
           ENDIF
        CASE(4) ! MARGUERITE
           IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>ONE).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
+             STABLE_DA=.false.
+             xlost=zero
+             xlost(1)=x(1)
+             xlost(3)=x(3)
+             messagelost="Lost in real kind=4 marguerite Aperture"
           ENDIF
        CASE(5) ! RACETRACK
           IF( (abs(x(1)-e%dx)) > (e%r(1)+e%x)                  &
@@ -537,6 +562,11 @@ CONTAINS
                .and. abs(x(3)-e%dy) .gt. e%y)) THEN
              CHECK_STABLE=.FALSE.
              CHECK_MADX_APERTURE=.false.
+             STABLE_DA=.false.
+             xlost=zero
+             xlost(1)=x(1)
+             xlost(3)=x(3)
+             messagelost="Lost in real kind=5 racetrack Aperture"
           ENDIF
 
        CASE(6) ! PILES OF POINTS
@@ -554,6 +584,7 @@ CONTAINS
     type (MADX_APERTURE),INTENT(IN)::E
     TYPE(REAL_8), INTENT(IN):: X(6)
     REAL(DP) Y(6)
+
     Y=X
     CALL CHECK_APERTURE(E,Y)
 

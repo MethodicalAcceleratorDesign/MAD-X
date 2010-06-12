@@ -955,8 +955,8 @@ contains
     c_%lda_used => lda_used
     c_%real_warning => real_warning
     c_%check_da => check_da
-    !    c_%stable_da => stable_da
-    c_%stable_da => CHECK_STABLE
+    c_%stable_da => stable_da
+    ! c_%stable_da => CHECK_STABLE
     c_%no => no
     c_%nv => nv
     c_%nd => nd
@@ -980,10 +980,7 @@ contains
     c_%APERTURE_FLAG => APERTURE_FLAG
     c_%s_aperture_CHECK => s_aperture_CHECK
     c_%absolute_aperture => absolute_aperture
-    c_%check_x_min => check_x_min
-    c_%check_x_max => check_x_max
-    c_%check_y_min => check_y_min
-    c_%check_y_max => check_y_max
+
     c_%hyperbolic_aperture => hyperbolic_aperture
     c_%WATCH_USER => WATCH_USER
     c_%no_hyperbolic_in_normal_form => no_hyperbolic_in_normal_form
@@ -1414,6 +1411,7 @@ contains
     s2%r=zero
     s2%i=0
     s2%j=0
+    s2%g=0
     s2%s=one
 
   END SUBROUTINE allocpoly
@@ -5427,8 +5425,15 @@ contains
     type (double_complex)  S2
 
     if(knob) then
-       varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
+       if(nb_==0) then
+          varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
+       elseif(s2%nb==nb_) then
+          varc1=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
+       else
+          varc1=S2%R
+       endif
     else ! Not a knob
+       stop 3330   ! buggy never used
        varc1=(/S2%R,S2%S/).var.(/0,0/)
     endif
 
@@ -5438,9 +5443,17 @@ contains
     implicit none
     type (double_complex)  S2
 
+
     if(knob) then
-       varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
+       if(nb_==0) then
+          varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp,s2%j+npara_fpp/)
+       elseif(s2%nb==nb_) then
+          varc2=(/S2%R,S2%S/).var.(/s2%i+npara_fpp-s2%g+1,s2%j+npara_fpp-s2%g+1/)
+       else
+          varc2=S2%R
+       endif
     else ! Not a knob
+       stop 3331   ! buggy never used
        varc2=(/S2%R,S2%S/).var.(/0,0/)
     endif
 

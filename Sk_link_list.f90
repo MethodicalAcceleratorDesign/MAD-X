@@ -1067,7 +1067,7 @@ CONTAINS
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
     TYPE (FIBRE),POINTER :: EL2
     REAL(DP)  D(3),ANG(3)
-    REAL(DP) ENT(3,3),EXI(3,3)
+    REAL(DP) ENT(3,3),EXI(3,3),ENT0(3,3),EXI0(3,3)
     REAL(DP), POINTER,DIMENSION(:)::A,B
     INTEGER  DIR
     REAL(DP)   PREC
@@ -1101,10 +1101,12 @@ CONTAINS
           A_XZ=1;A_YZ=1;
        ELSE
           EXI=EL1%CHART%F%ENT
-          call geo_rot(exi,pix,1,basis=exi)
+          exi0=exi
+          call geo_rot(exi,pix,1,basis=exi0)
           B=>EL1%CHART%F%A
           ENT=EL2%CHART%F%EXI
-          call geo_rot(ent,pix,1,basis=ent)
+          ent0=ent
+          call geo_rot(ent,pix,1,basis=ent0)
           A=>EL2%CHART%F%B
           ! A_XZ=1;A_YZ=1;
           A_XZ=-1;A_YZ=-1;
@@ -1114,12 +1116,14 @@ CONTAINS
           EXI=EL1%CHART%F%EXI
           B=>EL1%CHART%F%B
           ENT=EL2%CHART%F%EXI
-          call geo_rot(ent,pix,1,basis=ent)
+          ent0=ent
+          call geo_rot(ent,pix,1,basis=ent0)
           A=>EL2%CHART%F%B
           A_XZ=1;A_YZ=-1;
        ELSE
           EXI=EL1%CHART%F%ENT
-          call geo_rot(exi,pix,1,basis=exi)
+          exi0=exi
+          call geo_rot(exi,pix,1,basis=exi0)
           B=>EL1%CHART%F%A
           ENT=EL2%CHART%F%ENT
           A=>EL2%CHART%F%A
@@ -1214,7 +1218,7 @@ CONTAINS
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
     TYPE (FIBRE),POINTER :: EL2
     REAL(DP), INTENT(INOUT) :: D(3),ANG(3)
-    REAL(DP) ENT(3,3),EXI(3,3)
+    REAL(DP) ENT(3,3),EXI(3,3),ENT0(3,3),EXI0(3,3)
     REAL(DP), POINTER,DIMENSION(:)::A,B
     INTEGER, INTENT(IN) ::  DIR
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
@@ -1253,10 +1257,12 @@ CONTAINS
              A_XZ=1;A_YZ=1;
           ELSE
              EXI=EL1%CHART%F%ENT
-             call geo_rot(exi,pix,1,basis=exi)
+             exi0=exi
+             call geo_rot(exi,pix,1,basis=exi0)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%EXI
-             call geo_rot(ent,pix,1,basis=ent)
+             ent0=ent
+             call geo_rot(ent,pix,1,basis=ent0)
              A=>EL2%CHART%F%B
              !  A_XZ=1;A_YZ=1;
              A_XZ=-1;A_YZ=-1;
@@ -1266,12 +1272,14 @@ CONTAINS
              EXI=EL1%CHART%F%EXI
              B=>EL1%CHART%F%B
              ENT=EL2%CHART%F%EXI
-             call geo_rot(ent,pix,1,basis=ent)
+             ent0=ent
+             call geo_rot(ent,pix,1,basis=ent0)
              A=>EL2%CHART%F%B
              A_XZ=1;A_YZ=-1;
           ELSE
              EXI=EL1%CHART%F%ENT
-             call geo_rot(exi,pix,1,basis=exi)
+             exi0=exi
+             call geo_rot(exi,pix,1,basis=exi0)
              B=>EL1%CHART%F%A
              ENT=EL2%CHART%F%ENT
              A=>EL2%CHART%F%A

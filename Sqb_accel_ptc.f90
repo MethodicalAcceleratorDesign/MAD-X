@@ -55,7 +55,7 @@ contains
     do i=0,itime
        !       write(line,* ) i,accel(i)%b0,( accel(i)%volt(j)/1.e-3_dp,accel(i)%phase(j),j=1,size(accel(i)%volt)),accel(i)%dt0,accel(i)%freq
        accel(i)%v0=accel(i)%volt(1)*accel(i)%v0
-       write(line,* ) i,accel(i)%b0,accel(i)%phase(1),(accel(i)%volt(j)/accel(i)%volt(1),accel(i)%phase(j),j=2,size(accel(i)%volt))
+       write(line,* ) i,accel(i)%b0,accel(i)%phase(1),( accel(i)%volt(j)/ accel(i)%volt(1),accel(i)%phase(j),j=2,size(accel(i)%volt))
        call context(line,1)
        write(mf,'(a255)') line
        write(line,* ) accel(i)%dt0,accel(i)%freq,accel(i)%v0/1.e-3_dp

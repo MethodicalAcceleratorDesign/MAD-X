@@ -153,8 +153,8 @@ TYPE TKTF
    real(dp), DIMENSION(:,:), POINTER :: RMATX,RMATY !LINEAR MATRIX
    !frs     real(dp), DIMENSION(:), POINTER ::   Rlx(:)
    real(dp), DIMENSION(:), POINTER ::   Rlx
-   real(dp), DIMENSION(:), POINTER ::   dx(:)
-   real(dp), DIMENSION(:), POINTER ::   dy(:)
+   !     real(dp), DIMENSION(:), POINTER ::   dx(:)
+   !     real(dp), DIMENSION(:), POINTER ::   dy(:)
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
@@ -171,8 +171,8 @@ TYPE TKTFP
    TYPE(REAL_8), DIMENSION(:,:), POINTER :: RMATX,RMATY !LINEAR MATRIX
    !frs     TYPE(REAL_8), DIMENSION(:),   POINTER :: Rlx(:)
    TYPE(REAL_8), DIMENSION(:),   POINTER :: Rlx
-   real(dp), DIMENSION(:), POINTER ::   dx(:)
-   real(dp), DIMENSION(:), POINTER ::   dy(:)
+   !     real(dp), DIMENSION(:), POINTER ::   dx(:)
+   !     real(dp), DIMENSION(:), POINTER ::   dy(:)
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
@@ -292,6 +292,27 @@ TYPE STREXP
    integer, pointer :: f
 END  TYPE STREXP
 ! fitted magnet stuff
+
+TYPE ENGE
+   TYPE(MAGNET_CHART), POINTER:: P
+   real(dp), POINTER ::L,D
+   real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
+   real(dp),  DIMENSION(:), POINTER :: A             !ENGE  COEFFICIENTS
+   integer,  pointer :: nbessel                      !
+   type(my_1D_taylor), POINTER :: F
+END  TYPE ENGE
+
+TYPE ENGEP
+   TYPE(MAGNET_CHART), POINTER:: P
+   TYPE(REAL_8), POINTER ::L
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
+   real(dp), POINTER ::D
+   real(dp),  DIMENSION(:), POINTER :: A             !ENGE  COEFFICIENTS
+   integer,  pointer :: nbessel                      !
+   type(my_1D_taylor), POINTER :: F
+END  TYPE ENGEP
+
+
 
 !  NO POLYMORPH NECESSARY: DESCRIBES A TAYLOR MAP AS IN COSY-INFINITY
 !TYPE MARTIN

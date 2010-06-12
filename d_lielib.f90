@@ -2689,19 +2689,19 @@ contains
     call mapflol(sa,sai,cr,cm,st)
     do i=1,nd-ndc
        if(st(i)+c_1d_3.gt.one) then
-          a(i)=root(cr(2*i-1,2*i-1)**2+cr(2*i-1,2*i)**2)
-          q(i)=ARCCOS(cr(2*i-1,2*i-1)/a(i))
-          a(i)=LOGE(a(i))
+          a(i)=sqrt(cr(2*i-1,2*i-1)**2+cr(2*i-1,2*i)**2)
+          q(i)=ARCCOS_lielib(cr(2*i-1,2*i-1)/a(i))
+          a(i)=LOGE_lielib(a(i))
           if(cr(2*i-1,2*i).lt.zero) q(i)=twopi-q(i)
        else
-          a(i)=ROOT(cr(2*i-1,2*i-1)**2-cr(2*i-1,2*i)**2)
+          a(i)=sqrt(cr(2*i-1,2*i-1)**2-cr(2*i-1,2*i)**2)
           ch=cr(2*i-1,2*i-1)/a(i)
           shm=cr(2*i-1,2*i)/a(i)
           !       CH=CH+SQRT(CH**2-one)
           !       q(i)=LOG(CH)
-          q(i)=-LOGE(ch+shm)   ! half integer ???? blows up
+          q(i)=-LOGE_lielib(ch+shm)   ! half integer ???? blows up
           !       IF(cr(2*i-1,2*i).gt.zero) Q(I)=-Q(I)
-          a(i)=LOGE(a(i))
+          a(i)=LOGE_lielib(a(i))
        endif
     enddo
     if(ndc.eq.0) then
