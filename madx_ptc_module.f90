@@ -2319,7 +2319,7 @@ CONTAINS
        call context(name)
        call move_to(my_ring,p,name,pos)
        tilt=-p%mag%p%tiltd
-       if(pos/=0.and.p%mag%parent_fibre%dir==1) then
+       if(pos/=0) then
           if(p%mag%l/=zero) then
              do k=1,maxmul
                 b(k)=b(k)/p%mag%l
