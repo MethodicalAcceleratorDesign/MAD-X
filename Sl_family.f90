@@ -1054,8 +1054,12 @@ CONTAINS
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
     ANGLE=ZERO; ANGLE(1)=MAD_ANGLE(1)
+    ent1=ent
+    ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
     ANGLE=ZERO; ANGLE(2)=MAD_ANGLE(2)
+    ent1=ent
+    ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
 
     CALL CHANGE_BASIS(T_GLOBAL,GLOBAL_FRAME,T,ENT)
@@ -1965,7 +1969,8 @@ CONTAINS
 
              D=ZERO
              ent0=ent
-             CALL GEO_ROT(ENT0,D,ANG,1,ENT)
+             CALL GEO_ROT(ENT0,D,ANG,1,ENT) ! frank's flag
+             ent=ent0
 
              CALL GEO_TRA(A,ENT,DT,1)
 
@@ -2016,7 +2021,8 @@ CONTAINS
 
           D=ZERO
           ent0=ent
-          CALL GEO_ROT(ENT0,D,ANG,1,ENT)
+          CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! frank's flag
+          ent=ent0
 
           CALL GEO_TRA(A,ENT,DT,1)
 

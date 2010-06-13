@@ -432,7 +432,7 @@ CONTAINS
     real(dp), INTENT(IN):: ANG(3)
     INTEGER, INTENT(IN):: I
     real(dp) V(3)
-    real(dp), optional, INTENT(IN):: basis(3,3)
+    real(dp), optional, INTENT(INOUT):: basis(3,3)
 
     v=zero
     CALL GEO_ROT(ENT,V,ANG,i,basis)
@@ -446,7 +446,7 @@ CONTAINS
     real(dp), INTENT(INOUT):: ENT(3,3),A(3)
     real(dp), INTENT(IN):: ANG(3)
     INTEGER, INTENT(IN):: I
-    real(dp), optional, INTENT(IN):: basis(3,3)
+    real(dp), optional, INTENT(INOUT):: basis(3,3)
     REAL(DP) AT(3),AA(3),ent0(3,3)
     INTEGER J
 
@@ -471,7 +471,7 @@ CONTAINS
     real(dp), INTENT(INOUT):: ENT(3,3),exi(3,3)
     real(dp), INTENT(IN):: ANG(3)
     real(dp) v(3),vv(3)
-    real(dp), optional, INTENT(IN):: basis(3,3)
+    real(dp), optional, INTENT(INOUT):: basis(3,3)
 
 
     v=zero
@@ -603,7 +603,7 @@ CONTAINS
     real(dp), INTENT(INOUT):: ENT(3,3),EXI(3,3),A(3),B(3)
     real(dp), INTENT(IN):: ANG(3)
     real(dp) TEMP(3,3),exii(3,3),enti(3,3),T(3),R(3,3),basist(3,3)
-    real(dp), optional, INTENT(IN):: basis(3,3)
+    real(dp), optional, INTENT(INOUT):: basis(3,3)
     INTEGER I,j,k
     ! Definition
     !  ENT(1,i) is the local x-vector
@@ -817,8 +817,7 @@ CONTAINS
     AT=ZERO;AT(3)=A(3);
 
     CALL GEO_ROT(T10,T1,AT,T2)
-    T2=T1
-
+!    T2=T1
     !   write(16,*) t2-entb
 
 
@@ -837,8 +836,6 @@ CONTAINS
     ENDDO
 
   END SUBROUTINE  COMPUTE_SCALAR
-
-
 
 
 
