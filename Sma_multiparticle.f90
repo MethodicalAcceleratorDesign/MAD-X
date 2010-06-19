@@ -500,12 +500,14 @@ CONTAINS
     type(three_d_info),intent(INOUT) ::  v
     TYPE(INTEGRATION_NODE),POINTER:: mag_in,mag_out
 
-    IF(.NOT.CHECK_STABLE) then
-       CALL RESET_APERTURE_FLAG
-       return
-    endif
+    IF(.NOT.CHECK_STABLE) return
+    !       CALL RESET_APERTURE_FLAG
+    !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then
+       messageLOST="exceed absolute_aperture in TRACKV_NODE_SINGLE"
+       lost_node=>t
+       lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
     endif
@@ -564,12 +566,14 @@ CONTAINS
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
 
-    IF(.NOT.CHECK_STABLE) then
-       CALL RESET_APERTURE_FLAG
-    endif
+    IF(.NOT.CHECK_STABLE) return
+    !       CALL RESET_APERTURE_FLAG
+    !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       messageLOST="exceed absolute_aperture in TRACKR_NODE_SINGLE"
+       lost_node=>t
+       lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
     endif
@@ -594,9 +598,6 @@ CONTAINS
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
        if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
     CASE(CASEP2)
-       !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
-       !       CHECK_STABLE=.false.
-       !    endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -732,11 +733,14 @@ CONTAINS
     logical(lp) CHECK_KNOB
     logical(lp), pointer,dimension(:)::AN,BN
 
-    IF(.NOT.CHECK_STABLE) then
-       CALL RESET_APERTURE_FLAG
-    endif
+    IF(.NOT.CHECK_STABLE) return
+    !       CALL RESET_APERTURE_FLAG
+    !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then
+       messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
+       lost_node=>t
+       lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
     endif

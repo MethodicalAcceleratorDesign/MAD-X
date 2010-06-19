@@ -514,43 +514,35 @@ CONTAINS
        CASE(1)  ! ellipse circles
           IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE) THEN
              CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
              STABLE_DA=.false.
              xlost=zero
-             xlost(1)=x(1)
-             xlost(3)=x(3)
+             xlost=x
              messagelost="Lost in real kind=1 elliptic Aperture"
           ENDIF
        CASE(2)  ! rectangle
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
              STABLE_DA=.false.
              xlost=zero
-             xlost(1)=x(1)
-             xlost(3)=x(3)
+             xlost=x
              messagelost="Lost in real kind=2 rectangular Aperture"
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
              STABLE_DA=.false.
              xlost=zero
-             xlost(1)=x(1)
-             xlost(3)=x(3)
+             xlost=x
              messagelost="Lost in real kind=3 rect-ellipse Aperture"
           ENDIF
        CASE(4) ! MARGUERITE
           IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>ONE).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE)) THEN
              CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
              STABLE_DA=.false.
              xlost=zero
-             xlost(1)=x(1)
-             xlost(3)=x(3)
+             xlost=x
              messagelost="Lost in real kind=4 marguerite Aperture"
           ENDIF
        CASE(5) ! RACETRACK
@@ -561,11 +553,9 @@ CONTAINS
                .and. (abs(x(1)-e%dx)) .gt. e%x                        &
                .and. abs(x(3)-e%dy) .gt. e%y)) THEN
              CHECK_STABLE=.FALSE.
-             CHECK_MADX_APERTURE=.false.
              STABLE_DA=.false.
              xlost=zero
-             xlost(1)=x(1)
-             xlost(3)=x(3)
+             xlost=x
              messagelost="Lost in real kind=5 racetrack Aperture"
           ENDIF
 

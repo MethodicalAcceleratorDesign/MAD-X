@@ -331,6 +331,7 @@ contains
           if(wherelost==1) then
              t%lost=t%lost+1
           endif
+          exit
        endif
        T=>T%NEXT
     ENDDO
@@ -370,7 +371,7 @@ contains
 
     u=my_false
 
-    T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
+    T=>MY_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
     !    IF(T%USE_TPSA_MAP) THEN !1
     !       DO I=1,6
     !          X(I)=X(I)-T%ORBIT(I)
@@ -390,9 +391,10 @@ contains
           CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
        ENDIF
        if(.not.CHECK_STABLE) then
-          CALL RESET_APERTURE_FLAG
+          !          CALL RESET_APERTURE_FLAG
           u=my_true
           x(1)=XBIG
+          exit
        endif
        T=>T%NEXT
     ENDDO

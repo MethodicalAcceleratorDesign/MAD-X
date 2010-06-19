@@ -21,7 +21,6 @@ MODULE S_TRACKING
   PRIVATE TRACK_LAYOUT_FLAG_Rf,TRACK_LAYOUT_FLAG_Pf
   private TRACK_fibre_based_R,TRACK_fibre_based_P
   ! old Sj_elements
-  logical(lp),TARGET :: x_prime=.false.
   ! END old Sj_elements
 
   ! TYPE UPDATING
@@ -89,7 +88,7 @@ contains
 
     call track(R,X,II1,k,X_IN)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_R1f)
-    call RESET_APERTURE_FLAG(my_false)
+    !    call RESET_APERTURE_FLAG(my_false)
   end  function TRACK_LAYOUT_FLAG_R1f
 
   !  recursive
@@ -103,7 +102,7 @@ contains
 
     call track(R,X,II1,k)
     call PRODUCE_APERTURE_FLAG(TRACK_LAYOUT_FLAG_P1f)
-    call RESET_APERTURE_FLAG(my_false)
+    !    call RESET_APERTURE_FLAG(my_false)
 
   end  function TRACK_LAYOUT_FLAG_P1f
 
@@ -394,14 +393,15 @@ contains
   END SUBROUTINE TRACK_LAYOUT_FLAG_P
 
   !  recursive
-  SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
+  !  SUBROUTINE TRACK_FIBRE_R(C,X,K,CHARGE,X_IN)
+  SUBROUTINE TRACK_FIBRE_R(C,X,K,X_IN)
     implicit none
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     real(dp), INTENT(INOUT):: X(6)
     TYPE(WORM), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER,optional, target, INTENT(IN) :: CHARGE
+    !    INTEGER,optional, target, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) ou,patch
     INTEGER(2) PATCHT,PATCHG,PATCHE
@@ -423,9 +423,9 @@ contains
     C%MAG%P%CHARGE=>c%CHARGE
     ! DIRECTIONAL VARIABLE
     C%MAG%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAG%P%CHARGE=>CHARGE
-    endif
+    ! if(present(charge)) then
+    !    C%MAG%P%CHARGE=>CHARGE
+    ! endif
     !  C%MAG=K
 
     !    if(c_%x_prime) then
@@ -585,7 +585,7 @@ contains
     !    endif ! new 2010
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       messageLOST="exceed absolute_aperture in TRACK_FIBRE_R"
        xlost=x
        CHECK_STABLE=.false.
     endif
@@ -594,14 +594,15 @@ contains
   END SUBROUTINE TRACK_FIBRE_R
 
   !  recursive
-  SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE)
+  !  SUBROUTINE TRACK_FIBRE_P(C,X,K,CHARGE)
+  SUBROUTINE TRACK_FIBRE_P(C,X,K)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
     TYPE(REAL_8), INTENT(INOUT):: X(6)
     !    TYPE(WORM_8), OPTIONAL,INTENT(INOUT):: X_IN
-    INTEGER, optional,TARGET, INTENT(IN) :: CHARGE
+    !   INTEGER, optional,TARGET, INTENT(IN) :: CHARGE
     TYPE(INTERNAL_STATE), INTENT(IN) :: K
     logical(lp) OU,PATCH
     INTEGER(2) PATCHT,PATCHG,PATCHE
@@ -617,9 +618,9 @@ contains
     C%MAGp%P%GAMBET=>c%GAMBET
     C%MAGp%P%CHARGE=>c%CHARGE
     C%MAGP%P%DIR=>C%DIR
-    if(present(charge)) then
-       C%MAGP%P%CHARGE=>CHARGE
-    endif
+    !    if(present(charge)) then
+    !       C%MAGP%P%CHARGE=>CHARGE
+    !    endif
 
     ! NEW STUFF WITH KIND=3: KNOB OF FPP IS SET TO TRUE IF NECESSARY
     IF(K%PARA_IN ) KNOB=.TRUE.
@@ -727,7 +728,7 @@ contains
 
     ! new 2010
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       !   if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
+       messageLOST="exceed absolute_aperture in TRACK_FIBRE_P"
        xlost=x
        CHECK_STABLE=.false.
     endif

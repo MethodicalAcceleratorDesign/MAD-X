@@ -1969,7 +1969,7 @@ CONTAINS
 
              D=ZERO
              ent0=ent
-             CALL GEO_ROT(ENT0,D,ANG,1,ENT) ! frank's flag
+             CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! for frank's flags
              ent=ent0
 
              CALL GEO_TRA(A,ENT,DT,1)
@@ -2021,7 +2021,7 @@ CONTAINS
 
           D=ZERO
           ent0=ent
-          CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! frank's flag
+          CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! for frank's flags
           ent=ent0
 
           CALL GEO_TRA(A,ENT,DT,1)

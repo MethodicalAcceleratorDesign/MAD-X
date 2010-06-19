@@ -2823,6 +2823,7 @@ contains
           if(ri(i)==zero) then
              hyp=.true.
              c_%stable_da=.false.
+             c_%check_stable=.false.
           endif
        enddo
        if(hyp) then

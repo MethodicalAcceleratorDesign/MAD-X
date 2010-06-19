@@ -94,7 +94,7 @@ contains
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
 
-    c_%x_prime=.true.
+!    c_%x_prime=.true.
 
     e=restart_sequ()
     p=>my_ring%start
@@ -282,7 +282,7 @@ contains
     if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
 
-    c_%x_prime=.false.
+!    c_%x_prime=.false.
 
     CALL KILL_BEAM(TheBeam)
 
@@ -489,7 +489,7 @@ contains
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
 
-    c_%x_prime=.true.
+!    c_%x_prime=.true.
 
     e=restart_sequ()
     p=>my_ring%start
@@ -650,7 +650,7 @@ contains
 
     !close(mf)
 
-    c_%x_prime=.false.
+!    c_%x_prime=.false.
 
     deallocate (observedelements)
     !==============================================================================

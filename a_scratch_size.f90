@@ -169,7 +169,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=c_1d3
+  REAL(dp),TARGET   :: absolute_aperture=one
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
@@ -253,9 +253,6 @@ module precision_constants
      logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
      logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done (default)
      logical(lp),pointer  :: s_aperture_CHECK       !=.TRUE. aperture checks globally done (default)
-     logical(lp),pointer  :: check_iteration       ! checks iteration in fitted magnet for symplectic tracking (not used)
-     logical(lp),pointer  :: check_interpolate_x       ! check if lost by being outside the interpolation region
-     logical(lp),pointer  :: check_interpolate_y      ! check if lost by being outside the interpolation region
 
 
      logical(lp),pointer  :: WATCH_USER     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
@@ -286,7 +283,6 @@ module precision_constants
      ! creates a reverse propagator and a reversed ring in combination with above
      logical(lp),pointer ::FIBRE_flip    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
-     logical(lp), pointer :: x_prime != .false.
      real(dp), pointer :: eps_pos
      ! fill once and never touch again
 

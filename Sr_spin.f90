@@ -52,11 +52,11 @@ module ptc_spin
      MODULE PROCEDURE alloc_temporal_beam
   END INTERFACE
 
-  INTERFACE TRACK_PROBE2
+  INTERFACE TRACK_PROBE2     ! semi private routine
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_R  !#2  ! probe from node i1 to i2 (R,xs,k,I1,I2)
      MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_s12_P  ! Tracks probe from integer node i1 to i2 in state k
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_R  !#6 USING NODE1 TO NODE2 AS OBJECT
-     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P  ! (xs,k,fibre1,fibre2,node1,node2)
+     !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_R  !#6 USING NODE1 TO NODE2 AS OBJECT
+     !     MODULE PROCEDURE TRACK_NODE_LAYOUT_FLAG_pr_t12_P  ! (xs,k,fibre1,fibre2,node1,node2)
   END INTERFACE
 
   INTERFACE TRACK_PROBE
@@ -377,23 +377,6 @@ contains
 
   END subroutine rot_spin_zp
 
-  !  subroutine PUSH_SPIN_RAY8(c,DS,FAC,S,before,k,POS)
-  !    implicit none
-  !    TYPE(integration_node), POINTER::c
-  !    TYPE(ELEMENTP), POINTER::EL
-  !    INTEGER,OPTIONAL,INTENT(IN) ::POS
-  !    TYPE(REAL_8), INTENT(INout) :: DS
-  !    REAL(DP), INTENT(IN) :: FAC
-  !    type(probe_8),INTENT(INOUT) ::S
-  !    LOGICAL(LP),intent(in) :: before
-  !    type(internal_state) k
-  !    el=>c%parent_fibre%magp
-  !    if(EL%kind<=kind1) return
-  !    call PUSH_SPIN(c,DS,FAC,S,S%E_IJ,before,k,POS)
-
-  !  end subroutine PUSH_SPIN_RAY8
-
-  !  subroutine radiate_2r(c,DS,FAC,X,b2,dlds,XP,before,k,POS)
   subroutine radiate_2r(c,DS,FAC,X,b2,dlds,before,k,POS)
     use gauss_dis
     implicit none
@@ -408,6 +391,7 @@ contains
     real(dp)  st,z,av(3),t
     type(internal_state) k
 
+    IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%mag
 
     if(k%TIME) then
@@ -505,17 +489,16 @@ contains
 
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     if(.not.(k%radiation.or.k%SPIN)) return
+    IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%mag
     if(EL%kind<=kind1) return
 
     CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
-
     if(k%radiation.AND.BEFORE) then
        !if(el%p%radiation.AND.BEFORE) then
        !       call radiate_2(c,DS,FAC,P%X,b2,dlds,XP,before,k,POS)
        call radiate_2(c,DS,FAC,P%X,b2,dlds,before,k,POS)
     endif
-
 
     if(k%SPIN) then
        CO(1)=COS(FAC*DS*OM(1)/TWO)
@@ -568,6 +551,8 @@ contains
     type(damap) xpmap
     integer i,j
     type(internal_state) k
+
+    IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%magp
     if(.not.before.and.stoch_in_rec) then
 
@@ -709,6 +694,8 @@ contains
     type(internal_state) k
     INTEGER I
 
+    IF(.NOT.CHECK_STABLE) return
+
     if(.not.(k%radiation.or.k%SPIN)) return
     el=>c%parent_fibre%mag
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
@@ -771,6 +758,7 @@ contains
     type(internal_state) k
     INTEGER I
 
+    IF(.NOT.CHECK_STABLE) return
     if(.not.(k%radiation.or.k%SPIN)) return
     el=>c%parent_fibre%magp
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
@@ -859,8 +847,8 @@ contains
     LOGICAL(LP),intent(in) :: BEFORE
     type(internal_state) k
     INTEGER I
-
     if(.not.(k%radiation.or.k%SPIN)) return
+    IF(.NOT.CHECK_STABLE) return
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     el=>c%parent_fibre%magp
     if(EL%kind<=kind1) return
@@ -947,6 +935,8 @@ contains
     REAL(DP) BETA0,GAMMA0I,XPA(2)
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%mag
     P=>EL%P
     P%DIR    => C%PARENT_FIBRE%DIR
@@ -970,32 +960,32 @@ contains
     case(KIND2,kind5:kind7) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
 
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,E,EB,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
     case(KIND16:kind17,KIND20)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
        ENDIF
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
@@ -1006,10 +996,10 @@ contains
        else
           beta0=one;GAMMA0I=zero;
        endif
-       d1=SQRT(x(2)**2+x(4)**2+(one+P%B0*x(1))**2)
+       d1=root(x(2)**2+x(4)**2+(one+P%B0*x(1))**2)
        d2=one+two*x(5)/beta0+x(5)**2
        d2=gamma0I/beta0/d2
-       DLDS=SQRT((ONE+d2**2))*d1/(ONE/BETA0+X(5))
+       DLDS=root((ONE+d2**2))*d1/(ONE/BETA0+X(5))
        OM(2)=P%b0
     case(KINDWIGGLER)
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
@@ -1018,9 +1008,9 @@ contains
     case(KIND22)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case default
        OM(1)=ZERO
@@ -1069,6 +1059,7 @@ contains
     !     ID=1
     !     X=CLO+ID
 
+    IF(.NOT.CHECK_STABLE) return
 
     CALL ALLOC(B,3)
     CALL ALLOC(E,3)
@@ -2086,7 +2077,7 @@ contains
     !    CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
     IF(k%TIME) THEN
-       DP1=SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2)
+       DP1=root(ONE+TWO*X(5)/P%BETA0+X(5)**2)
     ELSE
        DP1=ONE+X(5)
     ENDIF
@@ -2097,7 +2088,7 @@ contains
 
           XPA(1)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)
           XPA(2)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)
-          N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
+          N=root(DP1**2-Xpa(1)**2-Xpa(2)**2)
 
           E(1)=Xpa(1)/DP1
           E(2)=Xpa(2)/DP1
@@ -2110,7 +2101,7 @@ contains
           Xpa(1)=X(2)-A
           CALL COMPY(EL%wi,Z,X,B,BP)
           Xpa(2)=X(4)-B
-          N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
+          N=root(DP1**2-Xpa(1)**2-Xpa(2)**2)
 
           E(1)=Xpa(1)/DP1
           E(2)=Xpa(2)/DP1
@@ -2129,7 +2120,7 @@ contains
           CALL compute_f4(EL%he22,X,Z,A=AV)
           Xpa(1)=X(2)-EL%P%CHARGE*AV(1)
           Xpa(2)=X(4)-EL%P%CHARGE*AV(2)
-          N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
+          N=root(DP1**2-Xpa(1)**2-Xpa(2)**2)
 
           E(1)=Xpa(1)/DP1
           E(2)=Xpa(2)/DP1
@@ -2140,7 +2131,7 @@ contains
        else
 
 
-          N=SQRT(DP1**2-X(2)**2-X(4)**2)
+          N=root(DP1**2-X(2)**2-X(4)**2)
 
           E(1)=X(2)/DP1
           E(2)=X(4)/DP1
@@ -2153,7 +2144,7 @@ contains
 
     ELSE    ! NON CANONICAL VARIABLES
        H=ONE+P%B0*TEAPOT_LIKE*X(1)
-       N=SQRT(H**2+X(2)**2+X(4)**2)
+       N=root(H**2+X(2)**2+X(4)**2)
        E(1)=X(2)/N
        E(2)=X(4)/N
        E(3)=H/N
@@ -2293,7 +2284,7 @@ contains
     !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
     !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
-    CALL RESET_APERTURE_FLAG
+    !    CALL RESET_APERTURE_FLAG
     nullify(n1)
     nullify(n2)
 
@@ -2351,7 +2342,7 @@ contains
     !    if(present(node1))CHARGE=NODE1%PARENT_FIBRE%CHARGE
     !    if(present(fibre1))CHARGE=fibre1%CHARGE
 
-    CALL RESET_APERTURE_FLAG
+    !    CALL RESET_APERTURE_FLAG
     nullify(n1)
     nullify(n2)
 
@@ -2574,129 +2565,129 @@ contains
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_probe_spin12P
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_spin12r_x(r,x,k,u,t, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+  SUBROUTINE TRACK_LAYOUT_FLAG_spin12r_x(r,x,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     type(probe) xs
     real(dp),intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
     integer,optional:: fibre1,fibre2,node1,node2
-    logical(lp), optional ::u
-    type(integration_node),optional, pointer :: t
+    !    logical(lp), optional ::u
+    !    type(integration_node),optional, pointer :: t
 
     if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
 
     xs%u=my_false
     XS=X
-    if(present(t)) THEN
-       nullify(t)
-    ENDIF
+    !    if(present(t)) THEN
+    !       nullify(t)
+    !    ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
     CALL TRACK_PROBE(r,xs,K, fibre1,fibre2,node1,node2)
-    if(present(u)) u=xs%u
+    !    if(present(u)) u=xs%u
     X=XS%X
-    if(present(t)) THEN
-       t=>xs%lost_node
-       NULLIFY(xs%lost_node)
-    ENDIF
+    !    if(present(t)) THEN
+    !       t=>xs%lost_node
+    !       NULLIFY(xs%lost_node)
+    !    ENDIF
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_spin12r_x
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_spin12p_x(r,x,k,u,t, fibre1,fibre2,node1,node2)  ! fibre i1 to i2
+  SUBROUTINE TRACK_LAYOUT_FLAG_spin12p_x(r,x,k, fibre1,fibre2,node1,node2)  ! fibre i1 to i2
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     type(probe_8) xs
     type(real_8),target,intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
     integer,optional:: fibre1,fibre2,node1,node2
-    logical(lp), optional ::u
-    type(integration_node),optional, pointer :: t
+    !  logical(lp), optional ::u
+    ! type(integration_node),optional, pointer :: t
     if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
     call alloc(xs)
     xs%u=my_false
     XS%x=X
-    if(present(t)) THEN
-       !    ALLOCATE(xs%lost_node)
-       !    t=>xs%lost_node
-       nullify(t)
-    ENDIF
+    ! if(present(t)) THEN
+    !    ALLOCATE(xs%lost_node)
+    !    t=>xs%lost_node
+    !    nullify(t)
+    ! ENDIF
 
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
     CALL TRACK_PROBE(r,xs,K, fibre1,fibre2,node1,node2)
-    if(present(u)) u=xs%u
-    if(present(t)) THEN
-       t=>xs%lost_node
+    !  if(present(u)) u=xs%u
+    !  if(present(t)) THEN
+    !     t=>xs%lost_node
 
-       !       deallocate(xs%lost_node)
-       NULLIFY(xs%lost_node)
-    ENDIF
+    !       deallocate(xs%lost_node)
+    !     NULLIFY(xs%lost_node)
+    !  ENDIF
 
     X=XS%X
     call kill(xs)
   END SUBROUTINE TRACK_LAYOUT_FLAG_spin12p_x
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_spint12r_x(x,k,u,t, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+  SUBROUTINE TRACK_LAYOUT_FLAG_spint12r_x(x,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
     IMPLICIT NONE
     type(probe) xs
     real(dp),intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
     type(fibre),optional,pointer:: fibre1,fibre2
     type(integration_node),optional,pointer:: node1,node2
-    logical(lp), optional ::u
-    type(integration_node),optional, pointer :: t
+    !   logical(lp), optional ::u
+    !   type(integration_node),optional, pointer :: t
 
 
     xs%u=my_false
     XS=X
-    if(present(t)) THEN
-       !       ALLOCATE(xs%lost_node)
-       !       t=>xs%lost_node
-       nullify(t)
-    ENDIF
+    !   if(present(t)) THEN
+    !       ALLOCATE(xs%lost_node)
+    !       t=>xs%lost_node
+    !     nullify(t)
+    !  ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
     CALL TRACK_PROBE(xs,K, fibre1,fibre2,node1,node2)
-    if(present(u)) u=xs%u
+    !   if(present(u)) u=xs%u
     X=XS%X
-    if(present(t)) THEN
-       t=>xs%lost_node
-       !       deallocate(xs%lost_node)
-       NULLIFY(xs%lost_node)
-    ENDIF
+    !   if(present(t)) THEN
+    !      t=>xs%lost_node
+    !       deallocate(xs%lost_node)
+    !      NULLIFY(xs%lost_node)
+    !   ENDIF
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_spint12r_x
 
-  SUBROUTINE TRACK_LAYOUT_FLAG_spint12p_x(x,k,u,t, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+  SUBROUTINE TRACK_LAYOUT_FLAG_spint12p_x(x,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
     IMPLICIT NONE
     type(probe_8) xs
     type(real_8),intent(INOUT) ::  x(6)
     TYPE(INTERNAL_STATE) K
     type(fibre),optional,pointer:: fibre1,fibre2
     type(integration_node),optional,pointer:: node1,node2
-    logical(lp), optional ::u
-    type(integration_node),optional, pointer :: t
+    !    logical(lp), optional ::u
+    !    type(integration_node),optional, pointer :: t
 
 
     call alloc(xs)
     xs%u=my_false
     XS%X=X
-    if(present(t)) THEN
-       !       ALLOCATE(xs%lost_node)
-       !       t=>xs%lost_node
-       nullify(t)
-    ENDIF
+    !  if(present(t)) THEN
+    !       ALLOCATE(xs%lost_node)
+    !       t=>xs%lost_node
+    !    nullify(t)
+    ! ENDIF
     !    IF(I22==I11.AND.I2>I1) I22=I11+R%T%N
 
     CALL TRACK_PROBE(xs,K, fibre1,fibre2,node1,node2)
-    if(present(u)) u=xs%u
+    !  if(present(u)) u=xs%u
     X=XS%X
-    if(present(t)) THEN
-       t=>xs%lost_node
-       !      deallocate(xs%lost_node)
-       NULLIFY(xs%lost_node)
-    ENDIF
+    !  if(present(t)) THEN
+    !     t=>xs%lost_node
+    !      deallocate(xs%lost_node)
+    !     NULLIFY(xs%lost_node)
+    !  ENDIF
     call kill(xs)
 
   END SUBROUTINE TRACK_LAYOUT_FLAG_spint12p_x
@@ -3006,7 +2997,6 @@ contains
 
     IF(.NOT.CHECK_STABLE) then
        CALL RESET_APERTURE_FLAG
-       return
     endif
 
     !    if(xs%u) return
@@ -3025,7 +3015,8 @@ contains
     IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
        CALL TRACK_MODULATION(C,XS,K)
     ENDIF
-
+    !   lost_node=>c
+    !     lost_fibre=>c%parent_fibre
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
@@ -3068,7 +3059,6 @@ contains
 
     IF(.NOT.CHECK_STABLE) then
        CALL RESET_APERTURE_FLAG
-       return
     endif
 
     C%PARENT_FIBRE%MAGp%P%DIR    => C%PARENT_FIBRE%DIR
@@ -3138,6 +3128,7 @@ contains
     if(.not.(k%SPIN)) return
 
     !    el=>C%PARENT_FIBRE%MAG
+    IF(.NOT.CHECK_STABLE) return
 
     if(C%PARENT_FIBRE%dir==1) then
        IF(C%CAS==CASE1) THEN
@@ -3163,8 +3154,11 @@ contains
     TYPE (INTEGRATION_NODE), POINTER :: C
     !    TYPE(ELEMENTP), POINTER :: EL
     integer pos
+
+
     if(.not.(k%SPIN)) return
     !    el=>C%PARENT_FIBRE%MAGp
+    IF(.NOT.CHECK_STABLE) return
 
 
     if(C%PARENT_FIBRE%dir==1) then
@@ -4233,7 +4227,7 @@ contains
        if(mod(k,kp)==0) then  ! kp
           write(6,*) k,"$$$$$$$$$$$$$$$$$$$$$$$$$"
           do i=1,3
-             norm=sqrt(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
+             norm=root(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
              if(norm>=zero) then
                 norm=1.d0/norm
              endif
@@ -4245,7 +4239,7 @@ contains
 
     norm0=zero
     do i=1,3
-       norm=sqrt(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
+       norm=root(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
        if(norm>=norm0) then
           imax=1
           n%x(1)=xst%s(1)%x(i)/norm
@@ -4275,6 +4269,8 @@ contains
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     LOGICAL(LP) END_OF_LINE
     END_OF_LINE=.FALSE.
+
+    CALL RESET_APERTURE_FLAG
 
     IF(K%TOTALPATH==0) then
        write(6,*) " Must used totalpath in tracking state "
@@ -4315,9 +4311,11 @@ contains
           END_OF_LINE=.TRUE.
           EXIT
        ENDIF
+       if(.not.check_stable) exit
+
     ENDDO
 
-    IF(.NOT.END_OF_LINE) THEN
+    IF(.NOT.END_OF_LINE.and.check_stable) THEN
        IF(DT0/=DT) THEN
           XT%NODE=>T%PREVIOUS
           XT%xs%X=XTT
@@ -4330,7 +4328,7 @@ contains
     ELSE
 
 
-       IF(DT0<DT) THEN
+       IF(DT0<DT.and.check_stable) THEN
           XT%NODE=>T%PREVIOUS
           XT%xs%X=XTT
           DT0=DT-DT_BEFORE
@@ -4347,7 +4345,8 @@ contains
     !    XT%NODE=>T
     if(.not.CHECK_STABLE) then
        !       write(6,*) "unstable "
-       CALL RESET_APERTURE_FLAG
+       lost_fibre=>t%parent_fibre
+       lost_node=>t
        XT%xs%u=.true.
     endif
 
@@ -4477,7 +4476,7 @@ contains
     do i=1,r%t%n
 
        if(t%cas==case0) then ! 1
-          d1=sqrt((t%a(1)-b%a(1))**2+(t%a(2)-b%a(2))**2+(t%a(3)-b%a(3))**2 )
+          d1=root((t%a(1)-b%a(1))**2+(t%a(2)-b%a(2))**2+(t%a(3)-b%a(3))**2 )
 
           if(d1<norm) then
              norm=d1
@@ -4520,7 +4519,7 @@ contains
     a=b%tp(j)%pos(1:3)
     do i=1,r%t%n
        if(t%cas==case0) then ! 1
-          d1=sqrt((t%a(1)-a(1))**2+(t%a(2)-a(2))**2+(t%a(3)-a(3))**2 )
+          d1=root((t%a(1)-a(1))**2+(t%a(2)-a(2))**2+(t%a(3)-a(3))**2 )
 
           if(d1<norm) then
              norm=d1
@@ -4594,7 +4593,7 @@ contains
 
     if(b%state%time) then
 
-       b%tp(j)%xs%x(5)=(d1-one)/ (sqrt(betinv**2-one +d1)+betinv)
+       b%tp(j)%xs%x(5)=(d1-one)/ (root(betinv**2-one +d1)+betinv)
        b%tp(j)%xs%x(2)=dal(1)
        b%tp(j)%xs%x(4)=dal(2)
        b%tp(j)%xs%x(1)=p(1)
@@ -4602,7 +4601,7 @@ contains
        b%tp(j)%xs%x(6)=b%total_time
 
     else
-       b%tp(j)%xs%x(5)=sqrt(d1)-one
+       b%tp(j)%xs%x(5)=root(d1)-one
        b%tp(j)%xs%x(2)=dal(1)
        b%tp(j)%xs%x(4)=dal(2)
        b%tp(j)%xs%x(1)=p(1)
@@ -4633,7 +4632,7 @@ contains
 
 
 
-  SUBROUTINE TRACK_beam(r,b,k,t, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+  SUBROUTINE TRACK_beam(r,b,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     real(dp) x(6)
@@ -4641,14 +4640,15 @@ contains
     TYPE(INTERNAL_STATE) K
     integer,optional:: fibre1,fibre2,node1,node2
     integer i
-    type(integration_node),optional, pointer :: t
+    !    type(integration_node),optional, pointer :: t
     !BEAM_IN_X(B,I)
     !X_IN_BEAM(B,X,I,DL,T)
 
     do i=1,b%n
        if(b%u(i)) cycle
        x=BEAM_IN_X(B,I)
-       call track_probe_x(r,x,k,b%u(i),t, fibre1,fibre2,node1,node2)
+       call track_probe_x(r,x,k, fibre1,fibre2,node1,node2)
+       B%U(I)=.NOT.CHECK_STABLE
        call X_IN_BEAM(B,X,I)
     enddo
     !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)

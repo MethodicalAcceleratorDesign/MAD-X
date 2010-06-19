@@ -2830,8 +2830,6 @@ CONTAINS
     c_%NP_pol => NP_pol
     c_%ALWAYS_EXACTMIS=> ALWAYS_EXACTMIS
 
-    c_%x_prime => x_prime
-    !    c_%NDPT_OTHER => NDPT_OTHER
 
     c_%CAVITY_TOTALPATH => CAVITY_TOTALPATH
     c_%wherelost => wherelost

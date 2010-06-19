@@ -140,7 +140,8 @@ contains
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
     !   CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT1,node2=IT2)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT1,node2=IT2)
+    U=.NOT.CHECK_STABLE
     nf=y
     TA(1)=0.75d0
     TA(2)=0.68d0
@@ -170,7 +171,9 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT3,node2=IT4)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT3,node2=IT4)
+    U=.NOT.CHECK_STABLE
+
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
     eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
@@ -375,7 +378,9 @@ contains
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
     !   CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT1,node2=IT2)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT1,node2=IT2)
+    U=.NOT.CHECK_STABLE
+
     nf=y
     TA(1)=0.75d0
     TA(2)=0.68d0
@@ -405,7 +410,9 @@ contains
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT3,node2=IT4)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT3,node2=IT4)
+    U=.NOT.CHECK_STABLE
+
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
     eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
@@ -556,7 +563,8 @@ contains
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT1,POS2=IT2)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT1,node2=IT2)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT1,node2=IT2)
+    U=.NOT.CHECK_STABLE
 
     nf=y
     TA(1)=0.75d0
@@ -659,7 +667,9 @@ contains
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
-    CALL TRACK_probe_x(R,Y,+STATE,U,node1=IT3,node2=IT4)
+    CALL TRACK_probe_x(R,Y,+STATE,node1=IT3,node2=IT4)
+    U=.NOT.CHECK_STABLE
+
     write(6,*) "before stable nf=y", check_stable
     !    global_verbose=.true.
     nf=y
