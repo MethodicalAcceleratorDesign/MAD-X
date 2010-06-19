@@ -1586,6 +1586,10 @@ void exec_command()
       {
         pro_ptc_read_errors();
       }
+      else if (strcmp(p->cmd_def->module, "ptc_refresh_k") == 0)
+      {
+        pro_ptc_refresh_k();
+      }
       else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
       {
         w_ptc_align_();

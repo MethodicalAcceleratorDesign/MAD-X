@@ -90,6 +90,7 @@
 #define w_ptc_export_xml        w_ptc_export_xml_
 #define w_ptc_move_to_layout    w_ptc_move_to_layout_
 #define w_ptc_read_errors       w_ptc_read_errors_
+#define w_ptc_refresh_k         w_ptc_refresh_k_
 #define w_ptc_input             w_ptc_input_
 #define w_ptc_align             w_ptc_align_
 #define w_ptc_twiss             w_ptc_twiss_
@@ -244,6 +245,7 @@
 #define w_ptc_export_xml        W_PTC_EXPORT_XML
 #define w_ptc_move_to_layout    W_PTC_MOVE_TO_LAYOUT
 #define w_ptc_read_errors       W_PTC_READ_ERRORS
+#define w_ptc_refresh_k         W_PTC_REFRESH_K
 #define w_ptc_input             W_PTC_INPUT
 #define w_ptc_align             W_PTC_ALIGN
 #define w_ptc_twiss             W_PTC_TWISS
@@ -843,6 +845,7 @@ void pro_twiss();
 void pro_ptc_twiss();
 void pro_ptc_create_layout();
 void pro_ptc_read_errors();
+void pro_ptc_refresh_k();
 void pro_ptc_track(struct in_cmd*);
 void pro_ptc_trackline(struct in_cmd*);
 int  pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA);
@@ -953,6 +956,7 @@ void w_ptc_create_layout();
 void w_ptc_export_xml(int * filename);
 void w_ptc_move_to_layout();
 void w_ptc_read_errors();
+void w_ptc_refresh_k();
 void w_ptc_input();
 void w_ptc_align();
 void w_ptc_twiss(int * twiss_table, int * summary_table);
@@ -1385,10 +1389,10 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.01.25";
+char myversion[] = "MAD-X 4.01.26";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
-char code_mod_date[] = "Code Modification Date: 13.06.2010";
+char code_mod_date[] = "Code Modification Date: 19.06.2010";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

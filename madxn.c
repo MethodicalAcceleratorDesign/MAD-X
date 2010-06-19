@@ -4080,6 +4080,21 @@ void pro_ptc_read_errors()
   probe_beam = delete_command(probe_beam);
 }
 
+void pro_ptc_refresh_k()
+  /* controls ptc_refresh_k module */
+{
+  struct command* keep_beam = current_beam;
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("ptc_refresh_k - sequence without beam:", current_sequ->name);
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+
+  w_ptc_refresh_k_();
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
+}
+
 void pro_twiss()
   /* controls twiss module */
 {

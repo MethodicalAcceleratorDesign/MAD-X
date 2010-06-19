@@ -676,13 +676,26 @@ CONTAINS
        endif                                                      !
        if (sk2s .ne. zero) then                                   !
           tilt = -atan2(sk2s, sk2)/three + tilt                   !
-          sk2 = sqrt(sk2**2 + sk2s**2)                            !
+          sk2 =  sqrt(sk2**2 + sk2s**2)                           !
        endif                                                      !
        key%list%k(3) =sk2                                         !
        key%list%ks(3)=zero  ! added by VK                         !
        key%tiltd=tilt  !==========================================!
 
        !================================================================
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             call string_to_table('errors_total ', 'name ',key%list%name)
+             myfield(:) = zero
+             do kk=1,maxmul
+                myfield(2*kk-1) = key%list%k(kk)
+                myfield(2*kk)   = key%list%ks(kk)
+             enddo
+             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call augment_count('errors_total ')
+          endif
+       endif
 
     case(7)
        key%magnet="octupole"
@@ -1174,6 +1187,78 @@ CONTAINS
 
 
   END SUBROUTINE SUMM_MULTIPOLES_AND_ERRORS
+  !----------------------------------------------------------------
+ !_________________________________________________________________
+
+  SUBROUTINE REFRESH_MULTIPOLES(l, normal_0123, skew_0123,ord_max,normal,skew)
+    use twtrrfi ! integer, maxmul,maxferr,maxnaper
+    implicit none
+    ! 1) read multipole coeff. and errors for a current thick element
+    ! 2) fill the error and multiploes arrays of data-bases
+    REAL(dp), INTENT(IN) :: l
+    REAL(dp), INTENT(OUT) :: normal_0123(0:3), skew_0123(0:3) ! n/l;
+    REAL(dp) :: normal(0:maxmul), skew  (0:maxmul), &
+         f_errors(0:maxferr), field(2,0:maxmul)
+    INTEGER :: n_norm, n_skew, n_ferr ! number of terms in command line
+    INTEGER :: node_fd_errors ! function
+    integer :: i, i_count, n_dim_mult_err, ord_max
+
+    !initialization
+    normal_0123(:)=zero
+    skew_0123(:)=zero
+
+    ! real(dp) f_errors(0:maxferr),normal(0:maxmul),skew(0:maxmul)
+    ! Get multipole components on bench !-----------------------!
+    call dzero(normal,maxmul+1) ! make zero "normal"            !
+    call dzero(skew,maxmul+1)   ! make zero "skew"              !
+    !                                                           !
+    ! madxdict.h: "knl = [r, {0}], "                            !
+    !             "ksl = [r, {0}], "                            !
+    ! Assign values from the command line                       !
+    call get_node_vector('knl ',n_norm,normal)                  !
+    call get_node_vector('ksl ',n_skew,skew)                    !
+    skew(0)=-skew(0)                                            ! frs error found 30.08.2008
+    if(n_norm.ge.maxmul) n_norm=maxmul-1                        !
+    if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
+    ord_max=max(n_norm,n_skew)                                  !
+    if(l.ne.zero) then                            !
+       do i=0,maxmul
+          normal(i)=normal(i)/l  
+          skew(i)=skew(i)/l
+       enddo
+    endif
+    do i=0,3
+       normal_0123(i)=normal(i)
+       skew_0123(i)=skew(i)
+    enddo
+    
+    ! get errors                                                !
+    call dzero(f_errors,maxferr+1)                              !
+    n_ferr = node_fd_errors(f_errors) !                         !
+    ! /* returns the field errors of a node */                  !
+    call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+    if (n_ferr .gt. 0) then                                     !
+       call dcopy(f_errors,field,n_ferr)                        !
+    endif                                                       !
+    !-----------------------------------------------------------!
+
+    n_dim_mult_err = max(n_norm, n_skew, n_ferr/2) !===========!
+    if(n_dim_mult_err.ge.maxmul) n_dim_mult_err=maxmul-1       !
+    if(n_ferr.gt.0) then                                       !
+       do i_count=0,n_dim_mult_err                             !
+          if(l.ne.zero) then                                   !
+             normal(i_count+1)=normal(i_count+1)+field(1,i_count)/l
+             skew(i_count+1)=skew(i_count+1)+field(2,i_count)/l
+          else                                                 !
+             normal(i_count+1)=normal(i_count+1)+field(1,i_count)
+             skew(i_count+1)=skew(i_count+1)+field(2,i_count)
+          endif                                                !
+       enddo                                                   !
+    endif !====================================================!
+
+
+
+  END SUBROUTINE REFRESH_MULTIPOLES
   !----------------------------------------------------------------
 
   subroutine ptc_getnfieldcomp(fibreidx, ncomp, nval)
@@ -2294,8 +2379,8 @@ CONTAINS
     p=>my_ring%start
     do while(.true.)
        i=i+1
-       a(:)=zero
        b(:)=zero
+       a(:)=zero
        d(:)=zero
        name2=" "
        flag = string_from_table('errors_read ', 'name ',i,name2)
@@ -2361,5 +2446,91 @@ CONTAINS
     return
 
   end SUBROUTINE ptc_read_errors
+
+  subroutine ptc_refresh_k()
+    use twtrrfi
+    use name_lenfi
+    implicit none
+    integer j,code,k,pos,nfac(maxmul)
+    integer restart_sequ,advance_node
+    type(fibre),pointer :: p
+    real(dp) sk,sks,tilt,b(maxmul),a(maxmul),bvk
+    real(kind(1d0))   :: get_value,node_value
+    character(name_len) name
+    logical(lp) :: overwrite
+    !---------------------------------------------------------------
+
+    overwrite = get_value('ptc_refresh_k ','overwrite ').ne.0
+    bvk=get_value('probe ','bv ')
+
+    nfac(1)=1
+    do j=2,maxmul
+       nfac(j)=nfac(j-1)*(j-1)
+    enddo
+
+    j=restart_sequ()
+    j=0
+    p=>my_ring%start
+10  continue
+    b(:)=zero
+    a(:)=zero
+
+    code=node_value('mad8_type ')
+    if(code.ne.5.and.code.ne.6) goto 100
+    if(code.eq.5) then
+       ! quadrupole components code =  5
+       k=2
+       sk= node_value('k1 ')
+       sks=node_value('k1s ')
+       tilt=node_value('tilt ')
+       b(k)=sk
+       if (sks .ne. zero) then
+          tilt = -atan2(sks, sk)/two + tilt
+          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk                            !
+       endif
+    elseif(code.eq.6) then
+       ! sextupole components code = 6
+       k=3
+       sk= node_value('k2 ')
+       sks=node_value('k2s ')
+       tilt=node_value('tilt ')
+       b(k)=sk
+       if (sks .ne. zero) then
+          tilt = -atan2(sks, sk)/three + tilt
+          b(k)=sqrt(sk**2+sks**2)/abs(sk)*sk                           !
+       endif
+    endif
+
+    call element_name(name,name_len)
+    call context(name)
+    call move_to(my_ring,p,name,pos)
+    if(pos/=0) then
+       b(k)=b(k)/nfac(k)
+       if(tilt/=zero) then
+          a(k)=-b(k)*sin(tilt*k)
+          b(k)=b(k)*cos(tilt*k)
+       endif
+       b(k)=bvk*b(k)
+       a(k)=bvk*a(k)
+       do j=1,maxmul
+          if(overwrite) then
+             call add(p,j,0,b(j))
+             call add(p,-j,0,a(j))
+          else
+             call add(p,j,1,b(j))
+             call add(p,-j,1,a(j))
+          endif
+       enddo
+    else
+       write(6,*) " name,pos, dir of dna ",name, p%mag%parent_fibre%dir
+    endif
+
+100 continue
+
+    if(advance_node().ne.0)  goto 10
+
+    return
+
+  END subroutine ptc_refresh_k
 
 END MODULE madx_ptc_module

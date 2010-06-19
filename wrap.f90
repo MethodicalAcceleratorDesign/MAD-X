@@ -29,6 +29,12 @@ subroutine w_ptc_read_errors()
   call ptc_read_errors()
 end subroutine w_ptc_read_errors
 
+subroutine w_ptc_refresh_k()
+  use madx_ptc_module
+  implicit none
+  call ptc_refresh_k()
+end subroutine w_ptc_refresh_k
+
 subroutine w_ptc_input()
   use madx_ptc_module
   implicit none
