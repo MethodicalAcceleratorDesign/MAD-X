@@ -1069,7 +1069,10 @@ void exec_plot(struct in_cmd* cmd)
         p_table = table_register->tables[pos];
     else
       {
-       fatal_error("Plot - non-existing table:", table_name); return;
+/*       fatal_error("Plot - non-existing table:", table_name); return; */
+       warning("Plot - non-existing table:", table_name);
+       p_table = table_register->tables[pos];
+
       }
     /* HG 21.10.09 allow plot from external table, end part1 */
 
