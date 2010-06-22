@@ -1799,6 +1799,7 @@ contains
 
       ! added 9 march 2009 to take into dependency on deltap, as done in subroutine 'ptc_twiss'
       icase = get_value('ptc_twiss ','icase ') ! mind the trailing space
+      write(0,*) 'icase=',icase
       deltap0 = get_value('ptc_twiss ','deltap ') ! mind the trailing space
       deltap = zero
       call my_state(icase,deltap,deltap0)
@@ -2026,10 +2027,12 @@ contains
       ! 26 november 2009
       if (icase.eq.6) then
          fractionalTunes(3) = - theNormalForm%DHDJ%v(3).sub.'0000' ! always yields 0 => does not work as I would have expected
+         write(0,*) 'fractionTunes(3)=', fractionalTunes(3)
          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)'
          ! computed as atan2(ascript(6).sub.'000010',ascript(6).sub.'000001')/2*pi
       else
          fractionalTunes(3) = 0.0
+         write(0,*) 'nullify fractionalTunes(3), icase=',icase
       endif
       ! Q: is it possible to get the actual total tune, as returned by twiss.F?
       ! => no, not with a map...
