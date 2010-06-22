@@ -574,6 +574,7 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
+       LOGE_lielib=ZERO
        return
     endif
 

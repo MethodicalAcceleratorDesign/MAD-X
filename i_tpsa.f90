@@ -3163,7 +3163,9 @@ CONTAINS
     integer                :: i,ii
 
     if (.not. associated(ut%n)) then
-       write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSICIATED)'
+       write(6,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)' 
+       write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)'
+       return
     endif
 
     write(iunit,'(/1X,A,I5,A,I5,A/1X,A/)') 'UNIV_TAYLOR   NO =',ut%n,', NV =',ut%nv,', INA = unita',&
