@@ -63,22 +63,22 @@ module Inf_NaN_Detection
   interface isnan
      module procedure sisnan
      module procedure disnan
-  end interface
+  end interface isnan
 
   interface isinf
      module procedure sisinf
      module procedure disinf
-  end interface
+  end interface isinf
 
   interface isposinf
      module procedure sisposinf
      module procedure disposinf
-  end interface
+  end interface isposinf
 
   interface isneginf
      module procedure sisneginf
      module procedure disneginf
-  end interface
+  end interface isneginf
 
 contains
 
@@ -239,7 +239,7 @@ MODULE madx_ptc_track_run_module
   !                                                  ! point from the ring start
 
   CHARACTER(name_len), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
-  !                                                  ! contrary to <character (16)> in c-code
+  !                                                  ! contrary to <character(16)> in c-code
 
   !real(KIND(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
 
@@ -329,7 +329,7 @@ CONTAINS
 
     EXTERNAL :: comm_para ! subroutine needed for LF95
 
-    !k    character*12 char_a
+    !k    character(12) char_a
     ! variables added by V.Kapin                ! = in <trrun.F>
     integer :: ptc_switch                       ! = switch
 
@@ -354,9 +354,9 @@ CONTAINS
     REAL(dp) :: summ_ring_length      ! saved ring-length calculated before tracking
     ! at the last element in subr. Prepare_Observation_points
     integer ::  nlm_current_element_number    ! line position =nlm
-    character*(name_len) el_name
+    character(name_len) el_name
     !hbu
-    character*4 vec_names(7)
+    character(4) vec_names(7)
     !hbu
     data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
@@ -648,8 +648,8 @@ CONTAINS
       implicit none
       ! local variables
       !real(dp) :: maxaper(1:6) move to HOST
-      character*4 text
-      character*12 tol_a, char_a
+      character(4) text
+      character(12) tol_a, char_a
       integer :: nint,ndble, nchar, int_arr(1),char_l
       data tol_a,char_a / 'maxaper ', ' ' /
       !defaults
@@ -737,18 +737,18 @@ CONTAINS
 
       Space_Charge = get_value('ptc_track ','space_charge ') .ne. 0
 
-     IF (radiation_model1_FZ .OR. Space_Charge ) THEN 
-      IF(.NOT.element_by_element) THEN
-        element_by_element=.TRUE.
-         Print *, ' '
-         Print *, '===================================================================='
-         call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
-         Print *,'     Only element-by-element tracking can be performed with  '
-         Print *,'     the options RADIATION_MODEL1 or SPACE_CHARGE.'
-         Print *, '===================================================================='
-         Print *, ' '        
+      IF (radiation_model1_FZ .OR. Space_Charge ) THEN 
+         IF(.NOT.element_by_element) THEN
+            element_by_element=.TRUE.
+            Print *, ' '
+            Print *, '===================================================================='
+            call fort_warn(' ELEMENT_BY_ELEMENT',' has been switched ON by the code')
+            Print *,'     Only element-by-element tracking can be performed with  '
+            Print *,'     the options RADIATION_MODEL1 or SPACE_CHARGE.'
+            Print *, '===================================================================='
+            Print *, ' '        
+         ENDIF
       ENDIF
-     ENDIF
 
       beam_envelope = get_value('ptc_track ','beam_envelope ') .ne. 0
       ! 'dump ' is done in c-code
@@ -879,7 +879,7 @@ CONTAINS
     SUBROUTINE Call_my_state_and_update_states
       ! USE  madx_ptc_module, ONLY:  my_state, UPDATE_STATES, default, print
       implicit none
-      character*4 text
+      character(4) text
 
       debug_print_1: if (ptc_track_debug) then
          print *,"before <call my_state(icase,deltap,deltap0)>", &
@@ -2167,7 +2167,7 @@ CONTAINS
 
       REAL(dp) :: length_current_element_f90, length_current_element_c ! from two databases
 
-      character (name_len) ::      local_name
+      character(name_len) ::      local_name
 
       debug_printing_1: if (ptc_track_debug) then
          Print *, 'Start subr. <Prepare_Observation_points> max_obs=', max_obs
@@ -2294,7 +2294,7 @@ CONTAINS
       REAL(dp),  allocatable :: Temp_X_incl_co_at_obs(:,:)
       Real(dp):: X_lnv_START(lnv), X_lnv_OBSRV(lnv)
 
-      character*8 ch,ch1
+      character(8) ch,ch1
 
       segment_one_table=0 ! for Printing to tables
       last_table_line_out = .false.
@@ -2340,7 +2340,7 @@ CONTAINS
       current=>MY_RING%start     ! F90 pointer to the CURRENT beamline element is set up
 
       obs_point_loop: DO i_obs_point=1, max_obs-1
-         
+
          if (ptc_track_debug) then
             call kanalnummer(mf(i_obs_point))
             ch=" "
@@ -2537,15 +2537,16 @@ CONTAINS
       REAL (dp) :: X_MAD(6), X_PTC(6)
 
       !hbu was *36 allow longer info
-      character*80 table_putone,comment
+      character(80) table_putone
+      character(41+name_len) comment
       !hbu
       integer :: ielem
       !hbu name of element
-      character*(name_len) :: el_name
+      character(name_len) :: el_name
       !hbu
       REAL(dp) :: spos
       !hbu
-      character*4 vec_names(7)
+      character(4) vec_names(7)
       !hbu
       data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MAD order
       !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
@@ -2635,11 +2636,11 @@ CONTAINS
       real(dp) :: MASS_GeV, ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
       REAL (dp) :: X_MAD(6), X_PTC(6)
 
-      character*36 table_puttab
+      character(36) table_puttab
       !hbu
       REAL(dp) :: spos
       !hbu
-      character*4 vec_names(7)
+      character(4) vec_names(7)
       !hbu
       data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MAD order
       !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
@@ -2796,7 +2797,7 @@ CONTAINS
       logical(lp) :: zgiv_exist, zngiv_exist ! existence of non-zero input for action-angle
 
       !k      parameter(zero=0d0)
-      character*120 msg(2) ! text stings for messages
+      character(120) msg(2) ! text stings for messages
       !k
       debug_print_1: if (ptc_track_debug) then
          print *; print *, "<subr. ptc_track_ini_conditions>:"

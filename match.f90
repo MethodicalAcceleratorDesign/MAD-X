@@ -58,8 +58,8 @@
         goto 1
       endif
 !  830 format(a23,1x,1p,'=',e16.8,';!',2x,e16.8,2x,e16.8)
-  830 format(a48,1x,1p,e16.8,3x,e16.8,3x,e16.8)
-  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
+  830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
+  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
 
 
@@ -98,7 +98,7 @@
         vect(j) = val
         goto 1
       endif
-  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
 
 
@@ -231,8 +231,8 @@
         goto 30
       endif
 !      if (psum) write(*,831) fsum
-  830 format(a48,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
-  832 format(a48,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
+  830 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8)
+  832 format(a24,3x,a6,5x,i3,3x,1p,e16.8,3x,e16.8,3x,e16.8,3x,e16.8)
   831 format(//,'Final Penalty Function = ',e16.8,//)
   840 format(a10,3x,1p,5e16.6)
   880 format(a10,3x,1p,3e16.6,16x,e16.6)

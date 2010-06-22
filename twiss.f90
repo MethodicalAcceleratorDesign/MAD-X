@@ -542,7 +542,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
        n_align,kobs,nobs,node,save,thr_on,ccode,pcode,get_vector,err,old,&
        kpro,corr_pick(2),enable,coc_cnt(2),lastnb,rep_cnt(2),max_rep,    &
        poc_cnt
-  double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6),el,ek(6),   &
+  double precision orbit0(6),orbit(6),orbit2(6),rt(6,6),tt(6,6,6),el,ek(6),   &
        re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
        get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
        restsum(2),restorb(6,2),restm(6,6,2),restt(6,6,6,2),cmatr(6,6,2), &
@@ -608,7 +608,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
   nobs = node_value('obs_point ')
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
   !---- Element matrix and length.
@@ -619,7 +620,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      suml = suml + el
   endif
   if (n_align.ne.0)  then
-     call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
   if (kobs.gt.0.and.kobs.eq.nobs) return
@@ -1069,7 +1071,7 @@ SUBROUTINE twcpgo(rt)
   integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
        node_al_errors,n_align
   double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),  &
-       te(6,6,6),el,orbit(6),betas,gammas,                 &
+       te(6,6,6),el,orbit(6),orbit2(6),betas,gammas,                 &
        al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
        one,two
   integer elpar_vl, el_par_vector
@@ -1151,7 +1153,8 @@ SUBROUTINE twcpgo(rt)
   opt_fun(73) = g_elpar(g_polarity)
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
@@ -1178,7 +1181,8 @@ SUBROUTINE twcpgo(rt)
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
   if (n_align.ne.0)  then
-     call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
@@ -1540,7 +1544,7 @@ SUBROUTINE twchgo
   logical fmap,cplxy,cplxt,dorad,mycentre_bttk
   integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
        node_al_errors
-  double precision orbit(6),ek(6),re(6,6),        &
+  double precision orbit(6),orbit2(6),ek(6),re(6,6),        &
        te(6,6,6),al_errors(align_max),deltap,el,betas,gammas,  &
        node_value,get_value,pos0,zero,one,two
   parameter(zero=0d0,one=1d0,two=2d0)
@@ -1606,7 +1610,8 @@ SUBROUTINE twchgo
   !---- Physical element.
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)
@@ -1624,7 +1629,8 @@ SUBROUTINE twchgo
      call twbttk(re,te)
   endif
   if (n_align.ne.0)  then
-     call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit,orbit2,6)
+     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)

@@ -29,7 +29,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
   !---- Communication area for radiation damping.
-  double precision orbit0(6), orbit(6), em(6,6), rd(6,6), reval(6)
+  double precision orbit0(6), orbit(6), orbit2(6), em(6,6), rd(6,6), reval(6)
   double precision aival(6), rt(6,6), orbit1(6), ek(6)
   double precision emit_v(3), nemit_v(3), tunes(3), sig_v(4)
   double precision u0, pdamp(3)
@@ -116,7 +116,8 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   el = node_value('l ')
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call tmali1(orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit, orbit2, 6)
+     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      if (.not. stabt) call m66byv(re, disp, disp)
      call m66mpy(re, em, em)
      if (frad .and. stabt) call m66mpy(re, rd, rd)
@@ -157,7 +158,8 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
      suml = suml + el
   endif
   if (n_align.ne.0)  then
-     call tmali2(el,orbit,al_errors,betas,gammas,orbit,re)
+     call dcopy(orbit, orbit2, 6)
+     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      if (.not. stabt) call m66byv(re, disp, disp)
      call m66mpy(re, em, em)
      if (frad .and. stabt) call m66mpy(re, rd, rd)

@@ -150,7 +150,7 @@ module name_lenfi
   implicit none
   public
   integer name_len
-  parameter(name_len=48)
+  parameter(name_len=24)
 end module name_lenfi
 module physconsfi
   implicit none

@@ -45,7 +45,7 @@
         vect(j) = val
         goto 1
       endif
-  830 format(a48,1x,1p,e16.8,3x,e16.8,3x,e16.8)
+  830 format(a24,1x,1p,e16.8,3x,e16.8,3x,e16.8)
 ! Choose SA parameters next:
 ! The value of rt and ns as suggested by Corana
       rt=0.85d0
