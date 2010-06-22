@@ -1836,8 +1836,7 @@ contains
 
 
       ! need at least order 2 to get the chromaticities
-      ! with an explicit call to init_default
-      ! if we hadn't ned the chromaticities we could have simply discarded the following snippe
+      ! no longer force order to 2 internally. Transmit the value passed when invoking ptc_twiss from the madx script.
       call init_default(default,order,0)
 
       call alloc(oneTurnMap)
@@ -2040,6 +2039,7 @@ contains
          chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
          chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
+         write(0,*),'chromaticities=', chromaticities(1), chromaticities(2)
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
          chromaticities(1) = 0.0
