@@ -2039,7 +2039,6 @@ contains
          chromaticities(1) = theNormalForm%DHDJ%v(1).sub.'00001' ! as in So_fitting.f90
          chromaticities(2) = theNormalForm%DHDJ%v(2).sub.'00001' ! as in So_fitting.f90
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
-         write(0,*),'chromaticities=', chromaticities(1), chromaticities(2)
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
          chromaticities(1) = 0.0
