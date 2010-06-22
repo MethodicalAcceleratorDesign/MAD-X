@@ -660,7 +660,7 @@
         endif
         goto 1
       endif
-  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
 
 
@@ -703,7 +703,7 @@
         endif
         goto 1
       endif
-  831 format(a16,1x,a48,a4,e16.8,a4,e16.8)
+  831 format(a16,1x,a24,a4,e16.8,a4,e16.8)
       end
 
 !  TODO
