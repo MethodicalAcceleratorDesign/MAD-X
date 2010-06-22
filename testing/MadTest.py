@@ -56,7 +56,11 @@ class Repository: # wrapper on CVS or SVN repository for examples
         os.mkdir(repositoryDir)
         os.chdir(topDir)
         #checkoutCommand = "cvs -d :gserver:isscvs.cern.ch:/local/reps/madx-examples checkout madX-examples";
-        checkoutCommand = "svn co svn+ssh://svn.cern.ch/reps/madx-examples/trunk/madX-examples" + " " + repositoryDir
+        if options.singleTarget:
+            checkoutCommand = "svn co svn+ssh://svn.cern.ch/reps/madx-examples/trunk/madX-examples"\
+                              +"/REF/"+options.singleTarget+" "+repositoryDir+'/REF/'+options.singleTarget
+        else:
+            checkoutCommand = "svn co svn+ssh://svn.cern.ch/reps/madx-examples/trunk/madX-examples" + " " + repositoryDir            
         os.system(checkoutCommand)
         os.chdir(currentDir)
 
