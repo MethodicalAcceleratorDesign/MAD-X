@@ -91,24 +91,30 @@ def main():
     if not options.releaseTag:
         raise("except a release tag to be specified")
     else: # is the release tag well formed?
-        releasePattern = re.compile(r'^madX\-\d+_\d{2}_\d{2}$')
+        releasePattern = re.compile(r'^madX\-\d+_\d{2}_\d{2}(\_dev)?$')
         if not releasePattern.match(options.releaseTag):
             raise("release tag is ill-formed: it should be like 'madX-4_01_01' instead of '"+options.releaseTag+"'")
 
-    os.environ['PATH'] = os.environ['PATH'] +\
-                         ":/afs/cern.ch/sw/fortran/nag/f95.5.361/bin:/afs/cern.ch/sw/fortran/lahey/lf9562/bin"
-
-    if os.getenv('LD_LIBRARY_PATH')==None: # would cause a key error at runtime
-        os.environ['LD_LIBRARY_PATH'] = ":/afs/cern.ch/sw/fortran/lahey/lf9562/lib"
-    else:
-        os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":/afs/cern.ch/sw/fortran/lahey/lf9562/lib"
+    # 23 juin 2010
+    #os.environ['PATH'] = os.environ['PATH'] +\
+    #                     ":/afs/cern.ch/sw/fortran/nag/f95.5.361/bin:/afs/cern.ch/sw/fortran/lahey/lf9562/bin"
+    #
+    #if os.getenv('LD_LIBRARY_PATH')==None: # would cause a key error at runtime
+    #    os.environ['LD_LIBRARY_PATH'] = ":/afs/cern.ch/sw/fortran/lahey/lf9562/lib"
+    #else:
+    #    os.environ['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH'] + ":/afs/cern.ch/sw/fortran/lahey/lf9562/lib"
 
     makefiles = ['Makefile']
 
     if options.nag:
-        os.environ['NAG95_ROOT'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361" # flexlm license manager for NAG compiler
-        os.environ['LM_LICENSE_FILE'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361/license.dat"
+        # 23 juin 2010
+        #        os.environ['NAG95_ROOT'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361" # flexlm license manager for NAG compiler
+        #os.environ['LM_LICENSE_FILE'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361/license.dat"
+        os.environ['NAG95_ROOT'] = "/usr/local/lib/NAG_Fortran"
+        os.environ['NAG_KUSARI_FILE'] = os.environ['NAG95_ROOT']+"/license.dat"
         makefiles.append('Makefile_nag')
+
+    os.environ['PATH'] = ".:/usr/local/lib/NAG_FORTRAN:"+os.environ['PATH']
 
     if options.dev:
         makefiles.append('Makefile_develop')
