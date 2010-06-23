@@ -2232,7 +2232,7 @@ CONTAINS
                                      map_coor(8)=j(4)
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
-                                     !call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                     call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
