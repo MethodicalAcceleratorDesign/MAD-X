@@ -154,12 +154,11 @@ contains
 
   subroutine ptc_setexactmis(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
-    !    print *, "Setting the flag"
-    !    print *, "And the flag is", flag
-
-    if (flag) then
+       ! print *, "Setting the flag"
+       ! print *, "And the flag is", flag
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON exact missaligment"
        intstate = intstate + EXACTMIS0
     else
@@ -174,10 +173,10 @@ contains
 
   subroutine ptc_setradiation(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
 
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON radiation"
        intstate = intstate + radiation0
     else
@@ -192,9 +191,9 @@ contains
 
   subroutine ptc_setfringe(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON fringe"
        intstate = intstate + fringe0
     else
@@ -210,9 +209,9 @@ contains
 
   subroutine ptc_settotalpath(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON totalpath (and switching OFF delta and only_4d)"
        intstate = intstate - delta0 - only_4d0 + totalpath0
     else
@@ -230,12 +229,12 @@ contains
 
   subroutine ptc_settime(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
     !    print *, "Setting the flag"
     !    print *, "And the flag is", flag
 
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON time"
        intstate = intstate + time0
     else
@@ -253,9 +252,9 @@ contains
 
   subroutine ptc_setnocavity(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
 
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON nocavity"
        intstate = intstate + nocavity0
     else
