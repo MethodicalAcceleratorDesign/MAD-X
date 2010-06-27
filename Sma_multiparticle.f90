@@ -1861,7 +1861,49 @@ CONTAINS
 
   END  SUBROUTINE X_IN_BEAM
 
-  !  plain fibre tracking
+  !  Beam Beam stuff
+
+  subroutine locate_beam_beam(my_ering,sc,pos,tl,b_b)
+    implicit none
+    type(layout), target :: my_ering
+    type(integration_node), pointer :: tl
+    real(dp) sc
+    integer pos,j
+    logical(lp) b_b
+
+
+    IF(.NOT.ASSOCIATED(my_ering%T)) THEN
+       CALL MAKE_NODE_LAYOUT(my_ering)
+    ENDIF
+    ! s(1) total ld
+    ! s(2) local integration distance
+    !          SC=MOD(SC,MY_RING%T%END%S(1))
+    b_b=.false.
+    TL=>my_ering%T%START
+    DO j=1,my_ering%T%N
+       if(pos<1) then
+          IF(TL%S(1)<=SC.AND.TL%NEXT%S(1)>SC) then
+             b_b=.true.
+             exit
+          endif
+       else
+          if(j==pos) then
+             b_b=.true.
+             exit
+          endif
+       endif
+       TL=>TL%NEXT
+    ENDDO
+    if(b_b.and.tl%cas==case0) then
+       write(6,*) " Beam-Beam position at ",tl%parent_fibre%mag%name
+       if(.not.associated(tl%BB)) call alloc(tl%BB)
+       write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
+       b_b=my_true
+    else
+       b_b=my_false
+       write(6,*) " Beam-Beam position not found "
+    endif
+  end  subroutine locate_beam_beam
 
 
 end module ptc_multiparticle

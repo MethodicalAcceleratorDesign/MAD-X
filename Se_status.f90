@@ -85,29 +85,32 @@ module S_status
   !  !  include "a_def_user2.inc"
 
   TYPE (INTERNAL_STATE), PARAMETER :: DEFAULT0 = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,f,f,f,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TOTALPATH0 = INTERNAL_STATE &
-       &(1,f,f,f,f,f,f,f,f,f,f,f,3)
+       &(1,f,f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: TIME0 = INTERNAL_STATE &
-       &(0,t,f,f,f,f,f,f,f,f,f,f,3)
+       &(0,t,f,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: RADIATION0 = INTERNAL_STATE &
-       &(0,f,t,f,f,f,f,f,f,f,f,f,3)
+       &(0,f,t,f,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: NOCAVITY0 = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,f,f,f,f,f,3)
+       &(0,f,f,t,f,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: FRINGE0 = INTERNAL_STATE &
-       &(0,f,f,f,t,f,f,f,f,f,f,f,3)
+       &(0,f,f,f,t,f,f,f,f,f,f,f,f,3)
   TYPE (INTERNAL_STATE), PARAMETER :: EXACTMIS0 = INTERNAL_STATE &
-       &(0,f,f,f,f,t,f,f,f,f,f,F,3)
+       &(0,f,f,f,f,t,f,f,f,f,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: STOCHASTIC0 = INTERNAL_STATE &
-       &(0,f,f,f,f,f,t,f,f,f,f,F,3)
+       &(0,f,f,f,f,f,t,f,f,f,f,f,F,3)
+  TYPE (INTERNAL_STATE), PARAMETER :: ENVELOPE0 = INTERNAL_STATE &
+       &(0,f,f,f,f,f,f,t,f,f,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: ONLY_4d0 = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,f,t,f,f,F,3)
+       &(0,f,f,t,f,f,f,f,f,t,f,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: DELTA0   = INTERNAL_STATE &
-       &(0,f,f,t,f,f,f,f,t,t,f,F,3)
+       &(0,f,f,t,f,f,f,f,f,t,t,f,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: SPIN0   = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,f,t,F,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,t,F,3)
   TYPE (INTERNAL_STATE), PARAMETER :: MODULATION0   = INTERNAL_STATE &
-       &(0,f,f,f,f,f,f,f,f,f,f,t,3)
+       &(0,f,f,f,f,f,f,f,f,f,f,f,t,3)
+
   TYPE(INTERNAL_STATE), target ::  DEFAULT=DEFAULT0
   TYPE(INTERNAL_STATE), target ::  TOTALPATH=TOTALPATH0
   TYPE(INTERNAL_STATE), target ::  RADIATION=RADIATION0
@@ -116,6 +119,7 @@ module S_status
   TYPE(INTERNAL_STATE), target ::  TIME=TIME0
   TYPE(INTERNAL_STATE), target ::  EXACTMIS=EXACTMIS0
   TYPE(INTERNAL_STATE), target ::  STOCHASTIC=STOCHASTIC0
+  TYPE(INTERNAL_STATE), target ::  ENVELOPE=ENVELOPE0
   TYPE(INTERNAL_STATE), target ::  ONLY_4D=ONLY_4D0
   TYPE(INTERNAL_STATE), target ::  DELTA=DELTA0
   TYPE(INTERNAL_STATE), target ::  SPIN=SPIN0
@@ -123,7 +127,7 @@ module S_status
 
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
-  LOGICAL(lp), target :: stoch_in_rec = .false.
+  LOGICAL(lp), target :: compute_stoch_kick = .true.
   private alloc_p,equal_p,dealloc_p,alloc_A,equal_A,dealloc_A
   PRIVATE KILL_S_APERTURE,ALLOC_S_APERTURE
   !,NULL_p
@@ -745,6 +749,7 @@ CONTAINS
     TOTALPATH=TOTALPATH0
     RADIATION=RADIATION0
     NOCAVITY=NOCAVITY0
+    ENVELOPE=ENVELOPE0
     FRINGE=FRINGE0
     TIME=TIME0
     EXACTMIS=EXACTMIS0
@@ -786,6 +791,8 @@ CONTAINS
     write(mf, '((1X,a20,1x,i4))' )  "      TOTALPATH   = ", S%TOTALPATH
     write(mf, '((1X,a20,1x,a5))' )  "      EXACTMIS    = ", CONV(S%EXACTMIS    )
     write(mf,'((1X,a20,1x,a5))' ) "      RADIATION   = ", CONV(S%RADIATION  )
+    write(mf,'((1X,a20,1x,a5))' ) "      STOCHASTIC  = ", CONV(S%STOCHASTIC  )
+    write(mf,'((1X,a20,1x,a5))' ) "      ENVELOPE    = ", CONV(S%ENVELOPE  )
     write(mf,'((1X,a20,1x,a5))' ) "      NOCAVITY    = ", CONV(S%NOCAVITY )
     write(mf,'((1X,a20,1x,a5))' ) "      TIME        = ", CONV(S%TIME )
     write(mf,'((1X,a20,1x,a5))' ) "      FRINGE      = ", CONV(S%FRINGE   )
@@ -836,6 +843,10 @@ CONTAINS
 
     NOCAVITY=  NOCAVITY+DEFAULT
 
+    STOCHASTIC=  STOCHASTIC+DEFAULT
+
+    ENVELOPE=  ENVELOPE+DEFAULT
+
     TIME=  TIME+DEFAULT
 
     FRINGE=  FRINGE+DEFAULT
@@ -865,6 +876,7 @@ CONTAINS
     S2%TIME=        S1%TIME
     S2%FRINGE=           S1%FRINGE
     S2%stochastic=           S1%stochastic
+    S2%ENVELOPE=           S1%ENVELOPE
     S2%PARA_IN=     S1%PARA_IN
     S2%ONLY_4D=      S1%ONLY_4D
     S2%DELTA=       S1%DELTA
@@ -891,6 +903,7 @@ CONTAINS
     add%TIME     =  S1%TIME.OR.S2%TIME
     add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
     add%stochastic   =       S1%stochastic.OR.S2%stochastic
+    add%ENVELOPE   =       S1%ENVELOPE.OR.S2%ENVELOPE
     add%ONLY_4D  =       S1%ONLY_4D.OR.S2%ONLY_4D
     add%DELTA  =       S1%DELTA.OR.S2%DELTA
     add%SPIN  =       S1%SPIN.OR.S2%SPIN
@@ -899,6 +912,12 @@ CONTAINS
     add%SPIN_DIM  =       MAX(S1%SPIN_DIM,S2%SPIN_DIM)
     IF(add%stochastic) THEN
        add%RADIATION=T
+    ENDIF
+    IF(add%ENVELOPE) THEN
+       add%radiation=T
+    ENDIF
+    IF(add%stochastic) THEN
+       add%radiation=T
     ENDIF
     IF(add%DELTA) THEN
        add%ONLY_4D=T
@@ -909,6 +928,7 @@ CONTAINS
        add%RADIATION  =  F
        add%NOCAVITY =  T
        add%stochastic   =  F
+       add%ENVELOPE   =  F
     ENDIF
   END FUNCTION add
 
@@ -931,6 +951,7 @@ CONTAINS
     sub%TIME     =  S1%TIME.min.S2%TIME
     sub%FRINGE   =       S1%FRINGE.min.S2%FRINGE
     sub%stochastic   =       S1%stochastic.min.S2%stochastic
+    sub%ENVELOPE   =       S1%ENVELOPE.min.S2%ENVELOPE
     sub%ONLY_4D  =       S1%ONLY_4D.min.S2%ONLY_4D
     sub%DELTA  =       S1%DELTA.min.S2%DELTA
     sub%SPIN  =       S1%SPIN.min.S2%SPIN
@@ -940,6 +961,9 @@ CONTAINS
     IF(sub%stochastic) THEN
        sub%RADIATION=T
     ENDIF
+    IF(sub%ENVELOPE) THEN
+       sub%RADIATION=T
+    ENDIF
     IF(sub%DELTA) THEN
        sub%ONLY_4D=T
        sub%NOCAVITY =  T
@@ -947,6 +971,8 @@ CONTAINS
     IF(sub%ONLY_4D) THEN
        sub%TOTALPATH=  0
        sub%RADIATION  =  F
+       sub%ENVELOPE  =  F
+       sub%stochastic  =  F
        sub%NOCAVITY =  T
        sub%stochastic   =  F
     ENDIF

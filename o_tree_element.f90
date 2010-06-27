@@ -34,8 +34,8 @@ module tree_element_MODULE
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
   private find_perp_basisp,find_exponentp
-  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8
-  PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8
+  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8,extract_envelope_probe8
+  PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8,concat_envelope,extract_envelope_damap
   private flip  ! flip in lielib
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
@@ -112,6 +112,11 @@ module tree_element_MODULE
   INTERFACE operator (-)
      MODULE PROCEDURE sub_spin8_spin8
   END  INTERFACE
+
+  INTERFACE extract_beam_sizes   !
+     MODULE PROCEDURE extract_envelope_damap  !
+     MODULE PROCEDURE extract_envelope_probe8  !
+  END INTERFACE
 
   INTERFACE exp   !  damapspin = exp(spinor_8)
      MODULE PROCEDURE exp_spinor_8  !
@@ -1070,6 +1075,7 @@ CONTAINS
     enddo
 
     s%m=r%m
+    s%e_ij=r%e_ij
     !    s%s0=r%s0
 
     !     do i=1,6
@@ -1187,7 +1193,7 @@ CONTAINS
 
     P%AC%X(1)=ZERO
     P%AC%X(2)=ZERO
-
+    p%e_ij=zero
   END    subroutine EQUAL_PROBE8_REAL6
 
   subroutine EQUAL_PROBE8_PROBE8(P8,P)
@@ -1352,7 +1358,7 @@ CONTAINS
     ELSE
        STOP 100
     ENDIF
-
+    R%e_ij=zero
   END    subroutine EQUAL_IDENTITY_probe_8
 
 
@@ -1421,14 +1427,14 @@ CONTAINS
     !          DS%S(I,1)=R%SX%X(I)
     !          DS%S(I,2)=R%SY%X(I)
     !          DS%S(I,3)=R%SZ%X(I)
+    ds%e_ij=r%e_ij
 
-
-    DO I=1,3
-       !     n(i)=R%S(0)%X(I)
-       DO J=1,3
-          S(I,J)=DS%S(I,J)
-       ENDDO
-    ENDDO
+    !  DO I=1,3
+    !    !     n(i)=R%S(0)%X(I)
+    !     DO J=1,3
+    !        S(I,J)=DS%S(I,J)
+    !     ENDDO
+    !  ENDDO
 
     !    call inv_as(s,s)
 
@@ -1465,7 +1471,7 @@ CONTAINS
        ENDDO
     ENDDO
 
-
+    r%e_ij=ds%e_ij
 
 
 
@@ -1494,7 +1500,7 @@ CONTAINS
           DS%S(I,I)=ONE
        endif
     ENDDO
-
+    DS%e_ij=zero
 
   END SUBROUTINE EQUAL_DAmapSPIN_int
 
@@ -1546,23 +1552,23 @@ CONTAINS
        master=localmaster
     enddo
 
-    if(doing_ac_modulation_in_ptc) then   ! useless now
-       localmaster=master
-       call ass(scdadd%AC%x(1))
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       scdadd%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
-       master=localmaster
-       localmaster=master
-       call ass(scdadd%AC%x(2))
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       scdadd%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
-       master=localmaster
-       localmaster=master
-       call ass(scdadd%AC%om)
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       scdadd%AC%om=s2%AC%om
-       master=localmaster
-    endif
+    !    if(doing_ac_modulation_in_ptc) then   ! useless now
+    localmaster=master
+    call ass(scdadd%AC%x(1))
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    scdadd%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+    master=localmaster
+    localmaster=master
+    call ass(scdadd%AC%x(2))
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    scdadd%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+    master=localmaster
+    localmaster=master
+    call ass(scdadd%AC%om)
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    scdadd%AC%om=s2%AC%om
+    master=localmaster
+    !    endif
 
     DO I=1,3
        !          call ass(scdadd%s%x(i))
@@ -1575,7 +1581,7 @@ CONTAINS
 
     ENDDO
 
-
+    scdadd%e_ij=s1%e_ij
   END FUNCTION scdadd
 
 
@@ -1630,23 +1636,23 @@ CONTAINS
        master=localmaster
     enddo
 
-    if(doing_ac_modulation_in_ptc) then   ! useless now
-       localmaster=master
-       call ass(daddsc%AC%x(1))
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       daddsc%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
-       master=localmaster
-       localmaster=master
-       call ass(daddsc%AC%x(2))
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       daddsc%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
-       master=localmaster
-       localmaster=master
-       call ass(daddsc%AC%om)
-       !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-       daddsc%AC%om=s2%AC%om
-       master=localmaster
-    endif
+    !    if(doing_ac_modulation_in_ptc) then   ! useless now
+    localmaster=master
+    call ass(daddsc%AC%x(1))
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    daddsc%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+    master=localmaster
+    localmaster=master
+    call ass(daddsc%AC%x(2))
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    daddsc%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+    master=localmaster
+    localmaster=master
+    call ass(daddsc%AC%om)
+    !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
+    daddsc%AC%om=s2%AC%om
+    master=localmaster
+    !    endif
 
     DO I=1,3
        !          call ass(scdadd%s%x(i))
@@ -1659,6 +1665,7 @@ CONTAINS
 
     ENDDO
 
+    daddsc%e_ij=s1%e_ij
 
 
   END FUNCTION daddsc
@@ -1668,7 +1675,7 @@ CONTAINS
     TYPE(damapspin), INTENT(INOUT) :: DS
     real(dp), optional :: prec
     INTEGER MF,I,J
-    logical(lp) spin_in
+    logical(lp) spin_in,rad_in
 
     !    WRITE(MF,*) " ORBIT "
     !     WRITE(MF,*) DS%X(1:3)
@@ -1684,6 +1691,22 @@ CONTAINS
              CALL PRINT(DS%S(I,J),MF,prec)
           ENDDO
        ENDDO
+    else
+
+       WRITE(MF,*) "NO SPIN MATRIX OR IDENTITY  "
+
+    endif
+    call check_rad(DS%e_ij,rad_in)
+    if(rad_in) then
+       WRITE(MF,*) " STOCHASTIC KICK  "
+       DO I=1,6
+          DO J=1,6
+             WRITE(MF,*) "  STOCHASTIC KICK COMPONENT ",I,J
+             write(mf,*) ds%e_ij(i,j)
+          ENDDO
+       ENDDO
+    else
+       WRITE(MF,*) "NO STOCHASTIC KICK  "
     endif
 
   END subroutine print_DASPIN
@@ -1691,7 +1714,8 @@ CONTAINS
   subroutine print_probe8(DS,MF)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: DS
-    INTEGER MF,I
+    INTEGER MF,I,j
+    logical(lp) rad_in
 
     WRITE(MF,*) " ORBIT "
     do i=1,6
@@ -1722,8 +1746,31 @@ CONTAINS
     !       call print(ds%s(3)%x(i),mf)
     !    enddo
 
-    if(doing_ac_modulation_in_ptc) call print(ds%ac,mf)
 
+    call check_rad(DS%e_ij,rad_in)
+
+
+
+    if(rad_in) then
+
+       WRITE(MF,*) " STOCHASTIC KICK  "
+
+       do i=1,6
+          do j=1,6
+             write(6,*) i,j,ds%e_ij(i,j)
+          enddo
+       enddo
+    else
+
+       WRITE(MF,*) "NO STOCHASTIC KICK  "
+
+    endif
+    if(doing_ac_modulation_in_ptc) then
+       call print(ds%ac,mf)
+    else
+       WRITE(MF,*) "NO MODULATION  "
+
+    endif
 
   END subroutine print_probe8
 
@@ -1732,7 +1779,6 @@ CONTAINS
     TYPE(rf_phasor_8), INTENT(INOUT) :: s
     INTEGER MF,I
 
-    write(mf,*) '  '
     write(mf,*) ' AC INFORMATION '
     call print(s%om,mf)
     do i=1,2
@@ -1823,6 +1869,13 @@ CONTAINS
           READ(MF1,*) LINE
           CALL READ(T,MF1)
           DS%S(I,J)=T     !MORPH(T)
+       ENDDO
+    ENDDO
+    READ(MF1,*) LINE
+    DO I=1,3
+       DO J=1,3
+          READ(MF1,*) LINE
+          read(mf,*) ds%e_ij(i,j)
        ENDDO
     ENDDO
     if(present(file)) close(mf1)
@@ -2799,6 +2852,7 @@ CONTAINS
     DO I=1,3
        DO J=1,3
           CALL ALLOC(D%S(I,J))
+          d%e_ij(i,j)=zero
        ENDDO
     ENDDO
 
@@ -2814,6 +2868,7 @@ CONTAINS
     DO I=1,3
        DO J=1,3
           CALL KILL(D%S(I,J))
+          d%e_ij(i,j)=zero
        ENDDO
     ENDDO
 
@@ -2853,7 +2908,7 @@ CONTAINS
        R%S(I)=0
     ENDDO
     CALL ALLOC(R%ac)
-
+    r%e_ij=zero
 
   END    subroutine ALLOC_probe_8
 
@@ -2898,7 +2953,7 @@ CONTAINS
     CALL KILL(R%X,6)
 
     CALL KILL(R%ac)
-
+    r%e_ij=zero
   END    subroutine KILL_probe_8
 
   subroutine kill_rf_phasor_8(R)
@@ -3199,11 +3254,74 @@ CONTAINS
     call smatp(one,s,concat%s)
     !    concat%s0=s1%s0
 
+    call concat_envelope(S2,S1,concat)
+
+
     call kill_33(s);
     call kill(t2);
     master=localmaster
 
   END FUNCTION concat
+
+  subroutine concat_envelope(S2,S1,S3)
+    implicit none
+    TYPE (damapspin), INTENT (IN) :: S1
+    TYPE (damapspin), INTENT (IN) :: S2
+    TYPE (damapspin), INTENT (INout) :: s3
+    real(dp) s1mi(ndim2,ndim2)
+    real(dp) e(ndim2,ndim2)
+
+    s1mi=zero
+    e=zero
+
+    s1mi=(s1%m.sub.1)**(-1)
+
+    e(1:c_%nd2,1:c_%nd2)=s2%e_ij
+    e=matmul(matmul(s1mi,e),transpose(s1mi))
+
+    s3%e_ij=e(1:c_%nd2,1:c_%nd2)+s1%e_ij
+
+  end subroutine concat_envelope
+
+  subroutine extract_envelope_damap(S1,E0_ij,E_ij)
+    implicit none
+    TYPE (damapspin), INTENT (IN) :: S1
+    real(dp), INTENT (in) :: E0_ij(6,6)
+    real(dp), INTENT (out) :: E_ij(6,6)
+    real(dp) s1m(ndim2,ndim2)
+    real(dp) e(ndim2,ndim2)
+
+    s1m=zero
+    e=zero
+
+
+    s1m=s1%m.sub.1
+
+
+    e(1:c_%nd2,1:c_%nd2)=s1%e_ij+E0_ij
+    e=matmul(matmul(s1m,e),transpose(s1m))
+
+    E_ij=e(1:c_%nd2,1:c_%nd2)
+
+  end subroutine extract_envelope_damap
+
+  subroutine extract_envelope_probe8(p,E0_ij,E_ij)
+    implicit none
+    TYPE (probe_8), INTENT (IN) :: p
+    TYPE (damapspin)  S1
+    real(dp), INTENT (in) :: E0_ij(6,6)
+    real(dp), INTENT (out) :: E_ij(6,6)
+    real(dp) s1m(ndim2,ndim2)
+    real(dp) e(ndim2,ndim2)
+
+    call alloc(s1)
+    s1=p
+
+    call extract_envelope_damap(s1,E0_ij,E_ij)
+
+    call kill(s1)
+  end subroutine extract_envelope_probe8
+
 
   FUNCTION cmul(S2,S1)   ! multiply spin part with real(dp) s1
     implicit none
@@ -3633,6 +3751,13 @@ CONTAINS
     D%NRES=0
     D%M=0
     D%Ms=0
+    D%s_ij0=zero
+    D%emittance=zero
+    D%tune=zero
+    D%damping=zero
+    D%AUTO=my_true
+    D%STOCHASTIC=my_false
+    D%STOCH=zero
 
 
   END    subroutine alloc_normal_spin
@@ -3657,13 +3782,17 @@ CONTAINS
     TYPE(normal_spin), INTENT(INOUT) :: ns
     TYPE(damapspin), INTENT(INout) :: DS
     logical(lp), INTENT(IN) :: spin_in
+    logical(lp) rad_in
     type(damapspin) a1i,ds0
     type(damapspin)s ,a ,ai
     type(taylor) nn
-    !    type(taylor) s(3,3),a(3,3),ai(3,3)
     type(real_8) a11,a13
-    integer i,j
+    integer i,j,jj(lnv)
     real(dp) ss(3,3)
+!!!!!!!!!!   wrapping for radiation  !!!!!!!!!!!!!!!!!!!
+    type(radtaylor) ys(ndim2)
+    type(beamenvelope) env
+
 
     call alloc(a1i)
     call alloc(ds0)
@@ -3686,7 +3815,42 @@ CONTAINS
     !    DS0=a1i*ds*ns%as  ! at this stage ds0 is the map around the fixed point
     ! but spin matrix unchanged except for its dependence on transverse
 
+!!!!!!!!!!   wrapping for radiation  !!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!   later to be change changed  !!!!!!!!!!!!!!!
+    call check_rad(ds%e_ij,rad_in)
+    if(rad_in) then
+       if(c_%no==1) then
+          Write(6,*) "No envelope calculation possible at them moment with NO=1 "
+       else
+          call alloc(ys,6)
+          call alloc(env)
+          jj=0
+          do i=1,6
+             ys(i)%v=ds%m%v(i)
+             do j=1,6
+                ys(i)%e(j)=ds%e_ij(i,j)
+             enddo
+          enddo
+          env%stochastic=ns%stochastic
+          env%auto=ns%auto
+          env=ys
 
+          ns%s_ij0      =  env%s_ij0
+          ns%emittance  =  env%emittance
+          ns%KICK       =  env%KICK
+          do i=1,6
+             do j=1,6
+                jj(j)=1
+                ns%STOCH(i,j)  =  env%STOCH%v(i).sub.jj
+                jj(j)=0
+             enddo
+          enddo
+
+          call kill(env)
+          call kill(ys,6)
+       endif
+    endif
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     s=1
     a=1
     ai=1
@@ -4174,11 +4338,33 @@ CONTAINS
     norm=abs(norm-three)
 
     if(norm<=eps_tpsalie) then
-       write(6,*) " Spin Map is identity : not printed "
+       write(6,*) " Spin Map is identity : not normalized "
        spin_in=.false.
     endif
 
   end  subroutine check_spin
+
+  subroutine check_rad(e_ij,rad_in)
+    implicit none
+    logical(lp), INTENT(INout) :: rad_in
+    real(dp) e_ij(6,6)
+    integer i,j
+    real(dp) norm
+
+    rad_in=.true.
+    norm=zero
+    do i=1,6
+       do j=1,6
+          norm=norm+abs(e_ij(i,j))
+       enddo
+    enddo
+
+    if(norm==zero) then
+       write(6,*) " Radiation Envelope  is zero : not printed "
+       rad_in=.false.
+    endif
+
+  end  subroutine check_rad
 
   subroutine normalise_spin(ns,DS_in)
     implicit none

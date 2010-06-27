@@ -294,7 +294,7 @@ module precision_constants
      logical(lp), pointer:: electron     !  electron if true otherwise proton
      real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
      ! global on the fly
-     logical(lp), pointer :: stoch_in_rec != .false. do stochastic calculation
+     logical(lp), pointer :: compute_stoch_kick != .false. store stochastic kick for stochastic tracking
      logical(lp),pointer :: FEED_P0C   !=.FALSE.  work takes p0c instead of energy
      logical(lp),pointer :: ALWAYS_EXACT_PATCHING  !=.TRUE. patching done correctly
      ! used to output horror messages
@@ -574,7 +574,7 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       LOGE_lielib=ZERO
+       LOGE_lielib=zero
        return
     endif
 

@@ -62,7 +62,7 @@ end type work
 
 TYPE INTERNAL_STATE
    integer TOTALPATH
-   LOGICAL(lp) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC
+   LOGICAL(lp) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC,ENVELOPE
    LOGICAL(lp) PARA_IN,ONLY_4D,DELTA,SPIN,MODULATION  ! DA related
    INTEGER  SPIN_DIM
 
@@ -426,16 +426,15 @@ END TYPE ORBIT_LATTICE
 !  BEAM BEAM
 
 TYPE BEAM_BEAM_NODE
-   !   REAL(DP), POINTER :: DS
    REAL(DP), POINTER :: S
-   REAL(DP), POINTER :: SX,SY,XM,YM,FK
-   REAL(DP), POINTER :: BBK(:)
-   REAL(DP), POINTER :: A(:)
-   REAL(DP), POINTER :: D(:)
-   REAL(DP), POINTER :: Beta0
-   INTEGER, POINTER :: A_X1,A_X2
-   integer, POINTER :: DPOS
-   LOGICAL(LP), POINTER :: PATCH
+   REAL(DP), POINTER :: SX,SY,FK
+   REAL(DP), POINTER :: XM,YM   ! trivial transverse displacement: not needed
+   REAL(DP), POINTER :: BBK(:)  ! kick on closed orbit
+   REAL(DP), pointer :: MID(:,:),O(:)
+   REAL(DP), POINTER :: A(:)    ! patch angles
+   REAL(DP), POINTER :: D(:)    ! patch translation
+   INTEGER, POINTER :: A_X1,A_X2 ! patch inverse propagator (not needed)
+   LOGICAL(LP), POINTER :: PATCH ! true= patch
 END TYPE BEAM_BEAM_NODE
 
 !  Additional work at node

@@ -491,7 +491,9 @@ contains
     if(.not.(k%radiation.or.k%SPIN)) return
     IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%mag
-    if(EL%kind<=kind1) return
+    if(EL%kind<=kind1) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
+    !    if(EL%kind>=kind11.and.EL%kind<=kind14) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
+    !    if(EL%kind>=kind18.and.EL%kind<=kind19) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
 
     CALL get_omega_spin(c,OM,B2,dlds,XP,P%X,POS,k)
     if(k%radiation.AND.BEFORE) then
@@ -554,7 +556,7 @@ contains
 
     IF(.NOT.CHECK_STABLE) return
     el=>c%parent_fibre%magp
-    if(.not.before.and.stoch_in_rec) then
+    if(.not.before.and.k%envelope) then
 
        denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
@@ -563,6 +565,7 @@ contains
        denf=denf*b30*FAC*DS
 
        call alloc(xpmap)
+
        xpmap%v(1)=x(1)
        xpmap%v(3)=x(3)
        xpmap%v(5)=x(5)
@@ -577,7 +580,7 @@ contains
              E_IJ(i,j)=E_IJ(i,j)+denf*x1*x3
           enddo
        enddo
-       c%delta_rad_out=root(denf)
+       if(compute_stoch_kick) c%delta_rad_out=root(denf)
        call kill(xpmap)
     endif
 
@@ -648,7 +651,7 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    if(before.and.stoch_in_rec) then
+    if(before.and.k%envelope) then
        denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
        b30=b30**c_1_5
@@ -670,7 +673,7 @@ contains
              E_IJ(i,j)=E_IJ(i,j)+denf*x1*x3
           enddo
        enddo
-       c%delta_rad_in=root(denf)
+       if(compute_stoch_kick) c%delta_rad_in=root(denf)
        call kill(xpmap)
     endif
 
@@ -851,7 +854,9 @@ contains
     IF(.NOT.CHECK_STABLE) return
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     el=>c%parent_fibre%magp
-    if(EL%kind<=kind1) return
+    if(EL%kind<=kind1) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
+    !    if(EL%kind>=kind11.and.EL%kind<=kind14) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
+    !    if(EL%kind>=kind18.and.EL%kind<=kind19) return    ! should I prevent monitor here??? instead of xp=Px,y in get_omega_spin
 
     CALL ALLOC(OM,3)
     CALL ALLOC(CO,3)
@@ -954,6 +959,9 @@ contains
     B=ZERO
     E=ZERO
 
+    xp(1)=x(2)
+    xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
+    dlds=zero
     CALL get_field(EL,B,E,X,k,POS)
 
     SELECT CASE(EL%KIND)
@@ -1080,6 +1088,9 @@ contains
     P%CHARGE=>C%PARENT_FIBRE%CHARGE
     ! DLDS IS  REALLY D(CT)/DS * (1/(ONE/BETA0+X(5)))
     OM(2)=ZERO
+    xp(1)=x(2)
+    xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
+    dlds=zero
 
     CALL get_field(EL,B,E,X,k,POS)
     SELECT CASE(EL%KIND)
@@ -2699,11 +2710,10 @@ contains
     type(probe_8) xs
     !    type(env_8),target,intent(INOUT) ::  ys(6)
     type(env_8),intent(INOUT) ::  ys(6)
-    TYPE(INTERNAL_STATE) K
+    TYPE(INTERNAL_STATE) K,k0
     integer i,j
-    logical(lp) stoch
-    stoch=stoch_in_rec
-    stoch_in_rec=.true.
+    k0=k
+    k=k0+envelope0
     if(.not.associated(r%t)) call MAKE_NODE_LAYOUT(r)
     call alloc(xs)
     xs%u=my_false
@@ -2723,7 +2733,7 @@ contains
           ys(i)%e(j)=xs%e_ij(i,j)
        enddo
     enddo
-    stoch_in_rec=stoch
+    k=k0
 
     call kill(xs)
   END SUBROUTINE TRACK_ys
@@ -3028,9 +3038,9 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
-          CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
+          if(k%spin) CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
        ELSE
-          CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
+          if(k%spin) CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
        ENDIF
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
@@ -3094,9 +3104,9 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
        IF(c%cas==caseP1) THEN
-          CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
+          if(k%spin) CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
        ELSE
-          CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
+          if(k%spin) CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
        ENDIF
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     endif
@@ -3917,6 +3927,13 @@ contains
        IF(STATE%NOCAVITY) THEN
           ND2=4
           STAT=STATE+only_4d0
+          if(state%radiation) then
+             check_stable=.false.
+             write(6,*) " Cavity needed when radiation present "
+             write(6,*) " FIND_ORBIT_LAYOUT will crash "
+             messagelost= " Cavity needed when radiation present "
+             return
+          endif
        ELSE
           ND2=6
           STAT=STATE
@@ -3925,8 +3942,11 @@ contains
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
+          check_stable=.false.
+
           write(6,*) " No Cavity in the Line "
           write(6,*) " FIND_ORBIT_LAYOUT will crash "
+          messagelost= " No cavity in the line "
           stop 456
        ENDIF
     endif

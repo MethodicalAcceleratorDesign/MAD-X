@@ -2295,18 +2295,22 @@ CONTAINS
     ALLOCATE(B%SY)
     ALLOCATE(B%XM)
     ALLOCATE(B%YM)
-    ALLOCATE(B%DPOS)
+    !    ALLOCATE(B%DPOS)
     ALLOCATE(B%bbk(2))
+    ALLOCATE(B%mid(3,3))
+    ALLOCATE(B%o(3))
     ALLOCATE(B%A(3))
     ALLOCATE(B%D(3))
-    ALLOCATE(B%beta0)
+    !    ALLOCATE(B%beta0)
     ALLOCATE(B%A_X1)
     ALLOCATE(B%A_X2)
     ALLOCATE(B%PATCH)
     B%PATCH=.FALSE.
     B%A_X1=1
     B%A_X2=1
-    B%beta0=one
+    !    B%beta0=one
+    B%mid=global_frame
+    B%o=zero
     B%A=zero
     B%D=zero
     B%bbk=zero
@@ -2316,7 +2320,7 @@ CONTAINS
     B%YM=zero
     !    B%DS=ZERO
     B%S=zero
-    B%DPOS=0
+    !    B%DPOS=0
     B%FK=ZERO
   END SUBROUTINE ALLOC_BEAM_BEAM_NODE
 
@@ -2331,11 +2335,13 @@ CONTAINS
     DEALLOCATE(B%XM)
     DEALLOCATE(B%YM)
     DEALLOCATE(B%s)
-    DEALLOCATE(B%DPOS)
+    !    DEALLOCATE(B%DPOS)
     DEALLOCATE(B%bbk)
+    DEALLOCATE(B%mid)
+    DEALLOCATE(B%O)
     DEALLOCATE(B%A)
     DEALLOCATE(B%D)
-    DEALLOCATE(B%beta0)
+    !    DEALLOCATE(B%beta0)
     DEALLOCATE(B%A_X1)
     DEALLOCATE(B%A_X2)
     DEALLOCATE(B%PATCH)

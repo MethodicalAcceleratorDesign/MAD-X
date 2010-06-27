@@ -261,19 +261,25 @@ module definition
   type damapspin
      type(damap) M
      type(real_8) s(3,3)
+     real(dp) e_ij(6,6)
   end type damapspin
 
   type normal_spin
-     type(normalform) N
-     type(damapspin) a1   !
-     type(damapspin) ar   !
-     type(damapspin) as
-     type(damapspin) a_t
-     ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
+     type(normalform) N   ! regular orbital normal form
+     type(damapspin) a1   ! brings to fixed point
+     type(damapspin) ar   ! normalises around the fixed point
+     type(damapspin) as   ! pure spin map
+     type(damapspin) a_t  ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
 !!!  extra info
-     integer M(NDIM,NRESO),MS(NRESO),NRES
-     type(real_8) n0(3)
-     type(real_8) theta0
+     integer M(NDIM,NRESO),MS(NRESO),NRES  ! orbital and spin resonances to be left in the map
+     type(real_8) n0(3)     ! n0 vector
+     type(real_8) theta0    !  angle for the matrix around the orbit (analogous to linear tunes)
+!!!Envelope
+     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
+     real(dp) emittance(3),tune(3),damping(3)   ! equilibrium emittances (partially well defined only for infinitesimal damping)
+     logical(lp) AUTO,STOCHASTIC
+     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
+     real(dp)  STOCH(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
   end type normal_spin
 
 
@@ -304,10 +310,11 @@ module definition
   end type probe
 
   type probe_8
-     type(real_8) x(6)
-     type(spinor_8) s(ISPIN0R:ISPIN1R)
-     type(rf_phasor_8) AC
-     real(dp) E_ij(6,6)
+     type(real_8) x(6)     ! Polymorphic orbital ray
+     type(spinor_8) s(ISPIN0R:ISPIN1R)   ! Polymorphic spin
+     type(rf_phasor_8) AC  ! Modulation
+     real(dp) E_ij(6,6)   !  Envelope
+     !   stuff for exception
      logical u
      type(integration_node),pointer :: lost_node
   end type probe_8

@@ -3887,7 +3887,9 @@ contains
     if(ier.eq.132) then
        if(check_da) then
           C_%STABLE_DA=.false.
+          C_%check_stable=.false.
           messagelost='ERROR IN ROUTINE DAINV, ier=132 in matinv'
+          write(6,*) messagelost
           call dadal_b(ml,ia)
           call dadal_b(ms,ia)
           return

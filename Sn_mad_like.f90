@@ -40,8 +40,8 @@ module Mad_like
   !  type(layout),save::mad_list
   type(layout),target, private::mad_list
   LOGICAL(LP) :: CURVED_ELEMENT=.FALSE.  !  TO SET UP BEND_FRINGE CORRECTLY FOR EXACT
-  type(tree_element), PRIVATE :: mad_tree,mad_tree_rad
-  type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV
+  !  type(tree_element), PRIVATE :: mad_tree,mad_tree_rad
+  !  type(tree_element),PRIVATE :: mad_tree_REV,mad_tree_rad_REV
   LOGICAL(LP) MAD_TREE_DELTAMAP
   logical(lp):: symplectic_print=.false.
   logical(lp):: symplectify=.false.
@@ -2856,7 +2856,7 @@ CONTAINS
     c_%SECTOR_NMUL_MAX => SECTOR_NMUL_MAX
     c_%electron => electron
     c_%massfactor => muon
-    c_%stoch_in_rec => stoch_in_rec
+    c_%compute_stoch_kick => compute_stoch_kick
     c_%FEED_P0C => FEED_P0C
     c_%ALWAYS_EXACT_PATCHING => ALWAYS_EXACT_PATCHING
     c_%OLD_IMPLEMENTATION_OF_SIXTRACK => OLD_IMPLEMENTATION_OF_SIXTRACK
@@ -2889,10 +2889,10 @@ CONTAINS
 
     call set_pointers
 
-    CALL NULL_TREE(mad_tree)
-    CALL NULL_TREE(mad_tree_rad)
-    CALL NULL_TREE(mad_tree_REV)
-    CALL NULL_TREE(mad_tree_rad_REV)
+    !    CALL NULL_TREE(mad_tree)
+    !    CALL NULL_TREE(mad_tree_rad)
+    !    CALL NULL_TREE(mad_tree_REV)
+    !    CALL NULL_TREE(mad_tree_rad_REV)
 
 
     ns=nstd
@@ -2965,6 +2965,14 @@ CONTAINS
     logical(lp) verb
     integer met,ns
     logical(lp) all
+
+    IF(MAD8_WEDGE) THEN
+       WEDGE_COEFF(1)=ONE+ONE/FOUR
+       WEDGE_COEFF(2)=TWO-HALF
+    ELSE
+       WEDGE_COEFF(1)=ONE
+       WEDGE_COEFF(2)=ONE
+    ENDIF
 
     call set_pointers
 

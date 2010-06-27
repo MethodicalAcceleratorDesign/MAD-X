@@ -407,7 +407,7 @@ contains
 
     write(line,*) l%start%mass,L%START%mag%p%p0c,l%start%ag, " MASS, P0C, AG(spin)"
     write(MF,'(a255)') line
-    write(MF,*) phase0,stoch_in_rec,l%start%charge, " PHASE0, STOCH_IN_REC, CHARGE"
+    write(MF,*) phase0,compute_stoch_kick,l%start%charge, " PHASE0, compute_stoch_kick, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
     write(line,*) SECTOR_NMUL_MAX,SECTOR_NMUL,&
@@ -489,7 +489,7 @@ contains
        read(lineg,*) MASSF,p0c,A_PARTICLE
     ENDIF
     ag0=A_PARTICLE
-    read(MF,*) phase0,stoch_in_rec,initial_charge
+    read(MF,*) phase0,compute_stoch_kick,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     call input_sector(se2,se1)
@@ -1632,7 +1632,7 @@ contains
     ag0=A_PARTICLE
 
     !    read(MF,*) MASSF,p0c
-    read(MF,*) phase0,stoch_in_rec,initial_charge
+    read(MF,*) phase0,compute_stoch_kick,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     read(MF,*) wedge_coeff

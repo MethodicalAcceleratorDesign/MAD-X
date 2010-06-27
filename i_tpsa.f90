@@ -3163,8 +3163,8 @@ CONTAINS
     integer                :: i,ii
 
     if (.not. associated(ut%n)) then
-       write(6,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)' 
        write(iunit,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)'
+       write(6,'(A)') '    UNIVERSAL_TAYLOR IS EMPTY (NOT ASSOCIATED)'
        return
     endif
 
