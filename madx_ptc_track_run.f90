@@ -434,15 +434,15 @@ CONTAINS
     ! finding the closed orbits at observations for element_by_element tracking
 
     ! START TRACKING WITH PTC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    change_default: IF(Radiation_PTC) THEN
-       MYSTATE=DEFAULT+RADIATION
+!    change_default: IF(Radiation_PTC) THEN
+!       MYSTATE=DEFAULT+RADIATION
 !       IF (Radiation_Quad) STOCH_IN_REC=.TRUE.
-       !element_by_element=.FALSE. ! make PTC one-turn tracking
-       print *, "################################################################"
-       print *, "The PTC parameter DEFAULT before the tracking with the turn-loop"
-       call print(MYSTATE,6)
-       CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
-    END IF change_default
+!       !element_by_element=.FALSE. ! make PTC one-turn tracking
+!       print *, "################################################################"
+!       print *, "The PTC parameter DEFAULT before the tracking with the turn-loop"
+!       call print(MYSTATE,6)
+!       CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
+!    END IF change_default
 
     !============================================================================!
     ! getting inial particle coordinates ========================================!
@@ -880,7 +880,7 @@ CONTAINS
     !=============================================================================
 
     SUBROUTINE Call_my_state_and_update_states
-      ! USE  madx_ptc_module, ONLY:  my_state, UPDATE_STATES, default, print
+      USE  madx_ptc_module, ONLY:  radiation0
       implicit none
       character(4) text
 
@@ -897,7 +897,7 @@ CONTAINS
          write(text, '(i4)') icase_ptc
          call aafail('Call_my_state_and_update_states: ',' ICASE not 4, 5 or 6 found: ' // text)
       endif
-      IF (Radiation_PTC) MYSTATE=DEFAULT+RADIATION
+      IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION0
       Print *, ' Radiation_PTC    =     ', Radiation_PTC
 
       debug_print_2: if (ptc_track_debug) then
@@ -910,13 +910,12 @@ CONTAINS
       end if debug_print_2
 
       CALL UPDATE_STATES
-      debug_print_3: if (ptc_track_debug) then
-         print *, "after CALL UPDATE_STATES"
-         print *; print*, '----------------------------------'
-         print *, "Prining by <call print(default,6)>:"
-         call print(MYSTATE,6)
-         print *, "after call print(MYSTATE,6)"
-      end if debug_print_3
+      MYSTATE=DEFAULT
+      print *, "after CALL UPDATE_STATES"
+      print *; print*, '----------------------------------'
+      print *, "Printing by <call print(default,6)>:"
+      call print(MYSTATE,6)
+      print *, "after call print(MYSTATE,6)"
 
     END SUBROUTINE Call_my_state_and_update_states
     !=============================================================================
@@ -2706,11 +2705,12 @@ CONTAINS
 
     !==============================================================================
     SUBROUTINE beam_enevelope_with_PTC
-      use madx_ptc_module
+      use madx_ptc_module, ONLY:ENVELOPE0,track_probe,track_probe_x,get_loss,&
+           FIND_ORBIT_x,init,print,alloc,kill
       implicit none
 
       TYPE (REAL_8) :: Y(6)
-      TYPE(INTERNAL_STATE) MYSTATE_env,wrapped_state
+      TYPE(INTERNAL_STATE) MYSTATE_ENV
       type(damap) id
       type(normalform) normal
       TYPE (PROBE) XS0
@@ -2719,20 +2719,14 @@ CONTAINS
       TYPE (NORMAL_SPIN) nf
       real(dp) x(6),energy,deltap
 
-      wrapped_state=MYSTATE+radiation0
-      CALL INIT(wrapped_state,1,0)
+      CALL INIT(MYSTATE,1,0)
       call alloc(id)
       call alloc(y)
       call alloc(normal)
       !nf%stochastic=my_true
 
       x=zero
-      WRITE(6,'(A)') "  Print the state: wrapped_state "
-      PRINT*," "
-      call print(wrapped_state,6)
-      PRINT*," "
-
-      CALL FIND_ORBIT_x(my_ring,X,wrapped_state,1.0e-7_dp,fibre1=1)
+      CALL FIND_ORBIT_x(my_ring,X,MYSTATE,1.0e-7_dp,fibre1=1)
       WRITE(6,'(A)') " Closed orbit with Radiation "
       WRITE(6,'(6(1x,E15.8))') x
       call GET_loss(my_ring,energy,deltap)
@@ -2741,7 +2735,7 @@ CONTAINS
       id=1
       y=x+id
 
-      call TRACK_PROBE_X(my_ring,y,wrapped_state, FIBRE1=1)
+      call TRACK_PROBE_X(my_ring,y,MYSTATE, FIBRE1=1)
 
       id=y
       normal=id   ! Normal is a regular Normalform type
@@ -2754,22 +2748,22 @@ CONTAINS
       call kill(y)
       call kill(normal)
 
-      mystate_env=MYSTATE+radiation0+envelope0
+      MYSTATE_ENV=MYSTATE+ENVELOPE0
       CALL INIT(mystate_env,2,0)
       call alloc(m)
       call alloc(xs)
       call alloc(nf)
 
       PRINT*," "
-      WRITE(6,'(A)') " Print the state: mystate_env "
+      WRITE(6,'(A)') " Print the state: MYSTATE_ENV "
       PRINT*," "
-      call print(mystate_env,6)
+      call print(MYSTATE_ENV,6)
 
       xs0=x
       m=1        ! damapspin set to identity
       xs=xs0+m   ! Probe_8 = closed orbit probe + Identity
 
-      call track_probe(my_ring,xs,mystate_env,fibre1=1)
+      call track_probe(my_ring,xs,MYSTATE_ENV,fibre1=1)
 
       m=xs       ! damapspin = Probe_8 
       nf=m       ! normal_spin = damapspin (Normalization including spin (if present) or radiation
