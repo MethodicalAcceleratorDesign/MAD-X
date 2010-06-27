@@ -37,6 +37,7 @@ module Inf_NaN_Detection
 
   private
 
+
   public :: isnan, isinf, isposinf, isneginf, sp, dp
 
 
@@ -158,9 +159,11 @@ MODULE madx_ptc_track_run_module
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
   use name_lenfi
+  use definition
   implicit none
   SAVE
   PRIVATE
+  TYPE(INTERNAL_STATE) MYSTATE
 
   PUBLIC :: ptc_track_run ! Subroutine inside the module
 
@@ -248,23 +251,23 @@ CONTAINS
   SUBROUTINE ptc_track_run(max_obs)
 
     !USE MADX_PTC_MODULE ==================================================================!
-    USE  madx_ptc_module, ONLY: universe, my_ring, default, index_mad, c_                      !
+    USE  madx_ptc_module, ONLY: universe, my_ring, default, index_mad, c_                  !
     !                                                                                      !
     USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,            !
          FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"        !
          NORMALFORM, & ! type for normalform                                               !
          REAL_8, &     ! type for map                                                      !
          damap, &      ! type for diff algebra                                             !
-         RADIATION, STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC           !
+         RADIATION, & ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
          BEAMENVELOPE, ENV_8        ! For beam envelope                                    !
     ! ======== functions ==================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
-         print, find_orbit, track,UPDATE_STATES, my_state, &                               !
+         print, find_orbit,FIND_ORBIT_x, track,track_probe_x,UPDATE_STATES, my_state, &    !
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
          Find_Envelope, &                                                                  !
-                                ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
+         ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
@@ -432,12 +435,12 @@ CONTAINS
 
     ! START TRACKING WITH PTC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     change_default: IF(Radiation_PTC) THEN
-       DEFAULT=DEFAULT+RADIATION
-       IF (Radiation_Quad) STOCH_IN_REC=.TRUE.
+       MYSTATE=DEFAULT+RADIATION
+!       IF (Radiation_Quad) STOCH_IN_REC=.TRUE.
        !element_by_element=.FALSE. ! make PTC one-turn tracking
        print *, "################################################################"
        print *, "The PTC parameter DEFAULT before the tracking with the turn-loop"
-       call print(default,6)
+       call print(MYSTATE,6)
        CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
     END IF change_default
 
@@ -894,7 +897,7 @@ CONTAINS
          write(text, '(i4)') icase_ptc
          call aafail('Call_my_state_and_update_states: ',' ICASE not 4, 5 or 6 found: ' // text)
       endif
-      !      IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION
+      IF (Radiation_PTC) MYSTATE=DEFAULT+RADIATION
       Print *, ' Radiation_PTC    =     ', Radiation_PTC
 
       debug_print_2: if (ptc_track_debug) then
@@ -911,8 +914,8 @@ CONTAINS
          print *, "after CALL UPDATE_STATES"
          print *; print*, '----------------------------------'
          print *, "Prining by <call print(default,6)>:"
-         call print(default,6)
-         print *, "after call print(default,6)"
+         call print(MYSTATE,6)
+         print *, "after call print(MYSTATE,6)"
       end if debug_print_3
 
     END SUBROUTINE Call_my_state_and_update_states
@@ -948,7 +951,8 @@ CONTAINS
       end if !--------------------------------------------!                !
       !                                                                    !
       if(closed_orbit) then !------------------------------------!         !
-         call find_orbit(my_ring,x_coord_co,1,default,c_1d_7)    !         !
+         CALL FIND_ORBIT_x(my_ring,x_coord_co,MYSTATE,c_1d_7,fibre1=1)     !
+         !         call find_orbit(my_ring,x_coord_co,1,MYSTATE,c_1d_7)    !
          print*,"===== ptc_track ============================"   !         !
          CALL write_closed_orbit(icase_ptc,x_coord_co)           !         !
          print*,"============================================"   !         !
@@ -1319,7 +1323,8 @@ CONTAINS
                     x_coord_incl_co(k_th_coord,j_particle)                   !               +   !
             end do !---------------------------------------------------------!               +   !
             !                                                                                !   !
-            call track(my_ring,current_x_coord_incl_co,1,default)                            !   !
+            call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE,fibre1=1)             !   !
+!            call track(my_ring,current_x_coord_incl_co,1,MYSTATE)                           !   !
             ! The PTC subroutine " To TRACK the MY_RING for X coordinates                    +   !
             ! over one-turn in the DEFAULT state (citation, p. 25).                          +   !
             ! there is no any other an explicit description in KEK 2002-3 report             +   !
@@ -1576,8 +1581,10 @@ CONTAINS
                        x_coord_incl_co(k_th_coord,j_th_partic)                  !                +  ! p
                end do !---------------------------------------------------------!                +  ! !
                !                                                                                 +  ^ !
-               call track(my_ring,current_x_coord_incl_co, &                                     !  ! !
-                    i_current_elem,i_current_elem+1,default)                                     !  ! o
+               call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
+                    fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
+!               call track(my_ring,current_x_coord_incl_co, &                                    !  ! !
+!                    i_current_elem,i_current_elem+1,MYSTATE)                                    !  ! o
                ! The PTC subroutine " To TRACK the MY_RING for X coordinates                     +  ! v
                ! throughout the element in the DEFAULT state (citation, p. 25).                  +  ! e
                !Print *, 'x=', current_x_coord_incl_co                                           +  ! r
@@ -2202,14 +2209,16 @@ CONTAINS
          length_current_element_c=node_value('l ')
          Sum_length_S=Sum_length_S+length_current_element_f90
 
-         find_CO_for_el_by_el: IF (element_by_element) THEN       !===!
-            IF (closed_orbit) THEN !-------------------------------!  !
-               Call track(my_ring,x_coord_co_temp, &               !  !
-                    i_ring_element, i_ring_element+1, default )    !  !
-            ELSE                                                   !  !
-               x_coord_co_temp(:)=zero                             !  !
-            ENDIF !------------------------------------------------!  !
-         ENDIF find_CO_for_el_by_el !=================================!
+         find_CO_for_el_by_el: IF (element_by_element) THEN            !===!
+            IF (closed_orbit) THEN !-----------------------------------!  !
+               call track_probe_x(my_ring,x_coord_co_temp,MYSTATE, &   !  ! 
+                    fibre1=i_ring_element,fibre2=i_ring_element+1)     !  ! 
+!               Call track(my_ring,x_coord_co_temp, &                  !  !
+!                    i_ring_element, i_ring_element+1, MYSTATE )       !  !
+            ELSE                                                       !  !
+               x_coord_co_temp(:)=zero                                 !  !
+            ENDIF !----------------------------------------------------!  !
+         ENDIF find_CO_for_el_by_el !=====================================!
 
          IF(number_obs.GT.0) THEN
             elem_number_at_observ(number_obs)= i_ring_element
@@ -2360,8 +2369,8 @@ CONTAINS
             Print *, 'Track from i_from=', i_from, 'i_till =',i_till
          end if
 
-         call track(my_ring,Map_Y_obs,i_from,i_till,default)
-         !call track(my_ring,Map_Y_obs,1,default)
+         call track_probe_x(my_ring,Map_Y_obs,MYSTATE,fibre1=i_from,fibre2=i_till)
+         !call track(my_ring,Map_Y_obs,1,MYSTATE)
 
 
          Map_damap=Map_Y_obs
@@ -2697,36 +2706,84 @@ CONTAINS
 
     !==============================================================================
     SUBROUTINE beam_enevelope_with_PTC
-      !use madx_ptc_module, ONLY: BEAMENVELOPE, ENV_8, REAL_8, &
-      !                           Find_Envelope, my_ring, default, track, &
-      !                           assignment(=), operator(+)
+      use madx_ptc_module
       implicit none
 
-      TYPE (BEAMENVELOPE) :: ENV
-      TYPE (ENV_8) :: YS(6)
-      TYPE (REAL_8) :: A1(6), Y(6)
-      ! REAL (dp)     :: x_coord_co(6)
+      TYPE (REAL_8) :: Y(6)
+      TYPE(INTERNAL_STATE) MYSTATE_env,wrapped_state
+      type(damap) id
+      type(normalform) normal
+      TYPE (PROBE) XS0
+      TYPE (PROBE_8) XS
+      TYPE (DAMAPSPIN) M
+      TYPE (NORMAL_SPIN) nf
+      real(dp) x(6),energy,deltap
 
-      Print *, ' Subr. beam_enevelope_with_PTC: '
-      Print*, 'x_coord_co=', x_coord_co
-      Print *, ' before Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default) '
+      wrapped_state=MYSTATE+radiation0
+      CALL INIT(wrapped_state,1,0)
+      call alloc(id)
+      call alloc(y)
+      call alloc(normal)
+      !nf%stochastic=my_true
 
-      Y=x_coord_co ! new line at 2005018
+      x=zero
+      WRITE(6,'(A)') "  Print the state: wrapped_state "
+      PRINT*," "
+      call print(wrapped_state,6)
+      PRINT*," "
 
-      Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default)
-      Print *, ' after Call FIND_ENVELOPE(my_ring,YS,A1,x_coord_co, 1, default) '
+      CALL FIND_ORBIT_x(my_ring,X,wrapped_state,1.0e-7_dp,fibre1=1)
+      WRITE(6,'(A)') " Closed orbit with Radiation "
+      WRITE(6,'(6(1x,E15.8))') x
+      call GET_loss(my_ring,energy,deltap)
+      write(6,'(a32,2(1x,E15.8))') "Energy loss: GEV and DeltaP/p0c ",energy,deltap
 
-      ENV=YS
-      Print *, ' after ENV=YS '
-      YS=Y
-      Print *, ' after ENV=YS '
-      YS=ENV%SIJ0
-      Print *, ' after YS=ENV%SIJ0 '
-      CALL TRACK (my_ring, YS, 1,  +default)
-      Print *, ' after CALL TRACK (my_ring, YS, 1,  +default) '
-      ENV%SIJ0=YS
+      id=1
+      y=x+id
 
-      Print *, ' The equilibrium emittances are : ', ENV%EMITTANCE
+      call TRACK_PROBE_X(my_ring,y,wrapped_state, FIBRE1=1)
+
+      id=y
+      normal=id   ! Normal is a regular Normalform type
+      write(6,*) "Tunes "
+      write(6,*) normal%tune(1:3)
+      write(6,*) "Damping decrements"
+      write(6,*) normal%damping(1:3)
+
+      call kill(id)
+      call kill(y)
+      call kill(normal)
+
+      mystate_env=MYSTATE+radiation0+envelope0
+      CALL INIT(mystate_env,2,0)
+      call alloc(m)
+      call alloc(xs)
+      call alloc(nf)
+
+      PRINT*," "
+      WRITE(6,'(A)') " Print the state: mystate_env "
+      PRINT*," "
+      call print(mystate_env,6)
+
+      xs0=x
+      m=1        ! damapspin set to identity
+      xs=xs0+m   ! Probe_8 = closed orbit probe + Identity
+
+      call track_probe(my_ring,xs,mystate_env,fibre1=1)
+
+      m=xs       ! damapspin = Probe_8 
+      nf=m       ! normal_spin = damapspin (Normalization including spin (if present) or radiation
+      ! envelope if present. (Spin without radiation)
+      write(6,*) ' Tunes : '
+      write(6,*) nf%n%tune(1:3)
+      write(6,*) ' The equilibrium emittances are : '
+      write(6,*) nf%emittance
+      write(6,*) ' nf%s_ij0(1,1),nf%s_ij0(5,5) : '
+      write(6,*) nf%s_ij0(1,1),nf%s_ij0(5,5)
+
+      call kill(m)
+      call kill(xs)
+      call kill(nf)
 
     END SUBROUTINE beam_enevelope_with_PTC
     !==============================================================================
@@ -2924,7 +2981,7 @@ CONTAINS
             !-- Transform to unnormalized coordinates and refer to closed orbit.!   c   !
             Z_stdt_temp(:)=zero;                                                !   l   !
             !                                                                   !   e   !
-            if(closed_orbit) Z_stdt_temp=A_t_map*Z_norm_temp(:icase_ptc)        !   !   !
+            if(closed_orbit) Z_stdt_temp=A_t_map*Z_norm_temp                    !   !   !
             !                     ! ANY ORDER !!!                               !   !   !
             debug_print_6: if (ptc_track_debug) then ! --------!                !   !   !
                Print *, 'Z_stdt_temp=A_t_map*Z_norm_temp=', &  !                !   !   !
@@ -3118,7 +3175,7 @@ CONTAINS
     USE  madx_ptc_module, ONLY: dp, real_8, normalform, damap,   &
          my_ring, default, BERZ, daprint, &
          assignment(=), operator(**), operator(.sub.), &
-         track, init, alloc, kill, &
+         track, track_probe_x, init, alloc, kill, &
          PRODUCE_APERTURE_FLAG,  ANALYSE_APERTURE_FLAG
     ! USE ptc_results
     implicit none
@@ -3144,9 +3201,9 @@ CONTAINS
     nda=0
     ! no = 1 =>  Normal_Order_n0 (INPUT)
 
-    call init(default,Normal_Order_n0,nda,BERZ,mynd2,npara)
+    call init(MYSTATE,Normal_Order_n0,nda,BERZ,mynd2,npara)
     if (ptc_track_debug) then
-       Print *, 'aftercall init(default,Normal_Order_n0,nda,BERZ,mynd2,npara)'
+       Print *, 'aftercall init(MYSTATE,Normal_Order_n0,nda,BERZ,mynd2,npara)'
        Print *, 'Normal_Order_n0,nda,mynd2,npara=', Normal_Order_n0,nda,mynd2,npara
     endif
 
@@ -3163,7 +3220,7 @@ CONTAINS
     endif
     !    c_%watch_user=.true.
 
-    call track(my_ring,Map_Y,1,default)
+    call track_probe_x(my_ring,Map_Y,MYSTATE,fibre1=1)
     IF (ptc_track_debug)call daprint(Map_Y,mf2);
 
 
