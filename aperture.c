@@ -3,6 +3,9 @@
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
+#ifdef _WRAP_C_CALLS
+#include "c_wrappers.h"
+#endif
 
 #define MIN_DOUBLE 1.e-36
 
