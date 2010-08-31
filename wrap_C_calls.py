@@ -124,6 +124,41 @@ class Wrapper:
                             #if func not in self.fortranCalls: # only add a function once in the list
                             #    self.fortranCalls.append(func)
 
+                # MISSED SOMETHING VERY IMPORTANT ABOUT THE ASSUMPTIONS WE MAKE ABOUT HOW FORTRAN CALLS C
+                # new finding on 31 august 2010: some C functions may be called from Fortran without the 'call' command
+                # for instance the double function node_value defined in C is called from Fortran
+                m = re.match(r'^[\s\t].+=(\w+)\(.+$',line) # all functions f found in patterns of the form: y = f(x)
+                if m:
+                    name = m.group(1)
+                    for func in cFunctions:
+                        # as Fortran is case insensitive, the strings must be compared as lower case
+                        if func.name == 'fact': # we know this function does not do any print out
+                            # ignore this one for the time being, as it causes trouble when linking madx
+                            continue
+                        if func.name.lower() == name.lower():
+                            # first make sure that the function is not a Fortran subroutine
+                            # then check that the number and type of parameters match...
+                            if not func.name in fortranSubroutines:                           
+                                # print "C function "+name+" is called from Fortran"
+                                alreadyPresent = False # default
+                                for anotherFunc in self.fortranCalls:
+                                    if anotherFunc.name == func.name:
+                                        alreadyPresent = True
+                                if not alreadyPresent:
+                                    self.fortranCalls.append(func)
+
+#        # MISSED SOMETHING VERY IMPORTANT ABOUT THE ASSUMPTIONS WE MAKE ABOUT HOW FORTRAN CALLS C
+#        # new finding on 31 august 2010: some C functions may be called from Fortran without the 'call' command
+#        # for instance the double function node_value defined in C is called from Fortran
+#        # add all such C functions we know to be called from Fortran:
+#        for func in cFunctions:
+#            if func.name.lower() == 'node_value':
+#                self.fortranCalls.append(func)
+#            # should the same as above for all functions called from Fortran in a similar fashion as for node_value, if any...
+#        # of course a better solution would be to find a generic pattern to match such functions in the Fortran code...
+                
+
+
     
     def listFunctionsCalledByFortran(self):
         for func in self.fortranCalls:
@@ -175,6 +210,10 @@ class Wrapper:
             code.append(newSignature)
             # code.append('printf("WRAPPER: now returning from invocation of '+func.name+'\\n");\n')
             debugMsg = '' # otherwise could be func.name
+            #if options.trace:
+            #    code.append('\t/* tracing code */\n');
+            #    code.append('\tfprintf(stderr,"now about to enter C function '+func.name+' in file '+func.sourceFile+'");\n');
+            #    code.append('\t/* end of tracing code */\n');
             if not func.returnType == 'void':
                 code.append('\t'+func.returnType+' retVal;\n')
             code.append('\tcall_fortran_flush_("'+debugMsg+'",'+str(len(debugMsg))+');\n')
@@ -183,6 +222,10 @@ class Wrapper:
             else:
                 body = '\tretVal = '+ func.name+'_wrapped('+argList+');\n'
             code.append(body)
+            if options.trace:
+                code.append('\t/* tracing code */\n');
+                code.append('\tfprintf(stdout,"now just leaved C function '+func.name+' in file '+func.sourceFile+'\\n");\n');
+                code.append('\t/* end of tracing code */\n');
             code.append('\tfflush(stdout);\n')
             if not func.returnType == 'void':
                 code.append('\treturn retVal;\n')
@@ -337,6 +380,7 @@ if __name__ == "__main__":
     parser = optparse.OptionParser(usage)
     parser.add_option('-c','--clean',help='deletes all files created by this script',action='store_true')
     parser.add_option('-v','--verbose',help='display messages that may be useful for debugging',action='store_true')
+    parser.add_option('-t','--trace', help='trace calls before flushing, which may be useful for debugging', action='store_true')
     (options,args) = parser.parse_args()
 
     if options.clean:
