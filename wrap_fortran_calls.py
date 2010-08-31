@@ -283,10 +283,36 @@ for file in FortranSourceFiles:
                 continue # next in the for-loop
 
             # Some very special cases of subroutines that cause problem with argument parsing and that we want to discard alltogether
-            skippedSubroutine = re.compile('subroutine trrun')
-            m = skippedSubroutine.match(line);
+
+#            skippedSubroutine = re.compile('subroutine trrun')
+#            m = skippedSubroutine.match(line);
+#            if m:
+#                continue # next in the for loop
+            trrunSubroutine = re.compile('subroutine trrun') # let's try not to skip it actually
+            m = trrunSubroutine.match(line);
             if m:
+                trrun = subroutine(file,"trrun","flag,turns,orbit0,oneturnmat,ibuf1,ibuf2, buf1, buf2,buf_dxt,buf_dyt,buf3,buf4,buf5,e_flag,ibuf3,buf6")
+                trrun.calledFromC()
+                trrun.registerArgumentType('int*','flag')
+                trrun.registerArgumentType('int*','turns')
+                trrun.registerArgumentType('double*','orbit0')
+                trrun.registerArgumentType('double*','oneturnmat')
+                trrun.registerArgumentType('int*','ibuf1')
+                trrun.registerArgumentType('int*','ibuf2')
+                trrun.registerArgumentType('double*','buf1')
+                trrun.registerArgumentType('double*','buf2')
+                trrun.registerArgumentType('double*','buf_dxt')
+                trrun.registerArgumentType('double*','buf_dyt')
+                trrun.registerArgumentType('double*','buf3')
+                trrun.registerArgumentType('double*','buf4')
+                trrun.registerArgumentType('double*','buf5')
+                trrun.registerArgumentType('int*','e_flag')
+                trrun.registerArgumentType('int*','ibuf3')
+                trrun.registerArgumentType('double*','buf6')
                 continue # next in the for loop
+
+
+
 
             
                     
