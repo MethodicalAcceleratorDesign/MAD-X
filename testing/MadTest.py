@@ -124,6 +124,9 @@ class Resource:
             
             commonPatterns.append(re.compile(r'sxfread, file = "(fv9\.sxf)";'))
 
+            # another - exceptional - instruction that calls a file from another (in aperture/lhccell.madx)
+            commonPatterns.append(re.compile(r'aperture,offsetelem=\"([\w\.]+)\".+'))
+
             # another - rare - instruction that calls a script available in the input directory
             # along the other input files. Such script must be copied locally along the other files.
             # This is for instance the case for the read.magnet.errors perl-script in twiss/test_5/ or foot
