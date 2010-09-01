@@ -127,7 +127,7 @@ class Wrapper:
                 # MISSED SOMETHING VERY IMPORTANT ABOUT THE ASSUMPTIONS WE MAKE ABOUT HOW FORTRAN CALLS C
                 # new finding on 31 august 2010: some C functions may be called from Fortran without the 'call' command
                 # for instance the double function node_value defined in C is called from Fortran
-                m = re.match(r'^[\s\t].+=(\w+)\(.+$',line) # all functions f found in patterns of the form: y = f(x)
+                m = re.match(r'^[\s\t]*.+=[\s\t]*(\w+)\(.+$',line) # all functions f found in patterns of the form: y = f(x)
                 if m:
                     name = m.group(1)
                     for func in cFunctions:
