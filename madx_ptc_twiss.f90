@@ -1815,7 +1815,7 @@ contains
 
       if (isRing) then
 
-         call find_orbit(my_ring,state,1,default)
+         call find_orbit(my_ring,state,1,default,c_1d_7)
 
          ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
 
@@ -2145,7 +2145,7 @@ contains
 
       state = 0.d0
 
-      call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
+      call find_orbit(my_ring,state,1,default,c_1d_7) ! 1 for the first element
 
       call alloc(theTransferMap) ! transfer map between two successive inner slices
       ! is it the correct way to initialize, or should we rely on y=x+id??
@@ -2514,7 +2514,7 @@ contains
 
        call make_node_layout(my_ring) ! essential: the way to look inside the magnets
        state = zero
-       call find_orbit(my_ring,state,1,default,1.d-5) ! 1 for the first element
+       call find_orbit(my_ring,state,1,default,c_1d_7) ! 1 for the first element
 
        xcomax = state(1)
        pxcomax = state(2)
