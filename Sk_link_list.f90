@@ -1608,6 +1608,35 @@ CONTAINS
     ENDIF
   END SUBROUTINE MOVE_TO_LAYOUT_I
 
+  SUBROUTINE MOVE_TO_LAYOUT_name( L,current,name ) ! Moves current to the i^th position
+    implicit none
+    TYPE (LAYOUT), POINTER :: Current
+    TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
+    integer i,k
+    character(120) name,name1
+
+    name1=name
+    call context(name1)
+
+
+    nullify(current);
+    do i=1,l%n
+       Current => L%START
+       call context(current%name)
+       IF(current%NAME==NAME1) RETURN
+       IF(I<=L%N) THEN
+          DO K=1,I-1
+             CURRENT=>CURRENT%NEXT
+             call context(current%name)
+             IF(current%NAME==NAME1) RETURN
+          ENDDO
+       ELSE
+          WRITE(6,*) "FATAL ERROR IN MOVE_TO_LAYOUT_I ",I,L%N
+          STOP 900
+       ENDIF
+    enddo
+  END SUBROUTINE MOVE_TO_LAYOUT_name
+
   SUBROUTINE de_Set_Up_UNIVERSE( L ) ! deallocates layout content
     implicit none
     TYPE (MAD_UNIVERSE), TARGET, intent(inout):: L
@@ -2297,8 +2326,8 @@ CONTAINS
     ALLOCATE(B%YM)
     !    ALLOCATE(B%DPOS)
     ALLOCATE(B%bbk(2))
-    ALLOCATE(B%mid(3,3))
-    ALLOCATE(B%o(3))
+    !    ALLOCATE(B%mid(3,3))
+    !    ALLOCATE(B%o(3))
     ALLOCATE(B%A(3))
     ALLOCATE(B%D(3))
     !    ALLOCATE(B%beta0)
@@ -2309,8 +2338,8 @@ CONTAINS
     B%A_X1=1
     B%A_X2=1
     !    B%beta0=one
-    B%mid=global_frame
-    B%o=zero
+    !    B%mid=global_frame
+    !    B%o=zero
     B%A=zero
     B%D=zero
     B%bbk=zero
@@ -2337,8 +2366,8 @@ CONTAINS
     DEALLOCATE(B%s)
     !    DEALLOCATE(B%DPOS)
     DEALLOCATE(B%bbk)
-    DEALLOCATE(B%mid)
-    DEALLOCATE(B%O)
+    !    DEALLOCATE(B%mid)
+    !    DEALLOCATE(B%O)
     DEALLOCATE(B%A)
     DEALLOCATE(B%D)
     !    DEALLOCATE(B%beta0)

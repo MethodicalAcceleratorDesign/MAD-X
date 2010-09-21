@@ -21,7 +21,7 @@ module pointer_lattice
   character(nlp) name_ap
   character(255) :: filename_ap = "Tracking.txt"
   integer last_npara
-  integer :: i_layout=1
+  integer :: i_layout=1, i_layout_t=1
   integer my_lost_position
   private thin
   real(dp) thin
@@ -82,7 +82,7 @@ contains
     CHARACTER*(120) com,COMT,filename,name_root,title,name_root_res,filetune,FILESMEAR
     character*(4) suffix,SUFFIX_res
     character(*) ptc_fichier
-    integer i,ii,mf,i_layout_temp,IB,NO
+    integer i,ii,mf,i_layout_temp,IB,NO,i_layout_temp_t
     !  FITTING FAMILIES
     INTEGER NPOL,J,NMUL,K,ICN,N,np
     type(pol_block), ALLOCATABLE :: pol_(:)
@@ -201,6 +201,19 @@ contains
        write(6,*) "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
        select case(com)
        case('SELECTLAYOUT','SELECTLATTICE')
+          read(mf,*) i_layout_temp
+          if(i_layout_temp>m_u%n) then
+             write(6,*) " Universe Size ", m_u%n
+
+             write(6,*) " Selected Layout does not exist "
+
+          else
+
+             i_layout=i_layout_temp
+             call move_to_layout_i(m_u,my_ering,i_layout)
+             write(6,*) "Selected Layout",i_layout,"  called  ---> ",my_ering%name
+          endif
+       case('SELECTTRACKABLELAYOUT','SELECTTRACKABLELATTICE')
           read(mf,*) i_layout_temp
           if(i_layout_temp>m_u%n) then
              write(6,*) " Universe Size ", m_u%n
@@ -368,10 +381,10 @@ contains
           my_estate=my_estate+RADIATION0
        case('-RADIATION')
           my_estate=my_estate-RADIATION0
-       case('+EXACTMIS')
-          my_estate=my_estate+EXACTMIS0
-       case('-EXACTMIS')
-          my_estate=my_estate-EXACTMIS0
+          !  case('+EXACTMIS')
+          !     my_estate=my_estate+EXACTMIS0
+          !  case('-EXACTMIS')
+          !     my_estate=my_estate-EXACTMIS0
 
           !       case('DEFAULTTPSA')
           !       read(mf,*) default_tpsa

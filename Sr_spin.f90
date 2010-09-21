@@ -2787,6 +2787,7 @@ contains
     TYPE(INTEGRATION_NODE),POINTER:: mag_in,mag_out
     logical(lp), optional :: ref
     logical(lp) ref0
+    if(.not.check_stable) return
 
     ref0=my_false
     if(present(ref)) ref0=ref
@@ -2796,7 +2797,6 @@ contains
        WRITE(6,*)  " SURVEY DONE FOR THIN LAYOUT IN TRACK_NODE_LAYOUT_FLAG_spin_v "
     ENDIF
 
-    if(.not.check_stable) return
     xs%u=my_false
     xs_ref%u=my_false
 
@@ -2816,7 +2816,7 @@ contains
 
     CALL TRACK_NODE_PROBE(T,xs,K)  !,t%parent_fibre%CHARGE)
 
-    if(.not.ref0) CALL TRACK_NODE_PROBE(T,XS_REF,K)  !,t%parent_fibre%CHARGE)
+    if(.not.ref0.and.check_stable) CALL TRACK_NODE_PROBE(T,XS_REF,K)  !,t%parent_fibre%CHARGE)
 
     v%u(1)=XS%u
 

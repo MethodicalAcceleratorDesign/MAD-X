@@ -1189,6 +1189,47 @@ CONTAINS
     ENDIF
   END FUNCTION QUADTILT
 
+  FUNCTION  multipoleTILT(NAME,T,list)
+    implicit none
+    type (EL_LIST) multipoleTILT
+    type (EL_LIST), INTENT(IN)::list
+    type (TILTING),optional, INTENT(IN):: T
+    CHARACTER(*), INTENT(IN):: NAME
+
+    real(dp) L1,K11
+    L1=zero
+    K11=zero
+    multipoleTILT=list
+    l1=list%L
+
+    multipoleTILT%L=L1
+    multipoleTILT%LD=L1
+    multipoleTILT%LC=L1
+    IF(L1==zero) THEN
+       multipoleTILT%KIND=MADKIND3N
+    ELSE
+       multipoleTILT%KIND=MADKIND2
+    ENDIF
+    IF(PRESENT(t)) then
+       IF(T%NATURAL) THEN
+          multipoleTILT%tilt=t%tilt(2)
+       ELSE
+          multipoleTILT%tilt=t%tilt(0)
+       ENDIF
+    endif
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       call write_i
+       multipoleTILT%NAME=NAME(1:16)
+    ELSE
+       multipoleTILT%NAME=NAME
+    ENDIF
+  END FUNCTION multipoleTILT
+
   FUNCTION  HELICALTILT(NAME,L,K1,ks1,omega,PHASE,list)
     implicit none
     type (EL_LIST) HELICALTILT

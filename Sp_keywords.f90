@@ -133,16 +133,25 @@ contains
        if(sixtrack_compatible) stop 1
        if(KEY%LIST%L/=zero) then
           BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+          !  BLANK%bend_fringe=key%list%bend_fringe
        else
           write(6,*) "switch solenoid to dubious thin multipole "
           BLANK=MULTIPOLE_BLOCK(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
        endif
+
+    CASE("THICKMULTIPOLE ")
+       BLANK=multipoleTILT(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       BLANK%bend_fringe=key%list%bend_fringe
+
     CASE("QUADRUPOLE     ")
        BLANK=QUADRUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       BLANK%bend_fringe=key%list%bend_fringe
     CASE("SEXTUPOLE     ")
        BLANK=SEXTUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       BLANK%bend_fringe=key%list%bend_fringe
     CASE("OCTUPOLE      ")
        BLANK=OCTUPOLE(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       BLANK%bend_fringe=key%list%bend_fringe
     CASE("SBEND         ")
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("TRUERBEND     ")
@@ -163,6 +172,7 @@ contains
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("KICKER         ","VKICKER        ","HKICKER        ")
        BLANK=KICKER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
+       BLANK%bend_fringe=key%list%bend_fringe
     CASE("MONITOR        ")
        if(sixtrack_compatible) then
           BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
@@ -243,6 +253,7 @@ contains
        !       ELSE
        !          BLANK=TAYLOR_MAP(KEY%LIST%NAME,t=tilt.is.KEY%tiltd)
        !       ENDIF
+       ! BLANK%bend_fringe=key%list%bend_fringe
     CASE DEFAULT
        WRITE(6,*) " "
        WRITE(6,*) " THE MAGNET"
@@ -277,6 +288,7 @@ contains
     !     if(.not.associated(EL%POS))allocate(EL%POS)
     !     EL%POS=1
     !    ENDIF
+
   end subroutine create_fibre
 
   subroutine zero_key(key)

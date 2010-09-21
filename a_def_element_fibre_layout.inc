@@ -61,11 +61,11 @@ end type work
 
 
 TYPE INTERNAL_STATE
-   integer TOTALPATH
-   LOGICAL(lp) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC,ENVELOPE
-   LOGICAL(lp) PARA_IN,ONLY_4D,DELTA,SPIN,MODULATION  ! DA related
-   INTEGER  SPIN_DIM
-
+   INTEGER TOTALPATH
+   !    LOGICAL(LP) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC,ENVELOPE
+   LOGICAL(LP) TIME,RADIATION,NOCAVITY,FRINGE,STOCHASTIC,ENVELOPE
+   LOGICAL(LP) PARA_IN,ONLY_4D,DELTA
+   LOGICAL(LP) SPIN,MODULATION
 END TYPE INTERNAL_STATE
 
 
@@ -430,7 +430,7 @@ TYPE BEAM_BEAM_NODE
    REAL(DP), POINTER :: SX,SY,FK
    REAL(DP), POINTER :: XM,YM   ! trivial transverse displacement: not needed
    REAL(DP), POINTER :: BBK(:)  ! kick on closed orbit
-   REAL(DP), pointer :: MID(:,:),O(:)
+   !    REAL(DP), pointer :: MID(:,:),O(:)
    REAL(DP), POINTER :: A(:)    ! patch angles
    REAL(DP), POINTER :: D(:)    ! patch translation
    INTEGER, POINTER :: A_X1,A_X2 ! patch inverse propagator (not needed)
@@ -445,3 +445,8 @@ TYPE EXTRA_WORK
    TYPE(MADX_APERTURE), POINTER :: A
    REAL(DP), POINTER :: ORB(:)
 END TYPE EXTRA_WORK
+
+TYPE fibre_array
+   type(fibre), pointer :: p
+   integer, pointer :: pos
+END TYPE fibre_array

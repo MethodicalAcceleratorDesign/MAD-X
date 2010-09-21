@@ -16,6 +16,7 @@ module ptc_multiparticle
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
 
   logical(lp),private, parameter :: dobb=.true.
+  logical(lp),private, parameter :: aperture_all_case0=.false.
 
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
@@ -284,7 +285,7 @@ CONTAINS
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAG%MIS) THEN
-       ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
+       ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
@@ -354,7 +355,7 @@ CONTAINS
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
     IF(C%MAGP%MIS) THEN
-       ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
+       ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
@@ -387,7 +388,7 @@ CONTAINS
 
 
     IF(C%MAG%MIS) THEN
-       ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
+       ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
@@ -451,7 +452,7 @@ CONTAINS
 
 
     IF(C%MAGP%MIS) THEN
-       ou = K%EXACTMIS.or.ALWAYS_EXACTMIS
+       ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
@@ -602,6 +603,9 @@ CONTAINS
 
     CASE(CASE1,CASE2)
        el=>T%PARENT_FIBRE%MAG
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
+            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
+
        SELECT CASE(EL%KIND)
        CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
        case(KIND2)
@@ -642,11 +646,12 @@ CONTAINS
        el=>T%PARENT_FIBRE%MAG
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE)  &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
-       if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
+       if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
+
        endif
 
        SELECT CASE(EL%KIND)
@@ -695,23 +700,30 @@ CONTAINS
        case(KINDPA)
           CALL TRACK_SLICE(EL%PA,X,k,T%POS_IN_FIBRE-2)
 
-
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
+       if(associated(T%PARENT_FIBRE%MAG%p%aperture).and.aperture_all_case0) &
+            call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
 
 
+    case(CASET)
+       if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
-       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
-            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
-       ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
+          if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
+          call BBKICK(t%bb,X)
+          if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
+       endif
+       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+    case(CASETF1,CASETF2)
 
-    case(CASET,CASETF1,CASETF2)
        IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
     END SELECT
+    ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
+
 
     !    T%PARENT_FIBRE%MAG=DEFAULT
     if(wherelost==2.and.(.not.check_stable)) then
@@ -769,6 +781,10 @@ CONTAINS
 
     CASE(CASE1,CASE2)
        el=>T%PARENT_FIBRE%MAGP
+       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
+            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
+
+
        SELECT CASE(EL%KIND)
        CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
        case(KIND2)
@@ -809,10 +825,12 @@ CONTAINS
        el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
-       if(associated(t%bb).and.dobb.and.check_stable.and.do_beam_beam) then
+       if(associated(t%bb).and.dobb.and.do_beam_beam) then
+
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
+
        endif
        SELECT CASE(EL%KIND)
        CASE(KIND0)
@@ -888,19 +906,25 @@ CONTAINS
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
+       if(associated(T%PARENT_FIBRE%MAG%p%aperture).and.aperture_all_case0) &
+            call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
 
-       ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
-       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
-            call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
+    case(CASET)
+       if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
-    case(CASET,CASETF1,CASETF2)
+          if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)
+          call BBKICK(t%bb,X)
+          if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
+       endif
+       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+    case(CASETF1,CASETF2)
 
        IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
 
     END SELECT
-
+    ! CASE(CASE100)  ! FAKE BEAM BEAM CAKE AT SOME S
     !    T%PARENT_FIBRE%MAGP=DEFAULT
     ! KNOB IS RETURNED TO THE PTC DEFAULT
     ! NEW STUFF WITH KIND=3
@@ -1863,7 +1887,7 @@ CONTAINS
 
   !  Beam Beam stuff
 
-  subroutine locate_beam_beam(my_ering,sc,pos,tl,b_b)
+  subroutine s_locate_beam_beam(my_ering,sc,pos,tl,b_b)
     implicit none
     type(layout), target :: my_ering
     type(integration_node), pointer :: tl
@@ -1894,7 +1918,7 @@ CONTAINS
        endif
        TL=>TL%NEXT
     ENDDO
-    if(b_b.and.tl%cas==case0) then
+    if(b_b.and.(tl%cas==case0.or.tl%cas==caset)) then
        write(6,*) " Beam-Beam position at ",tl%parent_fibre%mag%name
        if(.not.associated(tl%BB)) call alloc(tl%BB)
        write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
@@ -1903,7 +1927,62 @@ CONTAINS
        b_b=my_false
        write(6,*) " Beam-Beam position not found "
     endif
-  end  subroutine locate_beam_beam
+  end  subroutine s_locate_beam_beam
 
+  subroutine locate_beam_beam(my_ering,a,ent,tl,b_b)
+    implicit none
+    type(layout), target :: my_ering
+    type(integration_node), pointer :: tl,tmin,tp
+    real(dp) dmin,a(3),ent(3,3),d,cos
+    integer pos,j
+    logical(lp) b_b
+
+    dmin=mybig
+
+    IF(.NOT.ASSOCIATED(my_ering%T)) THEN
+       CALL MAKE_NODE_LAYOUT(my_ering)
+       call FILL_SURVEY_DATA_IN_NODE_LAYOUT(my_ering)
+    ENDIF
+    IF(.NOT.ASSOCIATED(my_ering%T%start%B)) THEN
+       call FILL_SURVEY_DATA_IN_NODE_LAYOUT(my_ering)
+    ENDIF
+
+    b_b=.false.
+    TL=>my_ering%T%START
+    tmin=>tl
+    tp=>tl
+    DO j=1,my_ering%T%N
+       if(tl%cas==case0.or.tl%cas==caset) then
+          d=sqrt((a(1)-tl%a(1))**2+(a(2)-tl%a(2))**2+(a(3)-tl%a(3))**2)
+          if(d<=dmin) then
+             dmin=d
+             tmin=>tl
+             tp=>tl%parent_fibre%previous%t2%previous%previous
+          endif
+       endif
+       TL=>TL%NEXT
+    ENDDO
+    if((tmin%cas==case0.or.tmin%cas==caset)) then
+
+       write(6,*) " Tentative Beam-Beam position at ",tl%parent_fibre%mag%name
+       write(6,*) tmin%pos,tmin%parent_fibre%mag%name,' created'
+       b_b=my_true
+
+       cos=zero
+       do j=1,3
+          cos=cos+ (a(j)-tmin%a(j))*tmin%ent(1,j)
+       enddo
+       tl=>tp
+       if(cos<zero) then
+          write(6,*) " Beam-Beam position replaced at ",tl%parent_fibre%mag%name,tl%cas
+          write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
+       endif
+    else
+       b_b=my_false
+       write(6,*) " Beam-Beam position not found "
+    endif
+    if(b_b.and.(.not.associated(tl%BB))) call alloc(tl%BB)
+
+  end  subroutine locate_beam_beam
 
 end module ptc_multiparticle
