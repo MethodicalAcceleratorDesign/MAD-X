@@ -12,10 +12,7 @@ module accel_ptc
   logicaL :: autoflip=.False.,must_stop=.False.,use_time=.False.
   real(dp) :: maximum_phase=one, dtime=-1.d0,time_0=0.d0,b0_table,p0c_table
   real(dp) :: last_synchr_time=zero
-  TYPE fibre_array
-     type(fibre), pointer :: p
-     integer, pointer :: pos
-  END TYPE fibre_array
+
   type(fibre_array), allocatable ::cavity_location(:)
   TYPE accel_data
      real(dp), pointer :: freq
