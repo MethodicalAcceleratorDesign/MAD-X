@@ -154,10 +154,10 @@ contains
 
    subroutine ptc_setexactmis(flag)
     implicit none
-    logical(lp)    :: flag
+    integer    :: flag
     !    print *, "Setting the flag"
     !    print *, "And the flag is", flag
-    if (flag) then
+    if (flag == 1) then
        if (getdebug() > 1) print *, "Switching ON exact missaligment"
        always_exactmis=.true.
      !  intstate = intstate + EXACTMIS0

@@ -127,7 +127,7 @@ subroutine w_ptc_setexactmis(method)
   use precision_constants
   use madx_ptc_intstate_module
   implicit none
-  logical(lp) method
+  integer method
   call ptc_setexactmis(method)
 end subroutine w_ptc_setexactmis
 
