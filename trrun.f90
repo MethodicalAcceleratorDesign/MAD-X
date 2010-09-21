@@ -643,7 +643,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 140 continue
 150 continue
 160 continue
-  call ttcorr(el, track, ktrack)
+  call ttcorr(el, track, ktrack, turn)
   go to 500
   !---- ECollimator, RCollimator, BeamBeam, Lump. ??
 200 continue
@@ -1558,7 +1558,7 @@ subroutine ttsep(el,track,ktrack)
   end do
 
 end subroutine ttsep
-subroutine ttcorr(el,track,ktrack)
+subroutine ttcorr(el,track,ktrack,turn)
 
   use twtrrfi
   use trackfi
@@ -1576,14 +1576,17 @@ subroutine ttcorr(el,track,ktrack)
   !----------------------------------------------------------------------*
   !      logical dorad,dodamp,dorand
   integer itrack,ktrack,n_ferr,node_fd_errors,code,bvk,i,get_option
+  integer sinkick,turn
   double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
        rpx,rpy,track(6,*),xkick,ykick,                                   &
        div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
-       node_value,zero,one,two,three,half
+       node_value,zero,one,two,three,half,twopi
   double precision dpxx,dpyy
+  double precision temp,sinpeak,sintune,sinphase
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
 
   !---- Initialize.
+  twopi=get_variable('twopi ')
   bvk = node_value('other_bv ')
   deltas = get_variable('track_deltap ')
   arad = get_value('probe ','arad ')
@@ -1624,6 +1627,22 @@ subroutine ttcorr(el,track,ktrack)
   else
      xkick=zero
      ykick=zero
+  endif
+
+  !---- Sinusoidal kick
+  if(sinkick.eq.1) then
+     sinpeak = node_value('sinpeak ')
+     sintune = node_value('sintune ')
+     sinphase = node_value('sinphase ')
+     temp = sinpeak * sin(sinphase + twopi * sintune * turn)
+     if (code.eq.14) then
+        xkick=xkick+temp
+     else if (code.eq.15) then
+        xkick=xkick+temp
+        ykick=ykick+temp
+     else if(code.eq.16) then
+        ykick=ykick+temp
+     endif
   endif
 
   !---- Sum up total kicks.
