@@ -1392,7 +1392,7 @@ char none[] = "none";
 char myversion[] = "MAD-X 4.01.29";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
-char code_mod_date[] = "Code Modification Date: 22.07.2010";
+char code_mod_date[] = "Code Modification Date: 21.09.2010";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */

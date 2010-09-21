@@ -152,18 +152,19 @@ contains
   !____________________________________________________________________________________________
 
 
-  subroutine ptc_setexactmis(flag)
+   subroutine ptc_setexactmis(flag)
     implicit none
-    integer    :: flag
-
-       ! print *, "Setting the flag"
-       ! print *, "And the flag is", flag
-    if (flag == 1) then
+    logical(lp)    :: flag
+    !    print *, "Setting the flag"
+    !    print *, "And the flag is", flag
+    if (flag) then
        if (getdebug() > 1) print *, "Switching ON exact missaligment"
-       intstate = intstate + EXACTMIS0
+       always_exactmis=.true.
+     !  intstate = intstate + EXACTMIS0
     else
        if (getdebug() > 1) print *, "Switching OFF exact missaligment"
-       intstate = intstate - EXACTMIS0
+     !  intstate = intstate - EXACTMIS0
+       always_exactmis=.false.
     endif
     default = intstate
     call update_states
