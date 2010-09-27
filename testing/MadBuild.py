@@ -153,7 +153,7 @@ def main():
         elif m == 'Makefile_develop':
             invocation = "make f95=lf95 DEBUG=YES madx" # the Lahey Fortran compiler
         elif m == 'Makefile_nag':
-            invocation = "make f95=f95 DEBUG = YES madx" # the NAG compiler
+            invocation = "make f95=f95 DEBUG=YES madx" # the NAG compiler
         else:
             raise("should never reach this point")
         print "make invocation=",invocation
