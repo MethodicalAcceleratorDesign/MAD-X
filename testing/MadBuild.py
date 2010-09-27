@@ -52,6 +52,10 @@ class Build:
 # this is necessary for the acron job which does not perform a login
 # that would set the variables transparently.
 
+# 27 september: this script is no longer called from an acron job, therefore
+# no longer need to reset the environment variables within the scripts.
+# instead we inherit everything from ~/.cshrc on pcslux99
+
 def main():
 
 # temporary: for the Intel compiler, lines split after the 80th character
@@ -110,11 +114,12 @@ def main():
         # 23 juin 2010
         #        os.environ['NAG95_ROOT'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361" # flexlm license manager for NAG compiler
         #os.environ['LM_LICENSE_FILE'] = "/afs/cern.ch/sw/fortran/nag/f95.5.361/license.dat"
-        os.environ['NAG95_ROOT'] = "/usr/local/lib/NAG_Fortran"
-        os.environ['NAG_KUSARI_FILE'] = os.environ['NAG95_ROOT']+"/license.dat"
+        # 27 september 2010: rely on the path and env set in ~/.cshrc instead of setting environment variables
+        #os.environ['NAG95_ROOT'] = "/usr/local/lib/NAG_Fortran"
+        #os.environ['NAG_KUSARI_FILE'] = os.environ['NAG95_ROOT']+"/license.dat"
         makefiles.append('Makefile_nag')
 
-    os.environ['PATH'] = ".:/usr/local/lib/NAG_FORTRAN:"+os.environ['PATH']
+        #os.environ['PATH'] = ".:/usr/local/lib/NAG_FORTRAN:"+os.environ['PATH']
 
     if options.dev:
         makefiles.append('Makefile_develop')
