@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# THIS CODE NOT USED YET. INSTEAD MADBUILDPY.PL IS USED
+
 
 import datetime
 import optparse
