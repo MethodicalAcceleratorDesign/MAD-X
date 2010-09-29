@@ -683,7 +683,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   go to 500
   !---- Crab cavity.
 370 continue
-  call ttcrabrf(track,ktrack)
+  call ttcrabrf(track,ktrack,turn)
   go to 500
   !---- h ac dipole.
 400 continue
@@ -1334,7 +1334,7 @@ subroutine ttrf(track,ktrack)
   ! 20   continue
   !      endif
 end subroutine ttrf
-subroutine ttcrabrf(track,ktrack)
+subroutine ttcrabrf(track,ktrack,turn)
 
   implicit none
 
@@ -1348,10 +1348,10 @@ subroutine ttcrabrf(track,ktrack)
   ! Output:                                                              *
   !   EL        (double)    Length of quadrupole.                        *
   !----------------------------------------------------------------------*
-  ! Added: 10/06 FZ, Modfied: R. Calaga (11/07)                          *
+  ! Added: R. Calaga/F. Zimmermann (10/06, 11/07, 09/10)                 *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack
-  double precision omega,phirf,pt,rff,rfl,rfv,track(6,*),clight,twopi,vrf,pc0,  &
+  integer itrack,ktrack,turn,t1,t2,t3,t4,p1,p2
+  double precision omega,phirf,pt,rff,rfl,rfv,eph,track(6,*),clight,twopi,vrf,pc0,  &
        get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
   !      double precision px,py,ttt,beti,el1
   parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
@@ -1365,10 +1365,45 @@ subroutine ttcrabrf(track,ktrack)
   rff = node_value('freq ')
   rfl = node_value('lag ')
   pc0 = get_value('beam ','pc ')
-  !---- Set up.
+
+  !--- specify voltage ramp (relative)
+  t1 = node_value('rv1 ')
+  t2 = node_value('rv2 ') + t1
+  t3 = node_value('rv3 ') + t2
+  t4 = node_value('rv4 ') + t3
+
+  !--- specify phase change in two steps
+  p1 = node_value('rph1 ')
+  p2 = node_value('rph2 ') + p1
+  eph = node_value('lagf ')
+
+  !---- Set up voltage ramp.
   omega = rff * (ten6p * twopi / clight)
-  vrf   = rfv * ten3m / pc0
-  phirf = rfl * twopi
+  
+  if (turn .lt. t1)  then
+     vrf = 0.0
+  else if (turn .ge. t1 .and. turn .lt. t2) then
+     vrf = (turn-t1)*rfv*ten3m/pc0/(t2-t1)
+  else if (turn .ge. t2 .and. turn .lt. t3) then
+     vrf = rfv*ten3m/pc0
+  else if (turn .ge. t3 .and. turn .lt. t4) then
+     vrf = (t4-turn)*rfv*ten3m/pc0/(t4-t3)
+  else
+     vrf = 0.0
+  endif
+
+  !---- Set up phase ramp.
+  if (turn .lt. p1)  then
+     phirf = rfl*twopi
+  else if (turn .ge. p1 .and. turn .lt. p2) then
+     phirf = (turn-p1)*eph*twopi/(p2-p1)
+  else
+     phirf= eph*twopi
+  endif
+
+  !  print*," turn: ",turn, " phase: ", phirf*360/twopi
+
+
   do itrack = 1, ktrack
      px  = track(2,itrack)                                           &
           + vrf * sin(phirf - omega * track(5,itrack))
