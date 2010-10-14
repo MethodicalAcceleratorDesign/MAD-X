@@ -1070,8 +1070,8 @@ void exec_plot(struct in_cmd* cmd)
     else
       {
 /*       fatal_error("Plot - non-existing table:", table_name); return; */
-       warning("Plot - non-existing table:", table_name);
-       p_table = table_register->tables[pos];
+       warning("Plot - potentially non-existing table:", table_name);
+       /*p_table = table_register->tables[pos];*/
 
       }
     /* HG 21.10.09 allow plot from external table, end part1 */
@@ -3182,6 +3182,10 @@ int next_constr_namepos(char* name)
           if      (name[2] == '1') pos = 31;
           else if (name[2] == '2') pos = 32;
 	}
+    /* start mod HG 10.10.2010 - trying to be ascii-independent */
+      else if      (name[1] == 'e')
+	  pos = ((int)name[2]-(int)'1')*6+(int)name[3]-(int)'1'+34;
+    /* end mod HG 10.10.2010 */
       break;
     case 't':
       pos = 13;

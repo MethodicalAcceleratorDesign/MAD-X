@@ -308,7 +308,7 @@ struct node                /* the sequence is a linked list of nodes */
   double other_bv;         /* equal to beam_bv (+1 or -1) */
   double chkick;           /* calculated by orbit correction module */
   double cvkick;           /* calculated by orbit correction module */
-  double match_data[32];   /* array for fast access to twiss data for match */
+  double match_data[74];   /* array for fast access to twiss data for match */
   struct expression* at_expr;
   char* from_name;
   struct element* p_elem;  /* pointer to element if any */

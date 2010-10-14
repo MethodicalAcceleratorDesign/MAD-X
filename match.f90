@@ -114,10 +114,9 @@
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
      &char_from_table
-      double precision fsum,fvect(*),val,value,c_min,c_max,weight,f_val
+      double precision fsum,fvect(*),val,valhg,c_min,c_max,weight,f_val
       character*(name_len) name,node_name
       integer n_pos, next_constr_namepos, advance_node
-
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
       psum=get_option('match_summary ') .ne. 0
@@ -128,7 +127,7 @@
         do pos=range(1),range(2)
           j=advance_to_pos('twiss ',pos)
  20       continue
-          i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
+          i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
           if(i.ne.0)  then
              flag=char_from_table('twiss ','name ',pos,node_name)
              flag=double_from_table('twiss ',name,pos,val)
@@ -142,14 +141,14 @@
               f_val=weight*dim(c_min,val)+weight*dim(val,c_max)
               if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
             elseif(type.eq.4) then
-              f_val=weight*(val-value)
-              if(fprt) write(*,840) name,weight,val,value,value,f_val**2
+              f_val=weight*(val-valhg)
+              if(fprt) write(*,840) name,weight,val,valhg,valhg,f_val**2
             endif
             ncon=ncon+1
             fvect(ncon)=f_val
             fsum=fsum+f_val**2
             if(psum .and. type.eq.4)                                    &
-     &write(*,830) node_name,name,type,value,val,f_val**2
+     &write(*,830) node_name,name,type,valhg,val,f_val**2
             if(psum .and. type.eq.2)                                    &
      &write(*,830) node_name,name,type,c_max,val,f_val**2
             if(psum .and. type.eq.1)                                    &
@@ -164,7 +163,7 @@
  21     continue
         call get_twiss_data(opt_fun)
  22     continue
-        i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
+        i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
         if(i.ne.0)  then
           n_pos = next_constr_namepos(name)
           if (n_pos .eq. 0)  then
@@ -184,14 +183,14 @@
               f_val=weight*dim(c_min,val)+weight*dim(val,c_max)
               if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
           elseif(type.eq.4) then
-              f_val=weight*(val-value)
-              if(fprt) write(*,840) name,weight,val,value,value,f_val**2
+              f_val=weight*(val-valhg)
+              if(fprt) write(*,840) name,weight,val,valhg,valhg,f_val**2
           endif
           ncon=ncon+1
           fvect(ncon)=f_val
           fsum=fsum+f_val**2
           if(psum .and. type.eq.4)                                    &
-     &write(*,830) node_name,name,type,value,val,f_val**2
+     &write(*,830) node_name,name,type,valhg,val,f_val**2
           if(psum .and. type.eq.2)                                    &
      &write(*,830) node_name,name,type,c_max,val,f_val**2
           if(psum .and. type.eq.1)                                    &
@@ -203,7 +202,7 @@
       if(advance_node() .ne. 0) goto 21
       endif
  30   continue
-      i=next_global(name,name_len,type,value,c_min,c_max,weight)
+      i=next_global(name,name_len,type,valhg,c_min,c_max,weight)
       if(i.ne.0)  then
         pos=1
         flag=double_from_table('summ ',name,pos,val)
@@ -217,15 +216,15 @@
           f_val=weight*dim(c_min,val)+ weight*dim(val,c_max)
           if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
         elseif(type.eq.4) then
-          f_val=weight*(val-value)
-          if(fprt) write(*,840) name,weight,val,value,value,f_val**2
+          f_val=weight*(val-valhg)
+          if(fprt) write(*,840) name,weight,val,valhg,valhg,f_val**2
         endif
         ncon=ncon+1
         fvect(ncon)=f_val
         fsum=fsum+f_val**2
 
         if(psum)                                                        &
-     &write(*,830) "Global constraint:      ",name,type,value,val,      &
+     &write(*,830) "Global constraint:      ",name,type,valhg,val,      &
      &f_val**2
 
         goto 30
@@ -438,7 +437,6 @@
       ftol = epsfcn
       gtol = epsil
       xtol = epsil
-
 !---- Compute matching functions.
       call mtcond(izero, m, fvec, iflag)
 !      call fcn(m,n,x,fvec,iflag)

@@ -767,12 +767,12 @@ void copy_double(double* source, double* target, int n)
 
 void copy_twiss_data(double* twiss_data)
 {
-  copy_double(twiss_data, current_node->match_data, 32);
+  copy_double(twiss_data, current_node->match_data, 74);
 }
 
 void get_twiss_data(double* twiss_data)
 {
-  copy_double(current_node->match_data, twiss_data, 32);
+  copy_double(current_node->match_data, twiss_data, 74);
 }
 
 void copy_name_list(struct name_list* out, struct name_list* in)
