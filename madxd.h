@@ -1390,7 +1390,7 @@ char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
 char myversion[] = "MAD-X 4.01.31";
-char version_type[] = "DEBUG Version - use at own risk!";
+char version_type[] = "DEBUG Version - use at own risk! ";
 /* char version_type[] = "       Production Version       "; */
 char code_mod_date[] = "Code Modification Date: 14.10.2010";
 char one_string[] = "1";
