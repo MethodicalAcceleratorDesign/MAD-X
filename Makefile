@@ -163,7 +163,11 @@ endif
 ifeq ($(ARCH),32)
   LIBX= libX11.a -lpthread -lstdc++ -lc -lgcc_eh
 else
-  LIBX= libX11_64.a -lpthread -lstdc++ -lc -lgcc_eh
+  ifeq ($(f95),lf95)
+    LIBX= libX11_64.a -lstdc++ -lgcc_eh
+  else
+    LIBX= libX11_64.a -lpthread -lstdc++ -lc -lgcc_eh
+  endif
 endif
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
