@@ -203,9 +203,14 @@ endif
 
 ifeq ($(PLUGIN_SUPPORT),YES)
   GCCP_FLAGS+= -DPLUGIN_SUPPORT
-  LDOPT=-dynamic $(M32)
-  LDOPT=--export $(M32)
+  ifeq ($(f95),lf95)
+    LDOPT=-dynamic --export $(M32) -ldl
+  endif
+  ifeq ($(f95),g95)
+    LDOPT=-rdynamic --export $(M32) -ldl
+  endif
 endif
+
 
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
 # allows running of madx under Macinstosh System 10
