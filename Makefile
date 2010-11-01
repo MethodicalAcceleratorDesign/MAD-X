@@ -362,6 +362,7 @@ clean:
 	rm -f *.o
 	rm -f *.g90
 	rm -f *.mod
+	rm -f *.lst
 	rm -f core
 	rm -f *~
 	python wrap_fortran_calls.py --clean
