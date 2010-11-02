@@ -3531,7 +3531,7 @@ void pro_emit(struct in_cmd* cmd)
   double* tt;
   double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3],
     sig_v[4], pdamp[3];
-  char tmp[16];
+  char tmp[26];
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
