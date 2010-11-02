@@ -217,10 +217,10 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
 # include headers for gxx11c
   GCCP_FLAGS += -I /usr/X11R6/include/
   ifeq ($(f95),g95)
-    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore $(M32)
+    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore $(M32) -O4
   endif
   ifeq ($(f95),gfortran)
-    f95_FLAGS += $(M32)
+    f95_FLAGS += $(M32) -O2
   endif
   LDOPT= $(M32)
 endif
