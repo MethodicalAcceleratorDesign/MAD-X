@@ -27,7 +27,7 @@ class Wrapper:
         cFiles = self.collectFiles('C')
         cFunctions = []
         for file in cFiles:
-            if not sys.platform[0:5]=='linux':
+            if (sys.platform[0:5]=='win32' or sys.platform[0:5]=='win64'):
                 if file in linuxFiles:
                     print("C call wrapper skips file '"+file+"' on Windows")
                     continue
