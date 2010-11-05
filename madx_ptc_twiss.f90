@@ -107,6 +107,7 @@ contains
     real(dp) :: epsil=1e-12  !
     integer  :: J(lnv)
 
+
     lat = zero
 
     n=3  ! 1 2 3 are tunes
@@ -912,6 +913,8 @@ contains
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
       real(kind(1d0))   :: deltae
       type(real_8), target :: transfermap(6)
+      real(dp) :: betx, bety, alfx, alfy ! added on 3 November 2010 to hold Edwards & Teng parametrization
+      real(dp) :: u, u1, u2, ax, ay, kx, ky, kxy2 ! to convert between Ripken and Edwards-Teng parametrization
 
       if (getdebug() > 2) then
          write(mf1,*) "##########################################"
@@ -1028,6 +1031,7 @@ contains
       opt_fun(gama32)= tw%gama(3,2) * deltae
       opt_fun(gama33)= tw%gama(3,3) * deltae
 
+
       ! --- derivatives of Twiss paramters w.r.t delta_p
       ! NOW why do we need to multiply by deltae, as for the other Twiss parameters?
       if (deltap_dependency) then
@@ -1095,7 +1099,7 @@ contains
       ! JLUC TODO
       ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
       ! jluc: left the following umodified, except 36->62
-      opt_fun(62+4+8)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4
+      opt_fun(62+4+8+6)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4 => on 3 November 2010 add 6
       do i1=1,c_%nd2
          if(i1.le.4) then
             i1a=i1
@@ -1112,7 +1116,7 @@ contains
             else
                i2a=5
             endif
-            ii=(62+4+8)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
+            ii=(62+4+8+6)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
             ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
@@ -1136,9 +1140,61 @@ contains
       ! jluc debug - end
 
       ! on July 3rd 2009, add another 8 for second/third derivatives of dispersions w.r.t. deltap
-      ioptfun=81+4+8 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
+      ioptfun=81+4+8+6 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
       ! actually 3*21+6 (???) elements from beta11 to include up to disp6p
-      call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1))
+	! on november 3rd 2010, added 6
+
+	! overwrote the above for which I am not sure where the value comes from
+	ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
+
+      call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1)) ! fill contiguous data in one-go, up to mu1, mu2, mu3
+
+
+    ! convert between the Ripken and Edwards-Teng parametrization
+    ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
+    ! from V. A. Lebedev and  S. A. Bogacz
+    kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
+    ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
+    ax=kx*tw%alfa(1,1) * deltae -tw%alfa(1,2) * deltae /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
+    ay=ky*tw%alfa(2,2) * deltae -tw%alfa(2,1) * deltae /ky; ! hence we reflect this in the formula from Lebedev
+    kxy2=kx*kx*ky*ky;
+    u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+    u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+    if (u1<1.0 .and. u1>=0.0) then
+	u=u1
+    else
+	u=u2
+    endif
+	
+    if (.not.isnan(u)) then
+	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
+	betx = tw%beta(1,1)/(1-u)
+	bety = tw%beta(2,2)/(1-u)
+	alfx = tw%alfa(1,1)/(1-u)
+	alfy = tw%alfa(2,2)/(1-u)
+    elseif (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
+	! in case there is absolutely no coupling u will be NaN
+	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
+	! therefore we simply copy beta11 into betx and beta22 into bety in this case, so as
+	! to get the same values between twiss and ptc_twiss
+	betx = tw%beta(1,1)
+	bety = tw%beta(2,2)
+	alfx = tw%alfa(1,1)
+	alfy = tw%alfa(2,2)
+    else
+	! betx, bety, alfx, alfy will be nan
+	betx = sqrt(-1.0) ! sets NaN
+	bety = sqrt(-1.0)
+	alfx = sqrt(-1.0)
+	alfy = sqrt(-1.0)	
+    endif
+
+	! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
+	call double_to_table(table_name, 'betx', betx ) ! non contiguous with the above table entries
+	call double_to_table(table_name, 'bety', bety ) ! hence we must store these values one by one
+	call double_to_table(table_name, 'alfx', alfx )
+	call double_to_table(table_name, 'alfy', alfy )
+
       call augment_count(table_name)
 
 
