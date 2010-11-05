@@ -100,6 +100,7 @@
       <test input = "slice.madx" output="slice.out" subdir="SliceMagnets"/>
       <test input = "center.madx" output="center.out" subdir="CenterMagnets"/>
       <test input = "deltaDependency.madx" output="deltaDependency.out" subdir="DeltaDependency"/>
+      <test input = "EdwardsTeng.madx" output="EdwardsTeng.out" subdir="EdwardsTeng"/>
    </target>
    <target name="special_features" responsible="Frank.Schmidt@cern.ch">
 	<test input ="setvars.madx" output="setvars.out"/>
