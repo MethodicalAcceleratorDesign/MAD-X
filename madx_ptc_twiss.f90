@@ -1168,19 +1168,23 @@ contains
 	
     if (.not.isnan(u)) then
 	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
-	betx = tw%beta(1,1)/(1-u)
-	bety = tw%beta(2,2)/(1-u)
-	alfx = tw%alfa(1,1)/(1-u)
-	alfy = tw%alfa(2,2)/(1-u)
+	! beta11, alfa11 etc... are multiplied by deltae before output
+    	! hence we reflect this in the formula from Lebedev
+	betx = (tw%beta(1,1)/(1-u)) * deltae
+	bety = (tw%beta(2,2)/(1-u)) * deltae
+	alfx = (tw%alfa(1,1)/(1-u)) * deltae
+	alfy = (tw%alfa(2,2)/(1-u)) * deltae
     elseif (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
 	! in case there is absolutely no coupling u will be NaN
 	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
 	! therefore we simply copy beta11 into betx and beta22 into bety in this case, so as
 	! to get the same values between twiss and ptc_twiss
-	betx = tw%beta(1,1)
-	bety = tw%beta(2,2)
-	alfx = tw%alfa(1,1)
-	alfy = tw%alfa(2,2)
+	! beta11, alfa11 etc... are multiplied by deltae before output
+    	! hence we reflect this in the formula from Lebedev
+	betx = tw%beta(1,1) * deltae
+	bety = tw%beta(2,2) * deltae
+	alfx = tw%alfa(1,1) * deltae
+	alfy = tw%alfa(2,2) * deltae
     else
 	! betx, bety, alfx, alfy will be nan
 	betx = sqrt(-1.0) ! sets NaN
