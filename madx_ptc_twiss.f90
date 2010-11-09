@@ -915,6 +915,7 @@ contains
       type(real_8), target :: transfermap(6)
       real(dp) :: betx, bety, alfx, alfy ! added on 3 November 2010 to hold Edwards & Teng parametrization
       real(dp) :: u, u1, u2, ax, ay, kx, ky, kxy2 ! to convert between Ripken and Edwards-Teng parametrization
+      real(dp) :: deltaeValue
 
       if (getdebug() > 2) then
          write(mf1,*) "##########################################"
@@ -1153,10 +1154,13 @@ contains
     ! convert between the Ripken and Edwards-Teng parametrization
     ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
     ! from V. A. Lebedev and  S. A. Bogacz
+
+      deltaeValue = 1.0
+
     kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
     ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
-    ax=kx*tw%alfa(1,1) * deltae -tw%alfa(1,2) * deltae /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
-    ay=ky*tw%alfa(2,2) * deltae -tw%alfa(2,1) * deltae /ky; ! hence we reflect this in the formula from Lebedev
+    ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltae /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
+    ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltae /ky; ! hence we reflect this in the formula from Lebedev
     kxy2=kx*kx*ky*ky;
     u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
     u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
@@ -1170,10 +1174,10 @@ contains
 	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
 	! beta11, alfa11 etc... are multiplied by deltae before output
     	! hence we reflect this in the formula from Lebedev
-	betx = (tw%beta(1,1)/(1-u)) * deltae
-	bety = (tw%beta(2,2)/(1-u)) * deltae
-	alfx = (tw%alfa(1,1)/(1-u)) * deltae
-	alfy = (tw%alfa(2,2)/(1-u)) * deltae
+	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
+	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
+	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
+	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue
     elseif (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
 	! in case there is absolutely no coupling u will be NaN
 	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
@@ -1181,16 +1185,19 @@ contains
 	! to get the same values between twiss and ptc_twiss
 	! beta11, alfa11 etc... are multiplied by deltae before output
     	! hence we reflect this in the formula from Lebedev
-	betx = tw%beta(1,1) * deltae
-	bety = tw%beta(2,2) * deltae
-	alfx = tw%alfa(1,1) * deltae
-	alfy = tw%alfa(2,2) * deltae
+	betx = tw%beta(1,1) * deltaeValue
+	bety = tw%beta(2,2) * deltaeValue
+	alfx = tw%alfa(1,1) * deltaeValue
+	alfy = tw%alfa(2,2) * deltaeValue
     else
-	! betx, bety, alfx, alfy will be nan
-	betx = sqrt(-1.0) ! sets NaN
-	bety = sqrt(-1.0)
-	alfx = sqrt(-1.0)
-	alfy = sqrt(-1.0)	
+	! betx, bety, alfx, alfy will evaluate to nan anyway - but
+        ! in Fortran there is no such statement as betx=NaN
+        ! and the trick of using betx=sqrt(-1) yielded compilation
+        ! error with gfortran...
+	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
+	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
+	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
+	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue	
     endif
 
 	! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
