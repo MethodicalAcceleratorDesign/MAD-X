@@ -1148,6 +1148,7 @@ contains
 	! overwrote the above for which I am not sure where the value comes from
 	ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
 
+
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1)) ! fill contiguous data in one-go, up to mu1, mu2, mu3
 
 
@@ -1155,15 +1156,16 @@ contains
     ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
     ! from V. A. Lebedev and  S. A. Bogacz
 
-      deltaeValue = 1.0
+      deltaeValue = deltae ! equals 1.0 unless there is a cavity
 
     kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
     ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
-    ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltae /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
-    ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltae /ky; ! hence we reflect this in the formula from Lebedev
+    ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
+    ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
     kxy2=kx*kx*ky*ky;
     u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
     u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+
     if (u1<1.0 .and. u1>=0.0) then
 	u=u1
     else
