@@ -446,6 +446,9 @@ void complete_twiss_table(struct table* t)
     }
     else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if (strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+    else if (strcmp(tmp, "v_pos") == 0 ) val = el_par_value(tmp, c_node->p_elem);
+    /*==*/
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
     else if(mult)
     {

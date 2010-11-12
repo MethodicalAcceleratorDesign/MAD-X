@@ -220,6 +220,11 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
   tmp = node_value('mech_sep ')
   call double_to_table('survey ', 'mech_sep ',tmp)
 
+  !== jln dealt with the new property v_pos as for mech_sep
+  tmp = node_value('v_pos ')
+  call double_to_table('survey ', 'v_pos ',tmp)
+  !==
+
   call augment_count('survey ')
 end subroutine sufill
 !-----------------  end of sufill subroutine --------------------------

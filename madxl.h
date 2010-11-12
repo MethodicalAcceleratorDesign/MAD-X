@@ -127,7 +127,10 @@ int survey_table_types[] =
 {
   3, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
-  1, 1, 2
+  1, 1, 2,
+  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  2
+  /*==*/
 };
 
 char* survey_table_cols[] =
@@ -135,6 +138,9 @@ char* survey_table_cols[] =
   "name", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
   "slot_id", "assembly_id", "mech_sep",
+  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  "v_pos",
+  /*==*/
   " "  /* blank terminates */
 };
 
@@ -190,8 +196,10 @@ char* sxf_table_names[] =
 int twiss_opt_end = 33; /* last column filled by twiss module */
 int twiss_mult_end = 78; /* last multipole column filled
                             by complete_twiss_table */
-int twiss_fill_end = 96; /* last standard column filled
+int twiss_fill_end = 97; /* last standard column filled
                             by complete_twiss_table */
+/*== jln 11.11.2010 increased twiss_fill_end from 96 to 97 to accomodate for v_pos */
+
 /* warning: modify routine complete_twiss_table in case of changes */
 int twiss_table_types[] =
 {
@@ -215,7 +223,9 @@ int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2,
   2, 2, 2, 2,
-  1, 1, 2, 2, 3,
+  1, 1, 2, 
+  2, /* v_pos */
+  2, 3,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -281,7 +291,11 @@ char* twiss_table_cols[] =
   "vkick", "tilt", "e1", "e2", "h1",
   "h2", "hgap", "fint", "fintx",
   "volt", "lag", "freq", "harmon",
-  "slot_id","assembly_id","mech_sep","lrad","parent",
+  "slot_id","assembly_id","mech_sep",
+  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  "v_pos",
+  /*==*/
+  "lrad","parent",
   "re11", "re12", "re13", "re14", "re15", "re16",
   "re21", "re22", "re23", "re24", "re25", "re26",
   "re31", "re32", "re33", "re34", "re35", "re36",
