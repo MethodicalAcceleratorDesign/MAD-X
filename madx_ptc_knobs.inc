@@ -162,7 +162,7 @@ integer, parameter                ::   ninparams = 27 	!possible initial conditi
 
 
 ! increase string size from 6 to 7 to accomodate Twiss derivatives w.r.t deltap
-CHARACTER*(7), parameter          ::   twissnames(ntwisses) = (/ &
+CHARACTER(7), parameter          ::   twissnames(ntwisses) = (/ &
      'beta11 ','beta12 ','beta13 ',& ! space-padding to reach 7
      'beta21 ','beta22 ','beta23 ',&
      'beta31 ','beta32 ','beta33 ',&

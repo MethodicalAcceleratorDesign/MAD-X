@@ -10,6 +10,9 @@ module madx_ptc_twiss_module
   USE madx_ptc_knobs_module
   USE madx_ptc_distrib_module
 
+  use Inf_NaN_Detection
+
+
   implicit none
 
   save
@@ -316,7 +319,7 @@ contains
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
     real(dp)                :: x(6)
-    real(dp)                :: deltap0,deltap,d_val
+    real(dp)                :: deltap0,deltap ,d_val
     real(kind(1d0))         :: get_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
     type(real_8)            :: y(6), transfermap(6)
@@ -328,13 +331,14 @@ contains
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
-    logical(lp)             :: skipnormalform, tracktm
-    character*48            :: summary_table_name
+    !logical(lp)             :: skipnormalform, 
+    logical(lp)             :: tracktm
+    character(48)           :: summary_table_name
     character(48) charconv
 
     call resetBetaExtremas()
 
-    skipnormalform = my_false
+    !skipnormalform = my_false
 
     !all zeroing
     testold = zero
@@ -421,7 +425,7 @@ contains
           call fort_warn('ptc_twiss: ','DA got unstable even before finding orbit')
           call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding orbit");
           stop
-          return
+!          return
        endif
 
        !print*, "Looking for orbit"
@@ -431,7 +435,7 @@ contains
           call fort_warn('ptc_twiss: ','DA got unstable at attempt to find closed orbit')
           call seterrorflag(10,"ptc_twiss ","DA got unstable at attempt to find closed orbit");
           stop
-          return
+!          return
        endif
        CALL write_closed_orbit(icase,x)
 
@@ -1160,6 +1164,7 @@ contains
 
     kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
     ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
+
     ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
     ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
     kxy2=kx*kx*ky*ky;
@@ -1381,18 +1386,20 @@ contains
       integer  :: double_from_table
 
       ! following added 26 april 2010
-      integer :: i1,i2,i3,i4,i5,i6
+      !integer :: i1,i2,i3,i4,i5,i6
       integer :: order
       integer :: nx, nxp, ny, nyp, ndeltap, nt, index
       real(dp):: coeff
-      character(6) :: selector
+      !character(6) :: selector
       integer, dimension(6) :: jj ! 3 may 2010
 
-      real(dp) :: oldv
-      type(taylor)::newtoset
+      !real(dp) :: oldv
+      !type(taylor)::newtoset
+
 
 
       goto 200 ! skip code that was used before 26 april 2010
+
       x(:)=zero
       allocate(j(c_%npara))
       j(:)=0
@@ -2558,7 +2565,7 @@ contains
 
   subroutine orbitRms(summary_table_name)
     implicit none
-    character*48	:: summary_table_name
+    character(48)	:: summary_table_name
 
     real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
     real(dp)	:: x(6) ! the 6 dimensional state space
@@ -2628,6 +2635,9 @@ contains
     endif
 
   end subroutine orbitRms
+
+
+
 
 
 end module madx_ptc_twiss_module
