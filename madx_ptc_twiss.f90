@@ -10,9 +10,6 @@ module madx_ptc_twiss_module
   USE madx_ptc_knobs_module
   USE madx_ptc_distrib_module
 
-  use Inf_NaN_Detection
-
-
   implicit none
 
   save
@@ -1162,31 +1159,10 @@ contains
 
       deltaeValue = deltae ! equals 1.0 unless there is a cavity
 
-    kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
-    ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
 
-    ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
-    ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
-    kxy2=kx*kx*ky*ky;
-    u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
-    u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+    if (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
 
-    if (u1<1.0 .and. u1>=0.0) then
-	u=u1
-    else
-	u=u2
-    endif
-	
-    if (.not.isnan(u)) then
-	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
-	! beta11, alfa11 etc... are multiplied by deltae before output
-    	! hence we reflect this in the formula from Lebedev
-	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
-	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
-	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
-	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue
-    elseif (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
-	! in case there is absolutely no coupling u will be NaN
+	! in case there is absolutely no coupling kx and ky will be zero and u will be NaN
 	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
 	! therefore we simply copy beta11 into betx and beta22 into bety in this case, so as
 	! to get the same values between twiss and ptc_twiss
@@ -1195,17 +1171,34 @@ contains
 	betx = tw%beta(1,1) * deltaeValue
 	bety = tw%beta(2,2) * deltaeValue
 	alfx = tw%alfa(1,1) * deltaeValue
-	alfy = tw%alfa(2,2) * deltaeValue
+	alfy = tw%alfa(2,2) * deltaeValue       
+
     else
-	! betx, bety, alfx, alfy will evaluate to nan anyway - but
-        ! in Fortran there is no such statement as betx=NaN
-        ! and the trick of using betx=sqrt(-1) yielded compilation
-        ! error with gfortran...
+
+        kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
+        ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
+
+        ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
+        ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
+        kxy2=kx*kx*ky*ky;
+        u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+        u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+
+        if (u1<1.0 .and. u1>=0.0) then
+           u=u1
+        else
+           u=u2
+        endif
+
+	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
+	! beta11, alfa11 etc... are multiplied by deltae before output
+    	! hence we reflect this in the formula from Lebedev
 	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
 	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
 	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
-	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue	
-    endif
+	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue
+
+     endif
 
 	! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
 	call double_to_table(table_name, 'betx', betx ) ! non contiguous with the above table entries
