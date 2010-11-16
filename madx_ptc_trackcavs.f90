@@ -483,6 +483,7 @@ contains
     intstate = getintstate()
     if (gcs .and.  intstate%TOTALPATH==1) then
        call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
+       call fort_warn("ptc_trackline","Disabling gcs")
        gcs = .false.
     endif
 

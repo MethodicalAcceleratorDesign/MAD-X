@@ -45,8 +45,14 @@ contains
 
     !Below we enforce that x(6) is cT, and it is time of flight from the start
     !we use time T=x(6)/ctime to find the time of arrival to a cavity so we can adjust its phase optimally
+    
+    !This is not needed, and even to contrary, it creates a bug: 
+    !if the tracking is done without totalpath, cavities should be tuned to such x(6)=0 gives max acceleration
+
     localis = getintstate()
-    localis = localis - nocavity0 + totalpath0
+    
+!    localis = localis - nocavity0 + totalpath0
+    localis = localis - nocavity0 
     if (getdebug() > 1) then
        print *, "I am in setcavities "
        call print(localis,6)
@@ -325,6 +331,7 @@ contains
       type(fibre),intent(inout):: f         ! fiber -> here must be a cavity, i.e. kind21 (tw) or kind4 (rf)
       real(dp)                 :: x(6)      ! reference particle coordinates (closed orbit for a circular machine)
       real(dp)                 :: phase_rel ! final relative phase
+      real(dp)                 :: phase_old ! for printing old phase
       integer, target          :: charge    ! charge of an particle
       logical(lp)              :: ene       ! switches if cavity should always maximally accelerate
       ! the reference track; lag is calculated
@@ -333,6 +340,7 @@ contains
       ! volt is calculated; lag and freq is preserved
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival
+!      type(internal_state)     :: globalis ! internal state to be use in the tracking
 
       arrivtime = x(6)/clight
       if (getdebug()>2) print *, 'arrivtime = ', arrivtime
@@ -350,15 +358,23 @@ contains
          endif
       endif
 
+!      globalis = getintstate()
+!      print*, "Total path is ", globalis%totalpath
+!      chargesign = charge/abs(charge)
+      
+      phase_old = f%mag%phas
+      
       if(ene) then
 
          if ( getdebug() > 2 ) then
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif
+
          f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
+
       else
 
          f%mag%phas = - f%mag%lag
@@ -376,7 +392,8 @@ contains
          write(6,'(a12,f12.5,a10)') '    Volt ',   f%mag%volt,' MV '
          write(6,'(a12,f12.5,a10)') '    DELTAE ', f%mag%delta_e, ' GeV '
          write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
-         write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad'
+         write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad '
+         write(6,'(a12,f12.3,a10)') '    Old Ph ', phase_old, ' rad '
          write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
          write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*c_360,' deg ', f%mag%lag,' rad '
          write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
