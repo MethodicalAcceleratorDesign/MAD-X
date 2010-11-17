@@ -257,7 +257,7 @@ match.o: util.o match.f90
 matchjc.o: util.o matchjc.f90
 matchsa.o: util.o matchsa.f90
 gxx11.o: util.o gxx11.f90
-plot.o: plot.f90
+plot.o: util.o plot.f90
 resindex.o: util.o resindex.f90
 sodd.o: sodd.f90
 survey.o: survey.f90
@@ -333,7 +333,7 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
 	madx_ptc_knobs.o \
-	madx_ptc_script.o St_pointers.o \
+	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
 run_madx.o: madx_ptc_module.o run_madx.f90
