@@ -1716,8 +1716,7 @@ contains
     type(fibre), pointer :: P
     character(*) filename
     call kanalnummer(mf)
-
-
+     
     open(unit=mf,file=filename)
     write(mf,*) "Contains location of each fibre and the magnet within the fibre "
     write(mf,*) "N.B. Drifts and Markers are fibres in PTC "
@@ -1813,9 +1812,17 @@ contains
     !   include 'twissa.fi'
     integer   filenameIA(*)
     character(48) filename
+    ! This Piotr S. code 
+    ! it is a hook to use print_frames implemented from madx
+    ! it shall use the madx's my_ring, not the local my_ering
+    if ( associated(my_ring) .eqv. .false. ) then
+      call fort_warn("printframes ", "Layout is not associated ");
+      return
+    endif
 
     filename = charconv(filenameIA)
-    call print_frames(my_ering,filename)
+
+    call print_frames(my_ring,filename)
 
   end subroutine printframes
 
