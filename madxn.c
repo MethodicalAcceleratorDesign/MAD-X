@@ -7397,7 +7397,12 @@ void pro_ptc_printframes(struct in_cmd* cmd)
   char*                          filename    = 0x0;
   struct int_array*              filenameIA      = 0x0;
   char*                          format    = 0x0;
-
+/* 
+ * Piotr.Skowronski@cern.ch
+ *  Routine that writes coordinates of magnets from PTC
+ *  either as text or ROOT macro which executed gives 3d image of the layout
+ *  Requires one parameter: filename 
+ */
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
   {
