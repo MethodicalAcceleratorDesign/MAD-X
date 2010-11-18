@@ -1201,10 +1201,10 @@ contains
      endif
 
 	! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
-	call double_to_table(table_name, 'betx', betx ) ! non contiguous with the above table entries
-	call double_to_table(table_name, 'bety', bety ) ! hence we must store these values one by one
-	call double_to_table(table_name, 'alfx', alfx )
-	call double_to_table(table_name, 'alfy', alfy )
+	call double_to_table(table_name, 'betx ', betx ) ! non contiguous with the above table entries
+	call double_to_table(table_name, 'bety ', bety ) ! hence we must store these values one by one
+	call double_to_table(table_name, 'alfx ', alfx )
+	call double_to_table(table_name, 'alfy ', alfy )
 
       call augment_count(table_name)
 
