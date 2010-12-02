@@ -66,6 +66,12 @@ module twissotmfi
   double precision :: rotm(6,6)=0.d0,rw(6,6)=0.d0,skick(6)=0.d0,sorb(6)=0.d0,&
        srmat(6,6)=0.d0,stmat(6,6,6)=0.d0
 end module twissotmfi
+module max_iterate
+  implicit none
+  public
+  integer MAXITER
+  parameter(MAXITER=150)
+end module max_iterate
 module twiss_elpfi
   implicit none
   public
@@ -1620,6 +1626,7 @@ subroutine ortran(ndim,n,ilow,iupp,h,d,v)
   enddo
 end subroutine ortran
 subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
+  use max_iterate
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1683,7 +1690,8 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
      y = h(na,na)
      w = h(ien,na) * h(na,ien)
      if (l .eq. na) go to 280
-     if (its .eq. 100) then
+     if (its .eq. MAXITER) then
+        write(6,*) "Maximum Iteration exceeded in HQR2, increase MAXITER: ",MAXITER
         ierr = ien
         go to 9999
      endif
