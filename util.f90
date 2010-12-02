@@ -1683,7 +1683,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
      y = h(na,na)
      w = h(ien,na) * h(na,ien)
      if (l .eq. na) go to 280
-     if (its .eq. 30) then
+     if (its .eq. 100) then
         ierr = ien
         go to 9999
      endif
