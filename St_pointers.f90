@@ -1353,10 +1353,10 @@ contains
           READ(MF,*)POS
           READ(MF,*)A1,B1
           CALL MOVE_TO(my_ering,P,POS)
-          p%mag%h1=A1
-          p%mag%h2=B1
-          p%magp%h1=A1
-          p%magp%h2=B1
+          p%mag%VA=A1
+          p%mag%VS=B1
+          p%magp%VA=A1
+          p%magp%VS=B1
        case('POWERVALISHEVQUADRUPOLE')
           valishev=my_true
           READ(MF,*)POS
@@ -1366,10 +1366,10 @@ contains
           cns=zero
           CALL ADD(P,2,0,cns)
           a1=half*a1*b1**2
-          p%mag%h1=A1
-          p%mag%h2=B1
-          p%magp%h1=A1
-          p%magp%h2=B1
+          p%mag%VA=A1
+          p%mag%VS=B1
+          p%magp%VA=A1
+          p%magp%VS=B1
        case('VALISHEVALLQUADRUPOLE')
           valishev=my_true
           READ(MF,*)B1
@@ -1382,10 +1382,10 @@ contains
                    cns=zero
                    CALL ADD(P,2,0,cns)
                    a1=half*a1*b1**2
-                   p%mag%h1=A1
-                   p%mag%h2=B1
-                   p%magp%h1=A1
-                   p%magp%h2=B1
+                   p%mag%VA=A1
+                   p%mag%VS=B1
+                   p%magp%VA=A1
+                   p%magp%VS=B1
                    i2=i2+1
                 endif
              endif
@@ -1399,13 +1399,13 @@ contains
           do i1=1,my_ering%n
              if(.not.associated(p%mag%volt).and.associated(p%mag%bn)) then
                 if(p%mag%p%nmul>=2) then
-                   a1= p%magp%h1
-                   B1=p%magp%h2
+                   a1= p%magp%VA
+                   B1=p%magp%VS
                    a1=a1*two/b1**2
-                   p%mag%h1=zero
-                   p%mag%h2=zero
-                   p%magp%h1=zero
-                   p%magp%h2=zero
+                   p%mag%VA=zero
+                   p%mag%VS=zero
+                   p%magp%VA=zero
+                   p%magp%VS=zero
                    cns=a1
                    i2=i2+1
                    CALL ADD(P,2,1,cns)
@@ -1425,10 +1425,10 @@ contains
              if(.not.associated(p%mag%volt).and.associated(p%mag%bn).and.name==p%mag%name) then
                 if(p%mag%p%nmul>=2) then
                    i2=i2+1
-                   p%mag%h1=A1
-                   p%mag%h2=B1
-                   p%magp%h1=A1
-                   p%magp%h2=B1
+                   p%mag%VA=A1
+                   p%mag%VS=B1
+                   p%magp%VA=A1
+                   p%magp%VS=B1
                 endif
              endif
              p=>p%next
@@ -1448,10 +1448,10 @@ contains
                    cns=zero
                    CALL ADD(P,2,0,cns)
                    a1=half*a1*b1**2
-                   p%mag%h1=A1
-                   p%mag%h2=B1
-                   p%magp%h1=A1
-                   p%magp%h2=B1
+                   p%mag%VA=A1
+                   p%mag%VS=B1
+                   p%magp%VA=A1
+                   p%magp%VS=B1
                 endif
              endif
              p=>p%next

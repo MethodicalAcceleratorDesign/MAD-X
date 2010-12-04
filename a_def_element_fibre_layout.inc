@@ -154,6 +154,7 @@ TYPE ELEMENT
    real(dp),   DIMENSION(:), POINTER:: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
    !
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,LAG       ! Cavity information
    real(dp), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
@@ -210,6 +211,7 @@ TYPE ELEMENTP
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !MULTIPOLE COMPONENT
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),    POINTER:: VA,VS         !valishev-like multipole
    !
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS ! CAVITY INFORMATION
    real(dp), POINTER :: DELTA_E     ! CAVITY ENERGY GAIN

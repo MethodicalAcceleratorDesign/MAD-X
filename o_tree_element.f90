@@ -3910,11 +3910,14 @@ CONTAINS
 
   end subroutine Go_to_closed
 
-  subroutine fetch_s0(DS,s0)
+  subroutine fetch_s0(DS,s)
     implicit none
     TYPE(damapspin), INTENT(INout) :: DS
-    TYPE(damapspin), INTENT(INout) :: s0
+    TYPE(damapspin), INTENT(INout) :: s
+    TYPE(damapspin) s0
     integer i,j
+
+    call alloc(s0)
 
     s0=1
 
@@ -3923,8 +3926,8 @@ CONTAINS
           s0%s(i,j)=ds%s(i,j).sub.'0'
        enddo
     enddo
-
-
+    s=s0
+    call kill(s0)
 
   end subroutine fetch_s0
 
@@ -3945,6 +3948,64 @@ CONTAINS
 
     call kill(om)
   end subroutine dalog_spinor_8
+
+  subroutine factor_parameter_dependent_s0(DS,s0,NS,N_AXIS,DIR)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS,s0,NS
+    TYPE(damapspin)A_F,A_S
+    TYPE(spinor_8), INTENT(INout) :: N_AXIS
+    INTEGER DIR
+
+    CALL ALLOC(A_F,A_S)
+
+    A_f=DS
+    a_f%m=1
+    CALL clean_orbital_33(A_f%S,A_f%S)
+    A_S=DS
+    a_s%m=1
+    IF(DIR==1) THEN
+       a_S=a_f*a_s**(-1)   ! angle has no constant part (DA) BUT PARAMETERS
+    ELSE
+       a_S=a_f**(-1)*a_s   ! angle has no constant part (DA)
+    ENDIF
+    CALL dalog_spinor_8(a_S,N_AXIS)   !  S=exp(N_AXIS)
+    S0=A_F
+    NS=A_S
+
+
+    CALL KILL(A_F,A_S)
+
+  END subroutine factor_parameter_dependent_s0
+
+
+  subroutine factor_s0(DS,s0,NS,N_AXIS,DIR)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS,s0,NS
+    TYPE(damapspin)A_F,A_S
+    TYPE(spinor_8), INTENT(INout) :: N_AXIS
+    INTEGER DIR
+
+    CALL ALLOC(A_F,A_S)
+
+    A_f=DS
+    a_f%m=1
+    CALL fetch_s0(A_f,A_f)
+    A_S=DS
+    a_s%m=1
+    IF(DIR==1) THEN
+       a_S=a_f*a_s**(-1)   ! angle has no constant part (DA) BUT PARAMETERS
+    ELSE
+       a_S=a_f**(-1)*a_s   ! angle has no constant part (DA)
+    ENDIF
+    CALL dalog_spinor_8(a_S,N_AXIS)   !  S=exp(N_AXIS)
+    S0=A_F
+    NS=A_S
+
+
+    CALL KILL(A_F,A_S)
+
+  END subroutine factor_s0
+
 
   subroutine dalog(DS,om)
     implicit none
@@ -4880,6 +4941,7 @@ CONTAINS
     enddo
 
   END SUBROUTINE clean_res_spinor_8
+
 
 
 

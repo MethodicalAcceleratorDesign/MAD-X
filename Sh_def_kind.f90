@@ -2282,7 +2282,6 @@ contains
     real(dp) XI,PM,DXI_PX,DXI_DDEL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    if(valishev) return  !valishev
 
     IF(EL%DIR==1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
@@ -2323,7 +2322,6 @@ contains
     TYPE(REAL_8) XI,PM,DXI_PX,DXI_DDEL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    if(valishev) return  !valishev
 
     CALL ALLOC(XI,PM,DXI_PX,DXI_DDEL)
 
@@ -2368,7 +2366,6 @@ contains
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    if(valishev) return  !valishev
 
     C=one/COS(E)**3
 
@@ -2388,7 +2385,6 @@ contains
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    if(valishev) return  !valishev
 
     C=one/COS(E)**3
 
@@ -2927,8 +2923,8 @@ contains
        endif
     ENDIF
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -2992,8 +2988,8 @@ contains
        endif
     ENDIF
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -3452,8 +3448,8 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
     endif !valishev
 
@@ -3486,8 +3482,8 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
     endif !valishev
 
@@ -4574,8 +4570,8 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -4631,8 +4627,8 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -5304,8 +5300,8 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -5364,8 +5360,8 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -9365,8 +9361,8 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev
@@ -9420,8 +9416,8 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
-    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        X(2)=X(2)-YL*DIR*BBYTW !valishev
        X(4)=X(4)+YL* DIR*BBXTW !valishev
     endif !valishev

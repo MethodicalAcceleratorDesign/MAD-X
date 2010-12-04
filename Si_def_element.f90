@@ -1020,6 +1020,8 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
+       EL%K2%VA=>EL%VA
+       EL%K2%VS=>EL%VS
        NULLIFY(EL%K2%F);ALLOCATE(EL%K2%F);EL%K2%F=1;
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3)) THEN
@@ -1119,6 +1121,8 @@ CONTAINS
        EL%S5%HGAP=>EL%HGAP
        EL%S5%H1=>EL%H1
        EL%S5%H2=>EL%H2
+       EL%S5%VA=>EL%VA
+       EL%S5%VS=>EL%VS
        EL%S5%B_SOL=>EL%B_SOL
     CASE(KIND6)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -1152,6 +1156,8 @@ CONTAINS
        EL%T6%HGAP=>EL%HGAP
        EL%T6%H1=>EL%H1
        EL%T6%H2=>EL%H2
+       EL%T6%VA=>EL%VA
+       EL%T6%VS=>EL%VS
        nullify(EL%T6%MATX);ALLOCATE(EL%T6%MATX(2,3));
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
@@ -1188,6 +1194,8 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
+       EL%T7%VA=>EL%VA
+       EL%T7%VS=>EL%VS
        NULLIFY(EL%T7%F);ALLOCATE(EL%T7%F);EL%T7%F=1;
        nullify(EL%T7%MATX);ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);ALLOCATE(EL%T7%MATY(2,3));
@@ -1295,6 +1303,8 @@ CONTAINS
        EL%K16%HGAP=>EL%HGAP
        EL%K16%H1=>EL%H1
        EL%K16%H2=>EL%H2
+       EL%K16%VA=>EL%VA
+       EL%K16%VS=>EL%VS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
@@ -1464,6 +1474,8 @@ CONTAINS
        EL%K2%HGAP=>EL%HGAP
        EL%K2%H1=>EL%H1
        EL%K2%H2=>EL%H2
+       EL%K2%VA=>EL%VA
+       EL%K2%VS=>EL%VS
        NULLIFY(EL%K2%F);ALLOCATE(EL%K2%F);EL%K2%F=1;
     CASE(KIND3)
        if(.not.ASSOCIATED(EL%K3)) THEN
@@ -1562,6 +1574,8 @@ CONTAINS
        EL%S5%HGAP=>EL%HGAP
        EL%S5%H1=>EL%H1
        EL%S5%H2=>EL%H2
+       EL%S5%VA=>EL%VA
+       EL%S5%VS=>EL%VS
        EL%S5%B_SOL=>EL%B_SOL
     CASE(KIND6)
        IF(EL%P%EXACT.AND.EL%P%B0/=zero) THEN
@@ -1595,6 +1609,8 @@ CONTAINS
        EL%T6%HGAP=>EL%HGAP
        EL%T6%H1=>EL%H1
        EL%T6%H2=>EL%H2
+       EL%T6%VA=>EL%VA
+       EL%T6%VS=>EL%VS
        nullify(EL%T6%MATX);ALLOCATE(EL%T6%MATX(2,3));
        nullify(EL%T6%MATY);ALLOCATE(EL%T6%MATY(2,3));
        nullify(EL%T6%LX);ALLOCATE(EL%T6%LX(6));
@@ -1631,6 +1647,8 @@ CONTAINS
        EL%T7%HGAP=>EL%HGAP
        EL%T7%H1=>EL%H1
        EL%T7%H2=>EL%H2
+       EL%T7%VA=>EL%VA
+       EL%T7%VS=>EL%VS
        NULLIFY(EL%T7%F);ALLOCATE(EL%T7%F);EL%T7%F=1;
        nullify(EL%T7%MATX);  ALLOCATE(EL%T7%MATX(2,3));
        nullify(EL%T7%MATY);  ALLOCATE(EL%T7%MATY(2,3));
@@ -1739,6 +1757,8 @@ CONTAINS
        EL%K16%HGAP=>EL%HGAP
        EL%K16%H1=>EL%H1
        EL%K16%H2=>EL%H2
+       EL%K16%VA=>EL%VA
+       EL%K16%VS=>EL%VS
        NULLIFY(EL%K16%DRIFTKICK);ALLOCATE(EL%K16%DRIFTKICK);EL%K16%DRIFTKICK=.true.;
        NULLIFY(EL%K16%LIKEMAD);ALLOCATE(EL%K16%LIKEMAD);EL%K16%LIKEMAD=.false.;
        NULLIFY(EL%K16%F);ALLOCATE(EL%K16%F);EL%K16%F=1;
@@ -2267,6 +2287,7 @@ CONTAINS
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
     nullify(EL%H1);nullify(EL%H2);
+    nullify(EL%VA);nullify(EL%VS);
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
     nullify(EL%lag);
     nullify(EL%B_SOL);
@@ -2322,6 +2343,7 @@ CONTAINS
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
     nullify(EL%H1);nullify(EL%H2);
+    nullify(EL%VA);nullify(EL%VS);
     nullify(EL%VOLT);nullify(EL%FREQ);nullify(EL%PHAS);nullify(EL%DELTA_E);
     nullify(EL%B_SOL);
     nullify(EL%slow_ac);
@@ -2383,6 +2405,8 @@ CONTAINS
        IF(ASSOCIATED(EL%HGAP)) DEALLOCATE(EL%HGAP)
        IF(ASSOCIATED(EL%H1)) DEALLOCATE(EL%H1)
        IF(ASSOCIATED(EL%H2)) DEALLOCATE(EL%H2)
+       IF(ASSOCIATED(EL%VA)) DEALLOCATE(EL%VA)
+       IF(ASSOCIATED(EL%VS)) DEALLOCATE(EL%VS)
        IF(ASSOCIATED(EL%VOLT)) DEALLOCATE(EL%VOLT)
        IF(ASSOCIATED(EL%lag)) DEALLOCATE(EL%lag)
        IF(ASSOCIATED(EL%FREQ)) DEALLOCATE(EL%FREQ)
@@ -2530,6 +2554,8 @@ CONTAINS
        ALLOCATE(EL%HGAP);EL%HGAP=zero;
        ALLOCATE(EL%H1);EL%H1=zero;
        ALLOCATE(EL%H2);EL%H2=zero;
+       ALLOCATE(EL%VA);EL%VA=zero;
+       ALLOCATE(EL%VS);EL%VS=zero;
        !       ALLOCATE(EL%theta_ac); EL%theta_ac= zero ;
        !       ALLOCATE(EL%a_ac);  EL%a_ac = zero;
        !       ALLOCATE(EL%DC_ac); EL%DC_ac= zero ;
@@ -2682,6 +2708,8 @@ CONTAINS
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
        CALL KILL(EL%H1);DEALLOCATE(EL%H1);
        CALL KILL(EL%H2);DEALLOCATE(EL%H2);
+       CALL KILL(EL%VA);DEALLOCATE(EL%VA);
+       CALL KILL(EL%VS);DEALLOCATE(EL%VS);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
 
        IF(ASSOCIATED(EL%slow_ac))DEALLOCATE(EL%slow_ac)
@@ -2754,6 +2782,8 @@ CONTAINS
        ALLOCATE(EL%HGAP);CALL ALLOC(EL%HGAP);EL%HGAP=zero;
        ALLOCATE(EL%H1);CALL ALLOC(EL%H1);EL%H1=zero;
        ALLOCATE(EL%H2);CALL ALLOC(EL%H2);EL%H2=zero;
+       ALLOCATE(EL%VA);CALL ALLOC(EL%VA);EL%VA=zero;
+       ALLOCATE(EL%VS);CALL ALLOC(EL%VS);EL%VS=zero;
        !       ALLOCATE(EL%theta_ac);CALL ALLOC(EL%theta_ac); EL%theta_ac= zero ;
        !       ALLOCATE(EL%a_ac);CALL ALLOC(EL%a_ac);  EL%a_ac = zero;
        !       ALLOCATE(EL%DC_ac); EL%DC_ac= zero ;
@@ -2800,6 +2830,8 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
+    ELP%VA=EL%VA
+    ELP%VS=EL%VS
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
     ELP%slow_ac=EL%slow_ac
@@ -3101,6 +3133,8 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
+    ELP%VA=EL%VA
+    ELP%VS=EL%VS
     ELP%slow_ac=EL%slow_ac
 
     IF(ASSOCIATED(EL%a_ac)) then
@@ -3392,6 +3426,8 @@ CONTAINS
     ELP%HGAP=EL%HGAP
     ELP%H1=EL%H1
     ELP%H2=EL%H2
+    ELP%VA=EL%VA
+    ELP%VS=EL%VS
     ELP%slow_ac=EL%slow_ac
 
     IF(ASSOCIATED(EL%a_ac)) then
@@ -3670,6 +3706,8 @@ CONTAINS
     CALL resetpoly_R31(ELP%HGAP)         ! SHARED BY EVERYONE
     CALL resetpoly_R31(ELP%H1)         ! SHARED BY EVERYONE
     CALL resetpoly_R31(ELP%H2)         ! SHARED BY EVERYONE
+    CALL resetpoly_R31(ELP%VA)         ! SHARED BY EVERYONE
+    CALL resetpoly_R31(ELP%VS)         ! SHARED BY EVERYONE
     if(associated(ELP%theta_ac)) CALL resetpoly_R31(ELP%theta_ac)         ! SHARED BY EVERYONE
     if(associated(ELP%a_ac)) CALL resetpoly_R31(ELP%a_ac)         ! SHARED BY EVERYONE
     if(associated(ELP%DC_ac)) CALL resetpoly_R31(ELP%DC_ac)         ! SHARED BY EVERYONE

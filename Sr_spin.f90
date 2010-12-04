@@ -1565,8 +1565,8 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
-    if(valishev)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        b(1)=b(1)+BBXTW !valishev
        b(2)=b(2)+BBYTW !valishev
     endif !valishev
@@ -1603,8 +1603,8 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
-    if(valishev)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
        b(1)=b(1)+BBXTW !valishev
        b(2)=b(2)+BBYTW !valishev
     endif !valishev
@@ -1688,11 +1688,6 @@ contains
     B(1)=BY/(one+EL%P%B0*X(1))
     B(2)=-BX/(one+EL%P%B0*X(1))
     B(3)=zero
-    if(valishev)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BTX,BTY) !valishev
-       b(1)=b(1)+BTX !valishev
-       b(2)=b(2)+BTY !valishev
-    endif !valishev
 
   END SUBROUTINE GETMULB_TEAPOTR
 
@@ -1775,11 +1770,6 @@ contains
     B(1)=BY/(one+EL%P%B0*X(1))
     B(2)=-BX/(one+EL%P%B0*X(1))
     B(3)=zero
-    if(valishev)   then  !valishev
-       call elliptical_b(el%h1,el%h2,x,BTX,BTY) !valishev
-       b(1)=b(1)+BTX !valishev
-       b(2)=b(2)+BTY !valishev
-    endif !valishev
 
     CALL KILL(X1,X3,BX,BY,BTX,BTY,BtYT)
 

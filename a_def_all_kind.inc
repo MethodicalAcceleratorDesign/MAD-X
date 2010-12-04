@@ -18,6 +18,7 @@ TYPE DKD2
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE DKD2
 
@@ -27,6 +28,7 @@ TYPE DKD2P
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE DKD2P
 
@@ -108,6 +110,7 @@ TYPE SOL5
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
 END  TYPE SOL5
 
 TYPE SOL5P
@@ -117,6 +120,7 @@ TYPE SOL5P
    TYPE(REAL_8), POINTER ::B_SOL
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
 END  TYPE SOL5P
 
 
@@ -129,6 +133,7 @@ TYPE KTK
    real(dp),  DIMENSION(:), POINTER :: lx,ly
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
 END  TYPE KTK
 
 TYPE KTKP
@@ -140,6 +145,7 @@ TYPE KTKP
    TYPE(REAL_8), DIMENSION(:), POINTER :: lx,ly
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
 END  TYPE KTKP
 
 TYPE TKTF
@@ -157,6 +163,7 @@ TYPE TKTF
    !     real(dp), DIMENSION(:), POINTER ::   dy(:)
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE TKTF
 
@@ -175,6 +182,7 @@ TYPE TKTFP
    !     real(dp), DIMENSION(:), POINTER ::   dy(:)
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE TKTFP
 
@@ -279,6 +287,7 @@ TYPE STREX
    logical(lp), POINTER :: DRIFTKICK,LIKEMAD
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE STREX
 
@@ -289,6 +298,7 @@ TYPE STREXP
    logical(lp),  POINTER :: DRIFTKICK,LIKEMAD
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
    integer, pointer :: f
 END  TYPE STREXP
 ! fitted magnet stuff
@@ -313,18 +323,6 @@ TYPE ENGEP
 END  TYPE ENGEP
 
 
-
-!  NO POLYMORPH NECESSARY: DESCRIBES A TAYLOR MAP AS IN COSY-INFINITY
-!TYPE MARTIN
-!   TYPE(MAGNET_CHART), POINTER :: P
-!   TYPE(tree_element), POINTER :: T
-!   TYPE(tree_element), POINTER :: T_RAD
-!   TYPE(tree_element), POINTER :: T_REV
-!   TYPE(tree_element), POINTER :: T_RAD_REV
-!   real(dp),pointer :: E(:,:)
-!   real(dp),pointer :: E_REV(:,:)
-!   logical(lp), POINTER :: deltamap
-!END  TYPE MARTIN
 
 ! GENERAL PANCAKE
 

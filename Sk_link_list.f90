@@ -221,9 +221,12 @@ CONTAINS
     L%N=L%N+1
     nullify(current)
     call alloc_fibre(current)
-    call copy(el%magp,current%mag)
-    call copy(current%mag,current%magp)
-    call copy(el%mag,current%mag)
+    !   call copy(el%magp,current%mag)       ! 2010 etienne does not understand!
+    !   call copy(current%mag,current%magp) ! 2010 etienne does not understand!
+    !   call copy(el%mag,current%mag)   ! 2010 etienne does not understand!
+    call copy(el%mag,current%mag)       ! 2010 etienne replaces!
+    call copy(current%mag,current%magp) ! 2010 etienne replaces!
+    !   write(6,*) " used "
     !if(associated(current%CHART))
     call copy(el%CHART,current%CHART)
     !if(associated(current%patch))
@@ -850,13 +853,13 @@ CONTAINS
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
        IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT).or.superkill) THEN    ! ORDINARY
-          IF(ASSOCIATED(c%mag)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
-             c%mag=-1;
-             deallocate(c%mag);
-          ENDIF
-          IF(ASSOCIATED(c%magP)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_MAG))) THEN
+          IF(ASSOCIATED(c%magP)) then  !  2010_1
              c%magp=-1;
              deallocate(c%magP);
+          ENDIF
+          IF(ASSOCIATED(c%mag)) then   !  2010_1 changed order with above
+             c%mag=-1;
+             deallocate(c%mag);
           ENDIF
           IF(ASSOCIATED(c%CHART)) then  !.AND.(.NOT.ASSOCIATED(c%PARENT_CHART))) THEN
              C%CHART=-1
