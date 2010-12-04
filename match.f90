@@ -315,6 +315,7 @@
 
       icovar = 0
       ilevel = 0
+      ipvt(:) = 0
       call mtgeti(vect,dvect)
       call lmdif(mtfcn,ncon,nvar,calls,call_lim,vect,fun_vec,tol,diag,  &
      &one,w_ifjac,ncon,ipvt,w_qtf,w_iwa1,w_iwa2,w_iwa3,w_iwa4,xold)
