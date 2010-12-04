@@ -1340,6 +1340,123 @@ contains
           CALL TRANSLATE_Fibre(P,DT,ORDER=1,BASIS=P%MAG%P%F%MID)
           CALL FIND_PATCH(P%PREVIOUS,P,NEXT=MY_TRUE,ENERGY_PATCH=MY_FALSE)
           CALL FIND_PATCH(P,P%NEXT,NEXT=MY_FALSE,ENERGY_PATCH=MY_FALSE)
+       case('DEBUG')
+          read(mf,*) debug_flag,debug_acos
+       case('VALISHEVON')
+          valishev=my_true
+          Write(6,*)"Valishev's multipoles are on"
+       case('VALISHEVOFF')
+          valishev=my_true
+          Write(6,*)"Valishev's multipoles are off"
+       case('POWERVALISHEV')
+          valishev=my_true
+          READ(MF,*)POS
+          READ(MF,*)A1,B1
+          CALL MOVE_TO(my_ering,P,POS)
+          p%mag%h1=A1
+          p%mag%h2=B1
+          p%magp%h1=A1
+          p%magp%h2=B1
+       case('POWERVALISHEVQUADRUPOLE')
+          valishev=my_true
+          READ(MF,*)POS
+          READ(MF,*)A1,B1
+          CALL MOVE_TO(my_ering,P,POS)
+          a1=p%mag%bn(2)
+          cns=zero
+          CALL ADD(P,2,0,cns)
+          a1=half*a1*b1**2
+          p%mag%h1=A1
+          p%mag%h2=B1
+          p%magp%h1=A1
+          p%magp%h2=B1
+       case('VALISHEVALLQUADRUPOLE')
+          valishev=my_true
+          READ(MF,*)B1
+          i2=0
+          p=>my_ering%start
+          do i1=1,my_ering%n
+             if(.not.associated(p%mag%volt).and.associated(p%mag%bn)) then
+                if(p%mag%p%nmul>=2) then
+                   a1=p%mag%bn(2)
+                   cns=zero
+                   CALL ADD(P,2,0,cns)
+                   a1=half*a1*b1**2
+                   p%mag%h1=A1
+                   p%mag%h2=B1
+                   p%magp%h1=A1
+                   p%magp%h2=B1
+                   i2=i2+1
+                endif
+             endif
+             p=>p%next
+          enddo
+          write(6,*) i2, "Quadrupoles globally replaced by Valishev quadrupoles"
+       case('UNDOVALISHEVQUADRUPOLE')
+          valishev=my_false
+          p=>my_ering%start
+          i2=0
+          do i1=1,my_ering%n
+             if(.not.associated(p%mag%volt).and.associated(p%mag%bn)) then
+                if(p%mag%p%nmul>=2) then
+                   a1= p%magp%h1
+                   B1=p%magp%h2
+                   a1=a1*two/b1**2
+                   p%mag%h1=zero
+                   p%mag%h2=zero
+                   p%magp%h1=zero
+                   p%magp%h2=zero
+                   cns=a1
+                   i2=i2+1
+                   CALL ADD(P,2,1,cns)
+                endif
+             endif
+             p=>p%next
+          enddo
+          write(6,*) i2,"Valishev quadrupoles globally replaced by normal quadrupoles"
+       case('POWERVALISHEVNAME')
+          valishev=my_true
+          READ(MF,*)name   !,POS
+          READ(MF,*)A1,B1
+          !          call move_to(my_ering,p,name,POS)
+          i2=0
+          p=>my_ering%start
+          do i1=1,my_ering%n
+             if(.not.associated(p%mag%volt).and.associated(p%mag%bn).and.name==p%mag%name) then
+                if(p%mag%p%nmul>=2) then
+                   i2=i2+1
+                   p%mag%h1=A1
+                   p%mag%h2=B1
+                   p%magp%h1=A1
+                   p%magp%h2=B1
+                endif
+             endif
+             p=>p%next
+          enddo
+          write(6,*) " found ",i2, " Valishev quadrupoles "
+       case('POWERVALISHEVNAMEQUADRUPOLE')
+          valishev=my_true
+          READ(MF,*)name   !,POS
+          READ(MF,*)A1,B1
+          !          call move_to(my_ering,p,name,POS)
+          p=>my_ering%start
+          do i1=1,my_ering%n
+             if(.not.associated(p%mag%volt).and.associated(p%mag%bn).and.name==p%mag%name) then
+                if(p%mag%p%nmul>=2) then
+                   i2=i2+1
+                   a1=p%mag%bn(2)
+                   cns=zero
+                   CALL ADD(P,2,0,cns)
+                   a1=half*a1*b1**2
+                   p%mag%h1=A1
+                   p%mag%h2=B1
+                   p%magp%h1=A1
+                   p%magp%h2=B1
+                endif
+             endif
+             p=>p%next
+          enddo
+          write(6,*) " found ",i2, " Valishev quadrupoles "
        case('POWERMULTIPOLE')
           READ(MF,*)POS
           READ(MF,*)n,cns, bend_like
@@ -1716,7 +1833,8 @@ contains
     type(fibre), pointer :: P
     character(*) filename
     call kanalnummer(mf)
-     
+
+
     open(unit=mf,file=filename)
     write(mf,*) "Contains location of each fibre and the magnet within the fibre "
     write(mf,*) "N.B. Drifts and Markers are fibres in PTC "
@@ -1812,17 +1930,9 @@ contains
     !   include 'twissa.fi'
     integer   filenameIA(*)
     character(48) filename
-    ! This Piotr S. code 
-    ! it is a hook to use print_frames implemented from madx
-    ! it shall use the madx's my_ring, not the local my_ering
-    if ( associated(my_ring) .eqv. .false. ) then
-      call fort_warn("printframes ", "Layout is not associated ");
-      return
-    endif
 
     filename = charconv(filenameIA)
-
-    call print_frames(my_ring,filename)
+    call print_frames(my_ering,filename)
 
   end subroutine printframes
 

@@ -98,6 +98,8 @@ MODULE S_DEF_KIND
   private ADJUSTR_TIME_CAV_TRAV_OUT,ADJUSTP_TIME_CAV_TRAV_OUT
   private FRINGE_CAV_TRAVR,FRINGE_CAV_TRAVp,INTER_CAV_TRAV,INTEP_CAV_TRAV
   private INTER_PANCAKE,INTEP_PANCAKE,ADJUSTR_PANCAKE,ADJUSTP_PANCAKE
+  private elliptical_b_r,elliptical_b_p  ! valishev
+
   INTEGER, PRIVATE :: TOTALPATH_FLAG
   !  private DRIFT_pancaker,DRIFT_pancakep,KICKPATH_pancaker,KICKPATH_pancakep
   ! using x and x'
@@ -131,7 +133,8 @@ MODULE S_DEF_KIND
   !include "def_all_kind.f90"
   ! New home for element and elementp
   integer, parameter :: N_ENGE=5
-
+  logical(lp),TARGET :: valishev=.false.
+  !  integer :: nvalishev=100
   INTERFACE TRACK_SLICE
      MODULE PROCEDURE INTER_CAV4
      MODULE PROCEDURE INTEP_CAV4
@@ -383,6 +386,11 @@ MODULE S_DEF_KIND
   INTERFACE KICKEX
      MODULE PROCEDURE KICKEXR !  EXACT
      MODULE PROCEDURE KICKEXP
+  END INTERFACE
+
+  INTERFACE elliptical_b
+     MODULE PROCEDURE elliptical_b_r !  EXACT
+     MODULE PROCEDURE elliptical_b_p
   END INTERFACE
 
 
@@ -2274,6 +2282,8 @@ contains
     real(dp) XI,PM,DXI_PX,DXI_DDEL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    if(valishev) return  !valishev
+
     IF(EL%DIR==1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
        X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
@@ -2312,6 +2322,8 @@ contains
     TYPE(REAL_8),INTENT(IN),dimension(:)::BN
     TYPE(REAL_8) XI,PM,DXI_PX,DXI_DDEL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    if(valishev) return  !valishev
 
     CALL ALLOC(XI,PM,DXI_PX,DXI_DDEL)
 
@@ -2356,6 +2368,8 @@ contains
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    if(valishev) return  !valishev
+
     C=one/COS(E)**3
 
     X(2)=X(2)+(DIR*BN(1)*H/two)*X(1)**2
@@ -2373,6 +2387,8 @@ contains
     INTEGER,INTENT(IN):: DIR
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+
+    if(valishev) return  !valishev
 
     C=one/COS(E)**3
 
@@ -2911,6 +2927,12 @@ contains
        endif
     ENDIF
 
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
+
   END SUBROUTINE KICKR
 
   SUBROUTINE KICKP(EL,YL,X,k)
@@ -2969,6 +2991,12 @@ contains
           X(6)=X(6)+YL*EL%P%B0*X1
        endif
     ENDIF
+
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
 
     CALL KILL(X1)
@@ -3424,6 +3452,11 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    endif !valishev
+
   END SUBROUTINE GETMULB_SOLR
 
   SUBROUTINE GETMULB_SOLP(EL,B,X,k)
@@ -3453,6 +3486,10 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    endif !valishev
 
     CALL KILL(X1,X3,BBYTW,BBXTW,BBYTWT)
 
@@ -4537,6 +4574,12 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
+
   END SUBROUTINE KICKKTKR
 
 
@@ -4587,6 +4630,12 @@ contains
 
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
+
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
 
     CALL KILL(X1)
@@ -5255,6 +5304,11 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
   END SUBROUTINE KICKTKT7R
 
@@ -5309,6 +5363,12 @@ contains
 
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
+
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
 
     CALL KILL(X1)
@@ -9305,6 +9365,11 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
   END SUBROUTINE KICKEXR
 
@@ -9355,6 +9420,11 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
+    if(valishev.and.ABS(el%h2)>eps)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       X(2)=X(2)-YL*DIR*BBYTW !valishev
+       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    endif !valishev
 
     CALL KILL(X1)
     CALL KILL(X3)
@@ -13582,5 +13652,141 @@ contains
     endif
 
   END SUBROUTINE ZEROP_enge
+
+  SUBROUTINE elliptical_b_r(st,sc,coord,bx,by)
+    ! Tracking subroutine for elliptical lens
+    ! A.Valishev (valishev@fnal.gov) October 19, 2010
+    ! Modified by E. Forest for PTC
+    !
+    ! U(u,v)=(u*sqrt(u**2-1)+v*sqrt(1-v**2)*(-pi/2+acos(v))/(u**2-v**2)
+    !st=lens strength
+    ! sc=c
+    ! b= bfield in x and y
+
+    implicit none
+
+    !global variables
+
+    real(dp), intent(inout) ::  coord(6),bx,by
+    real(dp), intent(in) :: st,sc
+
+    real(dp) dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+
+    bx=zero
+    by=zero
+    IF(ABS(SC)<=eps) RETURN
+    x = coord(1)/sc
+    y =  coord(3)/sc
+    u=half*sqrt((x-one)**2+y**2)+half*sqrt((x+one)**2+y**2)
+    v=half*sqrt((x+one)**2+y**2)-half*sqrt((x-one)**2+y**2)
+    if (u.eq.one) then
+       dd=zero
+    else
+       dd=u**2*log(u+sqrt(u*u-one))/sqrt(u**2-one)
+    end if
+    dUu=(u+log(u+sqrt(u*u-one))*sqrt(u**2-one)+dd)/(u**2-v**2) &
+         -two*u*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+         +v*(acos(v)-half*pi)*sqrt(one-v**2)) /(u**2-v**2)**2
+    dUv=two*v*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+         +v*(acos(v)-half*pi)*sqrt(one-v**2)) /(u**2-v**2)**2 &
+         -(v-(acos(v)-half*pi)*sqrt(one-v**2)+v**2*(acos(v)-half*pi)/sqrt(one-v**2))&
+         /(u**2-v**2)
+    dux=half*(x-one)/sqrt((x-one)**2+y**2) +half*(x+one)/sqrt((x+one)**2+y**2)
+    duy=half*y/sqrt((x-one)**2+y**2) +half*y/sqrt((x+one)**2+y**2)
+    dvx=half*(x+one)/sqrt((x+one)**2+y**2) -half*(x-one)/sqrt((x-one)**2+y**2)
+    dvy=half*y/sqrt((x+one)**2+y**2) -half*y/sqrt((x-one)**2+y**2)
+
+    by=-st*(dUu*dux+dUv*dvx)/sc
+    bx=st*(dUu*duy+dUv*dvy)/sc
+
+  end SUBROUTINE elliptical_b_r
+
+  SUBROUTINE elliptical_b_p(st,sc,coord,bx,by)
+    ! Tracking subroutine for elliptical lens
+    ! A.Valishev (valishev@fnal.gov) October 19, 2010
+    ! Modified by E. Forest for PTC
+    !
+    ! U(u,v)=(u*sqrt(u**2-1)+v*sqrt(1-v**2)*(-pi/2+acos(v))/(u**2-v**2)
+    !st=lens strength
+    ! sc=c
+    ! b= bfield in x and y
+
+    implicit none
+
+    !global variables
+
+    type(real_8), intent(inout) :: coord(6),bx,by
+    type(real_8), intent(in) :: st,sc
+    type(real_8) dd,ac,sqv,u, v, dUu, dUv, dux, duy, dvx, dvy, x, y,dv,uv2,uv,sqb,sqbm
+    integer i,n
+    real(dp) xu,x1,x2
+
+    bx=zero
+    by=zero
+    IF(ABS(SC)<=eps) RETURN
+
+    call alloc(u, v, dUu, dUv, dux, duy, dvx, dvy, x, y)
+    call alloc(dd,dv,uv,uv2,ac,sqv,sqb,sqbm)
+
+    bx=st*two/sc**2*coord(3)
+    by=st*two/sc**2*coord(1)
+
+    x = coord(1)/sc
+    y =  coord(3)/sc
+    sqb=sqrt((x+one)**2+y**2)
+    sqbm=sqrt((x-one)**2+y**2)
+
+    u=half*sqbm+half*sqb
+    v=half*sqb-half*sqbm
+    xu=u
+    if (xu<1.1_dp) then
+       !if (valishev) then
+       !write(6,*) " xu expanded", xu
+       dUu=u-one
+       dUv=one
+       dv=zero
+       !   do i=0,(nvalishev-1)/2
+       do i=0,(size(val_del%a)-1)/2
+          dv=val_del%a(i)*duv+dv
+          duv=duv*dUu
+          ! write(6,*) i, val_del%a(i)
+       enddo
+       dd=dv*u**2/sqrt(u+one)
+       dv=dv*sqrt(u+one)*(u-one)
+    else
+       ! write(6,*) " xu normal", xu
+       dd=u**2*log(u+sqrt(u*u-one))/sqrt(u**2-one)
+       dv=log(u+sqrt(u*u-one))/sqrt(u-one)
+       dv=dv*sqrt(u+one)*(u-one)
+    end if
+    uv=(u**2-v**2)
+    uv2=uv**2
+    ac=acos(v)
+
+
+    sqv=sqrt(one-v**2)
+
+    dUu=(u+dv+dd)/uv-two*u*(u*dv+v*(ac-half*pi)*sqv) /uv2
+    dUv=two*v*(u*dv+v*(ac-half*pi)*sqv) /uv2
+    dUv=dUv-(v-(ac-half*pi)*sqv+v**2*(ac-half*pi)/sqv)/uv
+
+    dux=half*(x-one)/sqbm +half*(x+one)/sqb
+
+    duy=half*y/sqbm +half*y/sqb
+    dvx=half*(x+one)/sqb -half*(x-one)/sqbm
+    dvy=half*y/sqb -half*y/sqbm
+
+    by=-st*(dUu*dux+dUv*dvx)/sc
+    bx=st*(dUu*duy+dUv*dvy)/sc
+
+    !call print(by,10)
+    !call print(bx,10)
+    !goto 100
+
+100 call kill(u, v, dUu, dUv, dux, duy, dvx, dvy, x, y)
+    call kill(dd,dv,uv,uv2,ac,sqv,sqb,sqbm)
+
+
+  end SUBROUTINE elliptical_b_p
 
 END MODULE S_DEF_KIND

@@ -4,6 +4,7 @@ module S_status
   use s_frame
   USE S_extend_poly
   use anbn
+  use my_own_1D_TPSA
   !  USE S_pol_user1
   !  USE S_pol_user2
   Use S_pol_sagan
@@ -123,7 +124,7 @@ module S_status
   CHARACTER(24) MYTYPE(-100:100)
   private check_S_APERTURE_r,check_S_APERTURE_out_r
   private check_S_APERTURE_p,check_S_APERTURE_out_p
-
+  type(my_1D_taylor) val_del
 
   INTERFACE OPERATOR (.min.)
      MODULE PROCEDURE minu                       ! to define the minus of Schmidt
@@ -986,6 +987,7 @@ CONTAINS
     INTEGER,optional :: ND2,NPARA
     INTEGER  ND2l,NPARAl
     LOGICAL(lp) package
+    call dd_p !valishev
     doing_ac_modulation_in_ptc=.false.
     package=my_true
     if(present(pack))     package=my_true
@@ -1153,5 +1155,29 @@ CONTAINS
 
   END SUBROUTINE DTILTP_EXTERNAL
 
+  SUBROUTINE dd_p   !(u,dd)    !valishev
+    use my_own_1D_TPSA
+
+    ! Tracking subroutine for elliptical lens
+    ! A.Valishev (valishev@fnal.gov) October 19, 2010
+    ! Modified by E. Forest for PTC
+    implicit none
+    type(real_8) u,dd
+    type(my_1D_taylor) del,logdel
+    integer i,n
+
+    call set_my_taylor_no(N_my_1D_taylor)
+    del=zero
+    del%a(1)=one
+    logdel=zero
+    val_del=zero
+    logdel=log(one+del**2+del*sqrt(two)*sqrt(one+del**2/two))
+
+    do i=0,N_my_1D_taylor
+       n=2*i+1
+       if(n>N_my_1D_taylor) cycle
+       val_del%a(i)=logdel%a(n)
+    enddo
+  end SUBROUTINE dd_p  !valishev
 
 end module S_status

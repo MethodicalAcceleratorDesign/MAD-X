@@ -2876,7 +2876,7 @@ CONTAINS
     c_%wherelost => wherelost
 
 
-    c_%other_program => other_program
+    c_%valishev => valishev
     c_%MADTHICK => MADKIND2
     c_%MADTHIN_NORMAL => MADKIND3N
     c_%MADTHIN_SKEW => MADKIND3S

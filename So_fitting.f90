@@ -552,6 +552,10 @@ contains
     Y=CLOSED+id
 
     CALL TRACK(R,Y,1,+STATE)
+    write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
+    write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
+    write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
+    write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
     NORM=Y
     gam(1)=(norm%a_t%v(2).sub.'1')**2+(norm%a_t%v(2).sub.'01')**2
     gam(2)=(norm%a_t%v(4).sub.'001')**2+(norm%a_t%v(4).sub.'0001')**2

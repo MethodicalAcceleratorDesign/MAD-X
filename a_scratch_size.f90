@@ -78,12 +78,12 @@ module precision_constants
   !Physical Constants
   real(dp),parameter::A_ELECTRON=1.15965218111e-3_dp  !frs NIST CODATA 2006
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
-  real(dp),parameter::A_PROTON=1.79284735e-0_dp        !frs (approx) NIST CODATA 2006
+  real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
   real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
-  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
-  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
-  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
-  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
+  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
+  !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
+  !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
+  !  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
 
 
   real(dp) :: A_particle = A_ELECTRON
@@ -190,7 +190,6 @@ module precision_constants
   character*255 :: file_block_name="noprint"
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
-
   integer   lielib_print(10)
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
@@ -241,7 +240,7 @@ module precision_constants
      integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC
      integer,pointer :: np_pol     ! parameters produced through pol_block
      logical(lp),pointer :: knob
-     logical(lp),pointer :: OTHER_PROGRAM
+     logical(lp),pointer :: valishev
      !     integer, pointer :: NDPT_OTHER
      logical(lp), pointer :: setknob
      REAL(dp),pointer     :: da_absolute_aperture  ! in case one tracks with da.
@@ -816,7 +815,8 @@ module my_own_1D_TPSA
   public
   private input_real_in_my_1D_taylor
   integer :: n_tpsa_exp = 10
-  integer, parameter :: N_my_1D_taylor=9  ! SHOULD BE AS ENGE_N
+  integer, parameter :: N_my_1D_taylor=31  ! SHOULD BE AS ENGE_N
+  integer, private :: No_my_1D_taylor=N_my_1D_taylor  ! SHOULD BE AS ENGE_N
 
   private mul,dmulsc,dscmul,INV
   private div,ddivsc,dscdiv,Idivsc
@@ -901,8 +901,18 @@ module my_own_1D_TPSA
 
 contains
 
+  subroutine set_my_taylor_no(no)
+    implicit none
+    integer no
 
+    if(no>N_my_1D_taylor) then
+       No_my_1D_taylor=N_my_1D_taylor
+       write(6,*) " warning NO too big in set_my_taylor_no: recompile FPP if needed "
+    else
+       No_my_1D_taylor=no
+    endif
 
+  end subroutine set_my_taylor_no
 
   FUNCTION add( S1, S2 )
     implicit none
@@ -993,9 +1003,9 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1, S2
     integer I,J
     mul%a=zero
-    DO I=0,N_my_1D_taylor
-       DO J=0,N_my_1D_taylor
-          IF(I+J>N_my_1D_taylor) CYCLE
+    DO I=0,No_my_1D_taylor
+       DO J=0,No_my_1D_taylor
+          IF(I+J>No_my_1D_taylor) CYCLE
           mul%a(I+J)=S1%a(I)*S2%a(J)+ mul%a(I+J)
        ENDDO
     ENDDO
@@ -1076,7 +1086,7 @@ contains
     TT=T
     inv=one
 
-    DO I=1,N_my_1D_taylor
+    DO I=1,No_my_1D_taylor
        INV=INV-TT
        TT=-TT*T
     ENDDO
@@ -1139,7 +1149,7 @@ contains
     DEXPT=one
     tt=one
 
-    do i=1,N_my_1D_taylor
+    do i=1,No_my_1D_taylor
        tt=tt*t/i
        DEXPT=DEXPT + tt
     enddo
@@ -1157,9 +1167,9 @@ contains
 
     T=S1/S1%A(0)
     T%A(0)=zero
-
+    DLOGT=zero
     TT=T
-    do i=1,N_my_1D_taylor
+    do i=1,No_my_1D_taylor
        DLOGT=TT/I+DLOGT
        TT=-TT*T
     ENDDO
@@ -1172,14 +1182,15 @@ contains
     implicit none
     type (my_1D_taylor) DSQRTT,t
     type (my_1D_taylor), INTENT (IN) :: S1
-    WRITE(6,*) " MARDE "
-    STOP 666
-    T=S1/S1%A(0)
-    T%A(0)=zero
+    ! WRITE(6,*) " MARDE "
+    ! STOP 666
+    ! T=S1/S1%A(0)
+    ! T%A(0)=zero
 
-    DSQRTT=one + T/two - T**2/eight+T**3/c_16
-    DSQRTT=DSQRTT* SQRT(S1%A(0))
-
+    ! DSQRTT=one + T/two - T**2/eight+T**3/c_16
+    ! DSQRTT=DSQRTT* SQRT(S1%A(0))
+    DSQRTT=log(s1)/two
+    DSQRTT=exp(DSQRTT)
   END FUNCTION  DSQRTT
 
   FUNCTION DCOST(S1)

@@ -25,7 +25,8 @@ module complex_taylor
   private datantt,dasintt,dacostt,full_abstpsat
   integer,private::NO,ND,ND2,NP,NDPT,NV           !,lastmaster 2002.12.13
   logical(lp),private::old
-
+  logical :: debug_flag =.false.
+  logical :: debug_acos=.false.
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL
@@ -2513,7 +2514,6 @@ contains
     call alloc(s)
     call alloc(ss)
 
-
     r1=s1%r.sub.'0'
     i1=s1%i.sub.'0'
 
@@ -2663,33 +2663,57 @@ contains
     master=localmaster
   END FUNCTION dasint
 
+
+
+
   FUNCTION dacostt( S1 )
     implicit none
     TYPE (taylor) dacostt
     TYPE (complextaylor) temp
     TYPE (taylor), INTENT (IN) :: S1
+    TYPE (taylor) t
     integer localmaster
     real(dp) a0
     localmaster=master
 
     call ass(dacostt)
     call alloc(temp)
+    call alloc(t)
 
-    temp%r=s1
-
-    a0=abs(temp%r)
+    a0=abs(s1)
     if(a0>one) then
        check_stable=.false.
        stable_da=.false.
        messagelost= " Not defined in dacostt of complex_taylor "
     endif
 
+    !   if(debug_flag) then
+    !    if(debug_acos) then
+    temp%r=s1
     temp=acos(temp)
+    !    else
+    !     temp=-one+s1**2
+    !     temp=temp**(half)
+
+    !      temp=(s1+ temp)
+    !      temp=-i_*log(temp)
+    !     endif
+    !    else
+    !     t=sqrt(one-s1**2)
+
+    !     temp=(s1+ i_*t)
+    !     temp=-i_*log(temp)
+    !    endif
+    !   call print(temp%r,10)
     dacostt=temp%r
+
+    call kill(t)
     call kill(temp)
 
     master=localmaster
   END FUNCTION dacostt
+
+
 
   FUNCTION dacost( S1 )
     implicit none
@@ -2701,10 +2725,10 @@ contains
     call ass(dacost)
     call alloc(temp)
 
-    temp=-one+s1**2
+    temp=one-s1**2
     temp=temp**(half)
 
-    temp=(s1+ temp)
+    temp=(s1+ i_*temp)
     dacost=-i_*log(temp)
 
     call kill(temp)

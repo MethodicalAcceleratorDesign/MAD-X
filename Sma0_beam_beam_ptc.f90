@@ -494,6 +494,4 @@ contains
     call kill( z,zt,w)
 
   end SUBROUTINE ccperrfP
-
-
 end module  beam_beam_ptc

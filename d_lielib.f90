@@ -44,6 +44,7 @@ module lielib_yang_berz
   logical :: perform_flip = .true.
   integer time_plane
   real(dp), private :: stmem(ndim)
+  logical(lp) :: courant_snyder=.true.
 contains
 
 
@@ -2895,6 +2896,7 @@ contains
     do i=1,nd-ndc
        if(x(i).lt.zero) xx(i)=-one
        x(i)=SQRT(abs(x(i)))
+       if(.not.courant_snyder) x(i)=one
     enddo
     do i=1,nd2-ndc2
        do j=1,nd-ndc
@@ -2932,7 +2934,7 @@ contains
           s1(2*i,2*i-1)=zero
           s1(2*i,2*i)=xd
        enddo
-       call mulnd2(s1,sai)
+       if(courant_snyder) call mulnd2(s1,sai)
        ! sa is now uniquely and unambigeously determined.
     endif
     do i=1,nd2
@@ -3617,8 +3619,10 @@ contains
           w_p%nc=1
           w_p%fc='((1X,A120))'
           w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
-          CALL WRITE_a
-          write(6,*) sqrt(reval(i)**2+aieval(i)**2)
+          if(lielib_print(4)==1) then
+             CALL WRITE_a
+             write(6,*) sqrt(reval(i)**2+aieval(i)**2)
+          endif
        endif
     enddo
     return

@@ -36,7 +36,6 @@ MODULE S_DEF_ELEMENT
   integer :: mfpolbloc=0
   logical(lp),target :: recirculator_cheat=my_false
   PRIVATE TRACKR,TRACKP
-  logical(lp),TARGET :: other_program=.false.
 
   ! Old home for element and elementp, now in sh_def_kind
 
@@ -1908,12 +1907,14 @@ CONTAINS
 
   END SUBROUTINE ZERO_ANBN_P
 
-  SUBROUTINE transfer_ANBN(EL,ELP,NM,VR,VP)
+  SUBROUTINE transfer_ANBN(EL,ELP,NM,VR,DVR,VP,DVP)
     IMPLICIT NONE
     TYPE(ELEMENT),TARGET, INTENT(INOUT) ::EL
     TYPE(ELEMENTp),TARGET, INTENT(INOUT) ::ELp
     real(dp),OPTIONAL :: VR
+    real(dp),OPTIONAL :: DVR
     TYPE(REAL_8),OPTIONAL :: VP
+    TYPE(REAL_8),OPTIONAL :: DVP
     INTEGER, INTENT(IN) ::NM
     INTEGER N
     if(EL%KIND==kind1) return
@@ -1922,8 +1923,8 @@ CONTAINS
     IF(EL%P%NMUL>=1) THEN
        if(nm==1) then
           do n=1,EL%P%NMUL
-             EL%BN(N)= vR*ELp%BN(N)
-             EL%AN(N)= vR*ELp%AN(N)
+             EL%BN(N)= vR*ELp%BN(N)+DVR*EL%D_BN(N)
+             EL%AN(N)= vR*ELp%AN(N)+DVR*EL%D_AN(N)
           enddo
           if(el%kind==kind10) then
              call GETANBN(EL%TP10)
@@ -1934,8 +1935,8 @@ CONTAINS
           if(associated(EL%b_sol)) EL%b_sol= vR*ELp%b_sol
        else
           do n=1,EL%P%NMUL
-             ELp%BN(N)= vP*EL%BN(N)
-             ELp%AN(N)= vP*EL%AN(N)
+             ELp%BN(N)= vP*EL%BN(N)+DVP*EL%D_BN(N)
+             ELp%AN(N)= vP*EL%AN(N)+DVP*EL%D_AN(N)
           enddo
           if(el%kind==kind10) then
              call GETANBN(ELp%TP10)
@@ -1945,6 +1946,14 @@ CONTAINS
           endif
           if(associated(ELp%b_sol)) ELp%b_sol= vP*EL%b_sol
        endif
+       if(valishev.and.abs(el%h2)>=eps)   then  !valishev
+          if(nm==1) then
+             EL%h1= vr*elp%h1
+          else
+             ELp%h1= vp*el%h1
+          endif
+       endif !valishev
+
        RETURN
     ENDIF
 
@@ -1993,6 +2002,13 @@ CONTAINS
           call ALLOC(ELP%b_sol)
           ELp%b_sol= EL%b_sol
        ENDIF
+       if(valishev.and.abs(el%h2)>=eps)   then  !valishev
+          if(nm==1) then
+             EL%h1= elp%h1
+          else
+             ELp%h1= el%h1
+          endif
+       endif !valishev
        RETURN
     ENDIF
 
@@ -2258,6 +2274,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);
     nullify(EL%THIN);
     nullify(EL%MIS); !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2311,6 +2328,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);
     nullify(EL%THIN);
     nullify(EL%MIS);  !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2375,7 +2393,9 @@ CONTAINS
        IF(ASSOCIATED(EL%a_ac)) DEALLOCATE(EL%a_ac)
        IF(ASSOCIATED(EL%theta_ac)) DEALLOCATE(EL%theta_ac)
        IF(ASSOCIATED(EL%DC_ac)) DEALLOCATE(EL%DC_ac)
-
+       IF(ASSOCIATED(EL%D_AC)) DEALLOCATE(EL%D_AC)
+       IF(ASSOCIATED(EL%D_AN)) DEALLOCATE(EL%D_AN)
+       IF(ASSOCIATED(EL%D_BN)) DEALLOCATE(EL%D_BN)
        IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
        IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
@@ -2677,6 +2697,19 @@ CONTAINS
           call kill(el%DC_ac)
           DEALLOCATE(EL%DC_ac)
        endif
+       IF(ASSOCIATED(EL%D_AC)) then
+          call kill(el%D_AC)
+          DEALLOCATE(EL%D_AC)
+       endif
+       IF(ASSOCIATED(EL%D_AN)) then
+          call kill(el%D_AN)
+          DEALLOCATE(EL%D_AN)
+       endif
+       IF(ASSOCIATED(EL%D_BN)) then
+          call kill(el%D_BN)
+          DEALLOCATE(EL%D_BN)
+       endif
+
 
 
        call kill(EL%P)        ! call kill(EL%P)    ! AIMIN MS 4.0
@@ -2780,6 +2813,31 @@ CONTAINS
     IF(ASSOCIATED(EL%DC_ac)) then
        ELP%DC_ac=EL%DC_ac
     endif
+    IF(ASSOCIATED(EL%D_AC)) then
+       ELP%D_AC=EL%D_AC
+
+       IF(EL%P%NMUL>0) THEN
+          IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
+             call kill(ELP%D_AN,ELP%P%NMUL);call kill(ELP%D_bN,ELP%P%NMUL);
+             DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+          endif
+          if(.not.ASSOCIATED(ELP%D_AN)) THEN
+             ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+          ENDIF
+
+
+          CALL ALLOC(ELP%D_AN,EL%P%NMUL)
+          CALL ALLOC(ELP%D_BN,EL%P%NMUL)
+          DO I=1,EL%P%NMUL
+             ELP%D_AN(I) = EL%D_AN(I)
+             ELP%D_BN(I) = EL%D_BN(I)
+          ENDDO
+
+       ENDIF
+
+    endif
+
+
 
 
     IF(EL%P%NMUL>0) THEN
@@ -3055,6 +3113,30 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
+    IF(ASSOCIATED(EL%D_AC)) then
+       ELP%D_AC=EL%D_AC
+
+       IF(EL%P%NMUL>0) THEN
+          IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
+             DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+          endif
+          if(.not.ASSOCIATED(ELP%D_AN)) THEN
+             ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+          ENDIF
+
+          DO I=1,EL%P%NMUL
+             ELP%D_AN(I) = EL%D_AN(I)
+             ELP%D_BN(I) = EL%D_BN(I)
+          ENDDO
+
+       ENDIF
+
+    endif
+
+
+
+
+
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
           DEALLOCATE(ELP%AN );DEALLOCATE(ELP%BN )
@@ -3322,6 +3404,25 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
+    IF(ASSOCIATED(EL%D_AC)) then
+       ELP%D_AC=EL%D_AC
+
+       IF(EL%P%NMUL>0) THEN
+          IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
+             DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+          endif
+          if(.not.ASSOCIATED(ELP%D_AN)) THEN
+             ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+          ENDIF
+
+          DO I=1,EL%P%NMUL
+             ELP%D_AN(I) = EL%D_AN(I)
+             ELP%D_BN(I) = EL%D_BN(I)
+          ENDDO
+
+       ENDIF
+
+    endif
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -3572,7 +3673,15 @@ CONTAINS
     if(associated(ELP%theta_ac)) CALL resetpoly_R31(ELP%theta_ac)         ! SHARED BY EVERYONE
     if(associated(ELP%a_ac)) CALL resetpoly_R31(ELP%a_ac)         ! SHARED BY EVERYONE
     if(associated(ELP%DC_ac)) CALL resetpoly_R31(ELP%DC_ac)         ! SHARED BY EVERYONE
-
+    if(associated(ELP%D_ac)) then
+       CALL resetpoly_R31(ELP%D_ac)         ! SHARED BY EVERYONE
+       IF(ELP%P%NMUL>0) THEN             ! SHARED BY A LOT
+          DO I=1,ELP%P%NMUL
+             CALL resetpoly_R31(ELP%d_AN(I))
+             CALL resetpoly_R31(ELP%d_BN(I))
+          ENDDO
+       ENDIF
+    endif
     IF(ELP%P%NMUL>0) THEN             ! SHARED BY A LOT
        DO I=1,ELP%P%NMUL
           CALL resetpoly_R31(ELP%AN(I))

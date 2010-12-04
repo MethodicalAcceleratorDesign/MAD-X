@@ -156,7 +156,8 @@ TYPE ELEMENT
    real(dp),   POINTER:: H1,H2         !FRINGE FUDGE FOR MAD
    !
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,LAG       ! Cavity information
-   real(dp), POINTER :: DC_ac,A_ac,theta_ac      ! slow RF: amplitude and phase
+   real(dp), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
+   real(dp),   DIMENSION(:), POINTER:: D_AN,D_BN         !Multipole component
    logical(lp), POINTER :: THIN,slow_ac
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    !  misalignements and rotation
@@ -212,7 +213,8 @@ TYPE ELEMENTP
    !
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS ! CAVITY INFORMATION
    real(dp), POINTER :: DELTA_E     ! CAVITY ENERGY GAIN
-   TYPE(REAL_8), POINTER :: DC_ac,A_ac,theta_ac      ! slow RF: amplitude and phase
+   TYPE(REAL_8), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
+   TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN,D_BN         !Multipole component
    !
    TYPE(REAL_8), POINTER :: B_SOL
    logical(lp), POINTER :: THIN,slow_ac

@@ -270,18 +270,18 @@ module definition
      type(damapspin) ar   ! normalises around the fixed point
      type(damapspin) as   ! pure spin map
      type(damapspin) a_t  ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
-!!!  extra info
+!!!  extra spin info
      integer M(NDIM,NRESO),MS(NRESO),NRES  ! orbital and spin resonances to be left in the map
      type(real_8) n0(3)     ! n0 vector
      type(real_8) theta0    !  angle for the matrix around the orbit (analogous to linear tunes)
-!!!Envelope
+     real(dp) nu    !  spin tune
+!!!Envelope radiation stuff
      real(dp) s_ij0(6,6)  !  equilibrium beam sizes
      real(dp) emittance(3),tune(3),damping(3)   ! equilibrium emittances (partially well defined only for infinitesimal damping)
      logical(lp) AUTO,STOCHASTIC
      real(dp)  KICK(3)   ! fake kicks for tracking stochastically
      real(dp)  STOCH(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
   end type normal_spin
-
 
   include "a_def_frame_patch_chart.inc"
   include "a_def_all_kind.inc"

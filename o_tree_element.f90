@@ -2978,7 +2978,7 @@ CONTAINS
     type(real_8), intent(inout) :: theta0
     type(spinor_8), intent(inout) :: n0
 
-    call get_spin_n0(DS,theta0,n0%x)
+    call get_spin_n0(DS,theta0,n0%x)  !get_spin_nx_t
 
   end subroutine get_spin_nx_spinor_8
 
@@ -3758,6 +3758,7 @@ CONTAINS
     D%AUTO=my_true
     D%STOCHASTIC=my_false
     D%STOCH=zero
+    D%nu=zero
 
 
   END    subroutine alloc_normal_spin
@@ -3881,6 +3882,7 @@ CONTAINS
        a13=s%s(1,3)
 
        ns%theta0=clockwise*atan2(a13,a11)
+       ns%nu=ns%theta0/twopi
        if(force_positive.and.ns%theta0<zero)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
 
        ns%as=ns%as*a
@@ -3925,6 +3927,24 @@ CONTAINS
 
 
   end subroutine fetch_s0
+
+
+  subroutine dalog_spinor_8(DS,n)
+    implicit none
+    TYPE(damapspin), INTENT(INout) :: DS
+    TYPE(spinor_8), INTENT(INout) :: n
+    TYPE(taylor) om(3)
+    integer i
+    call alloc(om)
+
+    call dalog(DS,om)
+
+    do i=1,3
+       n%x(i)=morph(om(i))
+    enddo
+
+    call kill(om)
+  end subroutine dalog_spinor_8
 
   subroutine dalog(DS,om)
     implicit none
@@ -4360,7 +4380,7 @@ CONTAINS
     enddo
 
     if(norm==zero) then
-       write(6,*) " Radiation Envelope  is zero : not printed "
+       if(global_verbose) write(6,*) " Radiation Envelope  is zero : not printed "
        rad_in=.false.
     endif
 
@@ -4395,9 +4415,9 @@ CONTAINS
     ! Apply the transformation found in step 1 to ds
     ds=ns%as**(-1)*ds*ns%as
     ! Apply the transformation found in step 1 to ds
-    ds=ns%ar**(-1)*ds*ns%ar
+    ds=ns%ar**(-1)*ds*ns%ar   ! around fixed point and transversely normalised
 
-    call fetch_s0(DS,ds0)
+    call fetch_s0(DS,ds0)   ! ds0=(I,exp(theta0 L_y) )
 
 
     ns%a_t=1

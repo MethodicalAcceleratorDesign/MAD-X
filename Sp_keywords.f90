@@ -426,7 +426,8 @@ contains
          OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE,&
          " SECTOR_NMUL_MAX,SECTOR_NMUL,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE"
     write(mf,'(a255)')line
-    write(MF,*) wedge_coeff, " wedge_coeff"
+    write(line,*) wedge_coeff,valishev, " wedge_coeff", " Valishev Multipole "
+    write(mf,'(a255)')line
     write(MF,*) MAD8_WEDGE, " MAD8_WEDGE"
     write(MF,*) " $$$$$$$ END GLOBAL DATA $$$$$$$$$$"
 
@@ -506,8 +507,14 @@ contains
     read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
     call input_sector(se2,se1)
 
+    read(MF,'(A255)') lineg
+    res=INDEX (lineG, "Valishev")
+    IF(RES==0) THEN
+       read(lineg,*) wedge_coeff
+    ELSE
+       read(lineg,*) wedge_coeff,valishev
+    ENDIF
 
-    read(MF,*) wedge_coeff
     read(MF,*) MAD8_WEDGE
     read(MF,'(a255)') line
     original=default
@@ -1647,7 +1654,13 @@ contains
     read(MF,*) phase0,compute_stoch_kick,initial_charge
     read(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING
     read(MF,*) se1,se2,OLD_IMPLEMENTATION_OF_SIXTRACK,HIGHEST_FRINGE
-    read(MF,*) wedge_coeff
+    read(MF,'(A255)') lineg
+    res=INDEX (lineG, "Valishev")
+    IF(RES==0) THEN
+       read(lineg,*) wedge_coeff
+    ELSE
+       read(lineg,*) wedge_coeff,valishev
+    ENDIF
     read(MF,*) MAD8_WEDGE
     read(MF,'(a120)') line
     original=default

@@ -3426,8 +3426,9 @@ CONTAINS
           w_p=0
           w_p%nc=1
           w_p%fc='(1((1X,A72)))'
-          write(w_p%c(1),'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
-          call write_e
+          write(6,'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
+          !          write(w_p%c(1),'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
+          !          call write_e
        enddo
     endif
   END   SUBROUTINE report_level

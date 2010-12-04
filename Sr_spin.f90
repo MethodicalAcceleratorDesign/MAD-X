@@ -1565,6 +1565,11 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
+    if(valishev)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       b(1)=b(1)+BBXTW !valishev
+       b(2)=b(2)+BBYTW !valishev
+    endif !valishev
   END SUBROUTINE get_BfieldR
 
   SUBROUTINE get_BfieldP(EL,B,X)
@@ -1598,6 +1603,11 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
+    if(valishev)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BBXTW,BBYTW) !valishev
+       b(1)=b(1)+BBXTW !valishev
+       b(2)=b(2)+BBYTW !valishev
+    endif !valishev
     CALL KILL(X1,X3,BBYTW,BBXTW,BBYTWT)
   END SUBROUTINE get_BfieldP
 
@@ -1678,6 +1688,11 @@ contains
     B(1)=BY/(one+EL%P%B0*X(1))
     B(2)=-BX/(one+EL%P%B0*X(1))
     B(3)=zero
+    if(valishev)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BTX,BTY) !valishev
+       b(1)=b(1)+BTX !valishev
+       b(2)=b(2)+BTY !valishev
+    endif !valishev
 
   END SUBROUTINE GETMULB_TEAPOTR
 
@@ -1760,6 +1775,11 @@ contains
     B(1)=BY/(one+EL%P%B0*X(1))
     B(2)=-BX/(one+EL%P%B0*X(1))
     B(3)=zero
+    if(valishev)   then  !valishev
+       call elliptical_b(el%h1,el%h2,x,BTX,BTY) !valishev
+       b(1)=b(1)+BTX !valishev
+       b(2)=b(2)+BTY !valishev
+    endif !valishev
 
     CALL KILL(X1,X3,BX,BY,BTX,BTY,BtYT)
 
@@ -2955,18 +2975,21 @@ contains
     TYPE(INTERNAL_STATE) K
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELp
-    REAL(DP) v
+    REAL(DP) v,dv
 
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
 
     IF(K%MODULATION) THEN
-       V=EL%DC_ac+EL%A_ac*(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+       V=EL%DC_ac+EL%A_ac*DV
+       DV=el%D_ac*DV
     else
        V=EL%DC_ac
+       DV=zero
     endif
-    call transfer_ANBN(EL,ELP,1,VR=V)
+    call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
 
   END   SUBROUTINE MODULATE_R
 
@@ -2977,21 +3000,26 @@ contains
     TYPE(INTERNAL_STATE) K
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELP
-    TYPE(REAL_8) V
+    TYPE(REAL_8) V,DV
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
 
     CALL ALLOC(V)
+    CALL ALLOC(DV)
 
     IF(K%MODULATION) THEN
-       V=ELP%DC_ac+ELP%A_ac*(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
+       DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
+       V=ELP%DC_ac+ELP%A_ac*DV
+       DV=DV
     else
-       V=EL%DC_ac
+       DV=elp%D_ac*DV
+       DV=zero
     endif
 
-    call transfer_ANBN(EL,ELP,2,VP=V)
+    call transfer_ANBN(EL,ELP,2,VP=V,DVP=DV)
     CALL KILL(V)
+    CALL KILL(DV)
 
 
   END   SUBROUTINE MODULATE_P
@@ -4221,11 +4249,10 @@ contains
 
   END SUBROUTINE find_ENVELOPE
 
-  SUBROUTINE stroboscopic_average(ring,xs0,xst,x0,pos,mstate0,nturn,kp,n)
+  SUBROUTINE stroboscopic_average(ring,xs0,xst,pos,mstate0,nturn,kp,n)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: RING
     type(probe) , intent(inout) :: xs0,xst
-    real(dp), intent(in) ::x0(6)
     TYPE(INTERNAL_STATE) mstate0,mstate
     integer, intent(in) :: kp,pos,nturn
     integer i,k,imax,nd2
@@ -4241,7 +4268,7 @@ contains
        call track_probe(ring,xs0,mstate,node1=pos)  !,fibre2=3)
 
        do i=1,3
-          xst%s(i)%x=xs0%s(i)%x+xst%s(i)%x
+          xst%s(i)%x=xs0%s(i)%x+xst%s(i)%x  ! <---- Stroboscopic average
        enddo
 
        if(mod(k,kp)==0) then  ! kp
@@ -4271,7 +4298,6 @@ contains
           norm0=norm
        endif
     enddo
-
 
   end SUBROUTINE stroboscopic_average
 

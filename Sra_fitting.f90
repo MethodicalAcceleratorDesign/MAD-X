@@ -1668,6 +1668,93 @@ contains
 
   end subroutine invert_monitors
 
+  subroutine invert_monitors_old(kind,zf0,g)
+    implicit none
+    type(damap) ex
+    type(gmap) gi,g
+    real(dp) zf(4),zx(6),zf0(4)
+    integer kind,i
+
+    zf=zf0
+
+    call alloc(ex)
+    call alloc(gi)
+    ! zf contains measuments xf(x_1,x_11,y_2,y_22)
+    gi=g
+
+    if(kind==1) then
+       !write(6,*) zf(1:4)
+       zx=zero
+       zx(1)=zf(1)
+       zx(2)=zf(2)   !!!
+       ex=0
+       ex=zx
+       ex%v(3)=ex%v(3)+(1.d0.mono.3)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
+       zx=zero
+       zx(1)=zf(1)
+       zx(3)=zf(3)   !!!
+       ex=0
+       ex=zx
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+
+       gi%v(3)=(gi%v(3).o.ex)-(1.d0.mono.3)
+       zx=zero
+       zx(1)=zf(1)
+       zx(4)=zf(4)   !!!
+       ex=0
+       ex=zx
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(3)=ex%v(3)+(1.d0.mono.3)
+       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
+       !call print(gi,6)
+       gi%v(1)=gi%v(1)-zf(1)
+
+    else
+       !write(6,*) zf(1:4)
+
+       zx=zero
+       zx(3)=zf(3)
+       zx(4)=zf(4)   !!!
+       ex=0
+       ex=zx
+       ex%v(1)=ex%v(1)+(1.d0.mono.1)
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
+       zx=zero
+       zx(1)=zf(1)
+       zx(3)=zf(3)   !!!
+       ex=0
+       ex=zx
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+
+       gi%v(1)=(gi%v(1).o.ex)-(1.d0.mono.1)
+       zx=zero
+       zx(3)=zf(3)
+       zx(2)=zf(2)   !!!
+       ex=0
+       ex=zx
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+       ex%v(1)=ex%v(1)+(1.d0.mono.1)
+       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
+       !call print(gi,6)
+
+       gi%v(3)=gi%v(3)-zf(3)
+    endif
+
+    gi=gi.oo.(-1)
+
+
+    zf0=gi
+
+    call kill(ex)
+    call kill(gi)
+
+  end subroutine invert_monitors_old
+
 
   subroutine  alex_mom_monitors
     implicit none
@@ -1875,7 +1962,7 @@ contains
   end subroutine kill_fibre_monitor_data
 
 
-
+!!!1 this is the correct one
   subroutine  alex_mom_real_monitors_old(ring,jm,jn,x,state_in)
     implicit none
     integer ipause, mypause
@@ -2197,60 +2284,6 @@ contains
 
   end subroutine  alex_mom_real_monitors_old
 
-  subroutine invert_monitors_old(kind,g)
-    implicit none
-    type(damap) ex
-    type(gmap) gi,g
-    integer kind
-
-
-    call alloc(ex)
-    call alloc(gi)
-    ! zf contains measuments xf(x_1,x_11,y_2,y_22)
-    gi=g
-
-    if(kind==1) then
-       !write(6,*) zf(1:4)
-       ex=0
-       ex%v(3)=ex%v(3)+(1.d0.mono.3)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
-       ex=0
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       gi%v(3)=(gi%v(3).o.ex)-(1.d0.mono.3)
-       ex=0
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(3)=ex%v(3)+(1.d0.mono.3)
-       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
-
-       gi%v(1)=gi%v(1)
-
-    else
-
-       ex=0
-       ex%v(1)=ex%v(1)+(1.d0.mono.1)
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
-       ex=0
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       gi%v(1)=(gi%v(1).o.ex)-(1.d0.mono.1)
-       ex=0
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       ex%v(1)=ex%v(1)+(1.d0.mono.1)
-       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
-       gi%v(3)=gi%v(3)
-    endif
-
-    gi=gi.oo.(-1)
-
-    g=gi
-
-    call kill(ex)
-    call kill(gi)
-
-  end subroutine invert_monitors_old
 
 
 end module S_fitting_new
