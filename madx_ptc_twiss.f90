@@ -25,6 +25,7 @@ module madx_ptc_twiss_module
   !  PRIVATE
   !    data structures
 
+  type(real_8)            :: theTransferMap(6) !PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
   type(universal_taylor)  :: unimap(6)
 
   type twiss
@@ -61,6 +62,7 @@ module madx_ptc_twiss_module
   integer,  private, parameter          :: ndd=ndim2
   integer,  private, dimension(4)       :: iia,icoast
   integer,  private                     :: np
+  integer,  private                     :: filecode=1
 
   !new lattice function
   real(dp), private, dimension(3)       :: testold
@@ -319,7 +321,7 @@ contains
     real(dp)                :: deltap0,deltap ,d_val
     real(kind(1d0))         :: get_value,suml
     integer                 :: geterrorflag !C function that returns errorflag value
-    type(real_8)            :: y(6), transfermap(6)
+    type(real_8)            :: y(6)
     type(twiss)             :: tw
     type(fibre), POINTER    :: current
     type(work)              :: startfen !Fibre energy at the start
@@ -329,10 +331,10 @@ contains
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
     !logical(lp)             :: skipnormalform, 
-    logical(lp)             :: tracktm
     character(48)           :: summary_table_name
-    character(48) charconv
-
+    character(48)           :: tmfile
+    character(48) charconv !routine
+    
     call resetBetaExtremas()
 
     !skipnormalform = my_false
@@ -467,19 +469,10 @@ contains
     y=npara
     Y=X
 
-    call alloc(transfermap)
+    call alloc(theTransferMap)
 
-    if ( getnpushes() > 0 .or. rmatrix > 0) then
-       tracktm = my_true
-    else
-       tracktm = my_false
-    endif
-
-
-    if (tracktm) then
-       transfermap = npara
-       transfermap = X
-    endif
+    theTransferMap = npara
+    theTransferMap = X
 
     !    if (maxaccel .eqv. .false.) then
     !      cavsareset = .false.
@@ -495,9 +488,9 @@ contains
 
     call setknobs(my_ring)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !  INIT Y that is tracked          !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap(dt)
 
     if (geterrorflag() /= 0) then
@@ -572,14 +565,10 @@ contains
              !         if (getnknobis() > 0) c_%knob = my_true
              !print*, "parametric",i,c_%knob
              call track(my_ring,y,i,i+1,+default)
-             if (tracktm) then
-                call track(my_ring,transfermap,i,i+1,+default)
-             endif
+             call track(my_ring,theTransferMap,i,i+1,+default)
           else
              call track(my_ring,y,i,i+1, default)
-             if (tracktm) then
-                call track(my_ring,transfermap,i,i+1,default)
-             endif
+             call track(my_ring,theTransferMap,i,i+1,default)
           endif
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              call fort_warn('ptc_twiss: ','DA got unstable')
@@ -618,11 +607,9 @@ contains
           ! compute the Twiss parameters
           tw=y
 
-          call puttwisstable(transfermap)
+          call puttwisstable(theTransferMap)
 
-          if (tracktm) then
-             call putusertable(i,current%mag%name,suml,getdeltae(),transfermap,y)
-          endif
+          call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap,y)
 
 
 
@@ -645,21 +632,36 @@ contains
     print77=.false.
     read77=.false.
 
-    call kanalnummer(mf2)
-    ! avoid file name conflict between slice.madx and center.madx
-    ! which are located under same testing directory
-    if (get_value('ptc_twiss ','center_magnets ').ne.0) then
-       open(unit=mf2,file='end_center.map')
-    else
-       open(unit=mf2,file='end.map')
-    endif
-    call print(y,mf2)
-    close(mf2)
-    ! relocated here to avoid side-effect
+    if (getdebug() > 2) then
+      call kanalnummer(mf2)
+      write(tmfile,'(i2,a3)') filecode, '.tm'
+      print *, 'Filename for transfer map is ', tmfile
+      open(unit=mf2,file=tmfile)
+      write(mf2,*) '=============================='
+      write(mf2,*) '===      TRANSFER MAP      ==='
+      call print(theTransferMap,mf2)
+      close(mf2)
+      filecode = filecode + 1
+    
 
+      call kanalnummer(mf2)
+      ! avoid file name conflict between slice.madx and center.madx
+      ! which are located under same testing directory
+      if (get_value('ptc_twiss ','center_magnets ').ne.0) then
+         open(unit=mf2,file='end_center.map')
+      else
+         open(unit=mf2,file='end.map')
+      endif
+
+      call print(y,mf2)
+
+      close(mf2)
+
+    endif  
+     
 
     ! 26 november 2009
-    call oneTurnSummary(isRing)
+    call oneTurnSummary(isRing, theTransferMap , x, suml)
     call set_option('ptc_twiss_summary ',1)
     ! 26 november 2009: comment the following and replace by the above
     !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
@@ -684,16 +686,14 @@ contains
     call kill(tw)
     CALL kill(y)
 
-    !  if (tracktm) then
-    CALL kill(transfermap)
-    !  endif
+    CALL kill(theTransferMap)
 
     do i=1,6
        call kill(unimap(i))
     enddo
 
     call finishknobs()
-
+    
     if (savemaps) then  !do it at the end, so we are sure the twiss was successful
        mapsorder = no
        mapsicase = icase
@@ -1805,10 +1805,13 @@ contains
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
-    subroutine oneTurnSummary(isRing)
+    subroutine oneTurnSummary(isRing,oneTurnMap,state,suml)
 
       implicit none
       logical :: isRing ! true for rings, false for lines
+      type(real_8),target :: oneTurnMap(6)
+      real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      real(dp) :: suml ! cumulative length along the ring
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
       real(dp) :: alpha_c_p ! first order derivative w.r.t delta-p/p
@@ -1818,13 +1821,10 @@ contains
       !  with respect to other particles is determined by its path length instead of by its velocity
       real(dp) :: deltap
       real(dp) :: betaRelativistic, gammaRelativistic
-      real(dp) :: suml ! cumulative length along the ring
       real(dp) :: fractionalTunes(ndim)
       real(dp) :: chromaticities(2)
       integer :: i,j
-      real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: sd ! as in twiss.F
-      type(real_8) :: oneTurnMap(6)
       type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
       type(damap) :: yy ! added on November 6th to retreive momemtum compaction without differentiating the formula
       integer, dimension(6,6) :: coeffSelector = &
@@ -1847,73 +1847,13 @@ contains
 
       debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
 
-      ! 1. track along the machine to get its cumulative length
-      fibrePtr => my_ring%start
-      suml = zero
-      do i=1,my_ring%n
-         suml = suml+fibrePtr%mag%p%ld
-         fibrePtr => fibrePtr%next
-         ! instead, could loop until we encounter the end-ground of the layout
-      enddo
 
       ! 2. retreive the relativistic parameters beta and gamma
       ! (beta=v/c, gamma=E/mc^2 and gamma=1/sqrt(1-beta^2))
       betaRelativistic = get_value('probe ','beta ');
       gammaRelativistic = get_value('probe ','gamma ');
 
-      ! 3. need the one-turn map's coefficients to reproduce twiss.F formulas for momentum compaction
-
-
-      state(:)=zero
-
-      ! added 9 march 2009 to take into dependency on deltap, as done in subroutine 'ptc_twiss'
       icase = get_value('ptc_twiss ','icase ') ! mind the trailing space
-      !write(0,*) 'icase=',icase
-      deltap0 = get_value('ptc_twiss ','deltap ') ! mind the trailing space
-      deltap = zero
-      call my_state(icase,deltap,deltap0)
-      if (mytime) then
-         call Convert_dp_to_dt(deltap,dt)
-      else
-         dt = deltap
-      endif
-      if (icase.eq.5) then
-         state(5) = dt
-      endif
-      ! end of added part
-
-      if (isRing) then
-
-         call find_orbit(my_ring,state,1,default,c_1d_7)
-
-         ! write(6,*) 'NOW ORBIT IS ',state(:) => y, py, pt, -cT all ZERO !!! (idem in ptc_twiss)
-
-         if (.not.c_%stable_da) then
-            call fort_warn('ptc_twiss:','DA got unstable in momentum-compaction routine')
-            call seterrorflag(10,"ptc_twiss","DA got unstable in momentum-compaction routine")
-            stop
-            return
-         endif
-
-         if (debugFiles .eq. 1) then
-            write(21,*) "Closed orbit state=", state(1:6)
-         endif
-      else
-         ! 26 november 2009
-         ! in case of  a line, what is the initial state of the beam, for the time-being, assume zero
-         state = state
-      endif
-
-
-      ! need at least order 2 to get the chromaticities
-      ! no longer force order to 2 internally. Transmit the value passed when invoking ptc_twiss from the madx script.
-      call init_default(default,order,0)
-
-      call alloc(oneTurnMap)
-      oneTurnMap = npara ! ?
-      oneTurnMap = state
-      ! or should we create it as x+id?
-      call track(my_ring,oneTurnMap,1,default)
 
       ! now retrieve the one-turn map's coefficients
       if (debugFiles .eq. 1) then
@@ -2022,9 +1962,11 @@ contains
 
          ! terms involving derivatives of the dispersions
          do i=1,4
+            print*, 'sd=',sd,' disp=',dispersion_p(i)
             sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion_p(i)
          enddo
 
+         print*, 'sd=',sd
          alpha_c_p = sd * (betaRelativistic**2) / suml
 
          ! eventually, one could differentiate the above formula to obtain alpha_c_p2
@@ -2189,7 +2131,6 @@ contains
       real(dp) :: s
       integer(dp) :: knobsNumber
       real(dp) :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
-      type(real_8) :: theTransferMap(6) ! transfer map between successive inner thin-lenses
       type(normalform) :: theNormalForm
       type(real_8) :: theAscript(6) ! the phase-advance
       integer :: returnedInteger
@@ -2216,7 +2157,13 @@ contains
 
       call find_orbit(my_ring,state,1,default,c_1d_7) ! 1 for the first element
 
+      !allocated in the main routine ptc_twiss
+
+      CALL kill(theTransferMap)
       call alloc(theTransferMap) ! transfer map between two successive inner slices
+
+      
+      
       ! is it the correct way to initialize, or should we rely on y=x+id??
       theTransferMap = npara ! to be checked later-on
       theTransferMap = state
@@ -2230,6 +2177,10 @@ contains
       theAscript = state + theNormalForm%A_t ! linear part of the normal form
 
       call kill(theNormalForm) ! theAscript only is of interest from now on...
+
+      !not really, we need also transferMap
+      theTransferMap = npara ! to be checked later-on
+      theTransferMap = state
 
       ! my_ring%nthin does return 0, instead of the actual value, which we can get from my_ring%t%n
 
@@ -2262,19 +2213,18 @@ contains
          if (knobsNumber > 0) then
             call track_probe_x(my_ring,theAscript,+default, & ! +default in case of extra parameters !?
                  & node1=thinLensPos,node2=thinLensPos+1)
-            if (getnpushes() > 0) then ! try to understand this part later-on
-               call track_probe_x(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
-                    & node1=thinLensPos,node2=thinLensPos+1)
-            endif
+            !always calculate TM for summary table (PSk 20110105)
+            call track_probe_x(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
+                 & node1=thinLensPos,node2=thinLensPos+1)
          else
             ! do we really need track_probe_x, or simply track to go along inner slices?
             call track_probe_x(my_ring,theAscript,default, &
                  & node1=thinLensPos,node2=thinLensPos+1)
             !write(27,*) "beta new=", (theTransferMap(1).sub.'1')**2+(theTransferMap(1).sub.'01')**2
-            if (getnpushes() > 0) then ! try to understand this part later-on
-               call track_probe_x(my_ring,theTransferMap,default, &
-                    & node1=thinLensPos,node2=thinLensPos+1)
-            endif
+
+            !always calculate TM for summary table (PSk 20110105)
+            call track_probe_x(my_ring,theTransferMap,default, &
+                 & node1=thinLensPos,node2=thinLensPos+1)
          endif
 
          if ((.not. check_stable) .or. (.not. c_%stable_da)) then
@@ -2303,11 +2253,11 @@ contains
          ! suml is used internally to puttwisstable to save the curvilign abciss...
 
 
-         ! call puttwisstable(transfermap) ! writes the resulting tw above to an internal table
+         ! call puttwisstable(theTransferMap) ! writes the resulting tw above to an internal table
 
          if (nodePtr%next%cas==case0 .and. (.not. at_center_only)) then
             ! this an inner integration node i.e. neither an extremity nor a fringe node, both to be discarded
-            call puttwisstable(transfermap)
+            call puttwisstable(theTransferMap)
          endif
 
          if (at_center_only .and. associated(nodePtr,fibrePtr%tm)) then
@@ -2315,7 +2265,7 @@ contains
                if (fibrePtr%mag%L==0) then
                   ! this is a zero-length marker or monitor or equivalent
                   ! keep it
-                  call puttwisstable(transfermap)
+                  call puttwisstable(theTransferMap)
                elseif (fibrePtr%mag%kind==31) then ! this is a DRIFT
                   ! write(0,*) 'SKIP a drift of length',fibrePtr%mag%L,'was cut into an odd number of slices: ',fibrePtr%mag%p%nst
                   countSkipped = countSkipped + 1
@@ -2324,7 +2274,7 @@ contains
                   countSkipped = countSkipped + 1
                endif
             else ! this element has an even number of slices
-               call puttwisstable(transfermap)
+               call puttwisstable(theTransferMap)
             endif
          endif
 
@@ -2368,7 +2318,10 @@ contains
          call fort_warn('ptc_twiss ',msg)
       endif
 
-      call kill(theTransferMap)
+
+
+
+      !call kill(theTransferMap) PSk 2011.01.05 shared throu the module for summ table
       call kill(theAscript)
 
     end subroutine TrackAlongInnerSlices

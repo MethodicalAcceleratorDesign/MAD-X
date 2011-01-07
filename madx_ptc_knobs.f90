@@ -1329,6 +1329,21 @@ contains
     results(currentrow, gama32p) = zero
     results(currentrow, gama33p) = zero
 
+    results(currentrow, disp1p) = zero
+    results(currentrow, disp2p) = zero
+    results(currentrow, disp3p) = zero
+    results(currentrow, disp4p) = zero
+
+    results(currentrow, disp1p2) = zero
+    results(currentrow, disp2p2) = zero
+    results(currentrow, disp3p2) = zero
+    results(currentrow, disp4p2) = zero
+
+    results(currentrow, disp1p3) = zero
+    results(currentrow, disp2p3) = zero
+    results(currentrow, disp3p3) = zero
+    results(currentrow, disp4p3) = zero
+
     
 !    print*, "parametrictwiss(",currentrow,",bet11):", beta12
 !    call print(results(currentrow,beta12),6)
@@ -1404,7 +1419,16 @@ contains
     integer                    :: get_string
     integer                    :: restart_sequ,advance_node
     character(48) charconv
-
+    
+    if(getdebug()>1) then 
+     print*," writeparresults "
+     print*,"nv=",c_%nv
+     print*,"nd2=",c_%nd2
+     print*,"np=",c_%np
+     print*,"ndpt=",c_%ndpt 
+     print*,"=>",c_%nv-c_%nd2-c_%np
+    endif
+    
     if (.not. ALLOCATED(results)) then
        call fort_warn("writeparresults","Array with parametric results is not present.")
        print*, "writeparresults tip: it might have been erased the ptc_end command."
@@ -1647,12 +1671,19 @@ contains
      
     if( .not. associated (ut%n)) then
        call fort_warn("printpareq", "this universal taylor is void")
+       write(iunit,'(A)') "this universal taylor is void"
        return
     endif
     
     if(ut%nv /= c_%nv) then
        call fort_warn("printpareq",&
             "number of variables of this universal taylor is different from currnet TPSA")
+       call print(ut,6)
+       print*,"nv=",c_%nv
+       print*,"nd2=",c_%nd2
+       print*,"np=",c_%np
+       print*,"ndpt=",c_%ndpt 
+       print*,"=>",c_%nv-c_%nd2-c_%np
        return
     endif
 
