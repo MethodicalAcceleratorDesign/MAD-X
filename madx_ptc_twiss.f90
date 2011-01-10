@@ -661,7 +661,15 @@ contains
      
 
     ! 26 november 2009
-    call oneTurnSummary(isRing, theTransferMap , x, suml)
+    if(isRing .eqv. .true.) then
+       call oneTurnSummary(isRing, theTransferMap , x, suml)
+    else
+      print*, "Reduced SUMM Table (closed orbit not requested)"
+      call onePassSummary(theTransferMap , x, suml)
+    endif    
+    
+    
+    
     call set_option('ptc_twiss_summary ',1)
     ! 26 november 2009: comment the following and replace by the above
     !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
@@ -1127,13 +1135,13 @@ contains
 
       if (getdebug() > 2)  then
          ! this part of the code is out of sync with the rest
-         write(6,'(a,1(f8.4,1x))') current%MAG%name,suml
-         write(6,'(a,1(f10.8,1x))') "Delta E ", deltae
-         write(6,'(a,3(i8.0,1x))')  "idxes ", beta11,beta22,beta33
-         write(6,'(a,3(f8.4,1x))')  "betas raw   ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
-         write(6,'(a,3(f8.4,1x))')  "betas w/ener", opt_fun(1),opt_fun(5),opt_fun(9)
-         write(6,'(a,3(f8.4,1x))')  "disps       ", opt_fun(57),opt_fun(58),opt_fun(59),opt_fun(60)
-         write(6,'(a,3(f8.4,1x))')  "tunes       ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,1(f9.4,1x))') current%MAG%name,suml
+         write(6,'(a,1(f10.7,1x))') "Delta E ", deltae
+         write(6,'(a,3(i8.0,1x))')  "idxes   ", beta11,beta22,beta33
+         write(6,'(a,3(f9.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
+         write(6,'(a,3(f9.4,1x))')  "betas w/ener ", opt_fun(1),opt_fun(5),opt_fun(9)
+         write(6,'(a,4(f9.4,1x))')  "dispersions  ", opt_fun(57),opt_fun(58),opt_fun(59),opt_fun(60)
+         write(6,'(a,3(f9.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
 
       ! the following works : we see the list of all elements in sequence - what about twiss_ptc_line & twiss_ptc_ring?
@@ -1802,6 +1810,49 @@ contains
 
 
 
+    subroutine onePassSummary(oneTurnMap,state,suml)
+
+      implicit none
+      type(real_8),target :: oneTurnMap(6)
+      real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      real(dp) :: suml ! cumulative length along the ring
+      real(dp) :: rdp_zero ! float with zero (0)
+      real(dp) :: deltap ! float with zero (0)
+      
+      call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
+
+      call double_to_table( summary_table_name, 'alpha_c ', rdp_zero ) ! momemtum compaction factor
+      call double_to_table( summary_table_name, 'alpha_c_p ', rdp_zero) ! derivative w.r.t delta-p/p
+      call double_to_table( summary_table_name, 'alpha_c_p2 ', rdp_zero) ! 2nd order derivative
+      call double_to_table( summary_table_name, 'alpha_c_p3 ', rdp_zero) ! 3rd order derivative
+      call double_to_table( summary_table_name, 'eta_c ', rdp_zero ) ! associated phase-slip factor
+      call double_to_table( summary_table_name, 'gamma_tr ', rdp_zero) ! associated transition energy
+      call double_to_table( summary_table_name, 'q1 ', rdp_zero)
+      call double_to_table( summary_table_name, 'q2 ', rdp_zero)
+      call double_to_table( summary_table_name, 'dq1 ', rdp_zero)
+      call double_to_table( summary_table_name, 'dq2 ', rdp_zero)
+
+      call double_to_table( summary_table_name, 'qs ', rdp_zero)
+      call double_to_table( summary_table_name, 'beta_x_min ', rdp_zero)
+      call double_to_table( summary_table_name, 'beta_x_max ', rdp_zero)
+      call double_to_table( summary_table_name, 'beta_y_min ', rdp_zero)
+      call double_to_table( summary_table_name, 'beta_y_max ', rdp_zero)
+      
+      deltap = get_value('ptc_twiss ','deltap ')
+      call double_to_table( summary_table_name, 'deltap ', deltap)
+      
+
+      call double_to_table( summary_table_name,'orbit_x ',rdp_zero)
+      call double_to_table( summary_table_name,'orbit_px ', rdp_zero)
+      call double_to_table( summary_table_name,'orbit_y ', rdp_zero)
+      call double_to_table( summary_table_name,'orbit_py ', rdp_zero)
+
+      call double_to_table( summary_table_name,'orbit_pt ', rdp_zero)
+      call double_to_table( summary_table_name,'orbit_-cT ', rdp_zero)
+
+      call augment_count( summary_table_name ); ! only one row actually...
+      
+    end subroutine onePassSummary
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
