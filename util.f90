@@ -45,7 +45,7 @@ module twisslfi
   implicit none
   public
   logical ::  centre=.false.,centre_cptk=.false.,centre_bttk=.false.,first,&
-       rmatrix=.false.,sectormap=.false.
+       rmatrix=.false.,sectormap=.false.,ripken=.false.
 end module twisslfi
 module twisscfi
   use twiss0fi

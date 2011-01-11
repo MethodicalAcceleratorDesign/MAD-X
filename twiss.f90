@@ -367,9 +367,10 @@ SUBROUTINE twfill(case,opt_fun,position,flag)
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
   integer case,i,flag
-  double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21, &
-       opt23,opt24,zero
+  double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21,opt23,opt24,zero,get_value
   parameter(zero=0d0)
+
+  ripken=get_value('twiss ','ripken ').ne.zero
 
   if (flag .ne. 0)  then
      if(case.eq.1) then
@@ -383,6 +384,7 @@ SUBROUTINE twfill(case,opt_fun,position,flag)
            i = 36
            call vector_to_table(table_name, 're11 ', i, opt_fun(34))
         endif
+        if(ripken) call twfill_ripken(opt_fun)
      elseif(case.eq.2) then
         i = 10
         call vector_to_table(table_name, 'wx ', i, opt_fun(19))
@@ -392,6 +394,73 @@ SUBROUTINE twfill(case,opt_fun,position,flag)
      call augment_count(table_name)
   endif
 end SUBROUTINE twfill
+SUBROUTINE twfill_ripken(opt_fun)
+
+  implicit none
+
+  !------------------------------------------------------------------
+  !----*
+  !     Purpose:
+  !         *
+  !     Fill twiss table with Ripken-Mais twiss parameters.
+  !         *
+  !     beta11, beta12, beta21, beta22, alfa11, alfa12, alfa21, alfa22 
+  !         *
+  !------------------------------------------------------------------
+  !----*
+  double precision opt_fun(*),kappa,gamx,gamy,beta11,beta12,beta21,beta22,alfa11,alfa12,alfa21,alfa22,&
+       gama11,gama12,gama21,gama22,zero,one
+  parameter(zero=0d0,one=1d0)
+
+  ! parameters
+  !
+  ! opt_fun(3) = betx
+  ! opt_fun(6) = bety
+  ! opt_fun(4) = alfx
+  ! opt_fun(7) = alfy
+  ! opt_fun(29) = r11
+  ! opt_fun(30) = r12
+  ! opt_fun(31) = r21
+  ! opt_fun(32) = r22
+  ! 
+
+  kappa=one/(one+(opt_fun(29)*opt_fun(32)-opt_fun(30)*opt_fun(31)))
+  gamx=(one+opt_fun(4)**2)/opt_fun(3)
+  gamy=(one+opt_fun(7)**2)/opt_fun(6)
+
+  beta11=kappa*opt_fun(3)
+  beta12=kappa*(opt_fun(32)*(opt_fun(32)*opt_fun(6)+2*opt_fun(30)*opt_fun(7))+opt_fun(30)*opt_fun(30)*gamy)
+  beta21=kappa*(opt_fun(29)*(opt_fun(29)*opt_fun(3)-2*opt_fun(30)*opt_fun(4))+opt_fun(30)*opt_fun(30)*gamx)
+  beta22=kappa*opt_fun(6)
+
+  alfa11=kappa*opt_fun(4)
+  alfa12=kappa*(opt_fun(31)*opt_fun(32)*opt_fun(6)+opt_fun(7)*(opt_fun(30)*opt_fun(31)+&
+       opt_fun(29)*opt_fun(32))+opt_fun(30)*opt_fun(29)*gamy)
+  alfa21=-kappa*(opt_fun(31)*opt_fun(29)*opt_fun(3)-opt_fun(4)*(opt_fun(30)*opt_fun(31)+&
+       opt_fun(29)*opt_fun(32))+opt_fun(30)*opt_fun(32)*gamx)
+  alfa22=kappa*opt_fun(7)
+
+  gama11=kappa*gamx
+  gama12=zero
+  gama21=zero
+  if(beta12.ne.zero) gama12=((one-kappa)**2+alfa12**2)/beta12
+  if(beta21.ne.zero) gama21=((one-kappa)**2+alfa21**2)/beta21
+  gama22=kappa*gamy
+  
+  call double_to_table('twiss ','beta11 ' ,beta11)
+  call double_to_table('twiss ','beta12 ' ,beta12)
+  call double_to_table('twiss ','beta21 ' ,beta21)
+  call double_to_table('twiss ','beta22 ' ,beta22)
+  call double_to_table('twiss ','alfa11 ' ,alfa11)
+  call double_to_table('twiss ','alfa12 ' ,alfa12)
+  call double_to_table('twiss ','alfa21 ' ,alfa21)
+  call double_to_table('twiss ','alfa22 ' ,alfa22)
+  call double_to_table('twiss ','gama11 ' ,gama11)
+  call double_to_table('twiss ','gama12 ' ,gama12)
+  call double_to_table('twiss ','gama21 ' ,gama21)
+  call double_to_table('twiss ','gama22 ' ,gama22)
+
+end SUBROUTINE twfill_ripken
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   implicit none

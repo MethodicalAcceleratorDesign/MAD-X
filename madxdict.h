@@ -2287,6 +2287,7 @@ char command_def[] =
 "re61     = [r, 0], re62     = [r, 0], re63     = [r, 0], "
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "centre   = [l, false, true], "
+"ripken   = [l, false, true], "
 "sectormap= [l, false, true], "
 "sectortable= [s, none, sectortable], "
 "sectorfile= [s, sectormap, sectormap], "
