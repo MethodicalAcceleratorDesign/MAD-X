@@ -1168,7 +1168,7 @@ contains
       deltaeValue = deltae ! equals 1.0 unless there is a cavity
 
 
-    if (tw%beta(1,2)==0.0 .and. tw%beta(2,1)==0.0) then
+    if (tw%beta(1,2)==zero .and. tw%beta(2,1)==zero) then
 
 	! in case there is absolutely no coupling kx and ky will be zero and u will be NaN
 	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
@@ -1189,18 +1189,23 @@ contains
         ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
         ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
         kxy2=kx*kx*ky*ky;
-        u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
-        u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+        if((kx*kx-ky*ky).gt.TINY(ONE).and.(1-kxy2).gt.TINY(ONE)) then
+           u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+           u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
 
-        if (u1<1.0 .and. u1>=0.0) then
-           u=u1
+           if (u1<one .and. u1>=zero) then
+              u=u1
+           else
+              u=u2
+           endif
         else
-           u=u2
+           u=zero
         endif
 
 	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
 	! beta11, alfa11 etc... are multiplied by deltae before output
     	! hence we reflect this in the formula from Lebedev
+
 	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
 	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
 	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
