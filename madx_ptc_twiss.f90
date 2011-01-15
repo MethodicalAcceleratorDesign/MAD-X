@@ -1189,7 +1189,7 @@ contains
         ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
         ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
         kxy2=kx*kx*ky*ky;
-        if((kx*kx-ky*ky).gt.TINY(ONE).and.(1-kxy2).gt.TINY(ONE)) then
+        if(abs(kx*kx-ky*ky).gt.TINY(ONE).and.abs(1-kxy2).gt.TINY(ONE)) then
            u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
            u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
 
