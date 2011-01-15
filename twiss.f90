@@ -12,7 +12,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
-  integer i
+  integer i,ithr_on
   integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
   double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
        ddisp0(6),r0mat(2,2),zero,one,two,get_value
@@ -27,6 +27,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   summ=0
   eflag=0
   inval=0
+  ithr_on=0
   fsecarb=.false.
   i = 6
   call dzero(orbit0,6)
@@ -118,7 +119,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      if (inval.eq.0) then
         call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
         if(eflag.ne.0) go to 900
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,0)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
         if(eflag.ne.0) go to 900
         call twcpin(rt,disp0,r0mat,eflag)
         if(eflag.ne.0) go to 900
@@ -161,12 +162,13 @@ SUBROUTINE tmrefe(rt)
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
-  integer eflag
+  integer eflag,ithr_on
   double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6)
 
+  ithr_on=0
   call dzero(orbit0,6)
   !---- Get transfer matrix.
-  call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,0)
+  call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
 end SUBROUTINE tmrefe
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
 
@@ -183,16 +185,17 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   !     orbit(6)  (double) closed orbit at obs. point kobs, or at end    *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
-  integer eflag,kobs,izero,ione
+  integer eflag,kobs,izero,ione,ithr_on
   double precision opt_fun0(fundim),orbit0(6),orbit(6),rt(6,6),     &
        tt(6,6,6)
   data izero, ione / 0, 1 /
 
+  ithr_on=0
   call dzero(orbit0,6)
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
   call set_option('bbd_flag ', ione)
-  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,0)
+  call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on)
   call set_option('bbd_flag ', izero)
 end SUBROUTINE tmrefo
 SUBROUTINE twinifun(opt_fun0,rt)
@@ -481,7 +484,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   !     eflag        (integer) error flag (0: OK, else != 0)             *
   !----------------------------------------------------------------------*
   logical fsec,ftrk,m66sta,pflag
-  integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on
+  integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on,ithr_on
   parameter(itmax=20)
   double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
        orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
@@ -490,6 +493,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
 
   !---- Initialize.
+  ithr_on=0
   thr_on = get_option('threader ')
   pflag = get_option('twiss_print ') .ne. 0
   deltap = get_value('probe ','deltap ')
@@ -545,7 +549,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      endif
      if (err.lt.cotol) then
         save_opt=get_option('keeporbit ')
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,0)
+        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
         opt_fun0(9 )=orbit0(1)
         opt_fun0(10)=orbit0(2)
         opt_fun0(11)=orbit0(3)
