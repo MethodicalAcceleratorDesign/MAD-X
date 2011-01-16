@@ -1189,9 +1189,14 @@ contains
         ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
         ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
         kxy2=kx*kx*ky*ky;
-        if(abs(kx*kx-ky*ky).gt.TINY(ONE).and.abs(1-kxy2).gt.TINY(ONE)) then
-           u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
-           u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(1-kxy2))))/(1-kxy2)
+        if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
+           if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
+              u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+              u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+           else
+              u1=-kxy2/(1-kxy2)
+              u2=u1
+           endif
 
            if (u1<one .and. u1>=zero) then
               u=u1
@@ -1199,6 +1204,8 @@ contains
               u=u2
            endif
         else
+           call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
+           print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
            u=zero
         endif
 
