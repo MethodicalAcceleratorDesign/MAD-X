@@ -1205,7 +1205,8 @@ contains
            endif
         else
            call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
-           print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
+           print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",&
+		      kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
            u=zero
         endif
 
