@@ -30,6 +30,8 @@ ONMAC=NO
 IFORTFIX=
 # IFORTFIX=-no-ipo
 
+OSTYPE = $(shell uname -s)
+
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   ONMAC=YES
 #  f95=g95
