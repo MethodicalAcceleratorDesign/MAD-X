@@ -25,7 +25,8 @@ module madx_ptc_twiss_module
   !  PRIVATE
   !    data structures
 
-  type(real_8)            :: theTransferMap(6) !PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
+!PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
+  type(real_8)            :: theTransferMap(6) 
   type(universal_taylor)  :: unimap(6)
 
   type twiss
@@ -1186,8 +1187,10 @@ contains
         kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
         ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
 
-        ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx; ! beta11, alfa11 etc... are multiplied by deltae before output
-        ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky; ! hence we reflect this in the formula from Lebedev
+        ! beta11, alfa11 etc... are multiplied by deltae before output
+        ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx;
+        ! hence we reflect this in the formula from Lebedev
+        ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
         kxy2=kx*kx*ky*ky;
         if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
            if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
