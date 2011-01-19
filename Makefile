@@ -34,8 +34,8 @@ NTPSA=YES
 ONMAC=NO
 
 # Temorary Fix for IFORT
-# IFORTFIX=
-IFORTFIX=-no-ipo
+IFORTFIX=
+# IFORTFIX=-no-ipo
 
 OSTYPE = $(shell uname -s)
 
