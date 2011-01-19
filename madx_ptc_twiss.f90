@@ -25,8 +25,8 @@ module madx_ptc_twiss_module
   !  PRIVATE
   !    data structures
 
-!PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
-  type(real_8)            :: theTransferMap(6) 
+  !PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
+  type(real_8)            :: theTransferMap(6)
   type(universal_taylor)  :: unimap(6)
 
   type twiss
@@ -47,15 +47,15 @@ module madx_ptc_twiss_module
      module procedure equaltwiss
      module procedure zerotwiss
      module procedure normalform_normalform
-  end interface
+  end interface assignment (=)
 
   interface alloc
      module procedure alloctwiss
-  end interface
+  end interface alloc
 
   interface kill
      module procedure killtwiss
-  end interface
+  end interface kill
 
   type(normalform)                      :: Normal
   real(dp), private, dimension(2,ndim2) :: angp
@@ -331,11 +331,11 @@ contains
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
-    !logical(lp)             :: skipnormalform, 
+    !logical(lp)             :: skipnormalform,
     character(48)           :: summary_table_name
     character(48)           :: tmfile
     character(48) charconv !routine
-    
+
     call resetBetaExtremas()
 
     !skipnormalform = my_false
@@ -425,7 +425,7 @@ contains
           call fort_warn('ptc_twiss: ','DA got unstable even before finding orbit')
           call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding orbit");
           stop
-!          return
+          !          return
        endif
 
        !print*, "Looking for orbit"
@@ -435,7 +435,7 @@ contains
           call fort_warn('ptc_twiss: ','DA got unstable at attempt to find closed orbit')
           call seterrorflag(10,"ptc_twiss ","DA got unstable at attempt to find closed orbit");
           stop
-!          return
+          !          return
        endif
        CALL write_closed_orbit(icase,x)
 
@@ -489,9 +489,9 @@ contains
 
     call setknobs(my_ring)
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !  INIT Y that is tracked          !
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap(dt)
 
     if (geterrorflag() /= 0) then
@@ -634,43 +634,43 @@ contains
     read77=.false.
 
     if (getdebug() > 2) then
-      call kanalnummer(mf2)
-      write(tmfile,'(i2,a3)') filecode, '.tm'
-      print *, 'Filename for transfer map is ', tmfile
-      open(unit=mf2,file=tmfile)
-      write(mf2,*) '=============================='
-      write(mf2,*) '===      TRANSFER MAP      ==='
-      call print(theTransferMap,mf2)
-      close(mf2)
-      filecode = filecode + 1
-    
+       call kanalnummer(mf2)
+       write(tmfile,'(i2,a3)') filecode, '.tm'
+       print *, 'Filename for transfer map is ', tmfile
+       open(unit=mf2,file=tmfile)
+       write(mf2,*) '=============================='
+       write(mf2,*) '===      TRANSFER MAP      ==='
+       call print(theTransferMap,mf2)
+       close(mf2)
+       filecode = filecode + 1
 
-      call kanalnummer(mf2)
-      ! avoid file name conflict between slice.madx and center.madx
-      ! which are located under same testing directory
-      if (get_value('ptc_twiss ','center_magnets ').ne.0) then
-         open(unit=mf2,file='end_center.map')
-      else
-         open(unit=mf2,file='end.map')
-      endif
 
-      call print(y,mf2)
+       call kanalnummer(mf2)
+       ! avoid file name conflict between slice.madx and center.madx
+       ! which are located under same testing directory
+       if (get_value('ptc_twiss ','center_magnets ').ne.0) then
+          open(unit=mf2,file='end_center.map')
+       else
+          open(unit=mf2,file='end.map')
+       endif
 
-      close(mf2)
+       call print(y,mf2)
 
-    endif  
-     
+       close(mf2)
+
+    endif
+
 
     ! 26 november 2009
     if(isRing .eqv. .true.) then
        call oneTurnSummary(isRing, theTransferMap , x, suml)
     else
-      print*, "Reduced SUMM Table (closed orbit not requested)"
-      call onePassSummary(theTransferMap , x, suml)
-    endif    
-    
-    
-    
+       print*, "Reduced SUMM Table (closed orbit not requested)"
+       call onePassSummary(theTransferMap , x, suml)
+    endif
+
+
+
     call set_option('ptc_twiss_summary ',1)
     ! 26 november 2009: comment the following and replace by the above
     !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
@@ -702,7 +702,7 @@ contains
     enddo
 
     call finishknobs()
-    
+
     if (savemaps) then  !do it at the end, so we are sure the twiss was successful
        mapsorder = no
        mapsicase = icase
@@ -923,8 +923,10 @@ contains
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
       real(kind(1d0))   :: deltae
       type(real_8), target :: transfermap(6)
-      real(dp) :: betx, bety, alfx, alfy ! added on 3 November 2010 to hold Edwards & Teng parametrization
-      real(dp) :: u, u1, u2, ax, ay, kx, ky, kxy2 ! to convert between Ripken and Edwards-Teng parametrization
+      ! added on 3 November 2010 to hold Edwards & Teng parametrization
+      real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
+      ! to convert between Ripken and Edwards-Teng parametrization
+      real(dp) :: kappa,u,u1,u2,ax,ay,kx,ky,kxy2,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
 
       if (getdebug() > 2) then
@@ -1153,82 +1155,116 @@ contains
       ! on July 3rd 2009, add another 8 for second/third derivatives of dispersions w.r.t. deltap
       ioptfun=81+4+8+6 !72->81 to accomodate additional derivatives w.r.t. delta_p => should one add 4 to this one, as above?
       ! actually 3*21+6 (???) elements from beta11 to include up to disp6p
-	! on november 3rd 2010, added 6
+      ! on november 3rd 2010, added 6
 
-	! overwrote the above for which I am not sure where the value comes from
-	ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
+      ! overwrote the above for which I am not sure where the value comes from
+      ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
 
 
       call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1)) ! fill contiguous data in one-go, up to mu1, mu2, mu3
 
 
-    ! convert between the Ripken and Edwards-Teng parametrization
-    ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
-    ! from V. A. Lebedev and  S. A. Bogacz
+      ! convert between the Ripken and Edwards-Teng parametrization
+      ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
+      ! from V. A. Lebedev    and  S. A. Bogacz
 
       deltaeValue = deltae ! equals 1.0 unless there is a cavity
 
+      r11 = zero
+      r12 = zero
+      r21 = zero
+      r22 = zero
 
-    if (tw%beta(1,2)==zero .and. tw%beta(2,1)==zero) then
+      if (tw%beta(1,2)==zero .and. tw%beta(2,1)==zero) then
 
-	! in case there is absolutely no coupling kx and ky will be zero and u will be NaN
-	! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
-	! therefore we simply copy beta11 into betx and beta22 into bety in this case, so as
-	! to get the same values between twiss and ptc_twiss
-	! beta11, alfa11 etc... are multiplied by deltae before output
-    	! hence we reflect this in the formula from Lebedev
-	betx = tw%beta(1,1) * deltaeValue
-	bety = tw%beta(2,2) * deltaeValue
-	alfx = tw%alfa(1,1) * deltaeValue
-	alfy = tw%alfa(2,2) * deltaeValue       
+         ! in case there is absolutely no coupling kx and ky will be zero and u will be NaN
+         ! and betx, bety, alfx, alfy will also evaluate as NaN if we apply the above formulae
+         ! therefore we simply copy beta11 into betx and beta22 into bety in this case, so as
+         ! to get the same values between twiss and ptc_twiss
+         ! beta11, alfa11 etc... are multiplied by deltae before output
+         ! hence we reflect this in the formula from Lebedev
+         betx = tw%beta(1,1) * deltaeValue
+         bety = tw%beta(2,2) * deltaeValue
+         alfx = tw%alfa(1,1) * deltaeValue
+         alfy = tw%alfa(2,2) * deltaeValue
 
-    else
+      else
 
-        kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
-        ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
+         kx=sqrt(tw%beta(1,2)/tw%beta(1,1)); ! multiplication by deltae in numerator and denominator
+         ky=sqrt(tw%beta(2,1)/tw%beta(2,2));
 
-        ! beta11, alfa11 etc... are multiplied by deltae before output
-        ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx;
-        ! hence we reflect this in the formula from Lebedev
-        ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
-        kxy2=kx*kx*ky*ky;
-        if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
-           if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
-              u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
-              u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
-           else
-              u1=-kxy2/(1-kxy2)
-              u2=u1
-           endif
+         ! beta11, alfa11 etc... are multiplied by deltae before output
+         ax=kx*tw%alfa(1,1) * deltaeValue -tw%alfa(1,2) * deltaeValue /kx;
+         ! hence we reflect this in the formula from Lebedev
+         ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
+         kxy2=kx*kx*ky*ky;
+         if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
+            if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
+               u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+               u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+            else
+               u1=-kxy2/(1-kxy2)
+               u2=u1
+            endif
 
-           if (u1<one .and. u1>=zero) then
-              u=u1
-           else
-              u=u2
-           endif
-        else
-           call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
-           print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",&
-		      kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
-           u=zero
-        endif
+            if (u1<one .and. u1>=zero) then
+               u=u1
+            else
+               u=u2
+            endif
 
-	! betx, bety, alfx, alfy are the values computed by twiss with very good precision
-	! beta11, alfa11 etc... are multiplied by deltae before output
-    	! hence we reflect this in the formula from Lebedev
+            ! betx, bety, alfx, alfy are the values computed by twiss with very good precision
+            ! beta11, alfa11 etc... are multiplied by deltae before output
+            ! hence we reflect this in the formula from Lebedev
 
-	betx = (tw%beta(1,1)/(1-u)) * deltaeValue
-	bety = (tw%beta(2,2)/(1-u)) * deltaeValue
-	alfx = (tw%alfa(1,1)/(1-u)) * deltaeValue
-	alfy = (tw%alfa(2,2)/(1-u)) * deltaeValue
+            kappa=1-u
 
-     endif
+            betx = (tw%beta(1,1)/kappa) * deltaeValue
+            bety = (tw%beta(2,2)/kappa) * deltaeValue
+            alfx = (tw%alfa(1,1)/kappa) * deltaeValue
+            alfy = (tw%alfa(2,2)/kappa) * deltaeValue
 
-	! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
-	call double_to_table(table_name, 'betx ', betx ) ! non contiguous with the above table entries
-	call double_to_table(table_name, 'bety ', bety ) ! hence we must store these values one by one
-	call double_to_table(table_name, 'alfx ', alfx )
-	call double_to_table(table_name, 'alfy ', alfy )
+            bx = kx*kappa+u/kx
+            by = ky*kappa-u/ky
+            cx = kx*kappa-u/kx
+            cy = ky*kappa+u/ky
+
+            cosvp = (ax*ay-bx*cy)/(ay*ay+cy*cy)
+            sinvp = (ax*cy+ay*bx)/(ay*ay+cy*cy)
+            cosvm = (ax*ay+by*cx)/(ax*ax+cx*cx)
+            sinvm = (ax*by-ay*cx)/(ax*ax+cx*cx)
+
+            cosv2 = sqrt((1+cosvp*cosvm-sinvp*sinvm)/2)
+            sinv2 = -sqrt((1-cosvp*cosvm+sinvp*sinvm)/2)
+            cosv1 = -sqrt((1+cosvp*cosvm+sinvp*sinvm)/2)
+            sinv1 = -sqrt((1-cosvp*cosvm-sinvp*sinvm)/2)
+
+            r11 = sqrt(tw%beta(2,2)/tw%beta(1,2))*(tw%alfa(1,2)*sinv2+u*cosv2)/kappa
+            r12 = sqrt(tw%beta(1,1)*tw%beta(2,1))*sinv1/kappa
+            r21 = (cosv2*(tw%alfa(1,2)*kappa-tw%alfa(2,2)*u)-sinv2*&
+                 (u*kappa+tw%alfa(1,2)*tw%alfa(2,2)))/(kappa*sqrt(tw%beta(1,2)*tw%beta(2,2)))
+            r22 = -sqrt(tw%beta(1,1)/tw%beta(2,1))*(u*cosv1+tw%alfa(2,1)*sinv1)/kappa
+         else
+            call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
+            print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",&
+                 kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
+            betx = tw%beta(1,1) * deltaeValue
+            bety = tw%beta(2,2) * deltaeValue
+            alfx = tw%alfa(1,1) * deltaeValue
+            alfy = tw%alfa(2,2) * deltaeValue
+         endif
+
+      endif
+
+      ! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
+      call double_to_table(table_name, 'betx ', betx ) ! non contiguous with the above table entries
+      call double_to_table(table_name, 'bety ', bety ) ! hence we must store these values one by one
+      call double_to_table(table_name, 'alfx ', alfx )
+      call double_to_table(table_name, 'alfy ', alfy )
+      call double_to_table(table_name, 'r11 ', r11 )
+      call double_to_table(table_name, 'r12 ', r12 )
+      call double_to_table(table_name, 'r21 ', r21 )
+      call double_to_table(table_name, 'r22 ', r22 )
 
       call augment_count(table_name)
 
@@ -1834,7 +1870,7 @@ contains
       real(dp) :: suml ! cumulative length along the ring
       real(dp) :: rdp_zero ! float with zero (0)
       real(dp) :: deltap ! float with zero (0)
-      
+
       call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
 
       call double_to_table( summary_table_name, 'alpha_c ', rdp_zero ) ! momemtum compaction factor
@@ -1853,10 +1889,10 @@ contains
       call double_to_table( summary_table_name, 'beta_x_max ', rdp_zero)
       call double_to_table( summary_table_name, 'beta_y_min ', rdp_zero)
       call double_to_table( summary_table_name, 'beta_y_max ', rdp_zero)
-      
+
       deltap = get_value('ptc_twiss ','deltap ')
       call double_to_table( summary_table_name, 'deltap ', deltap)
-      
+
 
       call double_to_table( summary_table_name,'orbit_x ',rdp_zero)
       call double_to_table( summary_table_name,'orbit_px ', rdp_zero)
@@ -1867,7 +1903,7 @@ contains
       call double_to_table( summary_table_name,'orbit_-cT ', rdp_zero)
 
       call augment_count( summary_table_name ); ! only one row actually...
-      
+
     end subroutine onePassSummary
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
@@ -2229,8 +2265,8 @@ contains
       CALL kill(theTransferMap)
       call alloc(theTransferMap) ! transfer map between two successive inner slices
 
-      
-      
+
+
       ! is it the correct way to initialize, or should we rely on y=x+id??
       theTransferMap = npara ! to be checked later-on
       theTransferMap = state
@@ -2578,13 +2614,13 @@ contains
 
   subroutine orbitRms(summary_table_name)
     implicit none
-    character(48)	:: summary_table_name
+    character(48) :: summary_table_name
 
-    real(dp) 	:: state(6) ! 6 dimensional state space usually referred to as 'x'
-    real(dp)	:: x(6) ! the 6 dimensional state space
+    real(dp)  :: state(6) ! 6 dimensional state space usually referred to as 'x'
+    real(dp) :: x(6) ! the 6 dimensional state space
     real(kind(1d0)) :: xrms(6)
     real(kind(1d0)) :: xcomax, pxcomax, ycomax, pycomax
-    integer		:: i, j
+    integer  :: i, j
 
     real(kind(1d0))         :: get_value
 
@@ -2593,11 +2629,11 @@ contains
        call double_to_table(summary_table_name,'xcorms ',0d0)
        call double_to_table(summary_table_name,'pxcorms ',0d0)
        call double_to_table(summary_table_name,'ycorms ',0d0)
-       call double_to_table(summary_table_name,'pycorms ',0d0)	
+       call double_to_table(summary_table_name,'pycorms ',0d0)
        call double_to_table(summary_table_name,'xcomax ',0d0)
        call double_to_table(summary_table_name,'pxcomax ',0d0)
        call double_to_table(summary_table_name,'ycomax ',0d0)
-       call double_to_table(summary_table_name,'pycomax ',0d0)		
+       call double_to_table(summary_table_name,'pycomax ',0d0)
     else
 
 
