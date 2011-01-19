@@ -3,7 +3,14 @@
 # Makefile for MAD-X development version
 #
 #######################################################################
-
+#
+# Changes on 19.01.2011 by H.Renshall:
+# add new flags f95_FLAGSP and Q for separate lf95 compilation of the
+# polymorphic code which cannot use the --chk u (undefined) flag.
+# Other compilers do not define these flags hence get same as before.
+# Link in static libX11 libraries for ARCH=64 builds.
+# End of 19.01.2011 changes
+#
 # C compiler
 CC=gcc
 # Fortran90 compiler
@@ -18,7 +25,7 @@ ONLINE=YES
 MEMLEAKS=NO
 # profiling version
 PROFILE=NO
-# Piotr's pluggins "root" etc 
+# Piotr's pluggins "root" etc
 PLUGIN_SUPPORT=NO
 # Alternative DA package in C++
 NTPSA=YES
@@ -27,8 +34,8 @@ NTPSA=YES
 ONMAC=NO
 
 # Temorary Fix for IFORT
-IFORTFIX=
-# IFORTFIX=-no-ipo
+# IFORTFIX=
+IFORTFIX=-no-ipo
 
 OSTYPE = $(shell uname -s)
 
@@ -128,15 +135,16 @@ ifeq ($(f95),gfortran)
   f95_FLAGS+= -fno-range-check
   ifeq ($(ARCH),32)
      f95_FLAGS+=$(M32)
-  endif 
+  endif
 endif
 
 ifeq ($(DEBUG),YES)
   ifeq ($(f95),lf95)
     # Replace Makefile_develop
-    # lff95 compiler options with severe lf95/Fujitsu flags
-#    f95_FLAGS+= -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -g -Hesu -a -e0 -E iu -Am --pca --private --trap 
-    f95_FLAGS+= --chk a,e,f,o,s,x -g --trace --info -pca --ap --chkglobal -f95 --lst --sav --wo --xref -X9 -AERTp -Ncompdisp -V -li -m6 -r5 -Hesu -a -e0 -E iu -Am --pca --private --trap
+    # lf95 compiler options with severe lf95/Fujitsu flags
+    # store in separate flags as polymorphic f90 cannot work with --chk u
+    f95_FLAGSP= --info --f95 --lst -V -g --chk aefosu --ap --trace --trap --verbose
+    f95_FLAGSQ= --info --f95 --lst -V -g --chk aefos  --ap --trace --trap --verbose
 
     GCCP_FLAGS+= -Wall -pedantic
   endif
@@ -165,12 +173,12 @@ else
 endif
 
 ifeq ($(ARCH),32)
-  LIBX= libX11.a -lpthread -lstdc++ -lc -lgcc_eh
+  LIBX= -L$(PWD)/lib -lX11 -lpthread -lstdc++ -lc -lgcc_eh
 else
   ifeq ($(f95),lf95)
-    LIBX= libX11_64.a -lstdc++ -lgcc_eh
+    LIBX= -L$(PWD)/lib64 -lX11 -lstdc++ -lgcc_eh
   else
-    LIBX= libX11_64.a -lpthread -lstdc++ -lc -lgcc_eh
+    LIBX= -L$(PWD)/lib64 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
   endif
 endif
 
@@ -193,9 +201,9 @@ ifeq ($(ONLINE),YES)
     LIBX+= -limf
   endif
   ifeq ($(ARCH),32)
-    LIBX+= libSDDS1c.a libSDDS1.a librpnlib.a libmdbmth.a libmdblib.a libgsl.a libz.a
+    LIBX+= -L$(PWD)/lib -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
   else
-    LIBX+= libSDDS1c64.a libSDDS164.a librpnlib64.a libmdbmth64.a libmdblib64.a libgsl64.a libz64.a
+    LIBX+= -L$(PWD)/lib64 -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
   endif
 endif
 
@@ -289,12 +297,19 @@ else
   FILT_TP_OUT_F90= c_tpsa_interface.o
 endif
 i_tpsa.o: h_definition.o i_tpsa.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) i_tpsa.f90
 j_tpsalie.o: i_tpsa.o j_tpsalie.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) j_tpsalie.f90
 k_tpsalie_analysis.o: j_tpsalie.o k_tpsalie_analysis.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) k_tpsalie_analysis.f90
 l_complex_taylor.o: k_tpsalie_analysis.o l_complex_taylor.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) l_complex_taylor.f90
 m_real_polymorph.o: l_complex_taylor.o m_real_polymorph.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) m_real_polymorph.f90
 n_complex_polymorph.o: m_real_polymorph.o n_complex_polymorph.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) n_complex_polymorph.f90
 o_tree_element.o: n_complex_polymorph.o o_tree_element.f90
+	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) o_tree_element.f90
 Sa_extend_poly.o: o_tree_element.o Sa_extend_poly.f90
 Sb_sagan_pol_arbitrary.o: Sa_extend_poly.o Sb_sagan_pol_arbitrary.f90
 Sc_euclidean.o: Sb_sagan_pol_arbitrary.o Sc_euclidean.f90
@@ -325,7 +340,7 @@ madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
 madx_ptc_trackcavs.o: util.o Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_setcavs.f90
 madx_ptc_script.o: util.o Sp_keywords.o madx_ptc_script.f90
-madx_ptc_knobs.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc madx_ptc_knobs.f90 
+madx_ptc_knobs.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc madx_ptc_knobs.f90
 madx_ptc_eplacement.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
 madx_ptc_twiss.o: util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_knobs.inc madx_ptc_distrib.inc madx_ptc_twiss.f90
@@ -347,11 +362,11 @@ madx_main.o: run_madx.o madx_main.F90
 
 # implicit rule to compile f90 code with f95
 %.o : %.f90
-	$(f95) $(f95_FLAGS) $<
+	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
 
 # implicit rule to compile f90 code with f95
 %.o : %.F90
-	$(f95) $(f95_FLAGS) $<
+	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
 
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
 madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o $(TPSA)
