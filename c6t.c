@@ -486,6 +486,7 @@ void att_aperture(struct c6t_element* el)
 
 void att_beambeam(struct c6t_element* el)
 {
+
   double beamx=zero,beamy=zero;
   if (double_from_table("twiss","x",&(el->twtab_row),&beamx) != 0 ||
       double_from_table("twiss","y",&(el->twtab_row),&beamy) != 0)
@@ -496,6 +497,10 @@ void att_beambeam(struct c6t_element* el)
   el->out_2 = c1p3*(el->value[12] - beamx);
   el->out_3 = c1p3*(el->value[13] - beamy);
   el->out_4 = el->value[16];
+  el->out_5 = pow(c1p3*el->value[14], 2);
+  el->out_6 = pow(c1p3*el->value[15], 2);
+  el->out_7 = 0;
+
 }
 
 void att_colli(struct c6t_element* el)
@@ -2428,8 +2433,8 @@ void write_all_el()
 void write_c6t_element(struct c6t_element* el)
 {
   if (strcmp(el->name, "CAV") != 0)
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e\n",
-            el->name, el->out_1, el->out_2, el->out_3, el->out_4);
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+            el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   el->w_flag = 1;
 }
 
