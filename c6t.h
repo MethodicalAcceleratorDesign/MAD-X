@@ -45,6 +45,9 @@ struct c6t_element
     double out_2;            /* output parameter 2, fort.2 */
     double out_3;            /* output parameter 3, fort.2 */
     double out_4;            /* output parameter 4, fort.2 */
+    double out_5;            /* output parameter 5, fort.2 */
+    double out_6;            /* output parameter 6, fort.2 */
+    double out_7;            /* output parameter 7, fort.2 */
     double* value;           /* element strength etc. values */
     struct object* p_al_err; /* pointer to alignment error object */
     struct object* p_fd_err; /* pointer to field error object */
