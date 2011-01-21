@@ -178,7 +178,7 @@ else
 endif
 
 ifeq ($(ARCH),32)
-  LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib -lX11
+  LIBX= -L$(PWD)/lib -lX11 -lpthread -lstdc++ -lc -lgcc_eh
 else
   ifeq ($(f95),lf95)
     LIBX= -lstdc++ -lgcc_eh -L$(PWD)/lib64 -lX11
