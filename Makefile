@@ -143,8 +143,13 @@ ifeq ($(DEBUG),YES)
     # Replace Makefile_develop
     # lf95 compiler options with severe lf95/Fujitsu flags
     # store in separate flags as polymorphic f90 cannot work with --chk u
-    f95_FLAGSP= --info --f95 --lst -V -g --chk aefosu --ap --trace --trap --verbose
-    f95_FLAGSQ= --info --f95 --lst -V -g --chk aefos  --ap --trace --trap --verbose
+    ifeq ($(ARCH),32)
+      f95_FLAGSP= --info --f95 --lst -V -g --chk aesux  --ap --trace --trap --verbose
+      f95_FLAGSQ= --info --f95 --lst -V -g --chk aesux  --ap --trace --trap --verbose
+    else
+      f95_FLAGSP= --info --f95 --lst -V -g --chk aefosu --ap --trace --trap --verbose
+      f95_FLAGSQ= --info --f95 --lst -V -g --chk aefs   --ap --trace --trap --verbose
+    endif
 
     GCCP_FLAGS+= -Wall -pedantic
   endif
@@ -173,12 +178,12 @@ else
 endif
 
 ifeq ($(ARCH),32)
-  LIBX= -L$(PWD)/lib -lX11 -lpthread -lstdc++ -lc -lgcc_eh
+  LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib -lX11
 else
   ifeq ($(f95),lf95)
-    LIBX= -L$(PWD)/lib64 -lX11 -lstdc++ -lgcc_eh
+    LIBX= -lstdc++ -lgcc_eh -L$(PWD)/lib64 -lX11
   else
-    LIBX= -L$(PWD)/lib64 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
+    LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib64 -lX11
   endif
 endif
 
