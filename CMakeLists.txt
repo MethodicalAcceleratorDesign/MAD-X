@@ -67,8 +67,9 @@ elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
   set (CMAKE_Fortran_FLAGS_DEBUG   " -f77rtl -O0 -g -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
   set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
 elseif (CMAKE_Fortran_COMPILER MATCHES "lf95")
-  message( WARNING " This compiler is not yet confirmed working with CMake")
+  message( WARNING " This compiler is not yet confirmed working properly with CMake")
   message( WARNING " The Lahey can only compile 32bit system")
+  message( WARNING " On a 64 bit system you need to use the toolchain-file (see README) to get anywhere.")
   SET ( MADX_OPTION_FORCE_32 1 )
   set (CMAKE_Fortran_FLAGS_RELEASE " --o2 --tp ")
   set (CMAKE_SKIP_RPATH ON)
@@ -161,17 +162,12 @@ endif (MADX_OPTION_ONLINE EQUAL 1)
 
 # OSX specifics:
 if (APPLE)
-  # this will only work if compilers supports it, should not be used by default...
-  #set(CMAKE_OSX_ARCHITECTURES "ppc;i386;ppc64;x86_64" CACHE STRING "Build architectures for OSX" FORCE)
-  #message("osx arch: ${CMAKE_OSX_ARCHITECTURES}")
-  # This seems to override so we don't find all X11libs anymore..?
   set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
 endif (APPLE)
 
 
 # C stuff:
 get_filename_component (C_COMPILER_NAME ${CMAKE_C_COMPILER} NAME)
-message("C compiler: ${C_COMPILER_NAME}")
 if (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortran")
 # this will probably crash on windows...
   execute_process(COMMAND ${C_COMPILER_NAME} -print-search-dirs
@@ -179,8 +175,8 @@ if (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortr
   string(REGEX REPLACE ".*libraries: =(.*)\n"  "\\1" gcclibs "${gccsearchdirs}")
   # need to do this many times because lf95 segfaults on lists with :
   string(REPLACE "/:/"  "/ -L/" gcclibs "${gcclibs}")
-  LINK_DIRECTORIES(${gcclibs})
-#   message("Added gcc lib directories: ${gcclibs}")
+  # adding these to the linking process which is handled by a non-gnu fortran compiler in your case
+  LINK_DIRECTORIES(${gcclibs}) 
 endif (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortran")
 # end C stuff
 
@@ -270,7 +266,6 @@ set(DIRS "")
 if(APPLE)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
   set(DIRS "")
-  message("aps: ${APPS}")
 endif(APPLE)
 INSTALL(TARGETS madx${BINARY_POSTFIX}
   BUNDLE DESTINATION .
@@ -278,13 +273,12 @@ INSTALL(TARGETS madx${BINARY_POSTFIX}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
-INSTALL(CODE " 
-  include(BundleUtilities) 
-  message(\"aps: ${APPS}\")
-  message(STATUS \"starting fixing up bundle shit\")
-  fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
-  message(STATUS \"finished fixing bundle\")
-  " COMPONENT Runtime) 
+if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
+  INSTALL(CODE " 
+    include(BundleUtilities) 
+    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
+    " COMPONENT Runtime) 
+endif(APPLE OR WIN32)
 
 # CPACK stuff
  # build a CPack driven installer package
