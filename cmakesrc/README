@@ -1,0 +1,31 @@
+CMake:
+
+ CMake is a build tool that can be used instead of make. 
+ In principle it can also be used on Windows, however we do not 
+ currently aim to support this. We do try to support all linux 
+ flavours in addition to Mac OSX.
+
+ Basic usage:
+ Create a temporary folder and enter it in terminal. Write the command
+  cmake <path to source>
+ You can then build mad-x with
+  make
+ If you wish, you can use "-j <nprocs>" to utilise several processors for faster compilation.
+ If you wish, you can use "VERBOSE=yes" to see all commands that are used, e.g. for making sure you use the correct flags and compiler.
+ If you wish to edit something in your current build configuration, you can use the command
+  ccmake .
+ Inside there, you can toggle advanced mode with "t", edit an option with "c", and quit with "q"
+ In order to use a different compiler, you can use instead of the first command
+  cmake -DCMAKE_Fortran_COMPILER=ifort <path to source>
+ This is general for all options, -D<option>=value will automatically set this option.
+ If you want to use the NAG compiler, please use -DCMAKE_Fortran_COMPILER=nagfor, not f95 (which is usually just a link to your default fortran compiler..)
+ 
+ OSX specific:
+ On OSX you can build a binary for multiple architectures. This requires that your compilers are built with the universal option on (e.g. for macports: "port install gcc +universal")
+ You can compile for multiple architectures with the flag CMAKE_OSX_ARCHITECTURES, so e.g. 
+    cmake -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" <srcdir>
+
+ In case of LF95:
+  lf95 can only build 32bit executables. If you want to use this compiler on a 64bit system, please use the initial command:
+    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/LinuxLF95.cmake <path-to-source>
+  This is so far only known to work with CMake newer than or equal to version 2.8.1. That means it will not work on lxplus at the moment. For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"

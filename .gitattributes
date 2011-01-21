@@ -1,4 +1,6 @@
 * text=auto !eol
+/CMakeLists.txt -text
+/License.txt -text
 /Makefile -text
 /Makefile.bat -text
 /MakefileIntel.bat -text
@@ -42,6 +44,14 @@
 /c_dabnew.f90 -text
 /c_dabnew_berz.f90 -text
 /c_tpsa_interface.F90 -text
+cmakesrc/FindGSL.cmake -text
+cmakesrc/LinuxLF95.cmake -text
+cmakesrc/MadX.icns -text svneol=unset#unset
+cmakesrc/README -text
+cmakesrc/ctests/job.sample.madx -text
+cmakesrc/ctests/testruns.sh -text
+cmakesrc/ctests/testsample.sh -text
+cmakesrc/madX.gif -text svneol=unset#unset
 /d_lielib.f90 -text
 /dynap.f90 -text
 /emit.f90 -text
