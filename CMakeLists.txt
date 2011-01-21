@@ -11,7 +11,7 @@ endif(COMMAND cmake_policy)
 # project version
 SET( ${PROJECT_NAME}_MAJOR_VERSION 4 )
 SET( ${PROJECT_NAME}_MINOR_VERSION 01 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 38 )
+SET( ${PROJECT_NAME}_PATCH_LEVEL 40 )
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
