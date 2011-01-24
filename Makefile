@@ -183,7 +183,7 @@ else
   ifeq ($(f95),lf95)
     LIBX= -L$(PWD)/lib64 -lX11 -lstdc++ -lgcc_eh
   else
-    LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib64 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
+    LIBX= -L$(PWD)/lib64 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
   endif
 endif
 
