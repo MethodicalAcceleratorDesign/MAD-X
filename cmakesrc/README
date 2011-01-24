@@ -12,6 +12,7 @@ CMake:
   make
  If you wish, you can use "-j <nprocs>" to utilise several processors for faster compilation.
  If you wish, you can use "VERBOSE=yes" to see all commands that are used, e.g. for making sure you use the correct flags and compiler.
+ If you want to see the commands without actually running them (dry-run), use "make -n".
  If you wish to edit something in your current build configuration, you can use the command
   ccmake .
  Inside there, you can toggle advanced mode with "t", edit an option with "c", and quit with "q"
@@ -26,6 +27,6 @@ CMake:
     cmake -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" <srcdir>
 
  In case of LF95:
-  lf95 can only build 32bit executables. If you want to use this compiler on a 64bit system, please use the initial command:
-    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/LinuxLF95.cmake <path-to-source>
+  If you want to use lf95 32bit compiler on a 64bit system, please use the initial command:
+    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmakesrc/LinuxLF95.cmake <path-to-source>
   This is so far only known to work with CMake newer than or equal to version 2.8.1. That means it will not work on lxplus at the moment. For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"
