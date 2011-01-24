@@ -26,13 +26,15 @@ endif ( NOT APPLE)
 # OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
-SET ( MADX_OPTION_ONLINE 0 CACHE VALUE "Set to 1 to build with Online model" )
-SET ( MADX_OPTION_NTPSA 1 CACHE VALUE "Set to 1 to build with NTPSA" )
-SET ( MADX_OPTION_FORCE_32 0 CACHE VALUE "Set to 1 to force 32bit build" )
-SET ( MADX_OPTION_FORCE_FORCE_FORTRAN_COMPILER 0 CACHE VALUE "Set to 1 to force a specific fortran compiler, otherwise system default will be used" )
+OPTION ( MADX_ONLINE "Build with Online model" OFF)
+OPTION ( MADX_NTPSA "Build with NTPSA" ON)
+OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
+OPTION ( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
 
 # Build type (defines different sets of flags)
+# RELEASE or DEBUG are valid build types currently...
 SET(CMAKE_BUILD_TYPE RELEASE)
+
 if ( NOT madX_PATCH_LEVEL EQUAL 00 )
  message( "Building a development version" )
  SET (BINARY_POSTFIX "_dev")
@@ -43,12 +45,6 @@ endif ( NOT madX_PATCH_LEVEL EQUAL 00 )
 # SET(CMAKE_C_FLAGS_MADBUILD "-O4")
 
 # include(FortranCInterface) # does cmake have automatic f/c interface??
-
-if ( MADX_OPTION_FORCE_FORCE_FORTRAN_COMPILER EQUAL 1 )
-  set(CMAKE_Fortran_COMPILER "g95")
-  message ("Forcing fortran compiler: " ${CMAKE_Fortran_COMPILER})
-  message ( WARNING "This is not recommended, rather use e.g. '-DCMAKE_Fortran_COMPILER=g95' as option when running cmake")
-endif (MADX_OPTION_FORCE_FORCE_FORTRAN_COMPILER EQUAL 1)
 
 
 #fortran compiler stuff... extensive example
@@ -66,10 +62,13 @@ elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
   set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -f77rtl -O2 -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
   set (CMAKE_Fortran_FLAGS_DEBUG   " -f77rtl -O0 -g -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
   set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
+  if(MADX_FEDORA_FIX)
+   message( WARNING "Only use the Fedora fix if you are using Fedora!" )
+   set(CMAKE_Fortran_FLAGS " -no-ipo ")
+  endif(MADX_FEDORA_FIX)
 elseif (CMAKE_Fortran_COMPILER MATCHES "lf95")
   message( WARNING " This compiler is not yet confirmed working properly with CMake")
   message( WARNING " On a 64 bit system you need to use the toolchain-file (see README) to get anywhere with the 32bit compiler.")
-  SET ( MADX_OPTION_FORCE_32 1 )
   set (CMAKE_Fortran_FLAGS_RELEASE " --o2 --tp ")
   set (CMAKE_SKIP_RPATH ON)
   set (CMAKE_Fortran_FLAGS_DEBUG   " --info --f95 --lst -V -g  --ap --trace --trap --verbose ")
@@ -108,7 +107,7 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -funroll-loops -D_CATCH_MEM -D_WRAP_FORT
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL -I. -I${CMAKE_CURRENT_SOURCE_DIR} ") #needed for c++ linking
 set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL -I. -I${CMAKE_CURRENT_SOURCE_DIR} ") 
 
-if ( MADX_OPTION_FORCE_32 EQUAL 1 )
+if ( MADX_FORCE_32  )
   message("Forced 32bit build" ) 
   set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
   set (CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
@@ -127,7 +126,7 @@ if ( MADX_OPTION_FORCE_32 EQUAL 1 )
   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib)
   endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-else ( MADX_OPTION_FORCE_32 EQUAL 1 )
+else ( MADX_FORCE_32  )
    INCLUDE(CheckTypeSize)
    CHECK_TYPE_SIZE (long LONG_SIZE) #4 if 32bit, 8 if 64bit...
   if (${LONG_SIZE} EQUAL 4)
@@ -157,13 +156,13 @@ else ( MADX_OPTION_FORCE_32 EQUAL 1 )
 	   LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib64)
 	 endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   endif (${LONG_SIZE} EQUAL 4)
-endif ( MADX_OPTION_FORCE_32 EQUAL 1 )
+endif ( MADX_FORCE_32  )
 
-if (MADX_OPTION_ONLINE EQUAL 1)
+if (MADX_ONLINE )
   message("Online Model turned on" )
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_ONLINE ")
   set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_ONLINE ")
-endif (MADX_OPTION_ONLINE EQUAL 1)
+endif (MADX_ONLINE )
 
 # OSX specifics:
 if (APPLE)
@@ -188,19 +187,19 @@ endif (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfo
 
 
 # list of c source files
-set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c tpsa.cpp )
+set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c )
 # list of fortran source files
 set(fsrcfiles madx_main.F90 Sqb_accel_ptc.f90 Sr_spin.f90 Sra_fitting.f90 madx_ptc_intstate.f90 madx_ptc_setcavs.f90 madx_ptc_knobs.f90 madx_ptc_module.f90 madx_ptc_distrib.f90 madx_ptc_eplacement.f90 madx_ptc_normal.f90 madx_ptc_script.f90 madx_ptc_trackcavs.f90 madx_ptc_track_run.f90 madx_ptc_twiss.f90 match.f90 matchjc.f90 matchlib.f90 matchsa.f90 orbf.f90 plot.f90 poisson.f90 ptc_export_xml.f90 resindex.f90 run_madx.f90 sodd.f90 Spb_fake_gino_sub.f90 St_pointers.f90 survey.f90 timest.f90 timex.f90 touschek.f90 trrun.f90 twiss.f90 user2_photon.f90 wrap.f90 fortran_flush.F90 a_scratch_size.f90 b_da_arrays_all.f90 d_lielib.f90 util.f90 dynap.f90 emit.f90 gxx11.f90 h_definition.f90 ibsdb.f90 i_tpsa.f90 j_tpsalie.f90 k_tpsalie_analysis.f90 l_complex_taylor.f90 m_real_polymorph.f90 n_complex_polymorph.f90 o_tree_element.f90 Sa_extend_poly.f90 Sb_sagan_pol_arbitrary.f90 Sc_euclidean.f90 Sd_frame.f90 Se_status.f90 Sf_def_all_kinds.f90 Sg_sagan_wiggler.f90 Sh_def_kind.f90 Si_def_element.f90 Sk_link_list.f90 Sl_family.f90 Sm_tracking.f90 Sma0_beam_beam_ptc.f90 Sma_multiparticle.f90 Sn_mad_like.f90 So_fitting.f90 Sp_keywords.f90 Sq_orbit_ptc.f90)
 
 
 # add source files according to NTPSA option...
-if (MADX_OPTION_NTPSA EQUAL 1)
+if (MADX_NTPSA )
   message("NTPSA turned on")
  set(fsrcfiles ${fsrcfiles} c_dabnew_berz.f90 c_tpsa_interface.F90)
  set(csrcfiles ${csrcfiles} tpsa.cpp)
-else (MADX_OPTION_NTPSA EQUAL 1)
+else (MADX_NTPSA )
  set(fsrcfiles ${fsrcfiles} c_dabnew.f90)
-endif  (MADX_OPTION_NTPSA EQUAL 1)
+endif  (MADX_NTPSA )
 
 #execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
 ADD_CUSTOM_COMMAND(
@@ -228,9 +227,9 @@ set(srcfiles ${csrcfiles} ${fsrcfiles} fortran_wrappers.c c_wrappers.c )
 
 
 if(APPLE)
-  SET(MACOSX_BUNDLE_STARTUP_COMMAND madx${BINARY_POSTFIX})
+  SET(MACOSX_BUNDLE_STARTUP_COMMAND madx)
   SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/MadX.icns")
-  SET(MACOSX_BUNDLE_LONG_VERSION_STRING "MadX ${BINARY_POSTFIX} version ${madX_MAJOR_VERSION}.${madX_MINOR_VERSION}.${madX_PATCH_LEVEL}")
+  SET(MACOSX_BUNDLE_LONG_VERSION_STRING "MadX  version ${madX_MAJOR_VERSION}.${madX_MINOR_VERSION}.${madX_PATCH_LEVEL}")
   SET(MACOSX_BUNDLE_BUNDLE_NAME "MadX${BINARY_POSTFIX}")
   SET(MACOSX_BUNDLE_GUI_IDENTIFIER "MadX${BINARY_POSTFIX}")
   # add icns to the .app/Resources with these two commands:
@@ -238,8 +237,8 @@ if(APPLE)
   SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/MadX.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
 
-add_executable(madx${BINARY_POSTFIX} MACOSX_BUNDLE ${srcfiles})
-SET_TARGET_PROPERTIES(madx${BINARY_POSTFIX} PROPERTIES LINKER_LANGUAGE Fortran)
+add_executable(madx MACOSX_BUNDLE ${srcfiles})
+SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 #I turn off search for libraries in case you are on Linux,
 #to make sure we make use of the lib/lib64 folders
@@ -249,26 +248,19 @@ FIND_PACKAGE(X11)
 IF(X11_FOUND)
    message("Found X11 libraries")
    INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-   TARGET_LINK_LIBRARIES(madx${BINARY_POSTFIX} ${X11_X11_LIB})
+   TARGET_LINK_LIBRARIES(madx ${X11_X11_LIB})
 ENDIF(X11_FOUND)
 else (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  target_link_libraries(madx${BINARY_POSTFIX} X11)
+  target_link_libraries(madx X11)
 endif (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 # Online libraries:
-if (MADX_OPTION_ONLINE EQUAL 1)
-target_link_libraries(madx${BINARY_POSTFIX} SDDS1c)
-target_link_libraries(madx${BINARY_POSTFIX} SDDS1)
-target_link_libraries(madx${BINARY_POSTFIX} gsl) # SDDS depends on gsl..
-target_link_libraries(madx${BINARY_POSTFIX} rpnlib)
-target_link_libraries(madx${BINARY_POSTFIX} mdbmth)
-target_link_libraries(madx${BINARY_POSTFIX} mdblib)
-endif (MADX_OPTION_ONLINE EQUAL 1)
-target_link_libraries(madx${BINARY_POSTFIX} z)
+if (MADX_ONLINE )
+target_link_libraries(madx SDDS1c  SDDS1 gsl  rpnlib mdbmth mdblib)
+endif (MADX_ONLINE )
+target_link_libraries(madx z)
 # new additions from Frank:
-target_link_libraries(madx${BINARY_POSTFIX} pthread)
-target_link_libraries(madx${BINARY_POSTFIX} c)
-target_link_libraries(madx${BINARY_POSTFIX} gcc_eh)
+target_link_libraries(madx pthread c gcc_eh)
 
 
 # Installation:
@@ -277,14 +269,14 @@ target_link_libraries(madx${BINARY_POSTFIX} gcc_eh)
 #INSTALL(FILES ${files} DESTINATION include/madx)
 
 
-set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx${BINARY_POSTFIX}")  # paths to executables
+set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx")  # paths to executables
 set(DIRS "")
 
 if(APPLE)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx.app")  # paths to executables
   set(DIRS "")
 endif(APPLE)
-INSTALL(TARGETS madx${BINARY_POSTFIX}
+INSTALL(TARGETS madx
   BUNDLE DESTINATION .
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
@@ -338,10 +330,10 @@ endif(APPLE OR WIN32)
 
 enable_testing()
 set (CTEST_PROJECT_NAME "MadX")
-ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testruns.sh" "${BINARY_POSTFIX}")
+ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testruns.sh" "")
 set_tests_properties (testruns 
   PROPERTIES PASS_REGULAR_EXPRESSION "Number of warnings: 0")
-ADD_TEST(testsample "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testsample.sh" "${BINARY_POSTFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests")
+ADD_TEST(testsample "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testsample.sh" "" "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests")
 set_tests_properties (testsample 
   PROPERTIES FAIL_REGULAR_EXPRESSION "Number of errors: [1-9]") # The no warning check fails on this test..
 
