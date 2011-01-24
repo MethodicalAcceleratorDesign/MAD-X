@@ -34,8 +34,8 @@ NTPSA=YES
 ONMAC=NO
 
 # Temorary Fix for IFORT
-IFORTFIX=
-# IFORTFIX=-no-ipo
+# IFORTFIX=
+IFORTFIX=-no-ipo
 
 OSTYPE = $(shell uname -s)
 
@@ -181,9 +181,9 @@ ifeq ($(ARCH),32)
   LIBX= -L$(PWD)/lib -lX11 -lpthread -lstdc++ -lc -lgcc_eh
 else
   ifeq ($(f95),lf95)
-    LIBX= -lstdc++ -lgcc_eh -L$(PWD)/lib64 -lX11
+    LIBX= -L$(PWD)/lib64 -lX11 -lstdc++ -lgcc_eh
   else
-    LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib64 -lX11
+    LIBX= -lpthread -lstdc++ -lc -lgcc_eh -L$(PWD)/lib64 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
   endif
 endif
 
