@@ -117,7 +117,7 @@ ifeq ($(f95),f95)
 endif
 
 ifeq ($(f95),ifort)
-  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
+  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL -fp-model precise
   ifeq ($(ARCH),32)
     f95_FLAGS+= $(M32)
   endif
