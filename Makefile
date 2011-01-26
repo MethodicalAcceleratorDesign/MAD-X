@@ -33,7 +33,7 @@ NTPSA=YES
 # Mac version
 ONMAC=NO
 
-# Temorary Fix for IFORT
+# Temorary Fix for IFORT on Fedora 13/14
 IFORTFIX=
 # IFORTFIX=-no-ipo
 
@@ -117,9 +117,9 @@ ifeq ($(f95),f95)
 endif
 
 ifeq ($(f95),ifort)
-  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL -fp-model precise
+  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
   ifeq ($(ARCH),32)
-    f95_FLAGS+= $(M32)
+    f95_FLAGS+= $(M32) -fp-model precise
   endif
 endif
 
