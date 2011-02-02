@@ -1665,6 +1665,7 @@ subroutine ttcorr(el,track,ktrack,turn)
   endif
 
   !---- Sinusoidal kick
+  sinkick = node_value('sinkick ')
   if(sinkick.eq.1) then
      sinpeak = node_value('sinpeak ')
      sintune = node_value('sintune ')
