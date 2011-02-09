@@ -474,7 +474,7 @@ CONTAINS
     call append_empty(my_ring)
 
     select case(code)
-    case(0,4,25)
+    case(0,4,22,25)
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
