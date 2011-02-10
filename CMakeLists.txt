@@ -11,7 +11,7 @@ endif(COMMAND cmake_policy)
 # project version
 SET( ${PROJECT_NAME}_MAJOR_VERSION 4 )
 SET( ${PROJECT_NAME}_MINOR_VERSION 01 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 40 )
+SET( ${PROJECT_NAME}_PATCH_LEVEL 42 )
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
@@ -53,7 +53,8 @@ endif ( NOT madX_PATCH_LEVEL EQUAL 00 )
 # SET(CMAKE_FORTRAN_COMPILER mpif77)
 if (CMAKE_Fortran_COMPILER MATCHES "gfortran")
   message( WARNING " g95 or ifort recommended, run cmake with e.g. '-DCMAKE_Fortran_COMPILER=g95' option")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -g -funroll-loops -fno-range-check -fno-f2c -O2 ")
+  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O4 ")
+  set (CMAKE_Fortran_FLAGS "") # remove -g -O2 from main list of flags.. issue for older cmake/gfortran
   set (CMAKE_Fortran_FLAGS_DEBUG   " -fno-f2c -O0 -g ")
   if ( NOT BUILD_SHARED_LIBS )
     set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
@@ -202,20 +203,20 @@ else (MADX_NTPSA )
 endif  (MADX_NTPSA )
 
 #execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
-ADD_CUSTOM_COMMAND(
-  OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
-  DEPENDS ${fsrcfiles}
-  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c . && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_fortran_calls.py && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.h .
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Creating fortran wrapper files"
-  )
 # Unsure about dependencies.. Might be an overkill this one.
 ADD_CUSTOM_COMMAND(
   OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
-  DEPENDS ${csrcfiles} ${fsrcfiles} fortran_wrappers.c
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
+  DEPENDS ${csrcfiles} ${fsrcfiles}
+  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c . && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Creating C wrapper files"
+  )
+ADD_CUSTOM_COMMAND(
+  OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
+  DEPENDS ${fsrcfiles} c_wrappers.c
+  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_fortran_calls.py && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.h .
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Creating fortran wrapper files"
   )
 # execute python wrap_fortran_calls.py
 # COMMAND python wrap_C_calls.py
@@ -260,7 +261,8 @@ target_link_libraries(madx SDDS1c  SDDS1 gsl  rpnlib mdbmth mdblib)
 endif (MADX_ONLINE )
 target_link_libraries(madx z)
 # new additions from Frank:
-target_link_libraries(madx pthread c gcc_eh)
+# On Debian Stable, stdc++ is not linked by default...
+target_link_libraries(madx pthread c stdc++ gcc_eh)
 
 
 # Installation:
