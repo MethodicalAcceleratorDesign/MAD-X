@@ -926,7 +926,7 @@ contains
       ! added on 3 November 2010 to hold Edwards & Teng parametrization
       real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
       ! to convert between Ripken and Edwards-Teng parametrization
-      real(dp) :: kappa,u,u1,u2,ax,ay,kx,ky,kxy2,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
+      real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
 
       if (getdebug() > 2) then
@@ -1200,17 +1200,9 @@ contains
          kxy2=kx*kx*ky*ky;
          if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
             if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
-               u1=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
-               u2=(-kxy2-sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+               u=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
             else
-               u1=-kxy2/(1-kxy2)
-               u2=u1
-            endif
-
-            if (u1<one .and. u1>=zero) then
-               u=u1
-            else
-               u=u2
+               u=-kxy2/(1-kxy2)
             endif
 
             ! betx, bety, alfx, alfy are the values computed by twiss with very good precision
@@ -1583,9 +1575,11 @@ contains
     subroutine readinitialascript
       !reads initial map elements from MAD-X ptc_twiss command parameters
       implicit none
-      call readrematrix() !reads re
-      call readreforbit() !reads x
-      call initmapfrommatrix()
+      type(damap) :: map
+      call alloc(map)
+      call dainput(map,19)
+      y = x+map
+      call kill(map)
       call reademittance()
 
     end subroutine readinitialascript
