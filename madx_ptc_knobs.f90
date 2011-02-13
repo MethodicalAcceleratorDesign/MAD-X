@@ -1744,7 +1744,7 @@ contains
           sign = ' '
        endif
 
-       write(string(cpos:last),'(A1,A1,G20.14)') " ",sign,ut%c(i);
+       write(string(cpos:last),'(A1,A1,G21.14)') " ",sign,ut%c(i);
        cpos = len_trim(string) + 1;
 
        if ( ( cpos + 200) > last) then

@@ -1018,7 +1018,7 @@ contains
           enddo
           if(abs(value)>eps) then
              cn=cn+1
-             write(iunit,'(I6,2X,G20.14,I5,4X,18(2i2,1X))') cn,value,ioa,(j(iii),iii=1,c_%nv)
+             write(iunit,'(I6,2X,G21.14,I5,4X,18(2i2,1X))') cn,value,ioa,(j(iii),iii=1,c_%nv)
              !ETIENNE
              write(iunit,*) value
           endif
@@ -1129,7 +1129,7 @@ contains
        !
 10     continue
        iin = iin + 1
-       read(iunit,'(I6,2X,G20.14,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,c_%nv)
+       read(iunit,'(I6,2X,G21.14,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,c_%nv)
        if(ii.eq.0) goto 20
        !ETIENNE
        read(iunit,*) c

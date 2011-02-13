@@ -63,7 +63,7 @@
      &iseed, iseed2
 8800  format(/,' simulated annealing ',/,                               &
      &/,' number of parameters: ',i3,                                   &
-     &/,' initial temp: ',g8.2, ' rt: ',g8.2,' eps:',g8.2,              &
+     &/,' initial temp: ',g9.2, ' rt: ',g9.2,' eps:',g9.2,              &
      &/,' ns: ',i3, '   nt: ',i4, '   neps: ',i2,                       &
      &/,' calls: ',i10, '   iprint: ',i1, '   iseed: ',i4,              &
      &'   iseed2: ',i4)

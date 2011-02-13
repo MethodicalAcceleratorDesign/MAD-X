@@ -101,7 +101,7 @@ contains
        a(2) = get_value('ptc_eplacement ','y ')
        a(3) = get_value('ptc_eplacement ','z ')
        if (getdebug() > 2 ) then
-          write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: Read position ',a
+          write(6,'(a, 3(f13.10,1x))') 'ptc_eplacement: Read position ',a
        endif
     endif
 
@@ -152,7 +152,7 @@ contains
           CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,base,ANGE)
 
           if (getdebug() > 2 ) then
-             write(6,'(a, 3(f12.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
+             write(6,'(a, 3(f13.10,1x))') 'ptc_eplacement: R0 Computed entr angles ',ange
           endif
 
           CALL ROTATE_Fibre(p,p%chart%f%a,ange)
