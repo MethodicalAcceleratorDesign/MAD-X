@@ -927,6 +927,7 @@ contains
     call dadal(b2,nd2)
     return
   end subroutine daflod
+
   subroutine intd(v,h,sca)
     implicit none
     ! IF SCA=-one
@@ -966,6 +967,7 @@ contains
     call dadal1(b1)
     return
   end subroutine intd
+
   subroutine difd(h1,v,sca)
     implicit none
     ! INVERSE OF INTD ROUTINE
@@ -986,6 +988,7 @@ contains
     call dadal1(b1)
     return
   end subroutine difd
+
   subroutine expflo(h,x,y,eps,nrmax)
     implicit none
     ! DOES EXP( \VEC{H} ) X = Y
@@ -1033,7 +1036,7 @@ contains
        call dacop(b3,b4)
     enddo
     if(lielib_print(2)==1) then
-       write(6,'(a6,1x,g20.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
+       write(6,'(a6,1x,G21.14,1x,a25)') ' NORM ',eps,' NEVER REACHED IN EXPFLO '
     endif
     call dacop(b3,y)
     call dadal1(b4)
@@ -1284,65 +1287,80 @@ contains
     eps=c_1d_5
     nrmax=1000
     xn=c_1d4
-    do k=1,nrmax
-       call dacmud(h,-one,t)
-       call expflod(t,xy,x,eps,nrmax)
-       call dalind(x,one,v,-one,t)
-       ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
-       ! call daprid(t,1,1,20)
-       if(xn.lt.epsone) then
-          if(lielib_print(3)==1) then
+
+    if(epsone>zero) then  !epsone>zero
+       do k=1,nrmax
+          call dacmud(h,-one,t)
+          call expflod(t,xy,x,eps,nrmax)
+          call dalind(x,one,v,-one,t)
+          ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
+          ! call daprid(t,1,1,20)
+          if(xn.lt.epsone) then
+             if(lielib_print(3)==1) then
+                w_p=0
+                w_p%nc=1
+                write(w_p%c(1),'(a14,g21.14)') " xn quadratic ",xn
+                w_p%fc='(1((1X,A72)))'
+                ! CALL !WRITE_a
+             endif
+             call daflod(t,t,w)
+             call dalind(t,one,w,-half,t)
+             call dacopd(t,z)
+             call dacopd(t,w)
+             !  second order in W
+             call etcom(h,w,x)
+             call etcom(x,w,x)
+             !  END OF  order in W
+
+             do kk=1,3   !10
+                call etcom(h,w,w)
+                call dalind(z,one,w,xintex(kk),z)
+             enddo
+             call dacopd(z,t)
+             xx=one/twelve
+             call dalind(x,xx,h,one,h)
+          endif
+
+          call dalind(t,one,h,one,h)
+          xnorm=zero
+          do i=1,nd2
+             call daabs(t(i),r)
+             xnorm=xnorm+r
+          enddo
+          xn=xnorm/xnorm1
+          if(xn.ge.epsone.and.(lielib_print(3)==1)) then
              w_p=0
              w_p%nc=1
-             write(w_p%c(1),'(a14,g20.14)') " xn quadratic ",xn
+             write(w_p%c(1),'(a11,g21.14)') " xn linear ",xn
              w_p%fc='(1((1X,A72)))'
-             CALL WRITE_a
+             !CALL !WRITE_a
           endif
-          call daflod(t,t,w)
-          call dalind(t,one,w,-half,t)
-          call dacopd(t,z)
-          call dacopd(t,w)
-          !  second order in W
-          call etcom(h,w,x)
-          call etcom(x,w,x)
-          !  END OF  order in W
-
-          do kk=1,3   !10
-             call etcom(h,w,w)
-             call dalind(z,one,w,xintex(kk),z)
-          enddo
-          call dacopd(z,t)
-          xx=one/twelve
-          call dalind(x,xx,h,one,h)
-       endif
-
-       call dalind(t,one,h,one,h)
-       xnorm=zero
-       do i=1,nd2
-          call daabs(t(i),r)
-          xnorm=xnorm+r
+          if(xn.lt.eps.or.more) then
+             more=.true.
+             if(xn.ge.xnbefore) goto 1000
+             xnbefore=xn
+          endif
        enddo
-       xn=xnorm/xnorm1
-       if(xn.ge.epsone.and.(lielib_print(3)==1)) then
-          w_p=0
-          w_p%nc=1
-          write(w_p%c(1),'(a11,g20.14)') " xn linear ",xn
-          w_p%fc='(1((1X,A72)))'
-          CALL WRITE_a
-       endif
-       if(xn.lt.eps.or.more) then
-          more=.true.
-          if(xn.ge.xnbefore) goto 1000
-          xnbefore=xn
-       endif
-    enddo
-1000 continue
-    WRITE(6,*) " K ", K,epsone
-    w_p=0
-    w_p%nc=1
-    write(w_p%c(1),'(a11,i4)') " iteration " , k
-    w_p%fc='(1((1X,A72)))'
-    CALL WRITE_a
+1000   continue
+    else  !epsone>zero
+       do k=1,nint(abs(epsone))-1
+          call dacmud(h,-one,t)
+          call expflod(t,xy,x,eps,nrmax)
+          call dalind(x,one,v,-one,t)
+          ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
+          ! call daprid(t,1,1,20)
+
+          call dalind(t,one,h,one,h)
+       enddo
+    endif
+    if(lielib_print(3)==1) WRITE(6,*) " K ", K,epsone
+    if(lielib_print(3)==1) then
+       w_p=0
+       w_p%nc=1
+       write(w_p%c(1),'(a11,i4)') " iteration " , k
+       w_p%fc='(1((1X,A72)))'
+    endif
+    !  if(lielib_print(3)==1) CALL WRITE_a
     call dadal(x,nd2)
     call dadal(w,nd2)
     call dadal(v,nd2)
@@ -1350,6 +1368,7 @@ contains
     call dadal(z,nd2)
     return
   end subroutine flofacg
+
   subroutine flofac(xy,x,h)
     implicit none
     ! GENERAL DRAGT-FINN FACTORIZATION
@@ -1547,8 +1566,8 @@ contains
           w_p%r(ij)=p(ij)
        enddo
        w_p%fc='((1X,A8))'
-       w_p%fr='(3(1x,g20.14))'
-       CALL WRITE_a
+       w_p%fr='(3(1x,g21.14))'
+       !CALL !WRITE_a
        w_p=1
        w_p%nc=1
        w_p%nr=2
@@ -1557,8 +1576,8 @@ contains
           w_p%r(ij)=rad(ij)
        enddo
        w_p%fc='((1X,A8))'
-       w_p%fr='(3(1x,g20.14))'
-       CALL WRITE_a
+       w_p%fr='(3(1x,g21.14))'
+       !CALL !WRITE_a
     endif
     do ij=1,nd       !  -ndc    Frank
        ps(ij)=p(ij)
@@ -1575,7 +1594,7 @@ contains
        !          w_p=0
        !          w_p%nc=1
        !          w_p%fc='((1X,A72))'
-       !          write(w_p%c(1),'(i4,a27,g20.14)') ij,' TH TUNE MODIFIED IN H2 TO ',p(ij)*twopii
+       !          write(w_p%c(1),'(i4,a27,g21.14)') ij,' TH TUNE MODIFIED IN H2 TO ',p(ij)*twopii
        !          CALL WRITE_a
        !       endif
     enddo
@@ -1937,7 +1956,7 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,A72),/))'
           write(w_p%c(1),'(a13,i4)') ' ORDERFLO K= ', k
-          CALL WRITE_a
+          !CALL !WRITE_a
        endif
        ! X = EXP(B9) W
        call facflod(b9,w,x,k,k,one,1)
@@ -2795,7 +2814,7 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)= 'Check of the symplectic condition on the linear part'
-       CALL WRITE_a
+       !CALL !WRITE_a
        xsu=zero
        do i=1,nd2
           w_p=0
@@ -2804,7 +2823,7 @@ contains
           do j=1,nd2
              w_p%r(j)=w(i,j)
           enddo
-          CALL WRITE_a
+          !CALL !WRITE_a
 
           do j=1,nd2
              xsu=xsu+abs(w(i,j)-XJ(I,J))
@@ -2814,7 +2833,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-       CALL WRITE_a
+       !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
     if(no_hyperbolic_in_normal_form) then
@@ -2841,23 +2860,23 @@ contains
        w_p%nc=3
        w_p%fc='(2(1X,A120,/),(1X,A120))'
        w_p%c(2)= '       Index         Real Part         ArcSin(Imaginary Part)/2/pi'
-       CALL WRITE_a
+       !CALL !WRITE_a
        do i=1,nd-ndc
           rd1=SQRT(rr(2*i-1)**2+ri(2*i-1)**2)
           rd=SQRT(rr(2*i)**2+ri(2*i)**2)
           w_p=0
           w_p%nc=3
           w_p%fc='(2(1X,A120,/),(1X,A120))'
-          write(6,'(i4,2(1x,g20.14))') 2*i-1,rr(2*i-1),ASIN(ri(2*i-1)/rd1)*twopii
-          write(6,'(i4,2(1x,g20.14))') 2*i,rr(2*i),ASIN(ri(2*i)/rd)*twopii
-          write(6,'(a8,g20.14)') ' alphas ', LOG(SQRT(rd*rd1))
-          CALL WRITE_a
+          write(6,'(i4,2(1x,g21.14))') 2*i-1,rr(2*i-1),ASIN(ri(2*i-1)/rd1)*twopii
+          write(6,'(i4,2(1x,g21.14))') 2*i,rr(2*i),ASIN(ri(2*i)/rd)*twopii
+          write(6,'(a8,g21.14)') ' alphas ', LOG(SQRT(rd*rd1))
+          !CALL !WRITE_a
        enddo
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
-       CALL WRITE_a
+       !CALL !WRITE_a
        call read(n,nd-ndc)
     elseif(lielib_print(8)==-1) then
        do i=1,nd-ndc
@@ -3360,7 +3379,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a19,i4)') " resonance in file ",iref
-       CALL WRITE_i
+       ! call ! WRITE_I
        read(iref,*) nres
        if(nres.ge.nreso) then
           line= ' NRESO IN LIELIB TOO SMALL '
@@ -3374,7 +3393,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        w_p%c(1) =' warning resonances left in the map'
-       CALL WRITE_i
+       ! call ! WRITE_I
     endif
     if(iref.gt.0) then
        do i=1,nres
@@ -3620,7 +3639,7 @@ contains
           w_p%fc='((1X,A120))'
           w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
           if(lielib_print(4)==1) then
-             CALL WRITE_a
+             !CALL !WRITE_a
              write(6,*) sqrt(reval(i)**2+aieval(i)**2)
           endif
        endif

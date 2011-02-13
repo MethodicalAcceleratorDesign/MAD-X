@@ -12,7 +12,7 @@ module tree_element_MODULE
   PRIVATE ALLOC_SPINOR_8,ALLOC_probe_8
   PRIVATE KILL_SPINOR_8,KILL_probe_8,KILL_DASPIN
   PRIVATE EQUAL_SPINOR8_SPINOR8,EQUAL_IDENTITY_SPINOR_8 !,EQUAL_SPINOR8_RAY8,EQUAL_RAY8_SPINOR8,
-  PRIVATE  EQUAL_IDENTITY_probe_8,ALLOC_daspin,EQUAL_DASPIN_RAY8 ,EQUAL_RAY8_DASPIN
+  PRIVATE  EQUAL_IDENTITY_probe_8,ALLOC_daspin,EQUAL_DAMAPSPIN_RAY8 ,EQUAL_RAY8_DAMAPSPIN
   private alloc_normal_spin,kill_normal_spin,EQUAL_IDENTITY_probe
   private READ_DASPIN,PRINT_DASPIN,EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
@@ -36,17 +36,20 @@ module tree_element_MODULE
   private find_perp_basisp,find_exponentp
   private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8,extract_envelope_probe8
   PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8,concat_envelope,extract_envelope_damap
-  private flip  ! flip in lielib
+  private EQUAL_DAMAP_RAY8,spimat_spinmat
+  private flip,dlie,dphase,phase_shift  ! flip in lielib
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
   logical(lp) :: force_positive=.false.
   logical(lp) :: use_ptc_ac_position=.false.
-
+  integer, private :: nd_used,i_phase,i_plane, decal
+  logical :: onelie = my_false
   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
      MODULE PROCEDURE REAL6REAL_8
      MODULE PROCEDURE real_8REAL_8
+     module PROCEDURE  spimat_spinmat
      !
      MODULE PROCEDURE EQUAL_IDENTITY_probe   ! probe_8=0 p%s=Id  p%x=x_i (tpsa) i=1,npara_fpp
      MODULE PROCEDURE EQUAL_IDENTITY_probe_8 ! probe=0 p%s=Id  p%x=0.d0
@@ -58,8 +61,9 @@ module tree_element_MODULE
 
      MODULE PROCEDURE EQUAL_SPINOR8_SPINOR8
      MODULE PROCEDURE EQUAL_SPINOR8_SPINOR
-     MODULE PROCEDURE EQUAL_DASPIN_RAY8
-     MODULE PROCEDURE EQUAL_RAY8_DASPIN
+     MODULE PROCEDURE EQUAL_DAMAPSPIN_RAY8
+     MODULE PROCEDURE EQUAL_RAY8_DAMAPSPIN
+     MODULE PROCEDURE EQUAL_DAMAP_RAY8
 
      MODULE PROCEDURE EQUAL_DAmapSPIN_int  ! damapspin = Identity (or zero)
      MODULE PROCEDURE EQUAL_PROBE8_PROBE8
@@ -67,15 +71,16 @@ module tree_element_MODULE
      MODULE PROCEDURE     EQUAL_SPINOR_SPINOR8
      MODULE PROCEDURE     EQUAL_PROBE_PROBE8
      MODULE PROCEDURE     normalise_spin
-     MODULE PROCEDURE     INTO_RES_SPIN8_eq !@
+     MODULE PROCEDURE     INTO_RES_SPIN8_eq !
      MODULE PROCEDURE     INTO_SPIN8_from_RES_eq
      MODULE PROCEDURE     EQUAL_RF8_RF8
      MODULE PROCEDURE     EQUAL_RF8_RF
      MODULE PROCEDURE     EQUAL_RF_RF8
+     !    MODULE PROCEDURE     EQUAL_nn_damap
   end  INTERFACE
 
   INTERFACE OPERATOR (*)
-     MODULE PROCEDURE concat  !@ damapspin= damapspin o damapspin
+     MODULE PROCEDURE concat  ! damapspin= damapspin o damapspin
      MODULE PROCEDURE cmul    ! damapspin%s= real(dp) * damapspin%s     orbital unchanged
      MODULE PROCEDURE mmul  ! damapspin%s=damapspin%s o damap
      MODULE PROCEDURE damapspin_spinor_mul  ! spinor_8%s(i)= damapspin%s(i,j) * spinor%s(j)
@@ -218,8 +223,28 @@ module tree_element_MODULE
      MODULE PROCEDURE ALLOC_33p
   END INTERFACE
 
+  INTERFACE ALLOC_nn
+     MODULE PROCEDURE ALLOC_33t
+     MODULE PROCEDURE ALLOC_33p
+  END INTERFACE
+
+  INTERFACE matmul_nn
+     MODULE PROCEDURE matmul_33
+  END INTERFACE
+
   INTERFACE zero_33
      MODULE PROCEDURE zero_33t
+     MODULE PROCEDURE zero_33p
+  END INTERFACE
+
+  INTERFACE zero_nn
+     MODULE PROCEDURE zero_33t
+     MODULE PROCEDURE zero_33p
+  END INTERFACE
+
+  INTERFACE KILL_nn
+     MODULE PROCEDURE KILL_33t
+     MODULE PROCEDURE KILL_33p
   END INTERFACE
 
   INTERFACE KILL_33
@@ -242,6 +267,8 @@ module tree_element_MODULE
   INTERFACE KILL
      MODULE PROCEDURE KILL_TREE
      MODULE PROCEDURE KILL_TREE_N
+     MODULE PROCEDURE KILL_33t
+     MODULE PROCEDURE KILL_33p
   END INTERFACE
 
   INTERFACE factor
@@ -383,6 +410,21 @@ CONTAINS
        s1(i)=s2(i)
     enddo
   END SUBROUTINE real_8REAL6
+
+
+
+  SUBROUTINE  spimat_spinmat(S1,S2)
+    implicit none
+    type (spinmatrix),INTENT(in)::S2
+    type (spinmatrix),INTENT(inOUT)::S1
+    integer i,j
+
+    do i=1,3
+       do j=1,3
+          s1%s(i,j)=s2%s(i,j)
+       enddo
+    enddo
+  END SUBROUTINE spimat_spinmat
 
   SUBROUTINE  print6(S1,mf)
     implicit none
@@ -914,12 +956,12 @@ CONTAINS
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     do i=1,3
        do j=1,3
-          call assp_no_master(s1%s(i,j))
+          call assp_no_master(s1%s%s(i,j))
           !          call ass0(s1%s(i,j)%t)   ! taylor
           !          s1%s(i,j)%alloc=my_true
           !          s1%s(i,j)%kind=1
@@ -945,7 +987,7 @@ CONTAINS
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     !    if(C_%SPIN_POS/=0) then
@@ -994,7 +1036,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          FULL_ABST=FULL_ABS(S1%s(i,j))+FULL_ABST
+          FULL_ABST=FULL_ABS(S1%s%s(i,j))+FULL_ABST
        enddo
     enddo
 
@@ -1016,7 +1058,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          CUTORDER%s(i,j)=s1%s(i,j).cut.(s2-1)
+          CUTORDER%s%s(i,j)=s1%s%s(i,j).cut.(s2-1)
        enddo
     enddo
 
@@ -1040,9 +1082,9 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          s%s(i,j)=t%s(j,i)
+          s%s%s(i,j)=t%s%s(j,i)
           !          if(s%s(i,j)%kind==2) then   ! taylor
-          s%s(i,j)=s%s(i,j)*s%m
+          s%s%s(i,j)=s%s%s(i,j)*s%m
           !           s%s(i,j)=s%s(i,j)%t*s%m ! taylor
           !          endif   ! taylor
        enddo
@@ -1070,7 +1112,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          s%s(i,j)=r%s(i,j)
+          s%s%s(i,j)=r%s%s(i,j)
        enddo
     enddo
 
@@ -1398,7 +1440,30 @@ CONTAINS
     !    R%G=S%G
   END    subroutine EQUAL_SPINOR8_SPINOR
 
-  subroutine EQUAL_DASPIN_RAY8(DS,R)
+  subroutine EQUAL_DAMAP_RAY8(DS,R)
+    implicit none
+    TYPE(probe_8), INTENT(IN) :: R
+    TYPE(damap), INTENT(INOUT) :: DS
+    INTEGER I,nd2t
+
+    nd2t=C_%ND2
+    if(doing_ac_modulation_in_ptc) then
+       nd2t=C_%ND2-2
+    endif
+
+
+
+    DO I=1,nd2t
+       DS%V(I)=R%X(I)
+    ENDDO
+    DO I=nd2t+1,C_%ND2
+       DS%V(I)=R%ac%x(i-nd2t)
+    ENDDO
+
+  END subroutine EQUAL_DAMAP_RAY8
+
+
+  subroutine EQUAL_DAMAPSPIN_RAY8(DS,R)
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damapspin), INTENT(INOUT) :: DS
@@ -1421,7 +1486,7 @@ CONTAINS
 
     DO I=1,3
        DO J=1,3
-          DS%S(I,J)=R%S(J)%X(I)
+          DS%S%s(I,J)=R%S(J)%X(I)
        ENDDO
     ENDDO
     !          DS%S(I,1)=R%SX%X(I)
@@ -1445,9 +1510,9 @@ CONTAINS
 
 
     !     DS%G=R%S%G
-  END subroutine EQUAL_DASPIN_RAY8
+  END subroutine EQUAL_DAMAPSPIN_RAY8
 
-  subroutine EQUAL_RAY8_DASPIN(R,DS)
+  subroutine EQUAL_RAY8_DAMAPSPIN(R,DS)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
     TYPE(damapspin), INTENT(IN) :: DS
@@ -1467,7 +1532,7 @@ CONTAINS
 
     DO J=1,3
        DO I=1,3
-          R%S(J)%X(I)=DS%S(I,J)                  ! taylor MORPH(DS%S(I,J))
+          R%S(J)%X(I)=DS%S%s(I,J)                  ! taylor MORPH(DS%S(I,J))
        ENDDO
     ENDDO
 
@@ -1477,7 +1542,7 @@ CONTAINS
 
     !    R%S%G=DS%G
 
-  END subroutine EQUAL_RAY8_DASPIN
+  END subroutine EQUAL_RAY8_DAMAPSPIN
 
   subroutine EQUAL_DAmapSPIN_int(DS,I1)
     implicit none
@@ -1493,11 +1558,11 @@ CONTAINS
 
     !    DS%X=ZERO
     DS%M=I1
-    CALL zero_33(DS%S)
+    CALL zero_33(DS%S%s)
 
     DO I=1,3
        if(i1==1) then
-          DS%S(I,I)=ONE
+          DS%S%s(I,I)=ONE
        endif
     ENDDO
     DS%e_ij=zero
@@ -1575,7 +1640,7 @@ CONTAINS
        DO J=1,3
           localmaster=master
           call ass(scdadd%s(J)%x(i))
-          scdadd%s(J)%x(i)=S1%S(I,J)
+          scdadd%s(J)%x(i)=S1%S%s(I,J)
           master=localmaster
        ENDDO
 
@@ -1659,7 +1724,7 @@ CONTAINS
        DO J=1,3
           localmaster=master
           call ass(daddsc%s(J)%x(i))
-          daddsc%s(J)%x(i)=S1%S(I,J)
+          daddsc%s(J)%x(i)=S1%S%s(I,J)
           master=localmaster
        ENDDO
 
@@ -1688,7 +1753,7 @@ CONTAINS
        DO I=1,3
           DO J=1,3
              WRITE(MF,*) " SPIN MATRIX COMPONENT ",I,J
-             CALL PRINT(DS%S(I,J),MF,prec)
+             CALL PRINT(DS%S%s(I,J),MF,prec)
           ENDDO
        ENDDO
     else
@@ -1868,7 +1933,7 @@ CONTAINS
        DO J=1,3
           READ(MF1,*) LINE
           CALL READ(T,MF1)
-          DS%S(I,J)=T     !MORPH(T)
+          DS%S%s(I,J)=T     !MORPH(T)
        ENDDO
     ENDDO
     READ(MF1,*) LINE
@@ -2052,11 +2117,10 @@ CONTAINS
 
     theta0=sqrt(n0(1)**2+n0(2)**2+n0(3)**2)
 
+
     do i=1,3
        n0(i)=n0(i)/theta0
     enddo
-
-
 
 
     call kill(det)
@@ -2086,7 +2150,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          ss(i,j)=ds%s(i,j)
+          ss(i,j)=ds%s%s(i,j)
        enddo
     enddo
 
@@ -2199,7 +2263,7 @@ CONTAINS
     s%m=1
     sf=0
     do i=1,3
-       s%s(i,i)=s%s(i,i)-one
+       s%s%s(i,i)=s%s%s(i,i)-one
     enddo
 
     st=s
@@ -2229,9 +2293,9 @@ CONTAINS
        stop 666
     endif
 
-    h_axis%x(1)=sf%s(3,2)
-    h_axis%x(2)=sf%s(1,3)
-    h_axis%x(3)=sf%s(2,1)
+    h_axis%x(1)=sf%s%s(3,2)
+    h_axis%x(2)=sf%s%s(1,3)
+    h_axis%x(3)=sf%s%s(2,1)
 
     !etienne
 
@@ -2276,6 +2340,225 @@ CONTAINS
     call kill(s)
   end subroutine find_exponentp
 
+  subroutine find_exponent_only(ds,h_axis,spin_tune)  !
+    implicit none
+    type(damapspin),intent(inout) :: ds
+    type(spinor_8),intent(inout) :: h_axis
+    type(spinor_8)  y_axis,x_axis,z_axis
+    type(spinor_8) s
+    type(real_8) cos,sin,theta
+    type(real_8) , optional :: spin_tune
+
+    call alloc(s)
+    call alloc(cos,sin,theta)
+    call alloc(y_axis)
+    call alloc(x_axis)
+    call alloc(z_axis)
+    call find_axis(ds,y_axis)
+    !  etienne
+
+    call find_perp_basis(y_axis,x_axis,z_axis)
+
+
+
+    s=ds*x_axis
+
+
+    cos=s.dot.x_axis
+    sin=-(s.dot.z_axis)
+
+    theta=clockwise*atan2(sin,cos)
+    !if(force_positive.and.theta<zero) theta = theta + twopi    !!!! allow negative theta
+
+    h_axis=(clockwise*theta)*y_axis
+
+    if(present(spin_tune)) then
+       spin_tune=(one/twopi)*theta
+    endif
+
+    call kill(y_axis)
+    call kill(x_axis)
+    call kill(z_axis)
+    call kill(cos,sin,theta)
+    call kill(s)
+  end subroutine find_exponent_only
+
+  subroutine remove_y_rot(as_xyz,r_y)
+    implicit none
+    type(damapspin), intent(inout) :: as_xyz
+    type(damapspin), optional , intent(inout) ::r_y
+    type(damapspin) temp,as_y,as_nl,rot_y
+    type(spinor_8) n_expo,n_tune
+    type(taylorresonance) tr
+    type(taylor) t
+    integer i,j
+    integer  nmax
+    real(dp) c,eps,norm1,norm2
+    logical check
+!!!  original as_xyz = as_xyz*r_y = a_y*a_nl*r_y  on exit
+    check=.true.
+    eps=1.d-1
+    nmax=1000
+
+    call alloc(n_expo)
+    call alloc(n_tune)
+    call alloc(temp,as_y,as_nl,rot_y)
+    call alloc(tr)
+    call alloc(t)
+
+    as_y=as_xyz
+
+    norm1=mybig
+    rot_y=1
+
+    check=.true.
+    norm1=mybig
+    do i=1,nmax
+       call find_exponent_only(as_y,n_expo)
+       !     call dalog_spinor_8(as_y,n_expo)
+       norm2=zero
+       n_tune%x(1)=zero
+       n_tune%x(3)=zero
+       ! do j=1,3
+       j=2     ! do loop was a theory error
+       t=n_expo%x(j)
+       tr=t
+       call cfu(tr%cos,phase_shift,tr%cos)
+       tr%sin=zero
+       t=tr
+       n_tune%x(j)=t
+       !  enddo
+       temp=exp(n_tune)
+
+       rot_y=temp*rot_y
+       call inv_as(temp%s%s,temp%s%s)
+       as_y=as_y*temp
+       if(check) then
+          if(norm2<eps) then
+             check=.false.
+          endif
+       else
+          if(norm2>=norm1) exit
+       endif
+       norm1=norm2
+
+    enddo
+    if(i>nmax-10) then
+       write(6,*) "no convergence in remove_y_rot "
+       stop 1067
+    endif
+    as_xyz=as_y
+    if(present(r_y)) r_y=rot_y
+
+    call kill(n_expo)
+    call kill(temp,as_y,as_nl,rot_y)
+    call kill(tr)
+    call kill(n_tune)
+    call kill(t)
+
+  end subroutine remove_y_rot
+
+  subroutine remove_y_rot0(as_xyz,a_y,a_nl,r_y)
+    implicit none
+    type(damapspin), intent(inout) :: as_xyz
+    type(damapspin), optional , intent(inout) :: a_y,a_nl,r_y
+    type(damapspin) temp,as_y,as_nl,rot_y
+    type(spinor_8) n_expo,n_tune
+    type(taylorresonance) tr
+    type(taylor) t
+    integer i,j
+    integer  nmax
+    real(dp) c,eps,norm1,norm2
+    logical check
+!!!  original as_xyz = as_xyz*r_y = a_y*a_nl*r_y  on exit
+    check=.true.
+    eps=1.d-5
+    nmax=1000
+
+    call alloc(n_expo)
+    call alloc(n_tune)
+    call alloc(temp,as_y,as_nl,rot_y)
+    call alloc(tr)
+    call alloc(t)
+
+    call factor_parameter_dependent_s0(as_xyz,as_y,as_nl,n_expo,1)
+
+    norm1=mybig
+    rot_y=1
+    do i=1,nmax
+       call find_exponent_only(as_y,n_expo)
+       n_expo%x(1)=zero
+       n_expo%x(3)=zero
+       temp=exp(n_expo)
+       rot_y=temp*rot_y
+       call inv_as(temp%s%s,temp%s%s)
+       as_y=as_y*temp
+       call norm_spinor_8(n_expo,norm2)
+       if(check) then
+          if(norm2<eps) then
+             check=.false.
+          endif
+       else
+          if(norm2>=norm1) exit
+       endif
+       norm1=norm2
+    enddo
+    if(i>nmax-10) then
+       write(6,*) "no convergence in daexplogp "
+       stop 1066
+    endif
+    as_nl=rot_y*as_nl*rot_y**(-1)
+
+    check=.true.
+    norm1=mybig
+    do i=1,nmax
+       call dalog_spinor_8(as_nl,n_expo)
+       norm2=zero
+       n_tune%x(1)=zero
+       n_tune%x(3)=zero
+       ! do j=1,3
+       j=2     ! do loop was a theory error
+       t=n_expo%x(j)
+       tr=t
+       call cfu(tr%cos,phase_shift,tr%cos)
+       tr%sin=zero
+       t=tr
+       n_tune%x(j)=t
+       norm2=norm2+full_abs(t)
+       !  enddo
+       temp=exp(n_tune)
+
+       rot_y=temp*rot_y
+       call inv_as(temp%s%s,temp%s%s)
+       as_nl=as_nl*temp
+       if(check) then
+          if(norm2<eps) then
+             check=.false.
+          endif
+       else
+          if(norm2>=norm1) exit
+       endif
+       norm1=norm2
+
+    enddo
+
+    if(i>nmax-10) then
+       write(6,*) "no convergence in daexplogp "
+       stop 1067
+    endif
+    as_xyz=as_y*as_nl
+    if(present(r_y)) r_y=rot_y
+    if(present(a_y)) a_y=as_y
+    if(present(a_nl)) a_nl=as_nl
+
+    call kill(n_expo)
+    call kill(temp,as_y,as_nl,rot_y)
+    call kill(tr)
+    call kill(n_tune)
+    call kill(t)
+
+  end subroutine remove_y_rot0
+
   subroutine daexplogp(h_axis,ds)
     implicit none
     TYPE(damapspin), INTENT(INout) :: DS
@@ -2297,12 +2580,12 @@ CONTAINS
     !  this only works with a da-map
     ds=1
     dh%m=1
-    dh%s(2,1)=h_axis%x(3)
-    dh%s(1,3)=h_axis%x(2)
-    dh%s(3,2)=h_axis%x(1)
-    dh%s(1,2)=-h_axis%x(3)
-    dh%s(3,1)=-h_axis%x(2)
-    dh%s(2,3)=-h_axis%x(1)
+    dh%s%s(2,1)=h_axis%x(3)
+    dh%s%s(1,3)=h_axis%x(2)
+    dh%s%s(3,2)=h_axis%x(1)
+    dh%s%s(1,2)=-h_axis%x(3)
+    dh%s%s(3,1)=-h_axis%x(2)
+    dh%s%s(2,3)=-h_axis%x(1)
     dhn=1
     c=one
     norm1=mybig
@@ -2344,11 +2627,25 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          norm=norm+full_abs( ds%s(i,j) )
+          norm=norm+full_abs( ds%s%s(i,j) )
        enddo
     enddo
 
   end subroutine norm_damapspin
+
+  subroutine norm_spinor_8(s,norm)
+    implicit none
+    TYPE(spinor_8), INTENT(INout) :: s
+    real(dp) norm
+    integer i
+
+    norm=zero
+
+    do i=1,3
+       norm=norm+full_abs( s%x(i) )
+    enddo
+
+  end subroutine norm_spinor_8
 
   ! end of  find exponent of rotation routines
 
@@ -2488,13 +2785,73 @@ CONTAINS
 
 
 
-  subroutine alloc_33t(a)
+  subroutine copy_damap_matrix(mi,a)
     implicit none
-    type(taylor) a(3,3)
+    type(taylor), intent(inout) :: a(:,:)
+    type(damap), intent(in) :: mi
+    type(damap) m
+
+    integer i,j,nt
+    logical doflip
+    integer, allocatable :: jl(:)
+
+    call alloc(m)
+
+    m=mi
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       perform_flip=.false.
+       call flip_damap(m,m)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+    nt=c_%nd2
+    if(c_%ndpt/=0)nt=nt-2
+
+    allocate(jl(nt))
+    jl=0
+    do i=1,min(nt,size(a,dim=1))
+       do j=1,min(nt,size(a,dim=2))
+          jl(j)=1
+          a(i,j)=m%v(i).par.jl
+          jl(j)=0
+       enddo
+    enddo
+
+    if(doflip) then
+       call flip_damap(m,m)
+       perform_flip=.true.
+    endif
+
+    call kill(m)
+    deallocate(jl)
+
+  end subroutine copy_damap_matrix
+
+  subroutine copy_matrix_matrix(ma,a)
+    implicit none
+    type(taylor), intent(inout) :: a(:,:)
+    type(taylor), intent(in) :: ma(:,:)
     integer i,j
 
-    do i=1,3
-       do j=1,3
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
+          a(i,j)=ma(i,j)
+       enddo
+    enddo
+
+  end subroutine copy_matrix_matrix
+
+
+
+  subroutine alloc_33t(a)
+    implicit none
+    type(taylor) a(:,:)
+    integer i,j
+
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
           call alloc(a(i,j))
        enddo
     enddo
@@ -2503,38 +2860,55 @@ CONTAINS
 
   subroutine kill_33t(a)
     implicit none
-    type(taylor) a(3,3)
+    type(taylor) a(:,:)
     integer i,j
 
-    do i=1,3
-       do j=1,3
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
           call kill(a(i,j))
        enddo
     enddo
 
   end subroutine kill_33t
 
-  subroutine zero_33t(a)
+  subroutine zero_33t(a,r)
     implicit none
-    type(real_8) a(3,3) ! taylor
+    type(taylor) a(:,:) ! taylor
     !    type(taylor) a(3,3)
     integer i,j
+    real(dp), optional :: r
 
-    do i=1,3
-       do j=1,3
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
           a(i,j)=zero
        enddo
+       if(present(r)) a(i,i)=one
+    enddo
+  end subroutine zero_33t
+
+  subroutine zero_33p(a,r)
+    implicit none
+    type(real_8) a(:,:) ! taylor
+    !    type(taylor) a(3,3)
+    integer i,j
+    real(dp), optional :: r
+
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
+          a(i,j)=zero
+       enddo
+       if(present(r)) a(i,i)=one
     enddo
 
-  end subroutine zero_33t
+  end subroutine zero_33p
 
   subroutine alloc_33p(a)
     implicit none
-    type(real_8) a(3,3)
+    type(real_8) a(:,:) ! taylor
     integer i,j
 
-    do i=1,3
-       do j=1,3
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
           call alloc(a(i,j))
        enddo
     enddo
@@ -2543,16 +2917,74 @@ CONTAINS
 
   subroutine kill_33p(a)
     implicit none
-    type(real_8) a(3,3)
+    type(real_8) a(:,:)
     integer i,j
 
-    do i=1,3
-       do j=1,3
+    do i=1,size(a,dim=1)
+       do j=1,size(a,dim=2)
           call kill(a(i,j))
        enddo
     enddo
 
   end subroutine kill_33p
+
+  subroutine matmul_33(m,n,mo,sc)
+    implicit none
+    type(taylor) m(:,:),n(:,:),mo(:,:)
+    type(taylor), allocatable :: a(:,:)
+    real(dp), optional :: sc
+    real(dp) sc0
+    integer i,j,k
+    sc0=one
+    allocate(a(size(m,dim=1),size(n,dim=2)))
+
+    call alloc_33(a)
+
+    do i=1,size(m,dim=1)
+       do j=1,size(m,dim=2)
+          do k=1,size(n,dim=2)
+             a(i,k)=m(i,j)*n(j,k)+a(i,k)
+          enddo
+       enddo
+    enddo
+
+    if(present(sc)) sc0=sc
+    do i=1,size(mo,dim=1)
+       do j=1,size(mo,dim=2)
+          mo(i,j)=sc0*a(i,j)
+       enddo
+    enddo
+    call kill_33(a)
+    deallocate(a)
+  end subroutine matmul_33
+
+  subroutine matmul_3344(m,n,mo)
+    implicit none
+    type(taylor) m(:,:),n(:,:),mo(:,:)
+    type(taylor), allocatable :: a(:,:)
+    integer i,j,k
+
+    allocate(a(size(m,dim=1),size(n,dim=2)))
+
+    call alloc_33(a)
+
+    do i=1,size(m,dim=1)
+       do j=1,size(m,dim=2)
+          do k=1,size(n,dim=2)
+             a(i,k)=m(i,j)*n(j,k)+a(i,k)
+          enddo
+       enddo
+    enddo
+
+
+    do i=1,size(mo,dim=1)
+       do j=1,size(mo,dim=2)
+          mo(i,j)=a(i,j)
+       enddo
+    enddo
+    call kill_33(a)
+    deallocate(a)
+  end subroutine matmul_3344
 
   subroutine matmulp(m,n,mo)
     implicit none
@@ -2851,7 +3283,7 @@ CONTAINS
     CALL ALLOC(D%M)
     DO I=1,3
        DO J=1,3
-          CALL ALLOC(D%S(I,J))
+          CALL ALLOC(D%S%s(I,J))
           d%e_ij(i,j)=zero
        ENDDO
     ENDDO
@@ -2867,7 +3299,7 @@ CONTAINS
     CALL KILL(D%M)
     DO I=1,3
        DO J=1,3
-          CALL KILL(D%S(I,J))
+          CALL KILL(D%S%s(I,J))
           d%e_ij(i,j)=zero
        ENDDO
     ENDDO
@@ -2998,7 +3430,7 @@ CONTAINS
     call alloc_33(ai)
     call alloc(a11,a13)
 
-    call find_n0(ds%s,n0)
+    call find_n0(ds%s%s,n0)
 
     !     call print(theta0,6)
 
@@ -3009,7 +3441,7 @@ CONTAINS
 
 
 
-    call matmulp(ai,ds%s,ai)    !
+    call matmulp(ai,ds%s%s,ai)    !
     call matmulp(ai,a,s)    !
 
     a11=(s(1,1))
@@ -3092,7 +3524,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          s(i,j)=ds%s(i,j)
+          s(i,j)=ds%s%s(i,j)
        enddo
     enddo
 
@@ -3143,8 +3575,8 @@ CONTAINS
        ! if(old) then
 
        s11%m=s11%m**(-1)
-       call trans_mat(s11%s,s11%m,s11%s)
-       call inv_as(s11%s,s11%s)
+       call trans_mat(s11%s%s,s11%m,s11%s%s)
+       call inv_as(s11%s%s,s11%s%s)
 
        !      CALL etinv(S11%v%i,S11%v%i)
        !       else
@@ -3229,7 +3661,7 @@ CONTAINS
        do j=1,3
           !     if(s2%s(i,j)%kind==2) then
           !          if(c_%nd2/=0) then
-          t2%s(i,j)=s2%s(i,j)*s1%m
+          t2%s%s(i,j)=s2%s%s(i,j)*s1%m
           !          else
           !           t2%s(i,j)=s2%s(i,j)
           !          endif
@@ -3247,11 +3679,11 @@ CONTAINS
     do i=1,3
        do j=1,3
           do k=1,3
-             s(i,j)= t2%s(i,k)*s1%s(k,j)+ s(i,j)
+             s(i,j)= t2%s%s(i,k)*s1%s%s(k,j)+ s(i,j)
           enddo
        enddo
     enddo
-    call smatp(one,s,concat%s)
+    call smatp(one,s,concat%s%s)
     !    concat%s0=s1%s0
 
     call concat_envelope(S2,S1,concat)
@@ -3343,7 +3775,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          cmul%s(i,j)=s2*s1%s(i,j)
+          cmul%s%s(i,j)=s2*s1%s%s(i,j)
        enddo
     enddo
     master=localmaster
@@ -3365,7 +3797,7 @@ CONTAINS
     call ass(mmul)
 
     mmul=s1
-    call trans_mat( mmul%s,s2, mmul%s)
+    call trans_mat( mmul%s%s,s2, mmul%s%s)
 
     !    do i=1,3
     !       do j=1,3
@@ -3400,7 +3832,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          damapspin_spinor8_mul%x(i)=(s1%s(i,j))*S2%x(j)+damapspin_spinor8_mul%x(i)
+          damapspin_spinor8_mul%x(i)=(s1%s%s(i,j))*S2%x(j)+damapspin_spinor8_mul%x(i)
        enddo
     enddo
 
@@ -3432,7 +3864,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          damapspin_spinor_mul%x(i)=(s1%s(i,j))*S2%x(j)+damapspin_spinor_mul%x(i)
+          damapspin_spinor_mul%x(i)=(s1%s%s(i,j))*S2%x(j)+damapspin_spinor_mul%x(i)
        enddo
     enddo
 
@@ -3655,7 +4087,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          addm%s(i,j)=s2%s(i,j)+s1%s(i,j)
+          addm%s%s(i,j)=s2%s%s(i,j)+s1%s%s(i,j)
        enddo
     enddo
 
@@ -3856,13 +4288,13 @@ CONTAINS
     a=1
     ai=1
 
-    call clean_orbital_33(ds0%s,s%s)
+    call clean_orbital_33(ds0%s%s,s%s%s)
     ! at this stage s is the spin map  without dependence on orbital
 
     if(spin_in) then           !!!!  spin in
-       call find_n0(s%s,ns%n0)
+       call find_n0(s%s%s,ns%n0)
 
-       call find_a(ns%n0,a%s)
+       call find_a(ns%n0,a%s%s)
 
        ai=a**(-1)
 
@@ -3878,8 +4310,8 @@ CONTAINS
 
        !pause 777
 
-       a11=s%s(1,1)
-       a13=s%s(1,3)
+       a11=s%s%s(1,1)
+       a13=s%s%s(1,3)
 
        ns%theta0=clockwise*atan2(a13,a11)
        ns%nu=ns%theta0/twopi
@@ -3923,7 +4355,7 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          s0%s(i,j)=ds%s(i,j).sub.'0'
+          s0%s%s(i,j)=ds%s%s(i,j).sub.'0'
        enddo
     enddo
     s=s0
@@ -3960,13 +4392,13 @@ CONTAINS
 
     A_f=DS
     a_f%m=1
-    CALL clean_orbital_33(A_f%S,A_f%S)
+    CALL clean_orbital_33(A_f%S%s,A_f%S%s)
     A_S=DS
     a_s%m=1
     IF(DIR==1) THEN
-       a_S=a_f*a_s**(-1)   ! angle has no constant part (DA) BUT PARAMETERS
+       a_S=a_f**(-1)*a_s   !   =s0*ns
     ELSE
-       a_S=a_f**(-1)*a_s   ! angle has no constant part (DA)
+       a_S=a_s*a_f**(-1)   !   =ns*s0    of course s0 is different
     ENDIF
     CALL dalog_spinor_8(a_S,N_AXIS)   !  S=exp(N_AXIS)
     S0=A_F
@@ -4024,9 +4456,9 @@ CONTAINS
     dh%m=1
     h=0
     dhn=1
-    dh%s(1,1)=dh%s(1,1)-one
-    dh%s(2,2)=dh%s(2,2)-one
-    dh%s(3,3)=dh%s(3,3)-one
+    dh%s%s(1,1)=dh%s%s(1,1)-one
+    dh%s%s(2,2)=dh%s%s(2,2)-one
+    dh%s%s(3,3)=dh%s%s(3,3)-one
 
     c=one
     do i=1,c_%no
@@ -4036,9 +4468,9 @@ CONTAINS
        c=-c
     enddo
 
-    om(1)=h%s(3,2)
-    om(2)=h%s(1,3)
-    om(3)=h%s(2,1)
+    om(1)=h%s%s(3,2)
+    om(2)=h%s%s(1,3)
+    om(3)=h%s%s(2,1)
 
     call kill(h)
     call kill(dh)
@@ -4058,12 +4490,12 @@ CONTAINS
     !  this only works with a da-map
     ds=1
     dh%m=1
-    dh%s(2,1)=om(3)
-    dh%s(1,3)=om(2)
-    dh%s(3,2)=om(1)
-    dh%s(1,2)=-om(3)
-    dh%s(3,1)=-om(2)
-    dh%s(2,3)=-om(1)
+    dh%s%s(2,1)=om(3)
+    dh%s%s(1,3)=om(2)
+    dh%s%s(3,2)=om(1)
+    dh%s%s(1,2)=-om(3)
+    dh%s%s(3,1)=-om(2)
+    dh%s%s(2,3)=-om(1)
     dhn=1
     c=one
     do i=1,c_%no
@@ -4413,7 +4845,7 @@ CONTAINS
     norm=zero
     do i=1,3
        do j=1,3
-          norm=norm+full_abs(DS%s(i,j))
+          norm=norm+full_abs(DS%s%s(i,j))
        enddo
     enddo
     norm=abs(norm-three)
@@ -4544,8 +4976,8 @@ CONTAINS
 
     do i=1,3
        do j=1,3
-          if(a_in%s(i,j)%kind==2) then
-             a_temp%s(i,j)=a_in%s(i,j)%t*x
+          if(a_in%s%s(i,j)%kind==2) then
+             a_temp%s%s(i,j)=a_in%s%s(i,j)%t*x
           endif
        enddo
     enddo
@@ -4556,18 +4988,69 @@ CONTAINS
   end subroutine eval_spin_matrix
 
 
-  subroutine factor_as(a_t,a_f,a_s,a_l,a_nl)
+  subroutine factor_as(a_t,a_f,a_s,a_l,a_nl,DR,R_TE,CS_TE,COSLIKE,s0,s_nl)
     implicit none
     TYPE(damapspin), INTENT(INout) :: a_t,a_f,a_s,a_l,a_nl
+    logical(lp) lagrange0,factor_spin0
+    TYPE(damapspin), optional, intent(inout) ::R_TE,CS_TE,DR,s0,s_nl
+    logical(lp) , optional, intent(inout)  :: COSLIKE
+    TYPE(damapspin) rot_y,temp,tempi
+
+    factor_spin0=my_false
+    if(present(s0).and.present(s_nl)) then
+       factor_spin0=my_true
+    elseif(.not.(present(s0)).and.(.not.present(s_nl))) then
+       ! do nothing
+    else
+       write(6,*) " error in factor_as "
+       stop 333
+    endif
     a_f=1
     a_l=1
     a_nl=1
+    lagrange0=my_false
+    if(present(dr))  then
+       lagrange0=my_true
+       dr=1
+    endif
+    if(present(R_TE).and.present(CS_TE)) then
+       R_TE=1
+       CS_TE=1
+    elseif((.not.present(R_TE)).and.(.not.present(CS_TE))) then
+       ! nothing to be done
+    else
+       write(6,*) " factor_as has an error: R_TE and CS_TE must be both present or absent "
+       stop 1068
 
-    call factor(a_t%m,a_f%m,a_l%m,a_nl%m)
+    endif
+
+    call factor(a_t%m,a_f%m,a_l%m,a_nl%m,DR%m,R_TE%m,CS_TE%m,COSLIKE)
+
+    if(lagrange0) then
+       a_s=1
+       a_s%s=a_t%s
+       a_s=a_s*dr**(-1)
+
+       call alloc(rot_y,temp,tempi)
+       if(factor_spin0) then
+          call remove_y_rot0(a_s,s0,s_nl,r_y=rot_y)
+       else
+          call remove_y_rot(a_s,r_y=rot_y)
+       endif
+       if(present(dr)) dr=dr*rot_y
+       call kill(rot_y,temp,tempi)
+
+       a_t%s=a_s%s
+    endif
+
+
 
     a_s=a_f**(-1)*a_t
     a_s%m=1
     a_s=a_s*a_t%m**(-1)
+
+
+
 
 !!! this creates
 
@@ -4588,17 +5071,39 @@ CONTAINS
 
 
 
-  subroutine factor_am(a_t,a_f,a_l,a_nl)
+  subroutine factor_am(a_t,a_f,a_l,a_nl,DR,R_TE,CS_TE,COSLIKE)
     implicit none
     TYPE(damap), INTENT(INout) :: a_t,a_nl,a_l,a_f
-    integer i,n,k
+    integer i,n,k,nt,j
     integer, allocatable :: jc(:)
-    real(dp) value
+    real(dp) value,alpha0
     logical doit
-    TYPE(damap) atemp
-    logical doflip
+    TYPE(damap) atemp,s1,s1i,m1
+    TYPE(taylor)a12,a11,p(ndim)
+    logical(lp) doflip,dote,lagrange0
+    TYPE(damap), optional, intent(inout) ::R_TE,CS_TE,DR
+    logical(lp) , optional, intent(inout)  :: COSLIKE
+    type(taylor) m(ndim2,ndim2)
+    type(taylor) at(2,2),bt(2,2),ct(2,2),dt(2,2),ati(2,2),bti(2,2),alpha,det
+    type(gmap) g
+    type(onelieexponent) un
+    type(reversedragtfinn) rdf
+    type(vecresonance) vr
 
-    call alloc(atemp)
+    lagrange0=my_false
+    if(present(dr)) lagrange0=my_true
+
+    call alloc(atemp,s1,s1i,m1)
+    call alloc(a12,a11)
+    call alloc(p,ndim)
+    call alloc_nn(m)
+    call alloc_nn(at)
+    call alloc_nn(bt)
+    call alloc_nn(ct)
+    call alloc_nn(dt)
+    call alloc_nn(ati)
+    call alloc_nn(bti)
+    call alloc(alpha,det)
     allocate(jc(c_%nv))
 
 
@@ -4685,19 +5190,459 @@ CONTAINS
     a_nl=atemp**(-1)*a_l
     a_l=atemp
 
+!!! a_t=a_f*a_l*a_nl at this stage
+
+    !   if(present(lagrange)) then
+    if(lagrange0) then
+       !   enforce Teng-Edwards to all orders in  parameters i.e. A_12=0 and A_3_4=0 etc....
+       nt=c_%nd
+       if(C_%ndpt/=0) nt=nt-1
+
+       s1=1
+       s1i=1
+
+       if(C_%ndpt/=0) then
+          s1%v(C_%ndpt)=one.mono.C_%ndpt
+          s1i%v(C_%ndpt)=one.mono.C_%ndpt
+       endif
+
+       do i=1,nt
+          a11=a_l%v(2*i-1).d.(2*i-1)
+          a12=a_l%v(2*i-1).d.(2*i)
+          p(i)=-a12/a11
+          p(i)=atan(p(i))
+          if(C_%ndpt/=0) then
+             if(mod(C_%ndpt,2)==1) then
+                s1%v(C_%ndpt+1)=s1%v(C_%ndpt+1)-(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+                s1i%v(C_%ndpt+1)=s1i%v(C_%ndpt+1)+(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+             else
+                s1%v(C_%ndpt-1)=s1%v(C_%ndpt-1)+(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+                s1i%v(C_%ndpt-1)=s1i%v(C_%ndpt-1)-(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+             endif
+          endif
+          s1%v(2*i-1)=COS(p(i))*(one.mono.(2*i-1))+SIN(p(i))*(one.mono.(2*i))
+          s1%v(2*i)  =COS(p(i))*(one.mono.(2*i))-SIN(p(i))*(one.mono.(2*i-1))
+          s1i%v(2*i-1)=COS(p(i))*(one.mono.(2*i-1))-SIN(p(i))*(one.mono.(2*i))
+          s1i%v(2*i)  =COS(p(i))*(one.mono.(2*i))+SIN(p(i))*(one.mono.(2*i-1))
+       enddo
+       a_nl=s1i*a_nl*s1
+       a_l=a_l*s1
+       dr=s1i
+       !       a_t_cs= a_f*a_l_cs* a_nl     ! a_nl is not yet " standard "
+!!!!!   nonlinear part if s1i !!!!!!
+       if(c_%no>1) then
+          if(onelie) then
+             nd_used=c_%nd2/2
+             if(c_%ndpt/=0) nd_used=nd_used-1
+             call alloc(vr)
+             call alloc(un)
+
+             s1i=a_nl   ! preserve it
+             s1=1
+             do i=1,c_%no   ! i=1,c_%no
+                un%eps=-c_%no
+                un=s1i
+                vr=un%vector
+                decal=1   ! not coasting plane
+                do k=1,nd_used*2
+                   i_phase=k
+                   if(mod(k,2)==0) then
+                      i_plane=k/2
+                   else
+                      i_plane=(k+1)/2
+                   endif
+                   call cfu(vr%cos%v(k),dphase,vr%cos%v(k))
+                   call cfu(vr%sin%v(k),dphase,vr%sin%v(k))
+                enddo
+
+                do k=nd_used*2+1,c_%nd2   !  fix coasting later
+                   vr%cos%v(k)=zero
+                   vr%sin%v(k)=zero
+                enddo
+
+                un%vector=vr
+                s1=texp(un%vector,s1)
+                s1i=texp(un%vector,s1i)
+             enddo    ! i=1,c_%no
+
+!!!! now fix coasting !!!!!
+             if( nd_used == c_%nd) then
+                a_nl=s1i
+             else  !  coasting
+                un%eps=-c_%no
+                un=s1
+                alpha0=one
+                if(mod(c_%ndpt,2)==0) alpha0=-one
+                do i=1,c_%nd2-2
+                   un%vector%v(i)=alpha0*(un%vector%v(i).d.c_%ndpt)
+                enddo
+                call int_partial(un%vector,un%pb,2)
+
+                if(mod(c_%ndpt,2)==0) then
+                   s1%v(c_%ndpt-1)=s1%v(c_%ndpt-1)+un%pb%h
+                else
+                   s1%v(c_%ndpt+1)=s1%v(c_%ndpt+1)+un%pb%h
+                endif
+
+                a_nl=a_nl*s1
+             endif   ! end of nd_used == c_%nd
+
+!!!! end of now fix coasting !!!!!
+
+             dr=dr*s1**(-1)
+             call kill(vr)
+             call kill(un)
+          else  !  reverse Dragt-Finn
+             nd_used=c_%nd2/2
+             if(c_%ndpt/=0) nd_used=nd_used-1
+             call alloc(vr)
+             call alloc(rdf)
+
+             s1i=a_nl   ! preserve it
+             s1=1
+             do i=1,c_%no   ! i=1,c_%no
+                rdf=s1i
+                vr=rdf%nonlinear
+                decal=1   ! not coasting plane
+                do k=1,nd_used*2
+                   i_phase=k
+                   if(mod(k,2)==0) then
+                      i_plane=k/2
+                   else
+                      i_plane=(k+1)/2
+                   endif
+                   call cfu(vr%cos%v(k),dphase,vr%cos%v(k))
+                   call cfu(vr%sin%v(k),dphase,vr%sin%v(k))
+                enddo
+
+                do k=nd_used*2+1,c_%nd2   !  fix coasting later
+                   vr%cos%v(k)=zero
+                   vr%sin%v(k)=zero
+                enddo
+
+                rdf%nonlinear=vr
+                s1=texp(rdf%nonlinear,s1)
+                s1i=texp(rdf%nonlinear,s1i)
+             enddo    ! i=1,c_%no
+
+!!!! now fix coasting !!!!!
+             if( nd_used == c_%nd) then
+                a_nl=s1i
+             else  !  coasting
+                rdf=s1
+                alpha0=one
+                if(mod(c_%ndpt,2)==0) alpha0=-one
+                do i=1,c_%nd2-2
+                   rdf%nonlinear%v(i)=alpha0*(rdf%nonlinear%v(i).d.c_%ndpt)
+                enddo
+                call int_partial(rdf%nonlinear,rdf%pb,2)
+
+                if(mod(c_%ndpt,2)==0) then
+                   s1%v(c_%ndpt-1)=s1%v(c_%ndpt-1)+rdf%pb%h
+                else
+                   s1%v(c_%ndpt+1)=s1%v(c_%ndpt+1)+rdf%pb%h
+                endif
+
+                a_nl=a_nl*s1
+             endif   ! end of nd_used == c_%nd
+
+!!!! end of now fix coasting !!!!!
+
+             dr=dr*s1**(-1)
+             call kill(vr)
+             call kill(rdf)
+          endif
+       endif   ! no>1
+
+
+!!!!
+    endif   ! it (te)
+    !       endif   ! present(te)
+
+
+    dote=present(R_TE).and.present(CS_TE)
+    if(doing_ac_modulation_in_ptc) then
+       dote=dote.and.(c_%nd2==6.or.c_%ndpt>=5)
+    else
+       dote=dote.and.(c_%nd2==4.or.c_%ndpt>=5)
+    endif
+    if(dote) then
+
+       call  copy_damap_matrix(a_l,m)
+       call  copy_matrix_matrix(m(1:2,1:2),at)
+       call  copy_matrix_matrix(m(1:2,3:4),ct)
+       call  copy_matrix_matrix(m(3:4,1:2),dt)
+       call  copy_matrix_matrix(m(3:4,3:4),bt)
+
+       call invert_22(at,ati)
+       call invert_22(bt,bti)
+
+
+       call matmul_nn(dt,ati,ati,sc=-one)
+       call matmul_nn(ati,ct,ct)
+       call matmul_nn(ct,bti,ct)
+
+       alpha=ct(1,1)
+       alpha0=alpha
+
+
+       det=sqrt(one/(one+alpha))
+
+       if(alpha0>=zero) then
+          COSLIKE=my_true
+       else
+          ! det=sqrt(one/(one-alpha))
+          COSLIKE=my_false
+       endif
+
+       CS_TE=0
+       do i=1,2
+          do j=1,2
+             CS_TE%v(i)=at(i,j)*(one.mono.j)/det+CS_TE%v(i)
+             CS_TE%v(i+2)=bt(i,j)*(one.mono.(j+2))/det+CS_TE%v(i+2)
+          enddo
+       enddo
+
+
+
+       !goto 1000
+       !  The rotation matrix is created but it may not have the correct path length
+       !dependence
+       if(c_%ndpt/=0) then
+          call alloc(g,c_%nv)
+          call alloc(un)
+          ! write(6,*) " epseone "
+          ! read(5,*) un%eps
+          un%eps=-c_%no
+          do i=1,c_%nv
+             g%v(i)=one.mono.i
+          enddo
+          g%v(c_%ndpt)=zero
+
+          do i=1,c_%nd2
+             s1%v(i) = CS_TE%v(i)*g
+          enddo
+          s1%v(c_%ndpt)=one.mono.c_%ndpt
+          s1i=s1**(-1)
+          s1i=s1i*CS_TE    ! s1i is completely nonlinear.
+          un=s1i
+
+
+
+          alpha0=one
+          if(mod(c_%ndpt,2)==0) alpha0=-one
+          do i=1,c_%nd2-2
+             un%vector%v(i)=alpha0*(un%vector%v(i).d.c_%ndpt)
+          enddo
+          call int_partial(un%vector,un%pb,2)
+          !  un%pb=un%vector  ! this is the longitudinal part
+          if(mod(c_%ndpt,2)==0) then
+             s1i%v(c_%ndpt-1)=s1i%v(c_%ndpt-1)+un%pb%h
+          else
+             s1i%v(c_%ndpt+1)=s1i%v(c_%ndpt+1)+un%pb%h
+          endif
+
+          CS_TE=s1*s1i
+
+
+
+          call kill(un)
+          call kill(g)
+
+          !endif !eps_te
+       endif
+
+       R_TE=a_l*cs_TE**(-1)
+
+
+    endif ! end of T-E  done
+
+
+    if(lagrange0) then
+       a_t=a_f*a_l*a_nl
+    endif
+
     if(doflip) then
        call flip_damap(a_t,a_t)
        call flip_damap(a_nl,a_nl)
        call flip_damap(a_l,a_l)
        call flip_damap(a_f,a_f)
+       if(present(dr))  call flip_damap(dr,dr)
+       if(present(CS_TE))  call flip_damap(CS_TE,CS_TE)
+       if(present(R_TE))   call flip_damap(R_TE,R_TE)
        perform_flip=.true.
     endif
 
+    if(doing_ac_modulation_in_ptc) then   ! removing useless tiny numbers
+       CS_TE%v(c_%nd2-1)=one.mono.(c_%nd2-1)
+       CS_TE%v(c_%nd2)=one.mono.(c_%nd2)
+    endif
+
     deallocate(jc)
-    call kill(atemp)
+    call kill(atemp,s1,s1i,m1)
+    call kill(a12,a11)
+    call kill(p,ndim)
+    call kill_nn(m)
+    call kill_nn(at)
+    call kill_nn(bt)
+    call kill_nn(ct)
+    call kill_nn(dt)
+    call kill_nn(ati)
+    call kill_nn(bti)
+    call kill(alpha,det)
 
 
   end subroutine factor_am
+
+
+  subroutine int_partial(v,h,nd0)
+    implicit none
+    ! IF SCA=-one
+    !     \VEC{V}.GRAD   = J GRAD H . GRAD = :H:
+    !
+    ! IF SCA=one
+    !     \VEC{V}.GRAD  = GRAD H . GRAD
+    integer i,nd0
+    type(vecfield) v
+    type(pbfield) h
+    type(taylor) b4,b3,b2,b1
+    type(damap) x
+    logical doflip
+    if(.not.c_%stable_da) return
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       !    write(6,*) " flipping ",c_%ndpt,c_%nd2-1
+       !    pause 7123
+
+       perform_flip=.false.
+       call flip_vecfield(v,v,1)
+       call flip_taylor(h%h,h%h,1)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
+    nd_used=nd0
+    call alloc(x)
+    call alloc(b4,b3,b2,b1)
+
+    x=1
+
+    do i=1,nd_used
+       call cfu(v%v(2*i-1),dlie,b3)
+       call cfu(v%v(2*i),dlie,b1)
+       b2=b1*x%v(2*i-1)
+       b1=b3*x%v(2*i)
+       b3=b2-b1
+       b2=b3+b4
+       b4=b2
+    enddo
+    h%h=b4
+
+
+    call kill(b4,b3,b2,b1)
+    call kill(x)
+
+    if(doflip) then
+       call flip_vecfield(v,v,-1)
+       call flip_taylor(h%h,h%h,-1)
+       perform_flip=.true.
+    endif
+  end subroutine int_partial
+
+  real(dp) function dlie(j)
+    implicit none
+    integer i
+    !      INTEGER J(NTT)
+    integer,dimension(:)::j
+    if(.not.c_%stable_da) return
+
+    dlie=zero
+    do i=1,nd_used
+       dlie=REAL(j(2*i-1)+j(2*i),kind=DP)+dlie
+    enddo
+    dlie=dlie+one
+    dlie=one/dlie
+    return
+  end function dlie
+
+
+  real(dp) function dphase(j)
+    implicit none
+    integer i
+    !      INTEGER J(NTT)
+    integer,dimension(:)::j
+    integer t,tu
+    if(.not.c_%stable_da) return
+
+    t=-decal
+    tu=0
+    dphase=zero
+    do i=1,nd_used
+       t=abs(j(2*i-1)-j(2*i))+t
+    enddo
+    if(t==0.and.decal/=0) then
+       tu=(j(2*i_plane-1)-j(2*i_plane))
+       if(mod(i_phase,2)==1) then
+          tu=tu-1
+       else
+          tu=tu+1
+       endif
+       if(tu==0) dphase=-one
+    else
+       if(t==0) dphase=-one
+    endif
+
+    return
+  end function dphase
+
+  real(dp) function phase_shift(j)
+    implicit none
+    integer i
+    !      INTEGER J(NTT)
+    integer,dimension(:)::j
+    integer nd,t
+    if(.not.c_%stable_da) return
+    nd=c_%nd2/2
+    if(c_%ndpt/=0) nd=nd-1
+
+
+    phase_shift=zero
+    t=0
+    do i=1,nd
+       t=abs(j(2*i-1)-j(2*i))+t
+    enddo
+    if(t==0) phase_shift=one
+
+    return
+  end function phase_shift
+
+
+  subroutine invert_22(a,ai)
+    implicit none
+    type(taylor) a(2,2),ai(2,2),t(2,2)
+    type(taylor) det
+    call alloc_nn(t)
+    call alloc(det)
+
+    det=a(1,1)*a(2,2)-a(1,2)*a(2,1)
+    t(1,1)=a(2,2)/det
+    t(2,2)=a(1,1)/det
+    t(1,2)=-a(1,2)/det
+    t(2,1)=-a(2,1)/det
+
+    ai(1,1)=t(1,1)
+    ai(1,1)=t(1,1)
+    ai(1,1)=t(1,1)
+    ai(1,1)=t(1,1)
+
+    call copy_matrix_matrix(t,ai)
+
+    call kill_nn(t)
+    call kill(det)
+
+  end subroutine invert_22
+
 
   subroutine check_fix(jc,ord,doit)
     implicit none
@@ -4718,6 +5663,7 @@ CONTAINS
     if(l==ord) doit=.true.
 
   end subroutine check_fix
+
 
   subroutine INTO_RES_SPIN8_eq(H_RES,H)
     implicit none
@@ -4845,7 +5791,7 @@ CONTAINS
     !    a11=(s(1,1))
     !    a13=(s(1,3))
 
-    theta0=atan2(nc%s(1,3),nc%s(1,1))
+    theta0=atan2(nc%s%s(1,3),nc%s%s(1,1))
     if((theta0.sub.'0')<zero) theta0 = theta0 + twopi
 
     theta0r=theta0
@@ -4909,7 +5855,7 @@ CONTAINS
     call clean_damap(s1%m,s2%m,prec)
     do i=1,3
        do j=1,3
-          call clean_real_8(s1%s(i,j),s2%s(i,j),prec)
+          call clean_real_8(s1%s%s(i,j),s2%s%s(i,j),prec)
        enddo
     enddo
 

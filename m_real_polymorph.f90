@@ -42,7 +42,7 @@ module polymorphic_taylor
   private  real_8ENV,ENVreal_8 ,RADTAYLORENV_8, ENV_8RADTAYLOR ,beamENV_8,normal_p
   private absoftdatan2dr,absoftdcosdr,absoftdsindr,absoftdtandr,absoftdatandr
   !complex stuff
-  private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt
+  private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt,datanht
   private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT,polymorpht
   ! PRIVATE EQUAL1D,EQUAL2D
   ! end complex stuff
@@ -590,10 +590,15 @@ module polymorphic_taylor
      MODULE PROCEDURE dcost
   END INTERFACE
 
+  INTERFACE atanh
+     MODULE PROCEDURE datanht
+  END INTERFACE
 
   INTERFACE tan
      MODULE PROCEDURE dtant
   END INTERFACE
+
+
   INTERFACE dtan
      MODULE PROCEDURE dtant
   END INTERFACE
@@ -1029,7 +1034,7 @@ contains
        w_p%c(1)= " trouble in greatereq "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION greatereq
@@ -1054,7 +1059,7 @@ contains
        w_p%c(1)= " trouble in dgreatereqsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dgreatereqsc
@@ -1080,7 +1085,7 @@ contains
        w_p%c(1)= " trouble in dscgreatereq "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dscgreatereq
@@ -1106,7 +1111,7 @@ contains
        w_p%c(1)= " trouble in greatereqsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION greatereqsc
@@ -1132,7 +1137,7 @@ contains
        w_p%c(1)= " trouble in scgreatereq "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION scgreatereq
@@ -1157,7 +1162,7 @@ contains
        w_p%c(1)= " trouble in igreatereqsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION igreatereqsc
@@ -1182,7 +1187,7 @@ contains
        w_p%c(1)= " trouble in iscgreatereq "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION iscgreatereq
@@ -1222,7 +1227,7 @@ contains
        w_p%c(1)= " trouble in greaterthan "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION greaterthan
@@ -1247,7 +1252,7 @@ contains
        w_p%c(1)= " trouble in igreatersc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION igreatersc
@@ -1272,7 +1277,7 @@ contains
        w_p%c(1)= " trouble in iscgreater "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION iscgreater
@@ -1297,7 +1302,7 @@ contains
        w_p%c(1)= " trouble in dgreatersc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dgreatersc
@@ -1323,7 +1328,7 @@ contains
        w_p%c(1)= " trouble in dscgreater "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
        ipause=mypause(0)
     end select
 
@@ -1350,7 +1355,7 @@ contains
        w_p%c(1)= " trouble in greatersc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION greatersc
@@ -1376,7 +1381,7 @@ contains
        w_p%c(1)= " trouble in scgreater "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION scgreater
@@ -1416,7 +1421,7 @@ contains
        w_p%c(1)= " trouble in lessthan "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION lessthan
@@ -1441,7 +1446,7 @@ contains
        w_p%c(1)= " trouble in dlessthansc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dlessthansc
@@ -1467,7 +1472,7 @@ contains
        w_p%c(1)= " trouble in dsclessthan "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dsclessthan
@@ -1493,7 +1498,7 @@ contains
        w_p%c(1)= " trouble in lessthansc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION lessthansc
@@ -1520,7 +1525,7 @@ contains
        w_p%c(1)= " trouble in sclessthan "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION sclessthan
@@ -1571,7 +1576,7 @@ contains
        w_p%c(1)= " trouble in isclessthan "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION isclessthan
@@ -1611,7 +1616,7 @@ contains
        w_p%c(1)= " trouble in lesseq "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
 
@@ -1637,7 +1642,7 @@ contains
        w_p%c(1)= " trouble in dlesseqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dlesseqsc
@@ -1662,7 +1667,7 @@ contains
        w_p%c(1)= " trouble in dsclesseq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dsclesseq
@@ -1688,7 +1693,7 @@ contains
        w_p%c(1)= " trouble in lesseqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION lesseqsc
@@ -1714,7 +1719,7 @@ contains
        w_p%c(1)= " trouble in sclesseq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION sclesseq
@@ -1739,7 +1744,7 @@ contains
        w_p%c(1)= " trouble in ilesseqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION ilesseqsc
@@ -1764,7 +1769,7 @@ contains
        w_p%c(1)= " trouble in isclesseq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION isclesseq
@@ -1804,7 +1809,7 @@ contains
        w_p%c(1)= " trouble in eq "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
 
@@ -1830,7 +1835,7 @@ contains
        w_p%c(1)= " trouble in deqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION deqsc
@@ -1855,7 +1860,7 @@ contains
        w_p%c(1)= " trouble in dsceq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dsceq
@@ -1881,7 +1886,7 @@ contains
        w_p%c(1)= " trouble in eqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION eqsc
@@ -1907,7 +1912,7 @@ contains
        w_p%c(1)= " trouble in sceq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION sceq
@@ -1933,7 +1938,7 @@ contains
        w_p%c(1)= " trouble in ieqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION ieqsc
@@ -1958,7 +1963,7 @@ contains
        w_p%c(1)= " trouble in isceq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION isceq
@@ -1998,7 +2003,7 @@ contains
        w_p%c(1)= " trouble in neq "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
 
@@ -2024,7 +2029,7 @@ contains
        w_p%c(1)= " trouble in dneqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dneqsc
@@ -2049,7 +2054,7 @@ contains
        w_p%c(1)= " trouble in dscneq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION dscneq
@@ -2075,7 +2080,7 @@ contains
        w_p%c(1)= " trouble in neqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION neqsc
@@ -2101,7 +2106,7 @@ contains
        w_p%c(1)= " trouble in scneq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION scneq
@@ -2126,7 +2131,7 @@ contains
        w_p%c(1)= " trouble in ineqsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION ineqsc
@@ -2151,7 +2156,7 @@ contains
        w_p%c(1)= " trouble in iscneq "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION iscneq
@@ -2192,7 +2197,7 @@ contains
        w_p%c(1)= " trouble in dexpt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dexpt
 
@@ -2215,7 +2220,7 @@ contains
        w_p%c(1)= " trouble in abst "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION abst
 
@@ -2261,7 +2266,7 @@ contains
        w_p%c(1)= " trouble in Pabs "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION Pabs
 
@@ -2286,7 +2291,7 @@ contains
        w_p%c(1)= " trouble in full_abst "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION full_abst
 
@@ -2324,7 +2329,7 @@ contains
        w_p%c(1)= " trouble in dtant "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dtant
 
@@ -2362,7 +2367,7 @@ contains
        w_p%c(1)= " trouble in dtandt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dtandt
 
@@ -2407,7 +2412,7 @@ contains
        w_p%c(1)= " trouble in dcost "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dcost
 
@@ -2445,7 +2450,7 @@ contains
        w_p%c(1)= " trouble in dcosdt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dcosdt
 
@@ -2491,7 +2496,7 @@ contains
        w_p%c(1)= " trouble in dsint "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsint
 
@@ -2529,7 +2534,7 @@ contains
        w_p%c(1)= " trouble in dsindt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsindt
 
@@ -2575,7 +2580,7 @@ contains
        w_p%c(1)= " trouble in dlogt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dlogt
 
@@ -2615,7 +2620,7 @@ contains
        w_p%c(1)= " trouble in dsqrtt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsqrtt
 
@@ -2656,7 +2661,7 @@ contains
        w_p%c(1)= " trouble in POW "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POW
 
@@ -2696,7 +2701,7 @@ contains
        w_p%c(1)= " trouble in POWR "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POWR
 
@@ -2735,7 +2740,7 @@ contains
        w_p%c(1)= " trouble in POWR8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POWR8
 
@@ -2774,7 +2779,7 @@ contains
        w_p%c(1)= " trouble in POWR8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION unaryADD
 
@@ -2812,7 +2817,7 @@ contains
        w_p%c(1)= " trouble in unarySUB "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION unarySUB
 
@@ -2904,7 +2909,7 @@ contains
        w_p%c(1)= " trouble in add "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION add
 
@@ -2996,7 +3001,7 @@ contains
        w_p%c(1)= " trouble in subs "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION subs
 
@@ -3035,7 +3040,7 @@ contains
        w_p%c(1)= " trouble in daddsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION daddsc
 
@@ -3074,7 +3079,7 @@ contains
        w_p%c(1)= " trouble in dscadd "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscadd
 
@@ -3113,7 +3118,7 @@ contains
        w_p%c(1)= " trouble in dsubsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsubsc
 
@@ -3152,7 +3157,7 @@ contains
        w_p%c(1)= " trouble in dscsub "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscsub
 
@@ -3192,7 +3197,7 @@ contains
        w_p%c(1)= " trouble in addsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION addsc
 
@@ -3232,7 +3237,7 @@ contains
        w_p%c(1)= " trouble in addsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scadd
 
@@ -3272,7 +3277,7 @@ contains
        w_p%c(1)= " trouble in subsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION subsc
 
@@ -3312,7 +3317,7 @@ contains
        w_p%c(1)= " trouble in scsub "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scsub
 
@@ -3351,7 +3356,7 @@ contains
        w_p%c(1)= " trouble in iaddsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iaddsc
 
@@ -3390,7 +3395,7 @@ contains
        w_p%c(1)= " trouble in iscadd "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscadd
 
@@ -3429,7 +3434,7 @@ contains
        w_p%c(1)= " trouble in isubsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION isubsc
 
@@ -3468,7 +3473,7 @@ contains
        w_p%c(1)= " trouble in iscsub "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscsub
 
@@ -3561,7 +3566,7 @@ contains
        w_p%c(1)= " trouble in mul "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION mul
 
@@ -3653,7 +3658,7 @@ contains
        w_p%c(1)= " trouble in div "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION div
 
@@ -3692,7 +3697,7 @@ contains
        w_p%c(1)= " trouble in dmulmapconcat "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dmulmapconcat
 
@@ -3732,7 +3737,7 @@ contains
        w_p%c(1)= " trouble in dmulsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dmulsc
 
@@ -3801,7 +3806,7 @@ contains
        w_p%c(1)= " trouble in ddivsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION ddivsc
 
@@ -3840,7 +3845,7 @@ contains
        w_p%c(1)= " trouble in ddivsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscdiv
 
@@ -3880,7 +3885,7 @@ contains
        w_p%c(1)= " trouble in mulsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION mulsc
 
@@ -3920,7 +3925,7 @@ contains
        w_p%c(1)= " trouble in scmul "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scmul
 
@@ -3960,7 +3965,7 @@ contains
        w_p%c(1)= " trouble in divsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION divsc
 
@@ -4000,7 +4005,7 @@ contains
        w_p%c(1)= " trouble in scdiv "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scdiv
 
@@ -4039,7 +4044,7 @@ contains
        w_p%c(1)= " trouble in imulsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION imulsc
 
@@ -4078,7 +4083,7 @@ contains
        w_p%c(1)= " trouble in iscmul "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscmul
 
@@ -4117,7 +4122,7 @@ contains
        w_p%c(1)= " trouble in idivsc "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION idivsc
 
@@ -4156,7 +4161,7 @@ contains
        w_p%c(1)= " trouble in iscdiv "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscdiv
 
@@ -4663,7 +4668,7 @@ contains
              w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
              w_p%c(4)= " at your own insane risk "
              w_p%c(5)= " Etienne Forest/Frank Schmidt"
-             CALL WRITE_E(778)
+             ! call !write_e(778)
              w_p%nc=sqrt(-float(w_p%nc))
           endif
        endif    ! end of what is s1
@@ -4702,7 +4707,7 @@ contains
        w_p%c(1)= " trouble in complexreal_8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE complexreal_8
@@ -4739,7 +4744,7 @@ contains
        w_p%c(1)= " trouble in realEQUAL "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE realEQUAL
@@ -4774,7 +4779,7 @@ contains
        w_p%c(1)= " trouble in realEQUAL "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE singleEQUAL
@@ -4816,7 +4821,7 @@ contains
        w_p%c(1)= " trouble in taylorEQUAL "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE taylorEQUAL
@@ -4909,7 +4914,7 @@ contains
        w_p%c(1)= " trouble in univreal_8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END SUBROUTINE univreal_8
 
@@ -5195,9 +5200,51 @@ contains
        w_p%c(1)= " trouble in datant "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION datant
+
+  FUNCTION datanht( S1 )
+    implicit none
+    TYPE (real_8) datanht
+    TYPE (real_8), INTENT (IN) :: S1
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       datanht%r=atanh(s1%r)
+       datanht%kind=1
+    case(m2)
+       localmaster=master
+       call ass(datanht)
+       datanht%t=atanh(s1%t)
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(datanht)
+          call varfk1(S1)
+          datanht%t=atanh(varf1)
+          master=localmaster
+       else
+          datanht%r=atanh(s1%r)
+          datanht%kind=1
+       endif
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in datant "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+  END FUNCTION datanht
+
+
+
+
 
   FUNCTION datanDt( S1 )
     implicit none
@@ -5242,7 +5289,7 @@ contains
        w_p%c(1)= " trouble in datanDt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION datanDt
 
@@ -5835,7 +5882,7 @@ contains
        w_p%c(1)= " trouble in dacost "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dacost
 
@@ -5883,7 +5930,7 @@ contains
        w_p%c(1)= " trouble in dcosht "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dcosht
 
@@ -5931,7 +5978,7 @@ contains
        w_p%c(1)= " trouble in dsinht "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsinht
 
@@ -5939,7 +5986,6 @@ contains
     implicit none
     TYPE (real_8) dtanht
     TYPE (real_8), INTENT (IN) :: S1
-    TYPE (complextaylor) w
     integer localmaster
 
     select case(s1%kind)
@@ -5949,22 +5995,14 @@ contains
     case(m2)
        localmaster=master
        call ass(dtanht)
-       call alloc(w)
-       w%r=s1%t
-       w= tanh(w)
-       dtanht%t=w%r
-       call kill(w)
+       dtanht%t=tanh(s1%t)
        master=localmaster
     case(m3)
        if(knob) then
           localmaster=master
           call ass(dtanht)
-          call alloc(w)
           call varfk1(S1)
-          w%r=varf1
-          w= tanh(w)
-          dtanht%t=w%r
-          call kill(w)
+          dtanht%t=tanh(varf1)
           master=localmaster
        else
           dtanht%r=tanh(s1%r)
@@ -5979,7 +6017,7 @@ contains
        w_p%c(1)= " trouble in dtanht "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dtanht
 
@@ -6509,7 +6547,7 @@ contains
        w_p%c(1)= " trouble in sinX_XT "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION sinX_XT
 
@@ -6622,7 +6660,7 @@ contains
        w_p%c(1)= " trouble in sinHX_Xt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION sinHX_Xt
 
@@ -6655,7 +6693,7 @@ contains
        w_p%c(1)= " trouble in clean_real_8 "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
     s2=t
     call kill(t)

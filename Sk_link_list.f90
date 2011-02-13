@@ -327,7 +327,7 @@ CONTAINS
        w_p%fc='((1X,a72,/),(1X,a72))'
        w_p%c(1)= " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
        write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
-       CALL WRITE_E(-124)
+       ! call !write_e(-124)
     ENDIF
 
     nullify(current);
@@ -581,7 +581,7 @@ CONTAINS
     !    w_p%nc=1
     !    w_p%fc='(1((1X,a72)))'
     !    w_p%c(1)= " Only =0 permitted (nullify) "
-    !    CALL WRITE_E(100)
+    !    ! call !write_e(100)
     ! endif
   END SUBROUTINE nullIFY_LAYOUT
 
@@ -934,7 +934,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1)= "Error in zero_fibre "
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     endif
   end SUBROUTINE zero_fibre
 
@@ -1019,7 +1019,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1)= "Error in zero_fibre "
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     endif
   end SUBROUTINE SUPER_zero_fibre
 
@@ -1374,7 +1374,7 @@ CONTAINS
        W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : EITHER NO FRAMES IN PTC OR NO PATCHES "
        WRITE(W_P%C(2),'(A16,1X,L1,1X,L1)')  " CHARTS 1 AND 2 ", ASSOCIATED(EL1%CHART%F), ASSOCIATED(EL2%CHART%F)
        WRITE(W_P%C(3),'(A16,1X,L1,1X,L1)')  "PATCHES 1 AND 2 ", ASSOCIATED(EL1%PATCH), ASSOCIATED(EL2%PATCH)
-       CALL WRITE_I
+       ! call ! WRITE_I
 
        IF(DIR==1) THEN
 
@@ -1392,7 +1392,7 @@ CONTAINS
              W_P%NC=1
              W_P%FC='((1X,A72))'
              W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 2 "
-             CALL WRITE_I
+             ! call ! WRITE_I
           ENDIF
 
        ELSEIF(DIR==-1) THEN
@@ -1411,7 +1411,7 @@ CONTAINS
              W_P%NC=1
              W_P%FC='((1X,A72))'
              W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
-             CALL WRITE_I
+             ! call ! WRITE_I
           ENDIF
        ENDIF
 
@@ -1436,7 +1436,7 @@ CONTAINS
        W_P%NC=1
        W_P%FC='(2(1X,A72,/),(1X,A72))'
        W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
-       CALL WRITE_I
+       ! call ! WRITE_I
     ENDIF
 
 
@@ -2287,7 +2287,7 @@ CONTAINS
        w_p%fc='((1X,a72,/),(1X,a72))'
        w_p%c(1)= " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
        write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
-       CALL WRITE_E(-124)
+       ! call !write_e(-124)
     ENDIF
 
     nullify(current);

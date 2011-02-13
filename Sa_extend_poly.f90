@@ -446,7 +446,7 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        w_p%c(1)= " failed inversion in curvebend part 1"
-       CALL WRITE_E(result)
+       ! call !write_e(result)
     endif
     MC=MB
     call matinv(MC,MB,no,no,result)
@@ -456,7 +456,7 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        w_p%c(1)= " failed inversion in curvebend part 2"
-       CALL WRITE_E(result)
+       ! call !write_e(result)
     endif
 
     do i=1,no
@@ -485,7 +485,7 @@ contains
              w_p%fc='(1((1X,a20)))'
              w_p=(/jd(1),jd(2)/);w_p%fi= '(2((1X,i4)),/)'
              w_p%c(1) = " curvebend error 1"
-             CALL WRITE_E(1)
+             ! call !write_e(1)
           endif
           call pek(da(i,1),jd,b_sol%a_x(i,j))
           if(abs(b_sol%a_x(i,j))<eps_extend_poly) b_sol%a_x(i,j)=zero
@@ -499,7 +499,7 @@ contains
              w_p%fc='(1((1X,a20)))'
              w_p=(/jd(1),jd(2)/);w_p%fi= '(2((1X,i4)),/)'
              w_p%c(1) = " curvebend error 2"
-             CALL WRITE_E(2)
+             ! call !write_e(2)
           endif
           call pek(da(i,2),jd,b_sol%a_y(i,j))
           if(abs(b_sol%a_y(i,j))<eps_extend_poly) b_sol%a_y(i,j)=zero
@@ -513,7 +513,7 @@ contains
              w_p%fc='(1((1X,a20)))'
              w_p=(/jd(1),jd(2)/);w_p%fi= '(2((1X,i4)),/)'
              w_p%c(1) = " curvebend error 3"
-             CALL WRITE_E(3)
+             ! call !write_e(3)
           endif
           call pek(db(i,1),jd,b_sol%b_x(i,j))
           if(abs(b_sol%b_x(i,j))<eps_extend_poly) b_sol%b_x(i,j)=zero
@@ -527,7 +527,7 @@ contains
              w_p%fc='(1((1X,a20)))'
              w_p=(/jd(1),jd(2)/);w_p%fi= '(2((1X,i4)),/)'
              w_p%c(1) = " curvebend error 4"
-             CALL WRITE_E(4)
+             ! call !write_e(4)
           endif
           call pek(db(i,2),jd,b_sol%b_y(i,j))
           if(abs(b_sol%b_y(i,j))<eps_extend_poly) b_sol%b_y(i,j)=zero
@@ -564,14 +564,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) = " MA ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(100)
+          ! call !write_e(100)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) = " MA ARRAY not DEALLOCATED : PROBLEMS"
-       CALL WRITE_E(101)
+       ! call !write_e(101)
     ENDIF
     IF (ALLOCATED(MB)) THEN
        DEALLOCATE (MB, STAT = error)
@@ -582,14 +582,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" MB ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(102)
+          ! call !write_e(102)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) ="MB DID NOT EXIST (curvebend)"
-       CALL WRITE_E(103)
+       ! call !write_e(103)
     ENDIF
     IF (ALLOCATED(MC)) THEN
        DEALLOCATE (MC, STAT = error)
@@ -600,14 +600,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" MC ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(102)
+          ! call !write_e(102)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) ="MC DID NOT EXIST (curvebend)"
-       CALL WRITE_E(103)
+       ! call !write_e(103)
     ENDIF
     IF (ALLOCATED(F)) THEN
        DEALLOCATE (F, STAT = error)
@@ -618,14 +618,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" F ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(104)
+          ! call !write_e(104)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" F DID NOT EXIST (curvebend)"
-       CALL WRITE_E(105)
+       ! call !write_e(105)
     ENDIF
     IF (ALLOCATED(FS)) THEN
        DEALLOCATE (FS, STAT = error)
@@ -636,14 +636,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" FS ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(106)
+          ! call !write_e(106)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" FS DID NOT EXIST (curvebend)"
-       CALL WRITE_E(106)
+       ! call !write_e(106)
     ENDIF
     IF (ALLOCATED(A)) THEN
        DEALLOCATE (A, STAT = error)
@@ -654,14 +654,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" A ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(107)
+          ! call !write_e(107)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" A DID NOT EXIST (curvebend)"
-       CALL WRITE_E(107)
+       ! call !write_e(107)
     ENDIF
     IF (ALLOCATED(B)) THEN
        DEALLOCATE (B, STAT = error)
@@ -672,14 +672,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" B ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(108)
+          ! call !write_e(108)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" B DID NOT EXIST (curvebend)"
-       CALL WRITE_E(109)
+       ! call !write_e(109)
     ENDIF
     IF (ALLOCATED(DA)) THEN
        DEALLOCATE (DA, STAT = error)
@@ -690,14 +690,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" DA ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(110)
+          ! call !write_e(110)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" DA DID NOT EXIST (curvebend)"
-       CALL WRITE_E(111)
+       ! call !write_e(111)
     ENDIF
     IF (ALLOCATED(DB)) THEN
        DEALLOCATE (DB, STAT = error)
@@ -708,14 +708,14 @@ contains
           w_p%nc=1
           w_p%fc='(1((1X,a72)))'
           w_p%c(1) =" DB ARRAY not DEALLOCATED : PROBLEMS"
-          CALL WRITE_E(111)
+          ! call !write_e(111)
        ENDIF
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        w_p%c(1) =" DB DID NOT EXIST (curvebend)"
-       CALL WRITE_E(111)
+       ! call !write_e(111)
     ENDIF
 
   end subroutine  curvebend

@@ -661,7 +661,7 @@ CONTAINS
     !    ELSE
     !       w_p%c(2) = " INPUT OF POLAR LENGTH FOR RBEND  "
     !    ENDIF
-    !    CALL WRITE_I
+    !    ! call ! WRITE_I
 
     NSTD=1
     METD=2
@@ -720,7 +720,7 @@ CONTAINS
        !       w_p%fI='(2((1X,I4)),/)'
        !       W_P=(/SECTOR_NMUL,sector_b%n_mono/)
        !       w_p%c(1) = " Small Machine Sector Bend Order ="
-       !       CALL WRITE_I
+       !       ! call ! WRITE_I
        firsttime_coef=.FALSE.
     ENDIF
 
@@ -768,7 +768,7 @@ CONTAINS
        if(muon==one)  then
           write(mf,*)"This is an electron (positron actually if charge=1) "
        else
-          write(mf,'((1X,a21,1x,G20.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
+          write(mf,'((1X,a21,1x,G21.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
        endif
     else
        write(mf,*) "This is a proton "
@@ -788,7 +788,7 @@ CONTAINS
     write(mf,'((1X,a20,1x,a5))' ) "      SPIN        = ", CONV(S%SPIN    )
     write(mf,'((1X,a20,1x,a5))' ) "      MODULATION   = ", CONV(S%MODULATION    )
     !    write(mf,'((1X,a20,1x,I4))' ) " SPIN DIMENSION   = ", S%SPIN_DIM
-    !   CALL WRITE_I
+    !   ! call ! WRITE_I
   end subroutine print_s
 
   FUNCTION CONV(LOG)

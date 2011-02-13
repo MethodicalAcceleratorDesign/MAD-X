@@ -39,12 +39,9 @@ module ptc_spin
   private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin,GET_BZ_fringe,GET_BZ_fringer,GET_BZ_fringep
   private TRACK_rotate_spin_r,TRACK_rotate_spin_p,TRACK_rotate_spin
   private TRACK_FRINGE_multipole_r,TRACK_FRINGE_multipole_p,TRACK_FRINGE_multipole
-  PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
   private TRACK_wedge_spin_R,TRACK_wedge_spin_p,TRACK_wedge_spin
-  PRIVATE MODULATE_R,MODULATE_P
   !REAL(DP) :: AG=A_ELECTRON
   REAL(DP) :: bran_init=pi
-  LOGICAL(lp) :: ALLOW_MODULATION=.true.
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
 
   INTERFACE alloc
@@ -240,15 +237,6 @@ module ptc_spin
      MODULE PROCEDURE B_PANCAkEp
   END INTERFACE
 
-  INTERFACE TRACK_MODULATION
-     MODULE PROCEDURE TRACK_MODULATION_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
-     MODULE PROCEDURE TRACK_MODULATION_P   !
-  END INTERFACE
-
-  INTERFACE MODULATE
-     MODULE PROCEDURE MODULATE_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
-     MODULE PROCEDURE MODULATE_P   !
-  END INTERFACE
 
 contains
 
@@ -2912,107 +2900,7 @@ contains
 
   !  FUNDAMENTAL TRACKING ROUTINES
 
-  SUBROUTINE TRACK_MODULATION_R(C,XS,K)
-    IMPLICIT NONE
-    type(INTEGRATION_NODE), pointer :: C
-    type(probe), INTENT(INOUT) :: xs
-    TYPE(INTERNAL_STATE) K
-    real(dp) xt
-    real(dp),pointer :: beta0
 
-    if(k%time) then
-       beta0=>C%PARENT_FIBRE%beta0
-       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    else
-       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    endif
-
-  END   SUBROUTINE TRACK_MODULATION_R
-
-  SUBROUTINE TRACK_MODULATION_P(C,XS,K)
-    IMPLICIT NONE
-    type(INTEGRATION_NODE), pointer :: C
-    type(probe_8), INTENT(INOUT) :: xs
-    TYPE(INTERNAL_STATE) K
-    TYPE(REAL_8) xt
-    real(dp),pointer :: beta0
-
-    CALL ALLOC(XT)
-
-    if(k%time) then
-       beta0=>C%PARENT_FIBRE%beta0
-       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    else
-       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    endif
-
-    CALL KILL(XT)
-
-  END   SUBROUTINE TRACK_MODULATION_P
-
-  SUBROUTINE MODULATE_R(C,XS,K)
-    IMPLICIT NONE
-    type(INTEGRATION_NODE), pointer :: C
-    type(probe), INTENT(INOUT) :: xs
-    TYPE(INTERNAL_STATE) K
-    TYPE(ELEMENT),POINTER :: EL
-    TYPE(ELEMENTP),POINTER :: ELp
-    REAL(DP) v,dv
-
-
-    EL=>C%PARENT_FIBRE%MAG
-    ELP=>C%PARENT_FIBRE%MAGP
-
-    IF(K%MODULATION) THEN
-       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
-       V=EL%DC_ac+EL%A_ac*DV
-       DV=el%D_ac*DV
-    else
-       V=EL%DC_ac
-       DV=zero
-    endif
-    call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
-
-  END   SUBROUTINE MODULATE_R
-
-  SUBROUTINE MODULATE_P(C,XS,K)
-    IMPLICIT NONE
-    type(INTEGRATION_NODE), pointer :: C
-    type(probe_8), INTENT(INOUT) :: xs
-    TYPE(INTERNAL_STATE) K
-    TYPE(ELEMENT),POINTER :: EL
-    TYPE(ELEMENTP),POINTER :: ELP
-    TYPE(REAL_8) V,DV
-
-    EL=>C%PARENT_FIBRE%MAG
-    ELP=>C%PARENT_FIBRE%MAGP
-
-    CALL ALLOC(V)
-    CALL ALLOC(DV)
-
-    IF(K%MODULATION) THEN
-       DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
-       V=ELP%DC_ac+ELP%A_ac*DV
-       DV=DV
-    else
-       DV=elp%D_ac*DV
-       DV=zero
-    endif
-
-    call transfer_ANBN(EL,ELP,2,VP=V,DVP=DV)
-    CALL KILL(V)
-    CALL KILL(DV)
-
-
-  END   SUBROUTINE MODULATE_P
 
 
 
@@ -3039,8 +2927,8 @@ contains
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
 
-    if(ALLOW_MODULATION.AND.c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K)
     IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       if(c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K)
        CALL TRACK_MODULATION(C,XS,K)
     ENDIF
     !   lost_node=>c
@@ -3063,7 +2951,7 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
     endif
-    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+    IF(ALLOW_MODULATION.AND.K%MODULATION.and.c%parent_fibre%mag%slow_ac) THEN
        CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,1)
     ENDIF
 
@@ -3098,8 +2986,8 @@ contains
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
 
-    if(ALLOW_MODULATION.AND.c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K)
     IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+       if(c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K)
        CALL TRACK_MODULATION(C,XS,K)
     ENDIF
 
@@ -3129,7 +3017,7 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     endif
 
-    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
+    IF(ALLOW_MODULATION.AND.K%MODULATION.and.c%parent_fibre%magp%slow_ac) THEN
        CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,2)
     ENDIF
 
@@ -3915,7 +3803,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
-       call write_e(100)
+       ! call !write_e(100)
     endif
     dix(:)=zero
     tiny=c_1d_40
@@ -3939,7 +3827,7 @@ contains
           w_p%fc='((1X,a72))'
           w_p%c(1)=" No Cavity in the Line "
           w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          call write_e(101)
+          ! call !write_e(101)
        ENDIF
     else   ! (.not.present(STATE)) t
        IF(STATE%NOCAVITY) THEN
@@ -4000,7 +3888,7 @@ contains
           w_p%fc='((1X,a72,/),(1X,a72))'
           w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
           w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          call write_E(113)
+          ! call !write_e(113)
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
@@ -4079,7 +3967,7 @@ contains
           !             w_p%nc=1
           !             w_p%fc='((1X,a72))'
           !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
-          !             call write_i
+          !             ! call ! WRITE_I
 
           !             return
           !          endif
@@ -4107,7 +3995,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        w_p%c(1)=" Inversion failed in FIND_ORBIT_LAYOUT_noda"
-       call write_e(333)
+       ! call !write_e(333)
        return
     endif
 
@@ -4131,7 +4019,7 @@ contains
     w_p=0
     w_p%nc=1
     w_p%fc='((1X,a72))'
-    write(w_p%c(1),'(a22,g20.14)') " Convergence Factor = ",xdix
+    write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
     if(xdix.gt.deps_tracking) then
        ite=1
     else
@@ -4198,7 +4086,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        write(w_p%c(1),'(a16)') " find_ENVELOPE 1"
-       call write_i
+       ! call ! WRITE_I
        CALL KILL(NORMAL)
        CALL KILL(ID)
        CALL KILL(Y)
@@ -4216,7 +4104,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        write(w_p%c(1),'(a16)') " find_ENVELOPE 2"
-       call write_i
+       ! call ! WRITE_I
        CALL KILL(NORMAL)
        CALL KILL(ID)
        CALL KILL(Y)

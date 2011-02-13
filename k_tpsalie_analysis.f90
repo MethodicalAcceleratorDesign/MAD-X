@@ -1259,7 +1259,7 @@ contains
     !       w_p%nc=1
     !       w_p=(/" Welcome to TPSA Overloaded"/)
     !       w_p%fc='(1((1X,A72),/))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !    else
     !       call DATERMINATE
     !       call kill(varf1)
@@ -1300,20 +1300,20 @@ contains
     w_p%nc=1
     w_p=(/" Berz's Package  "/)
     w_p%fc='(1((1X,A72),/))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !    else
     !       if(no1>3) then
     !          w_p=0
     !          w_p%nc=1
     !          w_p=(/" No1 is too big: run old=.true."/)
     !          w_p%fc='(1((1X,A72)))'
-    !          CALL WRITE_e(-1)
+    !          ! call !write_e(-1)
     !       endif
     !       w_p=0
     !       w_p%nc=1
     !       w_p=(/" Etienne's Experimental Package  "/)
     !       w_p%fc='(1((1X,A72)))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
     !    endif
     !
@@ -1328,7 +1328,7 @@ contains
     w_p%fc='(1((1X,A72)))'
     w_p%fi='(1x,6(6x,i6))'
     w_p=(/NO,ND,ND2,NP,NDPT,NV/)
-    call write_i
+    ! call ! WRITE_I
     CALL ASSIGN
     !    CALL ASSIGNMAP
     call alloc(varf1)
@@ -1371,7 +1371,7 @@ contains
     !       w_p%nc=1
     !       w_p=(/" Welcome to TPSA Overloaded"/)
     !       w_p%fc='(1((1X,A72),/))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !    else
     !       call DATERMINATE
     !       call kill(varf1)
@@ -1415,20 +1415,20 @@ contains
     w_p%nc=1
     w_p=(/" Berz's Package  "/)
     w_p%fc='(1((1X,A72),/))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !    else
     !       if(no1>3) then
     !          w_p=0
     !          w_p%nc=1
     !          w_p=(/" No1 is too big: run old=.true."/)
     !          w_p%fc='(1((1X,A72)))'
-    !          CALL WRITE_e(-1)
+    !          ! call !write_e(-1)
     !       endif
     !       w_p=0
     !       w_p%nc=1
     !       w_p=(/" Etienne's Experimental Package  "/)
     !       w_p%fc='(1((1X,A72)))'
-    !       CALL WRITE_i
+    !       ! call ! WRITE_I
     !       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
     !    endif
     call set_in_tpsa( NO,ND,ND2,NP,NDPT,NV,old)

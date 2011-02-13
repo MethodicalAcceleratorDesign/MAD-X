@@ -88,14 +88,16 @@ contains
 
     CALL TRACK(R,Y,1,STATE)
     NORM=Y
-    WRITE(6,'(a19,3(1x,g20.14))') "Fractional Tunes = ",norm%tune(1:3)
+    WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
     if(norm%tune(3)/=zero) &
-         WRITE(6,'(a20,(1x,g20.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
+         WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
 
   end SUBROUTINE lattice_GET_tune
+
+
 
 
   SUBROUTINE compute_A_4d(r,my_state,filename,pos,del,no,MY_A)
@@ -1464,7 +1466,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        w_p%c(1)= " This line is not ring : FIND_ORBIT_LAYOUT "
-       call write_E(100)
+       ! call !write_e(100)
     endif
     dix(:)=zero
     tiny=c_1d_40
@@ -1488,7 +1490,7 @@ contains
           w_p%fc='((1X,a72,/),(1X,a72))'
           w_p%c(1)=  " No Cavity in the Line "
           w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          call write_E(111)
+          ! call !write_e(111)
        ENDIF
     else
        IF(STATE%NOCAVITY) THEN
@@ -1507,7 +1509,7 @@ contains
           w_p%fc='((1X,a72,/),(1X,a72))'
           w_p%c(1)=  " No Cavity in the Line "
           w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          call write_E(112)
+          ! call !write_e(112)
        ENDIF
     endif
 101 continue
@@ -1539,7 +1541,7 @@ contains
           w_p%fc='((1X,a72,/),(1X,a72))'
           w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
           w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          call write_E(113)
+          ! call !write_e(113)
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
@@ -1580,7 +1582,7 @@ contains
           w_p%fc='((1X,a72))'
           write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",1
           messagelost(len_trim(messagelost)+1:255)=" -> Lost in Fixed Point Searcher "
-          call write_i
+          ! call ! WRITE_I
 
           return
        endif
@@ -1611,8 +1613,8 @@ contains
     w_p=0
     w_p%nc=1
     w_p%fc='((1X,a72))'
-    write(w_p%c(1),'(a22,g20.14)') " Convergence Factor = ",xdix
-    if(verbose) call write_i
+    if(verbose) write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
+    !    if(verbose) ! call ! WRITE_I
     if(xdix.gt.deps_tracking) then
        ite=1
     else
@@ -1682,7 +1684,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
-       call write_e(100)
+       ! call !write_e(100)
     endif
     dix(:)=zero
     tiny=c_1d_40
@@ -1705,7 +1707,7 @@ contains
           w_p%fc='((1X,a72))'
           w_p%c(1)=" No Cavity in the Line "
           w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          call write_e(101)
+          ! call !write_e(101)
        ENDIF
     else
        IF(STATE%NOCAVITY) THEN
@@ -1724,7 +1726,7 @@ contains
           w_p%fc='((1X,a72))'
           w_p%c(1)=" No Cavity in the Line "
           w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          call write_e(112)
+          ! call !write_e(112)
        ENDIF
     endif
 101 continue
@@ -1753,7 +1755,7 @@ contains
           w_p%fc='((1X,a72,/),(1X,a72))'
           w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
           w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          call write_E(113)
+          ! call !write_e(113)
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
@@ -1783,7 +1785,7 @@ contains
        !          w_p%nc=1
        !          w_p%fc='((1X,a72))'
        !          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",2
-       !          call write_i
+       !          ! call ! WRITE_I
 
        !          return
        !       endif
@@ -1830,7 +1832,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,a72))'
        w_p%c(1)=" Inversion failed in FIND_ORBIT_LAYOUT_noda"
-       call write_e(333)
+       ! call !write_e(333)
        return
     endif
 
@@ -1854,8 +1856,8 @@ contains
     w_p=0
     w_p%nc=1
     w_p%fc='((1X,a72))'
-    write(w_p%c(1),'(a22,g20.14)') " Convergence Factor = ",xdix
-    if(verbose) call write_i
+    if(verbose)write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
+    !  if(verbose) ! call ! WRITE_I
     if(xdix.gt.deps_tracking) then
        ite=1
     else

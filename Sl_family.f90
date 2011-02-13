@@ -472,8 +472,8 @@ CONTAINS
        W_P%FC='(2(1X,A72,/),(1X,A72))'
        W_P%C(1)=" BEWARE : ELEMENT AND ELEMENTP SEEM TO HAVE "
        W_P%C(2)=" DIFFERENT REFERENCE ENERGIES!"
-       WRITE(W_P%C(3),'(1X,G20.14,1X,G20.14)')  S1%MAG%P%P0C,S1%MAGP%P%P0C
-       CALL WRITE_E(100)
+       WRITE(W_P%C(3),'(1X,G21.14,1X,g21.14)')  S1%MAG%P%P0C,S1%MAGP%P%P0C
+       ! call !write_e(100)
     ENDIF
 
   END SUBROUTINE WORK_FIBRE
@@ -1031,7 +1031,7 @@ CONTAINS
        W_P%NC=1
        W_P%FC='((1X,A72))'
        WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     ENDIF
 
 
@@ -1851,7 +1851,7 @@ CONTAINS
        W_P%FC='(2(1X,A72,/),(1X,A72))'
        W_P%C(1)=" BEWARE : ENT AND A  "
        W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     ELSEIF(PRESENT(ENT)) THEN
        ENTT=ENT
        AT=A

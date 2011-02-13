@@ -272,13 +272,13 @@ contains
        write(w_p%c(5),'(a8,1x,i8)') " lda  = ",lda
        write(w_p%c(6),'(a8,1x,i8)') " lst  = ",lst
        write(w_p%c(7),'(a14,1x,i8)') " ndamaxi    = ",ndamaxi
-       write(w_p%c(8),'(a18,1x,g20.14)') " size in Mbytes = ",size
-       write(w_p%c(9),'(a25,1x,g20.14)') " Total_da_size Allowed = ",Total_da_size
+       write(w_p%c(8),'(a18,1x,g21.14)') " size in Mbytes = ",size
+       write(w_p%c(9),'(a25,1x,g21.14)') " Total_da_size Allowed = ",Total_da_size
        w_p%c(10)=" "
        w_p%c(11)="************************************"
        w_p%c(12)="* Execution Continues Nevertheless *"
        w_p%c(13)="************************************"
-       call write_e(1000)
+       ! call !write_e(1000)
        call kanalnummer(mf)
        open(unit=mf,file='too_big_da.txt')
        write(mf,*) "no,nv  = ",no,nv

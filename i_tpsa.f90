@@ -19,7 +19,7 @@ MODULE TPSA
   private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd
   private unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
-  private dexpt,dcost,dsint,dsqrtt,dtant
+  private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht
   PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
   private GETintnd2t
   PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
@@ -600,9 +600,21 @@ MODULE TPSA
      MODULE PROCEDURE dsqrtt
   END INTERFACE
 
+  INTERFACE atanh
+     MODULE PROCEDURE datanht
+  END INTERFACE
+
+
+
   INTERFACE tan
      MODULE PROCEDURE dtant
   END INTERFACE
+
+  INTERFACE tanh
+     MODULE PROCEDURE dtanht
+  END INTERFACE
+
+
   INTERFACE dtan
      MODULE PROCEDURE dtant
   END INTERFACE
@@ -809,7 +821,7 @@ CONTAINS
        w_p%nc=1
        w_p=(/" No TPSA package ever initialized "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(111)
+       ! call !write_e(111)
     ENDIF
     !    if(old) then
     s1%i=0
@@ -1080,6 +1092,23 @@ CONTAINS
 
   END FUNCTION dtant
 
+  FUNCTION datanht( S1 )
+    implicit none
+    TYPE (taylor) datanht
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    !    call check(s1)
+    call ass(datanht)
+
+    datanht=log(sqrt(1+s1)/sqrt(1-s1))
+
+    master=localmaster
+
+  END FUNCTION datanht
+
   FUNCTION dcost( S1 )
     implicit none
     TYPE (taylor) dcost
@@ -1169,6 +1198,27 @@ CONTAINS
 
   END FUNCTION DCOSHT
 
+  FUNCTION dtanht( S1 )
+    implicit none
+    TYPE (taylor) dtanht
+    TYPE (taylor), INTENT (IN) :: S1
+    integer localmaster
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+
+    !    call check(s1)
+    call ass(dtanht)
+    ! if(old) then
+
+    dtanht=sinh(s1)/cosh(s1)
+    !    else
+    !       call newdafun('COSH',s1%j,DCOSHT%j)
+    !    endif
+
+    master=localmaster
+
+  END FUNCTION dtanht
 
   FUNCTION dlogt( S1 )
     implicit none
@@ -2641,7 +2691,7 @@ CONTAINS
           w_p%nc=1
           w_p%fc='(1((1X,A72),/))'
           w_p%c(1)=" error in getchar for .para. "
-          call write_e(0)
+          ! call !write_e(0)
           stop
        endif
     enddo
@@ -2703,7 +2753,7 @@ CONTAINS
           w_p%nc=1
           w_p%fc='(1((1X,A72),/))'
           w_p%c(1)=" error in GETintnd2 for .para. "
-          call write_e(0)
+          ! call !write_e(0)
           stop
        endif
     enddo
@@ -2767,7 +2817,7 @@ CONTAINS
           w_p%nc=1
           w_p%fc='(1((1X,A72),/))'
           w_p%c(1)=" error in GETintnd2t for .part_taylor. "
-          call write_e(0)
+          ! call !write_e(0)
           stop
        endif
     enddo
@@ -2831,7 +2881,7 @@ CONTAINS
           w_p%fi='(3((1X,i4)))'
           w_p%c(1)= "iass0user(master),scratchda(master)%n,newscheme_max"
           w_p=(/iass0user(master),scratchda(master)%n,newscheme_max/)
-          call write_e
+          ! call !write_e
           call ndum_warning_user
        endif
        iass0user(master)=0
@@ -2840,7 +2890,7 @@ CONTAINS
        w_p%nc=1
        w_p=(/"Should not be here"/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(101)
+       ! call !write_e(101)
     end select
     master=master-1
   end subroutine check_snake
@@ -3129,7 +3179,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)=" ERROR IN REFILL_N: UNIVERSAL_TAYLOR DOES NOT EXIST"
-       call write_e(123)
+       ! call !write_e(123)
     ENDIF
     J=0
     DO I=1,S2%N
@@ -3177,7 +3227,7 @@ CONTAINS
     endif
 
     do i = 1,ut%n
-       write(iunit,'(I6,2X,G20.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
+       write(iunit,'(I6,2X,G21.14,I5,4X,18(2I2,1X))') i,ut%c(i),sum(ut%j(i,:)),(ut%j(i,ii),ii=1,ut%nv)
        if( .not. print77) then
           write(iunit,*)  ut%c(i)
        endif
@@ -3204,7 +3254,7 @@ CONTAINS
     w_p%fc='((1X,A72,/),(1X,A72))'
     w_p%c(1)= "ERROR IN :"
     w_p%c(2)= STRING
-    call write_e(3478)
+    ! call !write_e(3478)
 
   end subroutine crap1
 
@@ -3239,7 +3289,7 @@ CONTAINS
     w_p%nc=1
     w_p%fc='(1(1X,A72),/))'
     w_p%c(1)= " do you want a crash? "
-    call write_e
+    ! call !write_e
     call read(ipause)
     ii(2000*ipause)=0
 
@@ -3428,7 +3478,7 @@ CONTAINS
           w_p%fc='(1((1X,A72)))'
           write(6,'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
           !          write(w_p%c(1),'(a6,1x,i4,a5,1x,i4,1x,a7)') "Level ",i, " has ",scratchda(i)%n, "Taylors"
-          !          call write_e
+          !          ! call !write_e
        enddo
     endif
   END   SUBROUTINE report_level
@@ -3487,7 +3537,7 @@ CONTAINS
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
        master=sqrt(-dble(master))
     end select
     !    write(26,*) "   taylor ",master

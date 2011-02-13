@@ -13,6 +13,8 @@ module orbit_ptc
   REAL(dp) ::x_orbit_sync(6)= zero
   type(work)  :: w1_orbit,w2_orbit
   type(fibre), pointer :: p_orbit
+  integer :: ptc_node_old=-1
+  type(probe) :: xsm
 
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
@@ -292,10 +294,11 @@ contains
     IMPLICIT NONE
     REAL(DP),  INTENT(INOUT) :: X(6)
     INTEGER K,I
-    LOGICAL(LP) U
+    LOGICAL(LP) U,do_mod
     REAL(DP) X5
     TYPE(INTEGRATION_NODE), POINTER  :: T
-    TYPE(INTERNAL_STATE), OPTIONAL :: STATE
+    TYPE(INTERNAL_STATE), target, OPTIONAL :: STATE
+    TYPE(INTERNAL_STATE), pointer :: STATE0
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        x(1:4)=x(1:4)*1.e-3_dp
@@ -304,7 +307,7 @@ contains
        X(6)=X5/my_ORBIT_LATTICE%ORBIT_OMEGA
     ENDIF
 
-
+    do_mod=my_false
     u=my_false
 
     T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
@@ -317,13 +320,32 @@ contains
     !          x(1)=XBIG
     !       endif
     !    ELSE
-    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-       if(u) exit
-       IF(PRESENT(STATE)) THEN
-          CALL TRACK_NODE_SINGLE(T,X,STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
-       ELSE
-          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+
+    if(present(state)) then
+       state0=>state
+    else
+       state0=>my_ORBIT_LATTICE%STATE
+    endif
+
+    IF(ALLOW_MODULATION.AND.STATE0%MODULATION) THEN
+       if(K/=ptc_node_old) then
+          ptc_node_old=k
+          do_mod=my_true
        ENDIF
+
+    endif
+    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+       if(do_mod) then
+          if(t%parent_fibre%mag%slow_ac) CALL MODULATE(T,XSM,STATE0)
+          CALL TRACK_MODULATION(T,XSM,STATE0)
+       endif
+       if(u) exit
+       !       IF(PRESENT(STATE)) THEN
+       CALL TRACK_NODE_SINGLE(T,X,STATE0) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+       !          CALL TRACK_NODE_SINGLE(T,X,STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+       !       ELSE
+       !          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
+       !       ENDIF
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
@@ -345,6 +367,29 @@ contains
     ENDIF
 
   end SUBROUTINE ORBIT_TRACK_NODE_Standard_R
+
+  SUBROUTINE ORBIT_restore_ANBN
+    IMPLICIT NONE
+    INTEGER K,I
+    TYPE(INTEGRATION_NODE), POINTER  :: T
+
+
+    DO K=1,my_ORBIT_LATTICE%ORBIT_N_NODE
+
+       T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
+
+
+       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+          IF(T%PARENT_FIBRE%MAG%slow_ac) THEN
+             CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1)
+          ENDIF
+
+          T=>T%NEXT
+       ENDDO
+
+    enddo
+  end SUBROUTINE ORBIT_restore_ANBN
+
 
 
 

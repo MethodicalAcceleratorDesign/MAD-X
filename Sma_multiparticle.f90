@@ -14,6 +14,10 @@ module ptc_multiparticle
   PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE,TRACKV_NODE_SINGLE
   private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION  !,DRIFT_BACK_TO_POSITION
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
+  PRIVATE MODULATE_R,MODULATE_P
+  PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
+
+  LOGICAL(lp) :: ALLOW_MODULATION=.true.
 
   logical(lp),private, parameter :: dobb=.true.
   logical(lp),private, parameter :: aperture_all_case0=.false.
@@ -53,6 +57,17 @@ module ptc_multiparticle
      MODULE PROCEDURE fuzzy_neq
   END INTERFACE
 
+  INTERFACE MODULATE
+     MODULE PROCEDURE MODULATE_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
+     MODULE PROCEDURE MODULATE_P   !
+  END INTERFACE
+
+  INTERFACE TRACK_MODULATION
+     MODULE PROCEDURE TRACK_MODULATION_R   ! PROPAGATE FAKE MODULATED (Q,P) ; 7TH AND 8TH VARIABLES
+     MODULE PROCEDURE TRACK_MODULATION_P   !
+  END INTERFACE
+
+
   type three_d_info
      !   character(nlp),pointer :: name
      real(dp)  a(3),b(3)   ! Centre of entrance and exit faces
@@ -69,6 +84,111 @@ module ptc_multiparticle
   real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
 
 CONTAINS
+
+
+  SUBROUTINE MODULATE_R(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(ELEMENT),POINTER :: EL
+    TYPE(ELEMENTP),POINTER :: ELp
+    REAL(DP) v,dv
+
+
+    EL=>C%PARENT_FIBRE%MAG
+    ELP=>C%PARENT_FIBRE%MAGP
+
+    IF(K%MODULATION) THEN
+       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+       V=EL%DC_ac+EL%A_ac*DV
+       DV=el%D_ac*DV
+    else
+       V=EL%DC_ac
+       DV=zero
+    endif
+    call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
+
+  END   SUBROUTINE MODULATE_R
+
+  SUBROUTINE MODULATE_P(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe_8), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(ELEMENT),POINTER :: EL
+    TYPE(ELEMENTP),POINTER :: ELP
+    TYPE(REAL_8) V,DV
+
+    EL=>C%PARENT_FIBRE%MAG
+    ELP=>C%PARENT_FIBRE%MAGP
+
+    CALL ALLOC(V)
+    CALL ALLOC(DV)
+
+    IF(K%MODULATION) THEN
+       DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
+       V=ELP%DC_ac+ELP%A_ac*DV
+       DV=elp%D_ac*DV
+    else
+       V=elp%DC_ac
+       DV=zero
+    endif
+
+    call transfer_ANBN(EL,ELP,2,VP=V,DVP=DV)
+    CALL KILL(V)
+    CALL KILL(DV)
+
+
+  END   SUBROUTINE MODULATE_P
+
+  SUBROUTINE TRACK_MODULATION_R(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    real(dp) xt
+    real(dp),pointer :: beta0
+
+    if(k%time) then
+       beta0=>C%PARENT_FIBRE%beta0
+       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    else
+       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    endif
+
+  END   SUBROUTINE TRACK_MODULATION_R
+
+  SUBROUTINE TRACK_MODULATION_P(C,XS,K)
+    IMPLICIT NONE
+    type(INTEGRATION_NODE), pointer :: C
+    type(probe_8), INTENT(INOUT) :: xs
+    TYPE(INTERNAL_STATE) K
+    TYPE(REAL_8) xt
+    real(dp),pointer :: beta0
+
+    CALL ALLOC(XT)
+
+    if(k%time) then
+       beta0=>C%PARENT_FIBRE%beta0
+       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    else
+       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
+       XS%AC%X(1) = xt
+    endif
+
+    CALL KILL(XT)
+
+  END   SUBROUTINE TRACK_MODULATION_P
+
+
 
   FUNCTION fuzzy_eq( S1, S2 )
     implicit none

@@ -493,7 +493,7 @@ contains
     w_p%nc=1
     write(w_p%c(1),'(a11,i8)') ' ALLOCATED ',ldanow
     w_p%fc='(1((1X,A72)))'
-    CALL WRITE_i
+    ! call ! WRITE_I
     return
   end subroutine dallsta
   !
@@ -648,7 +648,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          CALL WRITE_E(125)
+          ! call !write_e(125)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -758,7 +758,7 @@ contains
              write(w_p%c(3),'(i8,1x,i8)') NST0,LST
              w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
              write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-             CALL WRITE_E(126)
+             ! call !write_e(126)
              call dadeb !(31,'ERR DAALL ',1)
           endif
           !
@@ -866,7 +866,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          CALL WRITE_E(127)
+          ! call !write_e(127)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -976,7 +976,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          CALL WRITE_E(127)
+          ! call !write_e(127)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -3729,7 +3729,7 @@ contains
                 call dadal(ms,ia)
                 return
              else
-                write(line,'(a50,2(1x,i4),3(1x,g12.6))')  'ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
+                write(line,'(a50,2(1x,i4),3(1x,g13.6))')  'ERROR IN DAINV, INVERSION DID NOT WORK,I,J,PROD = ' &
                      &  ,i,j,prod,epsmac,eps
                 ipause=mypauses(35,line)
                 ier = 1
@@ -4489,7 +4489,7 @@ contains
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,G20.14)') i-ipoa, cc(i)
+          write(iunit,'(I6,2X,g21.14)') i-ipoa, cc(i)
        enddo
     elseif(nomax.eq.1) then
        if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
@@ -4503,7 +4503,7 @@ contains
              j(i-1)=1
              ioa=1
           endif
-          write(iunit,'(I6,2X,G20.14,I5,4X,18(2i2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
+          write(iunit,'(I6,2X,G21.14,I5,4X,18(2i2,1X))') iout,cc(ipoa+i-1),ioa,(j(iii),iii=1,nvmax)
           write(iunit,*) cc(ipoa+i-1)
        enddo
     else
@@ -4517,7 +4517,7 @@ contains
              if(abs(cc(ii)).gt.eps) then
                 !ETIENNE
                 iout = iout+1
-                write(iunit,'(I6,2X,G20.14,I5,4X,18(2i2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
+                write(iunit,'(I6,2X,G21.14,I5,4X,18(2i2,1X))') iout,cc(ii),ioa,(j(iii),iii=1,nvmax)
                 !ETIENNE
                 write(iunit,*) cc(ii)
              endif
@@ -4786,7 +4786,7 @@ contains
     !
 10  continue
     iin = iin + 1
-    read(iunit,'(I6,2X,G20.14,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
+    read(iunit,'(I6,2X,G21.14,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
     !
     if(ii.eq.0) goto 20
     !ETIENNE

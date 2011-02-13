@@ -1060,526 +1060,6 @@ contains
   end subroutine  alex_track_monitors
 
 
-  subroutine  alex_mom_real_monitors(ring,jm,jn,x,state_in)
-    implicit none
-    integer ipause, mypause
-    integer jm,nm,i,jinv(4),i1,i11,i2,i22,jn(4)
-    type(layout), target :: ring
-    real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
-    real(dp)ar,x(6),z(4),zz(lnv),zx(4),z0(4),zf(4)
-    type(damap) id,m11,m2,m22,m1,ex,map1,fin
-    type(pbfield) h
-    type(normalform) norm
-    type(fibre),pointer::p1,p11,p2,p22
-    type(real_8) y(6)
-    type(internal_state) state,state_in
-    type(gmap) g,gi
-!!! will produce the real data at jm
-
-    z0=zero
-
-    nm=size(monitors)
-
-    state=state_in+only_4d0
-
-    CALL INIT(STATE,1,0)
-
-    call alloc(y)
-    call alloc(id,m11,m2,m22,m1,ex,fin)
-    call alloc(map1)
-    call alloc(g,gi)
-
-    CALL FIND_ORBIT(ring,x,1,STATE,c_1d_5)
-    write(6,*) monitors(jm)%kind
-    jn(1)=jm
-    if(monitors(jm)%kind==1) then
-
-       p1=>monitors(jm)%p
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
-             p11=>monitors(mod_n(i,nm))%p
-             jn(2)=mod_n(i,nm)
-             i11=i
-             exit
-          endif
-       enddo
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
-             p2=>monitors(mod_n(i,nm))%p
-             jn(3)=mod_n(i,nm)
-             i2=i
-             exit
-          endif
-       enddo
-       do i=i2+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
-             p22=>monitors(mod_n(i,nm))%p
-             jn(4)=mod_n(i,nm)
-             i22=i
-             exit
-          endif
-       enddo
-       write(6,*)
-       write(6,*) p1%mag%name,p11%mag%name
-       write(6,*) p2%mag%name,p22%mag%name
-       write(6,*) p1%pos,p11%pos
-       write(6,*) p2%pos,p22%pos
-
-       ! track from ip to p1 : jm x monitor
-
-       call track(x,state,ring%start,p1)
-       !
-       ! x is closed orbit at p1
-
-
-
-       id=1
-
-       y=x+id
-       call track(y,state,p1,p11)
-       m11=y
-       ! m11 is map from p1 to p11  (second x monitor)
-       m11=z0  ! removed zeroth order
-
-       y=x+id
-       call track(y,state,p1,p2)
-       m2=y
-       m2=z0
-       ! m2 is map from p1 to p2  (first y monitor)
-
-
-       y=x+id
-       call track(y,state,p1,p22)
-       m22=y
-       m22=z0
-       ! m22 is map from p1 to p22  (second y monitor)
-
-!!!!!!!!!!!!   testing and computing m11 !!!!!!!!!!!!!!!!!
-       fin=1
-       g=1
-
-       zF=0.d0
-
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-       zf(1)=z(1)
-       zz=m11*z
-       write(6,*) "testing tracking from jm to p1"
-       ! testing tracking from jm to p1
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(1)=1
-       ex%v(1)=1.0d0.mono.2
-       ex%v(2)=1.0d0.mono.1
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m11=m11*ex
-       m11=m11**jinv
-       !m11=m11**(-1)
-       ex%v(1)=1.0d0.mono.2
-       ex%v(2)=1.0d0.mono.1
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m11=ex*m11*ex
-
-       ! m11 is now the map from x,x11,y,py
-
-       fin%v(2)=m11%v(2)   !   px_0(x_0,x_p11,y_0,py_0)
-       g%v(2)=m11%v(2)     !   px_0(x_0,x_p11,y_0,py_0)
-       zf(2)=zz(1)
-
-       zx(1)=z(1)
-       zx(2)=zz(1)
-       zx(3)=z(3)
-       zx(4)=z(4)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m11.o.ex
-
-       zz(1:4)=map1
-
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(2),6)
-       ipause=mypause(778)
-!!!!!!!!!!!!   testing and computing m22  !!!!!!!!!!!!!!!!!
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-
-       zz=m22*z
-       write(6,*) "testing tracking from jm to p22"
-       ! testing tracking from jm to p2
-
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(3)=1
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.4
-       ex%v(4)=1.0d0.mono.3
-       m22=m22*ex
-       m22=m22**jinv
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.4
-       ex%v(4)=1.0d0.mono.3
-       m22=ex*m22*ex
-       ! m22 is now the map from x,px,y,y22
-
-
-       fin%v(4)=m22%v(4)    !   py_0(x_0,px_0,y_0,y_p22)
-       g%v(4)=m22%v(4)
-
-       zf(4)=zz(3)
-
-       zx(1)=z(1)
-       zx(2)=z(2)
-       zx(3)=z(3)
-       zx(4)=zz(3)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m22.o.ex
-
-       zz(1:4)=map1
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(4),6)
-       ipause=mypause(778)
-!!!!!!!!!!!!   testing and computing m2  !!!!!!!!!!!!!!!!!
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-
-       zz=m2*z
-
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(3)=1
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m2=m2*ex
-       m2=m2**jinv
-       !m11=m11**(-1)
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m2=ex*m2*ex
-
-       ! m2 is now the map from x,px,y2,py
-
-       fin%v(3)=m2%v(3)      !   y_0(x_0,px_0,y_p2,py_0)
-       g%v(3)=m2%v(3)
-       zf(3)=zz(3)
-
-       zx(1)=z(1)   !x_1
-       zx(2)=z(2)    ! x_0
-       zx(3)=zz(3)    !
-       zx(4)=z(4)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m2.o.ex
-
-       zz(1:4)=map1
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(3),6)
-       ipause=mypause(778)
-
-       call print(fin,6)
-
-
-
-       gi=g
-
-
-
-    else  !!!! if(monitors(jm)%kind==2)
-
-       write(6,*) " crotte "
-       ipause=mypause(0)
-       p2=>monitors(jm)%p
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
-             p22=>monitors(mod_n(i,nm))%p
-             jn(2)=mod_n(i,nm)
-             i22=i
-             exit
-          endif
-       enddo
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
-             p1=>monitors(mod_n(i,nm))%p
-             jn(3)=mod_n(i,nm)
-             i1=i
-             exit
-          endif
-       enddo
-       do i=i22+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
-             p11=>monitors(mod_n(i,nm))%p
-             jn(4)=mod_n(i,nm)
-             i11=i
-             exit
-          endif
-       enddo
-       write(6,*)
-       write(6,*) p1%mag%name,p11%mag%name
-       write(6,*) p2%mag%name,p22%mag%name
-       write(6,*) p1%pos,p11%pos
-       write(6,*) p2%pos,p22%pos
-
-       ! track from ip to p1 : jm x monitor
-
-       call track(x,state,ring%start,p2)
-       !
-       ! x is closed orbit at p2
-
-
-
-       id=1
-
-       y=x+id
-       call track(y,state,p2,p22)
-       m22=y
-       ! m22 is map from p2 to p22  (second y monitor)
-       m22=z0  ! removed zeroth order
-
-       y=x+id
-       call track(y,state,p2,p1)
-       m1=y
-       m1=z0
-       ! m1 is map from p2 to p1  (first x monitor)
-
-
-       y=x+id
-       call track(y,state,p2,p11)
-       m11=y
-       m11=z0
-       ! m11 is map from p2 to p11  (second x monitor)
-
-!!!!!!!!!!!!   testing and computing m22 !!!!!!!!!!!!!!!!!  asdad
-       fin=1
-       g=1
-
-       zF=0.d0
-
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-       zf(3)=z(3)
-       zz=m22*z
-       write(6,*) "testing tracking from jm to p22"
-       ! testing tracking from jm to p1
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(3)=1
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.4
-       ex%v(4)=1.0d0.mono.3
-       m22=m22*ex
-       m22=m22**jinv
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.4
-       ex%v(4)=1.0d0.mono.3
-       m22=ex*m22*ex
-
-       ! m22 is now the map from x,px,y,y22
-
-       fin%v(4)=m22%v(4)   !   py_0(x_0,p_x0,y_0,y_p22)
-       g%v(4)=m22%v(4)     !   py_0(x_0,p_x0,y_0,y_p22)
-       zf(4)=zz(3)
-
-       zx(1)=z(1)
-       zx(2)=z(2)
-       zx(3)=z(3)
-       zx(4)=zz(3)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m22.o.ex
-
-       zz(1:4)=map1
-
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(4),6)
-       ipause=mypause(666)
-!!!!!!!!!!!!   testing and computing m1  !!!!!!!!!!!!!!!!!
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-
-       zz=m1*z
-       write(6,*) "testing tracking from jm to p1"
-       ! testing tracking from jm to p1
-
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(1)=1
-       ex%v(1)=1.0d0.mono.2
-       ex%v(2)=1.0d0.mono.1
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m1=m1*ex
-       m1=m1**jinv
-       ex%v(1)=1.0d0.mono.2
-       ex%v(2)=1.0d0.mono.1
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m1=ex*m1*ex
-       ! m1 is now the map from x,x1,y,py
-
-
-       fin%v(2)=m1%v(2)    !   px_0(x_0,x1,y_0,py0)
-       g%v(2)=m1%v(2)
-
-       zf(2)=zz(1)
-
-       zx(1)=z(1)
-       zx(2)=zz(1)
-       zx(3)=z(3)
-       zx(4)=z(4)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m1.o.ex
-
-       zz(1:4)=map1
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(2),6)
-       ipause=mypause(667)
-!!!!!!!!!!!!   testing and computing m11  !!!!!!!!!!!!!!!!!
-       z=0.d0
-       z(1)=0.00001d0
-       z(2)=0.00002d0
-       z(3)=0.00003d0
-       z(4)=0.00004d0
-       zz=0.d0
-
-       zz=m11*z
-
-       WRITE(6,'(4(1x,E15.8))')z
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-
-       ipause=mypause(777)
-
-       jinv=0
-       jinv(1)=1
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m11=m11*ex
-       m11=m11**jinv
-       !m11=m11**(-1)
-       ex%v(1)=1.0d0.mono.1
-       ex%v(2)=1.0d0.mono.2
-       ex%v(3)=1.0d0.mono.3
-       ex%v(4)=1.0d0.mono.4
-       m11=ex*m11*ex
-
-       ! m11 is now the map from x2,px,y,py
-
-       fin%v(1)=m11%v(1)      !   x_0(x_0,px_0,y_p2,py_0)
-       g%v(1)=m11%v(1)
-       zf(1)=zz(1)
-
-       zx(3)=z(3)   !x_1
-       zx(2)=z(2)    ! x_0
-       zx(1)=zz(1)    !
-       zx(4)=z(4)
-
-       ex=0
-       ex=zx
-
-
-
-       map1=m11.o.ex
-
-       zz(1:4)=map1
-       WRITE(6,'(4(1x,E15.8))')zz(1:4)
-       call print(map1%v(1),6)
-       ipause=mypause(668)
-
-       call print(fin,6)
-
-
-
-       gi=g
-
-
-    endif !!!! if(monitors(jm)%kind==2)
-
-    call invert_monitors(monitors(jm)%kind,zf,gi)
-    write(6,*) zf(1:4)
-    ipause=mypause(555)
-
-
-
-    call kill(y)
-    call kill(id,m11,m2,m22,m1,ex,fin)
-    call kill(map1)
-    call kill(g,gi)
-
-
-
-  end subroutine  alex_mom_real_monitors
 
   subroutine invert_monitors(kind,zf0,g)
     implicit none
@@ -1668,97 +1148,10 @@ contains
 
   end subroutine invert_monitors
 
-  subroutine invert_monitors_old(kind,zf0,g)
+
+  subroutine  alex_mom_monitors(jm,nt)
     implicit none
-    type(damap) ex
-    type(gmap) gi,g
-    real(dp) zf(4),zx(6),zf0(4)
-    integer kind,i
-
-    zf=zf0
-
-    call alloc(ex)
-    call alloc(gi)
-    ! zf contains measuments xf(x_1,x_11,y_2,y_22)
-    gi=g
-
-    if(kind==1) then
-       !write(6,*) zf(1:4)
-       zx=zero
-       zx(1)=zf(1)
-       zx(2)=zf(2)   !!!
-       ex=0
-       ex=zx
-       ex%v(3)=ex%v(3)+(1.d0.mono.3)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
-       zx=zero
-       zx(1)=zf(1)
-       zx(3)=zf(3)   !!!
-       ex=0
-       ex=zx
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-
-       gi%v(3)=(gi%v(3).o.ex)-(1.d0.mono.3)
-       zx=zero
-       zx(1)=zf(1)
-       zx(4)=zf(4)   !!!
-       ex=0
-       ex=zx
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(3)=ex%v(3)+(1.d0.mono.3)
-       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
-       !call print(gi,6)
-       gi%v(1)=gi%v(1)-zf(1)
-
-    else
-       !write(6,*) zf(1:4)
-
-       zx=zero
-       zx(3)=zf(3)
-       zx(4)=zf(4)   !!!
-       ex=0
-       ex=zx
-       ex%v(1)=ex%v(1)+(1.d0.mono.1)
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
-       zx=zero
-       zx(1)=zf(1)
-       zx(3)=zf(3)   !!!
-       ex=0
-       ex=zx
-       ex%v(2)=ex%v(2)+(1.d0.mono.2)
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-
-       gi%v(1)=(gi%v(1).o.ex)-(1.d0.mono.1)
-       zx=zero
-       zx(3)=zf(3)
-       zx(2)=zf(2)   !!!
-       ex=0
-       ex=zx
-       ex%v(4)=ex%v(4)+(1.d0.mono.4)
-       ex%v(1)=ex%v(1)+(1.d0.mono.1)
-       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
-       !call print(gi,6)
-
-       gi%v(3)=gi%v(3)-zf(3)
-    endif
-
-    gi=gi.oo.(-1)
-
-
-    zf0=gi
-
-    call kill(ex)
-    call kill(gi)
-
-  end subroutine invert_monitors_old
-
-
-  subroutine  alex_mom_monitors
-    implicit none
-    integer nturn,i,j,nm,k,jm
+    integer nturn,i,j,nm,k,jm,nt
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
     real(dp)ar
     type(damap) id,m12,ex
@@ -1774,53 +1167,53 @@ contains
     nturn=SIZE (monitors(1)%r,dim=2)
     nm=size(monitors)
 
-    do jm=1,nm
+    !do jm=1,nm
 
-       mom=>monitors(jm)%mom
-       r=>monitors(jm)%r
-       a=>monitors(jm)%a
-       at=>monitors(jm)%at
-       mom=0.d0
-       do i=1,4
-          do j=i,4
-             do k=1,nturn
-                mom(i,j)=r(i,k)*r(j,k)+mom(i,j)
-             enddo
+    mom=>monitors(jm)%mom
+    r=>monitors(jm)%xf
+    a=>monitors(jm)%a
+    at=>monitors(jm)%at
+    mom=0.d0
+    do i=1,4
+       do j=i,4
+          do k=1,nt
+             mom(i,j)=r(i,k)*r(j,k)+mom(i,j)
           enddo
        enddo
+    enddo
 
-       mom=mom/nturn
-       do i=1,4
-          do j=i,4
-             mom(j,i)=mom(i,j)
-          enddo
+    mom=mom/nt
+    do i=1,4
+       do j=i,4
+          mom(j,i)=mom(i,j)
        enddo
+    enddo
 
 
-       h%h=zero
+    h%h=zero
 
-       do i=1,2
-          do j=1,2
-             if(with_c==0.and.i/=j) cycle
-             h%h=h%h + mom(2*i-1,2*j-1)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j))
-             h%h=h%h + mom(2*i,2*j)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j-1))
-             h%h=h%h - mom(2*i,2*j-1)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j))
-             h%h=h%h - mom(2*i-1,2*j)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j-1))
-          enddo
+    do i=1,2
+       do j=1,2
+          if(with_c==0.and.i/=j) cycle
+          h%h=h%h + mom(2*i-1,2*j-1)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j))
+          h%h=h%h + mom(2*i,2*j)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j-1))
+          h%h=h%h - mom(2*i,2*j-1)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j))
+          h%h=h%h - mom(2*i-1,2*j)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j-1))
        enddo
+    enddo
 
-       h%h=-h%h
-       ar=full_abs(h%h)
-       ar=ar*20.d0
-       h%h=h%h/ar
+    h%h=-h%h
+    ar=full_abs(h%h)
+    ar=ar*20.d0
+    h%h=h%h/ar
 
-       id=1
-       ex=texp(h,id)
-       norm=ex
+    id=1
+    ex=texp(h,id)
+    norm=ex
 
-       a=norm%a_t
-       at=matmul(at,a)
-    enddo   ! jm=1,nm
+    a=norm%a_t
+    at=matmul(at,a)
+    !enddo   ! jm=1,nm
 
 
     call kill(id,m12,ex)
@@ -1829,7 +1222,7 @@ contains
 
   end subroutine  alex_mom_monitors
 
-  subroutine  alex_apply_A_on_data
+  subroutine  alex_apply_A_on_data(jm)
     implicit none
     integer jm,ier,nm
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:)
@@ -1839,21 +1232,21 @@ contains
 
     nm=size(monitors)
 
-    do jm=1,nm
+    !do jm=1,nm
 
-       r=>monitors(jm)%r
-       a=>monitors(jm)%a
-       call matinv(a,ai,4,4,ier)
-       if(ier/=0) then
-          write(6,*) " error in matinv ",jm
-          stop 999
-       endif
+    r=>monitors(jm)%xf
+    a=>monitors(jm)%a
+    call matinv(a,ai,4,4,ier)
+    if(ier/=0) then
+       write(6,*) " error in matinv ",jm
+       stop 999
+    endif
 
-       r=matmul(ai,r)
+    r=matmul(ai,r)
 
 
 
-    enddo   ! jm=1,nm
+    !enddo   ! jm=1,nm
 
 
 
@@ -1963,10 +1356,10 @@ contains
 
 
 !!!1 this is the correct one
-  subroutine  alex_mom_real_monitors_old(ring,jm,jn,x,state_in)
+  subroutine  alex_mom_real_monitors(ring,jm,jn,x,state_in,no,nt)
     implicit none
     integer ipause, mypause
-    integer jm,nm,i,jinv(4),i1,i11,i2,i22,jn(4)
+    integer jm,nm,i,jinv(4),i1,i11,i2,i22,jn(4),mf1,mf2,no,nt
     type(layout), target :: ring
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
     real(dp)ar,x(6),z(4),zz(lnv),zx(4),z0(4),zf(4)
@@ -1985,7 +1378,7 @@ contains
 
     state=state_in+only_4d0
 
-    CALL INIT(STATE,1,0)
+    CALL INIT(STATE,no,0)
 
     call alloc(y)
     call alloc(id,m11,m2,m22,m1,ex)
@@ -1994,34 +1387,50 @@ contains
 
     CALL FIND_ORBIT(ring,x,1,STATE,c_1d_5)
     write(6,*) monitors(jm)%kind
-    if(monitors(jm)%kind==1) then
+    if(monitors(jm)%kind==1.or.monitors(jm)%kind==3) then
        jn(1)=jm
 
        p1=>monitors(jm)%p
+       if(monitors(jm)%kind==3) then
+          p2=>monitors(jm)%p
+          i2=jm
+          jn(3)=jm
+       else
+          do i=jm+1,jm+nm
+             if(monitors(mod_n(i,nm))%kind==2) then
+                p2=>monitors(mod_n(i,nm))%p
+                jn(3)=mod_n(i,nm)
+                i2=i
+                exit
+             endif
+          enddo
+
+       endif
+
        do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
+          if(monitors(mod_n(i,nm))%kind==1.or.monitors(mod_n(i,nm))%kind==3) then
              p11=>monitors(mod_n(i,nm))%p
              jn(2)=mod_n(i,nm)
              i11=i
              exit
           endif
        enddo
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
-             p2=>monitors(mod_n(i,nm))%p
-             jn(3)=mod_n(i,nm)
-             i2=i
-             exit
-          endif
-       enddo
-       do i=i2+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
-             p22=>monitors(mod_n(i,nm))%p
-             jn(4)=mod_n(i,nm)
-             i22=i
-             exit
-          endif
-       enddo
+
+       if(monitors(mod_n(jn(2),nm))%kind==3) then
+          p22=>monitors(mod_n(jn(2),nm))%p
+          jn(4)=jn(2)
+          i22=i2+1
+       else
+          do i=i2+1,jm+nm
+             if(monitors(mod_n(i,nm))%kind==2) then
+                p22=>monitors(mod_n(i,nm))%p
+                jn(4)=mod_n(i,nm)
+                i22=i
+                exit
+             endif
+          enddo
+       endif
+
        write(6,*)
        write(6,*) p1%mag%name,p11%mag%name
        write(6,*) p2%mag%name,p22%mag%name
@@ -2127,24 +1536,36 @@ contains
        write(6,*) " crotte "
        ipause=mypause(0)
        p2=>monitors(jm)%p
+
        do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==2) then
+          if(monitors(mod_n(i,nm))%kind==2.or.monitors(mod_n(i,nm))%kind==3) then
              p22=>monitors(mod_n(i,nm))%p
              jn(4)=mod_n(i,nm)
              i22=i
              exit
           endif
        enddo
-       do i=jm+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
-             p1=>monitors(mod_n(i,nm))%p
-             jn(2)=mod_n(i,nm)
-             i1=i
-             exit
-          endif
-       enddo
+
+       if(monitors(mod_n(jn(4),nm))%kind==3) then
+
+          p1=>monitors(mod_n(jn(4),nm))%p
+          i1=i22
+          jn(2)=jn(4)
+       else
+          do i=jm+1,jm+nm
+             if(monitors(mod_n(i,nm))%kind==1) then
+                p1=>monitors(mod_n(i,nm))%p
+                jn(2)=mod_n(i,nm)
+                i1=i
+                exit
+             endif
+          enddo
+
+       endif
+
+
        do i=i22+1,jm+nm
-          if(monitors(mod_n(i,nm))%kind==1) then
+          if(monitors(mod_n(i,nm))%kind==1.or.monitors(mod_n(i,nm))%kind==3) then
              p11=>monitors(mod_n(i,nm))%p
              jn(1)=mod_n(i,nm)
              i11=i
@@ -2251,7 +1672,8 @@ contains
 
     endif !!!! if(monitors(jm)%kind==2)
 
-
+    !call kanalnummer(mf1,"original.dat")
+    !call kanalnummer(mf2,"new.dat")
     zf=0.d0
     zf(1)=monitors(jn(1))%r(1,1)
     zf(2)=monitors(jn(2))%r(1,1)
@@ -2261,19 +1683,24 @@ contains
     write(6,*) monitors(jm)%r(1:4,1)
     ipause=mypause(200)
     call invert_monitors(monitors(jm)%kind,zf,g)
-    !call invert_monitors_old(monitors(jm)%kind,g)
-    !do i=1,4
-    !zz(i)=g%v(i)*zf
-    !enddo
-    !write(6,*) zz(1:4)
     write(6,*) zf(1:4)
-
-
     ipause=mypause(201)
 
+    write(6,*) " M_turn ",m_turn
+    do i=1,nt
+       zf=0.d0
+       zf(1)=monitors(jn(1))%r(1,i)
+       zf(2)=monitors(jn(2))%r(1,i)
+       zf(3)=monitors(jn(3))%r(3,i)
+       zf(4)=monitors(jn(4))%r(3,i)
+       call invert_monitors(monitors(jm)%kind,zf,g)
+       ! WRITE(mf1,'(4(1x,E15.8))')monitors(jm)%r(1:4,i)
+       ! WRITE(mf2,'(4(1x,E15.8))')zf(1:4)
+       monitors(jm)%xf(1:4,i)=zf(1:4)
+    enddo
 
-
-
+    !close(mf1)
+    !close(mf2)
 
     call kill(y)
     call kill(id,m11,m2,m22,m1,ex)
@@ -2282,8 +1709,245 @@ contains
 
 
 
-  end subroutine  alex_mom_real_monitors_old
+  end subroutine  alex_mom_real_monitors
+
+  subroutine  alex_print_xf(jm,filename,n_max)
+    implicit none
+    integer jm,mf1,n,i
+    CHARACTER(*) FILENAME
+    integer, optional :: n_max
+    call kanalnummer(mf1,filename)
+
+    n=m_turn
+    if(present(n_max)) n=n_max
+
+    do i=1,n
+       WRITE(mf1,'(4(1x,E15.8))')monitors(jm)%xf(1:4,i)
+    enddo
+
+    close(mf1)
+
+  end   subroutine  alex_print_xf
+
+  subroutine  alex_read_r(sc,jm,filename,n_max,nav)
+    implicit none
+    integer jm,mf1,n,i,na
+    CHARACTER(*), optional ::  FILENAME
+    integer, optional :: n_max,nav
+    real(dp) x,y,jj(4),xa(2),ya(2),sc
+    call kanalnummer(mf1,filename)
+
+    n=m_turn
+    na=0
+    if(present(n_max)) n=n_max
+    if(present(nav)) na=nav
+
+    if(present(filename)) then
+       x=zero
+       y=zero
+       do i=1,n
+          read(mf1,*)jj,monitors(jm)%r(1,i),monitors(jm)%r(3,i)
+          monitors(jm)%r(3,i)=sc*monitors(jm)%r(3,i)
+          x=monitors(jm)%r(1,i)+x
+          y=monitors(jm)%r(3,i)+y
+       enddo
+
+       x=x/n
+       y=y/n
+       write(6,*) "Averages ",x,y
+       do i=1,n
+          monitors(jm)%r(1,i)=(monitors(jm)%r(1,i)-x)/1000.d0
+          monitors(jm)%r(3,i)=(monitors(jm)%r(3,i)-y)/1000.d0
+       enddo
+
+    endif  ! filename
 
 
+    if(na>0) then
+       xa=zero
+       ya=zero
 
+       do i=1,na
+          xa(1)=monitors(jm)%r(1,i)**2+xa(1)
+          ya(1)=monitors(jm)%r(3,i)**2+ya(1)
+          xa(2)=monitors(jm)%r(1,n+1-i)**2+xa(2)
+          ya(2)=monitors(jm)%r(3,n+1-i)**2+ya(2)
+       enddo
+       xa(2)=sqrt(xa(1)/xa(2))
+       ya(2)=sqrt(ya(1)/ya(2))
+
+       write(6,*) " scales ",xa(2),ya(2)
+       xa(1)=(-one+xa(2) )/(n-1)
+       ya(1)=(-one+ya(2) )/(n-1)
+       xa(2)=(n-xa(2))/(n-1)
+       ya(2)=(n-ya(2))/(n-1)
+
+       do i=1,n
+          monitors(jm)%r(1,i)=monitors(jm)%r(1,i) * (i*xa(1)+xa(2))
+          monitors(jm)%r(3,i)=monitors(jm)%r(3,i) * (i*ya(1)+ya(2))
+       enddo
+
+       x=zero
+       y=zero
+       do i=1,n
+          x=monitors(jm)%r(1,i)+x
+          y=monitors(jm)%r(3,i)+y
+       enddo
+
+       x=x/n
+       y=y/n
+       write(6,*) "Averages ",x,y
+       do i=1,n
+          monitors(jm)%r(1,i)=(monitors(jm)%r(1,i)-x)
+          monitors(jm)%r(3,i)=(monitors(jm)%r(3,i)-y)
+       enddo
+
+    endif
+
+    close(mf1)
+
+    ! 171683 59 68 1 2.6794 -1.1248
+
+
+  end   subroutine  alex_read_r
+
+  SUBROUTINE compute_twiss(r,my_state,filename,pos,del,no,thinlens,name)
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    TYPE(internal_state), intent(in):: my_state
+    integer pos,no,I,mf,ind
+    TYPE(internal_state) state
+    real(dp) closed(6),del,bx,by,ax,ay,s,px,py,ex,exp,dpx,dpy,phi
+    type(DAMAP) ID,a_f,a_l,a_nl,DR,R_TE,cs_te
+    logical(lp) COSLIKE,thinlens, doname, printres
+    TYPE(REAL_8) Y(6)
+    CHARACTER(*) FILENAME
+    TYPE(FIBRE), POINTER :: P
+    TYPE(integration_node), POINTER :: t
+    TYPE(NORMALFORM) NORM
+    character(nlp) name
+    character(9) typec
+
+    printres=my_false
+    doname=my_true
+    call context(name)
+    if(name(1:len_trim(name))=="######") then
+       doname=my_false
+       printres=my_true
+    endif
+    call kanalnummer(mf,filename)
+
+    STATE=my_state+delta0
+
+    closed=zero
+    closed(5)=del
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+    CALL INIT(STATE,no,0)
+    CALL ALLOC(Y);   CALL ALLOC(NORM)
+    call alloc(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,pos,STATE)
+    id=y
+    NORM=ID
+    write(mf,*) " fractional tunes ",norm%tune(1:2)
+    p=>r%start
+    s=zero
+    do i=1,pos-1
+       s=s+p%mag%p%ld
+       p=>p%next
+    enddo
+    px=zero
+    py=zero
+
+    call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
+
+    Y=CLOSED+norm%a_t
+    !    bx,by,ay,ay,s,px,py
+    bx=(norm%a_t%v(1).sub.'1')**2+(norm%a_t%v(1).sub.'01')**2
+    by=(norm%a_t%v(3).sub.'001')**2+(norm%a_t%v(3).sub.'0001')**2
+    ax=-(norm%a_t%v(1).sub.'1')*(norm%a_t%v(2).sub.'1')-(norm%a_t%v(1).sub.'01')*(norm%a_t%v(2).sub.'01')
+    ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
+    ex=a_f%v(1).sub.'00001'
+    exp=a_f%v(2).sub.'00001'
+    phi=(r_te%v(1).sub.'1')-one   !acos
+    if(abs(phi)<epsflo) phi=zero
+    if(COSLIKE) then
+       typec=' = COS-1 '
+    else
+       typec=' = COSH-1'
+    endif
+    if(doname) then
+       if(index(p%mag%name,name(1:len_trim(name)))/=0) then
+          printres=my_true
+       endif
+    endif
+    write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)') &
+         "name", "s", "betax","betay","alphax","alphay","eta_x ","etap_x","Phase x","Phase y","Teng-Edwards Cos or Cosh "
+    if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
+    if(doname) printres=my_false
+
+    do i=pos,pos+r%n-1
+       t=>p%t1
+       do while(.not.associated(t,p%t2%next))
+          if(thinlens) then
+             call track_probe_x(y,STATE, node1=t,node2=t%next)
+          else
+             call track_probe_x(y,STATE, node1=t,node2=p%t2%next)
+          endif
+          closed=y
+          norm%a_t=y
+          call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
+          px=px+asin(dr%v(1).sub.'01')/twopi
+          py=py+asin(dr%v(3).sub.'0001')/twopi
+          Y=CLOSED+norm%a_t
+
+
+          if(thinlens) then
+             t=>t%next
+          else
+             t=>p%t2%next
+          endif
+       enddo
+       s=s+p%mag%p%ld
+       p=>p%next
+
+       bx=(norm%a_t%v(1).sub.'1')**2+(norm%a_t%v(1).sub.'01')**2
+       by=(norm%a_t%v(3).sub.'001')**2+(norm%a_t%v(3).sub.'0001')**2
+       ax=-(norm%a_t%v(1).sub.'1')*(norm%a_t%v(2).sub.'1')-(norm%a_t%v(1).sub.'01')*(norm%a_t%v(2).sub.'01')
+       ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
+       ex=a_f%v(1).sub.'00001'
+       exp=a_f%v(2).sub.'00001'
+       phi=(r_te%v(1).sub.'1')-one   !acos
+       if(abs(phi)<epsflo) phi=zero
+       if(COSLIKE) then
+          typec=' = COS-1 '
+       else
+          typec=' = COSH-1'
+          write(mf,*) bx
+          call print(r_te,mf)
+          call print(cs_te,mf)
+          stop
+       endif
+       if(doname) then
+          if(index(p%mag%name,name(1:len_trim(name)))/=0) then
+             printres=my_true
+          endif
+       endif
+       if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
+       if(doname) printres=my_false
+    enddo
+
+    CLOSE(mf)
+
+
+    CALL kill(Y)
+    call kill(NORM)
+    call kill(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
+
+  end SUBROUTINE compute_twiss
 end module S_fitting_new

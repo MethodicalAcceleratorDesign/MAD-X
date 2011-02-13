@@ -158,6 +158,7 @@ module definition
   TYPE pbfield
      type (taylor) h
      integer ifac
+     integer nd_used
   END TYPE pbfield
   !&4
 
@@ -258,9 +259,14 @@ module definition
      INTEGER,POINTER :: N,ND2,no
   end  type tree_element
 
+  type spinmatrix
+     type(real_8) s(3,3)
+  end type spinmatrix
+
   type damapspin
      type(damap) M
-     type(real_8) s(3,3)
+     type(spinmatrix) s
+     !     type(real_8) s(3,3)
      real(dp) e_ij(6,6)
   end type damapspin
 

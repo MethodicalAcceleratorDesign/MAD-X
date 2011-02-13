@@ -24,7 +24,7 @@ module precision_constants
   public
   integer,parameter  :: newscheme_max =200
   integer,private,parameter::n_read_max=20,NCAR=120
-  private EQUAL_i,EQUAL_Si,EQUAL_r,EQUAL_c,WRITE_G
+  private EQUAL_i,EQUAL_Si,EQUAL_r,EQUAL_c !,WRITE_G
   private read_d,read_int,read_int_a,read_d_a
   !Double precision
   real(kind(1d0)) :: doublenum = 0d0
@@ -190,8 +190,8 @@ module precision_constants
   character*255 :: file_block_name="noprint"
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
-  integer   lielib_print(10)
-  DATA lielib_print /0,0,0,0,0,0,0,0,0,0/
+  integer   lielib_print(11)
+  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   INTEGER, target :: SECTOR_NMUL = 4
   logical(lp) :: change_sector=my_true
@@ -208,6 +208,7 @@ module precision_constants
   !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
   !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
   !  lielib_print(10)=1  print lingyun's checks
+  !  lielib_print(11)=1  print warning about Teng-Edwards
 
 
 
@@ -320,12 +321,12 @@ module precision_constants
      MODULE PROCEDURE EQUAL_c
   end  INTERFACE
 
-  INTERFACE WRITE_I
-     MODULE PROCEDURE WRITE_G  ! not private
-  END INTERFACE
-  INTERFACE WRITE_E
-     MODULE PROCEDURE WRITE_G  ! not private
-  END INTERFACE
+  !  INTERFACE ! WRITE_I
+  !     MODULE PROCEDURE WRITE_G  ! not private
+  !  END INTERFACE
+  !  INTERFACE WRITE_E
+  !     MODULE PROCEDURE WRITE_G  ! not private
+  !  END INTERFACE
 
   INTERFACE read
      MODULE PROCEDURE read_d
@@ -469,58 +470,58 @@ contains
     enddo
   END SUBROUTINE EQUAL_c
 
-  SUBROUTINE WRITE_G(IEX)
-    IMPLICIT NONE
-    integer, OPTIONAL :: IEX
-    integer I,MYPAUSE,IPAUSE
-    if(.not.global_verbose) return
-    IF(W_P%NC/=0) THEN
-       if(W_P%FC/=' ') then
-          WRITE(6,W_P%FC,advance=W_P%ADV) (W_P%C(I), I=1,W_P%NC)
-       else
-          do i=1,W_P%NC
-             WRITE(6,*) W_P%C(I)
-          enddo
-       endif
-    ENDIF
-    IF(W_P%NI/=0) THEN
-       if(W_P%FI/=' ') then
-          WRITE(6,W_P%FI,advance=W_P%ADV) (W_P%I(I), I=1,W_P%NI )
-       else
-          do i=1,W_P%NI
-             WRITE(6,*) W_P%I(I)
-          enddo
-       endif
-    ENDIF
-    IF(W_P%NR/=0) THEN
-       if(W_P%FR/=' ') then
-          WRITE(6,W_P%FR,advance=W_P%ADV) (W_P%R(I), I=1,W_P%NR)
-       else
-          do i=1,W_P%NR
-             WRITE(6,*) W_P%R(I)
-          enddo
-       endif
-    ENDIF
-    if(W_P%ADV=='NO') then
-       WRITE(6,*) " "
-    endif
-    IF(PRESENT(IEX)) THEN
-       if(iex==-1) stop
-       IPAUSE=MYPAUSE(IEX)
-    ENDIF
-  END SUBROUTINE WRITE_G
-
-  SUBROUTINE WRITE_a(IEX)
-    IMPLICIT NONE
-    integer, OPTIONAL :: IEX
-    logical(lp) temp
-    temp=global_verbose
-    global_verbose=.true.
-    call WRITE_i(IEX)
-    global_verbose=temp
-
-  END SUBROUTINE WRITE_a
-
+  !  SUBROUTINE WRITE_G(IEX)
+  !    IMPLICIT NONE
+  !    integer, OPTIONAL :: IEX
+  !    integer I,MYPAUSE,IPAUSE
+  !    if(.not.global_verbose) return
+  !    IF(W_P%NC/=0) THEN
+  !       if(W_P%FC/=' ') then
+  !          WRITE(6,W_P%FC,advance=W_P%ADV) (W_P%C(I), I=1,W_P%NC)
+  !       else
+  !          do i=1,W_P%NC
+  !             WRITE(6,*) W_P%C(I)
+  !          enddo
+  !       endif
+  !    ENDIF
+  !    IF(W_P%NI/=0) THEN
+  !       if(W_P%FI/=' ') then
+  !          WRITE(6,W_P%FI,advance=W_P%ADV) (W_P%I(I), I=1,W_P%NI )
+  !       else
+  !          do i=1,W_P%NI
+  !             WRITE(6,*) W_P%I(I)
+  !          enddo
+  !       endif
+  !    ENDIF
+  !    IF(W_P%NR/=0) THEN
+  !       if(W_P%FR/=' ') then
+  !          WRITE(6,W_P%FR,advance=W_P%ADV) (W_P%R(I), I=1,W_P%NR)
+  !       else
+  !          do i=1,W_P%NR
+  !             WRITE(6,*) W_P%R(I)
+  !          enddo
+  !       endif
+  !    ENDIF
+  !    if(W_P%ADV=='NO') then
+  !       WRITE(6,*) " "
+  !    endif
+  !    IF(PRESENT(IEX)) THEN
+  !       if(iex==-1) stop
+  !       IPAUSE=MYPAUSE(IEX)
+  !    ENDIF
+  !  END SUBROUTINE WRITE_G
+  !
+  !  SUBROUTINE WRITE_a(IEX)
+  !    IMPLICIT NONE
+  !    integer, OPTIONAL :: IEX
+  !    logical(lp) temp
+  !    temp=global_verbose
+  !    global_verbose=.true.
+  !    ! call ! WRITE_I(IEX)
+  !    global_verbose=temp
+  !
+  !  END SUBROUTINE WRITE_a
+  !
   SUBROUTINE read_int(IEX)
     IMPLICIT NONE
     integer, intent(inout):: iex
@@ -653,7 +654,7 @@ CONTAINS
           !       w_p%nc=1
           !       w_p%fc='(1(1X,A120))'
           !       w_p%c(1)=  " NO MORE UNITS AVAILABLE: INTFILE "
-          !       call write_e(MFO)
+          !       ! call !write_e(MFO)
        ENDIF
        S2=I
        myfile(I)=.true.
@@ -662,7 +663,7 @@ CONTAINS
           !      w_p%nc=1
           !      w_p%fc='(1(1X,A120))'
           !      write(w_p%c(1),'(1x,L1,1x)')   s1%mf
-          !      call write_i
+          !      ! call ! WRITE_I
        endif
     endif
   END SUBROUTINE INTFILE
@@ -1295,7 +1296,7 @@ integer function mypause(i)
   w_p%nc=1
   w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
 
-  call write_i
+  ! call ! WRITE_I
   ! read(*,*) I
   mypause=i
   ! mypause=sqrt(dble(-i))
@@ -1320,7 +1321,7 @@ integer function mypauses(i,string)
   w_p%c(1)=string(1:l)
   w_p%c(2)=' ipause=mypause(0)  ';w_p%fc='((A120,1x,/,a8,1x,))'
 
-  call write_i
+  ! call ! WRITE_I
   !  read(*,*) I
   mypauses=i
   !  mypauses=sqrt(dble(-i))

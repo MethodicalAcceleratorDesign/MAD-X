@@ -1499,7 +1499,7 @@ contains
              !             w_p%fc='((1X,A72,/,1x,a72))'
              !             w_p%c(1)= " You are putting kind=3 (TPSA) into another kind=3"
              !             w_p%c(2)= " The left handside is not a knob!"
-             !             call write_e(0)
+             !             ! call !write_e(0)
           end select
        elseif(S2%kind>S1%kind ) then
           if(S1%kind/=2) then
@@ -1576,7 +1576,7 @@ contains
           w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
           w_p%c(4)= " at your own insane risk "
           w_p%c(5)= " Etienne Forest/Frank Schmidt"
-          CALL WRITE_E(778)
+          ! call !write_e(778)
        endif    ! end of what is s1
 
     endif   ! S2  does not exist
@@ -1618,7 +1618,7 @@ contains
              !             w_p%fc='((1X,A72,/,1x,a72))'
              !             w_p%c(1)= " You are putting kind=3 (TPSA) into another kind=3"
              !             w_p%c(2)= " The left handside is not a knob!"
-             !             call write_e(0)
+             !             ! call !write_e(0)
           end select
        elseif(S2%kind>S1%kind ) then
           if(S1%kind/=2) then
@@ -1693,7 +1693,7 @@ contains
           w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
           w_p%c(4)= " at your own insane risk "
           w_p%c(5)= " Etienne Forest/Frank Schmidt"
-          CALL WRITE_E(778)
+          ! call !write_e(778)
        endif    ! end of what is s1
 
     endif   ! S2  does not exist
@@ -1735,7 +1735,7 @@ contains
              !             w_p%fc='((1X,A72,/,1x,a72))'
              !             w_p%c(1)= " You are putting kind=3 (TPSA) into another kind=3"
              !             w_p%c(2)= " The left handside is not a knob!"
-             !             call write_e(0)
+             !             ! call !write_e(0)
           end select
        elseif(S2%kind>S1%kind ) then
           if(S1%kind/=2) then
@@ -1808,7 +1808,7 @@ contains
           w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
           w_p%c(4)= " at your own insane risk "
           w_p%c(5)= " Etienne Forest/Frank Schmidt"
-          CALL WRITE_E(778)
+          ! call !write_e(778)
        endif    ! end of what is s1
 
     endif   ! S2  does not exist
@@ -1850,7 +1850,7 @@ contains
        w_p%c(1)= " trouble in drealt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END FUNCTION drealt
@@ -1888,7 +1888,7 @@ contains
        w_p%c(1)= " trouble in dimagt "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dimagt
 
@@ -1989,7 +1989,7 @@ contains
        w_p%c(1)= " trouble in dcmplxt "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dcmplxt
 
@@ -2019,7 +2019,7 @@ contains
        w_p%c(1)= " trouble in complexEQUAL "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE complexEQUAL
@@ -2089,7 +2089,7 @@ contains
        w_p%c(1)= " trouble in complexEQUAL "
        w_p%c(2)= "s2%kind   "
        w_p=(/s2%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
 
   END SUBROUTINE complextEQUAL
@@ -2384,7 +2384,7 @@ contains
        w_p%c(1)= " trouble in add "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION add
 
@@ -2422,7 +2422,7 @@ contains
        w_p%c(1)= " trouble in unaryADD "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION unaryADD
 
@@ -2461,7 +2461,7 @@ contains
        w_p%c(1)= " trouble in daddsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION daddsc
 
@@ -2500,7 +2500,7 @@ contains
        w_p%c(1)= " trouble in caddsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION caddsc
 
@@ -2539,7 +2539,7 @@ contains
        w_p%c(1)= " trouble in dscadd "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscadd
 
@@ -2578,7 +2578,7 @@ contains
        w_p%c(1)= " trouble in cscadd "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cscadd
 
@@ -2618,7 +2618,7 @@ contains
        w_p%c(1)= " trouble in addsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION addsc
 
@@ -2658,7 +2658,7 @@ contains
        w_p%c(1)= " trouble in scadd "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scadd
 
@@ -2697,7 +2697,7 @@ contains
        w_p%c(1)= " trouble in iaddsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iaddsc
 
@@ -2736,7 +2736,7 @@ contains
        w_p%c(1)= " trouble in iscadd "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscadd
 
@@ -2827,7 +2827,7 @@ contains
        w_p%c(1)= " trouble in subs "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION subs
 
@@ -2865,7 +2865,7 @@ contains
        w_p%c(1)= " trouble in unarySUB "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION unarySUB
 
@@ -2904,7 +2904,7 @@ contains
        w_p%c(1)= " trouble in dsubsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsubsc
 
@@ -2943,7 +2943,7 @@ contains
        w_p%c(1)= " trouble in dscsub "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscsub
 
@@ -2982,7 +2982,7 @@ contains
        w_p%c(1)= " trouble in csubsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION csubsc
 
@@ -3021,7 +3021,7 @@ contains
        w_p%c(1)= " trouble in cscsub "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cscsub
 
@@ -3061,7 +3061,7 @@ contains
        w_p%c(1)= " trouble in subsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION subsc
 
@@ -3101,7 +3101,7 @@ contains
        w_p%c(1)= " trouble in scsub "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scsub
 
@@ -3140,7 +3140,7 @@ contains
        w_p%c(1)= " trouble in isubsc "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION isubsc
 
@@ -3179,7 +3179,7 @@ contains
        w_p%c(1)= " trouble in iscsub "
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscsub
 
@@ -3271,7 +3271,7 @@ contains
        w_p%c(1)= " trouble in mul "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION mul
 
@@ -3363,7 +3363,7 @@ contains
        w_p%c(1)= " trouble in pmul "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION pmul
 
@@ -3455,7 +3455,7 @@ contains
        w_p%c(1)= " trouble in mulp "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION mulp
 
@@ -3547,7 +3547,7 @@ contains
        w_p%c(1)= " trouble in padd "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION padd
 
@@ -3639,7 +3639,7 @@ contains
        w_p%c(1)= " trouble in addp "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION addp
 
@@ -3731,7 +3731,7 @@ contains
        w_p%c(1)= " trouble in psub "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION psub
 
@@ -3823,7 +3823,7 @@ contains
        w_p%c(1)= " trouble in subp "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION subp
 
@@ -3915,7 +3915,7 @@ contains
        w_p%c(1)= " trouble in pdiv "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION pdiv
 
@@ -4007,7 +4007,7 @@ contains
        w_p%c(1)= " trouble in divp "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION divp
 
@@ -4047,7 +4047,7 @@ contains
        w_p%c(1)= " trouble in cmulsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cmulsc
 
@@ -4086,7 +4086,7 @@ contains
        w_p%c(1)= " trouble in cscmul"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cscmul
 
@@ -4125,7 +4125,7 @@ contains
        w_p%c(1)= " trouble in cpmulsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpmulsc
 
@@ -4164,7 +4164,7 @@ contains
        w_p%c(1)= " trouble in cpscmul"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpscmul
 
@@ -4203,7 +4203,7 @@ contains
        w_p%c(1)= " trouble in cpaddsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpaddsc
 
@@ -4242,7 +4242,7 @@ contains
        w_p%c(1)= " trouble in cpscadd"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpscadd
 
@@ -4281,7 +4281,7 @@ contains
        w_p%c(1)= " trouble in cpsubsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpsubsc
 
@@ -4320,7 +4320,7 @@ contains
        w_p%c(1)= " trouble in cpscsub"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpscsub
 
@@ -4359,7 +4359,7 @@ contains
        w_p%c(1)= " trouble in cpdivsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpdivsc
 
@@ -4398,7 +4398,7 @@ contains
        w_p%c(1)= " trouble in cpscdiv"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cpscdiv
 
@@ -4437,7 +4437,7 @@ contains
        w_p%c(1)= " trouble in dmulsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dmulsc
 
@@ -4476,7 +4476,7 @@ contains
        w_p%c(1)= " trouble in dscmul"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscmul
 
@@ -4516,7 +4516,7 @@ contains
        w_p%c(1)= " trouble in mulsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION mulsc
 
@@ -4556,7 +4556,7 @@ contains
        w_p%c(1)= " trouble in scmul"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scmul
 
@@ -4595,7 +4595,7 @@ contains
        w_p%c(1)= " trouble in imulsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION imulsc
 
@@ -4634,7 +4634,7 @@ contains
        w_p%c(1)= " trouble in iscmul"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscmul
 
@@ -4725,7 +4725,7 @@ contains
        w_p%c(1)= " trouble in div "
        w_p%c(2)= "s1%kind ,s2%kind "
        w_p=(/s1%kind ,s2%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION div
 
@@ -4764,7 +4764,7 @@ contains
        w_p%c(1)= " trouble in ddivsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION ddivsc
 
@@ -4803,7 +4803,7 @@ contains
        w_p%c(1)= " trouble in dscdiv"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dscdiv
 
@@ -4842,7 +4842,7 @@ contains
        w_p%c(1)= " trouble in cdivsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cdivsc
 
@@ -4881,7 +4881,7 @@ contains
        w_p%c(1)= " trouble in "
        w_p%c(2)= "s1%kind cscdiv"
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION cscdiv
 
@@ -4921,7 +4921,7 @@ contains
        w_p%c(1)= " trouble in "
        w_p%c(2)= "s1%kind divsc"
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION divsc
 
@@ -4961,7 +4961,7 @@ contains
        w_p%c(1)= " trouble in "
        w_p%c(2)= "s1%kind scdiv"
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION scdiv
 
@@ -5000,7 +5000,7 @@ contains
        w_p%c(1)= " trouble in idivsc"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION idivsc
 
@@ -5039,7 +5039,7 @@ contains
        w_p%c(1)= " trouble in iscdiv"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION iscdiv
 
@@ -5078,7 +5078,7 @@ contains
        w_p%c(1)= " trouble in POW"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POW
 
@@ -5118,7 +5118,7 @@ contains
        w_p%c(1)= " trouble in POWR"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POWR
 
@@ -5157,7 +5157,7 @@ contains
        w_p%c(1)= " trouble in POWR8"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION POWR8
 
@@ -5195,7 +5195,7 @@ contains
        w_p%c(1)= " trouble in dexpt"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dexpt
 
@@ -5233,7 +5233,7 @@ contains
        w_p%c(1)= " trouble in dcost"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dcost
 
@@ -5271,7 +5271,7 @@ contains
        w_p%c(1)= " trouble in "
        w_p%c(2)= "s1%kind dsint"
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsint
 
@@ -5310,7 +5310,7 @@ contains
        w_p%c(1)= " trouble in dlogt"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dlogt
 
@@ -5348,7 +5348,7 @@ contains
        w_p%c(1)= " trouble in dsqrtt"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION dsqrtt
 
@@ -5372,7 +5372,7 @@ contains
        w_p%c(1)= " trouble in abst"
        w_p%c(2)= "s1%kind "
        w_p=(/s1%kind/)
-       call write_e(0)
+       ! call !write_e(0)
     end select
   END FUNCTION abst
 
@@ -5488,7 +5488,7 @@ contains
        w_p%c(1)= " trouble in clean_double_complex "
        w_p%c(2)= "s1%kind   "
        w_p=(/s1%kind  /)
-       call write_e(0)
+       ! call !write_e(0)
     end select
     s2=t
     call kill(t)

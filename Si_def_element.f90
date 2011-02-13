@@ -192,7 +192,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
-       CALL WRITE_E(0)
+       ! call !write_e(0)
     END SELECT
   END SUBROUTINE TRACKR
 
@@ -254,7 +254,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,a72)))'
        write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
-       CALL WRITE_E(0)
+       ! call !write_e(0)
     END SELECT
   END SUBROUTINE TRACKP
 
@@ -461,7 +461,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A4,1X,I4)') "j = ",j
-       CALL WRITE_E(812)
+       ! call !write_e(812)
     endif
     k=i
     if(i<1) then
@@ -492,13 +492,13 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A38,1X,I4)') " NMAX NOT BIG ENOUGH: PLEASE INCREASE ",NMAX
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     ELSE
        w_p=0
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        w_p%c(1) = " UNDEFINED  ASSIGNMENT IN BL_0"
-       CALL WRITE_E(101)
+       ! call !write_e(101)
     ENDIF
 
   END SUBROUTINE bL_0
@@ -562,7 +562,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
     S1=S2%P%NMUL
 
@@ -584,7 +584,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
     S1=S2%P%NMUL
 
@@ -606,7 +606,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
     IF(s1%nmul>s2%P%nmul) CALL ADD(s2,s1%nmul,1,zero)
 
@@ -629,7 +629,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
 
     IF(s1%nmul>s2%P%nmul) CALL ADD(s2,s1%nmul,1,zero)
@@ -656,7 +656,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
 
     S1NAME=S1%name
@@ -706,7 +706,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='(1((1X,A72)))'
        write(w_p%c(1),'(A21,1X,I4,1X,I4)')  " NMAX NOT BIG ENOUGH ", S2%P%NMUL,NMAX
-       CALL WRITE_E(456)
+       ! call !write_e(456)
     ENDIF
 
 
@@ -1001,7 +1001,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYR "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(222)
+          ! call !write_e(222)
        ENDIF
        if(.not.ASSOCIATED(EL%K2)) THEN
           ALLOCATE(EL%K2)
@@ -1131,7 +1131,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYR "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        if(.not.ASSOCIATED(EL%T6)) THEN
           ALLOCATE(EL%T6)
@@ -1148,7 +1148,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYR "
           w_p%c(2)= " ERROR ON T6: SLOW THICK "
-          call write_e(0)
+          ! call !write_e(0)
        ENDIF
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
@@ -1169,7 +1169,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYR "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        !       if(.not.ASSOCIATED(EL%T7))ALLOCATE(EL%T7)
        if(.not.ASSOCIATED(EL%T7)) THEN
@@ -1186,7 +1186,7 @@ CONTAINS
           w_p%nc=1
           w_p%fc='((1X,A72))'
           w_p%c(1)= "ERROR ON T7: FAST THICK "
-          call write_e(0)
+          ! call !write_e(0)
        ENDIF
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
@@ -1213,7 +1213,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYR "
           w_p%c(2)= "ERROR ON S8:  NORMAL SMI "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%S8%BN=>EL%BN
     CASE(KIND9)
@@ -1225,7 +1225,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYR "
           w_p%c(2)= "ERROR ON S9: SKEW SMI "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%S9%AN=>EL%AN
     CASE(KIND10)
@@ -1235,7 +1235,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYR "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        if(.not.ASSOCIATED(EL%TP10)) THEN
           ALLOCATE(EL%TP10)
@@ -1252,7 +1252,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYR "
           w_p%c(2)= "ERROR ON TP10: TEAPOT "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%TP10%AN=>EL%AN
        EL%TP10%BN=>EL%BN
@@ -1455,7 +1455,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYP "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(222)
+          ! call !write_e(222)
        ENDIF
        if(.not.ASSOCIATED(EL%K2)) THEN
           ALLOCATE(EL%K2)
@@ -1584,7 +1584,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYP "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        if(.not.ASSOCIATED(EL%T6)) THEN
           ALLOCATE(EL%T6)
@@ -1601,7 +1601,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYP "
           w_p%c(2)= "ERROR ON T6: SLOW THICK "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%T6%AN=>EL%AN
        EL%T6%BN=>EL%BN
@@ -1622,7 +1622,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYP "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        if(.not.ASSOCIATED(EL%T7)) THEN
           ALLOCATE(EL%T7)
@@ -1639,7 +1639,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYP "
           w_p%c(2)= "ERROR ON T7: FAST THICK "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%T7%AN=>EL%AN
        EL%T7%BN=>EL%BN
@@ -1667,7 +1667,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYP "
           w_p%c(2)= "ERROR ON S8:  NORMAL SMI "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%S8%BN=>EL%BN
     CASE(KIND9)
@@ -1679,7 +1679,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYP "
           w_p%c(2)= "ERROR ON S9: SKEW SMI "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%S9%AN=>EL%AN
     CASE(KIND10)
@@ -1689,7 +1689,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)=" ERROR IN SETFAMILYP "
           write(w_p%c(2),'(A37,1x,I4)') " EXACT OPTION NOT SUPPORTED FOR KIND ", EL%KIND
-          CALL WRITE_E(777)
+          ! call !write_e(777)
        ENDIF
        if(.not.ASSOCIATED(EL%TP10)) THEN
           ALLOCATE(EL%TP10)
@@ -1706,7 +1706,7 @@ CONTAINS
           w_p%fc='((1X,A72,/,1X,A72))'
           w_p%c(1)= " ERROR IN SETFAMILYP "
           w_p%c(2)= "ERROR ON TP10: TEAPOT "
-          CALL WRITE_E(0)
+          ! call !write_e(0)
        ENDIF
        EL%TP10%AN=>EL%AN
        EL%TP10%BN=>EL%BN
@@ -1966,11 +1966,11 @@ CONTAINS
           endif
           if(associated(ELp%b_sol)) ELp%b_sol= vP*EL%b_sol
        endif
-       if(valishev.and.abs(el%h2)>=eps)   then  !valishev
+       if(valishev.and.abs(el%vs)>=eps)   then  !valishev
           if(nm==1) then
-             EL%h1= vr*elp%h1
+             EL%va= vr*elp%va
           else
-             ELp%h1= vp*el%h1
+             ELp%va= vp*el%va
           endif
        endif !valishev
 
@@ -2022,11 +2022,11 @@ CONTAINS
           call ALLOC(ELP%b_sol)
           ELp%b_sol= EL%b_sol
        ENDIF
-       if(valishev.and.abs(el%h2)>=eps)   then  !valishev
+       if(valishev.and.abs(el%vs)>=eps)   then  !valishev
           if(nm==1) then
-             EL%h1= elp%h1
+             EL%va= elp%va
           else
-             ELp%h1= el%h1
+             ELp%va= el%va
           endif
        endif !valishev
        RETURN
@@ -2142,7 +2142,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='((1X,A72,/,1X,A72))'
        write(w_p%c(1),'(A13,A24,A27)')" THIS MAGNET ", MYTYPE(EL%KIND), " CANNOT ACCEPT ANs AND BNs "
-       CALL WRITE_E(988)
+       ! call !write_e(988)
     END SELECT
 
 
@@ -2261,7 +2261,7 @@ CONTAINS
        w_p%nc=1
        w_p%fc='((1X,A72,/,1X,A72))'
        write(w_p%c(1),'(A13,A24,A27)')" THIS MAGNET ", MYTYPE(EL%KIND), " CANNOT ACCEPT ANs AND BNs "
-       CALL WRITE_E(987)
+       ! call !write_e(987)
     END SELECT
 
     !if(el%kind==kind10) then
@@ -3865,19 +3865,21 @@ CONTAINS
     BETa01=SQRT(kinetic1**2+two*kinetic1*XMC2)/erg
     beta0i=one/BETa01
     GAMMA0=erg/XMC2
-    write(W_P%C(2),'(A16,G20.14)') ' Kinetic Energy ',kinetic1
-    write(W_P%C(3),'(A7,G20.14)') ' gamma ',gamma0
-    write(W_P%C(4),'(A7,G20.14)')' beta0 ',BETa01
+    write(W_P%C(2),'(A16,g21.14)') ' Kinetic Energy ',kinetic1
+    write(W_P%C(3),'(A7,g21.14)') ' gamma ',gamma0
+    write(W_P%C(4),'(A7,g21.14)')' beta0 ',BETa01
     CON=three*CU*CGAM*HBC/two*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     brho1=SQRT(ERG**2-XMC2**2)*ten/cl
-    write(W_P%C(5),'(A7,G20.14)') ' p0c = ',p0c1
-    write(W_P%C(6),'(A9,G20.14)')' GAMMA0 = ',SQRT(GAMMA2)
-    write(W_P%C(7),'(A8,G20.14)')' BRHO = ',brho1
-    write(W_P%C(8),'(A15,G20.14,1X,G20.14)')"CRAD AND CFLUC ", crad ,CFLUC
-    IF(VERBOSE) CALL WRITE_I
+    if(verbose) then
+       write(W_P%C(5),'(A7,g21.14)') ' p0c = ',p0c1
+       write(W_P%C(6),'(A9,g21.14)')' GAMMA0 = ',SQRT(GAMMA2)
+       write(W_P%C(7),'(A8,g21.14)')' BRHO = ',brho1
+       write(W_P%C(8),'(A15,G21.14,1X,g21.14)')"CRAD AND CFLUC ", crad ,CFLUC
+    endif
+    !    IF(VERBOSE) ! call ! WRITE_I
     !END OF SET RADIATION STUFF  AND TIME OF FLIGHT SUFF
     !    gamma0I=SQRT(one-beta0**2)
     !    gambet =(gamma0I/beta0)**2

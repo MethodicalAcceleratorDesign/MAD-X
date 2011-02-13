@@ -32,7 +32,7 @@ module tpsalie
 
   private A_OPT_gmap,k_OPT_gmap,allocgmap,KILLgmap,EQUALgMAP,IdentityEQUALgMAP,DAPRINTgMAP,concatorg
   private assgmap,concatg,DPEKgMAP,DPOKgMAP,gPOWMAP,trxgtaylorc,trxgtaylor,gPOWMAPtpsa,GETORDERgMAP,CUTORDERg
-
+  private matrixtMAPr
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALMAP
@@ -44,6 +44,7 @@ module tpsalie
      MODULE PROCEDURE zeroEQUALMAP
      MODULE PROCEDURE MAPmatrixr
      MODULE PROCEDURE matrixMAPr
+     MODULE PROCEDURE matrixtMAPr   ! Taylor matrix =  damap
      !     MODULE PROCEDURE DABSMAP
      !     MODULE PROCEDURE ABSMAP
      MODULE PROCEDURE DPEKMAP
@@ -911,6 +912,48 @@ contains
     enddo
 
   END SUBROUTINE TREEMAP
+
+  SUBROUTINE  matrixtMAPr(S2,S1)
+    implicit none
+    type(taylor),INTENT(inOUT)::S2(:,:)            !(ndim2,ndim2)
+    type (damap),INTENT(IN)::S1
+    integer i,j
+    type(taylor) m(ndim2,ndim2)
+    integer, allocatable :: jl(:)
+
+    IF(.NOT.C_%STABLE_DA) RETURN
+    call check_snake
+
+
+    allocate(JL(nd2))
+    do i=1,nd2
+       do j=1,nd2
+          call alloc(m(i,j))
+       enddo
+    enddo
+    ! if(old) then
+    do i=1,nd2
+       do j=1,nd2
+          JL(j)=1
+          m(i,j)=S1%v(i).par.jl
+          JL(j)=0
+       enddo
+    enddo
+    do i=1,nd2
+       do j=1,nd2
+          s2(i,j)=m(i,j)
+       enddo
+    enddo
+
+    do i=1,nd2
+       do j=1,nd2
+          call kill(m(i,j))
+       enddo
+    enddo
+
+    deallocate(jl)
+
+  END SUBROUTINE matrixtMAPr
 
 
 
@@ -2445,23 +2488,37 @@ contains
 
   END FUNCTION POWMAP_INV
 
-  subroutine checksymp(s1,norm)
+  subroutine checksymp(s1,norm,orthogonal)
     implicit none
     TYPE (damap) s1
     real(dp)  norm1,mat(6,6),xj(6,6)
     real(dp), optional :: norm
     integer i,j
+    logical(lp), optional :: orthogonal
     logical(lp) nn
     ! checks symplectic conditions on linear map
     nn=.not.present(norm)
     mat=0.d0
     mat=s1
     xj=0.d0
-    do i=1,nd
-       xj(2*i-1,2*i)=one
-       xj(2*i,2*i-1)=-one
-    enddo
-
+    if(present(orthogonal)) then
+       if(orthogonal) then
+          do i=1,nd
+             xj(2*i-1,2*i-1)=one
+             xj(2*i,2*i)=one
+          enddo
+       else
+          do i=1,nd
+             xj(2*i-1,2*i)=one
+             xj(2*i,2*i-1)=-one
+          enddo
+       endif
+    else
+       do i=1,nd
+          xj(2*i-1,2*i)=one
+          xj(2*i,2*i-1)=-one
+       enddo
+    endif
     xj= MATMUL( transpose(mat),MATMUL(xj,mat))
 
     norm1=0.d0
@@ -2490,7 +2547,7 @@ contains
           w_p%nc=1
           w_p=(/"Should not be here: Assign variables"/)
           w_p%fc='(1((1X,A72),/))'
-          CALL WRITE_E(200)
+          ! call !write_e(200)
           !             s1%v(i)%i=dummymap(i)
        endif
     enddo
@@ -2502,7 +2559,7 @@ contains
     !             w_p%nc=1
     !             w_p=(/"Should not be here: Assign variables"/)
     !             w_p%fc='(1((1X,A72),/))'
-    !             CALL WRITE_E(201)
+    !             ! call !write_e(201)
     !         endif
     !      enddo
     !   endif
@@ -2522,7 +2579,7 @@ contains
           w_p%nc=1
           w_p=(/"Should not be here: Assign variables"/)
           w_p%fc='(1((1X,A72),/))'
-          CALL WRITE_E(202)
+          ! call !write_e(202)
        endif
     enddo
     !    else
@@ -2532,7 +2589,7 @@ contains
     !             w_p%nc=1
     !             w_p=(/"Should not be here: Assign variables"/)
     !             w_p%fc='(1((1X,A72),/))'
-    !             CALL WRITE_E(203)
+    !             ! call !write_e(203)
     !             !             s1%v(i)%j=dummymapl(i)
     !          endif
     !       enddo
@@ -2550,7 +2607,7 @@ contains
        w_p%nc=1
        w_p=(/"Should not be here: Assign variables"/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(204)
+       ! call !write_e(204)
        !          s1%h%i=dummy
     endif
     !    else
@@ -2560,7 +2617,7 @@ contains
     !          w_p%nc=1
     !          w_p=(/"Should not be here: Assign variables"/)
     !          w_p%fc='(1((1X,A72),/))'
-    !          CALL WRITE_E(205)
+    !          ! call !write_e(205)
     !       endif
     !   endif
   end subroutine checkpb
@@ -2574,7 +2631,7 @@ contains
        w_p%nc=1
        w_p=(/"Should not be here: Assign variables"/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(206)
+       ! call !write_e(206)
        !          s1%i=dummy
     endif
     !    else
@@ -2583,7 +2640,7 @@ contains
     !          w_p%nc=1
     !          w_p=(/"Should not be here: Assign variables"/)
     !          w_p%fc='(1((1X,A72),/))'
-    !          CALL WRITE_E(207)
+    !          ! call !write_e(207)
     !          !          s1%j=dummyl
     !       endif
     !   endif
@@ -2603,7 +2660,7 @@ contains
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     call ass0(s1%h)
@@ -2623,7 +2680,7 @@ contains
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     call ass0(s1)
@@ -2643,7 +2700,7 @@ contains
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     do i=1,nd2
@@ -2665,7 +2722,7 @@ contains
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     do i=1,nd2
@@ -2687,7 +2744,7 @@ contains
        w_p%nc=1
        w_p=(/" cannot indent anymore "/)
        w_p%fc='(1((1X,A72),/))'
-       CALL WRITE_E(100)
+       ! call !write_e(100)
     end select
 
     do i=1,s1%n
@@ -2806,4 +2863,23 @@ contains
     call flip(S1%v%i,S2%v%i)
 
   end SUBROUTINE  flip_damap
+
+  SUBROUTINE  flip_taylor(S1,S2,i)
+    implicit none
+    type (taylor),INTENT(INOUT)::S2
+    type (taylor), intent(INOUT):: s1
+    integer i
+    call flip_i(S1%i,S2%i,i)
+
+  end SUBROUTINE  flip_taylor
+
+  SUBROUTINE  flip_vecfield(S1,S2,i)
+    implicit none
+    type (vecfield),INTENT(INOUT)::S2
+    type (vecfield), intent(INOUT):: s1
+    integer i
+    call flipflo(S1%v%i,S2%v%i,i)
+
+  end SUBROUTINE  flip_vecfield
+
 end module tpsalie

@@ -142,8 +142,9 @@ contains
     TYPE(WORK) W
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
-    REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac
-    integer icnmin,icnmax
+    REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
+    real(dp), allocatable :: an(:),bn(:)
+    integer icnmin,icnmax,n_ac
     logical :: log_estate=.true.
 
     if(log_estate) then
@@ -249,6 +250,10 @@ contains
           my_default=my_OLD_state
           my_estate=>my_OLD_state
           ! Orbit stuff
+       case('SETORBITPHASOR')
+          read(mf,*) xsm%ac%x(1:2)
+       case('SETORBITPHASORFREQUENCY')
+          read(mf,*) xsm%ac%om
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
        case('PUTORBITSTATE','USEORBITSTATE')
@@ -768,7 +773,21 @@ contains
              N_NAME=len_trim(name)
           ENDIF
           READ(MF,*)  DC_ac,A_ac,theta_ac
-
+          READ(MF,*)  D_ac,n_ac
+          i2=0
+          if(n_ac>0) then        !n_ac>0
+             allocate(an(n_ac))
+             allocate(bn(n_ac))
+             an=zero
+             bn=zero
+             do while(.true.)
+                read(mf,*) i1,dtu(1:2)
+                if(i1<=0) exit
+                if(i1>i2) i2=i1
+                an(i1)=dtu(2)
+                bn(i1)=dtu(1)
+             enddo
+          endif                  !n_ac>0
           p=>my_ering%start
           do ii=1,my_ering%N
              found_it=MY_FALSE
@@ -784,6 +803,7 @@ contains
                    allocate(P%MAG%DC_ac)
                    allocate(P%MAG%A_ac)
                    allocate(P%MAG%theta_ac)
+                   allocate(P%MAG%D_ac)
 
                    allocate(P%MAGP%DC_ac)
                    allocate(P%MAGP%A_ac)
@@ -791,15 +811,62 @@ contains
                    CALL alloc(P%MAGP%DC_ac)
                    CALL alloc(P%MAGP%A_ac)
                    CALL alloc(P%MAGP%theta_ac)
+                   allocate(P%MAGp%D_ac)
+                   CALL alloc(P%MAGP%D_ac)
 
+
+
+                   P%MAG%D_ac=D_ac
                    P%MAG%DC_ac=DC_ac
                    P%MAG%A_ac=A_ac
                    P%MAG%theta_ac=theta_ac*twopi
+                   P%MAGP%D_ac=D_ac
                    P%MAGP%DC_ac=DC_ac
                    P%MAGP%A_ac=A_ac
                    P%MAGP%theta_ac=theta_ac*twopi
                    P%MAG%slow_ac=.true.
                    P%MAGP%slow_ac=.true.
+
+                   if(i2>p%mag%p%nmul) then
+                      CALL ADD(P,i2,0,0.d0)
+                   endif
+                   allocate(P%MAG%d_an(p%mag%p%nmul))
+                   allocate(P%MAG%d_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d_bn(p%mag%p%nmul))
+
+                   P%MAG%d_an=zero
+                   P%MAG%d_bn=zero
+
+                   call alloc(P%MAGp%d_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d_bn,p%mag%p%nmul)
+
+                   do i1=1,n_ac
+                      P%MAG%d_an(i1) =an(i1)
+                      P%MAGp%d_an(i1)=an(i1)
+                      P%MAG%d_bn(i1) =bn(i1)
+                      P%MAGp%d_bn(i1)=bn(i1)
+                   enddo
+                   !
+                   !    IF(K%MODULATION) THEN
+                   !       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+                   !       V=EL%DC_ac+EL%A_ac*DV
+                   !       DV=el%D_ac*DV
+                   !    else
+                   !       V=EL%DC_ac
+                   !       DV=zero
+                   !    endif
+                   !                   P%MAG%DC_ac=DC_ac
+                   !                   P%MAG%A_ac=A_ac
+                   !                   P%MAG%theta_ac=theta_ac*twopi
+                   !                   P%MAGP%DC_ac=DC_ac
+                   !                   P%MAGP%A_ac=A_ac
+                   !                   P%MAGP%theta_ac=theta_ac*twopi
+                   !                   P%MAG%slow_ac=.true.
+                   !                   P%MAGP%slow_ac=.true.
+                else
+                   write(6,*) " already associated --> change code "
+                   stop 166
                 ENDIF
              ENDIF
 
@@ -808,7 +875,9 @@ contains
           enddo
 
 
-
+          if(n_ac>0) then
+             deallocate(an,bn)
+          endif
 
        case('SETAPERTURE')
           READ(MF,*) KINDA,NAME
@@ -868,6 +937,12 @@ contains
        case('DEALLOCATEFAMILIES')
           call kill_para(my_ering)
           deallocate(POL_)
+       case('PTCTWISS','TWISS')  !
+          read(mf,*) filename, NAME, integrated
+          read(mf,*) del
+
+          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name)
+
        case('FITTUNESCAN','SEARCHAPERTUREX=Y')
           read(mf,*) epsf
           read(mf,*) ntune

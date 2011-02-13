@@ -696,7 +696,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTER_DRIFT1
@@ -726,7 +726,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     CALL KILL(DH)
@@ -1150,7 +1150,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     k%TOTALPATH=TOTALPATH_FLAG
@@ -1252,7 +1252,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     k%TOTALPATH=TOTALPATH_FLAG
@@ -3100,7 +3100,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTER_dkd2
@@ -3206,7 +3206,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTEP_dkd2
@@ -3606,7 +3606,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
 
@@ -3697,7 +3697,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTEP_SOL5
@@ -4044,7 +4044,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -4117,7 +4117,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -4184,7 +4184,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -4246,7 +4246,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -4342,7 +4342,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTER_KTK
@@ -4441,7 +4441,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
     CALL kill(EL)
 
@@ -5694,7 +5694,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
     !       if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
     !       call check_S_APERTURE_out(el%p,pos,x)
@@ -5896,7 +5896,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTEP_TKTF
@@ -6066,7 +6066,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -6152,7 +6152,7 @@ contains
     w_p%nc=1
     w_p%fc='(1(1X,A72))'
     write(w_p%c(1),'(A31,1X,I4,1X,A11)') " EXPSOLR FAILED TO CONVERGE IN ",NMAXI," ITERATIONS"
-    call write_e(0)
+    ! call !write_e(0)
 
 100 CONTINUE
 
@@ -8097,7 +8097,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTER_TEAPOT
@@ -8194,7 +8194,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
   END SUBROUTINE INTEP_TEAPOT
@@ -8306,7 +8306,7 @@ contains
              w_p%nc=1
              w_p%fc='(1(1X,A72))'
              w_p%c(1)= " AN ARRAY not DEALLOCATED : PROBLEMS"
-             call write_e(357)
+             ! call !write_e(357)
           ENDIF
           DEALLOCATE (BN, STAT = error)
           IF(ERROR/=0) THEN
@@ -8314,7 +8314,7 @@ contains
              w_p%nc=1
              w_p%fc='(1(1X,A72))'
              w_p%c(1)= " BN ARRAY not DEALLOCATED : PROBLEMS"
-             call write_e(357)
+             ! call !write_e(357)
           ENDIF
        ENDIF
     ENDIF
@@ -9508,7 +9508,7 @@ contains
           w_p%nc=1
           w_p%fc='(1(1X,A72))'
           WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
+          ! call !write_e(357)
        END SELECT
     ELSE
        SELECT CASE(EL%P%METHOD)
@@ -9561,7 +9561,7 @@ contains
           w_p%nc=1
           w_p%fc='(1(1X,A72))'
           WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
+          ! call !write_e(357)
        END SELECT
 
     ENDIF
@@ -9654,7 +9654,7 @@ contains
           w_p%nc=1
           w_p%fc='(1(1X,A72))'
           WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
+          ! call !write_e(357)
        END SELECT
     ELSE
        SELECT CASE(EL%P%METHOD)
@@ -9713,7 +9713,7 @@ contains
           w_p%nc=1
           w_p%fc='(1(1X,A72))'
           WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-          call write_e(357)
+          ! call !write_e(357)
        END SELECT
 
     ENDIF
@@ -10123,7 +10123,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        w_p%c(1)= " ERROR IN WEDGER "
-       call write_e(101)
+       ! call !write_e(101)
     ENDIF
 
     IF(B1==ZERO) THEN
@@ -10207,7 +10207,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        w_p%c(1)= " ERROR IN WEDGEP "
-       call write_e(102)
+       ! call !write_e(102)
     ENDIF
 
     IF(B1==ZERO) THEN
@@ -10328,7 +10328,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     !    IF(k%FRINGE)
@@ -10379,7 +10379,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     !    IF(k%FRINGE)
@@ -11987,7 +11987,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
 
@@ -12022,7 +12022,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
     CALL KILL(TI,H)
@@ -12067,7 +12067,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
 
@@ -12142,7 +12142,7 @@ contains
        w_p%nc=1
        w_p%fc='(1(1X,A72))'
        WRITE(w_p%c(1),'(a12,1x,i4,1x,a17)') " THE METHOD ",EL%P%METHOD," IS NOT SUPPORTED"
-       call write_e(357)
+       ! call !write_e(357)
     END SELECT
 
 
