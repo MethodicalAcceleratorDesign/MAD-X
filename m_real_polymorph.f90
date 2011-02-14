@@ -5212,7 +5212,8 @@ contains
 
     select case(s1%kind)
     case(m1)
-       datanht%r=atanh(s1%r)
+       !          datanht%r=atanh(s1%r)
+       datanht%r=log((one+s1%r)/(one-s1%r))/two
        datanht%kind=1
     case(m2)
        localmaster=master
@@ -5227,7 +5228,8 @@ contains
           datanht%t=atanh(varf1)
           master=localmaster
        else
-          datanht%r=atanh(s1%r)
+          !          datanht%r=atanh(s1%r)
+          datanht%r=log((one+s1%r)/(one-s1%r))/two
           datanht%kind=1
        endif
     case default
