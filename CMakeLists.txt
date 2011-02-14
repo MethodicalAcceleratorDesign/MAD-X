@@ -11,7 +11,7 @@ endif(COMMAND cmake_policy)
 # project version
 SET( ${PROJECT_NAME}_MAJOR_VERSION 4 )
 SET( ${PROJECT_NAME}_MINOR_VERSION 01 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 42 )
+SET( ${PROJECT_NAME}_PATCH_LEVEL 45 )
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
@@ -31,76 +31,29 @@ OPTION ( MADX_NTPSA "Build with NTPSA" ON)
 OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
 OPTION ( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
 
-# Build type (defines different sets of flags)
-# RELEASE or DEBUG are valid build types currently...
-SET(CMAKE_BUILD_TYPE RELEASE)
+# Default build type (defines different sets of flags)
+IF(NOT CMAKE_BUILD_TYPE)
+				SET(CMAKE_BUILD_TYPE Release CACHE STRING
+								"Choose the type of build, options are: Debug Release"
+								FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+
 
 if ( NOT madX_PATCH_LEVEL EQUAL 00 )
  message( "Building a development version" )
  SET (BINARY_POSTFIX "_dev")
 endif ( NOT madX_PATCH_LEVEL EQUAL 00 )
 
-#My own build type (as an example):
-#SET(CMAKE_BUILD_TYPE madbuild)
-# SET(CMAKE_C_FLAGS_MADBUILD "-O4")
-
-# include(FortranCInterface) # does cmake have automatic f/c interface??
-
-
-#fortran compiler stuff... extensive example
-# FFLAGS depend on the compiler
-
-# SET(CMAKE_FORTRAN_COMPILER mpif77)
-if (CMAKE_Fortran_COMPILER MATCHES "gfortran")
-  message( WARNING " g95 or ifort recommended, run cmake with e.g. '-DCMAKE_Fortran_COMPILER=g95' option")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O4 ")
-  set (CMAKE_Fortran_FLAGS "") # remove -g -O2 from main list of flags.. issue for older cmake/gfortran
-  set (CMAKE_Fortran_FLAGS_DEBUG   " -fno-f2c -O0 -g ")
-  if ( NOT BUILD_SHARED_LIBS )
-    set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-  endif ( NOT BUILD_SHARED_LIBS )
-elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -f77rtl -O2 -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
-  set (CMAKE_Fortran_FLAGS_DEBUG   " -f77rtl -O0 -g -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
-  set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-  if(MADX_FEDORA_FIX)
-   message( WARNING "Only use the Fedora fix if you are using Fedora!" )
-   set(CMAKE_Fortran_FLAGS " -no-ipo ")
-  endif(MADX_FEDORA_FIX)
-elseif (CMAKE_Fortran_COMPILER MATCHES "lf95")
-  message( WARNING " This compiler is not yet confirmed working properly with CMake")
-  message( WARNING " On a 64 bit system you need to use the toolchain-file (see README) to get anywhere with the 32bit compiler.")
-  set (CMAKE_Fortran_FLAGS_RELEASE " --o2 --tp ")
-  set (CMAKE_SKIP_RPATH ON)
-  set (CMAKE_Fortran_FLAGS_DEBUG   " --info --f95 --lst -V -g  --ap --trace --trap --verbose ")
-  set(CMAKE_SHARED_LIBRARY_LINK_Fortran_FLAGS "") #suppress rdynamic which doesn't work for lf95...
-  set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-elseif (CMAKE_Fortran_COMPILER MATCHES "nagfor")
-  message( WARNING " Make sure you use the same gcc as nagfor is compiled with, or linking WILL fail.")
-  set (CMAKE_SKIP_RPATH ON)
-  set (CMAKE_Fortran_FLAGS_RELEASE " -gline -maxcontin=100 -ieee=full -D_NAG ")
-  set (CMAKE_Fortran_FLAGS_DEBUG   " -gline -maxcontin=100 -ieee=full -D_NAG -C=all -nan ")
-  set(CMAKE_SHARED_LIBRARY_LINK_Fortran_FLAGS "") #suppress rdynamic which isn't recognized by nagfor...
-  set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -Bstatic ")
-elseif (CMAKE_Fortran_COMPILER MATCHES "g77")
-  message( WARNING " This compiler is not yet confirmed working for mad-x")
-  message( WARNING " g95 or ifort recommended, run cmake with e.g. '-DCMAKE_Fortran_COMPILER=g95' option")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-f2c -O3 ")
-  set (CMAKE_Fortran_FLAGS_DEBUG   " -fno-f2c -O0 -g ")
-elseif (CMAKE_Fortran_COMPILER MATCHES "g95")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-second-underscore -fshort-circuit -O2 ")
-  set (CMAKE_Fortran_FLAGS_DEBUG   " -fno-second-underscore -O0 -g -Wall -pedantic -ggdb3")  
-else (CMAKE_Fortran_COMPILER MATCHES "gfortran")
-  message ("Fortran compiler full path: " ${CMAKE_Fortran_COMPILER})
-  message ("Fortran compiler: " ${Fortran_COMPILER_NAME})
-  message (WARNING " No optimized Fortran compiler flags are known for this compiler...")
-  set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -O2")
-  set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
-endif (CMAKE_Fortran_COMPILER MATCHES "gfortran")
-#end fortran compiler stuff...
 
 
 #adding flags to our compilers:
+
+# 
+# we call a subscript that sets up our compiler specific flags...
+# 
+include(setupCompilerSpecifics)
+
 
 # General compile flags:
 set (CMAKE_C_FLAGS_DEBUG   " ${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic ")
@@ -108,56 +61,9 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -funroll-loops -D_CATCH_MEM -D_WRAP_FORT
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL -I. -I${CMAKE_CURRENT_SOURCE_DIR} ") #needed for c++ linking
 set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL -I. -I${CMAKE_CURRENT_SOURCE_DIR} ") 
 
-if ( MADX_FORCE_32  )
-  message("Forced 32bit build" ) 
-  set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-  set (CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-  if (CMAKE_Fortran_COMPILER MATCHES "lf95")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wa,--32")
-  elseif (CMAKE_Fortran_COMPILER MATCHES "nagfor")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS}  -Wc,-m32 -Wl,-m32 -abi=32")
-  else (CMAKE_Fortran_COMPILER MATCHES "lf95")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --chk aesux")
-  else (CMAKE_Fortran_COMPILER MATCHES "gfortran")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -m32")
-  endif (CMAKE_Fortran_COMPILER MATCHES "lf95")
-  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 ")
-  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib)
-  endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-else ( MADX_FORCE_32  )
-   INCLUDE(CheckTypeSize)
-   CHECK_TYPE_SIZE (long LONG_SIZE) #4 if 32bit, 8 if 64bit...
-  if (${LONG_SIZE} EQUAL 4)
-  message("32 bit system found" )
-  message("${CMAKE_SYSTEM_PROCESSOR}")
-   set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-   set (CPACK_RPM_PACKAGE_ARCHITECTURE "i386")
-   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-  if (CMAKE_Fortran_COMPILER MATCHES "lf95")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --chk aesux")
-  endif (CMAKE_Fortran_COMPILER MATCHES "lf95")
-   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib)
-   endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
- elseif (${LONG_SIZE} EQUAL 8)
-  message("64 bit system found")
-	 #set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wa,--64")
-	 set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-   set (CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-	 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64 ")
-	 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 ")
-  if (CMAKE_Fortran_COMPILER MATCHES "lf95")
-    set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --chk aefs")
-  endif (CMAKE_Fortran_COMPILER MATCHES "lf95")
-	 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	   LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib64)
-	 endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  endif (${LONG_SIZE} EQUAL 4)
-endif ( MADX_FORCE_32  )
+# we call a subscript that will set up additional flags depending on 
+# architecture chosen.
+include(setupArchSpecifics)
 
 if (MADX_ONLINE )
   message("Online Model turned on" )
@@ -185,46 +91,10 @@ if (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortr
 endif (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortran")
 # end C stuff
 
-
-
-# list of c source files
-set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c )
-# list of fortran source files
-set(fsrcfiles madx_main.F90 Sqb_accel_ptc.f90 Sr_spin.f90 Sra_fitting.f90 madx_ptc_intstate.f90 madx_ptc_setcavs.f90 madx_ptc_knobs.f90 madx_ptc_module.f90 madx_ptc_distrib.f90 madx_ptc_eplacement.f90 madx_ptc_normal.f90 madx_ptc_script.f90 madx_ptc_trackcavs.f90 madx_ptc_track_run.f90 madx_ptc_twiss.f90 match.f90 matchjc.f90 matchlib.f90 matchsa.f90 orbf.f90 plot.f90 poisson.f90 ptc_export_xml.f90 resindex.f90 run_madx.f90 sodd.f90 Spb_fake_gino_sub.f90 St_pointers.f90 survey.f90 timest.f90 timex.f90 touschek.f90 trrun.f90 twiss.f90 user2_photon.f90 wrap.f90 fortran_flush.F90 a_scratch_size.f90 b_da_arrays_all.f90 d_lielib.f90 util.f90 dynap.f90 emit.f90 gxx11.f90 h_definition.f90 ibsdb.f90 i_tpsa.f90 j_tpsalie.f90 k_tpsalie_analysis.f90 l_complex_taylor.f90 m_real_polymorph.f90 n_complex_polymorph.f90 o_tree_element.f90 Sa_extend_poly.f90 Sb_sagan_pol_arbitrary.f90 Sc_euclidean.f90 Sd_frame.f90 Se_status.f90 Sf_def_all_kinds.f90 Sg_sagan_wiggler.f90 Sh_def_kind.f90 Si_def_element.f90 Sk_link_list.f90 Sl_family.f90 Sm_tracking.f90 Sma0_beam_beam_ptc.f90 Sma_multiparticle.f90 Sn_mad_like.f90 So_fitting.f90 Sp_keywords.f90 Sq_orbit_ptc.f90)
-
-
-# add source files according to NTPSA option...
-if (MADX_NTPSA )
-  message("NTPSA turned on")
- set(fsrcfiles ${fsrcfiles} c_dabnew_berz.f90 c_tpsa_interface.F90)
- set(csrcfiles ${csrcfiles} tpsa.cpp)
-else (MADX_NTPSA )
- set(fsrcfiles ${fsrcfiles} c_dabnew.f90)
-endif  (MADX_NTPSA )
-
-#execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
-# Unsure about dependencies.. Might be an overkill this one.
-ADD_CUSTOM_COMMAND(
-  OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
-  DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c . && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Creating C wrapper files"
-  )
-ADD_CUSTOM_COMMAND(
-  OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
-  DEPENDS ${fsrcfiles} c_wrappers.c
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_fortran_calls.py && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.h .
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Creating fortran wrapper files"
-  )
-# execute python wrap_fortran_calls.py
-# COMMAND python wrap_C_calls.py
-
-
-# main source files... 
-# TODO: please check this list at some point!
-set(srcfiles ${csrcfiles} ${fsrcfiles} fortran_wrappers.c c_wrappers.c )
+#
+# we call a subscript that sets up the source files:
+# 
+include(setupSources)
 
 
 if(APPLE)
@@ -238,11 +108,22 @@ if(APPLE)
   SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/MadX.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif(APPLE)
 
-add_executable(madx MACOSX_BUNDLE ${srcfiles})
+
+# adding library:
+ADD_LIBRARY(madxlib ${srcfiles})
+# we want the library to be called libmadx and not libmadxlib:
+SET_TARGET_PROPERTIES(madxlib PROPERTIES OUTPUT_NAME "madx")
+
+# adding an executable:
+add_executable(madx MACOSX_BUNDLE  madxp.c madx_main.F90)
 SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
-#I turn off search for libraries in case you are on Linux,
-#to make sure we make use of the lib/lib64 folders
+
+# we need to link executable to our own library:
+target_link_libraries(madx madxlib)
+
+# I turn off search for libraries in case you are on Linux,
+# to make sure we make use of the lib/lib64 folders
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
 #necessary to search for X11 for OSX instead of directly including it
 FIND_PACKAGE(X11)
@@ -265,66 +146,10 @@ target_link_libraries(madx z)
 target_link_libraries(madx pthread c stdc++ gcc_eh)
 
 
-# Installation:
-
-#FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_BINARY_DIR}/*.h" "${CMAKE_CURRENT_BINARY_DIR}/*.mod")
-#INSTALL(FILES ${files} DESTINATION include/madx)
-
-
-set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx")  # paths to executables
-set(DIRS "")
-
-if(APPLE)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx.app")  # paths to executables
-  set(DIRS "")
-endif(APPLE)
-INSTALL(TARGETS madx
-  BUNDLE DESTINATION .
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
-  INSTALL(CODE " 
-    include(BundleUtilities) 
-    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
-    " COMPONENT Runtime) 
-endif(APPLE OR WIN32)
-
-# CPACK stuff
- # build a CPack driven installer package
- set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
- 
- set (CPACK_PACKAGE_CONTACT "Frank Schmidt <Frank.Schmidt@cern.ch>")   
- 
- #Debian specific:
- set (CPACK_DEBIAN_PACKAGE_MAINTAINER
-      "Yngve Inntjore Levinsen <Yngve.Inntjore.Levinsen@cern.ch>") # if this is not set, CPACK_PACKAGE_CONTACT is used instead..
- set (CPACK_DEBIAN_PACKAGE_DESCRIPTION "MadX is a program for accelerator design and simulation")
- set (CPACK_DEBIAN_PACKAGE_SECTION "science")
- set (CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
- set (CPACK_DEBIAN_PACKAGE_RECOMMENDS "gnuplot")
- set (CPACK_DEBIAN_PACKAGE_DEPENDS 
-      "libc6 (>= 2.3.1-6), libgcc1 (>= 1:4.1), zlib1g, libx11-xcb1, libxcb1, libxau6") # some version dependencies kept as examples
- 
- # RPM Specific:
- set (CPACK_RPM_PACKAGE_SUMMARY
-      "MadX is a program for accelerator design and simulation")
- set (CPACK_RPM_PACKAGE_RELEASE 1)
- set (CPACK_RPM_PACKAGE_LICENSE "custom")
- set (CPACK_RPM_PACKAGE_GROUP "Development/Tools")
- set(CPACK_RPM_PACKAGE_REQUIRES "libgcc >= 4.1.0, libxau >= 1.0.5") # I don't know the names of the packages...
- 
- # Version:
- set (CPACK_PACKAGE_VERSION_MAJOR ${madX_MAJOR_VERSION})
- set (CPACK_PACKAGE_VERSION_MINOR ${madX_MINOR_VERSION})
- set (CPACK_PACKAGE_VERSION_PATCH ${madX_PATCH_LEVEL})
- 
- 
- # so that we can build dragndrop on osx:
- set(CPACK_BINARY_DRAGNDROP ON)
- include (CPack)
-# End CPACK stuff
+# 
+# we call a subscript that sets up installation stuff:
+# 
+include(setupInstallation)
 
 
 # Testing:

@@ -52,6 +52,10 @@ cmakesrc/ctests/job.sample.madx -text
 cmakesrc/ctests/testruns.sh -text
 cmakesrc/ctests/testsample.sh -text
 cmakesrc/madX.gif -text svneol=unset#unset
+cmakesrc/setupArchSpecifics.cmake -text
+cmakesrc/setupCompilerSpecifics.cmake -text
+cmakesrc/setupInstallation.cmake -text
+cmakesrc/setupSources.cmake -text
 /d_lielib.f90 -text
 /dynap.f90 -text
 /emit.f90 -text
