@@ -26,10 +26,15 @@ endif ( NOT APPLE)
 # OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
-OPTION ( MADX_ONLINE "Build with Online model" OFF)
 OPTION ( MADX_NTPSA "Build with NTPSA" ON)
 OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
 OPTION ( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	OPTION ( MADX_ONLINE "Build with Online model" ON)
+else (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	OPTION ( MADX_ONLINE "Build with Online model" OFF)
+endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 # Default build type (defines different sets of flags)
 IF(NOT CMAKE_BUILD_TYPE)
@@ -138,7 +143,10 @@ endif (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 # Online libraries:
 if (MADX_ONLINE )
-target_link_libraries(madx SDDS1c  SDDS1 gsl  rpnlib mdbmth mdblib)
+	target_link_libraries(madx SDDS1c  SDDS1 rpnlib mdbmth mdblib gsl) 
+if (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
+	target_link_libraries(madx imf)
+endif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
 endif (MADX_ONLINE )
 target_link_libraries(madx z)
 # new additions from Frank:
