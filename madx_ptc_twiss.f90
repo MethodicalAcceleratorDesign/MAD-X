@@ -2059,11 +2059,11 @@ contains
 
          ! terms involving derivatives of the dispersions
          do i=1,4
-            print*, 'sd=',sd,' disp=',dispersion_p(i)
+!            print*, 'sd=',sd,' disp=',dispersion_p(i)
             sd = sd - (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion_p(i)
          enddo
 
-         print*, 'sd=',sd
+!         print*, 'sd=',sd
          alpha_c_p = sd * (betaRelativistic**2) / suml
 
          ! eventually, one could differentiate the above formula to obtain alpha_c_p2

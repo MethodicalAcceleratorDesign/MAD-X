@@ -191,7 +191,7 @@ module precision_constants
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(11)
-  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0/
+  DATA lielib_print /0,0,0,0,0,1,0,0,0,0,0/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   INTEGER, target :: SECTOR_NMUL = 4
   logical(lp) :: change_sector=my_true

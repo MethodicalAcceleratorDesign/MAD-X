@@ -2814,6 +2814,7 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)= 'Check of the symplectic condition on the linear part'
+       write(6,*) 'Check of the symplectic condition on the linear part'
        !CALL !WRITE_a
        xsu=zero
        do i=1,nd2
@@ -2833,6 +2834,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
+       write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
