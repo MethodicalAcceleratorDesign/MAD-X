@@ -1,8 +1,5 @@
 
-INCLUDE(CheckTypeSize)
-CHECK_TYPE_SIZE (long LONG_SIZE) #4 if 32bit, 8 if 64bit...
-
-if ( MADX_FORCE_32 OR ${LONG_SIZE} EQUAL 4 )
+if ( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
 
   message("32 bit build" ) 
   
@@ -24,8 +21,7 @@ if ( MADX_FORCE_32 OR ${LONG_SIZE} EQUAL 4 )
     LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib)
   endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   
-  
-elseif (${LONG_SIZE} EQUAL 8)
+elseif (${CMAKE_SIZEOF_VOID_P} EQUAL 8)
 
   message("64 bit build")
   
@@ -41,4 +37,4 @@ elseif (${LONG_SIZE} EQUAL 8)
 	 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	   LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib64)
 	 endif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-endif ( MADX_FORCE_32   OR ${LONG_SIZE} EQUAL 4 )
+ endif ( MADX_FORCE_32   OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )

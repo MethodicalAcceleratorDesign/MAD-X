@@ -37,3 +37,7 @@ ADD_CUSTOM_COMMAND(
 # main source files... 
 # TODO: please check this list at some point!
 set(srcfiles ${csrcfiles} ${fsrcfiles} fortran_wrappers.c c_wrappers.c )
+
+# header files...
+set(headerfiles c6t.h madxdict.h madxl.h matchptcknobs.h tpsa.h madxd.h madx.h madxreg.h rplot.h)
+

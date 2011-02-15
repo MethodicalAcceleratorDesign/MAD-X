@@ -9,9 +9,9 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # project version
-SET( ${PROJECT_NAME}_MAJOR_VERSION 4 )
-SET( ${PROJECT_NAME}_MINOR_VERSION 01 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 45 )
+SET( PROJECT_MAJOR_VERSION 4 )
+SET( PROJECT_MINOR_VERSION 01 )
+SET( PROJECT_PATCH_LEVEL 45 )
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
@@ -29,6 +29,8 @@ endif ( NOT APPLE)
 OPTION ( MADX_NTPSA "Build with NTPSA" ON)
 OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
 OPTION ( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
+
+OPTION ( MADX_GOTOBLAS2 "Build with the GOTOBLAS2 libraries" OFF )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	OPTION ( MADX_ONLINE "Build with Online model" ON)
@@ -123,6 +125,8 @@ SET_TARGET_PROPERTIES(madxlib PROPERTIES OUTPUT_NAME "madx")
 add_executable(madx MACOSX_BUNDLE  madxp.c madx_main.F90)
 SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
+# we want to add _dev to the binary in case this is a dev version for the automatic packaging...
+SET_TARGET_PROPERTIES(madx PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
 
 # we need to link executable to our own library:
 target_link_libraries(madx madxlib)
