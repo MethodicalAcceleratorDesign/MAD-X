@@ -14,11 +14,11 @@
 # C compiler
 CC=gcc
 # Fortran90 compiler
-f95=ifort
+f95=lf95
 # architecture 32/64bit
-ARCH=32
+ARCH=64
 # Debugging compiler flags
-DEBUG=NO
+DEBUG=YES
 # Online version - mostly SDDS IO
 ONLINE=YES
 # Memory leak search version

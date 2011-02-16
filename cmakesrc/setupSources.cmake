@@ -19,7 +19,7 @@ endif  (MADX_NTPSA )
 ADD_CUSTOM_COMMAND(
   OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c . && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
+  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.F90 ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Creating C wrapper files"
   )

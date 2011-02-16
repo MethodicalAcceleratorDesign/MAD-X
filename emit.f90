@@ -424,7 +424,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   parameter         (four  = 4.0d0,  six   = 6.0d0)
   integer i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
   integer node_fd_errors
-  double precision  rw(6,6), tw(6,6,6), ferror(2)
+  double precision  rw(6,6), tw(6,6,6), ferror(2), rw0(6,6)
   double precision  normal(0:maxmul), skew(0:maxmul)
   double precision  vals(2,0:maxmul), field(2,0:maxmul)
   double precision  f_errors(0:50)
@@ -538,7 +538,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   call m66one(rw)
   call dzero(tw,216)
   call tmfrng(.false.,h,sk1,edg2,zero,-one,corr,rw,tw)
-  call m66inv(rw,rw)
+  call dcopy(rw,rw0,36)
+  call m66inv(rw0,rw)
   call m66byv(rw,o2,o2)
 
   !---- Local curvature and its derivatives,
