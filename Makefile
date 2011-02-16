@@ -249,10 +249,10 @@ madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c s
 	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
 
 # automatically generated code
-fortran_wrappers.h:
+fortran_wrappers.h fortran_wrappers.c fortran_prototypes.h fortran_wrappers_prototypes.h:
 	python wrap_fortran_calls.py # creates fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
 
-c_wrappers.h:
+c_wrappers.h c_wrappers.c:
 	python wrap_C_calls.py	
 
 fortran_wrappers.o: fortran_wrappers.c

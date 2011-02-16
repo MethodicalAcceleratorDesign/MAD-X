@@ -62,10 +62,6 @@ INSTALL (FILES ${headerfiles}
  set (CPACK_RPM_PACKAGE_LICENSE "custom")
  set (CPACK_RPM_PACKAGE_GROUP "Development/Tools")
  set(CPACK_RPM_PACKAGE_REQUIRES "libgcc >= 4.1.0, libxau >= 1.0.5") # I don't know the names of the packages...
- if( MADX_FORCE_32 ) # does not seem to help...
-	 set(CPACK_RPM_PACKAGE_ARCHITECTURE "i686")
- endif( MADX_FORCE_32 )
- 
  # so that we can build dragndrop on osx:
  set(CPACK_BINARY_DRAGNDROP ON)
  include (CPack)
