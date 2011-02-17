@@ -47,10 +47,10 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 
 
 
-if ( NOT madX_PATCH_LEVEL EQUAL 00 )
+if ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
  message( "Building a development version" )
  SET (BINARY_POSTFIX "_dev")
-endif ( NOT madX_PATCH_LEVEL EQUAL 00 )
+endif ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
 
 
 
