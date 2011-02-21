@@ -2743,6 +2743,8 @@ int interp_node(int *nint)
 
   struct node *first_node, *clone;
   struct element* el;
+  struct command_parameter* cp;
+  int i;
   int j, number_nodes;
   double bvk, angle, e1, e2, h1, h2, fint, hgap;
   double zero = 0.0, minus_one = -1.0, length, step, numint;
@@ -2784,7 +2786,14 @@ int interp_node(int *nint)
       el->def->mad8_type = 3;
     }
     angle = angle/numint;
-    store_node_value("angle",&angle);
+    /*    store_node_value("angle",&angle); */
+    i = name_list_pos("angle", el->def->par_names);
+    cp = el->def->par->parameters[i];
+    if(cp->expr != NULL) backup_expr = cp->expr;
+    backup_type = cp->type;
+    cp->type = 2;
+    cp->expr = NULL;
+    cp->double_value = angle;
     store_node_value("e1",&e1);
     store_node_value("e2",&zero);
     store_node_value("h1",&h1);
@@ -5333,6 +5342,8 @@ void reset_errors(struct sequence* sequ)
 int reset_interpolation(int *nint)
 {
   struct node *c_node, *second_node;
+  struct command_parameter* cp;
+  int i;
   int j,bend_flag = 0;
   double angle,length,e1,e2,numint, h1, h2, fint, fintx, hgap, bvk;
 
@@ -5361,7 +5372,12 @@ int reset_interpolation(int *nint)
   if (bend_flag)
   {
     angle = numint*node_value("angle");
-    store_node_value("angle",&angle);
+    i = name_list_pos("angle", current_node->p_elem->def->par_names);
+    cp = current_node->p_elem->def->par->parameters[i];
+    cp->expr = backup_expr;
+    cp->type = backup_type;
+    cp->double_value = angle;
+       /*    store_node_value("angle",&angle); */
     e1 = node_value("e1");
     h1 = node_value("h1");
     fint = node_value("fint");

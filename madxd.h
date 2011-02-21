@@ -1262,6 +1262,8 @@ struct el_list* element_list;
 struct el_list* base_type_list;
 struct el_list* selected_elements;
 
+struct expression* backup_expr;
+
 struct in_buff_list* in;           /* list of all active input buffers */
 struct in_buff_list* pro;          /* list of active processing buffers */
 
@@ -1389,10 +1391,10 @@ char tmp_key[NAME_L],
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 4.01.46";
+char myversion[] = "MAD-X 4.01.47";
 char version_type[] = "DEBUG Version - use at own risk!";
 /* char version_type[] = "       Production Version       "; */
-char code_mod_date[] = "Code Modification Date: 16.02.2011";
+char code_mod_date[] = "Code Modification Date: 21.02.2011";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
@@ -1440,6 +1442,8 @@ const double ten_m_19 = 1.e-19;
 int add_error_opt = 0;      /* ADD error option, set with eoption */
 int warn_numb = 0;           /* Number of warnings */
 int warn_numbf = 0;           /* Number of warnings from fortran*/
+int backup_type;
+
 /* E. T. d'Amico 25 feb 2004 */
 int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 /* E. T. d'Amico 13 may 2004 */
