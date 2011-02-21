@@ -5,7 +5,13 @@ CMake:
  currently aim to support this. We do try to support all linux 
  flavours in addition to Mac OSX.
 
- Basic usage:
+ As a first step one has to set the MAD-X version numbers: 
+        # project version
+        SET( PROJECT_MAJOR_VERSION 4 )
+        SET( PROJECT_MINOR_VERSION 01 )
+        SET( PROJECT_PATCH_LEVEL 47 )
+
+Basic usage:
  Create a temporary folder and enter it in terminal. Write the command
   cmake <path to source>
  You can then build mad-x with
