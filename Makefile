@@ -18,7 +18,7 @@ f95=ifort
 # architecture 32/64bit
 ARCH=32
 # Debugging compiler flags
-DEBUG=YES
+DEBUG=NO
 # Online version - mostly SDDS IO
 ONLINE=YES
 # Memory leak search version
