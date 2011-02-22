@@ -18,11 +18,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc")
 
 
 # project options
-if ( NOT APPLE)
-   OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  OFF )
-else ( NOT APPLE)
-   OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  ON )
-endif ( NOT APPLE)
+if (APPLE)
+	OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  ON )
+	OPTION ( MADX_STATIC "Turn on for static linking" OFF)
+else (APPLE)
+  OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  OFF )
+  OPTION ( MADX_STATIC "Turn on for static linking" OFF)
+endif (APPLE)
 # OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
@@ -105,7 +107,7 @@ include(setupSources)
 
 
 if(APPLE)
-  SET(MACOSX_BUNDLE_STARTUP_COMMAND madx)
+	SET(MACOSX_BUNDLE_STARTUP_COMMAND madx${BINARY_POSTFIX})
   SET(MACOSX_BUNDLE_ICON_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/MadX.icns")
   SET(MACOSX_BUNDLE_LONG_VERSION_STRING "MadX  version ${madX_MAJOR_VERSION}.${madX_MINOR_VERSION}.${madX_PATCH_LEVEL}")
   SET(MACOSX_BUNDLE_BUNDLE_NAME "MadX${BINARY_POSTFIX}")
@@ -118,6 +120,7 @@ endif(APPLE)
 
 # adding library:
 ADD_LIBRARY(madxlib ${srcfiles})
+SET_TARGET_PROPERTIES(madxlib PROPERTIES LINKER_LANGUAGE Fortran) # not needed on linux it seems, but osx cannot use c compiler
 # we want the library to be called libmadx and not libmadxlib:
 SET_TARGET_PROPERTIES(madxlib PROPERTIES OUTPUT_NAME "madx")
 
@@ -139,7 +142,7 @@ FIND_PACKAGE(X11)
 IF(X11_FOUND)
    message("Found X11 libraries")
    INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-   TARGET_LINK_LIBRARIES(madx ${X11_X11_LIB})
+	 TARGET_LINK_LIBRARIES(madxlib ${X11_X11_LIB})
 ENDIF(X11_FOUND)
 else (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(madx X11)

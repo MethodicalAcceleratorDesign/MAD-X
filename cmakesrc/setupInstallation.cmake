@@ -7,25 +7,20 @@ SET (CMAKE_Fortran_MODULE_DIRECTORY
     ${PROJECT_BINARY_DIR}/bin/fortran CACHE PATH "Single Directory for all fortran modules."
 )
 
-set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx")  # paths to executables
+set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx${BINARY_POSTFIX}")  # paths to executables
 set(DIRS "")
 
 if(APPLE)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx.app")  # paths to executables
+	set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
   set(DIRS "")
 endif(APPLE)
+
 INSTALL(TARGETS madx madxlib
   BUNDLE DESTINATION .
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
-if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
-  INSTALL(CODE " 
-    include(BundleUtilities) 
-    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
-    " COMPONENT Runtime) 
-endif(APPLE OR WIN32)
 
 # This installs the header files to <prefix>/include/madX
 INSTALL (FILES ${headerfiles} 
@@ -35,6 +30,13 @@ INSTALL (FILES ${headerfiles}
 	${CMAKE_CURRENT_BINARY_DIR}/fortran_prototypes.h
 	${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.h 
  		DESTINATION "include/${PROJECT_NAME}")
+
+if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
+  INSTALL(CODE " 
+    include(BundleUtilities) 
+    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
+    " COMPONENT Runtime) 
+endif(APPLE OR WIN32)
 
 # CPACK stuff
  # build a CPack driven installer package
