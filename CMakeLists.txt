@@ -18,14 +18,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc")
 
 
 # project options
+OPTION( BUILD_SHARED_LIBS "Turn on to build dynamic libraries"  OFF )
 if (APPLE)
-	OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  ON )
 	OPTION ( MADX_STATIC "Turn on for static linking" OFF)
 else (APPLE)
-  OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries"  OFF )
-  OPTION ( MADX_STATIC "Turn on for static linking" OFF)
+	OPTION ( MADX_STATIC "Turn on for static linking" ON)
 endif (APPLE)
-# OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
 OPTION ( MADX_NTPSA "Build with NTPSA" ON)
@@ -119,20 +117,19 @@ endif(APPLE)
 
 
 # adding library:
-ADD_LIBRARY(madxlib ${srcfiles})
-SET_TARGET_PROPERTIES(madxlib PROPERTIES LINKER_LANGUAGE Fortran) # not needed on linux it seems, but osx cannot use c compiler
-# we want the library to be called libmadx and not libmadxlib:
-SET_TARGET_PROPERTIES(madxlib PROPERTIES OUTPUT_NAME "madx")
+ADD_LIBRARY(madx ${srcfiles})
+# not sure if this is needed...
+SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran) 
 
 # adding an executable:
-add_executable(madx MACOSX_BUNDLE  madxp.c madx_main.F90)
-SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran)
+add_executable(madxbin MACOSX_BUNDLE  madxp.c madx_main.F90)
+SET_TARGET_PROPERTIES(madxbin PROPERTIES LINKER_LANGUAGE Fortran)
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
-SET_TARGET_PROPERTIES(madx PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
+SET_TARGET_PROPERTIES(madxbin PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
 
 # we need to link executable to our own library:
-target_link_libraries(madx madxlib)
+target_link_libraries(madxbin madx)
 
 # I turn off search for libraries in case you are on Linux,
 # to make sure we make use of the lib/lib64 folders
@@ -142,7 +139,7 @@ FIND_PACKAGE(X11)
 IF(X11_FOUND)
    message("Found X11 libraries")
    INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-	 TARGET_LINK_LIBRARIES(madxlib ${X11_X11_LIB})
+	 TARGET_LINK_LIBRARIES(madx ${X11_X11_LIB})
 ENDIF(X11_FOUND)
 else (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(madx X11)
@@ -154,7 +151,7 @@ if (MADX_ONLINE )
 if (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
 	target_link_libraries(madx imf)
 endif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-endif (MADX_ONLINE )
+endif (MADX_ONLINE)
 target_link_libraries(madx z)
 # new additions from Frank:
 # On Debian Stable, stdc++ is not linked by default...
