@@ -3049,7 +3049,7 @@ subroutine trclor(orbit0)
   !----------------------------------------------------------------------*
   double precision zero, one
   parameter(zero=0d0,one=1d0)
-  double precision orbit0(6), z(6,7), z0(6,7), a(6,7),deltap,ddd(6)
+  double precision orbit0(6), z(6,7), z0(6,7), z00(6,7), a(6,7),deltap,ddd(6)
   integer itra, itmax, j, bbd_pos, j_tot
   integer code
   double precision el,dxt(200),dyt(200)
@@ -3123,6 +3123,7 @@ subroutine trclor(orbit0)
 
   do k=1,7
      call dcopy(z(1,k),z0(1,k),6)
+     call dcopy(z(1,k),z00(1,k),6)
   enddo
 
   !--- jmax may be reduced by particle loss - keep number in j_tot
@@ -3236,6 +3237,7 @@ subroutine trclor(orbit0)
      if (irank.lt.6) go to 100
      do i = 1, 6
         z0(i,1) = z0(i,1) - a(i,7)
+        z00(i,1) = z00(i,1) - a(i,7)
      enddo
      !---- Solve for dynamic case.
      !      do i = 1, 6	
@@ -3257,7 +3259,7 @@ subroutine trclor(orbit0)
 
 
      do k=2,7
-        call dcopy(z0(1,1),z0(1,k),6)
+        call dcopy(z00(1,1),z0(1,k),6)
      enddo
 
      do k=1,6
