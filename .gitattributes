@@ -1,5 +1,6 @@
 * text=auto !eol
 /CMakeLists.txt -text
+/Doxyfile -text
 /License.txt -text
 /Makefile -text
 /Makefile.bat -text
@@ -58,6 +59,7 @@ cmakesrc/setupCompilerSpecifics.cmake -text
 cmakesrc/setupInstallation.cmake -text
 cmakesrc/setupSources.cmake -text
 /d_lielib.f90 -text
+/doxygen.h -text
 /dynap.f90 -text
 /emit.f90 -text
 /fortran_flush.F90 -text
