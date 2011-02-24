@@ -647,7 +647,8 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   chy    = c1y + c2y
   r1     = three / cy
   a      = cx + cl + chy
-  b      = (c3 + cy) * (c1 + cl + c1y) + cy * c2 + c3 * c2y
+!--- corrected b 23.02.2011 
+  b      = (c3 + cy) * (c1 + cl) + cy * c2 + c3 * c2y
 
   !---- Define CPRIME=C*CSCALE to try to keep the value.
   !     small enough for the VAX in single precision or
@@ -673,20 +674,24 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   td2    = one / (sqrt(ccy) * cscale * cy)
   tl1    = (two * a - cy - c3) / cprime
   tl2    = (b - two * c3 * cy + c1y * (c3+cy) ) / cprime
+!--- corrected ty1 23.02.2011 
   ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 -                 &
-       two*gammas**2/sige**2) + two * chy * (cx +chy)/cy )               &
+       two*gammas**2/sige**2) + two * chy * (cx +chy)/cy + six * c2y)    &
        / cprime
+!--- corrected ty2 23.02.2011 
   ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax          &
        /(betay*ex))                                                      &
        *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
        (betay*ex))*                                                      &
        cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
-       -c2y*(cy+c3+chy)) / cprime - r1 / cscale
+       -c2y*(cy+c3+chy)+three*c3*(two*c2y+c1y)) / cprime - r1 / cscale
+!--- corrected tx1 23.02.2011 
   tx1    = (two * a * (cx - c3) - cy * cx -                         &
-       c3 * (cy - cl - two * c3 )) / cprime
+       c3 * (cy - cl - two * c3 + six*c2 + c2y + c1y)) / cprime
+!--- corrected tx2 23.02.2011 
   tx2    = (c3 + cx) * ((b + c3 * cy) / cprime)-                    &
        six / cscale + three * c3 * cy * (cl / cprime)                    &
-       + (- six*(c3*c2*cy) + six*c3*cy*c1y                               &
+       + ( six*c3*cy*c1y                               &
        + (betay/ey+betax/ex)*chy*cx +                                    &
        chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*           &
        c2y ) / cprime
