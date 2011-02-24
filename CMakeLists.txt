@@ -50,6 +50,7 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 if ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
  message( "Building a development version" )
  SET (BINARY_POSTFIX "_dev")
+ SET (PKG_POSTFIX "-dev")
 endif ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
 
 

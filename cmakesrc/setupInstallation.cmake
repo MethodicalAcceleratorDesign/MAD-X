@@ -11,11 +11,18 @@ set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx${BINARY_POSTFIX}")  # paths to execu
 set(DIRS "")
 
 if(APPLE)
-	set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
   set(DIRS "")
 endif(APPLE)
 
-INSTALL(TARGETS madx madxbin
+# we only install the library in the development version so packages don't conflict...
+if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
+  set(mtargets madx madxbin)
+else(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
+  set(mtargets madx)
+endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
+
+INSTALL(TARGETS ${mtargets} 
   BUNDLE DESTINATION .
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
@@ -23,14 +30,25 @@ INSTALL(TARGETS madx madxbin
 )
 
 # This installs the header files to <prefix>/include/madX
+# We only want this in the development version...
+if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 INSTALL (FILES ${headerfiles} 
-	${CMAKE_CURRENT_BINARY_DIR}/c_wrappers.h 
-	${CMAKE_CURRENT_BINARY_DIR}/c_wrappers_prototypes.h
-	${CMAKE_CURRENT_BINARY_DIR}/c_prototypes.h
-	${CMAKE_CURRENT_BINARY_DIR}/fortran_prototypes.h
-	${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.h 
- 		DESTINATION "include/${PROJECT_NAME}")
+  ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers.h 
+  ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers_prototypes.h
+  ${CMAKE_CURRENT_BINARY_DIR}/c_prototypes.h
+  ${CMAKE_CURRENT_BINARY_DIR}/fortran_prototypes.h
+  ${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.h 
+  DESTINATION "include/${PROJECT_NAME}")
+endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/License.txt 
+    DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}")
+# In case we are on Linux we install syntax file for Kate
+# Only in case of devel version, so packages don't conflict...
+IF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/madx.xml 
+    DESTINATION "share/apps/katepart/syntax/")
+ENDIF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
 if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
   INSTALL(CODE " 
     include(BundleUtilities) 
@@ -41,11 +59,7 @@ endif(APPLE OR WIN32)
 # CPACK stuff
  # build a CPack driven installer package
  set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
- if ( PROJECT_PATCH_LEVEL EQUAL 00 )
- 	set (CPACK_PACKAGE_NAME "${PROJECT_NAME}")
- else ( PROJECT_PATCH_LEVEL EQUAL 00 )
- 	set (CPACK_PACKAGE_NAME "${PROJECT_NAME}-dev")
- endif ( PROJECT_PATCH_LEVEL EQUAL 00 )
+ set (CPACK_PACKAGE_NAME "${PROJECT_NAME}${PKG_POSTFIX}")
  # Version:
  set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
  set (CPACK_PACKAGE_VERSION_MINOR ${PROJECT_MINOR_VERSION})

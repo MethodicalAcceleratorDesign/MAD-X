@@ -52,6 +52,7 @@ cmakesrc/ctests/job.sample.madx -text
 cmakesrc/ctests/testruns.sh -text
 cmakesrc/ctests/testsample.sh -text
 cmakesrc/madX.gif -text svneol=unset#unset
+cmakesrc/madx.xml -text
 cmakesrc/setupArchSpecifics.cmake -text
 cmakesrc/setupCompilerSpecifics.cmake -text
 cmakesrc/setupInstallation.cmake -text
