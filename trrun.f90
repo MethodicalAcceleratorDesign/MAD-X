@@ -30,12 +30,12 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
   logical onepass,onetable,last_out,info,aperflag,doupdate
-  integer j,code,restart_sequ,advance_node,node_al_errors,n_align,  &
+  integer j,code,restart_sequ,advance_node,node_al_errors,n_align,       &
        nlm,jmax,j_tot,turn,turns,i,k,get_option,ffile,SWITCH,nint,ndble, &
        nchar,part_id(*),last_turn(*),char_l,segment, e_flag, nobs,lobs,  &
        int_arr(1),tot_segm,code_buf(*)
-  double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),     &
-       al_errors(align_max),z(6,*),dxt(*),dyt(*),eigen(6,6),sum,         &
+  double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),          &
+       al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
        node_value,one,                                                   &
        get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
        zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap
@@ -215,7 +215,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         n_align = node_al_errors(al_errors)
         if (n_align .ne. 0)  then
            do i = 1, jmax
-              call tmali1(z(1,i),al_errors, betas, gammas,z(1,i), re)
+              call dcopy(z(1,i),zz,6)
+              call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
            enddo
         endif
      endif
@@ -226,8 +227,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
            do i = 1, jmax
-              call tmali2(el,z(1,i), al_errors, betas, gammas,          &
-                   z(1,i), re)
+              call dcopy(z(1,i),zz,6)
+              call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
            enddo
         endif
      endif
@@ -453,6 +454,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      call node_string('apertype ',aptype,nn)
      call dzero(aperture,maxnaper)
      call get_node_vector('aperture ',nn,aperture)
+     call dzero(offset,2)
      call get_node_vector('aper_offset ',nn,offset)
 
      offx = offset(1)
@@ -3049,7 +3051,7 @@ subroutine trclor(orbit0)
   !----------------------------------------------------------------------*
   double precision zero, one
   parameter(zero=0d0,one=1d0)
-  double precision orbit0(6), z(6,7), z0(6,7), z00(6,7), a(6,7),deltap,ddd(6)
+  double precision orbit0(6),z(6,7),zz(6),z0(6,7),z00(6,7),a(6,7),deltap,ddd(6)
   integer itra, itmax, j, bbd_pos, j_tot
   integer code
   double precision el,dxt(200),dyt(200)
@@ -3192,7 +3194,8 @@ subroutine trclor(orbit0)
         n_align = node_al_errors(al_errors)
         if (n_align .ne. 0)  then
            do i = 1, pmax
-              call tmali1(z(1,i),al_errors, betas, gammas,z(1,i), re)
+              call dcopy(z(1,i),zz,6)
+              call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
            enddo
         endif
      endif
@@ -3205,8 +3208,8 @@ subroutine trclor(orbit0)
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
            do i = 1, pmax
-              call tmali2(el,z(1,i), al_errors, betas, gammas,          &
-                   z(1,i), re)
+              call dcopy(z(1,i),zz,6)
+              call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
            enddo
         endif
      endif
