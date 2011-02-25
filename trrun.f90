@@ -2476,7 +2476,7 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   integer i,j,npart,turn,tot_segm,segment,part_id(*),length
   double precision z(6,*),orbit0(6),tmp,tt,ss
   !hbu was *36 allow longer info
-  character(80) table,comment
+  character(120) table,comment
   !hbu
   integer ielem
   !hbu name of element
