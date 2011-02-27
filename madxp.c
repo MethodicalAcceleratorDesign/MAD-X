@@ -4945,6 +4945,16 @@ double table_value()
         {
           if (ntok > 2)  /* find row - else current (dynamic), or 0 */
           {
+	   /* start mod - HG 26.3.2011 */
+	   if (ntok > 5) /* check for [ count ] and convert to ->count */
+	     {
+	      if (*toks[2] == '[' && *toks[4] == ']')
+		{
+		 strcat(toks[1], "->");
+                 strcat(toks[1], toks[3]);
+		}
+	     }
+	   /* end mod - HG 26.3.2011 */
             row = table_row(table, toks[1]);
           }
           else if (table->dynamic)  row = table->curr;
