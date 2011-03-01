@@ -17,9 +17,9 @@ endif(APPLE)
 
 # we only install the library in the development version so packages don't conflict...
 if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
-  set(mtargets madx madxbin)
+  set(mtargets madxbin madx)
 else(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
-  set(mtargets madx)
+  set(mtargets madxbin)
 endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 
 INSTALL(TARGETS ${mtargets} 
