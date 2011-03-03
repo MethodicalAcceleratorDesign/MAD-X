@@ -74,14 +74,19 @@ endif(APPLE OR WIN32)
  set (CPACK_DEBIAN_PACKAGE_SECTION "science")
  set (CPACK_DEBIAN_PACKAGE_PRIORITY "extra")
  set (CPACK_DEBIAN_PACKAGE_RECOMMENDS "gnuplot")
+ if ( NOT MADX_STATIC )
  set (CPACK_DEBIAN_PACKAGE_DEPENDS 
       "libc6 (>= 2.3.1-6), libgcc1 (>= 1:4.1), zlib1g, libx11-xcb1, libxcb1, libxau6") # some version dependencies kept as examples
+ endif ( NOT MADX_STATIC )
  
  # RPM Specific:
  set (CPACK_RPM_PACKAGE_RELEASE 1)
  set (CPACK_RPM_PACKAGE_LICENSE "custom")
  set (CPACK_RPM_PACKAGE_GROUP "Development/Tools")
- set(CPACK_RPM_PACKAGE_REQUIRES "libgcc >= 4.1.0, libxau >= 1.0.5") # I don't know the names of the packages...
+ if ( NOT MADX_STATIC )
+ # set(CPACK_RPM_PACKAGE_REQUIRES "libgcc >= 4.1.0, libxau >= 1.0.5") # I don't know the names of the packages...
+ endif ( NOT MADX_STATIC )
+ 
  # so that we can build dragndrop on osx:
  set(CPACK_BINARY_DRAGNDROP ON)
  include (CPack)

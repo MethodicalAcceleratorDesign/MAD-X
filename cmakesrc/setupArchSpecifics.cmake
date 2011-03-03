@@ -4,12 +4,18 @@ if ( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
   message("32 bit build" ) 
   
   set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-	if ( NOT MADX_FORCE_32 )
+	
+	if ( MADX_STATIC )
+	 set (CPACK_RPM_PACKAGE_ARCHITECTURE "noarch")
+	 # I think this should be correct but it is not tested yet...
+	 #set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
+	else ( MADX_STATIC )
+	 if ( NOT MADX_FORCE_32 )
   	set (CPACK_RPM_PACKAGE_ARCHITECTURE "i686")
-		#	else ( NOT MADX_FORCE_32 )
-		# This might fix so the rpm is installable on both 32 and 64bit systems...?
-		#  	set (CPACK_RPM_PACKAGE_ARCHITECTURE "noarch")
-	endif ( NOT MADX_FORCE_32 )
+	 else ( NOT MADX_FORCE_32 )
+		 message(WARNING "Don't use CPACK to generate RPM, it will make no sense for these settings.")
+	 endif ( NOT MADX_FORCE_32 )
+	endif ( MADX_STATIC )
   
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
