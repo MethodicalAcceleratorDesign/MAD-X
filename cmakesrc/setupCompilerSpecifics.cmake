@@ -5,7 +5,9 @@
 # SET(CMAKE_FORTRAN_COMPILER mpif77)
 if (CMAKE_Fortran_COMPILER MATCHES "gfortran")
 	message( "--- ifort is recommended fortran compiler ---")
-	if(APPLE)
+	# ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
+	# for file l_complex_taylor.f90
+	if(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
 		set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O2 ")
 	else(APPLE)
   	set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O4 ")
