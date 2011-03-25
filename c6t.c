@@ -231,7 +231,7 @@ struct object *p_err_zero;  /* pointer to error object with all zeroes */
 char el_info[N_TYPES][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
 {"aperture     2       2       2       0       0       0",
- "beambeam     4       2       2       0       0       0",
+ "beambeam     2       2       2       0       0       0",
  "beamint      0       1       1       1       0       0",
  "drift        0       1       1       0       0       0",
  "decapole     2       2       2       0       1       2",
@@ -464,9 +464,9 @@ void assign_att()
         else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
         else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
         else if (strcmp(el->base_name, "dipedge") == 0) att_dipedge(el);
-	else if (strcmp(el->base_name, "solenoid") == 0) att_solenoid(el);
-	else if (strcmp(el->base_name, "hacdipole") == 0) att_hacdipole(el);
-	else if (strcmp(el->base_name, "vacdipole") == 0) att_vacdipole(el);
+        else if (strcmp(el->base_name, "solenoid") == 0) att_solenoid(el);
+        else if (strcmp(el->base_name, "hacdipole") == 0) att_hacdipole(el);
+        else if (strcmp(el->base_name, "vacdipole") == 0) att_vacdipole(el);
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
@@ -1414,6 +1414,7 @@ void equiv_elem()
                 && eln->equiv == eln
                 && ident_el(el, eln) == 0
                 && eln->nf_err == el->nf_err
+                && strcmp(eln->base_name,"beambeam") != 0
                 && strcmp(eln->base_name,"marker") != 0
                 && strstr(eln->base_name,"colli") == NULL)
               eln->equiv = el;
