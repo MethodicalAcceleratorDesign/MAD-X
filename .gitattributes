@@ -90,6 +90,7 @@ lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
 /m_real_polymorph.f90 -text
+/madextern.h -text
 /madx.h -text
 /madx_main.F90 -text
 /madx_ptc_distrib.f90 -text
