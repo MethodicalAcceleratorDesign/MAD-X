@@ -9,9 +9,9 @@ if (CMAKE_Fortran_COMPILER MATCHES "gfortran")
 	# for file l_complex_taylor.f90
 	if(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
 		set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O2 ")
-	else(APPLE)
+	else(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
   	set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O4 ")
-	endif(APPLE)
+	endif(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
   set (CMAKE_Fortran_FLAGS "") # remove -g -O2 from main list of flags.. issue for older cmake/gfortran
 	if (MADX_GOTOBLAS2)
 		set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fexternal-blas")

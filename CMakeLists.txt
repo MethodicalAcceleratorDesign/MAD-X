@@ -25,6 +25,13 @@ else (APPLE)
 	OPTION ( MADX_STATIC "Turn on for static linking" ON)
 endif (APPLE)
 
+# I think we don't get this to work in Linux without
+# this addition...?
+# cannot have one without the other...
+if ( BUILD_SHARED_LIBS ) 
+    set(MADX_STATIC OFF)
+endif ( BUILD_SHARED_LIBS )
+
 #Mad-X specific options (arch. specific options can be added in similar manner):
 OPTION ( MADX_NTPSA "Build with NTPSA" ON)
 OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
