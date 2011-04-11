@@ -20,6 +20,7 @@
 #include "madx.h"
 #include "madxreg.h"
 #include "madxd.h"
+#include "madextern.h"
 #include "madxdict.h"
 
 #ifdef _WIN32
@@ -65,6 +66,20 @@ void madx()
   madx_init();
   main_input(0);
   madx_finish();
+}
+void madextern_start()
+{
+    madx_start();
+    madx_init();
+}
+void madextern_end()
+{
+    madx_finish();
+}
+void madextern_input(char* ch) 
+{
+    stolower_nq(ch);
+    pro_input(ch);
 }
 
 #ifdef _FULL
