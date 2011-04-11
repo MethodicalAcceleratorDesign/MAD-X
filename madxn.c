@@ -2955,6 +2955,7 @@ void make_sequ_from_line(char* name)
   struct element* el;
   if (pos < 0) fatal_error("unknown line: ", name);
   line = line_list->macros[pos];
+  line->dead = 1;   /* prevent line from further conversion to sequence */
   line_buffer = new_char_p_array(1000);
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */

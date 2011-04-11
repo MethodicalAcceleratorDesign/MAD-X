@@ -20,7 +20,6 @@
 #include "madx.h"
 #include "madxreg.h"
 #include "madxd.h"
-#include "madextern.h"
 #include "madxdict.h"
 
 #ifdef _WIN32
@@ -66,20 +65,6 @@ void madx()
   madx_init();
   main_input(0);
   madx_finish();
-}
-void madextern_start()
-{
-    madx_start();
-    madx_init();
-}
-void madextern_end()
-{
-    madx_finish();
-}
-void madextern_input(char* ch) 
-{
-    stolower_nq(ch);
-    pro_input(ch);
 }
 
 #ifdef _FULL
@@ -2651,16 +2636,19 @@ int get_stmt(FILE* file, int supp_flag)
     if (get_option("echo")) puts(&ca->c[ca->curr]);
     c_cc = mystrstr(&ca->c[ca->curr], "//");
     c_ex = mystrchr(&ca->c[ca->curr], '!');
+    c_st = mystrstr(&ca->c[ca->curr], "/*");
     if (c_cc != NULL && c_ex != NULL)
     {
       c_cc = (uintptr_t)c_cc < (uintptr_t)c_ex ? c_cc : c_ex; *c_cc = '\0';
     }
-    else if(c_cc != NULL)
+    else if(c_cc != NULL 
+	    &&(c_st == NULL || (uintptr_t)c_cc < (uintptr_t)c_st))
     {
       if (c_cc == &ca->c[ca->curr]) goto next;
       else *c_cc = '\0';
     }
-    else if(c_ex != NULL)
+    else if(c_ex != NULL
+	    &&(c_st == NULL || (uintptr_t)c_ex < (uintptr_t)c_st))
     {
       if (c_ex == &ca->c[ca->curr]) goto next;
       else *c_ex = '\0';
