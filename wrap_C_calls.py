@@ -23,8 +23,10 @@ class CFunction:
         self.sourceFile = sourceFile
 
 class Wrapper:
-    def collectCfuncCalledByFortran(self):
-        cFiles = self.collectFiles('C')
+    ##
+    # dirs optional argument for additional folders to check for source/header files
+    def collectCfuncCalledByFortran(self,dirs=[]):
+        cFiles = self.collectFiles('C',dirs)
         cFunctions = []
         for file in cFiles:
             if (sys.platform[0:5]=='win32' or sys.platform[0:5]=='win64'):
@@ -86,7 +88,7 @@ class Wrapper:
                     cFunctions.append(func)
                     
         # now check wether the collected functions are called by Fortran
-        fortranFiles = self.collectFiles('Fortran')
+        fortranFiles = self.collectFiles('Fortran',dirs)
         
         # register all pure Fortran subroutines as we don't want to mix them with calls from Fortran to C
         fortranSubroutines = []
@@ -335,28 +337,30 @@ class Wrapper:
         f.writelines(code)
         f.close()
         
-
-    def collectFiles(self,type):
+    ##
+    # dirs optional argument for additional folders to check for source/header files
+    def collectFiles(self,type,dirs):
         if type == 'C':
             suffix = 'c'
         elif type == 'Fortran':
             suffix = 'f90'
-        # until we can rely on the subprocess library from Python 2.5 ...
-        # no way to get the output of a system call but through a file
-        command = 'ls -l *.' + suffix + ' > files.out'
-
         files = []
         allFiles = os.listdir('.')
+        for d in dirs:
+          allFiles.extend(os.listdir(d))
         for file in allFiles:
             if file[-((len(suffix))+1):] == ('.'+suffix):
                 files.append(file)
 
         return files
 
-def wrapFortranCallingC():
+def wrapFortranCallingC(outdir=''):
     try:
         wrapper = Wrapper()
-        wrapper.collectCfuncCalledByFortran()
+        if outdir:
+            wrapper.collectCfuncCalledByFortran([outdir])
+        else:
+            wrapper.collectCfuncCalledByFortran()
         wrapper.listFunctionsCalledByFortran()
         wrapper.generateWrapperCode()
         wrapper.generateWrapperHeader()
@@ -368,20 +372,31 @@ def wrapFortranCallingC():
         we.printout()
         
 if __name__ == "__main__":
-
-    c_wrappers_c_file = "c_wrappers.c"
-    c_wrappers_h_file = "c_wrappers.h"
-    c_prototypes_h_file = "c_prototypes.h"
-    c_wrappers_prototypes_h_file = "c_wrappers_prototypes.h"
-
-    files = [c_wrappers_c_file, c_wrappers_h_file, c_prototypes_h_file, c_wrappers_prototypes_h_file]
     
     usage = '%prog [options]'
     parser = optparse.OptionParser(usage)
     parser.add_option('-c','--clean',help='deletes all files created by this script',action='store_true')
     parser.add_option('-v','--verbose',help='display messages that may be useful for debugging',action='store_true')
     parser.add_option('-t','--trace', help='trace calls before flushing, which may be useful for debugging', action='store_true')
+    parser.add_option('-o','--outdir',
+            type=str,
+            default='',
+            help='Output directory for the generated code')
     (options,args) = parser.parse_args()
+    
+    prefix=""
+    if options.outdir:
+      prefix=options.outdir+"/"+prefix
+    c_wrappers_c_file = prefix+"c_wrappers.c"
+    c_wrappers_h_file = prefix+"c_wrappers.h"
+    c_prototypes_h_file = prefix+"c_prototypes.h"
+    c_wrappers_prototypes_h_file = prefix+"c_wrappers_prototypes.h"
+
+    files = [c_wrappers_c_file, c_wrappers_h_file, c_prototypes_h_file, c_wrappers_prototypes_h_file]
+    
+    if options.outdir:
+        for i in xrange(len(files)):
+            files[i]=options.outdir+'/'+files[i]
 
     if options.clean:
         for file in files:
@@ -391,4 +406,4 @@ if __name__ == "__main__":
             except:
                 pass
     else:
-        wrapFortranCallingC()
+        wrapFortranCallingC(options.outdir)
