@@ -19,15 +19,15 @@ endif  (MADX_NTPSA )
 ADD_CUSTOM_COMMAND(
   OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.F90 ${CMAKE_CURRENT_SOURCE_DIR}/*.f90 . && python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_C_calls.py
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMAND python wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating C wrapper files"
   )
 ADD_CUSTOM_COMMAND(
   OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
-  DEPENDS ${fsrcfiles} c_wrappers.c
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/wrap_fortran_calls.py && cp ${CMAKE_CURRENT_SOURCE_DIR}/*.h .
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  DEPENDS ${csrcfiles} ${fsrcfiles}
+  COMMAND python wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating fortran wrapper files"
   )
 # execute python wrap_fortran_calls.py
@@ -36,7 +36,7 @@ ADD_CUSTOM_COMMAND(
 
 # main source files... 
 # TODO: please check this list at some point!
-set(srcfiles ${csrcfiles} ${fsrcfiles} fortran_wrappers.c c_wrappers.c )
+set(srcfiles ${csrcfiles} ${fsrcfiles} ${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.c ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers.c )
 
 # header files...
 set(headerfiles c6t.h madxdict.h madxl.h matchptcknobs.h tpsa.h madxd.h madx.h madxreg.h rplot.h)

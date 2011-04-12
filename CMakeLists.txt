@@ -18,19 +18,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc")
 
 
 # project options
-OPTION( BUILD_SHARED_LIBS "Turn on to build dynamic libraries"  OFF )
-if (APPLE)
-	OPTION ( MADX_STATIC "Turn on for static linking" OFF)
-else (APPLE)
-	OPTION ( MADX_STATIC "Turn on for static linking" ON)
-endif (APPLE)
+if( NOT BUILD_SHARED_LIBS )
+	OPTION( BUILD_SHARED_LIBS "Turn on to build dynamic libraries"  OFF )
+endif( NOT BUILD_SHARED_LIBS )
 
-# I think we don't get this to work in Linux without
-# this addition...?
-# cannot have one without the other...
-if ( BUILD_SHARED_LIBS ) 
-    set(MADX_STATIC OFF)
-endif ( BUILD_SHARED_LIBS )
+if (APPLE OR BUILD_SHARED_LIBS)
+	option( MADX_STATIC "Turn on for static linking" OFF)
+else (APPLE OR BUILD_SHARED_LIBS)
+	OPTION ( MADX_STATIC "Turn on for static linking" ON)
+endif (APPLE OR BUILD_SHARED_LIBS)
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
 OPTION ( MADX_NTPSA "Build with NTPSA" ON)
