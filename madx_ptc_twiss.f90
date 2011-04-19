@@ -1863,38 +1863,54 @@ contains
       real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: suml ! cumulative length along the ring
       real(dp) :: rdp_zero ! float with zero (0)
+      real(dp) :: rdp_milion ! float with zero (0)
+      real(dp) :: rdp_mmilion ! float with zero (0)
       real(dp) :: deltap ! float with zero (0)
-
+      
+      rdp_mmilion= -1e6;
+      
       call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
 
-      call double_to_table( summary_table_name, 'alpha_c ', rdp_zero ) ! momemtum compaction factor
-      call double_to_table( summary_table_name, 'alpha_c_p ', rdp_zero) ! derivative w.r.t delta-p/p
-      call double_to_table( summary_table_name, 'alpha_c_p2 ', rdp_zero) ! 2nd order derivative
-      call double_to_table( summary_table_name, 'alpha_c_p3 ', rdp_zero) ! 3rd order derivative
-      call double_to_table( summary_table_name, 'eta_c ', rdp_zero ) ! associated phase-slip factor
-      call double_to_table( summary_table_name, 'gamma_tr ', rdp_zero) ! associated transition energy
-      call double_to_table( summary_table_name, 'q1 ', rdp_zero)
-      call double_to_table( summary_table_name, 'q2 ', rdp_zero)
-      call double_to_table( summary_table_name, 'dq1 ', rdp_zero)
-      call double_to_table( summary_table_name, 'dq2 ', rdp_zero)
 
-      call double_to_table( summary_table_name, 'qs ', rdp_zero)
-      call double_to_table( summary_table_name, 'beta_x_min ', rdp_zero)
-      call double_to_table( summary_table_name, 'beta_x_max ', rdp_zero)
-      call double_to_table( summary_table_name, 'beta_y_min ', rdp_zero)
-      call double_to_table( summary_table_name, 'beta_y_max ', rdp_zero)
+      call double_to_table( summary_table_name, 'alpha_c ',    rdp_mmilion ) ! momemtum compaction factor
+      call double_to_table( summary_table_name, 'alpha_c_p ',  rdp_mmilion) ! derivative w.r.t delta-p/p
+      call double_to_table( summary_table_name, 'alpha_c_p2 ', rdp_mmilion) ! 2nd order derivative
+      call double_to_table( summary_table_name, 'alpha_c_p3 ', rdp_mmilion) ! 3rd order derivative
+      call double_to_table( summary_table_name, 'eta_c ',      rdp_mmilion) ! associated phase-slip factor
+      call double_to_table( summary_table_name, 'gamma_tr ',   rdp_mmilion) ! associated transition energy
+
+      call double_to_table( summary_table_name, 'q1 ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'q2 ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'dq1 ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'dq2 ', rdp_mmilion)
+
+      call double_to_table( summary_table_name, 'qs ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'beta_x_min ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'beta_x_max ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'beta_y_min ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'beta_y_max ', rdp_mmilion)
 
       deltap = get_value('ptc_twiss ','deltap ')
       call double_to_table( summary_table_name, 'deltap ', deltap)
 
 
-      call double_to_table( summary_table_name,'orbit_x ',rdp_zero)
-      call double_to_table( summary_table_name,'orbit_px ', rdp_zero)
-      call double_to_table( summary_table_name,'orbit_y ', rdp_zero)
-      call double_to_table( summary_table_name,'orbit_py ', rdp_zero)
+      call double_to_table( summary_table_name,'orbit_x ',  rdp_mmilion)
+      call double_to_table( summary_table_name,'orbit_px ', rdp_mmilion)
+      call double_to_table( summary_table_name,'orbit_y ', rdp_mmilion)
+      call double_to_table( summary_table_name,'orbit_py ', rdp_mmilion)
 
-      call double_to_table( summary_table_name,'orbit_pt ', rdp_zero)
-      call double_to_table( summary_table_name,'orbit_-cT ', rdp_zero)
+      call double_to_table( summary_table_name,'xcorms ',  rdp_mmilion)
+      call double_to_table( summary_table_name,'ycorms ', rdp_mmilion)
+      call double_to_table( summary_table_name,'pxcorms ', rdp_mmilion)
+      call double_to_table( summary_table_name,'pycorms ', rdp_mmilion)
+
+      call double_to_table( summary_table_name,'xcomax ',  rdp_mmilion)
+      call double_to_table( summary_table_name,'ycomax ', rdp_mmilion)
+      call double_to_table( summary_table_name,'pxcomax ', rdp_mmilion)
+      call double_to_table( summary_table_name,'pycomax ', rdp_mmilion)
+
+      call double_to_table( summary_table_name,'orbit_pt ', rdp_mmilion)
+      call double_to_table( summary_table_name,'orbit_-cT ', rdp_mmilion)
 
       call augment_count( summary_table_name ); ! only one row actually...
 
