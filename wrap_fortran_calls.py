@@ -149,10 +149,10 @@ def main():
     targetFiles = [wrapper_filename, wrapper_header_filename, prototypes_filename,wrappers_prototypes_filename]
 
     if options.clean:
-        for file in targetFiles:
+        for ftrgt in targetFiles:
             try:
-                os.remove(file)
-                print("delete " + file)            
+                os.remove(ftrgt)
+                print("Deleted " + ftrgt)            
             except:
                 pass
         sys.exit()
@@ -165,25 +165,26 @@ def main():
 
     allFiles = os.listdir('.')
     if options.outdir:
-      allFiles.extend(os.listdir(options.outdir))
+        for entry in os.listdir(options.outdir):
+            allFiles.append(os.path.join(options.outdir,entry))
 
-    for file in allFiles:
-        if file[-2:] == '.c':
-            Cfiles.append(file)
-        elif file[-2:] == '.h':
-            Hfiles.append(file)
-        elif file[-4:] == '.f90':
-            F90files.append(file)
-        elif file[-3:] == '.fi':
-            FIfiles.append(file)
+    for f in allFiles:
+        if f[-2:] == '.c':
+            Cfiles.append(f)
+        elif f[-2:] == '.h':
+            Hfiles.append(f)
+        elif f[-4:] == '.f90':
+            F90files.append(f)
+        elif f[-3:] == '.fi':
+            FIfiles.append(f)
 
     Csourcefiles = Cfiles + Hfiles
     FortranSourceFiles = F90files + FIfiles
 
     maybeFortranCalls = {}
 
-    for file in Csourcefiles:
-        f = open(file,'r')
+    for fsrc in Csourcefiles:
+        f = open(fsrc,'r')
 
         # preprocessing: get rid of C-style /*...*/ comments
         bigString = ''
