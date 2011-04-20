@@ -224,13 +224,12 @@ contains
 
     s1%mu=phase
 
-    do k=1,c_%nd
-       do i=1,c_%nd2
+    do k=1,3
+       do i=1,6
           s1%eigen(k*2-1,i) = Y(k*2-1).sub.fo(i,:)
           s1%eigen(k*2  ,i) = Y(k*2  ).sub.fo(i,:)
        enddo
     enddo
-
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
        call fort_warn('ptc_twiss: ','DA in twiss got unstable')
@@ -1113,7 +1112,7 @@ contains
       ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
       ! jluc: left the following umodified, except 36->62
       opt_fun(62+4+8+6)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4 => on 3 November 2010 add 6
-      do i1=1,c_%nd2
+      do i1=1,6
          if(i1.le.4) then
             i1a=i1
          elseif(i1.eq.5) then
@@ -1121,7 +1120,7 @@ contains
          else
             i1a=5
          endif
-         do i2=1,c_%nd2
+         do i2=1,6
             if(i2.le.4) then
                i2a=i2
             elseif(i2.eq.5) then
@@ -1129,7 +1128,8 @@ contains
             else
                i2a=5
             endif
-            ii=(62+4+8+6)+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
+! idiotic counting reset (62+4+8+6) ==> 73
+            ii=73+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
             opt_fun(ii)=tw%eigen(i1,i2) * deltae
             ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
             if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
