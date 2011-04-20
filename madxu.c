@@ -1081,6 +1081,7 @@ struct node_list* delete_node_list(struct node_list* l)
 struct sequence* delete_sequence(struct sequence* sequ)
 {
   char rout_name[] = "delete_sequence";
+  int lp;
   if (sequ->ex_start != NULL)
   {
     sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
@@ -1088,6 +1089,8 @@ struct sequence* delete_sequence(struct sequence* sequ)
     sequ->orbits = delete_vector_list(sequ->orbits);
     myfree(rout_name, sequ->all_nodes);
   }
+  if ((lp = name_list_pos(sequ->name, sequences->list)) > -1)
+    remove_from_sequ_list(sequences->sequs[lp], sequences);
   if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
   sequ->nodes = delete_node_list(sequ->nodes);
   sequ->start = delete_node_ring(sequ->start);
