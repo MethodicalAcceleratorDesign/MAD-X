@@ -1862,8 +1862,6 @@ contains
       type(real_8),target :: oneTurnMap(6)
       real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: suml ! cumulative length along the ring
-      real(dp) :: rdp_zero ! float with zero (0)
-      real(dp) :: rdp_milion ! float with zero (0)
       real(dp) :: rdp_mmilion ! float with zero (0)
       real(dp) :: deltap ! float with zero (0)
       
@@ -1879,8 +1877,8 @@ contains
       call double_to_table( summary_table_name, 'eta_c ',      rdp_mmilion) ! associated phase-slip factor
       call double_to_table( summary_table_name, 'gamma_tr ',   rdp_mmilion) ! associated transition energy
 
-      call double_to_table( summary_table_name, 'q1 ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'q2 ', rdp_mmilion)
+      call double_to_table( summary_table_name, 'q1 ', tw%mu(1))
+      call double_to_table( summary_table_name, 'q2 ', tw%mu(2))
       call double_to_table( summary_table_name, 'dq1 ', rdp_mmilion)
       call double_to_table( summary_table_name, 'dq2 ', rdp_mmilion)
 
