@@ -78,6 +78,9 @@ include(setupArchSpecifics)
 
 if (MADX_ONLINE )
   message("Online Model turned on" )
+	if ( NOT MADX_STATIC )
+		message( WARNING "You might have problems finding the shared libraries for SDDS" )
+	endif ( NOT MADX_STATIC )
   set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_ONLINE ")
   set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_ONLINE ")
 endif (MADX_ONLINE )
@@ -85,6 +88,7 @@ endif (MADX_ONLINE )
 # OSX specifics:
 if (APPLE)
   set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
+	set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 endif (APPLE)
 
 
