@@ -1779,12 +1779,13 @@ contains
 
 
       !--moments--!
-      if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
-
-         if ( beta(3) .gt. zero ) then
+      if( (c_%npara==5)   ) then
+         
+         !print*, "c_%npara ",c_%npara, " c_%ndpt ", c_%ndpt
+         
+         if ( (beta(3) .gt. zero) .and. (c_%ndpt/=0) ) then
 
             !Option one: sigma(5) is sqrt of emittance as in other two dimensions
-
             !          print*, "Init X5 with betaz ", beta(3)
 
             if (c_%nd < 3) then !otherwise it was already done, to be cleaned cause it is ugly and bug prone
