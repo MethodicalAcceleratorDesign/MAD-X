@@ -288,6 +288,15 @@ contains
     !     if(.not.associated(EL%POS))allocate(EL%POS)
     !     EL%POS=1
     !    ENDIF
+    if(key%list%BEND_FRINGE) then
+       el%mag%p%bend_fringe=my_true
+       el%magp%p%bend_fringe=my_true
+    endif
+
+    if(el%mag%kind==kind4) then
+       el%mag%c4%CAVITY_TOTALPATH=key%list%CAVITY_TOTALPATH
+       el%magp%c4%CAVITY_TOTALPATH=key%list%CAVITY_TOTALPATH
+    endif
 
   end subroutine create_fibre
 

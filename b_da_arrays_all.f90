@@ -4,6 +4,7 @@
 
 module da_arrays
   use precision_constants
+  use my_own_1D_TPSA
   use scratch_size
   implicit none
   public

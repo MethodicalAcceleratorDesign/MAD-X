@@ -4,7 +4,7 @@ module S_status
   use s_frame
   USE S_extend_poly
   use anbn
-  use my_own_1D_TPSA
+  ! use my_own_1D_TPSA
   !  USE S_pol_user1
   !  USE S_pol_user2
   Use S_pol_sagan
@@ -1156,7 +1156,7 @@ CONTAINS
   END SUBROUTINE DTILTP_EXTERNAL
 
   SUBROUTINE dd_p   !(u,dd)    !valishev
-    use my_own_1D_TPSA
+    !use my_own_1D_TPSA
 
     ! Tracking subroutine for elliptical lens
     ! A.Valishev (valishev@fnal.gov) October 19, 2010

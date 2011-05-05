@@ -2502,7 +2502,7 @@ contains
     !    endif
 
 
-    IF((.not.EL%BEND_FRINGE).or.(.not.el%exact)) RETURN
+    IF(.not.EL%BEND_FRINGE) RETURN
     IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
@@ -2786,20 +2786,25 @@ contains
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ENDIF
 
-       X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
+       if(el%b0/=zero) then
+          X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
 
-       IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
+          IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
 
-          X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
-               & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
-       ENDIF
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+                  & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+          ENDIF
+       else
+          IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
+             CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          endif
+       endif
 
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
           IF(I==2) CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
        ENDIF
-
 
 
     ENDIF
@@ -2847,13 +2852,20 @@ contains
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ENDIF
 
-       X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
+       if(el%b0/=zero) then
+          X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
 
-       IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
+          IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
 
-          X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
-               & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
-       ENDIF
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+                  & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
+          ENDIF
+       else
+          IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
+             CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          endif
+       endif
+
 
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
@@ -2923,11 +2935,11 @@ contains
        endif
     ENDIF
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
   END SUBROUTINE KICKR
 
@@ -2988,11 +3000,11 @@ contains
        endif
     ENDIF
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
 
     CALL KILL(X1)
@@ -3448,10 +3460,10 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    !outvalishev    endif !valishev
 
   END SUBROUTINE GETMULB_SOLR
 
@@ -3482,10 +3494,10 @@ contains
        BBXTW=zero
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    !outvalishev    endif !valishev
 
     CALL KILL(X1,X3,BBYTW,BBXTW,BBYTWT)
 
@@ -4570,11 +4582,11 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
   END SUBROUTINE KICKKTKR
 
@@ -4627,11 +4639,11 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
 
     CALL KILL(X1)
@@ -5300,11 +5312,11 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
   END SUBROUTINE KICKTKT7R
 
@@ -5360,11 +5372,11 @@ contains
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
     X(4)=X(4)+YL*DIR*(BBXTW-EL%BN(2)*X(3))
 
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
 
     CALL KILL(X1)
@@ -9361,11 +9373,11 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
   END SUBROUTINE KICKEXR
 
@@ -9416,11 +9428,11 @@ contains
     IF(.NOT.EL%DRIFTKICK) THEN
        X(2)=X(2)+YL*DIR*EL%BN(1)
     ENDIF
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       X(2)=X(2)-YL*DIR*BBYTW !valishev
-       X(4)=X(4)+YL* DIR*BBXTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       X(2)=X(2)-YL*DIR*BBYTW !valishev
+    !outvalishev       X(4)=X(4)+YL* DIR*BBXTW !valishev
+    !outvalishev    endif !valishev
 
     CALL KILL(X1)
     CALL KILL(X3)

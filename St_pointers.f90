@@ -18,7 +18,7 @@ module pointer_lattice
   character(25) lat_name(81)
   real(dp) r_ap(2),x_ap,y_ap   ! default aperture
   integer :: kind_ap=2,file_ap=0                      ! Single aperture position and kind of aperture + file unit
-  character(nlp) name_ap
+  character(nlp) name_ap,namet(2)
   character(255) :: filename_ap = "Tracking.txt"
   integer last_npara
   integer :: i_layout=1, i_layout_t=1
@@ -143,8 +143,8 @@ contains
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
-    real(dp), allocatable :: an(:),bn(:)
-    integer icnmin,icnmax,n_ac
+    real(dp), allocatable :: an(:),bn(:),n_co(:)
+    integer icnmin,icnmax,n_ac,n_coeff
     logical :: log_estate=.true.
 
     if(log_estate) then
@@ -250,10 +250,20 @@ contains
           my_default=my_OLD_state
           my_estate=>my_OLD_state
           ! Orbit stuff
+       case('SETORBITRESTORE')
+          read(mf,*) restore_mag,restore_magp
        case('SETORBITPHASOR')
           read(mf,*) xsm%ac%x(1:2)
+          xsm0%ac%x(1:2)=xsm%ac%x(1:2)
+          ptc_node_old=-1
        case('SETORBITPHASORFREQUENCY')
           read(mf,*) xsm%ac%om
+          xsm0%ac%om=xsm%ac%om
+          ptc_node_old=-1
+       case('SETORBITPHASORTIME')
+          read(mf,*) xsm%ac%t
+          xsm0%ac%t=xsm%ac%t
+          ptc_node_old=-1
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
        case('PUTORBITSTATE','USEORBITSTATE')
@@ -386,6 +396,10 @@ contains
           my_estate=my_estate+RADIATION0
        case('-RADIATION')
           my_estate=my_estate-RADIATION0
+       case('+MODULATION')
+          my_estate=my_estate+MODULATION0
+       case('-MODULATION')
+          my_estate=my_estate-MODULATION0
           !  case('+EXACTMIS')
           !     my_estate=my_estate+EXACTMIS0
           !  case('-EXACTMIS')
@@ -773,7 +787,7 @@ contains
              N_NAME=len_trim(name)
           ENDIF
           READ(MF,*)  DC_ac,A_ac,theta_ac
-          READ(MF,*)  D_ac,n_ac
+          READ(MF,*)  D_ac,n_ac,n_coeff
           i2=0
           if(n_ac>0) then        !n_ac>0
              allocate(an(n_ac))
@@ -787,6 +801,11 @@ contains
                 an(i1)=dtu(2)
                 bn(i1)=dtu(1)
              enddo
+          endif                  !n_ac>0
+          if(n_coeff>0) then        !n_ac>0
+             allocate(n_co(n_coeff))
+             n_co=zero
+             read(mf,*) n_co
           endif                  !n_ac>0
           p=>my_ering%start
           do ii=1,my_ering%N
@@ -834,12 +853,35 @@ contains
                    allocate(P%MAG%d_bn(p%mag%p%nmul))
                    allocate(P%MAGp%d_an(p%mag%p%nmul))
                    allocate(P%MAGp%d_bn(p%mag%p%nmul))
+                   allocate(P%MAG%d0_an(p%mag%p%nmul))
+                   allocate(P%MAG%d0_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_bn(p%mag%p%nmul))
+                   if(n_coeff/=0) then
+                      allocate(P%MAG%d_coeff(n_coeff))
+                      allocate(P%MAGp%d_coeff(n_coeff))
+                   endif
 
                    P%MAG%d_an=zero
                    P%MAG%d_bn=zero
 
                    call alloc(P%MAGp%d_an,p%mag%p%nmul)
                    call alloc(P%MAGp%d_bn,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_bn,p%mag%p%nmul)
+                   do i1=1,p%mag%p%nmul
+                      P%MAG%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAG%d0_an(i1)=P%MAG%an(i1)
+                      P%MAGp%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAGp%d0_an(i1)=P%MAG%an(i1)
+                   enddo
+                   if(n_coeff/=0) then
+                      call alloc(P%MAGp%d_coeff,n_coeff)
+                      do i1=1,n_coeff
+                         P%MAG%d_coeff(i1)= n_co(i1)
+                         P%MAGp%d_coeff(i1)= n_co(i1)
+                      enddo
+                   endif
 
                    do i1=1,n_ac
                       P%MAG%d_an(i1) =an(i1)
@@ -877,6 +919,10 @@ contains
 
           if(n_ac>0) then
              deallocate(an,bn)
+          endif
+
+          if(n_coeff>0) then
+             deallocate(n_co)
           endif
 
        case('SETAPERTURE')
@@ -1054,6 +1100,12 @@ contains
           read(mf,*) targ_tune
           if(targ_tune(1)<=zero) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
+       case('FITTUNEAUTO')
+          read(mf,*) epsf
+          read(mf,*) targ_tune
+          read(mf,*) namet(1), namet(2)
+          if(targ_tune(1)<=zero) targ_tune=tune(1:2)
+          call lattice_fit_TUNE_gmap_auto(my_ering,my_estate,EPSF,targ_tune,namet)
        case('FITTUNECOUPLING')
           read(mf,*) epsf
           read(mf,*) targ_tune
@@ -1615,7 +1667,18 @@ contains
              endif
           endif
           CALL radia(my_ering,POS,FILENAME,fileTUNE,my_estate)
-
+       case('NEWEQUILIBRIUMSIZES')
+          READ(MF,*) POS,FILENAME, i1,NAME
+          call context(name)
+          if(name(1:11)/='NONAMEGIVEN') then
+             posr=pos
+             call move_to( my_ering,p,name,posR,POS)
+             if(pos==0) then
+                write(6,*) name, " not found "
+                stop
+             endif
+          endif
+          call radia_new(my_ering,POS,i1,FILENAME,my_estate)
        case('SPECIALALEX')
           READ(MF,*) I1
           READ(MF,*) targ_tune(1:2),sc
@@ -2322,6 +2385,111 @@ contains
     endif
 
   end subroutine radia
+
+  SUBROUTINE radia_new(R,loc,i1,FILE1,estate)
+    implicit none
+    TYPE(LAYOUT) R
+
+    REAL(DP) X(6),m,energy,deltap
+    CHARACTER(*) FILE1
+    type(normal_spin) normal
+    integer  i,j ,i1
+    TYPE(damapspin) ID
+    TYPE(INTERNAL_STATE) state
+    TYPE(INTERNAL_STATE), target :: estate
+    integer loc,mf1
+    type(fibre), pointer :: p
+    type(probe) xs0
+    type(probe_8) xs
+
+    call kanalnummer(mf1)
+    open(mf1,file=FILE1)
+
+
+
+
+    state=(estate-nocavity0)+radiation0
+    x=0.d0
+
+    CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
+    WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
+    write(6,*) x
+
+
+
+
+    call GET_loss(r,energy,deltap)
+
+    write(6,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+
+    write(mf1,*) " stable closed orbit tracked "
+    write(mf1,"(6(1X,D18.11))") x
+    write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+
+    CALL INIT(state,1,0)
+    CALL ALLOC(NORMAL)
+    CALL ALLOC(ID)
+    if(i1==1) normal%stochastic=my_true
+    xs0=x
+    ID=1
+    xs=XS0+ID
+
+    state=state+envelope0
+
+    CALL TRACK_PROBE(r,xs,state, fibre1=loc)
+
+    id=xs
+    normal=id
+    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    write(mf1,*)" Tunes "
+    write(mf1,*) normal%tune
+    write(mf1,*)" Damping "
+    write(mf1,*) normal%damping
+    write(mf1,*)" Emittances "
+    write(mf1,*) normal%emittance
+    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    write(mf1,*)"   "
+
+    write(mf1,*)" Equilibrium Beam Sizes "
+    do i=1,6
+       do j=1,6
+          write(mf1,*) i,j,normal%s_ij0(i,j)
+       enddo
+    enddo
+    write(mf1,*)" Equilibrium Phasor Sizes "
+    do i=1,6
+       do j=1,6
+          write(mf1,*) i,j,normal%s_ijr(i,j)
+       enddo
+    enddo
+
+    if(normal%stochastic) then
+       write(mf1,*) "Stochastic kicks"
+       write(mf1,*) normal%kick
+
+       write(mf1,*)" Stochastic Transformation "
+       do i=1,6
+          do j=1,6
+             write(mf1,*) i,j,normal%STOCH(i,j)
+          enddo
+       enddo
+
+       write(mf1,*)" Inverse Stochastic Transformation "
+       do i=1,6
+          do j=1,6
+             write(mf1,*) i,j,normal%STOCH_inv(i,j)
+          enddo
+       enddo
+
+    endif
+
+    close(mf1)
+
+    CALL KILL(NORMAL)
+    CALL KILL(ID)
+
+
+  end subroutine radia_new
 
   subroutine Universe_max_n(n)
     !use build_lattice

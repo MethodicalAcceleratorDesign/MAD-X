@@ -770,12 +770,15 @@ contains
   SUBROUTINE  DAPRINTTAYLORS(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
-    type (TAYLOR),INTENT(IN)::S1(NDIM2)
+    type (TAYLOR),INTENT(IN)::S1(:)
     REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
     INTEGER I
 
-    DO I=1,ND2
-       CALL PRI(s1(i),MFILE,DEPS)
+    DO I=1,size(S1)
+       if(s1(i)%i>0) then
+          if(size(S1)>1) write(MFILE,*) "Taylor #",i
+          CALL PRI(s1(i),MFILE,DEPS)
+       endif
     ENDDO
   END SUBROUTINE DAPRINTTAYLORS
 

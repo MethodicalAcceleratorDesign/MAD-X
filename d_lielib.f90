@@ -6,7 +6,7 @@
 
 module lielib_yang_berz
   use dabnew
-  use precision_constants
+  !  use precision_constants
   implicit none
   public
   !  private
@@ -24,7 +24,7 @@ module lielib_yang_berz
   private dapokzer,davar0,taked,daread,daprid,daflo,daflod,fexpo,etcom,etpoi
   private exp1d,expnd2,liefact,mapnorm,orderflo,nuanaflo,h2pluflo,rotflo,rotiflo
   private ctord,rtocd,resvec,reelflo,midbflo,mulnd2,movearou,movemul,cpart
-  private ctoi,itoc,etrtc,etctr,etcjg,ety,etyt,ety2,etdiv,sympl3  !,flip
+  private ctoi,itoc,etrtc,etctr,etcjg,etdiv,sympl3,ety,etyt,ety2  !,flip
   integer,public,parameter::ndim=4,nreso=100
   integer,public::no,nv,nd,nd2,ndpt
   integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres !,idpr
@@ -2814,7 +2814,6 @@ contains
        w_p%nc=1
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)= 'Check of the symplectic condition on the linear part'
-       write(6,*) 'Check of the symplectic condition on the linear part'
        !CALL !WRITE_a
        xsu=zero
        do i=1,nd2
@@ -2833,7 +2832,7 @@ contains
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
-       write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
+       !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
        write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
@@ -2862,6 +2861,7 @@ contains
        w_p%nc=3
        w_p%fc='(2(1X,A120,/),(1X,A120))'
        w_p%c(2)= '       Index         Real Part         ArcSin(Imaginary Part)/2/pi'
+       write(6,w_p%fc) w_p%c(2)
        !CALL !WRITE_a
        do i=1,nd-ndc
           rd1=SQRT(rr(2*i-1)**2+ri(2*i-1)**2)
@@ -2877,7 +2877,8 @@ contains
        w_p=0
        w_p%nc=1
        w_p%fc='((1X,A120))'
-       write(w_p%c(1),'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
+       !      write(w_p%c(1),'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
+       write(6,'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
        !CALL !WRITE_a
        call read(n,nd-ndc)
     elseif(lielib_print(8)==-1) then
@@ -2958,11 +2959,11 @@ contains
        if(courant_snyder) call mulnd2(s1,sai)
        ! sa is now uniquely and unambigeously determined.
     endif
-    do i=1,nd2
-       do l=1,nd2
-          sa(i,l)=sai(i,l)
-       enddo
-    enddo
+    !  do i=1,nd2
+    !     do l=1,nd2
+    !        sa(i,l)=sai(i,l)
+    !     enddo
+    !  enddo
     call matinv(sai,sa,nd2,ndim2,ier)
 
     call mulnd2(sai,cm)
@@ -4394,5 +4395,573 @@ contains
     enddo
     return
   end subroutine sympl3
+
+  subroutine diagonalise_envelope_a(b,br,a,ai,kick)
+    implicit none
+
+
+    integer i,j
+    real(dp) a(6,6),ai(6,6),b(6,6)
+
+    real(dp) xj(6,6),mj(6,6),xn,jb(6,6),kick(3),br(6,6)
+
+
+
+    xj=0.0_dp
+
+    do i=1,3
+       xj(2*i,2*i-1)=-one
+       xj(2*i-1,2*i)=one
+    enddo
+
+
+    jb=matmul(xj,b)
+    xn=30.0_dp*mat_norm(jb)
+    jb=jb/xn
+
+    !    mj=0.0_dp
+    !    xj=0.0_dp
+    !    do i=1,6
+    !     xj(i,i)=one
+    !    enddo
+
+    !    mj=xj+matmul(xj,jb)
+
+    call mapflol6s(a,ai,br,jb)
+
+
+    do i=1,3
+       kick(i)=sqrt(abs(br(2*i-1,2*i)*xn))
+    enddo
+
+
+
+  end subroutine diagonalise_envelope_a
+
+  subroutine mapflol6s(sa,sai,cr,cm)
+    implicit none
+    !---- FROM TRACKING CODE
+    ! ---------------------
+    integer, parameter :: ndimt=3,ndimt2=6
+    integer i,ier,iunst,j,l,n1,n(ndimt)
+    real(dp) ap,ax,rd,rd1,xd,xsu
+    real(dp),dimension(ndimt2,ndimt2)::cr,xj,sa,sai,cm,w,vr,vi,s1
+    real(dp),dimension(ndimt)::x,xx,st
+    real(dp),dimension(ndimt2)::rr,ri,p
+    logical hyp
+    if(.not.c_%stable_da) return
+
+    n1=0
+    !     frank/etienne
+    do i=1,ndimt2
+       do j=1,ndimt2
+          cr(j,i)=cm(i,j)
+       enddo
+    enddo
+    xj=zero
+    s1=zero
+
+    !     frank/etienne
+    do i=1,ndimt
+       n(i)=0
+       xj(2*i-1,2*i)=one
+       xj(2*i,2*i-1)=-one
+    enddo
+    !     frank/etienne
+
+
+    sai=zero
+    w=cm
+
+    w=matmul(xj,w)
+    w=matmul(cr,w)
+
+    !    call mulnd2(xj,w)
+    !    call mulnd2(cr,w)
+
+    call eig6s(cr,rr,ri,vr,vi)
+
+    do i=1,6
+       write(6,*) rr(i),ri(i)
+    enddo
+
+
+    do i=1,ndimt
+       n(i)=2*i-1
+       st(i)=one
+    enddo
+    !    elseif(idpr.eq.-101.or.idpr.eq.-102) then
+
+    iunst=0
+    do i=1,ndimt                 ! Frank NDC  kept
+       x(i)=zero
+       xx(i)=one
+       do j=1,ndimt
+          x(i)=vr(2*j-1,n(i))*vi(2*j,n(i))-vr(2*j,n(i))*vi(2*j-1,n(i))+x(i)
+       enddo
+    enddo
+
+    do i=1,ndimt
+       if(x(i).lt.zero) xx(i)=-one
+       x(i)=SQRT(abs(x(i)))
+    enddo
+    do i=1,ndimt2
+       do j=1,ndimt
+          sai(2*j-1,i)=vr(i,n(j))*xx(j)/x(j)
+          sai(2*j,i)=vi(i,n(j))/x(j)
+       enddo
+    enddo
+    !    if(idpr.eq.-101.or.idpr.eq.-102) then
+    call movearous(sai)
+    !    endif
+    ! adjust sa such that sa(1,2)=0 and sa(3,4)=zero (courant-snyder-edwards-teng
+    ! phase advances)
+    ! sa=sai
+
+
+    call matinv(sai,sa,ndimt2,ndimt2,ier)
+
+    !    call mulnd2(sai,cm)
+    cm=matmul(sai,cm)
+    cr=sa
+
+
+    cr=matmul(cm,cr)
+
+    !  call mulnd2(cm,cr)
+
+    return
+  end subroutine mapflol6s
+
+  subroutine eig6s(fm,reval,aieval,revec,aievec)
+    implicit none
+    !**************************************************************************
+
+    !  Diagonalization routines of NERI
+
+    !ccccccccccccccccc
+    !
+    !  this routine finds the eigenvalues and eigenvectors
+    !  of the full matrix fm.
+    !  the eigenvectors are normalized so that the real and
+    !  imaginary part of vectors 1, 3, and 5 have +1 antisymmetric
+    !  product:
+    !      revec1 J aivec1 = 1 ; revec3 J aivec3 = 1 ;
+    !      revec5 J aivec5 = one
+    !  the eigenvectors 2 ,4, and 6 have the opposite normalization.
+    !  written by F. Neri, Feb 26 1986.
+    !
+    integer, parameter :: ndimt=3,ndimt2=6
+    integer jet,nn,i,i1,ilo,ihi,mdim,info
+    real(dp),dimension(ndimt2)::reval,aieval,ort
+    real(dp),dimension(ndimt2,ndimt2)::revec,aievec,fm,aa,vv
+    INTEGER IPAUSE,MYPAUSES
+    if(.not.c_%stable_da) return
+
+    !  copy matrix to temporary storage (the matrix aa is destroyed)
+    do i=1,ndimt2
+       do i1=1,ndimt2
+          aa(i1,i) = fm(i1,i)
+       enddo
+    enddo
+    ilo = 1
+    ihi = ndimt2
+    mdim = ndimt2
+    nn = ndimt2
+    !  compute eigenvalues and eigenvectors using double
+    !  precision Eispack routines:
+    call ety(mdim,nn,ilo,ihi,aa,ort)
+    call etyt(mdim,nn,ilo,ihi,aa,ort,vv)
+    call ety2(mdim,nn,ilo,ihi,aa,reval,aieval,vv,info)
+
+
+    !      call neigv(vv,pbkt)
+    do i=1,ndimt
+       do jet=1,ndimt2
+          revec(jet,2*i-1)=vv(jet,2*i-1)
+          revec(jet,2*i)=vv(jet,2*i-1)
+          aievec(jet,2*i-1)=vv(jet,2*i)
+          aievec(jet,2*i)=-vv(jet,2*i)
+       enddo
+    enddo
+    do i=1,ndimt2
+       if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
+          w_p=0
+          w_p%nc=1
+          w_p%fc='((1X,A120))'
+          w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
+          if(lielib_print(4)==1) then
+             !CALL !WRITE_a
+             write(6,*) sqrt(reval(i)**2+aieval(i)**2)
+          endif
+       endif
+    enddo
+    return
+  end subroutine eig6s
+
+  subroutine movearous(rt)
+    implicit none
+    !      integer ipause, mypause
+    integer, parameter :: ndimt=3,ndimt2=6
+    integer i,ic,j
+    real(dp) xr,xrold
+    real(dp),dimension(ndimt2,ndimt2)::rt,rto,s
+    real(dp),dimension(ndimt2,ndimt2):: xt,yt,zt,xy,xz,yz
+    real(dp),dimension(ndimt2,ndimt2):: xyz,xzy,xyt,yxt,yzt,zyt,xzt,zxt
+    real(dp),dimension(ndimt2,ndimt2):: xyzt,xytz,xzyt,xzty,xtzy,xtyz
+
+    if(.not.c_%stable_da) return
+
+    do i=1,ndimt2
+       do j=1,ndimt2
+          s(i,j)=zero
+          s(i,i)=one
+       enddo
+    enddo
+    xt=zero;yt=zero;zt=zero;xy=zero;xz=zero;yz=zero;
+    xyzt=zero;xytz=zero;xzyt=zero;xzty=zero;xtzy=zero;xtyz=zero;
+    xyz=zero;xzy=zero;xyt=zero;yxt=zero;yzt=zero;zyt=zero;xzt=zero;zxt=zero;
+
+    do i=0,1
+
+       xy(1+i,3+i)=one
+       xy(3+i,1+i)=one
+       xy(5+i,5+i)=one
+       !  xy(7+i,7+i)=one
+
+       xz(1+i,5+i)=one
+       xz(5+i,1+i)=one
+       xz(3+i,3+i)=one
+       !  xz(7+i,7+i)=one
+
+       !   xt(1+i,7+i)=one
+       !   xt(7+i,1+i)=one
+       xt(3+i,3+i)=one
+       xt(5+i,5+i)=one
+
+       yz(3+i,5+i)=one
+       yz(5+i,3+i)=one
+       yz(1+i,1+i)=one
+       !   yz(7+i,7+i)=one
+
+       !   yt(3+i,7+i)=one
+       !   yt(7+i,3+i)=one
+       yt(1+i,1+i)=one
+       yt(5+i,5+i)=one
+
+       !   zt(5+i,7+i)=one
+       !   zt(7+i,5+i)=one
+       zt(1+i,1+i)=one
+       zt(3+i,3+i)=one
+
+       xyz(1+i,3+i)=one
+       xyz(3+i,5+i)=one
+       xyz(5+i,1+i)=one
+       !   xyz(7+i,7+i)=one
+
+       xyz(1+i,3+i)=one
+       xyz(3+i,5+i)=one
+       xyz(5+i,1+i)=one
+       !   xyz(7+i,7+i)=one
+
+       xzy(1+i,5+i)=one
+       xzy(5+i,3+i)=one
+       xzy(3+i,1+i)=one
+       !   xzy(7+i,7+i)=one
+
+       xyt(1+i,3+i)=one
+       !  xyt(3+i,7+i)=one
+       !   xyt(7+i,1+i)=one
+       xyt(5+i,5+i)=one
+
+       yxt(3+i,1+i)=one
+       !   yxt(1+i,7+i)=one
+       !   yxt(7+i,3+i)=one
+       yxt(5+i,5+i)=one
+
+       yzt(3+i,5+i)=one
+       !   yzt(5+i,7+i)=one
+       !   yzt(7+i,3+i)=one
+       yzt(1+i,1+i)=one
+
+       zyt(5+i,3+i)=one
+       !   zyt(3+i,7+i)=one
+       !   zyt(7+i,5+i)=one
+       zyt(1+i,1+i)=one
+
+       xzt(1+i,5+i)=one
+       !    xzt(5+i,7+i)=one
+       !    xzt(7+i,1+i)=one
+       xzt(3+i,3+i)=one
+
+       zxt(5+i,1+i)=one
+       !    zxt(1+i,7+i)=one
+       !    zxt(7+i,5+i)=one
+       zxt(3+i,3+i)=one
+
+       xyzt(1+i,3+i)=one
+       xyzt(3+i,5+i)=one
+       !   xyzt(5+i,7+i)=one
+       !   xyzt(7+i,1+i)=one
+
+       xytz(1+i,3+i)=one
+       !   xytz(3+i,7+i)=one
+       !   xytz(7+i,5+i)=one
+       xytz(5+i,1+i)=one
+
+       xzyt(1+i,5+i)=one
+       xzyt(5+i,3+i)=one
+       !   xzyt(3+i,7+i)=one
+       !   xzyt(7+i,1+i)=one
+
+       xzty(1+i,5+i)=one
+       !   xzty(5+i,7+i)=one
+       !   xzty(7+i,3+i)=one
+       xzty(3+i,1+i)=one
+
+       !  xtzy(1+i,7+i)=one
+       !  xtzy(7+i,5+i)=one
+       xtzy(5+i,3+i)=one
+       xtzy(3+i,1+i)=one
+
+       !  xtyz(1+i,7+i)=one
+       !  xtyz(7+i,3+i)=one
+       xtyz(3+i,5+i)=one
+       xtyz(5+i,1+i)=one
+    enddo
+
+    !do i=1,8
+    !write(6,100) (rt(i,j),j=1,8)
+    !enddo
+    !write(6,*) " "
+    !100  FORMAT(8(1x, E12.6))
+
+    ic=0
+    xrold=c_1d9
+    call movemuls(rt,s,rto,xr)
+
+    if(xr.lt.xrold) then
+       xrold=xr
+    endif
+
+    if(ndimt>=2) then
+       call movemuls(rt,xy,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=1
+       endif
+    endif
+
+    if(ndimt>=3) then
+       call movemuls(rt,xz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=2
+       endif
+       call movemuls(rt,yz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=3
+       endif
+       call movemuls(rt,xyz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=4
+       endif
+       call movemuls(rt,xzy,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=5
+       endif
+    endif
+
+    if(ndimt.eq.4) then
+       call movemuls(rt,xt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=6
+       endif
+       call movemuls(rt,yt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=7
+       endif
+       call movemuls(rt,zt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=8
+       endif
+
+       call movemuls(rt,xyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=9
+       endif
+       call movemuls(rt,yxt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=10
+       endif
+       call movemuls(rt,yzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=11
+
+       endif
+       call movemuls(rt,zyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=12
+       endif
+       call movemuls(rt,xzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=13
+       endif
+       call movemuls(rt,zxt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=14
+       endif
+       call movemuls(rt,xyzt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=15
+       endif
+       call movemuls(rt,xytz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=16
+       endif
+       call movemuls(rt,xzyt,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=17
+       endif
+       call movemuls(rt,xzty,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=18
+       endif
+       call movemuls(rt,xtzy,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=19
+       endif
+       call movemuls(rt,xtyz,rto,xr)
+       if(xr.lt.xrold) then
+          xrold=xr
+          ic=20
+       endif
+    endif
+
+
+    w_p=0
+    i=0
+    if(ic.eq.0) then
+       call movemuls(rt,s,rto,xr)
+       i=i+1
+       w_p%c(i)=  " no exchanged"
+    elseif(ic.eq.1) then
+       call movemuls(rt,xy,rto,xr)
+       i=i+1
+       w_p%c(i)=  " x-y exchanged"
+    elseif(ic.eq.2) then
+       call movemuls(rt,xz,rto,xr)
+       i=i+1
+       w_p%c(i)=  " x-z exchanged"
+    elseif(ic.eq.3) then
+       call movemuls(rt,yz,rto,xr)
+       i=i+1
+       w_p%c(i)= " y-z exchanged"
+    elseif(ic.eq.4) then
+       call movemuls(rt,xyz,rto,xr)
+       i=i+1
+       w_p%c(i)=  " x-y-z permuted"
+    elseif(ic.eq.5) then
+       call movemuls(rt,xzy,rto,xr)
+       i=i+1
+       w_p%c(i)=  " x-z-y permuted"
+    elseif(ic.eq.6) then
+       call movemuls(rt,xt,rto,xr)
+    elseif(ic.eq.7) then
+       call movemuls(rt,yt,rto,xr)
+    elseif(ic.eq.8) then
+       call movemuls(rt,zt,rto,xr)
+    elseif(ic.eq.9) then
+       call movemuls(rt,xyt,rto,xr)
+    elseif(ic.eq.10) then
+       call movemuls(rt,yxt,rto,xr)
+    elseif(ic.eq.11) then
+       call movemuls(rt,yzt,rto,xr)
+    elseif(ic.eq.12) then
+       call movemuls(rt,zyt,rto,xr)
+    elseif(ic.eq.13) then
+       call movemuls(rt,xzt,rto,xr)
+    elseif(ic.eq.14) then
+       call movemuls(rt,zxt,rto,xr)
+    elseif(ic.eq.15) then
+       call movemuls(rt,xyzt,rto,xr)
+    elseif(ic.eq.16) then
+       call movemuls(rt,xytz,rto,xr)
+    elseif(ic.eq.17) then
+       call movemuls(rt,xzyt,rto,xr)
+    elseif(ic.eq.18) then
+       call movemuls(rt,xzty,rto,xr)
+    elseif(ic.eq.19) then
+       call movemuls(rt,xtzy,rto,xr)
+    elseif(ic.eq.20) then
+       call movemuls(rt,xtyz,rto,xr)
+    endif
+
+
+
+
+
+    do i=1,ndimt2
+       do j=1,ndimt2
+          rt(i,j)=rto(i,j)
+       enddo
+    enddo
+
+    return
+  end subroutine movearous
+
+  subroutine movemuls(rt,xy,rto,xr)
+    implicit none
+    integer, parameter :: ndimt=3,ndimt2=6
+    integer i,j,k
+    real(dp) xr
+    real(dp),dimension(ndimt2,ndimt2)::rt,xy,rto
+    if(.not.c_%stable_da) return
+
+    do i=1,ndimt2
+       do j=1,ndimt2
+          rto(i,j)=zero
+       enddo
+    enddo
+
+    do  i=1,ndimt2
+       do  j=1,ndimt2
+          do  k=1,ndimt2
+             rto(i,k)=xy(i,j)*rt(j,k)+rto(i,k)
+          enddo
+       enddo
+    enddo
+
+    xr=zero
+    do i=1,ndimt2
+       do j=1,ndimt2
+          xr=xr+abs(rto(i,j))
+       enddo
+    enddo
+    do i=1,ndimt
+       xr=xr-abs(rto(2*i-1,2*i-1))
+       xr=xr-abs(rto(2*i-1,2*i))
+       xr=xr-abs(rto(2*i,2*i))
+       xr=xr-abs(rto(2*i,2*i-1))
+    enddo
+    return
+  end subroutine movemuls
 
 end module lielib_yang_berz

@@ -191,7 +191,7 @@ module precision_constants
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(11)
-  DATA lielib_print /0,0,0,0,0,1,0,0,0,0,0/
+  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   INTEGER, target :: SECTOR_NMUL = 4
   logical(lp) :: change_sector=my_true
@@ -337,6 +337,20 @@ module precision_constants
 
 contains
 
+  function mat_norm(m)
+    implicit none
+    real(dp) mat_norm
+    real(dp) m(:,:)
+    integer i,j
+
+    mat_norm=0.0_dp
+    do i=1,size(m,dim=1)
+       do j=1,size(m,dim=2)
+          mat_norm=mat_norm+abs(m(i,j))
+       enddo
+    enddo
+
+  end function mat_norm
 
   SUBROUTINE  check_stability(S1)
     implicit none
@@ -813,7 +827,7 @@ end module file_handler
 module my_own_1D_TPSA
   USE precision_constants
   implicit none
-  public
+  !  public
   private input_real_in_my_1D_taylor
   integer :: n_tpsa_exp = 10
   integer, parameter :: N_my_1D_taylor=31  ! SHOULD BE AS ENGE_N

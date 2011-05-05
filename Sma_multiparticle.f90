@@ -16,8 +16,7 @@ module ptc_multiparticle
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
   PRIVATE MODULATE_R,MODULATE_P
   PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
-
-  LOGICAL(lp) :: ALLOW_MODULATION=.true.
+  !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
   logical(lp),private, parameter :: aperture_all_case0=.false.
@@ -94,6 +93,7 @@ CONTAINS
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELp
     REAL(DP) v,dv
+    real(dp) a0,a1,b0,g,t0,t1,val,beta0
 
 
     EL=>C%PARENT_FIBRE%MAG
@@ -103,11 +103,32 @@ CONTAINS
        DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
        V=EL%DC_ac+EL%A_ac*DV
        DV=el%D_ac*DV
+       if(associated(el%d_coeff)) then
+          beta0=one
+          if(k%time) beta0=c%parent_fibre%beta0
+          t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+          t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+          a0=el%d_coeff(3)
+          a1=el%d_coeff(4)
+          if(xs%ac%t>=t0.and. xs%ac%t<t1) then
+             g=(a1-a0)/(t1-t0)
+             b0=a0-g*t0
+             val=b0+g*xs%ac%t
+             dv=dv+val
+          else
+             dv=a1
+          endif
+       endif
     else
        V=EL%DC_ac
        DV=zero
     endif
-    call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
+
+    !    IF(OLD_MOD) THEN
+    !     call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
+    !    ELSE
+    CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
+    !    ENDIF
 
   END   SUBROUTINE MODULATE_R
 
@@ -119,6 +140,7 @@ CONTAINS
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELP
     TYPE(REAL_8) V,DV
+    real(dp) a0,a1,b0,g,t0,t1,val,beta0
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
@@ -130,12 +152,32 @@ CONTAINS
        DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
        V=ELP%DC_ac+ELP%A_ac*DV
        DV=elp%D_ac*DV
+       if(associated(el%d_coeff)) then
+          beta0=one
+          if(k%time) beta0=c%parent_fibre%beta0
+          t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+          t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+          a0=el%d_coeff(3)
+          a1=el%d_coeff(4)
+          if(xs%ac%t>=t0.and. xs%ac%t<t1) then
+             g=(a1-a0)/(t1-t0)
+             b0=a0-g*t0
+             val=b0+g*xs%ac%t
+             dv=dv+val
+          else
+             dv=a1
+          endif
+       endif
     else
        V=elp%DC_ac
        DV=zero
     endif
 
-    call transfer_ANBN(EL,ELP,2,VP=V,DVP=DV)
+    !        IF(OLD_MOD) THEN
+    !          call transfer_ANBN(EL,ELP,2,VP=V,DVP=DV)
+    !        ELSE
+    CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
+    !        ENDIF
     CALL KILL(V)
     CALL KILL(DV)
 
@@ -152,6 +194,7 @@ CONTAINS
 
     if(k%time) then
        beta0=>C%PARENT_FIBRE%beta0
+       xs%ac%t=c%DS_AC/beta0+xs%ac%t
        xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
        XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
        XS%AC%X(1) = xt
@@ -159,6 +202,7 @@ CONTAINS
        xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
        XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
        XS%AC%X(1) = xt
+       xs%ac%t=c%DS_AC+xs%ac%t
     endif
 
   END   SUBROUTINE TRACK_MODULATION_R
@@ -175,6 +219,7 @@ CONTAINS
 
     if(k%time) then
        beta0=>C%PARENT_FIBRE%beta0
+       xs%ac%t=c%DS_AC/beta0+xs%ac%t
        xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
        XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
        XS%AC%X(1) = xt
@@ -182,6 +227,7 @@ CONTAINS
        xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
        XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
        XS%AC%X(1) = xt
+       xs%ac%t=c%DS_AC+xs%ac%t
     endif
 
     CALL KILL(XT)

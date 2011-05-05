@@ -1103,7 +1103,7 @@ CONTAINS
     !    call check(s1)
     call ass(datanht)
 
-    datanht=log(sqrt(1+s1)/sqrt(1-s1))
+    datanht=log((1+s1)/sqrt(1-s1))/two
 
     master=localmaster
 

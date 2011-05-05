@@ -144,7 +144,7 @@ CONTAINS
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
     !    integer get_option
     integer double_from_table
-    integer restart_sequ,advance_node,n_ferr,node_fd_errors
+    integer restart_sequ,advance_node,n_ferr,node_fd_errors,no_cavity_totalpath
     integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
     real(dp) f_errors(0:maxferr),aperture(maxnaper),normal(0:maxmul)
@@ -835,6 +835,8 @@ CONTAINS
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
+       no_cavity_totalpath=abs(node_value('no_cavity_totalpath ').eq.0)
+       key%list%cavity_totalpath=no_cavity_totalpath
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"

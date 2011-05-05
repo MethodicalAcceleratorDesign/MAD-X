@@ -5,16 +5,19 @@ module S_fitting_new
   USE ptc_spin
   IMPLICIT NONE
   public
-  integer m_turn
+  integer:: m_turn,m_skip=0
   integer :: with_c=1
   TYPE fibre_monitor_data
      type(fibre), pointer :: p    ! fibre location
      integer, pointer ::  turn,kind  ! kind=1 x, kind = 2 y
+     real(dp), pointer :: bpm(:,:)  ! store fake experiment from alex_track_monitors
      real(dp), pointer :: r(:,:)  ! store fake experiment from alex_track_monitors
      real(dp), pointer :: xf(:,:)  ! real data put here
+     real(dp), pointer :: xn(:,:)  ! real data put here
      real(dp), pointer :: mom(:,:)
      real(dp), pointer :: A(:,:)
      real(dp), pointer :: At(:,:)
+     logical full
   END TYPE fibre_monitor_data
 
   TYPE(fibre_monitor_data), allocatable :: monitors(:)
@@ -1041,11 +1044,15 @@ contains
 
        call track(y,state,p1,monitors(1)%p)
        monitors(1)%r(1:4,i)=x(1:4)-y(1:4)
+       monitors(1)%bpm(1,i)=monitors(1)%r(1,i)
+       monitors(1)%bpm(2,i)=monitors(1)%r(3,i)
 
        do j=1,nm-1
           call track(x,state,monitors(j)%p,monitors(j+1)%p)
           call track(y,state,monitors(j)%p,monitors(j+1)%p)
           monitors(j+1)%r(1:4,i)=x(1:4)-y(1:4)
+          monitors(j+1)%bpm(1,i)=monitors(j)%r(1,i)
+          monitors(j+1)%bpm(2,i)=monitors(j)%r(3,i)
 
        enddo
        call track(x,state,monitors(nm)%p,p1)
@@ -1153,7 +1160,7 @@ contains
     implicit none
     integer nturn,i,j,nm,k,jm,nt
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
-    real(dp)ar
+    real(dp)ar, momt(6,6),kick(3),a6(6,6),ai6(6,6),br(6,6)
     type(damap) id,m12,ex
     type(pbfield) h
     type(normalform) norm
@@ -1189,31 +1196,65 @@ contains
        enddo
     enddo
 
+    i=0
 
-    h%h=zero
+    if(i==0) then
 
-    do i=1,2
-       do j=1,2
-          if(with_c==0.and.i/=j) cycle
-          h%h=h%h + mom(2*i-1,2*j-1)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j))
-          h%h=h%h + mom(2*i,2*j)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j-1))
-          h%h=h%h - mom(2*i,2*j-1)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j))
-          h%h=h%h - mom(2*i-1,2*j)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j-1))
+       momt=0.0_dp
+       do i=1,2
+          do j=1,2
+             if(with_c==0.and.i/=j) cycle
+             ! momt(2*i-1,2*j-1)=mom(2*i-1,2*j-1)
+             ! momt(2*i-1,2*j)=mom(2*i-1,2*j)
+             ! momt(2*i,2*j-1)=mom(2*i,2*j-1)
+             ! momt(2*i,2*j)=mom(2*i,2*j)
+             momt(2*i,2*j)=mom(2*i-1,2*j-1)
+             momt(2*i,2*j-1)=-mom(2*i-1,2*j)
+             momt(2*i-1,2*j)=-mom(2*i,2*j-1)
+             momt(2*i-1,2*j-1)=mom(2*i,2*j)
+          enddo
        enddo
-    enddo
 
-    h%h=-h%h
-    ar=full_abs(h%h)
-    ar=ar*20.d0
-    h%h=h%h/ar
+       momt(5,5)=mom(1,1)
+       momt(6,6)=mom(1,1)
 
-    id=1
-    ex=texp(h,id)
-    norm=ex
+       call diagonalise_envelope_a(momt,br,a6,ai6,kick)
+       a=a6(1:4,1:4)
+       at=matmul(at,a)
+    else
+       h%h=zero
 
-    a=norm%a_t
-    at=matmul(at,a)
-    !enddo   ! jm=1,nm
+       do i=1,2
+          do j=1,2
+             if(with_c==0.and.i/=j) cycle
+             h%h=h%h + mom(2*i-1,2*j-1)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j))
+             h%h=h%h + mom(2*i,2*j)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j-1))
+             h%h=h%h - mom(2*i,2*j-1)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j))
+             h%h=h%h - mom(2*i-1,2*j)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j-1))
+          enddo
+       enddo
+
+       h%h=-h%h
+       ar=full_abs(h%h)
+       ar=ar*20.d0
+       h%h=h%h/ar
+
+       id=1
+       ex=texp(h,id)
+       norm=ex
+
+       a=norm%a_t
+       at=matmul(at,a)
+       !enddo   ! jm=1,nm
+
+    endif
+
+    !write(6,*) "betax", a(1,1)**2+a(1,2)**2, sqrt(a(1,1)**2+a(1,2)**2)
+    !write(6,*) "alphax", -a(1,1)*a(2,1)-a(1,2)*a(2,2)
+    !write(6,*) "betay", a(3,3)**2+a(3,4)**2, sqrt(a(3,3)**2+a(3,4)**2)
+    !write(6,*) "alphay", -a(3,3)*a(4,3)-a(3,4)*a(4,4)
+    !write(6,*) "betaxy", a(1,3)**2+a(1,4)**2
+    !write(6,*) "betayx", a(3,1)**2+a(3,2)**2
 
 
     call kill(id,m12,ex)
@@ -1225,7 +1266,7 @@ contains
   subroutine  alex_apply_A_on_data(jm)
     implicit none
     integer jm,ier,nm
-    real(dp), pointer :: mom(:,:),r(:,:),a(:,:)
+    real(dp), pointer :: mom(:,:),r(:,:),a(:,:),xn(:,:)
     real(dp) ai(4,4)
 
 
@@ -1235,6 +1276,7 @@ contains
     !do jm=1,nm
 
     r=>monitors(jm)%xf
+    xn=>monitors(jm)%xn
     a=>monitors(jm)%a
     call matinv(a,ai,4,4,ier)
     if(ier/=0) then
@@ -1242,7 +1284,7 @@ contains
        stop 999
     endif
 
-    r=matmul(ai,r)
+    xn=matmul(ai,r)
 
 
 
@@ -1252,11 +1294,12 @@ contains
 
   end subroutine  alex_apply_A_on_data
 
-  subroutine  alex_count_monitors(r,n) !locate monitors and create array monitors(n)
+  subroutine  alex_count_monitors(r,n,kind) !locate monitors and create array monitors(n)
     implicit none
     type(layout), target :: r
     type(fibre), pointer :: p
     integer i,n,nturn
+    integer, optional :: kind
 !!! find qf and qds
     !qf are horizontal monitors
     !qd are vertical monitors
@@ -1287,13 +1330,21 @@ contains
        if(p%mag%name(1:2)=="QF") then
           n=n+1
           call alloc_fibre_monitor_data(monitors(n),m_turn,p)  ! m_)turn is number of turns
-          monitors(n)%kind=1
+          if(present(kind)) then
+             monitors(n)%kind=kind
+          else
+             monitors(n)%kind=1
+          endif
           ! write(6,*) n,p%mag%name
        endif
        if(p%mag%name(1:2)=="QD") then
           n=n+1
           call alloc_fibre_monitor_data(monitors(n),m_turn,p)
-          monitors(n)%kind=2
+          if(present(kind)) then
+             monitors(n)%kind=kind
+          else
+             monitors(n)%kind=2
+          endif
           ! write(6,*) n,p%mag%name
        endif
 
@@ -1301,6 +1352,248 @@ contains
     enddo
 
   end subroutine alex_count_monitors
+
+  subroutine  alex_count_jparc_monitors(r,n,kind) !locate monitors and create array monitors(n)
+    implicit none
+    type(layout), target :: r
+    type(fibre), pointer :: p
+    integer i,n,nturn,mf,i1,i2,j,i3,kind
+    integer, allocatable :: ind(:)
+    character(255) line
+!!! find qf and qds
+    !qf are horizontal monitors
+    !qd are vertical monitors
+    !!
+
+    call kanalnummer(mf,"J_parc_monitor_id.txt")
+
+    n=0
+    do i=1,r%n
+       read(mf,*,end=100) i1,i2
+
+       n=n+1
+    enddo
+100 write(6,*) n
+    allocate(ind(n))
+    ind=0
+
+    rewind mf
+
+    do i=1,n
+       read(mf,*) i1,i2
+       ind(i1)=i2
+    enddo
+
+
+    close(mf)
+
+
+    allocate( monitors(n))
+
+    p=>r%start
+    do i=1,r%n
+
+       if(p%mag%name(1:2)=="QF") then
+
+
+          i1=0
+          line=p%mag%name(4:4)
+          read(line,*) i2
+          i1=i2*100+i1
+          line=p%mag%name(5:5)
+          read(line,*) i2
+          i1=i2*10+i1
+          line=p%mag%name(6:6)
+          read(line,*) i2
+          i1=i2+i1
+          i3=i1
+          if(i1>n) then
+             i3=n
+          endif
+          i2=0
+          do j=i3,1,-1
+             if(ind(j)==i1) then
+                i2=ind(j)
+                exit
+             endif
+          enddo
+          if(i2/=0) then
+             call alloc_fibre_monitor_data(monitors(j),m_turn,p)
+             monitors(j)%kind=kind
+          endif
+       endif
+
+       if(p%mag%name(1:2)=="QD") then
+
+          i1=0
+          line=p%mag%name(4:4)
+          read(line,*) i2
+          i1=i2*100+i1
+          line=p%mag%name(5:5)
+          read(line,*) i2
+          i1=i2*10+i1
+          line=p%mag%name(6:6)
+          read(line,*) i2
+          i1=i2+i1
+
+          i3=i1
+          if(i1>n) then
+             i3=n
+          endif
+          i2=0
+          do j=i3,1,-1
+             if(ind(j)==i1) then
+                i2=ind(j)
+                exit
+             endif
+          enddo
+
+          if(i2/=0) then
+             call alloc_fibre_monitor_data(monitors(j),m_turn,p)
+             monitors(j)%kind=kind
+          endif
+
+
+       endif
+
+
+       p=>p%next
+    enddo
+
+
+
+    deallocate(ind)
+
+  end subroutine alex_count_jparc_monitors
+
+  subroutine  alex_read_r_jparc(filename1,filename2,n_max,nav)
+    implicit none
+    integer jm,mf1,mf2,n,i,na,i1,i2
+    CHARACTER(*) filename1,filename2
+    integer, optional :: n_max,nav
+    real(dp) x,y,jj(4),xa(2),ya(2),norm(2)
+    real(dp), allocatable :: bpmx(:), bpmy(:)
+
+    allocate(bpmx(size(monitors)),bpmy(size(monitors)))
+
+    call kanalnummer(mf1,filename1)
+    call kanalnummer(mf2,filename2)
+
+    n=m_turn
+    na=0
+    if(present(n_max)) n=n_max
+    if(present(nav)) na=nav
+
+
+    x=zero
+    y=zero
+    do i=1,m_turn+m_skip
+       read(mf1,*)i1,i2,bpmx
+       read(mf2,*)i1,i2,bpmy
+       if(i>m_skip) then
+          do jm=1,size(monitors)
+             monitors(jm)%r(1,i-m_skip)=bpmx(jm)/1.d3
+             monitors(jm)%r(3,i-m_skip)=bpmy(jm)/1.d3
+             monitors(jm)%bpm(1,i-m_skip)=bpmx(jm)/1.d3
+             monitors(jm)%bpm(2,i-m_skip)=bpmy(jm)/1.d3
+          enddo
+       endif
+    enddo
+
+    do jm=1,size(monitors)
+       norm=0.0_dp
+       do i=1,m_turn
+          norm(1)=norm(1)+abs(monitors(jm)%r(1,i))
+          norm(2)=norm(2)+abs(monitors(jm)%r(3,i))
+       enddo
+       if(norm(1)<1.e-10.or. norm(2)<1.e-10) then
+          write(6,*) " monitor ",jm, " has no data "
+          monitors(jm)%full=.false.
+       endif
+    enddo
+
+    close(mf1)
+    close(mf2)
+    deallocate(bpmx,bpmy)
+    ! 171683 59 68 1 2.6794 -1.1248
+
+  end   subroutine  alex_read_r_jparc
+
+
+  subroutine scale_bpm
+    implicit none
+    integer i,n,ib
+    real x,y,x0,y0,sx,sy,ax,ay
+
+    if(.not.allocated(monitors)) return
+
+    do ib=1,size(monitors)
+       n=m_turn/10
+
+
+       do i=1,n
+          x0=abs(monitors(ib)%r(1,i))+x0
+          y0=abs(monitors(ib)%r(3,i))+y0
+       enddo
+
+       do i=m_turn-n+1,m_turn
+          x=abs(monitors(ib)%r(1,i))+x
+          y=abs(monitors(ib)%r(3,i))+y
+       enddo
+
+       sx=(x0/x-1)/(m_turn-1)
+       ax=1-sx
+       sy=(y0/y-1)/(m_turn-1)
+       ay=1-sy
+
+       do i=1,m_turn
+          monitors(ib)%r(1,i)=monitors(ib)%r(1,i)*(i*sx+ax)
+          monitors(ib)%r(3,i)=monitors(ib)%r(3,i)*(i*sy+ay)
+       enddo
+
+    enddo
+
+  end subroutine scale_bpm
+
+
+
+  subroutine  alex_average_r_jparc
+    implicit none
+    integer jm,mf1,mf2,n,i,na,i1,i2
+    real(dp) x,y,jj(4),xa(2),ya(2)
+
+
+    n=m_turn
+
+    do jm=1,size(monitors)
+       monitors(jm)%r(1,:)=monitors(jm)%bpm(1,:)
+       monitors(jm)%r(3,:)=monitors(jm)%bpm(2,:)
+    enddo
+    do jm=1,size(monitors)
+
+       x=zero
+       y=zero
+       do i=1,n
+          x=monitors(jm)%r(1,i)+x
+          y=monitors(jm)%r(3,i)+y
+       enddo
+
+       x=x/n
+       y=y/n
+       write(6,*) "Averages ",x,y
+       do i=1,n
+          monitors(jm)%r(1,i)=(monitors(jm)%r(1,i)-x)
+          monitors(jm)%r(3,i)=(monitors(jm)%r(3,i)-y)
+       enddo
+
+    enddo
+
+
+    ! 171683 59 68 1 2.6794 -1.1248
+
+  end   subroutine  alex_average_r_jparc
+
+
 
   subroutine alloc_fibre_monitor_data(c,turn,p)
     implicit none
@@ -1313,16 +1606,21 @@ contains
     allocate(c%turn)
     allocate(c%kind)
     allocate(c%r(4,turn))
+    allocate(c%bpm(2,turn))
     allocate(c%xf(4,turn))
+    allocate(c%xn(4,turn))
     allocate(c%mom(4,4))
     allocate(c%A(4,4))
     allocate(c%At(4,4))
     c%turn=0
     c%kind=0
     c%r=zero
+    c%bpm=zero
     c%xf=zero
+    c%xn=zero
     c%mom=zero
     c%A=zero
+    c%full=.true.
     do i=1,4
        c%a(i,i)=one
     enddo
@@ -1340,7 +1638,9 @@ contains
     deallocate(c%turn)
     deallocate(c%kind)
     deallocate(c%r)
+    deallocate(c%bpm)
     deallocate(c%xf)
+    deallocate(c%xn)
     deallocate(c%mom)
     deallocate(c%a)
     deallocate(c%at)
@@ -1348,6 +1648,7 @@ contains
     nullify(c%kind)
     nullify(c%r)
     nullify(c%xf)
+    nullify(c%xn)
     nullify(c%mom)
     nullify(c%a)
     nullify(c%at)
@@ -1358,7 +1659,6 @@ contains
 !!!1 this is the correct one
   subroutine  alex_mom_real_monitors(ring,jm,jn,x,state_in,no,nt)
     implicit none
-    integer ipause, mypause
     integer jm,nm,i,jinv(4),i1,i11,i2,i22,jn(4),mf1,mf2,no,nt
     type(layout), target :: ring
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
@@ -1533,8 +1833,8 @@ contains
     else  !!!! if(monitors(jm)%kind==2)
        jn(3)=jm
 
-       write(6,*) " crotte "
-       ipause=mypause(0)
+       !write(6,*) " crotte "
+       !pause
        p2=>monitors(jm)%p
 
        do i=jm+1,jm+nm
@@ -1681,12 +1981,12 @@ contains
     zf(4)=monitors(jn(4))%r(3,1)
     write(6,*) zf(1:4)
     write(6,*) monitors(jm)%r(1:4,1)
-    ipause=mypause(200)
+    !pause 200
     call invert_monitors(monitors(jm)%kind,zf,g)
     write(6,*) zf(1:4)
-    ipause=mypause(201)
+    !pause 201
 
-    write(6,*) " M_turn ",m_turn
+    write(6,*) " M_turn used in Eikonal",m_turn
     do i=1,nt
        zf=0.d0
        zf(1)=monitors(jn(1))%r(1,i)
@@ -1827,7 +2127,9 @@ contains
     TYPE(NORMALFORM) NORM
     character(nlp) name
     character(9) typec
-
+    if(.not.associated(r%t)) then
+       call make_node_layout(r)
+    endif
     printres=my_false
     doname=my_true
     call context(name)
@@ -1853,6 +2155,7 @@ contains
 
     CALL TRACK(R,Y,pos,STATE)
     id=y
+
     NORM=ID
     write(mf,*) " fractional tunes ",norm%tune(1:2)
     p=>r%start
@@ -1928,10 +2231,6 @@ contains
           typec=' = COS-1 '
        else
           typec=' = COSH-1'
-          write(mf,*) bx
-          call print(r_te,mf)
-          call print(cs_te,mf)
-          stop
        endif
        if(doname) then
           if(index(p%mag%name,name(1:len_trim(name)))/=0) then

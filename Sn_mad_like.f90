@@ -54,7 +54,7 @@ module Mad_like
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
      real(dp) ang(3),t(3)
      real(dp) angi(3),ti(3)
-     integer patchg
+     integer patchg,CAVITY_TOTALPATH
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
@@ -661,6 +661,7 @@ CONTAINS
           S2%angi(i)=zero
           S2%ti(i)=zero
        enddo
+       s2%CAVITY_TOTALPATH=1
        S2%patchg=0
        S2%T1=zero
        S2%T2=zero

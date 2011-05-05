@@ -3,11 +3,11 @@
 
 module definition
   !  use define_newda
-  use precision_constants   ! added to replace use define_newda
-  use scratch_size
-  use DABNEW
+  !  use precision_constants   ! added to replace use define_newda
+  !  use scratch_size
+  !  use DABNEW
+  !  use my_own_1D_TPSA
   use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
-  USE my_own_1D_TPSA
   !  use newda
   !  USE LIELIB_ETIENNE
   implicit none
@@ -283,10 +283,12 @@ module definition
      real(dp) nu    !  spin tune
 !!!Envelope radiation stuff
      real(dp) s_ij0(6,6)  !  equilibrium beam sizes
+     complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
      real(dp) emittance(3),tune(3),damping(3)   ! equilibrium emittances (partially well defined only for infinitesimal damping)
      logical(lp) AUTO,STOCHASTIC
      real(dp)  KICK(3)   ! fake kicks for tracking stochastically
      real(dp)  STOCH(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
+     real(dp)  STOCH_inv(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
   end type normal_spin
 
   include "a_def_frame_patch_chart.inc"
@@ -300,11 +302,13 @@ module definition
   type rf_phasor
      real(dp) x(2)
      real(dp) om
+     real(dp) t
   end type rf_phasor
 
   type rf_phasor_8
      type(real_8)  x(2)
      type(real_8) om
+     type(real_8) t
   end type rf_phasor_8
 
   type probe

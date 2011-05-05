@@ -1209,6 +1209,7 @@ CONTAINS
        P%s(i)%x(i)=one
     enddo
     P%X=X
+    P%ac%t=zero
 
   END    subroutine EQUAL_PROBE_REAL6
 
@@ -1235,6 +1236,7 @@ CONTAINS
 
     P%AC%X(1)=ZERO
     P%AC%X(2)=ZERO
+    P%AC%t=ZERO
     p%e_ij=zero
   END    subroutine EQUAL_PROBE8_REAL6
 
@@ -1276,6 +1278,7 @@ CONTAINS
        P8%X(I)=P%X(I)
     ENDDO
     P8%om=P%om
+    P8%t=P%t
 
   END subroutine EQUAL_RF8_RF8
 
@@ -1289,6 +1292,7 @@ CONTAINS
        P8%X(I)=P%X(I)
     ENDDO
     P8%om=P%om
+    P8%t=P%t
 
   END subroutine EQUAL_RF8_RF
 
@@ -1302,6 +1306,7 @@ CONTAINS
        P%X(I)=P8%X(I)
     ENDDO
     P%om=P8%om
+    P%t=P8%t
 
   END subroutine EQUAL_RF_RF8
 
@@ -1630,8 +1635,10 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(scdadd%AC%om)
+    call ass(scdadd%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     scdadd%AC%om=s2%AC%om
+    scdadd%AC%t=s2%AC%t
     master=localmaster
     !    endif
 
@@ -1714,8 +1721,10 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(daddsc%AC%om)
+    call ass(daddsc%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     daddsc%AC%om=s2%AC%om
+    daddsc%AC%t=s2%AC%t
     master=localmaster
     !    endif
 
@@ -1846,6 +1855,7 @@ CONTAINS
 
     write(mf,*) ' AC INFORMATION '
     call print(s%om,mf)
+    call print(s%t,mf)
     do i=1,2
        call print(s%x(i),mf)
     enddo
@@ -3353,6 +3363,7 @@ CONTAINS
        CALL alloc(R%X(I))
     ENDDO
     CALL alloc(R%om)
+    CALL alloc(R%t)
 
   END    subroutine ALLOC_rf_phasor_8
 
@@ -3397,6 +3408,7 @@ CONTAINS
        CALL KILL(R%X(I))
     ENDDO
     CALL KILL(R%om)
+    CALL KILL(R%t)
 
   END    subroutine kill_rf_phasor_8
 
@@ -4184,14 +4196,15 @@ CONTAINS
     D%M=0
     D%Ms=0
     D%s_ij0=zero
+    D%s_ijr=zero
     D%emittance=zero
     D%tune=zero
     D%damping=zero
     D%AUTO=my_true
     D%STOCHASTIC=my_false
     D%STOCH=zero
+    D%STOCH_inv=zero
     D%nu=zero
-
 
   END    subroutine alloc_normal_spin
 
@@ -4253,7 +4266,8 @@ CONTAINS
     call check_rad(ds%e_ij,rad_in)
     if(rad_in) then
        if(c_%no==1) then
-          Write(6,*) "No envelope calculation possible at them moment with NO=1 "
+          call normalize_envelope(ns,DS)
+          Write(6,*) "New envelope calculation attempted with NO=1 "
        else
           call alloc(ys,6)
           call alloc(env)
@@ -4341,6 +4355,114 @@ CONTAINS
     call kill(nn)
 
   end subroutine Go_to_closed
+
+  subroutine normalize_envelope(norm_spin,m_spin)
+    implicit none
+    type(normal_spin) norm_spin
+    type(damapspin) m_spin
+    type(normalform) norm
+    type(damap) m
+    integer i,j,i1,i2
+    real(dp) a(6,6),ai(6,6),ait(6,6),mat(6,6), sigma_inf(6,6),at(6,6),br(6,6)
+    complex(dp) c(6,6),ci(6,6),cit(6,6), b(6,6),ct(6,6)
+    complex(dp) coef,ba(6,6),b_phasor(6,6)
+    complex(dp) R(6,6),r_phasor(6,6), sigma_inf_phasor(6,6)
+    real(dp) xj(6,6),mj(6,6),xn,jb(6,6),bs(6,6)
+
+    b=m_spin%e_ij
+    bs=m_spin%e_ij
+
+    c=0.0_dp
+    ci=0.0_dp
+    do i=1,3
+       do j=1,3
+          xj(2*i,2*i-1)=-one
+          xj(2*i-1,2*i)=one
+          c(2*i-1,2*i-1)=half
+          c(2*i-1,2*i)=half
+          c(2*i,2*i-1)=half/i_
+          c(2*i,2*i)=-half/i_
+          ci(2*i-1,2*i-1)=one
+          ci(2*i-1,2*i)=i_
+          ci(2*i,2*i-1)=one
+          ci(2*i,2*i)=-i_
+       enddo
+    enddo
+
+    mat=m_spin%m
+    a=norm_spin%n%a_t
+    ai=norm_spin%n%a_t**(-1)
+    ait=transpose(ai)
+    at=transpose(a)
+    cit=transpose(ci)
+    ct=transpose(c)
+
+    R=matmul(matmul(ai,b),ait)
+
+    ba=matmul(matmul(ai,b),ait)
+
+    b_phasor=matmul(matmul(ci,ba),cit)
+
+    r=matmul(matmul(ai,mat),a)
+    r_phasor=matmul(matmul(ci,r),c)
+
+    do i=1,6
+       do j=1,6
+          sigma_inf_phasor(i,j)= r_phasor(i,i)*r_phasor(j,j)/(1.0_dp-r_phasor(i,i)*r_phasor(j,j))*b_phasor(i,j)
+       enddo
+    enddo
+    do i=1,3
+       norm_spin%emittance(i)=sigma_inf_phasor(2*i-1,2*i)/two
+    enddo
+
+    sigma_inf=matmul(matmul(c,sigma_inf_phasor),ct)
+    sigma_inf=matmul(matmul(a,sigma_inf),at)
+
+    norm_spin%s_ij0=sigma_inf
+    norm_spin%s_ijr=sigma_inf_phasor
+
+    norm_spin%tune=norm_spin%n%tune(1:3)
+    norm_spin%damping=norm_spin%n%damping(1:3)
+
+    !    if(norm_spin%STOCHASTIC) then
+    !    call alloc(norm)
+    !    call alloc(m)
+    !           jb=matmul(xj,b)
+    !      xn=mat_norm(jb)
+    !      jb=jb/xn
+    !
+    !        mj=0.0_dp
+    !        xj=0.0_dp
+    !        do i=1,6
+    !         xj(i,i)=one
+    !        enddo
+    !         mj=xj
+    !        do i=1,1000
+    !         xj=matmul(xj,jb)/i
+    !         mj=mj+xj
+    !        enddo
+    !        m=mj
+    !        norm=m
+    !
+    !        ai=norm%a_t**(-1)
+    !        a = norm%a_t
+    !        b=matmul(matmul(ai,jb),a)
+    !        do i=1,3
+    !         norm_spin%kick(i)=sqrt(abs(b(2*i-1,2*i)*xn))
+    !        enddo
+    !        write(6,*) " Stochastic kick ", norm_spin%kick
+    !    call kill(norm)
+    !    call kill(m)
+    !
+    !    endif
+
+    if(norm_spin%STOCHASTIC) then
+       call diagonalise_envelope_a(bs,br,a,ai,norm_spin%kick)   !diagonalise_envelope_a(b,br,a,ai,kick)
+       norm_spin%STOCH=a
+       norm_spin%STOCH_inv=ai
+    endif
+
+  end subroutine normalize_envelope
 
   subroutine fetch_s0(DS,s)
     implicit none
@@ -5068,8 +5190,53 @@ CONTAINS
 
   end subroutine factor_as
 
+  subroutine CANONIZE( a_t,A_cs,DR,PHASE_ADVANCE )
+    implicit none
+    TYPE(damap), INTENT(INout) :: a_t,A_cs,DR
+    type(taylor), INTENT(INout) ::  PHASE_ADVANCE(:)
+    TYPE(damap) a_f,a_l,a_nl
+    type(onelieexponent) uno
+    logical(lp) doflip
+    integer i
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       !    write(6,*) " flipping ",c_%ndpt,c_%nd2-1
+       !    pause 7123
+
+       perform_flip=.false.
+       call flip_damap(a_t,a_t)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
+    call alloc(a_f,a_l,a_nl)
+    call alloc(uno)
+
+    call factor(a_t,a_f,a_l,a_nl,DR)
+
+    A_cs=a_f*a_l*a_nl
+    uno=dr
+
+    do i=1,c_%nd
+       PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+    enddo
 
 
+    if(doflip) then
+       call flip_damap(a_t,a_t)
+       call flip_damap(a_cs,a_cs)
+       call flip_damap(dr,dr)
+       do i=1,c_%nd
+          call flip_taylor(PHASE_ADVANCE(i),PHASE_ADVANCE(i),-1)
+       enddo
+       perform_flip=.true.
+    endif
+
+    call kill(uno)
+    call kill(a_f,a_l,a_nl)
+
+  end subroutine CANONIZE
 
   subroutine factor_am(a_t,a_f,a_l,a_nl,DR,R_TE,CS_TE,COSLIKE)
     implicit none
@@ -5473,7 +5640,7 @@ CONTAINS
        perform_flip=.true.
     endif
 
-    if(doing_ac_modulation_in_ptc) then   ! removing useless tiny numbers
+    if(doing_ac_modulation_in_ptc.and.present(CS_TE)) then   ! removing useless tiny numbers
        CS_TE%v(c_%nd2-1)=one.mono.(c_%nd2-1)
        CS_TE%v(c_%nd2)=one.mono.(c_%nd2)
     endif
@@ -5842,6 +6009,94 @@ CONTAINS
     call kill(gam)
 
   end subroutine normal_thetaH
+
+
+!!! Some useful routines
+
+  subroutine AVERAGE(F,A,F_floquet,F_xp,use_J)
+    implicit none
+    type(damap) A
+    TYPE(TAYLOR), intent(inout):: F
+    TYPE(TAYLOR), intent(inout):: F_floquet
+    TYPE(TAYLOR), optional, intent(inout):: F_xp
+    type(taylor) tt,tt_xp
+    TYPE(taylorresonance) fq
+    real(dp) value,valuexp
+    integer, allocatable :: jc(:)
+    logical, optional :: use_J
+    logical usej
+    integer i,n,j,it,nd,iu
+    logical doflip,uj
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       perform_flip=.false.
+       call fliptaylor(F,F,1)
+       call flip_damap(A,A)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
+    uj=.false.
+    if(present(use_j)) uj=use_j
+
+    nd=c_%nd2/2
+    if(c_%ndpt/=0) nd=nd-1
+
+    allocate(jc(c_%nv))
+    call alloc(tt,tt_xp)
+    call alloc(fq)
+    !! USE_J is false by default
+
+
+    fq=F*A
+    fq%sin=zero
+
+    call taylor_cycle(fq%cos,size=n)
+
+    do i=1,n
+       call taylor_cycle(fq%cos,ii=i,value=value,j=jc)
+
+       it=0
+       iu=0
+       do j=1,nd
+          it=iabs(jc(j*2-1)-jc(j*2))+it
+          iu=iabs(jc(j*2-1)+jc(j*2))+iu
+       enddo
+       if(it==0) then
+          iu=iu/2
+          valuexp=value
+          if(uj) then
+             value=valuexp*2.0_dp**iu
+          endif
+          tt=(value.mono.jc)+tt
+          tt_xp=(valuexp.mono.jc)+tt_xp
+       endif
+
+    enddo
+
+    fq%cos=tt
+    F_floquet=tt
+
+    if(present(F_xp)) then
+       fq%cos=tt_xp
+       F_xp=fq
+       F_xp=F_xp*A**(-1)
+    endif
+
+    deallocate(jc)
+    call kill(tt,tt_xp)
+    call kill(fq)
+
+    if(doflip) then
+       call fliptaylor(F,F,-1)
+       call flip_damap(A,A)
+       call fliptaylor(F_floquet,F_floquet,-1)
+       if(present(F_xp)) call fliptaylor(F_xp,F_xp,-1)
+       perform_flip=.true.
+    endif
+
+  end subroutine AVERAGE
 
   ! remove small numbers
 

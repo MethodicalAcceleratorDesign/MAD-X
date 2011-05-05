@@ -14,8 +14,8 @@ module orbit_ptc
   type(work)  :: w1_orbit,w2_orbit
   type(fibre), pointer :: p_orbit
   integer :: ptc_node_old=-1
-  type(probe) :: xsm
-
+  type(probe) :: xsm,xsm0
+  !   integer mfff
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
      MODULE PROCEDURE ORBIT_TRACK_NODE_Standard_R
@@ -294,7 +294,7 @@ contains
     IMPLICIT NONE
     REAL(DP),  INTENT(INOUT) :: X(6)
     INTEGER K,I
-    LOGICAL(LP) U,do_mod
+    LOGICAL(LP) U
     REAL(DP) X5
     TYPE(INTEGRATION_NODE), POINTER  :: T
     TYPE(INTERNAL_STATE), target, OPTIONAL :: STATE
@@ -307,7 +307,6 @@ contains
        X(6)=X5/my_ORBIT_LATTICE%ORBIT_OMEGA
     ENDIF
 
-    do_mod=my_false
     u=my_false
 
     T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
@@ -327,25 +326,26 @@ contains
        state0=>my_ORBIT_LATTICE%STATE
     endif
 
-    IF(ALLOW_MODULATION.AND.STATE0%MODULATION) THEN
-       if(K/=ptc_node_old) then
-          ptc_node_old=k
-          do_mod=my_true
-       ENDIF
+    IF(STATE0%MODULATION ) THEN !modulate
+       if(K/=ptc_node_old) then !modulate
+          ptc_node_old=k !modulate
+          xsm=xsm0 !modulate
+       endif !modulate
+       xsm0=xsm !modulate
+    ENDIF !modulate
 
-    endif
+
+
     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-       if(do_mod) then
-          if(t%parent_fibre%mag%slow_ac) CALL MODULATE(T,XSM,STATE0)
-          CALL TRACK_MODULATION(T,XSM,STATE0)
-       endif
+       if(STATE0%MODULATION) then !modulate
+          if(t%parent_fibre%mag%slow_ac) CALL MODULATE(T,XSM0,STATE0) !modulate
+          CALL TRACK_MODULATION(T,XSM0,STATE0) !modulate
+       endif !modulate
        if(u) exit
-       !       IF(PRESENT(STATE)) THEN
        CALL TRACK_NODE_SINGLE(T,X,STATE0) !,my_ORBIT_LATTICE%ORBIT_CHARGE
-       !          CALL TRACK_NODE_SINGLE(T,X,STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
-       !       ELSE
-       !          CALL TRACK_NODE_SINGLE(T,X,my_ORBIT_LATTICE%STATE) !,my_ORBIT_LATTICE%ORBIT_CHARGE
-       !       ENDIF
+       !   WRITE(MFFF,*) t%parent_fibre%mag%name,t%pos_in_fibre
+       !   WRITE(MFFF,*) xsm0%ac%t
+       !   WRITE(MFFF,*) X(1),X(2)
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
@@ -355,9 +355,19 @@ contains
           endif
           exit
        endif
+       if(STATE0%MODULATION) then !modulate
+          IF(T%PARENT_FIBRE%MAG%slow_ac) THEN !modulate
+             !        if(old_mod) then
+             !          CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1) !modulate
+             !        else
+             CALL restore_ANBN_SINGLE(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP)
+             !        endif
+          ENDIF !modulate
+       endif  !modulate
        T=>T%NEXT
     ENDDO
-    !    ENDIF
+
+
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        x(1:4)=x(1:4)*1.e3_dp
@@ -381,7 +391,11 @@ contains
 
        DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
           IF(T%PARENT_FIBRE%MAG%slow_ac) THEN
-             CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1)
+             !         if(old_mod) then
+             !          CALL restore_ANBN(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP,1)
+             !         else
+             CALL restore_ANBN_SINGLE(T%PARENT_FIBRE%MAG,T%PARENT_FIBRE%MAGP)
+             !        endif
           ENDIF
 
           T=>T%NEXT
@@ -700,7 +714,7 @@ contains
        my_ORBIT_LATTICE%ORBIT_gammat=sqrt(one/my_ORBIT_LATTICE%ORBIT_gammat)
     endif
 
-    my_ORBIT_LATTICE%ORBIT_mass_in_amu=r%start%mass/PMAP   *pmae_amu/pmae
+    my_ORBIT_LATTICE%ORBIT_mass_in_amu=r%start%mass*pmae_amu/pmae
     my_ORBIT_LATTICE%orbit_kinetic=sqrt(r%start%mass**2+my_ORBIT_LATTICE%ORBIT_P0C**2) &
          -r%start%mass
     my_ORBIT_LATTICE%orbit_harmonic=my_ORBIT_LATTICE%ORBIT_L*my_ORBIT_LATTICE%ORBIT_OMEGA/TWOPI/my_ORBIT_LATTICE%ORBIT_BETA0

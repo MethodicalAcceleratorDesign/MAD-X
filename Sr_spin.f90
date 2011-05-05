@@ -1553,11 +1553,11 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       b(1)=b(1)+BBXTW !valishev
-       b(2)=b(2)+BBYTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       b(1)=b(1)+BBXTW !valishev
+    !outvalishev       b(2)=b(2)+BBYTW !valishev
+    !outvalishev    endif !valishev
   END SUBROUTINE get_BfieldR
 
   SUBROUTINE get_BfieldP(EL,B,X)
@@ -1591,11 +1591,11 @@ contains
     ELSE
        B(3)=ZERO
     ENDIF
-    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
-       call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-       b(1)=b(1)+BBXTW !valishev
-       b(2)=b(2)+BBYTW !valishev
-    endif !valishev
+    !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
+    !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
+    !outvalishev       b(1)=b(1)+BBXTW !valishev
+    !outvalishev       b(2)=b(2)+BBYTW !valishev
+    !outvalishev    endif !valishev
     CALL KILL(X1,X3,BBYTW,BBXTW,BBYTWT)
   END SUBROUTINE get_BfieldP
 
@@ -2724,13 +2724,17 @@ contains
     enddo
 
     CALL TRACK_PROBE(r,xs,K, fibre1=i1)
+    open(unit=10,file='junk.txt')
+    call print(xs%x,10)
 
     do i=1,6
        ys(i)%v=XS%x(i)
        do j=1,6
+          write(10,*) i,j,xs%e_ij(i,j)
           ys(i)%e(j)=xs%e_ij(i,j)
        enddo
     enddo
+    close(10)
     k=k0
 
     call kill(xs)
@@ -2927,10 +2931,10 @@ contains
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
 
-    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
-       if(c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K)
-       CALL TRACK_MODULATION(C,XS,K)
-    ENDIF
+    IF(K%MODULATION) THEN !modulate
+       if(c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K) !modulate
+       CALL TRACK_MODULATION(C,XS,K) !modulate
+    ENDIF !modulate
     !   lost_node=>c
     !     lost_fibre=>c%parent_fibre
     if(c%cas==0) then
@@ -2951,9 +2955,13 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
 
     endif
-    IF(ALLOW_MODULATION.AND.K%MODULATION.and.c%parent_fibre%mag%slow_ac) THEN
-       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,1)
-    ENDIF
+    IF(K%MODULATION.and.c%parent_fibre%mag%slow_ac) THEN  !modulate
+       !    if(old_mod) then
+       !       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,1)  !modulate
+       !    else
+       CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
+       !    endif
+    ENDIF  !modulate
 
     xs%u=.not.check_stable
     if(xs%u) then
@@ -2986,10 +2994,10 @@ contains
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
 
-    IF(ALLOW_MODULATION.AND.K%MODULATION) THEN
-       if(c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K)
-       CALL TRACK_MODULATION(C,XS,K)
-    ENDIF
+    IF(K%MODULATION) THEN !modulate
+       if(c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K) !modulate
+       CALL TRACK_MODULATION(C,XS,K) !modulate
+    ENDIF !modulate
 
 
     CALL ALLOC(DS)
@@ -3017,9 +3025,13 @@ contains
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     endif
 
-    IF(ALLOW_MODULATION.AND.K%MODULATION.and.c%parent_fibre%magp%slow_ac) THEN
-       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,2)
-    ENDIF
+    IF(K%MODULATION.and.c%parent_fibre%magp%slow_ac) THEN !modulate
+       !     if(old_mod) then
+       !       CALL restore_ANBN(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP,2) !modulate
+       !     else
+       CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
+       !    endif
+    ENDIF !modulate
 
     call kill(ds)
     xs%u=.not.check_stable
@@ -3853,6 +3865,8 @@ contains
           write(6,*) " No Cavity in the Line "
           write(6,*) " FIND_ORBIT_LAYOUT will crash "
           messagelost= " No cavity in the line "
+          write(6,*) " State is changed to allow a coasting beam calculation "
+
           stop 456
        ENDIF
     endif

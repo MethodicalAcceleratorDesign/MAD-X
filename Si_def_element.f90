@@ -36,7 +36,7 @@ MODULE S_DEF_ELEMENT
   integer :: mfpolbloc=0
   logical(lp),target :: recirculator_cheat=my_false
   PRIVATE TRACKR,TRACKP
-
+  logical(lp), target :: restore_mag=my_true,restore_magp=my_true
   ! Old home for element and elementp, now in sh_def_kind
 
 
@@ -1927,7 +1927,7 @@ CONTAINS
 
   END SUBROUTINE ZERO_ANBN_P
 
-  SUBROUTINE transfer_ANBN(EL,ELP,NM,VR,DVR,VP,DVP)
+  SUBROUTINE transfer_ANBN(EL,ELP,VR,DVR,VP,DVP)
     IMPLICIT NONE
     TYPE(ELEMENT),TARGET, INTENT(INOUT) ::EL
     TYPE(ELEMENTp),TARGET, INTENT(INOUT) ::ELp
@@ -1935,104 +1935,121 @@ CONTAINS
     real(dp),OPTIONAL :: DVR
     TYPE(REAL_8),OPTIONAL :: VP
     TYPE(REAL_8),OPTIONAL :: DVP
-    INTEGER, INTENT(IN) ::NM
     INTEGER N
+
     if(EL%KIND==kind1) return
 
 
     IF(EL%P%NMUL>=1) THEN
-       if(nm==1) then
+       if(present(VR))then
           do n=1,EL%P%NMUL
-             EL%BN(N)= vR*ELp%BN(N)+DVR*EL%D_BN(N)
-             EL%AN(N)= vR*ELp%AN(N)+DVR*EL%D_AN(N)
+             EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
+             EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
+             ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
+             ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
           enddo
-          if(el%kind==kind10) then
-             call GETANBN(EL%TP10)
-          endif
-          if(el%kind==kind7) then
-             call GETMAT7(EL%T7)
-          endif
-          if(associated(EL%b_sol)) EL%b_sol= vR*ELp%b_sol
        else
           do n=1,EL%P%NMUL
-             ELp%BN(N)= vP*EL%BN(N)+DVP*EL%D_BN(N)
-             ELp%AN(N)= vP*EL%AN(N)+DVP*EL%D_AN(N)
+             EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+             EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+             ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+             ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
           enddo
-          if(el%kind==kind10) then
-             call GETANBN(ELp%TP10)
-          endif
-          if(el%kind==kind7) then
-             call GETMAT7(ELp%T7)
-          endif
-          if(associated(ELp%b_sol)) ELp%b_sol= vP*EL%b_sol
        endif
-       if(valishev.and.abs(el%vs)>=eps)   then  !valishev
-          if(nm==1) then
-             EL%va= vr*elp%va
-          else
-             ELp%va= vp*el%va
-          endif
-       endif !valishev
-
-       RETURN
+       if(el%kind==kind10) then
+          call GETANBN(EL%TP10)
+          call GETANBN(ELP%TP10)
+       endif
+       if(el%kind==kind7) then
+          call GETMAT7(EL%T7)
+          call GETMAT7(ELP%T7)
+       endif
     ENDIF
 
   END SUBROUTINE transfer_ANBN
 
-  SUBROUTINE restore_ANBN(EL,ELP,NM)
+  SUBROUTINE restore_ANBN(R)
+    IMPLICIT NONE
+    type(layout), target :: R
+    type(fibre), pointer :: P
+    INTEGER N
+
+
+    p=>r%start
+
+    do N=1,R%N
+       IF(P%MAG%SLOW_AC) THEN
+          CALL restore_ANBN_SINGLE(P%MAG,P%MAGP)
+       ELSE
+          CYCLE
+       ENDIF
+       P=>P%NEXT
+    ENDDO
+
+  END SUBROUTINE restore_ANBN
+
+  SUBROUTINE restore_ANBN_SINGLE(EL,ELP)
     IMPLICIT NONE
     TYPE(ELEMENT),TARGET, INTENT(INOUT) ::EL
     TYPE(ELEMENTp),TARGET, INTENT(INOUT) ::ELp
-    INTEGER, INTENT(IN) ::NM
     INTEGER N
-    if(EL%KIND==kind1) return
-
 
     IF(EL%P%NMUL>=1) THEN
-       if(nm==1) then
-          do n=1,EL%P%NMUL
-             EL%BN(N)= ELp%BN(N)
-             EL%AN(N)= ELp%AN(N)
-          enddo
-          if(el%kind==kind10) then
-             call GETANBN(EL%TP10)
+       do n=1,EL%P%NMUL
+          if(restore_mag) then
+             EL%BN(N)= EL%D0_BN(N)
+             EL%AN(N)= EL%D0_AN(N)
           endif
-          if(el%kind==kind7) then
-             call GETMAT7(EL%T7)
+          if(restore_magp) then
+             ELp%BN(N)= EL%D0_BN(N)
+             ELp%AN(N)= EL%D0_AN(N)
           endif
-          if(associated(EL%b_sol)) EL%b_sol= ELp%b_sol
-       else
-          do n=1,EL%P%NMUL
-             call kill(ELp%BN(n))
-             call kill(ELp%AN(n))
-             call ALLOC(ELp%BN(n))
-             call ALLOC(ELp%AN(n))
-             ELp%BN(N)= EL%BN(N)
-             ELp%AN(N)= EL%AN(N)
-          enddo
-          if(el%kind==kind10) then
-             call GETANBN(ELp%TP10)
-          endif
-          if(el%kind==kind7) then
-             call GETMAT7(ELp%T7)
-          endif
+       enddo
+       if(el%kind==kind10) then
+          if(restore_mag)call GETANBN(EL%TP10)
+          if(restore_magp)call GETANBN(ELp%TP10)
        endif
-       if(associated(ELp%b_sol)) THEN
-          call kill(ELP%b_sol)
-          call ALLOC(ELP%b_sol)
-          ELp%b_sol= EL%b_sol
-       ENDIF
-       if(valishev.and.abs(el%vs)>=eps)   then  !valishev
-          if(nm==1) then
-             EL%va= elp%va
-          else
-             ELp%va= el%va
-          endif
-       endif !valishev
-       RETURN
+       if(el%kind==kind7) then
+          if(restore_mag) call GETMAT7(EL%T7)
+          if(restore_magp) call GETMAT7(ELp%T7)
+       endif
     ENDIF
 
-  END SUBROUTINE restore_ANBN
+  END SUBROUTINE restore_ANBN_SINGLE
+
+  SUBROUTINE force_restore_ANBN_SINGLE(EL,ELP)
+    IMPLICIT NONE
+    TYPE(ELEMENT),TARGET, INTENT(INOUT) ::EL
+    TYPE(ELEMENTp),TARGET, INTENT(INOUT) ::ELp
+    logical(lp) rm,rmp
+
+    rm=restore_mag
+    rmp=restore_magp
+    restore_mag=my_true
+    restore_magp=my_true
+
+    call restore_ANBN_SINGLE(EL,ELP)
+
+    restore_mag=rm
+    restore_magp=rmp
+
+  END SUBROUTINE force_restore_ANBN_SINGLE
+
+  SUBROUTINE force_restore_ANBN(R)
+    IMPLICIT NONE
+    type(layout), target :: R
+    type(fibre), pointer :: P
+    INTEGER N
+
+
+    p=>r%start
+
+    do N=1,R%N
+       IF(P%MAG%SLOW_AC) CALL force_restore_ANBN_SINGLE(P%MAG,P%MAGP)
+       P=>P%NEXT
+    ENDDO
+
+  END SUBROUTINE force_restore_ANBN
 
 
   SUBROUTINE ADDR_ANBN(EL,NM,F,V)
@@ -2295,7 +2312,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
-    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN); nullify(EL%D_COEFF);nullify(EL%D0_AN);nullify(EL%D0_BN);
     nullify(EL%THIN);
     nullify(EL%MIS); !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2350,7 +2367,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
-    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D_COEFF);nullify(EL%D0_AN);nullify(EL%D0_BN);
     nullify(EL%THIN);
     nullify(EL%MIS);  !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2420,6 +2437,9 @@ CONTAINS
        IF(ASSOCIATED(EL%D_AC)) DEALLOCATE(EL%D_AC)
        IF(ASSOCIATED(EL%D_AN)) DEALLOCATE(EL%D_AN)
        IF(ASSOCIATED(EL%D_BN)) DEALLOCATE(EL%D_BN)
+       IF(ASSOCIATED(EL%D0_AN)) DEALLOCATE(EL%D0_AN)
+       IF(ASSOCIATED(EL%D0_BN)) DEALLOCATE(EL%D0_BN)
+       IF(ASSOCIATED(EL%D_COEFF)) DEALLOCATE(EL%D_COEFF)
        IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
        IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
@@ -2737,6 +2757,18 @@ CONTAINS
           call kill(el%D_BN)
           DEALLOCATE(EL%D_BN)
        endif
+       IF(ASSOCIATED(EL%D0_AN)) then
+          call kill(el%D0_AN)
+          DEALLOCATE(EL%D0_AN)
+       endif
+       IF(ASSOCIATED(EL%D0_BN)) then
+          call kill(el%D0_BN)
+          DEALLOCATE(EL%D0_BN)
+       endif
+       IF(ASSOCIATED(EL%D_COEFF)) then
+          call kill(el%D_COEFF)
+          DEALLOCATE(EL%D_COEFF)
+       endif
 
 
 
@@ -2819,7 +2851,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENTP),INTENT(inOUT)::  ELP
-    INTEGER J,i
+    INTEGER J,i,N
 
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
@@ -2845,24 +2877,51 @@ CONTAINS
     IF(ASSOCIATED(EL%DC_ac)) then
        ELP%DC_ac=EL%DC_ac
     endif
-    IF(ASSOCIATED(EL%D_AC)) then
-       ELP%D_AC=EL%D_AC
+
+    IF(ASSOCIATED(EL%D_COEFF)) then
+       N=SIZE(EL%D_COEFF)
+       IF(N>0) THEN
+          call kill(ELP%D_COEFF,N);
+          DEALLOCATE(ELP%D_COEFF )
+          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
+             ALLOCATE(ELP%D_COEFF(N))
+          ENDIF
+
+
+          CALL ALLOC(ELP%D_COEFF,N)
+          DO I=1,N
+             ELP%D_COEFF(I) = EL%D_COEFF(I)
+          ENDDO
+
+       ENDIF
+
+
+    endif
+
+    IF(ASSOCIATED(EL%D_AN)) then
 
        IF(EL%P%NMUL>0) THEN
           IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
              call kill(ELP%D_AN,ELP%P%NMUL);call kill(ELP%D_bN,ELP%P%NMUL);
+             call kill(ELP%D0_AN,ELP%P%NMUL);call kill(ELP%D0_bN,ELP%P%NMUL);
              DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+             DEALLOCATE(ELP%D0_AN );DEALLOCATE(ELP%D0_BN )
           endif
           if(.not.ASSOCIATED(ELP%D_AN)) THEN
              ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+             ALLOCATE(ELP%D0_AN(EL%P%NMUL),ELP%D0_BN(EL%P%NMUL))
           ENDIF
 
 
           CALL ALLOC(ELP%D_AN,EL%P%NMUL)
           CALL ALLOC(ELP%D_BN,EL%P%NMUL)
+          CALL ALLOC(ELP%D0_AN,EL%P%NMUL)
+          CALL ALLOC(ELP%D0_BN,EL%P%NMUL)
           DO I=1,EL%P%NMUL
              ELP%D_AN(I) = EL%D_AN(I)
              ELP%D_BN(I) = EL%D_BN(I)
+             ELP%D0_AN(I) = EL%D0_AN(I)
+             ELP%D0_BN(I) = EL%D0_BN(I)
           ENDDO
 
        ENDIF
@@ -3120,7 +3179,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENTP),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J
+    INTEGER I,J,N
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
@@ -3147,20 +3206,41 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
-    IF(ASSOCIATED(EL%D_AC)) then
-       ELP%D_AC=EL%D_AC
+    IF(ASSOCIATED(EL%D_COEFF)) then
+       N=SIZE(EL%D_COEFF)
+       IF(N>0) THEN
+          DEALLOCATE(ELP%D_COEFF )
+          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
+             ALLOCATE(ELP%D_COEFF(N))
+          ENDIF
+
+
+          DO I=1,N
+             ELP%D_COEFF(I) = EL%D_COEFF(I)
+          ENDDO
+
+       ENDIF
+
+
+    endif
+
+    IF(ASSOCIATED(EL%D_AN)) then
 
        IF(EL%P%NMUL>0) THEN
           IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
              DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+             DEALLOCATE(ELP%D0_AN );DEALLOCATE(ELP%D0_BN )
           endif
           if(.not.ASSOCIATED(ELP%D_AN)) THEN
              ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+             ALLOCATE(ELP%D0_AN(EL%P%NMUL),ELP%D0_BN(EL%P%NMUL))
           ENDIF
 
           DO I=1,EL%P%NMUL
              ELP%D_AN(I) = EL%D_AN(I)
              ELP%D_BN(I) = EL%D_BN(I)
+             ELP%D0_AN(I) = EL%D0_AN(I)
+             ELP%D0_BN(I) = EL%D0_BN(I)
           ENDDO
 
        ENDIF
@@ -3409,7 +3489,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(ELEMENT),INTENT(IN)::  EL
     TYPE(ELEMENT),INTENT(inOUT)::  ELP
-    INTEGER I,J
+    INTEGER I,J,n
 
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
@@ -3440,23 +3520,45 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
-    IF(ASSOCIATED(EL%D_AC)) then
-       ELP%D_AC=EL%D_AC
+    IF(ASSOCIATED(EL%D_AN)) then
 
        IF(EL%P%NMUL>0) THEN
           IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
              DEALLOCATE(ELP%D_AN );DEALLOCATE(ELP%D_BN )
+             DEALLOCATE(ELP%D0_AN );DEALLOCATE(ELP%D0_BN )
           endif
           if(.not.ASSOCIATED(ELP%D_AN)) THEN
              ALLOCATE(ELP%D_AN(EL%P%NMUL),ELP%D_BN(EL%P%NMUL))
+             ALLOCATE(ELP%D0_AN(EL%P%NMUL),ELP%D0_BN(EL%P%NMUL))
           ENDIF
 
           DO I=1,EL%P%NMUL
              ELP%D_AN(I) = EL%D_AN(I)
              ELP%D_BN(I) = EL%D_BN(I)
+             ELP%D0_AN(I) = EL%D0_AN(I)
+             ELP%D0_BN(I) = EL%D0_BN(I)
           ENDDO
 
        ENDIF
+
+    endif
+
+
+    IF(ASSOCIATED(EL%D_COEFF)) then
+       N=SIZE(EL%D_COEFF)
+       IF(N>0) THEN
+          DEALLOCATE(ELP%D_COEFF )
+          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
+             ALLOCATE(ELP%D_COEFF(N))
+          ENDIF
+
+
+          DO I=1,N
+             ELP%D_COEFF(I) = EL%D_COEFF(I)
+          ENDDO
+
+       ENDIF
+
 
     endif
 
@@ -3717,6 +3819,13 @@ CONTAINS
           DO I=1,ELP%P%NMUL
              CALL resetpoly_R31(ELP%d_AN(I))
              CALL resetpoly_R31(ELP%d_BN(I))
+             CALL resetpoly_R31(ELP%d0_AN(I))
+             CALL resetpoly_R31(ELP%d0_BN(I))
+          ENDDO
+       ENDIF
+       IF(associated(ELP%d_coeff)) THEN             ! SHARED BY A LOT
+          DO I=1,size(ELP%d_coeff)
+             CALL resetpoly_R31(ELP%d_coeff(I))
           ENDDO
        ENDIF
     endif

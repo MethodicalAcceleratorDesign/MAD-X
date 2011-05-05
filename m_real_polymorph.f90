@@ -5212,8 +5212,7 @@ contains
 
     select case(s1%kind)
     case(m1)
-       !          datanht%r=atanh(s1%r)
-       datanht%r=log((one+s1%r)/(one-s1%r))/two
+       datanht%r=log((1+s1%r)/(1-s1%r))/two
        datanht%kind=1
     case(m2)
        localmaster=master
@@ -5228,8 +5227,7 @@ contains
           datanht%t=atanh(varf1)
           master=localmaster
        else
-          !          datanht%r=atanh(s1%r)
-          datanht%r=log((one+s1%r)/(one-s1%r))/two
+          datanht%r=log((1+s1%r)/sqrt(1-s1%r))/two
           datanht%kind=1
        endif
     case default
@@ -6702,6 +6700,17 @@ contains
 
 
   END SUBROUTINE clean_real_8
+
+  SUBROUTINE  flip_real_8(S1,S2,i)
+    implicit none
+    type (real_8),INTENT(INOUT)::S2
+    type (real_8), intent(INOUT):: s1
+    integer i
+    if(s1%kind==2) then
+       s2=s1  ! to make s2 taylor!
+       call flip_taylor(S1%t,S2%t,i)
+    endif
+  end SUBROUTINE  flip_real_8
 
 
 end module  polymorphic_taylor

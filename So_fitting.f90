@@ -501,6 +501,183 @@ contains
   end SUBROUTINE comp_linear2
 
 
+  subroutine lattice_fit_TUNE_gmap_auto(R,my_state,EPSF,TARG,name)
+    IMPLICIT NONE
+    TYPE(layout), target,intent(inout):: R
+    real(dp) , intent(IN),dimension(:)::TARG
+    real(dp) CLOSED(6)
+    TYPE(INTERNAL_STATE), intent(IN):: my_STATE
+    TYPE(INTERNAL_STATE) STATE
+    INTEGER I,SCRATCHFILE, MF
+    TYPE(TAYLOR), allocatable:: EQ(:)
+    TYPE(REAL_8) Y(6)
+    TYPE(NORMALFORM) NORM
+    integer :: neq=2, no=2,nt,j,it,NP
+    type(damap) id
+    type(gmap) g
+    TYPE(TAYLOR)t
+    character(nlp) name(2)
+    real(dp) epsf,epsr,epsnow,gam(2)
+    type(fibre), pointer:: p
+    logical dname(2)
+    TYPE(POL_BLOCK) poly(2)
+    call context(name(1))
+    call context(name(2))
+    poly(1)=0
+    poly(2)=0
+    poly(1)%ibn(2)=1
+    poly(2)%ibn(2)=2
+    !    EPSF=.0001
+    SET_TPSAFIT=.FALSE.
+    dname=.false.
+    p=>r%start
+    do i=1,r%n
+       if(index (p%mag%name,name(1)(1:len_trim(name(1))) )   /=0) then
+          call  EL_POL_force(p,poly(1))
+          dname(1)=.true.
+       elseif(index(p%mag%name,name(2)(1:len_trim(name(2))))/=0) then
+          call  EL_POL_force(p,poly(2))
+          dname(2)=.true.
+       endif
+
+       p=>p%next
+    enddo
+
+    if(.not.(dname(1).and.dname(2))) then
+       CALL ELP_TO_EL(R)
+       write(6,*) " lattice_fit_TUNE_gmap_auto ---> FAILED"
+       return
+    endif
+
+
+    epsr=abs(epsf)
+
+    np=2
+
+    allocate(eq(neq))
+
+    nt=neq+np
+    STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+
+    CALL INIT(STATE,no,NP)
+
+
+    !   DO I=1,NPOLY
+    !      R=POLY(i)
+    !   ENDDO
+
+
+    CLOSED(:)=zero
+    it=0
+100 continue
+    it=it+1
+
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    write(6,*) "closed orbit "
+    write(6,*) CLOSED
+
+
+    CALL INIT(STATE,no,NP)
+    CALL ALLOC(NORM)
+    CALL ALLOC(Y)
+    CALL ALLOC(EQ)
+    call alloc(id)
+
+    id=1
+    Y=CLOSED+id
+
+    CALL TRACK(R,Y,1,+STATE)
+    write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
+    write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
+    write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
+    write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
+    NORM=Y
+    gam(1)=(norm%a_t%v(2).sub.'1')**2+(norm%a_t%v(2).sub.'01')**2
+    gam(2)=(norm%a_t%v(4).sub.'001')**2+(norm%a_t%v(4).sub.'0001')**2
+    write(6,*) "  Gamma= ",GAM
+    !      CALL KANALNUMMER(MF)
+    OPEN(UNIT=1111,FILE='GAMMA.TXT')
+    WRITE(1111,*) "  Gamma= ",GAM
+
+    write(6,*) " tunes ",NORM%TUNE(1), NORM%TUNE(2)
+
+    eq(1)=       ((NORM%dhdj%v(1)).par.'0000')-targ(1)
+    eq(2)=       ((NORM%dhdj%v(2)).par.'0000')-targ(2)
+    epsnow=abs(eq(1))+abs(eq(2))
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+
+    do i=1,neq
+       eq(i)=eq(i)<=c_%npara
+    enddo
+    do i=1,neq
+       call daprint(eq(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+    CALL KILL(NORM)
+    CALL KILL(Y)
+    CALL KILL(id)
+    CALL KILL(EQ)
+
+
+
+    CALL INIT(1,nt)
+    call alloc(g,nt)
+    call kanalnummer(SCRATCHFILE)
+    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
+    rewind scratchfile
+    do i=np+1,nt
+       call read(g%v(i),scratchfile)
+    enddo
+    close(SCRATCHFILE)
+
+    call alloc(t)
+    do i=1,np
+       g%v(i)=one.mono.i
+       do j=np+1,nt
+          t=g%v(j).d.i
+          g%v(i)=g%v(i)+(one.mono.j)*t
+       enddo
+    enddo
+    CALL KILL(t)
+
+    g=g.oo.(-1)
+    tpsafit=zero
+    tpsafit(1:nt)=g
+
+    SET_TPSAFIT=.true.
+
+    p=>r%start
+    do i=1,r%n
+       if(index (p%mag%name,name(1)(1:len_trim(name(1))) )   /=0) then
+          call  EL_POL_force(p,poly(1))
+       elseif(index(p%mag%name,name(2)(1:len_trim(name(2))))/=0) then
+          call  EL_POL_force(p,poly(2))
+       endif
+
+       p=>p%next
+    enddo
+
+    SET_TPSAFIT=.false.
+
+    CALL ELP_TO_EL(R)
+
+    !    write(6,*) " more "
+    !    read(5,*) more
+    if(it>=max_fit_iter) goto 101
+    if(epsnow<=epsr) goto 102
+    GOTO 100
+
+101 continue
+    write(6,*) " warning did not converge "
+
+102 continue
+    CALL KILL_PARA(R)
+    deallocate(eq)
+
+  end subroutine lattice_fit_TUNE_gmap_auto
+
   subroutine lattice_fit_TUNE_gmap(R,my_state,EPSF,POLY,NPOLY,TARG,NP)
     IMPLICIT NONE
     TYPE(layout), target,intent(inout):: R
@@ -900,7 +1077,7 @@ contains
           endif
        enddo
        write(6,*) "epsnow ", epsnow
-       ipause=mypause(123321)
+       ipause=mypause(123)
        call kanalnummer(SCRATCHFILE)
        OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
        rewind scratchfile

@@ -20,6 +20,7 @@ module dabnew
   !  PUBLIC DADIV,DADIC,DACDI,DACAD,DACSU,DASUC,DASHIFT,DARAN,DACFUR
   !  PUBLIC DACFUI,DAPRI77,DAREA77,GET_C_J,PPUSH1,DALLSTA,dacycle
   !  public count_da
+  ! write_ removed
   integer,private,parameter:: lsw=1
   integer :: lda_max_used=0
   ! integer,private,parameter::nmax=400,lsw=1
@@ -493,7 +494,7 @@ contains
     w_p%nc=1
     write(w_p%c(1),'(a11,i8)') ' ALLOCATED ',ldanow
     w_p%fc='(1((1X,A72)))'
-    ! call ! WRITE_I
+    !CALL WRITE_i
     return
   end subroutine dallsta
   !
@@ -648,7 +649,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          ! call !write_e(125)
+          !CALL WRITE_E(125)(125)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -758,7 +759,7 @@ contains
              write(w_p%c(3),'(i8,1x,i8)') NST0,LST
              w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
              write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-             ! call !write_e(126)
+             !CALL WRITE_E(125)(126)
              call dadeb !(31,'ERR DAALL ',1)
           endif
           !
@@ -866,7 +867,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          ! call !write_e(127)
+          !CALL WRITE_E(125)(127)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -976,7 +977,7 @@ contains
           write(w_p%c(3),'(i8,1x,i8)') NST0,LST
           w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
           write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          ! call !write_e(127)
+          !CALL WRITE_E(125)(127)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -4489,7 +4490,7 @@ contains
     if(inva.eq.0) then
        write(iunit,'(A)') '    I  VALUE  '
        do i = ipoa,ipoa+illa-1
-          write(iunit,'(I6,2X,g20.13)') i-ipoa, cc(i)
+          write(iunit,'(I6,2X,G20.13)') i-ipoa, cc(i)
        enddo
     elseif(nomax.eq.1) then
        if(illa.ne.0) write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
@@ -4786,7 +4787,7 @@ contains
     !
 10  continue
     iin = iin + 1
-    read(iunit,'(I6,2X,g20.13,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
+    read(iunit,'(I6,2X,G20.13,I5,4X,18(2i2,1X))') ii,c,io,(j(i),i=1,inva)
     !
     if(ii.eq.0) goto 20
     !ETIENNE
