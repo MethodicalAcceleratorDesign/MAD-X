@@ -657,6 +657,8 @@ CONTAINS
        key%tiltd=tilt  !==========================================!
 
        !================================================================
+! dipole component not active in MAD-X proper
+       key%list%b0=bvk*node_value('k0 ')
 
     case(6)
        key%magnet="sextupole"
@@ -835,7 +837,8 @@ CONTAINS
        !     key%list%lag=atan2(node_value('ey '),node_value('ex '))
        !     key%tiltd=node_value('tilt ')
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
-       no_cavity_totalpath=abs(node_value('no_cavity_totalpath ').eq.0)
+       no_cavity_totalpath=node_value('no_cavity_totalpath ').eq.0
+       no_cavity_totalpath=abs(no_cavity_totalpath)
        key%list%cavity_totalpath=no_cavity_totalpath
     case(12)
        ! actually our SROT element

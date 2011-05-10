@@ -1021,6 +1021,7 @@ char command_def[] =
 "calib    = [r, 0], "
 "polarity = [r, 0], "
 "tilt     = [r, 0],  "
+"k0       = [r, 0],  "
 "k1       = [r, 0],  "
 "k1s      = [r, 0],  "
 "mech_sep = [r, 0], "
