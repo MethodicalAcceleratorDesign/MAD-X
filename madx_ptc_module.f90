@@ -843,7 +843,6 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
-       print*,"GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",no_cavity_totalpath,key%list%cavity_totalpath
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
