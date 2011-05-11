@@ -8,6 +8,7 @@ if(COMMAND cmake_policy)
 #   cmake_policy(SET CMP0014 OLD) #ignore not having CMakeLists.txt in subfolders (lib/lib64)
 endif(COMMAND cmake_policy)
 
+
 # project version
 SET( PROJECT_MAJOR_VERSION 5 )
 SET( PROJECT_MINOR_VERSION 00 )
