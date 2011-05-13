@@ -4,7 +4,6 @@ FILE (GLOB csrcfiles *.c)
 # list of fortran source files
 FILE (GLOB fsrcfiles *.f90 *.F90)
 
-macro
 
 # add source files according to NTPSA option...
 if (MADX_NTPSA )
