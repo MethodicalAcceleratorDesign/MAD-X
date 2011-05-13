@@ -658,7 +658,7 @@ CONTAINS
 
        !================================================================
 ! dipole component not active in MAD-X proper
-       key%list%b0=bvk*node_value('k0 ')
+       key%list%k(1)=key%list%k(1)+bvk*node_value('k0 ')
 
     case(6)
        key%magnet="sextupole"
