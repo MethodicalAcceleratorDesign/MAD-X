@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-PROJECT(madX C CXX Fortran) 
+PROJECT(madX Fortran C CXX) 
 #add name of languages used in the project as well
 
 if(COMMAND cmake_policy)
@@ -12,7 +12,7 @@ endif(COMMAND cmake_policy)
 # project version
 SET( PROJECT_MAJOR_VERSION 5 )
 SET( PROJECT_MINOR_VERSION 00 )
-SET( PROJECT_PATCH_LEVEL 00 )
+SET( PROJECT_PATCH_LEVEL 05 )
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
@@ -176,13 +176,26 @@ include(setupInstallation)
 # Testing:
 # enable dashboard scripting
 
+# Define useful build name for cdash:
+find_program(UNAME NAMES uname)
+macro(getuname name flag)
+  exec_program("${UNAME}" ARGS "${flag}" OUTPUT_VARIABLE "${name}")
+endmacro(getuname)
+
+getuname(osname -s)
+# getuname(osrel  -r)
+getuname(cpu    -m)
+STRING(REGEX REPLACE ".*/([^ ])" "\\1" fcompilername "${CMAKE_Fortran_COMPILER}" )
+SET(BUILDNAME "${osname}-${cpu}-${fcompilername}")
+if (MADX_FORCE_32 AND NOT ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+    set(BUILDNAME "${BUILDNAME}-32")
+endif (MADX_FORCE_32 AND NOT ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
+IF(BUILD_TESTING)
+    SET(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of build on the dashboard")
+  MARK_AS_ADVANCED(BUILDNAME)
+ENDIF(BUILD_TESTING)
+# End of defining build name...
+
 enable_testing()
 include(CTest)
-set (CTEST_PROJECT_NAME "MadX")
-ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testruns.sh" "${BINARY_POSTFIX}")
-set_tests_properties (testruns 
-  PROPERTIES PASS_REGULAR_EXPRESSION "Number of warnings: 0")
-ADD_TEST(testsample "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testsample.sh" "${BINARY_POSTFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests")
-set_tests_properties (testsample 
-  PROPERTIES FAIL_REGULAR_EXPRESSION "Number of errors: [1-9]") # The no warning check fails on this test..
 
