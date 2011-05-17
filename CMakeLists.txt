@@ -177,6 +177,7 @@ include(setupInstallation)
 # enable dashboard scripting
 
 enable_testing()
+include(CTest)
 set (CTEST_PROJECT_NAME "MadX")
 ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testruns.sh" "${BINARY_POSTFIX}")
 set_tests_properties (testruns 
