@@ -925,7 +925,7 @@ contains
       ! added on 3 November 2010 to hold Edwards & Teng parametrization
       real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
       ! to convert between Ripken and Edwards-Teng parametrization
-      real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
+      real(dp) :: kappa,u,ax,ay,kx,ky,kxy2,usqrt,bx,by,cx,cy,cosvp,sinvp,cosvm,sinvm,cosv2,sinv2,cosv1,sinv1
       real(dp) :: deltaeValue
 
       if (getdebug() > 2) then
@@ -1199,8 +1199,14 @@ contains
          ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
          kxy2=kx*kx*ky*ky;
          if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
-            if((1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2)).gt.TINY(ONE)) then
-               u=(-kxy2+sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))))/(1-kxy2)
+            usqrt=kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
+            if(usqrt.gt.TINY(ONE)) then
+               usqrt=sqrt(usqrt)
+               if(kxy2.le.usqrt) THEN
+                  u=(-kxy2+usqrt)/(one-kxy2)
+               else
+                  u=(-kxy2-usqrt)/(one-kxy2)
+               endif
             else
                u=-kxy2/(1-kxy2)
             endif
