@@ -1160,7 +1160,7 @@ contains
     implicit none
     integer nturn,i,j,nm,k,jm,nt
     real(dp), pointer :: mom(:,:),r(:,:),a(:,:),at(:,:)
-    real(dp)ar, momt(6,6),kick(3),a6(6,6),ai6(6,6),br(6,6)
+    real(dp)ar, momt(6,6),kicke(3),a6(6,6),ai6(6,6),br(6,6)
     type(damap) id,m12,ex
     type(pbfield) h
     type(normalform) norm
@@ -1218,7 +1218,7 @@ contains
        momt(5,5)=mom(1,1)
        momt(6,6)=mom(1,1)
 
-       call diagonalise_envelope_a(momt,br,a6,ai6,kick)
+       call diagonalise_envelope_a(momt,br,a6,ai6,kicke)
        a=a6(1:4,1:4)
        at=matmul(at,a)
     else
