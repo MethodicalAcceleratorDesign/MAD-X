@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "Binary postfix: $1"
-echo 'exit;' | ./madx$1
+echo "Executable: $1"
+echo 'exit;' | ./$1

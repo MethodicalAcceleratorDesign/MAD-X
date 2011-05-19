@@ -94,8 +94,7 @@ endif (APPLE)
 
 
 # C stuff:
-get_filename_component (C_COMPILER_NAME ${CMAKE_C_COMPILER} NAME)
-if (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortran")
+if (CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 # this will probably crash on windows...
   execute_process(COMMAND ${C_COMPILER_NAME} -print-search-dirs
                 OUTPUT_VARIABLE gccsearchdirs)
@@ -104,7 +103,7 @@ if (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortr
   string(REPLACE "/:/"  "/ -L/" gcclibs "${gcclibs}")
   # adding these to the linking process which is handled by a non-gnu fortran compiler in your case
   LINK_DIRECTORIES(${gcclibs}) 
-endif (C_COMPILER_NAME MATCHES "gcc" AND NOT CMAKE_Fortran_COMPILER MATCHES "gfortran")
+endif (CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 # end C stuff
 
 #
@@ -131,11 +130,12 @@ ADD_LIBRARY(madx ${srcfiles})
 SET_TARGET_PROPERTIES(madx PROPERTIES LINKER_LANGUAGE Fortran) 
 
 # adding an executable:
-add_executable(madxbin MACOSX_BUNDLE  madxp.c madx_main.F90)
+add_executable(madxbin MACOSX_BUNDLE  madx_main.F90)
 SET_TARGET_PROPERTIES(madxbin PROPERTIES LINKER_LANGUAGE Fortran)
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
 SET_TARGET_PROPERTIES(madxbin PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
+get_target_property(binaryname madxbin OUTPUT_NAME)
 
 # we need to link executable to our own library:
 target_link_libraries(madxbin madx)
@@ -185,14 +185,20 @@ endmacro(getuname)
 getuname(osname -s)
 # getuname(osrel  -r)
 getuname(cpu    -m)
-STRING(REGEX REPLACE ".*/([^ ])" "\\1" fcompilername "${CMAKE_Fortran_COMPILER}" )
-SET(BUILDNAME "${osname}-${cpu}-${fcompilername}")
+
+if(CMAKE_Fortran_COMPILER_ID MATCHES "unknown")
+    STRING(REGEX REPLACE ".*/([^ ])" "\\1" fcompilername "${CMAKE_Fortran_COMPILER}" )
+    SET(BUILDNAME "${osname}-${cpu}-${fcompilername}")
+else(CMAKE_Fortran_COMPILER_ID MATCHES "unknown")
+    SET(BUILDNAME "${osname}-${cpu}-${CMAKE_Fortran_COMPILER_ID}")
+endif(CMAKE_Fortran_COMPILER_ID MATCHES "unknown")
+
 if (MADX_FORCE_32 AND NOT ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
     set(BUILDNAME "${BUILDNAME}-32")
 endif (MADX_FORCE_32 AND NOT ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
 IF(BUILD_TESTING)
     SET(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of build on the dashboard")
-  MARK_AS_ADVANCED(BUILDNAME)
+    MARK_AS_ADVANCED(BUILDNAME)
 ENDIF(BUILD_TESTING)
 # End of defining build name...
 
