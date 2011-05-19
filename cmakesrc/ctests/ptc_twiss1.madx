@@ -1,0 +1,187 @@
+!TITLE,'Test input for PTC_TWISS ';
+
+!=========== RING PARAMETERS ===========================================
+ eg   :=  100;
+ bg   :=  eg/pmass;
+ en   := 3.75e-06;
+ epsx := en/bg;
+ epsy := en/bg;
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = 1,
+                         ex=epsx,   ey=epsy;
+value,epsx,epsy;
+option,-echo;
+call file="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/ring_lattice/fv9.opt";  // string without blanks does not need ".."
+call file="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/ring_lattice/fv9.seq";
+option,echo;
+
+use,period=fivecell;
+// alignment errors
+
+select,flag=error,clear;
+select,flag=error,pattern="q.*",range=qf.1;
+ealign,dx=0.0001;
+!select,flag=error,class=quadrupole,range=qf.4/qf.5;
+!ealign,dy=0.0002,dtheta=0.0003;
+
+/*
+select,flag=error,clear;
+
+// field errors
+gcutr=3.0;
+b1r=1.e-4;
+b2r=2.e-4;
+b3r=3.e-4;
+b4r=4.e-4;
+b5r=5.e-4;
+a1r=1.e-4;
+a2r=2.e-4;
+a3r=3.e-4;
+a4r=4.e-4;
+a5r=5.e-4;
+
+Select, flag=error, clear = true;
+select, flag=error, pattern="q.*\..*";
+efcomp, order:=1, radius:=0.010, 
+dknr={0,1e-1*b2r},
+dksr={0,1e-1*a2r};
+esave;
+*/
+
+acbh1=1e-6;
+acbh2=1e-6;
+acbh3=1e-6;
+acbh4=1e-6;
+acbh5=1e-6;
+
+/*           
+acbv1=1e-6;
+acbv2=1e-6;
+acbv3=1e-6;
+acbv4=1e-6;
+acbv5=1e-6;
+*/
+
+!select,flag=sectormap,class=drift;
+
+!select,flag=my_table,class=quadrupole,
+!column=name,parent,keyword,s,betx,bety,dx,dy,k1l,
+!re11,re12,re13,re14;
+
+!twiss,centre,rmatrix,
+!sectormap,sectorfile=my_sectorfile,
+!table=my_table,file=twiss_fv9;
+
+
+
+! At the end of the ring the data_block is produced
+
+SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
+
+select,flag=twiss,column=name,s,betx,bety,dx,dy;
+
+TWISS,file=twiss_madx_ring; 
+write,table="summ",file="twiss_summary_table.tfs";
+
+SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
+
+
+! Initialize PTC
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+!ptc_align;
+
+select,flag=ptc_twiss,column=name,s,beta11,beta21,
+                                  beta12,beta22,disp1,disp3,x,px,y,py;
+
+ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
+
+PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=1; ! currently cause
+! memory access outside program range later
+
+ptc_end;
+
+!write,table="map_table",file="map_table";
+write,table="map_table",file="ring_matrix_at_end.tfs";
+write,table="ptc_twiss_summary",file="ptc_twiss_summary.tfs";
+
+!=========== TRANSFER-LINE PARAMETERS ==================================== 
+
+  TITLE, s="e- Beam Delivery System 1 ->20 mr (ILC2005)";
+  OPTION,ECHO = false;!, VERIFY = true;
+!  ASSIGN, PRINT="ebds1.print";
+!  ASSIGN, ECHO="ebds1.echo";
+  const Cb=1.0E10/CLIGHT;
+  Ef:=250.0;
+  Brho:=Cb*Ef;
+  Efact:=Ef/500;
+  Bsign:=-1;
+  Bscl:=Ef/500;
+  L12MM:=0.012;
+  L50CM:=0.5;
+  L1M:=1.0;
+  L2M:=2.0;
+  LFBC:=0.2;
+  LFBK:=0.3;
+  Lspace:=0.1;
+  Bmax:=9.6; //maximum quadrupole pole-tip field for 500 GeV beam (kG)
+  TFOC:=0;
+  QBDS1:quadrupole, TYPE="QBDS1",L:=L50CM/2, aperture:=L12MM/2;
+  QFACT1:=1/(L12MM/2*Brho);
+  QBDS2:quadrupole, TYPE="QBDS2",L:=L1M/2, aperture:=L12MM/2;
+  QFACT2:=1/(L12MM/2*Brho);
+  QBDS3:quadrupole, TYPE="QBDS3",L:=L2M/2, aperture:=L12MM/2;
+  QFACT3:=1/(L12MM/2*Brho);
+  BPMQ079:monitor;
+  MMOVER:marker;
+!  FBCXY:INST;
+!  FBKXY:INST;
+  FBCXY:monitor;
+  FBKXY:monitor;
+  BPMMB079:monitor;
+  WS:WIRE;
+  BPMWS:monitor;
+  BPME:monitor;
+  BPMVIRT:monitor;
+  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/ebsy.madx";
+  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/eirt1.madx";
+  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/eff1.madx";
+  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/edl1.madx";
+!stop;
+  TBETX:=50.525915605603;
+  TALFX:=-2.379589233378;
+  TBETY:=9.563928674469;
+  TALFY:=0.510997181234;
+  TWSS0:BETA0, ENERGY:=Ef, BETX:=TBETX, ALFX:=TALFX, BETY:=TBETY, ALFY:=TALFY;
+  BEAM, PARTICLE=ELECTRON, ENERGY:=Ef;
+  SETPLOT, XSIZE:=25.4, YSIZE:=20.32;
+!  OPTION, ECHO = true;
+!     USE, period=(EBSY,EIRT1,EFF1,EDL1);
+ FFLINE0:LINE=(EBSY,EIRT1,EFF1,EDL1);
+! FFLINE:LINE=(EBSY,EIRT1,EFF1);
+ FFLINE:LINE=(EBSY,EIRT1,EFF1);
+! FFLINEI:LINE=(EBSY,EIRT1,EFF1,EDL1);
+!     USE, period=FFLINEI;
+! FFLINEI:LINE=(FFLINE); 
+ FFLINEI:LINE=(-EFF1); 
+myval1=0.;
+myval2=.001;
+
+select,flag=ptc_twiss,clear;
+select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
+
+ptc_create_universe;
+
+ptc_create_layout,model=2,method=6,nst=5,exact; ! with new version
+! creates a memory access outside program range
+! Example 1: BETA0 block  ================================================
+
+ptc_twiss,icase=5,no=3,BETA0=TWSSip,summary_table,summary_file,file=twiss_ptc_line;
+ptc_end;
+stop;
+
