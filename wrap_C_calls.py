@@ -347,7 +347,8 @@ class Wrapper:
         files = []
         allFiles = os.listdir('.')
         for d in dirs:
-          allFiles.extend(os.listdir(d))
+            for entry in os.listdir(d):
+                allFiles.append(os.path.join(options.outdir,entry))
         for file in allFiles:
             if file[-((len(suffix))+1):] == ('.'+suffix):
                 files.append(file)
