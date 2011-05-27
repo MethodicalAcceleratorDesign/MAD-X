@@ -54,6 +54,8 @@ if not exist %VCROOT%\vcvarsall.bat (
 ) else (
    echo using Visual C++ in %VCROOT%\vcvarsall.bat 
    call %VCROOT%\vcvarsall.bat amd64
+REM --- for cross-compiling on a 32-bit machine, with x64 target, replace the above by the following
+REM   call %VCROOT%\vcvarsall.bat x86_amd64
 )
 REM --- ABOVE FOR 64 BITS
 
