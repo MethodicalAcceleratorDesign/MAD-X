@@ -39,5 +39,7 @@ ADD_CUSTOM_COMMAND(
 set(srcfiles ${csrcfiles} ${fsrcfiles} ${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.c ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers.c )
 
 # header files...
-set(headerfiles c6t.h madxdict.h madxl.h matchptcknobs.h tpsa.h madxd.h madx.h madxreg.h rplot.h)
+file(GLOB headerfiles *.h)
+file(GLOB to_remove doxygen.h)
+list(REMOVE_ITEM headerfiles ${to_remove})
 
