@@ -21,11 +21,11 @@ INST_SCRIPT_FILES_NEW = $(PYTHON_SCRIPTS) $(XML_DOCS)
 INST_WEB_FILES = $(HTML_DOCS)
 
 # temporary locations
-DELIVERY_TARGET = /afs/cern.ch/user/n/nougaret/scratch0/mad-automation 
-DELIVERY_TARGET_NEW = /afs/cern.ch/user/n/nougaret/scratch1/mad-automation
+DELIVERY_TARGET = ~/cern/madx_trunk/mad-automation
+DELIVERY_TARGET_NEW = ~/cern/madx_trunk/mad-automation
 
 # directory in which cron starts build
-WEB_FOLDER_TARGET = /afs/cern.ch/user/n/nougaret/www/mad
+WEB_FOLDER_TARGET = ~/cern/madx_trunk/mad-automation/www
 
 install: $(INSTFILES)
 	chmod a+x *.pl	# just in case

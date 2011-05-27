@@ -14,21 +14,21 @@
 # C compiler
 CC=gcc
 # Fortran90 compiler
-f95=ifort
+f95=g95
 # architecture 32/64bit
 ARCH=32
 # Debugging compiler flags
 DEBUG=NO
 # Online version - mostly SDDS IO
-ONLINE=YES
+ONLINE=NO
 # Memory leak search version
 MEMLEAKS=NO
 # profiling version
 PROFILE=NO
 # Piotr's pluggins "root" etc
-PLUGIN_SUPPORT=NO
+PLUGIN_SUPPORT=YES
 # Alternative DA package in C++
-NTPSA=YES
+NTPSA=NO
 
 # Mac version
 ONMAC=NO
@@ -173,7 +173,7 @@ else
   ifneq ($(f95),lf95)
     ifeq ($(ONMAC),NO)
       f95_FLAGS+= -O4
-	endif
+    endif
   endif
 endif
 
@@ -381,6 +381,12 @@ madx_objects += $(filter-out $(FILT_TP_OUT_F90),$(patsubst %.F90,%.o,$(wildcard 
 madx: $(madx_objects)
 	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 #	strip madx
+
+x:
+#	$(f95) $(f95_FLAGS) madx_ptc_setcavs.f90
+	$(f95) $(f95_FLAGS) madx_ptc_twiss.f90
+	$(f95) $(f95_FLAGS) madx_ptc_knobs.f90
+	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 
 clean:
 	rm -f *.o

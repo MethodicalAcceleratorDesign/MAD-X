@@ -220,11 +220,13 @@ contains
 
              x = TheBeam%X(n,1:6)
 
-             p0=(1+x(5))
-             pz=sqrt(p0**2 - x(2)**2 - x(4)**2)
+             ! in the past we wanted angles (piotr 2011.05.27)
+             
+             !p0=(1+x(5))
+             !pz=sqrt(p0**2 - x(2)**2 - x(4)**2)
              p0 = p0*p%mag%p%p0c
-             xp = x(2)/pz
-             yp = x(4)/pz
+             !xp = x(2)/pz
+             !p = x(4)/pz
 
 
              !             write(441,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
@@ -233,7 +235,7 @@ contains
 
              write(mf,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
                   pathlegth, TheBeam%X(n,7), &
-                  x(1), xp , x(3), yp , x(5), p0 , x(6)
+                  x(1), x(2) , x(3), x(4) , x(5), x(6) , p0
 
 
              if (rplot) then
@@ -252,14 +254,15 @@ contains
                 !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
                 !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
                 !   else
-                call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                !call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                 call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
                 !   endif
              endif
 
              if ( observedelements(e) .gt. 0 ) then
                 if ( associated(CURR_SLICE, p%t2 ) ) then
                    print*, "Sending to table", n, e, pathlegth
-                   call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
+                   call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0)
                 endif
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
@@ -598,14 +601,14 @@ contains
 
                    if (getdebug() > 3 ) write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                   call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                   call plottrack(n, e, t, gposx, x(2) , gposy, x(4) , x(5), p0 , gposz)
                 else
-                   call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
                 endif
              endif
 
              if ( observedelements(e) .gt. 0) then
-                call putintracktable(n,t,observedelements(e),x(1), xp , x(3), yp , x(6), x(5), pathlegth, p0)
+                call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, p0)
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
 
