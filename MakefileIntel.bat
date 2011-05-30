@@ -101,8 +101,6 @@ SET WRAPPERS_OBJ=
 IF %WRAP_FORTRAN_CALLS% == 1 (
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\fortran_wrappers.c
 ifort /c /names:lowercase /assume:underscore /assume:noold_unit_star -D_INTEL_IFORT_SET_RECL /fpp /O2 -D_INTEL_IFORT_FLUSH %MADX%\fortran_flush.F90
-REM in the above, removing /assume:underscore did not help _call_fortran_flush_ and _flush unresolved
-REM for the time-being, comment the following as not yet ready to wrap C calls yet
 cl -c /Zm1000 -D_FULL -D_CATCH_MEM_W -D_WIN32 %WRAP_FLAG% %MULTITHREADING% %MADX%\c_wrappers.c
 )
 
