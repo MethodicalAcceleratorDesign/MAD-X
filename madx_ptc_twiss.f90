@@ -1198,24 +1198,25 @@ contains
          ! hence we reflect this in the formula from Lebedev
          ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
          kxy2=kx*kx*ky*ky;
-         if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(1-kxy2).gt.TINY(ONE))) then
-            usqrt=kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
+         if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(one-kxy2).gt.TINY(ONE))) then
+            usqrt=kxy2*(one+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
             if(usqrt.gt.TINY(ONE)) then
                usqrt=sqrt(usqrt)
+!               u=(-kxy2+usqrt)/(one-kxy2)
                if(kxy2.le.usqrt) THEN
                   u=(-kxy2+usqrt)/(one-kxy2)
                else
                   u=(-kxy2-usqrt)/(one-kxy2)
                endif
             else
-               u=-kxy2/(1-kxy2)
+               u=-kxy2/(one-kxy2)
             endif
 
             ! betx, bety, alfx, alfy are the values computed by twiss with very good precision
             ! beta11, alfa11 etc... are multiplied by deltae before output
             ! hence we reflect this in the formula from Lebedev
 
-            kappa=1-u
+            kappa=one-u
 
             betx = (tw%beta(1,1)/kappa) * deltaeValue
             bety = (tw%beta(2,2)/kappa) * deltaeValue
@@ -1232,10 +1233,10 @@ contains
             cosvm = (ax*ay+by*cx)/(ax*ax+cx*cx)
             sinvm = (ax*by-ay*cx)/(ax*ax+cx*cx)
 
-            cosv2 = sqrt((1+cosvp*cosvm-sinvp*sinvm)/2)
-            sinv2 = -sqrt((1-cosvp*cosvm+sinvp*sinvm)/2)
-            cosv1 = -sqrt((1+cosvp*cosvm+sinvp*sinvm)/2)
-            sinv1 = -sqrt((1-cosvp*cosvm-sinvp*sinvm)/2)
+            cosv2 =  sqrt((one+cosvp*cosvm-sinvp*sinvm)/two)
+            sinv2 = -sqrt((one-cosvp*cosvm+sinvp*sinvm)/two)
+            cosv1 = -sqrt((one+cosvp*cosvm+sinvp*sinvm)/two)
+            sinv1 = -sqrt((one-cosvp*cosvm-sinvp*sinvm)/two)
 
             r11 = sqrt(tw%beta(2,2)/tw%beta(1,2))*(tw%alfa(1,2)*sinv2+u*cosv2)/kappa
             r12 = sqrt(tw%beta(1,1)*tw%beta(2,1))*sinv1/kappa
