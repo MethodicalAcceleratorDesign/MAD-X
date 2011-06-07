@@ -3519,10 +3519,11 @@ void pro_aperture(struct in_cmd* cmd)
   {
     printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n",
            limit_node->name,limit_node->n1,limit_node->s);
+    aper_header(aperture_table, limit_node);
+    
     file = command_par_string("file", this_cmd->clone);
     if (file != NULL)
     {
-      aper_header(aperture_table, *limit_node);
       out_table(table, aperture_table, file);
     }
     if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);

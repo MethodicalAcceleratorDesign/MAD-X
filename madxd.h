@@ -1138,7 +1138,7 @@ struct table* aper_e_d_read_tfs(char* , int*, char*);
 
 int aper_external_file(char*, double*, double*);
 void aper_fill_quads(double*, double*, int, int*);
-void aper_header(struct table*, struct aper_node);
+void aper_header(struct table*, struct aper_node*);
 void aper_intersect(double, double, double, double, double, double,
                     double, double, int, int,double*, double*);
 int aper_linepar(double, double, double, double, double*, double*);

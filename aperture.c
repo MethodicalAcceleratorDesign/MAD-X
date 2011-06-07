@@ -1239,17 +1239,22 @@ void aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* hal
 
 
 
-void aper_header(struct table* aper_t, struct aper_node lim)
+void aper_header(struct table* aper_t, struct aper_node *lim_)
   /* puts beam and aperture parameters at start of the aperture table */
 {
   int i, err, nint=1, h_length = 25;
-  double dtmp, dtmp2, vtmp[4], deltap_twiss,n1min;
-  char tmp[NAME_L], *stmp;
+  double dtmp, vtmp[4], deltap_twiss, n1min, n1, s;
+  char tmp[NAME_L], name[NAME_L], *stmp;
 
+  n1 = lim_->n1;
+  s  = lim_->s;
+  strncpy(name, lim_->name, sizeof name);
+  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",name,n1,s);
 
   /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   /* =================================================================*/
+
 
   /* many modif to make the header being standard; BJ 25feb2008 */
 
@@ -1259,14 +1264,11 @@ void aper_header(struct table* aper_t, struct aper_node lim)
   stmp = command_par_string("halofile", this_cmd->clone);
   if (stmp) h_length += 1; else h_length += 4;
 
-  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",
-           lim.name,lim.n1,lim.s);
-
   printf("\nheader %d \n",h_length);
 
   /* beam properties */
   if (aper_t->header == NULL)  aper_t->header = new_char_p_array(h_length);
-  strcpy(tmp, current_sequ->name);
+  strncpy(tmp, current_sequ->name, sizeof tmp);
   sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   i = get_string("beam", "particle", tmp);
@@ -1301,13 +1303,11 @@ void aper_header(struct table* aper_t, struct aper_node lim)
   sprintf(c_dum->c, v_format("@ BETAQFX          %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dparx", this_cmd->clone);
-  dtmp2 = command_par_value("dpary", this_cmd->clone);
-
   sprintf(c_dum->c, v_format("@ PARAS_DX         %%le       %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le       %g"), dtmp2);
+  dtmp = command_par_value("dpary", this_cmd->clone);
+  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le       %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-
   dtmp = command_par_value("dp", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
@@ -1329,7 +1329,8 @@ void aper_header(struct table* aper_t, struct aper_node lim)
   stmp = command_par_string("halofile", this_cmd->clone);
   if (stmp)
   {
-    sprintf(c_dum->c, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    strncpy(tmp, stmp, sizeof tmp);
+    sprintf(c_dum->c, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
   else
@@ -1348,24 +1349,22 @@ void aper_header(struct table* aper_t, struct aper_node lim)
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp)
   {
-    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(stmp),stoupper(stmp));
+    strncpy(tmp, stmp, sizeof tmp);
+    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",
-           lim.name,lim.n1,lim.s);
+  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",name,n1,s);
   printf("\ncurr %d \n",aper_t->header->curr);
 
 
-  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim.n1);
+  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), n1);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  n1min = lim.n1;
+  n1min = n1;
   set_value("beam","n1min",&n1min);
 
-  strcpy(tmp, lim.name);
-  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""),strlen(tmp),stoupper(tmp) );
+  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""),strlen(name),stoupper(name) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-
 }
 
 
