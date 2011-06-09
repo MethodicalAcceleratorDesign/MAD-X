@@ -5,7 +5,7 @@
 module ptc_spin
   !use orbit_ptc
   !use beam_beam_ptc
-  use accel_ptc
+  use orbit_ptc
   implicit none
   public
   PRIVATE get_fieldR !,get_field

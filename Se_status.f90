@@ -110,6 +110,10 @@ module S_status
   TYPE(INTERNAL_STATE), target ::  DELTA=DELTA0
   TYPE(INTERNAL_STATE), target ::  SPIN=SPIN0
   TYPE(INTERNAL_STATE), target ::  MODULATION=MODULATION0
+  type(acceleration), pointer :: acc
+  type(acceleration), pointer :: accFIRST
+  type(fibre), pointer :: paccfirst
+  type(fibre), pointer :: paccthen
 
   !  private s_init,S_init_berz,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
   private s_init,MAKE_STATES_0,MAKE_STATES_m,print_s,CONV
@@ -605,6 +609,10 @@ CONTAINS
     integer i,lda_old
 
     W_P=>W_I
+    NULLIFY(ACC);
+    NULLIFY(ACCfirst);
+    NULLIFY(paccfirst);
+    NULLIFY(paccthen);
 
 
     insane_PTC=.true.
@@ -761,8 +769,8 @@ CONTAINS
     endif
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration method ',METD
     write(mf,'((1X,a28,1x,i4))' ) ' Default integration steps  ',NSTD
-    if(CAVITY_TOTALPATH==1) write(mf,'((1X,a24))' ) ' Real Pill Box Cavities '
-    if(CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
+    !   if(CAVITY_TOTALPATH==1) write(mf,'((1X,a24))' ) ' Real Pill Box Cavities '
+    !   if(CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
 
     If(electron) then
        if(muon==one)  then

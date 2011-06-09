@@ -1939,32 +1939,43 @@ CONTAINS
 
     if(EL%KIND==kind1) return
 
+    if(associated(EL%ramp)) then
+       do n=1,EL%P%NMUL
+          EL%BN(N)= EL%ramp%table(0)%bn(n)
+          EL%AN(N)= EL%ramp%table(0)%an(n)
+          ELP%BN(N)= ELP%ramp%table(0)%bn(n)
+          ELP%AN(N)= ELP%ramp%table(0)%an(n)
+       enddo
+    else
 
-    IF(EL%P%NMUL>=1) THEN
-       if(present(VR))then
-          do n=1,EL%P%NMUL
-             EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
-             EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
-             ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
-             ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
-          enddo
-       else
-          do n=1,EL%P%NMUL
-             EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
-             EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-             ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
-             ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-          enddo
+       IF(EL%P%NMUL>=1) THEN
+          if(present(VR))then
+             do n=1,EL%P%NMUL
+                EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
+                EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
+                ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
+                ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
+             enddo
+          else
+             do n=1,EL%P%NMUL
+                EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+                EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+                ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+                ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+             enddo
+          endif
+
+
        endif
-       if(el%kind==kind10) then
-          call GETANBN(EL%TP10)
-          call GETANBN(ELP%TP10)
-       endif
-       if(el%kind==kind7) then
-          call GETMAT7(EL%T7)
-          call GETMAT7(ELP%T7)
-       endif
-    ENDIF
+    endif
+    if(el%kind==kind10) then
+       call GETANBN(EL%TP10)
+       call GETANBN(ELP%TP10)
+    endif
+    if(el%kind==kind7) then
+       call GETMAT7(EL%T7)
+       call GETMAT7(ELP%T7)
+    endif
 
   END SUBROUTINE transfer_ANBN
 
@@ -2337,6 +2348,7 @@ CONTAINS
     !    nullify(EL%U1);
     !    nullify(EL%U2);
     nullify(EL%WI);
+    nullify(EL%RAMP);
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%siamese);
@@ -2392,6 +2404,7 @@ CONTAINS
     !    nullify(EL%U1);
     !    nullify(EL%U2);
     nullify(EL%WI);
+    nullify(EL%RAMP);
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
@@ -2521,6 +2534,11 @@ CONTAINS
        IF(ASSOCIATED(EL%WI))        then
           el%WI=-1     !USER DEFINED MAGNET
           DEALLOCATE(EL%WI)
+       ENDIF
+
+       IF(ASSOCIATED(EL%ramp))        then
+          el%ramp=-1     !USER DEFINED MAGNET
+          DEALLOCATE(EL%ramp)
        ENDIF
 
        IF(ASSOCIATED(EL%PARENT_FIBRE))        then
@@ -2714,6 +2732,13 @@ CONTAINS
           el%WI=-1
           DEALLOCATE(EL%WI)
        ENDIF
+
+
+       IF(ASSOCIATED(EL%ramp))        then
+          el%ramp=-1     !USER DEFINED MAGNET
+          DEALLOCATE(EL%ramp)
+       ENDIF
+
 
        !       IF(ASSOCIATED(EL%PARENT_FIBRE))        then
        !          nullify(EL%PARENT_FIBRE)
@@ -3160,6 +3185,13 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+
+    IF(ASSOCIATED(EL%RAMP)) THEN         !
+       CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
+    ENDIF
+
+
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
@@ -3471,6 +3503,11 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+
+    IF(ASSOCIATED(EL%RAMP)) THEN         !
+       CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
+    ENDIF
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
@@ -3783,6 +3820,11 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
+
+    IF(ASSOCIATED(EL%RAMP)) THEN         !
+       CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
+    ENDIF
+
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)

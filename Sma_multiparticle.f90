@@ -20,6 +20,8 @@ module ptc_multiparticle
 
   logical(lp),private, parameter :: dobb=.true.
   logical(lp),private, parameter :: aperture_all_case0=.false.
+  type(probe) :: xsm,xsm0
+  real(dp) :: unit_time =1.0e-3_dp
 
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
@@ -66,7 +68,6 @@ module ptc_multiparticle
      MODULE PROCEDURE TRACK_MODULATION_P   !
   END INTERFACE
 
-
   type three_d_info
      !   character(nlp),pointer :: name
      real(dp)  a(3),b(3)   ! Centre of entrance and exit faces
@@ -80,10 +81,9 @@ module ptc_multiparticle
      logical(lp) u(2)   ! unstable flag for both ray and reference_ray
   END type three_d_info
 
-  real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
+  !  real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
 
 CONTAINS
-
 
   SUBROUTINE MODULATE_R(C,XS,K)
     IMPLICIT NONE
@@ -100,30 +100,35 @@ CONTAINS
     ELP=>C%PARENT_FIBRE%MAGP
 
     IF(K%MODULATION) THEN
-       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
-       V=EL%DC_ac+EL%A_ac*DV
-       DV=el%D_ac*DV
-       if(associated(el%d_coeff)) then
-          beta0=one
-          if(k%time) beta0=c%parent_fibre%beta0
-          t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
-          t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
-          a0=el%d_coeff(3)
-          a1=el%d_coeff(4)
-          if(xs%ac%t>=t0.and. xs%ac%t<t1) then
-             g=(a1-a0)/(t1-t0)
-             b0=a0-g*t0
-             val=b0+g*xs%ac%t
-             dv=dv+val
-          else
-             dv=a1
+       if(.not.associated(c%parent_fibre%mag%ramp)) then
+          DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
+          V=EL%DC_ac+EL%A_ac*DV
+          DV=el%D_ac*DV
+          if(associated(el%d_coeff)) then
+             beta0=one
+             if(k%time) beta0=c%parent_fibre%beta0
+             t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+             t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+             a0=el%d_coeff(3)
+             a1=el%d_coeff(4)
+             if(xs%ac%t>=t0.and. xs%ac%t<t1) then
+                g=(a1-a0)/(t1-t0)
+                b0=a0-g*t0
+                val=b0+g*xs%ac%t
+                dv=dv+val
+             else
+                dv=a1
+             endif
           endif
+       else
+          V=zero
+          DV=zero
+          call set_ramp(C)
        endif
     else
        V=EL%DC_ac
        DV=zero
     endif
-
     !    IF(OLD_MOD) THEN
     !     call transfer_ANBN(EL,ELP,1,VR=V,DVR=DV)
     !    ELSE
@@ -131,6 +136,53 @@ CONTAINS
     !    ENDIF
 
   END   SUBROUTINE MODULATE_R
+
+  SUBROUTINE set_ramp(t)
+    IMPLICIT NONE
+    TYPE(INTEGRATION_NODE), POINTER  :: T
+    integer i,it
+    real(dp) r,ti,rat,dtot
+    type(ramping), pointer :: a
+    real(dp) an,bn
+
+
+    !   if(t%pos_in_fibre==1) return
+
+    a=>t%parent_fibre%mag%ramp
+
+
+    dtot=(a%table(a%n)%time-a%table(1)%time)/(a%n-1)
+
+    ti=XSM0%ac%t/clight/a%unit_time    ! time in milliseconds
+
+    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
+       return
+    endif
+
+    ti=(ti-a%table(1)%time)/dtot+1
+
+    it=idint(ti)
+
+    rat=(ti-it)
+
+
+    a%table(0)%bn=zero
+    a%table(0)%an=zero
+    do i=1,size(a%table(0)%bn)
+       a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
+       a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
+    enddo
+    a=>t%parent_fibre%magp%ramp
+    a%table(0)%bn=zero
+    a%table(0)%an=zero
+    do i=1,size(a%table(0)%bn)
+       a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
+       a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
+    enddo
+
+
+
+  end SUBROUTINE set_ramp
 
   SUBROUTINE MODULATE_P(C,XS,K)
     IMPLICIT NONE
@@ -149,24 +201,30 @@ CONTAINS
     CALL ALLOC(DV)
 
     IF(K%MODULATION) THEN
-       DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
-       V=ELP%DC_ac+ELP%A_ac*DV
-       DV=elp%D_ac*DV
-       if(associated(el%d_coeff)) then
-          beta0=one
-          if(k%time) beta0=c%parent_fibre%beta0
-          t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
-          t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
-          a0=el%d_coeff(3)
-          a1=el%d_coeff(4)
-          if(xs%ac%t>=t0.and. xs%ac%t<t1) then
-             g=(a1-a0)/(t1-t0)
-             b0=a0-g*t0
-             val=b0+g*xs%ac%t
-             dv=dv+val
-          else
-             dv=a1
+       if(.not.associated(c%parent_fibre%magp%ramp)) then
+          DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
+          V=ELP%DC_ac+ELP%A_ac*DV
+          DV=elp%D_ac*DV
+          if(associated(el%d_coeff)) then
+             beta0=one
+             if(k%time) beta0=c%parent_fibre%beta0
+             t0=el%d_coeff(1)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+             t1=el%d_coeff(2)*c%parent_fibre%parent_layout%t%end%s(1)/beta0
+             a0=el%d_coeff(3)
+             a1=el%d_coeff(4)
+             if(xs%ac%t>=t0.and. xs%ac%t<t1) then
+                g=(a1-a0)/(t1-t0)
+                b0=a0-g*t0
+                val=b0+g*xs%ac%t
+                dv=dv+val
+             else
+                dv=a1
+             endif
           endif
+       else  ! ramp
+          V=zero
+          DV=zero
+          call set_ramp(C)
        endif
     else
        V=elp%DC_ac

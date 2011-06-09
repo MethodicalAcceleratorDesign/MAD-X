@@ -45,6 +45,8 @@ module lielib_yang_berz
   integer time_plane
   real(dp), private :: stmem(ndim)
   logical(lp) :: courant_snyder=.true.
+  logical(lp) :: check_krein=.true.
+  real(dp),dimension(ndim2)::rr_eigen,ri_eigen
 contains
 
 
@@ -2664,6 +2666,7 @@ contains
 
     return
   end subroutine reelflo
+
   subroutine midbflo(c,a2,a2i,q,a,st)
     implicit none
     ! LINEAR EXACT NORMALIZATION USING EIGENVALUE PACKAGE OF NERI
@@ -2837,25 +2840,68 @@ contains
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
-    if(no_hyperbolic_in_normal_form) then
-       hyp=.false.
-       !      write(6,*) " checking no_hyperbolic_in_normal_form "
-       do i=1,nd2-ndc2
-          if(ri(i)==zero) then
-             hyp=.true.
-             c_%stable_da=.false.
-             c_%check_stable=.false.
-          endif
-       enddo
-       if(hyp) then
+    rr_eigen=zero
+    ri_eigen=zero
+    rr_eigen=rr
+    ri_eigen=ri
+    hyp=.false.
+    !      write(6,*) " checking no_hyperbolic_in_normal_form "
+    do i=1,nd2-ndc2
+       if(ri(i)==zero) then
+          hyp=.true.
+          c_%stable_da=.false.
+          c_%check_stable=.false.
+       endif
+    enddo
+
+
+    if(hyp) then
+       if(no_hyperbolic_in_normal_form) then  !no_hyperbolic_in_normal_form
           write(6,*) " Eigenvalues are "
           do i=1,nd2-ndc2
              write(6,*) i,rr(i),ri(i)
           enddo
+          write(6,*) " HYPERBOLIC NORMAL FORM DETECTED "
           write(6,*) " All TPSA/DA/LIE CALCULATIONS INTERRUPTED AT YOUR REQUEST "
-          write(6,*) " RESET STABLE FLAGS "
+          write(6,*) " PLEASE RESET STABLE FLAGS "
+       else
+          write(6,*) " HYPERBOLIC NORMAL FORM DETECTED "
+          write(6,*) " HOPE YOU KNOW WHAT YOU ARE DOING "
+       endif
+    endif  ! no_hyperbolic_in_normal_form
+
+    !  checking for Krein
+
+    if(check_krein.and.(.not.hyp)) then
+
+       if(.not.hyp.and.nd2>2) then
+          xsu=zero
+          xd=zero
+          do i=1,4
+             xsu=log(rr(i)**2+ri(i)**2)+xsu
+             xd=abs(log(rr(i)**2+ri(i)**2))+xd
+          enddo
+
+          if(xsu<1.0e-10_dp.and.xd>1.e-10_dp) then
+             write(6,*) " A Krein collision seemed to have happened "
+             write(6,*) " All calculations interrupted "
+             do i=1,nd2-ndc
+                write(6,*)"damping ", log(rr(i)**2+ri(i)**2)
+             enddo
+             do i=1,nd2-ndc
+                write(6,*)"tunes ",  atan2(ri(i),rr(i))/twopi
+             enddo
+             do i=1,nd2
+                write(6,*)"eigenvalues ",  rr(i),ri(i)
+             enddo
+             c_%stable_da=.false.
+             c_%check_stable=.false.
+
+          endif
+
        endif
     endif
+
     if(lielib_print(7)==-1) then
        w_p=0
        w_p%nc=3
@@ -2866,6 +2912,7 @@ contains
        do i=1,nd-ndc
           rd1=SQRT(rr(2*i-1)**2+ri(2*i-1)**2)
           rd=SQRT(rr(2*i)**2+ri(2*i)**2)
+          !       write(6,*) "modulus ",rd1,rd
           w_p=0
           w_p%nc=3
           w_p%fc='(2(1X,A120,/),(1X,A120))'

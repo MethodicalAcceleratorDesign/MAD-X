@@ -135,6 +135,21 @@ TYPE tilting
    LOGICAL(lp) natural                 ! for mad-like
 END TYPE tilting
 
+TYPE time_energy
+   real(dp),pointer :: time
+   real(dp),pointer :: energy
+   real(dp),pointer :: an(:),bn(:)
+END TYPE time_energy
+
+TYPE ramping
+   integer,pointer :: n
+   real(dp), pointer :: r, unit_time
+   type(time_energy),pointer :: table(:)
+   character(255), pointer :: file
+END TYPE ramping
+
+
+
 !   Element
 TYPE ELEMENT
    INTEGER, POINTER :: KIND
@@ -196,6 +211,7 @@ TYPE ELEMENT
    TYPE(AFFINE_FRAME), POINTER :: girder_FRAME
    !   integer, POINTER ::girder_index
    type(girder),pointer :: assembly
+   type(ramping), pointer :: ramp
 END TYPE  ELEMENT
 
 
@@ -252,6 +268,7 @@ TYPE ELEMENTP
    TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    !   TYPE(fibre_appearance), POINTER :: doko
+   type(ramping), pointer :: ramp
 END TYPE  ELEMENTP
 
 type fibre_appearance
@@ -287,7 +304,7 @@ TYPE FIBRE
    ! NEW STUFF....
    real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS   !,P0C
    INTEGER, POINTER :: CHARGE
-   real(dp), POINTER :: AG
+   real(dp), POINTER :: AG  ! spin g-2
    ! TO TIE LAYOUTS
    TYPE (FIBRE),POINTER :: P
    TYPE (FIBRE),POINTER :: N

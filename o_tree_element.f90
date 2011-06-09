@@ -5190,14 +5190,17 @@ CONTAINS
 
   end subroutine factor_as
 
-  subroutine CANONIZE( a_t,A_cs,DR,PHASE_ADVANCE )
+  subroutine CANONIZE( a_t,A_cs,PHASE_ADVANCE,R_TE,CS_TE,COSLIKE )
     implicit none
-    TYPE(damap), INTENT(INout) :: a_t,A_cs,DR
-    type(taylor), INTENT(INout) ::  PHASE_ADVANCE(:)
-    TYPE(damap) a_f,a_l,a_nl
+    TYPE(damap), INTENT(INout) :: a_t,A_cs
+    type(taylor),optional, INTENT(INout) ::  PHASE_ADVANCE(:)
+    TYPE(damap), optional, intent(inout) ::R_TE,CS_TE
+    logical(lp) , optional, intent(inout)  :: COSLIKE
+    TYPE(damap) a_f,a_l,a_nl,dr1,a_tt
     type(onelieexponent) uno
     logical(lp) doflip
     integer i
+
 
     if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
        !    write(6,*) " flipping ",c_%ndpt,c_%nd2-1
@@ -5210,31 +5213,50 @@ CONTAINS
        doflip=.false.
     endif
 
-    call alloc(a_f,a_l,a_nl)
+    call alloc(a_f,a_l,a_nl,dr1,a_tt)
     call alloc(uno)
-
-    call factor(a_t,a_f,a_l,a_nl,DR)
+    dr1=1
+    a_tt=a_t
+    call factor(a_tt,a_f,a_l,a_nl,DR1,R_TE,CS_TE,COSLIKE)
 
     A_cs=a_f*a_l*a_nl
-    uno=dr
+    if(present(PHASE_ADVANCE)) then
+       uno=dr1
 
-    do i=1,c_%nd
-       PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
-    enddo
+       if(c_%ndpt==0) then
+          do i=1,c_%nd
+             PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+          enddo
+       else
+          if(c_%ndpt>c_%nd2-2) then
+             do i=1,c_%nd-1
+                PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+             enddo
+          else
+             do i=1,c_%nd-2
+                PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+             enddo
+             i=c_%nd-1
+             PHASE_ADVANCE(i+1)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+          endif
+       endif
+
+    endif
 
 
     if(doflip) then
        call flip_damap(a_t,a_t)
        call flip_damap(a_cs,a_cs)
-       call flip_damap(dr,dr)
-       do i=1,c_%nd
-          call flip_taylor(PHASE_ADVANCE(i),PHASE_ADVANCE(i),-1)
-       enddo
+       call flip_damap(dr1,dr1)
+       if(present(PHASE_ADVANCE)) then
+          do i=1,c_%nd
+             call flip_taylor(PHASE_ADVANCE(i),PHASE_ADVANCE(i),-1)
+          enddo
+       endif
        perform_flip=.true.
     endif
-
     call kill(uno)
-    call kill(a_f,a_l,a_nl)
+    call kill(a_f,a_l,a_nl,dr1,a_tt)
 
   end subroutine CANONIZE
 
@@ -5256,7 +5278,9 @@ CONTAINS
     type(onelieexponent) un
     type(reversedragtfinn) rdf
     type(vecresonance) vr
+    logical(lp) t_e
 
+    t_e=my_true
     lagrange0=my_false
     if(present(dr)) lagrange0=my_true
 
@@ -5392,12 +5416,16 @@ CONTAINS
           s1i%v(2*i-1)=COS(p(i))*(one.mono.(2*i-1))-SIN(p(i))*(one.mono.(2*i))
           s1i%v(2*i)  =COS(p(i))*(one.mono.(2*i))+SIN(p(i))*(one.mono.(2*i-1))
        enddo
+       if(.not.courant_snyder) then
+          s1i=1
+          s1=1
+       endif
        a_nl=s1i*a_nl*s1
        a_l=a_l*s1
        dr=s1i
        !       a_t_cs= a_f*a_l_cs* a_nl     ! a_nl is not yet " standard "
 !!!!!   nonlinear part if s1i !!!!!!
-       if(c_%no>1) then
+       if(c_%no>1.and.courant_snyder) then
           if(onelie) then
              nd_used=c_%nd2/2
              if(c_%ndpt/=0) nd_used=nd_used-1
@@ -5543,17 +5571,32 @@ CONTAINS
 
        call invert_22(at,ati)
        call invert_22(bt,bti)
+       if(.not.c_%STABLE_DA) then
+          t_e=my_false
+       endif
 
 
        call matmul_nn(dt,ati,ati,sc=-one)
        call matmul_nn(ati,ct,ct)
        call matmul_nn(ct,bti,ct)
+       if(.not.c_%STABLE_DA) then
+          t_e=my_false
+          goto 888
+       endif
+
 
        alpha=ct(1,1)
        alpha0=alpha
 
+       if(alpha0<=-one) then
+          t_e=my_false
+          goto 888
+       endif
 
        det=sqrt(one/(one+alpha))
+
+
+
 
        if(alpha0>=zero) then
           COSLIKE=my_true
@@ -5572,10 +5615,9 @@ CONTAINS
 
 
 
-       !goto 1000
        !  The rotation matrix is created but it may not have the correct path length
        !dependence
-       if(c_%ndpt/=0) then
+       if(c_%ndpt/=0.and.t_e) then
           call alloc(g,c_%nv)
           call alloc(un)
           ! write(6,*) " epseone "
@@ -5615,18 +5657,28 @@ CONTAINS
 
           call kill(un)
           call kill(g)
-
           !endif !eps_te
        endif
 
-       R_TE=a_l*cs_TE**(-1)
-
+888    continue
+       if(.not.t_e) then
+          c_%STABLE_DA=my_true
+          cs_te=0
+          R_TE=0
+          write(6,*) " Teng-Edwards is crap !"
+       else
+          R_TE=a_l*cs_TE**(-1)
+       endif
 
     endif ! end of T-E  done
 
-
     if(lagrange0) then
        a_t=a_f*a_l*a_nl
+    endif
+
+    if(doing_ac_modulation_in_ptc.and.present(CS_TE)) then   ! removing useless tiny numbers
+       CS_TE%v(c_%nd2-1)=one.mono.(c_%nd2-1)
+       CS_TE%v(c_%nd2)=one.mono.(c_%nd2)
     endif
 
     if(doflip) then
@@ -5638,11 +5690,6 @@ CONTAINS
        if(present(CS_TE))  call flip_damap(CS_TE,CS_TE)
        if(present(R_TE))   call flip_damap(R_TE,R_TE)
        perform_flip=.true.
-    endif
-
-    if(doing_ac_modulation_in_ptc.and.present(CS_TE)) then   ! removing useless tiny numbers
-       CS_TE%v(c_%nd2-1)=one.mono.(c_%nd2-1)
-       CS_TE%v(c_%nd2)=one.mono.(c_%nd2)
     endif
 
     deallocate(jc)

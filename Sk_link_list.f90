@@ -1444,7 +1444,7 @@ CONTAINS
 
   SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
     IMPLICIT NONE
-    TYPE (FIBRE), INTENT(INOUT) :: EL1
+    TYPE (FIBRE),pointer :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
     TYPE (FIBRE),POINTER :: EL2
     REAL(DP)  D(3),ANG(3)
@@ -1461,6 +1461,17 @@ CONTAINS
     NEX=.FALSE.
     ENE=.FALSE.
     IF(PRESENT(NEXT)) NEX=NEXT
+
+    if(associated(el1,el1%parent_layout%start)) then
+       if(.not.nex) then
+          nex=my_true
+       endif
+    endif
+    if(associated(el1%next,el1%parent_layout%start)) then
+       if(nex) then
+          nex=my_false
+       endif
+    endif
 
     el1%PATCH%B_X1=1
     el1%PATCH%B_X2=1

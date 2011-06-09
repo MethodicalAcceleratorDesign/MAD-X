@@ -61,22 +61,25 @@ contains
   end SUBROUTINE lattice_GET_CHROM
 
 
-  SUBROUTINE lattice_GET_tune(R,my_state)
+  SUBROUTINE lattice_GET_tune(R,my_state,mf)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     TYPE(internal_state) state
+    integer mf
     real(dp) closed(6)
     type(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
+
+
 
     STATE=my_state
 
     closed=zero
     CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
     write(6,*) "closed orbit "
-    write(6,*) CLOSED
+    WRITE(6,'(6(1x,g21.14))') CLOSED
     CALL INIT(STATE,1,0,BERZ)
 
     CALL ALLOC(NORM)
@@ -88,15 +91,24 @@ contains
 
     CALL TRACK(R,Y,1,STATE)
     NORM=Y
-    WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
-    if(norm%tune(3)/=zero) &
-         WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
+    closed=y
+    WRITE(6,'(6(1x,g21.14),a24)') CLOSED," <-- should be identical"
+    if(mf==6) then
+       WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
+       if(norm%tune(3)/=zero.and.c_%ndpt==0) &
+            WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
+    else
+       if(norm%tune(3)/=zero.and.c_%ndpt==0) then
+          WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:3)
+       else
+          WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:2)
+       endif
+    endif
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
 
   end SUBROUTINE lattice_GET_tune
-
 
 
 
@@ -2962,12 +2974,12 @@ contains
 
 
 
-  SUBROUTINE  RECUT_KIND7_one(C,lmax0,drift) ! A re-splitting routine
+  SUBROUTINE  RECUT_KIND7_one(C,lmax0,drift,ido,idc) ! A re-splitting routine
     IMPLICIT NONE
     TYPE(layout),POINTER :: L
     real(dp) lmax0
     TYPE(FIBRE),target :: C
-    INTEGER I,f0
+    INTEGER I,f0,ido,idc
     logical(lp) drift,doit
 
     if(associated(c%parent_layout)) then
@@ -2981,7 +2993,6 @@ contains
           call kill(c%parent_layout%t)
        endif
     endif
-
     if(drift.and.C%MAG%KIND==KIND1) then
        f0=nint(C%MAG%l/lmax0)
        if(f0==0) f0=1
@@ -2998,7 +3009,7 @@ contains
           doit=(C%MAG%TP10%DRIFTKICK.and.C%MAG%p%method==2)
        endif
        IF(doit) then
-
+          ido=ido+1
           !         f0=nint(C%MAG%l/lmax0)
           f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/2)
           if(C%MAG%p%method==6) f0=nint(C%MAG%l/lmax0/C%MAG%p%nst/4)
@@ -3036,6 +3047,7 @@ contains
           endif
        ENDIF
     else !!!
+       idc=idc+1
        f0=nint(C%MAG%l/lmax0/C%MAG%p%nst)
        if(f0>=1) then
           C%MAG%p%nst=C%MAG%p%nst*f0
@@ -3065,16 +3077,20 @@ contains
     TYPE(layout),target, intent(inout) :: R
     real(dp) lmax0
     TYPE(FIBRE),POINTER :: C
-    INTEGER I
+    INTEGER I,ido,idc
     logical(lp) drift
+
+    ido=0
+    idc=0
 
 
     C=>R%START
     DO I=1,R%N
-       call RECUT_KIND7_one(c,lmax0,drift)
+       call RECUT_KIND7_one(c,lmax0,drift,ido,idc)
        C=>C%NEXT
     ENDDO
-
+    write(6,*) ido," elements changed to odd methods "
+    write(6,*) idc," elements only "
   END SUBROUTINE  RECUT_KIND7
 
   SUBROUTINE  ADD_SURVEY_INFO(R) ! A re-splitting routine
@@ -3434,6 +3450,24 @@ contains
        P=>P%next
     ENDDO
   end SUBROUTINE PUTFRINGE
+
+  SUBROUTINE PUTbend_fringe(R, changeanbn )
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer I
+    type(fibre), pointer :: P
+    logical(lp) changeanbn
+
+    p=>r%start
+    do i=1,r%n
+       if(p%mag%p%b0/=zero) then
+          p%mag%p%bend_fringe =changeanbn
+          p%magp%p%bend_fringe =changeanbn
+          write(6,*) P%mag%name, " changed to ",changeanbn
+       endif
+       P=>P%next
+    ENDDO
+  end SUBROUTINE PUTbend_fringe
 
 
   SUBROUTINE MESS_UP_ALIGNMENT(R,SIG,cut)

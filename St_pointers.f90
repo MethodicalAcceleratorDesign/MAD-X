@@ -135,7 +135,7 @@ contains
     ! remove_patches
     save my_default
     integer :: limit_int(2) =(/4,18/)
-    LOGICAL :: b_b
+    LOGICAL :: b_b,patchbb
     REAL(DP) xbend
     ! automatic track
     type(internal_state),pointer :: my_old_state
@@ -146,7 +146,7 @@ contains
     real(dp), allocatable :: an(:),bn(:),n_co(:)
     integer icnmin,icnmax,n_ac,n_coeff
     logical :: log_estate=.true.
-
+    integer :: mftune=6
     if(log_estate) then
        nullify(my_estate)
        nullify(my_old_state)
@@ -256,18 +256,88 @@ contains
           read(mf,*) xsm%ac%x(1:2)
           xsm0%ac%x(1:2)=xsm%ac%x(1:2)
           ptc_node_old=-1
+          first_particle=my_false
        case('SETORBITPHASORFREQUENCY')
           read(mf,*) xsm%ac%om
           xsm0%ac%om=xsm%ac%om
           ptc_node_old=-1
-       case('SETORBITPHASORTIME')
+          first_particle=my_false
+       case('SETORBITPHASORTIME','ORBITTIME')
           read(mf,*) xsm%ac%t
           xsm0%ac%t=xsm%ac%t
+          x_orbit_sync=zero
+          x_orbit_sync(6)=xsm%ac%t
           ptc_node_old=-1
+          first_particle=my_false
+       case('TIMEINUNITS','TIMEINSECONDS')
+
+          read(mf,*) xsm%ac%t
+          write(6,*) " Using ",unit_time," seconds"
+          xsm%ac%t=xsm%ac%t*clight*unit_time
+          xsm0%ac%t=xsm%ac%t
+          x_orbit_sync=zero
+          x_orbit_sync(6)=xsm%ac%t
+          ptc_node_old=-1
+          first_particle=my_false
+       case('INITIALTIMEINMYUNITS','TIMEINMYUNITS','READFROMFILEINITIALTIME')
+          INQUIRE (FILE = INITIAL_setting, EXIST = exists)
+          if(exists) then
+             write(6,*) "file ", INITIAL_setting(1:len_trim(FINAL_setting)), &
+                  " exists, interrupt execution if you do not want to overwrite!"
+             call kanalnummer(i1,INITIAL_setting)
+             read(i1,*) xsm%ac%t,unit_time
+             close(i1)
+          else
+             read(mf,*) xsm%ac%t,unit_time
+          endif
+          write(6,*) " Using ",unit_time," seconds"
+          xsm%ac%t=xsm%ac%t*clight*unit_time
+          xsm0%ac%t=xsm%ac%t
+          x_orbit_sync=zero
+          x_orbit_sync(6)=xsm%ac%t
+          ptc_node_old=-1
+          first_particle=my_false
+          write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
+       case('FINALTIMEINMYUNITS')
+          INQUIRE (FILE = FINAL_setting, EXIST = exists)
+          if(exists) then
+             call kanalnummer(i1,FINAL_setting)
+             write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time
+             write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
+             write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
+             close(i1)
+          endif
+
+
+       case('SETORBITACCELERATION')
+          accelerate=my_true
+       case('SETORBITNOACCELERATION')
+          accelerate=my_false
+       case('SETORBITTIMEUNIT')
+          read(mf,*) unit_time
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
        case('PUTORBITSTATE','USEORBITSTATE')
           my_estate=my_ORBIT_LATTICE%state
+       case('NULLIFYACCELERATION')
+          nullify(acc)
+          nullify(ACCFIRST)
+          nullify(paccfirst)
+          nullify(paccthen)
+       case('INITIALIZECAVITY','CAVITYTABLE')
+          p=>my_ering%start
+          READ(MF,*)n
+          do i1=1,n
+             read(mf,*) name,filename
+             call move_to( my_ering,p,name,pos)
+             write(6,*) "Found cavity ",name," at position ",pos
+             call lecture_fichier(p%mag,filename)
+          enddo
+          paccthen%mag%c4%acc%next=>paccfirst
+          paccfirst%mag%c4%acc%previous=>paccthen
+       case('ENERGIZEORBITLATTICE')
+          call energize_ORBIT_lattice
+
        case('PRINTHERD','OPENHERD')
           IF(MF_HERD/=0) THEN
              WRITE(6,*) " CANNOT OPEN HERD FILE TWICE "
@@ -297,11 +367,11 @@ contains
           close(ii)
 
        case('SETORBITFORACCELERATION')
-          CALL ptc_synchronous_set(-1)
+          !   CALL ptc_synchronous_set(-1)
        case('READORBITINTERMEDIATEDATA')
-          CALL ptc_synchronous_set(-2)
+          !   CALL ptc_synchronous_set(-2)
        case('PRINTORBITINTERMEDIATEDATA')
-          CALL ptc_synchronous_after(-2)
+          !   CALL ptc_synchronous_after(-2)
        case('FILEFORORBITINITIALSETTINGS')  ! ACCELERATION FILE
           READ(MF,*) initial_setting
           write(6,*) initial_setting
@@ -372,6 +442,10 @@ contains
           my_estate=my_estate+NOCAVITY0
        case('-NOCAVITY')
           my_estate=my_estate-NOCAVITY0
+       case('+CAVITY')
+          my_estate=my_estate-NOCAVITY0
+       case('-CAVITY')
+          my_estate=my_estate+NOCAVITY0
        case('+FRINGE')
           my_estate=my_estate+FRINGE0
        case('-FRINGE')
@@ -398,8 +472,12 @@ contains
           my_estate=my_estate-RADIATION0
        case('+MODULATION')
           my_estate=my_estate+MODULATION0
-       case('-MODULATION')
+       case('-MODULATION',"+NOMODULATION")
           my_estate=my_estate-MODULATION0
+       case('+SPIN')
+          my_estate=my_estate+SPIN0
+       case('-SPIN')
+          my_estate=my_estate-SPIN0
           !  case('+EXACTMIS')
           !     my_estate=my_estate+EXACTMIS0
           !  case('-EXACTMIS')
@@ -446,7 +524,7 @@ contains
           call THIN_LENS_restart(my_ering)
        case('MANUALTHINLENS')
           THIN=-1
-          CALL THIN_LENS_resplit(my_ering,THIN)
+          CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int)
        case('THINLENS')
           READ(MF,*) THIN
           xbend=-one
@@ -493,9 +571,9 @@ contains
 
           call ADD_SURVEY_INFO(my_ering)
 
-       case('RECUTKIND7NODRIFT')
+       case('RECUTKIND7NODRIFT','USEODDMETHODS')
           call RECUT_KIND7(my_ering,lmax,my_false)
-       case('RECUTKIND7ANDDRIFT')
+       case('RECUTKIND7ANDDRIFT','USEODDMETHODSONDRIFT')
           call RECUT_KIND7(my_ering,lmax,my_true)
        case('MAKE_THIN_LAYOUT','MAKELAYOUT','MAKE_NODE_LAYOUT')
 
@@ -603,8 +681,11 @@ contains
              ENDDO
           endif
        case('BEAMBEAM')
-          READ(MF,*) SC,pos
+          READ(MF,*) SC,pos,patchbb
           read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
+          if(patchbb) then
+             read(mf,*) x
+          endif
           IF(.NOT.ASSOCIATED(my_ering%T)) THEN
              CALL MAKE_NODE_LAYOUT(my_ering)
           ENDIF
@@ -636,6 +717,11 @@ contains
              !           if(pos<1) tl%bb%ds=SC-TL%S(1)
              write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
              !              write(6,*) " ds = ",tl%bb%ds
+             if(patchbb) then
+                tl%bb%patch=patchbb
+                tl%bb%a=x(1:3)
+                tl%bb%d=x(4:6)
+             endif
           else
              write(6,*) " Beam-Beam position not found "
           endif
@@ -749,6 +835,10 @@ contains
 
           close(mfr)
 
+       case('FRANKCOMMAND','MADCOMMAND','COMMAND')
+          read(mf,*) filename
+          call read_mad_command77(filename)
+
        case('PRINTFAMILIESANBN')
           read(mf,*) filename
           call kanalnummer(mfr,filename)
@@ -776,6 +866,111 @@ contains
           enddo
           call kill_para(my_ering)
           close(mfr)
+       case('RAMP','RAMPING')
+          READ(MF,*) NAME, filename, hgap
+
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+          DC_ac=one
+          A_ac=zero
+          theta_ac=zero
+          D_ac=zero
+          n_ac=0
+          n_coeff=0
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+
+                write(6,*) " slow ramping magnet found ",P%MAG%name
+
+                call reading_file(P%MAG,filename)
+                p%mag%ramp%r=hgap
+                p%magp%ramp%r=hgap
+
+                i2=size(p%mag%ramp%table(0)%bn)
+
+                if(.not.associated(P%MAG%DC_ac)) then
+                   allocate(P%MAG%DC_ac)
+                   allocate(P%MAG%A_ac)
+                   allocate(P%MAG%theta_ac)
+                   allocate(P%MAG%D_ac)
+
+                   allocate(P%MAGP%DC_ac)
+                   allocate(P%MAGP%A_ac)
+                   allocate(P%MAGP%theta_ac)
+                   CALL alloc(P%MAGP%DC_ac)
+                   CALL alloc(P%MAGP%A_ac)
+                   CALL alloc(P%MAGP%theta_ac)
+                   allocate(P%MAGp%D_ac)
+                   CALL alloc(P%MAGP%D_ac)
+
+
+
+                   P%MAG%D_ac=D_ac
+                   P%MAG%DC_ac=DC_ac
+                   P%MAG%A_ac=A_ac
+                   P%MAG%theta_ac=theta_ac*twopi
+                   P%MAGP%D_ac=D_ac
+                   P%MAGP%DC_ac=DC_ac
+                   P%MAGP%A_ac=A_ac
+                   P%MAGP%theta_ac=theta_ac*twopi
+                   P%MAG%slow_ac=.true.
+                   P%MAGP%slow_ac=.true.
+
+                   if(i2>p%mag%p%nmul) then
+                      CALL ADD(P,i2,0,0.d0)
+                   endif
+                   allocate(P%MAG%d_an(p%mag%p%nmul))
+                   allocate(P%MAG%d_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d_bn(p%mag%p%nmul))
+                   allocate(P%MAG%d0_an(p%mag%p%nmul))
+                   allocate(P%MAG%d0_bn(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_an(p%mag%p%nmul))
+                   allocate(P%MAGp%d0_bn(p%mag%p%nmul))
+                   if(n_coeff/=0) then
+                      allocate(P%MAG%d_coeff(n_coeff))
+                      allocate(P%MAGp%d_coeff(n_coeff))
+                   endif
+
+                   P%MAG%d_an=zero
+                   P%MAG%d_bn=zero
+
+                   call alloc(P%MAGp%d_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d_bn,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_an,p%mag%p%nmul)
+                   call alloc(P%MAGp%d0_bn,p%mag%p%nmul)
+                   do i1=1,p%mag%p%nmul
+                      P%MAG%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAG%d0_an(i1)=P%MAG%an(i1)
+                      P%MAGp%d0_bn(i1)=P%MAG%bn(i1)
+                      P%MAGp%d0_an(i1)=P%MAG%an(i1)
+                   enddo
+
+
+                else
+                   write(6,*) " already associated --> change code "
+                   stop 166
+                ENDIF
+             ENDIF
+
+
+             p=>p%next
+          enddo
+
+
        case('MODULATE','ACMAGNET')
           READ(MF,*) NAME
 
@@ -1167,8 +1362,15 @@ contains
           call lattice_fit_tune_CHROM_gmap(my_ering,my_estate,EPSF,pol_,NPOL,targ_RES,NP)
        case('GETCHROMATICITY')
           call lattice_GET_CHROM(my_ering,my_estate,CHROM)
+       case('OPENTUNEFILE')
+          read(mf,*) filename
+          call kanalnummer(mftune,filename)
+          write(mftune,*) " Time unit = ",unit_time ," seconds "
+       case('CLOSETUNEFILE')
+          close(mftune)
+          mftune=6
        case('GETTUNE')
-          call lattice_GET_tune(my_ering,my_estate)
+          call lattice_GET_tune(my_ering,my_estate,mftune)
        case('STRENGTH','STRENGTHFILE')  !
           IF(mfpolbloc/=0) CLOSE(mfpolbloc)
 
@@ -1375,6 +1577,14 @@ contains
        case('PERMFRINGEOFF')
 
           CALL  PUTFRINGE(my_ering,MY_FALSE)
+
+       case('BENDFRINGEON')
+
+          CALL  PUTbend_FRINGE(my_ering,MY_TRUE)
+
+       case('BENDFRINGEOFF')
+
+          CALL  PUTbend_FRINGE(my_ering,MY_FALSE)
 
        case('SOLENOID2','SOLENOIDFRINGE')
 
@@ -2544,7 +2754,7 @@ subroutine read_ptc_command77(ptc_fichier)
 
   call kanalnummer(m)
 
-  open(unit=m,file=ptc_fichier,status='old',err=2001)
+  open(unit=m,file=ptc_fichier,status='OLD',err=2001)
   close(m)
   call read_ptc_command(ptc_fichier)
   return
@@ -2574,3 +2784,23 @@ subroutine gino_ptc_command77(gino_command)
   call call_gino(gino_command)
 
 end  subroutine gino_ptc_command77
+
+
+subroutine read_mad_command77(ptc_fichier)
+  use pointer_lattice
+  !  use pointer_lattice_frank
+  implicit none
+  character(*) ptc_fichier
+  integer m
+
+  call kanalnummer(m)
+
+  open(unit=m,file=ptc_fichier,status='OLD',err=2001)
+  close(m)
+  !  call read_mad_command(ptc_fichier)  ! inside pointer_lattice_frank
+  return
+2001 continue
+
+  write(6,*) " Warning: mad command file does not exit "
+
+end  subroutine read_mad_command77

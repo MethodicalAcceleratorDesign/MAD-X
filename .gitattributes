@@ -29,7 +29,6 @@
 /Sp_keywords.f90 -text
 /Spb_fake_gino_sub.f90 -text
 /Sq_orbit_ptc.f90 -text
-/Sqb_accel_ptc.f90 -text
 /Sr_spin.f90 -text
 /Sra_fitting.f90 -text
 /St_pointers.f90 -text

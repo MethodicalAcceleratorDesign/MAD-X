@@ -74,7 +74,7 @@ MODULE S_DEF_KIND
   PRIVATE RCOLLIMATORR,RCOLLIMATORP
   PRIVATE RCOLLIMATORiR,RCOLLIMATORiP  !,RCOLLIMATORi
   PRIVATE ECOLLIMATORiR,ECOLLIMATORiP  !,RCOLLIMATORi
-  PRIVATE ZEROr_ECOL,ZEROP_ECOL,ZEROr_RCOL,ZEROP_RCOL
+  PRIVATE ZEROr_ECOL,ZEROP_ECOL,ZEROr_RCOL,ZEROP_RCOL,ZEROR_RAMP
 
   PRIVATE SEPR,SEPP,SYMPSEPR,SYMPSEPP !,SEPTTRACK
   !  PRIVATE IN,IN1,IN2
@@ -134,6 +134,7 @@ MODULE S_DEF_KIND
   ! New home for element and elementp
   integer, parameter :: N_ENGE=5
   logical(lp),TARGET :: valishev=.false.
+  logical(lp):: read_tc=.false.
   !  integer :: nvalishev=100
   INTERFACE TRACK_SLICE
      MODULE PROCEDURE INTER_CAV4
@@ -499,6 +500,7 @@ MODULE S_DEF_KIND
      MODULE PROCEDURE ZEROP_HE22
      MODULE PROCEDURE ZEROr_enge
      MODULE PROCEDURE ZEROp_enge
+     MODULE PROCEDURE ZEROR_RAMP
   END INTERFACE
 
 
@@ -11137,8 +11139,13 @@ contains
        if(ASSOCIATED(EL%phase0)) then
           deallocate(EL%phase0)
        endif
+       if(ASSOCIATED(EL%ACC)) then
+          call kill_acceleration(EL%ACC)
+          deallocate(EL%ACC)
+       endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%ACC)
        NULLIFY(EL%t)
        NULLIFY(EL%phase0)
        NULLIFY(EL%CAVITY_TOTALPATH)
@@ -11193,8 +11200,13 @@ contains
        if(ASSOCIATED(EL%NF)) then
           deallocate(EL%NF)
        endif
+       if(ASSOCIATED(EL%ACC)) then
+          call kill_acceleration(EL%ACC)
+          deallocate(EL%ACC)
+       endif
     elseif(i==0)       then          ! nullifies
 
+       NULLIFY(EL%ACC)
        NULLIFY(EL%t)
        NULLIFY(EL%phase0)
        NULLIFY(EL%CAVITY_TOTALPATH)
@@ -11208,6 +11220,463 @@ contains
     endif
 
   END SUBROUTINE ZEROP_CAV4
+
+  SUBROUTINE ZEROR_RAMP(EL,I)
+    IMPLICIT NONE
+    TYPE(RAMPING), INTENT(INOUT)::EL
+    INTEGER, INTENT(IN)::I
+    !integer k
+    IF(I==-1) THEN
+       call kill_ramping(EL)
+    elseif(i==0)       then          ! nullifies
+
+       call nullify_ramping(EL)
+
+    endif
+
+  END SUBROUTINE ZEROR_RAMP
+
+
+
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
+  SUBROUTINE alloc_acceleration(acc,nst,n,n_max,filename)
+    implicit none
+    type(acceleration), target :: acc
+    integer i,n,n_max,nst
+    character(*) filename
+    allocate(acc%n)
+    acc%n=n
+    allocate(acc%tableau(n))
+    allocate(acc%fichier)
+    allocate(acc%r)
+    allocate(acc%unit_time)
+    allocate(acc%w1)
+    allocate(acc%nst)
+    allocate(acc%de(nst))
+    allocate(acc%e_in(nst))
+    allocate(acc%w2)
+    allocate(acc%pos)
+    nullify(acc%next)
+    acc%de=zero
+    acc%e_in=zero
+    acc%nst=nst
+    acc%pos=0
+    !   acc%w1=0   not yet defined, done later
+    !   acc%w2=0
+    acc%r=one
+    acc%fichier=' '
+
+    if(len(filename)>255) then
+       write(6,*)  " Name of file too long (>255) "
+       stop 1945
+    endif
+    acc%fichier=filename
+
+    do i=1,n
+       call alloc_tableau(acc%tableau(i),n_max)
+    enddo
+
+  end SUBROUTINE alloc_acceleration
+
+  SUBROUTINE alloc_tableau(tableau,n)
+    implicit none
+    type(temps_energie), target, intent(inout) :: tableau
+    integer n
+    allocate(tableau%volt(n),tableau%phase(n),tableau%temps,tableau%energie,tableau%tc)
+    tableau%volt=zero
+    tableau%phase=zero
+    tableau%temps=zero
+    tableau%energie=zero
+    tableau%tc=zero
+  end SUBROUTINE alloc_tableau
+
+  SUBROUTINE kill_tableau(tableau)
+    implicit none
+    type(temps_energie), target, intent(inout)  :: tableau
+    deallocate(tableau%volt,tableau%phase,tableau%temps,tableau%energie,tableau%tc)
+
+  end SUBROUTINE kill_tableau
+
+  SUBROUTINE kill_acceleration(acc)
+    implicit none
+    type(acceleration), target , intent(inout) :: acc
+    integer i
+
+    do i=1,acc%n
+       call kill_tableau(acc%tableau(i))
+    enddo
+
+    deallocate(acc%tableau)
+    nullify(acc%next)
+    nullify(acc%previous)
+    deallocate(acc%pos)
+    deallocate(acc%unit_time)
+    deallocate(acc%n)
+    deallocate(acc%r)
+    deallocate(acc%w1)
+    deallocate(acc%w2)
+    deallocate(acc%de)
+    deallocate(acc%e_in)
+    deallocate(acc%nst)
+    deallocate(acc%fichier)
+
+  end SUBROUTINE kill_acceleration
+
+  SUBROUTINE nullify_acceleration(acc)
+    implicit none
+    type(acceleration), target , intent(inout) :: acc
+
+    nullify(acc%w1)
+    nullify(acc%w2)
+    nullify(acc%r)
+    nullify(acc%n)
+    nullify(acc%POS)
+    nullify(acc%NEXT)
+    nullify(acc%previous)
+    nullify(acc%unit_time)
+    nullify(acc%nst)
+    nullify(acc%de)
+    nullify(acc%e_in)
+    nullify(acc%tableau)
+    nullify(acc%fichier)
+
+  end SUBROUTINE nullify_acceleration
+
+  SUBROUTINE copy_tableau(tableau1,tableau2)
+    implicit none
+    type(temps_energie), target, intent(in) :: tableau1
+    type(temps_energie), target,  intent(inout)  :: tableau2
+
+    if(associated(tableau2%volt)) call kill_tableau(tableau2)
+    call alloc_tableau(tableau2,size(tableau1%phase))
+
+    tableau2%volt=tableau1%volt
+    tableau2%phase=tableau1%phase
+    tableau2%temps=tableau1%temps
+    tableau2%energie=tableau1%energie
+    tableau2%tc=tableau1%tc
+  end SUBROUTINE copy_tableau
+
+  SUBROUTINE copy_acceleration(acc1,acc2)
+    implicit none
+    type(acceleration), target, intent(in) :: acc1
+    type(acceleration), target,  intent(inout)  :: acc2
+    integer i
+
+    if(associated(acc2%n)) call kill_acceleration(acc2)
+    call alloc_acceleration(acc2,acc1%nst,size(acc1%tableau),size(acc1%tableau(1)%volt),acc1%fichier)
+    acc2%previous=>acc1%previous
+    acc2%next=>acc1%next
+    acc2%pos=acc1%pos
+    acc2%nst=acc1%nst
+    acc2%de=acc1%de
+    acc2%e_in=acc1%e_in
+    acc2%unit_time=acc1%unit_time
+    acc2%r=acc1%r
+    do i=1,acc2%n
+       !    acc2%tableau(i)=acc1%tableau(i)
+       call copy_tableau(acc1%tableau(i),acc2%tableau(i))
+    enddo
+
+
+  end SUBROUTINE copy_acceleration
+
+
+  SUBROUTINE lecture_fichier(EL,fichier)
+    implicit none
+    type(element), target, intent(inout) :: EL
+    type(elementp), pointer :: elp
+    character(*) fichier
+    integer mf,i,n_mode,n_max,j,n,cavpath,pos
+    integer, allocatable :: js(:)
+    real(dp) r,ut
+
+    if(ASSOCIATED(ACC)) THEN
+       ACC%NEXT=>el%parent_fibre
+       pos=acc%pos+1
+    else
+       pos=1
+       paccfirst=>el%parent_fibre
+    ENDIF
+
+    if(el%kind/=kind4) then
+       write(6,*) " error not a standard cavity "
+       stop 1946
+    endif
+
+    call kanalnummer(mf,fichier)
+    read(mf,*) n,ut,r,cavpath,n_mode
+    ! write(6,*) n,r,cavpath,n_mode
+
+    allocate(js(n_mode))
+
+    allocate(el%c4%acc)
+
+    acc=> el%c4%acc
+
+    if(.not.ASSOCIATED(paccfirst,el%parent_fibre)) THEN
+       acc%previous=>paccthen
+    else
+       accfirst=>acc
+    endif
+
+    read(mf,*) js
+
+    n_max=0
+    do i=1,n_mode
+       if(js(i)>n_max) n_max=js(i)
+    enddo
+
+
+
+    call alloc_acceleration(acc,el%p%nst,n,n_max,fichier)
+
+
+    acc%unit_time=ut
+
+
+    acc%pos=pos
+    acc%r=r
+    do i=1,acc%n
+       if(read_tc) then
+          read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
+               (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode ),acc%tableau(i)%tc
+       else
+          read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
+               (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode )
+          acc%tableau(i)%tc=zero
+       endif
+    enddo
+
+    close(mf)
+
+    deallocate(js)
+    elp=>el%parent_fibre%magp
+    if(.not.associated(elp%c4%acc)) then
+       allocate(elp%c4%acc)
+       call nullify_acceleration(elp%c4%acc)
+    endif
+    call copy_acceleration(acc,elp%c4%acc)
+
+    if(size(acc%tableau(1)%volt)/=el%c4%nf) then
+       el%c4%nf=size(acc%tableau(1)%volt)
+       elp%c4%nf=size(acc%tableau(1)%volt)
+       call kill(elp%c4%f)
+       deallocate(elp%c4%f)
+       deallocate(el%c4%f)
+       allocate(el%c4%f(el%c4%nf));el%c4%f=zero;el%c4%f(1)=one;
+       allocate(elp%c4%f(el%c4%nf))
+       call alloc(elp%c4%f,el%c4%nf)
+       elp%c4%f(1)=one
+    endif
+
+    el%c4%volt =one
+    elp%c4%volt =one
+    el%c4%phas  =zero
+    elp%c4%phas =zero
+    el%c4%phase0  =zero
+    elp%c4%phase0 =zero
+    el%c4%t  =zero
+    elp%c4%t =zero
+
+    do i=1,el%c4%nf
+       el%c4%f(i)   = acc%tableau(1)%volt(i)
+       el%c4%ph(i)  = acc%tableau(1)%phase(i)
+       elp%c4%f(i)  = acc%tableau(1)%volt(i)
+       elp%c4%ph(i) = acc%tableau(1)%phase(i)
+    enddo
+    if(cavpath==0.or. cavpath==1) then
+       el%c4%cavity_totalpath=cavpath
+       elp%c4%cavity_totalpath=cavpath
+    else
+       write(6,*) "cavpath is wrong ",cavpath
+    endif
+
+    NULLIFY(ACC%NEXT)
+
+    paccthen=>el%parent_fibre
+
+  END SUBROUTINE lecture_fichier
+
+!!!!!!!!!!!!! ramping !!!!!!!!!!!!!
+
+  SUBROUTINE alloc_ramping(acc,unit_time,n,n_max,filename)
+    implicit none
+    type(ramping), target :: acc
+    integer i,n,n_max
+    character(*) filename
+    real(dp) unit_time
+
+    allocate(acc%n)
+    acc%n=n
+    allocate(acc%table(0:n))
+    allocate(acc%file)
+    allocate(acc%r)
+    allocate(acc%unit_time)
+    acc%r=one
+    acc%unit_time=unit_time
+    acc%file=' '
+
+    if(len(filename)>255) then
+       write(6,*)  " Name of file too long (>255) "
+       stop 1945
+    endif
+    acc%file=filename
+
+    do i=0,n
+       call alloc_table(acc%table(i),n_max)
+    enddo
+
+  end SUBROUTINE alloc_ramping
+
+  SUBROUTINE alloc_table(tableau,n)
+    implicit none
+    type(time_energy), target, intent(inout) :: tableau
+    integer n
+    allocate(tableau%an(n),tableau%bn(n),tableau%time,tableau%energy)
+    tableau%an=zero
+    tableau%bn=zero
+    tableau%time=zero
+    tableau%energy=zero
+  end SUBROUTINE alloc_table
+
+  SUBROUTINE kill_table(tableau)
+    implicit none
+    type(time_energy), target, intent(inout)  :: tableau
+    deallocate(tableau%an,tableau%bn,tableau%time,tableau%energy)
+
+  end SUBROUTINE kill_table
+
+  SUBROUTINE kill_ramping(acc)
+    implicit none
+    type(ramping), target , intent(inout) :: acc
+    integer i
+
+    do i=0,acc%n
+       call kill_table(acc%table(i))
+    enddo
+
+    deallocate(acc%table)
+    deallocate(acc%n)
+    deallocate(acc%r)
+    deallocate(acc%unit_time)
+    deallocate(acc%file)
+
+  end SUBROUTINE kill_ramping
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
+  !  TYPE time_energy
+  !     real(dp),pointer :: time
+  !     real(dp),pointer :: energy
+  !     real(dp),pointer :: an(:),bn(:)
+  !  END TYPE time_energy
+
+  !  TYPE ramping
+  !     integer,pointer :: n
+  !     real(dp), pointer :: r, unit_time
+  !     type(time_energy),pointer :: table(:)
+  !     character(255), pointer :: file
+  !  END TYPE ramping
+
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
+
+  SUBROUTINE nullify_ramping(acc)
+    implicit none
+    type(ramping), target , intent(inout) :: acc
+
+    nullify(acc%r)
+    nullify(acc%n)
+    nullify(acc%file)
+    nullify(acc%table)
+    nullify(acc%unit_time)
+
+
+  end SUBROUTINE nullify_ramping
+
+  SUBROUTINE copy_table(tableau1,tableau2)
+    implicit none
+    type(time_energy), target, intent(in) :: tableau1
+    type(time_energy), target,  intent(inout)  :: tableau2
+
+    if(associated(tableau2%an)) call kill_table(tableau2)
+    call alloc_table(tableau2,size(tableau1%an))
+
+    tableau2%an=tableau1%an
+    tableau2%bn=tableau1%bn
+    tableau2%time=tableau1%time
+    tableau2%energy=tableau1%energy
+  end SUBROUTINE copy_table
+
+  SUBROUTINE copy_ramping(acc1,acc2)
+    implicit none
+    type(ramping), target, intent(in) :: acc1
+    type(ramping), target,  intent(inout)  :: acc2
+    integer i
+
+    if(associated(acc2%n)) call kill_ramping(acc2)
+    call alloc_ramping(acc2,acc1%unit_time,acc1%n,size(acc1%table(1)%an),acc1%file)
+
+    do i=0,acc2%n
+       !    acc2%tableau(i)=acc1%tableau(i)
+       call copy_table(acc1%table(i),acc2%table(i))
+    enddo
+
+
+  end SUBROUTINE copy_ramping
+
+
+  SUBROUTINE reading_file(EL,fichier)
+    implicit none
+    type(element), target, intent(inout) :: EL
+    type(elementp), pointer :: elp
+    type(ramping), pointer :: acc
+    character(*) fichier
+    integer mf,i,n_mode,n_max,j,n,cavpath,pos
+    integer, allocatable :: js(:)
+    real(dp) unit_time
+
+
+
+
+    call kanalnummer(mf,fichier)
+    read(mf,*) n,unit_time,n_mode
+    ! write(6,*) n,r,cavpath,n_mode
+    allocate(js(n_mode))
+
+    allocate(el%ramp)
+
+    acc=> el%ramp
+    read(mf,*) js
+
+    n_max=0
+    do i=1,n_mode
+       if(js(i)>n_max) n_max=js(i)
+    enddo
+
+    if(n_max<el%p%nmul) n_max = el%p%nmul
+
+    call alloc_ramping(acc,unit_time,n,n_max,fichier)
+    acc%r=one
+    do i=1,acc%n
+       read(mf,*) acc%table(i)%time,   &
+            (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode )
+       acc%table(i)%energy=0.d0
+    enddo
+
+    close(mf)
+
+    deallocate(js)
+    elp=>el%parent_fibre%magp
+    if(.not.associated(elp%ramp)) then
+       allocate(elp%ramp)
+       call nullify_ramping(elp%ramp)
+    endif
+    call copy_ramping(acc,elp%ramp)
+
+
+
+  END SUBROUTINE reading_file
+
+!!!!!! !!!!!! end ramping !!!!!! !!!!!!
 
   SUBROUTINE ZEROR_KICKT3(EL,I)
     IMPLICIT NONE
