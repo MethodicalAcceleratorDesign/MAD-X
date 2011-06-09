@@ -333,28 +333,26 @@ Sma_multiparticle.o: Sma0_beam_beam_ptc.o Sma_multiparticle.f90
 Sn_mad_like.o: Sma_multiparticle.o Sn_mad_like.f90
 So_fitting.o: Sn_mad_like.o So_fitting.f90
 Sp_keywords.o: So_fitting.o Sp_keywords.f90
-Spb_fake_gino_sub.o: Sp_keywords.o Spb_fake_gino_sub.f90
-Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
-Sqb_accel_ptc.o: Sq_orbit_ptc.o Sqb_accel_ptc.f90
-Sr_spin.o: Sqb_accel_ptc.o Sr_spin.f90
-Sra_fitting.o: Sr_spin.o Sra_fitting.f90
-madx_ptc_module.o: util.o Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_module.f90
-St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
-madx_ptc_track_run.o: util.o Sp_keywords.o madx_ptc_module.o madx_ptc_track_run.f90
 madx_ptc_intstate.o: Sp_keywords.o madx_ptc_intstate.f90
-madx_ptc_trackcavs.o: util.o Sp_keywords.o madx_ptc_intstate.o  madx_ptc_setcavs.o madx_ptc_module.o madx_ptc_trackcavs.f90
 madx_ptc_setcavs.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_setcavs.f90
-madx_ptc_script.o: util.o Sp_keywords.o madx_ptc_script.f90
-madx_ptc_knobs.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc madx_ptc_knobs.f90
-madx_ptc_eplacement.o: util.o Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_eplacement.f90
+madx_ptc_script.o: Sp_keywords.o util.o madx_ptc_script.f90
+Sq_orbit_ptc.o: Sp_keywords.o Sq_orbit_ptc.f90
+Sr_spin.o: Sq_orbit_ptc.o Sr_spin.f90
+Sra_fitting.o: Sr_spin.o Sra_fitting.f90
+madx_ptc_module.o: Sra_fitting.o madx_ptc_setcavs.o madx_ptc_knobs.o util.o madx_ptc_module.f90
+St_pointers.o: Sp_keywords.o madx_ptc_module.o St_pointers.f90
+madx_ptc_track_run.o: Sp_keywords.o madx_ptc_module.o util.o madx_ptc_track_run.f90
+madx_ptc_trackcavs.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_setcavs.o madx_ptc_module.o util.o madx_ptc_trackcavs.f90
+madx_ptc_knobs.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_knobs.inc util.o madx_ptc_knobs.f90
+madx_ptc_eplacement.o: Sp_keywords.o madx_ptc_intstate.o madx_ptc_module.o util.o madx_ptc_eplacement.f90
 madx_ptc_normal.o: madx_ptc_module.o madx_ptc_normal.f90
-madx_ptc_twiss.o: util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_knobs.inc madx_ptc_distrib.inc madx_ptc_twiss.f90
-madx_ptc_distrib.o: util.o madx_ptc_module.o madx_ptc_distrib.inc madx_ptc_distrib.f90
+madx_ptc_twiss.o: madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o madx_ptc_knobs.inc madx_ptc_distrib.inc util.o madx_ptc_twiss.f90
+madx_ptc_distrib.o: madx_ptc_module.o madx_ptc_distrib.inc util.o madx_ptc_distrib.f90
 
 wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_normal.o madx_ptc_twiss.o madx_ptc_distrib.o \
 	madx_ptc_setcavs.o madx_ptc_trackcavs.o \
-	madx_ptc_knobs.o \
+	madx_ptc_knobs.o madx_ptc_track_run.o \
 	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
