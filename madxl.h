@@ -15,7 +15,7 @@
 int item_no=-1;
 int* mtable[MTABLE_SIZE];
 #endif
-#define AUX_LG 10000        /* initial size for ancillary buffers */
+#define AUX_LG 50000        /* initial size for ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
 #define MAX_D_ITEM 30000    /* initial storage size for doubles */
