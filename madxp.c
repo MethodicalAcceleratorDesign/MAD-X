@@ -3785,9 +3785,15 @@ double polish_value(struct int_array* deco, char* expr_string)
               stack[c_stack] = floor(stack[c_stack]);
               break;
             case 20:
-              stack[c_stack] = fabs(stack[c_stack]);
-              stack[c_stack] = stack[c_stack] - floor(stack[c_stack]);
+              stack[c_stack] = ceil(stack[c_stack]);
               break;
+            case 21:
+              stack[c_stack] = round(stack[c_stack]);
+              break;
+            case 22: {
+              double int_part;
+              stack[c_stack] = modf(stack[c_stack], &int_part);
+              } break;
             default:
               fatal_error("polish_value: illegal function in expr:",
                           expr_string);

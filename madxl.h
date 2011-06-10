@@ -52,7 +52,7 @@ int* mtable[MTABLE_SIZE];
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
                         "atan", "sinh", "cosh", "tanh", "ranf",
-                        "gauss", "tgauss", "table", "exist", "floor","frac",
+                        "gauss", "tgauss", "table", "exist", "floor","ceil","round","frac",
                         ""}; /* keep "" ! */
 
 const char op_string[] = "-+*/^";
