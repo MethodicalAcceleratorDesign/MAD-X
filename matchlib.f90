@@ -1388,18 +1388,18 @@
 !     End of DGELSD
 !
       END
-      SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
-      implicit none
-!...
-      LOGICAL            IEEE1, RND
-      INTEGER            BETA, T
-!...
-      BETA = RADIX(0.0D0)
-      T = DIGITS(0.0D0)
-      RND = .TRUE.
-      IEEE1 = .TRUE.
-
-      END
+!!      SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )
+!!      implicit none
+!! !...
+!!      LOGICAL            IEEE1, RND
+!!      INTEGER            BETA, T
+!! !...
+!!      BETA = RADIX(0.0D0)
+!!      T = DIGITS(0.0D0)
+!!      RND = .TRUE.
+!!      IEEE1 = .TRUE.
+!!
+!!      END
       SUBROUTINE DLAMC2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
       implicit none
 !

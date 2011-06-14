@@ -42,7 +42,7 @@ OSTYPE = $(shell uname -s)
 ifeq ($(findstring arwin, $(OSTYPE)),arwin)
   ONMAC=YES
 #  f95=g95
-  f95=gfortran
+  f95=ifort
 #  for darwin go now by default to 64 bit executables
   ARCH=64
 
@@ -371,6 +371,9 @@ madx_main.o: run_madx.o madx_main.F90
 %.o : %.F90
 	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
 
+matchlib2.o: matchlib2.f90
+	$(f95) $(f95_FLAGS) $(f95_FLAGSP) -O0 $<
+
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
 madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o $(TPSA)
 madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), $(patsubst %.f90,%.o,$(wildcard *.f90)))
@@ -398,3 +401,4 @@ info:
 	@echo the OS is "                " = $(OS)
 	@echo the OSTYPE is "            " = $(OSTYPE)
 	@echo madx_objects "             " = $(madx_objects)
+
