@@ -128,6 +128,7 @@ lib64/libz.a -text
 /matchc2.c -text
 /matchjc.f90 -text
 /matchlib.f90 -text
+/matchlib2.f90 -text
 /matchptcknobs.c -text
 /matchptcknobs.h -text
 /matchsa.f90 -text

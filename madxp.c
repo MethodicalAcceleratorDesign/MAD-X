@@ -3788,7 +3788,7 @@ double polish_value(struct int_array* deco, char* expr_string)
               stack[c_stack] = ceil(stack[c_stack]);
               break;
             case 21:
-              stack[c_stack] = round(stack[c_stack]);
+              stack[c_stack] = rint(stack[c_stack]);
               break;
             case 22: {
               double int_part;
