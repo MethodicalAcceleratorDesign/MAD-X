@@ -49,6 +49,7 @@ cmakesrc/FindGSL.cmake -text
 cmakesrc/LinuxLF95.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
 cmakesrc/README -text
+cmakesrc/ctests/CMakeLists.txt -text
 cmakesrc/ctests/ibs.mad -text
 cmakesrc/ctests/job.sample.madx -text
 cmakesrc/ctests/ptc_twiss1.madx -text
