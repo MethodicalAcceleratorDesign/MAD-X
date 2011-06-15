@@ -10,6 +10,7 @@ set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "137.138.26.237")
 set(CTEST_DROP_LOCATION "/cdash/submit.php?project=Mad-X")
 set(CTEST_DROP_SITE_CDASH TRUE)
+set(CTEST_UPDATE_COMMAND "svn")
 
 
 
