@@ -20,9 +20,9 @@ SET(CTEST_MEMORYCHECK_COMMAND_OPTIONS "--gen-suppressions=all --child-silent-aft
 
 
 if (APPLE)
-    set(binaryname "${binaryname}.app/Contents/MacOS/${binaryname}")
+    set(binaryname "${binaryname}.app/Contents/MacOS/./${binaryname}")
 else(APPLE)
-    set(binaryname "${binaryname}")
+    set(binaryname "./${binaryname}")
 endif (APPLE)
 
 ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/ctests/testruns.sh" "${binaryname}")
