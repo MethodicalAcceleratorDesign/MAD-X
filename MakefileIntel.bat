@@ -77,8 +77,11 @@ REM on windows, set the path to contain C:\Python26\
 IF EXIST C:\Python26\python.exe (
 SET WRAP_FORTRAN_CALLS=1
 ) ELSE (
+IF EXIST C:\Python27\python.exe (
+SET WRAP_FORTRAN_CALLS=1
+) ELSE (
 SET WRAP_FORTRAN_CALLS=0
-)
+))
 IF %WRAP_FORTRAN_CALLS%==1 (
 ECHO Wrap Fortran calls from C to prevent garbled output.
 REM on windows, set the path to contain C:\Python26\
