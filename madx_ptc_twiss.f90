@@ -427,6 +427,16 @@ contains
           !          return
        endif
 
+       ! pass starting point for closed orbit search
+       x(1)=get_value('ptc_twiss ','x ')
+       x(2)=get_value('ptc_twiss ','px ')
+       x(3)=get_value('ptc_twiss ','y ')
+       x(4)=get_value('ptc_twiss ','py ')
+       x(6)=get_value('ptc_twiss ','t ')
+       x(5)=get_value('ptc_twiss ','pt ')
+
+
+
        !print*, "Looking for orbit"
        call find_orbit(my_ring,x,1,default,c_1d_7)
 
