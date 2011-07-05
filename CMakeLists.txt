@@ -154,6 +154,10 @@ else (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(madx X11)
 endif (NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
+if(LAPACK_FOUND)
+    target_link_libraries(madx ${LAPACK_LIBRARIES})
+endif()
+
 # Online libraries:
 if (MADX_ONLINE )
 	target_link_libraries(madx SDDS1c  SDDS1 rpnlib mdbmth mdblib gsl) 
