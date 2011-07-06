@@ -4,9 +4,14 @@ set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c )
 # list of fortran source files
 file(GLOB fsrcfiles *.f90 *.F90)
 
-
 if(MADX_STATIC)
- set(BLA_STATIC TRUE)
+    if(WIN32)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
+    elseif(APPLE)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+    else()
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    endif()
 endif()
 find_package(LAPACK) # (lapack requires blas...)
 if(LAPACK_FOUND)
