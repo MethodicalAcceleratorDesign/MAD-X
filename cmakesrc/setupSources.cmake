@@ -25,11 +25,12 @@ endif()
 # add source files according to NTPSA option...
 if (MADX_NTPSA )
   message("NTPSA turned on")
- set(fsrcfiles ${fsrcfiles} c_dabnew_berz.f90 c_tpsa_interface.F90)
- set(csrcfiles ${csrcfiles} tpsa.cpp)
+  file(GLOB to_remove c_dabnew.f90)
+  set(csrcfiles ${csrcfiles} tpsa.cpp)
 else (MADX_NTPSA )
- set(fsrcfiles ${fsrcfiles} c_dabnew.f90)
+  file(GLOB to_remove c_dabnew_berz.f90 c_tpsa_interface.F90)
 endif  (MADX_NTPSA )
+list(REMOVE_ITEM fsrcfiles ${to_remove})
 
 #execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
 # Unsure about dependencies.. Might be an overkill this one.
