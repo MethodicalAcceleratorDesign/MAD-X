@@ -14,9 +14,9 @@
 # C compiler
 CC=gcc
 # Fortran90 compiler
-f95=ifort
+f95=gfortran
 # architecture 32/64bit
-ARCH=32
+ARCH=64
 # Debugging compiler flags
 DEBUG=NO
 # Online version - mostly SDDS IO
