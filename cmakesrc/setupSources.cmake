@@ -24,7 +24,7 @@ endif()
 if(MADX_RICCARDO_FIX AND NOT LAPACK_FOUND)
     find_library(BLAS_LIBRARIES blas)
     find_library(LAPACK_LIBRARIES lapack)
-    set(BLAS_LIBRARIES ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+    set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
 endif()
 
 # add source files according to NTPSA option...
