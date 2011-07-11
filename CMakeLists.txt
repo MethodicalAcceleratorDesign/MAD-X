@@ -35,6 +35,7 @@ OPTION ( MADX_FORCE_32 "Force 32bit build" OFF )
 OPTION ( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
 
 OPTION ( MADX_GOTOBLAS2 "Build with the GOTOBLAS2 libraries" OFF )
+option ( MADX_RICCARDO_FIX "Fix for Riccardo to find BLAS/LAPACK on his machine..." OFF )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	OPTION ( MADX_ONLINE "Build with Online model" ON)

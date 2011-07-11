@@ -21,6 +21,11 @@ else()
     # Note, this only APPENDS -O0 to the compile flags, same as Makefile currently does.
     set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0") 
 endif()
+if(MADX_RICCARDO_FIX AND NOT LAPACK_FOUND)
+    find_library(BLAS_LIBRARIES blas)
+    find_library(LAPACK_LIBRARIES lapack)
+    set(BLAS_LIBRARIES ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
+endif()
 
 # add source files according to NTPSA option...
 if (MADX_NTPSA )
