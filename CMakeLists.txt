@@ -184,7 +184,7 @@ include(setupInstallation)
 # Define useful build name for cdash:
 find_program(UNAME NAMES uname)
 macro(getuname name flag)
-  exec_process("${UNAME}" ARGS "${flag}" OUTPUT_VARIABLE "${name}")
+  exec_program("${UNAME}" ARGS "${flag}" OUTPUT_VARIABLE "${name}")
 endmacro(getuname)
 
 getuname(osname -s)
