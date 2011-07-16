@@ -4,6 +4,10 @@ set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c )
 # list of fortran source files
 file(GLOB fsrcfiles *.f90 *.F90)
 
+# Remove some files which should never be compiled..
+file(GLOB to_remove gxx11ps.f90)
+list(REMOVE_ITEM fsrcfiles ${to_remove})
+
 if(MADX_STATIC)
     if(WIN32)
         set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
