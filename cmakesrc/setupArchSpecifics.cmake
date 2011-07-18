@@ -1,4 +1,10 @@
 
+# OSX specifics:
+if(APPLE)
+  set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
+endif(APPLE)
+
 if ( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
 
   message("32 bit build" ) 
