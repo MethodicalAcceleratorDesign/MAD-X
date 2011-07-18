@@ -1,7 +1,7 @@
 execute_process(COMMAND cat ${SOURCEDIR}/${TEST_SCRIPT} COMMAND ${TEST_PROG}
                 RESULT_VARIABLE HAD_ERROR)
 if(HAD_ERROR)
-    message(FATAL_ERROR "Test failed")
+    message(FATAL_ERROR "Test failed with error ${HAD_ERROR}")
 endif()
 
 # This will always fail because date/version is included in output...

@@ -49,14 +49,14 @@ list(REMOVE_ITEM fsrcfiles ${to_remove})
 ADD_CUSTOM_COMMAND(
   OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND python wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
+  COMMAND python2 wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating C wrapper files"
   )
 ADD_CUSTOM_COMMAND(
   OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND python wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
+  COMMAND python2 wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating fortran wrapper files"
   )
