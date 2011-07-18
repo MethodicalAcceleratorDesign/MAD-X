@@ -65,7 +65,12 @@ cmakesrc/madx.xml -text
 cmakesrc/setupArchSpecifics.cmake -text
 cmakesrc/setupCompilerSpecifics.cmake -text
 cmakesrc/setupInstallation.cmake -text
+cmakesrc/setupOptions.cmake -text
+cmakesrc/setupPackaging.cmake -text
 cmakesrc/setupSources.cmake -text
+cmakesrc/setupTargets.cmake -text
+cmakesrc/setupTesting.cmake -text
+cmakesrc/setupVersion.cmake -text
 /d_lielib.f90 -text
 /doxygen.h -text
 /dynap.f90 -text
