@@ -8,11 +8,11 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     # ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
     # for file l_complex_taylor.f90
     if(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O2 ")
-    else(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-      set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -fno-f2c -O4 ")
-    endif(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-  set (CMAKE_Fortran_FLAGS "") # remove -g -O2 from main list of flags.. issue for older cmake/gfortran
+        set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-f2c -O2 ")
+    else()
+      set (CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-f2c -O4 ")
+    endif()
+  set (CMAKE_Fortran_FLAGS " -fno-range-check ") # remove -g -O2 from main list
     if (MADX_GOTOBLAS2)
         set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fexternal-blas")
         set (CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -lgoto2 ")
