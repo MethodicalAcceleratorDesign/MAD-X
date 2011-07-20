@@ -28,7 +28,7 @@ else()
     target_link_libraries(madx X11)
 endif()
 
-if(LAPACK_FOUND)
+if(LAPACK_FOUND AND BLAS_FOUND)
     target_link_libraries(madx ${LAPACK_LIBRARIES})
 endif()
 
