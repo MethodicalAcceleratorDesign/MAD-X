@@ -178,7 +178,7 @@ else
 endif
 
 ifeq ($(ARCH),32)
-  LIBX= -L$(PWD)/lib -lX11 -lpthread -lstdc++ -lc -lgcc_eh
+  LIBX= -L$(PWD)/lib32 -lX11 -lpthread -lstdc++ -lc -lgcc_eh
 else
   ifeq ($(f95),lf95)
     LIBX= -L$(PWD)/lib64 -lX11 -lstdc++ -lgcc_eh
@@ -206,7 +206,7 @@ ifeq ($(ONLINE),YES)
     LIBX+= -limf
   endif
   ifeq ($(ARCH),32)
-    LIBX+= -L$(PWD)/lib -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
+    LIBX+= -L$(PWD)/lib32 -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
   else
     LIBX+= -L$(PWD)/lib64 -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
   endif

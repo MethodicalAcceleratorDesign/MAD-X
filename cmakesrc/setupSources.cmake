@@ -8,15 +8,6 @@ file(GLOB fsrcfiles *.f90 *.F90)
 file(GLOB to_remove gxx11ps.f90)
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
-if(MADX_STATIC)
-    if(WIN32)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
-    elseif(APPLE)
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
-    else()
-        set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
-    endif()
-endif()
 find_package(LAPACK) # (lapack requires blas...)
 if(MADX_RICCARDO_FIX AND NOT LAPACK_FOUND)
     find_library(BLAS_LIBRARIES blas)
@@ -36,7 +27,7 @@ endif()
 
 # add source files according to NTPSA option...
 if (MADX_NTPSA )
-  message("NTPSA turned on")
+  message(STATUS "NTPSA turned on")
   file(GLOB to_remove c_dabnew.f90)
   set(csrcfiles ${csrcfiles} tpsa.cpp)
 else (MADX_NTPSA )
@@ -46,17 +37,18 @@ list(REMOVE_ITEM fsrcfiles ${to_remove})
 
 #execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
 # Unsure about dependencies.. Might be an overkill this one.
+find_package(PythonInterp REQUIRED)
 ADD_CUSTOM_COMMAND(
   OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND python2 wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
+  COMMAND ${PYTHON_EXECUTABLE} wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating C wrapper files"
   )
 ADD_CUSTOM_COMMAND(
   OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
   DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND python2 wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
+  COMMAND ${PYTHON_EXECUTABLE} wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   COMMENT "Creating fortran wrapper files"
   )

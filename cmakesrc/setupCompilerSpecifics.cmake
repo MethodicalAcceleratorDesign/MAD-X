@@ -125,12 +125,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "
 endif()
 # end C stuff
 
-
-if(MADX_ONLINE )
-    message("Online Model turned on" )
-    if( NOT MADX_STATIC )
-        message( WARNING "You might have problems finding the shared libraries for SDDS" )
-    endif()
+if(MADX_ONLINE)
+    message(STATUS "Online model turned on")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_ONLINE ")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_ONLINE ")
 endif()

@@ -20,7 +20,6 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
     #necessary to search for X11 for OSX instead of directly including it
     find_package(X11)
     if(X11_FOUND)
-        message("Found X11 libraries")
         include_directories(${X11_INCLUDE_DIR})
         target_link_libraries(madx ${X11_X11_LIB})
     endif()
@@ -34,10 +33,7 @@ endif()
 
 # Online libraries:
 if(MADX_ONLINE)
-    target_link_libraries(madx SDDS1c  SDDS1 rpnlib mdbmth mdblib gsl) 
-    if(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-        target_link_libraries(madx imf)
-    endif()
+    target_link_libraries(madx ${SDDS_LIBRARIES}) 
 endif()
 target_link_libraries(madx z)
 # new additions from Frank:

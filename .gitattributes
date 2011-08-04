@@ -46,6 +46,7 @@
 /c_dabnew_berz.f90 -text
 /c_tpsa_interface.F90 -text
 cmakesrc/FindGSL.cmake -text
+cmakesrc/FindSDDS.cmake -text
 cmakesrc/LinuxLF95.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
 cmakesrc/README -text
@@ -86,14 +87,14 @@ cmakesrc/setupVersion.cmake -text
 /j_tpsalie.f90 -text
 /k_tpsalie_analysis.f90 -text
 /l_complex_taylor.f90 -text
-lib/libSDDS1.a -text
-lib/libSDDS1c.a -text
-lib/libX11.a -text
-lib/libgsl.a -text
-lib/libmdblib.a -text
-lib/libmdbmth.a -text
-lib/librpnlib.a -text
-lib/libz.a -text
+lib32/libSDDS1.a -text
+lib32/libSDDS1c.a -text
+lib32/libX11.a -text
+lib32/libgsl.a -text
+lib32/libmdblib.a -text
+lib32/libmdbmth.a -text
+lib32/librpnlib.a -text
+lib32/libz.a -text
 lib64/libSDDS1.a -text
 lib64/libSDDS1c.a -text
 lib64/libX11.a -text
