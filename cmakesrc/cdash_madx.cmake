@@ -17,6 +17,8 @@ SET(CTEST_SITE "myname.maymachine")
 set(CTEST_BUILD_NAME "SLC5-64bit-gfortran")
 # Your source should be checked out from svn into this directory:
 set(CTEST_SOURCE_DIRECTORY "/path/to/source/madX/")
+# and compilation will be done in this directory (no need to edit, must be unique for every configuration):
+set(CTEST_BINARY_DIRECTORY "${CTEST_SOURCE_DIRECTORY}/build")
 
 # Optional edits:
 ctest_start(Experimental)
@@ -25,7 +27,6 @@ set(cfg_options
  )
 
 # Do not edit (unless you know cmake/ctest):
-set(CTEST_BINARY_DIRECTORY "${CTEST_SOURCE_DIRECTORY}/build")
 
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_UPDATE_COMMAND "svn")
