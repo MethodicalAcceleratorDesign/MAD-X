@@ -4,7 +4,8 @@
 # http://137.138.26.237/cdash/index.php?project=Mad-X
 # 
 # How to:
-#  - check out the source from svn in a temporary directory
+#  - check out the source from svn in a temporary directory, from the url 
+#     http://svnweb.cern.ch/guest/madx/trunk/madX/
 #  - set the CTEST_SOURCE_DIRECTORY accordingly below
 #  - set a useful test site name (e.g. "your name"."machine type")
 #  - set a useful build name (e.g. architecture, os and compiler used)
