@@ -93,7 +93,9 @@ contains
   subroutine ptc_resetinternalstate
     implicit none
 
-    if (getdebug() > 1) print *, "Setting internal state to DEFAULT0"
+    if (getdebug() > 1) then
+        print *, "Setting internal state to DEFAULT0"
+    end if
 
     intstate = default0
     default = intstate
@@ -109,7 +111,9 @@ contains
     implicit none
     integer     :: level
 
-    if (level > 0) print *, "Setting debug level to", level
+    if (level > 0) then
+        print *, "Setting debug level to", level
+    end if
     debug = level
 
   end subroutine ptc_setdebuglevel
@@ -119,10 +123,14 @@ contains
     implicit none
     integer     :: flag
     if (flag == 0) then
-       if (getdebug() > 1) print *, "Switching off ENFORCE6D"
+       if (getdebug() > 1) then
+           print *, "Switching off ENFORCE6D"
+       end if
        enforce6D = .false.
     else
-       if (getdebug() > 1) print *, "Setting ENFORCE6D"
+       if (getdebug() > 1) then
+           print *, "Setting ENFORCE6D"
+       end if
        enforce6D = .true.
     endif
 
@@ -144,7 +152,9 @@ contains
     integer     :: flag
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Setting MAX ACCEL"
+       if (getdebug() > 1) then
+           print *, "Setting MAX ACCEL"
+       end if
        maxaccel = .true.
     endif
 
@@ -158,11 +168,15 @@ contains
     !    print *, "Setting the flag"
     !    print *, "And the flag is", flag
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON exact missaligment"
+       if (getdebug() > 1) then
+           print *, "Switching ON exact missaligment"
+       end if
        always_exactmis=.true.
      !  intstate = intstate + EXACTMIS0
     else
-       if (getdebug() > 1) print *, "Switching OFF exact missaligment"
+       if (getdebug() > 1) then 
+           print *, "Switching OFF exact missaligment"
+       end if
      !  intstate = intstate - EXACTMIS0
        always_exactmis=.false.
     endif
@@ -178,10 +192,14 @@ contains
 
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON radiation"
+       if (getdebug() > 1) then
+           print *, "Switching ON radiation"
+       end if
        intstate = intstate + radiation0
     else
-       if (getdebug() > 1) print *, "Switching OFF radiation"
+       if (getdebug() > 1) then
+           print *, "Switching OFF radiation"
+       end if
        intstate = intstate - radiation0
     endif
     default = intstate
@@ -195,10 +213,14 @@ contains
     integer    :: flag
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON fringe"
+       if (getdebug() > 1) then
+           print *, "Switching ON fringe"
+       end if
        intstate = intstate + fringe0
     else
-       if (getdebug() > 1) print *, "Switching OFF fringe"
+       if (getdebug() > 1) then 
+           print *, "Switching OFF fringe"
+       end if
        intstate = intstate - fringe0
     endif
 
@@ -213,10 +235,14 @@ contains
     integer    :: flag
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON totalpath (and switching OFF delta and only_4d)"
+       if (getdebug() > 1) then
+           print *, "Switching ON totalpath (and switching OFF delta and only_4d)"
+       end if
        intstate = intstate - delta0 - only_4d0 + totalpath0
     else
-       if (getdebug() > 1) print *, "Switching OFF totalpath"
+       if (getdebug() > 1) then
+           print *, "Switching OFF totalpath"
+       end if
        intstate = intstate - totalpath0
     endif
 
@@ -236,10 +262,14 @@ contains
     !    print *, "And the flag is", flag
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON time"
+       if (getdebug() > 1) then
+           print *, "Switching ON time"
+       end if
        intstate = intstate + time0
     else
-       if (getdebug() > 1) print *, "Switching OFF time"
+       if (getdebug() > 1) then
+           print *, "Switching OFF time"
+       end if
        intstate = intstate - time0
     endif
 
@@ -256,10 +286,14 @@ contains
     integer    :: flag
 
     if (flag == 1) then
-       if (getdebug() > 1) print *, "Switching ON nocavity"
+       if (getdebug() > 1) then
+           print *, "Switching ON nocavity"
+       end if
        intstate = intstate + nocavity0
     else
-       if (getdebug() > 1) print *, "Switching OFF nocavity and (also) delta and only_4d"
+       if (getdebug() > 1) then
+           print *, "Switching OFF nocavity and (also) delta and only_4d"
+       end if
        intstate = intstate  - delta0 - only_4d0 - nocavity0
     endif
 

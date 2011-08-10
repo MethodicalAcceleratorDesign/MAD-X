@@ -385,7 +385,9 @@ contains
     integer  :: i ! iterator
     ! we do not deal here with the main twiss table, hence we do not clear it
     do i=1,ntables
-       if (getdebug()>3) print *,"Clearing ",tables(i)
+       if (getdebug()>3) then
+           print *,"Clearing ",tables(i)
+       end if
        call reset_count(tables(i))
     enddo
 
@@ -397,7 +399,9 @@ contains
     integer  :: i ! iterator
 
     do i=1,ntables
-       if (getdebug()>3) print *,"Augmenting ",tables(i)
+       if (getdebug()>3) then
+           print *,"Augmenting ",tables(i)
+       end if
        call augmentcountonly(tables(i)) !we need to use special augement,
        !cause the regular one looks for for
        !variables names like columns to fill the table
@@ -410,7 +414,9 @@ contains
     implicit none
     integer       :: i ! iterator
     do i=1,ntables
-       if (getdebug()>2) print *,"Putting name in ",tables(i)
+       if (getdebug()>2) then
+           print *,"Putting name in ",tables(i)
+       end if
        call string_to_table(tables(i),"name ","name ")
     enddo
 
@@ -593,12 +599,16 @@ contains
        pb%name = fibrename
     endif
 
-    if (getdebug() > 1) print *,"addknob: pb%name is ", pb%name," npolblocks=",npolblocks
+    if (getdebug() > 1) then
+        print *,"addknob: pb%name is ", pb%name," npolblocks=",npolblocks
+    end if
 
 
     exactmatch = get_value('ptc_knob ','exactmatch ') .ne. 0
     if (exactmatch) then
-       if (getdebug() > 1) print*,"addknob: Using Exact name match: ", fibrename
+       if (getdebug() > 1) then
+           print*,"addknob: Using Exact name match: ", fibrename
+       end if
        pb%vorname = fibrename
     else
        pb%n_name =  len_trim(pb%name)
@@ -610,7 +620,9 @@ contains
     endif
 
     call comm_para('kn ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-    if (getdebug()>2) print*, "there is ",nint, " kn's: ", int_arr(1:nint)
+    if (getdebug()>2) then
+        print*, "there is ",nint, " kn's: ", int_arr(1:nint)
+    end if
     do i = 1, nint
        if (int_arr(i) < 0) then
           exit
@@ -618,11 +630,15 @@ contains
        int_arr(i) = int_arr(i) + 1 !madx numerates from 0
        nknobs = nknobs + 1
        pb%ibn(int_arr(i)) = nknobs
-       if (getdebug()>0) print*, "Set normal mulitpole component ", int_arr(i),"as ", nknobs, "parameter of PTC"
+       if (getdebug()>0) then
+           print*, "Set normal mulitpole component ", int_arr(i),"as ", nknobs, "parameter of PTC"
+       end if
     enddo
 
     call comm_para('ks ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-    if (getdebug()>2) print*, "there is ",nint, " ks's: ", int_arr(1:nint)
+    if (getdebug()>2) then
+        print*, "there is ",nint, " ks's: ", int_arr(1:nint)
+    end if
     do i = 1, nint
        if (int_arr(i) < 0) then
           exit
@@ -630,7 +646,9 @@ contains
        int_arr(i) = int_arr(i) + 1 !madx numerates from 0
        nknobs = nknobs + 1
        pb%ian(int_arr(i)) = nknobs
-       if (getdebug()>0) print*, "Set skew mulitpole component ", int_arr(i)," as ", nknobs, "parameter of PTC"
+       if (getdebug()>0) then
+           print*, "Set skew mulitpole component ", int_arr(i)," as ", nknobs, "parameter of PTC"
+       end if
     enddo
 
   end subroutine addknob
@@ -1619,7 +1637,9 @@ contains
        print*, "Setting parameter ",par,"(el=",fibrename(1:16),", kn=",kn,", ks=",ks," ) to ", v
     endif
 
-    if (getdebug() > 1) print*, "Setting par ", par, " to ", v, fibrename(1:16)
+    if (getdebug() > 1) then
+        print*, "Setting par ", par, " to ", v, fibrename(1:16)
+    end if
     call setparvalue(par, v)
 
     refreshtables = get_value('ptc_setknobvalue ','refreshtables ') .ne. 0

@@ -349,7 +349,9 @@ contains
        v = function_to_average.sub.0
 
        if (c_%npara == 5) then
-          if (debug > 3) print*, v
+          if (debug > 3) then
+              print*, v
+          endif
           e = 0
           do k=1,c_%no
              e(5) = k
@@ -359,7 +361,9 @@ contains
                 print*, (function_to_average.sub.e) * (sigmas(5)**(2*k))
              endif
              v = v + (function_to_average.sub.e) * (sigmas(5)**(k)) !was to 2*k
-             if (debug > 9) print*, v
+             if (debug > 9) then
+                 print*, v
+             endif
           enddo
        endif
 
@@ -405,7 +409,9 @@ contains
     endif
 
 
-    if (getdebug() > 1) print*, "Setting Sigmas (Emittances)"
+    if (getdebug() > 1) then
+        print*, "Setting Sigmas (Emittances)"
+    endif
 
     sigmas(1) = sqrt(emix)
     sigmas(2) = sigmas(1)
@@ -415,7 +421,9 @@ contains
     sigmas(5) = sqrt(emiz)
     sigmas(6) = sigmas(5)
 
-    if (getdebug() > 1) print *, "Current sigmas setemittances ", sigmas
+    if (getdebug() > 1) then
+        print *, "Current sigmas setemittances ", sigmas
+    endif
 
 
 
@@ -506,15 +514,21 @@ contains
        tmpstring = disttypes(i)
        select case(tmpstring(1:stringlength(i)))
        case ('gauss')
-          if (getdebug() > 1) print*, "initmoments: Gauss distribution for dimension ", i
+          if (getdebug() > 1) then
+              print*, "initmoments: Gauss distribution for dimension ", i
+          endif
           call makegaus(no,i)
           distributiontype(i) = distr_gauss
        case ('flat5')
-          if (getdebug() > 1) print*, "initmoments: Flat distribution for dimension ", i
+          if (getdebug() > 1) then
+              print*, "initmoments: Flat distribution for dimension ", i
+          endif
           call makeflat5(no,i)
           distributiontype(i) = distr_flat5
        case ('flat56')
-          if (getdebug() > 1) print*, "initmoments: Flat distribution for dimension ", i
+          if (getdebug() > 1) then
+              print*, "initmoments: Flat distribution for dimension ", i
+          endif
           call makeflat56(no,i)
           distributiontype(i) = distr_flat56
        case default
@@ -598,7 +612,9 @@ contains
     type(taylor) x,p,f
     type(Taylorresonance) fr
 
-    if (getdebug() > 1) print*, "Making Gauss distributions for dimension ", d
+    if (getdebug() > 1) then
+        print*, "Making Gauss distributions for dimension ", d
+    endif
 
     call init(no,1,0,0)
 
@@ -624,7 +640,9 @@ contains
           normmoments(d,i,j)=normmoments(d,i,j)*singlefac(jn(1))*two**(jn(1))
           normmoments(d,j,i)=normmoments(d,i,j)
 
-          if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          if (getdebug() > 1) then
+              print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          endif
        enddo
     enddo
     call kill(x,p,f)
@@ -640,7 +658,9 @@ contains
     integer d !dimension number
     integer i,j
 
-    if (getdebug() > 1) print*, "Making flat distribution "
+    if (getdebug() > 1) then
+        print*, "Making flat distribution "
+    endif
 
     do i=0,no
        do j=i,no
@@ -650,7 +670,9 @@ contains
           normmoments(d,i,j)=(three)**(i/2)/(i+1) !delta assumed flat distribution and
           normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
 
-          if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          if (getdebug() > 1) then
+              print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          endif
 
        enddo
     enddo
@@ -665,7 +687,9 @@ contains
     integer d !dimension number
     integer i,j
 
-    if (getdebug() > 1) print*, "Making flat in delta and T distributions"
+    if (getdebug() > 1) then
+        print*, "Making flat in delta and T distributions"
+    endif
 
     do i=0,no,2
        do j=i,no,2
@@ -675,7 +699,9 @@ contains
 
           normmoments(d,j,i)=normmoments(d,i,j)   !and L is the delta function
 
-          if (getdebug() > 1) print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          if (getdebug() > 1) then
+              print*, "mom(",i,",",j,")=",normmoments(d,i,j)
+          endif
 
        enddo
     enddo

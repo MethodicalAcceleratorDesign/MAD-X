@@ -346,7 +346,9 @@ contains
        unimap(i) = zero
     enddo
 
-    if (getdebug() > 1) print*,"ptc_twiss"
+    if (getdebug() > 1) then
+        print*,"ptc_twiss"
+    endif
     call momfirstinit()
 
     !------------------------------------------------------------------------------
@@ -1758,19 +1760,25 @@ contains
          do i=1,c_%nd
 
             if(inicondknobs%beta(i)/=0) then
-               if (getdebug() > 1) print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
+               if (getdebug() > 1) then
+                   print*,"Beta ",i," is knob no. ", inicondknobs%beta(i)
+               endif
                call make_it_knob(be(i),k_system+inicondknobs%beta(i))
             endif
 
             if(inicondknobs%alfa(i)/=0) then
-               if (getdebug() > 1) print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
+               if (getdebug() > 1) then
+                   print*,"Alfa ",i," is knob no. ",  inicondknobs%alfa(i)
+               endif
                call make_it_knob(al(i),k_system+inicondknobs%alfa(i))
             endif
          enddo
 
          do i=1,4
             if(inicondknobs%dispersion(i)/=0) then
-               if (getdebug() > 1) print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
+               if (getdebug() > 1) then
+                   print*,"Dispersion ",i," is knob no. ",  inicondknobs%dispersion(i)
+               endif
                call make_it_knob(di(i),k_system+inicondknobs%dispersion(i))
             endif
          enddo

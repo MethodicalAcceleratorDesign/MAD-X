@@ -60,7 +60,9 @@ CONTAINS
     nullify(maps)
 
     if (getdebug()==0) global_verbose = .false.
-    if (getdebug()>0) print*,"Now PTC"
+    if (getdebug()>0) then
+        print*,"Now PTC"
+    endif
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
 
     !    print*,">>ss1<< old sector_nmul",sector_nmul
@@ -204,15 +206,21 @@ CONTAINS
 
 
     if(abs(pma-pmae)/pmae<c_0_002) then
-       if (getdebug() > 1) print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
+       if (getdebug() > 1) then
+           print *,'Executing MAKE_STATES(TRUE), i.e. ELECTRON beam'
+       endif
        particle=.true.
        CALL MAKE_STATES(PARTICLE)
     elseif(abs(pma-pmap)/pmap<c_0_002) then
-       if (getdebug() > 1) print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
+       if (getdebug() > 1) then
+           print *,'Executing MAKE_STATES(FALSE), i.e. PROTON beam'
+       endif
        particle=.false.
        CALL MAKE_STATES(PARTICLE)
     else
-       if (getdebug() > 1) print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+       if (getdebug() > 1) then
+           print '(a, f8.4, a)','Executing MAKE_STATES(',pma/pmae,'), i.e. PROTON beam'
+       endif
        muonfactor=pma/pmae
        CALL MAKE_STATES(muonfactor)
     endif
@@ -237,14 +245,20 @@ CONTAINS
     endif
 
     sector_nmul_max0 = sector_nmul_max
-    if (getdebug() > 1) print*,'  Global max sector_nmul: ',sector_nmul_max0
+    if (getdebug() > 1) then
+        print*,'  Global max sector_nmul: ',sector_nmul_max0
+    endif
 
     sector_nmul0 = sector_nmul
-    if (getdebug() > 1) print*,'  Global sector_nmul: ',sector_nmul0
+    if (getdebug() > 1) then
+        print*,'  Global sector_nmul: ',sector_nmul0
+    endif
 
 
     model = get_value('ptc_create_layout ','model ')
-    if (getdebug() > 1) print*,'  Global Model code is : ',model
+    if (getdebug() > 1) then
+        print*,'  Global Model code is : ',model
+    endif
 
     !*****************************
     !  MODEL Settings
@@ -265,33 +279,51 @@ CONTAINS
 
 
 
-    if (getdebug() > 1) print*,'  Global Model name (keymod0) is : ',keymod0
+    if (getdebug() > 1) then
+        print*,'  Global Model name (keymod0) is : ',keymod0
+    endif
 
     method0   = get_value('ptc_create_layout ','method ')
-    if (getdebug() > 1) print*,'  Global method is: ',method0
+    if (getdebug() > 1) then
+        print*,'  Global method is: ',method0
+    endif
 
     exact0    = get_value('ptc_create_layout ','exact ') .ne. 0
-    if (getdebug() > 1) print*,'  Global exact is: ',exact0
+    if (getdebug() > 1) then
+        print*,'  Global exact is: ',exact0
+    endif
 
     nst0      = get_value('ptc_create_layout ','nst ')
-    if (getdebug() > 1) print*,'  Global Number of Integration Steps (nst) is: ',nst0
+    if (getdebug() > 1) then
+        print*,'  Global Number of Integration Steps (nst) is: ',nst0
+    endif
 
     ! MAD-X specials
     !    madlength = get_option('rbarc ') .eq. 0
     madlength = .false.
-    if (getdebug() > 1) print*,'  global rbend_length: ',madlength
+    if (getdebug() > 1) then
+        print*,'  global rbend_length: ',madlength
+    endif
 
     mad       = get_value('ptc_create_layout ','mad_mult ') .ne. 0
-    if (getdebug() > 1) print*,'  global mad_mult as in mad8: ',mad
+    if (getdebug() > 1) then
+        print*,'  global mad_mult as in mad8: ',mad
+    endif
 
     mad8      = get_value('ptc_create_layout ','mad8 ') .ne. 0
-    if (getdebug() > 1) print*,'  rbend as in mad8 (only global): ',mad8
+    if (getdebug() > 1) then
+        print*,'  rbend as in mad8 (only global): ',mad8
+    endif
 
     gamma     = get_value('probe ','gamma ')
-    if (getdebug() > 1) print*,'  gamma: ',gamma
+    if (getdebug() > 1) then
+        print*,'  gamma: ',gamma
+    endif
 
     k         = double_from_table('summ ','gammatr ',1,gammatr)
-    if (getdebug() > 1) print*,'  gammatr: ',gammatr
+    if (getdebug() > 1) then
+        print*,'  gammatr: ',gammatr
+    endif
 
     gamma2    = gamma**2
     gammatr2  = gammatr**2
@@ -337,7 +369,9 @@ CONTAINS
     !    my_ring%charge=1
     initial_charge=1
     CALL SET_MADx(energy=energy,METHOD=method0,STEP=nst0)
-    if (getdebug() > 1) print *, 'MADx is set'
+    if (getdebug() > 1) then
+        print *, 'MADx is set'
+    endif
 
     icav=0
     nt=0
@@ -1361,7 +1395,9 @@ CONTAINS
     if (kn >= 0) then
        kn = kn + 1
 
-       if (getdebug() > 1) print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
+       if (getdebug() > 1) then
+           print*,"Setting up KN ", kn, " from ", p%mag%BN(kn) ," to ", v
+       endif
 
        call add(p%mag, kn,0,v)
        call add(p%magp,kn,0,v)
@@ -1377,7 +1413,9 @@ CONTAINS
 
        !      print*,"Setting up skew field component ", ks," to ", v
 
-       if (getdebug() > 1) print*,"Setting up KS ", ks, " from ", p%mag%AN(ks) ," to ", v
+       if (getdebug() > 1) then
+           print*,"Setting up KS ", ks, " from ", p%mag%AN(ks) ," to ", v
+       endif
        call add(p%mag, -ks,0,v)
        call add(p%magp,-ks,0,v)
 
@@ -1444,7 +1482,9 @@ CONTAINS
        endif
     endif
 
-    if (getdebug() > 1) print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
+    if (getdebug() > 1) then
+        print *, '<madx_ptc_module.f90 : ptc_dumpmaps> Maps are dumped to file ',filename
+    endif
     call kanalnummer(mf1)
     open(unit=mf1,file=filename)
 
@@ -1520,7 +1560,9 @@ CONTAINS
              return
           endif
        else
-          if (getdebug() > 2) print *, 'Track Cavity...'
+          if (getdebug() > 2) then
+              print *, 'Track Cavity...'
+          endif
 
           call track(my_ring,y2,i,i+2,getintstate())
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -2007,17 +2049,23 @@ CONTAINS
     deltap = zero
     select case(icase)
     CASE(4)
-       if (getdebug()>1) print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
+       if (getdebug()>1) then
+           print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
+       endif
        default=default-delta0
        default=default+only_4d0+NOCAVITY0
        i=4
     CASE(5)
-       if (getdebug()>1) print*, "my_state: Enforcing DELTA"
+       if (getdebug()>1) then
+           print*, "my_state: Enforcing DELTA"
+       endif
        default=default+delta0
        deltap=deltap0
        i=5
     CASE(56)
-       if (getdebug()>1) print*, "my_state: Enforcing coasting beam"
+       if (getdebug()>1) then
+           print*, "my_state: Enforcing coasting beam"
+       endif
        default = default - delta0 - only_4d0
        default = default + NOCAVITY0
        deltap=deltap0

@@ -71,7 +71,9 @@ contains
     endif
 
     nturns = get_value('ptc_trackline ','turns ')
-    if (getdebug() > 2) print *, 'ptc_trackline, nturns = ', nturns
+    if (getdebug() > 2) then
+        print *, 'ptc_trackline, nturns = ', nturns
+    endif
 
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('WARNING: You can not make more than one turn in a line!', &
@@ -104,7 +106,9 @@ contains
        IF (e.eq.1) obspointnumber=1 ! node_value gives 0 for 1st (?)
 
        if (obspointnumber .gt. 0) then
-          if (getdebug() > 0) print *,"Element ",e," is an observation point no. ",obspointnumber
+          if (getdebug() > 0) then
+              print *,"Element ",e," is an observation point no. ",obspointnumber
+          endif
           observedelements(e) = obspointnumber
        endif
 
@@ -114,18 +118,24 @@ contains
 
 
     charge = get_value('beam ', "charge ");
-    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
+    if (getdebug() > 3 ) then
+        print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
+    endif
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
 
-    if (getdebug() > 0) print *, 'reading tracks starting posiotions from table ....'
+    if (getdebug() > 0) then
+        print *, 'reading tracks starting posiotions from table ....'
+    endif
 
     call gettrack(1,x(1),x(2),x(3),x(4),x(6),x(5))
     x(6) = -x(6)
 
-    if (getdebug() > 0) print *, 'reading.... Done'
+    if (getdebug() > 0) then
+        print *, 'reading.... Done'
+    endif
 
     if (getdebug() > 0) then
        print *, '###################################################'
@@ -146,7 +156,9 @@ contains
 
     n=1
     npart = getnumberoftracks()
-    if (getdebug() > 0) print *, 'There is ', npart,' tracks'
+    if (getdebug() > 0) then
+        print *, 'There is ', npart,' tracks'
+    endif
 
     !     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
     CALL ALLOCATE_BEAM(TheBeam,npart)
@@ -469,7 +481,9 @@ contains
     endif
 
     nturns = get_value('ptc_trackline ','turns ')
-    if (getdebug() > 2) print *, 'ptc_trackline, nturns = ', nturns
+    if (getdebug() > 2) then
+        print *, 'ptc_trackline, nturns = ', nturns
+    endif
 
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('WARNING: You can not make more than one turn in a line!', &
@@ -503,7 +517,9 @@ contains
        IF (e.eq.1) obspointnumber=1 ! node_value gives 0 for 1st (?)
 
        if (obspointnumber .gt. 0) then
-          if (getdebug() > 0) print *,"Element ",e," is an observation point no. ",obspointnumber
+          if (getdebug() > 0) then
+              print *,"Element ",e," is an observation point no. ",obspointnumber
+          endif
           observedelements(e) = obspointnumber
        endif
 
@@ -513,17 +529,23 @@ contains
 
 
     charge = get_value('beam ', "charge ");
-    if (getdebug() > 3 ) print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
+    if (getdebug() > 3 ) then
+        print *, 'Read charge:', charge,' layout has charge ', my_ring%start%charge
+    endif
 
     if (cavsareset .eqv. .false.) then
        call setcavities(my_ring,maxaccel)
     endif
 
-    if (getdebug() > 0) print *, 'reading tracks starting posiotions from table ....'
+    if (getdebug() > 0) then
+        print *, 'reading tracks starting posiotions from table ....'
+    endif
 
     call gettrack(1,x(1),x(2),x(3),x(4),x(6),x(5))
 
-    if (getdebug() > 0) print *, 'reading.... Done'
+    if (getdebug() > 0) then
+        print *, 'reading.... Done'
+    endif
 
     if (getdebug() > 0) then
        print *, '###################################################'
@@ -542,12 +564,16 @@ contains
 
     n=1
     npart = getnumberoftracks()
-    if (getdebug() > 0) print *, 'There is ', npart,' tracks'
+    if (getdebug() > 0) then
+        print *, 'There is ', npart,' tracks'
+    endif
     do n=1, npart
 
        pathlegth = zero
 
-       if (getdebug() > 3 ) print *, 'Getting track ',n
+       if (getdebug() > 3 ) then
+           print *, 'Getting track ',n
+       endif
 
        call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
        x(6) = -x(6)

@@ -91,7 +91,9 @@ contains
     startfen=p  !setting up start energy for record
     nfen=p      ! current fibre energy
 
-    if ( getdebug() > 1 ) print *, 'c_%feed_p0c = ', c_%feed_p0c
+    if ( getdebug() > 1 ) then
+        print *, 'c_%feed_p0c = ', c_%feed_p0c
+    endif
 
     if ( getdebug() > 2 ) write (*,*) 'START TRACKING TILL THE FIRST CAVITY'
 
@@ -285,7 +287,9 @@ contains
 
     do i=1,my_ring%n
        if ( associated(p%mag) .eqv. .false.) then
-          if (getdebug() > 1 ) print *, 'Fibre no. ',i,' has no mag assigned to it'
+          if (getdebug() > 1 ) then
+              print *, 'Fibre no. ',i,' has no mag assigned to it'
+          endif
           cycle
        endif
        if ( getdebug() > 2 ) then
@@ -343,7 +347,9 @@ contains
 !      type(internal_state)     :: globalis ! internal state to be use in the tracking
 
       arrivtime = x(6)/clight
-      if (getdebug()>2) print *, 'arrivtime = ', arrivtime
+      if (getdebug()>2) then
+          print *, 'arrivtime = ', arrivtime
+      endif
 
       if( (f%mag%kind/=kind21) .and. (f%mag%kind/=kind4) ) then
          write(6,*) " fatal error: not a Cavity "

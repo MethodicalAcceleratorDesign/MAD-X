@@ -406,7 +406,9 @@ CONTAINS
 
     ! initialize the closed orbit coordinates  at START of the ring
     x_coord_co(:)=zero
-    if (ptc_track_debug) print *, " x_coord_co(:)=zero = ",x_coord_co
+    if (ptc_track_debug) then
+        print *, " x_coord_co(:)=zero = ",x_coord_co
+    endif
 
     ! Closed_orbit_at_START:
     IF(closed_orbit) CALL Find_Closed_Orbit   ! Calculates x_coord_co(1:6)
@@ -566,7 +568,9 @@ CONTAINS
     ENDIF Output_observ_with_PTC !---------------------------------------------------------!
 
 
-    if (ptc_track_debug) Print *, 'Come to : <! Calculate beam envelope with PTC>'
+    if (ptc_track_debug) then
+        Print *, 'Come to : <! Calculate beam envelope with PTC>'
+    endif
 
     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
        Radiat_PTC: IF ( Radiation_PTC) THEN !====================================!  !
@@ -957,7 +961,9 @@ CONTAINS
          print*,"============================================"   !         !
       endif  !---------------------------------------------------!         !
       !                                                                    !
-      if (ptc_track_debug) print*,"After closed_orbit"; print *;           !
+      if (ptc_track_debug) then
+          print*,"After closed_orbit"; print *;                            !
+      endif                                                                !
       !                                                                    !
       !END closed_orbit    which is logically (.not.ONEPASS)               !
       !====================================================================!
@@ -1359,8 +1365,9 @@ CONTAINS
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
             !                                                                                !   !
             if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  !   !
-            if (ptc_track_debug) &                                                    !XXXX  !   !
+            if (ptc_track_debug) then                                                 !XXXX  !   !
                  print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
+            endif                                                                            !   !
             !                                                                                !   !
             if(flag_index_ptc_aperture/=0) c_%watch_user=.false.                             !   !
             !                                                                                !   !
@@ -1610,8 +1617,9 @@ CONTAINS
                !end if                                                                           !  ! n
                !                                                                                 +  ^ t
                if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX   +  ! s
-               if (ptc_track_debug) &                                                    !XXXX   +  ! !
+               if (ptc_track_debug) then                                                 !XXXX   +  ! !
                     print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX   !  ! !
+               endif                                                                             !  ! !
                !                                                                                 !  ! !
                if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !
                !                                                                                 !  ! !
@@ -2060,14 +2068,18 @@ CONTAINS
          ELSE
             Quadr_k=zero
          ENDIF
-         if (ptc_track_debug) Print *, 'B0_dipole=', B0_dipole, &
+         if (ptc_track_debug) then
+             Print *, 'B0_dipole=', B0_dipole, &
               'TiltD_dipole=', TiltD_dipole, &
               '  Quadr_k=',Quadr_k
+         endif
          IF (B0_dipole.EQ.zero .AND.Quadr_k .EQ.zero ) i_elem_type=0
          IF (B0_dipole.NE.zero .AND.Quadr_k .EQ.zero ) i_elem_type=1
          IF (B0_dipole.EQ.zero .AND.Quadr_k .NE.zero ) i_elem_type=2
          IF (B0_dipole.NE.zero .AND.Quadr_k .NE.zero ) i_elem_type=3
-         if (ptc_track_debug) Print *,'i_elem_type=',i_elem_type
+         if (ptc_track_debug) then
+             Print *,'i_elem_type=',i_elem_type
+         endif
 
          IF (i_elem_type .EQ. 0) RETURN
 
@@ -2087,10 +2099,14 @@ CONTAINS
          END IF
 
          IF (( i_elem_type .EQ. 2) .AND. Radiation_Quad) THEN
-            if (ptc_track_debug) Print *,'jmax_numb_particl_at_i_th_turn=', &
+            if (ptc_track_debug) then
+                Print *,'jmax_numb_particl_at_i_th_turn=', &
                  jmax_numb_particl_at_i_th_turn
+            endif
             DO j_partic=1, jmax_numb_particl_at_i_th_turn
-               if (ptc_track_debug) Print *, 'j_partic=',j_partic
+               if (ptc_track_debug) then
+                   Print *, 'j_partic=',j_partic
+               endif
                SQRT_X2_Y2=SQRT(x_coord_incl_co(1,j_partic)*x_coord_incl_co(1,j_partic)+ &
                     x_coord_incl_co(3,j_partic)*x_coord_incl_co(3,j_partic))
                !IF (SQRT_X2_Y2 .EQ. zero) EXIT
@@ -2138,9 +2154,11 @@ CONTAINS
 
       Space_Charge_Calculation: IF ( Space_Charge ) THEN
          ! Call Space_Charge
-         if (ptc_track_debug) Print *, '  i_current_elem=',i_current_elem, &
+         if (ptc_track_debug) then
+             Print *, '  i_current_elem=',i_current_elem, &
               '  name_curr_elem=', name_curr_elem, &
               '  sum_length=', sum_length
+         endif
 
       ENDIF Space_Charge_Calculation
 
@@ -2398,8 +2416,10 @@ CONTAINS
          X_co_temp(:)=zero
          DO i_coord=1, icase_ptc
             X_co_temp(i_coord) = (Map_Y_obs(i_coord)%T.sub.J) ! take line with all zero-order
-            if (ptc_track_debug) Print *,'CO extracted: i_coord=', i_coord, &
+            if (ptc_track_debug) then
+                Print *,'CO extracted: i_coord=', i_coord, &
                  ' X_co_temp(i_coord)=', X_co_temp(i_coord)
+            endif
          ENDDO
          deallocate(J)
          Save_co_in_X_co_observe: DO i_coord=1, icase_ptc !icase_PTC
@@ -2417,7 +2437,9 @@ CONTAINS
             Temp_X_incl_co_at_obs=zero
 
             Local_loop_for_particles: DO j_part_tmp=1,jmax_all_turns_numb_part(i_turn_tmp)
-               if (ptc_track_debug) Print *, '   the current particle j_part_tmp= ', j_part_tmp
+               if (ptc_track_debug) then
+                   Print *, '   the current particle j_part_tmp= ', j_part_tmp
+               endif
 
 
 
@@ -2438,8 +2460,10 @@ CONTAINS
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_damap*X_lnv_START(i_coord)
-                  if (ptc_track_debug) Print *, 'i_coord=',i_coord, &
+                  if (ptc_track_debug) then
+                      Print *, 'i_coord=',i_coord, &
                        'X_lnv_START/OBSRV=', X_lnv_START(i_coord), X_lnv_OBSRV(i_coord)
+                  endif
                   Temp_X_incl_co_at_obs(i_coord,j_part_tmp)= X_lnv_OBSRV(i_coord)
                ENDDO Loop_coord
 
@@ -3118,8 +3142,10 @@ CONTAINS
 
       X_PTC=X_MAD ! for all elements
 
-      if (ptc_track_debug) print *, &
+      if (ptc_track_debug) then
+          print *, &
            'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
+      endif
 
       if (icase_ptc.eq.6) THEN
          X_PTC(5)=X_MAD(6); X_PTC(6)=X_MAD(5);
@@ -3139,8 +3165,10 @@ CONTAINS
 
       X_MAD=X_PTC ! for all elements
 
-      if (ptc_track_debug) print *, &
+      if (ptc_track_debug) then
+          print *, &
            'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
+      endif
 
       IF (icase_ptc.eq.6) THEN
          X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5);
