@@ -1535,7 +1535,7 @@ double        sequ_length,         /* length of  sequence */
   al_errors[ALIGN_MAX],
   fd_errors[FIELD_MAX];
 
-char          line[LINE_MAX],
+char          line[MADX_LINE_MAX],
   tag_type[MAX_TAG][16],
   tag_code[MAX_TAG][16];
 

@@ -443,7 +443,7 @@ int get_token_list                 /* returns no. of tokens */
 
 void put_line(FILE* out, char* s)
 {
-  char tline[2*LINE_MAX];
+  char tline[2*MADX_LINE_MAX];
   int i;
   if (s != line) reset_line(out);
   for (i = 0; i < indent; i++) tline[i] = ' ';
@@ -592,7 +592,7 @@ void write_elend(FILE* out)
 
 void accu_line(FILE* out, char* s)
 {
-  if (strlen(line) + strlen(s) + indent > LINE_MAX)  reset_line(out);
+  if (strlen(line) + strlen(s) + indent > MADX_LINE_MAX)  reset_line(out);
   strcpy(&line[strlen(line)], s);
 }
 
