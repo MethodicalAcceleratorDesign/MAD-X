@@ -72,6 +72,10 @@ void madextern_start()
     madx_start();
     madx_init();
 }
+struct sequence_list *madextern_get_sequence_list()
+{
+    return sequences;
+}
 void madextern_end()
 {
     madx_finish();

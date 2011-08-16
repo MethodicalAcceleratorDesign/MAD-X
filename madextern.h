@@ -49,3 +49,18 @@ extern void madextern_end();
  */
 extern void madextern_input(char* ch);
 
+
+/**
+ * @brief Send command to the mad-x library.
+ *
+ * This function is part of the madextern external functions.
+ * These are not supposed to be used by any internal mad-x code.
+ *
+ * This function returns a name_list structure of all currently
+ *  available sequences. Reason we do not return sequence_list
+ *  is that name_list are "cleaner" structures which are easier
+ *  to access in python (currently only use-case).
+ *
+ */
+extern struct sequence_list *madextern_get_sequence_list();
+
