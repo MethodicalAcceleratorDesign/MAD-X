@@ -161,7 +161,7 @@ int advance_node()
   return 1;
 }
 
-int advance_to_pos(char* table, int* t_pos)
+int type_ofCall advance_to_pos(char* table, int* t_pos)
   /* advances current_node to node at t_pos in table */
 {
   struct table* t;
@@ -194,7 +194,7 @@ int attach_beam(struct sequence* sequ)
   return current_beam->beam_def;
 }
 
-void augment_count(char* table) /* increase table occ. by 1, fill missing */
+void type_ofCall augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
   int pos;
   struct table* t;
@@ -220,7 +220,7 @@ void augment_count(char* table) /* increase table occ. by 1, fill missing */
   if (++t->curr == t->max) grow_table(t);
 }
 
-void augmentcountonly(char* table) /* increase table occ. by 1 */
+void type_ofCall augmentcountonly(char* table) /* increase table occ. by 1 */
 {
   int pos;
   struct table* t;
@@ -243,7 +243,7 @@ char* buffer(char* string)  /* replaced by permbuff */
   return permbuff(string);
 }
 
-int char_from_table(char* table, char* name, int* row, char* val)
+int type_ofCall char_from_table(char* table, char* name, int* row, char* val)
   /* OB 2.4.2002 */
   /* returns val at position row in column with name "name".
      function value return:
@@ -308,7 +308,7 @@ int command_par_vector(char* parameter, struct command* cmd, double* vector)
   return 0;
 }
 
-void comment_to_table(char* table, char* comment, int* length)
+void type_ofCall comment_to_table(char* table, char* comment, int* length)
   /* Saves the comment string at the current line.
      This comment is then printed in front of this line.
      Several calls to the same current line are possible. */
@@ -327,7 +327,7 @@ void comment_to_table(char* table, char* comment, int* length)
   t->l_head[t->curr]->p[t->l_head[t->curr]->curr++] = tmpbuff(c_dum->c);
 }
 
-void comm_para(char* name, int* n_int, int* n_double, int* n_string,
+void type_ofCall comm_para(char* name, int* n_int, int* n_double, int* n_string,
                int* int_array, double* double_array, char* strings,
                int* string_lengths)
   /* returns the value for command parameter "name" being either
@@ -503,7 +503,7 @@ double double_from_expr(char** toks, int s_start, int s_end)
   else return INVALID;
 }
 
-void double_to_table(char* table, char* name, double* val)
+void type_ofCall double_to_table(char* table, char* name, double* val)
   /* puts val at current position in column with name "name".
      The table count is increased separately with "augment_count" */
 {
@@ -533,7 +533,7 @@ void double_to_table(char* table, char* name, double* val)
   }
 }
 
-void double_to_table_row(char* table, char* name, int* row, double* val)
+void type_ofCall double_to_table_row(char* table, char* name, int* row, double* val)
   /* puts val at row position in column with name "name".
      The table count is increased separately with "augment_count" */
 {
@@ -569,7 +569,7 @@ void string_to_table_row(char* table, char* name, int* row, char* string)
   }
 }
 
-int double_from_table(char* table, char* name, int* row, double* val)
+int type_ofCall double_from_table(char* table, char* name, int* row, double* val)
   /* returns val at position row in column with name "name".
      function value return:
      0  OK
@@ -593,7 +593,7 @@ int double_from_table(char* table, char* name, int* row, double* val)
   return 0;
 }
 
-int string_from_table(char* table, char* name, int* row, char* string)
+int type_ofCall string_from_table(char* table, char* name, int* row, char* string)
   /* returns val at position row in column with name "name".
      function value return:
      0  OK
@@ -619,7 +619,7 @@ int string_from_table(char* table, char* name, int* row, char* string)
   return 0;
 }
 
-int result_from_normal(char* name_var, int* order, double* val)
+int type_ofCall result_from_normal(char* name_var, int* order, double* val)
   /* returns value of table normal_results corresponding to the given variable name
      and to the given orders
      function value return:
@@ -8231,7 +8231,7 @@ int makemomentstables()
   return 0;
 }
 /********************************************************************************/
-void augmentcountmomtabs(double* s)
+void type_ofCall augmentcountmomtabs(double* s)
 {
   int i;
   struct table* t;

@@ -241,7 +241,7 @@ double act_value(int pos, struct name_list* chunks)
   return val;
 }
 
-char* alias(char* par_string) /* returns main parameter for alias */
+char* type_ofCall alias(char* par_string) /* returns main parameter for alias */
 {
   if (strcmp(par_string, "filename") == 0)  return file_string;
   else if(strcmp(par_string, "true_") == 0) return vrai;
@@ -269,7 +269,7 @@ void all_node_pos(struct sequence* sequ)
   }
 }
 
-int aperture_count(struct sequence* sequ)
+int type_ofCall aperture_count(struct sequence* sequ)
   /* returns max. number of aperture parameters needed for sequence */
 {
   int i = 0, n = 0;
