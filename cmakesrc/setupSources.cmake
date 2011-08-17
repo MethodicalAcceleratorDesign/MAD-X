@@ -1,11 +1,20 @@
 
 # list of c source files
-set(csrcfiles madxp.c gxx11c.c matchptcknobs.c rplot.c )
+set(csrcfiles madxp.c matchptcknobs.c rplot.c )
+if(WIN32)
+    set(csrcfiles ${csrcfiles} gxx11psc.c )
+else()
+    set(csrcfiles ${csrcfiles} gxx11c.c )
+endif()
 # list of fortran source files
 file(GLOB fsrcfiles *.f90 *.F90)
 
-# Remove some files which should never be compiled..
-file(GLOB to_remove gxx11ps.f90)
+# Remove some files which should not be compiled..
+if(WIN32)
+    file(GLOB to_remove gxx11.f90)
+else()
+    file(GLOB to_remove gxx11ps.f90)
+endif()
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
 find_package(LAPACK) # (lapack requires blas...)
@@ -55,6 +64,8 @@ ADD_CUSTOM_COMMAND(
 # execute python wrap_fortran_calls.py
 # COMMAND python wrap_C_calls.py
 
+# We need to include the wrapper headers..
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # main source files... 
 # TODO: please check this list at some point!

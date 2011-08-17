@@ -62,3 +62,11 @@ if (APPLE)
   set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
         set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 endif (APPLE)
+
+# Windows specifics:
+if (WIN32)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WIN32  -D_CATCH_MEM_W")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32")
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_CATCH_MEM")
+endif()
