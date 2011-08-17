@@ -68,6 +68,7 @@ cmakesrc/setupCompilerSpecifics.cmake -text
 cmakesrc/setupInstallation.cmake -text
 cmakesrc/setupOptions.cmake -text
 cmakesrc/setupPackaging.cmake -text
+cmakesrc/setupProcessorCount.cmake -text
 cmakesrc/setupSources.cmake -text
 cmakesrc/setupTargets.cmake -text
 cmakesrc/setupTesting.cmake -text

@@ -31,6 +31,13 @@ set(cfg_options
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_UPDATE_COMMAND "svn")
 
+if(CTEST_CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    include(setupProcessorCount)
+    if(PROCESSOR_COUNT)
+        set(CTEST_BUILD_FLAGS "${CTEST_BUILD_FLAGS} -j${PROCESSOR_COUNT}")
+    endif()
+endif()
+
 ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
  
 ctest_update()
