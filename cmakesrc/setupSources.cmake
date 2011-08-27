@@ -1,7 +1,7 @@
 
 # list of c source files
 set(csrcfiles madxp.c matchptcknobs.c rplot.c )
-if(WIN32)
+if(WIN32 OR CYGWIN)
     set(csrcfiles ${csrcfiles} gxx11psc.c )
 else()
     set(csrcfiles ${csrcfiles} gxx11c.c )
@@ -10,7 +10,7 @@ endif()
 file(GLOB fsrcfiles *.f90 *.F90)
 
 # Remove some files which should not be compiled..
-if(WIN32)
+if(WIN32 OR CYGWIN)
     file(GLOB to_remove gxx11.f90)
 else()
     file(GLOB to_remove gxx11ps.f90)

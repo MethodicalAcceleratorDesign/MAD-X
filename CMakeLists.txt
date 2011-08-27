@@ -1,3 +1,13 @@
+# Suppress warnings on cygwin
+# win32 is not anymore equal to 1 on cygwin
+# with newer cmake. We still assume so though..
+# Note:
+# - In cygwin, the boolean CYGWIN is defined and 1
+# - On Windows, WIN32 bool is defined, but 
+# after cmake 2.8.4 it's normally zero when using
+# cygwin.
+set(CMAKE_LEGACY_CYGWIN_WIN32 0)
+
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(madX Fortran C CXX) 

@@ -4,7 +4,7 @@ if( NOT BUILD_SHARED_LIBS )
         option( BUILD_SHARED_LIBS "Turn on to build dynamic libraries"  OFF )
 endif()
 
-if (APPLE OR BUILD_SHARED_LIBS)
+if (APPLE OR BUILD_SHARED_LIBS OR CYGWIN)
     option( MADX_STATIC "Turn on for static linking" OFF)
 else()
     option ( MADX_STATIC "Turn on for static linking" ON)
