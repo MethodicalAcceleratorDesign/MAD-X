@@ -1398,6 +1398,8 @@ SUBROUTINE twcptk(re,orbit)
      if(rmatrix) call dcopy(rw,rw0,36)
   else
      call dcopy(dt,disp,6)
+     disp(5) = zero
+     disp(6) = one
   endif
 
   !---- Auxiliary matrices.
