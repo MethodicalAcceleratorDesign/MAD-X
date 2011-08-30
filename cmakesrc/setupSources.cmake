@@ -17,21 +17,26 @@ else()
 endif()
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
-find_package(LAPACK) # (lapack requires blas...)
-if(MADX_RICCARDO_FIX AND NOT LAPACK_FOUND)
-    find_library(BLAS_LIBRARIES blas)
-    find_library(LAPACK_LIBRARIES lapack)
-    if(LAPACK_LIBRARIES AND BLAS_LIBRARIES)
-        set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-        set(LAPACK_FOUND TRUE)
-    endif()
+# find laplas and blas
+# find_package(LAPACK) does not work in debian for unknown reasons
+find_library(LAPACK_LIBRARIES lapack)
+find_library(BLAS_LIBRARIES  blas)
+
+if(LAPACK_LIBRARIES AND BLAS_LIBRARIES)
+  set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
+  set(LAPACK_FOUND TRUE)
+  set(BLAS_FOUND TRUE)
+else()
+  find_package(LAPACK)
 endif()
+
 if(LAPACK_FOUND AND BLAS_FOUND)
+    message(STATUS "LAPACK uses ${LAPACK_LIBRARIES}")
     file(GLOB to_remove matchlib.f90 matchlib2.f90)
     list(REMOVE_ITEM fsrcfiles ${to_remove})
 else()
     # Note, this only APPENDS -O0 to the compile flags, same as Makefile currently does.
-    set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0") 
+    set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0")
 endif()
 
 # add source files according to NTPSA option...
