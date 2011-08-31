@@ -1147,7 +1147,8 @@ SUBROUTINE twcpgo(rt)
        te(6,6,6),el,orbit(6),orbit2(6),betas,gammas,                 &
        al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
        one,two
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0)
   character(130) msg
   !---- Initialization
@@ -2283,7 +2284,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
        st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
        el0,orbit0(6),zero,one,two,three
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
@@ -3326,7 +3328,8 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
        octr,octi,posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,    &
        field(2,0:3),el0,orbit0(6),zero,one,two,three,four,six
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
 
   !---- Initialize.
@@ -3818,7 +3821,8 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
        re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
        bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
@@ -4044,7 +4048,8 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
        deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
        get_value,zero,one,two,ten3m
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
 
   !---- Initialize.
@@ -4250,7 +4255,8 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
        re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
        bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
 
   !---- Initialize.
@@ -4837,7 +4843,8 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
        c1,c2,ek0(6),ten6p,clight,node_value,get_value,twopi,get_variable,&
        zero,one,two,half,ten3m,bvk
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer elpar_vl, el_par_vector
+  integer, external :: el_par_vector
+  integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
        ten3m=1d-3)
 

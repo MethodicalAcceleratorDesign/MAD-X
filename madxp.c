@@ -1050,20 +1050,17 @@ int el_par_vector(int* total, double* vect)
   struct command_parameter* cp;
   int i, len = 0;
   double val;
-  for (i = 0; i < *total; i++)
-    {
-     if (i < elc->par->curr)
-       {
+  for (i = 0; i < *total; i++) {
+     if (i < elc->par->curr) {
         cp = parl->parameters[i];
-        if (cp->type < 3)
-         {
-          if (cp->expr == NULL)  val = cp->double_value;
+        if (cp->type < 3) {
+          if (cp->expr == NULL) val = cp->double_value;
           else val = expression_value(cp->expr, 2);
           vect[len++] = val;
-	 }
+	      }
         else val = 0;
-       }
-    }
+     }
+  }
   return len;
 }
 
@@ -4924,8 +4921,7 @@ int table_row(struct table* table, char* name)
   int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
   {
-    if(table->columns->inform[i] == 3)
-    {
+    if(table->columns->inform[i] == 3) {
       if (debuglevel > 2)
         printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
                i,table->columns->names[i]);
@@ -4933,8 +4929,7 @@ int table_row(struct table* table, char* name)
     }
   }
 
-  if (i < table->num_cols)
-  {
+  if (i < table->num_cols) {
     for (j = 0; j < table->curr; j++)
     {
       if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
@@ -4951,55 +4946,46 @@ int table_row(struct table* table, char* name)
   return ret;
 }
 
-double table_value()
+double table_value(void)
 {
   double val = zero;
   int ntok, pos, col, row;
   char** toks;
   struct table* table;
   char temp[NAME_L];
-  if (current_variable != NULL && current_variable->string != NULL)
-  {
+  
+  if (current_variable != NULL && current_variable->string != NULL) {
     strcpy(c_dum->c, current_variable->string);
     supp_char(',', c_dum->c);
     mysplit(c_dum->c, tmp_p_array);
     toks = tmp_p_array->p; ntok = tmp_p_array->curr;
-    if (ntok > 1)
-    {
-      if ((pos = name_list_pos(toks[0], table_register->names)) > -1)
-      {
+    if (ntok > 1) {
+      if ((pos = name_list_pos(toks[0], table_register->names)) > -1) {
         table = table_register->tables[pos];
-        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1)
-        {
-          if (ntok > 2)  /* find row - else current (dynamic), or 0 */
-          {
-	   /* start mod - HG 26.3.2011 */
-	   if (ntok > 5) /* check for [ count ] and convert to ->count */
-	     {
-	      if (*toks[2] == '[' && *toks[4] == ']')
-		{
-		 strcat(toks[1], "->");
-                 strcat(toks[1], toks[3]);
-		}
-	     }
-	   /* end mod - HG 26.3.2011 */
+        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1) {
+          if (ntok > 2) { /* find row - else current (dynamic), or 0 */
+            /* start mod - HG 26.3.2011 */
+            if (ntok > 5) { /* check for [ count ] and convert to ->count */
+              if (*toks[2] == '[' && *toks[4] == ']') {
+                strcat(toks[1], "->");
+                strcat(toks[1], toks[3]);
+              }
+	          }
+	          /* end mod - HG 26.3.2011 */
             row = table_row(table, toks[1]);
           }
-          else if (table->dynamic)  row = table->curr;
+          else if (table->dynamic) row = table->curr;
           else row = 0;
           val = table->d_cols[col][row];
         }
-        else if ((ntok == 3) 
-                 && ((col = name_list_pos(toks[1], table->columns)) > -1))
-        {
+        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1)) {
           row = atoi(toks[2])-1;
           if(row < table->curr) val = table->d_cols[col][row];
         }
-        else if(ntok == 2)
-	{
+        else if(ntok == 2) {
           strncpy(temp, toks[1], NAME_L);
           if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
-	}
+	      }
       }
     }
   }
