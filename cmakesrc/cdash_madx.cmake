@@ -1,7 +1,7 @@
 # This is a script for testing the source and submitting
 # your results to a common server (cdash). This currently
 # only works inside CERN. You can see the server at:
-# http://137.138.26.237/cdash/index.php?project=Mad-X
+# http://my.cdash.org/index.php?project=Mad-X
 # 
 # How to:
 #  - check out the source from svn in a temporary directory, from the url 
