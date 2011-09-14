@@ -26,9 +26,6 @@ option( MADX_NTPSA "Build with NTPSA" ON)
 option( MADX_FORCE_32 "Force 32bit build" OFF )
 option( MADX_FEDORA_FIX "Fix for Fedora>11 for ifort compiler" OFF )
 
-option( MADX_GOTOBLAS2 "Build with the GOTOBLAS2 libraries" OFF )
-option( MADX_RICCARDO_FIX "Fix for Riccardo to find BLAS/LAPACK on his machine..." OFF )
-
 # double logic: first we set madx_online default on if sdds is found
 # then if MADX_ONLINE is on without sdds found, we throw fatal error.
 

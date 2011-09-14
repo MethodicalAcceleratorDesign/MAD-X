@@ -24,11 +24,6 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif ()
-    if (MADX_GOTOBLAS2)
-        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fexternal-blas")
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -lgoto2 ")
-    endif (MADX_GOTOBLAS2)
-    
 
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")

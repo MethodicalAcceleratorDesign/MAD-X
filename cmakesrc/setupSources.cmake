@@ -18,17 +18,7 @@ endif()
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
 # find laplas and blas
-# find_package(LAPACK) does not work in debian for unknown reasons
-find_library(LAPACK_LIBRARIES lapack)
-find_library(BLAS_LIBRARIES  blas)
-
-if(LAPACK_LIBRARIES AND BLAS_LIBRARIES)
-  set(LAPACK_LIBRARIES ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES})
-  set(LAPACK_FOUND TRUE)
-  set(BLAS_FOUND TRUE)
-else()
-  find_package(LAPACK)
-endif()
+find_package(LAPACK)
 
 if(LAPACK_FOUND AND BLAS_FOUND)
     message(STATUS "LAPACK uses ${LAPACK_LIBRARIES}")

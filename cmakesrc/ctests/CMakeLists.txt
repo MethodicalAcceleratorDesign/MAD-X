@@ -21,22 +21,6 @@ set_tests_properties (testruns
 
 set(BASESCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/testbase.cmake)
 
-add_test(twiss_1
-    ${CMAKE_COMMAND}
-    -DTEST_PROG=${binaryname}
-    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -DTEST_SCRIPT=twiss1.madx
-    -DTEST_OUTPUT=sample_optics.tfs
-    -P ${BASESCRIPT})
-
-add_test(ptc_twiss_1
-    ${CMAKE_COMMAND}
-    -DTEST_PROG=${binaryname}
-    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -DTEST_SCRIPT=ptc_twiss1.madx
-    -DTEST_OUTPUT=twiss_ptc_line.tfs
-    -P ${BASESCRIPT})
-
 add_test(ptc_normal_1
     ${CMAKE_COMMAND}
     -DTEST_PROG=${binaryname}
@@ -45,10 +29,31 @@ add_test(ptc_normal_1
     -DTEST_OUTPUT=ptc_normal_results.tfs
     -P ${BASESCRIPT})
 
-add_test(ibs_1
-    ${CMAKE_COMMAND}
-    -DTEST_PROG=${binaryname}
-    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -DTEST_SCRIPT=ibs.mad
-    -DTEST_OUTPUT=ibs_output.tfs
-    -P ${BASESCRIPT})
+# Tests that require afs:
+if(EXISTS "/afs/cern.ch/")
+    add_test(twiss_1
+        ${CMAKE_COMMAND}
+        -DTEST_PROG=${binaryname}
+        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -DTEST_SCRIPT=twiss1.madx
+        -DTEST_OUTPUT=sample_optics.tfs
+        -P ${BASESCRIPT})
+    
+    add_test(ptc_twiss_1
+        ${CMAKE_COMMAND}
+        -DTEST_PROG=${binaryname}
+        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -DTEST_SCRIPT=ptc_twiss1.madx
+        -DTEST_OUTPUT=twiss_ptc_line.tfs
+        -P ${BASESCRIPT})
+    
+    add_test(ibs_1
+        ${CMAKE_COMMAND}
+        -DTEST_PROG=${binaryname}
+        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -DTEST_SCRIPT=ibs.mad
+        -DTEST_OUTPUT=ibs_output.tfs
+        -P ${BASESCRIPT})
+else()
+    message(STATUS "afs is not available, some tests will be missing")
+endif()
