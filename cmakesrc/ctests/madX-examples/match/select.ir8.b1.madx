@@ -1,0 +1,95 @@
+use, period=lhcb1, range = s.cell.78.B1/e.cell.78.B1;
+savebeta, label = bini1ir8, place = s.cell.78.B1;
+twiss, sequence=lhcb1,save;
+!show, bini1ir8;
+
+use, period=lhcb1, range = s.cell.81.B1/e.cell.81.B1;
+savebeta, label = bini2ir8, place =e.cell.81.B1 ;
+twiss, sequence=lhcb1,save;
+!show, bini2ir8;
+
+bini1ir8->mux = 0.0;
+bini1ir8->muy = 0.0;
+
+use, period=lhcb1, range = s.cell.78.B1/s.DS.L8.B1;
+savebeta, label = bir8b1, place = s.DS.L8.B1;
+twiss, sequence=lhcb1, beta0 = bini1ir8,save;
+!show, bir8b1;
+
+bir8b1->mux = 0.0;
+bir8b1->muy = 0.0;
+
+Seqedit, sequence=lhcb1;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=lhcb2;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir12;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir2;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir5;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir8;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir11;
+REFLECT;
+ENDEDIT;
+
+
+bini1ir8->betx = bini2ir8->betx;
+bini1ir8->bety = bini2ir8->bety;
+bini1ir8->alfx = -bini2ir8->alfx;
+bini1ir8->alfy = -bini2ir8->alfy;
+bini1ir8->dx = bini2ir8->dx;
+bini1ir8->dpx = -bini2ir8->dpx;
+bini1ir8->mux = 0.0;
+bini1ir8->muy = 0.0;
+!show, bini1ir8;
+
+
+use, period=lhcb1, range = e.cell.81.B1/e.DS.R8.B1;
+savebeta, label = eir8b1, place = e.DS.R8.B1;
+twiss, sequence=lhcb1, beta0=bini1ir8, save;
+
+eir8b1->mux = muxip8;
+eir8b1->muy = muyip8;
+eir8b1->alfx = -eir8b1->alfx;
+eir8b1->alfy = -eir8b1->alfy;
+eir8b1->dpx = -eir8b1->dpx;
+eir8b1->dpy = -eir8b1->dpy;
+
+Seqedit, sequence=lhcb1;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=lhcb2;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir12;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir2;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir5;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir8;
+REFLECT;
+ENDEDIT;
+Seqedit, sequence=ir11;
+REFLECT;
+ENDEDIT;
+
+USE, period=lhcb1, range=s.DS.L8.B1/e.DS.R8.B1;
+savebeta, label = bip8b1, place = ip8;
+TWISS, beta0 = bir8b1,save;
+
+Use, period=lhcb1, RANGE=s.DS.L8.B1/e.DS.R8.B1;
+
+return;

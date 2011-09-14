@@ -54,7 +54,10 @@ cmakesrc/cdash_madx.cmake -text
 cmakesrc/ctests/CMakeLists.txt -text
 cmakesrc/ctests/checkConsistency.py -text
 cmakesrc/ctests/ibs.mad -text
+cmakesrc/ctests/job.lhcV65.ir8squeeze.madx -text
 cmakesrc/ctests/job.sample.madx -text
+cmakesrc/ctests/madX-examples/match/select.ir8.b1.madx -text
+cmakesrc/ctests/madX-examples/match/twissini.ir8.b1.madx -text
 cmakesrc/ctests/madx_testing_output/ptc_twiss1_madx_ring.tfs -text
 cmakesrc/ctests/madx_testing_output/sample_optics.tfs -text
 cmakesrc/ctests/ptc_twiss1.madx -text

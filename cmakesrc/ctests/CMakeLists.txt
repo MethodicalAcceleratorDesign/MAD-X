@@ -1,4 +1,7 @@
 
+# creating symlink to supporting files..
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/madX-examples
+                                                           ${CMAKE_CURRENT_BINARY_DIR}/madX-examples)
 
 if (APPLE)
     set(binaryname "${CMAKE_BINARY_DIR}/${binaryname}.app/Contents/MacOS/./${binaryname}")
@@ -53,6 +56,13 @@ if(EXISTS "/afs/cern.ch/")
         -DTEST_PROG=${binaryname}
         -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
         -DTEST_SCRIPT=ibs.mad
+        -P ${BASESCRIPT})
+    
+    add_test(match_1
+        ${CMAKE_COMMAND}
+        -DTEST_PROG=${binaryname}
+        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+        -DTEST_SCRIPT=job.lhcV65.ir8squeeze.madx
         -P ${BASESCRIPT})
 else()
     message(STATUS "afs is not available, some tests will be missing")
