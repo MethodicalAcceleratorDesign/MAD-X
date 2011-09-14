@@ -52,8 +52,11 @@ cmakesrc/MadX.icns -text svneol=unset#unset
 cmakesrc/README -text
 cmakesrc/cdash_madx.cmake -text
 cmakesrc/ctests/CMakeLists.txt -text
+cmakesrc/ctests/checkConsistency.py -text
 cmakesrc/ctests/ibs.mad -text
 cmakesrc/ctests/job.sample.madx -text
+cmakesrc/ctests/madx_testing_output/ptc_twiss1_madx_ring.tfs -text
+cmakesrc/ctests/madx_testing_output/sample_optics.tfs -text
 cmakesrc/ctests/ptc_twiss1.madx -text
 cmakesrc/ctests/test_5frs.madx -text
 cmakesrc/ctests/testbase.cmake -text

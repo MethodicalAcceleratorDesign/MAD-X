@@ -85,7 +85,7 @@ SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
 
 select,flag=twiss,column=name,s,betx,bety,dx,dy;
 
-TWISS,file=twiss_madx_ring; 
+TWISS,file="ptc_twiss1_madx_ring.tfs"; 
 write,table="summ",file="twiss_summary_table.tfs";
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)

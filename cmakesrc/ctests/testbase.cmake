@@ -5,11 +5,14 @@ if(HAD_ERROR)
 endif()
 
 # This will always fail because date/version is included in output...
-# if(TEST_OUTPUT)
-#     execute_process(COMMAND ${CMAKE_COMMAND} -E compare_files
-#         ${TEST_OUTPUT} /afs/cern.ch/user/y/ylevinse/scratch1/public/madx_testing_output/${TEST_OUTPUT}
-#         RESULT_VARIABLE DIFFERENT)
-#     if(DIFFERENT)
-#         message(FATAL_ERROR "Test failed - files differ")
-#     endif()
-# endif()
+if(TEST_OUTPUT)
+    find_package(PythonInterp)
+    if(PYTHONINTERP_FOUND)
+        execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SOURCEDIR}/checkConsistency.py
+            ${SOURCEDIR}/madx_testing_output/${TEST_OUTPUT} ${TEST_OUTPUT}
+            RESULT_VARIABLE DIFFERENT)
+        if(DIFFERENT)
+            message(FATAL_ERROR "Test failed - files differ. Got return value ${DIFFERENT}")
+        endif()
+    endif()
+endif()
