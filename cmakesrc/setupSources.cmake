@@ -17,8 +17,10 @@ else()
 endif()
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
-# find laplas and blas
-find_package(LAPACK)
+if(NOT MADX_FORCE_32)
+    # find laplas and blas
+    find_package(LAPACK)
+endif()
 
 if(LAPACK_FOUND AND BLAS_FOUND)
     message(STATUS "LAPACK uses ${LAPACK_LIBRARIES}")
