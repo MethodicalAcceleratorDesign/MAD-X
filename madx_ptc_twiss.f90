@@ -435,7 +435,7 @@ contains
        x(3)=get_value('ptc_twiss ','y ')
        x(4)=get_value('ptc_twiss ','py ')
        x(6)=get_value('ptc_twiss ','t ')
-       x(5)=get_value('ptc_twiss ','pt ')
+       x(5)=x(5)+get_value('ptc_twiss ','pt ')
 
 
 

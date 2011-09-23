@@ -61,6 +61,14 @@ contains
     if(icase.eq.5) x(5)=dt
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
+      ! pass starting point for closed orbit search
+       x(1)=get_value('ptc_normal ','x ')
+       x(2)=get_value('ptc_normal ','px ')
+       x(3)=get_value('ptc_normal ','y ')
+       x(4)=get_value('ptc_normal ','py ')
+       x(6)=get_value('ptc_normal ','t ')
+       x(5)=x(5)+get_value('ptc_normal ','pt ')
+
        call find_orbit(my_ring,x,1,default,c_1d_7)
        CALL write_closed_orbit(icase,x)
     endif

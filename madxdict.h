@@ -575,7 +575,13 @@ char command_def[] =
 "maptable = [l, false, true], "
 "exact_mis = [l, false, true], "
 "time = [l, false, true], "
-"deltap = [r, 0]; "
+"deltap = [r, 0], "
+"x        = [r, 0], "
+"px       = [r, 0], "
+"y        = [r, 0], "
+"py       = [r, 0], "
+"t        = [r, 0], "
+"pt       = [r, 0]; "
 " "                               /*Piotr.Skowronski@cern.ch*/
 "ptc_trackline: ptc_trackline none 0 0 " /*implemented by subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 "turns        = [i, 1], "
