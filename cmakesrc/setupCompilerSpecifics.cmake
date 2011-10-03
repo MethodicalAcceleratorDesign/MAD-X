@@ -17,17 +17,14 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
       set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O4 ")
     endif()
     
-   # Debug flags:
-    set(CMAKE_Fortran_FLAGS_DEBUG   " -O0 -g ")
-    
    # Additional option dependent flags:
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif ()
 
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -D_INTEL_IFORT_SET_RECL")
-    set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops ")
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -D_INTEL_IFORT_SET_RECL -fp-model precise")
+    set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O3 ")
     set(CMAKE_Fortran_FLAGS_DEBUG   " -f77rtl -O3 -g ")
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
@@ -81,7 +78,6 @@ elseif(CMAKE_Fortran_COMPILER_ID MATCHES "PathScale")
     message( WARNING " This compiler is not yet confirmed working for mad-x")
     message( "--- ifort is recommended fortran compiler ---")
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O3 ")
-    set(CMAKE_Fortran_FLAGS_DEBUG   " -O0 -g ")  
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif()
@@ -92,7 +88,6 @@ else()
     message("Fortran compiler full path: " ${CMAKE_Fortran_COMPILER})
     message("Fortran compiler: " ${Fortran_COMPILER_NAME})
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -O2")
-    set(CMAKE_Fortran_FLAGS_DEBUG   "-O0 -g")
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif ( MADX_STATIC )
@@ -101,10 +96,11 @@ endif()
 
 
 # General compile flags:
+set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g ${CMAKE_Fortran_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_DEBUG   " ${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic ")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ") #needed for c++ linking
-set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -g -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ") #needed for c++ linking
+set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ") 
 
 
