@@ -1,64 +1,29 @@
+###
+#
+# This file sets compiler specific flags
+# and runs some special stuff needed for specific 
+# compiler selections
+# 
+###
 
-#fortran compiler stuff... extensive example
-# FFLAGS depend on the compiler
+# This does not work with cmake 2.6, but it is how we want to do it in the future:
+if(CMAKE_VERSION MATCHES "2.8.")
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_LIST_DIR}/compilers") 
+endif()
 
-# SET(CMAKE_FORTRAN_COMPILER mpif77)
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    message( "--- ifort is recommended fortran compiler ---")
-   # General:
-    set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c ") # remove -g -O2 from main list
-    
-   # Release flags:
-    # ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
-    # for file l_complex_taylor.f90
-    if(APPLE OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
-        set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O2 ")
-    else()
-      set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O4 ")
-    endif()
-    
-   # Additional option dependent flags:
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-    endif ()
-
+   include(setupGNU)
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -D_INTEL_IFORT_SET_RECL -fp-model precise")
-    set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O3 ")
-    set(CMAKE_Fortran_FLAGS_DEBUG   " -f77rtl -O3 -g ")
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-    endif ()
-    if(MADX_FEDORA_FIX)
-        message( WARNING "Only use the Fedora fix if you are using Fedora!" )
-        set(CMAKE_Fortran_FLAGS " -no-ipo ")
-    endif()
-
+    include(setupIntel)
 elseif(CMAKE_Fortran_COMPILER MATCHES "lf95")
-    message( WARNING " This compiler is not yet confirmed working properly with CMake")
-    if ( MADX_FORCE_32 )
-        message( WARNING " On a 64 bit system you need to use the toolchain-file (see README) to get anywhere with the 32bit compiler.")
-    endif ( MADX_FORCE_32 )
-    set(CMAKE_Fortran_FLAGS_RELEASE " --o2 --tp  ")
-    set(CMAKE_SKIP_RPATH ON)
-    set(CMAKE_Fortran_FLAGS_DEBUG   " --info --f95 --lst -V -g  --ap --trace --trap --verbose  --chk aesux ")
-    set(CMAKE_SHARED_LIBRARY_LINK_Fortran_FLAGS "") #suppress rdynamic which doesn't work for lf95...
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-    endif ()
-
+    message( WARNING " This compiler is not supported for Mad-X")
+    include(setupLahey)
 elseif(CMAKE_Fortran_COMPILER MATCHES "nagfor")
-    message( WARNING " Make sure you use the same gcc as nagfor is compiled with, or linking WILL fail.")
-    set(CMAKE_SKIP_RPATH ON)
-    set(CMAKE_Fortran_FLAGS_RELEASE " -gline -maxcontin=100 -ieee=full -D_NAG ")
-    set(CMAKE_Fortran_FLAGS_DEBUG   " -gline -maxcontin=100 -ieee=full -D_NAG -C=all -nan ")
-    set(CMAKE_SHARED_LIBRARY_LINK_Fortran_FLAGS "") #suppress rdynamic which isn't recognized by nagfor...
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -Bstatic ")
-    endif ()
+    message( WARNING " This compiler is not supported for Mad-X")
+    include(setupNAGFOR)
 
 elseif(CMAKE_Fortran_COMPILER MATCHES "g77")
-    message( WARNING " This compiler is not yet confirmed working for mad-x")
+    message( WARNING " This compiler is not supported for Mad-X")
     message( "--- ifort is recommended fortran compiler ---")
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-f2c -O3 ")
     set(CMAKE_Fortran_FLAGS_DEBUG   " -fno-f2c -O0 -g ")
@@ -67,7 +32,7 @@ elseif(CMAKE_Fortran_COMPILER MATCHES "g77")
     endif ()
 
 elseif(CMAKE_Fortran_COMPILER MATCHES "g95")
-    message( "--- ifort is recommended fortran compiler ---")
+    message( WARNING " This compiler is not supported for Mad-X")
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-second-underscore -fshort-circuit -O2 ")
     set(CMAKE_Fortran_FLAGS_DEBUG   " -fno-second-underscore -O3 -g -Wall -pedantic -ggdb3")  
     if ( MADX_STATIC )
@@ -75,16 +40,11 @@ elseif(CMAKE_Fortran_COMPILER MATCHES "g95")
     endif ()
 
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "PathScale")
-    message( WARNING " This compiler is not yet confirmed working for mad-x")
-    message( "--- ifort is recommended fortran compiler ---")
-    set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O3 ")
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-    endif()
+    message( WARNING " This compiler is not supported for Mad-X")
+    include(setupPathScale)
 
 else()
-    message( "--- ifort is recommended fortran compiler ---")
-    message( WARNING " Your compiler is not recognized. Mad-X might not compile successfully.")
+    message( WARNING " This compiler is not supported for Mad-X")
     message("Fortran compiler full path: " ${CMAKE_Fortran_COMPILER})
     message("Fortran compiler: " ${Fortran_COMPILER_NAME})
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -O2")
@@ -105,8 +65,8 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_WRAP_FORTRAN_CALLS -D_WRAP_C_
 
 
 # C stuff:
+# -- not needed for gnu/intel --
 if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-# this will probably crash on windows...
   execute_process(COMMAND ${C_COMPILER_NAME} -print-search-dirs
                   OUTPUT_VARIABLE gccsearchdirs)
   string(REGEX REPLACE ".*libraries: =(.*)\n"  "\\1" gcclibs "${gccsearchdirs}")
@@ -115,6 +75,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "
   # adding these to the linking process which is handled by a non-gnu fortran compiler in your case
   link_directories(${gcclibs}) 
 endif()
+# -- end of not needed for gnu/intel --
 # end C stuff
 
 if(MADX_ONLINE)

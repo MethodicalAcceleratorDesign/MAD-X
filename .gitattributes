@@ -51,6 +51,11 @@ cmakesrc/LinuxLF95.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
 cmakesrc/README -text
 cmakesrc/cdash_madx.cmake -text
+cmakesrc/compilers/setupGNU.cmake -text
+cmakesrc/compilers/setupIntel.cmake -text
+cmakesrc/compilers/setupLahey.cmake -text
+cmakesrc/compilers/setupNAGFOR.cmake -text
+cmakesrc/compilers/setupPathScale.cmake -text
 cmakesrc/ctests/CMakeLists.txt -text
 cmakesrc/ctests/checkConsistency.py -text
 cmakesrc/ctests/ibs.mad -text
@@ -69,6 +74,7 @@ cmakesrc/ctests/testsample.sh -text
 cmakesrc/ctests/twiss1.madx -text
 cmakesrc/madX.gif -text svneol=unset#unset
 cmakesrc/madx.xml -text
+cmakesrc/madxInit.cmake -text
 cmakesrc/setupArchSpecifics.cmake -text
 cmakesrc/setupCompilerSpecifics.cmake -text
 cmakesrc/setupInstallation.cmake -text

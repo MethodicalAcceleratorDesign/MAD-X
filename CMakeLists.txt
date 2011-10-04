@@ -22,6 +22,12 @@ endif(COMMAND cmake_policy)
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
 
+# When we don't need to support cmake 2.6 anymore, remove these three lines:
+if(CMAKE_VERSION MATCHES "2.6.")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc/compilers") 
+endif()
+include(madxInit)
+
 # Setting project version:
 include(setupVersion)
 
