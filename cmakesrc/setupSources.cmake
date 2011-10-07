@@ -41,25 +41,7 @@ else (MADX_NTPSA )
 endif  (MADX_NTPSA )
 list(REMOVE_ITEM fsrcfiles ${to_remove})
 
-#execute python wrapper scripts (you need to be dependent on one of the output files or else this command will never be ran):
-# Unsure about dependencies.. Might be an overkill this one.
-find_package(PythonInterp REQUIRED)
-ADD_CUSTOM_COMMAND(
-  OUTPUT c_wrappers.c c_wrappers.h c_prototypes.h c_wrappers_prototypes.h
-  DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND ${PYTHON_EXECUTABLE} wrap_C_calls.py -o ${CMAKE_CURRENT_BINARY_DIR} 
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Creating C wrapper files"
-  )
-ADD_CUSTOM_COMMAND(
-  OUTPUT fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
-  DEPENDS ${csrcfiles} ${fsrcfiles}
-  COMMAND ${PYTHON_EXECUTABLE} wrap_fortran_calls.py --outdir=${CMAKE_CURRENT_BINARY_DIR} 
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Creating fortran wrapper files"
-  )
-# execute python wrap_fortran_calls.py
-# COMMAND python wrap_C_calls.py
+include(setupWrappers)
 
 # We need to include the wrapper headers..
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

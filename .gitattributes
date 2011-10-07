@@ -85,6 +85,7 @@ cmakesrc/setupSources.cmake -text
 cmakesrc/setupTargets.cmake -text
 cmakesrc/setupTesting.cmake -text
 cmakesrc/setupVersion.cmake -text
+cmakesrc/setupWrappers.cmake -text
 /d_lielib.f90 -text
 /doxygen.h -text
 /dynap.f90 -text
@@ -216,4 +217,6 @@ testing/underConstruction.gif -text svneol=unset#unset
 /win32calls.fi -text
 /wrap.f90 -text
 /wrap_C_calls.py -text
+/wrap_C_calls_py3.py -text
 /wrap_fortran_calls.py -text
+/wrap_fortran_calls_py3.py -text
