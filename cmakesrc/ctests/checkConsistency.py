@@ -1,6 +1,7 @@
 import os,sys
 import optparse
 import numpy
+import platform
 
 class InputError(Exception):
     pass
@@ -10,6 +11,7 @@ def tfs(inputfile):
     Give file path as input, returns tfs table as output
     '''
     summary={}
+    PYVER=int(platform.python_version().split('.')[0])
     if not os.path.isfile(inputfile):
         if os.path.isfile(inputfile+'.tfs'):
             inputfile+='.tfs'
@@ -17,7 +19,10 @@ def tfs(inputfile):
             inputfile+='.TFS'
         else:
             raise ValueError("ERROR: "+inputfile+" is not a valid file path")
-    f=file(inputfile,'r')
+    if PYVER==3:
+        f=open(inputfile,'r')
+    else:
+        f=file(inputfile,'r')
     l=f.readline()
     while(l):
         if l.strip()[0]=='@':
@@ -84,7 +89,7 @@ def _read_table(fstream,names):
         elif typ=='%d':
             table[n.lower()]=numpy.array(table[n.lower()],dtype=int)
         elif typ=='%s':
-            for k in xrange(len(table[n.lower()])):
+            for k in range(len(table[n.lower()])):
                 table[n.lower()][k]=table[n.lower()][k].split('"')[1]
     return table
 
@@ -94,7 +99,7 @@ if __name__=="__main__":
     parser = optparse.OptionParser(usage)
     (options,args) = parser.parse_args()
     if len(args)!=2:
-        print len(args)
+        print(len(args))
         parser.print_help()
         print("\n      -- Wrong input -- \n")
         sys.exit(1)
