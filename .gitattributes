@@ -39,7 +39,6 @@
 /a_def_worm.inc -text
 /a_scratch_size.f90 -text
 /b_da_arrays_all.f90 -text
-/c6t.c -text
 /c_dabnew.f90 -text
 /c_dabnew_berz.f90 -text
 /c_tpsa_interface.F90 -text
@@ -246,7 +245,6 @@ lib64/libz.a -text
 /mad_vec.h -text
 /mad_wrap_f.h -text
 /madx.h -text
-/madx_main.F90 -text
 /madx_ptc_distrib.f90 -text
 /madx_ptc_distrib.inc -text
 /madx_ptc_eplacement.f90 -text
@@ -281,7 +279,6 @@ lib64/libz.a -text
 /resindex.f90 -text
 /rplot.c -text
 /rplot.h -text
-/run_madx.f90 -text
 /sodd.f90 -text
 /survey.f90 -text
 testing/MadBuild.pl -text
