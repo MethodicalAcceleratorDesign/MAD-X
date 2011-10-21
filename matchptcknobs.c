@@ -1,12 +1,5 @@
 #include "matchptcknobs.h"
 
-#ifdef _WRAP_FORTRAN_CALLS
-#include "fortran_wrappers.h"
-#endif
-#ifdef _WRAP_C_CALLS
-#include "c_wrappers.h"
-#endif
-
 /*______________________________________________________________
   matchptcknobs.c
   Piotr Skowronski (CERN) 2006
@@ -132,17 +125,19 @@ struct in_cmd* madx_mpk_comm_createlayout;
 struct in_cmd* madx_mpk_comm_setswitch;
 struct in_cmd* madx_mpk_comm_calculate;/*ptc_twiss or ptc_normal*/
 
-char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;";
+// static added 
+static char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;";
 
-void makestdmatchfile(char* fname, char* matchactioncommand);
-int  run_ptccalculation(int setknobs,char* readstartval);
-void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks);
-int  madx_mpk_scalelimits(int nv);
-int  findsetknob(char* ename, int exactnamematch,char* initialpar);
-int  mapptctomad(char* ptcname,char* madxname);
-int  readstartvalues();
-int  factorial(int v);
-double match2_summary();
+static void makestdmatchfile(char* fname, char* matchactioncommand);
+static int  run_ptccalculation(int setknobs,char* readstartval);
+static void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks);
+static int  madx_mpk_scalelimits(int nv);
+static int  findsetknob(char* ename, int exactnamematch,char* initialpar);
+static int  mapptctomad(char* ptcname,char* madxname);
+static int  readstartvalues();
+static int  factorial(int v);
+static double match2_summary();
+
 /*******************************************/
 /*MAD-X Global Variables used in this file */
 /*******************************************/
@@ -156,10 +151,12 @@ extern char             match2_keepexpressions;
 extern int              total_const;
 extern struct sequence* current_sequ;  /* pointer to currently used sequence */
 extern struct el_list*  element_list;
+
 /************************************/
 /*MAD-X Functions used in this file */
 /************************************/
 
+/*
 extern void             pro_input_(char* statement);
 extern void             process();
 extern void             pro_ptc_twiss();
@@ -170,7 +167,7 @@ extern void             comm_para_(char*, int*, int*, int*, int*, double*, char*
 extern double           get_variable_(char*);
 extern void             set_variable_(char*, double*);
 extern void*            mymalloc(char* caller, size_t size);
-extern void*            mycalloc(char* caller, int n, size_t size);
+extern void*            mycalloc(char* caller, size_t n, size_t size);
 extern void             myfree(char* rout_name, void* p);
 extern void             warning(char* t1, char* fmt, ...);
 extern void             warningnew(char* t1, char* fmt, ...);
@@ -186,9 +183,7 @@ extern int              element_vector(struct element*, char*, double*);
 extern double           el_par_value(char*, struct element*);
 extern void             w_ptc_getnfieldcomp_(int* fibreidx, int* ncomp, double*);
 extern void             w_ptc_getsfieldcomp_(int* fibreidx, int* ncomp, double*);
-
-extern int              errorflag;
-extern char*            errormessage;
+*/
 
 /*_________________________________________________________________________*/
 
@@ -335,7 +330,7 @@ void madx_mpk_run(struct in_cmd* cmd)
     if (debuglevel)  printf("\n\nCalling TWISS with KNOBS\n");
     run_ptccalculation(1,&readstartval);
 
-    if (errorflag)
+    if (geterrorflag())
     {
       error("Matching With Knobs","PTC calculation ended with an error. Check your setting and matching limits.");
       pro_input_(ptcend);

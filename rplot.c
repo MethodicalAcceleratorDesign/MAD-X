@@ -10,16 +10,9 @@
 #include <dlfcn.h>
 #endif
 
-#ifdef _WRAP_FORTRAN_CALLS
-#include "fortran_wrappers.h"
-#endif
-#ifdef _WRAP_C_CALLS
-#include "c_wrappers.h"
-#endif
-
 extern type_OfExtern void type_ofCall warning(const char*, const char*);
 
-void loadrplotlib()
+void loadrplotlib(void)
 {
 #if PLUGIN_SUPPORT
   void *handle;
@@ -169,7 +162,7 @@ void loadrplotlib()
 }
 /*_________________________________________________________________________________________*/
 
-void unloadrplotlib()
+void unloadrplotlib(void)
 {
 #if PLUGIN_SUPPORT
   dlclose(rplot_handle);
@@ -229,7 +222,7 @@ void type_ofCall  plottwiss(int* obspoint,
 
 
 
-extern type_OfExtern void type_ofCall rplotfinish()
+extern type_OfExtern void type_ofCall rplotfinish(void)
 {
 /*terminates plotter*/
 #ifdef ROOT_PLOT
@@ -255,7 +248,7 @@ extern type_OfExtern void type_ofCall rplotfinish()
 }
 /*_________________________________________________________________________________________*/
 
-extern type_OfExtern void type_ofCall newrplot()
+extern type_OfExtern void type_ofCall newrplot(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
@@ -299,7 +292,7 @@ extern type_OfExtern void type_ofCall newrplot()
 }
 /*_________________________________________________________________________________________*/
 
-extern type_OfExtern void type_ofCall plotter()
+extern type_OfExtern void type_ofCall plotter(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
@@ -309,7 +302,7 @@ extern type_OfExtern void type_ofCall plotter()
 /*_________________________________________________________________________________________*/
 
 
-extern type_OfExtern void type_ofCall print()
+extern type_OfExtern void type_ofCall print(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
@@ -319,7 +312,7 @@ extern type_OfExtern void type_ofCall print()
 /*_________________________________________________________________________________________*/
 
 
-extern type_OfExtern void type_ofCall rviewer()
+extern type_OfExtern void type_ofCall rviewer(void)
 {
 /*adds new plotter*/
 

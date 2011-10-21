@@ -5,12 +5,15 @@
 #include "SDDS.h"
 #include <ctype.h>
 */
+
+/*
 #ifdef _WRAP_FORTRAN_CALLS
 #include "fortran_wrappers.h"
 #endif
 #ifdef _WRAP_C_CALLS
 #include "c_wrappers.h"
 #endif
+*/
 
 /* define SDDS routine */
 int  treat_tfs_header(SDDS_TABLE *sd,  struct table* t);

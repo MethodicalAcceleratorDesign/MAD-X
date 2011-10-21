@@ -4,6 +4,20 @@
 #
 #######################################################################
 #
+# Changes on 21.10.2011 by L.Deniau:
+# python wrapper and rules removed
+# madx[cenu].c removed (and some others)
+# mad_%.[hc] added
+# few rules removed, two added (madx.h and mad_%.c)
+# end of changes
+#
+# Changes on 13.10.2011 by L.Deniau:
+# move F90 files to f90, -fpp added
+# remove F90 rules and substitution
+# update c_tpsa stuff
+# add -fpp to ifort
+# end of changes
+#
 # Changes on 19.01.2011 by H.Renshall:
 # add new flags f95_FLAGSP and Q for separate lf95 compilation of the
 # polymorphic code which cannot use the --chk u (undefined) flag.
@@ -117,7 +131,7 @@ ifeq ($(f95),f95)
 endif
 
 ifeq ($(f95),ifort)
-  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
+  f95_FLAGS+= -fpp -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
   ifeq ($(ARCH),32)
     f95_FLAGS+= $(M32) -fp-model precise
   endif
@@ -245,23 +259,18 @@ endif
 default: madx
 
 # dependencies of madxp which combines the C-code
-madxp.o: madxp.c madxn.c madxu.c aperture.c madxe.c madxc.c matchc.c matchc2.c sxf.c makethin.c c6t.c madxreg.c madxreg.h madx.h madxl.h madxd.h madxdict.h c6t.h matchptcknobs.h fortran_wrappers.h c_wrappers.h
+madxp.o: madxp.c matchc.c matchc2.c madx.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
 
-# automatically generated code
-fortran_wrappers.h fortran_wrappers.c fortran_prototypes.h fortran_wrappers_prototypes.h:
-	python wrap_fortran_calls.py # creates fortran_wrappers.c fortran_wrappers.h fortran_prototypes.h fortran_wrappers_prototypes.h
-
-c_wrappers.h c_wrappers.c:
-	python wrap_C_calls.py	
-
-fortran_wrappers.o: fortran_wrappers.c
-	$(CC) $(GCCP_FLAGS) -c fortran_wrappers.c
-
-c_wrappers.o: c_wrappers.c
-	$(CC) $(GCCP_FLAGS) -c c_wrappers.c
-
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
+
+# new C mad_* files dependencies (should be built automatically)
+MAD_H := $(wildcard mad_*.h)
+MAD_C := $(wildcard mad_*.c)
+MAD_O := $(patsubst %.c,%.o,$(MAD_C))
+
+madx.h: $(MAD_H)
+$(MAD_O): $(MAD_H) madx.h
 
 # fortran code dependencies on header files fi
 util.o: util.f90
@@ -285,21 +294,21 @@ a_scratch_size.o: a_scratch_size.f90
 b_da_arrays_all.o: a_scratch_size.o b_da_arrays_all.f90
 ifeq ($(NTPSA),YES)
   c_dabnew_berz.o: b_da_arrays_all.o c_dabnew_berz.f90
-  c_tpsa_interface.o: c_dabnew_berz.o c_tpsa_interface.F90
+  c_tpsa_interface.o: c_dabnew_berz.o c_tpsa_interface.f90
   d_lielib.o: c_tpsa_interface.o d_lielib.f90
   h_definition.o: a_scratch_size.o c_dabnew_berz.o d_lielib.o h_definition.f90 a_def_frame_patch_chart.inc a_def_all_kind.inc a_def_sagan.inc a_def_element_fibre_layout.inc
   tpsa.o: tpsa.cpp tpsa.h
 	$(CC) $(GCCP_FLAGS) -c -o tpsa.o tpsa.cpp
   TPSA= tpsa.o
   FILT_TP_OUT= c_dabnew.o
-  FILT_TP_OUT_F90=
+#  FILT_TP_OUT_F90=
 else
   c_dabnew.o: b_da_arrays_all.o c_dabnew.f90
   d_lielib.o: c_dabnew.o d_lielib.f90
   h_definition.o: a_scratch_size.o c_dabnew.o d_lielib.o h_definition.f90 a_def_frame_patch_chart.inc a_def_all_kind.inc a_def_sagan.inc a_def_element_fibre_layout.inc
   TPSA=
-  FILT_TP_OUT= c_dabnew_berz.o
-  FILT_TP_OUT_F90= c_tpsa_interface.o
+  FILT_TP_OUT= c_dabnew_berz.o c_tpsa_interface.o
+#  FILT_TP_OUT_F90= c_tpsa_interface.o
 endif
 i_tpsa.o: h_definition.o i_tpsa.f90
 	$(f95) $(f95_FLAGS)  $(f95_FLAGSQ) i_tpsa.f90
@@ -356,8 +365,7 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
-run_madx.o: madx_ptc_module.o run_madx.f90
-madx_main.o: run_madx.o madx_main.F90
+mad_init_f.o: madx_ptc_module.o mad_init_f.f90
 
 # implicit rule to compile with C
 %.o : %.c
@@ -367,20 +375,19 @@ madx_main.o: run_madx.o madx_main.F90
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
 
-# implicit rule to compile f90 code with f95
-%.o : %.F90
-	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
-
+# special rule to compile wih -O0
 matchlib2.o: matchlib2.f90
 	$(f95) $(f95_FLAGS) $(f95_FLAGSP) -O0 $<
 
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
-madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o fortran_wrappers.o c_wrappers.o $(TPSA)
+mad_objects = $(patsubst %.c,%.o,$(wildcard mad_*.c))
+madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o $(mad_objects) $(TPSA) 
 madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), $(patsubst %.f90,%.o,$(wildcard *.f90)))
-madx_objects += $(filter-out $(FILT_TP_OUT_F90),$(patsubst %.F90,%.o,$(wildcard *.F90)))
 
 madx: $(madx_objects)
-	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
+	$(f95) -nofor_main $(LDOPT) -o madx $(madx_objects) $(LIBX)
+
+#	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 #	strip madx
 
 clean:
@@ -390,8 +397,6 @@ clean:
 	rm -f *.lst
 	rm -f core
 	rm -f *~
-	python wrap_fortran_calls.py --clean
-	python wrap_C_calls.py --clean
 
 info:
 	@echo default C compiler CC "    " = $(CC)

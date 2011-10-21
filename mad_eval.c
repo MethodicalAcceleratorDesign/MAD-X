@@ -1,0 +1,336 @@
+#include "madx.h"
+
+void
+pro_input(char* statement)
+  /* processes one special (IF() etc.), or one normal statement after input */
+{
+  int type, code, nnb, ktmp;
+  char* sem;
+  int rs, re, start = 0, l = strlen(statement);
+
+  clearerrorflag(); /*reset global error flag */
+
+  while (start < l)
+  {
+    if ((type = in_spec_list(&statement[start])))
+    {
+      if (type == 6)
+      {
+        get_bracket_range(&statement[start], '(', ')', &rs, &re);
+        ktmp = re+1;
+        if (re > rs && strchr(&statement[ktmp], ':')) /* formal arg.s */
+        {
+          get_bracket_range(&statement[ktmp], '(', ')', &rs, &re);
+          rs += ktmp; re += ktmp;
+        }
+      }
+      else get_bracket_range(&statement[start], '{', '}', &rs, &re);
+      if (re > rs)
+      {
+        re += start + 1;
+        if (re < l && next_non_blank(&statement[re]) == ';')
+          re += next_non_blank_pos(&statement[re]) + 1;
+      }
+      if((code = act_special(type, &statement[start])) < 0)
+      {
+        if (get_option("warn"))
+        {
+          switch (code)
+          {
+            case -1:
+              warning("statement illegal in this context,", "skipped");
+              break;
+            case -2:
+              warning("statement label is protected keyword,", "skipped");
+            case -3:
+              warning("statement not recognised:", statement);
+              break;
+            default:
+              fatal_error("illegal return code","from act_special");
+          }
+        }
+      }
+      if (re > rs && re < l)
+      {
+        if (next_non_blank_pos(&statement[re]) < 0) start = l;
+        else start = re;
+      }
+      else start = l;
+    }
+    else
+    {
+      if ((sem = mystrchr(&statement[start], ';')) == NULL) return;
+      if ((uintptr_t) sem > (uintptr_t) &statement[start]) /* skip empty ';' */
+      {
+        *sem = '\0';
+        this_cmd = new_in_cmd(400);
+        pre_split(&statement[start], work, 1);
+        check_table(work->c); check_tabstring(work->c);
+        this_cmd->tok_list->curr = mysplit(work->c, this_cmd->tok_list);
+        if ((type = decode_command()) < 0) /* error */
+        {
+          if (get_option("warn"))
+          {
+            switch (type)
+            {
+              case -1:
+                warning("statement illegal in this context,", "skipped");
+                break;
+              case -2:
+                warning("statement label is protected keyword,","skipped");
+              case -3:
+                warning("statement not recognised:", work->c);
+                break;
+              default:
+                fatal_error("illegal return code","from decode_command");
+            }
+          }
+        }
+        else process();
+        if (stop_flag)  return;
+        *sem = ';';
+      }
+      sem++;
+      start = (uintptr_t)sem - (uintptr_t)statement;
+      if (start < l)
+      {
+        if ((nnb = next_non_blank_pos(sem)) < 0)  start = l;
+        else start += nnb;
+      }
+    }
+  }
+}
+
+void
+process(void)  /* steering routine: processes one command */
+{
+  int pos;
+  char* name;
+  struct element* el;
+  if (this_cmd != NULL)
+  {
+    switch (this_cmd->type)
+    {
+      case 0: /* executable commands */
+        exec_command();
+        if (stop_flag)
+        {
+          if (this_cmd)
+          {
+            if (this_cmd->clone != NULL)
+              this_cmd->clone = delete_command(this_cmd->clone);
+            this_cmd = delete_in_cmd(this_cmd);
+          }
+          return;
+        }
+        break;
+      case 1: /* element definition */
+        enter_element(this_cmd);
+        buffer_in_cmd(this_cmd);
+        break;
+      case 2: /* variable definition */
+        enter_variable(this_cmd);
+        break;
+      case 3: /* sequence start or end */
+        enter_sequence(this_cmd);
+        break;
+      case 4:
+        name = this_cmd->tok_list->p[0];
+        if (sequ_is_on)
+          /* element or sequence reference in sequence */
+        {
+          if ((pos =
+               name_list_pos(name, sequences->list)) < 0)
+            enter_element(this_cmd);
+          else
+          {
+            this_cmd->cmd_def  = find_command("sequence", defined_commands);
+            this_cmd->clone = clone_command(this_cmd->cmd_def);
+            strcpy(this_cmd->clone->name, name);
+            scan_in_cmd(this_cmd);
+            enter_sequ_reference(this_cmd, sequences->sequs[pos]);
+          }
+        }
+        else
+          /* element parameter definition */
+        {
+          if ((el = find_element(name, element_list)) == NULL)
+            warning("skipped, command or element unknown:", name);
+          else
+          {
+            this_cmd->cmd_def = el->def;
+            this_cmd->clone = clone_command(this_cmd->cmd_def);
+            strcpy(this_cmd->clone->name, name);
+            scan_in_cmd(this_cmd);
+            update_element(el, this_cmd->clone);
+          }
+        }
+        break;
+      default:
+        warning("unknown command type:",
+                join_b(this_cmd->tok_list->p,
+                       this_cmd->tok_list->curr));
+    }
+    if (this_cmd != NULL && (this_cmd->type == 0 || this_cmd->type == 2))
+    {
+      if (this_cmd->clone != NULL)
+      {
+        if (this_cmd->clone_flag == 0)
+          this_cmd->clone = delete_command(this_cmd->clone);
+        else add_to_command_list(this_cmd->clone->name,
+                                 this_cmd->clone, stored_commands, 0);
+      }
+      if (this_cmd->label != NULL) buffer_in_cmd(this_cmd);
+      else this_cmd = delete_in_cmd(this_cmd);
+    }
+  }
+}
+
+double
+act_value(int pos, struct name_list* chunks)
+  /* returns the actual value of a variable, element, or command parameter */
+{
+  char* name = chunks->names[pos];
+  char comm[NAME_L];
+  char par[NAME_L];
+  char *p, *n = name, *q = comm;
+  double val = zero;
+  struct element* el;
+  struct command* cmd = NULL;
+  if ((p = strstr(name, "->")) == NULL) /* variable */
+  {
+    if ((current_variable = find_variable(name, variable_list)) == NULL)
+    {
+      if (get_option("verify"))
+        warning("undefined variable set to zero:", name);
+      current_variable = new_variable(name, zero, 1, 1, NULL, NULL);
+      val = zero;
+      add_to_var_list(current_variable, variable_list, 0);
+    }
+    else val = variable_value(current_variable);
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if (strncmp(comm, "beam", 4) == 0)
+    {
+      cmd = current_beam = find_command("default_beam", beam_list);
+      if ((p = strchr(comm, '%')) != NULL)
+      {
+        if ((current_beam = find_command(++p, beam_list)) == NULL)
+          current_beam = cmd;
+      }
+      val = command_par_value(par, current_beam);
+    }
+    else if ((el = find_element(comm, element_list)) != NULL)
+      val = el_par_value(par, el);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      val = command_par_value(par, cmd);
+  }
+  return val;
+}
+
+int
+act_special(int type, char* statement)
+  /* acts on special commands (IF{..} etc.) */
+{
+  struct char_array* loc_buff = NULL;
+  struct char_array* loc_w = NULL;
+  int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
+  int ret_val = 0;
+  struct char_p_array* logic;
+  int logex = 0;
+  char *cp = statement;
+  if (ls < IN_BUFF_SIZE) ls = IN_BUFF_SIZE;
+  if (level == pro->max) grow_in_buff_list(pro);
+  if (pro->buffers[level] == NULL)
+    pro->buffers[level] = new_in_buffer(ls);
+  else
+  {
+    while(pro->buffers[level]->c_a->max < ls)
+      grow_char_array(pro->buffers[level]->c_a);
+  }
+  if (type == 5) /* macro */ return make_macro(statement);
+  else if (type == 6) /* line */ return make_line(statement);
+  logic = new_char_p_array(1000);
+  loc_buff = new_char_array(ls);
+  loc_w = new_char_array(ls);
+  get_bracket_range(statement, '{', '}', &rs, &re);
+  if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
+  cnt_1 = rs; start_2 = rs + 1;
+  mystrcpy(loc_buff, statement); loc_buff->c[re] =  '\0';
+  while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
+  strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';
+  switch (type)
+  {
+    case 1:  /* if */
+      pro->buffers[level]->flag = 0;
+    case 3:  /* else if */
+      if (pro->buffers[level]->flag < 0)
+      {
+        ret_val = -1;
+        break;
+      }
+      if (pro->buffers[level]->flag == 0)
+      {
+        pre_split(aux_buff->c, loc_w, 0);
+        mysplit(loc_w->c, tmp_l_array);
+        get_bracket_t_range(tmp_l_array->p, '(', ')', 0, tmp_l_array->curr,
+                            &rs, &re);
+        rs++;
+        if ((logex = logic_expr(re-rs, &tmp_l_array->p[rs])) > 0)
+        {
+          pro->buffers[level]->flag = 1;
+          pro->curr++;
+          /* now loop over statements inside {...} */
+          pro_input(&loc_buff->c[start_2]);
+          pro->curr--;
+        }
+        else if (logex < 0) warning("illegal if construct set false:", cp);
+      }
+      break;
+    case 2: /* else */
+      if (pro->buffers[level]->flag < 0)
+      {
+        ret_val = -1;
+        break;
+      }
+      if (pro->buffers[level]->flag == 0)
+      {
+        pro->curr++;
+        /* now loop over statements inside {...} */
+        pro_input(&loc_buff->c[start_2]);
+        pro->curr--;
+        pro->buffers[level]->flag = -1;
+      }
+      break;
+    case 4: /* while */
+      pre_split(aux_buff->c, loc_w, 0);
+      mysplit(loc_w->c, logic);
+      get_bracket_t_range(logic->p, '(', ')', 0, logic->curr,
+                          &rs, &re);
+      pro->curr++; rs++;
+      while ((logex = logic_expr(re-rs, &logic->p[rs])) > 0)
+      {
+        /* now loop over statements inside {...} */
+        pro_input(&loc_buff->c[start_2]);
+      }
+      pro->curr--;
+      break;
+    default:
+      ret_val = -1;
+  }
+  if (loc_buff != NULL) delete_char_array(loc_buff);
+  if (loc_w != NULL) delete_char_array(loc_w);
+  delete_char_p_array(logic, 0);
+  return ret_val;
+}
+

@@ -1,0 +1,675 @@
+#include <math.h>
+
+#include "madx.h"
+
+struct variable*
+find_variable(char* name, struct var_list* varl)
+{
+  int pos;
+  if ((pos = name_list_pos(name, varl->list)) < 0)
+    return NULL;
+  return varl->vars[pos];
+}
+
+double
+variable_value(struct variable* var)
+{
+  int k;
+  double val = zero;
+  if (var->type < 2 && var->status > 0) val = var->value;
+  else if(var->expr == NULL) val = var->value;
+  else
+  {
+    var->value = val = expression_value(var->expr, var->type);
+    var->status = 1;
+  }
+  if (var->val_type == 0) /* int */
+  {
+    k = val; val = k;
+  }
+  return val;
+}
+
+struct var_list*
+clone_var_list(struct var_list* vl)
+{
+  int i, l = vl->curr > 0 ? vl->curr : 1;
+  struct var_list* clone;
+  clone = new_var_list(l);
+  strcpy(clone->name, vl->name);
+  clone->list = clone_name_list(vl->list);
+  for (i = 0; i < vl->curr; i++) clone->vars[i] = vl->vars[i];
+  clone->curr = vl->curr;
+  return clone;
+}
+
+struct variable*
+new_variable(char* name, double val, int val_type, int type, struct expression* expr, char* string)
+{
+  char rout_name[] = "new_variable";
+  struct variable* var =
+    (struct variable*) mycalloc(rout_name,1, sizeof(struct variable));
+  strcpy(var->name, name);
+  var->stamp = 123456;
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", var->name);
+  var->value = val;
+  var->type = type;
+  var->val_type = val_type;
+  if ((var->expr = expr) == NULL) var->status = 1;
+  if (string != NULL) var->string = tmpbuff(string);
+  return var;
+}
+
+struct var_list*
+new_var_list(int length)
+{
+  char rout_name[] = "new_var_list";
+  struct var_list* var
+    = (struct var_list*) mycalloc(rout_name,1, sizeof(struct var_list));
+  strcpy(var->name, "var_list");
+  var->stamp = 123456;
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", var->name);
+  var->list = new_name_list(var->name, length);
+  var->vars
+    = (struct variable**) mycalloc(rout_name,length, sizeof(struct variable*));
+  var->max = length;
+  return var;
+}
+
+struct variable*
+delete_variable(struct variable* var)
+{
+  char rout_name[] = "delete_variable";
+  if (var == NULL)  return NULL;
+  if (stamp_flag && var->stamp != 123456)
+    fprintf(stamp_file, "d_v double delete --> %s\n", var->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", var->name);
+  if (var->expr != NULL) delete_expression(var->expr);
+  if (var->string != NULL) myfree(rout_name, var->string);
+  myfree(rout_name, var);
+  return NULL;
+}
+
+struct var_list*
+delete_var_list(struct var_list* varl)
+{
+  char rout_name[] = "delete_var_list";
+  if (varl == NULL) return NULL;
+  if (stamp_flag && varl->stamp != 123456)
+    fprintf(stamp_file, "d_v_l double delete --> %s\n", varl->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", varl->name);
+  if (varl->list != NULL) delete_name_list(varl->list);
+  if (varl->vars != NULL) myfree(rout_name, varl->vars);
+  myfree(rout_name, varl);
+  return NULL;
+}
+
+void
+grow_var_list(struct var_list* p)
+{
+  char rout_name[] = "grow_var_list";
+  struct variable** v_loc = p->vars;
+  int j, new = 2*p->max;
+
+  p->max = new;
+  p->vars
+    = (struct variable**) mycalloc(rout_name,new, sizeof(struct variable*));
+  for (j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
+  myfree(rout_name, v_loc);
+}
+
+void
+dump_variable(struct variable* v)
+{
+  fprintf(prt_file, "=== dumping variable %s\n", v->name);
+}
+
+void
+write_vars(struct var_list* varl, struct command_list* cl, FILE* file)
+{
+  int i;
+  for (i = 0; i < varl->curr; i++)
+  {
+    if (predef_var(varl->vars[i]) == 0
+        && pass_select_list(varl->vars[i]->name, cl))
+      export_variable(varl->vars[i], file);
+  }
+}
+
+void
+write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file)
+{
+  int i;
+  for (i = 0; i < varl->curr; i++)
+  {
+    if (predef_var(varl->vars[i]) == 0
+        && pass_select_list(varl->vars[i]->name, cl))
+      export_var_8(varl->vars[i], file);
+  }
+}
+
+void
+export_variable(struct variable* var, FILE* file)
+  /* exports variable in mad-X format */
+{
+  int k;
+  *c_dum->c = '\0';
+  if (var->status == 0) var->value = expression_value(var->expr, var->type);
+  if (var->val_type == 0) strcat(c_dum->c, "int ");
+  if (var->type == 0) strcat(c_dum->c, "const ");
+  strcat(c_dum->c, var->name);
+  if (var->type < 2) strcat(c_dum->c, " = ");
+  else               strcat(c_dum->c, " := ");
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
+  else if (var->val_type == 0)
+  {
+    k = var->value; sprintf(c_join->c, "%d", k); strcat(c_dum->c, c_join->c);
+  }
+  else
+  {
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
+  }
+  write_nice(c_dum->c, file);
+}
+
+void
+export_var_8(struct variable* var, FILE* file)
+  /* exports variable in mad-8 format */
+{
+  int k;
+  *c_dum->c = '\0';
+  if (var->status == 0) var->value = expression_value(var->expr, var->type);
+  if (var->type == 0)
+  {
+    strcat(c_dum->c, var->name);
+    strcat(c_dum->c, ": constant = ");
+  }
+  else
+  {
+    strcat(c_dum->c, var->name);
+    if (var->type < 2) strcat(c_dum->c, " = ");
+    else               strcat(c_dum->c, " := ");
+  }
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
+  else if (var->val_type == 0)
+  {
+    k = var->value; sprintf(c_join->c, v_format("%I"), k);
+    strcat(c_dum->c, c_join->c);
+  }
+  else
+  {
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
+  }
+  write_nice_8(c_dum->c, file);
+}
+
+double
+get_variable(char* name)
+{
+  char comm[NAME_L];
+  char par[NAME_L];
+  double val = zero;
+  struct variable* var;
+  struct element* el;
+  struct command* cmd;
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      val = variable_value(var);
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if ((el = find_element(comm, element_list)) != NULL)
+      val = command_par_value(par, el->def);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      val = command_par_value(par, cmd);
+  }
+  return val;
+}
+
+char*
+get_varstring(char* name)
+{
+  struct variable* var;
+  char *p, *ret;
+  ret = NULL;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      ret = var->string;
+  }
+  return ret;
+}
+
+char*
+make_string_variable(char* string)
+  /* creates + stores a variable containing a character string */
+{
+  char* name = get_new_name();
+  struct variable* var = new_variable(name, zero, 3, 0, NULL, string);
+  add_to_var_list(var, variable_list, 0);
+  return var->name;
+}
+
+void
+enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
+{
+  struct variable* var;
+  struct expression* expr = NULL;
+  int k, end, type = 0, name_pos = 0, start = cmd->decl_start, val_type = 0;
+  double val = 0;
+  char comm[NAME_L];
+  char par[NAME_L];
+  char* name;
+  char *p, *n, *q = comm;
+  int exp_type = loc_expr(cmd->tok_list->p, cmd->tok_list->curr,
+                          start, &end);
+  switch (cmd->sub_type)
+  {
+    case 2:
+    case 3:
+      val_type = 0;
+      type = 0;
+      name_pos = 2;
+      break;
+    case 4:
+    case 5:
+      val_type = 1;
+      type = 0;
+      name_pos = 2;
+      break;
+    case 6:
+      val_type = 0;
+      type = 1;
+      name_pos = 1;
+      break;
+    case 7:
+      val_type = 0;
+      type = 2;
+      name_pos = 1;
+      break;
+    case 8:
+      val_type = 1;
+      type = 1;
+      name_pos = 1;
+      break;
+    case 9:
+      val_type = 1;
+      type = 2;
+      name_pos = 1;
+      break;
+    case 10:
+    case 11:
+      val_type = 1;
+      type = 0;
+      name_pos = 1;
+      break;
+    case 12:
+      val_type = 1;
+      type = 1;
+      name_pos = 0;
+      break;
+    case 13:
+      val_type = 1;
+      type = 2;
+      name_pos = 0;
+      break;
+    default:
+      fatal_error("illegal command sub_type in:",
+                  join(cmd->tok_list->p, cmd->tok_list->curr));
+  }
+  n = name = permbuff(cmd->tok_list->p[name_pos]);
+  if (exp_type == 0)
+  {
+    warning("illegal expression set to 0 in:",
+            join_b(cmd->tok_list->p, cmd->tok_list->curr));
+  }
+  else
+  {
+    if ((p = strstr(name,"->")) != NULL) /* element or command parameter */
+    {
+      while (n < p)  *(q++) = *(n++);
+      *q = '\0';
+      q = par; n++; n++;
+      while (*n != '\0')  *(q++) = *(n++);
+      *q = '\0';
+      set_sub_variable(comm, par, cmd);
+    }
+    else if ((var = find_variable(name, variable_list)) != 0
+             && var->type == 0)
+    {
+      warning("ignored: attempt to redefine constant:", var->name);
+    }
+    else if (exp_type == 1) /* literal constant */
+    {
+      val = simple_double(cmd->tok_list->p, start, end);
+      var = new_variable(name, val, val_type, type, NULL, NULL);
+      add_to_var_list(var, variable_list, 1);
+    }
+    else
+    {
+      if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
+      {
+        if (type == 2) /* deferred: expression kept */
+        {
+          expr = new_expression(join(&cmd->tok_list->p[start],
+                                     end + 1 - start), deco);
+          val = expression_value(expr, type);
+        }
+        else
+        {
+          expr = NULL;
+          val = polish_value(deco,
+                             join(&cmd->tok_list->p[start],end + 1 - start));
+        }
+        if (val_type == 0)
+        {
+          if (fabs(val) < 2.e9)  k = val;
+          else                   k = 0;
+          val = k;
+        }
+        var = new_variable(name, val, val_type, type, expr, NULL);
+        add_to_var_list(var, variable_list, 1);
+      }
+      else
+      {
+        warning("illegal expression set to 0 in:",
+                join_b(cmd->tok_list->p, cmd->tok_list->curr));
+      }
+    }
+  }
+}
+
+void
+set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
+{
+  char* p;
+  struct element* el;
+  struct command *command, *keep_beam = current_beam;
+  int end, start = cmd->decl_start, t_num, exp_type;
+  double val = 0;
+  for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
+    if (*(cmd->tok_list->p[t_num]) == ',') break;
+  exp_type = loc_expr(cmd->tok_list->p, t_num,
+                      start, &end);
+  if (exp_type == 1) /* literal constant */
+    val = simple_double(cmd->tok_list->p, start, end);
+  else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
+    val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
+  if (strncmp(comm, "beam", 4) == 0)
+  {
+    command = current_beam = find_command("default_beam", beam_list);
+    if ((p = strchr(comm, '%')) != NULL)
+    {
+      if ((current_beam = find_command(++p, beam_list)) == NULL)
+        current_beam = command;
+    }
+    set_command_par_value(par, current_beam, val);
+  }
+  else if ((el = find_element(comm, element_list)) != NULL)
+    set_command_par_value(par, el->def, val);
+  else if ((command = find_command(comm, stored_commands)) != NULL)
+    set_command_par_value(par, command, val);
+  else if ((command = find_command(comm, beta0_list)) != NULL)
+    set_command_par_value(par, command, val);
+  else if ((command = find_command(comm, defined_commands)) != NULL)
+    set_command_par_value(par, command, val);
+  current_beam = keep_beam;
+}
+
+void
+add_to_var_list( /* adds variable to alphabetic variable list */
+  struct variable* var, struct var_list* varl, int flag)
+  /* flag = 0: undefined reference in expression, 1: definition
+     2: separate list, do not drop variable */
+{
+  int pos, j;
+
+  if ((pos = name_list_pos(var->name, varl->list)) > -1)
+  {
+    if (flag == 1)
+    {
+      if (varl->list->inform[pos] == 1)
+      {
+        put_info(var->name, "redefined");
+/*
+  printf("Old Value:\n");
+  export_variable(varl->vars[pos], stdout);
+  printf("New Value:\n");
+  export_variable(var, stdout);
+  printf("File %s line %d\n",filenames[in->curr], currentline[in->curr] );
+*/
+      }
+      else varl->list->inform[pos] = flag;
+    }
+    if (flag < 2) delete_variable(varl->vars[pos]);
+    varl->vars[pos] = var;
+  }
+  else
+  {
+    if (varl->curr == varl->max) grow_var_list(varl);
+    j = add_to_name_list(permbuff(var->name), flag, varl->list);
+    varl->vars[varl->curr++] = var;
+  }
+}
+
+void
+set_variable(char* name, double* value)
+{
+  /* sets variable name to value */
+  char comm[NAME_L];
+  char par[NAME_L];
+  struct variable* var;
+  double val = *value;
+  struct element* el;
+  struct command* cmd;
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+    {
+      if (var->type == 0)
+        warning("ignored: attempt to redefine constant:", var->name);
+      else if (var->type < 3)
+      {
+        var->value = val;
+        var->type = 1;
+        if (var->expr != NULL)  var->expr = delete_expression(var->expr);
+      }
+    }
+    else
+    {
+      var = new_variable(c_dum->c, val, 1, 1, NULL, NULL);
+      add_to_var_list(var, variable_list, 1);
+    }
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if ((el = find_element(comm, element_list)) != NULL)
+      set_command_par_value(par, el->def, val);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      set_command_par_value(par, cmd, val);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      set_command_par_value(par, cmd, val);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      set_command_par_value(par, cmd, val);
+  }
+}
+
+void
+set_stringvar(char* name, char* string)
+{
+  /* sets variable name->string to string */
+  char* p;
+  struct variable* var;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+    {
+      if (var->type == 3) var->string = string;
+    }
+    else
+    {
+      var = new_variable(c_dum->c, zero, 0, 3, NULL, string);
+      add_to_var_list(var, variable_list, 1);
+    }
+  }
+}
+
+int
+predef_var(struct variable* var)
+  /* return 1 for predefined variable, else 0 */
+{
+  int pos = name_list_pos(var->name, variable_list->list);
+  return (pos < start_var ? 1 : 0) ;
+}
+
+void
+print_global(double delta)
+{
+  char tmp[NAME_L], trad[4];
+  double alfa = get_value("probe", "alfa");
+  double freq0 = get_value("probe", "freq0");
+  double gamma = get_value("probe", "gamma");
+  double beta = get_value("probe", "beta");
+  double circ = get_value("probe", "circ");
+  double bcurrent = get_value("probe", "bcurrent");
+  double npart = get_value("probe", "npart");
+  double energy = get_value("probe", "energy");
+  int kbunch = get_value("probe", "kbunch");
+  int rad = get_value("probe", "radiate");
+  double gamtr = zero, t0 = zero, eta;
+  get_string("probe", "particle", tmp);
+  if (rad) strcpy(trad, "T");
+  else     strcpy(trad, "F");
+  if (alfa > zero) gamtr = sqrt(one / alfa);
+  else if (alfa < zero) gamtr = sqrt(-one / alfa);
+  if (freq0 > zero) t0 = one / freq0;
+  eta = alfa - one / (gamma*gamma);
+  puts(" ");
+  printf(" Global parameters for %ss, radiate = %s:\n\n",
+         tmp, trad);
+  printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
+  printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
+  printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"),
+         bcurrent, kbunch);
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"),
+         npart,energy);
+  printf(v_format(" gamma     %F            beta      %F\n"),
+         gamma, beta);
+}
+
+int
+next_vary(char* name, int* name_l, double* lower, double* upper, double* step, int* slope, double* opt)
+  /* returns the next variable to be varied during match;
+     0 = none, else count */
+{
+  int i, pos, ncp, nbl;
+  double l_step;
+  char* v_name;
+  struct name_list* nl;
+  struct command* comm;
+  struct command_parameter_list* pl;
+  if (vary_cnt == stored_match_var->curr)
+  {
+    vary_cnt = 0; return 0;
+  }
+  comm = stored_match_var->commands[vary_cnt];
+  nl = comm->par_names;
+  pl = comm->par;
+  pos = name_list_pos("name", nl);
+  v_name = pl->parameters[pos]->string;
+  ncp = strlen(v_name) < *name_l ? strlen(v_name) : *name_l;
+  nbl = *name_l - ncp;
+  strncpy(name, v_name, ncp);
+  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  *lower = command_par_value("lower", comm);
+  *upper = command_par_value("upper", comm);
+  if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;
+  *step = l_step;
+  *slope = command_par_value("slope", comm);
+  *opt = command_par_value("opt", comm);
+  return ++vary_cnt;
+}
+
+int
+vary_name(char* name, int* name_l, int* index)
+  /* returns the variable name */
+{
+  int pos, ncp, nbl;
+  char* v_name;
+  struct name_list* nl;
+  struct command* comm;
+  struct command_parameter_list* pl;
+  comm = stored_match_var->commands[*index];
+  nl = comm->par_names;
+  pl = comm->par;
+  pos = name_list_pos("name", nl);
+  v_name = pl->parameters[pos]->string;
+  ncp = strlen(v_name) < *name_l ? strlen(v_name) : *name_l;
+  nbl = *name_l - ncp;
+  strncpy(name, v_name, ncp);
+  return 1;
+}
+
+/*
+double
+sss_variable(char* name)
+{
+  char comm[NAME_L];
+  char par[NAME_L];
+  double val = zero;
+  struct variable* var;
+  struct element* el;
+  struct command* cmd;
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) // variable
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      val = variable_value(var);
+  }
+  else // element or command parameter
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if ((el = find_element(comm, element_list)) != NULL)
+      val = command_par_value(par, el->def);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      val = command_par_value(par, cmd);
+  }
+  return val;
+}
+*/
+
+
+

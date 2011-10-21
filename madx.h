@@ -1,499 +1,116 @@
 #ifndef MADX_H
 #define MADX_H
 
-struct aper_node        /* aperture limit node */
-{
-  char name[NAME_L];
-  double n1;
-  double s;
-  char apertype[NAME_L];
-  double aperture[4];
-  double aper_tol[3];
-};
+// standard headers
 
-struct aper_e_d         /* element displacement */
-{
-  char name[NAME_L];        /* element name */
-  int curr;         /* # of rows */
-  double tab[E_D_MAX][3];   /* the table of read values */
-};
+#include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
-struct char_array           /* dynamic array of char */
-{
-  int stamp;
-  int  max,                     /* max. array size */
-    curr;                    /* current occupation */
-  char* c;
-};
+// defines
 
-struct char_array_list
-{
-  char name[NAME_L];
-  int stamp;
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct char_array** ca;
-};
+#include "mad_def.h"
+#include "mad_main.h"
+#include "mad_wrap_f.h"
 
-struct char_p_array           /* dynamic array of char pointers */
-{
-  char name[NAME_L];
-  int  max,                     /* max. array size */
-    curr,                    /* current occupation */
-    flag;                    /* ancillary flag */
-  int stamp;
-  char** p;
-};
+// constants modules
 
-struct command                     /* holds one command */
-{
-  char name[NAME_L];
-  char module[NAME_L];                 /* name of module it belongs to */
-  char group[NAME_L];                  /* command group it belongs to */
-  int stamp;
-  int link_type;                       /* 0 none, 1 start, 2 end of group */
-  int mad8_type;                       /* 0 none, else mad-8 element code */
-  int beam_def;                        /* beam commands: 1 if defined */
-  struct name_list* par_names;         /* names + input flag of parameters */
-  struct command_parameter_list* par;  /* parameter pointer list */
-};
+#include "mad_dict.h"
 
-struct command_list /* contains list of command pointers sorted by name */
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of names */
-  int stamp;
-  struct command** commands;    /* command pointer list */
-};
+// types modules
 
-struct command_list_list /* contains list of command lists */
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of names */
-  struct command_list** command_lists;    /* command_list pointer list */
-  int stamp;
-};
+#include "mad_cst.h"
+#include "mad_var.h"
+#include "mad_name.h"
+#include "mad_expr.h"
+#include "mad_const.h"
 
-struct command_parameter        /* holds one command parameter */
-{
-  char name[NAME_L];
-  int type;                           /* 0 logical 1 integer 2 double
-                                         3 string 4 constraint */
-                                      /* 11 int array 12 double array
-                                         13 string array */
-  int c_type;                         /* for type 4:
-                                         1 min, 2 max, 3 both, 4 value */
-  double double_value;                /* type 0, 1, 2, 4 */
-  double c_min;                       /* type 4 */
-  double c_max;                       /* type 4 */
-  struct expression* expr;            /* type 1, 2, 4 */
-  struct expression* min_expr;        /* type 4 */
-  struct expression* max_expr;        /* type 4 */
-  char* string;                       /* type 3 */
-  int stamp;
-  struct double_array* double_array;  /* type 11, 12 */
-  struct expr_list* expr_list;        /* type 11, 12 */
-  struct char_p_array* m_string;      /* type 13 */
-  struct command_parameter* call_def; /* contains definitions for "bare"
-                                         parameter input, e.g. option,echo */
-};
+#include "mad_rpn.h"
+#include "mad_eval.h"
+#include "mad_exec.h"
+#include "mad_array.h"
+#include "mad_logic.h"
+#include "mad_macro.h"
+#include "mad_parse.h"
+#include "mad_range.h"
+#include "mad_regex.h"
+#include "mad_select.h"
+#include "mad_stream.h"
 
-struct command_parameter_list /* contains list of command parameter pointers */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                             /* max. pointer array size */
-    curr;                            /* current occupation */
-  struct command_parameter** parameters;  /* command_parameter pointer list */
-};
+// core modules
 
-struct constant
-{
-  char name[NAME_L];
-  struct expression* exp;       /* pointer to defining expression (always) */
-  double value;
-  int stamp;
-};
+#include "mad_err.h"
+#include "mad_mem.h"
+#include "mad_out.h"
+#include "mad_str.h"
+#include "mad_vec.h"
+#include "mad_core.h"
+#include "mad_math.h"
+#include "mad_rand.h"
+#include "mad_plot.h"
+#include "mad_time.h"
+#include "mad_util.h"
+#include "mad_help.h"
 
-struct constraint /* contains one constraint */
-{
-  char name[NAME_L];
-  int  type;                    /* 1 minimum */
-                                /* 2 maximum */
-                                /* 3 both 1 + 2 */
-                                /* 4 value */
-  int stamp;
-  double value,
-    c_min,
-    c_max,
-    weight;
-  struct expression   *ex_value,
-    *ex_c_min,
-    *ex_c_max;
-};
+// command modules
 
-struct constraint_list /* contains list of constraints */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                           /* max. pointer array size */
-    curr;                          /* current occupation */
-  struct constraint** constraints;    /* command pointer list */
-};
+#include "mad_cmd.h"
+#include "mad_cmdin.h"
+#include "mad_cmdpar.h"
+#include "mad_option.h"
 
-struct double_array        /* dynamic array of double */
-{
-  int stamp;
-  int  max,                     /* max. array size */
-    curr;                    /* current occupation */
-  double* a;
-};
+// sequence modules
 
-struct element             /* each element is unique */
-{
-  char name[NAME_L];
-  int def_type;                 /* 0 if defined separately,
-                                   1 if inside sequence */
-  int bv;                       /* bv: 0 false, 1 true (invert angle for
-                                   sequence bv = -1) */
-  double length;
-  struct command* def;          /* pointer to defining command */
-  struct element* parent;       /* pointer to parent of element */
-                                /* *this for base_type elements (rbend etc.) */
-  int stamp;
-  struct element* base_type;    /* pointer to base_type of element */
-                                /* *this for base_type elements (rbend etc.) */
-};
+#include "mad_seq.h"
+#include "mad_node.h"
+#include "mad_beam.h"
+#include "mad_table.h"
 
-struct el_list /* contains list of element pointers sorted by name */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of names */
-  struct element** elem;        /* element pointer list */
-};
+// elements modules
 
-struct expression
-{
-  char name[NAME_L];
-  char* string;                 /* expression in string form */
-  int status;                   /* status flag: 0 not evaluated
-            1 evaluated */
-  struct int_array* polish;     /* pointer to Polish notation, or NULL */
-  double value;                 /* actual value */
-  int stamp;
-};
+#include "mad_elem.h"
+#include "mad_elemdrift.h"
+#include "mad_elemmultp.h"
+#include "mad_elemerr.h"
+#include "mad_elemprobe.h"
+#include "mad_elemrfc.h"
 
-struct expr_list
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct expression** list;     /* expression pointer list */
-};
+// physics modules
 
-struct in_buffer
-{
-  char name[NAME_L];
-  int flag;                    /* flag for logical tests */
-  struct char_array* c_a;
-  int stamp;
-};
+#include "mad_aper.h"
+#include "mad_dynap.h"
+#include "mad_emit.h"
+#include "mad_ibs.h"
+#include "mad_match.h"
+#include "mad_match2.h"
+#include "mad_mkthin.h"
+#include "mad_orbit.h"
+#include "mad_survey.h"
+#include "mad_touschek.h"
+#include "mad_track.h"
+#include "mad_twiss.h"
 
-struct in_buff_list
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation = call level */
-  FILE** input_files;           /* input file pointers */
-  int stamp;
-  struct in_buffer** buffers;     /* in_buff pointer list */
-};
+#include "mad_ptc.h"
 
-struct in_cmd          /* contains information about classified command */
-{
-  char name[NAME_L];
-  char* label;         /* pointer to label: if != NULL then buffer this */
-  int type;            /*    0 command from list;
-                             1 element definiton outside sequence;
-                             2 variable definition;
-                             3 start or end of sequence;
-                             4 element definition; */
-  int sub_type;        /* position in cmd_match_base */
-  int stamp;
-  int decl_start;      /* start of declarative part in tok_list */
-  int clone_flag;      /* if zero, clone can be dropped after decoding */
-  struct char_p_array* tok_list; /* contains pointers to tokens */
-  struct command* cmd_def;       /* points to command definition */
-  struct command* clone;         /* points to clone of command definition */
-};
+// interface modules
 
-struct in_cmd_list /* contains list of in_cmd pointers sorted by label */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* labels;     /* index list of labels */
-  struct in_cmd** in_cmds;      /* in_cmd pointer list */
-};
+#include "mad_sxf.h"
+#include "mad_sodd.h"
+#include "mad_6track.h"
 
-struct int_array           /* dynamic array of int */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. array size */
-    curr;                    /* current occupation */
-  int* i;
-};
+// global constants (should disappear)
 
-struct macro     /* stores one line or macro definition */
-{
-  char name[NAME_L];
-  int n_formal;                 /* no. of formal parameters */
-  int dead;                     /* set to 1 to prevent line from expansion */
-  struct char_p_array* formal;  /* list of formal parameters */
-  struct char_p_array* tokens;  /* token pointers into body if split (line) */
-  struct char_array* body;      /* contains all statements */
-  int stamp;
-};
+#include "mad_gcst.h"
 
-struct macro_list
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;
-  struct macro** macros;
-};
+// global variables (should disappear)
 
-struct name_list /* contains list of index sorted names plus int inform. */
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  int* index;                   /* index for alphabetic access */
-  int* inform;                  /* array parallel to names with integer */
-  int stamp;
-  char** names;                 /* element names for sort */
-};
+#include "mad_gvar.h"
 
-struct node                /* the sequence is a linked list of nodes */
-{
-  char name[NAME_L];
-  char* base_name;           /* basic type */
-  struct node* previous;
-  struct node* next;
-  int share;               /* 0 normal, 1 if shared */
-  int occ_cnt;             /* element occurrence count at node */
-  int obs_point;           /* observation point number (tracking) */
-  int sel_err;             /* error select flag */
-  int sel_sector;          /* sectormap select flag */
-  int con_cnt;             /* constraint counter */
-  int enable;              /* flag for correctors and monitors: 0 off, 1 on */
-  int moved;               /* temporary flag during sequence editing */
-  int stamp;
-  double position;         /* s position in sequence [m] */
-  double at_value;
-  double length;
-  double dipole_bv;        /* +1 or -1 (if beam_bv AND element_bv) */
-  double other_bv;         /* equal to beam_bv (+1 or -1) */
-  double chkick;           /* calculated by orbit correction module */
-  double cvkick;           /* calculated by orbit correction module */
-  double match_data[74];   /* array for fast access to twiss data for match */
-  struct expression* at_expr;
-  char* from_name;
-  struct element* p_elem;  /* pointer to element if any */
-  struct sequence* p_sequ;  /* pointer to sequence if any */
-  struct double_array* p_al_err; /* pointer to alignment error array */
-  struct double_array* p_fd_err; /* pointer to field error array */
-  struct command* savebeta; /* pointer to savebeta command if any */
-  struct constraint_list* cl; /* pointer to constraint list during match */
-  struct double_array* obs_orbit; /* for track observation point */
-  struct double_array* orbit_ref; /* for threader orbit + cum. matrix */
-};
+// global functions (should disappear)
 
-struct node_list /* contains list of node pointers sorted by name */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of node (!) names */
-                                /* node_name = el_name:occ_cnt */
-  struct node** nodes;          /* node pointer list */
-};
-
-struct sequence
-{
-  /* original sequence */
-  char name[NAME_L];
-  char export_name[NAME_L];
-  char* refpos;                 /* reference position for insertion */
-  int ref_flag;                 /* -1 for exit, 0 for centre, 1 for entry */
-  int share;                    /* 0 normal, 1 if shared */
-  int nested;                   /* 0 flat, 1 if nested */
-  int con_cnt;                  /* constraint counter */
-  int stamp;
-  int line;                     /* set to 1 if origin is a line */
-  double length;                /* length as in declaration */
-  struct expression* l_expr;    /* length expression as in declaration */
-  struct node* start;           /* first node in sequence */
-  struct node* end;             /* last node in sequence */
-  struct node_list* nodes;      /* alphabetic list of nodes */
-  struct el_list* cavities;     /* alphabetic list of cavities */
-  struct el_list* crabcavities;     /* alphabetic list of crab cavities */
-  struct command* beam;         /* pointer to beam attached */
-  /* expanded sequence */
-  int n_nodes;                  /* number of nodes when expanded */
-  int start_node;               /* first node of current range in all_nodes */
-  struct node* ex_start;        /* first node in expanded sequence */
-  struct node* ex_end;          /* last node in expanded sequence */
-  struct node* range_start;     /* first node of current range in sequence */
-  struct node* range_end;       /* last node of current range in sequence */
-  struct node** all_nodes;      /* sequential list of all nodes */
-  struct node_list* ex_nodes;   /* alphabetic list of nodes (no drifts) */
-  struct table* tw_table;       /* pointer to latest twiss table created */
-  struct constraint_list* cl;   /* pointer to constraint list during match */
-  struct vector_list* orbits;   /* pointer to list of stored orbits */
-};
-
-struct sequence_list /* contains list of sequence pointers sorted by name */
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of names */
-  struct sequence** sequs;      /* sequence pointer list */
-  int stamp;
-};
-
-struct table
-{
-  char name[NAME_L],
-    type[NAME_L];            /* like "twiss", "survey" etc. */
-  int  max,                     /* max. # rows */
-    curr,                    /* current # rows */
-    num_cols,                /* total # columns - fixed */
-    org_cols,                /* original # columns from definition */
-    dynamic,                 /* if != 0, values taken from current row */
-    origin;                  /* 0 if created in job, 1 if read */
-  struct char_p_array* header;  /* extra lines for file header */
-  struct int_array* col_out;    /* column no.s to be written (in this order) */
-  struct int_array* row_out;    /* flag for row: 1 write, 0 don't */
-  struct char_p_array* node_nm; /* names of nodes at each row */
-  struct char_p_array** l_head; /* extra lines to be put in front of a line */
-  struct node** p_nodes;        /* pointers to nodes at each row */
-  char*** s_cols;               /* string columns */
-  double** d_cols;              /* double precision columns */
-  int stamp;
-  struct name_list* columns;    /* names + types (in inform):
-                                   1 double, 3 string */
-  struct sequence* org_sequ;    /* pointer to sequence it refers to */
-};
-
-struct table_list
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* names;      /* index list of tables */
-  struct table** tables;
-  int stamp;
-};
-
-struct table_list_list
-{
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct table_list** table_lists;
-  int stamp;
-};
-
-struct variable
-{
-  char name[NAME_L];
-  int status;                 /* 0 value not evaluated, 1 evaluated */
-  int type;                   /* 0 constant, 1 direct, 2 deferred, 3 string */
-  int val_type;               /* 0 int 1 double (0..2) */
-  char* string;               /* pointer to string if 3 */
-  struct expression* expr;    /* pointer to defining expression (0..2) */
-  double value;               /* (0..2) */
-  int stamp;
-};
-
-struct var_list /* contains list of variable pointers sorted by name */
-{
-  int stamp;
-  char name[NAME_L];
-  int  max,                     /* max. pointer array size */
-    curr;                    /* current occupation */
-  struct name_list* list;       /* index list of names */
-  struct variable** vars;       /* variable pointer list */
-};
-
-struct vector_list        /* contains named vectors */
-{
-  int curr,
-    max;
-  struct name_list* names;
-  struct double_array** vectors;
-};
-
-/*
-  start of corrector module structures
-*/
-
-struct val_mic {
-  double before[2];
-  double after[2];
-};
-
-struct id_mic {
-  int   id_ttb;
-  int   enable;
-  struct val_mic val;
-  struct node* p_node;
-  struct id_mic *next;
-  struct id_mic *previous;
-};
-
-struct id_mic2 {
-  int   id_ttb[2];
-  int   enable;
-  struct val_mic val;
-  struct node* p_node;
-  struct node* p_node_s1;
-  struct node* p_node_s2;
-  struct id_mic2 *next;
-  struct id_mic2 *previous;
-};
-
-struct orb_cor {
-  double qx0;
-  double qy0;
-  double units;
-  struct id_mic *cor_table;
-  struct id_mic *mon_table;
-};
-
-struct orb_cor2 {
-  double qx0;
-  double qy0;
-  double units;
-  struct id_mic2 *cor_table;
-  struct id_mic2 *mon_table;
-};
-
-enum Match_Mode{kMatch_NoMatch = 0, kMatch_Std, kMatch_UseMacro, kMatch_PTCknobs};
+#include "mad_gfun.h"
 
 #endif

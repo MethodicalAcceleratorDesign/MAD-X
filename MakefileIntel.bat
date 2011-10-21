@@ -1,4 +1,4 @@
-@ECHO OFF
+ @ECHO OFF
 SET user_main=.
 REM FPP code
 SET FPP=.

@@ -114,13 +114,12 @@ module twiss_elpfi
   integer    h_tilt, h_lrad , h_kick, h_hkick, h_chkick
   parameter (h_tilt = 7, h_lrad = 8, h_kick = 9, h_hkick = 10,       &
        h_chkick = 11)
-  !-hkick----------------------------------------------------------------*
+  !-vkick----------------------------------------------------------------*
   integer    v_tilt, v_lrad , v_kick, v_vkick, v_cvkick
   parameter (v_tilt = 7, v_lrad = 8, v_kick = 9, v_vkick = 10,       &
        v_cvkick = 11)
   !-kick-----------------------------------------------------------------*
-  integer    k_tilt, k_lrad , k_hkick, k_vkick, k_chkick,            &
-       k_cvkick
+  integer    k_tilt, k_lrad , k_hkick, k_vkick, k_chkick, k_cvkick
   parameter (k_tilt = 7, k_lrad = 8, k_hkick = 9, k_vkick = 10,      &
        k_chkick = 11, k_cvkick = 12)
 end module twiss_elpfi

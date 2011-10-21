@@ -16,7 +16,6 @@
 /*define function names depending if we are in MS WIN or elsewhere*/
 #ifndef WIN32
 
-
 # define newrplot newrplot_
 # define plottrack plottrack_
 # define plottwiss plottwiss_
@@ -27,7 +26,6 @@
 # define madxv_setfunctionat madxv_setfunctionat_
 
 # define type_ofCall
-
 
 #else
 
@@ -43,16 +41,14 @@
 # define type_ofCall  _stdcall
 #endif
 
-
 void *rplot_handle = 0x0;
 
 /*pointer to rplotter function, C intrtface to MadxPlotter::Fill, see MadxPlotter for details */
-typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,double,double,double);/*function type definition*/
-rplot_plottrack_fctn rplot_plottrack = 0x0; /*pointer to function*/
+typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,double,double,double);
 
+rplot_plottrack_fctn rplot_plottrack = 0; /*pointer to function*/
 
-
-void loadrplotlib();
+void loadrplotlib(void);
  
 extern type_OfExtern
 void type_ofCall plottrack(int* particleno, int* obspoint,  int* turn, double* x, double* xp,
@@ -67,13 +63,9 @@ void type_ofCall  plottwiss(int* obspoint,
                             double* betaz, double* alfaz,
                             double* length);
   
-extern type_OfExtern void type_ofCall rplotfinish();
-extern type_OfExtern void type_ofCall rviewer();
+extern type_OfExtern void type_ofCall rplotfinish(void);
+extern type_OfExtern void type_ofCall rviewer(void);
 extern type_OfExtern void type_ofCall madxv_setfctnname(int* n, const char* name);
 extern type_OfExtern void type_ofCall madxv_setfunctionat(int* n, int* el, const char* name);
 
-
-
-
-
-#endif 
+#endif // RPLOT_H

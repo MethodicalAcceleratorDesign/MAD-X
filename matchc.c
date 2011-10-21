@@ -2,13 +2,6 @@
 
 #include "matchptcknobs.h"
 
-#ifdef _WRAP_FORTRAN_CALLS
-#include "fortran_wrappers.h"
-#endif
-#ifdef _WRAP_C_CALLS
-#include "c_wrappers.h"
-#endif
-
 void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
            double*, int*, double*, double*, double*, double*, double*);
 void match_action(struct in_cmd* cmd)
@@ -178,7 +171,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       match_is_on=0;
       pro_input(execute);
       match_is_on=2;
-      if (errorflag == 0)
+      if (!geterrorflag())
       {
         *stab_flag=0;
         k=match2_evaluate_exressions(i,k,fun_vec);
@@ -224,7 +217,7 @@ void mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
 
       pro_twiss();
-      if ((twiss_success) && (errorflag == 0))
+      if (twiss_success && !geterrorflag())
       {
         *stab_flag = 0;
         collect_(&current_const, &penalty, fun_vec);
