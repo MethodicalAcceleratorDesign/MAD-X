@@ -1,6 +1,6 @@
 
 # list of source files
-file(GLOB srcfiles *.c *.f90 *.F90 )
+file(GLOB srcfiles mad_*.c *.f90 *.F90 )
 
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
@@ -11,7 +11,6 @@ endif()
 
 list(REMOVE_ITEM srcfiles ${main_file} ${to_remove})
 
-message("sources: ${srcfiles}")
 if(NOT MADX_FORCE_32)
     # find laplas and blas
     find_package(LAPACK)
@@ -30,9 +29,9 @@ endif()
 if (MADX_NTPSA )
   message(STATUS "NTPSA turned on")
   file(GLOB to_remove c_dabnew.f90)
-  set(csrcfiles ${csrcfiles} tpsa.cpp)
+  set(srcfiles ${srcfiles} tpsa.cpp)
 else (MADX_NTPSA )
-  file(GLOB to_remove c_dabnew_berz.f90 c_tpsa_interface.F90)
+  file(GLOB to_remove c_dabnew_berz.f90 c_tpsa_interface.f90)
 endif  (MADX_NTPSA )
 list(REMOVE_ITEM srcfiles ${to_remove})
 
