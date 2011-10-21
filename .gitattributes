@@ -82,7 +82,6 @@ cmakesrc/setupSources.cmake -text
 cmakesrc/setupTargets.cmake -text
 cmakesrc/setupTesting.cmake -text
 cmakesrc/setupVersion.cmake -text
-cmakesrc/setupWrappers.cmake -text
 /d_lielib.f90 -text
 /doxygen.h -text
 /dynap.f90 -text

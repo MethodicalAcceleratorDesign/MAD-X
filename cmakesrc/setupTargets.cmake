@@ -4,7 +4,7 @@ add_library(madx ${srcfiles})
 set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran) 
 
 # adding an executable:
-add_executable(madxbin MACOSX_BUNDLE  madx_main.F90)
+add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
 set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran)
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
