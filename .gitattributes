@@ -41,7 +41,7 @@
 /b_da_arrays_all.f90 -text
 /c_dabnew.f90 -text
 /c_dabnew_berz.f90 -text
-/c_tpsa_interface.F90 -text
+/c_tpsa_interface.f90 -text
 cmakesrc/FindGSL.cmake -text
 cmakesrc/FindSDDS.cmake -text
 cmakesrc/LinuxLF95.cmake -text
@@ -87,7 +87,6 @@ cmakesrc/setupWrappers.cmake -text
 /doxygen.h -text
 /dynap.f90 -text
 /emit.f90 -text
-/fortran_flush.F90 -text
 /gxx11.f90 -text
 /gxx11c.c -text
 /gxx11ps.f90 -text
