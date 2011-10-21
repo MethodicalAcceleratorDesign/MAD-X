@@ -173,6 +173,7 @@ lib64/libz.a -text
 /mad_help.h -text
 /mad_ibs.c -text
 /mad_ibs.h -text
+/mad_init_f.f90 -text
 /mad_logic.c -text
 /mad_logic.h -text
 /mad_macro.c -text
