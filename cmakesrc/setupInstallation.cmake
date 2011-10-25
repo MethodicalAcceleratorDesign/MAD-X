@@ -33,11 +33,6 @@ INSTALL(TARGETS ${mtargets}
 # We only want this in the development version...
 if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 INSTALL (FILES ${headerfiles} 
-  ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers.h 
-  ${CMAKE_CURRENT_BINARY_DIR}/c_wrappers_prototypes.h
-  ${CMAKE_CURRENT_BINARY_DIR}/c_prototypes.h
-  ${CMAKE_CURRENT_BINARY_DIR}/fortran_prototypes.h
-  ${CMAKE_CURRENT_BINARY_DIR}/fortran_wrappers.h 
   DESTINATION "include/${PROJECT_NAME}")
 endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 

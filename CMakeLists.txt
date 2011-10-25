@@ -26,10 +26,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc")
 if(CMAKE_VERSION MATCHES "2.6.")
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc/compilers") 
 endif()
-include(madxInit)
 
-# Setting project version:
-include(setupVersion)
+# Some initializations specific for Mad-X
+include(madxInit)
 
 # Defining project options:
 include(setupOptions)
