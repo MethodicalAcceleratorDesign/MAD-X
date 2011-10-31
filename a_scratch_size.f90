@@ -169,7 +169,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=one
+  REAL(dp),TARGET   :: absolute_aperture=c_1d3
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
