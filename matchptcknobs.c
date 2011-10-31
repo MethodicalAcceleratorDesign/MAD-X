@@ -134,9 +134,9 @@ static void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks);
 static int  madx_mpk_scalelimits(int nv);
 static int  findsetknob(char* ename, int exactnamematch,char* initialpar);
 static int  mapptctomad(char* ptcname,char* madxname);
-static int  readstartvalues();
+static int  readstartvalues(void);
 static int  factorial(int v);
-static double match2_summary();
+static double match2_summary(void);
 
 /*******************************************/
 /*MAD-X Global Variables used in this file */
@@ -563,7 +563,7 @@ void madx_mpk_run(struct in_cmd* cmd)
 }
 /*_________________________________________________________________________*/
 
-void madx_mpk_prepare()
+void madx_mpk_prepare(void)
 {
 /* prepares the internal variables*/
   int i; /**/
@@ -608,7 +608,7 @@ void madx_mpk_prepare()
 }
 /*_________________________________________________________________________*/
 
-int madx_mpk_init()
+int madx_mpk_init(void)
 {
   /*performs initialization,
     prepares commands for exacution out of gethered user information*/
@@ -1017,7 +1017,7 @@ int mapptctomad(char* ptcname, char* madxname)
 }
 /*_________________________________________________________________________*/
 
-int  readstartvalues()
+int  readstartvalues(void)
 {
 /*
   reads the starting values of variable to initializ currentvalue
@@ -1318,7 +1318,7 @@ void madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks)
 }
 /*_________________________________________________________________________*/
 
-void madx_mpk_end()
+void madx_mpk_end(void)
 {
 
 /*
@@ -1587,7 +1587,7 @@ int run_ptccalculation(int setknobs, char* readstartval)
 }
 
 
-double match2_summary()
+double match2_summary(void)
 {
   int i,j;
 

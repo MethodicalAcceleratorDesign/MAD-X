@@ -332,7 +332,7 @@ void match_end(struct in_cmd* cmd)
   }
 
   if (match_is_on == kMatch_PTCknobs) {
-    madx_mpk_end(cmd);
+    madx_mpk_end();
     return;
   }
 

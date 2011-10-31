@@ -13,11 +13,11 @@
 #include "math.h"
 
 void madx_mpk_run(struct in_cmd* cmd);
-void madx_mpk_prepare();
-int  madx_mpk_init();
+void madx_mpk_prepare(void);
+int  madx_mpk_init(void);
 void madx_mpk_addvariable(struct in_cmd* cmd);
 void madx_mpk_addconstraint(const char* constr);
-void madx_mpk_end();
+void madx_mpk_end(void);
 
 void madx_mpk_setcreateuniverse(struct in_cmd* cmd);
 void madx_mpk_setcreatelayout(struct in_cmd* cmd);

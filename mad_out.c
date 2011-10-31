@@ -1,11 +1,13 @@
 #include "madx.h"
 
+/*
 void
 cf77flush(void)
 {
   fflush(stdout);
   fflush(stderr);
 }
+*/
 
 void
 write_nice(char* string, FILE* file)

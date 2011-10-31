@@ -22,9 +22,9 @@ int  match2_augmentnconstraints(void); /*increases space in the working arrays*/
 
 /* frs 10.03.2008 */
 int  match2_print_var(struct in_cmd*);
-void match2_delete_arrays();
-void match2_alloc_arrays();
-void match2_init_arrays();
+void match2_delete_arrays(void);
+void match2_alloc_arrays(void);
+void match2_init_arrays(void);
 
 // variables
 
