@@ -163,7 +163,6 @@ lib64/libz.a -text
 /mad_expr.h -text
 /mad_gcst.c -text
 /mad_gcst.h -text
-/mad_gfun.h -text
 /mad_gvar.c -text
 /mad_gvar.h -text
 /mad_help.c -text
