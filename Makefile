@@ -259,7 +259,7 @@ endif
 default: madx
 
 # dependencies of madxp which combines the C-code
-madxp.o: madxp.c matchc.c matchc2.c madx.h matchptcknobs.h
+madxp.o: madxp.c madx.h matchptcknobs.h
 	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
 
 matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h

@@ -3,18 +3,6 @@
 #include "madx.h"
 
 struct element*
-clone_element(struct element* el)
-{
-  struct element* clone = new_element(el->name);
-  clone->length = el->length;
-  clone->bv = el->bv;
-  clone->def = el->def;
-  clone->parent = el;
-  clone->base_type = el->base_type;
-  return clone;
-}
-
-struct element*
 new_element(char* name)
 {
   char rout_name[] = "new_element";
@@ -44,18 +32,27 @@ struct el_list*
 new_el_list(int length)
 {
   char rout_name[] = "new_el_list";
-  struct el_list* ell
-    = (struct el_list*) mycalloc(rout_name,1, sizeof(struct el_list));
+  struct el_list* ell = mycalloc(rout_name,1, sizeof(struct el_list));
   strcpy(ell->name, "el_list");
   ell->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ell->name);
   ell->list = new_name_list(ell->name, length);
-  ell->elem
-    = (struct element**) mycalloc(rout_name,length, sizeof(struct element*));
+  ell->elem = mycalloc(rout_name,length, sizeof(struct element*));
   ell->max = length;
   return ell;
 }
 
+struct element*
+clone_element(struct element* el)
+{
+  struct element* clone = new_element(el->name);
+  clone->length = el->length;
+  clone->bv = el->bv;
+  clone->def = el->def;
+  clone->parent = el;
+  clone->base_type = el->base_type;
+  return clone;
+}
 
 struct element*
 make_element(char* name, char* parent, struct command* def, int flag)

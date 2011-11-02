@@ -98,6 +98,7 @@
 // interface modules
 
 #include "mad_sxf.h"
+#include "mad_sdds.h"
 #include "mad_sodd.h"
 #include "mad_6track.h"
 
@@ -108,9 +109,5 @@
 // global variables (should disappear)
 
 #include "mad_gvar.h"
-
-// global functions (should disappear)
-
-#include "mad_gfun.h"
 
 #endif

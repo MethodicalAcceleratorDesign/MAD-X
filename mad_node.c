@@ -4,27 +4,11 @@ struct node*
 new_node(char* name)
 {
   char rout_name[] = "new_node";
-  struct node* p = (struct node*) mycalloc(rout_name,1, sizeof(struct node));
+  struct node* p = mycalloc(rout_name,1, sizeof(struct node));
   strcpy(p->name, name);
   p->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", p->name);
   return p;
-}
-
-struct node_list*
-new_node_list(int length)
-{
-  char rout_name[] = "new_node_list";
-  struct node_list* nll =
-    (struct node_list*) mycalloc(rout_name,1, sizeof(struct node_list));
-  strcpy(nll->name, "node_list");
-  nll->stamp = 123456;
-  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
-  nll->list = new_name_list(nll->name, length);
-  nll->nodes
-    = (struct node**) mycalloc(rout_name,length, sizeof(struct node*));
-  nll->max = length;
-  return nll;
 }
 
 struct node*
@@ -67,19 +51,18 @@ delete_node(struct node* p)
   return NULL;
 }
 
-struct node*
-delete_node_ring(struct node* start)
+struct node_list*
+new_node_list(int length)
 {
-  struct node *p, *q;
-  if (start == NULL) return NULL;
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", "node_ring");
-  q = start->next;
-  while (q != NULL && q != start)
-  {
-    p = q; q = q->next; delete_node(p);
-  }
-  delete_node(start);
-  return NULL;
+  char rout_name[] = "new_node_list";
+  struct node_list* nll = mycalloc(rout_name,1, sizeof(struct node_list));
+  strcpy(nll->name, "node_list");
+  nll->stamp = 123456;
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
+  nll->list = new_name_list(nll->name, length);
+  nll->nodes = mycalloc(rout_name,length, sizeof(struct node*));
+  nll->max = length;
+  return nll;
 }
 
 struct node_list*
@@ -93,6 +76,21 @@ delete_node_list(struct node_list* l)
   if (l->nodes != NULL)  myfree(rout_name, l->nodes);
   if (l->list != NULL)  delete_name_list(l->list);
   myfree(rout_name, l);
+  return NULL;
+}
+
+struct node*
+delete_node_ring(struct node* start)
+{
+  struct node *p, *q;
+  if (start == NULL) return NULL;
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", "node_ring");
+  q = start->next;
+  while (q != NULL && q != start)
+  {
+    p = q; q = q->next; delete_node(p);
+  }
+  delete_node(start);
   return NULL;
 }
 

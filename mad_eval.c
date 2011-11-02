@@ -139,12 +139,11 @@ process(void)  /* steering routine: processes one command */
         if (sequ_is_on)
           /* element or sequence reference in sequence */
         {
-          if ((pos =
-               name_list_pos(name, sequences->list)) < 0)
+          if ((pos = name_list_pos(name, sequences->list)) < 0)
             enter_element(this_cmd);
           else
           {
-            this_cmd->cmd_def  = find_command("sequence", defined_commands);
+            this_cmd->cmd_def = find_command("sequence", defined_commands);
             this_cmd->clone = clone_command(this_cmd->cmd_def);
             strcpy(this_cmd->clone->name, name);
             scan_in_cmd(this_cmd);
@@ -168,8 +167,7 @@ process(void)  /* steering routine: processes one command */
         break;
       default:
         warning("unknown command type:",
-                join_b(this_cmd->tok_list->p,
-                       this_cmd->tok_list->curr));
+                join_b(this_cmd->tok_list->p, this_cmd->tok_list->curr));
     }
     if (this_cmd != NULL && (this_cmd->type == 0 || this_cmd->type == 2))
     {

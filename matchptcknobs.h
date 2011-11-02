@@ -23,4 +23,5 @@ void madx_mpk_setcreateuniverse(struct in_cmd* cmd);
 void madx_mpk_setcreatelayout(struct in_cmd* cmd);
 void madx_mpk_setsetswitch(struct in_cmd* cmd);
 void madx_mpk_setcalc(struct in_cmd* cmd);
-#endif
+
+#endif // MATCHPTCKNOBS_H

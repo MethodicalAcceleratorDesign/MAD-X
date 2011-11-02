@@ -51,12 +51,12 @@ force_consistent_slices(void)
  if not, use the maximum for both
  */
 {
-  struct element* el_i;
+//  struct element* el_i;
   struct command_parameter *child,*parent;
   int i,el_i_slice_pos,slices,slices_parent;
   for(i=0; i< element_list->curr; i++) /* loop over element_list */
   {
-    el_i = element_list->elem[i];
+    struct element* el_i = element_list->elem[i];
     el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
     if(el_i_slice_pos>0 && el_i->parent!=NULL && el_i != el_i->parent )
     {

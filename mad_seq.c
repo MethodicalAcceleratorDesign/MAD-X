@@ -879,8 +879,7 @@ expand_curr_sequ(int flag)
     current_sequ->n_nodes =
       add_drifts(current_sequ->ex_start, current_sequ->ex_end);
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
-    current_sequ->all_nodes
-      = (struct node**) mymalloc(rout_name, current_sequ->n_nodes * sizeof(struct node*));
+    current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof(struct node*));
     c_node = current_sequ->ex_start;
     for (j = 0; j < current_sequ->n_nodes; j++)
     {
