@@ -1,7 +1,6 @@
 * text=auto !eol
 /CMakeLists.txt -text
 /CTestConfig.cmake -text
-/Doxyfile -text
 /License.txt -text
 /Makefile -text
 /Makefile.bat -text
@@ -82,7 +81,6 @@ cmakesrc/setupSources.cmake -text
 cmakesrc/setupTargets.cmake -text
 cmakesrc/setupTesting.cmake -text
 /d_lielib.f90 -text
-/doxygen.h -text
 /dynap.f90 -text
 /emit.f90 -text
 /gxx11.f90 -text
