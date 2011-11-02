@@ -1,6 +1,10 @@
 #ifndef MAD_GCST_H
 #define MAD_GCST_H
 
+extern const char *myversion;
+extern const char *version_type;
+extern const char *code_mod_date;
+
 // Temporary file: global constants
 // these constants should be split over their respective modules...
 // and should be const pointers to constant values...

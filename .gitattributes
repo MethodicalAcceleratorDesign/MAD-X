@@ -211,6 +211,7 @@ lib64/libz.a -text
 /mad_rpn.c -text
 /mad_rpn.h -text
 /mad_sdds.c -text
+/mad_sdds.h -text
 /mad_select.c -text
 /mad_select.h -text
 /mad_seq.c -text

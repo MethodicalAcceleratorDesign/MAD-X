@@ -197,9 +197,6 @@ extern char int_format[20],             /* current integer format */
 extern char var_form[1000];             /* buffer for the user-controlled formats */
 extern char blank[];
 extern char none[];
-extern char myversion[];
-extern char version_type[];
-extern char code_mod_date[];
 extern char one_string[];
 extern char aptwfile[FNAME_L]; /* IW 02.12.2004 */
 extern char* aux_char_pt;               /* for debug purposes */

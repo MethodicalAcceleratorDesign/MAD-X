@@ -195,10 +195,6 @@ char int_format[20],             /* current integer format */
 char var_form[1000];             /* buffer for the user-controlled formats */
 char blank[] = "    ";
 char none[] = "none";
-char myversion[] = "MAD-X 5.00.07";
-char version_type[] =    "DEBUG Version - use at own risk!";
-/* char version_type[] = "       Production Version       ";    */
-char code_mod_date[] = "Code Modification Date: 23.06.2011";
 char one_string[] = "1";
 char aptwfile[FNAME_L] = "dummy"; /* IW 02.12.2004 */
 char* aux_char_pt;               /* for debug purposes */
