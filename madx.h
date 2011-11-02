@@ -93,9 +93,12 @@
 #include "mad_track.h"
 #include "mad_twiss.h"
 
-#include "mad_ptc.h"
+// ptc interface modules
 
-// interface modules
+#include "mad_ptc.h"
+#include "mad_ptcknobs.h"
+
+// I/O interface modules
 
 #include "mad_sxf.h"
 #include "mad_sdds.h"

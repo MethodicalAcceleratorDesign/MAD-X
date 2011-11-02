@@ -202,6 +202,8 @@ lib64/libz.a -text
 /mad_plot.h -text
 /mad_ptc.c -text
 /mad_ptc.h -text
+/mad_ptcknobs.c -text
+/mad_ptcknobs.h -text
 /mad_rand.c -text
 /mad_rand.h -text
 /mad_range.c -text
@@ -261,8 +263,6 @@ lib64/libz.a -text
 /matchjc.f90 -text
 /matchlib.f90 -text
 /matchlib2.f90 -text
-/matchptcknobs.c -text
-/matchptcknobs.h -text
 /matchsa.f90 -text
 /n_complex_polymorph.f90 -text
 /o_tree_element.f90 -text

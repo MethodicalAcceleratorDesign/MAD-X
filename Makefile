@@ -259,10 +259,8 @@ endif
 default: madx
 
 # dependencies of madxp which combines the C-code
-madxp.o: madxp.c madx.h matchptcknobs.h
+madxp.o: madxp.c madx.h
 	$(CC) $(GCCP_FLAGS) -c -o madxp.o madxp.c
-
-matchptcknobs.o: matchptcknobs.h matchptcknobs.c madx.h
 
 # new C mad_* files dependencies (should be built automatically)
 MAD_H := $(wildcard mad_*.h)
@@ -381,7 +379,7 @@ matchlib2.o: matchlib2.f90
 
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
 mad_objects = $(patsubst %.c,%.o,$(wildcard mad_*.c))
-madx_objects = madxp.o gxx11c.o matchptcknobs.o rplot.o $(mad_objects) $(TPSA) 
+madx_objects = madxp.o gxx11c.o rplot.o $(mad_objects) $(TPSA) 
 madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), $(patsubst %.f90,%.o,$(wildcard *.f90)))
 
 madx: $(madx_objects)

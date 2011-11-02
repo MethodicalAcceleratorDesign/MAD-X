@@ -1,16 +1,11 @@
-#ifndef MATCHPTCKNOBS_H
-#define MATCHPTCKNOBS_H
+#ifndef MAD_MATCHPTCKNOBS_H
+#define MAD_MATCHPTCKNOBS_H
 
-#include <stdio.h>
+// types
 
-#define NAME_L 48           /* internal name length */
-#define FIELD_MAX 42        /* field error array length */ /*defined in madxl.h*/
+struct in_cmd;
 
-/* IA */
-#define E_D_MAX 500         /* max. length of extra displacement tables (per element) */
-
-#include "madx.h"
-#include "math.h"
+// interface
 
 void madx_mpk_run(struct in_cmd* cmd);
 void madx_mpk_prepare(void);
@@ -24,4 +19,4 @@ void madx_mpk_setcreatelayout(struct in_cmd* cmd);
 void madx_mpk_setsetswitch(struct in_cmd* cmd);
 void madx_mpk_setcalc(struct in_cmd* cmd);
 
-#endif // MATCHPTCKNOBS_H
+#endif // MAD_MATCHPTCKNOBS_H
