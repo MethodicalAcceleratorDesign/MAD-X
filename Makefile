@@ -16,9 +16,6 @@
 # | $Id$
 # |
 
-# must be first
-include make/make.lib
-
 ###################
 # Project Settings
 
@@ -65,6 +62,14 @@ CXX := g++
 FC  := ifort
 
 #
+# Files settings
+#
+
+FILES_C   := Makefiles_c
+FILES_CXX := Makefiles_cpp
+FILES_F90 := Makefiles_f90
+
+#
 # Platform settings
 #
 
@@ -74,28 +79,38 @@ OSVERS := $(shell uname -r)
 OSARCH := $(shell uname -m)
 
 # build directory
-OBJDIR := $(CURDIR)/$(OSTYPE)$(ARCH)
+OBJDIR := $(OSTYPE)$(ARCH)
+
+# non-build targets
+NOBUILD := clean% info%
 
 ###########
 # Includes
 
-# system specific settings (optional)
--include make/system.$(OSTYPE)
+# make utilities
+include make/make.lib
 
-# compilers specific settings
+# files selection
+-include $(FILES_C)            # setup CC_SRC,   CC_HDR
+-include $(FILES_CXX)          # setup CXX_SRC,  CXX_HDR 
+-include $(FILES_F90)          # setup FC_SRC
+
+# compilers and linker specific settings
 include make/compiler.$(CC)
+include make/compiler.$(CXX)
 include make/compiler.$(FC)
-include make/compiler.rules
+-include make/linker.$(LD)      # optional
 
-# files dependencies
-include make/files.c
-include make/files.cpp
-include make/files.f90
+# system specific settings
+-include make/system.$(OSTYPE)  # optional
+
+# compilers, linker and depend rules
+include make/compiler.rules
+include make/linker.rules
+include make/depend.rules
 
 # cleaning & debugging
 include make/clean.rules
 include make/infos.rules
 
-######################
-# End of MAD makefile
-
+# end of makefile
