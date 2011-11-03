@@ -44,9 +44,9 @@
 /c_tpsa_interface.f90 -text
 cmakesrc/FindGSL.cmake -text
 cmakesrc/FindSDDS.cmake -text
-cmakesrc/LinuxLF95.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
 cmakesrc/README -text
+cmakesrc/ToolChains/Linux-LF95.cmake -text
 cmakesrc/cdash_madx.cmake -text
 cmakesrc/compilers/setupGNU.cmake -text
 cmakesrc/compilers/setupIntel.cmake -text

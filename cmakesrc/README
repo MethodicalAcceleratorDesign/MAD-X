@@ -34,8 +34,11 @@ Basic usage:
 
  In case of LF95:
   If you want to use lf95 32bit compiler on a 64bit system, please use the initial command:
-    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmakesrc/LinuxLF95.cmake <path-to-source>
-  This is so far only known to work with CMake newer than or equal to version 2.8.1. That means it will not work on lxplus at the moment. For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"
+    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmakesrc/ToolChains/LinuxLF95.cmake <path-to-source>
+  This is so far only known to work with CMake newer than or equal to version 2.8.1. 
+  That means it will not work on lxplus at the moment. 
+  For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"
+  Toolchain files must be generated if you want to do cross-platform compiling in general.
 
 Submitting to cdash:
     A testing server is set up, where a client can publish the results from updating, compiling, and testing. For this, a configuration script is needed. 
