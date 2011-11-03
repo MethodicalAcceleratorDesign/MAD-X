@@ -41,7 +41,6 @@
 /b_da_arrays_all.f90 -text
 /c_dabnew.f90 -text
 /c_dabnew_berz.f90 -text
-/c_tpsa_interface.f90 -text
 cmakesrc/FindGSL.cmake -text
 cmakesrc/FindSDDS.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
