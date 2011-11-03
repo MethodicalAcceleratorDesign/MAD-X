@@ -11,13 +11,6 @@
 # few rules removed, two added (madx.h and mad_%.c)
 # end of changes
 #
-# Changes on 13.10.2011 by L.Deniau:
-# move F90 files to f90, -fpp added
-# remove F90 rules and substitution
-# update c_tpsa stuff
-# add -fpp to ifort
-# end of changes
-#
 # Changes on 19.01.2011 by H.Renshall:
 # add new flags f95_FLAGSP and Q for separate lf95 compilation of the
 # polymorphic code which cannot use the --chk u (undefined) flag.
@@ -114,9 +107,9 @@ LDOPT=-static $(M32) $(IFORTFIX)
 
 ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= -Cpp --o2 --tp -c -Wa,--32
+    f95_FLAGS= --o2 --tp -c -Wa,--32
   else
-    f95_FLAGS= -Cpp --o2 -c
+    f95_FLAGS= --o2 -c
   endif
 endif
 
@@ -131,7 +124,7 @@ ifeq ($(f95),f95)
 endif
 
 ifeq ($(f95),ifort)
-  f95_FLAGS+= -fpp -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
+  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
   ifeq ($(ARCH),32)
     f95_FLAGS+= $(M32) -fp-model precise
   endif
@@ -373,16 +366,18 @@ mad_init_f.o: madx_ptc_module.o mad_init_f.f90
 %.o : %.f90
 	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
 
+%.o : %.F90
+	$(f95) $(f95_FLAGS) $(f95_FLAGSP) $<
+
 # special rule to compile wih -O0
 matchlib2.o: matchlib2.f90
 	$(f95) $(f95_FLAGS) $(f95_FLAGSP) -O0 $<
 
 # madx_objects  = $(filter-out gxx11psc.o , $(patsubst %.c,%.o,$(wildcard *.c)))
-FILT_TP_OUT  += gxx11ps.o 
-mad_objects   = $(patsubst %.c,%.o,$(wildcard mad_*.c))
-madx_objects  = madxp.o gxx11c.o rplot.o $(mad_objects) $(TPSA) 
-madx_objects += $(filter-out $(FILT_TP_OUT), $(patsubst %.f90,%.o,$(wildcard *.f90)))
-madx_objects += $(filter-out $(FILT_TP_OUT), $(patsubst %.F90,%.o,$(wildcard *.F90)))
+mad_objects = $(patsubst %.c,%.o,$(wildcard mad_*.c))
+madx_objects = madxp.o gxx11c.o rplot.o $(mad_objects) $(TPSA) 
+madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), \
+                    $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(wildcard *.f90 *.F90))))
 
 madx: $(madx_objects)
 	$(f95) -nofor_main $(LDOPT) -o madx $(madx_objects) $(LIBX)
