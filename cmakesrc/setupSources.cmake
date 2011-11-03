@@ -39,6 +39,4 @@ list(REMOVE_ITEM srcfiles ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remo
 
 # header files...
 file(GLOB headerfiles *.h)
-file(GLOB to_remove doxygen.h)
-list(REMOVE_ITEM headerfiles ${to_remove})
 
