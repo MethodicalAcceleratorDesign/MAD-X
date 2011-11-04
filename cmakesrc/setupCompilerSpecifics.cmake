@@ -58,10 +58,10 @@ endif()
 # General compile flags:
 set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g ${CMAKE_Fortran_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_DEBUG   " ${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic ")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ") #needed for c++ linking
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -D_FULL ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -D_FULL ") #needed for c++ linking
 set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -D_FULL ") 
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_FULL ") 
 
 
 # C stuff:
