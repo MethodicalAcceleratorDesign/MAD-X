@@ -41,8 +41,9 @@ NTPSA=YES
 ONMAC=NO
 
 # Temorary Fix for IFORT on Fedora 13/14
-IFORTFIX=
 # IFORTFIX=-no-ipo
+# for ifort as linker
+IFORTFIX+=-nofor_main 
 
 OSTYPE = $(shell uname -s)
 
@@ -380,9 +381,8 @@ madx_objects += $(filter-out gxx11ps.o $(FILT_TP_OUT), \
                     $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(wildcard *.f90 *.F90))))
 
 madx: $(madx_objects)
-	$(f95) -nofor_main $(LDOPT) -o madx $(madx_objects) $(LIBX)
+	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 
-#	$(f95) $(LDOPT) -o madx $(madx_objects) $(LIBX)
 #	strip madx
 
 clean:
