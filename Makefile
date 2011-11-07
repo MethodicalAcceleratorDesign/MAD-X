@@ -86,11 +86,11 @@ else
 endif
 
 # Production: C compiler flag options
- GCCP_FLAGS= -g $(M32) -funroll-loops -D_CATCH_MEM -D_WRAP_FORTRAN_CALLS -D_WRAP_C_CALLS -I. -D_FULL
+ GCCP_FLAGS= -g $(M32) -funroll-loops
 # to turn off fatal error at memory overflow add -D_DONOTCATCHOVERFLOW
 
 # Standard FORTRAN flags
- f95_FLAGS= -c -funroll-loops -I.
+ f95_FLAGS= -c -funroll-loops
 
 
 #######################################################################
@@ -124,7 +124,7 @@ endif
 
 ifeq ($(f95),ifort)
   LDOPT += -nofor-main
-  f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
+  f95_FLAGS+= -assume noold_unit_star
   ifeq ($(ARCH),32)
     f95_FLAGS+= $(M32) -fp-model precise
   endif
@@ -139,7 +139,7 @@ ifeq ($(f95),g95)
 endif
 
 ifeq ($(f95),gfortran)
-  f95_FLAGS+= -cpp -fno-range-check
+  f95_FLAGS+= -fno-range-check
   ifeq ($(ARCH),32)
      f95_FLAGS+=$(M32)
   endif
