@@ -17,11 +17,9 @@
 # |
 
 ###################
-# Project Settings
+# Project settings
 
 PROJECT := madx
-VERSION := 5.00.08
-VERDATE := 2011-11-01
 
 #
 # Build settings
@@ -62,12 +60,16 @@ CXX := g++
 FC  := ifort
 
 #
-# Files settings
+# Makefile settings
 #
 
-FILES_C   := Makefiles_c
-FILES_CXX := Makefiles_cpp
-FILES_F90 := Makefiles_f90
+FILE_VER := VERSION               # setup project VERSION and VERSION_DATE
+FILE_CPP := Makefile_cpp          # setup project specific CPPFLAGS defines
+FILE_C   := Makefile_c            # setup project CC_SRC and CC_HDR
+FILE_CXX := Makefile_c++          # setup project CXX_SRC and CXX_HDR
+FILE_F90 := Makefile_f90          # setup project FC_SRC
+FILE_LIB := Makefile_lib          # setup project LIBS paths and libs
+FILE_SYS := Makefile_sys          # setup project System specific stuffs
 
 #
 # Platform settings
@@ -84,33 +86,9 @@ OBJDIR := $(OSTYPE)$(ARCH)
 # non-build targets
 NOBUILD := clean% info%
 
-###########
-# Includes
+####################
+# Makefile includes
 
-# make utilities
-include make/make.lib
-
-# files selection
--include $(FILES_C)            # setup CC_SRC,   CC_HDR
--include $(FILES_CXX)          # setup CXX_SRC,  CXX_HDR 
--include $(FILES_F90)          # setup FC_SRC
-
-# compilers and linker specific settings
-include make/compiler.$(CC)
-include make/compiler.$(CXX)
-include make/compiler.$(FC)
--include make/linker.$(LD)      # optional
-
-# system specific settings
--include make/system.$(OSTYPE)  # optional
-
-# compilers, linker and depend rules
-include make/compiler.rules
-include make/linker.rules
-include make/depend.rules
-
-# cleaning & debugging
-include make/clean.rules
-include make/infos.rules
+include make/make.inc
 
 # end of makefile

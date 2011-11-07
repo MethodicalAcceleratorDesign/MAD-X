@@ -1,0 +1,120 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - Fortran files selection and dependencies
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+FC_SRC    := $(wildcard *.f90 *.F90)
+FC_SRC_RM := gxx11ps.f90 # obsolete file?
+
+# tpsa settings
+ifeq ($(NTPSA),yes)
+FC_SRC_RM += c_dabnew.f90
+else
+FC_SRC_RM += c_dabnew_berz.f90 c_tpsa_interface.F90
+endif
+
+# remove unwanted files
+FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC))
+
+# files specific compiler flag
+$(OBJDIR)/matchlib2.o: FFLAGS := $(patsubst -O%,-O0,$(FFLAGS))
+
+#######################
+# Fortran dependencies (case not automatic!)
+
+ifeq ($(FDEP),)
+
+# chain of dependencies
+b_da_arrays_all.f90:        a_scratch_size.o 
+c_dabnew.f90:               b_da_arrays_all.o
+c_dabnew_berz.f90:          b_da_arrays_all.o
+c_tpsa_interface.F90:       c_dabnew_berz.o 
+d_lielib.f90:               $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o) 
+h_definition.f90:           d_lielib.o
+i_tpsa.f90:                 h_definition.o 
+j_tpsalie.f90:              i_tpsa.o 
+k_tpsalie_analysis.f90:     j_tpsalie.o 
+l_complex_taylor.f90:       k_tpsalie_analysis.o 
+m_real_polymorph.f90:       l_complex_taylor.o 
+n_complex_polymorph.f90:    m_real_polymorph.o
+o_tree_element.f90:         n_complex_polymorph.o
+
+Sa_extend_poly.f90:         o_tree_element.o
+Sb_sagan_pol_arbitrary.f90: Sa_extend_poly.o
+Sc_euclidean.f90:           Sb_sagan_pol_arbitrary.o
+Sd_frame.f90:               Sc_euclidean.o
+Se_status.f90:              Sd_frame.o
+Sf_def_all_kinds.f90:       Se_status.o
+Sg_sagan_wiggler.f90:       Sf_def_all_kinds.o
+Sh_def_kind.f90:            Sg_sagan_wiggler.o
+Si_def_element.f90:         Sh_def_kind.o
+Sk_link_list.f90:           Si_def_element.o
+Sl_family.f90:              Sk_link_list.o
+Sm_tracking.f90:            Sl_family.o
+Sma0_beam_beam_ptc.f90:     Sm_tracking.o
+Sma_multiparticle.f90:      Sma0_beam_beam_ptc.o
+Sn_mad_like.f90:            Sma_multiparticle.o
+So_fitting.f90:             Sn_mad_like.o
+Sp_keywords.f90:            So_fitting.o
+Sr_spin.f90:                Sq_orbit_ptc.o
+Sra_fitting.f90:            Sr_spin.o
+madx_ptc_module.f90:        Sra_fitting.o
+
+madx_ptc_module.f90:        madx_ptc_setcavs.o madx_ptc_knobs.o
+madx_ptc_trackcavs.f90:     madx_ptc_setcavs.o
+madx_ptc_twiss.f90:         madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
+user2_photon.f90:           madx_ptc_track_run.o
+
+# dependencies on includes
+h_definition.f90:           a_def_frame_patch_chart.inc a_def_all_kind.inc \
+                            a_def_sagan.inc a_def_element_fibre_layout.inc
+Sf_def_all_kinds.f90:       a_def_worm.inc
+madx_ptc_distrib.f90:       madx_ptc_distrib.inc
+madx_ptc_knobs.f90:         madx_ptc_knobs.inc
+madx_ptc_twiss.f90:         madx_ptc_knobs.inc madx_ptc_distrib.inc
+user2_photon.f90:           photoni.inc
+
+# dependencies on Sp_keywords.f90
+madx_ptc_intstate.f90 madx_ptc_setcavs.f90 madx_ptc_script.f90 \
+  madx_ptc_intstate.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
+  madx_ptc_knobs.f90 madx_ptc_eplacement.f90 \
+  Sq_orbit_ptc.f90 St_pointers.f90: Sp_keywords.o
+
+# dependencies on madx_ptc_intstate.f90
+madx_ptc_setcavs.f90 madx_ptc_trackcavs.f90 madx_ptc_knobs.f90 \
+  madx_ptc_eplacement.f90: madx_ptc_intstate.o
+
+# dependencies on madx_ptc_module.f90
+madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 madx_ptc_eplacement.f90 \
+  madx_ptc_normal.f90 madx_ptc_twiss.f90 madx_ptc_distrib.f90 \
+  St_pointers.f90: madx_ptc_module.o
+
+# dependencies on util.f90
+dynap.f90 emit.f90 gxx11.f90 ibsdb.f90 matchjc.f90 match.f90 matchsa.f90 plot.f90 \
+  resindex.f90 sodd.f90 survey.f90 touschek.f90 trrun.f90 twiss.f90 \
+  madx_ptc_module.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
+  madx_ptc_knobs.f90 madx_ptc_eplacement.f90 madx_ptc_twiss.f90 \
+  madx_ptc_distrib.f90 madx_ptc_script.f90: util.o
+
+# dependencies of wrap.f90
+wrap.f90: madx_ptc_module.o madx_ptc_intstate.o madx_ptc_normal.o \
+  madx_ptc_twiss.f90 madx_ptc_distrib.o madx_ptc_setcavs.o \
+	madx_ptc_trackcavs.o madx_ptc_knobs.o madx_ptc_track_run.o \
+	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o
+
+endif
+
+# end of makefile

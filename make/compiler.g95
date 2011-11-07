@@ -1,0 +1,75 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - g95 compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+# FDEP := $(FC) -M -fmod=$(OBJDIR)
+
+#
+# linker
+#
+
+LD      := $(FC)
+LDFLAGS += -m$(ARCH)
+LDLIBS  += -lstdc++
+
+ifeq ($(OSTYPE),Darwin)
+LDLIBS  += -lSystemStubs
+endif
+
+#
+# basic flags
+#
+
+CPPFLAGS  += -D_G95
+
+FFLAGS    := -m$(ARCH) -pipe -O3
+
+# fortran code is not conformant to f90/f95 (break compilation)!
+# FFLAGS := -m$(ARCH) -std=f95 -pipe -O3
+
+# Trig too many warnings for the moment!
+# FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+FFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+FFLAGS  += -pg
+LDFLAGS += -pg
+endif
+
+ifeq ($(PLUGIN),yes)
+LDFLAGS += -rdynamic
+LDLIBS  += -ldl
+endif
+
+#
+# extra flags
+#
+
+FFLAGS += -fno-second-underscore -fmod=$(OBJDIR)
+
+# end of makefile

@@ -1,0 +1,35 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - Libraries settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# libs for online madx
+
+ifeq ($(ONLINE),yes)
+
+LIBS += -L$(CURDIR)/lib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
+
+endif
+
+# X11 on darwin
+
+ifneq ($(OSTYPE),Win32)
+
+LIBS += -L/usr/X11R6/lib -lX11
+
+endif
+
+# end of makefile

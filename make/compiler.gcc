@@ -1,0 +1,62 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - gcc compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+CDEP := $(CC) -M
+
+#
+# linker
+#
+
+# delegated to fortran compilers
+
+#
+# basic flags
+#
+
+CFLAGS := -m$(ARCH) -pipe -O3
+
+# trig too many warnings (> 100+) for the moment!
+# CFLAGS := -m$(ARCH) -std=c99 -Wall -W -pedantic -pipe -O3
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+CFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+CFLAGS += -pg
+endif
+
+#
+# extra warnings (gcc is the reference)
+#
+
+# trig too many warnings (> 1000+) for the moment!
+# CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
+#          -Wchar-subscripts -Wformat-nonliteral -Wwrite-strings \
+#          -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
+#          -Wfloat-equal -Wconversion -Wno-conversion -Winline
+
+# end of makefile

@@ -1,0 +1,77 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - depend rules
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+.PRECIOUS: $(OBJDIR)/%.d $(OBJDIR)/%.mod %.mod
+
+vpath %.d    $(OBJDIR)
+vpath %.mod  $(OBJDIR)
+
+#
+# rule for C dependencies
+#
+$(OBJDIR)/%.d: %.c
+	$E "*** Computing $(@F)"
+	$_ $(strip $(CDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+
+#
+# rule for C++ dependencies
+#
+$(OBJDIR)/%.d: %.cpp
+	$E "*** Computing $(@F)"
+	$_ $(strip $(CXXDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+
+#
+# rule for f90 and F90 dependencies
+#
+$(OBJDIR)/%.d: %.f90
+	$E "*** Computing $(@F)"
+	$_ $(strip $(FDEP)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+
+$(OBJDIR)/%.d: %.F90
+	$E "*** Computing $(@F)"
+	$_ $(strip $(FDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+
+#
+# compute dependencies
+#
+C_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
+CXX_DEPS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
+F_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+DEPENDS  :=
+
+ifneq ($(CDEP),)
+DEPENDS += $(C_DEPS)
+endif
+
+ifneq ($(CXXDEP),)
+DEPENDS += $(CXX_DEPS)
+endif
+
+ifneq ($(FDEP),)
+DEPENDS += $(F_DEPS)
+endif
+
+#
+# include dependencies
+#
+ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+-include $(DEPENDS)
+endif
+
+# end of makefile
+

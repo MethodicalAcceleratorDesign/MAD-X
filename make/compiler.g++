@@ -1,0 +1,57 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - g++ compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+CXXDEP := $(CXX) -M
+
+#
+# linker
+#
+
+# delegated to fortran compilers
+
+#
+# basic flags
+#
+
+CXXFLAGS := -m$(ARCH) -std=c++98 -Wall -W -pedantic -pipe -O3
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+CXXFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+CXXFLAGS += -pg
+endif
+
+#
+# extra warnings (g++ is the reference)
+#
+
+CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual \
+            -Wchar-subscripts -Wformat-nonliteral -Wwrite-strings \
+            -Wfloat-equal -Wconversion -Wno-conversion -Winline
+
+# end of makefile

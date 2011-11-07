@@ -1,0 +1,29 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - C files selection
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+CC_HDR := $(wildcard mad_*.h) 
+CC_SRC := $(wildcard mad_*.c)
+
+CC_HDR += rplot.h SDDS.h madx.h
+CC_SRC += rplot.c gxx11c.c madxp.c
+
+# files specific compiler flag
+$(OBJDIR)/mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
+                                  -D_VERSION_DATE=$(VERSION_DATE)
+
+# end of makefile

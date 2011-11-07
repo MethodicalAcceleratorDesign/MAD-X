@@ -1,0 +1,50 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - utilities
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# some useful functions
+eq     = $(if $(patsubst $1,,$2),,t)
+neq    = $(if $(patsubst $1,,$2),t,)
+
+first  = $(word 1,$1)
+last   = $(word $(words $1),$1)
+rest   = $(wordlist 2,$(words $1),$1)
+chop   = $(wordlist 2,$(words $1),_ $1)
+
+assert = $(if $1,,$(error $2))
+exists = $(if $(wildcard $1),,$(error $2))
+mkdir  = $(if $(wildcard $1),,$(shell mkdir -p $1))
+
+# set command echo (SHOW=yes -> trace commands & remove echo)
+_ := $(if $(call eq,$(SHOW),yes),,@)
+E := $(if $(call eq,$(SHOW),yes),@ \#,@ echo)
+
+# clear suffixes (avoid misbehavior)
+.SUFFIXES:
+
+# default target
+.DEFAULT_GOAL := $(PROJECT)
+
+# add default target to make commands
+ifeq ($(MAKECMDGOALS),)
+MAKECMDGOALS := $(PROJECT)
+endif
+
+# create build directory
+DOIT := $(call mkdir,$(OBJDIR))
+
+# end of makefile

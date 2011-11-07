@@ -66,18 +66,15 @@ exec_command(void)
         set_option("tell", &izero); /* reset every time */
         p->clone = options; p->clone_flag = 1;
       }
-#ifdef _FULL
       else if (strcmp(cmd_name, "setplot") == 0
                && plot_options != NULL)
       {
         p->clone = plot_options; p->clone_flag = 1;
       }
-#endif
       else p->clone = clone_command(p->cmd_def);
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
       if (strcmp(p->cmd_def->module, "control") == 0) control(p);
-#ifdef _FULL
       else if (strcmp(p->cmd_def->module, "c6t") == 0) conv_sixtrack(p);
       else if (strcmp(p->cmd_def->module, "edit") == 0) seq_edit_main(p);
       else if (strcmp(p->cmd_def->module, "ibs") == 0)
@@ -316,7 +313,6 @@ exec_command(void)
         current_twiss = p->clone;
         pro_twiss();
       }
-#endif
     }
   }
 }
@@ -570,7 +566,6 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "option")      == 0) exec_option();
   else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
   else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
-#ifdef _FULL
   else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
   else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
   else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
@@ -590,11 +585,8 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
   else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
-#endif
-#ifndef _FULL
   puts("++++++++++++++ command skipped in parser version");
   /* insert your proper command action here */
-#endif
 }
 
 int 

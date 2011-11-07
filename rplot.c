@@ -14,7 +14,7 @@ extern type_OfExtern void type_ofCall warning(const char*, const char*);
 
 void loadrplotlib(void)
 {
-#if PLUGIN_SUPPORT
+#if _PLUGIN
   void *handle;
   char buff[200];
   char* homedir = 0x0;
@@ -164,7 +164,7 @@ void loadrplotlib(void)
 
 void unloadrplotlib(void)
 {
-#if PLUGIN_SUPPORT
+#if _PLUGIN
   dlclose(rplot_handle);
   rplot_handle = 0x0;
   rplot_plottrack = 0x0;
@@ -189,7 +189,7 @@ void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
   }
 
   MadxPlotter::Instance()->Fill(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
 
   if (rplot_plottrack == 0x0) return;
 
@@ -227,7 +227,7 @@ extern type_OfExtern void type_ofCall rplotfinish(void)
 /*terminates plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->Finish();/*writes and deletes the current plot*/
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
   typedef void (*rvfun)();
   rvfun rfinish;
   char *error;
@@ -253,7 +253,7 @@ extern type_OfExtern void type_ofCall newrplot(void)
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->NewPlot();
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
 
   typedef void (*rvfun)();
   rvfun newrplot;
@@ -322,7 +322,7 @@ extern type_OfExtern void type_ofCall rviewer(void)
 
   MadxViewer::Instance();
 
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
 
   typedef void (*rvfun)();
   rvfun viewer;
@@ -357,7 +357,7 @@ void type_ofCall madxv_setknobname(int* n, const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetKnobName(*n,name);
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
   typedef void (*sknfctn)(int*,const char*);
   sknfctn fctn;
   char *error;
@@ -383,7 +383,7 @@ void type_ofCall madxv_setfctnname(int* n, const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionName(*n,name);
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
 
   typedef void (*sknfctn)(int*,const char*);
   sknfctn fctn;
@@ -410,7 +410,7 @@ void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
 {
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionAt(*el,*n,name);
-#elif defined PLUGIN_SUPPORT
+#elif defined _PLUGIN
 
   typedef void (*sknfctn)(int*,int*,const char*);
   sknfctn fctn;

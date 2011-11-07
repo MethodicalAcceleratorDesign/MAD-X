@@ -1,0 +1,66 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - ifort compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+# fortran dependencies calculation requires mod files (quite stupid)!
+# FDEP := $(FC) -module $(OBJDIR) -gen-dep
+
+#
+# linker flags (dirty)
+#
+
+LD      := $(FC)
+LDFLAGS += -m$(ARCH) -nofor-main
+LDLIBS  += -lstdc++
+
+#
+# basic flags
+#
+
+FFLAGS := -m$(ARCH) -O3 -warn all -warn nounused
+
+# Trig too many warnings for the moment!
+# FFLAGS := -m$(ARCH) -O3 -warn all
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+FFLAGS += -g -gdwarf-2
+endif
+
+ifeq ($(PROFILE),yes)
+FFLAGS  += -pg
+LDFLAGS += -pg
+endif
+
+ifeq ($(ARCH),32)
+FFLAGS += -fp-model precise
+endif
+
+#
+# extra flags
+#
+
+FFLAGS += -assume noold_unit_star -module $(OBJDIR)
+
+# end of makefile

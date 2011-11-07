@@ -226,7 +226,7 @@ ifeq ($(PROFILE),YES)
 endif
 
 ifeq ($(PLUGIN_SUPPORT),YES)
-  GCCP_FLAGS+= -DPLUGIN_SUPPORT
+  GCCP_FLAGS+= -D_PLUGIN
   ifeq ($(f95),lf95)
     LDOPT=-dynamic --export $(M32) -ldl
   endif

@@ -7,10 +7,7 @@
 // private constant
 
 #define FREECODE 380226     /* check-code to avoid multiple "free" */
-
-#ifdef _MEM_LEAKS
 #define MTABLE_SIZE 1000000
-#endif
 
 // private globals
 
@@ -45,12 +42,7 @@ mymalloc(char* caller, size_t size)
   size_t l_size = size + sizeof(double);
   if ((p = malloc(l_size)) == NULL)
   {
-#ifdef _DONOTCATCHOVERFLOW
-    warning("mymalloc: memory overflow, called from routine:", caller);
-    warning("mymalloc:","Program will crash now");
-#else
     fatal_error("memory overflow, called from routine:", caller);
-#endif      
   } 
   i_p = (int*) p;
   mtable[-item_no]=i_p;
@@ -75,12 +67,7 @@ mymalloc(char* caller, size_t size)
 /*  printf("xxxx %d xxxx\n",l_size);*/
   if ((p = malloc(l_size)) == NULL)
   {
-#ifdef _DONOTCATCHOVERFLOW
-    warning("mymalloc: memory overflow, called from routine:", caller);
-    warning("mymalloc:","Program will crash now");
-#else
     fatal_error("memory overflow, called from routine:", caller);
-#endif      
   } 
   i_p = (int*) p; *i_p = FREECODE;
   return (void *)((char*)p+sizeof(double));
@@ -97,12 +84,7 @@ mycalloc(char* caller, size_t nelem, size_t size)
   size_t l_size = nelem*size + sizeof(double);
   if ((p = calloc(1, l_size)) == NULL)
   {
-#ifdef _DONOTCATCHOVERFLOW
-    warning("mycalloc: memory overflow, called from routine:", caller);
-    warning("mycalloc: Program will crash now","");
-#else
     fatal_error("memory overflow, called from routine:", caller);
-#endif      
   } 
   mtable[-item_no]=p;
   i_p = (int*) p;
@@ -126,12 +108,7 @@ mycalloc(char* caller, size_t nelem, size_t size)
   size_t l_size = nelem*size + sizeof(double);
   if ((p = calloc(1, l_size)) == NULL)
   {
-#ifdef _DONOTCATCHOVERFLOW
-    warning("mycalloc: memory overflow, called from routine:", caller);
-    warning("mycalloc: Program will crash now","");
-#else
     fatal_error("memory overflow, called from routine:", caller);
-#endif      
   } 
   i_p = (int*) p; *i_p = FREECODE;
   return ((char*)p+sizeof(double));

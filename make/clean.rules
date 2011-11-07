@@ -1,0 +1,34 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - cleaning rules
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+.PHONY: clean cleanall
+
+clean:
+	$E "** Cleaning local files"
+	$_ rm -f *.o
+	$_ rm -f *.g90
+	$_ rm -f *.mod
+	$_ rm -f *.lst
+	$_ rm -f core
+	$_ rm -f *~
+
+cleanall: clean
+	$E "** Removing" $(OBJDIR)
+	$_ rm -rf $(OBJDIR)
+  
+# end of makefile

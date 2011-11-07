@@ -1,10 +1,18 @@
 #include "mad_def.h"
 #include "mad_gcst.h"
 
-const char *myversion     = "MAD-X 5.00.09";
+// madx version and date from makefile
+
+#define mkstr(a)  mkstr_(a)
+#define mkstr_(a) #a
+
+const char *myversion     = "MAD-X " mkstr(_VERSION);
 const char *version_type  =    "DEBUG Version - use at own risk!";
 /* const char *version_type = "       Production Version       ";    */
-const char *code_mod_date = "Code Modification Date: 23.06.2011";
+const char *code_mod_date = "Code Modification Date: " mkstr(_VERSION_DATE);
+
+#undef mkstr
+#undef mkstr_
 
 // Temporary file: these constants should be split over their respective modules...
 

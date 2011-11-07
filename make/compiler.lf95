@@ -1,0 +1,64 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - lf95 compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+# FDEP :=
+
+#
+# linker
+#
+
+LD      := $(FC)
+LDFLAGS += -m$(ARCH)
+LDLIBS  += -lstdc++
+
+#
+# basic flags
+#
+
+FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+FFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+FFLAGS  += -pg
+LDFLAGS += -pg
+endif
+
+ifeq ($(PLUGIN),yes)
+LDFLAGS += -rdynamic --export -m$(ARCH)
+LDLIBS  +=  -ldl
+endif
+
+#
+# extra flags
+#
+
+FFLAGS += -Wa,--$(ARCH) -fno-second-underscore -fmod $(OBJDIR)
+
+# end of makefile
+

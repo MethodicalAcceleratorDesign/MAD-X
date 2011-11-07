@@ -28,6 +28,7 @@ static void init_prod_index(unsigned int nv, unsigned int nd);
 static bool within_limit(TNVND nv, TNVND nd);
 static TNVND* choose(TNVND n, TNVND r, TNVND* p, TNVND nv, TNVND nd);
 static void init_base(TNVND nv, TNVND nd);
+static void print_vec(unsigned int, std::ostream&);
 
 //! Search for the element index of the product of two elements.
 // static unsigned int prod_index(TNVND* pb, TNVND* pm, TNVND order);
@@ -293,7 +294,7 @@ bool within_limit(TNVND nv, TNVND nd)
 
 //! \brief Get all the combinations, choose r from n.
 //! Do nothing if n==0 or r==0. other numbers are not checked.
-TNVND* choose(TNVND n, TNVND r, TNVND* p, TNVND nv, TNVND nd)
+TNVND* choose(TNVND n, TNVND r, TNVND* p, TNVND nv, TNVND /* nd */)
 {
     std::vector<TNVND> c(r);
     TNVND i, j, k;
@@ -1729,6 +1730,8 @@ _declspec(dllexport) void _stdcall ad_subst(const TVEC* iv, const TVEC* ibv, con
 void ad_subst(const TVEC* iv, const TVEC* ibv, const TNVND* nbv, const TVEC* iret)
 #endif
 {
+  (void)nbv; // ldeniau 2011.11.04: avoid g++ warning
+  
  #ifdef DEBUG_ALL
     std::cout << "AD substitute " << std::endl;
     std::cout << "  ia[" << adveclen[*iv] << "]:" << *iv
@@ -1804,6 +1807,8 @@ _declspec(dllexport) void _stdcall ad_inverse(const TVEC* iva, const TNVND* nva,
 void ad_inverse(const TVEC* iva, const TNVND* nva, const TVEC* iret, const TNVND* nret)
 #endif
 {
+  (void)iva; (void)nva; (void)iret; (void)nret; // ldeniau 2011.11.04: avoid g++ warnings
+
  #ifdef DEBUG_ALL
     std::cout << "AD inverse " << std::endl;
     for(size_t i = 0; i < *nva; ++i) {
@@ -1986,10 +1991,11 @@ void ad_read_block(const TVEC* iv,
 _declspec(dllexport) void _stdcall ad_save_block(const TVEC* iv,
                                                  const double* v, const TNVND* J, const unsigned int* N)
 #else
-void ad_save_block(const TVEC* iv,
-                   const double* v, const TNVND* J, const unsigned int* N)
+void ad_save_block(const TVEC* iv, const double* v, const TNVND* J, const unsigned int* N)
 #endif
 {
+    (void)J; // ldeniau 2011.11.04: avoid g++ warning
+
     //unsigned int ii = *iv;
     //TNVND* p = base;
     //os << "iv= " << ii << std::endl;

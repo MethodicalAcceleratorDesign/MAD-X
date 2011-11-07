@@ -102,11 +102,9 @@ mad_init_c(void)
 static void
 set_sigterm(void)
 {
-#ifdef _CATCH_MEM
   /* provide a termination routine for access to memory outside scope */
   if (signal(SIGSEGV, mad_mem_handler) == SIG_IGN)
     signal(SIGSEGV, SIG_IGN);
-#endif
 }
 
 // public functions
@@ -175,18 +173,16 @@ madx_finish(void)
   if (final_message == 0)
   {
     final_message = 1;
-#ifdef _FULL
     if (plots_made)
     {
       gxterm_();
       if(system("which ps2ps > tmp_plot.ps") == 0)
-	{
+	    {
          system("cp madx.ps tmp_plot.ps");
          system("ps2ps tmp_plot.ps madx.ps");
-	}
+	    }
       system("rm tmp_plot.ps");
     }
-#endif
     mad_err_getwarn(&warn_numb, &warn_numbf);
     nwarnings = warn_numb + warn_numbf;
     printf("\n  Number of warnings: %d\n",nwarnings);
