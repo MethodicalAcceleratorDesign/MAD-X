@@ -93,7 +93,6 @@ cmakesrc/setupTesting.cmake -text
 /gxx11.f90 -text
 /gxx11c.c -text
 /gxx11ps.f90 -text
-/gxx11psc.c -text
 /h_definition.f90 -text
 /i_tpsa.f90 -text
 /ibsdb.f90 -text
