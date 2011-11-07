@@ -20,6 +20,7 @@
 # makedep
 #
 
+# fortran dependencies computation requires mod files (quite stupid)!
 # FDEP := $(FC) -M -fmod=$(OBJDIR)
 
 #
@@ -27,8 +28,8 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -m$(ARCH)
-LDLIBS  += -lstdc++
+LDFLAGS += -m$(ARCH) -Bstatic
+LDLIBS  += -lstdc++ -lgcc_eh
 
 ifeq ($(OSTYPE),Darwin)
 LDLIBS  += -lSystemStubs
@@ -38,9 +39,8 @@ endif
 # basic flags
 #
 
-CPPFLAGS  += -D_G95
-
-FFLAGS    := -m$(ARCH) -pipe -O3
+CPPFLAGS += -D_G95
+FFLAGS   := -m$(ARCH) -pipe -O3
 
 # fortran code is not conformant to f90/f95 (break compilation)!
 # FFLAGS := -m$(ARCH) -std=f95 -pipe -O3

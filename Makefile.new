@@ -81,7 +81,7 @@ OSVERS := $(shell uname -r)
 OSARCH := $(shell uname -m)
 
 # build directory
-OBJDIR := $(OSTYPE)$(ARCH)
+OBJDIR := $(OSTYPE)$(ARCH)_$(FC)
 
 # non-build targets
 NOBUILD := clean% info%

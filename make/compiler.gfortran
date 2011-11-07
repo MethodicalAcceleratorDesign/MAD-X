@@ -20,21 +20,26 @@
 # makedep
 #
 
-# FDEP := $(FC) -M -fmod $(OBJDIR)
+# fortran dependencies computation requires mod files (quite stupid)!
+# FDEP := $(FC) -MM
 
 #
 # linker
 #
 
 LD      := $(FC)
-LDFLAGS += -m$(ARCH)
+LDFLAGS += -m$(ARCH) -Bstatic
 LDLIBS  += -lstdc++
 
 #
 # basic flags
 #
 
-FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+FFLAGS  := -m$(ARCH) -O2 -pipe
+
+# gfortran craches on l_complex_taylor.f90 with -O3
+# Trig too many warnings for the moment!
+# FFLAGS   := -m$(ARCH) -std=f95 -Wall -W -pedantic -pipe -O3
 
 #
 # options flags
@@ -53,6 +58,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -Wa,--$(ARCH) -fno-second-underscore -fmod $(OBJDIR)
+FFLAGS += -fno-second-underscore -fno-range-check -J $(OBJDIR)
 
 # end of makefile

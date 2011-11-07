@@ -31,9 +31,9 @@ ifneq ($(OSTYPE),Win32)
 LIBS += -L/usr/X11R6/lib -lX11
 
 ifeq ($(OSTYPE),Linux)
-LIBS += -lpthread     # X11 is threaded by default on Linux
+LIBS += -lpthread
 endif
 
-endif
+endif # !Win32
 
 # end of makefile

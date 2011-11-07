@@ -34,7 +34,9 @@ LDLIBS  += -lstdc++
 # basic flags
 #
 
-FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+CPPFLAGS += -D_LF95
+# Trig too many warnings for the moment!
+FFLAGS   := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
 
 #
 # options flags
@@ -51,7 +53,7 @@ endif
 
 ifeq ($(PLUGIN),yes)
 LDFLAGS += -rdynamic --export -m$(ARCH)
-LDLIBS  +=  -ldl
+LDLIBS  += -ldl
 endif
 
 #

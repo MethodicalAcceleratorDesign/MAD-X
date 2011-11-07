@@ -27,6 +27,22 @@ clean:
 	$_ rm -f core
 	$_ rm -f *~
 
+cleanc:
+	$E "** Cleaning C generated files"
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(C_SRC))))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(C_SRC))))
+
+cleancxx:
+	$E "** Cleaning C++ generated files"
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(CXX_SRC))))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC))))
+
+cleanf90:
+	$E "** Cleaning F90 generated files"
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+	$_ rm -f $(OBJDIR)/*.mod
+
 cleanall: clean
 	$E "** Removing" $(OBJDIR)
 	$_ rm -rf $(OBJDIR)

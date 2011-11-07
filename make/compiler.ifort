@@ -20,8 +20,8 @@
 # makedep
 #
 
-# fortran dependencies calculation requires mod files (quite stupid)!
-# FDEP := $(FC) -module $(OBJDIR) -gen-dep
+# fortran dependencies computation requires mod files (quite stupid)!
+# FDEP := $(FC) -gen-dep
 
 #
 # linker flags (dirty)
@@ -35,7 +35,8 @@ LDLIBS  += -lstdc++
 # basic flags
 #
 
-FFLAGS := -m$(ARCH) -O3 -warn all -warn nounused
+CPPFLAGS += -D_IFORT
+FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused
 
 # Trig too many warnings for the moment!
 # FFLAGS := -m$(ARCH) -O3 -warn all

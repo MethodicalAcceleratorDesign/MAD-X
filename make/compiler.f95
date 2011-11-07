@@ -34,7 +34,8 @@ LDLIBS  += -lstdc++
 # basic flags
 #
 
-FFLAGS := -m$(ARCH) -std=f95 -Wall -pedantic -pipe -O3
+CPPFLAGS += -D_F95
+FFLAGS   := -m$(ARCH) -std=f95 -Wall -pedantic -pipe -O3
 
 #
 # options flags

@@ -20,7 +20,7 @@
 # makedep
 #
 
-CDEP := $(CC) -M
+CDEP := $(CC) -MM
 
 #
 # linker

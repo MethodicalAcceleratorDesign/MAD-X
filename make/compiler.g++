@@ -20,7 +20,7 @@
 # makedep
 #
 
-CXXDEP := $(CXX) -M
+CXXDEP := $(CXX) -MM
 
 #
 # linker
