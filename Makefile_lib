@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-# libs for online madx
+# libs for ONLINE madx
 
 ifeq ($(ONLINE),yes)
 
@@ -24,11 +24,15 @@ LIBS += -L$(CURDIR)/lib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl
 
 endif
 
-# X11 on darwin
+# X11 on Unix
 
 ifneq ($(OSTYPE),Win32)
 
 LIBS += -L/usr/X11R6/lib -lX11
+
+ifeq ($(OSTYPE),Linux)
+LIBS += -lpthread     # X11 is threaded by default on Linux
+endif
 
 endif
 
