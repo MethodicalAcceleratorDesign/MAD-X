@@ -42,8 +42,6 @@ ONMAC=NO
 
 # Temorary Fix for IFORT on Fedora 13/14
 # IFORTFIX=-no-ipo
-# for ifort as linker
-IFORTFIX+=-nofor_main 
 
 OSTYPE = $(shell uname -s)
 
@@ -125,6 +123,7 @@ ifeq ($(f95),f95)
 endif
 
 ifeq ($(f95),ifort)
+  LDOPT += -nofor-main
   f95_FLAGS+= -assume noold_unit_star -D_INTEL_IFORT_SET_RECL
   ifeq ($(ARCH),32)
     f95_FLAGS+= $(M32) -fp-model precise
