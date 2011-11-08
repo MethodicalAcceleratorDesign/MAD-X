@@ -36,11 +36,7 @@ LDFLAGS += -m$(ARCH) -nofor-main
 LDLIBS  += -lstdc++
 
 ifeq ($(STATIC),yes)
-ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -staticlib
-else
-LDFLAGS += -static
-endif
+LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
 endif
 
 #

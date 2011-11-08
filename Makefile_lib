@@ -19,14 +19,14 @@
 # ONLINE madx
 
 ifeq ($(ONLINE),yes)
-LIBS += -L$(CURDIR)/lib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
+LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
 endif
 
 # X11 on Unix
 
 ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
-LIBS += -L/usr/lib -L/usr/X11/lib -L$(CURDIR)/lib$(ARCH) -lX11 -lpthread
+LIBS += -Llib$(ARCH) -lX11 -lpthread
 else
 LIBS += -lX11
 endif
