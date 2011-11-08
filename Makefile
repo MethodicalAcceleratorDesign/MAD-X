@@ -358,7 +358,7 @@ wrap.o: madx_ptc_module.o  madx_ptc_intstate.o \
 	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o \
 	wrap.f90
 user2_photon.o: madx_ptc_track_run.o user2_photon.f90 photoni.inc
-mad_init_f.o: madx_ptc_module.o mad_init_f.f90
+mad_init_f.o: madx_ptc_module.o mad_init_f.F90
 
 # implicit rule to compile with C
 %.o : %.c
