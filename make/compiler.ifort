@@ -25,7 +25,7 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid)!
-# FDEP := $(FC) -gen-dep
+# FDEP := $(FC) -gen-dep -module $(OBJDIR)
 
 #
 # linker flags

@@ -21,7 +21,7 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid)!
-# FDEP := $(FC) -MM
+# FDEP := $(FC) -MM -J$(OBJDIR)
 
 #
 # linker
@@ -62,6 +62,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fno-range-check -J $(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fno-range-check -J$(OBJDIR)
 
 # end of makefile
