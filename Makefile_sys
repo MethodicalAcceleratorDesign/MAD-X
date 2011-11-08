@@ -22,7 +22,7 @@ $(error madx ONLINE is not supported on $(OSTYPE))
 endif
 
 ifeq ($(STATIC),yes)
-# $(error madx statically linked is not supported on $(OSTYPE))
+$(error madx statically linked is not supported on $(OSTYPE))
 endif
 endif
 
