@@ -32,10 +32,10 @@ CDEP := $(CC) -MM
 # basic flags
 #
 
-CFLAGS := -m$(ARCH) -pipe -O3
+CFLAGS := -m$(ARCH) -O3
 
 # trig too many warnings (> 100+) for the moment!
-# CFLAGS := -m$(ARCH) -std=c99 -Wall -W -pedantic -pipe -O3
+# CFLAGS := -m$(ARCH) -std=c99 -Wall -W -pedantic -O3
 
 #
 # options flags
@@ -49,6 +49,12 @@ ifeq ($(PROFILE),yes)
 CFLAGS += -pg
 endif
 
+#
+# extra flags
+#
+
+CFLAGS += -pipe
+ 
 #
 # extra warnings (gcc is the reference)
 #

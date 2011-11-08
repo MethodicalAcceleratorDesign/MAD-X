@@ -28,6 +28,9 @@ PROJECT := madx
 # architecture 32/64bit (default is 64)
 ARCH      := 64
 
+# link with static libs (default is no)
+STATIC    := no
+
 # debugging mode (default is no)
 DEBUG     := no
 

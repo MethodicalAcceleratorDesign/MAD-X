@@ -19,21 +19,21 @@
 # ONLINE madx
 
 ifeq ($(ONLINE),yes)
-
 LIBS += -L$(CURDIR)/lib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
-
 endif
 
 # X11 on Unix
 
-ifneq ($(OSTYPE),Win32)
-
-LIBS += -L/usr/X11R6/lib -lX11
-
 ifeq ($(OSTYPE),Linux)
-LIBS += -lpthread
+ifeq ($(STATIC),yes)
+LIBS += -L/usr/lib -L/usr/X11/lib -L$(CURDIR)/lib$(ARCH) -lX11 -lpthread
+else
+LIBS += -lX11
+endif
 endif
 
-endif # !Win32
+ifeq ($(OSTYPE),Darwin)
+LIBS += -L/usr/X11R6/lib -lX11
+endif
 
 # end of makefile

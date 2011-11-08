@@ -20,6 +20,6 @@
 
 $(PROJECT): $(OBJECTS)
 	$E "*** Linking $(@F)"
-	$_ $(LD) $(LDFLAGS) -o $@ $^ $(LIBS) $(LDLIBS)
+	$_ $(LD) $(LDFLAGS) -o $@ $(call uniq,$^ $(LIBS) $(LDLIBS))
 
 # end of makefile

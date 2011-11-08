@@ -24,6 +24,8 @@ first  = $(word 1,$1)
 last   = $(word $(words $1),$1)
 rest   = $(wordlist 2,$(words $1),$1)
 chop   = $(wordlist 2,$(words $1),_ $1)
+uniq   = $(strip $(if $1,$(call uniq,$(call chop,$1)) \
+            $(if $(filter $(call last,$1),$(call chop,$1)),,$(call last,$1))))
 
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))

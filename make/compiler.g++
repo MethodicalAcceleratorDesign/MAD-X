@@ -32,7 +32,7 @@ CXXDEP := $(CXX) -MM
 # basic flags
 #
 
-CXXFLAGS := -m$(ARCH) -std=c++98 -Wall -W -pedantic -pipe -O3
+CXXFLAGS := -m$(ARCH) -std=c++98 -Wall -W -pedantic -O3
 
 #
 # options flags
@@ -46,6 +46,12 @@ ifeq ($(PROFILE),yes)
 CXXFLAGS += -pg
 endif
 
+#
+# extra flags
+#
+
+CXXFLAGS += -pipe
+ 
 #
 # extra warnings (g++ is the reference)
 #

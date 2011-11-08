@@ -16,6 +16,10 @@
 # | $Id$
 # |
 
+# NOTE: tested on MacOSX and Linux with 32 and 64 bits architecture
+# On Linux , libs are statically linked
+# On MacOSX, libs are dynamically linked
+
 #
 # makedep
 #
@@ -31,8 +35,12 @@ LD      := $(FC)
 LDFLAGS += -m$(ARCH) -nofor-main
 LDLIBS  += -lstdc++
 
-ifneq ($(OSTYPE),Darwin)
+ifeq ($(STATIC),yes)
+ifeq ($(OSTYPE),Darwin)
+LDFLAGS += -staticlib
+else
 LDFLAGS += -static
+endif
 endif
 
 #
