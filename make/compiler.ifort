@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-# NOTE: tested on MacOSX and Linux with 32 and 64 bits architecture
+# NOTE: tested on MacOSX & Linux with 32 & 64 bits and ONLINE=yes/no
 # On Linux , libs are statically linked
 # On MacOSX, libs are dynamically linked
 

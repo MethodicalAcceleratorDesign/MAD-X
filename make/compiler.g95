@@ -28,11 +28,15 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -m$(ARCH) -Bstatic
+LDFLAGS += -m$(ARCH)
 LDLIBS  += -lstdc++ -lgcc_eh
 
 ifeq ($(OSTYPE),Darwin)
 LDLIBS  += -lSystemStubs
+endif
+
+ifeq ($(STATIC),yes)
+LDFLAGS += -static
 endif
 
 #
@@ -40,7 +44,7 @@ endif
 #
 
 CPPFLAGS += -D_G95
-FFLAGS   := -m$(ARCH) -pipe -O3
+FFLAGS   := -m$(ARCH) -O3
 
 # fortran code is not conformant to f90/f95 (break compilation)!
 # FFLAGS := -m$(ARCH) -std=f95 -pipe -O3
@@ -70,6 +74,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -fno-second-underscore -fmod=$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fmod=$(OBJDIR)
 
 # end of makefile
