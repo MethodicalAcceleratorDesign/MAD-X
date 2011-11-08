@@ -20,6 +20,7 @@
 # makedep
 #
 
+# lf95 does not compute fortran dependencies
 # FDEP :=
 
 #
@@ -27,19 +28,22 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -Wa,--$(ARCH) --static
+LDFLAGS += -Wa,--$(ARCH)
 LDLIBS  += -lstdc++ -lgcc_eh
+
+ifeq ($(STATIC),yes)
+LDFLAGS += --static
+endif
 
 #
 # basic flags
 #
 
 CPPFLAGS += -D_LF95
-
 FFLAGS   := -Wa,--$(ARCH) -O --warn
 
 # Trig too many warnings for the moment!
-#FFLAGS   := -Wa,--$(ARCH) --f95 -O --tp4 --warn
+#FFLAGS   := -Wa,--$(ARCH) --f95 -O --warn
 
 #
 # options flags

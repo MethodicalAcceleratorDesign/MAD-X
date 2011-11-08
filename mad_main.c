@@ -18,7 +18,7 @@ void _gfortran_set_args (int argc, char *argv[]);
 #endif
 
 #ifdef _LF95
-// Lahey f95 compiler specific
+// Lahey f95 specific
 int
 MAIN__()
 {
@@ -36,6 +36,7 @@ main(int argc, char *argv[])
 #endif
 
 #ifdef _GFORTRAN
+// gfortran specific
   _gfortran_set_args(argc, argv);
 #endif
 
