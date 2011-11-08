@@ -111,7 +111,7 @@ dynap.f90 emit.f90 gxx11.f90 ibsdb.f90 matchjc.f90 match.f90 matchsa.f90 plot.f9
 
 # dependencies of wrap.f90
 wrap.f90: madx_ptc_module.o madx_ptc_intstate.o madx_ptc_normal.o \
-  madx_ptc_twiss.f90 madx_ptc_distrib.o madx_ptc_setcavs.o \
+  madx_ptc_twiss.o madx_ptc_distrib.o madx_ptc_setcavs.o \
 	madx_ptc_trackcavs.o madx_ptc_knobs.o madx_ptc_track_run.o \
 	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o
 
