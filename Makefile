@@ -94,6 +94,10 @@ endif
 # Standard FORTRAN flags
  f95_FLAGS= -c -funroll-loops
 
+# Temporary fix for Lahey95
+ifeq ($(f95),lf95)
+ GCCP_FLAGS+= -D_LF95
+endif
 
 #######################################################################
 # Link options
@@ -108,9 +112,9 @@ LDOPT=-static $(M32) $(IFORTFIX)
 
 ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= --o2 --tp -c -Wa,--32 -D_LF95
+    f95_FLAGS= --o2 --tp -c -Wa,--32
   else
-    f95_FLAGS= --o2 -c -D_LF95
+    f95_FLAGS= --o2 -c
   endif
 endif
 
