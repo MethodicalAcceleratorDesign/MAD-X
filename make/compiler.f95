@@ -42,12 +42,17 @@ FFLAGS   := -m$(ARCH) -std=f95 -Wall -pedantic -pipe -O3
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g
+FFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
 FFLAGS  += -pg
 LDFLAGS += -pg
+endif
+
+ifeq ($(PLUGIN),yes)
+LDFLAGS += -rdynamic
+LDLIBS  += -ldl
 endif
 
 #

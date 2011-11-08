@@ -59,7 +59,7 @@ LDFLAGS += -pg
 endif
 
 ifeq ($(PLUGIN),yes) # not found in the doc
-LDFLAGS += -dynamic --export
+LDFLAGS += -dynamic
 LDLIBS  += -ldl
 endif
 
