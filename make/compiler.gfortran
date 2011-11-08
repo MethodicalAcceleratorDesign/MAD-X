@@ -39,7 +39,7 @@ endif
 # basic flags
 #
 
-# gfortran 4.1 to 4.4 craches on l_complex_taylor.f90 with -O3
+# gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
 FFLAGS  := -m$(ARCH) -O2
 
 # Trig too many warnings for the moment!
