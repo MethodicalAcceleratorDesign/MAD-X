@@ -108,9 +108,9 @@ LDOPT=-static $(M32) $(IFORTFIX)
 
 ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= --o2 --tp -c -Wa,--32
+    f95_FLAGS= --o2 --tp -c -Wa,--32 -D_LF95
   else
-    f95_FLAGS= --o2 -c
+    f95_FLAGS= --o2 -c -D_LF95
   endif
 endif
 
