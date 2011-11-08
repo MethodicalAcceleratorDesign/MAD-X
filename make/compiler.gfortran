@@ -28,16 +28,20 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -m$(ARCH) -Bstatic
+LDFLAGS += -m$(ARCH)
 LDLIBS  += -lstdc++
+
+ifeq ($(STATIC),yes)
+LDFLAGS += -Bstatic
+endif
 
 #
 # basic flags
 #
 
-FFLAGS  := -m$(ARCH) -O2 -pipe
+# gfortran 4.1 to 4.4 craches on l_complex_taylor.f90 with -O3
+FFLAGS  := -m$(ARCH) -O2
 
-# gfortran craches on l_complex_taylor.f90 with -O3
 # Trig too many warnings for the moment!
 # FFLAGS   := -m$(ARCH) -std=f95 -Wall -W -pedantic -pipe -O3
 
@@ -58,6 +62,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -fno-second-underscore -fno-range-check -J $(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fno-range-check -J $(OBJDIR)
 
 # end of makefile
