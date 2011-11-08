@@ -33,18 +33,4 @@ mkdir  = $(if $(wildcard $1),,$(shell mkdir -p $1))
 _ := $(if $(call eq,$(SHOW),yes),,@)
 E := $(if $(call eq,$(SHOW),yes),@ \#,@ echo)
 
-# clear suffixes (avoid misbehavior)
-.SUFFIXES:
-
-# default target
-.DEFAULT_GOAL := $(PROJECT)
-
-# add default target to make commands
-ifeq ($(MAKECMDGOALS),)
-MAKECMDGOALS := $(PROJECT)
-endif
-
-# create build directory
-DOIT := $(call mkdir,$(OBJDIR))
-
 # end of makefile

@@ -24,12 +24,16 @@
 # FDEP := $(FC) -gen-dep
 
 #
-# linker flags (dirty)
+# linker flags
 #
 
 LD      := $(FC)
 LDFLAGS += -m$(ARCH) -nofor-main
 LDLIBS  += -lstdc++
+
+ifneq ($(OSTYPE),Darwin)
+LDFLAGS += -static
+endif
 
 #
 # basic flags
@@ -54,14 +58,10 @@ FFLAGS  += -pg
 LDFLAGS += -pg
 endif
 
-ifeq ($(ARCH),32)
-FFLAGS += -fp-model precise
-endif
-
 #
 # extra flags
 #
 
-FFLAGS += -assume noold_unit_star -module $(OBJDIR)
+FFLAGS += -fp-model precise -assume noold_unit_star -module $(OBJDIR)
 
 # end of makefile

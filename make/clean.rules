@@ -43,6 +43,10 @@ cleanf90:
 	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 	$_ rm -f $(OBJDIR)/*.mod
 
+cleanbuild:
+	$E "** Removing $(PROJECT)"
+	$_ rm -f $(PROJECT)
+
 cleanall: clean
 	$E "** Removing" $(OBJDIR)
 	$_ rm -rf $(OBJDIR)

@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-# libs for ONLINE madx
+# ONLINE madx
 
 ifeq ($(ONLINE),yes)
 
