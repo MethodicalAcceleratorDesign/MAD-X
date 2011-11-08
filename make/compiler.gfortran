@@ -16,6 +16,12 @@
 # | $Id$
 # |
 
+# NOTE: tested on MacOSX and Linux with 32 and 64 bits architecture
+# On Linux , libs are statically linked
+# On MacOSX, libs are dynamically linked
+# Requires gfortran 4.4 or higher to compile...
+# Requires gfortran 4.6 or higher to compile with -O3
+
 #
 # makedep
 #
@@ -38,6 +44,8 @@ endif
 #
 # basic flags
 #
+
+CPPFLAGS += -D_GFORTRAN
 
 # gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
 FFLAGS  := -m$(ARCH) -O2

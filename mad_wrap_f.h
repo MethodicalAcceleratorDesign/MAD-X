@@ -38,9 +38,6 @@
 #define element_name          element_name_
 #define node_name             node_name_
 #define frndm                 frndm_
-#define madx                  madx_
-#define madx_init             madx_init_
-#define madx_start            madx_start_
 #define el_par_vector         el_par_vector_
 #define f_ctof                f_ctof_
 #define get_disp0             get_disp0_
@@ -200,9 +197,6 @@
 #define element_name          ELEMENT_NAME
 #define node_name             NODE_NAME
 #define frndm                 FRNDM
-#define madx                  MADX
-#define madx_init             MADX_INIT
-#define madx_start            MADX_START
 #define el_par_vector         EL_PAR_VECTOR
 #define f_ctof                F_CTOF
 #define get_disp0             GET_DISP0
