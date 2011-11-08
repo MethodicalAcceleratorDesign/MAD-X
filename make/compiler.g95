@@ -31,12 +31,12 @@ LD      := $(FC)
 LDFLAGS += -m$(ARCH)
 LDLIBS  += -lstdc++ -lgcc_eh
 
-ifeq ($(OSTYPE),Darwin)
-LDLIBS  += -lSystemStubs
-endif
-
 ifeq ($(STATIC),yes)
 LDFLAGS += -static
+endif
+
+ifeq ($(OSTYPE),Darwin)
+LDLIBS  += -lSystemStubs
 endif
 
 #
