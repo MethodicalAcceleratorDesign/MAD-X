@@ -22,6 +22,8 @@
 CC=gcc
 # Fortran90 compiler
 f95=ifort
+#f95=lf95
+#f95=nagfor
 # architecture 32/64bit
 ARCH=32
 # Debugging compiler flags

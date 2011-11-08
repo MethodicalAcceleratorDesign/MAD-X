@@ -56,8 +56,8 @@ CXXFLAGS += -pipe
 # extra warnings (g++ is the reference)
 #
 
-CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual \
-            -Wchar-subscripts -Wformat-nonliteral -Wwrite-strings \
-            -Wfloat-equal -Wconversion -Wno-conversion -Winline
+CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual -Winline \
+            -Wfloat-equal -Wconversion -Wno-conversion \
+            -Wchar-subscripts -Wwrite-strings
 
 # end of makefile

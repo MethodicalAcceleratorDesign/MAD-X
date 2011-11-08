@@ -27,23 +27,26 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -m$(ARCH)
-LDLIBS  += -lstdc++
+LDFLAGS += -Wa,--$(ARCH) --static
+LDLIBS  += -lstdc++ -lgcc_eh
 
 #
 # basic flags
 #
 
 CPPFLAGS += -D_LF95
+
+FFLAGS   := -Wa,--$(ARCH) -O --warn
+
 # Trig too many warnings for the moment!
-FFLAGS   := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+#FFLAGS   := -Wa,--$(ARCH) --f95 -O --tp4 --warn
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -ggdb
+FFLAGS += -g --ap --info --chkglobal --lst --trap --verbose
 endif
 
 ifeq ($(PROFILE),yes)
@@ -51,8 +54,8 @@ FFLAGS  += -pg
 LDFLAGS += -pg
 endif
 
-ifeq ($(PLUGIN),yes)
-LDFLAGS += -rdynamic --export -m$(ARCH)
+ifeq ($(PLUGIN),yes) # not found in the doc
+LDFLAGS += -dynamic --export
 LDLIBS  += -ldl
 endif
 
@@ -60,7 +63,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -Wa,--$(ARCH) -fno-second-underscore -fmod $(OBJDIR)
+FFLAGS += --mod $(OBJDIR)
 
 # end of makefile
 
