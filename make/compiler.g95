@@ -52,7 +52,7 @@ FFLAGS   := -m$(ARCH) -O3
 # Trig too many warnings for the moment!
 # FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
 
-#
+#s
 # options flags
 #
 
