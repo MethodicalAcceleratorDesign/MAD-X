@@ -17,7 +17,6 @@ int
 main(int argc, char *argv[])
 {
   mad_stck_base = &argc;
-  
   mad_argc = argc;
   mad_argv = argv;
 
