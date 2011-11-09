@@ -16,9 +16,9 @@
 # | $Id$
 # |
 
-# NOTE: link only on properly configured linux
+# NOTE: link only on properly configured linux (not lxplus!)
 #   does not link correctly on other platforms
-#   64 bits architectures are not supported, only 32 bits
+#   supports only 32 bits ARCH
 
 ifneq ($(ARCH),32)
 $(error Lahey Fortran compiler build only 32 bits projects, use ARCH=32)

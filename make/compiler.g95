@@ -16,8 +16,8 @@
 # | $Id$
 # |
 
-# NOTE: compile/link only on properly configured linux
-#   does not link correctly on other platforms
+# NOTE: compile/link only on properly configured linux (not lxplus!)
+#   does not compile/link correctly on other platforms
 #   64 bits Linux required g95 >= 0.93
 
 #
