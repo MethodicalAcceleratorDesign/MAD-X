@@ -74,6 +74,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fno-range-check -fmod=$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fmod=$(OBJDIR)
 
 # end of makefile
