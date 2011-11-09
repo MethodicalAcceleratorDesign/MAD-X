@@ -40,17 +40,17 @@ endif
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS   := -Wa,--$(ARCH) -O --warn
+FFLAGS   := -Wa,--$(ARCH) --o2 --warn
 
 # Trig too many warnings for the moment!
-#FFLAGS   := -Wa,--$(ARCH) --f95 -O --warn
+#FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g --ap --info --chkglobal --lst --trap --verbose
+FFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
 endif
 
 ifeq ($(PROFILE),yes)

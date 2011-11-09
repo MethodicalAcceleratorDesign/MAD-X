@@ -54,12 +54,12 @@ FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -gdwarf-2
+FFLAGS += -g -gdwarf-2 -check all
 endif
 
 ifeq ($(PROFILE),yes)
-FFLAGS  += -pg
-LDFLAGS += -pg
+FFLAGS  += -p
+LDFLAGS += -p
 endif
 
 ifeq ($(PLUGIN),yes)
@@ -71,6 +71,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -fp-model precise -assume noold_unit_star -module $(OBJDIR)
+FFLAGS += -mp1 -fp-model precise -assume noold_unit_star -module $(OBJDIR)
 
 # end of makefile

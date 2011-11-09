@@ -32,7 +32,7 @@ NTPSA     := yes
 # memory leaks debug (default is no)
 MEMLEAKS  := no
 
-# makefiles to include
+# makefiles to include (all optional)
 FILE_VER := VERSION               # setup project VERSION and VERSION_DATE
 FILE_CPP := Makefile_cpp          # setup project specific CPPFLAGS defines
 FILE_C   := Makefile_c            # setup project CC_SRC and CC_HDR

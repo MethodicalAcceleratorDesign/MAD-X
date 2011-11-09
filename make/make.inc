@@ -23,9 +23,9 @@ include make/make.lib
 include make/make.cfg
 
 # compilers and linker specific settings
-include make/compiler.$(CC)
-include make/compiler.$(CXX)
-include make/compiler.$(FC)
+-include make/compiler.$(CC)
+-include make/compiler.$(CXX)
+-include make/compiler.$(FC)
 -include make/linker.$(LD)
 
 # system specific settings
