@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-# NOTE: link only on Linux!
+# NOTE: DOES NOT LINK! (should link only on linux)
 # does not link correctly on other platforms (MacOSX)
 # 64 bits architectures required g95 >= 0.93
 
@@ -38,7 +38,7 @@ endif
 
 LD      := $(FC)
 LDFLAGS += -m$(ARCH)
-LDLIBS  += $(GNULIBS) -lstdc++ -lgcc_eh
+LDLIBS  += $(GNULIBS) -lstdc++
 
 ifeq ($(STATIC),yes)
 LDFLAGS += -static
