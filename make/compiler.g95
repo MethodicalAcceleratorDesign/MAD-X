@@ -28,28 +28,7 @@
 # FDEP := $(FC) -M -fmod=$(OBJDIR)
 
 #
-# linker
-#
-
-# attemp to find the gnu libs directory (Linux only)
-ifeq ($(OSTYPE),Linux)
-  GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
-endif
-
-LD      := $(FC)
-LDFLAGS += -m$(ARCH)
-LDLIBS  += $(GNULIBS) -lstdc++
-
-ifeq ($(STATIC),yes)
-LDFLAGS += -static
-endif
-
-ifeq ($(OSTYPE),Darwin)
-LDLIBS  += -lSystemStubs
-endif
-
-#
-# basic flags
+# compiler flags
 #
 
 CPPFLAGS += -D_G95
@@ -71,12 +50,6 @@ endif
 
 ifeq ($(PROFILE),yes)
 FFLAGS  += -pg
-LDFLAGS += -pg
-endif
-
-ifeq ($(PLUGIN),yes)
-LDFLAGS += -rdynamic
-LDLIBS  += -ldl
 endif
 
 #

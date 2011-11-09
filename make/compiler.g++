@@ -23,13 +23,7 @@
 CXXDEP := $(CXX) -MM
 
 #
-# linker
-#
-
-# delegated to fortran compilers
-
-#
-# basic flags
+# compiler
 #
 
 CXXFLAGS := -m$(ARCH) -std=c++98 -Wall -W -pedantic -O3

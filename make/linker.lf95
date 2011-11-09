@@ -1,0 +1,53 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - lf95 linker settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# linker flags
+#
+
+# attemp to find the gnu libs directory (Linux only)
+ifeq ($(OSTYPE),Linux)
+  GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
+endif
+
+LDFLAGS += -m$(ARCH)
+LDLIBS  += $(GNULIBS) -lstdc++
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+LDFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
+endif
+
+ifeq ($(PROFILE),yes) # not found in the doc
+LDFLAGS += -pg
+endif
+
+ifeq ($(STATIC),yes)
+LDFLAGS += --static
+endif
+
+ifeq ($(PLUGIN),yes) # not found in the doc
+LDFLAGS += -dynamic
+LDLIBS  += -ldl
+endif
+
+# end of makefile
+

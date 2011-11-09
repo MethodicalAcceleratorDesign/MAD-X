@@ -23,13 +23,7 @@
 CDEP := $(CC) -MM
 
 #
-# linker
-#
-
-# delegated to fortran compilers
-
-#
-# basic flags
+# compiler flags
 #
 
 CFLAGS := -m$(ARCH) -O3

@@ -32,24 +32,7 @@ endif
 # FDEP :=
 
 #
-# linker
-#
-
-# attemp to find the gnu libs directory (Linux only)
-ifeq ($(OSTYPE),Linux)
-  GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
-endif
-
-LD      := $(FC)
-LDFLAGS += -m$(ARCH)
-LDLIBS  += $(GNULIBS) -lstdc++
-
-ifeq ($(STATIC),yes)
-LDFLAGS += --static
-endif
-
-#
-# basic flags
+# compiler flags
 #
 
 CPPFLAGS += -D_LF95
@@ -68,12 +51,6 @@ endif
 
 ifeq ($(PROFILE),yes) # not found in the doc
 FFLAGS  += -pg
-LDFLAGS += -pg
-endif
-
-ifeq ($(PLUGIN),yes) # not found in the doc
-LDFLAGS += -dynamic
-LDLIBS  += -ldl
 endif
 
 #

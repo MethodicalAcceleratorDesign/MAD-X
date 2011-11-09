@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - lf95 compiler settings
+# | MAD makefile - f95 compiler settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,6 +16,39 @@
 # | $Id$
 # |
 
-$(error $(FC) not supported yet)
+#
+# makedep
+#
+
+# FDEP := fpp -M
+
+#
+# compiler flags
+#
+
+CPPFLAGS += -D_NAGF95
+
+ifeq ($(ARCH),32)
+FFLAGS   := -Wc,-m32 -Wl,-m32 -abi=32
+endif
+FFLAGS   += -f95 -O4
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+FFLAGS += -g -C=all -nan -mtrace=size,line
+endif
+
+ifeq ($(PROFILE),yes)
+FFLAGS  += -pg
+endif
+
+#
+# extra flags
+#
+
+FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR)
 
 # end of makefile

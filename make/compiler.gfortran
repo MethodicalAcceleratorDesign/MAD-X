@@ -28,19 +28,7 @@
 # FDEP := $(FC) -MM -J$(OBJDIR)
 
 #
-# linker
-#
-
-LD      := $(FC)
-LDFLAGS += -m$(ARCH)
-LDLIBS  += -lstdc++
-
-ifeq ($(STATIC),yes)
-LDFLAGS += -Bstatic
-endif
-
-#
-# basic flags
+# compiler flags
 #
 
 CPPFLAGS += -D_GFORTRAN
@@ -61,12 +49,6 @@ endif
 
 ifeq ($(PROFILE),yes)
 FFLAGS  += -pg
-LDFLAGS += -pg
-endif
-
-ifeq ($(PLUGIN),yes)
-LDFLAGS += -rdynamic
-LDLIBS  += -ldl
 endif
 
 #

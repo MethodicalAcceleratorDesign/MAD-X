@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - f95 compiler settings
+# | MAD makefile - gcc linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -17,48 +17,31 @@
 # |
 
 #
-# makedep
+# linker flags
 #
 
-FDEP := $(FC) -M
-
-#
-# linker
-#
-
-LD      := $(FC)
-LDFLAGS += -m$(ARCH)
+LDFLAGS += -m$(ARCH) -O3
 LDLIBS  += -lstdc++
-
-#
-# basic flags
-#
-
-CPPFLAGS += -D_F95
-FFLAGS   := -m$(ARCH) -std=f95 -Wall -pedantic -pipe -O3
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -ggdb
+LDFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
-FFLAGS  += -pg
 LDFLAGS += -pg
+endif
+
+ifeq ($(STATIC),yes)
+LDFLAGS += -static
 endif
 
 ifeq ($(PLUGIN),yes)
 LDFLAGS += -rdynamic
 LDLIBS  += -ldl
 endif
-
-#
-# extra flags
-#
-
-# none
 
 # end of makefile

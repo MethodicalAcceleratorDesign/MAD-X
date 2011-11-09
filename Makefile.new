@@ -74,8 +74,8 @@ CXX := g++
 # Fortran compiler (default is ifort)
 FC  := ifort
 
-# Linker (default is ld, fortran compilers override it with LD:=$(FC))
-LD  := ld
+# Linker (default is fortran compilers)
+LD  := $(FC)
 
 ####################
 # Platform settings

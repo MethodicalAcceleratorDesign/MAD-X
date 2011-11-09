@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - icc compiler settings
+# | MAD makefile - f95 linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -17,40 +17,34 @@
 # |
 
 #
-# makedep
+# linker flags
 #
 
-CDEP := $(CC) -MM
+ifeq ($(ARCH),32)
+LDFLAGS += -Wl,-m32 -abi=32
+endif
 
-#
-# compiler
-#
-
-CFLAGS   := -m$(ARCH) -O3
-CXXFLAGS := -m$(ARCH) -std=c++0x -O3 -Wall
-
-# trig too many warnings (> 100+) for the moment!
-# CFLAGS   := -m$(ARCH) -std=c99 -Wall -O3
+LDLIBS  += -lstdc++
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS   += -g -gdwarf-2
-CXXFLAGS += -g -gdwarf-2
+LDFLAGS += -g -C=all -nan -mtrace=size,line
 endif
 
 ifeq ($(PROFILE),yes)
-CFLAGS   += -p
-CXXFLAGS += -p
+LDFLAGS += -pg
 endif
 
-#
-# extra flags
-#
- 
-CFLAGS   += -mp1 -fp-model precise
-CXXFLAGS += -mp1 -fp-model precise
+ifeq ($(STATIC),yes)
+LDFLAGS += -Bstatic
+endif
+
+ifeq ($(PLUGIN),yes)
+LDFLAGS += -rdynamic
+LDLIBS  += -ldl
+endif
 
 # end of makefile

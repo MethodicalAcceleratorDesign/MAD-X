@@ -24,19 +24,7 @@
 # FDEP := $(FC) -gen-dep -module $(OBJDIR)
 
 #
-# linker flags
-#
-
-LD      := $(FC)
-LDFLAGS += -m$(ARCH) -nofor-main
-LDLIBS  += -lstdc++
-
-ifeq ($(STATIC),yes)
-LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
-endif
-
-#
-# basic flags
+# compiler flags
 #
 
 CPPFLAGS += -D_IFORT
@@ -54,13 +42,7 @@ FFLAGS += -g -gdwarf-2 -check all
 endif
 
 ifeq ($(PROFILE),yes)
-FFLAGS  += -p
-LDFLAGS += -p
-endif
-
-ifeq ($(PLUGIN),yes)
-# LDFLAGS += -Bdynamic
-LDLIBS  += -ldl
+FFLAGS += -p
 endif
 
 #
