@@ -16,9 +16,7 @@
 # | $Id$
 # |
 
-# NOTE: tested on MacOSX and Linux with 32 and 64 bits architecture
-# On Linux , libs are statically linked
-# On MacOSX, libs are dynamically linked
+# NOTE:
 # Requires gfortran 4.4 or higher to compile...
 # Requires gfortran 4.6 or higher to compile with -O3
 

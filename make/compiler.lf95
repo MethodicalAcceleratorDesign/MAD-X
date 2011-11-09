@@ -16,6 +16,10 @@
 # | $Id$
 # |
 
+# NOTE: DOES NOT WORK!
+# does not link correctly on available platform (MacOSX and Linux)
+# can still be used to display fortran warnings and errors
+
 #
 # makedep
 #
