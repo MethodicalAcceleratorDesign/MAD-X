@@ -94,11 +94,6 @@ endif
 # Standard FORTRAN flags
  f95_FLAGS= -c -funroll-loops
 
-# Temporary fix for Lahey95
-ifeq ($(f95),lf95)
- GCCP_FLAGS+= -D_LF95
-endif
-
 #######################################################################
 # Link options
 #######################################################################
@@ -112,18 +107,18 @@ LDOPT=-static $(M32) $(IFORTFIX)
 
 ifeq ($(f95),lf95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= --o2 --tp -c -Wa,--32
+    f95_FLAGS= --o2 --tp -c -Wa,--32 -D_LF95
   else
-    f95_FLAGS= --o2 -c
+    f95_FLAGS= --o2 -c -D_LF95
   endif
 endif
 
 ifeq ($(f95),f95)
   ifeq ($(ARCH),32)
-    f95_FLAGS= -gline -c -Wc,-m32 -Wl,-m32 -abi=32 -maxcontin=100 -ieee=full -D_NAG
+    f95_FLAGS= -gline -c -Wc,-m32 -Wl,-m32 -abi=32 -maxcontin=100 -ieee=full -D_NAGFOR
     LDOPT= -Bstatic -Wl,-m32 -abi=32
   else
-    f95_FLAGS= -gline -c -maxcontin=100 -ieee=full -D_NAG
+    f95_FLAGS= -gline -c -maxcontin=100 -ieee=full -D_NAGFOR
     LDOPT= -Bstatic
   endif
 endif
@@ -138,14 +133,14 @@ endif
 
 ifeq ($(f95),g95)
   ifeq ($(ARCH),32)
-    f95_FLAGS+= -Wa,--32 -fno-second-underscore
+    f95_FLAGS+= -Wa,--32 -fno-second-underscore -D_G95
   else
-    f95_FLAGS+= -Wa,--64 -fno-second-underscore
+    f95_FLAGS+= -Wa,--64 -fno-second-underscore -D_G95
   endif
 endif
 
 ifeq ($(f95),gfortran)
-  f95_FLAGS+= -fno-range-check
+  f95_FLAGS+= -fno-range-check -D_GFORTRAN
   ifeq ($(ARCH),32)
      f95_FLAGS+=$(M32)
   endif
@@ -247,7 +242,7 @@ ifeq ($(findstring arwin, $(OSTYPE)),arwin)
 # include headers for gxx11c
   GCCP_FLAGS += -I /usr/X11R6/include/
   ifeq ($(f95),g95)
-    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore $(M32) -O4
+    f95_FLAGS= -c -funroll-loops -I. -fno-second-underscore $(M32) -O4 -D_G95
   endif
   ifeq ($(f95),gfortran)
     f95_FLAGS += $(M32) -O2
