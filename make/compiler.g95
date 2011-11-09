@@ -16,6 +16,10 @@
 # | $Id$
 # |
 
+# NOTE: link only on Linux!
+# does not link correctly on other platforms (MacOSX)
+# 64 bits architectures required g95 >= 0.93
+
 #
 # makedep
 #
@@ -27,9 +31,14 @@
 # linker
 #
 
+# attemp to find the gnu libs directory (Linux only)
+ifeq ($(OSTYPE),Linux)
+GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
+endif
+
 LD      := $(FC)
 LDFLAGS += -m$(ARCH)
-LDLIBS  += -lstdc++ -lgcc_eh
+LDLIBS  += $(GNULIBS) -lstdc++ -lgcc_eh
 
 ifeq ($(STATIC),yes)
 LDFLAGS += -static
@@ -57,7 +66,7 @@ FFLAGS   := -m$(ARCH) -O3
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -ggdb
+FFLAGS += -g
 endif
 
 ifeq ($(PROFILE),yes)

@@ -16,13 +16,17 @@
 # | $Id$
 # |
 
-# NOTE: DOES NOT WORK!
-# does not link correctly on available platform (MacOSX and Linux)
-# can still be used to display fortran warnings and errors
-# work only for 64 bits
+# NOTE: link only on linux!
+# does not link correctly on other platforms (MacOSX)
+# 64 bits architecture are not supported, only for 32 bits builds
 
-ifeq ($(ARCH),64)
+ifneq ($(ARCH),32)
 $(error Lahey Fortran compiler build only 32 bits project, use ARCH=32)
+endif
+
+# attemp to find the gnu libs directory (Linux only)
+ifeq ($(OSTYPE),Linux)
+GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
 endif
 
 #
@@ -38,7 +42,7 @@ endif
 
 LD      := $(FC)
 LDFLAGS += -m$(ARCH)
-LDLIBS  += -lstdc++ -lgcc_eh
+LDLIBS  += $(GNULIBS) -lstdc++ -lgcc_eh
 
 ifeq ($(STATIC),yes)
 LDFLAGS += --static

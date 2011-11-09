@@ -17,8 +17,13 @@ void*   mad_stck_base;
 void _gfortran_set_args (int argc, char *argv[]);
 #endif
 
+#ifdef _G95
+void g95_runtime_start(int argc, char *argv[]);
+void g95_runtime_stop (void);
+#endif
+
 #ifdef _LF95
-// Lahey f95 specific
+// Lahey f95 specific (requires main to be MAIN__)
 int
 MAIN__()
 {
@@ -40,9 +45,19 @@ main(int argc, char *argv[])
   _gfortran_set_args(argc, argv);
 #endif
 
+#ifdef _G95
+// g95 specific
+  g95_runtime_start(argc, argv);
+#endif
+
   madx_start();
   madx_input(CALL_LEVEL_ZERO);
   madx_finish();
+
+#ifdef _G95
+// g95 specific
+  g95_runtime_stop();
+#endif
   
   return EXIT_SUCCESS;
 }
