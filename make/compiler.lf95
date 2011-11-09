@@ -19,6 +19,11 @@
 # NOTE: DOES NOT WORK!
 # does not link correctly on available platform (MacOSX and Linux)
 # can still be used to display fortran warnings and errors
+# work only for 64 bits
+
+ifeq ($(ARCH),64)
+$(error Lahey Fortran compilers build only 32 bits project, use ARCH=32)
+endif
 
 #
 # makedep
@@ -32,11 +37,8 @@
 #
 
 LD      := $(FC)
+LDFLAGS += -m$(ARCH)
 LDLIBS  += -lstdc++ -lgcc_eh
-
-ifeq ($(ARCH),32)
-LDFLAGS +=-m$(ARCH)
-endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += --static
@@ -47,7 +49,7 @@ endif
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS   := --o2 --warn
+FFLAGS   := -Wa,--$(ARCH) --o2 --warn
 
 # Trig too many warnings for the moment!
 #FFLAGS   := --f95 --o2 --warn
@@ -56,15 +58,11 @@ FFLAGS   := --o2 --warn
 # options flags
 #
 
-ifeq ($(ARCH),32)
-FFLAGS += -Wa,--$(ARCH) --tp
-endif
-
 ifeq ($(DEBUG),yes)
 FFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
 endif
 
-ifeq ($(PROFILE),yes)
+ifeq ($(PROFILE),yes) # not found in the doc
 FFLAGS  += -pg
 LDFLAGS += -pg
 endif
