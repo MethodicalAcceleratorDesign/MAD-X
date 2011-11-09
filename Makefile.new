@@ -55,11 +55,11 @@ DEBUG   := no
 # profiling mode (default is no)
 PROFILE := no
 
-# plugging support (default is no)
-PLUGIN  := no
-
 # link with static libs (default is no)
 STATIC  := no
+
+# plugin dynamic loading (default is no)
+PLUGIN  := no
 
 #####################
 # Compilers settings
