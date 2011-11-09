@@ -7,8 +7,8 @@
 /Makefile.new -text
 /MakefileIntel.bat -text
 /Makefile_c -text
-/Makefile_c++ -text
 /Makefile_cpp -text
+/Makefile_cxx -text
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_sys -text

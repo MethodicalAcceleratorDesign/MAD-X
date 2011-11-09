@@ -33,15 +33,6 @@ NTPSA     := yes
 # memory leaks debug (default is no)
 MEMLEAKS  := no
 
-# makefiles to include (all optional)
-FILE_VER := VERSION               # setup project VERSION and VERSION_DATE
-FILE_CPP := Makefile_cpp          # setup project specific CPPFLAGS defines
-FILE_C   := Makefile_c            # setup project CC_SRC and CC_HDR
-FILE_CXX := Makefile_c++          # setup project CXX_SRC and CXX_HDR
-FILE_F90 := Makefile_f90          # setup project FC_SRC
-FILE_LIB := Makefile_lib          # setup project LIBS paths and libs
-FILE_SYS := Makefile_sys          # setup project System specific stuffs
-
 #################
 # Build settings
 #
@@ -61,8 +52,8 @@ STATIC  := no
 # plugin dynamic loading (default is no)
 PLUGIN  := no
 
-#####################
-# Compilers settings
+#############################
+# Compilers/Linkers settings
 #
 
 # C compiler (default is gcc)
@@ -76,6 +67,18 @@ FC  := ifort
 
 # Linker (default is fortran compilers)
 LD  := $(FC)
+
+####################
+# Includes settings
+
+# makefiles to include (all optional)
+FILE_VER := VERSION               # setup project VERSION and VERSION_DATE
+FILE_CPP := Makefile_cpp          # setup project specific CPPFLAGS defines
+FILE_C   := Makefile_c            # setup project CC_SRC and CC_HDR
+FILE_CXX := Makefile_cxx          # setup project CXX_SRC and CXX_HDR
+FILE_F90 := Makefile_f90          # setup project FC_SRC
+FILE_LIB := Makefile_lib          # setup project LIBS paths and libs
+FILE_SYS := Makefile_sys          # setup project System specific stuffs
 
 ####################
 # Platform settings

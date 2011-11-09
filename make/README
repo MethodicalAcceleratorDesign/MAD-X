@@ -16,17 +16,19 @@
 # | $Id$
 # |
 
-The MAD-X makefile is intend to compile project using C, C++ and Fortran 90
+The MAD-X makefile is intended to compile project using C, C++ and Fortran 90
 compilers in a flexible way. The following sections explain how to configure
-the makefile for the project.
+the makefile for the project. Changing the value of a variable on the command
+line of make allows to setup different configuration for your project, including
+the user-defined files included for files selection (i.e. FILE_%).
 
 targets for building the project:
-  [none] | $(PROJECT)
+  [none] | $(PROJECT)$(ARCH)
 
-targets for information:
+targets for printing information:
   info | infoprj | infoall
 
-targets for cleaning:
+targets for cleaning generated files:
   clean | cleanc | cleancxx | cleanf90 | cleanbuild | cleanall
 
 makefile options:
@@ -37,9 +39,47 @@ makefile options:
 
 PROJECT sets the project name.
   The program will have the name $(PROJECT)$(ARCH)
+  This will be also the name of the default target
 
 Other flags can be added to configure the project.
   Logical flags should use yes/no, not YES/NO
+
+#################
+# Build settings
+
+In the following settings, the first option is the default.
+
+ARCH=64/32 sets the target platform archictecture
+  The program and the default target will have the name $(PROJECT)$(ARCH)
+
+DEBUG=yes/no sets/unsets the build for debugging (with dwarf-2 compliance)
+  adds -D_DEBUG to CPPFLAGS
+
+PROFILE=yes/no sets/unsets the build for profiling (with gprof compliance)
+  adds -D_PROFILE to CPPFLAGS
+
+STATIC=no/yes unsets/sets the build for static linking (for distribution)
+
+PLUGIN=no/yes unsets/sets the build for dynamic loading of plugins
+  adds -D_PLUGIN to CPPFLAGS
+
+#############################
+# Compilers/Linkers settings
+
+CC=gcc sets the name of the C compiler.
+  The settings of the compiler are included from the file make/compiler.$(CC)
+
+CXX=g++ sets the name of the C++ compiler.
+  The settings of the compiler are included from the file make/compiler.$(CXX)
+
+FC=gfortran sets the name of the F90 compiler.
+  The settings of the compiler are included from the file make/compiler.$(FC)
+
+LD=ld sets the name of the linker
+  The settings of the linker are included from the file make/linker.$(LD)
+
+####################
+# Includes settings
 
 Makefile of the project to include
   FILE_VER contains the project VERSION and VERSION_DATE that must updated
@@ -53,44 +93,7 @@ Makefile of the project to include
   Notes:
     - dependencies of C and C++ files are computed automatically (must be!)
     - dependencies of F90 are computed automatically if the compiler allows to
-    - dependencies should be provided if resp. CDEP, CXXDEP, FCDEP are empty
-    - changing the value of a variable on the make command line allows to set
-      different settings for your project, including changing the files to
-      include for source files selection.
-
-#################
-# Build settings
-
-In the following, the first option is the default.
-
-ARCH=64/32 sets the target platform archictecture
-  The program will have the name $(PROJECT)$(ARCH)
-
-DEBUG=yes/no sets/unsets the build for debugging, compliant with dwarf-2
-  adds -D_DEBUG to CPPFLAGS
-
-PROFILE=yes/no sets/unsets the build for profiling with gprof
-  adds -D_PROFILE to CPPFLAGS
-
-PLUGIN=no/yes unsets/sets the build for dynamic loading of plugins
-  adds -D_PLUGIN to CPPFLAGS
-
-STATIC=no/yes unsets/sets the build for static linking (for distribution)
-
-#####################
-# Compilers settings
-
-CC=gcc sets the name of the C compiler.
-  The settings of the compiler are included from the file make/compiler.$(CC)
-
-CXX=g++ sets the name of the C++ compiler.
-  The settings of the compiler are included from the file make/compiler.$(CXX)
-
-FC=ifort sets the name of the F90 compiler.
-  The settings of the compiler are included from the file make/compiler.$(FC)
-
-LD=ld sets the name of the linker
-  The settings of the linker are included from the file make/linker.$(LD)
+    - dependencies must be provided if resp. CDEP, CXXDEP, FCDEP are empty
 
 ####################
 # Platform settings

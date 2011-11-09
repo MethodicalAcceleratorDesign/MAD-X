@@ -16,4 +16,8 @@
 # | $Id$
 # |
 
+ifeq ($(LD),)
+$(error Wrong linker settings (not configured?), 'ld' as default linker is not supported)
+endif
+
 # end of makefile
