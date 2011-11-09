@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: info infinc infoall
+.PHONY: info infoprj infoall
 
 info:
 	@ echo "Operating system             " = $(OSTYPE) "("$(ARCH) "bits)"
@@ -32,7 +32,7 @@ info:
 	@ echo "Linker       settings        " = $(LD) $(LDFLAGS)
 	@ echo "Libraries    settings        " = $(LIBS)
 
-infoinc infouser:
+infoprj:
 	@ echo "          project settings   " = $(PROJECT) $(VERSION) $(VERSION_DATE)
 	@ echo "Cpp       project settings   " = $(FILE_CPP)
 	@ echo "C         project settings   " = $(FILE_C)
@@ -41,7 +41,7 @@ infoinc infouser:
 	@ echo "Libraries project settings   " = $(FILE_LIB)
 	@ echo "System    project settings   " = $(FILE_SYS)
 
-infoall: info infoinc
+infoall: info infoprj
 	@ echo "Headers files                " = $(HEADERS)
 	@ echo "Sources files                " = $(SOURCES)
 	@ echo "Objects files                " = $(OBJECTS)

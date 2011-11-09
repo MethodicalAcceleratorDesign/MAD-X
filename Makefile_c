@@ -26,4 +26,11 @@ CC_SRC += rplot.c gxx11c.c madxp.c
 $(OBJDIR)/mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
                                   -D_VERSION_DATE=$(VERSION_DATE)
 
+#######################
+# C dependencies (case not automatic!)
+
+ifeq ($(CDEP),)
+$(error C dependencies must be computed automatically!)
+endif
+
 # end of makefile

@@ -24,4 +24,11 @@ ifeq ($(NTPSA),yes)
   CXX_SRC += tpsa.cpp
 endif
 
+#######################
+# C++ dependencies (case not automatic!)
+
+ifeq ($(CXXDEP),)
+$(error C++ dependencies must be computed automatically!)
+endif
+
 # end of makefile

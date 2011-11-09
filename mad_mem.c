@@ -13,7 +13,7 @@
 
 static char* myfree_caller = "none";
 
-#ifdef _MEM_LEAKS
+#ifdef _MEMLEAKS
 static int item_no=-1;
 static int* mtable[MTABLE_SIZE];
 #endif
@@ -34,7 +34,7 @@ mad_mem_handler(int sig)
 
 void*
 mymalloc(char* caller, size_t size)
-#ifdef _MEM_LEAKS
+#ifdef _MEMLEAKS
 {
   /* calls malloc, checks for memory granted */
   void* p;
@@ -58,7 +58,7 @@ mymalloc(char* caller, size_t size)
   return (void *)((char*)p+sizeof(double));
 }
 #endif
-#ifndef _MEM_LEAKS
+#ifndef _MEMLEAKS
 {
   /* calls malloc, checks for memory granted */
   void* p;
@@ -76,7 +76,7 @@ mymalloc(char* caller, size_t size)
 
 void*
 mycalloc(char* caller, size_t nelem, size_t size)
-#ifdef _MEM_LEAKS
+#ifdef _MEMLEAKS
 {
   /* calls calloc, checks for memory granted */
   void* p;
@@ -100,7 +100,7 @@ mycalloc(char* caller, size_t nelem, size_t size)
   return (void *)((char*)p+sizeof(double));
 }
 #endif
-#ifndef _MEM_LEAKS
+#ifndef _MEMLEAKS
 {
   /* calls calloc, checks for memory granted */
   void* p;
@@ -117,7 +117,7 @@ mycalloc(char* caller, size_t nelem, size_t size)
 
 void
 myfree(char* rout_name, void* p)
-#ifdef _MEM_LEAKS
+#ifdef _MEMLEAKS
 {
   int my_size,my_item_no,myend,old_item_no;
   char* l_p = (char*)p - sizeof(double);
@@ -155,7 +155,7 @@ myfree(char* rout_name, void* p)
   myfree_caller = "none";
 }
 #endif
-#ifndef _MEM_LEAKS
+#ifndef _MEMLEAKS
 {
   char* l_p = (char*)p - sizeof(double);
   int* i_p = (int*) l_p;

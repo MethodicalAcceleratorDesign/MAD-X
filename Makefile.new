@@ -54,11 +54,11 @@ DEBUG   := no
 # profiling mode (default is no)
 PROFILE := no
 
-# link with static libs (default is no)
-STATIC  := no
-
 # plugging support (default is no)
 PLUGIN  := no
+
+# link with static libs (default is no)
+STATIC  := no
 
 #####################
 # Compilers settings
@@ -72,6 +72,9 @@ CXX := g++
 
 # Fortran compiler (default is ifort)
 FC  := ifort
+
+# Linker (default is ld, fortran compilers override LD:=$(FC))
+LD  := ld
 
 ####################
 # Platform settings

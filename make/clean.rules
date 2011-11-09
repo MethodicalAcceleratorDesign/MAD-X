@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: clean cleanall
+.PHONY: clean cleanc cleancxx cleanf90 cleanbuild cleanall
 
 clean:
 	$E "** Cleaning local files"

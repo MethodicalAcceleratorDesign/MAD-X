@@ -17,23 +17,19 @@
 # |
 
 #
-# options flags
+# defines
 #
-
-ifeq ($(DEBUG),yes)
-CPPFLAGS += -D_DEBUG
-endif
-
-ifeq ($(MEMLEAKS),yes)
-CPPFLAGS += -D_MEM_LEAKS
-endif
 
 ifeq ($(ONLINE),yes)
 CPPFLAGS += -D_ONLINE
 endif
 
-ifeq ($(PLUGIN),yes)
-CPPFLAGS += -D_PLUGIN
+ifeq ($(NTPSA),yes)
+CPPFLAGS += -D_NTPSA
+endif
+
+ifeq ($(MEMLEAKS),yes)
+CPPFLAGS += -D_MEMLEAKS
 endif
 
 # end of makefile
