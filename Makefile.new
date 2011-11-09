@@ -17,6 +17,7 @@
 # |
 
 # For this makefile documentation, please read make/README
+# For information and bug report, please contact mad@cern.ch
 
 ###################
 # Project settings
@@ -73,7 +74,7 @@ CXX := g++
 # Fortran compiler (default is ifort)
 FC  := ifort
 
-# Linker (default is ld, fortran compilers override LD:=$(FC))
+# Linker (default is ld, fortran compilers override it with LD:=$(FC))
 LD  := ld
 
 ####################
