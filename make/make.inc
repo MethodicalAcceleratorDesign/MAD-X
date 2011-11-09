@@ -17,19 +17,19 @@
 # |
 
 # make utilities
-include make/make.lib
+include $(makedir)/make.lib
 
 # make config
-include make/make.cfg
+include $(makedir)/make.cfg
 
 # compilers and linker specific settings
--include make/compiler.$(CC)
--include make/compiler.$(CXX)
--include make/compiler.$(FC)
--include make/linker.$(LD)
+-include $(makedir)/compiler.$(CC)
+-include $(makedir)/compiler.$(CXX)
+-include $(makedir)/compiler.$(FC)
+-include $(makedir)/linker.$(LD)
 
 # system specific settings
--include make/system.$(OSTYPE)
+-include $(makedir)/system.$(OSTYPE)
 
 # project files
 -include $(FILE_VER)
@@ -41,12 +41,12 @@ include make/make.cfg
 -include $(FILE_SYS)
 
 # compilers, linker and depend rules
-include make/compiler.rules
-include make/linker.rules
-include make/depend.rules
+include $(makedir)/compiler.rules
+include $(makedir)/linker.rules
+include $(makedir)/depend.rules
 
 # cleaning & debugging
-include make/clean.rules
-include make/infos.rules
+include $(makedir)/clean.rules
+include $(makedir)/infos.rules
 
 # end of makefile

@@ -95,6 +95,7 @@ NOBUILD := clean% info%
 ####################
 # Makefile includes
 
-include make/make.inc
+makedir := make
+include $(makedir)/make.inc
 
 # end of makefile
