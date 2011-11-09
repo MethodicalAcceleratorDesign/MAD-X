@@ -32,8 +32,11 @@
 #
 
 LD      := $(FC)
-LDFLAGS += -Wa,--$(ARCH)
 LDLIBS  += -lstdc++ -lgcc_eh
+
+ifeq ($(ARCH),32)
+LDFLAGS +=-m$(ARCH)
+endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += --static
@@ -44,14 +47,18 @@ endif
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS   := -Wa,--$(ARCH) --o2 --warn
+FFLAGS   := --o2 --warn
 
 # Trig too many warnings for the moment!
-#FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn
+#FFLAGS   := --f95 --o2 --warn
 
 #
 # options flags
 #
+
+ifeq ($(ARCH),32)
+FFLAGS += -Wa,--$(ARCH) --tp
+endif
 
 ifeq ($(DEBUG),yes)
 FFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
