@@ -62,6 +62,11 @@ FFLAGS  += -pg
 LDFLAGS += -pg
 endif
 
+ifeq ($(PLUGIN),yes)
+# LDFLAGS += -Bdynamic
+LDLIBS  += -ldl
+endif
+
 #
 # extra flags
 #

@@ -29,13 +29,13 @@ clean:
 
 cleanc:
 	$E "** Cleaning C generated files"
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(C_SRC))))
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(C_SRC))))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(CC_SRC)))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
 
 cleancxx:
 	$E "** Cleaning C++ generated files"
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(CXX_SRC))))
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC))))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(CXX_SRC)))
+	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
 
 cleanf90:
 	$E "** Cleaning F90 generated files"

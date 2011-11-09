@@ -271,6 +271,7 @@ make/compiler.g++ -text
 make/compiler.g95 -text
 make/compiler.gcc -text
 make/compiler.gfortran -text
+make/compiler.icc -text
 make/compiler.ifort -text
 make/compiler.lf95 -text
 make/compiler.nagfor -text
