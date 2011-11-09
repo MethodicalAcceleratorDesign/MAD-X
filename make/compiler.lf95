@@ -22,7 +22,7 @@
 # work only for 64 bits
 
 ifeq ($(ARCH),64)
-$(error Lahey Fortran compilers build only 32 bits project, use ARCH=32)
+$(error Lahey Fortran compiler build only 32 bits project, use ARCH=32)
 endif
 
 #
@@ -52,7 +52,7 @@ CPPFLAGS += -D_LF95
 FFLAGS   := -Wa,--$(ARCH) --o2 --warn
 
 # Trig too many warnings for the moment!
-#FFLAGS   := --f95 --o2 --warn
+#FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn
 
 #
 # options flags
