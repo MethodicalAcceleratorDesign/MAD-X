@@ -16,35 +16,41 @@
 # | $Id$
 # |
 
-.PHONY: info infoprj infoall
+.PHONY: info infoinc infoprj infoall
 
 info:
-	@ echo "Operating system             " = $(OSTYPE) "("$(ARCH) "bits)"
-	@ echo "Current directory            " = $(CURDIR)
-	@ echo "Build   directory            " = $(OBJDIR)
-	@ echo "Preprocessing defines        " = $(CPPFLAGS)
-	@ echo "C   makedep  settings        " = $(CDEP)
-	@ echo "C++ makedep  settings        " = $(CXXDEP)
-	@ echo "F90 makedep  settings        " = $(FDEP)
-	@ echo "C   compiler settings        " = $(CC) $(CFLAGS)
-	@ echo "C++ compiler settings        " = $(CXX) $(CXXFLAGS)
-	@ echo "F90 compiler settings        " = $(FC) $(FFLAGS)
-	@ echo "Linker       settings        " = $(LD) $(LDFLAGS)
-	@ echo "Libraries    settings        " = $(LIBS)
+	@ echo "Operating system                " = $(OSTYPE)$(OSARCH) "($(ARCH) bits)"
+	@ echo "Current directory               " = $(CURDIR)
+	@ echo "Build   directory               " = $(OBJDIR)
+	@ echo "Preprocessing defines           " = $(CPPFLAGS)
+     	@ echo "C   makedep  settings           " = $(CDEP)
+     	@ echo "C++ makedep  settings           " = $(CXXDEP)
+	@ echo "F90 makedep  settings           " = $(FDEP)
+	@ echo "C   compiler settings           " = $(CC) $(CFLAGS)
+	@ echo "C++ compiler settings           " = $(CXX) $(CXXFLAGS)
+	@ echo "F90 compiler settings           " = $(FC) $(FFLAGS)
+	@ echo "Linker       settings           " = $(LD) $(LDFLAGS)
+	@ echo "Libraries    settings           " = $(LIBS)
+
+infoinc:
+	@ echo "C   compiler settings file      " = $(makedir)/compiler.$(CCNAME)
+	@ echo "C++ compiler settings file      " = $(makedir)/compiler.$(CXXNAME)
+	@ echo "F90 compiler settings file      " = $(makedir)/compiler.$(FCNAME)
+	@ echo "Linker       settings file      " = $(makedir)/linker.$(LDNAME)
 
 infoprj:
-	@ echo "          project settings   " = $(PROJECT) $(VERSION) $(VERSION_DATE)
-	@ echo "Cpp       project settings   " = $(FILE_CPP)
-	@ echo "C         project settings   " = $(FILE_C)
-	@ echo "C++       project settings   " = $(FILE_CXX)
-	@ echo "F90       project settings   " = $(FILE_F90)
-	@ echo "Libraries project settings   " = $(FILE_LIB)
-	@ echo "System    project settings   " = $(FILE_SYS)
+	@ echo "          project settings file " = $(PROJECT) $(VERSION) $(VERSION_DATE)
+	@ echo "Cpp       project settings file " = $(FILE_CPP)
+	@ echo "C         project settings file " = $(FILE_C)
+	@ echo "C++       project settings file " = $(FILE_CXX)
+	@ echo "F90       project settings file " = $(FILE_F90)
+	@ echo "Libraries project settings file " = $(FILE_LIB)
+	@ echo "System    project settings file " = $(FILE_SYS)
 
-infoall: info infoprj
-	@ echo "Headers files                " = $(HEADERS)
-	@ echo "Sources files                " = $(SOURCES)
-	@ echo "Objects files                " = $(OBJECTS)
-	@ echo "Depends files                " = $(DEPENDS)
+infoall: info infoinc infoprj
+	@ echo "Headers files                   " = $(HEADERS)
+	@ echo "Sources files                   " = $(SOURCES)
+	@ echo "Objects files                   " = $(OBJECTS)
+	@ echo "Depends files                   " = $(DEPENDS)
 
 # end of makefile

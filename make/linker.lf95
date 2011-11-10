@@ -25,9 +25,9 @@ LDFLAGS += -m$(ARCH)
 ifneq ($(CXX_SRC),)
   # attemp to find the gnu libs directory for Lahey! (Linux only)
   ifeq ($(OSTYPE),Linux)
-    GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
+    GNULIBS := $(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
   endif
-  LDLIBS += $(GNULIBS) -lstdc++
+  LDLIBS += -L$(GNULIBS) -lstdc++ $(GNULIBS)/crt*S.o
 endif
 
 #

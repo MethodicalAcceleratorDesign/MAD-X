@@ -27,7 +27,7 @@ ifneq ($(CXX_SRC),)
   ifeq ($(OSTYPE),Linux)
     GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
   endif
-  LDLIBS += $(GNULIBS) -lstdc++
+  LDLIBS += -L$(GNULIBS) -lstdc++ $(GNULIBS)/crt*S.o
 endif
 
 ifeq ($(OSTYPE),Darwin)

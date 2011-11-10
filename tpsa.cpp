@@ -62,8 +62,8 @@ static unsigned int tblsize;
 
 // memory pool
 static double **advecpool;
-std::vector<double*> advec;
-std::vector<unsigned int> adveclen;
+static std::vector<double*> advec;
+static std::vector<unsigned int> adveclen;
 
 
 using namespace std;

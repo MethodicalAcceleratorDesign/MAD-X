@@ -22,14 +22,10 @@ include $(makedir)/make.lib
 # make config
 include $(makedir)/make.cfg
 
-# compilers and linker specific settings
+# compilers specific settings
 -include $(makedir)/compiler.$(CCNAME)
 -include $(makedir)/compiler.$(CXXNAME)
 -include $(makedir)/compiler.$(FCNAME)
--include $(makedir)/linker.$(LDNAME)
-
-# system specific settings
--include $(makedir)/system.$(OSTYPE)
 
 # project files
 -include $(FILE_VER)
@@ -39,6 +35,12 @@ include $(makedir)/make.cfg
 -include $(FILE_F90)
 -include $(FILE_LIB)
 -include $(FILE_SYS)
+
+# linker specific settings
+-include $(makedir)/linker.$(LDNAME)
+
+# system specific settings
+-include $(makedir)/system.$(OSTYPE)
 
 # compilers, linker and depend rules
 include $(makedir)/compiler.rules
