@@ -23,7 +23,7 @@
 LDFLAGS += -m$(ARCH) -O3
 
 ifneq ($(CXX_SRC),)
-LDLIBS  += -lstdc++
+LDLIBS += -lstdc++
 endif
 
 #
