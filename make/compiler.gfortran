@@ -24,8 +24,8 @@
 # makedep
 #
 
-# fortran dependencies computation requires mod files (quite stupid)!
-# FDEP := $(FC) -MM -J$(OBJDIR)
+# fortran dependencies computation requires mod files (quite stupid, need loops)!
+# FDEP := $(FC) -MM -cpp -J$(OBJDIR)
 
 #
 # compiler flags
