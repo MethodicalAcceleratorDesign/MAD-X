@@ -22,17 +22,19 @@ include $(makedir)/make.lib
 # make config
 include $(makedir)/make.cfg
 
-# compilers specific settings
--include $(makedir)/compiler.$(CCNAME)
--include $(makedir)/compiler.$(CXXNAME)
--include $(makedir)/compiler.$(FCNAME)
-
 # project files
 -include $(FILE_VER)
 -include $(FILE_CPP)
+
+-include $(makedir)/compiler.$(CCNAME)
 -include $(FILE_C)
+
+-include $(makedir)/compiler.$(CXXNAME)
 -include $(FILE_CXX)
+
+-include $(makedir)/compiler.$(FCNAME)
 -include $(FILE_F90)
+
 -include $(FILE_LIB)
 -include $(FILE_SYS)
 

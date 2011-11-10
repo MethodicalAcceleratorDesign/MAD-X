@@ -51,4 +51,8 @@ endif
 
 FFLAGS += -mp1 -fp-model precise -assume noold_unit_star -module $(OBJDIR)
 
+ifneq ($(CXX_SRC),)
+FFLAGS += -fexceptions
+endif
+
 # end of makefile
