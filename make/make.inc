@@ -23,10 +23,10 @@ include $(makedir)/make.lib
 include $(makedir)/make.cfg
 
 # compilers and linker specific settings
--include $(makedir)/compiler.$(CC)
--include $(makedir)/compiler.$(CXX)
--include $(makedir)/compiler.$(FC)
--include $(makedir)/linker.$(LD)
+-include $(makedir)/compiler.$(CCNAME)
+-include $(makedir)/compiler.$(CXXNAME)
+-include $(makedir)/compiler.$(FCNAME)
+-include $(makedir)/linker.$(LDNAME)
 
 # system specific settings
 -include $(makedir)/system.$(OSTYPE)

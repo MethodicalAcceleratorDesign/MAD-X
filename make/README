@@ -78,6 +78,14 @@ FC=gfortran sets the name of the F90 compiler.
 LD=ld sets the name of the linker
   The settings of the linker are included from the file make/linker.$(LD)
 
+Notes:
+  - The compiler and linker configuration files are loaded using the paths and
+    names $(makedir)/[compiler|linker].$([CC|CXX|FC|LD]NAME), where
+    $([CC|CXX|FC|LD]NAME) are set to $([CC|CXX|FC|LD]) by default.
+  - Example:
+      make FC=gfortran44 FCNAME=gfortran
+    sets the compiler to gfortran44 but uses the configuration of compiler.gfortran
+
 ####################
 # Includes settings
 
@@ -90,10 +98,10 @@ Makefile of the project to include
   FILE_LIB sets LIBS with required paths (i.e. -Lpath) and names (i.e. -llib)
   FILE_SYS contains system specific stuff (e.g. unsupported configurations)
 
-  Notes:
-    - dependencies of C and C++ files are computed automatically (must be!)
-    - dependencies of F90 are computed automatically if the compiler allows to
-    - dependencies must be provided if resp. CDEP, CXXDEP, FCDEP are empty
+Notes:
+  - dependencies of C and C++ files are computed automatically (must be!)
+  - dependencies of F90 are computed automatically if the compiler allows to
+  - dependencies must be provided if resp. CDEP, CXXDEP, FCDEP are empty
 
 ####################
 # Platform settings
