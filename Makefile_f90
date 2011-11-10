@@ -78,6 +78,11 @@ madx_ptc_trackcavs.f90:     madx_ptc_setcavs.o
 madx_ptc_twiss.f90:         madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
 user2_photon.f90:           madx_ptc_track_run.o
 
+matchjc.f90:                match.o
+matchlib.f90:               matchjc.o
+matchlib2.f90:              matchlib.o
+matchsa.f90:                matchlib2.o
+
 # dependencies on includes
 h_definition.f90:           a_def_frame_patch_chart.inc a_def_all_kind.inc \
                             a_def_sagan.inc a_def_element_fibre_layout.inc
@@ -98,9 +103,9 @@ madx_ptc_setcavs.f90 madx_ptc_trackcavs.f90 madx_ptc_knobs.f90 \
   madx_ptc_eplacement.f90: madx_ptc_intstate.o
 
 # dependencies on madx_ptc_module.f90
-madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 madx_ptc_eplacement.f90 \
-  madx_ptc_normal.f90 madx_ptc_twiss.f90 madx_ptc_distrib.f90 \
-  St_pointers.f90: madx_ptc_module.o
+ptc_export_xml.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
+  madx_ptc_eplacement.f90 madx_ptc_normal.f90 madx_ptc_twiss.f90 \
+  madx_ptc_distrib.f90 St_pointers.f90: madx_ptc_module.o
 
 # dependencies on util.f90
 dynap.f90 emit.f90 gxx11.f90 ibsdb.f90 matchjc.f90 match.f90 matchsa.f90 plot.f90 \
