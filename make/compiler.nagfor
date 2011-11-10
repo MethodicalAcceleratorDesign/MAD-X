@@ -27,11 +27,11 @@
 #
 
 CPPFLAGS += -D_NAGF95
+FFLAGS   := -f95 -O4
 
 ifeq ($(ARCH),32)
-FFLAGS   := -Wc,-m32 -Wl,-m32 -abi=32
+FFLAGS   += -Wc,-m32 -abi=32
 endif
-FFLAGS   += -f95 -O4
 
 #
 # options flags
