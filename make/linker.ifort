@@ -21,7 +21,10 @@
 #
 
 LDFLAGS += -m$(ARCH) -nofor-main -O3
+
+ifneq($(CXX_SRC),)
 LDLIBS  += -lstdc++
+endif
 
 #
 # options flags

@@ -24,7 +24,9 @@ ifeq ($(ARCH),32)
 LDFLAGS += -Wl,-m32 -abi=32
 endif
 
+ifneq($(CXX_SRC),)
 LDLIBS  += -lstdc++
+endif
 
 #
 # options flags

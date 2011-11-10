@@ -20,13 +20,15 @@
 # linker flags
 #
 
-# attemp to find the gnu libs directory (Linux only)
-ifeq ($(OSTYPE),Linux)
-  GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
-endif
-
 LDFLAGS += -m$(ARCH)
+
+ifneq($(CXX_SRC),)
 LDLIBS  += $(GNULIBS) -lstdc++
+  # attemp to find the gnu libs directory (Linux only)
+  ifeq ($(OSTYPE),Linux)
+    GNULIBS := -L$(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
+  endif
+endif
 
 #
 # options flags
