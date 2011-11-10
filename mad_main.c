@@ -14,11 +14,12 @@ char**  mad_argv;
 void*   mad_stck_base;
 
 #ifdef _GFORTRAN
-void _gfortran_set_args (int argc, char *argv[]);
+void _gfortran_set_args    (int, char *[]);
+void _gfortran_set_options (int, int   []);
 #endif
 
 #ifdef _G95
-void g95_runtime_start(int argc, char *argv[]);
+void g95_runtime_start(int, char *[]);
 void g95_runtime_stop (void);
 #endif
 
@@ -43,6 +44,7 @@ main(int argc, char *argv[])
 #ifdef _GFORTRAN
 // gfortran specific
   _gfortran_set_args(argc, argv);
+  _gfortran_set_options(0, 0);
 #endif
 
 #ifdef _G95
