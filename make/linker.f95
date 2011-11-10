@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - nagfor compiler settings
+# | MAD makefile - f95 linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,39 +16,6 @@
 # | $Id$
 # |
 
-#
-# makedep
-#
-
-# FDEP := fpp -M
-
-#
-# compiler flags
-#
-
-CPPFLAGS += -D_NAGF95
-FFLAGS   := -f95 -O4
-
-ifeq ($(ARCH),32)
-FFLAGS   += -Wc,-m32 -abi=32
-endif
-
-#
-# options flags
-#
-
-ifeq ($(DEBUG),yes)
-FFLAGS += -g -C=all -nan -mtrace=size,line
-endif
-
-ifeq ($(PROFILE),yes)
-FFLAGS  += -pg
-endif
-
-#
-# extra flags
-#
-
-FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR)
+include $(makedir)/linker.nagfor
 
 # end of makefile

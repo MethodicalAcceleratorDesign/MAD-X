@@ -267,6 +267,7 @@ lib64/libz.a -text
 /madxp.c -text
 make/README -text
 make/clean.rules -text
+make/compiler.f95 -text
 make/compiler.g++ -text
 make/compiler.g95 -text
 make/compiler.gcc -text
@@ -278,6 +279,7 @@ make/compiler.nagfor -text
 make/compiler.rules -text
 make/depend.rules -text
 make/infos.rules -text
+make/linker.f95 -text
 make/linker.g++ -text
 make/linker.g95 -text
 make/linker.gcc -text
