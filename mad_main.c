@@ -18,9 +18,14 @@ void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
 #endif
 
+#ifdef _NAGF95
+void f90_init   (int, char *[]);
+void f90_finish (int);
+#endif
+
 #ifdef _G95
-void g95_runtime_start(int, char *[]);
-void g95_runtime_stop (void);
+void g95_runtime_start (int, char *[]);
+void g95_runtime_stop  (void);
 #endif
 
 #ifdef _LF95
@@ -33,31 +38,38 @@ MAIN__()
   mad_argc = 0;
   mad_argv = 0;
 #else
+
 int
 main(int argc, char *argv[])
 {
   mad_stck_base = &argc;
   mad_argc = argc;
   mad_argv = argv;
-#endif
+#endif // _LF95
 
 #ifdef _GFORTRAN
-// gfortran specific
   _gfortran_set_args(argc, argv);
   _gfortran_set_options(0, 0);
 #endif
 
+#ifdef _NAGF95
+  f90_init(argc, argv);
+#endif
+
 #ifdef _G95
-// g95 specific
   g95_runtime_start(argc, argv);
 #endif
 
+// madx main program
   madx_start();
   madx_input(CALL_LEVEL_ZERO);
   madx_finish();
 
+#ifdef _NAGF95
+  f90_finish(EXIT_SUCCESS);
+#endif
+
 #ifdef _G95
-// g95 specific
   g95_runtime_stop();
 #endif
   
