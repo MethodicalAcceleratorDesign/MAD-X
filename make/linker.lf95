@@ -23,11 +23,12 @@
 LDFLAGS += -m$(ARCH)
 
 ifneq ($(CXX_SRC),)
-  # attemp to find the gnu libs directory for Lahey! (Linux only)
-  ifeq ($(OSTYPE),Linux)
+  ifeq ($(ARCH),32)
+    # attemp to find the gnu libs directory for Lahey 32 bits! (gcc only)
     GNULIBS := $(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
+    LDLIBS  += -L$(GNULIBS) $(GNULIBS)/crt*S.o
   endif
-  LDLIBS += -L$(GNULIBS) -lstdc++ $(GNULIBS)/crt*S.o
+  LDLIBS += -lstdc++
 endif
 
 #
