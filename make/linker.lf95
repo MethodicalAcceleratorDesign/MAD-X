@@ -42,7 +42,7 @@ ifeq ($(STATIC),yes)
     # It uses partial link and unfortunately discards everthing in the final step
     # Hence, linker groups do not work and required symbols must be specified by hand...
     REQSYM := __divdi3 __moddi3
-    LDLIBS += $(addprefix -Wl\,--undefined=,$(REQSYM)) -lc -lgcc_eh -lgcc
+    LDLIBS += $(addprefix "-Wl,--undefined=",$(REQSYM)) -lc -lgcc_eh -lgcc
   endif
 endif
 
