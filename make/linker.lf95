@@ -22,20 +22,28 @@
 
 LDFLAGS += -m$(ARCH)
 
+ifeq ($(ARCH),32)
+  # attemp to find the gnu libs directory for Lahey 32 bits! (GCC only)
+  GNULIBS := $(dir $(shell $(CC) $(CFLAGS) -print-file-name=libgcc.a))
+  LDLIBS  += -L$(GNULIBS)
+endif
+
 ifneq ($(CXX_SRC),)
   ifeq ($(ARCH),32)
-    # attemp to find the gnu libs directory for Lahey 32 bits! (gcc only)
-    GNULIBS := $(dir $(shell $(CXX) $(CXXFLAGS) -print-file-name=libstdc++.a))
-    LDLIBS  += -L$(GNULIBS) $(GNULIBS)/crt*S.o
+    # required by __constructors
+    LDLIBS += $(GNULIBS)/crt*S.o
   endif
   LDLIBS += -lstdc++
 endif
 
 ifeq ($(STATIC),yes)
-ifeq ($(ARCH),32)
-  # Lahey 32 bits is asking for symbols in its last (hidden) linked libs
-  LDLIBS += -Wl,--undefined=__divdi3 -Wl,--undefined=__moddi3 -lc -lgcc_eh -lgcc
-endif
+  ifeq ($(ARCH),32)
+    # Lahey 32 bits (hidden) libs are asking for symbols during last linking step
+    # It uses partial link and unfortunately discards everthing in the final step
+    # Hence, linker groups do not work and required symbols must be specified by hand...
+    REQSYM := __divdi3 __moddi3
+    LDLIBS += $(addprefix -Wl,--undefined=,$(REQSYM)) -lc -lgcc_eh -lgcc
+  endif
 endif
 
 #
