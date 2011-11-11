@@ -39,8 +39,8 @@ endif
 ifeq ($(STATIC),yes)
   ifeq ($(ARCH),32)
     # Lahey 32 bits (hidden) libs are asking for symbols during last linking step
-    # It uses partial link and unfortunately discards everthing in the final step
-    # Hence, linker groups do not work and required symbols must be specified by hand...
+    # It probably uses partial link and discards everthing in the final step
+    # Hence, ld groups do not work and required symbols must be specified by hand...
     REQSYM := __divdi3 __moddi3
     REQCMD := -Wl,--undefined=
     LDLIBS += $(addprefix $(REQCMD),$(REQSYM)) -lc -lgcc_eh -lgcc
