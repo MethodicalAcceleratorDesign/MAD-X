@@ -31,6 +31,10 @@ ifneq ($(CXX_SRC),)
   LDLIBS += -lstdc++
 endif
 
+ifeq ($(STATIC),yes)
+  LDLIBS += -lc -lgcc_eh -lgcc
+endif
+
 #
 # options flags
 #
