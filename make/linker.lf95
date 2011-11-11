@@ -32,7 +32,10 @@ ifneq ($(CXX_SRC),)
 endif
 
 ifeq ($(STATIC),yes)
-  LDLIBS += -lc -lgcc_eh -lgcc
+ifeq ($(ARCH),32)
+  # Lahey 32 bits is asking for symbols in its last (hidden) linked libs
+  LDLIBS += -Wl,--undefined=__divdi3 -Wl,--undefined=__moddi3 -lc -lgcc_eh -lgcc
+endif
 endif
 
 #
