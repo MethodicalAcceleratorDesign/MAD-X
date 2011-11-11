@@ -53,4 +53,7 @@ include $(makedir)/depend.rules
 include $(makedir)/clean.rules
 include $(makedir)/infos.rules
 
+# user's extra stuff
+-include $(FILE_USR)
+
 # end of makefile
