@@ -1,0 +1,63 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - compilers environement on lxplus.cern.ch
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+The following command are for csh/tcsh shells. For Bash/Bourne shells, replace
+  - 'setenv VAR value' by 'export VAR=value'
+  - 'source script.csh' by '. script.sh' (note the file extension)
+
+GNU compilers: CC=gcc, CXX=g++, FC=gfortran
+--------------
+  [Nothing to do for ARCH=32 and ARCH=64]
+
+Intel compilers: CC=icc, CXX=icc, FC=ifort
+----------------
+for ARCH=32
+source /afs/cern.ch/sw/IntelSoftware/linux/setup.csh
+source /afs/cern.ch/sw/IntelSoftware/linux/x86_64/Compiler/11.1/072/bin/iccvars.csh ia32
+source /afs/cern.ch/sw/IntelSoftware/linux/x86_64/Compiler/11.1/072/bin/ifortvars.csh ia32
+
+for ARCH=64
+source /afs/cern.ch/sw/IntelSoftware/linux/setup.csh
+source /afs/cern.ch/sw/IntelSoftware/linux/x86_64/Compiler/11.1/072/bin/iccvars.csh intel64
+source /afs/cern.ch/sw/IntelSoftware/linux/x86_64/Compiler/11.1/072/bin/ifortvars.csh intel64
+
+Lahey Fortran compilers: FC=lf95
+------------------------
+for ARCH=32
+setenv PATH "${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
+setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
+
+for ARCH=64 (needs to be registered or logged on lxlahey02)
+setenv PATH "${PATH}:/afs/cern.ch/sw/fortran/lahey/lf6481/bin"
+setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf6481/lib64"
+setenv PFDIR /afs/cern.ch/sw/fortran/lahey/lf6481/bin
+setenv WISK /afs/cern.ch/sw/fortran/lahey/lf6481
+setenv LSERVRC /afs/cern.ch/sw/fortran/lahey/lf6481/bin/lservrc
+
+Nag Fortran compiler: FC=nagfor
+---------------------
+for ARCH=32 and ARCH=64
+setenv PATH "${PATH}:/afs/cern.ch/sw/fortran/nag2010/bin"
+setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2010/lib"
+setenv NAG_KUSARI_FILE "/afs/cern.ch/sw/fortran/nag2010/lib/nag.licence,lxlic04.cern.ch:"
+
+g95 Fortran compiler: FC=g95
+---------------------
+g95 on lxplus does not work. Need user's own g95 installation (>= 0.93)
+Nothing to do on Ubuntu/Debian once .deb package is installed
+

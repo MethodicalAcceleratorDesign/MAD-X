@@ -266,6 +266,7 @@ lib64/libz.a -text
 /madx_ptc_twiss.f90 -text
 /madxp.c -text
 make/README -text
+make/README.lxplus -text
 make/clean.rules -text
 make/compiler.g++ -text
 make/compiler.g95 -text
