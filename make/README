@@ -82,6 +82,10 @@ Notes:
   - The compiler and linker configuration files are loaded using
     $(makedir)/compiler.$([CC|CXX|FC]NAME) and $(makedir)/linker.$(LDNAME),
     where $([CC|CXX|FC|LD]NAME) are set to $([CC|CXX|FC|LD]) by default.
+  - In order to get the list of supported compilers and linkers, do
+    ls -l $(makedir)/compiler.*
+    ls -l $(makedir)/linker.*
+    where usually $(makedir)=make.
   - Example:
       make FC=gfortran44 FCNAME=gfortran
     sets the compiler to gfortran44 but uses the configuration of compiler.gfortran
