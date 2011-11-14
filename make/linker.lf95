@@ -30,7 +30,7 @@ endif
 
 ifneq ($(CXX_SRC),)
   ifeq ($(ARCH),32)
-    # required by __constructors
+    # required by __constructor/__destructor attributes
     LDLIBS += $(GNULIBS)/crt*S.o
   endif
   LDLIBS += -lstdc++
@@ -41,7 +41,7 @@ ifeq ($(STATIC),yes)
     # Lahey 32 bits (hidden) libs are asking for symbols during last linking step
     # It probably uses partial link and discards everthing in the final step
     # Hence, ld groups do not work and required symbols must be specified by hand...
-    REQSYM := __divdi3 __moddi3
+    REQSYM := __divdi3 __udivdi3 __moddi3 __umoddi3
     REQCMD := -Wl,--undefined=
     LDLIBS += $(addprefix $(REQCMD),$(REQSYM)) -lc -lgcc_eh -lgcc
   endif
@@ -52,7 +52,7 @@ endif
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
+LDFLAGS += -g --info --ap --chkglobal --lst --trap
 endif
 
 ifeq ($(PROFILE),yes) # not found in the doc

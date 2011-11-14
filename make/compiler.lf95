@@ -35,7 +35,7 @@ FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g --info --ap --chkglobal --lst --trap --verbose
+FFLAGS += -g --info --ap --chkglobal --lst --trap
 endif
 
 ifeq ($(PROFILE),yes) # not found in the doc
