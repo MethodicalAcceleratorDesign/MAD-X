@@ -60,7 +60,7 @@ LDFLAGS += -pg
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += --static
+LDFLAGS += -static
 endif
 
 ifeq ($(PLUGIN),yes) # not found in the doc

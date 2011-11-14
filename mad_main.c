@@ -18,7 +18,7 @@ void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
 #endif
 
-#ifdef _NAGF95
+#ifdef _NAGFOR
 void f90_init   (int, char *[]);
 void f90_finish (int);
 #endif
@@ -52,7 +52,7 @@ main(int argc, char *argv[])
   _gfortran_set_options(0, 0);
 #endif
 
-#ifdef _NAGF95
+#ifdef _NAGFOR
   f90_init(argc, argv);
 #endif
 
@@ -65,7 +65,7 @@ main(int argc, char *argv[])
   madx_input(CALL_LEVEL_ZERO);
   madx_finish();
 
-#ifdef _NAGF95
+#ifdef _NAGFOR
   f90_finish(EXIT_SUCCESS);
 #endif
 

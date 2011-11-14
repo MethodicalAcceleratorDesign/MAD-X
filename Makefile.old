@@ -111,6 +111,7 @@ ifeq ($(f95),lf95)
   else
     f95_FLAGS= --o2 -c -D_LF95
   endif
+  GCCP_FLAGS += -D_LF95
 endif
 
 ifeq ($(f95),f95)
@@ -121,6 +122,7 @@ ifeq ($(f95),f95)
     f95_FLAGS= -gline -c -maxcontin=100 -ieee=full -D_NAGFOR
     LDOPT= -Bstatic
   endif
+  GCCP_FLAGS += -D_NAGFOR
 endif
 
 ifeq ($(f95),ifort)
@@ -137,6 +139,7 @@ ifeq ($(f95),g95)
   else
     f95_FLAGS+= -Wa,--64 -fno-second-underscore -D_G95
   endif
+  GCCP_FLAGS += -D_G95
 endif
 
 ifeq ($(f95),gfortran)
@@ -144,6 +147,7 @@ ifeq ($(f95),gfortran)
   ifeq ($(ARCH),32)
      f95_FLAGS+=$(M32)
   endif
+  GCCP_FLAGS += -D_GFORTRAN
 endif
 
 ifeq ($(DEBUG),YES)
