@@ -27,6 +27,10 @@
 #   - depends on OSTYPE (detected), FC and ARCH !!!
 make FC=lf95 ARCH=32 cleanall
 
+# show all the infomation collected by the makefile for Intel 64 bits compilers
+#   - depends on user setup !!!
+make CC=icc FC=ifort infoall
+
 # build madx32 static online version for debug using Nag fortran compiler/linker
 make FC=nagfor ARCH=32 STATIC=yes ONLINE=yes DEBUG=yes
 

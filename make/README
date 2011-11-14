@@ -26,7 +26,7 @@ targets for building the project:
   [none] | $(PROJECT)$(ARCH)
 
 targets for printing information:
-  info | infoprj | infoinc | infoall
+  info | infoinc | infoprj | infoall
 
 targets for cleaning generated files:
   clean | cleanc | cleancxx | cleanf90 | cleanbuild | cleanall

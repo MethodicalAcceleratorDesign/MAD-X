@@ -32,13 +32,13 @@ info:
 	@ echo "Linker       settings           " = $(LD) $(LDFLAGS)
 	@ echo "Libraries    settings           " = $(LIBS)
 
-infoinc:
+infoinc: info
 	@ echo "C   compiler settings file      " = $(makedir)/compiler.$(CCNAME)
 	@ echo "C++ compiler settings file      " = $(makedir)/compiler.$(CXXNAME)
 	@ echo "F90 compiler settings file      " = $(makedir)/compiler.$(FCNAME)
 	@ echo "Linker       settings file      " = $(makedir)/linker.$(LDNAME)
 
-infoprj:
+infoprj: infoinc
 	@ echo "          project settings file " = $(PROJECT) $(VERSION) $(VERSION_DATE)
 	@ echo "Cpp       project settings file " = $(FILE_CPP)
 	@ echo "C         project settings file " = $(FILE_C)
@@ -47,7 +47,7 @@ infoprj:
 	@ echo "Libraries project settings file " = $(FILE_LIB)
 	@ echo "System    project settings file " = $(FILE_SYS)
 
-infoall: info infoinc infoprj
+infoall: infoprj
 	@ echo "Headers files                   " = $(HEADERS)
 	@ echo "Sources files                   " = $(SOURCES)
 	@ echo "Objects files                   " = $(OBJECTS)
