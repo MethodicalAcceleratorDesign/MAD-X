@@ -88,7 +88,7 @@ Notes:
     where usually $(makedir)=make.
   - Example:
       make FC=gfortran44 FCNAME=gfortran
-    sets the compiler to gfortran44 but uses the configuration of compiler.gfortran
+    sets the compiler to gfortran44 but uses the configuration of gfortran
 
 ####################
 # Includes settings
