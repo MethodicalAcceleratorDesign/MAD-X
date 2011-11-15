@@ -1,15 +1,8 @@
-#include <stdio.h>
 #include <time.h>
-
-#ifdef _WRAP_FORTRAN_CALLS
-#include "fortran_wrappers.h"
-#endif
-#ifdef _WRAP_C_CALLS
-#include "c_wrappers.h"
-#endif
 
 #define cbyt     cbyt_
 #define mydtime  mydtime_
+
 void cbyt(int* source, int* s_pos, int* target, int* t_pos, int* n)
 /* inserts n_bit byte from source at position s_pos in target at t_pos.
    Attention: least significant bit is #1, positions are those of the least
