@@ -16,10 +16,16 @@
 # | $Id$
 # |
 
-FC_SRC    := $(wildcard *.f90 *.F90)
-FC_SRC_RM := gxx11ps.f90 # obsolete file?
+FC_SRC := $(wildcard *.f90 *.F90)
 
-# tpsa settings
+ifeq ($(OSTYPE),Cygwin) # no X11
+FC_SRC    += gxx11ps.f90
+FC_SRC_RM += gxx11.f90
+else
+FC_SRC    += gxx11.f90
+FC_SRC_RM += gxx11ps.f90
+endif
+
 ifeq ($(NTPSA),yes)
 FC_SRC_RM += c_dabnew.f90
 else
