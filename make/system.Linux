@@ -16,4 +16,8 @@
 # | $Id$
 # |
 
+CPPFLAGS += -D_LINUX
+
+# __linux__ should also be defined by the compilers
+
 # end of makefile

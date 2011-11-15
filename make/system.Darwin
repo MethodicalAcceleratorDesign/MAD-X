@@ -16,4 +16,6 @@
 # | $Id$
 # |
 
+CPPFLAGS += -D_DARWIN
+
 # end of makefile
