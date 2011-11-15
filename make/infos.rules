@@ -19,7 +19,7 @@
 .PHONY: info infoinc infoprj infoall
 
 info:
-	@ echo "Operating system                " = $(OSTYPE)$(OSARCH) "($(ARCH) bits)"
+	@ echo "Operating system                " = $(OSTYPE)-$(OSARCH)
 	@ echo "Current directory               " = $(CURDIR)
 	@ echo "Build   directory               " = $(OBJDIR)
 	@ echo "Preprocessing defines           " = $(CPPFLAGS)
