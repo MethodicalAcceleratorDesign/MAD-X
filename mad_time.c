@@ -20,13 +20,21 @@ time_stamp(char* place)
 float
 fextim(void)
 {
-   float mytime;
-   struct timeval tp;
-   struct timezone tzp;
-   gettimeofday(&tp,&tzp);
-   mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
+   #ifndef _WIN32 /* gettimeofday available */
+     float mytime;
+     struct timeval tp;
+     struct timezone tzp;
+     gettimeofday(&tp,&tzp);
+     mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
+   #else /* use old ftime */
+     struct timeb tp;
+     float mytime;
+     ftime(&tp);
+     mytime = (float)(tp.time%10000) + 0.001*tp.millitm;
+   #endif
+
    /* printf("Time now:  %-6.3f\n",mytime);    */
-   return(mytime);
+   return mytime;
 }
 
 
