@@ -20,7 +20,13 @@ CC_HDR := $(wildcard mad_*.h)
 CC_SRC := $(wildcard mad_*.c)
 
 CC_HDR += rplot.h SDDS.h madx.h
-CC_SRC += rplot.c gxx11c.c madxp.c
+CC_SRC += rplot.c madxp.c
+
+ifeq ($(OSTYPE),Cygwin)
+CC_SRC += gxx11psc.c
+else
+CC_SRC += gxx11c.c
+endif
 
 # files specific compiler flag
 $(OBJDIR)/mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
