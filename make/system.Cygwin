@@ -1,0 +1,23 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - Linux specific
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+CPPFLAGS += -D_CYGWIN -D_WIN32
+
+# __CYGWIN32__ should also be defined by the compilers
+
+# end of makefile

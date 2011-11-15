@@ -293,6 +293,7 @@ make/linker.rules -text
 make/make.cfg -text
 make/make.inc -text
 make/make.lib -text
+make/system.Cygwin -text
 make/system.Darwin -text
 make/system.Linux -text
 /match.f90 -text
