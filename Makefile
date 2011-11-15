@@ -34,8 +34,8 @@
 # build madx32 static online version for debug using Nag fortran compiler/linker
 # make FC=nagfor ARCH=32 STATIC=yes ONLINE=yes DEBUG=yes
 
-# build madx64 online version using gfortran compiler/linker and show commands
-# make FC=gfortran ONLINE=yes SHOW=yes
+# build madx64 online version using Intel ifort compiler/linker and show commands
+# make FC=ifort ONLINE=yes SHOW=yes
 
 # build madx32 static online version using gfortran44 as compiler/linker
 # make FC=gfortran44 FCNAME=gfortran LDNAME=gfortran ARCH=32 STATIC=yes ONLINE=yes
@@ -75,6 +75,7 @@ PLUGIN  := no
 
 #############################
 # Compilers/Linkers settings
+# see make/compiler.* for supported compilers
 #
 
 # C compiler (default is gcc)
@@ -83,8 +84,8 @@ CC  := gcc
 # C++ compiler (default is g++)
 CXX := g++
 
-# Fortran compiler (default is ifort)
-FC  := ifort
+# Fortran compiler (default is gfortran)
+FC  := gfortran
 
 # Linker (default is fortran compiler)
 LD  := $(FC)
