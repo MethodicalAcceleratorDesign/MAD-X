@@ -24,6 +24,8 @@ SPACE +=
 eq     = $(if $(patsubst $1,,$2),,t)
 neq    = $(if $(patsubst $1,,$2),t,)
 
+escsp  = $(subst $(SPACE),\ ,$1)
+
 first  = $(word 1,$1)
 last   = $(word $(words $1),$1)
 rest   = $(wordlist 2,$(words $1),$1)
