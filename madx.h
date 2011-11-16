@@ -4,7 +4,7 @@
 // standard headers
 
 #ifdef _WIN32
-typedef UINT_PRT uintptr_t
+typedef UINT_PTR uintptr_t
 #else
 #include <stdint.h>
 #endif
