@@ -49,7 +49,8 @@ Other flags can be added to configure the project.
 
 In the following settings, the first option is the default.
 
-ARCH=64/32 sets the target platform archictecture
+ARCH=detect/32/64 sets the target platform archictecture
+  'detect' is replaced by 32/64 depending on platform architecture
   The program and the default target will have the name $(PROJECT)$(ARCH)
 
 DEBUG=yes/no sets/unsets the build for debugging (with dwarf-2 compliance)

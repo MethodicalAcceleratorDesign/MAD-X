@@ -45,32 +45,32 @@
 
 PROJECT := madx
 
-# online version - includes SDDS I/O (default is no)
+# online version - includes SDDS I/O: yes/no (default is no)
 ONLINE    := no
 
-# alternative DA package in C++ (default is yes)
+# alternative DA package: yes/no (default is yes)
 NTPSA     := yes
 
-# memory leaks debug (default is no)
+# memory leaks debug: yes/no (default is no)
 MEMLEAKS  := no
 
 #################
 # Build settings
 #
 
-# architecture 32/64bit (default is 64)
-ARCH    := 64
+# architecture bit: detect/32/64 (default is detect)
+ARCH    := detect
 
-# debugging mode (default is no)
+# debugging mode: yes/no (default is no)
 DEBUG   := no
 
-# profiling mode (default is no)
+# profiling mode: yes/no (default is no)
 PROFILE := no
 
-# link with static libs (default is no)
+# link with static libs: yes/no (default is no)
 STATIC  := no
 
-# plugin dynamic loading (default is no)
+# plugin dynamic loading: yes/no (default is no)
 PLUGIN  := no
 
 #############################
