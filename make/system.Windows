@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - Darwin (Mac OS X) specific
+# | MAD makefile - Windows specific
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,6 +16,10 @@
 # | $Id$
 # |
 
-CPPFLAGS += -D_DARWIN
+CPPFLAGS += -D_WIN32
+
+ifeq ($(ARCH),64)
+CPPFLAGS += -D_WIN64
+endif
 
 # end of makefile

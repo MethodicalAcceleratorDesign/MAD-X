@@ -269,6 +269,7 @@ lib64/libz.a -text
 make/README -text
 make/README.lxplus -text
 make/clean.rules -text
+make/compiler.cl -text
 make/compiler.g++ -text
 make/compiler.g95 -text
 make/compiler.gcc -text
@@ -296,6 +297,7 @@ make/make.lib -text
 make/system.Cygwin -text
 make/system.Darwin -text
 make/system.Linux -text
+make/system.Windows -text
 /match.f90 -text
 /matchjc.f90 -text
 /matchlib.f90 -text

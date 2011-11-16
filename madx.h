@@ -3,9 +3,14 @@
 
 // standard headers
 
+#ifdef _WIN32
+typedef UINT_PRT uintptr_t
+#else
+#include <stdint.h>
+#endif
+
 #include <stdio.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>

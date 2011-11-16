@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - Linux specific
+# | MAD makefile - CygWin specific
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-CPPFLAGS += -D_CYGWIN -D_WIN32
+CPPFLAGS += -D_WIN32 -D_CYGWIN
 
 # __CYGWIN32__ should also be defined by the compilers
 
