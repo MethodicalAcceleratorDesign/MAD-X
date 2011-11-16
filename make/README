@@ -101,6 +101,7 @@ Makefile of the project to include
   FILE_F90 contains F90 files selection and sets FC_SRC
   FILE_LIB sets LIBS with required paths (i.e. -Lpath) and names (i.e. -llib)
   FILE_SYS contains system specific stuff (e.g. unsupported configurations)
+  FILE_USR contains user's extra stuffs (e.g. special rules)
 
 Notes:
   - dependencies of C and C++ files are computed automatically (must be!)

@@ -52,6 +52,9 @@ include $(makedir)/linker.$(LDNAME)
 # system specific settings
 -include $(makedir)/system.$(OSTYPE)
 
+# user's extra stuff
+-include $(FILE_USR)
+
 # compilers, linker and depend rules
 include $(makedir)/compiler.rules
 include $(makedir)/linker.rules
@@ -60,8 +63,5 @@ include $(makedir)/depend.rules
 # cleaning & debugging
 include $(makedir)/clean.rules
 include $(makedir)/infos.rules
-
-# user's extra stuff
--include $(FILE_USR)
 
 # end of makefile
