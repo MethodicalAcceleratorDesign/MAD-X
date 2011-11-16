@@ -16,6 +16,8 @@
 # | $Id$
 # |
 
+$(error Not Yet Supported)
+
 #
 # makedep
 #
