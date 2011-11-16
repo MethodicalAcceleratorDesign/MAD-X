@@ -33,10 +33,10 @@ info:
 	@ echo "Libraries    settings           " = $(LIBS)
 
 infoinc: info
-	@ echo "C   compiler settings file      " = $(makedir)/compiler.$(CCNAME)
-	@ echo "C++ compiler settings file      " = $(makedir)/compiler.$(CXXNAME)
-	@ echo "F90 compiler settings file      " = $(makedir)/compiler.$(FCNAME)
-	@ echo "Linker       settings file      " = $(makedir)/linker.$(LDNAME)
+	@ echo "C   compiler settings file      " = $(makedir)$/compiler.$(CCNAME)
+	@ echo "C++ compiler settings file      " = $(makedir)$/compiler.$(CXXNAME)
+	@ echo "F90 compiler settings file      " = $(makedir)$/compiler.$(FCNAME)
+	@ echo "Linker       settings file      " = $(makedir)$/linker.$(LDNAME)
 
 infoprj: infoinc
 	@ echo "          project settings file " = $(PROJECT) $(VERSION) $(VERSION_DATE)

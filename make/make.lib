@@ -16,6 +16,10 @@
 # | $Id$
 # |
 
+# some useful variables
+SPACE := 
+SPACE +=
+
 # some useful functions
 eq     = $(if $(patsubst $1,,$2),,t)
 neq    = $(if $(patsubst $1,,$2),t,)
@@ -29,7 +33,8 @@ uniq   = $(strip $(if $1,$(call uniq,$(call chop,$1)) \
 
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))
-mkdir  = $(if $(wildcard $1),,$(shell mkdir -p $1))
+mkdir  = $(if $(wildcard $1),,$(shell mkdir $1))
+mkdirp = $(if $(wildcard $1),,$(shell mkdir -p $1))
 
 # set command echo (SHOW=yes -> trace commands & remove echo)
 _ := $(if $(call eq,$(SHOW),yes),,@)

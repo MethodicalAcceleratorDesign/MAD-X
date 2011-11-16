@@ -20,35 +20,35 @@
 
 clean:
 	$E "** Cleaning local files"
-	$_ rm -f *.o
-	$_ rm -f *.g90
-	$_ rm -f *.mod
-	$_ rm -f *.lst
-	$_ rm -f core
-	$_ rm -f *~
+	$_ $(RM) *.o
+	$_ $(RM) *.g90
+	$_ $(RM) *.mod
+	$_ $(RM) *.lst
+	$_ $(RM) core
+	$_ $(RM) *~
 
 cleanc:
 	$E "** Cleaning C generated files"
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.c,%.o,$(CC_SRC)))
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.o,$(CC_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.d,$(CC_SRC)))
 
 cleancxx:
 	$E "** Cleaning C++ generated files"
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.o,$(CXX_SRC)))
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.o,$(CXX_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
 
 cleanf90:
 	$E "** Cleaning F90 generated files"
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
-	$_ rm -f $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
-	$_ rm -f $(OBJDIR)/*.mod
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
+	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+	$_ $(RM) $(OBJDIR)$/*.mod
 
 cleanbuild:
 	$E "** Removing $(PROJECT)"
-	$_ rm -f $(PROJECT)
+	$_ $(RM) $(PROJECT)
 
 cleanall: clean
 	$E "** Removing" $(OBJDIR)
-	$_ rm -rf $(OBJDIR)
+	$_ $(RMDIR) $(OBJDIR)
   
 # end of makefile

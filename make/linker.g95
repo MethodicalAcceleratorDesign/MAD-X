@@ -31,7 +31,7 @@ endif
 ifneq ($(CXX_SRC),)
   ifeq ($(ARCH),32)
     # required by __constructors
-    LDLIBS += $(GNULIBS)/crt*S.o
+    LDLIBS += $(GNULIBS)$/crt*S.o
   endif
   LDLIBS += -lstdc++
 endif

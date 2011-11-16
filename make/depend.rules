@@ -26,32 +26,32 @@ vpath %.mod  $(OBJDIR)
 #
 $(OBJDIR)/%.d: %.c
 	$E "*** Computing $(@F)"
-	$_ $(strip $(CDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+	$_ $(strip $(CDEP) $(CPPFLAGS)) $< > $@
 
 #
 # rule for C++ dependencies
 #
 $(OBJDIR)/%.d: %.cpp
 	$E "*** Computing $(@F)"
-	$_ $(strip $(CXXDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+	$_ $(strip $(CXXDEP) $(CPPFLAGS)) $< > $@
 
 #
 # rule for f90 and F90 dependencies
 #
 $(OBJDIR)/%.d: %.f90
 	$E "*** Computing $(@F)"
-	$_ $(strip $(FDEP)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+	$_ $(strip $(FDEP)) $< > $@
 
 $(OBJDIR)/%.d: %.F90
 	$E "*** Computing $(@F)"
-	$_ $(strip $(FDEP) $(CPPFLAGS)) $< | sed -e 's,[^:]*:,$(basename $@).o:,' > $@
+	$_ $(strip $(FDEP) $(CPPFLAGS)) $< > $@
 
 #
 # compute dependencies
 #
-C_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
-CXX_DEPS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
-F_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+C_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.d,$(CC_SRC)))
+CXX_DEPS := $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
+F_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 DEPENDS  :=
 
 ifneq ($(CDEP),)
