@@ -86,8 +86,7 @@ user2_photon.f90:           madx_ptc_track_run.o
 
 matchjc.f90:                match.o
 matchlib.f90:               matchjc.o
-matchlib2.f90:              matchlib.o
-matchsa.f90:                matchlib2.o
+matchsa.f90:                matchlib.o
 
 # dependencies on includes
 h_definition.f90:           a_def_frame_patch_chart.inc a_def_all_kind.inc \
