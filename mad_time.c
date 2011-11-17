@@ -26,8 +26,7 @@ fextim(void)
 
    #ifndef _WIN32 /* gettimeofday available */
      struct timeval tp;
-     struct timezone tzp;
-     gettimeofday(&tp,&tzp);
+     gettimeofday(&tp,0);
      mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
    #else /* use old ftime */
      struct timeb tp;
