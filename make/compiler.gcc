@@ -26,10 +26,9 @@ CDEP := $(CC) -MM
 # compiler flags
 #
 
-CFLAGS := -m$(ARCH) -O3
+CFLAGS := -m$(ARCH) -std=c99 -O3 -c
 
-# trig too many warnings (> 100+) for the moment!
-# CFLAGS := -m$(ARCH) -std=c99 -Wall -W -pedantic -O3
+# CFLAGS := -m$(ARCH) -std=c99 -Wall -W -pedantic -O3 -c
 
 #
 # options flags

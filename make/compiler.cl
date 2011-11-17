@@ -22,17 +22,15 @@ $(error Not Yet Supported)
 # makedep
 #
 
+# must use mcpp, http://mcpp.sourceforge.net/
 CDEP := $(CC) -MM
 
 #
 # compiler
 #
 
-CFLAGS   := -m$(ARCH) -O3
-CXXFLAGS := -m$(ARCH) -std=c++0x -O3 -Wall
-
-# trig too many warnings (> 100+) for the moment!
-# CFLAGS   := -m$(ARCH) -std=c99 -Wall -O3
+CFLAGS   := -m$(ARCH) -std=c99   -Wall -O3 -c
+CXXFLAGS := -m$(ARCH) -std=c++0x -Wall -O3 -c
 
 #
 # options flags

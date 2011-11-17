@@ -32,13 +32,13 @@
 #
 
 CPPFLAGS += -D_G95
-FFLAGS   := -m$(ARCH) -O3
+FFLAGS   := -m$(ARCH) -O3 -c
 
 # fortran code is not conformant to f90/f95 (break compilation)!
-# FFLAGS := -m$(ARCH) -std=f95 -pipe -O3
+# FFLAGS := -m$(ARCH) -std=f95 -O3 -c
 
 # Trig too many warnings for the moment!
-# FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -pipe -O3
+# FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -O3 -c
 
 #s
 # options flags

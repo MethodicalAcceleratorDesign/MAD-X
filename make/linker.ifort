@@ -16,6 +16,11 @@
 # | $Id$
 # |
 
+################
+# Unix Settings
+#
+ifneq ($(OSTYPE),Windows)
+
 #
 # linker flags
 #
@@ -47,5 +52,40 @@ ifeq ($(PLUGIN),yes)
 LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
 endif
+
+endif # Unix Settings
+
+# |
+# o---------------------------------------------------------------------o
+# |
+
+###################
+# Windows Settings
+#
+ifeq ($(OSTYPE),Windows)
+
+#
+# linker flags
+#
+
+LDFLAGS += /nologo /O3
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+LDFLAGS += /debug:all /check:all
+endif
+
+ifeq ($(PROFILE),yes)
+LDFLAGS += /Qprof-use
+endif
+
+ifeq ($(STATIC),yes)
+LDFLAGS += /static
+endif
+
+endif # Windows Settings
 
 # end of makefile

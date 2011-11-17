@@ -34,10 +34,9 @@
 CPPFLAGS += -D_GFORTRAN
 
 # gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
-FFLAGS  := -m$(ARCH) -O2
+FFLAGS  := -m$(ARCH) -O2 -c
 
-# Trig too many warnings for the moment!
-# FFLAGS   := -m$(ARCH) -std=f95 -Wall -W -pedantic -pipe -O3
+#FFLAGS  := -m$(ARCH) -std=f95 -Wall -W -pedantic -O2 -c
 
 #
 # options flags
@@ -55,6 +54,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fno-range-check -J$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -J$(OBJDIR)
 
 # end of makefile

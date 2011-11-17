@@ -28,7 +28,7 @@
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn
+FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn -c
 
 #
 # options flags

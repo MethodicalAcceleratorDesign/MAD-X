@@ -27,10 +27,7 @@
 #
 
 CPPFLAGS += -D_NAGFOR
-FFLAGS   := -f95 -O4 -w=unused
-
-# Trig too many warnings for the moment!
-#FFLAGS   := -f95 -O4
+FFLAGS   := -f95 -O4 -w=unused -c
 
 ifeq ($(ARCH),32)
 FFLAGS   += -Wc,-m32 -abi=32

@@ -16,6 +16,11 @@
 # | $Id$
 # |
 
+################
+# Unix Settings
+#
+ifneq ($(OSTYPE),Windows)
+
 #
 # makedep
 #
@@ -28,10 +33,10 @@
 #
 
 CPPFLAGS += -D_IFORT
-FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused
+FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused -c
 
 # Trig too many warnings for the moment!
-# FFLAGS := -m$(ARCH) -O3 -warn all
+# FFLAGS := -m$(ARCH) -O3 -warn all -c
 
 #
 # options flags
@@ -54,5 +59,55 @@ FFLAGS += -mp1 -fp-model precise -assume noold_unit_star -module $(OBJDIR)
 ifneq ($(CXX_SRC),)
 FFLAGS += -fexceptions
 endif
+
+endif # Unix Settings
+
+# |
+# o---------------------------------------------------------------------o
+# |
+
+###################
+# Windows Settings
+#
+ifeq ($(OSTYPE),Windows)
+
+#
+# makedep
+#
+
+# fortran dependencies computation requires mod files (quite stupid)!
+# FDEP := $(FC) -gen-dep -module $(OBJDIR)
+
+#
+# compiler flags
+#
+
+CPPFLAGS += /D_IFORT
+FFLAGS   := /O3 /warn:all /warn:nounused /c
+
+# Trig too many warnings for the moment!
+# FFLAGS := /O3 /warn all /c
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+FFLAGS += /debug:all /check:all
+endif
+
+ifeq ($(PROFILE),yes)
+FFLAGS += /Qprof-use
+endif
+
+#
+# extra flags
+#
+
+FFLAGS += /nologo /Qprec /fp:precise \
+          /names:lowercase /assume:underscore /assume:noold_unit_star \
+          /module:$(OBJDIR)
+
+endif # Windows Settings
 
 # end of makefile

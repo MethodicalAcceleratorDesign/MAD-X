@@ -3,17 +3,17 @@
 
 // standard headers
 
-#ifdef _WIN32
-typedef size_t uintptr_t
-#else
-#include <stdint.h>
-#endif
-
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#ifdef _WIN32
+typedef size_t uintptr_t
+#else
+#include <stdint.h>
+#endif
 
 // defines
 

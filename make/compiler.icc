@@ -26,11 +26,11 @@ CDEP := $(CC) -MM
 # compiler
 #
 
-CFLAGS   := -m$(ARCH) -O3
-CXXFLAGS := -m$(ARCH) -std=c++0x -O3 -Wall
+CFLAGS   := -m$(ARCH) -std=c99   -O3 -c
+CXXFLAGS := -m$(ARCH) -std=c++0x -O3 -c
 
-# trig too many warnings (> 100+) for the moment!
-# CFLAGS   := -m$(ARCH) -std=c99 -Wall -O3
+#CFLAGS   := -m$(ARCH) -std=c99   -Wall -Wcheck -Wp64 -O3 -c
+#CXXFLAGS := -m$(ARCH) -std=c++0x -Wall -Wcheck -Wp64 -O3 -c
 
 #
 # options flags

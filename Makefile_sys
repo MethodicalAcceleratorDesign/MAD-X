@@ -16,13 +16,21 @@
 # | $Id$
 # |
 
-ifeq ($(OSTYPE),Darwin)
+ifneq ($(OSTYPE),Linux)
 ifeq ($(ONLINE),yes)
 $(error madx ONLINE is not supported on $(OSTYPE))
 endif
+endif
 
+ifeq ($(OSTYPE),Darwin)
 ifeq ($(STATIC),yes)
-$(error madx statically linked is not supported on $(OSTYPE))
+$(error madx STATIC is not supported on $(OSTYPE))
+endif
+endif
+
+ifeq ($(OSTYPE),Windows)
+ifeq ($(PLUGIN),yes)
+$(error madx PLUGIN is not supported on $(OSTYPE))
 endif
 endif
 
