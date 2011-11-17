@@ -60,7 +60,7 @@ CXXFLAGS += /nologo /Qprec /fp:precise /EHc /Qrestrict
 ICL_CC1  := -D  -I  -o
 ICL_CC2  := /D  /I  /Fo
 
-CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$3))
+CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$3)))
 CXX_tr = $(CC_tr)
 
 # end of makefile

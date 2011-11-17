@@ -121,7 +121,7 @@ FFLAGS += /nologo /Qprec /fp:precise \
 IFORT_CC1  := -D  -I  -o
 IFORT_CC2  := /D  /I  /Fo
 
-FC_tr = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$3))
+FC_tr = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$3)))
 
 endif # Windows Settings
 
