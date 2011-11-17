@@ -40,8 +40,4 @@ exists = $(if $(wildcard $1),,$(error $2))
 mkdir  = $(if $(wildcard $1),,$(shell mkdir $1))
 mkdirp = $(if $(wildcard $1),,$(shell mkdir -p $1))
 
-# set command echo (SHOW=yes -> trace commands & remove echo)
-_ := $(if $(call eq,$(SHOW),yes),,@)
-E := $(if $(call eq,$(SHOW),yes),@ \#,@ echo)
-
 # end of makefile
