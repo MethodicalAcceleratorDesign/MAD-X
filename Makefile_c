@@ -29,8 +29,8 @@ CC_SRC += gxx11c.c
 endif
 
 # files specific compiler flag
-$(OBJDIR)mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
-                                 -D_VERSION_DATE=$(VERSION_DATE)
+$(OBJDIR)/mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
+                                  -D_VERSION_DATE=$(VERSION_DATE)
 
 #######################
 # C dependencies (case not automatic!)

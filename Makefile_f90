@@ -36,7 +36,7 @@ endif
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC))
 
 # files specific compiler flag
-$(OBJDIR)matchlib2.o: FFLAGS := $(FFLAGS0)
+$(OBJDIR)/matchlib2.o: FFLAGS := $(FFLAGS0)
 
 #######################
 # Fortran dependencies (case not automatic!)
