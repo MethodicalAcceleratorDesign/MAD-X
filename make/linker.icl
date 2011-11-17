@@ -1,0 +1,46 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - icl/icc linker settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# linker flags
+#
+
+LDFLAGS += /nologo /O3
+LDLIBS  +=
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+LDFLAGS += /debug:all
+endif
+
+ifeq ($(PROFILE),yes)
+LDFLAGS += /Qprof-use
+endif
+
+ifeq ($(STATIC),yes)  # not supported
+LDFLAGS += /MD
+endif
+
+ifeq ($(PLUGIN),yes) # not supported
+LDFLAGS += /MT
+endif
+
+# end of makefile

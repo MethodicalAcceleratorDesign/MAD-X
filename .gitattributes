@@ -275,6 +275,7 @@ make/compiler.g95 -text
 make/compiler.gcc -text
 make/compiler.gfortran -text
 make/compiler.icc -text
+make/compiler.icl -text
 make/compiler.ifort -text
 make/compiler.lf95 -text
 make/compiler.nagfor -text
@@ -286,6 +287,7 @@ make/linker.g95 -text
 make/linker.gcc -text
 make/linker.gfortran -text
 make/linker.icc -text
+make/linker.icl -text
 make/linker.ifort -text
 make/linker.ld -text
 make/linker.lf95 -text
