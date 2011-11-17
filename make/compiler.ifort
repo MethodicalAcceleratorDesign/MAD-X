@@ -38,6 +38,9 @@ FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused -c
 # Trig too many warnings for the moment!
 # FFLAGS := -m$(ARCH) -O3 -warn all -c
 
+# cancellation of optimizations
+FFLAGS0   = $(subst -O3,-O0,$(FFLAGS))
+
 #
 # options flags
 #
@@ -86,7 +89,10 @@ CPPFLAGS += /D_IFORT
 FFLAGS   := /O3 /warn:all /warn:nounused /c
 
 # Trig too many warnings for the moment!
-# FFLAGS := /O3 /warn all /c
+# FFLAGS := /stand:f95 /O3 /warn all /c
+
+# cancellation of optimizations
+FFLAGS0   = $(subst /O3,/O0,$(FFLAGS))
 
 #
 # options flags
@@ -107,6 +113,15 @@ endif
 FFLAGS += /nologo /Qprec /fp:precise \
           /names:lowercase /assume:underscore /assume:noold_unit_star \
           /module:$(OBJDIR)
+
+#
+# flags translator
+#
+
+IFORT_CC1  := -D  -I  -o
+IFORT_CC2  := /D  /I  /Fo
+
+FC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$3))
 
 endif # Windows Settings
 

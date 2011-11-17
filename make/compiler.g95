@@ -40,7 +40,10 @@ FFLAGS   := -m$(ARCH) -O3 -c
 # Trig too many warnings for the moment!
 # FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -O3 -c
 
-#s
+# cancellation of optimizations
+FFLAGS0   = $(subst -O3,-O0,$(FFLAGS))
+
+#
 # options flags
 #
 

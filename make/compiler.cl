@@ -16,41 +16,42 @@
 # | $Id$
 # |
 
-$(error Not Yet Supported)
+$(error $(CC) is not yet supported)
 
 #
 # makedep
 #
 
 # must use mcpp, http://mcpp.sourceforge.net/
-CDEP := $(CC) -MM
+# TODO: not supported by cl!!!
+# CDEP := $(CC) /nolog /c /Zs /showIncludes
 
 #
 # compiler
 #
 
-CFLAGS   := -m$(ARCH) -std=c99   -Wall -O3 -c
-CXXFLAGS := -m$(ARCH) -std=c++0x -Wall -O3 -c
+CFLAGS   := /Za /Wall /O2 /c
+CXXFLAGS := /Za /Wall /O2 /c
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS   += -g -gdwarf-2
-CXXFLAGS += -g -gdwarf-2
+CFLAGS   += /Zi /Yd
+CXXFLAGS += /Zi /Yd
 endif
 
 ifeq ($(PROFILE),yes)
-CFLAGS   += -p
-CXXFLAGS += -p
+CFLAGS   +=
+CXXFLAGS +=
 endif
 
 #
 # extra flags
 #
  
-CFLAGS   += -mp1 -fp-model precise
-CXXFLAGS += -mp1 -fp-model precise
+CFLAGS   += /nologo /fp:precise /EHc
+CXXFLAGS += /nologo /fp:precise /EHc
 
 # end of makefile

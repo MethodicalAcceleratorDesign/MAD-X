@@ -29,21 +29,18 @@ include $(makedir)/make.cfg
 $(call exists, $(makedir)/compiler.$(CCNAME), \
 unable to include settings for compiler CC=$(CCNAME) (make [options] infoinc); \
 check CC or CCNAME for correct compiler configuration file)
-
 include $(makedir)/compiler.$(CCNAME)
 -include $(FILE_C)
 
 $(call exists, $(makedir)/compiler.$(CXXNAME), \
 unable to include settings for compiler CXX=$(CXXNAME) (make [options] infoinc); \
 check CXX or CXXNAME for correct compiler configuration file)
-
 include $(makedir)/compiler.$(CXXNAME)
 -include $(FILE_CXX)
 
 $(call exists, $(makedir)/compiler.$(FCNAME), \
 unable to include settings for compiler FC=$(FCNAME) (make [options] infoinc); \
 check FC or FCNAME for correct compiler configuration file)
-
 include $(makedir)/compiler.$(FCNAME)
 -include $(FILE_F90)
 
@@ -54,7 +51,6 @@ include $(makedir)/compiler.$(FCNAME)
 $(call exists, $(makedir)/linker.$(LDNAME), \
 unable to include settings for linker LD=$(LDNAME) (make [options] infoinc); \
 check LD or LDNAME for correct linker configuration file)
-
 include $(makedir)/linker.$(LDNAME)
 
 # system specific settings

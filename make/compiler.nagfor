@@ -33,6 +33,9 @@ ifeq ($(ARCH),32)
 FFLAGS   += -Wc,-m32 -abi=32
 endif
 
+# cancellation of optimizations
+FFLAGS0   = $(subst -O4,-O0,$(FFLAGS))
+
 #
 # options flags
 #

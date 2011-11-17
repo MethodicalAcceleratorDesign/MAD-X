@@ -35,12 +35,18 @@ ifeq ($(PROFILE),yes)
 LDFLAGS += /Qprof-use
 endif
 
-ifeq ($(STATIC),yes)  # not supported
+ifeq ($(STATIC),yes)
 LDFLAGS += /MD
 endif
 
-ifeq ($(PLUGIN),yes) # not supported
+ifeq ($(PLUGIN),yes)
 LDFLAGS += /MT
 endif
+
+#
+# extra flags
+#
+
+LDFLAGS += /link
 
 # end of makefile

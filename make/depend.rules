@@ -26,25 +26,25 @@ vpath %.mod  $(OBJDIR)
 #
 $(OBJDIR)/%.d: %.c
 	$E "*** Computing $(@F)"
-	$_ $(strip $(CDEP) $(CPPFLAGS)) $< > $@
+	$_ $(call CC_tr,$(CDEP) $(CPPFLAGS) $< > $@)
 
 #
 # rule for C++ dependencies
 #
 $(OBJDIR)/%.d: %.cpp
 	$E "*** Computing $(@F)"
-	$_ $(strip $(CXXDEP) $(CPPFLAGS)) $< > $@
+	$_ $(call CXX_tr,$(CXXDEP) $(CPPFLAGS) $< > $@)
 
 #
 # rule for f90 and F90 dependencies
 #
 $(OBJDIR)/%.d: %.f90
 	$E "*** Computing $(@F)"
-	$_ $(strip $(FDEP)) $< > $@
+	$_ $(call FC_tr,$(FDEP) $< > $@)
 
 $(OBJDIR)/%.d: %.F90
 	$E "*** Computing $(@F)"
-	$_ $(strip $(FDEP) $(CPPFLAGS)) $< > $@
+	$_ $(call FC_tr,$(FDEP) $(CPPFLAGS) $< > $@)
 
 #
 # compute dependencies

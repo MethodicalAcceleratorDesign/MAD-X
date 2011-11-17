@@ -86,6 +86,12 @@ ifeq ($(STATIC),yes)
 LDFLAGS += /static
 endif
 
+#
+# extra flags
+#
+
+LDFLAGS += /link
+
 endif # Windows Settings
 
 # end of makefile

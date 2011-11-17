@@ -31,27 +31,27 @@ OBJECTS := $(addprefix $(OBJDIR)$/,$(CC_OBJ) $(CXX_OBJ) $(FC_OBJ))
 #
 $(OBJDIR)/%.o: %.c
 	$E "*** Compiling $(<F)"
-	$_ $(strip $(CC) $(CFLAGS) $(CPPFLAGS)) $< -o $@
+	$_ $(call CC_tr,$(CC) $(CFLAGS) $(CPPFLAGS) $< -o $@)
 
 #
 # rule C++ compilation
 #
 $(OBJDIR)/%.o: %.cpp
 	$E "*** Compiling $(<F)"
-	$_ $(strip $(CXX) $(CXXFLAGS) $(CPPFLAGS)) $< -o $@
+	$_ $(call CXX_tr,$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -o $@)
 
 #
 # rule f90 compilation
 #
 $(OBJDIR)/%.o: %.f90
 	$E "*** Compiling $(<F)"
-	$_ $(strip $(FC) $(FFLAGS)) $< -o $@
+	$_ $(call FC_tr,$(FC) $(FFLAGS) $< -o $@)
 
 #
 # rule F90 compilation
 #
 $(OBJDIR)/%.o: %.F90
 	$E "*** Compiling $(<F)"
-	$_ $(strip $(FC) $(FFLAGS) $(CPPFLAGS)) $< -o $@
+	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $@)
 
 # end of makefile
