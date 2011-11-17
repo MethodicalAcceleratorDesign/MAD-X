@@ -24,33 +24,33 @@ FC_OBJ  := $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC)))
 
 HEADERS := $(CC_HDR) $(CXX_HDR)
 SOURCES := $(CC_SRC) $(CXX_SRC) $(FC_SRC)
-OBJECTS := $(addprefix $(OBJDIR)$/,$(CC_OBJ) $(CXX_OBJ) $(FC_OBJ))
+OBJECTS := $(addprefix $(OBJDIR),$(CC_OBJ) $(CXX_OBJ) $(FC_OBJ))
 
 #
 # rule C compilation
 #
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)%.o: %.c
 	$E "*** Compiling $(<F)"
 	$_ $(call CC_tr,$(CC) $(CFLAGS) $(CPPFLAGS) $< -o $@)
 
 #
 # rule C++ compilation
 #
-$(OBJDIR)/%.o: %.cpp
+$(OBJDIR)%.o: %.cpp
 	$E "*** Compiling $(<F)"
 	$_ $(call CXX_tr,$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -o $@)
 
 #
 # rule f90 compilation
 #
-$(OBJDIR)/%.o: %.f90
+$(OBJDIR)%.o: %.f90
 	$E "*** Compiling $(<F)"
 	$_ $(call FC_tr,$(FC) $(FFLAGS) $< -o $@)
 
 #
 # rule F90 compilation
 #
-$(OBJDIR)/%.o: %.F90
+$(OBJDIR)%.o: %.F90
 	$E "*** Compiling $(<F)"
 	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $@)
 

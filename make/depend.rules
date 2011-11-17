@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PRECIOUS: $(OBJDIR)/%.d $(OBJDIR)/%.mod %.mod
+.PRECIOUS: $(OBJDIR)%.d $(OBJDIR)%.mod %.mod
 
 vpath %.d    $(OBJDIR)
 vpath %.mod  $(OBJDIR)
@@ -24,34 +24,34 @@ vpath %.mod  $(OBJDIR)
 #
 # rule for C dependencies
 #
-$(OBJDIR)/%.d: %.c
+$(OBJDIR)%.d: %.c
 	$E "*** Computing $(@F)"
 	$_ $(call CC_tr,$(CDEP) $(CPPFLAGS) $< > $@)
 
 #
 # rule for C++ dependencies
 #
-$(OBJDIR)/%.d: %.cpp
+$(OBJDIR)%.d: %.cpp
 	$E "*** Computing $(@F)"
 	$_ $(call CXX_tr,$(CXXDEP) $(CPPFLAGS) $< > $@)
 
 #
 # rule for f90 and F90 dependencies
 #
-$(OBJDIR)/%.d: %.f90
+$(OBJDIR)%.d: %.f90
 	$E "*** Computing $(@F)"
 	$_ $(call FC_tr,$(FDEP) $< > $@)
 
-$(OBJDIR)/%.d: %.F90
+$(OBJDIR)%.d: %.F90
 	$E "*** Computing $(@F)"
 	$_ $(call FC_tr,$(FDEP) $(CPPFLAGS) $< > $@)
 
 #
 # compute dependencies
 #
-C_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.d,$(CC_SRC)))
-CXX_DEPS := $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
-F_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+C_DEPS   := $(addprefix $(OBJDIR),$(patsubst %.c,%.d,$(CC_SRC)))
+CXX_DEPS := $(addprefix $(OBJDIR),$(patsubst %.cpp,%.d,$(CXX_SRC)))
+F_DEPS   := $(addprefix $(OBJDIR),$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 DEPENDS  :=
 
 ifneq ($(CDEP),)

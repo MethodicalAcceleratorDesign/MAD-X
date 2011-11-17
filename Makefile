@@ -106,7 +106,7 @@ FILE_USR := Makefile_usr          # user's extra stuffs
 ####################
 # Makefile includes
 
-makedir := make
-include $(makedir)/make.inc
+makedir := make/
+include $(makedir)make.inc
 
 # end of makefile

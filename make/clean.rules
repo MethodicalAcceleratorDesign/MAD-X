@@ -29,19 +29,19 @@ clean:
 
 cleanc:
 	$E "** Cleaning C generated files"
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.o,$(CC_SRC)))
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.d,$(CC_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.c,%.o,$(CC_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.c,%.d,$(CC_SRC)))
 
 cleancxx:
 	$E "** Cleaning C++ generated files"
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.o,$(CXX_SRC)))
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.cpp,%.o,$(CXX_SRC)))
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.cpp,%.d,$(CXX_SRC)))
 
 cleanf90:
 	$E "** Cleaning F90 generated files"
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
-	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
-	$_ $(RM) $(OBJDIR)$/*.mod
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
+	$_ $(RM) $(addprefix $(OBJDIR),$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+	$_ $(RM) $(OBJDIR)*.mod
 
 cleanbuild:
 	$E "** Removing $(PROJECT)"
