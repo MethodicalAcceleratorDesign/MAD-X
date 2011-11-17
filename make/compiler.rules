@@ -18,14 +18,6 @@
 
 vpath %.o $(OBJDIR)
 
-CC_OBJ  := $(patsubst %.c,%.o,$(CC_SRC))
-CXX_OBJ := $(patsubst %.cpp,%.o,$(CXX_SRC))
-FC_OBJ  := $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC)))
-
-HEADERS := $(CC_HDR) $(CXX_HDR)
-SOURCES := $(CC_SRC) $(CXX_SRC) $(FC_SRC)
-OBJECTS := $(addprefix $(OBJDIR)$/,$(CC_OBJ) $(CXX_OBJ) $(FC_OBJ))
-
 #
 # rule C compilation
 #
@@ -53,5 +45,16 @@ $(OBJDIR)/%.o: %.f90
 $(OBJDIR)/%.o: %.F90
 	$E "*** Compiling $(<F)"
 	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $@)
+
+#
+# compute object files
+#
+CC_OBJ  := $(patsubst %.c,%.o,$(CC_SRC))
+CXX_OBJ := $(patsubst %.cpp,%.o,$(CXX_SRC))
+FC_OBJ  := $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC)))
+
+HEADERS := $(CC_HDR) $(CXX_HDR)
+SOURCES := $(CC_SRC) $(CXX_SRC) $(FC_SRC)
+OBJECTS := $(addprefix $(OBJDIR)/,$(CC_OBJ) $(CXX_OBJ) $(FC_OBJ))
 
 # end of makefile

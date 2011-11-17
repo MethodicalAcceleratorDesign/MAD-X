@@ -49,9 +49,9 @@ $(OBJDIR)/%.d: %.F90
 #
 # compute dependencies
 #
-C_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.c,%.d,$(CC_SRC)))
-CXX_DEPS := $(addprefix $(OBJDIR)$/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
-F_DEPS   := $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+C_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
+CXX_DEPS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
+F_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 DEPENDS  :=
 
 ifneq ($(CDEP),)
