@@ -20,7 +20,8 @@
 # makedep
 #
 
-CDEP := $(CC) -MM
+CDEP   := $(CC) -MM
+CXXDEP := $(CC) -MM
 
 #
 # compiler

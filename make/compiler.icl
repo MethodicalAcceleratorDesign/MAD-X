@@ -20,7 +20,8 @@
 # makedep
 #
 
-CDEP := $(CC) /nologo /QMM
+CDEP   := $(CC) /nologo /QMM
+CXXDEP := $(CC) /nologo /QMM
 
 #
 # compiler
