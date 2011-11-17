@@ -2,8 +2,7 @@
 #include <time.h>
 
 #ifndef _WIN32
-#define __USE_BSD
-#include <sys/time.h> /* for gettimeofday */
+#include <sys/time.h>  /* for gettimeofday */
 #else
 #include <sys/timeb.h> /* for ftime */
 #endif
@@ -38,5 +37,4 @@ fextim(void)
    /* printf("Time now:  %-6.3f\n",mytime);    */
    return mytime;
 }
-
 
