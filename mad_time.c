@@ -2,6 +2,7 @@
 #include <time.h>
 
 #ifndef _WIN32
+#define __USE_BSD
 #include <sys/time.h> /* for gettimeofday */
 #else
 #include <sys/timeb.h> /* for ftime */
