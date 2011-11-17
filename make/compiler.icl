@@ -57,10 +57,10 @@ CXXFLAGS += /nologo /Qprec /fp:precise /EHc /Qrestrict
 # flags translator
 #
 
-ICL_LST1  := -D  -I  -o
-ICL_LST2  := /D  /I  /Fo
+ICL_L1  := -D  -I  -o
+ICL_L2  := /D  /I  /Fo
 
-CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_LST1),$(ICL_LST2),$1)))
+CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_L1),$(ICL_L2),$1)))
 CXX_tr = $(CC_tr)
 
 # end of makefile
