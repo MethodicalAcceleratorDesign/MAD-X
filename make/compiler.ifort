@@ -110,7 +110,7 @@ endif
 # extra flags
 #
 
-FFLAGS += /nologo /Qprec /fp:precise /fpp \
+FFLAGS += /nologo /Qprec /fp:source /fpp \
           /names:lowercase /assume:underscore /assume:noold_unit_star \
           /module:$(OBJDIR)
 
