@@ -24,7 +24,8 @@ ifneq ($(SED),)
 CDEP   := $(CC) /nologo /Zs /QMM
 CXXDEP := $(CC) /nologo /Zs /QMM
 
-CDEP_tr   = | sed -e "s/$(CURDIR)//g" -e "s/.obj:/.o:/g"
+# icl /nologo /QMM file.c | sed -e "s/C:\\Documents and Settings\\home//g" -e "s/.obj:/.o:/g"
+CDEP_tr   = | sed -e "s/$(call f2bs,$(CURDIR))//g" -e "s/.obj:/.o:/g"
 CXXDEP_tr = $(CDEP_tr)
 endif
 
