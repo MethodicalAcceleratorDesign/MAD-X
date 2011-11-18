@@ -16,7 +16,8 @@
 # | $Id$
 # |
 
-vpath %.o $(OBJDIR)
+vpath %.o   $(OBJDIR)
+vpath %.obj $(OBJDIR)
 
 #
 # rule C compilation

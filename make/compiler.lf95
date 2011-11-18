@@ -30,7 +30,7 @@
 CPPFLAGS += -D_LF95
 FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn -c
 
-# cancellation of optimizations
+# FFLAGS with no-optimization
 FFLAGS0   = $(subst --o2,--o0,$(FFLAGS))
 
 #

@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-$(error $(CC) is not yet supported)
+$(error $(CC) is not supported)
 
 #
 # makedep

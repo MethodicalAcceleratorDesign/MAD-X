@@ -43,10 +43,4 @@ ifeq ($(PLUGIN),yes)
 LDFLAGS += /MT
 endif
 
-#
-# extra flags
-#
-
-LDFLAGS += /link
-
 # end of makefile

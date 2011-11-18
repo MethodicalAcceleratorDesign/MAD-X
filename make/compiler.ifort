@@ -91,7 +91,7 @@ FFLAGS   := /O3 /warn:all /warn:nounused /c
 # Trig too many warnings for the moment!
 # FFLAGS := /stand:f95 /O3 /warn all /c
 
-# cancellation of optimizations
+# FFLAGS with no-optimization
 FFLAGS0   = $(subst /O3,/O0,$(FFLAGS))
 
 #
@@ -115,11 +115,11 @@ FFLAGS += /nologo /Qprec /fp:source /fpp \
           /module:$(OBJDIR)
 
 #
-# flags translator
+# command translator
 #
 
-IFORT_L1  := -D  -I  -o
-IFORT_L2  := /D  /I  /Fo
+IFORT_L1 := -D  -I  -o
+IFORT_L2 := /D  /I  /Fo
 
 FC_tr = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(IFORT_L1),$(IFORT_L2),$1)))
 

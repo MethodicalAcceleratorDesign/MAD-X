@@ -38,7 +38,7 @@ FFLAGS  := -m$(ARCH) -O2 -c
 
 #FFLAGS  := -m$(ARCH) -std=f95 -Wall -W -pedantic -O2 -c
 
-# cancellation of optimizations
+# FFLAGS with no-optimization
 FFLAGS0   = $(subst -O2,-O0,$(FFLAGS))
 
 #
