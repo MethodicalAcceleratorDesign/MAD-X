@@ -118,10 +118,10 @@ FFLAGS += /nologo /Qprec /fp:source /fpp \
 # command translator
 #
 
-IFORT_L1 := -D  -I  -o
-IFORT_L2 := /D  /I  /Fo
+IFORT_FC1 := -D%  -I%  -o%
+IFORT_FC2 := /D%  /I%  /Fo%
 
-FC_tr = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(IFORT_L1),$(IFORT_L2),$1)))
+FC_tr = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(IFORT_FC1),$(IFORT_FC2),$1)))
 
 endif # Windows Settings
 

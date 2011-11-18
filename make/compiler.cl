@@ -16,8 +16,6 @@
 # | $Id$
 # |
 
-$(error $(CC) is not supported)
-
 #
 # makedep
 #
@@ -30,8 +28,8 @@ $(error $(CC) is not supported)
 # compiler
 #
 
-CFLAGS   := /Za /Wall /O2 /c
-CXXFLAGS := /Za /Wall /O2 /c
+CFLAGS   := /nologo /Wall /O2 /c
+CXXFLAGS := /nologo /Wall /O2 /c
 
 #
 # options flags
@@ -50,8 +48,18 @@ endif
 #
 # extra flags
 #
- 
-CFLAGS   += /nologo /fp:precise /EHc
-CXXFLAGS += /nologo /fp:precise /EHc
+
+CFLAGS   += /nologo /fp:precise /EHc /Zm1000
+CXXFLAGS += /nologo /fp:precise /EHc /Zm1000
+
+#
+# command translator
+#
+
+CL_CC1 := -D%  -I%  -o%
+CL_CC2 := /D%  /I%  /Fo%
+
+CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
+CXX_tr = $(CC_tr)
 
 # end of makefile

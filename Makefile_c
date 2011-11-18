@@ -36,7 +36,11 @@ $(OBJDIR)/mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
 # C dependencies (case not automatic!)
 
 ifeq ($(CDEP),)
-$(error C dependencies must be computed automatically!)
+$(info C dependencies are not computed automatically)
+
+# all C files depend on madx.h
+$(OBJDIR)/%.o: madx.h
+
 endif
 
 # end of makefile

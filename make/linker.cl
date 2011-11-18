@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - icl/icc linker settings
+# | MAD makefile - cl linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -27,28 +27,20 @@ LDFLAGS += /nologo /O3 /extlnk:.o
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += /debug:all
+LDFLAGS += /Zi /Yd
 endif
 
 ifeq ($(PROFILE),yes)
-LDFLAGS += /Qprof-use
-endif
-
-ifeq ($(STATIC),yes)
-LDFLAGS += /MD
-endif
-
-ifeq ($(PLUGIN),yes)
-LDFLAGS += /MT
+LDFLAGS +=
 endif
 
 #
 # command translator
 #
 
-ICL_LD1 := -o%
-ICL_LD2 := /Fe%
+CL_LD1 := -o%
+CL_LD2 := /Fe%
 
-LD_tr = $(strip $(subst $(SPACE)/Fe , /Fe,$(call trans,$(ICL_LD1),$(ICL_LD2),$1)))
+LD_tr = $(strip $(subst $(SPACE)/Fe , /Fe,$(call trans,$(CL_LD1),$(CL_LD2),$1)))
 
 # end of makefile

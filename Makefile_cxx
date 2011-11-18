@@ -28,7 +28,7 @@ endif
 # C++ dependencies (case not automatic!)
 
 ifeq ($(CXXDEP),)
-$(error C++ dependencies must be computed automatically!)
+$(info C++ dependencies are not computed automatically)
 endif
 
 # end of makefile

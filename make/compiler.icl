@@ -20,8 +20,8 @@
 # makedep
 #
 
-CDEP   := $(CC) /nologo /QMM
-CXXDEP := $(CC) /nologo /QMM
+#CDEP   := $(CC) /nologo /QMM
+#CXXDEP := $(CC) /nologo /QMM
 
 #
 # compiler
@@ -59,10 +59,10 @@ CXXFLAGS += /nologo /Qprec /fp:source /EHc /Qrestrict
 # command translator
 #
 
-ICL_L1 := -D  -I  -o
-ICL_L2 := /D  /I  /Fo
+ICL_CC1 := -D%  -I%  -o%
+ICL_CC2 := /D%  /I%  /Fo%
 
-CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_L1),$(ICL_L2),$1)))
+CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$1)))
 CXX_tr = $(CC_tr)
 
 # end of makefile
