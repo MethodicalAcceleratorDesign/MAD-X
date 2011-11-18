@@ -18,7 +18,7 @@
 
 FC_SRC := $(wildcard *.f90 *.F90)
 
-ifeq ($(OSTYPE),Cygwin) # no X11
+ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11
 FC_SRC    += gxx11ps.f90
 FC_SRC_RM += gxx11.f90
 else
