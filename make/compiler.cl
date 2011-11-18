@@ -28,6 +28,7 @@
 # compiler
 #
 
+CPPFLAGS += -D_MCC
 CFLAGS   := /nologo /Wall /O2 /c
 CXXFLAGS := /nologo /Wall /O2 /c
 
@@ -56,10 +57,10 @@ CXXFLAGS += /nologo /fp:precise /EHc /Zm1000
 # command translator
 #
 
-CL_CC1 := -D%  -I%  -o%
-CL_CC2 := /D%  /I%  /Fo%
+CL_CC1 := -D%  -I%
+CL_CC2 := /D%  /I%
 
-CC_tr  = $(strip $(subst $(SPACE)/Fo , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
+CC_tr  = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
 CXX_tr = $(CC_tr)
 
 # end of makefile

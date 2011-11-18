@@ -28,7 +28,9 @@ endif
 # C++ dependencies (case not automatic!)
 
 ifeq ($(CXXDEP),)
-$(info C++ dependencies are not computed automatically)
+
+$(OBJDIR)/tpsa.o: tpsa.h
+
 endif
 
 # end of makefile

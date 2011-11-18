@@ -38,9 +38,6 @@ endif
 # command translator
 #
 
-CL_LD1 := -o%
-CL_LD2 := /Fe%
-
-LD_tr = $(strip $(subst $(SPACE)/Fe , /Fe,$(call trans,$(CL_LD1),$(CL_LD2),$1)))
+LD_tr = $(strip $(subst $(SPACE)-o , /Fe,$1))
 
 # end of makefile

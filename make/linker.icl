@@ -46,9 +46,6 @@ endif
 # command translator
 #
 
-ICL_LD1 := -o%
-ICL_LD2 := /Fe%
-
-LD_tr = $(strip $(subst $(SPACE)/Fe , /Fe,$(call trans,$(ICL_LD1),$(ICL_LD2),$1)))
+LD_tr = $(strip $(subst $(SPACE)-o , /Fe,$1))
 
 # end of makefile

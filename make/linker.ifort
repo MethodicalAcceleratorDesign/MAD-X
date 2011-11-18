@@ -90,10 +90,7 @@ endif
 # command translator
 #
 
-IFORT_LD1 := -o%
-IFORT_LD2 := /Fe%
-
-LD_tr = $(strip $(subst $(SPACE)/Fe , /Fe,$(call trans,$(IFORT_LD1),$(IFORT_LD2),$1)))
+LD_tr = $(strip $(subst $(SPACE)-o , /Fe,$1))
 
 endif # Windows Settings
 
