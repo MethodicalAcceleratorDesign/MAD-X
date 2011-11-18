@@ -22,7 +22,7 @@ CC_SRC := $(wildcard mad_*.c)
 CC_HDR += rplot.h SDDS.h madx.h
 CC_SRC += rplot.c madxp.c
 
-ifeq ($(OSTYPE),Cygwin) # no X11
+ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11
 CC_SRC += gxx11psc.c
 else
 CC_SRC += gxx11c.c

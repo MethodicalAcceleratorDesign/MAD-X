@@ -50,7 +50,8 @@ endif
 #
 # extra flags
 #
- 
+
+CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
 CFLAGS   += /nologo /Qprec /fp:precise /EHc /Qrestrict
 CXXFLAGS += /nologo /Qprec /fp:precise /EHc /Qrestrict
 

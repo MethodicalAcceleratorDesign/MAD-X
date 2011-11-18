@@ -1,6 +1,7 @@
-#include <stdbool.h>
 #include <math.h>
 #include "madx.h"
+
+typedef unsigned char bool;
 
 /* makethin.c
  Thick to thin lens converter. Helmut Burkhardt
