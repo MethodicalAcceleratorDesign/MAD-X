@@ -22,6 +22,9 @@ include $(makedir)/make.lib
 # make config
 include $(makedir)/make.cfg
 
+# user's preprocessing extra stuff
+-include $(FILE_PRE)
+
 # project files
 -include $(FILE_VER)
 -include $(FILE_CPP)
@@ -60,8 +63,8 @@ include $(makedir)/linker.$(LDNAME)
 # system specific settings
 -include $(makedir)/system.$(OSTYPE)
 
-# user's extra stuff
--include $(FILE_USR)
+# user's postprocessing extra stuff
+-include $(FILE_POST)
 
 # compilers, linker and depend rules
 include $(makedir)/compiler.rules

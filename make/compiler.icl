@@ -20,8 +20,13 @@
 # makedep
 #
 
-#CDEP   := $(CC) /nologo /QMM
-#CXXDEP := $(CC) /nologo /QMM
+ifneq ($(SED),)
+CDEP   := $(CC) /nologo /Zs /QMM
+CXXDEP := $(CC) /nologo /Zs /QMM
+
+CDEP_tr   = | sed -e "s/$(CURDIR)//g" -e "s/.obj:/.o:/g"
+CXXDEP_tr = $(CDEP_tr)
+endif
 
 #
 # compiler

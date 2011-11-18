@@ -20,7 +20,7 @@ The MAD-X makefile is intended to compile project using C, C++ and Fortran 90
 compilers in a flexible way. The following sections explain how to configure
 the makefile for the project. Changing the value of a variable on the command
 line of make allows to setup different configuration for your project, including
-the user-defined files included for files selection (i.e. FILE_%).
+the user-defined files included for files selection (see Includes settings).
 
 targets for building the project:
   [none] | $(PROJECT)$(ARCH)
@@ -94,20 +94,21 @@ Notes:
 ####################
 # Includes settings
 
-Makefile of the project to include
-  FILE_VER contains the project VERSION and VERSION_DATE that must updated
-  FILE_CPP contains extra CPPFLAGS define (-Dname[=value])
-  FILE_C   contains C   files selection and sets CC_SRC  and CC_HDR
-  FILE_CXX contains C++ files selection and sets CXX_SRC and CXX_HDR
-  FILE_F90 contains F90 files selection and sets FC_SRC
-  FILE_LIB sets LIBS with required paths (i.e. -Lpath) and names (i.e. -llib)
-  FILE_SYS contains system specific stuff (e.g. unsupported configurations)
-  FILE_USR contains user's extra stuffs (e.g. special rules)
+Makefile of the project to include (in this order, all are optional)
+  FILE_PRE  contains user's preprocessing extra stuffs
+  FILE_VER  contains the project VERSION and VERSION_DATE that must updated
+  FILE_CPP  contains extra CPPFLAGS define (-Dname[=value])
+  FILE_C    contains C   files selection and sets CC_SRC  and CC_HDR
+  FILE_CXX  contains C++ files selection and sets CXX_SRC and CXX_HDR
+  FILE_F90  contains F90 files selection and sets FC_SRC
+  FILE_LIB  sets LIBS with required paths (i.e. -Lpath) and names (i.e. -llib)
+  FILE_SYS  contains system specific stuff (e.g. unsupported configurations)
+  FILE_POST contains user's postprocessing extra stuffs (e.g. special rules)
 
 Notes:
-  - dependencies of C and C++ files are computed automatically (must be!)
-  - dependencies of F90 are computed automatically if the compiler allows to
-  - dependencies must be provided if resp. CDEP, CXXDEP, FCDEP are empty
+  - dependencies of C and C++ files are computed automatically if possible
+  - dependencies of F90 are computed automatically if possible (often not)
+  - dependencies should be provided if resp. CDEP, CXXDEP, FCDEP are empty
 
 ####################
 # Platform settings
