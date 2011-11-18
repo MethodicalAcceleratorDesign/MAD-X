@@ -29,10 +29,10 @@
 #
 
 CPPFLAGS += -D_MCC
-CFLAGS   := /Wall /O2 /c
-CXXFLAGS := /Wall /O2 /c
+CFLAGS   := /O2 /c
+CXXFLAGS := /O2 /c
 
-# CFLAGS   := /O2 /c
+# CFLAGS   := /Wall /O2 /c
 
 #
 # options flags
