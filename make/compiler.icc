@@ -51,7 +51,7 @@ endif
 # extra flags
 #
  
-CFLAGS   += -mp1 -fp-model precise
-CXXFLAGS += -mp1 -fp-model precise
+CFLAGS   += -mp1 -fp-model source
+CXXFLAGS += -mp1 -fp-model source
 
 # end of makefile

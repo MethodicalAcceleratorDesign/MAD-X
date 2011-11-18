@@ -57,7 +57,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -mp1 -fp-model precise -assume noold_unit_star -module $(OBJDIR)
+FFLAGS += -mp1 -fp-model source -assume noold_unit_star -module $(OBJDIR)
 
 ifneq ($(CXX_SRC),)
 FFLAGS += -fexceptions
@@ -92,7 +92,7 @@ FFLAGS   := /O3 /warn:all /warn:nounused /c
 # FFLAGS := /stand:f95 /O3 /warn all /c
 
 # FFLAGS with no-optimization
-FFLAGS0   = $(subst /O3,/O0,$(FFLAGS))
+FFLAGS0   = $(subst /O3,/Od,$(FFLAGS))
 
 #
 # options flags

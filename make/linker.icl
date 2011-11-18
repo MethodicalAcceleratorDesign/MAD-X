@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += /nologo /O3
+LDFLAGS += /nologo /O3 /extlnk:.o
 LDLIBS  +=
 
 #

@@ -52,8 +52,8 @@ endif
 #
 
 CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /Qprec /fp:precise /EHc /Qrestrict
-CXXFLAGS += /nologo /Qprec /fp:precise /EHc /Qrestrict
+CFLAGS   += /nologo /Qprec /fp:source /EHc /Qrestrict
+CXXFLAGS += /nologo /Qprec /fp:source /EHc /Qrestrict
 
 #
 # command translator
