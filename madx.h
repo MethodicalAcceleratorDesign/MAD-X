@@ -15,7 +15,7 @@ typedef size_t uintptr_t;
 #include <stdint.h>
 #endif
 
-#ifdef _INTEL_CL
+#ifdef _ICC
 // problem with non-standard Intel names
 #define compound(a,b) compound_intel(a,b)
 #include <math.h>

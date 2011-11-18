@@ -27,6 +27,7 @@ CXXDEP := $(CC) -MM
 # compiler
 #
 
+CPPFLAGS += -D_ICC
 CFLAGS   := -m$(ARCH) -std=c99   -O3 -c
 CXXFLAGS := -m$(ARCH) -std=c++0x -O3 -c
 
