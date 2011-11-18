@@ -29,8 +29,10 @@
 #
 
 CPPFLAGS += -D_MCC
-CFLAGS   := /nologo /Wall /O2 /c
-CXXFLAGS := /nologo /Wall /O2 /c
+CFLAGS   := /Wall /O2 /c
+CXXFLAGS := /Wall /O2 /c
+
+# CFLAGS   := /O2 /c
 
 #
 # options flags
@@ -51,8 +53,8 @@ endif
 #
 
 CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /fp:precise /EHc /Zm1000
-CXXFLAGS += /nologo /fp:precise /EHc /Zm1000
+CFLAGS   += /nologo /fp:precise /Zm1000 /Dinline=$(SPACE)
+CXXFLAGS += /nologo /fp:precise /Zm1000
 
 #
 # command translator
