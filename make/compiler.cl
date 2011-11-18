@@ -21,7 +21,7 @@
 #
 
 # must use mcpp, http://mcpp.sourceforge.net/
-# TODO: not supported by cl!!!
+# TODO: need more work than icl (gawk?) -> use user's dependencies
 # CDEP := $(CC) /nolog /c /Zs /showIncludes
 
 #
