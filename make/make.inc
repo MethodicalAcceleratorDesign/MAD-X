@@ -35,7 +35,9 @@ include $(makedir)/compiler.$(CCNAME)
 $(call exists, $(makedir)/compiler.$(CXXNAME), \
 unable to include settings for compiler CXX=$(CXXNAME) (make [options] infoinc); \
 check CXX or CXXNAME for correct compiler configuration file)
+ifneq ($(CCNAME),$(CXXNAME))
 include $(makedir)/compiler.$(CXXNAME)
+endif
 -include $(FILE_CXX)
 
 $(call exists, $(makedir)/compiler.$(FCNAME), \
