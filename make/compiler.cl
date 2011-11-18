@@ -50,6 +50,7 @@ endif
 # extra flags
 #
 
+CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
 CFLAGS   += /nologo /fp:precise /EHc /Zm1000
 CXXFLAGS += /nologo /fp:precise /EHc /Zm1000
 
