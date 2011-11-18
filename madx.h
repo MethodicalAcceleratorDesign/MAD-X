@@ -10,7 +10,7 @@
 #include <errno.h>
 
 #ifdef _WIN32
-typedef size_t uintptr_t
+typedef size_t uintptr_t;
 #else
 #include <stdint.h>
 #endif
