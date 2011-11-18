@@ -1,7 +1,7 @@
 #include "madx.h"
 
 double
-vdot_(int* n, double* v1, double* v2)
+vdot(int* n, double* v1, double* v2)
   /* returns dot product of vectors v1 and v2 */
 {
   int i;
@@ -11,7 +11,7 @@ vdot_(int* n, double* v1, double* v2)
 }
 
 double
-vmod_(int* n, double* v)
+vmod(int* n, double* v)
 {
   int i;
   double mod = 0;
@@ -20,7 +20,7 @@ vmod_(int* n, double* v)
 }
 
 void
-zero_double_(double* a, int n)
+zero_double(double* a, int n)
   /* sets first n values in double array a to zero */
 {
   int j;
