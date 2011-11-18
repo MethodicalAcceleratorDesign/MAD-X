@@ -43,7 +43,9 @@ endif
 $(call exists, $(makedir)/compiler.$(FCNAME), \
 unable to include settings for compiler FC=$(FCNAME) (make [options] infoinc); \
 check FC or FCNAME for correct compiler configuration file)
+ifneq ($(CCNAME),$(FCNAME))
 include $(makedir)/compiler.$(FCNAME)
+endif
 -include $(FILE_F90)
 
 -include $(FILE_LIB)
