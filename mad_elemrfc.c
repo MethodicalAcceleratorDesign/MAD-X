@@ -1,4 +1,3 @@
-#include <math.h>
 #include "madx.h"
 
 void

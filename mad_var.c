@@ -1,5 +1,3 @@
-#include <math.h>
-
 #include "madx.h"
 
 struct variable*

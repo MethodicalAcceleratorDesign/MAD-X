@@ -1,4 +1,3 @@
-#include <math.h>
 #include "madx.h"
 
 typedef unsigned char bool;

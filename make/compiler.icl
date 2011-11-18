@@ -27,6 +27,7 @@
 # compiler
 #
 
+CPPFLAGS += -D_ICL
 CFLAGS   := /Qstd=c99   /O3 /c
 CXXFLAGS := /Qstd=c++0x /O3 /c
 

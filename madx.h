@@ -15,6 +15,15 @@ typedef size_t uintptr_t;
 #include <stdint.h>
 #endif
 
+#ifdef _INTELCL
+// problem with non-standard Intel names
+#define compound(a,b) compound_intel(a,b)
+#include <math.h>
+#undef  compound
+#else
+#include <math.h>
+#endif
+
 // defines
 
 #include "mad_def.h"

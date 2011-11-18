@@ -1,3 +1,5 @@
+#include "madx.h"
+
 /*---------------------------------------------------------------------*
  *                                                                      *
  *                           CERN                                       *
@@ -79,9 +81,6 @@
    to madxn.c
 
 */
-
-#include <math.h>
-#include "madx.h"
 
 #define BASE_TYPES 100    /* maximum no. of element types allowed */
 #define EL_COUNT   100    /* initial length of element type list */

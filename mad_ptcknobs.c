@@ -1,6 +1,4 @@
-#include <math.h>
 #include "madx.h"
-#include "mad_ptcknobs.h"
 
 /*______________________________________________________________
   matchptcknobs.c

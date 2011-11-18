@@ -1,8 +1,7 @@
-#include <math.h>
-#include "mad_wrap_f.h"
+#include "madx.h"
 
 double
-vdot(int* n, double* v1, double* v2)
+vdot_(int* n, double* v1, double* v2)
   /* returns dot product of vectors v1 and v2 */
 {
   int i;
@@ -12,7 +11,7 @@ vdot(int* n, double* v1, double* v2)
 }
 
 double
-vmod(int* n, double* v)
+vmod_(int* n, double* v)
 {
   int i;
   double mod = 0;
@@ -21,7 +20,7 @@ vmod(int* n, double* v)
 }
 
 void
-zero_double(double* a, int n)
+zero_double_(double* a, int n)
   /* sets first n values in double array a to zero */
 {
   int j;
