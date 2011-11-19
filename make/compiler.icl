@@ -25,7 +25,7 @@ CDEP   := $(CC) /nologo /Zs /QMM
 CXXDEP := $(CDEP)
 
 # CDEP output translator
-CDEP_tr   := | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//g" -e "s/\.obj:/\.o:/g"
+CDEP_tr   := | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
 CXXDEP_tr := $(CDEP_tr)
 endif
 

@@ -26,7 +26,7 @@ CXXDEP := $(CDEP)
 
 # CDEP output translator
 CDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
-          | $(SED)  -e "s/$(call f2bs,$(CURDIR)/)//g" \
+          | $(SED)  -e "s/$(call f2bs,$(CURDIR)/)//gi" \
                     -e "s/Note: including file:/$<:/g" \
                     -e "s/\.c:/\.o:/g"
 CXXDEP_tr = $(CDEP_tr)
