@@ -20,9 +20,20 @@
 # makedep
 #
 
-# must use mcpp, http://mcpp.sourceforge.net/
-# TODO: need more work than icl (gawk?) -> use user's dependencies
-# CDEP := $(CC) /nolog /c /Zs /showIncludes
+#
+# makedep
+#
+ifneq ($(and $(SED),$(GREP)),)
+CDEP   := $(CC) /nologo /c /Zs /showIncludes
+CXXDEP := $(CDEP)
+
+# CDEP output translator
+CDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
+          | $(SED)  -e "s/$(call f2bs,$(CURDIR)/)//g" \
+                    -e "s/Note: including file:/$<:/g" \
+                    -e "s/\.c:/\.o:/g"
+CXXDEP_tr = $(CDEP_tr)
+endif
 
 #
 # compiler
@@ -52,8 +63,8 @@ endif
 # extra flags
 #
 
-CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc /Dinline=$(SPACE)
+CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS /Dinline=$(SPACE)
+CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc
 CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc
 
 #
