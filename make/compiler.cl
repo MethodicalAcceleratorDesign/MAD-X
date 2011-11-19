@@ -20,9 +20,6 @@
 # makedep
 #
 
-#
-# makedep
-#
 ifneq ($(and $(SED),$(GREP)),)
 CDEP   := $(CC) /nologo /c /Zs /showIncludes
 CXXDEP := $(CDEP)
