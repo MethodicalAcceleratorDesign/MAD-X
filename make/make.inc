@@ -73,6 +73,6 @@ include $(makedir)/depend.rules
 
 # cleaning & debugging
 include $(makedir)/clean.rules
-include $(makedir)/infos.rules
+include $(makedir)/info.rules
 
 # end of makefile
