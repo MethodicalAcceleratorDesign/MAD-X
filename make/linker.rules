@@ -20,6 +20,6 @@
 
 $(PROJECT): $(OBJECTS)
 	$E "*** Linking $(@F)"
-	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $@ $^ $(LIBS) $(LDLIBS))
+	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $@ $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
 
 # end of makefile

@@ -16,10 +16,13 @@
 # | $Id$
 # |
 
-.PRECIOUS: $(OBJDIR)/%.d $(OBJDIR)/%.mod
+.PRECIOUS: %.d %.mod
 
-vpath %.d    $(OBJDIR)
-vpath %.mod  $(OBJDIR)
+vpath %.d
+vpath %.d   $(OBJDIR)
+
+vpath %.mod
+vpath %.mod $(OBJDIR)
 
 #
 # rule for C dependencies
@@ -49,9 +52,9 @@ $(OBJDIR)/%.d: %.F90
 #
 # compute dependencies
 #
-C_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.c,%.d,$(CC_SRC)))
-CXX_DEPS := $(addprefix $(OBJDIR)/,$(patsubst %.cpp,%.d,$(CXX_SRC)))
-F_DEPS   := $(addprefix $(OBJDIR)/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
+C_DEPS   := $(patsubst %.c,%.d,$(CC_SRC))
+CXX_DEPS := $(patsubst %.cpp,%.d,$(CXX_SRC))
+F_DEPS   := $(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC)))
 DEPENDS  :=
 
 ifneq ($(CDEP),)
@@ -70,7 +73,7 @@ endif
 # include dependencies
 #
 ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
--include $(DEPENDS)
+-include $(addprefix $(OBJDIR)/,$(DEPENDS))
 endif
 
 # end of makefile
