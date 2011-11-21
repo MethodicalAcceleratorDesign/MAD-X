@@ -268,6 +268,7 @@ lib64/libz.a -text
 /madxp.c -text
 make/README -text
 make/README.lxplus -text
+make/README.windows -text
 make/clean.rules -text
 make/compiler.cl -text
 make/compiler.g++ -text

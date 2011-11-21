@@ -16,7 +16,6 @@
 # | $Id$
 # |
 
-vpath %.o
 vpath %.o $(OBJDIR)
 
 #

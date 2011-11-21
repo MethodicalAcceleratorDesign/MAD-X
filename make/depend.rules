@@ -18,10 +18,7 @@
 
 .PRECIOUS: %.d %.mod
 
-vpath %.d
 vpath %.d   $(OBJDIR)
-
-vpath %.mod
 vpath %.mod $(OBJDIR)
 
 #

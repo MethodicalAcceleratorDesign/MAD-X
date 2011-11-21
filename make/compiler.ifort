@@ -25,7 +25,7 @@ ifneq ($(OSTYPE),Windows)
 # makedep
 #
 
-# fortran dependencies computation requires mod files (quite stupid)!
+# fortran dependencies computation requires mod files (i.e. loops)
 # FDEP := $(FC) -gen-dep -module $(OBJDIR)
 
 #
@@ -78,7 +78,7 @@ ifeq ($(OSTYPE),Windows)
 # makedep
 #
 
-# fortran dependencies computation requires mod files (quite stupid)!
+# fortran dependencies computation requires mod files (i.e. loops)
 # FDEP := $(FC) -gen-dep -module $(OBJDIR)
 
 #

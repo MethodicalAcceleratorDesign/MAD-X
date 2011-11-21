@@ -45,7 +45,7 @@ FFLAGS += -g -C=all -nan -mtrace=size,line
 endif
 
 ifeq ($(PROFILE),yes)
-FFLAGS  += -pg
+FFLAGS += -pg
 endif
 
 #

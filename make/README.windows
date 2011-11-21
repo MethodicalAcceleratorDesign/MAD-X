@@ -1,0 +1,58 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - compilers environement on windows
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+This build system requires Gnu Make 3.81.
+  Binaries available from http://gnuwin32.sourceforge.net/packages/make.htm
+  
+Intel icl compiler requires sed for dependencies computation
+  Binaries available from http://gnuwin32.sourceforge.net/packages/sed.htm
+
+Microsoft cl compiler requires sed and grep for dependencies computation
+  Binaries available from http://gnuwin32.sourceforge.net/packages/sed.htm
+  Binaries available from http://gnuwin32.sourceforge.net/packages/grep.htm
+
+For a complete installation of the GnuWin32 packages:
+  http://getgnuwin32.sourceforge.net/
+
+For a complete installation of the MinGW environment:
+  http://www.mingw.org/
+
+For a complete installation of the MinGW-w64 environment:
+  http://mingw-w64.sourceforge.net/
+
+For a complete installation of the Cygwin environment:
+  http://www.cygwin.com/
+
+GNU compilers: CC=gcc, CXX=g++, FC=gfortran
+--------------
+  Cygwin32:  Nothing to do for ARCH=32, not supported for ARCH=64 (no Cygwin64)
+  MinGW:     Nothing to do for ARCH=32, not supported for ARCH=64
+  MinGW-w64: Nothing to do for ARCH=32 and ARCH=64
+
+Intel compilers: CC=icl, CXX=icl, FC=ifort
+----------------
+Starts the command prompt corresponding to the ifort environment (32/64 bit)
+Add the C/C++ compiler path corresponding to the icl path (32/64 bit)
+path %path%;C:\Program Files\Intel\Compiler\11.1\054\bin\ia32
+or
+path %path%;C:\Program Files\Intel\Compiler\11.1\054\bin\ia32_intel64
+
+Intel/Microsoft compilers: CC=cl, CXX=cl, FC=ifort
+--------------------------
+Starts the command prompt corresponding to the ifort environment (32/64 bit)
+
