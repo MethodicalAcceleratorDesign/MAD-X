@@ -287,7 +287,9 @@ static void
 aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2,
                int ver1, int ver2, double *xm, double *ym)
 {
-  if (ver1&&ver2&&x1==x2)
+  (void)y1;
+  
+  if (ver1 && ver2 && x1==x2)
   {
     *xm=x2;
     *ym=y2;
@@ -734,6 +736,7 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
 static struct table*
 aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
 {
+  (void)cnt;
   /* Reads displacement data in tfs format */
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;

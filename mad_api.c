@@ -1,10 +1,4 @@
-#include "mad_api.h"
-#include "mad_str.h"
-#include "mad_core.h"
-#include "mad_eval.h"
-#include "mad_wrap_f.h"
-
-// dependencies from madxp.c
+#include "madx.h"
 
 void
 madextern_start(void)

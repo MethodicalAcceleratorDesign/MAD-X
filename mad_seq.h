@@ -82,6 +82,7 @@ void    enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ);
 void    all_node_pos(struct sequence* sequ);
 void    exec_save(struct in_cmd* cmd);
 void    exec_dumpsequ(struct in_cmd* cmd);
+void    exec_extract(struct in_cmd* cmd);
 void    seq_flatten(struct sequence* sequ);
 void    expand_sequence(struct sequence* sequ, int flag);
 void    expand_curr_sequ(int flag);

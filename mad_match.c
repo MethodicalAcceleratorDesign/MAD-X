@@ -1,10 +1,5 @@
-#include <float.h>
 #include "madx.h"
-
-// extern declaration
-
-extern void mtsa_(int*, int*, double*, int*, int*, double*, double*, int*, int*,
-                  double*, int*, double*, double*, double*, double*, double*);
+#include <float.h>
 
 // private interface
 

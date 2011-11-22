@@ -5,8 +5,9 @@ dynap_tables_create(struct in_cmd* cmd)
   /* creates the dynamic tables for DYNAP execution */
 {
   int npart = stored_track_start->curr;
-
   struct table* t;
+
+  (void)cmd;
   t = make_table("tracksumm", "tracksumm", tracksumm_table_cols,
                  tracksumm_table_types, 2*stored_track_start->curr);
   add_to_table_list(t, table_register);

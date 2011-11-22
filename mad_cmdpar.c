@@ -423,9 +423,10 @@ set_command_par_string(char* parameter, struct command* cmd, char* val)
     cp = cmd->par->parameters[i];
     if (cp->type == 3)
     {
+      int len = strlen(cp->string);
       new_len = strlen(val);
 
-      if( strlen(cp->string) < new_len )
+      if(len < new_len)
       {
         myfree(rout_name,cp->string);
         cp->string = (char*) mymalloc(rout_name,new_len);

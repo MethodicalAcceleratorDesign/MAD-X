@@ -706,6 +706,7 @@ void att_hkicker(struct c6t_element* el)
 
 void att_kicker(struct c6t_element* el)
 {
+  (void)el;
 }
 
 void att_lcavity(struct c6t_element* el)
@@ -722,6 +723,7 @@ void att_lcavity(struct c6t_element* el)
 
 void att_marker(struct c6t_element* el)
 {
+  (void)el;
 }
 
 void att_matrix(struct c6t_element* el)

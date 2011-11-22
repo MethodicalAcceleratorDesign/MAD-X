@@ -120,7 +120,7 @@ madx_start(void)
 
   // init C and Fortran
   mad_init_c();
-  mad_init_f();
+  mad_init_f_();
 
   /*  setbuf(stdout,(char *)0); */ /* no buffering - for debugging */
   time(&start_time); /* initialize timing */

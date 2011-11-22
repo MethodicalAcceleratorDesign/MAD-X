@@ -245,7 +245,7 @@ exec_command(void)
       }
       else if (strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0)
       {
-        w_ptc_refreshtables();
+        w_ptc_refreshtables_();
       }
       else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
       {
@@ -253,7 +253,7 @@ exec_command(void)
       }
       else if (strcmp(p->cmd_def->module, "rviewer") == 0)
       {
-        w_ptc_rviewer();
+        w_ptc_rviewer_();
       }
       else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
       {
@@ -406,7 +406,7 @@ scan_in_cmd(struct in_cmd* cmd)
   /* reads a command into a clone of the original */
 {
   int cnt = 0, /* gives position in command (from 1) */
-    i, k, log, n;
+      i, k, log, n;
   struct name_list* nl = cmd->clone->par_names;
   for (i = 0; i < nl->curr; i++) nl->inform[i] = 0; /* set when read */
   n = cmd->tok_list->curr;
@@ -424,8 +424,8 @@ scan_in_cmd(struct in_cmd* cmd)
       if ((k = name_list_pos(cmd->tok_list->p[i],
                              cmd->cmd_def->par_names)) < 0)  /* try alias */
       {
-        if ((k = name_list_pos(alias(cmd->tok_list->p[i]),
-                               cmd->cmd_def->par_names)) < 0)
+        k = name_list_pos(alias(cmd->tok_list->p[i]), cmd->cmd_def->par_names);
+        if (k < 0)
           fatal_error("illegal keyword:", cmd->tok_list->p[i]);
         break;
       }
@@ -452,7 +452,8 @@ make_line(char* statement)
   char** toks = tmp_l_array->p;
   char *prs, *psem;
   int i, n, rs, re;
-  while(strlen(statement) >= aux_buff->max) grow_char_array(aux_buff);
+  int len = strlen(statement);
+  while(len >= aux_buff->max) grow_char_array(aux_buff);
   strcpy(aux_buff->c, statement);
   if ((prs = strchr(aux_buff->c, '=')) == NULL) return -3;
   *prs = '\0'; prs++;
@@ -578,7 +579,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
-  else if (strcmp(toks[k], "extract")       == 0) exec_extract(cmd);
+  else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);

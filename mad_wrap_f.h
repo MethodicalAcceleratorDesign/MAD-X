@@ -1,97 +1,108 @@
 #ifndef MAD_WRAP_F_H
 #define MAD_WRAP_F_H
 
-#ifndef WIN32
+#define type_ofCall
 
-/* init fortran part */
-#define mad_init_f            mad_init_f_
+#if 0
+// #ifndef WIN32
 
-/* should work unchanged on _win32 using Lahey */
-#define advance_node          advance_node_
-#define advance_to_pos        advance_to_pos_
-#define augment_count         augment_count_
-#define augmentcountonly      augmentcountonly_
-#define augmentcountmomtabs   augmentcountmomtabs_
-#define char_from_table       char_from_table_  /* OB 2.4.2002 */
-#define comment_to_table      comment_to_table_
-#define comm_para             comm_para_
-#define double_from_table     double_from_table_
-#define string_from_table     string_from_table_ /* ETDA 8 nov 2004 */
-#define double_to_table_row   double_to_table_row_ /* ETDA 11 nov 2004 */
-#define double_table          double_table_    /* ETDA 25 aug 2004 */
-#define double_to_table       double_to_table_
+#define mad_init_f              mad_init_f_
 
-/* added by E. T. d'Amico on jan. 21st, 2004 */
-#define interp_node           interp_node_
-#define reset_interpolation   reset_interpolation_
-#define embedded_twiss        embedded_twiss_
-/* added by E. T. d'Amico on jan. 21stmay 19th, 2004 */
-#define embedded_plot         embedded_plot_
-/* end additions */
+#define advance_node            advance_node_
+#define advance_to_pos          advance_to_pos_
+#define augment_count           augment_count_
+#define augmentcountonly        augmentcountonly_
+#define augmentcountmomtabs     augmentcountmomtabs_
+#define char_from_table         char_from_table_
+#define comment_to_table        comment_to_table_
+#define comm_para               comm_para_
+#define double_from_table       double_from_table_
+#define string_from_table       string_from_table_
+#define double_to_table_row     double_to_table_row_
+#define double_table            double_table_
+#define double_to_table         double_to_table_
 
-/*Piotr Skowronski (CERN)*/
-#define gettrack gettrack_
+#define interp_node             interp_node_
+#define reset_interpolation     reset_interpolation_
+#define embedded_twiss          embedded_twiss_
+#define embedded_plot           embedded_plot_
+
+#define gettrack                gettrack_
+#define getnumberoftracks       getnumberoftracks_
 #define deletetrackstrarpositions deletetrackstrarpositions_
 
-#define copy_twiss_data       copy_twiss_data_
-#define current_node_name     current_node_name_
-#define element_name          element_name_
-#define node_name             node_name_
-#define frndm                 frndm_
-#define el_par_vector         el_par_vector_
-#define f_ctof                f_ctof_
-#define get_disp0             get_disp0_
-#define get_node_vector       get_node_vector_
-#define get_option            get_option_
-#define get_string            get_string_
-#define get_title             get_title_
-#define get_twiss_data        get_twiss_data_
-#define get_variable          get_variable_
-#define get_varstring         get_varstring_
-#define get_vector            get_vector_
-#define get_beam_value        get_beam_value_
-#define get_value             get_value_
-#define get_version           get_version_
-#define grndm                 grndm_
-#define headvalue             headvalue_
-#define intrac                intrac_
-#define mtcond                mtcond_
-#define next_constraint       next_constraint_
-#define next_constr_namepos   next_constr_namepos_
-#define next_global           next_global_
-#define getnumberoftracks     getnumberoftracks_
-#define next_start            next_start_
-#define next_vary             next_vary_
-/* RDM 20.1.2006 BEGIN jacobian strategy (match) */
-#define constraint_name       constraint_name_
-#define vary_name             vary_name_
-#define mtputconsname         mtputconsname_
-/* RDM 20.1.2006 END jacobian strategy (match) */
-#define node_al_errors        node_al_errors_
-#define node_fd_errors        node_fd_errors_
-#define node_string           node_string_
-#define node_value            node_value_
-#define plot_option           plot_option_
-#define reset_count           reset_count_
-#define restart_sequ          restart_sequ_
-#define retreat_node          retreat_node_
-#define sector_out            sector_out_
-#define sequence_name         sequence_name_
-#define set_option            set_option_
-#define set_value             set_value_
-#define set_variable          set_variable_
-#define set_stringvar         set_stringvar_
-#define spec_node_value       spec_node_value_
-#define store_node_value      store_node_value_
-#define store_node_vector     store_node_vector_
-#define string_to_table       string_to_table_
-#define table_length          table_length_
-#define table_org             table_org_
-#define table_range           table_range_
-#define track_pteigen         track_pteigen_
-#define vector_to_table       vector_to_table_
-#define vdot                  vdot_
-#define vmod                  vmod_
+#define copy_twiss_data         copy_twiss_data_
+#define current_node_name       current_node_name_
+#define element_name            element_name_
+#define node_name               node_name_
+#define frndm                   frndm_
+#define el_par_vector           el_par_vector_
+#define f_ctof                  f_ctof_
+#define get_disp0               get_disp0_
+#define get_node_vector         get_node_vector_
+#define get_option              get_option_
+#define get_string              get_string_
+#define get_title               get_title_
+#define get_twiss_data          get_twiss_data_
+#define get_variable            get_variable_
+#define get_varstring           get_varstring_
+#define get_vector              get_vector_
+#define get_beam_value          get_beam_value_
+#define get_value               get_value_
+#define get_version             get_version_
+#define grndm                   grndm_
+#define headvalue               headvalue_
+#define intrac                  intrac_
+#define mtcond                  mtcond_
+#define constraint_name         constraint_name_
+#define vary_name               vary_name_
+#define mtputconsname           mtputconsname_
+
+#define next_constraint         next_constraint_
+#define next_constr_namepos     next_constr_namepos_
+#define next_global             next_global_
+#define next_start              next_start_
+#define next_vary               next_vary_
+#define node_al_errors          node_al_errors_
+#define node_fd_errors          node_fd_errors_
+#define node_string             node_string_
+#define node_value              node_value_
+#define plot_option             plot_option_
+#define reset_count             reset_count_
+#define restart_sequ            restart_sequ_
+#define retreat_node            retreat_node_
+#define sector_out              sector_out_
+#define sequence_name           sequence_name_
+#define set_option              set_option_
+#define set_value               set_value_
+#define set_variable            set_variable_
+#define set_stringvar           set_stringvar_
+#define spec_node_value         spec_node_value_
+#define store_node_value        store_node_value_
+#define store_node_vector       store_node_vector_
+#define string_to_table         string_to_table_
+#define table_length            table_length_
+#define table_org               table_org_
+#define table_range             table_range_
+#define track_pteigen           track_pteigen_
+#define vector_to_table         vector_to_table_
+#define vdot                    vdot_
+#define vmod                    vmod_
+
+#define seterrorflagfort        seterrorflagfort_  /*sets the dglobal error flag*/
+#define geterrorflag            geterrorflag_  /*returns the dglobal error flag*/
+#define getcurrentelementname   getcurrentelementname_
+#define getcurrentcmdname       getcurrentcmdname_
+#define stolower                stolower_
+#define cf77flush               cf77flush_
+#define select_ptc_idx          select_ptc_idx_
+#define result_from_normal      result_from_normal_
+#define make_map_table          make_map_table_ /* table for maps */
+#define minimum_acceptable_order minimum_acceptable_order_
+#define augmentfwarn            augmentfwarn_
+#define makemomentstables       makemomentstables_
+#define pro_input               pro_input_
+
 #define w_ptc_create_universe   w_ptc_create_universe_
 #define w_ptc_create_layout     w_ptc_create_layout_
 #define w_ptc_export_xml        w_ptc_export_xml_
@@ -139,26 +150,12 @@
 #define w_ptc_settime           w_ptc_settime_
 #define w_ptc_setnocavity       w_ptc_setnocavity_
 
-#define seterrorflagfort        seterrorflagfort_  /*sets the dglobal error flag*/
-#define geterrorflag            geterrorflag_  /*returns the dglobal error flag*/
-#define getcurrentelementname   getcurrentelementname_
-#define getcurrentcmdname       getcurrentcmdname_
-#define stolower                stolower_
-#define cf77flush               cf77flush_
-#define select_ptc_idx          select_ptc_idx_  /* ETDA 10 nov 2004 */
-#define result_from_normal      result_from_normal_ /* ETDA 11 nov 2004 */
-#define make_map_table          make_map_table_ /* KZ 28.06.2005 table for maps */
-#define minimum_acceptable_order minimum_acceptable_order_ /* ETDA 17 nov 2004 */
-#define augmentfwarn            augmentfwarn_
-
-#define makemomentstables  makemomentstables_
-
-#define pro_input               pro_input_  /* AK 20070530*/
-
-#define type_ofCall
+#endif
 
 
-#else /* WIN32 */
+#if 0
+
+// #else /* WIN32 */
 
 #define madx                  MADX
 

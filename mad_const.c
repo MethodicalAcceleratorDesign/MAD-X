@@ -223,13 +223,15 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
   }
   else  /* RDM old match */
   {
+    int len;
     if (current_node->cl == NULL) return 0;
     if (current_node->con_cnt == current_node->cl->curr)
     {
       current_node->con_cnt = 0; return 0;
     }
     c_c = current_node->cl->constraints[current_node->con_cnt];
-    ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+    len = strlen(c_c->name);
+    ncp = len < *name_l ? len : *name_l; // min(len, name_l)
     nbl = *name_l - ncp;
     strncpy(name, c_c->name, ncp);
     for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
@@ -340,10 +342,11 @@ int
 constraint_name(char* name, int* name_l, int* index)
   /* returns the name of the constraint */
 {
-  int ncp, nbl;
+  int ncp, nbl, len;
   struct constraint* c_c;
   c_c = current_node->cl->constraints[*index];
-  ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+  len = strlen(c_c->name);
+  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
   nbl = *name_l - ncp;
   strncpy(name, c_c->name, ncp);
   return 1;
@@ -354,7 +357,7 @@ next_global(char* name, int* name_l, int* type, double* value, double* c_min, do
   /* returns the parameters of the next global constraint;
      0 = none, else count */
 {
-  int i, ncp, nbl;
+  int i, ncp, nbl, len;
   struct constraint* c_c;
   if (current_sequ->cl == NULL) return 0;
   if (current_sequ->con_cnt == current_sequ->cl->curr)
@@ -362,7 +365,8 @@ next_global(char* name, int* name_l, int* type, double* value, double* c_min, do
     current_sequ->con_cnt = 0; return 0;
   }
   c_c = current_sequ->cl->constraints[current_sequ->con_cnt];
-  ncp = strlen(c_c->name) < *name_l ? strlen(c_c->name) : *name_l;
+  len = strlen(c_c->name);
+  ncp = len < *name_l ? len : *name_l;
   nbl = *name_l - ncp;
   strncpy(name, c_c->name, ncp);
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
