@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: clean cleanc cleancxx cleanf90 cleanbuild cleanall
+.PHONY: clean cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
 
 clean:
 	$E "** Cleaning local files"
@@ -42,6 +42,10 @@ cleanf90:
 	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC))))
 	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 	$_ $(RM) $(OBJDIR)$/*.mod
+
+cleandep:
+	$E "** Removing DEP generated files"
+	$_ $(RM) $(OBJDIR)$/*.d
 
 cleanbuild:
 	$E "** Removing $(PROJECT)"
