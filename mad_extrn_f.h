@@ -19,76 +19,76 @@
 #define augment_count augment_count_
 // warning: augment_counts is provided by madx_ptc_knobs.f90 
 
-#define get_string get_string_
-#define restart_sequ restart_sequ_
-#define get_option get_option_ // *
-#define deletetrackstrarpositions deletetrackstrarpositions_
-#define get_disp0 get_disp0_
-#define double_to_table_row double_to_table_row_
-#define reset_interpolation reset_interpolation_
-#define double_table double_table_
-#define element_name element_name_
-#define current_node_name current_node_name_
-#define double_to_table double_to_table_ // **
-#define augmentfwarn augmentfwarn_
-#define get_title get_title_
-#define string_from_table string_from_table_
-#define node_name node_name_
-#define grndm grndm_
-#define get_value get_value_ // **
-#define embedded_twiss embedded_twiss_
-#define node_string node_string_
-#define get_node_vector get_node_vector_
-#define mtputconsname mtputconsname_
-#define seterrorflagfort seterrorflagfort_
-#define store_node_vector store_node_vector_
-#define f_ctof f_ctof_
-#define copy_twiss_data copy_twiss_data_
-#define geterrorflag geterrorflag_
-#define getcurrentcmdname getcurrentcmdname_
-#define interp_node interp_node_
-#define make_map_table make_map_table_
-#define advance_to_pos advance_to_pos_
-#define get_vector get_vector_
-#define el_par_vector el_par_vector_
 #define advance_node advance_node_ // *
-#define next_constraint next_constraint_
-#define getnumberoftracks getnumberoftracks_
-#define comment_to_table comment_to_table_
-#define vdot vdot_ // *
-#define augmentcountonly augmentcountonly_
-#define mtcond mtcond_
-#define next_global next_global_
-#define get_version get_version_
-#define node_al_errors node_al_errors_
-#define store_node_value store_node_value_
-#define vmod vmod_
-#define reset_count reset_count_
-#define select_ptc_idx select_ptc_idx_
-#define string_to_table string_to_table_
-#define sector_out sector_out_
-#define next_start next_start_
-#define table_length table_length_
-#define headvalue headvalue_
-#define retreat_node retreat_node_
-#define makemomentstables makemomentstables_
-#define intrac intrac_
-#define double_from_table double_from_table_ // *
-#define gettrack gettrack_
-#define node_value node_value_ // **
-#define table_range table_range_
-#define node_fd_errors node_fd_errors_
-#define minimum_acceptable_order minimum_acceptable_order_
-#define frndm frndm_
-#define track_pteigen track_pteigen_
-#define plot_option plot_option_
-#define next_constr_namepos next_constr_namepos_
-#define get_twiss_data get_twiss_data_
-#define next_vary next_vary_
-#define vector_to_table vector_to_table_
-#define char_from_table char_from_table_
-#define set_option set_option_
+#define advance_to_pos advance_to_pos_
 #define augmentcountmomtabs augmentcountmomtabs_
+#define augmentcountonly augmentcountonly_
+#define augmentfwarn augmentfwarn_
+#define char_from_table char_from_table_
+#define comment_to_table comment_to_table_
+#define copy_twiss_data copy_twiss_data_
+#define current_node_name current_node_name_
+#define deletetrackstrarpositions deletetrackstrarpositions_
+#define double_from_table double_from_table_ // *
+#define double_table double_table_
+#define double_to_table double_to_table_ // **
+#define double_to_table_row double_to_table_row_
+#define element_name element_name_
+#define el_par_vector el_par_vector_
+#define embedded_twiss embedded_twiss_
+#define f_ctof f_ctof_
+#define frndm frndm_
+#define getcurrentcmdname getcurrentcmdname_
+#define get_disp0 get_disp0_
+#define geterrorflag geterrorflag_
+#define get_node_vector get_node_vector_
+#define getnumberoftracks getnumberoftracks_
+#define get_option get_option_ // *
+#define get_string get_string_
+#define get_title get_title_
+#define gettrack gettrack_
+#define get_twiss_data get_twiss_data_
+#define get_value get_value_ // **
+#define get_vector get_vector_
+#define get_version get_version_
+#define grndm grndm_
+#define headvalue headvalue_
+#define interp_node interp_node_
+#define intrac intrac_
+#define make_map_table make_map_table_
+#define makemomentstables makemomentstables_
+#define minimum_acceptable_order minimum_acceptable_order_
+#define mtcond mtcond_
+#define mtputconsname mtputconsname_
+#define next_constraint next_constraint_
+#define next_constr_namepos next_constr_namepos_
+#define next_global next_global_
+#define next_start next_start_
+#define next_vary next_vary_
+#define node_al_errors node_al_errors_
+#define node_fd_errors node_fd_errors_
+#define node_name node_name_
+#define node_string node_string_
+#define node_value node_value_ // **
+#define plot_option plot_option_
+#define reset_count reset_count_
+#define reset_interpolation reset_interpolation_
+#define restart_sequ restart_sequ_
+#define retreat_node retreat_node_
+#define sector_out sector_out_
+#define select_ptc_idx select_ptc_idx_
+#define seterrorflagfort seterrorflagfort_
+#define set_option set_option_
+#define store_node_value store_node_value_
+#define store_node_vector store_node_vector_
+#define string_from_table string_from_table_
+#define string_to_table string_to_table_
+#define table_length table_length_
+#define table_range table_range_
+#define track_pteigen track_pteigen_
+#define vdot vdot_ // *
+#define vector_to_table vector_to_table_
+#define vmod vmod_
 
 /*
  * Provided by Fortran
@@ -208,6 +208,10 @@ void w_ptc_getmomentstabcol_();
 
 // from madx_ptc_knobs.f90
 void w_ptc_rviewer_(void);
+
+/*
+ * Windows specific (should be removed)
+ */
 
 // cancel type_ofCall
 #define type_ofCall

@@ -51,9 +51,10 @@ CFLAGS += -pipe
 #
 
 # trig too many warnings (> 1000+) for the moment!
-# CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
-#          -Wchar-subscripts -Wformat-nonliteral -Wwrite-strings \
-#          -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
-#          -Wfloat-equal -Wconversion -Wno-conversion -Winline
+CFLAGS += -Wmissing-prototypes -Wmissing-declarations \
+          -Wchar-subscripts -Wconversion -Wno-conversion -Winline \
+          -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual
+
+#         -Wfloat-equal -Wstrict-prototypes -Wwrite-strings -Wformat-nonliteral
 
 # end of makefile
