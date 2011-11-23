@@ -1381,9 +1381,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   char *cmd_refnode;
   char apertype[NAME_L];
   char name[NAME_L];
-  char tol_err_mess[80];
-
-  double offs_row[8];
+  char tol_err_mess[80] = "";
 
   struct node* rng_glob[2];
   struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
@@ -1598,11 +1596,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       /* do survey */
       if (do_survey)
       {
+        double offs_row[8] = { 0 };
+
         /* printf("\n using offsets\n");*/
 
         aper_surv(surv_init, nint);
 
-      offs_node=aper_tab_search_tfs(offs_tab, name, offs_row);
+        offs_node=aper_tab_search_tfs(offs_tab, name, offs_row);
         if (offs_node)
         {
           /* printf("\nusing offset");*/
