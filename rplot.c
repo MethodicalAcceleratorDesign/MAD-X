@@ -180,6 +180,9 @@ void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
                            double* dpOverP,  double* p,
                            double* length)
 {
+  (void)particleno, (void)obspoint, (void)turn;
+  (void)x, (void)xp, (void)y, (void)yp;
+  (void)dpOverP, (void)p, (void)length; 
 
 #ifdef ROOT_PLOT
 
@@ -207,6 +210,9 @@ void type_ofCall  plottwiss(int* obspoint,
                             double* betaz, double* alfaz,
                             double* length)
 {
+  (void)obspoint;
+  (void)betax, (void)alfax, (void)betay, (void)alfay, (void)betaz, (void)alfaz;
+  (void)length; 
 
 #ifdef ROOT_PLOT
 
@@ -356,6 +362,8 @@ extern type_OfExtern void type_ofCall rviewer(void)
 extern type_OfExtern
 void type_ofCall madxv_setknobname(int* n, const char* name)
 {
+  (void)n, (void)name;
+  
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetKnobName(*n,name);
 #elif defined _PLUGIN
@@ -382,6 +390,8 @@ void type_ofCall madxv_setknobname(int* n, const char* name)
 extern type_OfExtern
 void type_ofCall madxv_setfctnname(int* n, const char* name)
 {
+  (void)n, (void)name;
+  
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionName(*n,name);
 #elif defined _PLUGIN
@@ -409,6 +419,8 @@ void type_ofCall madxv_setfctnname(int* n, const char* name)
 extern type_OfExtern
 void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
 {
+  (void)el, (void)n, (void)name;
+  
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetFunctionAt(*el,*n,name);
 #elif defined _PLUGIN

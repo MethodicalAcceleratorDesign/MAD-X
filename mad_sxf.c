@@ -17,6 +17,7 @@ r_indent(void)
   indent = b_indent[--b_level];
 }
 
+#if 0 // not used
 static char*
 tag_spec(char* intype)
 {
@@ -28,6 +29,7 @@ tag_spec(char* intype)
   }
   return NULL;
 }
+#endif
 
 static int
 join_prefix(char* prefix, int ntok, char** toks)
@@ -46,6 +48,7 @@ join_prefix(char* prefix, int ntok, char** toks)
   return ntok;
 }
 
+#if 0 // not used
 static int
 get_token_list                 /* returns no. of tokens */
 (char* text,    /* input: blank separated tokens */
@@ -63,7 +66,9 @@ get_token_list                 /* returns no. of tokens */
   }
   return count;
 }
+#endif
 
+#if 0 // not used
 static int
 version_header(char* line)            /* processes and checks header */
 {
@@ -77,6 +82,7 @@ version_header(char* line)            /* processes and checks header */
   }
   return 1;
 }
+#endif
 
 static void
 reset_line(FILE* out)
@@ -289,7 +295,7 @@ write_elend(FILE* out)
 static void
 write_body(FILE* out)
 {
-  int i, flag, nval, pos, set = 0;
+  int i, flag = 0, nval, pos, set = 0;
   double val[100];
   char out_name[NAME_L];
   struct command* eldef;
@@ -410,13 +416,15 @@ pro_sxf(struct in_cmd* cmd)
 }
 
 void
-sxf_read(struct command* comm)
+sxf_read(struct command* cmd)
   /* reads an expanded sequence including errors from an SXF file */
 {
   struct sequence* keep_sequ = current_sequ;
   int n, echo, err, izero = 0, count = 0;
   FILE* in_file = in->input_files[in->curr];
   char *p, *pp;
+
+  (void)cmd;
   sxf_suml = zero;
   if (fgets(aux_buff->c, aux_buff->max, in_file) == NULL)
   {
@@ -591,6 +599,7 @@ sxf_align_fill(int start, int end, int ntok, char** toks, double* vec)
 {
   int cnt = 0, j, rss, res;
 
+  (void)end;
   if (strcmp(toks[start+1], "al") == 0)
   {
     get_bracket_t_range(toks, '[', ']', start+3, ntok, &rss, &res);
@@ -727,9 +736,10 @@ sxf_body_fill(struct command* comm, int start, int end, int ntok, char** toks, d
 }
 
 void
-sxf_write(struct command* comm, FILE* out)
+sxf_write(struct command* cmd, FILE* out)
   /* writes the currently USEd sequence in SXF format to a file */
 {
+  (void)cmd;
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
     warning("SXFWRITE, but no active sequence:", "ignored");
@@ -771,7 +781,7 @@ sxf_rtag(void)
   {
     strcpy(tag_type[j], type[j]);
     strcpy(tag_code[j], code[j]);
-    lower(tag_type[j]); lower(tag_code[j]);
+    stolower(tag_type[j]); stolower(tag_code[j]);
   }
   if (tag_cnt > 0)  tag_flag = 2;
 }

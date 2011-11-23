@@ -13,7 +13,8 @@ void
 mystrcpy(struct char_array* target, char* source)
 {
   /* string copy to char_array with size adjustment */
-  while (strlen(source) > target->max) grow_char_array(target);
+  int len = strlen(source);
+  while (len > target->max) grow_char_array(target);
   strcpy(target->c, source);
 }
 

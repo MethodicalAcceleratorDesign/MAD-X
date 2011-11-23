@@ -10,6 +10,8 @@ pro_ibs(struct in_cmd* cmd)
   char *filename = NULL, *table_name = NULL;
   int pos, w_file;
 
+  (void)cmd;
+  
   if (twiss_table == NULL)
     warning("no TWISS table present","IBS command ignored");
   else

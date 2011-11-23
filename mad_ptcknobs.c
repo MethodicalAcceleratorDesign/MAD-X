@@ -97,7 +97,7 @@ struct madx_mpk_knob
 
 // private variables
 
-static int                        madx_mpk_debug;
+// static int                        madx_mpk_debug;
 
 // constraints
 static int                        madx_mpk_Nconstraints;
@@ -107,7 +107,7 @@ static char*                      madx_mpk_constraints[MAX_CONTRAINS];
 static int                        madx_mpk_Nknobs;
 static struct madx_mpk_knob       madx_mpk_knobs[MAX_KNOBS];
 static char*                      madx_mpk_setknobs[MAX_KNOBS]; /*this is ptc_setknobs*/
-static struct in_cmd*             madx_mpk_varyknob_cmds[MAX_KNOBS]; /*this is ptc_setknobs*/
+// static struct in_cmd*             madx_mpk_varyknob_cmds[MAX_KNOBS]; /*this is ptc_setknobs*/
 
 // other
 static int                        madx_mpk_Nvariables;  /*total number if matching variables >= number of knob commands (one knob command may define more then one knob/variable)*/
@@ -118,7 +118,7 @@ static struct in_cmd* madx_mpk_comm_createlayout;
 static struct in_cmd* madx_mpk_comm_setswitch;
 static struct in_cmd* madx_mpk_comm_calculate;/*ptc_twiss or ptc_normal*/
 
-static char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;";
+// static char twisscommand[]="ptc_twiss, table=ptc_twiss, icase=6, no=2, betx=10, alfx=.0,  bety=10., alfy=0, betz=10., alfz=0;";
 
 // private functions
 

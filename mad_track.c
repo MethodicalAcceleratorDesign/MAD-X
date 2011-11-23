@@ -215,6 +215,8 @@ track_end(struct in_cmd* cmd)
 {
   int i;
   struct node* c_node;
+
+  (void)cmd;
   if (track_is_on == 0)
   {
     warning("track_end: no TRACK command seen yet", "ignored");
@@ -239,6 +241,8 @@ track_end(struct in_cmd* cmd)
 void
 track_ripple(struct in_cmd* cmd)
 {
+  (void)cmd;
+  
   if (track_is_on == 0)
   {
     warning("track_ripple: no TRACK command seen yet", "ignored");

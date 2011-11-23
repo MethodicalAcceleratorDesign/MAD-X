@@ -140,7 +140,7 @@ exec_plot(struct in_cmd* cmd)
   char* particle_list;
   struct name_list* nl_plot = NULL;
   struct command_parameter_list* pl_plot = NULL;
-  struct table* p_table;
+  struct table* p_table = NULL;
   char *table_name, *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
@@ -546,7 +546,7 @@ reset_interpolation(int *nint)
   struct command_parameter* cp;
   int i;
   int j,bend_flag = 0;
-  double angle,length,e1,e2,numint, h1, h2, fint, fintx, hgap, bvk;
+  double angle=0,length,e1,e2,numint, h1, h2, fint, fintx, hgap, bvk;
 
   /* Deletes the interpolating nodes expanded by the routine interp_node */
 

@@ -41,6 +41,7 @@ struct in_cmd*      new_in_cmd(int length);
 struct in_cmd_list* new_in_cmd_list(int length);
 struct in_cmd*      delete_in_cmd(struct in_cmd* cmd);
 struct in_cmd*      buffered_cmd(struct in_cmd* cmd);
+void  buffer_in_cmd(struct in_cmd* cmd);
 void  grow_in_cmd_list(struct in_cmd_list* p);
 void  dump_in_cmd(struct in_cmd* p_inp);
 void  scan_in_cmd(struct in_cmd* cmd);

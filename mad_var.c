@@ -558,6 +558,8 @@ print_global(double delta)
   int kbunch = get_value("probe", "kbunch");
   int rad = get_value("probe", "radiate");
   double gamtr = zero, t0 = zero, eta;
+
+  (void)delta;
   get_string("probe", "particle", tmp);
   if (rad) strcpy(trad, "T");
   else     strcpy(trad, "F");
@@ -584,7 +586,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   /* returns the next variable to be varied during match;
      0 = none, else count */
 {
-  int i, pos, ncp, nbl;
+  int i, pos, ncp, nbl, len;
   double l_step;
   char* v_name;
   struct name_list* nl;
@@ -599,7 +601,8 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   pl = comm->par;
   pos = name_list_pos("name", nl);
   v_name = pl->parameters[pos]->string;
-  ncp = strlen(v_name) < *name_l ? strlen(v_name) : *name_l;
+  len = strlen(v_name);
+  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
   nbl = *name_l - ncp;
   strncpy(name, v_name, ncp);
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
@@ -616,7 +619,7 @@ int
 vary_name(char* name, int* name_l, int* index)
   /* returns the variable name */
 {
-  int pos, ncp, nbl;
+  int pos, ncp, nbl, len;
   char* v_name;
   struct name_list* nl;
   struct command* comm;
@@ -626,7 +629,8 @@ vary_name(char* name, int* name_l, int* index)
   pl = comm->par;
   pos = name_list_pos("name", nl);
   v_name = pl->parameters[pos]->string;
-  ncp = strlen(v_name) < *name_l ? strlen(v_name) : *name_l;
+  len = strlen(v_name);
+  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
   nbl = *name_l - ncp;
   strncpy(name, v_name, ncp);
   return 1;

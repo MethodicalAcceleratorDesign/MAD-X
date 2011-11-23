@@ -1,6 +1,7 @@
 #include <stdlib.h>
+
+#include "mad_extrn_f.h"
 #include "mad_core.h"
-#include "mad_wrap_f.h"
 
 #define const // disable const for this module
 #include "mad_main.h"

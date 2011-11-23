@@ -72,12 +72,14 @@ void
 ptc_dumpmaps(struct in_cmd* cmd)
 /*Dumps PTC map for each element in the current sequence*/
 {
+  (void)cmd;
   w_ptc_dumpmaps_();
 }
 
 void
 ptc_oneturnmap(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -221,7 +223,7 @@ pro_ptc_twiss(void)
   add_to_table_list( ptc_twiss_summary_table, table_register );
   /* --- */
 
-  w_ptc_twiss(tarr->i,summary_tarr->i);
+  w_ptc_twiss_(tarr->i,summary_tarr->i);
 
   /* upon completion of the Fortran ptc_twiss call ... */
 
@@ -798,12 +800,12 @@ pro_ptc_trackline(struct in_cmd* cmd)
   if (command_par_value("everystep",cmd->clone) != 0)
   {
     /*printf("Calling PTC track line every step\n");*/
-    w_ptc_track_everystep(&curr_obs_points);
+    w_ptc_track_everystep_(&curr_obs_points);
   }
   else
   {
     /*printf("Calling STD PTC track line\n");*/
-    w_ptc_trackline(&curr_obs_points);
+    w_ptc_trackline_(&curr_obs_points);
   }
 
   track_tables_dump();
@@ -837,7 +839,7 @@ pro_ptc_enforce6d(struct in_cmd* cmd)
   {
     command_par_value2("flag", cmd->clone, &switchvalue);
     flag = (int)switchvalue;
-    w_ptc_enforce6d(&flag);
+    w_ptc_enforce6d_(&flag);
   }
   else
   {
@@ -879,7 +881,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   {
     command_par_value2("debuglevel", cmd->clone, &switchvalue);
     debuglevel = (int)switchvalue;
-    w_ptc_setdebuglevel(&debuglevel);
+    w_ptc_setdebuglevel_(&debuglevel);
   }
   else
   {
@@ -893,7 +895,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("maxacceleration", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setaccel_method(&i);
+    w_ptc_setaccel_method_(&i);
   }
   else
   {
@@ -907,7 +909,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("exact_mis", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setexactmis(&i);
+    w_ptc_setexactmis_(&i);
   }
   else
   {
@@ -921,7 +923,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("radiation", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setradiation(&i);
+    w_ptc_setradiation_(&i);
   }
   else
   {
@@ -934,7 +936,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("fringe", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setfringe(&i);
+    w_ptc_setfringe_(&i);
   }
   else
   {
@@ -949,7 +951,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("totalpath", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_settotalpath(&i);
+    w_ptc_settotalpath_(&i);
   }
   else
   {
@@ -963,7 +965,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("time", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_settime(&i);
+    w_ptc_settime_(&i);
   }
   else
   {
@@ -976,7 +978,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     command_par_value2("nocavity", cmd->clone, &switchvalue);
     if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
-    w_ptc_setnocavity(&i);
+    w_ptc_setnocavity_(&i);
   }
   else
   {
@@ -1026,7 +1028,7 @@ pro_ptc_printparametric(struct in_cmd* cmd)
     return;
   }
 
-  w_ptc_writeparresults(filep);
+  w_ptc_writeparresults_(filep);
 
   delete_int_array(filenameIA);
 }
@@ -1079,11 +1081,11 @@ pro_ptc_printframes(struct in_cmd* cmd)
 
   if (strcmp(format,"rootmacro") == 0)
   {
-    w_ptc_printlayout_rootm(filenameIA->i);
+    w_ptc_printlayout_rootm_(filenameIA->i);
   }
   else
   {
-    w_ptc_printframes(filenameIA->i);
+    w_ptc_printframes_(filenameIA->i);
   }
 
   delete_int_array(filenameIA);
@@ -1120,7 +1122,7 @@ pro_ptc_export_xml(struct in_cmd* cmd)
 
   conv_char(filename,filenameIA);
 
-  w_ptc_export_xml(filenameIA->i);
+  w_ptc_export_xml_(filenameIA->i);
 
   delete_int_array(filenameIA);
 }
@@ -1234,7 +1236,7 @@ pro_ptc_eplacement(struct in_cmd* cmd)
     pos++; /*before if because fortran numerates from 1*/
 
   }
-  w_ptc_eplacement(&pos,&refframe);
+  w_ptc_eplacement_(&pos,&refframe);
 }
 
 void
@@ -1302,7 +1304,7 @@ pro_ptc_knob(struct in_cmd* cmd)
 
     conv_char(c_dum->c,initialpIA);
 
-    w_ptc_addknob_i(initialpIA->i);
+    w_ptc_addknob_i_(initialpIA->i);
 
     delete_int_array(initialpIA);
 
@@ -1340,7 +1342,7 @@ pro_ptc_knob(struct in_cmd* cmd)
 
     conv_char(c_dum->c,elementIA);
 
-    w_ptc_addknob(elementIA->i);
+    w_ptc_addknob_(elementIA->i);
 
     delete_int_array(elementIA);
   }
@@ -1379,7 +1381,7 @@ pro_ptc_setknobvalue(struct in_cmd* cmd)
 
   conv_char(c_dum->c,elementIA);
 
-  w_ptc_setknobvalue(elementIA->i);
+  w_ptc_setknobvalue_(elementIA->i);
 
   delete_int_array(elementIA);
 
@@ -1459,7 +1461,7 @@ pro_ptc_setfieldcomp(struct in_cmd* cmd)
     pos++; /*before if because fortran numerates from 1*/
   }
 
-  w_ptc_setfieldcomp(&pos);
+  w_ptc_setfieldcomp_(&pos);
 
 }
 
@@ -1617,7 +1619,7 @@ pro_ptc_moments(struct in_cmd* cmd)
 
   int no = (int)command_par_value("no", cmd->clone);
 
-  w_ptc_moments(&no);
+  w_ptc_moments_(&no);
 
   return 1;
 }
@@ -1704,8 +1706,8 @@ pro_ptc_select_moment(struct in_cmd* cmd)
       mdefIA = new_int_array(9);/*size + "mu" + 6charnumbers*/
       conv_char(colname,mdefIA);
 
-      w_ptc_addmoment(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
-                      tabIA->i, mdefIA->i, &parametric);
+      w_ptc_addmoment_(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
+                       tabIA->i, mdefIA->i, &parametric);
 
       delete_int_array(mdefIA);
 
@@ -1762,8 +1764,8 @@ pro_ptc_select_moment(struct in_cmd* cmd)
     mdefIA = new_int_array(1+strlen(tablename));
 
     conv_char(tablename,mdefIA);
-    w_ptc_addmoment(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
-                    tabIA->i, mdefIA->i, &parametric);
+    w_ptc_addmoment_(&(mdefi[0]),&(mdefi[1]),&(mdefi[2]),&(mdefi[3]),&(mdefi[4]),&(mdefi[5]),
+                     tabIA->i, mdefIA->i, &parametric);
 
     delete_int_array(mdefIA);
   }
@@ -1791,10 +1793,10 @@ makemomentstables(void)
   memset(tables,0x0,maxtables*sizeof(char*));
 
 
-  nmom = w_ptc_getnmoments();
+  nmom = w_ptc_getnmoments_();
   for (i = 1; i <= nmom; i++)
   {
-    w_ptc_getmomentstabcol(&i, tabname, colname);
+    w_ptc_getmomentstabcol_(&i, tabname, colname);
     /*printf(" mom %d: %s %s\n",i, tabname, colname);*/
 
     for(j=0; tables[j] != 0x0 ;j++)

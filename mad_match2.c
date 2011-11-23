@@ -203,6 +203,8 @@ match2_delete_expressions(void)
 void
 match2_match(struct in_cmd* cmd)
 {
+  (void)cmd;
+
   match_is_on = 2;
   total_const=0;
 
@@ -747,10 +749,13 @@ match2_constraint(struct in_cmd* cmd)
   match2_cons_name[i][j]=(char*) mymalloc("match2_constraint",strlen(cname)+1);
 /*  strcpy(match2_cons_name[i][j],cname);*/
   n=0;
-  for(k=0;k<strlen(cname);k++){
-    if(cname[k]!=' ') {
-      match2_cons_name[i][j][n]=cname[k];
-      n++;
+  {
+    int len = strlen(cname);
+    for(k=0;k<len;k++){
+      if(cname[k]!=' ') {
+        match2_cons_name[i][j][n]=cname[k];
+        n++;
+      }
     }
   }
   match2_cons_name[i][j][n]='\0';

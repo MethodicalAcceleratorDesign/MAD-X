@@ -12,6 +12,8 @@ time_stamp(char* place)
 {
   time_t now;
   int k, l;
+
+  (void)place;
   time(&now);    /* get system time */
   k = (int)now - (int)start_time;
   l = (int)now - (int)last_time;

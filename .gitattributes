@@ -167,6 +167,7 @@ lib64/libz.a -text
 /mad_exec.h -text
 /mad_expr.c -text
 /mad_expr.h -text
+/mad_extrn_f.h -text
 /mad_gcst.c -text
 /mad_gcst.h -text
 /mad_gvar.c -text
@@ -250,7 +251,6 @@ lib64/libz.a -text
 /mad_var.h -text
 /mad_vec.c -text
 /mad_vec.h -text
-/mad_wrap_f.h -text
 /madx.h -text
 /madx_ptc_distrib.f90 -text
 /madx_ptc_distrib.inc -text

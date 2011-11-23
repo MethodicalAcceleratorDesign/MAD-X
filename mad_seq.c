@@ -1295,6 +1295,7 @@ seq_end(struct in_cmd* cmd)
   /* executes endedit command */
 {
   char tmp[8];
+  (void)cmd;
   sprintf(tmp, "%d", seqedit_install);
   put_info("seqedit - number of elements installed: ", tmp);
   sprintf(tmp, "%d", seqedit_move);
@@ -1525,6 +1526,8 @@ seq_reflect(struct in_cmd* cmd)
   /* executes reflect command */
 {
   struct node *tmp, *c_node;
+
+  (void)cmd;
   c_node = edit_sequ->start;
   while (c_node != NULL)
   {

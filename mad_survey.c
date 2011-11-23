@@ -9,6 +9,8 @@ pro_survey(struct in_cmd* cmd)
   char *filename = NULL, *table_name;
   int pos, w_file;
   int iarc = 1, keep;
+
+  (void)cmd;
   if (current_sequ == NULL)
   {
     warning("SURVEY, but no active sequence:", "ignored");

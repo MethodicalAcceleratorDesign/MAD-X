@@ -320,7 +320,6 @@ void invert_normal(int, double*);
 void invert_skew(int, double*);
 void link_behind(struct c6t_element*, struct c6t_element*);
 void link_c6t_in_front(struct c6t_element*, struct c6t_element*);
-void lower(char*);
 struct c6t_element* make_c6t_element(struct node*);
 struct object* make_obj(char*, int, int, int, int);
 void make_multipole(struct c6t_element*);
@@ -1851,7 +1850,7 @@ int in_keep_list(struct c6t_element* el)
   char temp[24];
   int j;
 
-  strcpy(temp, el->name); lower(temp);
+  strcpy(temp, el->name); stolower(temp);
   for (j = 0; j < MM_KEEP; j++)
   {
     if (strncmp(temp, keep_these[j], strlen(keep_these[j])) == 0) return 2;
@@ -1891,6 +1890,7 @@ void link_behind(struct c6t_element* new, struct c6t_element* el)
   el->next = new;
 }
 
+/* removed, replaced by stolower from mad_str.h
 void lower(char* s)
 {
   char* cp = s;
@@ -1899,6 +1899,7 @@ void lower(char* s)
     *cp = (char) tolower((int)*cp); cp++;
   }
 }
+*/
 
 struct c6t_element* make_c6t_element(struct node* p)
 {

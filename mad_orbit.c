@@ -314,7 +314,7 @@ correct_readcorr(struct in_cmd* cmd)
 
 /* printf("Pointers: %d %d %d\n",mysequ,nextnode,ndexe); */
 
-
+  (void)cmd;
   i = 1; ix=0;
   while(ix == 0) {
       ix =   str_from_table("corr", "name", &i, name);
@@ -1027,7 +1027,7 @@ pro_correct2_getcorrs(struct in_cmd* cmd)
   struct id_mic2 *c;  /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
-
+  (void)cmd;
 /*
   double xlimit;
 */
@@ -2315,6 +2315,7 @@ pro_correct_getcorrs(struct in_cmd* cmd)
   struct table *ttb;
   double **da1;
 
+  (void)cmd;
   ttb = model_table;
 
   da1 = ttb->d_cols;
@@ -2988,6 +2989,7 @@ correct_option(struct in_cmd* cmd)
 void
 correct_getorbit(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void

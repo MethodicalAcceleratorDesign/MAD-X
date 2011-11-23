@@ -132,6 +132,8 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   struct sequence* nodesequ = node->p_sequ;
   struct node *p, *q = nodesequ->start;
   int i;
+  (void)sequ;
+
   p = clone_node(q, 0);
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
     i = add_to_name_list(p->p_elem->name, 1, occ_list);

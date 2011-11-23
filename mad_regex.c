@@ -52,6 +52,7 @@ char_count(char c, char* s)
   return n;
 }
 
+#if 0 // not used
 static void
 dump_tokens(struct reg_token* tk)
 {
@@ -62,6 +63,7 @@ dump_tokens(struct reg_token* tk)
     tk = tk->next;
   }
 }
+#endif
 
 static void
 grow_r_char_array(struct r_char_array* a)
@@ -297,6 +299,7 @@ static void
 edit_tokens(struct reg_token* start, char* pattern, char* string, int dollar)
 {
   struct reg_token *tk, *tp;
+  (void)pattern;
   tk = tp = start;
   while (tk)
   {

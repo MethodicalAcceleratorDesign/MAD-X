@@ -169,6 +169,7 @@ void wclose()
 
 void wclrwk(int *i1,int *i2)
 {
+  (void)i1, (void)i2;
   /* clear workstation */
   XClearWindow(mydisplay, mywindow);
 

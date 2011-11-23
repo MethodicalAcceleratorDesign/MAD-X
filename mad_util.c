@@ -1,4 +1,4 @@
-#include "mad_wrap_f.h"
+#include "mad_extrn_f.h"
 
 #ifndef _WIN32
 #include <unistd.h>

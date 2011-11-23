@@ -107,7 +107,8 @@ make_macro(char* statement)
   struct macro* m;
   char** toks = tmp_l_array->p;
   int i, n, rs, re, start_2;
-  while(strlen(statement) >= aux_buff->max) grow_char_array(aux_buff);
+  int len = strlen(statement);
+  while(len >= aux_buff->max) grow_char_array(aux_buff);
   strcpy(aux_buff->c, statement);
   get_bracket_range(aux_buff->c, '{', '}', &rs, &re);
   start_2 = rs + 1;
@@ -144,9 +145,15 @@ exec_macro(struct in_cmd* cmd, int pos)
     any = re - rs - 1; rs++;
     if (any < 0) any = 0;
     else if (any > n) any = n;
-    for (i = 0; i < any; i++)  sum += strlen(toks[rs+i]);
-    while (l_wrk->max < (strlen(pro->buffers[level]->c_a->c)+sum))
-      grow_char_array(l_wrk);
+    for (i = 0; i < any; i++) {
+      int len = strlen(toks[rs+i]);
+      sum += len;
+    }
+    {
+      int len = strlen(pro->buffers[level]->c_a->c);
+      while (l_wrk->max < len+sum)
+        grow_char_array(l_wrk);
+    }
     for (i = 0; i < any; i++)
     {
       myrepl(macro_list->macros[pos]->formal->p[i], toks[rs+i],

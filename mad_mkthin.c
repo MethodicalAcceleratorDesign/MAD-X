@@ -74,6 +74,8 @@ force_consistent_slices(void)
   }
 }
 
+#if 0
+// not used
 static void
 dump_slices(void)
 /* Loops over all current elements and prints the number of slices. Used for debug and info */
@@ -104,6 +106,7 @@ dump_slices(void)
   }
   printf("------ end of dump slices. There were %4d elements, %3d with slice numbers and %2d with slice numbers>1\n\n",element_list->curr,n_elem_with_slice,n_elem_with_slice_gt_1);
 }
+#endif
 
 static int
 get_slices_from_elem(struct element* elem)
@@ -1147,18 +1150,21 @@ static double
 teapot_q_shift(int slices,int slice_no)
 {
   return 1./slices;
+  (void)slice_no;
 }
 
 static double
 simple_q_shift(int slices,int slice_no)
 {
   return 1./slices;
+  (void)slice_no;
 }
 
 static double
 collim_q_shift(int slices,int slice_no)
 { /* pointless actually, but it pleases symmetrically */
   return 1./slices;
+  (void)slice_no;
 }
 
 

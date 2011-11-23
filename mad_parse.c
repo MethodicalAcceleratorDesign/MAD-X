@@ -145,7 +145,8 @@ pre_split(char* inbuf, struct char_array* outbuf, int fill_flag)
   char c, cp = ' ', cpnb = ' ', quote = ' ';
   int j, k, kn, sl = strlen(inbuf), cout = 0, quote_lv = 0, rb_level = 0;
   int left_b = 0, new_string = 1, c_digit = 0, f_equal = 0, comm_cnt = 0;
-  while (2*strlen(inbuf) > outbuf->max) grow_char_array(outbuf);
+  int len = strlen(inbuf);
+  while (2*len > outbuf->max) grow_char_array(outbuf);
   for (k = 0; k < sl; k++)
   {
     c = inbuf[k];

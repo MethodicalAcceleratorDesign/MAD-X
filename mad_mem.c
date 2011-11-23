@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mad_wrap_f.h"
 #include "mad_mem.h"
+#include "mad_err.h"
 
 // private constant
 
@@ -23,6 +25,8 @@ static int* mtable[MTABLE_SIZE];
 void
 mad_mem_handler(int sig)
 {
+  (void)sig;
+  
   if (strcmp(myfree_caller, "none") == 0)
     puts("+++ memory access outside program range, fatal +++");
   else

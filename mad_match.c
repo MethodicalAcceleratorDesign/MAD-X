@@ -386,6 +386,7 @@ match_action(struct in_cmd* cmd)
 void
 match_cell(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -463,6 +464,7 @@ match_constraint(struct in_cmd* cmd)
 void
 match_couple(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -578,6 +580,7 @@ match_end(struct in_cmd* cmd)
 void
 match_fix(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -625,6 +628,8 @@ match_gweight(struct in_cmd* cmd)
   struct command_parameter_list* plc = cmd->clone->par;
   struct command_parameter_list* pl = current_gweight->par;
   int j;
+
+  (void)cmd;
   for (j = 0; j < pl->curr; j++)
   {
     if (nl->inform[j])
@@ -638,6 +643,7 @@ match_gweight(struct in_cmd* cmd)
 void
 match_level(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -1028,11 +1034,13 @@ match_match(struct in_cmd* cmd)
 void
 match_rmatrix(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
 match_tmatrix(struct in_cmd* cmd)
 {
+  (void)cmd;
 }
 
 void
@@ -1042,6 +1050,7 @@ match_vary(struct in_cmd* cmd)
   double value;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
+
   if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
   pos = name_list_pos("name", nl);
   if (nl->inform[pos])

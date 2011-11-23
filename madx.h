@@ -31,7 +31,6 @@ typedef size_t uintptr_t;
 
 // fortran externs
 
-#include "mad_wrap_f.h"
 #include "mad_extrn_f.h"
 
 // constants modules
