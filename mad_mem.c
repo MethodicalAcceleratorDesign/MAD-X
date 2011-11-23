@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mad_wrap_f.h"
+#include "mad_extrn_f.h"
 #include "mad_mem.h"
 #include "mad_err.h"
 
