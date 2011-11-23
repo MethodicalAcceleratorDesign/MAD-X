@@ -5,89 +5,145 @@
  * Called by Fortran
  */
 
+// from mad_cmdpar.c
+#define comm_para comm_para_
+#define get_string get_string_
+#define get_value get_value_ // **
+#define get_vector get_vector_
+
+// from mad_const.c
+#define next_constraint next_constraint_
+#define next_constr_namepos next_constr_namepos_
+#define next_global next_global_
+
+// from mad_elem.c
+#define element_name element_name_
+#define el_par_vector el_par_vector_
+#define get_node_vector get_node_vector_
+
+// from mad_elemerr.c
+#define node_al_errors node_al_errors_
+#define node_fd_errors node_fd_errors_
+
+// from mad_err.c
+#define augmentfwarn augmentfwarn_
+#define geterrorflag geterrorflag_
+#define seterrorflagfort seterrorflagfort_
+
 // from mad_eval.c
 #define pro_input pro_input_
 
-// from mad_var.c
-#define set_variable set_variable_
-#define get_variable get_variable_
+// from mad_gxx11c.c
+#define wopen    wopen_
+#define wclose   wclose_
+#define wclrwk   wclrwk_
+#define wpl      wpl_
+#define wfa      wfa_
+#define wswn     wswn_
+#define wtx      wtx_
+#define wwait    wwait_
+#define wsetci   wsetci_
+#define wsetls   wsetls_
+#define wstring  wstring_
+#define cbyt     cbyt_
+#define mydtime  mydtime_
 
-// from mad_cmdpar.c
-#define comm_para comm_para_
+// from mad_match.c
+#define mtcond mtcond_
+#define mtputconsname mtputconsname_
 
-// from mad_table.c
-#define augment_count augment_count_
-// warning: augment_counts is provided by madx_ptc_knobs.f90 
-
+// from mad_node.c
 #define advance_node advance_node_ // *
 #define advance_to_pos advance_to_pos_
+#define current_node_name current_node_name_
+#define node_name node_name_
+#define node_string node_string_
+#define node_value node_value_ // **
+#define retreat_node retreat_node_
+#define store_node_value store_node_value_
+#define store_node_vector store_node_vector_
+
+// from mad_option.c
+#define get_option get_option_ // *
+#define set_option set_option_
+
+// from mad_orbit.c
+#define f_ctof f_ctof_
+
+// from mad_plot.c
+#define get_title get_title_
+#define get_version get_version_
+#define interp_node interp_node_
+#define plot_option plot_option_
+#define reset_interpolation reset_interpolation_
+
+// from mad_ptc.c
 #define augmentcountmomtabs augmentcountmomtabs_
+#define makemomentstables makemomentstables_
+#define minimum_acceptable_order minimum_acceptable_order_
+#define select_ptc_idx select_ptc_idx_
+
+// from mad_rand.c
+#define frndm frndm_
+#define grndm grndm_
+
+// from mad_rplot.cpp
+#define newrplot newrplot_
+#define plottrack plottrack_
+#define plottwiss plottwiss_
+#define rplotfinish rplotfinish_
+#define rviewer rviewer_
+#define madxv_setfctnname madxv_setfctnname_
+#define madxv_setknobname madxv_setknobname_
+#define madxv_setfunctionat madxv_setfunctionat_
+
+// from mad_seq.c
+#define restart_sequ restart_sequ_
+
+// from mad_table.c
+// warning: augment_counts is provided by madx_ptc_knobs.f90
+#define augment_count augment_count_
 #define augmentcountonly augmentcountonly_
-#define augmentfwarn augmentfwarn_
 #define char_from_table char_from_table_
 #define comment_to_table comment_to_table_
-#define copy_twiss_data copy_twiss_data_
-#define current_node_name current_node_name_
-#define deletetrackstrarpositions deletetrackstrarpositions_
 #define double_from_table double_from_table_ // *
 #define double_table double_table_
 #define double_to_table double_to_table_ // **
 #define double_to_table_row double_to_table_row_
-#define element_name element_name_
-#define el_par_vector el_par_vector_
-#define embedded_twiss embedded_twiss_
-#define f_ctof f_ctof_
-#define frndm frndm_
-#define getcurrentcmdname getcurrentcmdname_
-#define get_disp0 get_disp0_
-#define geterrorflag geterrorflag_
-#define get_node_vector get_node_vector_
-#define getnumberoftracks getnumberoftracks_
-#define get_option get_option_ // *
-#define get_string get_string_
-#define get_title get_title_
-#define gettrack gettrack_
-#define get_twiss_data get_twiss_data_
-#define get_value get_value_ // **
-#define get_vector get_vector_
-#define get_version get_version_
-#define grndm grndm_
 #define headvalue headvalue_
-#define interp_node interp_node_
-#define intrac intrac_
 #define make_map_table make_map_table_
-#define makemomentstables makemomentstables_
-#define minimum_acceptable_order minimum_acceptable_order_
-#define mtcond mtcond_
-#define mtputconsname mtputconsname_
-#define next_constraint next_constraint_
-#define next_constr_namepos next_constr_namepos_
-#define next_global next_global_
-#define next_start next_start_
-#define next_vary next_vary_
-#define node_al_errors node_al_errors_
-#define node_fd_errors node_fd_errors_
-#define node_name node_name_
-#define node_string node_string_
-#define node_value node_value_ // **
-#define plot_option plot_option_
 #define reset_count reset_count_
-#define reset_interpolation reset_interpolation_
-#define restart_sequ restart_sequ_
-#define retreat_node retreat_node_
 #define sector_out sector_out_
-#define select_ptc_idx select_ptc_idx_
-#define seterrorflagfort seterrorflagfort_
-#define set_option set_option_
-#define store_node_value store_node_value_
-#define store_node_vector store_node_vector_
 #define string_from_table string_from_table_
 #define string_to_table string_to_table_
 #define table_length table_length_
 #define table_range table_range_
-#define track_pteigen track_pteigen_
-#define vdot vdot_ // *
 #define vector_to_table vector_to_table_
+
+// from mad_track.c
+#define deletetrackstrarpositions deletetrackstrarpositions_
+#define getcurrentcmdname getcurrentcmdname_
+#define getnumberoftracks getnumberoftracks_
+#define gettrack gettrack_
+#define next_start next_start_
+#define track_pteigen track_pteigen_
+
+// from mad_twiss.c
+#define copy_twiss_data copy_twiss_data_
+#define embedded_twiss embedded_twiss_
+#define get_disp0 get_disp0_
+#define get_twiss_data get_twiss_data_
+
+// from mad_util.c
+#define intrac intrac_
+
+// from mad_var.c
+#define set_variable set_variable_
+#define get_variable get_variable_
+#define next_vary next_vary_
+
+// from mad_vec.c
+#define vdot vdot_ // *
 #define vmod vmod_
 
 /*

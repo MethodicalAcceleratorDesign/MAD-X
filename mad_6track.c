@@ -262,142 +262,136 @@ struct object
 #define LINES_MAX 3         /* structure output line max. names */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 
-void add_c6t_drifts(void);
-void add_split_list(struct c6t_element*);
-void add_to_ellist(struct c6t_element*);
-void app_factor(double, double*, int);
-void arr_print(double*, int);
-void assign_att(void);
-void att_aperture(struct c6t_element*);
-void att_beambeam(struct c6t_element*);
-void att_colli(struct c6t_element*);
-void att_decapole(struct c6t_element*);
-void att_drift(struct c6t_element*);
-int f34_values(struct c6t_element*, int*, double*);
-void att_hkicker(struct c6t_element*);
-void att_kicker(struct c6t_element*);
-void att_lcavity(struct c6t_element*);
-void att_marker(struct c6t_element*);
-void att_matrix(struct c6t_element*);
-void att_multipole(struct c6t_element*);
-void att_octupole(struct c6t_element*);
-void att_quadrupole(struct c6t_element*);
-void att_rbend(struct c6t_element*);
-void att_rfcavity(struct c6t_element*);
-void att_crabcavity(struct c6t_element*);
-void att_dipedge(struct c6t_element*);
-void att_solenoid(struct c6t_element*);
-void att_hacdipole(struct c6t_element*);
-void att_vacdipole(struct c6t_element*);
-void att_sbend(struct c6t_element*);
-void att_sextupole(struct c6t_element*);
-void att_vkicker(struct c6t_element*);
-void att_undefined(struct c6t_element*);
-void clean_c6t_element(struct c6t_element*);
-struct c6t_element* create_aperture(char* ,char* ,double , double , struct double_array*);
-void concat_drifts(void);
-void conv_elem(void);
-void c6t_finish(void);
-void c6t_init(void);
-struct c6t_element* convert_madx_to_c6t(struct node*);
-void dump_c6t_element(struct c6t_element*);
-void dump_c6t_sequ(int);
-void dump_types(int);
-void equiv_elem(void);
-struct block* get_block_equiv(struct block*);
-void get_args(struct in_cmd*);
-void get_error_refs(struct c6t_element*);
-int get_flag(struct c6t_element*, struct type_info*);
-struct c6t_element* get_from_ellist(char*, char*);
-void get_multi_refs(void);
-int get_next_name(char*, char);
-void gnu_file(struct c6t_element*);
-void grow_ellist(struct c6t_el_list*);
-int ident_el(struct c6t_element*, struct c6t_element*);
-int ident_zero(struct c6t_element*);
-int in_keep_list(struct c6t_element*);
-void invert_normal(int, double*);
-void invert_skew(int, double*);
-void link_behind(struct c6t_element*, struct c6t_element*);
-void link_c6t_in_front(struct c6t_element*, struct c6t_element*);
-struct c6t_element* make_c6t_element(struct node*);
-struct object* make_obj(char*, int, int, int, int);
-void make_multipole(struct c6t_element*);
-void mod_errors(void);
-void mod_lcavity(struct c6t_element*);
-void mod_multipole(struct c6t_element*);
-void mod_octupole(struct c6t_element*);
-void mod_quadrupole(struct c6t_element*);
-void mod_rbend(struct c6t_element*);
-void mod_rfcavity(struct c6t_element*);
-void mod_crabcavity(struct c6t_element*);
-void mod_dipedge(struct c6t_element*);
-void mod_solenoid(struct c6t_element*);
-void mod_hacdipole(struct c6t_element*);
-void mod_vacdipole(struct c6t_element*);
-void mod_sextupole(struct c6t_element*);
-void multi_loop(void);
-struct c6t_element* new_c6t_element(int, char*, char*);
-struct block* new_block(void);
-void post_multipoles(void);
-double power_of(double, int);
-void pre_multipole(struct c6t_element*);
-void pro_elem(struct node*);
-void process_c6t(void);
-void read_sequ(void);
-void remove_from_ellist(struct c6t_element*);
-void replace_c6t(struct c6t_element*, struct c6t_element*);
-void split(void);
-void split_kicker(struct c6t_element*);
-void split_other(struct c6t_element*);
-void split_special(struct c6t_element*);
-void supp_elem(void);
-void supp_small_comp(struct c6t_element*);
-void treat_split(struct c6t_element*);
-void yank(struct c6t_element*);
-void write_all_el(void);
-void write_blocks(void);
-void write_c6t_element(struct c6t_element*);
-void write_f16_errors(void);
-void write_f8_errors(void);
-void write_f3_aper(void);
-void write_f3aux(void);
-void write_f3_matrix(void);
-void write_f3_entry(char*, struct c6t_element*);
-void write_f3_mult(struct c6t_element*);
-void write_f34_special(void);
-void write_struct(void);
-int my_table_row(struct table*, char*);
+static void add_c6t_drifts(void);
+static void add_split_list(struct c6t_element*);
+static void add_to_ellist(struct c6t_element*);
+static void app_factor(double, double*, int);
+// static void arr_print(double*, int); // not used
+static void assign_att(void);
+static void att_aperture(struct c6t_element*);
+static void att_beambeam(struct c6t_element*);
+static void att_colli(struct c6t_element*);
+static void att_decapole(struct c6t_element*);
+static void att_drift(struct c6t_element*);
+static int f34_values(struct c6t_element*, int*, double*);
+static void att_hkicker(struct c6t_element*);
+static void att_kicker(struct c6t_element*);
+static void att_lcavity(struct c6t_element*);
+static void att_marker(struct c6t_element*);
+static void att_matrix(struct c6t_element*);
+static void att_multipole(struct c6t_element*);
+static void att_octupole(struct c6t_element*);
+static void att_quadrupole(struct c6t_element*);
+static void att_rbend(struct c6t_element*);
+static void att_rfcavity(struct c6t_element*);
+static void att_crabcavity(struct c6t_element*);
+static void att_dipedge(struct c6t_element*);
+static void att_solenoid(struct c6t_element*);
+static void att_hacdipole(struct c6t_element*);
+static void att_vacdipole(struct c6t_element*);
+static void att_sbend(struct c6t_element*);
+static void att_sextupole(struct c6t_element*);
+static void att_vkicker(struct c6t_element*);
+static void att_undefined(struct c6t_element*);
+static void clean_c6t_element(struct c6t_element*);
+static struct c6t_element* create_aperture(char* ,char* ,double , double , struct double_array*);
+static void concat_drifts(void);
+static void conv_elem(void);
+static void c6t_finish(void);
+static void c6t_init(void);
+static struct c6t_element* convert_madx_to_c6t(struct node*);
+// static void dump_c6t_element(struct c6t_element*); // not used
+// static void dump_c6t_sequ(int); // not used
+// static void dump_types(int); // not used
+static void equiv_elem(void);
+static struct block* get_block_equiv(struct block*);
+static void get_args(struct in_cmd*);
+static void get_error_refs(struct c6t_element*);
+static int get_flag(struct c6t_element*, struct type_info*);
+// static struct c6t_element* get_from_ellist(char*, char*); // not used
+static void get_multi_refs(void);
+static int get_next_name(char*, char);
+// static void gnu_file(struct c6t_element*); // not used
+static void grow_ellist(struct c6t_el_list*);
+static int ident_el(struct c6t_element*, struct c6t_element*);
+static int ident_zero(struct c6t_element*);
+static int in_keep_list(struct c6t_element*);
+static void invert_normal(int, double*);
+// static void invert_skew(int, double*); // not used
+static void link_behind(struct c6t_element*, struct c6t_element*);
+static void link_c6t_in_front(struct c6t_element*, struct c6t_element*);
+static struct c6t_element* make_c6t_element(struct node*);
+static struct object* make_obj(char*, int, int, int, int);
+static void make_multipole(struct c6t_element*);
+static void mod_errors(void);
+static void mod_lcavity(struct c6t_element*);
+static void mod_multipole(struct c6t_element*);
+static void mod_octupole(struct c6t_element*);
+static void mod_quadrupole(struct c6t_element*);
+static void mod_rbend(struct c6t_element*);
+static void mod_rfcavity(struct c6t_element*);
+static void mod_crabcavity(struct c6t_element*);
+// static void mod_dipedge(struct c6t_element*); // not defined
+// static void mod_solenoid(struct c6t_element*); // not defined
+// static void mod_hacdipole(struct c6t_element*); // not defined
+// static void mod_vacdipole(struct c6t_element*); // not defined
+static void mod_sextupole(struct c6t_element*);
+static void multi_loop(void);
+static struct c6t_element* new_c6t_element(int, char*, char*);
+static struct block* new_block(void);
+static void post_multipoles(void);
+static double power_of(double, int);
+static void pre_multipole(struct c6t_element*);
+static void pro_elem(struct node*);
+static void process_c6t(void);
+static void read_sequ(void);
+static void remove_from_ellist(struct c6t_element*);
+static void replace_c6t(struct c6t_element*, struct c6t_element*);
+static void split(void);
+static void split_kicker(struct c6t_element*);
+static void split_other(struct c6t_element*);
+static void split_special(struct c6t_element*);
+static void supp_elem(void);
+static void supp_small_comp(struct c6t_element*);
+static void treat_split(struct c6t_element*);
+static void yank(struct c6t_element*);
+static void write_all_el(void);
+static void write_blocks(void);
+static void write_c6t_element(struct c6t_element*);
+static void write_f16_errors(void);
+static void write_f8_errors(void);
+static void write_f3_aper(void);
+static void write_f3aux(void);
+static void write_f3_matrix(void);
+static void write_f3_entry(char*, struct c6t_element*);
+static void write_f3_mult(struct c6t_element*);
+static void write_f34_special(void);
+static void write_struct(void);
+static int my_table_row(struct table*, char*);
 
 /* routines used from makethin.c */
-/*
-double el_par_value_recurse(char*, struct element*);
-*/
-struct command_parameter* return_param_recurse(char*, struct element* );
-struct command_parameter* return_param(char* , struct element* );
+static struct li_list types;
 
-struct li_list types;
+static struct type_info* t_info[N_TYPES];
 
-struct type_info* t_info[N_TYPES];
+static struct block   *first_block, *last_block;
+static struct block*   prev_block;
+static struct block*   current_block = NULL;
 
-struct block   *first_block, *last_block;
-struct block*   prev_block;
-struct block*   current_block = NULL;
+static int virgin_c6t = 1;
 
-int virgin_c6t = 1;
+static struct c6t_element *first_in_sequ, *last_in_sequ, *last_in_sequ_org;
+static struct c6t_element* prev_element;
+static struct c6t_element* current_element = NULL;
+// static struct c6t_element* debug_element = NULL; // not used
+static struct c6t_el_list* split_list = NULL;
+static struct aper_struct tag_aperture;
 
-struct c6t_element *first_in_sequ, *last_in_sequ, *last_in_sequ_org;
-struct c6t_element* prev_element;
-struct c6t_element* current_element = NULL;
-struct c6t_element* debug_element = NULL;
-struct c6t_el_list* split_list = NULL;
-struct aper_struct tag_aperture;
-
-struct object *p_err_zero;  /* pointer to error object with all zeroes */
+static struct object *p_err_zero;  /* pointer to error object with all zeroes */
 
 static int last_row = 0;
 
-char el_info[N_TYPES][60] = /* see type_info definition */
+static char el_info[N_TYPES][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
 {"aperture     2       2       2       0       0       0",
  "beambeam     2       2       2       0       0       0",
@@ -434,14 +428,14 @@ char el_info[N_TYPES][60] = /* see type_info definition */
  "vacdipole    3       3       3       0       0       2",
 };
 
-char keep_these[MM_KEEP][24] = {"ip", "mt_"};
-char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
+static char keep_these[MM_KEEP][24] = {"ip", "mt_"};
+static char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
                           "octupole", "decapole", "multipole"};
-char acro_list[20];   /* list for name starts */
-int acro_cnt[20];    /* counters for name starts */
-char tmp_name[KEY_LENGTH];
+static char acro_list[20];   /* list for name starts */
+static int acro_cnt[20];    /* counters for name starts */
+static char tmp_name[KEY_LENGTH];
 
-int 
+static int 
   block_count = 0,     /* current block count for naming */
   elem_cnt = 0,        /* element count */
   acro_occ = 0,        /* acro list occupation */
@@ -465,7 +459,7 @@ int
   multi_type = -1,     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */
 
-double
+static double
   sequ_length,         /* length of  sequence */
   sequ_start,
   sequ_end,
@@ -475,36 +469,19 @@ double
   error_matrix[FIELD_MAX],
   tmp_buff[FIELD_MAX];
 
-const double ten   = 10;
-const double c1p3 = 1.e3;
-const double eps_6 = 1.e-6;
-const double eps_9 = 1.e-9;
-const double eps_12 = 1.e-12;
-double ref_def = 0.017;
+static const double ten   = 10;
+static const double c1p3 = 1.e3;
+static const double eps_6 = 1.e-6;
+static const double eps_9 = 1.e-9;
+static const double eps_12 = 1.e-12;
+static double ref_def = 0.017;
 
-FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
+static FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
 
-void conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
-{
-  last_row = 0;
+// private functions
 
-  puts("  ++++++++++++++++++++++++++++");
-  puts("  +   c6t version 2.0        +");
-  puts("  ++++++++++++++++++++++++++++\n");
-
-  c6t_init();
-  get_args(mycmd);
-  process_c6t();
-  printf("\nc6t terminated - total number of elements: %d\n", elem_cnt);
-  printf("                    field errors    MAD-X: %d\n", field_cnt);
-  printf("                    field errors SixTrack: %d\n", f16_cnt);
-  printf("                 alignment errors   MAD-X: %d\n", align_cnt);
-  printf("                alignment errors SixTrack: %d\n", f8_cnt);
-  printf("                          sequence length: %f [m]\n", sequ_length);
-  c6t_finish();
-}
-
-void add_c6t_drifts()
+static void
+add_c6t_drifts()
 {
   int af;
   struct c6t_element *d1;
@@ -536,7 +513,8 @@ void add_c6t_drifts()
   }
 }
 
-void add_split_list(struct c6t_element* el)
+static void
+add_split_list(struct c6t_element* el)
 {
   int i;
   char rout_name[] = "c6t:add_split_list";
@@ -552,7 +530,8 @@ void add_split_list(struct c6t_element* el)
   split_list->elem[split_list->curr++] = el;
 }
 
-void add_to_ellist( /* adds element to correct object list */
+static void
+add_to_ellist( /* adds element to correct object list */
   struct c6t_element* p_elem)
 {
   int j;
@@ -588,13 +567,16 @@ void add_to_ellist( /* adds element to correct object list */
   types.curr++;
 }
 
-void app_factor(double fact, double* array, int count)
+static void
+app_factor(double fact, double* array, int count)
 {
   int i;
   for (i = 0; i < count; i++) array[i] *= fact;
 }
 
-void arr_print(double array[], int occ)
+#if 0 // not used
+static void
+arr_print(double array[], int occ)
 {
   int i;
   for (i = 0; i < occ; i++)
@@ -603,8 +585,10 @@ void arr_print(double array[], int occ)
   }
   printf("\n");
 }
+#endif
 
-void assign_att()
+static void
+assign_att()
 {
   struct c6t_element *el;
   int i, j;
@@ -647,7 +631,8 @@ void assign_att()
   }
 }
 
-void att_aperture(struct c6t_element* el)
+static void
+att_aperture(struct c6t_element* el)
 {
   el->out_1 = 3;
   el->out_2 = 1e-8;
@@ -655,7 +640,8 @@ void att_aperture(struct c6t_element* el)
   el->out_4 = 0.0;
 }
 
-void att_beambeam(struct c6t_element* el)
+static void
+att_beambeam(struct c6t_element* el)
 {
 
   double beamx=zero,beamy=zero;
@@ -674,13 +660,15 @@ void att_beambeam(struct c6t_element* el)
 
 }
 
-void att_colli(struct c6t_element* el)
+static void
+att_colli(struct c6t_element* el)
 /* ecollim. + rcollim. - make drift, do not concatenate */
 {
   el->out_1 = 0; el->out_4 = el->value[0];
 }
 
-void att_decapole(struct c6t_element* el)
+static void
+att_decapole(struct c6t_element* el)
 {
   if (el->value[20] != zero)
   {
@@ -693,22 +681,26 @@ void att_decapole(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_drift(struct c6t_element* el)
+static void
+att_drift(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
 }
 
-void att_hkicker(struct c6t_element* el)
+static void
+att_hkicker(struct c6t_element* el)
 {
   el->out_1 = 1; el->out_2 = el->value[12];
 }
 
-void att_kicker(struct c6t_element* el)
+static void
+att_kicker(struct c6t_element* el)
 {
   (void)el;
 }
 
-void att_lcavity(struct c6t_element* el)
+static void
+att_lcavity(struct c6t_element* el)
 {
   double lag = -el->value[5];
   el->out_1 = 12;
@@ -720,12 +712,14 @@ void att_lcavity(struct c6t_element* el)
   el->out_4 = 360. * lag;
 }
 
-void att_marker(struct c6t_element* el)
+static void
+att_marker(struct c6t_element* el)
 {
   (void)el;
 }
 
-void att_matrix(struct c6t_element* el)
+static void
+att_matrix(struct c6t_element* el)
 {
   el->out_1 = 22;
   el->out_2 = 0;
@@ -733,7 +727,8 @@ void att_matrix(struct c6t_element* el)
   el->out_4 = el->value[0];
 }
 
-void att_multipole(struct c6t_element* el)
+static void
+att_multipole(struct c6t_element* el)
 {
   el->out_1 = 11;
   if (el->nc_pos == 0)
@@ -754,7 +749,8 @@ void att_multipole(struct c6t_element* el)
   }
 }
 
-void att_octupole(struct c6t_element* el)
+static void
+att_octupole(struct c6t_element* el)
 {
   if (el->value[18] != zero)
   {
@@ -767,7 +763,8 @@ void att_octupole(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_quadrupole(struct c6t_element* el)
+static void
+att_quadrupole(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
   if (el->value[14] != zero)
@@ -783,7 +780,8 @@ void att_quadrupole(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_rbend(struct c6t_element* el)
+static void
+att_rbend(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
   if (el->value[12] != zero)
@@ -809,7 +807,8 @@ void att_rbend(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_rfcavity(struct c6t_element* el)
+static void
+att_rfcavity(struct c6t_element* el)
 {
   double lag = 0.5 - el->value[5];
   el->out_1 = 12;
@@ -825,7 +824,8 @@ void att_rfcavity(struct c6t_element* el)
   el->out_4 = 360. * lag;
 }
 
-void att_crabcavity(struct c6t_element* el)
+static void
+att_crabcavity(struct c6t_element* el)
 {
   double lag = el->value[5];
   el->out_1 = 23;
@@ -841,7 +841,8 @@ void att_crabcavity(struct c6t_element* el)
   el->out_4 = 360. * lag;
 }
 
-void att_dipedge(struct c6t_element* el)
+static void
+att_dipedge(struct c6t_element* el)
 {
   double corr;
   corr = 2*el->value[1]*el->value[8]*el->value[9];
@@ -861,7 +862,8 @@ void att_dipedge(struct c6t_element* el)
   el->out_4 = 0;
 }
 
-void att_solenoid(struct c6t_element* el)
+static void
+att_solenoid(struct c6t_element* el)
 {
   el->out_1 = 25;
   el->out_2 = el->value[2];
@@ -869,7 +871,8 @@ void att_solenoid(struct c6t_element* el)
   el->out_4 = el->value[0];
 }
 
-void att_hacdipole(struct c6t_element* el)
+static void
+att_hacdipole(struct c6t_element* el)
 {
   el->out_1 = 16;
   el->out_2 = el->value[2];
@@ -877,7 +880,8 @@ void att_hacdipole(struct c6t_element* el)
   el->out_4 = el->value[4];
 }
 
-void att_vacdipole(struct c6t_element* el)
+static void
+att_vacdipole(struct c6t_element* el)
 {
   el->out_1 = -16;
   el->out_2 = el->value[2];
@@ -885,7 +889,8 @@ void att_vacdipole(struct c6t_element* el)
   el->out_4 = el->value[4];
 }
 
-void att_sbend(struct c6t_element* el)
+static void
+att_sbend(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
   if (el->value[12] != zero)
@@ -907,7 +912,8 @@ void att_sbend(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_sextupole(struct c6t_element* el)
+static void
+att_sextupole(struct c6t_element* el)
 {
   if (el->value[16] != zero)
   {
@@ -920,17 +926,20 @@ void att_sextupole(struct c6t_element* el)
   else el->out_1 = 0;
 }
 
-void att_vkicker(struct c6t_element* el)
+static void
+att_vkicker(struct c6t_element* el)
 {
   el->out_1 = -1; el->out_2 = el->value[13];
 }
 
-void att_undefined(struct c6t_element* el)
+static void 
+att_undefined(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
 }
 
-void block_it()
+static void
+block_it(void)
 {
   struct c6t_element* el;
   char rout_name[] = "c6t:block_it";
@@ -976,7 +985,8 @@ void block_it()
   last_block = current_block;
 }
 
-void concat_drifts()
+static void
+concat_drifts(void)
 {
   struct c6t_element *d1, *temp, *nk;
   int flag, cnt;
@@ -1017,7 +1027,8 @@ void concat_drifts()
   }
 }
 
-void conv_elem()
+static void
+conv_elem(void)
 {
   int i, j, nup;
   struct type_info* type = NULL;
@@ -1064,7 +1075,8 @@ void conv_elem()
   }
 }
 
-void c6t_finish()
+static void
+c6t_finish(void)
 {
   char rout_name[] = "c6t_finish";
   int i,j;
@@ -1133,7 +1145,8 @@ void c6t_finish()
   if (f34) { fclose(f34); f34 = 0; }
 }
 
-void c6t_init()
+static void
+c6t_init(void)
 {
   int j;
   char rout_name[] = "c6t_init";
@@ -1197,13 +1210,15 @@ void c6t_init()
   f34 = 0;
 }
 
-void clean_c6t_element(struct c6t_element* cleanme)
+static void
+clean_c6t_element(struct c6t_element* cleanme)
 {
   int i;
   for(i=0; i<cleanme->n_values; i++) { cleanme->value[i]=0; }
 }
 
-struct c6t_element* create_aperture(char* name,char* type,double a, double b, struct double_array* p_al_err)
+static struct c6t_element*
+create_aperture(char* name,char* type,double a, double b, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
   aper_element = new_c6t_element(4,name,"aperture");
@@ -1234,7 +1249,8 @@ struct c6t_element* create_aperture(char* name,char* type,double a, double b, st
   return aper_element;
 }
 
-struct c6t_element* convert_madx_to_c6t(struct node* p)
+static struct c6t_element*
+convert_madx_to_c6t(struct node* p)
 {
   struct command_parameter *kn_param = NULL,*ks_param = NULL,*aper_param = NULL;
   int i,j,maxkn,maxks;
@@ -1521,7 +1537,9 @@ struct c6t_element* convert_madx_to_c6t(struct node* p)
   return c6t_elem;
 }
 
-void dump_c6t_element(struct c6t_element* el)
+#if 0 // not used
+static void
+dump_c6t_element(struct c6t_element* el)
 {
   int j;
   char pname[24] = "NULL", nname[24] = "NULL";
@@ -1551,8 +1569,11 @@ void dump_c6t_element(struct c6t_element* el)
     if ((j+1)%5 == 0 || j+1 == el->na_err)  printf("\n");
   }
 }
+#endif
 
-void dump_c6t_sequ(int level)
+#if 0 // not used
+static void
+dump_c6t_sequ(int level)
 {
   double suml = zero;
   puts("+++++++++ dump sequence +++++++++");
@@ -1569,8 +1590,11 @@ void dump_c6t_sequ(int level)
   }
   printf("=== sum of element length: %f\n", suml);
 }
+#endif
 
-void dump_types(int flag)
+#if 0 // not used
+static void
+dump_types(int flag)
 {
   int i, j;
 
@@ -1584,8 +1608,10 @@ void dump_types(int flag)
     if (flag > 0) dump_c6t_element(types.member[i]->elem[j]);
   }
 }
+#endif
 
-void equiv_elem()
+static void
+equiv_elem()
 {
   int i, j, k;
   struct c6t_element *el, *eln;
@@ -1618,7 +1644,8 @@ void equiv_elem()
   }
 }
 
-int f34_values(struct c6t_element* el, int* flags, double* values)
+static int
+f34_values(struct c6t_element* el, int* flags, double* values)
 {
   int i, j, np, nd, cnt = 0;
   double pow, tmp[FIELD_MAX];
@@ -1653,7 +1680,8 @@ int f34_values(struct c6t_element* el, int* flags, double* values)
   return cnt;
 }
 
-struct block* get_block_equiv(struct block* current)
+static struct block*
+get_block_equiv(struct block* current)
 {
   struct block* p = first_block;
   int i, k;
@@ -1674,7 +1702,8 @@ struct block* get_block_equiv(struct block* current)
   return p;
 }
 
-void get_args(struct in_cmd* my_cmd)
+static void
+get_args(struct in_cmd* my_cmd)
 {
   int tmp_max_mult_ord;
   double tmp_ref_def;
@@ -1699,7 +1728,8 @@ void get_args(struct in_cmd* my_cmd)
   }
 }
 
-void get_error_refs(struct c6t_element* el)
+static void
+get_error_refs(struct c6t_element* el)
 {
   int i;
   double tmp;
@@ -1722,7 +1752,8 @@ void get_error_refs(struct c6t_element* el)
   }
 }
 
-int get_flag(struct c6t_element* el, struct type_info* type)
+static int
+get_flag(struct c6t_element* el, struct type_info* type)
 {
 
   if (el->value[0] == zero)
@@ -1734,7 +1765,9 @@ int get_flag(struct c6t_element* el, struct type_info* type)
   else return (el->value[6] == 0 ? type->flag_2 : type->flag_3);
 }
 
-struct c6t_element* get_from_ellist(char* name, char* type)
+#if 0 // not used
+static struct c6t_element*
+get_from_ellist(char* name, char* type)
 {
   int i, j;
 
@@ -1754,8 +1787,10 @@ struct c6t_element* get_from_ellist(char* name, char* type)
   }
   return NULL;
 }
+#endif
 
-void get_multi_refs()
+static void
+get_multi_refs(void)
 {
   int i;
   for (i = 0; i < types.curr; i++)  /* loop over base types */
@@ -1767,7 +1802,8 @@ void get_multi_refs()
   }
 }
 
-int get_next_name(char* name, char acro)
+static int
+get_next_name(char* name, char acro)
 {
   char s[2];
   int j, k = -1;
@@ -1782,7 +1818,9 @@ int get_next_name(char* name, char acro)
   return 1;
 }
 
-void gnu_file(struct c6t_element* el)
+#if 0 // not used
+static void
+gnu_file(struct c6t_element* el)
 {
   double el_start, el_end;
 
@@ -1793,8 +1831,10 @@ void gnu_file(struct c6t_element* el)
   printf("%s %e 1.\n", el->name, el_end);
   printf("%s %e 0.\n", el->name, el_end);
 }
+#endif
 
-void grow_ellist( /* doubles object list size */
+static void
+grow_ellist( /* doubles object list size */
   struct c6t_el_list* p)
 {
   struct c6t_element** p_loc = p->elem;
@@ -1810,7 +1850,8 @@ void grow_ellist( /* doubles object list size */
   myfree(rout_name, p_loc);
 }
 
-int ident_el(struct c6t_element* el1, struct c6t_element* el2)
+static int
+ident_el(struct c6t_element* el1, struct c6t_element* el2)
 {
   double s, tolerance = eps_9;
   int j, m = el1->n_values < el2->n_values ? el1->n_values : el2->n_values;
@@ -1837,7 +1878,8 @@ int ident_el(struct c6t_element* el1, struct c6t_element* el2)
   return 0;
 }
 
-int ident_zero(struct c6t_element* el)
+static int
+ident_zero(struct c6t_element* el)
 {
   int j;
   for (j = 12; j < el->n_values; j++)
@@ -1845,7 +1887,8 @@ int ident_zero(struct c6t_element* el)
   return 0;
 }
 
-int in_keep_list(struct c6t_element* el)
+static int
+in_keep_list(struct c6t_element* el)
 {
   char temp[24];
   int j;
@@ -1858,19 +1901,24 @@ int in_keep_list(struct c6t_element* el)
   return 0;
 }
 
-void invert_normal(int count, double array[])
+static void
+invert_normal(int count, double array[])
 {
   int i;
   for (i = 0; i < (count+1)/2; i++)  array[2*i] = -array[2*i];
 }
 
-void invert_skew(int count, double array[])
+#if 0 // not used
+static void
+invert_skew(int count, double array[])
 {
   int i;
   for (i = 0; i < count/2; i++)  array[2*i+1] = -array[2*i+1];
 }
+#endif
 
-void link_c6t_in_front(struct c6t_element* new, struct c6t_element* el)
+static void
+link_c6t_in_front(struct c6t_element* new, struct c6t_element* el)
 {
   if (el->previous == NULL) first_in_sequ = new;
   else el->previous->next = new;
@@ -1878,7 +1926,8 @@ void link_c6t_in_front(struct c6t_element* new, struct c6t_element* el)
   el->previous = new;
 }
 
-void link_behind(struct c6t_element* new, struct c6t_element* el)
+static void
+link_behind(struct c6t_element* new, struct c6t_element* el)
 {
   if (el->next == NULL)
   {
@@ -1901,7 +1950,8 @@ void lower(char* s)
 }
 */
 
-struct c6t_element* make_c6t_element(struct node* p)
+static struct c6t_element*
+make_c6t_element(struct node* p)
 {
   struct c6t_element *tmp_element;
   if ((tmp_element = convert_madx_to_c6t(p)))
@@ -1918,7 +1968,8 @@ struct c6t_element* make_c6t_element(struct node* p)
 
 /* this is taken from doom but all it does is malloc the structure and fill
    it in */
-struct object* make_obj(   /* creates a new object */
+static struct object*
+make_obj(   /* creates a new object */
   char* key,
   int vlint,       /* length of integer array */
   int vldble,      /* length of double array */
@@ -1950,7 +2001,8 @@ struct object* make_obj(   /* creates a new object */
   return p;
 }
 
-void make_multipole(struct c6t_element* el)
+static void
+make_multipole(struct c6t_element* el)
 {
   if (el->force > 0) /* multiply forces with length */
     app_factor(el->value[0], &el->value[12], el->n_values-12);
@@ -1961,8 +2013,8 @@ void make_multipole(struct c6t_element* el)
   add_to_ellist(el);
 }
 
-
-void mod_errors()
+static void
+mod_errors(void)
 {
   current_element = first_in_sequ;
   while (current_element != NULL)
@@ -1973,27 +2025,32 @@ void mod_errors()
   }
 }
 
-void mod_lcavity(struct c6t_element* p)
+static void
+mod_lcavity(struct c6t_element* p)
 {
   total_voltage += p->value[1];   /* accumulate voltage */
 }
 
-void mod_multipole(struct c6t_element* p)
+static void
+mod_multipole(struct c6t_element* p)
 {
   supp_small_comp(p);
 }
 
-void mod_octupole(struct c6t_element* p)
+static void
+mod_octupole(struct c6t_element* p)
 {
   supp_small_comp(p);
 }
 
-void mod_quadrupole(struct c6t_element* p)
+static void
+mod_quadrupole(struct c6t_element* p)
 {
   supp_small_comp(p);
 }
 
-void mod_rbend(struct c6t_element* p)
+static void
+mod_rbend(struct c6t_element* p)
 {
   supp_small_comp(p);
   /* commented out in the original c6t (MEH)
@@ -2005,24 +2062,28 @@ void mod_rbend(struct c6t_element* p)
   p->value[1] = p->value[10] / p->value[0];
 }
 
-void mod_rfcavity(struct c6t_element* p)
+static void
+mod_rfcavity(struct c6t_element* p)
 {
   total_voltage += p->value[1];  /* accumulate voltage */
 }
 
-void mod_crabcavity(struct c6t_element* p)
+static void
+mod_crabcavity(struct c6t_element* p)
 {
   total_voltage += p->value[1];  /* accumulate voltage */
 }
 
-void mod_sextupole(struct c6t_element* p)
+static void
+mod_sextupole(struct c6t_element* p)
 {
   supp_small_comp(p);
   /* supress tilt angle (not component !) */
   /*    p->value[6] = zero; */
 }
 
-void multi_loop()
+static void
+multi_loop(void)
 {
   int i, j, nup;
   struct c6t_element* el;
@@ -2040,7 +2101,8 @@ void multi_loop()
   }
 }
 
-struct block* new_block()
+static struct block*
+new_block(void)
 {
   struct block* p;
   char rout_name[] = "c6t:new_block";
@@ -2049,7 +2111,8 @@ struct block* new_block()
   return p;
 }
 
-struct c6t_element* new_c6t_element(int size, char* name, char* base)
+static struct c6t_element*
+new_c6t_element(int size, char* name, char* base)
 {
   struct c6t_element* p;
   char rout_name[] = "c6t:new_c6t_element";
@@ -2063,7 +2126,8 @@ struct c6t_element* new_c6t_element(int size, char* name, char* base)
   return p;
 }
 
-void post_multipoles() /* post equiv. treatment of multipoles */
+static void
+post_multipoles(void) /* post equiv. treatment of multipoles */
 {
   int i, j;
   struct c6t_element *el, *eln;
@@ -2100,7 +2164,8 @@ void post_multipoles() /* post equiv. treatment of multipoles */
   }
 }
 
-double power_of(double d, int i)
+static double
+power_of(double d, int i)
 {
   int j;
   double tmp = 1;
@@ -2117,7 +2182,8 @@ double power_of(double d, int i)
   else return 1.;
 }
 
-void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
+static void
+pre_multipole(struct c6t_element* el) /* pre-process multipoles */
 {
   /*
     1. first count multipole components < decapole (cnt)
@@ -2208,7 +2274,8 @@ void pre_multipole(struct c6t_element* el) /* pre-process multipoles */
   }
 }
 
-void process_c6t()  /* steering routine */
+static void
+process_c6t(void)  /* steering routine */
 {
   read_sequ();   /* from db read sequence, store all elements */
   add_c6t_drifts();
@@ -2236,7 +2303,8 @@ void process_c6t()  /* steering routine */
   write_f8_errors();
 }
 
-void pro_elem(struct node* cnode)
+static void
+pro_elem(struct node* cnode)
 /* processes one element, makes linked list */
 /* converts MADX linked list to c6t internal linked list */
 {
@@ -2382,7 +2450,8 @@ void pro_elem(struct node* cnode)
   }
 }
 
-void read_sequ()
+static void
+read_sequ(void)
 {
   struct node* cnode;
   if ((current_sequ->n_nodes) > 0)  sequ_start = current_sequ->ex_start->position;
@@ -2400,7 +2469,8 @@ void read_sequ()
 }
 
 /* removes element from correct object list */
-void remove_from_ellist(struct c6t_element* p_elem)
+static void
+remove_from_ellist(struct c6t_element* p_elem)
 {
   int i, j;
 
@@ -2424,7 +2494,8 @@ void remove_from_ellist(struct c6t_element* p_elem)
   }
 }
 
-void replace_c6t(struct c6t_element* old, struct c6t_element* new)
+static void
+replace_c6t(struct c6t_element* old, struct c6t_element* new)
 {
   if (old->previous != NULL)  old->previous->next = new;
   new->previous = old->previous;
@@ -2433,7 +2504,8 @@ void replace_c6t(struct c6t_element* old, struct c6t_element* new)
   old->flag = 0;
 }
 
-void split()
+static void
+split(void)
 {
   int i;
   struct c6t_element* el;
@@ -2450,7 +2522,8 @@ void split()
   }
 }
 
-void split_kicker(struct c6t_element* el)
+static void
+split_kicker(struct c6t_element* el)
 {
   struct c6t_element *k1, *k2;
   char c[24];
@@ -2474,7 +2547,8 @@ void split_kicker(struct c6t_element* el)
   }
 }
 
-void split_other(struct c6t_element* el)
+static void
+split_other(struct c6t_element* el)
 {
   /* -> two drifts with non-lin. thin lens at centre */
   struct c6t_element *d1, *d2;
@@ -2496,7 +2570,8 @@ void split_other(struct c6t_element* el)
   add_to_ellist(d1); add_to_ellist(d2);
 }
 
-void split_special(struct c6t_element* el)
+static void
+split_special(struct c6t_element* el)
 /* -> two lin. halves with multipole at centre */
 {
   struct c6t_element *d1, *mt;
@@ -2531,7 +2606,8 @@ void split_special(struct c6t_element* el)
   link_behind(d1, mt);
 }
 
-void supp_elem()
+static void
+supp_elem(void)
 {
   struct c6t_element *d1, *el;
   char c[24];
@@ -2566,7 +2642,8 @@ void supp_elem()
   }
 }
 
-void supp_small_comp(struct c6t_element* p)
+static void
+supp_small_comp(struct c6t_element* p)
 {
   int i;
   for (i = 12; i < p->n_values-1; i+=2)
@@ -2584,7 +2661,8 @@ void supp_small_comp(struct c6t_element* p)
   }
 }
 
-void treat_split(struct c6t_element* el)
+static void
+treat_split(struct c6t_element* el)
 {
   if (el->flag == 2)  el->keep_in = 1;
   if (el->nf_err > 0)
@@ -2599,7 +2677,8 @@ void treat_split(struct c6t_element* el)
   }
 }
 
-void yank(struct c6t_element* el)
+static void
+yank(struct c6t_element* el)
 {
   if (el->previous != NULL)  el->previous->next = el->next;
   else                       first_in_sequ      = el->next;
@@ -2608,7 +2687,8 @@ void yank(struct c6t_element* el)
   el->flag = 0;
 }
 
-void write_all_el()
+static void
+write_all_el(void)
 {
   char title[] =
     "SINGLE ELEMENTS---------------------------------------------------------";
@@ -2626,7 +2706,8 @@ void write_all_el()
   fprintf(f2, "NEXT\n");
 }
 
-void write_c6t_element(struct c6t_element* el)
+static void
+write_c6t_element(struct c6t_element* el)
 {
   if (strcmp(el->name, "CAV") != 0)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
@@ -2634,7 +2715,8 @@ void write_c6t_element(struct c6t_element* el)
   el->w_flag = 1;
 }
 
-void write_blocks()
+static void
+write_blocks(void)
 {
   char title1[] =
     "BLOCK DEFINITIONS-------------------------------------------------------";
@@ -2673,7 +2755,8 @@ void write_blocks()
   fprintf(f2, "NEXT\n");
 }
 
-void write_f8_errors()
+static void
+write_f8_errors(void)
 {
   double tiltval;
   if (align_cnt == 0)  return;
@@ -2705,7 +2788,8 @@ void write_f8_errors()
   }
 }
 
-void write_f16_errors()
+static void
+write_f16_errors(void)
 {
   int i;
   double factor;
@@ -2747,7 +2831,8 @@ void write_f16_errors()
   }
 }
 
-void write_f34_special()
+static void
+write_f34_special(void)
 {
   int i, j, n, flags[FIELD_MAX];
   double values[FIELD_MAX];
@@ -2815,7 +2900,8 @@ void write_f34_special()
           spos,"end_marker",100,zero,betx,bety,mux,muy);
 }
 
-void write_f3_aper()
+static void
+write_f3_aper(void)
 {
   int f3aper_cnt = 0;
   current_element = first_in_sequ;
@@ -2845,7 +2931,8 @@ void write_f3_aper()
   if (f3aper_cnt > 0) fprintf(f3aper,"NEXT\n");
 }
 
-void write_f3aux()
+static void
+write_f3aux(void)
 {
   double aux_val[4] = {-1.e20, -1.e20, -1.e20, -1.e20};
   double tw_alfa;
@@ -2893,7 +2980,8 @@ void write_f3aux()
   }
 }
 
-void write_f3_matrix()
+static void
+write_f3_matrix(void)
 {
   int i, i_max = 43;
   current_element = first_in_sequ;
@@ -2918,13 +3006,15 @@ void write_f3_matrix()
   }
 }
 
-void write_f3_entry(char* option, struct c6t_element* el)
+static void
+write_f3_entry(char* option, struct c6t_element* el)
 {
   if (f3_cnt++ == 0) f3 = fopen("fc.3", "w");
   if (strcmp(option, "multipole") == 0) write_f3_mult(el);
 }
 
-void write_f3_mult(struct c6t_element* el)
+static void
+write_f3_mult(struct c6t_element* el)
 {
   int i, j, i_max = -1;
   struct c6t_element* eln;
@@ -2971,7 +3061,8 @@ void write_f3_mult(struct c6t_element* el)
   fprintf(f3,"NEXT\n");
 }
 
-void write_struct()
+static void
+write_struct(void)
 {
   struct block* p = first_block;
   int lc = 0;
@@ -2998,7 +3089,8 @@ void write_struct()
   fprintf(f2, "NEXT\n");
 }
 
-int my_table_row(struct table* table, char* name)
+static int
+my_table_row(struct table* table, char* name)
 {
   int i, j, ret = 0;
   char t_name[255];
@@ -3021,3 +3113,28 @@ int my_table_row(struct table* table, char* name)
   }
   return ret;
 }
+
+// public interface
+
+void
+conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
+{
+  last_row = 0;
+
+  puts("  ++++++++++++++++++++++++++++");
+  puts("  +   c6t version 2.0        +");
+  puts("  ++++++++++++++++++++++++++++\n");
+
+  c6t_init();
+  get_args(mycmd);
+  process_c6t();
+  printf("\nc6t terminated - total number of elements: %d\n", elem_cnt);
+  printf("                    field errors    MAD-X: %d\n", field_cnt);
+  printf("                    field errors SixTrack: %d\n", f16_cnt);
+  printf("                 alignment errors   MAD-X: %d\n", align_cnt);
+  printf("                alignment errors SixTrack: %d\n", f8_cnt);
+  printf("                          sequence length: %f [m]\n", sequ_length);
+  c6t_finish();
+}
+
+

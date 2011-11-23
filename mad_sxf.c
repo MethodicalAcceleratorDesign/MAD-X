@@ -2,6 +2,11 @@
 
 /* extract SXF file from mad-X, or read SXF file into mad-X */
 
+static double
+  sequ_length,         /* length of  sequence */
+  sequ_start,
+  sequ_end;
+
 // private functions
 
 static void put_line(FILE* out, char* s);

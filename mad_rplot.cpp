@@ -1,20 +1,44 @@
-#include "rplot.h"
-/*Piotr Skowronski, CERN*/
+/* Piotr Skowronski, CERN */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
-#define WIN32 _WIN32
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "mad_extrn_f.h"
+#include "mad_err.h"
+#include "mad_rplot.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif
 
-extern type_OfExtern void type_ofCall warning(const char*, const char*);
+#ifdef ROOT_PLOT
 
-void loadrplotlib(void)
+#include <MadxPlotter.h>
+#include <MadxViewer.h>
+
+#endif
+
+/* pointer to rplotter function, C intrtface to MadxPlotter::Fill, see MadxPlotter for details */
+typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,double,double,double);
+
+static void*                rplot_handle    = 0;
+static rplot_plottrack_fctn rplot_plottrack = 0; /*pointer to function*/
+
+static void
+loadrplotlib(void)
 {
+  (void)rplot_handle, (void)rplot_plottrack;
+  (void)loadrplotlib;
+
 #if _PLUGIN
   void *handle;
   char buff[200];
@@ -155,30 +179,28 @@ void loadrplotlib(void)
     return;
   }
 
-
 #else
   warning("rplot.c: loadrplotlib()",
           "Plugin support is not enabled in this version. Unable to use rplot.");
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-void unloadrplotlib(void)
+static void
+unloadrplotlib(void)
 {
+  (void)unloadrplotlib;
+  
 #if _PLUGIN
   dlclose(rplot_handle);
-  rplot_handle = 0x0;
-  rplot_plottrack = 0x0;
+  rplot_handle = 0;
+  rplot_plottrack = 0;
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-extern type_OfExtern
-void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
-                           double* x, double* xp,
-                           double* y, double* yp,
-                           double* dpOverP,  double* p,
-                           double* length)
+void type_ofCall
+plottrack(int* particleno, int* obspoint, int* turn,
+          double* x, double* xp, double* y, double* yp, double* dpOverP, double* p,
+          double* length)
 {
   (void)particleno, (void)obspoint, (void)turn;
   (void)x, (void)xp, (void)y, (void)yp;
@@ -195,27 +217,26 @@ void type_ofCall plottrack(int* particleno, int* obspoint, int* turn,
   MadxPlotter::Instance()->Fill(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
 #elif defined _PLUGIN
 
-  if (rplot_plottrack == 0x0) return;
+  if (rplot_plottrack == 0) return;
 
-  (*rplot_plottrack)(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
+  rplot_plottrack(*particleno, *obspoint, *turn, *x,  *xp,  *y,  *yp,  *dpOverP, *p ,*length);
 
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-extern type_OfExtern
-void type_ofCall  plottwiss(int* obspoint,
-                            double* betax, double* alfax,
-                            double* betay, double* alfay,
-                            double* betaz, double* alfaz,
-                            double* length)
+// not used in madx
+void type_ofCall
+plottwiss(int* obspoint,
+          double* betax, double* alfax,
+          double* betay, double* alfay,
+          double* betaz, double* alfaz,
+          double* length)
 {
   (void)obspoint;
   (void)betax, (void)alfax, (void)betay, (void)alfay, (void)betaz, (void)alfaz;
   (void)length; 
 
 #ifdef ROOT_PLOT
-
   if (MadxPlotter::GetDebug() >9)
   {
     printf("rlot.c: plottwiss:   %d   %12.8f %12.8f %12.8f %12.8f %12.8f %12.8f %12.8f\n",
@@ -225,16 +246,15 @@ void type_ofCall  plottwiss(int* obspoint,
   MadxPlotter::Instance()->Fill(*obspoint, *betax, *alfax, *betay, *alfay, *betaz, *alfaz, *length);
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-
-
-extern type_OfExtern void type_ofCall rplotfinish(void)
+void type_ofCall
+rplotfinish(void)
 {
 /*terminates plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->Finish();/*writes and deletes the current plot*/
 #elif defined _PLUGIN
+
   typedef void (*rvfun)();
   rvfun rfinish;
   char *error;
@@ -248,14 +268,14 @@ extern type_OfExtern void type_ofCall rplotfinish(void)
     return;
   }
 
-  (*rfinish)();
+  rfinish();
 
 #endif
 
 }
-/*_________________________________________________________________________________________*/
 
-extern type_OfExtern void type_ofCall newrplot(void)
+void type_ofCall
+newrplot(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
@@ -267,10 +287,10 @@ extern type_OfExtern void type_ofCall newrplot(void)
   char *error;
 
 
-  if (rplot_handle == 0x0)
+  if (rplot_handle == 0)
   {
     loadrplotlib();
-    if (rplot_handle == 0x0)
+    if (rplot_handle == 0)
     {
       /*It means that library was not loaded*/
       return;
@@ -291,35 +311,37 @@ extern type_OfExtern void type_ofCall newrplot(void)
     return;
   }
 
-  (*newrplot)();
+  newrplot();
 #else
   warning("rplot.c: newrplot()",
           "Plugin support is not enabled in this version. Unable to use rplot.");
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-extern type_OfExtern void type_ofCall plotter(void)
+#if 0 // not used
+static void type_ofCall
+plotter(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->Plotter();
 #endif
 }
-/*_________________________________________________________________________________________*/
+#endif
 
-
-extern type_OfExtern void type_ofCall print(void)
+#if 0 // not used
+static void type_ofCall
+print(void)
 {
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->Plotter();
 #endif
 }
-/*_________________________________________________________________________________________*/
+#endif
 
-
-extern type_OfExtern void type_ofCall rviewer(void)
+void type_ofCall
+rviewer(void)
 {
 /*adds new plotter*/
 
@@ -332,24 +354,21 @@ extern type_OfExtern void type_ofCall rviewer(void)
 #elif defined _PLUGIN
 
   typedef void (*rvfun)();
-  rvfun viewer;
-  void* fctn = 0x0;
+  rvfun fctn = 0;
   char *error;
 
   loadrplotlib();
 
-  if (rplot_handle == 0x0) return;
+  if (rplot_handle == 0) return;
 
   printf("Looking for runrviewer() \n");
-  fctn = dlsym(rplot_handle, "runrviewer");
-  if ((error = dlerror()) != NULL)  {
+  fctn = (rvfun)dlsym(rplot_handle, "runrviewer");
+  if ((error = dlerror()) != 0)  {
     fprintf (stderr, "%s\n", error);
     return;
   }
 
-  viewer = (rvfun)fctn;
-
-  (*viewer)();
+  fctn();
 
   unloadrplotlib();
 #else
@@ -357,38 +376,36 @@ extern type_OfExtern void type_ofCall rviewer(void)
           "Plugin support is not enabled in this version. Unable to use rviewer.");
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-extern type_OfExtern
-void type_ofCall madxv_setknobname(int* n, const char* name)
+void type_ofCall
+madxv_setknobname(int* n, const char* name)
 {
   (void)n, (void)name;
   
 #ifdef ROOT_PLOT
   MadxViewer::Instance()->SetKnobName(*n,name);
 #elif defined _PLUGIN
+
   typedef void (*sknfctn)(int*,const char*);
   sknfctn fctn;
   char *error;
 
-  if(rplot_handle == 0x0) return;
+  if(rplot_handle == 0) return;
 
   fctn = (sknfctn)dlsym(rplot_handle, "madxviewer_setknobname");
-  if ((error = dlerror()) != NULL)
+  if ((error = dlerror()) != 0)
   {
     fprintf (stderr, "%s\n", error);
     return;
   }
 
-  (*fctn)(n,name);
+  fctn(n,name);
 
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-
-extern type_OfExtern
-void type_ofCall madxv_setfctnname(int* n, const char* name)
+void type_ofCall
+madxv_setfctnname(int* n, const char* name)
 {
   (void)n, (void)name;
   
@@ -400,24 +417,22 @@ void type_ofCall madxv_setfctnname(int* n, const char* name)
   sknfctn fctn;
   char *error;
 
-  if(rplot_handle == 0x0) return;
+  if(rplot_handle == 0) return;
 
   fctn = (sknfctn)dlsym(rplot_handle, "madxviewer_setfctnname");
-  if ((error = dlerror()) != NULL)
+  if ((error = dlerror()) != 0)
   {
     fprintf (stderr, "%s\n", error);
     return;
   }
 
-  (*fctn)(n,name);
+  fctn(n,name);
 
 #endif
 }
-/*_________________________________________________________________________________________*/
 
-
-extern type_OfExtern
-void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
+void type_ofCall
+madxv_setfunctionat(int* el, int* n,  const char* name)
 {
   (void)el, (void)n, (void)name;
   
@@ -429,18 +444,17 @@ void type_ofCall madxv_setfunctionat(int* el, int* n,  const char* name)
   sknfctn fctn;
   char *error;
 
-  if(rplot_handle == 0x0) return;
+  if(rplot_handle == 0) return;
 
   fctn = (sknfctn)dlsym(rplot_handle, "madxviewer_setfunctionat");
-  if ((error = dlerror()) != NULL)
+  if ((error = dlerror()) != 0)
   {
     fprintf (stderr, "%s\n", error);
     return;
   }
 
-  (*fctn)(el,n,name);
+  fctn(el,n,name);
 
 #endif
 }
 
-/*_________________________________________________________________________________________*/

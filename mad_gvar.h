@@ -327,9 +327,7 @@ extern int na_err,              /* current no. of alignment errors */
   b_indent[100],       /* list of indents */
   add_indent[];
 
-extern double sequ_length,         /* length of  sequence */
-  sequ_start,
-  sequ_end,
+extern double
   guess_orbit[6],
   al_errors[ALIGN_MAX],
   fd_errors[FIELD_MAX];

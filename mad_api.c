@@ -1,4 +1,5 @@
 #include "madx.h"
+#include "mad_api.h"
 
 void
 madextern_start(void)

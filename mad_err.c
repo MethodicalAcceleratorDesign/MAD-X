@@ -68,7 +68,7 @@ geterrrormessage()
 */
 
 void
-warningnew(char* t1, char* fmt, ...)
+warningnew(const char* t1, const char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/
@@ -92,7 +92,7 @@ warningnew(char* t1, char* fmt, ...)
 }
 
 void
-error(char* t1, char* fmt, ...)
+error(const char* t1, const char* fmt, ...)
 {
 /*prints warning on the standard error and accepts parameters printout with std C formatting*/
 /*Piotr Skowronski CERN*/
@@ -111,7 +111,7 @@ error(char* t1, char* fmt, ...)
 }
 
 void
-fatal_error(char* t1, char* t2)
+fatal_error(const char* t1, const char* t2)
   /*prints fatal error message, halts program */
 {
   printf("+=+=+= fatal: %s %s\n",t1,t2);
@@ -119,7 +119,7 @@ fatal_error(char* t1, char* t2)
 }
 
 void
-warning(char* t1, char* t2)
+warning(const char* t1, const char* t2)
 {
   if (get_option("warn"))
   {
@@ -136,7 +136,7 @@ augmentfwarn(void)
 }
 
 void
-put_info(char* t1, char* t2)
+put_info(const char* t1, const char* t2)
 {
   if (get_option("info") && get_option("warn"))
     printf("++++++ info: %s %s\n",t1,t2);

@@ -395,7 +395,7 @@ select_ptc_normal(struct in_cmd* cmd)
       for (i = 0; i < curr; i++)
       {
         order_list = pl->parameters[pos]->m_string->p[i];
-        order[i] = (double)atoi(order_list);
+        order[i] = atoi(order_list);
       }
 
       if (j == 10 || j == 11)
@@ -1495,7 +1495,7 @@ pro_ptc_select(struct in_cmd* cmd)
   monoIA = new_int_array(1+strlen(monomial));
   conv_char(monomial,monoIA);
 
-  element = (int)command_par_value("polynomial",cmd->clone);
+  element = command_par_value("polynomial",cmd->clone);
 
   pro_ptc_select_checkpushtable(cmd,&tabnameIA,&colnameIA);
 
@@ -1617,7 +1617,7 @@ int
 pro_ptc_moments(struct in_cmd* cmd)
 {
 
-  int no = (int)command_par_value("no", cmd->clone);
+  int no = command_par_value("no", cmd->clone);
 
   w_ptc_moments_(&no);
 

@@ -194,7 +194,7 @@ write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
   }
 }
 
-void
+static void
 grow_sequence_list(struct sequence_list* l)
 {
   char rout_name[] = "grow_sequence_list";

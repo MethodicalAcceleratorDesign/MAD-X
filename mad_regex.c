@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "mad_mem.h"
+#include "mad_regex.h"
 
 // private types
 

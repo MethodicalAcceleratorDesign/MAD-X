@@ -1,4 +1,5 @@
 #include "mad_extrn_f.h"
+#include "mad_util.h"
 
 #ifndef _WIN32
 #include <unistd.h>

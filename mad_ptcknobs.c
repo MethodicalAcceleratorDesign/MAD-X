@@ -886,7 +886,7 @@ madx_mpk_run(struct in_cmd* cmd)
     warningnew("matchknobs.c: madx_mpk_run","Tolerance is less then 0. Command ignored.");
     return;
   }
-  maxcalls = (int)command_par_value("calls",cmd->clone);
+  maxcalls = command_par_value("calls",cmd->clone);
 
   if(madx_mpk_comm_createuniverse == 0x0)
   {
@@ -1364,8 +1364,8 @@ madx_mpk_addvariable(struct in_cmd* cmd)
     return;
   }
 
-  kn =  (int)command_par_value("kn",cmd->clone);
-  ks =  (int)command_par_value("ks",cmd->clone);
+  kn = command_par_value("kn",cmd->clone);
+  ks = command_par_value("ks",cmd->clone);
 
   if ( ename && (kn >= 0) && (ks >=0) )
   {

@@ -1,7 +1,7 @@
-#ifndef MADX_REGEX_H
-#define MADX_REGEX_H
+#ifndef MAD_REGEX_H
+#define MAD_REGEX_H
 
 int myregex(char* pattern, char* string);
 
-#endif // MADX_REGEX_H
+#endif // MAD_REGEX_H
 

@@ -1121,7 +1121,7 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
 }
 
 
-double
+static double
 aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
           int halolength,double haloxadj[],double haloyadj[],
           double newhalox[], double newhaloy[], double pipex[], double pipey[],

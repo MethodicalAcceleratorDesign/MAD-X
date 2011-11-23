@@ -207,7 +207,9 @@ add_to_macro_list( /* adds macro to alphabetic macro list */
   /* RDM new matching*/
 }
 
-void remove_from_macro_list( /* removes macro from alphabetic macro list */
+#if 0 // not used
+static void
+remove_from_macro_list( /* removes macro from alphabetic macro list */
   struct macro* macro, struct macro_list* nll)
 {
   int pos;
@@ -218,6 +220,7 @@ void remove_from_macro_list( /* removes macro from alphabetic macro list */
     nll->macros[pos] = nll->macros[nll->curr--];
   }
 }
+#endif
 
 int
 remove_from_name_list(char* name, struct name_list* nl)

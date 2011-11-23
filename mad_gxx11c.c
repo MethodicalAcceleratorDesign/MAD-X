@@ -1,65 +1,53 @@
-/* X include files */
+#ifndef _WIN32
 
+/* X include files */
 #define _HPUX_SOURCE
-#include <stdio.h>
-#include <stdlib.h> /* hbu for getenv */
 #include <unistd.h> /* hbu for sleep */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <time.h>
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-#define MAXCOL 256
+#include "mad_extrn_f.h"
+#include "mad_gxx11c.h"
+#include "mad_mem.h"
 
-#define cbyt     cbyt_
-#define mydtime  mydtime_
-#define wopen    wopen_
-#define wclose   wclose_
-#define wclrwk   wclrwk_
-#define wfa      wfa_
-#define wpl      wpl_
-#define wswn     wswn_
-#define wtx      wtx_
-#define wwait    wwait_
-#define wsetci   wsetci_
-#define wsetls   wsetls_
-#define wstring  wstring_
-
-void* mycalloc(char*, size_t, size_t);
-void myfree(char*, void*);
+// #define MAXCOL 256 // not used
 
 /* declarations */
-char logo[] = "GXplot";
-
-Display  *mydisplay;
-Window  mywindow;
-GC           mygc[4];  /* one gc per linestyle */
-XEvent  myevent;
-KeySym  mykey;
-XSizeHints         myhint;
-XWMHints         mywmhint;
-XSetWindowAttributes  xswa;
-int          i, done, myscreen, ncolors, style;
-unsigned int          wwidth, wwidth_mm, wheight, wheight_mm;
-float                 xwidth, xwidth_mm, xheight, xheight_mm;
-float                 w_lx, w_ly, wx_fact, wy_fact;
-float                 v_corrf;
-unsigned long         myforeground, mybackground, valuemask;
-static Colormap       cmap;
-static int            colored;
-XColor                color, colore, colors[MAXCOL] ;
-XWindowAttributes     theAtt;
-XGCValues             gcv;
+static char                   logo[] = "GXplot";
+static Display*               mydisplay;
+static Window                 mywindow;
+static GC                     mygc[4];  /* one gc per linestyle */
+static XEvent                 myevent;
+// static KeySym                 mykey; // not used
+static XSizeHints             myhint;
+static XWMHints               mywmhint;
+static XSetWindowAttributes   xswa;
+static int                    i, done, myscreen, ncolors, style;
+static unsigned int           wwidth, wwidth_mm, wheight, wheight_mm;
+static float                  xwidth, xwidth_mm, xheight, xheight_mm;
+static float                  w_lx, w_ly, wx_fact, wy_fact;
+static float                  v_corrf;
+static unsigned long          myforeground, mybackground, valuemask;
+static Colormap               cmap;
+static int                    colored;
+static XColor                 color, colore; //, colors[MAXCOL];
+static XWindowAttributes      theAtt;
+static XGCValues              gcv;
 
 static char solid[1]  = {0},
-  dashed[2] = {3,3},
-    dotted[2] = {1,3},
-      dot_dashed[4] = {1,3,3,3};
+            dashed[2] = {3,3},
+            dotted[2] = {1,3},
+            dot_dashed[4] = {1,3,3,3};
 static char *dash_list[] = {solid, dashed, dotted, dot_dashed};
 static int dash_list_length[] = {0, 2, 2, 4};
 
-void wopen(int *uswid, int *ushi)
-
+void
+wopen(int *uswid, int *ushi)
 {
   int argc;
   char **argv;
@@ -153,7 +141,8 @@ void wopen(int *uswid, int *ushi)
   sleep(3);
 }
 
-void wclose()
+void
+wclose(void)
 {
 
   /* termination */
@@ -167,7 +156,8 @@ void wclose()
 
 }
 
-void wclrwk(int *i1,int *i2)
+void
+wclrwk(int *i1,int *i2)
 {
   (void)i1, (void)i2;
   /* clear workstation */
@@ -175,7 +165,8 @@ void wclrwk(int *i1,int *i2)
 
 }
 
-void wpl(int *np, float *xp, float *yp)
+void
+wpl(int *np, float *xp, float *yp)
 {
   /* plot PolyLine of np points with coordinates (xp,yp) */
   char rout_name[] = "wpl";
@@ -196,7 +187,8 @@ void wpl(int *np, float *xp, float *yp)
 
 }
 
-void wfa(int *np, float *xp, float *yp)
+void
+wfa(int *np, float *xp, float *yp)
 {
   /* plot area-filled PolyLine of np points with coordinates (xp,yp) */
   char rout_name[] = "wfa";
@@ -218,8 +210,9 @@ void wfa(int *np, float *xp, float *yp)
 
 }
 
-void wswn(float *wlx, float *wxfact,
-          float *wly, float *wyfact)
+void
+wswn(float *wlx, float *wxfact,
+     float *wly, float *wyfact)
 {
   /* store window lower world coord.s, and conversion factors */
   w_lx = *wlx; wx_fact = *wxfact;
@@ -227,7 +220,8 @@ void wswn(float *wlx, float *wxfact,
 
 }
 
-void wtx(float *xp,float *yp, char *string)
+void
+wtx(float *xp,float *yp, char *string)
 {
   int k, x, y;
   x = (*xp - w_lx) * wx_fact + 0.5;
@@ -237,7 +231,8 @@ void wtx(float *xp,float *yp, char *string)
               x, y, string, strlen(string));
 }
 
-void wwait()
+void
+wwait(void)
 {
 
   /* main event reading loop */
@@ -258,7 +253,8 @@ void wwait()
   }
 }
 
-void wsetci(char *uscol)
+void
+wsetci(char *uscol)
 {
   if(colored)
   {
@@ -272,13 +268,15 @@ void wsetci(char *uscol)
   }
 }
 
-void wsetls(int *ls)
+void
+wsetls(int *ls)
 {
   style = *ls;
 }
 /*
  * return null terminated and blank trimmed string
  */
+ 
 void
 wstring( char *s, int *l )
 {
@@ -292,7 +290,16 @@ wstring( char *s, int *l )
   s[loc] = '\0';
 }
 
-void cbyt(int* source, int* s_pos, int* target, int* t_pos, int* n)
+#else // case _WIN32
+
+#include <time.h>
+#include "mad_extrn_f.h"
+#include "mad_gxx11c.h"
+
+#endif
+
+void
+cbyt(int* source, int* s_pos, int* target, int* t_pos, int* n)
 /* inserts n_bit byte from source at position s_pos in target at t_pos.
    Attention: least significant bit is #1, positions are those of the least
    significant bit in byte */
@@ -308,8 +315,8 @@ void cbyt(int* source, int* s_pos, int* target, int* t_pos, int* n)
   *target = tg;
 }
 
-void mydtime(int* year, int* month, int* day, int* hour, int* minute,
-             int* sec)
+void
+mydtime(int* year, int* month, int* day, int* hour, int* minute, int* sec)
 {
   time_t _time;
   struct tm* tm;
@@ -322,3 +329,4 @@ void mydtime(int* year, int* month, int* day, int* hour, int* minute,
   *minute = tm->tm_min;
   *sec = tm->tm_sec;
 }
+

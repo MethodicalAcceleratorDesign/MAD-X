@@ -92,7 +92,6 @@ cmakesrc/setupTesting.cmake -text
 /dynap.f90 -text
 /emit.f90 -text
 /gxx11.f90 -text
-/gxx11c.c -text
 /gxx11ps.f90 -text
 /gxx11psc.c -text
 /h_definition.f90 -text
@@ -172,6 +171,8 @@ lib64/libz.a -text
 /mad_gcst.h -text
 /mad_gvar.c -text
 /mad_gvar.h -text
+/mad_gxx11c.c -text
+/mad_gxx11c.h -text
 /mad_help.c -text
 /mad_help.h -text
 /mad_ibs.c -text
@@ -217,6 +218,8 @@ lib64/libz.a -text
 /mad_range.h -text
 /mad_regex.c -text
 /mad_regex.h -text
+/mad_rplot.cpp -text
+/mad_rplot.h -text
 /mad_rpn.c -text
 /mad_rpn.h -text
 /mad_sdds.c -text
@@ -314,8 +317,6 @@ make/system.Windows -text
 /poisson.f90 -text
 /ptc_export_xml.f90 -text
 /resindex.f90 -text
-/rplot.c -text
-/rplot.h -text
 /sodd.f90 -text
 /survey.f90 -text
 testing/MadBuild.pl -text

@@ -485,7 +485,7 @@ error_efcomp(struct in_cmd* cmd)
 
   while (nextnode != ndexe) { /*loop over elements and get strengths in vector*/
            current_node = nextnode;
-           flgmgt = (int)node_value("magnet");
+           flgmgt = node_value("magnet");
         if((nextnode->sel_err == 1) && (flgmgt == 1))  {
             if(nextnode->p_fd_err == NULL) {
             chcount[0]++;

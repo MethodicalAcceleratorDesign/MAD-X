@@ -19,14 +19,8 @@
 CC_HDR := $(wildcard mad_*.h) 
 CC_SRC := $(wildcard mad_*.c)
 
-CC_HDR += rplot.h SDDS.h madx.h
-CC_SRC += rplot.c
-
-ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11
-CC_SRC += gxx11psc.c
-else
-CC_SRC += gxx11c.c
-endif
+CC_HDR += SDDS.h madx.h
+CC_SRC +=
 
 # files specific compiler flag
 mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) -D_VERSION_DATE=$(VERSION_DATE)
