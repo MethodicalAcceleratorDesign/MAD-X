@@ -60,8 +60,8 @@ endif
 # extra flags
 #
 
-CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS
-CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc /Dinline=__inline
+CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS /Dinline=__inline
+CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc
 CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc
 
 #
