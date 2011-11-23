@@ -736,7 +736,6 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
 static struct table*
 aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
 {
-  (void)cnt;
   /* Reads displacement data in tfs format */
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;
@@ -747,6 +746,7 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
   int tempcount;
       tempcount = 0;
 
+  (void)cnt;
 
   if (e_d_name == NULL) return NULL;
 
