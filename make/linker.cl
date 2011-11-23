@@ -34,6 +34,10 @@ ifeq ($(PROFILE),yes)
 LDFLAGS +=
 endif
 
+ifeq ($(STATIC),yes)
+LDFLAGS += /MT
+endif
+
 #
 # command translator
 #
