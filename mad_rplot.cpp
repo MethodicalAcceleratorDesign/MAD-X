@@ -33,13 +33,11 @@ typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,do
 static void*                rplot_handle    = 0;
 static rplot_plottrack_fctn rplot_plottrack = 0; /*pointer to function*/
 
+#ifdef _PLUGIN
+
 static void
 loadrplotlib(void)
 {
-  (void)rplot_handle, (void)rplot_plottrack;
-  (void)loadrplotlib;
-
-#if _PLUGIN
   void *handle;
   char buff[200];
   char* homedir = 0x0;
@@ -179,7 +177,7 @@ loadrplotlib(void)
     return;
   }
 
-#else
+#if 0 // not used
   warning("rplot.c: loadrplotlib()",
           "Plugin support is not enabled in this version. Unable to use rplot.");
 #endif
@@ -188,14 +186,12 @@ loadrplotlib(void)
 static void
 unloadrplotlib(void)
 {
-  (void)unloadrplotlib;
-  
-#if _PLUGIN
   dlclose(rplot_handle);
   rplot_handle = 0;
   rplot_plottrack = 0;
-#endif
 }
+
+#endif // _PLUGIN
 
 void type_ofCall
 plottrack(int* particleno, int* obspoint, int* turn,
@@ -277,6 +273,8 @@ rplotfinish(void)
 void type_ofCall
 newrplot(void)
 {
+  (void)rplot_handle, (void)rplot_plottrack;
+
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->NewPlot();
