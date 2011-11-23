@@ -61,7 +61,7 @@ endif
 #
 
 CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS
-CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc /Dinline=$(SPACE)
+CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc /Dinline=__inline
 CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc
 
 #
