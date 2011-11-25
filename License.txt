@@ -16,7 +16,17 @@ Authors or contacts:          mad@cern.ch
                               SWITZERLAND
 
 
-Copyright CERN, Geneva 1990 - Copyright and any other appropriate legal protection of this computer program and associated documentation reserved in all countries of the world. Organisations collaborating with CERN may receive this program and documentation freely and without charge. CERN undertakes no obligation for the maintenance of this program, nor responsibility for its correctness, and accepts no liability whatsoever resulting from its use. Program and documentation are provided solely for the use of the organisation to which they are distributed. This program may not be copied or otherwise distributed without permission. This message must be retained on this and any other authorised copies. The material cannot be sold. CERN should be given credit in all references.
+Copyright CERN, Geneva 1990 - Copyright and any other appropriate legal
+protection of this computer program and associated documentation reserved
+in all countries of the world. Organisations collaborating with CERN may
+receive this program and documentation freely and without charge. CERN
+undertakes no obligation for the maintenance of this program, nor
+responsibility for its correctness, and accepts no liability whatsoever
+resulting from its use. Program and documentation are provided solely for
+the use of the organisation to which they are distributed. This program
+may not be copied or otherwise distributed without permission. This
+message must be retained on this and any other authorised copies. The
+material cannot be sold. CERN should be given credit in all references.
 
 
 Additional SDDS License (when Online model is included):
@@ -28,8 +38,8 @@ SDDS ToolKit is distributed subject to the following license conditions:
  SOFTWARE LICENSE AGREEMENT
  Software: SDDS ToolKit
 
- 1. The "Software", below, refers to SDDS ToolKit (in either source code, or
-    binary form and accompanying documentation). Each licensee is
+ 1. The "Software", below, refers to SDDS ToolKit (in either source code,
+    or binary form and accompanying documentation). Each licensee is
     addressed as "you" or "Licensee."
 
  2. The copyright holders shown above and their third-party licensors
