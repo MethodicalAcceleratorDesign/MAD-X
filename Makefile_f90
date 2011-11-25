@@ -121,7 +121,7 @@ dynap.f90 emit.f90 gxx11.f90 ibsdb.f90 matchjc.f90 match.f90 matchsa.f90 plot.f9
   resindex.f90 sodd.f90 survey.f90 touschek.f90 trrun.f90 twiss.f90 \
   madx_ptc_module.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
   madx_ptc_knobs.f90 madx_ptc_eplacement.f90 madx_ptc_twiss.f90 \
-  madx_ptc_distrib.f90 madx_ptc_script.f90: util.o
+  madx_ptc_distrib.f90 madx_ptc_script.f90 gxx11.f90 gxx11ps.f90: util.o
 
 # dependencies of wrap.f90
 wrap.f90: madx_ptc_module.o madx_ptc_intstate.o madx_ptc_normal.o \
