@@ -3,9 +3,6 @@
 /CTestConfig.cmake -text
 /License.txt -text
 /Makefile -text
-/Makefile.bat -text
-/Makefile.old -text
-/MakefileIntel.bat -text
 /Makefile_c -text
 /Makefile_cpp -text
 /Makefile_cxx -text
@@ -52,7 +49,6 @@ cmakesrc/setupProcessorCount.cmake -text
 cmakesrc/setupSources.cmake -text
 cmakesrc/setupTargets.cmake -text
 cmakesrc/setupTesting.cmake -text
-/gxx11psc.c -text
 lib32/libSDDS1.a -text
 lib32/libSDDS1c.a -text
 lib32/libX11.a -text
