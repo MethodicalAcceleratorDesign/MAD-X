@@ -15,11 +15,6 @@
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text
-/a_def_all_kind.inc -text
-/a_def_element_fibre_layout.inc -text
-/a_def_frame_patch_chart.inc -text
-/a_def_sagan.inc -text
-/a_def_worm.inc -text
 cmakesrc/FindGSL.cmake -text
 cmakesrc/FindSDDS.cmake -text
 cmakesrc/MadX.icns -text svneol=unset#unset
@@ -75,8 +70,6 @@ lib64/libmdblib.a -text
 lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
-/madx_ptc_distrib.inc -text
-/madx_ptc_knobs.inc -text
 make/README -text
 make/README.lxplus -text
 make/README.windows -text
@@ -113,7 +106,6 @@ make/system.Cygwin -text
 make/system.Darwin -text
 make/system.Linux -text
 make/system.Windows -text
-/photoni.inc -text
 src/SDDS.h -text
 src/SDDStypes.h -text
 src/Sa_extend_poly.f90 -text
@@ -138,6 +130,11 @@ src/Sq_orbit_ptc.f90 -text
 src/Sr_spin.f90 -text
 src/Sra_fitting.f90 -text
 src/St_pointers.f90 -text
+src/a_def_all_kind.inc -text
+src/a_def_element_fibre_layout.inc -text
+src/a_def_frame_patch_chart.inc -text
+src/a_def_sagan.inc -text
+src/a_def_worm.inc -text
 src/a_scratch_size.f90 -text
 src/b_da_arrays_all.f90 -text
 src/c_dabnew.f90 -text
@@ -295,9 +292,11 @@ src/mad_vec.c -text
 src/mad_vec.h -text
 src/madx.h -text
 src/madx_ptc_distrib.f90 -text
+src/madx_ptc_distrib.inc -text
 src/madx_ptc_eplacement.f90 -text
 src/madx_ptc_intstate.f90 -text
 src/madx_ptc_knobs.f90 -text
+src/madx_ptc_knobs.inc -text
 src/madx_ptc_module.f90 -text
 src/madx_ptc_normal.f90 -text
 src/madx_ptc_script.f90 -text
@@ -313,6 +312,7 @@ src/matchsa.f90 -text
 src/n_complex_polymorph.f90 -text
 src/o_tree_element.f90 -text
 src/orbf.f90 -text
+src/photoni.inc -text
 src/plot.f90 -text
 src/poisson.f90 -text
 src/ptc_export_xml.f90 -text
