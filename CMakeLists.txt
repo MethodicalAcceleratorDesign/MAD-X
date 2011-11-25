@@ -20,11 +20,11 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc") 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake") 
 
 # When we don't need to support cmake 2.6 anymore, remove these three lines:
 if(CMAKE_VERSION MATCHES "2.6.")
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmakesrc/compilers") 
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/compilers") 
 endif()
 
 # Some initializations specific for Mad-X
@@ -43,27 +43,12 @@ include(setupCompilerSpecifics)
 # architecture chosen.
 include(setupArchSpecifics)
 
-#
-# we call a subscript that sets up the source files:
-# 
-include(setupSources)
 
-# Defining specific stuff for packaging:
-# Should be called after sources are defined,
-# before targets are defined.
-include(setupPackaging)
+# Add sources subdirectory:
+add_subdirectory(src)
 
-
-# Setting up targets and linking between targets
-# and external libraries:
-include(setupTargets)
-
-# 
-# we call a subscript that sets up installation stuff:
-# 
-# Should be called after targets are defined
-# 
-include(setupInstallation)
 
 # Setting up testing:
 include(setupTesting)
+# Add test folders:
+add_subdirectory(testing/ctests)

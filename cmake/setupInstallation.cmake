@@ -36,7 +36,7 @@ INSTALL (FILES ${headerfiles}
   DESTINATION "include/${PROJECT_NAME}")
 endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/License.txt 
+INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
     DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}")
 # In case we are on Linux we install syntax file for Kate
 # Only in case of devel version, so packages don't conflict...
@@ -53,7 +53,7 @@ endif(APPLE OR WIN32)
 
 # CPACK stuff
  # build a CPack driven installer package
- set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+ set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/License.txt")
  set (CPACK_PACKAGE_NAME "${PROJECT_NAME}${PKG_POSTFIX}")
  # Version:
  set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
