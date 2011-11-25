@@ -12,6 +12,8 @@
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_sys -text
+/SDDS_COPYRIGHT.TXT -text
+/SDDS_LICENSE -text
 /VERSION -text
 cmakesrc/FindGSL.cmake -text
 cmakesrc/FindSDDS.cmake -text
@@ -105,8 +107,6 @@ make/system.Darwin -text
 make/system.Linux -text
 make/system.Windows -text
 src/SDDS.h -text
-src/SDDS_COPYRIGHT.TXT -text
-src/SDDS_LICENSE -text
 src/SDDStypes.h -text
 src/Sa_extend_poly.f90 -text
 src/Sb_sagan_pol_arbitrary.f90 -text
