@@ -255,7 +255,7 @@ sdds_readt(char *filename, char *tfsname)
   return(narr);
 }
 
-int
+static int
 sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
 {
   PARAMETER_DEFINITION *pardef;
@@ -318,6 +318,62 @@ sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
       }
 
   return(npar);
+}
+
+static int
+treat_tfs_header_set(SDDS_TABLE *SDDS_table, struct table* t)
+{
+  struct char_p_array* head_buf;
+  int i, j, k;
+  char  dumc[1000];
+
+  double  dbuf;
+  long    lbuf;
+
+  head_buf = new_char_p_array(1000);
+
+  printf("number of headers: %d\n",t->header->curr);
+  for(j=0; j < t->header->curr; j++) {
+    if (get_option("debug")) printf("for set header: %s\n", t->header->p[j]);
+    if (get_option("debug")) printf("header: %s\n", t->header->p[j]);
+    pre_split(t->header->p[j], l_wrk, 0);
+    i = head_split(l_wrk->c,head_buf);
+    if (get_option("debug")) printf("for set curr: %d\n",head_buf->curr);
+    if (get_option("debug")) printf("curr: %d\n",head_buf->curr);
+
+    if(head_buf->curr > 0) {
+      for(k=0; k < head_buf->curr; k++) {
+        if (get_option("debug")) printf("for set header: %d %s ", k,  head_buf->p[k]);
+
+        if(strcmp(head_buf->p[2],"%ld") == 0) {
+          sscanf(head_buf->p[3],"%ld",&lbuf);
+          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
+                               head_buf->p[1], lbuf, NULL)) {
+             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+             exit(1);
+          }
+        } else if(strcmp(head_buf->p[2],"%le") == 0) {
+          sscanf(head_buf->p[3],"%le",&dbuf);
+          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
+                               head_buf->p[1], dbuf, NULL)) {
+             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+             exit(1);
+          }
+        } else  {
+          strcpy(dumc,head_buf->p[3]);
+          replace(dumc, '\"', ' ');
+          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE,     
+                               head_buf->p[1], dumc, NULL)) {
+             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
+             exit(1);
+          }
+        }
+
+      }
+    }
+  }
+
+  return(head_buf->curr);
 }
 
 int
@@ -520,62 +576,6 @@ treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
   return(head_buf->curr);
 }
                                                                                                     
-int
-treat_tfs_header_set(SDDS_TABLE *SDDS_table, struct table* t)
-{
-  struct char_p_array* head_buf;
-  int i, j, k;
-  char  dumc[1000];
-
-  double  dbuf;
-  long    lbuf;
-
-  head_buf = new_char_p_array(1000);
-
-  printf("number of headers: %d\n",t->header->curr);
-  for(j=0; j < t->header->curr; j++) {
-    if (get_option("debug")) printf("for set header: %s\n", t->header->p[j]);
-    if (get_option("debug")) printf("header: %s\n", t->header->p[j]);
-    pre_split(t->header->p[j], l_wrk, 0);
-    i = head_split(l_wrk->c,head_buf);
-    if (get_option("debug")) printf("for set curr: %d\n",head_buf->curr);
-    if (get_option("debug")) printf("curr: %d\n",head_buf->curr);
-
-    if(head_buf->curr > 0) {
-      for(k=0; k < head_buf->curr; k++) {
-        if (get_option("debug")) printf("for set header: %d %s ", k,  head_buf->p[k]);
-
-        if(strcmp(head_buf->p[2],"%ld") == 0) {
-          sscanf(head_buf->p[3],"%ld",&lbuf);
-          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
-                               head_buf->p[1], lbuf, NULL)) {
-             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-             exit(1);
-          }
-        } else if(strcmp(head_buf->p[2],"%le") == 0) {
-          sscanf(head_buf->p[3],"%le",&dbuf);
-          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE, 
-                               head_buf->p[1], dbuf, NULL)) {
-             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-             exit(1);
-          }
-        } else  {
-          strcpy(dumc,head_buf->p[3]);
-          replace(dumc, '\"', ' ');
-          if (!SDDS_SetParameters(SDDS_table, SDDS_SET_BY_NAME|SDDS_PASS_BY_VALUE,     
-                               head_buf->p[1], dumc, NULL)) {
-             SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
-             exit(1);
-          }
-        }
-
-      }
-    }
-  }
-
-  return(head_buf->curr);
-}
-
 void
 sel_table(char* tname, struct table* t)
   /* output of a table */
