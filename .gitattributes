@@ -3,6 +3,9 @@
 /CTestConfig.cmake -text
 /License.txt -text
 /Makefile -text
+/Makefile.bat -text
+/Makefile.old -text
+/MakefileIntel.bat -text
 /Makefile_c -text
 /Makefile_cpp -text
 /Makefile_cxx -text

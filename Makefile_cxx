@@ -16,11 +16,8 @@
 # | $Id$
 # |
 
-vpath %.hpp src
-vpath %.cpp src
-
-CXX_HDR := $(notdir $(wildcard src/mad_*.hpp)) 
-CXX_SRC := $(notdir $(wildcard src/mad_*.cpp))
+CXX_HDR := $(wildcard mad_*.hpp) 
+CXX_SRC := $(wildcard mad_*.cpp)
 
 ifeq ($(NTPSA),yes)
   CXX_HDR += tpsa.h 

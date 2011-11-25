@@ -16,11 +16,8 @@
 # | $Id$
 # |
 
-vpath %.h src
-vpath %.c src
-
-CC_HDR := $(notdir $(wildcard src/mad_*.h))
-CC_SRC := $(notdir $(wildcard src/mad_*.c))
+CC_HDR := $(wildcard mad_*.h) 
+CC_SRC := $(wildcard mad_*.c)
 
 CC_HDR += SDDS.h madx.h
 CC_SRC +=

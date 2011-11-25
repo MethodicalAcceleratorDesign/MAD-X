@@ -16,11 +16,7 @@
 # | $Id$
 # |
 
-vpath %.f90 src
-vpath %.F90 src
-vpath %.inc src
-
-FC_SRC := $(notdir $(wildcard src/*.f90 src/*.F90))
+FC_SRC := $(wildcard *.f90 *.F90)
 
 ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11
 FC_SRC    += gxx11ps.f90
