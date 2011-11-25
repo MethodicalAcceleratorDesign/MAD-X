@@ -17,6 +17,7 @@ cmake/FindSDDS.cmake -text
 cmake/MadX.icns -text svneol=unset#unset
 cmake/README -text
 cmake/ToolChains/Linux-LF95.cmake -text
+cmake/ToolChains/Windows-MinGW32.cmake -text
 cmake/cdash_madx.cmake -text
 cmake/compilers/setupGNU.cmake -text
 cmake/compilers/setupIntel.cmake -text
