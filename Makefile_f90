@@ -81,8 +81,8 @@ So_fitting.f90:             Sn_mad_like.o
 Sp_keywords.f90:            So_fitting.o
 Sr_spin.f90:                Sq_orbit_ptc.o
 Sra_fitting.f90:            Sr_spin.o
-madx_ptc_module.f90:        Sra_fitting.o
 
+madx_ptc_module.f90:        Sra_fitting.o
 madx_ptc_module.f90:        madx_ptc_setcavs.o madx_ptc_knobs.o
 madx_ptc_trackcavs.f90:     madx_ptc_setcavs.o
 madx_ptc_twiss.f90:         madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
@@ -102,32 +102,67 @@ madx_ptc_twiss.f90:         madx_ptc_knobs.inc madx_ptc_distrib.inc
 user2_photon.f90:           photoni.inc
 
 # dependencies on Sp_keywords.f90
-madx_ptc_intstate.f90 madx_ptc_setcavs.f90 madx_ptc_script.f90 \
-  madx_ptc_intstate.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
-  madx_ptc_knobs.f90 madx_ptc_eplacement.f90 \
-  Sq_orbit_ptc.f90 St_pointers.f90: Sp_keywords.o
+madx_ptc_eplacement.f90:    Sp_keywords.o
+madx_ptc_intstate.f90:      Sp_keywords.o
+madx_ptc_intstate.f90:      Sp_keywords.o
+madx_ptc_knobs.f90:         Sp_keywords.o
+madx_ptc_script.f90:        Sp_keywords.o
+madx_ptc_setcavs.f90:       Sp_keywords.o
+madx_ptc_trackcavs.f90:     Sp_keywords.o
+madx_ptc_track_run.f90:     Sp_keywords.o
+Sq_orbit_ptc.f90:           Sp_keywords.o
+St_pointers.f90:            Sp_keywords.o
 
 # dependencies on madx_ptc_intstate.f90
-madx_ptc_setcavs.f90 madx_ptc_trackcavs.f90 madx_ptc_knobs.f90 \
-  madx_ptc_eplacement.f90: madx_ptc_intstate.o
+madx_ptc_eplacement.f90:    madx_ptc_intstate.o
+madx_ptc_knobs.f90:         madx_ptc_intstate.o
+madx_ptc_setcavs.f90:       madx_ptc_intstate.o
+madx_ptc_trackcavs.f90:     madx_ptc_intstate.o
 
 # dependencies on madx_ptc_module.f90
-ptc_export_xml.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
-  madx_ptc_eplacement.f90 madx_ptc_normal.f90 madx_ptc_twiss.f90 \
-  madx_ptc_distrib.f90 St_pointers.f90: madx_ptc_module.o
+madx_ptc_distrib.f90:       madx_ptc_module.o
+madx_ptc_eplacement.f90:    madx_ptc_module.o
+madx_ptc_normal.f90:        madx_ptc_module.o
+madx_ptc_trackcavs.f90:     madx_ptc_module.o
+madx_ptc_track_run.f90:     madx_ptc_module.o
+madx_ptc_twiss.f90:         madx_ptc_module.o
+ptc_export_xml.f90:         madx_ptc_module.o
+St_pointers.f90:            madx_ptc_module.o
 
 # dependencies on util.f90
-dynap.f90 emit.f90 gxx11.f90 ibsdb.f90 matchjc.f90 match.f90 matchsa.f90 plot.f90 \
-  resindex.f90 sodd.f90 survey.f90 touschek.f90 trrun.f90 twiss.f90 \
-  madx_ptc_module.f90 madx_ptc_track_run.f90 madx_ptc_trackcavs.f90 \
-  madx_ptc_knobs.f90 madx_ptc_eplacement.f90 madx_ptc_twiss.f90 \
-  madx_ptc_distrib.f90 madx_ptc_script.f90 gxx11.f90 gxx11ps.f90: util.o
+dynap.f90:                  util.o
+emit.f90:                   util.o
+gxx11.f90:                  util.o
+gxx11.f90:                  util.o
+gxx11ps.f90:                util.o
+ibsdb.f90:                  util.o
+madx_ptc_distrib.f90:       util.o
+madx_ptc_eplacement.f90:    util.o
+madx_ptc_knobs.f90:         util.o
+madx_ptc_module.f90:        util.o
+madx_ptc_script.f90:        util.o
+madx_ptc_trackcavs.f90:     util.o
+madx_ptc_track_run.f90:     util.o
+madx_ptc_twiss.f90:         util.o
+match.f90:                  util.o
+matchjc.f90:                util.o
+matchsa.f90:                util.o
+plot.f90:                   util.o
+resindex.f90:               util.o
+sodd.f90:                   util.o
+survey.f90:                 util.o
+touschek.f90:               util.o
+trrun.f90:                  util.o
+twiss.f90:                  util.o
 
 # dependencies of wrap.f90
-wrap.f90: madx_ptc_module.o madx_ptc_intstate.o madx_ptc_normal.o \
-  madx_ptc_twiss.o madx_ptc_distrib.o madx_ptc_setcavs.o \
-	madx_ptc_trackcavs.o madx_ptc_knobs.o madx_ptc_track_run.o \
-	madx_ptc_script.o St_pointers.o ptc_export_xml.o madx_ptc_eplacement.o
+wrap.f90:                   madx_ptc_module.o madx_ptc_intstate.o \
+                            madx_ptc_normal.o madx_ptc_twiss.o \
+                            madx_ptc_distrib.o madx_ptc_setcavs.o \
+	                          madx_ptc_trackcavs.o madx_ptc_knobs.o \
+	                          madx_ptc_track_run.o madx_ptc_script.o \
+	                          St_pointers.o ptc_export_xml.o \
+	                          madx_ptc_eplacement.o
 
 endif
 
