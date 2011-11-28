@@ -127,7 +127,6 @@ src/dynap.f90 -text
 src/emit.f90 -text
 src/gxx11.f90 -text
 src/gxx11ps.f90 -text
-src/gxx11psc.c -text
 src/h_definition.f90 -text
 src/i_tpsa.f90 -text
 src/ibsdb.f90 -text
