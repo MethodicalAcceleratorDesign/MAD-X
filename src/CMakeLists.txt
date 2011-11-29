@@ -1,6 +1,6 @@
 
 # list of source files
-file(GLOB srcfiles mad_*.c gxx*.c madxp.c matchptcknobs.c rplot.c *.f90 *.F90 )
+file(GLOB srcfiles mad_*.c *.f90 *.F90 *.cpp )
 
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
@@ -30,9 +30,8 @@ endif()
 if (MADX_NTPSA )
   message(STATUS "NTPSA turned on")
   file(GLOB ntpsa_remove c_dabnew.f90)
-  set(srcfiles ${srcfiles} tpsa.cpp)
 else (MADX_NTPSA )
-  file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90)
+  file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
 endif  (MADX_NTPSA )
 
 list(REMOVE_ITEM srcfiles ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
@@ -51,7 +50,6 @@ set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran)
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
 set_target_properties(madxbin PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
-get_target_property(binaryname madxbin OUTPUT_NAME)
 
 # we need to link executable to our own library:
 target_link_libraries(madxbin madx)

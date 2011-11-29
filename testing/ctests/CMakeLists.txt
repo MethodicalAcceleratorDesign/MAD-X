@@ -2,12 +2,7 @@
 # creating symlink to supporting files..
 execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/madX-examples
                                                            ${CMAKE_CURRENT_BINARY_DIR}/madX-examples)
-
-if (APPLE)
-    set(binaryname "${CMAKE_BINARY_DIR}/${binaryname}.app/Contents/MacOS/./${binaryname}")
-else(APPLE)
-    set(binaryname "${CMAKE_BINARY_DIR}/./${binaryname}")
-endif (APPLE)
+get_target_property(binaryname madxbin LOCATION)
 
 ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/testruns.sh" "${binaryname}")
 set_tests_properties (testruns 
