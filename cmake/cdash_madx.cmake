@@ -32,7 +32,7 @@ set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_UPDATE_COMMAND "svn")
 
 if(CTEST_CMAKE_GENERATOR STREQUAL "Unix Makefiles")
-    include(${CTEST_SOURCE_DIRECTORY}/cmakesrc/setupProcessorCount.cmake)
+    include(${CTEST_SOURCE_DIRECTORY}/cmake/setupProcessorCount.cmake)
     if(PROCESSOR_COUNT)
         set(CTEST_BUILD_FLAGS "${CTEST_BUILD_FLAGS} -j${PROCESSOR_COUNT}")
     endif()

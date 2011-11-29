@@ -41,7 +41,7 @@ INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt
 # In case we are on Linux we install syntax file for Kate
 # Only in case of devel version, so packages don't conflict...
 IF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cmakesrc/madx.xml 
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/madx.xml
     DESTINATION "share/apps/katepart/syntax/")
 ENDIF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
 if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?

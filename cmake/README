@@ -34,7 +34,7 @@ Basic usage:
 
  In case of LF95:
   If you want to use lf95 32bit compiler on a 64bit system, please use the initial command:
-    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmakesrc/ToolChains/LinuxLF95.cmake <path-to-source>
+    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmake/ToolChains/LinuxLF95.cmake <path-to-source>
   This is so far only known to work with CMake newer than or equal to version 2.8.1. 
   That means it will not work on lxplus at the moment. 
   For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"
@@ -42,7 +42,7 @@ Basic usage:
 
 Submitting to cdash:
     A testing server is set up, where a client can publish the results from updating, compiling, and testing. For this, a configuration script is needed. 
-    An example script is given in madX/cmakesrc/cdash_madx.cmake. In this file you need to edit the following:
+    An example script is given in madX/cmake/cdash_madx.cmake. In this file you need to edit the following:
     - CTEST_SITE "myname.maymachine" - select a useful name and machine name. Keep this fixed for all configurations on your machine. It is important that it is unique for you.
     - CTEST_BUILD_NAME "SLC5-64bit-gfortran" - select a useful name for the build. Change this for all different configurations you have.
     - CTEST_SOURCE_DIRECTORY "/path/to/source/madX/" - select a temporary folder where the madX source is checked out from svn. 
