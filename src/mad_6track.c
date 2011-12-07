@@ -481,7 +481,7 @@ static FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
 // private functions
 
 static void
-add_c6t_drifts()
+add_c6t_drifts(void)
 {
   int af;
   struct c6t_element *d1;

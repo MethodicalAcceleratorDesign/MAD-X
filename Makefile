@@ -31,6 +31,11 @@
 #   - depends on user setup, ARCH is detected !!!
 # make CC=icc FC=ifort infoall
 
+# use complilers famillies shortcuts (default GNU=yes)
+# make GNU=yes   infoall (equiv. to CC=gcc CXX=g++ FC=gfortran LD=gfortran)
+# make Intel=yes infoall (equiv. to CC=icc CXX=icc FC=ifort LD=ifort on Unix)
+# make Intel=yes infoall (equiv. to CC=icl CXX=icl FC=ifort LD=ifort on Windows)
+
 # build madx32 static online version for debug using Nag fortran compiler/linker
 # make FC=nagfor ARCH=32 STATIC=yes ONLINE=yes DEBUG=yes
 
@@ -76,7 +81,8 @@ PLUGIN  := no
 #############################
 # Compilers/Linkers settings
 # see make/compiler.* for supported compilers
-#
+# GNU=yes   sets gcc, g++, gfortran (default)
+# Intel=yes sets icc/icl, ifort.
 
 # C compiler (default is gcc)
 CC  := gcc
@@ -87,8 +93,8 @@ CXX := g++
 # Fortran compiler (default is gfortran)
 FC  := gfortran
 
-# Linker (default is fortran compiler)
-LD  := $(FC)
+# Linker (default is fortran compiler, deferred)
+LD   = $(FC)
 
 ####################
 # Includes settings

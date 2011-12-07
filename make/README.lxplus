@@ -20,11 +20,11 @@ The following command are for csh/tcsh shells. For Bash/Bourne shells, replace
   - 'setenv VAR value' by 'export VAR=value'
   - 'source script.csh' by '. script.sh' (note the file extension)
 
-GNU compilers: CC=gcc, CXX=g++, FC=gfortran
+GNU compilers: CC=gcc, CXX=g++, FC=gfortran (or GNU=yes)
 --------------
   [Nothing to do for ARCH=32 and ARCH=64]
 
-Intel compilers: CC=icc, CXX=icc, FC=ifort
+Intel compilers: CC=icc, CXX=icc, FC=ifort (or Intel=yes)
 ----------------
 for ARCH=32
 source /afs/cern.ch/sw/IntelSoftware/linux/setup.csh
