@@ -81,8 +81,8 @@ PLUGIN  := no
 #############################
 # Compilers/Linkers settings
 # see make/compiler.* for supported compilers
-# GNU=yes   sets gcc, g++, gfortran (default)
-# Intel=yes sets icc/icl, ifort.
+# GNU=yes   sets CC=gcc,     CXX=g++,     FC=gfortran (default)
+# Intel=yes sets CC=icc/icl, CXX=icc/icl, FC=ifort    (use icl on Windows)
 
 # C compiler (default is gcc)
 CC  := gcc
