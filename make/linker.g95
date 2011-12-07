@@ -22,26 +22,16 @@
 
 LDFLAGS += -m$(ARCH)
 
-ifeq ($(ARCH),32)
-  # attemp to find the gnu libs directory for g95 32 bits! (GCC only)
-  GNULIBS := $(dir $(shell $(CC) $(CFLAGS) -print-file-name=libgcc.a))
-  LDLIBS  += -L$(GNULIBS)
-endif
+# attemp to find the gnu libs directory for g95 (GCC only)
+GNULIBS := $(dir $(shell $(CC) $(CFLAGS) -print-file-name=libgcc.a))
+LDLIBS  += -L$(GNULIBS)
 
 ifneq ($(CXX_SRC),)
-  ifeq ($(ARCH),32)
-    # required by __constructors
-    LDLIBS += $(GNULIBS)$/crt*S.o
-  endif
   LDLIBS += -lstdc++
 endif
 
 ifeq ($(STATIC),yes)
-  ifeq ($(ARCH),32)
-    REQSYM := __divdi3 __moddi3
-    REQCMD := -Wl,--undefined=
-    LDLIBS += $(addprefix $(REQCMD),$(REQSYM)) -lc -lgcc_eh -lgcc
-  endif
+  LDLIBS += -lc -lgcc_eh -lgcc
 endif
 
 ifeq ($(OSTYPE),Darwin)
