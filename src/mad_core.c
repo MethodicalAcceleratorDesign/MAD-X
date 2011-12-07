@@ -127,9 +127,9 @@ madx_start(void)
   tm = localtime(&start_time); /* split system time */
   last_time = start_time;
   printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
-  printf("  +              %s              +\n", myversion);
-  printf("  +    %s     +\n", version_type);
-  printf("  + %s      +\n",code_mod_date);
+  printf("  +         %s %s          +\n", version_name, version_arch);
+  printf("  +    %s     +\n", version_name[strlen(version_name)-1]=='0' ? version_type_pro : version_type_dev);
+  printf("  + %s      +\n", version_date_mod);
   printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
@@ -191,9 +191,9 @@ madx_finish(void)
       printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
     }
     if (get_option("trace")) time_stamp("end");
-    printf("\n  +++++++++++++++++++++++++++++++++++\n");
-    printf("  + %s finished normally +\n", myversion);
-    printf("  +++++++++++++++++++++++++++++++++++\n");
+    printf("\n  ++++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("  + %s %s finished normally +\n", version_name, version_arch);
+    printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
   }
 }
 

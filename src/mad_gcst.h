@@ -1,9 +1,11 @@
 #ifndef MAD_GCST_H
 #define MAD_GCST_H
 
-extern const char *myversion;
-extern const char *version_type;
-extern const char *code_mod_date;
+extern const char *version_name;
+extern const char *version_arch;
+extern const char *version_type_dev;
+extern const char *version_type_pro;
+extern const char *version_date_mod;
 
 // Temporary file: global constants
 // these constants should be split over their respective modules...

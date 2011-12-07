@@ -18,10 +18,10 @@ get_version(char* tlt, int* l)
 {
   time_t tmp;
   struct tm* tm;
-  int n = strlen(myversion);
+  int n = strlen(version_name);
   time(&tmp);
   tm = localtime(&tmp); /* split system time */
-  strncpy(tlt, myversion, n);
+  strcpy(tlt, version_name);
   tlt += n;
   sprintf(tlt, "  %02d/%02d/%02d %02d.%02d.%02d\n",
           tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,

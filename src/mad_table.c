@@ -665,10 +665,10 @@ write_table(struct table* t, char* filename)
               "@ TITLE            %%%02ds \"%s\"\n", n, title);
     }
 
-    n = strlen(myversion)+strlen(sys_name)+1;
+    n = strlen(version_name)+strlen(sys_name)+1;
     fprintf(out_file,
             "@ ORIGIN           %%%02ds \"%s %s\"\n",
-            n, myversion, sys_name);
+            n, version_name, sys_name);
 
     fprintf(out_file,
             "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
