@@ -409,8 +409,8 @@ select_ptc_normal(struct in_cmd* cmd)
         myn1 = (int)order[1];
         myn2 = (int)order[2];
         min_req_order = mynorder;
-        res_index_(&skew, &mynorder, &myn1, &myn2, indexa, &mynres);
-        if (mynres > 0)
+        res_index_(&skew, &mynorder, &myn1, &myn2, &indexa[0][0], &mynres);
+	if (mynres > 0)
         {
           if (j == 10)
           {
