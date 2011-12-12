@@ -142,4 +142,21 @@ user2_photon.o:             src/photoni.inc
 
 endif
 
+#######################
+# compiler minimum version
+# check for gfortran version > 4.4
+#
+
+ifeq ($(FC),gfortran)
+FCVER  := $(subst ., ,$(word 4, $(shell $(FC) --version)))
+FCVER1 := $(findstring $(word 1,$(FCVER)),"456789")
+FCVER2 := 0
+  ifeq ($(FCVER1),4)
+  FCVER2 := $(findstring $(word 2,$(FCVER)),"456789")
+  endif
+ifeq ($(and $(FCVER1),$(FCVER2)),)
+$(error gfortran version must be >= 4.4 to compile madx) 
+endif
+endif
+
 # end of makefile
