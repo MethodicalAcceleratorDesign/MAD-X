@@ -46,6 +46,7 @@ include(setupArchSpecifics)
 
 # Add sources subdirectory:
 add_subdirectory(src)
+add_subdirectory(syntax)
 
 
 # Setting up testing:

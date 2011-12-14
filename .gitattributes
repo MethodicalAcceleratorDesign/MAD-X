@@ -311,6 +311,7 @@ src/twiss.f90 -text
 src/user2_photon.f90 -text
 src/util.f90 -text
 src/wrap.f90 -text
+syntax/CMakeLists.txt -text
 syntax/README.txt -text
 syntax/kate/madx.xml -text
 syntax/vim/madx.vim -text
