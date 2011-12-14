@@ -27,7 +27,6 @@ cmake/compilers/setupLahey.cmake -text
 cmake/compilers/setupNAGFOR.cmake -text
 cmake/compilers/setupPathScale.cmake -text
 cmake/madX.gif -text svneol=unset#unset
-cmake/madx.xml -text
 cmake/madxInit.cmake -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
@@ -53,7 +52,6 @@ lib64/libmdblib.a -text
 lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
-/madx.vim -text
 make/README -text
 make/README.lxplus -text
 make/README.windows -text
@@ -313,6 +311,9 @@ src/twiss.f90 -text
 src/user2_photon.f90 -text
 src/util.f90 -text
 src/wrap.f90 -text
+syntax/README.txt -text
+syntax/kate/madx.xml -text
+syntax/vim/madx.vim -text
 testing/MadBuild.pl -text
 testing/MadBuild.py -text
 testing/MadBuildAndTest.pl -text

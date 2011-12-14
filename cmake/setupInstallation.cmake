@@ -41,8 +41,12 @@ INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt
 # In case we are on Linux we install syntax file for Kate
 # Only in case of devel version, so packages don't conflict...
 IF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  INSTALL(FILES ${CMAKE_SOURCE_DIR}/cmake/madx.xml
-    DESTINATION "share/apps/katepart/syntax/")
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/syntax/kate/madx.xml
+    DESTINATION "share/apps/katepart/syntax/"
+    OPTIONAL)
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/syntax/vim/madx.vim
+    DESTINATION "share/vim/vimfiles/syntax/"
+    OPTIONAL)
 ENDIF(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00 AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
 if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
   INSTALL(CODE " 
