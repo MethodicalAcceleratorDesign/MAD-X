@@ -12,7 +12,9 @@
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text
+cmake/Copyright.txt -text
 cmake/FindGSL.cmake -text
+cmake/FindLAPACK.cmake -text
 cmake/FindSDDS.cmake -text
 cmake/MadX.icns -text svneol=unset#unset
 cmake/README -text
