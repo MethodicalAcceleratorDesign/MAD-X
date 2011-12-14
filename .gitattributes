@@ -53,6 +53,7 @@ lib64/libmdblib.a -text
 lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
+/madx.vim -text
 make/README -text
 make/README.lxplus -text
 make/README.windows -text
