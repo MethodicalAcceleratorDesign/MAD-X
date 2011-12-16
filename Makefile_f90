@@ -151,6 +151,7 @@ endif
 #
 
 ifeq ($(MAKE_RESTARTS),)
+ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
 FCVER  := $(word 4, $(shell $(FC) --version))
 FCVERL := $(subst ., ,$(FCVER))
@@ -163,6 +164,7 @@ ifeq ($(and $(FCVER1),$(FCVER2)),)
 $(warning MAD-X requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
 FC     := gfortran44
 FCNAME := gfortran
+endif
 endif
 endif
 endif
