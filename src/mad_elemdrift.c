@@ -1,6 +1,6 @@
 #include "madx.h"
 
-struct element*
+static struct element*
 get_drift(double length)
   /* makes a drift space with the required length */
 {
@@ -25,30 +25,29 @@ get_drift(double length)
 int
 add_drifts(struct node* c_node, struct node* end)
 {
+  const double tol = 1e-6;
   struct node *d1;
   struct element *drift;
   double pos, dl, el2;
   int cnt = 0;
-  pos = c_node->position
-    - c_node->length / two;
+  pos = c_node->position - c_node->length / 2;
   while (c_node != NULL)
   {
     cnt++;
-    el2 = c_node->length / two;
+    el2 = c_node->length / 2;
     dl = c_node->position - el2 - pos;
-    if (dl + ten_m_6 < zero)
+    if (dl + tol < 0)
     {
-      sprintf(c_dum->c, " %s and %s, length %e", c_node->previous->name,
-              c_node->name, dl);
+      sprintf(c_dum->c, " %s and %s, length %e", c_node->previous->name, c_node->name, dl);
       fatal_error("negative drift between elements", c_dum->c);
     }
-    else if (dl > ten_m_6)
+    else if (dl > tol)
     {
       cnt++;
       drift = get_drift(dl);
       d1 = new_elem_node(drift, 0);
       link_in_front(d1, c_node);
-      d1->position = pos + dl / two;
+      d1->position = pos + dl / 2;
     }
     pos = c_node->position + el2;
     if (c_node == end) break;
