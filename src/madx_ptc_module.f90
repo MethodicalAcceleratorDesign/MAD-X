@@ -2104,7 +2104,7 @@ CONTAINS
     integer i,ios
     logical(lp) ostat, fexist,option
     logical fexist1, ostat1
-    character*20 faction,faccess,fform,fwstat
+    character*20 faction,faccess,fform,fwstat,fposition
     character*255 fname
     inquire(err=1,iostat=ios,&
          unit=i,opened=ostat1,exist=fexist1,write=fwstat)
@@ -2113,9 +2113,9 @@ CONTAINS
     if (.not.ostat.or..not.fexist.or.fwstat.ne.'YES') return
     inquire(err=2,iostat=ios,&
          unit=i,action=faction,access=faccess,&
-         form=fform,name=fname)
+         form=fform,name=fname,position=fposition)
     close (unit=i,err=3)
-    !     write (*,*) 'Re-opening ',i,' ',faction,faccess,fform,fname
+    !     write (*,*) 'Re-opening ',i,' ',option,ios,faction,faccess,fform,fposition,fname
     if (option) then
        open(err=4,iostat=ios,&
             unit=i,action=faction,access=faccess,form=fform,&
@@ -2123,7 +2123,7 @@ CONTAINS
     else
        open(err=4,iostat=ios,&
             unit=i,action=faction,access=faccess,form=fform,&
-            file=fname,status='old',position='rewind')
+            file=fname,status='replace',position='rewind')
     endif
     return
 1   write (*,*)&
