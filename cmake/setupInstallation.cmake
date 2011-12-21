@@ -7,14 +7,6 @@ SET (CMAKE_Fortran_MODULE_DIRECTORY
     ${PROJECT_BINARY_DIR}/bin/fortran CACHE PATH "Single Directory for all fortran modules."
 )
 
-set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/madx${BINARY_POSTFIX}")  # paths to executables
-set(DIRS "")
-
-if(APPLE)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}.app")  # paths to executables
-  set(DIRS "")
-endif(APPLE)
-
 # we only install the library in the development version so packages don't conflict...
 if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
   set(mtargets madxbin madx)
@@ -40,10 +32,14 @@ endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
     DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}"
     COMPONENT Files)
-if(APPLE) # I don't think this is supposed to have a function on GNU/Linux systems?
+if(APPLE)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}")  # paths to executables
+  set(DIRS "")
   INSTALL(CODE " 
     include(BundleUtilities) 
-    fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
+    fixup_bundle(\"${APPS}.app\"   \"\"   \"${DIRS}\")
+    execute_process(COMMAND mv \"${APPS}.app/Contents\" \"${APPS}\"  )
+    execute_process(COMMAND rm -rf \"${APPS}.app\" \"\${CMAKE_INSTALL_PREFIX}/lib\" )
     " COMPONENT Runtime) 
 endif(APPLE)
 
