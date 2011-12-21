@@ -23,27 +23,29 @@ else(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 
 INSTALL(TARGETS ${mtargets} 
-  BUNDLE DESTINATION .
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  BUNDLE DESTINATION . COMPONENT Runtime
+  RUNTIME DESTINATION bin COMPONENT Runtime
+  LIBRARY DESTINATION lib COMPONENT Libraries
+  ARCHIVE DESTINATION lib COMPONENT Libraries
 )
 
 # This installs the header files to <prefix>/include/madX
 # We only want this in the development version...
 if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 INSTALL (FILES ${headerfiles} 
-  DESTINATION "include/${PROJECT_NAME}")
+  DESTINATION "include/${PROJECT_NAME}"
+  COMPONENT Files)
 endif(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
 
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
-    DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}")
-if(APPLE OR WIN32) # I don't think this is supposed to have a function on GNU/Linux systems?
+    DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}"
+    COMPONENT Files)
+if(APPLE) # I don't think this is supposed to have a function on GNU/Linux systems?
   INSTALL(CODE " 
     include(BundleUtilities) 
     fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\") 
     " COMPONENT Runtime) 
-endif(APPLE OR WIN32)
+endif(APPLE)
 
 # CPACK stuff
  # build a CPack driven installer package
