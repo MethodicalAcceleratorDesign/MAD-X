@@ -7,7 +7,6 @@ struct node;
 struct sequence;
 struct expression;
 struct command;
-struct command_parameter;
 
 struct constraint /* contains one constraint */
 {
@@ -32,23 +31,21 @@ struct constraint_list /* contains list of constraints */
 
 // interface
 
-void add_to_constraint_list(struct constraint* cs, struct constraint_list* cl);
-struct constraint* make_constraint(int type, struct command_parameter* par);
-struct constraint* new_constraint(int type);
-struct constraint_list* new_constraint_list(int length);
-struct constraint* delete_constraint(struct constraint* cst);
-struct constraint_list* delete_constraint_list(struct constraint_list* cl);
-void  dump_constraint(struct constraint* c);
-void  dump_constraint_list(struct constraint_list* cl);
-void  grow_constraint_list(struct constraint_list* p);
-void  fill_constraint_list(int type, struct command* cd, struct constraint_list* cl);
-void  update_sequ_constraints(struct sequence* sequ, struct constraint_list* cl);
-void  update_node_constraints(struct node* c_node, struct constraint_list* cl);
+struct constraint* delete_constraint(struct constraint*);   // used by mad_match.c
+void               dump_constraint(struct constraint*);     // used by mad_node.c
 
-int   constraint_name(char* name, int* name_l, int* index);
-int   next_constr_namepos(char* name);
-int   next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
-int   next_global(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
+struct constraint_list* new_constraint_list(int length);
+struct constraint_list* delete_constraint_list(struct constraint_list*);
+//void                  dump_constraint_list(struct constraint_list*);
+
+void fill_constraint_list(int type, struct command*, struct constraint_list*);
+void update_sequ_constraints(struct sequence*, struct constraint_list*);
+void update_node_constraints(struct node*, struct constraint_list*);
+
+int  constraint_name(char* name, int* name_l, int* index);
+int  next_constr_namepos(char* name);
+int  next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
+int  next_global(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
 
 #endif // MAD_CONST_H
 

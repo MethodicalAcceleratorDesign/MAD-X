@@ -1,5 +1,38 @@
 #include "madx.h"
 
+// public interface
+
+#if 0
+void
+set_command_par_string(char* parameter, struct command* cmd, char* val)
+{
+  char rout_name[] = "set_command_par_string";
+  struct command_parameter* cp;
+  int i, new_len;
+
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
+  {
+    cp = cmd->par->parameters[i];
+    if (cp->type == 3)
+    {
+      int len = strlen(cp->string);
+      new_len = strlen(val);
+
+      if(len < new_len)
+      {
+        myfree(rout_name,cp->string);
+        cp->string = (char*) mymalloc(rout_name,new_len);
+      }
+
+      strcpy(cp->string,val);
+
+      if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
+      cmd->par_names->inform[i] = 1; /* mark as set */
+    }
+  }
+}
+#endif
+
 struct command_parameter*
 clone_command_parameter(struct command_parameter* p)
 {
@@ -85,14 +118,13 @@ struct command_parameter_list*
 delete_command_parameter_list(struct command_parameter_list* parl)
 {
   char rout_name[] = "delete_command_parameter_list";
-  int i;
   if (parl == NULL) return NULL;
   if (stamp_flag && parl->stamp != 123456)
     fprintf(stamp_file, "d_c_p_l double delete --> %s\n", parl->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", parl->name);
   if (parl->parameters != NULL)
   {
-    for (i = 0; i < parl->curr; i++)
+    for (int i = 0; i < parl->curr; i++)
     {
       if (parl->parameters[i] != NULL)
       {
@@ -275,47 +307,6 @@ export_comm_par(struct command_parameter* par, char* string)
   }
 }
 
-double
-get_value(char* name, char* par)
-  /* this function is used by fortran to get the parameters values
-     returns parameter value "par" for command or store "name" if present,
-     else INVALID */
-{
-  struct name_list* nl = NULL;
-  mycpy(c_dum->c, name);
-  mycpy(aux_buff->c, par);
-  if (strcmp(c_dum->c, "beam") == 0)
-    return command_par_value(aux_buff->c, current_beam);
-  else if (strcmp(c_dum->c, "probe") == 0)
-    return command_par_value(aux_buff->c, probe_beam);
-  else if (strcmp(c_dum->c, "survey") == 0)
-  {
-    if (current_survey != NULL) nl = current_survey->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
-      return command_par_value(aux_buff->c, current_survey);
-    else return zero;
-  }
-  else if (strcmp(c_dum->c, "twiss") == 0)
-  {
-    if (current_twiss != NULL) nl = current_twiss->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
-      return command_par_value(aux_buff->c, current_twiss);
-    else return zero;
-  }
-  else if (strcmp(c_dum->c, "sequence") == 0)
-  {
-    if (strcmp(aux_buff->c, "l") == 0) return sequence_length(current_sequ);
-    else if (strcmp(aux_buff->c, "range_start") == 0)
-      return (current_sequ->range_start->position
-              - 0.5 * current_sequ->range_start->length);
-    else return INVALID;
-  }
-  else if (current_command != NULL
-           && strcmp(c_dum->c, current_command->name) == 0)
-    return command_par_value(aux_buff->c, current_command);
-  else return INVALID;
-}
-
 void
 check_table(char* string)
   /* replaces argument of "table" if any by a string variable */
@@ -409,35 +400,6 @@ add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int in
   cmd->par->parameters[cmd->par->curr]->double_value = par_value;
   add_to_name_list(par_name,inf,cmd->par_names);
   cmd->par->curr++;
-}
-
-void
-set_command_par_string(char* parameter, struct command* cmd, char* val)
-{
-  char rout_name[] = "set_command_par_string";
-  struct command_parameter* cp;
-  int i, new_len;
-
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
-    if (cp->type == 3)
-    {
-      int len = strlen(cp->string);
-      new_len = strlen(val);
-
-      if(len < new_len)
-      {
-        myfree(rout_name,cp->string);
-        cp->string = (char*) mymalloc(rout_name,new_len);
-      }
-
-      strcpy(cp->string,val);
-
-      if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
-      cmd->par_names->inform[i] = 1; /* mark as set */
-    }
-  }
 }
 
 double
@@ -727,146 +689,6 @@ fill_par_var_list(struct el_list* ell, struct command_parameter* par, struct var
 }
 
 int
-get_vector(char* name, char* par, double* vector)
-  /* returns double "vector" for "par" of command or store "name";
-     length is returned as function value (0 if not found) */
-{
-  mycpy(c_dum->c, name);
-  mycpy(aux_buff->c, par);
-  if (strcmp(c_dum->c, "threader") == 0)
-    return command_par_vector(aux_buff->c, threader_par, vector);
-  else return 0;
-}
-
-char* type_ofCall
-alias(char* par_string) /* returns main parameter for alias */
-{
-  if (strcmp(par_string, "filename") == 0)  return file_string;
-  else if(strcmp(par_string, "true_") == 0) return vrai;
-  else if(strcmp(par_string, "false_") == 0) return faux;
-  else return par_string;
-}
-
-int
-get_string(char* name, char* par, char* string)
-  /* returns string for  value "par" of command or store "name" if present,
-     length = string length, else length = 0 if not present */
-{
-  struct name_list* nl = NULL;
-  struct command* cmd;
-  char* p;
-  int length = 0;
-  mycpy(c_dum->c, name);
-  if (strcmp(c_dum->c, "beam") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if ((p = command_par_string(c_dum->c, current_beam)) != NULL)
-    {
-      strcpy(string, p); length = strlen(p);
-    }
-  }
-  else if (strcmp(c_dum->c, "probe") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if ((p = command_par_string(c_dum->c, probe_beam)) != NULL)
-    {
-      strcpy(string, p); length = strlen(p);
-    }
-  }
-  else if (strcmp(c_dum->c, "survey") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if (current_survey != NULL) nl = current_survey->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
-    {
-      if ((p = command_par_string(c_dum->c, current_survey)) != NULL)
-      {
-        strcpy(string, p); length = strlen(p);
-      }
-    }
-  }
-  /*else if (strcmp(c_dum->c, "ptc") == 0)
-    {
-    mycpy(c_dum->c, par);
-    if (current_ptc != NULL) nl = current_ptc->par_names;
-    if (nl != NULL )
-    {
-    if ((p = command_par_string(c_dum->c, current_ptc)) != NULL)
-    {
-    strcpy(string, p); length = strlen(p);
-    }
-    }
-    }  */
-  else if (strcmp(c_dum->c, "twiss") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if (current_twiss != NULL) nl = current_twiss->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
-    {
-      if ((p = command_par_string(c_dum->c, current_twiss)) != NULL)
-      {
-        strcpy(string, p); length = strlen(p);
-      }
-    }
-  }
-  else if (strcmp(c_dum->c, "sequence") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
-    {
-      p = current_sequ->name;
-      strcpy(string, p); length = strlen(p);
-    }
-  }
-  else if (strcmp(c_dum->c, "element") == 0)
-  {
-    mycpy(c_dum->c, par);
-    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
-    {
-      p = current_node->p_elem->name;
-      strcpy(string, p); length = strlen(p);
-    }
-  }
-  else
-  {
-/*     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);*/
-
-    cmd = find_command(c_dum->c, stored_commands);
-    if (cmd == NULL)
-    {
-      if (current_command != NULL)
-      {
-        if ( strcmp(c_dum->c, current_command->name) == 0)
-        {
-          cmd = current_command;
-        }
-      }
-    }
-
-    if (cmd != NULL)
-    {
-/*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
-      mycpy(c_dum->c, par);
-/*        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);*/
-      if ((p = command_par_string(c_dum->c, cmd)) != NULL)
-      {
-        strcpy(string, p); length = strlen(p);
-      }
-      else
-      {
-        printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
-      }
-    }
-
-    else
-    {
-      printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
-    }
-  }
-  return length;
-}
-
-int
 par_present(char* par, struct command* cmd, struct command_list* c_list)
   /* returns 1 if in cmd or in c_list par is read, else returns 0 */
 {
@@ -891,25 +713,6 @@ par_present(char* par, struct command* cmd, struct command_list* c_list)
 }
 
 void
-set_value(char* name, char* par, double* value)
-  /* sets parameter value "par" for command or store "name" if present */
-{
-  mycpy(c_dum->c, name);
-  mycpy(aux_buff->c, par);
-  if (strcmp(c_dum->c, "beam") == 0)
-    set_command_par_value(aux_buff->c, current_beam, *value);
-  else if (strcmp(c_dum->c, "probe") == 0)
-    set_command_par_value(aux_buff->c, probe_beam, *value);
-  else if (strcmp(c_dum->c, "survey") == 0)
-    set_command_par_value(aux_buff->c, current_survey, *value);
-  else if (strcmp(c_dum->c, "twiss") == 0)
-    set_command_par_value(aux_buff->c, current_twiss, *value);
-  else if (current_command != NULL
-           && strcmp(c_dum->c, current_command->name) == 0)
-    set_command_par_value(aux_buff->c, current_command, *value);
-}
-
-void type_ofCall
 comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths)
   /* returns the value for command parameter "name" being either
      one or several integers (including logicals),
@@ -1266,4 +1069,207 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   if (expr != NULL) delete_expression(expr);
   return tot_end;
 }
+
+char*
+alias(char* par_string) /* returns main parameter for alias */
+{
+  if (strcmp(par_string, "filename") == 0)  return file_string;
+  else if(strcmp(par_string, "true_") == 0) return vrai;
+  else if(strcmp(par_string, "false_") == 0) return faux;
+  else return par_string;
+}
+
+// public interface (used by Fortran)
+
+double
+get_value(char* name, char* par)
+  /* this function is used by fortran to get the parameters values
+     returns parameter value "par" for command or store "name" if present,
+     else INVALID */
+{
+  struct name_list* nl = NULL;
+  mycpy(c_dum->c, name);
+  mycpy(aux_buff->c, par);
+  if (strcmp(c_dum->c, "beam") == 0)
+    return command_par_value(aux_buff->c, current_beam);
+  else if (strcmp(c_dum->c, "probe") == 0)
+    return command_par_value(aux_buff->c, probe_beam);
+  else if (strcmp(c_dum->c, "survey") == 0)
+  {
+    if (current_survey != NULL) nl = current_survey->par_names;
+    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
+      return command_par_value(aux_buff->c, current_survey);
+    else return zero;
+  }
+  else if (strcmp(c_dum->c, "twiss") == 0)
+  {
+    if (current_twiss != NULL) nl = current_twiss->par_names;
+    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
+      return command_par_value(aux_buff->c, current_twiss);
+    else return zero;
+  }
+  else if (strcmp(c_dum->c, "sequence") == 0)
+  {
+    if (strcmp(aux_buff->c, "l") == 0) return sequence_length(current_sequ);
+    else if (strcmp(aux_buff->c, "range_start") == 0)
+      return (current_sequ->range_start->position
+              - 0.5 * current_sequ->range_start->length);
+    else return INVALID;
+  }
+  else if (current_command != NULL
+           && strcmp(c_dum->c, current_command->name) == 0)
+    return command_par_value(aux_buff->c, current_command);
+  else return INVALID;
+}
+
+int
+get_vector(char* name, char* par, double* vector)
+  /* returns double "vector" for "par" of command or store "name";
+     length is returned as function value (0 if not found) */
+{
+  mycpy(c_dum->c, name);
+  mycpy(aux_buff->c, par);
+  if (strcmp(c_dum->c, "threader") == 0)
+    return command_par_vector(aux_buff->c, threader_par, vector);
+  else return 0;
+}
+
+int
+get_string(char* name, char* par, char* string)
+  /* returns string for  value "par" of command or store "name" if present,
+     length = string length, else length = 0 if not present */
+{
+  struct name_list* nl = NULL;
+  struct command* cmd;
+  char* p;
+  int length = 0;
+  mycpy(c_dum->c, name);
+  if (strcmp(c_dum->c, "beam") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if ((p = command_par_string(c_dum->c, current_beam)) != NULL)
+    {
+      strcpy(string, p); length = strlen(p);
+    }
+  }
+  else if (strcmp(c_dum->c, "probe") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if ((p = command_par_string(c_dum->c, probe_beam)) != NULL)
+    {
+      strcpy(string, p); length = strlen(p);
+    }
+  }
+  else if (strcmp(c_dum->c, "survey") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if (current_survey != NULL) nl = current_survey->par_names;
+    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
+    {
+      if ((p = command_par_string(c_dum->c, current_survey)) != NULL)
+      {
+        strcpy(string, p); length = strlen(p);
+      }
+    }
+  }
+  /*else if (strcmp(c_dum->c, "ptc") == 0)
+    {
+    mycpy(c_dum->c, par);
+    if (current_ptc != NULL) nl = current_ptc->par_names;
+    if (nl != NULL )
+    {
+    if ((p = command_par_string(c_dum->c, current_ptc)) != NULL)
+    {
+    strcpy(string, p); length = strlen(p);
+    }
+    }
+    }  */
+  else if (strcmp(c_dum->c, "twiss") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if (current_twiss != NULL) nl = current_twiss->par_names;
+    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
+    {
+      if ((p = command_par_string(c_dum->c, current_twiss)) != NULL)
+      {
+        strcpy(string, p); length = strlen(p);
+      }
+    }
+  }
+  else if (strcmp(c_dum->c, "sequence") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
+    {
+      p = current_sequ->name;
+      strcpy(string, p); length = strlen(p);
+    }
+  }
+  else if (strcmp(c_dum->c, "element") == 0)
+  {
+    mycpy(c_dum->c, par);
+    if (current_sequ != NULL && strcmp(c_dum->c, "name") == 0)
+    {
+      p = current_node->p_elem->name;
+      strcpy(string, p); length = strlen(p);
+    }
+  }
+  else
+  {
+/*     printf("<madxp.c: get_string>: Looking for command %s \n",c_dum->c);*/
+
+    cmd = find_command(c_dum->c, stored_commands);
+    if (cmd == NULL)
+    {
+      if (current_command != NULL)
+      {
+        if ( strcmp(c_dum->c, current_command->name) == 0)
+        {
+          cmd = current_command;
+        }
+      }
+    }
+
+    if (cmd != NULL)
+    {
+/*        printf("<madxp.c: get_string>: Found command %s \n",c_dum->c);*/
+      mycpy(c_dum->c, par);
+/*        printf("<madxp.c: get_string>: Looking for parameter %s \n",c_dum->c);*/
+      if ((p = command_par_string(c_dum->c, cmd)) != NULL)
+      {
+        strcpy(string, p); length = strlen(p);
+      }
+      else
+      {
+        printf("<madxp.c: get_string>: Did not found parameter %s \n",c_dum->c);
+      }
+    }
+
+    else
+    {
+      printf("<madxp.c: get_string>: Did not found command %s \n",c_dum->c);
+    }
+  }
+  return length;
+}
+
+void
+set_value(char* name, char* par, double* value)
+  /* sets parameter value "par" for command or store "name" if present */
+{
+  mycpy(c_dum->c, name);
+  mycpy(aux_buff->c, par);
+  if (strcmp(c_dum->c, "beam") == 0)
+    set_command_par_value(aux_buff->c, current_beam, *value);
+  else if (strcmp(c_dum->c, "probe") == 0)
+    set_command_par_value(aux_buff->c, probe_beam, *value);
+  else if (strcmp(c_dum->c, "survey") == 0)
+    set_command_par_value(aux_buff->c, current_survey, *value);
+  else if (strcmp(c_dum->c, "twiss") == 0)
+    set_command_par_value(aux_buff->c, current_twiss, *value);
+  else if (current_command != NULL
+           && strcmp(c_dum->c, current_command->name) == 0)
+    set_command_par_value(aux_buff->c, current_command, *value);
+}
+
 

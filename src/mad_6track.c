@@ -588,7 +588,7 @@ arr_print(double array[], int occ)
 #endif
 
 static void
-assign_att()
+assign_att(void)
 {
   struct c6t_element *el;
   int i, j;
@@ -1076,141 +1076,6 @@ conv_elem(void)
 }
 
 static void
-c6t_finish(void)
-{
-  char rout_name[] = "c6t_finish";
-  int i,j;
-  struct block* p;
-  /* remove elements and elements list */
-  for(i=0; i<types.curr; i++)
-  {
-    for(j=0; j<types.member[i]->curr; j++)
-    {
-      if (types.member[i]->elem[j]->value)
-        myfree(rout_name, types.member[i]->elem[j]->value);
-      if (types.member[i]->elem[j]->p_al_err &&
-          types.member[i]->elem[j]->do_not_free != 1)
-      {
-        if (types.member[i]->elem[j]->p_al_err->a_dble)
-          myfree(rout_name, types.member[i]->elem[j]->p_al_err->a_dble);
-        myfree(rout_name, types.member[i]->elem[j]->p_al_err);
-        types.member[i]->elem[j]->p_al_err = NULL;
-      }
-      if (types.member[i]->elem[j]->p_fd_err &&
-          types.member[i]->elem[j]->do_not_free != 1)
-      {
-        if (types.member[i]->elem[j]->p_fd_err->a_dble)
-          myfree(rout_name, types.member[i]->elem[j]->p_fd_err->a_dble);
-        myfree(rout_name, types.member[i]->elem[j]->p_fd_err);
-        types.member[i]->elem[j]->p_fd_err = NULL;
-      }
-      myfree(rout_name, types.member[i]->elem[j]);
-      types.member[i]->elem[j]=NULL;
-    }
-    myfree(rout_name, types.member[i]);
-  }
-  types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL; last_in_sequ_org = NULL;
-  current_element=NULL;
-  /* remove blocks */
-  p = first_block;
-  while (p != NULL)
-  {
-    p = p->next;
-    if (p) myfree(rout_name, p->previous);
-  }
-  first_block = NULL; last_block=NULL; prev_block=NULL;
-  current_block = NULL;
-  /* remove split_list */
-  if (split_list)
-  {
-    myfree(rout_name, split_list); split_list = NULL;
-  }
-  /* clear acro_cnt and acro_list */
-  for(i=0; i<20; i++)
-  {
-    acro_list[i]='\0';
-    acro_cnt[i]=0;
-  }
-  /* remember that this is not the first time we run */
-  virgin_c6t=0;
-
-  /* added by LD 2011-10-18 */
-  if (f2) { fclose(f2); f2 = 0; }
-  if (f3) { fclose(f3); f3 = 0; }
-  if (f3aux) { fclose(f3aux); f3aux = 0; }
-  if (f3matrix) { fclose(f3matrix); f3matrix = 0; }
-  if (f3aper) { fclose(f3aper); f3aper = 0; }
-  if (f8) { fclose(f8); f8 = 0; }
-  if (f16) { fclose(f16); f16 = 0; }
-  if (f34) { fclose(f34); f34 = 0; }
-}
-
-static void
-c6t_init(void)
-{
-  int j;
-  char rout_name[] = "c6t_init";
-
-  if (virgin_c6t)
-  {
-    p_err_zero = make_obj("zero_errors", 0, FIELD_MAX, 0, 0);
-    for (j = 0; j < FIELD_MAX; j++)
-    {
-      p_err_zero->a_dble[j]=0.0;
-    }
-
-    for (j = 0; j < N_TYPES; j++)
-    {
-      t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
-      sscanf(el_info[j],"%s%d%d%d%d%d%d",t_info[j]->name, &t_info[j]->flag_1,
-             &t_info[j]->flag_2, &t_info[j]->flag_3, &t_info[j]->flag_4,
-             &t_info[j]->flag_5, &t_info[j]->flag_6);
-    }
-  }
-  if (current_sequ == NULL)
-    fatal_error("c6t - no current sequence.","");
-  if (current_sequ->ex_start == NULL)
-    fatal_error("c6t - sequence not expanded.","");
-  if (current_sequ->tw_table == NULL)
-    fatal_error("c6t - twiss table not found.","");
-  if (attach_beam(current_sequ) == 0)
-    fatal_error("c6t - sequence without beam command.","");
-
-  /* initialise everything */
-  block_count = 0;     /* current block count for naming */
-  elem_cnt = 0;        /* element count */
-  acro_occ = 0;        /* acro list occupation */
-  align_cnt = 0;       /* element with align errors count */
-  field_cnt = 0;       /* element with field errors count */
-  f3_cnt = 0;          /* f3 write flag */
-  f3aux_cnt = 0;       /* f3aux write flag */
-  f3_matrix_cnt = 0;   /* f3_matrix write flag */
-  f8_cnt = 0;          /* f8 write count */
-  f16_cnt = 0;         /* f16 write count */
-  f34_cnt = 0;         /* f34 write count */
-  special_flag = 1;    /* produce special output file from twiss */
-  aperture_flag = 0;   /* if 1 insert apertures into structure */
-  cavall_flag = 0;     /* if 0 lump all cavities into first */
-  radius_flag = 0;     /* change the default reference radius */
-  split_flag = 0;      /* if 1 keep zero multipoles after split */
-  multi_type = -1;     /* is set to multipole type if any found */
-  cavity_count = 0;    /* count cavities in output */
-
-  total_voltage = 0;
-  harmon = 0;
-
-  /* added by LD 2011-10-18 */
-  f2 = 0;
-  f3 = 0;
-  f3aux = 0;
-  f3matrix = 0;
-  f3aper = 0;
-  f8 = 0;
-  f16 = 0;
-  f34 = 0;
-}
-
-static void
 clean_c6t_element(struct c6t_element* cleanme)
 {
   int i;
@@ -1611,7 +1476,7 @@ dump_types(int flag)
 #endif
 
 static void
-equiv_elem()
+equiv_elem(void)
 {
   int i, j, k;
   struct c6t_element *el, *eln;
@@ -2272,35 +2137,6 @@ pre_multipole(struct c6t_element* el) /* pre-process multipoles */
     for (i = 0; i < el->nf_err; i++) el->p_fd_err->a_dble[i] = tmp_buff[i];
     for (i = 14; i < el->n_values; i++)  el->value[i] = zero;
   }
-}
-
-static void
-process_c6t(void)  /* steering routine */
-{
-  read_sequ();   /* from db read sequence, store all elements */
-  add_c6t_drifts();
-  conv_elem();   /* tag elements */
-  split();       /* convert to thin */
-  multi_loop();
-  supp_elem();   /* suppress/replace zero force, most markers,
-                    and possibly some cavities */
-  concat_drifts();
-  get_multi_refs();  /* get multipole flag */
-  equiv_elem();  /* find first equivalent for all elements */
-  post_multipoles();  /* give errors to all equiv. multipoles */
-  block_it();    /* group linear elements into blocks */
-  assign_att();  /* assign attributes + errors to all single elements */
-  mod_errors();  /* flip normal components */
-
-  write_all_el();
-  write_blocks();
-  write_struct();
-  write_f16_errors();
-  write_f34_special();
-  write_f3aux();
-  write_f3_matrix();
-  write_f3_aper();
-  write_f8_errors();
 }
 
 static void
@@ -3112,6 +2948,170 @@ my_table_row(struct table* table, char* name)
     }
   }
   return ret;
+}
+
+static void
+c6t_finish(void)
+{
+  char rout_name[] = "c6t_finish";
+  int i,j;
+  struct block* p;
+  /* remove elements and elements list */
+  for(i=0; i<types.curr; i++)
+  {
+    for(j=0; j<types.member[i]->curr; j++)
+    {
+      if (types.member[i]->elem[j]->value)
+        myfree(rout_name, types.member[i]->elem[j]->value);
+      if (types.member[i]->elem[j]->p_al_err &&
+          types.member[i]->elem[j]->do_not_free != 1)
+      {
+        if (types.member[i]->elem[j]->p_al_err->a_dble)
+          myfree(rout_name, types.member[i]->elem[j]->p_al_err->a_dble);
+        myfree(rout_name, types.member[i]->elem[j]->p_al_err);
+        types.member[i]->elem[j]->p_al_err = NULL;
+      }
+      if (types.member[i]->elem[j]->p_fd_err &&
+          types.member[i]->elem[j]->do_not_free != 1)
+      {
+        if (types.member[i]->elem[j]->p_fd_err->a_dble)
+          myfree(rout_name, types.member[i]->elem[j]->p_fd_err->a_dble);
+        myfree(rout_name, types.member[i]->elem[j]->p_fd_err);
+        types.member[i]->elem[j]->p_fd_err = NULL;
+      }
+      myfree(rout_name, types.member[i]->elem[j]);
+      types.member[i]->elem[j]=NULL;
+    }
+    myfree(rout_name, types.member[i]);
+  }
+  types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL; last_in_sequ_org = NULL;
+  current_element=NULL;
+  /* remove blocks */
+  p = first_block;
+  while (p != NULL)
+  {
+    p = p->next;
+    if (p) myfree(rout_name, p->previous);
+  }
+  first_block = NULL; last_block=NULL; prev_block=NULL;
+  current_block = NULL;
+  /* remove split_list */
+  if (split_list)
+  {
+    myfree(rout_name, split_list); split_list = NULL;
+  }
+  /* clear acro_cnt and acro_list */
+  for(i=0; i<20; i++)
+  {
+    acro_list[i]='\0';
+    acro_cnt[i]=0;
+  }
+  /* remember that this is not the first time we run */
+  virgin_c6t=0;
+
+  /* added by LD 2011-10-18 */
+  if (f2) { fclose(f2); f2 = 0; }
+  if (f3) { fclose(f3); f3 = 0; }
+  if (f3aux) { fclose(f3aux); f3aux = 0; }
+  if (f3matrix) { fclose(f3matrix); f3matrix = 0; }
+  if (f3aper) { fclose(f3aper); f3aper = 0; }
+  if (f8) { fclose(f8); f8 = 0; }
+  if (f16) { fclose(f16); f16 = 0; }
+  if (f34) { fclose(f34); f34 = 0; }
+}
+
+static void
+c6t_init(void)
+{
+  int j;
+  char rout_name[] = "c6t_init";
+
+  if (virgin_c6t)
+  {
+    p_err_zero = make_obj("zero_errors", 0, FIELD_MAX, 0, 0);
+    for (j = 0; j < FIELD_MAX; j++)
+    {
+      p_err_zero->a_dble[j]=0.0;
+    }
+
+    for (j = 0; j < N_TYPES; j++)
+    {
+      t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
+      sscanf(el_info[j],"%s%d%d%d%d%d%d",t_info[j]->name, &t_info[j]->flag_1,
+             &t_info[j]->flag_2, &t_info[j]->flag_3, &t_info[j]->flag_4,
+             &t_info[j]->flag_5, &t_info[j]->flag_6);
+    }
+  }
+  if (current_sequ == NULL)
+    fatal_error("c6t - no current sequence.","");
+  if (current_sequ->ex_start == NULL)
+    fatal_error("c6t - sequence not expanded.","");
+  if (current_sequ->tw_table == NULL)
+    fatal_error("c6t - twiss table not found.","");
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("c6t - sequence without beam command.","");
+
+  /* initialise everything */
+  block_count = 0;     /* current block count for naming */
+  elem_cnt = 0;        /* element count */
+  acro_occ = 0;        /* acro list occupation */
+  align_cnt = 0;       /* element with align errors count */
+  field_cnt = 0;       /* element with field errors count */
+  f3_cnt = 0;          /* f3 write flag */
+  f3aux_cnt = 0;       /* f3aux write flag */
+  f3_matrix_cnt = 0;   /* f3_matrix write flag */
+  f8_cnt = 0;          /* f8 write count */
+  f16_cnt = 0;         /* f16 write count */
+  f34_cnt = 0;         /* f34 write count */
+  special_flag = 1;    /* produce special output file from twiss */
+  aperture_flag = 0;   /* if 1 insert apertures into structure */
+  cavall_flag = 0;     /* if 0 lump all cavities into first */
+  radius_flag = 0;     /* change the default reference radius */
+  split_flag = 0;      /* if 1 keep zero multipoles after split */
+  multi_type = -1;     /* is set to multipole type if any found */
+  cavity_count = 0;    /* count cavities in output */
+
+  total_voltage = 0;
+  harmon = 0;
+
+  /* added by LD 2011-10-18 */
+  f2 = 0;
+  f3 = 0;
+  f3aux = 0;
+  f3matrix = 0;
+  f3aper = 0;
+  f8 = 0;
+  f16 = 0;
+  f34 = 0;
+}
+
+static void
+process_c6t(void)  /* steering routine */
+{
+  read_sequ();   /* from db read sequence, store all elements */
+  add_c6t_drifts();
+  conv_elem();   /* tag elements */
+  split();       /* convert to thin */
+  multi_loop();
+  supp_elem();   /* suppress/replace zero force, most markers,
+                    and possibly some cavities */
+  concat_drifts();
+  get_multi_refs();  /* get multipole flag */
+  equiv_elem();  /* find first equivalent for all elements */
+  post_multipoles();  /* give errors to all equiv. multipoles */
+  block_it();    /* group linear elements into blocks */
+  assign_att();  /* assign attributes + errors to all single elements */
+  mod_errors();  /* flip normal components */
+
+  write_all_el();
+  write_blocks();
+  write_struct();
+  write_f16_errors();
+  write_f34_special();
+  write_f3aux();
+  write_f3_matrix();
+  write_f3_aper();
+  write_f8_errors();
 }
 
 // public interface

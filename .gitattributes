@@ -155,8 +155,6 @@ src/mad_const.c -text
 src/mad_const.h -text
 src/mad_core.c -text
 src/mad_core.h -text
-src/mad_cst.c -text
-src/mad_cst.h -text
 src/mad_def.h -text
 src/mad_dict.c -text
 src/mad_dict.h -text

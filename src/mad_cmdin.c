@@ -1,5 +1,21 @@
 #include "madx.h"
 
+#if 0 // not used...
+static void
+dump_in_cmd(struct in_cmd* p_inp)
+{
+  fprintf(prt_file, "%s: type =%d, sub_type = %d, decl_start = %d\n",
+          p_inp->label, p_inp->type, p_inp->sub_type, p_inp->decl_start);
+  if (p_inp->cmd_def != NULL)
+  {
+    fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
+    /* dump_command(p_inp->cmd_def); */
+  }
+}
+#endif
+
+// public interface
+
 struct in_cmd*
 buffered_cmd(struct in_cmd* cmd)
   /* returns a buffered command if found */
@@ -84,46 +100,44 @@ grow_in_cmd_list(struct in_cmd_list* p)
 }
 
 void
-dump_in_cmd(struct in_cmd* p_inp)
+scan_in_cmd(struct in_cmd* cmd)
+  /* reads a command into a clone of the original */
 {
-  fprintf(prt_file, "%s: type =%d, sub_type = %d, decl_start = %d\n",
-          p_inp->label, p_inp->type, p_inp->sub_type, p_inp->decl_start);
-  if (p_inp->cmd_def != NULL)
+  int cnt = 0, /* gives position in command (from 1) */
+      i, k, log, n;
+  struct name_list* nl = cmd->clone->par_names;
+  for (i = 0; i < nl->curr; i++) nl->inform[i] = 0; /* set when read */
+  n = cmd->tok_list->curr;
+  i = cmd->decl_start;
+  cmd->tok_list->p[n] = blank;
+  while (i < n)
   {
-    fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
-    /* dump_command(p_inp->cmd_def); */
-  }
-}
-
-void
-print_value(struct in_cmd* cmd)
-{
-  char** toks = &cmd->tok_list->p[cmd->decl_start];
-  int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, type, nitem;
-  while (s_start < n)
-  {
-    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
-    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
+    log = 0;
+    if (i+1 < n && *cmd->tok_list->p[i] == '-')
     {
-      nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0)
-        fprintf(prt_file, v_format("%s = %F ;\n"),
-                spec_join(&toks[s_start], nitem), 
-                polish_value(deco, join(&toks[s_start], nitem)));
-      else
+      log = 1; i++;
+    }
+    if (*cmd->tok_list->p[i] != ',')
+    {
+      if ((k = name_list_pos(cmd->tok_list->p[i], cmd->cmd_def->par_names)) < 0)  /* try alias */
       {
-        warning("invalid expression:", spec_join(&toks[s_start], nitem));
-        return;
+        k = name_list_pos(alias(cmd->tok_list->p[i]), cmd->cmd_def->par_names);
+        if (k < 0)
+          fatal_error("illegal keyword:", cmd->tok_list->p[i]);
+        break;
       }
-      s_start = end+1;
-      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+      else if ((i = decode_par(cmd, i, n, k, log)) < 0)
+      {
+        fatal_error("illegal format near:", cmd->tok_list->p[-i]);
+        break;
+      }
+      cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
+      if (strcmp(cmd->tok_list->p[i], "true_") == 0
+          || strcmp(cmd->tok_list->p[i], "false_") == 0)
+         cmd->cmd_def->par->parameters[k]->double_value =
+	   cmd->clone->par->parameters[k]->double_value;
     }
-    else
-    {
-      warning("invalid expression:", spec_join(&toks[s_start], n));
-      return;
-    }
+    i++;
   }
 }
 

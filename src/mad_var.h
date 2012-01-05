@@ -8,6 +8,14 @@ struct command_list;
 struct expression;
 struct in_cmd;
 
+struct constant
+{
+  char name[NAME_L];
+  struct expression* exp;     /* pointer to defining expression (always) */
+  double value;
+  int stamp;
+};
+
 struct variable
 {
   char name[NAME_L];
@@ -37,6 +45,7 @@ struct var_list* new_var_list(int length);
 struct var_list* clone_var_list(struct var_list* vl);
 struct variable* delete_variable(struct variable* var);
 struct var_list* delete_var_list(struct var_list* varl);
+void    get_defined_constants(void);
 void    grow_var_list(struct var_list* p);
 void    dump_variable(struct variable* v);
 void    write_vars(struct var_list* varl, struct command_list* cl, FILE* file);
@@ -55,8 +64,7 @@ void    export_variable(struct variable* var, FILE* file);
 void    export_var_8(struct variable* var, FILE* file);
 int     predef_var(struct variable* var);
 void    print_global(double delta);
-int     next_vary(char* name, int* name_l, double* lower, double* upper, double* step, int* slope, double* opt);
-int     vary_name(char* name, int* name_l, int* index);
+// int     vary_name(char* name, int* name_l, int* index); // not used...
 
 #endif // MAD_VAR_H
 

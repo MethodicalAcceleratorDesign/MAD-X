@@ -1043,6 +1043,40 @@ match_tmatrix(struct in_cmd* cmd)
   (void)cmd;
 }
 
+int
+next_vary(char* name, int* name_l, double* lower, double* upper, double* step, int* slope, double* opt)
+  /* returns the next variable to be varied during match;
+     0 = none, else count */
+{
+  int i, pos, ncp, nbl, len;
+  double l_step;
+  char* v_name;
+  struct name_list* nl;
+  struct command* comm;
+  struct command_parameter_list* pl;
+  if (vary_cnt == stored_match_var->curr)
+  {
+    vary_cnt = 0; return 0;
+  }
+  comm = stored_match_var->commands[vary_cnt];
+  nl = comm->par_names;
+  pl = comm->par;
+  pos = name_list_pos("name", nl);
+  v_name = pl->parameters[pos]->string;
+  len = strlen(v_name);
+  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
+  nbl = *name_l - ncp;
+  strncpy(name, v_name, ncp);
+  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  *lower = command_par_value("lower", comm);
+  *upper = command_par_value("upper", comm);
+  if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;
+  *step = l_step;
+  *slope = command_par_value("slope", comm);
+  *opt = command_par_value("opt", comm);
+  return ++vary_cnt;
+}
+
 void
 match_vary(struct in_cmd* cmd)
 {

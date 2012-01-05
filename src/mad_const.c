@@ -1,14 +1,31 @@
 #include "madx.h"
 
-void
-add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
-  /* add constraint cs to the constraint list cl */
+static struct constraint*
+new_constraint(int type)
 {
-  if (cl->curr == cl->max) grow_constraint_list(cl);
-  cl->constraints[cl->curr++] = cs;
+  char rout_name[] = "new_constraint";
+  struct constraint* new = mycalloc(rout_name,1, sizeof(struct constraint));
+  strcpy(new->name, "constraint");
+  new->stamp = 123456;
+  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
+  new->type = type;
+  return new;
 }
 
-struct constraint*
+static void
+grow_constraint_list(struct constraint_list* p)
+{
+  char rout_name[] = "grow_constraint_list";
+  struct constraint** c_loc = p->constraints;
+  int new = 2*p->max;
+
+  p->max = new;
+  p->constraints = mycalloc(rout_name, new, sizeof(struct constraint*));
+  for (int j = 0; j < p->curr; j++) p->constraints[j] = c_loc[j];
+  myfree(rout_name, c_loc);
+}
+
+static struct constraint*
 make_constraint(int type, struct command_parameter* par)
   /* makes + stores a constraint from command parameter */
 {
@@ -46,18 +63,15 @@ make_constraint(int type, struct command_parameter* par)
   return new;
 }
 
-struct constraint*
-new_constraint(int type)
+static void
+add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
+  /* add constraint cs to the constraint list cl */
 {
-  char rout_name[] = "new_constraint";
-  struct constraint* new = (struct constraint*)
-    mycalloc(rout_name,1, sizeof(struct constraint));
-  strcpy(new->name, "constraint");
-  new->stamp = 123456;
-  if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
-  new->type = type;
-  return new;
+  if (cl->curr == cl->max) grow_constraint_list(cl);
+  cl->constraints[cl->curr++] = cs;
 }
+
+// public interface
 
 struct constraint_list*
 new_constraint_list(int length)
@@ -108,6 +122,7 @@ dump_constraint(struct constraint* c)
           c->name, c->type, c->value, c->c_min, c->c_max, c->weight);
 }
 
+#if 0 // not used...
 void
 dump_constraint_list(struct constraint_list* cl)
 {
@@ -117,20 +132,23 @@ dump_constraint_list(struct constraint_list* cl)
     if (cl->constraints[i]) dump_constraint(cl->constraints[i]);
   }
 }
+#endif
 
-void
-grow_constraint_list(struct constraint_list* p)
+#if 0 // not used...
+int
+constraint_name(char* name, int* name_l, int* index)
+  /* returns the name of the constraint */
 {
-  char rout_name[] = "grow_constraint_list";
-  struct constraint** c_loc = p->constraints;
-  int j, new = 2*p->max;
-
-  p->max = new;
-  p->constraints = (struct constraint**)
-    mycalloc(rout_name,new, sizeof(struct constraint*));
-  for (j = 0; j < p->curr; j++) p->constraints[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  int ncp, nbl, len;
+  struct constraint* c_c;
+  c_c = current_node->cl->constraints[*index];
+  len = strlen(c_c->name);
+  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
+  nbl = *name_l - ncp;
+  strncpy(name, c_c->name, ncp);
+  return 1;
 }
+#endif
 
 void
 fill_constraint_list(int type /* 1 node, 2 global */,
@@ -336,20 +354,6 @@ next_constr_namepos(char* name)
       pos = 11;
     }
   return pos;
-}
-
-int
-constraint_name(char* name, int* name_l, int* index)
-  /* returns the name of the constraint */
-{
-  int ncp, nbl, len;
-  struct constraint* c_c;
-  c_c = current_node->cl->constraints[*index];
-  len = strlen(c_c->name);
-  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
-  nbl = *name_l - ncp;
-  strncpy(name, c_c->name, ncp);
-  return 1;
 }
 
 int

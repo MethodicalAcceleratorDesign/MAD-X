@@ -1084,8 +1084,6 @@ aper_trim_ws(char* string, int len)
   if (c<len) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
 }
 
-
-
 static void
 aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
                   double* rtol, double* xtol, double* ytol,
@@ -1119,7 +1117,6 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
 
   augment_count(table);
 }
-
 
 static double
 aper_calc(double p, double q, double* minhl, double halox[], double haloy[],

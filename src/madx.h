@@ -39,7 +39,6 @@ typedef size_t uintptr_t;
 
 // types modules
 
-#include "mad_cst.h"
 #include "mad_var.h"
 #include "mad_name.h"
 #include "mad_expr.h"

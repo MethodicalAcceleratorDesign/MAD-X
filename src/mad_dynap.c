@@ -1,6 +1,6 @@
 #include "madx.h"
 
-void
+static void
 dynap_tables_create(struct in_cmd* cmd)
   /* creates the dynamic tables for DYNAP execution */
 {
@@ -13,10 +13,11 @@ dynap_tables_create(struct in_cmd* cmd)
   add_to_table_list(t, table_register);
   t = make_table("dynap", "dynap", dynap_table_cols, dynap_table_types, 10);
   add_to_table_list(t, table_register);
-  t = make_table("dynaptune", "dynaptune", dynaptune_table_cols,
-                 dynaptune_table_types, npart);
+  t = make_table("dynaptune", "dynaptune", dynaptune_table_cols, dynaptune_table_types, npart);
   add_to_table_list(t, table_register);
 }
+
+// public interface
 
 void
 track_dynap(struct in_cmd* cmd)
@@ -31,26 +32,22 @@ track_dynap(struct in_cmd* cmd)
     *buf7, *buf8, *buf9, *buf10, *buf11;
   struct table* t;
   int kopt01,kopt02;
-
-
+  
   kopt02=0;
   kopt01 = get_value("dynap","damp");
   if (kopt01 == 0) {
     kopt02=1;
-    fprintf(prt_file, "damp is on\n");}
+    fprintf(prt_file, "damp is on\n");
+  }
   set_option("damp", &kopt02);
-
-
 
   kopt02=0;
   kopt01 = get_value("dynap","quantum");
   if (kopt01 == 0) {
     kopt02=1;
-    fprintf(prt_file, "quantum is on\n");}
+    fprintf(prt_file, "quantum is on\n");
+  }
   set_option("quantum", &kopt02);
-
-
-
 
   if (track_is_on == 0)
   {
@@ -81,26 +78,25 @@ track_dynap(struct in_cmd* cmd)
   }
   dynap_tables_create(cmd);
   /* allocate buffers */
-  ibuf1 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf2 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf3 = (int*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(int));
-  buf1 = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf2 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf_dxt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf_dyt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf3 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf4 = (double*) mymalloc(rout_name,36*sizeof(double)); /* eigenvectors */
-  buf5 = (double*) mymalloc(rout_name,6*npart*(turns+1)*sizeof(double));
-  buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
-  buf7 = (double*) mymalloc(rout_name, turns*sizeof(double));
-  buf8 = (double*) mymalloc(rout_name, 6*turns*sizeof(double));
-  buf9 = (double*) mymalloc(rout_name, 2*turns*sizeof(double));
-  buf10 = (double*) mymalloc(rout_name, turns*sizeof(double));
-  buf11 = (double*) mymalloc(rout_name, turns*sizeof(double));
+  ibuf1 = mymalloc(rout_name,npart*sizeof(int));
+  ibuf2 = mymalloc(rout_name,npart*sizeof(int));
+  ibuf3 = mymalloc(rout_name, current_sequ->n_nodes*sizeof(int));
+  buf1 = mymalloc(rout_name,npart*sizeof(double));
+  buf2 = mymalloc(rout_name,6*npart*sizeof(double));
+  buf_dxt = mymalloc(rout_name,npart*sizeof(double));
+  buf_dyt = mymalloc(rout_name,npart*sizeof(double));
+  buf3 = mymalloc(rout_name,6*npart*sizeof(double));
+  buf4 = mymalloc(rout_name,36*sizeof(double)); /* eigenvectors */
+  buf5 = mymalloc(rout_name,6*npart*(turns+1)*sizeof(double));
+  buf6 = mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
+  buf7 = mymalloc(rout_name, turns*sizeof(double));
+  buf8 = mymalloc(rout_name, 6*turns*sizeof(double));
+  buf9 = mymalloc(rout_name, 2*turns*sizeof(double));
+  buf10 = mymalloc(rout_name, turns*sizeof(double));
+  buf11 = mymalloc(rout_name, turns*sizeof(double));
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
          buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
-  t =
-    table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
   print_table(t);
   if (e_flag)
   {

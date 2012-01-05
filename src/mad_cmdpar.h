@@ -49,40 +49,42 @@ struct command_parameter_list /* contains list of command parameter pointers */
 
 struct command_parameter*       new_command_parameter(char* name, int type);
 struct command_parameter_list*  new_command_parameter_list(int length);
-struct command_parameter*       clone_command_parameter(struct command_parameter* p);
-struct command_parameter*       delete_command_parameter(struct command_parameter* par);
-struct command_parameter_list*  delete_command_parameter_list(struct command_parameter_list* parl);
+struct command_parameter*       clone_command_parameter(struct command_parameter*);
+struct command_parameter*       delete_command_parameter(struct command_parameter*);
+struct command_parameter_list*  delete_command_parameter_list(struct command_parameter_list*);
+struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);
 
-int     get_string(char* name, char* par, char* string);
-double  get_value(char* name, char* par);
 void    check_table(char* string);
-struct expression* command_par_expr(char* parameter, struct command* cmd);
-double  command_par_special(char* parameter, struct element* el);
-char*   command_par_string(char* parameter, struct command* cmd);
-double  command_par_value(char* parameter, struct command* cmd);
-int     command_par_value2(char* parameter, struct command* cmd, double* val);
-struct double_array* command_par_array(char* parameter, struct command* cmd);
-int     command_par_vector(char* parameter, struct command* cmd, double* vector);
-void    set_command_par_string(char* parameter, struct command* cmd, char* val);
-void    set_command_par_value(char* parameter, struct command* cmd, double val);
-void    store_comm_par_value(char* parameter, double val, struct command* cmd);
-struct command_parameter* store_comm_par_def(char* toks[], int start, int end);
-char*   type_ofCall alias(char* par_string);
-void    fill_par_var_list(struct el_list* ell, struct command_parameter* par, struct var_list* varl);
+struct expression* command_par_expr(char* parameter, struct command*);
+double  command_par_special(char* parameter, struct element*);
+char*   command_par_string(char* parameter, struct command*);
+double  command_par_value(char* parameter, struct command*);
+int     command_par_value2(char* parameter, struct command*, double* val);
+struct double_array* command_par_array(char* parameter, struct command*);
+int     command_par_vector(char* parameter, struct command*, double* vector);
+void    set_command_par_value(char* parameter, struct command*, double val);
+void    store_comm_par_value(char* parameter, double val, struct command*);
+char*   alias(char* par_string);
+void    fill_par_var_list(struct el_list*, struct command_parameter*, struct var_list*);
 int     decode_par(struct in_cmd* cmd, int start, int number, int pos, int log);
-void    store_set(struct command* comm, int flag);
-void    dump_command_parameter(struct command_parameter* par);
-void    export_comm_par(struct command_parameter* par, char* string);
-void    grow_command_parameter_list(struct command_parameter_list* p);
-void    print_command_parameter(struct command_parameter* par);
-int     get_vector(char* name, char* par, double* vector);
-int     par_present(char* par, struct command* cmd, struct command_list* c_list);
-void    set_value(char* name, char* par, double* value);
-void    store_comm_par_vector(char* parameter, double* val, struct command* cmd);
-void    add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param,char* par_name,int inf);
-void    add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int inf);
+void    store_set(struct command*, int flag);
+void    dump_command_parameter(struct command_parameter*);
+void    export_comm_par(struct command_parameter*, char* string);
+void    grow_command_parameter_list(struct command_parameter_list*);
+void    print_command_parameter(struct command_parameter*);
+int     par_present(char* par, struct command*, struct command_list*);
+void    store_comm_par_vector(char* parameter, double* val, struct command*);
+void    add_cmd_parameter_clone(struct command*, struct command_parameter*,char* par_name,int inf);
+void    add_cmd_parameter_new(struct command*,double par_value,char* par_name,int inf);
+void    comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
 
-void type_ofCall comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
+// void    set_command_par_string(char* parameter, struct command*, char* val); // not used...
+
+// used by Fortran
+double  get_value (char* name, char* par);
+int     get_string(char* name, char* par, char* string);
+int     get_vector(char* name, char* par, double* vector);
+void    set_value (char* name, char* par, double* value);
 
 #endif // MAD_CMDPAR_H
 

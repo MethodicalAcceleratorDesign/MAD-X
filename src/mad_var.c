@@ -1,5 +1,14 @@
 #include "madx.h"
 
+void
+get_defined_constants(void)
+{
+  /* reads + stores the constants defined in madxdict.h */
+  supp_char('\n', constant_def);
+  pro_input(constant_def);
+  start_var = variable_list->curr;
+}
+
 struct variable*
 find_variable(char* name, struct var_list* varl)
 {
@@ -201,41 +210,6 @@ export_var_8(struct variable* var, FILE* file)
     strcat(c_dum->c, supp_tb(c_join->c));
   }
   write_nice_8(c_dum->c, file);
-}
-
-double
-get_variable(char* name)
-{
-  char comm[NAME_L];
-  char par[NAME_L];
-  double val = zero;
-  struct variable* var;
-  struct element* el;
-  struct command* cmd;
-  char *p, *n = c_dum->c, *q = comm;
-  mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
-  {
-    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
-      val = variable_value(var);
-  }
-  else /* element or command parameter */
-  {
-    while (n < p)  *(q++) = *(n++);
-    *q = '\0';
-    q = par; n++; n++;
-    while (*n != '\0')  *(q++) = *(n++);
-    *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      val = command_par_value(par, el->def);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      val = command_par_value(par, cmd);
-  }
-  return val;
 }
 
 char*
@@ -466,55 +440,6 @@ add_to_var_list( /* adds variable to alphabetic variable list */
 }
 
 void
-set_variable(char* name, double* value)
-{
-  /* sets variable name to value */
-  char comm[NAME_L];
-  char par[NAME_L];
-  struct variable* var;
-  double val = *value;
-  struct element* el;
-  struct command* cmd;
-  char *p, *n = c_dum->c, *q = comm;
-  mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
-  {
-    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
-    {
-      if (var->type == 0)
-        warning("ignored: attempt to redefine constant:", var->name);
-      else if (var->type < 3)
-      {
-        var->value = val;
-        var->type = 1;
-        if (var->expr != NULL)  var->expr = delete_expression(var->expr);
-      }
-    }
-    else
-    {
-      var = new_variable(c_dum->c, val, 1, 1, NULL, NULL);
-      add_to_var_list(var, variable_list, 1);
-    }
-  }
-  else /* element or command parameter */
-  {
-    while (n < p)  *(q++) = *(n++);
-    *q = '\0';
-    q = par; n++; n++;
-    while (*n != '\0')  *(q++) = *(n++);
-    *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      set_command_par_value(par, el->def, val);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
-      set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      set_command_par_value(par, cmd, val);
-  }
-}
-
-void
 set_stringvar(char* name, char* string)
 {
   /* sets variable name->string to string */
@@ -581,40 +506,7 @@ print_global(double delta)
          gamma, beta);
 }
 
-int
-next_vary(char* name, int* name_l, double* lower, double* upper, double* step, int* slope, double* opt)
-  /* returns the next variable to be varied during match;
-     0 = none, else count */
-{
-  int i, pos, ncp, nbl, len;
-  double l_step;
-  char* v_name;
-  struct name_list* nl;
-  struct command* comm;
-  struct command_parameter_list* pl;
-  if (vary_cnt == stored_match_var->curr)
-  {
-    vary_cnt = 0; return 0;
-  }
-  comm = stored_match_var->commands[vary_cnt];
-  nl = comm->par_names;
-  pl = comm->par;
-  pos = name_list_pos("name", nl);
-  v_name = pl->parameters[pos]->string;
-  len = strlen(v_name);
-  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
-  nbl = *name_l - ncp;
-  strncpy(name, v_name, ncp);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
-  *lower = command_par_value("lower", comm);
-  *upper = command_par_value("upper", comm);
-  if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;
-  *step = l_step;
-  *slope = command_par_value("slope", comm);
-  *opt = command_par_value("opt", comm);
-  return ++vary_cnt;
-}
-
+#if 0 // not used
 int
 vary_name(char* name, int* name_l, int* index)
   /* returns the variable name */
@@ -635,6 +527,7 @@ vary_name(char* name, int* name_l, int* index)
   strncpy(name, v_name, ncp);
   return 1;
 }
+#endif
 
 /*
 double
@@ -673,5 +566,89 @@ sss_variable(char* name)
 }
 */
 
+// public interface (used by Fortran)
 
+double
+get_variable(char* name)
+{
+  char comm[NAME_L];
+  char par[NAME_L];
+  double val = zero;
+  struct variable* var;
+  struct element* el;
+  struct command* cmd;
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      val = variable_value(var);
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if ((el = find_element(comm, element_list)) != NULL)
+      val = command_par_value(par, el->def);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      val = command_par_value(par, cmd);
+  }
+  return val;
+}
+
+void
+set_variable(char* name, double* value)
+{
+  /* sets variable name to value */
+  char comm[NAME_L];
+  char par[NAME_L];
+  struct variable* var;
+  double val = *value;
+  struct element* el;
+  struct command* cmd;
+  char *p, *n = c_dum->c, *q = comm;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+    {
+      if (var->type == 0)
+        warning("ignored: attempt to redefine constant:", var->name);
+      else if (var->type < 3)
+      {
+        var->value = val;
+        var->type = 1;
+        if (var->expr != NULL)  var->expr = delete_expression(var->expr);
+      }
+    }
+    else
+    {
+      var = new_variable(c_dum->c, val, 1, 1, NULL, NULL);
+      add_to_var_list(var, variable_list, 1);
+    }
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if ((el = find_element(comm, element_list)) != NULL)
+      set_command_par_value(par, el->def, val);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      set_command_par_value(par, cmd, val);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      set_command_par_value(par, cmd, val);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      set_command_par_value(par, cmd, val);
+  }
+}
 

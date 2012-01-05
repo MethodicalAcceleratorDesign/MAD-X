@@ -12,13 +12,14 @@
 #define FIELD_MAX 42        /* field error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 48           /* internal name length */
-#define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode (ETDA 24/06/2004) */
-#define PTC_NAMES_L 13      /* Number of ptc variables treated in select_ptc_normal (ETDA 10/11/2004)(FRS 06/12/2005) (FRS/VK 20/04/2006) */
+#define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode */
+#define PTC_NAMES_L 13      /* Number of ptc variables treated in select_ptc_normal */
 #define MAX_ROWS 101        /* Initial size of ptc_normal table */
 #define FNAME_L 240         /* for file names */
 
-#define AUX_LG 50000        /* initial size for ancillary buffers */
 #define INVALID 1.e20       /* used for erroneous value requests */
+
+#define AUX_LG 50000        /* initial size for ancillary buffers */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
 #define MAX_D_ITEM 30000    /* initial storage size for doubles */
 #define MAX_LINE 20000      /* max. input line length (has to stay fixed) */
@@ -39,7 +40,7 @@
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 #define MAXARRAY 1000       /* max. length of apex tables in aperture module*/
 #define DQ_DELTAP 1.e-6     /* deltap for difference calculation of chrom. */
-/* IA */
+
 #define E_D_MAX 500         /* max. length of extra displacement tables (per element) */
 #define E_D_LIST_CHUNK 1000  /* chunk to allocate memory for extra displacement tables */
 

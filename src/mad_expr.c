@@ -462,6 +462,38 @@ compound_expr(struct expression* e1, double v1, char* oper, struct expression* e
   return expr;
 }
 
+void
+print_value(struct in_cmd* cmd)
+{
+  char** toks = &cmd->tok_list->p[cmd->decl_start];
+  int n = cmd->tok_list->curr - cmd->decl_start;
+  int j, s_start = 0, end, type, nitem;
+  while (s_start < n)
+  {
+    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
+    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
+    {
+      nitem = end + 1 - s_start;
+      if (polish_expr(nitem, &toks[s_start]) == 0)
+        fprintf(prt_file, v_format("%s = %F ;\n"),
+                spec_join(&toks[s_start], nitem), 
+                polish_value(deco, join(&toks[s_start], nitem)));
+      else
+      {
+        warning("invalid expression:", spec_join(&toks[s_start], nitem));
+        return;
+      }
+      s_start = end+1;
+      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+    }
+    else
+    {
+      warning("invalid expression:", spec_join(&toks[s_start], n));
+      return;
+    }
+  }
+}
+
 /* scale an expression by a number - or leave it NULL */
 struct expression*
 scale_expr(struct expression* expr,double scale)

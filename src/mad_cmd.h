@@ -41,29 +41,29 @@ struct command_list_list /* contains list of command lists */
 
 // interface
 
-struct command*           new_command(char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8);
-struct command_list*      new_command_list(char* l_name, int length);
+struct command* new_command(char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8);
+struct command* delete_command(struct command*);
+struct command* clone_command(struct command*);
+struct command* find_command(char* name, struct command_list*);
+
+struct command_list* new_command_list(char* l_name, int length);
+struct command_list* delete_command_list(struct command_list* cl);
+struct command_list* find_command_list(char* name, struct command_list_list*);
+void                 grow_command_list(struct command_list*);
+void                 add_to_command_list(char* label, struct command*, struct command_list*, int flag);
+
 struct command_list_list* new_command_list_list(int length);
-struct command*           clone_command(struct command* p);
-struct command*           delete_command(struct command* cmd);
-struct command_list*      delete_command_list(struct command_list* cl);
-struct command_list_list* delete_command_list_list(struct command_list_list* ll);
+//struct command_list_list* delete_command_list_list(struct command_list_list*); // never used...
+void                      add_to_command_list_list(char* label, struct command_list*, struct command_list_list*);
+
 void    exec_command(void);
 int     decode_command(void);
-void    control(struct in_cmd* cmd);
+void    dump_command(struct command*);
+void    print_command(struct command*);
+void    store_command_def(char* cmd_string);  /* processes command definition */
 int     make_line(char* statement);
 int     get_stmt(FILE* file, int supp_flag);
-int     cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start);
-struct command* find_command(char* name, struct command_list* cl);
-struct command_list* find_command_list(char* name, struct command_list_list* sl);
-void    remove_from_command_list(char* label, struct command_list* list);
-void    store_command_def(char* cmd_string);  /* processes command definition */
 void    get_defined_commands(void);
-void    add_to_command_list(char* label, struct command* comm, struct command_list* cl, int flag);
-void    add_to_command_list_list(char* label, struct command_list* cl, struct command_list_list* sl);
-void    dump_command(struct command* cmd);
-void    grow_command_list(struct command_list* p);
-void    grow_command_list_list(struct command_list_list* p);
-void    print_command(struct command* cmd);
+void    remove_from_command_list(char* label, struct command_list*);
 
 #endif // MAD_CMD_H

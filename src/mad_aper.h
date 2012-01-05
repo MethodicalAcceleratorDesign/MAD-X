@@ -25,9 +25,9 @@ struct aper_e_d             /* element displacement */
 
 // interface
 
-double  get_apertol(struct node* node, char* par);
-double  get_aperture(struct node* node, char* par);
-void    pro_aperture(struct in_cmd* cmd);
+double  get_apertol(struct node* node, char* par);    // used by mad_table.c
+double  get_aperture(struct node* node, char* par);   // used by mad_table.c
+void    pro_aperture(struct in_cmd* cmd);             // used by mad_cmd.c
 struct aper_node* aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt);
 
 #endif // MAD_APER_H

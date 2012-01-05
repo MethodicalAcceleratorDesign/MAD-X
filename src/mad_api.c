@@ -12,11 +12,15 @@ madextern_get_sequence_list(void)
 {
     return sequences;
 }
-void madextern_end()
+
+void
+madextern_end(void)
 {
     madx_finish();
 }
-void madextern_input(char* ch) 
+
+void
+madextern_input(char* ch) 
 {
     stolower_nq(ch);
     pro_input(ch);

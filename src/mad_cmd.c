@@ -8,6 +8,92 @@ store_threader(struct in_cmd* cmd)
   dump_command(threader_par);
 }
 
+static int
+cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
+  /* matches input (user) command with the symbolic description
+     from the list in madxl.h and returns is type */
+{
+  int i, i2, j, k, lp;
+  for (i = 0; i < n_match; i++)
+  {
+    k = 0; lp = -1;
+    i2 = t_match[i];
+    for (j = s_match[i2]; j < s_match[i2+1]; j++)
+    {
+      if (k == cnt)  break;
+      if (*cmd_match_base[j] == '@')
+      {
+        if (strcmp(cmd_match_base[j], "@cmd") == 0)
+        {
+          if ((lp = name_list_pos(toks[k],
+                                  defined_commands->list)) < 0) break;
+        }
+        else if (isalpha(*toks[k]) == 0) break;
+      }
+      else if (strcmp(cmd_match_base[j], toks[k]) != 0)  break;
+      k++;
+    }
+
+    if (j == s_match[i2+1]) goto found;
+  }
+  return -3;
+  found:
+  *cmd_pos = lp; *decl_start = s_match[i2+1] - s_match[i2];
+
+
+  return i2;
+}
+
+static void
+grow_command_list_list(struct command_list_list* p)
+{
+  char rout_name[] = "grow_command_list_list";
+  struct command_list** c_loc = p->command_lists;
+  int new = 2*p->max;
+
+  p->max = new;
+  p->command_lists = mycalloc(rout_name,new, sizeof(struct command_list*));
+  for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
+  myfree(rout_name, c_loc);
+}
+
+static void
+control(struct in_cmd* cmd)
+  /* executes so-called "control" commands */
+{
+  char** toks = cmd->tok_list->p;
+  int k = cmd->decl_start - 1;
+  if      (strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
+  else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
+  else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
+  else if (strcmp(toks[k], "option")      == 0) exec_option();
+  else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
+  else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
+  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
+  else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
+  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
+  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
+  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
+  else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
+  else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
+  else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
+  else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
+  else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
+  else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
+  else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
+  else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
+  else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
+  else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
+  else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
+  else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
+  else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
+  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
+  puts("++++++++++++++ command skipped in parser version");
+  /* insert your proper command action here */
+}
+
+// public interface
+
 void
 exec_command(void)
   /* executes one command */
@@ -366,85 +452,6 @@ get_defined_commands(void)
 }
 
 int
-cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
-  /* matches input (user) command with the symbolic description
-     from the list in madxl.h and returns is type */
-{
-  int i, i2, j, k, lp;
-  for (i = 0; i < n_match; i++)
-  {
-    k = 0; lp = -1;
-    i2 = t_match[i];
-    for (j = s_match[i2]; j < s_match[i2+1]; j++)
-    {
-      if (k == cnt)  break;
-      if (*cmd_match_base[j] == '@')
-      {
-        if (strcmp(cmd_match_base[j], "@cmd") == 0)
-        {
-          if ((lp = name_list_pos(toks[k],
-                                  defined_commands->list)) < 0) break;
-        }
-        else if (isalpha(*toks[k]) == 0) break;
-      }
-      else if (strcmp(cmd_match_base[j], toks[k]) != 0)  break;
-      k++;
-    }
-
-    if (j == s_match[i2+1]) goto found;
-  }
-  return -3;
-  found:
-  *cmd_pos = lp; *decl_start = s_match[i2+1] - s_match[i2];
-
-
-  return i2;
-}
-
-void
-scan_in_cmd(struct in_cmd* cmd)
-  /* reads a command into a clone of the original */
-{
-  int cnt = 0, /* gives position in command (from 1) */
-      i, k, log, n;
-  struct name_list* nl = cmd->clone->par_names;
-  for (i = 0; i < nl->curr; i++) nl->inform[i] = 0; /* set when read */
-  n = cmd->tok_list->curr;
-  i = cmd->decl_start;
-  cmd->tok_list->p[n] = blank;
-  while (i < n)
-  {
-    log = 0;
-    if (i+1 < n && *cmd->tok_list->p[i] == '-')
-    {
-      log = 1; i++;
-    }
-    if (*cmd->tok_list->p[i] != ',')
-    {
-      if ((k = name_list_pos(cmd->tok_list->p[i],
-                             cmd->cmd_def->par_names)) < 0)  /* try alias */
-      {
-        k = name_list_pos(alias(cmd->tok_list->p[i]), cmd->cmd_def->par_names);
-        if (k < 0)
-          fatal_error("illegal keyword:", cmd->tok_list->p[i]);
-        break;
-      }
-      else if ((i = decode_par(cmd, i, n, k, log)) < 0)
-      {
-        fatal_error("illegal format near:", cmd->tok_list->p[-i]);
-        break;
-      }
-      cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
-      if (strcmp(cmd->tok_list->p[i], "true_") == 0
-          || strcmp(cmd->tok_list->p[i], "false_") == 0)
-         cmd->cmd_def->par->parameters[k]->double_value =
-	   cmd->clone->par->parameters[k]->double_value;
-    }
-    i++;
-  }
-}
-
-int
 make_line(char* statement)
   /* makes a new line from input command, stores name in name list */
 {
@@ -553,41 +560,6 @@ get_stmt(FILE* file, int supp_flag)
   }
   while (go_cond);
   return 1;
-}
-
-void
-control(struct in_cmd* cmd)
-  /* executes so-called "control" commands */
-{
-  char** toks = cmd->tok_list->p;
-  int k = cmd->decl_start - 1;
-  if      (strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
-  else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
-  else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
-  else if (strcmp(toks[k], "option")      == 0) exec_option();
-  else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
-  else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
-  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
-  else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
-  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
-  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
-  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
-  else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
-  else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
-  else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
-  else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
-  else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
-  else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
-  else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
-  else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
-  else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
-  else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
-  else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
-  else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
-  else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
-  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
-  puts("++++++++++++++ command skipped in parser version");
-  /* insert your proper command action here */
 }
 
 int 
@@ -700,8 +672,7 @@ new_command(char* name, int nl_length, int pl_length, char* module, char* group,
 {
   char rout_name[] = "new_command";
   char loc_name[2*NAME_L];
-  struct command* new
-    = (struct command*) mycalloc(rout_name,1, sizeof(struct command));
+  struct command* new = mycalloc(rout_name,1, sizeof(struct command));
   strcpy(loc_name, name); strcat(loc_name, "_param");
   new->stamp = 123456;
   strcpy(new->name, name);
@@ -720,8 +691,7 @@ struct command_list*
 new_command_list(char* l_name, int length)
 {
   char rout_name[] = "new_command_list";
-  struct command_list* il =
-    (struct command_list*) mycalloc(rout_name,1, sizeof(struct command_list));
+  struct command_list* il = mycalloc(rout_name,1, sizeof(struct command_list));
   strcpy(il->name, l_name);
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
@@ -737,21 +707,18 @@ struct command_list_list*
 new_command_list_list(int length)
 {
   char rout_name[] = "new_command_list_list";
-  struct command_list_list* il =
-    (struct command_list_list*)
-    mycalloc(rout_name,1, sizeof(struct command_list_list));
+  struct command_list_list* il = mycalloc(rout_name,1, sizeof(struct command_list_list));
   strcpy(il->name, "command_list_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->list = new_name_list(il->name, length);
-  il->command_lists
-    = (struct command_list**)
-    mycalloc(rout_name,length, sizeof(struct command_list*));
+  il->command_lists = mycalloc(rout_name,length, sizeof(struct command_list*));
   return il;
 }
 
+#if 0 // not used...
 struct command_list_list*
 delete_command_list_list( struct command_list_list* ll)
 {
@@ -774,6 +741,7 @@ delete_command_list_list( struct command_list_list* ll)
 
   return 0x0;
 }
+#endif
 
 struct command*
 delete_command(struct command* cmd)
@@ -816,20 +784,6 @@ grow_command_list(struct command_list* p)
   p->commands
     = (struct command**) mycalloc(rout_name,new, sizeof(struct command*));
   for (j = 0; j < p->curr; j++) p->commands[j] = c_loc[j];
-  myfree(rout_name, c_loc);
-}
-
-void
-grow_command_list_list(struct command_list_list* p)
-{
-  char rout_name[] = "grow_command_list_list";
-  struct command_list** c_loc = p->command_lists;
-  int j, new = 2*p->max;
-
-  p->max = new;
-  p->command_lists = (struct command_list**)
-    mycalloc(rout_name,new, sizeof(struct command_list*));
-  for (j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
 

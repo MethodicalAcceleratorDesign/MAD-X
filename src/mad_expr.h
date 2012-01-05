@@ -39,6 +39,7 @@ struct expression*  delete_expression(struct expression* expr);
 struct expr_list*   delete_expr_list(struct expr_list* exprl);
 void    grow_expr_list(struct expr_list* p);
 void    dump_expression(struct expression* ex);
+void    print_value(struct in_cmd*);
 struct expression* make_expression(int n, char** toks);
 double  expression_value(struct expression* expr, int flag); /* recursive */
 void    fill_expr_list(char** toks, int s_start, int s_end, struct expr_list* p);
