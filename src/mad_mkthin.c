@@ -74,8 +74,7 @@ force_consistent_slices(void)
   }
 }
 
-#if 0
-// not used
+#if 0 // not used
 static void
 dump_slices(void)
 /* Loops over all current elements and prints the number of slices. Used for debug and info */
@@ -732,7 +731,7 @@ new_marker(struct node *thick_node, double at, struct expression *at_expr)
     add_cmd_parameter_clone(clone,return_param_recurse("calib",   thick_node->p_elem),"calib",   1);
     add_cmd_parameter_clone(clone,return_param_recurse("polarity",thick_node->p_elem),"polarity",1);
     add_cmd_parameter_clone(clone,return_param_recurse("mech_sep",thick_node->p_elem),"mech_sep",1);
-    /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+    /*== dealt with the new property v_pos as for mech_sep */
     add_cmd_parameter_clone(clone,return_param_recurse("v_pos",thick_node->p_elem),"v_pos",1);
     /*==*/
     elem = make_element(thick_node->p_elem->name, "marker", clone,-1);
@@ -1216,7 +1215,7 @@ q_shift(int slices,int slice_no)
 
 static void
 set_selected_elements(void)
-{ /*hbu June 2005.  New set_selected_elements */
+{ /* New set_selected_elements */
   struct element* el_j;
   struct name_list* nl;
   struct command_parameter_list* pl;

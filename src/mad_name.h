@@ -26,19 +26,20 @@ struct vector_list              /* contains named vectors */
 
 // interface
 
-struct name_list*   new_name_list(char* list_name, int length);
-struct name_list*   clone_name_list(struct name_list* p);
-struct name_list*   delete_name_list(struct name_list* l);
-struct vector_list* new_vector_list(int length);
-struct vector_list* delete_vector_list(struct vector_list* vector);
-void    dump_name_list(struct name_list* nl);
-void    copy_name_list(struct name_list* out, struct name_list* in);
-void    grow_name_list(struct name_list* p);
-void    grow_vector_list(struct vector_list* p);
 char*   get_new_name(void);
-int     add_to_name_list(char* name, int inf, struct name_list* vlist);
-double  find_value(char* name, int ntok, char** toks);
-int     name_list_pos(char* p, struct name_list* vlist);
+
+struct name_list*  new_name_list(char* list_name, int length);
+struct name_list*  clone_name_list(struct name_list*);
+struct name_list*  delete_name_list(struct name_list*);
+void               dump_name_list(struct name_list*);
+void               copy_name_list(struct name_list* out, struct name_list* in);
+void               grow_name_list(struct name_list*);
+int                add_to_name_list(char* name, int inf, struct name_list*);
+int                name_list_pos(char* p, struct name_list*);
+
+struct vector_list* new_vector_list(int length);
+struct vector_list* delete_vector_list(struct vector_list*);
+void                grow_vector_list(struct vector_list*);
 
 #endif // MAD_NAME_H
 

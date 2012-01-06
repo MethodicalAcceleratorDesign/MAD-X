@@ -1,6 +1,6 @@
 #include "madx.h"
 
-struct macro*
+static struct macro*
 clone_macro(struct macro* org)
 {
   int i;
@@ -16,6 +16,75 @@ clone_macro(struct macro* org)
   clone->n_formal = org->n_formal;
   return clone;
 }
+
+static struct macro*
+delete_macro(struct macro* macro)
+{
+  char rout_name[] = "delete_macro";
+  if (macro == NULL)  return NULL;
+  if (stamp_flag && macro->stamp != 123456)
+    fprintf(stamp_file, "d_m double delete --> %s\n", macro->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", macro->name);
+  if (macro->formal != NULL) delete_char_p_array(macro->formal, 0);
+  if (macro->tokens != NULL) delete_char_p_array(macro->tokens, 0);
+  if (macro->body != NULL) delete_char_array(macro->body);
+  myfree(rout_name, macro);
+  return NULL;
+}
+
+static void
+grow_macro_list(struct macro_list* p)
+{
+  char rout_name[] = "grow_macro_list";
+  struct macro** n_loc = p->macros;
+  int j, new = 2*p->max;
+  p->max = new;
+  p->macros = (struct macro**) mycalloc(rout_name,new, sizeof(struct macro*));
+  for (j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
+  myfree(rout_name, n_loc);
+}
+
+static void
+dump_macro(struct macro* m)
+{
+  fprintf(prt_file, "name: %s\n", m->name);
+  if (m->formal != NULL) dump_char_p_array(m->formal);
+  dump_char_array(m->body);
+  if (m->tokens != NULL) dump_char_p_array(m->tokens);
+}
+
+static void
+dump_macro_list(struct macro_list* ml)
+{
+  int i;
+  puts("++++++ dump of macro list");
+  for (i = 0; i < ml->curr; i++) dump_macro(ml->macros[i]);
+}
+
+void
+disable_line( /* prevents line from further expansion by "use" */
+  char* name, struct macro_list* nll)
+{
+  int pos;
+  if ((pos = name_list_pos(name, nll->list)) > -1) nll->macros[pos]->dead = 1;
+}
+
+#if 0 // not used
+static void
+remove_from_macro_list( /* removes macro from alphabetic macro list */
+  struct macro* macro, struct macro_list* nll)
+{
+  int pos;
+  if ((pos = name_list_pos(macro->name, nll->list)) > -1)
+  {
+    remove_from_name_list(macro->name, nll->list);
+    delete_macro(nll->macros[pos]);
+    nll->macros[pos] = nll->macros[nll->curr--];
+  }
+}
+#endif
+
+// public interface
 
 struct macro*
 new_macro(int n_formal, int length, int p_length)
@@ -45,59 +114,6 @@ new_macro_list(int length)
     = (struct macro**) mycalloc(rout_name,length, sizeof(struct macro*));
   nll->max = length;
   return nll;
-}
-
-
-struct macro*
-delete_macro(struct macro* macro)
-{
-  char rout_name[] = "delete_macro";
-  if (macro == NULL)  return NULL;
-  if (stamp_flag && macro->stamp != 123456)
-    fprintf(stamp_file, "d_m double delete --> %s\n", macro->name);
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", macro->name);
-  if (macro->formal != NULL) delete_char_p_array(macro->formal, 0);
-  if (macro->tokens != NULL) delete_char_p_array(macro->tokens, 0);
-  if (macro->body != NULL) delete_char_array(macro->body);
-  myfree(rout_name, macro);
-  return NULL;
-}
-
-void
-grow_macro_list(struct macro_list* p)
-{
-  char rout_name[] = "grow_macro_list";
-  struct macro** n_loc = p->macros;
-  int j, new = 2*p->max;
-  p->max = new;
-  p->macros = (struct macro**) mycalloc(rout_name,new, sizeof(struct macro*));
-  for (j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
-  myfree(rout_name, n_loc);
-}
-
-void
-dump_macro(struct macro* m)
-{
-  fprintf(prt_file, "name: %s\n", m->name);
-  if (m->formal != NULL) dump_char_p_array(m->formal);
-  dump_char_array(m->body);
-  if (m->tokens != NULL) dump_char_p_array(m->tokens);
-}
-
-void
-dump_macro_list(struct macro_list* ml)
-{
-  int i;
-  puts("++++++ dump of macro list");
-  for (i = 0; i < ml->curr; i++) dump_macro(ml->macros[i]);
-}
-
-void
-disable_line( /* prevents line from further expansion by "use" */
-  char* name, struct macro_list* nll)
-{
-  int pos;
-  if ((pos = name_list_pos(name, nll->list)) > -1) nll->macros[pos]->dead = 1;
 }
 
 int
@@ -206,21 +222,6 @@ add_to_macro_list( /* adds macro to alphabetic macro list */
   }
   /* RDM new matching*/
 }
-
-#if 0 // not used
-static void
-remove_from_macro_list( /* removes macro from alphabetic macro list */
-  struct macro* macro, struct macro_list* nll)
-{
-  int pos;
-  if ((pos = name_list_pos(macro->name, nll->list)) > -1)
-  {
-    remove_from_name_list(macro->name, nll->list);
-    delete_macro(nll->macros[pos]);
-    nll->macros[pos] = nll->macros[nll->curr--];
-  }
-}
-#endif
 
 int
 remove_from_name_list(char* name, struct name_list* nl)

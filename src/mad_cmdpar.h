@@ -77,6 +77,7 @@ void    store_comm_par_vector(char* parameter, double* val, struct command*);
 void    add_cmd_parameter_clone(struct command*, struct command_parameter*,char* par_name,int inf);
 void    add_cmd_parameter_new(struct command*,double par_value,char* par_name,int inf);
 void    comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
+int     log_val(char* name, struct command*);
 
 // void    set_command_par_string(char* parameter, struct command*, char* val); // not used...
 

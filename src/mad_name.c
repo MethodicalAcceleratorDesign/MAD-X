@@ -184,26 +184,6 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
   return ret;
 }
 
-double
-find_value(char* name, int ntok, char** toks)
-  /* returns value found in construct "name = value", or INVALID */
-{
-  double val = INVALID;
-  int j;
-  for (j = 0; j < ntok; j++)
-  {
-    if (strcmp(toks[j], name) == 0)
-    {
-      if (j+2 < ntok && *toks[j+1] == '=')
-      {
-        sscanf(toks[j+2], "%lf", &val);
-        break;
-      }
-    }
-  }
-  return val;
-}
-
 int
 name_list_pos(char* p, struct name_list* vlist)
 {

@@ -192,8 +192,6 @@ src/mad_gxx11c.h -text
 src/mad_ibs.c -text
 src/mad_ibs.h -text
 src/mad_inif_f.F90 -text
-src/mad_logic.c -text
-src/mad_logic.h -text
 src/mad_macro.c -text
 src/mad_macro.h -text
 src/mad_main.c -text

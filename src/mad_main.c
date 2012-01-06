@@ -34,7 +34,7 @@ void g95_runtime_stop  (void);
 int
 MAIN__()
 {
-  int a;
+  int a = 0;
   mad_stck_base = &a;
   mad_argc = 0;
   mad_argv = 0;
@@ -43,7 +43,8 @@ MAIN__()
 int
 main(int argc, char *argv[])
 {
-  mad_stck_base = &argc;
+  int a = 0;
+  mad_stck_base = &a;
   mad_argc = argc;
   mad_argv = argv;
 #endif // _LF95

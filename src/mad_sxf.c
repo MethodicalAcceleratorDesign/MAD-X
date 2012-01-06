@@ -366,6 +366,26 @@ pro_elem_sxf(FILE* out)
   write_elend(out);
 }
 
+static double
+find_value(char* name, int ntok, char** toks)
+  /* returns value found in construct "name = value", or INVALID */
+{
+  double val = INVALID;
+  int j;
+  for (j = 0; j < ntok; j++)
+  {
+    if (strcmp(toks[j], name) == 0)
+    {
+      if (j+2 < ntok && *toks[j+1] == '=')
+      {
+        sscanf(toks[j+2], "%lf", &val);
+        break;
+      }
+    }
+  }
+  return val;
+}
+
 // public functions
 
 void

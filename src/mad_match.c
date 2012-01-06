@@ -147,91 +147,7 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
   }
 }
 
-// public interface
-
-void
-pro_match(struct in_cmd* cmd)
-  /* controls the matching module */
-{
-  /* OB 12.2.2002: changed the sequence of if statements so that MAD
-     can go through the whole matching sequence */
-
-  if (strcmp(cmd->tok_list->p[0], "match") == 0)
-  {
-    match_match(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "cell") == 0)
-  {
-    warning("CELL command no longer valid, ","use MATCH");
-    return;
-  }
-  else if (match_is_on == 0)
-  {
-    warning("no MATCH command seen,","ignored");
-    return;
-  }
-  else if (strcmp(cmd->tok_list->p[0], "endmatch") == 0)
-  {
-    match_end(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
-           strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
-           strcmp(cmd->tok_list->p[0], "jacobian") == 0 ||
-           strcmp(cmd->tok_list->p[0], "simplex") == 0)
-  {
-    match_action(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "constraint") == 0)
-  {
-    match_constraint(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "couple") == 0)
-  {
-    match_couple(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "fix") == 0)
-  {
-    match_fix(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
-  {
-    match_global(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "level") == 0)
-  {
-    match_level(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "vary") == 0)
-  {
-    match_vary(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "weight") == 0)
-  {
-    match_weight(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "gweight") == 0)
-  {
-    match_gweight(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "rmatrix") == 0)
-  {
-    match_rmatrix(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "tmatrix") == 0)
-  {
-    match_tmatrix(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
-  {
-    match_global(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "use_macro") == 0)
-  {
-    match2_macro(cmd);
-  }
-}
-
-void
+static void
 match_action(struct in_cmd* cmd)
 {
   int i;
@@ -383,13 +299,13 @@ match_action(struct in_cmd* cmd)
     match_work[i] = delete_double_array(match_work[i]);
 }
 
-void
+static void
 match_cell(struct in_cmd* cmd)
 {
   (void)cmd;
 }
 
-void
+static void
 match_constraint(struct in_cmd* cmd)
 {
   char* name;
@@ -402,15 +318,15 @@ match_constraint(struct in_cmd* cmd)
   int pos, k, n, low, up;
 
   if(match_is_on==2)
-  { /* RDM fork */
+  {
     match2_constraint(cmd);
   }
   else if (match_is_on == kMatch_PTCknobs)
-  { /*PSk fork*/
+  {
     madx_mpk_addconstraint(in->buffers[in->curr]->c_a->c);
   }
   else
-  { /* RDM old match */
+  { /* old match */
     pos = name_list_pos("sequence", nl);
     if(nl->inform[pos]) /* sequence specified */
     {
@@ -457,17 +373,16 @@ match_constraint(struct in_cmd* cmd)
         c_node = c_node->next;
       }
     }
-    /* OB 12.2.2002 */
   }
 }
 
-void
+static void
 match_couple(struct in_cmd* cmd)
 {
   (void)cmd;
 }
 
-void
+static void
 match_end(struct in_cmd* cmd)
 {
   int i;
@@ -490,7 +405,7 @@ match_end(struct in_cmd* cmd)
     return;
   }
 
-  /* OB 5.3.2002: write out all final constraint values and vary parameters */
+  /* write out all final constraint values and vary parameters */
   penalty = zero;
   if (get_option("varylength") != zero) match_prepare_varypos();
   pro_twiss();
@@ -521,8 +436,8 @@ match_end(struct in_cmd* cmd)
 /*  fprintf(prt_file, "-------------------------------------------------------------------------------\n");*/
 /*  if ((print_match_summary == 1) && vary_vect )*/
 /*  {*/
-/*    |+ drop first int* passed variable mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); 05.02.2005 +|*/
-/*    mtgetc_(vary_vect->a, vary_dvect->a); |+ mtgeti->mtgetc JMJ, 8/4/2003 +|*/
+/*    |+ drop first int* passed variable mtgetc_(&stored_match_var->curr, vary_vect->a, vary_dvect->a); +|*/
+/*    mtgetc_(vary_vect->a, vary_dvect->a); |+ mtgeti->mtgetc +|*/
 /*  }*/
 /*  fprintf(prt_file, "\n");*/
   match2_print_var(cmd);
@@ -577,13 +492,13 @@ match_end(struct in_cmd* cmd)
   set_variable("tar",&penalty);
 }
 
-void
+static void
 match_fix(struct in_cmd* cmd)
 {
   (void)cmd;
 }
 
-void
+static void
 match_global(struct in_cmd* cmd)
 {
   struct command_parameter* cp;
@@ -618,10 +533,9 @@ match_global(struct in_cmd* cmd)
     update_sequ_constraints(sequ, comm_constraints);
   }
   print_match_summary = 1;
-  /* OB 15.3.2002 */
 }
 
-void
+static void
 match_gweight(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
@@ -640,17 +554,17 @@ match_gweight(struct in_cmd* cmd)
   }
 }
 
-void
+static void
 match_level(struct in_cmd* cmd)
 {
   (void)cmd;
 }
 
-void
+static void
 match_match(struct in_cmd* cmd)
 {
-  struct name_list* tnl; /* OB 31.1.2002: local name list for TWISS input definition */
-  double match_beta_value; /* OB 31.1.2002 */
+  struct name_list* tnl; /* local name list for TWISS input definition */
+  double match_beta_value;
   struct command* comm;
   struct command_parameter* cp;
   struct name_list* nl = cmd->clone->par_names;
@@ -658,9 +572,7 @@ match_match(struct in_cmd* cmd)
   struct sequence* sequ;
   int i, j, pos, n, spos, tpos, chrom_flg;
   int izero = 0, ione = 1, slow;
-  /* RDM 19/12/2005*/
   char *dpp;
-  /* RDM 19/12/2005*/
 
   if (match_is_on)
   {
@@ -672,20 +584,18 @@ match_match(struct in_cmd* cmd)
   set_option("twiss_print", &izero);
 
   pos=name_list_pos("use_macro", nl);
-  if(nl->inform[pos]) {/* RDM FORK */
+  if(nl->inform[pos]) {
     match2_match(cmd);
     return;
-  }/* RDM FORK */
+  }
 
   pos=name_list_pos("use_ptcknob", nl);
-  if(nl->inform[pos]) {/* PSk FORK */
+  if(nl->inform[pos]) {
     match_is_on = kMatch_PTCknobs;
     madx_mpk_prepare();
     return;
-  }/* RDM FORK */
+  }
 
-
-  /* RDM  old match */
   match_is_on = 1;
   pos = name_list_pos("sequence", nl);
   fprintf(prt_file, "START MATCHING\n\n");
@@ -726,14 +636,14 @@ match_match(struct in_cmd* cmd)
   else i = 0;
   set_option("varylength", &i);
 
-  /* START SLOW-CHECK; HG 30.5.2009 */
+  /* START SLOW-CHECK */
   pos = name_list_pos("slow", nl);
   if(nl->inform[pos]) slow = pl->parameters[pos]->double_value;
   else slow = 0;
   set_option("slow_match", &slow);
-  /* END SLOW-CHECK; HG 30.5.2009 */
+  /* END SLOW-CHECK */
 
-  /* START CHK-SEQ; OB 1.2.2002 */
+  /* START CHK-SEQ */
   current_match = cmd->clone;
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
@@ -749,7 +659,7 @@ match_match(struct in_cmd* cmd)
       {
         current_sequ = sequences->sequs[pos];
         fprintf(prt_file, "sequence name: %s\n", current_sequ->name);
-        /* OB 1.2.2002 */
+
         /* START defining a TWISS input command for each sequence */
         local_twiss[i] = new_in_cmd(10);
         local_twiss[i]->type = 0;
@@ -799,7 +709,7 @@ match_match(struct in_cmd* cmd)
     warning("MATCH called without active sequence,", "ignored");
     return;
   }
-  /* END CHK-SEQ; OB 1.2.2002 */
+  /* END CHK-SEQ */
 
   for (i = 0; i < match_num_seqs; i++)
   {
@@ -814,8 +724,8 @@ match_match(struct in_cmd* cmd)
     }
   }
 
-  /* START CHK-BETA-INPUT; OB 1.2.2002 */
-  /* START CHK-BETA0; OB 23.1.2002 */
+  /* START CHK-BETA-INPUT */
+  /* START CHK-BETA0 */
   pos = name_list_pos("beta0", nl);
   if(nl->inform[pos]) /* beta0 specified */
   {
@@ -834,9 +744,9 @@ match_match(struct in_cmd* cmd)
       /* END defining a TWISS input command for each sequence */
     }
   }
-  /* END CHK-BETA0; OB 23.1.2002 */
+  /* END CHK-BETA0 */
 
-  /* START CHK-RANGE; HG 12.11.2002 */
+  /* START CHK-RANGE */
   pos = name_list_pos("range", nl);
   if(nl->inform[pos]) /* range specified */
   {
@@ -854,9 +764,9 @@ match_match(struct in_cmd* cmd)
       /* END adding range to TWISS input command for each sequence */
     }
   }
-  /* END CHK-RANGE; OB 12.11.2002 */
+  /* END CHK-RANGE */
 
-  /* START CHK-USEORBIT; HG 28.1.2003 */
+  /* START CHK-USEORBIT */
   pos = name_list_pos("useorbit", nl);
   if(nl->inform[pos]) /* useorbit specified */
   {
@@ -872,9 +782,9 @@ match_match(struct in_cmd* cmd)
       /* END adding range to TWISS input command for each sequence */
     }
   }
-  /* END CHK-USEORBIT; HG 28.1.2003 */
+  /* END CHK-USEORBIT */
 
-  /* START CHK-KEEPORBIT; HG 28.1.2003 */
+  /* START CHK-KEEPORBIT */
   pos = name_list_pos("keeporbit", nl);
   if(nl->inform[pos]) /* keeporbit specified */
   {
@@ -890,9 +800,9 @@ match_match(struct in_cmd* cmd)
       /* END adding range to TWISS input command for each sequence */
     }
   }
-  /* END CHK-KEEPORBIT; HG 28.1.2003 */
+  /* END CHK-KEEPORBIT */
 
-  /* START CHK-R-MATRIX; OB 6.10.2003 */
+  /* START CHK-R-MATRIX */
   pos = name_list_pos("rmatrix", nl);
   if(nl->inform[pos]) /* rmatrix specified */
   {
@@ -908,9 +818,9 @@ match_match(struct in_cmd* cmd)
       /* END adding rmatrix to TWISS input command for each sequence */
     }
   }
-  /* END CHK-R-MATRIX; OB 6.10.2003 */
+  /* END CHK-R-MATRIX */
 
-  /* START CHK-CHROM; RDM 22.9.2005 */
+  /* START CHK-CHROM */
   pos = name_list_pos("chrom", nl);
   chrom_flg = cmd->clone->par->parameters[pos]->double_value;
   if(chrom_flg) /* chrom specified */
@@ -928,9 +838,9 @@ match_match(struct in_cmd* cmd)
     }
   }
   else set_option("twiss_chrom",&izero);
-  /* END CHK-CHROM; RDM 22.9.2005 */
+  /* END CHK-CHROM */
 
-  /* START CHK-SECTORMAP; RDM 16.12.2005 */
+  /* START CHK-SECTORMAP */
   pos = name_list_pos("sectormap", nl);
   if(nl->inform[pos]) /* sectormap specified */
   {
@@ -946,9 +856,9 @@ match_match(struct in_cmd* cmd)
       /* END adding sectormap to TWISS input command for each sequence */
     }
   }
-  /* END CHK-CHROM; RDM 16.12.2005 */
+  /* END CHK-CHROM */
 
-  /* START CHK-DELTAP; RDM 12.12.2005 */
+  /* START CHK-DELTAP */
   pos = name_list_pos("deltap", nl);
   if(nl->inform[pos]) /* deltap specified */
   {
@@ -969,9 +879,9 @@ match_match(struct in_cmd* cmd)
       /*      twiss_deltas->a[0]=cp->double_array->a[0];*/
     }
   }
-  /* END CHK-DELTAP; RDM 12.12.2005 */
+  /* END CHK-DELTAP */
 
-  /* START CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
+  /* START CHK-ENTRIES of TYPE DOUBLE-REAL */
   for (j = 0; j < nl->curr; j++)
   {
     if(nl->inform[j]) /* initial conditions are specified
@@ -1007,10 +917,10 @@ match_match(struct in_cmd* cmd)
       }
     }
   }
-  /* END CHK-ENTRIES of TYPE DOUBLE-REAL; OB 23.1.2002 */
-  /* END CHK-BETA-INPUT; OB 1.2.2002 */
+  /* END CHK-ENTRIES of TYPE DOUBLE-REAL */
+  /* END CHK-BETA-INPUT */
 
-  /* START generating a TWISS table via 'pro_twiss'; OB 1.2.2002 */
+  /* START generating a TWISS table via 'pro_twiss' */
   for (i = 0; i < match_num_seqs; i++)
   {
     /* fprintf(prt_file, "%s %s\n", "call TWISS from MATCH: sequence =",
@@ -1031,16 +941,137 @@ match_match(struct in_cmd* cmd)
 
 }
 
-void
+static void
 match_rmatrix(struct in_cmd* cmd)
 {
   (void)cmd;
 }
 
-void
+static void
 match_tmatrix(struct in_cmd* cmd)
 {
   (void)cmd;
+}
+
+static void
+match_vary(struct in_cmd* cmd)
+{
+  int pos;
+  double value;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+
+  if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
+  pos = name_list_pos("name", nl);
+  if (nl->inform[pos])
+  {
+    value=get_variable(pl->parameters[pos]->string);
+    set_value("vary","init",&value);
+    cmd->clone_flag = 1;
+    add_to_command_list(pl->parameters[pos]->string,
+                        cmd->clone, stored_match_var, 1);
+  }
+}
+
+static void
+match_weight(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* plc = cmd->clone->par;
+  struct command_parameter_list* pl = current_weight->par;
+  int j;
+  for (j = 0; j < pl->curr; j++)
+  {
+    if (nl->inform[j])
+    {
+      pl->parameters[j]->double_value = plc->parameters[j]->double_value;
+      pl->parameters[j]->expr = plc->parameters[j]->expr;
+    }
+  }
+}
+
+// public interface
+
+void
+pro_match(struct in_cmd* cmd)
+  /* controls the matching module */
+{
+  /* changed the sequence of if statements so that MAD
+     can go through the whole matching sequence */
+
+  if (strcmp(cmd->tok_list->p[0], "match") == 0)
+  {
+    match_match(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "cell") == 0)
+  {
+    warning("CELL command no longer valid, ","use MATCH");
+    return;
+  }
+  else if (match_is_on == 0)
+  {
+    warning("no MATCH command seen,","ignored");
+    return;
+  }
+  else if (strcmp(cmd->tok_list->p[0], "endmatch") == 0)
+  {
+    match_end(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "migrad") == 0 ||
+           strcmp(cmd->tok_list->p[0], "lmdif") == 0 ||
+           strcmp(cmd->tok_list->p[0], "jacobian") == 0 ||
+           strcmp(cmd->tok_list->p[0], "simplex") == 0)
+  {
+    match_action(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "constraint") == 0)
+  {
+    match_constraint(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "couple") == 0)
+  {
+    match_couple(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "fix") == 0)
+  {
+    match_fix(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
+  {
+    match_global(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "level") == 0)
+  {
+    match_level(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "vary") == 0)
+  {
+    match_vary(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "weight") == 0)
+  {
+    match_weight(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "gweight") == 0)
+  {
+    match_gweight(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "rmatrix") == 0)
+  {
+    match_rmatrix(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "tmatrix") == 0)
+  {
+    match_tmatrix(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "global") == 0)
+  {
+    match_global(cmd);
+  }
+  else if (strcmp(cmd->tok_list->p[0], "use_macro") == 0)
+  {
+    match2_macro(cmd);
+  }
 }
 
 int
@@ -1077,53 +1108,16 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   return ++vary_cnt;
 }
 
-void
-match_vary(struct in_cmd* cmd)
-{
-  int pos;
-  double value;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-
-  if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
-  pos = name_list_pos("name", nl);
-  if (nl->inform[pos])
-  {
-    value=get_variable(pl->parameters[pos]->string);
-    set_value("vary","init",&value);
-    cmd->clone_flag = 1;
-    add_to_command_list(pl->parameters[pos]->string,
-                        cmd->clone, stored_match_var, 1);
-  }
-}
-
-void
-match_weight(struct in_cmd* cmd)
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* plc = cmd->clone->par;
-  struct command_parameter_list* pl = current_weight->par;
-  int j;
-  for (j = 0; j < pl->curr; j++)
-  {
-    if (nl->inform[j])
-    {
-      pl->parameters[j]->double_value = plc->parameters[j]->double_value;
-      pl->parameters[j]->expr = plc->parameters[j]->expr;
-    }
-  }
-}
-
 // public interface used by fortran code
 
 void
 mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
 {
   int i,j,k=0;
-  char execute[40];/* RDM fork */
+  char execute[40];
   static int nconserrs = 0; /*number of call finihed with error*/
 
-  if (match_is_on==2) /* RDM fork */
+  if (match_is_on==2)
   {
     for(i=0; i<MAX_MATCH_MACRO; i++)
     {
@@ -1158,7 +1152,7 @@ mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
     }
   }
   else
-  { /* RDM old match */
+  { /* old match */
     current_const = 0;
     penalty = zero;
     set_option("match_print", print_flag);
@@ -1171,11 +1165,11 @@ mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       if (get_option("varylength") != zero) match_prepare_varypos();
 
       if (get_option("rmatrix") != zero) fprintf(prt_file, "%s\n", "call TWISS with RMATRIX");
-      /* RDM 22.9.2005: match with chrom */
+      /* match with chrom */
       if (get_option("chrom") != zero) fprintf(prt_file, "%s\n", "call TWISS with CHROM");
-      /* RDM 12.12.2005: match with deltap */
+      /* match with deltap */
       if (get_option("deltap") != zero) fprintf(prt_file, "%s\n", "call TWISS with DELTAP");
-      /* RDM 16.12.2005: match with deltap */
+      /* match with deltap */
       if (get_option("sectormap") != zero) fprintf(prt_file, "%s\n", "call TWISS with SECTORMAP");
 
       pro_twiss();
@@ -1183,8 +1177,8 @@ mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
       {
         *stab_flag = 0;
         collect_(&current_const, &penalty, fun_vec);
-        /*OB 5.3.2002: Do not write the penalty function here.
-          'lmdif' still needs to check if the itteration was succesfull!
+        /* Do not write the penalty function here.
+          'lmdif' still needs to check if the iteration was succesfull!
           the penalty function should only be printed from the
           'lmdif' routine. */
         /* fprintf(prt_file, "penalty function: %e\n", penalty); */
@@ -1194,7 +1188,7 @@ mtcond(int* print_flag, int* nf, double* fun_vec, int* stab_flag)
         *stab_flag = 1; break;  /* Twiss failed - give up */
       }
     }
-  } /*RDM old match */
+  } /* old match */
 }
 
 int

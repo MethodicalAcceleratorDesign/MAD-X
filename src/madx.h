@@ -37,7 +37,6 @@
 #include "mad_eval.h"
 #include "mad_exec.h"
 #include "mad_array.h"
-#include "mad_logic.h"
 #include "mad_macro.h"
 #include "mad_parse.h"
 #include "mad_range.h"

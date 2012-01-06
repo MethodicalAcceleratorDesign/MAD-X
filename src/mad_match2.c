@@ -7,26 +7,306 @@ int MAX_MATCH_MACRO = 0; /*zero values means that it is not initialized yet*/
 
 char match2_keepexpressions = 0; /*do not delete expressions at the end matching used by match with PTC knobs*/
 
-char   **match2_macro_name;
 char*  **match2_cons_name;
+char   **match2_cons_sign;
 double **match2_cons_value;
 double **match2_cons_value_rhs;
 double **match2_cons_value_lhs;
 double **match2_cons_weight;
-char   **match2_cons_sign;
-struct expression* **match2_cons_rhs;
-struct expression* **match2_cons_lhs;
+char   **match2_macro_name;
+int      match2_cons_curr[3];
 
-int match2_cons_curr[3];
+static struct expression* **match2_cons_rhs;
+static struct expression* **match2_cons_lhs;
+
+// private interface
+
+static int
+match2_augmentnconstraints(void)
+{
+  /*makes place in the working arrays for a new macro*/
+  int i,j;
+  char fn[]={"match2_augmentnconstraints"};
+  char*   new_match2_macro_name     = 0x0;
+  char* * new_match2_cons_name      = 0x0;
+  double* new_match2_cons_value     = 0x0;
+  double* new_match2_cons_value_rhs = 0x0;
+  double* new_match2_cons_value_lhs = 0x0;
+  double* new_match2_cons_weight    = 0x0;
+  char*   new_match2_cons_sign      = 0x0;
+  struct expression* * new_match2_cons_rhs       = 0x0;
+  struct expression* * new_match2_cons_lhs       = 0x0;
+
+  if(MAX_MATCH_MACRO == 0)
+  {
+    error("match2_augmentnconstraints","match with use_maco was not initialized");
+    return 1;
+  }
+
+  for(i=0;i<MAX_MATCH_MACRO;i++)
+  {
+
+    new_match2_macro_name     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char));
+    new_match2_cons_name      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char*));
+    new_match2_cons_value     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
+    new_match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
+    new_match2_cons_value_lhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
+    new_match2_cons_weight    = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
+    new_match2_cons_sign      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char));
+    new_match2_cons_rhs       = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(struct expression*));
+    new_match2_cons_lhs       = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(struct expression*));
+
+    /*copy old content to the new arrays*/
+    for(j=0;j<MAX_MATCH_CONS;j++)
+    {
+      new_match2_cons_name     [j] = match2_cons_name     [i][j];
+
+      new_match2_cons_value    [j] = match2_cons_value    [i][j];
+      new_match2_cons_value_lhs[j] = match2_cons_value_lhs[i][j];
+      new_match2_cons_value_rhs[j] = match2_cons_value_rhs[i][j];
+      new_match2_cons_weight   [j] = match2_cons_weight   [i][j];
+      new_match2_cons_sign     [j] = match2_cons_sign     [i][j];
+
+      new_match2_cons_rhs      [j] = match2_cons_rhs      [i][j];
+      new_match2_cons_lhs      [j] = match2_cons_lhs      [i][j];
+    }
+
+    /*initializes the new parts*/
+    for(j=MAX_MATCH_CONS;j<MAX_MATCH_CONS*2;j++)
+    {
+      new_match2_cons_name     [j] = 0x0;
+
+      new_match2_cons_value    [j] = 0.0;
+      new_match2_cons_value_lhs[j] = 0.0;
+      new_match2_cons_value_rhs[j] = 0.0;
+      new_match2_cons_weight   [j] = 0.0;
+      new_match2_cons_sign     [j] = 'n';
+
+      new_match2_cons_rhs      [j] = 0x0;
+      new_match2_cons_lhs      [j] = 0x0;
+    }
+
+    /*free the old arrays*/
+    myfree(fn,match2_cons_name     [i]);
+    myfree(fn,match2_cons_value    [i]);
+    myfree(fn,match2_cons_value_lhs[i]);
+    myfree(fn,match2_cons_value_rhs[i]);
+    myfree(fn,match2_cons_weight   [i]);
+    myfree(fn,match2_cons_sign     [i]);
+    myfree(fn,match2_cons_rhs      [i]);
+    myfree(fn,match2_cons_lhs      [i]);
+
+    /*assign freed pointers to the new arrays*/
+    match2_cons_name     [i] = new_match2_cons_name ;
+    match2_cons_value    [i] = new_match2_cons_value ;
+    match2_cons_value_lhs[i] = new_match2_cons_value_lhs ;
+    match2_cons_value_rhs[i] = new_match2_cons_value_rhs ;
+    match2_cons_weight   [i] = new_match2_cons_weight ;
+    match2_cons_sign     [i] = new_match2_cons_sign ;
+    match2_cons_rhs      [i] = new_match2_cons_rhs ;
+    match2_cons_lhs      [i] = new_match2_cons_lhs ;
+  }
+
+  MAX_MATCH_CONS =  MAX_MATCH_CONS*2;
+
+  return MAX_MATCH_CONS;
+}
+
+static void
+match2_alloc_arrays(void)
+{
+  int i;
+  char fn[]={"match2_alloc_arrays"};
+
+  match2_macro_name     = mycalloc(fn,MAX_MATCH_MACRO,sizeof(char*));
+  match2_cons_name      = mycalloc(fn,MAX_MATCH_MACRO,sizeof(char**));
+  match2_cons_value     = mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
+  match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
+  match2_cons_value_lhs = mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
+  match2_cons_weight    = mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
+  match2_cons_sign      = mycalloc(fn,MAX_MATCH_MACRO,sizeof(char*));
+  match2_cons_rhs       = mycalloc(fn,MAX_MATCH_MACRO,sizeof(struct expression**));
+  match2_cons_lhs       = mycalloc(fn,MAX_MATCH_MACRO,sizeof(struct expression**));
+
+  for(i=0;i<MAX_MATCH_MACRO;i++)
+  {
+    match2_cons_name[i]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char*));
+
+    match2_cons_value[i]     = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
+
+    match2_cons_value_rhs[i] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
+    match2_cons_value_lhs[i] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
+    match2_cons_weight[i]    = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
+    match2_cons_sign[i]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char));
+
+    match2_cons_rhs[i]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
+    match2_cons_lhs[i]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
+  }
+
+}
+
+static void
+match2_init_arrays(void)
+{
+  /*clean the stuff;*/
+  int i,j;
+
+  for(i=0;i<MAX_MATCH_MACRO;i++)
+  {
+    match2_macro_name[i]=NULL;
+
+    for(j=0;j<MAX_MATCH_CONS;j++)
+    {
+      match2_cons_name     [i][j]=0x0;
+
+      match2_cons_value    [i][j]=0.0;
+      match2_cons_value_lhs[i][j]=0.0;
+      match2_cons_value_rhs[i][j]=0.0;
+      match2_cons_weight   [i][j]=0.0;
+      match2_cons_sign     [i][j]='n';
+
+      match2_cons_rhs      [i][j]=0x0;
+      match2_cons_lhs      [i][j]=0x0;
+    }
+  }
+
+  for(i=0;i<3;i++) match2_cons_curr[i]=0;
+}
+
+static void
+match2_setconstrinrange(struct node** nodes, double w, char* parname, char s, char* rexpr)
+{
+/* sets the same consraint for a range of elements defined bu nodes */
+  struct node* c_node;
+  char tablecmd[500];
+  char buff[500];
+  char* p;
+
+  c_node = nodes[0];
+  do
+  {
+    strcpy(buff,c_node->name);
+
+    p = strstr(buff,":");
+    if ( p )
+    {
+      if (p[1] == '0') /*it means that this is a drift automatically added to a sequence*/
+      {               /*this guy does not work with table command so we do not care about him*/
+        c_node = c_node->next;
+        continue;
+      }
+      p[0] = '[';
+      p[2] = ']';
+      p[3] =  0;
+    }
+
+    sprintf(tablecmd,"constraint, weight=%f, expr=table(twiss,%s,%s)%c%s ;",
+            w,  buff, parname, s, rexpr);
+
+    pro_input(tablecmd);
+
+    if (nodes[1] == c_node) break; /*only one element in the range*/
+
+    c_node = c_node->next;
+  } while ( c_node && (c_node != nodes[1]) );
+}
+
+static void
+match2_disasambleconstraint(struct in_cmd* cmd)
+{
+  /*Disassambles regular constraint with range into set of constraints with expr=...*/
+  struct node* nodes[2];
+  struct sequence* sequ;
+  char* name;
+  int k,  jj;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter* par = 0x0;
+  char s;
+  char buff[50];
+  double w;
+  sequ = current_sequ;
+  name = command_par_string("range",cmd->clone);
+
+  if ( strlen(name) > 0 )  /* parameter has been read */
+  {
+
+    k = get_ex_range(name, sequ, nodes);
+    if (k == 0)
+    {
+      error("match2_disasambleconstraint","Bad range! Ignoring\n");
+      return;
+    }
+  }
+  else
+  {
+    printf("Range not specified explicitely, using FULL range.\n");
+    nodes[0] = sequ->ex_start;
+    nodes[1] = sequ->ex_end;
+  }
+
+  w = command_par_value("weight",cmd->clone);
+  for (jj = 0; jj < pl->curr; jj++)
+  {
+    if (nl->inform[jj] && pl->parameters[jj]->type == 4)
+    {
+      par = pl->parameters[jj];
+/*
+  printf("Got constraint type %d name %s\n",par->c_type, par->name);
+  printf("   min_expr: %#x  c_min=%f \n", par->min_expr, par->c_min);
+  printf("   max_expr: %#x  c_max=%f \n", par->max_expr, par->c_max);
+  printf("       expr: %#x  double_value %f \n\n", par->expr, par->double_value);
+*/
+
+      switch(par->c_type)
+      {
+        case 1: /* minimum */
+        case 3: /* both */
+          s = '>';
+          if (par->min_expr == NULL)
+          {
+            sprintf(buff,"%f",par->c_min);
+            match2_setconstrinrange(nodes,w, par->name,s,buff);
+          }
+          else
+          {
+            match2_setconstrinrange(nodes,w, par->name,s,par->min_expr->string);
+          }
+          if (par->c_type == 1) break;
+        case 2: /* maximum */
+          s = '<';
+          if (par->max_expr == NULL)
+          {
+            sprintf(buff,"%f",par->c_max);
+            match2_setconstrinrange(nodes,w, par->name,s,buff);
+          }
+          else
+          {
+            match2_setconstrinrange(nodes,w, par->name,s,par->max_expr->string);
+          }
+          break;
+        case 4: /* value */
+          s = '=';
+          if (par->expr == NULL)
+          {
+            sprintf(buff,"%f",par->double_value);
+            match2_setconstrinrange(nodes,w, par->name,s,buff);
+          }
+          else
+          {
+            match2_setconstrinrange(nodes,w, par->name,s,par->expr->string);
+          }
+      }
+    }
+  }
+}
 
 // public interface
 
 int
 match2_augmentnmacros(void)
 {
-  /*makes place in the working arrays for a new macro
-    Piotr Skowronski Mar 2007
-  */
+  /* makes place in the working arrays for a new macro */
   int i,j;
   char fn[]={"match2_augmentnmacros"};
   char**   new_match2_macro_name;
@@ -222,99 +502,6 @@ match2_match(struct in_cmd* cmd)
   match2_init_arrays();
 }
 
-int
-match2_augmentnconstraints(void)
-{
-  /*makes place in the working arrays for a new macro
-    Piotr Skowronski Mar 2007
-  */
-  int i,j;
-  char fn[]={"match2_augmentnconstraints"};
-  char*   new_match2_macro_name     = 0x0;
-  char* * new_match2_cons_name      = 0x0;
-  double* new_match2_cons_value     = 0x0;
-  double* new_match2_cons_value_rhs = 0x0;
-  double* new_match2_cons_value_lhs = 0x0;
-  double* new_match2_cons_weight    = 0x0;
-  char*   new_match2_cons_sign      = 0x0;
-  struct expression* * new_match2_cons_rhs       = 0x0;
-  struct expression* * new_match2_cons_lhs       = 0x0;
-
-  if(MAX_MATCH_MACRO == 0)
-  {
-    error("match2_augmentnconstraints","match with use_maco was not initialized");
-    return 1;
-  }
-
-  for(i=0;i<MAX_MATCH_MACRO;i++)
-  {
-
-    new_match2_macro_name     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char));
-    new_match2_cons_name      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char*));
-    new_match2_cons_value     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
-    new_match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
-    new_match2_cons_value_lhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
-    new_match2_cons_weight    = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
-    new_match2_cons_sign      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char));
-    new_match2_cons_rhs       = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(struct expression*));
-    new_match2_cons_lhs       = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(struct expression*));
-
-    /*copy old content to the new arrays*/
-    for(j=0;j<MAX_MATCH_CONS;j++)
-    {
-      new_match2_cons_name     [j] = match2_cons_name     [i][j];
-
-      new_match2_cons_value    [j] = match2_cons_value    [i][j];
-      new_match2_cons_value_lhs[j] = match2_cons_value_lhs[i][j];
-      new_match2_cons_value_rhs[j] = match2_cons_value_rhs[i][j];
-      new_match2_cons_weight   [j] = match2_cons_weight   [i][j];
-      new_match2_cons_sign     [j] = match2_cons_sign     [i][j];
-
-      new_match2_cons_rhs      [j] = match2_cons_rhs      [i][j];
-      new_match2_cons_lhs      [j] = match2_cons_lhs      [i][j];
-    }
-
-    /*initializes the new parts*/
-    for(j=MAX_MATCH_CONS;j<MAX_MATCH_CONS*2;j++)
-    {
-      new_match2_cons_name     [j] = 0x0;
-
-      new_match2_cons_value    [j] = 0.0;
-      new_match2_cons_value_lhs[j] = 0.0;
-      new_match2_cons_value_rhs[j] = 0.0;
-      new_match2_cons_weight   [j] = 0.0;
-      new_match2_cons_sign     [j] = 'n';
-
-      new_match2_cons_rhs      [j] = 0x0;
-      new_match2_cons_lhs      [j] = 0x0;
-    }
-
-    /*free the old arrays*/
-    myfree(fn,match2_cons_name     [i]);
-    myfree(fn,match2_cons_value    [i]);
-    myfree(fn,match2_cons_value_lhs[i]);
-    myfree(fn,match2_cons_value_rhs[i]);
-    myfree(fn,match2_cons_weight   [i]);
-    myfree(fn,match2_cons_sign     [i]);
-    myfree(fn,match2_cons_rhs      [i]);
-    myfree(fn,match2_cons_lhs      [i]);
-
-    /*assign freed pointers to the new arrays*/
-    match2_cons_name     [i] = new_match2_cons_name ;
-    match2_cons_value    [i] = new_match2_cons_value ;
-    match2_cons_value_lhs[i] = new_match2_cons_value_lhs ;
-    match2_cons_value_rhs[i] = new_match2_cons_value_rhs ;
-    match2_cons_weight   [i] = new_match2_cons_weight ;
-    match2_cons_sign     [i] = new_match2_cons_sign ;
-    match2_cons_rhs      [i] = new_match2_cons_rhs ;
-    match2_cons_lhs      [i] = new_match2_cons_lhs ;
-  }
-
-  MAX_MATCH_CONS =  MAX_MATCH_CONS*2;
-
-  return MAX_MATCH_CONS;
-}
-
 void
 match2_end(struct in_cmd* cmd)
 {
@@ -377,67 +564,6 @@ match2_end(struct in_cmd* cmd)
 }
 
 void
-match2_alloc_arrays(void)
-{
-  int i;
-  char fn[]={"match2_alloc_arrays"};
-
-  match2_macro_name     = (char**)  mycalloc(fn,MAX_MATCH_MACRO,sizeof(char*));
-  match2_cons_name      = (char* **)mycalloc(fn,MAX_MATCH_MACRO,sizeof(char**));
-  match2_cons_value     = (double**)mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
-  match2_cons_value_rhs = (double**)mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
-  match2_cons_value_lhs = (double**)mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
-  match2_cons_weight    = (double**)mycalloc(fn,MAX_MATCH_MACRO,sizeof(double*));
-  match2_cons_sign      = (char**)  mycalloc(fn,MAX_MATCH_MACRO,sizeof(char*));
-  match2_cons_rhs       = (struct expression* **) mycalloc(fn,MAX_MATCH_MACRO,sizeof(struct expression**));
-  match2_cons_lhs       = (struct expression* **) mycalloc(fn,MAX_MATCH_MACRO,sizeof(struct expression**));
-
-  for(i=0;i<MAX_MATCH_MACRO;i++)
-  {
-    match2_cons_name[i]      = (char**)mycalloc(fn,MAX_MATCH_CONS,sizeof(char*));
-
-    match2_cons_value[i]     = (double*)mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-
-    match2_cons_value_rhs[i] = (double*)mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-    match2_cons_value_lhs[i] = (double*)mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-    match2_cons_weight[i]    = (double*)mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-    match2_cons_sign[i]      = (char*)mycalloc(fn,MAX_MATCH_CONS,sizeof(char));
-
-    match2_cons_rhs[i]       = (struct expression**) mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
-    match2_cons_lhs[i]       = (struct expression**) mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
-  }
-
-}
-
-void
-match2_init_arrays(void)
-{
-  /*clean the stuff;*/
-  int i,j;
-
-  for(i=0;i<MAX_MATCH_MACRO;i++)
-  {
-    match2_macro_name[i]=NULL;
-
-    for(j=0;j<MAX_MATCH_CONS;j++)
-    {
-      match2_cons_name     [i][j]=0x0;
-
-      match2_cons_value    [i][j]=0.0;
-      match2_cons_value_lhs[i][j]=0.0;
-      match2_cons_value_rhs[i][j]=0.0;
-      match2_cons_weight   [i][j]=0.0;
-      match2_cons_sign     [i][j]='n';
-
-      match2_cons_rhs      [i][j]=0x0;
-      match2_cons_lhs      [i][j]=0x0;
-    }
-  }
-
-  for(i=0;i<3;i++) match2_cons_curr[i]=0;
-}
-
-void
 match2_macro(struct in_cmd* cmd)
 {
   int pos;
@@ -472,140 +598,6 @@ match2_macro(struct in_cmd* cmd)
   printf("%s\n", execute);*/
     /*      pro_input(execute);*/
   }
-}
-
-void
-match2_disasambleconstraint(struct in_cmd* cmd)
-{
-  /*
-    Disassambles regular constraint with range into set of constraints with expr=...
-    Piotr Skowronski Mar 2007
-  */
-  struct node* nodes[2];
-  struct sequence* sequ;
-  char* name;
-  int k,  jj;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter* par = 0x0;
-  char s;
-  char buff[50];
-  double w;
-  sequ = current_sequ;
-  name = command_par_string("range",cmd->clone);
-
-  if ( strlen(name) > 0 )  /* parameter has been read */
-  {
-
-    k = get_ex_range(name, sequ, nodes);
-    if (k == 0)
-    {
-      error("match2_disasambleconstraint","Bad range! Ignoring\n");
-      return;
-    }
-  }
-  else
-  {
-    printf("Range not specified explicitely, using FULL range.\n");
-    nodes[0] = sequ->ex_start;
-    nodes[1] = sequ->ex_end;
-  }
-
-  w = command_par_value("weight",cmd->clone);
-  for (jj = 0; jj < pl->curr; jj++)
-  {
-    if (nl->inform[jj] && pl->parameters[jj]->type == 4)
-    {
-      par = pl->parameters[jj];
-/*
-  printf("Got constraint type %d name %s\n",par->c_type, par->name);
-  printf("   min_expr: %#x  c_min=%f \n", par->min_expr, par->c_min);
-  printf("   max_expr: %#x  c_max=%f \n", par->max_expr, par->c_max);
-  printf("       expr: %#x  double_value %f \n\n", par->expr, par->double_value);
-*/
-
-      switch(par->c_type)
-      {
-        case 1: /* minimum */
-        case 3: /* both */
-          s = '>';
-          if (par->min_expr == NULL)
-          {
-            sprintf(buff,"%f",par->c_min);
-            match2_setconstrinrange(nodes,w, par->name,s,buff);
-          }
-          else
-          {
-            match2_setconstrinrange(nodes,w, par->name,s,par->min_expr->string);
-          }
-          if (par->c_type == 1) break;
-        case 2: /* maximum */
-          s = '<';
-          if (par->max_expr == NULL)
-          {
-            sprintf(buff,"%f",par->c_max);
-            match2_setconstrinrange(nodes,w, par->name,s,buff);
-          }
-          else
-          {
-            match2_setconstrinrange(nodes,w, par->name,s,par->max_expr->string);
-          }
-          break;
-        case 4: /* value */
-          s = '=';
-          if (par->expr == NULL)
-          {
-            sprintf(buff,"%f",par->double_value);
-            match2_setconstrinrange(nodes,w, par->name,s,buff);
-          }
-          else
-          {
-            match2_setconstrinrange(nodes,w, par->name,s,par->expr->string);
-          }
-      }
-    }
-  }
-}
-
-void
-match2_setconstrinrange(struct node** nodes, double w, char* parname, char s, char* rexpr)
-{
-/*
-  sets the same consraint for a range of elements defined bu nodes
-  Piotr Skowronski Mar 2007
-*/
-  struct node* c_node;
-  char tablecmd[500];
-  char buff[500];
-  char* p;
-
-  c_node = nodes[0];
-  do
-  {
-    strcpy(buff,c_node->name);
-
-    p = strstr(buff,":");
-    if ( p )
-    {
-      if (p[1] == '0') /*it means that this is a drift automatically added to a sequence*/
-      {               /*this guy does not work with table command so we do not care about him*/
-        c_node = c_node->next;
-        continue;
-      }
-      p[0] = '[';
-      p[2] = ']';
-      p[3] =  0;
-    }
-
-    sprintf(tablecmd,"constraint, weight=%f, expr=table(twiss,%s,%s)%c%s ;",
-            w,  buff, parname, s, rexpr);
-
-    pro_input(tablecmd);
-
-    if (nodes[1] == c_node) break; /*only one element in the range*/
-
-    c_node = c_node->next;
-  } while ( c_node && (c_node != nodes[1]) );
 }
 
 void
@@ -772,7 +764,7 @@ int
 match2_evaluate_exressions(int i, int k, double* fun_vec)
 {
   int j;
-  double rhs,lhs,r;/* RDM fork */
+  double rhs,lhs,r;
   char s;
   for(j=0; j < MAX_MATCH_CONS ;j++) {
 

@@ -7,6 +7,6 @@ struct in_cmd;
 
 // interface
 
-void pro_ibs(struct in_cmd* cmd);
+void pro_ibs(struct in_cmd*);
 
 #endif // MAD_IBS_H

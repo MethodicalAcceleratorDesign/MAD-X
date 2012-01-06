@@ -1079,6 +1079,18 @@ alias(char* par_string) /* returns main parameter for alias */
   else return par_string;
 }
 
+int
+log_val(char* name, struct command* cmd)
+  /* returns 0 = false, 1 = true for a logical command parameter */
+{
+  struct name_list* nl = cmd->par_names;
+  struct command_parameter_list* pl = cmd->par;
+  int pos = name_list_pos(name, nl);
+  if (pos > -1 && nl->inform[pos]) /* "name" has beem read */
+    return pl->parameters[pos]->double_value == zero ? 0 : 1;
+  else return 0;
+}
+
 // public interface (used by Fortran)
 
 double
