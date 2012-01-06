@@ -58,7 +58,6 @@
 #include "mad_plot.h"
 #include "mad_time.h"
 #include "mad_util.h"
-#include "mad_help.h"
 
 // command modules
 
