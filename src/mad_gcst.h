@@ -1,15 +1,16 @@
 #ifndef MAD_GCST_H
 #define MAD_GCST_H
 
+/* Temporary file: global constants
+   these constants will be split over their respective modules...
+   and should be const pointers to constant values...
+*/
+
 extern const char *version_name;
 extern const char *version_arch;
 extern const char *version_type_dev;
 extern const char *version_type_pro;
 extern const char *version_date_mod;
-
-// Temporary file: global constants
-// these constants should be split over their respective modules...
-// and should be const pointers to constant values...
 
 extern char* const functs[];
 extern const char op_string[];
@@ -25,7 +26,7 @@ extern const char* cmd_match_base[];
 
 extern char*  aperture_types[];
 
-/*added 4, 3 and "racetrack" here, IW */
+/*added 4, 3 and "racetrack" here */
 
 extern int    aperture_npar[];
 
@@ -103,7 +104,7 @@ extern char*  dynap_table_cols[];
 extern int    dynaptune_table_types[];
 extern char*  dynaptune_table_cols[];
 
-/* Definition of "select_ptc_normal" parameters for "ptc_normal" FS/VK 20.04.2006*/
+/* Definition of "select_ptc_normal" parameters for "ptc_normal"*/
 extern char   names[PTC_NAMES_L][5];
 extern char   atm[3][4];
 extern char   atc[3][4];
@@ -114,4 +115,4 @@ extern int    atc_flag;
 extern char*  atm_type;
 extern int    atm_flag;
 
-#endif // MAD_GLOBALS_CST_H
+#endif // MAD_GCST_H

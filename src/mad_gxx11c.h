@@ -13,6 +13,7 @@ void wwait   (void);
 void wsetci  (char *uscol);
 void wsetls  (int *ls);
 void wstring (char *s, int *l);
+
 void cbyt    (int* source, int* s_pos, int* target, int* t_pos, int* n);
 void mydtime (int* year, int* month, int* day, int* hour, int* minute, int* sec);
 

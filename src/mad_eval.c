@@ -1,5 +1,170 @@
 #include "madx.h"
 
+static double
+act_value(int pos, struct name_list* chunks)
+  /* returns the actual value of a variable, element, or command parameter */
+{
+  char* name = chunks->names[pos];
+  char comm[NAME_L];
+  char par[NAME_L];
+  char *p, *n = name, *q = comm;
+  double val = zero;
+  struct element* el;
+  struct command* cmd = NULL;
+  if ((p = strstr(name, "->")) == NULL) /* variable */
+  {
+    if ((current_variable = find_variable(name, variable_list)) == NULL)
+    {
+      if (get_option("verify"))
+        warning("undefined variable set to zero:", name);
+      current_variable = new_variable(name, zero, 1, 1, NULL, NULL);
+      val = zero;
+      add_to_var_list(current_variable, variable_list, 0);
+    }
+    else val = variable_value(current_variable);
+  }
+  else /* element or command parameter */
+  {
+    while (n < p)  *(q++) = *(n++);
+    *q = '\0';
+    q = par; n++; n++;
+    while (*n != '\0')  *(q++) = *(n++);
+    *q = '\0';
+    if (strncmp(comm, "beam", 4) == 0)
+    {
+      cmd = current_beam = find_command("default_beam", beam_list);
+      if ((p = strchr(comm, '%')) != NULL)
+      {
+        if ((current_beam = find_command(++p, beam_list)) == NULL)
+          current_beam = cmd;
+      }
+      val = command_par_value(par, current_beam);
+    }
+    else if ((el = find_element(comm, element_list)) != NULL)
+      val = el_par_value(par, el);
+    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, beta0_list)) != NULL)
+      val = command_par_value(par, cmd);
+    else if ((cmd = find_command(comm, defined_commands)) != NULL)
+      val = command_par_value(par, cmd);
+  }
+  return val;
+}
+
+// public interface
+
+void
+deco_init(void)
+  /* initializes Polish decoding */
+{
+  expr_chunks = new_name_list("expr_chunks", 2000);
+  cat = new_int_array(MAX_ITEM);
+  deco = new_int_array(MAX_ITEM);
+  d_var = new_int_array(MAX_ITEM);
+  oper = new_int_array(MAX_ITEM);
+  func = new_int_array(MAX_ITEM);
+  cat_doubles = new_double_array(MAX_ITEM);
+  doubles = new_double_array(MAX_D_ITEM);
+  twiss_deltas = new_double_array(MAX_ITEM);
+}
+
+int
+act_special(int type, char* statement)
+  /* acts on special commands (IF{..} etc.) */
+{
+  struct char_array* loc_buff = NULL;
+  struct char_array* loc_w = NULL;
+  int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
+  int ret_val = 0;
+  struct char_p_array* logic;
+  int logex = 0;
+  char *cp = statement;
+  if (ls < IN_BUFF_SIZE) ls = IN_BUFF_SIZE;
+  if (level == pro->max) grow_in_buff_list(pro);
+  if (pro->buffers[level] == NULL)
+    pro->buffers[level] = new_in_buffer(ls);
+  else
+  {
+    while(pro->buffers[level]->c_a->max < ls)
+      grow_char_array(pro->buffers[level]->c_a);
+  }
+  if (type == 5) /* macro */ return make_macro(statement);
+  else if (type == 6) /* line */ return make_line(statement);
+  logic = new_char_p_array(1000);
+  loc_buff = new_char_array(ls);
+  loc_w = new_char_array(ls);
+  get_bracket_range(statement, '{', '}', &rs, &re);
+  if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
+  cnt_1 = rs; start_2 = rs + 1;
+  mystrcpy(loc_buff, statement); loc_buff->c[re] =  '\0';
+  while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
+  strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';
+  switch (type)
+  {
+    case 1:  /* if */
+      pro->buffers[level]->flag = 0;
+    case 3:  /* else if */
+      if (pro->buffers[level]->flag < 0)
+      {
+        ret_val = -1;
+        break;
+      }
+      if (pro->buffers[level]->flag == 0)
+      {
+        pre_split(aux_buff->c, loc_w, 0);
+        mysplit(loc_w->c, tmp_l_array);
+        get_bracket_t_range(tmp_l_array->p, '(', ')', 0, tmp_l_array->curr,
+                            &rs, &re);
+        rs++;
+        if ((logex = logic_expr(re-rs, &tmp_l_array->p[rs])) > 0)
+        {
+          pro->buffers[level]->flag = 1;
+          pro->curr++;
+          /* now loop over statements inside {...} */
+          pro_input(&loc_buff->c[start_2]);
+          pro->curr--;
+        }
+        else if (logex < 0) warning("illegal if construct set false:", cp);
+      }
+      break;
+    case 2: /* else */
+      if (pro->buffers[level]->flag < 0)
+      {
+        ret_val = -1;
+        break;
+      }
+      if (pro->buffers[level]->flag == 0)
+      {
+        pro->curr++;
+        /* now loop over statements inside {...} */
+        pro_input(&loc_buff->c[start_2]);
+        pro->curr--;
+        pro->buffers[level]->flag = -1;
+      }
+      break;
+    case 4: /* while */
+      pre_split(aux_buff->c, loc_w, 0);
+      mysplit(loc_w->c, logic);
+      get_bracket_t_range(logic->p, '(', ')', 0, logic->curr,
+                          &rs, &re);
+      pro->curr++; rs++;
+      while ((logex = logic_expr(re-rs, &logic->p[rs])) > 0)
+      {
+        /* now loop over statements inside {...} */
+        pro_input(&loc_buff->c[start_2]);
+      }
+      pro->curr--;
+      break;
+    default:
+      ret_val = -1;
+  }
+  if (loc_buff != NULL) delete_char_array(loc_buff);
+  if (loc_w != NULL) delete_char_array(loc_w);
+  delete_char_p_array(logic, 0);
+  return ret_val;
+}
+
 void
 pro_input(char* statement)
   /* processes one special (IF() etc.), or one normal statement after input */
@@ -184,151 +349,288 @@ process(void)  /* steering routine: processes one command */
   }
 }
 
-double
-act_value(int pos, struct name_list* chunks)
-  /* returns the actual value of a variable, element, or command parameter */
+int
+polish_expr(int c_item, char** item)   /* split input */
+  /* deco output array containing:
+     expression in Polish notation of length deco->curr,
+     coded as 0-, 1+, 2*, 3/, 4^ (power),
+     6 evaluate function
+     100000000 + n = variable n (refers to vars),
+     200000000 + n = function n (refers to functs),
+     400000000 + n = real n (refers to doubles)
+     -- Example: suppose a, b are variables 0 and 4, exp is function 3:
+     then     3 * a * q[l] * q[k1] / exp((b - 1.57)^2) + 1.57
+     would result in
+     400000000 100000000 2 100000001 2 100000002 2
+     100000003 400000001 0 400000002 3 200000003 3 400000001 1
+     where 3 = real 0, 1.57 = real 1, 2 = real 2
+     a = vars 0, q[l] vars 1, q[k1] vars 2, exp functs 3
+  */
 {
-  char* name = chunks->names[pos];
-  char comm[NAME_L];
-  char par[NAME_L];
-  char *p, *n = name, *q = comm;
-  double val = zero;
-  struct element* el;
-  struct command* cmd = NULL;
-  if ((p = strstr(name, "->")) == NULL) /* variable */
+  int i, j, error, op, id, stack = 0, l_deco, l_double;
+  int up[100][3] = {{-1, -1, -1}};
+
+  l_deco = deco->curr = 0;
+  l_double = doubles->curr;
+  error = scan_expr(c_item, item);
+  if (error) return error;
+  for (i = 0; i < cat->curr; i++)
   {
-    if ((current_variable = find_variable(name, variable_list)) == NULL)
+
+    /* categories: 1: variable, 3: floating constant, 4: operator
+       6: left par., 7: right par.     */
+    switch (cat->i[i])
     {
-      if (get_option("verify"))
-        warning("undefined variable set to zero:", name);
-      current_variable = new_variable(name, zero, 1, 1, NULL, NULL);
-      val = zero;
-      add_to_var_list(current_variable, variable_list, 0);
-    }
-    else val = variable_value(current_variable);
-  }
-  else /* element or command parameter */
+      case 1:                              /* variable */
+        if (l_deco == deco->max) grow_int_array(deco);
+        deco->i[l_deco++] = 100000000 + d_var->i[i];
+        break;
+      case 3:                              /* constant */
+        if (l_deco == deco->max) grow_int_array(deco);
+        if (l_double == doubles->max) grow_double_array(doubles);
+        doubles->a[l_double] = cat_doubles->a[i];
+        deco->i[l_deco++] = 400000000 + l_double++;
+        doubles->curr = l_double;
+        break;
+      case 4:
+        if ((op = oper->i[i]) < 5)           /* operator */
+        {
+          id = op / 2;
+          for (j = 2; j >= id; j--)
+          {
+            if (up[stack][j] > -1)
+            {
+              if (l_deco == deco->max) grow_int_array(deco);
+              deco->i[l_deco++] = up[stack][j];
+              up[stack][j] = -1;
+            }
+          }
+          up[stack][id] = op;
+        }
+        else
+        {
+          if (l_deco == deco->max) grow_int_array(deco);
+          deco->i[l_deco++] = 200000000 + func->i[i];  /* function */
+        }
+        break;
+      case 6:      /*  '(' */
+        stack++;
+        for (j = 0; j < 3; j++)  up[stack][j] = -1;
+        break;
+      case 7:      /*  ')' */
+        for (j = 2; j >= 0; j--)
+        {
+          if (up[stack][j] > -1)
+          {
+            if (l_deco == deco->max) grow_int_array(deco);
+            deco->i[l_deco++] = up[stack][j];
+          }
+        }
+        stack--;
+        break;
+      default:
+        return 9;
+    }   /* end switch */
+  }     /* end loop over categories */
+  for (j = 2; j >= 0; j--)   /* clear stack */
   {
-    while (n < p)  *(q++) = *(n++);
-    *q = '\0';
-    q = par; n++; n++;
-    while (*n != '\0')  *(q++) = *(n++);
-    *q = '\0';
-    if (strncmp(comm, "beam", 4) == 0)
+    if (up[stack][j] > -1)
     {
-      cmd = current_beam = find_command("default_beam", beam_list);
-      if ((p = strchr(comm, '%')) != NULL)
-      {
-        if ((current_beam = find_command(++p, beam_list)) == NULL)
-          current_beam = cmd;
-      }
-      val = command_par_value(par, current_beam);
+      if (l_deco == deco->max) grow_int_array(deco);
+      deco->i[l_deco++] = up[stack][j];
     }
-    else if ((el = find_element(comm, element_list)) != NULL)
-      val = el_par_value(par, el);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      val = command_par_value(par, cmd);
   }
-  return val;
+  deco->curr = l_deco;
+  return 0;
 }
 
-int
-act_special(int type, char* statement)
-  /* acts on special commands (IF{..} etc.) */
+double
+polish_value(struct int_array* deco, char* expr_string)
+  /* coded input (see below) */
+  /* description see polish_expression */
 {
-  struct char_array* loc_buff = NULL;
-  struct char_array* loc_w = NULL;
-  int cnt_1, start_2, rs, re, level = pro->curr, ls = strlen(statement);
-  int ret_val = 0;
-  struct char_p_array* logic;
-  int logex = 0;
-  char *cp = statement;
-  if (ls < IN_BUFF_SIZE) ls = IN_BUFF_SIZE;
-  if (level == pro->max) grow_in_buff_list(pro);
-  if (pro->buffers[level] == NULL)
-    pro->buffers[level] = new_in_buffer(ls);
-  else
+  int i, k, kc, c_stack = -1;
+  double stack[MAX_ITEM];
+  char tmp[20];
+
+  if (++polish_cnt > MAX_LOOP)
+    fatal_error("circular call in expression", expr_string);
+  stack[0] = 0;
+  for (i = 0; i < deco->curr; i++)   /* decoding loop */
   {
-    while(pro->buffers[level]->c_a->max < ls)
-      grow_char_array(pro->buffers[level]->c_a);
-  }
-  if (type == 5) /* macro */ return make_macro(statement);
-  else if (type == 6) /* line */ return make_line(statement);
-  logic = new_char_p_array(1000);
-  loc_buff = new_char_array(ls);
-  loc_w = new_char_array(ls);
-  get_bracket_range(statement, '{', '}', &rs, &re);
-  if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
-  cnt_1 = rs; start_2 = rs + 1;
-  mystrcpy(loc_buff, statement); loc_buff->c[re] =  '\0';
-  while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
-  strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';
-  switch (type)
+    k = deco->i[i];
+    if ( k < 5)     /* operator */
+    {
+      if (c_stack < 0)
+      {
+        fatal_error("stack underflow in expression:", expr_string);
+      }
+      else if (c_stack == 0)
+      {
+        stack[1] = stack[0]; stack[0] = 0;
+      }
+      else  c_stack--;
+
+
+      switch(k)
+      {
+        case 0:
+          stack[c_stack] -= stack[c_stack+1];
+          break;
+        case 1:
+          stack[c_stack] += stack[c_stack+1];
+          break;
+        case 2:
+          stack[c_stack] *= stack[c_stack+1];
+          break;
+        case 3:
+          if (stack[c_stack+1] == 0.0)
+          {
+            warning("division by zero, result set to zero, expr:",
+                    expr_string);
+            stack[c_stack] = 0.0;
+            break;
+          }
+          stack[c_stack] /= stack[c_stack+1];
+          break;
+        case 4:
+          stack[c_stack] = pow(stack[c_stack],stack[c_stack+1]);
+          break;
+        default:
+          fatal_error("illegal operator, Polish, expr.:", expr_string);
+      }
+    }
+    else
+    {
+      kc = k / 100000000;  k -= 100000000 * kc;
+      switch(kc)
+      {
+        case 1:            /* variable */
+          stack[++c_stack] = act_value(k, expr_chunks);
+          break;
+        case 4:            /* real constant */
+          stack[++c_stack] = doubles->a[k];
+          break;
+        case 2:            /* function */
+          switch(k-1)      /* the offset is due to dummyfunction */
+          {
+            case 0:
+              stack[c_stack] = fabs(stack[c_stack]);
+              break;
+            case 1:
+              stack[c_stack] = sqrt(stack[c_stack]);
+              break;
+            case 2:
+              stack[c_stack] = exp(stack[c_stack]);
+              break;
+            case 3:
+              stack[c_stack] = log(stack[c_stack]);
+              break;
+            case 4:
+              stack[c_stack] = log10(stack[c_stack]);
+              break;
+            case 5:
+              stack[c_stack] = sin(stack[c_stack]);
+              break;
+            case 6:
+              stack[c_stack] = cos(stack[c_stack]);
+              break;
+            case 7:
+              stack[c_stack] = tan(stack[c_stack]);
+              break;
+            case 8:
+              stack[c_stack] = asin(stack[c_stack]);
+              break;
+            case 9:
+              stack[c_stack] = acos(stack[c_stack]);
+              break;
+            case 10:
+              stack[c_stack] = atan(stack[c_stack]);
+              break;
+            case 11:
+              stack[c_stack] = sinh(stack[c_stack]);
+              break;
+            case 12:
+              stack[c_stack] = cosh(stack[c_stack]);
+              break;
+            case 13:
+              stack[c_stack] = tanh(stack[c_stack]);
+              break;
+            case 14:
+              stack[c_stack] = frndm();
+              break;
+            case 15:
+              stack[c_stack] = grndm();
+              break;
+            case 16:
+              stack[c_stack] = tgrndm(stack[c_stack]);
+              break;
+            case 17:
+              stack[c_stack] = table_value();
+              break;
+            case 18: /* function "exist" */
+              continue; /* value in stack not changed */
+              break;
+            case 19:
+              stack[c_stack] = floor(stack[c_stack]);
+              break;
+            case 20:
+              stack[c_stack] = ceil(stack[c_stack]);
+              break;
+            case 21:
+              stack[c_stack] = rint(stack[c_stack]);
+              break;
+            case 22: {
+              double int_part;
+              stack[c_stack] = modf(stack[c_stack], &int_part);
+              } break;
+            default:
+              fatal_error("polish_value: illegal function in expr:",
+                          expr_string);
+          }
+          break;
+        default:
+          /* if you get here, then most likely someone has created
+             more than 100000000 double precision numbers */
+          sprintf(tmp, "%d", k-1);
+          fatal_error("illegal type in Polish decoding: ", tmp);
+          exit(1);
+      }
+    }
+  }       /* end of decoding loop */
+  polish_cnt--;
+  return stack[0];
+}
+
+void
+print_value(struct in_cmd* cmd)
+{
+  char** toks = &cmd->tok_list->p[cmd->decl_start];
+  int n = cmd->tok_list->curr - cmd->decl_start;
+  int j, s_start = 0, end, type, nitem;
+  while (s_start < n)
   {
-    case 1:  /* if */
-      pro->buffers[level]->flag = 0;
-    case 3:  /* else if */
-      if (pro->buffers[level]->flag < 0)
+    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
+    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
+    {
+      nitem = end + 1 - s_start;
+      if (polish_expr(nitem, &toks[s_start]) == 0)
+        fprintf(prt_file, v_format("%s = %F ;\n"),
+                spec_join(&toks[s_start], nitem), 
+                polish_value(deco, join(&toks[s_start], nitem)));
+      else
       {
-        ret_val = -1;
-        break;
+        warning("invalid expression:", spec_join(&toks[s_start], nitem));
+        return;
       }
-      if (pro->buffers[level]->flag == 0)
-      {
-        pre_split(aux_buff->c, loc_w, 0);
-        mysplit(loc_w->c, tmp_l_array);
-        get_bracket_t_range(tmp_l_array->p, '(', ')', 0, tmp_l_array->curr,
-                            &rs, &re);
-        rs++;
-        if ((logex = logic_expr(re-rs, &tmp_l_array->p[rs])) > 0)
-        {
-          pro->buffers[level]->flag = 1;
-          pro->curr++;
-          /* now loop over statements inside {...} */
-          pro_input(&loc_buff->c[start_2]);
-          pro->curr--;
-        }
-        else if (logex < 0) warning("illegal if construct set false:", cp);
-      }
-      break;
-    case 2: /* else */
-      if (pro->buffers[level]->flag < 0)
-      {
-        ret_val = -1;
-        break;
-      }
-      if (pro->buffers[level]->flag == 0)
-      {
-        pro->curr++;
-        /* now loop over statements inside {...} */
-        pro_input(&loc_buff->c[start_2]);
-        pro->curr--;
-        pro->buffers[level]->flag = -1;
-      }
-      break;
-    case 4: /* while */
-      pre_split(aux_buff->c, loc_w, 0);
-      mysplit(loc_w->c, logic);
-      get_bracket_t_range(logic->p, '(', ')', 0, logic->curr,
-                          &rs, &re);
-      pro->curr++; rs++;
-      while ((logex = logic_expr(re-rs, &logic->p[rs])) > 0)
-      {
-        /* now loop over statements inside {...} */
-        pro_input(&loc_buff->c[start_2]);
-      }
-      pro->curr--;
-      break;
-    default:
-      ret_val = -1;
+      s_start = end+1;
+      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+    }
+    else
+    {
+      warning("invalid expression:", spec_join(&toks[s_start], n));
+      return;
+    }
   }
-  if (loc_buff != NULL) delete_char_array(loc_buff);
-  if (loc_w != NULL) delete_char_array(loc_w);
-  delete_char_p_array(logic, 0);
-  return ret_val;
 }
 

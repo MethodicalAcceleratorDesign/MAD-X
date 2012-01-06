@@ -8,21 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
-#ifdef _WIN32
-typedef size_t uintptr_t;
-#else
-#include <stdint.h>
-#endif
+// portability
 
-#ifdef _ICC
-// problem with non-standard Intel names in math.h
-#define compound(a,b) compound_intel(a,b)
-#include <math.h>
-#undef  compound
-#else
-#include <math.h>
-#endif
+#include "mad_port.h"
 
 // defines
 
@@ -44,7 +34,6 @@ typedef size_t uintptr_t;
 #include "mad_expr.h"
 #include "mad_const.h"
 
-#include "mad_rpn.h"
 #include "mad_eval.h"
 #include "mad_exec.h"
 #include "mad_array.h"

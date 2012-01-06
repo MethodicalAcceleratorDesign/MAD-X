@@ -1,12 +1,14 @@
 #ifndef MAD_GVAR_H
 #define MAD_GVAR_H
 
-#include <time.h>   // for time_t
-#include <stdio.h>  // for FILE
+/* Temporary file: global variables
+   these variables will be split over their respective modules...
+*/
 
-extern int  debuglevel;
+extern int debuglevel;
 
 /* Global structure variables by type (alphabetic) */
+
 extern struct char_array* aux_buff;       /* temporary buffer for many purposes */
 extern struct char_array* c_dum;
 extern struct char_array* c_join;
@@ -33,7 +35,7 @@ extern struct command* current_twiss;   /* current twiss command */
 extern struct command* current_command; /* current command clone */
 extern struct command* current_gweight; /* current gweight clone */
 extern struct command* current_weight;  /* current weight clone */
-extern struct command* current_match;   /* OB 23.1.2002: current match comm. */
+extern struct command* current_match;   /* current match comm. */
 extern struct command* current_eopt ;   /* to keep eoption command */
 extern struct command* threader_par ;   /* threader parameters */
 
@@ -62,7 +64,7 @@ extern struct double_array* twiss_deltas;   /* for deltap loop in twiss command 
 extern struct double_array* vary_vect;      /* for matching */
 extern struct double_array* vary_dvect;     /* for matching */
 extern struct double_array* fun_vect;       /* for matching */
-extern struct double_array* match_work[MATCH_WORK];  /* work space for matching */
+extern struct double_array* match_work[MATCH_WORK];/* work space for matching */
 
 extern struct el_list* drift_list;
 extern struct el_list* element_list;
@@ -71,8 +73,8 @@ extern struct el_list* selected_elements;
 
 extern struct expression* backup_expr;
 
-extern struct in_buff_list* in;           /* list of all active input buffers */
-extern struct in_buff_list* pro;          /* list of active processing buffers */
+extern struct in_buff_list* in;      /* list of all active input buffers */
+extern struct in_buff_list* pro;     /* list of active processing buffers */
 
 extern struct int_array* deco;       /* Polish: coded expression */
 extern struct int_array* cat;        /* Polish: catgories */
@@ -86,8 +88,8 @@ extern struct int_array* ed_range;   /* ends of deselect ranges */
 extern struct int_array* match_i_work[MATCH_WORK];  /* int work space for matching */
 
 extern struct in_cmd* this_cmd;      /* contains command just read */
-extern struct in_cmd* local_twiss[2]; /* OB 1.2.2002 */
-extern struct in_cmd* embedded_twiss_cmd;/* current plot command (ETdA 30.1.2004)*/
+extern struct in_cmd* local_twiss[2];
+extern struct in_cmd* embedded_twiss_cmd; /* current plot command */
 
 extern struct in_cmd_list* buffered_cmds;
 
@@ -111,7 +113,7 @@ extern struct sequence* edit_sequ;     /* pointer to sequence being edited */
 extern struct sequence_list* sequences;    /* pointer to sequence list */
 extern struct sequence_list* match_sequs;  /* pointer to sequence list for match */
 
-extern struct table* aperture_table;   /* current aperture table */
+extern struct table* aperture_table;     /* current aperture table */
 extern struct table* ibs_table;          /* current ibs table */
 extern struct table* touschek_table;     /* current touschek table */
 extern struct table* summ_table;         /* current twiss summary table */
@@ -121,21 +123,16 @@ extern struct table* twiss_table_beam2;  /* current twiss table beam2 */
 extern struct table* twiss_sector_table; /* used for sectormap */
 extern struct table* ptc_twiss_summary_table; /* holds summary data after one turn */
 extern struct table* map_table;          /* added for twiss_input_table */
-extern struct table_list* table_register;/* added by kzhang 26/06/2005 */
-extern struct table_list* moments_tables;/* skowron - tables for moments */
+extern struct table_list* table_register;
+extern struct table_list* moments_tables;/* tables for moments */
 
-
-/* E. T. d'Amico 2 feb 2004 */
-extern struct table* embedded_twiss_table;        /* current twiss table */
-/* end additions */
-/* E. T. d'Amico 5 nov 2004 */
+extern struct table* embedded_twiss_table;/* current twiss table */
 extern struct table* normal_results;     /* ptc table containing the selected high order functions (such as dx,qx,anhx etc.) */
-/* end additions */
 
 extern struct table* errors_dipole;
 extern struct table* errors_field;
 extern struct table* errors_total;
-extern struct table* errors_read; /* table needed for IO of errors with PTC FS Sep 2008*/
+extern struct table* errors_read;        /* table needed for IO of errors with PTC */
 
 extern struct table* survey_table;       /* current survey table */
 extern struct table* corr_table;         /* corrector table after orbit correction */
@@ -185,12 +182,12 @@ extern FILE* debug_file;              /* for debug output */
 extern FILE* stamp_file;              /* for debug output */
 extern FILE* out_file;                /* for table output */
 extern FILE* prt_file;                /* for echo output */
-extern FILE* sec_file;         /* for sector output in "embedded" twiss */
+extern FILE* sec_file;                /* for sector output in "embedded" twiss */
 extern FILE* tab_file;                /* for table input */
 
 /* Global simple variables by type */
 
-extern char quote;                       /* current open single or double quote */
+extern char quote;                      /* current open single or double quote */
 extern char int_format[20],             /* current integer format */
             float_format[20],           /* current float format */
             string_format[20];          /* current string format */
@@ -198,20 +195,18 @@ extern char var_form[1000];             /* buffer for the user-controlled format
 extern char blank[];
 extern char none[];
 extern char one_string[];
-extern char aptwfile[FNAME_L]; /* IW 02.12.2004 */
+extern char aptwfile[FNAME_L];
 extern char* aux_char_pt;               /* for debug purposes */
 extern char* exx;
 extern char* current_link_group;
 extern char* current_range;             /* currently used range, or NULL */
 extern char* title;
-extern char* match_seqs[2];             /* OB 23.1.2002   */
-extern char* match_beta[2];             /* OB 23.1.2002   */
-extern char* match_range[2];            /* HG 12.11.2002   */
+extern char* match_seqs[2];
+extern char* match_beta[2];
+extern char* match_range[2];
 extern char* track_filename;            /* track module file name start */
 extern char* track_fileext;             /* track module file name extension */
-/* E. T. d'Amico 11 june 2004 */
-extern char track_plot_filename[NAME_L];            /* plot module: output postscript file name in track mode */
-/* end additions */
+extern char  track_plot_filename[NAME_L];/* plot module: output postscript file name in track mode */
 
 extern double pi, twopi, degrad, raddeg, e, clight, hbar;
 extern double penalty;
@@ -221,9 +216,7 @@ extern double disp0[6];
 extern double sxf_suml;    
 extern double track_deltap;
 extern double oneturnmat[36];
-/* E. T. d'Amico 13 may 2004 */
-extern double fintx_plot;              /* to save the value of fintx for the reset_interpolation routine */
-/* end additions */
+extern double fintx_plot;    /* to save the value of fintx for the reset_interpolation routine */
 
 extern const double zero;
 extern const double one;
@@ -240,21 +233,17 @@ extern const double ten_m_15;
 extern const double ten_m_16;
 extern const double ten_m_19;
 
-extern int add_error_opt;      /* ADD error option, set with eoption */
+extern int add_error_opt;          /* ADD error option, set with eoption */
 extern int backup_type;
 
-/* E. T. d'Amico 25 feb 2004 */
-extern int rbend;              /* flag (= 1 when the element is a rectangular bending magnet) */
-/* E. T. d'Amico 13 may 2004 */
-extern int embedded_flag;              /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
-/* E. T. d'Amico 17 nov 2004 */
-extern int min_order;      /* minimum required order */
-/* end additions */
-extern int print_correct_opt;  /* PRINT options for orbit correction */
-extern int debug_correct_opt;       /* DEBUG options for orbit correction */
+extern int rbend;                  /* flag (= 1 when the element is a rectangular bending magnet) */
+extern int embedded_flag;          /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
+extern int min_order;              /* minimum required order */
+extern int print_correct_opt;      /* PRINT options for orbit correction */
+extern int debug_correct_opt;      /* DEBUG options for orbit correction */
 extern int assign_start;           /* flag for multiple assign statements */
 extern int aux_count;              /* for debug purposes */
-extern int beam_info;         /* flag to print beam information once */
+extern int beam_info;              /* flag to print beam information once */
 extern int c_range_end;            /* node count of current range end */
 extern int c_range_start;          /* node count of current range start */
 extern int curr_obs_points;        /* current number of observation points */
@@ -268,31 +257,30 @@ extern int group_is_on;            /* true when inside group */
 extern int guess_flag;             /* != 0 if coguess read */
 extern int in_stop;                /* input buffer stop flag */
 extern int inbuf_level;            /* input buffer level */
-extern int init_warn;          /* intialisation warning level */
+extern int init_warn;              /* intialisation warning level */
 extern int interactive;            /* non-zero if interactive */
 extern int irn_rand[NR_RAND];      /* for random generator */
 extern int keep_tw_print;          /* previous twiss print flag (match) */
 extern int loop_cnt;               /* used to detect infinite loops */
 extern int match_calls;            /* command call limit in match */
 extern int match_is_on;            /* true when inside match command */
-extern int match_num_beta;         /* OB 23.1.2002 */
-extern int match_num_range;        /* HG 12.11.2002 */
-extern int match_num_seqs;         /* OB 23.1.2002 */
+extern int match_num_beta;
+extern int match_num_range;
+extern int match_num_seqs;
 extern int mig_strategy;           /* migrad strategy (match) */
-extern int jac_strategy;           /* RDM 24.8.2005 jacobian strategy (match) */
-extern int jac_repeat;             /* RDM 24.8.2005 jacobian repeat (match) */
-extern double jac_cool;            /* RDM 24.8.2005 jacobian cool factor (match) */
-extern double jac_balance;         /* RDM 24.8.2005 jacobian balance cool factor (match) */
-extern double jac_random;         /* RDM 24.8.2005 jacobian random factor (match) */
-extern int jac_bisec;             /* RDM 16.3.2006 jacobian bisec factor (match) */
-extern double jac_cond;              /* RDM 17.11.2006 jacobian svd cond. num (match) */
+extern int jac_strategy;           /* jacobian strategy (match) */
+extern int jac_repeat;             /* jacobian repeat (match) */
+extern double jac_cool;            /* jacobian cool factor (match) */
+extern double jac_balance;         /* jacobian balance cool factor (match) */
+extern double jac_random;          /* jacobian random factor (match) */
+extern int jac_bisec;              /* jacobian bisec factor (match) */
+extern double jac_cond;            /* jacobian svd cond. num (match) */
 extern int new_name_count;         /* to make internal names */
 extern int next_rand;              /* for random generator */
 extern int plots_made;             /* set to 1 if plots are made */
 extern int polish_cnt;             /* used to detect infinite loops */
-extern int print_match_summary;    /* OB 6.3.2002:
-                               activate the print option in the
-                               'mtgeti' and 'collect' routines (mtgeti->mtgetc JMJ, 8/4/2003)    */
+extern int print_match_summary;    /* activate the print option in the
+                                      'mtgeti' and 'collect' routines (mtgeti->mtgetc) */
 extern int quote_toggle;           /* for quote strings on input */
 extern int return_flag;            /* 1 when "return" read */
 extern int scrap_count;            /* running counter to make things unique */
@@ -312,32 +300,33 @@ extern int use_count;              /* incremented by 1 every time use is execute
 extern int vary_cnt;               /* counter for vary commands */
 extern int watch_flag;             /* produces debug output when != 0 */
 
-extern int na_err,              /* current no. of alignment errors */
-  nf_err,              /* current no. of field errors */
-  indent,          /* current indentation count */
-  b_level,         /* current brace level */
-  sxf_elem_cnt,    /* element count */
-  tag_flag,        /* if > 0, tag = parent name written */
-  tag_cnt,         /* if > 0, tag = specified type code
-                          written for selected types only */
-  sxf_align_cnt,       /* element with align errors count */
-  sxf_field_cnt,       /* element with field errors count */
-  stop_flag,           /* 1 if stop condition */
-  occnt_add,       /* flag for element name modification */
-  b_indent[100],       /* list of indents */
-  add_indent[];
+extern int na_err,                 /* current no. of alignment errors */
+           nf_err,                 /* current no. of field errors */
+           indent,                 /* current indentation count */
+           b_level,                /* current brace level */
+           sxf_elem_cnt,           /* element count */
+           tag_flag,               /* if > 0, tag = parent name written */
+           tag_cnt,                /* if > 0, tag = specified type code
+                                      written for selected types only */
+           sxf_align_cnt,          /* element with align errors count */
+           sxf_field_cnt,          /* element with field errors count */
+           stop_flag,              /* 1 if stop condition */
+           occnt_add,              /* flag for element name modification */
+           b_indent[100],          /* list of indents */
+           add_indent[];
 
 extern double
-  guess_orbit[6],
-  al_errors[ALIGN_MAX],
-  fd_errors[FIELD_MAX];
+           guess_orbit[6],
+           al_errors[ALIGN_MAX],
+           fd_errors[FIELD_MAX];
 
-extern char line[MADX_LINE_MAX],
-  tag_type[MAX_TAG][16],
-  tag_code[MAX_TAG][16];
+extern char
+           line[MADX_LINE_MAX],
+           tag_type[MAX_TAG][16],
+           tag_code[MAX_TAG][16];
 
-time_t last_time;
-time_t start_time;
+time_t     last_time,
+           start_time;
 
 extern char filenames[100][500];
 extern int  currentline[100];

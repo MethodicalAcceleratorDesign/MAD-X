@@ -1,6 +1,11 @@
 #include "mad_def.h"
 #include "mad_gcst.h"
 
+/* Temporary file: global constants
+   these constants will be split over their respective modules...
+   and should be const pointers to constant values...
+*/
+
 // madx version and date from makefile
 
 #define mkstr(a)  mkstr_(a)
@@ -15,8 +20,7 @@ const char *version_date_mod = "Code Modification Date: " mkstr(_VERSION_DATE);
 #undef mkstr
 #undef mkstr_
 
-// Temporary file: these constants should be split over their respective modules...
-
+// madx constants
 
 char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
                         "sin", "cos", "tan", "asin", "acos",
@@ -62,7 +66,7 @@ char* aperture_types[] =
   " "  /* blank terminates */
 };
 
-/*added 4, 3 and "racetrack" here, IW */
+/*added 4, 3 and "racetrack" here */
 
 int aperture_npar[] =
 {
@@ -97,7 +101,7 @@ int survey_table_types[] =
   3, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   1, 1, 2,
-  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  /*== dealt with the new property v_pos as for mech_sep */
   2
   /*==*/
 };
@@ -107,7 +111,7 @@ char* survey_table_cols[] =
   "name", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
   "slot_id", "assembly_id", "mech_sep",
-  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  /*== dealt with the new property v_pos as for mech_sep */
   "v_pos",
   /*==*/
   " "  /* blank terminates */
@@ -167,7 +171,7 @@ int twiss_mult_end = 78; /* last multipole column filled
                             by complete_twiss_table */
 int twiss_fill_end = 97; /* last standard column filled
                             by complete_twiss_table */
-/*== jln 11.11.2010 increased twiss_fill_end from 96 to 97 to accomodate for v_pos */
+/*== increased twiss_fill_end from 96 to 97 to accomodate for v_pos */
 
 /* warning: modify routine complete_twiss_table in case of changes */
 int twiss_table_types[] =
@@ -261,7 +265,7 @@ char* twiss_table_cols[] =
   "h2", "hgap", "fint", "fintx",
   "volt", "lag", "freq", "harmon",
   "slot_id","assembly_id","mech_sep",
-  /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+  /*== dealt with the new property v_pos as for mech_sep */
   "v_pos",
   /*==*/
   "lrad","parent",
@@ -663,7 +667,7 @@ char* dynaptune_table_cols[] =
   " "  /* blank terminates */
 };
 
-/* Definition of "select_ptc_normal" parameters for "ptc_normal" FS/VK 20.04.2006*/
+/* Definition of "select_ptc_normal" parameters for "ptc_normal" */
 char names[PTC_NAMES_L][5]=
 {
   "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"

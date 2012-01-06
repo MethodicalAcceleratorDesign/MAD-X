@@ -1,5 +1,49 @@
 #include "madx.h"
 
+/* combine two parameters using compound expression */
+static struct expression*
+comb_param(struct command_parameter* param1, char* op, struct command_parameter* param2)
+{
+  return compound_expr(param1->expr,param1->double_value,op,param2->expr,param2->double_value);
+}
+
+static double
+combine_expr_expr(struct expression* exp1, char* oper, 
+                  struct expression* exp2, struct expression** comb_exp)
+{
+  strcpy(c_dum->c, exp1->string);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, exp2->string);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
+
+static double
+combine_expr_val(struct expression* exp1, char* oper, double val2, struct expression** comb_exp)
+{
+  strcpy(c_dum->c, exp1->string);
+  sprintf(aux_buff->c, "%.12g", val2);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, aux_buff->c);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
+
+static double
+combine_val_expr(double val1, char* oper, struct expression* exp2, struct expression** comb_exp)
+{
+  sprintf(c_dum->c, "%.12g", val1);
+  strcat(c_dum->c, oper);
+  strcat(c_dum->c, exp2->string);
+  mysplit(c_dum->c, tmp_p_array);
+  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
+  return expression_value(*comb_exp, 2);
+}
+
+// public interface
+
 struct expression*
 make_expression(int n, char** toks)
   /* makes an expression from a list of tokens */
@@ -162,41 +206,6 @@ expr_combine(struct expression* exp1, double val1, char* oper,
   else if(exp2 == NULL) val = combine_expr_val(exp1, oper, val2, exp_comb);
   else                  val = combine_expr_expr(exp1, oper, exp2, exp_comb);
   return val;
-}
-
-double
-combine_expr_expr(struct expression* exp1, char* oper, 
-                  struct expression* exp2, struct expression** comb_exp)
-{
-  strcpy(c_dum->c, exp1->string);
-  strcat(c_dum->c, oper);
-  strcat(c_dum->c, exp2->string);
-  mysplit(c_dum->c, tmp_p_array);
-  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
-  return expression_value(*comb_exp, 2);
-}
-
-double
-combine_expr_val(struct expression* exp1, char* oper, double val2, struct expression** comb_exp)
-{
-  strcpy(c_dum->c, exp1->string);
-  sprintf(aux_buff->c, "%.12g", val2);
-  strcat(c_dum->c, oper);
-  strcat(c_dum->c, aux_buff->c);
-  mysplit(c_dum->c, tmp_p_array);
-  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
-  return expression_value(*comb_exp, 2);
-}
-
-double
-combine_val_expr(double val1, char* oper, struct expression* exp2, struct expression** comb_exp)
-{
-  sprintf(c_dum->c, "%.12g", val1);
-  strcat(c_dum->c, oper);
-  strcat(c_dum->c, exp2->string);
-  mysplit(c_dum->c, tmp_p_array);
-  *comb_exp = make_expression(tmp_p_array->curr, tmp_p_array->p);
-  return expression_value(*comb_exp, 2);
 }
 
 void
@@ -462,38 +471,6 @@ compound_expr(struct expression* e1, double v1, char* oper, struct expression* e
   return expr;
 }
 
-void
-print_value(struct in_cmd* cmd)
-{
-  char** toks = &cmd->tok_list->p[cmd->decl_start];
-  int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, type, nitem;
-  while (s_start < n)
-  {
-    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
-    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
-    {
-      nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0)
-        fprintf(prt_file, v_format("%s = %F ;\n"),
-                spec_join(&toks[s_start], nitem), 
-                polish_value(deco, join(&toks[s_start], nitem)));
-      else
-      {
-        warning("invalid expression:", spec_join(&toks[s_start], nitem));
-        return;
-      }
-      s_start = end+1;
-      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
-    }
-    else
-    {
-      warning("invalid expression:", spec_join(&toks[s_start], n));
-      return;
-    }
-  }
-}
-
 /* scale an expression by a number - or leave it NULL */
 struct expression*
 scale_expr(struct expression* expr,double scale)
@@ -501,13 +478,5 @@ scale_expr(struct expression* expr,double scale)
   if (expr) return compound_expr(expr,0,"*",NULL,scale);
   return NULL;
 }
-
-/* combine two parameters using compound expression */
-struct expression*
-comb_param(struct command_parameter* param1, char* op, struct command_parameter* param2)
-{
-  return compound_expr(param1->expr,param1->double_value,op,param2->expr,param2->double_value);
-}
-
 
 

@@ -7,7 +7,6 @@ struct int_array;
 struct double_array;
 struct el_list;
 struct var_list;
-struct command_parameter;
 
 struct expression
 {
@@ -31,30 +30,27 @@ struct expr_list
 
 // interface
 
-struct expression*  clone_expression(struct expression* p);
-struct expression*  new_expression(char* in_string, struct int_array* polish);
-struct expr_list*   new_expr_list(int length);
-struct expr_list*   clone_expr_list(struct expr_list* p);
-struct expression*  delete_expression(struct expression* expr);
-struct expr_list*   delete_expr_list(struct expr_list* exprl);
-void    grow_expr_list(struct expr_list* p);
-void    dump_expression(struct expression* ex);
-void    print_value(struct in_cmd*);
 struct expression* make_expression(int n, char** toks);
-double  expression_value(struct expression* expr, int flag); /* recursive */
-void    fill_expr_list(char** toks, int s_start, int s_end, struct expr_list* p);
-void    fill_expr_var_list(struct el_list* ell, struct expression* expr, struct var_list* varl);
+struct expression* new_expression(char* in_string, struct int_array*);
+struct expression* clone_expression(struct expression*);
+struct expression* delete_expression(struct expression*);
+struct expression* scale_expr(struct expression*, double scale);
+struct expression* compound_expr(struct expression*, double v1, char* oper, struct expression*, double v2);
+double             expr_combine(struct expression*, double v1, char* oper, struct expression*, double v2, struct expression**);
+double             expression_value(struct expression*, int flag); /* recursive */
+void               dump_expression(struct expression*);
+
+struct expr_list* new_expr_list(int length);
+struct expr_list* clone_expr_list(struct expr_list*);
+struct expr_list* delete_expr_list(struct expr_list*);
+void              grow_expr_list(struct expr_list*);
+void              fill_expr_list(char** toks, int s_start, int s_end, struct expr_list*);
+void              fill_expr_var_list(struct el_list*, struct expression*, struct var_list*);
+void              update_vector(struct expr_list*, struct double_array*);
+
 double  double_from_expr(char** toks, int s_start, int s_end);
 int     loc_expr(char** items, int nit, int start, int* end);
 int     scan_expr(int c_item, char** item);
-void    update_vector(struct expr_list* ell, struct double_array* da);
-double  expr_combine(struct expression* exp1, double val1, char* oper, struct expression* exp2, double val2, struct expression** exp_comb);
-double  combine_expr_expr(struct expression* exp1, char* oper, struct expression* exp2, struct expression** comb_exp);
-double  combine_expr_val(struct expression* exp1, char* oper, double val2, struct expression** comb_exp);
-double  combine_val_expr(double val1, char* oper, struct expression* exp2, struct expression** comb_exp);
-struct expression*  compound_expr(struct expression* e1, double v1, char* oper, struct expression* e2, double v2);
-struct expression*  scale_expr(struct expression* expr,double scale);
-struct expression*  comb_param(struct command_parameter* param1, char* op, struct command_parameter* param2);
 
 #endif // MAD_EXPR_H
 

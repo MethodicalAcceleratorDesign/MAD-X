@@ -189,8 +189,6 @@ src/mad_gvar.c -text
 src/mad_gvar.h -text
 src/mad_gxx11c.c -text
 src/mad_gxx11c.h -text
-src/mad_help.c -text
-src/mad_help.h -text
 src/mad_ibs.c -text
 src/mad_ibs.h -text
 src/mad_inif_f.F90 -text
@@ -224,6 +222,7 @@ src/mad_parse.c -text
 src/mad_parse.h -text
 src/mad_plot.c -text
 src/mad_plot.h -text
+src/mad_port.h -text
 src/mad_ptc.c -text
 src/mad_ptc.h -text
 src/mad_ptcknobs.c -text
@@ -236,8 +235,6 @@ src/mad_regex.c -text
 src/mad_regex.h -text
 src/mad_rplot.cpp -text
 src/mad_rplot.h -text
-src/mad_rpn.c -text
-src/mad_rpn.h -text
 src/mad_sdds.c -text
 src/mad_sdds.h -text
 src/mad_select.c -text
