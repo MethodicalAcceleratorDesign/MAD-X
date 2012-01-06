@@ -1,79 +1,6 @@
 #include "madx.h"
 
-int
-node_al_errors(double* errors)
-  /* returns the alignment errors of a node */
-{
-  if (current_node->p_al_err == NULL) return 0;
-  else
-  {
-    copy_double(current_node->p_al_err->a, errors,
-                current_node->p_al_err->curr);
-    return current_node->p_al_err->curr;
-  }
-}
-
-int
-node_fd_errors(double* errors)
-  /* returns the field errors of a node */
-{
-  if (current_node->p_fd_err == NULL) return 0;
-  else
-  {
-    copy_double(current_node->p_fd_err->a, errors,
-                current_node->p_fd_err->curr);
-    return current_node->p_fd_err->curr;
-  }
-}
-
-void
-pro_error(struct in_cmd* cmd)
-{
-
- if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
-     {
-      error_eoption(cmd);
-      cmd->clone_flag = 1; /* do not drop */
-      current_eopt = cmd->clone;
-      return;
-     }
-  if (get_option("debug")) fprintf(prt_file, "enter ERROR module\n");
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-    {
-     warning("ERROR, but no active sequence:", "ignored");
-     return;
-    }
-        setbuf(stdout,(char *)0);
-
- if (error_select->curr > 0) set_selected_errors();
-
- if (strcmp(cmd->tok_list->p[0], "ealign") == 0)
-          {
-           error_ealign(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "efield") == 0)
-          {
-           error_efield(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "efcomp") == 0)
-          {
-           error_efcomp(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "eprint") == 0)
-          {
-           error_eprint(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "seterr") == 0)
-          {
-           error_seterr(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
-          {
-           error_esave(cmd);
-          }
-}
-
-void
+static void
 pro_error_make_efield_table(void)
 {
   struct table *ttb = efield_table;
@@ -116,7 +43,7 @@ pro_error_make_efield_table(void)
       }
 }
 
-void
+static void
 error_seterr(struct in_cmd* cmd)
 {
 
@@ -264,7 +191,7 @@ error_seterr(struct in_cmd* cmd)
 return;
 }
 
-void
+static void
 error_esave(struct in_cmd* cmd)
 {
     char *ef_table_file;
@@ -278,7 +205,7 @@ error_esave(struct in_cmd* cmd)
     out_table("efield",efield_table,ef_table_file);
 }
 
-void
+static void
 error_ealign(struct in_cmd* cmd)
 {
   struct node *ndexe;
@@ -334,7 +261,7 @@ error_ealign(struct in_cmd* cmd)
 
 }
 
-void
+static void
 error_eprint(struct in_cmd* cmd)
 {
   struct node *ndexe;
@@ -408,7 +335,7 @@ error_eprint(struct in_cmd* cmd)
 
 }
 
-void
+static void
 error_efcomp(struct in_cmd* cmd)
 {
   struct name_list* nl;
@@ -726,7 +653,7 @@ error_efcomp(struct in_cmd* cmd)
 
 }
 
-void
+static void
 error_efield(struct in_cmd* cmd)
 {
   int i;
@@ -748,7 +675,7 @@ error_efield(struct in_cmd* cmd)
   }
 }
 
-void
+static void
 error_eoption(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
@@ -805,5 +732,80 @@ error_eoption(struct in_cmd* cmd)
 
   if ((debug=get_option("debug"))) printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
 
+}
+
+// public interface
+
+int
+node_al_errors(double* errors)
+  /* returns the alignment errors of a node */
+{
+  if (current_node->p_al_err == NULL) return 0;
+  else
+  {
+    copy_double(current_node->p_al_err->a, errors,
+                current_node->p_al_err->curr);
+    return current_node->p_al_err->curr;
+  }
+}
+
+int
+node_fd_errors(double* errors)
+  /* returns the field errors of a node */
+{
+  if (current_node->p_fd_err == NULL) return 0;
+  else
+  {
+    copy_double(current_node->p_fd_err->a, errors,
+                current_node->p_fd_err->curr);
+    return current_node->p_fd_err->curr;
+  }
+}
+
+void
+pro_error(struct in_cmd* cmd)
+{
+
+ if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
+     {
+      error_eoption(cmd);
+      cmd->clone_flag = 1; /* do not drop */
+      current_eopt = cmd->clone;
+      return;
+     }
+  if (get_option("debug")) fprintf(prt_file, "enter ERROR module\n");
+  if (current_sequ == NULL || current_sequ->ex_start == NULL)
+    {
+     warning("ERROR, but no active sequence:", "ignored");
+     return;
+    }
+        setbuf(stdout,(char *)0);
+
+ if (error_select->curr > 0) set_selected_errors();
+
+ if (strcmp(cmd->tok_list->p[0], "ealign") == 0)
+          {
+           error_ealign(cmd);
+          }
+ else if (strcmp(cmd->tok_list->p[0], "efield") == 0)
+          {
+           error_efield(cmd);
+          }
+ else if (strcmp(cmd->tok_list->p[0], "efcomp") == 0)
+          {
+           error_efcomp(cmd);
+          }
+ else if (strcmp(cmd->tok_list->p[0], "eprint") == 0)
+          {
+           error_eprint(cmd);
+          }
+ else if (strcmp(cmd->tok_list->p[0], "seterr") == 0)
+          {
+           error_seterr(cmd);
+          }
+ else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
+          {
+           error_esave(cmd);
+          }
 }
 

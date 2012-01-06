@@ -1,6 +1,6 @@
 #include "madx.h"
 
-struct element*
+static struct element*
 new_element(char* name)
 {
   char rout_name[] = "new_element";
@@ -12,6 +12,203 @@ new_element(char* name)
   el->base_type = 0x0;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", el->name);
   return el;
+}
+
+static void
+grow_el_list(struct el_list* p)
+{
+  char rout_name[] = "grow_el_list";
+  struct element** e_loc = p->elem;
+  int j, new = 2*p->max;
+  p->max = new;
+  p->elem
+    = (struct element**) mycalloc(rout_name,new, sizeof(struct element*));
+  for (j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
+  myfree(rout_name, e_loc);
+}
+
+static void
+dump_el_list(struct el_list* ell)
+{
+  int i;
+  for (i = 0; i < ell->curr; i++) dump_element(ell->elem[i]);
+}
+
+static void
+export_element(struct element* el, struct el_list* ell, FILE* file)
+  /* recursive to have parents always in front for MAD-8 */
+{
+  int pos = name_list_pos(el->name, ell->list);
+  char out[AUX_LG];
+  if (pos >= 0)
+  {
+    if (ell->list->inform[pos] == 0)  /* not yet written */
+    {
+      export_element(el->parent, ell, file);
+      strcpy(out, el->name);
+      strcat(out, ": ");
+      strcat(out, el->parent->name);
+      export_el_def(el, out);
+      write_nice(out, file);
+      ell->list->inform[pos] = 1;
+    }
+  }
+}
+
+static void
+export_elem_8(struct element* el, struct el_list* ell, FILE* file)
+  /* exports an element in mad-8 format */
+  /* recursive to have parents always in front for MAD-8 */
+{
+  int pos = name_list_pos(el->name, ell->list);
+  char out[AUX_LG];
+  if (pos >= 0)
+  {
+    if (ell->list->inform[pos] == 0)  /* not yet written */
+    {
+      export_elem_8(el->parent, ell, file);
+      strcpy(out, el->name);
+      strcat(out, ": ");
+      strcat(out, el->parent->name);
+      export_el_def_8(el, out);
+      write_nice_8(out, file);
+      ell->list->inform[pos] = 1;
+    }
+  }
+}
+
+static void
+export_el_par_8(struct command_parameter* par, char* string)
+  /* exports an element parameter in mad-8 format */
+{
+  int i, k, last, vtilt = 0;
+  char num[2*NAME_L], tmp[8], tmpt[8];
+  switch(par->type)
+  {
+    case 0:
+      strcat(string, ",");
+      strcat(string, par->name);
+      strcat(string, " =");
+      if (par->double_value == zero) strcat(string, "false");
+      else                           strcat(string, "true");
+      break;
+    case 1:
+    case 2:
+      strcat(string, ",");
+      strcat(string, par->name);
+      strcat(string, "=");
+      if (par->expr != NULL && strcmp(par->name, "harmon") != 0)
+        strcat(string, par->expr->string);
+      else
+      {
+        if (par->type == 1)
+        {
+          k = par->double_value; sprintf(num, v_format("%I"), k);
+        }
+        else sprintf(num, v_format("%F"), par->double_value);
+        strcat(string, supp_tb(num));
+      }
+      break;
+    case 3:
+      if (par->string)
+      {
+        strcat(string, ",");
+        strcat(string, par->name);
+        strcat(string, "=");
+        strcat(string, par->string);
+      }
+      break;
+    case 11:
+    case 12:
+      vtilt = strcmp(par->name, "ks") == 0 ? 1 : 0;
+      for (last = par->double_array->curr-1; last > 0; last--)
+      {
+        if (par->expr_list->list[last] != NULL)
+        {
+          if (zero_string(par->expr_list->list[last]->string) == 0) break;
+        }
+        else if (par->double_array->a[last] != zero) break;
+      }
+      for (i = 0; i <= last; i++)
+      {
+        if (par->expr_list->list[i] != NULL
+            && !zero_string(par->expr_list->list[i]->string))
+        {
+          strcat(string, ",");
+          sprintf(tmp, " k%dl =", i);
+          sprintf(tmpt, ", t%d", i);
+          strcat(string, tmp);
+          strcat(string, par->expr_list->list[i]->string);
+          if (vtilt) strcat(string, tmpt);
+        }
+        else if (par->double_array->a[i] != zero)
+        {
+          strcat(string, ",");
+          sprintf(tmp, " k%dl =", i);
+          sprintf(tmpt, ", t%d", i);
+          if (par->type == 11)
+          {
+            k = par->double_array->a[i]; sprintf(num, "%d", k);
+          }
+          else sprintf(num, v_format("%F"), par->double_array->a[i]);
+          strcat(string, tmp);
+          strcat(string, supp_tb(num));
+          if (vtilt) strcat(string, tmpt);
+        }
+      }
+  }
+}
+
+static void
+enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
+  /* enters an element in a sequence */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int i, pos, k = 1;
+  double at;
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
+      find_element(el->name, current_sequ->cavities) == NULL)
+    add_to_el_list(&el, 0, current_sequ->cavities, 0);
+  if (nl->inform[name_list_pos("at", nl)] == 0)
+    fatal_error("element reference without 'at':",
+                join(cmd->tok_list->p, cmd->tok_list->curr));
+  at = command_par_value("at", cmd->clone);
+  if ((i = name_list_pos(el->name, occ_list)) < 0)
+    i = add_to_name_list(el->name, k, occ_list);
+  else if (flag)
+    fatal_error("multiple element definition inside sequence:", el->name);
+  else k = ++occ_list->inform[i];
+  make_elem_node(el, k);
+  current_node->at_value = at;
+  current_node->at_expr = command_par_expr("at", cmd->clone);
+  pos = name_list_pos("from", nl);
+  if (nl->inform[pos])
+    current_node->from_name = permbuff(pl->parameters[pos]->string);
+}
+
+static int
+par_out_flag(char* base_name, char* par_name)
+{
+  /* marks the element parameters that are to be written on "save" */
+  if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
+  if (strcmp(base_name, "multipole") == 0
+      && strcmp(par_name,"l") == 0) return 0;
+  if (strcmp(base_name, "rcollimator") == 0
+      && strcmp(par_name,"lrad") == 0) return 0;
+  if (strcmp(base_name, "ecollimator") == 0
+      && strcmp(par_name,"lrad") == 0) return 0;
+  return 1;
+}
+
+// public interface
+
+char*
+compound(char* e_name, int occ)
+  /* makes node name from element name and occurrence count */
+{
+  sprintf(c_dum->c,"%s:%d", e_name, occ);
+  return c_dum->c;
 }
 
 struct node*
@@ -115,31 +312,11 @@ delete_el_list(struct el_list* ell)
 }
 
 void
-grow_el_list(struct el_list* p)
-{
-  char rout_name[] = "grow_el_list";
-  struct element** e_loc = p->elem;
-  int j, new = 2*p->max;
-  p->max = new;
-  p->elem
-    = (struct element**) mycalloc(rout_name,new, sizeof(struct element*));
-  for (j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
-  myfree(rout_name, e_loc);
-}
-
-void
 dump_element(struct element* el)
 {
   fprintf(prt_file, v_format("+++ dumping element %S  parent %S\n"),
           el->name, el->parent->name);
   dump_command(el->def);
-}
-
-void
-dump_el_list(struct el_list* ell)
-{
-  int i;
-  for (i = 0; i < ell->curr; i++) dump_element(ell->elem[i]);
 }
 
 void
@@ -161,49 +338,6 @@ write_elems_8(struct el_list* ell, struct command_list* cl, FILE* file)
   {
     if (pass_select_list(ell->elem[i]->name, cl))
       export_elem_8(ell->elem[i], ell, file);
-  }
-}
-
-void
-export_element(struct element* el, struct el_list* ell, FILE* file)
-  /* recursive to have parents always in front for MAD-8 */
-{
-  int pos = name_list_pos(el->name, ell->list);
-  char out[AUX_LG];
-  if (pos >= 0)
-  {
-    if (ell->list->inform[pos] == 0)  /* not yet written */
-    {
-      export_element(el->parent, ell, file);
-      strcpy(out, el->name);
-      strcat(out, ": ");
-      strcat(out, el->parent->name);
-      export_el_def(el, out);
-      write_nice(out, file);
-      ell->list->inform[pos] = 1;
-    }
-  }
-}
-
-void
-export_elem_8(struct element* el, struct el_list* ell, FILE* file)
-  /* exports an element in mad-8 format */
-  /* recursive to have parents always in front for MAD-8 */
-{
-  int pos = name_list_pos(el->name, ell->list);
-  char out[AUX_LG];
-  if (pos >= 0)
-  {
-    if (ell->list->inform[pos] == 0)  /* not yet written */
-    {
-      export_elem_8(el->parent, ell, file);
-      strcpy(out, el->name);
-      strcat(out, ": ");
-      strcat(out, el->parent->name);
-      export_el_def_8(el, out);
-      write_nice_8(out, file);
-      ell->list->inform[pos] = 1;
-    }
   }
 }
 
@@ -317,88 +451,6 @@ export_el_def_8(struct element* el, char* string)
   }
 }
 
-void
-export_el_par_8(struct command_parameter* par, char* string)
-  /* exports an element parameter in mad-8 format */
-{
-  int i, k, last, vtilt = 0;
-  char num[2*NAME_L], tmp[8], tmpt[8];
-  switch(par->type)
-  {
-    case 0:
-      strcat(string, ",");
-      strcat(string, par->name);
-      strcat(string, " =");
-      if (par->double_value == zero) strcat(string, "false");
-      else                           strcat(string, "true");
-      break;
-    case 1:
-    case 2:
-      strcat(string, ",");
-      strcat(string, par->name);
-      strcat(string, "=");
-      if (par->expr != NULL && strcmp(par->name, "harmon") != 0)
-        strcat(string, par->expr->string);
-      else
-      {
-        if (par->type == 1)
-        {
-          k = par->double_value; sprintf(num, v_format("%I"), k);
-        }
-        else sprintf(num, v_format("%F"), par->double_value);
-        strcat(string, supp_tb(num));
-      }
-      break;
-    case 3:
-      if (par->string)
-      {
-        strcat(string, ",");
-        strcat(string, par->name);
-        strcat(string, "=");
-        strcat(string, par->string);
-      }
-      break;
-    case 11:
-    case 12:
-      vtilt = strcmp(par->name, "ks") == 0 ? 1 : 0;
-      for (last = par->double_array->curr-1; last > 0; last--)
-      {
-        if (par->expr_list->list[last] != NULL)
-        {
-          if (zero_string(par->expr_list->list[last]->string) == 0) break;
-        }
-        else if (par->double_array->a[last] != zero) break;
-      }
-      for (i = 0; i <= last; i++)
-      {
-        if (par->expr_list->list[i] != NULL
-            && !zero_string(par->expr_list->list[i]->string))
-        {
-          strcat(string, ",");
-          sprintf(tmp, " k%dl =", i);
-          sprintf(tmpt, ", t%d", i);
-          strcat(string, tmp);
-          strcat(string, par->expr_list->list[i]->string);
-          if (vtilt) strcat(string, tmpt);
-        }
-        else if (par->double_array->a[i] != zero)
-        {
-          strcat(string, ",");
-          sprintf(tmp, " k%dl =", i);
-          sprintf(tmpt, ", t%d", i);
-          if (par->type == 11)
-          {
-            k = par->double_array->a[i]; sprintf(num, "%d", k);
-          }
-          else sprintf(num, v_format("%F"), par->double_array->a[i]);
-          strcat(string, tmp);
-          strcat(string, supp_tb(num));
-          if (vtilt) strcat(string, tmpt);
-        }
-      }
-  }
-}
-
 int
 belongs_to_class(struct element* el, char* class)
   /* returns 1 if an element belongs to a class, else 0 */
@@ -417,14 +469,6 @@ belongs_to_class(struct element* el, char* class)
     }
   }
   return in;
-}
-
-char*
-compound(char* e_name, int occ)
-  /* makes node name from element name and occurrence count */
-{
-  sprintf(c_dum->c,"%s:%d", e_name, occ);
-  return c_dum->c;
 }
 
 void
@@ -650,7 +694,6 @@ el_par_value_recurse(char* par, struct element* elem)
   return 0;
 }
 
-
 void
 enter_element(struct in_cmd* cmd)
   /* enters an element in the list (and the sequence if applicable) */
@@ -691,34 +734,6 @@ enter_element(struct in_cmd* cmd)
     }
     if (sequ_is_on) enter_elm_reference(cmd, el, flag);
   }
-}
-
-void
-enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
-  /* enters an element in a sequence */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int i, pos, k = 1;
-  double at;
-  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
-      find_element(el->name, current_sequ->cavities) == NULL)
-    add_to_el_list(&el, 0, current_sequ->cavities, 0);
-  if (nl->inform[name_list_pos("at", nl)] == 0)
-    fatal_error("element reference without 'at':",
-                join(cmd->tok_list->p, cmd->tok_list->curr));
-  at = command_par_value("at", cmd->clone);
-  if ((i = name_list_pos(el->name, occ_list)) < 0)
-    i = add_to_name_list(el->name, k, occ_list);
-  else if (flag)
-    fatal_error("multiple element definition inside sequence:", el->name);
-  else k = ++occ_list->inform[i];
-  make_elem_node(el, k);
-  current_node->at_value = at;
-  current_node->at_expr = command_par_expr("at", cmd->clone);
-  pos = name_list_pos("from", nl);
-  if (nl->inform[pos])
-    current_node->from_name = permbuff(pl->parameters[pos]->string);
 }
 
 void
@@ -843,19 +858,5 @@ add_to_el_list( /* adds element to alphabetic element list */
     j = add_to_name_list(permbuff((*el)->name), inf, ell->list);
     ell->elem[ell->curr++] = *el;
   }
-}
-
-int
-par_out_flag(char* base_name, char* par_name)
-{
-  /* marks the element parameters that are to be written on "save" */
-  if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
-  if (strcmp(base_name, "multipole") == 0
-      && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "rcollimator") == 0
-      && strcmp(par_name,"lrad") == 0) return 0;
-  if (strcmp(base_name, "ecollimator") == 0
-      && strcmp(par_name,"lrad") == 0) return 0;
-  return 1;
 }
 

@@ -59,13 +59,13 @@ clearerrorflag(void)
   errorflag = 0;
 }
 
-/* not used...
+#if 0 // not used...
 char*
 geterrrormessage()
 {
   return errormessage;
 }
-*/
+#endif
 
 void
 warningnew(const char* t1, const char* fmt, ...)

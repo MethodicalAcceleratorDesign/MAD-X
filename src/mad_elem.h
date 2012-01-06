@@ -36,43 +36,41 @@ struct el_list /* contains list of element pointers sorted by name */
 
 // interface
 
-struct element* make_element(char* name, char* parent, struct command* def, int flag);
-void            make_elem_node(struct element* el, int occ_cnt);
-struct element* clone_element(struct element* el);
-struct element* new_element(char* name);
-struct node*    new_elem_node(struct element* el, int occ_cnt);
+struct element* make_element(char* name, char* parent, struct command*, int flag);
+struct element* clone_element(struct element*);
+struct element* delete_element(struct element*);
+void            update_element(struct element*, struct command* update);
+void            dump_element(struct element*);
+void            export_el_def(struct element*, char* string);
+void            export_el_def_8(struct element*, char* string);
+
 struct el_list* new_el_list(int length);
-struct element* delete_element(struct element* el);
-struct el_list* delete_el_list(struct el_list* ell);
-int     belongs_to_class(struct element* el, char* class);
-char*   compound(char* e_name, int occ);
-double  get_refpos(struct sequence* sequ);
-double  element_value(struct node* node, char* par);
-int     element_vector(struct element* el, char* par, double* vector);
-void    get_node_vector(char* par, int* length, double* vector);
+struct el_list* delete_el_list(struct el_list*);
+struct element* find_element(char* name, struct el_list*);
+void            write_elems(struct el_list*, struct command_list*, FILE*);
+void            write_elems_8(struct el_list*, struct command_list*, FILE*);
+
+struct node*    new_elem_node(struct element*, int occ_cnt);
+void            make_elem_node(struct element*, int occ_cnt);
+char*           compound(char* e_name, int occ_cnt);
+
+void    enter_element(struct in_cmd*);
 void    element_name(char* name, int* l);
+double  element_value(struct node*, char* par);
+int     element_vector(struct element*, char* par, double* vector);
+
+int     belongs_to_class(struct element*, char* class);
+double  get_refpos(struct sequence*);
+void    get_node_vector(char* par, int* length, double* vector);
 int     el_par_vector(int* total, double* vect);
-double  el_par_value(char* par, struct element* el);
-double  el_par_value_recurse(char* par, struct element* elem);
-struct command_parameter* return_param(char* par, struct element* elem);
-struct command_parameter* return_param_recurse(char* par, struct element* elem);
-void    enter_element(struct in_cmd* cmd);
-void    enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag);
-void    fill_elem_var_list(struct element* el, struct el_list* ell, struct var_list* varl);
-struct element* find_element(char* name, struct el_list* ell);
-void    update_element(struct element* el, struct command* update);
-void    add_to_el_list(struct element** el, int inf, struct el_list* ell, int flag);
-void    grow_el_list(struct el_list* p);
-void    dump_element(struct element* el);
-void    dump_el_list(struct el_list* ell);
-void    write_elems(struct el_list* ell, struct command_list* cl, FILE* file);
-void    write_elems_8(struct el_list* ell, struct command_list* cl, FILE* file);
-void    export_element(struct element* el, struct el_list* ell, FILE* file);
-void    export_elem_8(struct element* el, struct el_list* ell, FILE* file);
-void    export_el_def(struct element* el, char* string);
-void    export_el_def_8(struct element* el, char* string);
-void    export_el_par_8(struct command_parameter* par, char* string);
-int     par_out_flag(char* base_name, char* par_name);
+double  el_par_value(char* par, struct element*);
+double  el_par_value_recurse(char* par, struct element*);
+void    fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
+void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
+
+// used by mad_mkthin.c
+struct command_parameter* return_param(char* par, struct element*);
+struct command_parameter* return_param_recurse(char* par, struct element*);
 
 #endif // MAD_ELEM_H
 
