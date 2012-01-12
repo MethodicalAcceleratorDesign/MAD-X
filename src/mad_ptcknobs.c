@@ -850,6 +850,73 @@ match2_summary(void)
   return penalty;
 }
 
+static int
+madx_mpk_init(void)
+{
+  /*performs initialization,
+    prepares commands for exacution out of gethered user information*/
+
+  /*Create ptc_command: just copy paste the valid parameters - no error checking*/
+
+  char                           vary[COMM_LENGTH];
+  int i,k;
+
+  for(i=0; i< madx_mpk_Nknobs; i++)
+  {
+    sprintf(vary,"ptc_knob, ");
+
+    if (madx_mpk_knobs[i].elname)
+    {
+      sprintf(&(vary[strlen(vary)]),"element=%s, ",madx_mpk_knobs[i].elname);
+
+      if (madx_mpk_knobs[i].nKN > 0)
+      {
+
+        sprintf(&(vary[strlen(vary)]),"kn=");
+
+        for (k=0; k < madx_mpk_knobs[i].nKN; k++)
+        {
+          sprintf(&(vary[strlen(vary)]),"%d,",madx_mpk_knobs[i].KN[k]);
+        }
+      }
+
+      if (madx_mpk_knobs[i].nKS > 0)
+      {
+
+        sprintf(&(vary[strlen(vary)]),"ks=");
+
+        for (k=0; k < madx_mpk_knobs[i].nKS; k++)
+        {
+          sprintf(&(vary[strlen(vary)]),"%d,",madx_mpk_knobs[i].KS[k]);
+        }
+      }
+
+      /*this is the last one anyway if ename is specified ; at the end*/
+      if (madx_mpk_knobs[i].exactnamematch)
+      {
+        sprintf(&(vary[strlen(vary)]),"exactmatch=%s; ","true");
+      }
+      else
+      {
+        sprintf(&(vary[strlen(vary)]),"exactmatch=%s; ","false");
+      }
+
+    }
+
+    if (madx_mpk_knobs[i].initial)
+    {
+      sprintf(&(vary[strlen(vary)]),"initial=%s; ",madx_mpk_knobs[i].initial);
+    }
+
+    madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",1+strlen(vary)*sizeof(char));
+    strcpy(madx_mpk_setknobs[i],vary);
+
+    if (debuglevel)  printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
+  }
+
+  return 0;
+}
+
 // public interface
  
 void
@@ -1247,73 +1314,6 @@ madx_mpk_prepare(void)
   }
 }
 
-int
-madx_mpk_init(void)
-{
-  /*performs initialization,
-    prepares commands for exacution out of gethered user information*/
-
-  /*Create ptc_command: just copy paste the valid parameters - no error checking*/
-
-  char                           vary[COMM_LENGTH];
-  int i,k;
-
-  for(i=0; i< madx_mpk_Nknobs; i++)
-  {
-    sprintf(vary,"ptc_knob, ");
-
-    if (madx_mpk_knobs[i].elname)
-    {
-      sprintf(&(vary[strlen(vary)]),"element=%s, ",madx_mpk_knobs[i].elname);
-
-      if (madx_mpk_knobs[i].nKN > 0)
-      {
-
-        sprintf(&(vary[strlen(vary)]),"kn=");
-
-        for (k=0; k < madx_mpk_knobs[i].nKN; k++)
-        {
-          sprintf(&(vary[strlen(vary)]),"%d,",madx_mpk_knobs[i].KN[k]);
-        }
-      }
-
-      if (madx_mpk_knobs[i].nKS > 0)
-      {
-
-        sprintf(&(vary[strlen(vary)]),"ks=");
-
-        for (k=0; k < madx_mpk_knobs[i].nKS; k++)
-        {
-          sprintf(&(vary[strlen(vary)]),"%d,",madx_mpk_knobs[i].KS[k]);
-        }
-      }
-
-      /*this is the last one anyway if ename is specified ; at the end*/
-      if (madx_mpk_knobs[i].exactnamematch)
-      {
-        sprintf(&(vary[strlen(vary)]),"exactmatch=%s; ","true");
-      }
-      else
-      {
-        sprintf(&(vary[strlen(vary)]),"exactmatch=%s; ","false");
-      }
-
-    }
-
-    if (madx_mpk_knobs[i].initial)
-    {
-      sprintf(&(vary[strlen(vary)]),"initial=%s; ",madx_mpk_knobs[i].initial);
-    }
-
-    madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",1+strlen(vary)*sizeof(char));
-    strcpy(madx_mpk_setknobs[i],vary);
-
-    if (debuglevel)  printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
-  }
-
-  return 0;
-}
-
 void
 madx_mpk_addconstraint(const char* constr)
 {
@@ -1474,11 +1474,8 @@ madx_mpk_end(void)
 {
 /*
   remove_from_command_list(this_cmd->clone->name,stored_commands);
-
-
 */
   match_is_on = kMatch_NoMatch;
-
 }
 
 void

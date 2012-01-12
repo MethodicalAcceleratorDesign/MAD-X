@@ -1,35 +1,6 @@
 #include "madx.h"
 
-void
-get_title(char* tlt, int* l)
-  /* copies title from buffer into tl without trailing '\0' */
-{
-  *l = 0;
-  if (title != NULL)
-  {
-    *l = strlen(title);
-    strncpy(tlt, title, *l);
-  }
-}
-
-void
-get_version(char* tlt, int* l)
-  /* returns version number */
-{
-  time_t tmp;
-  struct tm* tm;
-  int n = strlen(version_name);
-  time(&tmp);
-  tm = localtime(&tmp); /* split system time */
-  strcpy(tlt, version_name);
-  tlt += n;
-  sprintf(tlt, "  %02d/%02d/%02d %02d.%02d.%02d\n",
-          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
-          tm->tm_hour, tm->tm_min, tm->tm_sec);
-  *l = n + 19;
-}
-
-int
+static int
 embedded_plot(void)
   /* returns the embedded_flag */
 {
@@ -38,21 +9,8 @@ embedded_plot(void)
   return ret;
 }
 
-double
-plot_option(char* name)
-  /* returns the value of setplot parameters */
-{
-  double val = zero;
-  int i;
-  mycpy(c_dum->c, name);
-  if (plot_options != NULL
-      && (i = name_list_pos(c_dum->c, plot_options->par_names)) > -1)
-    val = plot_options->par->parameters[i]->double_value;
-  return val;
-}
-
 /* Append the gnuplot ps file to the main ps file */
-void
+static void
 gnuplot_append(char *gplfilename, char *psfilename)
 {
   char line[1000];
@@ -125,6 +83,49 @@ gnuplot_append(char *gplfilename, char *psfilename)
   fprintf(newpsfile,"%%%%Pages: %d\n",page);
   fprintf(newpsfile,"%%%%EOF\n");
   fclose(newpsfile);
+}
+
+// public interface
+
+void
+get_title(char* tlt, int* l)
+  /* copies title from buffer into tl without trailing '\0' */
+{
+  *l = 0;
+  if (title != NULL) {
+    *l = strlen(title);
+    strncpy(tlt, title, *l);
+  }
+}
+
+void
+get_version(char* tlt, int* l)
+  /* returns version number */
+{
+  time_t tmp;
+  struct tm* tm;
+  int n = strlen(version_name);
+  time(&tmp);
+  tm = localtime(&tmp); /* split system time */
+  strcpy(tlt, version_name);
+  tlt += n;
+  sprintf(tlt, "  %02d/%02d/%02d %02d.%02d.%02d\n",
+          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
+          tm->tm_hour, tm->tm_min, tm->tm_sec);
+  *l = n + 19;
+}
+
+double
+plot_option(char* name)
+  /* returns the value of setplot parameters */
+{
+  double val = zero;
+  int i;
+  mycpy(c_dum->c, name);
+  if (plot_options != NULL
+      && (i = name_list_pos(c_dum->c, plot_options->par_names)) > -1)
+    val = plot_options->par->parameters[i]->double_value;
+  return val;
 }
 
 void

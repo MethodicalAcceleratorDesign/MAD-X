@@ -1,5 +1,310 @@
 #include "madx.h"
 
+static void
+fill_twiss_header_ptc(struct table* t, double ptc_deltap)
+  /* puts beam parameters etc. at start of twiss table */
+{
+  int i, h_length = 39+3+1+1+6+4; /* change when adding header lines ! - last 6 for the closed orbit */
+  double dtmp;
+  /*  struct table* s; */
+  char tmp[16];
+
+  int returnStatus;
+  int row;
+
+  if (t == NULL) return;
+  /* ATTENTION: if you add header lines, augment h_length accordingly */
+  if (t->header == NULL)  t->header = new_char_p_array(h_length);
+  strcpy(tmp, t->org_sequ->name);
+  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
+          strlen(tmp),stoupper(tmp));
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  i = get_string("beam", "particle", tmp);
+  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
+          i, stoupper(tmp));
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "mass");
+  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "charge");
+  sprintf(c_dum->c, v_format("@ CHARGE           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "energy");
+  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "pc");
+  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "gamma");
+  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "kbunch");
+  sprintf(c_dum->c, v_format("@ KBUNCH           %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "bcurrent");
+  sprintf(c_dum->c, v_format("@ BCURRENT         %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "sige");
+  sprintf(c_dum->c, v_format("@ SIGE             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "sigt");
+  sprintf(c_dum->c, v_format("@ SIGT             %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "npart");
+  sprintf(c_dum->c, v_format("@ NPART            %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "ex");
+  sprintf(c_dum->c, v_format("@ EX               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "ey");
+  sprintf(c_dum->c, v_format("@ EY               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "et");
+  sprintf(c_dum->c, v_format("@ ET               %%le  %F"), dtmp);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
+  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+  /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
+  if (get_option("ptc_twiss_summary") != zero){
+
+    /* now retreive all pieces of information from the ptc_twiss*/
+
+    row = 1; /* this particular table has only one row filled-in */
+
+    /* length of the machine */
+    returnStatus = double_from_table("ptc_twiss_summary","length",&row,&dtmp);
+    /* returnStatus should always be equal to zero */
+    sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+
+    /* momentum compaction factor, phase-slip factor and energy transition */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c", &row, &dtmp);
+    /* returnStatus should always be equal to zero */
+    sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    
+    /* momentum compaction factor first order derivative w.r.t delta-p/p */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P        %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    
+    
+     /* WARNING when restoring the following two lines don't forget to replace 39+1  by 39+2 for h_length */
+     /* momentum compaction factor second order derivative w.r.t delta-p/p */
+     /* uncomment the following once computation of alpha_c_p2 is reliable */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P2       %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c); 
+    
+     /* WARNING when restoring the following two lines don't forget to replace 39+2  by 39+3 for h_length */
+    /* momentum compaction factor third order derivative w.r.t delta-p/p */
+    /* uncomment the following once computation of alpha_c_p3 is reliable */
+    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p3", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ALPHA_C_P3       %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+       
+    returnStatus = double_from_table("ptc_twiss_summary","eta_c", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","gamma_tr", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    
+    /* tunes and chromaticities */
+    returnStatus = double_from_table("ptc_twiss_summary","q1", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","q2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","dq1", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","dq2", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    /* 26 november 2009 */
+    returnStatus = double_from_table("ptc_twiss_summary","qs", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ QS               %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);    
+
+
+    /* extremas of the beta-function */
+    returnStatus = double_from_table("ptc_twiss_summary","beta_x_min", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_X_MIN       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_x_max", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_X_MAX       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_y_min", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_Y_MIN       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","beta_y_max", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    /* now for the 6 closed orbits */
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_x", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_X          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_px", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PX         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_y", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_Y          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_py", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PY         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_pt", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_PT         %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","orbit_-cT", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+/* orbits RMS */
+    returnStatus = double_from_table("ptc_twiss_summary","xcorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pxcorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PXCORMS          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","ycorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pycorms", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PYCORMS          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+/* orbits MAX */
+    returnStatus = double_from_table("ptc_twiss_summary","xcomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pxcomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PXCOMAX          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","ycomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+    returnStatus = double_from_table("ptc_twiss_summary","pycomax", &row, &dtmp);
+    sprintf(c_dum->c, v_format("@ PYCOMAX          %%le  %F"),dtmp);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+
+  }
+}
+
+static int
+pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA)
+{
+  struct command_parameter_list* c_parameters= cmd->clone->par;
+  struct name_list*              c_parnames  = cmd->clone->par_names;
+  struct table*                  aTable      = 0x0;
+  int                            pos         = 0;
+  char*                          tablename   = 0x0;
+  char*                          columnname  = 0x0;
+
+
+  /*extracts column specified by the user*/
+  pos        = name_list_pos("column", c_parnames);
+  if (pos < 0)
+  {
+    printf("mad_ptc.c: pro_ptc_select: column parameter does not exist.\n");
+    return 5;
+  }
+
+  columnname  = c_parameters->parameters[pos]->string;
+  if ( columnname == 0x0 )
+  {
+/*    warning("mad_ptc.c: pro_ptc_select: Column name is empty: ", "ignored");*/
+    return 6;
+  }
+
+  *colnameIA = new_int_array(1+strlen(columnname));
+  conv_char(columnname,*colnameIA);
+
+
+  /*extracts table specified by the user*/
+  pos   = name_list_pos("table", c_parnames);
+  if (pos < 0)
+  {
+    printf("mad_ptc.c: pro_ptc_select: table parameter does not exist.\n");
+    return 1;
+  }
+
+  tablename  = c_parameters->parameters[pos]->string;
+  if ( tablename == 0x0 )
+  {
+    return -1;/*This means that table name was not specified at all*/
+  }
+  if ( tablename[0] == 0 )
+  {
+    return -1; /*This means that table name was not specified at all*/
+  }
+  pos = name_list_pos(tablename, table_register->names);
+  if (pos < 0)
+  {
+    printf("mad_ptc.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
+    return 3;
+  }
+
+  aTable = table_register->tables[pos];
+  if (aTable == 0x0)
+  {
+    printf("mad_ptc.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
+    return 4;
+  }
+
+
+  /*checks if the specified column exists*/
+  pos = name_list_pos(columnname,aTable->columns);
+  if (pos < 0)
+  {
+    error("mad_ptc.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
+          columnname,aTable->name);
+    return 7;
+  }
+
+  pos = name_list_pos("name",aTable->columns);
+  if (pos < 0)
+  {
+    warning("mad_ptc.c: pro_ptc_selectaTable->name: There is no column named <<name>> in table <<%s>>.",aTable->name);
+    return 8;
+  }
+
+  /*so none of the columns is filled */
+  aTable->org_cols = aTable->num_cols;
+
+
+  *tabnameIA = new_int_array(1+strlen(tablename));
+  conv_char(tablename,*tabnameIA);
+
+  return 0;
+}
+
+// public interface
+
 int
 minimum_acceptable_order(void)
 {
@@ -513,221 +818,6 @@ select_ptc_normal(struct in_cmd* cmd)
 }
 
 void
-fill_twiss_header_ptc(struct table* t, double ptc_deltap)
-  /* puts beam parameters etc. at start of twiss table */
-{
-  int i, h_length = 39+3+1+1+6+4; /* change when adding header lines ! - last 6 for the closed orbit */
-  double dtmp;
-  /*  struct table* s; */
-  char tmp[16];
-
-  int returnStatus;
-  int row;
-
-  if (t == NULL) return;
-  /* ATTENTION: if you add header lines, augment h_length accordingly */
-  if (t->header == NULL)  t->header = new_char_p_array(h_length);
-  strcpy(tmp, t->org_sequ->name);
-  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
-          strlen(tmp),stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  i = get_string("beam", "particle", tmp);
-  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
-          i, stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "mass");
-  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "charge");
-  sprintf(c_dum->c, v_format("@ CHARGE           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "energy");
-  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "pc");
-  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "gamma");
-  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "kbunch");
-  sprintf(c_dum->c, v_format("@ KBUNCH           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dum->c, v_format("@ BCURRENT         %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "sige");
-  sprintf(c_dum->c, v_format("@ SIGE             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "sigt");
-  sprintf(c_dum->c, v_format("@ SIGT             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "npart");
-  sprintf(c_dum->c, v_format("@ NPART            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "ex");
-  sprintf(c_dum->c, v_format("@ EX               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "ey");
-  sprintf(c_dum->c, v_format("@ EY               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "et");
-  sprintf(c_dum->c, v_format("@ ET               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-  /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
-  if (get_option("ptc_twiss_summary") != zero){
-
-    /* now retreive all pieces of information from the ptc_twiss*/
-
-    row = 1; /* this particular table has only one row filled-in */
-
-    /* length of the machine */
-    returnStatus = double_from_table("ptc_twiss_summary","length",&row,&dtmp);
-    /* returnStatus should always be equal to zero */
-    sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-    /* momentum compaction factor, phase-slip factor and energy transition */
-    returnStatus = double_from_table("ptc_twiss_summary","alpha_c", &row, &dtmp);
-    /* returnStatus should always be equal to zero */
-    sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    
-    /* momentum compaction factor first order derivative w.r.t delta-p/p */
-    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P        %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    
-    
-     /* WARNING when restoring the following two lines don't forget to replace 39+1  by 39+2 for h_length */
-     /* momentum compaction factor second order derivative w.r.t delta-p/p */
-     /* uncomment the following once computation of alpha_c_p2 is reliable */
-    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p2", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P2       %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c); 
-    
-     /* WARNING when restoring the following two lines don't forget to replace 39+2  by 39+3 for h_length */
-    /* momentum compaction factor third order derivative w.r.t delta-p/p */
-    /* uncomment the following once computation of alpha_c_p3 is reliable */
-    returnStatus = double_from_table("ptc_twiss_summary","alpha_c_p3", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P3       %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-       
-    returnStatus = double_from_table("ptc_twiss_summary","eta_c", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","gamma_tr", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    
-    /* tunes and chromaticities */
-    returnStatus = double_from_table("ptc_twiss_summary","q1", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","q2", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","dq1", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","dq2", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    /* 26 november 2009 */
-    returnStatus = double_from_table("ptc_twiss_summary","qs", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ QS               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);    
-
-
-    /* extremas of the beta-function */
-    returnStatus = double_from_table("ptc_twiss_summary","beta_x_min", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ BETA_X_MIN       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","beta_x_max", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ BETA_X_MAX       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","beta_y_min", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ BETA_Y_MIN       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","beta_y_max", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    /* now for the 6 closed orbits */
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_x", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_X          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_px", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_PX         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_y", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_Y          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_py", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_PY         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_pt", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_PT         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","orbit_-cT", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-/* orbits RMS */
-    returnStatus = double_from_table("ptc_twiss_summary","xcorms", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","pxcorms", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ PXCORMS          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","ycorms", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","pycorms", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ PYCORMS          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-/* orbits MAX */
-    returnStatus = double_from_table("ptc_twiss_summary","xcomax", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","pxcomax", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ PXCOMAX          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","ycomax", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    returnStatus = double_from_table("ptc_twiss_summary","pycomax", &row, &dtmp);
-    sprintf(c_dum->c, v_format("@ PYCOMAX          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-  }
-}
-
-void
 pro_ptc_trackline(struct in_cmd* cmd)
 {
   /*Does PTC tracking taking to the account acceleration */
@@ -1024,7 +1114,7 @@ pro_ptc_printparametric(struct in_cmd* cmd)
   pos   = name_list_pos("format", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_printparametric: format parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_printparametric: format parameter does not exist.\n");
     return;
   }
 
@@ -1041,8 +1131,8 @@ pro_ptc_printframes(struct in_cmd* cmd)
   int                            pos         = 0;
 
   char*                          filename    = 0x0;
-  struct int_array*              filenameIA      = 0x0;
-  char*                          format    = 0x0;
+  struct int_array*              filenameIA  = 0x0;
+  char*                          format      = 0x0;
 /* 
  * Piotr.Skowronski@cern.ch
  *  Routine that writes coordinates of magnets from PTC
@@ -1052,14 +1142,14 @@ pro_ptc_printframes(struct in_cmd* cmd)
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_printframes: file parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_printframes: file parameter does not exist.\n");
     return;
   }
 
   filename  = c_parameters->parameters[pos]->string;
   if ( filename == 0x0 )
   {
-    warning("madxn.c: pro_ptc_printframes: no file name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_printframes: no file name: ", "ignored");
     return;
   }
 
@@ -1067,12 +1157,12 @@ pro_ptc_printframes(struct in_cmd* cmd)
   pos   = name_list_pos("format", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_printframes: format parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_printframes: format parameter does not exist.\n");
     return;
   }
 
   format  = c_parameters->parameters[pos]->string;
-  printf("madxn.c: pro_ptc_printframes: format is %s.\n", format);
+  printf("mad_ptc.c: pro_ptc_printframes: format is %s.\n", format);
 
   filenameIA = new_int_array(1+strlen(filename));
 
@@ -1105,7 +1195,7 @@ pro_ptc_export_xml(struct in_cmd* cmd)
   if (pos < 0)
   {
     /* should never enter here */
-    printf("madxn.c: pro_ptc_export_xml: file parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_export_xml: file parameter does not exist.\n");
     return;
   }
 
@@ -1114,7 +1204,7 @@ pro_ptc_export_xml(struct in_cmd* cmd)
 
   if ( filename == 0x0 )
   {
-    warning("madxn.c: pro_ptc_export_xml: no file name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_export_xml: no file name: ", "ignored");
     return;
   }
 
@@ -1145,7 +1235,7 @@ pro_ptc_eplacement(struct in_cmd* cmd)
   pos   = name_list_pos("refframe", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_eplacement: refframe parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_eplacement: refframe parameter does not exist.\n");
     return;
   }
 
@@ -1155,7 +1245,7 @@ pro_ptc_eplacement(struct in_cmd* cmd)
 
     if ( c_parameters->parameters[pos]->string == 0x0 )
     {
-      warning("madxn.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
+      warning("mad_ptc.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
       refframe = 0;
     }
     else
@@ -1178,20 +1268,20 @@ pro_ptc_eplacement(struct in_cmd* cmd)
   pos   = name_list_pos("range", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_eplacement: range parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_eplacement: range parameter does not exist.\n");
     return;
   }
 
   if ( c_parnames->inform[pos] == 0 )
   {
-    printf("madxn.c: pro_ptc_eplacement: inform for range is 0.\n");
+    printf("mad_ptc.c: pro_ptc_eplacement: inform for range is 0.\n");
     return;
   }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
   {
-    warning("madxn.c: pro_ptc_eplacement: no element name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_eplacement: no element name: ", "ignored");
     return;
   }
 
@@ -1273,7 +1363,7 @@ pro_ptc_knob(struct in_cmd* cmd)
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_knob: element parameter does not exist.\n");
     return;
   }
   element  = c_parameters->parameters[pos]->string;
@@ -1281,7 +1371,7 @@ pro_ptc_knob(struct in_cmd* cmd)
   pos   = name_list_pos("initial", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: initial parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_knob: initial parameter does not exist.\n");
     return;
   }
 
@@ -1289,7 +1379,7 @@ pro_ptc_knob(struct in_cmd* cmd)
 
   if ( (element == 0x0) && (initialp == 0x0) )
   {
-    warning("madxn.c: pro_ptc_knob: no element name neither initial pareter specified: ",
+    warning("mad_ptc.c: pro_ptc_knob: no element name neither initial pareter specified: ",
             "command ignored");
     return;
   }
@@ -1322,7 +1412,7 @@ pro_ptc_knob(struct in_cmd* cmd)
         p = strstr(c_dum->c,"]");
         if (p == 0x0)
         {
-          warningnew("madxn.c: pro_ptc_knob:","element %s is bady defned. Commnad ignored.",element);
+          warningnew("mad_ptc.c: pro_ptc_knob:","element %s is bady defned. Commnad ignored.",element);
           return;
         }
         *p=0;
@@ -1363,14 +1453,14 @@ pro_ptc_setknobvalue(struct in_cmd* cmd)
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_knob: element parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_knob: element parameter does not exist.\n");
     return;
   }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
   {
-    warning("madxn.c: pro_ptc_knob: no element name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_knob: no element name: ", "ignored");
     return;
   }
   mycpy(c_dum->c, element);
@@ -1406,20 +1496,20 @@ pro_ptc_setfieldcomp(struct in_cmd* cmd)
   pos   = name_list_pos("element", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_setfieldcomp: range parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_setfieldcomp: range parameter does not exist.\n");
     return;
   }
 
   if ( c_parnames->inform[pos] == 0 )
   {
-    printf("madxn.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
+    printf("mad_ptc.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
     return;
   }
 
   element  = c_parameters->parameters[pos]->string;
   if ( element == 0x0 )
   {
-    warning("madxn.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
     return;
   }
 
@@ -1488,7 +1578,7 @@ pro_ptc_select(struct in_cmd* cmd)
 
   if (monomial == 0x0)
   {
-    warning("madxn.c: pro_ptc_select: monomial is NULL ", "ignored");
+    warning("mad_ptc.c: pro_ptc_select: monomial is NULL ", "ignored");
     return;
   }
 
@@ -1526,97 +1616,8 @@ pro_ptc_select(struct in_cmd* cmd)
 }
 
 int
-pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, struct int_array** colnameIA)
-{
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
-  struct table*                  aTable      = 0x0;
-  int                            pos         = 0;
-  char*                          tablename   = 0x0;
-  char*                          columnname  = 0x0;
-
-
-  /*extracts column specified by the user*/
-  pos        = name_list_pos("column", c_parnames);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_select: column parameter does not exist.\n");
-    return 5;
-  }
-
-  columnname  = c_parameters->parameters[pos]->string;
-  if ( columnname == 0x0 )
-  {
-/*    warning("madxn.c: pro_ptc_select: Column name is empty: ", "ignored");*/
-    return 6;
-  }
-
-  *colnameIA = new_int_array(1+strlen(columnname));
-  conv_char(columnname,*colnameIA);
-
-
-  /*extracts table specified by the user*/
-  pos   = name_list_pos("table", c_parnames);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_select: table parameter does not exist.\n");
-    return 1;
-  }
-
-  tablename  = c_parameters->parameters[pos]->string;
-  if ( tablename == 0x0 )
-  {
-    return -1;/*This means that table name was not specified at all*/
-  }
-  if ( tablename[0] == 0 )
-  {
-    return -1; /*This means that table name was not specified at all*/
-  }
-  pos = name_list_pos(tablename, table_register->names);
-  if (pos < 0)
-  {
-    printf("madxn.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
-    return 3;
-  }
-
-  aTable = table_register->tables[pos];
-  if (aTable == 0x0)
-  {
-    printf("madxn.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
-    return 4;
-  }
-
-
-  /*checks if the specified column exists*/
-  pos = name_list_pos(columnname,aTable->columns);
-  if (pos < 0)
-  {
-    error("madxn.c: pro_ptc_select","Can not find column named <<%s>> in table <<%s>>.",
-          columnname,aTable->name);
-    return 7;
-  }
-
-  pos = name_list_pos("name",aTable->columns);
-  if (pos < 0)
-  {
-    warning("madxn.c: pro_ptc_selectaTable->name: There is no column named <<name>> in table <<%s>>.",aTable->name);
-    return 8;
-  }
-
-  /*so none of the columns is filled */
-  aTable->org_cols = aTable->num_cols;
-
-
-  *tabnameIA = new_int_array(1+strlen(tablename));
-  conv_char(tablename,*tabnameIA);
-
-  return 0;
-}
-
-int
 pro_ptc_moments(struct in_cmd* cmd)
 {
-
   int no = command_par_value("no", cmd->clone);
 
   w_ptc_moments_(&no);
@@ -1844,7 +1845,7 @@ makemomentstables(void)
   return 0;
 }
 
-void type_ofCall
+void
 augmentcountmomtabs(double* s)
 {
   int i;
@@ -1885,14 +1886,14 @@ pro_ptc_script(struct in_cmd* cmd)
   pos   = name_list_pos("file", c_parnames);
   if (pos < 0)
   {
-    printf("madxn.c: pro_ptc_script: file parameter does not exist.\n");
+    printf("mad_ptc.c: pro_ptc_script: file parameter does not exist.\n");
     return;
   }
 
   scriptname  = c_parameters->parameters[pos]->string;
   if ( scriptname == 0x0 )
   {
-    warning("madxn.c: pro_ptc_script: no script name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_script: no script name: ", "ignored");
     return;
   }
 
@@ -1922,7 +1923,7 @@ pro_ptc_open_gino(struct in_cmd* cmd)
   scriptname  = c_parameters->parameters[pos]->string;
   if ( scriptname == 0x0 )
   {
-    warning("madxn.c: pro_ptc_open_gino: no script name: ", "ignored");
+    warning("mad_ptc.c: pro_ptc_open_gino: no script name: ", "ignored");
     return;
   }
 

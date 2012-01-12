@@ -4,63 +4,6 @@
 
 #include "SDDS.h"
 
-void
-pro_sdds(struct in_cmd* cmd)
-{
-  int   i;
-  if (strcmp(cmd->tok_list->p[0], "sddsin") == 0)
-    {
-     i = sdds_ior(cmd);
-    }
-  else if (strcmp(cmd->tok_list->p[0], "sddsout") == 0)
-    {
-     i = sdds_iow(cmd);
-    }
-}
-
-int
-sdds_ior(struct in_cmd* cmd)
-{
-    char *sdds_table_file;
-    char *tfs_table_name;
-    int   i;
-
-    if((sdds_table_file = command_par_string("file",cmd->clone)) == NULL) {
-         fatal_error("No file name to read SDDS table ","\n");
-    }
-    if((tfs_table_name = command_par_string("table",cmd->clone)) == NULL) {
-         fatal_error("No table name to read SDDS table ","\n");
-    }
-    printf("access SDDS table: %s %s\n",sdds_table_file,tfs_table_name);
-    i = sdds_readt(sdds_table_file,tfs_table_name);
-    return(i);
-}
-
-int 
-sdds_iow(struct in_cmd* cmd)
-{
-    char *sdds_table_file;
-    char *tfs_table_name;
-    struct table *tfs_table;
-    int   i, pos;
-    if((sdds_table_file = command_par_string("file",cmd->clone)) == NULL) {
-         fatal_error("No file name to write SDDS table ","\n");
-    }
-    if((tfs_table_name = command_par_string("table",cmd->clone)) == NULL) {
-         fatal_error("No table name to write SDDS table ","\n");
-    }
-
-    mycpy(c_dum->c, tfs_table_name);
-    if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1) {
-      tfs_table = table_register->tables[pos];
-    }
-
-    printf("create SDDS table: %s %d\n",sdds_table_file,pos);
-    sel_table(tfs_table_name, tfs_table);
-    i = sdds_writet_sel(sdds_table_file,tfs_table);
-    return(i);
-}
-
 static int
 sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
 {
@@ -126,7 +69,7 @@ sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
   return(npar);
 }
 
-int
+static int
 sdds_readt(char *filename, char *tfsname)
 {
   int     i1, i2, i3, i5;
@@ -376,7 +319,7 @@ treat_tfs_header_set(SDDS_TABLE *SDDS_table, struct table* t)
   return(head_buf->curr);
 }
 
-int
+static int
 treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
 {
   struct char_p_array* head_buf;
@@ -410,7 +353,7 @@ treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
   return(head_buf->curr);
 }
                                                                                                     
-int
+static int
 sdds_writet_sel(char *filename, struct table *tfstab)
 {
   int     i1;
@@ -555,7 +498,8 @@ sdds_writet_sel(char *filename, struct table *tfstab)
     
   return(0);
 }
-                                                                                                   int
+
+static int
 head_split(char* buf, struct char_p_array* list)
 {
   /* splits header information into tokens */
@@ -576,7 +520,7 @@ head_split(char* buf, struct char_p_array* list)
   return list->curr;
 }
                                                                                                      
-void
+static void
 sel_table(char* tname, struct table* t)
   /* output of a table */
 {
@@ -600,8 +544,7 @@ sel_table(char* tname, struct table* t)
   }
 }
                                                                                                           
-
-void
+static void
 set_selected_rows_tab(struct table* t, struct command_list* select, struct command_list* deselect)
 {
   int i, j, n = 0;
@@ -634,7 +577,7 @@ set_selected_rows_tab(struct table* t, struct command_list* select, struct comma
   t->row_out->curr = n;
 }
 
-int
+static int
 pass_select_tab(char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
      (but need not) be contained in command sc;
@@ -666,6 +609,65 @@ pass_select_tab(char* name, struct command* sc)
   }
   if (any == 0) return 1;
   else return in;
+}
+
+static int
+sdds_ior(struct in_cmd* cmd)
+{
+    char *sdds_table_file;
+    char *tfs_table_name;
+    int   i;
+
+    if((sdds_table_file = command_par_string("file",cmd->clone)) == NULL) {
+         fatal_error("No file name to read SDDS table ","\n");
+    }
+    if((tfs_table_name = command_par_string("table",cmd->clone)) == NULL) {
+         fatal_error("No table name to read SDDS table ","\n");
+    }
+    printf("access SDDS table: %s %s\n",sdds_table_file,tfs_table_name);
+    i = sdds_readt(sdds_table_file,tfs_table_name);
+    return(i);
+}
+
+static int 
+sdds_iow(struct in_cmd* cmd)
+{
+    char *sdds_table_file;
+    char *tfs_table_name;
+    struct table *tfs_table;
+    int   i, pos;
+    if((sdds_table_file = command_par_string("file",cmd->clone)) == NULL) {
+         fatal_error("No file name to write SDDS table ","\n");
+    }
+    if((tfs_table_name = command_par_string("table",cmd->clone)) == NULL) {
+         fatal_error("No table name to write SDDS table ","\n");
+    }
+
+    mycpy(c_dum->c, tfs_table_name);
+    if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1) {
+      tfs_table = table_register->tables[pos];
+    }
+
+    printf("create SDDS table: %s %d\n",sdds_table_file,pos);
+    sel_table(tfs_table_name, tfs_table);
+    i = sdds_writet_sel(sdds_table_file,tfs_table);
+    return(i);
+}
+
+// public interface
+
+void
+pro_sdds(struct in_cmd* cmd)
+{
+  int   i;
+  if (strcmp(cmd->tok_list->p[0], "sddsin") == 0)
+    {
+     i = sdds_ior(cmd);
+    }
+  else if (strcmp(cmd->tok_list->p[0], "sddsout") == 0)
+    {
+     i = sdds_iow(cmd);
+    }
 }
 
 #endif // _ONLINE

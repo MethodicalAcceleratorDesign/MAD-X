@@ -1,6 +1,6 @@
 #include "madx.h"
 
-int
+static int
 v_length(char* form)
 {
   int ret = 0;
@@ -8,6 +8,40 @@ v_length(char* form)
   else if (form[1] == 'F') sscanf(float_format, "%d", &ret);
   return ret;
 }
+
+static int
+get_val_num(char* in_string, int start, int end)
+{
+  int j, dot = 0, exp = 0, sign = 0;
+  char c;
+  for (j = start; j < end; j++)
+  {
+    c = in_string[j];
+    if(!isdigit(c))
+    {
+      if ((c = in_string[j]) == '.')
+      {
+        if (dot || exp) return (j - 1);
+        dot = 1;
+      }
+      else if (c == 'e' || c == 'd')
+      {
+        if (c == 'd') in_string[j] = 'e';
+        if (exp) return (j - 1);
+        else exp = j+1;
+      }
+      else if(strchr("+-", c))
+      {
+        if (exp != j || sign) return (j - 1);
+        sign = 1;
+      }
+      else return (j - 1);
+    }
+  }
+  return (j - 1);
+}
+
+// public interface
 
 char*
 v_format(char* string)
@@ -55,38 +89,6 @@ simple_double(char** toks, int start, int end)
     else if (*toks[start] == '+') return atof(toks[end]);
     else return INVALID;
   }
-}
-
-int
-get_val_num(char* in_string, int start, int end)
-{
-  int j, dot = 0, exp = 0, sign = 0;
-  char c;
-  for (j = start; j < end; j++)
-  {
-    c = in_string[j];
-    if(!isdigit(c))
-    {
-      if ((c = in_string[j]) == '.')
-      {
-        if (dot || exp) return (j - 1);
-        dot = 1;
-      }
-      else if (c == 'e' || c == 'd')
-      {
-        if (c == 'd') in_string[j] = 'e';
-        if (exp) return (j - 1);
-        else exp = j+1;
-      }
-      else if(strchr("+-", c))
-      {
-        if (exp != j || sign) return (j - 1);
-        sign = 1;
-      }
-      else return (j - 1);
-    }
-  }
-  return (j - 1);
 }
 
 int

@@ -37,7 +37,9 @@ int   quote_level(char* string, char* send);
 int   remove_colon(char** toks, int number, int start);
 int   square_to_colon(char* string);
 
-// inliners
+// inline functions
+
+#include <ctype.h>
 
 static inline int
 str_pos(const char s[], char c)

@@ -1,5 +1,20 @@
 #include "madx.h"
 
+static int
+is_operand(char c) {
+  return (isalnum(c) || c == '_' || c == '.');
+}
+
+static int
+is_operator(char c) {
+  return strchr("-+*/^", c) ? 1 : 0;
+}
+
+static int
+is_expr_start(char c) {
+  return strchr("-+(",c) || is_operand(c);
+}
+
 /* combine two parameters using compound expression */
 static struct expression*
 comb_param(struct command_parameter* param1, char* op, struct command_parameter* param2)

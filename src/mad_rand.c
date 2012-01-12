@@ -20,7 +20,7 @@ irngen(void)
   next_rand = 0;
 }
 
-// interface
+// public interface
 
 void
 init55(int seed)
@@ -38,7 +38,6 @@ init55(int seed)
   /* warm up */
   for (i = 0; i < 3; i++) irngen();
 }
-
 
 double
 frndm(void)

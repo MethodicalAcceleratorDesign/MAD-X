@@ -263,6 +263,8 @@ src/mad_var.c -text
 src/mad_var.h -text
 src/mad_vec.c -text
 src/mad_vec.h -text
+src/mad_write.c -text
+src/mad_write.h -text
 src/madx.h -text
 src/madx_ptc_distrib.f90 -text
 src/madx_ptc_distrib.inc -text

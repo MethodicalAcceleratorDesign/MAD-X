@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-
 #include "madx.h"
 
 // private globals
@@ -432,5 +429,4 @@ square_to_colon(char* string)
   }
   return strlen(string);
 }
-
 

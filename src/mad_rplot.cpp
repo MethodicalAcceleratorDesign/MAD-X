@@ -193,7 +193,7 @@ unloadrplotlib(void)
 
 #endif // _PLUGIN
 
-void type_ofCall
+void
 plottrack(int* particleno, int* obspoint, int* turn,
           double* x, double* xp, double* y, double* yp, double* dpOverP, double* p,
           double* length)
@@ -221,7 +221,7 @@ plottrack(int* particleno, int* obspoint, int* turn,
 }
 
 // not used in madx
-void type_ofCall
+void
 plottwiss(int* obspoint,
           double* betax, double* alfax,
           double* betay, double* alfay,
@@ -243,7 +243,7 @@ plottwiss(int* obspoint,
 #endif
 }
 
-void type_ofCall
+void
 rplotfinish(void)
 {
 /*terminates plotter*/
@@ -270,7 +270,7 @@ rplotfinish(void)
 
 }
 
-void type_ofCall
+void
 newrplot(void)
 {
   (void)rplot_handle, (void)rplot_plottrack;
@@ -317,7 +317,7 @@ newrplot(void)
 }
 
 #if 0 // not used
-static void type_ofCall
+static void
 plotter(void)
 {
 /*adds new plotter*/
@@ -328,7 +328,7 @@ plotter(void)
 #endif
 
 #if 0 // not used
-static void type_ofCall
+static void
 print(void)
 {
 /*adds new plotter*/
@@ -338,7 +338,7 @@ print(void)
 }
 #endif
 
-void type_ofCall
+void
 rviewer(void)
 {
 /*adds new plotter*/
@@ -375,7 +375,7 @@ rviewer(void)
 #endif
 }
 
-void type_ofCall
+void
 madxv_setknobname(int* n, const char* name)
 {
   (void)n, (void)name;
@@ -402,7 +402,7 @@ madxv_setknobname(int* n, const char* name)
 #endif
 }
 
-void type_ofCall
+void
 madxv_setfctnname(int* n, const char* name)
 {
   (void)n, (void)name;
@@ -429,7 +429,7 @@ madxv_setfctnname(int* n, const char* name)
 #endif
 }
 
-void type_ofCall
+void
 madxv_setfunctionat(int* el, int* n,  const char* name)
 {
   (void)el, (void)n, (void)name;
