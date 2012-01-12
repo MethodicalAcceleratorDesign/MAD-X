@@ -9,11 +9,12 @@ struct sequence;
 struct expression;
 struct constraint_list;
 struct double_array;
+struct name_list;
 
 struct node                /* the sequence is a linked list of nodes */
 {
   char name[NAME_L];
-  char* base_name;           /* basic type */
+  char* base_name;         /* basic type */
   struct node* previous;
   struct node* next;
   int share;               /* 0 normal, 1 if shared */
@@ -58,39 +59,38 @@ struct node_list /* contains list of node pointers sorted by name */
 
 // interface
 
-struct node*      new_node(char* name);
+struct node* new_node(char* name);
+struct node* clone_node(struct node*, int flag);
+struct node* delete_node(struct node*);
+struct node* expand_node(struct node*, struct sequence* top, struct sequence* seq, double position);
+void         dump_node(struct node*);
+int          advance_node(void);
+void         node_name(char* name, int* l);
+double       node_value(char* par);
+
 struct node_list* new_node_list(int length);
-struct node*      clone_node(struct node* p, int flag);
-struct node*      delete_node(struct node* p);
-struct node*      delete_node_ring(struct node* start);
-struct node_list* delete_node_list(struct node_list* l);
-void    grow_node_list(struct node_list* p);
-void    dump_node(struct node* node);
-struct node* expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ, double position);
-double  node_value(char* par);
-void    node_name(char* name, int* l);
-double  get_node_pos(struct node* node, struct sequence* sequ); /*recursive */
-double  hidden_node_pos(char* name, struct sequence* sequ);
-void    link_in_front(struct node* new, struct node* el);
-void    resequence_nodes(struct sequence* sequ);
+struct node_list* delete_node_list(struct node_list*);
+struct node*      delete_node_ring(struct node*);
+//void              grow_node_list(struct node_list* p);
+void              add_to_node_list(struct node*, int inf, struct node_list*);
+
+double  get_node_pos(struct node*, struct sequence*); /* recursive */
+double  hidden_node_pos(char* name, struct sequence*);
+void    link_in_front(struct node*, struct node* el);
+void    resequence_nodes(struct sequence*);
 void    store_node_value(char* par, double* value);
 void    store_node_vector(char* par, int* length, double* vector);
-void    add_to_node_list(struct node* node, int inf, struct node_list* nll);
-int     count_nodes(struct sequence* sequ);
+int     count_nodes(struct sequence*);
 void    current_node_name(char* name, int* lg);
-int     get_node_count(struct node* node);
-int     advance_node(void);
+int     get_node_count(struct node*);
 double  line_nodes(struct char_p_array* flat);
 void    node_string(char* key, char* string, int* l);
-double  spec_node_value(char* par, int* number);
-void    remove_from_node_list(struct node* node, struct node_list* nodes);
-int     remove_one(struct node* node);
-void    replace_one(struct node* node, struct element* el);
+int     remove_one(struct node*);
+void    replace_one(struct node*, struct element*);
 int     retreat_node(void);
-void    set_node_bv(struct sequence* sequ);
-void    set_new_position(struct sequence* sequ);
-
-int type_ofCall advance_to_pos(char* table, int* t_pos);
+void    set_node_bv(struct sequence*);
+void    set_new_position(struct sequence*);
+int     advance_to_pos(char* table, int* t_pos);
 
 #endif // MAD_NODE_H
 

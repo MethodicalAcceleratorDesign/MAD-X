@@ -48,7 +48,6 @@
 
 #include "mad_err.h"
 #include "mad_mem.h"
-#include "mad_out.h"
 #include "mad_str.h"
 #include "mad_vec.h"
 #include "mad_core.h"
@@ -57,6 +56,7 @@
 #include "mad_plot.h"
 #include "mad_time.h"
 #include "mad_util.h"
+#include "mad_write.h"
 
 // command modules
 

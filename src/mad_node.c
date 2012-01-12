@@ -1,5 +1,31 @@
 #include "madx.h"
 
+static void
+remove_from_node_list(struct node* node, struct node_list* nodes)
+{
+  int i;
+  if ((i = remove_from_name_list(node->name, nodes->list)) > -1)
+    nodes->nodes[i] = nodes->nodes[--nodes->curr];
+}
+
+static double
+spec_node_value(char* par, int* number)
+  /* returns value for parameter par of specified node (start = 1 !!) */
+{
+  double value = zero;
+  struct node* node = current_node;
+  int n = *number + current_sequ->start_node - 1;
+  if (0 <= n && n < current_sequ->n_nodes)
+  {
+    current_node = current_sequ->all_nodes[n];
+    value = node_value(par);
+    current_node = node;
+  }
+  return value;
+}
+
+// public interface
+
 struct node*
 new_node(char* name)
 {
@@ -94,7 +120,7 @@ delete_node_ring(struct node* start)
   return NULL;
 }
 
-void
+static void
 grow_node_list(struct node_list* p)
 {
   char rout_name[] = "grow_node_list";
@@ -455,7 +481,7 @@ advance_node(void)
   return 1;
 }
 
-int type_ofCall
+int
 advance_to_pos(char* table, int* t_pos)
   /* advances current_node to node at t_pos in table */
 {
@@ -524,14 +550,6 @@ node_string(char* key, char* string, int* l)
   for (i = 0; i < nbl; i++) string[ncp+i] = ' ';
 }
 
-void
-remove_from_node_list(struct node* node, struct node_list* nodes)
-{
-  int i;
-  if ((i = remove_from_name_list(node->name, nodes->list)) > -1)
-    nodes->nodes[i] = nodes->nodes[--nodes->curr];
-}
-
 int
 remove_one(struct node* node)
 {
@@ -567,21 +585,5 @@ replace_one(struct node* node, struct element* el)
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, edit_sequ->cavities, 0);
-}
-
-double
-spec_node_value(char* par, int* number)
-  /* returns value for parameter par of specified node (start = 1 !!) */
-{
-  double value = zero;
-  struct node* node = current_node;
-  int n = *number + current_sequ->start_node - 1;
-  if (0 <= n && n < current_sequ->n_nodes)
-  {
-    current_node = current_sequ->all_nodes[n];
-    value = node_value(par);
-    current_node = node;
-  }
-  return value;
 }
 

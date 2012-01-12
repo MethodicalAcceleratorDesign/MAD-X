@@ -214,8 +214,6 @@ src/mad_option.c -text
 src/mad_option.h -text
 src/mad_orbit.c -text
 src/mad_orbit.h -text
-src/mad_out.c -text
-src/mad_out.h -text
 src/mad_parse.c -text
 src/mad_parse.h -text
 src/mad_plot.c -text

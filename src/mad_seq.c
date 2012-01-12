@@ -1,5 +1,7 @@
 #include "madx.h"
 
+// public interface
+
 void
 make_sequ_node(struct sequence* sequ, int occ_cnt)
   /* makes + links a node pointing to a sub-sequence */
