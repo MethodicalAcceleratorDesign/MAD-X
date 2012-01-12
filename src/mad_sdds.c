@@ -5,6 +5,27 @@
 #include "SDDS.h"
 
 static int
+head_split(char* buf, struct char_p_array* list)
+{
+  /* splits header information into tokens */
+  int j;
+  char* p;
+  if ((p =strtok(buf, " \n")) == NULL) return 0;
+  list->curr = 0;
+  list->p[list->curr++] = p;
+  while ((p = strtok(NULL, " \n")) != NULL)
+  {
+    if (list->curr == list->max) grow_char_p_array(list);
+    list->p[list->curr++] = p;
+  }
+  /* remove '@' in strings */
+  for (j = 0; j < list->curr; j++)
+    if(*list->p[j] == '\"' || *list->p[j] == '\'') /* quote */
+      replace(list->p[j], '@', ' ');
+  return list->curr;
+}
+                                                                                                     
+static int
 sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
 {
   PARAMETER_DEFINITION *pardef;
@@ -500,84 +521,6 @@ sdds_writet_sel(char *filename, struct table *tfstab)
 }
 
 static int
-head_split(char* buf, struct char_p_array* list)
-{
-  /* splits header information into tokens */
-  int j;
-  char* p;
-  if ((p =strtok(buf, " \n")) == NULL) return 0;
-  list->curr = 0;
-  list->p[list->curr++] = p;
-  while ((p = strtok(NULL, " \n")) != NULL)
-  {
-    if (list->curr == list->max) grow_char_p_array(list);
-    list->p[list->curr++] = p;
-  }
-  /* remove '@' in strings */
-  for (j = 0; j < list->curr; j++)
-    if(*list->p[j] == '\"' || *list->p[j] == '\'') /* quote */
-      replace(list->p[j], '@', ' ');
-  return list->curr;
-}
-                                                                                                     
-static void
-sel_table(char* tname, struct table* t)
-  /* output of a table */
-{
-  int j;
-  struct command_list* scl = find_command_list(tname, table_select);
-  struct command_list* dscl = find_command_list(tname, table_deselect);
-  while (t->num_cols > t->col_out->max)
-    grow_int_array(t->col_out);
-  while (t->curr > t->row_out->max)
-    grow_int_array(t->row_out);
-  t->row_out->curr = t->curr;
-  if (par_present("full", NULL, scl))
-    put_info("obsolete option 'full'"," ignored on 'select'");
-  for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
-  for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
-  t->col_out->curr = t->num_cols;
-  if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
-  {
-    set_selected_columns(t, scl);
-    set_selected_rows_tab(t, scl, dscl);
-  }
-}
-                                                                                                          
-static void
-set_selected_rows_tab(struct table* t, struct command_list* select, struct command_list* deselect)
-{
-  int i, j, n = 0;
-  if (select != 0)
-  {
-    for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
-       t->row_out->curr = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      for (j = 0; j < t->curr; j++)
-      {
-        if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select_tab(t->s_cols[0][j], select->commands[i]);
-        if (t->row_out->i[j] == 1) n++;
-      }
-    }
-  }
-  if (deselect != NULL)
-  {
-    for (i = 0; i < deselect->curr; i++)
-    {
-      for (j = 0; j < t->curr; j++)
-      {
-        if (t->row_out->i[j] == 1) t->row_out->i[j]
-                                     = 1 - pass_select_tab(t->s_cols[0][j], deselect->commands[i]);
-        if (t->row_out->i[j] == 1) n++;
-      }
-    }
-  }
-  t->row_out->curr = n;
-}
-
-static int
 pass_select_tab(char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
      (but need not) be contained in command sc;
@@ -611,6 +554,63 @@ pass_select_tab(char* name, struct command* sc)
   else return in;
 }
 
+static void
+set_selected_rows_tab(struct table* t, struct command_list* select, struct command_list* deselect)
+{
+  int i, j, n = 0;
+  if (select != 0)
+  {
+    for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
+       t->row_out->curr = 0;
+    for (i = 0; i < select->curr; i++)
+    {
+      for (j = 0; j < t->curr; j++)
+      {
+        if (t->row_out->i[j] == 0) t->row_out->i[j]
+                                     = pass_select_tab(t->s_cols[0][j], select->commands[i]);
+        if (t->row_out->i[j] == 1) n++;
+      }
+    }
+  }
+  if (deselect != NULL)
+  {
+    for (i = 0; i < deselect->curr; i++)
+    {
+      for (j = 0; j < t->curr; j++)
+      {
+        if (t->row_out->i[j] == 1) t->row_out->i[j]
+                                     = 1 - pass_select_tab(t->s_cols[0][j], deselect->commands[i]);
+        if (t->row_out->i[j] == 1) n++;
+      }
+    }
+  }
+  t->row_out->curr = n;
+}
+
+static void
+sel_table(char* tname, struct table* t)
+  /* output of a table */
+{
+  int j;
+  struct command_list* scl = find_command_list(tname, table_select);
+  struct command_list* dscl = find_command_list(tname, table_deselect);
+  while (t->num_cols > t->col_out->max)
+    grow_int_array(t->col_out);
+  while (t->curr > t->row_out->max)
+    grow_int_array(t->row_out);
+  t->row_out->curr = t->curr;
+  if (par_present("full", NULL, scl))
+    put_info("obsolete option 'full'"," ignored on 'select'");
+  for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
+  for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+  t->col_out->curr = t->num_cols;
+  if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
+  {
+    set_selected_columns(t, scl);
+    set_selected_rows_tab(t, scl, dscl);
+  }
+}
+                                                                                                          
 static int
 sdds_ior(struct in_cmd* cmd)
 {
