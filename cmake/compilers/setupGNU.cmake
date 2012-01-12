@@ -8,8 +8,6 @@
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 # General:
     set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -pedantic")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98 -pedantic")
 
     # Release flags:
     # ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
