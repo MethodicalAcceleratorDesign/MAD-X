@@ -505,7 +505,7 @@ read_his_table(struct in_cmd* cmd)
 }
 #endif
 
-static void
+void
 set_selected_columns(struct table* t, struct command_list* select)
 {
   int i, j, pos, k, n = 0;

@@ -22,6 +22,7 @@ int   get_ex_range(char* range, struct sequence*, struct node**);
 int   get_sub_range(char* range, struct sequence*, struct node**);
 int   get_range(char* range, struct sequence*, struct node**);
 void  set_selected_errors(void);
+void  set_selected_columns(struct table*, struct command_list*);
 void  set_range(char* range, struct sequence*);
 void  set_sector(void);
 
