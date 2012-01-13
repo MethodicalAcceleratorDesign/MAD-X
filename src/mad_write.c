@@ -19,7 +19,7 @@ write_nice(char* string, FILE* file)
     c[pos] = '\0';
     fprintf(file, "%s\n", c);
     c[pos] = k;
-    ssc = (uintptr_t) &c[pos] - (uintptr_t) c;
+    ssc = &c[pos] - c;
     n -= ssc;
     c = &c[pos];
   }

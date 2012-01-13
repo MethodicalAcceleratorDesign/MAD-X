@@ -57,7 +57,7 @@ remove_range(char* string, char* s1, char* s2)
 {
   char* ps1 = strstr(string, s1);
   char* ps2 = strstr(string, s2);
-  if (ps1 != NULL && ps2 != NULL && (uintptr_t) ps1 < (uintptr_t) ps2)
+  if (ps1 != NULL && ps2 != NULL && ps1 < ps2)
   {
     ps2++; ps2++;
     while (*ps2 != '\0')  *ps1++ = *ps2++;

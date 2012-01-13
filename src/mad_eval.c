@@ -326,7 +326,7 @@ pro_input(char* statement)
     else
     {
       if ((sem = mystrchr(&statement[start], ';')) == NULL) return;
-      if ((uintptr_t) sem > (uintptr_t) &statement[start]) /* skip empty ';' */
+      if (sem > &statement[start]) /* skip empty ';' */
       {
         *sem = '\0';
         this_cmd = new_in_cmd(400);
@@ -357,7 +357,7 @@ pro_input(char* statement)
         *sem = ';';
       }
       sem++;
-      start = (uintptr_t)sem - (uintptr_t)statement;
+      start = sem - statement;
       if (start < l)
       {
         if ((nnb = next_non_blank_pos(sem)) < 0)  start = l;

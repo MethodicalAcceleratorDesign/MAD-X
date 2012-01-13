@@ -517,16 +517,16 @@ get_stmt(FILE* file, int supp_flag)
     c_st = mystrstr(&ca->c[ca->curr], "/*");
     if (c_cc != NULL && c_ex != NULL)
     {
-      c_cc = (uintptr_t)c_cc < (uintptr_t)c_ex ? c_cc : c_ex; *c_cc = '\0';
+      c_cc = c_cc < c_ex ? c_cc : c_ex; *c_cc = '\0';
     }
     else if(c_cc != NULL 
-	    &&(c_st == NULL || (uintptr_t)c_cc < (uintptr_t)c_st))
+	    &&(c_st == NULL || c_cc < c_st))
     {
       if (c_cc == &ca->c[ca->curr]) goto next;
       else *c_cc = '\0';
     }
     else if(c_ex != NULL
-	    &&(c_st == NULL || (uintptr_t)c_ex < (uintptr_t)c_st))
+	    &&(c_st == NULL || c_ex < c_st))
     {
       if (c_ex == &ca->c[ca->curr]) goto next;
       else *c_ex = '\0';

@@ -54,13 +54,13 @@ v_format(char* string)
   *var_form = '\0';
   while ((p = strpbrk(s, "NIFS")))
   {
-    if ((uintptr_t)p > (uintptr_t)q)
+    if (p > q)
     {
       t = p; t--;
       if (*t == '%')
       {
         c = *p;
-        strncat(var_form, q, (uintptr_t)p - (uintptr_t)q);
+        strncat(var_form, q, p - q);
         if (c == 'N')
         {
           sprintf(&var_form[strlen(var_form)], "%d", v_length(p));
