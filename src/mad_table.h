@@ -66,7 +66,6 @@ struct table*           read_table(struct in_cmd*);
 struct table*           read_my_table(struct in_cmd*);
 
 void    check_tabstring(char* string);
-char*   get_table_string(char* left, char* right);
 double  table_value(void);
 void    add_to_table_list(struct table*, struct table_list*);
 void    add_vars_to_table(struct table*);

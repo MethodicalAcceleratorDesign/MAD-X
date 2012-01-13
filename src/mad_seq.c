@@ -67,6 +67,7 @@ dump_exp_sequ(struct sequence* sequ, int level)
   fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
 
+#if 0 // not used...
 static void
 dump_sequ(struct sequence* c_sequ, int level)
 {
@@ -90,6 +91,7 @@ dump_sequ(struct sequence* c_sequ, int level)
   }
   fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
 }
+#endif
 
 static void
 grow_sequence_list(struct sequence_list* l)
@@ -1102,6 +1104,7 @@ seq_replace(struct in_cmd* cmd)
   else  warning("no element specified, ","ignored");
 }
 
+#if 0 // not used...
 static void
 sequence_name(char* name, int* l)
   /* returns current sequence name in Fortran format */
@@ -1112,6 +1115,7 @@ sequence_name(char* name, int* l)
   for (i = 0; i < ncp; i++) name[i] = current_sequ->name[i];
   for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
 }
+#endif
 
 void
 use_sequ(struct in_cmd* cmd)

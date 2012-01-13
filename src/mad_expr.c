@@ -15,12 +15,14 @@ is_expr_start(char c) {
   return strchr("-+(",c) || is_operand(c);
 }
 
+#if 0 // not used...
 /* combine two parameters using compound expression */
 static struct expression*
 comb_param(struct command_parameter* param1, char* op, struct command_parameter* param2)
 {
   return compound_expr(param1->expr,param1->double_value,op,param2->expr,param2->double_value);
 }
+#endif
 
 static double
 combine_expr_expr(struct expression* exp1, char* oper, 

@@ -6,6 +6,7 @@
 
 // private functions
 
+#if 0 // not used...
 static int
 table_org(char* table)
   /* returns origin: 0  this job, 1 read or unknown */
@@ -17,6 +18,7 @@ table_org(char* table)
     org = table_register->tables[pos]->origin;
   return org;
 }
+#endif
 
 static char*
 get_table_string(char* left, char* right)
@@ -307,6 +309,7 @@ write_table(struct table* t, char* filename)
   }
 }
 
+#if 0 // not used...
 static void
 string_to_table_row(char* table, char* name, int* row, char* string)
   /* puts string at current position in column with name "name".
@@ -327,7 +330,9 @@ string_to_table_row(char* table, char* name, int* row, char* string)
     t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
   }
 }
+#endif
 
+#if 0 // not used...
 static int
 result_from_normal(char* name_var, int* order, double* val)
   /* returns value of table normal_results corresponding to the given variable name
@@ -373,7 +378,9 @@ result_from_normal(char* name_var, int* order, double* val)
   *val = d_val;
   return 0;
 }
+#endif
 
+#if 0 // not used...
 static struct table*
 read_his_table(struct in_cmd* cmd)
   /* reads and stores TFS table */
@@ -496,6 +503,7 @@ read_his_table(struct in_cmd* cmd)
   add_to_table_list(t, table_register);
   return NULL;
 }
+#endif
 
 static void
 set_selected_columns(struct table* t, struct command_list* select)

@@ -8,6 +8,7 @@ remove_from_node_list(struct node* node, struct node_list* nodes)
     nodes->nodes[i] = nodes->nodes[--nodes->curr];
 }
 
+#if 0 // not used...
 static double
 spec_node_value(char* par, int* number)
   /* returns value for parameter par of specified node (start = 1 !!) */
@@ -23,6 +24,7 @@ spec_node_value(char* par, int* number)
   }
   return value;
 }
+#endif
 
 // public interface
 

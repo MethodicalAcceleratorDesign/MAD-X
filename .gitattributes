@@ -257,6 +257,7 @@ src/mad_track.c -text
 src/mad_track.h -text
 src/mad_twiss.c -text
 src/mad_twiss.h -text
+src/mad_types_f.h -text
 src/mad_util.c -text
 src/mad_util.h -text
 src/mad_var.c -text

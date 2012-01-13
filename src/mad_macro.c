@@ -44,6 +44,7 @@ grow_macro_list(struct macro_list* p)
   myfree(rout_name, n_loc);
 }
 
+#if 0 // not used...
 static void
 dump_macro(struct macro* m)
 {
@@ -52,14 +53,18 @@ dump_macro(struct macro* m)
   dump_char_array(m->body);
   if (m->tokens != NULL) dump_char_p_array(m->tokens);
 }
+#endif
 
+#if 0 // not used...
 static void
 dump_macro_list(struct macro_list* ml)
 {
   int i;
   puts("++++++ dump of macro list");
-  for (i = 0; i < ml->curr; i++) dump_macro(ml->macros[i]);
+  for (i = 0; i < ml->curr; i++)
+    dump_macro(ml->macros[i]);
 }
+#endif
 
 void
 disable_line( /* prevents line from further expansion by "use" */

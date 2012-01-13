@@ -16,8 +16,8 @@ void    pro_correct(struct in_cmd*);
 void    store_orbit(struct command*, double* orbit);
 
 // for orbf.f90
-uintptr_t locf_(char *iadr);
-void      f_ctof(int *j, char *string, int *nel);
+int     locf_(char *iadr);
+void    f_ctof(int *j, char *string, int *nel);
 
 #endif // MAD_ORBIT_H
 

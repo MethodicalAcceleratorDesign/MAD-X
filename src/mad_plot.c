@@ -1,5 +1,6 @@
 #include "madx.h"
 
+#if 0 // not used...
 static int
 embedded_plot(void)
   /* returns the embedded_flag */
@@ -8,6 +9,7 @@ embedded_plot(void)
   ret = embedded_flag;
   return ret;
 }
+#endif
 
 /* Append the gnuplot ps file to the main ps file */
 static void

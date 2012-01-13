@@ -27,12 +27,14 @@ grow_el_list(struct el_list* p)
   myfree(rout_name, e_loc);
 }
 
+#if 0 // not used...
 static void
 dump_el_list(struct el_list* ell)
 {
-  int i;
-  for (i = 0; i < ell->curr; i++) dump_element(ell->elem[i]);
+  for (int i = 0; i < ell->curr; i++)
+    dump_element(ell->elem[i]);
 }
+#endif
 
 static void
 export_element(struct element* el, struct el_list* ell, FILE* file)

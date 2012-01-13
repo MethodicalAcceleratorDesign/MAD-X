@@ -28,11 +28,13 @@ grow_var_list(struct var_list* p)
   myfree(rout_name, v_loc);
 }
 
+#if 0 // not used...
 static void
 dump_variable(struct variable* v)
 {
   fprintf(prt_file, "=== dumping variable %s\n", v->name);
 }
+#endif
 
 static void
 export_variable(struct variable* var, FILE* file)

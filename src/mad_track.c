@@ -215,6 +215,7 @@ track_track(struct in_cmd* cmd)
   track_fileext = permbuff(track_fileext);
 }
 
+#if 0 // not used...
 static const char*
 getcurrentelementname(void)
 {
@@ -228,6 +229,7 @@ getcurrentelementname(void)
   return current_node->name;
 
 }
+#endif
 
 static int
 copytrackstoarray(void)

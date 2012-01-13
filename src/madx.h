@@ -22,6 +22,7 @@
 
 // fortran externs
 
+#include "mad_types_f.h"
 #include "mad_extrn_f.h"
 
 // constants modules

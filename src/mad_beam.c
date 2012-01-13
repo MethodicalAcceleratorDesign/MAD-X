@@ -1,5 +1,6 @@
 #include "madx.h"
 
+#if 0 // not used...
 static double
 get_beam_value(char* name, char* par)
   /* this function is used by fortran to get the parameters values of beams;
@@ -21,6 +22,7 @@ get_beam_value(char* name, char* par)
     return command_par_value(aux_buff->c, cmd);
   else return INVALID;
 }
+#endif
 
 // public interface
 

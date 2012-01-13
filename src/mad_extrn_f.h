@@ -2,6 +2,14 @@
 #define MAD_EXTRN_F_H
 
 /*
+ * Fortran types in C
+ */
+
+#ifndef MAD_TYPES_F_H
+#include "mad_types_f.h"
+#endif
+
+/*
  * Called by Fortran
  */
 
@@ -150,16 +158,6 @@
  * Provided by Fortran
  */
  
-/*
- * Fortran to C type conversion
- */
-
-typedef int    *F_INTEGER;
-typedef int    *F_LOGICAL;
-typedef double *F_DOUBLE;
-typedef float  *F_REAL;
-typedef char   *F_CHARACTER;
-
 // from mad_init_f.F90
 void mad_init_f_(void);
 
@@ -317,12 +315,5 @@ int  w_ptc_getnmoments_(void);
 
 // from madx_ptc_knobs.f90
 void w_ptc_rviewer_(void);
-
-/*
- * Windows specific (should be removed)
- */
-
-// cancel type_ofCall
-#define type_ofCall
 
 #endif

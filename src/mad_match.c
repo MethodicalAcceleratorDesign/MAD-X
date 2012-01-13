@@ -299,11 +299,13 @@ match_action(struct in_cmd* cmd)
     match_work[i] = delete_double_array(match_work[i]);
 }
 
+#if 0 // not used...
 static void
 match_cell(struct in_cmd* cmd)
 {
   (void)cmd;
 }
+#endif
 
 static void
 match_constraint(struct in_cmd* cmd)

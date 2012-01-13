@@ -71,7 +71,7 @@ static int     pro_correct_getorbit_ext(struct in_cmd*);
 static int     pro_correct_getorbit(struct in_cmd*);
 static int     pro_correct_gettables(int iplane, struct in_cmd*);
 static int     pro_correct_getcommands(struct in_cmd*);
-static void    pro_correct_option(struct in_cmd*);
+// static void    pro_correct_option(struct in_cmd*);
 
 static void    correct_correct2(struct in_cmd*);
 static void    pro_correct2_fill_mon_table(int ip ,char *name, double old, double new_);
@@ -1803,6 +1803,7 @@ correct_correct(struct in_cmd* cmd)
   }
 }
 
+#if 0 // not used...
 static void
 pro_correct_option(struct in_cmd* cmd)
 {
@@ -1832,8 +1833,8 @@ pro_correct_option(struct in_cmd* cmd)
       if (debug)  fprintf(prt_file, "print option set\n");
       print_correct_opt = val;
  }
-
 }
+#endif
 
 static int
 pro_correct_getcommands(struct in_cmd* cmd)
@@ -3222,12 +3223,12 @@ pro_correct(struct in_cmd* cmd)
     }
 }
 
-uintptr_t
+int
 locf_(char *iadr)    
 #define NADUPW 4   /* Number of ADdress Units Per Word */
 #define LADUPW 2   /* Logarithm base 2 of ADdress Units Per Word */
 {
-	return( (uintptr_t) iadr >> LADUPW );
+	return (uintptr_t) iadr >> LADUPW;
 }
 
 void
