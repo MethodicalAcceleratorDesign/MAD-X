@@ -505,81 +505,6 @@ read_his_table(struct in_cmd* cmd)
 }
 #endif
 
-void
-set_selected_columns(struct table* t, struct command_list* select)
-{
-  int i, j, pos, k, n = 0;
-  char* p;
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  if (select && par_present("column", NULL, select))
-  {
-    for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
-      t->col_out->i[j] = 0;
-    t->col_out->curr = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      nl = select->commands[i]->par_names;
-      pl = select->commands[i]->par;
-      pos = name_list_pos("column", nl);
-      if (nl->inform[pos])
-      {
-        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-        {
-          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("re", t->columns->names[k], 2) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("eign", t->columns->names[k], 2) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j],
-                          "apertype") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("aper", t->columns->names[k], 4) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else
-          {
-            p = pl->parameters[pos]->m_string->p[j];
-            if ((k = name_list_pos(p, t->columns)) > -1)
-            {
-              if (k <  t->num_cols
-                  && int_in_array(k, n, t->col_out->i) == 0)
-                t->col_out->i[n++] = k;
-            }
-          }
-        }
-      }
-    }
-    t->col_out->curr = n;
-  }
-}
-
 static void
 set_selected_rows(struct table* t, struct command_list* select, struct command_list* deselect)
 {
@@ -1821,5 +1746,80 @@ read_my_table(struct in_cmd* cmd)
   t->origin = 1;
   add_to_table_list(t, table_register);
   return NULL;
+}
+
+void
+set_selected_columns(struct table* t, struct command_list* select)
+{
+  int i, j, pos, k, n = 0;
+  char* p;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  if (select && par_present("column", NULL, select))
+  {
+    for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
+      t->col_out->i[j] = 0;
+    t->col_out->curr = 0;
+    for (i = 0; i < select->curr; i++)
+    {
+      nl = select->commands[i]->par_names;
+      pl = select->commands[i]->par;
+      pos = name_list_pos("column", nl);
+      if (nl->inform[pos])
+      {
+        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+        {
+          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("re", t->columns->names[k], 2) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("eign", t->columns->names[k], 2) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else if (strcmp(pl->parameters[pos]->m_string->p[j],
+                          "apertype") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("aper", t->columns->names[k], 4) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else
+          {
+            p = pl->parameters[pos]->m_string->p[j];
+            if ((k = name_list_pos(p, t->columns)) > -1)
+            {
+              if (k <  t->num_cols
+                  && int_in_array(k, n, t->col_out->i) == 0)
+                t->col_out->i[n++] = k;
+            }
+          }
+        }
+      }
+    }
+    t->col_out->curr = n;
+  }
 }
 
