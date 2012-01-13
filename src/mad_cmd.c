@@ -88,7 +88,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
   else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
-  puts("++++++++++++++ command skipped in parser version");
+  fprintf(stderr, "++++++++++++++ unknown command '%s', skipped in parser version", toks[k]);
   /* insert your proper command action here */
 }
 

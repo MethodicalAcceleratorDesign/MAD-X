@@ -21,7 +21,8 @@ time_stamp(char* place)
   fprintf(prt_file, "sec.s since start: %d   since last call: %d\n", k, l);
 }
 
-float
+#if 0 // not used... (commented in micado)
+static float
 fextim(void)
 {
    float mytime;
@@ -39,4 +40,4 @@ fextim(void)
    /* printf("Time now:  %-6.3f\n",mytime);    */
    return mytime;
 }
-
+#endif

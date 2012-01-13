@@ -3,10 +3,10 @@
 
 // types
 
+struct in_cmd;
 struct name_list;
 struct command_list;
 struct expression;
-struct in_cmd;
 
 struct constant
 {
@@ -40,31 +40,25 @@ struct var_list         /* contains list of variable pointers sorted by name */
 
 // interface
 
-struct variable* new_variable(char* name, double val, int val_type, int type, struct expression* expr, char* string);
+void             enter_variable(struct in_cmd*); /* stores variable contained in cmd */
+struct variable* new_variable(char* name, double val, int val_type, int type, struct expression*, char* string);
+double           variable_value(struct variable*);
+
 struct var_list* new_var_list(int length);
-struct var_list* clone_var_list(struct var_list* vl);
-struct variable* delete_variable(struct variable* var);
-struct var_list* delete_var_list(struct var_list* varl);
-void    get_defined_constants(void);
-void    grow_var_list(struct var_list* p);
-void    dump_variable(struct variable* v);
-void    write_vars(struct var_list* varl, struct command_list* cl, FILE* file);
-void    write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file);
+struct var_list* clone_var_list(struct var_list*);
+struct var_list* delete_var_list(struct var_list*);
+void             add_to_var_list(struct variable*, struct var_list*, int flag);
+struct variable* find_variable(char* name, struct var_list*);
+
 char*   make_string_variable(char* string);
-double  variable_value(struct variable* var);
-double  get_variable(char* name);
-char*   get_varstring(char* name);
-void    enter_variable(struct in_cmd* cmd); /* stores variable contained in cmd */
-struct variable* find_variable(char* name, struct var_list* varl);
-void    set_sub_variable(char* comm, char* par, struct in_cmd* cmd);
-void    add_to_var_list(struct variable* var, struct var_list* varl, int flag);
+void    print_global(double delta);
+void    write_vars(struct var_list*, struct command_list*, FILE*);
+void    write_vars_8(struct var_list*, struct command_list*, FILE*);
 void    set_variable(char* name, double* value);
 void    set_stringvar(char* name, char* string);
-void    export_variable(struct variable* var, FILE* file);
-void    export_var_8(struct variable* var, FILE* file);
-int     predef_var(struct variable* var);
-void    print_global(double delta);
-// int     vary_name(char* name, int* name_l, int* index); // not used...
+double  get_variable(char* name);
+char*   get_varstring(char* name);
+void    get_defined_constants(void);
 
 #endif // MAD_VAR_H
 

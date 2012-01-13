@@ -1,5 +1,143 @@
 #include "madx.h"
 
+static struct variable*
+delete_variable(struct variable* var)
+{
+  char rout_name[] = "delete_variable";
+  if (var == NULL)  return NULL;
+  if (stamp_flag && var->stamp != 123456)
+    fprintf(stamp_file, "d_v double delete --> %s\n", var->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", var->name);
+  if (var->expr != NULL) delete_expression(var->expr);
+  if (var->string != NULL) myfree(rout_name, var->string);
+  myfree(rout_name, var);
+  return NULL;
+}
+
+static void
+grow_var_list(struct var_list* p)
+{
+  char rout_name[] = "grow_var_list";
+  struct variable** v_loc = p->vars;
+  int j, new = 2*p->max;
+
+  p->max = new;
+  p->vars
+    = (struct variable**) mycalloc(rout_name,new, sizeof(struct variable*));
+  for (j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
+  myfree(rout_name, v_loc);
+}
+
+static void
+dump_variable(struct variable* v)
+{
+  fprintf(prt_file, "=== dumping variable %s\n", v->name);
+}
+
+static void
+export_variable(struct variable* var, FILE* file)
+  /* exports variable in mad-X format */
+{
+  int k;
+  *c_dum->c = '\0';
+  if (var->status == 0) var->value = expression_value(var->expr, var->type);
+  if (var->val_type == 0) strcat(c_dum->c, "int ");
+  if (var->type == 0) strcat(c_dum->c, "const ");
+  strcat(c_dum->c, var->name);
+  if (var->type < 2) strcat(c_dum->c, " = ");
+  else               strcat(c_dum->c, " := ");
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
+  else if (var->val_type == 0)
+  {
+    k = var->value; sprintf(c_join->c, "%d", k); strcat(c_dum->c, c_join->c);
+  }
+  else
+  {
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
+  }
+  write_nice(c_dum->c, file);
+}
+
+static void
+export_var_8(struct variable* var, FILE* file)
+  /* exports variable in mad-8 format */
+{
+  int k;
+  *c_dum->c = '\0';
+  if (var->status == 0) var->value = expression_value(var->expr, var->type);
+  if (var->type == 0)
+  {
+    strcat(c_dum->c, var->name);
+    strcat(c_dum->c, ": constant = ");
+  }
+  else
+  {
+    strcat(c_dum->c, var->name);
+    if (var->type < 2) strcat(c_dum->c, " = ");
+    else               strcat(c_dum->c, " := ");
+  }
+  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
+  else if (var->val_type == 0)
+  {
+    k = var->value; sprintf(c_join->c, v_format("%I"), k);
+    strcat(c_dum->c, c_join->c);
+  }
+  else
+  {
+    sprintf(c_join->c, v_format("%F"), var->value);
+    strcat(c_dum->c, supp_tb(c_join->c));
+  }
+  write_nice_8(c_dum->c, file);
+}
+
+static int
+predef_var(struct variable* var)
+  /* return 1 for predefined variable, else 0 */
+{
+  int pos = name_list_pos(var->name, variable_list->list);
+  return (pos < start_var ? 1 : 0) ;
+}
+
+static void
+set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
+{
+  char* p;
+  struct element* el;
+  struct command *command, *keep_beam = current_beam;
+  int end, start = cmd->decl_start, t_num, exp_type;
+  double val = 0;
+  for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
+    if (*(cmd->tok_list->p[t_num]) == ',') break;
+  exp_type = loc_expr(cmd->tok_list->p, t_num,
+                      start, &end);
+  if (exp_type == 1) /* literal constant */
+    val = simple_double(cmd->tok_list->p, start, end);
+  else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
+    val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
+  if (strncmp(comm, "beam", 4) == 0)
+  {
+    command = current_beam = find_command("default_beam", beam_list);
+    if ((p = strchr(comm, '%')) != NULL)
+    {
+      if ((current_beam = find_command(++p, beam_list)) == NULL)
+        current_beam = command;
+    }
+    set_command_par_value(par, current_beam, val);
+  }
+  else if ((el = find_element(comm, element_list)) != NULL)
+    set_command_par_value(par, el->def, val);
+  else if ((command = find_command(comm, stored_commands)) != NULL)
+    set_command_par_value(par, command, val);
+  else if ((command = find_command(comm, beta0_list)) != NULL)
+    set_command_par_value(par, command, val);
+  else if ((command = find_command(comm, defined_commands)) != NULL)
+    set_command_par_value(par, command, val);
+  current_beam = keep_beam;
+}
+
+// public interface
+
 void
 get_defined_constants(void)
 {
@@ -7,6 +145,20 @@ get_defined_constants(void)
   supp_char('\n', constant_def);
   pro_input(constant_def);
   start_var = variable_list->curr;
+}
+
+struct var_list*
+delete_var_list(struct var_list* varl)
+{
+  char rout_name[] = "delete_var_list";
+  if (varl == NULL) return NULL;
+  if (stamp_flag && varl->stamp != 123456)
+    fprintf(stamp_file, "d_v_l double delete --> %s\n", varl->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", varl->name);
+  if (varl->list != NULL) delete_name_list(varl->list);
+  if (varl->vars != NULL) myfree(rout_name, varl->vars);
+  myfree(rout_name, varl);
+  return NULL;
 }
 
 struct variable*
@@ -83,52 +235,19 @@ new_var_list(int length)
   return var;
 }
 
-struct variable*
-delete_variable(struct variable* var)
+char*
+get_varstring(char* name)
 {
-  char rout_name[] = "delete_variable";
-  if (var == NULL)  return NULL;
-  if (stamp_flag && var->stamp != 123456)
-    fprintf(stamp_file, "d_v double delete --> %s\n", var->name);
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", var->name);
-  if (var->expr != NULL) delete_expression(var->expr);
-  if (var->string != NULL) myfree(rout_name, var->string);
-  myfree(rout_name, var);
-  return NULL;
-}
-
-struct var_list*
-delete_var_list(struct var_list* varl)
-{
-  char rout_name[] = "delete_var_list";
-  if (varl == NULL) return NULL;
-  if (stamp_flag && varl->stamp != 123456)
-    fprintf(stamp_file, "d_v_l double delete --> %s\n", varl->name);
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", varl->name);
-  if (varl->list != NULL) delete_name_list(varl->list);
-  if (varl->vars != NULL) myfree(rout_name, varl->vars);
-  myfree(rout_name, varl);
-  return NULL;
-}
-
-void
-grow_var_list(struct var_list* p)
-{
-  char rout_name[] = "grow_var_list";
-  struct variable** v_loc = p->vars;
-  int j, new = 2*p->max;
-
-  p->max = new;
-  p->vars
-    = (struct variable**) mycalloc(rout_name,new, sizeof(struct variable*));
-  for (j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
-  myfree(rout_name, v_loc);
-}
-
-void
-dump_variable(struct variable* v)
-{
-  fprintf(prt_file, "=== dumping variable %s\n", v->name);
+  struct variable* var;
+  char *p, *ret;
+  ret = NULL;
+  mycpy(c_dum->c, name);
+  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  {
+    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
+      ret = var->string;
+  }
+  return ret;
 }
 
 void
@@ -153,78 +272,6 @@ write_vars_8(struct var_list* varl, struct command_list* cl, FILE* file)
         && pass_select_list(varl->vars[i]->name, cl))
       export_var_8(varl->vars[i], file);
   }
-}
-
-void
-export_variable(struct variable* var, FILE* file)
-  /* exports variable in mad-X format */
-{
-  int k;
-  *c_dum->c = '\0';
-  if (var->status == 0) var->value = expression_value(var->expr, var->type);
-  if (var->val_type == 0) strcat(c_dum->c, "int ");
-  if (var->type == 0) strcat(c_dum->c, "const ");
-  strcat(c_dum->c, var->name);
-  if (var->type < 2) strcat(c_dum->c, " = ");
-  else               strcat(c_dum->c, " := ");
-  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
-  else if (var->val_type == 0)
-  {
-    k = var->value; sprintf(c_join->c, "%d", k); strcat(c_dum->c, c_join->c);
-  }
-  else
-  {
-    sprintf(c_join->c, v_format("%F"), var->value);
-    strcat(c_dum->c, supp_tb(c_join->c));
-  }
-  write_nice(c_dum->c, file);
-}
-
-void
-export_var_8(struct variable* var, FILE* file)
-  /* exports variable in mad-8 format */
-{
-  int k;
-  *c_dum->c = '\0';
-  if (var->status == 0) var->value = expression_value(var->expr, var->type);
-  if (var->type == 0)
-  {
-    strcat(c_dum->c, var->name);
-    strcat(c_dum->c, ": constant = ");
-  }
-  else
-  {
-    strcat(c_dum->c, var->name);
-    if (var->type < 2) strcat(c_dum->c, " = ");
-    else               strcat(c_dum->c, " := ");
-  }
-  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
-  else if (var->val_type == 0)
-  {
-    k = var->value; sprintf(c_join->c, v_format("%I"), k);
-    strcat(c_dum->c, c_join->c);
-  }
-  else
-  {
-    sprintf(c_join->c, v_format("%F"), var->value);
-    strcat(c_dum->c, supp_tb(c_join->c));
-  }
-  write_nice_8(c_dum->c, file);
-}
-
-char*
-get_varstring(char* name)
-{
-  struct variable* var;
-  char *p, *ret;
-  ret = NULL;
-  mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
-  {
-    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
-      ret = var->string;
-  }
-  return ret;
 }
 
 char*
@@ -367,43 +414,6 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
 }
 
 void
-set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
-{
-  char* p;
-  struct element* el;
-  struct command *command, *keep_beam = current_beam;
-  int end, start = cmd->decl_start, t_num, exp_type;
-  double val = 0;
-  for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
-    if (*(cmd->tok_list->p[t_num]) == ',') break;
-  exp_type = loc_expr(cmd->tok_list->p, t_num,
-                      start, &end);
-  if (exp_type == 1) /* literal constant */
-    val = simple_double(cmd->tok_list->p, start, end);
-  else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
-    val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
-  if (strncmp(comm, "beam", 4) == 0)
-  {
-    command = current_beam = find_command("default_beam", beam_list);
-    if ((p = strchr(comm, '%')) != NULL)
-    {
-      if ((current_beam = find_command(++p, beam_list)) == NULL)
-        current_beam = command;
-    }
-    set_command_par_value(par, current_beam, val);
-  }
-  else if ((el = find_element(comm, element_list)) != NULL)
-    set_command_par_value(par, el->def, val);
-  else if ((command = find_command(comm, stored_commands)) != NULL)
-    set_command_par_value(par, command, val);
-  else if ((command = find_command(comm, beta0_list)) != NULL)
-    set_command_par_value(par, command, val);
-  else if ((command = find_command(comm, defined_commands)) != NULL)
-    set_command_par_value(par, command, val);
-  current_beam = keep_beam;
-}
-
-void
 add_to_var_list( /* adds variable to alphabetic variable list */
   struct variable* var, struct var_list* varl, int flag)
   /* flag = 0: undefined reference in expression, 1: definition
@@ -458,14 +468,6 @@ set_stringvar(char* name, char* string)
       add_to_var_list(var, variable_list, 1);
     }
   }
-}
-
-int
-predef_var(struct variable* var)
-  /* return 1 for predefined variable, else 0 */
-{
-  int pos = name_list_pos(var->name, variable_list->list);
-  return (pos < start_var ? 1 : 0) ;
 }
 
 void
@@ -529,7 +531,7 @@ vary_name(char* name, int* name_l, int* index)
 }
 #endif
 
-/*
+#if 0 // not used...
 double
 sss_variable(char* name)
 {
@@ -564,7 +566,7 @@ sss_variable(char* name)
   }
   return val;
 }
-*/
+#endif
 
 // public interface (used by Fortran)
 

@@ -34,7 +34,6 @@ char  next_non_blank(char* string);
 int   next_non_blank_pos(char* string);
 char* noquote(char* string);
 int   quote_level(char* string, char* send);
-int   remove_colon(char** toks, int number, int start);
 int   square_to_colon(char* string);
 
 // inline functions

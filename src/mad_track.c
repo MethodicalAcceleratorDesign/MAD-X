@@ -1,5 +1,276 @@
 #include "madx.h"
 
+// private functions
+
+static void
+track_observe(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct node* nodes[2];
+  int pos;
+  if (track_is_on == 0)
+  {
+    warning("track_observe: no TRACK command seen yet,", "ignored");
+    return;
+  }
+  pos = name_list_pos("place", nl);
+  if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
+  {
+    nodes[0]->obs_point = ++curr_obs_points;
+    nodes[0]->obs_orbit = new_double_array(6);
+    nodes[0]->obs_orbit->curr = 6;
+    adjust_beam();
+    if (probe_beam) probe_beam = delete_command(probe_beam);
+    probe_beam = clone_command(current_beam);
+    adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
+    adjust_rfc(); /* sets freq in rf-cavities from probe */
+    zero_double(orbit0, 6);
+    zero_double(oneturnmat, 36);
+    if (get_option("onepass") == 0)
+    {
+      tmrefo_(&curr_obs_points,orbit0,nodes[0]->obs_orbit->a,oneturnmat);
+      /* closed orbit and one-turn linear transfer map */
+    }
+  }
+  else
+  {
+    warning("track_observe: unknown place,", "ignored");
+    return;
+  }
+}
+
+static void
+track_run(struct in_cmd* cmd)
+{
+  char rout_name[] = "track_run";
+  int e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
+  int *ibuf1, *ibuf2, *ibuf3;
+  double orbit[6];
+  double d_dummy, *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5,
+    *buf6;
+  struct table* t;
+  int turns = command_par_value("turns", cmd->clone);
+  if (track_is_on == 0)
+  {
+    warning("track_run: no TRACK command seen yet", "ignored");
+    return;
+  }
+  if (npart == 0)
+  {
+    warning("track_run: no START command seen yet", "ignored");
+    return;
+  }
+  adjust_beam();
+  if (probe_beam) probe_beam = delete_command(probe_beam);
+  probe_beam = clone_command(current_beam);
+  adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
+  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  zero_double(orbit0, 6);
+  zero_double(oneturnmat, 36);
+  if (get_option("onepass") == 0)
+  {
+    tmrefo_(&izero,orbit0,orbit,oneturnmat);
+    /* closed orbit and one-turn linear transfer map */
+  }
+  track_tables_create(cmd);
+  /* allocate buffers */
+  ibuf1 = (int*) mymalloc(rout_name,npart*sizeof(int));
+  ibuf2 = (int*) mymalloc(rout_name,npart*sizeof(int));
+  ibuf3 = (int*) mymalloc(rout_name,current_sequ->n_nodes*sizeof(int));
+  buf1 = (double*) mymalloc(rout_name,npart*sizeof(double));
+  buf2 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
+  buf_dxt = (double*) mymalloc(rout_name,npart*sizeof(double));
+  buf_dyt = (double*) mymalloc(rout_name,npart*sizeof(double));
+  buf3 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
+  buf4 = (double*) mymalloc(rout_name,36*sizeof(double));
+  buf5 = &d_dummy;
+  buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
+  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
+         buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
+  t =
+    table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  if (get_option("info"))  print_table(t);
+  if (get_option("track_dump")) track_tables_dump();
+  /* free buffers */
+  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
+  myfree(rout_name, buf1); myfree(rout_name, buf2);
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, buf3);
+  myfree(rout_name, buf4); myfree(rout_name, buf6);
+  fprintf(prt_file, "\n*****  end of trrun  *****\n");
+}
+
+static void
+track_end(struct in_cmd* cmd)
+{
+  int i;
+  struct node* c_node;
+
+  (void)cmd;
+  if (track_is_on == 0)
+  {
+    warning("track_end: no TRACK command seen yet", "ignored");
+    return;
+  }
+  for (i = 0; i < stored_track_start->curr; i++)
+    stored_track_start->commands[i] =
+      delete_command(stored_track_start->commands[i]);
+  stored_track_start->curr = 0;
+  c_node = current_sequ->ex_start;
+  while(c_node != NULL) /* clean observation points */
+  {
+    c_node->obs_point = 0;
+    c_node->obs_orbit = delete_double_array(c_node->obs_orbit);
+    if (c_node == current_sequ->ex_end)  break;
+    c_node = c_node->next;
+  }
+  track_is_on = 0;
+  fprintf(prt_file, "exit TRACK module\n\n");
+}
+
+static void
+track_ripple(struct in_cmd* cmd)
+{
+  (void)cmd;
+  
+  if (track_is_on == 0)
+  {
+    warning("track_ripple: no TRACK command seen yet", "ignored");
+    return;
+  }
+  puts("entered track_ripple routine");
+}
+
+static void
+track_track(struct in_cmd* cmd)
+{
+  int k=0, pos, one = 1;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+
+  if (current_sequ == NULL || current_sequ->ex_start == NULL)
+  {
+    warning("sequence not active,", "TRACK ignored");
+    return;
+  }
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("TRACK - sequence without beam:", current_sequ->name);
+  if (track_is_on)
+  {
+    warning("already inside TRACK command group,", "ignored");
+    return;
+  }
+  track_is_on = 1;
+  puts("enter TRACK module");
+  if ((k = get_value(current_command->name,"onepass")) != 0)
+    fprintf(prt_file, "one pass is on\n");
+  set_option("onepass", &k);
+
+  if ((k = get_value(current_command->name,"update")) != 0)
+    fprintf(prt_file, "update is on\n");
+  set_option("update", &k);
+
+
+  if ((k = get_value(current_command->name,"damp")) != 0)
+    fprintf(prt_file, "damp is on\n");
+  set_option("damp", &k);
+  if ((k = get_value(current_command->name,"quantum")) != 0)
+    fprintf(prt_file, "quantum is on\n");
+  set_option("quantum", &k);
+
+
+  if ((k = get_value(current_command->name,"aperture")) != 0)
+    fprintf(prt_file, "aperture tracking is on\n");
+  set_option("aperture", &k);
+  if ((k = get_value(current_command->name,"recloss")) != 0)
+    fprintf(prt_file, "losses recorded\n");
+  set_option("recloss", &k);
+  k = get_value(current_command->name,"dump");
+  set_option("track_dump", &k);
+  k = get_value(current_command->name,"onetable");
+  set_option("onetable", &k);
+  track_deltap=get_value(current_command->name,"deltap");
+  set_variable("track_deltap", &track_deltap);
+  if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
+                                track_deltap);
+  curr_obs_points = 1;  /* default: always observe at machine end */
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos]) set_option("track_dump", &one);
+  if ((track_filename = pl->parameters[pos]->string) == NULL)
+  {
+    if (pl->parameters[pos]->call_def != NULL)
+      track_filename = pl->parameters[pos]->call_def->string;
+    else track_filename = permbuff("dummy");
+  }
+  track_filename = permbuff(track_filename);
+  track_fileext = NULL;
+  pos = name_list_pos("extension", nl);
+  if ((track_fileext = pl->parameters[pos]->string) == NULL)
+  {
+    if (pl->parameters[pos]->call_def != NULL)
+      track_fileext = pl->parameters[pos]->call_def->string;
+    if (track_fileext == NULL)  track_fileext = permbuff("\0");
+  }
+  track_fileext = permbuff(track_fileext);
+}
+
+static const char*
+getcurrentelementname(void)
+{
+/*returns number of input tracks */
+
+  if (current_node == 0x0)
+  {
+    return 0x0;
+  }
+
+  return current_node->name;
+
+}
+
+static int
+copytrackstoarray(void)
+{
+  /*copies track positions from commands to array
+    returns number of copied tracks, value <= 0 in case of error
+  */
+  /**/
+  int ntracks = 0;/*number of tracks : returned value */
+  int n = 0; /*interator over tracks*/
+  struct command* comm;
+  if (trackstrarpositions)
+  {
+    deletetrackstrarpositions();
+  }
+
+  ntracks = getnumberoftracks();
+  if (ntracks <= 0)
+  {
+    printf("ERROR: copytrackstoarray: number of tracks is 0! Nothing to copy!");
+    return 0;
+  }
+  trackstrarpositions =  (double**)mymalloc("copytrackstoarray",ntracks*sizeof(double*));
+
+  for (n = 0; n < ntracks; n++)
+  {
+    trackstrarpositions[n] = (double*)mymalloc("copytrackstoarray",6*sizeof(double));
+
+    comm = stored_track_start->commands[n];
+    trackstrarpositions[n][0] = command_par_value("x",  comm);
+    trackstrarpositions[n][1] = command_par_value("px", comm);
+    trackstrarpositions[n][2] = command_par_value("y",  comm);
+    trackstrarpositions[n][3] = command_par_value("py", comm);
+    trackstrarpositions[n][4] = command_par_value("t",  comm);
+    trackstrarpositions[n][5] = command_par_value("pt", comm);
+
+  }
+  return ntracks;
+
+}
+
+// public interface
+
 int
 next_start(double* x,double* px,double* y,double* py,double* t,
            double* deltae,double* fx,double* phix,double* fy,double* phiy,
@@ -69,44 +340,6 @@ pro_track(struct in_cmd* cmd)
 }
 
 void
-track_observe(struct in_cmd* cmd)
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct node* nodes[2];
-  int pos;
-  if (track_is_on == 0)
-  {
-    warning("track_observe: no TRACK command seen yet,", "ignored");
-    return;
-  }
-  pos = name_list_pos("place", nl);
-  if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
-  {
-    nodes[0]->obs_point = ++curr_obs_points;
-    nodes[0]->obs_orbit = new_double_array(6);
-    nodes[0]->obs_orbit->curr = 6;
-    adjust_beam();
-    if (probe_beam) probe_beam = delete_command(probe_beam);
-    probe_beam = clone_command(current_beam);
-    adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
-    adjust_rfc(); /* sets freq in rf-cavities from probe */
-    zero_double(orbit0, 6);
-    zero_double(oneturnmat, 36);
-    if (get_option("onepass") == 0)
-    {
-      tmrefo_(&curr_obs_points,orbit0,nodes[0]->obs_orbit->a,oneturnmat);
-      /* closed orbit and one-turn linear transfer map */
-    }
-  }
-  else
-  {
-    warning("track_observe: unknown place,", "ignored");
-    return;
-  }
-}
-
-void
 track_pteigen(double* eigen)
 {
   int i, j, pos;
@@ -147,108 +380,6 @@ track_pteigen(double* eigen)
       }
     }
   }
-}
-
-void
-track_run(struct in_cmd* cmd)
-{
-  char rout_name[] = "track_run";
-  int e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
-  int *ibuf1, *ibuf2, *ibuf3;
-  double orbit[6];
-  double d_dummy, *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5,
-    *buf6;
-  struct table* t;
-  int turns = command_par_value("turns", cmd->clone);
-  if (track_is_on == 0)
-  {
-    warning("track_run: no TRACK command seen yet", "ignored");
-    return;
-  }
-  if (npart == 0)
-  {
-    warning("track_run: no START command seen yet", "ignored");
-    return;
-  }
-  adjust_beam();
-  if (probe_beam) probe_beam = delete_command(probe_beam);
-  probe_beam = clone_command(current_beam);
-  adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
-  zero_double(orbit0, 6);
-  zero_double(oneturnmat, 36);
-  if (get_option("onepass") == 0)
-  {
-    tmrefo_(&izero,orbit0,orbit,oneturnmat);
-    /* closed orbit and one-turn linear transfer map */
-  }
-  track_tables_create(cmd);
-  /* allocate buffers */
-  ibuf1 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf2 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf3 = (int*) mymalloc(rout_name,current_sequ->n_nodes*sizeof(int));
-  buf1 = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf2 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf_dxt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf_dyt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf3 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf4 = (double*) mymalloc(rout_name,36*sizeof(double));
-  buf5 = &d_dummy;
-  buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
-  trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
-         buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
-  t =
-    table_register->tables[name_list_pos("tracksumm", table_register->names)];
-  if (get_option("info"))  print_table(t);
-  if (get_option("track_dump")) track_tables_dump();
-  /* free buffers */
-  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1); myfree(rout_name, buf2);
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
-  myfree(rout_name, buf3);
-  myfree(rout_name, buf4); myfree(rout_name, buf6);
-  fprintf(prt_file, "\n*****  end of trrun  *****\n");
-}
-
-void
-track_end(struct in_cmd* cmd)
-{
-  int i;
-  struct node* c_node;
-
-  (void)cmd;
-  if (track_is_on == 0)
-  {
-    warning("track_end: no TRACK command seen yet", "ignored");
-    return;
-  }
-  for (i = 0; i < stored_track_start->curr; i++)
-    stored_track_start->commands[i] =
-      delete_command(stored_track_start->commands[i]);
-  stored_track_start->curr = 0;
-  c_node = current_sequ->ex_start;
-  while(c_node != NULL) /* clean observation points */
-  {
-    c_node->obs_point = 0;
-    c_node->obs_orbit = delete_double_array(c_node->obs_orbit);
-    if (c_node == current_sequ->ex_end)  break;
-    c_node = c_node->next;
-  }
-  track_is_on = 0;
-  fprintf(prt_file, "exit TRACK module\n\n");
-}
-
-void
-track_ripple(struct in_cmd* cmd)
-{
-  (void)cmd;
-  
-  if (track_is_on == 0)
-  {
-    warning("track_ripple: no TRACK command seen yet", "ignored");
-    return;
-  }
-  puts("entered track_ripple routine");
 }
 
 void
@@ -325,79 +456,6 @@ track_tables_dump(void)
   }
 }
 
-void
-track_track(struct in_cmd* cmd)
-{
-  int k=0, pos, one = 1;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-  {
-    warning("sequence not active,", "TRACK ignored");
-    return;
-  }
-  if (attach_beam(current_sequ) == 0)
-    fatal_error("TRACK - sequence without beam:", current_sequ->name);
-  if (track_is_on)
-  {
-    warning("already inside TRACK command group,", "ignored");
-    return;
-  }
-  track_is_on = 1;
-  puts("enter TRACK module");
-  if ((k = get_value(current_command->name,"onepass")) != 0)
-    fprintf(prt_file, "one pass is on\n");
-  set_option("onepass", &k);
-
-  if ((k = get_value(current_command->name,"update")) != 0)
-    fprintf(prt_file, "update is on\n");
-  set_option("update", &k);
-
-
-  if ((k = get_value(current_command->name,"damp")) != 0)
-    fprintf(prt_file, "damp is on\n");
-  set_option("damp", &k);
-  if ((k = get_value(current_command->name,"quantum")) != 0)
-    fprintf(prt_file, "quantum is on\n");
-  set_option("quantum", &k);
-
-
-  if ((k = get_value(current_command->name,"aperture")) != 0)
-    fprintf(prt_file, "aperture tracking is on\n");
-  set_option("aperture", &k);
-  if ((k = get_value(current_command->name,"recloss")) != 0)
-    fprintf(prt_file, "losses recorded\n");
-  set_option("recloss", &k);
-  k = get_value(current_command->name,"dump");
-  set_option("track_dump", &k);
-  k = get_value(current_command->name,"onetable");
-  set_option("onetable", &k);
-  track_deltap=get_value(current_command->name,"deltap");
-  set_variable("track_deltap", &track_deltap);
-  if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
-                                track_deltap);
-  curr_obs_points = 1;  /* default: always observe at machine end */
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos]) set_option("track_dump", &one);
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_filename = pl->parameters[pos]->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
-  track_filename = permbuff(track_filename);
-  track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_fileext = pl->parameters[pos]->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
-  }
-  track_fileext = permbuff(track_fileext);
-}
-
 int
 getnumberoftracks(void)
 {
@@ -421,60 +479,6 @@ getcurrentcmdname(char* string)
 
   strcpy(string, current_command->name);
   return strlen(current_command->name);
-
-}
-
-const char*
-getcurrentelementname(void)
-{
-/*returns number of input tracks */
-
-  if (current_node == 0x0)
-  {
-    return 0x0;
-  }
-
-  return current_node->name;
-
-}
-
-int
-copytrackstoarray(void)
-{
-  /*copies track positions from commands to array
-    returns number of copied tracks, value <= 0 in case of error
-  */
-  /**/
-  int ntracks = 0;/*number of tracks : returned value */
-  int n = 0; /*interator over tracks*/
-  struct command* comm;
-  if (trackstrarpositions)
-  {
-    deletetrackstrarpositions();
-  }
-
-  ntracks = getnumberoftracks();
-  if (ntracks <= 0)
-  {
-    printf("ERROR: copytrackstoarray: number of tracks is 0! Nothing to copy!");
-    return 0;
-  }
-  trackstrarpositions =  (double**)mymalloc("copytrackstoarray",ntracks*sizeof(double*));
-
-  for (n = 0; n < ntracks; n++)
-  {
-    trackstrarpositions[n] = (double*)mymalloc("copytrackstoarray",6*sizeof(double));
-
-    comm = stored_track_start->commands[n];
-    trackstrarpositions[n][0] = command_par_value("x",  comm);
-    trackstrarpositions[n][1] = command_par_value("px", comm);
-    trackstrarpositions[n][2] = command_par_value("y",  comm);
-    trackstrarpositions[n][3] = command_par_value("py", comm);
-    trackstrarpositions[n][4] = command_par_value("t",  comm);
-    trackstrarpositions[n][5] = command_par_value("pt", comm);
-
-  }
-  return ntracks;
 
 }
 

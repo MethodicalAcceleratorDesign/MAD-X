@@ -4,6 +4,608 @@
 #include <sys/utsname.h> // for uname
 #endif
 
+// private functions
+
+static int
+table_org(char* table)
+  /* returns origin: 0  this job, 1 read or unknown */
+{
+  int pos;
+  int org = 1;
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+    org = table_register->tables[pos]->origin;
+  return org;
+}
+
+static char*
+get_table_string(char* left, char* right)
+{
+/* for command tabstring(table,column,row) where table = table name, */
+/* column = name of a column containing strings, row = integer row number */
+/* starting at 0, returns the string found in that column and row, else NULL */
+  int col, ntok, pos, row;
+  char** toks;
+  struct table* table;
+  *right = '\0';
+  strcpy(c_dum->c, ++left);
+  supp_char(',', c_dum->c);
+  mysplit(c_dum->c, tmp_p_array);
+  toks = tmp_p_array->p; ntok = tmp_p_array->curr;
+  if (ntok == 3 && (pos = name_list_pos(toks[0], table_register->names)) > -1)
+  {
+    table = table_register->tables[pos];
+    if ((col = name_list_pos(toks[1], table->columns)) > -1)
+    {
+      row = atoi(toks[2]);
+      if(row > 0 && row <= table->curr && table->s_cols[col])
+        return table->s_cols[col][row-1];
+    }
+  }
+  return NULL;
+}
+
+static int
+tab_name_code(char* name, char* t_name)
+  /* returns 1 if name corresponds to t_name, else 0 */
+{
+  char tmp[2*NAME_L];
+  char *p, *n = one_string;
+  strcpy(tmp, name);
+  if ((p = strstr(tmp, "->")) != NULL)
+  {
+    *p = '\0'; p = strstr(name, "->"); p++; n = ++p;
+  }
+  if (strchr(t_name, ':'))
+  {
+    strcat(tmp, ":"); strcat(tmp, n);
+  }
+  return (strcmp(tmp, t_name) == 0 ? 1 : 0);
+}
+
+static int
+table_row(struct table* table, char* name)
+{
+  int i, j, ret = -1;
+  for (i = 0; i < table->num_cols; i++)
+  {
+    if(table->columns->inform[i] == 3) {
+      if (debuglevel > 2)
+        printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
+               i,table->columns->names[i]);
+      break;
+    }
+  }
+
+  if (i < table->num_cols) {
+    for (j = 0; j < table->curr; j++)
+    {
+      if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
+      if (tab_name_code(name, table->s_cols[i][j])) break;
+    }
+    if (j < table->curr) ret = j;
+  }
+  else
+  {
+    if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
+  }
+/*  if(ret==-1) fatal_error("Name of row not found", name);*/
+  if(ret==-1) warning("table_row: Name of row not found:",name);
+  return ret;
+}
+
+static void
+add_table_vars(struct name_list* cols, struct command_list* select)
+  /* 1: adds user selected variables to table - always type 2 = double
+     2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
+{
+  int i, j, k, n, pos;
+  char* var_name;
+  char tmp[12];
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  for (i = 0; i < select->curr; i++)
+  {
+    nl = select->commands[i]->par_names;
+    pl = select->commands[i]->par;
+    pos = name_list_pos("column", nl);
+    if (nl->inform[pos])
+    {
+      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+      {
+        var_name = pl->parameters[pos]->m_string->p[j];
+        if (strcmp(var_name, "apertype") == 0)
+        {
+          if ((n = aperture_count(current_sequ)) > 0)
+          {
+            add_to_name_list(permbuff("apertype"), 3, cols);
+            for (k = 0; k < n; k++)
+            {
+              sprintf(tmp, "aper_%d", k+1);
+              add_to_name_list(permbuff(tmp), 2, cols);
+            }
+          }
+        }
+        else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
+          add_to_name_list(permbuff(var_name), 2, cols);
+      }
+    }
+  }
+}
+
+static void
+grow_table_list(struct table_list* tl)
+{
+  char rout_name[] = "grow_table_list";
+  struct table** t_loc = tl->tables;
+  int j, new = 2*tl->max;
+
+  grow_name_list(tl->names);
+  tl->max = new;
+  tl->tables = mycalloc(rout_name,new, sizeof(struct table*));
+  for (j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
+  myfree(rout_name, t_loc);
+}
+
+static void
+grow_table_list_list(struct table_list_list* tll)
+{
+  char rout_name[] = "grow_table_list_list";
+  struct table_list** t_loc = tll->table_lists;
+  int j, new = 2*tll->max;
+
+  tll->max = new;
+  tll->table_lists = mycalloc(rout_name,new, sizeof(struct table_list*));
+  for (j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
+  myfree(rout_name, t_loc);
+}
+
+static void
+add_to_table_list_list(struct table_list* table_list, struct table_list_list* tll)
+  /* adds a table_list to a list of table_lists */
+{
+  int j;
+  for (j = 0; j < tll->curr; j++) 
+    if (tll->table_lists[j] == table_list) return;
+  if (tll->curr == tll->max) grow_table_list_list(tll);
+  tll->table_lists[tll->curr++] = table_list;
+}
+
+static void
+write_table(struct table* t, char* filename)
+  /* writes rows with columns listed in row and col */
+{
+  char l_name[NAME_L];
+  char sys_name[200], t_pc[2*NAME_L];
+  char* pc = t_pc;
+  struct int_array* col = t->col_out;
+  struct int_array* row = t->row_out;
+  int i, j, k, tmp, n;
+  time_t now;
+  struct tm* tm;
+#ifndef _WIN32
+  struct utsname u;
+  i = uname(&u); /* get system name */
+  strcpy(sys_name, u.sysname);
+#else // _WIN32
+  strcpy(sys_name, "Win32");
+#endif
+
+  time(&now);    /* get system time */
+  tm = localtime(&now); /* split system time */
+  if (strcmp(filename, "terminal") == 0) out_file = stdout;
+  else if ((out_file = fopen(filename, "w")) == NULL)
+  {
+    warning("cannot open output file:", filename); return;
+  }
+  if (t != NULL)
+  {
+    strcpy(l_name, t->name);
+    n = strlen(t->name);
+    fprintf(out_file,
+            "@ NAME             %%%02ds \"%s\"\n", n,
+            stoupper(l_name));
+
+    strcpy(l_name, t->type);
+    n = strlen(t->type);
+    fprintf(out_file,
+            "@ TYPE             %%%02ds \"%s\"\n", n,
+            stoupper(l_name));
+
+    if (t->header != NULL)
+    {
+      for (j = 0; j < t->header->curr; j++)
+        fprintf(out_file, "%s\n", t->header->p[j]);
+    }
+    if (title != NULL)
+    {
+      n = strlen(title);
+      fprintf(out_file,
+              "@ TITLE            %%%02ds \"%s\"\n", n, title);
+    }
+
+    n = strlen(version_name)+strlen(sys_name)+1;
+    fprintf(out_file,
+            "@ ORIGIN           %%%02ds \"%s %s\"\n",
+            n, version_name, sys_name);
+
+    fprintf(out_file,
+            "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
+            tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
+
+    fprintf(out_file,
+            "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
+            tm->tm_hour, tm->tm_min, tm->tm_sec);
+    fprintf(out_file, "* ");
+
+    for (i = 0; i < col->curr; i++)
+    {
+      strcpy(l_name, t->columns->names[col->i[i]]);
+      if (t->columns->inform[col->i[i]] == 1)
+        fprintf(out_file, v_format("%NIs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 2)
+        fprintf(out_file, v_format("%NFs "), stoupper(l_name));
+      else if (t->columns->inform[col->i[i]] == 3)
+        fprintf(out_file, v_format("%S "), stoupper(l_name));
+    }
+    fprintf(out_file, "\n");
+
+    fprintf(out_file, "$ ");
+    for (i = 0; i < col->curr; i++)
+    {
+      if (t->columns->inform[col->i[i]] == 1)
+        fprintf(out_file, v_format("%NIs "),"%d");
+      else if (t->columns->inform[col->i[i]] == 2)
+        fprintf(out_file, v_format("%NFs "),"%le");
+      else if (t->columns->inform[col->i[i]] == 3)
+        fprintf(out_file, v_format("%S "),"%s");
+    }
+    fprintf(out_file, "\n");
+
+    for (j = 0; j < row->curr; j++)
+    {
+      if (row->i[j])
+      {
+        if (t->l_head[j] != NULL)
+        {
+          for (k = 0; k < t->l_head[j]->curr; k++)
+            fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
+        }
+        for (i = 0; i < col->curr; i++)
+        {
+/*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
+          if (t->columns->inform[col->i[i]] == 1)
+          {
+            tmp = t->d_cols[col->i[i]][j];
+            fprintf(out_file, v_format(" %I"), tmp);
+          }
+          else
+            if (t->columns->inform[col->i[i]] == 2)
+            {
+              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
+              /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+            }
+            else if (t->columns->inform[col->i[i]] == 3)
+            {
+              pc[0] = c_dum->c[0] = '\"';
+              if (t->s_cols[col->i[i]][j] != NULL)
+              {
+                strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+                stoupper(c_dum->c);
+                pc = strip(c_dum->c); /* remove :<occ_count> */
+                k = strlen(pc);
+              }
+              else k = 1;
+              pc[k++] = '\"'; pc[k] = '\0';
+              fprintf(out_file, v_format(" %S "), pc);
+            }
+        }
+        fprintf(out_file, "\n");
+      }
+    }
+    if (strcmp(filename, "terminal") != 0) fclose(out_file);
+  }
+}
+
+static void
+string_to_table_row(char* table, char* name, int* row, char* string)
+  /* puts string at current position in column with name "name".
+     The table count is increased separately with "augment_count" */
+{
+  int pos;
+  struct table* t;
+
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
+      && t->columns->inform[pos] == 3)
+  {
+    mycpy(c_dum->c, string);
+    t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
+  }
+}
+
+static int
+result_from_normal(char* name_var, int* order, double* val)
+  /* returns value of table normal_results corresponding to the given variable name
+     and to the given orders
+     function value return:
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist
+  */
+{
+  int row,k,found,pos;
+  char string[AUX_LG],n_var[AUX_LG];
+  double d_val=zero;
+  struct table* t;
+
+  pos = name_list_pos("normal_results", table_register->names);
+  t = table_register->tables[pos];
+
+  *val = zero;
+  found = 0;
+  mycpy(n_var, name_var);
+  for (row = 1; row <= t->curr; row++)
+  {
+    k = string_from_table("normal_results","name", &row, string);
+    if (k != 0) return k;
+    if (strcmp(string,n_var) == 0)
+    {
+      found = 1;
+      k = double_from_table("normal_results","order1", &row, &d_val);
+      if ((int)d_val != order[0]) found = 0;
+      k = double_from_table("normal_results","order2", &row, &d_val);
+      if ((int)d_val != order[1]) found = 0;
+      k = double_from_table("normal_results","order3", &row, &d_val);
+      if ((int)d_val != order[2]) found = 0;
+      k = double_from_table("normal_results","order4", &row, &d_val);
+      if ((int)d_val != order[3]) found = 0;
+    }
+    if (found == 1) break;
+  }
+  if (found == 1)
+    k = double_from_table("normal_results","value", &row, &d_val);
+  *val = d_val;
+  return 0;
+}
+
+static struct table*
+read_his_table(struct in_cmd* cmd)
+  /* reads and stores TFS table */
+{
+  struct table* t = NULL;
+  struct char_p_array* tcpa = NULL;
+  struct name_list* tnl = NULL;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+  int i, k, error = 0;
+  char *cc, *filename, *type = NULL, *tmp, *name;
+
+  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
+  {
+    if ((tab_file = fopen(filename, "r")) == NULL)
+    {
+      warning("cannot open file:", filename); return NULL;
+    }
+  }
+  else
+  {
+    warning("no filename,","ignored"); return NULL;
+  }
+  while (fgets(aux_buff->c, aux_buff->max, tab_file))
+  {
+    cc = strtok(aux_buff->c, " \"\n");
+    if (*cc == '@')
+    {
+      if ((tmp = strtok(NULL, " \"\n")) != NULL
+          && strcmp(tmp, "TYPE") == 0)
+      {
+        if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
+        {
+          if ((name = strtok(NULL, " \"\n")) != NULL)
+            type = permbuff(stolower(name));
+        }
+      }
+    }
+    else if (*cc == '*' && tnl == NULL)
+    {
+      tnl = new_name_list("table_names", 20);
+      while ((tmp = strtok(NULL, " \"\n")) != NULL)
+        add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
+    }
+    else if (*cc == '$' && tcpa == NULL)
+    {
+      if (tnl == NULL)
+      {
+        warning("formats before names","skipped"); return NULL;
+      }
+      tcpa = new_char_p_array(20);
+      while ((tmp = strtok(NULL, " \"\n")) != NULL)
+      {
+        if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
+        if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
+        else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
+        else                              tnl->inform[tcpa->curr] = 2;
+        tcpa->p[tcpa->curr++] = permbuff(tmp);
+      }
+    }
+    else
+    {
+      if(t == NULL)
+      {
+        if (type == NULL)
+        {
+          warning("TFS table without type,","skipped"); error = 1;
+        }
+        else if (tcpa == NULL)
+        {
+          warning("TFS table without formats,","skipped"); error = 1;
+        }
+        else if (tnl == NULL)
+        {
+          warning("TFS table without column names,","skipped"); error = 1;
+        }
+        else if (tnl->curr == 0)
+        {
+          warning("TFS table: empty column name list,","skipped");
+          error = 1;
+        }
+        else if (tnl->curr != tcpa->curr)
+        {
+          warning("TFS table: number of names and formats differ,",
+                  "skipped");
+          error = 1;
+        }
+        if (error)
+        {
+          delete_name_list(tnl); return NULL;
+        }
+        t = new_table(type, "input", 500, tnl);
+      }
+      for (i = 0; i < tnl->curr; i++)
+      {
+        if (t->curr == t->max) grow_table(t);
+        tmp = tcpa->p[i];
+        if (strcmp(tmp,"%s") == 0)
+          t->s_cols[i][t->curr] = tmpbuff(stolower(cc));
+        else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
+        {
+          sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+        }
+        else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+        if (i+1 < tnl->curr)
+        {
+          if ((cc =strtok(NULL, " \"\n")) == NULL)
+          {
+            warning("incomplete table line starting with:", aux_buff->c);
+            return NULL;
+          }
+        }
+      }
+      t->curr++;
+    }
+  }
+  fclose(tab_file);
+  t->origin = 1;
+  add_to_table_list(t, table_register);
+  return NULL;
+}
+
+static void
+set_selected_columns(struct table* t, struct command_list* select)
+{
+  int i, j, pos, k, n = 0;
+  char* p;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  if (select && par_present("column", NULL, select))
+  {
+    for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
+      t->col_out->i[j] = 0;
+    t->col_out->curr = 0;
+    for (i = 0; i < select->curr; i++)
+    {
+      nl = select->commands[i]->par_names;
+      pl = select->commands[i]->par;
+      pos = name_list_pos("column", nl);
+      if (nl->inform[pos])
+      {
+        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+        {
+          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("re", t->columns->names[k], 2) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("eign", t->columns->names[k], 2) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else if (strcmp(pl->parameters[pos]->m_string->p[j],
+                          "apertype") == 0)
+          {
+            for (k = 0; k < t->num_cols; k++)
+            {
+              if (strncmp("aper", t->columns->names[k], 4) == 0)
+              {
+                if (k <  t->num_cols
+                    && int_in_array(k, n, t->col_out->i) == 0)
+                  t->col_out->i[n++] = k;
+              }
+            }
+          }
+          else
+          {
+            p = pl->parameters[pos]->m_string->p[j];
+            if ((k = name_list_pos(p, t->columns)) > -1)
+            {
+              if (k <  t->num_cols
+                  && int_in_array(k, n, t->col_out->i) == 0)
+                t->col_out->i[n++] = k;
+            }
+          }
+        }
+      }
+    }
+    t->col_out->curr = n;
+  }
+}
+
+static void
+set_selected_rows(struct table* t, struct command_list* select, struct command_list* deselect)
+{
+  int i, j;
+  c_range_start = get_node_count(current_sequ->range_start);
+  c_range_end = get_node_count(current_sequ->range_end);
+  get_select_t_ranges(select, deselect, t);
+  if (select != 0)
+  {
+    for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
+    for (i = 0; i < select->curr; i++)
+    {
+      for (j = s_range->i[i]; j <= e_range->i[i]; j++)
+      {
+        if (t->row_out->i[j] == 0) t->row_out->i[j]
+                                     = pass_select(t->s_cols[0][j], select->commands[i]);
+      }
+    }
+  }
+  if (deselect != NULL)
+  {
+    for (i = 0; i < deselect->curr; i++)
+    {
+      for (j = sd_range->i[i]; j <= ed_range->i[i]; j++)
+      {
+        if (t->row_out->i[j] == 1) t->row_out->i[j]
+                                     = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
+      }
+    }
+  }
+}
+
+// public interface
+
 struct table*
 new_table(char* name, char* type, int rows, struct name_list* cols)
 {
@@ -104,64 +706,6 @@ check_tabstring(char* string)
   }
 }
 
-char*
-get_table_string(char* left, char* right)
-{
-/* for command tabstring(table,column,row) where table = table name, */
-/* column = name of a column containing strings, row = integer row number */
-/* starting at 0, returns the string found in that column and row, else NULL */
-  int col, ntok, pos, row;
-  char** toks;
-  struct table* table;
-  *right = '\0';
-  strcpy(c_dum->c, ++left);
-  supp_char(',', c_dum->c);
-  mysplit(c_dum->c, tmp_p_array);
-  toks = tmp_p_array->p; ntok = tmp_p_array->curr;
-  if (ntok == 3 && (pos = name_list_pos(toks[0], table_register->names)) > -1)
-  {
-    table = table_register->tables[pos];
-    if ((col = name_list_pos(toks[1], table->columns)) > -1)
-    {
-      row = atoi(toks[2]);
-      if(row > 0 && row <= table->curr && table->s_cols[col])
-        return table->s_cols[col][row-1];
-    }
-  }
-  return NULL;
-}
-
-int
-table_row(struct table* table, char* name)
-{
-  int i, j, ret = -1;
-  for (i = 0; i < table->num_cols; i++)
-  {
-    if(table->columns->inform[i] == 3) {
-      if (debuglevel > 2)
-        printf("table_row: Column %d named <<%s>> is of strings. We use it to find the name.\n",
-               i,table->columns->names[i]);
-      break;
-    }
-  }
-
-  if (i < table->num_cols) {
-    for (j = 0; j < table->curr; j++)
-    {
-      if (debuglevel > 2) printf("table_row: Comparing <<%s>> <<%s>>\n",name, table->s_cols[i][j]);
-      if (tab_name_code(name, table->s_cols[i][j])) break;
-    }
-    if (j < table->curr) ret = j;
-  }
-  else
-  {
-    if (debuglevel > 1) printf("Can not find a column to search for row containing %s\n",name);
-  }
-/*  if(ret==-1) fatal_error("Name of row not found", name);*/
-  if(ret==-1) warning("table_row: Name of row not found:",name);
-  return ret;
-}
-
 double
 table_value(void)
 {
@@ -209,25 +753,7 @@ table_value(void)
   return val;
 }
 
-int
-tab_name_code(char* name, char* t_name)
-  /* returns 1 if name corresponds to t_name, else 0 */
-{
-  char tmp[2*NAME_L];
-  char *p, *n = one_string;
-  strcpy(tmp, name);
-  if ((p = strstr(tmp, "->")) != NULL)
-  {
-    *p = '\0'; p = strstr(name, "->"); p++; n = ++p;
-  }
-  if (strchr(t_name, ':'))
-  {
-    strcat(tmp, ":"); strcat(tmp, n);
-  }
-  return (strcmp(tmp, t_name) == 0 ? 1 : 0);
-}
-
-void type_ofCall
+void
 augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
   int pos;
@@ -254,7 +780,7 @@ augment_count(char* table) /* increase table occ. by 1, fill missing */
   if (++t->curr == t->max) grow_table(t);
 }
 
-void type_ofCall
+void
 augmentcountonly(char* table) /* increase table occ. by 1 */
 {
   int pos;
@@ -273,9 +799,8 @@ augmentcountonly(char* table) /* increase table occ. by 1 */
   if (++t->curr == t->max) grow_table(t);
 }
 
-int type_ofCall
+int
 char_from_table(char* table, char* name, int* row, char* val)
-  /* OB 2.4.2002 */
   /* returns val at position row in column with name "name".
      function value return:
      0  OK
@@ -300,7 +825,7 @@ char_from_table(char* table, char* name, int* row, char* val)
   return 0;
 }
 
-void type_ofCall
+void
 comment_to_table(char* table, char* comment, int* length)
   /* Saves the comment string at the current line.
      This comment is then printed in front of this line.
@@ -321,45 +846,6 @@ comment_to_table(char* table, char* comment, int* length)
 }
 
 void
-add_table_vars(struct name_list* cols, struct command_list* select)
-  /* 1: adds user selected variables to table - always type 2 = double
-     2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
-{
-  int i, j, k, n, pos;
-  char* var_name;
-  char tmp[12];
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  for (i = 0; i < select->curr; i++)
-  {
-    nl = select->commands[i]->par_names;
-    pl = select->commands[i]->par;
-    pos = name_list_pos("column", nl);
-    if (nl->inform[pos])
-    {
-      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-      {
-        var_name = pl->parameters[pos]->m_string->p[j];
-        if (strcmp(var_name, "apertype") == 0)
-        {
-          if ((n = aperture_count(current_sequ)) > 0)
-          {
-            add_to_name_list(permbuff("apertype"), 3, cols);
-            for (k = 0; k < n; k++)
-            {
-              sprintf(tmp, "aper_%d", k+1);
-              add_to_name_list(permbuff(tmp), 2, cols);
-            }
-          }
-        }
-        else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
-          add_to_name_list(permbuff(var_name), 2, cols);
-      }
-    }
-  }
-}
-
-void
 add_to_table_list(struct table* t, struct table_list* tl)
   /* adds table t to table list tl */
 {
@@ -375,17 +861,6 @@ add_to_table_list(struct table* t, struct table_list* tl)
     tl->tables[pos] = delete_table(tl->tables[pos]);
     tl->tables[pos] = t;
   }
-}
-
-void
-add_to_table_list_list(struct table_list* table_list, struct table_list_list* tll)
-  /* adds a table_list to a list of table_lists */
-{
-  int j;
-  for (j = 0; j < tll->curr; j++) 
-    if (tll->table_lists[j] == table_list) return;
-  if (tll->curr == tll->max) grow_table_list_list(tll);
-  tll->table_lists[tll->curr++] = table_list;
 }
 
 void
@@ -542,34 +1017,6 @@ grow_table(struct table* t) /* doubles number of rows */
 }
 
 void
-grow_table_list(struct table_list* tl)
-{
-  char rout_name[] = "grow_table_list";
-  struct table** t_loc = tl->tables;
-  int j, new = 2*tl->max;
-
-  grow_name_list(tl->names);
-  tl->max = new;
-  tl->tables = (struct table**) mycalloc(rout_name,new, sizeof(struct table*));
-  for (j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
-  myfree(rout_name, t_loc);
-}
-
-void
-grow_table_list_list(struct table_list_list* tll)
-{
-  char rout_name[] = "grow_table_list_list";
-  struct table_list** t_loc = tll->table_lists;
-  int j, new = 2*tll->max;
-
-  tll->max = new;
-  tll->table_lists = (struct table_list**) 
-    mycalloc(rout_name,new, sizeof(struct table_list*));
-  for (j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
-  myfree(rout_name, t_loc);
-}
-
-void
 print_table(struct table* t)
 {
   int i, j, k, l, n, tmp, wpl = 4;
@@ -613,142 +1060,6 @@ print_table(struct table* t)
 }
 
 void
-write_table(struct table* t, char* filename)
-  /* writes rows with columns listed in row and col */
-{
-  char l_name[NAME_L];
-  char sys_name[200], t_pc[2*NAME_L];
-  char* pc = t_pc;
-  struct int_array* col = t->col_out;
-  struct int_array* row = t->row_out;
-  int i, j, k, tmp, n;
-  time_t now;
-  struct tm* tm;
-#ifndef _WIN32
-  struct utsname u;
-  i = uname(&u); /* get system name */
-  strcpy(sys_name, u.sysname);
-#else // _WIN32
-  strcpy(sys_name, "Win32");
-#endif
-
-  time(&now);    /* get system time */
-  tm = localtime(&now); /* split system time */
-  if (strcmp(filename, "terminal") == 0) out_file = stdout;
-  else if ((out_file = fopen(filename, "w")) == NULL)
-  {
-    warning("cannot open output file:", filename); return;
-  }
-  if (t != NULL)
-  {
-    strcpy(l_name, t->name);
-    n = strlen(t->name);
-    fprintf(out_file,
-            "@ NAME             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
-
-    strcpy(l_name, t->type);
-    n = strlen(t->type);
-    fprintf(out_file,
-            "@ TYPE             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
-
-    if (t->header != NULL)
-    {
-      for (j = 0; j < t->header->curr; j++)
-        fprintf(out_file, "%s\n", t->header->p[j]);
-    }
-    if (title != NULL)
-    {
-      n = strlen(title);
-      fprintf(out_file,
-              "@ TITLE            %%%02ds \"%s\"\n", n, title);
-    }
-
-    n = strlen(version_name)+strlen(sys_name)+1;
-    fprintf(out_file,
-            "@ ORIGIN           %%%02ds \"%s %s\"\n",
-            n, version_name, sys_name);
-
-    fprintf(out_file,
-            "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
-            tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
-
-    fprintf(out_file,
-            "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
-            tm->tm_hour, tm->tm_min, tm->tm_sec);
-    fprintf(out_file, "* ");
-
-    for (i = 0; i < col->curr; i++)
-    {
-      strcpy(l_name, t->columns->names[col->i[i]]);
-      if (t->columns->inform[col->i[i]] == 1)
-        fprintf(out_file, v_format("%NIs "), stoupper(l_name));
-      else if (t->columns->inform[col->i[i]] == 2)
-        fprintf(out_file, v_format("%NFs "), stoupper(l_name));
-      else if (t->columns->inform[col->i[i]] == 3)
-        fprintf(out_file, v_format("%S "), stoupper(l_name));
-    }
-    fprintf(out_file, "\n");
-
-    fprintf(out_file, "$ ");
-    for (i = 0; i < col->curr; i++)
-    {
-      if (t->columns->inform[col->i[i]] == 1)
-        fprintf(out_file, v_format("%NIs "),"%d");
-      else if (t->columns->inform[col->i[i]] == 2)
-        fprintf(out_file, v_format("%NFs "),"%le");
-      else if (t->columns->inform[col->i[i]] == 3)
-        fprintf(out_file, v_format("%S "),"%s");
-    }
-    fprintf(out_file, "\n");
-
-    for (j = 0; j < row->curr; j++)
-    {
-      if (row->i[j])
-      {
-        if (t->l_head[j] != NULL)
-        {
-          for (k = 0; k < t->l_head[j]->curr; k++)
-            fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
-        }
-        for (i = 0; i < col->curr; i++)
-        {
-/*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
-          if (t->columns->inform[col->i[i]] == 1)
-          {
-            tmp = t->d_cols[col->i[i]][j];
-            fprintf(out_file, v_format(" %I"), tmp);
-          }
-          else
-            if (t->columns->inform[col->i[i]] == 2)
-            {
-              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
-              /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
-            }
-            else if (t->columns->inform[col->i[i]] == 3)
-            {
-              pc[0] = c_dum->c[0] = '\"';
-              if (t->s_cols[col->i[i]][j] != NULL)
-              {
-                strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-                stoupper(c_dum->c);
-                pc = strip(c_dum->c); /* remove :<occ_count> */
-                k = strlen(pc);
-              }
-              else k = 1;
-              pc[k++] = '\"'; pc[k] = '\0';
-              fprintf(out_file, v_format(" %S "), pc);
-            }
-        }
-        fprintf(out_file, "\n");
-      }
-    }
-    if (strcmp(filename, "terminal") != 0) fclose(out_file);
-  }
-}
-
-void type_ofCall
 double_to_table(char* table, char* name, double* val)
   /* puts val at current position in column with name "name".
      The table count is increased separately with "augment_count" */
@@ -779,7 +1090,7 @@ double_to_table(char* table, char* name, double* val)
   }
 }
 
-void type_ofCall
+void
 double_to_table_row(char* table, char* name, int* row, double* val)
   /* puts val at row position in column with name "name".
      The table count is increased separately with "augment_count" */
@@ -796,28 +1107,7 @@ double_to_table_row(char* table, char* name, int* row, double* val)
       && t->columns->inform[pos] < 3) t->d_cols[pos][*row-1] = *val;
 }
 
-void
-string_to_table_row(char* table, char* name, int* row, char* string)
-  /* puts string at current position in column with name "name".
-     The table count is increased separately with "augment_count" */
-{
-  int pos;
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] == 3)
-  {
-    mycpy(c_dum->c, string);
-    t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
-  }
-}
-
-int type_ofCall
+int
 double_from_table(char* table, char* name, int* row, double* val)
   /* returns val at position row in column with name "name".
      function value return:
@@ -842,7 +1132,7 @@ double_from_table(char* table, char* name, int* row, double* val)
   return 0;
 }
 
-int type_ofCall
+int
 string_from_table(char* table, char* name, int* row, char* string)
   /* returns val at position row in column with name "name".
      function value return:
@@ -866,52 +1156,6 @@ string_from_table(char* table, char* name, int* row, char* string)
   if (*row > t->curr)  return -3;
   l = strlen(t->s_cols[pos][*row-1]);
   mycpy(string, t->s_cols[pos][*row-1]);
-  return 0;
-}
-
-int type_ofCall
-result_from_normal(char* name_var, int* order, double* val)
-  /* returns value of table normal_results corresponding to the given variable name
-     and to the given orders
-     function value return:
-     0  OK
-     -1 table  does not exist
-     -2 column does not exist
-     -3 row    does not exist
-  */
-{
-  int row,k,found,pos;
-  char string[AUX_LG],n_var[AUX_LG];
-  double d_val=zero;
-  struct table* t;
-
-  pos = name_list_pos("normal_results", table_register->names);
-  t = table_register->tables[pos];
-
-  *val = zero;
-  found = 0;
-  mycpy(n_var, name_var);
-  for (row = 1; row <= t->curr; row++)
-  {
-    k = string_from_table("normal_results","name", &row, string);
-    if (k != 0) return k;
-    if (strcmp(string,n_var) == 0)
-    {
-      found = 1;
-      k = double_from_table("normal_results","order1", &row, &d_val);
-      if ((int)d_val != order[0]) found = 0;
-      k = double_from_table("normal_results","order2", &row, &d_val);
-      if ((int)d_val != order[1]) found = 0;
-      k = double_from_table("normal_results","order3", &row, &d_val);
-      if ((int)d_val != order[2]) found = 0;
-      k = double_from_table("normal_results","order4", &row, &d_val);
-      if ((int)d_val != order[3]) found = 0;
-    }
-    if (found == 1) break;
-  }
-  if (found == 1)
-    k = double_from_table("normal_results","value", &row, &d_val);
-  *val = d_val;
   return 0;
 }
 
@@ -1302,236 +1546,6 @@ read_table(struct in_cmd* cmd)
   return NULL;
 }
 
-struct table*
-read_his_table(struct in_cmd* cmd)
-  /* reads and stores TFS table */
-{
-  struct table* t = NULL;
-  struct char_p_array* tcpa = NULL;
-  struct name_list* tnl = NULL;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
-  int i, k, error = 0;
-  char *cc, *filename, *type = NULL, *tmp, *name;
-
-  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
-  {
-    if ((tab_file = fopen(filename, "r")) == NULL)
-    {
-      warning("cannot open file:", filename); return NULL;
-    }
-  }
-  else
-  {
-    warning("no filename,","ignored"); return NULL;
-  }
-  while (fgets(aux_buff->c, aux_buff->max, tab_file))
-  {
-    cc = strtok(aux_buff->c, " \"\n");
-    if (*cc == '@')
-    {
-      if ((tmp = strtok(NULL, " \"\n")) != NULL
-          && strcmp(tmp, "TYPE") == 0)
-      {
-        if ((name = strtok(NULL, " \"\n")) != NULL) /* skip format */
-        {
-          if ((name = strtok(NULL, " \"\n")) != NULL)
-            type = permbuff(stolower(name));
-        }
-      }
-    }
-    else if (*cc == '*' && tnl == NULL)
-    {
-      tnl = new_name_list("table_names", 20);
-      while ((tmp = strtok(NULL, " \"\n")) != NULL)
-        add_to_name_list(permbuff(stolower(tmp)), 0, tnl);
-    }
-    else if (*cc == '$' && tcpa == NULL)
-    {
-      if (tnl == NULL)
-      {
-        warning("formats before names","skipped"); return NULL;
-      }
-      tcpa = new_char_p_array(20);
-      while ((tmp = strtok(NULL, " \"\n")) != NULL)
-      {
-        if (tcpa->curr == tcpa->max) grow_char_p_array(tcpa);
-        if (strcmp(tmp, "%s") == 0)       tnl->inform[tcpa->curr] = 3;
-        else if (strcmp(tmp, "%hd") == 0) tnl->inform[tcpa->curr] = 1;
-        else                              tnl->inform[tcpa->curr] = 2;
-        tcpa->p[tcpa->curr++] = permbuff(tmp);
-      }
-    }
-    else
-    {
-      if(t == NULL)
-      {
-        if (type == NULL)
-        {
-          warning("TFS table without type,","skipped"); error = 1;
-        }
-        else if (tcpa == NULL)
-        {
-          warning("TFS table without formats,","skipped"); error = 1;
-        }
-        else if (tnl == NULL)
-        {
-          warning("TFS table without column names,","skipped"); error = 1;
-        }
-        else if (tnl->curr == 0)
-        {
-          warning("TFS table: empty column name list,","skipped");
-          error = 1;
-        }
-        else if (tnl->curr != tcpa->curr)
-        {
-          warning("TFS table: number of names and formats differ,",
-                  "skipped");
-          error = 1;
-        }
-        if (error)
-        {
-          delete_name_list(tnl); return NULL;
-        }
-        t = new_table(type, "input", 500, tnl);
-      }
-      for (i = 0; i < tnl->curr; i++)
-      {
-        if (t->curr == t->max) grow_table(t);
-        tmp = tcpa->p[i];
-        if (strcmp(tmp,"%s") == 0)
-          t->s_cols[i][t->curr] = tmpbuff(stolower(cc));
-        else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
-        {
-          sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
-        }
-        else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
-        if (i+1 < tnl->curr)
-        {
-          if ((cc =strtok(NULL, " \"\n")) == NULL)
-          {
-            warning("incomplete table line starting with:", aux_buff->c);
-            return NULL;
-          }
-        }
-      }
-      t->curr++;
-    }
-  }
-  fclose(tab_file);
-  t->origin = 1;
-  add_to_table_list(t, table_register);
-  return NULL;
-}
-
-void
-set_selected_columns(struct table* t, struct command_list* select)
-{
-  int i, j, pos, k, n = 0;
-  char* p;
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  if (select && par_present("column", NULL, select))
-  {
-    for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
-      t->col_out->i[j] = 0;
-    t->col_out->curr = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      nl = select->commands[i]->par_names;
-      pl = select->commands[i]->par;
-      pos = name_list_pos("column", nl);
-      if (nl->inform[pos])
-      {
-        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-        {
-          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("re", t->columns->names[k], 2) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("eign", t->columns->names[k], 2) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j],
-                          "apertype") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("aper", t->columns->names[k], 4) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
-                  t->col_out->i[n++] = k;
-              }
-            }
-          }
-          else
-          {
-            p = pl->parameters[pos]->m_string->p[j];
-            if ((k = name_list_pos(p, t->columns)) > -1)
-            {
-              if (k <  t->num_cols
-                  && int_in_array(k, n, t->col_out->i) == 0)
-                t->col_out->i[n++] = k;
-            }
-          }
-        }
-      }
-    }
-    t->col_out->curr = n;
-  }
-}
-
-void
-set_selected_rows(struct table* t, struct command_list* select, struct command_list* deselect)
-{
-  int i, j;
-  c_range_start = get_node_count(current_sequ->range_start);
-  c_range_end = get_node_count(current_sequ->range_end);
-  get_select_t_ranges(select, deselect, t);
-  if (select != 0)
-  {
-    for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      for (j = s_range->i[i]; j <= e_range->i[i]; j++)
-      {
-        if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select(t->s_cols[0][j], select->commands[i]);
-      }
-    }
-  }
-  if (deselect != NULL)
-  {
-    for (i = 0; i < deselect->curr; i++)
-    {
-      for (j = sd_range->i[i]; j <= ed_range->i[i]; j++)
-      {
-        if (t->row_out->i[j] == 1) t->row_out->i[j]
-                                     = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
-      }
-    }
-  }
-}
-
 void
 string_to_table(char* table, char* name, char* string)
   /* buffers + puts "string"
@@ -1566,18 +1580,6 @@ table_length(char* table)
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
     length = table_register->tables[pos]->curr;
   return length;
-}
-
-int
-table_org(char* table)
-  /* returns origin: 0  this job, 1 read or unknown */
-{
-  int pos;
-  int org = 1;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    org = table_register->tables[pos]->origin;
-  return org;
 }
 
 void

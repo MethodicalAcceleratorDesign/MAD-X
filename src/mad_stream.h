@@ -25,10 +25,10 @@ struct in_buff_list
 
 // interface
 
-int   down_unit(char* file_name);
-void  grow_in_buff_list(struct in_buff_list* p);
 struct in_buffer*     new_in_buffer(int length);
 struct in_buff_list*  new_in_buff_list(int length);
+void                  grow_in_buff_list(struct in_buff_list*);
+int                   down_unit(char* file_name);
 
 #endif // MAD_STREAM_H
 

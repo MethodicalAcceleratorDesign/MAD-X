@@ -402,14 +402,17 @@ quote_level(char* string, char* send)
   return level;
 }
 
-int
+#if 0 // not used...
+static int
 remove_colon(char** toks, int number, int start)
   /* removes colon behind declarative part for MAD-8 compatibility */
 {
   int i, k = start;
-  for (i = start; i < number; i++)  if (*toks[i] != ':') toks[k++] = toks[i];
+  for (i = start; i < number; i++)
+    if (*toks[i] != ':') toks[k++] = toks[i];
   return k;
 }
+#endif
 
 int
 square_to_colon(char* string)

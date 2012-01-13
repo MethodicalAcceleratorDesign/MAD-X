@@ -1,53 +1,6 @@
 #include "madx.h"
 
-int
-pass_select(char* name, struct command* sc)
-  /* checks name against class (if element) and pattern that may
-     (but need not) be contained in command sc;
-     0: does not pass, 1: passes */
-{
-  struct name_list* nl = sc->par_names;
-  struct command_parameter_list* pl = sc->par;
-  struct element* el = find_element(strip(name), element_list);
-  int pos, in = 0, any = 0;
-  char *class, *pattern;
-  pos = name_list_pos("class", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    el = find_element(strip(name), element_list);
-    if (el != NULL)
-    {
-      class = pl->parameters[pos]->string;
-      in = belongs_to_class(el, class);
-      if (in == 0) return 0;
-    }
-  }
-  any = in = 0;
-  pos = name_list_pos("pattern", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    any = 1;
-    pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(name)) == 0)  in = 1;
-  }
-  if (any == 0) return 1;
-  else return in;
-}
-
-int
-pass_select_list(char* name, struct command_list* cl)
-  /* returns 0 (does not pass) or 1 (passes) for a list of selects */
-{
-  int i, ret = 0;
-  if (cl->curr == 0)  return 1;
-  for (i = 0; i < cl->curr; i++)
-  {
-    if ((ret = pass_select(name, cl->commands[i]))) break;
-  }
-  return ret;
-}
-
-int
+static int
 get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct node_list* s_ranges)
   /* makes a list of nodes of an expanded sequence that pass the range
      selection */
@@ -94,6 +47,55 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
     if (full != 0) break;
   }
   return 1;
+}
+
+// public interface
+
+int
+pass_select(char* name, struct command* sc)
+  /* checks name against class (if element) and pattern that may
+     (but need not) be contained in command sc;
+     0: does not pass, 1: passes */
+{
+  struct name_list* nl = sc->par_names;
+  struct command_parameter_list* pl = sc->par;
+  struct element* el = find_element(strip(name), element_list);
+  int pos, in = 0, any = 0;
+  char *class, *pattern;
+  pos = name_list_pos("class", nl);
+  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+  {
+    el = find_element(strip(name), element_list);
+    if (el != NULL)
+    {
+      class = pl->parameters[pos]->string;
+      in = belongs_to_class(el, class);
+      if (in == 0) return 0;
+    }
+  }
+  any = in = 0;
+  pos = name_list_pos("pattern", nl);
+  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+  {
+    any = 1;
+    pattern = stolower(pl->parameters[pos]->string);
+    if(myregex(pattern, strip(name)) == 0)  in = 1;
+  }
+  if (any == 0) return 1;
+  else return in;
+}
+
+int
+pass_select_list(char* name, struct command_list* cl)
+  /* returns 0 (does not pass) or 1 (passes) for a list of selects */
+{
+  int i, ret = 0;
+  if (cl->curr == 0)  return 1;
+  for (i = 0; i < cl->curr; i++)
+  {
+    if ((ret = pass_select(name, cl->commands[i]))) break;
+  }
+  return ret;
 }
 
 int

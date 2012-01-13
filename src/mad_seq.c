@@ -1,8 +1,6 @@
 #include "madx.h"
 
-// public interface
-
-void
+static void
 make_sequ_node(struct sequence* sequ, int occ_cnt)
   /* makes + links a node pointing to a sub-sequence */
 {
@@ -14,6 +12,1147 @@ make_sequ_node(struct sequence* sequ, int occ_cnt)
   current_node->previous = prev_node;
   current_node->next = NULL;
 }
+
+static struct sequence_list*
+delete_sequence_list(struct sequence_list* sql)
+{
+  char rout_name[] = "delete_sequence_list";
+  if (sql == NULL) return NULL;
+  if (stamp_flag && sql->stamp != 123456)
+    fprintf(stamp_file, "d_s_l double delete --> %s\n", sql->name);
+  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", sql->name);
+  if (sql->list != NULL) delete_name_list(sql->list);
+  if (sql->sequs != NULL) myfree(rout_name, sql->sequs);
+  myfree(rout_name, sql);
+  return NULL;
+}
+
+static void
+dump_exp_sequ(struct sequence* sequ, int level)
+  /* executes the command dumpsequ, ... */
+{
+  struct node* c_node;
+  int j;
+  double suml = zero;
+  puts("+++++++++ dump expanded sequence +++++++++");
+  c_node = sequ->ex_start;
+  while(c_node != NULL)
+  {
+    suml += c_node->length;
+    if (level > 2)
+    {
+      dump_node(c_node);
+      if (c_node->p_al_err != NULL)
+      {
+        puts("alignment errors:");
+        for (j = 0; j < c_node->p_al_err->curr; j++)
+          printf(v_format("%F "), c_node->p_al_err->a[j]);
+        printf("\n");
+      }
+      if (c_node->p_fd_err != NULL)
+      {
+        puts("field errors:");
+        for (j = 0; j < c_node->p_fd_err->curr; j++)
+          printf(v_format("%e "), c_node->p_fd_err->a[j]);
+        printf("\n");
+      }
+      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
+    }
+    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+      fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
+              c_node->position, c_node->enable);
+    if (c_node == sequ->ex_end)  break;
+    c_node = c_node->next;
+  }
+  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
+}
+
+static void
+dump_sequ(struct sequence* c_sequ, int level)
+{
+  struct node* c_node;
+  double suml = zero;
+  fprintf(prt_file, v_format("+++ dump sequence: %S\n"), c_sequ->name);
+  c_node = c_sequ->start;
+  while(c_node != NULL)
+  {
+    suml += c_node->length;
+    if (level > 2)
+    {
+      dump_node(c_node);
+      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
+    }
+    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
+      fprintf(prt_file, v_format("%S: at = %F\n"),
+              c_node->name, c_node->position);
+    if (c_node == c_sequ->end)  break;
+    c_node = c_node->next;
+  }
+  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
+}
+
+static void
+grow_sequence_list(struct sequence_list* l)
+{
+  char rout_name[] = "grow_sequence_list";
+  struct sequence** sloc = l->sequs;
+  int j, new = 2*l->max;
+  l->max = new;
+  l->sequs
+    = (struct sequence**) mycalloc(rout_name,new, sizeof(struct sequence*));
+  for (j = 0; j < l->curr; j++) l->sequs[j] = sloc[j];
+  myfree(rout_name, sloc);
+}
+
+static void
+make_occ_list(struct sequence* sequ)
+  /* makes the node occurrence list */
+{
+  struct node* c_node = sequ->start;
+  int i;
+  while (c_node != NULL)
+  {
+    if (c_node->p_elem != NULL)
+    {
+      if ((i = name_list_pos(c_node->p_elem->name, occ_list)) < 0)
+        i = add_to_name_list(c_node->p_elem->name, 1, occ_list);
+      else ++occ_list->inform[i];
+    }
+    if (c_node == sequ->end) break;
+    c_node = c_node->next;
+  }
+}
+
+static void
+all_node_pos(struct sequence* sequ)
+  /* calculates all node positions in an expanded sequence */
+{
+  struct node* node = sequ->start;
+  while (node != NULL)
+  {
+    if (node->p_elem != NULL)
+      node->length = node->p_elem->length
+        = element_value(node, "l");
+    else if (node->p_sequ != NULL)
+      node->length = sequence_length(node->p_sequ);
+    else fatal_error("node is neither element nor sequence:",
+                     node->name);
+    if ((node->position = get_node_pos(node, sequ)) < zero)
+      node->position += sequence_length(sequ);
+    if (node == sequ->end) break;
+    node = node->next;
+  }
+}
+
+static struct sequence*
+extract_sequence(char* name, struct sequence* sequ, struct node* from, struct node* to, char* refpos)
+{
+  struct element* el;
+  int pos, marker_pos, from_cond;
+  struct command* clone;
+  struct sequence* keep_curr_sequ = current_sequ;
+  struct sequence* new_sequ;
+  struct node *q = from, *from_node;
+  struct node_list* new_nodes;
+  double start_value, end_value;
+  char tmp_name[2*NAME_L];
+
+  if (get_option("info")) printf("+++ extracting sequence %s from %s to %s\n",
+                                 sequ->name, from->name, to->name);
+  current_sequ = new_sequence(name, sequ->ref_flag);
+  current_sequ->share = 1; /* make shared for recombination */
+  current_sequ->refpos = refpos;
+  current_sequ->cavities = new_el_list(100);
+  new_nodes = new_node_list(1000);
+/* fill new_node list for 'from' references */
+  while (q)
+  {
+    add_to_node_list(q, 0, new_nodes);
+    if (q == to)  break;
+    q = q->next;
+  }
+/* sequence construction */
+  q = from;
+  start_value = get_node_pos(from, sequ);
+  end_value = get_node_pos(to, sequ);
+  current_sequ->l_expr = NULL;
+  current_sequ->length = end_value - start_value;
+  if (current_sequ->length < zero) current_sequ->length += sequ->length;
+  marker_pos = name_list_pos("marker", defined_commands->list);
+  clone = clone_command(defined_commands->commands[marker_pos]);
+  sprintf(c_dum->c, "%s$start", name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  current_node = NULL;
+  make_elem_node(el, 1);
+  current_sequ->start = current_node;
+  make_elem_node(from->p_elem, from->occ_cnt);
+  current_node->at_value = 0;
+  current_node->at_expr = NULL;
+/* loop over sequ nodes from 'from' to 'to' */
+  while (current_node != NULL)
+  {
+    while (strchr(q->next->name, '$')) q = q->next; /* suppress internal markers */
+    if (q->next->p_elem)
+      make_elem_node(q->next->p_elem, q->next->occ_cnt);
+    else if(q->next->p_sequ)
+      make_sequ_node(q->next->p_sequ, q->next->occ_cnt);
+    else
+      fatal_error("node has neither element nor sequence reference:", q->next->name);
+    q = q->next;
+    if (q->p_elem && strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
+        find_element(q->p_elem->name, current_sequ->cavities) == NULL)
+      add_to_el_list(&q->p_elem, 0, current_sequ->cavities, 0);
+    from_cond = 0;
+    if (q->from_name)
+    {
+      strcpy(tmp_name, q->from_name);
+      strcat(tmp_name, ":1");
+      if ((pos = name_list_pos(tmp_name, sequ->nodes->list)) > -1)
+      {
+        from_node = sequ->nodes->nodes[pos];
+        from_cond = 1;
+        if (name_list_pos(tmp_name, new_nodes->list) > -1)
+          from_cond = 2;
+      }
+    }
+    if (from_cond == 2)
+    {
+      current_node->from_name = q->from_name;
+      current_node->at_value = q->at_value;
+      current_node->at_expr = q->at_expr;
+    }
+    else
+    {
+      if (from_cond == 1)
+        current_node->at_value = expr_combine(q->at_expr, q->at_value, " + ",
+                                              from_node->at_expr, from_node->at_value,
+                                              &current_node->at_expr);
+      else
+      {
+        current_node->at_expr = q->at_expr;
+        current_node->at_value = q->at_value;
+      }
+      current_node->at_value = expr_combine(current_node->at_expr,
+                                            current_node->at_value, " - ",
+                                            NULL, start_value,
+                                            &current_node->at_expr);
+      if (current_node->at_value < zero)
+        current_node->at_value = expr_combine(current_node->at_expr,
+                                              current_node->at_value, " + ",
+                                              sequ->l_expr, sequ->length,
+                                              &current_node->at_expr);
+    }
+    if (q == to) break;
+  }
+  clone = clone_command(defined_commands->commands[marker_pos]);
+  sprintf(c_dum->c, "%s$end", name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  make_elem_node(el, 1);
+  current_node->at_expr = current_sequ->l_expr;
+  current_node->at_value = current_sequ->length;
+  current_sequ->end = current_node;
+  current_node->next = current_sequ->start;
+  current_sequ->start->previous = current_node;
+  new_sequ = current_sequ;
+  current_sequ = keep_curr_sequ;
+  if (get_option("info"))
+    printf("+++ new sequence: %s  with current length = %.12g\n\n",
+           new_sequ->name, new_sequ->length);
+  return new_sequ;
+}
+
+static void
+fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell, struct var_list* varl)
+  /* puts all variables a sequence depends on, in a list */
+{
+  int i;
+  struct sequence* sequ;
+  struct node* c_node;
+  for (i = 0; i < sql->curr; i++)
+  {
+    sequ = sql->sequs[i];
+    if (sequ->l_expr != NULL) fill_expr_var_list(ell, sequ->l_expr, varl);
+    c_node = sequ->start;
+    while(c_node != NULL)
+    {
+      if (c_node->at_expr != NULL)
+        fill_expr_var_list(ell, c_node->at_expr, varl);
+      if (c_node == sequ->end)  break;
+      c_node = c_node->next;
+    }
+  }
+}
+
+static void 
+seq_edit_ex(struct sequence* seq)
+{
+  edit_sequ = seq;
+  edit_is_on = 1;
+  seqedit_install = seqedit_move = seqedit_remove = 0;
+  if (edit_sequ->ex_start != NULL)
+  {
+    edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
+    edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
+  }
+  if (occ_list == NULL)
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
+  else occ_list->curr = 0;
+  resequence_nodes(edit_sequ);
+  all_node_pos(edit_sequ);
+}
+
+static void
+seq_end_ex(void)
+{
+  occ_list->curr = 0;
+  resequence_nodes(edit_sequ);
+  selected_ranges->curr = 0;
+  selected_ranges->list->curr = 0;
+  edit_is_on = 0;
+}
+
+static void
+expand_sequence(struct sequence* sequ, int flag)
+  /* expands a sequence into nodes, expands sequence nodes */
+{
+  /* Transfers errors from original nodes if flag != 0;
+     this is needed for SXF input  */
+  struct node *p, *q = sequ->start;
+  p = sequ->ex_start = clone_node(sequ->start, 0);
+  add_to_node_list(p, 0, sequ->ex_nodes);
+  while (p != NULL)
+  {
+    if (q == sequ->end) break;
+    p->next = clone_node(q->next, flag);
+    p->next->previous = p;
+    p = p->next;
+    q = q->next;
+    if (p->p_sequ != NULL) p = expand_node(p, sequ, sequ, p->position);
+    else add_to_node_list(p, 0, sequ->ex_nodes);
+  }
+  sequ->ex_end = p;
+  sequ->ex_end->next = sequ->ex_start;
+  sequ->ex_start->previous = sequ->ex_end;
+  p = sequ->ex_start;
+  while (p != sequ->ex_end)
+  {
+    if (strstr(p->base_name, "kicker") ||strstr(p->base_name, "monitor"))
+      p->enable = 1; /* flag for orbit correction module */
+    p = p->next;
+  }
+}
+
+static void
+seq_flatten(struct sequence* sequ)
+  /* executes flatten command */
+{
+  struct node* c_node;
+  struct node_list* nl;
+  if (occ_list == NULL)
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
+  else occ_list->curr = 0;
+  make_occ_list(sequ);
+  all_node_pos(sequ);
+  sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
+  expand_sequence(sequ, 0);
+  sequ->nested = 0;
+  nl = sequ->nodes;
+  sequ->nodes = sequ->ex_nodes;
+  sequ->ex_nodes = delete_node_list(nl);
+  sequ->start = sequ->ex_start; sequ->ex_start = NULL;
+  sequ->end = sequ->ex_end; sequ->ex_end = NULL;
+  c_node = sequ->start;
+  while (c_node != NULL)
+  {
+    c_node->at_value = c_node->position;
+    c_node->at_expr = NULL;
+    c_node->from_name = NULL;
+    if (c_node == sequ->end) break;
+    c_node = c_node->next;
+  }
+  sequ->ref_flag = 0;
+}
+
+static void
+insert_elem(struct sequence* sequ, struct node* node)
+  /* inserts an element in a sequence as function of its position */
+{
+  struct node* c_node = sequ->start->next;
+
+  while (c_node != NULL)
+  {
+    if (node->position <= c_node->position || c_node == sequ->end) break;
+    c_node = c_node->next;
+  }
+  link_in_front(node, c_node);
+}
+
+static struct node*
+install_one(struct element* el, char* from_name, double at_value, struct expression* at_expr, double position)
+  /* adds an element to a sequence */
+{
+  struct node* node;
+  int i, occ = 1;
+  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
+      find_element(el->name, edit_sequ->cavities) == NULL)
+    add_to_el_list(&el, 0, edit_sequ->cavities, 0);
+  if ((i = name_list_pos(el->name, occ_list)) < 0)
+    i = add_to_name_list(el->name, occ, occ_list);
+  else occ = ++occ_list->inform[i];
+  node = new_elem_node(el, occ);
+  add_to_node_list(node, 0, edit_sequ->nodes);
+  node->position = position;
+  node->at_value = at_value;
+  node->at_expr = at_expr;
+  node->from_name = from_name;
+  set_command_par_value("at", el->def, position);
+  insert_elem(edit_sequ, node);
+  return node;
+}
+
+static void
+make_sequ_from_line(char* name)
+  /* converts a line into a sequence from actual line definition */
+{
+  char** tmp = NULL;
+  int pos = name_list_pos(name, line_list->list);
+  int spos;
+  struct sequence* old_sequ = NULL;
+  struct macro* line;
+  int mpos = name_list_pos("marker", defined_commands->list);
+  struct command* clone = clone_command(defined_commands->commands[mpos]);
+  struct element* el;
+  if (pos < 0) fatal_error("unknown line: ", name);
+  line = line_list->macros[pos];
+  line->dead = 1;   /* prevent line from further conversion to sequence */
+  line_buffer = new_char_p_array(1000);
+  replace_lines(line, 0, tmp); /* replaces all referenced lines */
+  expand_line(line_buffer); /* act on '-' and rep. count */
+  current_sequ = new_sequence(name, 0); /* node positions = centre */
+  if ((spos = name_list_pos(name, sequences->list)) >= 0)
+    old_sequ = sequences->sequs[spos];
+  add_to_sequ_list(current_sequ, sequences);
+  if (old_sequ) old_sequ = delete_sequence(old_sequ);
+  if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
+  else current_sequ->cavities = new_el_list(100);
+  if (occ_list == NULL)
+    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
+  else occ_list->curr = 0;
+  sprintf(c_dum->c, "%s$start", current_sequ->name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  current_node = NULL;
+  make_elem_node(el, 1);
+  current_sequ->start = current_node;
+  current_sequ->length = line_nodes(line_buffer);
+  sprintf(c_dum->c, "%s$end", current_sequ->name);
+  el = make_element(c_dum->c, "marker", clone, 0);
+  make_elem_node(el, 1);
+  current_node->at_value = current_node->position = current_sequ->length;
+  current_sequ->end = current_node;
+  current_sequ->start->previous = current_sequ->end;
+  current_sequ->end->next = current_sequ->start;
+  current_sequ->line = 1; /* remember origin of sequence */
+  if(line_buffer) delete_char_p_array(line_buffer,1);
+}
+
+static void
+export_sequence(struct sequence* sequ, FILE* file)
+  /* exports sequence in mad-X format */
+{
+  char num[2*NAME_L];
+  struct element* el;
+  struct sequence* sq;
+  struct node* c_node = sequ->start;
+  int exp_par_flag;
+  int seqref = 0;
+  char rpos[3][6] = {"exit", "centre", "entry"};
+  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
+  *c_dum->c = '\0';
+  if (sequ->share) strcat(c_dum->c, "shared ");
+  strcat(c_dum->c, sequ->export_name);
+  strcat(c_dum->c, ": sequence");
+  if (seqref)
+  {
+    strcat(c_dum->c, ", refer = ");
+    strcat(c_dum->c, rpos[seqref+1]);
+  }
+  if (sequ->refpos != NULL)
+  {
+    strcat(c_dum->c, ", refpos = ");
+    strcat(c_dum->c, sequ->refpos);
+  }
+  strcat(c_dum->c, ", l = ");
+  if (sequ->l_expr != NULL) strcat(c_dum->c, sequ->l_expr->string);
+  else
+  {
+    sprintf(num, v_format("%F"), sequence_length(sequ));
+    strcat(c_dum->c, supp_tb(num));
+  }
+  write_nice(c_dum->c, file);
+  while(c_node != NULL)
+  {
+    exp_par_flag = 0;
+    *c_dum->c = '\0';
+    if (strchr(c_node->name, '$') == NULL
+        && strstr(c_node->name, "_p_") == NULL
+        && strcmp(c_node->base_name, "drift") != 0)
+    {
+      if ((el = c_node->p_elem) != NULL)
+      {
+        if (c_node->p_elem->def_type)
+        {
+          strcat(c_dum->c, el->name);
+          strcat(c_dum->c, ": ");
+          strcat(c_dum->c, el->parent->name);
+          exp_par_flag = 1;
+        }
+        else strcat(c_dum->c, el->name);
+      }
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
+      else fatal_error("save error: node without link:", c_node->name);
+      strcat(c_dum->c, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
+      else
+      {
+        sprintf(num, v_format("%F"), c_node->at_value);
+        strcat(c_dum->c, supp_tb(num));
+      }
+      if (c_node->from_name != NULL)
+      {
+        strcat(c_dum->c, ", from = ");
+        strcat(c_dum->c, c_node->from_name);
+      }
+      if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c);
+      write_nice(c_dum->c, file);
+    }
+    if (c_node == sequ->end)  break;
+    c_node = c_node->next;
+  }
+  strcpy(c_dum->c, "endsequence");
+  write_nice(c_dum->c, file);
+}
+
+static void
+export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
+  /* exports sequence in mad-8 format */
+  /* set refer = centre always (local var. seqref) HG 9.1.09 */
+{
+  char num[2*NAME_L];
+  int exp_par_flag;
+  int seqref = 0;
+  struct element* el;
+  struct sequence* sq;
+  struct node* c_node = sequ->start;
+  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
+  if (pass_select_list(sequ->name, cl) == 0)  return;
+  *c_dum->c = '\0';
+  strcat(c_dum->c, sequ->export_name);
+  strcat(c_dum->c, ": sequence");
+  if (seqref ==1)  strcat(c_dum->c, ", refer=entry");
+  write_nice_8(c_dum->c, file);
+  while(c_node != NULL)
+  {
+    exp_par_flag = 0;
+    *c_dum->c = '\0';
+    if (strchr(c_node->name, '$') == NULL
+        && strcmp(c_node->base_name, "drift") != 0)
+    {
+      if ((el = c_node->p_elem) != NULL)
+      {
+        if (c_node->p_elem->def_type)
+        {
+          strcat(c_dum->c, el->name);
+          strcat(c_dum->c, ": ");
+          strcat(c_dum->c, el->parent->name);
+          exp_par_flag = 1;
+        }
+        else strcat(c_dum->c, el->name);
+      }
+      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
+      else fatal_error("save error: node without link:", c_node->name);
+      strcat(c_dum->c, ", at = ");
+      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
+      else
+      {
+        sprintf(num, v_format("%F"), c_node->at_value);
+        strcat(c_dum->c, supp_tb(num));
+      }
+      if (c_node->from_name != NULL)
+      {
+        strcat(c_dum->c, ", from = ");
+        strcat(c_dum->c, c_node->from_name);
+      }
+      if (exp_par_flag)  export_el_def_8(c_node->p_elem, c_dum->c);
+      write_nice_8(c_dum->c, file);
+    }
+    if (c_node == sequ->end)  break;
+    c_node = c_node->next;
+  }
+  strcpy(c_dum->c, sequ->name);
+  strcat(c_dum->c, "_end: marker, at = ");
+  sprintf(num, v_format("%F"), sequence_length(sequ));
+  strcat(c_dum->c,num);
+  write_nice_8(c_dum->c, file);
+  strcpy(c_dum->c, "endsequence");
+  write_nice_8(c_dum->c, file);
+}
+
+static void
+write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
+{
+  /* exports sequences in order of their nest level, flat first etc. */
+  int i, j, max_nest = 0;
+  for (i = 0; i < sql->curr; i++)
+    if(sql->sequs[i]->nested > max_nest) max_nest = sql->sequs[i]->nested;
+  for (j = 0; j <= max_nest; j++)
+  {
+    for (i = 0; i < sql->curr; i++)
+      if(sql->sequs[i]->nested == j)
+      {
+        if (pass_select_list(sql->sequs[i]->name, cl))
+          export_sequence(sql->sequs[i], file);
+      }
+  }
+}
+
+static void
+seq_cycle(struct in_cmd* cmd)
+  /* cycles a sequence */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct node *node, *clone;
+  char* name = NULL;
+  int pos = name_list_pos("start", nl);
+  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  {
+    sprintf(c_dum->c, "%s:1", name);
+    if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
+    {
+      node = edit_sequ->nodes->nodes[pos];
+      sprintf(c_dum->c, "%s%s_p_", edit_sequ->name,strip(node->name));
+      if (strstr(node->previous->name, "_p_") == NULL)
+      {
+        clone = clone_node(node, 0);
+        clone->p_elem = clone_element(node->p_elem);
+        strcpy(clone->p_elem->name, c_dum->c);
+
+        /* IA 29.11.07 : fixes a bug with aperture module */
+/* Removed HG 11.10.2009 */
+        /* sprintf(c_dum->c, " ");
+           set_command_par_string("apertype", clone->p_elem->def,c_dum->c); */
+
+
+        add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
+                       element_list, 1);
+        link_in_front(clone, node);
+      }
+      edit_sequ->start = node;
+      edit_sequ->end = node->previous;
+      set_new_position(edit_sequ);
+      all_node_pos(edit_sequ);
+    }
+    else warning("cycle: unknown element ignored:", name);
+  }
+  else warning("cycle: no start given,","ignored");
+}
+
+static void
+seq_edit(struct in_cmd* cmd)
+  /* executes seqedit command */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  char* name = NULL;
+  int pos;
+  pos = name_list_pos("sequence", nl);
+  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  {
+    if ((pos = name_list_pos(name, sequences->list)) >= 0)
+    {
+      if (sequences->sequs[pos]->line)
+        warning("sequence originates from line,","edit ignored");
+      else  seq_edit_ex(sequences->sequs[pos]);
+    }
+    else warning("unknown sequence:", "ignored");
+  }
+  else warning("seqedit without sequence:", "ignored");
+}
+
+static void
+seq_end(struct in_cmd* cmd)
+  /* executes endedit command */
+{
+  char tmp[8];
+  (void)cmd;
+  sprintf(tmp, "%d", seqedit_install);
+  put_info("seqedit - number of elements installed: ", tmp);
+  sprintf(tmp, "%d", seqedit_move);
+  put_info("seqedit - number of elements moved:     ", tmp);
+  sprintf(tmp, "%d", seqedit_remove);
+  put_info("seqedit - number of elements removed:   ", tmp);
+  seq_end_ex();
+}
+
+static void
+seq_install(struct in_cmd* cmd)
+  /* executes install command */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct element *cl, *el;
+  struct node* c_node;
+  struct expression* expr = NULL;
+  double at, from = zero;
+  char name[NAME_L], *pname, *name_e = NULL, *name_c = NULL, *from_name = NULL;
+  int k, pos, any = 0;
+  int pos_e = name_list_pos("element", nl);
+  int pos_c = name_list_pos("class", nl);
+  if (nl->inform[pos_e] && (name_e = pl->parameters[pos_e]->string) != NULL)
+  {
+    if (nl->inform[pos_c] && (name_c = pl->parameters[pos_c]->string) != NULL)
+    {
+      if ((cl = find_element(name_c, element_list)) == NULL)
+      {
+        warning("ignored because of unknown class:", name_c);
+        return;
+      }
+      else
+      {
+        el = clone_element(cl);
+        strcpy(el->name, name_e);
+        add_to_el_list(&el, cl->def->mad8_type, element_list, 2);
+      }
+    }
+    else if ((el = find_element(name_e, element_list)) == NULL)
+    {
+      warning("ignored, unknown command or element:", name_c); return;
+    }
+  }
+  else
+  {
+    warning("no element specified,","ignored"); return;
+  }
+  if (nl->inform[name_list_pos("at", nl)] == 0)
+  {
+    warning("no 'at':", "ignored"); return;
+  }
+  at = command_par_value("at", cmd->clone);
+  expr = clone_expression(command_par_expr("at", cmd->clone));
+  pos = name_list_pos("from", nl);
+  if (nl->inform[pos])
+  {
+    from_name = pl->parameters[pos]->string;
+    if (strcmp(from_name, "selected") == 0)
+    {
+      if (seqedit_select->curr == 0)
+      {
+        warning("no active select commands:", "ignored"); return;
+      }
+      else
+      {
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+            == 0) any = 1;
+        c_node = edit_sequ->start;
+        while (c_node != NULL)
+        {
+          if (any
+              || name_list_pos(c_node->name, selected_ranges->list) > -1)
+          {
+            for (k = 0; k < seqedit_select->curr; k++)
+            {
+              myrepl(":", "[", c_node->name, name);
+              strcat(name, "]");
+              if (strchr(name, '$') == NULL &&
+                  pass_select(c_node->name,
+                              seqedit_select->commands[k])) break;
+            }
+            if (k < seqedit_select->curr)
+            {
+              from = get_node_pos(c_node, edit_sequ);
+              pname = permbuff(name);
+              install_one(el, pname, at, expr, at+from);
+              seqedit_install++;
+            }
+          }
+          if (c_node == edit_sequ->end) break;
+          c_node = c_node->next;
+        }
+      }
+    }
+    else
+    {
+      from_name = permbuff(pl->parameters[pos]->string);
+      if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
+      {
+        warning("ignoring 'from' reference to unknown element:", from_name);
+        return;
+      }
+      install_one(el, from_name, at, expr, at+from);
+      seqedit_install++;
+    }
+  }
+  else
+  {
+    install_one(el, from_name, at, expr, at);
+    seqedit_install++;
+  }
+}
+
+static void
+seq_move(struct in_cmd* cmd)
+  /* executes move command */
+{
+  char *name, *from_name;
+  double at, by, to, from = zero;
+  int any = 0, k;
+  struct node *node, *next;
+  struct element* el;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("element", nl);
+  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  {
+    if (strcmp(name, "selected") == 0)
+    {
+      if (seqedit_select->curr == 0)
+      {
+        warning("no active select commands:", "ignored"); return;
+      }
+      else
+      {
+        if (nl->inform[name_list_pos("by", nl)] == 0)
+        {
+          warning("no 'by' given,", "ignored"); return;
+        }
+        by = command_par_value("by", cmd->clone);
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+            == 0) any = 1;
+        node = edit_sequ->start;
+        while (node != edit_sequ->end)
+        {
+          node = node->next; node->moved = 0;
+        }
+        node = edit_sequ->start;
+        while (node != NULL && node != edit_sequ->end)
+        {
+          next = node->next;
+          if (node->moved == 0)
+          {
+            if (any
+                || name_list_pos(node->name, selected_ranges->list) > -1)
+            {
+              name = NULL;
+              for (k = 0; k < seqedit_select->curr; k++)
+              {
+                if (node->p_elem != NULL) name = node->p_elem->name;
+                if (name != NULL && strchr(name, '$') == NULL &&
+                    pass_select(name,
+                                seqedit_select->commands[k])) break;
+              }
+              if (k < seqedit_select->curr)
+              {
+                at = node->position + by;
+                el = node->p_elem;
+                if (remove_one(node) > 0)
+                {
+                  node = install_one(el, NULL, at, NULL, at);
+                  node->moved = 1;
+                  seqedit_move++;
+                }
+              }
+            }
+          }
+          node = next;
+        }
+      }
+    }
+    else
+    {
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
+      {
+        node = edit_sequ->nodes->nodes[pos];
+        if (nl->inform[name_list_pos("by", nl)] == 0)
+        {
+          if (nl->inform[name_list_pos("to", nl)] == 0)
+          {
+            warning("no position given,", "ignored"); return;
+          }
+          to = command_par_value("to", cmd->clone);
+          pos = name_list_pos("from", nl);
+          if (nl->inform[pos])
+          {
+            from_name = pl->parameters[pos]->string;
+            if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
+            {
+              warning("ignoring 'from' reference to unknown element:",
+                      from_name);
+              return;
+            }
+          }
+          at = to + from;
+        }
+        else
+        {
+          by = command_par_value("by", cmd->clone);
+          at = node->position + by;
+        }
+        el = node->p_elem;
+        if (remove_one(node) > 0)
+        {
+          install_one(el, NULL, at, NULL, at);
+          seqedit_move++;
+        }
+      }
+    }
+  }
+}
+
+static void
+seq_reflect(struct in_cmd* cmd)
+  /* executes reflect command */
+{
+  struct node *tmp, *c_node;
+
+  (void)cmd;
+  c_node = edit_sequ->start;
+  while (c_node != NULL)
+  {
+    tmp = c_node->next;
+    c_node->next = c_node->previous;
+    c_node->previous = tmp;
+    if (c_node == edit_sequ->end) break;
+    c_node = tmp;
+  }
+  tmp = edit_sequ->start;
+  edit_sequ->start = edit_sequ->end;
+  edit_sequ->end = tmp;
+  c_node = edit_sequ->start;
+  edit_sequ->range_start = edit_sequ->start;
+  edit_sequ->range_end = edit_sequ->end;
+  while (c_node != NULL)
+  {
+    c_node->at_expr = NULL;
+    c_node->from_name = NULL;
+    c_node->position = c_node->at_value
+      = sequence_length(edit_sequ) - c_node->position;
+    if (c_node == edit_sequ->end) break;
+    c_node = c_node->next;
+  }
+}
+
+static void
+seq_remove(struct in_cmd* cmd)
+  /* executes remove command */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct node *c_node;
+  char *name;
+  int k, any = 0;
+  int pose = name_list_pos("element", nl);
+  if (nl->inform[pose] && (name = pl->parameters[pose]->string) != NULL)
+  {
+    if (strcmp(name, "selected") == 0)
+    {
+      if (seqedit_select->curr == 0)
+      {
+        warning("no active select commands:", "ignored"); return;
+      }
+      else
+      {
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+            == 0) any = 1;
+        c_node = edit_sequ->start;
+        while (c_node != NULL)
+        {
+          if (any
+              || name_list_pos(c_node->name, selected_ranges->list) > -1)
+          {
+            name = NULL;
+            for (k = 0; k < seqedit_select->curr; k++)
+            {
+              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+              if (name != NULL && strchr(name, '$') == NULL &&
+                  pass_select(name,
+                              seqedit_select->commands[k])) break;
+            }
+            if (k < seqedit_select->curr)
+            {
+              seqedit_remove += remove_one(c_node);
+            }
+          }
+          if (c_node == edit_sequ->end) break;
+          c_node = c_node->next;
+        }
+      }
+    }
+    else
+    {
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pose = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
+      {
+        seqedit_remove += remove_one(edit_sequ->nodes->nodes[pose]);
+      }
+      else warning("ignored because of unknown element:", name);
+    }
+  }
+  else  warning("no element specified,","ignored");
+}
+
+static void
+seq_replace(struct in_cmd* cmd)
+  /* executes replace command */
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct node** rep_nodes = NULL;
+  struct element** rep_els = NULL;
+  struct node *node, *c_node;
+  char* name;
+  struct element* el;
+  int count = count_nodes(edit_sequ);
+  int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
+  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  {
+    if (strcmp(name, "selected") == 0)
+    {
+      if (seqedit_select->curr == 0)
+      {
+        warning("no active select commands:", "ignored"); return;
+      }
+      else
+      {
+        pos = name_list_pos("by", nl);
+        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+        {
+          if ((el = find_element(name, element_list)) == NULL)
+          {
+            warning("ignoring unknown 'by' element:",name);
+            return;
+          }
+        }
+        else
+        {
+          warning("'by' missing, ","ignored");
+          return;
+        }
+        rep_nodes = (struct node**)
+          mymalloc("seq_replace", count*sizeof(struct node*));
+        rep_els = (struct element**)
+          mymalloc("seq_replace", count*sizeof(struct element*));
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
+            == 0) any = 1;
+        c_node = edit_sequ->start;
+        while (c_node != NULL)
+        {
+          if (any || name_list_pos(c_node->name, selected_ranges->list) > -1)
+          {
+            name = NULL;
+            for (k = 0; k < seqedit_select->curr; k++)
+            {
+              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+              if (name != NULL && strchr(name, '$') == NULL &&
+                  pass_select(name,
+                              seqedit_select->commands[k])) break;
+            }
+            if (k < seqedit_select->curr)
+            {
+              rep_els[rep_cnt] = el;
+              rep_nodes[rep_cnt++] = c_node;
+            }
+          }
+          if (c_node == edit_sequ->end) break;
+          c_node = c_node->next;
+        }
+      }
+    }
+    else
+    {
+      rep_nodes = (struct node**)
+        mymalloc("seq_replace", count*sizeof(struct node*));
+      rep_els = (struct element**)
+        mymalloc("seq_replace", count*sizeof(struct element*));
+      strcpy(c_dum->c, name);
+      square_to_colon(c_dum->c);
+      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
+      {
+        node = edit_sequ->nodes->nodes[pos];
+        pos = name_list_pos("by", nl);
+        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+        {
+          if ((el = find_element(name, element_list)) != NULL)
+          {
+            rep_els[rep_cnt] = el;
+            rep_nodes[rep_cnt++] = node;
+          }
+          else warning("ignoring unknown 'by' element: ",name);
+        }
+        else warning("'by' missing, ","ignored");
+      }
+      else warning("ignored because of unknown element: ", name);
+    }
+    for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
+    if (rep_nodes) myfree("seq_replace", rep_nodes);
+    if (rep_els)   myfree("seq_replace", rep_els);
+  }
+  else  warning("no element specified, ","ignored");
+}
+
+static void
+sequence_name(char* name, int* l)
+  /* returns current sequence name in Fortran format */
+{
+  int sname_l = strlen(current_sequ->name);
+  int i, ncp = sname_l < *l ? sname_l : *l;
+  int nbl = *l - ncp;
+  for (i = 0; i < ncp; i++) name[i] = current_sequ->name[i];
+  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+}
+
+void
+use_sequ(struct in_cmd* cmd)
+{
+  char rout_name[] = "use_sequ";
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos, lp;
+  char* name;
+  struct command* keep_beam = current_beam;
+  if (sequ_is_on)
+    fatal_error("no endsequence yet for sequence:", current_sequ->name);
+  pos = name_list_pos("period", nl);
+  if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
+  if (nl->inform[pos])  /* parameter has been read */
+  {
+    if (current_range != NULL)
+    {
+      myfree(rout_name, current_range); current_range = NULL;
+    }
+    name = pl->parameters[pos]->string;
+    if ((pos = name_list_pos(name, line_list->list)) > -1
+        && line_list->macros[pos]->dead == 0)
+      make_sequ_from_line(name); /* only if not disabled */
+    if ((lp = name_list_pos(name, sequences->list)) > -1)
+    {
+      current_sequ = sequences->sequs[lp];
+      if (attach_beam(current_sequ) == 0)
+        fatal_error("USE - sequence without beam:", current_sequ->name);
+      current_sequ->beam = current_beam;
+      pos = name_list_pos("range", nl);
+      if (nl->inform[pos])  /* parameter has been read */
+        current_range = tmpbuff(pl->parameters[pos]->string);
+      expand_curr_sequ(0);
+    }
+    else warning("unknown sequence skipped:", name);
+  }
+  current_beam = keep_beam;
+}
+
+// public interface
 
 struct sequence*
 new_sequence(char* name, int ref)
@@ -77,20 +1216,6 @@ delete_sequence(struct sequence* sequ)
   return NULL;
 }
 
-struct sequence_list*
-delete_sequence_list(struct sequence_list* sql)
-{
-  char rout_name[] = "delete_sequence_list";
-  if (sql == NULL) return NULL;
-  if (stamp_flag && sql->stamp != 123456)
-    fprintf(stamp_file, "d_s_l double delete --> %s\n", sql->name);
-  if (watch_flag) fprintf(debug_file, "deleting --> %s\n", sql->name);
-  if (sql->list != NULL) delete_name_list(sql->list);
-  if (sql->sequs != NULL) myfree(rout_name, sql->sequs);
-  myfree(rout_name, sql);
-  return NULL;
-}
-
 void
 remove_from_sequ_list(struct sequence* sequ, struct sequence_list* sql)
   /* removes sequence sequ from sequence list sql */
@@ -112,101 +1237,6 @@ sequence_length(struct sequence* sequ)
     else val = sequ->length;
   }
   return val;
-}
-
-void
-dump_exp_sequ(struct sequence* sequ, int level)
-  /* executes the command dumpsequ, ... */
-{
-  struct node* c_node;
-  int j;
-  double suml = zero;
-  puts("+++++++++ dump expanded sequence +++++++++");
-  c_node = sequ->ex_start;
-  while(c_node != NULL)
-  {
-    suml += c_node->length;
-    if (level > 2)
-    {
-      dump_node(c_node);
-      if (c_node->p_al_err != NULL)
-      {
-        puts("alignment errors:");
-        for (j = 0; j < c_node->p_al_err->curr; j++)
-          printf(v_format("%F "), c_node->p_al_err->a[j]);
-        printf("\n");
-      }
-      if (c_node->p_fd_err != NULL)
-      {
-        puts("field errors:");
-        for (j = 0; j < c_node->p_fd_err->curr; j++)
-          printf(v_format("%e "), c_node->p_fd_err->a[j]);
-        printf("\n");
-      }
-      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-    }
-    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-      fprintf(prt_file, v_format("%S: at = %F  flag = %I\n"), c_node->name,
-              c_node->position, c_node->enable);
-    if (c_node == sequ->ex_end)  break;
-    c_node = c_node->next;
-  }
-  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
-}
-
-void
-dump_sequ(struct sequence* c_sequ, int level)
-{
-  struct node* c_node;
-  double suml = zero;
-  fprintf(prt_file, v_format("+++ dump sequence: %S\n"), c_sequ->name);
-  c_node = c_sequ->start;
-  while(c_node != NULL)
-  {
-    suml += c_node->length;
-    if (level > 2)
-    {
-      dump_node(c_node);
-      if (level > 3 && c_node->p_elem != NULL)  dump_element(c_node->p_elem);
-    }
-    else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
-      fprintf(prt_file, v_format("%S: at = %F\n"),
-              c_node->name, c_node->position);
-    if (c_node == c_sequ->end)  break;
-    c_node = c_node->next;
-  }
-  fprintf(prt_file, v_format("=== sum of node length: %F\n"), suml);
-}
-
-void
-write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
-{
-  /* exports sequences in order of their nest level, flat first etc. */
-  int i, j, max_nest = 0;
-  for (i = 0; i < sql->curr; i++)
-    if(sql->sequs[i]->nested > max_nest) max_nest = sql->sequs[i]->nested;
-  for (j = 0; j <= max_nest; j++)
-  {
-    for (i = 0; i < sql->curr; i++)
-      if(sql->sequs[i]->nested == j)
-      {
-        if (pass_select_list(sql->sequs[i]->name, cl))
-          export_sequence(sql->sequs[i], file);
-      }
-  }
-}
-
-static void
-grow_sequence_list(struct sequence_list* l)
-{
-  char rout_name[] = "grow_sequence_list";
-  struct sequence** sloc = l->sequs;
-  int j, new = 2*l->max;
-  l->max = new;
-  l->sequs
-    = (struct sequence**) mycalloc(rout_name,new, sizeof(struct sequence*));
-  for (j = 0; j < l->curr; j++) l->sequs[j] = sloc[j];
-  myfree(rout_name, sloc);
 }
 
 void
@@ -284,7 +1314,7 @@ enter_sequence(struct in_cmd* cmd)
   }
 }
 
-int type_ofCall
+int
 aperture_count(struct sequence* sequ)
   /* returns max. number of aperture parameters needed for sequence */
 {
@@ -334,46 +1364,6 @@ enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ)
     current_node->from_name = permbuff(pl->parameters[pos]->string);
   if (current_sequ->nested <= sequ->nested)
     current_sequ->nested = sequ->nested + 1;
-}
-
-void
-make_occ_list(struct sequence* sequ)
-  /* makes the node occurrence list */
-{
-  struct node* c_node = sequ->start;
-  int i;
-  while (c_node != NULL)
-  {
-    if (c_node->p_elem != NULL)
-    {
-      if ((i = name_list_pos(c_node->p_elem->name, occ_list)) < 0)
-        i = add_to_name_list(c_node->p_elem->name, 1, occ_list);
-      else ++occ_list->inform[i];
-    }
-    if (c_node == sequ->end) break;
-    c_node = c_node->next;
-  }
-}
-
-void
-all_node_pos(struct sequence* sequ)
-  /* calculates all node positions in an expanded sequence */
-{
-  struct node* node = sequ->start;
-  while (node != NULL)
-  {
-    if (node->p_elem != NULL)
-      node->length = node->p_elem->length
-        = element_value(node, "l");
-    else if (node->p_sequ != NULL)
-      node->length = sequence_length(node->p_sequ);
-    else fatal_error("node is neither element nor sequence:",
-                     node->name);
-    if ((node->position = get_node_pos(node, sequ)) < zero)
-      node->position += sequence_length(sequ);
-    if (node == sequ->end) break;
-    node = node->next;
-  }
 }
 
 void
@@ -623,235 +1613,6 @@ exec_extract(struct in_cmd* cmd)
   add_to_sequ_list(part, sequences);
 }
 
-struct sequence*
-extract_sequence(char* name, struct sequence* sequ, struct node* from, struct node* to, char* refpos)
-{
-  struct element* el;
-  int pos, marker_pos, from_cond;
-  struct command* clone;
-  struct sequence* keep_curr_sequ = current_sequ;
-  struct sequence* new_sequ;
-  struct node *q = from, *from_node;
-  struct node_list* new_nodes;
-  double start_value, end_value;
-  char tmp_name[2*NAME_L];
-
-  if (get_option("info")) printf("+++ extracting sequence %s from %s to %s\n",
-                                 sequ->name, from->name, to->name);
-  current_sequ = new_sequence(name, sequ->ref_flag);
-  current_sequ->share = 1; /* make shared for recombination */
-  current_sequ->refpos = refpos;
-  current_sequ->cavities = new_el_list(100);
-  new_nodes = new_node_list(1000);
-/* fill new_node list for 'from' references */
-  while (q)
-  {
-    add_to_node_list(q, 0, new_nodes);
-    if (q == to)  break;
-    q = q->next;
-  }
-/* sequence construction */
-  q = from;
-  start_value = get_node_pos(from, sequ);
-  end_value = get_node_pos(to, sequ);
-  current_sequ->l_expr = NULL;
-  current_sequ->length = end_value - start_value;
-  if (current_sequ->length < zero) current_sequ->length += sequ->length;
-  marker_pos = name_list_pos("marker", defined_commands->list);
-  clone = clone_command(defined_commands->commands[marker_pos]);
-  sprintf(c_dum->c, "%s$start", name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  current_node = NULL;
-  make_elem_node(el, 1);
-  current_sequ->start = current_node;
-  make_elem_node(from->p_elem, from->occ_cnt);
-  current_node->at_value = 0;
-  current_node->at_expr = NULL;
-/* loop over sequ nodes from 'from' to 'to' */
-  while (current_node != NULL)
-  {
-    while (strchr(q->next->name, '$')) q = q->next; /* suppress internal markers */
-    if (q->next->p_elem)
-      make_elem_node(q->next->p_elem, q->next->occ_cnt);
-    else if(q->next->p_sequ)
-      make_sequ_node(q->next->p_sequ, q->next->occ_cnt);
-    else
-      fatal_error("node has neither element nor sequence reference:", q->next->name);
-    q = q->next;
-    if (q->p_elem && strcmp(q->p_elem->base_type->name, "rfcavity") == 0 &&
-        find_element(q->p_elem->name, current_sequ->cavities) == NULL)
-      add_to_el_list(&q->p_elem, 0, current_sequ->cavities, 0);
-    from_cond = 0;
-    if (q->from_name)
-    {
-      strcpy(tmp_name, q->from_name);
-      strcat(tmp_name, ":1");
-      if ((pos = name_list_pos(tmp_name, sequ->nodes->list)) > -1)
-      {
-        from_node = sequ->nodes->nodes[pos];
-        from_cond = 1;
-        if (name_list_pos(tmp_name, new_nodes->list) > -1)
-          from_cond = 2;
-      }
-    }
-    if (from_cond == 2)
-    {
-      current_node->from_name = q->from_name;
-      current_node->at_value = q->at_value;
-      current_node->at_expr = q->at_expr;
-    }
-    else
-    {
-      if (from_cond == 1)
-        current_node->at_value = expr_combine(q->at_expr, q->at_value, " + ",
-                                              from_node->at_expr, from_node->at_value,
-                                              &current_node->at_expr);
-      else
-      {
-        current_node->at_expr = q->at_expr;
-        current_node->at_value = q->at_value;
-      }
-      current_node->at_value = expr_combine(current_node->at_expr,
-                                            current_node->at_value, " - ",
-                                            NULL, start_value,
-                                            &current_node->at_expr);
-      if (current_node->at_value < zero)
-        current_node->at_value = expr_combine(current_node->at_expr,
-                                              current_node->at_value, " + ",
-                                              sequ->l_expr, sequ->length,
-                                              &current_node->at_expr);
-    }
-    if (q == to) break;
-  }
-  clone = clone_command(defined_commands->commands[marker_pos]);
-  sprintf(c_dum->c, "%s$end", name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  make_elem_node(el, 1);
-  current_node->at_expr = current_sequ->l_expr;
-  current_node->at_value = current_sequ->length;
-  current_sequ->end = current_node;
-  current_node->next = current_sequ->start;
-  current_sequ->start->previous = current_node;
-  new_sequ = current_sequ;
-  current_sequ = keep_curr_sequ;
-  if (get_option("info"))
-    printf("+++ new sequence: %s  with current length = %.12g\n\n",
-           new_sequ->name, new_sequ->length);
-  return new_sequ;
-}
-
-void
-fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell, struct var_list* varl)
-  /* puts all variables a sequence depends on, in a list */
-{
-  int i;
-  struct sequence* sequ;
-  struct node* c_node;
-  for (i = 0; i < sql->curr; i++)
-  {
-    sequ = sql->sequs[i];
-    if (sequ->l_expr != NULL) fill_expr_var_list(ell, sequ->l_expr, varl);
-    c_node = sequ->start;
-    while(c_node != NULL)
-    {
-      if (c_node->at_expr != NULL)
-        fill_expr_var_list(ell, c_node->at_expr, varl);
-      if (c_node == sequ->end)  break;
-      c_node = c_node->next;
-    }
-  }
-}
-
-void 
-seq_edit_ex(struct sequence* seq)
-{
-  edit_sequ = seq;
-  edit_is_on = 1;
-  seqedit_install = seqedit_move = seqedit_remove = 0;
-  if (edit_sequ->ex_start != NULL)
-  {
-    edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
-    edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
-  }
-  if (occ_list == NULL)
-    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
-  else occ_list->curr = 0;
-  resequence_nodes(edit_sequ);
-  all_node_pos(edit_sequ);
-}
-
-void
-seq_end_ex(void)
-{
-  occ_list->curr = 0;
-  resequence_nodes(edit_sequ);
-  selected_ranges->curr = 0;
-  selected_ranges->list->curr = 0;
-  edit_is_on = 0;
-}
-
-void
-seq_flatten(struct sequence* sequ)
-  /* executes flatten command */
-{
-  struct node* c_node;
-  struct node_list* nl;
-  if (occ_list == NULL)
-    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
-  else occ_list->curr = 0;
-  make_occ_list(sequ);
-  all_node_pos(sequ);
-  sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
-  expand_sequence(sequ, 0);
-  sequ->nested = 0;
-  nl = sequ->nodes;
-  sequ->nodes = sequ->ex_nodes;
-  sequ->ex_nodes = delete_node_list(nl);
-  sequ->start = sequ->ex_start; sequ->ex_start = NULL;
-  sequ->end = sequ->ex_end; sequ->ex_end = NULL;
-  c_node = sequ->start;
-  while (c_node != NULL)
-  {
-    c_node->at_value = c_node->position;
-    c_node->at_expr = NULL;
-    c_node->from_name = NULL;
-    if (c_node == sequ->end) break;
-    c_node = c_node->next;
-  }
-  sequ->ref_flag = 0;
-}
-
-void
-expand_sequence(struct sequence* sequ, int flag)
-  /* expands a sequence into nodes, expands sequence nodes */
-{
-  /* Transfers errors from original nodes if flag != 0;
-     this is needed for SXF input  */
-  struct node *p, *q = sequ->start;
-  p = sequ->ex_start = clone_node(sequ->start, 0);
-  add_to_node_list(p, 0, sequ->ex_nodes);
-  while (p != NULL)
-  {
-    if (q == sequ->end) break;
-    p->next = clone_node(q->next, flag);
-    p->next->previous = p;
-    p = p->next;
-    q = q->next;
-    if (p->p_sequ != NULL) p = expand_node(p, sequ, sequ, p->position);
-    else add_to_node_list(p, 0, sequ->ex_nodes);
-  }
-  sequ->ex_end = p;
-  sequ->ex_end->next = sequ->ex_start;
-  sequ->ex_start->previous = sequ->ex_end;
-  p = sequ->ex_start;
-  while (p != sequ->ex_end)
-  {
-    if (strstr(p->base_name, "kicker") ||strstr(p->base_name, "monitor"))
-      p->enable = 1; /* flag for orbit correction module */
-    p = p->next;
-  }
-}
-
 void
 expand_curr_sequ(int flag)
   /* expands the current sequence, i.e. flattens it, inserts drifts etc. */
@@ -896,88 +1657,6 @@ expand_curr_sequ(int flag)
     current_sequ->range_start = current_sequ->ex_start;
     current_sequ->range_end = current_sequ->ex_end;
   }
-}
-
-void
-insert_elem(struct sequence* sequ, struct node* node)
-  /* inserts an element in a sequence as function of its position */
-{
-  struct node* c_node = sequ->start->next;
-
-  while (c_node != NULL)
-  {
-    if (node->position <= c_node->position || c_node == sequ->end) break;
-    c_node = c_node->next;
-  }
-  link_in_front(node, c_node);
-}
-
-struct node*
-install_one(struct element* el, char* from_name, double at_value, struct expression* at_expr, double position)
-  /* adds an element to a sequence */
-{
-  struct node* node;
-  int i, occ = 1;
-  if (strcmp(el->base_type->name, "rfcavity") == 0 &&
-      find_element(el->name, edit_sequ->cavities) == NULL)
-    add_to_el_list(&el, 0, edit_sequ->cavities, 0);
-  if ((i = name_list_pos(el->name, occ_list)) < 0)
-    i = add_to_name_list(el->name, occ, occ_list);
-  else occ = ++occ_list->inform[i];
-  node = new_elem_node(el, occ);
-  add_to_node_list(node, 0, edit_sequ->nodes);
-  node->position = position;
-  node->at_value = at_value;
-  node->at_expr = at_expr;
-  node->from_name = from_name;
-  set_command_par_value("at", el->def, position);
-  insert_elem(edit_sequ, node);
-  return node;
-}
-
-void
-make_sequ_from_line(char* name)
-  /* converts a line into a sequence from actual line definition */
-{
-  char** tmp = NULL;
-  int pos = name_list_pos(name, line_list->list);
-  int spos;
-  struct sequence* old_sequ = NULL;
-  struct macro* line;
-  int mpos = name_list_pos("marker", defined_commands->list);
-  struct command* clone = clone_command(defined_commands->commands[mpos]);
-  struct element* el;
-  if (pos < 0) fatal_error("unknown line: ", name);
-  line = line_list->macros[pos];
-  line->dead = 1;   /* prevent line from further conversion to sequence */
-  line_buffer = new_char_p_array(1000);
-  replace_lines(line, 0, tmp); /* replaces all referenced lines */
-  expand_line(line_buffer); /* act on '-' and rep. count */
-  current_sequ = new_sequence(name, 0); /* node positions = centre */
-  if ((spos = name_list_pos(name, sequences->list)) >= 0)
-    old_sequ = sequences->sequs[spos];
-  add_to_sequ_list(current_sequ, sequences);
-  if (old_sequ) old_sequ = delete_sequence(old_sequ);
-  if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
-  else current_sequ->cavities = new_el_list(100);
-  if (occ_list == NULL)
-    occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
-  else occ_list->curr = 0;
-  sprintf(c_dum->c, "%s$start", current_sequ->name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  current_node = NULL;
-  make_elem_node(el, 1);
-  current_sequ->start = current_node;
-  current_sequ->length = line_nodes(line_buffer);
-  sprintf(c_dum->c, "%s$end", current_sequ->name);
-  el = make_element(c_dum->c, "marker", clone, 0);
-  make_elem_node(el, 1);
-  current_node->at_value = current_node->position = current_sequ->length;
-  current_sequ->end = current_node;
-  current_sequ->start->previous = current_sequ->end;
-  current_sequ->end->next = current_sequ->start;
-  current_sequ->line = 1; /* remember origin of sequence */
-  if(line_buffer) delete_char_p_array(line_buffer,1);
 }
 
 void
@@ -1042,148 +1721,6 @@ add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
 }
 
 void
-export_sequence(struct sequence* sequ, FILE* file)
-  /* exports sequence in mad-X format */
-{
-  char num[2*NAME_L];
-  struct element* el;
-  struct sequence* sq;
-  struct node* c_node = sequ->start;
-  int exp_par_flag;
-  int seqref = 0;
-  char rpos[3][6] = {"exit", "centre", "entry"};
-  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
-  *c_dum->c = '\0';
-  if (sequ->share) strcat(c_dum->c, "shared ");
-  strcat(c_dum->c, sequ->export_name);
-  strcat(c_dum->c, ": sequence");
-  if (seqref)
-  {
-    strcat(c_dum->c, ", refer = ");
-    strcat(c_dum->c, rpos[seqref+1]);
-  }
-  if (sequ->refpos != NULL)
-  {
-    strcat(c_dum->c, ", refpos = ");
-    strcat(c_dum->c, sequ->refpos);
-  }
-  strcat(c_dum->c, ", l = ");
-  if (sequ->l_expr != NULL) strcat(c_dum->c, sequ->l_expr->string);
-  else
-  {
-    sprintf(num, v_format("%F"), sequence_length(sequ));
-    strcat(c_dum->c, supp_tb(num));
-  }
-  write_nice(c_dum->c, file);
-  while(c_node != NULL)
-  {
-    exp_par_flag = 0;
-    *c_dum->c = '\0';
-    if (strchr(c_node->name, '$') == NULL
-        && strstr(c_node->name, "_p_") == NULL
-        && strcmp(c_node->base_name, "drift") != 0)
-    {
-      if ((el = c_node->p_elem) != NULL)
-      {
-        if (c_node->p_elem->def_type)
-        {
-          strcat(c_dum->c, el->name);
-          strcat(c_dum->c, ": ");
-          strcat(c_dum->c, el->parent->name);
-          exp_par_flag = 1;
-        }
-        else strcat(c_dum->c, el->name);
-      }
-      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
-      else fatal_error("save error: node without link:", c_node->name);
-      strcat(c_dum->c, ", at = ");
-      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
-      else
-      {
-        sprintf(num, v_format("%F"), c_node->at_value);
-        strcat(c_dum->c, supp_tb(num));
-      }
-      if (c_node->from_name != NULL)
-      {
-        strcat(c_dum->c, ", from = ");
-        strcat(c_dum->c, c_node->from_name);
-      }
-      if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c);
-      write_nice(c_dum->c, file);
-    }
-    if (c_node == sequ->end)  break;
-    c_node = c_node->next;
-  }
-  strcpy(c_dum->c, "endsequence");
-  write_nice(c_dum->c, file);
-}
-
-void
-export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
-  /* exports sequence in mad-8 format */
-  /* set refer = centre always (local var. seqref) HG 9.1.09 */
-{
-  char num[2*NAME_L];
-  int exp_par_flag;
-  int seqref = 0;
-  struct element* el;
-  struct sequence* sq;
-  struct node* c_node = sequ->start;
-  seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
-  if (pass_select_list(sequ->name, cl) == 0)  return;
-  *c_dum->c = '\0';
-  strcat(c_dum->c, sequ->export_name);
-  strcat(c_dum->c, ": sequence");
-  if (seqref ==1)  strcat(c_dum->c, ", refer=entry");
-  write_nice_8(c_dum->c, file);
-  while(c_node != NULL)
-  {
-    exp_par_flag = 0;
-    *c_dum->c = '\0';
-    if (strchr(c_node->name, '$') == NULL
-        && strcmp(c_node->base_name, "drift") != 0)
-    {
-      if ((el = c_node->p_elem) != NULL)
-      {
-        if (c_node->p_elem->def_type)
-        {
-          strcat(c_dum->c, el->name);
-          strcat(c_dum->c, ": ");
-          strcat(c_dum->c, el->parent->name);
-          exp_par_flag = 1;
-        }
-        else strcat(c_dum->c, el->name);
-      }
-      else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
-      else fatal_error("save error: node without link:", c_node->name);
-      strcat(c_dum->c, ", at = ");
-      if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
-      else
-      {
-        sprintf(num, v_format("%F"), c_node->at_value);
-        strcat(c_dum->c, supp_tb(num));
-      }
-      if (c_node->from_name != NULL)
-      {
-        strcat(c_dum->c, ", from = ");
-        strcat(c_dum->c, c_node->from_name);
-      }
-      if (exp_par_flag)  export_el_def_8(c_node->p_elem, c_dum->c);
-      write_nice_8(c_dum->c, file);
-    }
-    if (c_node == sequ->end)  break;
-    c_node = c_node->next;
-  }
-  strcpy(c_dum->c, sequ->name);
-  strcat(c_dum->c, "_end: marker, at = ");
-  sprintf(num, v_format("%F"), sequence_length(sequ));
-  strcat(c_dum->c,num);
-  write_nice_8(c_dum->c, file);
-  strcpy(c_dum->c, "endsequence");
-  write_nice_8(c_dum->c, file);
-}
-
-void
 reset_sector(struct sequence* sequ, int val)
   /* sets node->sel_sector = val for all nodes of an expanded sequence */
 {
@@ -1208,48 +1745,6 @@ restart_sequ(void)
 }
 
 void
-seq_cycle(struct in_cmd* cmd)
-  /* cycles a sequence */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct node *node, *clone;
-  char* name = NULL;
-  int pos = name_list_pos("start", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    sprintf(c_dum->c, "%s:1", name);
-    if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-    {
-      node = edit_sequ->nodes->nodes[pos];
-      sprintf(c_dum->c, "%s%s_p_", edit_sequ->name,strip(node->name));
-      if (strstr(node->previous->name, "_p_") == NULL)
-      {
-        clone = clone_node(node, 0);
-        clone->p_elem = clone_element(node->p_elem);
-        strcpy(clone->p_elem->name, c_dum->c);
-
-        /* IA 29.11.07 : fixes a bug with aperture module */
-/* Removed HG 11.10.2009 */
-        /* sprintf(c_dum->c, " ");
-           set_command_par_string("apertype", clone->p_elem->def,c_dum->c); */
-
-
-        add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
-                       element_list, 1);
-        link_in_front(clone, node);
-      }
-      edit_sequ->start = node;
-      edit_sequ->end = node->previous;
-      set_new_position(edit_sequ);
-      all_node_pos(edit_sequ);
-    }
-    else warning("cycle: unknown element ignored:", name);
-  }
-  else warning("cycle: no start given,","ignored");
-}
-
-void
 seq_edit_main(struct in_cmd* cmd)
   /* controls sequence editing */
 {
@@ -1268,501 +1763,6 @@ seq_edit_main(struct in_cmd* cmd)
     else if (strcmp(toks[k], "endedit") == 0)  seq_end(cmd);
   }
   else warning("seqedit command outside edit", "ignored");
-}
-
-void
-seq_edit(struct in_cmd* cmd)
-  /* executes seqedit command */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  char* name = NULL;
-  int pos;
-  pos = name_list_pos("sequence", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    if ((pos = name_list_pos(name, sequences->list)) >= 0)
-    {
-      if (sequences->sequs[pos]->line)
-        warning("sequence originates from line,","edit ignored");
-      else  seq_edit_ex(sequences->sequs[pos]);
-    }
-    else warning("unknown sequence:", "ignored");
-  }
-  else warning("seqedit without sequence:", "ignored");
-}
-
-void
-seq_end(struct in_cmd* cmd)
-  /* executes endedit command */
-{
-  char tmp[8];
-  (void)cmd;
-  sprintf(tmp, "%d", seqedit_install);
-  put_info("seqedit - number of elements installed: ", tmp);
-  sprintf(tmp, "%d", seqedit_move);
-  put_info("seqedit - number of elements moved:     ", tmp);
-  sprintf(tmp, "%d", seqedit_remove);
-  put_info("seqedit - number of elements removed:   ", tmp);
-  seq_end_ex();
-}
-
-void
-seq_install(struct in_cmd* cmd)
-  /* executes install command */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct element *cl, *el;
-  struct node* c_node;
-  struct expression* expr = NULL;
-  double at, from = zero;
-  char name[NAME_L], *pname, *name_e = NULL, *name_c = NULL, *from_name = NULL;
-  int k, pos, any = 0;
-  int pos_e = name_list_pos("element", nl);
-  int pos_c = name_list_pos("class", nl);
-  if (nl->inform[pos_e] && (name_e = pl->parameters[pos_e]->string) != NULL)
-  {
-    if (nl->inform[pos_c] && (name_c = pl->parameters[pos_c]->string) != NULL)
-    {
-      if ((cl = find_element(name_c, element_list)) == NULL)
-      {
-        warning("ignored because of unknown class:", name_c);
-        return;
-      }
-      else
-      {
-        el = clone_element(cl);
-        strcpy(el->name, name_e);
-        add_to_el_list(&el, cl->def->mad8_type, element_list, 2);
-      }
-    }
-    else if ((el = find_element(name_e, element_list)) == NULL)
-    {
-      warning("ignored, unknown command or element:", name_c); return;
-    }
-  }
-  else
-  {
-    warning("no element specified,","ignored"); return;
-  }
-  if (nl->inform[name_list_pos("at", nl)] == 0)
-  {
-    warning("no 'at':", "ignored"); return;
-  }
-  at = command_par_value("at", cmd->clone);
-  expr = clone_expression(command_par_expr("at", cmd->clone));
-  pos = name_list_pos("from", nl);
-  if (nl->inform[pos])
-  {
-    from_name = pl->parameters[pos]->string;
-    if (strcmp(from_name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
-        c_node = edit_sequ->start;
-        while (c_node != NULL)
-        {
-          if (any
-              || name_list_pos(c_node->name, selected_ranges->list) > -1)
-          {
-            for (k = 0; k < seqedit_select->curr; k++)
-            {
-              myrepl(":", "[", c_node->name, name);
-              strcat(name, "]");
-              if (strchr(name, '$') == NULL &&
-                  pass_select(c_node->name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              from = get_node_pos(c_node, edit_sequ);
-              pname = permbuff(name);
-              install_one(el, pname, at, expr, at+from);
-              seqedit_install++;
-            }
-          }
-          if (c_node == edit_sequ->end) break;
-          c_node = c_node->next;
-        }
-      }
-    }
-    else
-    {
-      from_name = permbuff(pl->parameters[pos]->string);
-      if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
-      {
-        warning("ignoring 'from' reference to unknown element:", from_name);
-        return;
-      }
-      install_one(el, from_name, at, expr, at+from);
-      seqedit_install++;
-    }
-  }
-  else
-  {
-    install_one(el, from_name, at, expr, at);
-    seqedit_install++;
-  }
-}
-
-void
-seq_move(struct in_cmd* cmd)
-  /* executes move command */
-{
-  char *name, *from_name;
-  double at, by, to, from = zero;
-  int any = 0, k;
-  struct node *node, *next;
-  struct element* el;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("element", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        if (nl->inform[name_list_pos("by", nl)] == 0)
-        {
-          warning("no 'by' given,", "ignored"); return;
-        }
-        by = command_par_value("by", cmd->clone);
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
-        node = edit_sequ->start;
-        while (node != edit_sequ->end)
-        {
-          node = node->next; node->moved = 0;
-        }
-        node = edit_sequ->start;
-        while (node != NULL && node != edit_sequ->end)
-        {
-          next = node->next;
-          if (node->moved == 0)
-          {
-            if (any
-                || name_list_pos(node->name, selected_ranges->list) > -1)
-            {
-              name = NULL;
-              for (k = 0; k < seqedit_select->curr; k++)
-              {
-                if (node->p_elem != NULL) name = node->p_elem->name;
-                if (name != NULL && strchr(name, '$') == NULL &&
-                    pass_select(name,
-                                seqedit_select->commands[k])) break;
-              }
-              if (k < seqedit_select->curr)
-              {
-                at = node->position + by;
-                el = node->p_elem;
-                if (remove_one(node) > 0)
-                {
-                  node = install_one(el, NULL, at, NULL, at);
-                  node->moved = 1;
-                  seqedit_move++;
-                }
-              }
-            }
-          }
-          node = next;
-        }
-      }
-    }
-    else
-    {
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-      {
-        node = edit_sequ->nodes->nodes[pos];
-        if (nl->inform[name_list_pos("by", nl)] == 0)
-        {
-          if (nl->inform[name_list_pos("to", nl)] == 0)
-          {
-            warning("no position given,", "ignored"); return;
-          }
-          to = command_par_value("to", cmd->clone);
-          pos = name_list_pos("from", nl);
-          if (nl->inform[pos])
-          {
-            from_name = pl->parameters[pos]->string;
-            if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
-            {
-              warning("ignoring 'from' reference to unknown element:",
-                      from_name);
-              return;
-            }
-          }
-          at = to + from;
-        }
-        else
-        {
-          by = command_par_value("by", cmd->clone);
-          at = node->position + by;
-        }
-        el = node->p_elem;
-        if (remove_one(node) > 0)
-        {
-          install_one(el, NULL, at, NULL, at);
-          seqedit_move++;
-        }
-      }
-    }
-  }
-}
-
-void
-seq_reflect(struct in_cmd* cmd)
-  /* executes reflect command */
-{
-  struct node *tmp, *c_node;
-
-  (void)cmd;
-  c_node = edit_sequ->start;
-  while (c_node != NULL)
-  {
-    tmp = c_node->next;
-    c_node->next = c_node->previous;
-    c_node->previous = tmp;
-    if (c_node == edit_sequ->end) break;
-    c_node = tmp;
-  }
-  tmp = edit_sequ->start;
-  edit_sequ->start = edit_sequ->end;
-  edit_sequ->end = tmp;
-  c_node = edit_sequ->start;
-  edit_sequ->range_start = edit_sequ->start;
-  edit_sequ->range_end = edit_sequ->end;
-  while (c_node != NULL)
-  {
-    c_node->at_expr = NULL;
-    c_node->from_name = NULL;
-    c_node->position = c_node->at_value
-      = sequence_length(edit_sequ) - c_node->position;
-    if (c_node == edit_sequ->end) break;
-    c_node = c_node->next;
-  }
-}
-
-void
-seq_remove(struct in_cmd* cmd)
-  /* executes remove command */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct node *c_node;
-  char *name;
-  int k, any = 0;
-  int pose = name_list_pos("element", nl);
-  if (nl->inform[pose] && (name = pl->parameters[pose]->string) != NULL)
-  {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
-        c_node = edit_sequ->start;
-        while (c_node != NULL)
-        {
-          if (any
-              || name_list_pos(c_node->name, selected_ranges->list) > -1)
-          {
-            name = NULL;
-            for (k = 0; k < seqedit_select->curr; k++)
-            {
-              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-              if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              seqedit_remove += remove_one(c_node);
-            }
-          }
-          if (c_node == edit_sequ->end) break;
-          c_node = c_node->next;
-        }
-      }
-    }
-    else
-    {
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pose = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-      {
-        seqedit_remove += remove_one(edit_sequ->nodes->nodes[pose]);
-      }
-      else warning("ignored because of unknown element:", name);
-    }
-  }
-  else  warning("no element specified,","ignored");
-}
-
-void
-seq_replace(struct in_cmd* cmd)
-  /* executes replace command */
-{
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct node** rep_nodes = NULL;
-  struct element** rep_els = NULL;
-  struct node *node, *c_node;
-  char* name;
-  struct element* el;
-  int count = count_nodes(edit_sequ);
-  int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) == NULL)
-          {
-            warning("ignoring unknown 'by' element:",name);
-            return;
-          }
-        }
-        else
-        {
-          warning("'by' missing, ","ignored");
-          return;
-        }
-        rep_nodes = (struct node**)
-          mymalloc("seq_replace", count*sizeof(struct node*));
-        rep_els = (struct element**)
-          mymalloc("seq_replace", count*sizeof(struct element*));
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
-        c_node = edit_sequ->start;
-        while (c_node != NULL)
-        {
-          if (any || name_list_pos(c_node->name, selected_ranges->list) > -1)
-          {
-            name = NULL;
-            for (k = 0; k < seqedit_select->curr; k++)
-            {
-              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-              if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              rep_els[rep_cnt] = el;
-              rep_nodes[rep_cnt++] = c_node;
-            }
-          }
-          if (c_node == edit_sequ->end) break;
-          c_node = c_node->next;
-        }
-      }
-    }
-    else
-    {
-      rep_nodes = (struct node**)
-        mymalloc("seq_replace", count*sizeof(struct node*));
-      rep_els = (struct element**)
-        mymalloc("seq_replace", count*sizeof(struct element*));
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-      {
-        node = edit_sequ->nodes->nodes[pos];
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) != NULL)
-          {
-            rep_els[rep_cnt] = el;
-            rep_nodes[rep_cnt++] = node;
-          }
-          else warning("ignoring unknown 'by' element: ",name);
-        }
-        else warning("'by' missing, ","ignored");
-      }
-      else warning("ignored because of unknown element: ", name);
-    }
-    for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
-    if (rep_nodes) myfree("seq_replace", rep_nodes);
-    if (rep_els)   myfree("seq_replace", rep_els);
-  }
-  else  warning("no element specified, ","ignored");
-}
-
-void
-sequence_name(char* name, int* l)
-  /* returns current sequence name in Fortran format */
-{
-  int sname_l = strlen(current_sequ->name);
-  int i, ncp = sname_l < *l ? sname_l : *l;
-  int nbl = *l - ncp;
-  for (i = 0; i < ncp; i++) name[i] = current_sequ->name[i];
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
-}
-
-void
-use_sequ(struct in_cmd* cmd)
-{
-  char rout_name[] = "use_sequ";
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos, lp;
-  char* name;
-  struct command* keep_beam = current_beam;
-  if (sequ_is_on)
-    fatal_error("no endsequence yet for sequence:", current_sequ->name);
-  pos = name_list_pos("period", nl);
-  if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
-  if (nl->inform[pos])  /* parameter has been read */
-  {
-    if (current_range != NULL)
-    {
-      myfree(rout_name, current_range); current_range = NULL;
-    }
-    name = pl->parameters[pos]->string;
-    if ((pos = name_list_pos(name, line_list->list)) > -1
-        && line_list->macros[pos]->dead == 0)
-      make_sequ_from_line(name); /* only if not disabled */
-    if ((lp = name_list_pos(name, sequences->list)) > -1)
-    {
-      current_sequ = sequences->sequs[lp];
-      if (attach_beam(current_sequ) == 0)
-        fatal_error("USE - sequence without beam:", current_sequ->name);
-      current_sequ->beam = current_beam;
-      pos = name_list_pos("range", nl);
-      if (nl->inform[pos])  /* parameter has been read */
-        current_range = tmpbuff(pl->parameters[pos]->string);
-      expand_curr_sequ(0);
-    }
-    else warning("unknown sequence skipped:", name);
-  }
-  current_beam = keep_beam;
 }
 
 int

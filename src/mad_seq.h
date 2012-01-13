@@ -60,54 +60,27 @@ struct sequence_list /* contains list of sequence pointers sorted by name */
 
 // interface
 
-struct node*          new_sequ_node(struct sequence* sequ, int occ_cnt);
-struct sequence*      new_sequence(char* name, int ref);
+struct node*     new_sequ_node(struct sequence*, int occ_cnt);
+struct sequence* new_sequence(char* name, int ref);
+struct sequence* delete_sequence(struct sequence*);
 struct sequence_list* new_sequence_list(int length);
-struct sequence*      delete_sequence(struct sequence* sequ);
-struct sequence_list* delete_sequence_list(struct sequence_list* sql);
 
-struct node* install_one(struct element* el, char* from_name, double at_value, struct expression* at_expr, double position);
-void    make_sequ_from_line(char* name);
-void    insert_elem(struct sequence* sequ, struct node* node);
-double  sequence_length(struct sequence* sequ);
-void    remove_from_sequ_list(struct sequence* sequ, struct sequence_list* sql);
-void    enter_sequence(struct in_cmd* cmd);
-void    make_sequ_node(struct sequence* sequ, int occ_cnt);
-void    dump_exp_sequ(struct sequence* sequ, int level);
-void    dump_sequ(struct sequence* c_sequ, int level);
-void    write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file);
-void    make_occ_list(struct sequence* sequ);
-int     type_ofCall aperture_count(struct sequence* sequ);
-void    enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ);
-void    all_node_pos(struct sequence* sequ);
-void    exec_save(struct in_cmd* cmd);
-void    exec_dumpsequ(struct in_cmd* cmd);
-void    exec_extract(struct in_cmd* cmd);
-void    seq_flatten(struct sequence* sequ);
-void    expand_sequence(struct sequence* sequ, int flag);
+void    use_sequ(struct in_cmd*);
+void    remove_from_sequ_list(struct sequence*, struct sequence_list*);
+double  sequence_length(struct sequence*);
+void    enter_sequence(struct in_cmd*);
+int     aperture_count(struct sequence*);
+void    enter_sequ_reference(struct in_cmd*, struct sequence*);
+void    exec_dumpsequ(struct in_cmd*);
+void    exec_save(struct in_cmd*);
+void    exec_extract(struct in_cmd*);
 void    expand_curr_sequ(int flag);
-struct sequence* extract_sequence(char* name, struct sequence* sequ, struct node* from, struct node* to, char* refpos);
-void    fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell, struct var_list* varl);
-void    seq_edit_ex(struct sequence* seq);
-void    seq_end_ex(void);
-void    add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql);
-void    export_sequence(struct sequence* sequ, FILE* file);
-void    export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file);
-void    reset_errors(struct sequence* sequ);
-void    reset_sector(struct sequence* sequ, int val);
+void    add_to_sequ_list(struct sequence*, struct sequence_list*);
+void    reset_errors(struct sequence*);
+void    reset_sector(struct sequence*, int val);
 int     restart_sequ(void);
-void    seq_cycle(struct in_cmd* cmd);
-void    seq_install(struct in_cmd* cmd);
-void    seq_end(struct in_cmd* cmd);
-void    seq_edit(struct in_cmd* cmd);
-void    seq_edit_main(struct in_cmd* cmd);
-void    seq_move(struct in_cmd* cmd);
-void    seq_reflect(struct in_cmd* cmd);
-void    seq_remove(struct in_cmd* cmd);
-void    seq_replace(struct in_cmd* cmd);
-void    sequence_name(char* name, int* l);
-int     set_enable(char* type, struct in_cmd* cmd);
-void    use_sequ(struct in_cmd* cmd);
+void    seq_edit_main(struct in_cmd*);
+int     set_enable(char* type, struct in_cmd*);
 
 #endif // MAD_SEQ_H
 

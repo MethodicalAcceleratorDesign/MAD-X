@@ -1,24 +1,8 @@
 #include "madx.h"
 
-void
-copy_twiss_data(double* twiss_data)
-{
-  copy_double(twiss_data, current_node->match_data, 74);
-}
+// private functions
 
-void
-get_twiss_data(double* twiss_data)
-{
-  copy_double(current_node->match_data, twiss_data, 74);
-}
-
-void
-get_disp0(double* disp)
-{
-  copy_double(disp0, disp, 6);
-}
-
-void
+static void
 fill_beta0(struct command* beta0, struct node* node)
 {
   /* makes uses of fact that beta0 and twiss_table have the same variables
@@ -43,7 +27,7 @@ fill_beta0(struct command* beta0, struct node* node)
   }
 }
 
-void
+static void
 exec_savebeta(void)
   /* stores twiss values in a beta0 structure */
 {
@@ -78,90 +62,7 @@ exec_savebeta(void)
   }
 }
 
-
-void
-complete_twiss_table(struct table* t)
-  /* fills all items missing after "twiss" into twiss table */
-{
-  int i, j, mult, n, myrbend;
-  double el, val;
-  struct node* c_node;
-  char tmp[16];
-
-  if (t == NULL) return;
-  i = t->curr;
-  c_node = current_node;
-  mult = strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
-  t->s_cols[0][i] = tmpbuff(c_node->name);
-  t->s_cols[1][i] = tmpbuff(c_node->base_name);
-  t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
-  for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
-  {
-    el = c_node->length;
-    strcpy(tmp, twiss_table_cols[j]);
-    myrbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
-    if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
-    else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
-    {
-      if(myrbend)
-      {
-        val =  el_par_value(tmp, c_node->p_elem) +
-          c_node->other_bv * el_par_value("angle", c_node->p_elem) / two;
-      }
-      else
-      {
-        val =  el_par_value(tmp, c_node->p_elem);
-      }
-    }
-    else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if (strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
-    else if (strcmp(tmp, "v_pos") == 0 ) val = el_par_value(tmp, c_node->p_elem);
-    /*==*/
-    else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
-    else if(mult)
-    {
-      if(j<=twiss_mult_end)
-      {
-        val = mult_par(twiss_table_cols[j], c_node->p_elem);
-        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
-      }
-      else
-      {
-        val = el_par_value(tmp, c_node->p_elem);
-      }
-    }
-    else
-    {
-      strcpy(tmp, twiss_table_cols[j]);
-      n = strlen(tmp) - 1;
-      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
-        tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
-      if (el != zero && n > 1 && tmp[0] == 'k' && tmp[1] == 's' && tmp[n] == 'i')
-        tmp[n] = '\0'; /* suppress trailing i in ksi */
-      val = el_par_value(tmp, c_node->p_elem);
-      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
-        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
-      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
-               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
-               strcmp(tmp, "volt") == 0 )
-        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
-      if (el != zero)
-      {
-        if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
-            && strcmp(tmp, "tilt") && strcmp(tmp, "e1") && strcmp(tmp, "e2")
-            && strcmp(tmp, "h1") && strcmp(tmp, "h2") && strcmp(tmp, "hgap")
-            && strcmp(tmp, "fint") && strcmp(tmp, "fintx")
-            && strcmp(tmp, "volt") && strcmp(tmp, "lag")
-            && strcmp(tmp, "freq") && strcmp(tmp, "harmon")) val *= el;
-      }
-    }
-    t->d_cols[j][i] = val;
-  }
-}
-
-void
+static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
@@ -322,337 +223,7 @@ fill_twiss_header(struct table* t)
   }
 }
 
-void
-pro_twiss(void)
-  /* controls twiss module */
-{
-  struct command* keep_beam = current_beam;
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  struct int_array* tarr;
-  struct int_array* tarr_sector;
-  struct node *nodes[2], *use_range[2];
-  char *filename = NULL, *name, *table_name, *sector_name = NULL;
-  char *sector_table_name = "dummy"; /* second string required by twiss() */
-  /* will be set to a proper string in case twiss_sector option selected */
-  double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
-      w_file, beta_def;
-  int chrom_flg;
-  int keep_info = get_option("info");
-  i = keep_info * get_option("twiss_print");
-  set_option("info", &i);
-
-  if (current_twiss == 0x0)
-  {
-    seterrorflag(2,"pro_twiss","No twiss command seen yet");
-    warning("pro_twiss","No twiss command seen yet!");
-    return;
-  }
-
-  if (current_twiss->par_names == 0x0)
-  {
-    seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
-    warning("pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
-    return;
-  }
-
-  if (current_twiss->par == 0x0)
-  {
-    seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
-    warning("pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
-    return;
-  }
-
-
-  nl = current_twiss->par_names;
-  pl = current_twiss->par;
-
-  if (match_is_on)  k_save = 0;  /* match gets its own variable transfer -
-				    this can be overridden with option "slow"
-                                    on match command */
-
-  /*
-    start command decoding
-  */
-  pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) /* sequence specified */
-  {
-    name = pl->parameters[pos]->string;
-    if ((lp = name_list_pos(name, sequences->list)) > -1)
-      current_sequ = sequences->sequs[lp];
-    else
-    {
-      warning("unknown sequence ignored:", name);
-      return;
-    }
-  }
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-  {
-    warning("sequence not active,", "Twiss ignored");
-    return;
-  }
-  if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
-  if (attach_beam(current_sequ) == 0)
-    fatal_error("TWISS - sequence without beam:", current_sequ->name);
-  pos = name_list_pos("table", nl);
-  if(nl->inform[pos]) /* table name specified - overrides save */
-  {
-    if ((table_name = pl->parameters[pos]->string) == NULL)
-      table_name = pl->parameters[pos]->call_def->string;
-  }
-  else if((pos = name_list_pos("save", nl)) > -1 &&
-          nl->inform[pos]) /* save name specified */
-  {
-    k_save = 1;
-    if ((table_name = pl->parameters[pos]->string) == NULL)
-      table_name = pl->parameters[pos]->call_def->string;
-  }
-  else table_name = "twiss";
-  if ((k_sect = get_value(current_command->name,"sectormap")) != 0)
-  {
-    set_option("twiss_sector", &k_sect);
-    /* sector_table - start */
-    pos = name_list_pos("sectortable",nl);
-    if (nl->inform[pos]) {
-      if ((sector_table_name = pl->parameters[pos]->string) == NULL)
-        sector_table_name = pl->parameters[pos]->call_def->string;
-    }
-    else {
-      sector_table_name = pl->parameters[pos]->call_def->string;
-    }
-    /* sector_table - end */
-    pos = name_list_pos("sectorfile", nl);
-    if(nl->inform[pos])
-    {
-      if ((sector_name = pl->parameters[pos]->string) == NULL)
-        sector_name = pl->parameters[pos]->call_def->string;
-    }
-    else  sector_name = pl->parameters[pos]->call_def->string; /* filename for sector file */
-
-  }
-  use_range[0] = current_sequ->range_start;
-  use_range[1] = current_sequ->range_end;
-  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
-  {
-    if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
-    {
-      current_sequ->range_start = nodes[0];
-      current_sequ->range_end = nodes[1];
-    }
-    else warning("illegal range ignored:", pl->parameters[pos]->string);
-  }
-  for (j = 0; j < current_sequ->n_nodes; j++)
-  {
-    if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
-  }
-  if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos])
-    /* orbit specified */
-  {
-    if (current_sequ->orbits == NULL)
-      warning("orbit not found, ignored: ", pl->parameters[pos]->string);
-    else
-    {
-      name = pl->parameters[pos]->string;
-      if ((u_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
-        warning("orbit not found, ignored: ", name);
-      else set_option("useorbit", &k);
-    }
-  }
-  pos = name_list_pos("centre", nl);
-  if(nl->inform[pos])
-    set_option("centre", &k);
-  else
-  {
-    k = 0;
-    set_option("centre", &k);
-    k = 1;
-  }
-  pos = name_list_pos("keeporbit", nl);
-  if(nl->inform[pos]) /* orbit specified */
-  {
-    name = pl->parameters[pos]->string;
-    if (current_sequ->orbits == NULL)
-      current_sequ->orbits = new_vector_list(10);
-    else if (current_sequ->orbits->curr == current_sequ->orbits->max)
-      grow_vector_list(current_sequ->orbits);
-    if ((k_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
-    {
-      k_orb = add_to_name_list(permbuff(name), 0,
-                               current_sequ->orbits->names);
-      current_sequ->orbits->vectors[k_orb] = new_double_array(6);
-    }
-    set_option("keeporbit", &k);
-  }
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos])
-  {
-    if ((filename = pl->parameters[pos]->string) == NULL)
-    {
-      if (pl->parameters[pos]->call_def != NULL)
-        filename = pl->parameters[pos]->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-
-    strcpy(aptwfile,filename); /* IW 02.12.2004 */
-
-  }
-  else w_file = 0;
-  tol_keep = get_variable("twiss_tol");
-  pos = name_list_pos("tolerance", nl);
-  if (nl->inform[pos])
-  {
-    tol = command_par_value("tolerance", current_twiss);
-    set_variable("twiss_tol", &tol);
-  }
-  pos = name_list_pos("chrom", nl);
-  chrom_flg = command_par_value("chrom", current_twiss);
-  if((pos = name_list_pos("notable", nl)) > -1 &&nl->inform[pos]) k_save = 0;
-  /*
-    end of command decoding
-  */
-
-  zero_double(orbit0, 6);
-  /*  zero_double(disp0, 6); */
-  zero_double(oneturnmat, 36);
-  if ((beta_def = twiss_input(current_twiss)) < 0)
-  {
-    if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
-    else if (beta_def == -2)
-      warning("betx or bety missing,", "Twiss ignored");
-    set_variable("twiss_tol", &tol_keep);
-    return;
-  }
-  set_option("twiss_inval", &beta_def);
-  set_option("twiss_summ", &k);
-  set_option("twiss_chrom", &chrom_flg);
-  set_option("twiss_save", &k_save);
-  set_twiss_deltas(current_twiss);
-  adjust_beam();
-  probe_beam = clone_command(current_beam);
-  tmrefe_(oneturnmat); /* one-turn linear transfer map */
-  summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types,
-                          twiss_deltas->curr+1);
-  add_to_table_list(summ_table, table_register);
-  l = strlen(table_name);
-  tarr = new_int_array(l+1);
-  conv_char(table_name, tarr);
-  /* now create the sector table */
-  l = strlen(sector_table_name);
-  tarr_sector = new_int_array(l+1);
-  conv_char(sector_table_name, tarr_sector);
-
-  if (get_option("twiss_sector"))
-  {
-    reset_sector(current_sequ, 0);
-    set_sector();
-
-    twiss_sector_table = make_table(sector_table_name, "sectormap",
-                                    twiss_sector_table_cols,
-                                    twiss_sector_table_types,
-                                    1); /* start with one row at first */
-    twiss_sector_table->dynamic = 1; /* flag for access to current row */
-    add_to_table_list(twiss_sector_table, table_register);
-  }
-  if (get_option("useorbit"))
-    copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
-  else if (guess_flag)
-  {
-    for (i = 0; i < 6; i++)
-    {
-      if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
-    }
-  }
-
-  for (i = 0; i < twiss_deltas->curr; i++)
-  {
-    if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
-    {
-      twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                               twiss_table_types, current_sequ->n_nodes);
-      twiss_table->dynamic = 1; /* flag for table row access to current row */
-      add_to_table_list(twiss_table, table_register);
-      current_sequ->tw_table = twiss_table;
-      twiss_table->org_sequ = current_sequ;
-      adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
-      adjust_rfc(); /* sets freq in rf-cavities from probe */
-      current_node = current_sequ->ex_start;
-      /* invoke twiss */
-      twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
-      pos = name_list_pos("q1", summ_table->columns);
-      q1_val_p = summ_table->d_cols[pos][i];
-      pos = name_list_pos("q2", summ_table->columns);
-      q2_val_p = summ_table->d_cols[pos][i];
-    }
-    if (k_save)
-      {
-    twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                             twiss_table_types, current_sequ->n_nodes);
-    twiss_table->dynamic = 1; /* flag for table row access to current row */
-    add_to_table_list(twiss_table, table_register);
-    current_sequ->tw_table = twiss_table;
-    twiss_table->org_sequ = current_sequ;
-      }
-    adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
-    adjust_rfc(); /* sets freq in rf-cavities from probe */
-    current_node = current_sequ->ex_start;
-    /* invoke twiss */
-    twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
-    augment_count_("summ ");
-    if ((twiss_success = get_option("twiss_success")))
-    {
-      if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
-      {
-        pos = name_list_pos("q1", summ_table->columns);
-        q1_val = summ_table->d_cols[pos][i];
-        pos = name_list_pos("q2", summ_table->columns);
-        q2_val = summ_table->d_cols[pos][i];
-        dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
-        dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
-        pos = name_list_pos("dq1", summ_table->columns);
-        summ_table->d_cols[pos][i] = dq1;
-        pos = name_list_pos("dq2", summ_table->columns);
-        summ_table->d_cols[pos][i] = dq2;
-      }
-      if (get_option("keeporbit"))  copy_double(orbit0,
-                                                current_sequ->orbits->vectors[k_orb]->a, 6);
-      if (k_save) fill_twiss_header(twiss_table);
-      if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-      if (k_save && w_file) out_table(table_name, twiss_table, filename);
-    }
-    else
-    {
-      seterrorflag(1,"pro_twiss","TWISS failed");
-      warning("Twiss failed: ", "MAD-X continues");
-    }
-  }
-  if (get_option("twiss_sector")){
-    out_table( sector_table_name, twiss_sector_table, sector_name );
-  }
-
-  tarr = delete_int_array(tarr);
-  tarr_sector = delete_int_array(tarr_sector);
-
-  if (twiss_success && get_option("twiss_print")) print_table(summ_table);
-
-  /* cleanup */
-  current_beam = keep_beam;
-  probe_beam = delete_command(probe_beam);
-  k = 0;
-  set_option("couple", &k);
-  set_option("chrom", &k);
-  set_option("rmatrix", &k);
-  set_option("twiss_sector", &k);
-  set_option("keeporbit", &k);
-  set_option("useorbit", &k);
-  set_option("info", &keep_info);
-  set_variable("twiss_tol", &tol_keep);
-  current_sequ->range_start = use_range[0];
-  current_sequ->range_end = use_range[1];
-}
-
-void
+static void
 pro_embedded_twiss(struct command* current_global_twiss)
   /* controls twiss embedded module */
 {
@@ -1006,6 +577,489 @@ pro_embedded_twiss(struct command* current_global_twiss)
   embedded_flag = 0;
 }
 
+static void
+set_twiss_deltas(struct command* comm)
+{
+  char* string;
+  int i, k = 0, n = 0, pos;
+  double s, sign = one, ar[3];
+  struct name_list* nl = comm->par_names;
+  pos = name_list_pos("deltap", nl);
+  twiss_deltas->curr = 1;
+  twiss_deltas->a[0] = zero;
+  if ((pos = name_list_pos("deltap", nl)) >= 0 && nl->inform[pos]
+      && (string = comm->par->parameters[pos]->string) != NULL)
+  {
+    pre_split(string, c_dum, 0);
+    mysplit(c_dum->c, tmp_p_array);
+    while (k < tmp_p_array->curr)
+    {
+      for (i = k; i < tmp_p_array->curr; i++)
+        if (*tmp_p_array->p[i] == ':') break;
+      ar[n++] = double_from_expr(tmp_p_array->p, k, i-1);
+      k = i + 1;
+    }
+    if (n == 1) twiss_deltas->a[0] = ar[0];
+    else  /* there is a range given - fill array */
+    {
+      if (n == 2) ar[n++] = ar[1] - ar[0];
+      if (ar[2] == zero) twiss_deltas->a[0] = ar[0];
+      else if (ar[2] * (ar[1] - ar[0]) < zero)
+        warning("illegal deltap range ignored:", string);
+      else
+      {
+        twiss_deltas->a[0] = ar[0];
+        if (ar[2] < zero) sign = -sign;
+        for (s = sign * (ar[0] + ar[2]);
+             s <= sign * ar[1]; s+= sign * ar[2])
+        {
+          if (twiss_deltas->curr == twiss_deltas->max)
+          {
+            sprintf(c_dum->c, "%d values", twiss_deltas->max);
+            warning("deltap loop cut at", c_dum->c);
+            break;
+          }
+          twiss_deltas->a[twiss_deltas->curr]
+            = twiss_deltas->a[twiss_deltas->curr-1] + ar[2];
+          twiss_deltas->curr++;
+        }
+      }
+    }
+  }
+}
+
+// public interface
+
+void
+copy_twiss_data(double* twiss_data)
+{
+  copy_double(twiss_data, current_node->match_data, 74);
+}
+
+void
+get_twiss_data(double* twiss_data)
+{
+  copy_double(current_node->match_data, twiss_data, 74);
+}
+
+void
+get_disp0(double* disp)
+{
+  copy_double(disp0, disp, 6);
+}
+
+void
+complete_twiss_table(struct table* t)
+  /* fills all items missing after "twiss" into twiss table */
+{
+  int i, j, mult, n, myrbend;
+  double el, val;
+  struct node* c_node;
+  char tmp[16];
+
+  if (t == NULL) return;
+  i = t->curr;
+  c_node = current_node;
+  mult = strcmp(c_node->base_name, "multipole") == 0 ? 1 : 0;
+  t->s_cols[0][i] = tmpbuff(c_node->name);
+  t->s_cols[1][i] = tmpbuff(c_node->base_name);
+  t->s_cols[twiss_fill_end+1][i] = tmpbuff(c_node->p_elem->parent->name);
+  for (j = twiss_opt_end+1; j<= twiss_fill_end; j++)
+  {
+    el = c_node->length;
+    strcpy(tmp, twiss_table_cols[j]);
+    myrbend = (strcmp(c_node->p_elem->base_type->name, "rbend") == 0);
+    if (strcmp(twiss_table_cols[j], "l") == 0) val = el;
+    else if (strcmp(tmp, "slot_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "e1") == 0 || strcmp(tmp, "e2") == 0)
+    {
+      if(myrbend)
+      {
+        val =  el_par_value(tmp, c_node->p_elem) +
+          c_node->other_bv * el_par_value("angle", c_node->p_elem) / two;
+      }
+      else
+      {
+        val =  el_par_value(tmp, c_node->p_elem);
+      }
+    }
+    else if (strcmp(tmp, "assembly_id") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "mech_sep") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    /*== jln 11.11.2010 dealt with the new property v_pos as for mech_sep */
+    else if (strcmp(tmp, "v_pos") == 0 ) val = el_par_value(tmp, c_node->p_elem);
+    /*==*/
+    else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if(mult)
+    {
+      if(j<=twiss_mult_end)
+      {
+        val = mult_par(twiss_table_cols[j], c_node->p_elem);
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
+      }
+      else
+      {
+        val = el_par_value(tmp, c_node->p_elem);
+      }
+    }
+    else
+    {
+      strcpy(tmp, twiss_table_cols[j]);
+      n = strlen(tmp) - 1;
+      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]) && tmp[n] == 'l')
+        tmp[n] = '\0'; /* suppress trailing l in k0l etc. */
+      if (el != zero && n > 1 && tmp[0] == 'k' && tmp[1] == 's' && tmp[n] == 'i')
+        tmp[n] = '\0'; /* suppress trailing i in ksi */
+      val = el_par_value(tmp, c_node->p_elem);
+      if (n > 1 && tmp[0] == 'k' && isdigit(tmp[1]))
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
+      else if (strstr(tmp, "kick") || strcmp(tmp, "angle") == 0 ||
+               strcmp(tmp, "ks") == 0 || strcmp(tmp, "ksi") == 0 ||
+               strcmp(tmp, "volt") == 0 )
+        val *= c_node->other_bv; /* dipole_bv kill initiative SF TR FS */
+      if (el != zero)
+      {
+        if (strstr(tmp,"kick") == NULL && strcmp(tmp, "angle")
+            && strcmp(tmp, "tilt") && strcmp(tmp, "e1") && strcmp(tmp, "e2")
+            && strcmp(tmp, "h1") && strcmp(tmp, "h2") && strcmp(tmp, "hgap")
+            && strcmp(tmp, "fint") && strcmp(tmp, "fintx")
+            && strcmp(tmp, "volt") && strcmp(tmp, "lag")
+            && strcmp(tmp, "freq") && strcmp(tmp, "harmon")) val *= el;
+      }
+    }
+    t->d_cols[j][i] = val;
+  }
+}
+
+void
+pro_twiss(void)
+  /* controls twiss module */
+{
+  struct command* keep_beam = current_beam;
+  struct name_list* nl;
+  struct command_parameter_list* pl;
+  struct int_array* tarr;
+  struct int_array* tarr_sector;
+  struct node *nodes[2], *use_range[2];
+  char *filename = NULL, *name, *table_name, *sector_name = NULL;
+  char *sector_table_name = "dummy"; /* second string required by twiss() */
+  /* will be set to a proper string in case twiss_sector option selected */
+  double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
+  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
+      w_file, beta_def;
+  int chrom_flg;
+  int keep_info = get_option("info");
+  i = keep_info * get_option("twiss_print");
+  set_option("info", &i);
+
+  if (current_twiss == 0x0)
+  {
+    seterrorflag(2,"pro_twiss","No twiss command seen yet");
+    warning("pro_twiss","No twiss command seen yet!");
+    return;
+  }
+
+  if (current_twiss->par_names == 0x0)
+  {
+    seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
+    warning("pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
+    return;
+  }
+
+  if (current_twiss->par == 0x0)
+  {
+    seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
+    warning("pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
+    return;
+  }
+
+
+  nl = current_twiss->par_names;
+  pl = current_twiss->par;
+
+  if (match_is_on)  k_save = 0;  /* match gets its own variable transfer -
+				    this can be overridden with option "slow"
+                                    on match command */
+
+  /*
+    start command decoding
+  */
+  pos = name_list_pos("sequence", nl);
+  if(nl->inform[pos]) /* sequence specified */
+  {
+    name = pl->parameters[pos]->string;
+    if ((lp = name_list_pos(name, sequences->list)) > -1)
+      current_sequ = sequences->sequs[lp];
+    else
+    {
+      warning("unknown sequence ignored:", name);
+      return;
+    }
+  }
+  if (current_sequ == NULL || current_sequ->ex_start == NULL)
+  {
+    warning("sequence not active,", "Twiss ignored");
+    return;
+  }
+  if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("TWISS - sequence without beam:", current_sequ->name);
+  pos = name_list_pos("table", nl);
+  if(nl->inform[pos]) /* table name specified - overrides save */
+  {
+    if ((table_name = pl->parameters[pos]->string) == NULL)
+      table_name = pl->parameters[pos]->call_def->string;
+  }
+  else if((pos = name_list_pos("save", nl)) > -1 &&
+          nl->inform[pos]) /* save name specified */
+  {
+    k_save = 1;
+    if ((table_name = pl->parameters[pos]->string) == NULL)
+      table_name = pl->parameters[pos]->call_def->string;
+  }
+  else table_name = "twiss";
+  if ((k_sect = get_value(current_command->name,"sectormap")) != 0)
+  {
+    set_option("twiss_sector", &k_sect);
+    /* sector_table - start */
+    pos = name_list_pos("sectortable",nl);
+    if (nl->inform[pos]) {
+      if ((sector_table_name = pl->parameters[pos]->string) == NULL)
+        sector_table_name = pl->parameters[pos]->call_def->string;
+    }
+    else {
+      sector_table_name = pl->parameters[pos]->call_def->string;
+    }
+    /* sector_table - end */
+    pos = name_list_pos("sectorfile", nl);
+    if(nl->inform[pos])
+    {
+      if ((sector_name = pl->parameters[pos]->string) == NULL)
+        sector_name = pl->parameters[pos]->call_def->string;
+    }
+    else  sector_name = pl->parameters[pos]->call_def->string; /* filename for sector file */
+
+  }
+  use_range[0] = current_sequ->range_start;
+  use_range[1] = current_sequ->range_end;
+  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
+  {
+    if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
+    {
+      current_sequ->range_start = nodes[0];
+      current_sequ->range_end = nodes[1];
+    }
+    else warning("illegal range ignored:", pl->parameters[pos]->string);
+  }
+  for (j = 0; j < current_sequ->n_nodes; j++)
+  {
+    if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
+  }
+  if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos])
+    /* orbit specified */
+  {
+    if (current_sequ->orbits == NULL)
+      warning("orbit not found, ignored: ", pl->parameters[pos]->string);
+    else
+    {
+      name = pl->parameters[pos]->string;
+      if ((u_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
+        warning("orbit not found, ignored: ", name);
+      else set_option("useorbit", &k);
+    }
+  }
+  pos = name_list_pos("centre", nl);
+  if(nl->inform[pos])
+    set_option("centre", &k);
+  else
+  {
+    k = 0;
+    set_option("centre", &k);
+    k = 1;
+  }
+  pos = name_list_pos("keeporbit", nl);
+  if(nl->inform[pos]) /* orbit specified */
+  {
+    name = pl->parameters[pos]->string;
+    if (current_sequ->orbits == NULL)
+      current_sequ->orbits = new_vector_list(10);
+    else if (current_sequ->orbits->curr == current_sequ->orbits->max)
+      grow_vector_list(current_sequ->orbits);
+    if ((k_orb = name_list_pos(name, current_sequ->orbits->names)) < 0)
+    {
+      k_orb = add_to_name_list(permbuff(name), 0,
+                               current_sequ->orbits->names);
+      current_sequ->orbits->vectors[k_orb] = new_double_array(6);
+    }
+    set_option("keeporbit", &k);
+  }
+  pos = name_list_pos("file", nl);
+  if (nl->inform[pos])
+  {
+    if ((filename = pl->parameters[pos]->string) == NULL)
+    {
+      if (pl->parameters[pos]->call_def != NULL)
+        filename = pl->parameters[pos]->call_def->string;
+    }
+    if (filename == NULL) filename = permbuff("dummy");
+    w_file = 1;
+
+    strcpy(aptwfile,filename); /* IW 02.12.2004 */
+
+  }
+  else w_file = 0;
+  tol_keep = get_variable("twiss_tol");
+  pos = name_list_pos("tolerance", nl);
+  if (nl->inform[pos])
+  {
+    tol = command_par_value("tolerance", current_twiss);
+    set_variable("twiss_tol", &tol);
+  }
+  pos = name_list_pos("chrom", nl);
+  chrom_flg = command_par_value("chrom", current_twiss);
+  if((pos = name_list_pos("notable", nl)) > -1 &&nl->inform[pos]) k_save = 0;
+  /*
+    end of command decoding
+  */
+
+  zero_double(orbit0, 6);
+  /*  zero_double(disp0, 6); */
+  zero_double(oneturnmat, 36);
+  if ((beta_def = twiss_input(current_twiss)) < 0)
+  {
+    if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
+    else if (beta_def == -2)
+      warning("betx or bety missing,", "Twiss ignored");
+    set_variable("twiss_tol", &tol_keep);
+    return;
+  }
+  set_option("twiss_inval", &beta_def);
+  set_option("twiss_summ", &k);
+  set_option("twiss_chrom", &chrom_flg);
+  set_option("twiss_save", &k_save);
+  set_twiss_deltas(current_twiss);
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+  tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types,
+                          twiss_deltas->curr+1);
+  add_to_table_list(summ_table, table_register);
+  l = strlen(table_name);
+  tarr = new_int_array(l+1);
+  conv_char(table_name, tarr);
+  /* now create the sector table */
+  l = strlen(sector_table_name);
+  tarr_sector = new_int_array(l+1);
+  conv_char(sector_table_name, tarr_sector);
+
+  if (get_option("twiss_sector"))
+  {
+    reset_sector(current_sequ, 0);
+    set_sector();
+
+    twiss_sector_table = make_table(sector_table_name, "sectormap",
+                                    twiss_sector_table_cols,
+                                    twiss_sector_table_types,
+                                    1); /* start with one row at first */
+    twiss_sector_table->dynamic = 1; /* flag for access to current row */
+    add_to_table_list(twiss_sector_table, table_register);
+  }
+  if (get_option("useorbit"))
+    copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
+  else if (guess_flag)
+  {
+    for (i = 0; i < 6; i++)
+    {
+      if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
+    }
+  }
+
+  for (i = 0; i < twiss_deltas->curr; i++)
+  {
+    if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
+    {
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                               twiss_table_types, current_sequ->n_nodes);
+      twiss_table->dynamic = 1; /* flag for table row access to current row */
+      add_to_table_list(twiss_table, table_register);
+      current_sequ->tw_table = twiss_table;
+      twiss_table->org_sequ = current_sequ;
+      adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
+      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      current_node = current_sequ->ex_start;
+      /* invoke twiss */
+      twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+      pos = name_list_pos("q1", summ_table->columns);
+      q1_val_p = summ_table->d_cols[pos][i];
+      pos = name_list_pos("q2", summ_table->columns);
+      q2_val_p = summ_table->d_cols[pos][i];
+    }
+    if (k_save)
+      {
+    twiss_table = make_table(table_name, "twiss", twiss_table_cols,
+                             twiss_table_types, current_sequ->n_nodes);
+    twiss_table->dynamic = 1; /* flag for table row access to current row */
+    add_to_table_list(twiss_table, table_register);
+    current_sequ->tw_table = twiss_table;
+    twiss_table->org_sequ = current_sequ;
+      }
+    adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
+    adjust_rfc(); /* sets freq in rf-cavities from probe */
+    current_node = current_sequ->ex_start;
+    /* invoke twiss */
+    twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+    augment_count_("summ ");
+    if ((twiss_success = get_option("twiss_success")))
+    {
+      if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
+      {
+        pos = name_list_pos("q1", summ_table->columns);
+        q1_val = summ_table->d_cols[pos][i];
+        pos = name_list_pos("q2", summ_table->columns);
+        q2_val = summ_table->d_cols[pos][i];
+        dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
+        dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+        pos = name_list_pos("dq1", summ_table->columns);
+        summ_table->d_cols[pos][i] = dq1;
+        pos = name_list_pos("dq2", summ_table->columns);
+        summ_table->d_cols[pos][i] = dq2;
+      }
+      if (get_option("keeporbit"))  copy_double(orbit0,
+                                                current_sequ->orbits->vectors[k_orb]->a, 6);
+      if (k_save) fill_twiss_header(twiss_table);
+      if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
+      if (k_save && w_file) out_table(table_name, twiss_table, filename);
+    }
+    else
+    {
+      seterrorflag(1,"pro_twiss","TWISS failed");
+      warning("Twiss failed: ", "MAD-X continues");
+    }
+  }
+  if (get_option("twiss_sector")){
+    out_table( sector_table_name, twiss_sector_table, sector_name );
+  }
+
+  tarr = delete_int_array(tarr);
+  tarr_sector = delete_int_array(tarr_sector);
+
+  if (twiss_success && get_option("twiss_print")) print_table(summ_table);
+
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
+  k = 0;
+  set_option("couple", &k);
+  set_option("chrom", &k);
+  set_option("rmatrix", &k);
+  set_option("twiss_sector", &k);
+  set_option("keeporbit", &k);
+  set_option("useorbit", &k);
+  set_option("info", &keep_info);
+  set_variable("twiss_tol", &tol_keep);
+  current_sequ->range_start = use_range[0];
+  current_sequ->range_end = use_range[1];
+}
+
 int
 embedded_twiss(void)
   /* controls twiss module to create a twiss table for interpolated nodes
@@ -1120,57 +1174,6 @@ embedded_twiss(void)
   current_twiss = current_global_twiss;
 
   return 0;
-}
-
-void
-set_twiss_deltas(struct command* comm)
-{
-  char* string;
-  int i, k = 0, n = 0, pos;
-  double s, sign = one, ar[3];
-  struct name_list* nl = comm->par_names;
-  pos = name_list_pos("deltap", nl);
-  twiss_deltas->curr = 1;
-  twiss_deltas->a[0] = zero;
-  if ((pos = name_list_pos("deltap", nl)) >= 0 && nl->inform[pos]
-      && (string = comm->par->parameters[pos]->string) != NULL)
-  {
-    pre_split(string, c_dum, 0);
-    mysplit(c_dum->c, tmp_p_array);
-    while (k < tmp_p_array->curr)
-    {
-      for (i = k; i < tmp_p_array->curr; i++)
-        if (*tmp_p_array->p[i] == ':') break;
-      ar[n++] = double_from_expr(tmp_p_array->p, k, i-1);
-      k = i + 1;
-    }
-    if (n == 1) twiss_deltas->a[0] = ar[0];
-    else  /* there is a range given - fill array */
-    {
-      if (n == 2) ar[n++] = ar[1] - ar[0];
-      if (ar[2] == zero) twiss_deltas->a[0] = ar[0];
-      else if (ar[2] * (ar[1] - ar[0]) < zero)
-        warning("illegal deltap range ignored:", string);
-      else
-      {
-        twiss_deltas->a[0] = ar[0];
-        if (ar[2] < zero) sign = -sign;
-        for (s = sign * (ar[0] + ar[2]);
-             s <= sign * ar[1]; s+= sign * ar[2])
-        {
-          if (twiss_deltas->curr == twiss_deltas->max)
-          {
-            sprintf(c_dum->c, "%d values", twiss_deltas->max);
-            warning("deltap loop cut at", c_dum->c);
-            break;
-          }
-          twiss_deltas->a[twiss_deltas->curr]
-            = twiss_deltas->a[twiss_deltas->curr-1] + ar[2];
-          twiss_deltas->curr++;
-        }
-      }
-    }
-  }
 }
 
 void
