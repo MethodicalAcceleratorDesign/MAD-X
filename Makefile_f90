@@ -146,12 +146,12 @@ user2_photon.o:             src/photoni.inc
 endif
 
 #######################
-# check for gfortran version > 4.4
+# check for gfortran version >= 4.4
 # set to gfortran44 on lxplus
 #
 
-ifeq ($(FC),gfortran)
 ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+ifeq ($(FC),gfortran)
 FCVER  := $(word 4, $(shell $(FC) --version))
 FCVERL := $(subst ., ,$(FCVER))
 FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
