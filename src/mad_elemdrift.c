@@ -33,6 +33,7 @@ add_drifts(struct node* c_node, struct node* end)
   pos = c_node->position - c_node->length / 2;
   while (c_node != NULL)
   {
+//    printf("******* %s, %.9f, %.9f\n", c_node->name, c_node->position, c_node->length);
     cnt++;
     el2 = c_node->length / 2;
     dl = c_node->position - el2 - pos;
