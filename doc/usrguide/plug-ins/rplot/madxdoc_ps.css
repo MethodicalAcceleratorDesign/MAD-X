@@ -1,0 +1,137 @@
+/* madxdoc.css */
+
+/* --- Common Properties --- */
+/* --- ----------------- --- */
+
+.orange      { color:#F0800F; }
+.red         { color:#B40C10; }
+.blue        { color:#004080; }
+.green       { color:#008040; }
+.lightblue   { color:#96B0E0; }
+.darkblue    { color:#00234E; }
+.lightgrey   { color:#EBEBEB; }
+.darkgrey    { color:#CCCCCC; }
+.lightblack  { color:#666666; }
+
+
+/* --- Page Properties   --- */
+/* --- ----------------- --- */
+
+
+div.madxdocContent div { /* Main sections */
+        margin-top:1%;
+        margin-bottom:0%; }
+
+div.madxdocContent ul { /* Lists without indent */
+        margin-top:0%;
+        margin-bottom:0%; 
+        padding:0%; 
+        padding-left:0%; }
+
+div.madxdocContent h4 { /* Main sections text */
+        margin-top:1%;
+        margin-bottom:0%; 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:110%;
+        font-style:normal;
+        font-weight:normal;
+        line-height:125%;
+        background-color:#96B0E0;
+        color:#0000A0; }
+
+div.madxdocContent h5 { /* Sub sections text */
+        margin-top:2%;
+        margin-bottom:0%; 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:bold;
+        background-color:#FFFFFF;
+        color:#0000A0; }
+
+div.madxdocContent div div div dt { /* SubSub sections text */
+        margin-top:1%;
+        margin-bottom:0%; 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:normal;
+        background-color:#FFFFFF;
+        color:#0000A0; }
+
+div.madxdocContent div div dt.command { /* Sub sections text of type "command" */
+        margin-top:2%;
+        margin-bottom:0%; 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:normal;
+        /* border-width:1px; */
+        /* border-color:#666666; */
+        /* border-style:solid; */
+        background-color:#E0E0E0;
+        color:#000000; }
+
+div.madxdocContent div div dt.command var.command { /* Sub sections text of type "command" */
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:bold;
+        background-color:#E0E0E0;
+        color:#000000; }
+
+div.madxdocContent div div dt.command var.option { /* Sub sections text of type "command" */
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:bold;
+        background-color:#E0E0E0;
+        color:#000000; }
+
+div.madxdocContent div dt strong { 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:110%;
+        font-style:normal;
+        font-weight:normal;
+        line-height:125%;
+        background-color:#96B0E0;
+        color:#0000A0; }
+
+div.madxdocContent div div dt strong { 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:bold;
+        background-color:#FFFFFF;
+        color:#0000A0; }
+
+div.madxdocContent div div dt.command strong { 
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:100%;
+        font-style:normal;
+        font-weight:normal;
+        background-color:#E0E0E0;
+        color:#000000; }
+
+var.command { 
+        font-style:normal;
+        font-weight:normal;
+        color:#800000; }
+
+var.option { 
+        font-style:normal;
+        font-weight:normal;
+        color:#800000; }
+
+.important { 
+        font-style:normal;
+        font-weight:bold;
+        color:#800000; }
+
+
+img {
+	border : 0;
+	border-style:0; }
+
+/* --- ----------------- --- */
+/* --- ----------------- --- */

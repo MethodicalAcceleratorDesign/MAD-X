@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="./madxdoc_ps.css" />
+<title>MAD-X PLUG-INS</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/mad/madx/icons/mx7_25.gif" align="right">
+  <h1>MAD-X PLUGINS</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+
+<div>
+
+MAD-X provides a plug-in mechanism for functionality extensions.
+Plug-in technique does not require linking at build time.
+The job is done at the time plug-in is loaded by the dynamic linker.
+
+In order to use any plug-in, the plugin support must be compiled in MADX.
+At the top of every MADX makefile there is variable PLUGIN_SUPPORT
+that must be set to "YES". 
+Then, the appropriate C interface is compiled in and MADX is 
+linked dynamically.
+
+
+Plug-ins must be accessible to the dynamic linker. 
+The default location where plug-ins are searched is $HOME/.madx/plugins.
+Otherwise, the directory containing the library must be either listed in 
+<ol>
+<li> the configuration file of the dynamic linker (on SLC3 it is /etc/ld.so.conf) </li>
+<li> LD_LIBRARY_PATH environment variable </li>
+</ol>
+ 
+<p>
+Existing plug-ins
+
+<ol>
+<li>  <a href="rplot/index.html">RPLOT</a>.</li>
+</ol>
+
+</div>
+
+<h4> Example </h4>
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+
+<h4> PROGRAMMERS MANUAL  </h4>
+
+<p> 
+The interface is not yet fully defined. The documentation apears at
+the moment it happens. 
+
+</div>
+
+</body>
+
+</html>

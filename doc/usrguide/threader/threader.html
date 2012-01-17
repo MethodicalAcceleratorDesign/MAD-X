@@ -1,0 +1,57 @@
+<html>
+<head><lastmodified>
+<title>Threader</title>
+<!-- Changed by: Thys Risselada, 17-MAR-2006 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC=../icons/mx7_25.gif align=right>
+<h2>Beam Threader</h2>
+</center>
+<!p>
+<!H4><!IMG ISMAP SRC="http://cern.ch/Frank.Schmidt/dynap/icons/at_work.gif"height=90><!Under construction and not yet reliable!!!!!><!/A><!/H4>
+<!/P>
+
+The <b>threader</b> simulates beam steering through a machine with field and
+alignment errors in situations where the beam does not circulate and the
+closed orbit cannot be measured.
+<p>
+If enabled, threading is executed whenever a trajectory or closed orbit search is
+carried out by the
+<A HREF="http://frs.home.cern.ch/frs/Xdoc/twiss/twiss.html">TWISS</A> module.
+<p>
+The following MAD-X commands control the action of the threader :
+
+<p><br><br><pre>
+<b>option, threader ;</b>
+</pre>
+
+enables the threader
+<p>
+when set, the threader checks at all monitors the difference with
+respect to the stored orbit there (from
+<A HREF="http://frs.home.cern.ch/frs/Xdoc/twiss/twiss.html">keeporbit</A>) if
+<A HREF="http://frs.home.cern.ch/frs/Xdoc/twiss/twiss.html">useorbit</A> is
+present. The threader then provides kicks (if possible) to reduce
+the orbit difference below the maxima specified on the threader
+command. This procedure allows to thread with orbit bumps present
+
+<p><br><br><pre>
+<b>threader, vector = {xmax, ymax, att} ;</b>
+</pre>
+
+sets the parameters for the threader
+<pre>
+xmax, ymax : orbit excursion (at a monitor) at which threader acts
+att        : attenuation factor for the kicks applied by the threader
+defaults   : {0.005, 0.005, 1.000}
+</pre>
+
+<p><br><br>
+<HR><address>
+Hans Grote, 31.10.2008
+</address>
+
+</body>

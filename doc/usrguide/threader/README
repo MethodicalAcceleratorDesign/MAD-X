@@ -1,0 +1,3 @@
+The MADX threader simulates beam steering through a machine with field and
+alignment errors in situations where the beam does not circulate and the
+closed orbit cannot be measured.
