@@ -1,0 +1,235 @@
+<head>
+<title>Matching Constraints</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Oliver Bruning, 20-Jun-2002 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Constraints</h2>
+</center>
+<p>
+
+<H2><a name=constraint>CONSTRAINT</a>: Simple Constraint</H2>
+Simple constraints are imposed by the CONSTRAINT command.
+The CONSTRAINT command has three attributes: 
+<ul>
+<li>
+the SEQUENCE entry specifies the
+sequence for which the constraint applies.
+<li>
+the RANGE entry specifies the position where the constraint must be
+satisfied. The RANGE can either be the name of a single element in the sequence
+or a range between two elements. In the later case the two element names
+must be separated by a '/': RANGE=nam1/name2
+<li>the optics functions to be constrained
+</ul>
+
+The optic functions can be constraint in four different ways:
+<ul>
+<li>lower limits: 'BETX &gt; value' -> type1
+<li>upper limits: 'BETX &lt; value' -> type2
+<li>lower and upper limits: 'BETX &lt; value1,BETX &gt; value2' -> type3
+<li>target value: BETX=value -> type 4
+</ul>
+In case one element is affected my more than one constraint command the last 
+CONSTRAINT will be chosen. For example, one can specify the maximum acceptable
+beta function over a range of the sequence and specify the target beta 
+function for one element that lies inside this range. In this case one must
+first specify the constraint that affects the whole range and then the
+constraint for the single element. This way the constraint of the target value
+overrides the previous constraint on the upper limit for the selected element.
+For example, the following constraint statements limit the maximum
+horizontal beta function between 'marker1' and 'marker2' to 200 meter and
+require a horizontal beta function of 180 meter at element 'name1':
+<pre>
+CONSTRAINT,SEQUENCE=sequence-name,RANGE='marker1'/'marker2',BETX<200.0;
+CONSTRAINT,SEQUENCE=sequence-name,RANGE='name1'/'marker2',BETX=100.0;
+</pre>
+When the two constraint statements are interchanged the 
+horizontal beta function at element 'name1' will only be limited to less than
+200 meter and NOT constrained to 100 meter!
+<p>
+
+The CONSTRAINTS can
+either be specified with explicit values for the constraints of
+the optic functions or via a pre-calculated 
+<a href="../control/general.html#savebeta">SAVEBETA</a> module.
+The first options has the form:
+<pre>
+CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETX=real,ALFX=real,MUX=real,
+                                                 BETY=real,ALFY=real,MUY=real,
+                                                 X=real,PX=real,Y=real,PY=real,
+                                                 DX=real,DY=real,DPX=real,DPY=real;
+
+</pre>
+Here all <a href="../Introduction/tables.html#linear">linear lattice functions</a>
+(BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
+or <a href="../Introduction/tables.html#chrom">chromatic lattice functions</a>
+(WX, XY, PHIX, PHIY, DMUX, DUMY, DDX, DDY, DDPX, DDPY)
+are constrained at the selected range to the corresponding values.
+<P>
+The second form of the CONSTRAINT command has the form
+<pre>
+CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETA0=beta0-name,MUX=real,MUY=real
+</pre>
+Here all of (BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
+are constrained in the selected points to the corresponding values
+of a pre-calculated <a href="../control/general.html#savebeta">SAVEBETA</a> module.
+In the above example
+the phases (MUX, MUY) are overridden by the numerical values specified via
+'MUX=real' and 'MUY=real'.
+Normally ``RANGE'' refers to a single
+<a href="../Introduction/ranges.html#position">position</a>.
+<P>
+
+<H2><a name=user-var>User Defined Matching Constraints</a></H2>
+In addition to the nominal TWISS variables the user can define a 
+limited set of 'user-defined' variables in the
+constrint statement. This allows, for example, the matching of the nromalized
+dispersion or the mechanical aperture.
+The MATCH module allows four user defined variables called: mvar1, mvar2, 
+mvar3 and mvar4. The variables can be defined according to the general variable
+declaration rules of 
+<a href="../Introduction/expression.html#defer">deferred exressions</a>.
+For example, in order to match the normalized dispersion at a certain
+location in the sequence one would first define a variable:
+<pre>
+mvar1 := table(twiss,dx)/sqrt(table(twiss,betx));
+</pre>
+After that the user has to select the variable for output in the TWISS
+statement (see <a href="../twiss/twiss.html">TWISS module</a> and
+<a href="../Introduction/select.html">SELECT</a> for more
+details on the TWISS module and SELECTION statements):
+<pre>
+select, flag=twiss, clear;
+select, flag=twiss, column=keyword,, name, s, betx, dx, mvar1;
+twiss, sequence='sequence-name',file=twiss.file;
+</pre>
+The variable can now be referenced like any other TWISS variable
+in the constraint command:
+<pre>
+constraint, sequence='sequence-name',range='location',mvar1='target-value';
+</pre>
+
+
+<H2><a name=weight>Matching Weights</a></H2>
+The matching procedures try to fulfil the constraints
+in a least square sense.
+A penalty function is constructed which is the sum of the
+squares of all errors,
+each multiplied by the specified weight.
+The larger the weight, the more important a constraint becomes.
+The weights are taken from a table of current values.
+These are initially set to <a href="#default">weight default values</a>,
+and may be reset at any time to different values.
+Values set in this way remain valid until changed again.
+The command
+<pre>
+WEIGHT, BETX=real,ALFX=real,MUX=real, 
+        BETY=real,ALFY=real,MUY=real, 
+        X=real,PX=real,Y=real,PY=real, 
+        DX=real,DPX=real,DY=real,DPY=real;
+</pre>
+changes the weights for subsequent constraints.
+The weights are entered with the same name as the
+<a href="../Introduction/tables.html#linear">linear lattice functions</a>
+<a href="../Introduction/closed_orbit.html">orbit coordinate</a>
+to which the weight applies.
+Frequently the matching weights serve to select a restricted
+set of functions to be matched.
+<H3><a name=default>Default Matching Weights</a></H3>
+<table cols = 8 border=4 frame=box align=center rules=all>
+<tr>
+  <td>name  </td> <td>weight</td>
+  <td>name  </td> <td>weight</td>
+  <td>name  </td> <td>weight</td>
+  <td>name  </td> <td>weight</td>
+  <td>name  </td> <td>weight</td>
+  <td>name  </td> <td>weight</td>
+</tr>
+<tr>
+  <td>BETX  </td> <td align=decimal>  1.0 </td>
+  <td>ALFX  </td> <td align=decimal> 10.0 </td>
+  <td>MUX   </td> <td align=decimal> 10.0 </td>
+  <td>BETY  </td> <td align=decimal>  1.0 </td>
+  <td>ALFY  </td> <td align=decimal> 10.0 </td>
+  <td>MUY   </td> <td align=decimal> 10.0 </td>
+</tr>
+<tr>
+  <td>X     </td> <td align=decimal> 10.0 </td>
+  <td>PX    </td> <td align=decimal>100.0 </td>
+  <td>Y     </td> <td align=decimal> 10.0 </td>
+  <td>PY    </td> <td align=decimal>100.0 </td>
+  <td>T     </td> <td align=decimal>  0.0 </td>
+  <td>PT    </td> <td align=decimal>  0.0 </td>
+</tr>
+<tr>
+  <td>DX    </td> <td align=decimal> 10.0 </td>
+  <td>DPX   </td> <td align=decimal>100.0 </td>
+  <td>DY    </td> <td align=decimal> 10.0 </td>
+  <td>DPY   </td> <td align=decimal>100.0 </td>
+  <td colspan=4 align=center>-</td>
+</tr>
+<tr>
+  <td>WX    </td> <td align=decimal> 10.0 </td>
+  <td>PHIX  </td> <td align=decimal> 10.0 </td>
+  <td>DMUX  </td> <td align=decimal>100.0 </td>
+  <td>WY    </td> <td align=decimal> 10.0 </td>
+  <td>PHIY  </td> <td align=decimal> 10.0 </td>
+  <td>DMUY  </td> <td align=decimal>100.0 </td>
+</tr>
+<tr>
+  <td>DDX   </td> <td align=decimal> 10.0 </td>
+  <td>DDPX  </td> <td align=decimal>100.0 </td>
+  <td>DDY   </td> <td align=decimal> 10.0 </td>
+  <td>DDPY  </td> <td align=decimal>100.0 </td>
+  <td colspan=4 align=center>-</td>
+</tr>
+<tr>
+  <td>MVAR1   </td> <td align=decimal>10.0 </td>
+  <td>MVAR2   </td> <td align=decimal>10.0 </td>
+  <td>MVAR3   </td> <td align=decimal>10.0 </td>
+  <td>MVAR4   </td> <td align=decimal>10.0 </td>
+  <td colspan=4 align=center>-</td>
+</tr>
+</table>
+
+<h2>GLOBAL: Global Matching Constraints</h2>
+In addition to conventional matching constraints that specify the optics 
+functions at a certain position in the sequence the user can also constrain 
+global optics parameters such as, for example, 
+the overall machine tune and the machine chromaticity.
+Such global optics parameters can be constraint via the 
+GLOBAL command, having
+the following syntax:
+<pre>
+GLOBAL,SEQUENCE=sequence-name,Q1=real,Q2=real,dQ1=real,dQ2=real,&
+                              ddQ1=real,ddQ2=real;
+</pre>
+Global matching weights can be (re)set by the new 
+<a name=gweight>GWEIGHT</a>
+command, having attributes identical to those of GLOBAL.
+All the attributes are optional and have the following meaning:
+<dl>
+<dt>Q1, Q2, dQ1, dQ2
+<dd> enable a correction of tunes and
+  chromaticities in presence of magnetic
+  imperfections or misalignments, 
+<dt>ddQ1, ddQ2
+<dd> enable a correction of 
+  nonlinear chromaticities
+</dl>
+
+
+
+<address>
+<a href="http://bruening.home.cern.ch/bruening/">Oliver Br&uuml;ning</a>,
+June, 2002
+</address>
+
+</body>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_SELECT_MOMENT</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_SELECT_MOMENT</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_SELECT_MOMENT, 
+table      = [s, none, none], 
+column     = [s, none, none], 
+moments   = [s, none] , 
+moments   = [i, {0}] , 
+parametric = [l, false, true], 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Selects a moment to be:
+<p>
+   a) <b>Stored in a user specified table and column. </b>
+<p>
+   b) <b>Stored as a function (taylor series) of 
+      <a href="PTC_Knob.html">knobs</a>,  if any is defined.</b> 
+      Than, <i>parametric</i> switch should be set to true. 
+<p>
+Both a) and b) can be joined in one command. 
+
+
+</div>
+
+<h4> Examples</h4>
+
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx"> ATF2 </a>
+
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+
+
+<dt><b> moment_s </b></dt> 
+  <dd>
+  <i> list of coma separated strings composed of up to 6 digits </i>
+  <p> Defines moment of the polynomial in PTC nomenclature. 
+      String 'ijklmn' (i,j,k,l,m,n are digits ) defines 
+      &lt;x<sup>i</sup>p<sub>x</sub><sup>j</sup>y<sup>k</sup>p<sub>y</sub><sup>l</sup>
+      &Delta;T<sup>m</sup>(&Delta;p/p)<sup>n</sup>&gt;.
+      For example, moments=1000000 defines &lt;x<sup>1</sup>&gt;
+  <p>
+      Note that for input we always use MAD-X notation where dp/p is always the 6th coordinate.
+      (Internaly PTC dp/p is the 5th coordinate. We perform automatic conversion that is transparent for the user.)
+      As the consequence RMS in dp/p is always defined as 000002, even in 5D case.
+  <p>   
+      This notations allows to define more then one moment with one command. In this case,
+      the corresponding column names are as the passed strings with "mu" prefix.
+      However, they are always extended to 6 digits, i.e. the trailing 0 are automatically added.
+      For example, if specified moments=2, the column name is mu200000. 
+  <p>    
+      This method does not allow to pass bigger numbers then 9. If you need to define
+      such a moment, use the command switch below.
+  </dd>
+
+
+<dt><b> moment </b></dt> 
+  <dd>
+  <i> list of up to 6 coma separated integers, </i>
+  <p> Defines a moment. For example: moment=2 defines &lt;x<sup>2</sup>&gt; , 
+      moment=0,0,2 : &lt;y<sup>2</sup>&gt;, 
+      moment=0,14,0,2 : &lt;px<sup>14</sup>py<sup>2</sup>&gt;, etc.
+  </dd>
+
+<dt><b> table </b></dt> 
+  <dd>
+  <i> string, default "moments" </i>
+  <p> Specifies name of the table where the calculated moments should be stored.
+  </dd>
+
+
+<dt><b> column </b></dt> 
+  <dd>
+  <i> string </i>
+  <p> Ignored if <i> moments </i> is specified. 
+      Defines name of the column where values should be stored. 
+      If not specified then it is automatically generated from moment the definition
+      &lt;x<sup>i</sup>p<sub>x</sub><sup>j</sup>y<sup>k</sup>p<sub>y</sub><sup>l</sup>
+      &Delta;T<sup>m</sup>(&Delta;p/p)<sup>n</sup>&gt; =&gt;
+      mu_i_j_k_l_m_n (numbers separated with underscores).
+      
+      
+  </dd>
+
+
+<dt><b> parametric </b></dt> 
+  <dd>
+  <i> logical, default false, if value explicitly not specified then true</i>
+  <p> If it is true, and any
+      <a href="PTC_Knob.html">knobs</a> 
+      are defined the map element is stored as the parametric result. 
+       
+  </dd>
+
+
+
+</dl>
+
+<h4>  </h4>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_ptc_SELECT function in madxn.c and 
+by subroutine xxxx in madx_ptc_xxx.f90.
+<p>
+Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+element in the PTC layout.
+<p>
+
+-->
+
+</div>
+
+</body>
+
+</html>

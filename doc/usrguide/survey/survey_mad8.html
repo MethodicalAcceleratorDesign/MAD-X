@@ -1,0 +1,64 @@
+<head>
+<title>SURVEY</title>
+<!-- Changed by: Chris ISELIN,  4-Aug-1997 -->
+<!-- Changed by: Hans Grote, 23-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>SURVEY: Compute Geometric Layout</h1>
+
+The SURVEY command computes the <a href="global.html">geometry</a>
+of the machine:
+<pre>
+SURVEY, X0=real,Y0=real,Z0=real,&amp;
+        THETA0=real,PHI0=real,PSI0=real,TAPE=file-name
+</pre>
+It operates on the working beam line entered in the latest
+<a href="use.html">USE</a> command.
+Its parameter list specifies the initial position and orientation
+of the reference orbit in the
+<a href="global.html">global coordinate system</a> (X,Y,Z).
+Omitted attributes assume zero values.
+Valid attributes are:
+<ul>
+<li>X0:
+The initial X coordinate [m].
+<li>Y0:
+The initial Y coordinate [m].
+<li>Z0:
+The initial Z coordinate [m].
+<li>THETA0:
+The initial angle theta [rad].
+<li>PHI0:
+The initial angle phi.
+<li>PSI0:
+The initial angle psi.
+<li>TAPE:
+If TAPE=file-name appears
+MAD writes a full <a href="tape3.html#survey">survey table</a> on a disk file
+<a href="files.html">file-name</a>.
+TAPE alone is equivalent to TAPE=&quot;survey&quot;:
+</ul>
+SURVEY prints one line for either end of the computation range
+and a summary.
+It also prints one line for each element and
+for the entrance and exit of each beam line,
+if this position has been selected by
+<a href="print.html">PRINT</a> or
+by <a href="print.html">SELECT,FLAG=TWISS</a>.
+<p>
+
+Example:
+<pre>
+SURVEY, TAPE=LAYOUT
+</pre>
+This example computes the machine layout with zero initial
+conditions and writes the results on a file called LAYOUT:
+
+<address>
+<a href="http://wwwslap.cern.ch/fci/fci_sign.html">fci</a>,
+January 27, 1997
+</address>
+
+</body>

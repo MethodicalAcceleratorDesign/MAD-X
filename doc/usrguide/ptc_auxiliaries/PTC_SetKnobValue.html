@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_SETKNOBVALUE</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_SETKNOBVALUE</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_SETKNOBVALUE, 
+elementname = [s, none] , 
+kn    = [i, {-1}], 
+ks    = [i, {-1}], 
+value = [r] ; 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+
+With this command the user set a given knob value. In its effect all the values in
+<ul>
+ <li> the twiss table used by the last ptc_twiss command </li>
+ <li> the columns specified with <a href="PTC_Select.html">ptc_select</a>, parametric=true;</li>
+
+</ul>
+are reevaluated using the buffered parametric results.
+
+<p>
+The parameters of the command basically contains the fields that allow to identify uniquely the knob and
+the value to be set.
+
+
+
+<h4> Example </h4>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/matchknobs.madx">  dog leg chicane </a> :
+strength of dipol field component in quads is matched to obtain required R56 value.
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b> elementname </b></dt> 
+  <dd>
+  <i> string in range format, </i>
+  <p> Specifies name of the element containing the knob to be set.
+  </dd>
+<dt><b> kn,ks </b></dt> 
+  <dd>
+  <i> list of integers,   </i>
+  <p> Defines the knob
+  </dd>
+
+<dt><b> value </b></dt> 
+  <dd>
+  <i> real, default 0, if value explicitly not specified then 0</i>
+  <p> Specifies the value the knob is set to.
+  
+      
+  </dd>
+
+
+
+</dl>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_PTC_SETKNOBVALUE function in madxn.c and 
+
+-->
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<head>
+<title>EMIT</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 15-Oct-2002 -->
+<!-- Changed by: Ralph Assmann, 02-Sep-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>Fully Coupled Motion and Radiation</h1>
+
+<h2><a name=emit>EMIT: Equilibrium Emittances</a></h2>
+The command
+<pre>EMIT,DELTAP=real,TOL=tolerance;
+</pre>
+adjusts the RF frequencies such as to obtain the specified average
+energy error.
+More precisely,
+the revolution frequency <i>f<sub>0</sub></i>
+is determined for a fictitious particle with constant momentum error
+<p>
+DELTAP = delta<sub><i>s</i></sub> = delta(<i>E</i>) / <i>p<sub>s</sub> c</i>
+<p>
+which travels along the design orbit.
+The RF frequencies are then set to
+<p>
+<i>f<sub>RF</sub> = h f<sub>0</sub></i>.
+<p>
+If the machine contains at least one RF cavity, and if synchrotron
+radiation is <a href="../Introduction/beam.html#radiate">on</a>,
+the EMIT command computes the equilibrium emittances and other
+electron beam parameters using the method of
+<a href="../Introduction/bibliography.html#chao">[Chao]</a>.
+In this calculation the effects of quadrupoles, sextupoles, and
+octupoles along the closed orbit is also considered.
+Thin multipoles are used only if they have a fictitious length LRAD 
+different from zero.
+<p>
+If the machine contains no RF cavity,
+if synchrotron radiation is 
+<a href="../Introduction/beam.html#radiate">off</a>,
+or if the longitudinal motion is not stable,
+it only computes the parameters which are not related to radiation.
+<p>
+The tolerance is for the distinction static/dynamic: if for the eigenvalues
+of the one-turn matrix, |e_val_5| < tol and |e-val_6| < tol, then the
+longitudinal motion is not considered, otherwise it is.
+The default for TOL is 1.000001.
+<p>
+In the current implementation, the BEAM values of the emittances and beam
+sizes are only updated for deltap = zero.
+Example:
+<pre>RFC: RFCAVITY,HARMON...,VOLT=...;
+     BEAM,ENERGY=100.0,RADIATE;
+     EMIT,DELTAP=0.01;
+</pre>
+
+<STRONG>Remark:</STRONG>
+ This module assumes nearly constant
+lattice functions inside elements. This assumption works for many machines, 
+like LEP (<a href="http://frs.home.cern.ch/frs/mad-X_examples/emit/LEP/">see example</a>),
+but it fails when the lattice funcionts largely vary inside single elements.
+In the later case it is advised to slice the elements as shown in    
+<a href="http://frs.home.cern.ch/frs/mad-X_examples/emit/ALBA/">ALBA</a>.
+
+
+<HR><table cols=2 width="100%"><tr><td ALIGN=LEFT>
+<ADDRESS>
+<A NAME=Rogelio HREF="http://consult.cern.ch/xwho/people/69118">R. Tom&aacute;s</A>
+</ADDRESS> <td ALIGN=RIGHT><b>Last updated:</b> <script language="JavaScript"><!--
+document.write(document.lastModified) // --> </script></td></tr></table>
+
+
+</body>

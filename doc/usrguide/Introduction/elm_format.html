@@ -1,0 +1,69 @@
+<head>
+<title>Element Input Format</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 22-Jan-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Element Input Format</h2>
+</center>
+<p>
+All physical elements are defined by statements of the form
+<pre>
+label: keyword {,attribute};
+</pre>
+Example:
+<pre>
+QF: QUADRUPOLE,L=1.8,K1=0.015832;
+</pre>
+where
+<UL>
+<LI><a href="label.html">label</a>
+is a name to be given to the element (in the example QF),
+<LI><a href="keyword.html">keyword</a>
+is an element type keyword (in the example QUADRUPOLE).
+<LI><a href="attribute.html">attribute</a>
+normally has the form
+"attribute-name=attribute-value" or "attribute-name:=attribute-value"
+(except for multipoles).
+<LI><a href="label.html">attribute-name</a>
+selects the attribute, as defined for the element type keyword
+(in the example L and K1).
+<LI><a href="attribute.html">attribute-value</a> gives it a value
+(in the example 1.8 and 0.015832). The value may be specified
+by an expression. The "=" assigns the value on the right to the
+attribute at the time of definition, regardless of any further change
+of the right hand side; the ":=" re-evaluates the expression at the right
+every time the attribute is being used. For constant right hand sides,
+"=" and ":=" are of course equivalent.
+</UL>
+Omitted attributes are assigned a default value, normally zero.
+<p>
+A special format is used for a <a href="multipole.html">multipole</a>:
+<pre>
+m:multipole, kn= {kn0, kn1, kn2, ..., knmax},
+             ks= {ks0, ks1, ks2, ..., ksmax};
+</pre>
+where kn and ks give the integrated normal and skew strengths, respectively.
+The commas are mandatory, each strength can be an expression; their position
+defines the order. example:
+<pre>
+m:multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};
+</pre>
+defines a multipole with a normal octupole, and a skew decapole component.
+<p>
+To know the current maximum order, enter the command
+<pre>
+help,multipole;
+</pre>
+and count.
+<p>
+<address>
+<a href="http://www.cern.ch/hansg/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

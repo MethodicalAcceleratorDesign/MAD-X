@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>SOLENOID</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+<!-- Changed by: Alexander Koschik, 16-May-2006 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Solenoid</h2>
+</center>
+
+<p>
+<tt>label: SOLENOID, L=real, KS=real;           </tt> (<b>thick</b> version) <br />
+<tt>label: SOLENOID, L=0,    KS=real, KSI=real; </tt> (<b>thin</b> version)
+</p>
+	
+<p>	
+A SOLENOID has two (three) real attributes:
+<ul>
+<li>L:
+The length of the solenoid (default: 0 m)
+<li>KS:
+The solenoid strength <i>K<sub>s</sub></i> (default: 0 rad/m).
+For positive KS and positive particle charge,
+the solenoid field points in the direction of increasing <i>s</i>.
+<li>KSI:
+The solenoid integrated strength <i>K<sub>s</sub>*L</i> (default: 0 rad). 
+This additional attribute is needed only when using the <emph>thin</emph> solenoid, 
+where <i>L=0</i>!   
+<li><font color=ff0000><i> KNL & KSL: 
+Take note that one can specify multipole coefficients but they have no
+effect in MAD-X proper but are used for solenoids with multipoles in
+PTC.</i></font>
+</ul> 
+</p>
+
+<p>
+Example:
+<pre>
+SOLO: SOLENOID, L=2., KS=0.001;
+THINSOLO: SOLENOID, L=0, KS=0.001, KSI=0.002;
+</pre>
+</p>
+
+<p>
+The <a href="local_system.html#straight">straight reference system</a>
+for a solenoid is a cartesian coordinate system.
+</p>
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 27, 1977
+</address>
+</p>
+
+</body>
+</html>

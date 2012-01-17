@@ -1,0 +1,90 @@
+<head>
+<title>the mad program</title>
+<!-- Changed by: Chris ISELIN, 27-Mar-1997 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Statements</h2> and
+<h2>Comments</h2>
+</center>
+
+Input for MAD-X follows in broad lines the new
+<a href="http://www.cern.ch/mad/mad9.html">MAD-9</a> format,
+i.e. free format with commas "," as separators; however, outside
+{...} enclosures blanks may be used as separators.
+Blank input lines do not affect program execution.
+The input is not case sensitive except for strings enclosed in " ".
+<p>
+The input file consists of a sequence of commands,
+also known as statements.
+A statement may occupy any number of  input lines. It must be terminated
+by a semicolon, except if it contains a block of statements itself,
+like in
+<pre>
+if (a < 3) {a=b^2; b=2*b+4;}
+</pre>
+Several statements may be placed on the same line.
+When a "!" or "//" is found on an input line,
+the remaining characters of the line are skipped.
+A line "/*" starts a comment region, it ends with a "*/" line.
+The general format for a command is (items enclosed in /rep/ ... /rep/
+can be repeated any number of times, including zero):
+<pre>
+label: keyword /rep/,attribute/rep/ ;
+</pre>
+It has three parts:
+<ul>
+<li>A <a href="label.html">label</a>
+is required for a definition statement.
+It gives a name to the stored command.
+<li>A <a href="keyword.html">keyword</a>
+identifies the action desired.
+<li>The <a name=attribute HREF="attribute.html">attributes</a>
+are normally entered in the form
+"attribute-name=attribute-value"
+and serve to define data for the command, where:
+<ul>
+<li><a href="label.html">attribute-name</a> selects the attribute,
+<li><a href="attribute.html">attribute-value</a> gives it a value.
+</ul>
+</ul>
+If a value has to be assigned to an attribute, the
+attribute name is mandatory.
+For logical attributes it is sufficient to enter the name only.
+The attribute is then given a default value taken from the
+command dictionary.
+<p>
+Example: TILT attribute for various magnets.
+<p>
+The command attributes can have one of the following types:
+<ul>
+<li><a href="string.html">String attribute</a>,
+<li><a href="logical.html">Logical attribute</a>,
+<li><a href="integer.html">Integer attribute</a>,
+<li><a href="real.html">Real attribute</a>,
+<li><a href="expression.html">Expression</a>,
+<li><a href="select.html">Range selection</a>,
+</ul>
+Any integer or real attribute can be replaced by
+a <a href="expression.html">real expression</a>; expressions are
+normally deferred (see 
+<a href="expression.html#defer">deferred expression</a>), except in the
+definition of constants where they are evaluated immediately.
+When a command has a <a href="label.html">label</a>,
+MAD-X keeps it in memory.
+This allows repeated execution of the same command
+by just entering EXEC label. This construct may be nested.
+For an exhaustive list of valid declarations of constants or variables
+see <a href="declarations.html">declarations</a>.
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+May 8, 2001
+</address>
+
+</body>

@@ -1,0 +1,233 @@
+<head>
+<title>LINE</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 11-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Beam Lines</h2>
+</center>
+
+The accelerator to be studied is known to MAD-X either
+as a sequence of physical elements called
+<a href="sequence.html">sequence</a>, or as a
+hierarchically structured list of elements called a <em>beam line</em>.
+A beam line is built from simpler beam lines whose definitions
+can be nested to any level.
+A powerful syntax allows to repeat, to reflect, or to replace
+pieces of beam lines. However, internally MAD-X knows only sequences,
+and lines as shown below are converted into flat sequences with the
+same name when they are expanded. Consequently, only sequences can be SAVEd
+onto a file (see <a href="../control/general.html#save">save</a>).
+<p>
+Formally a beam line is defined by a LINE command:
+<pre>
+label(arg{,arg}): LINE=(member{,member});
+</pre>
+<a HREF="label.html">Label</a>
+gives a name to the beam line for later reference.
+<p>
+The formal argument list (arg{,arg}) is optional (see below).
+Each "member" may be one of the following:
+<UL>
+<LI> Element label,
+<LI> Beam line label,
+<LI> Sub-line, enclosed in parentheses,
+<LI> Formal argument name,
+<LI> Replacement list label.
+</UL>
+Beam lines may be nested to any level.
+
+<h3><a name=simple>Simple Beam Lines</a></h3>
+The simplest beam line consists of single elements:
+<pre>
+label: LINE=(member{,member});
+</pre>
+Example:
+<pre>
+l:      line=(a,b,c,d,a,d);
+        use,period=l;
+</pre>
+The <a HREF="../control/general.html#use">USE</a>
+command tells MAD to perform all subsequent calculations on the sequence
+<pre>
+a,b,c,d,a,d
+</pre>
+
+<h3><a name=subline>Sub-lines</a></h3>
+Instead of referring to an element,
+a beam line member can refer to another beam line
+defined in a separate command.
+This provides a shorthand notation for sub-lines which occur
+several times in a beam line.
+Lines and sub-lines can be entered in any order,
+but when a line is expanded, all its sub-lines must be known.
+<p>
+Example:
+<pre>
+l:      line=(a,b,s,b,a,s,a,b);
+s:      line=(c,d,e);
+        use,period=l;
+</pre>
+this example produces the following expansion steps:
+<p>1. replace sub-line s:
+<pre>
+(a,b,(c,d,e),b,a,(c,d,e),a,b)
+</pre>
+<p>2. omit parentheses:
+<pre>
+a,b,c,d,e,b,a,c,d,e,a,b
+</pre>
+
+<h3><a name=reflect>Reflection and Repetition</a></h3>
+An unsigned repetition count and an asterisk indicate
+repetition of a beam line member.
+A minus prefix causes reflection,
+i.e. all elements in the subsequence are taken in reverse order.
+Sub-lines of reflected lines are also reflected,
+but physical elements are not.
+If both reflection and repetition are desired,
+the minus sign must precede the repetition count.
+<p>
+Example:
+<pre>
+r:      line=(g,h);
+s:      line=(c,r,d);
+t:      line=(2*s,2*(e,f),-s,-(a,b));
+        use,period=t;
+<font color=ff0000><i>Attention: the repetition "2*s" will only work if
+"s" is itself a line. In case "s" is an element replace by
+"2*(s)". </i></font>
+</pre>
+Proceeding step by step, this example produces
+<p>1. Replace sub-line S:
+<pre>
+((c,r,d),(c,r,d),(e,f),(e,f),(d,-r,c),(b,a))
+</pre>
+<p>2. replace sub-line r:
+<pre>
+((c,(g,h),d),(c,(g,h),d),(e,f),(e,f),(d,(h,g),c),(b,a))
+</pre>
+<p>3. omit parentheses:
+<pre>
+c,g,h,d,c,g,h,d,e,f,e,f,d,h,g,c,b,a
+</pre>
+Note that the inner sub-line R is reflected together with
+the outer sub-line S.
+
+<h3><a name=argument>Replaceable Arguments</a></h3>
+A beam line definition may contain a formal argument list,
+consisting of labels separated by commas and enclosed in parentheses.
+Such a line can be expanded for different values of its arguments.
+When this line is referred to,
+its label must be followed by a list of actual arguments
+separated by commas and enclosed in parentheses. These arguments must
+be beam line, or element names.
+The number of actual arguments must agree with the number
+of formal arguments.
+All occurrences of a formal argument on the right-hand side of the
+line definition are replaced by the corresponding actual argument.
+<p>
+Example:
+<pre>
+s:        line=(a,b,c);
+l(x,y):   line=(d,x,e,3*y);
+l4f:      line=(4*f);
+lm2s:     line=(-2*s);
+res:      line=l(l4f,lm2s);
+</pre>
+Proceeding step by step, this example generates the expansion
+<pre>
+d,f,f,f,f,e,c,b,a,c,b,a,c,b,a,c,b,a,c,b,a,c,b,a
+</pre>
+Second example:
+<pre>
+cel(sf,sd):     line=(qf,d,sf,d,b,d,qd,d,sd,d,b,d);
+arc:            line=(cel(sf1,sd1),cel(sf2,sd2),cel(sf1,sd1));
+                use,period=arc;
+</pre>
+This example generates the expansion
+<p>
+1. Replace the line CEL and its formal arguments:
+<pre>
+((qf,d,(sf1),d,b,d,qd,d,(sd1),d,b,d)
+ (qf,d,(sf2),d,b,d,qd,d,(sd2),d,b,d)
+ (qf,d,(sf1),d,b,d,qd,d,(sd1),d,b,d))
+</pre>
+<p>
+2. Omit parentheses:
+<pre>
+qf,d,sf1,d,b,d,qd,d,sd1,d,b,d
+qf,d,sf2,d,b,d,qd,d,sd2,d,b,d
+qf,d,sf1,d,b,d,qd,d,sd1,d,b,d
+</pre>
+
+<h3><a name=Line_Depreciation>Warning: Line Depreciation</a></h3>
+MADX has been devolopped using sequences, in fact internally the code
+works with sequences only. Consequently, there may exist some
+inconveniences when only lines are used. It is recommended to convert
+as soon as possible lines into sequences (by means of the save
+command) in a design phase and to use only sequences for a finalised
+machine. 
+
+<h3><a name=Line_Limits> Limits of Construction of Lines</a></h3>
+
+Since Lines are in fact depreciated there are some limits of how they can
+be constructed. Please find below a running MADX run which shows an
+example of OK (valid) and WRONG (invalid) cases.
+
+<pre>
+!----------------------------------------------------------------------
+beam, PARTICLE=electron, energy=1;
+
+qf: QUADRUPOLE, L:=1,K1:=1;
+qd: QUADRUPOLE, L:=1,K1:=-1;
+d: DRIFT, l=1;
+m: MARKER;
+
+rpl(a,b): LINE=(a,b);
+sl: LINE=(qf,d,qd);
+test0: LINE=(rpl(sl,sl));          !OK 
+test1: LINE=(rpl((sl),(sl)));      !OK
+test2: LINE=(rpl((sl),(-sl)));     !OK
+test3: LINE=(sl,-sl);              !OK
+test4: LINE=(rpl((3*sl),(3*sl)));  ! WRONG
+test5: LINE=(3*sl,3*sl);           !OK
+test6: LINE=(rpl((3*sl),(-3*sl))); ! WRONG
+test7: LINE=(3*sl,-3*sl);          !OK
+
+use, period=test0;
+twiss,BETX=1,bety=1;
+
+use, period=test1;
+twiss,BETX=1,bety=1;
+
+use, period=test2;
+twiss,BETX=1,bety=1;
+
+use, period=test3;
+twiss,BETX=1,bety=1;
+
+use, period=test4;
+twiss,BETX=1,bety=1;
+
+use, period=test5;
+twiss,BETX=1,bety=1;
+
+use, period=test6;
+twiss,BETX=1,bety=1;
+
+use, period=test7;
+twiss,BETX=1,bety=1;
+!----------------------------------------------------------------------
+</pre>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+
+</body>

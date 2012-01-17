@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.70)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>ibs</TITLE>
+<META NAME="description" CONTENT="ibs">
+<META NAME="keywords" CONTENT="ibs">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="ibs.css">
+
+</HEAD>
+
+<BODY >
+
+<P>
+
+<P>
+<H1><A NAME="SECTION00000000000000000000">
+The Intra-Beam Scattering Module (IBS)</A>
+</H1><FONT SIZE="+1">
+<P>
+
+<P><BR>
+<FONT SIZE="+1"><HR></FONT>
+<P><P><BR>
+<FONT SIZE="+1"></FONT>
+<P>
+<FONT SIZE="+1">As emphasized by its name, the Intra-Beam Scattering module (IBS) computes the 
+contribution to emittance growth rates due to Coulomb scattering of particles
+within relativistic beams.
+The formalism used in this module is that derived by J.D. Bjorken and
+S.K.Mtingwa [<a href="../Introduction/bibliography.html#bm1">[Bjorken and Mtingwa]</a>] in 1982.
+Contrary to other IBS-routines, the Bjorken-Mtingwa formalism takes into
+account the variation of the lattice parameters around the machine, rather than using average values. Consequently, the knowledge of the optical functions of the machine is required. In MAD-X, this is achieved with the ``<B>twiss</B>'' command.
+</FONT>
+<P>
+<FONT SIZE="+1">It is well known that the intra-beam scattering growth times behave like:
+</FONT><BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+\frac{1}{\tau_i} \quad = \quad C_i \times \frac{N}{\gamma \epsilon_x \epsilon_y \epsilon_s} \qquad (i = x, y, s)
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="289" HEIGHT="47" BORDER="0"
+ SRC="img1.png"
+ ALT="\begin{displaymath}
+\frac{1}{\tau_i} \quad = \quad C_i \times \frac{N}{\gamma \epsilon_x \epsilon_y \epsilon_s} \qquad (i = x, y, s)
+\end{displaymath}">
+</DIV><BR CLEAR="ALL">
+<P></P><FONT SIZE="+1">
+where C<IMG
+ WIDTH="10" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img2.png"
+ ALT="$_i$"> accounts for some constants and the integrals for the scattering functions, N is the number of particles in the bunch, <IMG
+ WIDTH="14" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\gamma$"> is the relativistic factor and <IMG
+ WIDTH="17" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$\epsilon_i$"> are the normalized emittances in the horizontal, vertical and longitudinal plane respectively.
+It thus follows that the second required input is a description of the beam parameters, which is achieved via the ``<B>beam</B>'' command (see below).
+</FONT>
+<P>
+<FONT SIZE="+1">Once the optical functions and the beam parameters have been defined, the evaluation of the scattering growth times follows via the ``<B>ibs</B>'' command.
+The logical follow-up of the MAD-X commands is illustrated in the two examples provided with the IBS-module.
+</FONT>
+<P>
+
+<H1><A NAME="SECTION00010000000000000000">
+Input of the beam parameters</A>
+</H1><FONT SIZE="+1">
+This section briefly describes the parameters which have to be present in the 
+``<B>beam</B>'' command in order to run the IBS-module:
+</FONT>
+<P>
+
+<H2><A NAME="SECTION00011000000000000000">
+Type of particle</A>
+</H2><FONT SIZE="+1">
+The parameter ``<B>particle=</B>'' is mandatory. It can take one of the following <B>three</B> values: <B>proton, electron or ion</B>.
+For proton and electron, the parameter ``particle'' is the only one to be defined.
+In case <B>ion</B> is used, two additional parameters have to be
+defined, namely ``<B>mass=</B>'', which is typically the number of
+nucleons for the corresponding ion multiplied by <B>nmass</B> the unified atomic
+mass unit [0.931494013 GeV/(c**2)] , and ``<B>charge=</B>'' for the number of charges.
+
+<H2><A NAME="SECTION00012000000000000000">
+The energy</A>
+</H2><FONT SIZE="+1">
+The definition of the energy (total, kinetic, total energy of the ions or energy per nucleon) is a difficult one.
+In the present approach, the energy is the <B>total</B> energy of the
+particle. For ions, the expected input is the <B>proton equivalent</B>
+energy, i.e. the total energy a proton would have when circulating in
+the defined machine. As an illustration, in the LHC, protons will be
+injected with an energy of 450&nbsp;GeV. Consequently, to evaluate the
+growth times for Lead ions at injection in the LHC, one has to input
+<B>energy=450*charge</B>. Therefore the above example of Lead at the
+LHC injection energy may look as follows in the MAD-X input language:
+</FONT><DIV ALIGN="CENTER"><FONT SIZE="+1">
+<B>
+nucleon=208;
+charge=82;
+beam,particle=ion,charge=charge,energy=450*charge,mass=nucleon*nmass;</B></FONT></DIV>
+
+An important check for the correctness of the input is the printed value of the relativistic factor <IMG
+ WIDTH="14" HEIGHT="31" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\gamma$">. The latter should correspond to:
+</FONT><BR><P></P>
+<DIV ALIGN="CENTER">
+<!-- MATH
+ \begin{displaymath}
+\gamma_{ion} \quad = \quad \gamma_{proton} \times \frac{charge}{nucleon}
+\end{displaymath}
+ -->
+
+<IMG
+ WIDTH="220" HEIGHT="42" BORDER="0"
+ SRC="img5.png"
+ ALT="\begin{displaymath}
+\gamma_{ion} \quad = \quad \gamma_{proton} \times \frac{charge}{nucleon}
+\end{displaymath}">
+</DIV><BR CLEAR="ALL">
+<P></P>
+<H2><A NAME="SECTION00013000000000000000">
+The number of particles</A>
+</H2><FONT SIZE="+1">
+The number of particles (or number of ions) is defined with the parameter
+``<B>npart=</B>''.
+</FONT>
+<P>
+
+<H2><A NAME="SECTION00014000000000000000">
+Beam sizes - Emittances</A>
+</H2><FONT SIZE="+1">
+This part of the input is used to define the normalized emittances (horizontal, vertical and longitudinal). The required parameters are the <B>physical</B> transverse emittances (<B>ex=</B> and <B>ey=</B> [<IMG
+ WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
+ SRC="img6.png"
+ ALT="$\pi$">m]), the bunch length (<B>sigt=</B> [m]) and the relative energy spread (<B>sige=</B>).
+</FONT>
+<P>
+
+<H1><A NAME="SECTION00020000000000000000">
+File Attribute</A>
+</H1><FONT SIZE="+1">
+If FILE="file_name" appears MAD-X produces a table and writes on a
+file for each element of the machine: ELEMENT NAME, Position S [m],
+DELS [m] (Length Difference of consecutive Elements in the Table), TLI (Longitudinal growth time), TXI (Horizontal growth time), TYI (Vertical growth time).
+</FONT>
+<P>
+ </FONT>
+
+<H1><A NAME="SECTION00030000000000000000">
+Examples</A>
+</H1><FONT SIZE="+1">
+The two examples provided for the module Intra-Beam Scattering illustrate the commands required to run the module. The two examples have been selected such as to highlight the differences between a computation for protons and that for ions. Both examples compute the IBS growth times at injection into the LHC. The examples are located at http://frs.home.cern.ch/frs/Xdoc/mad-X.html.
+</FONT>
+<P>
+ </FONT>
+
+<P>
+</DL>
+<P>
+<BR><HR>
+<ADDRESS>
+Frank Schmidt
+2003-05-23
+</ADDRESS>
+</BODY>
+</HTML>

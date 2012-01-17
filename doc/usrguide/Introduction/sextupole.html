@@ -1,0 +1,74 @@
+<head>
+<title>SEXTUPOLE</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+<!-- Changed by: Frank Schmidt, 28-Aug-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Sextupole</h2>
+</center>
+
+<pre>
+label: SEXTUPOLE,L=real,K2=real,K2S=real,TILT=real;
+</pre>
+A SEXTUPOLE has four real attributes:
+<ul>
+<li>L:
+The sextupole length (default: 0 m).
+<li>K2:
+The normal sextupole coefficient
+<p>
+<i>K</i><sub>2</sub> = 1/(<i>B</i> rho)
+(&eth;<sup>2</sup><i>B<sub>y</sub></i>/&eth; <i>x</i><sup>2</sup>).
+<p>
+(default: 0 m**(-3)).
+<li>K2S:
+The skew sextupole coefficient
+<p>
+<i>K</i><sub>2S</sub> = 1/(2 <i>B</i> rho)
+(&eth;<sup>2</sup><i>B<sub>x</sub></i>/&eth; <i>x</i><sup>2</sup> - &eth;<sup>2</sup><i>B<sub>y</sub></i>/&eth; <i>y</i><sup>2</sup>).
+<p>
+where (x,y) is now a coordinate system rotated by -30<sup>o</sup>
+around s with respect to the normal one.
+(default: 0 m**(-3)).
+A positive skew sextupole strength implies
+defocussing (!) of positively charged particles in the (x,s) plane rotated by
+30<sup>o</sup> around s (particles in this plane have x &gt; 0, y &gt; 0).
+<p><LI>TILT:
+The roll angle about the longitudinal axis (default: 0 rad, i.e. a
+normal sextupole). A positive angle represents a clockwise rotation. A
+TILT=pi/6 turns a positive normal sextupole into a negative skew sextupole.
+<p><b><font color="#ff0000"> 
+Please note that contrary to MAD8 one has to specify
+the desired TILT angle, otherwise it is taken as 0 rad. This was
+needed to avoid the confusion in MAD8 about the actual meaning of the
+TILT attribute for various elements.
+</b></font>
+</ul>
+<p><b><font color="#0000ff"> 
+Note also that K</i><sub>2</sub>/K</i><sub>2s</sub> can be considered
+as the normal or skew sextupole components of the magnet on the bench,
+while the TILT attribute can be considered as an tilt alignment error
+in the machine. In fact, a positive K</i><sub>2</sub> with a tilt=0 is
+equivalent to a positive K</i><sub>2s</sub> with positive tilt=+pi/6. 
+</b></font>
+<p>Example:
+<pre>
+S: SEXTUPOLE,L=0.4,K2=0.00134;
+</pre>
+The <a href="local_system.html#straight">straight reference system</a>
+for a sextupole is a cartesian coordinate system.
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+<a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
+August 28, 2003 
+</address>
+
+</body>

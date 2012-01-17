@@ -1,0 +1,147 @@
+<head>
+<title>Field Errors</title>
+<!-- Changed by: Hans Grote, 19-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>Field Errors</h1>
+
+Field errors can be entered as relative or absolute errors.
+Different multipole components can be specified with
+different kinds of errors (relative or absolute).
+Relations between absolute and relative field errors are listed below.
+<p>
+<font COLOR="#00ff00">
+In MAD8 two commands were used for that purpose: EFIELD and EFCOMP.
+Only EFCOMP was implemented in MAD-X since it provides the full
+functionality of EFIELD and there was no need for duplication.
+</font>
+<p>
+All field errors are specified as the integrated value
+int(<i>K*ds</i>) of the <a href="../Introduction/sign_convent.html">field components</A>
+along the magnet axis in m<sup>-i</sup>.
+There is no provision to specify a global relative
+excitation error affecting all field components in a combined function
+magnet.
+Such an error may only be entered by defining the same relative error
+for all field components.
+<p>
+Field errors can be specified for all magnetic elements
+by the statement
+<pre>
+SELECT,FLAG=ERROR,RANGE=range,CLASS=name,PATTERN=string;
+EFCOMP, ORDER:=integer,RADIUS:=real,
+        DKN:={dkn(0),dkn(1),dkn(2),...},
+        DKS:={dks(0),dks(1),dks(2),...},
+        DKNR:={dknr(0),dknr(1),dknr(2),...},
+        DKSR:={dksr(0),dksr(1),dksr(2),...};
+</pre>
+and elements are now selected by the <a href="../Introduction/select.html">SELECT</A> command.
+Each new <a name=efcomp>EFCOMP</A> statement
+replaces the field errors for all elements in its range (s).
+Any old field errors present in the range are discarded
+or incremented depending on the setting of 
+<a href="error_option.html">EOPTION,ADD</A>.
+EFCOMP defines them in terms of relative or absolute components.
+<p>
+The attributes are:
+<p>ORDER:
+If relative errors are entered for multipoles,
+this defines the order of the base component to which the relative 
+errors refer.
+This reference strength <i>k<sub>ref</sub></i> always refers to the normal component.
+To use a skew component as the reference the reference radius
+should be specified as a negative number.
+The default is zero.
+<br>
+<font COLOR="#ff0000">
+Please note that this implies to specify <i>k<sub>0</sub></i> to assign
+relative field errors to a bending magnet since <i>k<sub>0</sub></i> is used
+for the normalization and NOT the ANGLE.
+</font>
+<p>RADIUS:
+Radius <i>R</i> were dknr(i) or dksr(i) are specified for 0...i...20 (default 1 m).
+This attribute is required if dknr(i) or dksr(i) are specified.
+If <i>R</i> is negativ, the skew component is used for the reference strength.
+<p>DKN(i):
+Absolute error for the normal multipole strength with (2i+2) poles
+(default: 0  m<sup>-i</sup>).
+<p>DKS(i):
+Absolute error for the skewed multipole strength with (2i+2) poles
+(default: 0  m<sup>-i</sup>).
+<p>DKNR(i):
+Relative error for the normal multipole strength with (2i+2) poles
+(default: 0  m<sup>-i</sup>).
+<p>DKSR(i):
+Relative error for the skewed multipole strength with (2i+2) poles
+(default: 0  m<sup>-i</sup>).
+<p>
+<br>
+<br>
+<b>Time memory effects:</b>
+<br>
+The relative errors can be corrected for possible time memory effects.
+A correction term is computed and added to the relative error.
+<br>
+The correction term is parametrized as a 3rd order polynomial in the 
+reference strength <i>k<sub>ref</sub></i> according to:
+<br>
+<br>
+<pre>
+Delta = sum (c<sub>i</sub> * <i>k<sup>i</sup><sub>ref</sub></i>)            i = 0,..3
+</pre>
+<br>
+The coefficients c<sub>i</sub> for the polynominal must be supplied in the command.
+<br>
+<br>
+Two additional parameters and options are required:
+<br>
+<p>HYSTER: if it is set to 1 applies the correction term derived from the reference
+strength and the coefficients.
+<br>
+<p>HCOEFFN and HCOEFFS: coefficients (normal and skew) for the computation of
+the correction term. The 4 coefficients are specified in increasing order, starting
+with the 0th order. Each group of four coefficients is valid for one order of
+the field errors. Trailing zeros can be omitted, preceding zeros must be given.
+<br>
+<br>
+<br>
+<font COLOR="#0000ff">
+Examples:
+</font>
+<font COLOR="#ff0000">
+<br>
+<br>
+<br>
+Example 1 (assign relative errors to quadrupoles);
+<pre>
+select, flag=error, pattern="q.*";
+efcomp, order:=1, radius:=0.010,
+dknr:={0,4e-1,1e-1,2e-3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+dksr:={0,4e-1,1e-1,2e-3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+</pre>
+<br>
+<br>
+Example 2 (add time memory effect to relative errors):
+<pre>
+select, flag=error, pattern="^q.*";
+efcomp, order=1, radius=0.020, hyster=1,
+hcoeffn:={0.000,0.000,0.000,0.000,   // coefficients multipole order 0
+          0.001,0.000,0.000,0.000,   // coefficients multipole order 1
+          0.000,0.000,0.002,0.000},  // coefficients multipole order 2
+dknr:={0,1e-2,2e-4,4e-5,1e-5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+dksr:={0,1e-2,2e-4,4e-5,1e-5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+</pre>
+</font>
+<br>
+See also: <a href="../Introduction/expression.html#random">Random values</A> and
+<a href="../Introduction/expression.html#defer">deferred expressions</A>.
+<br>
+<br>
+<address>
+<a href="http://consult.cern.ch/xwho/people/1808">Werner Herr</a>
+ 6.12.2004
+</address>
+
+</body>

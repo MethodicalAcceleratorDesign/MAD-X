@@ -1,0 +1,95 @@
+<head>
+<title>Local Reference System</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Local Reference Systems</h2>
+</center>
+
+<h2><a name=straight>Reference System for Straight Beam Elements</a></h2>
+In straight elements the local reference system is simply translated
+by the length of the element along the local <i>s</i>-axis.
+This is true for
+<ul>
+<li><a href="drift.html">Drift space</a>,
+<li><a href="quadrupole.html">Quadrupole</a>,
+<li><a href="sextupole.html">Sextupole</a>,
+<li><a href="octupole.html">Octupole</a>,
+<li><a href="solenoid.html">Solenoid</a>,
+<li><a href="crabcavity.html">CRABCAVITY</a>,
+<li><a href="cavity.html">RF cavity</a>,
+<li><a href="separator.html">Electrostatic separator</a>,
+<li><a href="kickers.html">Closed orbit corrector</a>,
+<li><a href="monitors.html">Beam position monitor</a>.
+</ul>
+The corresponding <i>R</i>, <i>S</i> are
+<p>
+<img align=bottom src="../equations/RSstraight.gif">
+<p>
+A rotation of the element about the <i>S</i>-axis has no effect
+on <i>R</i> and <i>S</i>, since the rotations of the reference system 
+before and after the element cancel.
+<center>
+<img align=bottom src="../figures/ref_straight.gif">
+<p>
+<b>Figure 1:</b> Reference System for Straight Beam Elements
+</center>
+
+<h2><a name=rbend>Reference System for Bending Magnets</a></h2>
+<a href="bend.html">Bending magnets</a> have a curved reference orbit.
+For both rectangular and sector bending magnets
+<p>
+<img align=bottom src="../equations/RSbend.gif">
+<p>
+where alphais the bend angle.
+A positive bend angle represents a bend to the right,
+i.e. towards negative <i>x</i> values.
+For sector bending magnets,
+the bend radius is given by rho,
+and for rectangular bending magnets it has the value
+<p>
+rho = <i>L</i> / 2 sin(alpha/2).
+<p>
+If the magnet is rotated about the <i>s</i>-axis by an angle psi,
+<i>R</i> and <i>S</i> are transformed by
+<p>
+<i>R</i>* = <i>T R</i>, <i>S</i>* = <i>T S T<sup>-1</sup></i>.
+<p>
+where <i>T</i> is the orthogonal rotation matrix
+<p>
+<img align=bottom src="../equations/Trot.gif">
+<p>
+The special value psi = pi/2 represents a bend down.
+
+<center>
+<a name=rbend><img align=bottom src="../figures/ref_rbend.gif"></a>
+<p>
+<b>Figure 2:</b> Reference System for Rectangular Bends;
+The signs of the pole-face rotations are positive as shown.
+</center>
+
+<center>
+<a name=sbend><img align=bottom src="../figures/ref_sbend.gif"></a>
+<p>
+<b>Figure 3:</b>  Reference System for Sector Bends;
+The signs of the pole-face rotations are positive as shown.
+</center>
+
+<h2>Elements which do not Change the Local Reference</h2>
+<a href="marker.html">MARKER</a> elements do not 
+affect the reference orbit.
+They are ignored for geometry calculations.
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

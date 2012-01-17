@@ -1,0 +1,55 @@
+<head>
+<title>TFS Column Formats</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Column Formats</h2>
+</center>
+
+The column formats used are listed in the 
+<a href="#table">TFS columns table</a>.
+<p>
+<a name=table>
+<table cols = 3 border=4 frame=box align=center rules=all>
+<tr>
+  <td><b>C format</b></td>
+  <td><b>Meaning</b></td>
+  <td><b>C format</b></td>
+</tr>
+<tr>
+  <td>%hd</td>
+  <td>Short integer</td>
+  <td>(%8d)</td>
+</tr>
+<tr>
+  <td>%le</td>
+  <td>Long float</td>
+  <td>(%-18.10g)</td>
+</tr>
+<tr>
+  <td>%ks</td>
+  <td>String of length k</td>
+  <td>("\"-18s\"")</td>
+</tr>
+<caption><b>Table: 1</b>Column Formats used in TFS Tables</caption>
+</table>
+</a>
+<p>
+Control lines begin with the TFS control character, followed by a blank.
+Data lines begin with two blanks.
+Columns are also separated by one blank character.
+The column width is chosen such as to accommodate the large of the
+column name and the data values of the column.
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

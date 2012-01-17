@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Twiss Module</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 --><!-- Changed by: Frank Schmidt, 11-Jul-2002 --><!-- Changed by: Hans Grote, 15-Jan-2003 --><!-- Changed by: Frank Schmidt, 06-APR-2003 --><!-- IMG ISMAP SRC="http://cern.ch/Frank.Schmidt/dynap/icons/at_work.gif"height=90 Under construction and not yet reliable!!!!-->
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" /> 
+</head>
+<body bgcolor="#ffffff">
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+<h2>Twiss Module</h2>
+<!--p-->
+<!--H4--><!--IMG ISMAP SRC="http://cern.ch/Frank.Schmidt/dynap/icons/at_work.gif"height=90--><!--Under construction and not yet reliable!!!!--><!--/A--><!--/H4--><!--/P-->
+The TWISS command causes computation of the
+<a href="../Introduction/bibliography.html#courant">[Courant and Snyder]</a>
+<a href="../Introduction/tables.html#linear">linear lattice functions</a>,
+and optionally of the <a href="../Introduction/tables.html#chrom">chromatic
+functions</a>. The coupled functions are calculated in the sense of <a
+ href="../Introduction/bibliography.html#edwards">[Edwards and
+Teng]</a>. For the uncoupled cases they reduce to the C and S
+functions.
+It operates on the working beam line defined in the latest
+<a href="../control/general.html#use">USE</a> command. One can also
+specify either a <a href="../Introduction/sequence.html">SEQUENCE</a>="sequence_name"
+or a
+<a href="../Introduction/line.html">LINE</a>="line_name" on the TWISS
+command. Moreover, one can restrict the TWISS calculation to a
+desired <a href="../Introduction/ranges.html#range">RANGE</a>.
+<p>The relative energy error DELTAP may be entered in one of the 2
+forms
+</p>
+<pre>DELTAP=real{,real}<br>DELTAP=initial:final:step<br></pre>
+The first form lists several numbers, which may be general expressions,
+separated by commas.
+The second form specifies an initial value, a final value,
+and a step, which must be constant expressions,
+separated by colons.
+<p>Examples:
+</p>
+<pre>DELTAP=0.001                    ! a single value<br>DELTAP=0.001,0.005              ! two values<br>DELTAP=0.001:0.007:0.002        ! four values<br></pre>
+If DELTAP is missing, MAD-X uses the value 0.0.
+<p>Further attributes of the TWISS statements are:
+</p>
+<ul>
+  <li>CHROM:
+A logical flag.
+If set, MAD-X also computes the
+    <a href="../Introduction/tables.html#chrom">chromatic
+    functions</a>.
+<p><font color="#ff0000"><i>Please note that this option is needed
+for a proper calculation of the chromaticities in the
+presence of coupling!</i></font></p>
+  </li>
+  <li>FILE:
+If FILE="file_name" appears MAD-X writes a full TFS Twiss table <a
+ href="../Introduction/select.html#tfs">Example TFS Twiss table</a> on
+the disk file "file_name". FILE alone is equivalent to
+FILE="twiss": </li>
+  <li>TABLE (overrides SAVE):
+MAD-X creates a full <a href="../Introduction/tables.html#linear">Twiss
+table</a> in memory and gives it the name TWISS, unless
+TABLE="table_name" appears on the command, then it is called <a
+ href="../Introduction/label.html">table_name</a>.
+This table includes linear lattice functions as well as the chromatic
+functions for all positions. An important new feature of MAD-X is the
+possibility to access entries of tables and in particular the twiss
+table (see <a href="../Introduction/expression.html#table">table access</a>).
+  <li>CENTRE:
+This flag enforces the calculation of the <a
+ href="../Introduction/tables.html#linear">linear lattice functions</a>
+at the center of the element instead of the end of it. <font
+color="#ff0000"><i> Mind you that since this is inside the element the
+closed orbit includes the misalignment of the element.</i></font>
+  </li>
+  <li>RMATRIX:
+If this flag is used the the one-turn map at the location of every
+element is calculated and prepared for storage in the TWISS
+table. Using the <a href="../Introduction/select.html">SELECT</a>
+command and using the column RE, RE11...RE16...RE61...RE66 these
+components will be added to the TWISS table, i.e. with "column, RE"
+and "column, REij" one gets all or the component "ij" respectively.
+  </li>
+  <li>SECTORMAP:
+This flag initiates the calculation of a sector map as described at: <a
+ href="../Introduction/sectormap.html">SECTORMAP</a>.
+  </li>
+  <li>SECTORFILE:
+Used to write SECTORMAPs to the file SECTORFILE="file_name", if
+missing the output of SECTORMAP will go to the file "sectormap" with
+the format as found in <a href="../Introduction/sectormap.html">SECTORMAP</a>.
+  </li>
+  <li>KEEPORBIT:
+The keeporbit attribute (with an optional name, keeporbit="name")
+stores the orbit under this name at the start, and at all monitors.
+  </li>
+  <li>USEORBIT:
+The useorbit attribute (with an optional name, useorbit="name") uses
+the start value provided for the closed orbit search; the values at
+the monitors are used by the threader.
+  </li>
+  <li><font color="#ff0000"><i> COUPLE (obsolete)</i></font> :
+This MAD8 option can no longer be set since TWISS in MAD-X is always
+calculated in coupled mode. MAD-X computes the coupled functions in the
+sense of <a href="../Introduction/bibliography.html#edwards">[Edwards
+and
+Teng]</a>. For the uncoupled cases they reduce to the C and S
+functions.
+  </li>
+  <li><font color="#ff0000"><i> Twiss calculation is 4D only!</i></font>
+:
+The Twiss command will calculate an approximate 6D closed orbit when
+the accelerator structure includes an active <a
+ href="../Introduction/cavity.html">cavity</a>. However, the calcuation
+of the Twiss parameters are 4D only. This may result in apparently
+non-closure of the beta values in the plane with non-zero
+dispersion. The full 6D Twiss parameters can be calculated with the <a
+ href="../ptc_twiss/ptc_twiss.html">ptc_twiss</a> command.
+  </li>
+  <li>RIPKEN:
+This flags will calculate the Ripken-Mais TWISS parameters (beta11,
+beta12, beta21, beta22, alfa11, alfa12, alfa21, alfa22, gama11,
+gamma12, gamm21 and gamm22) using betx, bety, alfx, alfy, gamax,
+gamay, R11, r12, R21 and R22 as input.
+</ul>
+The tables are suitable for <a href="../plot/plot.html">plot</a>.  </li>
+After a successful TWISS run MAD-X creates an implicit <a
+ href="../Introduction/tables.html#summ">table of summary parameters</a>
+named "summ" which includes tunes, chromaticities etc <font color="#ff0000"><i>(Please
+note that the <a href="../Introduction/tables.html#chrom">chrom</a> option
+is needed 
+for a proper calculation of the chromaticities in the
+presence of coupling!)</i></font> versus the selected values of
+DELTAP. Notice that in MAD-X DELTAP is converted in PT, which is used
+as longitudinal variable.
+Dispersive and chromatic functions are hence derivatives with respects
+to PT( see <a href="../Introduction/tables.html#summ">table</a>).
+These summary parameters can later be accessed via the <a
+ href="../Introduction/expression.html#table">table access</a>
+function using the aforementionned implicit table named "summ".
+There is no way to change the name of this summary table.
+<h2><a name="periodic">Twiss Parameters for a Period</a></h2>
+The simplest form of the TWISS command is
+<pre>TWISS, DELTAP=real{,value},CHROM,<br>       TABLE=table_name;<br></pre>
+It computes the periodic solution for the specified beam
+line for all values of DELTAP entered
+(or for DELTAP = 0, if none is entered).
+<p>Example:
+</p>
+<pre>USE,period=OCT;<br>TWISS,DELTAP=0.001,CHROM;<br></pre>
+This example computes the periodic solution for the linear lattice
+and chromatic functions for the beam line OCT.
+The DELTAP value used is 0.001.
+Apart from saving computing time,
+it is equivalent to the command sequence
+<pre>RING: LINE=(4*(OCT,-OCT));<br>      USE,period=RING;<br>      TWISS,DELTAP=0.001,CHROM;<br></pre>
+<h2><a name="line">Initial Values from a Periodic Line</a></h2>
+It is possible to track the lattice functions
+starting with the periodic solution for another beam line.
+If this is desired the TWISS command takes the form
+<pre>TWISS, DELTAP=real{,value},LINE=beam-line,<br>       MUX=real,MUY=real,<br>       TABLE=table_name;<br></pre>
+No other attributes should appear in the command.
+For each value of DELTAP MAD-X first searches for the periodic
+solution for the beam line mentioned in LINE=beam-line:
+The result is used as an initial condition for the lattice function
+tracking.
+<p>Example:
+</p>
+<pre>CELL:   LINE=(...);<br>INSERT: LINE=(...);<br>        USE,period=INSERT;<br>        TWISS,LINE=CELL,DELTAP=0.0:0.003:0.001,CHROM,FILE;<br></pre>
+For four values of DELTAP the following happens:
+First MAD-X finds the periodic solution for the beam line CELL:
+Then it uses this solution as initial conditions for tracking
+the lattice functions of the beam line CELL:
+Output is also written on the file TWISS:
+<p>If any of the beam lines was defined with formal arguments,
+actual arguments must be provided:
+</p>
+<pre>CELL(SF,SD): LINE=(...);<br>INSERT(X):   LINE=(...);<br>             USE,period=INSERT;<br>             TWISS,LINE=CELL(SF1,SD1);<br></pre>
+<h2><a name="initial">Given Initial Values</a></h2>
+Initial values for <a href="../Introduction/tables.html#linear">linear
+lattice functions</a> and <a href="../Introduction/tables.html#chrom">chromatic
+functions</a>
+may also be numerical. Initial values can be specified on the TWISS
+command:
+<p></p>
+<pre>TWISS,   BETX=real,ALFX=real,MUX=real,<br>         BETY=real,ALFY=real,MUY=real,<br>         DX=real,DPX=real,DY=real,DPY=real,<br>         X=real,PX=real,Y=real,PY=real,<br>         T=real,PT=real,<br>         WX=real,PHIX=real,DMUX=real,<br>         WY=real,PHIY=real,DMUY=real,<br>         DDX=real,DDY=real,DDPX=real,DDPY=real,<br>         R11=real,R12=real,R21=real,R22=real,  !coupling matrix<br>         TABLE=table_name,<br>         TOLERANCE=real,<br>         DELTAP=real:real:real;<br></pre>
+All initial values for
+<a href="../Introduction/tables.html#linear">linear lattice functions</a>
+and <a href="../Introduction/tables.html#chrom">chromatic functions</a>
+are permitted, but BETX and BETY are required. Moreover, a <a
+ name="beta0">beta0</a> block can be added as filled by the <a
+ href="../control/general.html#savebeta">savebeta</a> command or see
+below. The lattice parameters are taken from this block, but will be
+overwritten by explicitly stated lattice parameters.
+As entered, the initial conditions cannot depend on DELTAP,
+and can thus be correct only for one such value.
+<h2><a name="tolerance">Tolerance</a></h2>
+This value defines the maximum closed orbit error of all six orbit
+components
+during the closed orbit search. The default value is 1.e-6. The value
+is
+only valid for the current twiss command; a permanent value can be
+entered
+via the <a href="../control/general.html#coguess">COGUESS</a> command.
+<h2><a name="savebeta">SAVEBETA: Save Lattice Parameters</a></h2>
+Initial lattice parameters can be transfered for later commands, in
+particular for twiss or the <a href="../match/match.html">match module</a>,
+by using
+the <a href="../control/general.html#savebeta">savebeta</a> command
+sequence.
+<p><font color="#00ff00"><i> It should be mentioned that parameters can
+be also accessed
+from tables using the <a href="../Introduction/expression.html#table">table
+access</a> function.</i></font>
+</p>
+<p></p>
+<pre>USE,period=...;<br>SAVEBETA,LABEL=name,PLACE=place,SEQUENCE=s_name;<br>TWISS,...;<br></pre>
+When reaching the <a href="../control/general.html#place">place</a>
+in the sequence "s_name" during execution of TWISS,
+MAD-X will save a <a href="#beta0">beta0</a> block with the <a
+ href="../Introduction/label.html">label</a> name:
+This block is filled with the values of all lattice parameters
+in place.
+Example 1:
+<pre>USE,period=CELL;<br>SAVEBETA,LABEL=END,PLACE=#E,SEQUENCE=CELL;<br>TWISS;<br>USE,period=INSERT;<br>TWISS,BETA0=END;<br></pre>
+This first example calculates the <a href="#periodic">periodic solution</a>
+of the line CELL,
+and then track lattice parameters through INSERT, using all end
+conditions (including orbit) in CELL to start.
+<p>Example 2:
+</p>
+<pre>USE,period=CELL;<br>SAVEBETA,LABEL=END,PLACE=#E,SEQUENCE=CELL;<br>TWISS;<br>USE,period=INSERT;<br>TWISS,BETX=END-&gt;BETY,BETY=END-&gt;BETX;<br></pre>
+<pre>This is similar to the first example,<br>but the beta functions are interchanged (overwritten).<br></pre>
+<hr>
+<address><a href="http://cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
+06-Apr-2003. Revised in February 2007.
+</address>
+</body>
+</html>

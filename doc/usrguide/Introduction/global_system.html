@@ -1,0 +1,111 @@
+<head>
+<title>Global Reference System</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Global Reference System</h2>
+</center>
+
+The <a href="#global">global reference orbit</a> of the accelerator
+is uniquely defined by the sequence of physical elements.
+The local reference system (<i>x</i>, <i>y</i>, <i>s</i>)
+may thus be referred to a global Cartesian coordinate system
+(<i>X</i>, <i>Y</i>, <i>Z</i>) (see <a href="#global">Figure 1</a>).
+The positions between beam elements are numbered 0,...,i,...n.
+The local reference system 
+(<i>x<sub>i</sub>, y<sub>i</sub>, s<sub>i</sub></i>)
+at position <i>i</i>,
+i.e. the displacement and direction of the reference orbit
+with respect to the system (<i>X</i>, <i>Y</i>, <i>Z</i>)
+are defined by three displacements 
+(<i>X<sub>i</sub></i>, <i>Y<sub>i</sub></i>, <i>Z<sub>i</sub></i>)
+and three angles
+(<i>Theta<sub>i</sub></i>, <i>Phi<sub>i</sub></i>, <i>Psi<sub>i</sub></i>)
+The above quantities are defined more precisely as follows:
+<ul>
+<li>X:
+Displacement of the local origin in <i>X</i>-direction.
+<li>Y:
+Displacement of the local origin in <i>Y</i>-direction.
+<li>Z:
+Displacement of the local origin in <i>Z</i>-direction.
+<li><a name=theta>THETA</a>:
+Angle of rotation (azimuth) about the global <i>Y</i>-axis,
+between the global <i>Z</i>-axis and the projection
+of the reference orbit onto the (<i>Z</i>, <i>X</i>)-plane.
+A positive angle THETA forms a right-hand screw with the <i>Y</i>-axis.
+<li><a name=phi>PHI</a>:
+Elevation angle, i.e. the angle between the reference orbit and its projection
+onto the (<i>Z</i>, <i>X</i>)-plane.
+A positive angle PHI correspond to increasing <i>Y</i>.
+If only horizontal bends are present,
+the reference orbit remains in the (<i>Z</i>, <i>X</i>)-plane.
+In this case PHI is always zero.
+<li><a name=psi>PSI</a>:
+Roll angle about the local <i>s</i>-axis,
+i.e. the angle between the intersection (<i>x</i>, <i>y</i>)- and
+(<i>Z</i>, <i>X</i>)-planes and the local <i>x</i>-axis.
+A positive angle PSI forms a right-hand screw with the <i>s</i>-axis.
+</ul>
+The angles (THETA, PHI, PSI) are <b>not</b> the Euler angles.
+The reference orbit starts at the origin and points by default
+in the direction of the positive <i>Z</i>-axis.
+The initial local axes (<i>x</i>, <i>y</i>, <i>s</i>) 
+coincide with the global axes (<i>X</i>, <i>Y</i>, <i>Z</i>) in this order.
+The six quantities (X<sub>0</sub>, Y<sub>0</sub>, Z<sub>0</sub>,
+THETA<sub>0</sub>, PHI<sub>0</sub>, PSI<sub>0</sub>)
+thus all have zero initial values by default.
+The program user may however specify different initial conditions.
+<p>
+Internally the displacement is described by a vector <i>V</i>
+and the orientation by a unitary matrix <i>W</i>.
+The column vectors of <i>W</i> are the unit vectors spanning 
+the local coordinate axes in the order (<i>x, y, s</i>).
+<i>V</i> and <i>W</i> have the values:
+<p>
+<img align=bottom src="../equations/VW.gif">
+<p>
+where
+<p>
+<img align=bottom src="../equations/PhiThetaPsi.gif">
+<p>
+The reference orbit should be closed and it should not be twisted.
+This means that the displacement of the local reference system
+must be periodic with the revolution frequency of the accelerator,
+while the position angles must be periodic modulo(2 pi)
+with the revolution frequency.
+If PSI is not periodic module(2 pi), coupling effects are introduced.
+When advancing through a beam element,
+MAD computes <i>V<sub>i</sub></i> and <i>W<sub>i</sub></i>
+by the recurrence relations
+<p>
+<i>V<sub>i</sub> = W<sub>i-1</sub>R<sub>i</sub> + V<sub>i-1</sub></i>,
+<i>W<sub>i</sub> = w<sub>i-1</sub>S<sub>i</sub></i>.
+<p>
+The vector <i>R<sub>i</sub></i> is the displacement and the matrix
+<i>S<sub>i</sub></i> is the rotation of the local reference system 
+at the exit of the element <i>i</i> with respect to the entrance 
+of the same element.
+The values of <i>R<sub>i</sub></i> and <i>S<sub>i</sub></i>
+are listed in the: 
+
+<a href="local_system.html#straight">straight reference system</a>
+for each physical element type.
+<center>
+<a name=global><img align=bottom src="../figures/global.gif"></a>
+<p>
+<b>Figure 1:</b> Global Reference System
+</center>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

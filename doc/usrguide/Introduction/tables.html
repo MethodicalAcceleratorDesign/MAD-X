@@ -1,0 +1,501 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Variables in MAD</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 --><!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+<body bgcolor="#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+<h2>Variables</h2>
+</center>
+<h5>
+For each variable the physical units are listed in square brackets.
+</h5>
+<h3><a name="canon">Canonical Variables Describing Orbits</a></h3>
+MAD uses the following canonical variables
+to describe the motion of particles:
+<ul>
+  <li>X:
+Horizontal position <i>x</i> of the (closed) orbit,
+referred to the ideal orbit [m].
+  </li>
+  <li>PX:
+Horizontal canonical momentum <i>p<sub>x</sub></i>
+of the (closed) orbit referred to the ideal orbit,
+divided by the reference momentum:
+PX = <i>p<sub>x</sub> / p<sub>0</sub></i>, [1].
+  </li>
+  <li>Y:
+Vertical position <i>y</i> of the (closed) orbit,
+referred to the ideal orbit [m].
+  </li>
+  <li>PY:
+Vertical canonical momentum <i>p<sub>y</sub></i>
+of the (closed) orbit referred to the ideal orbit,
+divided by the reference momentum:
+PY = <i>p<sub>x</sub> / p<sub>0</sub></i>, [1].
+  </li>
+  <li>T:
+Velocity of light times the negative time difference
+with respect to the reference particle:
+T = <i> - c t</i>, [m].
+A positive T means that the particle arrives ahead
+of the reference particle.
+  </li>
+  <li>PT:
+Energy error, divided by the reference momentum times the velocity
+of light:
+PT = delta(<i>E</i>) / <i>p<sub>s</sub> c</i>, [1].
+This value is only non-zero when synchrotron motion is present.
+It describes the deviation of the particle from the orbit of a
+particle with the momentum error DELTAP.
+  </li>
+  <li>DELTAP:
+Difference of the reference momentum and the design momentum,
+divided by the reference momentum:
+DELTAP = delta(<i>p</i>) / <i>p<sub>0</sub></i>, [1].
+This quantity is used to <a href="defects.html">normalize</a>
+all element strengths.
+  </li>
+</ul>
+The independent variable is:
+<ul>
+  <li><a name="s">S</a>:
+Arc length <i>s</i> along the reference orbit, [m].
+  </li>
+</ul>
+In the limit of fully relativistic particles
+(gamma &gt;&gt; 1, <i>v = c</i>, <i>p c = E</i>),
+the variables T, PT used here agree with the longitudinal variables
+used in <a href="bibliography.html#transport">[TRANSPORT]</a>.
+This means that T becomes the negative path length difference,
+while PT becomes the fractional momentum error.
+The reference momentum <i>p<sub>s</sub></i>
+must be constant in order to keep the system canonical.
+<h3><a name="normal">Normalised Variables and other Derived Quantities</a></h3>
+<ul>
+  <li>XN:
+The normalised horizontal displacement
+    <p>XN = <i>x<sub>n</sub></i> = Re(<i>E<sub>1</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>PXN:
+The normalised horizontal transverse momentum
+    <p>PXN = <i>x<sub>n</sub></i> = Im(<i>E<sub>1</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>WX:
+The horizontal Courant-Snyder invariant
+    <p>WX = sqrt(<i>x<sub>n</sub><sup>2</sup> + p<sub>xn</sub><sup>2</sup></i>),
+[m].
+    </p>
+    <p></p>
+  </li>
+  <li>PHIX:
+The horizontal phase
+    <p>PHIX = - atan(<i>p<sub>xn</sub> / x<sub>n</sub></i>) / 2 pi [1].
+    </p>
+    <p></p>
+  </li>
+  <li>YN:
+The normalised vertical displacement
+    <p>YN = <i>x<sub>n</sub></i> = Re(<i>E<sub>2</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>PYN:
+The normalised vertical transverse momentum
+    <p>PYN = <i>x<sub>n</sub></i> = Im(<i>E<sub>2</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>WY:
+The vertical Courant-Snyder invariant
+    <p>WY = sqrt(<i>y<sub>n</sub><sup>2</sup> + p<sub>yn</sub><sup>2</sup></i>),
+[m].
+    </p>
+    <p></p>
+  </li>
+  <li>PHIY:
+The vertical phase
+    <p>PHIY = - atan(<i>p<sub>yn</sub> / y<sub>n</sub></i>) / 2 pi [1].
+    </p>
+    <p></p>
+  </li>
+  <li>TN:
+The normalised longitudinal displacement
+    <p>TN = <i>x<sub>n</sub></i> = Re(<i>E<sub>3</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>PTN:
+The normalised longitudinal transverse momentum
+    <p>PTN = <i>x<sub>n</sub></i> = Im(<i>E<sub>3</sub><sup>T</sup> S Z</i>),
+[sqrt(m)].
+    </p>
+    <p></p>
+  </li>
+  <li>WT:
+The longitudinal invariant
+    <p>WT = sqrt(<i>t<sub>n</sub><sup>2</sup> + p<sub>tn</sub><sup>2</sup></i>),
+[m].
+    </p>
+    <p></p>
+  </li>
+  <li>PHIT:
+The longitudinal phase
+    <p>PHIT = + atan(<i>p<sub>tn</sub> / t<sub>n</sub></i>) / 2 pi [1].
+    </p>
+    <p></p>
+  </li>
+</ul>
+in the above formulas <i>Z</i> is the phase space vector
+<p><i>Z = ( x, p<sub>x</sub>, y, p<sub>y</sub>, t, p<sub>t</sub>)<sup>T</sup></i>.
+</p>
+<p>the matrix <i>S</i> is the ``symplectic unit matrix''
+</p>
+<p><img src="../equations/S_matrix.gif" align="bottom">
+</p>
+<p>and the vectors <i>E<sub>i</sub></i> are the three complex
+eigenvectors.
+</p>
+<h3><a name="linear">Linear Lattice Functions (Optical Functions)</a></h3>
+Several MAD commands refer to linear lattice functions.
+Since MAD uses the canonical momenta (<i>p<sub>x</sub></i>, <i>p<sub>y</sub></i>)
+instead of the slopes
+(<i>x</i>', <i>y</i>'),
+their definitions differ slightly from those
+in <a href="bibliography.html#courant">[Courant and Snyder]</a>.
+Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
+Dispersive and chromatic functions are hence derivatives with respects
+to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions must be multiplied by BETA a number of time
+equal to the order of the derivative. The linear lattice functions are
+known to MAD under the following names:
+<ul>
+  <li>BETX:
+Amplitude function beta<sub><i>x</i></sub>, [m].
+  </li>
+  <li>ALFX:
+Correlation function alpha<sub><i>x</i></sub>, [1]:
+    <p>ALFX = alpha<sub><i>x</i></sub> = - 1/2 * (del beta<sub><i>x</i></sub>
+/ del <i>s</i>).
+    </p>
+    <p></p>
+  </li>
+  <li>MUX:
+Phase function mu<sub><i>x</i></sub>, [2pi]:
+    <p>MUX = mu<sub><i>x</i></sub> = integral (d<i>s</i> / beta<sub><i>x</i></sub>).
+    </p>
+    <p></p>
+  </li>
+  <li>DX:
+Dispersion <i>D<sub>x</sub></i> of <i>x</i>, [m]:
+    <p>DX = <i>D<sub>x</sub></i> = (del <i>x</i> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>DPX:
+Dispersion <i>D<sub>px</sub></i> of <i>p<sub>x</sub></i>, [1]:
+    <p>DPX = <i>D<sub>px</sub></i> = (del <i>p<sub>x</sub></i> / del
+PT) / <i>p<sub>s</sub></i>.
+    </p>
+    <p></p>
+  </li>
+  <li>BETY:
+Amplitude function beta<sub><i>y</i></sub>, [m].
+  </li>
+  <li>ALFY:
+Correlation function alpha<sub><i>y</i></sub>, [1].
+    <p>ALFY = alpha<sub><i>y</i></sub> = - 1/2 * (del beta<sub><i>y</i></sub>
+/ del <i>s</i>).
+    </p>
+    <p></p>
+  </li>
+  <li>MUY:
+Phase function mu<sub><i>y</i></sub>, [2pi].
+    <p>MUY = mu<sub><i>y</i></sub> = integral (d<i>s</i> / beta<sub><i>y</i></sub>).
+    </p>
+    <p></p>
+  </li>
+  <li>DY:
+Dispersion <i>D<sub>y</sub></i> of <i>y</i>, [m]:
+    <p>DY = <i>D<sub>y</sub></i> = (del <i>y</i> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>DPY:
+Dispersion <i>D<sub>px</sub></i> of <i>p<sub>x</sub></i>, [1]:
+    <p>DPY = <i>D<sub>py</sub></i> = (del <i>p<sub>y</sub></i> / del
+PT) / <i>p<sub>s</sub></i>.
+    </p>
+    <p></p>
+  </li>
+  <li>R11, R12, R21, R22:
+Coupling Matrix
+    <p></p>
+  </li>
+  <li>ENERGY: The total energy per particle in GeV. If given, it must
+be
+greater then the particle mass.
+    <p></p>
+  </li>
+</ul>
+<!-- The TWISS table also defines the following expressions which -->
+<!-- can be used in plots:--><!--ul-->
+<!--li--><!-- GAMX = (1 + ALFX*ALFX) / BETX, --><!--li--><!-- GAMY = (1 + ALFY*ALFY) / BETY, -->
+<!--li--><!-- SIGX = SQRT(BETX * EX), the vertical r.m.s. half-width of the beam, -->
+<!--li--><!-- SIGY = SQRT(BETY * EY), the vertical r.m.s. half-height of the beam. --><!--/ul-->
+<h3><a name="chrom">Chromatic Functions</a></h3>
+Several MAD commands refer to the chromatic functions.
+(<i>p<sub>x</sub></i>, <i>p<sub>y</sub></i>) instead of the slopes
+(<i>x</i>', <i>y</i>'),
+their definitions differ slightly from those
+in <a href="bibliography.html#montague">[Montague]</a>.
+Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
+Dispersive and chromatic functions are hence derivatives with respects
+to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions must be multiplied by BETA a number of time
+equal to the order of the derivative. The chromatic functions are known
+to MAD under the following names:
+<p><font color="#ff0000"><i>Please note that this option is needed
+for a proper calculation of the chromaticities in the
+presence of coupling!</i></font></p>
+<ul>
+  <li>WX:
+Chromatic amplitude function <i>W<sub>x</sub></i>, [1]:
+    <p>WX = <i>W<sub>x</sub></i> = sqrt(<i>a<sub>x</sub><sup>2</sup> +
+b<sub>x</sub><sup>2</sup></i>),
+    </p>
+    <p><i>a<sub>x</sub></i> = (del beta<sub><i>x</i></sub> / del PT) /
+beta<sub><i>x</i></sub>,
+    </p>
+    <p><i>b<sub>x</sub></i> =
+(del alpha<sub><i>x</i></sub> / del PT) - (alpha<sub><i>x</i></sub> /
+beta<sub><i>x</i></sub>) *
+(del beta<sub><i>x</i></sub> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>PHIX:
+Chromatic phase function Phi<sub><i>x</i></sub>, [2pi]:
+    <p>PHIX = Phi<sub><i>x</i></sub> = atan(<i>a<sub>x</sub> / b<sub>x</sub></i>).
+    </p>
+    <p></p>
+  </li>
+  <li>DMUX:
+Chromatic derivative of phase function mu<sub><i>x</i></sub>, [2pi]:
+    <p>DMUX = (del mu<sub><i>x</i></sub> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>DDX:
+Chromatic derivative of dispersion <i>D<sub>x</sub></i>, [m]:
+    <p>DDX = 1/2 * (del<sup>2</sup><i>x</i> / del PT<sup>2</sup>).
+    </p>
+    <p></p>
+  </li>
+  <li>DDPX:
+Chromatic derivative of dispersion <i>D<sub>px</sub></i>, [1]:
+    <p>DDPX = 1/2 * (del<sup>2</sup><i>p<sub>x</sub></i> / del PT<sup>2</sup>)
+/ <i>p<sub>s</sub></i>.
+    </p>
+    <p></p>
+  </li>
+  <li>WY:
+Chromatic amplitude function <i>W<sub>y</sub></i>, [1]:
+    <p>WY = <i>W<sub>y</sub></i> = sqrt(<i>a<sub>y</sub><sup>2</sup> +
+b<sub>y</sub><sup>2</sup></i>),
+    </p>
+    <p><i>a<sub>y</sub></i> = (del beta<sub><i>y</i></sub> / del PT) /
+beta<sub><i>y</i></sub>,
+    </p>
+    <p><i>b<sub>y</sub></i> =
+(del alpha<sub><i>y</i></sub> / del PT) - (alpha<sub><i>y</i></sub> /
+beta<sub><i>y</i></sub>) *
+(del beta<sub><i>y</i></sub> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>PHIY:
+Chromatic phase function Phi<sub><i>y</i></sub>, [2pi]:
+    <p>PHIY = Phi<sub><i>y</i></sub> = atan(<i>a<sub>y</sub> / b<sub>y</sub></i>).
+    </p>
+    <p></p>
+  </li>
+  <li>DMUY:
+Chromatic derivative of phase function mu<sub><i>y</i></sub>, [2pi]:
+    <p>DMUY = (del mu<sub><i>y</i></sub> / del PT).
+    </p>
+    <p></p>
+  </li>
+  <li>DDY:
+Chromatic derivative of dispersion <i>D<sub>y</sub></i>, [m]:
+    <p>DDY = 1/2 * (del<sup>2</sup><i>y</i> / del PT<sup>2</sup>).
+    </p>
+    <p></p>
+  </li>
+  <li>DDPY:
+Chromatic derivative of dispersion <i>D<sub>py</sub></i>, [1]:
+    <p>DDPY = 1/2 * (del<sup>2</sup><i>p<sub>y</sub></i> / del PT<sup>2</sup>)
+/ <i>p<sub>s</sub></i>.
+    </p>
+    <p></p>
+  </li>
+</ul>
+<h3><a name="summ">Variables in the SUMM Table</a></h3>
+After a successful TWISS command a summary table
+is created which contains the following variables:
+<ul>
+  <li>LENGTH:
+The length of the machine, [m].
+    <p></p>
+  </li>
+  <li>ORBIT5:
+The T (= <i>c t</i>, [m]) component of the closed orbit.
+    <p></p>
+  </li>
+  <li>ALFA:
+The momentum compaction alpha<sub>p</sub>, [1].
+    <p></p>
+  </li>
+  <li>GAMMATR:
+The transition energy gamma<sub>transition</sub>, [1].
+    <p></p>
+  </li>
+  <li>Q1:
+The horizontal tune <i>Q<sub>1</sub></i> [1].
+    <p></p>
+  </li>
+  <li>DQ1:
+The horizontal chromaticity dq<sub><i>1</i></sub>, [1]:
+    <p>DQ1 = dq<sub><i>1</i></sub> = (del <i>Q<sub>1</sub></i> / del
+PT).
+    </p>
+    <p></p>
+  </li>
+  <li>BETXMAX:
+The largest horizontal beta<sub><i>x</i></sub>, [m].
+    <p></p>
+  </li>
+  <li>DXMAX:
+The largest horizontal dispersion [m].
+    <p></p>
+  </li>
+  <li>DXRMS:
+The r.m.s. of the horizontal dispersion [m].
+    <p></p>
+  </li>
+  <li>XCOMAX:
+The maximum of the horizontal closed orbit deviation [m].
+    <p></p>
+  </li>
+  <li>XRMS:
+The r.m.s. of the horizontal closed orbit deviation [m].
+    <p></p>
+  </li>
+  <li>Q2:
+The vertical tune <i>Q<sub>2</sub></i> [1].
+    <p></p>
+  </li>
+  <li>DQ2:
+The vertical chromaticity dq<sub><i>2</i></sub>, [1]:
+    <p>DQ2 = dq<sub><i>2</i></sub> = (del <i>Q<sub>2</sub></i> / del
+PT).
+    </p>
+    <p></p>
+  </li>
+  <li>BETYMAX:
+The largest vertical beta<sub><i>y</i></sub>, [m].
+    <p></p>
+  </li>
+  <li>DYMAX:
+The largest vertical dispersion [m].
+    <p></p>
+  </li>
+  <li>DYRMS:
+The r.m.s. of the vertical dispersion [m].
+    <p></p>
+  </li>
+  <li>YCOMAX:
+The maximum of the vertical closed orbit deviation [m].
+    <p></p>
+  </li>
+  <li>YCORMS:
+The r.m.s. of the vertical closed orbit deviation [m].
+    <p></p>
+  </li>
+  <li>DELTAP:
+Energy difference,
+divided by the reference momentum times the velocity of light, [1]:
+    <p>DELTAP = delta(<i>E</i>) / <i>p<sub>s</sub> c</i>.</p>
+  </li>
+</ul>
+Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
+Dispersive and chromatic functions are hence derivatives with respects
+to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions must be multiplied by BETA a number of time
+equal to the order of the derivative.
+<h3><a name="track">Variables in the TRACK Table</a></h3>
+The command RUN writes tables with the following variables:
+<ul>
+  <li>X:
+Horizontal position <i>x</i> of the orbit,
+referred to the ideal orbit [m].
+  </li>
+  <li>PX:
+Horizontal canonical momentum <i>p<sub>x</sub></i>
+of the orbit referred to the ideal orbit, divided by the reference
+momentum.
+  </li>
+  <li>Y:
+Vertical position <i>y</i> of the orbit, referred to the ideal orbit
+[m].
+  </li>
+  <li>PY:
+Vertical canonical momentum <i>p<sub>x</sub></i>
+of the orbit referred to the ideal orbit, divided by the reference
+momentum.
+  </li>
+  <li>T:
+Velocity of light times the negative time difference
+with respect to the reference particle, [m].
+A positive T means that the particle arrives ahead of the reference
+particle.
+  </li>
+  <li>PT:
+Energy difference,
+divided by the reference momentum times the velocity of light, [1].
+  </li>
+</ul>
+When tracking Lyapunov companions (not yet implemented),
+the TRACK table defines the following dependent expressions:
+<ul>
+  <li>DISTANCE:
+the relative Lyapunov distance between the two particles.
+  </li>
+  <li>LYAPUNOV:
+the estimated Lyapunov Exponent.
+  </li>
+  <li>LOGDIST:
+the natural logarithm of the relative distance.
+  </li>
+  <li>LOGTURNS:
+the natural logarithm of the turn number.
+  </li>
+</ul>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997. Revised in February 2007.<br>
+</address>
+</body>
+</html>

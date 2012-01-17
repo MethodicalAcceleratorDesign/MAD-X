@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_EPLACEMENT</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_EPLACEMENT</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_EPLACEMENT, 
+range = [s, none],
+x        = [r, 0], y       = [r, 0], z       = [r, 0],
+phi      = [r, 0],
+theta   = [r, 0], 
+onlyposition    = [l, false, true] ,
+onlyorientation = [l, false, true] ,
+autoplacedownstream = [l, true, true] ,
+refframe = [s, gcs] ; 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Places a given element at required position and orientation. 
+All rotations are made around the front face of the element.
+</div>
+
+<h4> Example </h4>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx">  Dog leg chicane </a> :
+postion of quads is matched to obtain required R566 value.
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b> range </b></dt> 
+  <dd>
+  <i> string in range format, </i>
+  <p> Specifies name of the element to be moved.
+  </dd>
+<dt><b> x,y,z </b></dt> 
+  <dd>
+  <i> real,   </i>
+  <p>Coordinate of the front face of the magnet.
+  </dd>
+<dt><b> phi, theta </b></dt> 
+  <dd>
+  <i> real,   </i>
+  <p> polar (in xz plane, around z axis) and azimuthal (around x axis) angles, respectively.
+  </dd>
+
+
+<dt><b> refframe </b></dt> 
+  <dd>
+  <i> string, default gcs</i>
+  <p> Defines the coordinate system with respect to which coordinates and angles are specified.
+      Possible values are:
+      <dl>  
+      <dt>gcs </dt> <dd> global coordinate system </dd> 
+      <dt>current </dt> <dd>  current position</dd>
+      <dt>previouselement </dt> <dd> end face of the previous element </dd>
+      </dl>
+  </dd>
+
+<dt><b> onlyposition </b></dt> 
+  <dd>
+  <i> logical, default false, if value explicitly not specified then true</i>
+  <p> If true, only translation are performed and orientation of the element is not changed.
+  </dd>
+
+<dt><b> onlyorientation </b></dt> 
+  <dd>
+  <i> logical, default false, if value explicitly not specified then true</i>
+  <p> If true, only rotations are performed and position of the element is not changed.
+  </dd>
+
+  
+<dt><b> autoplacedownstream </b></dt> 
+  <dd>
+  <i> logical, default true,    </i>
+  <p> if true all the elements downstream are placed at default positions in respect to the 
+      moved element, if false the rest of the layout stays untouched.
+  </dd>
+
+
+<dt><b> surveyall </b></dt> 
+  <dd>
+  <i> logical, default true, if value explicitly not specified then true</i>
+  <p> If true, survey of all the line is performed after element placement at new position
+      and orientation. It is implemented mainly for the software debugging purposes. 
+      If patching was performed correctly, the global survey should not change anything.
+  </dd>
+
+</dl>
+
+<h4>_  </h4>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_ptc_eplacement function in madxn.c and 
+by subroutine ptc_eplacement() in madx_ptc_eplacement.f90.
+<p>
+Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+element in the PTC layout.
+<p>
+TRANSLATE_Fibre and ROTATE_Fibre routines of ptc are employed to place and orient an element in space.
+These commands adds rotation and translation from the current position. Hence, if the specified reference frame is
+other then "current", the element firstly needs to be placed at the center of the reference frame and then it is
+moved about the user specified coordinates. 
+<p>
+After element placement at new position and orientation patch needs to be recomputed. If autoplacedownstream
+is false then patch to the next element is also recomputed. Otherwise, the layout is surveyed from
+the next element on, what places all the elements downstream with default position with respect to the moved element.
+<p>
+At the end all the layout is surveyed, if surveyall flag is true, what normally should always take place. 
+
+
+
+</div>
+
+</body>
+
+</html>

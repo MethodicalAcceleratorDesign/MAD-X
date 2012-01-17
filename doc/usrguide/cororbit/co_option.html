@@ -1,0 +1,53 @@
+<head>
+<title>COPTION</title>
+<!-- Changed by: Werner Herr, 19-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>COPTION: Set Orbit Correction Options</h1>
+
+The random generator for MAD is taken from
+<a href="../Introduction/bibliography.html#knuth">[Knuth]</a>.
+<br>
+In the orbit program monitors can be randomly disabled and
+<br>
+the correct option command specifies different seeds for random values:
+<pre>
+COPTION,SEED=integer,PRINT=2      
+</pre>
+<ul>
+<li>SEED:
+Selects a particular sequence of random values.
+<br>
+A SEED value is an integer in the range [0...999999999] (default: 123456789).
+<br>
+SEED alone continues with the current sequence
+<br>
+See also: <a href="../Introduction/expression.html#random">Random values</a>.
+<br>
+SEED may be an expression.
+<li>PRINT:
+This flag can take integer values and
+controls the printout.
+<br>
+In general: the higher its value the more printout
+is produced. 
+<br>
+For PRINT=0 no output is produced.
+<br>
+The default value is 1 (Correction summary is given).
+</ul>
+<font COLOR="#ff0000">
+Example:
+<pre>
+COPTION,SEED=987456321,PRINT=2;
+</pre>
+</font>
+
+<address>
+<a href="http://consult.cern.ch/xwho/people/1808">Werner Herr</a>
+18.6.2002
+</address>
+
+</body>

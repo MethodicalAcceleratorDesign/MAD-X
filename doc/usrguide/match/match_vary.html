@@ -1,0 +1,67 @@
+<head>
+<title>the mad program</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Oliver Bruning, 19-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Define Variable Parameter</h2>
+</center>
+<p>
+
+<h2><a name=vary>VARY: Define Variable Parameter</a></h2>
+A parameter to be varied is specified by the command
+<PRE>
+VARY,NAME=variable,STEP=real,LOWER=real,UPPER=real;
+</PRE>
+It has four attributes:
+<ul>
+<li>NAME:
+The <a href="../Introduction/variable.html">name of the parameter or attribute</a>
+to be varied,
+<li>STEP:
+The approximate initial step size for varying the parameter.
+If the step is not entered, MAD tries to find a reasonable step,
+but this may not always work.
+<li>LOWER:
+Lower limit for the parameter (optional),
+<li>UPPER:
+Upper limit for the parameter (optional).
+<li>SLOPE: allowed change rate (optional, available only using <a href="match_xeq.html#jacobian">JACOBIAN</a> routine). Limit the parameter to increase (SLOPE=1) decrease (SLOPE=-1) only.
+<li>OPT:
+optimal value for the parameter (optional, available only using <a href="match_xeq.html#jacobian">JACOBIAN</a> routine).
+</ul>
+Examples:
+<PRE>
+VARY,NAME=PAR1,STEP=1.0E-4;                         ! vary global parameter PAR1 
+VARY,NAME=QL11->K1,STEP=1.0E-6;                     ! vary attribute K1 of the QL11 
+VARY,NAME=Q15->K1,STEP=0.0001,LOWER=0.0,UPPER=0.08; ! vary with limits
+</PRE>
+If the upper limit is smaller than the lower limit,
+the two limits are interchanged.
+If the current value is outside the range defined by the limits,
+it is brought back to range.
+If a parameter comes outside the limits during the matching process
+the matching module resets the parameter to a value inside the limits
+and informs the user with a message. If such a 'rescaling' occurs more than
+20 times the matching process terminates. The user should either eliminate
+the corresponding parameters from the list of varied parameters or
+change the corresponding upper and lower limits before restarting the
+matching process.
+After a matching operation all varied attributes retain their value
+after the last successful matching iteration.
+Using <a href="match_xeq.html#jacobian">JACOBIAN</a> routine, STRATEGY=3, in case the number of parameters is greater the the number of constraint, if a parameter comes outside the limits, it is excluded automatically from the set of variables and a new solution is searched.
+<P>
+
+
+<address>
+<a href="http://bruening.home.cern.ch/bruening/">Oliver Br&uuml;ning</a>,
+June, 2002.
+<a href="http://rdemaria.home.cern.ch/rdemaria/">Riccardo de Maria</a>, February, 2006.
+</address>
+
+</body>

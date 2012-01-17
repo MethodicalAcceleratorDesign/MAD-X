@@ -1,0 +1,40 @@
+<head>
+<title>Variable Declarations</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Variable Declarations</h2>
+</center>
+
+In the following, "=" means that the variable at the left receives
+the current value of the expression at right, but does not depend
+on it any further, whereas ":=" makes it depend on this expression,
+i.e. every time the expression changes, the variable is re-evaluated,
+except for "const" variables.
+<pre>
+var = expression;
+var := expression;
+real var = expression;        // identical
+real var := expression;       // to above
+int var = expression;         // truncated if expression is real
+int var := expression;
+const var = expression;
+const var := expression;
+const real var = expression;        // identical
+const real var := expression;       // to above
+const int var = expression;         // truncated if expression is real
+const int var := expression;
+</pre>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+May 8, 2001
+</address>
+
+</body>

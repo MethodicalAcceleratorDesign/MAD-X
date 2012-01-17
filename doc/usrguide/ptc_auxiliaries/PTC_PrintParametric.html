@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_KNOB</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_KNOB</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_KNOB, 
+elementname = [s, none] , 
+kn    = [i, {-1}], 
+ks    = [i, {-1}], 
+exactmatch = [l, true, true] ; 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Sets knobs in PTC calculations (currently ony in PTC_TWISS, PTC_NORMAL will follow).
+Knobs appear as the additional parameters of the phase space. Twiss functions are then obtained 
+as functions of these parameters (taylor series). Also map elements might 
+</div>
+
+<h4> Example </h4>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx">  Not yet ready </a> :
+postion of quads is matched to obtain required R566 value.
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b> elementname </b></dt> 
+  <dd>
+  <i> string in range format, </i>
+  <p> Specifies name of the element containing the knob(s) to be set.
+  </dd>
+<dt><b> kn,ks </b></dt> 
+  <dd>
+  <i> list of integers,   </i>
+  <p> Defines which order 
+  </dd>
+
+<dt><b> exactmatch </b></dt> 
+  <dd>
+  <i> logical, default true, if value explicitly not specified then true</i>
+  <p> Normally a knob is a property of a single element in a layout. 
+      The specified name must match 1:1 to an element name. This is the case
+      when exactmatch is true.
+  
+  <p> Knobs might be alos set to all family of elements. In such case 
+      the exactmatch switch must be false. Filed components of all the elements 
+      that name starts with the name specified by the user become a single knob.
+      
+  </dd>
+
+
+
+</dl>
+
+<h4>_  </h4>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_ptc_knob function in madxn.c and 
+by subroutine xxxx in madx_ptc_xxx.f90.
+<p>
+Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+element in the PTC layout.
+<p>
+
+-->
+
+</div>
+
+</body>
+
+</html>

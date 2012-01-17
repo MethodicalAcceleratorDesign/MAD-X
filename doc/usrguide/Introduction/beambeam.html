@@ -1,0 +1,152 @@
+<head>
+<title>BEAMBEAM</title>
+<!-- Changed by: Chris ISELIN, 23-Jan-1997 -->
+<!-- Changed by: Hans Grote,   25-Sep-2002 -->
+<!-- Changed by: Stefan Sorge, 2007 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h2>BEAMBEAM: Beam-beam Interaction</h2>
+
+The command BEAMBEAM may be inserted in a beam line
+to simulate a beam-beam interaction point:
+<pre>
+label: BEAMBEAM, SIGX=real,SIGY=real,
+                 XMA=real,YMA=real,CHARGE=real
+                 BBSHAPE=int,WIDTH=real,BBDIR=int;
+</pre>
+The beam-beam interaction is represented by a
+four-dimensional interaction with a thin element, i.e. horizontal
+and vertical non-linear kicks.
+The code for this element has been contributed by J.M. Veuillen 
+(1987) and extended by S. Sorge (2007).
+<ul>
+<LI>SIGX:
+The horizontal extent of the opposite beam (default: 1 m).
+Meaning depends on parameter BBSHAPE.
+<LI>SIGY:
+The vertical extent of the opposite beam (default: 1 m).
+Meaning depends on parameter BBSHAPE.
+<LI>XMA:
+The horizontal displacement of the opposite beam with respect to
+the ideal orbit (default: 0 m).
+<LI>YMA:
+The vertical displacement of the opposite beam with respect to
+the ideal orbit (default: 0 m).
+<LI>CHARGE:
+The charge of particles in the opposite beam in elementary charges. 
+It is set by default CHARGE=1. So, if you want to describe collisions 
+between beams containing the same particles having a charge different 
+from 1, you have to set CHARGE explicitly in BEAM and 
+in BEAMBEAM. 
+<LI>BBSHAPE: The parameter to choose the radial density shape of the 
+opposite beam (default: 1)
+<ul>
+<LI> BBSHAPE=1: Gaussian shape (default), SIGX/SIGY: standard deviation in 
+vertical/horizontal direction.
+<LI> BBSHAPE=2: <a href="beambeam_n_trapez.jpg">trapezoidal shape</a>, 
+SIGX/SIGY: half width of density profile, 
+i.e. distance from the centre to half edge region with linear decrease of 
+density in horizontal/vertical direction. Still only circular opposite beam 
+possible, i.e. in the calculations 
+SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have different values <br>
+<a href="beambeam_n_trapez.jpg"><img src="beambeam_n_trapez.jpg" width="35%" border="0" alt="BBSHAPE=2, trapezoidal shape" /></a>
+
+<LI> BBSHAPE=3: <a href="beambeam_n_hollowparabol.jpg">hollow-parabolic shape</a>, 
+SIGX/SIGY: distance from the centre 
+to the maximum of the parabolic density profile in vertical/horizontal 
+direction. Still only circular opposite beam possible, 
+i.e. in the calculations 
+SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have different values <br>
+<a href="beambeam_n_hollowparabol.jpg"><img src="beambeam_n_hollowparabol.jpg" width="35%" border="0"  alt="BBSHAPE=3, hollow-parabolic shape" /></a>
+
+</ul>
+The restriction to circular opposite beams in the cases BBSHAPE=2,3 
+appears to be sufficient, because such beam profiles are more important 
+for the description of the interaction between the particle beam and 
+an electron beam of an electron cooler, which are usually circular. 
+<LI> WIDTH: The relative extent of the edge region, absolute value is given by 
+WIDTH*SIGX and WIDTH*SIGY vertical and horizontal direction, respectively. 
+For 
+<ul>
+<LI> BBSHAPE=1, WIDTH is meaningless and will be ignored.
+<LI> BBSHAPE=2, WIDTH denotes the full width of the edge region in units of 
+SIGX (or SIGX' and SIGY', respectively, if SIGX and SIGY are not equal), i.e. 
+if WIDTH=0.01 and SIGX=5 mm, the edge 
+region has a full width of 0.05 mm. It must be WIDTH < 2.0.
+<LI> BBSHAPE=3, WIDTH denotes the full width at half maximum of the parabolic 
+density profile in units of SIGX (or SIGX' and SIGY', respectively, if SIGX 
+SIGY are not equal. It must be 
+WIDTH < SQRT(2.0).
+</ul>
+<LI> BBDIR: The parameter to choose the direction of motion of the 
+opposite beam relative to the beam considered. It determines 
+the sign of the Lorenz force between the both beams (default: -1): 
+<ul/>
+<LI> BBDIR=-1: Beams move in the opposite direction as in a collider. 
+Therefore, the Lorenz force enhances the beam-beam interaction. 
+<LI> BBDIR=0: Opposite beam does not move, Lorenz force is neglected 
+<LI> BBDIR=1: Beams move in the same direction as in an electron cooler. 
+So, the Lorenz force reduces the beam-beam interaction. 
+</ul>
+Note: 
+<ul/>
+<LI> The particles in the beam considered may have a momentum deviation 
+given by DELTAP defined in the TRACK command. 
+<LI> The opposite beam is assumed to have the velocity according to the 
+unperturbed energy o the particles in the beam considered. 
+So, only the direction of motion can be chosen. 
+<LI> In the case of motion in the opposite direction (BBDIR=-1), 
+the time of interaction between the beams is given by 
+tau = length/(2*beta*c_light), where length is the length of a bunch in the 
+opposite beam. In the case of motion in the same direction 
+(BBDIR=1) as in an electron cooler, this time 
+is given by tau = length/(beta*c_light), where length is the length of 
+the cooler. So, the factor 1/2 is inserted only for BBDIR=-1 to calculate 
+correct results. 
+</ul>
+</ul>
+<p>
+A beam-beam element requires the particle energy
+(<a href="beam.html#energy">ENERGY</a>)
+and the particle charge
+(<a href="beam.html#charge">CHARGE</a>)
+as well as the number of particles per bunch 
+(<a href="beam.html#npart">NPART</a>)
+to be set by a <a href="beam.html">BEAM</a> command
+before any calculations are performed.
+<p>
+Examples of a four-dimensional beam-beam element definition:
+<p>
+Collider regime example:
+<pre>
+beam,   particle=positron,npart=1.e12,energy=50.0;
+bb:     beambeam,sigx=1.e-3,sigy=5.e-4,charge=1.;
+</pre>
+<p>
+Electron cooler example:
+<pre>
+gamma0=1.032;                           ! relativistic factors
+beta0=sqrt(1.0-1.0/gamm0/gamma0);
+
+i_e=0.2;                                ! electron current
+re_cool=0.01;                           ! electron beam radius
+l_cool=5.0;                             ! cooling length
+nelect=i_e*l_cool/beta0/clight/qelect;  ! electron number in e-cooler
+
+beam,particle=antiproton,gamma=gamma0,npart=nelect; 
+bb_ecool:beambeam,sigx=re_cool,sigy=re_cool,bbshape=2,width=0.01,charge=-1,bbdir=1;
+</pre>
+<p>
+For the definition of the LHC head-on and parasitic beam-beam
+elements see 
+<a href="../control/foot.html#macro">beam-beam element examples</a>.
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, ssorge, 
+July 13, 2007
+</address>
+
+</body>
+</html>

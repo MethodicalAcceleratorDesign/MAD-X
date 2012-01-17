@@ -1,0 +1,419 @@
+<head>
+<title>Range Selection</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 16-Jan-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>General Control Statements</h2>
+</center>
+<p>
+<ul>
+<li><h4><a name=assign>ASSIGN</a></h4>
+<pre>
+assign, echo = file_name;
+</pre>
+where "file_name" </a> is the name of an output file, or "terminal".
+This allows switching the echo stream to a file or back, but only for
+the commands value, show, and print. Allows easy composition of future
+MAD-X input files. A real life example (always the same) is to be found
+under <a href="foot.html">footprint example</a>.
+<p>
+<li><h4><a name=call>CALL</a></h4>
+<pre>
+call, file = file_name;
+</pre>
+where "file_name" </a> is the name of an input file. This file will be
+read until a "return;" statement, or until end_of_file; it may contain any
+number of calls itself, and so on to any depth.
+<p>
+<li><h4><a name=coguess>COGUESS</a></h4>
+<pre>
+coguess,tolerance=double,x=double,
+       px=double,y=double,py=double,t=double,pt=double;
+</pre>
+sets the required convergence precision in the closed orbit search
+("tolerance", see as well Twiss command
+<a href="../twiss/twiss.html#tolerance">tolerance</a>.
+<p>
+The other parameters define a first guess for all future closed orbit
+searches in case they are different from zero.
+<p>
+<li><h4><a name=create>CREATE</a></h4>
+<pre>
+create,table=table,column=var1,var2,_name,...;
+</pre>
+creates a table with the specified variables as columns. This table
+can then be <a href="#fill">fill</a>ed, and finally one can
+<a href="#write">write</a> it in TFS format. The attribute "_name" adds
+the element name to the table at the specified column, this replaces
+the undocumented "withname" attribute that was not always working
+properly.
+<p>
+See the
+<a href="../Introduction/select.html#ucreate">user table I</a> example;
+<p>
+or an example of joining 2 tables of different length in one table
+including the element name:
+<a href="../Introduction/select.html#screate">user table II</a> 
+<p>
+<p>
+<li><h4><a name=delete>DELETE</a></h4>
+<pre>
+delete,sequence=s_name,table=t_name;
+</pre>
+deletes a sequence with name "s_name" or a table with name "t_name"
+from memory. The sequence deletion is done without influence on other
+sequences that may have elements that were in the deleted sequence.
+<p>
+<li><h4><a name=dumpsequ>DUMPSEQU</a></h4>
+<pre>
+dumpsequ, sequence = s_name, level = integer;
+</pre>
+Actually a debug statement, but it may come handy at certain occasions.
+Here "s_name" is the name of an expanded (i.e. USEd) sequence.
+The amount of detail is controlled by "level":
+<pre>
+level = 0:    print only the cumulative node length = sequence length
+      > 0:    print all node (element) names except drifts
+      > 2:    print all nodes with their attached parameters
+      > 3:    print all nodes, and their elements with all parameters
+</pre>
+<p>
+<li><h4><a name=exec>EXEC</a></h4>
+<pre>
+exec, label;
+</pre>
+Each statement may be preceded by a label; it is then stored and can
+be executed again with "exec, label;" any number of times; the executed
+statement may be another "exec", etc.; however, the major usage of
+this statement is the execution of a <a href="special.html#macro">macro</a>.
+<p>
+<li><h4><a name=exit>EXIT</a></h4>
+<pre>
+exit;
+</pre>
+ends the program execution.
+<p>
+<li><h4><a name=fill>FILL</a></h4>
+Every command
+<pre>
+fill,table=table;
+</pre>
+adds a new line with the current values of all column variables into the
+user table <a href="#create">create</a>d beforehand. This table
+one can then <a href="#write">write</a> in TFS format. 
+See as well the
+<a href="../Introduction/select.html#ucreate">user table</a> example.
+<p>
+<li><h4><a name=help>HELP</a></h4>
+<pre>
+help,statement_name;
+</pre>
+prints all parameters, and their defaults of the statement given;
+this includes basic element types.
+<p>
+<li><h4><a name=option>OPTION</a></h4>
+<pre>
+option, flag { = true | false };
+option, flag | -flag;
+</pre>
+sets an option as given in "flag"; the part in curly brackets is optional:
+if only the name of the option is given, then the option will be set true
+(see second line); a "-" sign preceding the name sets it to "false".
+<p>
+Example:
+<pre>
+option,echo=true;
+option,echo;
+</pre>
+are identical, ditto
+<pre>
+option,echo=false;
+option,-echo;
+</pre>
+The available options are:
+<pre>
+  name           default meaning if true
+  ====           ======= ===============
+  bborbit         false  the closed orbit is modified by beam-beam kicks
+  sympl           false  all element matrices are symplectified in Twiss
+  echo            true   echoes the input on the standard output file
+  trace           false  prints the system time after each command
+  verify          false  issues a warning if an undefined variable is used
+  warn            true   issues warnings
+  info            true   issues informations
+  tell            false  prints the current value of all options
+  reset           false  resets all options to their defaults
+  rbarc           true   converts the RBEND straight length into the arc length
+  thin_foc        true   if false suppresses the 1(rho**2) focusing of thin dipoles
+  no_fatal_stop   false  Prevents madx from stopping in case of a fatal error. Use at your own risk.
+</pre>
+The option "rbarc" is implemented for backwards compatibility with MAD-8
+up to version 8.23.06 included; in this version, the RBEND length was just
+taken as the arc length of an SBEND with inclined pole faces, 
+contrary to the MAD-8 manual.
+<p>
+<li><h4><a name=print>PRINT</a></h4>
+<pre>
+print,text="...";
+</pre>
+prints the text to the current output file (see ASSIGN above). The text
+can be edited with the help of a 
+<a href="special.html#macro">macro statement</a>.
+For more details, see there.
+<p>
+<li><h4><a name=quit>QUIT</a></h4>
+<pre>
+quit;
+</pre>
+ends the program execution.
+<p>
+<li><h4><a name=readtable>READTABLE</a></h4>
+<pre>
+readtable,file=filename;
+</pre>
+reads a TFS file containing a MAD-X table back into memory. This table
+can then be manipulated as any other table, i.e. its values can be accessed,
+it can be plotted, written out again etc.
+<p>
+<li><h4><a name="readmytable">READMYTABLE</a></h4>
+<pre>
+readmytable,file=filename,table=internalname;
+</pre>
+reads a TFS file containing a MAD-X table back into memory. This table
+can then be manipulated as any other table, i.e. its values can be accessed,
+it can be plotted, written out again etc.
+An internal name for the table can be freely assigned while for
+the command READTABLE it is taken from the information section
+of the table itself.
+This feature allows to store multiple tables of the same type
+in memory without overwriting existing ones.
+<p>
+<li><h4><a name=resbeam>RESBEAM</a></h4>
+<pre>
+resbeam,sequence=s_name;
+</pre>
+resets the default values of the beam belonging to sequence s_name, or
+of the default beam if no sequence is given.
+<p>
+<li><h4><a name=return>RETURN</a></h4>
+<pre>
+return;
+</pre>
+ends reading from a "called" file; if encountered in the standard input
+file, it ends the program execution.
+<p>
+<li><h4><a name=save>SAVE</a></h4>
+<pre>
+save,beam,sequence=sequ1,sequ2,...,file=filename,beam,bare;
+</pre>
+saves the sequence(s) specified with all variables and elements needed
+for their expansion, onto the file "filename". If quotes are used for
+the "filename" capital and low characters are kept as specified, if
+they are omitted the "filename" will have lower characters only. The
+optional flag can have the value "mad8" (without the quotes), in which
+case the sequence(s) is/are saved in MAD-8 input format.
+<p>
+The flag "beam" is optional; when given, all beams belonging to the
+sequences specified are saved at the top of the save file.
+<p>
+The parameter "sequence" is optional; when omitted, all sequences are saved.
+<p>
+
+<font color=ff0000> 
+However, it is not advisable to use "save" without the "sequence"
+option unless you know what you are doing. This practice will avoid
+spurious saved entries.
+</font>
+ 
+Any number of "select,flag=save" commands may precede the SAVE command.
+In that case, the names of elements, variables, and sequences must match
+the pattern(s) if given, and in addition the elements must be of the class(es)
+specified. See here for a 
+<a href="../Introduction/select.html#save_select">SAVE with SELECT</a> example.
+<p>
+It is important to note that the precision of the output of the save
+command depends on the output precision. Details about default
+precisions and how to adjust those precisions can be found at the
+<a href="../Introduction/set.html#Format">SET Format</a> instruction page.
+<p>
+The Attribute 'bare' allows to save just the sequence without the
+element definitions nor beam information. This allows to re-read in a
+sequence with might otherwise create a stop of the program. This is
+particularly useful to turn a line into a sequence to seqedit it.
+Example:
+<pre>
+tl3:line=(ldl6,qtl301,mqn,qtl301,ldl7,qtl302,mqn,qtl302,ldl8,ison);
+DLTL3 : LINE=(delay, tl3);
+use, period=dltl3;
+
+save,sequence=dltl3,file=t1,bare; // new parameter "bare": only sequ. saved
+call,file=t1; // sequence is read in and is now a "real" sequence
+// if the two preceding lines are suppressed, seqedit will print a warning
+// and else do nothing
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+plot, vaxis=betx, bety, haxis=s, colour:=100;
+SEQEDIT, SEQUENCE=dltl3;
+  remove,element=cx.bhe0330;
+  remove,element=cd.bhe0330;
+ENDEDIT;
+
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+</pre>
+<li><h4><a name=savebeta>SAVEBETA</a></h4>
+<pre>
+savebeta, label=label,<a name=place>place</a>=place,sequence=s_name;
+</pre>
+marks a place "place" in an expanded sequence "s_name"; at the
+next TWISS command execution, a 
+<a href="../twiss/twiss.html#beta0">beta0</a> block
+will be saved at that place with the label "label". This is done only
+once; in order to get a new beta0 block there, one has to re-issue the
+command. The contents of the beta0 block can then be used in other commands,
+e.g. TWISS and MATCH.
+<p>
+Example (after sequence expansion):
+<pre>
+savebeta,label=sb1,place=mb[5],sequence=fivecell;
+twiss;
+show,sb1;
+</pre>
+will save and show the beta0 block parameters at the end (!) of the
+fifth element mb in the sequence.
+<p>
+<li><h4><a name=select</a>SELECT</h4>
+<pre>
+select, flag=flag,range=range,class=class,pattern=pattern,
+        slice=integer,column=s1,s2,s3,..,sn,sequence=s_name,
+        full,clear;
+</pre>
+selects one or several elements for special treatment in a subsequent
+command. All selections for a given command remain valid until "clear"
+is specified; the selection criteria on the same command are logically
+ANDed, on different SELECT statements logically ORed.
+<p>
+Example:
+<pre>
+select,flag=error,class=quadrupole,range=mb[1]/mb[5];
+select,flag=error,pattern="^mqw.*";
+</pre>
+selects all quadrupoles in the range mb[1] to mb[5], and all
+elements (in the whole sequence) the name of which starts with "mqw"
+for treatment by the error module.
+<p>
+"flag" can be one of the following::
+<ul>
+<li>seqedit: selection of elements for the 
+<a href="seqedit.html">seqedit</a> module.
+<li>error: selection of elements for the 
+<a href="../error/error.html">error</a> assignment module.
+<li>makethin: selection of elements for the 
+<a href="../makethin/makethin.html">makethin</a> module that converts the
+sequence into one with thin elements only.
+<li>sectormap: selection of elements for the 
+<a href="../Introduction/sectormap.html">sectormap</a> output file
+from the Twiss module.
+<li>table: here "table" is a table name such as twiss, track etc.,
+and the rows and columns to be written are selected.
+</ul>
+For the RANGE, CLASS, PATTERN, FULL, and CLEAR parameters see
+<a href="../Introduction/select.html">SELECT</a>.
+<p>
+"slice" is only used by <a href="../makethin/makethin.html">makethin</a>
+and prescribes the number of slices into which the selected elements have
+to be cut (default = 1).
+<p>
+"column" is only valid for tables and decides the selection of columns to be
+written into the TFS file. The "name" argument is special in that it
+refers to the actual name of the selected element. For an example,
+see <a href="../Introduction/select.html">SELECT</a>.
+<li><h4><a name=show>SHOW</a></h4>
+<pre>
+show,command;
+</pre>
+prints the "command" (typically "beam", "beam%sequ", or an element name),
+with the actual value of all its parameters.
+<p>
+<li><h4><a name=stop>STOP</a></h4>
+<pre>
+stop;
+</pre>
+ends the program execution.
+<p>
+<li><h4><a name=system>SYSTEM</a></h4>
+<pre>
+system,"...";
+</pre>
+transfers the string in quotes to the system for execution.
+<p>
+Example:
+<pre>
+system,"ln -s /afs/cern.ch/user/u/user/public/some/directory short";
+</pre>
+<p>
+<li><h4><a name=tabstring>TABSTRING</a></h4>
+<pre>
+tabstring(arg1,arg2,arg3)
+</pre>
+
+The"string function" tabstring(arg1,arg2,arg3) with exactly 
+three arguments; arg1 is a table name (string), arg2 is a column name 
+(string), arg3 is a row number (integer), count starts at 0. The
+function can be used in any context where a string appears; in case
+there is no match, it returns _void_.
+<p>
+<li><h4><a name=title>TITLE</a></h4>
+<pre>
+title,"...";
+</pre>
+inserts the string in quotes as title in various tables and plots.
+<p>
+<li><h4><a name=use>USE</a></h4>
+<pre>
+use,period=s_name,range=range;
+</pre>
+expands the sequence with name "s_name", or a part of it as specified
+in the
+<a href="../Introduction/ranges.html#range">range</a>.
+<p>
+<li><h4><a name=value>VALUE</a></h4>
+<pre>
+value,exp1,exp2,...;
+</pre>
+prints the actual values of the expressions given.
+<p>
+Example:
+<pre>
+a=clight/1000.;
+value,a,pmass,exp(sqrt(2));
+</pre>
+results in
+<pre>
+a = 299792.458         ;
+pmass = 0.938271998        ;
+exp(sqrt(2)) = 4.113250379        ;
+</pre>
+<p>
+<li><h4><a name=write>WRITE</a></h4>
+<pre>
+write,table=table,file=file_name;
+</pre>
+writes the table "table" onto the file "file_name"; only the rows and
+columns of a preceding select,flag=table,...; are written. If no select
+has been issued for this table, the file will only contain the header.
+If the FILE argument is omitted, the table is written to standard output.
+</ul>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

@@ -1,0 +1,362 @@
+<head>
+<title>Expressions</title>
+<!-- Changed by: Chris ISELIN, 27-Mar-1997 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2><a name=expression> Real Expressions</a></h2>
+</center>
+
+To facilitate the definition of interdependent quantities,
+any real value and integer value can be entered as an arithmetic expression.
+When a value used in an expression is redefined by the user
+or changed in a matching process, the expression is reevaluated.
+Expression definitions may be entered in any order.
+MAD evaluates them in the correct order before it performs
+any computation.
+At evaluation time all operands used must have values assigned.
+<p>
+An expression is built from a combination of
+<a href="#operator">operator</a> and
+<a href="#operand">operand</a>,
+and it may contain <a href="#random">random generators</a>.
+
+<h2><a name=operator> Operators in Arithmetic Expressions</a></h2>
+An expression can be formed using the following operators:
+<H3>Arithmetic operators</H3>
+<UL>
+<LI>+ Addition,
+<LI>- Subtraction,
+<LI>* Multiplication,
+<LI>/ Division,
+<LI>^ Exponentiation.
+</UL>
+<H3><a name=function>Ordinary functions</a></H3>
+<UL>
+<li>sqrt(x) square root,
+<li>log(x) natural logarithm,
+<li>log10(x) logarithm base 10,
+<li>exp(x) exponential,
+<li>sin(x) trigonometric sine,
+<li>cos(x) trigonometric cosine,
+<li>tan(x) trigonometric tangent,
+<li>asin(x) arc sine,
+<li>acos(x) arc cosine,
+<li>atan(x) arc tangent,
+<li>sinh(x) hyperbolic sine,
+<li>cosh(x) hyperbolic cosine,
+<li>tanh(x) hyperbolic tangent,
+<li>abs(x) absolute value;
+</ul>
+<h3><a name=random>random number generators</a></h3>
+<ul>
+<li>ranf() random number,
+uniformly distributed in [0,1],
+<li>gauss() random number,
+gaussian distribution with unit standard deviation,
+<li>tgauss(x) random number,
+gaussian distribution with unit standard deviation,
+truncated at x standard deviations;
+</ul>
+in the above cases, "x" can be any expression, i.e. contain other
+functions, variable or constant expressions. To initialize the MAD-X
+random generator use the <a
+href="../error/error_option.html#EOPTION">Eoption command</a>.
+<h3><a name=table>table access functions</a></h3>
+<ul>
+<li>table(x,z): accesses value of the named table column "z" of table
+"x"; example: table(summ,q1) returns the hor. tune of the Twiss
+summary table "summ". <li>table(x,y,z): accesses value of the named
+table column "z" for element "y" (first table row with that name) of
+table "x"; example: table(twiss,mb.12,betx) returns the beta_x at
+element mb.12 from the Twiss table "twiss". 
+<font color=0000ff> When the element is called with its proper name,
+as in the example above, the value is returned at the first occurrence
+of the element of this name. If the value is needed at a occurrence
+number: NNN, then "[NNN]" has to be appended to the name, e.g. in the
+above example one obtains the betx of the 23th occurrence of the
+element "mb.12" by changing the example to:
+"table(twiss,mb.12[23],betx)". Mind you that the old, but little known,
+form: "table(twiss,mb.12->23,betx)" continues to work. Lastly, if NNN
+exceeds the maximum occurrence number the return value is arbitrarily
+small.
+</font>
+<font color=ff0000>
+<p>Beware:
+<li> Unnamed Drifts are not included in the table name database, so
+as to speed up the search for "real" elements. Therefore, those 
+unnamed drifts cannot be found. However, named drifts can be searched
+for.
+<li> Due to the importance of finding elements in the table for a
+proper functioning of the MAD-X runs, the programs throws a
+"fatal_error" if an element cannot be found in the table. 
+</font>
+ <p> There is a second option of this function with 3 entries
+ <li>table(x,z,N_row): accesses the value of the named table column
+ "z" at the "N_row" number of rows of table "x" (row numbers start at
+ 1); example: table(twiss,betx,370) returns the beta_x at row number
+ "370" of the Twiss table "twiss". The return value is zero if "N_row"
+ is outside of the allowed range. 
+<p>
+Note that "N_row" has to be a <font color=ff0000>number</font> and not a 
+<font color=ff0000>variable</font>. However, the <a
+ href="../control/special.html#macro">Macro facility</a> in MAD-X
+ allows one to use a variable instead.
+<p>
+A typical example could look like this, in fact the square root of
+betx (user defined variable myvar) is added to the twiss table:
+<p>
+<font color=0000ff><pre>
+myvar := sqrt(table(twiss,betx));
+select,flag=twiss,column=name,s,myvar,betx;
+twiss,file;
+</font></pre>
+<p>
+Or another arbitrary test case of adding k1l taken from the Twiss table:
+<p>
+Define macro:
+<p>
+<font color=0000ff><pre>
+mycrap(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
+</font></pre>
+<p>
+Use macro in loop:
+<p>
+<font color=0000ff><pre>
+i = 0;
+incval = 0;
+while (i < 100) {
+value,i;
+exec,mycrap(twiss,k1l,$i);
+incval = incval + myval;
+value,i,myval,incval;                
+i = i + 1;
+}
+</font></pre>
+
+<H3><font color=ff0000>Features as of Version 3_03_50</font></H3>
+<li>
+<p>
+FILL,TABLE=t,ROW=n;
+<p>
+fill a table row with the present variable values. If ROW is negative
+or missing a new row is created. If ROW is greater than the number of
+rows, the last row is selected without creating a new row.
+<p>
+<li>
+  SETVARS,TABLE=t,ROW=n;
+<p>
+set variables according to the column names of the given table and
+the values of the given row. if ROW is negative, missing or greater
+than the number of rows, the last row is selected.
+<p>
+<li>
+An example can be found at: <a
+href="http://www.cern.ch/frs/mad-X_examples/special_features">Special
+Features</a>
+<p>
+<li>
+The length of a table can be determined by using the attribute
+"tablelength" via table("your_table_name", tablelength). This is
+useful when creating a table from existing ones. See an example at:
+<a href="../Introduction/select.html#screate">user table II</a> 
+<p>
+
+</ul>
+<h2><a name=operand> Operands in Arithmetic Expressions</a></h2>
+An expression may contain the following operands:
+
+<H3>Literal constants</H3>
+Numerical values are entered like FORTRAN constants.
+Real values are accepted in INTEGER or REAL format.
+The use of a decimal exponent, marked by the letter D or E,
+is permitted.
+<p>
+Examples:
+<pre>
+1, 10.35, 5E3, 314.1592E-2
+</pre>
+
+<H3><a name=constant>Symbolic constants</a></H3>
+MAD recognizes some
+<a href="#constant">mathematical and physical constants</a>.
+Their names must not be used for user-defined labels.
+<p>
+Additional symbolic constants may be defined to simplify
+their repeated use in statements and expressions.
+<pre>CONST name=constant-expression;</pre>
+defines a real constant with the name given.
+An existing symbolic constant can be redefined,
+but it cannot change in a matching procedure.
+<p>
+Example:
+<pre>
+const in = 0.0254;
+</pre>
+<p>
+<a name=constant>
+<table cols = 4 border=4 frame=box align=center rules=all>
+<caption><b>Table 1:</b> Predefined Symbolic Constants in MAD
+<tr>
+  <td><b>mad name</b></td>
+  <td><b>symbol</b></td>
+  <td><b>value used</b></td>
+  <td><b>unit</b></td>
+</tr>
+<tr>
+  <td>pi</td>
+  <td>pi</td>
+  <td>4 * atan(1)</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>twopi</td>
+  <td>2 pi</td>
+  <td>2 * pi</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>degrad</td>
+  <td>180/pi</td>
+  <td>180 / pi</td>
+  <td>deg/rad</td>
+</tr>
+<tr>
+  <td>raddeg</td>
+  <td>pi/180</td>
+  <td>180 / pi</td>
+  <td>rad/deg</td>
+</tr>
+<tr>
+  <td>e</td>
+  <td>e</td>
+  <td>exp(1)</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>emass</td>
+  <td>m_e</td>
+  <td>.510998902*10(-3)</td>
+  <td>GeV</td>
+</tr>
+<tr>
+  <td>pmass</td>
+  <td>m_p</td>
+  <td>.938271998</td>
+  <td>GeV</td>
+</tr>
+<tr>
+  <td>mumass</td>
+  <td>m_mu</td>
+  <td>.1056583568</td>
+  <td>GeV</td>
+</tr>
+<tr>
+  <td>clight</td>
+  <td>c</td>
+  <td>2.99792458*10**8</td>
+  <td>m/s</td>
+</tr>
+<tr>
+  <td>qelect</td>
+  <td>elem. charge</td>
+  <td>1.602176462e-19</td>
+  <td>As</td>
+</tr>
+</table>
+</a>
+
+<H3>Parameter labels</H3>
+Often a set of numerical values depends
+on a common variable parameter.
+Such a parameter must be defined as a
+<a href="parameter.html">global parameter</a>.
+A global parameter always has a current value; however, this value may
+be re-evaluated or not, depending on the parameter definition:
+<pre>
+x = a;
+</pre>
+x is set to the current value of a and not changed, even if a changes.
+This makes assignments such as
+<pre>
+x = x + 1;
+</pre>
+perfectly valid (this replaces the old SET instruction).
+The definition of the deferred expression
+<pre>
+x := a;
+</pre>
+assign the current value of a to x every time x is used, i.e. it is
+re-evaluated using the latest value of a; therefore,
+<pre>
+x := x + 1;
+</pre>
+results in an infinite loop (!) when x is used (error abort).
+Of course, the following definitions are equivalent:
+<pre>
+x = 0.1;
+x := 0.1;
+</pre>
+<p>
+When such a parameter is used in an expression,
+MAD uses the current value of the parameter if the expression is deferred:
+<p>
+Example:
+<pre>
+x:=1.0;
+d1: drift,l = x;
+d2: drift,l := 2.0 - x;
+</pre>
+When the value of X is changed,
+the length of the drift d1 remains unchanged, that of d2 is recalculated.
+
+<H3>Element or command attributes</H3>
+In arithmetic expressions the attributes of physical elements
+or commands can occur as operands.
+They are named respectively by
+<pre>
+element-name->attribute-name
+command-name->attribute-name
+</pre>
+Values are assigned to attributes in element definitions or commands.
+<p>
+Example:
+<pre>
+D1: DRIFT,L=1.0;
+D2: DRIFT,L=2.0-D1->L;
+</pre>
+D1->L refers to the length L of the drift space D1.
+
+<h2><a name=defer>Expressions and Random Values</a></h2>
+The definition of random machine imperfections requires evaluation
+of expressions containing random functions.
+These are evaluated like any other expression when the expression
+is used, i.e. only once if a "=" assignment refers to it, or every time
+if the assignment is ":="; this latter case is used by the error
+generation routines.
+<p>
+Example:
+<pre>
+a := 3*ranf();
+</pre>
+Every time a is used, it gets a random value assigned from a uniform
+distribution between 0 and 3.
+<pre>
+error:  ealign,range,dx:=sigma*gauss();
+</pre>
+All elements in range are assigned independent random
+displacements sampled from a Gaussian distribution
+with standard deviation sigma.
+<p>
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+May 8, 2001
+</address>
+
+</body>

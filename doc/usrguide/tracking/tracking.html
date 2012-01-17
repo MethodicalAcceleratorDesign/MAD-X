@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="author"      content="Valery Kapin & Frank Schmidt" />
+  <meta name="description" content="Overview of MAD-X Tracking Modules" />
+  <meta name="keywords"    content="MADX MAD-X PTC Tracking TRACK PTC_TRACK PTC_TRACL_LINAC" />
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" />
+  <title>Overview of MAD-X Tracking Modules</title>
+	<!-- Created by: Valery KAPIN, 21-Mar-2006 -->
+	<!-- Changed by: ____________, ___________ -->	
+	<style>
+<!--
+div.Section1
+	{page:Section1;}
+span.SpellE
+	{}
+-->
+</style>
+</head>
+
+<body bgcolor="#ffffff">
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right" alt="MAD-X Logo" />
+  <h1>Overview of MAD-X Tracking Modules</h1>
+</center>
+</div>
+
+<div class="madxdocContent">
+	
+<div>
+<p align="left">
+A number of particles with given initial conditions can be tracked through a 
+beam-line or a ring. The 
+particles can be tracked either for a single passage or for many turns. </p>
+<p align="left">
+While MAD-X [<a href="#F._Schmidt">a</a>] is keeping most of the functionality of 
+its predecessor <a href="http://cern.ch/mad8">MAD-8</a>, the trajectory tracking in MAD-X is 
+considerably modified 
+comparing to MAD-8 . The reason is that in MAD8 the thick lens tracking is 
+inherently not symplectic, which implies that the phase space volume is not 
+preserved during the tracking, i.e. contrary to the real particle the tracked 
+particle amplitude is either growing or decreasing.</p>
+<p align="left">
+The non-symplectic tracking as in MAD-8 has been completely excluded from MAD-X 
+by taking out the thick lens part from the tracking modules. Instead two 
+types of tracking modules (both symplectic) are implemented into MAD-X.</p>
+<p align="left">
+The first part of this design decision is the thin-lens tracking module (<var class="option"><a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a></var>) 
+which tracks symplecticly through drifts and kicks and by replacing 
+the end effects by their symplectic part in form of an additional kick on either 
+end of the element. This method demands a preliminary conversion of a sequence 
+with thick elements into one composed entirely of thin elements (see the&nbsp;
+<var class="option">
+<a href="http://cern.ch/madx/makethin/makethin.html">MAKETHIN</a></var> 
+command). The details of its usage are given on the page &quot;<a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a>&quot;.</p>
+<p align="left">
+The second part of this design decision is to produce a thick lens tracking 
+module based on the PTC code [<a href="#E._Forest">b</a>] that allows a 
+symplectic treatment of all accelerator elements giving the user full control 
+over the precision (number of steps and integration type) and exactness (full or 
+extended Hamiltonian) of the results.</p>
+<p align="left">
+The first PTC thick-lens tracking module is named
+<a href="http://cern.ch/madx/ptc_track/ptc_track.html">ptc_track</a>. It 
+has the same features as the thin-lens tracking code (<var class="option"><a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a></var>) 
+except it treats thick-lenses in a symplectic manner.</p>
+<p align="left">
+&nbsp;There is a second PTC tracking module called the line tracking module (<a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html">ptc_track_line</a>). 
+It is meant for tracking particles in&nbsp;
+<a href="http://clic-study.web.cern.ch/CLIC-Study/">CLIC</a>, in fact it treats beam-lines 
+containing traveling-wave cavities and includes a beam acceleration.</p>
+</div>
+
+<hr />
+
+<div>
+	<dl>
+	<dl>
+		<dt>References</dt>
+	</dl>
+	<ol type="a">
+		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'', 
+		Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
+		<li><span lang="EN-US"><a name="E._Forest">E.&nbsp;Forest</a>, F.&nbsp;Schmidt 
+		and E.&nbsp;McIntosh, “Introduction to the Polymorphic Tracking Code”, 
+		<a href="http://doc.cern.ch/archive/electronic/cern/preprints/sl/sl-2002-044.pdf">
+		CERN-SL-2002-044-AP</a>,
+		<a href="http://ccdb4fs.kek.jp/cgi-bin/img/allpdf?200302020">KEK 
+		report 2002-3</a>, July 2002</span>.</li>
+	</ol>
+	<dl>
+		<dt>See Also</dt>
+		<dd>
+      	<a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+		Set-up Parameters</a></dd>
+</dl>
+	</dl>
+</div>
+
+</div>
+
+<hr />
+<address>
+<span lang="EN-US">
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru">
+V.&nbsp;<span class="SpellE">Kapin<span style="text-decoration: none"> </span></span>
+</a></span>(ITEP) and <span lang="EN-US">
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch">
+F.&nbsp;Schmidt</a>, </span>March  2006</address>
+
+</body>
+</html>

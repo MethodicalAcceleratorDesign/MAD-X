@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="author"      content="Valery Kapin & Frank Schmidt" />
+  <meta name="description" content="MADX PTC_TRACK Module" />
+  <meta name="keywords"    content="MADX MAD-X PTC tracking PTC_TRACK" />
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" />
+  <title>Thick-Lens Tracking Module (PTC-TRACK Module)</title>
+	<!-- Created by: Valery KAPIN, 06-Apr-2006 -->
+	<!-- Changed by: ____________, ___________ -->	
+	<style>
+<!--
+div.Section1
+	{page:Section1;}
+span.SpellE
+	{}
+h4
+	{margin-right:0cm;
+	margin-left:0cm;
+	text-indent:35.45pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	font-weight:bold}
+table.MsoTableGrid
+	{border:1.0pt solid windowtext;
+	text-indent:35.45pt;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	}
+-->
+</style>
+</head>
+
+<body bgcolor="#ffffff">
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right" alt="MAD-X Logo" />
+  <h1>Thick-Lens Tracking Module <br>
+	(PTC-TRACK Module)</h1>
+</center>
+</div>
+
+<div class="madxdocContent">
+	
+<div>
+<p align="left">
+The <b>PTC-TRACK module </b>[<a href="#V._Kapin">a</a>] is the symplectic 
+thick-lens tracking facility in MAD-X [<a href="#F._Schmidt">b</a>]. It is based 
+on PTC library written by E.Forest [<a href="#E._Forest">c</a>]. The 
+commands of&nbsp; this module are described below, optional parameters are 
+denoted by square brackets ([ ]). Prior to using this module 
+the active beam line must be selected by means of a
+<a href="http://cern.ch/madx/control/general.html#use">USE</a> command. 
+The general <a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+environment</a> must also be initialized. </p>
+</div><hr />
+<div>
+	<dl>
+		<dt>Synopsis</dt>
+		<dd><i><code>PTC_CREATE_UNIVERSE;</code></i></dd>
+		<dd><i><code>PTC_CREATE_LAYOUT, model=integer,method=integer, 
+		nst=integer, [exact];</code></i></dd>
+		<dd><code>..........................<br>PTC_START, .....;<br>..........................<br>PTC_OBSERVE,....;<br>..........................<br>PTC_TRACK, .....;<br>..........................<br>PTC_TRACK_END;</code></dd>
+		<dd><code>..............................</code></dd>
+		<dd><i><code>PTC_END; </code></i></dd>
+	</dl></div>
+<div>
+	<dl>
+		<dt>Commands</dt>
+		<dd>
+		<div>
+			<dl>
+				<dt class="command"><span lang="EN-US"><b>PTC_START</b>, <b><br>&nbsp;&nbsp;&nbsp; x</b>=double, 
+				<b>px</b>=double, <b>y</b>=double, <b>py</b>=double,
+		<b>t</b>=double, <b>pt</b>=double,<br>&nbsp;&nbsp;&nbsp; </span><b>fx</b>=double, 
+				<b>phix</b>=double, <b>fy</b>=double,
+		<b>phiy</b>=double, <b>ft</b>=double, <b>phit</b>=double<span lang="EN-US"> 
+		;</span></dt>
+				<dd>
+				<div>
+					<dl>
+						<dt>Description</dt>
+						<dd>To start particle tracking, a series of initial trajectory 
+				coordinates has to be given by means of <var class="command">PTC_START 
+						</var>command (as many commands as trajectories). It 
+				must be done before the <var class="command">
+						<a href="#PTC_TRACK">PTC_TRACK</a> </var>command. The coordinates can be either
+						<a href="http://cern.ch/madx/Introduction/tables.html#canon">canonical coordinates</a> (<b>x</b>, 
+						<b>px</b>, <b>y</b>, <b>py</b>,
+				<b>t</b>, <b>pt</b>) or action-angle coordinates (<b>fx</b>, <b>phix</b>, 
+						<b>fy</b>, <b>phiy</b>, <b>ft</b>, <b>phit</b>), which 
+				are expressed by the normalized amplitude, <i>F</i><sub><i>z </i>
+						</sub>&nbsp;and the phase, 
+						<i><font face="Times New Roman"><span lang="EN-US">&#934;</span></font></i><sub><i>z</i></sub> 
+				for the <i>z</i>-th mode plane (<i>z</i>={<i>x</i>,<i>y</i>,<i>t</i>}). 
+				The actions are computed with the values of the emittances, <i>F</i><sub><i>z</i></sub>, 
+				which must be specified in the preceding
+						<a href="http://cern.ch/madx/Introduction/beam.html">BEAM</a> command. 
+						<i>F</i><sub><i>z</i></sub> are expressed in 
+				number of r.m.s. beam sizes and
+						<i><font face="Times New Roman"><span lang="EN-US">&#934;</span></font></i><sub><i>z</i></sub> 
+				are expressed in radians.</dd>
+						<dt>Options</dt>
+						<dd>
+						<table cellspacing="0" cellpadding="3" border="1" id="table11">
+							<tr>
+								<th>Option</th>
+								<th>Meaning</th>
+								<th>Default Value</th>
+								<th>Value Type</th>
+							</tr>
+							<tr>
+								<td>X, PX, Y, PY, T, PT</td>
+								<td><span lang="EN-US">canonical coordinates</span></td>
+								<td>0.0</td>
+								<td>double</td>
+							</tr>
+							<tr>
+								<td>FX, PHIX, FY, PHIY, FT, PHIT</td>
+								<td>
+								<p align="left">action-angle coordinates</td>
+								<td>0.0</td>
+								<td>double</td>
+							</tr>
+						</table></dd>
+						<dt>Remarks</dt>
+						<dd>1. If the option <var class="command">
+						<a href="#CLOSED_ORBIT">closed_orbit</a> </var>
+						<span lang="EN-US">in the </span><var class="command">
+						<a href="#PTC_TRACK">PTC_TRACK</a></var> 
+				command is active (see below), all coordinates are specified with 
+				respect to the actual closed orbit (possibly off-momentum with 
+				magnet errors) and NOT with respect to the reference orbit. If 
+				the option <var class="command"><a href="#CLOSED_ORBIT">
+						closed_orbit</a> </var>is absent, then coordinates are specified with respect 
+				to the reference orbit.</dd>
+						<dd><span lang="EN-US">2. In the uncoupled case, the canonical 
+				and the action-angle variables are related with equations&nbsp;
+						<i><br>
+						z</i>=
+				<i>F<sub>z</sub></i>(<i>E<sub>z</sub></i>)<sup>1/2</sup>cos(</span><i><font face="Times New Roman"><span lang="EN-US">&#934;</span></font></i><sub><i>z</i></sub><span lang="EN-US">),&nbsp;
+						<i>p<sub>z</sub></i>= <i>F<sub>z</sub></i>(<i>E<sub>z</sub></i>)<sup>1/2</sup>sin(</span><i><font face="Times New Roman"><span lang="EN-US">&#934;</span></font></i><sub><i>z</i></sub><span lang="EN-US">).</span><p>
+						<span lang="EN-US">3. The use of the action-angle coordinates 
+						requires the option </span><var class="command">
+						<a href="#CLOSED_ORBIT">closed_orbit</a> </var>
+						<span lang="EN-US">in the </span><var class="command">
+						<a href="#PTC_TRACK">PTC_TRACK</a></var><span lang="EN-US"> 
+						command. </span></p>
+						<p>4. If both the canonical and the action-angle coordinates are 
+				given in the <var class="command">PTC_START </var>command, they 
+				are summed after conversion of the action-angle coordinates to 
+				the canonical ones.</dd>
+					</dl></div></dd>
+				<dt class="command"><span lang="EN-US"><b>PTC_OBSERVE, <br>&nbsp;&nbsp;&nbsp; place=</b></span>string; 
+				</dt>
+				<dd>
+				<div>
+					<dl>
+						<dt>Description</dt>
+						<dd>Besides of the beginning of the beam-line, one can 
+						define an additional observation points along the 
+						machine. Subsequent <var class="command">PTC_TRACK </var>
+						command will then record the tracking data on all these 
+						observation points. </dd>
+						<dt>Option</dt>
+						<dd>
+						<table cellspacing="0" cellpadding="3" border="1" id="table12" width="483">
+							<tr>
+								<th>Option</th>
+								<th>Meaning</th>
+								<th>Value Type</th>
+							</tr>
+							<tr>
+								<td>PLACE</td>
+								<td>name of observation point<br>
+								(markers are very much preferred)</td>
+								<td>string</td>
+							</tr>
+						</table></dd>
+						<dt>Remarks</dt>
+						<dd>1. The first observation point at the beginning of 
+						the beam-line is marked as <b>&quot;start&quot;</b>. 
+						</dd>
+						<dd><br>
+						2. It is recommended to use
+						<a href="http://cern.ch/madx/Introduction/label.html">labels</a> of
+						<a href="http://cern.ch/madx/Introduction/marker.html">markers</a> in order to avoid usage observations at the ends of 
+				thick elements.<br>
+						<span lang="EN-US"><br>
+						3. The data at the observation points other than at <b>
+						&quot;start&quot;</b> can be produced by two different means: <br>
+						a) traditional (<a href="http://cern.ch/madx/thintrack/thintrack.html">MADX</a>) element-by-element tracking (use 
+						option <a href="#ELEMENT_BY_ELEMENT">element_by_element</a>);
+						<br>
+						b) coordinate transformation from <b>&quot;start&quot;</b> to the 
+						respective observation point using high-order PTC 
+						transfer maps <br>
+						(required option </span><var class="command">
+						<a href="#CLOSED_ORBIT">closed_orbit</a></var><span lang="EN-US">; 
+						turned off options <a href="#RADIATION">radiation</a> 
+						and <a href="#ELEMENT_BY_ELEMENT">element_by_element</a>).
+						</span></dd>
+					</dl></div></dd>
+				<dt class="command"><span lang="EN-US"><b><a name="PTC_TRACK">PTC_TRACK</a>, 
+				<br>&nbsp;&nbsp;&nbsp; deltap=</b>double<b>, icase=</b>integer<b>, closed_orbit, 
+		element_by_element, turns=</b>integer<b>, <br>&nbsp;&nbsp;&nbsp; dump, onetable, maxaper=double array, norm=</b>integer<b>, 
+		norm_out, <br>&nbsp;&nbsp;&nbsp; file[=</b>string<b>], extension=</b>string<b>, ffile=</b>integer<b>,<br>&nbsp;&nbsp;&nbsp; radiation, radiation_model1, radiation_energy_loss, 
+		radiation_quadr,<br>&nbsp;&nbsp;&nbsp; beam_envelope, space_charge;</b></span></dt>
+				<dd>
+				<div>
+					<dl>
+						<dt>Description</dt>
+						<dd>The <var class="command">PTC_TRACK</var> command initiates 
+				trajectory tracking by entering the thick-lens tracking module. 
+				Several options can be specified, the most important are 
+				presented in table &quot;Basic Options&quot;. There are also switches to 
+				use special modules for particular tasks. They are presented in 
+				the table &quot;Special Switches&quot;.</dd>
+						<dd>The tracking can be done element-by-element using the option
+						<a href="#ELEMENT_BY_ELEMENT">element-by-element</a>, or 
+				&quot;turn-by-turn&quot; (default) with coordinate transformations over the whole 
+				turn. Tracking 
+				is done in parallel, i.e. the coordinates of all particles are 
+				transformed through each beam element (option
+						<a href="#ELEMENT_BY_ELEMENT">element-by-element</a>) or 
+						over full turns.</dd>
+						<dd>The particle is lost if its trajectory is outside the boundaries 
+						as specified by <a href="#MAXAPER">maxaper</a> option. 
+						In PTC, there is a continuous check, if the particle 
+						trajectories stays within the aperture limits. <br>
+						The Normal Form calculations (required option
+						<a href="#CLOSED_ORBIT">closed_orbit</a>) is controlled 
+						by <a href="#NORM_NO">norm_no</a> and
+						<a href="#NORM_OUT">norm_out</a> 
+				are used.</dd>
+						<dt>Basic Options</dt>
+						<dd>
+						<table cellspacing="0" cellpadding="3" border="1" id="table14" width="728">
+							<tr>
+								<th width="143">Option</th>
+								<th colspan="2">Meaning</th>
+								<th width="85">Default <br>
+								Value</th>
+								<th width="72">Value<br>
+&nbsp;Type</th>
+							</tr>
+							<tr>
+								<td width="143"><a name="ICASE">ICASE</a></td>
+								<td colspan="2"><span lang="EN-US">user-defined dimensionality
+								<br>
+								of the phase-space (4, 5 or 6).</span></td>
+								<td width="85">4</td>
+								<td width="72">integer</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="DELTAP">DELTAP</a></td>
+								<td colspan="2">
+								<p align="left">relative momentum offset for <br>
+								reference closed orbit 
+						<br>
+								(used for 5D case ONLY). </td>
+								<td width="85">0.0</td>
+								<td width="72">double</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="CLOSED_ORBIT">CLOSED_ORBIT</a></td>
+								<td colspan="2"><span lang="EN-US">switch to turn on 
+						the closed <br>
+								orbit calculation</span></td>
+								<td width="85">.FALSE.</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="ELEMENT_BY_ELEMENT">ELEMENT_BY_ELEMENT</a></td>
+								<td colspan="2"><span lang="EN-US">switch from the 
+						default <br>
+								turn-by-turn tracking to  
+						the <br>
+								element-by-element tracking.</span></td>
+								<td width="85">.FALSE.</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td width="143">TURNS</td>
+								<td colspan="2"><span lang="EN-US">number of turns 
+						to be tracked.</span></td>
+								<td width="85">1</td>
+								<td width="72">integer</td>
+							</tr>
+							<tr>
+								<td width="143">DUMP</td>
+								<td colspan="2">enforces writing of particle <br>
+								coordinates to formatted text files</td>
+								<td width="85">.FALSE.</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="ONETABLE">ONETABLE</a></td>
+								<td colspan="2"><span lang="EN-US">writing
+								</span>all particle coordinates <br>
+								to a single file </td>
+								<td width="85">.FALSE.</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="MAXAPER">MAXAPER</a></td>
+								<td colspan="2">upper limits for the <br>
+								particle 
+						coordinates. </td>
+								<td width="85">{0.1,0.01,<br>
+&nbsp;0.1, 0.01,<br>
+&nbsp;1.0,0.1}</td>
+								<td width="72">double,<br>array&nbsp; (1:6)</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="NORM_NO">NORM_NO</a></td>
+								<td colspan="2">order of the Normal Form</td>
+								<td width="85">1</td>
+								<td width="72">integer</td>
+							</tr>
+							<tr>
+								<td width="143"><a name="NORM_OUT">NORM_OUT</a></td>
+								<td colspan="2"><span lang="EN-US">switch to transform 
+								canonical <br>
+								variables to action-angle variables</span></td>
+								<td width="85">.FALSE.</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td rowspan="2" width="143">FILE</td>
+								<td width="79">omitted </td>
+								<td width="223">no output written to a file</td>
+								<td width="85">&nbsp;</td>
+								<td width="72">&nbsp;</td>
+							</tr>
+							<tr>
+								<td width="79">present</td>
+								<td width="223">file name for printing 
+						<br>
+								the track tables.</td>
+								<td width="85">track</td>
+								<td width="72">string</td>
+							</tr>
+							<tr>
+								<td width="143">EXTENSION</td>
+								<td colspan="2">the extension of filename for 
+								<br>
+								the track 
+						table, e.g., txt, doc etc<span lang="EN-US"> </span>
+								</td>
+								<td width="85">none</td>
+								<td width="72">logical</td>
+							</tr>
+							<tr>
+								<td width="143">FFILE</td>
+								<td colspan="2">printing coordinates <br>
+								after every FFILE 
+						turns</td>
+								<td width="85">1</td>
+								<td width="72">integer</td>
+							</tr>
+						</table></dd>
+						<dt>Remarks</dt>
+						<dd><b>ICASE</b>:<span lang="EN-US">&nbsp;has a highest 
+						priority over other options:&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a) RF 
+						cavity with non-zero voltage will be ignored for
+						<a href="#ICASE">icase</a>=4, 5;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b) A 
+						non-zero <a href="#DELTAP">deltap</a> will be ignored 
+						for <a href="#ICASE">icase</a>=4, 6.<br>
+						However, if RF cavity has the voltage set to zero and 
+						for <a href="#ICASE">icase</a>=6, the code sets
+						<a href="#ICASE">icase</a>=4.<br>
+						<br>
+						</span><b>DELTAP: </b><span lang="EN-US">&nbsp;is 
+						ignored for <a href="#ICASE">icase</a>=6, but the option
+						<a href="http://cern.ch/madx/ptc_general/ptc_general.html">offset_deltap</a> of the command
+						</span><var class="command">PTC_CREATE_LAYOUT</var> may 
+						be used, if 
+						</dd>
+						<dd><span lang="EN-US">the reference particle should 
+						have an momentum off-set as specified by
+						<a href="http://cern.ch/madx/ptc_general/ptc_general.html">offset_deltap</a>.</span></dd>
+						<dd><span lang="EN-US"><br><b>CLOSED_ORBIT</b> : It must 
+						be used for closed rings only. This option allows to 
+						switch ON <br>
+						the Normal Form analysis, if required. If CLOSED_ORBIT is off, the sequence is 
+				treated as a transfer line.<br><br><b>NORM_NO=1</b>: makes the 
+						Normal Form linear (always true for MAD8/X).<br><br>
+						</span><b>FILE</b>: The output file endings are:
+						<font face="Courier New">.obsnnnn</font>(observation 
+				point), followed by <font face="Courier New">.pnnnn</font> 
+				(particle number), <br>
+						if the <a href="#ONETABLE">onetable</a> option is not 
+						used.</dd>
+					</dl>
+					<dl>
+						<dt>Special Switches</dt>
+						<dd>
+						<table cellspacing="0" cellpadding="3" border="1" id="table13" width="765">
+							<tr>
+								<th width="264">Option</th>
+								<th>Meaning</th>
+								<th width="74">Default<br>
+&nbsp;Value</th>
+								<th width="57">Value<br>
+&nbsp;Type</th>
+							</tr>
+							<tr>
+								<td width="264"><a name="RADIATION">RADIATION</a></td>
+								<td>turn on the synchrotron <br>
+								radiation 
+						calculated by an internal <br>
+								procedure of PTC</td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+							<tr>
+								<td width="264"><a name="RADIATION_MODEL1">RADIATION_MODEL1</a></td>
+								<td>switch to turn on the radiation <br>
+								according to the 
+						method given <br>
+								in the Ref. [<a href="#G.J._Roy">d</a>] 
+						</td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+							<tr>
+								<td width="264">RADIATION_ENERGY_LOSS</td>
+								<td>adds the energy loss for <br>
+								<a href="#RADIATION_MODEL1">radiation_model1</a></td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+							<tr>
+								<td width="264">RADIATION_QUADR</td>
+								<td>adds the radiation in quadrupoles. <br>
+								It supplements either <a href="#RADIATION">
+								radiation</a>, <br>
+								<a href="#RADIATION_MODEL1">radiation_model1</a></td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+							<tr>
+								<td width="264">BEAM_ENVELOPE</td>
+								<td>turn on the calculations <br>
+								of the beam 
+						envelope with PTC </td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+							<tr>
+								<td width="264">SPACE_CHARGE<br>
+								(under construction)</td>
+								<td>turn on the simulations of the <br>
+								space 
+						charge forces between particles. </td>
+								<td width="74">.FALSE.</td>
+								<td width="57">logical</td>
+							</tr>
+						</table></dd>
+						<dt>Remarks</dt>
+						<dd>
+						<span lang="EN-US">
+						<b>1. RADIATION: </b>Has precedence
+						<a href="#RADIATION_MODEL1">radiation model1.</a><br>
+						<br>
+						<b>2. </b></span><b>RADIATION_MODEL1</b>: Additional 
+						module by F. Zimmermann. The model simulates 
+						quantum excitation via a random number generator and tables for 
+				photon emission. It can be used only with the element-by-element 
+				tracking (option <a href="#ELEMENT_BY_ELEMENT">element-by-element</a>).<br>
+						<br><b>3. RADIATION_ENERGY_LOSS</b>: Of use for
+						<a href="#RADIATION_MODEL1">radiation_model1</a>.<br>
+						<br><b>4. BEAM_ENVELOPE:</b> It requires the options
+						<a href="#RADIATION">radiation</a> and <a href="#ICASE">icase</a>=6.<br>
+						<br><b>5. SPACE_CHARGE:</b> This option 
+						is under construction and is reserved for future use.</dd>
+					</dl></div></dd>
+			</dl></div></dd>
+	</dl>
+	<dl>
+		<dd>
+		<div>
+			<dl>
+				<dt class="command"><span lang="EN-US"><b>PTC_TRACK_END;</b></span></dt>
+				<dd>
+				<div>
+					<dl>
+						<dt>Description</dt>
+						<dd>The <var class="command">PTC_TRACK_END </var>command terminate 
+				the command lines related to the PTC_TRACK module.</dd>
+					</dl></div>
+				<dl>
+					<dt>TRACKSUMM table</dt>
+				</dl>
+				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The starting and final 
+				canonical coordinates are collected in the internal table &quot;tracksumm&quot; (printed to the file with
+				<a href="http://cern.ch/madx/control/general.html#write">WRITE</a> 
+		command).</p>
+			</dl></div>
+	</dl>
+	<dl>
+		<dl>
+			<dt>Examples</dt>
+			<dd>Several examples are found on the
+						<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_track">
+			here</a>.</dd>
+		</dl>
+		<dt>The typical tasks </dt>
+	</dl>
+	<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The following table 
+	facilitates the choice of the correct options for a number of tasks.</p>
+	<dl>
+		<dd>
+		<table cellspacing="0" cellpadding="3" border="1" id="table15" width="578">
+			<tr>
+				<th width="253">Option</th>
+				<th width="63">1</th>
+				<th width="63">2</th>
+				<th width="63">3</th>
+				<th width="63">4</th>
+				<th width="63">5 </th>
+			</tr>
+			<tr>
+				<td width="253"><a name="CLOSED_ORBIT1">CLOSED_ORBIT</a></td>
+				<td width="63">
+				<p align="center">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+			</tr>
+			<tr>
+				<td width="253"><a name="ELEMENT_BY_ELEMENT1">ELEMENT_BY_ELEMENT</a></td>
+				<td width="63">
+				<p align="center">-</td>
+				<td align="center" width="63">+</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">-</td>
+			</tr>
+			<tr>
+				<td width="253">PTC_START, 
+				X, PX, ...</td>
+				<td width="63">
+				<p align="center">+</td>
+				<td align="center" width="63">+</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+			</tr>
+			<tr>
+				<td width="253">PTC_START, FX, PHIX, …</td>
+				<td width="63">
+				<p align="center">- </td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+				<td width="63" align="center">+</td>
+			</tr>
+			<tr>
+				<td width="253">NORM_NO</td>
+				<td width="63">
+				<p align="center">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">
+				<p align="center">&gt;1</td>
+				<td width="63" align="center">&gt;1</td>
+				<td width="63" align="center">&gt;1</td>
+			</tr>
+			<tr>
+				<td width="253">NORM_OUT</td>
+				<td width="63">
+				<p align="center">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">
+				<p align="center">+</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">+</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">PTC_OBSERVE</span></td>
+				<td width="63">
+				<p align="center">-</td>
+				<td width="63">
+				<p align="center">+</td>
+				<td width="63">
+				<p align="center">+</td>
+				<td width="63">
+				<p align="center">+</td>
+				<td width="63">
+				<p align="center">-</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">RADIATION</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">+</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">RADIATION_MODEL1</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">RADIATION_ENERGY_LOSS</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">RADIATION_QUAD</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">+/-</td>
+			</tr>
+			<tr>
+				<td width="253">BEAM_EN<span lang="EN-US">VELOPE</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+			</tr>
+			<tr>
+				<td width="253"><span lang="EN-US">SPACE_CHARGE</span></td>
+				<td align="center" width="63">-</td>
+				<td align="center" width="63">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+				<td width="63" align="center">-</td>
+			</tr>
+		</table></dd>
+		<dd>&nbsp;</dd>
+		<dd>1) The tracking of a beam-line with default parameters.</dd>
+		<dd>2) As “1)”, but with element-by-element tracking and an output 
+		at observation points. </dd>
+		<dd>3) Tracking in a closed ring with closed orbit search and the 
+		Normal Forms calculations. <br>
+		Both canonical and action-angle 
+		input/output coordinates are possible. Output at observation 
+		points is produced via PTC maps. </dd>
+		<dd>4) Similar to &quot;3)&quot; except that output at observation points is 
+		created by element-by-element tracking.</dd>
+		<dd>5) The with PTC radiation.</dd>
+		<dt>References for PTC-TRACK</dt>
+	</dl>
+	<ol type="a">
+		<li><a name="V._Kapin">V. Kapin</a> and F. Schmidt, “PTC modules for MAD-X code”, to be published as CERN internal note by the end of 
+		2006</li>
+		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'', 
+		Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
+		<li><a name="E._Forest">E. Forest</a>, F. Schmidt and E. McIntosh, 
+		“Introduction to the Polymorphic Tracking Code”, KEK report 2002-3, July 
+		2002</li>
+		<li><a name="G.J._Roy">G.J. Roy</a>, “A new method for the simulation of 
+		synchrotron radiation in particle tracking codes”, Nuclear Instruments &amp; 
+		Methods in Phys. Res., Vol. A298, 1990, pp. 128-133.</li>
+	</ol></div>
+<div>
+	<dl>
+		<dt>See Also</dt>
+		<dd><a href="http://cern.ch/madx/tracking/tracking.html">Overview of 
+		MAD-X Tracking Modules</a>,
+		<a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+		Set-up Parameters</a>,<var class="command"> </var>
+		<a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a>,
+		<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_track">PTC-TRACK 
+		Examples</a>.</dd>
+	</dl></div>
+
+</div>
+
+<hr />
+<address>
+<span lang="EN-US">
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru">
+V.&nbsp;<span class="SpellE">Kapin<span style="text-decoration: none"> </span></span>
+</a></span>(ITEP) and <span lang="EN-US">
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch">
+F.&nbsp;Schmidt</a>, July </span>2005; revised in April, 2006</address>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<head>
+<title>Sequence Editor</title>
+<!-- Changed by: Chris ISELIN, 24-Feb-1998 -->
+<!-- Changed by: Hans Grote, 17-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Edit a Beam Line Sequence</h2>
+</center>
+<p>
+With the help of the commands explained below, a sequence may be modified
+in many ways: the starting point can be moved to another place; the
+order of elements can be inverted; elements can be inserted one by one,
+or as a whole group with one single command; single elements, or classes
+thereof can be removed; elements can be replaced by others; finally, the
+sequence can be "flattened", i.e. all inserted sequences are replaced by
+their actual elements, such that a flattened sequence contains only
+elements. It is good practice to add a <font color=ff0000><i>
+flatten; </i></font> statement at the end of a <font color=ff0000><i>
+seqedit operation </i></font> to ensure a fully operational
+sequence. And this is particularly useful for the <font color=ff0000><i>
+save </i></font> command to properly save <font
+color=ff0000><i> shared sequences </i></font> and to
+write out in <font color=ff0000><i> MAD-8 </i></font> format.
+
+<p>
+<ul>
+<li><h4><a name=seqedit>SEQEDIT</a></h4>
+<pre>
+seqedit, sequence=s_name;
+</pre> selects the sequence named for editing. The editing is
+performed on the non-expanded sequence; after having finished the
+editing, one has to re-expand the sequence if necessary.
+<p>
+<p>
+<li><h4><a name=extract>EXTRACT</a></h4>
+<pre>
+extract,sequence=s_name,from=MARKER_1,to=MARKER_2,newname=p;
+</pre>
+From the sequence named "s_name" is extracted a new sequence with name
+"p" starting from MARKER_1 and ending at MARKER_2. The new sequence
+"p" can be USEd as any other sequence. It is declared as "shared" and
+can therefore be combined E.G. into the cycled original sequence.
+<p>
+<li><h4><a name=flatten>FLATTEN</a></h4>
+<pre>
+flatten;
+</pre>
+This command includes all sequences in the sequence being edited, if any.
+The resulting sequence contains only elements.
+<p>
+<li><h4><a name=install>INSTALL</a></h4>
+<pre>
+install, element=name,class=class_name,at=real,from=place|selected;
+</pre>
+where the parameters have the following meaning:
+<ul>
+<li>element: name of the (new) element to be inserted (mandatory)
+<li>class: class of the new element to be inserted (mandatory)
+<li>at: position where the element is to be inserted; if no "from"
+is given,this is relative to the start of the sequence. If "from"
+is given, it is relative to the position specified there.
+<li>from:either a place (i.e. the name(+occurrence count) of an
+element already existing in the sequence, e.g. mb[15], or mq.a..i1..4 etc.;
+or the string "selected"; in this latter case an element of the type
+specified will be inserted behind all elements in the sequence that are
+currently selected by one or several
+<a href="../Introduction/select.html">SELECT</a> commands of the type
+<pre>
+select,flag=seqedit,class=.., pattern=.., range=..;
+</pre>
+<li><font color=ff0000><i>
+Attention: No element definitions inside seqedit. </i></font><p>
+</ul><li><h4><a name=move>MOVE</a></h4>
+<pre>
+move, element=name|selected,by=real,to=real,from=place;
+</pre>
+<ul>
+<li>element: name of the existing element to be moved, or "selected", in
+which case all elements from existing 
+<a href="../Introduction/select.html">SELECT</a> commands will be
+moved; in the latter case, "by" must be given.
+<li>by: amount by which the element(s) is/are to be moved; no "to" nor
+"from" in this case.
+<li>to: position to which the element has to be moved; if no from,
+then this is relative to the start of the sequence; otherwise, it is
+relative to the place given in "from".
+<li>from: place in the sequence with respect to which the element is
+to be positioned.
+</ul>
+<p>
+<li><h4><a name=remove>REMOVE</a></h4>
+<pre>
+remove, element=name|selected;
+</pre>
+<ul>
+<li>element: name of the existing element to be removed, or
+"selected", in which case all elements from existing 
+<a href="../Introduction/select.html">SELECT</a> commands will be
+removed.
+<font color=ff0000><i>
+<li>Attention: It is a bad idea to remove all markers from a sequence!
+In particular the "start=" marker and the new markers added by "cycle"
+must never be removed from a sequence.</i></font>
+<p>
+</ul><li><h4><a name=cycle>CYCLE</a></h4>
+<pre>
+cycle,start=place;
+</pre>
+This makes the sequence start at the place given, which must be a marker.
+<p>
+In the case there is a shared sequence in the used sequence, the 
+command FLATTEN has to be used before the command CYCLE. Example:
+<p>
+    flatten ; cycle,start=place;
+<p>
+<p>
+<li><h4><a name=reflect>REFLECT</a></h4>
+<pre>
+reflect;
+</pre>
+This inverts the order of element in the sequence, starting from the
+last element.
+<p>
+If there are shared sequences inside the USEd sequence, the command
+FLATTEN must be used before the command REFLECT.  Alternatively each
+shared sequence must first be reflected. Example: 
+<p>
+    flatten ; reflect;
+<p>
+<p>
+<li><h4><a name=replace>REPLACE</a></h4>
+<pre>
+replace,element=name1|selected,by=name2;
+</pre>
+Element with name1 is replaced by element with name2. If name1 is
+"selected", then all elements selected by
+<a href="../Introduction/select.html">SELECT</a> commands will be
+replaced by the element name2.
+<p>
+<li><h4><a name=endedit>ENDEDIT</a></h4>
+<pre>
+endedit;
+</pre>
+terminates the sequence editing process. The nodes in the sequence are
+renumbered according to their occurrence which might have changed
+during editing.
+<p>
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.1 release (March 30, 1999)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>fortran-rules</TITLE>
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+<META NAME="description" CONTENT="fortran-rules">
+<META NAME="keywords" CONTENT="fortran-rules">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.1 release">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<BR>
+<!--End of Navigation Panel-->
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2> Rules for Fortran routines for MAD-X</B></h2> 
+</center>
+
+<UL>
+<LI><B> Code</B>
+ 
+<OL>
+<LI>lower case throughout</LI>
+<LI>all routines start with ``implicit none''</LI>
+<LI>the following types should be used exclusively:
+  
+<UL>
+<LI>integer - use integer as well instead of logical, 0 = false,
+         else true</LI>
+<LI>double precision (not real*8)</LI>
+<LI>complex*16 - only internally, and in cases where it really helps</LI>
+<LI>character - if this routine can be called from outside
+     (i.e. as well from C routines), always foresee a length input
+     variable (see example). When calling a C routine with character strings,
+     make sure they end with a blank (e.g. 'abc ').
+  </LI>
+</UL></LI>
+<LI>use only generic names for functions, i.e. sin, cos, abs, exp
+    etc. and <B> not</B> dsin, dcos, dabs, dexp etc.; nota bene: ANSI
+    for arcus sinus and arcus cosinus is asin and acos (not arsin and arcos)
+ </LI>
+<LI>do not use statement functions, arithmetic IF (3-branch), or IMPLICIT GOTO.
+ </LI>
+<LI>in DO loops: use always do...enddo constructs.
+ </LI>
+<LI>IMPORTANT: when transferring  strings to C routines, always terminate
+    the string with a blank, e.g.
+<PRE>
+      call double_to_table('twiss ', 'betx ', betx)
+</PRE>
+ </LI>
+<LI>When transferring  integer or double to C routines, always use
+    specific variables (no values or expressions), e.g. to receive the
+    current element name
+<PRE>
+      integer i
+      character * 16 name
+      i = 16
+      call element_name(name, i)
+</PRE>
+ </LI>
+</OL></LI>
+<LI><B> Style</B>
+ 
+<OL>
+<LI>all modules and stand-alone routines perform all input/output
+        through symbolic variables in the call (no ``common'');
+        common blocks can be used inside modules, however.</LI>
+<LI>functions return only one (the function-) value and do not
+        modify any of the input variables</LI>
+<LI>all input/output parameters are described, and the routine
+    purpose stated</LI>
+<LI>avoid ``goto'' as far as reasonable</LI>
+<LI>indent do ... enddo and if ... then ... else constructs</LI>
+<LI>avoid using ``return'';
+        only one exit of the routine, at the end (this makes 
+        debugging easier)
+ </LI>
+<LI>no I/O (read, write, print to files) in a Fortran routine, except
+        for printing to output (error messages, summary data etc.);
+        most of the data will be put into tables via C routine calls.</LI>
+<LI>    Error flags, or calls to special exception routines 
+        can be foreseen as need arises.</LI>
+</OL></LI>
+<LI><B> General</B>
+ 
+<OL>
+<LI>for local buffers of moderate size use local arrays; for bulk
+        storage use blank common; blank common may as well be used to
+        pass data inside modules</LI>
+<LI>for matrix manipulation use the existing m66 package</LI>
+<LI>do not use any external library (e.g. cernlib), rather extract
+        and include the code needed
+ </LI>
+</OL></LI>
+<LI><B> Checks are essential!!</B>
+<OL>
+<LI> Run your code through f2c to check that the Fortran is compatible
+with standard Fortran 77. Recent testing of the MAD-X Fortran77 code has 
+revealed some problematic programming techniques.
+Example: f2c twiss.F 
+<LI> Use the NAG f95 compiler with very strict checking by using
+"make -f Makefile_develop (madxp)" in brackets if you test the MAD-X
+        PTC version.</LI>
+<LI> Then run your example with that executable. The "-nan" compile
+        flags will demonstrate at run time if variables have not been
+properly initialized so as to allow for fixing this problem.
+ </LI>
+<LI> At last the MAD-X custodian (presently FS) will check the
+        compatibility with Fortran90. Thereby performing certain
+        "beautification" procedures. Moreover, the NAG f95 compiler
+        reveals more inconsistencies in the Fortran90 mode.
+ </LI>
+</OL></LI>
+</UL>
+ 
+<B> Example</B>
+<PRE>
+
+      integer function type(s_length, s_type)
+*++ Purpose: returns an integer type code for certain elements
+*-- input:
+*   s_length   length of s_type
+*   s_type     string containing type
+*-- return values:
+*   1   for s_type == 'drift'
+*   2   for s_type == 'sbend'
+*   3   for s_type == 'rbend'
+*   5   for s-type == 'quadrupole'
+*   0   else
+*++
+      implicit none
+      integer s_length
+      character *(*) s_type
+
+      if (s_type(:s_length) .eq. 'drift')  then
+        type = 1
+      elseif (s_type(:s_length) .eq. 'sbend')  then
+        type = 2
+      elseif (s_type(:s_length) .eq. 'rbend')  then
+        type = 3
+      elseif (s_type(:s_length) .eq. 'quadrupole')  then
+        type = 5
+      else
+        type = 0
+      endif
+      end
+</PRE>
+<BR><HR>
+<aDDRESS>
+<I>Hans Grote</I>
+<BR><I>2001-01-22</I>
+</ADDRESS>
+</BODY>
+</HTML>

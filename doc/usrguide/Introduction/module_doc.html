@@ -1,0 +1,172 @@
+<head>
+<title>MAD-X Module Writer's Guide</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor = "#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>MAD-X Module Writer's Guide</h2> 
+</center>
+<br>
+Hans Grote and Frank Schmidt
+</center>
+<hr>
+<h2>Introduction</h2>
+MAD-X, in its actual form, consists of a main program in Fortran-77 that 
+does nothing but call a C program which handles the overall control. 
+This C program (CONTROL in the following)
+in turn calls modules written in Fortran-77, possibly 
+Fortran-90 or Fortran-95, and C. The Fortran-77 modules come from MAD-8
+and are adapted to the new structure.
+<p>
+All I/O (except for debug or error messages) is performed by CONTROL. The
+modules receive their input data via calls (Fortran), or take them from
+structures (C); the module outputs are stored in tables or variables via
+calls (Fortran) or directly in structures (C).
+<p>
+For each new module to be added, FS will provide a complete
+development environment consisting of:
+<ul>
+<li>Makefile</li>
+<li>A separate mad-X version with a call to the new module</li>
+<li>Access to the input commands steering the module</li>
+</ul>
+Additional functionality will be added to CONTROL as it becomes necessary,
+i.e. to gain access to data not yet provided.
+<p>
+In the following, the different cases are handled separately.
+<ul>
+<h2>C part</h2>
+The C language is already pretty safe by nature. However, one can
+still produce bad code! Therefore, use the compile flags "-Wall
+-pedantic" (can be done via "make -f Makefile_develop" either for madx
+or madxp) and please fix all warnings that the compiler detects. The
+last checking campaign revealed hundreds of warnings!
+To allow for better code maintainability we have recently to introduce
+a general indentation by 2 characters per level
+level with all curly brackets on an extra line. The curly brackets are
+aligned with the operators. FS has semi-automatic tools to do this
+indentation.
+<li> Memory allocation: <font color=ff0000>Never use the plain
+malloc or calloc C functions!</font>. Instead use the wrappers <font
+color=ff0000> mymalloc and mycalloc </font>. The syntax of how to call
+these functions can be found in madxu.c.
+<h2>Fortran</h2>
+Fortran normally mixes well with C (at least under Unix) provided a few
+<a href="fortran-rules.html">basic rules</a> are respected.
+They concern mainly the transfer of arguments to and from C.
+<p>
+Normally the module will already exist in MAD-8.In this case, follow these
+steps:
+<ul>
+<li>Extract all routines belonging to the module from MAD-8 (possibly
+with the help of FS)
+<li>Find out which routines if any have already been transmitted to mad-X
+<li>Remove all common statements
+<li>Transfer variables that exist only inside the module either via calls
+(as arguments), or via a common block with a name reminding of the module.
+This common block has to be identical in all routines where it appears.
+<li>Make a list of all variables that the module needs from outside
+<li>Give the list to FS so he can provide them
+<li>Make a list of the output data provided by the module (reminder:
+the module should only print error messages, 
+and transfer all result data to tables or variables);
+Discuss the details of the output storage with FS
+<li>Attach the modified module to mad-X and test it
+<li>Provide module documentation (based on MAD-8 documentation)
+<li>Provide test jobs that test the module abilities as far as reasonable
+</ul>
+If it is a new module, the above rules are modified accordingly. However,
+new modules should be written in C whenever possible.
+<p>
+<h2>Strict Checking</h2>
+Before committing to CVS (see next section) it is mandatory
+to perform a strict check of all your examples. To this end create an
+executable with Makefile_develop:
+<p>
+<ul>
+<li> For madx perform: "make -f Makefile_develop"
+<li> For madxp perform: "make -f Makefile_develop madxp"
+</ul>
+Check compiler output for warnings and get rid of them. Then run your
+examples with these executables until MAD-X finishes the job
+successfully. There will be a crash if variables have not been
+initialized before usage and in case of out-of-bound usage of arrays.
+<p>
+<h2>CVS</h2>
+MAD-X is kept under CVS (Concurrent Version System). The CVS version
+number should be >=1.11.2.
+<p>
+Here are the  CVS basics for MAD-X:
+<p>
+<ul>
+<li> For CERN users: First step is to include the following lines into
+your .tcshrc file in your HOME directory (users of other SHELLs adapt
+accordingly):
+<ul>
+<p>
+setenv CVSROOT :kserver:isscvs.cern.ch:/local/reps/madx
+<p>
+setenv CVSEDITOR emacs
+</ul>
+(second command for emacs users) use "source .tcshrc" to activate the
+MAD-X CVS repository.
+<li> Go to your directory of choice, probably the one where you develop
+your module.
+<li> type <font color=ff0000>cvs checkout madX</font> this will create
+a new directory named <font color=00ff00>madX</font> with the newest
+files from the CVS repository. Change directory to <font
+color=00ff00>madX</font>.
+<li> Make your changes.
+<li> <font color=ff0000>VERY IMPORTANT BEFORE PROCEEDING!!! </font>
+<ul>
+<li> Before you <font color=ff0000>commit</font> your changes check
+with <font color=ff0000>cvs log</font> <font
+color=0000ff>your_file</font> if anybody has worked on that file in
+the meantime.
+<li> Also, before a <font color=ff0000>commit</font> please check
+with <font color=ff0000>cvs -n update -A </font> <font
+color=0000ff>your_file</font> if this is truly what you want to commit
+or if there are conflicts. Explanation: <font color=ff0000>-n</font>
+is a global CVS option that give information without actually changing
+any files, the auxiliary <font color=ff0000>-A</font> flag removes
+<font color=ff0000>sticky tags</font> about which you do not really
+want to know about!
+<li> With <font color=ff0000>make</font> produce an executable <font
+color=0000ff>madx</font> and check that all your examples run
+properly!
+</ul>
+<li> type <font color=ff0000>cvs commit </font> <font
+color=0000ff>your_file</font> for each file you have changed. 
+<li> In the rare case that there is a conflict with another module writer
+that has edited the same file, you have to contact him to sort out
+possible problems. It is one of the advantage of the CVS system to
+detect these conflicts.
+<li> Optional: Go back to directory above and type <font
+color=ff0000>cvs release madX </font> this insures that you really
+have committed all changed files before getting rid of the <font
+color=00ff00>madX</font> directory.
+<li> Optional: If you want to know about the history of a file type
+<font color=ff0000>cvs log -S</font> <font
+color=0000ff>your_file</font> (you have to be in the <font
+color=00ff00>madX</font> directory). Explanation: The <font
+color=ff0000>-S</font> flags avoids excessive printout.  
+</ul>
+
+If you want to learn more about CVS please consult the manual which is
+accessible at:
+/afs/cern.ch/eng/sl/MAD-X/dev/cvs_manual.ps
+
+<p>
+Comments from readers are most welcome.
+They may be sent to the following Internet addresses:
+<pre><tt>
+   Frank.Schmidt@cern.ch
+</tt></pre>
+<hr>
+
+<hr>
+</body>

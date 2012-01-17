@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_SELECT</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_SELECT</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_SELECT, 
+table      = [s, none, none], 
+column     = [s, none, none], 
+polynomial = [i, none] , 
+monomial   = [s, none] , 
+parametric = [l, false, true], 
+quantity   = [s, none] ; "
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Selects map elements to be:
+<p>
+   a) <b>Stored in a user specified table and column.</b> <i>Table</i> and <i>column</i> must be specified than,
+      and such table with such column must exists.
+<p>
+   b) <b>Stored as a function (taylor series) of 
+      <a href="PTC_Knob.html">knobs</a>,  if any is defined.</b> 
+      Than, <i>parametric</i> should be set to true. 
+
+Both a) and b) can be joined in one command. 
+
+
+</div>
+
+<h4> Examples</h4>
+
+<p>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/ptc_secordmatch/chicane.madx">  dog leg chicane </a> :
+strength of quads is matched to obtain required T112 value.
+
+
+<p>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx">  dog leg chicane </a> :
+postion of quads is matched to obtain required T566 value.
+
+<p>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/matchwithknobs/matchwithknobs.madx">  dog leg chicane </a> :
+dipols and quads strengths are matched with the help of knobs to obtain required momentum compaction and Twiss functions.
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b> table </b></dt> 
+  <dd>
+  <i> string, </i>
+  <p> Specifies name of the table where values should be stored.
+  </dd>
+
+
+<dt><b> column </b></dt> 
+  <dd>
+  <i> string, </i>
+  <p> Specifies name of the table where values should be stored.
+  </dd>
+
+<dt><b> polynomial </b></dt> 
+  <dd>
+  <i> integer, </i>
+  <p> Specifies row of the map.
+  </dd>
+
+
+<dt><b> monomial </b></dt> 
+  <dd>
+  <i> string composed of digits </i>
+  <p> Defines monomial of the polynomial in PTC nomenclature. 
+      Its lengh should be equal to number of variables. Each of digits corresponds
+      to the exponent of a variable. Monomial 'ijklmn' defines 
+      x<sup>i</sup>p<sub>x</sub><sup>j</sup>y<sup>k</sup>p<sub>y</sub><sup>l</sup>
+      &Delta;T<sup>m</sup>(&Delta;p/p)<sup>n</sup>.
+      For example, element=2 and monomial=1000000
+      defines coefficient of the second polynomial (that defines p<sub>x</sub>) 
+      close to x, in the other words it is R21.
+  
+  </dd>
+
+
+<dt><b> parametric </b></dt> 
+  <dd>
+  <i> logical, default false, if value explicitly not specified then true</i>
+  <p> If it is true, and any
+      <a href="PTC_Knob.html">knobs</a> 
+      are defined the map element is stored as the parametric result. 
+      
+  </dd>
+
+
+
+</dl>
+
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<h4> PROGRAMMERS MANUAL </h4>
+
+<p> 
+The command is implemented pro_ptc_select function in madxn.c and 
+by subroutine addpush in madx_ptc_knobs.f90, that is part of
+madx_ptc_knobs_module
+
+<p>
+On the very beginning the existance of the table and within column is checked.
+In the case of failure, error message is printed and the function is abandoned.
+
+<p>
+The command parameters are passed as the arguments of addpush Fortran routine. 
+A selection is stored in a type called tablepush_poly defined madx_ptc_knobs.inc.
+A newly created object is added to array named pushes. 
+
+<p>
+More then one element might be stored in a single table, so the module must assure that 
+each of tables is augmented only ones for each magnet (or integration slice). 
+For that purpose array of tables to be augmented (named tables) is stored separately and 
+we assure that a table is listed here only ones. This is simply done by checking 
+if a table name is not already listed before adding a new element to the array.
+
+<p>
+In case the user requested an element to be stored in the paramteric format,
+and column in the array of parametric results is reserved and the index of the column is
+remembered in index field of tablepush_poly type is filled. In the other case this field
+is equal to zero.
+
+<p>
+The routine ptc_twiss (defined in file madx_ptc_twiss.f90), after tracking each of magnets 
+in the sequence, calls putusertable routine. This routine loops over selected elemetns defined
+in the pushes table. For each of them it extracts the requested element from the map using .sub. 
+operator of PTC and stores it in the defined table and column. 
+If index field is not zero and any knob is defined, it extracts the polynomial using .par.
+operator, and stores it in the 2D array called results, in the row corresponding to the number
+of the magnet (or integration step) and column defined by the index field.
+
+
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<head>
+<title>SODD</title>
+<!-- Changed by: E. T. d'Amico, 8-Sep-2004 -->
+</head>
+
+<body bgcolor="#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>SODD</h2>
+</center>
+<p>
+This command will execute the Second Order Detuning and Distortion as
+described in the paper of J. Bengtsson and J. Irwin 
+"Analytical Calculation of Smear and Tune Shift " (SSC-232, February
+1990), on the beam line defined by the last USE command followed by a
+TWISS command. It is based on the stand-alone program written by Frank
+Schmidt in November 1998 - January 1999 who also extended the
+analytical computation to the second order distortion (cfr. Beam
+Physics Note 60 F. Schmidt "SODD: A physics Guide"). 
+It consists of three parts:
+<p>
+<li><h4>Subroutine detune (launched by the attribute detune)</h4>
+It calculates the detuning
+function terms in first and second order in the strength of the
+multipoles.
+If the attribute print_at_end has been set, the following two files 
+(and the corresponding madx tables) are created :
+<p>
+<i>detune_1_end</i> containing five columns :
+<ul>
+1) 'multipole order', 2) '(hor., ver. plane => (1/2)', 
+3) 'hor. or ver. detuning', 4) 'order of horizontal invariant', 5) 'order of
+vertical invariant'.
+</ul>
+<p> 
+<i>detune_2_end</i>  containing five columns :
+<ul>
+1) 'first multipole order', 2) 'second multipole order', 
+3) 'horizontal detuning', 4) 'order of horizontal invariant', 5)'order of
+vertical invariant'. 
+</ul>
+If the attribute print_all has been set, the following two files 
+(and the corresponding madx tables) are created :
+<p>
+<i>detune_1_all</i>  containing  five columns : 
+<ul>
+1) 'multipole order', 2) '(hor., ver. plane => (1/2)', 
+3) 'hor. or ver. detuning', 4) 'order of horizontal invariant', 5)'order of
+vertical invariant'.
+</ul> 
+<i>detune_2_all</i>  containing five columns : 
+<ul>
+1) 'first multipole order', 2) 'second multipole order', 
+3) 'horizontal detuning', 4) 'order of horizontal invariant', 5) 'order of
+vertical invariant'.
+</ul>
+<p>
+<li><h4>Subroutine distort1 (launched by the attribute distort1)</h4> 
+It calculates the distortion function and the
+Hamiltonian terms in first order in the strength of the multipoles.
+If the attribute print_at_end has been set, the two files 
+(and the corresponding madx tables) are created :
+<p>
+<i>distort_1_F_end</i> containing eight columns :
+<ul>
+1) 'multipole order', 2) 'cosine part
+of distortion', 3) 'sine part of distortion', 4) 'amplitude of distortion',
+5) 'j', 6) 'k', 7) 'l', 8) 'm'.
+</ul> 
+<i>distort_1_H_end</i>  containing eight columns :
+<ul>
+1) 'multipole order', 2) 'cosine part
+of Hamiltonian', 3) 'sine part of Hamiltonian', 4) 'amplitude of Hamiltonian',
+5) 'j', 6) 'k', 7) 'l', 8) 'm'. 
+</ul>
+If the attribute print_all has been set, the following two files 
+(and the corresponding madx tables) are created :
+<p>
+<i>distort_1_F_all</i> containing eleven columns : 
+<ul>
+1) 'multipole order', 2) 'appearance
+number in position range', 3) 'number of resonance', 4) 'position', 5)
+'cosine part of distortion', 6) 'sine part of distortion', 7) 'amplitude of distortion',
+8) 'j', 9) 'k', 10) 'l', 11) 'm'.
+</ul> 
+<i>distort_1_H_all</i>  containing eleven columns :
+<ul>
+1) 'multipole order', 2) 'appearance
+number in position range, 3) 'number of resonance', 4) 'position', 5) 'cosine part
+of Hamiltonian', 6) 'sine part of Hamiltonian', 7) 'amplitude of Hamiltonian',
+8) 'j', 9) 'k', 10) 'l', 11) 'm'. 
+</ul>
+<p>
+<li><h4>Subroutine distort2 (launched by the attribute distort2)</h4> 
+It calculates the distortion function and Hamiltonian
+terms in second order in the strength of the multipoles.
+If the attribute print_at_end has been set, the following two files 
+(and the corresponding madx tables) are created :
+<p>
+<i>distort_2_F_end</i> containing nine columns :
+<ul>
+1) 'first multipole order',2) 'second multipole order', 
+3) 'cosine part of distortion', 4) 'sine part of distortion', 5) 'amplitude of distortion',
+6) 'j', 7) 'k', 8) 'l', 9) 'm'.
+</ul> 
+<i>distort_2_H_end</i>  containing nine columns : 
+<ul>
+1) 'first multipole order', 2) 'second multipole order', 
+3) 'cosine part of Hamiltonian', 4) 'sine part of Hamiltonian', 5) 'amplitude of Hamiltonian',
+6) 'j', 7) 'k', 8) 'l', 9) 'm'. 
+</ul>
+<p>
+N. B. The first row of every file is a header containing the names of
+the columns. This row is absent in the internal tables.
+<p>
+<li><h4><a name=sodd>SODD</a></h4>
+<pre>
+sodd,
+detune=logical,
+distort1=logical,
+distort2=logical,
+start_stop = start,stop
+multipole_order_range = fist,last
+noprint = logical
+print_all = logical
+print_at_end = logical
+nosixtrack  = logical
+</pre>
+where the parameters have the following meaning:
+</ul>
+<ul>
+<li>detune : logical, default=false. If true, the detune subroutine is executed.
+<li>distort1 : logical, default=false. If true, the distort1 subroutine is executed.
+<li>distort2 : logical, default=false. If true, the distort2 subroutine is executed.
+<li>start_stop : longitudinal interval of the beam line (in m). start
+and stop should be given as real numbers.
+<li>multipole_order_range : the lowest and the largest multipole order
+which will be taken in account. first and last should be given as integers.
+<li>noprint : logical, default=false. If true, no file or internal
+table will be created to keep the results. In this case the attributes
+print_all or print_at_end have no effect.
+<li>print_all : logical, default=false. If true, the files and
+internal tables containing results at each multipole will be generated.
+<li>print_at_end : logical, default=false. If true, the files and
+internal tables containing results at the end of the
+position range will be generated.
+<li>nosixtrack  : logical, default=false. If true, the input file
+fc.34 will not be generated internally by invoking the conversion
+routine of sixtrack and the user should provide it before the
+execution of the sodd command.
+</ul>
+<li>A more detailed description can be found in 
+<address>
+<a href="http://documents.cern.ch/cgi-bin/setlink?base=internal&categ=ab&id=ab-note-2004-069">AB-note-2004-069</a>
+</address>
+</ul>
+<address>
+<a href="http://xwho.web.cern.ch/xwho/people/show/6175">damico</a>,
+September 10, 2004
+</address>
+
+</body>

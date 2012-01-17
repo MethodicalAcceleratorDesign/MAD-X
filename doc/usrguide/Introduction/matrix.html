@@ -1,0 +1,35 @@
+<html><head>
+
+<title>MATRIX</title><!-- Changed by: Frank Schmidt, 25-June-2003 --></head><body bgcolor="#ffffff">
+
+<h1>MATRIX: Arbitrary Element</h1>
+
+<pre>label: MATRIX,TYPE=name,L=real,KICK1=real,...,KICK6=real,
+               RM11=real,...,RM66=real,
+               TM111=real,...,TM666=real;
+</pre>
+The MATRIX permits the definition of an arbitrary transfer matrix.
+It has four real array attributes:
+<ul>
+<li>L:
+Length of the element, which may be zero.
+<li>KICKi:
+Defines the kick of the element acting on the six phase space coordinates.
+</li><li>RMik:
+Defines the linear transfer matrix (6*6) of the element.
+</li><li>TMikl:
+Defines the second-order terms (6*6*6) of the element.
+</li></ul>
+Data values not entered are taken from the identity transformation,
+kick and second order terms are zero as default. In the thin-lens
+tracking module the length of an arbitrary matrix is accepted, however
+no second order are allowed to avoid non symplectic tracking runs. In
+the latter case the tracking run will be aborted.
+
+
+<address>
+<a href="http://www.cern.ch/Frank/Schmidt/frs_sign.html">frs</a>,
+June 25, 2003
+</address>
+
+</body></html>

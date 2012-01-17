@@ -1,0 +1,69 @@
+<head>
+<title>MULTIPOLE</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 17-Jun-2002 -->
+<!-- Changed by: Frank Schmidt, 28-Aug-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h2>MULTIPOLE: General Thin Multipole</h2>
+
+<pre>
+label:   MULTIPOLE,LRAD=real,TILT=real,
+         KNL:={..,..,..}, KSL:={..,..,..};
+</pre>
+A MULTIPOLE is a thin-lens magnet of arbitrary order, including a dipole:
+<ul>
+<li>LRAD:
+A fictitious length, which was originally just used to compute synchrotron
+radiation effects.<br> A non-zero <b><font color="#ff0000"> LRAD </b></font> in conjunction 
+with the <a href="../control/general.html#option">OPTION</a>
+<b><font color="#ff0000"> thin_foc </b></font> set to a <b><font color="#ff0000"> true </b></font> logical
+value takes into account of the weak focussing of bending magnets.
+<LI>TILT:
+The roll angle about the longitudinal axis (default: 0 rad).
+A positive angle represents a clockwise rotation of the multipole
+element. 
+<p><b><font color="#ff0000"> 
+Please note that contrary to MAD8 one has to specify the desired TILT
+angle, otherwise it is taken as 0 rad. We believe that the MAD8
+concept of having individual TILT values for each component and on top
+with default values led to considerable confusion and allowed for
+excessive and unphysical freedom. Instead, in MAD-X the KNL/KSL
+components can be considered as the normal or skew multipole
+components of the magnet on the bench, while the TILT attribute can be
+considered as an tilt alignment error in the machine.
+</b></font>
+<li>KNL:
+The normal multipole coefficients from order zero to the maximum;
+the parameters are positional, therefore zeros must be filled in
+for components that do not exist. Example of a thin-lens sextupole:
+<pre>
+ms:multipole, knl:={0, 0, k2l};
+</pre>
+<li>KSL:
+The skew multipole coefficients from order zero to the maximum;
+the parameters are positional, therefore zeros must be filled in
+for components that do not exist. Example of a thin-lens skew octupole:
+<pre>
+ms:multipole, ksl:={0, 0, 0, k3sl};
+</pre>
+</ul>
+Both KNL and KSL may be specified for the same multipole.
+<p>
+A multipole with no dipole component has no effect on the reference
+orbit,
+i.e. the reference system at its exit is the same as at its entrance.
+If it includes a dipole component,
+it has the same effect on the reference orbit as a dipole
+with zero length and deflection angle K0L, being the first component
+of KNL above.
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+<a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">Frank.Schmidt</a>,
+August 28, 2003 
+</address>
+
+</body>

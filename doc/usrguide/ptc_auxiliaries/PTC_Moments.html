@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_MOMENTS</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_MOMENTS</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_MOMENTS, 
+no = [i, 1], 
+xdistr   = [s, gauss, gauss], 
+ydistr   = [s, gauss, gauss], 
+zdistr   = [s, gauss, gauss], 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Calculates moments previously selected with the 
+<a href="PTC_SelectMoment.html">ptc_select_moment</a> command. 
+It uses maps saved by the ptc_twiss command, hence, the savemaps switch of
+ptc_twiss must be set to true (default) to be able to calculate moments.
+
+</div>
+
+<h4> Examples</h4>
+
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx"> ATF2 </a>
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+
+
+<dt><b> no </b></dt> 
+  <dd>
+  <i> integer </i>
+  <p> order of the calculation, maximally twise the order of the last twiss
+  </dd>
+
+
+<dt><b> xdistr, ydistr, zdistr </b></dt> 
+  <dd>
+  <i> string defining type of distribution for x, y, z dimension, respectively,
+    <ol>
+     <li> <b>gauss</b> - Gaussian</li>
+     <li> <b>flat5</b> - flat distribution in the first of variables (dp over p) of a given dimension 
+                         and Delta Dirac in the second one (T) </li>
+     <li> <b>flat56</b> - flat rectangular distribution </li>
+    </ol>
+
+    
+   </i>
+  <p> 
+  </dd>
+
+
+</dl>
+
+<h4>  </h4>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_ptc_SELECT function in madxn.c and 
+by subroutine xxxx in madx_ptc_xxx.f90.
+<p>
+Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+element in the PTC layout.
+<p>
+
+-->
+
+</div>
+
+</body>
+
+</html>

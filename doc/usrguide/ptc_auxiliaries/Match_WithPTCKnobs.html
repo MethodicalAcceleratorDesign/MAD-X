@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>Match using PTC knobs</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>Matching with PTC knobs</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div> 
+
+
+This matching procedure takes advantage of the parametric results that 
+are accessible with PTC. Namely,  parameters occuring in the matching
+constrains are obtained as functions (polynomials) of the matching variables.
+In other words, each variable is a knob in PTC calculation.
+Evaluation of the polynomials is relatively fast comparing to the regular PTC calculation
+what makes findining the minimum with the parametrized constraints very fast.
+<p>
+However, the algorithm is not faster in a general case:
+<ol>
+ <li> The calculation time dramatically increases with number of parameters and at some point penalty rising from
+      this overcomes the gain we get from the fast polynomial evaluation.
+
+ <li> A parametric result is an approximation that is valid only around 
+      the nominal parameter values. 
+ 
+</ol>
+
+<p>
+The algorithm:
+<p>
+
+1. Buffer the key commands (ptc_varyknob, constraint, ptc_setswitch, ptc_twiss or ptc_normal, etc) 
+appearing between 
+match, useptcknobs=true;
+and any of matching actions calls (migrad,lmdif,jacobian, etc) 
+<br>
+2.  When matching action appears,  <br>
+<blockquote>
+     a) set "The Current Variables Values" (TCVV) to zero <br>
+     b) perform THE LOOP, i.e. points 3-17 <br>
+</blockquote>
+<br>
+3.  Prepare PTC environment (ptc_createuniverse, ptc_createlayout)
+<br>
+4.  Set the user defined knobs (with ptc_knob).
+<br>
+5.  Set TCVV using ptc_setfieldcomp command
+<br>
+6.  Run a PTC command (twiss or normal)
+<br>
+7.  Run a runtime created script that performs a standard matching;
+    all the user defined knobs are variables of this matching.
+<br>
+8.  Evaluate constraints expressions to get the matching function vector (I)
+<br>
+9.  Add the matched values to TCVV
+<br>
+10. End PTC session (run ptc_end)
+<br>
+11. If the matched values are not close enough to zeroes then goto 3
+<br>
+12. Prepare PTC environment (ptc_createuniverse, ptc_createlayout)
+<br>
+13. Set TCVV using ptc_setfieldcomp command <br>
+  ( --- please note that knobs are not set in this case  -- )
+<br>
+14. Run a PTC command (twiss or normal) 
+<br>
+15. Evaluate constraints expressions to get the matching function vector (II)
+<br>
+16. Evaluate a penalty function that compares matching function vectors (I) and (II)
+    See points 7 and 14
+<br>
+17  If the matching function vectors are not similar to each other 
+    within requested precision then goto 3
+<br>
+18. Print TCVV, which are the matched values.
+<br>
+
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+MATCH, use_ptcknobs=true;
+
+PTC_VARYKNOB: 
+  initial = [s, none] , 
+  element = [s, none] , 
+  kn    = [i, -1], 
+  ks    = [i, -1], 
+  exactmatch = [l, true, true], 
+  trustrange    = [r, 0.1],  
+  step     = [r, 0.0], 
+  lower    = [r, -1.e20],
+  upper    = [r,  1.e20]; 
+
+END_MATCH;
+</big>
+</pre>
+
+<p>
+
+For the user convenience the limits are specified in the MAD-X units (k1,k2, etc).
+This also applies to dipolar field where the user must specify limits of k0=angle/path_lengh.
+
+This guarantees concistency in treatment of normal and skew dipol components.
+
+<p>
+Important: Note that inside the code skew magnets are represented only by 
+normal component and tilt, so the nominal skew component is always zero. 
+Inside PTC tilt can not become a knob, while skew component can. 
+Remember about this fact when setting the limits of skew components in the matching. 
+When the final results are exported back to MAD-X, they are converted back to
+the "normal" state, so the nominal skew compoment is zero and tilt and 
+normal component are modified accordingly.
+
+
+
+<p>
+trustrange - defines the range the expansion is trusted
+
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+
+
+
+
+<p>
+
+
+
+
+<h4> Example </h4>
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/.madx">  dog leg chicane </a>:
+
+
+<!--  ##########################################################              -->
+
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_PTC_SETKNOBVALUE function in madxn.c and 
+
+-->
+
+</div>
+
+</body>
+
+</html>

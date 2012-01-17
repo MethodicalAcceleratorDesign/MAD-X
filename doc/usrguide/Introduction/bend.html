@@ -1,0 +1,161 @@
+<head>
+<title>RBEND, SBEND</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+<!-- Changed by: Frank Schmidt, 28-Aug-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<H2>Bending Magnets</H2>
+</center>
+<p>
+Two different type keywords are recognised for bending magnets,
+they are distinguished only by the reference system used:
+<UL>
+<LI><a name=rbend>RBEND</a> is a rectangular bending magnet.
+It has parallel pole faces and is based on a curved
+<a href="local_system.html#rbend">rbend reference system</a>; 
+<b><font color="#ff0000">
+its length is the straight length as in the Figure but
+internally the arc length is being used. 
+- to define an RBEND with the arc length as length (straight line
+shorter than input - for compatibility with MAD8 version up to
+version 8.23.06 including), the option RBARC=FALSE has to be set.</font></b>
+<p><LI><a name=sbend>SBEND</a> is a sector bending magnet.
+Its pole faces meet at the centre of curvature of the curved
+<a href="local_system.html#sbend">sbend reference system</a>.
+</UL>
+They are defined by the commands:
+<PRE>
+SBEND,   L=real,ANGLE=real,TILT=real,K0=real,K0S=real,K1=real,E1=real,E2=real,
+         FINT=real,FINTX=real,HGAP=real,K2=real,H1=real,H2=real;
+
+RBEND,   L=real,ANGLE=real,TILT=real,K0=real,K0S=real,K1=real,E1=real,E2=real,
+         FINT=real,FINTX=real,HGAP=real,K2=real,H1=real,H2=real;
+</PRE>
+For both types,
+the following first-order attributes are permitted:
+<UL>
+<LI>L:
+The length of the magnet (default: 0 m).
+For a rectangular magnet the length is measured along a straight line 
+as in the Figure (internally the arc length is used), while for a 
+sector magnet it is the arc length of the reference orbit.
+<b><font color="#ff0000">
+To define an RBEND with the arc length (shorter straight length), 
+the option RBARC=FALSE has to be set.</font></b>
+<p><LI>ANGLE:
+The bend angle (default: 0 rad).
+A positive bend angle represents a bend to the right,
+i.e. towards negative <VAR>x</VAR> values.
+<p><LI>TILT:
+The roll angle about the longitudinal axis (default: 0 rad,
+i.e. a horizontal bend). A positive angle represents a clockwise
+rotation. A TILT=pi/2 turns a horizontal into a vertical bend, i.e. a
+positive bend ANGLE denotes a deflection down.
+<b><font color="#ff0000"> Please note that contrary to MAD8 one has to
+specify the desired TILT angle, otherwise it is taken as 0 rad. This
+was needed to avoid the confusion in MAD8 about the actual meaning of
+the TILT attribute for various elements.
+</b></font>
+<p><b>
+<LI>Please take note that K<sub>0</sub> and K<sub>0s</sub> are left in
+the data base but are no longer used for the MAP of the bends (but see
+below for what K<sub>0</sub> is being used), instead ANGLE and TILT
+are used exclusively. We believe that this will allow for a clearer
+and unambiguous definition, in particular in view of the upcoming
+integration of MAD-X with PTC which will allow a more general
+definition of bends. <font color="#ff0000"> However, it is required to
+specify k0 to assign RELATIVE field errors to a bending magnet since
+k0 is used for the normalization and NOT the ANGLE. (see
+EFCOMP).</b></font>
+<p>
+<!---<PRE>K0: -->
+<!---The horizontal dipole coefficient -->
+<!---<i>K<sub>0</sub> = (1 / B rho) B<sub>y</sub> </i>. -->
+<!---The default is 0 m<sup>-1</sup>. -->
+<!---A positive dipole strength is equivalent to a positive ANGLE which has the -->
+<!---precedence over K<sub>0</sub>; however, if ANGLE is omitted,  -->
+<!---K<sub>0</sub>*L is used instead. -->
+<!---K0S: -->
+<!---The vertical dipole coefficient -->
+<!---<i>K<sub>0s</sub> = (1 / B rho) B<sub>x</sub> </i>. -->
+<!---The default is 0 m<sup>-1</sup>. A positive K0S deflects the closed -->
+<!---orbit to positive y values.</PRE> -->
+<LI>K1:
+The quadrupole coefficient
+<p>
+<i>K<sub>1</sub> = (1 / B rho) (del B<sub>y</sub> / del x)</i>.
+<p>
+The default is 0 m<sup>-2</sup>.
+A positive quadrupole strength implies horizontal focussing
+of positively charged particles.
+<LI>E1:
+The rotation angle for the entrance pole face
+(default: 0 rad).
+<LI>E2:
+The rotation angle for the exit pole face
+(default: 0 rad).
+<LI>FINT:
+The field integral whose default value is 0.
+<LI>FINTX:
+Allows (FINTX > 0)to set FINT at the element exit different from its entry
+value. In particular useful to switch it off (FINTX=0).
+<LI>HGAP:
+The half gap of the magnet (default: 0 m).
+</UL>
+The pole face rotation angles are referred to the magnet model for
+<a href="local_system.html#rbend">rectangular bend</a> and
+<a href="local_system.html#sbend">sector bend</a> respectively.
+The quantities FINT and HGAP specify
+the finite extent of the fringe fields as defined in
+<a href="bibliography.html#slac75">[SLAC-75]</a>
+There they are defined as follows:
+<p>
+<img src="../equations/fint_hgap.gif" alt="(see SLAC-75)" align=bottom>
+<p>
+The default values of zero corresponds to the hard-edge approximation,
+i.e. a rectangular field distribution.
+For other approximations, enter the correct value of the half gap,
+and one of the following values for FINT:
+<PRE>
+Linear Field drop-off                     1/6
+Clamped "Rogowski" fringing field         0.4
+Unclamped "Rogowski" fringing field       0.7
+"Square-edged" non-saturating magnet      0.45
+</PRE>
+Entering the keyword FINT alone sets the integral to 0.5.
+This is a reasonable average of the above values.
+
+The following second-order attributes are permitted:
+<ul>
+<LI>K2:
+The sextupole coefficient
+<i>K<sub>2</sub> = (1 / B rho) (del<sup>2</sup> B<sub>y</sub> / del x<sup>2</sup>)</i>.
+<LI>H1:
+The curvature of the entrance pole face (default: 0 m<sup>-1</sup>).
+<LI>H2:
+The curvature of the exit pole face (default: 0 m<sup>-1</sup>).
+A positive pole face curvature induces a negative sextupole component;
+i.e. for positive H1 and H2
+the centres of curvature of the pole faces are placed inside the magnet.
+</UL>
+Examples:
+<PRE>
+BR: RBEND,L=5.5,ANGLE=+0.001;              // Deflection to the right
+BD: SBEND,L=5.5,K0S=+0.001/5.5;            // Deflection up
+BL: SBEND,L=5.5,K0=-0.001/5.5;             // Deflection to the left
+BU: SBEND,L=5.5,K0S=-0.001;                // Deflection down
+</PRE>
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+<a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
+August 28, 2003 
+</address>
+</body>

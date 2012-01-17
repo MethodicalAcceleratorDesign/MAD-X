@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_SETSWITCH</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_SETSWITCH</h1>
+  <h2> routine that sets the internal PTC switches </h2>
+</center>
+</div>
+
+<div class="madxdocContent">
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_SETSWITCH,
+debuglevel = [i,0], 
+maxacceleration = [l, true, true],
+exact_mis = [l, false, true],
+totalpath = [l, false, true],
+radiation = [l false, true],
+fringe = [l, false, true],
+time = [l, true, true];
+</big>
+</pre>
+
+</div>
+
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+Using this command the user can set switches of PTC and the MAD-X-PTC interface, adapting 
+this way the program behavior to his needs. 
+</div>
+
+
+<div>
+<h4> Command parameters and switches </h4>
+
+
+<dl>
+<dt><b>debuglevel</b></dt> 
+  <dd>
+  <i> integer, default value 1, no default value if value explicitly not specified</i>
+  <p> Sets the level of debugging printout 0 none, 4 everything
+  </dd>
+
+<dt><b>maxacceleration</b></dt> 
+  <dd>
+  <i> logical, default true, if value explicitly not specified then true </i> 
+  <p> Switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy
+  </dd>
+
+<dt><b> exact_mis </b></dt> 
+  <dd>
+  <i> logical, default false, true if value explicitly specified </i> 
+  <p> Switch ensures exact misalignment treatment.
+  </dd>
+ 
+<dt><b> totalpath </b></dt> 
+  <dd>
+  <i> logical, default false, true if value explicitly specified </i>
+  <p> If true, the 6th variable of PTC, i.e. 5th of MAD-X is the total path.
+      If false it is deviation from the reference particle, which is normally the closed orbit for closed
+      layouts.
+  </dd>
+
+<dt><b> radiation </b></dt> 
+  <dd>
+   <i> logical, default false, if value explicitly not specified then true</i>:
+   <p> Sets the radiation switch/internal state of PTC.
+  </dd>
+
+<dt><b> fringe </b></dt> 
+  <dd>
+  <i> logical, default false, true if value explicitly specified</i>: 
+  <p> Sets the fringe switch/internal state of PTC. If true the influence of the fringe fields is evaluated for
+      all the elements. 
+  <p> Please note that currently fringe fields are always taken to the account for some elements
+      (f.g. traveling wave cavities) even if this flag is set to false. 
+      The more detailed list of the elements will be provided later, 
+      when the situation in this matter will be definitely settled.
+  </dd>
+
+<dt><b> time </b></dt> 
+  <dd>
+  <i> logical, default true, if value explicitly not specified then true </i>: 
+  <p> If true, Selects time of flight rather than path length. (<i>cT</i> to be precise)
+      as the 6th variable of PTC, i.e. 5th of MAD-X.
+  </dd>
+
+</dl>
+
+</div>
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+
+<h3> PROGRAMMERS MANUAL </h3>
+
+
+Values of the switches are stored in Fortran 90 module mad_ptc_intstate (mad_ptc_intstate.f90).
+The command is processed by pro_ptc_setswitch C function in file madxn.c
+It call an appropriate routines of the Fortran module to set each of the switches:
+<ul>
+<li> ptc_setdebuglevel </li>
+<li> ptc_setaccel_method </li>
+<li> ptc_setexactmis </li>
+<li> ptc_setradiation </li>
+<li> ptc_settotalpath </li>
+<li> ptc_settime </li>
+<li> ptc_setfringe  </li>
+</ul>
+
+
+
+</div>
+</div>
+
+</body>
+
+</html>

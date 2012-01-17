@@ -1,0 +1,190 @@
+<head>
+<title>BEAM</title>
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>BEAM: Set Beam Parameters</h2>
+</center>
+
+Many commands in MAD-X require the setting of various quantities related
+to the beam in the machine. Therefore, MAD-X will stop with a fatal error
+if an attempt is made to expand (USE) a sequence for which no BEAM
+command has been issued before.
+<p>
+The quantities are entered by a BEAM command:
+<pre>
+BEAM, PARTICLE=name,MASS=real,CHARGE=real,
+      ENERGY=real,PC=real,GAMMA=real,
+      EX=real,EXN=real,EY=real,EYN=real,
+      ET=real,SIGT=real,SIGE=real,
+      KBUNCH=integer,NPART=real,BCURRENT=real,
+      BUNCHED=logical,RADIATE=logical,BV=integer,SEQUENCE=name;
+</pre>
+Warning: BEAM updates, i. e. it replaces attributes explicitely
+mentioned, but does not return to default values for others!
+To reset to <a href="resbeam.html#defaults">beam value defaults</a>, 
+use <a href="resbeam.html">RESBEAM</a>.
+The particle restmass and <a name=charge>charge</a> are defined by:
+<ul>
+<li><a name=particle>PARTICLE</a>:
+The name of particles in the machine.
+MAD knows the restmass and the charge for the following particles:
+<ul><li>POSITRON:
+The particles are positrons (MASS=<i>m<sub>e</sub></i>, CHARGE=1),
+<li>ELECTRON:
+The particles are electrons (MASS=<i>m<sub>e</sub></i>, CHARGE=-1),
+<li>PROTON:
+The particles are protons (MASS=<i>m<sub>p</sub></i>, CHARGE=1),
+<li>ANTIPROTON:
+The particles are anti-protons (MASS=<i>m<sub>p</sub></i>, CHARGE=-1).
+<li>POSMUON:
+The particles are positive muons (MASS=<i>m<sub>mu</sub></i>, CHARGE=1),
+<li>NEGMUON:
+The particles are negative muons (MASS=<i>m<sub>mu</sub></i>, CHARGE=-1).
+</ul>
+</ul>
+Therefore neither restmass nor charge can be modified for these predefined
+particles. On the other hand, for ions and all other user defined
+particles the name, restmass, and charge can be entered independently.
+<p>
+By default the total particle energy is 1 GeV.
+A different value can be defined by one of the following:
+<ul>
+<li><a name=energy>ENERGY</a>:
+The total energy per particle in GeV.
+If given, it must be greater then the particle restmass.
+<li><a name=pc>PC</a>:
+The momentum per particle in GeV/c.
+If given, it must be greater than zero.
+<li><a name=gamma>GAMMA</a>:
+The ratio between total energy and rest energy of the particles:
+GAMMA = <i>E / m<sub>0</sub></i>.
+If given, it must be greater than one.
+If the restmass is changed a new value for the energy should be entered.
+Otherwise the energy remains unchanged,
+and the momentum PC and the quantity GAMMA are recalculated.
+The emittances are defined by:
+<li><a name=ex>EX</a>:
+The horizontal emittance <i>E<sub>x</sub></i> (default: 1 m).
+<li><a name=ey>EY</a>:
+The vertical emittance <i>E<sub>y</sub></i> (default: 1 m).
+<li><a name=et>ET</a>:
+The longitudinal emittance <i>E<sub>t</sub></i> (default: 1 m).
+The emittances can be replaced
+by the normalised emittances and the energy spread:
+<li><a name=exn>EXN</a>:
+The normalised horizontal emittance [m]:
+<i>E<sub>xn</sub></i> =
+4 (GAMMA<sup>2</sup> - 1)<sup>1/2</sup> <i>E<sub>x</sub></i>
+(ignored if <i>E<sub>x</sub></i> is given).
+<li><a name=eyn>EYN</a>:
+The normalised vertical emittance [m]:
+<i>E<sub>yn</sub></i> =
+4 (GAMMA<sup>2</sup> - 1)<sup>1/2</sup> <i>E<sub>y</sub></i>
+(ignored if <i>E<sub>x</sub></i> is given).
+<li><a name=sigt>SIGT</a>:
+The bunch length <i>c</i> sigma(<i>t</i>) in [m].
+<li><a name=sige>SIGE</a>:
+The <em>relative</em> energy spread sigma(<i>E</i>)/<i>E</i> in [1].
+</ul>
+Certain commands compute the synchrotron tune <i>Q<sub>s</sub></i>
+from the RF cavities.
+If <i>Q<sub>s</sub></i> is non-zero,
+the relative energy spread and the bunch length are
+<p>
+sigma(<i>E</i>) / <i>p<sub>0</sub> c = 
+(2 pi Q<sub>s</sub> E<sub>t</sub> / ETA C)<sup>1/2</sup></i>,
+<p>
+<i>c</i> sigma(<i>t</i>) =
+</i>(ETA C E<sub>t</sub> / 2 pi Q<sub>s</sub>)<sup>1/2</sup></i>.
+<p>
+<i>C</i> is the machine circumference, and
+<p>
+<i>ETA</i> = GAMMA<sup>-2</sup> - GAMMA(transition)<sup>-2</sup>.
+<p>
+The order of precedence in the parameter evaluation is given below:
+<pre>
+    particle->(mass+charge)
+    energy->pc->gamma->beta
+    ex->exn
+    ey->eyn
+    current->npart
+    et->sigt->sige
+</pre>
+where any item to the left takes precendence over the others.
+<p>
+Finally, the BEAM command accepts
+<ul>
+<li><a name=kbunch>KBUNCH</a>:
+The number of particle bunches in the machine (default: 1).
+<li><a name=npart>NPART</a>:
+The number of particles per bunch (default: 0).
+<li><a name=bcurrent>BCURRENT</a>:
+The bunch current (default: 0 A).
+<li><a name=bunched>BUNCHED</a>:
+A logical flag.
+If set, the beam is treated as bunched whenever this makes sense.
+<li><a name=radiate>RADIATE</a>:
+A logical flag.
+If set, synchrotron radiation is considered in all bipolar magnets.
+<li><a name=bv>BV</a>: an integer specifying the direction of the
+particle movement in a beam line; either +1 (default), or -1. For
+a detailed explanation see under <a href=bv_flag.html>bv flag</a>.
+<li><a name=sequence>SEQUENCE</a>: this attaches the beam command to a
+specific sequence; if the name is omitted, the BEAM command refers to
+the default beam always present. Sequences without attached beam use this
+default beam. When updating a beam, the corresponding sequence name,
+if any, must always be mentioned.
+</ul>
+The BEAM command changes only the parameters entered.
+The command
+<a href=resbeam.html>RESBEAM</a>
+resets all beam data to their 
+<a href = "resbeam.html#defaults">beam value defaults</a>.
+<p>
+Examples:
+<pre>
+BEAM,   PARTICLE=ELECTRON,ENERGY=50,EX=1.E-6,EY=1.E-8,SIGE=1.E-3;
+ ...
+BEAM,   RADIATE;
+ ...
+RESBEAM;
+BEAM,   EX=2.E-5,EY=3.E-7,SIGE=4.E-3;
+</pre>
+The first command selects electrons, and sets energy and emittances.
+The second one turns on synchrotron radiation.
+The last two select positrons (by default),
+set the energy to 1 GeV (default),
+clear the synchrotron radiation flag,
+and set the emittances to the values entered.
+<p>
+Some program modules of MAD-X may also store data into a beam data block.
+Expressions may refer to data in this beam data block
+using the notation
+<pre>BEAM->attribute-name</pre> or <pre>BEAM%sequence->attribute-name.</pre>
+This notation refers to the value of attribute-name
+found in the default BEAM resp. the beam belonging to the sequence
+given.
+This can be used for receiving or using values, e.g.
+<pre>
+value,beam%lhcb2->bv;
+</pre>
+or for storing values in the beam (this does NOT trigger an update
+of dependent variables !), e.g.
+<pre>
+beam->charge=-1;
+</pre>
+The current values in the BEAM bank can be obtained by the command
+<pre>show,beam;</pre> resp. <pre>show,beam%sequence;</pre>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>
+11.9.2000
+</address>
+
+</body>

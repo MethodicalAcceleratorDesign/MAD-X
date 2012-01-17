@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="author"      content="Alexander Koschik" />
+  <meta name="description" content="MADX MAD-X Thin-Lens Tracking Module" />
+  <meta name="keywords"    content="MADX MAD-X Thin-Lens tracking thin lens thintrack thinlens thin-lens module trajectory aperture" />
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" />
+  <title>Thin-Lens Tracking Module (thintrack)</title>
+	<!-- Created by: Andre VERDIER, 21-Jun-2002 -->
+	<!-- Changed by: Andre Verdier, 26-Jun-2002 -->
+	<!-- Changed by: Alexander Koschik, 07-Mar-2006 -->
+	<!-- Changed by: Alexander Koschik, 29-Mar-2006 -->
+	<!-- Changed by: Alexander Koschik, 02-Feb-2007 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right" alt="MAD-X Logo" />
+  <h1>Thin-Lens Tracking Module (thintrack)</h1>
+</center>
+</div>
+
+<div class="madxdocContent">
+	
+<div>
+<p>
+The <strong>thin-lens tracking module</strong> of MAD-X performs element per element tracking of (one to many) 
+particle trajectories in the last <a href="../control/general.html#use"><var class="command">use</var></a>d sequence. 
+<!-- either for single passage (option <var class="option">onepass</var>) or for many turns (default option). -->
+Only thin elements are allowed (apart from the element <var class="element">drift</var>), which guarantees
+the symplecticity of the coordinate transformation. Any lattice can be converted into a "thin element" lattice
+by invoking the <a href="../makethin/makethin.html"><var class="command">makethin</var></a> command.
+</p>
+</div>
+
+<hr />
+
+<div>
+	<dl>
+		<dt class="madxdoc">Synopsis</dt>
+		<dd>
+			  <code>
+        TRACK, onepass, deltap= double, dump; <br />
+        &nbsp;&nbsp;START, x= double, px= double, y= double, py= double, t= double, pt= double; <br />
+        &nbsp;&nbsp;RUN, turns= integer;<br />
+        ENDTRACK;
+      </code>
+    </dd>
+</dl>
+</div>
+
+<div>
+	<dl>
+		<dt class="madxdoc">Commands</dt>
+		<dd>
+<div>
+	<dl>
+		<dt class="command">
+			  <strong><var class="command">TRACK</var>, <var class="option">deltap</var>= double, <var class="option">onepass</var>, <var class="option">dump</var>, <var class="option">onetable</var>, <var class="option">file</var>= string</strong>; &nbsp;&nbsp;(MAD-X version 1)<br />
+			  <strong><var class="command">TRACK</var>, <var class="option">deltap</var>= double, <var class="option">onepass</var>, <var class="option">damp</var>, <var class="option">quantum</var>, <var class="option">dump</var>, <var class="option">aperture</var>, <var class="option">onetable</var>, <var class="option">file</var>= string</strong>; &nbsp;&nbsp;(MAD-X version 2)<br />
+			  <strong><var class="command">TRACK</var>, <var class="option">deltap</var>= double, <var class="option">onepass</var>, <var class="option">damp</var>, <var class="option">quantum</var>, <var class="option">dump</var>, <var class="option">aperture</var>, <var class="option">onetable</var>, <var class="option">recloss</var>, <var class="option">file</var>= string</strong>; &nbsp;&nbsp;(MAD-X version 3)<br />
+			  <strong>&nbsp;&nbsp;[commands]</strong>;<br />
+			  <strong><var class="command">ENDTRACK</var></strong>;</dt>
+		<dd>
+		<div>
+			<dl>
+				<dt class="madxdoc">Description</dt>
+				  <dd>
+		      	<!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
+		      	<strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
+		      	The <var class="command">TRACK</var> command initiates trajectory tracking by entering the 
+		      	thin-lens tracking module. Several options can be specified, the most 
+		      	important being <var class="option">dump</var>, <var class="option">deltap</var> and
+		      	<var class="option">aperture</var>. 
+		      	<!-- The options <var class="option">damp</var> and 
+		      	<var class="option">quantum</var> are not available in MAD-X versions 1.xx. --> <br />
+		      	Inside the block <var class="command">TRACK</var>-<var class="command">ENDTRACK</var> a series 
+		      	of initial trajectory coordinates can be specified by the <var class="command">START</var> 
+		      	command (as many commands as trajectories). This will be usually done in a 
+		      	<var class="command">while</var>-loop. <strong>Note</strong> that the coordinates are either 
+		      	<strong>canonical</strong> coordinates or <strong>action-angle</strong> variables!<br /><br />
+		      	<ul class="noindent">
+		      		<li>
+               For usual tracking (single/multi-turn), all coordinates are specified with respect to the actual closed 
+               orbit (possibly off-momentum, with magnet errors) and <strong>NOT</strong> with respect 
+               to the reference orbit.</li>
+              <li>
+               <!-- For <var class="option">onepass</var> tracking, the coordinates are specified with respect 
+               to the reference orbit. -->
+               If the option <var class="option">onepass</var> is used, the coordinates are specified with respect 
+               to the reference orbit. The name "onepass" might be misleading: Still tracking can be single- or multi-turn!  
+               </li>
+            </ul><br />
+            
+            The tracking is actually started with the <var class="command">RUN</var> command, where the option 
+            <var class="option">turns</var> defines for how many turns the particles will be tracked in the 
+            given sequence.<br /> 
+		      	
+		      	If the option <var class="option">dump</var> is used, the particle coordinates are written
+		      	to files at each turn. The output files are named automatically. The name given by the user is followed 
+		      	by .obsnnnn(observation point), followed by .pnnnn(particle number). Hence filenames look like 
+		      	<code>track.obs0001.p0001</code>. <br />
+		      	Tracking is terminated by the command <var class="command">ENDTRACK</var>.
+		     </dd>
+		    <dt class="madxdoc">Options</dt>
+		      <dd>
+<table cellspacing="0" cellpadding="3" border="1">
+<tr>
+    <th>Option</th>
+    <th>Meaning</th>
+    <th>Default Value</th>
+    <th>Value Type</th>
+</tr>
+<tr>
+    <td>DELTAP</td>
+    <td>relative momentum offset for reference closed orbit (switched off for onepass)</td>
+    <td> 0.0</td>
+    <td>double</td>
+</tr>
+<tr>
+    <td>ONEPASS</td>
+    <td>the sequence is treated as transfer line (no stability test, ie. no closed-orbit search)</td>
+    <td>.FALSE.= closed-orbit search</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>DAMP</td>
+    <td>introduce synchrotron damping (needs RF cavity, RADIATE in BEAM) </td>
+    <td>.FALSE.= no damping</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>QUANTUM</td>
+    <td>introduce quantum excitation via random number generator and tables for photon emission</td>
+    <td>.FALSE.= no excitation</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>DUMP</td>
+    <td>write the particle coordinates in files (names generated automatically) </td>
+    <td>.FALSE.= no file generated</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>APERTURE</td>
+    <td>particle is lost if its trajectory is outside the aperture of the current element. 
+    	  <a class="important" href="#track:remarks:aperture:notes">Notes</a>.</td>
+    <td>.FALSE.= no aperture check</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>ONETABLE</td>
+    <td>write all particle coordinates in a single file</td>
+    <td>.FALSE.= one file per particle</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>RECLOSS</td>
+    <td>create a table named "trackloss" in memory with lost particles' coordinates</td>
+    <td>.FALSE.= no table</td>
+    <td>logical</td>
+</tr>
+<tr>
+    <td>FILE</td>
+    <td>name for the track table  </td>
+    <td>"track", "trackone"</td>
+    <td>string</td>
+</tr>
+<tr>
+    <td>UPDATE</td>
+    <td>parameter update per turn  </td>
+    <td>.FALSE.= no update</td>
+    <td>string</td>
+</tr>
+</table>
+          </dd>
+		    <dt class="madxdoc">Remarks</dt>
+		      <dd>
+		      	<em>IMPORTANT:</em> If an RF cavity has a no zero voltage, synchrotron
+            oscillations are automatically included. If tracking with constant
+            momentum is desired, then the voltage of the RF cavities has to be set
+            to zero. If an RF cavity has a no zero voltage and DELTAP is non zero, 
+            tracking is done with synchrotron oscillations around an off-momentum
+            closed orbit.
+            <br />
+            
+            <p class="note"><a name="track:remarks:deltap:notes" id="track:remarks:deltap:notes">DELTAP</a></p>
+            Defining a non-zero <var class="option">deltap</var> results in a change of the 
+            beam momentum/energy without changing the magnetic properties in the sequence. This 
+            leads to a new closed orbit, the off-momentum closed orbit. Particle coordinates are
+            then given with respect to this new closed orbit, unless the option <var class="option">onepass</var>
+            is used!<br />
+
+            <p class="note"><a name="track:remarks:onepass:notes" id="track:remarks:onepass:notes">ONEPASS</a></p>
+            If the option <var class="option">onepass</var> is used, no closed orbit is searched, which also means 
+            that no stability test is done. Use this option if you want to get the particles' coordinates with 
+            respect to the reference orbit rather than the closed orbit. Unfortunately the name is misleading, 
+            but for backwards compatibility it is kept. "onepass" does <strong>NOT</strong> restrict the tracking 
+            to one turn only!<br />
+                                     
+            <p class="note"><a name="track:remarks:aperture:notes" id="track:remarks:aperture:notes">APERTURE</a></p>
+            <ul class="noindent">
+              <li>If the <var class="option">aperture</var> option is applied, the <var class="option">apertype</var> 
+              	  and <var class="option">aperture</var>
+                  information of each element in the sequence is used to check whether the particle is lost or not. 
+                  For further information on the definition of apertures and different aperture types, 
+                  see the documentation of the <a href="../Introduction/aperture.html"><var class="command">APERTURE</var></a>
+                  module.
+              </li>
+              <li>In case no aperture information was specified for an element, 
+              	  the following procedure will currently take place:<br />
+                  &nbsp;&rarr;&nbsp; No aperture definition for element &nbsp;&rarr;&nbsp; 
+                  Default apertype/aperture assigned (currently this is 
+                  <code>apertype= circle, aperture = {0}</code>) <br /> &nbsp;&rarr;&nbsp;  
+                  If tracking with <var class="option">aperture</var> is used and an
+                  element with <code>apertype= circle</code> AND <code>aperture= {0}</code> 
+                  is encountered, then the first value of the <var class="option">maxaper</var> vector
+                  is assigned as the circle's radius (no permanent assignment!). 
+                  See option <a href="#run"><var class="option">maxaper</var></a> for 
+                  the default values. <br /> &nbsp;&rArr;&nbsp;
+                  Hence even if no aperture information is specified by the user for certain elements, 
+                  default values will be used!
+               </li> 
+            </ul>
+                        
+            <p class="note"><a name="track:remarks:recloss:notes" id="track:remarks:recloss:notes">RECLOSS</a></p>
+            Traditionally, when a particle is lost on the aperture, this information is written to stdout. To allow more flexible 
+            tracking studies, the lost particles' coordinates and further information can also be saved in a table in memory. 
+            Usually one would save this table to a file using the <var class="command">WRITE</var> command after the tracking run has finished.
+            The following information is available in the TFS table "trackloss":
+            <ul class="noindent">
+              <li>Particle ID (number)</li>
+              <li>Turn number</li>
+              <li>Particle coordinates (x,px,y,py,t,pt)</li>
+              <li>Longitudinal position in the machine (s)</li>
+              <li>Beam energy</li>
+              <li>Element name, where the particle is lost</li>
+            </ul>
+
+            <p class="note"><a name="track:remarks:update:notes" id="track:remarks:update:notes">UPDATE</a></p>
+            Changed behaviour for time variation in tracking. Use
+            track command option 'update' (e.g.: 'track, onepass,
+            update;') to use the following additions: 
+            <ul class="noindent">
+              <li> Introduced special variable ('tr$turni') that can be
+                 used in expressions like 'KICK:= sin(tr$turni)' and is updated at each turn during tracking.
+              </li>
+              <li> Introduced special macro ('tr$macro') that can be
+                    user-defined ('tr$macro(turn): macro = {whatever
+                       depending on turnnumber;};') and is executed/updated at each turn during tracking.
+                       (Macro is necessary e.g. for table access.)
+              </li>   
+            </ul>               
+          </dd>
+      </dl>
+    </div>
+    </dd>
+  </dl>
+</div>
+
+<div>
+	<dl>
+		<dt class="command"><strong><var class="command">START</var>, <var class="option">x</var>= double, <var class="option">px</var>= double, <var class="option">y</var>= double, <var class="option">py</var>= double, <var class="option">t</var>= double, <var class="option">pt</var>= double;</strong><br />
+			                  <strong><var class="command">START</var>, <var class="option">fx</var>= double, <var class="option">phix</var>= double, <var class="option">fy</var>= double, <var class="option">phiy</var>= double, <var class="option">ft</var>= double, <var class="option">phit</var>= double;</strong></dt>
+		<dd>
+		<div>
+			<dl>
+		    <dt class="madxdoc">Description</dt>
+		      <dd>
+           After the <var class="command">TRACK</var> command, a series of initial trajectory coordinates has to be given 
+           by means of a <var class="command">START</var> command (as many commands as trajectories). The coordinates can 
+           be either <a href="../Introduction/tables.html#canon"><strong>canonical</strong></a> coordinates, <br /><br />
+           <strong>START, X= double, PX= double, Y= double, PY= double, T= double, PT= double; </strong><br /><br />
+           or <strong>action-angle</strong> coordinates,<br /><br />
+           <strong>START, FX= double, PHIX= double, FY= double, PHIY= double, FT= double, PHIT= double; </strong><br /><br />
+           For this case the normalised amplitudes are expressed in number 
+           of r.m.s. beam size F<sub>X</sub>, F<sub>Y</sub>, F<sub>T</sub> (the actions being computed with the 
+           emittances in the <var class="command">BEAM</var>
+           command) <strong>in each mode plane</strong>. The phases are PHI<sub>X</sub>, PHI<sub>Y</sub> and PHI<sub>T</sub>
+           expressed in radian. 
+           In the uncoupled case, we have in the plane mode labelled z, <br /><br />
+                   Z = F<sub>z</sub> sqrt(E<sub>z</sub>) cos(PHI<sub>z</sub>), &nbsp;&nbsp;&nbsp;&nbsp;   
+           	       P<sub>z</sub>= F<sub>z</sub> sqrt(E<sub>z</sub>) sin(PHI<sub>z</sub>), <br /><br /> 
+           where E<sub>z</sub> is the r.m.s. emittance in the plane Z.
+          </dd>
+		    <dt class="madxdoc">Options</dt>
+		      <dd>
+<table cellspacing="0" cellpadding="3" border="1">
+<tr>
+    <th>Option</th>
+    <th>Meaning</th>
+    <th>Default Value</th>
+    <th>Value Type</th>
+    <th>Unit</th>
+</tr>
+<tr>
+    <td>X, PX, Y, PY, T, PT</td>
+    <td>canonical coordinates</td>
+    <td>0.0</td>
+    <td>double</td>
+    <td>m</td>
+</tr>
+<tr>
+    <td>FX, PHIX, FY, PHIY, FT, PHIT</td>
+    <td>action-angle coordinates</td>
+    <td>0.0</td>
+    <td>double</td>
+    <td>rad</td>
+</tr>
+</table>
+          </dd>
+		    <dt class="madxdoc">Remarks</dt>
+		      <dd>
+		      	<ul class="noindent">
+		      		<li>
+               For usual tracking (single/multi-turn), all coordinates are specified with respect to the actual closed 
+               orbit (possibly off-momentum, with magnet errors) and <strong>NOT</strong> with respect 
+               to the reference orbit.</li>
+              <li>
+               <!-- For <var class="option">onepass</var> tracking, the coordinates are specified with respect 
+               to the reference orbit. -->
+               If the option <var class="option">onepass</var> is used, the coordinates are specified with respect 
+               to the reference orbit. The name "onepass" might be misleading: Still tracking can be single- or multi-turn!  
+               </li>
+            </ul>
+          </dd>
+      </dl>
+    </div>
+    </dd>
+</dl>
+</div>
+
+<div>
+	<dl>
+		<dt class="command"><strong><var class="command">OBSERVE</var>, <var class="option">place</var>= string;</strong></dt>
+		<dd>
+		<div>
+			<dl>
+		    <dt class="madxdoc">Description</dt>
+		      <dd>
+		      	Coordinates can be recorded at places that have names.  Such observation points are 
+            specified by the command <var class="command">OBSERVE</var> (as many commands as places).
+            The output files are named automatically. The name given by the user is followed 
+		      	by .obsnnnn(observation point), followed by .pnnnn(particle number). Hence filenames look like 
+		      	<code>track.obs0001.p0001</code>. 
+          </dd>
+		    <dt class="madxdoc">Options</dt>
+		      <dd>
+<table cellspacing="0" cellpadding="3" border="1">
+<tr>
+    <th>Option</th>
+    <th>Meaning</th>
+    <th>Default Value</th>
+    <th>Value Type</th>
+</tr>
+<tr>
+    <td>PLACE</td>
+    <td>name of the observation point</td>
+    <td>&nbsp;</td>
+    <td>string</td>
+</tr>
+</table>
+          </dd>
+		    <dt class="madxdoc">Remarks</dt>
+		      <dd>
+		      	If no <var class="command">OBSERVE</var> command is given, but the <var class="option">dump</var> option in the 
+		      	<var class="command">TRACK</var> command is used, the particles trajectory coordinates are still recorded. 
+		      	The observation point is then the starting point of the sequence.
+          </dd>
+      </dl>
+    </div>
+    </dd>
+</dl>
+</div>
+
+<div>
+	<dl>
+		<dt class="command"><strong><var class="command"><a name="run" id="run">RUN</a></var>, <var class="option">maxaper</var>= double array, <var class="option">turns</var>= integer, <var class="option">ffile</var>= integer;</strong></dt>
+		<dd>
+	  <div>
+	  	<dl>
+		    <dt class="madxdoc">Description</dt>
+		      <dd>
+            The actual tracking itself is launched by the <var class="command">RUN</var> command. Via the option 
+            <var class="option">turns</var> the user can specify how many turns will be tracked.
+          </dd>
+		    <dt class="madxdoc">Options</dt>
+		      <dd>
+<table cellspacing="0" cellpadding="3" border="1">
+<tr>
+    <th>Option</th>
+    <th>Meaning</th>
+    <th>Default Value</th>
+    <th>Value Type</th>
+</tr>
+<tr>
+    <td>MAXAPER</td>
+    <td>upper limits for the six coordinates</td>
+    <td>{0.1, 0.01, 0.1, 0.01, 1.0, 0.1}</td>
+    <td>double array</td>
+</tr>
+<tr>
+    <td>TURNS</td>
+    <td>number of turns </td>
+    <td>1</td>
+    <td>interger</td>
+</tr>
+<tr>
+    <td>FFILE</td>
+    <td>periodicity for printing coordinates </td>
+    <td>1</td>
+    <td>interger</td>
+</tr>
+</table>
+          </dd>
+		    <dt class="madxdoc">Remarks</dt>
+		      <dd>
+		      	The limits defined by the <var class="option">maxaper</var> option are only being taken into account if the 
+		      	<var class="option">aperture</var> option of the <var class="command">TRACK</var> command is used.
+          </dd>
+      </dl>
+    </div>
+    </dd>
+</dl>
+</div>
+    </dd>
+</dl>
+</div>
+
+
+<!--
+<div>
+	<dl>
+		<dt class="madxdoc">Examples</dt>
+		<dd>
+    </dd>
+</dl>
+</div>
+-->
+<div>
+	<dl>
+		<dt class="madxdoc">Remarks</dt>
+		<dd>
+		  <ul class="noindent">
+		  	<li>Plotting is possible in MAD-X, however it can also be done
+            externally by using the files created by <var class="command">TRACK</var>. </li>
+		  	<li>The following internal tables are created while tracking:<br />
+		  		  <code>tracksumm</code>, <code>trackloss</code>, and <code>trackone</code> or <code>track.obs$$$$.p$$$$</code> 
+		  		  (depending on option <var class="option">onetable</var>).<br />
+		  		  These internal tables can be accessed via the 
+		  		  <a href="../Introduction/expression.html#table"><var class="command">table</var></a>-access functions.
+		  		   </li>
+		  </ul>
+    </dd>
+</dl>
+</div>
+<div>
+	<dl>
+		<dt class="madxdoc">See Also</dt>
+		<dd>
+      <a href="../Introduction/aperture.html"><var class="command">APERTURE</var></a>, 
+      <a href="../makethin/makethin.html"><var class="command">MAKETHIN</var></a>
+    </dd>
+</dl>
+</div>
+
+</div>
+
+<hr />
+<address>
+<a href="http://consult.cern.ch/xwho/people/74251">A. Koschik</a>,&nbsp;&nbsp; 
+February  2007
+</address>
+
+</body>
+</html>

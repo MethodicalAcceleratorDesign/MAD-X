@@ -1,0 +1,139 @@
+<head>
+<title>the mad program</title>
+<!-- Changed by: Chris ISELIN, 16-Sep-1997 -->
+<!-- Changed by: Oliver Bruning, 27-Jun-2002 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Matching Examples</h2>
+</center>
+<p>
+All matching examples and the related files for executing
+the MADX sample jobs can be found on the 'afs' directory under:
+<p>
+<a href="examples">
+/afs/cern.ch/group/si/slap/share/mad-X/test_suite/match/V3.02.03</a>.
+<ul>
+<li>
+<h2><a name=cell>Simple Periodic Cell</a></h2>
+Match a simple cell to given phase advances:
+<pre>
+<a href="examples/job.5cell.madx">FIVE-CELL</a>
+</pre>
+
+<li>
+<h2><a name=cell>Simple Periodic Cell</a></h2>
+Match the matrix elements of the linear transfer matrix at the end of a sequence 5 periodic cells:
+<pre>
+<a href="examples/job.r-matrix.madx">RMATRIX</a>
+</pre>
+
+
+<li>
+<h2><a name=cell>Transfer line with initial conditions</a></h2>
+Match a sequence of 5 periodic cells with initial conditions 
+to given beta-functions at the end of the sequence:
+<pre>
+<a href="examples/job.line.madx">Transfer line</a>
+</pre>
+
+<li>
+<h2><a name=cell>Global tune matching in a sequence of 5 periodic cells</a></h2>
+Match the global tune of a sequence of 5 periodic cells:
+<pre>
+<a href="examples/job.global-tune.madx">Global tune</a>
+</pre>
+
+<li>
+<h2><a name=cell>Global tune matching for the LHC</a></h2>
+Match the global tune for beam1 of the LHC:
+<pre>
+<a href="examples/job.lhc.tune.madx">Global tune for the LHC</a>
+</pre>
+
+<li>
+<h2><a name=cell>Global chromaticity matching for the LHC</a></h2>
+Match the global chromaticity for beam1 of the LHC:
+<pre>
+<a href="examples/job.lhc.chromaticity.madx">Global chromaticity for the LHC</a>
+</pre>
+
+<li>
+<h2><a name=cell>Global chromaticity matching for both beams of the LHC</a></h2>
+Match the global chromaticity for beam1 and beam2 of the LHC:
+<pre>
+<a href="examples/job.lhc.2chromaticity.madx">Global chromaticity for both beams of the LHC</a>
+</pre>
+
+<li>
+<h2><a name=cell>IR8 insertion matching for beam1 of the LHC</a></h2>
+Match the insertion IR8 with initial conditions to given values of the optics 
+functions at the IP and the end of the insertion:
+<pre>
+<a href="examples/job.lhc.insertion.madx">IR8 insertion matching</a> for beam1 of the LHC
+</pre>
+
+<li>
+<h2><a name=cell>IR8 insertion matching for beam1 of the LHC with upper limits on the optics functions</a></h2>
+Match the insertion IR8 with initial conditions to given values of the optics 
+functions at the IP and the end of the insertion while limiting the maximum
+acceptable beta functions over the whole insertion:
+<pre>
+<a href="examples/job.lhc.insertion-upper.madx">IR8 insertion matching</a> for beam1 of the LHC with upper limits for all beta functions inside the insertion
+</pre>
+
+
+<li>
+<h2><a name=cell>Simultaneous orbit matching at IP8 for beam1 and beam2 of the LHC</a></h2>
+Match simultaneously the orbit of beam1 and beam of the LHC at IP8 
+with initial conditions to the same given values at the IP:
+<pre>
+<a href="examples/job.lhc.iporbit.madx">Orbit matching at IP8</a> for beam1 and beam2 of the LHC
+</pre>
+
+
+<li>
+<h2><a name=cell>IR8 beta squeeze for beam1 using JACOBIAN matching routine</a></h2>
+Try to find a beta squeeze for IR8 starting from 10 meters.
+<pre>
+<a href="examples/job.lhcV65.ir8squeeze.madx">Beta squeeze for IR8</a>
+</pre>
+
+<li>
+<h2><a name=cell>Mathching first and second order chromaticity of the LHC using USE_MACRO option.</a></h2>
+Match simultaneously the first and second order chromaticity by defining macros which compute them using the TWISS command or PTC.
+<pre>
+<a href="examples/job.lhc.qpp.madx">Second order chromaticity</a>
+</pre>
+
+
+<li>
+<h2><a name=cell>Mathching s position using VLENGTH flag.</a></h2>
+match the positions of elements and the total sequence length for a simple sample sequence.
+<pre>
+<a href="examples/job.s-match.madx">s position matching</a>
+</pre>
+
+<li>
+<h2><a name=cell>Mathching s position using USE_MACRO.</a></h2>
+match the positions of elements and the total sequence length for a simple sample sequence using USE_MACRO.
+<pre>
+<a href="examples/job.s-match-usemacro.madx">s position matching</a>
+</pre>
+
+
+</ul>
+
+
+<address>
+<a href="http://bruening.home.cern.ch/bruening/">Oliver Br&uuml;ning</a>,
+June, 2002;
+<a href="http://rdemaria.home.cern.ch/rdemaria/">Riccardo de Maria</a>, August, 2007.
+</address>
+
+</body>

@@ -1,0 +1,37 @@
+<head>
+<title>Editing Element Definitions</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>Editing Element Definitions</h1>
+
+An element definition can be changed in two ways:
+<ul>
+<li> <b>Entering a new definition:</b>
+The element will be replaced in the main beam line expansion.
+<li> <b>Entering the element name together with new attributes:</b>
+The element will be updated in place,
+and the new attribute values will replace the old ones.
+</ul>
+This example shows two ways to change the strength of a quadrupole:
+<pre>
+QF: QUADRUPOLE,L=1,K1=0.01;     ! Original definition of QF
+QF: QUADRUPOLE,L=1,K1=0.02;     ! Replace whole definition of QF
+QF,K1=0.02;                     ! Replace value of K1
+</pre>
+When the type of the element remains the same,
+replacement of an attribute is the more efficient way.
+<p>
+Element definitions can be edited freely.
+The changes do not affect already defined objects which belong to
+its <a href="elm_class.html">element class</a>.
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

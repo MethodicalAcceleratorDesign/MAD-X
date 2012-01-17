@@ -1,0 +1,53 @@
+<head>
+<title>Error Definitions</title>
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+<!-- Added by: Werner Herr, 19-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>Error Definitions</h1>
+
+This chapter describes the commands which provide error assignment
+and output of errors assigned to elements.
+It is possible to assign alignment errors and field errors
+to single beam elements or to ranges or classes of beam elements.
+<br>
+<br>
+Elements, classes or ranges of elements are selected by the
+<a href="../Introduction/select.html">SELECT</a> command.
+<br>
+<br>
+<font COLOR="#00ff00"> ATTENTION: since errors can only be assigned to machine elements, it is necessary to 
+<a href="http://frs.home.cern.ch/frs/Xdoc/control/seqedit.html#flatten">FLATTEN</a> a
+sequence if it includes other sequences. </font>
+<br>
+<br>
+Errors can be specified both with a constant or random values.
+Error definitions consist of four types of statements listed below.
+They may be entered after having selected a beam line
+by means of a <a href="../control/general.html#use">USE</a> command.
+<br>
+<br>
+<font COLOR="#ff0000"> WARNING: any further <a href="../control/general.html#use">USE</a> command will destroy the assigned errors. Use the <a href="http://frs.home.cern.ch/frs/Xdoc/error/error_save.html">ESAVE</a> option to save and reload errors. </font>
+
+<br>
+<br>
+<ul> 
+<li><a href="error_align.html">EALIGN: Define Misalignments</a>
+<li><a href="error_field.html">Field Errors</a>
+<ul> 
+<li><a href="error_field.html#efcomp">EFCOMP: Components</a>
+</ul>
+<li><a href="error_option.html">EOPTION: Set Error Options</a>
+<li><a href="error_print.html">EPRINT: List Machine Imperfections</a>
+<li><a href="error_save.html">ESAVE: Save Machine Imperfections and read back from file</a>
+</ul>
+
+<address>
+<a href="http://consult.cern.ch/xwho/people/1808">Werner Herr</a>
+18.6.2002
+</address>
+
+
+</body>

@@ -1,0 +1,38 @@
+<head>
+<title>DRIFT</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>RESBEAM: reset beam defaults</h2>
+</center>
+
+<pre>
+label: RESBEAM,SEQUENCE=name;
+</pre>
+If the sequence name is omitted, the default beam is reset.
+<pre>
+<a name=defaults>Default BEAM Data:</a>
+PARTICLE        POSITRON
+ENERGY          1 GeV
+EX              1 rad m
+EY              1 rad m
+ET              1 rad m
+KBUNCH          1
+NPART           0
+BCURRENT        0 A
+BUNCHED         .TRUE.
+RADIATE         .FALSE.
+</pre>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

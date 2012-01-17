@@ -1,0 +1,37 @@
+<head>
+<title>Constraints</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Constraints</h2>
+</center>
+
+In matching it is desired to specify equality constraints,
+as well as lower and upper limits for a quantity.
+MAD accepts the following forms of constraints:
+<pre>
+! equality constraint:
+name=expression
+
+! upper limit:
+name&lt;expression
+
+! lower limit:
+name&gt;expression
+
+! both upper and lower limit for the same name:
+name&lt;expression,name&gt;expression
+</pre>
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+May 8, 2001
+</address>
+
+</body>

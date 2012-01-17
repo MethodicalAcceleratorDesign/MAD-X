@@ -1,0 +1,88 @@
+<head>
+<title>Known Defects of MAD8 and MAD-X</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Known Differences to Other Programs</h2>
+</center>
+
+<h2>Definitions</h2>
+MAD uses full 6-by6-matrices to allow coupling effects to
+be treated, and the canonical variable set
+(<i>x</i>, <i>p<sub>x</sub> / p<sub>0</sub></i>),
+(<i>y</i>, <i>p<sub>y</sub> / p<sub>0</sub></i>),
+(<i>-ct</i>, delta(<i>E</i>) / <i>p<sub>0</sub> c</i>),
+as opposed to other programs most of which use the set
+(<i>x</i>, <i>x</i>'), (<i>y</i>, <i>y</i>'), 
+(-delta(<i>s</i>), delta(<i>p</i>)/<i>p<sub>0</sub></i>).
+Like <a href="bibliography.html#dragt">[Dragt]</a>,
+MAD uses the relative energy error <i>p<sub>y</sub> / p<sub>0</sub></i>,
+which is equal the relative momentum error 
+delta = delta(<i>p</i>)/<i>p<sub>0</sub></i> multiplied by beta = v/c.
+<p>
+As from Version 8.13, MAD8 uses an additional <b>constant</b> momentum
+error delta<sub><i>s</i></sub> in all optical calculations.
+The transfer maps contain the <b>exact</b> dependence upon this value;
+therefore the tunes for large deviations can be computed with high
+accuracy as opposed to previous versions.
+<p>
+The choice of canonical variables in MAD still
+leads to slightly different definitions of the lattice functions.
+In MAD the Courant-Snyder invariants in
+<a href="bibliography.html#courant">[Courant and Snyder]</a> take the form
+<p>
+W<sub>x</sub> = gamma<sub><i>x</i></sub> <i>x</i><sup>2</sup> -
+2 alpha<sub><i>x</i></sub> <i>x p<sub>x</sub></i> +
+beta<sub><i>x</i></sub> <i>p<sub>x</sub></i><sup>2</sup>
+<p>
+Comparison to the original form
+<p>
+W<sub>x</sub> = gamma<sub><i>x</i></sub> <i>x</i><sup>2</sup> -
+2 alpha<sub><i>x</i></sub> <i>x x</i>' +
+beta<sub><i>x</i></sub> <i>x</i>'<sup>2</sup>
+<p>
+shows that the orbit functions cannot be the same.
+A more detailed analysis, using
+<p>
+<i>x</i>' = <i>p<sub>x</sub></i> / (1 + delta)
+<p>
+shows that all formulas can be made consistent
+by defining the MAD orbit functions as
+<p>
+beta<sub><i>x</i>M</sub> = beta<sub><i>x</i>C</sub> * (1 + delta),
+alpha<sub><i>x</i>M</sub> = alpha<sub><i>x</i>C</sub>,
+gammaa<sub><i>x</i>M</sub> = gamma<sub><i>x</i>C</sub> / (1 + delta),
+<p>
+For constant delta<sub><i>s</i></sub> along the beam line and
+delta = 0, the lattice functions are the same.
+In a machine where delta varies along the circumference,
+e.g. in a linear accelerator or in an electron-positron storage ring,
+the definition of the Courant-Snyder invariants must be generalised.
+The MAD invariants have the advantage that they
+remain invariants along the beam line even for variable delta.
+<p>
+With the new method this problem occurs in 
+<a href="../twiss/twiss.html">Twiss module</a>
+only for non-constant delta.
+
+<h2>Treatment of Energy Error in TWISS</h2>
+It has been noted in
+<a href="bibliography.html#ruggiero">[Milutinovic and Ruggiero]</a>
+that MAD returned tunes which are too low for non-zero delta.
+The difference was found to be quadratic in delta with a negative coefficient.
+This problem has been eliminated thanks to the new treatment 
+of momentum errors from MAD8 Version 8.13 onwards.
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

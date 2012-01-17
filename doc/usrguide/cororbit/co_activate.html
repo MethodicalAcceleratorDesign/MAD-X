@@ -1,0 +1,64 @@
+<head>
+<title>(De)activate Correctors and Monitors</title>
+<!-- Changed by: Hans Grote, 13-Sep-2000 -->
+<!-- Changed by: Werner Herr, 19-Jun-2002 -->
+<!-- Changed by: Hans Grote, 25-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<h1>Activate/Deactivate Correctors or Monitors</h1>
+
+To provide more flexibility with orbit correction two
+commands are provided:
+<pre>
+USEMONITOR, STATUS=flag,
+            [,SEQUENCE=sequence][,RANGE=range][,CLASS=class][,PATTERN=regex]
+USEKICK,    STATUS=flag,
+            [,SEQUENCE=sequence][,RANGE=range][,CLASS=class][,PATTERN=regex]
+</pre>
+The purpose of the two commands is:
+<ul>
+<li><a name="monitor">USEMONITOR</a>:
+Activates or deactivates a selection of
+<a href="../Introduction/monitors.html">beam position monitor</a>s.
+This command affects elements of types MONITOR, HMONITOR, or VMONITOR.
+<li><a name=kick>USEKICK</a>:
+Activates or deactivates a selection of
+<a href="../Introduction/kickers.html">orbit correctors</a>.
+This command affects elements of types KICKER, HKICKER, or VKICKER.
+</ul>
+Both commands have the same attributes:
+<ul>
+<li>STATUS:
+If this flag is true (on), the selected elements are activated.
+Active orbit monitor readings will be considered,
+and active correctors can change their strengths in subsequent correction
+commands.
+Inactive elements will be ignored subsequently.
+<li>SEQUENCE:
+The sequence can be specified, otherwise the currect sequence is
+used for this operation.
+<li>RANGE, CLASS, PATTERN:
+The usual selection commands are used to identify the elements   
+for this operation.
+</ul>
+<font COLOR="#ff0000">
+Example:                                                                 
+<pre>
+USE,...                          ! set working beam line 
+...                              ! define imperfections 
+USEKICK,STATUS=OFF,RANGE=...;    ! deactivate selected correctors 
+USEMONITOR,STATUS=OFF,RANGE=...; ! deactivate selected monitors   
+CORRECT,NCORR=32;                ! uses different set of correctors
+USEKICK,STATUS=OFF,RANGE=...;    ! deactivate different set of correctors 
+CORRECT,NCORR=32;                ! uses different set of correctors
+</pre>
+</font>
+
+<address>
+<a href="http://consult.cern.ch/xwho/people/1808">Werner Herr</a>
+18.6.2002
+</address>
+
+</body>

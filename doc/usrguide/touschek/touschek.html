@@ -1,0 +1,91 @@
+<head>
+<title>Touschek</title>
+<!-- Changed by: Frank Zimmermann, 18-Jun-2002 -->
+<! IMG ISMAP SRC="http://cern.ch/Frank.Schmidt/dynap/icons/at_work.gif"height=90 Under construction and not yet reliable!!!!!>
+</head>
+
+<body bgcolor="#ffffff">
+
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>TOUSCHEK: Touschek Lifetime and Scattering Rates</h2>
+</center>
+
+<P>The TOUSCHEK module computes the Touschek lifetime and the scattering rates 
+around a lepton or hadron storage ring, based on the formalism of Piwinski [A. 
+Piwinski, &quot;The Touschek Effect in Strong Focusing Storage Rings,&quot; DESY-98-179; 
+see also Piwinski's article on Touschek lifetime in the Handbook of Accelerator 
+Physics and Engineering (A. Chao, M. Tigner, eds.), World Scientific, 1999] .</P>
+<P>The syntax of the TOUSCHEK command is: </P><PRE>TOUSCHEK, FILE;
+</PRE>TOUSCHEK should be called after a TWISS command. One or several cavities 
+with rf voltages should be defined prior to calling TWISS and TOUSCHEK. 
+[Warning: Calling EMIT between the TWISS and TOUSCHEK commands leads to TOUSCHEK using wrong beam parameters, even if the BEAM command is reiterated.]
+<p>The momentum acceptance is taken from the bucket size taking into account the 
+energy loss per turn <i>U0 </i>from synchrotron radiation. The value of <i>U0</i> 
+is computed from the second synchrotron radiation integral <i>synch_2</i> in the 
+TWISS summ table (<i>synch_2</i> is calculated only when the TWISS option 'chrom' 
+is invoked), using Eq. (3.61) in Matt Sands' report SLAC-121, which was 
+generalized to the case of several harmonic rf systems. If <i>synch_2=0</i>, not 
+defined, or not calculated, zero energy loss is assumed. </p>
+<p>In the case of several&nbsp; rf systems with nonzero voltages, it is assumed 
+that the lowest frequency system defines the phase of the outer point on the 
+separatrix when calculating the momentum acceptance, and that all 
+higher-harmonic systems are either in phase or in anti-phase to the lowest 
+frequency system. (Note: if a storage rings really uses a different rf scheme, 
+one would need to change the acceptance function in the routine <i>cavtousch </i>
+for that ring.) <br>
+&nbsp;</p>
+<P>The arguments have the following meaning: </P>
+<UL>
+  <LI>FILE: The name of the output file (default: 'touschek') 
+  </UL>
+<P>Example: </P><PRE>BEAM,PARTICLE=PROTON,ENERGY=450,NPART=1.15e11,EX=7.82E-9,EY=7.82E-9,ET=5.302e-5,SIGE=7.164e-4,SIGT=0.1124,RADIATE=TRUE;
+</PRE>
+<PRE>...
+</PRE>
+<PRE>USE,PERIOD=FODO;	
+</PRE>
+<PRE>... 	
+</PRE>
+<PRE>VRF=400;
+</PRE>
+<PRE>...
+</PRE>
+<PRE>SELECT,FLAG=TWISS,CLEAR;
+TWISS,CHROM,TABLE,FILE;
+</PRE>
+<PRE>TOUSCHEK,FILE;
+</PRE>
+<PRE>...
+</PRE>
+<br>
+
+The first command defines the beam parameters. It is essential that the 
+longitudinal emittances and bunch length are set. The command <I>use</I> selects the beam 
+line or sequence. The next command assign a value to the cavity rf voltage vrf 
+(example name). The <i>select</i> clear previous assignments to the <i>twiss </i>module,
+<I>twiss 
+</I>calculates and saves the values of all twiss parameters for all elements in 
+the ring; the <i>touschek</i> command computes the Touschek lifetime and writes 
+it to the file 'touschek' (default name). 
+<P>The results are stored in the <I>TOUSCHEK </I>tables, and can be written to a 
+file (with the default name 'touschek' in the example above), or values can be 
+extracted from the table using the value command as follows </P>
+<P>value,table(touschek,name),table(touschek,s),table(touschek,tli),table(touschek,tliw),table(touschek,tlitot); </P>
+<P><font face="Times New Roman" size="3">where 'name' denotes the name of a 
+beamline element, <i>s</i> the position of the center of the element,<i> tli</i> 
+the instanteneous Touschek loss rate within the element, and <i>tliw</i> the 
+instantaneous rate weighted by the length of the element divided by the 
+circumference (its contribution to the total loss rate), and<i> tlitot </i>the 
+accumulated loss rate adding the rates over all beamline elements through the 
+present position. The value of <i>tlitot</i> at the end of the beamline is the 
+inverse of the Touschek lifetime in units of 1/s.</font></P>
+<P>Also, all results can be printed to a file using the command </P>
+<P>write,table=touschek,file;</P>
+<P>The MADX Touschek module was developed by
+<a href="mailto:catia.milardi@lnf.infn.it">Catia Milardi</a> and
+<a href="mailto:frank.zimmermann@cern.ch">Frank Zimmermann . </a><br>
+</P>
+<ADDRESS><A href="http://consult.cern.ch/xwho/people/62690">frankz</A> 
+	11.03.2008 
+</ADDRESS></BODY></HTML>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+  <meta name="author"      content="Valery Kapin & Frank Schmidt" /> 
+  <meta name="description" content="MADX PTC_NORMAL Module" /> 
+  <meta name="keywords"    content="MADX MAD-X PTC PTC_NORMAL Non-Linear Machine Parameters" /> 
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" /> 
+  <title>PTC_NORMAL Module (Non-Linear Machine Parameters)</title> 
+      <!-- Created by: Valery KAPIN, 21-Mar-2006 --> 
+      <!-- Changed by: ____________, ___________ -->  
+      <style> 
+<!-- 
+div.Section1 
+      {page:Section1;} 
+span.SpellE 
+      {} 
+--> 
+</style> 
+</head> 
+ 
+<body bgcolor="#ffffff"> 
+ 
+<div style="text-align:center;"> 
+<center> 
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH 
+  <img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right" alt="MAD-X Logo" /> 
+  <h1>PTC_NORMAL Module <br> 
+      (Non-Linear Machine Parameters)</h1> 
+</center> 
+</div> 
+ 
+<div class="madxdocContent"> 
+       
+<div> 
+<p align="left"> 
+The <b>PTC_NORMAL module</b>&nbsp;of MAD-X [<a href="#F._Schmidt">a</a>,<a href="#d Amico">b</a>] is based on PTC  
+code. This module takes full advantage of the PTC Normal Form analysis which is  
+a&nbsp; considerable upgrade of what was available with the Lie Algebra  
+technique used in MAD8. It allows to calculate dispersions, chromaticities,  
+anharmonicities and Hamiltonian terms to very high order. In fact, the order is  
+only limited by the RAM memory of your computer and your patience to wait for  
+the results. </p> 
+<p align="left"> 
+The number of terms per order increases with some power law. The internal MAD-X  
+tables are not adequate to keep such large amounts of data. On the other hand,  
+only a reduced set of this data is actually needed by the user. Thus a much  
+easier and flexible solution is to gather the users  requirements with a series  
+of special MAD-X command called <var class="option">SELECT_PTC_NORMAL</var>. A  
+special MAD-X table is dynamically built using just those commands and it will  
+be filled by the next call to the&nbsp; <var class="option">PTC_NORMAL</var>-command. </p> 
+<p align="left"> 
+Another essential advantage of this table is the fact that it is structured to  
+facilitate exchange of Normal Form (including Hamiltonian terms of high order)  
+between MAD-X modules. The immediate goal is to use this table to allow  
+non-linear matching inside the present MAD-X MATCHING module.</p> 
+</div> 
+ 
+<hr /> 
+ 
+<div> 
+      <dl> 
+       <dt>Synopsis</dt> 
+       <dd><i><code>PTC_CREATE_UNIVERSE;</code></i></dd> 
+       <dd><i><code>PTC_CREATE_LAYOUT, model=integer,method=integer,  
+       nst=integer, [exact];</code></i></dd> 
+       <dd><code>..............................<br> 
+       SELECT_PTC_NORMAL, dx,..., gnfu;</code></dd> 
+       <dd><code>..............................</code></dd> 
+       <dd><code>PTC_NORMAL;<br> 
+       WRITE, table=normal_results, file=normal_results;</code></dd> 
+       <dd><code>..............................</code></dd> 
+       <dd><i><code>PTC_END; </code></i></dd> 
+</dl> 
+</div> 
+ 
+<div> 
+      <dl> 
+       <dt>Commands</dt> 
+       <dd> 
+<div> 
+      <dl> 
+       <dt class="command"><var><strong><b>SELECT_PTC_NORMAL, <br> 
+       </b></strong></var><strong> 
+       <b> dx</b>=integer<b>, dpx</b>=integer<b>, dy</b>=integer<b>, dpy</b>=integer<b>,<br> 
+       q1</b>=0<b>, dq1</b>=integer<b>, q2</b>=0<b>, dq2</b>=integer<b>, 
+       <br> 
+       anhx</b>=integer array, <b>anhy</b>=integer array<b>, <br> 
+       gnfu</b>=integer,0,0<b>, haml</b>=integer,0,0<b>,<br> 
+       <font color="#FF0000">eign</font></b><font color="#FF0000">=integer,  
+       integer</font><b>;</b></strong></dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              The <var class="command">SELECT_PTC_NORMAL </var>command selects  
+         parameters to be calculated by the next <var class="command"> 
+         PTC_NORMAL </var>command. The dispersion and tune parameters are defined  
+         by a name and an integer number specifying their  
+         order. For example, the notation &quot;dx=2&quot; means  
+         the horizontal dispersion to second order <i>D<sub>x</sub></i><sup>(2)</sup>=<font face="Times New Roman">&#8706;</font><sup>(2)</sup><i>x</i><sub>co</sub>/<font face="Times New Roman">&#8706;<i>&#948;</i></font><sub><i>p</i></sub><sup>(2)</sup>,  
+         where &quot;co&quot; is abbreviation of &quot;closed orbit&quot;. The  
+         anharmonisities are defined by a name and three  
+         integer numbers: the first is the order of <font face="Times New Roman"><i>&#949;</i></font><sub>1</sub>,  
+         the second is the order of <font face="Times New Roman"><i>&#949;</i></font><sub>2</sub>,  
+         the third is the order of <font face="Times New Roman"><i>&nbsp;&#948;</i></font><sub><i>p</i></sub>. For example, the notation &quot;anhx=2,0,0&quot;  
+         means second order in <font face="Times New Roman"><i>&#949;</i></font><sub>1</sub>: 
+         <font face="Times New Roman">&#8706;</font><sup>(2)</sup><i>q</i><sub>1</sub>/<font face="Times New Roman">&#8706;<i>&#949;</i></font><sub>1</sub><sup>(2)</sup>. </dd> 
+         <dd><font color="#FF0000">Components of the eigenvectors at the  
+         end of the structure can be specified by two integers:  
+         the first integer defines the&nbsp; eigenvector number, the  
+         second integer defines the coordinate {<i>x</i>, <i> 
+         p<sub>x</sub></i>, <i>y</i>, <i>p<sub>y</sub></i>, <i>t</i>,<i> 
+         p<sub>t</sub></i>}.</font></dd> 
+         <dd>The Generating Function can be specified by 
+         <font face="Times New Roman">{ <i>n</i>, 0, 0}. </font>The positive and negative values of&nbsp; 
+         <i>n</i>  
+         define the order of upright or skew resonances, respectively.  
+         The integers <i>n</i><sub>2</sub> and <i>n</i><sub>3</sub> are  
+         reserved for a future upgrade. 
+              For example, &quot;gnfu=-5, 0, 0&quot; will calculate all  
+         Generating Function terms for skew decapoles. In the output  
+         table, one finds the cosine, sine and amplitude coefficients as  
+         denoted by &quot;GNFC&quot;, &quot;GNFS&quot;, and &quot;GNFA&quot;, respectively.</dd> 
+         <dd>Similarily, the Hamiltonian terms can be specified by 
+         <font face="Times New Roman">{ <i>n</i>, 0, 0}. </font>The positive and negative values of&nbsp; 
+         <i>n</i> define the order of upright or skew resonances,  
+         respectively. 
+              For example, &quot;haml=3, 0, 0&quot; will calculate all  
+         Hamiltonian terms for upright sextupoles. In the output table,  
+         one finds the cosine, sine and amplitude coefficients as denoted  
+         by &quot;HAMC&quot;, &quot;HAMS&quot;, and &quot;HAMA&quot;, respectively.</dd> 
+        </dl></div></dd> 
+       <dd> 
+       <div> 
+        <dl> 
+        <dl> 
+         <dt>Parameters</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table3"> 
+          <tr> 
+           <th>Notation</th> 
+           <th>Meaning</th> 
+           <th>Value</th> 
+          </tr> 
+          <tr> 
+           <td>DX, DPX, <br> 
+           DY,DPY</td> 
+           <td>dispersions, <i>D<sub>x</sub></i><sup>(<i>n</i>)</sup>, <i>D<sub>px</sub></i><sup>(<i>n</i>)</sup>, 
+           <i><br> 
+           D<sub>y</sub></i><sup>(<i>n</i>)</sup>, <i>D<sub>py</sub></i><sup>(<i>n</i>)</sup></td> 
+           <td> 
+           <p align="center"><i>n</i></td> 
+          </tr> 
+          <tr> 
+           <td>Q1, Q2</td> 
+           <td> 
+           <p align="left">horizontal and vertical <br> 
+           tunes <i>q</i><sub>1</sub><sup>(0)</sup>, 
+           <i>q</i><sub>2</sub><sup>(0)</sup></td> 
+           <td> 
+           <p align="center">0</td> 
+          </tr> 
+          <tr> 
+           <td>DQ1, DQ2</td> 
+           <td>derivatives of horizontal <br> 
+           and 
+           vertical tunes <font face="Times New Roman"><br> 
+           &#8706;</font><sup>(<i>n</i>)</sup><i>q</i><sub>1</sub>/<font face="Times New Roman">&#8706;<i>&#948;</i></font><sub><i>p</i></sub><sup>(<i>n</i>)</sup>, <font face="Times New Roman">&#8706;</font><sup>(<i>n</i>)</sup><i>q</i><sub>2</sub>/<font face="Times New Roman">&#8706;<i>&#948;</i></font><sub><i>p</i></sub><sup>(<i>n</i>)</sup> </td> 
+           <td> 
+           <p align="center"><i>n</i></td> 
+          </tr> 
+          <tr> 
+           <td>ANHX, ANHY</td> 
+           <td>Anharmonicities</td> 
+           <td> 
+           <p align="center"><i>n</i>(<font face="Times New Roman"><i>&#949;</i></font><sub>1</sub>), 
+           <i>n</i>(<font face="Times New Roman"><i>&#949;</i></font><sub>2</sub>), 
+           <i><br> 
+           n</i>(<font face="Times New Roman"><i>&#948;</i></font><sub><i>p</i></sub>)</td> 
+          </tr> 
+          <tr> 
+           <td>GNFU</td> 
+           <td>Generating Function&nbsp; </td> 
+           <td> 
+           <p align="center"><font face="Times New Roman"> <i>n</i>, 0, 0</font></td> 
+          </tr> 
+          <tr> 
+           <td>HAML</td> 
+           <td>Hamiltonian </td> 
+           <td> 
+           <p align="center"><font face="Times New Roman"> <i>n</i>, 0, 0</font></td> 
+          </tr> 
+          <tr> 
+           <td><font color="#FF0000">EIGN</font></td> 
+           <td><font color="#FF0000">Eigenvector (the <i>n</i><sub>2</sub>-th  
+           component <br> 
+           of the <i>n</i><sub>1</sub>-th eigenvector)</font></td> 
+           <td> 
+           <p align="center"><font color="#FF0000"><i>n</i><sub>1</sub>, 
+           <i>n</i><sub>2</sub></font></td> 
+          </tr> 
+          </table></dd> 
+        </dl> 
+        </dl></div></dd> 
+       <dt class="command"><var><strong><b>PTC_NORMAL, <br> 
+&nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var><strong> 
+       <var class="option">normal</var>, <b>closed_orbit</b>, <b><br> 
+&nbsp;&nbsp;&nbsp; no</b>=integer, 
+       <b>map_table, deltap</b>=double<b>;</b></strong></dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              The calculation of the parameters  
+         specified by the preceding&nbsp; <var class="command">SELECT_PTC_NORMAL </var> 
+         commands is initiated by the <var class="command">PTC_NORMAL </var>command,  
+         which operates on the working beam line defined in the latest 
+         <a href="http://cern.ch/madx/control/general.html#use"> 
+         USE</a> command. The options for <var class="command"> 
+         PTC_NORMAL </var>command are  
+         described in the table below. </dd> 
+         <dt>Options</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table1" width="571"> 
+          <tr> 
+           <th>Option</th> 
+           <th>Meaning</th> 
+           <th width="69">Default Value</th> 
+           <th width="57">Value Type</th> 
+          </tr> 
+          <tr> 
+           <td>ICASE</td> 
+           <td><span lang="EN-US">the user-defined dimensionality  
+           <br> 
+           of 
+           the phase-space (4, 5 or 6)</span></td> 
+           <td width="69"> 
+           <p align="center">4</td> 
+           <td width="57">integer</td> 
+          </tr> 
+          <tr> 
+           <td>NO</td> 
+           <td>the order of the map.</td> 
+           <td width="69"> 
+           <p align="center">1</td> 
+           <td width="57">integer</td> 
+          </tr> 
+          <tr> 
+           <td>CLOSED_ORBIT</td> 
+           <td><span lang="EN-US">the switch to turn on <br> 
+           the closed  
+           orbit calculation.</span></td> 
+           <td width="69"> 
+           <p align="center">.FALSE.</td> 
+           <td width="57">logical</td> 
+          </tr> 
+          <tr> 
+           <td>DELTAP</td> 
+           <td> 
+           <p align="left">relative momentum offset <br> 
+           for reference closed orbit</td> 
+           <td width="69"> 
+           <p align="center">0.0</td> 
+           <td width="57">double</td> 
+          </tr> 
+          <tr> 
+           <td>MAPTABLE</td> 
+           <td>turn on the map-table in memory</td> 
+           <td width="69"> 
+           <p align="center">.FALSE.</td> 
+           <td width="57">logical</td> 
+          </tr> 
+          <tr> 
+           <td>NORMAL</td> 
+           <td>turn on the calculation of <br> 
+           the Normal  
+           Form</td> 
+           <td width="69"> 
+           <p align="center">.FALSE.</td> 
+           <td width="57">logical</td> 
+          </tr> 
+          </table></dd> 
+         <dt>Remarks</dt> 
+         <dd><p><b>MAPTABLE</b>:&nbsp;(requires no=1) creates the one-turn matrix which  
+         can be used by the next 
+         <a href="http://cern.ch/madx/ptc_twiss/ptc_twiss.html"> 
+         PTC_TWISS</a> command.</dd> 
+           <dt>Example</dt> 
+           <dd>The simple example is located on the Web-page for the  
+           <a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_normal"> 
+           <var class="command">PTC_NORMAL</var> example</a>.</dd> 
+        </dl></div></dd> 
+      </dl></div> 
+    </dd> 
+</dl> 
+      <dl> 
+       <dt>References for PTC_NORMAL</dt> 
+      </dl> 
+      <ol type="a"> 
+       <li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'',  
+       Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li> 
+       <li>E.T. <a name="d Amico">d Amico</a>, &quot;Nonlinear parameters from PTC&quot;, 
+       <a href="http://frs.home.cern.ch/frs/MAD-X_minutes/Meeting-7">MAD-X  
+       Meeting 7 (29.11.2004)</a>, notes (<a href="http://frs.home.cern.ch/frs/MAD-X_minutes/Meeting-7/Nonlinear_parameters_from_PTC.doc">doc</a>-file).</li> 
+       <li><a name="A._Schoch">A. Schoch</a>, &quot;Theory of linear and non-linear  
+       perturbations of betatron oscillations in alternating-gradient  
+       synchrotrons &quot;, 
+       <a href="http://doc.cern.ch/yellowrep/1957/1957-021/p1.pdf">CERN-27-21</a>,  
+       1958.</li> 
+      </ol> 
+</div> 
+<div> 
+      <dl> 
+       <dt>.See Also</dt> 
+       <dd> 
+       <a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_normal"> 
+       <var class="command">PTC_NORMAL</var> example</a>, 
+       <a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC  
+       Set-up Parameters</a>.</dd> 
+</dl> 
+</div> 
+ 
+</div> 
+ 
+<hr /> 
+<address> 
+<span lang="EN-US"> 
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru"> 
+V.&nbsp;<span class="SpellE">Kapin<span style="text-decoration: none"> </span></span> 
+</a></span>(ITEP) and <span lang="EN-US"> 
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch"> 
+F.&nbsp;Schmidt</a>, </span>March  2006</address> 
+ 
+</body> 
+</html> 

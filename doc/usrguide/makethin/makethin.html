@@ -1,0 +1,72 @@
+<head>
+<title>MAKETHIN</title>
+<!-- Changed by: Helmut Burkhardt,  7-April-2005 -->
+</head>
+
+<body bgcolor="#ffffff">
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+
+<h2>MAKETHIN: Slice a sequence into thin lenses</h2>
+</center>
+This module converts a sequence with thick elements into one composed entirely of
+thin elemtens as required by the default MAD-X tracking.
+</P>
+Slicing is done by the MAKETHIN command:
+<pre>
+MAKETHIN,SEQUENCE=sequence name,
+         STYLE=slicing style;
+</pre>
+The parameters are defined as:
+<ul>
+<li>SEQUENCE chooses the sequence you wish to slice.
+<li>STYLE (optional) chooses the slicing style. The options are:
+  <UL>
+    <LI>SIMPLE : this is a simplified slicing algorithm which produces any number of equal strength slices at equidistant positions with the kick in the middle of each slice.
+    <LI>COLLIM : this is the default slicing for collimators. If only one slice is 
+chosen it is placed in the middle of the old element. If two slices are chosen they 
+are placed at either end. Three slices or more are treated as one slice.
+    <LI>
+    <a href="../Introduction/bibliography.html#TEAPOT">[TEAPOT]</a>
+    (default): this is the standard slicing as used by MAD9. N.B. This
+    has a maximum of four slices for any one object.
+  </UL>
+</ul>
+
+<span style="font-weight: bold;">By default</span> all elements are converted to one thin element positioned at the center of  the thick element.
+To get a greater slicing for certain elements use a standard SELECT command with FLAG=MAKETHIN and 
+CLASS, RANGE or PATTERN:
+<pre>
+SELECT,FLAG=MAKETHIN,
+       CLASS=class,RANGE=range,
+       SLICE=no of slices;
+</pre>
+
+The created thin lens sequence has the following properties:
+<ul>
+<li>The created sequence has the same name as the original. The original is therefore no longer 
+available and has to be reloaded if it is needed again. 
+<li>The slicer also slices any inserted
+sequence used in the main sequence. These are also given the same names as the originals.
+<li>Any component changed into a single thin lens has the same name as the original.
+<li>If a component is sliced into more than one slice, the individual slices have the same
+name as the original component and a suffix <tt>..1</tt>, <tt>..2</tt>, etc... and a marker 
+will be placed at the center with the original name of the component.
+</ul>
+
+Hints:
+<ul>
+<li>See the <a href="http://mad.home.cern.ch/frs/mad-X_examples/makethin/">examples</a> for makethin.
+<li>Compare the optics before and after slicing with makethin. Consider to increase the number of slices and rematch
+after makethin to <span style="font-weight: bold;">reach the required accuracy</span>.
+<li>Consider to replace rbend by sbend + thin quads taking into account the edge focusing before slicing with makethin.
+<li>The selection works on the current sequence. Consider to insert a "USE,SEQUENCE=.." before SELECT
+</ul>
+
+<HR>
+<address>
+Helmut Burkhardt, September 2005
+</address>
+
+</body>

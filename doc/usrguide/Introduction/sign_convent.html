@@ -1,0 +1,69 @@
+<head>
+<title>Sign Conventions</title>
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Sign Conventions for Magnetic Fields</h2>
+</center>
+
+The MAD program uses the following Taylor expansion
+for the field on the mid-plane <i>y</i>=0, described in 
+<a href="bibliography.html#slac75">SLAC-75</a>:
+<p>
+<img align=bottom src="../equations/Taylor_field.gif">
+<p>
+Note the factorial in the denominator.
+The field coefficients have the following meaning:
+<ul>
+<li><i>B</i><sub>0</sub>: Dipole field, with a positive value in the 
+positive <i>y</i> direction;
+a positive field bends a positively charged particle to the right.
+<li><i>B</i><sub>1</sub>: Quadrupole coefficient
+<p>
+<i>B</i><sub>1</sub> = (del <i>B<sub>y</sub></i> / del <i>x</i>);
+<p>
+a positive value corresponds to horizontal focussing of a positively
+charged particle.
+<li><i>B</i><sub>2</sub>: Sextupole coefficient 
+<p>
+<i>B</i><sub>2</sub> = 
+(del<sup>2</sup> <i>B<sub>y</sub></i> / del <i>x</i><sup>2</sup>).
+<p>
+<li><i>B</i><sub>2</sub>: Octupole coefficient 
+<p>
+<i>B</i><sub>3</sub> = 
+(del<sup>3</sup> <i>B<sub>y</sub></i> / del <i>x</i><sup>3</sup>).
+<p>
+</ul>
+Using this expansion and the curvature <i>h</i> of the reference orbit,
+the longitudinal component of the vector potential to order 4 is:
+<p>
+<img align=bottom src="../equations/Taylor_A_s.gif">
+<p>
+Taking curl <i>A</i> in curvilinear coordinates,
+the field components can be computed as
+<p>
+<img align=bottom src="../equations/Taylor_B.gif">
+<p>
+It can be easily verified that both curl <i>B</i> and div <i>B</i>
+are zero to the order of the <i>B</i><sub>3</sub> term.
+Introducing the magnetic rigidity <i>B</i>rho,
+the multipole coefficients are computed as
+<p>
+<i>K<sub>n</sub></i> = <i>e B<sub>n</sub> / p<sub>s</sub></i> = 
+<i>B<sub>n</sub> / B</i> rho.
+<p>
+
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

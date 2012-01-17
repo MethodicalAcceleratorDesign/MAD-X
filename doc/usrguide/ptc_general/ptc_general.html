@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+  <meta name="author"      content="Valery Kapin & Frank Schmidt" /> 
+  <meta name="description" content="MADX PTC Set-up Parameters" /> 
+  <meta name="keywords"    content="MADX MAD-X PTC PTC_CREATE_UNIVERSE PTC_CREATE_LAYOUT" /> 
+  <link rel="stylesheet" type="text/css" href="madxdoc.css" /> 
+  <title>PTC Set-up Parameters</title> 
+      <!-- Created by: Valery KAPIN, 21-Mar-2006 --> 
+      <!-- Changed by: ____________, ___________ -->  
+      <style> 
+<!-- 
+div.Section1 
+      {page:Section1;} 
+span.SpellE 
+      {} 
+--> 
+  </style> 
+</head> 
+ 
+<body bgcolor="#ffffff"> 
+ 
+<div style="text-align:center;"> 
+<center> 
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH 
+  <img SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right" alt="MAD-X Logo" /> 
+  <h1>PTC Set-up Parameters</h1> 
+</center> 
+</div> 
+ 
+<div class="madxdocContent"> 
+       
+<div> 
+<p align="left"> 
+The E. Forest s Polymorphic Tracking Code (<a href="#E.Forest">PTC</a>)  
+is a kick code, allowing a symplectic integration through all  
+accelerator elements giving the user full control over the precision (number of  
+steps and integration type) and exactness (full or extended Hamiltonian) of the  
+results. The degree of exactness is determined by the user and the speed of his  
+computer. The&nbsp; main advantage is that the code is inherently based on the  
+map formalism and provides users with all associated tools.</p> 
+<p align="left"> 
+The PTC code is actually a library that can be used in many different ways to  
+create an actual module that calculates some property of interest. Several  
+modules using the PTC code have been presently implemented in MAD-X. These MADX-PTC modules [<a href="#F.Schmidt">b</a>] are  
+executed by the following  
+commands: <a href="http://cern.ch/madx/ptc_twiss/ptc_twiss.html"> 
+ptc_twiss</a>, <a href="http://cern.ch/madx/ptc_normal/ptc_normal.html"> 
+ptc_normal</a>, <a href="http://cern.ch/madx/ptc_track/ptc_track.html"> 
+ptc_track</a>, 
+<a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html"> 
+ptc_track_line</a>. To perform calculations with these MADX-PTC commands, the PTC  
+environment must be initialized, handled and turned off by the special commands within the MAD-X  
+input script.</p> 
+</div> 
+ 
+<hr /> 
+ 
+<div> 
+      <dl> 
+       <dt>Synopsis</dt> 
+       <dd><code>PTC_CREATE_UNIVERSE, sector_nmul_max=integer,
+      sector_nmul=integer, ntpsa=logical, symprint=logical;</code></dd> 
+       <dd><code>PTC_CREATE_LAYOUT, time=logical, model=integer,
+      method=integer, nst=integer, exact=logical,
+      offset_deltap=double, errors_out=logical, magnet_name=string,
+      resplit=logical, thin=double, xbend=double,
+      even=logical;</code></dd>
+       <dd><code>.........................</code></dd> 
+       <dd><i><code>PTC_READ_ERRORS, overwrite=logical;</code></i></dd> 
+       <dd><code>.........................</code></dd> 
+       <dd><i><code>PTC_MOVE_TO_LAYOUT, index=integer;</code></i></dd> 
+       <dd><code>.........................</code></dd> 
+       <dd><i><code>PTC_ALIGN;</code></i></dd> 
+       <dd><code>.........................</code></dd> 
+       <dd><i><code> PTC_END;</code></dd> 
+</dl> 
+</div> 
+ 
+<div> 
+      <dl> 
+       <dt>Commands</dt> 
+       <dd> 
+<div> 
+      <dl> 
+      <dl> 
+       <dt class="command"><var><strong><b>PTC_CREATE_UNIVERSE</b></strong></var><strong><b>;</b></strong></dt> 
+        <dd><code><b>sector_nmul_max</b>=integer, <b>sector_nmul</b>=integer</code></dd> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              <span lang="EN-US">The </span><var class="command">&quot;PTC_CREATE_UNIVERSE&quot; </var> 
+         <span lang="EN-US">command is </span> 
+         <font face="Times New Roman"><span lang="EN-US">needed to set-up  
+         the PTC environment.</span></font></dd> 
+        </dl></div></dd> 
+      </dl> 
+      <blockquote> 
+         <dt>Options</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table5"> 
+          <tr> 
+           <th>Option</th> 
+           <th>Meaning</th> 
+           <th>Default Value</th> 
+           <th>Value Type</th> 
+          </tr> 
+          <tr> 
+           <td>SECTOR_NMUL_MAX</td> 
+           <td> 
+           <span lang="EN-US">Global variable in PTC needed for  
+                        exact sector bends defining up to which order Maxwell's  
+                        equation are solved [<a href="#E.Forest">a</a>, page  
+                        76-77]. The value of </span>SECTOR_NMUL_MAX must not be  
+                        smaller than SECTOR_NMUL otherwise MAD-X stops with an  
+                        error.</td> 
+           <td> 
+           <p align="center">10</td> 
+           <td align="center">integer</td> 
+          </tr> 
+          <tr> 
+           <td> 
+           SECTOR_NMUL</td> 
+           <td> 
+           <span lang="EN-US">Global variable in PTC needed for  
+                        exact sector bends defining up to which order the  
+                        multipole are included in solving&nbsp; Maxwell's  
+                        equation up to order </span>SECTOR_NMUL_MAX. Multipoles  
+                        of order N with N <font face="Times New Roman">&gt;</font>  
+                        SECTOR_NMUL and N <font face="Times New Roman">&#8804; </font>&nbsp;SECTOR_NMUL_MAX  
+                        are treated a la SixTrack.</td> 
+           <td> 
+           <p align="center">10</td> 
+           <td align="center"> 
+           <span lang="EN-US"> 
+           integer</span></td> 
+          </tr> 
+          <tr> 
+           <td> 
+           NTPSA</td> 
+           <td> 
+           <span lang="EN-US">This attribute invokes the second DA
+      package written in C++ and kindly provided by Lingyun Yang
+      lyyang@lbl.gov. Etienne Forest has written the wrapper to allow
+      both the use of the legendary DA packages written in Fortran by
+      Martin Berz (default) or this new DA package. It is expected
+      that this DA package will allow for the efficient calculation of
+      a large number of DA parameters.</td> 
+           <td> 
+           <p align="center">.FALSE.</td> 
+           <td align="center"> 
+           <span lang="EN-US"> 
+           logical</span></td> 
+          </tr> 
+          <tr> 
+           <td> 
+           SYMPRINT</td> 
+           <td> 
+           <span lang="EN-US">This flag allows the supression of the
+      printing of the check of symplecticity. It is recommended to
+      leave this flag set to TRUE.</td> 
+           <td> 
+           <p align="center">.TRUE.</td> 
+           <td align="center"> 
+           <span lang="EN-US"> 
+           logical</span></td> 
+          </tr> 
+          </table></dd> 
+         </blockquote> 
+      <dt class="command">&nbsp;</dt> 
+      <dt class="command"><b><a name="PTC_CREATE_LAYOUT">PTC_CREATE_LAYOUT</a></b>, <b><br> 
+&nbsp;&nbsp;&nbsp; <font color="#FF0000">time</font></b><font
+      color="#FF0000">=logical</font>,<b> model</b>=integer,
+      <b>method</b>=integer, <b><br>
+&nbsp;&nbsp;&nbsp; nst</b>=integer, <b>exact=logical</b>,
+      <b>offset_deltap</b>=double, <b>errors_out</b>=logical,
+      <b>magnet_name</b>=string, <b>resplit</b>=logical,  <b>thin</b>=double,
+      <b>xbend</b>=double, <b>even</b>=logical;</dt>
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              <span lang="EN-US">The </span><var class="command">&quot;PTC_CREATE_LAYOUT&quot; </var> 
+         <span lang="EN-US">command creates the PTC-layout according to  
+         the specified integration method and fills it with the current  
+         MAD-X sequence defined in the latest 
+         <a href="http://cern.ch/madx/control/general.html#use"> 
+         USE</a> command.<br> 
+         The logical input variable </span><font color="#FF0000">time</font><span lang="EN-US">  
+         controls the coordinate system that is being used.</span></dd> 
+         <dt>Options</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table2"> 
+          <tr> 
+           <th>Option</th> 
+           <th colspan="2">Meaning</th> 
+           <th>Default Value</th> 
+           <th>Value Type</th> 
+          </tr> 
+          <tr> 
+           <td rowspan="4">TIME</td> 
+           <td rowspan="2"> 
+           5D</td> 
+           <td> 
+           <span lang="EN-US"> 
+           &quot;</span><font color="#FF0000">time=true</font><span lang="EN-US">&quot;:  
+           fifth coordinate is  
+           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           PT</a>, <i>p<sub>t</sub></i>=<font face="Times New Roman">&#916;<i>E</i>/<i>p</i><sub>0</sub><i>c;</i></font></span></td> 
+           <td rowspan="4"> 
+           <p align="center">.TRUE.</td> 
+           <td align="center" rowspan="4">logical</td> 
+          </tr> 
+          <tr> 
+           <td> 
+           <span lang="EN-US"> 
+           &quot;</span><font color="#FF0000">time=false</font><span lang="EN-US">&quot;:  
+           fifth coordinate is&nbsp; 
+           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           DELTAP</a>,&nbsp; <font face="Times New Roman"><i>&#948;</i><sub><i>p</i></sub>=&#916;<i>p</i>/<i>p</i><sub>0</sub></font></span></td> 
+          </tr> 
+          <tr> 
+           <td rowspan="2"> 
+           6D</td> 
+           <td> 
+           <span lang="EN-US"> 
+           &quot;</span><font color="#FF0000">time=true</font><span lang="EN-US">&quot;: 
+           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           MAD-X coordinate system</a> {-<i>ct</i>, <i>p<sub>t</sub></i>}</span></td> 
+          </tr> 
+          <tr> 
+           <td> 
+           <span lang="EN-US"> 
+           &quot;</span><font color="#FF0000">time=false</font><span lang="EN-US">&quot;:  
+           second PTC coordinate system {-pathlength, <font face="Times New Roman"><i>&#948;</i><sub><i>p</i></sub></font>}</span></td> 
+          </tr> 
+          <tr> 
+           <td>MODEL</td> 
+           <td colspan="2"> 
+           <span lang="EN-US"> 
+           Type of element: 1, 2,or 3.</span></td> 
+           <td> 
+           <p align="center">1</td> 
+           <td align="center">integer</td> 
+          </tr> 
+          <tr> 
+           <td> 
+           <span lang="EN-US"> 
+           METHOD</span></td> 
+           <td colspan="2"> 
+           <span lang="EN-US"> 
+           Integration order (2, 4, 6) [<a href="#E.Forest">a</a>,  
+           Chapter K]</span></td> 
+           <td> 
+           <p align="center">2</td> 
+           <td align="center"> 
+           <span lang="EN-US"> 
+           integer</span></td> 
+          </tr> 
+          <tr> 
+           <td><a name="NST">NST</a></td> 
+           <td colspan="2">Number of integration steps: 1, 2, 3,  .</td> 
+           <td> 
+           <p align="center">1</td> 
+           <td align="center">integer</td> 
+          </tr> 
+          <tr> 
+           <td> 
+           <span lang="EN-US"> 
+           EXACT</span></td> 
+           <td colspan="2"> 
+           Switch to turn on calculations with an exact  
+           Hamiltonian, <br> 
+           otherwise the expanded Hamiltonian is used.</td> 
+           <td> 
+           <p align="center">.FALSE.</td> 
+           <td align="center">logical</td> 
+          </tr> 
+          <tr> 
+           <td>OFFSET_DELTAP</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US"> 
+                  <font color="#FF0000">Beware: Expert flag!</font> 
+                                                The relative momentum deviation of the reference  
+           particle <br> 
+           <font color="#FF0000">(6D case ONLY)</font>. This option  
+           implies &quot;</span><font color="#FF0000">totalpath=true</font><span lang="EN-US">&quot;.</span></td> 
+           <td> 
+           <p align="center">0.0</td> 
+           <td align="center">double</td> 
+         </tr> 
+           <td>ERRORS_OUT</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US"> 
+                 Flag to write-out multipolar errors in Efcomp table format. Two
+                 tables are filled "<font color="#FF0000">errors_field</font>"
+                 and "<font color="#FF0000">errors_total</font>". In the first
+                 case only field errors are written out and in the second one also
+                 desired field components are added. The latter is useful e.g. to
+                 include the strength of correctors. The choice of magnets is
+                 defined by the "<font color="#FF0000">magnet_name</font>"
+                 attribute (see below). As usual the tables can be
+                 written to files for later use for read-in via the "<font
+                 color="#FF0000">ERRORS_IN</font>" flag:<br><br>
+                 <font color="#0000FF">write, table=errors_field,file=Your_Errors_Field_File;<br>
+                 write, table=errors_total,file=Your_Errors_Total_File;</font><br><br>
+                 The "<font color="#FF0000">ERRORS_IN</font>" flag has precedence over
+                 this "<font color="#FF0000">ERRORS_OUT</font>" flag.
+           </span></td> 
+           <td> 
+           <p align="center">.FALSE.</td> 
+           <td align="center">logical</td> 
+         </tr> 
+           <td>MAGNET_NAME</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US">
+           Simple selection for the names of magnet to be used for an error write-out 
+           using the "<font color="#FF0000">ERRORS_OUT</font>" flag (see above). 
+           In fact, the errors are recorded for all magnets with their name starting with
+           the exact string of "<font color="#FF0000">MAGNET_NAME</font>".
+           </span></td> 
+           <td> 
+           <p align="center">NULL</td> 
+           <td align="center">string</td> 
+         </tr> 
+            <td>RESPLIT</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US">
+           Flag to apply the PTC resplit procedure. This is meant to
+       create an "adaptive" setting of the "<font
+       color="#FF0000">METHOD</font>" and  "<font
+       color="#FF0000">NST</font>"  attributes according to the
+       strength of the quadrupoles (using the "<font
+       color="#FF0000">THIN</font>"  attribute) and separatedly the
+       dipoles (using the "<font
+       color="#FF0000">XBEND</font>"  attribute). Additionally, there
+       is the  "<font
+       color="#FF0000">EVEN</font>" attribute for even and odd number
+       of splits.
+            </td> 
+            <td> 
+           <p align="center">.FALSE.</td> 
+           <td align="center">logical</td> 
+          </tr> 
+         <td> THIN</span></td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US">
+            This is the main "<font
+       color="#FF0000">RESPLIT</font>" attribute. It is meant
+       for splitting quadrupoles according to their strength. The default
+       of "<font
+       color="#FF0000">THIN=0.001</font>" has shown in practice to
+       work well without costing too much with respect of performance. 
+            </td> 
+            <td> 
+           <p align="center">0.001</td> 
+           <td align="center">double</td> 
+         </tr> 
+         <td>XBEND</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US">
+            This attribute is meant for splitting dipoles, e.g. "<font
+       color="#FF0000">XBEND=0.001</font>". It is an optional "<font
+       color="#FF0000">RESPLIT</font>" attribute and therefore has the
+       default set to -1, which means no splitting. A splitting by "<font
+       color="#FF0000">XBEND=0.001</font>" maybe advisable for dipoles
+       as well. 
+            </td> 
+            <td> 
+           <p align="center">-1 (off)</td> 
+           <td align="center">double</td> 
+         </tr> 
+           <td>EVEN</span></td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US">
+           Switch to ensure even number of splits when using the PTC "<font
+       color="#FF0000">RESPLIT</font>" procedure. The default is "<font
+       color="#FF0000">EVEN=TRUE</font>". This is particularly useful
+       when one attempts to calculate "<font
+       color="#FF0000">PTC_TWISS</font>" with then "<font
+       color="#FF0000">CENTER_MAGNETS</font>" option, i.e. if one
+       would like to calculate the TWISS parameters in the center of
+       the element. Uneven number of splits will be achieved with "<font
+       color="#FF0000">EVEN=FALSE</font>".</td>
+           <td> 
+           <p align="center">.TRUE.</td> 
+           <td align="center">logical</td> 
+          </tr> 
+         </table></dd> 
+         <dt>Remarks</dt> 
+         <dd><b><font color="#FF0000">TIME</font>:</b> at small energy (<font face="Times New Roman"><i>&#946;</i><sub>0</sub></font>  
+         &lt;&lt;1), momentum-dependent variables like dispersion will depend  
+         strongly on the choice of  
+         <span lang="EN-US">the logical input variable</span> &quot;<font color="#FF0000">time</font>&quot;.  
+         In fact, the derivative (<font face="Times New Roman">&#8706;</font>/<font face="Times New Roman">&#8706;<i>&#948;</i><sub><i>p</i></sub></font>)  
+         and (<font face="Times New Roman">&#8706;</font>/<font face="Times New Roman">&#8706;<i>p</i><sub><i>t</i></sub></font>)  
+         are different by the factor <font face="Times New Roman"><i>&#946;</i><sub>0</sub></font>. One would  
+         therefore typically  
+         choose the option &quot;<font color="#FF0000">time=false</font>&quot;,  
+         which&nbsp; sets the fifth variable to 
+         the relative momentum deviation <font face="Times New Roman"> 
+         <span lang="EN-US"><i>&#948;<sub>p</sub></i></span></font>. <b> 
+         <br><br>MODEL</b>:&nbsp;&nbsp;  
+         <span lang="EN-US">1 for &quot;Drift-Kick-Drift&quot;; 2 for &quot;Matrix-Kick-Matrix&quot;; 3 for  
+         &quot;Delta-Matrix-Kick-Matrix&quot; (SixTrack-code model)</span><span lang="EN-US">.<br> 
+         <br><font color="#FF0000"><b>NST</b></font>: sets the same value  
+         for all &quot;thick&quot; elements (<i>l </i>&gt; 0) of a beam-line.  
+         Please note, that each individual element may have its own NST  
+         value (<a href="#individual">see below</a>).</span></dd> 
+        </dl></div></dd> 
+      <dt class="command"><b>PTC_READ_ERRORS</b>, <b><br> 
+&nbsp;&nbsp;&nbsp; <b>overwrite</b>=logical;</dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <span lang="EN-US">The </span><var class="command">&quot;PTC_READ-ERRORS&quot; </var> 
+         <span lang="EN-US">command let's you read any numbers of
+       <b>"errors_read"</b> tables  <a href="http://cern.ch/madx/control/general.html#readmytable">READMYTABLE</a> </span></dd> 
+         <dt>Options</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table2"> 
+          <tr> 
+           <th>Option</th> 
+           <th colspan="2">Meaning</th> 
+           <th>Default Value</th> 
+           <th>Value Type</th> 
+          </tr> 
+          <tr> 
+         <tr> 
+         </tr> 
+           <td>OVERWRITE</td> 
+           <td colspan="2"> 
+           <p align="left"> 
+           <span lang="EN-US"> 
+                 Flag to either OVERWRITE the read-in errors (on
+         request by using this flag) or by DEFAULT just add them to
+         multipole components already present.
+           </span></td> 
+           <td> 
+           <p align="center">.FALSE.</td> 
+           <td align="center">logical</td> 
+         </table></dd> 
+         <dt>Remarks</dt> 
+         <dd></dd> 
+        </dl></div></dd> 
+       <dt class="command"><b>PTC_MOVE_TO_LAYOUT</b>, <b><br> 
+&nbsp;&nbsp;&nbsp; index</b>=integer;</dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <span lang="EN-US"> 
+         Several PTC layouts can be created within a one PTC-&quot;universe&quot;.  
+         The layouts are automatically numbered with sequential integers  
+         by the MAD-X code. T</span><span lang="EN-US">he </span> 
+         <var class="command">&quot;PTC_MOVE_TO_LAYOUT&quot; </var> 
+         <span lang="EN-US">is used for an activation&nbsp; of a requested  
+         layout and the next PTC commands will be applied to this active  
+         PTC layout until a new PTC layout will be created or activated.</span></dd> 
+         <dt>Option</dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table3"> 
+          <tr> 
+           <th>Option</th> 
+           <th>Meaning</th> 
+           <th>Default Value</th> 
+           <th>Value Type</th> 
+          </tr> 
+          <tr> 
+           <td>INDEX</td> 
+           <td> 
+           <span lang="EN-US"> 
+           Number of the PTC layout to be activated.</span></td> 
+           <td> 
+           <p align="center">1</td> 
+           <td> 
+           <p align="center">integer</td> 
+          </tr> 
+          </table></dd> 
+        </dl></div></dd> 
+       <dt class="command"><b>PTC_ALIGN</b>;</dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              <span lang="EN-US"> 
+         </span><span lang="EN-US">The </span><var class="command">&quot;PTC_ALIGN&quot; </var> 
+         <span lang="EN-US">command is used to apply the MAD-X alignment  
+         errors to the current PTC layout.</span></dd> 
+        </dl></div></dd> 
+       <dt class="command"><b><a name="PTC_END">PTC_END</a>;</b></dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
+              <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
+              <span lang="EN-US">The </span><var class="command">&quot;PTC_END&quot; </var> 
+         <span lang="EN-US">command </span> 
+         <span lang="EN-US"> 
+         is </span>turning of<span lang="EN-US">f the PTC environment,  
+         which releases all memory back to the MAD-X world proper;</span></dd> 
+        </dl></div></dd> 
+      </dl></div> 
+    </dd> 
+</dl> 
+      <dl> 
+      <dl> 
+       <dt><font color="#FF0000">Additional Options for Physical Elements</font></dt> 
+       <dd> 
+<div> 
+      <dl> 
+      <dt class="command"><b>[SBEND | RBEND | <a name="PTC_CREATE_LAYOUT0"> 
+      QUADRUPOLE | SEXTUPOLE | OCTUPOLE | SOLENOID ], </a><br> 
+&nbsp;&nbsp;&nbsp; l</b>=double<b>, .....,tilt</b>=double<b>, ...., nst</b>=integer<b>,  
+      ...,<br> 
+&nbsp;&nbsp;&nbsp; knl</b>:={0, double, double,..}, <b>ksl</b>:={0, double,  
+      double,..}<b>;</b></dt> 
+       <dd> 
+       <div> 
+        <dl> 
+         <dt>Description</dt> 
+         <dd> 
+              1. <span lang="EN-US">The full range of  
+         normal and skew multipole components on the bench can be  
+         specified for the following physical elements: </span> 
+         <var class="command">sbend, rbend, quadrupole, sextupole,  
+         octupole and solenoid. </var>Multipole coefficients are specified as the integrated value 
+         <font face="Times New Roman">&quot;&#8747;</font><i>K<font face="Times New Roman"> </font>ds&quot;</i>  
+         of the field components along the magnet axis (see 
+         <a href="#Multipoles_on_Bench_(PTC_only)">the table</a> below). 
+         <span lang="EN-US">These multipole components in PTC are spread over a whole   
+         element, if <i>l </i>&gt; 0. This is a considerable advantage of PTC input compare  
+         to MAD-X  
+         which allows only 
+         <a href="http://cern.ch/madx/Introduction/multipole.html"> 
+         thin multipoles</a>.<br> 
+         2. 
+         To preserve the reference orbit of straight elements, dipole components  
+         for those elements are   
+         ignored, knl(0)=0, ksl(0)=0.<br> 
+         3. <a name="individual">Individual</a> <a href="#NST">NST</a> values for a  
+         particular &quot;thick&quot; element (<i>l </i>&gt; 0) can be specified. For example,  
+         in MAD-X any RF cavity is represented by a single kick, while  
+         PTC splits the RF cavity into (global) NST segments. In this  
+         way, PTC considers properly transit-time effects of the cavity.  
+         In case, one wants to reproduce the approximate results of  
+         MAD-X, one can use NST=1 for RF cavity in PTC.</span></dd> 
+         <dt><a name="Multipoles_on_Bench_(PTC_only)">Multipoles on Bench  
+         (PTC only)</a></dt> 
+         <dd> 
+         <table cellspacing="0" cellpadding="3" border="1" id="table4" width="566"> 
+          <tr> 
+           <th>Option</th> 
+           <th>Meaning</th> 
+           <th>Default Value</th> 
+           <th>Value Type</th> 
+          </tr> 
+          <tr> 
+           <td>KNL</td> 
+           <td> 
+           The normal multipole coefficient</td> 
+           <td> 
+           <p align="center">0 [m<sup>-1</sup>] </td> 
+           <td> 
+           <p align="center">double <br> 
+           &nbsp;array</td> 
+          </tr> 
+          <tr> 
+           <td>KSL</td> 
+           <td> 
+           The skew multipole coefficient</td> 
+           <td> 
+           <p align="center">0 [m<sup>-1</sup>] </td> 
+           <td> 
+           <p align="center">double <br> 
+           &nbsp;array</td> 
+          </tr> 
+          </table></dd> 
+         <dt>Remarks</dt> 
+         <dd><b>Length l: </b>Bending magnets (<var class="command">sbend,  
+         rbend</var>) are treated as &quot;markers&quot;, if <i>l</i> = 0.<b><br> 
+         <br> 
+         Additional Field Errors: 
+         </b>A full range of multipole 
+         <a href="http://cern.ch/madx/error/error_field.html"> 
+         field errors</a> can be additionally specified with 
+         <a href="http://cern.ch/madx/error/error_field.html#efcomp"> 
+         EFCOMP</a> command. Errors are added to the above multipole  
+         fields on the bench.</dd> 
+        </dl></div></dd> 
+      </dl></div> 
+    </dd> 
+       <dt><font color="#FF0000">Caution</font></dt> 
+       <dd>A user has to understand that PTC exists inside of MAD-X as a  
+       library. MAD-X offers the interface to PTC, i.e. the MAD-X input file is  
+       used as input for PTC. Internally, both PTC and MAD-X have their own  
+       independent databases which are linked via the interface.</dd> 
+       <dd>With the <var class="command"><a href="#PTC_CREATE_LAYOUT">&quot;PTC_CREATE_LAYOUT&quot;</a> </var> 
+       command, <font color="#FF0000">only numerical numbers</font> are  
+       transferred from the MAD-X  
+       database to the PTC database. </dd> 
+       <dd>Any modification to the MAD-X  
+       database is ignored in PTC until the next call to <var class="command"><a href="#PTC_CREATE_LAYOUT">&quot;PTC_CREATE_LAYOUT&quot;</a></var>.</dd> 
+       <dd>For example, a 
+       <a href="http://cern.ch/madx/Introduction/expression.html#defer"> 
+       deferred expression</a> of MAD-X <font color="#FF0000">after</font> a 
+       <var class="command"><a href="#PTC_CREATE_LAYOUT">&quot;PTC_CREATE_LAYOUT&quot;</a> </var> 
+       command is ignored within PTC. </dd> 
+       <dt>Examples</dt> 
+       <dd>Examples for any MADX-PTC module contain the above PTC set-up  
+       commands. </dd> 
+      </dl> 
+       <dt>References</dt> 
+      </dl> 
+      <ol type="a"> 
+       <li><span lang="EN-US"><a name="E.Forest">E.&nbsp;Forest</a>, F.&nbsp;Schmidt  
+       and E.&nbsp;McIntosh,  Introduction to the Polymorphic Tracking Code ,  
+       <a href="http://doc.cern.ch/archive/electronic/cern/preprints/sl/sl-2002-044.pdf"> 
+       CERN-SL-2002-044-AP</a>, 
+       <a href="http://ccdb4fs.kek.jp/cgi-bin/img/allpdf?200302020">KEK report  
+       2002-3</a>, July 2002</span>.</li> 
+       <li><a name="F.Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'',  
+       Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li> 
+      </ol> 
+</div> 
+<div> 
+      <dl> 
+       <dt>See Also</dt> 
+       <dd> 
+       <a href="http://cern.ch/madx/ptc_twiss/ptc_twiss.html"> 
+       ptc_twiss</a>,  
+       <a href="http://cern.ch/madx/ptc_normal/ptc_normal.html"> 
+       ptc_normal</a>,  
+       <a href="http://cern.ch/madx/ptc_track/ptc_track.html"> 
+       ptc_track</a>, 
+       <a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html"> 
+       ptc_track_line</a>.</dd> 
+</dl> 
+</div> 
+ 
+</div> 
+ 
+<hr /> 
+<address> 
+<span lang="EN-US"> 
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru"> 
+V.&nbsp;<span class="SpellE">Kapin<span style="text-decoration: none"> </span></span> 
+</a></span>(ITEP) and <span lang="EN-US"> 
+<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch"> 
+F.&nbsp;Schmidt</a>, </span>March  2006</address> 
+ 
+</body> 
+</html> 

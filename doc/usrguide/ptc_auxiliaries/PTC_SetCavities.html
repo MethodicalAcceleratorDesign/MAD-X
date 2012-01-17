@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="madxdoc_ps.css" />
+<title>PTC_SetCavities</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_SetCavities</h1>
+  <h2> f90 routine that adjusts cavities and sets appropriate reference momenta 
+       for a layout containing traveling wave cavities 
+  </h2>
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> <strong> CAUTION </strong> For the time being cavities MUST not be placed 
+one after another, and at least a marker must be inserted between two 
+neighboring accelerating structures. 
+Otherwise, program will stop with the error message. 
+
+<h4> Description </h4>
+
+<p> This routine sets up the properties of a layout and traveling wave cavities. 
+The main goal is to update  reference beam energy for the elements 
+that follow a traveling wave cavity. 
+It traces the synchronous particle, i.e. one that has 
+all its parameters set to zero at the beginning
+of the layout under study. At the point it arrives to a cavity, 
+the parameters of the latter one are adjusted according to the switches 
+defined by the user. There are 2 cases
+
+<ol>
+ <li> <b>Leaves all parameters untouched</b></li>
+ <li> <b>Phase of cavity is adjusted so it gives the maximum acceleration </b> 
+         Afterwards to the calculated phase the lag is added.
+         This setting is acquired using set_switch command, setting maxaccel
+         parameter to true.
+ </li>
+</ol>
+Afterwards,  the synchronous particle is tracked through traveling wave cavity 
+and its energy gain is known. 
+This energy becomes the reference one for all the elements downstream of the cavity. 
+The particle is tracked further to the next cavity, 
+for which the procedure described above is repeated. 
+
+<p> Parameters of the cavities are dumped to the file named twcavsettings.txt. 
+
+<p> At the end patches at the ends of the cavities are set, 
+so the parameters after them are 
+calculated taking to the account reference energy increase.
+
+<p> The exact program behavior depends on the 
+<a href="PTC_SetSwitch.html"> PTC switches settings</a>.
+
+<p> Please note that in PTC phase velocity of a cavities wave is always equal to speed of light. 
+Hence, if PTC internal state TIME is TRUE, what is the most correct setting, 
+then voltage seen by a particle is varying along the structure. If TIME is FALSE, 
+track is assumed to fly with speed of light
+and in such case a particle moves together with the wave front.
+
+
+</div>
+
+</body>
+
+</html>

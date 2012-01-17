@@ -1,0 +1,93 @@
+<head>
+<title>SEQUENCE</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Beam Line Sequences</h2>
+</center>
+
+MAD-X accepts two forms of an accelerator definition: sequences and
+<a href="line.html">lines</a>. However, the sequence definition is the
+only one used internally; lines are converted into sequences when they
+are USEd. Consequently, only sequences can be saved (written onto a file)
+by MAD-X.
+<p>
+The corresponding sequence of statements defining a sequence is
+<pre>
+name: SEQUENCE,REFER=keyword,REFPOS=name,LENGTH=real
+label: class,AT=real{,attributes} | class,AT=real | sequ_name, AT=real
+    ...
+ENDSEQUENCE
+</pre>
+where "real" means a real number, variable, or expression.
+<p>
+The first line gives the sequence name, a REFER flag (entry, centre,
+or exit) which specifies at which part of the element its position along
+the beam line will be given (default: centre), a REFPOS argument used
+for sequence insertion, and the total length.
+<p>
+Inside the sequence ... endsequence bracket three types of commands
+may be placed:
+<ul>
+<li>an element declaration as usual, with an additional "at" attribute
+giving the element position relative to the start of the sequence;
+CAUTION: an existing definition for an element with the same name will
+be replaced, however, defining the same element twice inside the same
+sequence results in a fatal error, since a unique object (this element)
+would be placed at two different positions.</li>
+<li>a class name with a position; this causes an instance of the class
+to be placed at the position given. For uses inside ranges, instances
+of the same class can be accessed with an occurrence count.</li>
+<li>a sequence name with a position; this causes the sequence with that
+name to be placed at the position indicated. The entry, centre, or exit
+of the inserted sequence are placed at the position given, UNLESS a "refpos"
+(the name of an element in the inserted sequence) is given, in which case
+the sequence is inserted such that the refpos element is 
+at the insertion point.</li>
+</ul>
+When the sequence is expanded in a 
+<a href="../control/general.html#use">USE</a> command,
+MAD generates the missing drift spaces. At this moment, overlapping elements
+will cause "negative drift length" errors.
+<p>
+For efficiency reasons MAD-X imposes an <b>important restriction</b>
+on element lengths and positions: once a sequence is expanded, the element
+positions and lengths are considered as fixed; in order to vary a position
+or element length, a re-expansion of the sequence becomes necessary.
+The MATCH command contains a special flag "vlength" to
+<a href="../match/match.html">match element lengths</a>.
+<p>
+<a name=example>Example:</a>
+<pre>
+! define a default beam (otherwise fatal error)
+beam;
+! Define element classes for a simple cell:
+b:     sbend,l=35.09, angle = 0.011306116;
+qf:    quadrupole,l=1.6,k1=-0.02268553;
+qd:    quadrupole,l=1.6,k1=0.022683642;
+sf:    sextupole,l=0.4,k2=-0.13129;
+sd:    sextupole,l=0.76,k2=0.26328;
+! define the cell as a sequence:
+sequ:  sequence,l=79;
+   b1:    b,      at=19.115;
+   sf1:   sf,     at=37.42;
+   qf1:   qf,     at=38.70;
+   b2:    b,      at=58.255,angle=b1->angle;
+   sd1:   sd,     at=76.74;
+   qd1:   qd,     at=78.20;
+   endm:  marker, at=79.0;
+endsequence;
+</pre>
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

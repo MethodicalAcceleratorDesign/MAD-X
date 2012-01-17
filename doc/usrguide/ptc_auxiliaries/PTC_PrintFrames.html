@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="../ptc_general/madxdoc_ps.css" />
+<title>PTC_PRINTFRAMES</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_PRINTFRAMES</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+
+PTC_PRINTFRAMES, 
+file = [s, none] ,
+format = [s, text] ; 
+
+</big>
+</pre>
+
+</div>
+  
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+
+Print to a specified file PTC geometry of a layout. 
+
+</div>
+
+<h4> Example </h4>
+
+<a href="http://frs.web.cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/eplacement.madx">  
+Dog leg chicane </a> with some elements displaced with help of ptc_eplacement:
+
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b> file </b></dt> 
+  <dd>
+  <i> string, </i>
+  <p> Specifies name of the file.
+  </dd>
+
+<dt><b> format </b></dt> 
+  <dd>
+  <i> string, default "text"</i>
+  <p> Format of geometry. Currently two formats are accepted:
+      <dl>
+        <dt> text </dt> 
+          <dd>
+          <p> Prints a simple text file.
+          </dd>
+
+        <dt> rootmacro </dt> 
+          <dd>
+          <p> Creates <a href="http://root.cern.ch"> root </a> macro that produces 3D display of the geometry.
+          </dd>
+      </dl>      
+
+
+  </dd>
+
+
+
+</dl>
+
+<h4> ____  </h4>
+
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!--
+<h3> PROGRAMMERS MANUAL </h3>
+
+<p> 
+The command is implemented pro_ptc_knob function in madxn.c and 
+by subroutine xxxx in madx_ptc_xxx.f90.
+<p>
+Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+element in the PTC layout.
+<p>
+
+-->
+
+</div>
+
+</body>
+
+</html>

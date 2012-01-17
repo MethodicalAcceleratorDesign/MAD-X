@@ -1,0 +1,38 @@
+<head>
+<title>DRIFT</title>
+<!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Drift Space</h2>
+</center>
+
+<pre>
+label: DRIFT,L=real;
+</pre>
+A DRIFT space has one real attribute:
+<ul>
+<li>L:
+The drift length (default: 0 m)
+</ul>
+Examples:
+<pre>
+DR1:   DRIFT,L=1.5;
+DR2:   DRIFT,L=DR1[L];
+</pre>
+The length of DR2 will always be equal to the length of DR1.
+The <a href="../Introduction/local_system.html#straight">straight 
+reference system</a>
+for a drift space is a cartesian coordinate system.
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

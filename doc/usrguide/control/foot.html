@@ -1,0 +1,742 @@
+<head>
+<title>Range Selection</title>
+<!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h4>Real life example for IF statements, and MACRO usage</h4>
+</center>
+<p>
+<pre>
+! Creates a footprint for head-on + parasitic collisions at IP1+5 
+! of lhc.6.5; both lhcb1 (for tracking) and lhcb2 (to define the
+! beam-beam elements, i.e. weak-strong) are used; there are flags to
+! select head-on, left, and right parasitic separately at all IPs.
+! The bunch spacing can be given in nanosec and automatically creates
+! the beam-beam interaction points at the correct positions.
+! It is important to set the correct BEAM parameters, i.e. number
+! of particles, emittances, bunch length, energy.
+
+!--- For completeness, all files needed by this job are copied
+!    to the local directory ldb. The links to the the originals
+!    in offdb (official database) are commented out.
+
+Option,  warn,info,echo;
+!System,
+"ln -fns /afs/cern.ch/eng/sl/MAD-X/dev/test_suite/foot/V3.01.01 ldb";
+!system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.4 offdb";
+Option, -echo,-info,warn;
+SU=1.0;
+call, file = "ldb/V6.5.seq";
+call,file="ldb/slice_new.madx";
+Option, echo,info,warn;
+
+!+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
+! 	define beam constants
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+b_t_dist = 25.e-9;                  !--- bunch distance in [sec]
+b_h_dist = clight * b_t_dist / 2 ;  !--- bunch half-distance in [m]
+ip1_range = 58.;                     ! range for parasitic collisions
+ip5_range = ip1_range;
+ip2_range = 60.;
+ip8_range = ip2_range;
+
+npara_1 = ip1_range / b_h_dist;     ! # parasitic either side
+npara_2 = ip2_range / b_h_dist;
+npara_5 = ip5_range / b_h_dist;
+npara_8 = ip8_range / b_h_dist;
+
+value,npara_1,npara_2,npara_5,npara_8;
+
+ eg   =  7000;
+ bg   =  eg/pmass;
+ en   = 3.75e-06;
+ epsx = en/bg;
+ epsy = en/bg;
+
+Beam, particle = proton, sequence=lhcb1, energy = eg,
+          sigt=      0.077     , 
+          bv = +1, NPART=1.1E11, sige=      1.1e-4, 
+          ex=epsx,   ey=epsy;
+
+Beam, particle = proton, sequence=lhcb2, energy = eg,
+          sigt=      0.077     , 
+          bv = -1, NPART=1.1E11, sige=      1.1e-4, 
+          ex=epsx,   ey=epsy;
+
+beamx = beam%lhcb1->ex;   beamy%lhcb1 = beam->ey;
+sigz  = beam%lhcb1->sigt; sige = beam%lhcb1->sige;
+
+!--- split5, 4d
+long_a= 0.53 * sigz/2;
+long_b= 1.40 * sigz/2;
+value,long_a,long_b;
+
+ho_charge = 0.2;
+
+!+++++++++++++++++++++++++ Step 2 +++++++++++++++++++++++
+! 	slice, flatten sequence, and cycle start to ip3
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+use,sequence=lhcb1;
+makethin,sequence=lhcb1;
+!save,sequence=lhcb1,file=lhcb1_thin_new_seq;
+use,sequence=lhcb2;
+makethin,sequence=lhcb2;
+!save,sequence=lhcb2,file=lhcb2_thin_new_seq;
+!stop;
+
+option,-warn,-echo,-info;
+call,file="ldb/V6.5.thin.coll.str";
+option,warn,echo,info;
+
+! keep sextupoles
+ksf0=ksf; ksd0=ksd;
+use,period=lhcb1;
+select,flag=twiss.1,column=name,x,y,betx,bety;
+twiss,file;
+plot,haxis=s,vaxis=x,y,colour=100,noline;
+
+use,period=lhcb2;
+select,flag=twiss.2,column=name,x,y,betx,bety;
+twiss,file;
+plot,haxis=s,vaxis=x,y,colour=100,noline;
+seqedit,sequence=lhcb1;
+flatten;
+endedit;
+
+seqedit,sequence=lhcb1;
+cycle,start=ip3.b1;
+endedit;
+
+seqedit,sequence=lhcb2;
+flatten;
+endedit;
+
+seqedit,sequence=lhcb2;
+cycle,start=ip3.b2;
+endedit;
+
+bbmarker: marker;  /* for subsequent remove */
+
+
+!+++++++++++++++++++++++++ Step 3 +++++++++++++++++++++++
+! 	define the beam-beam elements
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!
+!===========================================================
+! read macro definitions
+option,-echo;
+call,file="ldb/bb.macros";
+option,echo;
+
+!
+!===========================================================
+!   this sets CHARGE in the head-on beam-beam elements. 
+!   set +1 * ho_charge   for parasitic on, 0 for off
+
+ on_ho1  = +1 * ho_charge; ! ho_charge depends on split
+ on_ho2  = +0 * ho_charge; ! because of the "by hand" splitting
+ on_ho5  = +1 * ho_charge;
+ on_ho8  = +0 * ho_charge;
+
+!
+!===========================================================
+!   set CHARGE in the parasitic beam-beam elements. 
+!   set +1 for parasitic on, 0 for off
+ on_lr1l = +1;
+ on_lr1r = +1;
+ on_lr2l = +0;
+ on_lr2r = +0;
+ on_lr5l = +1;
+ on_lr5r = +1;
+ on_lr8l = +0;
+ on_lr8r = +0;
+
+!
+!===========================================================
+!   define markers and savebetas
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+  exec, mkho(1);
+  exec, sbhomk(1);
+}
+if (on_lr1l <> 0 || on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, mkl(1,$n);
+   exec, sbl(1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0 || on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, mkr(1,$n);
+   exec, sbr(1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+  exec, mkho(5);
+  exec, sbhomk(5);
+}
+if (on_lr5l <> 0 || on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, mkl(5,$n);
+   exec, sbl(5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0 || on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, mkr(5,$n);
+   exec, sbr(5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+  exec, mkho(2);
+  exec, sbhomk(2);
+}
+if (on_lr2l <> 0 || on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, mkl(2,$n);
+   exec, sbl(2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0 || on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, mkr(2,$n);
+   exec, sbr(2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+  exec, mkho(8);
+  exec, sbhomk(8);
+}
+if (on_lr8l <> 0 || on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, mkl(8,$n);
+   exec, sbl(8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0 || on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, mkr(8,$n);
+   exec, sbr(8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+call,file=temp.bb.install;
+system, "rm temp.bb.install";
+!
+!===========================================================
+!   install bb markers
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, inho(mk,1);
+}
+if (on_lr1l <> 0 || on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inl(mk,1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0 || on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inr(mk,1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, inho(mk,5);
+}
+if (on_lr5l <> 0 || on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inl(mk,5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0 || on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inr(mk,5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, inho(mk,2);
+}
+if (on_lr2l <> 0 || on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inl(mk,2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0 || on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inr(mk,2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, inho(mk,8);
+}
+if (on_lr8l <> 0 || on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inl(mk,8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0 || on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inr(mk,8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+seqedit,sequence=lhcb2;
+call,file=temp.bb.install;
+endedit;
+system, "rm temp.bb.install";
+
+!
+!===========================================================
+!--- get beta functions at bb in all four IPs
+use,period=lhcb2;
+!select,flag=twiss,class=bbmarker,column=name,s,x,y;
+twiss, sequence=lhcb2; !,file;
+!--- separation for halo collisions at IP2
+on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
+value,on_sep2;
+!===========================================================
+!   define bb elements
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, bbho(1);
+}
+if (on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, bbl(1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, bbr(1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, bbho(5);
+}
+if (on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, bbl(5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, bbr(5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, bbho(2);
+}
+if (on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, bbl(2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, bbr(2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, bbho(8);
+}
+if (on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, bbl(8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, bbr(8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+call,file=temp.bb.install;
+system, "rm temp.bb.install";
+!
+!===========================================================
+!   install bb elements
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, inho(bb,1);
+}
+if (on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inl(bb,1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inr(bb,1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, inho(bb,5);
+}
+if (on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inl(bb,5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inr(bb,5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, inho(bb,2);
+}
+if (on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inl(bb,2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inr(bb,2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, inho(bb,8);
+}
+if (on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inl(bb,8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inr(bb,8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+select,flag=seqedit,class=bbmarker;
+seqedit,sequence=lhcb2;
+remove,element=selected;
+endedit;
+select,flag=seqedit,clear;
+
+seqedit,sequence=lhcb1;
+call,file=temp.bb.install;
+endedit;
+
+!--- Now the beam-beam element installation is complete
+
+system, "rm temp.bb.install";
+
+seqedit,sequence=lhcb1;
+cycle,start=ip1;
+endedit;
+
+use,period=lhcb1;
+!twiss, sequence=lhcb1;
+!
+!  make footprint
+!
+
+option,trace;
+small=0.05;
+big=sqrt(1.-small^2);
+track;
+xs=small; ys=small;
+value,xs,ys;
+start,fx=xs,fy=ys;  // zero amplitude
+nsigmax=6;
+n=1; // sigma multiplier
+m=0; // angle multiplier
+while (n <= nsigmax)
+{
+  angle = 15*m*pi/180;
+  if (m == 0) {xs=n*big; ys=n*small;}
+  elseif (m == 6) {xs=n*small; ys=n*big;}
+  else
+  {
+    xs=n*cos(angle);
+    ys=n*sin(angle);
+  }
+  value,xs,ys;
+  start,fx=xs,fy=ys;
+  m=m+1;
+  if (m == 7) { m=0; n=n+1;}
+};
+dynap,fastune,turns=1024;
+endtrack;
+write,table=dynap,file;
+write,table=dynaptune,file;
+system,"foot < dynaptune > footprint";
+stop;
+</pre>
+
+<h4><a name=macro>Real life example of MACRO definitions</a></h4>
+<p>
+<pre>
+bbho(nn): macro = {
+!--- macro defining head-on beam-beam elements; nn = IP number
+print, text="bbipnnl2: beambeam, sigx=sqrt(rnnipnnl2->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnl2->bety*epsy),";
+print, text="          xma=rnnipnnl2->x,yma=rnnipnnl2->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnl1: beambeam, sigx=sqrt(rnnipnnl1->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnl1->bety*epsy),";
+print, text="          xma=rnnipnnl1->x,yma=rnnipnnl1->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnn:   beambeam, sigx=sqrt(rnnipnn->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnn->bety*epsy),";
+print, text="          xma=rnnipnn->x,yma=rnnipnn->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnr1: beambeam, sigx=sqrt(rnnipnnr1->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnr1->bety*epsy),";
+print, text="          xma=rnnipnnr1->x,yma=rnnipnnr1->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnr2: beambeam, sigx=sqrt(rnnipnnr2->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnr2->bety*epsy),";
+print, text="          xma=rnnipnnr2->x,yma=rnnipnnr2->y,";
+print, text="          charge:=on_honn;";
+};
+
+mkho(nn): macro = {
+!--- macro defining head-on markers; nn = IP number
+print, text="mkipnnl2: bbmarker;";
+print, text="mkipnnl1: bbmarker;";
+print, text="mkipnn:   bbmarker;";
+print, text="mkipnnr1: bbmarker;";
+print, text="mkipnnr2: bbmarker;";
+};
+
+inho(xx,nn): macro = {
+!--- macro installing bb or markers for head-on beam-beam (split into 5)
+print, text="install, element= xxipnnl2, at=-long_b, from=ipnn;";
+print, text="install, element= xxipnnl1, at=-long_a, from=ipnn;";
+print, text="install, element= xxipnn,   at=1.e-9,   from=ipnn;";
+print, text="install, element= xxipnnr1, at=+long_a, from=ipnn;"; 
+print, text="install, element= xxipnnr2, at=+long_b, from=ipnn;"; 
+};
+
+sbhomk(nn): macro = {
+!--- macro to create savebetas for ho markers
+print, text="savebeta, label=rnnipnnl2, place=mkipnnl2;";
+print, text="savebeta, label=rnnipnnl1, place=mkipnnl1;";
+print, text="savebeta, label=rnnipnn,   place=mkipnn;";
+print, text="savebeta, label=rnnipnnr1, place=mkipnnr1;";
+print, text="savebeta, label=rnnipnnr2, place=mkipnnr2;";    
+};
+
+mkl(nn,cc): macro = {
+!--- macro to create parasitic bb marker on left side of ip nn; cc = count
+print, text="mkipnnplcc: bbmarker;";
+};
+
+mkr(nn,cc): macro = {
+!--- macro to create parasitic bb marker on right side of ip nn; cc = count
+print, text="mkipnnprcc: bbmarker;";
+};
+
+sbl(nn,cc): macro = {
+!--- macro to create savebetas for left parasitic
+print, text="savebeta, label=rnnipnnplcc, place=mkipnnplcc;";
+};
+
+sbr(nn,cc): macro = {
+!--- macro to create savebetas for right parasitic
+print, text="savebeta, label=rnnipnnprcc, place=mkipnnprcc;";
+};
+
+inl(xx,nn,cc): macro = {
+!--- macro installing bb and markers for left side parasitic beam-beam
+print, text="install, element= xxipnnplcc, at=-cc*b_h_dist, from=ipnn;";
+};
+
+inr(xx,nn,cc): macro = {
+!--- macro installing bb and markers for right side parasitic beam-beam
+print, text="install, element= xxipnnprcc, at=cc*b_h_dist, from=ipnn;";
+};
+
+bbl(nn,cc): macro = {
+!--- macro defining parasitic beam-beam elements; nn = IP number
+print, text="bbipnnplcc: beambeam, sigx=sqrt(rnnipnnplcc->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnplcc->bety*epsy),";
+print, text="          xma=rnnipnnplcc->x,yma=rnnipnnplcc->y,";
+print, text="          charge:=on_lrnnl;";
+};
+
+bbr(nn,cc): macro = {
+!--- macro defining parasitic beam-beam elements; nn = IP number
+print, text="bbipnnprcc: beambeam, sigx=sqrt(rnnipnnprcc->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnprcc->bety*epsy),";
+print, text="          xma=rnnipnnprcc->x,yma=rnnipnnprcc->y,";
+print, text="          charge:=on_lrnnr;";
+};
+</pre>
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+June 17, 2002
+</address>
+
+</body>

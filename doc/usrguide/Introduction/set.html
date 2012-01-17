@@ -1,0 +1,71 @@
+<head>
+<title>SET</title>
+<!-- Changed by: Hans Grote, 09-Jun-2003 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Set Statements</h2>
+</center>
+
+<pre>
+set,format="...", sequence="...";
+</pre>
+The set command allows 2 actions:
+<h3>1) Format</h3>
+The first command lets you vary the output precision.
+<pre>
+parameter: format = s1, s2, s3
+</pre>
+(up to) three strings defining the integer, floating, and string
+output format for the save, show, value, and table output. The formats
+can be given in any order and stay valid until replaced. The defaults
+are:
+<pre>
+"10d","18.10g","-18s".
+</pre>
+They follow the C convention. The quotes are mandatory. The allowed
+formats are:
+<pre>
+"nd" for integer with n = field width.
+</pre>
+<pre>
+"m.nf" or "m.ng" or "m.ne" for floating, m field width, n precision.
+</pre>
+<pre>
+"ns" for string output.
+</pre>
+The default is "right adjusted", a "-" changes it to "left adjusted".
+
+Example:
+<pre>
+set,format="22.14e";
+</pre>
+changes the current floating point format to 22.14e; the other formats
+remain untouched.
+<pre>
+set,format="s","d","g";
+</pre>
+sets all formats to automatic adjustment according to C conventions.
+<h3>2) Sequence</h3>
+The second command lets you choose the current sequence without having
+to use the "USE" command, which would bring you back to a bare lattice
+without errors. The command only works if the chosen sequence had been
+activated before with the "USE" command, otherwise a warning will be
+issued and MAD-X will continue with the unmodified current sequence.
+This command is particularly useful for commands that do not have the
+sequence as an argument like "EMIT" or "IBS".
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+<a href="http://www.cern.ch/Frank.Frank/frs_sign.html">frs</a>,
+June 18, 2003
+</address>
+</body>
+
+
+
+
+

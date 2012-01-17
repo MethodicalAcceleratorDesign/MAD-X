@@ -1,0 +1,111 @@
+<html><head>
+
+<title>DYNAP</title><!-- Changed by: Hans Grote, 17-Jun-2002 -->
+<!-- Changed by: Frank Zimmermann, 18-Jun-2002 --></head><body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<img SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>DYNAP: Tunes, Tune Footprints, Smear and Lyapunov Exponent</h2>
+</center>
+
+
+<p>
+DYNAP can be called instead of RUN inside a TRACK command:
+</p><pre>DYNAP,TURNS=real, FASTUNE=logical,LYAPUNOV=real,MAXAPER:={..,..,..,..,..,..},ORBIT=logical;
+</pre>
+
+For each previously entered start command, 
+DYNAP tracks two close-by particles over a selected 
+number of turns, from which it obtains the
+betatron tunes with error, the action smear,
+and an estimate of  the lyapunov exponent. 
+Many such companion particle-pairs 
+can be tracked at the same time, which
+speeds up the calculation.
+The <i> smear </i> is defined as 
+<i>2.0 (wxy<sub>max</sub> - wxy<sub>min</sub>) / (wxy<sub>max</sub> + wxy
+<sub>min</sub>)</i>, where the <i>wxy<sub>min,max</sub></i> refer to the 
+miminum and maximum values of the sum of the transverse betatron invariants
+<i>wx+wy</i> during the tracking. The tunes are computed by 
+using an FFT and either formula (18) or formula
+(25) of CERN SL/95-84 (AP),
+depending on whether the number of turns is less-equal or
+larger than 64.
+
+<p>
+The arguments have the following meaning:
+</p><ul>
+<li><a name="particle">TURNS</a>:
+The number of turns to be tracked (default: 64, present maximum: 1024).
+</li><li><a name="particle">FASTUNE</a>:
+A logical flag. If set, the tunes are computed (default: false).
+</li><li><a name="particle">MAXAPER</a>:
+If the particle phase-space coordinates exceed certain 
+<i> maximum </i>
+values, the particle is considered lost. The maximum aperture
+is a vector of 6 real numbers 
+(default: (0.1, 0.01, 0.1,0.01, 1.0, 0.1) ).
+</li><li><a name="particle">LYAPUNOV</a>:
+The launch distance 
+between two companion particles 
+added to the <i>x</i> coordinate (default: 1.e-7 m).
+</li><li><a name="particle">ORBIT</a>:
+A logical flag. If set, the flag <i>orbit</i> 
+is true during the tracking and its initialization
+(default: true).
+<b> This flag should be set to be true, if 
+normalized coordinates are to be entered.</b>
+</li></ul>
+
+<p>
+Example:
+</p><pre>BEAM,PARTICLE=ELECTRON,ENERGY=50,EX=1.E-6,EY=1.E-8,ET=0.002,SIGT=1.E-2;
+...
+USE,PERIOD=FODO;
+...
+TRACK;
+START,X=0.0010,Y=0.0017,PT=0.0003;
+DYNAP,FASTUNE,TURNS=1024,LYAPUNOV=1.e-7;
+ENDTRACK;
+...
+
+</pre>
+The first command defines the beam parameters. It is 
+essential that the longitudinal emittance <i>ET</i>
+is set. The command <i>use</i> selects the beam line
+or sequence. The <i>track</i> activates the tracking
+module, <i>start </i> enters the starting coordinates
+(more than one particle can be defined), 
+<i>dynap</i> finally tracks two nearby particles 
+with an initial distance <i>lyapunov</i> 
+for each <i>start</i> definition over <i> turns </i>
+revolutions, and <i>endtrack</i> terminates
+the execution of the tracking module.
+
+
+<p>
+The results are stored in the <i>DYNAP</i> and 
+<i> DUNAPTUNE </i> tables, and can be obtained by the commands 
+</p><pre>value,table(dynap,smear);</pre> 
+resp. <pre>value,(dynaptune,tunx),(dynaptune,tuny),(dynaptune,dtune);</pre>
+<p>
+More generally, all results can be printed to a file, using the commands 
+</p><pre>write,table=dynap,file;
+write,table=dynaptune,file;
+</pre>
+
+<p>
+The output file 'lyapunov.data' lists  
+the turn number and phase distance between the 
+two Lyapunov partners, respectively, 
+allowing for visual inspection of chaoticity.
+</p>
+
+
+<address>
+<a href="http://consult.cern.ch/xwho/people/62690">frankz</a>
+20.03.2006
+</address>
+
+</body></html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8889-2">
+<meta name=Generator content="NEdit">
+<meta name=Originator content="Skowron">
+<link rel="stylesheet" type="text/css" href="madxdoc_ps.css" />
+<title>PTC_DumpMaps</title>
+<style>
+</style>
+</head>
+
+<body bgcolor="#ffffff"'>
+
+<div style="text-align:center;">
+<center>
+  EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+  <IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align="right">
+  <h1>PTC_DUMPMAPS</h1>
+  
+</center>
+</div>
+
+
+<!--  ##########################################################              -->
+
+<div class="madxdocContent">
+
+
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+<!--  ##########################################################              -->
+
+<h3 align=center style='margin-top:0cm;text-align:left;text-indent:0cm'>
+ <span>
+  USER MANUAL 
+ </span>
+</h3>
+
+<div>
+
+<!--  ##########################################################              -->
+
+<h4>SYNOPSIS</h4>
+
+<pre>
+<big>
+PTC_DUMPMAPS, 
+file     = [s, ptcmaps, ptcmaps];
+</big>
+</pre>
+
+</div>
+
+implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90
+
+
+<!--  ##########################################################              -->
+
+<h4> Description </h4>
+
+<div>
+PTC_DUMPMAPS dumps linear part of the map for each element 
+of the layout into specified file. 
+</div>
+
+
+<!--  ##########################################################              -->
+
+<h4> Command parameters and switches </h4>
+<div>
+
+<dl>
+<dt><b>file</b></dt> 
+  <dd>
+  <i> string, default value "ptcmaps",  default value if value explicitly not specified is "ptcmaps"</i>
+  <p> Specifies name of the file to which the matrices are dumped to.
+  </dd>
+</dl>
+
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<!-- ############################################################ -->
+<h3> PROGRAMMERS MANUAL </h3>
+
+
+The command is implemented by subroutine ptc_dumpmaps() in madx_ptc_module.f90.
+The matrix for a single element is obtained by tracking identity map through an element,
+that is initialized for each element by adding identity map to the reference particle.
+For the elements that change reference momentum (i.e. traveling wave cavity) 
+it is tracked to the end of the following marker, that has updated reference momentum.
+Hence, each cavity must be followed by a marker. If it is not, setcavities subroutine detects
+error and stops the program.
+
+</div>
+
+</body>
+
+</html>

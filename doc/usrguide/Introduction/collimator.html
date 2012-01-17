@@ -1,0 +1,60 @@
+<head>
+<title>[RE]COLLIMATOR</title>
+<!-- Changed by: Chris ISELIN,  3-Mar-1998 -->
+<!-- Changed by: Hans Grote, 30-Sep-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Collimators</h2>
+</center>
+
+Two types of collimators are defined:
+<ul>
+<li><a name=ecol>ECOLLIMATOR</a>.
+Elliptic aperture,
+<li><a name=rcol>RCOLLIMATOR</a>.
+Rectangular aperture.
+</ul>
+<pre>
+label: ECOLLIMATOR,TYPE=name,L=real,XSIZE=real,YSIZE=real;
+label: RCOLLIMATOR,TYPE=name,L=real,XSIZE=real,YSIZE=real;
+</pre>
+Either type has three real attributes:
+<ul>
+<li>L:
+The collimator length (default: 0 m).
+<li>XSIZE:
+The horizontal half-aperture (default: unlimited).
+<li>YSIZE:
+The vertical half-aperture (default: unlimited).
+</ul>
+For elliptic apertures,
+XSIZE and YSIZE denote the half-axes respectively,
+for rectangular apertures they denote the half-width of the rectangle.
+Optically a collimator behaves like a drift space, but during tracking,
+it also introduces an aperture limit.
+The aperture is checked at the entrance.
+If the length is not zero, the aperture is also checked at the exit.
+<P>
+Example:
+<pre>
+COLLIM: ECOLLIMATOR,L=0.5,XSIZE=0.01,YSIZE=0.005;
+</pre>
+The <a href="local_system.html#straight">straight reference system</a>
+for a collimator is a cartesian coordinate system.
+<P>
+<b>NOTE:</b> When a collimator is displaced transversally in order to model 
+an asymmetric collimator, particle losses in tracking are reported with
+respect to the <b>displaced</b> reference system, not with respect to the
+surrounding beam line.
+
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+January 24, 1997
+</address>
+
+</body>

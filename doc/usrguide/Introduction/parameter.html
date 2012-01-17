@@ -1,0 +1,102 @@
+<head>
+<title>Parameters</title>
+<!-- Changed by: Hans Grote, 17-Jun-2002 -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Parameter Statements</h2>
+</center>
+
+<h2><a name=relation>Relations between Variable Parameters</a></h2>
+A relation is established between variables by the statement
+<pre>
+parameter-name = expression;
+</pre>
+or
+<pre>
+parameter-name := expression;
+</pre>
+The first form evaluates the expression at the right immediately
+and assigns its value to the parameter. The second form assigns the value
+by evaluating  the expression at right every time the parameter is
+actually used.
+This holds as well for element parameters - beware ! If you want to modify
+e.g. the strength of a quadrupole later (e.g. in a match, 
+or by entering a new value for a parameter on which it depends)
+then the defition has to be
+<pre>
+qd:quadrupole,k1:= ak1;
+</pre>
+and not
+<pre>
+qd:quadrupole,k1 = ak1;
+</pre>
+In the latter case, k1 will be set to the current value of ak1, and will
+not change when ak1 changes.
+<p>
+Parameters not yet defined have the value zero.
+<p>
+Example:
+<pre>
+gev = 100;
+beam,energy=gev;
+</pre>
+the parameter on the left may appear on the right as well:
+<pre>
+x = x+1;
+</pre>
+Increases the value of x by 1. As a result, the SET statement of MAD-8
+is no longer necessary and is not implemented.
+<pre>
+Circular definitions are allowed in the first form:
+<pre>
+a = b + 2;
+b = a * b;
+</pre>
+However, circular definitions in the second form are forbidden:
+<pre>
+a := b + 2;
+b := a * b;
+</pre>
+will result in an error.
+<h2><a name=par_output>VALUE: Output of Parameters</a></h2>
+The VALUE statement
+<pre>VALUE = expression;</pre>
+or
+<pre>VALUE = expression1, expression2, ...;</pre>
+evaluates the current value of "expression" resp. "expression1" etc. and
+prints the result on the standard output file.
+<p>
+Example:
+<pre>
+p1 = 5;
+p2 = 7;
+value,p1*p2-3;
+</pre>
+After echoing the command, this prints:
+<pre>
+p1*p2-3 = 32       ;
+</pre>
+Another example:
+<pre>
+option,-warn;
+while (x < 100) {x = x + 1;}
+value,x,x^2,log10(x);
+</pre>
+After echoing the command, this prints:
+<pre>
+x = 100        ;       
+x^2 = 10000      ;       
+log10(x) = 2      ;            
+</pre>
+<p>
+<address>
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>
+11.9.2000
+</address>
+
+</body>
