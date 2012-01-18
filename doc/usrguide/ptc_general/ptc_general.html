@@ -46,11 +46,11 @@ The PTC code is actually a library that can be used in many different ways to
 create an actual module that calculates some property of interest. Several  
 modules using the PTC code have been presently implemented in MAD-X. These MADX-PTC modules [<a href="#F.Schmidt">b</a>] are  
 executed by the following  
-commands: <a href="http://cern.ch/madx/ptc_twiss/ptc_twiss.html"> 
-ptc_twiss</a>, <a href="http://cern.ch/madx/ptc_normal/ptc_normal.html"> 
-ptc_normal</a>, <a href="http://cern.ch/madx/ptc_track/ptc_track.html"> 
+commands: <a href="../ptc_twiss/ptc_twiss.html"> 
+ptc_twiss</a>, <a href="../ptc_normal/ptc_normal.html"> 
+ptc_normal</a>, <a href="../ptc_track/ptc_track.html"> 
 ptc_track</a>, 
-<a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html"> 
+<a href="../ptc_track_line/ptc_track_line.html"> 
 ptc_track_line</a>. To perform calculations with these MADX-PTC commands, the PTC  
 environment must be initialized, handled and turned off by the special commands within the MAD-X  
 input script.</p> 
@@ -193,7 +193,7 @@ input script.</p>
          <span lang="EN-US">command creates the PTC-layout according to  
          the specified integration method and fills it with the current  
          MAD-X sequence defined in the latest 
-         <a href="http://cern.ch/madx/control/general.html#use"> 
+         <a href="../control/general.html#use"> 
          USE</a> command.<br> 
          The logical input variable </span><font color="#FF0000">time</font><span lang="EN-US">  
          controls the coordinate system that is being used.</span></dd> 
@@ -214,7 +214,7 @@ input script.</p>
            <span lang="EN-US"> 
            &quot;</span><font color="#FF0000">time=true</font><span lang="EN-US">&quot;:  
            fifth coordinate is  
-           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           <a href="../Introduction/tables.html#canon"> 
            PT</a>, <i>p<sub>t</sub></i>=<font face="Times New Roman">&#916;<i>E</i>/<i>p</i><sub>0</sub><i>c;</i></font></span></td> 
            <td rowspan="4"> 
            <p align="center">.TRUE.</td> 
@@ -225,7 +225,7 @@ input script.</p>
            <span lang="EN-US"> 
            &quot;</span><font color="#FF0000">time=false</font><span lang="EN-US">&quot;:  
            fifth coordinate is&nbsp; 
-           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           <a href="../Introduction/tables.html#canon"> 
            DELTAP</a>,&nbsp; <font face="Times New Roman"><i>&#948;</i><sub><i>p</i></sub>=&#916;<i>p</i>/<i>p</i><sub>0</sub></font></span></td> 
           </tr> 
           <tr> 
@@ -234,7 +234,7 @@ input script.</p>
            <td> 
            <span lang="EN-US"> 
            &quot;</span><font color="#FF0000">time=true</font><span lang="EN-US">&quot;: 
-           <a href="http://cern.ch/madx/Introduction/tables.html#canon"> 
+           <a href="../Introduction/tables.html#canon"> 
            MAD-X coordinate system</a> {-<i>ct</i>, <i>p<sub>t</sub></i>}</span></td> 
           </tr> 
           <tr> 
@@ -433,7 +433,7 @@ input script.</p>
          <dd> 
               <span lang="EN-US">The </span><var class="command">&quot;PTC_READ-ERRORS&quot; </var> 
          <span lang="EN-US">command let's you read any numbers of
-       <b>"errors_read"</b> tables  <a href="http://cern.ch/madx/control/general.html#readmytable">READMYTABLE</a> </span></dd> 
+       <b>"errors_read"</b> tables  <a href="../control/general.html#readmytable">READMYTABLE</a> </span></dd> 
          <dt>Options</dt> 
          <dd> 
          <table cellspacing="0" cellpadding="3" border="1" id="table2"> 
@@ -556,7 +556,7 @@ input script.</p>
          element, if <i>l </i>&gt; 0. This is a considerable advantage of PTC input compare  
          to MAD-X  
          which allows only 
-         <a href="http://cern.ch/madx/Introduction/multipole.html"> 
+         <a href="../Introduction/multipole.html"> 
          thin multipoles</a>.<br> 
          2. 
          To preserve the reference orbit of straight elements, dipole components  
@@ -606,9 +606,9 @@ input script.</p>
          <br> 
          Additional Field Errors: 
          </b>A full range of multipole 
-         <a href="http://cern.ch/madx/error/error_field.html"> 
+         <a href="../error/error_field.html"> 
          field errors</a> can be additionally specified with 
-         <a href="http://cern.ch/madx/error/error_field.html#efcomp"> 
+         <a href="../error/error_field.html#efcomp"> 
          EFCOMP</a> command. Errors are added to the above multipole  
          fields on the bench.</dd> 
         </dl></div></dd> 
@@ -626,7 +626,7 @@ input script.</p>
        <dd>Any modification to the MAD-X  
        database is ignored in PTC until the next call to <var class="command"><a href="#PTC_CREATE_LAYOUT">&quot;PTC_CREATE_LAYOUT&quot;</a></var>.</dd> 
        <dd>For example, a 
-       <a href="http://cern.ch/madx/Introduction/expression.html#defer"> 
+       <a href="../Introduction/expression.html#defer"> 
        deferred expression</a> of MAD-X <font color="#FF0000">after</font> a 
        <var class="command"><a href="#PTC_CREATE_LAYOUT">&quot;PTC_CREATE_LAYOUT&quot;</a> </var> 
        command is ignored within PTC. </dd> 
@@ -639,11 +639,10 @@ input script.</p>
       <ol type="a"> 
        <li><span lang="EN-US"><a name="E.Forest">E.&nbsp;Forest</a>, F.&nbsp;Schmidt  
        and E.&nbsp;McIntosh,  Introduction to the Polymorphic Tracking Code ,  
-       <a href="http://doc.cern.ch/archive/electronic/cern/preprints/sl/sl-2002-044.pdf"> 
-       CERN-SL-2002-044-AP</a>, 
+       <a href="http://cern.ch/madx/doc/sl-2002-044.pdf">CERN-SL-2002-044</a>, 
        <a href="http://ccdb4fs.kek.jp/cgi-bin/img/allpdf?200302020">KEK report  
        2002-3</a>, July 2002</span>.</li> 
-       <li><a name="F.Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'',  
+       <li><a name="F.Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/madx/doc/MPPE012.pdf">MAD-X PTC Integration</a>'',  
        Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li> 
       </ol> 
 </div> 
@@ -651,13 +650,13 @@ input script.</p>
       <dl> 
        <dt>See Also</dt> 
        <dd> 
-       <a href="http://cern.ch/madx/ptc_twiss/ptc_twiss.html"> 
+       <a href="../ptc_twiss/ptc_twiss.html"> 
        ptc_twiss</a>,  
-       <a href="http://cern.ch/madx/ptc_normal/ptc_normal.html"> 
+       <a href="../ptc_normal/ptc_normal.html"> 
        ptc_normal</a>,  
-       <a href="http://cern.ch/madx/ptc_track/ptc_track.html"> 
+       <a href="../ptc_track/ptc_track.html"> 
        ptc_track</a>, 
-       <a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html"> 
+       <a href="../ptc_track_line/ptc_track_line.html"> 
        ptc_track_line</a>.</dd> 
 </dl> 
 </div> 

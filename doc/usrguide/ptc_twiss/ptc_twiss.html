@@ -189,7 +189,7 @@ For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as
 		      	The <var class="command">PTC_TWISS </var>command causes
 				computation of the Twiss parameters in
 the Ripken's style. It operates on the working beam line defined in the latest
-				<a href="http://cern.ch/madx/control/general.html#use">
+				<a href="../control/general.html#use">
 				USE</a> command. Several options can be specified, the most
 		      	important being <var class="option">icase, deltap</var>,
 				<var class="option">closed_orbit, slice_magnets,</var>&nbsp;<var class="option">no,
@@ -198,7 +198,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 				Other options should be specified for particular tasks.
 				Applications for the <var class="command">PTC_TWISS </var>
 				command are similar to the <var class="command">
-				<a href="http://cern.ch/madx/twiss/twiss.html">TWISS</a></var>-command.
+				<a href="../twiss/twiss.html">TWISS</a></var>-command.
 				The PTC_TWISS can be applied to two basic tasks. It can calculate
 				either a <a href="#Periodical_Solution">periodical solution</a>
 				or a <a href="#Initial_Conditions">solution with initial
@@ -335,7 +335,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 					</tr>					
 					<tr>
 						<td width="143">
-						<a href="http://cern.ch/madx/Introduction/ranges.html#range">
+						<a href="../Introduction/ranges.html#range">
 						RANGE</a></td>
 						<td colspan="2">specifies a segment of beam-line for <br>
 						the PTC_TWISS calculation</td>
@@ -348,7 +348,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 						<td colspan="2"><span lang="EN-US">Reading
 									the transfer matrix from the
 									map-table in memory (preceding </span> <var class="command">
-				<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command
+				<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command
 						needed).</td>
 						<td width="84">.FALSE.</td>
 						<td width="57">logical</td>
@@ -366,7 +366,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 						INITIAL_MAP_MANUAL</td>
 						<td colspan="2"><span lang="EN-US">Using the input map stored beforehand
 						in file fort.18 (e.g. by some initial run of
-						<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a>).
+						<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a>).
 						</span></td>
 						<td width="84">.FALSE.</td>
 						<td width="57">logical</td>
@@ -394,7 +394,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 						betx, alfx, mux, bety, alfy, muy,
 								dx,dpx,dy, dpy</td>
 						<td colspan="2"><span lang="EN-US">&nbsp;
-						<a href="http://cern.ch/madx/twiss/twiss.html">Twiss and dispersion parameters</a> </span><i>
+						<a href="../twiss/twiss.html">Twiss and dispersion parameters</a> </span><i>
 								<font face="Symbol">b</font><sub>x,y</sub></i>,
 								<i><font face="Symbol">a</font><sub>x</sub></i><sub>,<i>y,
 								</i></sub><i><font face="Symbol">g</font><sub>x,y,
@@ -402,7 +402,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
 								<i>D<sub>px</sub></i>, <i>D<sub>y</sub></i>, <i>
 								D<sub>py</sub></i> </span>
 						<a
-href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and Teng)</a><span lang="EN-US">.</span></td>
+href="../Introduction/bibliography.html#edwards">(Edwards and Teng)</a><span lang="EN-US">.</span></td>
 						<td width="84">0</td>
 						<td width="57">double</td>
 					</tr>
@@ -531,7 +531,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 					<font color="#FF0000"><a name="map-table">Map-Table</a></font></i></u></b><var><strong><b><u><i>
 					<br>
 					(obtainable by a preceding </i></u></b></strong></var> <var class="command">
-				<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a></var><b><i>
+				<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var><b><i>
 					</i></b><var><strong><b><u><i>command)</i></u></b></strong><b><i><strong><u>:<br>
 					</u></strong></i><strong>&nbsp;&nbsp;&nbsp; PTC_TWISS,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer,
 					</strong></var><strong><var class="option">deltap</var>=double,
@@ -551,7 +551,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 							<var class="option">initial_matrix_table</var> and an existence of the map-table in
 							memory, which was generated
 							by a&nbsp; preceding <var class="command">
-				<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
+				<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
 							<dt>Example</dt>
 							<dd>An example is found in the
 							<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_twiss">
@@ -574,7 +574,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 					<font color="#FF0000"><a name="Given_Map_File">Map-File</a></font></i></u></b><var><strong><b><u><i>
 					<br>
 					(obtainable by a preceding </i></u></b></strong></var> <var class="command">
-				<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a></var><b><i>
+				<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var><b><i>
 					</i></b><var><strong><b><u><i>command)</i></u></b></strong><b><i><strong><u>:<br>
 					</u></strong></i><strong>&nbsp;&nbsp;&nbsp; PTC_TWISS,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer,
 					</strong></var><strong><var class="option">deltap</var>=double,
@@ -594,7 +594,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 							<var class="option">initial_map_manual</var> and an existence of the map-file named
 							a fort.18 file, which was generated
 							by a&nbsp; preceding <var class="command">
-				<a href="http://cern.ch/madx/ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
+				<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
 							<dt>Example</dt>
 							<dd>An example is found in the
 							<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_twiss">
@@ -673,9 +673,9 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 						</span>&nbsp;The data in the <span lang="EN-US">the
 						</span><var class="command">BETA0</var><span lang="EN-US">-block
 						have to be filled </span>by a combination of the
-				<a href="http://cern.ch/madx/control/general.html#savebeta">
+				<a href="../control/general.html#savebeta">
 						SAVEBETA</a> and
-						<a href="http://cern.ch/madx/twiss/twiss.html">
+						<a href="../twiss/twiss.html">
 						TWISS</a> commands of a preceding ring or beam-line. Note, that
 				this case is limited to uncoupled motion of the preceding
 				machine.</dd>
@@ -731,9 +731,9 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 		<dt>References for PTC_TWISS</dt>
 	</dl>
 	<ol type="a">
-		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'',
+		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/madx/doc/MPPE012.pdf">MAD-X PTC Integration</a>'',
 		Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
-		<li><a name="G.&nbsp;Ripken">G.&nbsp;Ripken</a> and F.&nbsp;Willeke, &quot;<a href="1988_Ripken.pdf">Methods of
+		<li><a name="G.&nbsp;Ripken">G.&nbsp;Ripken</a> and F.&nbsp;Willeke, &quot;<a href="http://cern.ch/madx/doc/1988_Ripken.pdf">Methods of
 		Beam Optics</a>&quot;, DESY 88–114, 1988.</li>
 		<li><a name="K._Zhang">K. Zhang</a>, &quot;PTC twiss with initial TWISS
 		parameters&quot;,
@@ -741,7 +741,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 		MAD-X Meeting 13 (04.07.2005)</a>,&nbsp; <font color="#000000">slides in
 		<a href="http://frs.home.cern.ch/frs/MAD-X_minutes/Meeting-13/Input_of_PTC_TWISS_module.ppt">
 		ppt</a>.</font></li>
-		<li><a name="V.A.&nbsp;Lebedev">V.A.&nbsp;Lebedev</a> and S.A.&nbsp;Bogacsz, &quot;<a href="http://iopscience.iop.org/1748-0221/5/10/P10010/pdf/1748-0221_5_10_P10010.pdf">Betatron motion with coupling of horizontal and vertical degrees of motion</a>&quot;, Thomas Jefferson National Accelerator Facility 2010.</li>
+		<li><a name="V.A.&nbsp;Lebedev">V.A.&nbsp;Lebedev</a> and S.A.&nbsp;Bogacsz, &quot;<a href="http://cern.ch/madx/doc/1748-0221_5_10_P10010.pdf">Betatron motion with coupling of horizontal and vertical degrees of motion</a>&quot;, Thomas Jefferson National Accelerator Facility 2010.</li>
 
 	</ol>
 </div>
@@ -750,7 +750,7 @@ href="http://cern.ch/madx/Introduction/bibliography.html#edwards">(Edwards and T
 		<dt>See Also</dt>
 		<dd>
       	<var class="command">
-		<a href="http://cern.ch/madx/twiss/twiss.html">TWISS</a></var>,
+		<a href="../twiss/twiss.html">TWISS</a></var>,
 		<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_twiss">
 		<var class="command">PTC_TWISS</var> Examples</a>.</dd>
 </dl>

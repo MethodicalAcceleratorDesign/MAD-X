@@ -54,8 +54,8 @@ on PTC library written by E.Forest [<a href="#E._Forest">c</a>]. The
 commands of&nbsp; this module are described below, optional parameters are 
 denoted by square brackets ([ ]). Prior to using this module 
 the active beam line must be selected by means of a
-<a href="http://cern.ch/madx/control/general.html#use">USE</a> command. 
-The general <a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+<a href="../control/general.html#use">USE</a> command. 
+The general <a href="../ptc_general/ptc_general.html">PTC 
 environment</a> must also be initialized. </p>
 </div><hr />
 <div>
@@ -89,7 +89,7 @@ environment</a> must also be initialized. </p>
 						</var>command (as many commands as trajectories). It 
 				must be done before the <var class="command">
 						<a href="#PTC_TRACK">PTC_TRACK</a> </var>command. The coordinates can be either
-						<a href="http://cern.ch/madx/Introduction/tables.html#canon">canonical coordinates</a> (<b>x</b>, 
+						<a href="../Introduction/tables.html#canon">canonical coordinates</a> (<b>x</b>, 
 						<b>px</b>, <b>y</b>, <b>py</b>,
 				<b>t</b>, <b>pt</b>) or action-angle coordinates (<b>fx</b>, <b>phix</b>, 
 						<b>fy</b>, <b>phiy</b>, <b>ft</b>, <b>phit</b>), which 
@@ -99,7 +99,7 @@ environment</a> must also be initialized. </p>
 				for the <i>z</i>-th mode plane (<i>z</i>={<i>x</i>,<i>y</i>,<i>t</i>}). 
 				The actions are computed with the values of the emittances, <i>F</i><sub><i>z</i></sub>, 
 				which must be specified in the preceding
-						<a href="http://cern.ch/madx/Introduction/beam.html">BEAM</a> command. 
+						<a href="../Introduction/beam.html">BEAM</a> command. 
 						<i>F</i><sub><i>z</i></sub> are expressed in 
 				number of r.m.s. beam sizes and
 						<i><font face="Times New Roman"><span lang="EN-US">&#934;</span></font></i><sub><i>z</i></sub> 
@@ -187,13 +187,13 @@ environment</a> must also be initialized. </p>
 						</dd>
 						<dd><br>
 						2. It is recommended to use
-						<a href="http://cern.ch/madx/Introduction/label.html">labels</a> of
-						<a href="http://cern.ch/madx/Introduction/marker.html">markers</a> in order to avoid usage observations at the ends of 
+						<a href="../Introduction/label.html">labels</a> of
+						<a href="../Introduction/marker.html">markers</a> in order to avoid usage observations at the ends of 
 				thick elements.<br>
 						<span lang="EN-US"><br>
 						3. The data at the observation points other than at <b>
 						&quot;start&quot;</b> can be produced by two different means: <br>
-						a) traditional (<a href="http://cern.ch/madx/thintrack/thintrack.html">MADX</a>) element-by-element tracking (use 
+						a) traditional (<a href="../thintrack/thintrack.html">MADX</a>) element-by-element tracking (use 
 						option <a href="#ELEMENT_BY_ELEMENT">element_by_element</a>);
 						<br>
 						b) coordinate transformation from <b>&quot;start&quot;</b> to the 
@@ -379,13 +379,13 @@ environment</a> must also be initialized. </p>
 						<br>
 						</span><b>DELTAP: </b><span lang="EN-US">&nbsp;is 
 						ignored for <a href="#ICASE">icase</a>=6, but the option
-						<a href="http://cern.ch/madx/ptc_general/ptc_general.html">offset_deltap</a> of the command
+						<a href="../ptc_general/ptc_general.html">offset_deltap</a> of the command
 						</span><var class="command">PTC_CREATE_LAYOUT</var> may 
 						be used, if 
 						</dd>
 						<dd><span lang="EN-US">the reference particle should 
 						have an momentum off-set as specified by
-						<a href="http://cern.ch/madx/ptc_general/ptc_general.html">offset_deltap</a>.</span></dd>
+						<a href="../ptc_general/ptc_general.html">offset_deltap</a>.</span></dd>
 						<dd><span lang="EN-US"><br><b>CLOSED_ORBIT</b> : It must 
 						be used for closed rings only. This option allows to 
 						switch ON <br>
@@ -501,7 +501,7 @@ environment</a> must also be initialized. </p>
 				</dl>
 				<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The starting and final 
 				canonical coordinates are collected in the internal table &quot;tracksumm&quot; (printed to the file with
-				<a href="http://cern.ch/madx/control/general.html#write">WRITE</a> 
+				<a href="../control/general.html#write">WRITE</a> 
 		command).</p>
 			</dl></div>
 	</dl>
@@ -556,7 +556,7 @@ environment</a> must also be initialized. </p>
 				<td width="63" align="center">+</td>
 			</tr>
 			<tr>
-				<td width="253">PTC_START, FX, PHIX, …</td>
+				<td width="253">PTC_START, FX, PHIX, \85</td>
 				<td width="63">
 				<p align="center">- </td>
 				<td align="center" width="63">-</td>
@@ -648,7 +648,7 @@ environment</a> must also be initialized. </p>
 		</table></dd>
 		<dd>&nbsp;</dd>
 		<dd>1) The tracking of a beam-line with default parameters.</dd>
-		<dd>2) As “1)”, but with element-by-element tracking and an output 
+		<dd>2) As \931)\94, but with element-by-element tracking and an output 
 		at observation points. </dd>
 		<dd>3) Tracking in a closed ring with closed orbit search and the 
 		Normal Forms calculations. <br>
@@ -661,25 +661,25 @@ environment</a> must also be initialized. </p>
 		<dt>References for PTC-TRACK</dt>
 	</dl>
 	<ol type="a">
-		<li><a name="V._Kapin">V. Kapin</a> and F. Schmidt, “PTC modules for MAD-X code”, to be published as CERN internal note by the end of 
+		<li><a name="V._Kapin">V. Kapin</a> and F. Schmidt, \93PTC modules for MAD-X code\94, to be published as CERN internal note by the end of 
 		2006</li>
-		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'', 
+		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/madx/doc/MPPE012.pdf">MAD-X PTC Integration</a>'', 
 		Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
 		<li><a name="E._Forest">E. Forest</a>, F. Schmidt and E. McIntosh, 
-		“Introduction to the Polymorphic Tracking Code”, KEK report 2002-3, July 
+		\93Introduction to the Polymorphic Tracking Code\94, KEK report 2002-3, July 
 		2002</li>
-		<li><a name="G.J._Roy">G.J. Roy</a>, “A new method for the simulation of 
-		synchrotron radiation in particle tracking codes”, Nuclear Instruments &amp; 
+		<li><a name="G.J._Roy">G.J. Roy</a>, \93A new method for the simulation of 
+		synchrotron radiation in particle tracking codes\94, Nuclear Instruments &amp; 
 		Methods in Phys. Res., Vol. A298, 1990, pp. 128-133.</li>
 	</ol></div>
 <div>
 	<dl>
 		<dt>See Also</dt>
-		<dd><a href="http://cern.ch/madx/tracking/tracking.html">Overview of 
+		<dd><a href="../tracking/tracking.html">Overview of 
 		MAD-X Tracking Modules</a>,
-		<a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+		<a href="../ptc_general/ptc_general.html">PTC 
 		Set-up Parameters</a>,<var class="command"> </var>
-		<a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a>,
+		<a href="../thintrack/thintrack.html">thintrack</a>,
 		<a href="http://frs.home.cern.ch/frs/mad-X_examples/ptc_track">PTC-TRACK 
 		Examples</a>.</dd>
 	</dl></div>

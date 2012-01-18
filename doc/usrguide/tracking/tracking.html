@@ -8,8 +8,6 @@
   <meta name="keywords"    content="MADX MAD-X PTC Tracking TRACK PTC_TRACK PTC_TRACL_LINAC" />
   <link rel="stylesheet" type="text/css" href="madxdoc.css" />
   <title>Overview of MAD-X Tracking Modules</title>
-	<!-- Created by: Valery KAPIN, 21-Mar-2006 -->
-	<!-- Changed by: ____________, ___________ -->	
 	<style>
 <!--
 div.Section1
@@ -50,14 +48,14 @@ The non-symplectic tracking as in MAD-8 has been completely excluded from MAD-X
 by taking out the thick lens part from the tracking modules. Instead two 
 types of tracking modules (both symplectic) are implemented into MAD-X.</p>
 <p align="left">
-The first part of this design decision is the thin-lens tracking module (<var class="option"><a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a></var>) 
+The first part of this design decision is the thin-lens tracking module (<var class="option"><a href="../thintrack/thintrack.html">thintrack</a></var>) 
 which tracks symplecticly through drifts and kicks and by replacing 
 the end effects by their symplectic part in form of an additional kick on either 
 end of the element. This method demands a preliminary conversion of a sequence 
 with thick elements into one composed entirely of thin elements (see the&nbsp;
 <var class="option">
-<a href="http://cern.ch/madx/makethin/makethin.html">MAKETHIN</a></var> 
-command). The details of its usage are given on the page &quot;<a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a>&quot;.</p>
+<a href="../makethin/makethin.html">MAKETHIN</a></var> 
+command). The details of its usage are given on the page &quot;<a href="../thintrack/thintrack.html">thintrack</a>&quot;.</p>
 <p align="left">
 The second part of this design decision is to produce a thick lens tracking 
 module based on the PTC code [<a href="#E._Forest">b</a>] that allows a 
@@ -66,11 +64,11 @@ over the precision (number of steps and integration type) and exactness (full or
 extended Hamiltonian) of the results.</p>
 <p align="left">
 The first PTC thick-lens tracking module is named
-<a href="http://cern.ch/madx/ptc_track/ptc_track.html">ptc_track</a>. It 
-has the same features as the thin-lens tracking code (<var class="option"><a href="http://cern.ch/madx/thintrack/thintrack.html">thintrack</a></var>) 
+<a href="../ptc_track/ptc_track.html">ptc_track</a>. It 
+has the same features as the thin-lens tracking code (<var class="option"><a href="../thintrack/thintrack.html">thintrack</a></var>) 
 except it treats thick-lenses in a symplectic manner.</p>
 <p align="left">
-&nbsp;There is a second PTC tracking module called the line tracking module (<a href="http://cern.ch/madx/ptc_track_line/ptc_track_line.html">ptc_track_line</a>). 
+&nbsp;There is a second PTC tracking module called the line tracking module (<a href="../ptc_track_line/ptc_track_line.html">ptc_track_line</a>). 
 It is meant for tracking particles in&nbsp;
 <a href="http://clic-study.web.cern.ch/CLIC-Study/">CLIC</a>, in fact it treats beam-lines 
 containing traveling-wave cavities and includes a beam acceleration.</p>
@@ -84,11 +82,11 @@ containing traveling-wave cavities and includes a beam acceleration.</p>
 		<dt>References</dt>
 	</dl>
 	<ol type="a">
-		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/Frank.Schmidt/report/MPPE012.pdf">MAD-X PTC Integration</a>'', 
+		<li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/madx/doc/MPPE012.pdf">MAD-X PTC Integration</a>'', 
 		Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
 		<li><span lang="EN-US"><a name="E._Forest">E.&nbsp;Forest</a>, F.&nbsp;Schmidt 
 		and E.&nbsp;McIntosh, “Introduction to the Polymorphic Tracking Code”, 
-		<a href="http://doc.cern.ch/archive/electronic/cern/preprints/sl/sl-2002-044.pdf">
+		<a href="http://cern.ch/madx/doc/sl-2002-044.pdf">
 		CERN-SL-2002-044-AP</a>,
 		<a href="http://ccdb4fs.kek.jp/cgi-bin/img/allpdf?200302020">KEK 
 		report 2002-3</a>, July 2002</span>.</li>
@@ -96,7 +94,7 @@ containing traveling-wave cavities and includes a beam acceleration.</p>
 	<dl>
 		<dt>See Also</dt>
 		<dd>
-      	<a href="http://cern.ch/madx/ptc_general/ptc_general.html">PTC 
+      	<a href="../ptc_general/ptc_general.html">PTC 
 		Set-up Parameters</a></dd>
 </dl>
 	</dl>
