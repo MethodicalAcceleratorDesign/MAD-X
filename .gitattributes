@@ -234,6 +234,13 @@ doc/usrguide/ptc_track_line/ptc_track_line.html -text
 doc/usrguide/ptc_twiss/1988_Ripken.pdf -text svneol=unset#unset
 doc/usrguide/ptc_twiss/madxdoc.css -text
 doc/usrguide/ptc_twiss/ptc_twiss.html -text
+doc/usrguide/reports/reference.tex -text
+doc/usrguide/reports/reference/img1.png -text
+doc/usrguide/reports/reference/index.html -text
+doc/usrguide/reports/reference/node1.html -text
+doc/usrguide/reports/reference/node2.html -text
+doc/usrguide/reports/reference/reference.css -text
+doc/usrguide/reports/reference/reference.html -text
 doc/usrguide/sindex.html -text
 doc/usrguide/sodd/sodd.html -text
 doc/usrguide/survey/V6.4.seq.070602 -text
