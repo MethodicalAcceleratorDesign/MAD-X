@@ -181,6 +181,8 @@ doc/usrguide/ibs/img3.png -text
 doc/usrguide/ibs/img4.png -text
 doc/usrguide/ibs/img5.png -text
 doc/usrguide/ibs/img6.png -text
+doc/usrguide/mac/Mad-X_on_MaxOS_X.html -text
+doc/usrguide/mac/ball_red.gif -text
 doc/usrguide/makethin/makethin.html -text
 doc/usrguide/match/bibliography.html -text
 doc/usrguide/match/examples -text
@@ -191,6 +193,7 @@ doc/usrguide/match/match_um.html -text
 doc/usrguide/match/match_vary.html -text
 doc/usrguide/match/match_xeq.html -text
 doc/usrguide/match/match_xmpl.html -text
+doc/usrguide/module_keepers/module_keepers.html -text
 doc/usrguide/plot/plot.html -text
 doc/usrguide/plug-ins/index.html -text
 doc/usrguide/plug-ins/madxdoc_ps.css -text
