@@ -20,8 +20,8 @@
 # makedep
 #
 
-CDEP   := $(CC) -MM
-CXXDEP := $(CC) -MM
+CDEP   := $(CC)  -MM $(addprefix -I,$(CC_DIR))
+CXXDEP := $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 
 #
 # compiler
@@ -51,7 +51,7 @@ endif
 # extra flags
 #
  
-CFLAGS   += -mp1 -fp-model source
-CXXFLAGS += -mp1 -fp-model source
+CFLAGS   += -mp1 -fp-model source $(addprefix -I,$(CC_DIR))
+CXXFLAGS += -mp1 -fp-model source $(addprefix -I,$(CXX_DIR))
 
 # end of makefile

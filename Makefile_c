@@ -19,6 +19,7 @@
 vpath %.h src
 vpath %.c src
 
+CC_DIR := src
 CC_HDR := $(notdir $(wildcard src/mad_*.h))
 CC_SRC := $(notdir $(wildcard src/mad_*.c))
 

@@ -21,8 +21,8 @@
 #
 
 ifneq ($(SED),)
-CDEP   := $(CC) /nologo /Zs /QMM
-CXXDEP := $(CDEP)
+CDEP   := $(CC)  /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
+CXXDEP := $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
 
 # CDEP output translator
 CDEP_tr   := | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" \
@@ -60,8 +60,8 @@ endif
 #
 
 CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /Qprec /fp:source /EHc /Qrestrict
-CXXFLAGS += /nologo /Qprec /fp:source /EHc /Qrestrict
+CFLAGS   += /nologo /Qprec /fp:source /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
+CXXFLAGS += /nologo /Qprec /fp:source /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
 
 #
 # command translator

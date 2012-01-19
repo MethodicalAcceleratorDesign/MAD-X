@@ -20,7 +20,7 @@
 # makedep
 #
 
-CDEP := $(CC) -MM
+CDEP := $(CC) -MM $(addprefix -I,$(CC_DIR))
 
 #
 # compiler flags
@@ -44,7 +44,7 @@ endif
 # extra flags
 #
 
-CFLAGS += -pipe
+CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
  
 #
 # extra warnings (gcc is the reference)

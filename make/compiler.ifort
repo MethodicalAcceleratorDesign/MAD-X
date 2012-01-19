@@ -26,7 +26,7 @@ ifneq ($(OSTYPE),Windows)
 #
 
 # fortran dependencies computation requires mod files (i.e. loops)
-# FDEP := $(FC) -gen-dep -module $(OBJDIR)
+# FDEP := $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
@@ -57,7 +57,8 @@ endif
 # extra flags
 #
 
-FFLAGS += -mp1 -fp-model source -assume noold_unit_star -module $(OBJDIR)
+FFLAGS += -mp1 -fp-model source -assume noold_unit_star \
+          -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 ifneq ($(CXX_SRC),)
 FFLAGS += -fexceptions
@@ -79,7 +80,7 @@ ifeq ($(OSTYPE),Windows)
 #
 
 # fortran dependencies computation requires mod files (i.e. loops)
-# FDEP := $(FC) -gen-dep -module $(OBJDIR)
+# FDEP := $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
@@ -112,7 +113,7 @@ endif
 
 FFLAGS += /nologo /Qprec /fp:source /fpp \
           /names:lowercase /assume:underscore /assume:noold_unit_star \
-          /module:$(OBJDIR)
+          /module:$(OBJDIR) $(addprefix /I,$(FC_DIR))
 
 #
 # command translator

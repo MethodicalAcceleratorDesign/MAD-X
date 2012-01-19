@@ -20,7 +20,7 @@
 # makedep
 #
 
-CXXDEP := $(CXX) -MM
+CXXDEP := $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 
 #
 # compiler
@@ -44,7 +44,7 @@ endif
 # extra flags
 #
 
-CXXFLAGS += -pipe
+CXXFLAGS += -pipe $(addprefix -I,$(CXX_DIR))
  
 #
 # extra warnings (g++ is the reference)

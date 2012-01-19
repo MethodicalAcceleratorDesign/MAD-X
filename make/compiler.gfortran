@@ -25,7 +25,7 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid, need loops)!
-# FDEP := $(FC) -MM -cpp -J$(OBJDIR)
+# FDEP := $(FC) -MM -cpp -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
@@ -57,6 +57,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -J$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check \
+          -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 # end of makefile

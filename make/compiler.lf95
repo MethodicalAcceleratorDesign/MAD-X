@@ -49,7 +49,7 @@ endif
 # extra flags
 #
 
-FFLAGS += --mod $(OBJDIR)
+FFLAGS += --mod $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 # end of makefile
 

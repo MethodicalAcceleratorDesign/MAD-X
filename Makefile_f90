@@ -20,6 +20,7 @@ vpath %.inc src
 vpath %.f90 src
 vpath %.F90 src
 
+FC_DIR := src
 FC_SRC := $(notdir $(wildcard src/*.f90 src/*.F90))
 
 ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11

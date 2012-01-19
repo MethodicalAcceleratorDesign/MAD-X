@@ -25,7 +25,7 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid)!
-# FDEP := $(FC) -M -fmod=$(OBJDIR)
+# FDEP := $(FC) -M -fmod=$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
@@ -59,6 +59,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fmod=$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fmod=$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 # end of makefile
