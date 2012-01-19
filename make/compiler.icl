@@ -21,13 +21,13 @@
 #
 
 ifneq ($(SED),)
-CDEP   := $(CC)  /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
-CXXDEP := $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
+CDEP   = $(CC)  /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
+CXXDEP = $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
 
 # CDEP output translator
-CDEP_tr   := | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" \
-                      -e "s/\.obj:/\.o:/g"
-CXXDEP_tr := $(CDEP_tr)
+CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" \
+                   -e "s/\.obj:/\.o:/g"
+CXXDEP_tr = $(CDEP_tr)
 endif
 
 #
@@ -35,11 +35,11 @@ endif
 #
 
 CPPFLAGS += -D_ICC
-CFLAGS   := /Qstd=c99   /O3 /c
-CXXFLAGS := /Qstd=c++0x /O3 /c
+CFLAGS   = /Qstd=c99   /O3 /c
+CXXFLAGS = /Qstd=c++0x /O3 /c
 
-#CFLAGS   := /Qstd=c99   /Wall /Wcheck /Wp64 /O3 /c
-#CXXFLAGS := /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
+#CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O3 /c
+#CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
 
 #
 # options flags

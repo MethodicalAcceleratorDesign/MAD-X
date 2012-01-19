@@ -26,17 +26,17 @@ ifneq ($(OSTYPE),Windows)
 #
 
 # fortran dependencies computation requires mod files (i.e. loops)
-# FDEP := $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
+# FDEP = $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
 #
 
 CPPFLAGS += -D_IFORT
-FFLAGS   := -m$(ARCH) -O3 -warn all -warn nounused -c
+FFLAGS    = -m$(ARCH) -O3 -warn all -warn nounused -c
 
 # Trig too many warnings for the moment!
-# FFLAGS := -m$(ARCH) -O3 -warn all -c
+# FFLAGS  = -m$(ARCH) -O3 -warn all -c
 
 # cancellation of optimizations
 FFLAGS0   = $(subst -O3,-O0,$(FFLAGS))
@@ -80,17 +80,17 @@ ifeq ($(OSTYPE),Windows)
 #
 
 # fortran dependencies computation requires mod files (i.e. loops)
-# FDEP := $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
+# FDEP = $(FC) -gen-dep -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
 #
 
 CPPFLAGS += -D_IFORT
-FFLAGS   := /O3 /warn:all /warn:nounused /c
+FFLAGS    = /O3 /warn:all /warn:nounused /c
 
 # Trig too many warnings for the moment!
-# FFLAGS := /stand:f95 /O3 /warn all /c
+# FFLAGS  = /stand:f95 /O3 /warn all /c
 
 # FFLAGS with no-optimization
 FFLAGS0   = $(subst /O3,/Od,$(FFLAGS))

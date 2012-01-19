@@ -665,7 +665,7 @@ epicsShareFuncSDDS extern int32_t SDDS_InitializeInputFromSearchPath(SDDS_DATASE
 epicsShareFuncSDDS extern int32_t SDDS_InitializeInput(SDDS_DATASET *SDDS_dataset, char *filename);
 epicsShareFuncSDDS extern int32_t SDDS_ReadLayout(SDDS_DATASET *SDDS_dataset, FILE *fp);
 epicsShareFuncSDDS extern int32_t SDDS_InitializeHeaderlessInput(SDDS_DATASET *SDDS_dataset, char *filename);
-epicsShareFuncSDDS extern int32_t SDDS_GetRowLimit();
+epicsShareFuncSDDS extern int32_t SDDS_GetRowLimit(void);
 epicsShareFuncSDDS extern int32_t SDDS_SetRowLimit(int32_t limit);
 epicsShareFuncSDDS extern int32_t SDDS_GotoPage(SDDS_DATASET *SDDS_dataset,int32_t page_number);
 epicsShareFuncSDDS extern int32_t SDDS_CheckEndOfFile(SDDS_DATASET *SDDS_dataset);
@@ -959,7 +959,7 @@ epicsShareFuncSDDS extern int32_t SDDS_ComputeParameter(SDDS_DATASET *SDDS_datas
 #define SDDS_BIGENDIAN         SDDS_BIGENDIAN_SEEN
 #define SDDS_LITTLEENDIAN      SDDS_LITTLEENDIAN_SEEN
 #define SDDS_FIXED_ROWCOUNT    SDDS_FIXED_ROWCOUNT_SEEN
-epicsShareFuncSDDS extern int32_t SDDS_IsBigEndianMachine();
+epicsShareFuncSDDS extern int32_t SDDS_IsBigEndianMachine(void);
 void SDDS_SwapShort(short *data);
 void SDDS_SwapUShort(unsigned short *data);
 epicsShareFuncSDDS extern void SDDS_SwapLong(int32_t *data);

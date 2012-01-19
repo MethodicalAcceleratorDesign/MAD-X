@@ -21,17 +21,17 @@
 #
 
 # lf95 does not compute fortran dependencies
-# FDEP :=
+# FDEP =
 
 #
 # compiler flags
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS   := -Wa,--$(ARCH) --f95 --o2 --warn -c
+FFLAGS  = -Wa,--$(ARCH) --f95 --o2 --warn -c
 
 # FFLAGS with no-optimization
-FFLAGS0   = $(subst --o2,--o0,$(FFLAGS))
+FFLAGS0 = $(subst --o2,--o0,$(FFLAGS))
 
 #
 # options flags
@@ -42,7 +42,7 @@ FFLAGS += -g --info --ap --chkglobal --lst --trap
 endif
 
 ifeq ($(PROFILE),yes) # not found in the doc
-FFLAGS  += -pg
+FFLAGS += -pg
 endif
 
 #

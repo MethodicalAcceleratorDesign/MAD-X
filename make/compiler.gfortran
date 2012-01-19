@@ -25,7 +25,7 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid, need loops)!
-# FDEP := $(FC) -MM -cpp -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
+# FDEP = $(FC) -MM -cpp -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
@@ -34,12 +34,12 @@
 CPPFLAGS += -D_GFORTRAN
 
 # gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
-FFLAGS  := -m$(ARCH) -O2 -c
+FFLAGS = -m$(ARCH) -O2 -c
 
-#FFLAGS  := -m$(ARCH) -std=f95 -Wall -W -pedantic -O2 -c
+#FFLAGS = -m$(ARCH) -std=f95 -Wall -W -pedantic -O2 -c
 
 # FFLAGS with no-optimization
-FFLAGS0   = $(subst -O2,-O0,$(FFLAGS))
+FFLAGS0 = $(subst -O2,-O0,$(FFLAGS))
 
 #
 # options flags
@@ -50,7 +50,7 @@ FFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
-FFLAGS  += -pg
+FFLAGS += -pg
 endif
 
 #

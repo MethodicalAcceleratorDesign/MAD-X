@@ -21,8 +21,8 @@
 #
 
 ifneq ($(and $(SED),$(GREP)),)
-CDEP   := $(CC) /nologo /c /Zs /showIncludes
-CXXDEP := $(CDEP)
+CDEP   = $(CC) /nologo /c /Zs /showIncludes
+CXXDEP = $(CDEP)
 
 # CDEP output translator
 CDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
@@ -37,10 +37,10 @@ endif
 #
 
 CPPFLAGS += -D_MCC
-CFLAGS   := /O2 /c
-CXXFLAGS := /O2 /c
+CFLAGS    = /O2 /c
+CXXFLAGS  = /O2 /c
 
-# CFLAGS   := /Wall /O2 /c
+# CFLAGS  = /Wall /O2 /c
 
 #
 # options flags

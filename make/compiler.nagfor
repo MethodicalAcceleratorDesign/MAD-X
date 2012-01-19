@@ -20,14 +20,14 @@
 # makedep
 #
 
-# FDEP := fpp -M $(addprefix -I,$(FC_DIR))
+# FDEP = fpp -M $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
 #
 
 CPPFLAGS += -D_NAGFOR
-FFLAGS   := -f95 -O4 -w=unused -c
+FFLAGS    = -f95 -O4 -w=unused -c
 
 ifeq ($(ARCH),32)
 FFLAGS   += -Wc,-m32 -abi=32

@@ -25,20 +25,20 @@
 #
 
 # fortran dependencies computation requires mod files (quite stupid)!
-# FDEP := $(FC) -M -fmod=$(OBJDIR) $(addprefix -I,$(FC_DIR))
+# FDEP = $(FC) -M -fmod=$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
 # compiler flags
 #
 
 CPPFLAGS += -D_G95
-FFLAGS   := -m$(ARCH) -O3 -c
+FFLAGS    = -m$(ARCH) -O3 -c
 
 # fortran code is not conformant to f90/f95 (break compilation)!
-# FFLAGS := -m$(ARCH) -std=f95 -O3 -c
+# FFLAGS  = -m$(ARCH) -std=f95 -O3 -c
 
 # Trig too many warnings for the moment!
-# FFLAGS := -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -O3 -c
+# FFLAGS  = -m$(ARCH) -std=f95 -Wall -Wextra -pedantic -O3 -c
 
 # FFLAGS with no-optimization
 FFLAGS0   = $(subst -O3,-O0,$(FFLAGS))

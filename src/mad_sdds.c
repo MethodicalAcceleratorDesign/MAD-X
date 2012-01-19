@@ -149,8 +149,12 @@ sdds_readt(char *filename, char *tfsname)
   }
 
       /* access array data  SDDS_GetArray(...) */
-      /*   */
-      c0 = SDDS_GetArrayNames(&SDDS_table,(int32_t *)&nall);
+      /* */
+      {
+        int32_t nall32 = 0;
+        c0 = SDDS_GetArrayNames(&SDDS_table,&nall32);
+        nall = nall32;
+      }
 
       if (get_option("debug")) printf("Found %ld arrays in total\n",nall);
 
