@@ -35,7 +35,7 @@ endif
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g -C=all -nan -mtrace=size,line
+LDFLAGS += -g -C=all -nan # -mtrace=size,line
 endif
 
 ifeq ($(PROFILE),yes)
