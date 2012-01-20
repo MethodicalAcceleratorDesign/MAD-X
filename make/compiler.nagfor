@@ -41,7 +41,7 @@ FFLAGS0   = $(subst -O4,-O0,$(FFLAGS))
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -C=all -nan -mtrace=size,line
+FFLAGS += -g -C=all -nan # -mtrace=size,line
 endif
 
 ifeq ($(PROFILE),yes)
