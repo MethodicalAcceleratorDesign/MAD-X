@@ -1,14 +1,8 @@
 
 # project options
-if( NOT BUILD_SHARED_LIBS )
-        option( BUILD_SHARED_LIBS "Turn on to build dynamic libraries"  OFF )
-endif()
 
-if (APPLE OR BUILD_SHARED_LIBS OR CYGWIN)
-    option( MADX_STATIC "Turn on for static linking" OFF)
-else()
-    option ( MADX_STATIC "Turn on for static linking" ON)
-endif()
+option( MADX_STATIC "Turn on for static linking" OFF)
+
 # We need to specify what kind of library suffixes we search for in case
 # for static linking:
 if(MADX_STATIC)
@@ -18,6 +12,9 @@ if(MADX_STATIC)
         set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
     else()
         set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+    endif()
+    if(BUILD_SHARED_LIBS)
+       message(FATAL_ERROR "Cannot build shared libs with MADX_STATIC on")
     endif()
 endif()
 
