@@ -53,7 +53,7 @@ if(EXISTS "/afs/cern.ch/")
         -DTEST_SCRIPT=ibs.mad
         -P ${BASESCRIPT})
     
-    add_test(match_1
+    add_test(match_1_LONG
         ${CMAKE_COMMAND}
         -DTEST_PROG=${binaryname}
         -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
