@@ -1,6 +1,7 @@
 
 # list of source files
 file(GLOB srcfiles mad_*.c *.f90 *.F90 *.cpp )
+file(GLOB mad_fpp_src [a-z]_*.f90 [a-z]_*.F90 tpsa.cpp)
 
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
@@ -34,15 +35,22 @@ else (MADX_NTPSA )
   file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
 endif  (MADX_NTPSA )
 
-list(REMOVE_ITEM srcfiles ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
+set(remove_list ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
+list(REMOVE_ITEM srcfiles ${remove_list} ${mad_fpp_src})
+list(REMOVE_ITEM mad_fpp_src ${remove_list})
 
 # header files...
 file(GLOB headerfiles *.h)
 
 # adding library:
 add_library(madx ${srcfiles})
+add_library(madx_fpp ${mad_fpp_src})
+
+target_link_libraries(madx madx_fpp)
+
+
 # not sure if this is needed...
-set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran) 
+set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 # adding an executable:
 add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
