@@ -230,12 +230,12 @@ subroutine ibs
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer step,i,j,flag,range(2),n,get_option,double_from_table,    &
+  integer step,i,j,flag,testtype,range(2),n,get_option,double_from_table,    &
        restart_sequ,advance_to_pos
   double precision tol,alx,alxbar,alxwtd,aly,alybar,ax1,ax2,ay1,ay2,&
        betax,betay,beteff,bx1,bx2,bxbar,bxinv,by1,by2,bybar,byinv,bywtd, &
        const,dels,dpx,dpx1,dpx2,dpxbr,dpxwtd,dx,dx1,dx2,dxbar,dxwtd,     &
-       hscrpt,hscwtd,s1,s2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
+       hscrpt,hscwtd,s1,s2,ss2,l1,l2,ll2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
        sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
        tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
        get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
@@ -359,6 +359,8 @@ subroutine ibs
   !     print *, 'Range for Table ', range
   flag = double_from_table('twiss ', 's ', range(1), s1)
   if (flag .ne. 0)  goto 102
+  flag = double_from_table('twiss ', 'l ', range(1), l1)
+  if (flag .ne. 0)  goto 102
   flag = double_from_table('twiss ', 'betx ', range(1), bx1)
   if (flag .ne. 0)  goto 102
   flag = double_from_table('twiss ', 'bety ', range(1), by1)
@@ -375,6 +377,26 @@ subroutine ibs
   if (flag .ne. 0)  goto 102
   flag = double_from_table('twiss ', 'dpy ', range(1), dpy1)
   if (flag .ne. 0)  goto 102
+  
+  j = restart_sequ()
+  do i=range(1)+1, range(2)     
+     j = advance_to_pos('twiss ', i)
+     flag = double_from_table('twiss ', 's ', i, ss2)
+     if (flag .ne. 0)  goto 102
+     flag = double_from_table('twiss ', 'l ', i, ll2)
+     if (flag .gt. 0)  goto 102
+     if (ll2 .gt. 0.0001) goto 103 
+  enddo
+  103 continue
+  
+  !  Added 16.01.2012 to check if the twiss is taken at the center or the exit of the elements
+  if ((ss2-s1) .eq. ll2) then
+	testtype = 1
+  else if ((ss2-s1) .eq. (l1+ll2)/2) then
+	testtype = 2
+  endif
+
+!  print *, 'testtype: ', testtype
 
   ! ************** Check if "ibs_table" required  ****************
 
@@ -386,6 +408,8 @@ subroutine ibs
   do i = range(1)+1, range(2)
      j = advance_to_pos('twiss ', i)
      flag = double_from_table('twiss ', 's ', i, s2)
+     if (flag .ne. 0)  goto 102
+     flag = double_from_table('twiss ', 'l ', i, l2)
      if (flag .ne. 0)  goto 102
      flag = double_from_table('twiss ', 'betx ', i, bx2)
      if (flag .ne. 0)  goto 102
@@ -403,37 +427,45 @@ subroutine ibs
      if (flag .ne. 0)  goto 102
      flag = double_from_table('twiss ', 'dpy ', i, dpy2)
      if (flag .ne. 0)  goto 102
-     dels = s2-s1
 
-     sdum = half * (s2 + s1)
+     if (testtype .eq. 1) then
+	dels = s2-s1
+	sdum = half * (s2 + s1)
+        betax  = half * (bx2 + bx1)
+	betay  = half * (by2 + by1)
+	alx    = half * (ax2 + ax1)
+	aly    = half * (ay2 + ay1)
+	dx     = half * (dx2 + dx1)
+	dpx    = half * (dpx2 + dpx1)
+	dy     = half * (dy2 + dy1)
+	dpy    = half * (dpy2 + dpy1)
 
-     betax  = half * (bx2 + bx1)
-     sbxb   = sbxb + betax * dels
-     sbxinv = sbxinv + dels / betax
+     else if (testtype .eq. 2) then
+	dels = l2
+	sdum = s2
+	betax  = bx2
+	betay  = by2
+	alx    = ax2
+	aly    = ay2
+	dx     = dx2
+	dpx    = dpx2
+	dy     = dy2
+	dpy    = dpy2
+    endif
 
-     betay  = half * (by2 + by1)
-     sbyb   = sbyb + betay * dels
-     sbyinv = sbyinv + dels / betay
-
-     alx    = half * (ax2 + ax1)
-     salxb  = salxb + alx * dels
-
-     aly    = half * (ay2 + ay1)
-     salyb  = salyb + aly * dels
-
-     dx     = half * (dx2 + dx1)
-     sdxb   = sdxb + dx * dels
-
-     dpx    = half * (dpx2 + dpx1)
-     sdpxb  = sdpxb + dpx * dels
-
-     dy     = half * (dy2 + dy1)
-     sdyb   = sdyb + dy * dels
-
-     dpy    = half * (dpy2 + dpy1)
-     sdpyb  = sdpyb + dpy * dels
+	sbxb   = sbxb + betax * dels
+	sbxinv = sbxinv + dels / betax
+	sbyb   = sbyb + betay * dels
+	sbyinv = sbyinv + dels / betay
+	salxb  = salxb + alx * dels
+	salyb  = salyb + aly * dels
+	sdxb   = sdxb + dx * dels
+	sdpxb  = sdpxb + dpx * dels
+	sdyb   = sdyb + dy * dels
+	sdpyb  = sdpyb + dpy * dels
 
 
+ 
      !*---- Calculate weighted average in region of non-zero DX's.
      !     These values are used to calculate "average" ring lifetimes
      !     in TWSINT.
@@ -471,7 +503,15 @@ subroutine ibs
         call double_to_table('ibs ','dels ', dels)
         call double_to_table('ibs ','tli ', tlidc)
         call double_to_table('ibs ','txi ', txidc)
-        call double_to_table('ibs ','tyi ', tyidc)
+        call double_to_table('ibs ','tyi ', tyidc)        
+        call double_to_table('ibs ','betx ', betax)
+        call double_to_table('ibs ','alfx ', alx)
+        call double_to_table('ibs ','dx ', dx)
+        call double_to_table('ibs ','dpx ', dpx)
+        call double_to_table('ibs ','bety ', betay)
+        call double_to_table('ibs ','alfy ', aly)
+        call double_to_table('ibs ','dy ', dy)
+        call double_to_table('ibs ','dpy ', dpy)
         call augment_count('ibs ')
      endif
 
@@ -484,6 +524,8 @@ subroutine ibs
      ay1  = ay2
      dx1  = dx2
      dpx1 = dpx2
+     dy1  = dy2	
+     dpy1 = dpy2
 
   enddo
   goto 101
@@ -491,6 +533,7 @@ subroutine ibs
   call aawarn('IBS ', 'table value not found, rest skipped ')
   stop
 101 continue
+
 
   !---- We have finished reading the lattice from MAD
   bxbar  = sbxb / s2
@@ -646,9 +689,9 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   c2y    = cy * (gammas*phiy)**2
   chy    = c1y + c2y
   r1     = three / cy
-  a      = cx + cl + chy
+  a      = cx + cl + chy + c3 + cy
 !--- corrected b 23.02.2011 
-  b      = (c3 + cy) * (c1 + cl) + cy * c2 + c3 * c2y
+  b      = (c3 + cy) * (c1 + cl+c1y) + cy * c2 + c3 * c2y+ c3 * cy
 
   !---- Define CPRIME=C*CSCALE to try to keep the value.
   !     small enough for the VAX in single precision or
@@ -670,26 +713,27 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   !     scaled by 1/CPRIME and the denominator by 1/CPRIME**2.
   !     The extra factor of CPRIME is accounted for after integrating
   ccy    = cprime**power
-  td1    = (a + c3) * ccy
+  td1    = (a - cy) * ccy
   td2    = one / (sqrt(ccy) * cscale * cy)
-  tl1    = (two * a - cy - c3) / cprime
-  tl2    = (b - two * c3 * cy + c1y * (c3+cy) ) / cprime
+  tl1    = (two * a - three *cy - three * c3) / cprime
+  tl2    = (b - three * c3 * cy ) / cprime
 !--- corrected ty1 23.02.2011 
-  ty1    = (- a - c3 + two * cy -chy - chy/cy*(c3 -                 &
+  ty1    = (- a + three * cy -chy - chy/cy*(c3 -                 &
        two*gammas**2/sige**2) + two * chy * (cx +chy)/cy + six * c2y)    &
        / cprime
 !--- corrected ty2 23.02.2011 
-  ty2    = (b + cy * c3 +chy*(cy+chy)+chy*ey*(one/ey+betax          &
-       /(betay*ex))                                                      &
+  ty2    = (b - c1y * (c3+cy) +chy*(cy+chy)+chy*ey*(one/ey+&
+            betax/(betay*ex))                                            &
        *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
        (betay*ex))*                                                      &
        cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
        -c2y*(cy+c3+chy)+three*c3*(two*c2y+c1y)) / cprime - r1 / cscale
+
 !--- corrected tx1 23.02.2011 
-  tx1    = (two * a * (cx - c3) - cy * cx -                         &
-       c3 * (cy - cl - two * c3 + six*c2 + c2y + c1y)) / cprime
+  tx1    = (two * (a-c3-cy) * (cx - c3) - cy * cx +                         &
+       c3 * (c1y + six * c2 + c2y + two * c3 + cl - cy)) / cprime
 !--- corrected tx2 23.02.2011 
-  tx2    = (c3 + cx) * ((b + c3 * cy) / cprime)-                    &
+  tx2    = (c3 + cx) * ((b - c1y * (c3 + cy)) / cprime)-        &
        six / cscale + three * c3 * cy * (cl / cprime)                    &
        + ( six*c3*cy*c1y                               &
        + (betay/ey+betax/ex)*chy*cx +                                    &
