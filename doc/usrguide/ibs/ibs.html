@@ -39,7 +39,15 @@ The Intra-Beam Scattering Module (IBS)</A>
 contribution to emittance growth rates due to Coulomb scattering of particles
 within relativistic beams.
 The formalism used in this module is that derived by J.D. Bjorken and
-S.K.Mtingwa [<a href="../Introduction/bibliography.html#bm1">[Bjorken and Mtingwa]</a>] in 1982.
+S.K.Mtingwa [<a href="../Introduction/bibliography.html#bm1">Bjorken and Mtingwa</a>] in 1982,
+using the expansion of M. Conte and M. Martini [<a href="../Introduction/bibliography.html#conte">Conte and Martini</a>] in 1985, 
+generalized to the case of nonzero vertical dispersion. 
+The IBS module uses the beta and dispersion provided by the TWISS command.  
+The IBS module does not include a consistent treatment of linear betatron coupling. 
+The present implementation of the IBS module in MAD-X is described in a forthcoming note 
+[<a>Antoniou and Zimmermann</a>] (2012).
+
+<P>
 Contrary to other IBS-routines, the Bjorken-Mtingwa formalism takes into
 account the variation of the lattice parameters around the machine, rather than using average values. Consequently, the knowledge of the optical functions of the machine is required. In MAD-X, this is achieved with the ``<B>twiss</B>'' command.
 </FONT>
@@ -74,7 +82,16 @@ where C<IMG
 It thus follows that the second required input is a description of the beam parameters, which is achieved via the ``<B>beam</B>'' command (see below).
 </FONT>
 <P>
-<FONT SIZE="+1">Once the optical functions and the beam parameters have been defined, the evaluation of the scattering growth times follows via the ``<B>ibs</B>'' command.
+<FONT SIZE="+1">Once the optical functions and the beam parameters have been defined, the evaluation of the scattering growth times follows via the ``<B>ibs</B>'' command. 
+The ``<B>ibs</B>'' command should be immediately preceded by a call of ``<B>twiss</B>''.
+In particular, the ``<B>emit</B>'' command should be followed by another call of ``<B>twiss</B>'' before ``<B>ibs</B>'' is used.   
+
+<P>
+If ``<B>twiss</B>'' calculates the optical functions at the end of each element ``<B>ibs</B>'' performs a linear extrapolation to determine their values 
+at the center of the elements. If ``<B>twiss</B>'' already computes the optical functions at the center of each element ``<B>ibs</B>'' uses these 
+values directly without making any interpolation. 
+<P>
+
 The logical follow-up of the MAD-X commands is illustrated in the two examples provided with the IBS-module.
 </FONT>
 <P>
@@ -148,8 +165,9 @@ Beam sizes - Emittances</A>
 </H2><FONT SIZE="+1">
 This part of the input is used to define the normalized emittances (horizontal, vertical and longitudinal). The required parameters are the <B>physical</B> transverse emittances (<B>ex=</B> and <B>ey=</B> [<IMG
  WIDTH="15" HEIGHT="15" ALIGN="BOTTOM" BORDER="0"
- SRC="img6.png"
- ALT="$\pi$">m]), the bunch length (<B>sigt=</B> [m]) and the relative energy spread (<B>sige=</B>).
+ SRC="img6.png" ALT="$\pi$">m]), the longitudinal emittance (<B>ET=</B>) which is defined   
+as the product of the bunch length (<B>sigt=</B> [m]) and the relative energy spread (<B>sige=</B>).
+
 </FONT>
 <P>
 
@@ -158,7 +176,9 @@ File Attribute</A>
 </H1><FONT SIZE="+1">
 If FILE="file_name" appears MAD-X produces a table and writes on a
 file for each element of the machine: ELEMENT NAME, Position S [m],
-DELS [m] (Length Difference of consecutive Elements in the Table), TLI (Longitudinal growth time), TXI (Horizontal growth time), TYI (Vertical growth time).
+DELS [m] (Length Difference of consecutive Elements in the Table), 
+TLI (Longitudinal growth time), TXI (Horizontal growth time), TYI (Vertical growth time),
+BETX [m], ALFX [1], DX [m], DPX [1], BETY [m], ALFY [1], DY [m], DPY [1] 
 </FONT>
 <P>
  </FONT>
