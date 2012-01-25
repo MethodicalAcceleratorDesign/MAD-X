@@ -436,12 +436,12 @@ char* ptc_twiss_summary_table_cols[] = {
 
 int ibs_table_types[] =
 {
-  3, 2, 2, 2, 2, 2
+  3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 char* ibs_table_cols[] =
 {
-  "name", "s", "dels", "tli", "txi", "tyi",
+  "name", "s", "dels", "tli", "txi", "tyi", "betx","alfx","dx","dpx", "bety","alfy","dy","dpy",
   " "  /* blank terminates */
 };
 
