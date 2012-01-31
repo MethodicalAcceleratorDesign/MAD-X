@@ -6,6 +6,7 @@
 
 if(CMAKE_Fortran_COMPILER MATCHES "nagfor")
     message( WARNING " Make sure you use the same gcc as nagfor is compiled with, or linking WILL fail.")
+    add_definitions(-D_NAGFOR)
     set(CMAKE_SKIP_RPATH ON)
     set(CMAKE_Fortran_FLAGS_RELEASE " -gline -maxcontin=100 -ieee=full -D_NAG ")
     set(CMAKE_Fortran_FLAGS_DEBUG   " -gline -maxcontin=100 -ieee=full -D_NAG -C=all -nan ")

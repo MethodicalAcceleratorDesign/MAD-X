@@ -2,6 +2,7 @@
 # project options
 
 option( MADX_STATIC "Turn on for static linking" OFF)
+option( MADX_DEBUG "Turn on debug output" OFF)
 
 # We need to specify what kind of library suffixes we search for in case
 # for static linking:
