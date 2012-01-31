@@ -52,9 +52,13 @@ target_link_libraries(madx madx_fpp)
 # not sure if this is needed...
 set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
+# set library version:
+set_target_properties(madx     PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+set_target_properties(madx_fpp PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+
 # adding an executable:
 add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
-set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran)
+set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran VERSION ${PROJECT_VERSION})
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
 set_target_properties(madxbin PROPERTIES OUTPUT_NAME "madx${BINARY_POSTFIX}")
