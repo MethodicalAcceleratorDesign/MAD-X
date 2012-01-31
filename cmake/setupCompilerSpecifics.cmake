@@ -63,6 +63,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -std=c++98 -D_FULL ") #ne
 set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_FULL ") 
 
+# Project version:
+execute_process(COMMAND "date" "+%d-%m-%Y" OUTPUT_VARIABLE BUILD_DATE)
+add_definitions(-D_VERSION=${PROJECT_VERSION} -D_VERSION_DATE=${BUILD_DATE})
+message("Build date: ${BUILD_DATE}")
 
 # C stuff:
 # -- not needed for gnu/intel --

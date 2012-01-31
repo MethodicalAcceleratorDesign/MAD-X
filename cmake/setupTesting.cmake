@@ -1,16 +1,6 @@
 # Testing:
 # enable dashboard scripting
 
-# Define useful build name for cdash:
-find_program(UNAME NAMES uname)
-macro(getuname name flag)
-  exec_program("${UNAME}" ARGS "${flag}" OUTPUT_VARIABLE "${name}")
-endmacro(getuname)
-
-getuname(osname -s)
-# getuname(osrel  -r)
-getuname(cpu    -m)
-
 if(CMAKE_Fortran_COMPILER_ID MATCHES "unknown")
     STRING(REGEX REPLACE ".*/([^ ])" "\\1" fcompilername "${CMAKE_Fortran_COMPILER}" )
     SET(BUILDNAME "${osname}-${cpu}-${fcompilername}")
