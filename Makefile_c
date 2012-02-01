@@ -27,7 +27,9 @@ CC_HDR += SDDS.h madx.h
 CC_SRC +=
 
 # files specific compiler flag
-mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) -D_VERSION_DATE=$(VERSION_DATE)
+mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
+                        -D_VERSION_DATE=$(VERSION_DATE) \
+                        -D_VERSION_OSTYPE=$(OSTYPE)
 
 # special dependency
 mad_gcst.o: VERSION

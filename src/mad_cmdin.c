@@ -45,8 +45,7 @@ struct in_cmd*
 new_in_cmd(int length)
 {
   char rout_name[] = "new_in_cmd";
-  struct in_cmd* new
-    = (struct in_cmd*) mycalloc(rout_name,1, sizeof(struct in_cmd));
+  struct in_cmd* new = mycalloc(rout_name,1, sizeof(struct in_cmd));
   strcpy(new->name, "in_cmd");
   new->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
@@ -58,16 +57,14 @@ struct in_cmd_list*
 new_in_cmd_list(int length)
 {
   char rout_name[] = "new_in_cmd_list";
-  struct in_cmd_list* il =
-    (struct in_cmd_list*) mycalloc(rout_name,1, sizeof(struct in_cmd_list));
+  struct in_cmd_list* il = mycalloc(rout_name,1, sizeof(struct in_cmd_list));
   strcpy(il->name, "in_cmd_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->labels = new_name_list(il->name, length);
-  il->in_cmds
-    = (struct in_cmd**) mycalloc(rout_name,length, sizeof(struct in_cmd*));
+  il->in_cmds = mycalloc(rout_name,length, sizeof(struct in_cmd*));
   return il;
 }
 

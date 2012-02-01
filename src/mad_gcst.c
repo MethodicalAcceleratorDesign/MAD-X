@@ -11,11 +11,12 @@
 #define mkstr(a)  mkstr_(a)
 #define mkstr_(a) #a
 
-const char *version_name  = "MAD-X " mkstr(_VERSION);
-const char *version_arch  = sizeof(void*) == 4 ? "(32 bit)" : sizeof(void*) == 8 ? "(64 bit)" : "";
+const char *version_name     = "MAD-X " mkstr(_VERSION);
+const char *version_arch     = sizeof(void*) == 4 ? "32" : sizeof(void*) == 8 ? "64" : "??";
+const char *version_ostype   = mkstr(_VERSION_OSTYPE);
+const char *version_date_mod = "Code Modification Date: " mkstr(_VERSION_DATE);
 const char *version_type_dev = "DEBUG Version - use at own risk!";
 const char *version_type_pro = "       Production Version       ";
-const char *version_date_mod = "Code Modification Date: " mkstr(_VERSION_DATE);
 
 #undef mkstr
 #undef mkstr_
