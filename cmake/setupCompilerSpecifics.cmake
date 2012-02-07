@@ -6,10 +6,10 @@
 # 
 ###
 
-# This does not work with cmake 2.6, but it is how we want to do it in the future:
-if(CMAKE_VERSION MATCHES "2.8.")
-    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_LIST_DIR}/compilers") 
+if(CMAKE_VERSION VERSION_LESS "2.8.3")
+  get_filename_component(CMAKE_CURRENT_LIST_DIR CMAKE_CURRENT_LIST_FILE PATH)
 endif()
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_LIST_DIR}/compilers")
 
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
    include(setupGNU)
