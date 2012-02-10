@@ -54,7 +54,6 @@ struct command_parameter*       delete_command_parameter(struct command_paramete
 struct command_parameter_list*  delete_command_parameter_list(struct command_parameter_list*);
 struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);
 
-void    check_table(char* string);
 struct expression* command_par_expr(char* parameter, struct command*);
 double  command_par_special(char* parameter, struct element*);
 char*   command_par_string(char* parameter, struct command*);

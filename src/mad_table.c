@@ -610,6 +610,38 @@ new_table_list_list(int size)
 }
 
 void
+check_table(char* string)
+  /* replaces argument of "table" if any by a string variable */
+{
+
+  char *pa, *pb, *pt, *pl, *pr, *sv;
+  pa = string;
+  while ((pb = strstr(pa, "table")) != NULL)
+  {
+    if (is_token(pb, string, 5))
+    {
+      if (quote_level(pa, pb) == 0)
+      {
+        mystrcpy(c_join, pa);                             // global var
+        pt = strstr(c_join->c, "table");
+        if ((pl = strchr(pt, '(')) == NULL) return;
+        if ((pr = strchr(pl, ')')) == NULL) return;
+        *pl = '\0';
+        *pr = '\0';
+        sv = make_string_variable(++pl);
+        *pa ='\0';
+        strcat(string, c_join->c);
+        strcat(string, " ( ");
+        strcat(string, sv);
+        strcat(string, " ) ");
+        strcat(string, ++pr);
+      }
+    }
+    pa = ++pb;
+  }
+}
+
+void
 check_tabstring(char* string)
   /* replaces tabstring(tab_name, col_name, row_number) by the
      string found in that column/row of table tab_name, or by "_void_"

@@ -27,7 +27,7 @@ char constant_def[] =
 
 /* The special commands
    "if(", "else{", "elseif(", "while(", ">:macro", ">:line"
-   are not included here, but can be found in full.h
+   are not included here, but can be found in mad_gcst.c
    under special_comm_desc */
 /* IMPORTANT:
    beta0 and twiss MUST have identical portions

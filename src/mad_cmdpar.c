@@ -307,38 +307,6 @@ export_comm_par(struct command_parameter* par, char* string)
   }
 }
 
-void
-check_table(char* string)
-  /* replaces argument of "table" if any by a string variable */
-{
-
-  char *pa, *pb, *pt, *pl, *pr, *sv;
-  pa = string;
-  while ((pb = strstr(pa, "table")) != NULL)
-  {
-    if (is_token(pb, string, 5))
-    {
-      if (quote_level(pa, pb) == 0)
-      {
-        mystrcpy(c_join, pa);                             // global var
-        pt = strstr(c_join->c, "table");
-        if ((pl = strchr(pt, '(')) == NULL) return;
-        if ((pr = strchr(pl, ')')) == NULL) return;
-        *pl = '\0';
-        *pr = '\0';
-        sv = make_string_variable(++pl);
-        *pa ='\0';
-        strcat(string, c_join->c);
-        strcat(string, " ( ");
-        strcat(string, sv);
-        strcat(string, " ) ");
-        strcat(string, ++pr);
-      }
-    }
-    pa = ++pb;
-  }
-}
-
 struct expression*
 command_par_expr(char* parameter, struct command* cmd)
   /* returns a command parameter expression if found, else NULL */
