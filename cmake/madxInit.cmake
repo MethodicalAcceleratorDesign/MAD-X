@@ -16,18 +16,24 @@ else()
     set(IS32BIT TRUE)
 endif()
 
-
 # project version
-set( PROJECT_MAJOR_VERSION 5 )
-set( PROJECT_MINOR_VERSION 00 )
-set( PROJECT_PATCH_LEVEL 11 )
+file(READ ${CMAKE_SOURCE_DIR}/VERSION VERSION_INFO)
+string(REGEX MATCH "VERSION *= *[0-9]+.[0-9]+.[0-9]+" MADX_VERSION  ${VERSION_INFO})
+string(REGEX REPLACE "VERSION *= *" "" MADX_VERSION ${MADX_VERSION})
+# split version in major/minor/patch_level:
+string(REGEX REPLACE "^([0-9])+.[0-9]+.[0-9]+" "\\1" MADX_MAJOR_VERSION ${MADX_VERSION})
+string(REGEX REPLACE "^[0-9]+.([0-9]+).[0-9]+" "\\1" MADX_MINOR_VERSION ${MADX_VERSION})
+string(REGEX REPLACE "^[0-9]+.[0-9]+.([0-9]+)" "\\1" MADX_PATCH_LEVEL ${MADX_VERSION})
+#VERSION_DATE:
+string(REGEX MATCH "VERSION_DATE += *[^\n]+" VERSION_DATE  ${VERSION_INFO})
+string(REGEX REPLACE "VERSION_DATE += *" "" VERSION_DATE  ${VERSION_DATE})
 
-set( PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_PATCH_LEVEL} )
-
+message(STATUS "Mad-X version: ${MADX_VERSION}")
+message(STATUS "Version date: ${VERSION_DATE}")
 
 # Append _dev/-dev to binary/package name
-if ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
-    message(STATUS "Building a development version" )
+if(NOT MADX_PATCH_LEVEL EQUAL 00)
+    message(STATUS "Building a development version")
     set (BINARY_POSTFIX "_dev")
     set (PKG_POSTFIX "-dev")
-endif ( NOT PROJECT_PATCH_LEVEL EQUAL 00 )
+endif()

@@ -60,18 +60,14 @@ endif()
 # General compile flags:
 set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g ${CMAKE_Fortran_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_DEBUG   " ${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -std=c99 -D_FULL ")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -std=c++98 -D_FULL ") #needed for c++ linking
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -std=c99")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -std=c++98") #needed for c++ linking
 set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -D_FULL ") 
 if(MADX_DEBUG)
    add_definitions(-D_DEBUG -DDEBUG_ALL)
 endif()
 
-# Project version:
-execute_process(COMMAND "date" "+%d-%m-%Y" OUTPUT_VARIABLE BUILD_DATE)
-string(REGEX REPLACE "\n" "" BUILD_DATE ${BUILD_DATE})
-add_definitions(-D_VERSION=${PROJECT_VERSION} -D_VERSION_DATE=${BUILD_DATE})
+add_definitions(-D_FULL -D_VERSION=${MADX_VERSION} -D_VERSION_DATE=${VERSION_DATE} -D_VERSION_OSTYPE=${CMAKE_SYSTEM_NAME})
 
 # C stuff:
 # -- not needed for gnu/intel --

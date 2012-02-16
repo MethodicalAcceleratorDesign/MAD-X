@@ -16,7 +16,7 @@ install(TARGETS madxbin madx madx_fpp
 
 # This installs the header files to <prefix>/include/madX
 # We only want this in the development version...
-if(NOT ${PROJECT_PATCH_LEVEL} EQUAL 00)
+if(NOT ${MADX_PATCH_LEVEL} EQUAL 00)
 INSTALL (FILES ${headerfiles} 
   DESTINATION "include/${PROJECT_NAME}"
   COMPONENT Files)
@@ -41,9 +41,9 @@ endif()
  set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/License.txt")
  set (CPACK_PACKAGE_NAME "${PROJECT_NAME}${PKG_POSTFIX}")
  # Version:
- set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
- set (CPACK_PACKAGE_VERSION_MINOR ${PROJECT_MINOR_VERSION})
- set (CPACK_PACKAGE_VERSION_PATCH ${PROJECT_PATCH_LEVEL})
+ set (CPACK_PACKAGE_VERSION_MAJOR ${MADX_MAJOR_VERSION})
+ set (CPACK_PACKAGE_VERSION_MINOR ${MADX_MINOR_VERSION})
+ set (CPACK_PACKAGE_VERSION_PATCH ${MADX_PATCH_LEVEL})
 
  set (CPACK_PACKAGE_CONTACT "Frank Schmidt <Frank.Schmidt@cern.ch>")   
  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "MadX is a program for accelerator design and simulation") 
