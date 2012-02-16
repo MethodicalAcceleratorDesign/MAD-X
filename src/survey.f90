@@ -279,6 +279,7 @@ end subroutine sufill
 subroutine survtest
   integer j, length, advance_node
   double precision vector(7)
+  integer, external :: restart_sequ
   ! test routine for USE with option SURVEY
   call set_sequence('combseq ')
   print *, "# sequence combseq"
