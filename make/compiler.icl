@@ -35,11 +35,15 @@ endif
 #
 
 CPPFLAGS += -D_ICC
-CFLAGS   = /Qstd=c99   /O3 /c
-CXXFLAGS = /Qstd=c++0x /O3 /c
+CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O3 /c
+CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
 
-#CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O3 /c
-#CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
+#
+# diagnostics
+#
+
+CFLAGS   += /Qdiag-disable:2259 # /Qdiag-enable:sc2
+CXXFLAGS += /Qdiag-disable:2259 # /Qdiag-enable:sc2
 
 #
 # options flags
@@ -60,8 +64,8 @@ endif
 #
 
 CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /Qprec /fp:source /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
-CXXFLAGS += /nologo /Qprec /fp:source /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
+CFLAGS   += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
+CXXFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
 
 #
 # command translator

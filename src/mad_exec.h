@@ -19,5 +19,6 @@ void exec_fill_table(struct in_cmd*);
 void exec_create_table(struct in_cmd*);
 void exec_setvars_table(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
+void exec_delete_table(char* name);
 
 #endif // MAD_EXEC_H

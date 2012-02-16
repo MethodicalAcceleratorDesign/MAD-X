@@ -47,15 +47,14 @@ endif
 CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
  
 #
-# extra warnings (gcc is the reference)
+# diagnostics (gcc is the reference)
 #
 
-# trig too many warnings (> 1000+) for the moment!
 CFLAGS += -Wmissing-prototypes -Wmissing-declarations \
           -Wchar-subscripts -Wconversion -Wno-conversion -Winline \
           -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
           -Wstrict-prototypes
 
-#         -Wfloat-equal -Wwrite-strings -Wformat-nonliteral
+#         -Wfloat-equal -Wformat-nonliteral -Wwrite-strings
 
 # end of makefile

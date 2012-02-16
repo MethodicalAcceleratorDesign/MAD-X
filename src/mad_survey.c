@@ -50,19 +50,16 @@ pro_survey(struct in_cmd* cmd)
 }
 
 void
-pro_use_survey()
+pro_use_survey(void)
 {
   /* Constructs artificial survey command for USE,SURVEY. 
      The survey data are stored at the nodes. */
   struct in_cmd* pro_use = new_in_cmd(10);
   struct name_list* usenl;
   int usepos;
-  int nint=10;
-  double init[6];
   pro_use->label = NULL;
   pro_use->type = 0;
-  pro_use->clone = pro_use->cmd_def =
-    clone_command(find_command("survey",defined_commands));
+  pro_use->clone = pro_use->cmd_def = clone_command(find_command("survey",defined_commands));
   usenl = pro_use->cmd_def->par_names;
   usepos = name_list_pos("table", usenl);
   pro_use->cmd_def->par->parameters[usepos]->string = tmpbuff("survey");

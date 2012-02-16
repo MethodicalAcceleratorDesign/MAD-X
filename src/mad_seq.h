@@ -84,6 +84,8 @@ void    reset_sector(struct sequence*, int val);
 int     restart_sequ(void);
 void    seq_edit_main(struct in_cmd*);
 int     set_enable(char* type, struct in_cmd*);
+void    set_sequence(char* name);
+int     set_cont_sequence(void);
 
 #endif // MAD_SEQ_H
 

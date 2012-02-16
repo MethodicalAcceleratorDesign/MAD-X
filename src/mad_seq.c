@@ -1165,7 +1165,8 @@ use_sequ(struct in_cmd* cmd)
   current_beam = keep_beam;
 }
 
-int set_cont_sequence()
+int
+set_cont_sequence(void)
 {
   if (current_sequ->next_sequ != NULL)
     {
@@ -1175,7 +1176,8 @@ int set_cont_sequence()
   else return 0;
 }
 
-void set_sequence(char* name)
+void
+set_sequence(char* name)
 {
   int lp;
   struct sequence* t_sequ;

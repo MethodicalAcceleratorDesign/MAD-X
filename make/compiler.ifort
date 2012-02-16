@@ -35,9 +35,6 @@ ifneq ($(OSTYPE),Windows)
 CPPFLAGS += -D_IFORT
 FFLAGS    = -m$(ARCH) -O3 -warn all -warn nounused -c
 
-# Trig too many warnings for the moment!
-# FFLAGS  = -m$(ARCH) -O3 -warn all -c
-
 # cancellation of optimizations
 FFLAGS0   = $(subst -O3,-O0,$(FFLAGS))
 
@@ -57,7 +54,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -mp1 -fp-model source -assume noold_unit_star \
+FFLAGS += -mp1 -fp-model strict -assume noold_unit_star \
           -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 ifneq ($(CXX_SRC),)
