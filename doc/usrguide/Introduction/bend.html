@@ -35,7 +35,8 @@ SBEND,   L=real,ANGLE=real,TILT=real,K0=real,K0S=real,K1=real,E1=real,E2=real,
          FINT=real,FINTX=real,HGAP=real,K2=real,H1=real,H2=real;
 
 RBEND,   L=real,ANGLE=real,TILT=real,K0=real,K0S=real,K1=real,E1=real,E2=real,
-         FINT=real,FINTX=real,HGAP=real,K2=real,H1=real,H2=real;
+         FINT=real,FINTX=real,HGAP=real,K2=real,H1=real,H2=real,
+         ADD_ANGLE={<i>array_of_max_5_angles</i>};
 </PRE>
 For both types,
 the following first-order attributes are permitted:
@@ -52,6 +53,8 @@ the option RBARC=FALSE has to be set.</font></b>
 The bend angle (default: 0 rad).
 A positive bend angle represents a bend to the right,
 i.e. towards negative <VAR>x</VAR> values.
+<p><LI>ADD_ANGLE:
+An array of (maximum 5) bending angles for multiple passes. See <tt>add_pass</tt> option of the <a href="sequence.html">sequence</a> command.
 <p><LI>TILT:
 The roll angle about the longitudinal axis (default: 0 rad,
 i.e. a horizontal bend). A positive angle represents a clockwise

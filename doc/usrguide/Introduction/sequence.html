@@ -20,7 +20,7 @@ by MAD-X.
 <p>
 The corresponding sequence of statements defining a sequence is
 <pre>
-name: SEQUENCE,REFER=keyword,REFPOS=name,LENGTH=real
+name: SEQUENCE,REFER=keyword,REFPOS=name,LENGTH=real,ADD_PASS=integer,NEXT_SEQU='seq_name'
 label: class,AT=real{,attributes} | class,AT=real | sequ_name, AT=real
     ...
 ENDSEQUENCE
@@ -31,6 +31,12 @@ The first line gives the sequence name, a REFER flag (entry, centre,
 or exit) which specifies at which part of the element its position along
 the beam line will be given (default: centre), a REFPOS argument used
 for sequence insertion, and the total length.
+The ADD_PASS=integer option specifies a number of additionnal passes (max. 5)
+through the structure; in case of an RBEND the angle will be overwritten in
+ survey using the i-th component (1 <= i <= <tt>add_pass</tt> <= 5) of its <i>array_of_angles</i>
+(see <a href="bend.html">RBEND<a>).
+The NEXT_SEQU='seq_name' concatenates the sequence with name 'seq_name'
+ to the end of the specified sequence.
 <p>
 Inside the sequence ... endsequence bracket three types of commands
 may be placed:
