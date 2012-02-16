@@ -236,6 +236,7 @@ node_value(char* par)
   else if (strcmp(lpar, "sel_sector") == 0) value = current_node->sel_sector;
   else if (strcmp(lpar, "enable") == 0) value = current_node->enable;
   else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
+  else if (strcmp(lpar, "pass_flag") == 0) value = current_node->pass_flag;
   else value =  element_value(current_node, lpar);
   return value;
 }
@@ -343,6 +344,7 @@ store_node_value(char* par, double* value)
   else if (strcmp(lpar, "fint") == 0) store_comm_par_value("fint",*value,el->def);
   else if (strcmp(lpar, "fintx") == 0) store_comm_par_value("fintx",*value,el->def);
   else if (strcmp(lpar, "hgap") == 0) store_comm_par_value("hgap",*value,el->def);
+  else if (strcmp(lpar, "pass_flag") == 0) current_node->pass_flag = *value;
 
   /* end of additions */
 }
@@ -471,6 +473,9 @@ store_node_vector(char* par, int* length, double* vector)
     copy_double(vector, current_node->orbit_ref->a, *length);
     current_node->orbit_ref->curr = *length;
   }
+  else if (strcmp(lpar, "surv_data") == 0)  
+        copy_double(vector, current_node->surv_data, *length);
+
 }
 
 int

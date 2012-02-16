@@ -8,6 +8,7 @@ struct in_cmd;
 // interface
 
 void pro_survey(struct in_cmd*);
+void pro_use_survey();
 
 #endif // MAD_SURVEY_H
 

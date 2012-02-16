@@ -6,6 +6,7 @@ pro_survey(struct in_cmd* cmd)
 {
   struct name_list* nl = current_survey->par_names;
   struct command_parameter_list* pl = current_survey->par;
+  struct sequence* keep_current;
   char *filename = NULL, *table_name;
   int pos, w_file;
   int iarc = 1, keep;
@@ -41,9 +42,37 @@ pro_survey(struct in_cmd* cmd)
   survey_table = make_table(table_name, "survey", survey_table_cols,
                             survey_table_types, current_sequ->n_nodes);
   add_to_table_list(survey_table, table_register);
+  keep_current = current_sequ;
   survey_();
+  current_sequ = keep_current;
   if (w_file) out_table(table_name, survey_table, filename);
   set_option("rbarc", &keep);
+}
+
+void
+pro_use_survey()
+{
+  /* Constructs artificial survey command for USE,SURVEY. 
+     The survey data are stored at the nodes. */
+  struct in_cmd* pro_use = new_in_cmd(10);
+  struct name_list* usenl;
+  int usepos;
+  int nint=10;
+  double init[6];
+  pro_use->label = NULL;
+  pro_use->type = 0;
+  pro_use->clone = pro_use->cmd_def =
+    clone_command(find_command("survey",defined_commands));
+  usenl = pro_use->cmd_def->par_names;
+  usepos = name_list_pos("table", usenl);
+  pro_use->cmd_def->par->parameters[usepos]->string = tmpbuff("survey");
+  pro_use->cmd_def->par_names->inform[usepos] = 1;
+  usepos = name_list_pos("file", usenl);
+  pro_use->cmd_def->par->parameters[usepos]->string = NULL;
+  pro_use->cmd_def->par_names->inform[usepos] = 0;
+  current_survey=(pro_use->clone);
+  pro_survey(pro_use);
+  exec_delete_table("survey");
 }
 
 

@@ -557,6 +557,11 @@ get_node_vector(char* par, int* length, double* vector)
       copy_double(current_node->orbit_ref->a, vector, *length);
     }
   }
+  else if (strcmp(lpar, "surv_data") == 0) 
+    {
+     copy_double(current_node->surv_data, vector, 7);
+     *length = 7;
+    }
   else *length = element_vector(current_node->p_elem, lpar, vector);
 }
 

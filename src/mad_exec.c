@@ -21,7 +21,7 @@ exec_delete_sequ(char* name)
   else warning("sequence to be deleted does not exist:", name);
 }
 
-static void
+void
 exec_delete_table(char* name)
 {
   struct table_list* tl;

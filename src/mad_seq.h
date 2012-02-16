@@ -20,12 +20,14 @@ struct sequence
   char name[NAME_L];
   char export_name[NAME_L];
   char* refpos;                 /* reference position for insertion */
+  char* next_sequ;              /* name of following sequence (only survey) */
   int ref_flag;                 /* -1 for exit, 0 for centre, 1 for entry */
   int share;                    /* 0 normal, 1 if shared */
   int nested;                   /* 0 flat, 1 if nested */
   int con_cnt;                  /* constraint counter */
   int stamp;
   int line;                     /* set to 1 if origin is a line */
+  int add_pass;                 /* number of additional passes */
   double length;                /* length as in declaration */
   struct expression* l_expr;    /* length expression as in declaration */
   struct node* start;           /* first node in sequence */
@@ -37,6 +39,7 @@ struct sequence
   /* expanded sequence */
   int n_nodes;                  /* number of nodes when expanded */
   int start_node;               /* first node of current range in all_nodes */
+  int pass_count;               /* number of executed passes */
   struct node* ex_start;        /* first node in expanded sequence */
   struct node* ex_end;          /* last node in expanded sequence */
   struct node* range_start;     /* first node of current range in sequence */

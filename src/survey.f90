@@ -22,10 +22,12 @@ subroutine survey
   !   ENERGY                                                             *
   !----------------------------------------------------------------------*
 
-  integer i,j,code,restart_sequ,advance_node
+  integer i,j,code,restart_sequ,advance_node,add_pass,passes,n_add_angle
+  integer angle_count, node_count, node_ref(100),set_cont_sequence
   double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
        theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
-       node_value,el,suml,get_value,tilt,globaltilt,zero
+       node_value,el,suml,get_value,tilt,globaltilt,zero,add_angle(10), &
+       org_ang(100)
   parameter(zero=0d0)
 
   !---- Retrieve command attributes.
@@ -57,30 +59,63 @@ subroutine survey
         w(i,j) = w0(i,j)
      enddo
   enddo
+5 continue
 
   !---- loop over elements  NO SYMMETRIC SUPERPERIOD ANYMORE!   *******
   !      print *,"suml  length   theta(x)   phi(y)    psi(z)   coord."
-  j = restart_sequ()
-10 continue
-  code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  !      print *,"code   ", code
-  !**** el is the arc length for all bends  ********
-  el = node_value('l ')
-  call suelem(el, ve, we,tilt)
-  !      print *,"el, tilt", el, tilt
-  suml = suml + el
-  !**  Compute the coordinates at each point
-  call sutrak(v, w, ve, we)
-  !**  Compute globaltilt HERE : it's the value at the entrance
-  globaltilt=psi+tilt
-  !**  Compute the survey angles at each point
-  call suangl(w, theta, phi, psi)
-  !**  Fill the survey table
-  call sufill(suml,v, theta, phi, psi,globaltilt)
-  if (advance_node().ne.0)  goto 10
-  !---- end of loop over elements  ***********************************
+  add_pass = get_value('sequence ','add_pass ')
+  ! multiple passes allowed
+  do passes = 0, add_pass
+     j = restart_sequ()
+     angle_count = 0
+     node_count = 0
+10   continue
+     node_count = node_count + 1
+     if (passes .gt. 0)  then
+        call get_node_vector('add_angle ',n_add_angle,add_angle)
+        if (n_add_angle .gt. 0 .and. add_angle(passes) .ne. 0.) then
+           if (passes .eq. 1) then
+              angle_count = angle_count + 1
+              node_ref(angle_count) = node_count
+              org_ang(angle_count) = node_value('angle ')
+           endif
+           call store_node_value('angle ', add_angle(passes))
+        endif
+     endif
+     code = node_value('mad8_type ')
+     if(code.eq.39) code=15
+     if(code.eq.38) code=24
+     !      print *,"code   ", code
+     !**** el is the arc length for all bends  ********
+     el = node_value('l ')
+     call suelem(el, ve, we,tilt)
+     !      print *,"el, tilt", el, tilt
+     suml = suml + el
+     !**  Compute the coordinates at each point
+     call sutrak(v, w, ve, we)
+     !**  Compute globaltilt HERE : it's the value at the entrance
+     globaltilt=psi+tilt
+     !**  Compute the survey angles at each point
+     call suangl(w, theta, phi, psi)
+     !**  Fill the survey table
+     call sufill(suml,v, theta, phi, psi,globaltilt)
+     if (advance_node().ne.0)  goto 10
+     !---- end of loop over elements  ***********************************
+  enddo
+  ! restore original angle to node if necessary
+  if (add_pass .gt. 0) then
+     j = restart_sequ()
+     angle_count = 1
+     node_count = 0
+20   continue
+     node_count = node_count+1
+     if (node_ref(angle_count) .eq. node_count)  then
+        call store_node_value('angle ', org_ang(angle_count))
+        angle_count = angle_count+1
+     endif
+     if (advance_node().ne.0)  goto 20
+  endif
+  if (set_cont_sequence() .ne. 0)  goto 5
 
   !---- Centre of machine.
   do i = 1, 3
@@ -174,9 +209,9 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
   !   V(3)     (real)    Coordinate at the end of the element            *
   ! theta, phi, psi(real) : the survey angles                            *
   !----------------------------------------------------------------------*
-  integer code,nn
+  integer code,nn, i
   double precision ang,el,v(3),theta,phi,psi,node_value,suml,       &
-       normal(0:maxmul),globaltilt,tmp
+       normal(0:maxmul),globaltilt,tmp, surv_vect(7)
 
   el = node_value('l ')
   call string_to_table('survey ', 'name ', 'name ')
@@ -189,7 +224,20 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
   call double_to_table('survey ', 'phi ',phi)
   call double_to_table('survey ', 'psi ',psi)
   call double_to_table('survey ', 'globaltilt ',globaltilt)
-
+  i = node_value('pass_flag ')
+  if (i .eq. 0) then
+     surv_vect(1) = v(1)
+     surv_vect(2) = v(2)
+     surv_vect(3) = v(3)
+     surv_vect(4) = theta
+     surv_vect(5) = phi
+     surv_vect(6) = psi
+     surv_vect(7) = suml
+     tmp = 1
+     call store_node_value('pass_flag ', tmp)
+     i = 7
+     call store_node_vector('surv_data ', i, surv_vect)
+  endif
   code = node_value('mad8_type ')
   if(code.eq.39) code=15
   if(code.eq.38) code=24
@@ -228,3 +276,23 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
   call augment_count('survey ')
 end subroutine sufill
 !-----------------  end of sufill subroutine --------------------------
+subroutine survtest
+  integer j, length, advance_node
+  double precision vector(7)
+  ! test routine for USE with option SURVEY
+  call set_sequence('combseq ')
+  print *, "# sequence combseq"
+  j = restart_sequ()
+10 continue
+  call get_node_vector('surv_data ', length, vector)
+  print *, vector
+  if (advance_node() .ne. 0)  goto 10
+  call set_sequence('new3 ')
+  print *, "# sequence newcont"
+  j = restart_sequ()
+20 continue
+  call get_node_vector('surv_data ', length, vector)
+  print *, vector
+  if (advance_node() .ne. 0)  goto 20
+end subroutine survtest
+!-----------------  end of surtest subroutine --------------------------

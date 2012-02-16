@@ -74,6 +74,8 @@
 // from mad_option.c
 #define get_option get_option_ // *
 #define set_option set_option_
+#define set_cont_sequence set_cont_sequence_
+#define set_sequence set_sequence_
 
 // from mad_orbit.c
 #define f_ctof f_ctof_
@@ -249,6 +251,7 @@ void soddin_(F_INTEGER ierr);
 
 // from survey.f90
 void survey_(void);
+void survtest_(void);
 
 // from toucheck.f90
 void touschek_(void);

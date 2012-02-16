@@ -26,6 +26,7 @@ struct node                /* the sequence is a linked list of nodes */
   int enable;              /* flag for correctors and monitors: 0 off, 1 on */
   int moved;               /* temporary flag during sequence editing */
   int stamp;
+  double pass_flag;        /* set to 1 at first pass of use-triggered survey */
   double position;         /* s position in sequence [m] */
   double at_value;
   double length;
@@ -34,6 +35,7 @@ struct node                /* the sequence is a linked list of nodes */
   double chkick;           /* calculated by orbit correction module */
   double cvkick;           /* calculated by orbit correction module */
   double match_data[74];   /* array for fast access to twiss data for match */
+  double surv_data[7];     /* x,y,z,theta,phi,psi,s for use with survey */
   struct expression* at_expr;
   char* from_name;
   struct element* p_elem;  /* pointer to element if any */

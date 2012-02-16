@@ -1150,10 +1150,53 @@ use_sequ(struct in_cmd* cmd)
       if (nl->inform[pos])  /* parameter has been read */
         current_range = tmpbuff(pl->parameters[pos]->string);
       expand_curr_sequ(0);
+      pos = name_list_pos("survey", nl);
+      if (nl->inform[pos])  /* parameter has been read */
+	{
+	 pro_use_survey();
+         pos = name_list_pos("survtest", nl);
+         if (nl->inform[pos]) survtest_();
+         exec_delete_table("survey");
+ 	}
+
     }
     else warning("unknown sequence skipped:", name);
   }
   current_beam = keep_beam;
+}
+
+int set_cont_sequence()
+{
+  if (current_sequ->next_sequ != NULL)
+    {
+     set_sequence(current_sequ->next_sequ);
+     return 1;
+    }
+  else return 0;
+}
+
+void set_sequence(char* name)
+{
+  int lp;
+  struct sequence* t_sequ;
+  mycpy(c_dum->c, name);
+  /* makes sequence "name" the current sequence */
+  if ((lp = name_list_pos(c_dum->c, sequences->list)) > -1)
+    t_sequ = sequences->sequs[lp];
+  else
+  {
+    warning("unknown sequence ignored:", name);
+    return;
+  }
+  if (attach_beam(t_sequ) == 0)
+    fatal_error("USE - sequence without beam:", t_sequ->name);
+  t_sequ->beam = current_beam;
+  if (t_sequ == NULL || t_sequ->ex_start == NULL)
+  {
+    warning("sequence not active,", "SET ignored");
+    return;
+  }
+  current_sequ = t_sequ;
 }
 
 // public interface
@@ -1297,11 +1340,15 @@ enter_sequence(struct in_cmd* cmd)
     pl = cmd->clone->par;
     current_sequ->l_expr = command_par_expr("l", cmd->clone);
     current_sequ->length = command_par_value("l", cmd->clone);
+    current_sequ->add_pass = command_par_value("add_pass", cmd->clone);
     if (current_sequ->l_expr == NULL && sequence_length(current_sequ) == zero)
       fatal_error("missing length for sequence:", toks[aux_pos]);
     pos = name_list_pos("refpos", nl);
     if (nl->inform[pos])
       current_sequ->refpos = permbuff(pl->parameters[pos]->string);
+    pos = name_list_pos("next_sequ", nl);
+    if (nl->inform[pos])
+      current_sequ->next_sequ = permbuff(pl->parameters[pos]->string);
     current_node = NULL;
     if (occ_list == NULL)
       occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */

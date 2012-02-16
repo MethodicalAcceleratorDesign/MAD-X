@@ -1094,6 +1094,8 @@ get_value(char* name, char* par)
     else if (strcmp(aux_buff->c, "range_start") == 0)
       return (current_sequ->range_start->position
               - 0.5 * current_sequ->range_start->length);
+    else if (strcmp(aux_buff->c, "add_pass") == 0)
+      return ((double)current_sequ->add_pass);
     else return INVALID;
   }
   else if (current_command != NULL
