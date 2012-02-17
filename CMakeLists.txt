@@ -22,8 +22,8 @@ endif(COMMAND cmake_policy)
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake") 
 
-# When we don't need to support cmake 2.6 anymore, remove these three lines:
-if(CMAKE_VERSION MATCHES "2.6.")
+# When we don't need to support cmake <2.8.3 anymore, remove these three lines:
+if(CMAKE_VERSION VERSION_LESS "2.8.3")
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/compilers") 
 endif()
 
