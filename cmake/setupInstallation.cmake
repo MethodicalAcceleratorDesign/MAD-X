@@ -25,7 +25,7 @@ endif()
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
     DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}"
     COMPONENT Files)
-if(APPLE)
+if(APPLE AND MADX_BUNDLE)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}")  # paths to executables
   set(DIRS "")
   INSTALL(CODE " 

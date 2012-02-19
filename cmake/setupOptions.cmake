@@ -22,6 +22,9 @@ endif()
 #Mad-X specific options (arch. specific options can be added in similar manner):
 option( MADX_NTPSA "Build with NTPSA" ON)
 option( MADX_FORCE_32 "Force 32bit build" OFF )
+if(APPLE)
+ option( MADX_BUNDLE "Create bundle on OSX" ON)
+endif()
 
 # double logic: first we set madx_online default on if sdds is found
 # then if MADX_ONLINE is on without sdds found, we throw fatal error.

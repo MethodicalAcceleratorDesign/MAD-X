@@ -57,7 +57,11 @@ set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
 set_target_properties(madx_fpp PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
 
 # adding an executable:
-add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
+if(MADX_BUNDLE)
+  add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
+else()
+  add_executable(madxbin mad_main.c)
+endif()
 set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran VERSION ${MADX_VERSION})
 
 # we want to add _dev to the binary in case this is a dev version for the automatic packaging...
