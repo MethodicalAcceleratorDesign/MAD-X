@@ -1,7 +1,7 @@
 # This is a script for testing the source and submitting
-# your results to a common server (cdash). This currently
-# only works inside CERN. You can see the server at:
-# http://137.138.26.237/cdash/index.php?project=Mad-X
+# your results to a common server (cdash).
+# You can find the server at:
+# http://cern.ch/yngve/cdash/index.php?project=Mad-X
 # 
 # How to:
 #  - check out the source from svn in a temporary directory, from the url 
@@ -43,8 +43,10 @@ ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 ctest_update()
  
 ctest_configure(OPTIONS "${cfg_options}")
-ctest_build() 
-ctest_test()
-# coverage test doesn't work at the moment..
-#ctest_coverage()
+ctest_build(NUMBER_ERRORS MADX_BUILD_ERRORS)
+if(NOT ${MADX_BUILD_ERRORS})
+   ctest_test()
+   # coverage test doesn't work at the moment..
+   #ctest_coverage()
+endif()
 ctest_submit()
