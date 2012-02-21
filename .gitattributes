@@ -34,7 +34,6 @@ cmake/setupInstallation.cmake -text
 cmake/setupOptions.cmake -text
 cmake/setupPackaging.cmake -text
 cmake/setupProcessorCount.cmake -text
-cmake/setupTargets.cmake -text
 cmake/setupTesting.cmake -text
 doc/usrguide/Introduction/aperexample.jpg -text
 doc/usrguide/Introduction/aperture.html -text

@@ -2,6 +2,8 @@
 # list of source files
 file(GLOB srcfiles mad_*.c *.f90 *.F90 *.cpp )
 file(GLOB mad_fpp_src [a-z]_*.f90 [a-z]_*.F90 tpsa.cpp)
+file(GLOB mad_ptc_core_src S[a-f]_*.f90)
+file(GLOB mad_ptc_src S[g-o]_*.f90)
 
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
@@ -36,8 +38,10 @@ else (MADX_NTPSA )
 endif  (MADX_NTPSA )
 
 set(remove_list ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
-list(REMOVE_ITEM srcfiles ${remove_list} ${mad_fpp_src})
+list(REMOVE_ITEM srcfiles ${remove_list} ${mad_fpp_src} ${mad_ptc_core_src} ${mad_ptc_src})
 list(REMOVE_ITEM mad_fpp_src ${remove_list})
+list(REMOVE_ITEM mad_ptc_core_src ${remove_list})
+list(REMOVE_ITEM mad_ptc_src ${remove_list})
 
 # header files...
 file(GLOB headerfiles *.h)
@@ -45,8 +49,12 @@ file(GLOB headerfiles *.h)
 # adding library:
 add_library(madx ${srcfiles})
 add_library(madx_fpp ${mad_fpp_src})
+add_library(madx_ptc_core ${mad_ptc_core_src})
+add_library(madx_ptc ${mad_ptc_src})
 
-target_link_libraries(madx madx_fpp)
+target_link_libraries(madx_ptc_core madx_fpp)
+target_link_libraries(madx_ptc madx_ptc_core)
+target_link_libraries(madx madx_ptc)
 
 
 # not sure if this is needed...
