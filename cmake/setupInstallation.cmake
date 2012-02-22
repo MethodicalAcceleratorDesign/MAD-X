@@ -4,10 +4,10 @@
 #INSTALL(FILES ${files} DESTINATION include/madx)
 
 set(CMAKE_Fortran_MODULE_DIRECTORY
-    ${PROJECT_BINARY_DIR}/bin/fortran CACHE PATH "Single Directory for all fortran modules."
+    ${PROJECT_BINARY_DIR}/include/fortran/madX CACHE PATH "Single Directory for all fortran modules."
 )
 
-install(TARGETS madxbin madx madx_fpp
+install(TARGETS madxbin madx madx_core madx_fpp madx_ptc_core madx_ptc
   BUNDLE DESTINATION . COMPONENT Runtime
   RUNTIME DESTINATION bin COMPONENT Runtime
   LIBRARY DESTINATION lib COMPONENT Libraries
