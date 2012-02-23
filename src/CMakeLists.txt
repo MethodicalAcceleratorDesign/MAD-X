@@ -24,6 +24,11 @@ endif()
 # Some source files which should not be included:
 file(GLOB sdds_remove matchsdds.c)
 
+# Some weird problem with this file with gfortran < 4.6..
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU" AND 
+      CMAKE_Fortran_COMPILER_VERSION VERSION_LESS "4.6")
+   set_source_files_properties(l_complex_taylor.f90 COMPILE_FLAGS "-O2")
+endif()
 
 if(NOT MADX_FORCE_32)
    # find laplas and blas
