@@ -185,7 +185,7 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
 }
 
 int
-name_list_pos(char* p, struct name_list* vlist)
+name_list_pos(const char* p, struct name_list* vlist)
 {
   int num, mid, low = 0, high = vlist->curr - 1;
   while (low <= high)
