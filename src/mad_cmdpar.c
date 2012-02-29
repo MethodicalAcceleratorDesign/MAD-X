@@ -308,7 +308,7 @@ export_comm_par(struct command_parameter* par, char* string)
 }
 
 struct expression*
-command_par_expr(char* parameter, struct command* cmd)
+command_par_expr(const char* parameter, struct command* cmd)
   /* returns a command parameter expression if found, else NULL */
 {
   struct expression* expr = NULL;
@@ -319,7 +319,7 @@ command_par_expr(char* parameter, struct command* cmd)
 }
 
 double
-command_par_special(char* parameter, struct element* el)
+command_par_special(const char* parameter, struct element* el)
 /* construct missing tilt from normal and skew  */
 {
   double val = zero;
@@ -336,7 +336,7 @@ command_par_special(char* parameter, struct element* el)
 }
 
 char*
-command_par_string(char* parameter, struct command* cmd)
+command_par_string(const char* parameter, struct command* cmd)
   /* returns a command parameter string if found, else NULL */
 {
   struct command_parameter* cp;
@@ -371,7 +371,7 @@ add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int in
 }
 
 double
-command_par_value(char* parameter, struct command* cmd)
+command_par_value(const char* parameter, struct command* cmd)
   /* returns a command parameter value if found, else zero */
 {
   struct command_parameter* cp;
@@ -390,7 +390,7 @@ command_par_value(char* parameter, struct command* cmd)
 }
 
 int
-command_par_value2(char* parameter, struct command* cmd, double* val)
+command_par_value2(const char* parameter, struct command* cmd, double* val)
   /* returns a command parameter value val
      if found returns 1, else 0 */
 {
@@ -414,15 +414,14 @@ command_par_value2(char* parameter, struct command* cmd, double* val)
 }
 
 struct double_array*
-command_par_array(char* parameter, struct command* cmd)
+command_par_array(const char* parameter, struct command* cmd)
   /* returns an updated command parameter array if found, else NULL */
 {
-  struct command_parameter* cp;
   struct double_array* arr = NULL;
   int i;
   if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
   {
-    cp = cmd->par->parameters[i];
+    struct command_parameter* cp = cmd->par->parameters[i];
     if (cp->type == 11 || cp->type == 12)
     {
       arr = cp->double_array;
@@ -433,16 +432,15 @@ command_par_array(char* parameter, struct command* cmd)
 }
 
 int
-command_par_vector(char* parameter, struct command* cmd, double* vector)
+command_par_vector(const char* parameter, struct command* cmd, double* vector)
   /* returns the length of, and an updated command parameter vector
      if found, else 0 */
 
 {
-  struct command_parameter* cp;
   int i;
   if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
   {
-    cp = cmd->par->parameters[i];
+    struct command_parameter* cp = cmd->par->parameters[i];
     if (cp->double_array != NULL)
     {
       if (cp->expr_list != NULL)
@@ -455,7 +453,7 @@ command_par_vector(char* parameter, struct command* cmd, double* vector)
 }
 
 void
-set_command_par_value(char* parameter, struct command* cmd, double val)
+set_command_par_value(const char* parameter, struct command* cmd, double val)
 {
   struct command_parameter* cp;
   int i;
@@ -582,7 +580,7 @@ store_comm_par_def(char* toks[], int start, int end)
 }
 
 void
-store_comm_par_value(char* parameter, double val, struct command* cmd)
+store_comm_par_value(const char* parameter, double val, struct command* cmd)
 {
   struct command_parameter* cp;
   int i;
@@ -763,7 +761,7 @@ comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, 
 }
 
 void
-store_comm_par_vector(char* parameter, double* val, struct command* cmd)
+store_comm_par_vector(const char* parameter, double* val, struct command* cmd)
 {
   struct command_parameter* cp;
   int i;
