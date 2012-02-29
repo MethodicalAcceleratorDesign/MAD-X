@@ -7,7 +7,7 @@ struct element;
 
 // interface
 
-double mult_par(char* par, struct element* el);
+double mult_par(const char* par, struct element* el);
 
 #endif // MAD_ELEMMULTP_H
 
