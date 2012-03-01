@@ -5,17 +5,18 @@ mult_par(const char* par, struct element* el)
   /* returns multipole parameter for par = "k0l" or "k0sl" etc. */
 {
   double val = zero;
-  char* p;
-  if (*par == 'k' && (p = strchr(par, 'l')) != NULL)
+  char tmp[12] ,*p;
+  strcpy(tmp, par);
+  if (*tmp == 'k' && (p = strchr(tmp, 'l')) != NULL)
   {
     *p = '\0';  /* suppress trailing l */
     int skew = 0;
-    if ((p = strchr(par, 's')) != NULL)
+    if ((p = strchr(tmp, 's')) != NULL)
     {
       skew = 1; *p = '\0';
     }
     int k = 0;
-    sscanf(&par[1], "%d", &k);
+    sscanf(&tmp[1], "%d", &k);
     double vect[FIELD_MAX];
     int l;
     if (skew) l = element_vector(el, "ksl", vect);
