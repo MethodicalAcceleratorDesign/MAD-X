@@ -1,4 +1,10 @@
-! **********************************************************
+! **************************************************************************
+! Note by F. Antoniou and F. Zimmermann March 2012
+! Note that in this version the dispersion is corrected (multiplied by beta) 
+! within the module as in the twiss table the disperion is given in the pt
+! frame (dx/dpt) while for the ibs calculations the dx/dp is needed.
+! ***************************************************************************
+
 subroutine enprem
   use ibsdbfi
   implicit none
@@ -59,9 +65,7 @@ subroutine enprgl
 
   write (*, 910) frad, circ, freq0, t0, alfa,                       &
        eta, gamtr, currnt, bunch, parnum, en0, gamma, beta
-
-
-
+   
 910 format(' '/' Global parameters for the machine: ',//,             &
        'radiate = ',l1,':'/' '/                                          &
        t6,'C',t16,f14.6,' m',t46,'f0',t56,f14.6,' MHz',                  &
@@ -104,7 +108,7 @@ subroutine cavprt()
 end subroutine cavprt
 
 ! *********************************************************************
-subroutine twclog(bxbar, bybar, const)
+subroutine twclog(bxbar, bybar,dxbar,dybar, const)
   use ibsdbfi
   use physconsfi
   implicit none
@@ -124,7 +128,7 @@ subroutine twclog(bxbar, bybar, const)
   !----------------------------------------------------------------------*
   logical fbch
   integer n
-  double precision get_value,bgam,bxbar,bybar,cbunch,const,coulog,  &
+  double precision get_value,bgam,bxbar,bybar,dxbar,dybar,cbunch,const,coulog,  &
        debyel,densty,etrans,pnbtot,qion,rmax,rmin,rmincl,rminqm,sigtcm,  &
        sigxcm,sigycm,tempev,vol,pi,get_variable,zero,two,four,eight,ot2, &
        ft8,ot5,ttm3,fac1,fac2
@@ -132,12 +136,11 @@ subroutine twclog(bxbar, bybar, const)
        ot5=1d5,ttm3=2d-3,fac1=743.4d0,fac2=1.44d-7)
 
   pi=get_variable('pi ')
+  
   ! **************************** DB *********************
   n = get_value('probe ', 'bunched ')
   fbch = n.ne.0
   ! *****************************************************
-
-
 
   !---- Calculate transverse temperature as 2*P*X',
   !     i.e., assume the transverse energy is temperature/2.
@@ -146,8 +149,9 @@ subroutine twclog(bxbar, bybar, const)
   tempev = two * etrans
 
   !---- Calculate beam volume to get density (in cm**-3).
-  sigxcm = ot2 * sqrt(ex * bxbar)
-  sigycm = ot2 * sqrt(ey * bybar)
+
+  sigxcm = ot2 * sqrt(ex * bxbar + (dxbar * sige)**2)
+  sigycm = ot2 * sqrt(ey * bybar + (dybar * sige)**2)
   sigtcm = ot2 * sigt
   if (fbch) then
      vol    = eight * sqrt(pi**3) * sigxcm * sigycm * sigtcm
@@ -299,7 +303,15 @@ subroutine ibs
   alfa     = get_value('probe ', 'alfa ')
   freq0    = get_value('probe ', 'freq0 ')
   bunch   = get_value('probe ', 'kbunch ')
-
+  
+  ! NOTE:
+  !****************************************************************
+  ! Sige is the dE/E. dp/p needed as input for the IBS calculations
+  ! dp/p= (dE/E)/beta**2
+  !*****************************************************************
+  sige    = sige/beta/beta
+  print *, 'sige ', sige
+  
   !  ****************** Test print ********
   !     print *, 'Charge ', charge
   !     print *, 'gammas ', gammas
@@ -322,8 +334,6 @@ subroutine ibs
   !     print *, 'freq0 ', freq0
   !     print *, 'kbunch ', bunch
   ! ***************************************
-
-
 
   !---- Initialize variables to accumulate weighted average lifetimes.
   tavlc  = zero
@@ -389,14 +399,22 @@ subroutine ibs
   enddo
   103 continue
   
-  !  Added 16.01.2012 to check if the twiss is taken at the center or the exit of the elements
+  ! NOTE by F.A & F.Z
+  ! ************************************************************************************
+  ! Added 16.01.2012 to check if the twiss is taken at the center (testtype=2) or the 
+  ! exit (testtype=1) of the elements.
+  ! I testtype=1 linear interpolation will be used to 
+  ! calculate the twiss at the center of the elements.
+  !*************************************************************************************
+  
   if ((ss2-s1) .eq. ll2) then
 	testtype = 1
+	print *, 'Twiss was calculated at the exit of the elements. Twiss functions at the center &
+		  of the elements are calculated through linear interpolation'
   else if ((ss2-s1) .eq. (l1+ll2)/2) then
 	testtype = 2
+	print *, 'Twiss was calculated at the center of the elements. No interpolation is used'
   endif
-
-!  print *, 'testtype: ', testtype
 
   ! ************** Check if "ibs_table" required  ****************
 
@@ -428,6 +446,13 @@ subroutine ibs
      flag = double_from_table('twiss ', 'dpy ', i, dpy2)
      if (flag .ne. 0)  goto 102
 
+    
+    !  NOTE by F.A & F.Z
+    ! ************************************************************************************
+    ! Dispersion and Dispersion prime is multiplied by beta, in order to be in the deltap 
+    ! and not the pt frame. This correction is necessary for non-relativistic beams
+    !*************************************************************************************
+	
      if (testtype .eq. 1) then
 	dels = s2-s1
 	sdum = half * (s2 + s1)
@@ -435,10 +460,10 @@ subroutine ibs
 	betay  = half * (by2 + by1)
 	alx    = half * (ax2 + ax1)
 	aly    = half * (ay2 + ay1)
-	dx     = half * (dx2 + dx1)
-	dpx    = half * (dpx2 + dpx1)
-	dy     = half * (dy2 + dy1)
-	dpy    = half * (dpy2 + dpy1)
+	dx     = beta * half * (dx2 + dx1)
+	dpx    = beta * half * (dpx2 + dpx1)
+	dy     = beta * half * (dy2 + dy1)
+	dpy    = beta * half * (dpy2 + dpy1)
 
      else if (testtype .eq. 2) then
 	dels = l2
@@ -447,10 +472,10 @@ subroutine ibs
 	betay  = by2
 	alx    = ax2
 	aly    = ay2
-	dx     = dx2
-	dpx    = dpx2
-	dy     = dy2
-	dpy    = dpy2
+	dx     = beta * dx2
+	dpx    = beta * dpx2
+	dy     = beta * dy2
+	dpy    = beta * dpy2
     endif
 
 	sbxb   = sbxb + betax * dels
@@ -564,8 +589,8 @@ subroutine ibs
   endif
   ! ********** Compute beam sizes with average betas ************
 
-  sigx = sqrt(ex * bxbar)
-  sigy = sqrt(ey * bybar)
+  sigx = sqrt(ex * bxbar + (dx * sige)**2)
+  sigy = sqrt(ey * bybar + (dy * sige)**2)
 
   call enprgl
   call enprem
@@ -581,7 +606,7 @@ subroutine ibs
        dywtd,dpywtd,txwtd,tywtd,tlwtd)
 
   !---- Calculate the Coulomb logarithm.
-  call twclog(bxbar, bybar, const)
+  call twclog(bxbar, bybar, dxbar, dybar, const)
 
   !---- Output (weighted) average values.
   write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar,        &
