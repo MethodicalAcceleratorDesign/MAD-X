@@ -118,7 +118,6 @@ char* survey_table_cols[] =
   " "  /* blank terminates */
 };
 
-
 int efield_table_types[] =
 {
   3, 2, 2, 2, 2,
@@ -132,7 +131,16 @@ int efield_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
-  2, 2
+  2, 2,
+  /* AL: RF-multipolar error */
+  2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2
 };
 
 char* efield_table_cols[] =
@@ -150,6 +158,17 @@ char* efield_table_cols[] =
   "dx", "dy", "ds", "dphi", "dtheta",
   "dpsi", "mrex", "mrey", "mredx", "mredy",
   "arex", "arey", "mscalx", "mscaly",
+  /* AL: RF-multipolar errors */
+  "freq", "harmon", "lag",
+  "p0l", "p0sl", "p1l", "p1sl",
+  "p2l", "p2sl", "p3l", "p3sl", "p4l",
+  "p4sl", "p5l", "p5sl", "p6l", "p6sl",
+  "p7l", "p7sl", "p8l", "p8sl", "p9l",
+  "p9sl", "p10l", "p10sl", "p11l", "p11sl",
+  "p12l", "p12sl", "p13l", "p13sl", "p14l",
+  "p14sl", "p15l", "p15sl", "p16l", "p16sl",
+  "p17l", "p17sl", "p18l", "p18sl", "p19l",
+  "p19sl", "p20l", "p20sl",
   " "  /* blank terminates */
 };
 

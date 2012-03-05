@@ -589,7 +589,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
        500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
-       330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
+       330, 500, 350, 360, 370,500,500,400,410,420, 500, 500, 500), code
   !
   !---- Make sure that nothing is execute if element is not known
   go to 500
@@ -695,6 +695,10 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 410 continue
   call ttvacdip(track,ktrack,turn)
   go to 500
+420 continue
+  call ttrfmult(track,ktrack,dxt,dyt,turn)
+  go to 500
+  !---- Solenoid.
 
 
 500 continue
@@ -3292,3 +3296,317 @@ subroutine trclor(orbit0)
   print '(''orbit: '', 1p,6e14.6)', orbit0
 
 end subroutine trclor
+
+subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
+
+  use twtrrfi
+  use name_lenfi
+  use trackfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !    Track particle through a general thin multipole.                  *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) Number of surviving tracks.                    *
+  !   dxt       (double)  local buffer                                   *
+  !   dyt       (double)  local buffer                                   *
+  !----------------------------------------------------------------------*
+  logical first
+  integer iord,jtrk,nd,nord,ktrack,j,n_ferr,nn,ns,node_fd_errors,   &
+       get_option,turn,noisemax,nn1,in
+  double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
+       pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
+       f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
+       ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
+       skew(0:maxmul),bvk,node_value,zero,one,two,three,half,ttt,        &
+       npeak(100), nlag(100), ntune(100), temp,noise
+
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
+  character(name_len) aptype
+
+  save first,ordinv
+  data first / .true. /
+
+ !--- AL: RF-multipole
+   double precision freq, volt, lag, harmon
+   double precision pnl(0:maxmul), psl(0:maxmul)
+   double precision krf, tmp1, tmp2
+   integer npn, nps
+   double precision twopi, clight
+   parameter ( twopi = 2.*3.14159265358979d0 )
+   parameter ( clight = 299792458d0 )
+    
+   freq = node_value('freq ');
+   volt = node_value('volt ');
+   lag = node_value('lag ');
+   harmon = node_value('harmon ');
+   call get_node_vector('pnl ', npn, pnl);
+   call get_node_vector('psl ', nps, psl);
+   krf = twopi*freq*1d6/clight;
+
+  !---- Precompute reciprocals of orders.
+  if (first) then
+     do iord = 1, maxmul
+        ordinv(iord) = one / float(iord)
+     enddo
+     first = .false.
+  endif
+  call dzero(f_errors, maxferr+1)
+  n_ferr = node_fd_errors(f_errors)
+  bvk = node_value('other_bv ')
+  !---- Multipole length for radiation.
+  elrad = node_value('lrad ')
+  noise = node_value('noise ')
+  !---- Multipole components.
+  call dzero(normal,maxmul+1)
+  call dzero(skew,maxmul+1)
+  call get_node_vector('knl ',nn,normal)
+  call get_node_vector('ksl ',ns,skew)
+  nd = 2 * max(nn, ns)
+  call dzero(vals,2*(maxmul+1))
+
+  if(noise .eq. 1)   then
+     nn1=name_len
+     noisemax = node_value('noisemax ')
+     call dzero(npeak,noisemax)
+     call dzero(ntune,noisemax)
+     call dzero(nlag,noisemax)
+     call get_node_vector('npeak ',nn1,npeak)
+     call get_node_vector('ntune ',nn1,ntune)
+     call get_node_vector('nlag ',nn1,nlag)
+
+     temp = 0
+     do in = 1, noisemax
+        temp = temp + npeak(in) * sin(nlag(in) + ntune(in) * turn)
+     enddo
+
+
+     !   temp = npeak * sin(nlag + ntune * turn)
+     do iord = 0, nn
+        vals(1,iord) = normal(iord) * (1+temp)
+     enddo
+     do iord = 0, ns
+        vals(2,iord) = skew(iord) * (1+temp)
+     enddo
+  else
+     do iord = 0, nn
+        vals(1,iord) = normal(iord)
+     enddo
+     do iord = 0, ns
+        vals(2,iord) = skew(iord)
+     enddo
+  endif
+
+  !  do iord = 0, nn
+  !     vals(1,iord) = normal(iord)
+  !  enddo
+  !  do iord = 0, ns
+  !     vals(2,iord) = skew(iord)
+  !  enddo
+  !---- Field error vals.
+  call dzero(field,2*(maxmul+1))
+  if (n_ferr .gt. 0) then
+     call dcopy(f_errors,field,n_ferr)
+  endif
+  !-----added FrankS, 10-12-2008
+  nd = 2 * max(nn, ns, n_ferr/2-1)
+  !---- Dipole error.
+  !      dbr = bvk * field(1,0) / (one + deltas)
+  !      dbi = bvk * field(2,0) / (one + deltas)
+  dbr = bvk * field(1,0)
+  dbi = bvk * field(2,0)
+  !---- Nominal dipole strength.
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
+  dipr = bvk * vals(1,0)
+  dipi = bvk * vals(2,0)
+  !---- Other components and errors.
+  nord = 0
+  do iord = 1, nd/2
+     do j = 1, 2
+        !          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
+        !     / (one + deltas)
+        field(j,iord) = bvk * (vals(j,iord) + field(j,iord))
+        if (field(j,iord) .ne. zero)  nord = iord
+     enddo
+  enddo
+  !---- Pure dipole: only quadrupole kicks according to lrad.
+  if (nord .eq. 0) then
+     do jtrk = 1,ktrack
+        dxt(jtrk) = zero
+        dyt(jtrk) = zero
+     enddo
+     !----------- introduction of dipole focusing
+     if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
+        do jtrk = 1,ktrack
+           ! AL: RF-Mulitpole
+           tmp1 = dipr;
+           tmp2 = dipi;
+           if (0 .lt. npn) then
+              tmp1 = tmp1 * cos((lag + pnl(0)) * twopi - krf * track(5,jtrk));
+           endif
+           if (0 .lt. nps) then
+              tmp2 = tmp2 * cos((lag + psl(0)) * twopi - krf * track(5,jtrk));
+           endif
+           dxt(jtrk) =  tmp1*tmp1*track(1,jtrk)/elrad
+           dyt(jtrk) =  tmp2*tmp2*track(3,jtrk)/elrad
+        enddo
+     endif
+     !---- Accumulate multipole kick from highest multipole to quadrupole.
+  else
+     do jtrk = 1,ktrack
+       ! AL: RF-Mulitpole
+        tmp1 = field(1,nord)
+        tmp2 = field(2,nord)
+        if (nord .lt. npn) then
+          tmp1 = tmp1 * cos((lag + pnl(nord)) * twopi - krf * track(5,jtrk));
+        endif
+        if (nord .lt. nps) then
+          tmp2 = tmp2 * cos((lag + psl(nord)) * twopi - krf * track(5,jtrk));
+        endif 
+        dxt(jtrk) = tmp1*track(1,jtrk) - tmp2*track(3,jtrk)
+        dyt(jtrk) = tmp1*track(3,jtrk) + tmp2*track(1,jtrk)
+     enddo
+
+     do iord = nord - 1, 1, -1
+        do jtrk = 1,ktrack
+           ! AL: RF-Mulitpole
+           tmp1 = field(1,iord)
+           tmp2 = field(2,iord)
+           if (iord .lt. npn) then
+              tmp1 = tmp1 * cos((lag + pnl(iord)) * twopi - krf * track(5,jtrk));
+           endif
+           if (iord .lt. nps) then
+              tmp2 = tmp2 * cos((lag + psl(iord)) * twopi - krf * track(5,jtrk));
+           endif
+           dx = dxt(jtrk)*ordinv(iord+1) + tmp1
+           dy = dyt(jtrk)*ordinv(iord+1) + tmp2
+           dxt(jtrk) = dx*track(1,jtrk) - dy*track(3,jtrk)
+           dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
+        enddo
+     enddo
+     !        do jtrk = 1,ktrack
+     !          dxt(jtrk) = dxt(jtrk) / (one + deltas)
+     !          dyt(jtrk) = dyt(jtrk) / (one + deltas)
+     !        enddo
+     if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
+        do jtrk = 1,ktrack
+           tmp1 = dipr;
+           tmp2 = dipi;
+           if (0 .lt. npn) then
+              tmp1 = tmp1 * cos((lag + pnl(0)) * twopi - krf * track(5,jtrk));
+           endif
+           if (0 .lt. nps) then
+              tmp2 = tmp2 * cos((lag + psl(0)) * twopi - krf * track(5,jtrk));
+           endif
+           dxt(jtrk) = dxt(jtrk) + tmp1*tmp1*track(1,jtrk)/elrad
+           dyt(jtrk) = dyt(jtrk) + tmp2*tmp2*track(3,jtrk)/elrad
+        enddo
+     endif
+  endif
+
+  !---- Radiation loss at entrance.
+  if (dorad .and. elrad .ne. 0) then
+     const = arad * gammas**3 / three
+
+     !---- Full damping.
+     if (dodamp) then
+        do jtrk = 1,ktrack
+           curv = sqrt((dipr + dxt(jtrk))**2 +                         &
+                (dipi + dyt(jtrk))**2) / elrad
+
+           if (dorand) then
+              call trphot(elrad,curv,rfac,deltas)
+           else
+              rfac = const * curv**2 * elrad
+           endif
+
+           px = track(2,jtrk)
+           py = track(4,jtrk)
+           pt = track(6,jtrk)
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
+        enddo
+
+        !---- Energy loss like for closed orbit.
+     else
+
+        !---- Store energy loss on closed orbit.
+        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
+        rpx1 = rfac * (one + track(6,1)) * track(2,1)
+        rpy1 = rfac * (one + track(6,1)) * track(4,1)
+        rpt1 = rfac * (one + track(6,1)) ** 2
+
+        do jtrk = 1,ktrack
+           track(2,jtrk) = track(2,jtrk) - rpx1
+           track(4,jtrk) = track(4,jtrk) - rpy1
+           track(6,jtrk) = track(6,jtrk) - rpt1
+        enddo
+
+     endif
+  endif
+
+  !---- Apply multipole effect including dipole.
+  do jtrk = 1,ktrack
+     !       Added for correct Ripken implementation of formulae
+     ttt = sqrt(one+two*track(6,jtrk)*bet0i+track(6,jtrk)**2)
+     !        track(2,jtrk) = track(2,jtrk) -                                 &
+     !     (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
+     !        track(4,jtrk) = track(4,jtrk) +                                 &
+     !     (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
+     !        track(5,jtrk) = track(5,jtrk)                                   &
+     !     - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
+     track(2,jtrk) = track(2,jtrk) -                                 &
+          (dbr + dxt(jtrk) - dipr * (ttt - one))
+     track(4,jtrk) = track(4,jtrk) +                                 &
+          (dbi + dyt(jtrk) - dipi * (ttt - one))
+     track(5,jtrk) = track(5,jtrk) -                                 &
+          (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                       &
+          ((one + bet0*track(6,jtrk))/ttt)*bet0i
+  enddo
+
+  !---- Radiation loss at exit.
+  if (dorad .and. elrad .ne. 0) then
+
+     !---- Full damping.
+     if (dodamp) then
+        do jtrk = 1,ktrack
+           curv = sqrt((dipr + dxt(jtrk))**2 +                         &
+                (dipi + dyt(jtrk))**2) / elrad
+
+           if (dorand) then
+              call trphot(elrad,curv,rfac,deltas)
+           else
+              rfac = const * curv**2 * elrad
+           endif
+
+           px = track(2,jtrk)
+           py = track(4,jtrk)
+           pt = track(6,jtrk)
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
+        enddo
+
+        !---- Energy loss like for closed orbit.
+     else
+
+        !---- Store energy loss on closed orbit.
+        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
+        rpx2 = rfac * (one + track(6,1)) * track(2,1)
+        rpy2 = rfac * (one + track(6,1)) * track(4,1)
+        rpt2 = rfac * (one + track(6,1)) ** 2
+
+        do jtrk = 1,ktrack
+           track(2,jtrk) = track(2,jtrk) - rpx2
+           track(4,jtrk) = track(4,jtrk) - rpy2
+           track(6,jtrk) = track(6,jtrk) - rpt2
+        enddo
+     endif
+  endif
+
+
+end subroutine ttrfmult

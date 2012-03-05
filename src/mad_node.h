@@ -46,6 +46,13 @@ struct node                /* the sequence is a linked list of nodes */
   struct constraint_list* cl; /* pointer to constraint list during match */
   struct double_array* obs_orbit; /* for track observation point */
   struct double_array* orbit_ref; /* for threader orbit + cum. matrix */
+  /* RF-Multipole errors (EFCOMP) */
+  struct double_array* p_ph_err; /* pointer to rf-multipole phase error array AL: */
+  /* RF-Multipoles */
+  double volt; /* volt of the main rf-multipole field  AL: */
+  double freq; /* frequency of the rf-multipole fields  AL: */
+  int harmon; /* harmonic number of the rf-multipole fields  AL: */
+  double lag; /* lag of the rf-multipole fields  AL: */
 };
 
 struct node_list /* contains list of node pointers sorted by name */

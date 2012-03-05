@@ -2007,7 +2007,7 @@ char command_def[] =
 "lagerr   = [r, 0],  "
 "nbin     = [i, 0],  "
 "binmax   = [r, 0],  "
-"magnet   = [i, 0],  "
+"magnet   = [i, 1],  " /* AL: Crab-cavity turned into a magnet, to allow EFCOMP attach its errors */
 "slice    = [i, 1],  "
 "lfile    = [s, none, lfile],  "
 "tfile    = [s, none, tfile], "
@@ -2190,7 +2190,50 @@ char command_def[] =
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
 "n_bessel        = [i, 0]; "
-" "  
+" "
+"rfmultipole: element none 0 42 "
+"at       = [r, 1.e20], "
+"l        = [r, 0], "
+"kmax     = [r, 0], "
+"kmin     = [r, 0], "
+"calib    = [r, 0], "
+"polarity = [r, 0], "
+"noise     = [r, 0], "
+"noisemax    = [i, 1],  "
+"npeak     = [r, {0}], "
+"ntune     = [r, {0}], "
+"nlag     = [r, {0}], "
+"tilt     = [r, 0],  "
+"lrad     = [r, 0], "
+"knl      = [r, {0}], "
+"ksl      = [r, {0}], "
+"apertype = [s, circle, circle], "
+"aperture = [r, {0}],  "
+"aper_offset = [r, {0}], "
+"aper_tol = [r, {0, 0, 0}], "
+"slice    = [i, 1],  "
+"slot_id  = [i, none], "
+"assembly_id = [i, none], "
+"mech_sep = [r, 0], "
+"v_pos = [r, 0], "
+"magnet   = [i, 1],  "
+"model           = [i, -1], "
+"method          = [i, -1], "
+"exact           = [i, -1, 1], "
+"nst             = [i, -1], "
+"from     = [s, none], "
+"type     = [s, none, none], "
+"permfringe      = [l, false, true], "
+"bend_fringe     = [l, false, true], "
+"kill_ent_fringe = [l, false, true], "
+"kill_exi_fringe = [l, false, true], "
+"freq     = [r, 0],  " // RF-Multipole
+"volt     = [r, 0],  " // RF-Multipole
+"lag      = [r, 0],  " // RF-Multipole
+"harmon   = [i, 0],  " // RF-Multipole
+"pnl      = [r, {0}], " // RF-Multipole
+"psl      = [r, {0}]; " // RF-Multipole
+" "
 "emit: emit none 0 0 "
 "deltap   = [r, 0], "
 "tol      = [r, 1.000001, 0]; "
@@ -2234,7 +2277,12 @@ char command_def[] =
 "dkn      = [r, {0}], "
 "dks      = [r, {0}], "
 "dknr     = [r, {0}], "
-"dksr     = [r, {0}]; "
+"dksr     = [r, {0}], "
+"freq     = [r, 0], "   /* AL: frequency of the RF-multipoles main mode */
+"harmon   = [i, 0], "   /* AL: harmonic number of the RF-multipoles main mode */
+"lag      = [r, 0], "   /* AL: lag for the RF-multipoles main mode */
+"dpn      = [r, {0}], " /* AL: abssolute phase of the normal components of the multipole */
+"dps      = [r, {0}], " /* AL: absolute phase of the skew components of the multipole */
 " "
 "sddsin: sdds none 0 0 "
 "table    = [s, none, none], "

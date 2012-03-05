@@ -10,6 +10,7 @@
 #define ALIGN_MAX 14        /* alignment error array length */
 #define EFIELD_TAB 42       /* field error array length for ESAVE table */
 #define FIELD_MAX 42        /* field error array length */
+#define RFPHASE_MAX 42      /* rf-phase error array length */
 #define SEQ_DUMP_LEVEL 0    /* chooses amount of dumped output */
 #define NAME_L 48           /* internal name length */
 #define TITLE_SIZE 114      /* Size of the title for gnuplot ploting in tracking mode */

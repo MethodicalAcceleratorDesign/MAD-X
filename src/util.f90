@@ -1223,7 +1223,7 @@ end subroutine dcopy
 subroutine dzero(vector,n)
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
-  !   Copy an array.                                                     *
+  !   Zero an array.                                                     *
   ! Input:                                                               *
   !   n      (integer) array length.                                     *
   ! Input/output:                                                        *

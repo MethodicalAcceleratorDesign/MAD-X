@@ -61,7 +61,17 @@ clone_node(struct node* p, int flag)
   {
     clone->p_al_err = p->p_al_err;
     clone->p_fd_err = p->p_fd_err;
+    // AL: RF-Multipole errors (EFCOMP)
+    clone->p_ph_err = p->p_ph_err;
   }
+  // AL: RF-Multipole
+  //clone->pnl = p->pnl;
+  //clone->psl = p->psl;
+  clone->lag = p->lag;
+  clone->freq = p->freq;
+  clone->volt = p->volt;
+  clone->harmon = p->harmon;
+  //  
   return clone;
 }
 
@@ -75,6 +85,12 @@ delete_node(struct node* p)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", p->name);
   if (p->p_al_err) p->p_al_err = delete_double_array(p->p_al_err);
   if (p->p_fd_err) p->p_fd_err = delete_double_array(p->p_fd_err);
+  // AL: RF-Multipole errors (EFCOMP)
+  if (p->p_ph_err) p->p_ph_err = delete_double_array(p->p_ph_err);
+  // AL: RF-Multipole
+  // if (p->pnl) p->pnl = delete_double_array(p->pnl);
+  // if (p->psl) p->psl = delete_double_array(p->psl);
+  //
   myfree(rout_name, p);
   return NULL;
 }
@@ -237,6 +253,12 @@ node_value(char* par)
   else if (strcmp(lpar, "enable") == 0) value = current_node->enable;
   else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
   else if (strcmp(lpar, "pass_flag") == 0) value = current_node->pass_flag;
+/* AL: added by A. Latina 16 Feb 2012 */
+  else if (strcmp(lpar, "freq") == 0) value = current_node->freq;
+  else if (strcmp(lpar, "volt") == 0) value = current_node->volt;
+  else if (strcmp(lpar, "lag") == 0) value = current_node->lag;
+  else if (strcmp(lpar, "harmon") == 0) value = current_node->harmon;
+//
   else value =  element_value(current_node, lpar);
   return value;
 }
@@ -346,6 +368,13 @@ store_node_value(char* par, double* value)
   else if (strcmp(lpar, "hgap") == 0) store_comm_par_value("hgap",*value,el->def);
   else if (strcmp(lpar, "pass_flag") == 0) current_node->pass_flag = *value;
 
+  /* AL: added by A. Latina 16 Feb 2012 */
+
+  else if (strcmp(lpar, "freq") == 0) store_comm_par_value("freq", *value, el->def);
+  else if (strcmp(lpar, "volt") == 0) store_comm_par_value("volt", *value, el->def);
+  else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag", *value, el->def);
+  else if (strcmp(lpar, "harmon") == 0) store_comm_par_value("harmon", *value, el->def);
+  
   /* end of additions */
 }
 
