@@ -3559,13 +3559,24 @@ subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
      !     (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
      !        track(5,jtrk) = track(5,jtrk)                                   &
      !     - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
-     track(2,jtrk) = track(2,jtrk) -                                 &
-          (dbr + dxt(jtrk) - dipr * (ttt - one))
-     track(4,jtrk) = track(4,jtrk) +                                 &
-          (dbi + dyt(jtrk) - dipi * (ttt - one))
-     track(5,jtrk) = track(5,jtrk) -                                 &
-          (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                       &
-          ((one + bet0*track(6,jtrk))/ttt)*bet0i
+     if (0 .lt. npn) then
+        tmp1 = cos((lag + pnl(0)) * twopi - krf * track(5,jtrk));
+     else
+        tmp1 = 1.0;
+     endif
+     if (0 .lt. nps) then
+        tmp2 = cos((lag + psl(0)) * twopi - krf * track(5,jtrk));
+     else
+        tmp2 = 1.0;
+     endif
+          
+     track(2,jtrk) = track(2,jtrk) - ((dbr - dipr * (ttt - one)) * tmp1 + &
+        dxt(jtrk))
+     track(4,jtrk) = track(4,jtrk) + ((dbi - dipi * (ttt - one)) * tmp2 + &
+        dyt(jtrk))
+     track(5,jtrk) = track(5,jtrk) - &
+        (dipr*tmp1*track(1,jtrk) - dipi*tmp2*track(3,jtrk)) * &
+        ((one + bet0*track(6,jtrk))/ttt)*bet0i
   enddo
 
   !---- Radiation loss at exit.
@@ -3574,8 +3585,21 @@ subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
      !---- Full damping.
      if (dodamp) then
         do jtrk = 1,ktrack
-           curv = sqrt((dipr + dxt(jtrk))**2 +                         &
-                (dipi + dyt(jtrk))**2) / elrad
+           
+           if (0 .lt. npn) then
+              tmp1 = cos((lag + pnl(0)) * twopi - krf * track(5,jtrk));
+           else
+              tmp1 = 1.0;
+           endif
+           if (0 .lt. nps) then
+              tmp2 = cos((lag + psl(0)) * twopi - krf * track(5,jtrk));
+           else
+              tmp2 = 1.0;
+           endif
+           
+           curv = sqrt( &
+                (dipr*tmp1 + dxt(jtrk))**2 +                         &
+                (dipi*tmp2 + dyt(jtrk))**2) / elrad
 
            if (dorand) then
               call trphot(elrad,curv,rfac,deltas)
@@ -3594,8 +3618,20 @@ subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
         !---- Energy loss like for closed orbit.
      else
 
+        if (0 .lt. npn) then
+           tmp1 = cos((lag + pnl(0)) * twopi - krf * track(5,jtrk));
+        else
+           tmp1 = 1.0;
+        endif
+        if (0 .lt. nps) then
+           tmp2 = cos((lag + psl(0)) * twopi - krf * track(5,jtrk));
+        else
+           tmp2 = 1.0;
+        endif
+        
         !---- Store energy loss on closed orbit.
-        rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
+        rfac = const * ((dipr*tmp1 + dxt(1))**2 + &
+                        (dipi*tmp2 + dyt(1))**2)
         rpx2 = rfac * (one + track(6,1)) * track(2,1)
         rpy2 = rfac * (one + track(6,1)) * track(4,1)
         rpt2 = rfac * (one + track(6,1)) ** 2
