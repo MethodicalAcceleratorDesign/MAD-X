@@ -1915,7 +1915,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %ld\n",(long int)twiss_table);
+            printf("TWISS table: %p\n",twiss_table);
          }
        }
        pps = -1;
@@ -1952,7 +1952,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %ld\n",(long int)twiss_table);
+            printf("TWISS table: %p\n",twiss_table);
          }
        }
        ppt = -1;
@@ -1961,14 +1961,14 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
 
 
        if (get_option("debug")) {
-            printf("The tables are: %ld %ld %ld %ld\n",
-                   (long int) orbin_table,(long int)twiss_table,(long int)target_table,(long int)model_table);
+            printf("The tables are: %p %p %p %p\n",
+                   orbin_table,twiss_table,target_table,model_table);
        }
        if (get_option("debug")) {
        }
 
   if(correct_orbit == NULL) {
-    correct_orbit = (struct orb_cor*)mycalloc("pro_correct_gettables",1, sizeof(struct orb_cor));
+    correct_orbit = mycalloc("pro_correct_gettables",1, sizeof(struct orb_cor));
   }
        if (get_option("debug")) {
            printf("-0-\n");
@@ -2891,10 +2891,10 @@ pro_correct2_fill_corr_table(int b, int ip ,char *name, double old, double new)
 
   int j;
   
-  long longB = b;
-  
   if((b != 1) && (b != 0)) {
-      fatal_error("Invalid beam requested:",(char *) longB);
+      char buf[256];
+      snprintf(buf, sizeof buf, "%d", b);
+      fatal_error("Invalid beam requested:", buf);
   }
 
   if(b == 0) cor =  corr_table1;
