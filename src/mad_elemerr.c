@@ -1,4 +1,4 @@
-#include <strings.h>
+#include <string.h>
 #include "madx.h"
 
 static int
