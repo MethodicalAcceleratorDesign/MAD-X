@@ -575,7 +575,7 @@ makestdmatchfile(char* fname, char* matchactioncommand)
   FILE* f = 0x0;
   struct madx_mpk_variable*      v = 0x0;
   int  i;
-  unsigned int anumber = abs(time(0x0)*rand());
+  unsigned int anumber = abs(time(0)*rand());
   double lower, upper;
 
   if (debuglevel)  printf("I am in makestdmatchfile, file name is >%s<\n", fname);
@@ -584,7 +584,7 @@ makestdmatchfile(char* fname, char* matchactioncommand)
   {/*repeat until generate unique file name*/
     if (fname[0] == 0)
     { /*if string is empty*/
-      sprintf(fname,"/tmp/match_ptcknobs_%d.madx",anumber);
+      sprintf(fname,"/tmp/match_ptcknobs_%u.madx",anumber);
     }
     f = fopen(fname,"w");
     if (f == 0x0)
