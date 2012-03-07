@@ -26,7 +26,7 @@ int   zero_string(char* string);  /* returns 1 if string defaults to '0', else 0
 char* buffer(char* string);       /* obsolete, replaced by permbuff */
 char* permbuff(char* string);     /* copy string to permanent buffer */
 char* tmpbuff(char* string);      /* copy string to temporary allocated buffer */
-int   compare_no_case(char* string_1, char* string_2);
+// int   compare_no_case(char* string_1, char* string_2); // replaced by string_icmp
 int   is_token(char* pb, char* string, int slen);
 char* join(char** it_list, int n);
 char* join_b(char** it_list, int n);
@@ -98,6 +98,18 @@ stoupper(char* s)  /* converts string to upper in place */
     s[j] = toupper(c);
   }
   return s;
+}
+
+static inline int
+string_icmp(const char* s1, const char *s2)  /* case insitive string compare */
+{
+  int j;
+  for (j = 0; s1[j] && s2[j]; j++) {
+    unsigned char c1 = s1[j], c2 = s2[j];
+    int ic1 = tolower(c1), ic2 = tolower(c2);
+    if (c1 != c2) return c2-c1;
+  }
+  return s2[j]-s1[j];
 }
 
 static inline int

@@ -1293,8 +1293,7 @@ headvalue(char* table_name, char* par, double* value)
       for (i = 0; i < tab->header->curr; i++)
       {
         strcpy(aux_buff->c, &tab->header->p[i][1]);
-        if ((tp =strtok(aux_buff->c, " \"\n")) &&
-            compare_no_case(tp, lpar) == 0)
+        if ((tp =strtok(aux_buff->c, " \"\n")) && string_icmp(tp, lpar) == 0)
         {
           if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
           {

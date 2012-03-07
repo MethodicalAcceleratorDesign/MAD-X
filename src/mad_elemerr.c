@@ -1,4 +1,3 @@
-#include <string.h>
 #include "madx.h"
 
 static int
@@ -6,7 +5,7 @@ find_index_in_table(char *cols[], const char *name )
 {
   int ret = -1; // returns -1 if not found
   for (int i = 0; strcmp(cols[i], " ") != 0; i++) {
-    if (strcasecmp(cols[i], name) == 0) {
+    if (string_icmp(cols[i], name) == 0) {
       ret = i;
       break;
     }

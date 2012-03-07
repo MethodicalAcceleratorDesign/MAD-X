@@ -268,6 +268,7 @@ zero_string(char* string) /* returns 1 if string defaults to '0', else 0 */
   return 1;
 }
 
+#if 0 // veryyyy slloowww, replaced by string_icmp
 int
 compare_no_case(char* string_1, char* string_2)
 /* like strcmp, but ignoring case */
@@ -282,6 +283,7 @@ compare_no_case(char* string_1, char* string_2)
   myfree(rout_name, s1); myfree(rout_name, s2);
   return ret;
 }
+#endif
 
 int
 is_token(char* pb, char* string, int slen)
