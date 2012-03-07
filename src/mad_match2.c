@@ -653,7 +653,7 @@ match2_constraint(struct in_cmd* cmd)
     }
   }
 
-  /*the ckeck if "expr" is present should be here? /skowron/*/
+  /* the ckeck if "expr" is present should be here? /skowron/ */
   if (exprfound == 0)
   {
     match2_disasambleconstraint(cmd);
