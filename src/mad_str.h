@@ -107,7 +107,7 @@ string_icmp(const char* s1, const char *s2)  /* case insitive string compare */
   for (j = 0; s1[j] && s2[j]; j++) {
     unsigned char c1 = s1[j], c2 = s2[j];
     int ic1 = tolower(c1), ic2 = tolower(c2);
-    if (c1 != c2) return c2-c1;
+    if (ic1 != ic2) return ic2-ic1;
   }
   return s2[j]-s1[j];
 }
