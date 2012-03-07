@@ -1148,22 +1148,22 @@ collim_at_shift(int slices,int slice_no)
 static double
 teapot_q_shift(int slices,int slice_no)
 {
-  return 1./slices;
   (void)slice_no;
+  return 1./slices;
 }
 
 static double
 simple_q_shift(int slices,int slice_no)
 {
-  return 1./slices;
   (void)slice_no;
+  return 1./slices;
 }
 
 static double
 collim_q_shift(int slices,int slice_no)
 { /* pointless actually, but it pleases symmetrically */
-  return 1./slices;
   (void)slice_no;
+  return 1./slices;
 }
 
 
