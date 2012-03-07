@@ -2145,7 +2145,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
        310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 420), code
+       310, 310), code  ! Disable RF-Multipole
+  !     310, 420), code  ! Enable RF-Multipole 
 
   !---- Drift space, monitor, collimator, or beam instrument.
 10 continue

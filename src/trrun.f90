@@ -589,7 +589,9 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
        500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
-       330, 500, 350, 360, 370,500,500,400,410,420, 500, 500, 500), code
+       330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
+  ! Use this line to enable RF-Multipole
+  !     330, 500, 350, 360, 370,500,500,400,410,420, 500, 500, 500), code
   !
   !---- Make sure that nothing is execute if element is not known
   go to 500
