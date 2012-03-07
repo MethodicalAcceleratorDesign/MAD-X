@@ -2892,8 +2892,8 @@ pro_correct2_fill_corr_table(int b, int ip ,char *name, double old, double new)
   int j;
   
   if((b != 1) && (b != 0)) {
-      char buf[256];
-      snprintf(buf, sizeof buf, "%d", b);
+      char buf[64];
+      sprintf(buf, sizeof buf, "%d", b);
       fatal_error("Invalid beam requested:", buf);
   }
 
