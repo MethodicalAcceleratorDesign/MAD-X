@@ -1,9 +1,7 @@
 #ifndef MAD_PORT_H
 #define MAD_PORT_H
 
-#ifdef _WIN32
-typedef size_t uintptr_t;
-#else
+#ifndef _WIN32
 #include <stdint.h>
 #endif
 
