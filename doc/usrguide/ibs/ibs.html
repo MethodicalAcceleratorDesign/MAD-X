@@ -178,7 +178,16 @@ If FILE="file_name" appears MAD-X produces a table and writes on a
 file for each element of the machine: ELEMENT NAME, Position S [m],
 DELS [m] (Length Difference of consecutive Elements in the Table), 
 TLI (Longitudinal growth time), TXI (Horizontal growth time), TYI (Vertical growth time),
-BETX [m], ALFX [1], DX [m], DPX [1], BETY [m], ALFY [1], DY [m], DPY [1] 
+BETX [m], ALFX [1], DX [m], DPX [1], BETY [m], ALFY [1], DY [m], DPY [1].
+
+<H1><A NAME="SECTION00020000000000000000">
+Features</A>
+</H1><FONT SIZE="+1">
+The average growth rates in [sec] are defined as variables called ibs.tx, ibs.ty, ibs.tl for the horizontal, vertical and longitudinal growth times respectively. One can access them simply by calling them after the ibs commant is called. </p> 
+Example: </p> 
+ ibs; </p> 
+ Tx=ibs.tx;</p> 
+ This defines a variable Tx which is the average horizontal growth rate in seconds.
 </FONT>
 <P>
  </FONT>
