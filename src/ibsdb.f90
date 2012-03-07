@@ -113,7 +113,6 @@ subroutine twclog(bxbar, bybar,dxbar,dybar, const)
   use physconsfi
   implicit none
 
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Calculation of Coulomb logarithm (and print)                       *
@@ -222,6 +221,7 @@ subroutine ibs
 
   use ibsdbfi
   use physconsfi
+  use name_lenfi
   implicit none
 
 
@@ -245,7 +245,7 @@ subroutine ibs
        get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
        hscwtdy,sdpyb,sdyb,dpy,dpy1,dpy2,dpybr,dpywtd,beteffy,alywtd
   parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0)
-
+  
   !---- Universal physical constants.
 
   !     Permeability of vacuum [V*s/A*m]:
@@ -621,7 +621,11 @@ subroutine ibs
   taul   = one / tavl
   taux   = one / tavx
   tauy   = one / tavy
-
+  
+  call set_variable('ibs.tx ',taux)
+  call set_variable('ibs.ty ',tauy)
+  call set_variable('ibs.tl ',taul)
+  
   write (*, 950) tavl, tavx, tavy, taul, taux, tauy
 
 910 format(' '/' Particle beam: ',a,10x,a,'bunched.')
@@ -643,7 +647,7 @@ subroutine ibs
        5x,'Longitudinal= ',1p,e15.6/                                     &
        5x,'Horizontal  = ',   e15.6/                                     &
        5x,'Vertical    = ',   e15.6/' ')
-
+       
 end subroutine ibs
 ! *********************************************************************
 subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
@@ -837,7 +841,7 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   !---- Divide answers by cprime to account for scaling.
   txi    =      (zintx / cprime)
   tli    = cl * (zintl / cprime)
-  tyi    = cy * (zinty / cprime)
-
+  tyi    = cy * (zinty / cprime)  
+  
 end subroutine twsint
 ! ***************************************************************
