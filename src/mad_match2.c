@@ -27,15 +27,14 @@ match2_augmentnconstraints(void)
   /*makes place in the working arrays for a new macro*/
   int i,j;
   char fn[]={"match2_augmentnconstraints"};
-//  char*   new_match2_macro_name     = 0x0; // not used
   char* * new_match2_cons_name      = 0x0;
   double* new_match2_cons_value     = 0x0;
   double* new_match2_cons_value_rhs = 0x0;
   double* new_match2_cons_value_lhs = 0x0;
   double* new_match2_cons_weight    = 0x0;
   char*   new_match2_cons_sign      = 0x0;
-  struct expression* * new_match2_cons_rhs       = 0x0;
-  struct expression* * new_match2_cons_lhs       = 0x0;
+  struct expression* * new_match2_cons_rhs = 0x0;
+  struct expression* * new_match2_cons_lhs = 0x0;
 
   if(MAX_MATCH_MACRO == 0)
   {
@@ -45,8 +44,6 @@ match2_augmentnconstraints(void)
 
   for(i=0;i<MAX_MATCH_MACRO;i++)
   {
-
-    // new_match2_macro_name     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char)); // not used
     new_match2_cons_name      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char*));
     new_match2_cons_value     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
     new_match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
@@ -60,13 +57,11 @@ match2_augmentnconstraints(void)
     for(j=0;j<MAX_MATCH_CONS;j++)
     {
       new_match2_cons_name     [j] = match2_cons_name     [i][j];
-
       new_match2_cons_value    [j] = match2_cons_value    [i][j];
       new_match2_cons_value_lhs[j] = match2_cons_value_lhs[i][j];
       new_match2_cons_value_rhs[j] = match2_cons_value_rhs[i][j];
       new_match2_cons_weight   [j] = match2_cons_weight   [i][j];
       new_match2_cons_sign     [j] = match2_cons_sign     [i][j];
-
       new_match2_cons_rhs      [j] = match2_cons_rhs      [i][j];
       new_match2_cons_lhs      [j] = match2_cons_lhs      [i][j];
     }
@@ -75,13 +70,11 @@ match2_augmentnconstraints(void)
     for(j=MAX_MATCH_CONS;j<MAX_MATCH_CONS*2;j++)
     {
       new_match2_cons_name     [j] = 0x0;
-
       new_match2_cons_value    [j] = 0.0;
       new_match2_cons_value_lhs[j] = 0.0;
       new_match2_cons_value_rhs[j] = 0.0;
       new_match2_cons_weight   [j] = 0.0;
       new_match2_cons_sign     [j] = 'n';
-
       new_match2_cons_rhs      [j] = 0x0;
       new_match2_cons_lhs      [j] = 0x0;
     }
@@ -131,14 +124,11 @@ match2_alloc_arrays(void)
   for(i=0;i<MAX_MATCH_MACRO;i++)
   {
     match2_cons_name[i]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char*));
-
     match2_cons_value[i]     = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-
     match2_cons_value_rhs[i] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
     match2_cons_value_lhs[i] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
     match2_cons_weight[i]    = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
     match2_cons_sign[i]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char));
-
     match2_cons_rhs[i]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
     match2_cons_lhs[i]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
   }
@@ -158,13 +148,11 @@ match2_init_arrays(void)
     for(j=0;j<MAX_MATCH_CONS;j++)
     {
       match2_cons_name     [i][j]=0x0;
-
       match2_cons_value    [i][j]=0.0;
       match2_cons_value_lhs[i][j]=0.0;
       match2_cons_value_rhs[i][j]=0.0;
       match2_cons_weight   [i][j]=0.0;
       match2_cons_sign     [i][j]='n';
-
       match2_cons_rhs      [i][j]=0x0;
       match2_cons_lhs      [i][j]=0x0;
     }
@@ -309,15 +297,15 @@ match2_augmentnmacros(void)
   /* makes place in the working arrays for a new macro */
   int i,j;
   char fn[]={"match2_augmentnmacros"};
-  char**   new_match2_macro_name;
-  char* ** new_match2_cons_name;
-  double** new_match2_cons_value;
-  double** new_match2_cons_value_rhs;
-  double** new_match2_cons_value_lhs;
-  double** new_match2_cons_weight;
-  char**   new_match2_cons_sign;
-  struct expression* ** new_match2_cons_rhs;
-  struct expression* ** new_match2_cons_lhs;
+  char   **new_match2_macro_name;
+  char*  **new_match2_cons_name;
+  double **new_match2_cons_value;
+  double **new_match2_cons_value_rhs;
+  double **new_match2_cons_value_lhs;
+  double **new_match2_cons_weight;
+  char   **new_match2_cons_sign;
+  struct expression* **new_match2_cons_rhs;
+  struct expression* **new_match2_cons_lhs;
 
   if(MAX_MATCH_MACRO == 0)
   {
@@ -325,35 +313,32 @@ match2_augmentnmacros(void)
     return 1;
   }
 
-  new_match2_macro_name     = (char**)  mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char*));
-  new_match2_cons_name      = (char* **)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char**));
-  new_match2_cons_value     = (double**)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
-  new_match2_cons_value_rhs = (double**)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
-  new_match2_cons_value_lhs = (double**)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
-  new_match2_cons_weight    = (double**)mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
-  new_match2_cons_sign      = (char**)  mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char*));
-  new_match2_cons_rhs       = (struct expression* **) mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(struct expression**));
-  new_match2_cons_lhs       = (struct expression* **) mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(struct expression**));
+  new_match2_macro_name     = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char*));
+  new_match2_cons_name      = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char**));
+  new_match2_cons_value     = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
+  new_match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
+  new_match2_cons_value_lhs = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
+  new_match2_cons_weight    = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(double*));
+  new_match2_cons_sign      = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(char*));
+  new_match2_cons_rhs       = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(struct expression**));
+  new_match2_cons_lhs       = mycalloc(fn,MAX_MATCH_MACRO+1,sizeof(struct expression**));
 
   /*copy old pointers to arrays*/
   for(i=0;i<MAX_MATCH_MACRO;i++)
   {
+    new_match2_macro_name[i]     = match2_macro_name[i];
     new_match2_cons_name[i]      = match2_cons_name[i];
-
     new_match2_cons_value[i]     = match2_cons_value[i];
-
     new_match2_cons_value_rhs[i] = match2_cons_value_rhs[i];
     new_match2_cons_value_lhs[i] = match2_cons_value_lhs[i];
     new_match2_cons_weight[i]    = match2_cons_weight[i];
     new_match2_cons_sign[i]      = match2_cons_sign[i];
-
     new_match2_cons_rhs[i]       = match2_cons_rhs[i];
     new_match2_cons_lhs[i]       = match2_cons_lhs[i];
-
-    new_match2_macro_name[i]     = match2_macro_name[i];
   }
 
   /*free the old arrays*/
+  myfree(fn,match2_macro_name);
   myfree(fn,match2_cons_name);
   myfree(fn,match2_cons_value);
   myfree(fn,match2_cons_value_rhs);
@@ -362,47 +347,39 @@ match2_augmentnmacros(void)
   myfree(fn,match2_cons_sign);
   myfree(fn,match2_cons_rhs);
   myfree(fn,match2_cons_lhs);
-  myfree(fn,match2_macro_name);
 
   /*assign freed pointers to the new arrays*/
-
-  match2_cons_name = new_match2_cons_name;
-  match2_cons_value = new_match2_cons_value;
+  match2_macro_name     = new_match2_macro_name;
+  match2_cons_name      = new_match2_cons_name;
+  match2_cons_value     = new_match2_cons_value;
   match2_cons_value_rhs = new_match2_cons_value_rhs;
   match2_cons_value_lhs = new_match2_cons_value_lhs;
-  match2_cons_weight = new_match2_cons_weight;
-  match2_cons_sign = new_match2_cons_sign;
-  match2_cons_rhs = new_match2_cons_rhs;
-  match2_cons_lhs = new_match2_cons_lhs;
-  match2_macro_name = new_match2_macro_name;
+  match2_cons_weight    = new_match2_cons_weight;
+  match2_cons_sign      = new_match2_cons_sign;
+  match2_cons_rhs       = new_match2_cons_rhs;
+  match2_cons_lhs       = new_match2_cons_lhs;
 
   /*make arrays in the new row*/
-
   match2_cons_name[MAX_MATCH_MACRO]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char*));
   match2_cons_value[MAX_MATCH_MACRO]     = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
-
   match2_cons_value_rhs[MAX_MATCH_MACRO] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
   match2_cons_value_lhs[MAX_MATCH_MACRO] = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
   match2_cons_weight[MAX_MATCH_MACRO]    = mycalloc(fn,MAX_MATCH_CONS,sizeof(double));
   match2_cons_sign[MAX_MATCH_MACRO]      = mycalloc(fn,MAX_MATCH_CONS,sizeof(char));
-
   match2_cons_rhs[MAX_MATCH_MACRO]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
   match2_cons_lhs[MAX_MATCH_MACRO]       = mycalloc(fn,MAX_MATCH_CONS,sizeof(struct expression*));
 
   /*initializes arrays in the last row*/
-
   match2_macro_name[MAX_MATCH_MACRO]=NULL;
 
   for(j=0;j<MAX_MATCH_CONS;j++)
   {
     match2_cons_name     [MAX_MATCH_MACRO][j]=0x0;
-
     match2_cons_value    [MAX_MATCH_MACRO][j]=0.0;
     match2_cons_value_lhs[MAX_MATCH_MACRO][j]=0.0;
     match2_cons_value_rhs[MAX_MATCH_MACRO][j]=0.0;
     match2_cons_weight   [MAX_MATCH_MACRO][j]=0.0;
     match2_cons_sign     [MAX_MATCH_MACRO][j]='n';
-
     match2_cons_rhs      [MAX_MATCH_MACRO][j]=0x0;
     match2_cons_lhs      [MAX_MATCH_MACRO][j]=0x0;
   }
@@ -432,6 +409,7 @@ match2_delete_arrays(void)
     myfree(fn,match2_cons_lhs      [i]);
   }
 
+  myfree(fn,match2_macro_name);
   myfree(fn,match2_cons_name);
   myfree(fn,match2_cons_value);
   myfree(fn,match2_cons_value_rhs);
@@ -440,18 +418,16 @@ match2_delete_arrays(void)
   myfree(fn,match2_cons_sign);
   myfree(fn,match2_cons_rhs);
   myfree(fn,match2_cons_lhs);
-  myfree(fn,match2_macro_name);
 
-
-  match2_cons_name = 0x0;
-  match2_cons_value = 0x0;
+  match2_macro_name     = 0x0;
+  match2_cons_name      = 0x0;
+  match2_cons_value     = 0x0;
   match2_cons_value_rhs = 0x0;
   match2_cons_value_lhs = 0x0;
-  match2_cons_weight = 0x0;
-  match2_cons_sign = 0x0;
-  match2_cons_rhs = 0x0;
-  match2_cons_lhs = 0x0;
-  match2_macro_name = 0x0;
+  match2_cons_weight    = 0x0;
+  match2_cons_sign      = 0x0;
+  match2_cons_rhs       = 0x0;
+  match2_cons_lhs       = 0x0;
 
   /*for security so we cannot add more constraints if the module is not initialized*/
   MAX_MATCH_CONS =  0;
