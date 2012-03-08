@@ -549,11 +549,11 @@ reset_interpolation(int *nint)
   struct command_parameter* cp;
   int i;
   int j,bend_flag = 0;
-  double angle=0,length,e1,e2,numint, h1, h2, fint, fintx, hgap, bvk;
+  double angle=0,length,e1,e2,numint, h1, h2, fint, hgap, bvk; // , fintx not used
 
   /* Deletes the interpolating nodes expanded by the routine interp_node */
 
-  numint = (double)*nint;
+  numint = *nint;
 
   /* reset first and last node in the sequence range */
 
@@ -585,7 +585,7 @@ reset_interpolation(int *nint)
     e1 = node_value("e1");
     h1 = node_value("h1");
     fint = node_value("fint");
-    fintx = fintx_plot;
+//    fintx = fintx_plot; // not used
     hgap = node_value("hgap");
   }
 

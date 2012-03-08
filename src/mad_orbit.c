@@ -747,7 +747,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   struct id_mic2 *cor_l12, *mon_l12;
   struct id_mic2 *prt;
 
-  struct table *ttb;
+  // struct table *ttb; // not used
 
   struct table *b1 = NULL;
   struct table *b2 = NULL;
@@ -826,7 +826,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
           correct_orbit12->units=1.0;      
    }
 
-  ttb = model_table;
+  // ttb = model_table; // not used
 /* no more need, we have b1 and b2 as pointers .. */
 
   correct_orbit12->mon_table->previous = NULL;
@@ -1119,14 +1119,14 @@ pro_correct2_getcorrs(struct in_cmd* cmd)
 {
   int i;
   struct id_mic2 *c;  /* access to tables for monitors and correctors */
-  double **da1;
-  double **da2;
+  // double **da1; // not used
+  // double **da2; // not used
   (void)cmd;
 /*
   double xlimit;
 */
-  da1 = twiss_table_beam1->d_cols;
-  da2 = twiss_table_beam2->d_cols;
+  // da1 = twiss_table_beam1->d_cols; // not used
+  // da2 = twiss_table_beam2->d_cols; // not used
 
   c = correct_orbit12->cor_table;
   while(c) {
@@ -1499,8 +1499,8 @@ correct_correct1(struct in_cmd* cmd)
 /* Steering routine for orbit corrections of one beam */
 {
   char rout_name[] = "correct_correct";
-  int ix, im, ip, it, idrop;
-  int j,err,nnnseq;
+  int ix, im, ip, idrop; // , it not used
+  int j,nnnseq; // ,err not used
   int imon, icor;
   int ncorr, nmon;
   int niter;
@@ -1562,10 +1562,10 @@ correct_correct1(struct in_cmd* cmd)
      if((nnnseq = get_variable("n")) == 0) {
          nnnseq = twism;
      }
-     err = double_from_table("summ", "xcomax",&j,&tmp1);
-     err = double_from_table("summ", "xcorms",&j,&tmp2);
-     err = double_from_table("summ", "ycomax",&j,&tmp3);
-     err = double_from_table("summ", "ycorms",&j,&tmp4);
+     double_from_table("summ", "xcomax",&j,&tmp1); // err = not used
+     double_from_table("summ", "xcorms",&j,&tmp2); // err = not used
+     double_from_table("summ", "ycomax",&j,&tmp3); // err = not used
+     double_from_table("summ", "ycorms",&j,&tmp4); // err = not used
      fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
      return;
   }
@@ -1583,15 +1583,14 @@ correct_correct1(struct in_cmd* cmd)
 
 
   /* get original settings of correctors from input Twiss-table */
-  it = pro_correct_getcorrs(cmd);
+  pro_correct_getcorrs(cmd); // it = not used
 
   /* get input orbit, default is from input Twiss-table */
   /* if flag "extern" is true: can be from external table */
-  if(command_par_value("extern",cmd->clone)) {
-     it = pro_correct_getorbit_ext(cmd);
-  } else {
-     it = pro_correct_getorbit(cmd);
-  }
+  if(command_par_value("extern",cmd->clone))
+     pro_correct_getorbit_ext(cmd); // it = not used
+  else
+     pro_correct_getorbit(cmd); // it = not used
 
 
   /* find and prepare enabled correctors and monitors, may be repeated */
@@ -1915,7 +1914,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %p\n",twiss_table);
+            printf("TWISS table: %p\n", (void*)twiss_table);
          }
        }
        pps = -1;
@@ -1952,7 +1951,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
          exit(81);
        } else {
          if (get_option("debug")) {
-            printf("TWISS table: %p\n",twiss_table);
+            printf("TWISS table: %p\n", (void*)twiss_table);
          }
        }
        ppt = -1;
@@ -1962,7 +1961,8 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
 
        if (get_option("debug")) {
             printf("The tables are: %p %p %p %p\n",
-                   orbin_table,twiss_table,target_table,model_table);
+                    (void*)orbin_table, (void*)twiss_table,
+                    (void*)target_table, (void*)model_table);
        }
        if (get_option("debug")) {
        }
@@ -2445,13 +2445,13 @@ pro_correct_getcorrs(struct in_cmd* cmd)
 {
   int i;
   struct id_mic *c;  /* access to tables for monitors and correctors */
-  struct table *ttb;
-  double **da1;
+//  struct table *ttb; // not used
+//  double **da1; // not used
 
   (void)cmd;
-  ttb = model_table;
+//  ttb = model_table; // not used
 
-  da1 = ttb->d_cols;
+  // da1 = ttb->d_cols; // not used
 
   c = correct_orbit->cor_table;
   while(c) {
@@ -2541,7 +2541,7 @@ pro_correct_write_cocu_table(void)
 static int
 pro_correct_filter(int iplane, double sigcut)
 {
-  int    ic, im, ip, icnt;
+  int    im, ip, icnt; // ic, no used
   struct id_mic *m;  /* access to tables for monitors */
 
   struct table *ttb;
@@ -2549,18 +2549,18 @@ pro_correct_filter(int iplane, double sigcut)
   double **da1;
   double bx_m = -9999.;
   double xsig;
-  double xmea, ymea;
+  double xmea; //, ymea; not used
   double xn;
 
   ttb = model_table;
   da1 = ttb->d_cols;
-  ic = 0; im = 0; icnt = 0;
+  im = 0; icnt = 0; // ic = 0; // not used
   ip = iplane - 1;
 
   printf("A (normalized) cut of %-2.2f is requested\n",sigcut);
 
       m = correct_orbit->mon_table;
-      xmea= 0.0; ymea = 0.0;
+      xmea= 0.0; // ymea = 0.0; // not used
       while(m) {
         if (get_option("debug")) {
       printf("monitor flag: %d\n",m->enable);
@@ -2708,7 +2708,7 @@ pro_correct_response_line(int ip, int nc, int nm)
   double **da1;
   double bx_c,by_c,pix_c,piy_c;
   double bx_m,by_m,pix_m,piy_m;
-  double qx0, qy0;
+//  double qx0, qy0; // not used
   double respx1, respy1;
   double respx, respy;
   double *dmat;
@@ -2721,8 +2721,8 @@ pro_correct_response_line(int ip, int nc, int nm)
 
   correct_orbit->qx0 = da1[5][ttb->curr-1];
   correct_orbit->qy0 = da1[8][ttb->curr-1];
-  qx0 = correct_orbit->qx0;
-  qy0 = correct_orbit->qy0;
+//  qx0 = correct_orbit->qx0; // not used
+//  qy0 = correct_orbit->qy0; // not used
 
   c = correct_orbit->cor_table;
   ic = 0;

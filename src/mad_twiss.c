@@ -1071,14 +1071,14 @@ embedded_twiss(void)
   struct command* current_global_twiss;
   struct command_parameter* cp;
   struct name_list* nl;
-  struct command_parameter_list* pl;
+//  struct command_parameter_list* pl; // not used
   char* embedded_twiss_beta[2];
   int j, pos, tpos;
   int izero = 0;
 
   cmd = embedded_twiss_cmd;
   nl = cmd->clone->par_names;
-  pl = cmd->clone->par;
+//  pl = cmd->clone->par; // not used
   keep_tw_print = get_option("twiss_print");
   set_option("twiss_print", &izero);
 

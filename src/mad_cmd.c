@@ -102,7 +102,7 @@ exec_command(void)
   char* cmd_name;
   struct in_cmd* p = this_cmd;
   struct in_cmd* pp;
-  int ret, izero = 0, pos;
+  int izero = 0, pos; // ret, not used
 
 
   if (p->cmd_def != NULL)
@@ -134,7 +134,7 @@ exec_command(void)
       print_value(p);
     }
     else if (strcmp(cmd_name, "system") == 0)
-      ret = system(noquote(toks[p->decl_start]));
+      system(noquote(toks[p->decl_start])); // ret =, not used
     else if (strcmp(cmd_name, "title") == 0)
       title = permbuff(noquote(toks[p->decl_start]));
     else if (strcmp(cmd_name, "resplot") == 0)
@@ -790,8 +790,8 @@ grow_command_list(struct command_list* p)
 void
 store_command_def(char* cmd_string)  /* processes command definition */
 {
-  int i, n, j, b_s = 0, r_start, r_end, b_cnt;
-  struct element* el;
+  int i, n, b_s = 0, r_start, r_end, b_cnt; // j, not used
+//  struct element* el; // not used
   struct command* cmd;
   struct command_parameter* p;
   struct in_cmd* tmp_cmd = new_in_cmd(1000);
@@ -829,12 +829,12 @@ store_command_def(char* cmd_string)  /* processes command definition */
       if (p == NULL) fatal_error("illegal cmd parameter definition:",
                                  cmd->name);
       cmd->par->parameters[cmd->par->curr++] = p;
-      j = add_to_name_list(p->name, 1, cmd->par_names);
+      add_to_name_list(p->name, 1, cmd->par_names); // j = not used
       b_s = r_end + 1;
     }
   }
   if (strcmp(toks->p[2], "element") == 0)
-    el = make_element(toks->p[0], toks->p[0], cmd, 0);
+    make_element(toks->p[0], toks->p[0], cmd, 0); // el = not used
   delete_in_cmd(tmp_cmd);
 }
 
@@ -843,7 +843,7 @@ add_to_command_list(char* label, struct command* comm, struct command_list* cl, 
   /* adds command comm to the command list cl */
   /* flag for printing a warning */
 {
-  int pos, j;
+  int pos; // , j; not used
   if ((pos = name_list_pos(label, cl->list)) > -1)
   {
     if (flag) put_info(label, "redefined");
@@ -854,7 +854,7 @@ add_to_command_list(char* label, struct command* comm, struct command_list* cl, 
   else
   {
     if (cl->curr == cl->max) grow_command_list(cl);
-    j = add_to_name_list(permbuff(label), 0, cl->list);
+    add_to_name_list(permbuff(label), 0, cl->list);
     cl->commands[cl->curr++] = comm;
   }
 }
@@ -863,7 +863,7 @@ void
 add_to_command_list_list(char* label, struct command_list* cl, struct command_list_list* sl)
   /* adds command list cl to command-list list sl */
 {
-  int pos, j;
+  int pos; // , j; not used
   if ((pos = name_list_pos(label, sl->list)) > -1)
   {
     delete_command_list(sl->command_lists[pos]);
@@ -872,7 +872,7 @@ add_to_command_list_list(char* label, struct command_list* cl, struct command_li
   else
   {
     if (sl->curr == sl->max) grow_command_list_list(sl);
-    j = add_to_name_list(permbuff(label), 0, sl->list);
+    add_to_name_list(permbuff(label), 0, sl->list);
     sl->command_lists[sl->curr++] = cl;
   }
 }

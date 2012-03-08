@@ -706,7 +706,7 @@ enter_element(struct in_cmd* cmd)
   /* enters an element in the list (and the sequence if applicable) */
 {
   struct name_list* nl;
-  struct command_parameter_list* pl;
+//  struct command_parameter_list* pl; // not used
   char** toks = cmd->tok_list->p;
   struct element *el, *parent;
   struct command* comm;
@@ -730,7 +730,7 @@ enter_element(struct in_cmd* cmd)
       flag = 1; /* new element - definition only once in sequence allowed */
     }
     nl = cmd->clone->par_names;
-    pl = cmd->clone->par;
+    // pl = cmd->clone->par; // not used
     if (el != parent && (pos = name_list_pos("bv", nl)) > -1)
     {
       if (nl->inform[pos]) el->bv = command_par_value("bv", cmd->clone);

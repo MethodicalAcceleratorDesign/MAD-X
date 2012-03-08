@@ -452,7 +452,7 @@ madx_mpk_scalelimits(int nv)
   float  fact = 0.0;
 
   struct madx_mpk_variable*     v = 0x0;
-  struct madx_mpk_knob*         kn = 0x0;
+//  struct madx_mpk_knob*         kn = 0x0; // not used
 
   if ( (nv < 0) || (nv >= MAX_KNOBS) )
   {
@@ -461,8 +461,8 @@ madx_mpk_scalelimits(int nv)
   }
 
 
-  v = &(madx_mpk_variables[nv]);
-  kn = &(madx_mpk_knobs[v->knobidx]);
+  v = &madx_mpk_variables[nv];
+  // kn = &(madx_mpk_knobs[v->knobidx]); // not used
 
   fieldorder = 1 + (v->kn >= 0)?v->kn:v->ks;/*PTC nomenclature, 1 dipol, 2 quad ...*/
 
@@ -941,7 +941,7 @@ madx_mpk_run(struct in_cmd* cmd)
   char    matched2 = 0;
   char    matched = 0;
   char    readstartval = 1;
-  int     retval;
+//  int     retval; // not used
   int     fieldorder;
   FILE*   fdbg = fopen("currentvalues.txt","a+");
 
@@ -997,7 +997,7 @@ madx_mpk_run(struct in_cmd* cmd)
 
   sprintf(&(matchactioncommand[strlen(matchactioncommand)]),";");
 
-  retval = madx_mpk_init();
+  madx_mpk_init(); // retval = not used
 
 
 

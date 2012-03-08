@@ -1340,7 +1340,7 @@ void ad_sin(const TVEC* iv, const TVEC* iret)
     double c = cos(v[0]);
 
     // odd and even
-    size_t pnevlen = adveclen[ipnev], pnodlen=adveclen[ipnod];
+//    size_t pnevlen = adveclen[ipnev], pnodlen=adveclen[ipnod]; // not used
 
     pnev[0] = pnod[0] = p[0] = 0;
 
@@ -1380,8 +1380,8 @@ void ad_sin(const TVEC* iv, const TVEC* iret)
         //std::swap(pnevlen, pnodlen);
         pnev = advec[ipnev];
         pnod = advec[ipnod];
-        pnevlen = adveclen[ipnev];
-        pnodlen = adveclen[ipnod];
+//        pnevlen = adveclen[ipnev]; // not used
+//        pnodlen = adveclen[ipnod]; // not used
     }
 
     adveclen[*iret] = FULL_VEC_LEN;
@@ -1567,7 +1567,7 @@ void ad_tra(const TVEC* iv, unsigned int* expo, const TVEC* iret)
 
     unsigned int *cef = new unsigned int[gnv];
     unsigned int *bv = new unsigned int[gnv];
-    unsigned int d = 0, jexp;
+    unsigned int d = 0; // , jexp; not used
 
     ad_reset(iret);
     // const part was kept
@@ -1600,7 +1600,7 @@ void ad_tra(const TVEC* iv, unsigned int* expo, const TVEC* iret)
             continue;
         }
 
-        jexp = cef[iexpo];
+//        jexp = cef[iexpo]; // not used
 
         cef[iexpo] -= 1;
         --d;

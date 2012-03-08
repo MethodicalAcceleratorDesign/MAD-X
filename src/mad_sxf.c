@@ -705,7 +705,7 @@ sxf_read(struct command* cmd)
   /* reads an expanded sequence including errors from an SXF file */
 {
   struct sequence* keep_sequ = current_sequ;
-  int n, echo, err, izero = 0, count = 0;
+  int echo, err, izero = 0, count = 0; // n, not used
   FILE* in_file = in->input_files[in->curr];
   char *p, *pp;
 
@@ -726,7 +726,7 @@ sxf_read(struct command* cmd)
   sequ_is_on = 1;
   echo = get_option("echo");
   set_option("echo", &izero);
-  n = get_stmt(in_file, 1);
+  get_stmt(in_file, 1); // n = not used
   replace(in->buffers[in->curr]->c_a->c, ',', ' ');
   replace(in->buffers[in->curr]->c_a->c, '\n', ' ');
   p = strtok(in->buffers[in->curr]->c_a->c, ";");

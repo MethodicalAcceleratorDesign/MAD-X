@@ -425,11 +425,11 @@ void
 add_to_node_list( /* adds node to alphabetic node list */
   struct node* node, int inf, struct node_list* nll)
 {
-  int pos, j;
+  int pos; // , j; // not used
   if ((pos = name_list_pos(node->name, nll->list)) < 0)
   {
     if (nll->curr == nll->max) grow_node_list(nll);
-    j = add_to_name_list(node->name, inf, nll->list);
+    add_to_name_list(node->name, inf, nll->list); // j = not used
     nll->nodes[nll->curr++] = node;
   }
 }

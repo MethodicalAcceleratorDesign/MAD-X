@@ -18,12 +18,12 @@ set_option(char* str, int* opt)
   /* sets an (old or new) option with name "str",
      value *opt (0 flase, 1 true) */
 {
-  int i, j, k;
+  int i, k; //, j not used
   char* bc;
   mycpy(c_dum->c, str); bc = permbuff(c_dum->c);
   if ((i = name_list_pos(bc, options->par_names)) < 0)
   {
-    j = add_to_name_list(bc, 0, options->par_names);
+    add_to_name_list(bc, 0, options->par_names); // j = not used
     if ((k = options->par->curr) == options->par->max)
       grow_command_parameter_list(options->par);
     options->par->parameters[options->par->curr++]

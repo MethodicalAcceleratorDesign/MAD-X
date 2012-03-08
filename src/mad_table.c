@@ -814,11 +814,11 @@ void
 add_to_table_list(struct table* t, struct table_list* tl)
   /* adds table t to table list tl */
 {
-  int pos, j;
+  int pos; //, j; not used
   if ((pos = name_list_pos(t->name, tl->names)) < 0)
   {
     if (tl->curr == tl->max) grow_table_list(tl);
-    j = add_to_name_list(tmpbuff(t->name), 0, tl->names);
+    add_to_name_list(tmpbuff(t->name), 0, tl->names); // j = not used
     tl->tables[tl->curr++] = t;
   }
   else
@@ -1109,7 +1109,7 @@ string_from_table(char* table, char* name, int* row, char* string)
      struct double_array* arr = NULL;
   */
 {
-  int pos,l;
+  int pos; //,l; not used
   struct table* t;
 
   mycpy(c_dum->c, table);
@@ -1119,7 +1119,7 @@ string_from_table(char* table, char* name, int* row, char* string)
   mycpy(c_dum->c, name);
   if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
   if (*row > t->curr)  return -3;
-  l = strlen(t->s_cols[pos][*row-1]);
+  // l = strlen(t->s_cols[pos][*row-1]); not used
   mycpy(string, t->s_cols[pos][*row-1]);
   return 0;
 }

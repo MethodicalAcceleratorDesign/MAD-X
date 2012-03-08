@@ -1672,16 +1672,17 @@ get_multi_refs(void)
 static int
 get_next_name(char* name, char acro)
 {
-  char s[2];
   int j, k = -1;
 
-  for (j = 0; j < acro_occ; j++) if (acro_list[j] == acro)  k = j;
-  if (k < 0)
-  {
+  for (j = 0; j < acro_occ; j++)
+    if (acro_list[j] == acro)  k = j;
+
+  if (k < 0) {
     k = acro_occ++; acro_list[k] = acro; acro_cnt[k] = 0;
   }
-  s[0] = acro; s[1] = '\0';
-  sprintf(name, "%s_c6t_%d", s, ++acro_cnt[k]);
+
+  sprintf(name, "%c_c6t_%d", acro, ++acro_cnt[k]);
+
   return 1;
 }
 
@@ -2064,7 +2065,8 @@ pre_multipole(struct c6t_element* el) /* pre-process multipoles */
     else
     put sum into errors, zero all el->components
   */
-  int i, last_nzero = -1, nz_cnt = 0, cnt = 0, n_pole, s_pole = 0, ndmax;
+  int i, last_nzero = -1, nz_cnt = 0, cnt = 0, s_pole = 0, ndmax;
+  // int n_pole, // not used
   int low, new_el_t;
   struct c6t_element *new_el = NULL;
   char t_list[5][12] = {"dipole", "quadrupole", "sextupole", "octupole",
@@ -2112,7 +2114,7 @@ pre_multipole(struct c6t_element* el) /* pre-process multipoles */
   {
     last_nzero = i; nz_cnt++;
   }
-  n_pole = last_nzero / 2;
+  // n_pole = last_nzero / 2; // not used
   el->rad_length = el->value[11];
   if (last_nzero < 0)  /* all quad+ components and all errors = zero */
   {
@@ -2365,13 +2367,13 @@ split_kicker(struct c6t_element* el)
 {
   struct c6t_element *k1, *k2;
   char c[24];
-  int af;
+
   if (el->value[0] > zero) split_other(el);
   if (el->flag == 6) /*split kicker into h + v */
   {
-    af = get_next_name(c, 'h');
+    get_next_name(c, 'h');
     k1 = new_c6t_element(13, c, "hkicker");
-    af = get_next_name(c, 'v');
+    get_next_name(c, 'v');
     k2 = new_c6t_element(14, c, "vkicker");
     k1->force = k2->force = el->force;
     k1->value[12] = el->value[12];
@@ -2392,11 +2394,10 @@ split_other(struct c6t_element* el)
   struct c6t_element *d1, *d2;
   double length = el->value[0] / two;
   char c[24];
-  int af;
 
-  af = get_next_name(c, 'd');
+  get_next_name(c, 'd');
   d1 = new_c6t_element(1, c, "drift");
-  af = get_next_name(c, 'd');
+  get_next_name(c, 'd');
   d2 = new_c6t_element(1, c, "drift");
   d1->value[0] = d2->value[0] = length;
   d1->flag = d2->flag = 1;
@@ -2415,11 +2416,11 @@ split_special(struct c6t_element* el)
   struct c6t_element *d1, *mt;
   double length = el->value[0] / two, mt_position = el->position;
   char c[24];
-  int j, af;
+  int j;
 
   if (el->nf_err > 0)
     app_factor(el->value[0], el->p_fd_err->a_dble, el->nf_err);
-  af = get_next_name(c, *el->base_name);
+  get_next_name(c, *el->base_name);
   d1 = new_c6t_element(el->n_values, c, el->base_name);
   d1->value[0] = el->value[0] = length;
   for (j = 1; j < el->n_values; j++)
@@ -2428,7 +2429,7 @@ split_special(struct c6t_element* el)
   d1->force = el->force = 1;
   d1->position = el->position + d1->value[0] / two;
   el->position = el->position - el->value[0] / two;
-  af = get_next_name(c, 'm');
+  get_next_name(c, 'm');
   mt = new_c6t_element(MULTI_MAX, c, "multipole");
   mt->force = 1;
   mt->flag = 2; mt->position = mt_position;

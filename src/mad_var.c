@@ -421,7 +421,7 @@ add_to_var_list( /* adds variable to alphabetic variable list */
   /* flag = 0: undefined reference in expression, 1: definition
      2: separate list, do not drop variable */
 {
-  int pos, j;
+  int pos; // , j; not used
 
   if ((pos = name_list_pos(var->name, varl->list)) > -1)
   {
@@ -446,7 +446,7 @@ add_to_var_list( /* adds variable to alphabetic variable list */
   else
   {
     if (varl->curr == varl->max) grow_var_list(varl);
-    j = add_to_name_list(permbuff(var->name), flag, varl->list);
+    add_to_name_list(permbuff(var->name), flag, varl->list); // j = not used
     varl->vars[varl->curr++] = var;
   }
 }

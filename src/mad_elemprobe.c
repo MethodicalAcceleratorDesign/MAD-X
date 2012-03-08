@@ -6,7 +6,7 @@ adjust_probe(double delta_p)
 {
   int j;
   double etas, slope, qs, fact, tmp, ds = oneturnmat[34];
-  double alfa, beta, gamma, dtbyds, circ, deltat, freq0;
+  double alfa, beta, gamma, dtbyds, circ, freq0; // , deltat // not used
   double betas, gammas, et, sigt, sige;
   et = command_par_value("et", current_beam);
   sigt = command_par_value("sigt", current_beam);
@@ -23,7 +23,7 @@ adjust_probe(double delta_p)
   tmp = - betas * betas * ds / circ;
   alfa = one / (gammas * gammas) + tmp;
   dtbyds = delta_p * tmp / betas;
-  deltat = circ * dtbyds;
+  // deltat = circ * dtbyds;
   store_comm_par_value("freq0", freq0, probe_beam);
   store_comm_par_value("alfa", alfa, probe_beam);
   store_comm_par_value("beta", betas, probe_beam);

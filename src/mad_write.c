@@ -29,7 +29,7 @@ write_nice(char* string, FILE* file)
 void
 write_nice_8(char* string, FILE* file)
 {
-  int n, pos, comma, ssc;
+  int n, pos, ssc;
   char *c = string;
   char k;
   supp_mul_char(' ', string);
@@ -37,7 +37,6 @@ write_nice_8(char* string, FILE* file)
   n = strlen(string);
   while (n > LINE_F_MAD8)
   {
-    comma = 0;
     for (pos = LINE_F_MAD8; pos > 10; pos--)
     {
       k = c[pos];

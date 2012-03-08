@@ -883,7 +883,7 @@ static void
 aper_header(struct table* aper_t, struct aper_node *lim_)
   /* puts beam and aperture parameters at start of the aperture table */
 {
-  int i, err, nint=1, h_length = 25;
+  int i, nint=1, h_length = 25;
   double dtmp, vtmp[4], deltap_twiss, n1min, n1, s;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
@@ -952,7 +952,7 @@ aper_header(struct table* aper_t, struct aper_node *lim_)
   dtmp = command_par_value("dp", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  err = double_from_table("summ","deltap",&nint,&deltap_twiss);
+  double_from_table("summ","deltap",&nint,&deltap_twiss);
   sprintf(c_dum->c, v_format("@ TWISS_DELTAP     %%le  %F"), deltap_twiss);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
@@ -1349,10 +1349,10 @@ pro_aperture(struct in_cmd* cmd)
 struct aper_node*
 aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt)
 {
-  int stop=0, nint=1, jslice=1, err, first, ap=1;
+  int stop=0, nint=1, jslice=1, first, ap=1; // , err not used
   int true_flag, true_node=0, offs_node=0, do_survey=0;
   int truepos=0, true_cnt=0, offs_cnt=0;
-  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, nhalopar, ntol;
+  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; // nhalopar, not used
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x=zero, surv_y=zero, elem_x=0, elem_y=0;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
@@ -1407,7 +1407,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   cor = command_par_value("cor", this_cmd->clone);
   bbeat = command_par_value("bbeat", this_cmd->clone);
   nco = command_par_value("nco", this_cmd->clone);
-  nhalopar = command_par_vector("halo", this_cmd->clone, halo);
+  command_par_vector("halo", this_cmd->clone, halo); // nhalopar = // not used
   interval = command_par_value("interval", this_cmd->clone);
   spec = command_par_value("spec", this_cmd->clone);
   notsimple = command_par_value("notsimple", this_cmd->clone);
@@ -1422,7 +1422,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   /* fetch deltap as set by user in the former TWISS command */
   /* will be used below for displacement associated to parasitic dipersion */
 
-  err = double_from_table("summ","deltap",&nint,&deltap_twiss);
+  double_from_table("summ","deltap",&nint,&deltap_twiss);
   printf ("+++++++ deltap from TWISS %12.6g\n",deltap_twiss);
 
   /* calculate emittance and delta angle */
@@ -1486,7 +1486,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (current_sequ->range_start == current_node) first=1; else first=0;
 
     length=node_value("l");
-    err=double_from_table(current_sequ->tw_table->name, "s", tw_cnt, &s_end);
+    double_from_table(current_sequ->tw_table->name, "s", tw_cnt, &s_end);
     s_start=s_end-length;
     s_curr=s_start;
 
@@ -1588,7 +1588,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
 
       /* slice the node, call survey if necessary, make twiss for slices*/
-      err=interp_node(&nint);
+      interp_node(&nint);
 
       /* do survey */
       if (do_survey)
@@ -1617,7 +1617,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
       }
 
-      err=embedded_twiss();
+      embedded_twiss();
 
       /* Treat each slice, for all angles */
       for (jslice=0;jslice<=nint;jslice++)
@@ -1652,8 +1652,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
 	/*       printf ("%20s  s %10.6f / x %10.6f   y %10.6f\n",name,s,x,y); */
 
-	xeff = x;
-	yeff = y;
+        xeff = x;
+        yeff = y;
 	  
         /* survey adjustments */
        /* BJ 3 APR 2009 : introduced xeff and yeff in order to avoid
@@ -1732,7 +1732,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
       }
 
-      err=reset_interpolation(&nint);
+      reset_interpolation(&nint);
 
       /* insert minimum node value into Twiss table */
 
