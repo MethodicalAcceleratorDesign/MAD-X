@@ -27,13 +27,13 @@ extern "C" {
 
 #endif
 
+#ifdef _PLUGIN
+
 /* pointer to rplotter function, C intrtface to MadxPlotter::Fill, see MadxPlotter for details */
 typedef void (*rplot_plottrack_fctn)(int,int,int,double, double,double,double,double,double,double);
 
 static void*                rplot_handle    = 0;
 static rplot_plottrack_fctn rplot_plottrack = 0; /*pointer to function*/
-
-#ifdef _PLUGIN
 
 static void
 loadrplotlib(void)
@@ -273,8 +273,6 @@ rplotfinish(void)
 void
 newrplot(void)
 {
-  (void)rplot_handle, (void)rplot_plottrack;
-
 /*adds new plotter*/
 #ifdef ROOT_PLOT
   MadxPlotter::Instance()->NewPlot();

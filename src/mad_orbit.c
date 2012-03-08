@@ -338,7 +338,7 @@ correct_setcorr(struct in_cmd* cmd)
   char   slnname[NAME_L];
 
   char*    namtab;
-  int      t1;
+//  int      t1;
 
   double   xnew, ynew;
 
@@ -351,7 +351,7 @@ correct_setcorr(struct in_cmd* cmd)
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
        printf("Want to use named table: %s\n",namtab);
-       if ((t1 = name_list_pos(namtab, table_register->names)) > -1) {
+       if (name_list_pos(namtab, table_register->names) > -1) { // (t1 = not used
           printf("The table ==> %s <=== was found \n",namtab);
        } else {
           /* fatal_error("Corrector table requested, but not existing:",namtab); */
@@ -525,7 +525,7 @@ correct_correct2(struct in_cmd* cmd)
   int imon, icor;
   int ncorr, nmon;
   int niter;
-  int resout;
+//  int resout; not used
   int twism;
   int ifail;
   float  rms;
@@ -568,7 +568,7 @@ correct_correct2(struct in_cmd* cmd)
 
 
   /* Prepare file descriptors for the output */
-  if((resout = command_par_value("resout",cmd->clone)) > 0) {
+  if(command_par_value("resout",cmd->clone) > 0) { // (resout = not used
      if(fddata == NULL) {
         if((fddata = fopen("corr.out","w")) == NULL)
            exit(99);
@@ -760,7 +760,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   int ebl1, ebl2;
 
   int j,k;
-  int set0;
+//  int set0; // not used
   int cntm1 = {0};
   int cntc1 = {0};
   int cntm2 = {0};
@@ -863,7 +863,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l1->p_node = b1->p_nodes[j];
         cor_l1->p_node_s1 = b1->p_nodes[j];
         cor_l1->p_node_s2 = NULL;            
-        if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
+        if(command_par_value("corzero",cmd->clone) > 0) { // (set0 = not used
           if(iplane == 1) cor_l1->p_node_s1->chkick = 0.0;
           if(iplane == 2) cor_l1->p_node_s1->cvkick = 0.0;
         }
@@ -904,7 +904,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         cor_l2->p_node = b2->p_nodes[j];
         cor_l2->p_node_s2 = b2->p_nodes[j];
         cor_l2->p_node_s1 = NULL;            
-        if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
+        if(command_par_value("corzero",cmd->clone) > 0) { // (set0 = not used 
           if(iplane == 1) cor_l2->p_node_s2->chkick = 0.0;
           if(iplane == 2) cor_l2->p_node_s2->cvkick = 0.0;
         }
@@ -957,7 +957,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
         ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
         ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
         cor_l12->enable = ebl1*ebl2;                  
-        if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
+        if(command_par_value("corzero",cmd->clone) > 0) { // (set0 = not used
           if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
           if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
           if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
@@ -1507,7 +1507,7 @@ correct_correct1(struct in_cmd* cmd)
   int resout;
   int twism;
   int dbg = 0;
-  int ifail, sflag, svdflg;
+  int ifail, sflag; // , svdflg; // not used
   float  rms;
   double sngcut, sngval;
   double tmp1, tmp2, tmp3, tmp4;
@@ -1616,7 +1616,7 @@ correct_correct1(struct in_cmd* cmd)
     if(dmat != NULL) myfree(rout_name,dmat);
     /* icor and imon used to set up correct matrix size !! */
     dmat  = pro_correct_response_ring(ip,icor,imon);
-    if((svdflg = command_par_value("cond",cmd->clone)) == 1) {
+    if(command_par_value("cond",cmd->clone) == 1) { // (svdflg = not used
        sngcut = command_par_value("sngcut", cmd->clone);
        sngval = command_par_value("sngval", cmd->clone);
        printf("SVD conditioning requested ...\n");
@@ -1653,7 +1653,7 @@ correct_correct1(struct in_cmd* cmd)
           printf("make response for line\n");
     dmat  = pro_correct_response_line(ip,icor,imon); 
 
-    if((svdflg = command_par_value("cond",cmd->clone)) == 1) {
+    if(command_par_value("cond",cmd->clone) == 1) { // (svdflg = not used
        sngcut = command_par_value("sngcut", cmd->clone);
        sngval = command_par_value("sngval", cmd->clone);
        printf("SVD conditioning requested ...\n");
@@ -2077,7 +2077,7 @@ pro_correct_getorbit(struct in_cmd* cmd)
 {
   struct name_list* nl;
   int i;
-  char *tartab;
+//  char *tartab; // not used
   int pos;
   struct id_mic *m;  /* access to tables for monitors and correctors */
   struct table *ttb;
@@ -2126,7 +2126,7 @@ pro_correct_getorbit(struct in_cmd* cmd)
     printf("====c1===>  %d %d %d %d \n",posx,posy,pospx,pospy);
   }
 
-  if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
+  if (command_par_string("target",cmd->clone) != NULL) { // (tartab = not used
     if((tosx = name_list_pos("x",tar->columns)) < 0) { 
         fatal_error("target orbit x not found in table",", MAD-X terminates ");
     }
@@ -2148,7 +2148,7 @@ pro_correct_getorbit(struct in_cmd* cmd)
   while(m) {
 
 /* If correction to target orbit, subtract the wanted orbit ... */
-  if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
+  if (command_par_string("target",cmd->clone) != NULL) { // (tartab = not used
     m->val.before[0] =  da1[posx][m->id_ttb] - da2[tosx][m->id_ttb];
     m->val.before[1] =  da1[posy][m->id_ttb] - da2[tosy][m->id_ttb];
     m->val.before[0] = (da1[posx][m->id_ttb] - da2[tosx][m->id_ttb])*1000.*correct_orbit->units;
@@ -2218,7 +2218,7 @@ pro_correct_getorbit_ext(struct in_cmd* cmd)
   struct name_list* nl;
   int i;
   int j;
-  char *tartab;
+//  char *tartab; // not used
   int pos;
   struct id_mic *m;  /* access to tables for monitors and correctors */
   struct table *ttb;
@@ -2298,7 +2298,7 @@ pro_correct_getorbit_ext(struct in_cmd* cmd)
     printf("====c1===>  %d %d %d %d \n",posx,posy,pospx,pospy);
   }
 
-  if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
+  if (command_par_string("target",cmd->clone) != NULL) { // (tartab = not used
     if((tosx = name_list_pos("x",tar->columns)) < 0) { 
         fatal_error("target orbit x not found in table",", MAD-X terminates ");
     }
@@ -2361,7 +2361,7 @@ pro_correct_getorbit_ext(struct in_cmd* cmd)
 
     if((jjy >= 0) && (yok == 1)) { 
 /*  if(jjx >= 0)  {  */
-     if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
+     if (command_par_string("target",cmd->clone) != NULL) { // (tartab = not used
   if(dbk == 1) {
        printf("x ==> %d %d %e %e\n",jjx,m->id_ttb,da1[posx][jjx],da2[tosx][jjy]);
        printf("y ==> %e %e\n",da1[posy][jjx],da2[tosy][jjy]);

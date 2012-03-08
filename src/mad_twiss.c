@@ -242,7 +242,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
     phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
     r11,r12,r21,r22,s;
   int i, jt=0, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
-  int ks, w_file, beta_def, err = 0, inval = 1,chrom_flg;
+  int w_file, beta_def, err = 0, inval = 1,chrom_flg; // ks, not used
   int keep_info = get_option("info");
 
   /* Set embedded_flag */
@@ -278,7 +278,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
   table_name = current_sequ->tw_table->name;
   table_embedded_name = "embedded_twiss_table";
 
-  if ((ks = get_value(current_command->name,"sectormap")) != 0)
+  if (get_value(current_command->name,"sectormap") != 0) // (ks = not used
   {
     set_option("twiss_sector", &k);
     pos = name_list_pos("sectorfile", nl);
@@ -1195,7 +1195,7 @@ store_savebeta(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos;
   char* name = NULL;
-  struct command* comm;
+//  struct command* comm; // not used
   if (log_val("clear", cmd->clone))
   {
     delete_command_list(savebeta_list);
@@ -1213,7 +1213,7 @@ store_savebeta(struct in_cmd* cmd)
     if (name != NULL)
     {
       cmd->clone_flag = 1; /* do not delete */
-      if ((comm = find_command(name, beta0_list)))
+      if (find_command(name, beta0_list)) // (comm = not used
         remove_from_command_list(name, beta0_list);
       add_to_command_list(permbuff(name), cmd->clone, savebeta_list, 0);
     }

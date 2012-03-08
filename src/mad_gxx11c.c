@@ -27,7 +27,7 @@ static XEvent                 myevent;
 static XSizeHints             myhint;
 static XWMHints               mywmhint;
 static XSetWindowAttributes   xswa;
-static int                    i, done, myscreen, ncolors, style;
+static int                    i, done, myscreen, style; // , ncolors // not used
 static unsigned int           wwidth, wwidth_mm, wheight, wheight_mm;
 static float                  xwidth, xwidth_mm, xheight, xheight_mm;
 static float                  w_lx, w_ly, wx_fact, wy_fact;
@@ -105,7 +105,7 @@ wopen(int *uswid, int *ushi)
     XSetFillRule  (mydisplay, mygc[i], WindingRule);
   }
   XGetWindowAttributes(mydisplay, mywindow, &theAtt);
-  ncolors = theAtt.visual->map_entries;
+//  ncolors = theAtt.visual->map_entries; // not used
   cmap    = theAtt.colormap;
   colored = DisplayPlanes( mydisplay, myscreen ) > 1;
   if(colored) cmap = DefaultColormap( mydisplay, myscreen);

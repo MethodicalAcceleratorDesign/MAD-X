@@ -708,11 +708,11 @@ print_value(struct in_cmd* cmd)
 {
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, type, nitem;
+  int j, s_start = 0, end, nitem; // , type // not used
   while (s_start < n)
   {
     for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
-    if ((type = loc_expr(toks, j, s_start, &end)) > 0)
+    if (loc_expr(toks, j, s_start, &end) > 0) // type = // not used 
     {
       nitem = end + 1 - s_start;
       if (polish_expr(nitem, &toks[s_start]) == 0)

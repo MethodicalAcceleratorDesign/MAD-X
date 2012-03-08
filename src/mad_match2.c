@@ -579,7 +579,7 @@ match2_macro(struct in_cmd* cmd)
 void
 match2_constraint(struct in_cmd* cmd)
 {
-  int i,j,k,nitem,type;
+  int i,j,k,nitem; // ,type; // not used
   int start,end;
   char **toks=cmd->tok_list->p;
   int n = cmd->tok_list->curr;
@@ -654,7 +654,7 @@ match2_constraint(struct in_cmd* cmd)
   }
 
   /*  printf("%d\n",k);*/
-  if ((type = loc_expr(toks, k, start, &end)) > 0)
+  if (loc_expr(toks, k, start, &end) > 0) // (type =  // not used
   {
     nitem = end + 1 - start;
 
@@ -682,7 +682,7 @@ match2_constraint(struct in_cmd* cmd)
     }
   }
 
-  if ((type = loc_expr(toks, k, start, &end)) > 0)
+  if (loc_expr(toks, k, start, &end) > 0) // (type = // not used
   {
     nitem = end + 1 - start;
     expr=make_expression(nitem,&toks[start]);

@@ -93,10 +93,10 @@ sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
 static int
 sdds_readt(char *filename, char *tfsname)
 {
-  int     i1, i2, i3, i5;
+  int     i1, i2, i3; // i5; not used
   int     j1, j2;
 
-  long    lb;
+//  long    lb; // not used
   long    narr, nall;
   long    arrdim[MAX_TFS_COL];
   long    arrtyp[MAX_TFS_COL];
@@ -141,7 +141,7 @@ sdds_readt(char *filename, char *tfsname)
   }
 
   /* read and process each data table in the data set */ 
-  while ((lb = SDDS_ReadTable(&SDDS_table))>0) { 
+  while (SDDS_ReadTable(&SDDS_table) > 0) { // (lb = not used
       /* set all rows and all columns to initially be "of interest" */ 
       SDDS_SetColumnFlags(&SDDS_table, 1); 
       SDDS_SetRowFlags(&SDDS_table, 1);
@@ -248,7 +248,7 @@ sdds_readt(char *filename, char *tfsname)
        tfstab = make_table(tfsname, tfsname, tfs_table_cols, tfs_table_types, 5000);
        add_to_table_list(tfstab, table_register);
 
-       i5 = sdds_get_parm(&SDDS_table, tfstab);
+       sdds_get_parm(&SDDS_table, tfstab); // i5 = not used
 
        if (get_option("debug")) {
            for(j1=0;j1<narr; j1++){
@@ -292,7 +292,7 @@ static int
 treat_tfs_header_set(SDDS_TABLE *SDDS_table, struct table* t)
 {
   struct char_p_array* head_buf;
-  int i, j, k;
+  int j, k; // i, not used
   char  dumc[1000];
 
   double  dbuf;
@@ -305,7 +305,7 @@ treat_tfs_header_set(SDDS_TABLE *SDDS_table, struct table* t)
     if (get_option("debug")) printf("for set header: %s\n", t->header->p[j]);
     if (get_option("debug")) printf("header: %s\n", t->header->p[j]);
     pre_split(t->header->p[j], l_wrk, 0);
-    i = head_split(l_wrk->c,head_buf);
+    head_split(l_wrk->c,head_buf); // i = not used
     if (get_option("debug")) printf("for set curr: %d\n",head_buf->curr);
     if (get_option("debug")) printf("curr: %d\n",head_buf->curr);
 
@@ -348,7 +348,7 @@ static int
 treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
 {
   struct char_p_array* head_buf;
-  int i, j, k;
+  int j, k; // i, not used
 
   head_buf = new_char_p_array(1000);
 
@@ -356,7 +356,7 @@ treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
   for(j=0; j < t->header->curr; j++) {
     if (get_option("debug")) printf("header: %s\n", t->header->p[j]);
     pre_split(t->header->p[j], l_wrk, 0);
-    i = head_split(l_wrk->c,head_buf);
+    head_split(l_wrk->c,head_buf); // i = not used 
     if (get_option("debug")) printf("curr: %d\n",head_buf->curr);
 
     if(head_buf->curr > 0) {
@@ -381,7 +381,7 @@ treat_tfs_header_define(SDDS_TABLE *SDDS_table, struct table* t)
 static int
 sdds_writet_sel(char *filename, struct table *tfstab)
 {
-  int     i1;
+//  int     i1;
   int     j1, j2;
 
   double  **da1;
@@ -438,7 +438,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
     /* define parameters from TFS table header */
     if(tfstab->header != NULL) {
       if (get_option("debug")) printf("c ==> %d\n",tfstab->header->curr);
-     i1 = treat_tfs_header_define(&SDDS_table, tfstab);
+     treat_tfs_header_define(&SDDS_table, tfstab); // i1 = not used
     }
 
     if (!SDDS_SaveLayout(&SDDS_table)) {
@@ -457,7 +457,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
   /* set parameters from TFS table header */
     if(tfstab->header != NULL) {
       if (get_option("debug")) printf("cc ==> %d\n",tfstab->header->curr);
-     i1 = treat_tfs_header_set(&SDDS_table, tfstab);
+     treat_tfs_header_set(&SDDS_table, tfstab); // i1 = not used
     }
 
   /* fill SDDS table with data */
@@ -663,14 +663,14 @@ sdds_iow(struct in_cmd* cmd)
 void
 pro_sdds(struct in_cmd* cmd)
 {
-  int   i;
+//  int   i;
   if (strcmp(cmd->tok_list->p[0], "sddsin") == 0)
     {
-     i = sdds_ior(cmd);
+     sdds_ior(cmd); // i = not used
     }
   else if (strcmp(cmd->tok_list->p[0], "sddsout") == 0)
     {
-     i = sdds_iow(cmd);
+     sdds_iow(cmd); // i = not used
     }
 }
 

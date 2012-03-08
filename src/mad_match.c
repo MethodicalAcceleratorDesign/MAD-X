@@ -317,7 +317,7 @@ match_constraint(struct in_cmd* cmd)
   struct sequence* sequ;
   struct node* nodes[2];
   struct node* c_node;
-  int pos, k, n, low, up;
+  int pos, n, low, up; // , k // not used
 
   if(match_is_on==2)
   {
@@ -358,7 +358,7 @@ match_constraint(struct in_cmd* cmd)
       if (pos > -1 && nl->inform[pos])  /* parameter has been read */
       {
         name = pl->parameters[pos]->string;
-        if ((k = get_ex_range(name, sequ, nodes)) == 0)  return;
+        if (get_ex_range(name, sequ, nodes) == 0)  return; // (k = not used
       }
       else
       {

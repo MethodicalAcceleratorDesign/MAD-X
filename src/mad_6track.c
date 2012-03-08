@@ -376,13 +376,13 @@ static struct li_list types;
 
 static struct type_info* t_info[N_TYPES];
 
-static struct block   *first_block, *last_block;
+static struct block   *first_block; //, *last_block; not used
 static struct block*   prev_block;
 static struct block*   current_block = NULL;
 
 static int virgin_c6t = 1;
 
-static struct c6t_element *first_in_sequ, *last_in_sequ, *last_in_sequ_org;
+static struct c6t_element *first_in_sequ, *last_in_sequ_org; // *last_in_sequ, // not used
 static struct c6t_element* prev_element;
 static struct c6t_element* current_element = NULL;
 // static struct c6t_element* debug_element = NULL; // not used
@@ -452,7 +452,7 @@ static int
   special_flag = 1,    /* produce special output file from twiss */
   cavall_flag = 0,     /* if 0 lump all cavities into first */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
-  radius_flag = 0,     /* change the default reference radius */
+//  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
   mult_auto_off = 1,   /* if 1 code does not process zero value
                           multipoles;
@@ -467,7 +467,7 @@ static double
   sequ_end,
   total_voltage = 0,
   harmon = 0,
-  freq = 0,
+//  freq = 0, // not used
   error_matrix[FIELD_MAX],
   tmp_buff[FIELD_MAX];
 
@@ -837,7 +837,7 @@ att_crabcavity(struct c6t_element* el)
     strcpy(el->name, "CAV");
   }
   else el->out_2 = el->value[1];
-  el->out_3 = freq = el->value[4];
+  el->out_3 = el->value[4]; // freq = // not used
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
   el->out_4 = 360. * lag;
@@ -984,7 +984,7 @@ block_it(void)
     current_element = current_element->next;
     prev_block = current_block;
   }
-  last_block = current_block;
+  // last_block = current_block; // not used
 }
 
 static void
@@ -1589,7 +1589,7 @@ get_args(struct in_cmd* my_cmd)
   }
   if ((tmp_ref_def = command_par_value("radius", my_cmd->clone))>0.)
   {
-    radius_flag = 1;
+//    radius_flag = 1; // not_used
     ref_def = tmp_ref_def;
     printf("Reference radius set to : %f\n",ref_def);
   }
@@ -1799,7 +1799,7 @@ link_behind(struct c6t_element* new, struct c6t_element* el)
 {
   if (el->next == NULL)
   {
-    last_in_sequ = new;
+//    last_in_sequ = new; // not used
     last_in_sequ_org = new;
   }
   else el->next->previous = new;
@@ -2303,7 +2303,7 @@ read_sequ(void)
   }
   sequ_end = current_sequ->ex_end->position;
   sequ_length = sequ_end - sequ_start;
-  last_in_sequ = current_element;
+//  last_in_sequ = current_element; // not used
   last_in_sequ_org = current_element;
   put_info("MADX sequence converted to c6t internal.","");
 }
@@ -2522,7 +2522,7 @@ yank(struct c6t_element* el)
   if (el->previous != NULL)  el->previous->next = el->next;
   else                       first_in_sequ      = el->next;
   if (el->next != NULL)      el->next->previous = el->previous;
-  else                       last_in_sequ       = el->previous;
+//  else                       last_in_sequ       = el->previous; // not used
   el->flag = 0;
 }
 
@@ -2987,7 +2987,7 @@ c6t_finish(void)
     }
     myfree(rout_name, types.member[i]);
   }
-  types.curr=0; first_in_sequ = NULL; last_in_sequ = NULL; last_in_sequ_org = NULL;
+  types.curr=0; first_in_sequ = NULL; last_in_sequ_org = NULL; // last_in_sequ = NULL; // not used 
   current_element=NULL;
   /* remove blocks */
   p = first_block;
@@ -2996,7 +2996,7 @@ c6t_finish(void)
     p = p->next;
     if (p) myfree(rout_name, p->previous);
   }
-  first_block = NULL; last_block=NULL; prev_block=NULL;
+  first_block = NULL; prev_block=NULL; // last_block=NULL; not used 
   current_block = NULL;
   /* remove split_list */
   if (split_list)
@@ -3069,7 +3069,7 @@ c6t_init(void)
   special_flag = 1;    /* produce special output file from twiss */
   aperture_flag = 0;   /* if 1 insert apertures into structure */
   cavall_flag = 0;     /* if 0 lump all cavities into first */
-  radius_flag = 0;     /* change the default reference radius */
+//  radius_flag = 0; // not used    /* change the default reference radius */
   split_flag = 0;      /* if 1 keep zero multipoles after split */
   multi_type = -1;     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */

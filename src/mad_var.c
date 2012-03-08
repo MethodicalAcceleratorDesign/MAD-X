@@ -241,14 +241,13 @@ char*
 get_varstring(char* name)
 {
   struct variable* var;
-  char *p, *ret;
+  char *ret; // *p, not used
   ret = NULL;
   mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
-  {
+  if (strstr(c_dum->c, "->") == NULL) /* variable */ // (p = not used
     if ((var = find_variable(c_dum->c, variable_list)) != NULL)
       ret = var->string;
-  }
+
   return ret;
 }
 
@@ -455,10 +454,10 @@ void
 set_stringvar(char* name, char* string)
 {
   /* sets variable name->string to string */
-  char* p;
+//  char* p;
   struct variable* var;
   mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) /* variable */
+  if (strstr(c_dum->c, "->") == NULL) /* variable */ // (p = not used
   {
     if ((var = find_variable(c_dum->c, variable_list)) != NULL)
     {

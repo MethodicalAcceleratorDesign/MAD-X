@@ -58,7 +58,7 @@ static TNVND *base;
 static unsigned int** prdidx; // index of product
 static TNVND nvec; // number of vec assigned.
 static TNVND* vec; // vec initialized.
-static unsigned int tblsize;
+// static unsigned int tblsize; // not used
 
 // memory pool
 static double **advecpool;
@@ -243,7 +243,7 @@ void init_prod_index(unsigned int nv, unsigned int nd)
             prdidx[i][j] = idx;
         }
     }
-    tblsize = NS;
+    // tblsize = NS; not used
     //std::cout << "Mem: " << NS << std::endl;
 }
 

@@ -569,7 +569,7 @@ double
 el_par_value(char* par, struct element* el)
   /* returns an element parameter value */
 {
-  int k = 0, n;
+  int k = 0; // , n; not used
   char tmp[8];
   double val = zero, angle = zero, l, vec[100];
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
@@ -617,7 +617,7 @@ el_par_value(char* par, struct element* el)
       if (strchr(par, 's')) strcpy(tmp, "ksl");
       else                  strcpy(tmp, "knl");
       sscanf(&par[1], "%d", &k);
-      if ((n = element_vector(el, tmp, vec)) > k)  val = vec[k];
+      if (element_vector(el, tmp, vec) > k)  val = vec[k]; // n = not used
     }
     else val = command_par_value(par, el->def);
   }

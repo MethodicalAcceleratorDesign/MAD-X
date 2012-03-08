@@ -11,7 +11,7 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
   struct command* cd;
   struct command_parameter_list* pl;
   char* name;
-  int full = 0, i, k, pos;
+  int full = 0, i, pos; // k, // not used 
   struct node* c_node;
   struct node* nodes[2];
   if (sequ == NULL) return 0;
@@ -29,7 +29,7 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
         && nl->inform[pos])
     {
       name = pl->parameters[pos]->string;
-      if ((k = get_ex_range(name, sequ, nodes)) == 0) return 0;
+      if (get_ex_range(name, sequ, nodes) == 0) return 0; // (k = not used
     }
     else
     {
@@ -106,7 +106,7 @@ get_select_ranges(struct sequence* sequ, struct command_list* select, struct nod
   struct command_parameter_list* pl;
   char* name;
   char full_range[] = "#s/#e";
-  int i, k, pos;
+  int i, pos; //, k // not used
   struct node* c_node;
   struct node* nodes[2];
   for (i = 0; i < select->curr; i++)
@@ -117,7 +117,7 @@ get_select_ranges(struct sequence* sequ, struct command_list* select, struct nod
     if (pos > -1 && nl->inform[pos])  /* parameter has been read */
       name = pl->parameters[pos]->string;
     else name = full_range;
-    if ((k = get_range(name, sequ, nodes)) > 0)
+    if (get_range(name, sequ, nodes) > 0) // (k = not used
     {
       c_node = nodes[0];
       while (c_node != NULL)
@@ -237,13 +237,10 @@ get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
 void
 set_selected_errors(void)
 {
-  int i, flag;
-  if ((flag =
-       get_select_ex_ranges(current_sequ, error_select, selected_ranges)) != 0)
-  {
+  int i;
+  if (get_select_ex_ranges(current_sequ, error_select, selected_ranges) != 0)
     for (i = 0; i < selected_ranges->curr; i++)
       selected_ranges->nodes[i]->sel_err = 1;
-  }
 }
 
 void
@@ -260,17 +257,14 @@ set_range(char* range, struct sequence* sequ)
 void
 set_sector(void)
 {
-  int i, flag;
+  int i;
   if (sector_select->curr == 0) reset_sector(current_sequ, 1);
   else
   {
     sector_ranges->curr = 0; sector_ranges->list->curr = 0;
-    if ((flag =
-         get_select_ex_ranges(current_sequ, sector_select, sector_ranges)) != 0)
-    {
+    if (get_select_ex_ranges(current_sequ, sector_select, sector_ranges) != 0)
       for (i = 0; i < sector_ranges->curr; i++)
         sector_ranges->nodes[i]->sel_sector = 1;
-    }
   }
 }
 

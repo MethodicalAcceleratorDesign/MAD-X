@@ -562,14 +562,14 @@ void
 pro_ptc_create_layout(void)
   /* controls ptc_create_layout module */
 {
-  int pos;
+//  int pos; not used
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_create_layout - sequence without beam:", current_sequ->name);
   adjust_beam();
   probe_beam = clone_command(current_beam);
 
-  if ((pos = name_list_pos("errors_dipole", table_register->names)) <= -1)
+  if (name_list_pos("errors_dipole", table_register->names) <= -1) // (pos = not used
   {
     errors_dipole = make_table("errors_dipole", "efield", efield_table_cols,
                                efield_table_types, 10000);
@@ -580,7 +580,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_dipole");
   }
 
-  if ((pos = name_list_pos("errors_field", table_register->names)) <= -1)
+  if (name_list_pos("errors_field", table_register->names) <= -1) // (pos = not used
   {
     errors_field = make_table("errors_field", "efield", efield_table_cols,
                               efield_table_types, 10000);
@@ -591,7 +591,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_field");
   }
 
-  if ((pos = name_list_pos("errors_total", table_register->names)) <= -1)
+  if (name_list_pos("errors_total", table_register->names) <= -1) // (pos = not used
   {
     errors_total = make_table("errors_total", "efield", efield_table_cols,
                               efield_table_types, 10000);

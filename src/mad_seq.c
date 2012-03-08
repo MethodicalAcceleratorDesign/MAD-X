@@ -1828,7 +1828,7 @@ set_enable(char* type, struct in_cmd* cmd)
   struct sequence* sequ;
   struct node* nodes[2];
   struct node* c_node;
-  int pos, k, n, status, count = 0;
+  int pos, n, status, count = 0; // k, // not used
   pos = name_list_pos("sequence", nl);
   if(nl->inform[pos]) /* sequence specified */
   {
@@ -1858,7 +1858,7 @@ set_enable(char* type, struct in_cmd* cmd)
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
     name = pl->parameters[pos]->string;
-    if ((k = get_ex_range(name, sequ, nodes)) == 0)
+    if (get_ex_range(name, sequ, nodes) == 0) // (k = // not used
     {
       nodes[0] = NULL; nodes[1] = NULL;
     }
