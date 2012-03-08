@@ -27,7 +27,7 @@ match2_augmentnconstraints(void)
   /*makes place in the working arrays for a new macro*/
   int i,j;
   char fn[]={"match2_augmentnconstraints"};
-  char*   new_match2_macro_name     = 0x0;
+//  char*   new_match2_macro_name     = 0x0; // not used
   char* * new_match2_cons_name      = 0x0;
   double* new_match2_cons_value     = 0x0;
   double* new_match2_cons_value_rhs = 0x0;
@@ -46,7 +46,7 @@ match2_augmentnconstraints(void)
   for(i=0;i<MAX_MATCH_MACRO;i++)
   {
 
-    new_match2_macro_name     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char));
+    // new_match2_macro_name     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char)); // not used
     new_match2_cons_name      = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(char*));
     new_match2_cons_value     = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
     new_match2_cons_value_rhs = mycalloc(fn,MAX_MATCH_CONS*2,sizeof(double));
