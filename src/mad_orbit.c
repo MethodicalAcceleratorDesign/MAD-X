@@ -1504,7 +1504,7 @@ correct_correct1(struct in_cmd* cmd)
   int imon, icor;
   int ncorr, nmon;
   int niter;
-  int resout;
+//  int resout; // not used
   int twism;
   int dbg = 0;
   int ifail, sflag; // , svdflg; // not used
@@ -1540,7 +1540,7 @@ correct_correct1(struct in_cmd* cmd)
 
 
   /* Prepare file descriptors for the output */
-  if((resout = command_par_value("resout",cmd->clone)) > 0) {
+  if(command_par_value("resout",cmd->clone) > 0) { // (resout = not used
      if(fddata == NULL) {
         if((fddata = fopen("corr.out","w")) == NULL)
            exit(99);
@@ -1886,7 +1886,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
 
   int j;
   int pps, ppt;
-  int set0;
+//  int set0; // not used
   int cntm = {0};
   int cntc = {0};
 
@@ -2051,7 +2051,7 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
       cor_l->id_ttb = j;
       cor_l->enable = ttb->p_nodes[j]->enable;
       cor_l->p_node = ttb->p_nodes[j];
-      if((set0 = command_par_value("corzero",cmd->clone)) > 0) {
+      if(command_par_value("corzero",cmd->clone) > 0) { // (set0 = not used
         if(iplane == 1) cor_l->p_node->chkick = 0.0;
         if(iplane == 2) cor_l->p_node->cvkick = 0.0;
       }
