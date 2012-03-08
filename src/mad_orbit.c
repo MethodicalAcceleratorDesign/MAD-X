@@ -520,8 +520,8 @@ correct_correct2(struct in_cmd* cmd)
   double  sigcut;         
 */
 
-  int ix, im, ip, it;
-  int i,j,err,nnnseq;
+  int ix, im, ip; // , it; not used
+  int i,j,nnnseq; // ,err // not used
   int imon, icor;
   int ncorr, nmon;
   int niter;
@@ -537,7 +537,7 @@ correct_correct2(struct in_cmd* cmd)
   double  *corvec, *monvec;  /* vectors to hold measured orbit and correctors */
   double  *resvec;           /* vector to hold corrected orbit */
   char    *conm;             /* vector to hold corrector names (for MICADO) */
-  int     *sing;             /* array to store pointer to singular correctors */
+//  int     *sing;  // not used /* array to store pointer to singular correctors */
   static int     *nm, *nx, *nc;
   struct id_mic2  *c;
   /*
@@ -594,10 +594,10 @@ correct_correct2(struct in_cmd* cmd)
      if((nnnseq = get_variable("n")) == 0) {
          nnnseq = twism;
      }
-     err = double_from_table("summ", "xcomax",&j,&tmp1);
-     err = double_from_table("summ", "xcorms",&j,&tmp2);
-     err = double_from_table("summ", "ycomax",&j,&tmp3);
-     err = double_from_table("summ", "ycorms",&j,&tmp4);
+     double_from_table("summ", "xcomax",&j,&tmp1); // err = not used
+     double_from_table("summ", "xcorms",&j,&tmp2); // err = not used
+     double_from_table("summ", "ycomax",&j,&tmp3); // err = not used
+     double_from_table("summ", "ycorms",&j,&tmp4); // err = not used
      fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
      return;
   }
@@ -606,16 +606,16 @@ correct_correct2(struct in_cmd* cmd)
   nx     = mycalloc("correct_correct2_nx",ncorr,sizeof(int));
   nc     = mycalloc("correct_correct2_nc",ncorr,sizeof(int));
   nm     = mycalloc("correct_correct2_nm",nmon,sizeof(int));
-  sing   = mycalloc("correct_correct2_sing",ncorr*2,sizeof(int));
+  // sing   = mycalloc("correct_correct2_sing",ncorr*2,sizeof(int)); // not used
   corvec = mycalloc("correct_correct2_corvec",ncorr,sizeof(double));
   monvec = mycalloc("correct_correct2_monvec",nmon,sizeof(double));
   resvec = mycalloc("correct_correct2_resvec",nmon,sizeof(double));
   conm   = mycalloc("correct_correct2_conm",ncorr*16,sizeof(char));
 
   /* get original settings of correctors from input Twiss-table */
-  it = pro_correct2_getcorrs(cmd);
+  pro_correct2_getcorrs(cmd); // it = not used
   /* get input orbit, default is from input Twiss-table */
-  it = pro_correct2_getorbit(cmd);
+  pro_correct2_getorbit(cmd);  // it = not used
 
 
   /* find and prepare enabled correctors and monitors, may be repeated */
