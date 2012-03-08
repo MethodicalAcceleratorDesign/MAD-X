@@ -42,8 +42,8 @@ CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
 # diagnostics
 #
 
-CFLAGS   += /Qdiag-disable:2259 # /Qdiag-enable:sc2
-CXXFLAGS += /Qdiag-disable:2259 # /Qdiag-enable:sc2
+CFLAGS   += /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
+CXXFLAGS += /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
 
 #
 # options flags
