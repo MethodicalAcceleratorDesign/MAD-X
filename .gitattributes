@@ -328,6 +328,7 @@ src/a_def_element_fibre_layout.inc -text
 src/a_def_frame_patch_chart.inc -text
 src/a_def_sagan.inc -text
 src/a_def_worm.inc -text
+src/a_namelists.inc -text
 src/a_scratch_size.f90 -text
 src/b_da_arrays_all.f90 -text
 src/c_dabnew.f90 -text
