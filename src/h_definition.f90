@@ -308,7 +308,7 @@ module definition
   type rf_phasor_8
      type(real_8)  x(2)
      type(real_8) om
-     type(real_8) t
+     reaL(DP) t
   end type rf_phasor_8
 
   type probe

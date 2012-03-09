@@ -1266,6 +1266,23 @@ CONTAINS
        !       NULLIFY(EL%TP10%BF_X);ALLOCATE(EL%TP10%BF_X(S_B(EL%P%NMUL)%N_MONO))
        !       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
+       if(EL%ELECTRIC) then
+          NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
+          NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
+          NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
+          NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
+          NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
+          NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
+          NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
+          EL%TP10%AS=ZERO
+          EL%TP10%BS=ZERO
+          EL%TP10%AE=ZERO
+          EL%TP10%BE=ZERO
+          EL%TP10%E_X=ZERO
+          EL%TP10%E_Y=ZERO
+          EL%TP10%PHI=ZERO
+          call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
+       endif
        call GETANBN(EL%TP10)
        NULLIFY(EL%TP10%F);ALLOCATE(EL%TP10%F);EL%TP10%F=1;
     CASE(KIND11:KIND14)
@@ -1347,62 +1364,6 @@ CONTAINS
        EL%ECOL19%P=>EL%P
        EL%ECOL19%L=>EL%L
        nullify(EL%ECOL19%A);ALLOCATE(EL%ECOL19%A);CALL ALLOC(EL%ECOL19%A)
-       !    CASE(KIND22)
-       !       if(.not.ASSOCIATED(EL%M22)) THEN
-       !          ALLOCATE(EL%M22)
-       !          el%M22=0
-       !       ELSE
-       !          el%M22=-1
-       !          el%M22=0
-       !       ENDIF
-       !       EL%M22%P=>EL%P
-       !
-       !       allocate(EL%M22%DELTAMAP)
-       !       EL%M22%DELTAMAP=.TRUE.
-       !       if(NTOT/=0) then
-       !          allocate(EL%M22%T)
-       !          CALL ALLOC_TREE(EL%M22%T,NTOT,ND2)
-       !       endif
-       !       if(NTOT_rad/=0) then
-       !          allocate(EL%M22%T_rad)
-       !          CALL ALLOC_TREE(EL%M22%T_rad,NTOT_rad,ND2)
-       !       endif
-       !       if(NTOT_REV/=0) then
-       !          allocate(EL%M22%T_REV)
-       !          CALL ALLOC_TREE(EL%M22%T_REV,NTOT_REV,ND2)
-       !       endif
-       !       if(NTOT_rad_REV/=0) then
-       !          allocate(EL%M22%T_rad_REV)
-       !          CALL ALLOC_TREE(EL%M22%T_rad_REV,NTOT_rad_REV,ND2)
-       !       endif
-       !    CASE(KINDUSER1)
-       !       if(.not.ASSOCIATED(EL%U1)) THEN
-       !          ALLOCATE(EL%U1)
-       !          EL%U1=0
-       !       ELSE
-       !          EL%U1=-1
-       !          EL%U1=0
-       !       ENDIF
-       !       EL%U1%P=>EL%P
-       !       EL%U1%L=>EL%L
-       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       !       EL%U1%AN=>EL%AN
-       !       EL%U1%BN=>EL%BN
-       !       CALL POINTERS_USER1(EL%U1)
-       !    CASE(KINDUSER2)
-       !       if(.not.ASSOCIATED(EL%U2)) THEN
-       !          ALLOCATE(EL%U2)
-       !          EL%U2=0
-       !       ELSE
-       !          EL%U2=-1
-       !          EL%U2=0
-       !       ENDIF
-       !       EL%U2%P=>EL%P
-       !       EL%U2%L=>EL%L
-       !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
-       !       EL%U2%AN=>EL%AN
-       !       EL%U2%BN=>EL%BN
-       !       CALL POINTERS_USER2(EL%U2)
     CASE(KINDWIGGLER)
        if(.not.ASSOCIATED(EL%WI)) THEN
           ALLOCATE(EL%WI)
@@ -1720,6 +1681,22 @@ CONTAINS
        !       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        CALL ALLOC(EL%TP10)
+       if(EL%ELECTRIC) then
+          NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
+          NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
+          NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
+          NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
+          NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
+          call alloc(EL%TP10%E_X,EL%TP10%E_Y,EL%TP10%PHI)
+          call alloc(EL%TP10%AE,NO_E)
+          call alloc(EL%TP10%BE,NO_E)
+          NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
+          NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
+          EL%TP10%AS=ZERO
+          EL%TP10%BS=ZERO
+          call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
+          !  write(6,*) " electric polymorph"
+       endif
        call GETANBN(EL%TP10)
        NULLIFY(EL%TP10%F);ALLOCATE(EL%TP10%F);EL%TP10%F=1;
     CASE(KIND11:KIND14)
@@ -1946,6 +1923,17 @@ CONTAINS
           ELP%BN(N)= ELP%ramp%table(0)%bn(n)
           ELP%AN(N)= ELP%ramp%table(0)%an(n)
        enddo
+
+       if(EL%ramp%table(0)%b_t/=zero) then
+          if(EL%parent_fibre%PATCH%TIME==0) EL%parent_fibre%PATCH%TIME=2
+          if(EL%parent_fibre%PATCH%TIME==1) EL%parent_fibre%PATCH%TIME=3
+          EL%parent_fibre%PATCH%b_T=EL%ramp%table(0)%b_t
+       else
+          if(EL%parent_fibre%PATCH%TIME==2) EL%parent_fibre%PATCH%TIME=0
+          if(EL%parent_fibre%PATCH%TIME==3) EL%parent_fibre%PATCH%TIME=1
+          EL%parent_fibre%PATCH%b_T=zero
+       endif
+
     else
 
        IF(EL%P%NMUL>=1) THEN
@@ -2308,7 +2296,7 @@ CONTAINS
     TYPE(ELEMENT), INTENT(INOUT)::EL
     nullify(EL%KIND);
     nullify(EL%PLOT);
-    nullify(EL%NAME);nullify(EL%vorname);
+    nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
 
     nullify(EL%PERMFRINGE);
     nullify(EL%L);
@@ -2323,7 +2311,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
-    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN); nullify(EL%D_COEFF);nullify(EL%D0_AN);nullify(EL%D0_BN);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D0_AN);nullify(EL%D0_BN);
     nullify(EL%THIN);
     nullify(EL%MIS); !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2365,7 +2353,7 @@ CONTAINS
 
     nullify(EL%KNOB);
     nullify(EL%KIND);
-    nullify(EL%NAME);nullify(EL%vorname);
+    nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
 
     nullify(EL%PERMFRINGE);
     nullify(EL%L);
@@ -2379,7 +2367,7 @@ CONTAINS
     nullify(EL%a_ac);
     nullify(EL%theta_ac);
     nullify(EL%DC_ac);
-    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D_COEFF);nullify(EL%D0_AN);nullify(EL%D0_BN);
+    nullify(EL%D_AC);nullify(EL%D_AN);nullify(EL%D_BN);nullify(EL%D0_AN);nullify(EL%D0_BN);
     nullify(EL%THIN);
     nullify(EL%MIS);  !nullify(EL%EXACTMIS);
     !    nullify(EL%D);nullify(EL%R);
@@ -2422,7 +2410,7 @@ CONTAINS
        DEALLOCATE(EL%PLOT);
        DEALLOCATE(EL%recut);
        DEALLOCATE(EL%even);
-       DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);
+       DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
        DEALLOCATE(EL%L);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
        call kill(EL%P)    ! AIMIN MS 4.0
@@ -2452,7 +2440,6 @@ CONTAINS
        IF(ASSOCIATED(EL%D_BN)) DEALLOCATE(EL%D_BN)
        IF(ASSOCIATED(EL%D0_AN)) DEALLOCATE(EL%D0_AN)
        IF(ASSOCIATED(EL%D0_BN)) DEALLOCATE(EL%D0_BN)
-       IF(ASSOCIATED(EL%D_COEFF)) DEALLOCATE(EL%D_COEFF)
        IF(ASSOCIATED(EL%THIN)) DEALLOCATE(EL%THIN)
        IF(ASSOCIATED(EL%d0)) DEALLOCATE(EL%d0)       ! drift
        IF(ASSOCIATED(EL%K2)) DEALLOCATE(EL%K2)       ! INTEGRATOR
@@ -2571,10 +2558,10 @@ CONTAINS
        ALLOCATE(EL%PLOT);EL%PLOT=MY_TRUE;
        ALLOCATE(EL%RECUT);EL%RECUT=MY_TRUE;
        ALLOCATE(EL%even);EL%even=MY_false;
-       ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);
+       ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
-
+       EL%electric=solve_electric
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);
@@ -2746,7 +2733,7 @@ CONTAINS
 
 
        DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
-       DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);
+       DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
        DEALLOCATE(EL%PERMFRINGE);
        CALL KILL(EL%L);DEALLOCATE(EL%L);
        CALL KILL(EL%FINT);DEALLOCATE(EL%FINT);
@@ -2790,10 +2777,6 @@ CONTAINS
           call kill(el%D0_BN)
           DEALLOCATE(EL%D0_BN)
        endif
-       IF(ASSOCIATED(EL%D_COEFF)) then
-          call kill(el%D_COEFF)
-          DEALLOCATE(EL%D_COEFF)
-       endif
 
 
 
@@ -2821,9 +2804,10 @@ CONTAINS
        call alloc(el%P)
 
        ALLOCATE(EL%KIND);EL%KIND=0;ALLOCATE(EL%KNOB);EL%KNOB=.FALSE.;
-       ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);
+       ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
+       EL%electric=solve_electric
        ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);CALL ALLOC(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);
@@ -2880,6 +2864,7 @@ CONTAINS
 
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
+    ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%KIND=EL%KIND
     ELP%L=EL%L
@@ -2903,25 +2888,7 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
-    IF(ASSOCIATED(EL%D_COEFF)) then
-       N=SIZE(EL%D_COEFF)
-       IF(N>0) THEN
-          call kill(ELP%D_COEFF,N);
-          DEALLOCATE(ELP%D_COEFF )
-          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
-             ALLOCATE(ELP%D_COEFF(N))
-          ENDIF
 
-
-          CALL ALLOC(ELP%D_COEFF,N)
-          DO I=1,N
-             ELP%D_COEFF(I) = EL%D_COEFF(I)
-          ENDDO
-
-       ENDIF
-
-
-    endif
 
     IF(ASSOCIATED(EL%D_AN)) then
 
@@ -3143,6 +3110,15 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
+       IF(EL%ELECTRIC) THEN
+          ELP%TP10%E_X=EL%TP10%E_X
+          ELP%TP10%E_Y=EL%TP10%E_Y
+          ELP%TP10%PHI=EL%TP10%PHI
+          DO I=1,NO_E
+             ELP%TP10%AE(I)=EL%TP10%AE(I)
+             ELP%TP10%BE(I)=EL%TP10%BE(I)
+          enddo
+       ENDIF
     ENDIF
 
     IF(EL%KIND>=KIND11.AND.EL%KIND<=KIND14) THEN
@@ -3216,7 +3192,7 @@ CONTAINS
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
     ELP%PERMFRINGE=EL%PERMFRINGE
-    ELP%NAME=EL%NAME
+    ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%KIND=EL%KIND
     ELP%L=EL%L
@@ -3238,23 +3214,6 @@ CONTAINS
        ELP%DC_ac=EL%DC_ac
     endif
 
-    IF(ASSOCIATED(EL%D_COEFF)) then
-       N=SIZE(EL%D_COEFF)
-       IF(N>0) THEN
-          DEALLOCATE(ELP%D_COEFF )
-          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
-             ALLOCATE(ELP%D_COEFF(N))
-          ENDIF
-
-
-          DO I=1,N
-             ELP%D_COEFF(I) = EL%D_COEFF(I)
-          ENDDO
-
-       ENDIF
-
-
-    endif
 
     IF(ASSOCIATED(EL%D_AN)) then
 
@@ -3462,6 +3421,16 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
+       IF(EL%ELECTRIC) THEN
+          ELP%TP10%E_X=EL%TP10%E_X
+          ELP%TP10%E_Y=EL%TP10%E_Y
+          ELP%TP10%PHI=EL%TP10%PHI
+          DO I=1,NO_E
+             ELP%TP10%AE(I)=EL%TP10%AE(I)
+             ELP%TP10%BE(I)=EL%TP10%BE(I)
+          enddo
+       ENDIF
+
     ENDIF
 
     IF(EL%KIND>=KIND11.AND.EL%KIND<=KIND14) THEN
@@ -3533,6 +3502,7 @@ CONTAINS
     !    if(associated(el%girder)) elp%girder=>el%girder
     ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
+    ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%RECUT=EL%RECUT
     ELP%even=EL%even
@@ -3581,23 +3551,7 @@ CONTAINS
     endif
 
 
-    IF(ASSOCIATED(EL%D_COEFF)) then
-       N=SIZE(EL%D_COEFF)
-       IF(N>0) THEN
-          DEALLOCATE(ELP%D_COEFF )
-          if(.not.ASSOCIATED(ELP%D_COEFF)) THEN
-             ALLOCATE(ELP%D_COEFF(N))
-          ENDIF
 
-
-          DO I=1,N
-             ELP%D_COEFF(I) = EL%D_COEFF(I)
-          ENDDO
-
-       ENDIF
-
-
-    endif
 
     IF(EL%P%NMUL>0) THEN
        IF(EL%P%NMUL/=ELP%P%NMUL.and.ELP%P%NMUL/=0) THEN
@@ -3779,6 +3733,15 @@ CONTAINS
        CALL SETFAMILY(ELP)
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
+       IF(EL%ELECTRIC) THEN
+          ELP%TP10%E_X=EL%TP10%E_X
+          ELP%TP10%E_Y=EL%TP10%E_Y
+          ELP%TP10%PHI=EL%TP10%PHI
+          DO I=1,NO_E
+             ELP%TP10%AE(I)=EL%TP10%AE(I)
+             ELP%TP10%BE(I)=EL%TP10%BE(I)
+          enddo
+       ENDIF
     ENDIF
 
     IF(EL%KIND>=KIND11.AND.EL%KIND<=KIND14) THEN
@@ -3863,11 +3826,6 @@ CONTAINS
              CALL resetpoly_R31(ELP%d_BN(I))
              CALL resetpoly_R31(ELP%d0_AN(I))
              CALL resetpoly_R31(ELP%d0_BN(I))
-          ENDDO
-       ENDIF
-       IF(associated(ELP%d_coeff)) THEN             ! SHARED BY A LOT
-          DO I=1,size(ELP%d_coeff)
-             CALL resetpoly_R31(ELP%d_coeff(I))
           ENDDO
        ENDIF
     endif

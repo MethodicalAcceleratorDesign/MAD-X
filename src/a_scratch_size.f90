@@ -42,7 +42,7 @@ module precision_constants
   logical(lp),parameter:: my_true=.true.
   logical(lp),parameter:: my_false=.false.
   logical(lp),target :: global_verbose=.false.
-  logical(lp),target :: no_hyperbolic_in_normal_form=.false.
+  logical(lp),target :: no_hyperbolic_in_normal_form=.true.
   !Numbers double
   real(dp),parameter::zero=0e0_dp,one=1e0_dp,two=2e0_dp,three=3e0_dp,four=4e0_dp,five=5e0_dp
   real(dp),parameter::six=6e0_dp,seven=7e0_dp,eight=8e0_dp,nine=9e0_dp,ten=10e0_dp
@@ -80,6 +80,7 @@ module precision_constants
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
   real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
   real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
+  real(dp) :: e_muon = 0.d0
   !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
   !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
@@ -169,7 +170,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=c_1d3
+  REAL(dp),TARGET   :: absolute_aperture=one
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
@@ -190,10 +191,12 @@ module precision_constants
   character*255 :: file_block_name="noprint"
   real(dp) :: lmax=1.e38_dp
   logical(lp) :: printdainfo=my_false
-  integer   lielib_print(11)
-  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0/
+  integer   lielib_print(12)
+  DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
-  INTEGER, target :: SECTOR_NMUL = 4
+  INTEGER, target :: SECTOR_NMUL = 10
+  integer, parameter :: no_e=5  !  electric
+
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=zero
   character(255) :: messagelost
@@ -209,7 +212,7 @@ module precision_constants
   !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
   !  lielib_print(10)=1  print lingyun's checks
   !  lielib_print(11)=1  print warning about Teng-Edwards
-
+  !  lielib_print(12)=1  print info in make_node_layout
 
 
   type info_window

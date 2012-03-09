@@ -139,11 +139,12 @@ TYPE time_energy
    real(dp),pointer :: time
    real(dp),pointer :: energy
    real(dp),pointer :: an(:),bn(:)
+   real(dp),pointer :: b_t
 END TYPE time_energy
 
 TYPE ramping
    integer,pointer :: n
-   real(dp), pointer :: r, unit_time
+   real(dp), pointer :: r, unit_time,t_max
    type(time_energy),pointer :: table(:)
    character(255), pointer :: file
 END TYPE ramping
@@ -155,6 +156,8 @@ TYPE ELEMENT
    INTEGER, POINTER :: KIND
    logical(lp), POINTER :: recut,even
    LOGICAL(LP), POINTER :: PLOT
+   LOGICAL(LP), POINTER :: electric
+
    ! common stuff to all element
    type(MAGNET_CHART), pointer :: P
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
@@ -174,7 +177,6 @@ TYPE ELEMENT
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,LAG       ! Cavity information
    real(dp), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
    real(dp),   DIMENSION(:), POINTER:: D_AN,D_BN,D0_AN,D0_BN         !Multipole component
-   real(dp),   DIMENSION(:), POINTER:: D_COEFF         !coefficient for changing magnets
    logical(lp), POINTER :: THIN,slow_ac
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    !  misalignements and rotation
@@ -212,6 +214,7 @@ TYPE ELEMENT
    !   integer, POINTER ::girder_index
    type(girder),pointer :: assembly
    type(ramping), pointer :: ramp
+
 END TYPE  ELEMENT
 
 
@@ -221,6 +224,7 @@ TYPE ELEMENTP
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
    CHARACTER(vp), POINTER ::  VORNAME    ! Identification
    logical(lp), POINTER ::  PERMFRINGE
+   LOGICAL(LP), POINTER :: electric
    !
    !
    !
@@ -234,7 +238,6 @@ TYPE ELEMENTP
    real(dp), POINTER :: DELTA_E     ! CAVITY ENERGY GAIN
    TYPE(REAL_8), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN,D_BN,D0_AN,D0_BN         !Multipole component
-   TYPE(REAL_8),   DIMENSION(:), POINTER:: D_COEFF         !coefficient for changing magnets
    !
    TYPE(REAL_8), POINTER :: B_SOL
    logical(lp), POINTER :: THIN,slow_ac
@@ -443,6 +446,8 @@ TYPE ORBIT_LATTICE
    REAL(DP), pointer  ::  ORBIT_OMEGA_after
    !   REAL(DP), pointer  ::  freqb,freqa,voltb,volta,phasa,phasb,xs6,dxs6
    TYPE(INTERNAL_STATE),pointer :: STATE
+   TYPE(INTEGRATION_NODE), pointer :: tp
+   real(dp), pointer :: dt(:)
 END TYPE ORBIT_LATTICE
 
 

@@ -2466,12 +2466,12 @@ CONTAINS
     elseif(present(L)) then
        WIGGLERL=0
        WIGGLERL%L=L
-       WIGGLERL%LD=L
-       WIGGLERL%LC=L
     else
        write(6,*) " Error neither L nor list is present in WIGGLERL"
        stop 900
     endif
+    WIGGLERL%LD=WIGGLERL%L
+    WIGGLERL%LC=WIGGLERL%L
     WIGGLERL%KIND=KINDWIGGLER
     IF(LEN(NAME)>nlp) THEN
        w_p=0

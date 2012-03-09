@@ -2497,9 +2497,12 @@ CONTAINS
     INTEGER,INTENT(IN),dimension(:)::j
     real(dp),INTENT(inOUT)::R1
     type (taylor),INTENT(IN)::S1
+    !   integer k
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
     if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
+    !   k=s1%i
+    !    write(6,*) r1,k
     CALL DApek(s1%i,j,r1)
     !    else
     !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pek000  2" ) ! newetall(s1%j,1)
@@ -2862,12 +2865,12 @@ CONTAINS
   END SUBROUTINE taylor_cycle
 
 
-  SUBROUTINE  taylor_clean(S1,VALUE)
-    implicit none
-    type (taylor),INTENT(INout)::S1
-    real(dp) value
-    call daclean(S1%i,value)
-  END SUBROUTINE taylor_clean
+  ! SUBROUTINE  taylor_clean(S1,VALUE)
+  !   implicit none
+  !   type (taylor),INTENT(INout)::S1
+  !   real(dp) value
+  !   call daclean(S1%i,value)
+  ! END SUBROUTINE taylor_clean
 
   subroutine check_snake()
     implicit none
@@ -3603,6 +3606,116 @@ CONTAINS
     call kill(t)
 
   END SUBROUTINE clean_taylor
+
+
+  SUBROUTINE  clean_pbfield(S1,S2,prec)
+    implicit none
+    type (pbfield),INTENT(INOUT)::S2
+    type (pbfield), intent(INOUT):: s1
+    real(dp) prec
+
+    call clean_taylor(s1%h,s2%h,prec)
+
+  END SUBROUTINE clean_pbfield
+
+  SUBROUTINE  clean_pbresonance (S1,S2,prec)
+    implicit none
+    type (pbresonance),INTENT(INOUT)::S2
+    type (pbresonance), intent(INOUT):: s1
+    real(dp) prec
+
+    call clean_pbfield(s1%cos,s2%cos,prec)
+    call clean_pbfield(s1%sin,s2%sin,prec)
+
+  END SUBROUTINE clean_pbresonance
+
+  SUBROUTINE  clean_damap(S1,S2,prec)
+    implicit none
+    type (damap),INTENT(INOUT)::S2
+    type (damap), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,c_%nd2
+       call clean_taylor(s1%v(i),s2%v(i),prec)
+    enddo
+
+
+  END SUBROUTINE clean_damap
+
+  SUBROUTINE  clean_vecfield(S1,S2,prec)
+    implicit none
+    type (vecfield),INTENT(INOUT)::S2
+    type (vecfield), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,c_%nd2
+       call clean_taylor(s1%v(i),s2%v(i),prec)
+    enddo
+
+
+  END SUBROUTINE clean_vecfield
+
+  SUBROUTINE  clean_vecresonance(S1,S2,prec)
+    implicit none
+    type (vecresonance),INTENT(INOUT)::S2
+    type (vecresonance), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+
+    call clean_vecfield(s1%cos,s2%cos,prec)
+    call clean_vecfield(s1%sin,s2%sin,prec)
+
+
+
+  END SUBROUTINE clean_vecresonance
+
+  SUBROUTINE  clean_onelieexponent(S1,S2,prec)
+    implicit none
+    type (onelieexponent),INTENT(INOUT)::S2
+    type (onelieexponent), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+
+    call clean_vecfield(s1%vector,s2%vector,prec)
+    call clean_pbfield(s1%pb,s2%pb,prec)
+
+
+
+  END SUBROUTINE clean_onelieexponent
+
+
+  ! remove small numbers
+
+  SUBROUTINE  clean_complextaylor(S1,S2,prec)
+    implicit none
+    type (complextaylor),INTENT(INOUT)::S2
+    type (complextaylor), intent(INOUT):: s1
+    real(dp) prec
+
+    call clean_taylor(S1%r,S1%r,prec)
+    call clean_taylor(S1%i,S1%i,prec)
+
+
+  END SUBROUTINE clean_complextaylor
+
+  SUBROUTINE  clean_gmap(S1,s2,prec)
+    implicit none
+    type (gmap),INTENT(INOUT)::S1
+    type (gmap),INTENT(INOUT)::S2
+    real(dp) prec
+    INTEGER I
+
+    DO I=1,s1%n
+       CALL clean_taylor(S1%V(I),S2%V(I),prec)
+    ENDDO
+
+  END SUBROUTINE clean_gmap
+
+
 
 
 END MODULE  tpsa

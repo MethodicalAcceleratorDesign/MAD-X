@@ -9,7 +9,7 @@ module S_extend_poly
   private PRINTenv,env_8map,env_8benv
   private ALLOCenv6,killenv6,REAL6env_8,env_8t,tenv_8
   logical(lp), target :: ALWAYS_knobs=.false.
-
+  type(real_8) e_muon_scale
   INTERFACE ASSIGNMENT (=)
      MODULE PROCEDURE ENV_8MAP
      MODULE PROCEDURE REAL6env_8
@@ -487,6 +487,16 @@ contains
              w_p%c(1) = " curvebend error 1"
              ! call !write_e(1)
           endif
+          ! if(da(i,1)%I==39) then
+
+          !   call print(da(i,1),6)
+          !   write(6,*) i,j
+          !   write(6,*) size(b_sol%a_x,1),size(b_sol%a_x,2)
+          !   write(6,*) no,b_sol%n_mono
+          !   write(6,*) jd
+          !   write(6,*) b_sol%a_x(i,j)
+          !   pause 8
+          !  endif
           call pek(da(i,1),jd,b_sol%a_x(i,j))
           if(abs(b_sol%a_x(i,j))<eps_extend_poly) b_sol%a_x(i,j)=zero
        enddo
