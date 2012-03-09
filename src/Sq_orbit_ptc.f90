@@ -570,7 +570,7 @@ contains
     write(6,*) "energize at time ", t0,t0/clight
     write(6,*) "Initial Frequency of First Cavity", paccfirst%mag%c4%freq
 
-    call find_acc_energy(paccfirst,t0,e_in,.true.) ! new
+    call find_acc_energy(paccfirst,t0,e_in,my_true) ! new
     !      call find_acc_energy(paccfirst,x_orbit_sync(6),e_in,.false.)
     call find_energy(werk,kinetic=e_in)
 
@@ -586,7 +586,7 @@ contains
              freqs=p%mag%c4%freq
              found=.true.
           endif
-          call find_acc_energy(paccfirst,t0,e_in,.true.)  ! new
+          call find_acc_energy(paccfirst,t0,e_in,my_true)  ! new
        endif
        p=werk
        p=>p%next
@@ -722,7 +722,7 @@ contains
 
                 t_fin=xsync(6)   ! to insure ridiculous self-consistancy on bare ideal no patch lattice
                 !        call find_acc_energy(c%parent_fibre,t_fin,e_fin,.false.)  ! new
-                call find_acc_energy(c%parent_fibre,t_fin,e_fin,.true.)  ! to insure ridiculous self-consistancy
+                call find_acc_energy(c%parent_fibre,t_fin,e_fin,my_true)  ! to insure ridiculous self-consistancy
 
                 de=e_fin-e_in
 
@@ -854,7 +854,7 @@ contains
        if(c%parent_fibre%mag%kind==kind4.and.c%cas==case0) then
           t_fin=xsync(6)
           !       t_fin=xs%ac%t
-          call find_acc_energy(c%parent_fibre,t_fin,e_fin,.false.)
+          call find_acc_energy(c%parent_fibre,t_fin,e_fin,my_false)
           e_in=e_fin
        endif
 
