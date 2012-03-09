@@ -31,8 +31,8 @@ void g95_runtime_stop  (void);
 
 #ifdef _LF95
 // Lahey f95 specific (requires main to be MAIN__)
-int
-MAIN__(void)
+int MAIN__(void);
+int MAIN__(void)
 {
   int a = 0;
   mad_stck_base = &a;
