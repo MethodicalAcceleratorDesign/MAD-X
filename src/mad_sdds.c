@@ -115,7 +115,7 @@ sdds_readt(char *filename, char *tfsname)
 
   SDDS_TABLE SDDS_table;
 
-  SDDS_ARRAY *arr;
+  SDDS_ARRAY *arr=0;
 
   char*   tfs_table_cols[500];
 
@@ -638,7 +638,7 @@ sdds_iow(struct in_cmd* cmd)
 {
     char *sdds_table_file;
     char *tfs_table_name;
-    struct table *tfs_table;
+    struct table *tfs_table=0;
     int   i, pos;
     if((sdds_table_file = command_par_string("file",cmd->clone)) == NULL) {
          fatal_error("No file name to write SDDS table ","\n");
@@ -663,15 +663,10 @@ sdds_iow(struct in_cmd* cmd)
 void
 pro_sdds(struct in_cmd* cmd)
 {
-//  int   i;
   if (strcmp(cmd->tok_list->p[0], "sddsin") == 0)
-    {
-     sdds_ior(cmd); // i = not used
-    }
+    sdds_ior(cmd);
   else if (strcmp(cmd->tok_list->p[0], "sddsout") == 0)
-    {
-     sdds_iow(cmd); // i = not used
-    }
+    sdds_iow(cmd);
 }
 
 #endif // _ONLINE
