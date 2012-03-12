@@ -547,7 +547,7 @@ correct_correct2(struct in_cmd* cmd)
   strcpy(clist1,"\0");
   strcpy(clist2,"\0");
 
-  printf("for two beam orbit corrections ...\n");
+  printf("for two beams orbit corrections ...\n");
   ip = pro_correct_getcommands(cmd);
   im = pro_correct2_gettables(ip,cmd);
   ncorr = im%10000; nmon  = im/10000;
