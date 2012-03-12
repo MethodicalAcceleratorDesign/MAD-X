@@ -7,6 +7,7 @@ module pointer_lattice
   ! stuff for main program
   type(layout),pointer :: my_ering
   type(internal_state),pointer :: my_estate
+  !  type(internal_state),pointer :: my_old_state
   integer ,pointer :: my_start, MY_ORDER, MY_NP,MY_END,my_start_t
   real(dp), pointer :: my_fix(:),MY_DELTA
   real(dp), pointer ::my_target(:)
@@ -39,6 +40,12 @@ module pointer_lattice
   type(internal_state), target:: etat
   integer,target:: START ,FIN,ORDER,np,start_t
   real(dp),target:: xfix(6) ,DELT0
+
+  INTERFACE SCRIPT
+     MODULE PROCEDURE read_ptc_command
+  END INTERFACE
+
+
 contains
   subroutine set_lattice_pointers
     implicit none
@@ -47,7 +54,14 @@ contains
     read77 =.true.
 
     my_ering => m_u%start
-    my_estate => etat
+    if(associated(my_estate)) then
+       !  my_estate=>my_old_state
+       etat=my_estate
+       my_estate => etat
+    else
+       etat=DEFAULT !+nocavity0-time0
+       my_estate => etat
+    endif
     my_start => START
     my_END => FIN
     my_fix=>xfix
@@ -58,7 +72,6 @@ contains
     my_start_t=>start_t
     start_t=1
     DELT0=0.D0
-    etat=DEFAULT !+nocavity0-time0
     START=1
     FIN=1
     ORDER=1
@@ -101,7 +114,7 @@ contains
     ! end
     ! TRACK 4D NORMALIZED
     INTEGER POS,NTURN,resmax
-    real(dp) EMIT(6),APER(2),emit0(2)
+    real(dp) EMIT(6),APER(2),emit0(2),sca
     integer nscan,mfr,ITMAX,MRES(4)
     real(dp), allocatable :: resu(:,:)
     ! END
@@ -120,7 +133,7 @@ contains
     TYPE(integration_node), POINTER :: TL
     type(internal_state),target :: my_default
     ! DYN APERTURE
-    REAL(DP) r_in,del_in,DLAM,ang_in,ang_out,dx,targ_tune_alex(2)
+    REAL(DP) r_in,del_in,DLAM,ang_in,ang_out,dx,targ_tune_alex(2),sexr0
     INTEGER ITE,n_in,POSR
     logical(lp) found_it
     type(fibre),pointer ::p
@@ -138,23 +151,30 @@ contains
     LOGICAL :: b_b,patchbb
     REAL(DP) xbend
     ! automatic track
-    type(internal_state),pointer :: my_old_state
+    !    type(internal_state),pointer :: my_old_state
     TYPE(WORK) W
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
-    real(dp), allocatable :: an(:),bn(:),n_co(:)
-    integer icnmin,icnmax,n_ac,n_coeff
+    real(dp), allocatable :: an(:),bn(:) !,n_co(:)
+    integer icnmin,icnmax,n_ac,inode !,n_coeff
     logical :: log_estate=.true.
-    integer :: mftune=6
+    integer :: mftune=6,nc
+    real(dp), allocatable :: tc(:)
+    type(integration_node), pointer  :: t
+
     if(log_estate) then
        nullify(my_estate)
-       nullify(my_old_state)
+       !       nullify(my_old_state)
        log_estate=.false.
     endif
 
-    if(associated(my_estate)) my_old_state=>my_estate
-    my_default=default
+    if(associated(my_estate)) then
+       !      my_old_state=>my_estate
+       my_default=my_estate
+    else
+       my_default=default
+    endif
     my_estate=>my_default
     skip=.false.
     call kanalnummer(mf)
@@ -177,20 +197,21 @@ contains
           WRITE(6,*) ' '
           cycle
        ENDIF
-       if(com(1:1)=='!'.and.com(2:2)/='!') THEN
+       !     if(com(1:1)=='!'.and.com(2:2)/='!') THEN
+       if(com(1:1)=='!') THEN
           cycle
        ENDIF
        if(com(1:5)=='PAUSE') THEN
           com=com(1:5)
        ENDIF
        if(.not.skip) then
-          if(com(1:2)=="!!") then
+          if(com(1:2)=="/*") then
              skip=.true.
              cycle
           endif
        endif
        if(skip) then !1
-          if(com(1:2)=="!!") then
+          if(com(1:2)=="*/") then
              skip=.false.
           endif
           cycle
@@ -246,10 +267,15 @@ contains
           read(mf,*) NAME
           call kill_last_layout(m_u)
           my_ering%NAME=NAME
-       case('RESTOREMYSTATE','RESTORE')
-          my_default=my_OLD_state
-          my_estate=>my_OLD_state
+          !       case('RESTOREDEFAULT','RESTORE')
+          !          my_OLD_state=default
+          !          my_default=default
+          !          my_estate=>my_default
           ! Orbit stuff
+       case('USEORBITUNITS')
+          MY_ERING%t%ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
+       case('DONOTUSEORBITUNITS')
+          MY_ERING%t%ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.false.
        case('SETORBITRESTORE')
           read(mf,*) restore_mag,restore_magp
        case('SETORBITPHASOR')
@@ -285,10 +311,50 @@ contains
              write(6,*) "file ", INITIAL_setting(1:len_trim(FINAL_setting)), &
                   " exists, interrupt execution if you do not want to overwrite!"
              call kanalnummer(i1,INITIAL_setting)
-             read(i1,*) xsm%ac%t,unit_time
+             read(i1,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+             read(i1,*) nc
+             if(nc/=0) then
+                allocate(tc(nc))
+                do i2=1,nc
+                   read(i1,*) tc(i2)
+                enddo
+                call set_all_tc_for_restarting(my_ering,tc,nc)
+                deallocate(tc)
+             endif
              close(i1)
+             if(include_patch) then
+                call kanalnummer(i1,"time_patch.dat")
+                read(i1,*) n_patch
+                if(associated(my_ering%T%ORBIT_LATTICE%dt)) deallocate(my_ering%T%ORBIT_LATTICE%dt)
+                allocate(my_ering%T%ORBIT_LATTICE%dt(n_patch))
+                do i2=1,n_patch
+                   read(i1,*) i3,my_ering%T%ORBIT_LATTICE%dt(i2)
+                enddo
+                close(i1)
+                !looking for element just before the cavity
+                do i2=1,size(my_ering%T%ORBIT_LATTICE%ORBIT_NODES)
+                   T=>my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%NODE
+
+                   DO I1=1,my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%dpos
+
+
+                      if(t%parent_fibre%mag%kind==kind4) then
+                         my_ering%T%ORBIT_LATTICE%tp=>t%previous
+                         inode=i2
+                         goto 2222
+                      endif
+
+                      T=>T%NEXT
+                   ENDDO
+                enddo
+2222            write(6,*) "ptc mode # ",inode,"element ", my_ering%T%ORBIT_LATTICE%tp%parent_fibre%mag%name
+
+
+
+
+             endif
           else
-             read(mf,*) xsm%ac%t,unit_time
+             read(mf,*) xsm%ac%t,unit_time,n_used_patch,include_patch
           endif
           write(6,*) " Using ",unit_time," seconds"
           xsm%ac%t=xsm%ac%t*clight*unit_time
@@ -298,21 +364,33 @@ contains
           ptc_node_old=-1
           first_particle=my_false
           write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
+
        case('FINALTIMEINMYUNITS')
-          INQUIRE (FILE = FINAL_setting, EXIST = exists)
-          if(exists) then
-             call kanalnummer(i1,FINAL_setting)
-             write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time
-             write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
-             write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
-             close(i1)
-          endif
+          ! INQUIRE (FILE = FINAL_setting, EXIST = exists)
+          !    if(exists) then
+          call kanalnummer(i1,FINAL_setting)
+          write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time,n_used_patch,include_patch
+          write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
+          write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
+
+          call find_all_tc_for_restarting(my_ering,tc,nc)
+          write(i1,*) nc
+          do i2=1,nc
+             write(i1,*) tc(i2)
+          enddo
+          deallocate(tc)
+          close(i1)
+          !    endif
 
 
        case('SETORBITACCELERATION')
           accelerate=my_true
        case('SETORBITNOACCELERATION')
           accelerate=my_false
+       case('SETORBITRAMPING','RAMPING')
+          RAMP=my_true
+       case('SETORBITNORAMPING','NORAMPING')
+          RAMP=my_false
        case('SETORBITTIMEUNIT')
           read(mf,*) unit_time
        case('SETORBITSTATE')
@@ -335,8 +413,13 @@ contains
           enddo
           paccthen%mag%c4%acc%next=>paccfirst
           paccfirst%mag%c4%acc%previous=>paccthen
+       case('ENERGIZEORBITLATTICEATTIME')
+          read(mf,*) xa
+          call energize_ORBIT_lattice(xa)
        case('ENERGIZEORBITLATTICE')
           call energize_ORBIT_lattice
+       case('SETALLRAMP')
+          call set_all_ramp(my_ering)
 
        case('PRINTHERD','OPENHERD')
           IF(MF_HERD/=0) THEN
@@ -490,6 +573,12 @@ contains
           !       else
           !        write(6,*) " Default TPSA is Germanic "
           !       endif
+       case('ALMOSTEXACT')
+          almost_exact=.true.
+          write(6,*) " Almost Exact = ",almost_exact
+       case('TRUELYEXACT','EXACT')
+          almost_exact=.false.
+          write(6,*) " Almost Exact = ",almost_exact
        case('BERZ','GERMANIC','MARTIN')
           CALL change_package(2)
        case('YANG','CHINESE','LINGYUN')
@@ -529,7 +618,7 @@ contains
           READ(MF,*) THIN
           xbend=-one
           if(thin<0) then
-             READ(MF,*) xbend
+             READ(MF,*) sexr0,xbend
              if(xbend<0) then
                 xbend=-xbend
                 radiation_bend_split=MY_true
@@ -537,13 +626,13 @@ contains
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int,lmax0=lmax,xbend=xbend)
+          CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int,lmax0=lmax,sexr=sexr0,xbend=xbend)
           radiation_bend_split=MY_false
        case('EVENTHINLENS')
           READ(MF,*) THIN
           xbend=-one
           if(thin<0) then
-             READ(MF,*) xbend
+             READ(MF,*) sexr0,xbend
              if(xbend<0) then
                 xbend=-xbend
                 radiation_bend_split=MY_true
@@ -551,12 +640,12 @@ contains
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax0=lmax,xbend=xbend)
+          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax0=lmax,sexr=sexr0,xbend=xbend)
        case('ODDTHINLENS')
           READ(MF,*) THIN
           xbend=-one
           if(thin<0) then
-             READ(MF,*) xbend
+             READ(MF,*) sexr0,xbend
              if(xbend<0) then
                 xbend=-xbend
                 radiation_bend_split=MY_true
@@ -564,7 +653,7 @@ contains
              thin=-thin
           endif
           WRITE(6,*) "THIN LENS FACTOR =",THIN
-          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax0=lmax,xbend=xbend)
+          CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_FALSE,lim=limit_int,lmax0=lmax,sexr=sexr0,xbend=xbend)
           ! thin layout stuff
 
        case('ADDSURVEYINFO')
@@ -866,7 +955,7 @@ contains
           enddo
           call kill_para(my_ering)
           close(mfr)
-       case('RAMP','RAMPING')
+       case('RAMP','RAMPMAGNET')
           READ(MF,*) NAME, filename, hgap
 
           CALL CONTEXT(NAME)
@@ -881,7 +970,7 @@ contains
           theta_ac=zero
           D_ac=zero
           n_ac=0
-          n_coeff=0
+          ! n_coeff=0
           p=>my_ering%start
           do ii=1,my_ering%N
              found_it=MY_FALSE
@@ -930,7 +1019,7 @@ contains
                    P%MAGP%slow_ac=.true.
 
                    if(i2>p%mag%p%nmul) then
-                      CALL ADD(P,i2,0,0.d0)
+                      CALL ADD(P,i2,0,zero)
                    endif
                    allocate(P%MAG%d_an(p%mag%p%nmul))
                    allocate(P%MAG%d_bn(p%mag%p%nmul))
@@ -940,10 +1029,7 @@ contains
                    allocate(P%MAG%d0_bn(p%mag%p%nmul))
                    allocate(P%MAGp%d0_an(p%mag%p%nmul))
                    allocate(P%MAGp%d0_bn(p%mag%p%nmul))
-                   if(n_coeff/=0) then
-                      allocate(P%MAG%d_coeff(n_coeff))
-                      allocate(P%MAGp%d_coeff(n_coeff))
-                   endif
+
 
                    P%MAG%d_an=zero
                    P%MAG%d_bn=zero
@@ -982,7 +1068,7 @@ contains
              N_NAME=len_trim(name)
           ENDIF
           READ(MF,*)  DC_ac,A_ac,theta_ac
-          READ(MF,*)  D_ac,n_ac,n_coeff
+          READ(MF,*)  D_ac,n_ac !,n_coeff
           i2=0
           if(n_ac>0) then        !n_ac>0
              allocate(an(n_ac))
@@ -997,11 +1083,11 @@ contains
                 bn(i1)=dtu(1)
              enddo
           endif                  !n_ac>0
-          if(n_coeff>0) then        !n_ac>0
-             allocate(n_co(n_coeff))
-             n_co=zero
-             read(mf,*) n_co
-          endif                  !n_ac>0
+          !    if(n_coeff>0) then        !n_ac>0
+          !       allocate(n_co(n_coeff))
+          !       n_co=zero
+          !       read(mf,*) n_co
+          !    endif                  !n_ac>0
           p=>my_ering%start
           do ii=1,my_ering%N
              found_it=MY_FALSE
@@ -1042,7 +1128,7 @@ contains
                    P%MAGP%slow_ac=.true.
 
                    if(i2>p%mag%p%nmul) then
-                      CALL ADD(P,i2,0,0.d0)
+                      CALL ADD(P,i2,0,zero)
                    endif
                    allocate(P%MAG%d_an(p%mag%p%nmul))
                    allocate(P%MAG%d_bn(p%mag%p%nmul))
@@ -1052,10 +1138,7 @@ contains
                    allocate(P%MAG%d0_bn(p%mag%p%nmul))
                    allocate(P%MAGp%d0_an(p%mag%p%nmul))
                    allocate(P%MAGp%d0_bn(p%mag%p%nmul))
-                   if(n_coeff/=0) then
-                      allocate(P%MAG%d_coeff(n_coeff))
-                      allocate(P%MAGp%d_coeff(n_coeff))
-                   endif
+
 
                    P%MAG%d_an=zero
                    P%MAG%d_bn=zero
@@ -1070,13 +1153,6 @@ contains
                       P%MAGp%d0_bn(i1)=P%MAG%bn(i1)
                       P%MAGp%d0_an(i1)=P%MAG%an(i1)
                    enddo
-                   if(n_coeff/=0) then
-                      call alloc(P%MAGp%d_coeff,n_coeff)
-                      do i1=1,n_coeff
-                         P%MAG%d_coeff(i1)= n_co(i1)
-                         P%MAGp%d_coeff(i1)= n_co(i1)
-                      enddo
-                   endif
 
                    do i1=1,n_ac
                       P%MAG%d_an(i1) =an(i1)
@@ -1116,9 +1192,9 @@ contains
              deallocate(an,bn)
           endif
 
-          if(n_coeff>0) then
-             deallocate(n_co)
-          endif
+          !    if(n_coeff>0) then
+          !       deallocate(n_co)
+          !    endif
 
        case('SETAPERTURE')
           READ(MF,*) KINDA,NAME
@@ -1551,8 +1627,10 @@ contains
 
        case('ALEXREMOVAL')
           call special_alex_main_ring_removal(my_ering)
-
-
+       case('SASHASPECIALRCS')
+          READ(MF,*) epsf,sca   ! aper scale >0 <=1
+          ! call lattice_fit_bump_rcs(my_ering,epsf)
+          call lattice_fit_bump_min_rcs(my_ering%next,my_ering,EPSF,pol_,NPOL,sca)
        case('PRINTFRAMES')
 
           READ(MF,*) FILENAME
@@ -1570,6 +1648,18 @@ contains
           CALL  print_COMPLEX_SINGLE_STRUCTURE(my_ering,filename,lmax0=lmax)
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
+       case('SKIPMARKER','SKIPMARKERS')
+          print_marker=my_false
+       case('INCLUDEMARKER','INCLUDEMARKERS')
+          print_marker=my_true
+
+       case('TOGGLEMARKER','TOGGLEMARKERS')
+          print_marker=.not.print_marker
+          if(print_marker) then
+             Write(6,*)  'printing makers on flat file '
+          else
+             Write(6,*)  ' NOT printing makers on flat file '
+          endif
        case('PERMFRINGEON')
 
           CALL  PUTFRINGE(my_ering,MY_TRUE)
@@ -1865,6 +1955,18 @@ contains
           READ(MF,*)HARMONIC_NUMBER,VOLT,PHASE,c_%phase0,c_%CAVITY_TOTALPATH,epsf
           c_%phase0=c_%phase0*pi
           CALL power_cavity(my_ering,HARMONIC_NUMBER,VOLT,PHASE,epsf)
+
+
+       case('CAVITYTOTALPATH')
+          read(mf,*) pos
+
+          if(pos/=0.and.pos/=1) then
+             Write(6,*) "Cavity totalpath must 0 or 1"
+             stop 665
+          endif
+
+          call totalpath_cavity(my_ering,pos)
+
        case('EQUILIBRIUMSIZES')
           READ(MF,*) POS,FILENAME,fileTUNE, NAME
           call context(name)
@@ -1911,13 +2013,35 @@ contains
 
     enddo
 100 continue
-    if(associated(my_old_state)) my_estate=>my_old_state
+    !    if(associated(my_old_state)) my_estate=>my_old_state
 
     write(6,*) " Exiting Command File ", ptc_fichier(1:len_trim(ptc_fichier))
 
     close(mf)
 
   END subroutine read_ptc_command
+
+  subroutine totalpath_cavity(r,j)
+    implicit none
+    TYPE(LAYOUT), POINTER :: r
+    type(fibre), pointer :: p
+    integer i,j
+
+
+    p=>r%start
+    do i=1,r%n
+
+       if(p%mag%kind==kind4) then
+          write(6,*) " cavity found ",p%mag%name,p%mag%vorname
+          p%mag%c4%CAVITY_TOTALPATH=0
+          p%magp%c4%CAVITY_TOTALPATH=0
+       endif
+
+       p=>P%NEXT
+
+    enddo
+    c_%CAVITY_TOTALPATH=j
+  end subroutine totalpath_cavity
 
   subroutine power_cavity(r,HARM,VOLT,PHAS,prec)
     implicit none

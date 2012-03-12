@@ -36,7 +36,7 @@ module tree_element_MODULE
   private find_perp_basisp,find_exponentp
   private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8,extract_envelope_probe8
   PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8,concat_envelope,extract_envelope_damap
-  private EQUAL_DAMAP_RAY8,spimat_spinmat
+  private EQUAL_DAMAP_RAY8,spimat_spinmat,EQUAL_damapspin_smat,EQUAL_smat_damapspin
   private flip,dlie,dphase,phase_shift  ! flip in lielib
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
   integer :: clockwise=1
@@ -44,6 +44,10 @@ module tree_element_MODULE
   logical(lp) :: use_ptc_ac_position=.false.
   integer, private :: nd_used,i_phase,i_plane, decal
   logical :: onelie = my_false
+  logical :: firstfac=.true.
+  integer, private, parameter :: nfac=20
+  real(dp), private :: fac(0:nfac)
+
   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
@@ -67,7 +71,9 @@ module tree_element_MODULE
 
      MODULE PROCEDURE EQUAL_DAmapSPIN_int  ! damapspin = Identity (or zero)
      MODULE PROCEDURE EQUAL_PROBE8_PROBE8
-     MODULE PROCEDURE      EQUAL_damapspin
+     MODULE PROCEDURE      EQUAL_damapspin ! damapspin <= real spin matrix
+     MODULE PROCEDURE EQUAL_damapspin_smat ! damapspin => real spin matrix
+     MODULE PROCEDURE EQUAL_smat_damapspin
      MODULE PROCEDURE     EQUAL_SPINOR_SPINOR8
      MODULE PROCEDURE     EQUAL_PROBE_PROBE8
      MODULE PROCEDURE     normalise_spin
@@ -832,103 +838,6 @@ CONTAINS
 
   end SUBROUTINE symplectic
 
-  ! TABLE STUFF FOR FUTURE DA
-
-  integer function number_mon(n,m)
-    implicit none
-    integer i,n,m
-
-    number_mon=1
-
-
-    do i=n+m,max(n,m)+1,-1
-
-       number_mon=number_mon*i
-    enddo
-
-    do i=2,min(n,m)
-       number_mon=number_mon/i
-    enddo
-
-  end  function number_mon
-
-  integer function pos_mon(ju,nomax,nv)
-    implicit none
-    integer ju(:),no,nv,nomax
-    integer i,k,nk
-
-    pos_mon=0
-    no=0
-    do i=1,nv
-       no=no+ju(i)
-    enddo
-
-    nk=no
-
-    if(nk>nomax) then
-       pos_mon=0
-       return
-    endif
-
-    do k=1,nv-1
-       if(ju(k)/=0) then
-          pos_mon=pos_mon+number_mon(nk,nv-k)-number_mon(nk-ju(k),nv-k)
-          nk=nk-ju(k)
-       endif
-    enddo
-    pos_mon=pos_mon+1
-
-    if(no>0) pos_mon=pos_mon+number_mon(no-1,nv)
-
-  end  function pos_mon
-
-  subroutine find_exp(p,ju,no,nv)
-    implicit none
-    integer ju(:),no,nv
-    integer i,nk,nvk,p,p0,p1,pg
-
-    ju=0
-
-    if(p==1) then
-       return
-    endif
-
-    if(p<=nv+1) then
-       ju(nv-p+2)=1
-       return
-    endif
-
-
-    do i=1,no
-       p1=number_mon(i,nv)
-       if(p1>=p) then
-          nk=i
-          exit
-       endif
-       p0=p1
-    enddo
-
-
-
-    nvk=nv-1
-    pg=p0
-    do while(nvk>0)
-
-       p1=pg
-       do i=0,nk
-          p1=number_mon(nk-i,nvk-1)+p1
-          if(p1>=p) then
-             nk=nk-i
-             ju(nv-nvk)=i
-             nvk=nvk-1
-             exit
-          endif
-          pg=p1
-       enddo
-    enddo
-    ju(nv)=nk
-  end subroutine find_exp
-
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
   !  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -1127,6 +1036,35 @@ CONTAINS
   END    subroutine EQUAL_damapspin
 
 
+  subroutine EQUAL_damapspin_smat(S,R)
+    implicit none
+    TYPE(damapspin), INTENT(INOUT) :: S
+    real(dp), INTENT(IN) :: r(3,3)
+    INTEGER I,j
+
+    do i=1,3
+       do j=1,3
+          s%s%s(i,j)=r(i,j)
+       enddo
+    enddo
+
+
+  END    subroutine EQUAL_damapspin_smat
+
+  subroutine EQUAL_smat_damapspin(R,S)
+    implicit none
+    real(dp), INTENT(INout) :: r(3,3)
+    TYPE(damapspin), INTENT(IN) :: S
+    INTEGER I,j
+
+    do i=1,3
+       do j=1,3
+          r(i,j)=s%s%s(i,j)
+       enddo
+    enddo
+
+
+  END    subroutine EQUAL_smat_damapspin
 
 
   subroutine EQUAL_IDENTITY_SPINOR_8(S,R)
@@ -1635,7 +1573,7 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(scdadd%AC%om)
-    call ass(scdadd%AC%t)
+    !    call ass(scdadd%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     scdadd%AC%om=s2%AC%om
     scdadd%AC%t=s2%AC%t
@@ -1721,7 +1659,7 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(daddsc%AC%om)
-    call ass(daddsc%AC%t)
+    !    call ass(daddsc%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     daddsc%AC%om=s2%AC%om
     daddsc%AC%t=s2%AC%t
@@ -3363,7 +3301,7 @@ CONTAINS
        CALL alloc(R%X(I))
     ENDDO
     CALL alloc(R%om)
-    CALL alloc(R%t)
+    !    CALL alloc(R%t)
 
   END    subroutine ALLOC_rf_phasor_8
 
@@ -3408,7 +3346,7 @@ CONTAINS
        CALL KILL(R%X(I))
     ENDDO
     CALL KILL(R%om)
-    CALL KILL(R%t)
+    !    CALL KILL(R%t)
 
   END    subroutine kill_rf_phasor_8
 
@@ -5987,8 +5925,8 @@ CONTAINS
 
     nc=ns%a_t**(-1)*ds*ns%a_t
 
-    h%h=muc*((1.d0.mono.'002')+(1.d0.mono.'0002'))/two
-    h%h=h%h+muc*((1.d0.mono.'2')+(1.d0.mono.'02'))/two
+    h%h=muc*((one.mono.'002')+(one.mono.'0002'))/two
+    h%h=h%h+muc*((one.mono.'2')+(one.mono.'02'))/two
 
     nc%m=texp(h,nc%m)
 
@@ -5997,7 +5935,7 @@ CONTAINS
     !     nf=nc%m
 
     uno=nc%m
-    uno%pb%h=uno%pb%h-muc*((1.d0.mono.'2')+(1.d0.mono.'02'))/two
+    uno%pb%h=uno%pb%h-muc*((one.mono.'2')+(one.mono.'02'))/two
     tr=uno%pb%h
 
     call print(ns%theta0,6)
@@ -6010,10 +5948,10 @@ CONTAINS
 
     theta0r=theta0
 
-    call taylor_clean(theta0r%cos,1.d-1)
-    call taylor_clean(theta0r%sin,1.d-1)
-    call taylor_clean(tr%cos,1.d-5)
-    call taylor_clean(tr%sin,1.d-5)
+    !!    call taylor_clean(theta0r%cos,1.d-1)
+    !    call taylor_clean(theta0r%sin,1.d-1)
+    !    call taylor_clean(tr%cos,1.d-5)
+    !    call taylor_clean(tr%sin,1.d-5)
 
     call print(theta0r%cos,6)
     call print(tr%cos,6)
@@ -6190,6 +6128,159 @@ CONTAINS
 
   END SUBROUTINE clean_res_spinor_8
 
+
+  ! TABLE STUFF FOR FUTURE DA
+
+  integer function number_mon(n,m)
+    implicit none
+    integer i,n,m
+
+    number_mon=1
+
+
+    do i=n+m,max(n,m)+1,-1
+
+       number_mon=number_mon*i
+    enddo
+
+    do i=2,min(n,m)
+       number_mon=number_mon/i
+    enddo
+
+  end  function number_mon
+
+  integer function mul_fac(ju)
+    implicit none
+    integer ju(:),nv
+    integer i,k,no
+
+    mul_fac=one
+    if(firstfac) then
+       call make_fac
+       firstfac=.false.
+    endif
+    nv=size(ju)
+
+    k=0
+    do i=1,nv
+       k=k+ju(i)
+    enddo
+
+
+    do i=1,nv
+       if(ju(i)==0) cycle
+
+       mul_fac=(fac(k)/fac(k-ju(i))/fac(ju(i)))*mul_fac
+       k=k-ju(i)
+
+    enddo
+
+
+  end function mul_fac
+
+  subroutine make_fac
+    implicit none
+    integer i
+
+    fac(0)=one
+    do i=1,nfac
+       fac(i)=i*fac(i-1)
+    enddo
+
+  end subroutine make_fac
+
+
+  integer function pos_mon(ju,nomax,nv)
+    implicit none
+    integer ju(:),no,nv,nomax
+    integer i,k,nk
+
+    pos_mon=0
+    no=0
+    do i=1,nv
+       no=no+ju(i)
+    enddo
+
+    nk=no
+
+    if(nk>nomax) then
+       pos_mon=0
+       return
+    endif
+
+    do k=1,nv-1
+       if(ju(k)/=0) then
+          pos_mon=pos_mon+number_mon(nk,nv-k)-number_mon(nk-ju(k),nv-k)
+          nk=nk-ju(k)
+       endif
+    enddo
+    pos_mon=pos_mon+1
+
+    if(no>0) pos_mon=pos_mon+number_mon(no-1,nv)
+
+  end  function pos_mon
+
+  integer function pos_no(no,nomax,nv)
+    implicit none
+    integer ju(lnv),no,nv,nomax
+
+    if(no==0) then
+       pos_no=0
+    endif
+    if(no>nomax) then
+       pos_no=-1
+    endif
+    ju=0
+    ju(nv)=no
+    pos_no=pos_mon(ju,nomax,nv)
+  end  function pos_no
+
+  subroutine find_exp(p,ju,no,nv)
+    implicit none
+    integer ju(:),no,nv
+    integer i,nk,nvk,p,p0,p1,pg
+
+    ju=0
+
+    if(p==1) then
+       return
+    endif
+
+    if(p<=nv+1) then
+       ju(nv-p+2)=1
+       return
+    endif
+
+
+    do i=1,no
+       p1=number_mon(i,nv)
+       if(p1>=p) then
+          nk=i
+          exit
+       endif
+       p0=p1
+    enddo
+
+
+
+    nvk=nv-1
+    pg=p0
+    do while(nvk>0)
+
+       p1=pg
+       do i=0,nk
+          p1=number_mon(nk-i,nvk-1)+p1
+          if(p1>=p) then
+             nk=nk-i
+             ju(nv-nvk)=i
+             nvk=nvk-1
+             exit
+          endif
+          pg=p1
+       enddo
+    enddo
+    ju(nv)=nk
+  end subroutine find_exp
 
 
 
