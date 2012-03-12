@@ -51,7 +51,7 @@ struct node                /* the sequence is a linked list of nodes */
   /* RF-Multipoles */
   double volt; /* volt of the main rf-multipole field  AL: */
   double freq; /* frequency of the rf-multipole fields  AL: */
-  int    harmon; /* harmonic number of the rf-multipole fields  AL: */
+  int harmon; /* harmonic number of the rf-multipole fields  AL: */
   double lag; /* lag of the rf-multipole fields  AL: */
 };
 

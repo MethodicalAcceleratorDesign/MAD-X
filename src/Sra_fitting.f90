@@ -149,7 +149,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.D0
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);call alloc(eq,5);
     ID=1
@@ -159,8 +159,8 @@ contains
     CALL TRACK_probe_x(R,Y,+STATE,node1=IT1,node2=IT2)
     U=.NOT.CHECK_STABLE
     nf=y
-    TA(1)=0.75_dp
-    TA(2)=0.68_dp
+    TA(1)=0.75d0
+    TA(2)=0.68d0
     write(6,*) " arc tunes ",nf%tune(1:2)
     eq(1)=nf%dhdj%v(1) !-TA(1)
     eq(2)=nf%dhdj%v(2) !-TA(2)
@@ -183,7 +183,7 @@ contains
 
     !WRITE(6,*) BEX,BEY
     !WRITE(6,*) ALX,ALY
-    x=zero
+    x=0.d0
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
@@ -192,8 +192,8 @@ contains
 
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
-    eq(1)=(eq(1)*8 + (one+nf%dhdj%v(1)))*3-targ(1)
-    eq(2)=(eq(2)*8 + (one+nf%dhdj%v(2)))*3-targ(2)
+    eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
+    eq(2)=(eq(2)*8 + (1.d0+nf%dhdj%v(2)))*3-targ(2)
     eq(3)=eq(3)-ta(1)
 
     eq(4)=eq(4)-(nf%A_T%V(1).par.'1000')**2-(nf%A_T%V(1).par.'0100')**2
@@ -225,7 +225,7 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
@@ -387,7 +387,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.D0
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);call alloc(eq,5);
     ID=1
@@ -398,8 +398,8 @@ contains
     U=.NOT.CHECK_STABLE
 
     nf=y
-    TA(1)=0.75_dp
-    TA(2)=0.68_dp
+    TA(1)=0.75d0
+    TA(2)=0.68d0
     write(6,*) " arc tunes ",nf%tune(1:2)
     eq(1)=nf%dhdj%v(1) !-TA(1)
     eq(2)=nf%dhdj%v(2) !-TA(2)
@@ -422,7 +422,7 @@ contains
 
     !WRITE(6,*) BEX,BEY
     !WRITE(6,*) ALX,ALY
-    x=zero
+    x=0.d0
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
@@ -431,8 +431,8 @@ contains
 
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
-    eq(1)=(eq(1)*8 + (one+nf%dhdj%v(1)))*3-targ(1)
-    eq(2)=(eq(2)*8 + (one+nf%dhdj%v(2)))*3-targ(2)
+    eq(1)=(eq(1)*8 + (1.d0+nf%dhdj%v(1)))*3-targ(1)
+    eq(2)=(eq(2)*8 + (1.d0+nf%dhdj%v(2)))*3-targ(2)
     eq(3)=eq(3)-ta(1)
 
     eq(4)=eq(4)-(nf%A_T%V(1).par.'1000')**2-(nf%A_T%V(1).par.'0100')**2
@@ -465,7 +465,7 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
@@ -572,7 +572,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.D0
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);
     ID=1
@@ -583,8 +583,8 @@ contains
     U=.NOT.CHECK_STABLE
 
     nf=y
-    TA(1)=0.75_dp
-    TA(2)=0.68_dp
+    TA(1)=0.75d0
+    TA(2)=0.68d0
     write(6,*) " arc tunes ",nf%tune(1:2)
     nf%dhdj%v(1)=nf%dhdj%v(1)-TA(1)
     nf%dhdj%v(2)=nf%dhdj%v(2)-TA(2)
@@ -624,7 +624,7 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
     enddo
 
 
@@ -676,7 +676,7 @@ contains
     ENDDO
 
 112 continue
-    X=zero
+    X=0.D0
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);
     ID=1
@@ -697,8 +697,8 @@ contains
 
     call alloc(eq,4)
 
-    eq(1)=(TA(1)*8 + (one+nf%dhdj%v(1)))*3
-    eq(2)=(TA(2)*8 + (one+nf%dhdj%v(2)))*3
+    eq(1)=(TA(1)*8 + (1.d0+nf%dhdj%v(1)))*3
+    eq(2)=(TA(2)*8 + (1.d0+nf%dhdj%v(2)))*3
 
     nux=eq(1)
     nuy=eq(2)
@@ -739,7 +739,7 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.d0-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
@@ -940,20 +940,20 @@ contains
        if(doit) then
           ij=ij+1
           do k=p%mag%p%nmul,1,-1
-             an=p%mag%an(k)/p1%mag%l*two
-             bn=p%mag%bn(k)/p1%mag%l*two
+             an=p%mag%an(k)/p1%mag%l*2.d0
+             bn=p%mag%bn(k)/p1%mag%l*2.d0
              call add(p1,-k,1,an)
              call add(p1,k,1,bn)
-             !   call add(p,-k,0,zero)
-             !   call add(p,k,0,zero)
-             !   call add(p2,-k,0,zero)
-             !   call add(p2,k,0,zero)
+             !   call add(p,-k,0,0.d0)
+             !   call add(p,k,0,0.d0)
+             !   call add(p2,-k,0,0.d0)
+             !   call add(p2,k,0,0.d0)
           enddo
           ! el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
           if(p%mag%kind==kind3) then
-             bn=p%mag%k3%thin_h_angle/p1%mag%l*two
+             bn=p%mag%k3%thin_h_angle/p1%mag%l*2.d0
              call add(p1,1,1,bn)
-             an=p%mag%k3%thin_v_angle/p1%mag%l*two
+             an=p%mag%k3%thin_v_angle/p1%mag%l*2.d0
              call add(p1,-1,1,an)
              doit=(p%mag%k3%thin_h_foc/=zero.or.p%mag%k3%thin_v_foc/=zero)  !.or.p%mag%k3%thin_v_angle/=zero)
              if(doit) then
@@ -1089,26 +1089,26 @@ contains
        zx(2)=zf(2)   !!!
        ex=0
        ex=zx
-       ex%v(3)=ex%v(3)+(one.mono.3)
-       ex%v(4)=ex%v(4)+(one.mono.4)
-       gi%v(2)=(gi%v(2).o.ex)-(one.mono.2)
+       ex%v(3)=ex%v(3)+(1.d0.mono.3)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
        zx=zero
        zx(1)=zf(1)
        zx(3)=zf(3)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(4)=ex%v(4)+(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
 
-       gi%v(3)=(gi%v(3).o.ex)-(one.mono.3)
+       gi%v(3)=(gi%v(3).o.ex)-(1.d0.mono.3)
        zx=zero
        zx(1)=zf(1)
        zx(4)=zf(4)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(3)=ex%v(3)+(one.mono.3)
-       gi%v(4)=(gi%v(4).o.ex)-(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(3)=ex%v(3)+(1.d0.mono.3)
+       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
        !call print(gi,6)
        gi%v(1)=gi%v(1)-zf(1)
 
@@ -1120,26 +1120,26 @@ contains
        zx(4)=zf(4)   !!!
        ex=0
        ex=zx
-       ex%v(1)=ex%v(1)+(one.mono.1)
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       gi%v(4)=(gi%v(4).o.ex)-(one.mono.4)
+       ex%v(1)=ex%v(1)+(1.d0.mono.1)
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       gi%v(4)=(gi%v(4).o.ex)-(1.d0.mono.4)
        zx=zero
        zx(1)=zf(1)
        zx(3)=zf(3)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(4)=ex%v(4)+(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.d0.mono.2)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
 
-       gi%v(1)=(gi%v(1).o.ex)-(one.mono.1)
+       gi%v(1)=(gi%v(1).o.ex)-(1.d0.mono.1)
        zx=zero
        zx(3)=zf(3)
        zx(2)=zf(2)   !!!
        ex=0
        ex=zx
-       ex%v(4)=ex%v(4)+(one.mono.4)
-       ex%v(1)=ex%v(1)+(one.mono.1)
-       gi%v(2)=(gi%v(2).o.ex)-(one.mono.2)
+       ex%v(4)=ex%v(4)+(1.d0.mono.4)
+       ex%v(1)=ex%v(1)+(1.d0.mono.1)
+       gi%v(2)=(gi%v(2).o.ex)-(1.d0.mono.2)
        !call print(gi,6)
 
        gi%v(3)=gi%v(3)-zf(3)
@@ -1180,7 +1180,7 @@ contains
     r=>monitors(jm)%xf
     a=>monitors(jm)%a
     at=>monitors(jm)%at
-    mom=zero
+    mom=0.d0
     do i=1,4
        do j=i,4
           do k=1,nt
@@ -1227,16 +1227,16 @@ contains
        do i=1,2
           do j=1,2
              if(with_c==0.and.i/=j) cycle
-             h%h=h%h + mom(2*i-1,2*j-1)*(one.mono.(2*i))*(one.mono.(2*j))
-             h%h=h%h + mom(2*i,2*j)*(one.mono.(2*i-1))*(one.mono.(2*j-1))
-             h%h=h%h - mom(2*i,2*j-1)*(one.mono.(2*i-1))*(one.mono.(2*j))
-             h%h=h%h - mom(2*i-1,2*j)*(one.mono.(2*i))*(one.mono.(2*j-1))
+             h%h=h%h + mom(2*i-1,2*j-1)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j))
+             h%h=h%h + mom(2*i,2*j)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j-1))
+             h%h=h%h - mom(2*i,2*j-1)*(1.d0.mono.(2*i-1))*(1.d0.mono.(2*j))
+             h%h=h%h - mom(2*i-1,2*j)*(1.d0.mono.(2*i))*(1.d0.mono.(2*j-1))
           enddo
        enddo
 
        h%h=-h%h
        ar=full_abs(h%h)
-       ar=ar*20.0_dp
+       ar=ar*20.d0
        h%h=h%h/ar
 
        id=1
@@ -1500,7 +1500,6 @@ contains
        endif
     enddo
 
-    write(6,*) size(monitors), "monitors "
     do jm=1,size(monitors)
        norm=0.0_dp
        do i=1,m_turn
@@ -1773,16 +1772,16 @@ contains
 
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.2
+       ex%v(2)=1.0d0.mono.1
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m11=m11*ex
        m11=m11**jinv
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.2
+       ex%v(2)=1.0d0.mono.1
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m11=ex*m11*ex
 
        ! m11 is now the map from x,x11,y,py
@@ -1793,16 +1792,16 @@ contains
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.4
+       ex%v(4)=1.0d0.mono.3
        m22=m22*ex
        m22=m22**jinv
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.4
+       ex%v(4)=1.0d0.mono.3
        m22=ex*m22*ex
        ! m22 is now the map from x,px,y,y22
 
@@ -1813,17 +1812,17 @@ contains
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m2=m2*ex
        m2=m2**jinv
        !m11=m11**(-1)
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m2=ex*m2*ex
 
        ! m2 is now the map from x,px,y2,py
@@ -1914,16 +1913,16 @@ contains
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.4
+       ex%v(4)=1.0d0.mono.3
        m22=m22*ex
        m22=m22**jinv
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.4
+       ex%v(4)=1.0d0.mono.3
        m22=ex*m22*ex
 
        g%v(4)=m22%v(4)     !   py_0(x_0,p_x0,y_0,y_p22)
@@ -1934,16 +1933,16 @@ contains
 
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.2
+       ex%v(2)=1.0d0.mono.1
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m1=m1*ex
        m1=m1**jinv
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.2
+       ex%v(2)=1.0d0.mono.1
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m1=ex*m1*ex
        ! m1 is now the map from x,x1,y,py
 
@@ -1953,17 +1952,17 @@ contains
 !!!!!!!!!!!!   testing and computing m11  !!!!!!!!!!!!!!!!!
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m11=m11*ex
        m11=m11**jinv
 
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0d0.mono.1
+       ex%v(2)=1.0d0.mono.2
+       ex%v(3)=1.0d0.mono.3
+       ex%v(4)=1.0d0.mono.4
        m11=ex*m11*ex
 
        ! m11 is now the map from x2,px,y,py
@@ -1975,7 +1974,7 @@ contains
 
     !call kanalnummer(mf1,"original.dat")
     !call kanalnummer(mf2,"new.dat")
-    zf=zero
+    zf=0.d0
     zf(1)=monitors(jn(1))%r(1,1)
     zf(2)=monitors(jn(2))%r(1,1)
     zf(3)=monitors(jn(3))%r(3,1)
@@ -1989,7 +1988,7 @@ contains
 
     write(6,*) " M_turn used in Eikonal",m_turn
     do i=1,nt
-       zf=zero
+       zf=0.d0
        zf(1)=monitors(jn(1))%r(1,i)
        zf(2)=monitors(jn(2))%r(1,i)
        zf(3)=monitors(jn(3))%r(3,i)
@@ -2057,8 +2056,8 @@ contains
        y=y/n
        write(6,*) "Averages ",x,y
        do i=1,n
-          monitors(jm)%r(1,i)=(monitors(jm)%r(1,i)-x)/1000.0_dp
-          monitors(jm)%r(3,i)=(monitors(jm)%r(3,i)-y)/1000.0_dp
+          monitors(jm)%r(1,i)=(monitors(jm)%r(1,i)-x)/1000.d0
+          monitors(jm)%r(3,i)=(monitors(jm)%r(3,i)-y)/1000.d0
        enddo
 
     endif  ! filename
@@ -2250,533 +2249,4 @@ contains
     call kill(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
 
   end SUBROUTINE compute_twiss
-
-!!!! special rcs
-
-  subroutine lattice_fit_bump_rcs(R,EPSF)
-    IMPLICIT NONE
-    TYPE(layout), target,intent(inout):: R
-    integer, parameter :: neq=6,np=7
-    real(dp)  TARG(neq)
-    real(dp) CLOSED(6)
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE, MF
-    TYPE(TAYLOR) EQ(neq)
-    TYPE(REAL_8) Y(6)
-    integer ::  no=2,nt,j,it,pos1,pos2
-    type(damap) id
-    type(gmap) g
-    TYPE(TAYLOR)t
-    real(dp) epsf,epsr,epsnow,gam(2)
-    type(fibre), pointer:: p
-    TYPE(POL_BLOCK) poly(np)
-
-    do i=1,np
-       poly(i)=0
-    enddo
-
-    poly(1)%name='QDX2701'
-    poly(2)%name='QFL0101'
-    poly(3)%name='QDL0101'
-    poly(4)%name='QFM0201'
-    poly(5)%name='QDL0201'
-    poly(6)%name='QFL0301'
-    poly(7)%name='QDX0301'
-
-    do i=1,np
-       poly(i)%ibn(2)=i
-       r=poly(i)
-    enddo
-    !r%lastpos=1
-    !r%last=>R%start
-    call move_to( R,p,poly(1)%name,pos1,reset=my_true)
-    call move_to( R,p,poly(7)%name,pos2)
-    pos2=pos2+1
-
-    SET_TPSAFIT=.FALSE.
-
-
-    targ(1)=-1.216091585893243e0_dp     !  1 1
-    targ(2)=-6.061686871135153e0_dp     !  1 2
-    targ(3)=-0.7900090444471683E-01_dp  ! 2 1
-    targ(4)=2.120414509984705e0_dp      ! 3 3
-    targ(5)=-19.02200463334060e0_dp     ! 3 4
-    targ(6)=-0.1837954391003473e0_dp    ! 4 3
-
-
-
-
-
-    epsr=abs(epsf)
-
-    nt=neq+np
-    STATE=only_4d0
-
-    CALL INIT(STATE,no,NP)
-
-
-    it=0
-100 continue
-    it=it+1
-
-    CLOSED=zero
-
-
-    CALL INIT(STATE,no,NP)
-    CALL ALLOC(Y)
-    CALL ALLOC(EQ)
-    call alloc(id)
-
-    id=1
-    Y=CLOSED+id
-
-    CALL TRACK(R,Y,pos1,pos2,+STATE)
-
-    !stop
-
-    !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
-    !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
-    !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
-    !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
-
-    eq(1)=(y(1)%t.par.'1000')-targ(1)
-    eq(2)=(y(1)%t.par.'0100')-targ(2)
-    eq(3)=(y(2)%t.par.'1000')-targ(3)
-    eq(4)=(y(3)%t.par.'0010')-targ(4)
-    eq(5)=(y(3)%t.par.'0001')-targ(5)
-    eq(6)=(y(4)%t.par.'0010')-targ(6)
-
-    epsnow=zero
-    do i=1,neq
-       epsnow=epsnow+abs(eq(i))
-    enddo
-    write(6,*) " deviation ",epsnow
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-
-    do i=1,neq
-       eq(i)=eq(i)<=c_%npara
-    enddo
-    do i=1,neq
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-
-    CALL KILL(Y)
-    CALL KILL(id)
-    CALL KILL(EQ)
-
-
-
-    CALL INIT(1,nt)
-    call alloc(g,nt)
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=np+1,nt
-       call read(g%v(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-
-    call alloc(t)
-    do i=1,np
-       g%v(i)=one.mono.i
-       do j=np+1,nt
-          t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
-       enddo
-    enddo
-    CALL KILL(t)
-
-    g=g.oo.(-1)
-    tpsafit=zero
-    tpsafit(1:nt)=g
-
-    SET_TPSAFIT=.true.
-
-    do i=1,7
-       r=poly(i)
-    enddo
-
-
-    SET_TPSAFIT=.false.
-
-    CALL ELP_TO_EL(R)
-
-    !    write(6,*) " more "
-    !    read(5,*) more
-    if(it>=max_fit_iter) goto 101
-    if(epsnow<=epsr) goto 102
-    GOTO 100
-
-101 continue
-    write(6,*) " warning did not converge "
-
-102 continue
-    CALL KILL_PARA(R)
-
-
-  end subroutine lattice_fit_bump_rcs
-
-  subroutine lattice_fit_bump_min_rcs(R0,R1,EPSF,poly,np,sca)
-    IMPLICIT NONE
-    TYPE(layout), target,intent(inout):: R0,R1
-    integer, parameter :: neq=2
-    real(dp)  TARG(neq),bety0m,bety1m,bety1,bety0,dbx,dby,betx1ma,bety1ma
-    real(dp) X0(6),X1(6),CLOSED(6),betx0m,betx1m,betx1,betx0,dbyr,dbyrm,dbxr,dbxrm
-    TYPE(INTERNAL_STATE) STATE
-    INTEGER I,SCRATCHFILE, MF
-    TYPE(TAYLOR) EQ(neq)
-    TYPE(REAL_8) Y(6),Y1(6),Y0(6)
-    integer ::  no=2,nt,j,it,pos1,pos2,np
-    type(damap) id1,ID0
-    type(gmap) g
-    TYPE(TAYLOR)t,bp(2),v
-    type(taylor), allocatable :: dr(:)
-    real(dp) epsf,epsr,epsnow,gam(2),sca
-    type(fibre), pointer:: p,px,py
-    TYPE(POL_BLOCK) poly(:)
-    type(normalform) norm
-    real(dp) s0,ds
-    !   write(6,*)" correct ? "
-    !   read(5,*) j
-    !   if(j==1)    call lattice_fit_bump_rcs(R1,EPSF)
-    !do i=1,np
-    ! poly(i)=0
-    !enddo
-
-    !poly(1)%name='QDX2701'
-    !poly(2)%name='QFL0101'
-    !poly(3)%name='QDL0101'
-    !poly(4)%name='QFM0201'
-    !poly(5)%name='QDL0201'
-    !poly(6)%name='QFL0301'
-    !poly(7)%name='QDX0301'
-
-    !do i=1,np
-    ! poly(i)%ibn(2)=i
-    ! r1=poly(i)
-    !enddo
-
-    do i=1,np
-       r1=poly(i)
-    enddo
-
-    SET_TPSAFIT=.FALSE.
-    STATE=only_4d0
-
-
-    CALL FIND_ORBIT(R0,X0,1,STATE,c_1d_5)
-    write(6,*) "closed orbit ", CHECK_STABLE
-    write(6,*) X0
-    CALL FIND_ORBIT(R1,X1,1,STATE,c_1d_5)
-    write(6,*) "closed orbit ", CHECK_STABLE
-    write(6,*) X1
-
-    CALL INIT(STATE,1,0)
-
-    CALL ALLOC(Y0)
-    CALL ALLOC(Y1)
-    CALL ALLOC(norm)
-    CALL ALLOC(ID1,ID0)
-    id1=1
-    id0=1
-
-    y0=x0+id0
-    y1=x1+id1
-
-    CALL TRACK(R0,Y0,1,STATE)
-    CALL TRACK(R1,Y1,1,STATE)
-
-    norm=y0
-    id0=norm%a_t
-    targ(1:2) = norm%tune(1:2)
-    norm=y1
-    id1=norm%a_t
-    y0=x0+id0
-    y1=x1+id1
-
-    betx0m=0
-    betx1m=0
-    bety0m=0
-    bety1m=0
-    dbxrm=0
-    dbyrm=0
-
-    dbxr=0
-    dbyr=0
-
-    dbx=0
-    dby=0
-    s0=0
-    ds=0
-
-    p=>r0%start
-
-    do i=1,r0%n
-
-       ds=p%mag%p%ld
-
-       call TRACK(R0,Y0,i,i+1,STATE)
-       betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
-       bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
-       call TRACK(R1,Y1,i,i+1,STATE)
-       betx1=(y1(1)%t.sub.'1')**2+(y1(1)%t.sub.'01')**2
-       bety1=(y1(3)%t.sub.'001')**2+(y1(3)%t.sub.'0001')**2
-       if(betx0>betx0m) betx0m=betx0
-       if(betx1>betx1m) betx1m=betx1
-       if(bety0>bety0m) bety0m=bety0
-       if(bety1>bety1m) bety1m=bety1
-       dbxr= abs(betx1-betx0)  !/bety0
-       dbyr= abs(bety1-bety0)  !/bety0
-       if(dbxr>dbxrm) then
-          dbxrm=dbxr
-          ! write(6,*)"x", betx0,betx1
-          px=>p
-       endif
-       if(dbyr>dbyrm) then
-          dbyrm=dbyr
-          !write(6,*)"y", bety0,bety1
-          py=>p
-       endif
-       dbx=ds*(betx1-betx0)**2+dbx
-       dby=ds*(bety1-bety0)**2+dby
-       p=>p%next
-       s0=s0+ds
-    enddo
-
-    dbx=dbx/s0
-    dby=dby/s0
-    write(6,*) " maximum "
-    write(6,*) sqrt(betx0m),sqrt(betx1m)
-    write(6,*) sqrt(bety0m),sqrt(bety1m)
-    !   write(6,*) sqrt(dbx),sqrt(dby),s0
-    !   write(6,*) px%mag%name,py%mag%name
-    !   write(6,*) dbxr,dbyr
-
-
-    CALL kill(Y0)
-    CALL kill(Y1)
-    CALL kill(norm)
-    CALL kill(ID1,ID0)
-
-
-
-    epsr=abs(epsf)
-
-    nt=neq+np
-
-    CALL INIT(STATE,no,NP)
-
-
-    it=0
-100 continue
-    it=it+1
-
-    x1=zero
-
-
-    CALL INIT(STATE,no,NP)
-
-    CALL ALLOC(Y0)
-    CALL ALLOC(Y1)
-    CALL ALLOC(EQ)
-    call alloc(id0)
-    call alloc(id1)
-    call alloc(bp)
-    call alloc(norm)
-    call alloc(t,v)
-
-    CALL FIND_ORBIT(R1,X1,1,STATE,c_1d_5)
-
-    id0=1
-    Y0=x0+id0
-    id1=1
-    Y1=x1+id1
-
-    CALL TRACK(R0,Y0,1,STATE)
-    CALL TRACK(R1,Y1,1,+STATE)
-
-    norm=y0
-    id0=norm%a_t
-    targ(1:2) = norm%tune(1:2)
-    targ(1)=targ(1)+0.02d0
-    targ(2)=targ(2)+0.01d0
-    norm=y1
-    id1=norm%a_t
-
-    y0=x0+id0
-    y1=x1+id1
-
-
-    betx1ma=0
-    bety1ma=0
-
-    s0=0
-    p=>r0%start
-
-    do i=1,r0%n
-
-       ds=p%mag%p%ld
-
-       call TRACK(R0,Y0,i,i+1,STATE)
-       betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
-       bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
-
-
-       call TRACK(R1,Y1,i,i+1,+STATE)
-       bp(1)=ds*((y1(1)%t.par.'1000')**2+(y1(1)%t.par.'0100')**2-betx0)**2+bp(1)
-       bp(2)=ds*((y1(3)%t.par.'0010')**2+(y1(3)%t.par.'0001')**2-bety0)**2+bp(2)
-
-       betx1=(y1(1)%t.sub.'1000')**2+(y1(1)%t.sub.'0100')**2
-       bety1=(y1(3)%t.sub.'0010')**2+(y1(3)%t.sub.'0001')**2
-       if(betx1>betx1ma) betx1ma=betx1
-       if(bety1>bety1ma) bety1ma=bety1
-
-
-
-       p=>p%next
-       s0=s0+ds
-    enddo
-
-    write(6,*) " maximum "
-    write(6,*) sqrt(betx0m),sqrt(betx1m)
-    write(6,*) sqrt(bety0m),sqrt(bety1m)
-    write(6,*) " maximum now"
-    write(6,*) sqrt(betx0m),sqrt(betx1ma)
-    write(6,*) sqrt(bety0m),sqrt(bety1ma)
-
-    !stop
-
-    !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
-    !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
-    !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
-    !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
-
-    eq(1)=       ((NORM%dhdj%v(1)).par.'0000')-targ(1)
-    eq(2)=       ((NORM%dhdj%v(2)).par.'0000')-targ(2)
-    bp(1)=bp(1)/s0
-    bp(2)=bp(2)/s0
-    epsnow=zero
-    do i=1,neq
-       epsnow=epsnow+abs(eq(i))
-    enddo
-
-    write(6,*) " deviation ",epsnow
-    !write(6,*) " scale "
-    !read(5,*) sca
-    do i=1,neq
-       eq(i)=eq(i)-(one-sca)*(eq(i).sub.'0')
-    enddo
-    epsnow=zero
-    do i=1,neq
-       epsnow=epsnow+abs(eq(i))
-    enddo
-    write(6,*) " deviation ",epsnow
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-
-    t=(bp(1)+bp(2))
-    ds=t
-    write(6,*) " Merit function  ",ds
-
-    ! t=0
-    ! do i=1,np
-    !  t=t+half*(one.mono.(i+c_%nd2))**2
-    ! enddo
-
-    do i=1,np
-       v=t.d.(i+c_%nd2)
-       v=v<=c_%npara
-       call daprint(v,scratchfile)
-    enddo
-
-    do i=1,neq
-       eq(i)=eq(i)<=c_%npara
-       call daprint(eq(i),scratchfile)
-    enddo
-    close(SCRATCHFILE)
-
-    CALL KILL(Y0)
-    CALL KILL(Y1)
-    call KILL(id0)
-    CALL KILL(id1)
-    CALL KILL(EQ)
-    call KILL(bp)
-    call KILL(norm)
-    call KILL(t,v)
-
-
-
-    CALL INIT(1,nt)
-
-    call alloc(g,nt)
-    call alloc(t,v)
-    allocate(dr(nt))
-    call alloc(dr,nt)
-
-    call kanalnummer(SCRATCHFILE)
-    OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
-    rewind scratchfile
-    do i=1,nt
-       call read(dr(i),scratchfile)
-    enddo
-
-    do i=1,np
-       t=zero
-       do j=1,neq
-          v=(dr(np+j).d.i)
-          t=(one.mono.(np+j))*v+t
-       enddo
-       g%v(i)=dr(i)+t
-    enddo
-    do j=1,neq
-       g%v(np+j)=dr(np+j)
-    enddo
-    close(SCRATCHFILE)
-
-
-    g=g.oo.(-1)
-    tpsafit=zero
-    tpsafit(1:nt)=g
-
-    SET_TPSAFIT=.true.
-
-    do i=1,np
-       r1=poly(i)
-    enddo
-
-
-    SET_TPSAFIT=.false.
-
-    CALL ELP_TO_EL(R1)
-    CALL KILL(t,v)
-    CALL KILL(g)
-    call KILL(dr,nt)
-    deallocate(dr)
-
-    !   write(6,*) " more "
-    !   read(5,*) i
-    !   if(i==0) goto 102
-    if(it>=max_fit_iter/sca**2) goto 101
-    if(epsnow<=epsr) goto 102
-    GOTO 100
-
-101 continue
-    write(6,*) " warning did not converge "
-
-102 continue
-    CALL KILL_PARA(R1)
-
-
-
-
-  end subroutine lattice_fit_bump_min_rcs
-
-
-
 end module S_fitting_new

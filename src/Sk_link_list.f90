@@ -171,7 +171,6 @@ CONTAINS
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     logical(lp) doneit
-    write(6,*) "Killing Layout",L%name
     CALL LINE_L(L,doneit)
     nullify(current)
     IF(ASSOCIATED(L%T)) THEN
@@ -209,7 +208,6 @@ CONTAINS
        L%N=L%N-1
     END DO
     call de_set_up(L)
-    WRITE(6,*) 'Layout killed '
   END SUBROUTINE kill_layout
 
 
@@ -354,9 +352,8 @@ CONTAINS
   END SUBROUTINE move_to_p
 
 
-  SUBROUTINE move_to_name_old( L,current,name,pos,reset) ! moves to next one in list called name
+  SUBROUTINE move_to_name_old( L,current,name,pos) ! moves to next one in list called name
     implicit none
-    logical(lp),optional :: reset
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     integer, intent(inout):: pos
@@ -366,14 +363,6 @@ CONTAINS
 
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
-
-    if(present(reset)) then
-       if(reset) then
-          l%lastpos=1
-          l%last=>L%start
-       endif
-    endif
-
     foundit=.false.
     S1NAME=name
     CALL CONTEXT(S1name)
@@ -1591,9 +1580,9 @@ CONTAINS
     DO WHILE (ASSOCIATED(L % end))
        Current1 => L % end      ! end at the end
        L % end => Current % previous  ! update the end before disposing
-       !  WRITE(6,*) ' killing last layout '
+       WRITE(6,*) ' killing last layout '
        call kill_layout(Current)
-       !  WRITE(6,*) ' killed last layout '
+       WRITE(6,*) ' killed last layout '
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
        deallocate(Current1)
@@ -2194,8 +2183,6 @@ CONTAINS
     !    deallocate(L%orbit_dppfac)
     deallocate(L%orbit_deltae)
     deallocate(L%accel)
-    if(associated(L%dt)) deallocate(L%dt)
-    nullify(L%tp)
 
     !    deallocate(L%dxs6,L%xs6,L%freqb,L%freqa,L%voltb,L%volta,L%phasa,L%phasb)
     deallocate(L)
@@ -2266,8 +2253,6 @@ CONTAINS
        ALLOCATE(O%ORBIT_OMEGA_after);O%ORBIT_OMEGA_after=one
        !    ALLOCATE(O%dxs6,O%xs6,O%freqb,O%freqa,O%voltb,O%volta,O%phasa,O%phasb)
        ALLOCATE(O%accel);
-       nullify(O%dt);
-       nullify(O%tp);
        !    O%freqb=zero
        !    O%freqa=zero
        !    O%voltb=zero

@@ -254,10 +254,10 @@ node_value(char* par)
   else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
   else if (strcmp(lpar, "pass_flag") == 0) value = current_node->pass_flag;
 /* AL: added by A. Latina 16 Feb 2012 */
-//  else if (strcmp(lpar, "freq") == 0) value = current_node->freq;
-//  else if (strcmp(lpar, "volt") == 0) value = current_node->volt;
-//  else if (strcmp(lpar, "lag") == 0) value = current_node->lag;
-//  else if (strcmp(lpar, "harmon") == 0) value = current_node->harmon;
+  else if (strcmp(lpar, "freq") == 0) value = current_node->freq;
+  else if (strcmp(lpar, "volt") == 0) value = current_node->volt;
+  else if (strcmp(lpar, "lag") == 0) value = current_node->lag;
+  else if (strcmp(lpar, "harmon") == 0) value = current_node->harmon;
 //
   else value =  element_value(current_node, lpar);
   return value;

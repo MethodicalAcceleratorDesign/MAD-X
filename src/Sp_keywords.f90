@@ -8,7 +8,6 @@ module madx_keywords
   logical(lp)::mad8=my_false
   integer :: ifield_name=0
   logical(lp),private :: do_survey =.false.
-  logical(lp) :: print_marker =.true.
 
   type keywords
      character*20 magnet
@@ -30,46 +29,12 @@ module madx_keywords
      TYPE(CHART) CHART
   END type MADX_SURVEY
 
-  include "a_namelists.inc"
+
 
 
 contains
 
 
-  subroutine create_fibre_append(append,m_u,key,EXCEPTION,magnet_only)
-    implicit none
-
-    type(mad_universe), target, intent(inout)  :: m_u
-    logical(lp), optional :: magnet_only
-    type(keywords) key
-    INTEGER EXCEPTION  !,NSTD0,METD0
-    logical(lp) doneit,append
-    type(fibre), pointer :: current
-
-    if(append) then
-       call append_empty(m_u%end)
-    else
-       if(associated(m_u%end%end)) then
-          IF(ASSOCIATED(m_u%end%T)) THEN
-             CALL kill_NODE_LAYOUT(m_u%end%T)  !  KILLING THIN LAYOUT
-             nullify(m_u%end%T)
-             if(lielib_print(12)==1) WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
-          ENDIF
-          m_u%end%end=-1
-       else
-          call append_empty(m_u%end)
-       endif
-    endif
-    call  create_fibre(m_u%end%end,key,EXCEPTION,magnet_only)
-
-    m_u%end%closed=.true.
-
-    doneit=.true.
-    call ring_l(m_u%end,doneit)
-
-    call survey(m_u%end)
-    call MAKE_NODE_LAYOUT( m_u%end)
-  end subroutine create_fibre_append
 
 
   subroutine create_fibre(el,key,EXCEPTION,magnet_only)
@@ -435,28 +400,13 @@ contains
   subroutine print_LAYOUT(L,FILENAME,LMAX0,MFF)
     implicit none
     character(*) filename
-    integer I,MF,nmark
+    integer I,MF
     INTEGER, OPTIONAL :: MFF
     type(LAYOUT), TARGET :: L
     type(FIBRE), pointer :: P
     REAL(DP),OPTIONAL :: LMAX0
     character*255 line
     logical(lp) print_temp
-    nmark=0
-    if(.not.print_marker) then ! counting markers if not printing them
-       P=>L%START
-       DO I=1,L%N
-          if(.not.(print_marker.or.p%mag%kind/=kind0.or.i==1)) then
-             nmark=nmark+1
-          endif
-          P=>P%NEXT
-       ENDDO
-       if(L%START%mag%kind==kind0) then
-          write(6,*) "Removing ",nmark, "markers (first one left in) "
-       else
-          write(6,*) "Removing ",nmark, "markers "
-       endif
-    endif  ! counting markers
 
     IF(PRESENT(MFF)) THEN
        MF=MFF
@@ -466,9 +416,9 @@ contains
     ENDIF
 
     IF(PRESENT(LMAX0)) THEN
-       WRITE(MF,*) L%N-nmark, LMAX0, " NUMBER OF FIBRES AND L_MAX  "
+       WRITE(MF,*) L%N, LMAX0, " NUMBER OF FIBRES AND L_MAX  "
     ELSE
-       WRITE(MF,*) L%N-nmark, 0, " NUMBER OF FIBRES AND L_MAX  "
+       WRITE(MF,*) L%N, 0, " NUMBER OF FIBRES AND L_MAX  "
     ENDIF
     if(l%name(1:1)/=' ') then
        write(MF,'(a17,a16)') " GLOBAL DATA FOR ",l%name
@@ -497,10 +447,7 @@ contains
           print_temp=print_frame
           print_frame=my_true
        endif
-
-       if(print_marker.or.p%mag%kind/=kind0.or.i==1) then
-          CALL print_FIBRE(P,mf)
-       endif
+       CALL print_FIBRE(P,mf)
        if(i==1) then
           print_frame=print_temp
        endif
@@ -1961,88 +1908,5 @@ contains
     end select
 
   END SUBROUTINE switch_to_kind7
-
-
-  subroutine  print_new_flat(ring,filename)
-
-    implicit none
-    type(layout), target :: ring
-    type(fibre), pointer :: f
-    character(*) filename
-    integer i,mf
-
-    !goto 1
-    call kanalnummer(mf,filename)
-
-
-    f=>ring%start
-
-    do i=1,ring%n
-       call fib_fib0(f,my_true,mf)
-
-       f=>f%next
-    enddo
-
-    close(mf)
-
-
-1   call kanalnummer(mf,filename)
-
-
-    f=>ring%start
-
-    do i=1,1
-       write(6,*) f%beta0
-       call fib_fib0(f,my_false,mf)
-       write(6,*) f%beta0
-
-       f=>f%next
-    enddo
-
-    close(mf)
-  end subroutine print_new_flat
-
-
-  subroutine  fib_fib0(f,dir,mf)
-
-    implicit none
-    type(fibre), target :: f
-    logical(lp),optional ::  dir
-    integer,optional :: mf
-
-    if(present(dir)) then
-       if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
-          ! fib0%t(1)=f%BETA0
-          fib0%t(1)=f%GAMMA0I
-          fib0%t(2)=f%GAMBET
-          fib0%t(3)=f%MASS
-          fib0%t(4)=f%AG
-          fib0%i(1)=f%DIR
-          fib0%i(2)=f%CHARGE
-          !fib0%pos=f%pos
-          !fib0%loc=f%loc
-          if(present(mf)) then
-             write(mf,NML=fibrename)
-          endif
-       else
-          if(present(mf)) then
-             read(mf,NML=fibrename)
-          endif
-          ! f%BETA0=fib0%t(1)
-          f%GAMMA0I=fib0%t(1)
-          f%GAMBET=fib0%t(2)
-          f%MASS=fib0%t(3)
-          f%AG=fib0%t(4)
-          f%BETA0=sqrt(one-f%GAMMA0I**2)
-          f%DIR=fib0%i(1)
-          f%CHARGE=fib0%i(2)
-          !f%pos=fib0%pos
-          !f%loc=fib$%loc
-       endif
-    endif
-
-
-
-  end subroutine fib_fib0
 
 end module madx_keywords

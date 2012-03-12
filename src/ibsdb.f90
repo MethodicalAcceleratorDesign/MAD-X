@@ -410,7 +410,7 @@ subroutine ibs
   if ((ss2-s1) .eq. ll2) then
 	testtype = 1
 	print *, 'Twiss was calculated at the exit of the elements. Twiss functions at the center &
-		      & of the elements are calculated through linear interpolation'
+		  of the elements are calculated through linear interpolation'
   else if ((ss2-s1) .eq. (l1+ll2)/2) then
 	testtype = 2
 	print *, 'Twiss was calculated at the center of the elements. No interpolation is used'

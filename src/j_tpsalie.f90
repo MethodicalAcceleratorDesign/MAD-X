@@ -32,12 +32,11 @@ module tpsalie
 
   private A_OPT_gmap,k_OPT_gmap,allocgmap,KILLgmap,EQUALgMAP,IdentityEQUALgMAP,DAPRINTgMAP,concatorg
   private assgmap,concatg,DPEKgMAP,DPOKgMAP,gPOWMAP,trxgtaylorc,trxgtaylor,gPOWMAPtpsa,GETORDERgMAP,CUTORDERg
-  private matrixtMAPr,EQUALgMAPdamap
+  private matrixtMAPr
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALMAP
      MODULE PROCEDURE EQUALgMAP
-     MODULE PROCEDURE EQUALgMAPdamap
      MODULE PROCEDURE MAPTAYLORS
      MODULE PROCEDURE TAYLORSMAP
      MODULE PROCEDURE IdentityEQUALMAP
@@ -378,17 +377,17 @@ contains
     !    endif
   END SUBROUTINE alloctree
 
-  ! SUBROUTINE  damap_clean(S1,value)
-  !   implicit none
-  !   type (damap),INTENT(INOUT)::S1
-  !   real(dp),INTENT(INOUT)::value
-  !   INTEGER I
+  SUBROUTINE  damap_clean(S1,value)
+    implicit none
+    type (damap),INTENT(INOUT)::S1
+    real(dp),INTENT(INOUT)::value
+    INTEGER I
 
-  !    DO I=1,ND2
-  !       CALL taylor_clean(S1%V(I),value)
-  !    ENDDO
+    DO I=1,ND2
+       CALL taylor_clean(S1%V(I),value)
+    ENDDO
 
-  !  END SUBROUTINE damap_clean
+  END SUBROUTINE damap_clean
 
   SUBROUTINE  allocmap(S1)
     implicit none
@@ -424,6 +423,17 @@ contains
 
   END SUBROUTINE allocgmap
 
+  SUBROUTINE  gmap_clean(S1,value)
+    implicit none
+    type (gmap),INTENT(INOUT)::S1
+    real(dp),INTENT(INOUT)::value
+    INTEGER I
+
+    DO I=1,s1%n
+       CALL taylor_clean(S1%V(I),value)
+    ENDDO
+
+  END SUBROUTINE gmap_clean
 
   SUBROUTINE  allocvec(S1)
     implicit none
@@ -1097,19 +1107,6 @@ contains
        s2%v(i)=s1%v(i)
     enddo
   END SUBROUTINE EQUALgMAP
-
-  SUBROUTINE  EQUALgMAPdamap(S2,S1)
-    implicit none
-    type (gmap),INTENT(inOUT)::S2
-    type (damap),INTENT(IN)::S1
-    integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
-    call check_snake
-
-    do i=1,c_%nd2
-       s2%v(i)=s1%v(i)
-    enddo
-  END SUBROUTINE EQUALgMAPdamap
 
 
 
@@ -2497,7 +2494,7 @@ contains
   subroutine checksymp(s1,norm,orthogonal)
     implicit none
     TYPE (damap) s1
-    real(dp)  norm1,mat(8,8),xj(8,8)
+    real(dp)  norm1,mat(6,6),xj(6,6)
     real(dp), optional :: norm
     integer i,j
     logical(lp), optional :: orthogonal
@@ -2847,6 +2844,19 @@ contains
 
   ! remove small numbers
 
+  SUBROUTINE  clean_damap(S1,S2,prec)
+    implicit none
+    type (damap),INTENT(INOUT)::S2
+    type (damap), intent(INOUT):: s1
+    real(dp) prec
+    integer i
+
+    do i=1,c_%nd2
+       call clean_taylor(s1%v(i),s2%v(i),prec)
+    enddo
+
+
+  END SUBROUTINE clean_damap
 
   SUBROUTINE  flip_damap(S1,S2)
     implicit none

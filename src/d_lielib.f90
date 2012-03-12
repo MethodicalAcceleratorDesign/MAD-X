@@ -52,17 +52,13 @@ contains
 
 
 
-  subroutine lieinit(no1,nv1,nd1,ndpt1,time_pos,da_init)   !,nis
+  subroutine lieinit(no1,nv1,nd1,ndpt1,time_pos)   !,nis
     implicit none
     !! Lieinit initializes AD Package and Lielib
     integer i,nd1,ndc1,ndpt1,no1,nv1      !,nis
     real(dp),dimension(ndim)::ang,ra,st
     integer, optional :: time_pos
     integer ipause,mypauses
-    logical, optional :: da_init
-    logical dai
-    dai=.true.
-    if(present(da_init)) dai=da_init
 
     if(present(time_pos)) then
        time_plane=time_pos
@@ -84,7 +80,7 @@ contains
     !    do i=1,100
     !       is(i)=0
     !    enddo
-    if(dai) call daini(no,nv,0)
+    call daini(no,nv,0)
     !    if(nis.gt.0)call etallnom(is,nis,'$$IS      ')
 
     if(ndpt1.eq.0) then
@@ -2985,7 +2981,7 @@ contains
        enddo
     enddo
     !    if(idpr.eq.-101.or.idpr.eq.-102) then
-    if(lielib_print(7)/=-1)  call movearou(sai)
+    call movearou(sai)
     !    endif
     ! adjust sa such that sa(1,2)=0 and sa(3,4)=zero (courant-snyder-edwards-teng
     ! phase advances)

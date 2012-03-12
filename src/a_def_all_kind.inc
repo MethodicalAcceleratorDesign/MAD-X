@@ -225,7 +225,6 @@ TYPE SSMIP
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN         !Multipole component
 END  TYPE SSMIP
 
-
 TYPE TEAPOT
    TYPE(MAGNET_CHART), POINTER:: P
    real(dp),  POINTER ::L
@@ -236,10 +235,6 @@ TYPE TEAPOT
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
-   !!  electric info
-   real(dp),  DIMENSION(:), POINTER :: AE,BE  ! an,bn for electric stuff
-   real(dp),  DIMENSION(:,:,:), POINTER :: As,Bs
-   real(dp),  POINTER :: e_x,e_y,PHI
 END TYPE TEAPOT
 
 TYPE TEAPOTP
@@ -252,10 +247,6 @@ TYPE TEAPOTP
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
-   !!  electric info
-   TYPE(REAL_8),  DIMENSION(:), POINTER :: AE,BE ! an,bn for electric stuff
-   real(dp),  DIMENSION(:,:,:), POINTER :: As,Bs
-   TYPE(REAL_8),  POINTER :: e_x,e_y,PHI
 END TYPE TEAPOTP
 
 TYPE MON

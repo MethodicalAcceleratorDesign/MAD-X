@@ -5411,7 +5411,6 @@ contains
     if(ina.lt.1.or.ina.gt.nda_dab) then
        write(line,'(a22,i8)') 'ERROR IN dacycle, INA = ',ina
        ipause=mypauses(39,line)
-       write(6,*) ina
        stop
     endif
     !

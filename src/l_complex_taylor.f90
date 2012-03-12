@@ -3182,5 +3182,18 @@ contains
 
   END SUBROUTINE CFURES
 
+  ! remove small numbers
+
+  SUBROUTINE  clean_complextaylor(S1,S2,prec)
+    implicit none
+    type (complextaylor),INTENT(INOUT)::S2
+    type (complextaylor), intent(INOUT):: s1
+    real(dp) prec
+
+    call clean_taylor(S1%r,S1%r,prec)
+    call clean_taylor(S1%i,S1%i,prec)
+
+
+  END SUBROUTINE clean_complextaylor
 
 end module  complex_taylor

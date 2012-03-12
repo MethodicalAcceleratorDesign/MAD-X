@@ -57,10 +57,6 @@ contains
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
-    if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset in lattice_GET_CHROM"
-    endif
 
   end SUBROUTINE lattice_GET_CHROM
 
@@ -111,10 +107,6 @@ contains
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
-    if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset lattice_GET_tune"
-    endif
 
   end SUBROUTINE lattice_GET_tune
 
@@ -178,10 +170,6 @@ contains
     CALL kill(Y)
     call kill(id)
     call kill(NORM)
-    if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset in compute_A_4d"
-    endif
 
   end SUBROUTINE compute_A_4d
 
@@ -2442,18 +2430,17 @@ contains
   end SUBROUTINE  track_aperture
 
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,sexr,fib,useknob) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,fib,useknob) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
     real(dp), OPTIONAL, intent(inout) :: THIN
     real(dp), OPTIONAL, intent(in) :: lmax0
     real(dp), OPTIONAL, intent(in) ::xbend
-    real(dp), OPTIONAL, intent(in) ::sexr
     type(fibre), OPTIONAL, target :: fib
     logical(lp), OPTIONAL :: useknob
-    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggbt,xbend1,gf(7),sexr0,quad0
-    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb,sexk
+    real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggbt,xbend1,gf(7)
+    INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb
     integer incold ,parityold
     integer, optional :: lim(2)
     logical(lp) MANUAL,eject,doit,DOBEND
@@ -2461,11 +2448,6 @@ contains
     logical(lp),optional :: even
     type(layout), pointer :: L
     logical f1,f2
-
-    sexr0=zero
-
-
-    if(present(sexr)) sexr0=sexr
 
     f1=.false.
     f2=.false.
@@ -2477,7 +2459,7 @@ contains
           call kill(l%t)
           l=>l%next
        enddo
-    elseif(associated(r%t)) then
+    else
        call kill(r%t)
        f2=.true.
     endif
@@ -2514,8 +2496,8 @@ contains
 
 
     IF(MANUAL) THEN
-       write(6,*) "thi: thin lens factor (THI<0 TO STOP), sextupole factor and Bend factor "
-       read(5,*) thi,sexr0,xbend1
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) and Bend factor "
+       read(5,*) thi,xbend1
        IF(THI<0) eject=.true.
     ENDIF
 
@@ -2539,7 +2521,7 @@ contains
     MK3=0
     r%NTHIN=0
     nst_tot=0
-    sexk=0
+
     C=>R%START
     do  ii=1,r%n    ! WHILE(ASSOCIATED(C))
        doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
@@ -2636,17 +2618,12 @@ contains
              xl=C%MAG%L
              RHOI=zero
              QUAD=zero
-             QUAD0=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
              endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
-                IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
-                endif
              ELSE
                 QUAD=zero
              ENDIF
@@ -2672,7 +2649,6 @@ contains
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
              NTE=INT(GG)
-             sexk=sexk+xl*ABS(QUAD0)/thi
              metb=0
              if(dobend) then
                 call check_bend(xl,gg,rhoi,xbend1,gf,metb)
@@ -2733,17 +2709,12 @@ contains
              xl=C%MAG%L
              RHOI=zero
              QUAD=zero
-             QUAD0=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
              endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
-                IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
-                endif
              ELSE
                 QUAD=zero
              ENDIF
@@ -2768,7 +2739,6 @@ contains
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
-             sexk=sexk+xl*ABS(QUAD0)/thi
              NTE=INT(GG)
              metb=0
              if(dobend) then
@@ -2840,17 +2810,12 @@ contains
              xl=C%MAG%L
              RHOI=zero
              QUAD=zero
-             QUAD0=zero
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
              endif
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
-                IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
-                endif
              ELSE
                 QUAD=zero
              ENDIF
@@ -2876,7 +2841,6 @@ contains
              GG=XL*(RHOI**2+ABS(QUAD))
              GG=GG/THI
              NTE=INT(GG)
-             sexk=sexk+xl*ABS(QUAD0)/thi
              metb=0
              if(dobend) then
                 call check_bend(xl,gg,rhoi,xbend1,gf,metb)
@@ -2974,14 +2938,13 @@ contains
     else
        write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
     endif
-    write(6,*)   "Total NST due to Sextupoles ", sexk
     write(6,*)   "Biggest ds ", max_ds
 
 
 
     IF(MANUAL) THEN
-       write(6,*) "thi: thin lens factor (THI<0 TO STOP), sextupole factor and Bend factor "
-       read(5,*) thi,sexr0, xbend1
+       write(6,*) "thi: thin lens factor (THI<0 TO STOP) and Bend factor "
+       read(5,*) thi,xbend1
        IF(THI<0) THEN
           THI=R%THIN
           !          limit(1)=limit0(1)
@@ -2993,7 +2956,7 @@ contains
                 l=>l%next
              enddo
           elseif(f2) then
-             call make_node_layout(r)  !!! bug (l) was wrong
+             call make_node_layout(l)
           endif
           RETURN
        ELSE
