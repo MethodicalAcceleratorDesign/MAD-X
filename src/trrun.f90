@@ -3340,10 +3340,10 @@ subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
    parameter ( twopi = 2.*3.14159265358979d0 )
    parameter ( clight = 299792458d0 )
     
-   freq = node_value('freq ');
-   volt = node_value('volt ');
-   lag = node_value('lag ');
-   harmon = node_value('harmon ');
+   freq = node_value('rfm_freq ');
+   volt = node_value('rfm_volt ');
+   lag = node_value('rfm_lag ');
+   harmon = node_value('rfm_harmon ');
    call get_node_vector('pnl ', npn, pnl);
    call get_node_vector('psl ', nps, psl);
    krf = twopi*freq*1d6/clight;

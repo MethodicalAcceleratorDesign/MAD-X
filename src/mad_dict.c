@@ -2007,7 +2007,7 @@ char command_def[] =
 "lagerr   = [r, 0],  "
 "nbin     = [i, 0],  "
 "binmax   = [r, 0],  "
-"magnet   = [i, 1],  " /* AL: Crab-cavity turned into a magnet, to allow EFCOMP attach its errors */
+"magnet   = [i, 0],  "
 "slice    = [i, 1],  "
 "lfile    = [s, none, lfile],  "
 "tfile    = [s, none, tfile], "
@@ -2227,12 +2227,12 @@ char command_def[] =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
-"freq     = [r, 0],  " // RF-Multipole
-"volt     = [r, 0],  " // RF-Multipole
-"lag      = [r, 0],  " // RF-Multipole
-"harmon   = [i, 0],  " // RF-Multipole
-"pnl      = [r, {0}], " // RF-Multipole
-"psl      = [r, {0}]; " // RF-Multipole
+"rfm_freq   = [r, 0], "   // RF-Multipole
+"rfm_volt   = [r, 0], "   // RF-Multipole
+"rfm_lag    = [r, 0], "   // RF-Multipole
+"rfm_harmon = [i, 0], "   // RF-Multipole
+"pnl        = [r, {0}], " // RF-Multipole
+"psl        = [r, {0}]; " // RF-Multipole
 " "
 "emit: emit none 0 0 "
 "deltap   = [r, 0], "

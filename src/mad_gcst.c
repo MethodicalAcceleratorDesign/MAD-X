@@ -159,7 +159,7 @@ char* efield_table_cols[] =
   "dpsi", "mrex", "mrey", "mredx", "mredy",
   "arex", "arey", "mscalx", "mscaly",
   /* AL: RF-multipolar errors */
-  "freq", "harmon", "lag",
+  "rfm_freq", "rfm_harmon", "rfm_lag",
   "p0l", "p0sl", "p1l", "p1sl",
   "p2l", "p2sl", "p3l", "p3sl", "p4l",
   "p4sl", "p5l", "p5sl", "p6l", "p6sl",

@@ -49,10 +49,10 @@ struct node                /* the sequence is a linked list of nodes */
   /* RF-Multipole errors (EFCOMP) */
   struct double_array* p_ph_err; /* pointer to rf-multipole phase error array AL: */
   /* RF-Multipoles */
-  double volt; /* volt of the main rf-multipole field  AL: */
-  double freq; /* frequency of the rf-multipole fields  AL: */
-  int harmon; /* harmonic number of the rf-multipole fields  AL: */
-  double lag; /* lag of the rf-multipole fields  AL: */
+  double rfm_volt;   /* volt of the main rf-multipole field  AL: */
+  double rfm_freq;   /* frequency of the rf-multipole fields  AL: */
+  int    rfm_harmon; /* harmonic number of the rf-multipole fields  AL: */
+  double rfm_lag;    /* lag of the rf-multipole fields  AL: */
 };
 
 struct node_list /* contains list of node pointers sorted by name */

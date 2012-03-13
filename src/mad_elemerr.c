@@ -57,9 +57,9 @@ pro_error_make_efield_table(void)
            }
            /* AL: RF-errors */
            if(nanf->p_ph_err != NULL) {
-              ttb->d_cols[find_index_in_table(efield_table_cols, "freq")][ttb->curr] = nanf->freq;
-              ttb->d_cols[find_index_in_table(efield_table_cols, "harmon")][ttb->curr] = nanf->harmon;
-              ttb->d_cols[find_index_in_table(efield_table_cols, "lag")][ttb->curr] = nanf->lag;
+              ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_freq")][ttb->curr] = nanf->rfm_freq;
+              ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_harmon")][ttb->curr] = nanf->rfm_harmon;
+              ttb->d_cols[find_index_in_table(efield_table_cols, "rfm_lag")][ttb->curr] = nanf->rfm_lag;
               int from_col = find_index_in_table(efield_table_cols, "p0l");
               int to_col = find_index_in_table(efield_table_cols, "p20sl");
               int ncols = to_col - from_col + 1;
@@ -205,9 +205,9 @@ error_seterr(struct in_cmd* cmd)
                     for (j=0; j < ncols; j++) {
                       nextnode->p_al_err->a[j] = err->d_cols[from_col+j][i-1];
                     }
-                    nextnode->freq = err->d_cols[find_index_in_table(efield_table_cols, "freq")][i-1];
-                    nextnode->harmon = err->d_cols[find_index_in_table(efield_table_cols, "harmon")][i-1];
-                    nextnode->lag = err->d_cols[find_index_in_table(efield_table_cols, "lag")][i-1];
+                    nextnode->rfm_freq = err->d_cols[find_index_in_table(efield_table_cols, "rfm_freq")][i-1];
+                    nextnode->rfm_harmon = err->d_cols[find_index_in_table(efield_table_cols, "rfm_harmon")][i-1];
+                    nextnode->rfm_lag = err->d_cols[find_index_in_table(efield_table_cols, "rfm_lag")][i-1];
                   }
                   {
                     int from_col = find_index_in_table(efield_table_cols, "p0l");
@@ -419,7 +419,7 @@ error_efcomp(struct in_cmd* cmd)
   //  double nlength;
   //  double nvec0, nvec1, nvec2, nvec3;
   //  double val[4] = {0, 0, 0, 0};
-  static const char *atts[6] = {"order","radius","hyster","freq", "harmon", "lag"};
+  static const char *atts[6] = {"order","radius","hyster","rfm_freq", "rfm_harmon", "rfm_lag"};
   static const char *attv[6] = {"dkn","dks","dknr","dksr","dpn","dps"};
   const size_t attv_len = sizeof attv/sizeof *attv;
   const size_t atts_len = sizeof atts/sizeof *atts;
@@ -506,19 +506,19 @@ error_efcomp(struct in_cmd* cmd)
 	    fprintf(prt_file, "hyster flag is %d\n",(int)val);
 	} else if (i==3) {
 	  freq = val;
-          nextnode->freq = freq;
+          nextnode->rfm_freq = freq;
 	  /* debug printout */
 	  if (opt_debug)
 	    fprintf(prt_file, "freq flag is %d\n",(int)val);
 	} else if (i==4) {
 	  harmon = (int)val;
-          nextnode->harmon = harmon;
+          nextnode->rfm_harmon = harmon;
 	  /* debug printout */
 	  if (opt_debug)
 	    fprintf(prt_file, "harmon flag is %d\n",(int)val);
 	} else if (i==5) {
 	  lag = lag;
-          nextnode->lag = lag;
+          nextnode->rfm_lag = lag;
 	  /* debug printout */
 	  if (opt_debug)
 	    fprintf(prt_file, "lag flag is %d\n",(int)val);
@@ -856,9 +856,9 @@ node_rf_errors(double* errors, double *freq, double *harmon, double *lag )
   if (current_node->p_ph_err == NULL) return 0;
   else
   {
-    *freq = current_node->freq;
-    *harmon = current_node->harmon;
-    *lag = current_node->lag;
+    *freq = current_node->rfm_freq;
+    *harmon = current_node->rfm_harmon;
+    *lag = current_node->rfm_lag;
     copy_double(current_node->p_ph_err->a, errors,
                 current_node->p_ph_err->curr);
     return current_node->p_ph_err->curr;

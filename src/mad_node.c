@@ -67,10 +67,10 @@ clone_node(struct node* p, int flag)
   // AL: RF-Multipole
   //clone->pnl = p->pnl;
   //clone->psl = p->psl;
-  clone->lag = p->lag;
-  clone->freq = p->freq;
-  clone->volt = p->volt;
-  clone->harmon = p->harmon;
+  clone->rfm_lag = p->rfm_lag;
+  clone->rfm_freq = p->rfm_freq;
+  clone->rfm_volt = p->rfm_volt;
+  clone->rfm_harmon = p->rfm_harmon;
   //  
   return clone;
 }
@@ -254,10 +254,10 @@ node_value(char* par)
   else if (strcmp(lpar, "occ_cnt") == 0) value = current_node->occ_cnt;
   else if (strcmp(lpar, "pass_flag") == 0) value = current_node->pass_flag;
 /* AL: added by A. Latina 16 Feb 2012 */
-//  else if (strcmp(lpar, "freq") == 0) value = current_node->freq;
-//  else if (strcmp(lpar, "volt") == 0) value = current_node->volt;
-//  else if (strcmp(lpar, "lag") == 0) value = current_node->lag;
-//  else if (strcmp(lpar, "harmon") == 0) value = current_node->harmon;
+  else if (strcmp(lpar, "rfm_freq") == 0) value = current_node->rfm_freq;
+  else if (strcmp(lpar, "rfm_volt") == 0) value = current_node->rfm_volt;
+  else if (strcmp(lpar, "rfm_lag") == 0) value = current_node->rfm_lag;
+  else if (strcmp(lpar, "rfm_harmon") == 0) value = current_node->rfm_harmon;
 //
   else value =  element_value(current_node, lpar);
   return value;
@@ -370,10 +370,10 @@ store_node_value(char* par, double* value)
 
   /* AL: added by A. Latina 16 Feb 2012 */
 
-  else if (strcmp(lpar, "freq") == 0) store_comm_par_value("freq", *value, el->def);
-  else if (strcmp(lpar, "volt") == 0) store_comm_par_value("volt", *value, el->def);
-  else if (strcmp(lpar, "lag") == 0) store_comm_par_value("lag", *value, el->def);
-  else if (strcmp(lpar, "harmon") == 0) store_comm_par_value("harmon", *value, el->def);
+  else if (strcmp(lpar, "rfm_freq") == 0) store_comm_par_value("rfm_freq", *value, el->def);
+  else if (strcmp(lpar, "rfm_volt") == 0) store_comm_par_value("rfm_volt", *value, el->def);
+  else if (strcmp(lpar, "rfm_lag") == 0) store_comm_par_value("rfm_lag", *value, el->def);
+  else if (strcmp(lpar, "rfm_harmon") == 0) store_comm_par_value("rfm_harmon", *value, el->def);
   
   /* end of additions */
 }
