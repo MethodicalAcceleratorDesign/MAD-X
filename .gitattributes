@@ -292,6 +292,7 @@ make/linker.ld -text
 make/linker.lf95 -text
 make/linker.nagfor -text
 make/linker.rules -text
+make/make.act -text
 make/make.cfg -text
 make/make.inc -text
 make/make.lib -text

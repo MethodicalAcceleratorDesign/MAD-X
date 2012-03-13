@@ -1,0 +1,25 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - actions
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# create build directory
+
+ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+__DOIT := $(call mkdir,$(OBJDIR))
+endif
+
+# end of makefile

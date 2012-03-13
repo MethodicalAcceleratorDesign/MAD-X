@@ -25,6 +25,9 @@ include $(makedir)/make.cfg
 # user's preprocessing extra stuff
 -include $(FILE_PRE)
 
+# make actions
+include $(makedir)/make.act
+
 # project files
 -include $(FILE_VER)
 -include $(FILE_CPP)
