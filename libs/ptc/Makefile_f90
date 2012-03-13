@@ -1,0 +1,87 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | PTC makefile - Fortran files selection and dependencies
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Polymorphic Tracking Code from Etienne Forest
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+vpath %.inc src ../../src
+vpath %.f90 src ../../src
+vpath %.F90 src ../../src
+
+FC_SRC_PTC := a_scratch_size.f90 b_da_arrays_all.f90 c_dabnew.f90 d_lielib.f90 \
+              h_definition.f90 i_tpsa.f90 j_tpsalie.f90 k_tpsalie_analysis.f90 \
+              l_complex_taylor.f90 m_real_polymorph.f90 n_complex_polymorph.f90 \
+              o_tree_element.f90 \
+              \
+              Sa_extend_poly.f90 Sb_sagan_pol_arbitrary.f90 Sc_euclidean.f90 Sd_frame.f90 \
+              Se_status.f90 Sf_def_all_kinds.f90 Sg_sagan_wiggler.f90 Sh_def_kind.f90 \
+              Si_def_element.f90 Sk_link_list.f90 Sl_family.f90 Sm_tracking.f90 \
+              Sma0_beam_beam_ptc.f90 Sma_multiparticle.f90 Sn_mad_like.f90 So_fitting.f90 \
+              Sp_keywords.f90 Sq_orbit_ptc.f90 Sr_spin.f90 Sra_fitting.f90 St_pointers.f90
+
+FC_DIR := src ../../src
+FC_SRC := $(FC_SRC_PTC) $(notdir $(wildcard src/*.f90 src/*.F90))
+
+#######################
+# Fortran dependencies (case not automatic!)
+
+ifeq ($(FDEP),)
+
+# chain of dependencies (PTC from MAD-X)
+a_scratch_size.o:           ../../src/a_scratch_size.f90
+b_da_arrays_all.o:          ../../src/b_da_arrays_all.f90         a_scratch_size.o
+c_dabnew.o:                 ../../src/c_dabnew.f90                b_da_arrays_all.o
+d_lielib.o:                 ../../src/d_lielib.f90                c_dabnew.o
+h_definition.o:             ../../src/h_definition.f90            d_lielib.o
+i_tpsa.o:                   ../../src/i_tpsa.f90                  h_definition.o
+j_tpsalie.o:                ../../src/j_tpsalie.f90               i_tpsa.o
+k_tpsalie_analysis.o:       ../../src/k_tpsalie_analysis.f90      j_tpsalie.o
+l_complex_taylor.o:         ../../src/l_complex_taylor.f90        k_tpsalie_analysis.o
+m_real_polymorph.o:         ../../src/m_real_polymorph.f90        l_complex_taylor.o
+n_complex_polymorph.o:      ../../src/n_complex_polymorph.f90     m_real_polymorph.o
+o_tree_element.o:           ../../src/o_tree_element.f90          n_complex_polymorph.o
+
+Sa_extend_poly.o:           ../../src/Sa_extend_poly.f90          o_tree_element.o
+Sb_sagan_pol_arbitrary.o:   ../../src/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o
+Sc_euclidean.o:             ../../src/Sc_euclidean.f90            Sb_sagan_pol_arbitrary.o
+Sd_frame.o:                 ../../src/Sd_frame.f90                Sc_euclidean.o
+Se_status.o:                ../../src/Se_status.f90               Sd_frame.o
+Sf_def_all_kinds.o:         ../../src/Sf_def_all_kinds.f90        Se_status.o
+Sg_sagan_wiggler.o:         ../../src/Sg_sagan_wiggler.f90        Sf_def_all_kinds.o
+Sh_def_kind.o:              ../../src/Sh_def_kind.f90             Sg_sagan_wiggler.o
+Si_def_element.o:           ../../src/Si_def_element.f90          Sh_def_kind.o
+Sk_link_list.o:             ../../src/Sk_link_list.f90            Si_def_element.o
+Sl_family.o:                ../../src/Sl_family.f90               Sk_link_list.o
+Sm_tracking.o:              ../../src/Sm_tracking.f90             Sl_family.o
+Sma0_beam_beam_ptc.o:       ../../src/Sma0_beam_beam_ptc.f90      Sm_tracking.o
+Sma_multiparticle.o:        ../../src/Sma_multiparticle.f90       Sma0_beam_beam_ptc.o
+Sn_mad_like.o:              ../../src/Sn_mad_like.f90             Sma_multiparticle.o
+So_fitting.o:               ../../src/So_fitting.f90              Sn_mad_like.o
+Sp_keywords.o:              ../../src/Sp_keywords.f90             So_fitting.o
+Sq_orbit_ptc.o:             ../../src/Sq_orbit_ptc.f90            Sp_keywords.o
+Sr_spin.o:                  ../../src/Sr_spin.f90                 Sq_orbit_ptc.o
+Sra_fitting.o:              ../../src/Sra_fitting.f90             Sr_spin.o
+St_pointers.o:              ../../src/St_pointers.f90             Sp_keywords.o Ss_fake_mad.o 
+
+h_definition.o:             ../../src/a_def_frame_patch_chart.inc ../../src/a_def_all_kind.inc \
+                            ../../src/a_def_sagan.inc ../../src/a_def_element_fibre_layout.inc
+Sf_def_all_kinds.o:         ../../src/a_def_worm.inc
+Sp_keywords.o:              ../../src/a_namelists.inc
+
+# chain of dependencies (PTC lib)
+Ss_fake_mad.o:              src/Ss_fake_mad.f90                   Sra_fitting.o
+ptcinterface.o:             src/ptcinterface.f90                  St_pointers.o
+
+endif
+
+# end of makefile
