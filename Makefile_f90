@@ -48,7 +48,7 @@ matchlib2.o: FFLAGS := $(FFLAGS0)
 
 ifeq ($(FDEP),)
 
-# chain of dependencies
+# chain of dependencies (PTC)
 a_scratch_size.o:           src/a_scratch_size.f90
 b_da_arrays_all.o:          src/b_da_arrays_all.f90         a_scratch_size.o
 c_dabnew.o:                 src/c_dabnew.f90                b_da_arrays_all.o
@@ -87,6 +87,12 @@ Sr_spin.o:                  src/Sr_spin.f90                 Sq_orbit_ptc.o
 Sra_fitting.o:              src/Sra_fitting.f90             Sr_spin.o
 St_pointers.o:              src/St_pointers.f90             madx_ptc_module.o Sp_keywords.o
 
+h_definition.o:             src/a_def_frame_patch_chart.inc src/a_def_all_kind.inc \
+                            src/a_def_sagan.inc src/a_def_element_fibre_layout.inc
+Sf_def_all_kinds.o:         src/a_def_worm.inc
+Sp_keywords.o:              src/a_namelists.inc
+
+# chain of dependencies (MAD-X PTC)
 madx_ptc_distrib.o:         src/madx_ptc_distrib.f90        util.o madx_ptc_module.o
 madx_ptc_eplacement.o:      src/madx_ptc_eplacement.f90     util.o madx_ptc_intstate.o madx_ptc_module.o Sp_keywords.o
 madx_ptc_intstate.o:        src/madx_ptc_intstate.f90       Sp_keywords.o
@@ -98,7 +104,23 @@ madx_ptc_setcavs.o:         src/madx_ptc_setcavs.f90        madx_ptc_intstate.o 
 madx_ptc_trackcavs.o:       src/madx_ptc_trackcavs.f90      util.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_setcavs.o Sp_keywords.o
 madx_ptc_track_run.o:       src/madx_ptc_track_run.f90      util.o madx_ptc_module.o Sp_keywords.o
 madx_ptc_twiss.o:           src/madx_ptc_twiss.f90          util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
+ptc_export_xml.o:           src/ptc_export_xml.f90          madx_ptc_module.o
+user2_photon.o:             src/user2_photon.f90            madx_ptc_track_run.o
+ifneq ($(NOWRAP),yes) # wrap is long to compile, with little "true" dependencies
+wrap.o:                     src/wrap.f90                    madx_ptc_module.o madx_ptc_intstate.o \
+                                                            madx_ptc_normal.o madx_ptc_twiss.o \
+                                                            madx_ptc_distrib.o madx_ptc_setcavs.o \
+	                                                          madx_ptc_trackcavs.o madx_ptc_knobs.o \
+	                                                          madx_ptc_track_run.o madx_ptc_script.o \
+	                                                          St_pointers.o ptc_export_xml.o \
+	                                                          madx_ptc_eplacement.o
+endif
+madx_ptc_distrib.o:         src/madx_ptc_distrib.inc
+madx_ptc_knobs.o:           src/madx_ptc_knobs.inc
+madx_ptc_twiss.o:           src/madx_ptc_knobs.inc src/madx_ptc_distrib.inc
+user2_photon.o:             src/photoni.inc
 
+# chain of dependencies (MAD-X)
 dynap.o:                    src/dynap.f90                   util.o
 emit.o:                     src/emit.f90                    util.o
 gxx11.o:                    src/gxx11.f90                   util.o
@@ -113,7 +135,6 @@ matchsa.o:                  src/matchsa.f90                 util.o matchlib.o
 orbf.o:                     src/orbf.f90
 plot.o:                     src/plot.f90                    util.o
 poisson.o:                  src/poisson.f90
-ptc_export_xml.o:           src/ptc_export_xml.f90          madx_ptc_module.o
 resindex.o:                 src/resindex.f90                util.o
 sodd.o:                     src/sodd.f90                    util.o
 survey.o:                   src/survey.f90                  util.o
@@ -122,29 +143,7 @@ timex.o:                    src/timex.f90
 touschek.o:                 src/touschek.f90                util.o
 trrun.o:                    src/trrun.f90                   util.o
 twiss.o:                    src/twiss.f90                   util.o
-user2_photon.o:             src/user2_photon.f90            madx_ptc_track_run.o
 util.o:                     src/util.f90
-
-# wrap is long to compile, with little "real" dependencies
-ifneq ($(NOWRAP),yes)
-wrap.o:                     src/wrap.f90                    madx_ptc_module.o madx_ptc_intstate.o \
-                                                            madx_ptc_normal.o madx_ptc_twiss.o \
-                                                            madx_ptc_distrib.o madx_ptc_setcavs.o \
-	                                                          madx_ptc_trackcavs.o madx_ptc_knobs.o \
-	                                                          madx_ptc_track_run.o madx_ptc_script.o \
-	                                                          St_pointers.o ptc_export_xml.o \
-	                                                          madx_ptc_eplacement.o
-endif
-
-# dependencies on includes
-h_definition.o:             src/a_def_frame_patch_chart.inc src/a_def_all_kind.inc \
-                            src/a_def_sagan.inc src/a_def_element_fibre_layout.inc
-Sf_def_all_kinds.o:         src/a_def_worm.inc
-Sp_keywords.o:              src/a_namelists.inc
-madx_ptc_distrib.o:         src/madx_ptc_distrib.inc
-madx_ptc_knobs.o:           src/madx_ptc_knobs.inc
-madx_ptc_twiss.o:           src/madx_ptc_knobs.inc src/madx_ptc_distrib.inc
-user2_photon.o:             src/photoni.inc
 
 endif
 
