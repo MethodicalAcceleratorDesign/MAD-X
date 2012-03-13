@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - linker rules
+# | MAD makefile - ar linker settings (archive)
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,10 +16,16 @@
 # | $Id$
 # |
 
-.PHONY: $(PROJECT)
+#
+# linker flags
+#
 
-$(PROJECT): $(OBJECTS)
-	$E "*** Linking $(@F)"
-	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $@$(PROJEXT) $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
+LDFLAGS += -rc
+
+#
+# command translator
+#
+
+LD_tr = $(strip $(subst $(SPACE)-o , ,$1))
 
 # end of makefile

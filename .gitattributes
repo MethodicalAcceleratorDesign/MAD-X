@@ -279,6 +279,7 @@ make/compiler.nagfor -text
 make/compiler.rules -text
 make/depend.rules -text
 make/info.rules -text
+make/linker.ar -text
 make/linker.cl -text
 make/linker.g++ -text
 make/linker.g95 -text

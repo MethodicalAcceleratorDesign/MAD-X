@@ -49,7 +49,7 @@ cleandep:
 
 cleanbuild:
 	$E "** Removing $(PROJECT)"
-	$_ $(RM) $(PROJECT)
+	$_ $(RM) $(PROJECT)$(PROJEXT)
 
 cleanall: clean
 	$E "** Removing" $(OBJDIR)

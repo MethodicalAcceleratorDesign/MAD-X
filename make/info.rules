@@ -38,7 +38,7 @@ infoinc: info
 	@ echo "Linker       settings file      " = $(if $(LD),$(makedir)$/linker.$(LDNAME),)
 
 infoprj: infoinc
-	@ echo "          project settings file " = $(PROJECT) $(VERSION) $(VERSION_DATE)
+	@ echo "          project settings file " = $(PROJECT)$(PROJEXT) $(VERSION) $(VERSION_DATE)
 	@ echo "Cpp       project settings file " = $(FILE_CPP)
 	@ echo "C         project settings file " = $(FILE_C)
 	@ echo "C++       project settings file " = $(FILE_CXX)

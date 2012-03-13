@@ -38,8 +38,7 @@ makefile options:
 # Project settings
 
 PROJECT sets the project name.
-  The program will have the name $(PROJECT)$(ARCH)
-  This will be also the name of the default target
+  The program/library/archive will have the name $(PROJECT)$(ARCH)$(PROJEXT)
 
 Other flags can be added to configure the project.
   Logical flags should use yes/no, not YES/NO
@@ -51,7 +50,8 @@ In the following settings, the first option is the default.
 
 ARCH=detect/32/64 sets the target platform archictecture
   'detect' is replaced by 32/64 depending on platform architecture
-  The program and the default target will have the name $(PROJECT)$(ARCH)
+  The default target will have the name $(PROJECT)$(ARCH)
+  The program/library/archive will have the name $(PROJECT)$(ARCH)$(PROJEXT)
 
 DEBUG=yes/no sets/unsets the build for debugging (with dwarf-2 compliance)
   adds -D_DEBUG to CPPFLAGS
