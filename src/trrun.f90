@@ -590,8 +590,10 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
        500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
        330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
+  ! Use this line to enable non-linear thin lens
+  !     330, 500, 350, 360, 370,500,500,400,410,420,500, 500, 500, 500), code
   ! Use this line to enable RF-Multipole
-  !     330, 500, 350, 360, 370,500,500,400,410,420, 500, 500, 500), code
+  !     330, 500, 350, 360, 370,500,500,400,410,420,430, 500, 500, 500), code
   !
   !---- Make sure that nothing is execute if element is not known
   go to 500
@@ -697,9 +699,15 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 410 continue
   call ttvacdip(track,ktrack,turn)
   go to 500
+  !---- nonlinear elliptical lens
 420 continue
+  call ttnllens(track,ktrack)
+  go to 500
+  !---- rf multipoles
+430 continue
   call ttrfmult(track,ktrack,dxt,dyt,turn)
   go to 500
+
   !---- Solenoid.
 
 
@@ -3298,6 +3306,59 @@ subroutine trclor(orbit0)
   print '(''orbit: '', 1p,6e14.6)', orbit0
 
 end subroutine trclor
+
+subroutine ttnllens(track,ktrack)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Track a set of trajectories through a thin nonlinear lens          *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  ! Added by Alexander Valishev 22 Oct 2010                              *
+  !----------------------------------------------------------------------*
+  integer itrack,ktrack
+  double precision track(6,*),node_value,get_variable,    &
+       pi,one,two,knll,cnll, &
+       dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  parameter(one=1d0,two=2d0)
+  
+  cnll=node_value('cnll ')
+  knll=node_value('knll ')/cnll
+  pi=get_variable('pi ')
+
+  do itrack = 1, ktrack
+
+    x = track(1,itrack)/cnll
+    y = track(3,itrack)/cnll
+
+    u=0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
+    v=0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
+    if (u.eq.1d0) then 
+       dd=0 
+    else 
+       dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
+    endif
+    dUu=(u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
+     -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+     +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
+    dUv=2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
+         -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2))&
+         /(u**2-v**2)
+    dux=0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
+    duy=0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
+    dvx=0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
+    dvy=0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+
+    track(2,itrack)=track(2,itrack)+knll*(dUu*dux+dUv*dvx)
+    track(4,itrack)=track(4,itrack)+knll*(dUu*duy+dUv*dvy)
+
+  enddo
+end subroutine ttnllens
 
 subroutine ttrfmult(track, ktrack,dxt,dyt,turn)
 

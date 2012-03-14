@@ -443,7 +443,7 @@ get_defined_commands(void)
   int i;
   char** p;
   int n = char_cnt(';', command_def);
-  p = (char**) mymalloc(rout_name,n * sizeof(char*));
+  p = mymalloc(rout_name,n * sizeof(char*));
   p[0] = strtok(command_def, ";");
   for (i = 1; i < n; i++) /* make temporary list - strtok is called again */
     p[i] = strtok(NULL, ";");

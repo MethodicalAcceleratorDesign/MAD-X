@@ -2145,9 +2145,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
        310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 310), code  ! Disable RF-Multipole
-  !     310, 420), code  ! Enable RF-Multipole 
-
+       310, 310, 310), code
+  !     310, 320), code  ! Enable non-linear thin lens 
+  !     310, 320, 330), code  ! Enable RF-Multipole 
+  
   !---- Drift space, monitor, collimator, or beam instrument.
 10 continue
 170 continue
@@ -2250,8 +2251,13 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 300 call tmdpdg(ftrk,orbit,fmap,re)
   go to 500
 
+  !---- non-linear thin lens
+320 continue
+  call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
+  go to 500
+
   !---- RF-Multipole.
-420 continue
+330 continue
   call tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   go to 500
 
@@ -6349,6 +6355,79 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsol_th
+
+SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for elliptical lens A.Valishev Oct.19,2010         *
+  !     Input:                                                           *
+  !     FSEC      (logical) If true, return second order terms.          *
+  !     FTRK      (logical) If true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     ORBIT(6)  (real)    Closed orbit.                                *
+  !     Output:                                                          *
+  !     FMAP      (logical) If true, element has a map.                  *
+  !     EK(6)     (real)    Kick due to element.                         *
+  !     RE(6,6)   (real)    Transfer matrix.                             *
+  !     TE(6,6,6) (real)    Second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical fsec,ftrk,fmap
+  double precision orbit(6),ek(6),re(6,6),te(6,6,6),node_value,get_variable,&
+       pi,zero,one,two,knll,cnll,k1, &
+       dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  parameter(zero=0d0,one=1d0,two=2d0)
+
+  !---- Matrix
+  fmap = .true.
+  cnll=node_value('cnll ')
+  knll=node_value('knll ')/cnll
+  k1=knll/cnll
+  re(1,1)=one
+  re(2,1)=-two*k1
+  re(2,2)=one
+  re(3,3)=one
+  re(4,3)=two*k1
+  re(4,4)=one
+  re(5,5)=one
+  re(6,6)=one
+
+  !---- Second Order Terms
+!  if (fsec) then
+!  endif
+
+  !---- Track orbit.
+  if (ftrk) then
+    pi=get_variable('pi ')
+    x = orbit(1)/cnll
+    y = orbit(3)/cnll
+    u=0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
+    v=0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
+    if (u.eq.1d0) then 
+       dd=0 
+    else 
+       dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
+    endif
+    dUu=(u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
+     -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+     +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
+    dUv=2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
+         -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2))&
+         /(u**2-v**2)
+    dux=0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
+    duy=0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
+    dvx=0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
+    dvy=0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+
+    orbit(2)=orbit(2)+knll*(dUu*dux+dUv*dvx)
+    orbit(4)=orbit(4)+knll*(dUu*duy+dUv*dvy)
+  endif
+
+end SUBROUTINE tmnll
+
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
 
   use twtrrfi
