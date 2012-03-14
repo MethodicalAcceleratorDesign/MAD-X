@@ -27,7 +27,8 @@ FC_SRC_PTC := a_scratch_size.f90 b_da_arrays_all.f90 c_dabnew.f90 d_lielib.f90 \
               Se_status.f90 Sf_def_all_kinds.f90 Sg_sagan_wiggler.f90 Sh_def_kind.f90 \
               Si_def_element.f90 Sk_link_list.f90 Sl_family.f90 Sm_tracking.f90 \
               Sma0_beam_beam_ptc.f90 Sma_multiparticle.f90 Sn_mad_like.f90 So_fitting.f90 \
-              Sp_keywords.f90 Sq_orbit_ptc.f90 Sr_spin.f90 Sra_fitting.f90 St_pointers.f90
+              Sp_keywords.f90 Spb_fake_gino_sub.f90 Sq_orbit_ptc.f90 Sr_spin.f90 \
+              Sra_fitting.f90 St_pointers.f90
 
 FC_DIR := src ../../src
 FC_SRC := $(FC_SRC_PTC) $(notdir $(wildcard src/*.f90 src/*.F90))
@@ -68,6 +69,7 @@ Sma_multiparticle.o:        ../../src/Sma_multiparticle.f90       Sma0_beam_beam
 Sn_mad_like.o:              ../../src/Sn_mad_like.f90             Sma_multiparticle.o
 So_fitting.o:               ../../src/So_fitting.f90              Sn_mad_like.o
 Sp_keywords.o:              ../../src/Sp_keywords.f90             So_fitting.o
+Spb_fake_gino_sub.o:        ../../src/Spb_fake_gino_sub.f90
 Sq_orbit_ptc.o:             ../../src/Sq_orbit_ptc.f90            Sp_keywords.o
 Sr_spin.o:                  ../../src/Sr_spin.f90                 Sq_orbit_ptc.o
 Sra_fitting.o:              ../../src/Sra_fitting.f90             Sr_spin.o
