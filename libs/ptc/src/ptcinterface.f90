@@ -235,7 +235,7 @@ CAVITY_TOTALPATH=0
 SUBROUTINE ptc_synchronous_set(i_node)
      IMPLICIT NONE
      integer i_node
-   write(6,*) " Not needed anymore "
+!   write(6,*) " Not needed anymore "
 end SUBROUTINE ptc_synchronous_set
 
 SUBROUTINE ptc_synchronous_after(i_node)
@@ -256,7 +256,7 @@ SUBROUTINE ptc_synchronous_after(i_node)
       call print(my_ORBIT_LATTICE%state,6)
       write(6,*) " ********************************************************* "
    else
-    write(6,*) " ptc_synchronous_after not needed anymore "
+!    write(6,*) " ptc_synchronous_after not needed anymore "
    endif
 end SUBROUTINE ptc_synchronous_after
 
