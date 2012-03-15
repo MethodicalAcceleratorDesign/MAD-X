@@ -81,7 +81,7 @@ module precision_constants
   real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
   real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
   real(dp) :: e_muon = 0.d0
-  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
+ !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
   !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
   !  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
@@ -195,7 +195,7 @@ module precision_constants
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1/
   INTEGER,TARGET :: SECTOR_NMUL_MAX=10
   INTEGER, target :: SECTOR_NMUL = 10
-  integer, parameter :: no_e=5  !  electric
+  integer, parameter :: no_e=5  !  electric 
 
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=zero

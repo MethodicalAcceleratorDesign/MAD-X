@@ -58,8 +58,8 @@ contains
     CALL kill(Y)
     call kill(id)
     if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset in lattice_GET_CHROM"
+     CALL RESET_APERTURE_FLAG
+     write(6,*) " Flags were reset in lattice_GET_CHROM"
     endif
 
   end SUBROUTINE lattice_GET_CHROM
@@ -75,11 +75,11 @@ contains
     type(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
-
-
+    
+    
 
     STATE=my_state
-
+  
     closed=zero
     CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
     write(6,*) "closed orbit "
@@ -98,24 +98,24 @@ contains
     closed=y
     WRITE(6,'(6(1x,g21.14),a24)') CLOSED," <-- should be identical"
     if(mf==6) then
-       WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
-       if(norm%tune(3)/=zero.and.c_%ndpt==0) &
-            WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
-    else
-       if(norm%tune(3)/=zero.and.c_%ndpt==0) then
-          WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:3)
-       else
-          WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:2)
-       endif
+     WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
+     if(norm%tune(3)/=zero.and.c_%ndpt==0) &
+     WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
+     else
+     if(norm%tune(3)/=zero.and.c_%ndpt==0) then
+       WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:3)
+     else
+       WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:2)
+     endif
     endif
     CALL kill(NORM)
     CALL kill(Y)
     call kill(id)
     if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset lattice_GET_tune"
+     CALL RESET_APERTURE_FLAG
+     write(6,*) " Flags were reset lattice_GET_tune"
     endif
-
+    
   end SUBROUTINE lattice_GET_tune
 
 
@@ -179,8 +179,8 @@ contains
     call kill(id)
     call kill(NORM)
     if(.not.check_stable) then
-       CALL RESET_APERTURE_FLAG
-       write(6,*) " Flags were reset in compute_A_4d"
+     CALL RESET_APERTURE_FLAG
+     write(6,*) " Flags were reset in compute_A_4d"
     endif
 
   end SUBROUTINE compute_A_4d
@@ -2644,8 +2644,8 @@ contains
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
                 IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
+                 quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
+                 QUAD=QUAD+quad0
                 endif
              ELSE
                 QUAD=zero
@@ -2741,8 +2741,8 @@ contains
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
                 IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
+                 quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
+                 QUAD=QUAD+quad0
                 endif
              ELSE
                 QUAD=zero
@@ -2848,8 +2848,8 @@ contains
              IF(C%MAG%P%NMUL>=2) THEN
                 QUAD=SQRT(C%MAG%BN(2)**2+C%MAG%AN(2)**2)
                 IF(C%MAG%P%NMUL>=3) THEN
-                   quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
-                   QUAD=QUAD+quad0
+                 quad0=SQRT(C%MAG%BN(3)**2+C%MAG%AN(3)**2)*sexr0
+                 QUAD=QUAD+quad0
                 endif
              ELSE
                 QUAD=zero
@@ -3018,7 +3018,7 @@ contains
     TYPE(FIBRE),target :: C
     INTEGER I,f0,ido,idc
     logical(lp) drift,doit
-
+   
     if(associated(c%parent_layout)) then
        if(associated(c%parent_layout%parent_universe)) then
           l=>c%parent_layout%parent_universe%start
@@ -3126,8 +3126,8 @@ contains
        call RECUT_KIND7_one(c,lmax0,drift,ido,idc)
        C=>C%NEXT
     ENDDO
-    write(6,*) ido," elements changed to odd methods "
-    write(6,*) idc," elements only "
+    write(6,*) ido," elements changed to odd methods " 
+    write(6,*) idc," elements only " 
   END SUBROUTINE  RECUT_KIND7
 
   SUBROUTINE  ADD_SURVEY_INFO(R) ! A re-splitting routine
@@ -3497,11 +3497,11 @@ contains
 
     p=>r%start
     do i=1,r%n
-       if(p%mag%p%b0/=zero) then
-          p%mag%p%bend_fringe =changeanbn
-          p%magp%p%bend_fringe =changeanbn
-          write(6,*) P%mag%name, " changed to ",changeanbn
-       endif
+    if(p%mag%p%b0/=zero) then
+       p%mag%p%bend_fringe =changeanbn
+       p%magp%p%bend_fringe =changeanbn
+       write(6,*) P%mag%name, " changed to ",changeanbn
+    endif
        P=>P%next
     ENDDO
   end SUBROUTINE PUTbend_fringe

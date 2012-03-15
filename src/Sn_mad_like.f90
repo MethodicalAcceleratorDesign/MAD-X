@@ -2470,8 +2470,8 @@ CONTAINS
        write(6,*) " Error neither L nor list is present in WIGGLERL"
        stop 900
     endif
-    WIGGLERL%LD=WIGGLERL%L
-    WIGGLERL%LC=WIGGLERL%L
+       WIGGLERL%LD=WIGGLERL%L
+       WIGGLERL%LC=WIGGLERL%L
     WIGGLERL%KIND=KINDWIGGLER
     IF(LEN(NAME)>nlp) THEN
        w_p=0

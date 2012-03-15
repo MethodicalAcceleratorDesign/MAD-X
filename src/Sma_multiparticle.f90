@@ -24,7 +24,7 @@ module ptc_multiparticle
   type(probe) :: xsm,xsm0
   real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= zero,dt_orbit_sync=zero
-
+  
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
      MODULE PROCEDURE TRACKP_NODE_SINGLE     !@1  t,y,state,charge
@@ -84,7 +84,7 @@ module ptc_multiparticle
      logical(lp) u(2)   ! unstable flag for both ray and reference_ray
   END type three_d_info
 
-  !  real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
+!  real :: ttime0,ttime1,dt1=0.0,dt2=0.0;
 
 CONTAINS
 
@@ -107,17 +107,17 @@ CONTAINS
        DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
        V=EL%DC_ac+EL%A_ac*DV
        DV=el%D_ac*DV
-    else
+     else
        V=zero
        DV=zero
-    endif
+     endif
 
     CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
 
 
   END   SUBROUTINE MODULATE_R
-
-  SUBROUTINE do_ramping_R(C,t,K)
+  
+   SUBROUTINE do_ramping_R(C,t,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
     TYPE(INTERNAL_STATE) K
@@ -131,16 +131,16 @@ CONTAINS
     ELP=>C%PARENT_FIBRE%MAGP
     if(.not.associated(EL%ramp)) return
 
-    V=EL%DC_ac
-    DV=zero
-    call set_ramp(C,t)
+       V=EL%DC_ac
+       DV=zero
+       call set_ramp(C,t)
 
     CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
 
 
   END   SUBROUTINE do_ramping_R
-
-  SUBROUTINE DO_Ramping_p(C,t,K)
+  
+   SUBROUTINE DO_Ramping_p(C,t,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
     TYPE(INTERNAL_STATE) K
@@ -151,16 +151,16 @@ CONTAINS
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
-
+    
     if(.not.associated(EL%ramp)) return
 
     CALL ALLOC(V)
     CALL ALLOC(DV)
 
 
-    V=elp%DC_ac
-    DV=zero
-    call set_ramp(C,t)
+       V=elp%DC_ac
+       DV=zero
+         call set_ramp(C,t)
 
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
@@ -170,28 +170,28 @@ CONTAINS
 
   END   SUBROUTINE DO_Ramping_p
 
-  SUBROUTINE set_all_ramp(R)
+   SUBROUTINE set_all_ramp(R)
     IMPLICIT NONE
     TYPE(layout), target  :: r
     TYPE(fibre), POINTER  :: p
     integer i
     REAL(DP) v,dv
     v=zero
-    dv=zero
-    p=>r%start
-    do i=1,r%n
+    dv=zero     
+     p=>r%start
+     do i=1,r%n
+     
+      if(associated(p%mag%ramp)) then
+       call set_ramp(p%t1,x_orbit_sync(6))
+       CALL transfer_ANBN(p%mag,p%magp,VR=V,DVR=DV)
 
-       if(associated(p%mag%ramp)) then
-          call set_ramp(p%t1,x_orbit_sync(6))
-          CALL transfer_ANBN(p%mag,p%magp,VR=V,DVR=DV)
-
-       endif
-
-       p=>p%next
-    enddo
-
-  end SUBROUTINE set_all_ramp
-
+      endif 
+     
+      p=>p%next
+     enddo      
+     
+    end SUBROUTINE set_all_ramp
+     
   SUBROUTINE set_ramp(t,t0)
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), POINTER  :: T
@@ -199,95 +199,95 @@ CONTAINS
     real(dp) r,ti,rat,dtot
     type(ramping), pointer :: a
     real(dp) an,bn,t0
+    
 
-
-    !   if(t%pos_in_fibre==1) return
-
+ !   if(t%pos_in_fibre==1) return
+    
     a=>t%parent_fibre%mag%ramp
-
+    
 
     dtot=(a%table(a%n)%time-a%table(1)%time)  !/(a%n-1)
-
-    !   ti=XSM0%ac%t/clight/a%unit_time    ! time in milliseconds
+    
+ !   ti=XSM0%ac%t/clight/a%unit_time    ! time in milliseconds
     ti=t0/clight/a%unit_time    ! time in milliseconds
+    
+!    if(ti>a%t_max.or.ti<a%table(1)%time) then
+!    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
+!     return
+!    endif
+     
 
-    !    if(ti>a%t_max.or.ti<a%table(1)%time) then
-    !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
-    !     return
-    !    endif
-
-
-
+     
     if(ti>=a%t_max.or.ti<a%table(1)%time) then
-       !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
-       if(ti>=a%t_max) then
-          a%table(0)%bn=zero
-          a%table(0)%an=zero
+!    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
+      if(ti>=a%t_max) then
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
           do i=1,size(a%table(0)%bn)
-             a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
-             a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo
+           a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
+           a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
+          enddo 
+            a%table(0)%b_t= a%table(a%n)%b_t
+           a=>t%parent_fibre%magp%ramp
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
+          do i=1,size(a%table(0)%bn)
+           a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
+           a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
+          enddo 
           a%table(0)%b_t= a%table(a%n)%b_t
+      else
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
+          do i=1,size(a%table(0)%bn)
+           a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
+           a%table(0)%an(i)= a%table(1)%an(i)*a%r
+          enddo 
+         a%table(0)%b_t= a%table(1)%b_t
           a=>t%parent_fibre%magp%ramp
-          a%table(0)%bn=zero
-          a%table(0)%an=zero
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
           do i=1,size(a%table(0)%bn)
-             a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
-             a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
-          enddo
-          a%table(0)%b_t= a%table(a%n)%b_t
-       else
-          a%table(0)%bn=zero
-          a%table(0)%an=zero
-          do i=1,size(a%table(0)%bn)
-             a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
-             a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo
+           a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
+           a%table(0)%an(i)= a%table(1)%an(i)*a%r
+          enddo 
           a%table(0)%b_t= a%table(1)%b_t
-          a=>t%parent_fibre%magp%ramp
-          a%table(0)%bn=zero
-          a%table(0)%an=zero
-          do i=1,size(a%table(0)%bn)
-             a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
-             a%table(0)%an(i)= a%table(1)%an(i)*a%r
-          enddo
-          a%table(0)%b_t= a%table(1)%b_t
-
-       endif
+     
+      endif
 
     else
+    
+         ti=ti-a%table(1)%time
+         ti=mod(ti,dtot)+a%table(1)%time
+          dtot=dtot/(a%n-1)
+          ti=(ti-a%table(1)%time)/dtot+1
+           
+          it=int(ti)
+!          it=idint(ti)
+          
+           rat=(ti-it)    
+           
 
-       ti=ti-a%table(1)%time
-       ti=mod(ti,dtot)+a%table(1)%time
-       dtot=dtot/(a%n-1)
-       ti=(ti-a%table(1)%time)/dtot+1
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
+          do i=1,size(a%table(0)%bn)
+           a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
+           a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
+          enddo 
+           a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
 
-       it=int(ti)
-       !          it=idint(ti)
-
-       rat=(ti-it)
-
-
-       a%table(0)%bn=zero
-       a%table(0)%an=zero
-       do i=1,size(a%table(0)%bn)
-          a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
-          a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-       enddo
-       a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
-
-       a=>t%parent_fibre%magp%ramp
-       a%table(0)%bn=zero
-       a%table(0)%an=zero
-       do i=1,size(a%table(0)%bn)
-          a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
-          a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
-       enddo
-       a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
-
+          a=>t%parent_fibre%magp%ramp
+           a%table(0)%bn=zero
+           a%table(0)%an=zero
+          do i=1,size(a%table(0)%bn)
+           a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
+           a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
+          enddo 
+           a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
+          
     endif
   end SUBROUTINE set_ramp
-
+  
   SUBROUTINE MODULATE_P(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -308,11 +308,11 @@ CONTAINS
        V=ELP%DC_ac+ELP%A_ac*DV
        DV=elp%D_ac*DV
 
-    else  ! ramp
-       V=zero
-       DV=zero
-    endif
-
+       else  ! ramp
+          V=zero
+          DV=zero
+       endif
+ 
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
     CALL KILL(V)
@@ -321,7 +321,7 @@ CONTAINS
 
   END   SUBROUTINE MODULATE_P
 
-
+  
   SUBROUTINE TRACK_MODULATION_R(C,XS,K)
     IMPLICIT NONE
     type(INTEGRATION_NODE), pointer :: C
@@ -581,11 +581,11 @@ CONTAINS
     ENDIF
 
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%a_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%a_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%a_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%a_T
+      endif
     ENDIF
 
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,1,X)
@@ -655,11 +655,11 @@ CONTAINS
     ENDIF
 
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%a_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%a_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%a_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%a_T
+      endif
     ENDIF
 
     CALL DTILTD(C%DIR,C%MAGP%P%TILTD,1,X)
@@ -707,11 +707,11 @@ CONTAINS
     CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%b_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%b_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%b_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%b_T
+      endif
     ENDIF
 
     IF(PATCHG==2.or.PATCHG==3) THEN
@@ -775,11 +775,11 @@ CONTAINS
     CALL DTILTD(C%DIR,C%MAGP%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%b_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%b_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%b_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%b_T
+      endif
     ENDIF
 
     IF(PATCHG==2.or.PATCHG==3) THEN
@@ -1413,7 +1413,7 @@ CONTAINS
        CALL RING_L_THIN(L,CIRCULAR)
     ENDIF
 
-    if(lielib_print(12)==1)  call stat_NODE_LAYOUT(l)
+   if(lielib_print(12)==1)  call stat_NODE_LAYOUT(l)
 
   END SUBROUTINE MAKE_NODE_LAYOUT_2
 

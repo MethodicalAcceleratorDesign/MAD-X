@@ -7,7 +7,7 @@ module pointer_lattice
   ! stuff for main program
   type(layout),pointer :: my_ering
   type(internal_state),pointer :: my_estate
-  !  type(internal_state),pointer :: my_old_state
+!  type(internal_state),pointer :: my_old_state
   integer ,pointer :: my_start, MY_ORDER, MY_NP,MY_END,my_start_t
   real(dp), pointer :: my_fix(:),MY_DELTA
   real(dp), pointer ::my_target(:)
@@ -45,7 +45,7 @@ module pointer_lattice
      MODULE PROCEDURE read_ptc_command
   END INTERFACE
 
-
+  
 contains
   subroutine set_lattice_pointers
     implicit none
@@ -55,13 +55,13 @@ contains
 
     my_ering => m_u%start
     if(associated(my_estate)) then
-       !  my_estate=>my_old_state
-       etat=my_estate
-       my_estate => etat
+    !  my_estate=>my_old_state
+      etat=my_estate
+      my_estate => etat
     else
-       etat=DEFAULT !+nocavity0-time0
-       my_estate => etat
-    endif
+     etat=DEFAULT !+nocavity0-time0
+     my_estate => etat
+    endif 
     my_start => START
     my_END => FIN
     my_fix=>xfix
@@ -151,7 +151,7 @@ contains
     LOGICAL :: b_b,patchbb
     REAL(DP) xbend
     ! automatic track
-    !    type(internal_state),pointer :: my_old_state
+!    type(internal_state),pointer :: my_old_state
     TYPE(WORK) W
     INTEGER   KINDA   ! 1,2,3,4
     REAL(DP) RA(2)
@@ -165,16 +165,16 @@ contains
 
     if(log_estate) then
        nullify(my_estate)
-       !       nullify(my_old_state)
+!       nullify(my_old_state)
        log_estate=.false.
     endif
 
     if(associated(my_estate)) then
-       !      my_old_state=>my_estate
-       my_default=my_estate
+!      my_old_state=>my_estate
+      my_default=my_estate
     else
-       my_default=default
-    endif
+      my_default=default
+    endif 
     my_estate=>my_default
     skip=.false.
     call kanalnummer(mf)
@@ -197,7 +197,7 @@ contains
           WRITE(6,*) ' '
           cycle
        ENDIF
-       !     if(com(1:1)=='!'.and.com(2:2)/='!') THEN
+  !     if(com(1:1)=='!'.and.com(2:2)/='!') THEN
        if(com(1:1)=='!') THEN
           cycle
        ENDIF
@@ -267,10 +267,10 @@ contains
           read(mf,*) NAME
           call kill_last_layout(m_u)
           my_ering%NAME=NAME
-          !       case('RESTOREDEFAULT','RESTORE')
-          !          my_OLD_state=default
-          !          my_default=default
-          !          my_estate=>my_default
+!       case('RESTOREDEFAULT','RESTORE')
+!          my_OLD_state=default
+!          my_default=default
+!          my_estate=>my_default
           ! Orbit stuff
        case('USEORBITUNITS')
           MY_ERING%t%ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
@@ -294,9 +294,9 @@ contains
           x_orbit_sync=zero
           x_orbit_sync(6)=xsm%ac%t
           ptc_node_old=-1
-          first_particle=my_false
+          first_particle=my_false       
        case('TIMEINUNITS','TIMEINSECONDS')
-
+       
           read(mf,*) xsm%ac%t
           write(6,*) " Using ",unit_time," seconds"
           xsm%ac%t=xsm%ac%t*clight*unit_time
@@ -306,55 +306,55 @@ contains
           ptc_node_old=-1
           first_particle=my_false
        case('INITIALTIMEINMYUNITS','TIMEINMYUNITS','READFROMFILEINITIALTIME')
-          INQUIRE (FILE = INITIAL_setting, EXIST = exists)
+         INQUIRE (FILE = INITIAL_setting, EXIST = exists)
           if(exists) then
              write(6,*) "file ", INITIAL_setting(1:len_trim(FINAL_setting)), &
                   " exists, interrupt execution if you do not want to overwrite!"
-             call kanalnummer(i1,INITIAL_setting)
-             read(i1,*) xsm%ac%t,unit_time,n_used_patch,include_patch
-             read(i1,*) nc
-             if(nc/=0) then
-                allocate(tc(nc))
-                do i2=1,nc
-                   read(i1,*) tc(i2)
-                enddo
-                call set_all_tc_for_restarting(my_ering,tc,nc)
-                deallocate(tc)
-             endif
-             close(i1)
-             if(include_patch) then
-                call kanalnummer(i1,"time_patch.dat")
-                read(i1,*) n_patch
-                if(associated(my_ering%T%ORBIT_LATTICE%dt)) deallocate(my_ering%T%ORBIT_LATTICE%dt)
-                allocate(my_ering%T%ORBIT_LATTICE%dt(n_patch))
+            call kanalnummer(i1,INITIAL_setting)
+            read(i1,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+            read(i1,*) nc
+            if(nc/=0) then
+                 allocate(tc(nc))
+                  do i2=1,nc
+                   read(i1,*) tc(i2) 
+                  enddo
+                 call set_all_tc_for_restarting(my_ering,tc,nc)
+                 deallocate(tc)
+            endif
+            close(i1)
+            if(include_patch) then
+              call kanalnummer(i1,"time_patch.dat")
+               read(i1,*) n_patch
+               if(associated(my_ering%T%ORBIT_LATTICE%dt)) deallocate(my_ering%T%ORBIT_LATTICE%dt)
+               allocate(my_ering%T%ORBIT_LATTICE%dt(n_patch))
                 do i2=1,n_patch
-                   read(i1,*) i3,my_ering%T%ORBIT_LATTICE%dt(i2)
+                 read(i1,*) i3,my_ering%T%ORBIT_LATTICE%dt(i2)
                 enddo
-                close(i1)
-                !looking for element just before the cavity
-                do i2=1,size(my_ering%T%ORBIT_LATTICE%ORBIT_NODES)
-                   T=>my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%NODE
+              close(i1)
+!looking for element just before the cavity
+   do i2=1,size(my_ering%T%ORBIT_LATTICE%ORBIT_NODES)
+     T=>my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%NODE
+  
+    DO I1=1,my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%dpos
+ 
 
-                   DO I1=1,my_ering%T%ORBIT_LATTICE%ORBIT_NODES(i2)%dpos
+       if(t%parent_fibre%mag%kind==kind4) then
+        my_ering%T%ORBIT_LATTICE%tp=>t%previous
+        inode=i2
+        goto 2222
+       endif
 
-
-                      if(t%parent_fibre%mag%kind==kind4) then
-                         my_ering%T%ORBIT_LATTICE%tp=>t%previous
-                         inode=i2
-                         goto 2222
-                      endif
-
-                      T=>T%NEXT
-                   ENDDO
-                enddo
-2222            write(6,*) "ptc mode # ",inode,"element ", my_ering%T%ORBIT_LATTICE%tp%parent_fibre%mag%name
-
+       T=>T%NEXT
+    ENDDO
+   enddo
+2222   write(6,*) "ptc mode # ",inode,"element ", my_ering%T%ORBIT_LATTICE%tp%parent_fibre%mag%name
+  
 
 
 
-             endif
-          else
-             read(mf,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+            endif
+           else
+           read(mf,*) xsm%ac%t,unit_time,n_used_patch,include_patch
           endif
           write(6,*) " Using ",unit_time," seconds"
           xsm%ac%t=xsm%ac%t*clight*unit_time
@@ -364,63 +364,63 @@ contains
           ptc_node_old=-1
           first_particle=my_false
           write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
-
+          
        case('FINALTIMEINMYUNITS')
-          ! INQUIRE (FILE = FINAL_setting, EXIST = exists)
-          !    if(exists) then
-          call kanalnummer(i1,FINAL_setting)
-          write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time,n_used_patch,include_patch
-          write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
-          write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
+      ! INQUIRE (FILE = FINAL_setting, EXIST = exists)
+      !    if(exists) then
+            call kanalnummer(i1,FINAL_setting)
+             write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time,n_used_patch,include_patch
+             write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
+             write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
+             
+             call find_all_tc_for_restarting(my_ering,tc,nc)
+             write(i1,*) nc
+             do i2=1,nc
+                write(i1,*) tc(i2)
+             enddo
+             deallocate(tc)
+            close(i1)
+      !    endif              
 
-          call find_all_tc_for_restarting(my_ering,tc,nc)
-          write(i1,*) nc
-          do i2=1,nc
-             write(i1,*) tc(i2)
-          enddo
-          deallocate(tc)
-          close(i1)
-          !    endif
-
-
+      
        case('SETORBITACCELERATION')
-          accelerate=my_true
+          accelerate=my_true          
        case('SETORBITNOACCELERATION')
-          accelerate=my_false
+          accelerate=my_false          
        case('SETORBITRAMPING','RAMPING')
-          RAMP=my_true
+          RAMP=my_true          
        case('SETORBITNORAMPING','NORAMPING')
-          RAMP=my_false
+          RAMP=my_false          
        case('SETORBITTIMEUNIT')
-          read(mf,*) unit_time
+            read(mf,*) unit_time
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
        case('PUTORBITSTATE','USEORBITSTATE')
           my_estate=my_ORBIT_LATTICE%state
        case('NULLIFYACCELERATION')
-          nullify(acc)
-          nullify(ACCFIRST)
-          nullify(paccfirst)
-          nullify(paccthen)
+        nullify(acc)
+        nullify(ACCFIRST)
+        nullify(paccfirst)
+        nullify(paccthen)
        case('INITIALIZECAVITY','CAVITYTABLE')
-          p=>my_ering%start
+        p=>my_ering%start
           READ(MF,*)n
           do i1=1,n
-             read(mf,*) name,filename
-             call move_to( my_ering,p,name,pos)
-             write(6,*) "Found cavity ",name," at position ",pos
-             call lecture_fichier(p%mag,filename)
+            read(mf,*) name,filename
+            call move_to( my_ering,p,name,pos) 
+            write(6,*) "Found cavity ",name," at position ",pos
+            call lecture_fichier(p%mag,filename)        
           enddo
-          paccthen%mag%c4%acc%next=>paccfirst
-          paccfirst%mag%c4%acc%previous=>paccthen
+           paccthen%mag%c4%acc%next=>paccfirst
+           paccfirst%mag%c4%acc%previous=>paccthen
        case('ENERGIZEORBITLATTICEATTIME')
-          read(mf,*) xa
-          call energize_ORBIT_lattice(xa)
-       case('ENERGIZEORBITLATTICE')
-          call energize_ORBIT_lattice
+        read(mf,*) xa
+        call energize_ORBIT_lattice(xa)
+      case('ENERGIZEORBITLATTICE')
+        call energize_ORBIT_lattice
        case('SETALLRAMP')
-          call set_all_ramp(my_ering)
-
+        call set_all_ramp(my_ering)
+        
        case('PRINTHERD','OPENHERD')
           IF(MF_HERD/=0) THEN
              WRITE(6,*) " CANNOT OPEN HERD FILE TWICE "
@@ -450,11 +450,11 @@ contains
           close(ii)
 
        case('SETORBITFORACCELERATION')
-          !   CALL ptc_synchronous_set(-1)
+       !   CALL ptc_synchronous_set(-1)
        case('READORBITINTERMEDIATEDATA')
-          !   CALL ptc_synchronous_set(-2)
+       !   CALL ptc_synchronous_set(-2)
        case('PRINTORBITINTERMEDIATEDATA')
-          !   CALL ptc_synchronous_after(-2)
+       !   CALL ptc_synchronous_after(-2)
        case('FILEFORORBITINITIALSETTINGS')  ! ACCELERATION FILE
           READ(MF,*) initial_setting
           write(6,*) initial_setting
@@ -773,7 +773,7 @@ contains
           READ(MF,*) SC,pos,patchbb
           read(mf,*) X_ref(1), X_ref(2), X_ref(3), X_ref(4)
           if(patchbb) then
-             read(mf,*) x
+           read(mf,*) x
           endif
           IF(.NOT.ASSOCIATED(my_ering%T)) THEN
              CALL MAKE_NODE_LAYOUT(my_ering)
@@ -807,9 +807,9 @@ contains
              write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
              !              write(6,*) " ds = ",tl%bb%ds
              if(patchbb) then
-                tl%bb%patch=patchbb
-                tl%bb%a=x(1:3)
-                tl%bb%d=x(4:6)
+              tl%bb%patch=patchbb
+              tl%bb%a=x(1:3)
+              tl%bb%d=x(4:6)              
              endif
           else
              write(6,*) " Beam-Beam position not found "
@@ -927,7 +927,7 @@ contains
        case('FRANKCOMMAND','MADCOMMAND','COMMAND')
           read(mf,*) filename
           call read_mad_command77(filename)
-
+          
        case('PRINTFAMILIESANBN')
           read(mf,*) filename
           call kanalnummer(mfr,filename)
@@ -965,12 +965,12 @@ contains
              call context(name)
              N_NAME=len_trim(name)
           ENDIF
-          DC_ac=one
-          A_ac=zero
-          theta_ac=zero
-          D_ac=zero
-          n_ac=0
-          ! n_coeff=0
+            DC_ac=one
+            A_ac=zero
+            theta_ac=zero
+            D_ac=zero
+            n_ac=0
+           ! n_coeff=0
           p=>my_ering%start
           do ii=1,my_ering%N
              found_it=MY_FALSE
@@ -981,15 +981,15 @@ contains
              ENDIF
 
              IF(FOUND_IT) THEN
-
+             
                 write(6,*) " slow ramping magnet found ",P%MAG%name
-
+                
                 call reading_file(P%MAG,filename)
                 p%mag%ramp%r=hgap
                 p%magp%ramp%r=hgap
-
+                
                 i2=size(p%mag%ramp%table(0)%bn)
-
+                
                 if(.not.associated(P%MAG%DC_ac)) then
                    allocate(P%MAG%DC_ac)
                    allocate(P%MAG%A_ac)
@@ -1083,11 +1083,11 @@ contains
                 bn(i1)=dtu(1)
              enddo
           endif                  !n_ac>0
-          !    if(n_coeff>0) then        !n_ac>0
-          !       allocate(n_co(n_coeff))
-          !       n_co=zero
-          !       read(mf,*) n_co
-          !    endif                  !n_ac>0
+      !    if(n_coeff>0) then        !n_ac>0
+      !       allocate(n_co(n_coeff))
+      !       n_co=zero
+      !       read(mf,*) n_co
+      !    endif                  !n_ac>0
           p=>my_ering%start
           do ii=1,my_ering%N
              found_it=MY_FALSE
@@ -1192,9 +1192,9 @@ contains
              deallocate(an,bn)
           endif
 
-          !    if(n_coeff>0) then
-          !       deallocate(n_co)
-          !    endif
+      !    if(n_coeff>0) then
+      !       deallocate(n_co)
+      !    endif
 
        case('SETAPERTURE')
           READ(MF,*) KINDA,NAME
@@ -1443,8 +1443,8 @@ contains
           call kanalnummer(mftune,filename)
           write(mftune,*) " Time unit = ",unit_time ," seconds "
        case('CLOSETUNEFILE')
-          close(mftune)
-          mftune=6
+           close(mftune)
+           mftune=6
        case('GETTUNE')
           call lattice_GET_tune(my_ering,my_estate,mftune)
        case('STRENGTH','STRENGTHFILE')  !
@@ -1629,8 +1629,8 @@ contains
           call special_alex_main_ring_removal(my_ering)
        case('SASHASPECIALRCS')
           READ(MF,*) epsf,sca   ! aper scale >0 <=1
-          ! call lattice_fit_bump_rcs(my_ering,epsf)
-          call lattice_fit_bump_min_rcs(my_ering%next,my_ering,EPSF,pol_,NPOL,sca)
+      ! call lattice_fit_bump_rcs(my_ering,epsf)
+        call lattice_fit_bump_min_rcs(my_ering%next,my_ering,EPSF,pol_,NPOL,sca)
        case('PRINTFRAMES')
 
           READ(MF,*) FILENAME
@@ -1649,18 +1649,18 @@ contains
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
        case('SKIPMARKER','SKIPMARKERS')
-          print_marker=my_false
+        print_marker=my_false
        case('INCLUDEMARKER','INCLUDEMARKERS')
-          print_marker=my_true
-
+        print_marker=my_true
+        
        case('TOGGLEMARKER','TOGGLEMARKERS')
-          print_marker=.not.print_marker
-          if(print_marker) then
+        print_marker=.not.print_marker
+        if(print_marker) then
              Write(6,*)  'printing makers on flat file '
-          else
-             Write(6,*)  ' NOT printing makers on flat file '
-          endif
-       case('PERMFRINGEON')
+        else
+            Write(6,*)  ' NOT printing makers on flat file '
+        endif
+        case('PERMFRINGEON')
 
           CALL  PUTFRINGE(my_ering,MY_TRUE)
 
@@ -1957,15 +1957,15 @@ contains
           CALL power_cavity(my_ering,HARMONIC_NUMBER,VOLT,PHASE,epsf)
 
 
-       case('CAVITYTOTALPATH')
-          read(mf,*) pos
+        case('CAVITYTOTALPATH')
+        read(mf,*) pos
 
-          if(pos/=0.and.pos/=1) then
-             Write(6,*) "Cavity totalpath must 0 or 1"
-             stop 665
-          endif
+        if(pos/=0.and.pos/=1) then
+            Write(6,*) "Cavity totalpath must 0 or 1"
+            stop 665 
+        endif
 
-          call totalpath_cavity(my_ering,pos)
+        call totalpath_cavity(my_ering,pos)
 
        case('EQUILIBRIUMSIZES')
           READ(MF,*) POS,FILENAME,fileTUNE, NAME
@@ -2013,7 +2013,7 @@ contains
 
     enddo
 100 continue
-    !    if(associated(my_old_state)) my_estate=>my_old_state
+!    if(associated(my_old_state)) my_estate=>my_old_state
 
     write(6,*) " Exiting Command File ", ptc_fichier(1:len_trim(ptc_fichier))
 
@@ -2026,7 +2026,7 @@ contains
     TYPE(LAYOUT), POINTER :: r
     type(fibre), pointer :: p
     integer i,j
-
+ 
 
     p=>r%start
     do i=1,r%n
@@ -2912,7 +2912,7 @@ end  subroutine gino_ptc_command77
 
 subroutine read_mad_command77(ptc_fichier)
   use pointer_lattice
-  !  use pointer_lattice_frank
+!  use pointer_lattice_frank
   implicit none
   character(*) ptc_fichier
   integer m
@@ -2921,10 +2921,11 @@ subroutine read_mad_command77(ptc_fichier)
 
   open(unit=m,file=ptc_fichier,status='OLD',err=2001)
   close(m)
-  !  call read_mad_command(ptc_fichier)  ! inside pointer_lattice_frank
+!  call read_mad_command(ptc_fichier)  ! inside pointer_lattice_frank
   return
 2001 continue
 
   write(6,*) " Warning: mad command file does not exit "
 
 end  subroutine read_mad_command77
+

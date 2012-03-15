@@ -76,7 +76,7 @@
 CAVITY_TOTALPATH=0
 
       return
-      end subroutine ptc_init
+      end  
 
 !===================================================
 !reads additional ptc commands from file and execute them inside ptc
@@ -91,7 +91,7 @@ CAVITY_TOTALPATH=0
 
         CALL read_ptc_command(p_in_file)
 
-     end subroutine ptc_script
+     end  subroutine ptc_script
 
 !===================================================
 !get initial twiss at entrance of the ring
@@ -109,7 +109,7 @@ CAVITY_TOTALPATH=0
         call GET_info(i,length,bx,by,ax,ay,ex,epx)
 
       return
-      end subroutine ptc_get_twiss_init
+      end
 
 
 !===================================================
@@ -129,7 +129,7 @@ CAVITY_TOTALPATH=0
         call GET_GAMMAT(gammaT)
 
       return
-      end subroutine ptc_get_ini_params
+      end
 
 !===================================================
 !get synchronous particle params mass, charge, and energy
@@ -147,7 +147,7 @@ CAVITY_TOTALPATH=0
         call  GET_CHARGE(charge)
 
       return
-      end subroutine ptc_get_syncpart
+      end
 
 !===================================================
 !get twiss and length for a node with index
@@ -164,7 +164,7 @@ CAVITY_TOTALPATH=0
         call GET_info(i,node_length,bx,by,ax,ay,ex,epx)
 
       return
-      end subroutine ptc_get_twiss_for_node
+      end
 
 
 !===================================================
@@ -235,7 +235,7 @@ CAVITY_TOTALPATH=0
 SUBROUTINE ptc_synchronous_set(i_node)
      IMPLICIT NONE
      integer i_node
-!   write(6,*) " Not needed anymore "
+   write(6,*) " Not needed anymore "
 end SUBROUTINE ptc_synchronous_set
 
 SUBROUTINE ptc_synchronous_after(i_node)
@@ -256,7 +256,7 @@ SUBROUTINE ptc_synchronous_after(i_node)
       call print(my_ORBIT_LATTICE%state,6)
       write(6,*) " ********************************************************* "
    else
-!    write(6,*) " ptc_synchronous_after not needed anymore "
+    write(6,*) " ptc_synchronous_after not needed anymore "
    endif
 end SUBROUTINE ptc_synchronous_after
 

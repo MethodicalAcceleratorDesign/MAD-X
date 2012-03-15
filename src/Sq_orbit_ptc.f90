@@ -258,28 +258,28 @@ contains
 
     do k=1,my_ORBIT_LATTICE%ORBIT_N_NODE
 
-       T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
-       DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
-          if(associated(t,t%parent_fibre%t1)) k1=k1+1
-          if(k1==n) then
-             m=k
-             goto 100
-          endif
-          T=>T%NEXT
-       ENDDO
+    T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
+    DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+       if(associated(t,t%parent_fibre%t1)) k1=k1+1
+       if(k1==n) then
+        m=k
+        goto 100
+       endif
+       T=>T%NEXT
+    ENDDO
 
     enddo
-
-100 continue
-    T=>my_ORBIT_LATTICE%ORBIT_NODES(m)%NODE
-    write(6,*) " Fibre position ",n,t%parent_fibre%mag%name
-    write(6,*) "  position in fibre ",t%pos_in_fibre,t%parent_fibre%mag%p%nst
-    write(6,*) " Orbit node ",m
+     
+     100 continue
+     T=>my_ORBIT_LATTICE%ORBIT_NODES(m)%NODE
+     write(6,*) " Fibre position ",n,t%parent_fibre%mag%name
+     write(6,*) "  position in fibre ",t%pos_in_fibre,t%parent_fibre%mag%p%nst
+     write(6,*) " Orbit node ",m
 
   end SUBROUTINE Locate_orbit_start
 
 
-
+ 
 
 
   SUBROUTINE TRACK_NODE_fake_totalpath_half(T,X,STATE,after)
@@ -291,48 +291,48 @@ contains
     real(dp) beta0
     type(work) w
     integer nst,PATCHT
-
-    beta0=t%PARENT_FIBRE%beta0
-    nst=t%pos_in_fibre-2
-
-    if(t%PARENT_FIBRE%mag%kind==kind4.and.accelerate) then
-
-       if(after.and.t%cas==case0.and.associated(t%parent_fibre%mag%c4%acc)) then
+     
+       beta0=t%PARENT_FIBRE%beta0   
+       nst=t%pos_in_fibre-2
+        
+     if(t%PARENT_FIBRE%mag%kind==kind4.and.accelerate) then
+     
+      if(after.and.t%cas==case0.and.associated(t%parent_fibre%mag%c4%acc)) then
           w=t%parent_fibre
-          x(5)= x(5) + t%parent_fibre%mag%c4%acc%de(nst)/w%p0c
-       endif !  kind4
+             x(5)= x(5) + t%parent_fibre%mag%c4%acc%de(nst)/w%p0c
+      endif !  kind4
+     
+     endif 
+    
+        !  if(state%time) then
+             x(6)=x(6)+T%ds_AC*half*(one/beta0+x(5))/root(one+2*x(5)/beta0+x(5)**2)
+         ! else
+         !    x(6)=x(6)+T%ds_AC*half
+             
+         ! endif
 
-    endif
 
-    !  if(state%time) then
-    x(6)=x(6)+T%ds_AC*half*(one/beta0+x(5))/root(one+2*x(5)/beta0+x(5)**2)
-    ! else
-    !    x(6)=x(6)+T%ds_AC*half
+!    if(T%CAS==CASEP1.and.include_patch) then
+!       PATCHT=t%parent_fibre%patch%time
+!       IF(PATCHT/=0.AND.PATCHT/=2) THEN
+!         if(state%time) then
+!          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half/t%parent_fibre%beta0
+!         else
+!          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half
+!         endif
+!       ENDIF
+!    endif
 
-    ! endif
-
-
-    !    if(T%CAS==CASEP1.and.include_patch) then
-    !       PATCHT=t%parent_fibre%patch%time
-    !       IF(PATCHT/=0.AND.PATCHT/=2) THEN
-    !         if(state%time) then
-    !          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half/t%parent_fibre%beta0
-    !         else
-    !          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half
-    !         endif
-    !       ENDIF
-    !    endif
-
-    !    if(T%CAS==CASEP2.and.include_patch) then
-    !       PATCHT=t%parent_fibre%patch%time
-    !       IF(PATCHT/=0.AND.PATCHT/=1) THEN
-    !         if(state%time) then
-    !          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half/t%parent_fibre%beta0
-    !         else
-    !          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half
-    !         endif
-    !       ENDIF
-    !    endif
+!    if(T%CAS==CASEP2.and.include_patch) then
+!       PATCHT=t%parent_fibre%patch%time
+!       IF(PATCHT/=0.AND.PATCHT/=1) THEN
+!         if(state%time) then
+!          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half/t%parent_fibre%beta0
+!         else
+!          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half
+!         endif
+!       ENDIF
+!    endif
 
   end SUBROUTINE TRACK_NODE_fake_totalpath_half
 
@@ -342,33 +342,33 @@ contains
     TYPE(INTEGRATION_NODE), POINTER  :: T
     TYPE(INTERNAL_STATE), target :: STATE
     integer PATCHT
-    !    if(state%time) then
-    x(6)=x(6)+T%ds_AC*half/t%PARENT_FIBRE%beta0
-    !    else
-    !       x(6)=x(6)+T%ds_AC*half
-    !    endif
+      !    if(state%time) then
+             x(6)=x(6)+T%ds_AC*half/t%PARENT_FIBRE%beta0
+      !    else
+      !       x(6)=x(6)+T%ds_AC*half
+      !    endif
 
-    !    if(T%CAS==CASEP1.and.include_patch) then
-    !       PATCHT=t%parent_fibre%patch%time
-    !       IF(PATCHT/=0.AND.PATCHT/=2) THEN
-    !         if(state%time) then
-    !          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half/t%parent_fibre%beta0
-    !         else
-    !          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half
-    !         endif
-    !       ENDIF
-    !    endif
+!    if(T%CAS==CASEP1.and.include_patch) then
+!       PATCHT=t%parent_fibre%patch%time
+!       IF(PATCHT/=0.AND.PATCHT/=2) THEN
+!         if(state%time) then
+!          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half/t%parent_fibre%beta0
+!         else
+!          X(6)=X(6)+t%parent_fibre%PATCH%a_T*half
+!         endif
+!       ENDIF
+!    endif
 
-    !    if(T%CAS==CASEP2.and.include_patch) then
-    !       PATCHT=t%parent_fibre%patch%time
-    !       IF(PATCHT/=0.AND.PATCHT/=1) THEN
-    !         if(state%time) then
-    !          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half/t%parent_fibre%beta0
-    !         else
-    !          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half
-    !         endif
-    !       ENDIF
-    !    endif
+!    if(T%CAS==CASEP2.and.include_patch) then
+!       PATCHT=t%parent_fibre%patch%time
+!       IF(PATCHT/=0.AND.PATCHT/=1) THEN
+!         if(state%time) then
+!          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half/t%parent_fibre%beta0
+!         else
+!          X(6)=X(6)+t%parent_fibre%PATCH%b_T*half
+!         endif
+!       ENDIF
+!    endif
 
   end SUBROUTINE TRACK_NODE_fake_totalpath_half_plain
 
@@ -380,40 +380,40 @@ contains
     TYPE(INTERNAL_STATE), target :: STATE
     integer i
     logical found
-
-    found=.false.
-    if(.not.associated(R%T))then
-       call make_node_layout(r)
-    endif
-    x=zero
-    t=>R%t%start
-    om=1.e38_dp
-    do i=1,R%T%N
-
-       if(t%parent_fibre%mag%kind==kind4) then
-          om0=t%parent_fibre%mag%freq
-          if(om0/=zero) then
-             if(om0<om) om=om0
-             found=.true.
-          endif
-       endif
-
-       call TRACK_NODE_fake_totalpath_half_plain(T,X,STATE)
-       call TRACK_NODE_fake_totalpath_half_plain(T,X,STATE)
-       t=>t%next
-    enddo
-
-    if(found) then
-       xharm=om*x(6)/clight
-       dt=clight/om
-    else
-       write(6,*) "No cavities found"
-       xharm=zero
-       dt=zero
-    endif
-
+    
+     found=.false.
+     if(.not.associated(R%T))then
+      call make_node_layout(r)
+     endif 
+     x=zero
+     t=>R%t%start
+     om=1.e38_dp
+     do i=1,R%T%N   
+      
+      if(t%parent_fibre%mag%kind==kind4) then
+       om0=t%parent_fibre%mag%freq
+       if(om0/=zero) then
+        if(om0<om) om=om0
+         found=.true.
+        endif
+      endif
+            
+      call TRACK_NODE_fake_totalpath_half_plain(T,X,STATE)
+      call TRACK_NODE_fake_totalpath_half_plain(T,X,STATE)
+      t=>t%next
+     enddo
+     
+     if(found) then
+      xharm=om*x(6)/clight
+      dt=clight/om
+     else
+      write(6,*) "No cavities found"
+      xharm=zero
+      dt=zero
+     endif
+          
   end subroutine get_ideal_harmonic
-
+  
   SUBROUTINE ORBIT_TRACK_NODE_Standard_R(K,X,STATE)
     IMPLICIT NONE
     REAL(DP),  INTENT(INOUT) :: X(6)
@@ -423,7 +423,7 @@ contains
     TYPE(INTEGRATION_NODE), POINTER  :: T
     TYPE(INTERNAL_STATE), target, OPTIONAL :: STATE
     TYPE(INTERNAL_STATE), pointer :: STATE0
-
+    
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        x(1:4)=x(1:4)*1.e-3_dp
        X5=X(5)
@@ -434,8 +434,8 @@ contains
     u=my_false
 
     T=>my_ORBIT_LATTICE%ORBIT_NODES(K)%NODE
-
-    if(present(state)) then
+  
+   if(present(state)) then
        state0=>state
     else
        state0=>my_ORBIT_LATTICE%STATE
@@ -454,41 +454,41 @@ contains
 
 
     DO I=1,my_ORBIT_LATTICE%ORBIT_NODES(K)%dpos
+ 
 
-
-
+      
        if(first_particle.and.accelerate) then !accelerate
-          if(t%previous%parent_fibre%mag%kind==kind4.and.associated(t%previous%parent_fibre%mag%c4%acc)) then
-             !  if(t%previous%cas==case0) t%previous%parent_fibre=t%previous%parent_fibre%mag%c4%acc%w2
+         if(t%previous%parent_fibre%mag%kind==kind4.and.associated(t%previous%parent_fibre%mag%c4%acc)) then
+           !  if(t%previous%cas==case0) t%previous%parent_fibre=t%previous%parent_fibre%mag%c4%acc%w2
              if(t%previous%cas==case0) then
-                call ORBIT_up_grade_mag(t%previous)
+               call ORBIT_up_grade_mag(t%previous)
              endif
           endif
-          if(t%parent_fibre%mag%kind==kind4.and.accelerate) then !accelerate
-             cav=(t%cas==case0)
-             if(associated(t%parent_fibre%mag%c4%acc).and.cav) then !accelerate
-                if(t%parent_fibre%mag%c4%acc%pos==1.and.t%pos_in_fibre==3) call find_all_energies(t,state0) !accelerate
-             endif !accelerate
-             if(associated(t%parent_fibre%mag%c4%acc).and.cav) call set_cavity(t,state0,dt_orbit_sync)
-             !          if(cav) call set_cavity(t,state0,dt_orbit_sync)
-             p_orbit=>t%parent_fibre   !p_orbit%mag%c4%t
+        if(t%parent_fibre%mag%kind==kind4.and.accelerate) then !accelerate
+          cav=(t%cas==case0)
+          if(associated(t%parent_fibre%mag%c4%acc).and.cav) then !accelerate
+            if(t%parent_fibre%mag%c4%acc%pos==1.and.t%pos_in_fibre==3) call find_all_energies(t,state0) !accelerate
           endif !accelerate
-
+          if(associated(t%parent_fibre%mag%c4%acc).and.cav) call set_cavity(t,state0,dt_orbit_sync)
+!          if(cav) call set_cavity(t,state0,dt_orbit_sync)
+          p_orbit=>t%parent_fibre   !p_orbit%mag%c4%t
+       endif !accelerate
+       
 
 
        endif !accelerate
 
        if(first_particle.and.(accelerate.or.ramp)) then !accelerate
-          call TRACK_NODE_fake_totalpath_half(T,x_orbit_sync,STATE0,my_true)  ! accelerate
+        call TRACK_NODE_fake_totalpath_half(T,x_orbit_sync,STATE0,my_true)  ! accelerate
        endif
 
        if(RAMP.and.first_particle) then !modulate
           if(t%parent_fibre%mag%slow_ac.and.t%cas==CASEP1) CALL do_ramping_r(T,x_orbit_sync(6),STATE0) !modulate
        endif !modulate
-
+       
        if(u) exit
        CALL TRACK_NODE_SINGLE(T,X,STATE0) !,my_ORBIT_LATTICE%ORBIT_CHARGE
-
+       
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
@@ -498,45 +498,45 @@ contains
           endif
           exit
        endif
+       
 
-
-
+       
        if(first_particle.and.(accelerate.or.ramp)) then !accelerate
-          call TRACK_NODE_fake_totalpath_half(T,x_orbit_sync,STATE0,my_true)  ! accelerate
+        call TRACK_NODE_fake_totalpath_half(T,x_orbit_sync,STATE0,my_true)  ! accelerate
        endif
+             
 
+    if(t%parent_fibre%mag%kind==kind4.and.accelerate.and.associated(t%parent_fibre%mag%c4%acc)) then
+!    if(t%parent_fibre%mag%kind==kind4.and.accelerate) then
+       if(t%cas==case0) then 
+        x(6)=x(6)-dt_orbit_sync
+        call ORBIT_up_grade_x(x,t)
+        if(first_particle) call ORBIT_up_grade_x(x_orbit_sync,t)
+     endif
+     endif 
+     
+if(mbugplot/=0) then
+     write(mbugplot,*) t%pos,t%cas,t%parent_fibre%mag%name
+     write(mbugplot,'(4(1X,D18.11))') x(1:2),x(5:6)  !, dt_orbit_sync
+endif
+     if(fill_patch.and.associated(t,my_ORBIT_LATTICE%tp)) then
+      n_fill_patch=n_fill_patch+1
+     my_ORBIT_LATTICE%dt(n_fill_patch)=x(6)
+     x(6)=0.d0
+     endif 
 
-       if(t%parent_fibre%mag%kind==kind4.and.accelerate.and.associated(t%parent_fibre%mag%c4%acc)) then
-          !    if(t%parent_fibre%mag%kind==kind4.and.accelerate) then
-          if(t%cas==case0) then
-             x(6)=x(6)-dt_orbit_sync
-             call ORBIT_up_grade_x(x,t)
-             if(first_particle) call ORBIT_up_grade_x(x_orbit_sync,t)
-          endif
-       endif
-
-       if(mbugplot/=0) then
-          write(mbugplot,*) t%pos,t%cas,t%parent_fibre%mag%name
-          write(mbugplot,'(4(1X,D18.11))') x(1:2),x(5:6)  !, dt_orbit_sync
-       endif
-       if(fill_patch.and.associated(t,my_ORBIT_LATTICE%tp)) then
-          n_fill_patch=n_fill_patch+1
-          my_ORBIT_LATTICE%dt(n_fill_patch)=x(6)
-          x(6)=0.d0
-       endif
-
-       if(associated(t,my_ORBIT_LATTICE%tp).and.n_used_patch<=n_patch.and.include_patch) then
-          if(state0%time) then
-             X(6)=X(6)-my_ORBIT_LATTICE%dt(n_used_patch)/t%parent_fibre%beta0
-             !  write(30,*)n_used_patch, my_ORBIT_LATTICE%dt(n_used_patch),t%parent_fibre%beta0
-          else
-             X(6)=X(6)-my_ORBIT_LATTICE%dt(n_used_patch)
-          endif
-       endif
+     if(associated(t,my_ORBIT_LATTICE%tp).and.n_used_patch<=n_patch.and.include_patch) then
+         if(state0%time) then
+          X(6)=X(6)-my_ORBIT_LATTICE%dt(n_used_patch)/t%parent_fibre%beta0
+        !  write(30,*)n_used_patch, my_ORBIT_LATTICE%dt(n_used_patch),t%parent_fibre%beta0
+         else
+          X(6)=X(6)-my_ORBIT_LATTICE%dt(n_used_patch)
+         endif       
+    endif 
 
        T=>T%NEXT
     ENDDO
-    first_particle=.false.
+   first_particle=.false.
 
     IF(my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS) THEN
        x(1:4)=x(1:4)*1.e3_dp
@@ -548,59 +548,59 @@ contains
   end SUBROUTINE ORBIT_TRACK_NODE_Standard_R
 
 
-  subroutine energize_ORBIT_lattice(t)
-    implicit none
-    real(dp), optional :: t
-    type(fibre), pointer :: p
-    type(work) werk,travail
-    real(dp) e_in,t0,freqs
-    integer i
-    logical found
-
-    found=.false.
-    freqs=1.e38_dp
-    werk=0
-    travail=0
-    t0=x_orbit_sync(6)
-    if(present(t)) t0=t
-    if(fill_patch) then
-       write(6,*) " filling patches with t= x0 from main program "
-       t0=t0_main
-    endif
-    write(6,*) "energize at time ", t0,t0/clight
-    write(6,*) "Initial Frequency of First Cavity", paccfirst%mag%c4%freq
-
-    call find_acc_energy(paccfirst,t0,e_in,my_true) ! new
-    !      call find_acc_energy(paccfirst,x_orbit_sync(6),e_in,.false.)
-    call find_energy(werk,kinetic=e_in)
-
-
-
-    p=>paccfirst%parent_layout%start
-    do i=1,paccfirst%parent_layout%n
+    subroutine energize_ORBIT_lattice(t)
+      implicit none
+      real(dp), optional :: t
+      type(fibre), pointer :: p
+      type(work) werk,travail
+      real(dp) e_in,t0,freqs
+      integer i
+      logical found
+      
+      found=.false.
+      freqs=1.e38_dp
+      werk=0
+      travail=0
+      t0=x_orbit_sync(6)
+      if(present(t)) t0=t
+      if(fill_patch) then
+        write(6,*) " filling patches with t= x0 from main program "
+        t0=t0_main
+      endif
+      write(6,*) "energize at time ", t0,t0/clight
+      write(6,*) "Initial Frequency of First Cavity", paccfirst%mag%c4%freq
+      
+      call find_acc_energy(paccfirst,t0,e_in,.true.) ! new
+!      call find_acc_energy(paccfirst,x_orbit_sync(6),e_in,.false.) 
+      call find_energy(werk,kinetic=e_in)
+      
+      
+      
+       p=>paccfirst%parent_layout%start
+      do i=1,paccfirst%parent_layout%n
        travail=p
        if(p%mag%kind==kind4) then
-          p%mag%c4%freq  = p%mag%c4%freq*werk%beta0/travail%beta0
-          p%magp%c4%freq = p%mag%c4%freq
-          if(p%mag%c4%freq<freqs)then
-             freqs=p%mag%c4%freq
-             found=.true.
-          endif
-          call find_acc_energy(paccfirst,t0,e_in,my_true)  ! new
+        p%mag%c4%freq  = p%mag%c4%freq*werk%beta0/travail%beta0
+        p%magp%c4%freq = p%mag%c4%freq
+        if(p%mag%c4%freq<freqs)then
+         freqs=p%mag%c4%freq
+         found=.true.
+        endif
+        call find_acc_energy(paccfirst,t0,e_in,.true.)  ! new
        endif
        p=werk
        p=>p%next
-    enddo
-    if(freqs/=0.and.found) then
+      enddo
+      if(freqs/=0.and.found) then
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
-    else
+      else
        write(6,*) " cavity with frequency problems ", freqs,found
        stop
-    endif
-    write(6,*) "Final Frequency of First Cavity", paccfirst%mag%c4%freq
-    write(6,*) "Initial and Final beta0 ",travail%beta0,werk%beta0
-
-  end subroutine energize_ORBIT_lattice
+      endif
+      write(6,*) "Final Frequency of First Cavity", paccfirst%mag%c4%freq
+      write(6,*) "Initial and Final beta0 ",travail%beta0,werk%beta0
+      
+    end subroutine energize_ORBIT_lattice
 
   subroutine ORBIT_up_grade_mag(t)
     implicit none
@@ -608,11 +608,11 @@ contains
     integer i
     TYPE(INTEGRATION_NODE), POINTER  :: T
     type(acceleration), pointer :: a
-    real(dp) freqs
-    logical found
+      real(dp) freqs
+      logical found
 
-    found=.false.
-    freqs=1.e38_dp
+      found=.false.
+      freqs=1.e38_dp
 
     a=>t%parent_fibre%mag%c4%acc
 
@@ -621,24 +621,24 @@ contains
 
     do i=1,p%parent_layout%n  !-1
        if(p%mag%kind==kind4) then
-          p%mag%c4%freq  = p%mag%c4%freq*a%w2%beta0/a%w1%beta0
-          p%magp%c4%freq = p%mag%c4%freq
-          if(p%mag%c4%freq<freqs.and.associated(p%mag%c4%acc))then
-             freqs=p%mag%c4%freq
-             found=.true.
-          endif
+        p%mag%c4%freq  = p%mag%c4%freq*a%w2%beta0/a%w1%beta0
+        p%magp%c4%freq = p%mag%c4%freq
+        if(p%mag%c4%freq<freqs.and.associated(p%mag%c4%acc))then
+         freqs=p%mag%c4%freq
+         found=.true.
+        endif
        endif
        p=a%w2
        p=>p%next
     enddo
 
-    if(freqs/=0.and.found) then
+      if(freqs/=0.and.found) then
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
-    else
+      else
        write(6,*) " ORBIT_up_grade_mag ", freqs,found
        write(6,*) " cavity with frequency problems ", freqs,found
        stop
-    endif
+      endif
 
   end subroutine ORBIT_up_grade_mag
 
@@ -649,7 +649,7 @@ contains
     type(acceleration), pointer :: a
 
     a=>t%parent_fibre%mag%c4%acc
-
+     
     X(2)=X(2)*a%w1%P0C/a%w2%P0C
     X(4)=X(4)*a%w1%P0C/a%w2%P0C
     X(5)=root(one+two*X(5)/a%w1%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
@@ -657,239 +657,239 @@ contains
     X(5)=(two*X(5)+X(5)**2)/(root(one/a%w2%BETA0**2+two*X(5)+X(5)**2) &
          +one/a%w2%BETA0)
     !if(enforce_zero_x5) x(5)=zero
-    !    x(6)=x(6)*my_ORBIT_LATTICE%orbit_omega_after/my_ORBIT_LATTICE%ORBIT_OMEGA
+!    x(6)=x(6)*my_ORBIT_LATTICE%orbit_omega_after/my_ORBIT_LATTICE%ORBIT_OMEGA
 
     !write(6,*) orbit_omega_after/my_ORBIT_LATTICE%ORBIT_OMEGA
   END subroutine ORBIT_up_grade_x
-
+  
   SUBROUTINE find_all_energies(t,state0)
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), POINTER  :: T,c
     TYPE(internal_state), target  :: state0
     integer i,ipause,mypause
     real(dp)e_fin,beta0,e_in,de,e_in0,xsync(6),t_fin
-    !    type(probe) xs
-    type(acceleration), pointer :: a
+!    type(probe) xs
+    type(acceleration), pointer :: a 
     type(work) w
-
+        
     call find_one_turn_final_energy(t,state0,e_fin)
-    !    xs%x=zero
-    !    xs%ac%om=zero
-    !    xs%ac%t=xsm0%ac%t
+!    xs%x=zero
+!    xs%ac%om=zero
+!    xs%ac%t=xsm0%ac%t
     w=t%parent_fibre%previous
-
-    e_in0=w%kinetic
+    
+    e_in0=w%kinetic 
     e_in=e_in0
-
+    
     xsync=x_orbit_sync
-
+    
     i=0
     c=>t
 
     do while(.true.)
+     
+        beta0=C%PARENT_FIBRE%beta0
+        call find_energy(w,kinetic=e_in)
+        C%PARENT_FIBRE%beta0=w%beta0
+          call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
+        C%PARENT_FIBRE%beta0=beta0
+        
+     if(c%parent_fibre%mag%kind==kind4.and.c%cas==case0) then  !.and.c%pos_in_fibre==3) then
+       
+       a=>c%parent_fibre%mag%c4%acc
+       
+       de=(e_fin-e_in0)*a%r/a%nst
+       
+       a%de(c%pos_in_fibre-2)=de
+       a%e_in(c%pos_in_fibre-2)=e_in       
 
-       beta0=C%PARENT_FIBRE%beta0
-       call find_energy(w,kinetic=e_in)
-       C%PARENT_FIBRE%beta0=w%beta0
-       call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
-       C%PARENT_FIBRE%beta0=beta0
-
-       if(c%parent_fibre%mag%kind==kind4.and.c%cas==case0) then  !.and.c%pos_in_fibre==3) then
-
-          a=>c%parent_fibre%mag%c4%acc
-
-          de=(e_fin-e_in0)*a%r/a%nst
-
-          a%de(c%pos_in_fibre-2)=de
-          a%e_in(c%pos_in_fibre-2)=e_in
-
-          a=>c%parent_fibre%magp%c4%acc
-          a%de(c%pos_in_fibre-2)=de
-          a%e_in(c%pos_in_fibre-2)=e_in
+       a=>c%parent_fibre%magp%c4%acc
+       a%de(c%pos_in_fibre-2)=de
+       a%e_in(c%pos_in_fibre-2)=e_in       
 
 
-
-          e_in=e_in+de
+       
+       e_in=e_in+de      
+     endif
+     
+     
+     if(c%parent_fibre%mag%kind==kind4) then
+      a=>c%parent_fibre%mag%c4%acc
+       if(associated(c,c%parent_fibre%t2)) then
+        if(associated(c%parent_fibre%mag%c4%acc%next%t1%next%next,t)) then
+        
+        e_in=e_in-de      ! remove last
+        
+        t_fin=xsync(6)   ! to insure ridiculous self-consistancy on bare ideal no patch lattice
+!        call find_acc_energy(c%parent_fibre,t_fin,e_fin,.false.)  ! new
+        call find_acc_energy(c%parent_fibre,t_fin,e_fin,.true.)  ! to insure ridiculous self-consistancy
+        
+        de=e_fin-e_in
+ 
+        a=>c%parent_fibre%mag%c4%acc
+        a%de(c%pos_in_fibre-4)=de
+        a%e_in(c%pos_in_fibre-4)=e_in       
+        a=>c%parent_fibre%magp%c4%acc
+        a%de(c%pos_in_fibre-4)=de
+        a%e_in(c%pos_in_fibre-4)=e_in       
+  !           write(6,*) i,de,e_in
+     
+        
+         exit
+        endif
        endif
+     endif
+     
+        beta0=C%PARENT_FIBRE%beta0
+        call find_energy(w,kinetic=e_in)
+        C%PARENT_FIBRE%beta0=w%beta0
+          call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
+        C%PARENT_FIBRE%beta0=beta0
 
-
-       if(c%parent_fibre%mag%kind==kind4) then
-          a=>c%parent_fibre%mag%c4%acc
-          if(associated(c,c%parent_fibre%t2)) then
-             if(associated(c%parent_fibre%mag%c4%acc%next%t1%next%next,t)) then
-
-                e_in=e_in-de      ! remove last
-
-                t_fin=xsync(6)   ! to insure ridiculous self-consistancy on bare ideal no patch lattice
-                !        call find_acc_energy(c%parent_fibre,t_fin,e_fin,.false.)  ! new
-                call find_acc_energy(c%parent_fibre,t_fin,e_fin,my_true)  ! to insure ridiculous self-consistancy
-
-                de=e_fin-e_in
-
-                a=>c%parent_fibre%mag%c4%acc
-                a%de(c%pos_in_fibre-4)=de
-                a%e_in(c%pos_in_fibre-4)=e_in
-                a=>c%parent_fibre%magp%c4%acc
-                a%de(c%pos_in_fibre-4)=de
-                a%e_in(c%pos_in_fibre-4)=e_in
-                !           write(6,*) i,de,e_in
-
-
-                exit
-             endif
-          endif
-       endif
-
-       beta0=C%PARENT_FIBRE%beta0
-       call find_energy(w,kinetic=e_in)
-       C%PARENT_FIBRE%beta0=w%beta0
-       call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
-       C%PARENT_FIBRE%beta0=beta0
-
-       c=>c%next
-
-
+     c=>c%next
+     
+     
        i=i+1
        if(i>c%parent_fibre%parent_layout%t%n) then
-          write(6,*) " error acceleration loop find_final_energy "
-          ipause=mypause( 1)
-          stop 1950
+        write(6,*) " error acceleration loop find_final_energy "
+        ipause=mypause( 1)
+        stop 1950
        endif
+     
 
-
-    enddo
+    enddo 
   end SUBROUTINE find_all_energies
-
-  SUBROUTINE find_all_tc_for_restarting(r,tc,nc)
+ 
+   SUBROUTINE find_all_tc_for_restarting(r,tc,nc)
     IMPLICIT NONE
     TYPE(layout), POINTER  :: r
     TYPE(fibre), POINTER  :: f
-    real(dp), allocatable :: tc(:)
+     real(dp), allocatable :: tc(:)
     integer i,n,nc
 
-
-
+        
+    
     f=>r%start
     n=0
     do i=1,r%n
-
-       if(f%mag%kind==kind4) then
-          n=n+1
-       endif
-       f=>f%next
-    enddo
+             
+     if(f%mag%kind==kind4) then  
+       n=n+1
+     endif    
+     f=>f%next
+    enddo 
     nc=n
     allocate(tc(nc))
     n=0
     do i=1,r%n
-
-       if(f%mag%kind==kind4) then
-          n=n+1
-          tc(n)=f%mag%c4%t
-       endif
-       f=>f%next
+             
+     if(f%mag%kind==kind4) then   
+       n=n+1
+       tc(n)=f%mag%c4%t
+     endif    
+     f=>f%next     
     enddo
-
+     
   end SUBROUTINE find_all_tc_for_restarting
 
-  SUBROUTINE set_all_tc_for_restarting(r,tc,nc)
+   SUBROUTINE set_all_tc_for_restarting(r,tc,nc)
     IMPLICIT NONE
     TYPE(layout), POINTER  :: r
     TYPE(fibre), POINTER  :: f
-    real(dp), allocatable :: tc(:)
+     real(dp), allocatable :: tc(:)
     integer i,n,nc,ne
 
-
-
+        
+    
     f=>r%start
 
-    n=0
-    ne=0
+    n=0 
+    ne=0 
     do i=1,r%n
-
-       if(f%mag%kind==kind4) then
-          if(associated(f%mag%c4%acc)) then
-             n=n+1
-             f%mag%c4%t=tc(n)
-          else
-             ne=ne+1
-          endif
-       endif
-       f=>f%next
+             
+     if(f%mag%kind==kind4) then   
+      if(associated(f%mag%c4%acc)) then
+       n=n+1
+       f%mag%c4%t=tc(n)
+      else
+      ne=ne+1
+      endif
+     endif    
+     f=>f%next     
     enddo
-    write(6,*)ne," cavities have no table "
+      write(6,*)ne," cavities have no table "
 
   end SUBROUTINE set_all_tc_for_restarting
-
-  SUBROUTINE find_one_turn_final_energy(t,state0,e_fin)
+ 
+   SUBROUTINE find_one_turn_final_energy(t,state0,e_fin)
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), POINTER  :: T,c
     TYPE(internal_state), target  :: state0
     integer i,ipause,mypause
     real(dp)e_fin,t_fin,beta0,e_in,xsync(6)
-    !    type(probe) xs
-    type(acceleration), pointer :: a
+!    type(probe) xs
+    type(acceleration), pointer :: a 
     type(work) w
-
-    !    xs%x=zero
-    !    xs%ac%om=zero
-    !    xs%ac%t=xsm0%ac%t
+    
+!    xs%x=zero
+!    xs%ac%om=zero
+!    xs%ac%t=xsm0%ac%t
     w=t%parent_fibre%previous   !  correspounds to last fibre's energy
-
+    
     xsync=x_orbit_sync
-
-    e_in=w%kinetic
-
+    
+    e_in=w%kinetic 
+    
     i=0
     c=>t
 
     do while(.true.)
+     
+        beta0=C%PARENT_FIBRE%beta0
+        call find_energy(w,kinetic=e_in)
+        C%PARENT_FIBRE%beta0=w%beta0
+          call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
+        C%PARENT_FIBRE%beta0=beta0
 
-       beta0=C%PARENT_FIBRE%beta0
-       call find_energy(w,kinetic=e_in)
-       C%PARENT_FIBRE%beta0=w%beta0
-       call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
-       C%PARENT_FIBRE%beta0=beta0
+     if(c%parent_fibre%mag%kind==kind4.and.c%cas==case0) then
+       t_fin=xsync(6)
+!       t_fin=xs%ac%t
+       call find_acc_energy(c%parent_fibre,t_fin,e_fin,.false.)
+       e_in=e_fin      
+     endif
 
-       if(c%parent_fibre%mag%kind==kind4.and.c%cas==case0) then
-          t_fin=xsync(6)
-          !       t_fin=xs%ac%t
-          call find_acc_energy(c%parent_fibre,t_fin,e_fin,my_false)
-          e_in=e_fin
+        beta0=C%PARENT_FIBRE%beta0
+        call find_energy(w,kinetic=e_in)
+        C%PARENT_FIBRE%beta0=w%beta0
+          call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
+        C%PARENT_FIBRE%beta0=beta0
+     
+     if(c%parent_fibre%mag%kind==kind4) then
+      a=>c%parent_fibre%mag%c4%acc
+       if(associated(c,c%parent_fibre%t2)) then
+        if(associated(c%parent_fibre%mag%c4%acc%next%t1%next%next,t)) then
+         exit
+        endif
        endif
-
-       beta0=C%PARENT_FIBRE%beta0
-       call find_energy(w,kinetic=e_in)
-       C%PARENT_FIBRE%beta0=w%beta0
-       call TRACK_NODE_fake_totalpath_half_plain(c,xsync,STATE0)
-       C%PARENT_FIBRE%beta0=beta0
-
-       if(c%parent_fibre%mag%kind==kind4) then
-          a=>c%parent_fibre%mag%c4%acc
-          if(associated(c,c%parent_fibre%t2)) then
-             if(associated(c%parent_fibre%mag%c4%acc%next%t1%next%next,t)) then
-                exit
-             endif
-          endif
-       endif
-       c=>c%next
-
-
+     endif
+     c=>c%next
+     
+     
        i=i+1
        if(i>c%parent_fibre%parent_layout%t%n) then
-          write(6,*) " error acceleration loop find_final_energy "
-          ipause=mypause( 1)
-          stop 1951
+        write(6,*) " error acceleration loop find_final_energy "
+               ipause=mypause( 1)
+        stop 1951
        endif
+     
 
-
-    enddo
-
-    !  write(6,*) " one turn cav x(6) ",xsync(6)
+    enddo 
+    
+  !  write(6,*) " one turn cav x(6) ",xsync(6)
   end SUBROUTINE find_one_turn_final_energy
+ 
 
-
-
+ 
   SUBROUTINE find_acc_energy(p,t_fin,e_fin,insert)
     IMPLICIT NONE
     TYPE(fibre), POINTER  :: p
@@ -900,7 +900,7 @@ contains
     type(element), pointer :: el
     type(elementp), pointer :: elp
     logical(lp) insert
-
+    
     el=>p%mag
     elp=>p%magp
     a=>el%c4%acc
@@ -908,53 +908,53 @@ contains
 
     ti=t_fin/clight/a%unit_time    ! time in milliseconds
     if(ti>a%tableau(a%n)%temps.or.ti<a%tableau(1)%temps) then
-       ! write(6,*) " Acceleration must stop time =",ti
-       if(ti>a%tableau(a%n)%temps) then
-          if(insert) then
-             do i=1,el%c4%nf
-                el%c4%f(i)= a%tableau(a%n)%volt(i)
-                el%c4%ph(i)= a%tableau(a%n)%phase(i)
-                elp%c4%f(i)=a%tableau(a%n)%volt(i)
-                elp%c4%ph(i)= a%tableau(a%n)%phase(i)
-             enddo
-          endif
-          e_fin=a%tableau(a%n)%energie
-       else
-          if(insert) then
-             do i=1,el%c4%nf
-                el%c4%f(i)= a%tableau(1)%volt(i)
-                el%c4%ph(i)= a%tableau(1)%phase(i)
-                elp%c4%f(i)=a%tableau(1)%volt(i)
-                elp%c4%ph(i)= a%tableau(1)%phase(i)
-             enddo
-          endif
-          e_fin=a%tableau(1)%energie
+    ! write(6,*) " Acceleration must stop time =",ti
+     if(ti>a%tableau(a%n)%temps) then
+       if(insert) then    
+        do i=1,el%c4%nf
+         el%c4%f(i)= a%tableau(a%n)%volt(i)
+         el%c4%ph(i)= a%tableau(a%n)%phase(i)
+         elp%c4%f(i)=a%tableau(a%n)%volt(i)
+         elp%c4%ph(i)= a%tableau(a%n)%phase(i)
+        enddo 
        endif
-    else  ! time inside table
-
-
-       dtot=(a%tableau(a%n)%temps-a%tableau(1)%temps)/(a%n-1)
-
-       ti=(ti-a%tableau(1)%temps)/dtot+1
-
-       !    it=idint(ti)
-       it=int(ti)
-
-       rat=(ti-it)
-       if(insert) then
-          do i=1,el%c4%nf
-             el%c4%f(i)=(a%tableau(it+1)%volt(i)-a%tableau(it)%volt(i))*rat + a%tableau(it)%volt(i)
-             el%c4%ph(i)=(a%tableau(it+1)%phase(i)-a%tableau(it)%phase(i))*rat + a%tableau(it)%phase(i)
-             elp%c4%f(i)=(a%tableau(it+1)%volt(i)-a%tableau(it)%volt(i))*rat + a%tableau(it)%volt(i)
-             elp%c4%ph(i)=(a%tableau(it+1)%phase(i)-a%tableau(it)%phase(i))*rat + a%tableau(it)%phase(i)
-          enddo
+        e_fin=a%tableau(a%n)%energie 
+       else       
+       if(insert) then    
+        do i=1,el%c4%nf
+         el%c4%f(i)= a%tableau(1)%volt(i)
+         el%c4%ph(i)= a%tableau(1)%phase(i)
+         elp%c4%f(i)=a%tableau(1)%volt(i)
+         elp%c4%ph(i)= a%tableau(1)%phase(i)
+        enddo 
        endif
-       e_fin=(a%tableau(it+1)%energie-a%tableau(it)%energie)*rat + a%tableau(it)%energie
+        e_fin=a%tableau(1)%energie 
+      endif
+     else  ! time inside table
 
+
+    dtot=(a%tableau(a%n)%temps-a%tableau(1)%temps)/(a%n-1)
+ 
+    ti=(ti-a%tableau(1)%temps)/dtot+1
+     
+!    it=idint(ti)
+    it=int(ti)
+ 
+     rat=(ti-it) 
+    if(insert) then    
+     do i=1,el%c4%nf
+      el%c4%f(i)=(a%tableau(it+1)%volt(i)-a%tableau(it)%volt(i))*rat + a%tableau(it)%volt(i)
+      el%c4%ph(i)=(a%tableau(it+1)%phase(i)-a%tableau(it)%phase(i))*rat + a%tableau(it)%phase(i)
+      elp%c4%f(i)=(a%tableau(it+1)%volt(i)-a%tableau(it)%volt(i))*rat + a%tableau(it)%volt(i)
+      elp%c4%ph(i)=(a%tableau(it+1)%phase(i)-a%tableau(it)%phase(i))*rat + a%tableau(it)%phase(i)
+     enddo 
+    endif
+     e_fin=(a%tableau(it+1)%energie-a%tableau(it)%energie)*rat + a%tableau(it)%energie 
+    
     endif
 
   end SUBROUTINE find_acc_energy
-
+    
   SUBROUTINE set_cavity(tIN,state0,dt)
     IMPLICIT NONE
     TYPE(INTEGRATION_NODE), POINTER  :: TIN,T,t0
@@ -970,86 +970,86 @@ contains
     hh=hh+1
     t=>tin
     nit=1000
-
+    
     w=t%parent_fibre
     energy0=w%kinetic   !+x_orbit_sync(5)*w%p0c
 
     el=>t%parent_fibre%mag
     elp=>t%parent_fibre%magp
     a=>el%c4%acc
-
-
+    
+    
     n=t%pos_in_fibre-2
 
-    t0=>t     !!!!!!!!!!!!!!!
-
-    a%w1=0
-    a%w2=0
-
+    t0=>t     !!!!!!!!!!!!!!! 
+    
+        a%w1=0
+        a%w2=0
+        
 
     small_tc=(twopi*EL%freq/CLIGHT)**(-1)*1.e-7_dp
     dep=small_tc
 
-    !  write(6,*) small_tc
-    ! write(6,*) energy0
+  !  write(6,*) small_tc
+ ! write(6,*) energy0
 
-    !     energy0=a%e_in(n)
-    call find_energy(a%w1,kinetic=energy0)
-    energy0=energy0+a%de(n)   ! final energy after that cavity
+!     energy0=a%e_in(n)
+     call find_energy(a%w1,kinetic=energy0)
+     energy0=energy0+a%de(n)   ! final energy after that cavity
 
     call find_energy(a%w2,kinetic=energy0)
 
     if(a%de(n)/=zero ) then
-       if(mdebug/=0) then
-          write(mdebug,*) hh,a%de(n)
-          tc=el%c4%t
-          dtc=(EL%freq/CLIGHT)**(-1)/50
-          do count=-50,50
-             x=0.d0;
-             el%c4%t=count*dtc
-             CALL TRACK_NODE_SINGLE(T,X,STATE0)
-             write(mdebug,*) el%c4%t, x(5)*w%p0c,a%de(n)
-          enddo
-          el%c4%t=tc
-       endif
+      if(mdebug/=0) then
+       write(mdebug,*) hh,a%de(n)
+       tc=el%c4%t
+       dtc=(EL%freq/CLIGHT)**(-1)/50
+       do count=-50,50
+        x=0.d0;
+        el%c4%t=count*dtc
+        CALL TRACK_NODE_SINGLE(T,X,STATE0)
+        write(mdebug,*) el%c4%t, x(5)*w%p0c,a%de(n)
+       enddo
+       el%c4%t=tc
+      endif
        dtc0=1.e38_dp
        do i=1,nit
-          tc=el%c4%t
-          x=0.d0;
-          CALL TRACK_NODE_SINGLE(T,X,STATE0)
-          en0=x(5)*w%p0c
-
-          x=0.d0;
-          el%c4%t=tc+dep
-          CALL TRACK_NODE_SINGLE(T,X,STATE0)
-          !  !  write(6,*) x(5)*w%p0c
-          dtc=(x(5)*w%p0c-en0)/dep
-          dtc=(a%de(n)-en0)/dtc
-          el%c4%t=tc+dtc
-
-          if(i>100) then
-             if(abs(dtc)<small_tc.and.abs(dtc)>=dtc0) exit
-             dtc0=abs(dtc)
-             !    pause 123
-          endif
-          !    write(6,*) " more ",i,dtc,small_tc
+       tc=el%c4%t
+       x=0.d0;
+       CALL TRACK_NODE_SINGLE(T,X,STATE0)
+       en0=x(5)*w%p0c
+       
+       x=0.d0;
+       el%c4%t=tc+dep
+       CALL TRACK_NODE_SINGLE(T,X,STATE0)
+  !  !  write(6,*) x(5)*w%p0c
+        dtc=(x(5)*w%p0c-en0)/dep
+        dtc=(a%de(n)-en0)/dtc 
+        el%c4%t=tc+dtc
+        
+        if(i>100) then
+         if(abs(dtc)<small_tc.and.abs(dtc)>=dtc0) exit
+         dtc0=abs(dtc)
+     !    pause 123
+        endif
+    !    write(6,*) " more ",i,dtc,small_tc
        enddo
-       el%c4%t=tc+dtc
-       !     elp%c4%t=tc+dtc
+        el%c4%t=tc+dtc
+  !     elp%c4%t=tc+dtc
        x=0.d0;
        CALL TRACK_NODE_SINGLE(T,X,STATE0)
        dt=x(6)
-
+       
        if(mdebug/=0) write(mdebug,*) "final tc = ", el%c4%t
-
+            
 
        if(i>nit-1) then
-          write(6,*) " NO convergence in set_cavity "
-          stop 1939
+       write(6,*) " NO convergence in set_cavity "
+       stop 1939
        endif
     endif  ! de=zero
   end SUBROUTINE set_cavity
-
+    
   SUBROUTINE ORBIT_restore_ANBN
     IMPLICIT NONE
     INTEGER K,I
@@ -1191,7 +1191,7 @@ contains
     REAL(DP) BET(2),ALF(2),ETA,ETAP
     TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
     logical(lp) doit,cav
-
+    
 
     END_MAG=.not.no_end_mag
     ALLOCATE(R%T%ORBIT_LATTICE)
@@ -1219,26 +1219,26 @@ contains
     T=>R%T%START
     DO I=1,R%T%N-1
        cav=.false.
-       !       if(t%parent_fibre%mag%kind==kind4) then
-       !          doit=.false.
-       !       else
-       !          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       !       endif
+!       if(t%parent_fibre%mag%kind==kind4) then
+!          doit=.false.
+!       else
+!          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+!       endif
 !!!!!
-
-       doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
-          DOIT=.TRUE.
-       ENDIF
+ 
+          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+          if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
+           DOIT=.TRUE.
+          ENDIF
 !!!!!
-       !       if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
-       !       if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
+!       if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
+!       if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
        doit=doit.or.cav
        doit=doit.and.I/=1
        IF(doit) THEN    !
           K=K+1
           DL=T%S(1)-L
-          !          IF(DL>DLMAX.and.t%previous%parent_fibre%mag%kind/=kind4) DLMAX=DL
+!          IF(DL>DLMAX.and.t%previous%parent_fibre%mag%kind/=kind4) DLMAX=DL
           IF(DL>DLMAX) DLMAX=DL
           L=T%S(1)
        ENDIF
@@ -1266,20 +1266,20 @@ contains
     IF(t%parent_fibre%mag%kind==kind4) ORBIT_NODES(K)%CAVITY=MY_TRUE;
     DO I=1,R%T%N-1
        cav=.false.
-       !       if(t%parent_fibre%mag%kind==kind4) then
-       !          doit=.false.
-       !       else
-       !          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       !       endif
+!       if(t%parent_fibre%mag%kind==kind4) then
+!          doit=.false.
+!       else
+!          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+!       endif
 !!!!!
 
-       doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
-          DOIT=.TRUE.
-       ENDIF
+          doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+          if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
+           DOIT=.TRUE.
+          ENDIF
 !!!!!
-       !       if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
-       !       if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
+!       if(T%CAS==CASEP1.AND.t%parent_fibre%mag%kind==kind4) cav=.true.
+!       if(T%CAS==CASEP1.AND.t%previous%parent_fibre%mag%kind==kind4) cav=.true.
        doit=doit.or.cav
        doit=doit.and.I/=1
        IF(doit) THEN    !
@@ -1451,11 +1451,11 @@ subroutine ptc_track_particle(node_index, x,xp,y,yp,phi,dE)
   i = node_index + 1
 
 
-  call PUT_RAY(x,xp,y,yp,phi,dE)
+     call PUT_RAY(x,xp,y,yp,phi,dE)
 
-  call TRACK_ONE_NODE(i)
+     call TRACK_ONE_NODE(i)
 
-  call GET_RAY(x,xp,y,yp,phi,dE)
+     call GET_RAY(x,xp,y,yp,phi,dE)
 
   IF(I==1.AND.MF_HERD/=0) THEN
      WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_p0c, &

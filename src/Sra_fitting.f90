@@ -1500,7 +1500,7 @@ contains
        endif
     enddo
 
-    write(6,*) size(monitors), "monitors "
+write(6,*) size(monitors), "monitors "
     do jm=1,size(monitors)
        norm=0.0_dp
        do i=1,m_turn
@@ -2250,7 +2250,7 @@ contains
     call kill(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
 
   end SUBROUTINE compute_twiss
-
+  
 !!!! special rcs
 
   subroutine lattice_fit_bump_rcs(R,EPSF)
@@ -2270,38 +2270,38 @@ contains
     real(dp) epsf,epsr,epsnow,gam(2)
     type(fibre), pointer:: p
     TYPE(POL_BLOCK) poly(np)
+    
+do i=1,np
+ poly(i)=0
+enddo
 
-    do i=1,np
-       poly(i)=0
-    enddo
+poly(1)%name='QDX2701'
+poly(2)%name='QFL0101'
+poly(3)%name='QDL0101'
+poly(4)%name='QFM0201'
+poly(5)%name='QDL0201'
+poly(6)%name='QFL0301'
+poly(7)%name='QDX0301'
 
-    poly(1)%name='QDX2701'
-    poly(2)%name='QFL0101'
-    poly(3)%name='QDL0101'
-    poly(4)%name='QFM0201'
-    poly(5)%name='QDL0201'
-    poly(6)%name='QFL0301'
-    poly(7)%name='QDX0301'
+do i=1,np
+ poly(i)%ibn(2)=i
+ r=poly(i)
+enddo
+!r%lastpos=1
+!r%last=>R%start
+call move_to( R,p,poly(1)%name,pos1,reset=my_true)
+call move_to( R,p,poly(7)%name,pos2)
+pos2=pos2+1
 
-    do i=1,np
-       poly(i)%ibn(2)=i
-       r=poly(i)
-    enddo
-    !r%lastpos=1
-    !r%last=>R%start
-    call move_to( R,p,poly(1)%name,pos1,reset=my_true)
-    call move_to( R,p,poly(7)%name,pos2)
-    pos2=pos2+1
+SET_TPSAFIT=.FALSE.
 
-    SET_TPSAFIT=.FALSE.
-
-
-    targ(1)=-1.216091585893243e0_dp     !  1 1
-    targ(2)=-6.061686871135153e0_dp     !  1 2
-    targ(3)=-0.7900090444471683E-01_dp  ! 2 1
-    targ(4)=2.120414509984705e0_dp      ! 3 3
-    targ(5)=-19.02200463334060e0_dp     ! 3 4
-    targ(6)=-0.1837954391003473e0_dp    ! 4 3
+ 
+targ(1)=-1.216091585893243e0_dp     !  1 1
+targ(2)=-6.061686871135153e0_dp     !  1 2
+targ(3)=-0.7900090444471683E-01_dp  ! 2 1 
+targ(4)=2.120414509984705e0_dp      ! 3 3
+targ(5)=-19.02200463334060e0_dp     ! 3 4
+targ(6)=-0.1837954391003473e0_dp    ! 4 3
 
 
 
@@ -2334,10 +2334,10 @@ contains
 
     !stop
 
-    !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
-    !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
-    !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
-    !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
+ !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
+ !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
+ !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
+ !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
 
     eq(1)=(y(1)%t.par.'1000')-targ(1)
     eq(2)=(y(1)%t.par.'0100')-targ(2)
@@ -2348,10 +2348,10 @@ contains
 
     epsnow=zero
     do i=1,neq
-       epsnow=epsnow+abs(eq(i))
+     epsnow=epsnow+abs(eq(i)) 
     enddo
-    write(6,*) " deviation ",epsnow
-
+     write(6,*) " deviation ",epsnow
+     
     call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
@@ -2397,7 +2397,7 @@ contains
     SET_TPSAFIT=.true.
 
     do i=1,7
-       r=poly(i)
+     r=poly(i)
     enddo
 
 
@@ -2419,8 +2419,8 @@ contains
 
 
   end subroutine lattice_fit_bump_rcs
-
-  subroutine lattice_fit_bump_min_rcs(R0,R1,EPSF,poly,np,sca)
+  
+    subroutine lattice_fit_bump_min_rcs(R0,R1,EPSF,poly,np,sca)
     IMPLICIT NONE
     TYPE(layout), target,intent(inout):: R0,R1
     integer, parameter :: neq=2
@@ -2430,7 +2430,7 @@ contains
     INTEGER I,SCRATCHFILE, MF
     TYPE(TAYLOR) EQ(neq)
     TYPE(REAL_8) Y(6),Y1(6),Y0(6)
-    integer ::  no=2,nt,j,it,pos1,pos2,np
+    integer ::  no=2,nt,j,it,pos1,pos2,np 
     type(damap) id1,ID0
     type(gmap) g
     TYPE(TAYLOR)t,bp(2),v
@@ -2440,31 +2440,31 @@ contains
     TYPE(POL_BLOCK) poly(:)
     type(normalform) norm
     real(dp) s0,ds
-    !   write(6,*)" correct ? "
-    !   read(5,*) j
-    !   if(j==1)    call lattice_fit_bump_rcs(R1,EPSF)
-    !do i=1,np
-    ! poly(i)=0
-    !enddo
+ !   write(6,*)" correct ? "
+ !   read(5,*) j
+ !   if(j==1)    call lattice_fit_bump_rcs(R1,EPSF)
+!do i=1,np
+! poly(i)=0
+!enddo
 
-    !poly(1)%name='QDX2701'
-    !poly(2)%name='QFL0101'
-    !poly(3)%name='QDL0101'
-    !poly(4)%name='QFM0201'
-    !poly(5)%name='QDL0201'
-    !poly(6)%name='QFL0301'
-    !poly(7)%name='QDX0301'
+!poly(1)%name='QDX2701'
+!poly(2)%name='QFL0101'
+!poly(3)%name='QDL0101'
+!poly(4)%name='QFM0201'
+!poly(5)%name='QDL0201'
+!poly(6)%name='QFL0301'
+!poly(7)%name='QDX0301'
 
-    !do i=1,np
-    ! poly(i)%ibn(2)=i
-    ! r1=poly(i)
-    !enddo
+!do i=1,np
+! poly(i)%ibn(2)=i
+! r1=poly(i)
+!enddo
 
     do i=1,np
-       r1=poly(i)
+     r1=poly(i)
     enddo
 
-    SET_TPSAFIT=.FALSE.
+SET_TPSAFIT=.FALSE.
     STATE=only_4d0
 
 
@@ -2475,21 +2475,21 @@ contains
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) X1
 
-    CALL INIT(STATE,1,0)
-
-    CALL ALLOC(Y0)
-    CALL ALLOC(Y1)
-    CALL ALLOC(norm)
-    CALL ALLOC(ID1,ID0)
-    id1=1
-    id0=1
-
-    y0=x0+id0
-    y1=x1+id1
+   CALL INIT(STATE,1,0)
+   
+   CALL ALLOC(Y0)
+   CALL ALLOC(Y1)
+   CALL ALLOC(norm)
+   CALL ALLOC(ID1,ID0)
+   id1=1
+   id0=1
+   
+   y0=x0+id0
+   y1=x1+id1
 
     CALL TRACK(R0,Y0,1,STATE)
     CALL TRACK(R1,Y1,1,STATE)
-
+    
     norm=y0
     id0=norm%a_t
     targ(1:2) = norm%tune(1:2)
@@ -2497,70 +2497,70 @@ contains
     id1=norm%a_t
     y0=x0+id0
     y1=x1+id1
-
+  
     betx0m=0
-    betx1m=0
+    betx1m=0 
     bety0m=0
-    bety1m=0
+    bety1m=0 
     dbxrm=0
     dbyrm=0
-
+   
     dbxr=0
     dbyr=0
-
+   
     dbx=0
     dby=0
     s0=0
     ds=0
-
+    
     p=>r0%start
-
+    
     do i=1,r0%n
-
-       ds=p%mag%p%ld
-
-       call TRACK(R0,Y0,i,i+1,STATE)
-       betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
-       bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
-       call TRACK(R1,Y1,i,i+1,STATE)
-       betx1=(y1(1)%t.sub.'1')**2+(y1(1)%t.sub.'01')**2
-       bety1=(y1(3)%t.sub.'001')**2+(y1(3)%t.sub.'0001')**2
-       if(betx0>betx0m) betx0m=betx0
-       if(betx1>betx1m) betx1m=betx1
-       if(bety0>bety0m) bety0m=bety0
-       if(bety1>bety1m) bety1m=bety1
-       dbxr= abs(betx1-betx0)  !/bety0
-       dbyr= abs(bety1-bety0)  !/bety0
-       if(dbxr>dbxrm) then
-          dbxrm=dbxr
-          ! write(6,*)"x", betx0,betx1
-          px=>p
-       endif
-       if(dbyr>dbyrm) then
-          dbyrm=dbyr
-          !write(6,*)"y", bety0,bety1
-          py=>p
-       endif
-       dbx=ds*(betx1-betx0)**2+dbx
-       dby=ds*(bety1-bety0)**2+dby
-       p=>p%next
-       s0=s0+ds
+    
+    ds=p%mag%p%ld
+    
+      call TRACK(R0,Y0,i,i+1,STATE)      
+      betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
+      bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
+        call TRACK(R1,Y1,i,i+1,STATE)          
+      betx1=(y1(1)%t.sub.'1')**2+(y1(1)%t.sub.'01')**2
+      bety1=(y1(3)%t.sub.'001')**2+(y1(3)%t.sub.'0001')**2
+     if(betx0>betx0m) betx0m=betx0
+     if(betx1>betx1m) betx1m=betx1   
+     if(bety0>bety0m) bety0m=bety0
+     if(bety1>bety1m) bety1m=bety1  
+     dbxr= abs(betx1-betx0)  !/bety0
+     dbyr= abs(bety1-bety0)  !/bety0
+     if(dbxr>dbxrm) then
+      dbxrm=dbxr
+     ! write(6,*)"x", betx0,betx1
+      px=>p
+     endif
+     if(dbyr>dbyrm) then
+      dbyrm=dbyr
+      !write(6,*)"y", bety0,bety1
+      py=>p
+     endif
+     dbx=ds*(betx1-betx0)**2+dbx
+     dby=ds*(bety1-bety0)**2+dby
+     p=>p%next
+     s0=s0+ds
     enddo
-
-    dbx=dbx/s0
-    dby=dby/s0
+    
+     dbx=dbx/s0
+     dby=dby/s0
     write(6,*) " maximum "
     write(6,*) sqrt(betx0m),sqrt(betx1m)
     write(6,*) sqrt(bety0m),sqrt(bety1m)
-    !   write(6,*) sqrt(dbx),sqrt(dby),s0
-    !   write(6,*) px%mag%name,py%mag%name
-    !   write(6,*) dbxr,dbyr
-
-
-    CALL kill(Y0)
-    CALL kill(Y1)
-    CALL kill(norm)
-    CALL kill(ID1,ID0)
+ !   write(6,*) sqrt(dbx),sqrt(dby),s0
+ !   write(6,*) px%mag%name,py%mag%name
+ !   write(6,*) dbxr,dbyr
+        
+    
+   CALL kill(Y0)
+   CALL kill(Y1)
+   CALL kill(norm)
+   CALL kill(ID1,ID0)
 
 
 
@@ -2579,7 +2579,7 @@ contains
 
 
     CALL INIT(STATE,no,NP)
-
+    
     CALL ALLOC(Y0)
     CALL ALLOC(Y1)
     CALL ALLOC(EQ)
@@ -2606,39 +2606,39 @@ contains
     targ(2)=targ(2)+0.01d0
     norm=y1
     id1=norm%a_t
-
+     
     y0=x0+id0
     y1=x1+id1
 
 
     betx1ma=0
-    bety1ma=0
+    bety1ma=0 
 
     s0=0
     p=>r0%start
-
+    
     do i=1,r0%n
-
-       ds=p%mag%p%ld
-
-       call TRACK(R0,Y0,i,i+1,STATE)
-       betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
-       bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
-
-
-       call TRACK(R1,Y1,i,i+1,+STATE)
-       bp(1)=ds*((y1(1)%t.par.'1000')**2+(y1(1)%t.par.'0100')**2-betx0)**2+bp(1)
-       bp(2)=ds*((y1(3)%t.par.'0010')**2+(y1(3)%t.par.'0001')**2-bety0)**2+bp(2)
-
-       betx1=(y1(1)%t.sub.'1000')**2+(y1(1)%t.sub.'0100')**2
-       bety1=(y1(3)%t.sub.'0010')**2+(y1(3)%t.sub.'0001')**2
-       if(betx1>betx1ma) betx1ma=betx1
-       if(bety1>bety1ma) bety1ma=bety1
+    
+    ds=p%mag%p%ld
+    
+      call TRACK(R0,Y0,i,i+1,STATE)      
+      betx0=(y0(1)%t.sub.'1')**2+(y0(1)%t.sub.'01')**2
+      bety0=(y0(3)%t.sub.'001')**2+(y0(3)%t.sub.'0001')**2
 
 
+      call TRACK(R1,Y1,i,i+1,+STATE)          
+      bp(1)=ds*((y1(1)%t.par.'1000')**2+(y1(1)%t.par.'0100')**2-betx0)**2+bp(1)
+      bp(2)=ds*((y1(3)%t.par.'0010')**2+(y1(3)%t.par.'0001')**2-bety0)**2+bp(2)
+      
+      betx1=(y1(1)%t.sub.'1000')**2+(y1(1)%t.sub.'0100')**2
+      bety1=(y1(3)%t.sub.'0010')**2+(y1(3)%t.sub.'0001')**2
+      if(betx1>betx1ma) betx1ma=betx1
+      if(bety1>bety1ma) bety1ma=bety1
 
-       p=>p%next
-       s0=s0+ds
+
+
+     p=>p%next
+     s0=s0+ds
     enddo
 
     write(6,*) " maximum "
@@ -2650,10 +2650,10 @@ contains
 
     !stop
 
-    !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
-    !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
-    !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
-    !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
+ !   write(6,*) "c_%no,c_%nv,c_%nd,c_%nd2"
+ !   write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
+ !   write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
+ !   write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
 
     eq(1)=       ((NORM%dhdj%v(1)).par.'0000')-targ(1)
     eq(2)=       ((NORM%dhdj%v(2)).par.'0000')-targ(2)
@@ -2661,43 +2661,43 @@ contains
     bp(2)=bp(2)/s0
     epsnow=zero
     do i=1,neq
-       epsnow=epsnow+abs(eq(i))
+     epsnow=epsnow+abs(eq(i)) 
     enddo
-
-    write(6,*) " deviation ",epsnow
-    !write(6,*) " scale "
-    !read(5,*) sca
+    
+     write(6,*) " deviation ",epsnow
+!write(6,*) " scale "
+!read(5,*) sca
     do i=1,neq
-       eq(i)=eq(i)-(one-sca)*(eq(i).sub.'0')
+     eq(i)=eq(i)-(one-sca)*(eq(i).sub.'0')
     enddo
     epsnow=zero
     do i=1,neq
-       epsnow=epsnow+abs(eq(i))
+     epsnow=epsnow+abs(eq(i)) 
     enddo
-    write(6,*) " deviation ",epsnow
-
+      write(6,*) " deviation ",epsnow
+    
     call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
-
-    t=(bp(1)+bp(2))
-    ds=t
-    write(6,*) " Merit function  ",ds
+    
+     t=(bp(1)+bp(2))
+         ds=t
+     write(6,*) " Merit function  ",ds
 
     ! t=0
     ! do i=1,np
     !  t=t+half*(one.mono.(i+c_%nd2))**2
     ! enddo
-
+     
     do i=1,np
-       v=t.d.(i+c_%nd2)
-       v=v<=c_%npara
-       call daprint(v,scratchfile)
+     v=t.d.(i+c_%nd2)
+     v=v<=c_%npara
+       call daprint(v,scratchfile)  
     enddo
-
+ 
     do i=1,neq
-       eq(i)=eq(i)<=c_%npara
-       call daprint(eq(i),scratchfile)
+        eq(i)=eq(i)<=c_%npara
+      call daprint(eq(i),scratchfile)
     enddo
     close(SCRATCHFILE)
 
@@ -2711,14 +2711,14 @@ contains
     call KILL(t,v)
 
 
-
+     
     CALL INIT(1,nt)
-
+    
     call alloc(g,nt)
     call alloc(t,v)
     allocate(dr(nt))
     call alloc(dr,nt)
-
+    
     call kanalnummer(SCRATCHFILE)
     OPEN(UNIT=SCRATCHFILE,FILE='EQUATION.TXT')
     rewind scratchfile
@@ -2727,16 +2727,16 @@ contains
     enddo
 
     do i=1,np
-       t=zero
-       do j=1,neq
-          v=(dr(np+j).d.i)
-          t=(one.mono.(np+j))*v+t
-       enddo
+      t=zero
+      do j=1,neq
+       v=(dr(np+j).d.i)
+       t=(one.mono.(np+j))*v+t
+      enddo 
        g%v(i)=dr(i)+t
     enddo
-    do j=1,neq
-       g%v(np+j)=dr(np+j)
-    enddo
+        do j=1,neq
+         g%v(np+j)=dr(np+j)
+       enddo  
     close(SCRATCHFILE)
 
 
@@ -2747,7 +2747,7 @@ contains
     SET_TPSAFIT=.true.
 
     do i=1,np
-       r1=poly(i)
+     r1=poly(i)
     enddo
 
 
@@ -2759,9 +2759,9 @@ contains
     call KILL(dr,nt)
     deallocate(dr)
 
-    !   write(6,*) " more "
-    !   read(5,*) i
-    !   if(i==0) goto 102
+     !   write(6,*) " more "
+     !   read(5,*) i
+     !   if(i==0) goto 102
     if(it>=max_fit_iter/sca**2) goto 101
     if(epsnow<=epsr) goto 102
     GOTO 100
@@ -2776,7 +2776,7 @@ contains
 
 
   end subroutine lattice_fit_bump_min_rcs
+  
 
-
-
+  
 end module S_fitting_new

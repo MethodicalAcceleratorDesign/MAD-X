@@ -10,7 +10,7 @@ module ptc_spin
   public
   PRIVATE get_fieldR !,get_field
   PRIVATE get_BfieldR,get_BfieldP,get_Bfield,get_fieldp
-  !,GETMULB_TEAPOT
+ !,GETMULB_TEAPOT
   private B_PANCAkEr,B_PANCAkEp,B_PANCAkE
   PRIVATE DIRECTION_VR,DIRECTION_VP,DIRECTION_V
   PRIVATE  B_PARA_PERP_r,B_PARA_PERP_p,B_PARA_PERP
@@ -582,7 +582,7 @@ contains
     !   X(5)=one/(one/(one+X(5))-B2*FAC*DS)-one
     !   X(5)=one/(one/(one+X(5))+CRADF(EL%P)*(one+X(5))*B2*DLDS*FAC*DS)-one
     !          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-    if(K%radiation)  X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS*DLDS
+  if(K%radiation)  X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS*DLDS
 
 
     if(el%kind/=kindpa) then
@@ -751,9 +751,9 @@ contains
     el=>c%parent_fibre%magp
     !if(.not.(el%p%radiation.or.EL%P%SPIN)) return
     if(EL%kind<=kind1) return
-
+   
     IF(K%PARA_IN ) KNOB=.TRUE.
-
+   
 
     CALL ALLOC(OM,3)
     CALL ALLOC(CO,3)
@@ -1020,12 +1020,12 @@ contains
     OM(1)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(1) + (ONE+p%AG)*BPA(1) )
     OM(2)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(2) + (ONE+p%AG)*BPA(2) )+OM(2)
     OM(3)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(3) + (ONE+p%AG)*BPA(3) )
-
+    
     beta=(one+two*x(5)/p%beta0+x(5)**2)   !/(one/beta0+x(5))   beta*(one/beta0+x(5))
     om(1)=-DLDS*half*e_muon*beta*(ed(2)*BPE(3)-ed(3)*BPE(2))/P%GAMMA0I +  om(1)
     om(2)=-DLDS*half*e_muon*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
     om(3)=-DLDS*half*e_muon*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
-
+    
     DO I=1,3
        OM(I)=OM(I)-DLDS*(p%AG*GAMMA+GAMMA/(ONE+GAMMA))*EB(I)
     ENDDO
@@ -1175,7 +1175,7 @@ contains
     om(2)=-DLDS*half*e_muon_scale*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
     om(3)=-DLDS*half*e_muon_scale*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
 
-    !     write(16,*) " bpe "
+   !     write(16,*) " bpe "
     !     do i=1,3
     !      call print(bpe(i),16)
     !     enddo
@@ -1892,7 +1892,7 @@ contains
 
     P=>EL%P
 
-    call alloc(be);
+     call alloc(be);
 
     call DIRECTION_V(k,EL,TEAPOT_LIKE,X,E,XP,XPA,POS)
 
@@ -1913,7 +1913,7 @@ contains
        EFB(3)=EF(1)*E(2)-EF(2)*E(1)
     ENDIF
 
-    call kill(be);
+     call kill(be);
 
   END subroutine B_PARA_PERP_p
 
@@ -2788,13 +2788,13 @@ contains
        if(c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K) !modulate
        CALL TRACK_MODULATION(C,XS,K) !modulate
     ENDIF !modulate
+    
+   !     if(ramp) then !modulate
+   !       if(c%parent_fibre%mag%slow_ac) CALL do_ramping_r(c,XS%ac%t,k) !modulate
+   !       if(.not.k%modulation) CALL TRACK_MODULATION(C,XS,K) 
+   !    endif !modulate
 
-    !     if(ramp) then !modulate
-    !       if(c%parent_fibre%mag%slow_ac) CALL do_ramping_r(c,XS%ac%t,k) !modulate
-    !       if(.not.k%modulation) CALL TRACK_MODULATION(C,XS,K)
-    !    endif !modulate
-
-
+ 
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=half
@@ -2816,9 +2816,9 @@ contains
     IF((K%MODULATION).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
        CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
     ENDIF  !modulate
-    !  IF((K%MODULATION.or.ramp).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
-    !     CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
-    !  ENDIF  !modulate
+  !  IF((K%MODULATION.or.ramp).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
+  !     CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
+  !  ENDIF  !modulate
 
     xs%u=.not.check_stable
     if(xs%u) then
@@ -2858,10 +2858,10 @@ contains
        CALL TRACK_MODULATION(C,XS,K) !modulate
     ENDIF !modulate
 
-    !     if(ramp) then !modulate
-    !       if(c%parent_fibre%mag%slow_ac) CALL do_ramping_p(c,XS%ac%t,k) !modulate
-    !       if(.not.k%modulation) CALL TRACK_MODULATION(C,XS,K)
-    !    endif !modulate
+   !     if(ramp) then !modulate
+   !       if(c%parent_fibre%mag%slow_ac) CALL do_ramping_p(c,XS%ac%t,k) !modulate
+   !       if(.not.k%modulation) CALL TRACK_MODULATION(C,XS,K) 
+   !    endif !modulate
 
 
     CALL ALLOC(DS)
@@ -2871,17 +2871,17 @@ contains
     if(c%cas==0) then
        ds=c%parent_fibre%MAGp%L/c%parent_fibre%MAG%p%nst
        fac=half
-       if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,K)
+if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,K)
        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
-       if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
-       if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
-       if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     elseIF(c%cas==case1.or.c%cas==case2) then
-       if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        CALL TRACK_FRINGE_spin(C,XS,K)
-       if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !        CALL  (C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
     else
@@ -4551,3 +4551,4 @@ contains
 
 
 end module ptc_spin
+

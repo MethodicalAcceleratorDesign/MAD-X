@@ -147,8 +147,8 @@ MODULE S_DEF_KIND
 
 
   INTERFACE TRACK_SLICE
-     !     MODULE PROCEDURE INTER_CAV4
-     !     MODULE PROCEDURE INTEP_CAV4
+!     MODULE PROCEDURE INTER_CAV4
+!     MODULE PROCEDURE INTEP_CAV4
      MODULE PROCEDURE track_slice4r
      MODULE PROCEDURE track_slice4p
      MODULE PROCEDURE INTER_TEAPOT
@@ -174,7 +174,7 @@ MODULE S_DEF_KIND
   END INTERFACE
 
 
-
+  
 
   INTERFACE ADJUST_PANCAKE
      MODULE PROCEDURE ADJUSTR_PANCAKE
@@ -305,7 +305,7 @@ MODULE S_DEF_KIND
   INTERFACE feval_CAV
      MODULE PROCEDURE feval_CAVr
      MODULE PROCEDURE feval_CAVp
-     MODULE PROCEDURE fevalBMAD_CAVR
+     MODULE PROCEDURE fevalBMAD_CAVR 
      MODULE PROCEDURE fevalBMAD_CAVP
   END INTERFACE
 
@@ -1115,12 +1115,12 @@ contains
     integer zi
     TYPE(CAV4),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) kt !,OPTIONAL :: K
-
+    
     if(el%n_bessel/=-1) then
-       call INTER_CAV4(EL,X,kt)
+     call INTER_CAV4(EL,X,kt)
     else
-       call INTER_CAVbmad4(EL,X,kt,zi)
-    endif
+     call INTER_CAVbmad4(EL,X,kt,zi)
+    endif    
   end SUBROUTINE track_slice4r
 
   SUBROUTINE INTER_CAV4(EL,X,kt)
@@ -1320,7 +1320,7 @@ contains
 
   END SUBROUTINE INTEP_CAV4
 
-
+  
   SUBROUTINE track_slice4p(EL,X,kt,zi)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) ::  X(6)
@@ -1328,12 +1328,12 @@ contains
     TYPE(REAL_8) z
     TYPE(CAV4P),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) kt !,OPTIONAL :: K
-
+   
     if(el%n_bessel/=-1) then
-       call INTEP_CAV4(EL,X,kt)
+     call INTEP_CAV4(EL,X,kt)
     else
-       call INTEP_CAVbmad4(EL,X,kt,zi)
-    endif
+     call INTEP_CAVbmad4(EL,X,kt,zi)
+    endif    
   end SUBROUTINE track_slice4p
 
 
@@ -1347,8 +1347,8 @@ contains
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
-    !    IF(EL%N_BESSEL>0)
-    CALL FRINGECAV(EL,X,k,1)
+!    IF(EL%N_BESSEL>0)
+ CALL FRINGECAV(EL,X,k,1)
 
     !    TOTALPATH_FLAG=k%TOTALPATH
     !    k%TOTALPATH=CAVITY_TOTALPATH
@@ -1362,8 +1362,8 @@ contains
 
     !    k%TOTALPATH=TOTALPATH_FLAG
 
-    !    IF(EL%N_BESSEL>0)
-    CALL FRINGECAV(EL,X,k,2)
+!    IF(EL%N_BESSEL>0)
+ CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
 
@@ -1379,8 +1379,8 @@ contains
 
 
     CALL ADJUST_TIME_CAV4(EL,X,k,1)
-    ! IF(EL%N_BESSEL>0)
-    CALL FRINGECAV(EL,X,k,1)
+   ! IF(EL%N_BESSEL>0) 
+CALL FRINGECAV(EL,X,k,1)
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     !   TOTALPATH_FLAG=k%TOTALPATH
@@ -1393,8 +1393,8 @@ contains
 
     !    k%TOTALPATH=TOTALPATH_FLAG
 
-    !  IF(EL%N_BESSEL>0)
-    CALL FRINGECAV(EL,X,k,2)
+  !  IF(EL%N_BESSEL>0) 
+CALL FRINGECAV(EL,X,k,2)
     CALL ADJUST_TIME_CAV4(EL,X,k,2)
 
 
@@ -1550,7 +1550,7 @@ contains
     real(dp),INTENT(INOUT):: Z,A(3),AD(2)
     TYPE(CAV4),INTENT(INOUT):: EL
     real(dp) C1,S1,V,O
-    INTEGER KO
+     INTEGER KO
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     if(el%N_BESSEL/=-1) return
@@ -1563,66 +1563,66 @@ contains
 
     A=zero
     ad=zero
-    do ko=1,el%nf    ! over modes
+   do ko=1,el%nf    ! over modes
+   
+    C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
+    S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
+    AD(1)=-C1+AD(1)
+    AD(2)=S1+AD(2)
 
-       C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
-       S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
-       AD(1)=-C1+AD(1)
-       AD(2)=S1+AD(2)
+    A(1)=AD(1)*X(1)+A(1)
+    A(2)=AD(1)*X(3)+A(2)
+!!!   DA_3/DT FOR KICK IN X(5)    
+    A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+   enddo
 
-       A(1)=AD(1)*X(1)+A(1)
-       A(2)=AD(1)*X(3)+A(2)
-!!!   DA_3/DT FOR KICK IN X(5)
-       A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-    enddo
-
-    !     x(5)=x(5)-el%f(ko)*F*VL*cos(kbmad*ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-
+  !     x(5)=x(5)-el%f(ko)*F*VL*cos(kbmad*ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+ 
 
 
 
   END SUBROUTINE Abmad_TRANSR
 
-  SUBROUTINE Abmad_TRANSP(EL,Z,X,k,A,AD)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
+ SUBROUTINE Abmad_TRANSP(EL,Z,X,k,A,AD)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(REAL_8),INTENT(INOUT):: Z,A(3),AD(2)
     TYPE(CAV4P),INTENT(INOUT):: EL
     TYPE(REAL_8) C1,S1,V,O
-    INTEGER KO
+     INTEGER KO
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     if(el%N_BESSEL/=-1) return
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(EL%THIN) RETURN
-
+    
     CALL ALLOC(C1,S1,V,O)
 
     O=EL%freq*twopi/CLIGHT
     V=EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
-
+    
     DO KO=1,3
-       A(KO)=zero
+     A(KO)=zero
     ENDDO
     DO KO=1,2
-       AD(KO)=zero
+     AD(KO)=zero
     ENDDO
 
-    do ko=1,el%nf    ! over modes
+   do ko=1,el%nf    ! over modes
+   
+    C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
+    S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
+    AD(1)=-C1+AD(1)
+    AD(2)=S1+AD(2)
 
-       C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
-       S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
-       AD(1)=-C1+AD(1)
-       AD(2)=S1+AD(2)
+    A(1)=AD(1)*X(1)+A(1)
+    A(2)=AD(1)*X(3)+A(2)
+!!!   DA_3/DT FOR KICK IN X(5)    
+    A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+   enddo
 
-       A(1)=AD(1)*X(1)+A(1)
-       A(2)=AD(1)*X(3)+A(2)
-!!!   DA_3/DT FOR KICK IN X(5)
-       A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-    enddo
-
-    !     x(5)=x(5)-el%f(ko)*F*VL*cos(kbmad*ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
-
+  !     x(5)=x(5)-el%f(ko)*F*VL*cos(kbmad*ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
+ 
 
     CALL KILL(C1,S1,V,O)
 
@@ -1746,7 +1746,7 @@ contains
 
   END subroutine fevalBMAD_CAVP
 
-  subroutine rk2bmad_cavr(ti,h,GR,y,k)
+ subroutine rk2bmad_cavr(ti,h,GR,y,k)
     IMPLICIT none
 
     integer ne
@@ -1782,7 +1782,7 @@ contains
     return
   end  subroutine rk2bmad_cavr
 
-  subroutine rk4bmad_cavr(ti,h,GR,y,k)
+ subroutine rk4bmad_cavr(ti,h,GR,y,k)
     IMPLICIT none
 
     integer ne
@@ -1839,7 +1839,7 @@ contains
     return
   end  subroutine rk4bmad_cavr
 
-  subroutine rk6bmad_cavr(ti,h,GR,y,k)
+ subroutine rk6bmad_cavr(ti,h,GR,y,k)
     IMPLICIT none
     !  Written by Rob Ryne, Spring 1986, based on a routine of
     !c  J. Milutinovic.
@@ -2279,7 +2279,7 @@ contains
     integer JC,ko
     REAL(DP) C1,S1,V,O,z
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    REAL(DP) KBMAD
+    REAL(DP) KBMAD 
     !return
     !  As of June 2007, Etienne believes that the fringe approximately cancels
     ! it is a mystery perhaps due to the use of canonical variables.
@@ -2287,9 +2287,9 @@ contains
 
     JC=-2*J+3
     if(jc==1) then
-       z=zero
+     z=zero
     else
-       z=EL%L
+     z=EL%L
     endif
 
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
@@ -2298,28 +2298,28 @@ contains
     IF(jC==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
     IF(jC==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
     IF(el%N_BESSEL==-1) THEN
-       KBMAD=1
+     KBMAD=1
     ELSE
-       KBMAD=0
+     KBMAD=0 
     ENDIF
 
-
+       
 
     O=EL%freq*twopi/CLIGHT
     V=jC*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
 
-    do ko=1,el%nf    ! over modes
+   do ko=1,el%nf    ! over modes
+   
+    s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
+    c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
-       s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
-       c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
+    X(2)=X(2)+V*S1*X(1)*HALF
+    X(4)=X(4)+V*S1*X(3)*HALF
+    x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
-       X(2)=X(2)+V*S1*X(1)*HALF
-       X(4)=X(4)+V*S1*X(3)*HALF
-       x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
-
-    enddo
+   enddo
   END SUBROUTINE FRINGECAVR
 
   SUBROUTINE FRINGECAVP(EL,X,k,J)
@@ -2330,19 +2330,19 @@ contains
     integer JC,ko
     TYPE(REAL_8) C1,S1,V,O,z
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    REAL(DP) KBMAD
+    REAL(DP) KBMAD 
     !return
     !  As of June 2007, Etienne believes that the fringe approximately cancels
     ! it is a mystery perhaps due to the use of canonical variables.
     ! as of 2012 David Sagan said that this is needed after all
     CALL ALLOC(C1,S1,V,O,z)
-
-
+    
+ 
     JC=-2*J+3
     if(jc==1) then
-       z=zero
+     z=zero
     else
-       z=EL%L
+     z=EL%L
     endif
 
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
@@ -2351,25 +2351,25 @@ contains
     IF(jC==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
     IF(jC==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
     IF(el%N_BESSEL==-1) THEN
-       KBMAD=1
+     KBMAD=1
     ELSE
-       KBMAD=0
+     KBMAD=0 
     ENDIF
 
     O=EL%freq*twopi/CLIGHT
     V=jC*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
 
-    do ko=1,el%nf    ! over modes
+   do ko=1,el%nf    ! over modes
+   
+    s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
+    c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
-       s1=cos(kbmad*ko*O*z)*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
-       c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
+    X(2)=X(2)+V*S1*X(1)*HALF
+    X(4)=X(4)+V*S1*X(3)*HALF
+    x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
-       X(2)=X(2)+V*S1*X(1)*HALF
-       X(4)=X(4)+V*S1*X(3)*HALF
-       x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
-
-    enddo
+   enddo
     CALL KILL(C1,S1,V,O,z)
 
   END SUBROUTINE FRINGECAVP
@@ -2378,7 +2378,7 @@ contains
 
 
 
-
+ 
   SUBROUTINE KICKCAVR(EL,YL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
@@ -2472,7 +2472,7 @@ contains
 
   END SUBROUTINE KICKCAVR
 
-  SUBROUTINE KICKCAVP(EL,YL,X,k)
+SUBROUTINE KICKCAVP(EL,YL,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6),YL
     TYPE(CAV4P),INTENT(INOUT):: EL
@@ -3626,22 +3626,22 @@ contains
           IF(I==2) CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
        ELSE
           IF(I==1) then
-             CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-             if(almost_exact.and.i==1.AND.el%b0/=zero) then
-                x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
-                x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-                if(k%time) then
-                else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-                   x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                   x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                endif
-
-             endif
+           CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
+           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
+           if(k%time) then
+           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
+            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
+            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
+           endif
+            
+           endif
           ENDIF
        ENDIF
 
        if(el%b0/=zero) then
-
+                
           X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
 
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
@@ -3659,21 +3659,21 @@ contains
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
-          IF(I==2) THEN
-             if(almost_exact.and.i==1.AND.el%b0/=zero) then
-                if(k%time) then
-                else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-                   x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                   x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                endif
-
-                x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
-                x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-             endif
-             CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
+          IF(I==2) THEN 
+           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+           if(k%time) then
+           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
+            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
+            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
+           endif
+           
+            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
+           endif
+           CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
           ENDIF
 
-       ENDIF
+        ENDIF
     ENDIF
 
   END SUBROUTINE EDGER
@@ -3717,17 +3717,17 @@ contains
           IF(I==2) CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
        ELSE
           IF(I==1) then
-             CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-             if(almost_exact.and.i==1.AND.el%b0/=zero) then
-                x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
-                x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-                !       if(k%time) then
-                !       else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-                !        x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                !        x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                !       endif
-
-             endif
+           CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
+           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
+    !       if(k%time) then
+    !       else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
+    !        x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
+    !        x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
+    !       endif
+            
+           endif
           ENDIF
        ENDIF
 
@@ -3750,18 +3750,18 @@ contains
        IF(EL%DIR==1) THEN
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
-          IF(I==2) THEN
-             if(almost_exact.and.i==1.AND.el%b0/=zero) then
-                if(k%time) then
-                else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-                   x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                   x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-                endif
-
-                x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
-                x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-             endif
-             CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
+          IF(I==2) THEN 
+           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+           if(k%time) then
+           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
+            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
+            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
+           endif
+           
+            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
+           endif
+           CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
           ENDIF
        ENDIF
 
@@ -6361,13 +6361,13 @@ contains
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
           X(6)=X(6)+X1*YL*( one + (X(2)**2+X(4)**2)/two/(one+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
-          !! temporary shit almost true
-          if(almost_exact) then
-             x(1)=x(1)/(one-yl*EL%P%b0*x(2))
-             x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-             x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
-          endif
-          !!
+!! temporary shit almost true   
+         if(almost_exact) then       
+          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
+          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+         endif 
+!!
        ENDIF
     else
        if(EL%P%EXACT) THEN
@@ -6379,13 +6379,13 @@ contains
           X(1)=X(1)-X(5)*YL*X(2)/(one+X(5))
           X(3)=X(3)-X(5)*YL*X(4)/(one+X(5))
           X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X(5))**2 )
-          !! temporary shit almost true
-          if(almost_exact) then
-             x(1)=x(1)/(one-yl*EL%P%b0*x(2))
-             x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-             x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
-          endif
-          !!
+!! temporary shit almost true   
+         if(almost_exact) then       
+          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
+          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+         endif 
+!!
        endif
     endif
 
@@ -6416,13 +6416,13 @@ contains
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
           X(6)=X(6)+X1*YL*( one + (X(2)**2+X(4)**2)/two/(one+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
-          !! temporary shit almost true
-          if(almost_exact) then
-             x(1)=x(1)/(one-yl*EL%P%b0*x(2))
-             x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-             x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
-          endif
-          !!
+!! temporary shit almost true   
+         if(almost_exact) then       
+          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
+          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+         endif 
+!!
           CALL KILL(X1,X5)
        ENDIF
     else
@@ -6438,13 +6438,13 @@ contains
           X(3)=X(3)-X(5)*YL*X(4)/(one+X(5))
           X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X(5))**2 )
        endif
-       !! temporary shit almost true
-       if(almost_exact) then
+!! temporary shit almost true   
+         if(almost_exact) then       
           x(1)=x(1)/(one-yl*EL%P%b0*x(2))
           x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
           x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
-       endif
-       !!
+         endif 
+!!
     endif
 
   END SUBROUTINE KICKPATHD
@@ -8494,38 +8494,38 @@ contains
     REAL(DP) VAL(0:NO_E,0:NO_E),V
     INTEGER I,J,K,POW
 
-    !    VAL(0,0)=1
+!    VAL(0,0)=1
 
     val(0,0)=ONE
     val(1,0)=x(1)
     val(0,1)=x(3)
-
+    
     do pow=2,NO_E
-       val(0,pow)=val(0,pow-1)*x(3)
-       val(pow,0)=val(pow-1,0)*x(1)
-       do j=1,pow-1
-          k=pow-j
-          val(j,k)=val(j-1,k-1)*x(1)*x(3)
-       enddo
+     val(0,pow)=val(0,pow-1)*x(3)
+     val(pow,0)=val(pow-1,0)*x(1)
+     do j=1,pow-1
+      k=pow-j
+      val(j,k)=val(j-1,k-1)*x(1)*x(3)
+     enddo
     enddo
 
-    EL%E_X=ZERO
-    EL%E_Y=ZERO
-    EL%PHI=ZERO
-
-    do i=0,NO_E
-       do j=0,NO_E
-          if(i+j>NO_E) cycle
-          DO K=1,NO_E
-             V=EL%AE(K)*EL%AS(k,i,j)+EL%BE(K)*EL%BS(k,i,j)
-
-             EL%PHI=EL%PHI+val(i,j)*V
-             IF(I/=0) EL%E_X=EL%E_X-val(i-1,j)*I*V
-             IF(J/=0) EL%E_Y=EL%E_Y-val(i,j-1)*I*V
-          enddo
-
-       enddo
-    enddo
+      EL%E_X=ZERO
+      EL%E_Y=ZERO
+      EL%PHI=ZERO
+      
+      do i=0,NO_E
+      do j=0,NO_E  
+      if(i+j>NO_E) cycle 
+      DO K=1,NO_E
+       V=EL%AE(K)*EL%AS(k,i,j)+EL%BE(K)*EL%BS(k,i,j)
+                     
+       EL%PHI=EL%PHI+val(i,j)*V
+       IF(I/=0) EL%E_X=EL%E_X-val(i-1,j)*I*V
+       IF(J/=0) EL%E_Y=EL%E_Y-val(i,j-1)*I*V
+      enddo
+      
+      enddo
+      enddo
 
   END SUBROUTINE GETELECTRICR
 
@@ -8538,49 +8538,49 @@ contains
 
     call alloc(v)
     do i=0,no_e
-       do j=0,no_e
-          call alloc(val(i,j))
-       enddo
+    do j=0,no_e
+    call alloc(val(i,j))
+    enddo
     enddo
 
-    !    VAL(0,0)=1
+!    VAL(0,0)=1
 
     val(0,0)=ONE
     val(1,0)=x(1)
     val(0,1)=x(3)
-
+    
     do pow=2,NO_E
-       val(0,pow)=val(0,pow-1)*x(3)
-       val(pow,0)=val(pow-1,0)*x(1)
-       do j=1,pow-1
-          k=pow-j
-          val(j,k)=val(j-1,k-1)*x(1)*x(3)
-       enddo
+     val(0,pow)=val(0,pow-1)*x(3)
+     val(pow,0)=val(pow-1,0)*x(1)
+     do j=1,pow-1
+      k=pow-j
+      val(j,k)=val(j-1,k-1)*x(1)*x(3)
+     enddo
     enddo
 
-    EL%E_X=ZERO
-    EL%E_Y=ZERO
-    EL%PHI=ZERO
-
-    do i=0,NO_E
-       do j=0,NO_E
-          if(i+j>NO_E) cycle
-          DO K=1,NO_E
-             V=EL%AE(K)*EL%AS(k,i,j)+EL%BE(K)*EL%BS(k,i,j)
-
-             EL%PHI=EL%PHI+val(i,j)*V
-             IF(I/=0) EL%E_X=EL%E_X-val(i-1,j)*I*V
-             IF(J/=0) EL%E_Y=EL%E_Y-val(i,j-1)*I*V
-          enddo
-
-       enddo
-    enddo
+      EL%E_X=ZERO
+      EL%E_Y=ZERO
+      EL%PHI=ZERO
+      
+      do i=0,NO_E
+      do j=0,NO_E  
+      if(i+j>NO_E) cycle 
+      DO K=1,NO_E
+       V=EL%AE(K)*EL%AS(k,i,j)+EL%BE(K)*EL%BS(k,i,j)
+                     
+       EL%PHI=EL%PHI+val(i,j)*V
+       IF(I/=0) EL%E_X=EL%E_X-val(i-1,j)*I*V
+       IF(J/=0) EL%E_Y=EL%E_Y-val(i,j-1)*I*V
+      enddo
+      
+      enddo
+      enddo
 
     call kill(v)
     do i=0,no_e
-       do j=0,no_e
-          call kill(val(i,j))
-       enddo
+    do j=0,no_e
+    call kill(val(i,j))
+    enddo
     enddo
 
 
@@ -8760,40 +8760,40 @@ contains
     REAL(DP) PZ,DEL,H,B(3)
     TYPE(teapot),  INTENT(INOUT) :: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
-    call GETELECTRIC(EL,X)
-    CALL GETMULB_TEAPOT(EL,B,X)
-    IF(EL%P%EXACT) THEN
-       if(k%TIME) then
-          H=ONE+EL%P%B0*X(1)
-          DEL=one/EL%P%BETA0+x(5)-EL%PHI
-          PZ=ROOT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
-          F(1)=X(2)*H/PZ
-          F(3)=X(4)*H/PZ
-          F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
-          F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-          F(5)=zero
-          F(6)=H*DEL/PZ
-       else
-          H=ONE+X(1)
-          DEL=one+x(5)-EL%PHI
-          PZ=ROOT(DEL**2-X(2)**2-X(4)**2)
-          F(1)=X(2)*H/PZ
-          F(3)=X(4)*H/PZ
-          F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
-          F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-          F(5)=zero
-          F(6)=H*DEL/PZ
-       endif
-    ELSE
-       STOP 468
-       !        if(k%TIME) then
-       !        else
-       !        endif
-    ENDIF
-
-  END subroutine feval_teapotr
-
+ 
+     call GETELECTRIC(EL,X)
+     CALL GETMULB_TEAPOT(EL,B,X)
+     IF(EL%P%EXACT) THEN
+        if(k%TIME) then
+           H=ONE+EL%P%B0*X(1)
+           DEL=one/EL%P%BETA0+x(5)-EL%PHI
+           PZ=ROOT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
+           F(1)=X(2)*H/PZ
+           F(3)=X(4)*H/PZ
+           F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
+           F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
+           F(5)=zero
+           F(6)=H*DEL/PZ
+        else
+           H=ONE+X(1)
+           DEL=one+x(5)-EL%PHI
+           PZ=ROOT(DEL**2-X(2)**2-X(4)**2)
+           F(1)=X(2)*H/PZ
+           F(3)=X(4)*H/PZ
+           F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
+           F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
+           F(5)=zero
+           F(6)=H*DEL/PZ
+        endif
+     ELSE
+      STOP 468
+!        if(k%TIME) then
+!        else
+!        endif
+     ENDIF
+     
+   END subroutine feval_teapotr
+ 
   subroutine feval_teapotp(X,k,f,EL)   ! MODELLED BASED ON DRIFT
     IMPLICIT NONE
     type(real_8), INTENT(INout) :: X(6)
@@ -8801,43 +8801,43 @@ contains
     type(real_8) PZ,DEL,H,B(3)
     TYPE(teapotp),  INTENT(INOUT) :: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
-    call alloc(PZ,DEL,H,B(1),B(2),B(3))
-    call GETELECTRIC(EL,X)
-    CALL GETMULB_TEAPOT(EL,B,X)
-    IF(EL%P%EXACT) THEN
-       if(k%TIME) then
-          H=ONE+EL%P%B0*X(1)
-          DEL=one/EL%P%BETA0+x(5)-EL%PHI
-          PZ=SQRT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
-          F(1)=X(2)*H/PZ
-          F(3)=X(4)*H/PZ
-          F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
-          F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-          F(5)=zero
-          F(6)=H*DEL/PZ
-       else
-          H=ONE+X(1)
-          DEL=one+x(5)-EL%PHI
-          PZ=SQRT(DEL**2-X(2)**2-X(4)**2)
-          F(1)=X(2)*H/PZ
-          F(3)=X(4)*H/PZ
-          F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
-          F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-          F(5)=zero
-          F(6)=H*DEL/PZ
-       endif
-    ELSE
-       STOP 468
-       !        if(k%TIME) then
-       !        else
-       !        endif
-    ENDIF
-    call KILL(PZ,DEL,H,B(1),B(2),B(3))
-
-  END subroutine feval_teapotp
-
-  subroutine rk2_teapotr(h,GR,y,k)
+     
+     call alloc(PZ,DEL,H,B(1),B(2),B(3))
+     call GETELECTRIC(EL,X)
+     CALL GETMULB_TEAPOT(EL,B,X)
+     IF(EL%P%EXACT) THEN
+        if(k%TIME) then
+           H=ONE+EL%P%B0*X(1)
+           DEL=one/EL%P%BETA0+x(5)-EL%PHI
+           PZ=SQRT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
+           F(1)=X(2)*H/PZ
+           F(3)=X(4)*H/PZ
+           F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
+           F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
+           F(5)=zero
+           F(6)=H*DEL/PZ
+        else
+           H=ONE+X(1)
+           DEL=one+x(5)-EL%PHI
+           PZ=SQRT(DEL**2-X(2)**2-X(4)**2)
+           F(1)=X(2)*H/PZ
+           F(3)=X(4)*H/PZ
+           F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
+           F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
+           F(5)=zero
+           F(6)=H*DEL/PZ
+        endif
+     ELSE
+      STOP 468
+!        if(k%TIME) then
+!        else
+!        endif
+     ENDIF
+     call KILL(PZ,DEL,H,B(1),B(2),B(3))
+     
+   END subroutine feval_teapotp
+ 
+   subroutine rk2_teapotr(h,GR,y,k)
     IMPLICIT none
 
     integer ne
@@ -9231,8 +9231,8 @@ contains
 
     return
   end  subroutine rk6_teapotp
-
-  SUBROUTINE SSECH1R(EL,YL,DL,X,k)
+ 
+   SUBROUTINE SSECH1R(EL,YL,DL,X,k)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN):: YL,DL
@@ -9934,11 +9934,11 @@ contains
     TYPE(TEAPOTP),INTENT(INOUT):: EL
     integer(2), pointer,dimension(:)::AN,BN
     LOGICAL(LP) CHECK_KNOB,doit
-    type(internal_state), optional :: k
+    type(internal_state), optional :: k 
     integer I
     doit=.false.
     if(present(k)) then
-       IF(K%PARA_IN ) doit=.TRUE.
+        IF(K%PARA_IN ) doit=.TRUE.
     endif
     IF(KNOB.or.doit) THEN
        CALL CHECKPOTKNOB(EL,CHECK_KNOB) ! RECOMPUTES ONLY IF KNOB (SPEED)
@@ -9951,12 +9951,12 @@ contains
              IF(EL%AN(I)%KIND>=2) AN(I)=EL%AN(I)%KIND  ! g-2 modification
           ENDDO
           if(doit.and.(.not.knob)) then
-             knob=.true.
-             call GETANBN(EL)
-             knob=.false.
+           knob=.true.
+           call GETANBN(EL)
+           knob=.false.
           else
-             call GETANBN(EL)
-          endif
+           call GETANBN(EL)
+          endif 
        ENDIF
     ENDIF
   END SUBROUTINE MAKEPOTKNOB
@@ -9967,14 +9967,14 @@ contains
     integer(2), pointer,dimension(:)::AN,BN
     LOGICAL(LP) CHECK_KNOB,doit
     integer I,ERROR
-    type(internal_state), optional :: k
+        type(internal_state), optional :: k 
 
     doit=.false.
     if(present(k)) then
-       IF(K%PARA_IN ) doit=.TRUE.
+        IF(K%PARA_IN ) doit=.TRUE.
     endif
-
-    IF(KNOB.or.doit) THEN
+    
+     IF(KNOB.or.doit) THEN
        IF(CHECK_KNOB) THEN
           DO I=1,EL%P%NMUL
              EL%BN(I)%KIND=1
@@ -12139,8 +12139,8 @@ contains
 
     IF(k%NOCAVITY) RETURN
 
-    IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
-    IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+        IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
+        IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
@@ -12181,8 +12181,8 @@ contains
 
     IF(k%NOCAVITY) RETURN
 
-    IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
-    IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+        IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
+        IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
 
     CALL ALLOC(C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI)
     call alloc(dv)
@@ -12734,7 +12734,7 @@ contains
           deallocate(EL%DRIFTKICK)
        endif
        if(ASSOCIATED(EL%e_x)) then
-          deallocate(EL%e_x,EL%e_y,EL%PHI,EL%AE,EL%BE,EL%As,EL%Bs)
+         deallocate(EL%e_x,EL%e_y,EL%PHI,EL%AE,EL%BE,EL%As,EL%Bs)
        endif
     elseif(i==0)       then          ! nullifies
 
@@ -12768,11 +12768,11 @@ contains
           deallocate(EL%DRIFTKICK)
        endif
        if(ASSOCIATED(EL%e_x)) then
-          CALL KILL(EL%e_x)
-          CALL KILL(EL%e_y,EL%PHI)
-          CALL KILL(EL%AE)
-          CALL KILL(EL%BE)
-          deallocate(EL%e_x,EL%e_y,EL%AE,EL%BE,EL%PHI)
+         CALL KILL(EL%e_x)
+         CALL KILL(EL%e_y,EL%PHI)
+         CALL KILL(EL%AE)
+         CALL KILL(EL%BE)
+         deallocate(EL%e_x,EL%e_y,EL%AE,EL%BE,EL%PHI)
        endif
 
     elseif(i==0)       then          ! nullifies
@@ -12825,7 +12825,7 @@ contains
           deallocate(EL%phase0)
        endif
        if(ASSOCIATED(EL%ACC)) then
-          call kill_acceleration(EL%ACC)
+       call kill_acceleration(EL%ACC)
           deallocate(EL%ACC)
        endif
     elseif(i==0)       then          ! nullifies
@@ -12886,7 +12886,7 @@ contains
           deallocate(EL%NF)
        endif
        if(ASSOCIATED(EL%ACC)) then
-          call kill_acceleration(EL%ACC)
+       call kill_acceleration(EL%ACC)
           deallocate(EL%ACC)
        endif
     elseif(i==0)       then          ! nullifies
@@ -12912,10 +12912,10 @@ contains
     INTEGER, INTENT(IN)::I
     !integer k
     IF(I==-1) THEN
-       call kill_ramping(EL)
+     call kill_ramping(EL)
     elseif(i==0)       then          ! nullifies
 
-       call nullify_ramping(EL)
+     call nullify_ramping(EL)
 
     endif
 
@@ -12923,235 +12923,235 @@ contains
 
 
 
-!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
-  SUBROUTINE alloc_acceleration(acc,nst,n,n_max,filename)
-    implicit none
-    type(acceleration), target :: acc
-    integer i,n,n_max,nst
-    character(*) filename
-    allocate(acc%n)
-    acc%n=n
-    allocate(acc%tableau(n))
-    allocate(acc%fichier)
-    allocate(acc%r)
-    allocate(acc%unit_time)
-    allocate(acc%w1)
-    allocate(acc%nst)
-    allocate(acc%de(nst))
-    allocate(acc%e_in(nst))
-    allocate(acc%w2)
-    allocate(acc%pos)
-    nullify(acc%next)
-    acc%de=zero
-    acc%e_in=zero
-    acc%nst=nst
-    acc%pos=0
-    !   acc%w1=0   not yet defined, done later
-    !   acc%w2=0
-    acc%r=one
-    acc%fichier=' '
-
-    if(len(filename)>255) then
-       write(6,*)  " Name of file too long (>255) "
-       stop 1945
-    endif
-    acc%fichier=filename
-
-    do i=1,n
-       call alloc_tableau(acc%tableau(i),n_max)
-    enddo
-
-  end SUBROUTINE alloc_acceleration
-
-  SUBROUTINE alloc_tableau(tableau,n)
-    implicit none
-    type(temps_energie), target, intent(inout) :: tableau
-    integer n
-    allocate(tableau%volt(n),tableau%phase(n),tableau%temps,tableau%energie,tableau%tc)
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!! 
+   SUBROUTINE alloc_acceleration(acc,nst,n,n_max,filename)
+   implicit none
+   type(acceleration), target :: acc
+   integer i,n,n_max,nst
+   character(*) filename
+   allocate(acc%n)
+   acc%n=n
+   allocate(acc%tableau(n))
+   allocate(acc%fichier)
+   allocate(acc%r)
+   allocate(acc%unit_time)
+   allocate(acc%w1)
+   allocate(acc%nst)
+   allocate(acc%de(nst))
+   allocate(acc%e_in(nst))
+   allocate(acc%w2)
+   allocate(acc%pos)
+   nullify(acc%next)
+   acc%de=zero
+   acc%e_in=zero
+   acc%nst=nst
+   acc%pos=0
+!   acc%w1=0   not yet defined, done later
+!   acc%w2=0
+   acc%r=one
+   acc%fichier=' '
+   
+   if(len(filename)>255) then
+    write(6,*)  " Name of file too long (>255) "
+    stop 1945
+   endif 
+   acc%fichier=filename
+   
+   do i=1,n
+    call alloc_tableau(acc%tableau(i),n_max)
+   enddo
+   
+   end SUBROUTINE alloc_acceleration
+   
+   SUBROUTINE alloc_tableau(tableau,n)
+   implicit none
+   type(temps_energie), target, intent(inout) :: tableau
+   integer n
+   allocate(tableau%volt(n),tableau%phase(n),tableau%temps,tableau%energie,tableau%tc)
     tableau%volt=zero
     tableau%phase=zero
     tableau%temps=zero
     tableau%energie=zero
     tableau%tc=zero
-  end SUBROUTINE alloc_tableau
+   end SUBROUTINE alloc_tableau
+ 
+   SUBROUTINE kill_tableau(tableau)
+   implicit none
+   type(temps_energie), target, intent(inout)  :: tableau
+   deallocate(tableau%volt,tableau%phase,tableau%temps,tableau%energie,tableau%tc)
 
-  SUBROUTINE kill_tableau(tableau)
-    implicit none
-    type(temps_energie), target, intent(inout)  :: tableau
-    deallocate(tableau%volt,tableau%phase,tableau%temps,tableau%energie,tableau%tc)
+   end SUBROUTINE kill_tableau
+ 
+   SUBROUTINE kill_acceleration(acc)
+   implicit none
+   type(acceleration), target , intent(inout) :: acc
+   integer i
+   
+   do i=1,acc%n
+    call kill_tableau(acc%tableau(i))
+   enddo
+   
+   deallocate(acc%tableau)
+   nullify(acc%next)
+   nullify(acc%previous)
+   deallocate(acc%pos)
+   deallocate(acc%unit_time)
+   deallocate(acc%n)
+   deallocate(acc%r)
+   deallocate(acc%w1)
+   deallocate(acc%w2)
+   deallocate(acc%de)
+   deallocate(acc%e_in)
+   deallocate(acc%nst)
+   deallocate(acc%fichier)
+   
+   end SUBROUTINE kill_acceleration
 
-  end SUBROUTINE kill_tableau
+   SUBROUTINE nullify_acceleration(acc)
+   implicit none
+   type(acceleration), target , intent(inout) :: acc
+   
+   nullify(acc%w1)
+   nullify(acc%w2)
+   nullify(acc%r)
+   nullify(acc%n)
+   nullify(acc%POS)
+   nullify(acc%NEXT)
+   nullify(acc%previous)
+   nullify(acc%unit_time)
+   nullify(acc%nst)
+   nullify(acc%de)
+   nullify(acc%e_in)
+   nullify(acc%tableau)
+   nullify(acc%fichier)
+   
+   end SUBROUTINE nullify_acceleration
 
-  SUBROUTINE kill_acceleration(acc)
-    implicit none
-    type(acceleration), target , intent(inout) :: acc
-    integer i
-
-    do i=1,acc%n
-       call kill_tableau(acc%tableau(i))
-    enddo
-
-    deallocate(acc%tableau)
-    nullify(acc%next)
-    nullify(acc%previous)
-    deallocate(acc%pos)
-    deallocate(acc%unit_time)
-    deallocate(acc%n)
-    deallocate(acc%r)
-    deallocate(acc%w1)
-    deallocate(acc%w2)
-    deallocate(acc%de)
-    deallocate(acc%e_in)
-    deallocate(acc%nst)
-    deallocate(acc%fichier)
-
-  end SUBROUTINE kill_acceleration
-
-  SUBROUTINE nullify_acceleration(acc)
-    implicit none
-    type(acceleration), target , intent(inout) :: acc
-
-    nullify(acc%w1)
-    nullify(acc%w2)
-    nullify(acc%r)
-    nullify(acc%n)
-    nullify(acc%POS)
-    nullify(acc%NEXT)
-    nullify(acc%previous)
-    nullify(acc%unit_time)
-    nullify(acc%nst)
-    nullify(acc%de)
-    nullify(acc%e_in)
-    nullify(acc%tableau)
-    nullify(acc%fichier)
-
-  end SUBROUTINE nullify_acceleration
-
-  SUBROUTINE copy_tableau(tableau1,tableau2)
-    implicit none
-    type(temps_energie), target, intent(in) :: tableau1
-    type(temps_energie), target,  intent(inout)  :: tableau2
+   SUBROUTINE copy_tableau(tableau1,tableau2)
+   implicit none
+   type(temps_energie), target, intent(in) :: tableau1
+   type(temps_energie), target,  intent(inout)  :: tableau2
 
     if(associated(tableau2%volt)) call kill_tableau(tableau2)
     call alloc_tableau(tableau2,size(tableau1%phase))
-
+    
     tableau2%volt=tableau1%volt
     tableau2%phase=tableau1%phase
     tableau2%temps=tableau1%temps
     tableau2%energie=tableau1%energie
     tableau2%tc=tableau1%tc
-  end SUBROUTINE copy_tableau
+   end SUBROUTINE copy_tableau
+ 
+   SUBROUTINE copy_acceleration(acc1,acc2)
+   implicit none
+   type(acceleration), target, intent(in) :: acc1
+   type(acceleration), target,  intent(inout)  :: acc2
+   integer i
+   
+   if(associated(acc2%n)) call kill_acceleration(acc2)
+   call alloc_acceleration(acc2,acc1%nst,size(acc1%tableau),size(acc1%tableau(1)%volt),acc1%fichier)
+   acc2%previous=>acc1%previous
+   acc2%next=>acc1%next
+   acc2%pos=acc1%pos
+   acc2%nst=acc1%nst
+   acc2%de=acc1%de
+   acc2%e_in=acc1%e_in
+   acc2%unit_time=acc1%unit_time
+   acc2%r=acc1%r
+   do i=1,acc2%n
+!    acc2%tableau(i)=acc1%tableau(i)
+    call copy_tableau(acc1%tableau(i),acc2%tableau(i))
+   enddo
+   
 
-  SUBROUTINE copy_acceleration(acc1,acc2)
-    implicit none
-    type(acceleration), target, intent(in) :: acc1
-    type(acceleration), target,  intent(inout)  :: acc2
-    integer i
+   end SUBROUTINE copy_acceleration
+ 
 
-    if(associated(acc2%n)) call kill_acceleration(acc2)
-    call alloc_acceleration(acc2,acc1%nst,size(acc1%tableau),size(acc1%tableau(1)%volt),acc1%fichier)
-    acc2%previous=>acc1%previous
-    acc2%next=>acc1%next
-    acc2%pos=acc1%pos
-    acc2%nst=acc1%nst
-    acc2%de=acc1%de
-    acc2%e_in=acc1%e_in
-    acc2%unit_time=acc1%unit_time
-    acc2%r=acc1%r
-    do i=1,acc2%n
-       !    acc2%tableau(i)=acc1%tableau(i)
-       call copy_tableau(acc1%tableau(i),acc2%tableau(i))
-    enddo
+   SUBROUTINE lecture_fichier(EL,fichier)
+   implicit none
+   type(element), target, intent(inout) :: EL
+   type(elementp), pointer :: elp
+   character(*) fichier
+   integer mf,i,n_mode,n_max,j,n,cavpath,pos
+   integer, allocatable :: js(:)
+   real(dp) r,ut,tc
+   
+   if(ASSOCIATED(ACC)) THEN
+    ACC%NEXT=>el%parent_fibre
+    pos=acc%pos+1
+   else
+   pos=1
+   paccfirst=>el%parent_fibre
+   ENDIF
+   
+   if(el%kind/=kind4) then
+    write(6,*) " error not a standard cavity "
+    stop 1946
+   endif
+   
+   call kanalnummer(mf,fichier)
+   read(mf,*) n,ut,r,cavpath,n_mode   ! r percentage of acceleration from that cavity
+  ! n is number of lines in files
+  ! r is the percentage of acceleration done by that cavity
+  ! cavpath is 0 or 1  usual fake pill box parameter
+  ! n_mode number of mode
 
+   allocate(js(n_mode))
+   
+   allocate(el%c4%acc)
+   
+   acc=> el%c4%acc
+   
+      if(.not.ASSOCIATED(paccfirst,el%parent_fibre)) THEN
+      acc%previous=>paccthen
+      else
+      accfirst=>acc
+      endif
+   
+   read(mf,*) js
 
-  end SUBROUTINE copy_acceleration
-
-
-  SUBROUTINE lecture_fichier(EL,fichier)
-    implicit none
-    type(element), target, intent(inout) :: EL
-    type(elementp), pointer :: elp
-    character(*) fichier
-    integer mf,i,n_mode,n_max,j,n,cavpath,pos
-    integer, allocatable :: js(:)
-    real(dp) r,ut,tc
-
-    if(ASSOCIATED(ACC)) THEN
-       ACC%NEXT=>el%parent_fibre
-       pos=acc%pos+1
-    else
-       pos=1
-       paccfirst=>el%parent_fibre
-    ENDIF
-
-    if(el%kind/=kind4) then
-       write(6,*) " error not a standard cavity "
-       stop 1946
-    endif
-
-    call kanalnummer(mf,fichier)
-    read(mf,*) n,ut,r,cavpath,n_mode   ! r percentage of acceleration from that cavity
-    ! n is number of lines in files
-    ! r is the percentage of acceleration done by that cavity
-    ! cavpath is 0 or 1  usual fake pill box parameter
-    ! n_mode number of mode
-
-    allocate(js(n_mode))
-
-    allocate(el%c4%acc)
-
-    acc=> el%c4%acc
-
-    if(.not.ASSOCIATED(paccfirst,el%parent_fibre)) THEN
-       acc%previous=>paccthen
-    else
-       accfirst=>acc
-    endif
-
-    read(mf,*) js
-
-    n_max=0
-    do i=1,n_mode
-       if(js(i)>n_max) n_max=js(i)
-    enddo
+   n_max=0
+   do i=1,n_mode
+    if(js(i)>n_max) n_max=js(i)
+   enddo
 
 
-
-    call alloc_acceleration(acc,el%p%nst,n,n_max,fichier)
-
+   
+   call alloc_acceleration(acc,el%p%nst,n,n_max,fichier)
+   
 
     acc%unit_time=ut
 
+   
+   acc%pos=pos
+   acc%r=r
+   do i=1,acc%n
+    if(read_tc) then
+     read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
+     (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode ),acc%tableau(i)%tc
+    else
+     read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
+     (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode )
+     acc%tableau(i)%tc=zero
+    endif 
+  !  acc%tableau(i)%phase(2)=-acc%tableau(i)%phase(2)
+  !  write(6,*) acc%tableau(i)%phase(2)
+   enddo
+   
+   close(mf)
+   
+   deallocate(js)
+   elp=>el%parent_fibre%magp
+   if(.not.associated(elp%c4%acc)) then
+    allocate(elp%c4%acc)
+      call nullify_acceleration(elp%c4%acc)
+   endif
 
-    acc%pos=pos
-    acc%r=r
-    do i=1,acc%n
-       if(read_tc) then
-          read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
-               (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode ),acc%tableau(i)%tc
-       else
-          read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
-               (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode )
-          acc%tableau(i)%tc=zero
-       endif
-       !  acc%tableau(i)%phase(2)=-acc%tableau(i)%phase(2)
-       !  write(6,*) acc%tableau(i)%phase(2)
-    enddo
+     ! write(6,*) " initial time shift in cavity ",el%c4%t
+      tc=zero   !el%c4%t
+      call copy_acceleration(acc,elp%c4%acc)
 
-    close(mf)
-
-    deallocate(js)
-    elp=>el%parent_fibre%magp
-    if(.not.associated(elp%c4%acc)) then
-       allocate(elp%c4%acc)
-       call nullify_acceleration(elp%c4%acc)
-    endif
-
-    ! write(6,*) " initial time shift in cavity ",el%c4%t
-    tc=zero   !el%c4%t
-    call copy_acceleration(acc,elp%c4%acc)
-
-    if(size(acc%tableau(1)%volt)/=el%c4%nf) then
+      if(size(acc%tableau(1)%volt)/=el%c4%nf) then
        el%c4%nf=size(acc%tableau(1)%volt)
        elp%c4%nf=size(acc%tableau(1)%volt)
        call kill(elp%c4%f)
@@ -13160,242 +13160,242 @@ contains
        allocate(el%c4%f(el%c4%nf));el%c4%f=zero;el%c4%f(1)=one;
        allocate(elp%c4%f(el%c4%nf))
        call alloc(elp%c4%f,el%c4%nf)
-       elp%c4%f(1)=one
+       elp%c4%f(1)=one    
 
        call kill(elp%c4%ph)
        deallocate(elp%c4%ph)
        deallocate(el%c4%ph)
-       allocate(el%c4%ph(el%c4%nf));el%c4%ph=zero;
+       allocate(el%c4%ph(el%c4%nf));el%c4%ph=zero; 
        allocate(elp%c4%ph(el%c4%nf))
        call alloc(elp%c4%ph,el%c4%nf)
-    endif
-
-    el%c4%volt =one
-    elp%c4%volt =one
-    el%c4%phas  =zero
-    elp%c4%phas =zero
-    el%c4%phase0  =zero
-    elp%c4%phase0 =zero
-    el%c4%t  =tc
-    elp%c4%t =tc
-
-    do i=1,el%c4%nf
-       el%c4%f(i)   = acc%tableau(1)%volt(i)
-       el%c4%ph(i)  = acc%tableau(1)%phase(i)
-       elp%c4%f(i)  = acc%tableau(1)%volt(i)
-       elp%c4%ph(i) = acc%tableau(1)%phase(i)
-    enddo
-    if(cavpath==0.or. cavpath==1) then
-       el%c4%cavity_totalpath=cavpath
-       elp%c4%cavity_totalpath=cavpath
-    else
-       write(6,*) "cavpath is wrong ",cavpath
-    endif
-
-    NULLIFY(ACC%NEXT)
-
-    paccthen=>el%parent_fibre
-
-  END SUBROUTINE lecture_fichier
-
-!!!!!!!!!!!!! ramping !!!!!!!!!!!!!
-
-  SUBROUTINE alloc_ramping(acc,unit_time,t_max,n,n_max,filename)
-    implicit none
-    type(ramping), target :: acc
-    integer i,n,n_max
-    character(*) filename
-    real(dp) unit_time,t_max
-
-    allocate(acc%n)
-    acc%n=n
-    allocate(acc%table(0:n))
-    allocate(acc%file)
-    allocate(acc%r,acc%t_max)
-    allocate(acc%unit_time)
-    acc%r=one
-    acc%t_max=t_max
-    acc%unit_time=unit_time
-    acc%file=' '
-
-    if(len(filename)>255) then
-       write(6,*)  " Name of file too long (>255) "
-       stop 1945
-    endif
-    acc%file=filename
-
-    do i=0,n
-       call alloc_table(acc%table(i),n_max)
-    enddo
-
-  end SUBROUTINE alloc_ramping
-
-  SUBROUTINE alloc_table(tableau,n)
-    implicit none
-    type(time_energy), target, intent(inout) :: tableau
-    integer n
-    allocate(tableau%an(n),tableau%bn(n),tableau%time,tableau%energy,tableau%b_t)
+      endif
+      
+      el%c4%volt =one
+      elp%c4%volt =one
+      el%c4%phas  =zero
+      elp%c4%phas =zero
+      el%c4%phase0  =zero
+      elp%c4%phase0 =zero      
+      el%c4%t  =tc
+      elp%c4%t =tc
+     
+         do i=1,el%c4%nf
+          el%c4%f(i)   = acc%tableau(1)%volt(i)
+          el%c4%ph(i)  = acc%tableau(1)%phase(i)
+          elp%c4%f(i)  = acc%tableau(1)%volt(i)
+          elp%c4%ph(i) = acc%tableau(1)%phase(i)
+         enddo
+     if(cavpath==0.or. cavpath==1) then   
+     el%c4%cavity_totalpath=cavpath    
+     elp%c4%cavity_totalpath=cavpath 
+     else
+     write(6,*) "cavpath is wrong ",cavpath  
+     endif  
+    
+     NULLIFY(ACC%NEXT) 
+     
+     paccthen=>el%parent_fibre
+     
+   END SUBROUTINE lecture_fichier 
+ 
+ !!!!!!!!!!!!! ramping !!!!!!!!!!!!! 
+ 
+   SUBROUTINE alloc_ramping(acc,unit_time,t_max,n,n_max,filename)
+   implicit none
+   type(ramping), target :: acc
+   integer i,n,n_max
+   character(*) filename
+   real(dp) unit_time,t_max
+   
+   allocate(acc%n)
+   acc%n=n
+   allocate(acc%table(0:n))
+   allocate(acc%file)
+   allocate(acc%r,acc%t_max)
+   allocate(acc%unit_time)
+   acc%r=one
+   acc%t_max=t_max
+   acc%unit_time=unit_time
+   acc%file=' '
+   
+   if(len(filename)>255) then
+    write(6,*)  " Name of file too long (>255) "
+    stop 1945
+   endif 
+   acc%file=filename
+   
+   do i=0,n
+    call alloc_table(acc%table(i),n_max)
+   enddo
+   
+   end SUBROUTINE alloc_ramping
+   
+   SUBROUTINE alloc_table(tableau,n)
+   implicit none
+   type(time_energy), target, intent(inout) :: tableau
+   integer n
+   allocate(tableau%an(n),tableau%bn(n),tableau%time,tableau%energy,tableau%b_t)
     tableau%an=zero
     tableau%bn=zero
     tableau%time=zero
     tableau%energy=zero
     tableau%b_t=zero
-  end SUBROUTINE alloc_table
+   end SUBROUTINE alloc_table 
+ 
+   SUBROUTINE kill_table(tableau)
+   implicit none
+   type(time_energy), target, intent(inout)  :: tableau
+   deallocate(tableau%an,tableau%bn,tableau%time,tableau%energy,tableau%b_t)
 
-  SUBROUTINE kill_table(tableau)
-    implicit none
-    type(time_energy), target, intent(inout)  :: tableau
-    deallocate(tableau%an,tableau%bn,tableau%time,tableau%energy,tableau%b_t)
+   end SUBROUTINE kill_table
+ 
+   SUBROUTINE kill_ramping(acc)
+   implicit none
+   type(ramping), target , intent(inout) :: acc
+   integer i
+   
+   do i=0,acc%n
+    call kill_table(acc%table(i))
+   enddo
+   
+   deallocate(acc%table)
+   deallocate(acc%n)
+   deallocate(acc%r)
+   deallocate(acc%t_max)
+   deallocate(acc%unit_time)
+   deallocate(acc%file)
+   
+   end SUBROUTINE kill_ramping
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!! 
+!  TYPE time_energy
+!     real(dp),pointer :: time
+!     real(dp),pointer :: energy
+!     real(dp),pointer :: an(:),bn(:)
+!  END TYPE time_energy
+  
+!  TYPE ramping
+!     integer,pointer :: n 
+!     real(dp), pointer :: r, unit_time 
+!     type(time_energy),pointer :: table(:)
+!     character(255), pointer :: file
+!  END TYPE ramping
 
-  end SUBROUTINE kill_table
+!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!! 
 
-  SUBROUTINE kill_ramping(acc)
-    implicit none
-    type(ramping), target , intent(inout) :: acc
-    integer i
+   SUBROUTINE nullify_ramping(acc)
+   implicit none
+   type(ramping), target , intent(inout) :: acc
+   
+   nullify(acc%r)
+   nullify(acc%n)
+   nullify(acc%file)
+   nullify(acc%table)
+   nullify(acc%unit_time)
+   
+   
+   end SUBROUTINE nullify_ramping
 
-    do i=0,acc%n
-       call kill_table(acc%table(i))
-    enddo
-
-    deallocate(acc%table)
-    deallocate(acc%n)
-    deallocate(acc%r)
-    deallocate(acc%t_max)
-    deallocate(acc%unit_time)
-    deallocate(acc%file)
-
-  end SUBROUTINE kill_ramping
-!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
-  !  TYPE time_energy
-  !     real(dp),pointer :: time
-  !     real(dp),pointer :: energy
-  !     real(dp),pointer :: an(:),bn(:)
-  !  END TYPE time_energy
-
-  !  TYPE ramping
-  !     integer,pointer :: n
-  !     real(dp), pointer :: r, unit_time
-  !     type(time_energy),pointer :: table(:)
-  !     character(255), pointer :: file
-  !  END TYPE ramping
-
-!!!!!!!!!!!!!!!!! cav4 acceleration !!!!!!!!!!!!!!!!!!!
-
-  SUBROUTINE nullify_ramping(acc)
-    implicit none
-    type(ramping), target , intent(inout) :: acc
-
-    nullify(acc%r)
-    nullify(acc%n)
-    nullify(acc%file)
-    nullify(acc%table)
-    nullify(acc%unit_time)
-
-
-  end SUBROUTINE nullify_ramping
-
-  SUBROUTINE copy_table(tableau1,tableau2)
-    implicit none
-    type(time_energy), target, intent(in) :: tableau1
-    type(time_energy), target,  intent(inout)  :: tableau2
+   SUBROUTINE copy_table(tableau1,tableau2)
+   implicit none
+   type(time_energy), target, intent(in) :: tableau1
+   type(time_energy), target,  intent(inout)  :: tableau2
 
     if(associated(tableau2%an)) call kill_table(tableau2)
     call alloc_table(tableau2,size(tableau1%an))
-
+    
     tableau2%an=tableau1%an
     tableau2%bn=tableau1%bn
     tableau2%time=tableau1%time
     tableau2%energy=tableau1%energy
     tableau2%b_t=tableau1%b_t
-  end SUBROUTINE copy_table
+   end SUBROUTINE copy_table
+ 
+   SUBROUTINE copy_ramping(acc1,acc2)
+   implicit none
+   type(ramping), target, intent(in) :: acc1
+   type(ramping), target,  intent(inout)  :: acc2
+   integer i
+   
+   if(associated(acc2%n)) call kill_ramping(acc2)
+   call alloc_ramping(acc2,acc1%unit_time,acc1%t_max,acc1%n,size(acc1%table(1)%an),acc1%file)
+   
+   do i=0,acc2%n
+!    acc2%tableau(i)=acc1%tableau(i)
+    call copy_table(acc1%table(i),acc2%table(i))
+   enddo
+   
 
-  SUBROUTINE copy_ramping(acc1,acc2)
-    implicit none
-    type(ramping), target, intent(in) :: acc1
-    type(ramping), target,  intent(inout)  :: acc2
-    integer i
+   end SUBROUTINE copy_ramping
+ 
 
-    if(associated(acc2%n)) call kill_ramping(acc2)
-    call alloc_ramping(acc2,acc1%unit_time,acc1%t_max,acc1%n,size(acc1%table(1)%an),acc1%file)
-
-    do i=0,acc2%n
-       !    acc2%tableau(i)=acc1%tableau(i)
-       call copy_table(acc1%table(i),acc2%table(i))
-    enddo
-
-
-  end SUBROUTINE copy_ramping
-
-
-  SUBROUTINE reading_file(EL,fichier)
-    implicit none
-    type(element), target, intent(inout) :: EL
-    type(elementp), pointer :: elp
-    type(ramping), pointer :: acc
-    character(*) fichier
-    integer mf,i,n_mode,n_max,j,n,cavpath,pos,np
-    integer, allocatable :: js(:)
-    real(dp) unit_time
-    character(255) line
-    character(7) car
-    logical timepatch
-    timepatch=.false.
+   SUBROUTINE reading_file(EL,fichier)
+   implicit none
+   type(element), target, intent(inout) :: EL
+   type(elementp), pointer :: elp
+   type(ramping), pointer :: acc
+   character(*) fichier
+   integer mf,i,n_mode,n_max,j,n,cavpath,pos,np
+   integer, allocatable :: js(:)
+   real(dp) unit_time
+   character(255) line
+   character(7) car
+   logical timepatch
+   timepatch=.false.
 
 
-    np=1
-
-    call kanalnummer(mf,fichier)
-    read(mf,'(a255)') line
+   np=1
+   
+   call kanalnummer(mf,fichier)
+   read(mf,'(a255)') line
     if(index(line,"#")/=0) then
-       read(line,*) n,unit_time,n_mode,car,np
+     read(line,*) n,unit_time,n_mode,car,np
     else
-       read(line,*) n,unit_time,n_mode
+     read(line,*) n,unit_time,n_mode
     endif
     if(index(line,"T")/=0.or.index(line,"t")/=0) timepatch=.true.
-    !   read(mf,*) n,unit_time,n_mode
-    ! write(6,*) n,r,cavpath,n_mode
-    allocate(js(n_mode))
+!   read(mf,*) n,unit_time,n_mode
+  ! write(6,*) n,r,cavpath,n_mode
+   allocate(js(n_mode))
+   
+   allocate(el%ramp)
+   
+   acc=> el%ramp
+   read(mf,*) js
 
-    allocate(el%ramp)
-
-    acc=> el%ramp
-    read(mf,*) js
-
-    n_max=0
-    do i=1,n_mode
-       if(js(i)>n_max) n_max=js(i)
-    enddo
-
-    if(n_max<el%p%nmul) n_max = el%p%nmul
-
-    call alloc_ramping(acc,unit_time,zero,n,n_max,fichier)
-    acc%r=one
-    do i=1,acc%n
-       if(timepatch) then
-          read(mf,*) acc%table(i)%time,   &
-               (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode ),acc%table(i)%b_t
-       else
-          read(mf,*) acc%table(i)%time,   &
-               (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode )
-          acc%table(i)%b_t=zero
-       endif
-       acc%table(i)%energy=0.d0
-    enddo
-
-    close(mf)
+   n_max=0
+   do i=1,n_mode
+    if(js(i)>n_max) n_max=js(i)
+   enddo
+   
+   if(n_max<el%p%nmul) n_max = el%p%nmul
+   
+   call alloc_ramping(acc,unit_time,zero,n,n_max,fichier)
+   acc%r=one
+   do i=1,acc%n
+    if(timepatch) then
+     read(mf,*) acc%table(i)%time,   &
+     (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode ),acc%table(i)%b_t
+    else
+     read(mf,*) acc%table(i)%time,   &
+     (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode )
+        acc%table(i)%b_t=zero
+    endif
+    acc%table(i)%energy=0.d0
+   enddo
+   
+   close(mf)
     acc%t_max= acc%table(1)%time+np*(acc%table(acc%n)%time-acc%table(1)%time)
 
-    deallocate(js)
-    elp=>el%parent_fibre%magp
-    if(.not.associated(elp%ramp)) then
-       allocate(elp%ramp)
-       call nullify_ramping(elp%ramp)
-    endif
-    call copy_ramping(acc,elp%ramp)
+   deallocate(js)
+   elp=>el%parent_fibre%magp
+   if(.not.associated(elp%ramp)) then
+    allocate(elp%ramp)
+      call nullify_ramping(elp%ramp)
+   endif
+      call copy_ramping(acc,elp%ramp)
 
 
-  END SUBROUTINE reading_file
+   END SUBROUTINE reading_file 
 
 !!!!!! !!!!!! end ramping !!!!!! !!!!!!
 
@@ -14357,7 +14357,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! cav_trav
 
-  subroutine feval_CAVR(Z0,X,k,f,D)
+  subroutine feval_CAVR(Z0,X,k,f,D) 
     IMPLICIT NONE
     real(dp), INTENT(INout) :: X(6)
     real(dp),INTENT(INOUT):: Z0
@@ -15987,193 +15987,193 @@ contains
 
   end SUBROUTINE elliptical_b_p
 
-!!!!!!!!!!!!!!!!!!!!    electric field testing !!!!!!!!!!!!!!!!!!!!
-  subroutine invert_electric_teapot(asni,bsni)
-    implicit none
-    real(dp) a(no_e,no_e),b(no_e,no_e),asni(no_e,0:no_e,0:no_e), &
-         bsni(no_e,0:no_e,0:no_e)
-    integer no,np,nd,k,n,l,jc(2),ier,i,j
-    type(taylor) fh,x,y,h
-    type(taylorresonance) fhr
-    type(complextaylor) fhc
-    type(taylor) phi,e(2)
-    type(taylor)   as(no_e),bs(no_e)
-    real(dp)   asn(no_e,0:no_e,0:no_e),bsn(no_e,0:no_e,0:no_e)
-    real(dp) h0
-    type(damap) m
-    no=no_e
-    nd=1
-    np=0
-    h0=1.d-1
-    call init(no,nd,np,0)
-    asn=zero
-    bsn=zero
-    a=zero
-    b=zero
-    call alloc(as,no)
-    call alloc(bs,no)
-    call alloc(m)
-    call alloc(e)
-    call alloc(fhc)
-    call alloc(phi)
-    call alloc(fhr)
-    call alloc(fh,x,y,h)
-    h=h0 !+one.mono.3
-    m=1
-    m%v(2)=zero
+ !!!!!!!!!!!!!!!!!!!!    electric field testing !!!!!!!!!!!!!!!!!!!!
+ subroutine invert_electric_teapot(asni,bsni)
+ implicit none
+ real(dp) a(no_e,no_e),b(no_e,no_e),asni(no_e,0:no_e,0:no_e), &
+  bsni(no_e,0:no_e,0:no_e)
+ integer no,np,nd,k,n,l,jc(2),ier,i,j
+ type(taylor) fh,x,y,h
+ type(taylorresonance) fhr
+ type(complextaylor) fhc
+ type(taylor) phi,e(2)
+ type(taylor)   as(no_e),bs(no_e)
+ real(dp)   asn(no_e,0:no_e,0:no_e),bsn(no_e,0:no_e,0:no_e)
+ real(dp) h0
+ type(damap) m
+ no=no_e 
+ nd=1
+ np=0
+ h0=1.d-1
+ call init(no,nd,np,0)
+ asn=zero
+ bsn=zero
+ a=zero
+ b=zero
+ call alloc(as,no)
+ call alloc(bs,no)
+ call alloc(m)
+ call alloc(e)
+ call alloc(fhc)
+ call alloc(phi)
+ call alloc(fhr)
+ call alloc(fh,x,y,h)
+ h=h0 !+one.mono.3
+ m=1
+ m%v(2)=zero
+ 
+ do n=1,no
+ x=one.mono.1
+ y=one.mono.2
+ fhc=-(x+i_*y)**n/n
+ 
+ fh=fhc%r
+ fhr=fh
+ phi=zero 
 
-    do n=1,no
-       x=one.mono.1
-       y=one.mono.2
-       fhc=-(x+i_*y)**n/n
+do k=1,c_%no+2
+ call integrate_electric_teapot(fh,phi,h)
+ !x=one+h*(one.mono.1)
+ bs(n)=fh+phi
+ !y= ((((y.d.1)*x).d.1)/x)+((y.d.2).d.2)
+enddo
+! call print(y,6)
+ e(1)=-(bs(n).d.1)*m
+ !call print(e(1),6)
+  jc=0
+ do l=1,no
+  jc(1)=l-1
+  b(l,n)=e(1).sub.jc
+ enddo
+ ! write(6,*) b(n,1:no)
 
-       fh=fhc%r
-       fhr=fh
-       phi=zero
+ fh=fhc%i
+ fhr=fh
+ phi=zero 
 
-       do k=1,c_%no+2
-          call integrate_electric_teapot(fh,phi,h)
-          !x=one+h*(one.mono.1)
-          bs(n)=fh+phi
-          !y= ((((y.d.1)*x).d.1)/x)+((y.d.2).d.2)
-       enddo
-       ! call print(y,6)
-       e(1)=-(bs(n).d.1)*m
-       !call print(e(1),6)
-       jc=0
-       do l=1,no
-          jc(1)=l-1
-          b(l,n)=e(1).sub.jc
-       enddo
-       ! write(6,*) b(n,1:no)
-
-       fh=fhc%i
-       fhr=fh
-       phi=zero
-
-       do k=1,c_%no
-          call integrate_electric_teapot(fh,phi,h)
-          ! x=one+h*(one.mono.1)
-          as(n)=fh+phi
-          ! y= ((((y.d.1)*x).d.1)/x)+((y.d.2).d.2)
-       enddo
-       ! call print(y,6)
-       e(2)=-(as(n).d.2)*m
-       ! call print(e(2),6)
-       jc=0
-       do l=1,no
-          jc(1)=l-1
-          a(l,n)=e(2).sub.jc
-       enddo
-       !write(6,*) a(n,1:no)
-       !pause 12
-    enddo
-    call matinv(a,a,no,no,ier)
-    if(ier/=0) then
-       write(6,*) ier
-       stop 9
-    endif
-    call matinv(b,b,no,no,ier)
-    if(ier/=0) then
-       write(6,*) ier
-       stop 10
-    endif
-
-    do k=1,no
-       do i=0,no
-          do j=0,no
-             if(i+j>no) cycle
-             jc(1)=i
-             jc(2)=j
-             asn(k,i,j)=as(k).sub.jc
-             bsn(k,i,j)=bs(k).sub.jc
-          enddo
-       enddo
-    enddo
-
-
+do k=1,c_%no
+ call integrate_electric_teapot(fh,phi,h)
+! x=one+h*(one.mono.1)
+ as(n)=fh+phi
+! y= ((((y.d.1)*x).d.1)/x)+((y.d.2).d.2)
+enddo
+! call print(y,6)
+ e(2)=-(as(n).d.2)*m
+! call print(e(2),6)
+   jc=0
+ do l=1,no
+  jc(1)=l-1
+  a(l,n)=e(2).sub.jc
+ enddo
+ !write(6,*) a(n,1:no)
+ !pause 12
+enddo
+   call matinv(a,a,no,no,ier)
+   if(ier/=0) then
+    write(6,*) ier
+    stop 9
+   endif
+   call matinv(b,b,no,no,ier)
+   if(ier/=0) then
+    write(6,*) ier
+    stop 10
+   endif
+  
+   do k=1,no
     do i=0,no
-       do j=0,no
-          do k=1,no
-             do l=1,no
-                asni(l,i,j)=a(k,l)*asn(k,i,j)+asni(l,i,j)
-                bsni(l,i,j)=b(k,l)*bsn(k,i,j)+bsni(l,i,j)
-             enddo
-          enddo
-       enddo
+     do j=0,no
+      if(i+j>no) cycle
+      jc(1)=i
+      jc(2)=j
+      asn(k,i,j)=as(k).sub.jc
+      bsn(k,i,j)=bs(k).sub.jc
+     enddo
     enddo
-
-    call kill(fh,x,y,h)
-    call kill(fhr)
-    call kill(fhc)
-    call kill(phi)
-    call kill(e)
-    call kill(m)
-    call kill(as,no)
-    call kill(bs,no)
-
-  end  subroutine invert_electric_teapot
-
-  subroutine integrate_electric_teapot(fh,phi,h)
-    implicit none
-    integer n1,i
-    type(taylor) fh
-    type(taylorresonance) tr
-    type(taylorresonance) ur
-    type(complextaylor) u
-    type(taylor) phi,h,f
-    integer, allocatable :: jc(:)
-    real(dp) val
-
-    call alloc(u)
-    call alloc(tr)
-    call alloc(ur)
-    call alloc(f)
+   enddo
 
 
-    f=fh+phi
-    f=f.d.1
-    f=-(h/(one+h*(one.mono.1))  )*f
+  do i=0,no
+  do j=0,no
+  do k=1,no
+  do l=1,no
+   asni(l,i,j)=a(k,l)*asn(k,i,j)+asni(l,i,j)
+   bsni(l,i,j)=b(k,l)*bsn(k,i,j)+bsni(l,i,j)
+  enddo
+  enddo
+  enddo
+  enddo
 
-    tr=f
-    allocate(jc(c_%nv))
-    u=zero
+ call kill(fh,x,y,h)
+ call kill(fhr)
+ call kill(fhc)
+ call kill(phi)
+ call kill(e)
+ call kill(m)
+ call kill(as,no)
+ call kill(bs,no)
+ 
+ end  subroutine invert_electric_teapot
+ 
+ subroutine integrate_electric_teapot(fh,phi,h)
+ implicit none
+ integer n1,i
+ type(taylor) fh
+ type(taylorresonance) tr
+ type(taylorresonance) ur
+ type(complextaylor) u
+ type(taylor) phi,h,f
+ integer, allocatable :: jc(:)
+ real(dp) val
+  
+  call alloc(u)
+  call alloc(tr)
+  call alloc(ur)
+  call alloc(f)
+  
+  
+  f=fh+phi
+  f=f.d.1
+  f=-(h/(one+h*(one.mono.1))  )*f
+  
+  tr=f
+  allocate(jc(c_%nv))
+ u=zero
     call taylor_cycle(tr%cos,size=n1)
 
     do i=1,n1
-
-       jc=0
+     
+     jc=0
        call taylor_cycle(tr%cos,ii=i,value=val,j=jc)
-
+       
        jc(1)=jc(1)+1
        jc(2)=jc(2)+1
-       val=val/four/jc(1)/jc(2)
-       u=u+(val.mono.jc)
+        val=val/four/jc(1)/jc(2)
+        u=u+(val.mono.jc)  
     enddo
 
     call taylor_cycle(tr%sin,size=n1)
 
     do i=1,n1
-
-       jc=0
+     
+     jc=0
        call taylor_cycle(tr%sin,ii=i,value=val,j=jc)
-
+       
        jc(1)=jc(1)+1
        jc(2)=jc(2)+1
-       val=val/four/jc(1)/jc(2)
-       u=u+i_*(val.mono.jc)
+        val=val/four/jc(1)/jc(2)
+        u=u+i_*(val.mono.jc)  
     enddo
-
+    
     tr%cos=u%r
     tr%sin=u%i
     phi=tr
-    deallocate(jc)
-    call kill(f)
-    call kill(u)
-    call kill(ur)
-    call kill(tr)
+  deallocate(jc)   
+  call kill(f)
+  call kill(u)
+  call kill(ur)
+  call kill(tr)
 
-  end subroutine integrate_electric_teapot
+end subroutine integrate_electric_teapot
 
 
 END MODULE S_DEF_KIND

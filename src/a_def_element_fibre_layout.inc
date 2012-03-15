@@ -135,19 +135,19 @@ TYPE tilting
    LOGICAL(lp) natural                 ! for mad-like
 END TYPE tilting
 
-TYPE time_energy
-   real(dp),pointer :: time
-   real(dp),pointer :: energy
-   real(dp),pointer :: an(:),bn(:)
-   real(dp),pointer :: b_t
-END TYPE time_energy
-
-TYPE ramping
-   integer,pointer :: n
-   real(dp), pointer :: r, unit_time,t_max
-   type(time_energy),pointer :: table(:)
-   character(255), pointer :: file
-END TYPE ramping
+  TYPE time_energy
+     real(dp),pointer :: time
+     real(dp),pointer :: energy
+     real(dp),pointer :: an(:),bn(:)
+     real(dp),pointer :: b_t
+  END TYPE time_energy
+  
+  TYPE ramping
+     integer,pointer :: n
+     real(dp), pointer :: r, unit_time,t_max    
+     type(time_energy),pointer :: table(:)
+     character(255), pointer :: file
+  END TYPE ramping
 
 
 

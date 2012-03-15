@@ -1,21 +1,21 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and CERN
 
-TYPE temps_energie
-   real(dp),pointer :: temps
-   real(dp),pointer :: energie
-   real(dp),pointer :: volt(:),phase(:),tc
-END TYPE temps_energie
-
-TYPE acceleration
-   integer,pointer :: n,POS,nst
-   real(dp), pointer :: r, unit_time,de(:),e_in(:)
-   type(work),pointer :: w1,w2
-   TYPE(FIBRE), pointer :: PREVIOUS
-   TYPE(FIBRE), pointer :: NEXT
-   type(temps_energie),pointer :: tableau(:)
-   character(255), pointer :: fichier
-END TYPE acceleration
+  TYPE temps_energie
+     real(dp),pointer :: temps
+     real(dp),pointer :: energie
+     real(dp),pointer :: volt(:),phase(:),tc
+  END TYPE temps_energie
+  
+  TYPE acceleration
+     integer,pointer :: n,POS,nst 
+     real(dp), pointer :: r, unit_time,de(:),e_in(:)
+     type(work),pointer :: w1,w2      
+     TYPE(FIBRE), pointer :: PREVIOUS    
+     TYPE(FIBRE), pointer :: NEXT    
+     type(temps_energie),pointer :: tableau(:)
+     character(255), pointer :: fichier
+  END TYPE acceleration
 
 
 TYPE DRIFT1
@@ -81,7 +81,7 @@ TYPE CAV4
    integer, POINTER :: N_BESSEL,CAVITY_TOTALPATH     ! Cavity information
    logical, pointer :: always_on
    type(acceleration), pointer :: ACC
-
+   
 END  TYPE CAV4
 
 TYPE CAV4P

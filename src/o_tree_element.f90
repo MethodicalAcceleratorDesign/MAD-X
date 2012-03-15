@@ -1573,7 +1573,7 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(scdadd%AC%om)
-    !    call ass(scdadd%AC%t)
+!    call ass(scdadd%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     scdadd%AC%om=s2%AC%om
     scdadd%AC%t=s2%AC%t
@@ -1659,7 +1659,7 @@ CONTAINS
     master=localmaster
     localmaster=master
     call ass(daddsc%AC%om)
-    !    call ass(daddsc%AC%t)
+!    call ass(daddsc%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
     daddsc%AC%om=s2%AC%om
     daddsc%AC%t=s2%AC%t
@@ -3301,7 +3301,7 @@ CONTAINS
        CALL alloc(R%X(I))
     ENDDO
     CALL alloc(R%om)
-    !    CALL alloc(R%t)
+!    CALL alloc(R%t)
 
   END    subroutine ALLOC_rf_phasor_8
 
@@ -3346,7 +3346,7 @@ CONTAINS
        CALL KILL(R%X(I))
     ENDDO
     CALL KILL(R%om)
-    !    CALL KILL(R%t)
+!    CALL KILL(R%t)
 
   END    subroutine kill_rf_phasor_8
 
@@ -5132,7 +5132,7 @@ CONTAINS
     implicit none
     TYPE(damap), INTENT(INout) :: a_t,A_cs
     type(taylor),optional, INTENT(INout) ::  PHASE_ADVANCE(:)
-    TYPE(damap), optional, intent(inout) ::R_TE,CS_TE
+    TYPE(damap), optional, intent(inout) ::R_TE,CS_TE 
     logical(lp) , optional, intent(inout)  :: COSLIKE
     TYPE(damap) a_f,a_l,a_nl,dr1,a_tt
     type(onelieexponent) uno
@@ -5159,38 +5159,38 @@ CONTAINS
 
     A_cs=a_f*a_l*a_nl
     if(present(PHASE_ADVANCE)) then
-       uno=dr1
+    uno=dr1
 
-       if(c_%ndpt==0) then
-          do i=1,c_%nd
-             PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
-          enddo
+     if(c_%ndpt==0) then
+      do i=1,c_%nd
+        PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+      enddo
+     else
+       if(c_%ndpt>c_%nd2-2) then
+        do i=1,c_%nd-1
+         PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+        enddo
        else
-          if(c_%ndpt>c_%nd2-2) then
-             do i=1,c_%nd-1
-                PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
-             enddo
-          else
-             do i=1,c_%nd-2
-                PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
-             enddo
-             i=c_%nd-1
-             PHASE_ADVANCE(i+1)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
-          endif
+        do i=1,c_%nd-2
+         PHASE_ADVANCE(i)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
+        enddo
+         i=c_%nd-1
+         PHASE_ADVANCE(i+1)=PHASE_ADVANCE(i)+((uno%VECTOR%v(2*i-1)).k.(2*i))/twopi
        endif
-
+     endif
+      
     endif
-
+    
 
     if(doflip) then
        call flip_damap(a_t,a_t)
        call flip_damap(a_cs,a_cs)
        call flip_damap(dr1,dr1)
-       if(present(PHASE_ADVANCE)) then
-          do i=1,c_%nd
-             call flip_taylor(PHASE_ADVANCE(i),PHASE_ADVANCE(i),-1)
-          enddo
-       endif
+     if(present(PHASE_ADVANCE)) then
+       do i=1,c_%nd
+          call flip_taylor(PHASE_ADVANCE(i),PHASE_ADVANCE(i),-1)
+       enddo
+     endif  
        perform_flip=.true.
     endif
     call kill(uno)
@@ -5217,7 +5217,7 @@ CONTAINS
     type(reversedragtfinn) rdf
     type(vecresonance) vr
     logical(lp) t_e
-
+    
     t_e=my_true
     lagrange0=my_false
     if(present(dr)) lagrange0=my_true
@@ -5355,8 +5355,8 @@ CONTAINS
           s1i%v(2*i)  =COS(p(i))*(one.mono.(2*i))+SIN(p(i))*(one.mono.(2*i-1))
        enddo
        if(.not.courant_snyder) then
-          s1i=1
-          s1=1
+        s1i=1
+        s1=1
        endif
        a_nl=s1i*a_nl*s1
        a_l=a_l*s1
@@ -5506,31 +5506,31 @@ CONTAINS
        call  copy_matrix_matrix(m(1:2,3:4),ct)
        call  copy_matrix_matrix(m(3:4,1:2),dt)
        call  copy_matrix_matrix(m(3:4,3:4),bt)
-
+        
        call invert_22(at,ati)
        call invert_22(bt,bti)
        if(.not.c_%STABLE_DA) then
-          t_e=my_false
-       endif
+        t_e=my_false
+       endif 
 
 
        call matmul_nn(dt,ati,ati,sc=-one)
        call matmul_nn(ati,ct,ct)
        call matmul_nn(ct,bti,ct)
        if(.not.c_%STABLE_DA) then
-          t_e=my_false
-          goto 888
-       endif
+        t_e=my_false
+        goto 888
+       endif 
 
 
        alpha=ct(1,1)
        alpha0=alpha
 
        if(alpha0<=-one) then
-          t_e=my_false
-          goto 888
+        t_e=my_false
+        goto 888
        endif
-
+        
        det=sqrt(one/(one+alpha))
 
 
@@ -5542,17 +5542,17 @@ CONTAINS
           ! det=sqrt(one/(one-alpha))
           COSLIKE=my_false
        endif
-
-       CS_TE=0
+ 
+        CS_TE=0
        do i=1,2
           do j=1,2
              CS_TE%v(i)=at(i,j)*(one.mono.j)/det+CS_TE%v(i)
              CS_TE%v(i+2)=bt(i,j)*(one.mono.(j+2))/det+CS_TE%v(i+2)
           enddo
        enddo
+ 
 
-
-
+        
        !  The rotation matrix is created but it may not have the correct path length
        !dependence
        if(c_%ndpt/=0.and.t_e) then
@@ -5597,16 +5597,16 @@ CONTAINS
           call kill(g)
           !endif !eps_te
        endif
-
-888    continue
-       if(.not.t_e) then
-          c_%STABLE_DA=my_true
-          cs_te=0
-          R_TE=0
-          write(6,*) " Teng-Edwards is crap !"
-       else
-          R_TE=a_l*cs_TE**(-1)
-       endif
+       
+         888 continue
+       if(.not.t_e) then       
+        c_%STABLE_DA=my_true
+        cs_te=0
+        R_TE=0
+        write(6,*) " Teng-Edwards is crap !"
+       else       
+        R_TE=a_l*cs_TE**(-1)
+       endif  
 
     endif ! end of T-E  done
 
@@ -5948,10 +5948,10 @@ CONTAINS
 
     theta0r=theta0
 
-    !!    call taylor_clean(theta0r%cos,1.d-1)
-    !    call taylor_clean(theta0r%sin,1.d-1)
-    !    call taylor_clean(tr%cos,1.d-5)
-    !    call taylor_clean(tr%sin,1.d-5)
+!!    call taylor_clean(theta0r%cos,1.d-1)
+!    call taylor_clean(theta0r%sin,1.d-1)
+!    call taylor_clean(tr%cos,1.d-5)
+!    call taylor_clean(tr%sin,1.d-5)
 
     call print(theta0r%cos,6)
     call print(tr%cos,6)
@@ -6149,45 +6149,45 @@ CONTAINS
 
   end  function number_mon
 
-  integer function mul_fac(ju)
+ integer function mul_fac(ju)
     implicit none
     integer ju(:),nv
     integer i,k,no
-
+    
     mul_fac=one
     if(firstfac) then
-       call make_fac
-       firstfac=.false.
+     call make_fac
+     firstfac=.false.
     endif
     nv=size(ju)
-
+    
     k=0
     do i=1,nv
-       k=k+ju(i)
+     k=k+ju(i)
     enddo
 
 
     do i=1,nv
-       if(ju(i)==0) cycle
-
-       mul_fac=(fac(k)/fac(k-ju(i))/fac(ju(i)))*mul_fac
-       k=k-ju(i)
-
+     if(ju(i)==0) cycle
+     
+     mul_fac=(fac(k)/fac(k-ju(i))/fac(ju(i)))*mul_fac
+     k=k-ju(i)
+     
     enddo
+    
 
+end function mul_fac
 
-  end function mul_fac
-
-  subroutine make_fac
+subroutine make_fac
     implicit none
     integer i
 
     fac(0)=one
     do i=1,nfac
-       fac(i)=i*fac(i-1)
+    fac(i)=i*fac(i-1)
     enddo
 
-  end subroutine make_fac
+end subroutine make_fac
 
 
   integer function pos_mon(ju,nomax,nv)
@@ -6223,12 +6223,12 @@ CONTAINS
   integer function pos_no(no,nomax,nv)
     implicit none
     integer ju(lnv),no,nv,nomax
-
+ 
     if(no==0) then
-       pos_no=0
+     pos_no=0
     endif
-    if(no>nomax) then
-       pos_no=-1
+   if(no>nomax) then
+     pos_no=-1
     endif
     ju=0
     ju(nv)=no

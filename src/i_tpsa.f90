@@ -2497,12 +2497,12 @@ CONTAINS
     INTEGER,INTENT(IN),dimension(:)::j
     real(dp),INTENT(inOUT)::R1
     type (taylor),INTENT(IN)::S1
-    !   integer k
+ !   integer k
     IF(.NOT.C_%STABLE_DA) RETURN
     ! if(old) then
     if(s1%i==0) call crap1("pek000  1" )  !call etall1(s1%i)
-    !   k=s1%i
-    !    write(6,*) r1,k
+ !   k=s1%i
+!    write(6,*) r1,k
     CALL DApek(s1%i,j,r1)
     !    else
     !       if(.NOT. ASSOCIATED(s1%j%r)) call crap1("pek000  2" ) ! newetall(s1%j,1)
@@ -2865,12 +2865,12 @@ CONTAINS
   END SUBROUTINE taylor_cycle
 
 
-  ! SUBROUTINE  taylor_clean(S1,VALUE)
-  !   implicit none
-  !   type (taylor),INTENT(INout)::S1
-  !   real(dp) value
-  !   call daclean(S1%i,value)
-  ! END SUBROUTINE taylor_clean
+ ! SUBROUTINE  taylor_clean(S1,VALUE)
+ !   implicit none
+ !   type (taylor),INTENT(INout)::S1
+ !   real(dp) value
+ !   call daclean(S1%i,value)
+ ! END SUBROUTINE taylor_clean
 
   subroutine check_snake()
     implicit none
@@ -3613,7 +3613,7 @@ CONTAINS
     type (pbfield),INTENT(INOUT)::S2
     type (pbfield), intent(INOUT):: s1
     real(dp) prec
-
+     
     call clean_taylor(s1%h,s2%h,prec)
 
   END SUBROUTINE clean_pbfield
@@ -3623,9 +3623,9 @@ CONTAINS
     type (pbresonance),INTENT(INOUT)::S2
     type (pbresonance), intent(INOUT):: s1
     real(dp) prec
-
+     
     call clean_pbfield(s1%cos,s2%cos,prec)
-    call clean_pbfield(s1%sin,s2%sin,prec)
+   call clean_pbfield(s1%sin,s2%sin,prec)
 
   END SUBROUTINE clean_pbresonance
 
@@ -3665,8 +3665,8 @@ CONTAINS
     integer i
 
 
-    call clean_vecfield(s1%cos,s2%cos,prec)
-    call clean_vecfield(s1%sin,s2%sin,prec)
+       call clean_vecfield(s1%cos,s2%cos,prec)
+       call clean_vecfield(s1%sin,s2%sin,prec)
 
 
 
@@ -3680,8 +3680,8 @@ CONTAINS
     integer i
 
 
-    call clean_vecfield(s1%vector,s2%vector,prec)
-    call clean_pbfield(s1%pb,s2%pb,prec)
+       call clean_vecfield(s1%vector,s2%vector,prec)
+       call clean_pbfield(s1%pb,s2%pb,prec)
 
 
 
@@ -3715,7 +3715,7 @@ CONTAINS
 
   END SUBROUTINE clean_gmap
 
-
+  
 
 
 END MODULE  tpsa

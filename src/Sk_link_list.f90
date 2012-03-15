@@ -356,7 +356,7 @@ CONTAINS
 
   SUBROUTINE move_to_name_old( L,current,name,pos,reset) ! moves to next one in list called name
     implicit none
-    logical(lp),optional :: reset
+    logical(lp),optional :: reset    
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     integer, intent(inout):: pos
@@ -366,18 +366,18 @@ CONTAINS
 
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
-
+    
     if(present(reset)) then
-       if(reset) then
-          l%lastpos=1
-          l%last=>L%start
-       endif
+     if(reset) then
+       l%lastpos=1
+       l%last=>L%start
+     endif
     endif
-
+    
     foundit=.false.
     S1NAME=name
     CALL CONTEXT(S1name)
-
+    
     nullify(p)
     p=>l%last%next
 
@@ -1472,18 +1472,18 @@ CONTAINS
     NEX=.FALSE.
     ENE=.FALSE.
     IF(PRESENT(NEXT)) NEX=NEXT
-
+    
     if(associated(el1,el1%parent_layout%start)) then
-       if(.not.nex) then
-          nex=my_true
-       endif
+     if(.not.nex) then
+      nex=my_true
+     endif
     endif
     if(associated(el1%next,el1%parent_layout%start)) then
-       if(nex) then
-          nex=my_false
-       endif
+     if(nex) then
+      nex=my_false
+     endif
     endif
-
+    
     el1%PATCH%B_X1=1
     el1%PATCH%B_X2=1
     el1%PATCH%B_D=zero
@@ -1591,9 +1591,9 @@ CONTAINS
     DO WHILE (ASSOCIATED(L % end))
        Current1 => L % end      ! end at the end
        L % end => Current % previous  ! update the end before disposing
-       !  WRITE(6,*) ' killing last layout '
+     !  WRITE(6,*) ' killing last layout '
        call kill_layout(Current)
-       !  WRITE(6,*) ' killed last layout '
+     !  WRITE(6,*) ' killed last layout '
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
        deallocate(Current1)
@@ -2195,7 +2195,7 @@ CONTAINS
     deallocate(L%orbit_deltae)
     deallocate(L%accel)
     if(associated(L%dt)) deallocate(L%dt)
-    nullify(L%tp)
+   nullify(L%tp)
 
     !    deallocate(L%dxs6,L%xs6,L%freqb,L%freqa,L%voltb,L%volta,L%phasa,L%phasb)
     deallocate(L)

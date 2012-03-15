@@ -1267,21 +1267,21 @@ CONTAINS
        !       NULLIFY(EL%TP10%BF_Y);ALLOCATE(EL%TP10%BF_Y(S_B(EL%P%NMUL)%N_MONO))
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        if(EL%ELECTRIC) then
-          NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
-          NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
-          NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
-          NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
-          NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
-          NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
-          NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
-          EL%TP10%AS=ZERO
-          EL%TP10%BS=ZERO
-          EL%TP10%AE=ZERO
-          EL%TP10%BE=ZERO
-          EL%TP10%E_X=ZERO
-          EL%TP10%E_Y=ZERO
-          EL%TP10%PHI=ZERO
-          call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
+        NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
+        NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
+        NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
+        NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
+        NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
+        NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
+        NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
+        EL%TP10%AS=ZERO
+        EL%TP10%BS=ZERO
+        EL%TP10%AE=ZERO
+        EL%TP10%BE=ZERO
+        EL%TP10%E_X=ZERO
+        EL%TP10%E_Y=ZERO
+        EL%TP10%PHI=ZERO
+        call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
        endif
        call GETANBN(EL%TP10)
        NULLIFY(EL%TP10%F);ALLOCATE(EL%TP10%F);EL%TP10%F=1;
@@ -1682,20 +1682,20 @@ CONTAINS
        NULLIFY(EL%TP10%DRIFTKICK);ALLOCATE(EL%TP10%DRIFTKICK);EL%TP10%DRIFTKICK=.true.;
        CALL ALLOC(EL%TP10)
        if(EL%ELECTRIC) then
-          NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
-          NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
-          NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
-          NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
-          NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
-          call alloc(EL%TP10%E_X,EL%TP10%E_Y,EL%TP10%PHI)
-          call alloc(EL%TP10%AE,NO_E)
-          call alloc(EL%TP10%BE,NO_E)
-          NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
-          NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
-          EL%TP10%AS=ZERO
-          EL%TP10%BS=ZERO
-          call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
-          !  write(6,*) " electric polymorph"
+        NULLIFY(EL%TP10%E_X);ALLOCATE(EL%TP10%E_X)
+        NULLIFY(EL%TP10%E_Y);ALLOCATE(EL%TP10%E_Y)
+        NULLIFY(EL%TP10%PHI);ALLOCATE(EL%TP10%PHI)
+        NULLIFY(EL%TP10%AE);ALLOCATE(EL%TP10%AE(NO_E))
+        NULLIFY(EL%TP10%BE);ALLOCATE(EL%TP10%BE(NO_E))
+        call alloc(EL%TP10%E_X,EL%TP10%E_Y,EL%TP10%PHI)
+        call alloc(EL%TP10%AE,NO_E)
+        call alloc(EL%TP10%BE,NO_E)
+        NULLIFY(EL%TP10%AS);ALLOCATE(EL%TP10%AS(NO_E,0:NO_E,0:NO_E))
+        NULLIFY(EL%TP10%BS);ALLOCATE(EL%TP10%BS(NO_E,0:NO_E,0:NO_E))
+        EL%TP10%AS=ZERO
+        EL%TP10%BS=ZERO
+        call invert_electric_teapot(EL%TP10%AS,EL%TP10%BS)
+              !  write(6,*) " electric polymorph"
        endif
        call GETANBN(EL%TP10)
        NULLIFY(EL%TP10%F);ALLOCATE(EL%TP10%F);EL%TP10%F=1;
@@ -1917,53 +1917,53 @@ CONTAINS
     if(EL%KIND==kind1) return
 
     if(associated(EL%ramp)) then
-       do n=1,EL%P%NMUL
-          EL%BN(N)= EL%ramp%table(0)%bn(n)
-          EL%AN(N)= EL%ramp%table(0)%an(n)
-          ELP%BN(N)= ELP%ramp%table(0)%bn(n)
-          ELP%AN(N)= ELP%ramp%table(0)%an(n)
-       enddo
+          do n=1,EL%P%NMUL
+             EL%BN(N)= EL%ramp%table(0)%bn(n)
+             EL%AN(N)= EL%ramp%table(0)%an(n)
+             ELP%BN(N)= ELP%ramp%table(0)%bn(n)
+             ELP%AN(N)= ELP%ramp%table(0)%an(n)
+          enddo  
 
-       if(EL%ramp%table(0)%b_t/=zero) then
-          if(EL%parent_fibre%PATCH%TIME==0) EL%parent_fibre%PATCH%TIME=2
-          if(EL%parent_fibre%PATCH%TIME==1) EL%parent_fibre%PATCH%TIME=3
-          EL%parent_fibre%PATCH%b_T=EL%ramp%table(0)%b_t
-       else
-          if(EL%parent_fibre%PATCH%TIME==2) EL%parent_fibre%PATCH%TIME=0
-          if(EL%parent_fibre%PATCH%TIME==3) EL%parent_fibre%PATCH%TIME=1
-          EL%parent_fibre%PATCH%b_T=zero
-       endif
-
+          if(EL%ramp%table(0)%b_t/=zero) then
+              if(EL%parent_fibre%PATCH%TIME==0) EL%parent_fibre%PATCH%TIME=2
+              if(EL%parent_fibre%PATCH%TIME==1) EL%parent_fibre%PATCH%TIME=3
+              EL%parent_fibre%PATCH%b_T=EL%ramp%table(0)%b_t
+            else
+              if(EL%parent_fibre%PATCH%TIME==2) EL%parent_fibre%PATCH%TIME=0
+              if(EL%parent_fibre%PATCH%TIME==3) EL%parent_fibre%PATCH%TIME=1
+            EL%parent_fibre%PATCH%b_T=zero
+        endif
+          
     else
 
-       IF(EL%P%NMUL>=1) THEN
-          if(present(VR))then
-             do n=1,EL%P%NMUL
-                EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
-                EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
-                ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
-                ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
-             enddo
-          else
-             do n=1,EL%P%NMUL
-                EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
-                EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-                ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
-                ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
-             enddo
-          endif
-
-
+    IF(EL%P%NMUL>=1) THEN
+       if(present(VR))then
+          do n=1,EL%P%NMUL
+             EL%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N) 
+             EL%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
+             ELP%BN(N)= vR*EL%D0_BN(N)+DVR*EL%D_BN(N)
+             ELP%AN(N)= vR*EL%D0_AN(N)+DVR*EL%D_AN(N)
+          enddo
+       else
+          do n=1,EL%P%NMUL
+             EL%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+             EL%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+             ELP%BN(N)= vp*EL%D0_BN(N)+DVp*EL%D_BN(N)
+             ELP%AN(N)= vp*EL%D0_AN(N)+DVp*EL%D_AN(N)
+          enddo
        endif
-    endif
-    if(el%kind==kind10) then
-       call GETANBN(EL%TP10)
-       call GETANBN(ELP%TP10)
-    endif
-    if(el%kind==kind7) then
-       call GETMAT7(EL%T7)
-       call GETMAT7(ELP%T7)
-    endif
+    
+    
+     endif 
+   endif
+       if(el%kind==kind10) then
+          call GETANBN(EL%TP10)
+          call GETANBN(ELP%TP10)
+       endif
+       if(el%kind==kind7) then
+          call GETMAT7(EL%T7)
+          call GETMAT7(ELP%T7)
+       endif
 
   END SUBROUTINE transfer_ANBN
 
@@ -3111,13 +3111,13 @@ CONTAINS
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
        IF(EL%ELECTRIC) THEN
-          ELP%TP10%E_X=EL%TP10%E_X
-          ELP%TP10%E_Y=EL%TP10%E_Y
-          ELP%TP10%PHI=EL%TP10%PHI
-          DO I=1,NO_E
-             ELP%TP10%AE(I)=EL%TP10%AE(I)
-             ELP%TP10%BE(I)=EL%TP10%BE(I)
-          enddo
+        ELP%TP10%E_X=EL%TP10%E_X
+        ELP%TP10%E_Y=EL%TP10%E_Y
+        ELP%TP10%PHI=EL%TP10%PHI
+        DO I=1,NO_E
+         ELP%TP10%AE(I)=EL%TP10%AE(I)     
+         ELP%TP10%BE(I)=EL%TP10%BE(I)     
+        enddo        
        ENDIF
     ENDIF
 
@@ -3165,9 +3165,9 @@ CONTAINS
     IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
     ENDIF
-
-
-
+    
+    
+    
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
@@ -3422,15 +3422,15 @@ CONTAINS
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
        IF(EL%ELECTRIC) THEN
-          ELP%TP10%E_X=EL%TP10%E_X
-          ELP%TP10%E_Y=EL%TP10%E_Y
-          ELP%TP10%PHI=EL%TP10%PHI
-          DO I=1,NO_E
-             ELP%TP10%AE(I)=EL%TP10%AE(I)
-             ELP%TP10%BE(I)=EL%TP10%BE(I)
-          enddo
+        ELP%TP10%E_X=EL%TP10%E_X
+        ELP%TP10%E_Y=EL%TP10%E_Y
+        ELP%TP10%PHI=EL%TP10%PHI
+        DO I=1,NO_E
+         ELP%TP10%AE(I)=EL%TP10%AE(I)     
+         ELP%TP10%BE(I)=EL%TP10%BE(I)     
+        enddo        
        ENDIF
-
+       
     ENDIF
 
     IF(EL%KIND>=KIND11.AND.EL%KIND<=KIND14) THEN
@@ -3472,11 +3472,11 @@ CONTAINS
        CALL SETFAMILY(ELP)
        CALL COPY(EL%WI,ELP%WI)
     ENDIF
-
-    IF(ASSOCIATED(EL%RAMP)) THEN         !
+    
+       IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
     ENDIF
-
+ 
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
@@ -3734,13 +3734,13 @@ CONTAINS
        ELP%TP10%DRIFTKICK=EL%TP10%DRIFTKICK
        ELP%TP10%F=EL%TP10%F
        IF(EL%ELECTRIC) THEN
-          ELP%TP10%E_X=EL%TP10%E_X
-          ELP%TP10%E_Y=EL%TP10%E_Y
-          ELP%TP10%PHI=EL%TP10%PHI
-          DO I=1,NO_E
-             ELP%TP10%AE(I)=EL%TP10%AE(I)
-             ELP%TP10%BE(I)=EL%TP10%BE(I)
-          enddo
+        ELP%TP10%E_X=EL%TP10%E_X
+        ELP%TP10%E_Y=EL%TP10%E_Y
+        ELP%TP10%PHI=EL%TP10%PHI
+        DO I=1,NO_E
+         ELP%TP10%AE(I)=EL%TP10%AE(I)     
+         ELP%TP10%BE(I)=EL%TP10%BE(I)     
+        enddo        
        ENDIF
     ENDIF
 
@@ -3786,8 +3786,8 @@ CONTAINS
 
     IF(ASSOCIATED(EL%RAMP)) THEN         !
        CALL COPY_RAMPING(EL%RAMP,ELP%RAMP)
-    ENDIF
-
+    ENDIF    
+    
     IF(EL%KIND==KINDPA) THEN         !
        CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)

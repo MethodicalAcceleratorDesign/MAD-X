@@ -501,11 +501,11 @@ contains
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%a_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%a_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%a_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%a_T
+      endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -543,11 +543,11 @@ contains
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%b_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%b_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%b_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%b_T
+      endif
     ENDIF
     IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
@@ -666,11 +666,11 @@ contains
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-4)
     ! TIME PATCH
     IF(PATCHT/=0.AND.PATCHT/=2.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%a_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%a_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%a_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%a_T
+      endif
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,-3)
 
@@ -702,11 +702,11 @@ contains
     !EXIT PATCH
     ! TIME PATCH
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
-       if(K%time) then
-          X(6)=X(6)-C%PATCH%b_T/c%beta0
-       else
-          X(6)=X(6)-C%PATCH%b_T
-       endif
+      if(K%time) then
+       X(6)=X(6)-C%PATCH%b_T/c%beta0
+      else
+       X(6)=X(6)-C%PATCH%b_T
+      endif
     ENDIF
     !    IF(PRESENT(X_IN)) CALL XMID(X_IN,X,X_IN%nst+1)
 
