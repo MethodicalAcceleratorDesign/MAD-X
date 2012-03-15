@@ -76,7 +76,7 @@
 CAVITY_TOTALPATH=0
 
       return
-      end  
+      end subroutine ptc_init
 
 !===================================================
 !reads additional ptc commands from file and execute them inside ptc
@@ -91,7 +91,7 @@ CAVITY_TOTALPATH=0
 
         CALL read_ptc_command(p_in_file)
 
-     end  subroutine ptc_script
+     end subroutine ptc_script
 
 !===================================================
 !get initial twiss at entrance of the ring
@@ -109,7 +109,7 @@ CAVITY_TOTALPATH=0
         call GET_info(i,length,bx,by,ax,ay,ex,epx)
 
       return
-      end
+      end subroutine ptc_get_twiss_init
 
 
 !===================================================
@@ -129,7 +129,7 @@ CAVITY_TOTALPATH=0
         call GET_GAMMAT(gammaT)
 
       return
-      end
+      end subroutine ptc_get_ini_params
 
 !===================================================
 !get synchronous particle params mass, charge, and energy
@@ -147,7 +147,7 @@ CAVITY_TOTALPATH=0
         call  GET_CHARGE(charge)
 
       return
-      end
+      end subroutine ptc_get_syncpart
 
 !===================================================
 !get twiss and length for a node with index
@@ -164,7 +164,7 @@ CAVITY_TOTALPATH=0
         call GET_info(i,node_length,bx,by,ax,ay,ex,epx)
 
       return
-      end
+      end subroutine ptc_get_twiss_for_node
 
 
 !===================================================
