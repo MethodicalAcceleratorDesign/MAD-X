@@ -2105,7 +2105,7 @@ CONTAINS
     IMPLICIT NONE
  !!! maybe missing per Sagan 2012.3.18       
   ! TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
-   TYPE(INTEGRATION_NODE), pointer, INTENT(INOUT) :: T
+    TYPE(INTEGRATION_NODE), POINTER :: T
 !!! maybe missing per Sagan 2012.3.18       
  
     !    IF(ASSOCIATED(T%bb)) then
