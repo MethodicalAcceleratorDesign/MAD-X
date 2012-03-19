@@ -584,7 +584,7 @@ contains
        case('YANG','CHINESE','LINGYUN')
           CALL change_package(1)
        case('ALLOCATEBETA')
-          ALLOCATE(BETA(2,2,my_ering%N))
+          ALLOCATE(BETA(2,3,my_ering%N))
 
        case('DEALLOCATEBETA')
           DEALLOCATE(BETA)

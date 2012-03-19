@@ -30,7 +30,7 @@ module precision_constants
   real(kind(1d0)) :: doublenum = 0d0
   !Precision
   integer,parameter::nlp=24
-  integer,parameter::vp=24
+  integer,parameter::vp=nlp
   integer,parameter::lp=4
   ! double precision
   integer,parameter::sp=kind(1.e0)

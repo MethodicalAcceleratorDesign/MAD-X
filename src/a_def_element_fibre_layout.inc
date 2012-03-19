@@ -163,7 +163,6 @@ TYPE ELEMENT
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
    CHARACTER(vp), POINTER ::  VORNAME    ! Identification
    !
-   logical(lp), POINTER ::  PERMFRINGE
    !
    ! Length is common although certain things like Markers should not have a length
    ! Well let us say it is zero
@@ -223,7 +222,6 @@ TYPE ELEMENTP
    logical(lp), POINTER :: KNOB ! FALSE IF NO KNOB
    CHARACTER(nlp), POINTER ::  NAME    ! Identification
    CHARACTER(vp), POINTER ::  VORNAME    ! Identification
-   logical(lp), POINTER ::  PERMFRINGE
    LOGICAL(LP), POINTER :: electric
    !
    !

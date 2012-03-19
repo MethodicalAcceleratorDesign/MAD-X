@@ -854,7 +854,7 @@ nmark=0
     ELSE
        WRITE(MF,*) M%KIND,M%NAME,' ',M%VORNAME
     ENDIF
-    WRITE(MF,*) M%L,M%PERMFRINGE,M%MIS , " L,PERMFRINGE,MIS "
+    WRITE(MF,*) M%L,M%p%PERMFRINGE,M%MIS , " L,PERMFRINGE,MIS "
     WRITE(LINE,*) M%FINT,M%HGAP,M%H1,M%H2, " FINT,HGAP,H1,H2 "
     WRITE(MF,'(A255)') LINE
     WRITE(LINE,*) 0.d0,0.d0,0.d0,0.d0,0.d0,0.d0, " no more mis"
@@ -1218,7 +1218,7 @@ nmark=0
     CALL CONTEXT(M%VORNAME);
     IF(M%VORNAME(1:9)=='NOVORNAME') M%VORNAME=' '
 
-    READ(MF,*) M%L,M%PERMFRINGE,M%MIS  !,M%EXACTMIS
+    READ(MF,*) M%L,M%p%PERMFRINGE,M%MIS  !,M%EXACTMIS
     READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
     READ(MF,*) R,D
     READ(MF,*) LINE
@@ -1316,7 +1316,7 @@ nmark=0
     CALL CONTEXT(M%VORNAME);
     IF(M%VORNAME(1:9)=='NOVORNAME') M%VORNAME=' '
 
-    READ(MF,*) M%L,M%PERMFRINGE,M%MIS   !,M%EXACTMIS
+    READ(MF,*) M%L,M%p%PERMFRINGE,M%MIS   !,M%EXACTMIS
     READ(MF,*) M%FINT,M%HGAP,M%H1,M%H2
     READ(MF,*) R,D
     READ(MF,*) LINE
@@ -1978,8 +1978,10 @@ call kanalnummer(mf,filename)
 f=>ring%start
 
 do i=1,ring%n
+  call el_el0(f%mag,my_true,mf)
   call fib_fib0(f,my_true,mf)
-  
+  CALL MC_MC0(f%MAG%P,my_true,mf)
+  CALL print_ElementLIST(f%mag,MY_TRUE,mf)
  f=>f%next    
 enddo
 
@@ -1991,10 +1993,19 @@ close(mf)
 
 f=>ring%start
 
-do i=1,1
-  write(6,*) f%beta0
+do i=1,ring%n
+  write(6,*) f%MAG%NAME
+  write(6,*) f%beta0,f%MAG%P%B0
+  
+  call el_el0(f%mag,my_false,mf)
   call fib_fib0(f,my_false,mf)
-  write(6,*) f%beta0
+  CALL MC_MC0(f%MAG%P,my_false,mf) 
+  CALL print_ElementLIST(f%mag,my_false,mf)
+
+ 
+ 
+  write(6,*) f%MAG%NAME
+  write(6,*) f%beta0,f%MAG%P%B0
   
  f=>f%next    
 enddo
@@ -2002,9 +2013,7 @@ enddo
 close(mf)
 end subroutine print_new_flat
 
-  
 subroutine  fib_fib0(f,dir,mf)
-
 implicit none
 type(fibre), target :: f
 logical(lp),optional ::  dir
@@ -2013,12 +2022,12 @@ integer,optional :: mf
 if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
 ! fib0%t(1)=f%BETA0
- fib0%t(1)=f%GAMMA0I
- fib0%t(2)=f%GAMBET
- fib0%t(3)=f%MASS
- fib0%t(4)=f%AG
- fib0%i(1)=f%DIR
- fib0%i(2)=f%CHARGE
+ fib0%GAMMA0I_GAMBET_MASS_AG(1)=f%GAMMA0I
+ fib0%GAMMA0I_GAMBET_MASS_AG(2)=f%GAMBET
+ fib0%GAMMA0I_GAMBET_MASS_AG(3)=f%MASS
+ fib0%GAMMA0I_GAMBET_MASS_AG(4)=f%AG
+ fib0%DIR_CHARGE(1)=f%DIR
+ fib0%DIR_CHARGE(2)=f%CHARGE
  !fib0%pos=f%pos
  !fib0%loc=f%loc
     if(present(mf)) then
@@ -2029,20 +2038,335 @@ else
      read(mf,NML=fibrename)
     endif   
     ! f%BETA0=fib0%t(1)
- f%GAMMA0I=fib0%t(1)
- f%GAMBET=fib0%t(2)
- f%MASS=fib0%t(3)
- f%AG=fib0%t(4)
+ f%GAMMA0I=fib0%GAMMA0I_GAMBET_MASS_AG(1)
+ f%GAMBET=fib0%GAMMA0I_GAMBET_MASS_AG(2)
+ f%MASS=fib0%GAMMA0I_GAMBET_MASS_AG(3)
+ f%AG=fib0%GAMMA0I_GAMBET_MASS_AG(4)
  f%BETA0=sqrt(one-f%GAMMA0I**2)   
- f%DIR=fib0%i(1)
- f%CHARGE=fib0%i(2)
+ f%DIR=fib0%DIR_CHARGE(1)
+ f%CHARGE=fib0%DIR_CHARGE(2)
  !f%pos=fib0%pos
  !f%loc=fib$%loc
 endif
 endif
-
- 
-
 end subroutine fib_fib0
 
+subroutine  MC_MC0(f,dir,mf)
+implicit none
+type(MAGNET_CHART), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+ MAGL0%LC_LD_B0_P0(1)=f%LC
+ MAGL0%LC_LD_B0_P0(2)=f%LD
+ MAGL0%LC_LD_B0_P0(3)=f%B0
+ MAGL0%LC_LD_B0_P0(4)=f%P0C
+ 
+ MAGL0%TILTD_EDGE(1)=f%TILTD
+ MAGL0%TILTD_EDGE(2)=f%EDGE(1)
+ MAGL0%TILTD_EDGE(3)=f%EDGE(2)
+
+ MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(1)=f%KILL_ENT_FRINGE
+ MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(2)=f%KILL_EXI_FRINGE
+ MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(3)=f%bend_fringe
+ MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(4)=f%permFRINGE
+ MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(5)=f%EXACT
+
+ MAGL0%METHOD_NST_NMUL(1)=f%METHOD
+ MAGL0%METHOD_NST_NMUL(2)=f%NST
+ MAGL0%METHOD_NST_NMUL(3)=f%NMUL
+
+ if(present(mf)) then
+     write(mf,NML=MAGLname)
+    endif   
+else
+    if(present(mf)) then
+     read(mf,NML=MAGLname)
+    endif   
+ f%LC=MAGL0%LC_LD_B0_P0(1)
+ f%LD=MAGL0%LC_LD_B0_P0(2)
+ f%B0=MAGL0%LC_LD_B0_P0(3)
+ f%P0C=MAGL0%LC_LD_B0_P0(4)
+ 
+ f%TILTD=MAGL0%TILTD_EDGE(1)
+ f%EDGE(1)=MAGL0%TILTD_EDGE(2)
+ f%EDGE(2)=MAGL0%TILTD_EDGE(3)
+
+ f%KILL_ENT_FRINGE=MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(1)
+ f%KILL_EXI_FRINGE=MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(2)
+ f%bend_fringe=MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(3)
+ f%permFRINGE=MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(4)
+ f%EXACT=MAGL0%KIN_KEX_BENDFRINGE_permFRINGE_EXACT(5)
+
+ f%METHOD=MAGL0%METHOD_NST_NMUL(1)
+ f%NST=MAGL0%METHOD_NST_NMUL(2)
+ f%NMUL=MAGL0%METHOD_NST_NMUL(3)
+
+endif
+endif
+end subroutine MC_MC0
+
+subroutine  el_el0(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+ ELE0%KIND=F%KIND
+ ELE0%name_vorname(1)=f%name
+ ELE0%name_vorname(2)=f%vorname
+ ele0%an=zero
+ ele0%an=zero
+ ele0%an(1:f%p%nmul)=f%an(1:f%p%nmul)
+ ele0%bn(1:f%p%nmul)=f%bn(1:f%p%nmul)
+ ele0%VOLT_FREQ_PHAS_LAG=zero
+ ele0%B_SOL=ZERO
+ 
+   ele0%fint_hgap_h1_h2(1)=f%fint
+   ele0%fint_hgap_h1_h2(2)=f%hgap
+   ele0%fint_hgap_h1_h2(3)=f%h1
+   ele0%fint_hgap_h1_h2(4)=f%h2
+   
+   ele0%L=f%L
+   IF(ASSOCIATED(f%B_SOL)) ele0%B_SOL=f%B_SOL
+ 
+ if(associated(f%volt)) then
+   ele0%VOLT_FREQ_PHAS_LAG(1)=f%VOLT
+   ele0%VOLT_FREQ_PHAS_LAG(2)=f%FREQ
+   ele0%VOLT_FREQ_PHAS_LAG(3)=f%PHAS
+   ele0%VOLT_FREQ_PHAS_LAG(4)=f%LAG
+   ele0%THIN=f%THIN
+ endif
+ 
+ele0%slowac_recut_even_electric_MIS(1) = f%slow_ac
+ele0%slowac_recut_even_electric_MIS(2) = f%recut
+ele0%slowac_recut_even_electric_MIS(3) = f%even
+ele0%slowac_recut_even_electric_MIS(4) = f%electric
+ele0%slowac_recut_even_electric_MIS(5) = f%MIS
+ 
+    if(present(mf)) then
+     write(mf,NML=ELEname)
+    endif   
+else
+    if(present(mf)) then
+     read(mf,NML=ELEname)
+    endif   
+ f%name=ELE0%name_vorname(1)
+ f%vorname=ELE0%name_vorname(2)
+ f%an(1:f%p%nmul)=ele0%an(1:f%p%nmul)
+ f%bn(1:f%p%nmul)=ele0%bn(1:f%p%nmul)
+
+f%fint= ele0%fint_hgap_h1_h2(1)
+f%hgap= ele0%fint_hgap_h1_h2(2)
+f%h1  = ele0%fint_hgap_h1_h2(3)
+f%h2  = ele0%fint_hgap_h1_h2(4)
+ 
+if(associated(f%volt)) then
+  f%VOLT=ele0%VOLT_FREQ_PHAS_LAG(1)
+  f%FREQ=ele0%VOLT_FREQ_PHAS_LAG(2)
+  f%PHAS=ele0%VOLT_FREQ_PHAS_LAG(3)
+  f%LAG =ele0%VOLT_FREQ_PHAS_LAG(4)
+  f%THIN=ele0%THIN
+endif
+
+
+ f%slow_ac = ele0%slowac_recut_even_electric_MIS(1)
+ f%recut = ele0%slowac_recut_even_electric_MIS(2)
+ f%even = ele0%slowac_recut_even_electric_MIS(3)
+ f%electric = ele0%slowac_recut_even_electric_MIS(4)
+ f%MIS = ele0%slowac_recut_even_electric_MIS(5)
+
+   F%L=ele0%L
+   IF(ASSOCIATED(f%B_SOL)) F%B_SOL=ele0%B_SOL
+
+   F%KIND=ELE0%KIND   
+   
+endif
+endif
+end subroutine el_el0
+
+
+  subroutine print_ElementLIST(el,dir,mf)
+    implicit none
+    type(element), pointer :: el
+    integer mf,i
+    LOGICAL dir
+    character*255 line
+
+
+    select case(el%kind)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
+    case(kind3)
+     call thin3_thin30(el,dir,mf)
+    case(kind4)
+        call cav4_cav40(EL,dir,mf)
+    case(kind10)
+        call tp10_tp100(EL,dir,mf)
+
+    case(kind16,kind20)
+        call k16_k160(EL,dir,mf)
+
+    case(kind18)
+!       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
+!       CALL print_aperture(EL%RCOL18%A,mf)
+    case(kind19)
+!       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
+!       CALL print_aperture(EL%ECOL19%A,mf)
+    case(kind21)
+!       WRITE(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
+    case(KINDWIGGLER)
+ !      call print_wig(el%wi,mf)
+    case(KINDpa)
+ !      call print_pancake(el%pa,mf)
+    case default
+       write(MF,*) " not supported in print_specific_element",el%kind
+ !      stop 101
+    end select
+
+  END SUBROUTINE print_ElementLIST
+
+   
+subroutine  cav4_cav40(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+ cav0%f=zero
+ cav0%PH=zero   
+ cav0%N_BESSEL=F%c4%N_BESSEL
+ cav0%NF=F%c4%NF
+ cav0%CAVITY_TOTALPATH=F%c4%CAVITY_TOTALPATH
+ cav0%phase0=F%c4%phase0
+ cav0%t=F%c4%t
+ cav0%always_on=F%c4%always_on
+ cav0%f(1:F%c4%NF)=F%c4%f
+ cav0%PH(1:F%c4%NF)=F%c4%PH
+ cav0%A=F%c4%A
+ cav0%R=F%c4%R
+    if(present(mf)) then
+     write(mf,NML=CAVname)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=CAVname)
+    endif   
+ F%c4%N_BESSEL=cav0%N_BESSEL
+ F%c4%NF =cav0%NF
+ F%c4%CAVITY_TOTALPATH=cav0%CAVITY_TOTALPATH
+ F%c4%phase0=cav0%phase0
+ F%c4%t=cav0%t
+ F%c4%always_on=cav0%always_on
+ F%c4%f=cav0%f(1:F%c4%NF)
+ F%c4%PH=cav0%PH(1:F%c4%NF)
+ F%c4%A=cav0%A
+ F%c4%R=cav0%R  
+endif
+endif
+end subroutine cav4_cav40
+
+
+
+subroutine  thin3_thin30(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+    
+
+ thin30%thin_h_foc=F%k3%thin_h_foc
+ thin30%thin_v_foc=F%k3%thin_v_foc
+ thin30%thin_h_angle=F%k3%thin_h_angle
+ thin30%thin_v_angle=F%k3%thin_v_angle
+ thin30%hf=F%k3%hf
+ thin30%vf=F%k3%vf
+ thin30%patch=F%k3%patch
+ thin30%ls=F%k3%ls
+    if(present(mf)) then
+     write(mf,NML=thin30name)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=thin30name)
+    endif   
+ f%k3%thin_h_foc=thin30%thin_h_foc
+ f%k3%thin_v_foc=thin30%thin_v_foc
+ f%k3%thin_h_angle=thin30%thin_h_angle
+ f%k3%thin_v_angle=thin30%thin_v_angle
+ f%k3%hf=thin30%hf
+ f%k3%vf=thin30%vf
+ f%k3%patch=thin30%patch 
+ f%k3%ls=thin30%ls
+endif
+endif
+end subroutine thin3_thin30
+
+subroutine  tp10_tp100(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+    
+
+ tp100%DRIFTKICK=F%tp10%DRIFTKICK
+     if(present(mf)) then
+     write(mf,NML=tp100_list)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=tp100_list)
+    endif   
+ F%tp10%DRIFTKICK=tp100%DRIFTKICK
+endif
+endif
+end subroutine tp10_tp100
+
+subroutine  k16_k160(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+ 
+ k160%DRIFTKICK=F%k16%DRIFTKICK
+ k160%LIKEMAD=F%k16%LIKEMAD
+     if(present(mf)) then
+     write(mf,NML=k160_list)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=k160_list)
+    endif   
+ F%k16%DRIFTKICK=k160%DRIFTKICK
+ F%k16%LIKEMAD=k160%LIKEMAD
+endif
+endif
+end subroutine k16_k160
+
+
+
+
+
 end module madx_keywords
+

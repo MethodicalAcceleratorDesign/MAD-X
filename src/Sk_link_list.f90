@@ -921,11 +921,15 @@ CONTAINS
        nullify(C%N)
        nullify(C%P)
 
-       IF(ASSOCIATED(C%T1)) THEN
-          if(associated(C%T1,C%TM)) nullify(C%TM)
-          deallocate(C%T1);
-          deallocate(C%T2);
-       ENDIF
+   !!! maybe missing per Sagan 2012.3.18       
+ !    IF(ASSOCIATED(C%T1)) THEN
+ !         if(associated(C%T1,C%TM)) nullify(C%TM)
+ !         deallocate(C%T1);
+ !         deallocate(C%T2);
+ !    ENDIF
+    nullify(C%T1,C%T2,C%Tm)
+  !!! maybe missing per Sagan 2012.3.18       
+    
        IF(ASSOCIATED(c%pos)) THEN
           deallocate(c%pos);
        ENDIF
@@ -2099,8 +2103,11 @@ CONTAINS
 
   SUBROUTINE  DEALLOC_INTEGRATION_NODE(T)
     IMPLICIT NONE
-    TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
-
+ !!! maybe missing per Sagan 2012.3.18       
+  ! TYPE(INTEGRATION_NODE), TARGET, INTENT(INOUT) :: T
+   TYPE(INTEGRATION_NODE), pointer, INTENT(INOUT) :: T
+!!! maybe missing per Sagan 2012.3.18       
+ 
     !    IF(ASSOCIATED(T%bb)) then
     !      CALL KILL(t%bb)
     !      DEALLOCATE(T%bb)
@@ -2133,6 +2140,9 @@ CONTAINS
     !       CALL KILL(T%TPSA_MAP)
     !       DEALLOCATE(T%TPSA_MAP)
     !    ENDIF
+!!! maybe missing per Sagan 2012.3.18       
+          DEALLOCATE(T)
+!!! maybe missing per Sagan 2012.3.18       
 
   END SUBROUTINE  DEALLOC_INTEGRATION_NODE
 

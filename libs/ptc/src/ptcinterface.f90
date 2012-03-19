@@ -18,12 +18,10 @@
   !      M_U=>orbit_universe
         
         write (*,*) "=============PTC INIT=====START==========="
-!    allocate(m_u)
-!    call set_up_universe(m_u)
-!    allocate(m_t)
-!    call set_up_universe(m_t)
-  call ptc_ini_no_append()
-
+    allocate(m_u)
+    call set_up_universe(m_u)
+    allocate(m_t)
+    call set_up_universe(m_t)
 !old        allocate(m_u)
 !old        call set_up_universe(m_u)
 !        call APPEND_EMPTY_LAYOUT(m_u)

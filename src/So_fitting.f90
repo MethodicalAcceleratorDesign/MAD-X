@@ -314,13 +314,15 @@ contains
     type(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
-    real(dp) dbetamax,db1,db2
+    real(dp) dbetamax,db1,db2,db31,db32,eta1,eta2
     real(dp),optional :: a(6,6),ai(6,6),mat(6,6),clos(6)
 
-    if(.not.associated(beta))   ALLOCATE(BETA(2,2,R%N))
+    if(.not.associated(beta))   ALLOCATE(BETA(2,3,R%N))
 
-
+eta1=zero
+eta2=zero
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
+    state=state+delta0
 
     if(present(clos)) then
        closed=clos
@@ -379,11 +381,16 @@ contains
           CALL TRACK(R,Y,i,i+1,STATE)
           beta(IB,1,i-pos+1)=(y(1).sub.'1')**2   + (y(1).sub.'01')**2
           beta(iB,2,i-pos+1)=(y(3).sub.'001')**2 + (y(3).sub.'0001')**2
-
+          beta(IB,3,i-pos+1)=y(1).sub.'00001'
+          
           IF(IB==2) THEN
              db1=ABS(beta(2,1,i-pos+1)-beta(1,1,i-pos+1))/beta(1,1,i-pos+1)
              db2=ABS(beta(2,2,i-pos+1)-beta(1,2,i-pos+1))/beta(1,2,i-pos+1)
+             db31=ABS(beta(1,3,i-pos+1))
+             db32=ABS(beta(2,3,i-pos+1)-beta(1,3,i-pos+1))
              DBETA=(db1+db2)/TWO+dbeta
+             eta1=db31+eta1
+             eta2=db32+eta2
              if( db1>dbetamax) dbetamax=db1
              if( db2>dbetamax) dbetamax=db2
           ENDIF
@@ -393,6 +400,8 @@ contains
 
        IF(IB==2) WRITE(6,*) "<DBETA/BETA> = ",DBETA
        IF(IB==2) WRITE(6,*) "MAXIMUM OF DBETA/BETA = ",dbetamax
+       IF(IB==2) WRITE(6,*) "<DETA/ETA> = ",eta2/eta1
+ 
     endif
     CALL kill(NORM)
     CALL kill(Y)
@@ -3482,8 +3491,8 @@ contains
 
     p=>r%start
     do i=1,r%n
-       p%mag%PERMFRINGE =changeanbn
-       p%magP%PERMFRINGE=changeanbn
+       p%mag%p%PERMFRINGE =changeanbn
+       p%magP%p%PERMFRINGE=changeanbn
        P=>P%next
     ENDDO
   end SUBROUTINE PUTFRINGE

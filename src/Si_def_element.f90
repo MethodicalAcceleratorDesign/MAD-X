@@ -988,7 +988,7 @@ CONTAINS
     TYPE(ELEMENT), INTENT(INOUT) ::EL
     !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
-    EL%P%permfringe=>EL%permfringe
+   ! EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
        if(.not.ASSOCIATED(EL%D0))ALLOCATE(EL%D0)
@@ -1403,7 +1403,7 @@ CONTAINS
     !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
 
-    EL%P%permfringe=>EL%permfringe
+!    EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
        if(.not.ASSOCIATED(EL%D0))ALLOCATE(EL%D0)
@@ -2298,7 +2298,7 @@ CONTAINS
     nullify(EL%PLOT);
     nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
 
-    nullify(EL%PERMFRINGE);
+!    nullify(EL%PERMFRINGE);
     nullify(EL%L);
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
@@ -2355,7 +2355,7 @@ CONTAINS
     nullify(EL%KIND);
     nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
 
-    nullify(EL%PERMFRINGE);
+!    nullify(EL%PERMFRINGE);
     nullify(EL%L);
     nullify(EL%AN);nullify(EL%BN);
     nullify(EL%FINT);nullify(EL%HGAP);
@@ -2414,7 +2414,7 @@ CONTAINS
        DEALLOCATE(EL%L);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
        call kill(EL%P)    ! AIMIN MS 4.0
-       DEALLOCATE(EL%PERMFRINGE);
+!       DEALLOCATE(EL%PERMFRINGE);
        !       IF(ASSOCIATED(EL%R)) DEALLOCATE(EL%R)
        !       IF(ASSOCIATED(EL%D)) DEALLOCATE(EL%D)
        IF(ASSOCIATED(EL%AN)) DEALLOCATE(EL%AN)
@@ -2562,7 +2562,7 @@ CONTAINS
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
        EL%electric=solve_electric
-       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
+!       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);
        !       ALLOCATE(EL%girder_index);
@@ -2734,7 +2734,7 @@ CONTAINS
 
        DEALLOCATE(EL%KIND);DEALLOCATE(EL%KNOB);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
-       DEALLOCATE(EL%PERMFRINGE);
+!       DEALLOCATE(EL%PERMFRINGE);
        CALL KILL(EL%L);DEALLOCATE(EL%L);
        CALL KILL(EL%FINT);DEALLOCATE(EL%FINT);
        CALL KILL(EL%HGAP);DEALLOCATE(EL%HGAP);
@@ -2808,7 +2808,7 @@ CONTAINS
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
        EL%electric=solve_electric
-       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
+!       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);CALL ALLOC(EL%L);EL%L=zero;
        ALLOCATE(EL%MIS);
        ! ALLOCATE(EL%EXACTMIS);
@@ -2862,7 +2862,7 @@ CONTAINS
     TYPE(ELEMENTP),INTENT(inOUT)::  ELP
     INTEGER J,i,N
 
-    ELP%PERMFRINGE=EL%PERMFRINGE
+!    ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
@@ -3191,7 +3191,7 @@ CONTAINS
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
-    ELP%PERMFRINGE=EL%PERMFRINGE
+!    ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
     ELP%KIND=EL%KIND
@@ -3500,7 +3500,7 @@ CONTAINS
 
     !    if(associated(el%siamese)) elp%siamese=>el%siamese
     !    if(associated(el%girder)) elp%girder=>el%girder
-    ELP%PERMFRINGE=EL%PERMFRINGE
+!    ELP%PERMFRINGE=EL%PERMFRINGE
     ELP%NAME=EL%NAME
     ELP%electric=EL%electric
     ELP%vorname=EL%vorname
