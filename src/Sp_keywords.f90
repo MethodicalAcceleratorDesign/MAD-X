@@ -1981,7 +1981,7 @@ do i=1,ring%n
   call el_el0(f%mag,my_true,mf)
   call fib_fib0(f,my_true,mf)
   CALL MC_MC0(f%MAG%P,my_true,mf)
-  CALL print_ElementLIST(f%mag,.true.,mf)
+  CALL print_ElementLIST(f%mag,my_true,mf)
  f=>f%next    
 enddo
 
@@ -2000,7 +2000,7 @@ do i=1,ring%n
   call el_el0(f%mag,my_false,mf)
   call fib_fib0(f,my_false,mf)
   CALL MC_MC0(f%MAG%P,my_false,mf) 
-  CALL print_ElementLIST(f%mag,.false.,mf)
+  CALL print_ElementLIST(f%mag,my_false,mf)
 
  
  
