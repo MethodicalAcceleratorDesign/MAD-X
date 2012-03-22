@@ -48,7 +48,7 @@ double
 rfc_slope(void)
   /* calculates the accumulated "slope" of all cavities */
 {
-  double slope = zero, lag, volt, harmon, charge, pc;
+  double slope = zero, harmon, charge, pc;
   struct node* c_node = current_sequ->range_start;
   struct element* el;
   charge = command_par_value("charge", current_beam);
@@ -59,8 +59,8 @@ rfc_slope(void)
     if (strcmp(el->base_type->name, "rfcavity") == 0 &&
         (harmon = command_par_value("harmon", el->def)) > zero)
     {
-      volt = command_par_value("volt", el->def);
-      lag = command_par_value("lag", el->def);
+      double volt = command_par_value("volt", el->def);
+      double lag = command_par_value("lag", el->def);
       slope += ten_m_3 * charge * volt * harmon * cos(twopi * lag) / pc;
     }
     if (c_node == current_sequ->range_end) break;
