@@ -1169,6 +1169,8 @@ SUBROUTINE twcpgo(rt)
   save=get_option('twiss_save ')
   call dcopy(opt_fun0,opt_fun,fundim)
 
+  print *, '****DISPERSION twcpgo is called****'
+
   !---- Initial values for lattice functions.
   betx    =opt_fun(3 )
   alfx    =opt_fun(4 )
@@ -1374,6 +1376,8 @@ SUBROUTINE twcptk(re,orbit)
   amuy0=zero
   alfy0=zero
   alfx0=zero
+
+  print *, '****DISPERSION twcptk is called****'
 
   !---- Dispersion.
   call dzero(dt,6)
@@ -1807,6 +1811,8 @@ SUBROUTINE twbttk(re,te)
   !---- Tor: needed for synchrotron integrals
   blen=node_value('blen ')
   rhoinv=node_value('rhoinv ')
+
+  print *, '****DISPERSION twbttk is called****'
 
   !---- Synchrotron integrals before element.
   if(.not.centre_bttk) then

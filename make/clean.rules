@@ -16,16 +16,16 @@
 # | $Id$
 # |
 
-.PHONY: clean cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
+.PHONY: clean cleandir cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
 
 clean:
 	$E "** Cleaning local files"
-	$_ $(RM) *.o
-	$_ $(RM) *.g90
-	$_ $(RM) *.mod
-	$_ $(RM) *.lst
 	$_ $(RM) core
 	$_ $(RM) *~
+
+cleandir: clean
+	$E "** Cleaning files in depth"
+	$_ $(FIND) . -name '*~' -exec $(RM) -i {} \;
 
 cleanc:
 	$E "** Cleaning C generated files"
@@ -51,7 +51,7 @@ cleanbuild:
 	$E "** Removing $(PROJECT)"
 	$_ $(RM) $(PROJECT)$(PROJEXT)
 
-cleanall: clean
+cleanall: cleandir
 	$E "** Removing" $(OBJDIR)
 	$_ $(RMDIR) $(OBJDIR)
   
