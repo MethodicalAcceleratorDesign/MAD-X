@@ -2282,7 +2282,7 @@ char command_def[] =
 "harmon   = [i, 0], "   /* AL: harmonic number of the RF-multipoles main mode */
 "lag      = [r, 0], "   /* AL: lag for the RF-multipoles main mode */
 "dpn      = [r, {0}], " /* AL: abssolute phase of the normal components of the multipole */
-"dps      = [r, {0}], " /* AL: absolute phase of the skew components of the multipole */
+"dps      = [r, {0}]; " /* AL: absolute phase of the skew components of the multipole */
 " "
 "sddsin: sdds none 0 0 "
 "table    = [s, none, none], "
