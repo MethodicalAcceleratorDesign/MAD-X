@@ -157,7 +157,7 @@ SUBROUTINE tmrefe(rt)
 
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     Transfer matris w.r.t. ideal orbit for one period.               *
+  !     Transfer matrix w.r.t. ideal orbit for one period.               *
   !     Ignores cavities, radiation, and imperfections.                  *
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *

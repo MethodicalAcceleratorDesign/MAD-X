@@ -1168,7 +1168,7 @@ subroutine ttyrot(track,ktrack)
 
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
-  !   Coordinate change due to rotation about s axis                     *
+  !   Coordinate change due to rotation about y axis                     *
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.        tmsrot      *

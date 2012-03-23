@@ -534,6 +534,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
       current_node = current_sequ->range_start;
       set_option("twiss_inval", &inval);
 
+// CALL TWISS
       twiss_(oneturnmat, disp0, tarr->i, dummy_arr->i); /* different call */
 
       if ((twiss_success = get_option("twiss_success")))
@@ -986,7 +987,8 @@ pro_twiss(void)
       adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
       adjust_rfc(); /* sets freq in rf-cavities from probe */
       current_node = current_sequ->ex_start;
-      /* invoke twiss */
+
+// CALL TWISS
       twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
       pos = name_list_pos("q1", summ_table->columns);
       q1_val_p = summ_table->d_cols[pos][i];
@@ -1005,7 +1007,8 @@ pro_twiss(void)
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;
-    /* invoke twiss */
+
+// CALL TWISS
     twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
     augment_count_("summ ");
     if ((twiss_success = get_option("twiss_success")))
