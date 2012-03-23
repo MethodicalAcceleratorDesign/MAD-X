@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += -O4
+LDFLAGS += -O$(NOPT)
 
 ifeq ($(ARCH),32)
 LDFLAGS += -Wl,-m32 -abi=32

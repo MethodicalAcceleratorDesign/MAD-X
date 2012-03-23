@@ -28,8 +28,8 @@ CXXDEP = $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 #
 
 CPPFLAGS += -D_ICC
-CFLAGS   = -m$(ARCH) -std=c99   -Wall -Wcheck -Wp64 -O3 -c
-CXXFLAGS = -m$(ARCH) -std=c++0x -Wall -Wcheck -Wp64 -O3 -c
+CFLAGS   = -m$(ARCH) -O$(NOPT) -std=c99   -Wall -Wcheck -Wp64 -c
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++0x -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics

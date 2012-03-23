@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH) -O3
+LDFLAGS += -m$(ARCH) -O$(NOPT)
 LDLIBS  +=
 
 #

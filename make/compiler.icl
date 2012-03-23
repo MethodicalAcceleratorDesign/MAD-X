@@ -35,8 +35,8 @@ endif
 #
 
 CPPFLAGS += -D_ICC
-CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O3 /c
-CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O3 /c
+CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O$(NOPT) /c
+CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c
 
 #
 # diagnostics
@@ -71,8 +71,8 @@ CXXFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
 # command translator
 #
 
-ICL_CC1 := -D%  -I%
-ICL_CC2 := /D%  /I%
+ICL_CC1 := -D%  -I% /O0
+ICL_CC2 := /D%  /I% /Od
 
 CC_tr  = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$1)))
 CXX_tr = $(CC_tr)

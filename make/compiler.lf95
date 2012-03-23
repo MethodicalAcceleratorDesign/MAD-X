@@ -28,10 +28,10 @@
 #
 
 CPPFLAGS += -D_LF95
-FFLAGS  = -Wa,--$(ARCH) --f95 --o2 --warn -c
+FFLAGS  = -Wa,--$(ARCH) --f95 --o$(NOPT) --warn -c
 
 # FFLAGS with no-optimization
-FFLAGS0 = $(subst --o2,--o0,$(FFLAGS))
+FFLAGS0 = $(patsubst $(SPACE)--o% , --o0 ,$(FFLAGS))
 
 #
 # options flags

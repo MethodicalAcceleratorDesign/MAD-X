@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH)
+LDFLAGS += -m$(ARCH) -O$(NOPT)
 
 ifeq ($(ARCH),32)
   # attemp to find the gnu libs directory for Lahey 32 bits! (GCC only)

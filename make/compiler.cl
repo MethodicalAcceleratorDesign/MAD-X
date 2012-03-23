@@ -37,10 +37,10 @@ endif
 #
 
 CPPFLAGS += -D_MCC
-CFLAGS    = /O2 /c
-CXXFLAGS  = /O2 /c
+CFLAGS    = /O$(NOPT) /c
+CXXFLAGS  = /O$(NOPT) /c
 
-# CFLAGS  = /Wall /O2 /c
+# CFLAGS  = /Wall /O$(NOPT) /c
 
 #
 # options flags
@@ -68,8 +68,8 @@ CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc
 # command translator
 #
 
-CL_CC1 := -D%  -I%
-CL_CC2 := /D%  /I%
+CL_CC1 := -D%  -I% /O3 /O0
+CL_CC2 := /D%  /I% /O2 /Od
 
 CC_tr  = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
 CXX_tr = $(CC_tr)

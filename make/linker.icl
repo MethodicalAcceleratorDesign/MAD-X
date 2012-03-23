@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += /nologo /O3 /extlnk:.o
+LDFLAGS += /nologo /O$(NOPT) /extlnk:.o
 
 #
 # options flags
@@ -46,6 +46,6 @@ endif
 # command translator
 #
 
-LD_tr = $(strip $(subst $(SPACE)-o , /Fe,$1))
+LD_tr = $(strip $(subst $(SPACE)/O0 , /Od ,$(subst $(SPACE)-o , /Fe,$1)))
 
 # end of makefile
