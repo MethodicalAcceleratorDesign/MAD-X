@@ -5061,7 +5061,7 @@ SUBROUTINE tmsymp(r)
   enddo
   call m66div(a,b,v,eflag)
   if (eflag) then
-    print *, 'tmsymp: error I-R is a singular matrix, simplectification of R cancelled'
+    print *, 'Twiss:tmsymp - error - singular matrix I-R occurred during simplectification (cancelled).'
   else
     call m66inv(v,a)
     do i = 1, 6
@@ -5074,7 +5074,7 @@ SUBROUTINE tmsymp(r)
     enddo
     call m66div(a,b,v,eflag)
     if (eflag) then
-      print *, 'tmsymp: error I-W is a singular matrix, simplectification of R cancelled'
+    print *, 'Twiss:tmsymp - error - singular matrix I-W occurred during simplectification (cancelled).'
     else
       call dcopy(v,r,36)
     endif
