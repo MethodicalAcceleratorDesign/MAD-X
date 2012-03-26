@@ -5060,16 +5060,25 @@ SUBROUTINE tmsymp(r)
      b(i,i) = b(i,i) + one
   enddo
   call m66div(a,b,v,eflag)
-  call m66inv(v,a)
-  do i = 1, 6
-     do j = 1, 6
-        a(i,j) = (a(i,j) - v(i,j)) / two
-        b(i,j) = - a(i,j)
-     enddo
-     b(i,i) = b(i,i) + one
-     a(i,i) = a(i,i) + one
-  enddo
-  call m66div(a,b,r,eflag)
+  if (eflag) then
+    print *, 'tmsymp: error I-R is a singular matrix, simplectification of R cancelled'
+  else
+    call m66inv(v,a)
+    do i = 1, 6
+       do j = 1, 6
+          a(i,j) = (a(i,j) - v(i,j)) / two
+          b(i,j) = - a(i,j)
+       enddo
+       b(i,i) = b(i,i) + one
+       a(i,i) = a(i,i) + one
+    enddo
+    call m66div(a,b,v,eflag)
+    if (eflag) then
+      print *, 'tmsymp: error I-W is a singular matrix, simplectification of R cancelled'
+    else
+      call dcopy(v,r,36)
+    endif
+  endif
 
 end SUBROUTINE tmsymp
 SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
