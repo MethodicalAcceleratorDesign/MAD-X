@@ -640,6 +640,29 @@ subroutine m66inv(source,target)
   enddo
 
 end subroutine m66inv
+subroutine m66symp(r,nrm)
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:
+  !   Check if a 6 by 6 matrix R is symplectic.
+  ! Input:
+  !   r(6,6)    (double)  Matrix R to check
+  ! Output:
+  !   nrm       (double)  The column norm of R'*J*R-J
+  !----------------------------------------------------------------------*
+  double precision R(6,6),J(6,6),T(6,6),nrm,z,o,n
+  parameter(z=0d0,o=1d0,n=-1d0)
+  J = reshape((/ z, o, z, z, z, z, &
+               & n, z, z, z, z, z, &
+               & z, z, z, o, z, z, &
+               & z, z, n, z, z, z, &
+               & z, z, z, z, z, o, &
+               & z, z, z, z, n, z /), shape(J))
+  call m66trm(R,J,T)
+  call m66mpy(T,R,T)
+  call m66sub(T,J,T)
+  call m66nrm(T,nrm)
+end subroutine m66symp
 subroutine m66mak(f2,target)
   implicit none
   !----------------------------------------------------------------------*

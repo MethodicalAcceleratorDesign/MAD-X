@@ -5048,8 +5048,8 @@ SUBROUTINE tmsymp(r)
   !----------------------------------------------------------------------*
   logical eflag
   integer i,j
-  double precision a(6,6),b(6,6),r(6,6),v(6,6),one,two
-  parameter(one=1d0,two=2d0)
+  double precision a(6,6),b(6,6),r(6,6),v(6,6),zero,one,two,nrm
+  parameter(zero=0d0,one=1d0,two=2d0)
 
   do i = 1, 6
      do j = 1, 6
@@ -5060,27 +5060,29 @@ SUBROUTINE tmsymp(r)
      b(i,i) = b(i,i) + one
   enddo
   call m66div(a,b,v,eflag)
-  if (eflag) then
-    print *, 'Singular matrix I-R occurred during simplectification (cancelled).'
-  else
-    call m66inv(v,a)
-    do i = 1, 6
-       do j = 1, 6
-          a(i,j) = (a(i,j) - v(i,j)) / two
-          b(i,j) = - a(i,j)
-       enddo
-       b(i,i) = b(i,i) + one
-       a(i,i) = a(i,i) + one
-    enddo
-    call m66div(a,b,v,eflag)
-    if (eflag) then
-    print *, 'Singular matrix I-W occurred during simplectification (cancelled).'
-    else
-      call dcopy(v,r,36)
-    endif
+  if (eflag) goto 100
+  call m66inv(v,a)
+  do i = 1, 6
+     do j = 1, 6
+        a(i,j) = (a(i,j) - v(i,j)) / two
+        b(i,j) = - a(i,j)
+     enddo
+     b(i,i) = b(i,i) + one
+     a(i,i) = a(i,i) + one
+  enddo
+  call m66div(a,b,v,eflag)
+  if (eflag) goto 100
+  call dcopy(v,r,36)
+  goto 999
+
+100 continue
+  call m66symp(r,nrm)
+  if (nrm .gt. zero) then
+    print *," Singular matrix occurred during simplectification of R (left unchanged)."
+    print *," The column norm of R'*J*R-J is",nrm
   endif
 
-end SUBROUTINE tmsymp
+999 end SUBROUTINE tmsymp
 SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
 
   use twiss0fi
