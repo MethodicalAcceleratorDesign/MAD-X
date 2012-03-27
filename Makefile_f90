@@ -128,10 +128,10 @@ gxx11ps.o:                  src/gxx11ps.f90                 util.o
 ibsdb.o:                    src/ibsdb.f90                   util.o
 mad_inif_f.o:               src/mad_inif_f.F90
 match.o:                    src/match.f90                   util.o
-matchjc.o:                  src/matchjc.f90                 util.o match.o
-matchlib.o:                 src/matchlib.f90                matchjc.o
+matchjc.o:                  src/matchjc.f90                 util.o match.o matchlib.o
+matchlib.o:                 src/matchlib.f90                matchlib2.o
 matchlib2.o:                src/matchlib2.f90
-matchsa.o:                  src/matchsa.f90                 util.o matchlib.o
+matchsa.o:                  src/matchsa.f90                 util.o
 orbf.o:                     src/orbf.f90
 plot.o:                     src/plot.f90                    util.o
 poisson.o:                  src/poisson.f90

@@ -716,8 +716,7 @@
 
       subroutine mtsvd(M,N,fjac,SV,U,VT)
       implicit none
-      integer M,N,IWORK,INFO
+      integer M,N,IWORK(30*(N+M)),INFO
       double precision fjac(m,n),SV(N+M),U(M,M),VT(N,N),WORK(1000*(N+M))
-      call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,                           &
-     &WORK, 1000*(N+M), IWORK, INFO )
+      call DGESDD('A',M,N,fjac,M,SV,U,M,VT,N,WORK,1000*(N+M),IWORK,INFO)
       end
