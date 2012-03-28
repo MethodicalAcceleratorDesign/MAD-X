@@ -178,19 +178,22 @@ write_table(struct table* t, char* filename)
   /* writes rows with columns listed in row and col */
 {
   char l_name[NAME_L];
-  char sys_name[200], t_pc[2*NAME_L];
+  char t_pc[2*NAME_L];
   char* pc = t_pc;
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
   int i, j, k, tmp, n;
   time_t now;
   struct tm* tm;
+#if 0
+  char sys_name[200];
 #ifndef _WIN32
   struct utsname u;
   i = uname(&u); /* get system name */
   strcpy(sys_name, u.sysname);
 #else // _WIN32
   strcpy(sys_name, "Win32");
+#endif
 #endif
 
   time(&now);    /* get system time */
@@ -226,10 +229,10 @@ write_table(struct table* t, char* filename)
               "@ TITLE            %%%02ds \"%s\"\n", n, title);
     }
 
-    n = strlen(version_name)+strlen(sys_name)+1;
+    n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
     fprintf(out_file,
-            "@ ORIGIN           %%%02ds \"%s %s\"\n",
-            n, version_name, sys_name);
+            "@ ORIGIN           %%%02ds \"%s %s %s\"\n",
+            n, version_name, version_ostype, version_arch);
 
     fprintf(out_file,
             "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
