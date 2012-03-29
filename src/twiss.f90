@@ -5079,7 +5079,7 @@ SUBROUTINE tmsymp(r)
   call m66symp(r,nrm)
   if (nrm .gt. zero) then
     print *," Singular matrix occurred during simplectification of R (left unchanged)."
-    print *," The column norm of R'*J*R-J is",nrm
+    print *," The column norm of R'*J*R-J is ",nrm
   endif
 
 999 end SUBROUTINE tmsymp

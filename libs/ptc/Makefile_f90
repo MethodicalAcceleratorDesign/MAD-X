@@ -86,4 +86,35 @@ ptcinterface.o:             src/ptcinterface.f90                  St_pointers.o
 
 endif
 
+#######################
+# check for gfortran version >= 4.4
+# set to gfortran44 on lxplus
+#
+
+ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+ifeq ($(FC),gfortran)
+ifeq ($(origin FC),file)
+FCVER  := $(word 4, $(shell $(FC) --version))
+FCVERL := $(subst ., ,$(FCVER))
+FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
+FCVER2 := 0
+  ifeq ($(FCVER1),4)
+  FCVER2 := $(findstring $(word 2,$(FCVERL)),"456789")
+  endif
+ifeq ($(and $(FCVER1),$(FCVER2)),)
+ifeq ($(findstring lxplus,$(HOST)),lxplus)
+$(warning PTC requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
+FC     := gfortran44
+FCNAME := gfortran
+ifeq ($(NOPT),3)
+NOPT   := 2 
+endif
+else
+$(error PTC requires gfortran >= 4.4 ($(FCVER) detected))
+endif # lxplus
+endif # version
+endif # origin
+endif # gfortran
+endif # cmdgoal
+
 # end of makefile
