@@ -134,7 +134,7 @@ struct c6t_element
     struct object* p_al_err; /* pointer to alignment error object */
     struct object* p_fd_err; /* pointer to field error object */
     struct object* p_ph_err; /* pointer to field phase error array AL: */
-    double freq;             /* frequency of the rf-multipole fields  AL: */
+    double rfm_freq;         /* frequency of the rf-multipole fields  AL: */
     int tilt_err;            /* allow write_f8 to dump tilt as well */
     int do_not_free;         /* avoid free crash */
 };
@@ -258,7 +258,7 @@ struct object
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 33          /* no. of valid element types */
+#define N_TYPES 37          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -294,6 +294,9 @@ static void att_vacdipole(struct c6t_element*);
 static void att_sbend(struct c6t_element*);
 static void att_sextupole(struct c6t_element*);
 static void att_vkicker(struct c6t_element*);
+static void att_rfquadrupole(struct c6t_element*);
+static void att_rfsextupole(struct c6t_element*);
+static void att_rfoctupole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
 static struct c6t_element* create_aperture(char* ,char* ,double , double , struct double_array*);
@@ -428,6 +431,10 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "solenoid     2       2       2       0       0       0",
  "hacdipole    3       3       3       0       0       2",
  "vacdipole    3       3       3       0       0       2",
+ "rfmultipole  2       0       2       0       0       2",
+ "rfquadrupole 2       0       2       0       0       2",
+ "rfsextupole  2       0       2       0       0       2",
+ "rfoctupole   2       0       2       0       0       2"
 };
 
 static char keep_these[MM_KEEP][24] = {"ip", "mt_"};
@@ -627,6 +634,9 @@ assign_att(void)
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
+        else if (strcmp(el->base_name, "rfquadrupole") == 0) att_rfquadrupole(el);
+        else if (strcmp(el->base_name, "rfsextupole") == 0) att_rfsextupole(el);
+        else if (strcmp(el->base_name, "rfoctupole") == 0) att_rfoctupole(el);
         else att_undefined(el);
       }
     }
@@ -941,6 +951,33 @@ att_undefined(struct c6t_element* el)
 }
 
 static void
+att_rfquadrupole(struct c6t_element* el)
+{
+  el->out_1 = 26;
+  el->out_2 = el->value[3];
+  el->out_3 = el->value[2];
+  el->out_4 = el->value[6];
+}
+
+static void
+att_rfsextupole(struct c6t_element* el)
+{
+  el->out_1 = 27;
+  el->out_2 = el->value[4];
+  el->out_3 = el->value[2];
+  el->out_4 = el->value[7];
+}
+
+static void
+att_rfoctupole(struct c6t_element* el)
+{
+  el->out_1 = 28;
+  el->out_2 = el->value[5];
+  el->out_3 = el->value[2];
+  el->out_4 = el->value[8];
+}
+
+static void
 block_it(void)
 {
   struct c6t_element* el;
@@ -1120,9 +1157,10 @@ static struct c6t_element*
 convert_madx_to_c6t(struct node* p)
 {
   struct command_parameter *kn_param = NULL,*ks_param = NULL,*aper_param = NULL;
-  int i,j,maxkn,maxks;
+  struct command_parameter *pn_param = NULL,*ps_param = NULL;
   struct c6t_element* c6t_elem = NULL;
   char t_name[255];
+  int i,j;
   char* cp;
   int index=-1;
 
@@ -1169,7 +1207,7 @@ convert_madx_to_c6t(struct node* p)
   }
   else if ((strcmp(p->base_name,"multipole") == 0))
   {
-    maxkn=0;maxks=0;
+    int maxkn=0, maxks=0;
     /*      if ((kn_param = return_param_recurse("knl",p->p_elem))) maxkn=kn_param->double_array->curr; */
     /*      if ((ks_param = return_param_recurse("ksl",p->p_elem))) maxks=ks_param->double_array->curr; */
     if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1)
@@ -1362,6 +1400,73 @@ convert_madx_to_c6t(struct node* p)
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+  }
+  else if (strcmp(p->base_name,"rfmultipole") == 0)
+  {
+    int maxkn=0, maxks=0, maxpn=0, maxps=0;
+    if ((index = name_list_pos("knl",p->p_elem->def->par_names))>-1)
+    {
+      kn_param = p->p_elem->def->par->parameters[index];
+      maxkn=kn_param->double_array->curr;
+    }
+    if ((index = name_list_pos("ksl",p->p_elem->def->par_names))>-1)
+    {
+      ks_param = p->p_elem->def->par->parameters[index];
+      maxks=ks_param->double_array->curr;
+    }
+    if ((index = name_list_pos("pnl",p->p_elem->def->par_names))>-1)
+    {
+      pn_param = p->p_elem->def->par->parameters[index];
+      maxpn=kn_param->double_array->curr;
+    }
+    if ((index = name_list_pos("psl",p->p_elem->def->par_names))>-1)
+    {
+      ps_param = p->p_elem->def->par->parameters[index];
+      maxps=ks_param->double_array->curr;
+    }
+    if (maxks>0) {
+    	printf("warning while converting rfmultipole: skew components are ignored\n");
+    }
+    if (maxkn>3) {
+    	printf("warning while converting rfmultipole: normal components beyond octupole are ignored\n");
+    }
+    
+    /*
+    ** In particular, for the RF multipoles:
+    ** Name: any name
+    ** type: 26, 27 or 28 for quadrupole, sextupole and octupole, respectively (note there are
+    ** no skew elements yet).
+    ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
+    ** n2: Frequency in MHz
+    ** n3: RF phase in radians 
+    */  
+
+    /* 
+    ** we have 9 parameters
+    ** value[0] = el_par_value_recurse("l",p->p_elem);
+    ** value[1] = el_par_value_recurse("tilt",p->p_elem);
+    ** value[2] = frequency in MhZ
+    ** value[3] = integrated quadrupole strength
+    ** value[4] = integrated sextupole strength
+    ** value[5] = integrated octupole strength
+    ** value[6] = phase for quadrupole
+    ** value[7] = phase for sextupole
+    ** value[8] = phase for octupole
+    */ 
+    
+    c6t_elem = new_c6t_element(8,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+ 
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+    c6t_elem->value[1] = el_par_value_recurse("tilt",p->p_elem);
+    c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
+    c6t_elem->value[3] = maxkn>=1?kn_param->double_array->a[1]:0.0;
+    c6t_elem->value[4] = maxkn>=2?kn_param->double_array->a[2]:0.0;
+    c6t_elem->value[5] = maxkn>=3?kn_param->double_array->a[3]:0.0;
+    c6t_elem->value[6] = maxpn>=1?pn_param->double_array->a[1]:0.0;
+    c6t_elem->value[7] = maxpn>=2?pn_param->double_array->a[2]:0.0;
+    c6t_elem->value[8] = maxpn>=3?pn_param->double_array->a[3]:0.0;
   }
   else
   {
@@ -1906,6 +2011,12 @@ mod_multipole(struct c6t_element* p)
 }
 
 static void
+mod_rfmultipole(struct c6t_element* p)
+{
+  supp_small_comp(p);
+}
+
+static void
 mod_octupole(struct c6t_element* p)
 {
   supp_small_comp(p);
@@ -2166,6 +2277,8 @@ pro_elem(struct node* cnode)
   else if (strcmp(cnode->base_name, "sextupole") == 0) mod_sextupole(current_element);
   else if (strcmp(cnode->base_name, "rfcavity") == 0) mod_rfcavity(current_element);
   else if (strcmp(cnode->base_name, "crabcavity") == 0) mod_crabcavity(current_element);
+  else if (strcmp(cnode->base_name, "rfmultipole") == 0) mod_rfmultipole(current_element);
+  
   if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
   {
     if (cnode->p_elem)
@@ -2212,6 +2325,7 @@ pro_elem(struct node* cnode)
       current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
   }
   /* if we have a tilt set the flag */
+  ///// AL: WARNING: NOT ALL ELEMENTS STORE "TILT" in value[6]
   if (current_element->n_values >= 7 && fabs(current_element->value[6]) > zero)
   {
     align_cnt++;
@@ -2347,13 +2461,12 @@ replace_c6t(struct c6t_element* old, struct c6t_element* new)
 static void
 split(void)
 {
-  int i;
-  struct c6t_element* el;
   if (split_list != NULL)
   {
+    int i;
     for (i = 0; i < split_list->curr; i++)
     {
-      el = split_list->elem[i];
+      struct c6t_element *el = split_list->elem[i];
       if (el->flag == 1
           && (split_flag != 0 || el->nf_err > 0)) split_special(el);
       else if (el->flag == 2 || el->flag == 3)  split_other(el);
@@ -2361,6 +2474,7 @@ split(void)
     }
   }
 }
+
 
 static void
 split_kicker(struct c6t_element* el)
@@ -2545,12 +2659,43 @@ write_all_el(void)
   fprintf(f2, "NEXT\n");
 }
 
+static void write_rfmultipole(struct c6t_element* el)
+{
+  char name[48];
+  if (fabs(el->value[3])>eps_9) {
+    att_rfquadrupole(el);
+    strcpy(name, el->name);
+    strcat(name, "_q");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  }
+  if (fabs(el->value[4])>eps_9) {
+    att_rfsextupole(el);
+    strcpy(name, el->name);
+    strcat(name, "_s");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  }
+  if (fabs(el->value[5])>eps_9) {
+    att_rfoctupole(el);
+    strcpy(name, el->name);
+    strcat(name, "_o");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  }
+}
+
 static void
 write_c6t_element(struct c6t_element* el)
 {
-  if (strcmp(el->name, "CAV") != 0)
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-            el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  if (strcmp(el->name, "CAV") != 0) {
+    if (strcmp(el->base_name, "rfmultipole")==0) { 
+      write_rfmultipole(el);
+    } else {
+      fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+    }
+  }
   el->w_flag = 1;
 }
 
