@@ -2145,10 +2145,9 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
        310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 310, 310), code
-  !     310, 320), code  ! Enable non-linear thin lens 
-  !     310, 320, 330), code  ! Enable RF-Multipole 
-  
+       310, 420, 430), code  ! Enable non-linear thin lens and RF-Multipole  
+  !     310, 310, 310), ! Disable non-linear thin lens and RF-Multipole
+   
   !---- Drift space, monitor, collimator, or beam instrument.
 10 continue
 170 continue
@@ -2252,12 +2251,12 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   go to 500
 
   !---- non-linear thin lens
-320 continue
+420 continue
   call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
   go to 500
 
   !---- RF-Multipole.
-330 continue
+430 continue
   call tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   go to 500
 
@@ -6467,8 +6466,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
        dpyr,zero,one,two,three, tilt, angle, dtmp
   double precision orbit00(6),re00(6,6),te00(6,6,6)
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
-  
-  
+
    !--- AL: RF-multipole
    double precision freq, volt, lag, harmon
    double precision pnl(0:maxmul), psl(0:maxmul)
