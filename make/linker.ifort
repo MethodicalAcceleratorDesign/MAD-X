@@ -30,6 +30,7 @@ LDFLAGS += -m$(ARCH) -O$(NOPT) -nofor-main
 ifneq ($(CXX_SRC),)
 LDFLAG += -cxxlib
 LDLIBS += -lstdc++
+#LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
 endif
 
 #
