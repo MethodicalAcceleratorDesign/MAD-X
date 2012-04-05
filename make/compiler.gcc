@@ -50,7 +50,7 @@ CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
 # diagnostics (gcc is the reference)
 #
 
-CFLAGS += -Wmissing-prototypes -Wmissing-declarations \
+CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
           -Wchar-subscripts -Wconversion -Wno-conversion -Winline \
           -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
           -Wstrict-prototypes

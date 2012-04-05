@@ -2123,6 +2123,13 @@ CONTAINS
     IF(ASSOCIATED(T%pos_in_fibre)) DEALLOCATE(T%pos_in_fibre)
     IF(ASSOCIATED(T%POS)) DEALLOCATE(T%POS)
     IF(ASSOCIATED(T%CAS)) DEALLOCATE(T%CAS)
+    !!! added by L. Deniau from H. Renschall
+    IF(ASSOCIATED(T%ref)) DEALLOCATE(T%ref)
+    IF(ASSOCIATED(T%delta_rad_in)) DEALLOCATE(T%delta_rad_in)
+    IF(ASSOCIATED(T%delta_rad_out)) DEALLOCATE(T%delta_rad_out)
+    IF(ASSOCIATED(T%TEAPOT_LIKE)) DEALLOCATE(T%TEAPOT_LIKE)
+    !!! added by L. Deniau from H. Renschall
+
     IF(ASSOCIATED(T%BB)) THEN
        CALL KILL(T%BB)
        DEALLOCATE(T%BB)
