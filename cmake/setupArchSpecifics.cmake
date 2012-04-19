@@ -41,11 +41,10 @@ if (APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 endif (APPLE)
 
-# Windows specifics:
 if (WIN32)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_WIN32  -D_CATCH_MEM_W")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32")
-else()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_CATCH_MEM")
+   add_definitions("-D_WIN32")
+elseif(APPLE)
+   add_definitions("-D_DARWIN")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   add_definitions("-D_LINUX")
 endif()
-
