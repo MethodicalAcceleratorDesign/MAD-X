@@ -1,10 +1,3 @@
-
-# OSX specifics:
-if(APPLE)
-  set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
-endif(APPLE)
-
 if ( IS32BIT )
     message(STATUS "32 bit build" ) 
     
@@ -44,8 +37,8 @@ endif ()
 
 # OSX specifics:
 if (APPLE)
-  set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
-        set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
+    set(CMAKE_LIBRARY_PATH /usr/lib/ /usr/X11/lib/ ${CMAKE_LIBRARY_PATH})
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
 endif (APPLE)
 
 # Windows specifics:
