@@ -1461,9 +1461,9 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[1] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
-    c6t_elem->value[3] = maxkn>=1?kn_param->double_array->a[1]:0.0;
-    c6t_elem->value[4] = maxkn>=2?kn_param->double_array->a[2]:0.0;
-    c6t_elem->value[5] = maxkn>=3?kn_param->double_array->a[3]:0.0;
+    c6t_elem->value[3] = maxkn>=1?(-kn_param->double_array->a[1]/1.0):0.0;
+    c6t_elem->value[4] = maxkn>=2?(-kn_param->double_array->a[2]/2.0):0.0;
+    c6t_elem->value[5] = maxkn>=3?(-kn_param->double_array->a[3]/6.0):0.0;
     c6t_elem->value[6] = maxpn>=1?pn_param->double_array->a[1]:0.0;
     c6t_elem->value[7] = maxpn>=2?pn_param->double_array->a[2]:0.0;
     c6t_elem->value[8] = maxpn>=3?pn_param->double_array->a[3]:0.0;
