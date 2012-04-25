@@ -3046,6 +3046,29 @@ write_f3_mult(struct c6t_element* el)
 }
 
 static void
+rfmultipole_name(char *name, struct c6t_element* el)
+{
+  char tmp[256] = "";
+  int n = 0;
+
+  if (fabs(el->value[3])>eps_9) {
+    strcpy(tmp, el->name);
+    strcat(tmp, "_q");
+    n += sprintf(name+n, "%-18s", tmp);
+  }
+  if (fabs(el->value[4])>eps_9) {
+    strcpy(tmp, el->name);
+    strcat(tmp, "_s");
+    n += sprintf(name+n, "%-18s", tmp);
+  }
+  if (fabs(el->value[5])>eps_9) {
+    strcpy(tmp, el->name);
+    strcat(tmp, "_o");
+    n += sprintf(name+n, "%-18s", tmp);
+  }
+}
+
+static void
 write_struct(void)
 {
   struct block* p = first_block;
@@ -3057,13 +3080,22 @@ write_struct(void)
   fprintf(f2, "%s\n", title);
   while (p != NULL)
   {
-    if (p->flag == 0) out = p->first->equiv->name;
-    else              out = p->equiv->name;
+    char name[256] = "";
+
+    if (p->flag == 0) {
+      if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0)
+        rfmultipole_name(name, p->first->equiv);
+      else
+        strcpy(name, p->first->equiv->name);
+    }
+    else
+      strcpy(name,p->equiv->name);
+
     if (lc++ == LINES_MAX)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-18s", out);
+    fprintf(f2, "%-18s", name);
     p = p->next;
   }
   if (lc > 0)

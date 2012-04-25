@@ -25,7 +25,7 @@
 #include "mad_types_f.h"
 #include "mad_extrn_f.h"
 
-// constants modules
+// constants and commands
 
 #include "mad_dict.h"
 
@@ -42,6 +42,7 @@
 #include "mad_macro.h"
 #include "mad_parse.h"
 #include "mad_range.h"
+#include "mad_table.h"
 #include "mad_regex.h"
 #include "mad_select.h"
 #include "mad_stream.h"
@@ -72,7 +73,6 @@
 #include "mad_seq.h"
 #include "mad_node.h"
 #include "mad_beam.h"
-#include "mad_table.h"
 
 // elements modules
 

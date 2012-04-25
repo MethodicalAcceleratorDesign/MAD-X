@@ -1327,12 +1327,12 @@ pro_correct2_response_ring(int ip, int nc, int nm)
               if(ip == 1) {
                   respx1 = cos((fabs(pix_m - pix_c)*twopi) - qx0*pi);
                   respx = respx1*sqrt(bx_m*bx_c)/(2.0*sin(pi*qx0));
-                  if(icb != 0) { respx =  respx; }
+                  if(icb != 0) { respx = respx; }
                   setup_(&respx, dmat, &im, &ic, &nm, &nc);
               }  else if (ip == 2) {
                   respy1 = cos((fabs(piy_m - piy_c)*twopi) - qy0*pi);
                   respy = respy1*sqrt(by_m*by_c)/(2.0*sin(pi*qy0));
-                  if(icb != 0) { respy =  respy; }
+                  if(icb != 0) { respy = respy; }
                   setup_(&respy, dmat, &im, &ic, &nm, &nc);
               }
               if((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) { 
