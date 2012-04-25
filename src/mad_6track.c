@@ -3073,7 +3073,6 @@ write_struct(void)
 {
   struct block* p = first_block;
   int lc = 0;
-  char* out;
   char title[] =
     "STRUCTURE INPUT---------------------------------------------------------";
 
