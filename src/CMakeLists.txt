@@ -1,16 +1,10 @@
 
 # list of source files
 file(GLOB mad_src
-    mad_*.c *.f90
+    mad_*.c
+    *.f90
     *.F90
-    *.cpp
-    madx_ptc*.f90
-    Sra_*.f90
-    mad_ptc*.c
-    S[p-t]_*.f90
-    ptc_*.f90
-    user2_photon.f90
-    wrap.f90)
+    *.cpp)
 file(GLOB mad_fpp_src [a-z]_*.f90 [a-z]_*.F90 tpsa.cpp)
 file(GLOB mad_ptc_core_src S[a-f]_*.f90)
 file(GLOB mad_ptc_src S[g-o]_*.f90 Sma*.f90)
