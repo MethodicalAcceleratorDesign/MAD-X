@@ -66,6 +66,9 @@ include $(makedir)/linker.$(LDNAME)
 # system specific settings
 -include $(makedir)/system.$(OSTYPE)
 
+# project tests
+-include $(FILE_TEST)
+
 # user's postprocessing extra stuff
 -include $(FILE_POST)
 

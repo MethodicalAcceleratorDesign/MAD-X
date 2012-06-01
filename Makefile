@@ -110,6 +110,7 @@ FILE_CXX  := Makefile_cxx          # setup project CXX_SRC and CXX_HDR
 FILE_F90  := Makefile_f90          # setup project FC_SRC
 FILE_LIB  := Makefile_lib          # setup project LIBS paths and libs
 FILE_SYS  := Makefile_sys          # setup project System specific stuffs
+FILE_TEST := Makefile_test         # setup project tests
 FILE_POST := Makefile_post         # user's postprocessing extra stuff
 
 ####################
