@@ -1,0 +1,51 @@
+README file for NUMDIFF utility
+-------------------------------
+
+Purpose
+-------
+
+  Diff files with numerical content. Allow to specify per-numeric constraints
+  - absolute, relative and content-specific relative accuracies - in an easy way.
+  Content other than numerics are strictly compared characters by characters.
+
+  Numdiff can diff ~100MB of data per second with hundred constraints on a
+  decent laptop.
+
+Usage
+-----
+
+Config examples
+---------------
+
+Config syntax
+-------------
+
+Comments:
+- line: # or !
+
+Statements:
+
+# row col eps-command
+*       *  dig=1
+10-100  *  rel=1e-7 abs=1e-12
+
+Rows and columns selections:
+
+- all:      *     (shortcut for 1-$)
+- last:     $
+- single:   num
+- range:    num-num       (beg-end, end included)
+- range_s:  num-num/num   (beg-end/step)
+- slice:    num:num       (beg:len, beg+len not included)
+- slice_s:  num:num/num   (beg:len/step, beg+len*step not included)
+
+Commands:
+
+- dig=eps
+- rel=eps
+- abs=eps
+- equ
+- ign
+- skip
+
+

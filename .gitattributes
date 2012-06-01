@@ -575,6 +575,25 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tools/numdiff/Makefile -text
+tools/numdiff/Makefile_c -text
+tools/numdiff/README -text
+tools/numdiff/src/constraint.c -text
+tools/numdiff/src/constraint.h -text
+tools/numdiff/src/context.c -text
+tools/numdiff/src/context.h -text
+tools/numdiff/src/error.c -text
+tools/numdiff/src/error.h -text
+tools/numdiff/src/main.c -text
+tools/numdiff/src/ndiff.c -text
+tools/numdiff/src/ndiff.h -text
+tools/numdiff/src/ploop.h -text
+tools/numdiff/src/slice.h -text
+tools/numdiff/src/types.h -text
+tools/numdiff/src/utest.c -text
+tools/numdiff/src/utest.h -text
+tools/numdiff/src/utils.c -text
+tools/numdiff/src/utils.h -text
 win/tpsa.dll -text svneol=unset#unset
 win/tpsa.lib -text svneol=unset#unset
 win/win32calls.fi -text
