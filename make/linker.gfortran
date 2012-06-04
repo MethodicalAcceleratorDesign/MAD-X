@@ -22,6 +22,10 @@
 
 LDFLAGS += -m$(ARCH) -O3
 
+ifeq ($(OSTYPE),Darwin)
+LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
+endif
+
 ifneq ($(CXX_SRC),)
 LDLIBS += -lstdc++
 #LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
