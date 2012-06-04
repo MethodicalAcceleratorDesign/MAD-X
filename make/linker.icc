@@ -23,6 +23,10 @@
 LDFLAGS += -m$(ARCH) -O$(NOPT)
 LDLIBS  +=
 
+ifeq ($(OSTYPE),Darwin)
+LDFLAGS += -mmacosx-version-min=10.5
+endif
+
 #
 # options flags
 #
