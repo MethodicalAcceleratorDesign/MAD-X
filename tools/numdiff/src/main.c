@@ -66,7 +66,7 @@ diff_summary(const struct ndiff *dif)
 int
 main(int argc, const char* argv[])
 {
-  int debug = 0, serie = 0, quiet = 0;
+  int debug = 0, serie = 0;
   const char *fmt = "%d";
   const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
   logmsg_config.level = inform_level;
@@ -87,23 +87,29 @@ main(int argc, const char* argv[])
 
     // set debug mode [setup]
     if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
-      inform("debug mode on");
       logmsg_config.level = debug_level;
+      debug("debug mode on");
       debug = 1;
+      continue;
+    }
+
+    // set info mode [setup]
+    if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "-info")) {
+      debug("info mode on");
+      logmsg_config.level = inform_level;
       continue;
     }
 
     // set quiet mode [setup]
     if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "-quiet")) {
+      debug("quiet mode on");
       logmsg_config.level = warning_level;
-      quiet = 1;
       continue;
     }
 
     // set serie mode [setup]
     if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-serie")) {
-      inform("serie mode on");
-      serie = 1;
+      debug("serie mode on");
       continue;
     }
 
@@ -111,7 +117,7 @@ main(int argc, const char* argv[])
     if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "-format")) {
       if (serie) {
         fmt = argv[++i];
-        if (debug) inform("format set to '%s'", fmt);
+        debug("format set to '%s'", fmt);
       } else {
         i += 1;
         inform("serie mode is off, format ignored");
