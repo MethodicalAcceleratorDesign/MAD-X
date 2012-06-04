@@ -16,10 +16,8 @@
 # | $Id$
 # |
 
-.PHONY: $(PROJECT)
-
 $(PROJECT): $(OBJECTS)
 	$E "*** Linking $(@F)"
-	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $@$(PROJEXT) $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
+	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $@ $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
 
 # end of makefile
