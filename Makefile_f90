@@ -152,7 +152,7 @@ endif
 # set to gfortran44 on lxplus
 #
 
-ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+ifneq ($(filter $(PROJECT),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
 ifeq ($(origin FC),file)
 FCVER  := $(word 4, $(shell $(FC) --version))
