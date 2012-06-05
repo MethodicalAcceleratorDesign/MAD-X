@@ -576,6 +576,10 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tests/test-jacobian-2/cfg.txt -text
+tests/test-jacobian-2/out.txt -text
+tests/test-jacobian-2/ref.txt -text
+tests/test-jacobian-2/test-jacobian2.madx -text
 tests/test-jacobian-knobs/cfg.txt -text
 tests/test-jacobian-knobs/cfg1.txt -text
 tests/test-jacobian-knobs/out.txt -text
@@ -586,9 +590,6 @@ tests/test-jacobian-knobs/test-jacobian-knobs.madx -text
 tests/test-jacobian/cfg.txt -text
 tests/test-jacobian/ref.txt -text
 tests/test-jacobian/test-jacobian.madx -text
-tests/test-jacobian2/cfg.txt -text
-tests/test-jacobian2/ref.txt -text
-tests/test-jacobian2/test-jacobian2.madx -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
 tools/numdiff/README -text
