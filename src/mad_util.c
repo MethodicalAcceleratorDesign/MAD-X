@@ -12,12 +12,14 @@ intrac(void)
 }
 
 #else // _WIN32
+#include <io.h>
+#define STDIN_FILENO 0
 
 int
 intrac(void)
 {
-  // always interactive on windows
-  return 1;
+  /* returns non-zero inf program is used interactively, else 0 */
+  return _isatty(STDIN_FILENO);
 }
 
 #endif
