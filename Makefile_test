@@ -19,12 +19,18 @@
 #################################################
 # testsuite
 
+# tests list
+# test-case must be short and should test features only
+# test-user can be longer and should test if studies are working
+
 test-case := test-jacobian test-jacobian-2 test-jacobian-knobs
 test-user :=
 
 # testsuite titles (attached to first rule of the suite)
 
 test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
+
+
 
 # end of testsuite
 #################################################
