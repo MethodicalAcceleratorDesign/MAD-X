@@ -17,6 +17,7 @@
 # |
 
 # some useful variables
+EMPTY :=
 SPACE := 
 SPACE +=
 
