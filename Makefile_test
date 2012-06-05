@@ -22,7 +22,7 @@
 test-case := test-jacobian test-jacobian-2 test-jacobian-knobs
 test-user :=
 
-# testsuite titles (attached to first rule)
+# testsuite titles (attached to first rule of the suite)
 
 test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
 
@@ -30,14 +30,21 @@ test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
 #################################################
 # implementation
 
-# tests selection (from tests directory)
+# directory selection (from tests)
 
-ifeq ($(TESTDIR),yes)
+ifdef TESTDIR
+ifeq ($(TESTDIR),detect)
 test-case := $(notdir $(wildcard tests/*))
-test-user := 
+test-user :=
+else 
+test-case := $(TESTDIR)
+test-user :=
+endif
 endif
 
-# $(warning tests-list = $(test-case) $(test-user))
+check-test-dirs := \
+   $(foreach dir,$(test-case) $(test-user),\
+     $(call exists,tests/$(dir),invalid test directory tests/$(dir)))
 
 # tests helper
 
