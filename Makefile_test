@@ -17,7 +17,29 @@
 # |
 
 #################################################
-# vars & macro helper
+# testsuite
+
+test-case := test-jacobian test-jacobian-2 test-jacobian-knobs
+test-user :=
+
+# testsuite titles (attached to first rule)
+
+test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
+
+# end of testsuite
+#################################################
+# implementation
+
+# tests selection (from tests directory)
+
+ifeq ($(TESTDIR),yes)
+test-case := $(notdir $(wildcard tests/*))
+test-user := 
+endif
+
+# $(warning tests-list = $(test-case) $(test-user))
+
+# tests helper
 
 MADX    := $(PROJECT)
 NDIFF   := numdiff$(ARCH)
@@ -28,30 +50,20 @@ test-%: NDIFF := ../../$(NDIFF)
 define run-test
 $_ cd tests/$@ ; $(RM) out*.txt ; \
 $(MADX) < $@.madx > out.txt ; \
-$(NDIFF) -q -s -t $@ $(NDFLAGS) out.txt ref.txt cfg.txt
+$(NDIFF) -q -n -t $@ $(NDFLAGS) out.txt ref.txt cfg.txt
 endef
 
-# end of settings
-#################################################
+# tests rules
 
 .PHONY: tools tests test-case test-user
 
 tests: tools test-case test-user
-
-#################################################
-# testsuite
-
-test-case: test-jacobian
-test-user:
-
-# test-rules
-
-test-jacobian:
+test-case: $(test-case)
+test-user: $(test-user)
+$(test-case) $(test-user):
 	$(run-test)
 
-
-#################################################
-# tools (numdiff)
+# tests tools
 
 tools: $(NDIFF)
 
