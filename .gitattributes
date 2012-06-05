@@ -579,7 +579,7 @@ testing/underConstruction.gif -text svneol=unset#unset
 tests/test-jacobian-2/cfg.txt -text
 tests/test-jacobian-2/out.txt -text
 tests/test-jacobian-2/ref.txt -text
-tests/test-jacobian-2/test-jacobian2.madx -text
+tests/test-jacobian-2/test-jacobian-2.madx -text
 tests/test-jacobian-knobs/cfg.txt -text
 tests/test-jacobian-knobs/cfg1.txt -text
 tests/test-jacobian-knobs/out.txt -text
