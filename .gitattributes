@@ -9,6 +9,7 @@
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_sys -text
+/Makefile_test -text
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text
