@@ -395,7 +395,7 @@ quit_diff:
           dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
   char str[128];
-  snprintf(str, sizeof str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
+  sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
   warning(str, dif->cnt_i, lhs_p, rhs_p);
   ret = 1;
 

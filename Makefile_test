@@ -56,8 +56,8 @@ check-test-dirs := \
 
 # tests helper
 
-MADX    := $(PROJECT)
-NDIFF   := numdiff$(ARCH)
+MADX    := $(PROJECT)$(EXE)
+NDIFF   := numdiff$(ARCH)$(EXE)
 
 test-%: MADX  := ../../$(MADX)
 test-%: NDIFF := ../../$(NDIFF)

@@ -32,14 +32,14 @@ const double *const pow10_table99 = &pow10_tbl[99];
 FILE*
 open_indexedFile(const char* str, int idx, const char *fmt, int strict)
 {
-  char buf[FILENAME_MAX];
+  char buf[FILENAME_MAX+100];
 
   strncpy(buf, str, sizeof buf);
 
   if (idx > 0) {
     const char *dot = strrchr(str, '.');
     const int pos = dot ? dot-str : (int)strlen(buf);
-    snprintf(buf+pos, sizeof buf - pos, fmt, idx);
+    sprintf(buf+pos, fmt, idx);
     strncat(buf+pos, dot, sizeof buf - pos);
   }
 

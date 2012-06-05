@@ -10,6 +10,14 @@ FILE* open_indexedFile(const char* str, int idx, const char *fmt, int strict);
 
 // inline functions
 
+#if !__STDC__ || __STDC_VERSION__ < 199901L
+static inline int
+isblank(int c)
+{
+  return c == ' ' || c == '\t';
+}
+#endif
+
 static inline int
 imin (int a, int b)
 {
