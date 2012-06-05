@@ -37,6 +37,7 @@ usage(void)
   inform("usage:");
   inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
   inform("options:");
+  inform("\t-t    -test name    set test name for output message");
   inform("\t-s    -serie        enable serie mode (indexed filenames)");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
@@ -54,19 +55,25 @@ invalid(void)
   usage();
 }
 
-static void
-diff_summary(const struct ndiff *dif)
+static int
+diff_summary(const struct ndiff *dif, const char *tst)
 {
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c);
   inform("% 6d lines have been diffed", n);
   inform("% 6d diffs have been detected", c);
+
+  if (tst)
+    fprintf(stdout, "%-50s %s\n", tst, c ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
+
+  return c;
 }
 
 int
 main(int argc, const char* argv[])
 {
-  int debug = 0, serie = 0;
+  int n, debug = 0, serie = 0;
+  const char *tst = 0;
   const char *fmt = "%d";
   const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
   logmsg_config.level = inform_level;
@@ -88,6 +95,7 @@ main(int argc, const char* argv[])
     // set debug mode [setup]
     if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
       logmsg_config.level = debug_level;
+      logmsg_config.locate = 1;
       debug("debug mode on");
       debug = 1;
       continue;
@@ -97,6 +105,7 @@ main(int argc, const char* argv[])
     if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "-info")) {
       debug("info mode on");
       logmsg_config.level = inform_level;
+      logmsg_config.locate = 0;
       continue;
     }
 
@@ -104,12 +113,21 @@ main(int argc, const char* argv[])
     if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "-quiet")) {
       debug("quiet mode on");
       logmsg_config.level = warning_level;
+      logmsg_config.locate = 0;
       continue;
     }
 
     // set serie mode [setup]
     if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-serie")) {
       debug("serie mode on");
+      serie = 1;
+      continue;
+    }
+
+    // set test name [setup]
+    if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-test")) {
+      tst = argv[++i];
+      debug("test name set to '%s'", tst);
       continue;
     }
 
@@ -144,8 +162,7 @@ main(int argc, const char* argv[])
     if (cfg_s) cfg_fp = open_indexedFile(cfg_s, i, fmt, 0);
 
     // serie number
-    if (debug && i)
-      fprintf(stderr, "serie #%d\n", i);
+    if (i) inform("serie #%d\n", i);
 
     // create context of constraints
     struct context *cxt = context_alloc(0);
@@ -164,7 +181,7 @@ main(int argc, const char* argv[])
     ndiff_loop(dif, cxt, debug);
 
     // print summary
-    diff_summary(dif);
+    n = diff_summary(dif, tst);
 
     // destroy components
     ndiff_free(dif);
@@ -179,6 +196,6 @@ main(int argc, const char* argv[])
     if (!serie) break;
   }
 
-  return EXIT_SUCCESS;
+  return n ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
