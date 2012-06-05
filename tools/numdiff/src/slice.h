@@ -1,7 +1,6 @@
 #ifndef SLICE_H
 #define SLICE_H
 
-#include <stdbool.h>
 #include "types.h"
 #include "error.h"
 

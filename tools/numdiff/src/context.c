@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include <stdlib.h>
 #include <assert.h>
 
@@ -60,18 +59,6 @@ cmpRow (const C *cst1, const C *cst2)
   // sorted by (> row last, > idx)
   return slice_last(row1) < slice_last(row2) ?  1
        : slice_last(row1) > slice_last(row2) ? -1
-       : cst1 < cst2 ? 1 : -1;
-}
-
-static inline int
-cmpCol (const C *cst1, const C *cst2)
-{
-  const struct slice *col1 = &cst1->col;
-  const struct slice *col2 = &cst2->col;
-
-  // sorted by (> col last, > idx)
-  return slice_last(col1) < slice_last(col2) ?  1
-       : slice_last(col1) > slice_last(col2) ? -1
        : cst1 < cst2 ? 1 : -1;
 }
 
@@ -393,28 +380,28 @@ enum { NROW = 5, NCOL = 5 };
 static void
 ut_trace(const T *cxt, int i, int j, const C* cst1, const C* cst2)
 {
-  fprintf(stderr, "(%u,%u)\n", i, j);
+  fprintf(stderr, "(%d,%d)\n", i, j);
   if (cst1) {
-    fprintf(stderr, "[%u].1: ", context_findIdx(cxt, cst1));
+    fprintf(stderr, "[%d].1: ", context_findIdx(cxt, cst1));
     constraint_print(cst1, stderr);
     putc('\n', stderr);
   }
   if (cst2) {
-    fprintf(stderr, "[%u].2: ", context_findIdx(cxt, cst2));
+    fprintf(stderr, "[%d].2: ", context_findIdx(cxt, cst2));
     constraint_print(cst2, stderr);
     putc('\n', stderr);
   }
   fprintf(stderr, "{F} ");
   for(int i = 0; i < cxt->fut_n; i++)
-    fprintf(stderr, "%u ", context_findIdx(cxt, cxt->fut[i]));
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->fut[i]));
 
   fprintf(stderr, "\n{A} ");
   for(int i = 0; i < cxt->act_n; i++)
-    fprintf(stderr, "%u ", context_findIdx(cxt, cxt->act[i]));
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->act[i]));
 
   fprintf(stderr, "\n{R} ");
   for(int i = 0; i < cxt->row_n; i++)
-    fprintf(stderr, "%u ", context_findIdx(cxt, cxt->row[i]));
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->row[i]));
 
   putc('\n', stderr);
 }
