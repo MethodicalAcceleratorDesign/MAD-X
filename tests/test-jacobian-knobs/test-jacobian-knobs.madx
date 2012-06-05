@@ -19,4 +19,4 @@ m1: macro={;};
 constraint,expr= x1+3*x2=1;
 constraint,expr= x1+1*x2=1;
 jacobian,calls=20,tolerance=1.e-21;
-endmatch,knobfile="knob2.madx";
+endmatch,knobfile="out1.txt";

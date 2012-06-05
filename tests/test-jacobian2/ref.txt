@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.16  (32 bit, Darwin)      +
+  +    MAD-X 5.00.16  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.04.05      +
-  + Execution Time Stamp: 01.06.12 16.47.56 +
+  + Execution Time Stamp: 05.06.12 10.38.39 +
   +++++++++++++++++++++++++++++++++++++++++++
 match,use_macro;
 
@@ -124,5 +124,5 @@ VARIABLE "TAR" SET TO   0.00000000e+00
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.16 32 finished normally +
+  + MAD-X 5.00.16 64 finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
