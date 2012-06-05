@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 #include "context.h"
 #include "constraint.h"
 #include "ndiff.h"
@@ -37,8 +38,9 @@ usage(void)
   inform("usage:");
   inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
   inform("options:");
-  inform("\t-t    -test name    set test name for output message");
-  inform("\t-s    -serie        enable serie mode (indexed filenames)");
+  inform("\t-s    -suite name   set testsuite name for output message (title)");
+  inform("\t-t    -test name    set test name for output message (item)");
+  inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
   inform("\t-d    -debug        enable debug mode");
@@ -56,30 +58,27 @@ invalid(void)
 }
 
 static int
-diff_summary(const struct ndiff *dif, const char *tst)
+diff_summary(const struct ndiff *dif)
 {
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c);
   inform("% 6d lines have been diffed", n);
   inform("% 6d diffs have been detected", c);
-
-  if (tst)
-    fprintf(stdout, "%-50s %s\n", tst, c ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
-
   return c;
 }
 
 int
 main(int argc, const char* argv[])
 {
-  int n, debug = 0, serie = 0;
-  const char *tst = 0;
+  int failed = 0, debug = 0, serie = 0, utest = 0;
+  const char *suite = 0, *test = 0;
   const char *fmt = "%d";
   const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
   logmsg_config.level = inform_level;
 
   // parse command line arguments
-  for (int i = 1; i < argc; i++) {
+  int i;
+  for (i = 1; i < argc; i++) {
 
     // display help [immediate]
     if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-help")) {
@@ -89,6 +88,7 @@ main(int argc, const char* argv[])
     // run utests [immediate]
     if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "-utest")) {
       run_utest();
+      utest += 1;
       continue;
     }
 
@@ -118,16 +118,23 @@ main(int argc, const char* argv[])
     }
 
     // set serie mode [setup]
-    if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-serie")) {
+    if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "-serie")) {
       debug("serie mode on");
       serie = 1;
       continue;
     }
 
+    // set suite name [setup]
+    if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-suite")) {
+      suite = argv[++i];
+      debug("suite name set to '%s'", suite);
+      continue;
+    }
+
     // set test name [setup]
     if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-test")) {
-      tst = argv[++i];
-      debug("test name set to '%s'", tst);
+      test = argv[++i];
+      debug("test name set to '%s'", test);
       continue;
     }
 
@@ -150,19 +157,31 @@ main(int argc, const char* argv[])
   }
 
   // checks
-  if (!lhs_s || !rhs_s) invalid();
+  if (!lhs_s || !rhs_s) {
+    if (i == argc-utest) invalid();
+    else exit(EXIT_SUCCESS);
+  }
+
+  // testsuite
+  if (suite)
+    fprintf(stdout, " [ %s ]\n", suite);
+
+  // timer
+  double t0 = clock();
 
   // serie loop
-  for (int i = 0; i >= 0; i++) {
+  int n = 0;
+  while (1) {
     FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
 
     // open files
-               lhs_fp = open_indexedFile(lhs_s, i, fmt, serie && i);
-               rhs_fp = open_indexedFile(rhs_s, i, fmt, 0);
-    if (cfg_s) cfg_fp = open_indexedFile(cfg_s, i, fmt, 0);
+    lhs_fp = open_indexedFile(lhs_s, n, fmt, !(serie && n));
+    if (!lhs_fp) break;
+    rhs_fp = open_indexedFile(rhs_s, n, fmt, 1);
+    if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, fmt, 1);
 
     // serie number
-    if (i) inform("serie #%d\n", i);
+    if (n) inform("serie #%d\n", n);
 
     // create context of constraints
     struct context *cxt = context_alloc(0);
@@ -172,7 +191,7 @@ main(int argc, const char* argv[])
 
     // show constraints
     if (debug) {
-      fprintf(stderr, "rules list:\n");
+      inform("rules list:");
       context_print(cxt, stderr);
     }
 
@@ -181,7 +200,7 @@ main(int argc, const char* argv[])
     ndiff_loop(dif, cxt, debug);
 
     // print summary
-    n = diff_summary(dif, tst);
+    if (diff_summary(dif) > 0) ++failed;
 
     // destroy components
     ndiff_free(dif);
@@ -194,8 +213,17 @@ main(int argc, const char* argv[])
 
     // not a serie, stop
     if (!serie) break;
+
+    n += 1;
   }
 
-  return n ? EXIT_FAILURE : EXIT_SUCCESS;
+  double t1 = clock();
+  double t = (t1 - t0) / CLOCKS_PER_SEC;
+
+  if (test)
+    fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", test, t, n-failed, n,
+            failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
+
+  return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 

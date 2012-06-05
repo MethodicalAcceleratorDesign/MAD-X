@@ -30,7 +30,7 @@ static const double pow10_tbl[2*99+1] = {
 const double *const pow10_table99 = &pow10_tbl[99];
 
 FILE*
-open_indexedFile(const char* str, int idx, const char *fmt, int do_exit)
+open_indexedFile(const char* str, int idx, const char *fmt, int strict)
 {
   char buf[FILENAME_MAX];
 
@@ -44,12 +44,10 @@ open_indexedFile(const char* str, int idx, const char *fmt, int do_exit)
   }
 
   FILE *fp = fopen(buf, "r");
-  if (!fp) {
-    if (do_exit) exit(EXIT_SUCCESS);
+  if (!fp && strict)
     ensure(fp, "failed to open %s", buf);
-  }
 
-  if (BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
+  if (fp && BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
     fclose(fp);
     error("unable to resize the stream buffer size");
   }
