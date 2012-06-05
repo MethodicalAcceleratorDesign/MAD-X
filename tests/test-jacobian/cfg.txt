@@ -1,0 +1,7 @@
+1-7  *   skip         # head
+75-$ *   skip         # tail
+*    *   dig=1e2
+37   3   abs=1e-21
+65   1   rel=1e-10
+66   1   abs=1e-15
+

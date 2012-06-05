@@ -1,0 +1,78 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.16  (32 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.04.05      +
+  + Execution Time Stamp: 31.05.12 15.38.54 +
+  +++++++++++++++++++++++++++++++++++++++++++
+x1=0.1;
+
+match,use_macro;
+
+vary,name=x1;
+
+vary,name=x2;
+
+m1: macro={;};
+
+constraint,expr= x1+3*x2=1;
+
+constraint,expr= x1+1*x2=1;
+
+jacobian,calls=20,tolerance=1.e-21;
+
+number of variables:    2
+user given constraints: 0
+total constraints:      2
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.1620000000000000E+01
+
+
+ Solve system with            2 con,           2 var
+ Rank             2   Condition number   5.82842712474619     
+ Step length  0.899999999999851     
+call:     2 Dx =   0.90000000E+00  Penalty function =  0.4463902367581577E-23
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:  0.948683298049726     
+endmatch;
+
+
+MATCH SUMMARY
+
+--------------------------------------------------------------------
+macro: m1                  
+  constraint: x1+3*x2=1                               
+  values:     +1.00000e+00=+1.00000e+00
+  weight:     +1.00000e+00
+  penalty:    -1.49403e-12
+
+  constraint: x1+1*x2=1                               
+  values:     +1.00000e+00=+1.00000e+00
+  weight:     +1.00000e+00
+  penalty:    -1.49392e-12
+
+
+
+Final Penalty Function =   4.46390237e-24
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+x1                        1.00000e+00  1.00000e-01 -1.00000e+20  1.00000e+20
+x2                       -3.92523e-17  0.00000e+00 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   4.46390237e-24
+
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.16 32 finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
