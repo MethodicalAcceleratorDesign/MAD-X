@@ -36,7 +36,7 @@ test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
 
 ifdef TESTDIR
 ifeq ($(TESTDIR),detect)
-test-case := $(notdir $(wildcard tests/*))
+test-case := $(notdir $(wildcard tests/test-*))
 test-user :=
 else 
 test-case := $(TESTDIR)
