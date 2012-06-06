@@ -222,7 +222,11 @@ main(int argc, const char* argv[])
 
   if (test)
     fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", test, t, n-failed, n,
+#ifdef _WIN32
+            failed ? "FAIL" : "PASS");
+#else
             failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
+#endif
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }

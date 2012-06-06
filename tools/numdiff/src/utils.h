@@ -16,6 +16,18 @@ isblank(int c)
 {
   return c == ' ' || c == '\t';
 }
+
+static inline double
+fmin(double a, double b)
+{
+  return a < b ? a : b;
+}
+
+static inline double
+fmax(double a, double b)
+{
+  return a > b ? a : b;
+}
 #endif
 
 static inline int

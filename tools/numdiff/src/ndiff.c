@@ -41,6 +41,9 @@ parse_number (char *buf, int *d_, int *n_, int *e_)
 {
   int i = 0, d = 0, n = 0, e = 0;
 
+  // spaces
+  while(isblank(buf[i])) i++;
+
   // sign
   if (buf[i] == '+' || buf[i] == '-') i++;
 
@@ -338,6 +341,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // invalid numbers
   if (!l1 || !l2) {
     l1 = l2 = 20;
+    warning("(%d) one number is missing", dif->cnt_i+1);
     goto quit_diff;
   }
 
@@ -346,8 +350,10 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
     goto quit;
 
   // ...required
-  if (c->eps.cmd == eps_equ)
+  if (c->eps.cmd == eps_equ) {
+    warning("(%d) numbers strict representation differ", dif->cnt_i+1);
     goto quit_diff;
+  }
 
   lhs_d = strtod(lhs_p, &end); assert(end == lhs_p+l1);
   rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
@@ -390,6 +396,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (!ret) goto quit;
 
 quit_diff:
+  ret = 1;
   dif->cnt_i += 1;
   warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
           dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
@@ -397,7 +404,6 @@ quit_diff:
   char str[128];
   sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
   warning(str, dif->cnt_i, lhs_p, rhs_p);
-  ret = 1;
 
 quit:
   dif->lhs_i += l1;
