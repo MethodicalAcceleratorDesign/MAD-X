@@ -28,7 +28,7 @@ test-user :=
 
 # testsuite titles (attached to first rule of the suite)
 
-test-jacobian: NDFLAGS += -suite "Jacobian testsuite"
+test-jacobian: TITLE := Jacobian testsuite
 
 
 
@@ -63,7 +63,7 @@ test-%: MADX  := ..$/..$/$(MADX)
 test-%: NDIFF := ..$/..$/$(NDIFF)
 
 define run-test
-$_ cd tests$/$@ && \
+$_ $(if $(TITLE),echo ' [ $(TITLE) ]' &&,) cd tests$/$@ && \
 $(MADX) < $@.madx > out.txt && \
 $(NDIFF) -q -n -t $@ $(NDFLAGS) out.txt ref.txt cfg.txt
 endef
