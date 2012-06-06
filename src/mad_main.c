@@ -15,6 +15,9 @@ char**  mad_argv;
 void*   mad_stck_base;
 
 #ifdef _GFORTRAN
+#include <unistd.h>
+#include <stdio.h>
+
 void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
 #endif
@@ -52,6 +55,12 @@ main(int argc, char *argv[])
 #ifdef _GFORTRAN
   _gfortran_set_args(argc, argv);
   _gfortran_set_options(0, 0);
+
+  // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
+  if (getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
+    setenv("GFORTRAN_UNBUFFERED_PRECONNECTED","y",1);
+    execvp(argv[0], argv);
+  }
 #endif
 
 #ifdef _NAGFOR
