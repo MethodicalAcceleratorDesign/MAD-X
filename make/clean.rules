@@ -25,7 +25,7 @@ clean:
 
 cleandir: clean
 	$E "** Cleaning files in depth"
-	$_ $(FIND) . -name '*~' -exec $(RM) -i {} \;
+	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
 
 cleanc:
 	$E "** Cleaning C generated files"
