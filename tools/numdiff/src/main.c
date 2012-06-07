@@ -19,7 +19,7 @@ run_utest(void)
 {
   struct utest *ut = utest_alloc(0);
 
-  fprintf(stderr, "Running unit tests (incomplete)\n");
+  inform("Running unit tests (incomplete)");
 
   // list of unit tests: TODO
   context_utest(ut);
@@ -59,12 +59,24 @@ invalid(void)
 }
 
 static int
-diff_summary(const struct ndiff *dif)
+diff_summary(const struct ndiff *dif, int ns)
 {
+  static const char *msg[] = {
+    "% 6d lines have been diffed",
+    "% 6d lines have been diffed in serie #%d",
+    "% 6d diffs have been detected",
+    "% 6d diffs have been detected in serie #%d"
+  };
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c);
-  inform("% 6d lines have been diffed", n);
-  inform("% 6d diffs have been detected", c);
+
+  if (c) {
+    warning(msg[0 + (ns > 0)], n, ns);
+    warning(msg[1 + (ns > 0)], c, ns);
+  } else {
+    inform (msg[0 + (ns > 0)], n, ns);
+  }
+
   return c;
 }
 
@@ -176,67 +188,68 @@ main(int argc, const char* argv[])
   if (suite)
     fprintf(stdout, " [ %s ]\n", suite);
 
-  // timer
-  double t0 = clock();
-
   // serie loop
-  int n = 0;
-  while (1) {
-    FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
+  {
+    double t0 = clock();
+    int n = 0;
 
-    // open files
-    lhs_fp = open_indexedFile(lhs_s, n, fmt, !(serie && n));
-    if (!lhs_fp) break;
-    rhs_fp = open_indexedFile(rhs_s, n, fmt, 1);
-    if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, fmt, 1);
+    while (1) {
+      FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
 
-    // serie number
-    if (n) inform("serie #%d", n);
+      // open files
+      lhs_fp = open_indexedFile(lhs_s, n, fmt, !(serie && n));
+      if (!lhs_fp) break;
+      rhs_fp = open_indexedFile(rhs_s, n, fmt, 1);
+      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, fmt, 1);
 
-    // create context of constraints
-    struct context *cxt = context_alloc(0);
+      // serie number
+      if (n) inform("serie #%d", n);
 
-    // load constraints
-    if (cfg_fp) cxt = context_scan(cxt, cfg_fp);
+      // create context of constraints
+      struct context *cxt = context_alloc(0);
 
-    // show constraints
-    if (debug) {
-      inform("rules list:");
-      context_print(cxt, stderr);
+      // load constraints
+      if (cfg_fp) cxt = context_scan(cxt, cfg_fp);
+
+      // show constraints
+      if (debug) {
+        inform("rules list:");
+        context_print(cxt, stderr);
+      }
+
+      // numdiff loop
+      struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
+      ndiff_loop(dif, cxt, blank, debug);
+
+      // print summary
+      if (diff_summary(dif, n) > 0) ++failed;
+
+      // destroy components
+      ndiff_free(dif);
+      context_free(cxt);
+
+      // close files
+      fclose(lhs_fp);
+      fclose(rhs_fp);
+      if (cfg_fp) fclose(cfg_fp);
+
+      n += 1;
+
+      // not a serie, stop
+      if (!serie) break;
     }
 
-    // numdiff loop
-    struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
-    ndiff_loop(dif, cxt, blank, debug);
+    double t1 = clock();
+    double t = (t1 - t0) / CLOCKS_PER_SEC;
 
-    // print summary
-    if (diff_summary(dif) > 0) ++failed;
-
-    // destroy components
-    ndiff_free(dif);
-    context_free(cxt);
-
-    // close files
-    fclose(lhs_fp);
-    fclose(rhs_fp);
-    if (cfg_fp) fclose(cfg_fp);
-
-    n += 1;
-
-    // not a serie, stop
-    if (!serie) break;
+    if (test)
+      fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", test, t, n-failed, n,
+  #ifdef _WIN32
+              failed ? "FAIL" : "PASS");
+  #else
+              failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
+  #endif
   }
-
-  double t1 = clock();
-  double t = (t1 - t0) / CLOCKS_PER_SEC;
-
-  if (test)
-    fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", test, t, n-failed, n,
-#ifdef _WIN32
-            failed ? "FAIL" : "PASS");
-#else
-            failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
-#endif
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
