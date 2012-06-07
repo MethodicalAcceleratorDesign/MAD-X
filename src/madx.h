@@ -1,6 +1,10 @@
 #ifndef MADX_H
 #define MADX_H
 
+// portability
+
+#include "mad_port.h"
+
 // standard headers
 
 #include <stdio.h>
@@ -9,11 +13,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <math.h>
 #include <time.h>
-
-// portability
-
-#include "mad_port.h"
 
 // defines
 
