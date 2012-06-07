@@ -20,16 +20,15 @@ void  ndiff_clear (T*);
 void  ndiff_free  (T*);
 
 // high level API
-void  ndiff_loop     (T*, struct context*, int debug);
+void  ndiff_loop     (T*, struct context*, int blank, int debug);
 
 // low level API
-void  ndiff_diffLine (T*);
-
 int   ndiff_skipLine (T*);
 int   ndiff_readLine (T*);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
 
-int   ndiff_nextNum  (T*); // return 0 if no number is found
+void  ndiff_diffLine (T*, int blank);
+int   ndiff_nextNum  (T*, int blank); // return 0 if no number is found
 int   ndiff_testNum  (T*, const struct context*, const struct constraint*);
 
 void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_);

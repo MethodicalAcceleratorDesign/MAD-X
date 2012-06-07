@@ -42,6 +42,7 @@ usage(void)
   inform("\t-t    -test name    set test name for output message (item)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
+  inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
   inform("\t-d    -debug        enable debug mode");
   inform("\t-u    -utest        run the test suite");
@@ -70,96 +71,105 @@ diff_summary(const struct ndiff *dif)
 int
 main(int argc, const char* argv[])
 {
-  int failed = 0, debug = 0, serie = 0, utest = 0;
+  int failed = 0, debug = 0, serie = 0, blank = 0, utest = 0;
   const char *suite = 0, *test = 0;
   const char *fmt = "%d";
   const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
   logmsg_config.level = inform_level;
 
   // parse command line arguments
-  int i;
-  for (i = 1; i < argc; i++) {
+  {
+    int i;
+    for (i = 1; i < argc; i++) {
 
-    // display help [immediate]
-    if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-help")) {
-      usage();
-      continue;
-    }
-    // run utests [immediate]
-    if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "-utest")) {
-      run_utest();
-      utest += 1;
-      continue;
-    }
-
-    // set debug mode [setup]
-    if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
-      logmsg_config.level = debug_level;
-      logmsg_config.locate = 1;
-      debug("debug mode on");
-      debug = 1;
-      continue;
-    }
-
-    // set info mode [setup]
-    if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "-info")) {
-      debug("info mode on");
-      logmsg_config.level = inform_level;
-      logmsg_config.locate = 0;
-      continue;
-    }
-
-    // set quiet mode [setup]
-    if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "-quiet")) {
-      debug("quiet mode on");
-      logmsg_config.level = warning_level;
-      logmsg_config.locate = 0;
-      continue;
-    }
-
-    // set serie mode [setup]
-    if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "-serie")) {
-      debug("serie mode on");
-      serie = 1;
-      continue;
-    }
-
-    // set suite name [setup]
-    if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-suite")) {
-      suite = argv[++i];
-      debug("suite name set to '%s'", suite);
-      continue;
-    }
-
-    // set test name [setup]
-    if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-test")) {
-      test = argv[++i];
-      debug("test name set to '%s'", test);
-      continue;
-    }
-
-    // set serie format [setup]
-    if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "-format")) {
-      if (serie) {
-        fmt = argv[++i];
-        debug("format set to '%s'", fmt);
-      } else {
-        i += 1;
-        inform("serie mode is off, format ignored");
+      // display help [immediate]
+      if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-help")) {
+        usage();
+        continue;
       }
-      continue;
+      // run utests [immediate]
+      if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "-utest")) {
+        run_utest();
+        utest += 1;
+        continue;
+      }
+
+      // set debug mode [setup]
+      if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
+        logmsg_config.level = debug_level;
+        logmsg_config.locate = 1;
+        debug("debug mode on");
+        debug = 1;
+        continue;
+      }
+
+      // set info mode [setup]
+      if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "-info")) {
+        debug("info mode on");
+        logmsg_config.level = inform_level;
+        logmsg_config.locate = 0;
+        continue;
+      }
+
+      // set blank mode [setup]
+      if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "-blank")) {
+        debug("blank space ignored");
+        blank = !blank;
+        continue;
+      }
+
+      // set quiet mode [setup]
+      if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "-quiet")) {
+        debug("quiet mode on");
+        logmsg_config.level = warning_level;
+        logmsg_config.locate = 0;
+        continue;
+      }
+
+      // set serie mode [setup]
+      if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "-serie")) {
+        debug("serie mode on");
+        serie = 1;
+        continue;
+      }
+
+      // set suite name [setup]
+      if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-suite")) {
+        suite = argv[++i];
+        debug("suite name set to '%s'", suite);
+        continue;
+      }
+
+      // set test name [setup]
+      if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-test")) {
+        test = argv[++i];
+        debug("test name set to '%s'", test);
+        continue;
+      }
+
+      // set serie format [setup]
+      if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "-format")) {
+        if (serie) {
+          fmt = argv[++i];
+          debug("format set to '%s'", fmt);
+        } else {
+          i += 1;
+          inform("serie mode is off, format ignored");
+        }
+        continue;
+      }
+
+      // setup filenames [incremental]
+           if (!lhs_s) lhs_s = argv[i];
+      else if (!rhs_s) rhs_s = argv[i];
+      else if (!cfg_s) cfg_s = argv[i];
     }
 
-    // setup filenames [incremental]
-         if (!lhs_s) lhs_s = argv[i];
-    else if (!rhs_s) rhs_s = argv[i];
-    else if (!cfg_s) cfg_s = argv[i];
-  }
-
-  // checks
-  if (!lhs_s || !rhs_s) {
-    if (i == argc-utest) invalid();
-    else exit(EXIT_SUCCESS);
+    // checks
+    if (!lhs_s || !rhs_s) {
+      if (i == argc-utest) invalid();
+      else exit(EXIT_SUCCESS);
+    }
   }
 
   // testsuite
@@ -181,7 +191,7 @@ main(int argc, const char* argv[])
     if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, fmt, 1);
 
     // serie number
-    if (n) inform("serie #%d\n", n);
+    if (n) inform("serie #%d", n);
 
     // create context of constraints
     struct context *cxt = context_alloc(0);
@@ -197,7 +207,7 @@ main(int argc, const char* argv[])
 
     // numdiff loop
     struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
-    ndiff_loop(dif, cxt, debug);
+    ndiff_loop(dif, cxt, blank, debug);
 
     // print summary
     if (diff_summary(dif) > 0) ++failed;
@@ -211,10 +221,10 @@ main(int argc, const char* argv[])
     fclose(rhs_fp);
     if (cfg_fp) fclose(cfg_fp);
 
+    n += 1;
+
     // not a serie, stop
     if (!serie) break;
-
-    n += 1;
   }
 
   double t1 = clock();
