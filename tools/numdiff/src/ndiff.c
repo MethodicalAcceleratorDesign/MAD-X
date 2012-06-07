@@ -218,6 +218,9 @@ ndiff_readLine (T *dif)
   dif->col_i  = 0;
   dif->row_i += 1;
 
+  trace("<-readLine line %d", dif->row_i);
+  trace("  buffers: '%.30s'|'%.30s'", dif->lhs_b, dif->rhs_b);
+
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
 
@@ -248,6 +251,9 @@ ndiff_diffLine (T *dif, int blank)
 
   char *lhs_p = dif->lhs_b+dif->lhs_i;
   char *rhs_p = dif->rhs_b+dif->rhs_i;
+
+  trace("->diffLine line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  buffers: '%.30s'|'%.30s'", lhs_p, rhs_p);
 
 retry:
 
@@ -336,6 +342,8 @@ retry:
   // numbers found
   dif->lhs_i += i;
   dif->rhs_i += i;
+  trace("<-nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  strnums: '%.20s'|'%.20s'", lhs_p+i, rhs_p+i);
   return ++dif->col_i;
 
 quit_diff:
@@ -435,6 +443,9 @@ quit_diff:
   warning(str, dif->cnt_i, lhs_p, rhs_p);
 
 quit:
+  trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  numbers: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
+
   dif->lhs_i += l1;
   dif->rhs_i += l2;
 

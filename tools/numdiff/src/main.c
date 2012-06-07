@@ -107,6 +107,15 @@ main(int argc, const char* argv[])
       }
 
       // set debug mode [setup]
+      if (!strcmp(argv[i], "-trace")) {
+        logmsg_config.level = trace_level;
+        logmsg_config.locate = 1;
+        debug("trace mode on");
+        debug = 1;
+        continue;
+      }
+
+      // set debug mode [setup]
       if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
         logmsg_config.level = debug_level;
         logmsg_config.locate = 1;

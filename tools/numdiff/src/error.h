@@ -35,7 +35,7 @@ extern struct logmsg_config logmsg_config;
 
 // compile-time logmsg level, override with -DLOGMSG_LEVEL=xxx_level or in files
 #ifndef NDEBUG
-#define LOGMSG_LEVEL debug_level
+#define LOGMSG_LEVEL trace_level
 #else
 #define LOGMSG_LEVEL inform_level
 #endif
