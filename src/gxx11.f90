@@ -5288,7 +5288,7 @@ subroutine gxwpep(iun, ityp)
      if (ityp .eq. 113)  then
         !--- eps
         eppro(2)(10:) = spsnam
-        write(eppro(3)(25:28), '(f4.2)')  versio
+        write(eppro(3)(25:28), '(f5.2)')  versio
         write(eppro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
              iyear, imonth, iday
         write(eppro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
@@ -5297,7 +5297,7 @@ subroutine gxwpep(iun, ityp)
         write(eppro(6)(15:30), '(4i4)')  ibbox
      else
         pspro(2)(10:) = spsnam
-        write(pspro(3)(25:28), '(f4.2)')  versio
+        write(pspro(3)(25:28), '(f5.2)')  versio
         write(pspro(4)(17:24), '(i2.2,''/'',i2.2,''/'',i2.2)')        &
              iyear, imonth, iday
         write(pspro(4)(26:33), '(i2.2,'':'',i2.2)')                   &
