@@ -26,7 +26,7 @@
 test-case := test-jacobian test-jacobian-2 test-jacobian-knobs
 test-user :=
 
-# testsuite titles (attached to first rule of the suite)
+# testsuite titles (attached to first rule of your suite)
 
 test-jacobian: TITLE := Jacobian testsuite
 
@@ -36,7 +36,7 @@ test-jacobian: TITLE := Jacobian testsuite
 #################################################
 
 #################################################
-# implementation
+# helpers implementation -- DO NOT MODIFY
 
 # directory selection (from tests)
 
@@ -73,8 +73,8 @@ endef
 .PHONY: tools tests test-case test-user
 
 tests: tools test-case test-user
-test-case: $(test-case)
-test-user: $(test-user)
+test-case: $(sort $(test-case))
+test-user: $(sort $(test-user))
 $(test-case) $(test-user):
 	$(run-test)
 
