@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "mad_extrn_f.h"
 #include "mad_core.h"
 
@@ -15,11 +13,15 @@ char**  mad_argv;
 void*   mad_stck_base;
 
 #ifdef _GFORTRAN
-#include <unistd.h>
+#define _POSIX_C_SOURCE 1
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
+#else
+#include <stdlib.h>
 #endif
 
 #ifdef _NAGFOR
