@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "mad_extrn_f.h"
 #include "mad_util.h"
 

@@ -490,7 +490,7 @@ store_comm_par_def(char* toks[], int start, int end)
   {
     case 0:
       jj = 0;
-      for (j = 0; j <= mymin((end - start),2); j++)
+      for (j = 0; j <= imin((end - start),2); j++)
       {
         if (strcmp(toks[start+j], "true") == 0
             )  pl[jj]->double_value = 1;

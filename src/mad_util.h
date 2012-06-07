@@ -8,12 +8,12 @@ int intrac(void);
 // inliners
 
 static inline int
-mymax(int a, int b) {
+imax(int a, int b) {
   return a > b ? a : b;
 }
 
 static inline int
-mymin(int a, int b) {
+imin(int a, int b) {
   return a < b ? a : b;
 }
 

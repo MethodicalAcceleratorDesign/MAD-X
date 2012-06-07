@@ -80,15 +80,15 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
   fprintf(prt_file, "%-25s %12s %-34s\n",
           "Variable vector","---> Sing. val.","* Node constraint vector");
   fprintf(prt_file, "--------------------------------------------------------------------\n");
-  for(i=0;i<mymax(n,m);i++){
-    for(j=0;j<mymax(n,m);j++){
+  for(i=0;i<imax(n,m);i++){
+    for(j=0;j<imax(n,m);j++){
       if ( (i<n)&&(j<n)) {
         fprintf(prt_file, "%-12s",command_par_string("name",stored_match_var->commands[j]));
         fprintf(prt_file, "%12.5g ",VT[j*n+i]);
       }
       else { fprintf(prt_file, "%24s",""); }
 
-      if ( (i<mymin(n,m)) &&(j==0))   {
+      if ( (i<imin(n,m)) &&(j==0))   {
         fprintf(prt_file, "%12.5g ",SV[i]);
       }
       else { fprintf(prt_file, "%12s ",""); }
@@ -129,7 +129,7 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
         /*          = sum_t^min(m,n)  VT[t,i] / SV[t] * U[j,t]  ) */
         /* in fortran M[i,j]=M[i+j*n] */
         tmp=0;
-        for(t=0;t<mymin(m,n);t++) {
+        for(t=0;t<imin(m,n);t++) {
           if (SV[t]>jac_cond) { tmp+=VT[t+n*i]/SV[t]*U[j+t*m]; }
           /*        fprintf(prt_file,"VT %d,%d,%12.5e ",t,i,VT[t+n*i]);*/
           /*        fprintf(prt_file,"SV %d,%12.5e ",t,SV[t]);*/

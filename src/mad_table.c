@@ -1582,7 +1582,7 @@ vector_to_table(char* table, char* col, int* nval, double* vals)
   else return;
   mycpy(c_dum->c, col);
   if ((c_pos = name_list_pos(c_dum->c, t->columns)) > -1)
-    last = mymin(c_pos + *nval, t->num_cols);
+    last = imin(c_pos + *nval, t->num_cols);
   for (j = c_pos; j < last; j++)
     if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
 }
