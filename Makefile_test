@@ -64,6 +64,8 @@ test-%: NDIFF := ..$/..$/$(NDIFF)
 
 define run-test
 $_ $(if $(TITLE),echo ' [ $(TITLE) ]' &&,) cd tests$/$@ && \
+$(RM) out*.txt \
+$(if $(call eq,$(OSTYPE),Windows),2> err.txt && $(RM) err.txt,) && \
 $(MADX) < $@.madx > out.txt && \
 $(NDIFF) -q -b -n -t $@ $(NDFLAGS) out.txt ref.txt cfg.txt
 endef
