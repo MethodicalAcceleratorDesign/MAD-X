@@ -72,7 +72,7 @@ diff_summary(const struct ndiff *dif, int ns)
 
   if (c) {
     warning(msg[0 + (ns > 0)], n, ns);
-    warning(msg[1 + (ns > 0)], c, ns);
+    warning(msg[2 + (ns > 0)], c, ns);
   } else {
     inform (msg[0 + (ns > 0)], n, ns);
   }
