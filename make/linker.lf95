@@ -24,14 +24,13 @@ LDFLAGS += -m$(ARCH) -O$(NOPT)
 
 ifeq ($(ARCH),32)
   # attemp to find the gnu libs directory for Lahey 32 bits! (GCC only)
-  GNULIBS := $(dir $(shell $(CC) $(CFLAGS) -print-file-name=libgcc.a))
-  LDLIBS  += -L$(GNULIBS)
+  LDLIBS += -L$(GNULIBDIR)
 endif
 
 ifneq ($(CXX_SRC),)
   ifeq ($(ARCH),32)
     # required by __constructor/__destructor attributes
-    LDLIBS += $(GNULIBS)$/crt*S.o
+    LDLIBS += $(GNULIBDIR)$/crt*S.o
   endif
   LDLIBS += -lstdc++
 endif

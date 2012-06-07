@@ -23,8 +23,7 @@
 LDFLAGS += -m$(ARCH) -O$(NOPT)
 
 # attemp to find the gnu libs directory for g95 (GCC only)
-GNULIBS := $(dir $(shell $(CC) $(CFLAGS) -print-file-name=libgcc.a))
-LDLIBS  += -L$(GNULIBS)
+LDLIBS += -L$(GNULIBDIR)
 
 ifneq ($(CXX_SRC),)
   LDLIBS += -lstdc++
