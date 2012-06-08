@@ -1,9 +1,9 @@
-1-7  *   skip         # head
-75-$ *   skip         # tail
-*    *   dig=1e2
-36   1   dig=1e3
-39   1   dig=1e3
-37   3   abs=1e-21
-65   1   rel=1e-10
-66   1   abs=1e-15
+1-7     *     skip         # head
+75-$    *     skip         # tail
+*       *     dig=10       # global
+
+# first match
+35-36   1-2   rel=1e-12
+37      3     abs=1e-21
+39      1     rel=1e-12
 
