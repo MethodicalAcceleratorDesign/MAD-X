@@ -63,7 +63,7 @@ test-%: MADX  := ..$/..$/$(MADX)
 test-%: NDIFF := ..$/..$/$(NDIFF)
 
 define run-test
-$_ $(if $(TITLE),echo ' [ $(TITLE) ]' &&,) cd tests$/$@ && \
+$_ $(if $(TITLE),echo [ $(TITLE) ] &&,) cd tests$/$@ && \
 $(RM) out*.txt \
 $(if $(call eq,$(OSTYPE),Windows),2> err.txt && $(RM) err.txt,) && \
 $(MADX) < $@.madx > out.txt && \
