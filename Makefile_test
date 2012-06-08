@@ -56,11 +56,13 @@ check-test-dirs := \
 
 # tests helper
 
-MADX  := $(PROJECT)$(EXE)
-NDIFF := numdiff$(ARCH)$(EXE)
+ifndef MADX
+MADX  := ../../$(PROJECT)$(EXE)
+endif
 
-test-%: MADX  := ..$/..$/$(MADX)
-test-%: NDIFF := ..$/..$/$(NDIFF)
+ifndef NDIFF
+NDIFF := ../../numdiff$(ARCH)$(EXE)
+endif
 
 define run-test
 $_ $(if $(TITLE),echo [ $(TITLE) ] &&,) cd tests$/$@ && \
@@ -82,10 +84,10 @@ $(test-case) $(test-user):
 
 # tests tools
 
-tools: $(NDIFF)
+tools: numdiff$(ARCH)$(EXE)
 
-$(NDIFF):
-	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ; \
-     $(CP) tools$/numdiff$/$(NDIFF) $(NDIFF)
+numdiff$(ARCH)$(EXE):
+	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 && \
+     $(CP) tools$/numdiff$/numdiff$(ARCH)$(EXE) .
 
 # end of makefile
