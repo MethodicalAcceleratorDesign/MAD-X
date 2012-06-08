@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include "constraint.h"
 #include "utils.h"
+#include "error.h"
 
 #define T struct constraint
 
@@ -89,11 +90,13 @@ finish:
   else
     *s = slice_initSizeStride(first, last, stride);
 
+  trace("<-readSlcOrRng %u%c%u/%u", first, r ? '-' : ':', last, stride);
+
   return 0;
 }
 
 static int
-readEps(struct eps *e, FILE *in)
+readEps(struct eps *e, FILE *in, int row)
 {
   int c = 0, r = 0;
   char str[16];
@@ -102,29 +105,30 @@ readEps(struct eps *e, FILE *in)
 
   while (1) {
     // parse next constraint
+    *str = 0;
     r = fscanf(in, "%*[ \t]%10[^= \t\n\r#!]", str);
     if (r == EOF || *str == 0) break;
 
          if (strcmp(str, "skip") == 0) {
-      e->cmd |= eps_skip; // debug("skip [%d] '%s'", row, str);
+      e->cmd |= eps_skip; trace("[%d] skip", row);
     }
     else if (strcmp(str, "ign") == 0) {
-      e->cmd |= eps_ign;  // debug("ign  [%d] '%s'", row, str);
+      e->cmd |= eps_ign;  trace("[%d] ign", row);
     }
     else if (strcmp(str, "equ") == 0) {
-      e->cmd |= eps_equ;  // debug("equ  [%d] '%s'", row, str);
+      e->cmd |= eps_equ;  trace("[%d] equ", row);
     }
     else if (strcmp(str, "dig") == 0 && (r = fscanf(in, "=%lf", &e->dig)) == 1) {
-      e->cmd |= eps_dig;  // debug("dig=%g [%d] '%s'", e->dig, row, str);
+      e->cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
     }
     else if (strcmp(str, "rel") == 0 && (r = fscanf(in, "=%lf", &e->rel)) == 1) {
-      e->cmd |= eps_rel;  // debug("rel=%g [%d] '%s'", e->rel, row, str);
+      e->cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
     }
     else if (strcmp(str, "abs") == 0 && (r = fscanf(in, "=%lf", &e->abs)) == 1) {
-      e->cmd |= eps_abs;  // debug("abs=%g [%d] '%s'", e->abs, row, str);
+      e->cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
     }
     else {
-                          // debug("inv [%d] '%s'", row, str);
+                          trace("[%d] invalid '%s'", row, str);
       e->cmd = eps_invalid;
       break;
     }
@@ -134,7 +138,7 @@ readEps(struct eps *e, FILE *in)
     if (c == EOF || (isspace(c) && !isblank(c)) || c == '#' || c == '!') break; 
   }
 
-  // debug("*** eps->cmd = %d, str = '%s', c = '%c', row = %d", e->cmd, str, row, c);
+  trace("<-readEps cmd = %d, str = '%s', c = '%c'", e->cmd, str, c);
 
   return e->cmd == eps_invalid || r == EOF ? EOF : 0;
 }
@@ -185,9 +189,9 @@ retry:
     goto retry;
   }
 
-  ensure(readSlcOrRng(&cst->row, in) != EOF, "invalid row constraint line %d"   , *row);
-  ensure(readSlcOrRng(&cst->col, in) != EOF, "invalid column constraint line %d", *row);
-  ensure(readEps     (&cst->eps, in) != EOF, "invalid eps constraint line %d"   , *row);
+  ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row constraint line %d"   , *row);
+  ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column constraint line %d", *row);
+  ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid eps constraint line %d"   , *row);
   if (skipLine(in, 0) == '\n') ++*row;
 }
 
