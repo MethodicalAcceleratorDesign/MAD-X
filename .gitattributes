@@ -581,7 +581,6 @@ tests/test-jacobian-2/ref.txt -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
 tests/test-jacobian-knobs/cfg.txt -text
 tests/test-jacobian-knobs/cfg1.txt -text
-tests/test-jacobian-knobs/out1.txt -text
 tests/test-jacobian-knobs/ref.txt -text
 tests/test-jacobian-knobs/ref1.txt -text
 tests/test-jacobian-knobs/test-jacobian-knobs.madx -text
