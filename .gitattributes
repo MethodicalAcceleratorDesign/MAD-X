@@ -590,6 +590,7 @@ tests/test-jacobian/ref.txt -text
 tests/test-jacobian/test-jacobian.madx -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
+tools/numdiff/Makefile_lib -text
 tools/numdiff/README -text
 tools/numdiff/src/constraint.c -text
 tools/numdiff/src/constraint.h -text

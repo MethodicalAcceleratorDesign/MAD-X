@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - Libraries settings
+# | numdiff makefile - Libraries settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,24 +16,8 @@
 # | $Id$
 # |
 
-# ONLINE madx
-
-ifeq ($(ONLINE),yes)
-LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
-endif
-
-# X11 on Unix
-
 ifeq ($(OSTYPE),Linux)
-ifeq ($(STATIC),yes)
-LIBS += -Llib$(ARCH) -lX11 -lpthread -lm
-else
-LIBS += -lX11 -lm
-endif
-endif
-
-ifeq ($(OSTYPE),Darwin)
-LIBS += -L/usr/X11R6/lib -lX11
+LIBS += -lm
 endif
 
 # end of makefile
