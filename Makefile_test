@@ -57,11 +57,11 @@ check-test-dirs := \
 # tests helper
 
 ifndef MADX
-MADX  := ../../$(PROJECT)$(EXE)
+MADX  := ..$/..$/$(PROJECT)$(EXE)
 endif
 
 ifndef NDIFF
-NDIFF := ../../numdiff$(ARCH)$(EXE)
+NDIFF := ..$/..$/numdiff$(ARCH)$(EXE)
 endif
 
 define run-test
