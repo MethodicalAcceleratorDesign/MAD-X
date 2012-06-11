@@ -80,7 +80,7 @@ STATIC  := no
 PLUGIN  := no
 
 #############################
-# Compilers/Linkers settings
+# Compilers, Linkers, Testers settings
 # see make/compiler.* for supported compilers
 # GNU=yes   sets CC=gcc,     CXX=g++,     FC=gfortran (default)
 # Intel=yes sets CC=icc/icl, CXX=icc/icl, FC=ifort    (use icl on Windows)
@@ -97,6 +97,9 @@ FC  := gfortran
 # Linker (default is fortran compiler, deferred)
 LD     = $(FC)
 LDNAME = $(FCNAME)
+
+# Tester (default is numdiff)
+ND  := numdiff
 
 ####################
 # Includes settings

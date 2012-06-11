@@ -19,75 +19,23 @@
 #################################################
 # testsuite
 
-# tests list
-# test-case must be short and should test features only
-# test-user can be longer and should test if studies are working
+# test case must be short and should test features only
+# user test can be longer and should test if studies are working
 
-test-case := test-jacobian test-jacobian-2 test-jacobian-knobs
-test-user :=
+ifndef TESTS
+
+tests-case := test-jacobian test-jacobian-2 test-jacobian-knobs
+tests-user :=
+
+endif
 
 # testsuite titles (attached to first rule of your suite)
-
-test-jacobian: TITLE := Jacobian testsuite
-
-
+test-jacobian: TESTSUITE := Jacobian testsuite
 
 # end of testsuite
 #################################################
 
-#################################################
-# helpers implementation -- DO NOT MODIFY
-
-# directory selection (from tests)
-
-ifdef TESTDIR
-ifeq ($(TESTDIR),detect)
-test-case := $(notdir $(wildcard tests/test-*))
-test-user :=
-else 
-test-case := $(TESTDIR)
-test-user :=
-endif
-endif
-
-check-test-dirs := \
-   $(foreach dir,$(test-case) $(test-user),\
-     $(call exists,tests/$(dir),invalid test directory tests/$(dir)))
-
-# tests helper
-
-ifndef MADX
-MADX  := ..$/..$/$(PROJECT)$(EXE)
-endif
-
-ifndef NDIFF
-NDIFF := ..$/..$/numdiff$(ARCH)$(EXE)
-endif
-
-define run-test
-$_ $(if $(TITLE),echo [ $(TITLE) ] &&,) cd tests$/$@ && \
-$(RM) out*.txt \
-$(if $(call eq,$(OSTYPE),Windows),2> err.txt && $(RM) err.txt,) && \
-$(MADX) < $@.madx > out.txt && \
-$(NDIFF) -q -b -n -t $@ $(NDFLAGS) out.txt ref.txt cfg.txt
-endef
-
-# tests rules
-
-.PHONY: tools tests test-case test-user
-
-tests: tools test-case test-user
-test-case: $(sort $(test-case))
-test-user: $(sort $(test-user))
-$(test-case) $(test-user):
-	$(run-test)
-
-# tests tools
-
-tools: numdiff$(ARCH)$(EXE)
-
-numdiff$(ARCH)$(EXE):
-	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 && \
-     $(CP) tools$/numdiff$/numdiff$(ARCH)$(EXE) .
+# madx command for tests
+TESTCMD = ..$/..$/$(PROJECT)$(EXE) < $@.madx
 
 # end of makefile
