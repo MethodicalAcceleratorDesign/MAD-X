@@ -66,15 +66,22 @@ include $(makedir)/linker.$(LDNAME)
 # system specific settings
 -include $(makedir)/system.$(OSTYPE)
 
+# tester specific settings
+$(call exists, $(makedir)/tester.$(NDNAME), \
+unable to include settings for tester ND=$(NDNAME) (make [options] infoinc); \
+check ND or NDNAME for correct tester configuration file)
+include $(makedir)/tester.$(NDNAME)
+
 # project tests
 -include $(FILE_TEST)
 
 # user's postprocessing extra stuff
 -include $(FILE_POST)
 
-# compilers, linker and depend rules
+# compilers, linker, depend and test rules
 include $(makedir)/compiler.rules
 include $(makedir)/linker.rules
+include $(makedir)/tester.rules
 include $(makedir)/depend.rules
 
 # cleaning & debugging

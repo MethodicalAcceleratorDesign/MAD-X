@@ -1,0 +1,50 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - numdiff tester settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# numdiff path
+#
+ND := $(if $(wildcard $(ND)$(ARCH)$(EXE)),..$/..$/$(ND)$(ARCH)$(EXE),$(ND))
+
+#
+# numdiff flags
+#
+NDFLAGS = -q -b -n -t $@
+
+#
+# numdiff files
+#
+NDFILES = out.txt ref.txt cfg.txt
+
+#
+# test macro
+#
+run-test = $(call run-test-file,$(NDFILES))
+
+# $@ = test name & directory
+# $1 = files for numdiff: generated output, reference output and configuration
+
+define run-test-file
+$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
+$(RM) $(basename $(firstword $1))*$(suffix $(firstword $1)) \
+$(if $(call eq,$(OSTYPE),Windows),2> err.txt && $(RM) err.txt,) && \
+$(TESTCMD) > $(firstword $1) && \
+$(call ND_tr,$(ND) $(NDFLAGS) $1)
+endef
+
+# end of makefile

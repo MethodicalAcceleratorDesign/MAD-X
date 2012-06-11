@@ -1,0 +1,49 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - tester rules
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+.PHONY: tests tests-case tests-user $(TESTS)
+
+#
+# all tests
+#
+tests: tests-case tests-user
+
+#
+# test cases only, sorted
+#
+tests-case: $(sort $(tests-case))
+
+#
+# user tests only, sorted
+#
+tests-user: $(sort $(tests-user))
+
+#
+# rule for one test
+#
+$(tests-case) $(tests-user):
+	$(run-test)
+
+#
+# check for directory existence
+#
+check-test-dirs := \
+   $(foreach dir,$(tests-case) $(tests-user),\
+     $(call exists,tests/$(dir),invalid test directory tests/$(dir)))
+
+# end of makefile

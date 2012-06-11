@@ -19,7 +19,7 @@
 # create build directory
 
 ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
-__DOIT := $(call mkdir,$(OBJDIR))
+$(call mkdir,$(OBJDIR))
 endif
 
 # end of makefile
