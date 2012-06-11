@@ -67,10 +67,12 @@ include $(makedir)/linker.$(LDNAME)
 -include $(makedir)/system.$(OSTYPE)
 
 # tester specific settings
+ifdef ND
 $(call exists, $(makedir)/tester.$(NDNAME), \
 unable to include settings for tester ND=$(NDNAME) (make [options] infoinc); \
 check ND or NDNAME for correct tester configuration file)
 include $(makedir)/tester.$(NDNAME)
+endif
 
 # project tests
 -include $(FILE_TEST)
