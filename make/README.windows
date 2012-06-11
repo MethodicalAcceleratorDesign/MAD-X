@@ -27,7 +27,7 @@ Microsoft cl compiler requires sed and grep for dependencies computation
   Binaries available from http://gnuwin32.sourceforge.net/packages/grep.htm
 
 For a complete installation of the GnuWin32 packages:
-  http://getgnuwin32.sourceforge.net/
+  http://gnuwin32.sourceforge.net/ -> Download all
 
 For a complete installation of the MinGW environment:
   http://www.mingw.org/

@@ -30,12 +30,14 @@ info:
 	@ echo "F90 compiler settings           " = $(if $(FC),$(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS)),)
 	@ echo "Linker       settings           " = $(call LD_tr,$(LD) $(LDFLAGS))
 	@ echo "Libraries    settings           " = $(call LD_tr,$(LIBS) $(LDLIBS))
+	@ echo "Tester       settings           " = $(call ND_tr,$(ND) $(subst $@,$$\@,$(NDFLAGS)))
 
 infoinc: info
 	@ echo "C   compiler settings file      " = $(if $(CC),$(makedir)$/compiler.$(CCNAME),)
 	@ echo "C++ compiler settings file      " = $(if $(CXX),$(makedir)$/compiler.$(CXXNAME),)
 	@ echo "F90 compiler settings file      " = $(if $(FC),$(makedir)$/compiler.$(FCNAME),)
 	@ echo "Linker       settings file      " = $(if $(LD),$(makedir)$/linker.$(LDNAME),)
+	@ echo "Tester       settings file      " = $(if $(ND),$(makedir)$/tester.$(NDNAME),)
 
 infoprj: infoinc
 	@ echo "          project settings file " = $(PROJECT)$(PROJEXT) $(VERSION) $(VERSION_DATE)
@@ -45,6 +47,7 @@ infoprj: infoinc
 	@ echo "F90       project settings file " = $(FILE_F90)
 	@ echo "Libraries project settings file " = $(FILE_LIB)
 	@ echo "System    project settings file " = $(FILE_SYS)
+	@ echo "Tests     project settings file " = $(FILE_TEST)
 
 infoall: infoprj
 	@ echo "Headers files                   " = $(HEADERS)

@@ -23,13 +23,13 @@ line of make allows to setup different configuration for your project, including
 the user-defined files included for files selection (see Includes settings).
 
 targets for building the project:
-  [none] | $(PROJECT)$(ARCH)
+  [none] | $(PROJECT)$(ARCH)$(PROJEXT)
 
 targets for printing information:
   info | infoinc | infoprj | infoall
 
 targets for cleaning generated files:
-  clean | cleanc | cleancxx | cleanf90 | cleanbuild | cleanall
+  clean | cleandir | cleanc | cleancxx | cleanf90 | cleanbuild | cleanall
 
 makefile options:
   - SHOW=yes displays commands executed by make instead of summary message
@@ -64,8 +64,8 @@ STATIC=no/yes unsets/sets the build for static linking (for distribution)
 PLUGIN=no/yes unsets/sets the build for dynamic loading of plugins
   adds -D_PLUGIN to CPPFLAGS
 
-#############################
-# Compilers/Linkers settings
+###################################
+# Compilers/Linkers/Tester settings
 
 CC=gcc sets the name of the C compiler.
   The settings of the compiler are included from the file make/compiler.$(CC)
@@ -79,13 +79,19 @@ FC=gfortran sets the name of the F90 compiler.
 LD=ld sets the name of the linker
   The settings of the linker are included from the file make/linker.$(LD)
 
+ND=numdiff sets the name of the tester
+  The settings of the tester are included from the file make/tester.$(ND)
+
 Notes:
-  - The compiler and linker configuration files are loaded using
-    $(makedir)/compiler.$([CC|CXX|FC]NAME) and $(makedir)/linker.$(LDNAME),
-    where $([CC|CXX|FC|LD]NAME) are set to $([CC|CXX|FC|LD]) by default.
-  - In order to get the list of supported compilers and linkers, do
+  - The compiler, linker and tester configuration files are loaded using
+    $(makedir)/compiler.$([CC|CXX|FC]NAME)
+    $(makedir)/linker.$(LDNAME)
+    $(makedir)/tester.$(NDNAME)
+    where $([CC|CXX|FC|LD|ND]NAME) are set to $([CC|CXX|FC|LD|ND]) by default.
+  - In order to get the list of supported compilers, linkers and testers, do
     ls -l $(makedir)/compiler.*
     ls -l $(makedir)/linker.*
+    ls -l $(makedir)/tester.*
     where usually $(makedir)=make.
   - Example:
       make FC=gfortran44 FCNAME=gfortran
@@ -103,6 +109,7 @@ Makefile of the project to include (in this order, all are optional)
   FILE_F90  contains F90 files selection and sets FC_SRC
   FILE_LIB  sets LIBS with required paths (i.e. -Lpath) and names (i.e. -llib)
   FILE_SYS  contains system specific stuff (e.g. unsupported configurations)
+  FILE_TEST contains project tests
   FILE_POST contains user's postprocessing extra stuffs (e.g. special rules)
 
 Notes:
@@ -115,6 +122,7 @@ Notes:
 
 OSTYPE is set to the operating system name 
   One of Linux, Darwin, Cygwin, Windows
+
 OSARCH is set to the operating system architecture
   One of i386, i686, x86, x86_64, amd64, ia64
 
@@ -126,3 +134,9 @@ NOBUILD is a list of patterns specifying make target which do not make the build
   It is used to avoid automatic dependencies computation triggered by including
   the .d files (i.e. rules for files dependencies) when they are not required.
  
+####################
+# Tests settings
+
+TESTS is set to the list of test directories
+   tests must be present in the tests subdirectory and prefixed by test-
+
