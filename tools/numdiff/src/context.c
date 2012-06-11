@@ -396,11 +396,11 @@ ut_trace(const T *cxt, int i, int j, const C* cst1, const C* cst2)
     fprintf(stderr, "%d ", context_findIdx(cxt, cxt->fut[k]));
 
   fprintf(stderr, "\n{A} ");
-  for(k = 0; k < cxt->act_n; k++)
+  for(int k = 0; k < cxt->act_n; k++)
     fprintf(stderr, "%d ", context_findIdx(cxt, cxt->act[k]));
 
   fprintf(stderr, "\n{R} ");
-  for(k = 0; k < cxt->row_n; k++)
+  for(int k = 0; k < cxt->row_n; k++)
     fprintf(stderr, "%d ", context_findIdx(cxt, cxt->row[k]));
 
   putc('\n', stderr);
