@@ -36,6 +36,6 @@ test-jacobian: TESTSUITE := Jacobian testsuite
 #################################################
 
 # madx command for tests
-TESTCMD = ..$/..$/$(PROJECT) < $@.madx
+TESTCMD = $(if $(wildcard $(PROJECT)),..$/..$/$(PROJECT),$(PROJECT)) < $@.madx
 
 # end of makefile
