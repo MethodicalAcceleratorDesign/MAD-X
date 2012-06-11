@@ -380,8 +380,6 @@ enum { NROW = 5, NCOL = 5 };
 static void
 ut_trace(const T *cxt, int i, int j, const C* cst1, const C* cst2)
 {
-  int i;
-
   fprintf(stderr, "(%d,%d)\n", i, j);
   if (cst1) {
     fprintf(stderr, "[%d].1: ", context_findIdx(cxt, cst1));
@@ -394,16 +392,16 @@ ut_trace(const T *cxt, int i, int j, const C* cst1, const C* cst2)
     putc('\n', stderr);
   }
   fprintf(stderr, "{F} ");
-  for(i = 0; i < cxt->fut_n; i++)
-    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->fut[i]));
+  for(int k = 0; k < cxt->fut_n; k++)
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->fut[k]));
 
   fprintf(stderr, "\n{A} ");
-  for(i = 0; i < cxt->act_n; i++)
-    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->act[i]));
+  for(k = 0; k < cxt->act_n; k++)
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->act[k]));
 
   fprintf(stderr, "\n{R} ");
-  for(i = 0; i < cxt->row_n; i++)
-    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->row[i]));
+  for(k = 0; k < cxt->row_n; k++)
+    fprintf(stderr, "%d ", context_findIdx(cxt, cxt->row[k]));
 
   putc('\n', stderr);
 }
