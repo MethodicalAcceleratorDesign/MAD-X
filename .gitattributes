@@ -36,10 +36,10 @@ cmake/compilers/setupPathScale.cmake -text
 cmake/ctestbase.cmake -text
 cmake/madX.gif -text svneol=unset#unset
 cmake/madxInit.cmake -text
+cmake/numdifftests.cmake -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
 cmake/setupInstallation.cmake -text
-cmake/setupNUMDIFFTESTS.cmake -text
 cmake/setupOptions.cmake -text
 cmake/setupPackaging.cmake -text
 cmake/setupProcessorCount.cmake -text
@@ -582,7 +582,6 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
-tests/CMakeLists.txt -text
 tests/test-jacobian-2/cfg.txt -text
 tests/test-jacobian-2/ref.txt -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
