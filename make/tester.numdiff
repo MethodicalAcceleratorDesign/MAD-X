@@ -42,7 +42,7 @@ run-test = $(call run-test-file,$(NDFILES))
 define run-test-file
 $_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
 $(RM) $(basename $(firstword $1))*$(suffix $(firstword $1)) \
-$(if $(call eq,$(OSTYPE),Windows),2> err.txt && $(RM) err.txt,) && \
+$(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
 $(TESTCMD) > $(firstword $1) && \
 $(call ND_tr,$(NDIFF) $(NDFLAGS) $1)
 endef
