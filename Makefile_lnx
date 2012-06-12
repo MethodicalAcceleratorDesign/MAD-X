@@ -31,42 +31,42 @@ madx-dev-linux-nagfor:  madx-dev-linux32-nagfor madx-dev-linux64-nagfor
 madx-dev-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 madx-dev-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 madx-dev-linux32-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-linux64-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 madx-dev-linux32-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-linux64-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 # libptc
 .PHONY:                 libptc-dev-linux        libptc-dev-linux-gnu

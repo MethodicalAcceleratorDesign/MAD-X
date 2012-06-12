@@ -31,22 +31,22 @@ madx-dev-macosx-gnu:    madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
 madx-dev-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 madx-dev-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
-     $(MV) madx32 $@ && ln -sf $@ madx32
+     $(CP) madx32 $@
 
 madx-dev-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
-     $(MV) madx64 $@ && ln -sf $@ madx64
+     $(CP) madx64 $@
 
 # numdiff
 .PHONY:                 numdiff-dev-macosx numdiff-dev-macosx-gnu

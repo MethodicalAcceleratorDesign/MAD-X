@@ -24,13 +24,17 @@
 
 ifndef TESTS
 
-tests-case := test-jacobian test-jacobian-2 test-jacobian-knobs
+tests-case := \
+test-jacobian test-jacobian-2 test-jacobian-knobs \
+test-ptc-twiss 
+
 tests-user :=
 
 endif
 
 # testsuite titles (attached to first rule of your suite)
-test-jacobian: TESTSUITE := Jacobian testsuite
+test-jacobian:  TESTSUITE := Jacobian testsuite
+test-ptc-twiss: TESTSUITE := PTC Twiss testsuite 
 
 # end of testsuite
 #################################################
