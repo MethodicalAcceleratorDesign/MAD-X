@@ -588,7 +588,9 @@ tests/test-jacobian/cfg.txt -text
 tests/test-jacobian/ref.txt -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-ptc-twiss/cfg.txt -text
+tests/test-ptc-twiss/cfg1.txt -text
 tests/test-ptc-twiss/ref.txt -text
+tests/test-ptc-twiss/ref1.txt -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
