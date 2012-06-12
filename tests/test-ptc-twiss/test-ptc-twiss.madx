@@ -16,8 +16,8 @@ beam, particle = proton, energy =   eg        ,
                          ex=epsx,   ey=epsy;
 value,epsx,epsy;
 option,-echo;
-call file="examples/ptc_twiss/ring_lattice/fv9.opt";  // string without blanks does not need ".."
-call file="examples/ptc_twiss/ring_lattice/fv9.seq";
+call file="../examples/ptc_twiss/ring_lattice/fv9.opt";  // string without blanks does not need ".."
+call file="../examples/ptc_twiss/ring_lattice/fv9.seq";
 option,echo;
 
 use,period=fivecell;
@@ -148,10 +148,10 @@ write,table="ptc_twiss_summary",file="ptc_twiss_summary.tfs";
   BPMWS:monitor;
   BPME:monitor;
   BPMVIRT:monitor;
-  CALL, FILE="examples/ptc_twiss/line_lattice/ebsy.madx";
-  CALL, FILE="examples/ptc_twiss/line_lattice/eirt1.madx";
-  CALL, FILE="examples/ptc_twiss/line_lattice/eff1.madx";
-  CALL, FILE="examples/ptc_twiss/line_lattice/edl1.madx";
+  CALL, FILE="../examples/ptc_twiss/line_lattice/ebsy.madx";
+  CALL, FILE="../examples/ptc_twiss/line_lattice/eirt1.madx";
+  CALL, FILE="../examples/ptc_twiss/line_lattice/eff1.madx";
+  CALL, FILE="../examples/ptc_twiss/line_lattice/edl1.madx";
 !stop;
   TBETX:=50.525915605603;
   TALFX:=-2.379589233378;
@@ -159,7 +159,6 @@ write,table="ptc_twiss_summary",file="ptc_twiss_summary.tfs";
   TALFY:=0.510997181234;
   TWSS0:BETA0, ENERGY:=Ef, BETX:=TBETX, ALFX:=TALFX, BETY:=TBETY, ALFY:=TALFY;
   BEAM, PARTICLE=ELECTRON, ENERGY:=Ef;
-  SETPLOT, XSIZE:=25.4, YSIZE:=20.32;
 !  OPTION, ECHO = true;
 !     USE, period=(EBSY,EIRT1,EFF1,EDL1);
  FFLINE0:LINE=(EBSY,EIRT1,EFF1,EDL1);
