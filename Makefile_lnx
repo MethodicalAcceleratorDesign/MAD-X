@@ -31,42 +31,42 @@ madx-dev-linux-nagfor:  madx-dev-linux32-nagfor madx-dev-linux64-nagfor
 madx-dev-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 madx-dev-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 madx-dev-linux32-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-linux64-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 madx-dev-linux32-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-linux64-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 # libptc
 .PHONY:                 libptc-dev-linux        libptc-dev-linux-gnu
@@ -105,21 +105,21 @@ numdiff-dev-linux-gnu:  numdiff-dev-linux32-gnu   numdiff-dev-linux64-gnu
 numdiff-dev-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff32 $@
+     $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
 numdiff-dev-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff64 $@
+     $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
 numdiff-dev-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 GNU=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff32 $@
+     $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
 numdiff-dev-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 GNU=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff64 $@
+     $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
 # end of makefile

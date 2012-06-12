@@ -31,22 +31,22 @@ madx-dev-macosx-gnu:    madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
 madx-dev-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 madx-dev-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
-     $(CP) madx32 $@
+     $(MV) madx32 $@ && ln -sf $@ madx32
 
 madx-dev-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
-     $(CP) madx64 $@
+     $(MV) madx64 $@ && ln -sf $@ madx64
 
 # numdiff
 .PHONY:                 numdiff-dev-macosx numdiff-dev-macosx-gnu
@@ -58,21 +58,21 @@ numdiff-dev-macosx-gnu: numdiff-dev-macosx32-gnu  numdiff-dev-macosx64-gnu
 numdiff-dev-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff32 $@
+     $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
 numdiff-dev-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff64 $@
+     $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
 numdiff-dev-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 GNU=yes $(GNUMAC) APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff32 $@
+     $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
 numdiff-dev-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 GNU=yes $(GNUMAC) APPENDLD=yes && \
-     $(CP) tools/numdiff/numdiff64 $@
+     $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
 # end of makefile
