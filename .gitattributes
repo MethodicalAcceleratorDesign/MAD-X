@@ -592,6 +592,7 @@ tests/test-ptc-twiss/cfg1.txt -text
 tests/test-ptc-twiss/ref.txt -text
 tests/test-ptc-twiss/ref1.txt -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
+tools/CMakeLists.txt -text
 tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
