@@ -24,7 +24,7 @@ NDIFF := $(if $(wildcard $(ND)$(ARCH)$(EXE)),..$/..$/$(ND)$(ARCH)$(EXE),$(ND))
 #
 # numdiff flags
 #
-NDFLAGS = -q -b -n -t $@
+NDFLAGS = -q -b -c -n -t $@
 
 #
 # numdiff files
