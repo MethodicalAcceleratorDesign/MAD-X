@@ -27,14 +27,6 @@ add_test(ptc_normal_1
     -DTEST_SCRIPT=test_5frs.madx
     -P ${BASESCRIPT})
 
-add_test(ptc_twiss_1
-    ${CMAKE_COMMAND}
-    -DTEST_PROG=${binaryname}
-    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-    -DTEST_SCRIPT=ptc_twiss1.madx
-    -DTEST_OUTPUT=ptc_twiss1_madx_ring.tfs
-    -P ${BASESCRIPT})
-
 add_test(ibs_1
     ${CMAKE_COMMAND}
     -DTEST_PROG=${binaryname}

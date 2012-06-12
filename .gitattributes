@@ -561,7 +561,6 @@ testing/ctests/checkConsistency.py -text
 testing/ctests/ibs.mad -text
 testing/ctests/job.lhcV65.ir8squeeze.madx -text
 testing/ctests/job.sample.madx -text
-testing/ctests/madx_testing_output/ptc_twiss1_madx_ring.tfs -text
 testing/ctests/madx_testing_output/sample_optics.tfs -text
 testing/ctests/test_5frs.madx -text
 testing/ctests/testbase.cmake -text
