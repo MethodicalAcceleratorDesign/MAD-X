@@ -6,12 +6,16 @@
 /Makefile_c -text
 /Makefile_cpp -text
 /Makefile_cxx -text
+/Makefile_cyg -text
 /Makefile_f90 -text
 /Makefile_lib -text
+/Makefile_lnx -text
+/Makefile_mac -text
 /Makefile_post -text
 /Makefile_pre -text
 /Makefile_sys -text
 /Makefile_test -text
+/Makefile_win -text
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text

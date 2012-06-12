@@ -1,0 +1,78 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - post-makefile MacOSX customization
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# use macport GCC suite
+ifeq ($(USER),ldeniau)
+%-gnu: GNUMAC:=CC=gcc-mp-4.7 CXX=g++-mp-4.7 FC=gfortran-mp-4.7 CCNAME=gcc CXXNAME=g++ FCNAME=gfortran
+endif
+
+# madx
+.PHONY:                 madx-dev-macosx           madx-dev-macosx-gnu
+.PHONY:                 madx-dev-macosx32         madx-dev-macosx64
+.PHONY:                 madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
+madx-dev-macosx:        madx-dev-macosx32         madx-dev-macosx64
+madx-dev-macosx-gnu:    madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
+
+madx-dev-macosx32:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+     $(CP) madx32 $@
+
+madx-dev-macosx64:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+     $(CP) madx64 $@
+
+madx-dev-macosx32-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+     $(CP) madx32 $@
+
+madx-dev-macosx64-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+     $(CP) madx64 $@
+
+# numdiff
+.PHONY:                 numdiff-dev-macosx numdiff-dev-macosx-gnu
+.PHONY:                 numdiff-dev-macosx32      numdiff-dev-macosx64
+.PHONY:                 numdiff-dev-macosx32-gnu  numdiff-dev-macosx64-gnu
+numdiff-dev-macosx:     numdiff-dev-macosx32      numdiff-dev-macosx64
+numdiff-dev-macosx-gnu: numdiff-dev-macosx32-gnu  numdiff-dev-macosx64-gnu
+
+numdiff-dev-macosx32:
+	$E "*** Building $@"
+	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
+     $(CP) tools/numdiff/numdiff32 $@
+
+numdiff-dev-macosx64:
+	$E "*** Building $@"
+	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
+     $(CP) tools/numdiff/numdiff64 $@
+
+numdiff-dev-macosx32-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 GNU=yes $(GNUMAC) APPENDLD=yes && \
+     $(CP) tools/numdiff/numdiff32 $@
+
+numdiff-dev-macosx64-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 GNU=yes $(GNUMAC) APPENDLD=yes && \
+     $(CP) tools/numdiff/numdiff64 $@
+
+# end of makefile

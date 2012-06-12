@@ -1,0 +1,38 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - post-makefile Cygwin customization
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# madx
+.PHONY:       madx-dev-win
+.PHONY:       madx-dev-win32.exe
+madx-dev-win: madx-dev-win32.exe
+
+madx-dev-win32.exe:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory ARCH=32 ONLINE=no STATIC=yes GNU=yes APPENDLD=yes && \
+     $(CP) madx32 $@
+
+# numdiff
+.PHONY:           numdiff-dev-win
+.PHONY:           numdiff-dev-win32.exe
+numdiff-dev-win:  numdiff-dev-win32.exe
+
+numdiff-dev-win32.exe:
+	$E "*** Building $@"
+	$_ $(MAKE) --no-print-directory ARCH=32 ONLINE=no STATIC=yes GNU=yes APPENDLD=yes && \
+     $(CP) tools$/numdiff$/numdiff32 $@
+
