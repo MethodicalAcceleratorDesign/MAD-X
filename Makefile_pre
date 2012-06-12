@@ -1,0 +1,23 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - pre-makefile customization
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+SED      = sed
+GREP     = grep
+NOBUILD += madx-% libptc-% numdiff-% %-install
+
+# end of makefile
