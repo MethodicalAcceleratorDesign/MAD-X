@@ -33,11 +33,13 @@ cmake/compilers/setupIntel.cmake -text
 cmake/compilers/setupLahey.cmake -text
 cmake/compilers/setupNAGFOR.cmake -text
 cmake/compilers/setupPathScale.cmake -text
+cmake/ctestbase.cmake -text
 cmake/madX.gif -text svneol=unset#unset
 cmake/madxInit.cmake -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
 cmake/setupInstallation.cmake -text
+cmake/setupNUMDIFFTESTS.cmake -text
 cmake/setupOptions.cmake -text
 cmake/setupPackaging.cmake -text
 cmake/setupProcessorCount.cmake -text
@@ -581,7 +583,6 @@ testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
 tests/CMakeLists.txt -text
-tests/ctestbase.cmake -text
 tests/test-jacobian-2/cfg.txt -text
 tests/test-jacobian-2/ref.txt -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
