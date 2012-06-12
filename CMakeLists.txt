@@ -46,6 +46,7 @@ include(setupArchSpecifics)
 
 # Add sources subdirectory:
 add_subdirectory(src)
+add_subdirectory(tools)
 add_subdirectory(syntax)
 
 
@@ -53,3 +54,4 @@ add_subdirectory(syntax)
 include(setupTesting)
 # Add test folders:
 add_subdirectory(testing/ctests)
+add_subdirectory(tests)
