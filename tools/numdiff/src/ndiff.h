@@ -20,7 +20,7 @@ void  ndiff_clear (T*);
 void  ndiff_free  (T*);
 
 // high level API
-void  ndiff_loop     (T*, struct context*, int blank, int debug);
+void  ndiff_loop     (T*, struct context*, int blank, int check);
 
 // low level API
 int   ndiff_skipLine (T*);

@@ -44,7 +44,8 @@ usage(void)
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
   inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
-  inform("\t-d    -debug        enable debug mode");
+  inform("\t-c    -check        enable check mode");
+  inform("\t-d    -debug        enable debug mode (include check mode)");
   inform("\t-u    -utest        run the test suite");
   inform("\t-h    -help         display this help");
 
@@ -83,7 +84,7 @@ diff_summary(const struct ndiff *dif, int ns)
 int
 main(int argc, const char* argv[])
 {
-  int failed = 0, debug = 0, serie = 0, blank = 0, utest = 0;
+  int failed = 0, check = 0, debug = 0, serie = 0, blank = 0, utest = 0;
   const char *suite = 0, *test = 0;
   const char *fmt = "%d";
   const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
@@ -121,6 +122,14 @@ main(int argc, const char* argv[])
         logmsg_config.locate = 1;
         debug("debug mode on");
         debug = 1;
+        check = 1;
+        continue;
+      }
+
+      // set check mode [setup]
+      if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "-check")) {
+        debug("check mode on");
+        check = 1;
         continue;
       }
 
@@ -228,7 +237,7 @@ main(int argc, const char* argv[])
 
       // numdiff loop
       struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
-      ndiff_loop(dif, cxt, blank, debug);
+      ndiff_loop(dif, cxt, blank, check);
 
       // print summary
       if (diff_summary(dif, n) > 0) ++failed;

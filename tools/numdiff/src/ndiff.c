@@ -471,7 +471,7 @@ ndiff_feof (const T *dif)
 }
 
 void
-ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int debug)
+ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
 {
   const struct constraint *c, *c2;
   int row = 0, col, n;
@@ -480,7 +480,7 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int debug)
     ++row, col = 0;
 
     c = context_getInc(cxt, row, col);
-    if (debug && c != (c2 = context_getAt(cxt, row, col)))
+    if (check && c != (c2 = context_getAt(cxt, row, col)))
       ndiff_error(cxt, c, c2, row, col); 
 
     // no constraint, diff-lines
@@ -505,7 +505,7 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int debug)
       assert(n == col);
 
       c = context_getInc(cxt, row, col);
-      if (debug && c != (c2 = context_getAt(cxt, row, col)))
+      if (check && c != (c2 = context_getAt(cxt, row, col)))
         ndiff_error(cxt, c, c2, row, col); 
 
       // no constraint, diff-number
