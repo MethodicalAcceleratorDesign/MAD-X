@@ -1,7 +1,6 @@
 
 # creating symlink to supporting files..
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/madX-examples
-                                                           ${CMAKE_CURRENT_BINARY_DIR}/madX-examples)
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_SOURCE_DIR}/examples/ ${CMAKE_CURRENT_BINARY_DIR}/examples)
 get_target_property(binaryname madxbin LOCATION)
 
 ADD_TEST(testruns "${CMAKE_CURRENT_SOURCE_DIR}/testruns.sh" "${binaryname}")
@@ -28,6 +27,21 @@ add_test(ptc_normal_1
     -DTEST_SCRIPT=test_5frs.madx
     -P ${BASESCRIPT})
 
+add_test(ptc_twiss_1
+    ${CMAKE_COMMAND}
+    -DTEST_PROG=${binaryname}
+    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+    -DTEST_SCRIPT=ptc_twiss1.madx
+    -DTEST_OUTPUT=ptc_twiss1_madx_ring.tfs
+    -P ${BASESCRIPT})
+
+add_test(ibs_1
+    ${CMAKE_COMMAND}
+    -DTEST_PROG=${binaryname}
+    -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
+    -DTEST_SCRIPT=ibs.mad
+    -P ${BASESCRIPT})
+
 # Tests that require afs:
 if(EXISTS "/afs/cern.ch/")
     add_test(twiss_1
@@ -37,22 +51,7 @@ if(EXISTS "/afs/cern.ch/")
         -DTEST_SCRIPT=twiss1.madx
         -DTEST_OUTPUT=sample_optics.tfs
         -P ${BASESCRIPT})
-    
-    add_test(ptc_twiss_1
-        ${CMAKE_COMMAND}
-        -DTEST_PROG=${binaryname}
-        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-        -DTEST_SCRIPT=ptc_twiss1.madx
-        -DTEST_OUTPUT=ptc_twiss1_madx_ring.tfs
-        -P ${BASESCRIPT})
-    
-    add_test(ibs_1
-        ${CMAKE_COMMAND}
-        -DTEST_PROG=${binaryname}
-        -DSOURCEDIR=${CMAKE_CURRENT_SOURCE_DIR}
-        -DTEST_SCRIPT=ibs.mad
-        -P ${BASESCRIPT})
-    
+
     add_test(match_1_LONG
         ${CMAKE_COMMAND}
         -DTEST_PROG=${binaryname}

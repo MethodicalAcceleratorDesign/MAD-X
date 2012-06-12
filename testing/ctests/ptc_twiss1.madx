@@ -16,8 +16,8 @@ beam, particle = proton, energy =   eg        ,
                          ex=epsx,   ey=epsy;
 value,epsx,epsy;
 option,-echo;
-call file="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/ring_lattice/fv9.opt";  // string without blanks does not need ".."
-call file="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/ring_lattice/fv9.seq";
+call file="examples/ptc_twiss/ring_lattice/fv9.opt";  // string without blanks does not need ".."
+call file="examples/ptc_twiss/ring_lattice/fv9.seq";
 option,echo;
 
 use,period=fivecell;
@@ -148,10 +148,10 @@ write,table="ptc_twiss_summary",file="ptc_twiss_summary.tfs";
   BPMWS:monitor;
   BPME:monitor;
   BPMVIRT:monitor;
-  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/ebsy.madx";
-  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/eirt1.madx";
-  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/eff1.madx";
-  CALL, FILE="/afs/cern.ch/user/y/ylevinse/scratch1/public/madX-examples/REF/ptc_twiss/line_lattice/edl1.madx";
+  CALL, FILE="examples/ptc_twiss/line_lattice/ebsy.madx";
+  CALL, FILE="examples/ptc_twiss/line_lattice/eirt1.madx";
+  CALL, FILE="examples/ptc_twiss/line_lattice/eff1.madx";
+  CALL, FILE="examples/ptc_twiss/line_lattice/edl1.madx";
 !stop;
   TBETX:=50.525915605603;
   TALFX:=-2.379589233378;
