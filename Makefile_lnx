@@ -78,22 +78,22 @@ libptc-dev-linux-gnu:   libptc-dev-linux32-gnu  libptc-dev-linux64-gnu
 libptc-dev-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
-     $(CP) libs/ptc/libptc32.a $@.a
+     $(CP) libs/ptc/libptc32.a $@.a && ln -sf $@ libptc32.a
 
 libptc-dev-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
-     $(CP) libs/ptc/libptc64.a $@.a
+     $(CP) libs/ptc/libptc64.a $@.a && ln -sf $@ libptc64.a
 
 libptc-dev-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 GNU=yes APPENDLD=yes && \
-     $(CP) libs/ptc/libptc32.a $@.a
+     $(CP) libs/ptc/libptc32.a $@.a && ln -sf $@ libptc32.a
 
 libptc-dev-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 GNU=yes APPENDLD=yes && \
-     $(CP) libs/ptc/libptc64.a $@.a
+     $(CP) libs/ptc/libptc64.a $@.a && ln -sf $@ libptc64.a
 
 # numdiff
 .PHONY:                 numdiff-dev-linux         numdiff-dev-linux-gnu
