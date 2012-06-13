@@ -37,10 +37,10 @@ vpath %.o $(OBJDIR)
 #
 %.o: %.f90
 	$E "*** Compiling $(<F)"
-	$_ $(call FC_tr,$(FC) $(FFLAGS) $< -o $(OBJDIR)$/$(@F))
+	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $(OBJDIR)$/$(@F))
 
 #
-# rule F90 compilation
+# rule F90 compilation (same as f90 due to case insensitive file systems)
 #
 %.o: %.F90
 	$E "*** Compiling $(<F)"
