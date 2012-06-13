@@ -1,2 +1,2 @@
-50-52     *     skip         # date
+50-52   *     skip         # version, date and time
 *       *     dig=10       # global
