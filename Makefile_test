@@ -25,10 +25,10 @@
 ifndef TESTS
 
 tests-case := \
-test-jacobian test-jacobian-2 test-jacobian-knobs \
-test-ptc-twiss 
+test-jacobian test-jacobian-2 test-jacobian-knobs
 
-tests-user :=
+tests-user := \
+test-ptc-twiss
 
 endif
 
@@ -40,6 +40,10 @@ test-ptc-twiss: TESTSUITE := PTC Twiss testsuite
 #################################################
 
 # madx command for tests
+ifndef MADX
 TESTCMD = $(if $(wildcard $(PROJECT)),..$/..$/$(PROJECT),$(PROJECT)) < $@.madx
+else
+TESTCMD = $(MADX) < $@.madx
+endif
 
 # end of makefile
