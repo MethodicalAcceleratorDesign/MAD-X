@@ -52,7 +52,8 @@ open_indexedFile(const char* str, int idx, const char *fmt, int strict)
     error("unable to resize the stream buffer size");
   }
 
-  debug(fp ? "file %s open for reading" : "unable to open file %s for reading", buf);
+  if (fp) debug("file %s open for reading", buf);
+  else    trace("<-open_indexedFile: unable to open file %s for reading", buf);
 
   return fp;
 }
