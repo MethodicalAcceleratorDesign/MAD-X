@@ -34,9 +34,7 @@ of which depends on the APERTYPE:
 <TR><TD>RECTELLIPSE</TD><TD>4</TD><TD>half width, half height (of
 rectangle), horizontal half axis, vertical
 half axis (of ellipse)</TD></TR>
-<TR><TD>RACETRACK</TD><TD>3</TD><TD>horizontal, vertical
-shift, radius
-shift</TD></TR>
+<TR><TD>RACETRACK</TD><TD>3</TD><TD>horizontal [1] and vertical [2] positions of the circle, radius [3] of the circle (see s, g, r in the figure below)</TD></TR>
 <TR><TD>FILENAME</TD><TD>0</TD><TD>where the file contains a list of x and y coordinates outlining the shape. This option is only supported by the aperture module, see below.</TD></TR>
 </TABLE>
 </UL>
@@ -90,7 +88,7 @@ together with the specified TWISS parameters into the TWISS table.
 <h2>Defining tolerances in MAD-X</h2>
 </center>
 A parameter closely connected to the aperture is the sum of the mechanical and alignment tolerances. The mechanical tolerance is the maximal error margin of errors in the element body which causes a decrease of aperture, and the alignment tolerance is a mislignment of the element in the accelerator, which also causes a decrease of aperture. The tolerance is given in the transverse plane as a racetrack, like in the picture below.<br>
-<IMG SRC=tolerance.jpg align=center width="420" height="360"><br>
+<IMG SRC=tolerance.jpg align=center width="450"><br>
 A tolerance can be assigned to each element in a MAD-X sequence as a vector:
 <pre>
 Syntax: APER_TOL = {r, g, s};
@@ -162,7 +160,7 @@ if an input file with beam screen coordinates are given. See below for a graphic
 
 <h3>Not simply connex beam pipes</h3>
 Methodically, the algorithm for finding the largest possible halo is fairly simple. The distance from halo centre to the first apex (i = 0) in the halo is calculated (l_i), and the equation for a line going through these points is derived. This line is then compared with all lines making the pipe polygon to find their respective intersection coordinates. The distance h_i between halo centre and intersection are then divided by l_i, to find the maximal ratio of enlargement, as seen below. This procedure is then repeated for all apexes i in the halo polygon, and the smallest ratio  of all apexes is the maximal enlargement ratio for this halo to just touch the pipe at this particular longitudinal position.<br>
-<IMG SRC=notsimple0.jpg align=center width="420" height="360"><br>
+<IMG SRC=notsimple0.jpg align=center width="420"><br>
 
 There is one complication to this solution; polygons which are not simple connexes. (Geometrical definition of ``simply connex'': A figure in which any two points can be connected by a line segment, with all points on the segment inside the figure.) The figure below shows what happens when a beam pipe polygon is not a simple connex. The halo is expanded in such a way that it overlaps the external polygon in the area where the latter is dented inwards.<br>
 <IMG SRC=notsimple1.jpg align=center width="420" height="420"><br>
