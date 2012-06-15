@@ -30,13 +30,51 @@ struct ndiff {
 
 // ----- private (parser helpers)
 
-static int
+static inline int
 is_separator (int c)
 {
   return isblank(c) || (ispunct(c) && c != '.' && c != '_');
 }
 
-static int
+static inline int
+is_number_start(char *buf, const char *beg)
+{
+  // number starts by a '-' or is at the beginning or is preceded by a separator
+  return *buf == '-' || buf == beg || (buf > beg && is_separator(buf[-1]));
+}
+
+static inline int
+is_number (char *buf)
+{
+  int i = 0;
+
+  // sign
+  if (buf[i] == '+' || buf[i] == '-') i++;
+
+  // digits
+  if(isdigit(buf[i])) return 1;
+
+  // dot
+  if (buf[i] == '.') ++i;
+
+  // decimals
+  if(isdigit(buf[i])) return 1;
+
+  return 0;
+}
+
+static inline char*
+backtrace_number (char *buf, const char *beg)
+{
+  if (isdigit(*buf)) {
+    if (buf > beg && buf[-1] == '.') --buf;
+    if (buf > beg && buf[-1] == '-') --buf;
+  }
+
+  return buf;
+}
+
+static inline int
 parse_number (char *buf, int *d_, int *n_, int *e_)
 {
   int i = 0, d = 0, n = 0, e = 0;
@@ -78,6 +116,17 @@ parse_number (char *buf, int *d_, int *n_, int *e_)
   if (n_) *n_ = n;
   if (d_) *d_ = d-1;
   if (e_) *e_ = e-1;
+
+  return i;
+}
+
+static inline int
+skip_identifier_digits(const char *lhs, const char *rhs)
+{
+  int i = 0;
+
+  while (lhs[i] == rhs[i] && (isdigit(lhs[i]) || lhs[i] == '.'))
+    i++;
 
   return i;
 }
@@ -294,22 +343,22 @@ ndiff_nextNum (T *dif, int blank)
 
   char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
-  int i, s, n = imin(dif->lhs_i,dif->rhs_i);
 
 retry:
 
   // search for difference or digits
-  for (i = 0; lhs_p[i] && lhs_p[i] == rhs_p[i] && !isdigit(lhs_p[i]); i++) ;
+  { int i = 0;
 
-  // synchronize buffers
-  lhs_p += i; dif->lhs_i += i;
-  rhs_p += i; dif->rhs_i += i;
-  n += i, i = 0;
+    while (lhs_p[i] && lhs_p[i] == rhs_p[i] && !isdigit(lhs_p[i]))
+      i++;
 
-  // skip whitespaces
+    lhs_p += i; rhs_p += i;
+  }
+
+  // skip whitespaces differences
   if (blank && (isblank(*lhs_p) || isblank(*rhs_p))) {
-    while (isblank(*lhs_p)) ++lhs_p, ++dif->lhs_i;
-    while (isblank(*rhs_p)) ++rhs_p, ++dif->rhs_i;
+    while (isblank(*lhs_p)) ++lhs_p;
+    while (isblank(*rhs_p)) ++rhs_p;
     goto retry;
   }
 
@@ -317,44 +366,41 @@ retry:
   if (!*lhs_p && !*rhs_p)
     goto quit;
 
-  // difference in nan
-  if (*lhs_p != *rhs_p && (!isdigit(*lhs_p) || !isdigit(*rhs_p)))
+  // difference in not-a-number
+  if (*lhs_p != *rhs_p && (!is_number(lhs_p) || !is_number(rhs_p)))
     goto quit_diff;
 
-  // preceding dot (if any)
-  if (n-i > 0 && lhs_p[i-1] == '.') --i;
+  // backtrace number
+  lhs_p = backtrace_number(lhs_p, dif->lhs_b);
+  rhs_p = backtrace_number(rhs_p, dif->rhs_b);
 
-  // preceding char is a separator?
-  s = 0;
-  if (n-i > 0 && (s = is_separator(lhs_p[i-1])))
-    i -= lhs_p[i-1] == '-';
-
-  // nan, skip digits and retry
-  if (!(s || n-i == 0)) {
-    for (i = 0; lhs_p[i] == rhs_p[i] && isdigit(lhs_p[i]); i++) ;
-    lhs_p += i; dif->lhs_i += i;
-    rhs_p += i; dif->rhs_i += i;
-    n += i, i = 0;
+  // at the start of a number?
+  if (!is_number_start(lhs_p, dif->lhs_b) || !is_number_start(rhs_p, dif->rhs_b)) {
+    int i = skip_identifier_digits(lhs_p, rhs_p);
+    lhs_p += i; rhs_p += i;
     if (!isdigit(*lhs_p)) goto retry;
     goto quit_diff;
   }
 
   // numbers found
-  dif->lhs_i += i;
-  dif->rhs_i += i;
+  dif->lhs_i = lhs_p-dif->lhs_b;
+  dif->rhs_i = rhs_p-dif->rhs_b;
   trace("<-nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  strnums: '%.20s'|'%.20s'", lhs_p+i, rhs_p+i);
+  trace("  strnums: '%.20s'|'%.20s'", lhs_p, rhs_p);
   return ++dif->col_i;
 
 quit_diff:
-  dif->lhs_i += 1;
-  dif->rhs_i += 1;
+  dif->lhs_i = lhs_p-dif->lhs_b+1;
+  dif->rhs_i = rhs_p-dif->rhs_b+1;
   dif->cnt_i += 1;
   warning("(%d) files differ at line %d and char-columns %d|%d",
           dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
   warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
+  return dif->col_i = 0;
 
 quit:
+  dif->lhs_i = lhs_p-dif->lhs_b+1;
+  dif->rhs_i = rhs_p-dif->rhs_b+1;
   return dif->col_i = 0;
 }
 
@@ -381,6 +427,10 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
     warning("(%d) one number is missing", dif->cnt_i+1);
     goto quit_diff;
   }
+
+  // ignore difference
+  if (c->eps.cmd == eps_ign)
+    goto quit;
 
   // strict comparison...
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
@@ -508,15 +558,11 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
       if (check && c != (c2 = context_getAt(cxt, row, col)))
         ndiff_error(cxt, c, c2, row, col); 
 
-      // no constraint, diff-number
+      // no constraint means equal
       if (!c) {
         static const struct constraint cst_equ = { .eps = { .cmd = eps_equ } };
         c = &cst_equ;
       }
-
-      // ignore this column
-      if (c->eps.cmd == eps_ign)
-        continue;
 
       ndiff_testNum(dif, cxt, c);
     }
