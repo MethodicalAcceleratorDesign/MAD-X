@@ -40,7 +40,7 @@ open_indexedFile(const char* str, int idx, const char *fmt, int strict)
     const char *dot = strrchr(str, '.');
     const int pos = dot ? dot-str : (int)strlen(buf);
     sprintf(buf+pos, fmt, idx);
-    strncat(buf+pos, dot, sizeof buf - pos);
+    if (dot) strncat(buf+pos, dot, sizeof buf - pos);
   }
 
   FILE *fp = fopen(buf, "r");
@@ -52,7 +52,7 @@ open_indexedFile(const char* str, int idx, const char *fmt, int strict)
     error("unable to resize the stream buffer size");
   }
 
-  if (fp) debug("file %s open for reading", buf);
+  debug(fp ? "unable to open file %s for reading" : "file %s open for reading", buf);
 
   return fp;
 }
