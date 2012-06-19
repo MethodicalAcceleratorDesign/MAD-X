@@ -75,7 +75,7 @@ backtrace_number (char *buf, const char *beg)
 }
 
 static inline int
-parse_number (char *buf, int *d_, int *n_, int *e_)
+parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 {
   int i = 0, d = 0, n = 0, e = 0;
 
@@ -116,6 +116,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_)
   if (n_) *n_ = n;
   if (d_) *d_ = d-1;
   if (e_) *e_ = e-1;
+  if (f_) *f_ = d > 0 || (e > 0 && buf[e] == '-');
 
   return i;
 }
@@ -416,9 +417,9 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   double lhs_d, rhs_d, dif_a, min_a;
 
   // parse numbers
-  int d1, d2, n1, n2, e1, e2;
-  int l1 = parse_number(lhs_p, &d1, &n1, &e1);
-  int l2 = parse_number(rhs_p, &d2, &n2, &e2);
+  int d1, d2, n1, n2, e1, e2, f1, f2;
+  int l1 = parse_number(lhs_p, &d1, &n1, &e1, &f1);
+  int l2 = parse_number(rhs_p, &d2, &n2, &e2, &f2);
   int ret = 0;
 
   // invalid numbers
@@ -436,8 +437,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
 
-  // ...required
-  if (c->eps.cmd == eps_equ) {
+  // ...required or integer values
+  if (c->eps.cmd == eps_equ || (c->eps.cmd != eps_abs && !f1 && !f2)) {
     warning("(%d) numbers strict representation differ", dif->cnt_i+1);
     goto quit_diff;
   }
@@ -453,12 +454,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // input-specific comparison
   if (c->eps.cmd & eps_dig) {
     double rel = c->eps.dig * pow10(-imax(n1, n2));
-
-    // bounded if there is no digit after the dot
-    if (rel > 0.1) rel = 0.1; 
-
     if (dif_a > rel * min_a) {
-      warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, dig=%d]",
+      warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
               dif->cnt_i+1, context_findIdx(cxt, c)+1, rel, dif_a, dif_a/min_a, imax(n1, n2));   
       ret = 1; 
     }
@@ -475,7 +472,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // absolute comparison
   if (c->eps.cmd & eps_abs)
     if (dif_a > c->eps.abs) {
-      warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g",
+      warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g]",
               dif->cnt_i+1, context_findIdx(cxt, c)+1, c->eps.abs, dif_a);   
       ret = 1;
     }

@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+
 #include "error.h"
 #include "utils.h"
 #include "args.h"
@@ -31,16 +33,24 @@ static const double pow10_tbl[2*99+1] = {
 const double *const pow10_table99 = &pow10_tbl[99];
 
 FILE*
-open_indexedFile(const char* str, int idx, const char *ext, int optext)
+open_indexedFile(const char* str, int idx, const char *ext, int optext, int required)
 {
   char buf[FILENAME_MAX+100];
 
+  assert(str && ext);
+
+  // copy filename
   strncpy(buf, str, sizeof buf);
 
-  // remove extension, if any
+  // find extension, if any
   const char *dot = strrchr(buf, '.');
-  int pos = dot ? dot-buf : (int)strlen(buf);
-  buf[pos] = 0;
+  int pos = (int)strlen(buf);
+
+  // remove extension if it matches ext
+  if (dot && !strcmp(dot, ext)) {
+    pos = dot-buf; 
+    buf[pos] = 0;
+  }
 
   // add formatted index
   if (idx > 0) pos += sprintf(buf+pos, option.fmt, idx);
@@ -53,13 +63,14 @@ open_indexedFile(const char* str, int idx, const char *ext, int optext)
 
   // try to open
   FILE *fp = fopen(buf, "r");
-  if (!fp && !optext) ensure(fp, "failed to open %s", buf);
 
-  // extension if optional, try again upon failure
+  // try again upon failure if extension is optional
   if (!fp && optext) {
     buf[pos] = 0;
     fp = fopen(buf, "r");
   }
+
+  if (!fp && required) ensure(fp, "failed to open %s", buf);
 
   // resize buffer for faster read
   if (fp && BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {

@@ -9,10 +9,10 @@
 
 enum eps_cmd {
   eps_invalid =   0u,  // invalid command
-  eps_dig     =   1u,  // relative input eps >= 1
-  eps_rel     =   2u,  // relative eps       <= 1
+  eps_dig     =   1u,  // relative input eps
+  eps_rel     =   2u,  // relative eps
   eps_abs     =   4u,  // absolute eps
-  eps_equ     =   8u,  // equal string 
+  eps_equ     =   8u,  // equal string
   eps_ign     =  16u,  // ignore value
   eps_skip    =  32u,  // skip line
   eps_last

@@ -72,10 +72,10 @@ main(int argc, const char* argv[])
       FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
 
       // open files
-      lhs_fp = open_indexedFile(lhs_s, n, option.out_e, 1);
-      if (!lhs_fp && option.serie) break;
-      rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, 0);
-      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, 0);
+      lhs_fp = open_indexedFile(lhs_s, n, option.out_e, 1, 0);
+      if (!lhs_fp && n) break;
+      rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, 0, 1);
+      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, 0, 0);
 
       if (!lhs_fp || !rhs_fp) invalid();
 
