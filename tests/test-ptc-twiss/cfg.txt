@@ -1,3 +1,0 @@
-1-7     *     skip         # head
-288-$   *     skip         # tail
-*       *     dig=100      # global

@@ -187,7 +187,7 @@ select,flag=ptc_twiss,column=name,s,beta11,beta21,
 
 
 
-ptc_twiss,closed_orbit,icase=5,file=out1.txt,no=1;
+ptc_twiss,closed_orbit,icase=5,no=1,file="ptc-twiss-table.out";
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     

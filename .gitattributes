@@ -593,11 +593,13 @@ tests/test-jacobian-knobs/test-jacobian-knobs.madx -text
 tests/test-jacobian/cfg.txt -text
 tests/test-jacobian/ref.txt -text
 tests/test-jacobian/test-jacobian.madx -text
-tests/test-ptc-twiss/cfg.txt -text
-tests/test-ptc-twiss/cfg1.txt -text
-tests/test-ptc-twiss/ref.txt -text
-tests/test-ptc-twiss/ref1.txt -text
+tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
+tests/test-ptc-twiss/fort.18.ref -text
+tests/test-ptc-twiss/ptc-twiss-table.cfg -text
+tests/test-ptc-twiss/ptc-twiss-table.ref -text
+tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
+tests/test-ptc-twiss/test-ptc-twiss.ref -text
 tools/CMakeLists.txt -text
 tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
