@@ -958,6 +958,14 @@ att_undefined(struct c6t_element* el)
 static void
 att_rfquadrupole(struct c6t_element* el)
 {
+  /* 
+  ** out_1 = 26
+  ** out_2 = coefficient
+  ** out_3 = frequency
+  ** out_4 = phase
+  ** out_5 = tilt
+  */
+
   if (fabs(el->value[3])>eps_9) {
     el->out_1 = 26;
     el->out_2 = el->value[3];
@@ -967,11 +975,20 @@ att_rfquadrupole(struct c6t_element* el)
   }
   el->out_3 = el->value[2];
   el->out_4 = el->value[6];
+  el->out_5 = el->value[1];
 }
 
 static void
 att_rfsextupole(struct c6t_element* el)
 {
+  /* 
+  ** out_1 = 27
+  ** out_2 = coefficient
+  ** out_3 = frequency
+  ** out_4 = phase
+  ** out_5 = tilt
+  */
+
   if (fabs(el->value[4])>eps_9) {
     el->out_1 = 27;
     el->out_2 = el->value[4];
@@ -981,11 +998,20 @@ att_rfsextupole(struct c6t_element* el)
   }
   el->out_3 = el->value[2];
   el->out_4 = el->value[7];
+  el->out_5 = el->value[1];
 }
 
 static void
 att_rfoctupole(struct c6t_element* el)
 {
+  /* 
+  ** out_1 = 28
+  ** out_2 = coefficient
+  ** out_3 = frequency
+  ** out_4 = phase
+  ** out_5 = tilt
+  */
+
   if (fabs(el->value[5])>eps_9) {
     el->out_1 = 28;
     el->out_2 = el->value[5];
@@ -995,6 +1021,7 @@ att_rfoctupole(struct c6t_element* el)
   }
   el->out_3 = el->value[2];
   el->out_4 = el->value[8];
+  el->out_5 = el->value[1];
 }
 
 static void
