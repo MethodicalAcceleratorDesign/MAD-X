@@ -2,6 +2,7 @@
 #include <string.h>
 #include "error.h"
 #include "utils.h"
+#include "args.h"
 
 static const double pow10_tbl[2*99+1] = { 
   1e-99, 1e-98, 1e-97, 1e-96, 1e-95, 1e-94, 1e-93, 1e-92, 1e-91, 1e-90,
@@ -30,30 +31,48 @@ static const double pow10_tbl[2*99+1] = {
 const double *const pow10_table99 = &pow10_tbl[99];
 
 FILE*
-open_indexedFile(const char* str, int idx, const char *fmt, int strict)
+open_indexedFile(const char* str, int idx, const char *ext, int optext)
 {
   char buf[FILENAME_MAX+100];
 
   strncpy(buf, str, sizeof buf);
 
-  if (idx > 0) {
-    const char *dot = strrchr(str, '.');
-    const int pos = dot ? dot-str : (int)strlen(buf);
-    sprintf(buf+pos, fmt, idx);
-    if (dot) strncat(buf+pos, dot, sizeof buf - pos);
+  // remove extension, if any
+  const char *dot = strrchr(buf, '.');
+  int pos = dot ? dot-buf : (int)strlen(buf);
+  buf[pos] = 0;
+
+  // add formatted index
+  if (idx > 0) pos += sprintf(buf+pos, option.fmt, idx);
+
+  // copy filename into option
+  strncpy(option.indexed_filename, buf, sizeof option.indexed_filename);
+
+  // add extension
+  strncat(buf+pos, ext, sizeof buf - pos);
+
+  // try to open
+  FILE *fp = fopen(buf, "r");
+  if (!fp && !optext) ensure(fp, "failed to open %s", buf);
+
+  // extension if optional, try again upon failure
+  if (!fp && optext) {
+    buf[pos] = 0;
+    fp = fopen(buf, "r");
   }
 
-  FILE *fp = fopen(buf, "r");
-  if (!fp && strict)
-    ensure(fp, "failed to open %s", buf);
-
+  // resize buffer for faster read
   if (fp && BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
     fclose(fp);
     error("unable to resize the stream buffer size");
   }
 
-  if (fp) debug("file %s open for reading", buf);
-  else    trace("<-open_indexedFile: unable to open file %s for reading", buf);
+  // debug information
+  if (fp) {
+    if (optext) inform("processing %s", option.indexed_filename);
+    debug("file %s open for reading", buf);
+  } else
+    trace("<-open_indexedFile: unable to open file %s for reading", buf);
 
   return fp;
 }

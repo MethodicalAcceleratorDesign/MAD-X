@@ -6,7 +6,7 @@
 
 // extern functions
 
-FILE* open_indexedFile(const char* str, int idx, const char *fmt, int strict);
+FILE* open_indexedFile(const char* str, int idx, const char *ext, int optext);
 
 // inline functions
 

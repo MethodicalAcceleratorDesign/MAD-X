@@ -7,76 +7,25 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
+
+#include "args.h"
+#include "utils.h"
+#include "error.h"
+#include "ndiff.h"
 #include "context.h"
 #include "constraint.h"
-#include "ndiff.h"
-#include "error.h"
-#include "utils.h"
-#include "utest.h"
-
-static void
-run_utest(void)
-{
-  struct utest *ut = utest_alloc(0);
-
-  inform("Running unit tests (incomplete)");
-
-  // list of unit tests: TODO
-  context_utest(ut);
-  ndiff_utest(ut);
-
-  // stat
-  utest_stat(ut);
-  utest_free(ut);
-}
-
-static void
-usage(void)
-{
-  logmsg_config.level = inform_level;
-
-  inform("usage:");
-  inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
-  inform("options:");
-  inform("\t-s    -suite name   set testsuite name for output message (title)");
-  inform("\t-t    -test name    set test name for output message (item)");
-  inform("\t-n    -serie        enable series mode (indexed filenames)");
-  inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
-  inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
-  inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
-  inform("\t-c    -check        enable check mode");
-  inform("\t-d    -debug        enable debug mode (include check mode)");
-  inform("\t-u    -utest        run the test suite");
-  inform("\t-h    -help         display this help");
-
-  exit(EXIT_FAILURE);
-}
-
-static void
-invalid(void)
-{
-  warning("invalid program options or arguments");
-  usage();
-}
 
 static int
-diff_summary(const struct ndiff *dif, int ns)
+diff_summary(const struct ndiff *dif)
 {
-  static const char *msg[] = {
-    "% 6d lines have been diffed",
-    "% 6d lines have been diffed in serie #%d",
-    "% 6d diffs have been detected",
-    "% 6d diffs have been detected in serie #%d"
-  };
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c);
 
   if (c) {
-    warning(msg[0 + (ns > 0)], n, ns);
-    warning(msg[2 + (ns > 0)], c, ns);
-  } else {
-    inform (msg[0 + (ns > 0)], n, ns);
-  }
+    warning("% 6d lines have been diffed   in %s", n, option.indexed_filename);
+    warning("% 6d diffs have been detected in %s", c, option.indexed_filename);
+  } else
+    inform ("% 6d lines have been diffed in %s", n, option.indexed_filename);
 
   return c;
 }
@@ -84,144 +33,51 @@ diff_summary(const struct ndiff *dif, int ns)
 int
 main(int argc, const char* argv[])
 {
-  int failed = 0, check = 0, debug = 0, serie = 0, blank = 0, utest = 0;
-  const char *suite = 0, *test = 0;
-  const char *fmt = "%d";
-  const char *lhs_s=0, *rhs_s=0, *cfg_s=0;
-  logmsg_config.level = inform_level;
+  // start timer
+  double t0 = clock();
 
-  // parse command line arguments
-  {
-    int i;
-    for (i = 1; i < argc; i++) {
+  // parse arguments
+  parse_args(argc, argv);
 
-      // display help [immediate]
-      if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-help")) {
-        usage();
-        continue;
-      }
-      // run utests [immediate]
-      if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "-utest")) {
-        run_utest();
-        utest += 1;
-        continue;
-      }
+  // test counter
+  int total = 0, failed = 0;
 
-      // set debug mode [setup]
-      if (!strcmp(argv[i], "-trace")) {
-        logmsg_config.level = trace_level;
-        logmsg_config.locate = 1;
-        debug("trace mode on");
-        debug = 1;
-        continue;
-      }
+  debug("arguments: total=%d, left=%d, right=%d, curr=%s",
+        argc, option.argi, argc-option.argi, argv[option.argi]);
 
-      // set debug mode [setup]
-      if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "-debug")) {
-        logmsg_config.level = debug_level;
-        logmsg_config.locate = 1;
-        debug("debug mode on");
-        debug = 1;
-        check = 1;
-        continue;
-      }
+  // file list loop
+  while (option.argi < argc) {
+    const char *lhs_s = 0, *rhs_s = 0, *cfg_s = 0;
+    int n = 0;
 
-      // set check mode [setup]
-      if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "-check")) {
-        debug("check mode on");
-        check = 1;
-        continue;
-      }
+    // setup filenames [incremental]
+    if (!option.list) {
+      if (option.argi < argc) lhs_s = argv[option.argi++];
+      if (option.argi < argc) rhs_s = argv[option.argi++];
+      if (option.argi < argc) cfg_s = argv[option.argi++];
+    } else
+      if (option.argi < argc) lhs_s = rhs_s = cfg_s = argv[option.argi++];
 
-      // set info mode [setup]
-      if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "-info")) {
-        debug("info mode on");
-        logmsg_config.level = inform_level;
-        logmsg_config.locate = 0;
-        continue;
-      }
-
-      // set blank mode [setup]
-      if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "-blank")) {
-        debug("blank space ignored");
-        blank = !blank;
-        continue;
-      }
-
-      // set quiet mode [setup]
-      if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "-quiet")) {
-        debug("quiet mode on");
-        logmsg_config.level = warning_level;
-        logmsg_config.locate = 0;
-        continue;
-      }
-
-      // set serie mode [setup]
-      if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "-serie")) {
-        debug("serie mode on");
-        serie = 1;
-        continue;
-      }
-
-      // set suite name [setup]
-      if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "-suite")) {
-        suite = argv[++i];
-        debug("suite name set to '%s'", suite);
-        continue;
-      }
-
-      // set test name [setup]
-      if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-test")) {
-        test = argv[++i];
-        debug("test name set to '%s'", test);
-        continue;
-      }
-
-      // set serie format [setup]
-      if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "-format")) {
-        if (serie) {
-          fmt = argv[++i];
-          debug("format set to '%s'", fmt);
-        } else {
-          i += 1;
-          inform("serie mode is off, format ignored");
-        }
-        continue;
-      }
-
-      // setup filenames [incremental]
-           if (!lhs_s) lhs_s = argv[i];
-      else if (!rhs_s) rhs_s = argv[i];
-      else if (!cfg_s) cfg_s = argv[i];
-    }
+    debug("arguments: total=%d, left=%d, right=%d, curr=%s",
+          argc, option.argi, argc-option.argi, argv[option.argi]);
 
     // checks
     if (!lhs_s || !rhs_s) {
-      if (i == argc-utest) invalid();
+      if (option.argi == argc-option.utest) invalid();
       else exit(EXIT_SUCCESS);
     }
-  }
 
-  // testsuite
-  if (suite)
-    fprintf(stdout, " [ %s ]\n", suite);
-
-  // serie loop
-  {
-    double t0 = clock();
-    int n = 0;
-
-    while (1) {
+    // serie loop
+    while (option.serie || !n) {
       FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
 
       // open files
-      lhs_fp = open_indexedFile(lhs_s, n, fmt, !(serie && n));
-      if (!lhs_fp) break;
-      rhs_fp = open_indexedFile(rhs_s, n, fmt, 1);
-      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, fmt, 1);
+      lhs_fp = open_indexedFile(lhs_s, n, option.out_e, 1);
+      if (!lhs_fp && option.serie) break;
+      rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, 0);
+      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, 0);
 
-      // serie number
-      if (n) inform("serie #%d", n);
+      if (!lhs_fp || !rhs_fp) invalid();
 
       // create context of constraints
       struct context *cxt = context_alloc(0);
@@ -230,17 +86,17 @@ main(int argc, const char* argv[])
       if (cfg_fp) cxt = context_scan(cxt, cfg_fp);
 
       // show constraints
-      if (debug) {
+      if (option.debug) {
         inform("rules list:");
         context_print(cxt, stderr);
       }
 
       // numdiff loop
       struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
-      ndiff_loop(dif, cxt, blank, check);
+      ndiff_loop(dif, cxt, option.blank, option.check);
 
       // print summary
-      if (diff_summary(dif, n) > 0) ++failed;
+      if (diff_summary(dif) > 0) ++failed;
 
       // destroy components
       ndiff_free(dif);
@@ -253,21 +109,23 @@ main(int argc, const char* argv[])
 
       n += 1;
 
-      // not a serie, stop
-      if (!serie) break;
+      // not a serie, stop this loop
+      if (!option.serie) break;
     }
 
-    double t1 = clock();
-    double t = (t1 - t0) / CLOCKS_PER_SEC;
-
-    if (test)
-      fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", test, t, n-failed, n,
-  #ifdef _WIN32
-              failed ? "FAIL" : "PASS");
-  #else
-              failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
-  #endif
+    total += n;
   }
+
+  double t1 = clock();
+  double t = (t1 - t0) / CLOCKS_PER_SEC;
+
+  if (option.test)
+    fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
+#ifdef _WIN32
+            failed ? "FAIL" : "PASS");
+#else
+            failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
+#endif
 
   return failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
