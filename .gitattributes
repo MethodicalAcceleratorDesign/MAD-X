@@ -592,7 +592,6 @@ tests/test-jacobian-knobs/test-jacobian-knobs.madx -text
 tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
-tests/test-jacobian/test-jacobian.out -text
 tests/test-jacobian/test-jacobian.ref -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss/fort.18.ref -text
