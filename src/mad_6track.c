@@ -84,6 +84,7 @@
 
 #define BASE_TYPES 100    /* maximum no. of element types allowed */
 #define EL_COUNT   100    /* initial length of element type list */
+#define M_PI 3.141592653589793238462643383279502
 
 // types
 
@@ -840,7 +841,11 @@ static void
 att_crabcavity(struct c6t_element* el)
 {
   double lag = el->value[5];
-  el->out_1 = 23;
+  double tilt = el->value[12];
+  if (fabs(tilt - M_PI/2)<eps_9)
+    el->out_1 = -23;
+  else
+    el->out_1 = 23;
   if (cavall_flag == 0)
   {
     el->out_2 = total_voltage;
@@ -953,8 +958,13 @@ att_undefined(struct c6t_element* el)
 static void
 att_rfquadrupole(struct c6t_element* el)
 {
-  el->out_1 = 26;
-  el->out_2 = el->value[3];
+  if (fabs(el->value[3])>eps_9) {
+    el->out_1 = 26;
+    el->out_2 = el->value[3];
+  } else if (fabs(el->value[9])>eps_9) {
+    el->out_1 = -26;
+    el->out_2 = el->value[9];
+  }
   el->out_3 = el->value[2];
   el->out_4 = el->value[6];
 }
@@ -962,8 +972,13 @@ att_rfquadrupole(struct c6t_element* el)
 static void
 att_rfsextupole(struct c6t_element* el)
 {
-  el->out_1 = 27;
-  el->out_2 = el->value[4];
+  if (fabs(el->value[4])>eps_9) {
+    el->out_1 = 27;
+    el->out_2 = el->value[4];
+  } else if (fabs(el->value[10])>eps_9) {
+    el->out_1 = -27;
+    el->out_2 = el->value[10];
+  }
   el->out_3 = el->value[2];
   el->out_4 = el->value[7];
 }
@@ -971,8 +986,13 @@ att_rfsextupole(struct c6t_element* el)
 static void
 att_rfoctupole(struct c6t_element* el)
 {
-  el->out_1 = 28;
-  el->out_2 = el->value[5];
+  if (fabs(el->value[5])>eps_9) {
+    el->out_1 = 28;
+    el->out_2 = el->value[5];
+  } else if (fabs(el->value[11])>eps_9) {
+    el->out_1 = -28;
+    el->out_2 = el->value[11];
+  }
   el->out_3 = el->value[2];
   el->out_4 = el->value[8];
 }
@@ -1300,7 +1320,7 @@ convert_madx_to_c6t(struct node* p)
   }
   else if ((strcmp(p->base_name,"crabcavity") == 0))
   {
-    c6t_elem = new_c6t_element(11,t_name,p->base_name);
+    c6t_elem = new_c6t_element(12,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
@@ -1312,6 +1332,7 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[9] = el_par_value_recurse("shunt",p->p_elem);
     c6t_elem->value[10] = el_par_value_recurse("tfill",p->p_elem);
     c6t_elem->value[11] = el_par_value_recurse("harmon",p->p_elem);
+    c6t_elem->value[12] = el_par_value_recurse("tilt",p->p_elem);
   }
   else if ((strcmp(p->base_name,"dipedge") == 0))
   {
@@ -1424,11 +1445,8 @@ convert_madx_to_c6t(struct node* p)
       ps_param = p->p_elem->def->par->parameters[index];
       maxps=ks_param->double_array->curr;
     }
-    if (maxks>0) {
-    	printf("warning while converting rfmultipole: skew components are ignored\n");
-    }
-    if (maxkn>3) {
-    	printf("warning while converting rfmultipole: normal components beyond octupole are ignored\n");
+    if (maxkn>3 || maxks>3) {
+    	printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
     }
     
     /*
@@ -1438,7 +1456,7 @@ convert_madx_to_c6t(struct node* p)
     ** no skew elements yet).
     ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
     ** n2: Frequency in MHz
-    ** n3: RF phase in radians 
+    ** n3: RF phase in radians
     */  
 
     /* 
@@ -1454,19 +1472,27 @@ convert_madx_to_c6t(struct node* p)
     ** value[8] = phase for octupole
     */ 
     
-    c6t_elem = new_c6t_element(8,t_name,p->base_name);
+    c6t_elem = new_c6t_element(14,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
  
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[1] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
+    // normal components
     c6t_elem->value[3] = maxkn>=1?(-kn_param->double_array->a[1]/1.0):0.0;
     c6t_elem->value[4] = maxkn>=2?(-kn_param->double_array->a[2]/2.0):0.0;
     c6t_elem->value[5] = maxkn>=3?(-kn_param->double_array->a[3]/6.0):0.0;
     c6t_elem->value[6] = maxpn>=1?pn_param->double_array->a[1]:0.0;
     c6t_elem->value[7] = maxpn>=2?pn_param->double_array->a[2]:0.0;
     c6t_elem->value[8] = maxpn>=3?pn_param->double_array->a[3]:0.0;
+    // skew component
+    c6t_elem->value[9]  = maxks>=1?(-ks_param->double_array->a[1]/1.0):0.0;
+    c6t_elem->value[10] = maxks>=2?(-ks_param->double_array->a[2]/2.0):0.0;
+    c6t_elem->value[11] = maxks>=3?(-ks_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[12] = maxps>=1?ps_param->double_array->a[1]:0.0;
+    c6t_elem->value[13] = maxps>=2?ps_param->double_array->a[2]:0.0;
+    c6t_elem->value[14] = maxps>=3?ps_param->double_array->a[3]:0.0;
   }
   else
   {
@@ -2662,21 +2688,21 @@ write_all_el(void)
 static void write_rfmultipole(struct c6t_element* el)
 {
   char name[48];
-  if (fabs(el->value[3])>eps_9) {
+  if (fabs(el->value[3])>eps_9 || fabs(el->value[9])>eps_9) {
     att_rfquadrupole(el);
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(el->value[4])>eps_9) {
+  if (fabs(el->value[4])>eps_9 || fabs(el->value[10])>eps_9) {
     att_rfsextupole(el);
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(el->value[5])>eps_9) {
+  if (fabs(el->value[5])>eps_9 || fabs(el->value[11])>eps_9) {
     att_rfoctupole(el);
     strcpy(name, el->name);
     strcat(name, "_o");
@@ -3051,17 +3077,17 @@ rfmultipole_name(char *name, struct c6t_element* el)
   char tmp[256] = "";
   int n = 0;
 
-  if (fabs(el->value[3])>eps_9) {
+  if (fabs(el->value[3])>eps_9 || fabs(el->value[9])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_q");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(el->value[4])>eps_9) {
+  if (fabs(el->value[4])>eps_9 || fabs(el->value[10])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_s");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(el->value[5])>eps_9) {
+  if (fabs(el->value[5])>eps_9 || fabs(el->value[11])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_o");
     n += sprintf(name+n, "%-18s", tmp);
