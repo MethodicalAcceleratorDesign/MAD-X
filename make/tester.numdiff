@@ -27,24 +27,29 @@ NDIFF := $(if $(wildcard $(ND)$(ARCH)$(EXE)),..$/..$/$(ND)$(ARCH)$(EXE),$(ND))
 NDFLAGS = -q -b -c -n -t $@
 
 #
-# numdiff files
+# run-test macro
 #
-NDFILES = out.txt ref.txt cfg.txt
-
-#
-# test macro
-#
-run-test = $(call run-test-file,$(NDFILES))
-
 # $@ = test name & directory
-# $1 = files for numdiff: generated output, reference output and configuration
+NDFILES     = $(basename $(NDFILES_REF))
+NDFILES_OUT = $(addsuffix .out,$(NDFILES)) $(NDFILES)
+NDFILES_REF = $(wildcard   tests$/$@$/$@.ref) \
+              $(filter-out tests$/$@$/$@.ref, $(sort $(wildcard tests$/$@$/*.ref)))
 
-define run-test-file
+# Remarks line-by-line
+# check for .ref files
+# check for testsuite name ; go to test directory
+# delete generated files + cleanup output on Windows (case file not found)
+# run the test command (generate outputs)
+# for each reference file, diff with the generated file + constraints
+define run-test
+$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found)
 $_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
-$(RM) $(basename $(firstword $1))*$(suffix $(firstword $1)) \
-$(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
-$(TESTCMD) > $(firstword $1) && \
-$(call ND_tr,$(NDIFF) $(NDFLAGS) $1)
+$(RM) $(notdir $(NDFILES_OUT)) \
+  $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
+$(TESTCMD) > $@.out \
+$(foreach f, $(NDFILES),&& $(call ND_tr,$(NDIFF) $(NDFLAGS)) $(notdir \
+  $(or $(wildcard $f),$(wildcard $f.out)) $f.ref $(wildcard $f.cfg)) \
+ )
 endef
 
 # end of makefile

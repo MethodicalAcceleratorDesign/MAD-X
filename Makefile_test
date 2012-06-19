@@ -34,7 +34,7 @@ endif
 
 # testsuite titles (attached to first rule of your suite)
 test-jacobian:  TESTSUITE := Jacobian testsuite
-test-ptc-twiss: TESTSUITE := PTC Twiss testsuite 
+test-ptc-twiss: TESTSUITE := PTC Twiss testsuite
 
 # end of testsuite
 #################################################
