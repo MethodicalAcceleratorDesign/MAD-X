@@ -120,7 +120,7 @@ main(int argc, const char* argv[])
   double t = (t1 - t0) / CLOCKS_PER_SEC;
 
   if (option.test)
-    inform(" + %-50s (%.2f s) - %2d/%2d : %s", option.test, t, total-failed, total,
+    printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
 #ifdef _WIN32
             failed ? "FAIL" : "PASS");
 #else
