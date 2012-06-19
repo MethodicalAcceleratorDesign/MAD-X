@@ -23,8 +23,8 @@ NDIFF := $(if $(wildcard $(ND)$(ARCH)$(EXE)),..$/..$/$(ND)$(ARCH)$(EXE),$(ND))
 
 #
 # numdiff flags
-#
-NDFLAGS = -q -b -c -n -t $@
+# quiet, ingore blanks, check constraints, list mode, serie mode, debug mode, test title
+NDFLAGS = -q -b -c -l -n $(if $(call eq,$(DEBUG),yes),-d,) -t $@
 
 #
 # run-test macro
@@ -46,10 +46,8 @@ $(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found)
 $_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
 $(RM) $(notdir $(NDFILES_OUT)) \
   $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
-$(TESTCMD) > $@.out \
-$(foreach f, $(NDFILES),&& $(call ND_tr,$(NDIFF) $(NDFLAGS)) $(notdir \
-  $(or $(wildcard $f),$(wildcard $f.out)) $f.ref $(wildcard $f.cfg)) \
- )
+$(TESTCMD) > $@.out && \
+$(call ND_tr,$(NDIFF) $(NDFLAGS)) $(notdir $(NDFILES))
 endef
 
 # end of makefile

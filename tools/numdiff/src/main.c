@@ -42,7 +42,7 @@ main(int argc, const char* argv[])
   // test counter
   int total = 0, failed = 0;
 
-  debug("arguments: total=%d, left=%d, right=%d, curr=%s",
+  trace("arguments: total=%d, left=%d, right=%d, curr=%s",
         argc, option.argi, argc-option.argi, argv[option.argi]);
 
   // file list loop
@@ -58,7 +58,7 @@ main(int argc, const char* argv[])
     } else
       if (option.argi < argc) lhs_s = rhs_s = cfg_s = argv[option.argi++];
 
-    debug("arguments: total=%d, left=%d, right=%d, curr=%s",
+    trace("arguments: total=%d, left=%d, right=%d, curr=%s",
           argc, option.argi, argc-option.argi, argv[option.argi]);
 
     // checks
@@ -87,7 +87,7 @@ main(int argc, const char* argv[])
 
       // show constraints
       if (option.debug) {
-        inform("rules list:");
+        debug("rules list:");
         context_print(cxt, stderr);
       }
 
@@ -120,13 +120,13 @@ main(int argc, const char* argv[])
   double t = (t1 - t0) / CLOCKS_PER_SEC;
 
   if (option.test)
-    fprintf(stdout, " + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
+    inform(" + %-50s (%.2f s) - %2d/%2d : %s", option.test, t, total-failed, total,
 #ifdef _WIN32
             failed ? "FAIL" : "PASS");
 #else
             failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
 #endif
 
-  return failed ? EXIT_FAILURE : EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
