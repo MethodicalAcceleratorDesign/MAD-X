@@ -3,13 +3,13 @@ Option,  warn,info,echo;
 Option, -echo,-warn;
 !SU=1.0;
 
-call file="examples/ibs/thin62.madx";
+call file="../../examples/ibs/thin62.madx";
 
-call,file="examples/ibs/K450Is64-59nV6.2.opt";
+call,file="../../examples/ibs/K450Is64-59nV6.2.opt";
 ! injection Optics:
-Call,file="examples/ibs/kinj.b1b2.v6.2.thin";
-Call,file="examples/ibs/kinj.corr.ir2.ir8.thin";
-Call,file="examples/ibs/kinj.corr.ir1.ir5.thin";
+Call,file="../../examples/ibs/kinj.b1b2.v6.2.thin";
+Call,file="../../examples/ibs/kinj.corr.ir2.ir8.thin";
+Call,file="../../examples/ibs/kinj.corr.ir1.ir5.thin";
 ! collision Optics:
 !call,file="kcol.b1b2.v6.2.thin";
 !Call,file="kcol.corr.ir1.ir5.thin";

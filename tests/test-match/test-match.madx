@@ -16,8 +16,8 @@ Beam, particle = proton, sequence=lhcb2, energy = 7000.0;
 ! the 'bv' parameter indicates that beam2 rotates counter-clockwise
 
 ! select IR8 of beam1:
-call,file="examples/match/select.ir8.b1.madx";
-call,file="examples/match/twissini.ir8.b1.madx";
+call,file="../../examples/match/select.ir8.b1.madx";
+call,file="../../examples/match/twissini.ir8.b1.madx";
 
 
 ! Create table for storing data
