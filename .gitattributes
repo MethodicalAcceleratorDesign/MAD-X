@@ -566,22 +566,18 @@ testing/ProcessScenario.xsl -text
 testing/TestScenario.xml -text
 testing/ctests/CMakeLists.txt -text
 testing/ctests/checkConsistency.py -text
-testing/ctests/ibs.mad -text
-testing/ctests/job.lhcV65.ir8squeeze.madx -text
 testing/ctests/job.sample.madx -text
-testing/ctests/madx_testing_output/sample_optics.tfs -text
-testing/ctests/test_5frs.madx -text
 testing/ctests/testbase.cmake -text
 testing/ctests/testbase.sh -text
 testing/ctests/testruns.sh -text
 testing/ctests/testsample.sh -text
-testing/ctests/twiss1.madx -text
 testing/index.htm -text
 testing/mad_install -text
 testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tests/test-ibs/test-ibs.madx -text
 tests/test-jacobian-2/test-jacobian-2.cfg -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
 tests/test-jacobian-2/test-jacobian-2.ref -text
@@ -593,6 +589,8 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
+tests/test-match/test-match.madx -text
+tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss/fort.18.ref -text
 tests/test-ptc-twiss/ptc-twiss-table.cfg -text
@@ -600,6 +598,8 @@ tests/test-ptc-twiss/ptc-twiss-table.ref -text
 tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tests/test-ptc-twiss/test-ptc-twiss.ref -text
+tests/test-twiss/sample_optics.tfs -text
+tests/test-twiss/test-twiss.madx -text
 tools/CMakeLists.txt -text
 tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
