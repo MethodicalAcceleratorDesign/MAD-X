@@ -1,7 +1,3 @@
-/* Compilation:
-   gcc -std=c99 -W -Wall -pedantic -O3 *.c -o numdiff
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
