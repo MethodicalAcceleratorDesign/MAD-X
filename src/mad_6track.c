@@ -84,7 +84,10 @@
 
 #define BASE_TYPES 100    /* maximum no. of element types allowed */
 #define EL_COUNT   100    /* initial length of element type list */
+
+#ifndef M_PI
 #define M_PI 3.141592653589793238462643383279502
+#endif
 
 // types
 
