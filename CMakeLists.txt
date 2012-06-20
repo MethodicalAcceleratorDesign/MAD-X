@@ -53,5 +53,4 @@ add_subdirectory(syntax)
 # Setting up testing:
 include(setupTesting)
 # Add test folders:
-add_subdirectory(testing/ctests)
 include(numdifftests)

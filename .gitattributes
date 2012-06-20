@@ -564,13 +564,6 @@ testing/Makefile -text
 testing/Notify.py -text
 testing/ProcessScenario.xsl -text
 testing/TestScenario.xml -text
-testing/ctests/CMakeLists.txt -text
-testing/ctests/checkConsistency.py -text
-testing/ctests/job.sample.madx -text
-testing/ctests/testbase.cmake -text
-testing/ctests/testbase.sh -text
-testing/ctests/testruns.sh -text
-testing/ctests/testsample.sh -text
 testing/index.htm -text
 testing/mad_install -text
 testing/repository.gif -text svneol=unset#unset
