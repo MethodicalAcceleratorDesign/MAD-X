@@ -606,7 +606,7 @@ tests/test-ptc-twiss/ptc-twiss-table.ref -text
 tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tests/test-ptc-twiss/test-ptc-twiss.ref -text
-tests/test-twiss/sample_optics.tfs -text
+tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text
 tests/test-twiss/test-twiss.madx -text
 tests/test-twiss/test-twiss.ref -text
