@@ -417,7 +417,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   double lhs_d, rhs_d, dif_a, min_a;
 
   // parse numbers
-  int d1, d2, n1, n2, e1, e2, f1, f2;
+  int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
   int l1 = parse_number(lhs_p, &d1, &n1, &e1, &f1);
   int l2 = parse_number(rhs_p, &d2, &n2, &e2, &f2);
   int ret = 0;
