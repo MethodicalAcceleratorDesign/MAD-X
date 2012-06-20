@@ -24,6 +24,8 @@ macro(numdiff_test testname testout islong)
        -DTEST_NAME=${testname}
        -DNUMDIFF=${ndiffbin}
        -P ${BASESCRIPT})
+    set_tests_properties (${_testname}
+       PROPERTIES PASS_REGULAR_EXPRESSION ".*${testname}.*PASS")
 endmacro()
 
 # First parameter is test name.
