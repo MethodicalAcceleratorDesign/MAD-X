@@ -16,46 +16,102 @@
 # | $Id$
 # |
 
+#####################
+# ICC specific
+#
+
+ICL_CC1 := -D%  -I% /O0
+ICL_CC2 := /D%  /I% /Od
+
+###############
+# C language
+#
+
+ifeq ($(CCNAME),icc)
+
 #
 # makedep
 #
 
 ifneq ($(SED),)
-CDEP   = $(CC)  /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
-CXXDEP = $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
-
-# CDEP output translator
-CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" \
-                   -e "s/\.obj:/\.o:/g"
-CXXDEP_tr = $(CDEP_tr)
+CDEP = $(CC) /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
+CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
 endif
 
 #
 # compiler
 #
 
-CPPFLAGS += -D_ICC
-CFLAGS   = /Qstd=c99   /Wall /Wcheck /Wp64 /O$(NOPT) /c
-CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c
+CFLAGS = /Qstd=c99 /Wall /Wcheck /Wp64 /O$(NOPT) /c /D_ICC /D_ICL
 
 #
 # diagnostics
 #
 
-CFLAGS   += /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
-CXXFLAGS += /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
+CFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS   += /debug:all
+CFLAGS += /debug:all
+endif
+
+ifeq ($(PROFILE),yes)
+CFLAGS += /Qprof-use
+endif
+
+#
+# extra flags
+#
+
+CFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
+
+#
+# command translator
+#
+
+CC_tr = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$1)))
+
+endif
+
+###############
+# C++ language
+#
+
+ifeq ($(CXXNAME),icc)
+
+#
+# makedep
+#
+
+ifneq ($(SED),)
+CXXDEP = $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
+CXXDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
+endif
+
+#
+# compiler
+#
+
+CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c /D_ICC /D_ICL
+
+#
+# diagnostics
+#
+
+CXXFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
 CXXFLAGS += /debug:all
 endif
 
 ifeq ($(PROFILE),yes)
-CFLAGS   += /Qprof-use
 CXXFLAGS += /Qprof-use
 endif
 
@@ -63,18 +119,14 @@ endif
 # extra flags
 #
 
-CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS 
-CFLAGS   += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
 CXXFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
 
 #
 # command translator
 #
 
-ICL_CC1 := -D%  -I% /O0
-ICL_CC2 := /D%  /I% /Od
+CXX_tr = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$1)))
 
-CC_tr  = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(ICL_CC1),$(ICL_CC2),$1)))
-CXX_tr = $(CC_tr)
+endif
 
 # end of makefile

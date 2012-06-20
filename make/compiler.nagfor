@@ -26,15 +26,14 @@
 # compiler flags
 #
 
-CPPFLAGS += -D_NAGFOR
-FFLAGS    = -f95 -O$(NOPT) -w=unused -c
+FFLAGS = -f95 -O$(NOPT) -w=unused -c -D_NAGFOR
 
 ifeq ($(ARCH),32)
-FFLAGS   += -Wc,-m32 -abi=32
+FFLAGS += -Wc,-m32 -abi=32
 endif
 
 # FFLAGS with no-optimization
-FFLAGS0   = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
+FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
 
 #
 # options flags

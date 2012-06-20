@@ -45,32 +45,10 @@ PROFILE := no
 # Intel=yes sets CC=icc/icl, CXX=icc/icl, FC=ifort    (use icl on Windows)
 
 # C compiler (default is gcc)
-CC  := gcc
+CC := gcc
 
-# C++ compiler (default is g++)
-CXX := g++
-
-# Fortran compiler (default is gfortran)
-FC  := gfortran
-
-# Linker (default is fortran compiler, deferred)
-LD     = $(CC)
-LDNAME = $(CCNAME)
-
-####################
-# Includes settings
-
-# makefiles to include (in this order, all optional)
-FILE_PRE  := Makefile_pre          # user's preprocessing extra stuff
-FILE_VER  := VERSION               # setup project VERSION and VERSION_DATE
-FILE_CPP  := Makefile_cpp          # setup project specific CPPFLAGS defines
-FILE_C    := Makefile_c            # setup project CC_SRC and CC_HDR
-FILE_CXX  := Makefile_cxx          # setup project CXX_SRC and CXX_HDR
-FILE_F90  := Makefile_f90          # setup project FC_SRC
-FILE_LIB  := Makefile_lib          # setup project LIBS paths and libs
-FILE_SYS  := Makefile_sys          # setup project System specific stuffs
-FILE_TEST := Makefile_test         # setup project tests
-FILE_POST := Makefile_post         # user's postprocessing extra stuff
+# Linker (default is gcc compiler, deferred)
+LD  = $(CC)
 
 ####################
 # Makefile includes

@@ -31,8 +31,7 @@
 # compiler flags
 #
 
-CPPFLAGS += -D_G95
-FFLAGS    = -m$(ARCH) -O$(NOPT) -c
+FFLAGS = -m$(ARCH) -O$(NOPT) -c -D_G95
 
 # fortran code is not conformant to f90/f95 (break compilation)!
 # FFLAGS  = -m$(ARCH) -O$(NOPT) -std=f95 -c
@@ -41,7 +40,7 @@ FFLAGS    = -m$(ARCH) -O$(NOPT) -c
 # FFLAGS  = -m$(ARCH) -O$(NOPT) -std=f95 -Wall -Wextra -pedantic -c
 
 # FFLAGS with no-optimization
-FFLAGS0   = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
+FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
 
 #
 # options flags

@@ -32,50 +32,56 @@ include $(makedir)/make.act
 -include $(FILE_VER)
 -include $(FILE_CPP)
 
+# c files
+ifneq ($(CCNAME),)
 $(call exists, $(makedir)/compiler.$(CCNAME), \
 unable to include settings for compiler CC=$(CCNAME) (make [options] infoinc); \
 check CC or CCNAME for correct compiler configuration file)
 include $(makedir)/compiler.$(CCNAME)
 -include $(FILE_C)
+endif
 
+# c++ files
+ifneq ($(CXXNAME),)
 $(call exists, $(makedir)/compiler.$(CXXNAME), \
 unable to include settings for compiler CXX=$(CXXNAME) (make [options] infoinc); \
 check CXX or CXXNAME for correct compiler configuration file)
-ifneq ($(CCNAME),$(CXXNAME))
 include $(makedir)/compiler.$(CXXNAME)
-endif
 -include $(FILE_CXX)
+endif
 
+# fortran files
+ifneq ($(FCNAME),)
 $(call exists, $(makedir)/compiler.$(FCNAME), \
 unable to include settings for compiler FC=$(FCNAME) (make [options] infoinc); \
 check FC or FCNAME for correct compiler configuration file)
-ifneq ($(CCNAME),$(FCNAME))
 include $(makedir)/compiler.$(FCNAME)
-endif
 -include $(FILE_F90)
+endif
 
+# lib, sys files
 -include $(FILE_LIB)
 -include $(FILE_SYS)
 
-# linker specific settings
+# linker files
+ifneq ($(LDNAME),)
 $(call exists, $(makedir)/linker.$(LDNAME), \
 unable to include settings for linker LD=$(LDNAME) (make [options] infoinc); \
 check LD or LDNAME for correct linker configuration file)
 include $(makedir)/linker.$(LDNAME)
+endif
 
-# system specific settings
+# system files
 -include $(makedir)/system.$(OSTYPE)
 
-# tester specific settings
-ifdef ND
+# tests files
+ifneq ($(NDNAME),)
 $(call exists, $(makedir)/tester.$(NDNAME), \
 unable to include settings for tester ND=$(NDNAME) (make [options] infoinc); \
 check ND or NDNAME for correct tester configuration file)
 include $(makedir)/tester.$(NDNAME)
-endif
-
-# project tests
 -include $(FILE_TEST)
+endif
 
 # user's postprocessing extra stuff
 -include $(FILE_POST)

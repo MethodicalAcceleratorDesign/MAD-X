@@ -16,43 +16,96 @@
 # | $Id$
 # |
 
+#####################
+# CL specific
+#
+
+CL_CC1 := -D%  -I% /O3 /O0
+CL_CC2 := /D%  /I% /O2 /Od
+
+###############
+# C language
+#
+
+ifeq ($(CCNAME),cl)
+
 #
 # makedep
 #
 
 ifneq ($(and $(SED),$(GREP)),)
-CDEP   = $(CC) /nologo /c /Zs /showIncludes
-CXXDEP = $(CDEP)
-
-# CDEP output translator
+CDEP = $(CC) /nologo /c /Zs /showIncludes
 CDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
           | $(SED)  -e "s/$(call f2bs,$(CURDIR)/)//gi" \
                     -e "s/Note: including file:/$<:/gi" \
                     -e "s/\.c:/\.o:/g"
-CXXDEP_tr = $(CDEP_tr)
 endif
 
 #
 # compiler
 #
 
-CPPFLAGS += -D_MCC
-CFLAGS    = /O$(NOPT) /c
-CXXFLAGS  = /O$(NOPT) /c
-
-# CFLAGS  = /Wall /O$(NOPT) /c
+CFLAGS = /O$(NOPT) /c /D_MCC # /Wall
 
 #
 # options flags
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS   += /Zi /Yd
+CFLAGS += /Zi /Yd
+endif
+
+ifeq ($(PROFILE),yes)
+CFLAGS +=
+endif
+
+#
+# extra flags
+#
+
+CFLAGS += /nologo /fp:precise /Zm1000 /EHsc /D_CRT_SECURE_NO_WARNINGS /Dinline=__inline
+
+#
+# command translator
+#
+
+CC_tr = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
+
+endif
+
+###############
+# C++ language
+#
+
+ifeq ($(CXXNAME),cl)
+
+#
+# makedep
+#
+
+ifneq ($(and $(SED),$(GREP)),)
+CXXDEP = $(CC) /nologo /c /Zs /showIncludes
+CXXDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
+            | $(SED)  -e "s/$(call f2bs,$(CURDIR)/)//gi" \
+                      -e "s/Note: including file:/$<:/gi" \
+                      -e "s/\.c:/\.o:/g"
+endif
+
+#
+# compiler
+#
+
+CXXFLAGS = /O$(NOPT) /c /D_MCC # /Wall
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
 CXXFLAGS += /Zi /Yd
 endif
 
 ifeq ($(PROFILE),yes)
-CFLAGS   +=
 CXXFLAGS +=
 endif
 
@@ -60,18 +113,14 @@ endif
 # extra flags
 #
 
-CPPFLAGS += /D_CRT_SECURE_NO_WARNINGS /Dinline=__inline
-CFLAGS   += /nologo /fp:precise /Zm1000 /EHsc
-CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc
+CXXFLAGS += /nologo /fp:precise /Zm1000 /EHsc /D_CRT_SECURE_NO_WARNINGS /Dinline=__inline
 
 #
 # command translator
 #
 
-CL_CC1 := -D%  -I% /O3 /O0
-CL_CC2 := /D%  /I% /O2 /Od
+CXX_tr = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
 
-CC_tr  = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(CL_CC1),$(CL_CC2),$1)))
-CXX_tr = $(CC_tr)
+endif
 
 # end of makefile

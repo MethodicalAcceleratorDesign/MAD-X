@@ -16,26 +16,72 @@
 # | $Id$
 # |
 
+###############
+# C language
+#
+
+ifeq ($(CCNAME),icc)
+
 #
 # makedep
 #
 
-CDEP   = $(CC)  -MM $(addprefix -I,$(CC_DIR))
+CDEP = $(CC) -MM $(addprefix -I,$(CC_DIR))
+
+#
+# compiler
+#
+
+CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -Wcheck -Wp64 -c -D_ICC
+
+#
+# diagnostics
+#
+
+CFLAGS += -diag-disable 2259,1572,981 # -diag-enable sc2
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+CFLAGS += -g -gdwarf-2
+endif
+
+ifeq ($(PROFILE),yes)
+CFLAGS += -p
+endif
+
+#
+# extra flags
+#
+ 
+CFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CC_DIR))
+
+endif
+
+###############
+# C++ language
+#
+
+ifeq ($(CXXNAME),icc)
+
+#
+# makedep
+#
+
 CXXDEP = $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 
 #
 # compiler
 #
 
-CPPFLAGS += -D_ICC
-CFLAGS   = -m$(ARCH) -O$(NOPT) -std=c99   -Wall -Wcheck -Wp64 -c
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++0x -Wall -Wcheck -Wp64 -c
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++0x -Wall -Wcheck -Wp64 -c -D_ICC
 
 #
 # diagnostics
 #
 
-CFLAGS   += -diag-disable 2259,1572,981 # -diag-enable sc2
 CXXFLAGS += -diag-disable 2259,1572,981 # -diag-enable sc2
 
 #
@@ -43,12 +89,10 @@ CXXFLAGS += -diag-disable 2259,1572,981 # -diag-enable sc2
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS   += -g -gdwarf-2
 CXXFLAGS += -g -gdwarf-2
 endif
 
 ifeq ($(PROFILE),yes)
-CFLAGS   += -p
 CXXFLAGS += -p
 endif
 
@@ -56,7 +100,8 @@ endif
 # extra flags
 #
  
-CFLAGS   += -mp1 -fp-model strict $(addprefix -I,$(CC_DIR))
 CXXFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CXX_DIR))
+
+endif
 
 # end of makefile
