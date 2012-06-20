@@ -104,7 +104,7 @@ ND  := numdiff
 ####################
 # Includes settings
 
-# makefiles to include (in this order, all optional)
+# makefiles to include (in this order, all optional, here are default names)
 FILE_PRE  := Makefile_pre          # user's preprocessing extra stuff
 FILE_VER  := VERSION               # setup project VERSION and VERSION_DATE
 FILE_CPP  := Makefile_cpp          # setup project specific CPPFLAGS defines
