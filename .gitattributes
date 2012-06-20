@@ -570,6 +570,7 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tests/test-ibs/test-ibs.cfg -text
 tests/test-ibs/test-ibs.madx -text
 tests/test-jacobian-2/test-jacobian-2.cfg -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
@@ -582,7 +583,9 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
+tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
+tests/test-ptc-normal/test-ptc-normal.cfg -text
 tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss/fort.18.ref -text
@@ -592,6 +595,7 @@ tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tests/test-ptc-twiss/test-ptc-twiss.ref -text
 tests/test-twiss/sample_optics.tfs -text
+tests/test-twiss/test-twiss.cfg -text
 tests/test-twiss/test-twiss.madx -text
 tools/CMakeLists.txt -text
 tools/numdiff/CMakeLists.txt -text
