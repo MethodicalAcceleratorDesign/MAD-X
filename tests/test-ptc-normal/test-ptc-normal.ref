@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +              MAD-X 5.00.00              +
-  +           Production Version            +
-  + Code Modification Date: 28.02.2011      +
-  + Execution Time Stamp: 20.06.12 10.35.50 +
+  +    MAD-X 5.00.16  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.04.05      +
+  + Execution Time Stamp: 20.06.12 17.38.36 +
   +++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -230,13 +230,13 @@ c6t terminated - total number of elements: 1014
                           sequence length: 19.099988 [m]
 input file fc.34 is ready. 
   Program <DISTORT1> will be executed 
- Start and End Position in [m]:    0.0000000000000000        27000.000000000000     
+ Start and End Position in [m]:   0.000000000000000E+000   27000.0000000000     
   Print_out at end of structure 
-  Qx=   0.36426353119764998       Qy=   0.29889581027168000     
+  Qx=   0.364263531197650       Qy=   0.298895810271680     
 
 --------------------------------------------------------------------------------
 
-Reading Data took      0.002 second(s) of Execution Time
+Reading Data took      0.012 second(s) of Execution Time
 
 --------------------------------------------------------------------------------
 
@@ -289,7 +289,7 @@ Reading Data took      0.002 second(s) of Execution Time
 
 --------------------------------------------------------------------------------
 
-Program <DISTORT1> used      0.001 second(s) of Execution Time
+Program <DISTORT1> used      0.002 second(s) of Execution Time
 
 --------------------------------------------------------------------------------
 
@@ -297,7 +297,7 @@ Program <DISTORT1> used      0.001 second(s) of Execution Time
 
 --------------------------------------------------------------------------------
 
-Program <SODD> used a total of      0.003 second(s) of Execution Time
+Program <SODD> used a total of      0.014 second(s) of Execution Time
 
 --------------------------------------------------------------------------------
 
@@ -313,17 +313,17 @@ Program <SODD> used a total of      0.003 second(s) of Execution Time
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.500000E+04
  Setting MADx with 
-     energy           5000.0000000000000     
+     energy           5000.00000000000     
      method                   2
      Num. of steps            1
-     charge           1.0000000000000000     
-  Length of machine:    19.099987755982863     
+     charge           1.00000000000000     
+  Length of machine:    19.0999877559829     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        19.099987755983108     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   19.0999877559831     
 !	select_ptc_normal, dx=1, dpx=1;
 
 !	select_ptc_normal, dy=1, dpy=1;	
@@ -373,7 +373,6 @@ The minimum required order is 5
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     2
   Default integration steps      1
-  Real Pill Box Cavities 
  This is a proton 
        EXACT_MODEL =  FALSE
        TOTALPATH   =     0
@@ -387,14 +386,15 @@ The minimum required order is 5
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
-       MODULATION   = FALSE
- Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Check of the symplectic condition on the linear part
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 Deviation from symplecticity  0.6217248937900877E-12 %
    ptc_end;
 
-  killing last layout 
-  killed last layout 
+ Killing LayoutNo name assigned                                                                                                        
+ Layout killed 
    write, table=normal_results,file=ptc_normal_results.tfs; 
 
    write, table=map_table, file=ptc_map_table.tfs;
@@ -404,6 +404,6 @@ Deviation from symplecticity  0.6217248937900877E-12 %
 
   Number of warnings: 0
 
-  +++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.00 finished normally +
-  +++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.16 32 finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
