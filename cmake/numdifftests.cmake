@@ -28,7 +28,17 @@ endmacro()
 # second is a bool saying if it is 
 # a long test (test-user)
 
+numdiff_test(test-ibs False)
 numdiff_test(test-jacobian False)
 numdiff_test(test-jacobian-2 False)
 numdiff_test(test-jacobian-knobs False)
 numdiff_test(test-ptc-twiss False)
+numdiff_test(test-ptc-normal False)
+
+# Tests that require afs:
+if(EXISTS "/afs/cern.ch/")
+   numdiff_test(test-twiss False)
+   numdiff_test(test-match True)
+else()
+   message(STATUS "afs is not available, some tests will be missing")
+endif()
