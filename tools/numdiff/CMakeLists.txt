@@ -1,6 +1,5 @@
 
-
-set(numdiff_src src/constraint.c  src/context.c  src/error.c  src/main.c  src/ndiff.c  src/utest.c  src/utils.c)
+file(GLOB numdiff_src src/*.c)
 
 include_directories(src)
 
