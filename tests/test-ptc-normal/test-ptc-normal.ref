@@ -1,0 +1,409 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 20.06.12 10.35.50 +
+  +++++++++++++++++++++++++++++++++++++++++++
+   !                     FODO for MAD-X
+
+   ! FODO --: with SIS cell length and SIS bending magnets
+
+   !---------------------  DRIFT SPACES DEFINITION  ---------------------
+
+  
+
+   dr: drift, L=1.191;
+
+    
+
+   !---------------------------------------------------------------------
+
+
+
+   !--------------------------  BENDING MAGNET ---------------------------
+
+   bang=0.1;
+
+   ALPHA  := 15 * RADDEG;
+
+   LL     := 150 * RADDEG;
+
+   PFR    := 7.3* RADDEG;
+
+   FI     := 0.7;
+
+   RB: SBEND,L=LL,ANGLE= ALPHA;!,E1= PFR,E2=PFR,HGAP= 0.035,FINT= FI;
+
+ksf = .0198492943e1;
+
+   ! ------------------- horizontal quadrupole ----------------------------
+
+   qf:  quadrupole, L= 4.0,  K1=  0.05;
+
+   qd:  quadrupole, L= 4.0,  K1= -0.05;
+
+   hk:  hkicker, hkick=0e-3;
+
+!   hk:  hkicker, hkick=0e-3;
+
+mscbh: sextupole, l=1.1, k2:=0.0;!ksf;
+
+!
+
+mb1: multipole;
+
+!
+
+   !---------------------------------------------------------------
+
+
+
+   ! ---------------------------  LINE DEFINITION ---------------------------
+
+   cella: line=(qf,dr,rb,dr,qd,mscbh,mb1,dr,rb,dr,hk);
+
+   !------------------------------------------------------------------------
+
+
+
+!   beam,particle=proton,energy=0.942563;
+
+   beam,particle=proton,energy=5000.;
+
+!   beam,particle=proton,energy=0.942563,sequence=cella;
+
+!   beam;
+
+
+
+   use, period=cella; 
+
+   show,beam%cella;
+
+   show,beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:        0.938272013
+parameter: charge   double value:                  1
+parameter: energy   double value:               5000
+parameter: pc   double value:        4999.999912
+parameter: gamma   double value:        5328.945051
+parameter: ex   double value:                  1
+parameter: exn   double value:        21315.77983
+parameter: ey   double value:                  1
+parameter: eyn   double value:        21315.77983
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:                  0
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: beta   double value:       0.9999999824
+parameter: alfa   double value:    3.521417482e-08
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698248e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+!---------------MATCHING----------------------------------------
+
+
+
+!   match,sequence=cella;
+
+!   VARY,NAME=QF[K1],STEP=0.01; 
+
+!   VARY,NAME=QD[K1],STEP=0.01; 
+
+!   CONSTRAINT,sequence=cella,RANGE=#E,MUX=0.3525,MUY=0.29;
+
+!   MIGRAD,calls=2000,tolerance=1.e-15;
+
+!   endmatch;
+
+
+
+!---------------------------------------------------------
+
+ 
+
+    select,flag=makethin,clear;
+
+    select,flag=makethin,pattern="q*",slice=100; 
+
+    makethin,sequence=cella;
+
+makethin: slicing sequence : cella
+
+
+    use, period=cella;
+
+  
+
+SELECT,FLAG=ERROR,pattern="mb1*";
+
+!value,bang;
+
+EFCOMP, DKS:={0,0,0,0,-1.};
+
+Assigned field errors to 1 elements
+   select,flag=sectormap,clear;
+
+   select,flag=sectormap,range=#e;
+
+   select,flag=twiss,clear;
+
+   select,flag=twiss,column=name,s,keyword,L,betx,bety,alfx,alfy,dx,dpx;
+
+
+
+
+
+
+
+!   twiss,rmatrix,file,sectormap;
+
+
+
+   setplot,post=1,ascale=1.5, lscale=1.5,rscale=1.5, sscale=1.5, lwidth=3;
+
+!   PLOT, HAXIS=S,VAXIS1=BETX,VAXIS2=BETY,colour=100;
+
+
+
+TWISS;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       19.09998776                 -0      0.07360632992        3.685890406 
+
+                q1                dq1            betxmax              dxmax 
+      0.3642635312      -0.5650132384        36.91316294        3.946011124 
+
+             dxrms             xcomax             xcorms                 q2 
+       2.728571506                  0                  0       0.2988958103 
+
+               dq2            betymax              dymax              dyrms 
+     -0.4328308235        34.07505989                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+sodd, distort1,multipole_order_range=-8,8,start_stop= 0.,27000.,
+
+      print_at_end;
+
+Build-up of input file fc.34 by call to program sixtrack. 
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 19.099988
+
+c6t terminated - total number of elements: 1014
+                    field errors    MAD-X: 1
+                    field errors SixTrack: 1
+                 alignment errors   MAD-X: 0
+                alignment errors SixTrack: 0
+                          sequence length: 19.099988 [m]
+input file fc.34 is ready. 
+  Program <DISTORT1> will be executed 
+ Start and End Position in [m]:    0.0000000000000000        27000.000000000000     
+  Print_out at end of structure 
+  Qx=   0.36426353119764998       Qy=   0.29889581027168000     
+
+--------------------------------------------------------------------------------
+
+Reading Data took      0.002 second(s) of Execution Time
+
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+
+          First Order Contribution of:        1 Skew Decapoles   
+
+--------------------------------------------------------------------------------
+          Distortionfunction Terms (first order)
+--------------------------------------------------------------------------------
+    Cosine-Term        Sine-Term        Amplitude       J     K     L     M
+--------------------------------------------------------------------------------
+ -1.154532375E-01 -1.840164414E-01  2.172360484E-01     4     0     1     0
+  1.201513909E-01 -2.924516065E-01  3.161713125E-01     4     0     0     1
+  6.088064596E+00 -3.467231253E+00  7.006156085E+00     3     1     1     0
+ -5.610016259E-01 -2.589494803E-01  6.178815886E-01     3     1     0     1
+ -5.125507876E-01 -9.964737021E-01  1.120565995E+00     2     2     1     0
+ -1.074920496E-01  1.040435033E+00  1.045973039E+00     2     0     3     0
+ -2.926912509E+01  1.666914397E+01  3.368296371E+01     2     0     2     1
+  2.697084846E+00  1.244931720E+00  2.970542316E+00     2     0     1     2
+ -3.585890096E-01 -1.882765557E+00  1.916609564E+00     2     0     0     3
+  5.994806014E+00  8.789231507E-01  6.058894705E+00     1     1     3     0
+  3.285535248E+00  6.387561099E+00  7.183013201E+00     1     1     2     1
+  2.147417217E-01 -2.231374055E-01  3.096842082E-01     0     0     5     0
+ -4.803462149E+00 -7.042553298E-01  4.854814537E+00     0     0     4     1
+ -1.755068656E+00 -3.412110182E+00  3.837025135E+00     0     0     3     2
+
+--------------------------------------------------------------------------------
+          Hamiltonian Terms (first order)
+--------------------------------------------------------------------------------
+    Cosine-Term        Sine-Term        Amplitude       J     K     L     M
+--------------------------------------------------------------------------------
+  7.274978916E-02 -2.925112408E-01  3.014222251E-01     4     0     1     0
+ -1.904937682E-01 -2.335968366E-01  3.014222251E-01     4     0     0     1
+ -5.043138164E-01 -1.095149898E+00  1.205688900E+00     3     1     1     0
+ -1.178854180E+00 -2.529595761E-01  1.205688900E+00     3     1     0     1
+ -1.617368289E+00 -8.092667656E-01  1.808533351E+00     2     2     1     0
+ -9.200874016E-01  1.699030806E+00  1.932166273E+00     2     0     3     0
+  2.424551176E+00  5.265068866E+00  5.796498820E+00     2     0     2     1
+  5.667487575E+00  1.216134513E+00  5.796498820E+00     2     0     1     2
+  1.457069026E+00 -1.268943010E+00  1.932166273E+00     2     0     0     3
+  6.879860300E-01  3.802596646E+00  3.864332546E+00     1     1     3     0
+  1.036759800E+01  5.187533699E+00  1.159299764E+01     1     1     2     1
+  4.216153600E-01 -4.535882823E-01  6.192752552E-01     0     0     5     0
+ -5.512630178E-01 -3.046909110E+00  3.096376276E+00     0     0     4     1
+ -5.538168039E+00 -2.771079021E+00  6.192752552E+00     0     0     3     2
+
+--------------------------------------------------------------------------------
+
+Program <DISTORT1> used      0.001 second(s) of Execution Time
+
+--------------------------------------------------------------------------------
+
+
+
+--------------------------------------------------------------------------------
+
+Program <SODD> used a total of      0.003 second(s) of Execution Time
+
+--------------------------------------------------------------------------------
+
+
+   ptc_create_universe;
+
+ Now PTC
+   ptc_create_layout,model=1,method=2,nst=1;!,exact;
+
+ MAD-X Beam Parameters
+                  Energy : 0.500000E+04
+          Kinetic Energy : 0.499906E+04
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.500000E+04
+ Setting MADx with 
+     energy           5000.0000000000000     
+     method                   2
+     Num. of steps            1
+     charge           1.0000000000000000     
+  Length of machine:    19.099987755982863     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        19.099987755983108     
+!	select_ptc_normal, dx=1, dpx=1;
+
+!	select_ptc_normal, dy=1, dpy=1;	
+
+!	select_ptc_normal, q1=0, q2=0;
+
+!	select_ptc_normal, dq1=1, dq2=1;
+
+!	select_ptc_normal, dq1=2, dq2=2;
+
+!	select_ptc_normal, anhx=1,0,0;
+
+!	select_ptc_normal, anhy=1,0,0;
+
+!	select_ptc_normal, anhx=1,0,1;
+
+!	select_ptc_normal, anhy=1,0,1;
+
+!	select_ptc_normal, anhx=0,0,2;
+
+!	select_ptc_normal, anhy=0,0,2;
+
+!	select_ptc_normal, anhx=2,0,0;
+
+!	select_ptc_normal, anhy=2,0,0;
+
+!	select_ptc_normal, anhx=1,1,0;
+
+!	select_ptc_normal, anhy=1,1,0;	
+
+!	select_ptc_normal, haml=1,0,0;
+
+!	select_ptc_normal, haml=3,0,0;
+
+!	select_ptc_normal, haml=1,2,0;
+
+ 	select_ptc_normal, gnfu=-5,0,0;
+
+The minimum required order is 5 
+--------------------------------
+			
+
+   ptc_normal,closed_orbit,normal,maptable,icase=5,no=7;
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      1
+  Real Pill Box Cavities 
+ This is a proton 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION   = FALSE
+ Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Check of the symplectic condition on the linear part
+Deviation from symplecticity  0.6217248937900877E-12 %
+   ptc_end;
+
+  killing last layout 
+  killed last layout 
+   write, table=normal_results,file=ptc_normal_results.tfs; 
+
+   write, table=map_table, file=ptc_map_table.tfs;
+
+    stop;
+
+
+  Number of warnings: 0
+
+  +++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.00 finished normally +
+  +++++++++++++++++++++++++++++++++++
