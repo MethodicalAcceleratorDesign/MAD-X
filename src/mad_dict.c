@@ -2258,10 +2258,10 @@ char command_def[] =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
-"rfm_freq   = [r, 0], "   // RF-Multipole
-"rfm_volt   = [r, 0], "   // RF-Multipole
-"rfm_lag    = [r, 0], "   // RF-Multipole
-"rfm_harmon = [i, 0], "   // RF-Multipole
+"freq       = [r, 0], "   // RF-Multipole
+"volt       = [r, 0], "   // RF-Multipole
+"lag        = [r, 0], "   // RF-Multipole
+"harmon     = [i, 0], "   // RF-Multipole
 "pnl        = [r, {0}], " // RF-Multipole
 "psl        = [r, {0}]; " // RF-Multipole
 " "  
