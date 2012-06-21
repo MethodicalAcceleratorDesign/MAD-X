@@ -6636,10 +6636,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
     Cp1 = Cp1 * DCMPLX(x, y) / (iord+2)   + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
     Sp1 = Sp1 * DCMPLX(x, y) / (iord+2)   + bvk * DCMPLX(field_sin(1,iord), field_sin(2,iord));
   enddo
-  if ((x.ne.0.0).and.(y.ne.0.0)) then
-    Cm2 = Cm2 / DCMPLX(x, y);
-    Sm2 = Sm2 / DCMPLX(x, y);
-  endif
   Cp0 = Cp0 * DCMPLX(x, y);
   Sp0 = Sp0 * DCMPLX(x, y);
   Sp1 = Sp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2; ! the missing term of factorial
