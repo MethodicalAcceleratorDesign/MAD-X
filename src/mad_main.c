@@ -5,15 +5,13 @@
 #include "mad_main.h"
 #undef  const
 
-// readonly global information about program's command line arguments
+// readonly global information about program's command line arguments and stack base
 int     mad_argc;
 char**  mad_argv;
-
-// readonly global information about program's stack
-void*   mad_stck_base;
+void*   mad_stck;
 
 #ifdef _GFORTRAN
-#define _POSIX_C_SOURCE 1
+#define _POSIX_C_SOURCE 200112L
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,27 +37,37 @@ void g95_runtime_stop  (void);
 int MAIN__(void);
 int MAIN__(void)
 {
-  int a = 0;
-  mad_stck_base = &a;
-  mad_argc = 0;
-  mad_argv = 0;
+  mad_init(0, 0);
+
 #else
 
 int
 main(int argc, char *argv[])
 {
+  mad_init(argc, argv);
+
+#endif // _LF95
+
+  mad_run ();
+  mad_fini();
+
+  return EXIT_SUCCESS;
+}
+
+void
+mad_init(int argc, char *argv[])
+{
   int a = 0;
-  mad_stck_base = &a;
+  mad_stck = &a;
   mad_argc = argc;
   mad_argv = argv;
-#endif // _LF95
 
 #ifdef _GFORTRAN
   _gfortran_set_args(argc, argv);
   _gfortran_set_options(0, 0);
 
   // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
-  if (getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
+  if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
     setenv("GFORTRAN_UNBUFFERED_PRECONNECTED","y",1);
     execvp(argv[0], argv);
   }
@@ -73,9 +81,18 @@ main(int argc, char *argv[])
   g95_runtime_start(argc, argv);
 #endif
 
-// madx main program
   madx_start();
+}
+
+void
+mad_run(void)
+{
   madx_input(CALL_LEVEL_ZERO);
+}
+
+void
+mad_fini(void)
+{
   madx_finish();
 
 #ifdef _NAGFOR
@@ -85,8 +102,4 @@ main(int argc, char *argv[])
 #ifdef _G95
   g95_runtime_stop();
 #endif
-  
-  return EXIT_SUCCESS;
 }
-
-
