@@ -16,6 +16,12 @@
 # | $Id$
 # |
 
+# debug
+ifeq ($(DEBUG_MAKE),yes)
+$(warning MAKEFLAGS = $(MAKEFLAGS))
+$(warning MAKEOVERRIDES = $(MAKEOVERRIDES))
+endif
+
 # make utilities (no rules!)
 include $(makedir)/make.lib
 
