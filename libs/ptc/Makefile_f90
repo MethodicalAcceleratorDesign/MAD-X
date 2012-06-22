@@ -110,7 +110,7 @@ ifeq ($(NOPT),3)
 NOPT   := 2 
 endif
 else
-$(error PTC requires gfortran >= 4.4 ($(FCVER) detected))
+$(error PTC requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
 endif # lxplus
 endif # version
 endif # origin
