@@ -16,7 +16,9 @@
 # | $Id$
 # |
 
+#
 # madx
+#
 .PHONY:                 madx-dev-linux          madx-dev-linux-gnu
 .PHONY:                 madx-dev-linux-lahey    madx-dev-linux-nagfor
 .PHONY:                 madx-dev-linux32        madx-dev-linux64
@@ -68,7 +70,42 @@ madx-dev-linux64-lahey:
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
      $(CP) madx64 $@
 
+#
+# libmadx
+#
+.PHONY:                 libmadx-dev-linux        libmadx-dev-linux-gnu
+.PHONY:                 libmadx-dev-linux32      libmadx-dev-linux64
+.PHONY:                 libmadx-dev-linux32-gnu  libmadx-dev-linux64-gnu
+libmadx-dev-linux:      libmadx-dev-linux32      libmadx-dev-linux64
+libmadx-dev-linux-gnu:  libmadx-dev-linux32-gnu  libmadx-dev-linux64-gnu
+
+libmadx-dev-linux32:
+	$E "*** Building $@"
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
+     $(CP) libs/madx/libmadx32.a  $@.a  && ln -sf $@.a  libmadx32.a && \
+     $(CP) libs/madx/libmadx32.so $@.so && ln -sf $@.so libmadx32.so
+
+libmadx-dev-linux64:
+	$E "*** Building $@"
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+     $(CP) libs/madx/libmadx64.a  $@.a  && ln -sf $@.a  libmadx64.a && \
+     $(CP) libs/madx/libmadx64.so $@.so && ln -sf $@.so libmadx64.so
+
+libmadx-dev-linux32-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+     $(CP) libs/madx/libmadx32.a  $@.a  && ln -sf $@.a  libmadx32.a && \
+     $(CP) libs/madx/libmadx32.so $@.so && ln -sf $@.so libmadx32.so
+
+libmadx-dev-linux64-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+     $(CP) libs/madx/libmadx64.a  $@.a  && ln -sf $@.a  libmadx64.a && \
+     $(CP) libs/madx/libmadx64.so $@.so && ln -sf $@.so libmadx64.so
+
+#
 # libptc
+#
 .PHONY:                 libptc-dev-linux        libptc-dev-linux-gnu
 .PHONY:                 libptc-dev-linux32      libptc-dev-linux64
 .PHONY:                 libptc-dev-linux32-gnu  libptc-dev-linux64-gnu
@@ -95,7 +132,9 @@ libptc-dev-linux64-gnu:
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 GNU=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc64.a $@.a && ln -sf $@ libptc64.a
 
+#
 # numdiff
+#
 .PHONY:                 numdiff-dev-linux         numdiff-dev-linux-gnu
 .PHONY:                 numdiff-dev-linux32       numdiff-dev-linux64
 .PHONY:                 numdiff-dev-linux32-gnu   numdiff-dev-linux64-gnu
