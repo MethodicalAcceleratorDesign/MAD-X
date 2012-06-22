@@ -271,6 +271,7 @@ lib64/libmdblib.a -text
 lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
+libs/madx/Makefile -text
 libs/ptc/Makefile -text
 libs/ptc/Makefile_f90 -text
 libs/ptc/src/Ss_fake_mad.f90 -text
