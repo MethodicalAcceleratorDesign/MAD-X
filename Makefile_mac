@@ -40,7 +40,7 @@ madx-dev-macosx32:
 
 madx-dev-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+	$_ $(MAKE) --no-print-directory -j5 -e ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) madx64 $@
 
 madx-dev-macosx32-gnu:
@@ -70,19 +70,19 @@ libmadx-dev-macosx32:
 
 libmadx-dev-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a     $@.a     && ln -sf $@.a     libmadx64.a && \
      $(CP) libs/madx/libmadx64.dylib $@.dylib && ln -sf $@.dylib libmadx64.dylib
 
 libmadx-dev-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx32.a     $@.a     && ln -sf $@.a      libmadx32.a && \
      $(CP) libs/madx/libmadx32.dylib $@.dylib && ln -sf $@.dylib libmadx32.dylib
 
 libmadx-dev-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
+	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a     $@.a     && ln -sf $@.a     libmadx64.a && \
      $(CP) libs/madx/libmadx64.dylib $@.dylib && ln -sf $@.dylib libmadx64.dylib
 
