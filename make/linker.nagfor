@@ -20,13 +20,14 @@
 # linker flags
 #
 
-LDFLAGS += -O$(NOPT)
+LDFLAGS = -O$(NOPT)
+LDLIBS  =
 
 ifeq ($(ARCH),32)
 LDFLAGS += -Wl,-m32 -abi=32
 endif
 
-ifneq ($(CXX_SRC),)
+ifneq ($(CXXNAME),)
 LDLIBS += -lstdc++
 endif
 

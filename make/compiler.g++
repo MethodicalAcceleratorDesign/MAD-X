@@ -40,6 +40,10 @@ ifeq ($(PROFILE),yes)
 CXXFLAGS += -pg
 endif
 
+ifeq ($(SHARED),yes)
+CXXFLAGS += -fpic
+endif
+
 #
 # extra flags
 #

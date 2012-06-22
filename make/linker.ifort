@@ -25,9 +25,10 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH) -O$(NOPT) -nofor-main
+LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main
+LDLIBS  =
 
-ifneq ($(CXX_SRC),)
+ifneq ($(CXXNAME),)
 LDFLAG += -cxxlib
 LDLIBS += -lstdc++
 #LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
@@ -56,6 +57,10 @@ ifeq ($(STATIC),yes)
 LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
 endif
 
+ifeq ($(SHARED),yes)
+LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared)
+endif
+
 ifeq ($(PLUGIN),yes)
 LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
@@ -76,7 +81,8 @@ ifeq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS += /nologo /O$(NOPT) /extlnk:.o
+LDFLAGS = /nologo /O$(NOPT) /extlnk:.o
+LDLIBS  =
 
 #
 # options flags
@@ -92,6 +98,10 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += /static
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += /shared
 endif
 
 #

@@ -20,8 +20,8 @@
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH) -O$(NOPT)
-LDLIBS  +=
+LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
 LDFLAGS += -mmacosx-version-min=10.5
@@ -41,6 +41,10 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared)
 endif
 
 ifeq ($(PLUGIN),yes)

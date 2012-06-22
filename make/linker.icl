@@ -20,7 +20,8 @@
 # linker flags
 #
 
-LDFLAGS += /nologo /O$(NOPT) /extlnk:.o
+LDFLAGS = /nologo /O$(NOPT) /extlnk:.o
+LDLIBS  =
 
 #
 # options flags
@@ -35,11 +36,15 @@ LDFLAGS += /Qprof-use
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += /MD
+LDFLAGS += /static
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += /shared
 endif
 
 ifeq ($(PLUGIN),yes)
-LDFLAGS += /MT
+LDFLAGS += /MD # TODO
 endif
 
 #

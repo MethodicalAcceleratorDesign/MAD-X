@@ -48,8 +48,8 @@ cleandep:
 	$_ $(RM) $(OBJDIR)$/*.d
 
 cleanbuild:
-	$E "** Removing $(PROJECT)"
-	$_ $(RM) $(PROJECT)$(PROJEXT)
+	$E "** Removing $(PRJNAME)"
+	$_ $(RM) $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 
 cleanall: cleandir
 	$E "** Removing" $(OBJDIR)

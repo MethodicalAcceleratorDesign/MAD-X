@@ -19,7 +19,7 @@
 #
 # numdiff path
 #
-NDIFF := $(if $(wildcard $(ND)$(ARCH)$(EXE)),..$/..$/$(ND)$(ARCH)$(EXE),$(ND))
+NDIFF := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),..$/..$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
 
 #
 # numdiff flags

@@ -38,7 +38,7 @@ CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -Wcheck -Wp64 -c -D_ICC
 # diagnostics
 #
 
-CFLAGS += -diag-disable 2259,1572,981 # -diag-enable sc2
+CFLAGS += -diag-disable 2259,1572,981 -diag-enable port-win # -diag-enable sc2
 
 #
 # options flags
@@ -50,6 +50,10 @@ endif
 
 ifeq ($(PROFILE),yes)
 CFLAGS += -p
+endif
+
+ifeq ($(SHARED),yes)
+CFLAGS += -fpic
 endif
 
 #
@@ -94,6 +98,10 @@ endif
 
 ifeq ($(PROFILE),yes)
 CXXFLAGS += -p
+endif
+
+ifeq ($(SHARED),yes)
+CXXFLAGS += -fpic
 endif
 
 #

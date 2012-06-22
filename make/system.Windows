@@ -16,10 +16,10 @@
 # | $Id$
 # |
 
-CPPFLAGS += -D_WIN32
+CPPFLAGS += -D_WIN32 $(if $(call eq,$(ARCH),64),-D_WIN64,)
 
-ifeq ($(ARCH),64)
-CPPFLAGS += -D_WIN64
-endif
+BINARY_EXT := .exe
+SHARED_EXT := .dll
+STATIC_EXT := .a
 
 # end of makefile

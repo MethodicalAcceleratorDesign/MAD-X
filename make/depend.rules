@@ -69,7 +69,7 @@ endif
 #
 # include dependencies
 #
-ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 -include $(addprefix $(OBJDIR)/,$(DEPENDS))
 endif
 

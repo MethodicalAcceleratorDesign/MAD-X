@@ -51,6 +51,10 @@ ifeq ($(PROFILE),yes)
 FFLAGS += -pg
 endif
 
+ifeq ($(SHARED),yes)
+FFLAGS += -fpic
+endif
+
 #
 # extra flags
 #

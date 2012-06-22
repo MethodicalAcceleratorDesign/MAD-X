@@ -18,4 +18,8 @@
 
 CPPFLAGS += -D_DARWIN
 
+BINARY_EXT := 
+SHARED_EXT := .dylib
+STATIC_EXT := .a
+
 # end of makefile

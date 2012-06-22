@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS += /nologo /extlnk:.o
+LDFLAGS = /nologo /extlnk:.o
 
 #
 # options flags
@@ -36,6 +36,10 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += /MT
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += # TODO
 endif
 
 #

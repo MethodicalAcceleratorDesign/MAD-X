@@ -20,4 +20,8 @@ CPPFLAGS += -D_LINUX
 
 # __linux__ should also be defined by the compilers
 
+BINARY_EXT :=
+SHARED_EXT := .so
+STATIC_EXT := .a
+
 # end of makefile

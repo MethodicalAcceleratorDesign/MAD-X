@@ -20,12 +20,13 @@
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDLIBS  =
 
 # attemp to find the gnu libs directory for g95 (GCC only)
 LDLIBS += -L$(GNULIBDIR)
 
-ifneq ($(CXX_SRC),)
+ifneq ($(CXXNAME),)
   LDLIBS += -lstdc++
 endif
 
@@ -51,6 +52,10 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += -static
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += -shared
 endif
 
 ifeq ($(PLUGIN),yes)

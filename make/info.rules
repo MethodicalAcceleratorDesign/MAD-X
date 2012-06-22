@@ -29,8 +29,9 @@ info:
 	@ echo "C++ compiler settings           " = $(if $(CXX),$(call CXX_tr,$(CXX) $(CXXFLAGS) $(CPPFLAGS)),)
 	@ echo "F90 compiler settings           " = $(if $(FC),$(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS)),)
 	@ echo "Linker       settings           " = $(if $(LD),$(call LD_tr,$(LD) $(LDFLAGS)),)
-	@ echo "Libraries    settings           " = $(if $(LD),$(call LD_tr,$(LIBS) $(LDLIBS)),)
 	@ echo "Tester       settings           " = $(if $(ND),$(call ND_tr,$(ND) $(subst $@,$$\@,$(NDFLAGS))))
+	@ echo "Libraries    settings           " = $(if $(LD),$(call LD_tr,$(LIBS) $(LDLIBS)),)
+	@ echo "Archives     settings           " = $(if $(AR),$(call AR_tr,$(LIBS)),)
 
 infoinc: info
 	@ echo "C   compiler settings file      " = $(if $(CC),$(makedir)$/compiler.$(CCNAME),)
@@ -40,7 +41,7 @@ infoinc: info
 	@ echo "Tester       settings file      " = $(if $(ND),$(makedir)$/tester.$(NDNAME),)
 
 infoprj: infoinc
-	@ echo "          project settings file " = $(PROJECT)$(PROJEXT) $(VERSION) $(VERSION_DATE)
+	@ echo "          project settings file " = $(PRJNAME) $(VERSION) $(VERSION_DATE)
 	@ echo "Cpp       project settings file " = $(FILE_CPP)  $(if $(wildcard $(FILE_CPP)),," (not defined)")
 	@ echo "C         project settings file " = $(FILE_C)    $(if $(wildcard $(FILE_C)),,"   (not defined)")
 	@ echo "C++       project settings file " = $(FILE_CXX)  $(if $(wildcard $(FILE_CXX)),," (not defined)")

@@ -20,14 +20,15 @@
 # linker flags
 #
 
-LDFLAGS += -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDLIBS  =
 
 ifeq ($(ARCH),32)
   # attemp to find the gnu libs directory for Lahey 32 bits! (GCC only)
   LDLIBS += -L$(GNULIBDIR)
 endif
 
-ifneq ($(CXX_SRC),)
+ifneq ($(CXXNAME),)
   ifeq ($(ARCH),32)
     # required by __constructor/__destructor attributes
     LDLIBS += $(GNULIBDIR)$/crt*S.o

@@ -20,12 +20,12 @@
 # linker flags
 #
 
-LDFLAGS += -rc
+ARFLAGS = -rc
 
 #
 # command translator
 #
 
-LD_tr = $(strip $(subst $(SPACE)-o , ,$1))
+AR_tr = $(strip $(subst $(SPACE)-o , ,$1))
 
 # end of makefile

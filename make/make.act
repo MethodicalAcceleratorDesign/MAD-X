@@ -17,8 +17,7 @@
 # |
 
 # create build directory
-
-ifneq ($(filter-out $(NOBUILD),$(MAKECMDGOALS)),)
+ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 $(call mkdir,$(OBJDIR))
 endif
 
