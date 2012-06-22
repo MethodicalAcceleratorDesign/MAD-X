@@ -6458,12 +6458,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical fsec,ftrk,fmap,dorad
-  integer nord,iord,j,nd,nn,ns,node_fd_errors,get_option
-  double precision orbit(6),re(6,6),te(6,6,6),x,&
-       y,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
+  integer nord,iord,j,nn,ns,node_fd_errors
+  double precision orbit(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
        field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
-       skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bvk,dpxr, &
-       dpyr,zero,one,two,three, tilt, angle, dtmp
+       skew(0:maxmul),node_value,get_value,arad,gammas,rfac,bvk, &
+       zero,one,two,three, tilt, angle, cangle, sangle, dtmp
   double precision orbit00(6),re00(6,6),te00(6,6,6)
   double precision f_errors(0:maxferr)
   !double precisio vals(2,0:maxmul)
@@ -6471,18 +6470,15 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   
   !--- AL: RF-multipole
   integer dummyi
+  double precision pc, krf, vrf
+  double precision pi, clight, ten3m
+  double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
-  double precision pnl(0:maxmul), psl(0:maxmul)
-  double precision krf
-  double precision pi, clight
-  double precision ten3m
-  double precision pc, vrf
-  double precision drpt, dipt
   double precision field_cos(2,0:maxmul)
   double precision field_sin(2,0:maxmul)
+  double precision pnl(0:maxmul), psl(0:maxmul)
   complex*16 Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
-  
-  
+    
   parameter ( pi = 3.14159265358979d0 )
   parameter ( clight = 299792458d0 )
   parameter ( zero=0d0, one=1d0, two=2d0, ten3m=1d-3)
@@ -6517,7 +6513,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
  
   rfac = zero
   fmap = .true.
-  bi = one / beta
   
   !---- Set-up some parameters
   krf = 2*pi*freq*1d6/clight;
@@ -6526,95 +6521,33 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   if (n_ferr.gt.0) then
      call dcopy(f_errors,field,n_ferr)
   endif
-  nd = 2 * max(nn, ns, n_ferr/2-1);
-  nord = nd / 2;
+  nord = max(nn, ns, n_ferr/2-1);
   
+  !---- Particle's coordinates
+  x = orbit(1);
+  y = orbit(3);
+  z = orbit(5);
   
-  !---- Vector with strengths + field errors 
-  do iord = 0, nd/2 ;
-     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * orbit(5)) + field(1,iord)) / (one + deltap);
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * orbit(5)) + field(1,iord)) / (one + deltap);
-     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * orbit(5)) + field(2,iord)) / (one + deltap);
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * orbit(5)) + field(2,iord)) / (one + deltap);
-     if (tilt .ne. zero)  then
-        !---- Cos part
-        if(field_cos(2,iord).ne.zero.or.field_cos(1,iord).ne.zero) then
-           angle = atan2(field_cos(2,iord), field_cos(1,iord))/(iord+1) - tilt
-        else
-           angle = -tilt
-        endif
-        dtmp = sqrt(field_cos(1,iord)**2+field_cos(2,iord)**2)
-        angle = (iord+1) * angle
-        field_cos(1,iord) = dtmp * cos(angle)
-        field_cos(2,iord) = dtmp * sin(angle)
-        !---- Sin part
-        dtmp = sqrt(field_sin(1,iord)**2+field_sin(2,iord)**2)
-        field_sin(1,iord) = dtmp * cos(angle)
-        field_sin(2,iord) = dtmp * sin(angle)
+  !---- Vector with strengths + field errors
+  do iord = 0, nord;
+     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
+     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
+     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
+     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
+     if (tilt.ne.zero)  then
+        angle = (iord+1) * (-tilt);
+        cangle = cos(angle);
+        sangle = sin(angle);
+        dtmp              = field_cos(1,iord) * cangle - field_cos(2,iord) * sangle;
+        field_cos(2,iord) = field_cos(1,iord) * sangle + field_cos(2,iord) * cangle;
+        field_cos(1,iord) = dtmp;
+        dtmp              = field_sin(1,iord) * cangle - field_sin(2,iord) * sangle;
+        field_sin(2,iord) = field_sin(1,iord) * sangle + field_sin(2,iord) * cangle;
+        field_sin(1,iord) = dtmp;
      endif
   enddo
-  
-  !---- Track orbit.
-  if (ftrk) then
-     x = orbit(1)
-     y = orbit(3)
-     
-     !---- Multipole kick.
-     dr = zero
-     di = zero
-     do iord = nord, 0, -1     ! all terms dipole included
-        drt = (dr * x - di * y) / (iord+1) + field_cos(1,iord)
-        di  = (dr * y + di * x) / (iord+1) + field_cos(2,iord)
-        dr  = drt
-     enddo
-     dpx = dr
-     dpy = di
-
-     !---- Energy kick
-     drpt = zero
-     dipt = zero
-     do iord = nord, 1, -1
-        drt   = (drpt * x - dipt * y) / (iord) + field_sin(1,iord)
-        dipt  = (drpt * y + dipt * x) / (iord) + field_sin(2,iord)
-        drpt  = drt
-     enddo
-     drt  = (drpt * x - dipt * y) / (nord+1);
-     dipt = (drpt * y + dipt * x) / (nord+1);
-     drpt = drt;
-     
-     !---- Radiation effects at entrance.
-     if (dorad  .and.  elrad .ne. zero) then
-        dpxr = dpx
-        dpyr = dpy
-        rfac = arad * gammas**3 * (dpxr**2+dpyr**2) / (three*elrad)
-        pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
-     endif
-     
-     !---- Apply the kick
-     orbit(2) = orbit(2) - dpx
-     orbit(4) = orbit(4) + dpy
-     orbit(6) = orbit(6) + vrf * sin(lag * 2 * pi - krf * orbit(5)) - krf * drpt
-  
-     !---- Radiation effects at exit.
-     if (dorad  .and.  elrad .ne. zero) then
-        pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
-     endif
-     
-     !---- Orbit not wanted.
-  else
-     x = zero
-     y = zero
-     nord = min(nord, 2)
-  endif
-    
-  !---- Matrix elements
-  
+      
+  !---- Prepare to calculate the kick and the matrix elements
   Cm2 = 0.0;
   Sm2 = 0.0;
   Cm1 = 0.0;
@@ -6623,7 +6556,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   Sp0 = 0.0;
   Cp1 = 0.0;
   Sp1 = 0.0;
-  
   do iord = nord, 1, -1
     if (iord.ge.2) then
       Cm2 = Cm2 * DCMPLX(x, y) / (iord-1) + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
@@ -6638,40 +6570,69 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   enddo
   Cp0 = Cp0 * DCMPLX(x, y);
   Sp0 = Sp0 * DCMPLX(x, y);
-  Sp1 = Sp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2; ! the missing term of factorial
+  Sp1 = Sp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2; ! the missing term from the factorial
   Cp1 = Cp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2;
+  
+  !---- Track orbit.
+  if (ftrk) then
+     !---- The kick
+     dpx = -DREAL(Cp0);
+     dpy =  DIMAG(Cp0);
+     dpt =  vrf * sin(lag * 2 * pi - krf * z) - krf * DREAL(Sp1);
+     
+     !---- Radiation effects at entrance.
+     if (dorad  .and.  elrad .ne. zero) then
+        rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+        orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+        orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+        orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+     endif
+     
+     !---- Apply the kick
+     orbit(2) = orbit(2) + dpx
+     orbit(4) = orbit(4) + dpy
+     orbit(6) = orbit(6) + dpt
+  
+     !---- Radiation effects at exit.
+     if (dorad  .and.  elrad .ne. zero) then
+        orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
+        orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
+        orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+     endif
+     
+     !---- Orbit not wanted.
+  else
+     x = zero
+     y = zero
+     nord = min(nord, 2)
+  endif
+
 
   !---- First-order terms
-  
-  if (nord .ge. 1) then
+  if (nord.ge.1) then
     re(2,1) = -DREAL(Cm1);
     re(2,3) =  DIMAG(Cm1);
-    
     re(4,1) =  re(2,3);
     re(4,3) = -re(2,1);
-    
   endif
 
   re(2,5) = -krf * DREAL(Sp0);
   re(4,5) =  krf * DIMAG(Sp0);
-  re(6,1) = re(2,5);
-  re(6,3) = re(4,5);
-  re(6,5) = -krf * vrf * cos(lag * 2 * pi - krf * orbit(5)) + krf * krf * DREAL(Cp1);
+  re(6,1) =  re(2,5);
+  re(6,3) =  re(4,5);
+  re(6,5) = -krf * vrf * cos(lag * 2 * pi - krf * z) + krf * krf * DREAL(Cp1);
   
   !---- Second-order terms (use X,Y from orbit tracking).
   if (fsec) then
-     if (nord .ge. 2) then
- 
+     if (nord.ge.2) then
        te(2,1,1) = 0.5 * (-DREAL(Cm2));
-       te(2,1,3) = 0.5 * (DIMAG(Cm2));
+       te(2,1,3) = 0.5 * ( DIMAG(Cm2));
        te(2,3,1) =  te(2,1,3);
        te(2,3,3) = -te(2,1,1);
-       
        te(4,1,1) =  te(2,1,3);
        te(4,1,3) = -te(2,1,1);
        te(4,3,1) = -te(2,1,1);
        te(4,3,3) = -te(2,1,3);
-       
      endif
 
      te(2,1,5) = 0.5 * (-krf * DREAL(Sm1));
@@ -6679,24 +6640,23 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
      te(2,5,1) = te(2,1,5);
      te(2,5,3) = te(2,3,5);
      te(2,5,5) = 0.5 * krf * krf * DREAL(Cp0);
-     
      te(4,1,5) =  te(2,3,5);
      te(4,3,5) = -te(2,3,5);
      te(4,5,1) =  te(4,1,5);
      te(4,5,3) =  te(4,3,5);
      te(4,5,5) = 0.5 * (-krf * krf * DIMAG(Cp0));
-     
-     te(6,1,1) =  te(2,1,5);
-     te(6,1,3) =  te(2,3,5);
-     te(6,1,5) =  te(2,5,5);
-     te(6,3,1) =  te(2,3,5);
-     te(6,3,3) =  te(2,1,5);
-     te(6,3,5) =  te(4,5,5);
-     te(6,5,1) =  te(6,1,5);
-     te(6,5,3) =  te(6,3,5);
-     te(6,5,5) = 0.5 * (-krf * krf * vrf * sin(lag * 2 * pi - krf * orbit(5)) + krf * krf * krf * DREAL(Sp1));
+     te(6,1,1) = te(2,1,5);
+     te(6,1,3) = te(2,3,5);
+     te(6,1,5) = te(2,5,5);
+     te(6,3,1) = te(2,3,5);
+     te(6,3,3) = te(2,1,5);
+     te(6,3,5) = te(4,5,5);
+     te(6,5,1) = te(6,1,5);
+     te(6,5,3) = te(6,3,5);
+     te(6,5,5) = 0.5 * (-krf * krf * vrf * sin(lag * 2 * pi - krf * z) + krf * krf * krf * DREAL(Sp1));
 
   endif
+  
   !---- centre option
   if(centre_cptk.or.centre_bttk) then
      call dcopy(orbit,orbit00,6)
