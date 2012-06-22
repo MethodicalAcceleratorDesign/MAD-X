@@ -35,7 +35,7 @@ ifneq ($(OSTYPE),Windows)
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c -D_IFORT
 
 # cancellation of optimizations
-FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
+#FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
 
 #
 # options flags
@@ -60,7 +60,7 @@ endif
 FFLAGS += -mp1 -fp-model strict -assume noold_unit_star \
           -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
 
-ifneq ($(CXX_SRC),)
+ifneq ($(CXXNAME),)
 FFLAGS += -fexceptions
 endif
 
@@ -92,7 +92,7 @@ FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c /D_IFORT
 # FFLAGS  = /stand:f95 /warn all /c
 
 # FFLAGS with no-optimization subtitution
-FFLAGS0 = $(patsubst $(SPACE)/O% , /Od ,$(FFLAGS))
+#FFLAGS0 = $(patsubst $(SPACE)/O% , /Od ,$(FFLAGS))
 
 #
 # options flags
