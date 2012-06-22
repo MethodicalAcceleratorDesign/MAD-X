@@ -21,7 +21,6 @@
 # Project settings
 
 PROJECT := libptc
-PROJEXT := .a
 
 #################
 # Build settings
@@ -36,6 +35,9 @@ DEBUG   := no
 # profiling mode: yes/no (default is no)
 PROFILE := no
 
+# link with static lib: yes/no (default is yes)
+SHARED  := yes
+
 #############################
 # Compilers/Linkers settings
 # see make/compiler.* for supported compilers
@@ -45,8 +47,11 @@ PROFILE := no
 # Fortran compiler (default is gfortran)
 FC  := gfortran
 
-# Linker (default is ar)
-LD  := ar
+# Linker (default is Fortran compiler, deferred)
+LD   = $(FC)
+
+# Archiver (default is ar)
+AR  := ar
 
 ####################
 # Includes settings

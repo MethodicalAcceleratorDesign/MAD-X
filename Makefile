@@ -49,16 +49,16 @@
 ###################
 # Project settings
 
-PROJECT := madx
+PROJECT  := madx
 
 # online version - includes SDDS I/O: yes/no (default is no)
-ONLINE    := no
+ONLINE   := no
 
 # alternative DA package: yes/no (default is yes)
-NTPSA     := yes
+NTPSA    := yes
 
 # memory leaks debug: yes/no (default is no)
-MEMLEAKS  := no
+MEMLEAKS := no
 
 #################
 # Build settings
@@ -94,9 +94,8 @@ CXX := g++
 # Fortran compiler (default is gfortran)
 FC  := gfortran
 
-# Linker (default is fortran compiler, deferred)
-LD     = $(FC)
-LDNAME = $(FCNAME)
+# Linker (default is Fortran compiler, deferred)
+LD   = $(FC)
 
 # Tester (default is numdiff)
 ND  := numdiff

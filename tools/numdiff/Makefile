@@ -47,7 +47,7 @@ PROFILE := no
 # C compiler (default is gcc)
 CC := gcc
 
-# Linker (default is gcc compiler, deferred)
+# Linker (default is C compiler)
 LD  = $(CC)
 
 ####################

@@ -41,9 +41,10 @@ test-ptc-twiss: TESTSUITE := PTC Twiss testsuite
 
 # madx command for tests
 ifndef MADX
-TESTCMD = $(if $(wildcard $(PROJECT)),..$/..$/$(PROJECT),$(PROJECT)) < $@.madx
+MADX    = $(PRJNAME)$(BINARY_EXT)
+TESTCMD = $(if $(wildcard $(MADX)),..$/..$/$(MADX),$(MADX)) < $(@F).madx
 else
-TESTCMD = $(MADX) < $@.madx
+TESTCMD = $(MADX) < $(@F).madx
 endif
 
 # end of makefile

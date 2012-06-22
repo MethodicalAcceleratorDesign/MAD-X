@@ -16,8 +16,7 @@
 # | $Id$
 # |
 
-SED      = sed
-GREP     = grep
-NOBUILD += madx-% libptc-% numdiff-% %-install
+SED  = sed
+GREP = grep
 
 # end of makefile

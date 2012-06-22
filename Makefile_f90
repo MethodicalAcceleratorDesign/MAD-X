@@ -41,7 +41,7 @@ endif
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC))
 
 # files specific compiler flag
-matchlib2.o: FFLAGS := $(FFLAGS0)
+matchlib2.o: NOPT := 0
 
 #######################
 # Fortran dependencies (case not automatic!)
@@ -152,9 +152,8 @@ endif
 # set to gfortran44 on lxplus
 #
 
-ifneq ($(filter $(PROJECT),$(MAKECMDGOALS)),)
+ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
-ifeq ($(origin FC),file)
 FCVER  := $(word 4, $(shell $(FC) --version))
 FCVERL := $(subst ., ,$(FCVER))
 FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
@@ -174,7 +173,6 @@ else
 $(error MAD-X requires gfortran >= 4.4 ($(FCVER) detected))
 endif # lxplus
 endif # version
-endif # origin
 endif # gfortran
 endif # cmdgoal
 
