@@ -27,7 +27,7 @@ ICL_CC2 := /D%  /I% /Od
 # C language
 #
 
-ifeq ($(CCNAME),icc)
+ifeq ($(CCNAME),icl)
 
 #
 # makedep
@@ -80,7 +80,7 @@ endif
 # C++ language
 #
 
-ifeq ($(CXXNAME),icc)
+ifeq ($(CXXNAME),icl)
 
 #
 # makedep
