@@ -16,7 +16,9 @@
 # | $Id$
 # |
 
+#
 # madx
+#
 .PHONY:         madx-dev-win
 .PHONY:         madx-dev-win32.exe  madx-dev-win64.exe
 madx-dev-win:   madx-dev-win32.exe  madx-dev-win64.exe
@@ -31,7 +33,9 @@ madx-dev-win64.exe:
 	$_ $(MAKE) --no-print-directory ARCH=64 ONLINE=no STATIC=yes Intel=yes APPENDLD=yes && \
      $(CP) madx64.exe $@
 
+#
 # numdiff
+#
 .PHONY:           numdiff-dev-win
 .PHONY:           numdiff-dev-win32.exe   numdiff-dev-win64.exe
 numdiff-dev-win:  numdiff-dev-win32.exe   numdiff-dev-win64.exe

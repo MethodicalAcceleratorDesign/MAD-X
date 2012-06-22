@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = /nologo /O$(NOPT) /extlnk:.o
+LDFLAGS = /nologo /O$(NOPT) /Qdiag-disable:10161
 LDLIBS  =
 
 #
