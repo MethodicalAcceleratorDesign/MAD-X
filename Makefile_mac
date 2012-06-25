@@ -40,7 +40,7 @@ madx-dev-macosx32:
 
 madx-dev-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) --no-print-directory -j5 -e ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
+	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) madx64 $@
 
 madx-dev-macosx32-gnu:
