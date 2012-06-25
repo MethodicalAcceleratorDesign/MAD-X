@@ -6481,7 +6481,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
     
   parameter ( pi = 3.14159265358979d0 )
   parameter ( clight = 299792458d0 )
-  parameter ( zero=0d0, one=1d0, two=2d0, ten3m=1d-3)
+  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
   
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
