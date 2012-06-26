@@ -49,6 +49,8 @@ add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(syntax)
 
+# External projects...
+include(setupExternalProjects)
 
 # Setting up testing:
 include(setupTesting)

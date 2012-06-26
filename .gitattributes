@@ -20,6 +20,8 @@
 /SDDS_LICENSE -text
 /VERSION -text
 cmake/Copyright.txt -text
+cmake/ExternalProject-pymad.cmake -text
+cmake/FindCYTHON.cmake -text
 cmake/FindGSL.cmake -text
 cmake/FindLAPACK.cmake -text
 cmake/FindSDDS.cmake -text
@@ -39,6 +41,7 @@ cmake/madxInit.cmake -text
 cmake/numdifftests.cmake -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
+cmake/setupExternalProjects.cmake -text
 cmake/setupInstallation.cmake -text
 cmake/setupOptions.cmake -text
 cmake/setupPackaging.cmake -text
