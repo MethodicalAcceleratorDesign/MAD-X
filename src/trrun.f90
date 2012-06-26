@@ -3368,15 +3368,15 @@ subroutine ttrfmult(track, ktrack, turn)
 
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
-  !    Track particle through a general thin multipole.                  *
+  !    Track particle through a general thin rf-multipole.               *
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) Number of surviving tracks.                    *
   !----------------------------------------------------------------------*
 
   double precision beta, angle, cangle, sangle, dtmp
-  double precision bvk, deltap, elrad
   double precision node_value, get_value
+  double precision bvk, deltap, elrad
   double precision f_errors(0:maxferr)
   double precision vals(2,0:maxmul)
   integer n_ferr, jtrk, iord, nord
@@ -3388,8 +3388,9 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision field_cos(2,0:maxmul)
   double precision field_sin(2,0:maxmul)
   double precision zero, one, two, three
-  double precision pc, krf, vrf, rfac
+  double precision pc, krf, rfac
   double precision pi, clight, ten3m
+  double precision one_plus_delta
   double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision pnl(0:maxmul), psl(0:maxmul)
@@ -3438,10 +3439,10 @@ subroutine ttrfmult(track, ktrack, turn)
   
   !---- Vector with strengths + field errors
   do iord = 0, nord;
-     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
-     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
+     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
+     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
+     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord));
+     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z) + field(2,iord));
   enddo
       
   !---- Prepare to calculate the kick and the matrix elements
@@ -3449,7 +3450,6 @@ subroutine ttrfmult(track, ktrack, turn)
     x = track(1,jtrk);
     y = track(3,jtrk);
     z = track(5,jtrk);
-    vrf = volt*ten3m/(pc*(one+deltap)*(1.0/beta+track(6,jtrk)));
     Cm2 = 0.0;
     Sm2 = 0.0;
     Cm1 = 0.0;
@@ -3476,9 +3476,10 @@ subroutine ttrfmult(track, ktrack, turn)
     Cp1 = Cp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2;
 
     !---- The kick    
-    dpx = -DREAL(Cp0);
-    dpy =  DIMAG(Cp0);
-    dpt =  vrf * sin(lag * 2 * pi - krf * z) - krf * DREAL(Sp1);
+    one_plus_delta = (track(6,jtrk) + 1d0 / beta) * (1d0 + deltap);
+    dpx = -DREAL(Cp0) / one_plus_delta;
+    dpy =  DIMAG(Cp0) / one_plus_delta;
+    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * DREAL(Sp1)) / one_plus_delta;
 
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. zero) then
