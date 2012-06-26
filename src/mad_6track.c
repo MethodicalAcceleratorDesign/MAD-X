@@ -2718,26 +2718,47 @@ write_all_el(void)
 static void write_rfmultipole(struct c6t_element* el)
 {
   char name[48];
-  if (fabs(el->value[3])>eps_9 || fabs(el->value[9])>eps_9) {
-    att_rfquadrupole(el);
+  if (fabs(el->value[3])>eps_9) {
+    /* att_rfquadrupole(el); */
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+	    name, 26, el->value[3], el->value[2], el->value[6], el->value[1], 0.0, 0.0);
   }
-  if (fabs(el->value[4])>eps_9 || fabs(el->value[10])>eps_9) {
-    att_rfsextupole(el);
+  if (fabs(el->value[4])>eps_9) {
+    /* att_rfsextupole(el); */
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+	    name, 27, el->value[4], el->value[2], el->value[7], el->value[1], 0.0, 0.0);
   }
-  if (fabs(el->value[5])>eps_9 || fabs(el->value[11])>eps_9) {
-    att_rfoctupole(el);
+  if (fabs(el->value[5])>eps_9) {
+    /* att_rfoctupole(el); */
     strcpy(name, el->name);
     strcat(name, "_o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+	    name, 28, el->value[5], el->value[2], el->value[8], el->value[1], 0.0, 0.0);
+  }
+  if (fabs(el->value[9])>eps_9) {
+    /* att_rfquadrupole(el); */
+    strcpy(name, el->name);
+    strcat(name, "_q");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, -26, el->value[9], el->value[2], el->value[12], el->value[1], 0.0, 0.0);
+  }
+  if (fabs(el->value[10])>eps_9) {
+    /* att_rfsextupole(el); */
+    strcpy(name, el->name);
+    strcat(name, "_s");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, -27, el->value[10], el->value[2], el->value[13], el->value[1], 0.0, 0.0);
+  }
+  if (fabs(el->value[11])>eps_9) {
+    /* att_rfoctupole(el); */
+    strcpy(name, el->name);
+    strcat(name, "_o");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, -28, el->value[11], el->value[2], el->value[14], el->value[1], 0.0, 0.0);
   }
 }
 
