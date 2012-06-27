@@ -6,8 +6,7 @@
 ###
 
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-# General:
-    message("GNU fortran compiler!")
+    # General:
     set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
     execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version OUTPUT_VARIABLE CMAKE_Fortran_COMPILER_VERSION)
     string(REGEX MATCH "[3-5].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
