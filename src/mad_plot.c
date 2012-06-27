@@ -357,14 +357,8 @@ exec_plot(struct in_cmd* cmd)
       }
     }
     fclose(gpu);
-    /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
-    system("gnuplot 'gnu_plot.cmd'");
-    /* Copy or append the gnuplot ps file in the target ps_file */
-    gnuplot_append("tmpplot.ps",ps_file_name);
-    /* Remove the gnuplot command */
-/*    remove("gnu_plot.cmd");*/
 
-#if 0
+//#if 0
 	  {  // backup gnuplot command file
 	     static int i = 0;
 	     char cmd[1000];
@@ -374,9 +368,19 @@ exec_plot(struct in_cmd* cmd)
        const char *cp = "cp -f";
 #endif
 	     sprintf(cmd, "%s gnu_plot.cmd gnu_plot_%d.cmd", cp, ++i);
-	     system(cmd);
+       if (system(cmd) == -1)
+         warning("Plot - system cannot run the command: ", cmd);
 	  }
-#endif
+//#endif
+
+    /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
+    if (system("gnuplot 'gnu_plot.cmd'") == -1)
+       warning("Plot - system cannot run the command: ", "gnuplot 'gnu_plot.cmd'");
+    /* Copy or append the gnuplot ps file in the target ps_file */
+    else
+      gnuplot_append("tmpplot.ps",ps_file_name);
+    /* Remove the gnuplot command */
+/*    remove("gnu_plot.cmd");*/
 
   }
   else
