@@ -326,7 +326,7 @@ exec_plot(struct in_cmd* cmd)
     sprintf(ps_file_name,"%s",track_plot_filename);
     strcat(ps_file_name,".ps");
 
-    gpu = fopen("gnu_plot.cmd","w");
+    gpu = fopen("gnu_plot.gp","w");
     fprintf(gpu,"set terminal postscript color\n");
     fprintf(gpu,"set pointsize 0.48\n");
     fprintf(gpu,"set output '%s'\n","tmpplot.ps");
@@ -367,15 +367,15 @@ exec_plot(struct in_cmd* cmd)
 #else
        const char *cp = "cp -f";
 #endif
-	     sprintf(cmd, "%s gnu_plot.cmd gnu_plot_%d.cmd", cp, ++i);
+	     sprintf(cmd, "%s gnu_plot.gp gnu_plot_%d.gp", cp, ++i);
        if (system(cmd) == -1)
          warning("Plot - system cannot run the command: ", cmd);
 	  }
 //#endif
 
     /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
-    if (system("gnuplot 'gnu_plot.cmd'") == -1)
-       warning("Plot - system cannot run the command: ", "gnuplot 'gnu_plot.cmd'");
+    if (system("gnuplot gnu_plot.gp") == -1)
+       warning("Plot - system cannot run the command: ", "gnuplot gnu_plot.cmd");
     /* Copy or append the gnuplot ps file in the target ps_file */
     else
       gnuplot_append("tmpplot.ps",ps_file_name);
