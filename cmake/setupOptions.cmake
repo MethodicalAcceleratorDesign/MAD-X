@@ -55,3 +55,7 @@ if(NOT CMAKE_BUILD_TYPE)
        "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel."
        FORCE)
 endif()
+
+if(MADX_NTPSA)
+    add_definitions("-D_NTPSA")
+endif()

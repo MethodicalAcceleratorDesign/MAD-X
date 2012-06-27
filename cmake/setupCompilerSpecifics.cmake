@@ -56,7 +56,7 @@ endif()
 set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g ${CMAKE_Fortran_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_DEBUG   " ${CMAKE_C_FLAGS_DEBUG} -Wall -pedantic")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -funroll-loops -std=c99")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops -std=c++98") #needed for c++ linking
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -funroll-loops") #needed for c++ linking
 set(CMAKE_CXX_FLAGS_DEBUG " ${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 if(MADX_DEBUG)
    add_definitions(-D_DEBUG -DDEBUG_ALL)
