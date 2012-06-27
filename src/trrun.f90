@@ -3390,7 +3390,6 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision zero, one, two, three
   double precision pc, krf, rfac
   double precision pi, clight, ten3m
-  double precision one_plus_delta
   double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision pnl(0:maxmul), psl(0:maxmul)
@@ -3476,10 +3475,9 @@ subroutine ttrfmult(track, ktrack, turn)
     Cp1 = Cp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2;
 
     !---- The kick    
-    one_plus_delta = (track(6,jtrk) + 1d0 / beta) * (1d0 + deltap);
-    dpx = -DREAL(Cp0) / one_plus_delta;
-    dpy =  DIMAG(Cp0) / one_plus_delta;
-    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * DREAL(Sp1)) / one_plus_delta;
+    dpx = -DREAL(Cp0) / (one + track(6,jtrk));
+    dpy =  DIMAG(Cp0) / (one + track(6,jtrk));
+    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * DREAL(Sp1)) / (one + track(6,jtrk));
 
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. zero) then
