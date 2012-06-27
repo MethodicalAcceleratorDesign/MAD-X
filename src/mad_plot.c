@@ -351,10 +351,9 @@ exec_plot(struct in_cmd* cmd)
         }
         fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
         if (nolegend)
-          fprintf(gpu,"notitle with points %d ",part_idx[j]);
+          fprintf(gpu,"notitle with points pointtype %d ",part_idx[j]);
         else
-          fprintf(gpu,"title 'particle %d' with points %d ",part_idx[j],part_idx[j]);
-
+          fprintf(gpu,"title 'particle %d' with points pointtype %d ",part_idx[j],part_idx[j]);
       }
     }
     fclose(gpu);
@@ -364,6 +363,21 @@ exec_plot(struct in_cmd* cmd)
     gnuplot_append("tmpplot.ps",ps_file_name);
     /* Remove the gnuplot command */
 /*    remove("gnu_plot.cmd");*/
+
+#if 0
+	  {  // backup gnuplot command file
+	     static int i = 0;
+	     char cmd[1000];
+#ifdef _WIN32
+       const char *cp = "copy /Y";
+#else
+       const char *cp = "cp -f";
+#endif
+	     sprintf(cmd, "%s gnu_plot.cmd gnu_plot_%d.cmd", cp, ++i);
+	     system(cmd);
+	  }
+#endif
+
   }
   else
 
