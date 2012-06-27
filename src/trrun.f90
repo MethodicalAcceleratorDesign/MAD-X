@@ -3439,9 +3439,9 @@ subroutine ttrfmult(track, ktrack, turn)
   !---- Vector with strengths + field errors
   do iord = 0, nord;
      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
+     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z));
      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord));
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z) + field(2,iord));
+     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z));
   enddo
       
   !---- Prepare to calculate the kick and the matrix elements

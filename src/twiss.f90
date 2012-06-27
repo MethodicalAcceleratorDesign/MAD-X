@@ -6531,9 +6531,9 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   !---- Vector with strengths + field errors
   do iord = 0, nord;
      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
+     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z))                 / (one + deltap);
      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
+     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z))                 / (one + deltap);
      if (tilt.ne.zero)  then
         angle = (iord+1) * (-tilt);
         cangle = cos(angle);
@@ -6624,7 +6624,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
      te(2,1,1) = 0.5 * (-DREAL(Cm2));
      te(2,1,3) = 0.5 * ( DIMAG(Cm2));
      te(2,1,5) = 0.5 * (-krf * DREAL(Sm1));
-     te(2,3,1) =  te(2,1,3);
+     te(2,3,1) = te(2,1,3);
      te(2,3,3) = 0.5 * ( DREAL(Cm2));
      te(2,3,5) = 0.5 *   krf * DIMAG(Sm1);
      te(2,5,1) = te(2,1,5);
@@ -6638,7 +6638,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
      te(4,3,5) = -te(2,1,5);
      te(4,5,1) =  te(4,1,5);
      te(4,5,3) =  te(4,3,5);
-     te(4,5,5) = 0.5 * (-krf * krf * DIMAG(Cp0));
+     te(4,5,5) =  0.5 * (-krf * krf * DIMAG(Cp0));
      te(6,1,1) =  te(2,1,5);
      te(6,1,3) =  te(2,3,5);
      te(6,1,5) =  te(2,5,5);
