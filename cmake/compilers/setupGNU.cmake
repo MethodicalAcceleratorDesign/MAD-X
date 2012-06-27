@@ -7,6 +7,7 @@
 
 if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
 # General:
+    message("GNU fortran compiler!")
     set(CMAKE_Fortran_FLAGS " -fno-range-check -fno-f2c -cpp ") # remove -g -O2 from main list
     execute_process(COMMAND ${CMAKE_Fortran_COMPILER} --version OUTPUT_VARIABLE CMAKE_Fortran_COMPILER_VERSION)
     string(REGEX MATCH "[3-5].[0-9].[0-9]" CMAKE_Fortran_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION})
@@ -29,7 +30,7 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     if(IS32BIT)
         set (CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -m32")
     endif()
+endif()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-else()
-    message("You used setupGNU.cmake but it had no effect")
 endif()

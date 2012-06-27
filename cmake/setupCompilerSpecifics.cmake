@@ -8,17 +8,17 @@
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_LIST_DIR}/compilers")
 
-if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-   include(setupGNU)
-elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
-    include(setupIntel)
-elseif(CMAKE_Fortran_COMPILER MATCHES "lf95")
+# These two compilers can be mixed at will...
+include(setupGNU)
+include(setupIntel)
+
+# Only Fortran..
+if(CMAKE_Fortran_COMPILER MATCHES "lf95")
     message( WARNING " This compiler is not supported for Mad-X")
     include(setupLahey)
 elseif(CMAKE_Fortran_COMPILER MATCHES "nagfor")
     message( WARNING " This compiler is not supported for Mad-X")
     include(setupNAGFOR)
-
 elseif(CMAKE_Fortran_COMPILER MATCHES "g77")
     message( WARNING " This compiler is not supported for Mad-X")
     message( "--- ifort is recommended fortran compiler ---")
@@ -27,7 +27,6 @@ elseif(CMAKE_Fortran_COMPILER MATCHES "g77")
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif ()
-
 elseif(CMAKE_Fortran_COMPILER MATCHES "g95")
     message( WARNING " This compiler is not supported for Mad-X")
     set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-second-underscore -fshort-circuit -O2 ")
@@ -35,19 +34,9 @@ elseif(CMAKE_Fortran_COMPILER MATCHES "g95")
     if ( MADX_STATIC )
         set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
     endif ()
-
 elseif(CMAKE_Fortran_COMPILER_ID MATCHES "PathScale")
     message( WARNING " This compiler is not supported for Mad-X")
     include(setupPathScale)
-
-else()
-    message( WARNING " This compiler is not supported for Mad-X")
-    message("Fortran compiler full path: " ${CMAKE_Fortran_COMPILER})
-    message("Fortran compiler: " ${Fortran_COMPILER_NAME})
-    set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -fno-range-check -O2")
-    if ( MADX_STATIC )
-        set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -static ")
-    endif ( MADX_STATIC )
 endif()
 #end fortran compiler stuff...
 
