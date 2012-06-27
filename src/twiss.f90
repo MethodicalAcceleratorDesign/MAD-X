@@ -6516,7 +6516,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   
   !---- Set-up some parameters
   krf = 2*pi*freq*1d6/clight;
-  vrf = volt*ten3m/(pc*(one+deltap));
+  vrf = bvk*volt*ten3m/(pc*(one+deltap));
   
   if (n_ferr.gt.0) then
      call dcopy(f_errors,field,n_ferr)
@@ -6609,14 +6609,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
 
 
   !---- First-order terms
-  if (nord.ge.1) then
-    re(2,1) = -DREAL(Cm1);
-    re(2,3) =  DIMAG(Cm1);
-    re(4,1) =  re(2,3);
-    re(4,3) = -re(2,1);
-  endif
-
+  re(2,1) = -DREAL(Cm1);
+  re(2,3) =  DIMAG(Cm1);
   re(2,5) = -krf * DREAL(Sp0);
+  re(4,1) =  re(2,3);
+  re(4,3) = -re(2,1);
   re(4,5) =  krf * DIMAG(Sp0);
   re(6,1) =  re(2,5);
   re(6,3) =  re(4,5);
@@ -6624,37 +6621,33 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   
   !---- Second-order terms (use X,Y from orbit tracking).
   if (fsec) then
-     if (nord.ge.2) then
-       te(2,1,1) = 0.5 * (-DREAL(Cm2));
-       te(2,1,3) = 0.5 * ( DIMAG(Cm2));
-       te(2,3,1) =  te(2,1,3);
-       te(2,3,3) = -te(2,1,1);
-       te(4,1,1) =  te(2,1,3);
-       te(4,1,3) = -te(2,1,1);
-       te(4,3,1) = -te(2,1,1);
-       te(4,3,3) = -te(2,1,3);
-     endif
-
+     te(2,1,1) = 0.5 * (-DREAL(Cm2));
+     te(2,1,3) = 0.5 * ( DIMAG(Cm2));
      te(2,1,5) = 0.5 * (-krf * DREAL(Sm1));
+     te(2,3,1) =  te(2,1,3);
+     te(2,3,3) = 0.5 * ( DREAL(Cm2));
      te(2,3,5) = 0.5 *   krf * DIMAG(Sm1);
      te(2,5,1) = te(2,1,5);
      te(2,5,3) = te(2,3,5);
      te(2,5,5) = 0.5 * krf * krf * DREAL(Cp0);
+     te(4,1,1) =  te(2,1,3);
+     te(4,1,3) = -te(2,1,1);
      te(4,1,5) =  te(2,3,5);
-     te(4,3,5) = -te(2,3,5);
+     te(4,3,1) =  te(4,1,3);
+     te(4,3,3) = -te(2,1,3);
+     te(4,3,5) = -te(2,1,5);
      te(4,5,1) =  te(4,1,5);
      te(4,5,3) =  te(4,3,5);
      te(4,5,5) = 0.5 * (-krf * krf * DIMAG(Cp0));
-     te(6,1,1) = te(2,1,5);
-     te(6,1,3) = te(2,3,5);
-     te(6,1,5) = te(2,5,5);
-     te(6,3,1) = te(2,3,5);
-     te(6,3,3) = te(2,1,5);
-     te(6,3,5) = te(4,5,5);
-     te(6,5,1) = te(6,1,5);
-     te(6,5,3) = te(6,3,5);
-     te(6,5,5) = 0.5 * (-krf * krf * vrf * sin(lag * 2 * pi - krf * z) + krf * krf * krf * DREAL(Sp1));
-
+     te(6,1,1) =  te(2,1,5);
+     te(6,1,3) =  te(2,3,5);
+     te(6,1,5) =  te(2,5,5);
+     te(6,3,1) =  te(6,1,3);
+     te(6,3,3) = -te(2,1,5);
+     te(6,3,5) =  te(4,5,5);
+     te(6,5,1) =  te(6,1,5);
+     te(6,5,3) =  te(6,3,5);
+     te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * 2 * pi - krf * z) + krf * krf * krf * DREAL(Sp1));
   endif
   
   !---- centre option
