@@ -358,8 +358,8 @@ exec_plot(struct in_cmd* cmd)
     }
     fclose(gpu);
 
-//#if 0
-	  {  // backup gnuplot command file
+#if 0
+	  {  // backup gnuplot command file for debugging purpose
 	     static int i = 0;
 	     char cmd[1000];
 #ifdef _WIN32
@@ -371,7 +371,7 @@ exec_plot(struct in_cmd* cmd)
        if (system(cmd) == -1)
          warning("Plot - system cannot run the command: ", cmd);
 	  }
-//#endif
+#endif
 
     /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
     if (system("gnuplot gnu_plot.gp") == -1)
