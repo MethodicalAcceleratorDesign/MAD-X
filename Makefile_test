@@ -26,7 +26,7 @@ ifndef TESTS
 
 tests-case := \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
-test-rfmultipole 
+test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4
 
 tests-user := \
 test-ptc-twiss

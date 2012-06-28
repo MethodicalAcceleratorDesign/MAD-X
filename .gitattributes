@@ -624,6 +624,17 @@ tests/test-ptc-twiss/ptc-twiss-table.ref -text
 tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tests/test-ptc-twiss/test-ptc-twiss.ref -text
+tests/test-rfmultipole-2/sectormap.cfg -text
+tests/test-rfmultipole-2/sectormap.ref -text
+tests/test-rfmultipole-2/test-rfmultipole-2.cfg -text
+tests/test-rfmultipole-2/test-rfmultipole-2.madx -text
+tests/test-rfmultipole-2/test-rfmultipole-2.ref -text
+tests/test-rfmultipole-4/sectormap.cfg -text
+tests/test-rfmultipole-4/sectormap.ref -text
+tests/test-rfmultipole-4/test-rfmultipole-4.cfg -text
+tests/test-rfmultipole-4/test-rfmultipole-4.m -text
+tests/test-rfmultipole-4/test-rfmultipole-4.madx -text
+tests/test-rfmultipole-4/test-rfmultipole-4.ref -text
 tests/test-rfmultipole/fc.16.ref -text
 tests/test-rfmultipole/fc.2.ref -text
 tests/test-rfmultipole/fc.3.aux.ref -text
