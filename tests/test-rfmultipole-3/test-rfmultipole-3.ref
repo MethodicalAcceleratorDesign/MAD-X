@@ -1,0 +1,41 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.17  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.06.28      +
+  + Execution Time Stamp: 28.06.12 12.22.24 +
+  +++++++++++++++++++++++++++++++++++++++++++
+title, 'test of rf-multipole';
+
+option, debug, -echo;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 0                 -1                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+                 0                  0                  1                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  1                  1                  0 
+
+               dq2            betymax              dymax              dyrms 
+                 0                  1                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.17 32 finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
