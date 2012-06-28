@@ -16,6 +16,16 @@
 # | $Id$
 # |
 
+#####################
+# IFORT specific
+#
+
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_IFORT
+
 ################
 # Unix Settings
 #
@@ -32,7 +42,7 @@ ifneq ($(OSTYPE),Windows)
 # compiler flags
 #
 
-FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c -D_IFORT
+FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c
 
 # cancellation of optimizations
 #FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
@@ -86,7 +96,7 @@ ifeq ($(OSTYPE),Windows)
 # compiler flags
 #
 
-FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c /D_IFORT
+FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c
 
 # Trig too many warnings for the moment!
 # FFLAGS  = /stand:f95 /warn all /c

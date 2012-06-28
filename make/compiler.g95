@@ -28,10 +28,16 @@
 # FDEP = $(FC) -M -fmod=$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
+# preprocessor flags
+#
+
+CPPFLAGS += -D_G95
+
+#
 # compiler flags
 #
 
-FFLAGS = -m$(ARCH) -O$(NOPT) -c -D_G95
+FFLAGS = -m$(ARCH) -O$(NOPT) -c
 
 # fortran code is not conformant to f90/f95 (break compilation)!
 # FFLAGS  = -m$(ARCH) -O$(NOPT) -std=f95 -c

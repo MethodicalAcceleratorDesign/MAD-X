@@ -23,10 +23,16 @@
 CDEP = $(CC) -MM $(addprefix -I,$(CC_DIR))
 
 #
+# preprocessor flags
+#
+
+CPPFLAGS += -D_GCC
+
+#
 # compiler flags
 #
 
-CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -pedantic -c -D_GCC
+CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -pedantic -c
 
 #
 # options flags

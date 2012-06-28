@@ -20,6 +20,16 @@
 # ICC specific
 #
 
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_ICC -D_ICL
+
+#
+# command translator
+#
+
 ICL_CC1 := -D%  -I% /O0
 ICL_CC2 := /D%  /I% /Od
 
@@ -42,7 +52,7 @@ endif
 # compiler
 #
 
-CFLAGS = /Qstd=c99 /Wall /Wcheck /Wp64 /O$(NOPT) /c /D_ICC /D_ICL
+CFLAGS = /Qstd=c99 /Wall /Wcheck /Wp64 /O$(NOPT) /c
 
 #
 # diagnostics
@@ -95,7 +105,7 @@ endif
 # compiler
 #
 
-CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c /D_ICC /D_ICL
+CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c
 
 #
 # diagnostics

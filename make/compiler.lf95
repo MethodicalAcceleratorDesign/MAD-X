@@ -24,10 +24,16 @@
 # FDEP =
 
 #
+# preprocessor flags
+#
+
+CPPFLAGS += -D_LF95
+
+#
 # compiler flags
 #
 
-FFLAGS = -Wa,--$(ARCH) --f95 --o$(NOPT) --warn -c -D_LF95
+FFLAGS = -Wa,--$(ARCH) --f95 --o$(NOPT) --warn -c
 
 # FFLAGS with no-optimization
 FFLAGS0 = $(patsubst $(SPACE)--o% , --o0 ,$(FFLAGS))

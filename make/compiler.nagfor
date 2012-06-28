@@ -23,17 +23,20 @@
 # FDEP = fpp -M $(addprefix -I,$(FC_DIR))
 
 #
+# preprocessor flags
+#
+
+CPPFLAGS += -D_NAGFOR
+
+#
 # compiler flags
 #
 
-FFLAGS = -f95 -O$(NOPT) -w=unused -c -D_NAGFOR
+FFLAGS = -f95 -O$(NOPT) -w=unused -c
 
 ifeq ($(ARCH),32)
 FFLAGS += -Wc,-m32 -abi=32
 endif
-
-# FFLAGS with no-optimization
-FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
 
 #
 # options flags

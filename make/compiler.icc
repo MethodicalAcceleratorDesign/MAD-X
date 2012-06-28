@@ -16,6 +16,16 @@
 # | $Id$
 # |
 
+#####################
+# ICC specific
+#
+
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_ICC
+
 ###############
 # C language
 #
@@ -32,7 +42,7 @@ CDEP = $(CC) -MM $(addprefix -I,$(CC_DIR))
 # compiler
 #
 
-CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -Wcheck -Wp64 -c -D_ICC
+CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics
@@ -80,7 +90,7 @@ CXXDEP = $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++0x -Wall -Wcheck -Wp64 -c -D_ICC
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++0x -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics

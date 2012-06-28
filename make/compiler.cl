@@ -20,6 +20,16 @@
 # CL specific
 #
 
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_MCC
+
+#
+# command translator
+#
+
 CL_CC1 := -D%  -I% /O3 /O0
 CL_CC2 := /D%  /I% /O2 /Od
 
@@ -42,10 +52,10 @@ CDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
 endif
 
 #
-# compiler
+# compiler flags
 #
 
-CFLAGS = /O$(NOPT) /c /D_MCC # /Wall
+CFLAGS = /O$(NOPT) /c # /Wall
 
 #
 # options flags
@@ -92,10 +102,10 @@ CXXDEP_tr = | $(GREP) -i -F "$(call f1bs,$(CURDIR))" \
 endif
 
 #
-# compiler
+# compiler flags
 #
 
-CXXFLAGS = /O$(NOPT) /c /D_MCC # /Wall
+CXXFLAGS = /O$(NOPT) /c # /Wall
 
 #
 # options flags

@@ -17,8 +17,8 @@
 # |
 
 # NOTE:
-# Requires gfortran 4.4 or higher to compile...
-# Requires gfortran 4.6 or higher to compile with -O3
+# Use gfortran 4.4 or higher to compile...
+# Use gfortran 4.6 or higher to compile with -O3
 
 #
 # makedep
@@ -28,16 +28,19 @@
 # FDEP = $(FC) -MM -cpp -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
 #
+# preprocessor flags
+#
+
+CPPFLAGS += -D_GFORTRAN
+
+#
 # compiler flags
 #
 
 # gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
-FFLAGS = -m$(ARCH) -O$(NOPT) -c -D_GFORTRAN
+FFLAGS = -m$(ARCH) -O$(NOPT) -c
 
 #FFLAGS = -m$(ARCH) -std=f95 -Wall -W -pedantic -c
-
-# FFLAGS with no-optimization subtitution
-FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
 
 #
 # options flags
