@@ -644,6 +644,7 @@ tests/test-rfmultipole/fc.16.cfg -text
 tests/test-rfmultipole/fc.16.ref -text
 tests/test-rfmultipole/fc.2.cfg -text
 tests/test-rfmultipole/fc.2.ref -text
+tests/test-rfmultipole/fc.3.aux.cfg -text
 tests/test-rfmultipole/fc.3.aux.ref -text
 tests/test-rfmultipole/fc.3.cfg -text
 tests/test-rfmultipole/fc.3.ref -text
