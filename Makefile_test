@@ -25,7 +25,8 @@
 ifndef TESTS
 
 tests-case := \
-test-jacobian test-jacobian-2 test-jacobian-knobs
+test-jacobian test-jacobian-2 test-jacobian-knobs \
+test-rfmultipole 
 
 tests-user := \
 test-ptc-twiss
@@ -33,8 +34,9 @@ test-ptc-twiss
 endif
 
 # testsuite titles (attached to first rule of your suite)
-test-jacobian:  TESTSUITE := Jacobian testsuite
-test-ptc-twiss: TESTSUITE := PTC Twiss testsuite
+test-jacobian:     TESTSUITE := Jacobian testsuite
+test-rfmultipole:  TESTSUITE := RF multipole testsuite
+test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 
 # end of testsuite
 #################################################

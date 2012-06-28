@@ -1,0 +1,64 @@
+title, 'test of rf-multipole';
+option, debug, -echo;
+
+bunchcharge := 2.e10;
+
+twss_ebc1 : beta0, 
+            betx=3.3999, bety=3.7645,
+            alfx=-1.0879, alfy= 1.1907;
+
+beam_ebc1 : beam, energy=5, npart=bunchcharge, 
+            sige=1.5e-3, sigt=6e-03, 
+            ex=8e-6 * emass/5, ey=20e-9 * emass/5;
+
+!!!
+!!! it creates a sequence with an RF-Multipole and multipole that cancel each other
+!!!
+
+k:=sqrt(pi);
+rfm1 : rfmultipole, l=0, freq=12, knl:={0, k, k}, ksl:={0, k, k, k, k }, pnl:={ 0, 0, 0,0,0,0,0,0,0 }, psl:={0,0,0,0,0,0,0,0};
+m1 : multipole, l=0.0, knl:={0, -k, -k}, ksl:={0, -k, -k, -k, -k};
+
+test_line : line=( m1, rfm1 );
+
+!!! 
+!!! TEST 1: prints some of the RF-Multipole attributes
+!!!
+
+use, period=test_line;
+value, rfm1->l;
+value, rfm1->freq;
+value, rfm1->knl;
+value, rfm1->pnl;
+
+!!! creeates the twiss table
+
+twiss,betx=1,bety=1,x=1,t=1;
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,l,x,px,y,py,t,pt,k0l,ks0l;
+write,table=twiss;
+
+!!!
+!!! TEST 2: performs tracking, expecting to find all zeros as the two elements cancel each other
+!!!
+
+track,onepass,file=test1_track;
+start,x=1,t=0;
+observe,place=test_line$END;
+run,turns=10;
+endtrack;
+
+!!!
+!!! TEST 3: saves the lattice in plain madx format
+!!!
+
+save, file=test1_flat.seq;
+
+!!! 
+!!! TEST 4: saves the lattice in Six-Track format
+!!!
+
+select, flag=makethin, clear;
+select, flag=makethin, pattern="q*", slice=1;
+use, period=test_line;
+sixtrack, radius=0.017;
