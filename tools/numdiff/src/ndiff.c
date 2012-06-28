@@ -116,7 +116,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
   if (n_) *n_ = n;
   if (d_) *d_ = d-1;
   if (e_) *e_ = e-1;
-  if (f_) *f_ = d > 0 || (e > 0 && buf[e] == '-');
+  if (f_) *f_ = d > 0 || e > 0;
 
   return i;
 }
