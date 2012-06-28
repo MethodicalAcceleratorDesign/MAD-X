@@ -44,9 +44,6 @@ ifneq ($(OSTYPE),Windows)
 
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c
 
-# cancellation of optimizations
-#FFLAGS0 = $(patsubst $(SPACE)-O% , -O0 ,$(FFLAGS))
-
 #
 # options flags
 #
@@ -100,9 +97,6 @@ FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c
 
 # Trig too many warnings for the moment!
 # FFLAGS  = /stand:f95 /warn all /c
-
-# FFLAGS with no-optimization subtitution
-#FFLAGS0 = $(patsubst $(SPACE)/O% , /Od ,$(FFLAGS))
 
 #
 # options flags
