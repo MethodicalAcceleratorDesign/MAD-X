@@ -32,8 +32,8 @@ NDFLAGS = -q -b -c -l -n $(if $(call eq,$(DEBUG),yes),-d,) -t $@
 # $@ = test name & directory
 NDFILES     = $(basename $(NDFILES_REF))
 NDFILES_OUT = $(addsuffix .out,$(NDFILES)) $(NDFILES)
-NDFILES_REF = $(wildcard   tests$/$@$/$@.ref) \
-              $(filter-out tests$/$@$/$@.ref, $(sort $(wildcard tests$/$@$/*.ref)))
+NDFILES_REF = $(wildcard   tests/$@/$@.ref) \
+              $(filter-out tests/$@/$@.ref, $(sort $(wildcard tests/$@/*.ref)))
 
 # Remarks line-by-line
 # check for .ref files
