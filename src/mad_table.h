@@ -96,5 +96,12 @@ void    double_to_table_row(char* table, char* name, int* row, double* val);
 int     double_from_table(char* table, char* name, int* row, double* val);
 int     string_from_table(char* table, char* name, int* row, char* string);
 
+struct column_info{
+  void* data;
+  int length;
+  char datatype;
+  char datasize;
+};
+
 #endif // MAD_TABLE_H
 
