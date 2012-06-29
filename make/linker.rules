@@ -26,13 +26,13 @@ $(PROJECT): $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 ifneq ($(LD),)
 $(PRJNAME_LD): $(OBJECTS)
 	$E "*** Linking $(@F)"
-	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $(DEST_DIR)$@ $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
+	$_ $(call LD_tr,$(LD) $(LDFLAGS) -o $(DESTDIR)$@ $(addprefix $(OBJDIR)$/,$(^F)) $(LIBS) $(LDLIBS))
 endif
 
 ifneq ($(AR),)
 $(PRJNAME_AR): $(OBJECTS)
 	$E "*** Archiving $(@F)"
-	$_ $(call AR_tr,$(AR) $(ARFLAGS) -o $(DEST_DIR)$@ $(addprefix $(OBJDIR)$/,$(^F)))
+	$_ $(call AR_tr,$(AR) $(ARFLAGS) -o $(DESTDIR)$@ $(addprefix $(OBJDIR)$/,$(^F)))
 endif
 
 # end of makefile
