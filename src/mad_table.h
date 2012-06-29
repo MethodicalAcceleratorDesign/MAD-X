@@ -103,5 +103,7 @@ struct column_info{
   char datasize;
 };
 
+struct column_info  table_get_column(char* table_name,char* column_name);
+
 #endif // MAD_TABLE_H
 

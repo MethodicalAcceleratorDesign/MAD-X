@@ -721,6 +721,31 @@ table_value(void)
   return val;
 }
 
+struct column_info
+table_get_column(char* table_name,char* column_name)
+{
+  struct column_info info={NULL,0,'V',0};
+  int pos, col, i;
+  struct table* table;
+  if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
+    table = table_register->tables[pos];
+    if ((col = name_list_pos(column_name, table->columns)) > -1) {
+      //printf("col: n %d type %d\n",col,table->columns->inform[col]);
+      info.length  = table->curr;
+      if (table->columns->inform[col]==2){
+        info.data =  table->d_cols[col];
+        info.datatype='d';
+        info.datasize=sizeof(double);
+      } else if (table->columns->inform[col]==3) {
+        info.data=table->s_cols[col];
+        info.datasize=NAME_L;
+        info.datatype='S';
+      };
+    }
+  }
+  return info;
+}
+
 void
 augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
