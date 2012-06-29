@@ -39,6 +39,10 @@ numdiff_test(test-jacobian-2 "" 0)
 numdiff_test(test-jacobian-knobs "knobfile" 0)
 numdiff_test(test-ptc-twiss "Maxwellian_bend_for_ptc.txt fort.18 ptc-twiss-table" 0)
 numdiff_test(test-ptc-normal "distort_1_f_end distort_1_h_end fc.3 fort.18 ptc_map_table.tfs ptc_normal_results.tfs" 0)
+numdiff_test(test-rfmultipole "fc.16 fc.2 fc.34 fc.3 fc.3.aux test1_flat.seq test1_track.obs0001.p0001 test1_track.obs0002.p0001" 0)
+numdiff_test(test-rfmultipole-2 "sectormap" 0)
+numdiff_test(test-rfmultipole-3 "sectormap" 0)
+numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
 # Tests that require afs:
 if(EXISTS "/afs/cern.ch/")
