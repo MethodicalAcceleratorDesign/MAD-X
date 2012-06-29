@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <float.h>
 #include <time.h>
 
 #include "args.h"
@@ -75,8 +76,13 @@ main(int argc, const char* argv[])
 
       if (!lhs_fp || !rhs_fp) invalid();
 
-      // create context of constraints
+      // create context of constraints (using default size)
       struct context *cxt = context_alloc(0);
+
+      // add rule #0: "* * abs=DBL_MIN"
+      const struct constraint c =
+        constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN));
+      context_add(cxt, &c);
 
       // load constraints
       if (cfg_fp) cxt = context_scan(cxt, cfg_fp);

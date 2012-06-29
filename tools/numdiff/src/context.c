@@ -353,7 +353,7 @@ context_print(const T *cxt, FILE *fp)
   const C *c;
 
   for (int i = 0; (c = context_getIdx(cxt, i)) != 0; i++) {
-    fprintf(fp,"[#%d] ", i+1);
+    fprintf(fp,"[#%d] ", i);
     constraint_print(c, fp);
     putc('\n', fp);
   }

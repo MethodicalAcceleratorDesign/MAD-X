@@ -190,8 +190,8 @@ ndiff_error(const struct context    *cxt,
             int row, int col)
 {
   warning("dual constraints differ at %d:%d", row, col);
-  warning("getIncr select [#%d]", context_findIdx(cxt, c )+1);
-  warning("getAt   select [#%d]", context_findIdx(cxt, c2)+1);
+  warning("getIncr select [#%d]", context_findIdx(cxt, c ));
+  warning("getAt   select [#%d]", context_findIdx(cxt, c2));
   warning("rules list:");
   context_print(cxt, stderr);
   error("please report to mad@cern.ch");
@@ -437,8 +437,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
 
-  // ...required or get integer values and no absolute constraint
-  if (c->eps.cmd == eps_equ || (c->eps.cmd != eps_abs && !f1 && !f2)) {
+  // ...required or got an integer value and no absolute constraint >= 0.5
+  if (c->eps.cmd == eps_equ || (!f1 && !f2 && !(c->eps.cmd == eps_abs && c->eps.abs >= 0.5))) {
     warning("(%d) numbers strict representation differ", dif->cnt_i+1);
     goto quit_diff;
   }
@@ -457,7 +457,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
     double rel = c->eps.dig * pow10(-imax(n1, n2));
     if (dif_a > rel * min_a) {
       warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
-              dif->cnt_i+1, context_findIdx(cxt, c)+1, rel, dif_a, dif_a/min_a, imax(n1, n2));   
+              dif->cnt_i+1, context_findIdx(cxt, c), rel, dif_a, dif_a/min_a, imax(n1, n2));   
       ret = 1; 
     }
   }
@@ -466,7 +466,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (c->eps.cmd & eps_rel)
     if (dif_a > c->eps.rel * min_a) {
       warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g]",
-              dif->cnt_i+1, context_findIdx(cxt, c)+1, c->eps.rel, dif_a, dif_a/min_a);   
+              dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a);   
       ret = 1; 
     }
 
@@ -474,7 +474,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (c->eps.cmd & eps_abs)
     if (dif_a > c->eps.abs) {
       warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g]",
-              dif->cnt_i+1, context_findIdx(cxt, c)+1, c->eps.abs, dif_a);   
+              dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a);   
       ret = 1;
     }
 
