@@ -88,14 +88,15 @@ Normally ``RANGE'' refers to a single
 <P>
 
 <H2><a name=user-var>User Defined Matching Constraints</a></H2>
+In addition to the nominal TWISS variables the user can define a limited set of 'user-defined' variables in the constrint statement. This allows, for example, the matching of the normalized dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4. The variables can be defined according to the general variable declaration rules of deferred exressions. For example, in order to match the normalized dispersion at a certain location in the sequence one would first define a variable: 
+
+
+
 In addition to the nominal TWISS variables the user can define a 
-limited set of 'user-defined' variables in the
-constrint statement. This allows, for example, the matching of the nromalized
-dispersion or the mechanical aperture.
-The MATCH module allows four user defined variables called: mvar1, mvar2, 
-mvar3 and mvar4. The variables can be defined according to the general variable
-declaration rules of 
-<a href="../Introduction/expression.html#defer">deferred exressions</a>.
+limited set of 'user-defined' variables in the constraint statement. This allows, for example, the matching of the normalized
+dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4.
+The variables can be defined according to the general variable declaration rules of 
+<a href="../Introduction/expression.html#defer">deferred expressions</a>.
 For example, in order to match the normalized dispersion at a certain
 location in the sequence one would first define a variable:
 <pre>
