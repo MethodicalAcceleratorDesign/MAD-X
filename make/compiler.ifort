@@ -57,7 +57,7 @@ FFLAGS += -p
 endif
 
 ifeq ($(SHARED),yes)
-FFLAGS += -fpic
+FFLAGS += -fPIC
 endif
 
 #

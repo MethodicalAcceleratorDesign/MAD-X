@@ -63,7 +63,7 @@ CFLAGS += -p
 endif
 
 ifeq ($(SHARED),yes)
-CFLAGS += -fpic
+CFLAGS += -fPIC
 endif
 
 #
@@ -111,7 +111,7 @@ CXXFLAGS += -p
 endif
 
 ifeq ($(SHARED),yes)
-CXXFLAGS += -fpic
+CXXFLAGS += -fPIC
 endif
 
 #

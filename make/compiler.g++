@@ -47,7 +47,7 @@ CXXFLAGS += -pg
 endif
 
 ifeq ($(SHARED),yes)
-CXXFLAGS += -fpic
+CXXFLAGS += -fPIC
 endif
 
 #
