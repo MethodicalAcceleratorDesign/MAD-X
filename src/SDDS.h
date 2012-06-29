@@ -307,7 +307,7 @@
 #define SDDS_MPI_READ_WRITE  0x0004UL
 #define SDDS_MPI_STRING_COLUMN_LEN 16
 
-#if SDDS_MPI_IO
+#if defined(SDDS_MPI_IO) && SDDS_MPI_IO
 #include "mpi.h"
 #include "mdb.h"
 
@@ -541,7 +541,7 @@ typedef struct {
      */
     void **data;
   short column_major;
-#if SDDS_MPI_IO
+#if defined(SDDS_MPI_IO) && SDDS_MPI_IO
   MPI_DATASET *MPI_dataset;
 #endif
     } SDDS_DATASET;
@@ -1000,7 +1000,7 @@ int32_t SDDS_WriteNonNativeBinaryString(char *string, FILE *fp, SDDS_FILEBUFFER 
 int32_t SDDS_GZipWriteNonNativeBinaryString(char *string, gzFile *gzfp, SDDS_FILEBUFFER *fBuffer);
 #endif
 
-#if SDDS_MPI_IO
+#if defined(SDDS_MPI_IO) && SDDS_MPI_IO
   /* SDDSmpi_output.c */
   char *BlankToNull(char *string);
   epicsShareFuncSDDS extern void SDDS_MPI_BOMB(char *text, MPI_File *mpi_file);

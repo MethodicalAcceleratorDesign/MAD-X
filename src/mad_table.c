@@ -725,7 +725,7 @@ struct column_info
 table_get_column(char* table_name,char* column_name)
 {
   struct column_info info={NULL,0,'V',0};
-  int pos, col, i;
+  int pos, col; // not used , i;
   struct table* table;
   if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
     table = table_register->tables[pos];
