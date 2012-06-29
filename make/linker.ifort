@@ -25,7 +25,7 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main
+LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel
 LDLIBS  =
 
 ifneq ($(CXXNAME),)

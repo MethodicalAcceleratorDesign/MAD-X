@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-intel
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
