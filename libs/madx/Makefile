@@ -14,6 +14,12 @@
 # | $Id$
 # |
 
+# Note: this makefile
+#   - is not supposed to be used directly
+#   - assume that the madx environment is already setup
+#   - add settings to the original madx environment (PROJECT, SHARED, DESTDIR)
+#   - call/reload the madx Makefile again
+
 # For makefile documentation, please read make/README
 # For information and bug report, please contact mad@cern.ch
 
@@ -34,17 +40,18 @@ SHARED  := yes
 # Build settings
 #
 
+# add the archiver
 AR := ar
 
 #################
 # Recursive call
 #
 
-.PHONY: any
+.PHONY: $(PROJECT)
 
 export
 
-any:
+$(PROJECT):
 	@ $(MAKE) -C ../.. $(MAKEFLAGS) $(MAKEOVERRIDES) \
                      PROJECT=$(PROJECT) SHARED=$(SHARED) DESTDIR=libs/madx/
 
