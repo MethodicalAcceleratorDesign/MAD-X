@@ -41,7 +41,8 @@ endif
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC))
 
 # files specific compiler flag
-matchlib2.o: NOPT := 0
+matchlib2.o:        NOPT := 0
+l_complex_taylor.o: NOPT := 2
 
 #######################
 # Fortran dependencies (case not automatic!)
@@ -166,9 +167,6 @@ ifeq ($(findstring lxplus,$(HOST)),lxplus)
 $(warning MAD-X requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
 FC     := gfortran44
 FCNAME := gfortran
-ifeq ($(NOPT),3)
-NOPT   := 2 
-endif
 else
 $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
 endif # lxplus

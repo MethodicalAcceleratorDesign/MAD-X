@@ -33,6 +33,9 @@ FC_SRC_PTC := a_scratch_size.f90 b_da_arrays_all.f90 c_dabnew.f90 d_lielib.f90 \
 FC_DIR := src ../../src
 FC_SRC := $(FC_SRC_PTC) $(notdir $(wildcard src/*.f90 src/*.F90))
 
+# files specific compiler flag
+l_complex_taylor.o: NOPT := 2
+
 #######################
 # Fortran dependencies (case not automatic!)
 
@@ -106,9 +109,6 @@ ifeq ($(findstring lxplus,$(HOST)),lxplus)
 $(warning PTC requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
 FC     := gfortran44
 FCNAME := gfortran
-ifeq ($(NOPT),3)
-NOPT   := 2 
-endif
 else
 $(error PTC requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
 endif # lxplus
