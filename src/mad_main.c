@@ -68,7 +68,9 @@ mad_init(int argc, char *argv[])
 
   // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
   if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
-    setenv("GFORTRAN_UNBUFFERED_PRECONNECTED","y",1);
+    // YIL-2012: Using putenv instead, also available on Windows. Declaration first..
+    int putenv(char*);
+    putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
     execvp(argv[0], argv);
   }
 #endif
