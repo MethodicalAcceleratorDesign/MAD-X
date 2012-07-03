@@ -47,7 +47,7 @@ numdiff_test(test-rfmultipole-4 "sectormap" 0)
 # Tests that require afs:
 if(EXISTS "/afs/cern.ch/")
    numdiff_test(test-twiss "sample_optics.tfs" 0)
-   numdiff_test(test-match "str.ip8.b1.dat test-match twiss.ir8.b1.data" 1)
+   numdiff_test(test-match "str.ip8.b1.dat twiss.ir8.b1.data" 1)
 else()
    message(STATUS "afs is not available, some tests will be missing")
 endif()
