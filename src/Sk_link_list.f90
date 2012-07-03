@@ -2132,7 +2132,7 @@ CONTAINS
 
     IF(ASSOCIATED(T%BB)) THEN
        CALL KILL(T%BB)
-       DEALLOCATE(T%BB)
+       !DEALLOCATE(T%BB)
     ENDIF
     IF(ASSOCIATED(T%T)) THEN
        CALL KILL(T%T)
@@ -2172,6 +2172,7 @@ CONTAINS
     Current => L % end      ! end at the end
     DO WHILE (ASSOCIATED(L % end))
        L % end => Current % previous  ! update the end before disposing
+       !print*, current%parent_fibre%mag%name
        call DEALLOC_INTEGRATION_NODE(Current)
        Current => L % end     ! alias of last fibre again
        L%N=L%N-1
