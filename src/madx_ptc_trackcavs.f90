@@ -19,6 +19,8 @@ module madx_ptc_trackline_module
 
 contains
 
+
+
   subroutine ptc_track_everystep(nobs)
     ! subroutine that performs tracking with acceleration
     ! it is called as a result of ptc_trackline MAD-X command
@@ -30,14 +32,15 @@ contains
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
-    real (dp)            :: xp, yp, pz, p0
+    real (dp)            :: xp, yp,  p0
     real (dp)            :: pathlegth = zero
     integer              :: npart = 1
     integer              :: n = 1
     integer              :: nturns = 1
     integer              :: t = 1
+    integer              :: elcode
     logical(lp)          :: gcs
-    logical(lp)          :: rplot
+    logical(lp)          :: rplot, dosave, doloop, isstart, isend
 !    real (dp)            :: gposx, gposy, gposz
     integer              :: e, ni
     integer              :: obspointnumber ! observation point number in c-code
@@ -52,6 +55,7 @@ contains
     TYPE(BEAM) :: TheBEAM
     TYPE(INTEGRATION_NODE),POINTER :: CURR_SLICE,PREV_SLICE
     integer             :: mf
+
 
     !------------------------------------------------------
     !initialization
@@ -96,26 +100,6 @@ contains
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
 
-!    c_%x_prime=.true.
-
-    e=restart_sequ()
-    p=>my_ring%start
-    do e=1, my_ring%n
-
-       obspointnumber=node_value('obs_point ')
-       IF (e.eq.1) obspointnumber=1 ! node_value gives 0 for 1st (?)
-
-       if (obspointnumber .gt. 0) then
-          if (getdebug() > 0) then
-              print *,"Element ",e," is an observation point no. ",obspointnumber
-          endif
-          observedelements(e) = obspointnumber
-       endif
-
-       obspointnumber=advance_node() ! c-code go to the next node -> the passed value is never used, just to shut up a compiler
-       p=>p%next
-    enddo
-
 
     charge = get_value('beam ', "charge ");
     if (getdebug() > 3 ) then
@@ -153,6 +137,80 @@ contains
     if(.not.associated(my_ring%t))  then
        CALL MAKE_node_LAYOUT(my_ring)
     endif
+    
+!    c_%x_prime=.true.
+    ! Check observation points and install bb elements if any
+    if (getdebug() > 2 ) then
+      print*, "DO BEAM BEAM FLAG = ", do_beam_beam
+    endif 
+    
+    e=restart_sequ()
+    p=>my_ring%start
+    do e=1, my_ring%n !in slices e goes to nelem + 1 because the last slice is the fist one.
+
+       obspointnumber=node_value('obs_point ')
+       ! instead enforce saving data at the beginning and the very end
+       !IF (e.eq.1) obspointnumber=1 ! node_value gives 0 for 1st (?)
+
+       if (obspointnumber .gt. 0) then
+          if (getdebug() > 0) then
+              print *,"Element ",e," is an observation point no. ",obspointnumber
+          endif
+          observedelements(e) = obspointnumber
+       endif
+       
+       elcode=node_value('mad8_type ')
+        
+       if (elcode .eq. 22) then
+          
+          if (getdebug() > 1 ) then
+            write(6,*) " Beam-Beam position at element named >>",p%mag%name,"<<"
+          endif
+            
+          CURR_SLICE => p%t1
+          
+          do while (.not. (CURR_SLICE%cas==case0.or.CURR_SLICE%cas==caset) )
+            if (associated(CURR_SLICE,p%t2)) exit
+            CURR_SLICE => CURR_SLICE%next
+            !print*, CURR_SLICE%cas
+          enddo
+          
+          !print *,  'BB Node Case NO: ',CURR_SLICE%cas
+          
+          if(((CURR_SLICE%cas==case0).or.(CURR_SLICE%cas==caset))) then !must be 0 or 3
+
+            if(.not.associated(CURR_SLICE%BB)) call alloc(CURR_SLICE%BB)
+
+            call getfk(xp)
+            CURR_SLICE%bb%fk = xp
+            CURR_SLICE%bb%sx = node_value('sigx ')
+            CURR_SLICE%bb%sy = node_value('sigy ')
+            CURR_SLICE%bb%xm = node_value('xma ')
+            CURR_SLICE%bb%ym = node_value('yma ')
+            CURR_SLICE%bb%PATCH=.true.
+            if (getdebug() > 2 ) then
+              print*, "BB fk=",CURR_SLICE%bb%fk
+              print*, "BB sx=",CURR_SLICE%bb%sx
+              print*, "BB sy=",CURR_SLICE%bb%sy
+              print*, "BB xm=",CURR_SLICE%bb%xm
+              print*, "BB ym=",CURR_SLICE%bb%ym
+            endif
+
+            do_beam_beam = .true.
+             
+          else
+            call fort_warn('ptc_trackline: ','Bad node case for BeamBeam')
+          endif 
+          
+       endif
+       
+       obspointnumber=advance_node() ! c-code go to the next node -> the passed value is never used, just to shut up a compiler
+       p=>p%next
+    enddo
+    
+    if (getdebug() > 2 ) then
+      print*, "DO BEAM BEAM FLAG = ", do_beam_beam
+    endif
 
     n=1
     npart = getnumberoftracks()
@@ -175,14 +233,16 @@ contains
 
        pathlegth = zero
 
-       !if (getdebug() > 3 )
-       print *, 'Getting track ',n
+       if (getdebug() > 2 ) then
+         print *, 'Getting track ',n
+       endif  
 
        call gettrack(n,TheBeam%X(n,1),TheBeam%X(n,2),TheBeam%X(n,3),TheBeam%X(n,4),TheBeam%X(n,6),TheBeam%X(n,5))
 
-       !if (getdebug() > 0 )
-       write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,TheBeam%X(n,1:6)
-
+       if (getdebug() > 1 ) then
+         write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,TheBeam%X(n,1:6)
+       endif
+       
        TheBeam%X(n,7)=ZERO
 
        if( associated(TheBeam%POS(n)%NODE) ) then
@@ -195,12 +255,15 @@ contains
 !!!!!!!!!      TRACKING       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    call kanalnummer(mf)
-
-    open(unit=mf,file='thintracking_ptc.txt',POSITION='APPEND' , STATUS='UNKNOWN')
-
+    if (getdebug() > 1 ) then
+      call kanalnummer(mf)
+      open(unit=mf,file='thintracking_ptc.txt',POSITION='APPEND' , STATUS='UNKNOWN')
+    endif
+    
     do t=1, nturns
+       if (getdebug() > 2 ) then
        print*, "TURN NUMBER ",t
+       endif
        p=>my_ring%start
 
        PREV_SLICE => my_ring%start%T1
@@ -225,62 +288,63 @@ contains
           pathlegth = curr_slice%s(3)
 
           if (getdebug() > 2 ) then
-             write(6,*) e, 'l=',pathlegth
+             !write(6,*) e, 'l=',pathlegth
+             n=1! print only first one for debug
+             write(6,'(a7,1x,i4,1x,a5,1x,i3,1x,a4,1x,f9.2,1x ,6(f10.8,1x))') &
+                     'Track ',n,'Elem ',e,'S =',pathlegth,TheBeam%X(n,1:6)
           endif
+          
+          isstart= (t.eq.1).and.(e.eq.1)
+          isend  = (t.eq.nturns).and.(e.eq.my_ring%n)
+          dosave = (observedelements(e) .gt. 0) .or. isstart .or. isend
+          doloop = dosave .or. rplot
+          if (doloop) then
+            do n=1, npart
 
-          do n=1, npart
+               x = TheBeam%X(n,1:6)
 
-             x = TheBeam%X(n,1:6)
+               p0 = p%mag%p%p0c
 
-             ! in the past we wanted angles (piotr 2011.05.27)
-             
-             !p0=(1+x(5))
-             !pz=sqrt(p0**2 - x(2)**2 - x(4)**2)
-             p0 = p0*p%mag%p%p0c
-             !xp = x(2)/pz
-             !p = x(4)/pz
+                ! a simple hook to get a text file 
+               if (getdebug() > 1 ) then
+                  write(mf,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
+                       pathlegth, TheBeam%X(n,7), &
+                       x(1), x(2) , x(3), x(4) , x(5), x(6) , p0
+               endif
 
+               if (rplot) then
+                  !For thin tracking I still do not know how to get global coordinates
+                  !   gcs = my_false !For thin tracking
+                  !   if (gcs) then
+                  !      !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                  !      gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                  !      gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                  !      gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
+                  !      !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                  !      gposx = gposx + p%chart%f%b(1)
+                  !      gposy = gposy + p%chart%f%b(2)
+                  !      gposz = gposz + p%chart%f%b(3)
+                  !
+                  !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
+                  !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                  !   else
+                  !call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
+                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
+                  !   endif
+               endif
 
-             !             write(441,'(i8, 1x, a16, i4 ,1x, 2f8.4, 1x, 6f8.4)') ni, p%mag%name, e,&
-             !                    pathlegth, TheBeam%X(n,7), &
-             !     x(1), xp , x(3), yp , x(5), p0 , x(6)
+               if ( dosave ) then
+                  if ( associated(CURR_SLICE, p%t2 ) ) then
+	 !print*, "Sending to table", n, e, pathlegth
+	 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0)
+                  endif
+               endif
+               !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
 
-             write(mf,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
-                  pathlegth, TheBeam%X(n,7), &
-                  x(1), x(2) , x(3), x(4) , x(5), x(6) , p0
-
-
-             if (rplot) then
-                !For thin tracking I still do not know how to get global coordinates
-                !   gcs = my_false !For thin tracking
-                !   if (gcs) then
-                !      !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
-                !      gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
-                !      gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
-                !      gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
-                !      !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
-                !      gposx = gposx + p%chart%f%b(1)
-                !      gposy = gposy + p%chart%f%b(2)
-                !      gposz = gposz + p%chart%f%b(3)
-                !
-                !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
-                !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
-                !   else
-                !call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
-                 call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
-                !   endif
-             endif
-
-             if ( observedelements(e) .gt. 0 ) then
-                if ( associated(CURR_SLICE, p%t2 ) ) then
-                   print*, "Sending to table", n, e, pathlegth
-                   call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0)
-                endif
-             endif
-             !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
-
-          enddo
-
+              enddo
+          
+          endif !if doloop over tracks to save in table or root ntuple
+          
           if (associated(CURR_SLICE%next)) then
              PREV_SLICE => CURR_SLICE
              CURR_SLICE => CURR_SLICE%next
@@ -292,7 +356,10 @@ contains
 
     enddo !loop over turns
 
-    close(mf)
+    
+    if (getdebug() > 1 ) then
+      close(mf)
+    endif  
 
     if (rplot) call rplotfinish()
     call deletetrackstrarpositions()
@@ -304,9 +371,9 @@ contains
     deallocate (observedelements)
     !==============================================================================
   end subroutine ptc_track_everystep
-  !_________________________________________________________________________________
+ !_________________________________________________________________________________
 
-
+    
   subroutine putinstatustable (npart,turn,elno,elna,spos,stat,x,xini,e,mf)
     use name_lenfi
     implicit none
@@ -438,7 +505,7 @@ contains
     real (dp)            :: x(1:6)
     real (dp)            :: xini(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
-    real (dp)            :: xp, yp, pz, p0
+    real (dp)            :: xp, yp, p0
     real (dp)            :: pathlegth = zero
     integer              :: npart = 1
     integer              :: n = 1
@@ -608,11 +675,7 @@ contains
                 write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
              endif
 
-             p0=(1+x(5))
-             pz=sqrt(p0**2 - x(2)**2 - x(4)**2)
-             p0 = p0*p%mag%p%p0c
-             xp = x(2)/pz
-             yp = x(4)/pz
+             p0 = p%mag%p%p0c
 
              if (rplot) then
                 if (gcs) then
