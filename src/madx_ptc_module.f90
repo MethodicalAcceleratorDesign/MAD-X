@@ -506,9 +506,14 @@ CONTAINS
        end select
     endif
     call append_empty(my_ring)
-
+    
+    !print *,'Element code is ',code
+    
     select case(code)
-    case(0,4,22,25)
+    case(0,4,25)
+       key%magnet="marker"
+    case(22)
+       call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
     case(1,11,20,21)
        key%magnet="drift"
@@ -2588,5 +2593,40 @@ CONTAINS
     return
 
   END subroutine ptc_refresh_k
+
+  subroutine getfk(fk)
+  !returns FK factor for Beam-Beam effect
+    implicit none
+    real (dp) :: fk,dpp
+    real (dp) :: gamma0,beta0,beta_dp,ptot,b_dir,arad,totch
+    real (dp) :: q,q_prime
+    integer   :: b_dir_int
+    real(kind(1d0)) :: get_value
+    real(kind(1d0)) :: get_variable
+    integer         :: get_option
+    REAL(KIND(1d0)) :: node_value  !/*returns value for parameter par of current element */
+
+    !---- Calculate momentum deviation and according changes
+    !     of the relativistic factor beta0
+
+    gamma0 = get_value('probe ','gamma ')
+    arad=get_value('probe ', 'arad ')
+    totch=node_value('charge ') * get_value('probe ', 'npart ')
+
+    dpp  = get_variable('track_deltap ')
+    q = get_value('probe ','charge ')
+    q_prime = node_value('charge ')
+
+    beta0 = sqrt(one-one/gamma0**2)
+    ptot = beta0*gamma0*(one+dpp)
+    beta_dp = ptot / sqrt(one + ptot**2)
+    b_dir_int = node_value('bbdir ')
+    b_dir=dble(b_dir_int)
+    b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
+
+    fk = two*arad*totch/gamma0 /beta0/(one+dpp)/q*          &
+         (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
+
+  end subroutine getfk
 
 END MODULE madx_ptc_module
