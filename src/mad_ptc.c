@@ -829,6 +829,11 @@ pro_ptc_trackline(struct in_cmd* cmd)
   int parexist = -1;
   double value = 0;
   int ivalue = 0;
+
+  struct command* keep_beam = current_beam;
+
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("PTC_TRACKLINE - sequence without beam:", current_sequ->name);
   
 
   pos = name_list_pos("file", nl);
@@ -884,6 +889,11 @@ pro_ptc_trackline(struct in_cmd* cmd)
    }
    
 
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+  adjust_rfc(); /* sets freq in rf-cavities from probe */
+
+
   track_tables_create(cmd);
   
   
@@ -899,6 +909,11 @@ pro_ptc_trackline(struct in_cmd* cmd)
   }
 
   track_tables_dump();
+
+  /* cleanup */
+  current_beam = keep_beam;
+  probe_beam = delete_command(probe_beam);
+  
 }
 
 void
