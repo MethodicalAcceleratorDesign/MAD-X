@@ -1,8 +1,15 @@
 get_target_property(binaryname madxbin LOCATION)
 get_target_property(ndiffbin numdiff LOCATION)
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
-   ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+if(WIN32)
+   if(NOT EXISTS ${CMAKE_BINARY_DIR}/examples)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
+         ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+   endif()
+else()
+   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
+      ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+endif()
 
 set(BASESCRIPT ${CMAKE_SOURCE_DIR}/cmake/ctestbase.cmake)
 
@@ -13,19 +20,19 @@ macro(numdiff_test testname testout islong)
       set(_testname ${testname})
    endif()
    set(_testout "${testname} ${testout}")
-   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory 
+   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/${testname}
       ${CMAKE_CURRENT_BINARY_DIR}/tests/${testname})
    add_test(${_testname}
-       ${CMAKE_COMMAND}
-       -DTEST_PROG=${binaryname}
-       -DTEST_OUTPUT=${_testout}
-       -DSOURCEDIR=${CMAKE_CURRENT_BINARY_DIR}/tests/${testname}
-       -DTEST_NAME=${testname}
-       -DNUMDIFF=${ndiffbin}
-       -P ${BASESCRIPT})
-    set_tests_properties (${_testname}
-       PROPERTIES PASS_REGULAR_EXPRESSION ".*${testname}.*PASS")
+      ${CMAKE_COMMAND}
+      -DTEST_PROG=${binaryname}
+      -DTEST_OUTPUT=${_testout}
+      -DSOURCEDIR=${CMAKE_CURRENT_BINARY_DIR}/tests/${testname}
+      -DTEST_NAME=${testname}
+      -DNUMDIFF=${ndiffbin}
+      -P ${BASESCRIPT})
+   set_tests_properties (${_testname}
+      PROPERTIES PASS_REGULAR_EXPRESSION ".*${testname}.*PASS")
 endmacro()
 
 # First parameter is test name.
