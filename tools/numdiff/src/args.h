@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 struct option {
-  int check, debug, serie, list, blank, utest;
+  int check, debug, serie, list, blank, utest, keep;
   const char *suite, *test;
   const char *fmt;
   const char *out_e, *ref_e, *cfg_e;

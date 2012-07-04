@@ -31,6 +31,7 @@ void  ndiff_diffLine (T*, int blank);
 int   ndiff_nextNum  (T*, int blank); // return 0 if no number is found
 int   ndiff_testNum  (T*, const struct context*, const struct constraint*);
 
+int   ndiff_maxDisp  (T*, int max);   // return the previous value
 void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_);
 int   ndiff_feof     (const T*);
 

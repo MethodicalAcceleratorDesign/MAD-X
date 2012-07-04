@@ -11,6 +11,9 @@ struct option option = {
   // names and series numbering
   .fmt = "%d",
 
+  // number of diff displayed
+  .keep = 25,
+
   // file extensions
   .out_e  = ".out", .ref_e =  ".ref", .cfg_e = ".cfg",
 };
@@ -53,6 +56,7 @@ usage(void)
   inform("\t-e    -cfgext ext   specify the config file extension, default is .cfg");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
   inform("\t-h    -help         display this help");
+  inform("\t-k    -keep num     specify the number of diffs to display by file, default is 25");
   inform("\t-l    -list         enable list mode (list of filenames)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-o    -outext ext   specify the output file extension, default is .out");
@@ -161,6 +165,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "-test")) {
       option.test = argv[++option.argi];
       debug("test name set to '%s'", option.test);
+      continue;
+    }
+
+    // set keep number [setup]
+    if (!strcmp(argv[option.argi], "-k") || !strcmp(argv[option.argi], "-keep")) {
+      option.keep = strtoul(argv[++option.argi],0,0);
+      debug("keep set to %d", option.keep);
       continue;
     }
 

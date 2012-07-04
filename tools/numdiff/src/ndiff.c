@@ -20,7 +20,7 @@ struct ndiff {
   int   row_i,  col_i; // line, num-column
 
   // diff counter
-  int   cnt_i;
+  int   cnt_i, max_i;
 
   // buffers
   int   lhs_i,  rhs_i; // char-columns
@@ -148,7 +148,8 @@ ndiff_setup (T *dif, int n)
   *dif = (T) {
     .lhs_f = dif->lhs_f, .rhs_f = dif->rhs_f,
     .lhs_b = dif->lhs_b, .rhs_b = dif->rhs_b,
-    .buf_s = n
+    .buf_s = n,
+    .max_i = 25
   };
 }
 
@@ -332,9 +333,11 @@ retry:
   dif->lhs_i += 1;
   dif->rhs_i += 1;
   dif->cnt_i += 1;
-  warning("(%d) files differ at line %d at char-column %d|%d",
-          dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
-  warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
+  if (dif->cnt_i <= dif->max_i) {
+    warning("(%d) files differ at line %d at char-column %d|%d",
+            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
+    warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
+  }
 }
 
 int
@@ -394,9 +397,11 @@ quit_diff:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   dif->cnt_i += 1;
-  warning("(%d) files differ at line %d and char-columns %d|%d",
-          dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
-  warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
+  if (dif->cnt_i <= dif->max_i) {
+    warning("(%d) files differ at line %d and char-columns %d|%d",
+            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
+    warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
+  }
   return dif->col_i = 0;
 
 quit:
@@ -425,7 +430,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // invalid numbers
   if (!l1 || !l2) {
     l1 = l2 = 20;
-    warning("(%d) one number is missing", dif->cnt_i+1);
+    if (dif->cnt_i+1 <= dif->max_i) warning("(%d) one number is missing", dif->cnt_i+1);
     goto quit_diff;
   }
 
@@ -439,7 +444,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
 
   // ...required or got an integer value and no absolute constraint >= 0.5
   if (c->eps.cmd == eps_equ || (!f1 && !f2 && !(c->eps.cmd == eps_abs && c->eps.abs >= 0.5))) {
-    warning("(%d) numbers strict representation differ", dif->cnt_i+1);
+    if (dif->cnt_i+1 <= dif->max_i) warning("(%d) numbers strict representation differ", dif->cnt_i+1);
     goto quit_diff;
   }
 
@@ -456,8 +461,9 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (c->eps.cmd & eps_dig) {
     double rel = c->eps.dig * pow10(-imax(n1, n2));
     if (dif_a > rel * min_a) {
-      warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
-              dif->cnt_i+1, context_findIdx(cxt, c), rel, dif_a, dif_a/min_a, imax(n1, n2));   
+      if (dif->cnt_i+1 <= dif->max_i) 
+        warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+                dif->cnt_i+1, context_findIdx(cxt, c), rel, dif_a, dif_a/min_a, imax(n1, n2));   
       ret = 1; 
     }
   }
@@ -465,16 +471,18 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // relative comparison 
   if (c->eps.cmd & eps_rel)
     if (dif_a > c->eps.rel * min_a) {
-      warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g]",
-              dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a);   
+      if (dif->cnt_i+1 <= dif->max_i) 
+        warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g]",
+                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a);   
       ret = 1; 
     }
 
   // absolute comparison
   if (c->eps.cmd & eps_abs)
     if (dif_a > c->eps.abs) {
-      warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g]",
-              dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a);   
+      if (dif->cnt_i+1 <= dif->max_i) 
+        warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g]",
+                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a);   
       ret = 1;
     }
 
@@ -483,13 +491,14 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
 quit_diff:
   ret = 1;
   dif->cnt_i += 1;
-  warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
-          dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
+  if (dif->cnt_i <= dif->max_i) {
+    warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
+            dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
-  char str[128];
-  sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
-  warning(str, dif->cnt_i, lhs_p, rhs_p);
-
+    char str[128];
+    sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
+    warning(str, dif->cnt_i, lhs_p, rhs_p);
+  }
 quit:
   trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  numbers: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
@@ -498,6 +507,17 @@ quit:
   dif->rhs_i += l2;
 
   return ret;
+}
+
+int
+ndiff_maxDisp  (T *dif, int max)
+{
+  assert(dif);
+  ensure(max > 0, "number of diff must be positive");
+  
+  int max_i = dif->max_i;
+  dif->max_i = max;
+  return max_i;
 }
 
 void
