@@ -13,7 +13,7 @@ string(REGEX REPLACE " " ";" _TEST_OUTPUT ${TEST_OUTPUT})
 if(HAD_ERROR)
     message(FATAL_ERROR "Test failed with error ${HAD_ERROR}")
 else()
-    message("COMMAND ${NUMDIFF} -q -b -c -l -n -t ${TEST_NAME} ${_TEST_OUTPUT}")
+    message("COMMAND ${NUMDIFF} -q -b -c -l -n -t ${TEST_NAME} ${TEST_OUTPUT}")
     execute_process(COMMAND ${NUMDIFF} -q -b -c -l -n -t ${TEST_NAME} ${_TEST_OUTPUT}
         WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE NUMDIFF_ERROR)
     if(NUMDIFF_ERROR)
