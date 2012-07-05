@@ -40,7 +40,7 @@ static inline int
 is_number_start(char *buf, const char *beg)
 {
   // number starts by a '-' or is at the beginning or is preceded by a separator
-  return *buf == '-' || buf == beg || (buf > beg && is_separator(buf[-1]));
+  return *buf == '-' || *buf == '+' || buf == beg || (buf > beg && is_separator(buf[-1]));
 }
 
 static inline int
@@ -49,7 +49,7 @@ is_number (char *buf)
   int i = 0;
 
   // sign
-  if (buf[i] == '+' || buf[i] == '-') i++;
+  if (buf[i] == '-' || buf[i] == '+') i++;
 
   // digits
   if(isdigit(buf[i])) return 1;
@@ -126,7 +126,7 @@ skip_identifier_digits(const char *lhs, const char *rhs)
 {
   int i = 0;
 
-  while (lhs[i] == rhs[i] && (isdigit(lhs[i]) || lhs[i] == '.'))
+  while (lhs[i] == rhs[i] && (isdigit(lhs[i]) || lhs[i] == '.' || lhs[i] == '_'))
     i++;
 
   return i;
@@ -348,6 +348,9 @@ ndiff_nextNum (T *dif, int blank)
   char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
 
+  trace("->nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  strings: '%.30s'|'%.30s'", lhs_p, rhs_p);
+
 retry:
 
   // search for difference or digits
@@ -370,6 +373,8 @@ retry:
   if (!*lhs_p && !*rhs_p)
     goto quit;
 
+  trace("  diff found for strings '%.30s'|'%.30s'", lhs_p, rhs_p);
+
   // difference in not-a-number
   if (*lhs_p != *rhs_p && (!is_number(lhs_p) || !is_number(rhs_p)))
     goto quit_diff;
@@ -378,6 +383,8 @@ retry:
   lhs_p = backtrace_number(lhs_p, dif->lhs_b);
   rhs_p = backtrace_number(rhs_p, dif->rhs_b);
 
+  trace("  backtracing to numbers '%.30s'|'%.30s'", lhs_p, rhs_p);
+
   // at the start of a number?
   if (!is_number_start(lhs_p, dif->lhs_b) || !is_number_start(rhs_p, dif->rhs_b)) {
     int i = skip_identifier_digits(lhs_p, rhs_p);
@@ -385,6 +392,8 @@ retry:
     if (!isdigit(*lhs_p)) goto retry;
     goto quit_diff;
   }
+
+  trace("  diff found for numbers '%.30s'|'%.30s'", lhs_p, rhs_p);
 
   // numbers found
   dif->lhs_i = lhs_p-dif->lhs_b;
@@ -420,6 +429,9 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   char *end;
 
   double lhs_d, rhs_d, dif_a, min_a;
+
+  trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  strnums: '%.30s'|'%.30s'", lhs_p, rhs_p);
 
   // parse numbers
   int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
