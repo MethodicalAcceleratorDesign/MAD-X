@@ -1443,7 +1443,6 @@ CONTAINS
     type(fibre), pointer :: f
     !---------------------------------------------------------------
 
-
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1452,7 +1451,7 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
-       !       write(6,'(6f8.3)')  al_errors(1:6)
+        !write(6,'(6f11.8)')  al_errors(1:6)
        call mad_misalign_fibre(f,al_errors(1:6))
     endif
     f=>f%next
