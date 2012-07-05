@@ -444,14 +444,24 @@ contains
 
 
        !print*, "Looking for orbit"
+       !w_p = 0
        call find_orbit(my_ring,x,1,default,c_1d_7)
-
-       if ( .not. c_%stable_da) then
-          call fort_warn('ptc_twiss: ','DA got unstable at attempt to find closed orbit')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable at attempt to find closed orbit");
-          stop
+       
+       if ( .not. check_stable) then
+          call fort_warn('ptc_twiss: ','Can not find closed orbit')
+          call seterrorflag(10,"ptc_twiss ","Can not find closed orbit");
+          return
           !          return
        endif
+       
+      ! print*, "From closed orbit", w_p%nc
+      ! if ( w_p%nc .gt. 0) then
+      !   do i=1,w_p%nc
+      !      call fort_warn('ptc_twiss: ',w_p%c(i))
+      !      call seterrorflag(10,"ptc_twiss ",w_p%c(i));
+      !   enddo
+      ! endif    
+       
        CALL write_closed_orbit(icase,x)
 
     elseif(my_ring%closed .eqv. .true.) then
@@ -902,7 +912,7 @@ contains
       integer  :: double_from_table
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
       integer  :: mmap
-      real(dp) dt
+      real(dp) :: dt
 
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
