@@ -430,6 +430,13 @@ subroutine pefill(ierr)
   dpp_flag = .false.
 
   !--- Initialisation of local variables
+  currtilt =0
+  currk1l = 0
+  currk1sl =0
+  currk2l = 0
+  currk2sl =0
+  currk3l = 0
+  currk3sl =0
 
   new1 = 0
   new2 = 0
