@@ -1,10 +1,5 @@
-if(WIN32)
-	set(_CAT cmd.exe /c type)
-else()
-	set(_CAT cat)
-endif()
 message("COMMAND ${TEST_PROG} < ${SOURCEDIR}/${TEST_NAME}.madx")
-execute_process(COMMAND ${_CAT} ${SOURCEDIR}/${TEST_NAME}.madx COMMAND ${TEST_PROG}
+execute_process(COMMAND ${TEST_PROG} INPUT_FILE ${SOURCEDIR}/${TEST_NAME}.madx
    OUTPUT_FILE ${TEST_NAME}.out WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE HAD_ERROR)
 
 # We must make a list so it is understood as multiple
