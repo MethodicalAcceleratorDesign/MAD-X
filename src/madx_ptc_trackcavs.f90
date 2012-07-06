@@ -290,7 +290,7 @@ contains
           if (getdebug() > 2 ) then
              !write(6,*) e, 'l=',pathlegth
              n=1! print only first one for debug
-             write(6,'(a7,1x,i4,1x,a5,1x,i3,1x,a4,1x,f9.2,1x ,6(f10.8,1x))') &
+             write(6,'(a7,1x,i4,1x,a5,1x,i3,1x,a4,1x,f9.2,1x ,6(f12.8,1x))') &
                      'Track ',n,'Elem ',e,'S =',pathlegth,TheBeam%X(n,1:6)
           endif
           
