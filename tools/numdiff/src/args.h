@@ -15,7 +15,8 @@ struct option {
 extern struct option option;
 
 void usage(void);
-void invalid(void);
+void invalid_file(const char*);
+void invalid_option(const char*);
 void parse_args(int argc, const char *argv[]);
 
 #endif

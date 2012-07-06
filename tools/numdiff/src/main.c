@@ -60,7 +60,8 @@ main(int argc, const char* argv[])
 
     // checks
     if (!lhs_s || !rhs_s) {
-      if (option.argi == argc-option.utest) invalid();
+      if (option.argi == argc-option.utest)
+        invalid_option(argv[option.argi-1]);
       else exit(EXIT_SUCCESS);
     }
 
@@ -74,7 +75,8 @@ main(int argc, const char* argv[])
       rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, 0, 1);
       if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, 0, 0);
 
-      if (!lhs_fp || !rhs_fp) invalid();
+      if (!lhs_fp) invalid_file(lhs_s);
+      if (!rhs_fp) invalid_file(rhs_s);
 
       // create context of constraints (using default size)
       struct context *cxt = context_alloc(0);

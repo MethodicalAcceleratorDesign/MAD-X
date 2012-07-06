@@ -35,9 +35,16 @@ run_utest(void)
 }
 
 void
-invalid(void)
+invalid_option(const char *str)
 {
-  warning("invalid program options or arguments");
+  warning("invalid program options or arguments '%s'", str);
+  usage();
+}
+
+void
+invalid_file(const char *str)
+{
+  warning("invalid filename argument '%s'", str);
   usage();
 }
 
@@ -209,9 +216,8 @@ parse_args(int argc, const char *argv[])
     }
 
     // unknown option
-    if (argv[option.argi][0] == '-') {
-      invalid();
-    }
+    if (argv[option.argi][0] == '-')
+      invalid_option(argv[option.argi]);
 
     break;
   }
