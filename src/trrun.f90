@@ -3457,22 +3457,22 @@ subroutine ttrfmult(track, ktrack, turn)
     Sp0 = 0.0;
     Cp1 = 0.0;
     Sp1 = 0.0;
-    do iord = nord, 1, -1
+    do iord = nord, 0, -1
       if (iord.ge.2) then
-        Cm2 = Cm2 * DCMPLX(x, y) / (iord-1) + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
-        Sm2 = Sm2 * DCMPLX(x, y) / (iord-1) + bvk * DCMPLX(field_sin(1,iord), field_sin(2,iord));
+        Cm2 = Cm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_cos(1,iord), field_cos(2,iord));
+        Sm2 = Sm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_sin(1,iord), field_sin(2,iord));
       endif
-      Cm1 = Cm1 * DCMPLX(x, y) / (iord)     + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sm1 = Sm1 * DCMPLX(x, y) / (iord)     + bvk * DCMPLX(field_sin(1,iord), field_sin(2,iord));
-      Cp0 = Cp0 * DCMPLX(x, y) / (iord+1)   + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sp0 = Sp0 * DCMPLX(x, y) / (iord+1)   + bvk * DCMPLX(field_sin(1,iord), field_sin(2,iord));
-      Cp1 = Cp1 * DCMPLX(x, y) / (iord+2)   + bvk * DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sp1 = Sp1 * DCMPLX(x, y) / (iord+2)   + bvk * DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      if (iord.ge.1) then
+        Cm1 = Cm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
+        Sm1 = Sm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      endif
+      Cp0 = Cp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
+      Sp0 = Sp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      Cp1 = Cp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
+      Sp1 = Sp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
     enddo
-    Cp0 = Cp0 * DCMPLX(x, y);
-    Sp0 = Sp0 * DCMPLX(x, y);
-    Sp1 = Sp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2; ! the missing term from the factorial
-    Cp1 = Cp1 * DCMPLX(x, y) * DCMPLX(x, y) / 2;
+    Sp1 = Sp1 * DCMPLX(x, y);
+    Cp1 = Cp1 * DCMPLX(x, y);
 
     !---- The kick    
     dpx = -DREAL(Cp0) / (one + track(6,jtrk));
