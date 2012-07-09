@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.16  (32 bit, Darwin)      +
+  +    MAD-X 5.00.17  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.04.05      +
-  + Execution Time Stamp: 28.06.12 10.20.50 +
+  + Code Modification Date: 2012.06.28      +
+  + Execution Time Stamp: 09.07.12 14.56.41 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -79,9 +79,9 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %23s "MAD-X 5.00.16 Darwin 32"
-@ DATE             %08s "28/06/12"
-@ TIME             %08s "10.20.50"
+@ ORIGIN           %22s "MAD-X 5.00.17 Linux 32"
+@ DATE             %08s "09/07/12"
+@ TIME             %08s "14.56.41"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0
@@ -99,7 +99,7 @@ one pass is on
 
                  y                 py                  t                 pt 
                  0                  0                  0                  0 
-                 0                  0                  0   3.806451147e-313 
+                 0                  0                  0                  0 
 
                  s                  e 
                  0                  0 
@@ -131,5 +131,5 @@ c6t terminated - total number of elements: 2
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.16 32 finished normally +
+  + MAD-X 5.00.17 32 finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -3,16 +3,18 @@
   +    MAD-X 5.00.17  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.06.28      +
-  + Execution Time Stamp: 28.06.12 12.22.24 +
+  + Execution Time Stamp: 09.07.12 17.33.10 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
 option, debug, -echo;
 
 enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  1.175571E-02
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00 -5.877853E-02
 
 ++++++ table: summ
 

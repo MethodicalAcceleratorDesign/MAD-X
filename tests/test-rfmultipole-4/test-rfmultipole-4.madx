@@ -3,13 +3,9 @@ option, debug, -echo;
 
 bunchcharge := 2.e10;
 
-twss_ebc1 : beta0, 
-            betx=3.3999, bety=3.7645,
-            alfx=-1.0879, alfy= 1.1907;
-
-beam_ebc1 : beam, energy=5, npart=bunchcharge, 
-            sige=1.5e-3, sigt=6e-03, 
-            ex=8e-6 * emass/5, ey=20e-9 * emass/5;
+twss1 : beta0, 
+        betx=3.3999, bety=3.7645,
+        alfx=-1.0879, alfy= 1.1907;
 
 !!!
 !!! it creates a sequence with an RF-Multipole and multipole that cancel each other
@@ -20,8 +16,6 @@ rfm1 : rfmultipole,  knl:={0, k, k, k }, ksl:={0, k, k, k, k}, pnl:={ 0, 0, 0,0,
 
 test_line : line =( rfm1 );
 
-!freq=12, volt=100, lag=0.1, 
-
 !!! 
 !!! TEST: together with test-rf-multipole-4.m (octave) it checks the symplecticity of the RF-Multipole 
 !!!
@@ -29,6 +23,6 @@ test_line : line =( rfm1 );
 !!! creeates the twiss table
 
 select,flag=sectormap;
-use, period=test_line;
-twiss,betx=1,bety=1,x=1,t=1,rmatrix,sectormap,file='sectormap';
-
+beam, sequence=test_line, bv=-1;
+use, sequence=test_line;
+twiss, betx=1,bety=1,x=1,px=1,t=1,rmatrix,sectormap,file='sectormap';
