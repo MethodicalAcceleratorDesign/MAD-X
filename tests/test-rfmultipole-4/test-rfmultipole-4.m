@@ -1,5 +1,6 @@
 % Reads the file
-M = load 'sectormap.dat';
+K = textread('sectormap', '%f', 'headerlines', 9);
+M = K(3:260)'; % reads K + R + T of RF-Multipole 
 
 % matrix J
 J = [ 0 1 0 0  0 0 ; -1 0 0 0 0 0 ; 0 0 0 1 0 0 ; 0 0 -1 0 0 0 ; 0 ...
