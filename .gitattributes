@@ -574,6 +574,9 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tests/share/eng/lhc/optics/V6.503/V6.5.coll.str -text
+tests/share/eng/lhc/optics/V6.503/V6.5.inj.str -text
+tests/share/eng/lhc/optics/V6.503/V6.5.seq -text
 tests/test-ibs/ibs_output.tfs.cfg -text
 tests/test-ibs/ibs_output.tfs.ref -text
 tests/test-ibs/test-ibs.cfg -text
