@@ -3,12 +3,20 @@ get_target_property(ndiffbin numdiff LOCATION)
 
 if(WIN32)
    if(NOT EXISTS ${CMAKE_BINARY_DIR}/examples)
+      message(STATUS "Copying examples folder, this will take some time...")
       execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
          ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+   endif()
+   if(NOT EXISTS ${CMAKE_BINARY_DIR}/tests/share)
+      message(STATUS "Copying examples folder, this will take some time...")
+      execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
+         ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
    endif()
 else()
    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
       ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
+      ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
 endif()
 
 set(BASESCRIPT ${CMAKE_SOURCE_DIR}/cmake/ctestbase.cmake)
@@ -51,10 +59,5 @@ numdiff_test(test-rfmultipole-2 "sectormap" 0)
 numdiff_test(test-rfmultipole-3 "sectormap" 0)
 numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
-# Tests that require afs:
-if(EXISTS "/afs/cern.ch/")
-   numdiff_test(test-twiss "sample_optics.tfs" 0)
-   numdiff_test(test-match "str.ip8.b1.dat twiss.ir8.b1.data" 1)
-else()
-   message(STATUS "afs is not available, some tests will be missing")
-endif()
+numdiff_test(test-twiss "sample_optics.tfs" 0)
+numdiff_test(test-match "str.ip8.b1.dat twiss.ir8.b1.data" 1)
