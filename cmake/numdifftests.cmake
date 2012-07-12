@@ -15,6 +15,7 @@ if(WIN32)
 else()
    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
       ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
+   file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
       ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
 endif()
