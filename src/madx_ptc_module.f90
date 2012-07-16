@@ -2628,4 +2628,55 @@ CONTAINS
 
   end subroutine getfk
 
+
+
+
+  subroutine putbeambeam()
+  !returns FK factor for Beam-Beam effect
+    implicit none
+    real (dp) :: fk, xma, yma, sigx, sigy,s
+    integer :: elno
+    logical(lp) :: found
+    TYPE(INTEGRATION_NODE),POINTER :: node
+
+    real(kind(1d0)), external :: get_value
+    real(kind(1d0)), external :: get_variable
+    integer, external         :: get_option
+    REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
+    
+    s    = get_value('ptc_putbeambeam ','global_s ')
+    xma  = get_value('ptc_putbeambeam ','xma ')
+    yma  = get_value('ptc_putbeambeam ','yma ')
+    sigx = get_value('ptc_putbeambeam ','sigx ')
+    sigy = get_value('ptc_putbeambeam ','sigy ')
+    
+    print*, 'Input   xma, yma, sigx, sigy, s'
+    print*, 'Input', xma, yma, sigx, sigy, s
+
+    if(.not.associated(my_ring%t))  then
+       CALL MAKE_node_LAYOUT(my_ring)
+    endif
+    
+    elno = 0
+    call s_locate_beam_beam(my_ring,s,elno,node,found)
+    
+    if (.not. found) then
+      print*,"could not find a node for beam-beam"
+      return
+    endif
+    
+    print*, 'Name of element in PTC: ', node%PARENT_FIBRE%mag%name
+    
+    write(6,*) 'node%a:',node%a            ! node entrance position
+    write(6,*) 'node%ent(1,1:3):',node%ent(1,1:3)   ! node entrance e_1 vector
+    write(6,*) 'node%ent(2,1:3):',node%ent(2,1:3)   ! node entrance e_2 vector
+    write(6,*) 'node%ent(3,1:3):',node%ent(3,1:3)   ! node entrance e_3 vector
+    write(6,*) " s variable of node and following node "
+    write(6,*) node%s(1),node%next%s(1)
+    
+    !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node. 
+    !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick 
+    
+  end subroutine putbeambeam
+
 END MODULE madx_ptc_module

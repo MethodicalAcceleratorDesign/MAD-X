@@ -25,7 +25,7 @@ module madx_ptc_twiss_module
   !  PRIVATE
   !    data structures
 
-  !PSk 2011.01.05 goes global to the modulse so the slice tracking produces it for the summ table
+  !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(real_8)            :: theTransferMap(6)
   type(universal_taylor)  :: unimap(6)
 
@@ -63,7 +63,6 @@ module madx_ptc_twiss_module
   integer,  private, parameter          :: ndd=ndim2
   integer,  private, dimension(4)       :: iia,icoast
   integer,  private                     :: np
-  integer,  private                     :: filecode=1
 
   !new lattice function
   real(dp), private, dimension(3)       :: testold
@@ -329,13 +328,13 @@ contains
     type(work)              :: startfen !Fibre energy at the start
     real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
-    logical(lp)             :: initial_distrib_manual, initial_ascript_manual
+    logical(lp)             :: initial_distrib_manual, initial_ascript_manual, writetmap
     integer                 :: row, rmatrix
     real(dp)                :: emi(3)
     logical(lp)             :: isputdata
     integer                 :: countSkipped
     character(48)           :: summary_table_name
-    character(48)           :: tmfile
+    character(12)           :: tmfile='transfer.map'
     character(48) charconv !routine
     
     call resetBetaExtremas()
@@ -477,7 +476,9 @@ contains
        print*, "Order is ", no
        return
     endif
-
+    
+    writetmap = get_value('ptc_twiss ','writetmap ') .ne. 0
+    
     !this must be before initialization of the Bertz
 
     initial_distrib_manual = get_value('ptc_twiss ','initial_moments_manual ') .ne. 0
@@ -491,14 +492,10 @@ contains
 
     call init(default,no,nda,BERZ,mynd2,npara)
 
+    !This must be before init map
     call alloc(y)
     y=npara
     Y=X
-
-    call alloc(theTransferMap)
-
-    theTransferMap = npara
-    theTransferMap = X
 
     !    if (maxaccel .eqv. .false.) then
     !      cavsareset = .false.
@@ -514,15 +511,20 @@ contains
 
     call setknobs(my_ring)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !  INIT Y that is tracked          !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap(dt)
 
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
     endif
+
+    call alloc(theTransferMap)
+    theTransferMap = npara
+    theTransferMap = X
+
 
     !############################################################################
     !############################################################################
@@ -818,16 +820,16 @@ contains
     print77=.false.
     read77=.false.
 
-    if (getdebug() > 2) then
+    
+    if (writetmap) then
+       !'===      TRANSFER MAP      ==='
        call kanalnummer(mf2)
-       write(tmfile,'(i2,a3)') filecode, '.tm'
-       print *, 'Filename for transfer map is ', tmfile
        open(unit=mf2,file=tmfile)
-       write(mf2,*) '=============================='
-       write(mf2,*) '===      TRANSFER MAP      ==='
        call print(theTransferMap,mf2)
        close(mf2)
-       filecode = filecode + 1
+    endif
+    
+    if (getdebug() > 2) then
 
 
        call kanalnummer(mf2)

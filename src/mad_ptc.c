@@ -372,7 +372,19 @@ ptc_track_observe(struct in_cmd* cmd)
     return;
   }
 }
+/*________________________________________________________________*/
+void
+ptc_putbeambeam(struct in_cmd* cmd)
+{
+/*Installs beam beam interaction on a given integration step*/
+/*might be defined by global s or element name and local s*/
 
+  (void)cmd;
+  w_ptc_putbeambeam_();
+}
+
+
+/*________________________________________________________________*/
 void
 ptc_dumpmaps(struct in_cmd* cmd)
 /*Dumps PTC map for each element in the current sequence*/

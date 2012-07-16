@@ -116,6 +116,12 @@ subroutine w_ptc_enforce6D(level)
   call setenforce6D(level)
 end subroutine w_ptc_enforce6D
 
+subroutine w_ptc_putbeambeam()
+  use madx_ptc_module
+  implicit none
+  call putbeambeam()
+end subroutine w_ptc_putbeambeam
+
 subroutine w_ptc_setaccel_method(method)
   use madx_ptc_intstate_module
   implicit none

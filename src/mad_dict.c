@@ -441,6 +441,15 @@ char command_def[] =
 "ks    = [i, {-1}], "
 "exactmatch = [l, true, true]; "
 " "
+"ptc_putbeambeam: ptc_putbeambeam none 0 0 "
+"element = [s, none] , "/* */
+"local_s = [r, -1] , "/* */
+"global_s = [r, -1] , "/* */
+"xma = [r, none] , "/* */
+"yma = [r, none] , "/* */
+"sigx  = [r, none], "
+"sigy  = [r, none]; "
+" "
 "ptc_varyknob: ptc_varyknob none 0 0 "
 "initial = [s, none] , "/* */
 "element = [s, none] , "/* */
@@ -513,6 +522,7 @@ char command_def[] =
 "summary_file  = [s, none, ptc_twiss_summary], "
 "summary_table = [s, none, ptc_twiss_summary], "
 "savemaps = [l, true, true], " /*buffers maps for future usage as universal_taylors */
+"writetmap = [l,false, true], " /*writes transfer.map */
 "slice_magnets  = [l,false,true], "
 "center_magnets = [l,false,true], "
 "deltap_dependency = [l,false,true], " /* compute Twiss derivatives w.r.t deltap*/

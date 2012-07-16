@@ -365,6 +365,10 @@ exec_command(void)
       {
         ptc_track_observe(p);
       }
+      else if (strcmp(p->cmd_def->module, "ptc_putbeambeam") == 0)
+      {
+        ptc_putbeambeam(p);
+      }
       else if (strcmp(p->cmd_def->module, "ptc_start") == 0)
       {
         track_is_on = 1;
