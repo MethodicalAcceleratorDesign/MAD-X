@@ -32,6 +32,8 @@ contains
     real(kind(1d0)) get_value,val_ptc
     character(len = 5) name_var
     type(real_8) y(6)
+    type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
+
     !------------------------------------------------------------------------------
 
     if(universe.le.0) then
@@ -42,7 +44,9 @@ contains
        call fort_warn('return from ptc_normal: ',' no layout created')
        return
     endif
-
+    
+    call cleartables() !defined in madx_ptc_knobs
+    
     nda=0
 
     icase = get_value('ptc_normal ','icase ')
@@ -240,6 +244,13 @@ contains
           call daprint(n%dhdj,19)
           !  call daprint(pbrh,19)
        endif
+       
+       call alloc(theAscript)
+       theAscript = X+n%A_t;
+       
+       
+       call putusertable(1,'$end$ ',dt ,dt,y,theAscript)
+       call kill(theAscript)
 
        if (n_gnfu > 0) call kill(pbrg)
        if (n_haml > 0) call kill(pbrh)

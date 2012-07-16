@@ -45,7 +45,7 @@ module madx_ptc_knobs_module
   public                         :: setparvalue
   public                         :: setknobvalue
   public                         :: filltables
-
+  public                         :: setnameintbles
 
   !============================================================================================
   !  PRIVATE
@@ -179,8 +179,15 @@ contains
     else
        pblockson = .false.
     endif
-
-    call putnameintables()
+    
+    if (name /= '$end$ ') then
+      call putnameintables()
+    else
+      call setnameintbles('$end$ ')!twiss gets names automatically from C element iterator
+      if (getdebug()>3) then
+        print*,"PTC_NORMAL mode"
+      endif
+    endif  
 
     if (c_%npara == 6) then
        call sixdmode()
@@ -409,14 +416,30 @@ contains
 
   end subroutine augment_counts
   !____________________________________________________________________________________________
-
-  subroutine putnameintables()
+  subroutine setnameintbles(name)
     implicit none
+    character(*)         :: name !fibre name
     integer       :: i ! iterator
+    
     do i=1,ntables
        if (getdebug()>2) then
            print *,"Putting name in ",tables(i)
        end if
+       call string_to_table(tables(i),"name ",name)
+    enddo
+
+  end subroutine setnameintbles
+  !____________________________________________________________________________________________
+  subroutine putnameintables()
+    implicit none
+    integer       :: i ! iterator
+    
+    do i=1,ntables
+       if (getdebug()>2) then
+           print *,"Putting name in ",tables(i)
+       end if
+       !puts automatically name of the current element
+       !does not work for ptc_normal
        call string_to_table(tables(i),"name ","name ")
     enddo
 
