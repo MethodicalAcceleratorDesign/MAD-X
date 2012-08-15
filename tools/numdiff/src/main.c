@@ -72,8 +72,8 @@ main(int argc, const char* argv[])
       // open files
       lhs_fp = open_indexedFile(lhs_s, n, option.out_e, 1, 0);
       if (!lhs_fp && n) break;
-      rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, 0, 1);
-      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, 0, 0);
+      rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, !option.list, 1);
+      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, !option.list, 0);
 
       if (!lhs_fp) invalid_file(lhs_s);
       if (!rhs_fp) invalid_file(rhs_s);
