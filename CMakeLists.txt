@@ -10,7 +10,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 cmake_minimum_required(VERSION 2.6)
 
-PROJECT(madX Fortran C CXX) 
+PROJECT(madX C CXX Fortran)
 #add name of languages used in the project as well
 
 # Some policies regarding configure
