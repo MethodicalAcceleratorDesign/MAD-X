@@ -38,8 +38,10 @@
       <item> ptc_create_universe </item>
       <item> ptc_create_layout </item>
       <item> ptc_align </item>
+      <item> ptc_start </item>
       <item> ptc_end </item>
       <item> ptc_twiss </item>
+      <item> ptc_track </item>
       <item> savebeta </item>
       <item> select </item>
       <item> set </item>
@@ -79,6 +81,35 @@
 	<list name="beam_attributes">
 		<item> electron </item>
 		<item> proton </item>
+	</list>
+	<list name="ptc_keywords">
+		<item> icase </item>
+		<item> deltap </item>
+		<item> turns </item>
+		<item> maxaper </item>
+		<item> norm </item>
+		<item> file </item>
+		<item> ffile </item>
+		<item> model </item>
+		<item> method </item>
+		<item> nst </item>
+		<item> x </item>
+		<item> y </item>
+		<item> px </item>
+		<item> py </item>
+	</list>
+	<list name="ptc_attributes">
+		<item> exact </item>
+		<item> dump </item>
+		<item> closed_orbit </item>
+		<item> element_by_element </item>
+		<item> norm_out </item>
+		<item> radiation </item>
+		<item> radiation_model1 </item>
+		<item> radiation_energy_loss </item>
+		<item> radiation_quadr </item>
+		<item> beam_envelope </item>
+		<item> space_charge </item>
 	</list>
 	<list name="element_keywords">
 		<item> angle  </item>
@@ -316,6 +347,7 @@
 			<RegExpr attribute="Command" context="find_command_twiss" String="\btwiss\s*[,]" insensitive="TRUE"/>
 			<RegExpr attribute="Command" context="find_command_use" String="\buse\s*[,]" insensitive="TRUE"/>
 			<RegExpr attribute="Command" context="find_command_beam" String="\bbeam\s*[,]" insensitive="TRUE"/>
+			<RegExpr attribute="Command" context="find_command_ptc" String="\bptc_[a-z\_]*\s*[,]" insensitive="TRUE"/>
 			<keyword attribute="Command" context="find_command_parent" String="commands"/>
 		</context>
 		
@@ -368,6 +400,11 @@
 			<IncludeRules context="find_command_parent"/>
 			<keyword attribute="CommandParameters"  context="#stay" String="beam_keywords"/>
 			<keyword attribute="CommandAttributes"  context="#stay" String="beam_attributes"/>
+		</context>
+		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_ptc">
+			<IncludeRules context="find_command_parent"/>
+			<keyword attribute="CommandParameters"  context="#stay" String="ptc_keywords"/>
+			<keyword attribute="CommandAttributes"  context="#stay" String="ptc_attributes"/>
 		</context>
 		
 		<context attribute="Normal Text" lineEndContext="#stay" name="find_varnames">
