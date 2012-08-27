@@ -35,6 +35,10 @@ uniq   = $(strip $(if $1,$(call uniq,$(call chop,$1)) \
             $(if $(filter $(call last,$1),$(call chop,$1)),,$(call last,$1))))
 trans  = $(if $1,$(call trans,$(call rest,$1),$(call rest,$2)\
                     ,$(patsubst $(firstword $1),$(firstword $2),$3)),$3) 
+find   = $(if $(and $1,$2),$(if $(findstring $1,$(firstword $2)),$2,\
+              $(call find,$1,$(call rest,$2))),)
+trunc  = $(if $(and $1,$2),$(if $(findstring $1,$(lastword $2)),$2,\
+              $(call trunc,$1,$(call chop,$2))),)
 
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))

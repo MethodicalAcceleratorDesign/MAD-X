@@ -155,7 +155,7 @@ endif
 
 ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
-FCVER  := $(word 4, $(shell $(FC) --version))
+FCVER  := $(shell $(FC) -dumpversion)
 FCVERL := $(subst ., ,$(FCVER))
 FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
 FCVER2 := 0
