@@ -1094,9 +1094,7 @@ seq_diet(struct sequence* thick_sequ)
 static double
 simple_at_shift(int slices,int slice_no)
 {
-  double at = 0;
-  at = ((double) 2*slice_no-1)/((double) 2*slices)-0.5;
-  return at;
+  return (2.0*slice_no-1)/(2.0*slices)-0.5;
 }
 
 static double
