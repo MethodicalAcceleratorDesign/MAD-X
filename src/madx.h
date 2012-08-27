@@ -94,6 +94,7 @@
 #include "mad_match2.h"
 #include "mad_mkthin.h"
 #include "mad_orbit.h"
+#include "mad_sodd.h"
 #include "mad_survey.h"
 #include "mad_touschek.h"
 #include "mad_track.h"
@@ -108,7 +109,6 @@
 
 #include "mad_sxf.h"
 #include "mad_sdds.h"
-#include "mad_sodd.h"
 #include "mad_6track.h"
 
 // global constants (should disappear)
