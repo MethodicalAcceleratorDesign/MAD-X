@@ -277,6 +277,7 @@ void w_ptc_addmoment_(F_INTEGER x, F_INTEGER px, F_INTEGER y, F_INTEGER py, F_IN
 		      F_INTEGER tableIA, F_INTEGER columnIA, F_INTEGER parametric);
 void w_ptc_addpush_(F_INTEGER tabname, F_INTEGER colname, F_INTEGER polinomial, F_INTEGER monomial);
 void w_ptc_align_(void);
+void w_ptc_putbeambeam_(void);
 void w_ptc_create_layout_(void);
 void w_ptc_create_universe_(void);
 void w_ptc_dumpmaps_(void);
