@@ -14,6 +14,8 @@ adjust_probe(double delta_p)
   beta = command_par_value("beta", current_beam);
   gamma = command_par_value("gamma", current_beam);
   circ = command_par_value("circ", current_beam);
+
+  /* assume oneturnmap and disp0 already computed (see pro_emit) */ 
   for (j = 0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
   tmp = - beta * beta * ds / circ;
   freq0 = (clight * ten_m_6 * beta) / (circ * (one + tmp * delta_p));

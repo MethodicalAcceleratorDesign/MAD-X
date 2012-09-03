@@ -10,7 +10,7 @@ pro_emit(struct in_cmd* cmd)
   int j, error, keep;
   double* tt;
   double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3],
-    sig_v[4], pdamp[3];
+    sig_v[4], pdamp[3], r0mat[4];
   char tmp[100];
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
@@ -33,6 +33,7 @@ pro_emit(struct in_cmd* cmd)
   adjust_beam();
   probe_beam = clone_command(current_beam);
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
