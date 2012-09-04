@@ -266,6 +266,7 @@ void trrun_(F_INTEGER switch_, F_INTEGER turns, F_DOUBLE orbit0, F_DOUBLE rt, F_
 void tmrefe_(F_DOUBLE rf);
 void tmrefo_(F_INTEGER kobs, F_DOUBLE orbit0, F_DOUBLE orbit, F_DOUBLE rt);
 void twiss_(F_DOUBLE rt, F_DOUBLE disp0, F_INTEGER tab_name, F_INTEGER sector_tab_name);
+void twcpin_(F_DOUBLE rt, F_DOUBLE disp0, F_DOUBLE r0mat, F_INTEGER error);
 
 // from util.f90
 void getclor_(F_DOUBLE orbit0, F_DOUBLE rt, F_DOUBLE tt, F_INTEGER error);
