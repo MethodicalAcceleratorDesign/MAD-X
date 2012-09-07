@@ -723,7 +723,7 @@ contains
             endif
 
             tw = y ! set the twiss parameters, with y being equal to the A_ phase advance
-            suml = s;
+            suml = s; 
 
             call puttwisstable(theTransferMap)
             call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, y)
@@ -743,7 +743,9 @@ contains
           endif
 
           tw = y ! set the twiss parameters, with y being equal to the A_ phase advance
-          suml = s;
+          if (s > suml) then !work around against last element having s=0
+            suml = s; 
+          endif
 
           call puttwisstable(theTransferMap)
           call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap, y)
@@ -801,7 +803,7 @@ contains
         tw=y
 
         call puttwisstable(theTransferMap)
-
+        
         call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap,y)
 
 
