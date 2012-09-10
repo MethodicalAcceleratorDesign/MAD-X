@@ -43,7 +43,7 @@
         call MAKE_NODE_LAYOUT(o_ring)
         if(lmax==zero) then
          write(6,*) " Error lmax = 0 "
-         pause
+!         pause
          stop 777
         endif
 
