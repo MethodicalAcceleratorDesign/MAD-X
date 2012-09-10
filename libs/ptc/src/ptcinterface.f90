@@ -136,13 +136,12 @@ CAVITY_TOTALPATH=0
 
         USE orbit_ptc
         IMPLICIT NONE
-        REAL(DP) mass,kin_energy
-        INTEGER charge
+        REAL(DP) mass,kin_energy,charge
+!        INTEGER charge
 
         call GET_MASS_AMU(mass)
-        
         call GET_kinetic(kin_energy)
-        call  GET_CHARGE(charge)
+        call GET_CHARGE(charge)
 
       return
       end
