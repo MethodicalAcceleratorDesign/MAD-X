@@ -25,6 +25,13 @@ else
 endif
 
 #
+# all
+#
+.PHONY: all-dev-macosx
+
+all-dev-macosx: madx-dev-macosx libmadx-dev-macosx libptc-dev-macosx numdiff-dev-macosx
+
+#
 # madx
 #
 .PHONY:                 madx-dev-macosx           madx-dev-macosx-gnu
