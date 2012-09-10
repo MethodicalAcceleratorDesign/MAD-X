@@ -17,6 +17,14 @@
 # |
 
 #
+# all
+#
+.PHONY: all-dev-linux32 all-dev-linux64
+
+all-dev-linux32: madx-dev-linux32 libmadx-dev-linux32 libptc-dev-linux32 numdiff-dev-linux32
+all-dev-linux64: madx-dev-linux64 libmadx-dev-linux64 libptc-dev-linux64 numdiff-dev-linux64
+
+#
 # madx
 #
 .PHONY:                 madx-dev-linux          madx-dev-linux-gnu
