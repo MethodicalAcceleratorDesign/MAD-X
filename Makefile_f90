@@ -16,14 +16,18 @@
 # | $Id$
 # |
 
-vpath %.inc src
-vpath %.f90 src
-vpath %.F90 src
+vpath %.inc src libs/ptc/src
+vpath %.f90 src libs/ptc/src
+vpath %.F90 src libs/ptc/src
 
 FC_DIR := src
-FC_SRC := $(notdir $(wildcard src/*.f90 src/*.F90))
+FC_SRC := $(notdir $(wildcard $(FC_DIR)/*.f90 $(FC_DIR)/*.F90))
 
-ifneq ($(findstring $(OSTYPE),Cygwin Windows),) # no X11
+FC_DIR_PTC := libs/ptc/src
+FC_SRC_PTC := $(notdir $(wildcard $(FC_DIR_PTC)/*.f90 $(FC_DIR_PTC)/*.F90))
+
+ # x11 dependencies
+ifneq ($(findstring $(OSTYPE),Cygwin Windows),)
 FC_SRC    += gxx11ps.f90
 FC_SRC_RM += gxx11.f90
 else
@@ -31,14 +35,18 @@ FC_SRC    += gxx11.f90
 FC_SRC_RM += gxx11ps.f90
 endif
 
+# ptc dependencies
+FC_SRC_RM += Ss_fake_mad.f90 ptcinterface.f90
+
+ # ntpsa dependencies
 ifeq ($(NTPSA),yes)
 FC_SRC_RM += c_dabnew.f90
 else
-FC_SRC_RM += c_dabnew_berz.f90 c_tpsa_interface.F90
+FC_SRC_RM += c_tpsa_interface.F90 c_dabnew_berz.o
 endif
 
 # remove unwanted files
-FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC))
+FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC) $(FC_SRC_PTC))
 
 # files specific compiler flag
 matchlib2.o:        NOPT := 0
@@ -50,101 +58,101 @@ l_complex_taylor.o: NOPT := 2
 ifeq ($(FDEP),)
 
 # chain of dependencies (PTC)
-a_scratch_size.o:           src/a_scratch_size.f90
-b_da_arrays_all.o:          src/b_da_arrays_all.f90         a_scratch_size.o
-c_dabnew.o:                 src/c_dabnew.f90                b_da_arrays_all.o
-c_dabnew_berz.o:            src/c_dabnew_berz.f90           b_da_arrays_all.o
-c_tpsa_interface.o:         src/c_tpsa_interface.F90        c_dabnew_berz.o
-d_lielib.o:                 src/d_lielib.f90                $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o)
-h_definition.o:             src/h_definition.f90            d_lielib.o
-i_tpsa.o:                   src/i_tpsa.f90                  h_definition.o
-j_tpsalie.o:                src/j_tpsalie.f90               i_tpsa.o
-k_tpsalie_analysis.o:       src/k_tpsalie_analysis.f90      j_tpsalie.o
-l_complex_taylor.o:         src/l_complex_taylor.f90        k_tpsalie_analysis.o
-m_real_polymorph.o:         src/m_real_polymorph.f90        l_complex_taylor.o
-n_complex_polymorph.o:      src/n_complex_polymorph.f90     m_real_polymorph.o
-o_tree_element.o:           src/o_tree_element.f90          n_complex_polymorph.o
+a_scratch_size.o:           $(FC_DIR_PTC)/a_scratch_size.f90
+b_da_arrays_all.o:          $(FC_DIR_PTC)/b_da_arrays_all.f90         a_scratch_size.o
+c_dabnew.o:                 $(FC_DIR_PTC)/c_dabnew.f90                b_da_arrays_all.o
+c_dabnew_berz.o:            $(FC_DIR)/c_dabnew_berz.f90               b_da_arrays_all.o
+c_tpsa_interface.o:         $(FC_DIR)/c_tpsa_interface.F90            c_dabnew_berz.o
+d_lielib.o:                 $(FC_DIR_PTC)/d_lielib.f90                $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o)
+h_definition.o:             $(FC_DIR_PTC)/h_definition.f90            d_lielib.o
+i_tpsa.o:                   $(FC_DIR_PTC)/i_tpsa.f90                  h_definition.o
+j_tpsalie.o:                $(FC_DIR_PTC)/j_tpsalie.f90               i_tpsa.o
+k_tpsalie_analysis.o:       $(FC_DIR_PTC)/k_tpsalie_analysis.f90      j_tpsalie.o
+l_complex_taylor.o:         $(FC_DIR_PTC)/l_complex_taylor.f90        k_tpsalie_analysis.o
+m_real_polymorph.o:         $(FC_DIR_PTC)/m_real_polymorph.f90        l_complex_taylor.o
+n_complex_polymorph.o:      $(FC_DIR_PTC)/n_complex_polymorph.f90     m_real_polymorph.o
+o_tree_element.o:           $(FC_DIR_PTC)/o_tree_element.f90          n_complex_polymorph.o
 
-Sa_extend_poly.o:           src/Sa_extend_poly.f90          o_tree_element.o
-Sb_sagan_pol_arbitrary.o:   src/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o
-Sc_euclidean.o:             src/Sc_euclidean.f90            Sb_sagan_pol_arbitrary.o
-Sd_frame.o:                 src/Sd_frame.f90                Sc_euclidean.o
-Se_status.o:                src/Se_status.f90               Sd_frame.o
-Sf_def_all_kinds.o:         src/Sf_def_all_kinds.f90        Se_status.o
-Sg_sagan_wiggler.o:         src/Sg_sagan_wiggler.f90        Sf_def_all_kinds.o
-Sh_def_kind.o:              src/Sh_def_kind.f90             Sg_sagan_wiggler.o
-Si_def_element.o:           src/Si_def_element.f90          Sh_def_kind.o
-Sk_link_list.o:             src/Sk_link_list.f90            Si_def_element.o
-Sl_family.o:                src/Sl_family.f90               Sk_link_list.o
-Sm_tracking.o:              src/Sm_tracking.f90             Sl_family.o
-Sma0_beam_beam_ptc.o:       src/Sma0_beam_beam_ptc.f90      Sm_tracking.o
-Sma_multiparticle.o:        src/Sma_multiparticle.f90       Sma0_beam_beam_ptc.o
-Sn_mad_like.o:              src/Sn_mad_like.f90             Sma_multiparticle.o
-So_fitting.o:               src/So_fitting.f90              Sn_mad_like.o
-Sp_keywords.o:              src/Sp_keywords.f90             So_fitting.o
-Spb_fake_gino_sub.o:        src/Spb_fake_gino_sub.f90
-Sq_orbit_ptc.o:             src/Sq_orbit_ptc.f90            Sp_keywords.o
-Sr_spin.o:                  src/Sr_spin.f90                 Sq_orbit_ptc.o
-Sra_fitting.o:              src/Sra_fitting.f90             Sr_spin.o
-St_pointers.o:              src/St_pointers.f90             madx_ptc_module.o Sp_keywords.o
+Sa_extend_poly.o:           $(FC_DIR_PTC)/Sa_extend_poly.f90          o_tree_element.o
+Sb_sagan_pol_arbitrary.o:   $(FC_DIR_PTC)/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o
+Sc_euclidean.o:             $(FC_DIR_PTC)/Sc_euclidean.f90            Sb_sagan_pol_arbitrary.o
+Sd_frame.o:                 $(FC_DIR_PTC)/Sd_frame.f90                Sc_euclidean.o
+Se_status.o:                $(FC_DIR_PTC)/Se_status.f90               Sd_frame.o
+Sf_def_all_kinds.o:         $(FC_DIR_PTC)/Sf_def_all_kinds.f90        Se_status.o
+Sg_sagan_wiggler.o:         $(FC_DIR_PTC)/Sg_sagan_wiggler.f90        Sf_def_all_kinds.o
+Sh_def_kind.o:              $(FC_DIR_PTC)/Sh_def_kind.f90             Sg_sagan_wiggler.o
+Si_def_element.o:           $(FC_DIR_PTC)/Si_def_element.f90          Sh_def_kind.o
+Sk_link_list.o:             $(FC_DIR_PTC)/Sk_link_list.f90            Si_def_element.o
+Sl_family.o:                $(FC_DIR_PTC)/Sl_family.f90               Sk_link_list.o
+Sm_tracking.o:              $(FC_DIR_PTC)/Sm_tracking.f90             Sl_family.o
+Sma0_beam_beam_ptc.o:       $(FC_DIR_PTC)/Sma0_beam_beam_ptc.f90      Sm_tracking.o
+Sma_multiparticle.o:        $(FC_DIR_PTC)/Sma_multiparticle.f90       Sma0_beam_beam_ptc.o
+Sn_mad_like.o:              $(FC_DIR_PTC)/Sn_mad_like.f90             Sma_multiparticle.o
+So_fitting.o:               $(FC_DIR_PTC)/So_fitting.f90              Sn_mad_like.o
+Sp_keywords.o:              $(FC_DIR_PTC)/Sp_keywords.f90             So_fitting.o
+Spb_fake_gino_sub.o:        $(FC_DIR_PTC)/Spb_fake_gino_sub.f90
+Sq_orbit_ptc.o:             $(FC_DIR_PTC)/Sq_orbit_ptc.f90            Sp_keywords.o
+Sr_spin.o:                  $(FC_DIR_PTC)/Sr_spin.f90                 Sq_orbit_ptc.o
+Sra_fitting.o:              $(FC_DIR_PTC)/Sra_fitting.f90             Sr_spin.o
+St_pointers.o:              $(FC_DIR_PTC)/St_pointers.f90             madx_ptc_module.o Sp_keywords.o
 
-h_definition.o:             src/a_def_frame_patch_chart.inc src/a_def_all_kind.inc \
-                            src/a_def_sagan.inc src/a_def_element_fibre_layout.inc
-Sf_def_all_kinds.o:         src/a_def_worm.inc
-Sp_keywords.o:              src/a_namelists.inc
+h_definition.o:             $(FC_DIR_PTC)/a_def_frame_patch_chart.inc $(FC_DIR_PTC)/a_def_all_kind.inc \
+                            $(FC_DIR_PTC)/a_def_sagan.inc $(FC_DIR_PTC)/a_def_element_fibre_layout.inc
+Sf_def_all_kinds.o:         $(FC_DIR_PTC)/a_def_worm.inc
+Sp_keywords.o:              $(FC_DIR_PTC)/a_namelists.inc
 
 # chain of dependencies (MAD-X PTC)
-madx_ptc_distrib.o:         src/madx_ptc_distrib.f90        util.o madx_ptc_module.o
-madx_ptc_eplacement.o:      src/madx_ptc_eplacement.f90     util.o madx_ptc_intstate.o madx_ptc_module.o Sp_keywords.o
-madx_ptc_intstate.o:        src/madx_ptc_intstate.f90       Sp_keywords.o
-madx_ptc_knobs.o:           src/madx_ptc_knobs.f90          util.o madx_ptc_intstate.o Sp_keywords.o
-madx_ptc_module.o:          src/madx_ptc_module.f90         util.o madx_ptc_setcavs.o madx_ptc_knobs.o Sra_fitting.o
-madx_ptc_normal.o:          src/madx_ptc_normal.f90         madx_ptc_module.o
-madx_ptc_script.o:          src/madx_ptc_script.f90         util.o Sp_keywords.o
-madx_ptc_setcavs.o:         src/madx_ptc_setcavs.f90        madx_ptc_intstate.o Sp_keywords.o
-madx_ptc_trackcavs.o:       src/madx_ptc_trackcavs.f90      util.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_setcavs.o Sp_keywords.o
-madx_ptc_track_run.o:       src/madx_ptc_track_run.f90      util.o madx_ptc_module.o Sp_keywords.o
-madx_ptc_twiss.o:           src/madx_ptc_twiss.f90          util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
-ptc_export_xml.o:           src/ptc_export_xml.f90          madx_ptc_module.o
-user2_photon.o:             src/user2_photon.f90            madx_ptc_track_run.o
+madx_ptc_distrib.o:         $(FC_DIR)/madx_ptc_distrib.f90        util.o madx_ptc_module.o
+madx_ptc_eplacement.o:      $(FC_DIR)/madx_ptc_eplacement.f90     util.o madx_ptc_intstate.o madx_ptc_module.o Sp_keywords.o
+madx_ptc_intstate.o:        $(FC_DIR)/madx_ptc_intstate.f90       Sp_keywords.o
+madx_ptc_knobs.o:           $(FC_DIR)/madx_ptc_knobs.f90          util.o madx_ptc_intstate.o Sp_keywords.o
+madx_ptc_module.o:          $(FC_DIR)/madx_ptc_module.f90         util.o madx_ptc_setcavs.o madx_ptc_knobs.o Sra_fitting.o
+madx_ptc_normal.o:          $(FC_DIR)/madx_ptc_normal.f90         madx_ptc_module.o
+madx_ptc_script.o:          $(FC_DIR)/madx_ptc_script.f90         util.o Sp_keywords.o
+madx_ptc_setcavs.o:         $(FC_DIR)/madx_ptc_setcavs.f90        madx_ptc_intstate.o Sp_keywords.o
+madx_ptc_trackcavs.o:       $(FC_DIR)/madx_ptc_trackcavs.f90      util.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_setcavs.o Sp_keywords.o
+madx_ptc_track_run.o:       $(FC_DIR)/madx_ptc_track_run.f90      util.o madx_ptc_module.o Sp_keywords.o
+madx_ptc_twiss.o:           $(FC_DIR)/madx_ptc_twiss.f90          util.o madx_ptc_module.o madx_ptc_setcavs.o madx_ptc_knobs.o madx_ptc_distrib.o
+ptc_export_xml.o:           $(FC_DIR)/ptc_export_xml.f90          madx_ptc_module.o
+user2_photon.o:             $(FC_DIR)/user2_photon.f90            madx_ptc_track_run.o
 ifneq ($(NOWRAP),yes) # wrap is long to compile, with little "true" dependencies
-wrap.o:                     src/wrap.f90                    madx_ptc_module.o madx_ptc_intstate.o \
-                                                            madx_ptc_normal.o madx_ptc_twiss.o \
-                                                            madx_ptc_distrib.o madx_ptc_setcavs.o \
-	                                                          madx_ptc_trackcavs.o madx_ptc_knobs.o \
-	                                                          madx_ptc_track_run.o madx_ptc_script.o \
-	                                                          St_pointers.o ptc_export_xml.o \
-	                                                          madx_ptc_eplacement.o
+wrap.o:                     $(FC_DIR)/wrap.f90                    madx_ptc_module.o madx_ptc_intstate.o \
+                                                                  madx_ptc_normal.o madx_ptc_twiss.o \
+                                                                  madx_ptc_distrib.o madx_ptc_setcavs.o \
+	                                                                madx_ptc_trackcavs.o madx_ptc_knobs.o \
+	                                                                madx_ptc_track_run.o madx_ptc_script.o \
+	                                                                St_pointers.o ptc_export_xml.o \
+	                                                                madx_ptc_eplacement.o
 endif
-madx_ptc_distrib.o:         src/madx_ptc_distrib.inc
-madx_ptc_knobs.o:           src/madx_ptc_knobs.inc
-madx_ptc_twiss.o:           src/madx_ptc_knobs.inc src/madx_ptc_distrib.inc
-user2_photon.o:             src/photoni.inc
+madx_ptc_distrib.o:         $(FC_DIR)/madx_ptc_distrib.inc
+madx_ptc_knobs.o:           $(FC_DIR)/madx_ptc_knobs.inc
+madx_ptc_twiss.o:           $(FC_DIR)/madx_ptc_knobs.inc $(FC_DIR)/madx_ptc_distrib.inc
+user2_photon.o:             $(FC_DIR)/photoni.inc
 
 # chain of dependencies (MAD-X)
-dynap.o:                    src/dynap.f90                   util.o
-emit.o:                     src/emit.f90                    util.o
-gxx11.o:                    src/gxx11.f90                   util.o
-gxx11ps.o:                  src/gxx11ps.f90                 util.o
-ibsdb.o:                    src/ibsdb.f90                   util.o
-mad_inif_f.o:               src/mad_inif_f.F90
-match.o:                    src/match.f90                   util.o
-matchjc.o:                  src/matchjc.f90                 util.o match.o matchlib.o
-matchlib.o:                 src/matchlib.f90                matchlib2.o
-matchlib2.o:                src/matchlib2.f90
-matchsa.o:                  src/matchsa.f90                 util.o
-orbf.o:                     src/orbf.f90
-plot.o:                     src/plot.f90                    util.o
-poisson.o:                  src/poisson.f90
-resindex.o:                 src/resindex.f90                util.o
-sodd.o:                     src/sodd.f90                    util.o
-survey.o:                   src/survey.f90                  util.o
-timest.o:                   src/timest.f90
-timex.o:                    src/timex.f90
-touschek.o:                 src/touschek.f90                util.o
-trrun.o:                    src/trrun.f90                   util.o
-twiss.o:                    src/twiss.f90                   util.o
-util.o:                     src/util.f90
+dynap.o:                    $(FC_DIR)/dynap.f90                   util.o
+emit.o:                     $(FC_DIR)/emit.f90                    util.o
+gxx11.o:                    $(FC_DIR)/gxx11.f90                   util.o
+gxx11ps.o:                  $(FC_DIR)/gxx11ps.f90                 util.o
+ibsdb.o:                    $(FC_DIR)/ibsdb.f90                   util.o
+mad_inif_f.o:               $(FC_DIR)/mad_inif_f.F90
+match.o:                    $(FC_DIR)/match.f90                   util.o
+matchjc.o:                  $(FC_DIR)/matchjc.f90                 util.o match.o matchlib.o
+matchlib.o:                 $(FC_DIR)/matchlib.f90                matchlib2.o
+matchlib2.o:                $(FC_DIR)/matchlib2.f90
+matchsa.o:                  $(FC_DIR)/matchsa.f90                 util.o
+orbf.o:                     $(FC_DIR)/orbf.f90
+plot.o:                     $(FC_DIR)/plot.f90                    util.o
+poisson.o:                  $(FC_DIR)/poisson.f90
+resindex.o:                 $(FC_DIR)/resindex.f90                util.o
+sodd.o:                     $(FC_DIR)/sodd.f90                    util.o
+survey.o:                   $(FC_DIR)/survey.f90                  util.o
+timest.o:                   $(FC_DIR)/timest.f90
+timex.o:                    $(FC_DIR)/timex.f90
+touschek.o:                 $(FC_DIR)/touschek.f90                util.o
+trrun.o:                    $(FC_DIR)/trrun.f90                   util.o
+twiss.o:                    $(FC_DIR)/twiss.f90                   util.o
+util.o:                     $(FC_DIR)/util.f90
 
 endif
 
