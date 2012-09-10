@@ -16,7 +16,7 @@ MODULE TPSA
   private getdiff,getdATRA  ,mul,dmulsc,dscmul
   private mulsc,scmul,imulsc,iscmul
   private div,ddivsc,dscdiv,divsc,scdiv,idivsc,iscdiv
-  private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd
+  private unaryADD,add,daddsc,dscadd,addsc,scadd,iaddsc,iscadd 
   private unarySUB,subs,dsubsc,dscsub,subsc,scsub,isubsc,iscsub
   private allocda,KILLda,A_OPT,K_opt
   private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht
@@ -40,7 +40,7 @@ MODULE TPSA
   logical(lp),target  :: real_warning =.true.
 
   PRIVATE null_it,Set_Up,de_Set_Up,LINE_L,RING_L,kill_DALEVEL,dealloc_DASCRATCH,set_up_level
-  private insert_da,append_da
+  private insert_da,append_da,GETINTegrate
 
 
   type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
@@ -484,6 +484,11 @@ MODULE TPSA
      MODULE PROCEDURE getdiff    !@1 takes derivatives
   END INTERFACE
 
+  INTERFACE OPERATOR (.i.)
+     MODULE PROCEDURE GETINTegrate    !@1 takes derivatives
+  END INTERFACE
+
+
   INTERFACE OPERATOR (.SUB.)
      MODULE PROCEDURE GETORDER
      MODULE PROCEDURE getchar
@@ -787,7 +792,7 @@ CONTAINS
 
     ! unarySUB=(-one)*s1
     !    if(old) then
-    call dacmu(s1%i,-one,temp)
+    call dacmu(s1%i,-1.0_dp,temp)
     call dacop(temp,unarySUB%i)
     !   else
     !      call newdacmu(s1%j,-one,unarySUB%j)
@@ -1103,7 +1108,7 @@ CONTAINS
     !    call check(s1)
     call ass(datanht)
 
-    datanht=log((1+s1)/sqrt(1-s1))/two
+    datanht=log((1+s1)/sqrt(1-s1))/2.0_dp
 
     master=localmaster
 
@@ -1304,7 +1309,7 @@ CONTAINS
     call ass(pbbra)
 
     ! if(old) then
-    pbbra=zero
+    pbbra=0.0_dp
     do i=1,nd
        pbbra=(s1.d.(2*i-1))*(s2.d.(2*i))-(s2.d.(2*i-1))*(s1.d.(2*i))+pbbra
     enddo
@@ -1405,7 +1410,7 @@ CONTAINS
        CALL  CHARINT(RESUL(I:I),J(I))
        if(i>nv) then
           if(j(i)>0) then
-             dputchar=zero
+             dputchar=0.0_dp
              !             call var(dputchar,zero,0)
              return
           endif
@@ -1414,7 +1419,7 @@ CONTAINS
 
 
 
-    dputchar=zero
+    dputchar=0.0_dp
     !    call var(dputchar,zero,0)
     CALL pok(dputchar,j,s1)
     master=localmaster
@@ -1450,14 +1455,14 @@ CONTAINS
        if(i>nv) then
           if(j(i)>0) then
              !             call var(dputint,zero,0)
-             dputint=zero
+             dputint=0.0_dp
              return
           endif
        endif
     enddo
 
 
-    dputint=zero
+    dputint=0.0_dp
     !    call var(dputint,zero,0)
     CALL pok(dputint,j,s1)
     master=localmaster
@@ -1484,7 +1489,7 @@ CONTAINS
     endif
 
 
-    dputint0=zero
+    dputint0=0.0_dp
     !    call var(dputint0,zero,s2)
 
     j(s2)=1
@@ -1591,7 +1596,11 @@ CONTAINS
 
 
     ! if(old) then
-    CALL dapek(S1%I,j,r1)
+    if(nd2par>c_%nv) then
+        r1=0.0_dp
+    else
+     CALL dapek(S1%I,j,r1)
+    endif
     !    else
     !       CALL newdapek(S1%j,j,r1)
     !    endif
@@ -1658,6 +1667,43 @@ CONTAINS
 
   END FUNCTION GETdiff
 
+  FUNCTION GETINTegrate( S1, S2 )
+    implicit none
+    TYPE (taylor) GETINTegrate
+    TYPE (taylor), INTENT (IN) :: S1
+    INTEGER, INTENT (IN) ::  S2
+    integer localmaster,n,i
+    type(taylor) t,x
+    real(dp) value
+    integer, allocatable :: jc(:)
+    IF(.NOT.C_%STABLE_DA) RETURN
+    localmaster=master
+
+    allocate(jc(c_%nv))
+    jc=0
+    !    call check(s1)
+    call ass(GETINTegrate)
+    call alloc(t,x)
+    t=s1
+    x=0
+    call taylor_cycle(t,size=n)
+
+    do i=1,n
+       call taylor_cycle(t,ii=i,value=value,j=jc)
+ 
+         x=((value/(jc(s2)+1)).mono.jc)*(1.0_dp.mono.s2)+x
+
+    enddo
+
+    GETINTegrate=x
+
+    call kill(t,x)
+    deallocate(jc)
+    master=localmaster
+
+  END FUNCTION GETINTegrate
+
+
   FUNCTION GETdatra( S1, S2 )
     implicit none
     TYPE (taylor) GETdatra
@@ -1697,14 +1743,14 @@ CONTAINS
     call ass(POW)
 
     ! if(old) then
-    CALL DACON(TEMP,one)
+    CALL DACON(TEMP,1.0_dp)
 
     R22=IABS(R2)
     DO I=1,R22
        CALL DAMUL(TEMP,S1%I,TEMP)
     ENDDO
     IF(R2.LT.0) THEN
-       CALL DADIC(TEMP,one,TEMP)
+       CALL DADIC(TEMP,1.0_dp,TEMP)
     ENDIF
     call dacop(temp,POW%i)
     !    ELSE
@@ -2447,7 +2493,7 @@ CONTAINS
 
     call ass(varf)
 
-    varf=S1 + (one.mono.S2)
+    varf=S1 + (1.0_dp.mono.S2)
 
     master=localmaster
 
@@ -2680,7 +2726,7 @@ CONTAINS
        CALL  CHARINT(RESUL(I:I),Jfil(I))
        if(i>nv) then
           if(Jfil(i)>0) then
-             GETCHARnd2=zero
+             GETCHARnd2=0.0_dp
              return
           endif
        endif
@@ -2742,7 +2788,7 @@ CONTAINS
        Jfil(I)=s2(i)
        if(i>nv) then
           if(Jfil(i)>0) then
-             GETintnd2=zero
+             GETintnd2=0.0_dp
              return
           endif
        endif
@@ -2806,7 +2852,7 @@ CONTAINS
        jfilt(I)=s2(i)
        if(i>nv) then
           if(jfilt(i)>0) then
-             GETintnd2t=zero
+             GETintnd2t=0.0_dp
              return
           endif
        endif
@@ -2978,10 +3024,10 @@ CONTAINS
     integer i
     integer,dimension(:)::j
 
-    filter=one
+    filter=1.0_dp
     !do i=1,nd2+ndel
     do i=1,nd2par
-       if(jfil(i)/=j(i)) filter=zero
+       if(jfil(i)/=j(i)) filter=0.0_dp
     enddo
 
   end  function filter
@@ -2993,10 +3039,10 @@ CONTAINS
     integer,dimension(:)::j
     !    WRITE(6,*) jfilt(1:4)
     !    WRITE(6,*)nd2part,nd2partt
-    filter_part=one
+    filter_part=1.0_dp
     !do i=1,nd2+ndel
     do i=nd2part,nd2partt
-       if(jfilt(i)/=j(i)) filter_part=zero
+       if(jfilt(i)/=j(i)) filter_part=0.0_dp
     enddo
 
   end  function filter_part
@@ -3011,7 +3057,7 @@ CONTAINS
     REAL(DP) PREC
 
     IF(PRESENT(DEPS)) THEN
-       PREC=-ONE
+       PREC=-1.0_dp
        CALL taylor_eps(PREC)
        CALL taylor_eps(DEPS)
     ENDIF
@@ -3097,7 +3143,7 @@ CONTAINS
     integer, intent(in):: N,NV
     ALLOCATE(S2%N,S2%NV)
     if(N==0) then
-       allocate(S2%C(1),S2%J(1,NV));S2%C(1)=zero;S2%J(:,:)=0;
+       allocate(S2%C(1),S2%J(1,NV));S2%C(1)=0.0_dp;S2%J(:,:)=0;
     else
        allocate(S2%C(N),S2%J(N,NV))
     endif
@@ -3175,7 +3221,7 @@ CONTAINS
     !    endif
 
 
-    S1=zero
+    S1=0.0_dp
 
     IF(.not.ASSOCIATED(S2%N)) THEN
        w_p=0
@@ -3226,7 +3272,7 @@ CONTAINS
     if(ut%n /= 0) then
        write(iunit,'(A)') '    I  COEFFICIENT          ORDER   EXPONENTS'
     else
-       write(iunit,'(A)') '   ALL COMPONENTS ZERO '
+       write(iunit,'(A)') '   ALL COMPONENTS 0.0_dp '
     endif
 
     do i = 1,ut%n
@@ -3267,7 +3313,7 @@ CONTAINS
 
     w_p=0
     w_p%nc=3
-    write(6,*) " You are using a kind(one) "
+    write(6,*) " You are using a kind(1.0_dp) "
     write(6,*)" set real_warning to false to permit this "
     write(6,*)" write 1 to continue or -1 for a crash "
     call read(j)
@@ -3589,7 +3635,7 @@ CONTAINS
     type (TAYLOR) t
 
     call alloc(t)
-    t=zero
+    t=0.0_dp
     ipresent=1
     call dacycle(S1%I,ipresent,value,n)
 

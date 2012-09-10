@@ -10,7 +10,7 @@ module da_arrays
   public
   integer lda,lea,lia,lst
   integer,private,parameter::nmax=400
-  real(dp),private,parameter::tiny=c_1d_20
+  real(dp),private,parameter::tiny=1e-20_dp
   private ludcmp_nr,lubksb_nr
   ! johan
   ! integer,parameter::lno=2,lnv=6,lnomax=8,lnvmax=9,lstmax=800500,ldamax=16000,leamax=5000,liamax=50000
@@ -70,7 +70,7 @@ contains
     allocate(daname(lda));
     allocate(allvec(lda));
     do i=1,lst
-       cc(I)=zero  ! ADDED BY ETIENNE
+       cc(I)=0.0_dp  ! ADDED BY ETIENNE
        i_1(i)=0
        i_2(i)=0
     enddo
@@ -256,11 +256,11 @@ contains
     lst=lda*lea
 
     if(lingyun_yang) then
-       size=REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
+       size=REAL(lst,kind=DP)*(8.0_dp/1024.0_dp**2+2.0_dp*4.0_dp/1024.0_dp**2)
     else
-       size=(three*REAL(lea,kind=DP)+two*(REAL(lia,kind=DP)+one)+five*REAL(lda,kind=DP))*four/c_1024**2
-       size=size+ten*REAL(lda,kind=DP)/c_1024**2+REAL(lda,kind=DP)/eight/c_1024**2
-       size=size+REAL(lst,kind=DP)*(eight/c_1024**2+two*four/c_1024**2)
+       size=(3.0_dp*REAL(lea,kind=DP)+2.0_dp*(REAL(lia,kind=DP)+1.0_dp)+5.0_dp*REAL(lda,kind=DP))*4.0_dp/1024.0_dp**2
+       size=size+10.0_dp*REAL(lda,kind=DP)/1024.0_dp**2+REAL(lda,kind=DP)/8.0_dp/1024.0_dp**2
+       size=size+REAL(lst,kind=DP)*(8.0_dp/1024.0_dp**2+2.0_dp*4.0_dp/1024.0_dp**2)
     endif
     if(size>total_da_size.or.printdainfo) then
        w_p=0
@@ -318,8 +318,8 @@ contains
     !
     real(dp) xran
     !
-    xran = xran + ten
-    if(xran.gt.c_1d4) xran = xran - c_9999_12345
+    xran = xran + 10.0_dp
+    if(xran.gt.1e4_dp) xran = xran - 9999.12345e0_dp
     bran = abs(sin(xran))
     bran = 10*bran
     bran = bran - int(bran)
@@ -350,10 +350,10 @@ contains
     call ludcmp_nr(aw,n,nmax,indx,d,ier)
     if (ier .eq. 132) return
 
-    ai(1:n,1:n) = zero
+    ai(1:n,1:n) = 0.0_dp
     !    forall (i = 1:n) ai(i,i) = one
     do i=1,n
-       ai(i,i) = one
+       ai(i,i) = 1.0_dp
     enddo
 
     do j=1,n
@@ -391,17 +391,17 @@ contains
     !       return
     !    endif
     ier=0
-    d=one
+    d=1.0_dp
     do i=1,n
-       aamax=zero
+       aamax=0.0_dp
        do j=1,n
           if(abs(a(i,j)).gt.aamax) aamax=abs(a(i,j))
        enddo
-       if(aamax.eq.zero) then
+       if(aamax.eq.0.0_dp) then
           ier=132
           return
        endif
-       vv(i)=one/aamax
+       vv(i)=1.0_dp/aamax
     enddo
     do j=1,n
        if(j.gt.1) then
@@ -415,7 +415,7 @@ contains
              endif
           enddo
        endif
-       aamax=zero
+       aamax=0.0_dp
        do i=j,n
           sum=a(i,j)
           if (j.gt.1) then
@@ -441,14 +441,14 @@ contains
        endif
        indx(j)=imax
        if(j.ne.n) then
-          if(a(j,j).eq.zero) a(j,j)=tiny
-          dum=one/a(j,j)
+          if(a(j,j).eq.0.0_dp) a(j,j)=tiny
+          dum=1.0_dp/a(j,j)
           do i=j+1,n
              a(i,j)=a(i,j)*dum
           enddo
        endif
     enddo
-    if(a(n,n).eq.zero) a(n,n)=tiny
+    if(a(n,n).eq.0.0_dp) a(n,n)=tiny
     return
   end subroutine ludcmp_nr
   !
@@ -488,7 +488,7 @@ contains
           do j=ii,i-1
              sum = sum-a(i,j)*b(j)
           enddo
-       else if (sum.ne.zero) then
+       else if (sum.ne.0.0_dp) then
           ii = i
        endif
        b(i)=sum

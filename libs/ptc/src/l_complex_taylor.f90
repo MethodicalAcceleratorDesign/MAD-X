@@ -1253,8 +1253,8 @@ contains
 
     call ass(varco)
 
-    varco%r=REAL(s1,kind=DP) + (one.mono.s2(1))
-    varco%i=aimag(s1) + (one.mono.s2(2))
+    varco%r=REAL(s1,kind=DP) + (1.0_dp.mono.s2(1))
+    varco%i=aimag(s1) + (1.0_dp.mono.s2(2))
 
 
     !varco%r=REAL(s1,kind=DP).var.s2(1)
@@ -1278,7 +1278,7 @@ contains
 
 
 
-    varco1=s1(1)+s1(2)*((one.mono.s2(1))+i_*(one.mono.s2(2)))
+    varco1=s1(1)+s1(2)*((1.0_dp.mono.s2(1))+i_*(1.0_dp.mono.s2(2)))
 
     master=localmaster
 
@@ -1371,7 +1371,7 @@ contains
 
     call alloc(temp)
 
-    TEMP=one
+    TEMP=1.0_dp
 
 
     R22=IABS(R2)
@@ -1379,7 +1379,7 @@ contains
        temp=temp*s1
     ENDDO
     IF(R2.LT.0) THEN
-       temp=one/temp
+       temp=1.0_dp/temp
     ENDIF
 
     POW=temp
@@ -1674,8 +1674,8 @@ contains
     integer localmaster
     localmaster=master
     call ass(idivsc)
-    idivsc%r=(one/s1)*s2%r
-    idivsc%i=(one/s1)*s2%i
+    idivsc%r=(1.0_dp/s1)*s2%r
+    idivsc%i=(1.0_dp/s1)*s2%i
     master=localmaster
   END FUNCTION idivsc
 
@@ -1689,8 +1689,8 @@ contains
     if(real_warning) call real_stop
     localmaster=master
     call ass(divsc)
-    divsc%r=(one/s1)*s2%r
-    divsc%i=(one/s1)*s2%i
+    divsc%r=(1.0_dp/s1)*s2%r
+    divsc%i=(1.0_dp/s1)*s2%i
     master=localmaster
   END FUNCTION divsc
 
@@ -1703,8 +1703,8 @@ contains
     integer localmaster
     localmaster=master
     call ass(ddivsc)
-    ddivsc%r=(one/s1)*s2%r
-    ddivsc%i=(one/s1)*s2%i
+    ddivsc%r=(1.0_dp/s1)*s2%r
+    ddivsc%i=(1.0_dp/s1)*s2%i
     master=localmaster
   END FUNCTION ddivsc
 
@@ -1716,8 +1716,8 @@ contains
     integer localmaster
     localmaster=master
     call ass(cdivsc)
-    cdivsc%r=REAL((one/s1),kind=DP)*s2%r-aimag((one/s1))*s2%i
-    cdivsc%i=REAL((one/s1),kind=DP)*s2%i+aimag((one/s1))*s2%r
+    cdivsc%r=REAL((1.0_dp/s1),kind=DP)*s2%r-aimag((1.0_dp/s1))*s2%i
+    cdivsc%i=REAL((1.0_dp/s1),kind=DP)*s2%i+aimag((1.0_dp/s1))*s2%r
     master=localmaster
   END FUNCTION cdivsc
 
@@ -1842,7 +1842,7 @@ contains
     integer localmaster
     localmaster=master
     call ass(ctdiv)
-    w=one/sc
+    w=1.0_dp/sc
     ctdiv%r=s1*REAL(w,kind=DP)
     ctdiv%i=s1*aimag(w)
     master=localmaster
@@ -1975,7 +1975,7 @@ contains
     call check_snake
 
     S2%R=S1
-    S2%I=zero
+    S2%I=0.0_dp
 
   END SUBROUTINE ctEQUAL
 
@@ -2042,7 +2042,7 @@ contains
 
 
     S2%R=R1
-    S2%I=zero
+    S2%I=0.0_dp
 
   END SUBROUTINE dEQUALDACON
 
@@ -2055,7 +2055,7 @@ contains
     call check_snake
 
     S2%R=REAL(R1,kind=DP)
-    S2%I=zero
+    S2%I=0.0_dp
 
   END SUBROUTINE EQUALDACON
 
@@ -2067,7 +2067,7 @@ contains
 
 
     S2%R=REAL(R1,kind=DP)
-    S2%I=zero
+    S2%I=0.0_dp
 
   END SUBROUTINE iEQUALDACON
 
@@ -2170,7 +2170,7 @@ contains
     localmaster=master
     call ass(tdiv)
     call alloc(temp)
-    temp=one/s2
+    temp=1.0_dp/s2
     tdiv%r=s1*temp%r
     tdiv%i=s1*temp%i
     master=localmaster
@@ -2187,7 +2187,7 @@ contains
     localmaster=master
     call ass(divt)
     call alloc(temp)
-    temp=one/s1
+    temp=1.0_dp/s1
     divt%r=temp*s2%r
     divt%i=temp*s2%i
     master=localmaster
@@ -2467,15 +2467,15 @@ contains
     i1=s1%i.sub.'0'
     s=s1
     d1=cmplx(r1,i1,kind=dp)
-    d1=one/d1
+    d1=1.0_dp/d1
 
     s=d1*s1
 
-    s=s-one
-    s=(-one)*s
+    s=s-1.0_dp
+    s=(-1.0_dp)*s
 
-    ss=cmplx(one,zero,kind=dp)
-    s2=cmplx(one,zero,kind=dp)
+    ss=cmplx(1.0_dp,0.0_dp,kind=dp)
+    s2=cmplx(1.0_dp,0.0_dp,kind=dp)
 
     do i=1,no
        ss=ss*s
@@ -2518,7 +2518,7 @@ contains
     i1=s1%i.sub.'0'
 
     d1=cmplx(r1,i1,kind=dp)
-    s=(one/d1)*s1-one
+    s=(1.0_dp/d1)*s1-1.0_dp
 
     s2=s
 
@@ -2526,7 +2526,7 @@ contains
     ss=s
 
     do i=2,no
-       ss=cmplx(-one,zero,kind=dp)*ss*s
+       ss=cmplx(-1.0_dp,0.0_dp,kind=dp)*ss*s
        s2=s2+ss/REAL(i,kind=DP)
     enddo
 
@@ -2585,12 +2585,12 @@ contains
     call ass(datant)
     call alloc(temp)
 
-    temp=(one+s1*i_)
+    temp=(1.0_dp+s1*i_)
 
-    temp=temp/(one-s1*i_)
+    temp=temp/(1.0_dp-s1*i_)
 
     temp=log(temp)
-    datant=temp/two/i_
+    datant=temp/2.0_dp/i_
 
     call kill(temp)
 
@@ -2629,7 +2629,7 @@ contains
 
     temp%r=s1
     a0=abs(temp%r)
-    if(a0>one) then
+    if(a0>1.0_dp) then
        check_stable=.false.
        stable_da=.false.
        messagelost= " Not defined in dasintt of complex_taylor "
@@ -2652,8 +2652,8 @@ contains
     call ass(dasint)
     call alloc(temp)
 
-    temp=(one-s1**2)
-    temp=temp**(half)
+    temp=(1.0_dp-s1**2)
+    temp=temp**(0.5_dp)
 
     temp=i_*s1+ temp
     dasint=-i_*log(temp)
@@ -2681,7 +2681,7 @@ contains
     call alloc(t)
 
     a0=abs(s1)
-    if(a0>one) then
+    if(a0>1.0_dp) then
        check_stable=.false.
        stable_da=.false.
        messagelost= " Not defined in dacostt of complex_taylor "
@@ -2725,8 +2725,8 @@ contains
     call ass(dacost)
     call alloc(temp)
 
-    temp=one-s1**2
-    temp=temp**(half)
+    temp=1.0_dp-s1**2
+    temp=temp**(0.5_dp)
 
     temp=(s1+ i_*temp)
     dacost=-i_*log(temp)
@@ -2797,7 +2797,7 @@ contains
 
     dcost=exp(i_*s1)
     dcost=dcost+exp(-i_*s1)
-    dcost=dcost/two
+    dcost=dcost/2.0_dp
 
     master=localmaster
   END FUNCTION dcost
@@ -2814,7 +2814,7 @@ contains
 
     dcosht=exp(s1)
     dcosht=dcosht+exp(-s1)
-    dcosht=dcosht/two
+    dcosht=dcosht/2.0_dp
 
     master=localmaster
   END FUNCTION dcosht
@@ -2832,7 +2832,7 @@ contains
 
     dsint=exp(i_*s1)
     dsint=dsint-exp(-i_*s1)
-    dsint=dsint/two/i_
+    dsint=dsint/2.0_dp/i_
 
     master=localmaster
   END FUNCTION dsint
@@ -2849,7 +2849,7 @@ contains
 
     dsinht=exp(s1)
     dsinht=dsinht-exp(-s1)
-    dsinht=dsinht/two
+    dsinht=dsinht/2.0_dp
 
     master=localmaster
   END FUNCTION dsinht
@@ -2877,7 +2877,7 @@ contains
 
 
     call ass(dsqrtt)
-    dsqrtt= S1**half
+    dsqrtt= S1**0.5_dp
 
     master=localmaster
   END FUNCTION dsqrtt
@@ -2903,8 +2903,8 @@ contains
     s=s1-d1
 
 
-    ss=cmplx(one,zero,kind=dp)
-    s2=cmplx(one,zero,kind=dp)
+    ss=cmplx(1.0_dp,0.0_dp,kind=dp)
+    s2=cmplx(1.0_dp,0.0_dp,kind=dp)
 
     do i=1,no
        ss=ss*s

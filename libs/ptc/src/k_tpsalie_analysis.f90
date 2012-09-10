@@ -304,7 +304,7 @@ contains
     glo=global_verbose
     call check_snake
     call alloc(junk)
-    zero_(:)=zero
+    zero_(:)=0.0_dp
     !    if(old) then
     if(s2%normal%linear%V(1)%i==0)  call crap1("normalMAP 1") !call allocw(s2%normal%linear%V(1))  ! changed
     lielib_print(7)=0
@@ -402,10 +402,10 @@ contains
     !     ZERO_(I)=zero
     !     ENDDO
     !     JUNK=ZERO_
-    IF(s2%eps==ZERO) THEN
-       S2%EPS=c_1d3*FULL_ABS(S1)
+    IF(s2%eps==0.0_dp) THEN
+       S2%EPS=1e3_dp*FULL_ABS(S1)
        call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
-       S2%EPS=ZERO
+       S2%EPS=0.0_dp
     ELSE
        call FLOFACG(JUNK%V%i,s2%VECTOR%V%i,s2%eps)
     ENDIF
@@ -461,7 +461,7 @@ contains
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(junk)
-    ZERO_(:)=zero
+    ZERO_(:)=0.0_dp
     !    if(old) then
     if(s2%linear%V(1)%i==0)  call crap1("revdfMAP 1")  !call allocw(s2%linear%V(1))
     JUNK=S1
@@ -470,7 +470,7 @@ contains
     junk=junk**(-1)
     call FLOFAC(JUNK%V%i,s2%linear%V%i,s2%nonlinear%V%i)
     s2%linear=s2%linear**(-1)
-    call dacmud(s2%nonlinear%V%i,-one,s2%nonlinear%V%i)
+    call dacmud(s2%nonlinear%V%i,-1.0_dp,s2%nonlinear%V%i)
     !    S2%nonlinear=S2%nonlinear*S2%linear
     S2%pb=S2%nonlinear
     !    else
@@ -499,7 +499,7 @@ contains
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
     call alloc(junk)
-    ZERO_(:)=zero
+    ZERO_(:)=0.0_dp
     !    if(old) then
     if(s2%linear%V(1)%i==0)  call crap1("dfMAP 1")  !call allocw(s2%linear%V(1))
     JUNK=S1
@@ -635,7 +635,7 @@ contains
     !       if(.not.associated(s1%V(1)%j%r)) call crap1("MAPdf 2")  !call allocw(s1%V(1))
     !    endif
     ID=1
-    ID=texpdf( S2%NONLINEAR, ID,2,NO1,one,1 )
+    ID=texpdf( S2%NONLINEAR, ID,2,NO1,1.0_dp,1 )
     S1=ID*S2%LINEAR
     S1=S2%CONSTANT
     CALL KILL(ID)
@@ -657,7 +657,7 @@ contains
     !       if(.NOT.ASSOCIATED(s1%V(1)%j%r)) call crap1("MAPrevdf 2")  !call allocw(s1%V(1))
     !    endif
     ID=1
-    ID=texpdf( S2%NONLINEAR, ID,2,NO1,one,-1 )
+    ID=texpdf( S2%NONLINEAR, ID,2,NO1,1.0_dp,-1 )
     S1=S2%LINEAR*ID
     S1=S2%CONSTANT
     CALL KILL(ID)
@@ -669,11 +669,11 @@ contains
     integer i,j
     call alloc(s1%h)
 
-    s1%eps=c_1d_6
+    s1%eps=1e-6_dp
     s1%ifac=1
     s1%linear_in=.false.
     s1%imax=1000
-    s1%constant(:)=zero
+    s1%constant(:)=0.0_dp
     imaxflag=.false.
     s1%no_cut=no+1
     do i=1,nd
@@ -737,7 +737,7 @@ contains
 
     s2%constant=s1
     do i=1,ndim2
-       zero_(i)=zero
+       zero_(i)=0.0_dp
     enddo
     do i=1,lnv
        jn(i)=0
@@ -771,7 +771,7 @@ contains
     if(s2%h%i==0) call crap1("EQUALgenMAP 1")  ! call etall1(s2%h%i)
     if(s2%m%v(1)%i==0) call crap1("EQUALgenMAP 2")  !call etall(s2%m%v%i,nd2)
     call etpin(w%v%i,s2%m%v%i,jn)
-    call intd(s2%m%v%i,s2%h%i,one)
+    call intd(s2%m%v%i,s2%h%i,1.0_dp)
     !   else
     !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALgenMAP 3")  !call newetall(s2%h%j,1)
     !       if(.NOT. ASSOCIATED(s2%m%v(1)%J%r)) call crap1("EQUALgenMAP 4")  !call newetall(s2%m%v%J,nd2)
@@ -818,7 +818,7 @@ contains
 
     ! if(old) then
     if(s1%v(1)%i==0)call crap1("EQUALMAPgen 1")  ! call etall(s1%v%i,nd2)
-    call difd(s2%h%i,w%v%i,one)
+    call difd(s2%h%i,w%v%i,1.0_dp)
     call etpin(w%v%i,s1%v%i,jn)
     !   else
     !      if(.NOT. ASSOCIATED(s1%v(1)%J%r))call crap1("EQUALMAPgen 2")  ! call newetall(s1%v%J,nd2)
@@ -875,7 +875,7 @@ contains
 
           more=.true.
 
-          eb=c_111110
+          eb=1.1111e5_dp
 
           do i=1,nv
              S2t(i)= junk(i)
@@ -884,7 +884,7 @@ contains
 
           do i=1,imax
 
-             de(:)=zero
+             de(:)=0.0_dp
 
 
 
@@ -898,14 +898,14 @@ contains
                 enddo
              enddo
              call matinv(mt,mI,nd,ndim,ier)
-             et(:)=zero
+             et(:)=0.0_dp
              do j=1,nd
                 do k=1,nd
                    et(j)=mI(j,k)*de(k)+et(j)
                 enddo
              enddo
 
-             e=zero
+             e=0.0_dp
              do k=1,nd
                 junk(2*k)=junk(2*k)+et(k)
                 e=abs(et(k))+e
@@ -991,7 +991,7 @@ contains
     call allocTPSA(s2%pb)
     s2%nonlinear%ifac=1
     s2%pb%ifac=1
-    s2%constant(:)=zero
+    s2%constant(:)=0.0_dp
   END SUBROUTINE allocdf
 
   SUBROUTINE  allocONELIE(S2)
@@ -999,7 +999,7 @@ contains
     type (ONELIEEXPONENT)  S2
     call allocTPSA(s2%VECTOR)
     call allocTPSA(s2%pb)
-    S2%EPS=ZERO
+    S2%EPS=0.0_dp
   END SUBROUTINE allocONELIE
 
 
@@ -1014,8 +1014,8 @@ contains
     call allocTPSA(s2%normal%Linear)
     call allocTPSA(s2%normal%nonlinear)
     call allocTPSA(s2%normal%pb)
-    s2%normal%constant(:)=zero
-    s2%a%constant(:)=zero
+    s2%normal%constant(:)=0.0_dp
+    s2%a%constant(:)=0.0_dp
     s2%NORMAL%nonlinear%ifac=1
     s2%NORMAL%PB%ifac=1
     s2%A%nonlinear%ifac=-1
@@ -1025,8 +1025,8 @@ contains
     s2%nres=0
     s2%jtune=0
     do i=1,ndim
-       s2%tune(i)=zero
-       s2%DAMPING(i)=zero
+       s2%tune(i)=0.0_dp
+       s2%DAMPING(i)=0.0_dp
        s2%PLANE(i)=2*i-1
        do j=1,nreso
           s2%M(i,j)=0
@@ -1044,7 +1044,7 @@ contains
     call allocTPSA(s2%pb)
     s2%nonlinear%ifac=-1
     s2%pb%ifac=-1
-    s2%constant(:)=zero
+    s2%constant(:)=0.0_dp
   END SUBROUTINE allocfd
 
   SUBROUTINE  killnormal(S2)
@@ -1506,8 +1506,8 @@ contains
 
     IF(.NOT.C_%STABLE_DA) RETURN
     call check_snake
-    st(:)=zero;rad(:)=zero;ang(:)=zero;
-    stn(:)=zero;radn(:)=zero;angn(:)=zero;
+    st(:)=0.0_dp;rad(:)=0.0_dp;ang(:)=0.0_dp;
+    stn(:)=0.0_dp;radn(:)=0.0_dp;angn(:)=0.0_dp;
     do i=1,ndim2
        do j=1,ndim2
           call alloc(trt(i,j))
@@ -1544,7 +1544,7 @@ contains
 
 
 
-    s2%bij=zero
+    s2%bij=0.0_dp
 
     do i=1,nd2
        s2%transpose%v(i)=s1(i)%v
@@ -1570,7 +1570,7 @@ contains
           !    jj(j)=1
           !     call pok(s2%transpose%v(i),jj,tr%m(j,i))
           !     call pok(s2%transpose%v(i),jj,tr(j,i))
-          s2%transpose%v(i)=s2%transpose%v(i)+trt(j,i)*(one.mono.ind_stoc(j))
+          s2%transpose%v(i)=s2%transpose%v(i)+trt(j,i)*(1.0_dp.mono.ind_stoc(j))
           !     jj(j)=0
           s2%bij=s2%bij+s1(i)%e(j)*id%v(i)*id%v(j)
        enddo
@@ -1591,14 +1591,14 @@ contains
 
     do i=1,nd
        s2%damping(i)=n%damping(i)
-       s2%tune(i)=one-n%tune(i)
-       if(s2%tune(i)<zero) s2%tune(i)=s2%tune(i)+one
+       s2%tune(i)=1.0_dp-n%tune(i)
+       if(s2%tune(i)<0.0_dp) s2%tune(i)=s2%tune(i)+1.0_dp
     enddo
-    if(s2%tune(3)>=half) s2%tune(3)=s2%tune(3)-one
-    s2%emittance(1)=-(tc(1).sub.'11' )/two/n%damping(1)
+    if(s2%tune(3)>=0.5_dp) s2%tune(3)=s2%tune(3)-1.0_dp
+    s2%emittance(1)=-(tc(1).sub.'11' )/2.0_dp/n%damping(1)
     if(nd>1) then
-       s2%emittance(2)=-(tc(1).sub.'0011'  )/two/n%damping(2)
-       if(nd==3) s2%emittance(3)=-(tc(1).sub.'000011')/two/n%damping(3)
+       s2%emittance(2)=-(tc(1).sub.'0011'  )/2.0_dp/n%damping(2)
+       if(nd==3) s2%emittance(3)=-(tc(1).sub.'000011')/2.0_dp/n%damping(3)
     endif
     call pertpeek(st,ang,rad)
     call flowpara(0,0)
@@ -1642,8 +1642,8 @@ contains
        bijn=s2%bij/norm
        id=1
 
-       if(s2%emittance(2)==zero.and.nd2>=2) then
-          bijn%h=bijn%h+(c_1d_7.mono.'002')+(c_1d_7.mono.'0002')
+       if(s2%emittance(2)==0.0_dp.and.nd2>=2) then
+          bijn%h=bijn%h+(1e-7_dp.mono.'002')+(1e-7_dp.mono.'0002')
        endif
        id=texp(bijn,id)
 
@@ -1657,8 +1657,8 @@ contains
           JJ(2*I-1)=0
        ENDDO
 
-       if(s2%emittance(2)==zero) then
-          S2%KICK(2)=zero    !  to make the map away from identity in case on e_2=0
+       if(s2%emittance(2)==0.0_dp) then
+          S2%KICK(2)=0.0_dp    !  to make the map away from identity in case on e_2=0
        endif
 
        DO I=1,ND

@@ -116,7 +116,7 @@ contains
     FK=BB%FK
     !    write(6,*) "bb%FK = " ,bb%FK
 
-    if (fk == zero)  return
+    if (fk == 0.0_dp)  return
     sx2 = sx*sx
     sy2 = sy*sy
     !---- limit formulae for sigma(x) = sigma(y).
@@ -128,12 +128,12 @@ contains
        if (tk .gt. explim) then
           phix = xs * fk / rho2
           phiy = ys * fk / rho2
-       else if (rho2 .ne. zero) then
-          phix = xs * fk / rho2 * (one - exp(-tk) )
-          phiy = ys * fk / rho2 * (one - exp(-tk) )
+       else if (rho2 .ne. 0.0_dp) then
+          phix = xs * fk / rho2 * (1.0_dp - exp(-tk) )
+          phiy = ys * fk / rho2 * (1.0_dp - exp(-tk) )
        else
-          phix = zero
-          phiy = zero
+          phix = 0.0_dp
+          phiy = 0.0_dp
        endif
        phix = phix - bb%bbk(1) ! subtract horizontal bb kick
        phiy = phiy - bb%bbk(2) ! subtract vertical co
@@ -142,7 +142,7 @@ contains
 
        !---- case sigma(x) > sigma(y).
     else if (sx2 > sy2) then
-       r2 = two * (sx2 - sy2)
+       r2 = 2.0_dp * (sx2 - sy2)
        r  = sqrt(r2)
        rk = fk * sqrt(pi) / r
        xs = x(1) - xm
@@ -150,7 +150,7 @@ contains
        xr = abs(xs) / r
        yr = abs(ys) / r
        call ccperrf(xr, yr, crx, cry)
-       tk = (xs * xs / sx2 + ys * ys / sy2) / two
+       tk = (xs * xs / sx2 + ys * ys / sy2) / 2.0_dp
        if (tk .gt. explim) then
           phix = rk * cry
           phiy = rk * crx
@@ -161,14 +161,14 @@ contains
           phix = rk * (cry - exp(-tk) * cby)
           phiy = rk * (crx - exp(-tk) * cbx)
        endif
-       x(2) = x(2) + phix * sign(one,xs)
-       x(4) = x(4) + phiy * sign(one,ys)
+       x(2) = x(2) + phix * sign(1.0_dp,xs)
+       x(4) = x(4) + phiy * sign(1.0_dp,ys)
        x(2) = x(2) - BB%bbk(1)
        x(4) = x(4) - BB%bbk(2)
 
        !---- case sigma(x) < sigma(y).
     else
-       r2 = two * (sy2 - sx2)
+       r2 = 2.0_dp * (sy2 - sx2)
        r  = sqrt(r2)
        rk = fk * sqrt(pi) / r
        !       do itrack = 1, b%n
@@ -180,7 +180,7 @@ contains
        xr = abs(xs) / r
        yr = abs(ys) / r
        call ccperrf(yr, xr, cry, crx)
-       tk = (xs * xs / sx2 + ys * ys / sy2) / two
+       tk = (xs * xs / sx2 + ys * ys / sy2) / 2.0_dp
        if (tk .gt. explim) then
           phix = rk * cry
           phiy = rk * crx
@@ -192,8 +192,8 @@ contains
           phiy = rk * (crx - exp(-tk) * cbx)
        endif
 
-       x(2) = x(2) + phix * sign(one,xs)
-       x(4) = x(4) + phiy * sign(one,ys)
+       x(2) = x(2) + phix * sign(1.0_dp,xs)
+       x(4) = x(4) + phiy * sign(1.0_dp,ys)
 
        x(2) = x(2) - BB%bbk(1)
        x(4) = x(4) - BB%bbk(2)
@@ -225,26 +225,26 @@ contains
     y = abs(yy)
 
     if (y .lt. ylim  .and.  x .lt. xlim) then
-       q  = (one - y / ylim) * sqrt(one - (x/xlim)**2)
-       h  = one / (fac1 * q)
+       q  = (1.0_dp - y / ylim) * sqrt(1.0_dp - (x/xlim)**2)
+       h  = 1.0_dp / (fac1 * q)
        nc = 7 + int(fac2*q)
        xl = h**(1 - nc)
-       xh = y + half/h
+       xh = y + 0.5_dp/h
        yh = x
        nu = 10 + int(fac3*q)
-       rx(nu+1) = zero
-       ry(nu+1) = zero
+       rx(nu+1) = 0.0_dp
+       ry(nu+1) = 0.0_dp
 
        do n = nu, 1, -1
           tx = xh + n * rx(n+1)
           ty = yh - n * ry(n+1)
           tn = tx*tx + ty*ty
-          rx(n) = half * tx / tn
-          ry(n) = half * ty / tn
+          rx(n) = 0.5_dp * tx / tn
+          ry(n) = 0.5_dp * ty / tn
        enddo
 
-       sx = zero
-       sy = zero
+       sx = 0.0_dp
+       sy = 0.0_dp
 
        do n = nc, 1, -1
           saux = sx + xl
@@ -258,15 +258,15 @@ contains
     else
        xh = y
        yh = x
-       rx(1) = zero
-       ry(1) = zero
+       rx(1) = 0.0_dp
+       ry(1) = 0.0_dp
 
        do n = 9, 1, -1
           tx = xh + n * rx(1)
           ty = yh - n * ry(1)
           tn = tx*tx + ty*ty
-          rx(1) = half * tx / tn
-          ry(1) = half * ty / tn
+          rx(1) = 0.5_dp * tx / tn
+          ry(1) = 0.5_dp * ty / tn
        enddo
 
        wx = cc * rx(1)
@@ -274,12 +274,12 @@ contains
     endif
 
     !      if(y .eq. zero) wx = exp(-x**2)
-    if(yy .lt. zero) then
-       wx =   two * exp(y*y-x*x) * cos(two*x*y) - wx
-       wy = - two * exp(y*y-x*x) * sin(two*x*y) - wy
-       if(xx .gt. zero) wy = -wy
+    if(yy .lt. 0.0_dp) then
+       wx =   2.0_dp * exp(y*y-x*x) * cos(2.0_dp*x*y) - wx
+       wy = - 2.0_dp * exp(y*y-x*x) * sin(2.0_dp*x*y) - wy
+       if(xx .gt. 0.0_dp) wy = -wy
     else
-       if(xx .lt. zero) wy = -wy
+       if(xx .lt. 0.0_dp) wy = -wy
     endif
 
   end SUBROUTINE ccperrfr
@@ -307,7 +307,7 @@ contains
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     parameter(ten3m=1.0e-3_dp,arglim=1.0e-2_dp,explim=150.0_dp)
 
-    if (BB%fk == zero)  return
+    if (BB%fk == 0.0_dp)  return
 
     CALL ALLOC(xr,yr,cbx,cby,rho2)
     CALL ALLOC(xs,ys,tk,phix,phiy)
@@ -336,12 +336,12 @@ contains
           phix = xs * fk / rho2
           phiy = ys * fk / rho2
        else if (tk > arglim) then
-          phix = xs * fk / rho2 * (one - exp(-tk) )
-          phiy = ys * fk / rho2 * (one - exp(-tk) )
+          phix = xs * fk / rho2 * (1.0_dp - exp(-tk) )
+          phiy = ys * fk / rho2 * (1.0_dp - exp(-tk) )
        else
 
-          xr=one
-          yr=one
+          xr=1.0_dp
+          yr=1.0_dp
 
           n=mybig
           do it=1,imax
@@ -354,8 +354,8 @@ contains
              write(6,*) it,n
              write(6,*) " Stopped in Beam-Beam "
           endif
-          phix = xs * fk / (two * sx2) * YR ! fudge
-          phiY = Ys * fk / (two * sx2) * YR ! fudge
+          phix = xs * fk / (2.0_dp * sx2) * YR ! fudge
+          phiY = Ys * fk / (2.0_dp * sx2) * YR ! fudge
        endif
 
        phix = phix - bb%bbk(1)
@@ -371,10 +371,10 @@ contains
 
        xs = x(1) - xm
        ys = x(3) - ym
-       tk = (xs * xs / sx2 + ys * ys / sy2) / two
+       tk = (xs * xs / sx2 + ys * ys / sy2) / 2.0_dp
 
        if(xs1 > xs2) then
-          r2 = two * (sx2 - sy2)
+          r2 = 2.0_dp * (sx2 - sy2)
           r  = sqrt(r2)
           rk = fk * sqrt(pi) / r
           xr = xs / r   !
@@ -400,7 +400,7 @@ contains
 
           !---- case sigma(x) < sigma(y).
        else
-          r2 = two * (sy2 - sx2)
+          r2 = 2.0_dp * (sy2 - sx2)
           r  = sqrt(r2)
           rk = fk * sqrt(pi) / r
 
@@ -469,7 +469,7 @@ contains
 
     w0=wx0+i_*wy0
 
-    w1=-two*z0*w0+two*i_/sqrt(pi)
+    w1=-2.0_dp*z0*w0+2.0_dp*i_/sqrt(pi)
 
     w=w0+w1*z
 
@@ -478,7 +478,7 @@ contains
     do i=2,c_%no
 
        zt=z*zt
-       wt0=  -two*(w0+z0*w1)/i
+       wt0=  -2.0_dp*(w0+z0*w1)/i
 
        w=w+wt0*zt
 

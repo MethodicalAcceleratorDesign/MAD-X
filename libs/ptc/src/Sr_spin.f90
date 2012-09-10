@@ -29,8 +29,8 @@ module ptc_spin
   !  private PUSH_SPIN_RAY8
   private radiate_2p,radiate_2r,radiate_2
   private TRACK_NODE_FLAG_probe_R,TRACK_NODE_FLAG_probe_p,TRACK_NODE_LAYOUT_FLAG_spinr_x
-  private FIND_ORBIT_LAYOUT_noda,TRACK_NODE_LAYOUT_FLAG_spinp_x
-  PRIVATE get_Bfield_fringe_R,get_Bfield_fringe_p,get_Bfield_fringe
+  private FIND_ORBIT_LAYOUT_noda,FIND_ORBIT_LAYOUT_noda_object,FIND_ORBIT_LAYOUT_noda_spin_object
+  PRIVATE get_Bfield_fringe_R,get_Bfield_fringe_p,get_Bfield_fringe,TRACK_NODE_LAYOUT_FLAG_spinp_x
   private TRACK_LAYOUT_FLAG_spin12r_x,TRACK_LAYOUT_FLAG_spin12p_x
   PRIVATE TRACK_LAYOUT_FLAG_probe_spin12R,TRACK_LAYOUT_FLAG_probe_spin12P,TRACK_YS
   private PUSH_SPIN_fake_fringer,PUSH_SPIN_fake_fringep,PUSH_SPIN_fake_fringe
@@ -93,15 +93,18 @@ module ptc_spin
 
   INTERFACE FIND_ORBIT_x
      MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda
+     MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_object
   END INTERFACE
 
   INTERFACE FIND_ORBIT_probe_x
      MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda
+     MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_object
   END INTERFACE
 
 
   INTERFACE FIND_ORBIT_probe_spin
      MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_spin
+     MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_spin_object
   END INTERFACE
 
 
@@ -380,7 +383,7 @@ contains
     el=>c%parent_fibre%mag
 
     if(k%TIME) then
-       ST=root(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       ST=root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        ST=X(5)
     endif
@@ -389,15 +392,15 @@ contains
     !        B2=-CRADF(EL%P)*(one+X(5))**3*B2*DLDS
     ! X(5)=one/(one/(one+X(5))+CRADF(EL%P)*(one+X(5))*B2*DLDS*FAC*DS)-one
     !        X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-    if(K%radiation) X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS*DLDS
+    if(K%radiation) X(5)=X(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*FAC*DS*DLDS
     if(k%stochastic) then
        !         t=sqrt(12.e0_dp)*(bran(bran_init)-half)
        t=RANF()
        !         t=sqrt(12.d0)*(RANF()-half)
-       if(t>half) then
-          t=one
+       if(t>0.5_dp) then
+          t=1.0_dp
        else
-          t=-one
+          t=-1.0_dp
        endif
        if(before) then
           x(5)=x(5)+t*c%delta_rad_in
@@ -409,15 +412,15 @@ contains
     if(el%kind/=kindpa) then
        IF(ASSOCIATED(EL%B_SOL)) THEN
           if(k%TIME) then
-             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)*root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/two
-             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
+             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)*root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp
+             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)*root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp
           else
-             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)*(one+X(5))/(one+ST)
-             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/two
-             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*(one+X(5))/(one+ST)
-             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
+             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp
+             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp
           endif
        ELSEif(el%kind==kind22) then
 
@@ -428,25 +431,25 @@ contains
           ENDIF
           CALL compute_f4(EL%he22,X,Z,A=AV)
           if(k%TIME) then
-             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
              X(2)=X(2)-EL%P%CHARGE*AV(1)
-             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
              X(4)=X(4)+EL%P%CHARGE*AV(2)
           else
-             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(one+X(5))/(one+ST)
+             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(1.0_dp+X(5))/(1.0_dp+ST)
              X(2)=X(2)-EL%P%CHARGE*AV(1)
-             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(one+X(5))/(one+ST)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(1.0_dp+X(5))/(1.0_dp+ST)
              X(4)=X(4)+EL%P%CHARGE*AV(2)
           endif
 
 
        ELSE
           if(k%TIME) then
-             X(2)=X(2)*root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(4)=X(4)*root(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=X(2)*root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(4)=X(4)*root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
           else
-             X(2)=X(2)*(one+X(5))/(one+ST)
-             X(4)=X(4)*(one+X(5))/(one+ST)
+             X(2)=X(2)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(4)=X(4)*(1.0_dp+X(5))/(1.0_dp+ST)
           endif
        ENDIF
     endif
@@ -488,10 +491,10 @@ contains
     endif
 
     if(k%SPIN) then
-       CO(1)=COS(FAC*DS*OM(1)/TWO)
-       SI(1)=SIN(FAC*DS*OM(1)/TWO)
-       CO(2)=COS(FAC*DS*OM(2)/TWO)
-       SI(2)=SIN(FAC*DS*OM(2)/TWO)
+       CO(1)=COS(FAC*DS*OM(1)/2.0_dp)
+       SI(1)=SIN(FAC*DS*OM(1)/2.0_dp)
+       CO(2)=COS(FAC*DS*OM(2)/2.0_dp)
+       SI(2)=SIN(FAC*DS*OM(2)/2.0_dp)
        CO(3)=COS(FAC*DS*OM(3))
        SI(3)=SIN(FAC*DS*OM(3))
 
@@ -543,9 +546,9 @@ contains
     el=>c%parent_fibre%magp
     if(.not.before.and.k%envelope) then
 
-       denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
+       denf=(1.0_dp+x(5))**5/SQRT((1.0_dp+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
-       b30=b30**c_1_5
+       b30=b30**1.5e0_dp
        b30=cflucf(el%p)*b30
        denf=denf*b30*FAC*DS
 
@@ -573,7 +576,7 @@ contains
     call alloc(st)
 
     if(k%TIME) then
-       ST=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       ST=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        ST=X(5)
     endif
@@ -582,21 +585,21 @@ contains
     !   X(5)=one/(one/(one+X(5))-B2*FAC*DS)-one
     !   X(5)=one/(one/(one+X(5))+CRADF(EL%P)*(one+X(5))*B2*DLDS*FAC*DS)-one
     !          X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS/SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-  if(K%radiation)  X(5)=X(5)-CRADF(EL%P)*(one+X(5))**3*B2*FAC*DS*DLDS
+  if(K%radiation)  X(5)=X(5)-CRADF(EL%P)*(1.0_dp+X(5))**3*B2*FAC*DS*DLDS
 
 
     if(el%kind/=kindpa) then
        IF(ASSOCIATED(EL%B_SOL)) THEN
           if(k%TIME) then
-             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/two
-             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
+             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)*SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp
+             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)*SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp
           else
-             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)*(one+X(5))/(one+ST)
-             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/two
-             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)*(one+X(5))/(one+ST)
-             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/two
+             X(2)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(2)=X(2)-EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp
+             X(4)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(4)=X(4)+EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp
           endif
        ELSEif(el%kind==kind22) then
           call alloc(av,3)
@@ -609,25 +612,25 @@ contains
           ENDIF
           CALL compute_f4(EL%he22,X,Z,A=AV)
           if(k%TIME) then
-             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=(X(2)+EL%P%CHARGE*AV(1)) *sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
              X(2)=X(2)-EL%P%CHARGE*AV(1)
-             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2)) *sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
              X(4)=X(4)+EL%P%CHARGE*AV(2)
           else
-             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(one+X(5))/(one+ST)
+             X(2)=(X(2)+EL%P%CHARGE*AV(1))*(1.0_dp+X(5))/(1.0_dp+ST)
              X(2)=X(2)-EL%P%CHARGE*AV(1)
-             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(one+X(5))/(one+ST)
+             X(4)=(X(4)-EL%P%CHARGE*AV(2))*(1.0_dp+X(5))/(1.0_dp+ST)
              X(4)=X(4)+EL%P%CHARGE*AV(2)
           endif
           call kill(av,3)
           call kill(z)
        ELSE
           if(k%TIME) then
-             X(2)=X(2)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
-             X(4)=X(4)*SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)/(one+ST)
+             X(2)=X(2)*SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
+             X(4)=X(4)*SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)/(1.0_dp+ST)
           else
-             X(2)=X(2)*(one+X(5))/(one+ST)
-             X(4)=X(4)*(one+X(5))/(one+ST)
+             X(2)=X(2)*(1.0_dp+X(5))/(1.0_dp+ST)
+             X(4)=X(4)*(1.0_dp+X(5))/(1.0_dp+ST)
           endif
        ENDIF
     endif
@@ -637,9 +640,9 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     if(before.and.k%envelope) then
-       denf=(one+x(5))**5/SQRT((one+X(5))**2-Xp(1)**2-Xp(2)**2)
+       denf=(1.0_dp+x(5))**5/SQRT((1.0_dp+X(5))**2-Xp(1)**2-Xp(2)**2)
        b30=b2
-       b30=b30**c_1_5
+       b30=b30**1.5e0_dp
        b30=cflucf(el%p)*b30
        denf=denf*b30*FAC*DS
 
@@ -698,10 +701,10 @@ contains
     !endif
 
     if(k%SPIN) then
-       CO(1)=COS(OM(1)/TWO)
-       SI(1)=SIN(OM(1)/TWO)
-       CO(2)=COS(OM(2)/TWO)
-       SI(2)=SIN(OM(2)/TWO)
+       CO(1)=COS(OM(1)/2.0_dp)
+       SI(1)=SIN(OM(1)/2.0_dp)
+       CO(2)=COS(OM(2)/2.0_dp)
+       SI(2)=SIN(OM(2)/2.0_dp)
        CO(3)=COS(OM(3))
        SI(3)=SIN(OM(3))
 
@@ -768,10 +771,10 @@ contains
     !endif
 
     if(k%SPIN) then
-       CO(1)=COS(OM(1)/TWO)
-       SI(1)=SIN(OM(1)/TWO)
-       CO(2)=COS(OM(2)/TWO)
-       SI(2)=SIN(OM(2)/TWO)
+       CO(1)=COS(OM(1)/2.0_dp)
+       SI(1)=SIN(OM(1)/2.0_dp)
+       CO(2)=COS(OM(2)/2.0_dp)
+       SI(2)=SIN(OM(2)/2.0_dp)
        CO(3)=COS(OM(3))
        SI(3)=SIN(OM(3))
 
@@ -861,10 +864,10 @@ contains
     endif
 
     if(k%SPIN) then
-       CO(1)=COS(FAC*DS*OM(1)/TWO)
-       SI(1)=SIN(FAC*DS*OM(1)/TWO)
-       CO(2)=COS(FAC*DS*OM(2)/TWO)
-       SI(2)=SIN(FAC*DS*OM(2)/TWO)
+       CO(1)=COS(FAC*DS*OM(1)/2.0_dp)
+       SI(1)=SIN(FAC*DS*OM(1)/2.0_dp)
+       CO(2)=COS(FAC*DS*OM(2)/2.0_dp)
+       SI(2)=SIN(FAC*DS*OM(2)/2.0_dp)
        CO(3)=COS(FAC*DS*OM(3))
        SI(3)=SIN(FAC*DS*OM(3))
 
@@ -940,48 +943,48 @@ contains
     P%ag => C%PARENT_FIBRE%ag
     P%CHARGE=>C%PARENT_FIBRE%CHARGE
     ! DLDS IS  REALLY D(CT)/DS * (1/(ONE/BETA0+X(5)))
-    OM(2)=ZERO
-    EB=ZERO
-    BPA=ZERO
-    BPE=ZERO
-    B=ZERO
-    E=ZERO
+    OM(2)=0.0_dp
+    EB=0.0_dp
+    BPA=0.0_dp
+    BPE=0.0_dp
+    B=0.0_dp
+    E=0.0_dp
 
     xp(1)=x(2)
     xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
-    dlds=zero
+    dlds=0.0_dp
     CALL get_field(EL,B,E,X,k,POS)
 
     SELECT CASE(EL%KIND)
-    case(KIND2,kind5:kind7) ! Straight for all practical purposes
+    case(KIND2,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
 
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
     case(KIND16:kind17,KIND20)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
@@ -990,44 +993,42 @@ contains
        if(k%time) then
           beta0=p%beta0;GAMMA0I=p%GAMMA0I;
        else
-          beta0=one;GAMMA0I=zero;
+          beta0=1.0_dp;GAMMA0I=0.0_dp;
        endif
-       d1=root(x(2)**2+x(4)**2+(one+P%B0*x(1))**2)
-       d2=one+two*x(5)/beta0+x(5)**2
+       d1=root(x(2)**2+x(4)**2+(1.0_dp+P%B0*x(1))**2)
+       d2=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
        d2=gamma0I/beta0/d2
-       DLDS=root((ONE+d2**2))*d1/(ONE/BETA0+X(5))
+       DLDS=root((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+X(5))
        OM(2)=P%b0
-    case(KINDWIGGLER)
-       WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     case(KIND22)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/root(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/root((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case default
-       OM(1)=ZERO
-       OM(2)=ZERO
-       OM(3)=ZERO
+       OM(1)=0.0_dp
+       OM(2)=0.0_dp
+       OM(3)=0.0_dp
     END SELECT
 
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
-    GAMMA=P%BETA0/P%GAMMA0I*( ONE/P%BETA0 + X(5) )
+    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
 
-    OM(1)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(1) + (ONE+p%AG)*BPA(1) )
-    OM(2)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(2) + (ONE+p%AG)*BPA(2) )+OM(2)
-    OM(3)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(3) + (ONE+p%AG)*BPA(3) )
+    OM(1)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(1) + (1.0_dp+p%AG)*BPA(1) )
+    OM(2)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(2) + (1.0_dp+p%AG)*BPA(2) )+OM(2)
+    OM(3)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(3) + (1.0_dp+p%AG)*BPA(3) )
     
-    beta=(one+two*x(5)/p%beta0+x(5)**2)   !/(one/beta0+x(5))   beta*(one/beta0+x(5))
-    om(1)=-DLDS*half*e_muon*beta*(ed(2)*BPE(3)-ed(3)*BPE(2))/P%GAMMA0I +  om(1)
-    om(2)=-DLDS*half*e_muon*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
-    om(3)=-DLDS*half*e_muon*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
+    beta=(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)   !/(one/beta0+x(5))   beta*(one/beta0+x(5))
+    om(1)=-DLDS*0.5_dp*e_muon*beta*(ed(2)*BPE(3)-ed(3)*BPE(2))/P%GAMMA0I +  om(1)
+    om(2)=-DLDS*0.5_dp*e_muon*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
+    om(3)=-DLDS*0.5_dp*e_muon*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
     
     DO I=1,3
-       OM(I)=OM(I)-DLDS*(p%AG*GAMMA+GAMMA/(ONE+GAMMA))*EB(I)
+       OM(I)=OM(I)-DLDS*(p%AG*GAMMA+GAMMA/(1.0_dp+GAMMA))*EB(I)
     ENDDO
     if((k%radiation.or.k%envelope)) then
        !      if(P%RADIATION) then
@@ -1083,34 +1084,34 @@ contains
     P%ag => C%PARENT_FIBRE%ag
     P%CHARGE=>C%PARENT_FIBRE%CHARGE
     ! DLDS IS  REALLY D(CT)/DS * (1/(ONE/BETA0+X(5)))
-    OM(2)=ZERO
+    OM(2)=0.0_dp
     xp(1)=x(2)
     xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
-    dlds=zero
+    dlds=0.0_dp
 
     CALL get_field(EL,B,E,X,k,POS)
     SELECT CASE(EL%KIND)
-    case(KIND2,kind5:kind7) ! Straight for all practical purposes
+    case(KIND2,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-X(2)**2-X(4)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
     case(KIND16:kind17,KIND20)
        CALL B_PARA_PERP(k,el,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
@@ -1127,9 +1128,9 @@ contains
        !        pause 12
        !       enddo
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)*(one+P%b0*X(1))
+          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
        if(pos>=0) OM(2)=P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
@@ -1137,43 +1138,40 @@ contains
        if(k%time) then
           beta0=p%beta0;GAMMA0I=p%GAMMA0I;
        else
-          beta0=one;GAMMA0I=zero;
+          beta0=1.0_dp;GAMMA0I=0.0_dp;
        endif
-       d1=SQRT(x(2)**2+x(4)**2+(one+P%B0*x(1))**2)
-       d2=one+two*x(5)/beta0+x(5)**2
+       d1=SQRT(x(2)**2+x(4)**2+(1.0_dp+P%B0*x(1))**2)
+       d2=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
        d2=gamma0I/beta0/d2
-       DLDS=SQRT((ONE+d2**2))*d1/(ONE/BETA0+X(5))
+       DLDS=SQRT((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+X(5))
        OM(2)=P%b0
-    case(KINDWIGGLER)
-       WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
-
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     case(KIND22)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=ONE/SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=ONE/SQRT((ONE+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case default
-       OM(1)=ZERO
-       OM(2)=ZERO
-       OM(3)=ZERO
+       OM(1)=0.0_dp
+       OM(2)=0.0_dp
+       OM(3)=0.0_dp
     END SELECT
 
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
-    GAMMA=P%BETA0/P%GAMMA0I*( ONE/P%BETA0 + X(5) )
+    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
 
-    OM(1)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(1) + (ONE+p%AG)*BPA(1) )
-    OM(2)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(2) + (ONE+p%AG)*BPA(2) )+OM(2)
-    OM(3)=-DLDS*( (ONE+p%AG*GAMMA)*BPE(3) + (ONE+p%AG)*BPA(3) )
-    beta=(one+two*x(5)/p%beta0+x(5)**2)   !/(one/beta0+x(5))   beta*(one/beta0+x(5))
+    OM(1)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(1) + (1.0_dp+p%AG)*BPA(1) )
+    OM(2)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(2) + (1.0_dp+p%AG)*BPA(2) )+OM(2)
+    OM(3)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(3) + (1.0_dp+p%AG)*BPA(3) )
+    beta=(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)   !/(one/beta0+x(5))   beta*(one/beta0+x(5))
 
     e_muon_scale%r=e_muon
-    om(1)=-DLDS*half*e_muon_scale*(ed(2)*BPE(3)-ed(3)*BPE(2))/P%GAMMA0I +  om(1)
-    om(2)=-DLDS*half*e_muon_scale*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
-    om(3)=-DLDS*half*e_muon_scale*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
+    om(1)=-DLDS*0.5_dp*e_muon_scale*(ed(2)*BPE(3)-ed(3)*BPE(2))/P%GAMMA0I +  om(1)
+    om(2)=-DLDS*0.5_dp*e_muon_scale*beta*(ed(3)*BPE(1)-ed(1)*BPE(3))/P%GAMMA0I +  om(2)
+    om(3)=-DLDS*0.5_dp*e_muon_scale*beta*(ed(1)*BPE(2)-ed(2)*BPE(1))/P%GAMMA0I +  om(3)
 
    !     write(16,*) " bpe "
     !     do i=1,3
@@ -1191,7 +1189,7 @@ contains
     !       call print(bpa(i),30)
     !     enddo
     DO I=1,3
-       OM(I)=OM(I)-DLDS*(p%AG*GAMMA+GAMMA/(ONE+GAMMA))*EB(I)
+       OM(I)=OM(I)-DLDS*(p%AG*GAMMA+GAMMA/(1.0_dp+GAMMA))*EB(I)
     ENDDO
     if((k%radiation.or.k%envelope)) then
        !      if(P%RADIATION) then
@@ -1240,8 +1238,8 @@ contains
     REAL(DP) Z
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    B=ZERO
-    E=ZERO
+    B=0.0_dp
+    E=0.0_dp
 
     SELECT CASE(EL%KIND)
     case(KIND2,kind5:kind7,KIND16:kind17,KIND20) ! Straight for all practical purposes
@@ -1308,8 +1306,8 @@ contains
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     DO I=1,3
-       B(I)=ZERO
-       E(I)=ZERO
+       B(I)=0.0_dp
+       E(I)=0.0_dp
     ENDDO
 
     SELECT CASE(EL%KIND)
@@ -1370,13 +1368,13 @@ contains
 
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)=  (2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
-       B(2)=  (2*Pos+3)*EL%B_SOL*half*x(3);
-       B(3)=zero;
+       B(1)=  (2*Pos+3)*EL%B_SOL*0.5_dp*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)=  (2*Pos+3)*EL%B_SOL*0.5_dp*x(3);
+       B(3)=0.0_dp;
     else
-       b(1)=zero
-       b(2)=zero
-       b(3)=zero
+       b(1)=0.0_dp
+       b(2)=0.0_dp
+       b(3)=0.0_dp
     ENDIF
 
     select case(el%kind)
@@ -1386,8 +1384,8 @@ contains
           b(1)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
        endif
     case(kind20)  !! likemad=true
-       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
-       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/2.0_dp)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/2.0_dp)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
     case(kind16)  ! likemad=false
     end select
 
@@ -1404,13 +1402,13 @@ contains
     TYPE(INTERNAL_STATE) K
 
     IF(ASSOCIATED(EL%B_SOL)) THEN
-       B(1)= (2*Pos+3)*EL%B_SOL*half*x(1);    ! POS =-2,-1  (ENT, EXIT)
-       B(2)= (2*Pos+3)*EL%B_SOL*half*x(3);
-       B(3)=zero;
+       B(1)= (2*Pos+3)*EL%B_SOL*0.5_dp*x(1);    ! POS =-2,-1  (ENT, EXIT)
+       B(2)= (2*Pos+3)*EL%B_SOL*0.5_dp*x(3);
+       B(3)=0.0_dp;
     else
-       b(1)=zero
-       b(2)=zero
-       b(3)=zero
+       b(1)=0.0_dp
+       b(2)=0.0_dp
+       b(3)=0.0_dp
     ENDIF
 
     select case(el%kind)
@@ -1420,8 +1418,8 @@ contains
           b(1)=-TAN(EL%p%EDGE(pos+3))*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
        endif
     case(kind20)  !! likemad=true
-       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
-       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/two)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
+       b(2)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/2.0_dp)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(1)+b(2)
+       b(1)=-TAN(EL%p%EDGE(pos+3)-EL%p%b0*EL%p%LD/2.0_dp)*EL%p%DIR*EL%p%CHARGE*el%BN(1)*X(3)+b(1)
     case(kind16)  ! likemad=false
     end select
 
@@ -1439,7 +1437,7 @@ contains
     real(dp), allocatable :: an(:),bn(:)
     TYPE(INTERNAL_STATE) K
 
-    bz=zero
+    bz=0.0_dp
     IF(EL%P%BEND_FRINGE) then
        bz=-(2*Pos+3)*X(3)*EL%BN(1)
     endif
@@ -1452,11 +1450,11 @@ contains
     jmax=MIN(EL%p%NMUL,HIGHEST_FRINGE)+1
 
     allocate(an(jmax),bn(jmax))
-    an(1)=zero
-    bn(1)=zero
+    an(1)=0.0_dp
+    bn(1)=0.0_dp
     do j=2,jmax
        IF(J==2.AND.EL%P%BEND_FRINGE) then
-          an(j)=zero
+          an(j)=0.0_dp
           bn(j)= EL%AN(j-1)/(j-1)
        else
           an(j)=-EL%BN(j-1)/(j-1)
@@ -1488,7 +1486,7 @@ contains
     type(real_8), allocatable :: an(:),bn(:)
     TYPE(INTERNAL_STATE) K
 
-    bz=zero
+    bz=0.0_dp
     IF(EL%P%BEND_FRINGE) then
        bz=-(2*Pos+3)*X(3)*EL%BN(1)
     endif
@@ -1506,11 +1504,11 @@ contains
        call alloc(an(j))
        call alloc(bn(j))
     enddo
-    an(1)=zero
-    bn(1)=zero
+    an(1)=0.0_dp
+    bn(1)=0.0_dp
     do j=2,jmax
        IF(J==2.AND.EL%P%BEND_FRINGE) then
-          an(j)=zero
+          an(j)=0.0_dp
           bn(j)= EL%AN(j-1)/(j-1)
        else
           an(j)=-EL%BN(j-1)/(j-1)
@@ -1561,14 +1559,14 @@ contains
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;
     IF(ASSOCIATED(EL%B_SOL)) THEN
        B(3)=EL%B_SOL;
     ELSE
-       B(3)=ZERO
+       B(3)=0.0_dp
     ENDIF
     !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
     !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
@@ -1599,14 +1597,14 @@ contains
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;
     IF(ASSOCIATED(EL%B_SOL)) THEN
        B(3)=EL%B_SOL;
     ELSE
-       B(3)=ZERO
+       B(3)=0.0_dp
     ENDIF
     !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
     !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
@@ -1626,20 +1624,20 @@ contains
     real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
     integer J,ko
 
-    E=ZERO
-    B=ZERO
+    E=0.0_dp
+    B=0.0_dp
     IF(k%NOCAVITY) RETURN
 
     O=twopi*EL%freq/CLIGHT
-    VL=EL%volt*c_1d_3/EL%P%P0C
+    VL=EL%volt*1e-3_dp/EL%P%P0C
     do ko=1,el%nf
 
-       DF=ZERO
-       F=ONE
-       R2=ONE
+       DF=0.0_dp
+       F=1.0_dp
+       R2=1.0_dp
 
        DO I=1,EL%N_BESSEL
-          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          R2=-R2*(ko*O)**2/4.0_dp/(I+1)**2
           DR2=R2*I
           DF=DF+DR2*2
           R2=R2*(X(1)**2+X(3)**2)
@@ -1671,8 +1669,8 @@ contains
              BBYTW=BBYTWT
           ENDDO
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
@@ -1694,8 +1692,8 @@ contains
           BBXTW=X3*BBYTW+X1*BBXTW
           BBYTW=BBYTWT
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        E(3)=E(3)+EL%F(KO)*ko*O*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
@@ -1714,8 +1712,8 @@ contains
     integer J,KO
 
     DO I=1,3
-       E(I)=ZERO
-       B(I)=ZERO
+       E(I)=0.0_dp
+       B(I)=0.0_dp
     ENDDO
 
     IF(k%NOCAVITY) RETURN
@@ -1723,15 +1721,15 @@ contains
     CALL ALLOC(BBYTWT,BBXTW,BBYTW,x1,x3)
 
     O=twopi*EL%freq/CLIGHT
-    VL=EL%volt*c_1d_3/EL%P%P0C
+    VL=EL%volt*1e-3_dp/EL%P%P0C
     do ko=1,el%nf
 
-       DF=ZERO
-       F=ONE
-       R2=ONE
+       DF=0.0_dp
+       F=1.0_dp
+       R2=1.0_dp
 
        DO I=1,EL%N_BESSEL
-          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          R2=-R2*(ko*O)**2/4.0_dp/(I+1)**2
           DR2=R2*I
           DF=DF+DR2*2
           R2=R2*(X(1)**2+X(3)**2)
@@ -1763,8 +1761,8 @@ contains
              BBYTW=BBYTWT
           ENDDO
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
@@ -1786,8 +1784,8 @@ contains
           BBXTW=X3*BBYTW+X1*BBXTW
           BBYTW=BBYTWT
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        E(3)=E(3)+EL%F(KO)*ko*O*BBYTW/EL%P%P0C*sin(ko*O*x(6)+EL%PHAS+EL%phase0)
@@ -1810,7 +1808,7 @@ contains
 
     B(1)=X(1);
     B(2)=X(3);
-    B(3)=ZERO;
+    B(3)=0.0_dp;
 
     CALL trackg(EL%B(POS),B)
 
@@ -1830,7 +1828,7 @@ contains
 
     B(1)=X(1);
     B(2)=X(3);
-    B(3)=ZERO;
+    B(3)=0.0_dp;
 
     CALL trackg(EL%B(POS),B)
 
@@ -1869,7 +1867,7 @@ contains
     enddo
 
     IF(PRESENT(EF)) THEN
-       BE=ROOT(ONE+TWO*X(5)+X(5)**2)/(ONE/P%BETA0+X(5)) !  BUGGGGGGG CHECK
+       BE=ROOT(1.0_dp+2.0_dp*X(5)+X(5)**2)/(1.0_dp/P%BETA0+X(5)) !  BUGGGGGGG CHECK
        E=BE*E
        EFB(1)=EF(2)*E(3)-EF(3)*E(2)      ! BETA * E X e = Beta * E_perp
        EFB(2)=EF(3)*E(1)-EF(1)*E(3)
@@ -1906,7 +1904,7 @@ contains
     enddo
 
     IF(PRESENT(EF)) THEN
-       BE=SQRT(ONE+TWO*X(5)+X(5)**2)/(ONE/P%BETA0+X(5))
+       BE=SQRT(1.0_dp+2.0_dp*X(5)+X(5)**2)/(1.0_dp/P%BETA0+X(5))
        E(1)=BE*E(1);E(2)=BE*E(2);E(3)=BE*E(3);
        EFB(1)=EF(2)*E(3)-EF(3)*E(2)
        EFB(2)=EF(3)*E(1)-EF(1)*E(3)
@@ -1939,17 +1937,17 @@ contains
     !    CALL B2PERP(EL%P,B_F,X_MEC,X5,B2)
 
     IF(k%TIME) THEN
-       DP1=root(ONE+TWO*X(5)/P%BETA0+X(5)**2)
+       DP1=root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2)
     ELSE
-       DP1=ONE+X(5)
+       DP1=1.0_dp+X(5)
     ENDIF
 
     IF(EL%KIND/=KINDPA) THEN
 
        IF(ASSOCIATED(EL%B_SOL)) THEN  !SOLENOID
 
-          XPA(1)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)
-          XPA(2)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)
+          XPA(1)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)
+          XPA(2)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)
           N=root(DP1**2-Xpa(1)**2-Xpa(2)**2)
 
           E(1)=Xpa(1)/DP1
@@ -2005,7 +2003,7 @@ contains
        ENDIF
 
     ELSE    ! NON CANONICAL VARIABLES
-       H=ONE+P%B0*TEAPOT_LIKE*X(1)
+       H=1.0_dp+P%B0*TEAPOT_LIKE*X(1)
        N=root(H**2+X(2)**2+X(4)**2)
        E(1)=X(2)/N
        E(2)=X(4)/N
@@ -2041,17 +2039,17 @@ contains
     CALL ALLOC(N,H,DP1 )
 
     IF(k%TIME) THEN
-       DP1=SQRT(ONE+TWO*X(5)/P%BETA0+X(5)**2)
+       DP1=SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2)
     ELSE
-       DP1=ONE+X(5)
+       DP1=1.0_dp+X(5)
     ENDIF
 
     IF(EL%KIND/=KINDPA) THEN
 
        IF(ASSOCIATED(EL%B_SOL)) THEN  !SOLENOID
 
-          XPA(1)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/two)
-          XPA(2)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/two)
+          XPA(1)=(X(2)+EL%B_SOL*EL%P%CHARGE*X(3)/2.0_dp)
+          XPA(2)=(X(4)-EL%B_SOL*EL%P%CHARGE*X(1)/2.0_dp)
           N=SQRT(DP1**2-Xpa(1)**2-Xpa(2)**2)
 
           E(1)=Xpa(1)/DP1
@@ -2111,7 +2109,7 @@ contains
        ENDIF
 
     ELSE    ! NON CANONICAL VARIABLES
-       H=ONE+P%B0*TEAPOT_LIKE*X(1)
+       H=1.0_dp+P%B0*TEAPOT_LIKE*X(1)
        N=SQRT(H**2+X(2)**2+X(4)**2)
        E(1)=X(2)/N
        E(2)=X(4)/N
@@ -2664,7 +2662,7 @@ contains
     if(.not.ref0) then
        reference_ray=V%reference_ray
     else
-       reference_ray=zero
+       reference_ray=0.0_dp
        reference_ray(1)=t%ref(1)
        reference_ray(3)=t%ref(2)
     endif
@@ -2680,7 +2678,7 @@ contains
        v%reference_ray=XS_REF%x
     else
        v%u(2)=my_false
-       v%reference_ray=zero
+       v%reference_ray=0.0_dp
        v%reference_ray(1)=t%ref(3)
        v%reference_ray(3)=t%ref(4)
     endif
@@ -2690,8 +2688,8 @@ contains
     IF(V%U(1).OR.V%U(2)) RETURN
 
 
-    SC=ONE
-    IF(v%SCALE/=zero) SC=v%SCALE
+    SC=1.0_dp
+    IF(v%SCALE/=0.0_dp) SC=v%SCALE
     !      t=>B%POS(1)%NODE%previous
 
     V%r0=t%A+(reference_ray(1)-SC*reference_ray(1))*t%ENT(1,1:3)+ SC*X(1)*t%ENT(1,1:3)
@@ -2797,7 +2795,7 @@ contains
  
     if(c%cas==0) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
-       fac=half
+       fac=0.5_dp
        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
@@ -2870,7 +2868,7 @@ contains
 
     if(c%cas==0) then
        ds=c%parent_fibre%MAGp%L/c%parent_fibre%MAG%p%nst
-       fac=half
+       fac=0.5_dp
 if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,K)
        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
 if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
@@ -3075,9 +3073,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ENDIF
 
     END SELECT
@@ -3104,9 +3102,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/TWO)
+          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ENDIF
 
     END SELECT
@@ -3545,7 +3543,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
 
-    IF(TILTD==zero) RETURN
+    IF(TILTD==0.0_dp) RETURN
     IF(I==1) THEN
        YS=DIR*TILTD
        call rot_spin_Z(P,YS)
@@ -3564,7 +3562,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
 
-    IF(TILTD==zero) RETURN
+    IF(TILTD==0.0_dp) RETURN
     IF(I==1) THEN
        YS=DIR*TILTD
        call rot_spin_Z(P,YS)
@@ -3618,7 +3616,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     FIXT=x0
 
     do i=1,TURNS0
-       call track_probe(RING,fixt,stat,fibre1,node1)
+       call track_probe(RING,fixt,stat,fibre1=fibre1,node1=node1)
     enddo
     DO J=1,3
        s(1:3,j)=FIXT%S(J)%X(1:3)
@@ -3639,6 +3637,79 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
   END SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin
 
+  SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin_object(FIX,STATE,eps,TURNS,fibre1,node1,theta0)
+    ! Finds orbit without TPSA in State or compatible state
+    IMPLICIT NONE
+    TYPE(layout),pointer :: RING
+    type(probe) , intent(inOUT) :: FIX
+    type(probe)  FIXT
+    INTEGER , optional,intent(in) :: TURNS
+    type(fibre), optional, pointer :: fibre1
+    type(integration_node), optional, pointer :: node1
+    real(dp)  eps,x0(6),theta0r,s(3,3)
+    real(dp), optional,intent(inout) :: theta0
+    TYPE(INTERNAL_STATE), intent(in) :: STATE
+    TYPE(INTERNAL_STATE) stat
+    !    type(probe_8) xs
+    !    type(damapspin) ds
+    integer i,turns0,J
+
+    
+    if(present(fibre1)) then
+     ring=>fibre1%parent_layout
+    else
+     ring=>node1%parent_fibre%parent_layout
+    endif
+
+    turns0=1
+    theta0r=0.d0
+    if(present(turns)) turns0=turns
+    x0=FIX%x
+    stat=state
+    call find_orbit_x(x0,STATE,eps,TURNS,fibre1,node1)
+
+    stat=state+spin0 !+spin_only0
+
+    FIX=x0
+
+    !        call init(stat,1,0)
+
+    !        call alloc(xs)
+    !        call alloc(ds)
+
+    !        ds=1
+    !        xs= FIX + ds
+
+    !        do i=1,TURNS0
+    !         call track_probe(RING,xs,stat,fibre1,node1)
+    !        enddo
+
+    !        ds=xs
+
+    !         DO J=1,3
+    FIXT=x0
+
+    do i=1,TURNS0
+       call track_probe(fixt,stat,fibre1=fibre1,node1=node1)
+    enddo
+    DO J=1,3
+       s(1:3,j)=FIXT%S(J)%X(1:3)
+    ENDDO
+    !         ENDDO
+
+
+
+    call get_spin_n0(S,theta0r,FIX%s(1)%x)
+    FIX%s(2)%x=FIX%s(1)%x
+    FIX%s(3)%x=FIX%s(1)%x
+    if(present(theta0)) theta0=theta0r
+
+    !        call kill(xs)
+    !        call kill(ds)
+
+
+
+  END SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin_object
 
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,STATE,eps,TURNS,fibre1,node1) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
@@ -3666,7 +3737,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     TURNS0=1
     trackflag=0
     IF(PRESENT(TURNS)) TURNS0=TURNS
-    freq=zero
+    freq=0.0_dp
     APERTURE=c_%APERTURE_FLAG
     c_%APERTURE_FLAG=.false.
 
@@ -3683,9 +3754,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
        ! call !write_e(100)
     endif
-    dix(:)=zero
-    tiny=c_1d_40
-    xdix0=c_1d4*DEPS_tracking
+    dix(:)=0.0_dp
+    tiny=1e-40_dp
+    xdix0=1e4_dp*DEPS_tracking
     NO1=1
 
     if(.not.present(STATE)) then
@@ -3700,12 +3771,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1)=" No Cavity in the Line "
-          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          ! call !write_e(101)
+          
+          messagelost= " No Cavity in the Line "
+          check_stable=.false.
+          return
+ 
        ENDIF
     else   ! (.not.present(STATE)) t
        IF(STATE%NOCAVITY) THEN
@@ -3713,8 +3783,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           STAT=STATE+only_4d0
           if(state%radiation) then
              check_stable=.false.
-             write(6,*) " Cavity needed when radiation present "
-             write(6,*) " FIND_ORBIT_LAYOUT will crash "
+
              messagelost= " Cavity needed when radiation present "
              return
           endif
@@ -3727,13 +3796,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C=>C%NEXT
           enddo
           check_stable=.false.
+          messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+         return
 
-          write(6,*) " No Cavity in the Line "
-          write(6,*) " FIND_ORBIT_LAYOUT will crash "
-          messagelost= " No cavity in the line "
-          write(6,*) " State is changed to allow a coasting beam calculation "
-
-          stop 456
        ENDIF
     endif
 101 continue
@@ -3741,14 +3806,14 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     if((stat%totalpath==1).and.(.not.stat%nocavity)) then
        C=>RING%START
-       freq=zero
+       freq=0.0_dp
        i=1
-       xdix=zero
+       xdix=0.0_dp
        do while(i<=RING%n)
           if(associated(c%magp%freq)) then
-             IF(FREQ==ZERO) THEN
+             IF(FREQ==0.0_dp) THEN
                 freq=c%magp%freq
-             ELSEIF(c%magp%freq/=ZERO.AND.c%magp%freq<FREQ) THEN
+             ELSEIF(c%magp%freq/=0.0_dp.AND.c%magp%freq<FREQ) THEN
                 freq=c%magp%freq
              ENDIF
           endif
@@ -3762,13 +3827,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           c=>c%next
           i=i+1
        enddo
-       if(freq==zero) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1X,a72))'
-          w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
-          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          ! call !write_e(113)
+       if(freq==0.0_dp) then
+          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+         check_stable=.false.
+         return
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
@@ -3826,7 +3888,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     !    write(6,*) x
     x(6)=x(6)-freq*turns0
 
-    mx=zero
+    mx=0.0_dp
     DO J=1,ND2
        Y=FIX
        Y(J)=FIX(J)+EPS
@@ -3835,7 +3897,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           !!       xs%x=y
           call TRACK_probe_X(Ring,Y,stat,fibre1=fibre1,node1=node1)
           if(.not.check_stable) then
-             messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking small rays around the guessed orbit "
+             messagelost(len_trim(messagelost)+1:255)=" -> Unstable while tracking small rays around the guessed orbit "
              !   fixed_found=my_false
              c_%APERTURE_FLAG=APERTURE
              return
@@ -3862,7 +3924,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     SX=MX;
     DO I=1,nd2   !  6 before
-       SX(I,I)=MX(I,I)-one
+       SX(I,I)=MX(I,I)-1.0_dp
     ENDDO
 
     DO I=1,ND2
@@ -3871,15 +3933,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     CALL matinv(SX,SXI,ND2,6,ier)
     IF(IER==132)  then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" Inversion failed in FIND_ORBIT_LAYOUT_noda"
-       ! call !write_e(333)
+       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+        check_stable=.false.
        return
     endif
 
-    x=zero
+    x=0.0_dp
     do i=1,nd2
        do j=1,nd2
           x(i)=sxi(i,j)*dix(j)+x(i)
@@ -3890,16 +3949,13 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        FIX(I)=FIX(I)+DIX(I)
     ENDDO
 
-    xdix=zero
+    xdix=0.0_dp
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
     !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
     !    pause 123321
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,a72))'
-    write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
+  !  if(verbose) write(6,*) " Convergence Factor = ",xdix
     if(xdix.gt.deps_tracking) then
        ite=1
     else
@@ -3933,6 +3989,294 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     c_%APERTURE_FLAG=APERTURE
 
   END SUBROUTINE FIND_ORBIT_LAYOUT_noda
+
+  SUBROUTINE FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,fibre1,node1) ! Finds orbit without TPSA in State or compatible state
+    IMPLICIT NONE
+    TYPE(layout),pointer :: RING
+    real(dp) , intent(inOUT) :: FIX(6)
+    INTEGER , optional,intent(in) :: TURNS
+    type(fibre), optional, pointer :: fibre1
+    type(integration_node), optional, pointer :: node1
+    real(dp)  eps
+    TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
+    TYPE(INTERNAL_STATE) stat
+
+    real(dp)  DIX(6),xdix,xdix0,tiny,freq
+    real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
+    integer NO1,ND2,I,IU,ITE,ier,j,ITEM
+    TYPE (fibre), POINTER :: C
+    TYPE (integration_node), POINTER :: t
+    logical(lp) APERTURE
+    INTEGER TURNS0,trackflag
+    
+    if(present(fibre1)) then
+     ring=>fibre1%parent_layout
+    else
+     ring=>node1%parent_fibre%parent_layout
+    endif
+
+    !    fixed_found=my_true
+    !!    type(probe) xs
+    if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
+    !!    xs%x=zero
+    !!    xs%s%x=zero
+
+    TURNS0=1
+    trackflag=0
+    IF(PRESENT(TURNS)) TURNS0=TURNS
+    freq=0.0_dp
+    APERTURE=c_%APERTURE_FLAG
+    c_%APERTURE_FLAG=.false.
+
+    !!    call move_to(ring,c,loc)
+    !!    loct=c%t1%pos
+
+
+    Nullify(C);
+
+    if(.not.ring%closed) then
+       w_p=0
+       w_p%nc=1
+       w_p%fc='((1X,a72))'
+       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
+       ! call !write_e(100)
+    endif
+    dix(:)=0.0_dp
+    tiny=1e-40_dp
+    xdix0=1e4_dp*DEPS_tracking
+    NO1=1
+
+    if(.not.present(STATE)) then
+       IF(default%NOCAVITY) THEN
+          !    ND1=2
+          stat=default+    only_4d
+       ELSE
+          !   ND1=3
+          STAT=default
+          C=>RING%START
+          do i=1,RING%n
+             if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
+             C=>C%NEXT
+          enddo
+          
+          messagelost= " No Cavity in the Line "
+          check_stable=.false.
+          return
+ 
+       ENDIF
+    else   ! (.not.present(STATE)) t
+       IF(STATE%NOCAVITY) THEN
+          ND2=4
+          STAT=STATE+only_4d0
+          if(state%radiation) then
+             check_stable=.false.
+
+             messagelost= " Cavity needed when radiation present "
+             return
+          endif
+       ELSE
+          ND2=6
+          STAT=STATE
+          C=>RING%START
+          do i=1,RING%n
+             if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
+             C=>C%NEXT
+          enddo
+          check_stable=.false.
+          messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+         return
+
+       ENDIF
+    endif
+101 continue
+
+
+    if((stat%totalpath==1).and.(.not.stat%nocavity)) then
+       C=>RING%START
+       freq=0.0_dp
+       i=1
+       xdix=0.0_dp
+       do while(i<=RING%n)
+          if(associated(c%magp%freq)) then
+             IF(FREQ==0.0_dp) THEN
+                freq=c%magp%freq
+             ELSEIF(c%magp%freq/=0.0_dp.AND.c%magp%freq<FREQ) THEN
+                freq=c%magp%freq
+             ENDIF
+          endif
+          IF(stat%TIME) THEN
+             XDIX=XDIX+c%mag%P%LD/c%BETA0
+          ELSE
+             XDIX=XDIX+c%mag%P%LD
+          ENDIF
+
+
+          c=>c%next
+          i=i+1
+       enddo
+       if(freq==0.0_dp) then
+          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+         check_stable=.false.
+         return
+       endif
+       IF(RING%HARMONIC_NUMBER>0) THEN
+          FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
+          STOP 476
+       ELSE
+          !   fancy way
+          stat=stat+nocavity0
+          x=fix
+          if(present(fibre1)) then
+             call FIND_ORBIT(RING,x,fibre1%pos,stat,1.e-6_dp)
+             x(6)=0.d0
+             call track(RING,x,fibre1%pos,stat)
+             xdix=x(6)
+          else
+             CALL move_to_INTEGRATION_NODE( Ring%T,t,t%pos )
+             call FIND_ORBIT(RING,x,t%parent_fibre%pos,stat,1.e-6_dp)
+             x(6)=0.d0
+             call track(RING,x,t%parent_fibre%pos,stat)
+             xdix=x(6)
+          endif
+          stat=stat-nocavity0
+          !   end of fancy way
+          XDIX=XDIX*FREQ/CLIGHT
+          write(6,*) NINT(xdix)
+          FREQ=NINT(XDIX)*CLIGHT/FREQ
+          WRITE(6,*) " FREQ ",FREQ
+       ENDIF
+    endif
+
+
+
+    ITEM=0
+3   continue
+    ITEM=ITEM+1
+    X=FIX
+
+    DO I=1,TURNS0
+       !       CALL TRACK(RING,X,LOC,STAT)
+       !       trackflag=TRACK_flag(RING,X,LOC,STAT)
+       !!       xs%x=x
+       call TRACK_probe_X(x,stat,fibre1=fibre1,node1=node1)
+       if(.not.check_stable) then
+          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
+          c_%APERTURE_FLAG=APERTURE
+          return
+       endif
+       !     write(6,*) item,check_stable
+       !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
+       !!       x=xs%x
+       !       if(trackflag/=0) then
+       !         ITEM=MAX_FIND_ITER+100
+       !       endif
+
+    ENDDO
+    !    write(6,*) x
+    x(6)=x(6)-freq*turns0
+
+    mx=0.0_dp
+    DO J=1,ND2
+       Y=FIX
+       Y(J)=FIX(J)+EPS
+       DO I=1,TURNS0
+          !          CALL TRACK(RING,Y,LOC,STAT)
+          !!       xs%x=y
+          call TRACK_probe_X(Y,stat,fibre1=fibre1,node1=node1)
+          if(.not.check_stable) then
+             messagelost(len_trim(messagelost)+1:255)=" -> Unstable while tracking small rays around the guessed orbit "
+             !   fixed_found=my_false
+             c_%APERTURE_FLAG=APERTURE
+             return
+          endif
+          !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
+          !!       y=xs%x
+          !          if(.not.check_stable) then
+          !             w_p=0
+          !             w_p%nc=1
+          !             w_p%fc='((1X,a72))'
+          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
+          !             ! call ! WRITE_I
+
+          !             return
+          !          endif
+       ENDDO
+       y(6)=y(6)-freq*turns0
+
+       do i=1,ND2
+          MX(I,J)=(Y(i)-X(i))/eps
+       enddo
+
+    ENDDO
+
+    SX=MX;
+    DO I=1,nd2   !  6 before
+       SX(I,I)=MX(I,I)-1.0_dp
+    ENDDO
+
+    DO I=1,ND2
+       DIX(I)=FIX(I)-X(I)
+    enddo
+
+    CALL matinv(SX,SXI,ND2,6,ier)
+    IF(IER==132)  then
+       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+        check_stable=.false.
+       return
+    endif
+
+    x=0.0_dp
+    do i=1,nd2
+       do j=1,nd2
+          x(i)=sxi(i,j)*dix(j)+x(i)
+       enddo
+    enddo
+    dix=x
+    DO  I=1,ND2
+       FIX(I)=FIX(I)+DIX(I)
+    ENDDO
+
+    xdix=0.0_dp
+    do iu=1,ND2
+       xdix=abs(dix(iu))+xdix
+    enddo
+    !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
+    !    pause 123321
+  !  if(verbose) write(6,*) " Convergence Factor = ",xdix
+    if(xdix.gt.deps_tracking) then
+       ite=1
+    else
+       if(xdix.ge.xdix0.or.xdix<=tiny) then
+          ite=0
+       else
+          ite=1
+          xdix0=xdix
+       endif
+    endif
+
+    if(iteM>=MAX_FIND_ITER)  then
+       !   C_%stable_da=.FALSE.
+       !      IF(iteM==MAX_FIND_ITER+100) THEN
+       !        write(6,*) " Unstable in find_orbit without TPSA"
+       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       xlost=fix
+       check_stable=my_false
+       !     ENDIF
+       ITE=0
+    endif
+    !   write(6,*) item,xdix,xdix0,tiny
+
+    if(ite.eq.1)  then
+       GOTO 3
+
+    endif
+
+
+    !    FIX(6)=FIX(6)+freq*turns0
+    c_%APERTURE_FLAG=APERTURE
+
+  END SUBROUTINE FIND_ORBIT_LAYOUT_noda_object
+
 
   !   backward compatible routine for radiation
 
@@ -4033,7 +4377,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           write(6,*) k,"$$$$$$$$$$$$$$$$$$$$$$$$$"
           do i=1,3
              norm=root(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
-             if(norm>=zero) then
+             if(norm>=0.0_dp) then
                 norm=1.d0/norm
              endif
              write(6,*) 1.d0/norm
@@ -4042,7 +4386,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        endif ! kp
     enddo
 
-    norm0=zero
+    norm0=0.0_dp
     do i=1,3
        norm=root(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
        if(norm>=norm0) then
@@ -4092,10 +4436,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     DT0=XT%xs%X(6)
     CALL DRIFT_BACK_TO_POSITION(T,XT%Ds,XT%xs%X,k)
-    XT%Ds=ZERO
+    XT%Ds=0.0_dp
     DT0=XT%xs%X(6)-DT0
 
-    YL=zero
+    YL=0.0_dp
 
     DO WHILE(DT0<=DT)
        XTT=XT%xs%X
@@ -4168,7 +4512,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     if(associated(XT%NODE%ENT)) then
        ! computing global position
 
-       XT%pos=ZERO
+       XT%pos=0.0_dp
        DO I=1,3
           XT%POS(i)=XT%POS(i) + XT%XS%X(1)*XT%NODE%ENT(1,I)     !
           XT%POS(i)=XT%POS(i) + XT%XS%X(3)*XT%NODE%ENT(2,I)     !
@@ -4177,15 +4521,15 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        XT%pos(1:3) = XT%pos(1:3) + XT%NODE%A
        ! computing global momentum
        if(k%time) then
-          betinv=one/XT%NODE%PARENT_FIBRE%beta0
+          betinv=1.0_dp/XT%NODE%PARENT_FIBRE%beta0
        ELSE
-          betinv=one
+          betinv=1.0_dp
        ENDIF
        P(1)=XT%XS%X(2)*XT%NODE%PARENT_FIBRE%mag%p%p0c
        P(2)=XT%XS%X(4)*XT%NODE%PARENT_FIBRE%mag%p%p0c
        !       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c* &
        !            (one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-xt%pos(4)**2-xt%pos(5)**2
-       pz=(one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-XT%XS%X(2)**2-XT%XS%X(4)**2
+       pz=(1.0_dp+2.0_dp*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-XT%XS%X(2)**2-XT%XS%X(4)**2
        pz=XT%NODE%PARENT_FIBRE%mag%p%p0c*root(pz)*XT%NODE%PARENT_FIBRE%DIR
        P(3)=PZ
        DO I=1,3
@@ -4232,7 +4576,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     b%n=n
     b%a=GLOBAL_origin
     b%ent=global_frame
-    b%total_time=zero
+    b%total_time=0.0_dp
     b%p0c=p0c
     nullify(b%c)
 
@@ -4247,12 +4591,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     type(temporal_probe), intent(inout):: p
 
     p%xs%u=my_false
-    p%xs%x=zero
+    p%xs%x=0.0_dp
     p%xs%s(1)=0
     p%xs%s(2)=0
     p%xs%s(3)=0
-    p%ds=zero
-    p%pos=zero
+    p%ds=0.0_dp
+    p%pos=0.0_dp
     nullify(p%node)
     nullify(p%xs%lost_node)
 
@@ -4268,7 +4612,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     type(internal_state) :: k
 
     if(k%totalpath/=1) then
-       write(6,*) " One must use total path or time "
+       write(6,*) " 1.0_dp must use total path or time "
        write(6,*) " execution stopped in position_temporal_beam "
        stop 101
     endif
@@ -4291,7 +4635,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     enddo
 
     do i=1,b%n
-       b%tp(i)%pos(1:3)=zero
+       b%tp(i)%pos(1:3)=0.0_dp
        !      GEO_TRA(A,ENT,D,I)    ! A= A +I D*ENT     I=1,-1
        ! puts the particle in the frame ent around the point a
        call GEO_TRA(b%tp(i)%pos(1:3),b%ent,b%tp(i)%xs%x(1:3),1)
@@ -4344,7 +4688,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     ! some gymnastic if behind the integration node
     if(tw%parent_fibre%dir>0) then
 
-       if(dal(3)<zero) then
+       if(dal(3)<0.0_dp) then
           tw=>tw%previous
           do while(tw%cas/=case0)
              tw=>tw%previous
@@ -4355,7 +4699,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     else
 
-       if(dal(3)>zero) then
+       if(dal(3)>0.0_dp) then
           tw=>tw%previous
           do while(tw%cas/=case0)
              tw=>tw%previous
@@ -4393,11 +4737,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     ! nor x', y' for pancake
 
     d1=dal(1)**2+dal(2)**2+dal(3)**2
-    betinv=one/tw%parent_fibre%beta0
+    betinv=1.0_dp/tw%parent_fibre%beta0
 
     if(b%state%time) then
 
-       b%tp(j)%xs%x(5)=(d1-one)/ (root(betinv**2-one +d1)+betinv)
+       b%tp(j)%xs%x(5)=(d1-1.0_dp)/ (root(betinv**2-1.0_dp +d1)+betinv)
        b%tp(j)%xs%x(2)=dal(1)
        b%tp(j)%xs%x(4)=dal(2)
        b%tp(j)%xs%x(1)=p(1)
@@ -4405,7 +4749,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        b%tp(j)%xs%x(6)=b%total_time
 
     else
-       b%tp(j)%xs%x(5)=root(d1)-one
+       b%tp(j)%xs%x(5)=root(d1)-1.0_dp
        b%tp(j)%xs%x(2)=dal(1)
        b%tp(j)%xs%x(4)=dal(2)
        b%tp(j)%xs%x(1)=p(1)
@@ -4472,7 +4816,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     m=p8%x
     mat=m
 
-    s_ij_out=zero
+    s_ij_out=0.0_dp
     s_ij_out=s_ij_in + p8%e_ij
     s_ij_out=matmul(mat,s_ij_out)
     mat=transpose(mat)
@@ -4501,16 +4845,16 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        do j=1,c_%nd
           i1=2*i-1
           i2=2*j-1
-          h%h=h%h+ s_ij_in(i1,i2)*(one.mono.(i1+1))*(one.mono.(i2+1))
+          h%h=h%h+ s_ij_in(i1,i2)*(1.0_dp.mono.(i1+1))*(1.0_dp.mono.(i2+1))
           i1=2*i
           i2=2*j
-          h%h=h%h+ s_ij_in(i1,i2)*(one.mono.(i1-1))*(one.mono.(i2-1))
+          h%h=h%h+ s_ij_in(i1,i2)*(1.0_dp.mono.(i1-1))*(1.0_dp.mono.(i2-1))
           i1=2*i-1
           i2=2*j
-          h%h=h%h-s_ij_in(i1,i2)*(one.mono.(i1+1))*(one.mono.(i2-1))
+          h%h=h%h-s_ij_in(i1,i2)*(1.0_dp.mono.(i1+1))*(1.0_dp.mono.(i2-1))
           i1=2*i
           i2=2*j-1
-          h%h=h%h- s_ij_in(i1,i2)*(one.mono.(i1-1))*(one.mono.(i2+1))
+          h%h=h%h- s_ij_in(i1,i2)*(1.0_dp.mono.(i1-1))*(1.0_dp.mono.(i2+1))
        enddo
     enddo
     call print(h%h,6)
@@ -4518,12 +4862,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     norm=full_abs(h%h)
     write(6,*) " norm ",norm
 
-    sca=one/ten
+    sca=1.0_dp/10.0_dp
 
     h%h=sca/norm*h%h
 
     i=2
-    h%h=crash*( (one.mono.(2*i-1))**2+(one.mono.(2*i))**2 ) + h%h
+    h%h=crash*( (1.0_dp.mono.(2*i-1))**2+(1.0_dp.mono.(2*i))**2 ) + h%h
 
     id=1
 

@@ -1,15 +1,15 @@
 !The Polymorphic Tracking Code
 !Copyright (C) Etienne Forest and CERN
 
-module S_fitting
+module S_fitting 
   USE MAD_LIKE
   IMPLICIT NONE
   public
   PRIVATE FIND_ORBIT_LAYOUT, FIND_ORBIT_LAYOUT_noda
   logical(lp), PRIVATE :: VERBOSE = .false.
   integer :: max_fit_iter=20, ierror_fit=0, max_fiND_iter=40
-  real(dp) :: fuzzy_split=one
-  real(dp) :: max_ds=zero
+  real(dp) :: fuzzy_split=1.0_dp
+  real(dp) :: max_ds=0.0_dp
   integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
   ! 2  space charge algorithm
   logical(lp) :: radiation_bend_split=my_false
@@ -35,8 +35,8 @@ contains
 
     STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
 
-    closed=zero
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    closed=0.0_dp
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
     CALL INIT(STATE,2,0,BERZ)
@@ -80,8 +80,8 @@ contains
 
     STATE=my_state
   
-    closed=zero
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    closed=0.0_dp
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     WRITE(6,'(6(1x,g21.14))') CLOSED
     CALL INIT(STATE,1,0,BERZ)
@@ -99,10 +99,10 @@ contains
     WRITE(6,'(6(1x,g21.14),a24)') CLOSED," <-- should be identical"
     if(mf==6) then
      WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
-     if(norm%tune(3)/=zero.and.c_%ndpt==0) &
+     if(norm%tune(3)/=0.0_dp.and.c_%ndpt==0) &
      WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
      else
-     if(norm%tune(3)/=zero.and.c_%ndpt==0) then
+     if(norm%tune(3)/=0.0_dp.and.c_%ndpt==0) then
        WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:3)
      else
        WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:2)
@@ -137,9 +137,9 @@ contains
 
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
 
-    closed=zero
+    closed=0.0_dp
     closed(5)=del
-    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -215,12 +215,12 @@ contains
        allocate(expo3(6),expo4(6))
     endif
 
-    expo1=zero;expo2=zero;
-    expo3=zero;expo4=zero;
+    expo1=0.0_dp;expo2=0.0_dp;
+    expo3=0.0_dp;expo4=0.0_dp;
 
-    closed=zero
+    closed=0.0_dp
     closed(5)=del
-    CALL FIND_ORBIT(R,CLOSED,pos,my_state,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,pos,my_state,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -261,9 +261,9 @@ contains
 
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
 
-    closed=zero
+    closed=0.0_dp
     closed(5)=del
-    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -319,25 +319,25 @@ contains
 
     if(.not.associated(beta))   ALLOCATE(BETA(2,3,R%N))
 
-eta1=zero
-eta2=zero
+eta1=0.0_dp
+eta2=0.0_dp
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
     state=state+delta0
 
     if(present(clos)) then
        closed=clos
     else
-       closed=zero
+       closed=0.0_dp
     endif
     if(pos/=0) then
-       CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+       CALL FIND_ORBIT(R,CLOSED,pos,STATE,1e-5_dp)
        write(6,*) "closed orbit "
        write(6,*) CLOSED
     else
        write(6,*) " Using a map "
     endif
-    DBETA=ZERO
-    dbetamax=zero
+    DBETA=0.0_dp
+    dbetamax=0.0_dp
     CALL INIT(STATE,1,0,BERZ)
 
     CALL ALLOC(NORM)
@@ -359,8 +359,8 @@ eta2=zero
     endif
     NORM=id
     if(present(a)) then
-       a=zero
-       ai=zero
+       a=0.0_dp
+       ai=0.0_dp
        a=norm%a_t
        ai=norm%a_t**(-1)
        id=y
@@ -388,7 +388,7 @@ eta2=zero
              db2=ABS(beta(2,2,i-pos+1)-beta(1,2,i-pos+1))/beta(1,2,i-pos+1)
              db31=ABS(beta(1,3,i-pos+1))
              db32=ABS(beta(2,3,i-pos+1)-beta(1,3,i-pos+1))
-             DBETA=(db1+db2)/TWO+dbeta
+             DBETA=(db1+db2)/2.0_dp+dbeta
              eta1=db31+eta1
              eta2=db32+eta2
              if( db1>dbetamax) dbetamax=db1
@@ -460,7 +460,7 @@ eta2=zero
 
     STATE=my_state+nocavity0
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
 
     CALL INIT(STATE,no,0)
 
@@ -505,7 +505,7 @@ eta2=zero
 
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
 
     CALL INIT(STATE,1,0,BERZ)
 
@@ -520,9 +520,9 @@ eta2=zero
     NORM=Y
 
     Write(6,*) " Tunes ",norm%tune(1:2)
-    A=ZERO
-    AI=ZERO
-    MAT=ZERO
+    A=0.0_dp
+    AI=0.0_dp
+    MAT=0.0_dp
     a=norm%a_t
     AI=norm%a_t**(-1)
     id=y
@@ -600,12 +600,12 @@ eta2=zero
     !   ENDDO
 
 
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -667,16 +667,16 @@ eta2=zero
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
 
     g=g.oo.(-1)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -744,12 +744,12 @@ eta2=zero
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -811,16 +811,16 @@ eta2=zero
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
 
     g=g.oo.(-1)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -880,12 +880,12 @@ eta2=zero
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) CLOSED
 
@@ -939,16 +939,16 @@ eta2=zero
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
 
     g=g.oo.(-1)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -1032,10 +1032,10 @@ eta2=zero
     it=0
 100 continue
     it=it+1
-    mat=zero
-    v0=zero
+    mat=0.0_dp
+    v0=0.0_dp
     do i=1,np
-       mat(i,i)=one
+       mat(i,i)=1.0_dp
     enddo
 
     do kb=1,kbmax
@@ -1052,9 +1052,9 @@ eta2=zero
        write(6,*) " np in batch ",kb," = ",npi
        !         pause 1
 
-       CLOSED(:)=zero
+       CLOSED(:)=0.0_dp
 
-       CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+       CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
        write(6,*) "closed orbit ", CHECK_STABLE
        write(6,*) CLOSED
 
@@ -1098,7 +1098,7 @@ eta2=zero
           eq(2+2*i)=       ((vr%sin%v(2)).par.jt)
        enddo
 
-       epsnow=zero
+       epsnow=0.0_dp
        do i=1,neq
           epsnow=abs(eq(i))+epsnow
           if(kb==1) then
@@ -1159,7 +1159,7 @@ eta2=zero
     !    pause 2001
 
     v0=matmul(mat,v0)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=v0
 
     SET_TPSAFIT=.true.
@@ -1235,12 +1235,12 @@ eta2=zero
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) CLOSED
 
@@ -1283,7 +1283,7 @@ eta2=zero
        eq(2+2*i)=       ((vr%sin%v(2)).par.jt)
     enddo
 
-    epsnow=zero
+    epsnow=0.0_dp
     do i=1,neq
        epsnow=abs(eq(i))+epsnow
     enddo
@@ -1319,10 +1319,10 @@ eta2=zero
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -1390,12 +1390,12 @@ eta2=zero
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) CLOSED
 
@@ -1460,10 +1460,10 @@ eta2=zero
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -1510,13 +1510,13 @@ eta2=zero
     REAL(DP) PREC,EMIT0(2),STR
     INTEGER NO,MF,MRES(4)
 
-    PREC=c_1d_10
+    PREC=1e-10_dp
 
     STATE=((((my_state+nocavity0)-delta0)+only_4d0)-RADIATION0)
 
 
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -1570,23 +1570,20 @@ eta2=zero
 
   !          call lattice_random_error(my_ring,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
 
-  subroutine lattice_random_error(R,nom,i1,i2,cut,n,addi,integrated,cn,cns,per)
+
+
+  subroutine lattice_random_error_new(R,nom,full,iseed,cut,n,addi,integrated,cn,cns,per,pr)
     use gauss_dis
     IMPLICIT NONE
     TYPE(layout),target, intent(inout):: R
-    integer n,addi,ic,i,i1,i2,j
+    integer n,addi,ic,i,iseed,j
     character(nlp) nom
     type(fibre), pointer :: p
-    logical(lp) integrated,f1,f2
+    logical(lp) integrated,f1,f2,full,pr
     real(dp) x,bn,cn,cns,cut,per
 
-    if(i1>i2) then
-       Write(6,*) " error i1 > i2 ",i1,i2
-       return
-    elseif(i2>nlp)then
-       Write(6,*) " error i2 > nlp ",i2,nlp
-       return
-    endif
+    if(iseed/=0) call gaussian_seed(iseed)
+
 
     call context(nom)
 
@@ -1595,46 +1592,50 @@ eta2=zero
     do i=1,r%n
        f1=.false.
        f2=.false.
-       if(i1>=0) then
-          f1=(p%mag%name(i1:i2)==nom(i1:i2))
-       else
+       if(full) then
           f1=(p%mag%name ==nom )
+       else
+          f1=(   index(p%mag%name,nom(1:len_trim(nom)))   >0)
        endif
 
 
        if(f1) then
           call GRNF(X,cut)
           bn=cns+cn*x
-          if(integrated.and.p%mag%p%ld/=zero) then
+          if(integrated.and.p%mag%p%ld/=0.0_dp) then
              bn=bn/p%mag%l
           endif
-          if(bn/=zero) call add(p,n,addi,bn)
+          if(bn/=0.0_dp) call add(p,n,addi,bn)
           f2=.true.
        endif
 
-       if(f1.and.per/=zero ) then
+       if(f1.and.per/=0.0_dp) then
           call GRNF(X,cut)
           do j=p%mag%p%nmul,1,-1
              !        if(n>0) then
              bn=p%mag%bn(j)
-             bn=bn*(one+x*per)
+             bn=bn*(1.0_dp+x*per)
              call add(p,j,0,bn)
              !        else
              bn=p%mag%an(j)
-             bn=bn*(one+x*per)
+             bn=bn*(1.0_dp+x*per)
              !        endif
              call add(p,-j,0,bn)
 
           enddo
           f2=.true.
        endif
-       if(f2) ic=ic+1
+       if(f2) then 
+         ic=ic+1
+        if(pr) write(6,*) p%mag%name
+       endif
        p=>P%next
     enddo
 
-    write(6,*) ic," Magnets modified "
+   if(pr) write(6,*) ic," Magnets modified "
 
-  end  subroutine lattice_random_error
+  end  subroutine lattice_random_error_new
+
 
   subroutine toggle_verbose
     implicit none
@@ -1668,7 +1669,7 @@ eta2=zero
     c_%stable_da=.true.
     c_%check_da=.true.
     TURNS0=1
-    freq=zero
+    freq=0.0_dp
     IF(PRESENT(TURNS)) TURNS0=TURNS
     Nullify(C);
     if(.not.ring%closed) then
@@ -1678,9 +1679,9 @@ eta2=zero
        w_p%c(1)= " This line is not ring : FIND_ORBIT_LAYOUT "
        ! call !write_e(100)
     endif
-    dix(:)=zero
-    tiny=c_1d_40
-    xdix0=c_1d4*DEPS_tracking
+    dix(:)=0.0_dp
+    tiny=1e-40_dp
+    xdix0=1e4_dp*DEPS_tracking
     NO1=1
 
     if(.not.present(STATE)) then
@@ -1726,14 +1727,14 @@ eta2=zero
     !    ND2=2*ND1
     if(stat%totalpath==1.and.(.not.stat%nocavity)) then
        C=>RING%START
-       freq=zero
+       freq=0.0_dp
        i=1
-       xdix=zero
+       xdix=0.0_dp
        do while(i<=RING%n)
           if(associated(c%magp%freq)) then
-             IF(FREQ==ZERO) THEN
+             IF(FREQ==0.0_dp) THEN
                 freq=c%magp%freq
-             ELSEIF(c%magp%freq/=ZERO.AND.c%magp%freq<FREQ) THEN
+             ELSEIF(c%magp%freq/=0.0_dp.AND.c%magp%freq<FREQ) THEN
                 freq=c%magp%freq
              ENDIF
           endif
@@ -1745,7 +1746,7 @@ eta2=zero
           c=>c%next
           i=i+1
        enddo
-       if(freq==zero) then
+       if(freq==0.0_dp) then
           w_p=0
           w_p%nc=2
           w_p%fc='((1X,a72,/),(1X,a72))'
@@ -1816,13 +1817,11 @@ eta2=zero
        FIX(I)=FIX(I)+DIX(I)
     ENDDO
 
-    xdix=zero
+    xdix=0.0_dp
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,a72))'
+
     if(verbose) write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
     !    if(verbose) ! call ! WRITE_I
     if(xdix.gt.deps_tracking) then
@@ -1872,10 +1871,10 @@ eta2=zero
     TURNS0=1
     trackflag=0
     IF(PRESENT(TURNS)) TURNS0=TURNS
-    freq=zero
+    freq=0.0_dp
     APERTURE=c_%APERTURE_FLAG
     c_%APERTURE_FLAG=.false.
-
+    messagelost=' Orbit most likely found'
     if(.not.present(eps)) then
        if(.not.present(STATE)) then
           call FIND_ORBIT_LAYOUT(RING,FIX,LOC,TURNS=TURNS0)
@@ -1890,15 +1889,13 @@ eta2=zero
     Nullify(C);
 
     if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
+       write(6,*) " This line is not ring : FIND_ORBIT_LAYOUT_noda "
+        check_stable=.false.
        ! call !write_e(100)
     endif
-    dix(:)=zero
-    tiny=c_1d_40
-    xdix0=c_1d4*DEPS_tracking
+    dix(:)=0.0_dp
+    tiny=1e-40_dp
+    xdix0=1e4_dp*DEPS_tracking
     NO1=1
     if(.not.present(STATE)) then
        IF(default%NOCAVITY) THEN
@@ -1912,12 +1909,9 @@ eta2=zero
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1)=" No Cavity in the Line "
-          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          ! call !write_e(101)
+          messagelost= " FIND_ORBIT_LAYOUT will crash : exiting"
+         check_stable=.false.
+          return
        ENDIF
     else
        IF(STATE%NOCAVITY) THEN
@@ -1931,12 +1925,9 @@ eta2=zero
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72))'
-          w_p%c(1)=" No Cavity in the Line "
-          w_p%c(2)=" FIND_ORBIT_LAYOUT will crash "
-          ! call !write_e(112)
+          messagelost=" State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+         check_stable=.false.
+         return
        ENDIF
     endif
 101 continue
@@ -1944,14 +1935,14 @@ eta2=zero
 
     if(stat%totalpath==1.and.(.not.stat%nocavity)) then
        C=>RING%START
-       freq=zero
+       freq=0.0_dp
        i=1
-       xdix=zero
+       xdix=0.0_dp
        do while(i<=RING%n)
           if(associated(c%magp%freq)) then
-             IF(FREQ==ZERO) THEN
+             IF(FREQ==0.0_dp) THEN
                 freq=c%magp%freq
-             ELSEIF(c%magp%freq/=ZERO.AND.c%magp%freq<FREQ) THEN
+             ELSEIF(c%magp%freq/=0.0_dp.AND.c%magp%freq<FREQ) THEN
                 freq=c%magp%freq
              ENDIF
           endif
@@ -1959,13 +1950,11 @@ eta2=zero
           c=>c%next
           i=i+1
        enddo
-       if(freq==zero) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1X,a72))'
-          w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
-          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
-          ! call !write_e(113)
+       if(freq==0.0_dp) then
+       
+          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+         check_stable=.false.
+         return
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
           FREQ=RING%HARMONIC_NUMBER*CLIGHT/FREQ
@@ -1986,7 +1975,7 @@ eta2=zero
        !       CALL TRACK(RING,X,LOC,STAT)
        call TRACK(RING,X,LOC,STAT)
        if(.not.check_stable) then
-          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
+          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking: closed orbit not found"
           c_%APERTURE_FLAG=APERTURE
           return
        endif
@@ -2004,7 +1993,7 @@ eta2=zero
     !    write(6,*) x
     x(6)=x(6)-freq*turns0
 
-    mx=zero
+    mx=0.0_dp
     DO J=1,ND2
 
        Y=FIX
@@ -2012,7 +2001,7 @@ eta2=zero
        DO I=1,TURNS0
           CALL TRACK(RING,Y,LOC,STAT)
           if(.not.check_stable) then
-             messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking small rays around the guessed orbit "
+             messagelost(len_trim(messagelost)+1:255)=" -> Unstable while tracking small rays around the guessed orbit "
              !   fixed_found=my_false
              c_%APERTURE_FLAG=APERTURE
              return
@@ -2029,7 +2018,7 @@ eta2=zero
 
     SX=MX;
     DO I=1,nd2   !  6 before
-       SX(I,I)=MX(I,I)-one
+       SX(I,I)=MX(I,I)-1.0_dp
     ENDDO
 
     DO I=1,ND2
@@ -2038,15 +2027,12 @@ eta2=zero
 
     CALL matinv(SX,SXI,ND2,6,ier)
     IF(IER==132)  then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" Inversion failed in FIND_ORBIT_LAYOUT_noda"
-       ! call !write_e(333)
+       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+        check_stable=.false.
        return
     endif
 
-    x=zero
+    x=0.0_dp
     do i=1,nd2
        do j=1,nd2
           x(i)=sxi(i,j)*dix(j)+x(i)
@@ -2057,16 +2043,14 @@ eta2=zero
        FIX(I)=FIX(I)+DIX(I)
     ENDDO
 
-    xdix=zero
+    xdix=0.0_dp
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
     !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
     !    pause 123321
-    w_p=0
-    w_p%nc=1
-    w_p%fc='((1X,a72))'
-    if(verbose)write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
+
+    if(verbose) write(6,*) " Convergence Factor = ",xdix
     !  if(verbose) ! call ! WRITE_I
     if(xdix.gt.deps_tracking) then
        ite=1
@@ -2109,7 +2093,7 @@ eta2=zero
     p=>r%start
 
     do i=1,r%n
-       if(p%mag%p%b0/=zero) call fit_bare_bend(p,state)
+       if(p%mag%p%b0/=0.0_dp) call fit_bare_bend(p,state)
        p=>p%next
     enddo
 
@@ -2127,10 +2111,10 @@ eta2=zero
     logical(lp) nex
     nex=my_false
     if(present(next)) nex=next
-    tiny=c_1d_40
-    xdix0=c_1d4*DEPS_tracking
+    tiny=1e-40_dp
+    xdix0=1e4_dp*DEPS_tracking
 
-    KF=ZERO   ;
+    KF=0.0_dp   ;
     F%MAGP%BN(1)%KIND=3
     F%MAGP%BN(1)%I=1
     if(nex) then
@@ -2143,7 +2127,7 @@ eta2=zero
     CALL ALLOC(Y)
 
 3   continue
-    X=ZERO
+    X=0.0_dp
     Y=X
     CALL TRACK(f,Y,+state)  !,CHARGE)
     if(nex) CALL TRACK(f%next,Y,+state)  !,CHARGE)
@@ -2158,8 +2142,8 @@ eta2=zero
        f%next%MAG%BN(1) = f%next%MAG%BN(1)+KF
     endif
 
-    CALL ADD(f,1,1,zero)     !etienne
-    if(nex) CALL ADD(f%next,1,1,zero)     !etienne
+    CALL ADD(f,1,1,0.0_dp)     !etienne
+    if(nex) CALL ADD(f%next,1,1,0.0_dp)     !etienne
 
     if(xdix.gt.deps_tracking) then
        ite=1
@@ -2205,11 +2189,11 @@ eta2=zero
 
 
 
-    epsi=one/nturn
+    epsi=1.0_dp/nturn
     STATE=((((my_state+nocavity0)+delta0)+only_4d0)-RADIATION0)
     allocate(dat(0:nturn,6),dats(0:nturn,6))
     allocate(SMEAR(ITMAX,8))
-    CLOSED=ZERO
+    CLOSED=0.0_dp
 
     call FILL_BETA(r,my_state,pos,BETA,IB,DBETA,tuneold,tunenew,a,ai,mat,closed)
     write(6,*) " *****************************************************************"
@@ -2227,12 +2211,12 @@ eta2=zero
        monkey=id
        call kill(id)
        close(mf)
-       xda=zero
+       xda=0.0_dp
     endif
-    scau=one
-    scas=zero
-    dats=zero
-    SMEAR=ZERO
+    scau=1.0_dp
+    scas=0.0_dp
+    dats=0.0_dp
+    SMEAR=0.0_dp
     it=0
     CALL KANALNUMMER(MFt)
     OPEN(UNIT=MFt,FILE=FILEtune)
@@ -2244,10 +2228,10 @@ eta2=zero
     scat(1)=(emit0(1)+ it*emit0(3))/aper(1)
     scat(2)=(emit0(2)+ it*emit0(6))/aper(2)
     !    scat=(scau+scas)/two    ! etienne
-    dat=zero
+    dat=0.0_dp
 
-    xn=zero
-    JMAX=ZERO
+    xn=0.0_dp
+    JMAX=0.0_dp
     JMIN=mybig
     emit=scat*aper
     write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
@@ -2255,7 +2239,7 @@ eta2=zero
     write(6,*) " %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
     xn(2)=sqrt(emit(1))
     xn(4)=sqrt(emit(2))
-    X=zero
+    X=0.0_dp
 
     x=matmul(a,xn)+closed
 
@@ -2306,11 +2290,11 @@ eta2=zero
     WRITE(6,*) "      MAXIMUM/INITIAL = ",JMAX(1:2)/emit(1:2)
     WRITE(6,*) "     MINIMUM RADIUS SQUARE = ",JMIN
     WRITE(6,*) "      MINIMUM/INITIAL = ",JMIN(1:2)/emit(1:2)
-    WRITE(6,*) "     SMEAR = ",TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    WRITE(6,*) "     SMEAR = ",2.0_dp*(JMAX-JMIN)/(JMAX+JMIN)
     SMEAR(IT,1:2)=EMIT(1:2)
     SMEAR(IT,3:4)=JMIN(1:2)
     SMEAR(IT,5:6)=JMAX(1:2)
-    SMEAR(IT,7:8)=TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    SMEAR(IT,7:8)=2.0_dp*(JMAX-JMIN)/(JMAX+JMIN)
     if(flag/=0)then
        ! scau=scat
        IF(fLAG==101) THEN
@@ -2339,21 +2323,21 @@ eta2=zero
        dats=dat
 
        !  RESONANCE
-       tot_tune=zero
+       tot_tune=0.0_dp
        xn(1:4)=dats(0,1:4)
        tune1(1)=atan2(-xn(2),xn(1))/twopi
        tune1(2)=atan2(-xn(4),xn(3))/twopi
-       if(tune1(1)<zero)  tune1(1)=tune1(1)+one
-       if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+       if(tune1(1)<0.0_dp)  tune1(1)=tune1(1)+1.0_dp
+       if(tune1(2)<0.0_dp)  tune1(2)=tune1(2)+1.0_dp
        DO I1=0,NTURN
           xn(1:4)=dats(i1,1:4)
           tune2(1)=atan2(-xn(2),xn(1))/twopi
           tune2(2)=atan2(-xn(4),xn(3))/twopi
-          if(tune2(1)<zero)  tune2(1)=tune2(1)+one
-          if(tune2(2)<zero)  tune2(2)=tune2(2)+one
+          if(tune2(1)<0.0_dp)  tune2(1)=tune2(1)+1.0_dp
+          if(tune2(2)<0.0_dp)  tune2(2)=tune2(2)+1.0_dp
           tune1=tune2-tune1
-          if(tune1(1)<zero)  tune1(1)=tune1(1)+one
-          if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+          if(tune1(1)<0.0_dp)  tune1(1)=tune1(1)+1.0_dp
+          if(tune1(2)<0.0_dp)  tune1(2)=tune1(2)+1.0_dp
           tot_tune =tot_tune+tune1
           tune1=tune2
        ENDDO
@@ -2400,23 +2384,23 @@ eta2=zero
     OPEN(UNIT=MF,FILE=FILENAME)
 
     WRITE(MF,201) EMIT,APER, TUNEnew(1:2),DBETA
-    tot_tune=zero
+    tot_tune=0.0_dp
     xn(1:4)=dats(0,1:4)
     tune1(1)=atan2(-xn(2),xn(1))/twopi
     tune1(2)=atan2(-xn(4),xn(3))/twopi
-    if(tune1(1)<zero)  tune1(1)=tune1(1)+one
-    if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+    if(tune1(1)<0.0_dp)  tune1(1)=tune1(1)+1.0_dp
+    if(tune1(2)<0.0_dp)  tune1(2)=tune1(2)+1.0_dp
 
     DO I=0,NTURN
        WRITE(MF,200)DATs(I,1:6)
        xn(1:4)=dats(i,1:4)
        tune2(1)=atan2(-xn(2),xn(1))/twopi
        tune2(2)=atan2(-xn(4),xn(3))/twopi
-       if(tune2(1)<zero)  tune2(1)=tune2(1)+one
-       if(tune2(2)<zero)  tune2(2)=tune2(2)+one
+       if(tune2(1)<0.0_dp)  tune2(1)=tune2(1)+1.0_dp
+       if(tune2(2)<0.0_dp)  tune2(2)=tune2(2)+1.0_dp
        tune1=tune2-tune1
-       if(tune1(1)<zero)  tune1(1)=tune1(1)+one
-       if(tune1(2)<zero)  tune1(2)=tune1(2)+one
+       if(tune1(1)<0.0_dp)  tune1(1)=tune1(1)+1.0_dp
+       if(tune1(2)<0.0_dp)  tune1(2)=tune1(2)+1.0_dp
        tot_tune =tot_tune+tune1
        tune1=tune2
     ENDDO
@@ -2427,7 +2411,7 @@ eta2=zero
 
     CALL KANALNUMMER(MF)
     OPEN(UNIT=MF,FILE=FILESMEAR)
-    WRITE(MF,*) " ITERATION   EMIT0(1:2)  JMIN(1:2) JMAX(1:2) TWO*(JMAX-JMIN)/(JMAX+JMIN)"
+    WRITE(MF,*) " ITERATION   EMIT0(1:2)  JMIN(1:2) JMAX(1:2) 2.0_dp*(JMAX-JMIN)/(JMAX+JMIN)"
     DO I=1,ITMAX
        WRITE(MF,202)I, SMEAR(I,1:8)
     ENDDO
@@ -2445,7 +2429,7 @@ eta2=zero
     WRITE(6,*) "      MAXIMUM/INITIAL = ",JMAX(1:2)/emit(1:2)
     WRITE(6,*) "     MINIMUM RADIUS SQUARE = ",JMIN
     WRITE(6,*) "      MINIMUM/INITIAL = ",JMIN(1:2)/emit(1:2)
-    WRITE(6,*) "     SMEAR = ",TWO*(JMAX-JMIN)/(JMAX+JMIN)
+    WRITE(6,*) "     SMEAR = ",2.0_dp*(JMAX-JMIN)/(JMAX+JMIN)
     write(6,*) " *****************************************************************"
     if(pos==0) call kill(monkey)
   end SUBROUTINE  track_aperture
@@ -2471,7 +2455,7 @@ eta2=zero
     type(layout), pointer :: L
     logical f1,f2
 
-    sexr0=zero
+    sexr0=0.0_dp
 
 
     if(present(sexr)) sexr0=sexr
@@ -2496,8 +2480,8 @@ eta2=zero
     inc=0
     lm=1.0e38_dp
     ntec=0
-    max_ds=zero
-    xbend1=-one
+    max_ds=0.0_dp
+    xbend1=-1.0_dp
 
     if(present(xbend)) xbend1=xbend
     if(present(lmax0)) lm=abs(lmax0)
@@ -2596,7 +2580,7 @@ eta2=zero
     MK3=0
     ! CAVITY FOCUSING
     ! TEAPOT SPLITTING....
-    ggbt=zero
+    ggbt=0.0_dp
     r%NTHIN=0
     r%THIN=THI
 
@@ -2643,9 +2627,9 @@ eta2=zero
           doit=doit.and.C%MAG%recut
           if(doit) then
              xl=C%MAG%L
-             RHOI=zero
-             QUAD=zero
-             QUAD0=zero
+             RHOI=0.0_dp
+             QUAD=0.0_dp
+             QUAD0=0.0_dp
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -2657,14 +2641,14 @@ eta2=zero
                  QUAD=QUAD+quad0
                 endif
              ELSE
-                QUAD=zero
+                QUAD=0.0_dp
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
+                quad=quad+(C%MAG%b_sol)**2/4.0_dp+abs(C%MAG%b_sol/2.0_dp)
              endif
 
              DOBEND=MY_FALSE
-             IF(xbend1>ZERO) THEN
+             IF(xbend1>0.0_dp) THEN
                 IF(C%MAG%KIND==kind10) THEN
                    IF(C%MAG%TP10%DRIFTKICK) THEN
                       DOBEND=MY_TRUE
@@ -2675,7 +2659,7 @@ eta2=zero
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
-                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
+                if(rhoi/=0.0_dp.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -2722,9 +2706,9 @@ eta2=zero
 
              r%NTHIN=r%NTHIN+1  !C%MAG%NST
              !         write(6,*)"nte>ntec", nte,ntec
-             call add(C%MAG,C%MAG%P%nmul,1,zero)
+             call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
              call COPY(C%MAG,C%MAGP)
-             if(gg>zero) then
+             if(gg>0.0_dp) then
                 if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
              endif
 
@@ -2740,9 +2724,9 @@ eta2=zero
 
           if(doit) then
              xl=C%MAG%L
-             RHOI=zero
-             QUAD=zero
-             QUAD0=zero
+             RHOI=0.0_dp
+             QUAD=0.0_dp
+             QUAD0=0.0_dp
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -2754,14 +2738,14 @@ eta2=zero
                  QUAD=QUAD+quad0
                 endif
              ELSE
-                QUAD=zero
+                QUAD=0.0_dp
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
+                quad=quad+(C%MAG%b_sol)**2/4.0_dp+abs(C%MAG%b_sol/2.0_dp)
              endif
 
              DOBEND=MY_FALSE
-             IF(xbend1>ZERO) THEN
+             IF(xbend1>0.0_dp) THEN
                 IF(C%MAG%KIND==kind10) THEN
                    IF(C%MAG%TP10%DRIFTKICK) THEN
                       DOBEND=MY_TRUE
@@ -2772,7 +2756,7 @@ eta2=zero
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
-                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
+                if(rhoi/=0.0_dp.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -2829,7 +2813,7 @@ eta2=zero
                 endif
              endif
 
-             call add(C%MAG,C%MAG%P%nmul,1,zero)
+             call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
              call COPY(C%MAG,C%MAGP)
              !             if(gg>zero) then
              if(c%mag%l/c%mag%p%nst>max_ds) max_ds=c%mag%l/c%mag%p%nst
@@ -2847,9 +2831,9 @@ eta2=zero
 
           if(doit) then
              xl=C%MAG%L
-             RHOI=zero
-             QUAD=zero
-             QUAD0=zero
+             RHOI=0.0_dp
+             QUAD=0.0_dp
+             QUAD0=0.0_dp
              IF(C%MAG%P%NMUL>=1) THEN
                 !               RHOI=C%MAG%P%B0
                 RHOI=abs(C%MAG%bn(1))+abs(C%MAG%an(1))
@@ -2861,14 +2845,14 @@ eta2=zero
                  QUAD=QUAD+quad0
                 endif
              ELSE
-                QUAD=zero
+                QUAD=0.0_dp
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
-                quad=quad+(C%MAG%b_sol)**2/four+abs(C%MAG%b_sol/two)
+                quad=quad+(C%MAG%b_sol)**2/4.0_dp+abs(C%MAG%b_sol/2.0_dp)
              endif
 
              DOBEND=MY_FALSE
-             IF(xbend1>ZERO) THEN
+             IF(xbend1>0.0_dp) THEN
                 IF(C%MAG%KIND==kind10) THEN
                    IF(C%MAG%TP10%DRIFTKICK) THEN
                       DOBEND=MY_TRUE
@@ -2879,7 +2863,7 @@ eta2=zero
                       DOBEND=MY_TRUE
                    ENDIF
                 ENDIF
-                if(rhoi/=zero.and.radiation_bend_split)DOBEND=MY_TRUE
+                if(rhoi/=0.0_dp.and.radiation_bend_split)DOBEND=MY_TRUE
              ENDIF
              !  ETIENNE
              GG=XL*(RHOI**2+ABS(QUAD))
@@ -2928,7 +2912,7 @@ eta2=zero
              r%NTHIN=r%NTHIN+1  !C%MAG%NST
              !         write(6,*)"nte>ntec", nte,ntec
              if(nte>ntec.or.(.not.present(lmax0)) ) then
-                call add(C%MAG,C%MAG%P%nmul,1,zero)
+                call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
                 call COPY(C%MAG,C%MAGP)
              endif
              !            if(gg>zero) then
@@ -2942,7 +2926,7 @@ eta2=zero
                    if(mod(nte,2)/=parity) nte=nte+inc
                    if(nte > C%MAG%P%NST ) then
                       C%MAG%P%NST=nte
-                      call add(C%MAG,C%MAG%P%nmul,1,zero)
+                      call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
                       call COPY(C%MAG,C%MAGP)
                    endif
 
@@ -3076,7 +3060,7 @@ eta2=zero
              C%MAG%p%method=5
              C%MAGp%p%method=5
           endif
-          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
           call COPY(C%MAG,C%MAGP)
           if(C%MAG%KIND==KIND7) then
              C%MAG%t7%f=f0
@@ -3098,7 +3082,7 @@ eta2=zero
        if(f0>=1) then
           C%MAG%p%nst=C%MAG%p%nst*f0
           C%MAGp%p%nst=C%MAG%p%nst
-          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
           call COPY(C%MAG,C%MAGP)
           if(C%MAG%KIND==KIND7) then
              C%MAG%t7%f=f0*C%MAG%t7%f
@@ -3152,8 +3136,8 @@ eta2=zero
     DO I=1,R%N
        if(C%mag%kind==kind3) then
           b1=C%mag%k3%thin_h_angle
-          if(b1/=zero) then
-             b1=b1/two
+          if(b1/=0.0_dp) then
+             b1=b1/2.0_dp
              C%mag%k3%patch=my_true
              C%magp%k3%patch=my_true
              c%patch%patch=3
@@ -3183,7 +3167,7 @@ eta2=zero
     co(5)=  0.2992989446749238e0_dp
     co(7)=0.2585213173527224e-1_dp
     ar=abs(rhoi)
-    gf=zero
+    gf=0.0_dp
     !     do i=3,7,2
     !              ggb=((XL/gg) * ar)**(i)*(XL/gg)*co(i)  ! approximate residual orbit
     !              if(xbend1<ggb) then
@@ -3196,7 +3180,7 @@ eta2=zero
     do i=3,7,2
        ggb=((XL/gg) * ar)**(i-1)*(XL/gg)*co(i)*twopi  ! approximate residual orbit
        !              if(xbend1<ggb) then
-       gf(i)=(ar**(i-1)*co(i)/xbend1/twopi)**(one/(i+zero))*xl
+       gf(i)=(ar**(i-1)*co(i)/xbend1/twopi)**(1.0_dp/(i+0.0_dp))*xl
        !              endif
     enddo
     gf(2)=gf(3)
@@ -3288,12 +3272,12 @@ eta2=zero
 
           r%NTHIN=r%NTHIN+1  !C%MAG%NST
 
-          call add(C%MAG,C%MAG%P%nmul,1,zero)
+          call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
           call COPY(C%MAG,C%MAGP)
        else
           if(C%MAG%KIND/=kindpa) then
              C%MAG%P%NST=1
-             if(associated(C%MAG%bn))call add(C%MAG,C%MAG%P%nmul,1,zero)
+             if(associated(C%MAG%bn))call add(C%MAG,C%MAG%P%nmul,1,0.0_dp)
              call COPY(C%MAG,C%MAGP)
           endif
        endif
@@ -3369,7 +3353,7 @@ eta2=zero
     write(6,'(a120)') title
     read(mf,*) n
     allocate(an(n),bn(n))
-    an=zero;bn=zero;
+    an=0.0_dp;bn=0.0_dp;
 
     do i=1,r%n
 
@@ -3466,14 +3450,14 @@ eta2=zero
                 p%magp%bn(j)=-p%magp%bn(j)
                 p%magp%an(j)=-p%magp%an(j)
              enddo
-             if(abs(abs(p%mag%bn(1))-abs(p%mag%p%b0)).gt.c_1d_11.or. &
-                  abs(p%mag%p%b0).lt.c_1d_11) then
+             if(abs(abs(p%mag%bn(1))-abs(p%mag%p%b0)).gt.1e-11_dp.or. &
+                  abs(p%mag%p%b0).lt.1e-11_dp) then
                 p%mag%bn(1)=-p%magp%bn(1)
                 p%mag%an(1)=-p%magp%an(1)
                 p%magp%bn(1)=-p%magp%bn(1)
                 p%magp%an(1)=-p%magp%an(1)
              endif
-             if(p%mag%p%nmul>0) call add(p,1,1,zero)
+             if(p%mag%p%nmul>0) call add(p,1,1,0.0_dp)
           endif
           if(associated(p%mag%volt)) p%mag%volt=-p%mag%volt
           if(associated(p%magp%volt)) p%magp%volt=-p%magp%volt
@@ -3506,7 +3490,7 @@ eta2=zero
 
     p=>r%start
     do i=1,r%n
-    if(p%mag%p%b0/=zero) then
+    if(p%mag%p%b0/=0.0_dp) then
        p%mag%p%bend_fringe =changeanbn
        p%magp%p%bend_fringe =changeanbn
        write(6,*) P%mag%name, " changed to ",changeanbn
@@ -3542,39 +3526,34 @@ eta2=zero
 
   !          CALL MESS_UP_ALIGNMENT_name(my_ring,name,i1,i2,SIG,cut)
 
-  subroutine MESS_UP_ALIGNMENT_name(R,nom,i1,i2,sig,cut)
+  subroutine MESS_UP_ALIGNMENT_name(R,nom,iseed,full,sig,cut,pr)
     use gauss_dis
     IMPLICIT NONE
     TYPE(layout),target, intent(inout):: R
-    integer i1,i2,j,ic,i
+    integer iseed,j,ic,i
     character(nlp) nom
     type(fibre), pointer :: p
-    logical(lp) f1
+    logical(lp) f1,full,pr
     real(dp) cut,sig(6),mis(6),x,taxi(6)
 
-    if(i1>i2) then
-       Write(6,*) " error i1 > i2 ",i1,i2
-       return
-    elseif(i2>nlp) then
-       Write(6,*) " error i2 > nlp ",i2,nlp
-       return
-    endif
+    if(iseed/=0) call gaussian_seed(iseed)
+
     taxi=0.d0
     call context(nom)
 
     ic=0
 
-
     p=>r%start
     do i=1,r%n
+       f1=.false.
 
-       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1) THEN
-          f1=.false.
-          if(i1>=0) then
-             f1=(p%mag%name(i1:i2)==nom(i1:i2))
-          else
-             f1=(p%mag%name ==nom )
-          endif
+       if(full) then
+          f1=(p%mag%name ==nom )
+       else
+          f1=(   index(p%mag%name,nom(1:len_trim(nom)))   >0)
+       endif
+
+
           if(f1) then
              ic=ic+1
              DO J=1,6
@@ -3584,15 +3563,26 @@ eta2=zero
              ENDDO
              call MISALIGN_FIBRE(p,mis)
           endif
-       ENDIF
-       P=>P%NEXT
-    ENDDO
+
+       if(f1) then 
+         ic=ic+1
+       if(pr)   write(6,*) p%mag%name
+       endif
+
+       p=>P%next
+    enddo
+
+  if(pr) then  
+   write(6,*) ic," Magnets modified "
+
+
 
     write(6,*) ic," Magnets misaligned "
     taxi=taxi/ic
 
-    write(6,'(a16,3(1x,E15.8))') "displacements = ",taxi(1:3)
-    write(6,'(a16,3(1x,E15.8))') "rotations     = ",taxi(4:6)
+    write(6,'(a21,3(1x,E15.8))') " <|displacements|> = ",taxi(1:3)
+    write(6,'(a21,3(1x,E15.8))') " <|rotations|>     = ",taxi(4:6)
+endif
 
   end  subroutine MESS_UP_ALIGNMENT_name
 
@@ -3610,20 +3600,20 @@ eta2=zero
     lab(5)=" Day Average and Sigma "
     lab(6)=" Daz Average and Sigma "
 
-    AVE=ZERO
-    SIG=ZERO
+    AVE=0.0_dp
+    SIG=0.0_dp
     p=>r%start
     is=0
     do i=1,r%n
        do j=1,3
-          if(p%chart%D_IN(j)/=zero) then
+          if(p%chart%D_IN(j)/=0.0_dp) then
              is(j)=is(j)+1
              ave(j)=p%chart%D_IN(j)+ave(j)
              sig(j)=p%chart%D_IN(j)**2+sig(j)
           endif
        enddo
        do j=4,6
-          if(p%chart%ANG_IN(j)/=zero) then
+          if(p%chart%ANG_IN(j)/=0.0_dp) then
              is(j)=is(j)+1
              ave(j)=p%chart%ANG_IN(j)+ave(j)
              sig(j)=p%chart%ANG_IN(j)**2+sig(j)
@@ -3660,19 +3650,19 @@ eta2=zero
     !    TYPE(DAMAP) ID
     !    TYPE(NORMALFORM) NORM
 
-    closed=zero
+    closed=0.0_dp
     !    STATE=STATE+NOCAVITY0
     if(state%nocavity) closed(5)=del_in
 
-    CALL FIND_ORBIT(L,CLOSED,pos,STATE,c_1d_5)
+    CALL FIND_ORBIT(L,CLOSED,pos,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
     write(mf,201) closed
     ang= (ang_out-ang_in)/n_in
-    lamt=one
+    lamt=1.0_dp
     do j_in=0,n_in
 
-       x=zero
+       x=0.0_dp
        x(1)=x_in*cos(j_in*ang+ang_in)
        x(3)=x_in*sin(j_in*ang+ang_in)
        x(5)=del_in
@@ -3680,9 +3670,9 @@ eta2=zero
 
        dx=0.3_dp
 
-       r=zero;rt=zero;
-       lams=zero
-       lamu=ZERO
+       r=0.0_dp;rt=0.0_dp;
+       lams=0.0_dp
+       lamu=0.0_dp
 
        DLAMT=DX
 
@@ -3691,7 +3681,7 @@ eta2=zero
        do while(DLAMT>dlam.and.ic<ite)
 
           ic=ic+1
-          R=ZERO;
+          R=0.0_dp;
           r(1:4)=lamt*x(1:4)
           if(state%nocavity) then
              rt=r+closed
@@ -3708,13 +3698,13 @@ eta2=zero
 
           if(st/=0) then
              lamu=lamt
-             lamt=(lams+lamt)/two
+             lamt=(lams+lamt)/2.0_dp
           else
              lams=lamt
              IF(LAMU<DX) THEN
                 lamt=DX+lamt
              ELSE
-                lamt=(lamu+lamt)/two
+                lamt=(lamu+lamt)/2.0_dp
              ENDIF
           endif
           DLAMT=sqrt(x(1)**2+x(3)**2)*ABS(LAMU-LAMS)
@@ -3745,38 +3735,38 @@ eta2=zero
     !    TYPE(DAMAP) ID
     !    TYPE(NORMALFORM) NORM
 
-    closed=zero
+    closed=0.0_dp
     !    STATE=STATE+NOCAVITY0
 
     !    if(state%nocavity)
     closed(5)=del_in
     if(fixp) then
-       CALL FIND_ORBIT(L,CLOSED,pos,STATE,c_1d_5)
+       CALL FIND_ORBIT(L,CLOSED,pos,STATE,1e-5_dp)
        write(6,*) "closed orbit "
        write(6,*) CLOSED
     else
-       closed(1:4)=zero
-       closed(6)=zero
+       closed(1:4)=0.0_dp
+       closed(6)=0.0_dp
     endif
     !    write(mf,201) closed
     n_in=1
-    ang_in=pi/four
-    ang_out=pi/four
+    ang_in=pi/4.0_dp
+    ang_out=pi/4.0_dp
     ang= (ang_out-ang_in)/n_in
-    lamt=one
+    lamt=1.0_dp
     j_in=0
     !  do j_in=0,n_in
 
-    x=zero
+    x=0.0_dp
     x(1)=x_in*cos(j_in*ang+ang_in)
     x(3)=x_in*sin(j_in*ang+ang_in)
     !       x(5)=del_in
 
 
 
-    r=zero;rt=zero;
-    lams=zero
-    lamu=ZERO
+    r=0.0_dp;rt=0.0_dp;
+    lams=0.0_dp
+    lamu=0.0_dp
 
     DLAMT=DX
 
@@ -3785,14 +3775,14 @@ eta2=zero
     do while(DLAMT>dlam.and.ic<ite)
 
        ic=ic+1
-       R=ZERO;
+       R=0.0_dp;
        r(1:4)=lamt*x(1:4)
        if(state%nocavity) then
           if(fixp) then
              rt=r+closed
           else
              rt(1:4)=r(1:4)
-             rt(6)=zero
+             rt(6)=0.0_dp
              rt(5)=del_in
           endif
        else
@@ -3815,7 +3805,7 @@ eta2=zero
        !   pause
        if(st/=0) then
           lamu=lamt
-          lamt=(lams+lamt)/two
+          lamt=(lams+lamt)/2.0_dp
           !  write(mf,*) "unstable ",lamt
 
        else
@@ -3823,7 +3813,7 @@ eta2=zero
           IF(LAMU<DX) THEN
              lamt=DX+lamt
           ELSE
-             lamt=(lamu+lamt)/two
+             lamt=(lamu+lamt)/2.0_dp
           ENDIF
           !  write(mf,*) "stable ",lamt
 

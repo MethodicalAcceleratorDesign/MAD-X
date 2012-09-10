@@ -25,9 +25,9 @@ contains
     type (POL_BLOCK_sagan),INTENT(inOUT):: S2
     INTEGER,INTENT(IN):: S1
 
-    S2%SInternal=one
+    S2%SInternal=1.0_dp
     S2%Iinternal=0
-    S2%w%Sa=one
+    S2%w%Sa=1.0_dp
     S2%w%ia=0
 
   END SUBROUTINE bLPOL2_0

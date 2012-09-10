@@ -72,23 +72,23 @@ CONTAINS
     X(1)=X(1)-A(1)
     X(3)=X(3)-A(2)
     if(ctime) then     ! THIS IS SIXTRACK HERE
-       PZ=ROOT(one+two*X(5)/b+x(5)**2)
+       PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
        X(1)=X(1)+A(3)*X(2)/pz
        X(3)=X(3)+A(3)*X(4)/pz
        IF(SIXTRACK) THEN
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*A(3)/pz-A(3)/B   ! SIXTRACK DRIFT  b=beta0
-          X(6)=X(6)+ dl*(one/b+x(5))/pz + DL_SIXTRACK/B     ! EXTRA
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*A(3)/pz-A(3)/B   ! SIXTRACK DRIFT  b=beta0
+          X(6)=X(6)+ dl*(1.0_dp/b+x(5))/pz + DL_SIXTRACK/B     ! EXTRA
        ELSE
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*A(3)/pz+ dl*(one/b+x(5))/pz-LD/B
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*A(3)/pz+ dl*(1.0_dp/b+x(5))/pz-LD/B
        ENDIF
     else
-       X(1)=X(1)+A(3)*X(2)/(one+X(5))
-       X(3)=X(3)+A(3)*X(4)/(one+X(5))
+       X(1)=X(1)+A(3)*X(2)/(1.0_dp+X(5))
+       X(3)=X(3)+A(3)*X(4)/(1.0_dp+X(5))
        IF(SIXTRACK) THEN
-          X(6)=X(6)+(A(3)/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))
+          X(6)=X(6)+(A(3)/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
           X(6)=X(6)+dl + DL_SIXTRACK
        ELSE
-          X(6)=X(6)+(A(3)/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+a(3)+ dl-LD
+          X(6)=X(6)+(A(3)/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+a(3)+ dl-LD
        ENDIF
     endif
 
@@ -161,12 +161,12 @@ CONTAINS
     E(1)%kind=1
     E(2)%kind=2
     E(3)%kind=3
-    E(1)%T1%A=ZERO
-    E(2)%T2%A=ZERO
-    E(3)%T3%D=ZERO
-    E(3)%T3%DL=ZERO
-    E(3)%T3%DL_SIXTRACK=ZERO
-    E(3)%T3%L_DESIGN=ZERO
+    E(1)%T1%A=0.0_dp
+    E(2)%T2%A=0.0_dp
+    E(3)%T3%D=0.0_dp
+    E(3)%T3%DL=0.0_dp
+    E(3)%T3%DL_SIXTRACK=0.0_dp
+    E(3)%T3%L_DESIGN=0.0_dp
     do i=1,size(s)
        if(S(I)%KIND==1) THEN
           E(1)%T1%A=E(1)%T1%A+S(I)%T1%A
@@ -325,26 +325,26 @@ CONTAINS
     X(3)=X(3)-A(2)
     IF(EXACT) THEN
        if(ctime) then
-          PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+A(3)*X(2)/PZ
           X(3)=X(3)+A(3)*X(4)/PZ
-          X(6)=X(6)+A(3)*(one/b+X(5))/PZ
+          X(6)=X(6)+A(3)*(1.0_dp/b+X(5))/PZ
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+A(3)*X(2)/PZ
           X(3)=X(3)+A(3)*X(4)/PZ
-          X(6)=X(6)+A(3)*(one+X(5))/PZ
+          X(6)=X(6)+A(3)*(1.0_dp+X(5))/PZ
        endif
     ELSE
        if(ctime) then     ! THIS IS SIXTRACK HERE
-          PZ=ROOT(one+two*X(5)/b+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
           X(1)=X(1)+A(3)*X(2)/pz
           X(3)=X(3)+A(3)*X(4)/pz
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*A(3)/pz
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*A(3)/pz
        else
-          X(1)=X(1)+A(3)*X(2)/(one+X(5))
-          X(3)=X(3)+A(3)*X(4)/(one+X(5))
-          X(6)=X(6)+(A(3)/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+a(3)
+          X(1)=X(1)+A(3)*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)+A(3)*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(A(3)/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+a(3)
        endif
     ENDIF
 
@@ -363,27 +363,27 @@ CONTAINS
     IF(EXACT) THEN
        CALL ALLOC(PZ)
        if(ctime) then
-          PZ=SQRT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+A(3)*X(2)/PZ
           X(3)=X(3)+A(3)*X(4)/PZ
-          X(6)=X(6)+A(3)*(one/b+X(5))/PZ
+          X(6)=X(6)+A(3)*(1.0_dp/b+X(5))/PZ
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+A(3)*X(2)/PZ
           X(3)=X(3)+A(3)*X(4)/PZ
-          X(6)=X(6)+A(3)*(one+X(5))/PZ
+          X(6)=X(6)+A(3)*(1.0_dp+X(5))/PZ
        endif
        CALL KILL(PZ)
     ELSE
        if(ctime) then
-          PZ=SQRT(one+two*X(5)/b+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
           X(1)=X(1)+A(3)*X(2)/pz
           X(3)=X(3)+A(3)*X(4)/pz
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*A(3)/pz
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*A(3)/pz
        else
-          X(1)=X(1)+A(3)*X(2)/(one+X(5))
-          X(3)=X(3)+A(3)*X(4)/(one+X(5))
-          X(6)=X(6)+(A(3)/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+a(3)
+          X(1)=X(1)+A(3)*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)+A(3)*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(A(3)/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+a(3)
        endif
     ENDIF
 
@@ -450,19 +450,19 @@ CONTAINS
 
     IF(EXACT) THEN
        if(ctime) then
-          PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           XN(1)=X(1)/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+X(1)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=X(6)+X(1)*TAN(A)/PZ/PT*(1.0_dp/b+x(5))
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           XN(1)=X(1)/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(one+X(5))*X(1)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(1.0_dp+X(5))*X(1)*TAN(A)/PZ/PT
        endif
        X(1)=XN(1)
        X(2)=XN(2)
@@ -470,11 +470,11 @@ CONTAINS
        X(6)=XN(6)
     ELSE
        if(ctime) then   ! SIXTRACK
-          PZ=ROOT(one+two*x(5)/b+X(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2)
           X(2)=X(2)+A*PZ
-          X(6)=X(6)+A*X(1)*(one/b+x(5))/PZ
+          X(6)=X(6)+A*X(1)*(1.0_dp/b+x(5))/PZ
        else
-          X(2)=X(2)+A*(one+X(5))
+          X(2)=X(2)+A*(1.0_dp+X(5))
           X(6)=X(6)+A*X(1)
        endif
     ENDIF
@@ -493,19 +493,19 @@ CONTAINS
        CALL ALLOC(PZ)
        CALL ALLOC(PT)
        if(ctime) then
-          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           XN(1)=X(1)/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+X(1)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=X(6)+X(1)*TAN(A)/PZ/PT*(1.0_dp/b+x(5))
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           XN(1)=X(1)/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(one+X(5))*X(1)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(1.0_dp+X(5))*X(1)*TAN(A)/PZ/PT
        endif
 
        X(1)=XN(1)
@@ -518,12 +518,12 @@ CONTAINS
     ELSE
        if(ctime) then
           CALL ALLOC(PZ)
-          PZ=SQRT(one+two*x(5)/b+X(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2)
           X(2)=X(2)+A*PZ
-          X(6)=X(6)+A*X(1)*(one/b+x(5))/PZ
+          X(6)=X(6)+A*X(1)*(1.0_dp/b+x(5))/PZ
           CALL KILL(PZ)
        else
-          X(2)=X(2)+A*(one+X(5))
+          X(2)=X(2)+A*(1.0_dp+X(5))
           X(6)=X(6)+A*X(1)
        endif
     ENDIF

@@ -69,12 +69,12 @@ module precision_constants
   real(dp),parameter::c_0_28=0.28e0_dp,c_0_31=0.31e0_dp,c_1_8=1.8e0_dp
   real(dp),parameter::c_1d_5=1e-5_dp, c_0_3079=0.3079e0_dp
   !Mathematical Constants
-  real(dp),TARGET :: hyperbolic_aperture=ten
-  real(dp),parameter::pi=3.141592653589793238462643383279502e0_dp,twopi=two*pi,pih=pi*half
-  real(dp),parameter::twopii=one/twopi,pil=pih-c_4d_1,pim=pih+c_4d_1
+  real(dp),TARGET :: hyperbolic_aperture=10.0_dp
+  real(dp),parameter::pi=3.141592653589793238462643383279502e0_dp,twopi=2.0_dp*pi,pih=pi*0.5_dp
+  real(dp),parameter::twopii=1.0_dp/twopi,pil=pih-0.4_dp,pim=pih+0.4_dp
   !  real(dp),parameter::rpi4=1.772453850905516027298167e0_dp/two ! rpi4=sqrt(pi)/2
   real(dp)::rpi4
-  real(dp),parameter::RAD_TO_DEG_=c_180/pi,DEG_TO_RAD_=pi/c_180
+  real(dp),parameter::RAD_TO_DEG_=180.0_dp/pi,DEG_TO_RAD_=pi/180.0_dp
   !Physical Constants
   real(dp),parameter::A_ELECTRON=1.15965218111e-3_dp  !frs NIST CODATA 2006
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
@@ -103,13 +103,14 @@ module precision_constants
   ![A*s]
   real(dp),parameter::eps_0=8.854187817e-12_dp        ! exact
   ![A*S/V*m]
-  real(dp),parameter::class_e_radius=qelect/four/pi/eps_0/pmae/c_1d9
+  real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp
   ![m]
-  real(dp),parameter::CGAM=four*pi/three*class_e_radius/pmae**3
+  real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3
   ![m/Gev^3] old: 8.846056192e-5_dp
   real(dp),parameter::HBC=hbar*CLIGHT
   ![GeV*m] old: HBC=1.9732858e-16_dp
   !Smallness Parameters
+   !Smallness Parameters
   real(dp),parameter::epsmac=1e-7_dp,c_1d_20=1e-20_dp,c_1d_37=1e-37_dp
   real(dp) :: epsflo=1.e-10_dp
   real(dp),parameter::mybig=1e38_dp
@@ -157,7 +158,7 @@ module precision_constants
   ! Constant Symplectic integrator schemes
   real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   real(dp),parameter::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
-  real(dp),parameter::FD1=half/(one+AAA),FD2=AAA*FD1,FK1=one/(one+AAA),FK2=(AAA-one)*FK1
+  real(dp),parameter::FD1=0.5_dp/(1.0_dp+AAA),FD2=AAA*FD1,FK1=1.0_dp/(1.0_dp+AAA),FK2=(AAA-1.0_dp)*FK1
   ! end of symplectic integrator coefficients
   !Initialized numbers
   real(dp)::eps=1e-38_dp
@@ -170,14 +171,14 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=one
+  REAL(dp),TARGET   :: absolute_aperture=1.0_dp
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
   logical(lp),TARGET :: print_frame =.true.
   logical(lp),TARGET :: sixtrack_compatible =.false.
   integer ,target ::  spin_normal_position=2
-  real(dp),target ::  da_absolute_aperture=c_1d6
+  real(dp),target ::  da_absolute_aperture=1e6_dp
   real(dp),pointer :: crash
   INTEGER,  TARGET :: NPARA_original
   logical  :: default_tpsa=.false.
@@ -198,7 +199,7 @@ module precision_constants
   integer, parameter :: no_e=5  !  electric 
 
   logical(lp) :: change_sector=my_true
-  real(dp) :: xlost(6)=zero
+  real(dp) :: xlost(6)=0.0_dp
   character(255) :: messagelost
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
@@ -282,7 +283,7 @@ module precision_constants
      logical(lp),pointer :: do_beam_beam   ! obvious meaning: false normally
      ! creates a reverse propagator
      integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed
-     integer,pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
+     real(dp),pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
      ! creates a reverse propagator and a reversed ring in combination with above
      logical(lp),pointer ::FIBRE_flip    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
@@ -376,14 +377,14 @@ contains
     IMPLICIT NONE
     integer i
 
-    YOSK(4)=zero
-    YOSK(3)=c_0_78451361047756
-    YOSK(2)=c_0_235573213359357
-    YOSK(1)=-c_1_17767998417887
-    YOSK(0)=one-two*(YOSK(1)+YOSK(2)+YOSK(3))
+    YOSK(4)=0.0_dp
+    YOSK(3)=0.78451361047756e0_dp
+    YOSK(2)=0.235573213359357e0_dp
+    YOSK(1)=-1.17767998417887e0_dp
+    YOSK(0)=1.0_dp-2.0_dp*(YOSK(1)+YOSK(2)+YOSK(3))
 
     do i=4,1,-1
-       YOSD(i)=(YOSK(i)+YOSK(i-1))/two
+       YOSD(i)=(YOSK(i)+YOSK(i-1))/2.0_dp
     enddo
 
     do i=3,0,-1
@@ -447,7 +448,7 @@ contains
     s2%FR=' '
     do i=1,n_read_max
        s2%i(i)=0
-       s2%R(i)=zero
+       s2%R(i)=0.0_dp
        s2%C(i)=' '
     enddo
   END SUBROUTINE EQUAL_Si
@@ -572,16 +573,16 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ARCCOS_lielib=ZERO
+       ARCCOS_lielib=0.0_dp
        return
     endif
-    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
-       ARCCOS_lielib=ZERO
+    IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
+       ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-    ELSEIF(ABS(X)<=ONE) THEN
+    ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
-       ARCCOS_lielib=ZERO
+       ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -591,12 +592,12 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       LOGE_lielib=zero
+       LOGE_lielib=0.0_dp
        return
     endif
 
-    IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
-       LOGE_lielib=ZERO
+    IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
+       LOGE_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ELSE
        LOGE_lielib=LOG(X)
@@ -1020,7 +1021,7 @@ contains
     type (my_1D_taylor) mul
     type (my_1D_taylor), INTENT (IN) :: S1, S2
     integer I,J
-    mul%a=zero
+    mul%a=0.0_dp
     DO I=0,No_my_1D_taylor
        DO J=0,No_my_1D_taylor
           IF(I+J>No_my_1D_taylor) CYCLE
@@ -1077,10 +1078,10 @@ contains
     integer, INTENT (IN) :: N
     integer I
 
-    POW=one
+    POW=1.0_dp
 
     IF(N<=0) THEN
-       T=one/S1
+       T=1.0_dp/S1
        DO I=1,-N
           POW=POW*T
        ENDDO
@@ -1099,10 +1100,10 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1
     integer I
     T=S1/S1%A(0)
-    T%A(0)=zero
+    T%A(0)=0.0_dp
 
     TT=T
-    inv=one
+    inv=1.0_dp
 
     DO I=1,No_my_1D_taylor
        INV=INV-TT
@@ -1139,7 +1140,7 @@ contains
     real(dp), INTENT (IN) :: S1
     type (my_1D_taylor), INTENT (inout) :: S2
 
-    S2%a=zero
+    S2%a=0.0_dp
     S2%a(0)=s1
 
   END subroutine input_real_in_my_1D_taylor
@@ -1161,11 +1162,11 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1
     integer I
     T=S1
-    T%A(0)=zero
+    T%A(0)=0.0_dp
 
 
-    DEXPT=one
-    tt=one
+    DEXPT=1.0_dp
+    tt=1.0_dp
 
     do i=1,No_my_1D_taylor
        tt=tt*t/i
@@ -1184,8 +1185,8 @@ contains
     integer I
 
     T=S1/S1%A(0)
-    T%A(0)=zero
-    DLOGT=zero
+    T%A(0)=0.0_dp
+    DLOGT=0.0_dp
     TT=T
     do i=1,No_my_1D_taylor
        DLOGT=TT/I+DLOGT
@@ -1207,7 +1208,7 @@ contains
 
     ! DSQRTT=one + T/two - T**2/eight+T**3/c_16
     ! DSQRTT=DSQRTT* SQRT(S1%A(0))
-    DSQRTT=log(s1)/two
+    DSQRTT=log(s1)/2.0_dp
     DSQRTT=exp(DSQRTT)
   END FUNCTION  DSQRTT
 
@@ -1219,9 +1220,9 @@ contains
     STOP 666
 
     T=S1
-    T%A(0)=zero
+    T%A(0)=0.0_dp
 
-    DCOST=COS(S1%A(0))*(one-T**2/two)-SIN(S1%A(0))*(T-T**3/six)
+    DCOST=COS(S1%A(0))*(1.0_dp-T**2/2.0_dp)-SIN(S1%A(0))*(T-T**3/6.0_dp)
 
   END FUNCTION  DCOST
 
@@ -1231,9 +1232,9 @@ contains
     type (my_1D_taylor), INTENT (IN) :: S1
 
     T=S1
-    T%A(0)=zero
+    T%A(0)=0.0_dp
 
-    DSINT=SIN(S1%A(0))*(one-T**2/two)+COS(S1%A(0))*(T-T**3/six)
+    DSINT=SIN(S1%A(0))*(1.0_dp-T**2/2.0_dp)+COS(S1%A(0))*(T-T**3/6.0_dp)
 
   END FUNCTION  DSINT
 
@@ -1272,9 +1273,9 @@ contains
     real(dp) r1,r2,x,cut
 
 
-1   R1 = -LOG(one-RANF())
-    R2 = two*PI*RANF()
-    R1 = SQRT(two*R1)
+1   R1 = -LOG(1.0_dp-RANF())
+    R2 = 2.0_dp*PI*RANF()
+    R1 = SQRT(2.0_dp*R1)
     X  = R1*COS(R2)
     if(abs(x)>cut) goto 1
     ! Y  = R1*SIN(R2)

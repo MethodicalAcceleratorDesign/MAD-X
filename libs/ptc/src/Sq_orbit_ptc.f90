@@ -19,8 +19,8 @@ module orbit_ptc
   logical :: fill_patch =.false.
   integer :: n_patch=0
   integer :: n_fill_patch=0
-  integer :: n_used_patch=0
-  real(dp) :: t0_main=zero
+  integer :: n_used_patch=0, extra_node=0  
+  real(dp) :: t0_main=0.0_dp
   !   integer mfff
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
@@ -181,7 +181,7 @@ contains
 
   SUBROUTINE GET_CHARGE(X)
     IMPLICIT NONE
-    INTEGER X
+    real(dp) X
     X=my_ORBIT_LATTICE%ORBIT_CHARGE
   END SUBROUTINE GET_CHARGE
 
@@ -305,7 +305,7 @@ contains
     endif
 
     !  if(state%time) then
-    x(6)=x(6)+T%ds_AC*half*(one/beta0+x(5))/root(one+2*x(5)/beta0+x(5)**2)
+    x(6)=x(6)+T%ds_AC*0.5_dp*(1.0_dp/beta0+x(5))/root(1.0_dp+2*x(5)/beta0+x(5)**2)
     ! else
     !    x(6)=x(6)+T%ds_AC*half
 
@@ -343,7 +343,7 @@ contains
     TYPE(INTERNAL_STATE), target :: STATE
     integer PATCHT
     !    if(state%time) then
-    x(6)=x(6)+T%ds_AC*half/t%PARENT_FIBRE%beta0
+    x(6)=x(6)+T%ds_AC*0.5_dp/t%PARENT_FIBRE%beta0
     !    else
     !       x(6)=x(6)+T%ds_AC*half
     !    endif
@@ -385,14 +385,14 @@ contains
     if(.not.associated(R%T))then
        call make_node_layout(r)
     endif
-    x=zero
+    x=0.0_dp
     t=>R%t%start
     om=1.e38_dp
     do i=1,R%T%N
 
        if(t%parent_fibre%mag%kind==kind4) then
           om0=t%parent_fibre%mag%freq
-          if(om0/=zero) then
+          if(om0/=0.0_dp) then
              if(om0<om) om=om0
              found=.true.
           endif
@@ -408,8 +408,8 @@ contains
        dt=clight/om
     else
        write(6,*) "No cavities found"
-       xharm=zero
-       dt=zero
+       xharm=0.0_dp
+       dt=0.0_dp
     endif
 
   end subroutine get_ideal_harmonic
@@ -652,10 +652,10 @@ contains
 
     X(2)=X(2)*a%w1%P0C/a%w2%P0C
     X(4)=X(4)*a%w1%P0C/a%w2%P0C
-    X(5)=root(one+two*X(5)/a%w1%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-    X(5)=X(5)*a%w1%P0C/a%w2%P0C-one !X(5) = DP/P0C_NEW
-    X(5)=(two*X(5)+X(5)**2)/(root(one/a%w2%BETA0**2+two*X(5)+X(5)**2) &
-         +one/a%w2%BETA0)
+    X(5)=root(1.0_dp+2.0_dp*X(5)/a%w1%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+    X(5)=X(5)*a%w1%P0C/a%w2%P0C-1.0_dp !X(5) = DP/P0C_NEW
+    X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/a%w2%BETA0**2+2.0_dp*X(5)+X(5)**2) &
+         +1.0_dp/a%w2%BETA0)
     !if(enforce_zero_x5) x(5)=zero
     !    x(6)=x(6)*my_ORBIT_LATTICE%orbit_omega_after/my_ORBIT_LATTICE%ORBIT_OMEGA
 
@@ -999,7 +999,7 @@ contains
 
     call find_energy(a%w2,kinetic=energy0)
 
-    if(a%de(n)/=zero ) then
+    if(a%de(n)/=0.0_dp ) then
        if(mdebug/=0) then
           write(mdebug,*) hh,a%de(n)
           tc=el%c4%t
@@ -1191,20 +1191,21 @@ contains
     REAL(DP) BET(2),ALF(2),ETA,ETAP
     TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
     logical(lp) doit,cav
-
+integer mf
 
     END_MAG=.not.no_end_mag
     ALLOCATE(R%T%ORBIT_LATTICE)
     CALL Set_Up_ORBIT_LATTICE(R%T%ORBIT_LATTICE,0,MY_TRUE)
     my_ORBIT_LATTICE=>R%T%ORBIT_LATTICE
+    my_ORBIT_LATTICE%parent_layout=>R
 
     my_ORBIT_LATTICE%ORBIT_WARNING=0
     CALL GET_FREQ(R,FREQ)
-    IF(FREQ/=ZERO) THEN
+    IF(FREQ/=0.0_dp) THEN
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*FREQ/CLIGHT
     ELSE
-       WRITE(6,*) " COULD NOT LOCALIZE NON ZERO CAVITY FREQUENCY "
-       my_ORBIT_LATTICE%ORBIT_OMEGA=ONE
+       WRITE(6,*) " COULD NOT LOCALIZE NON 0.0_dp CAVITY FREQUENCY "
+       my_ORBIT_LATTICE%ORBIT_OMEGA=1.0_dp
        my_ORBIT_LATTICE%ORBIT_WARNING=1
     ENDIF
     my_ORBIT_LATTICE%ORBIT_P0C=R%START%mag%P%P0C
@@ -1214,8 +1215,11 @@ contains
     NL=7
     K=1
     DLMAX=0.D0
-    L=ZERO
-    DL=ZERO
+    L=0.0_dp
+    DL=0.0_dp
+     if(extra_node==1) then  
+             k=k+1
+     endif 
     T=>R%T%START
     DO I=1,R%T%N-1
        cav=.false.
@@ -1256,8 +1260,13 @@ contains
 
     K=1
     cav=.false.
-    L=ZERO
-    DL=ZERO
+    L=0.0_dp
+    DL=0.0_dp
+     if(extra_node==1) then
+             ORBIT_NODES(K)%NODE=>T
+             CALL ALLOC_ORBIT_NODE1(ORBIT_NODES(K),NL)    
+             k=k+1
+     endif    
     T=>R%T%START
     ORBIT_NODES(K)%NODE=>T
 
@@ -1306,7 +1315,7 @@ contains
     !      MY_ORBIT_STATE=>DEFAULT
     my_ORBIT_LATTICE%ORBIT_CHARGE=R%start%CHARGE
     my_ORBIT_LATTICE%ORBIT_N_NODE=k-1
-
+    
     !    write(6,*) size(ORBIT_NODES),my_ORBIT_LATTICE%ORBIT_N_NODE,k
 
     IF(DLMAX>LMAX) THEN
@@ -1325,7 +1334,7 @@ contains
           stop
        endif
     ENDDO
-
+   if(extra_node==1) ORBIT_NODES(1)%DPOS=0
     P=>R%START
     DO K=1,R%N
        IF(P%PATCH%PATCH/=0) THEN
@@ -1344,25 +1353,33 @@ contains
 
     !  COMPUTE LATTICE FUNCTIONS
     my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=MY_FALSE
-    STATE=(DEFAULT0+NOCAVITY0)
+ !   STATE=(DEFAULT0+NOCAVITY0)
+    STATE=(DEFAULT0+NOCAVITY0)  !+time0
 
     CALL INIT(STATE,1,0,BERZ)
     CALL ALLOC(ID);CALL ALLOC(Y);CALL ALLOC(NORM);
 
-    closed=zero
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    closed=0.0_dp
 
+ !   CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+closed(1)=0.001d0
+call kanalnummer(mf,"junk.txt")
+p=>r%start
+do i=1,r%n
+    CALL TRACK(R,closed,i,i+1,STATE)
+write(mf,*) i,p%mag%name
+write(mf,*) closed(1:2)
+p=>p%next
+enddo
+!write(6,*) closed
+close(mf)
+pause 123
 
     ID=1
     Y=CLOSED+ID
     CALL TRACK(R,Y,1,STATE)
 
-
     NORM=Y
-
-
-
-
 
     Y=CLOSED+NORM%A_T
     BET(1)=(Y(1).SUB.'1')**2+(Y(1).SUB.'01')**2
@@ -1398,9 +1415,9 @@ contains
     my_ORBIT_LATTICE%ORBIT_L=r%t%end%s(1)
     my_ORBIT_LATTICE%ORBIT_gammat=norm%tune(3)/my_ORBIT_LATTICE%ORBIT_L
     if(my_ORBIT_LATTICE%ORBIT_gammat<0) then
-       my_ORBIT_LATTICE%ORBIT_gammat=-sqrt(-one/my_ORBIT_LATTICE%ORBIT_gammat)
+       my_ORBIT_LATTICE%ORBIT_gammat=-sqrt(-1.0_dp/my_ORBIT_LATTICE%ORBIT_gammat)
     else
-       my_ORBIT_LATTICE%ORBIT_gammat=sqrt(one/my_ORBIT_LATTICE%ORBIT_gammat)
+       my_ORBIT_LATTICE%ORBIT_gammat=sqrt(1.0_dp/my_ORBIT_LATTICE%ORBIT_gammat)
     endif
 
     my_ORBIT_LATTICE%ORBIT_mass_in_amu=r%start%mass*pmae_amu/pmae
@@ -1419,9 +1436,9 @@ contains
     w1_orbit=r%start
     my_ORBIT_LATTICE%orbit_brho=w1_orbit%brho
     my_ORBIT_LATTICE%orbit_energy=w1_orbit%energy
-    my_ORBIT_LATTICE%orbit_gamma=one/w1_orbit%gamma0i
+    my_ORBIT_LATTICE%orbit_gamma=1.0_dp/w1_orbit%gamma0i
     !    my_ORBIT_LATTICE%orbit_dppfac=one/sqrt(w1_orbit%beta0)/w1_orbit%energy
-    my_ORBIT_LATTICE%orbit_deltae=zero;
+    my_ORBIT_LATTICE%orbit_deltae=0.0_dp;
 
     write(6,*) my_ORBIT_LATTICE%ORBIT_L
     write(6,*) my_ORBIT_LATTICE%ORBIT_OMEGA
@@ -1437,6 +1454,74 @@ contains
   END SUBROUTINE ORBIT_MAKE_NODE_LAYOUT_accel
 
 
+  SUBROUTINE update_twiss_for_orbit 
+    IMPLICIT NONE
+    type(layout), pointer :: R
+    REAL(DP) CLOSED(6)
+
+    INTEGER K
+    TYPE(INTERNAL_STATE) STATE
+    TYPE(DAMAP) ID
+    TYPE(NORMALFORM) NORM
+    TYPE(REAL_8) Y(6)
+    REAL(DP) BET(2),ALF(2),ETA,ETAP
+    TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
+
+    
+
+      !  COMPUTE LATTICE FUNCTIONS
+    r=>my_ORBIT_LATTICE%parent_layout
+    ORBIT_NODES=>my_ORBIT_LATTICE%ORBIT_NODES
+    my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=MY_FALSE
+ 
+    STATE=(my_ORBIT_LATTICE%state-time0)+delta0   
+
+    CALL INIT(STATE,1,0,BERZ)
+    CALL ALLOC(ID);CALL ALLOC(Y);CALL ALLOC(NORM);
+
+    closed=0.0_dp
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
+
+
+    ID=1
+    Y=CLOSED+ID
+    CALL TRACK(R,Y,1,STATE)
+
+    NORM=Y
+
+    Y=CLOSED+NORM%A_T
+    BET(1)=(Y(1).SUB.'1')**2+(Y(1).SUB.'01')**2
+    BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
+    ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
+    ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
+    ETA=Y(1).SUB.'00001'
+    ETAP=Y(2).SUB.'00001'
+
+    WRITE(6,*) "TWISS PARAMETERS AT THE ENTRANCE"
+    WRITE(6,*) "BETAS ", BET
+    WRITE(6,*) "ALPHAS ",ALF
+    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
+    DO K=1,my_ORBIT_LATTICE%ORBIT_N_NODE
+       CALL ORBIT_TRACK_NODE(K,Y,STATE)
+       BET(1)=(Y(1).SUB.'1')**2+(Y(1).SUB.'01')**2
+       BET(2)=(Y(3).SUB.'001')**2+(Y(3).SUB.'0001')**2
+       ALF(1)=-((Y(1).SUB.'1')*(Y(2).SUB.'1')+(Y(1).SUB.'01')*(Y(2).SUB.'01'))
+       ALF(2)=-((Y(3).SUB.'001')*(Y(4).SUB.'001')+(Y(3).SUB.'0001')*(Y(4).SUB.'0001'))
+       ETA=Y(1).SUB.'00001'
+       ETAP=Y(2).SUB.'00001'
+       ORBIT_NODES(K)%LATTICE(2:3)=BET
+       ORBIT_NODES(K)%LATTICE(4:5)=ALF
+       ORBIT_NODES(K)%LATTICE(6)=ETA
+       ORBIT_NODES(K)%LATTICE(7)=ETAP
+    ENDDO
+    WRITE(6,*) "TWISS PARAMETERS AT THE EXIT"
+    WRITE(6,*) "BETAS ", BET
+    WRITE(6,*) "ALPHAS ",ALF
+    WRITE(6,*) "ETA, ETAP ",ETA,ETAP
+
+    my_ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=my_true
+ 
+    end SUBROUTINE update_twiss_for_orbit 
 
 end module orbit_ptc
 
@@ -1459,7 +1544,7 @@ subroutine ptc_track_particle(node_index, x,xp,y,yp,phi,dE)
 
   IF(I==1.AND.MF_HERD/=0) THEN
      WRITE(MF_HERD,'(4(1X,E15.8))') PHI,DE,my_ORBIT_LATTICE%orbit_p0c, &
-          x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*c_1d3
+          x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1e3_dp
      !       WRITE(MF_HERD,'(6(1X,E15.8))') PHI,DE,X_ORBIT(6),X_ORBIT(5), &
      !x_orbit_sync(5)/my_ORBIT_LATTICE%ORBIT_OMEGA/clight*1000.d0,my_ORBIT_LATTICE%ORBIT_OMEGA
      !        ,my_ORBIT_LATTICE%ORBIT_P0C

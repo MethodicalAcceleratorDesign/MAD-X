@@ -36,7 +36,7 @@ module definition
   !  private xintex,dsta,sta,angle,rad,ps,rads,mx
   ! numerical differentiation by knobs
   logical(lp) :: knob_numerical=.false.
-  real(dp) ::  knob_eps(lnv)=c_1d_6
+  real(dp) ::  knob_eps(lnv)=1e-6_dp
   integer ::  knob_i =0
   INTEGER,PARAMETER::NMAX=20
   integer,private,parameter::n_max=10   ! sagan stuff
@@ -370,7 +370,7 @@ contains
     c_%CHECK_MADX_APERTURE =.TRUE.
     c_%stable_da =.true.
     if(comp) then
-       xlost=zero
+       xlost=0.0_dp
        messagelost=" Aperture has been reset "
        nullify(lost_fibre)
        nullify(lost_node)
@@ -397,18 +397,18 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ROOT=ONE
+       ROOT=1.0_dp
        return
     endif
 
-    IF((X<ZERO).AND.c_%ROOT_CHECK) THEN
-       ROOT=ONE
+    IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
+       ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Root undefined "
-    ELSEIF(X>=ZERO) THEN
+    ELSEIF(X>=0.0_dp) THEN
        ROOT=SQRT(X)
     ELSE      !  IF X IS NOT A NUMBER
-       ROOT=ONE
+       ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -418,17 +418,17 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ARCSIN=ZERO
+       ARCSIN=0.0_dp
        return
     endif
-    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
-       ARCSIN=ZERO
+    IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
+       ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Arcsin undefined "
-    ELSEIF(ABS(X)<=ONE) THEN
+    ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCSIN=ASIN(X)
     ELSE      !  IF X IS NOT A NUMBER
-       ARCSIN=ZERO
+       ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -438,17 +438,17 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       ARCCOS=ZERO
+       ARCCOS=0.0_dp
        return
     endif
-    IF((ABS(X)>ONE).AND.c_%ROOT_CHECK) THEN
-       ARCCOS=ZERO
+    IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
+       ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Arccos undefined "
-    ELSEIF(ABS(X)<=ONE) THEN
+    ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
-       ARCCOS=ZERO
+       ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -458,12 +458,12 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       LOGE=ZERO
+       LOGE=0.0_dp
        return
     endif
 
-    IF(X<=ZERO.AND.c_%ROOT_CHECK) THEN
-       LOGE=ZERO
+    IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
+       LOGE=0.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Log undefined "
     ELSE
@@ -478,18 +478,18 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       COSEH=ONE
+       COSEH=1.0_dp
        return
     endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       COSEH=ONE
+       COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Coseh undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        COSEH=COSH(X)
     ELSE      !  IF X IS NOT A NUMBER
-       COSEH=ONE
+       COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -499,18 +499,18 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       SINEH=ZERO
+       SINEH=0.0_dp
        return
     endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       SINEH=ZERO
+       SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Sineh undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        SINEH=SINH(X)
     ELSE      !  IF X IS NOT A NUMBER
-       SINEH=ZERO
+       SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 
@@ -520,18 +520,18 @@ contains
     IMPLICIT NONE
     REAL(DP),INTENT(IN)::X
     IF(.NOT.c_%CHECK_STABLE) then
-       arctan=ZERO
+       arctan=0.0_dp
        return
     endif
 
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
-       arctan=ZERO
+       arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
        messagelost="Arctan undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        arctan=atan(X)
     ELSE      !  IF X IS NOT A NUMBER
-       arctan=ZERO
+       arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
     ENDIF
 

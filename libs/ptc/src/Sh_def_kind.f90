@@ -1145,9 +1145,9 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
        !       DO I=1,B%N
 
@@ -1242,9 +1242,9 @@ contains
     CASE(2)
        CALL ALLOC(DH,D)
 
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
        !       DO I=1,B%N
 
@@ -1407,8 +1407,8 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(CAV4),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) O,X1,X3,BBYTWT,BBYTW,BBXTW
-    integer j,dir,ko
-
+    integer j,ko
+    real(dp) dir
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
@@ -1418,7 +1418,7 @@ CALL FRINGECAV(EL,X,k,2)
 
        do ko=1,el%nf
 
-          x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO) &
+          x(5)=x(5)-el%f(ko)*dir*EL%volt*1e-3_dp*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO) &
                +EL%phase0)/EL%P%P0C
           ! doing crabola
 
@@ -1436,8 +1436,8 @@ CALL FRINGECAV(EL,X,k,2)
                 BBYTW=BBYTWT
              ENDDO
           ELSE
-             BBYTW=zero
-             BBXTW=zero
+             BBYTW=0.0_dp
+             BBXTW=0.0_dp
           ENDIF
 
           ! multipole * cos(omega t+ phi)/p0c
@@ -1459,8 +1459,8 @@ CALL FRINGECAV(EL,X,k,2)
              BBXTW=X3*BBYTW+X1*BBXTW
              BBYTW=BBYTWT
           ELSE
-             BBYTW=zero
-             BBXTW=zero
+             BBYTW=0.0_dp
+             BBXTW=0.0_dp
           ENDIF
           X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*el%r*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
@@ -1481,7 +1481,8 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(CAV4P),INTENT(INOUT):: EL
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     type(real_8) O,X1,X3,BBYTWT,BBYTW,BBXTW
-    INTEGER J,dir,ko
+    INTEGER J,ko
+    real(dp) dir
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
@@ -1491,7 +1492,7 @@ CALL FRINGECAV(EL,X,k,2)
 
     do ko=1,el%nf
 
-       x(5)=x(5)-el%f(ko)*dir*EL%volt*c_1d_3*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+ &
+       x(5)=x(5)-el%f(ko)*dir*EL%volt*1e-3_dp*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+ &
             EL%PH(KO)+EL%phase0)/EL%P%P0C
        ! doing crabola
 
@@ -1509,8 +1510,8 @@ CALL FRINGECAV(EL,X,k,2)
              BBYTW=BBYTWT
           ENDDO
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
@@ -1534,8 +1535,8 @@ CALL FRINGECAV(EL,X,k,2)
           BBXTW=X3*BBYTW+X1*BBXTW
           BBYTW=BBYTWT
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
        X(5)=X(5)+el%f(ko)*ko*O*dir*BBYTW/EL%P%P0C*el%r*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
@@ -1559,14 +1560,14 @@ CALL FRINGECAV(EL,X,k,2)
 
 
     O=EL%freq*twopi/CLIGHT
-    V=EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*EL%volt*1e-3_dp/EL%P%P0C
 
-    A=zero
-    ad=zero
+    A=0.0_dp
+    ad=0.0_dp
    do ko=1,el%nf    ! over modes
    
-    C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
-    S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
+    C1=el%f(ko)*V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
+    S1=-el%f(ko)*(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/4.0_dp
     AD(1)=-C1+AD(1)
     AD(2)=S1+AD(2)
 
@@ -1599,19 +1600,19 @@ CALL FRINGECAV(EL,X,k,2)
     CALL ALLOC(C1,S1,V,O)
 
     O=EL%freq*twopi/CLIGHT
-    V=EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*EL%volt*1e-3_dp/EL%P%P0C
     
     DO KO=1,3
-     A(KO)=zero
+     A(KO)=0.0_dp
     ENDDO
     DO KO=1,2
-     AD(KO)=zero
+     AD(KO)=0.0_dp
     ENDDO
 
    do ko=1,el%nf    ! over modes
    
-    C1=V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*HALF
-    S1=-(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/four
+    C1=el%f(ko)*V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
+    S1=-el%f(ko)*(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/4.0_dp
     AD(1)=-C1+AD(1)
     AD(2)=S1+AD(2)
 
@@ -1646,39 +1647,39 @@ CALL FRINGECAV(EL,X,k,2)
 
     IF(D%P%EXACT) THEN
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
+          F(6)=(1.0_dp/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one+X(5))/PZ-(1-k%TOTALPATH)
+          F(6)=(1.0_dp+X(5))/PZ-(1-k%TOTALPATH)
        endif
     ELSE
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))/pz
+          F(6)=((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/D%P%BETA0+x(5))/pz
           F(6)=F(6)-(1-k%TOTALPATH)/D%P%BETA0
        else
-          F(1)=X(2)/(one+X(5))
-          F(3)=X(4)/(one+X(5))
+          F(1)=X(2)/(1.0_dp+X(5))
+          F(3)=X(4)/(1.0_dp+X(5))
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(ONE/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+k%TOTALPATH
+          F(6)=(1.0_dp/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+k%TOTALPATH
        endif
     ENDIF
 
@@ -1697,6 +1698,9 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(CAV4P),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    call alloc(A,3)
+    call alloc(AD,2)
+    call alloc(PZ)
 
     CALL Abmad_TRANS(D,Z0,X,k,A,AD)
 
@@ -1705,45 +1709,48 @@ CALL FRINGECAV(EL,X,k,2)
 
     IF(D%P%EXACT) THEN
        if(k%TIME) then
-          PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
+          F(6)=(1.0_dp/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
        else
-          PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=sqrt((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one+X(5))/PZ-(1-k%TOTALPATH)
+          F(6)=(1.0_dp+X(5))/PZ-(1-k%TOTALPATH)
        endif
     ELSE
        if(k%TIME) then
-          PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))/pz
+          F(6)=((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/D%P%BETA0+x(5))/pz
           F(6)=F(6)-(1-k%TOTALPATH)/D%P%BETA0
        else
-          F(1)=X(2)/(one+X(5))
-          F(3)=X(4)/(one+X(5))
+          F(1)=X(2)/(1.0_dp+X(5))
+          F(3)=X(4)/(1.0_dp+X(5))
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(ONE/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+k%TOTALPATH
+          F(6)=(1.0_dp/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+k%TOTALPATH
        endif
     ENDIF
 
     X(2)=X(2)+A(1)
     X(4)=X(4)+A(2)
 
+    call KILL(A,3)
+    call KILL(AD,2)
+    call KILL(PZ)
   END subroutine fevalBMAD_CAVP
 
  subroutine rk2bmad_cavr(ti,h,GR,y,k)
@@ -1765,10 +1772,10 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -1802,16 +1809,16 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -1832,7 +1839,7 @@ CALL FRINGECAV(EL,X,k,2)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=tt
 
@@ -1866,59 +1873,59 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
-    tt=tI+h/nine
+    tt=tI+h/9.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
-    tt=tI+h/six
+    tt=tI+h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
-    tt=tI+h/three
+    tt=tI+h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
-    tt=tI+half*h
+    tt=tI+0.5_dp*h
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
-    tt = tI+two*h/three
+    tt = tI+2.0_dp*h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
-    tt = tI + five*h/six
+    tt = tI + 5.0_dp*h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
     tt = tI + h
@@ -1928,7 +1935,7 @@ CALL FRINGECAV(EL,X,k,2)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
     tI=ti+h
 
@@ -1960,10 +1967,10 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -2010,16 +2017,16 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -2040,7 +2047,7 @@ CALL FRINGECAV(EL,X,k,2)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=tt
 
@@ -2087,59 +2094,59 @@ CALL FRINGECAV(EL,X,k,2)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
-    tt=tI+h/nine
+    tt=tI+h/9.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
-    tt=tI+h/six
+    tt=tI+h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
-    tt=tI+h/three
+    tt=tI+h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
-    tt=tI+half*h
+    tt=tI+0.5_dp*h
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
-    tt = tI+two*h/three
+    tt = tI+2.0_dp*h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
-    tt = tI + five*h/six
+    tt = tI + 5.0_dp*h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
     tt = tI + h
@@ -2149,7 +2156,7 @@ CALL FRINGECAV(EL,X,k,2)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
     tI=ti+h
     call kill(tt)
@@ -2226,6 +2233,7 @@ CALL FRINGECAV(EL,X,k,2)
     integer, INTENT(IN) :: j
     TYPE(REAL_8) Z0,D1
     INTEGER TOTALPATH
+    real(dp) xx(6)
 
     CALL ALLOC(Z0,D1)
 
@@ -2287,7 +2295,7 @@ CALL FRINGECAV(EL,X,k,2)
 
     JC=-2*J+3
     if(jc==1) then
-     z=zero
+     z=0.0_dp
     else
      z=EL%L
     endif
@@ -2306,7 +2314,7 @@ CALL FRINGECAV(EL,X,k,2)
        
 
     O=EL%freq*twopi/CLIGHT
-    V=jC*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=jC*EL%P%CHARGE*EL%volt*1e-3_dp/EL%P%P0C
 
 
    do ko=1,el%nf    ! over modes
@@ -2315,8 +2323,8 @@ CALL FRINGECAV(EL,X,k,2)
     c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
 
-    X(2)=X(2)+V*S1*X(1)*HALF
-    X(4)=X(4)+V*S1*X(3)*HALF
+    X(2)=X(2)+V*S1*X(1)*0.5_dp
+    X(4)=X(4)+V*S1*X(3)*0.5_dp
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
    enddo
@@ -2340,7 +2348,7 @@ CALL FRINGECAV(EL,X,k,2)
  
     JC=-2*J+3
     if(jc==1) then
-     z=zero
+     z=0.0_dp
     else
      z=EL%L
     endif
@@ -2357,7 +2365,7 @@ CALL FRINGECAV(EL,X,k,2)
     ENDIF
 
     O=EL%freq*twopi/CLIGHT
-    V=jC*EL%P%CHARGE*EL%volt*c_1d_3/EL%P%P0C
+    V=jC*EL%P%CHARGE*EL%volt*1e-3_dp/EL%P%P0C
 
    do ko=1,el%nf    ! over modes
    
@@ -2365,8 +2373,8 @@ CALL FRINGECAV(EL,X,k,2)
     c1=cos(kbmad*ko*O*z)*cos(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))
 
 
-    X(2)=X(2)+V*S1*X(1)*HALF
-    X(4)=X(4)+V*S1*X(3)*HALF
+    X(2)=X(2)+V*S1*X(1)*0.5_dp
+    X(4)=X(4)+V*S1*X(3)*0.5_dp
     x(5)=x(5)-0.25e0_dp*(X(1)**2+X(3)**2)*V*C1*O*ko
 
    enddo
@@ -2388,23 +2396,24 @@ CALL FRINGECAV(EL,X,k,2)
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
-    integer j,dir,ko
+    integer j,ko
+    real(dp) dir
 
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
     O=twopi*EL%freq/CLIGHT
-    VL=dir*YL*EL%volt*c_1d_3/EL%P%P0C
+    VL=dir*YL*EL%volt*1e-3_dp/EL%P%P0C
 
     do ko=1,el%nf    ! over modes
 
-       DF=ZERO
-       F=ONE
-       R2=ONE
+       DF=0.0_dp
+       F=1.0_dp
+       R2=1.0_dp
 
        DO I=1,EL%N_BESSEL
-          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          R2=-R2*(ko*O)**2/4.0_dp/(I+1)**2
           DR2=R2*I
           DF=DF+DR2*2
           R2=R2*(X(1)**2+X(3)**2)
@@ -2439,8 +2448,8 @@ CALL FRINGECAV(EL,X,k,2)
              BBYTW=BBYTWT
           ENDDO
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
@@ -2462,8 +2471,8 @@ CALL FRINGECAV(EL,X,k,2)
           BBXTW=X3*BBYTW+X1*BBXTW
           BBYTW=BBYTWT
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
@@ -2480,7 +2489,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     TYPE(REAL_8) BBYTWT,BBXTW,BBYTW,x1,x3
-    integer j,dir,ko
+    integer j,ko
+    real(dp) dir
 
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     CALL ALLOC(DF,R2,F,DR2,O,VL)
@@ -2489,16 +2499,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     DIR=EL%P%DIR*EL%P%CHARGE
 
     O=twopi*EL%freq/CLIGHT
-    VL=dir*YL*EL%volt*c_1d_3/EL%P%P0C
+    VL=dir*YL*EL%volt*1e-3_dp/EL%P%P0C
 
     do ko=1,el%nf    ! over modes
 
-       DF=ZERO
-       F=ONE
-       R2=ONE
+       DF=0.0_dp
+       F=1.0_dp
+       R2=1.0_dp
 
        DO I=1,EL%N_BESSEL
-          R2=-R2*(ko*O)**2/FOUR/(I+1)**2
+          R2=-R2*(ko*O)**2/4.0_dp/(I+1)**2
           DR2=R2*I
           DF=DF+DR2*2
           R2=R2*(X(1)**2+X(3)**2)
@@ -2533,8 +2543,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
              BBYTW=BBYTWT
           ENDDO
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        ! multipole * cos(omega t+ phi)/p0c
@@ -2556,8 +2566,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBXTW=X3*BBYTW+X1*BBXTW
           BBYTW=BBYTWT
        ELSE
-          BBYTW=zero
-          BBXTW=zero
+          BBYTW=0.0_dp
+          BBXTW=0.0_dp
        ENDIF
 
        X(5)=X(5)+el%f(ko)*(ko*O)*YL*DIR*BBYTW/EL%P%P0C*EL%R*sin(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
@@ -2581,29 +2591,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(EXACT) THEN
        if(CTIME) then
-          PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
-          X(6)=X(6)+L*(one/b+X(5))/PZ-(1-T)*LD/b
+          X(6)=X(6)+L*(1.0_dp/b+X(5))/PZ-(1-T)*LD/b
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
-          X(6)=X(6)+L*(one+X(5))/PZ-(1-T)*LD
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ-(1-T)*LD
        endif
     ELSE
        if(CTIME) then
-          PZ=ROOT(one+two*X(5)/b+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
           X(3)=X(3)+L*X(4)/pz
           ! bug found by Schmidt totalpath=false time=true
           !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+T)*(one/b+x(5))*L/pz
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*L/pz
           X(6)=X(6)-(1-T)*L/B
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+T*L
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+T*L
        endif
     ENDIF
 
@@ -2622,32 +2632,32 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(EXACT) THEN
        CALL ALLOC(PZ)
        if(ctime) then
-          PZ=SQRT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
-          X(6)=X(6)+L*(one/b+X(5))/PZ-(1-T)*LD/b
+          X(6)=X(6)+L*(1.0_dp/b+X(5))/PZ-(1-T)*LD/b
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
-          X(6)=X(6)+L*(one+X(5))/PZ-(1-T)*LD
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ-(1-T)*LD
        endif
        CALL KILL(PZ)
     ELSE
        if(ctime) then
           CALL ALLOC(PZ)
-          PZ=SQRT(one+two*X(5)/b+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
           X(3)=X(3)+L*X(4)/pz
           ! bug found by Schmidt totalpath=false time=true
           !          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+T)*(one/b+x(5))*L/pz
-          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/b+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*L/pz
           X(6)=X(6)-(1-T)*L/B
           CALL KILL(PZ)
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+T*L
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+T*L
        endif
     ENDIF
 
@@ -2679,11 +2689,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
     if(el%patch) then
-       alfh=-EL%thin_h_angle/two
+       alfh=-EL%thin_h_angle/2.0_dp
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
     IF(PRESENT(MID)) THEN
@@ -2694,10 +2704,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL XMID(MID,X,1)
     ELSE
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-          X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-          X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
+          X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-1.0_dp)  ! highly illegal additions by frs
+          X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-1.0_dp)  ! highly illegal additions by frs
+          X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(1.0_dp/EL%P%BETA0+x(5))/pz
        else
           X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
           X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*x(5)  ! highly illegal additions by frs
@@ -2711,10 +2721,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 !!!!!!!!!!!   solenoid
 
     if(k%TIME) then   ! bug 2006.1.8
-       ANG=EL%B_SOL*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2)*el%ls
+       ANG=EL%B_SOL*EL%P%CHARGE/2.0_dp/root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
-       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))*el%ls
+       ANG=EL%B_SOL*EL%P%CHARGE/2.0_dp/(1.0_dp+X(5))*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
@@ -2727,9 +2737,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     XT(4)=myCOS*X(4)-mySIN*X(2)
 
     if(k%TIME) then
-       X(6)=X(6)+ANG*(one/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(one+two*X(5)/EL%P%beta0+x(5)**2)
+       X(6)=X(6)+ANG*(1.0_dp/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
     else
-       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(one+X(5))
+       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(1.0_dp+X(5))
     endif
     DO I=1,4
        X(I)=XT(I)
@@ -2739,14 +2749,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     myCOS=(EL%B_SOL*EL%P%CHARGE)**2*el%ls
 
     if(k%TIME) then
-       mySIN=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
-       X(2)=X(2)-(myCOS)*X(1)/four/mySIN
-       X(4)=X(4)-(myCOS)*X(3)/four/mySIN
-       X(6)=X(6)+(one/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/eight/mySIN**3
+       mySIN=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+       X(2)=X(2)-(myCOS)*X(1)/4.0_dp/mySIN
+       X(4)=X(4)-(myCOS)*X(3)/4.0_dp/mySIN
+       X(6)=X(6)+(1.0_dp/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/8.0_dp/mySIN**3
     else
-       X(2)=X(2)-(myCOS)*X(1)/four/(one+X(5))
-       X(4)=X(4)-(myCOS)*X(3)/four/(one+X(5))
-       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/eight/(one+X(5))**2
+       X(2)=X(2)-(myCOS)*X(1)/4.0_dp/(1.0_dp+X(5))
+       X(4)=X(4)-(myCOS)*X(3)/4.0_dp/(1.0_dp+X(5))
+       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/8.0_dp/(1.0_dp+X(5))**2
     endif
 
 
@@ -2757,7 +2767,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(el%patch) then
-       alfh=-EL%thin_h_angle/two
+       alfh=-EL%thin_h_angle/2.0_dp
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
 
@@ -2803,22 +2813,22 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
     if(el%patch) then
-       alfh=-EL%thin_h_angle/two
+       alfh=-EL%thin_h_angle/2.0_dp
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
 
     if(k%TIME) then
        call alloc(pz)
-       PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
-       X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-one)  ! highly illegal additions by frs
-       X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-one)  ! highly illegal additions by frs
-       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(one/EL%P%BETA0+x(5))/pz
+       PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
+       X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*(PZ-1.0_dp)  ! highly illegal additions by frs
+       X(4)=X(4)+(-EL%thin_v_foc+EL%vf)*x3+EL%P%DIR*EL%P%CHARGE*EL%thin_v_angle*(PZ-1.0_dp)  ! highly illegal additions by frs
+       X(6)=X(6)+EL%P%DIR*EL%P%CHARGE*(EL%thin_h_angle*x1+EL%thin_v_angle*x3)*(1.0_dp/EL%P%BETA0+x(5))/pz
        call kill(pz)
     else
        X(2)=X(2)+(-EL%thin_h_foc+EL%hf)*x1+EL%P%DIR*EL%P%CHARGE*EL%thin_h_angle*x(5)  ! highly illegal additions by frs
@@ -2833,10 +2843,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 !!!!!!!!!!!   solenoid
 
     if(k%TIME) then   ! bug 2006.1.8
-       ANG=EL%B_SOL*EL%P%CHARGE/two/sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)*el%ls
+       ANG=EL%B_SOL*EL%P%CHARGE/2.0_dp/sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/root(one+two*X(5)/EL%P%beta0+x(5)**2) ! bug_intentional
     else
-       ANG=EL%B_SOL*EL%P%CHARGE/two/(one+X(5))*el%ls
+       ANG=EL%B_SOL*EL%P%CHARGE/2.0_dp/(1.0_dp+X(5))*el%ls
        !       ANG=YL*EL%B_SOL*EL%P%dir*EL%P%CHARGE/two/(one+X(5))   ! bug_intentional
     endif
     myCOS=COS(ANG)
@@ -2849,9 +2859,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     XT(4)=myCOS*X(4)-mySIN*X(2)
 
     if(k%TIME) then
-       X(6)=X(6)+ANG*(one/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(one+two*X(5)/EL%P%beta0+x(5)**2)
+       X(6)=X(6)+ANG*(1.0_dp/EL%P%beta0+x(5))*(X(3)*X(2)-X(1)*X(4))/(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
     else
-       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(one+X(5))
+       X(6)=X(6)+ANG*(X(3)*X(2)-X(1)*X(4))/(1.0_dp+X(5))
     endif
     DO I=1,4
        X(I)=XT(I)
@@ -2864,21 +2874,21 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     myCOS=(EL%B_SOL*EL%P%CHARGE)**2*el%ls
 
     if(k%TIME) then
-       mySIN=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
-       X(2)=X(2)-(myCOS)*X(1)/four/mySIN
-       X(4)=X(4)-(myCOS)*X(3)/four/mySIN
-       X(6)=X(6)+(one/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/eight/mySIN**3
+       mySIN=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+       X(2)=X(2)-(myCOS)*X(1)/4.0_dp/mySIN
+       X(4)=X(4)-(myCOS)*X(3)/4.0_dp/mySIN
+       X(6)=X(6)+(1.0_dp/EL%P%beta0+x(5))*(myCOS)*(X(1)**2+X(3)**2)/8.0_dp/mySIN**3
     else
-       X(2)=X(2)-(myCOS)*X(1)/four/(one+X(5))
-       X(4)=X(4)-(myCOS)*X(3)/four/(one+X(5))
-       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/eight/(one+X(5))**2
+       X(2)=X(2)-(myCOS)*X(1)/4.0_dp/(1.0_dp+X(5))
+       X(4)=X(4)-(myCOS)*X(3)/4.0_dp/(1.0_dp+X(5))
+       X(6)=X(6)+(myCOS)*(X(1)**2+X(3)**2)/8.0_dp/(1.0_dp+X(5))**2
     endif
 
 
 
 
     if(el%patch) then
-       alfh=-EL%thin_h_angle/two
+       alfh=-EL%thin_h_angle/2.0_dp
        call ROT_XZ(alfh,X,EL%P%BETA0,EL%P%exact.or.c_%ALWAYS_EXACT_PATCHING,k%TIME)
     endif
 
@@ -2901,10 +2911,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(MAGNET_CHART),INTENT(IN):: EL
     INTEGER, INTENT(IN) :: K1
     real(dp) A,B,C,D,DEL,X2
-    INTEGER I,J
+    INTEGER J
     real(dp) RX,IX,DRX,DIX,U,V,DU,DV,NF
     real(dp) DUX,DUY,DVX,DVY,FX_X,FX_Y,FY_X,FY_Y,FX,FY
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) i
 
     IF(EL%NMUL<=1) RETURN
 
@@ -2918,15 +2929,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        I=-EL%CHARGE
     ENDIF
 
-    FX=ZERO
-    FY=ZERO
-    FX_X=ZERO
-    FX_Y=ZERO
-    FY_X=ZERO
-    FY_Y=ZERO
+    FX=0.0_dp
+    FY=0.0_dp
+    FX_X=0.0_dp
+    FX_Y=0.0_dp
+    FY_X=0.0_dp
+    FY_Y=0.0_dp
 
-    RX=ONE
-    IX=ZERO
+    RX=1.0_dp
+    IX=0.0_dp
 
     !   RX=X(1)
     !   IX=X(3)
@@ -2949,10 +2960,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           DV =  BN(J)*DIX  +  AN(J)*DRX
        ENDIF
 
-       U  = (-I/FOUR/(J+1))*U
-       V  = (-I/FOUR/(J+1))*V
-       DU = (-I/FOUR/(J+1))*DU
-       DV = (-I/FOUR/(J+1))*DV
+       U  = (-I/4.0_dp/(J+1))*U
+       V  = (-I/4.0_dp/(J+1))*V
+       DU = (-I/4.0_dp/(J+1))*DU
+       DV = (-I/4.0_dp/(J+1))*DV
 
        DUX = J*DU
        DVX = J*DV
@@ -2973,17 +2984,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ENDDO
 
     if(k%TIME) then
-       del=one/ROOT(one+two*X(5)/el%beta0+x(5)**2)
+       del=1.0_dp/ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)
     else
-       DEL=one/(one+X(5))
+       DEL=1.0_dp/(1.0_dp+X(5))
     endif
 
 
 
 
-    A=one-FX_X*DEL
+    A=1.0_dp-FX_X*DEL
     B=-FY_X*DEL
-    D=one-FY_Y*DEL
+    D=1.0_dp-FY_Y*DEL
     C=-FX_Y*DEL
 
     X(1)=X(1)-FX*DEL
@@ -2992,7 +3003,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X2
     X(3)=X(3)-FY*DEL
     if(k%TIME) then
-       X(6)=X(6)-(one/el%beta0+x(5))*(X(2)*FX+X(4)*FY)*DEL**3
+       X(6)=X(6)-(1.0_dp/el%beta0+x(5))*(X(2)*FX+X(4)*FY)*DEL**3
     else
        X(6)=X(6)-(X(2)*FX+X(4)*FY)*DEL**2
     endif
@@ -3006,12 +3017,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(REAL_8),INTENT(IN),dimension(:)::AN,BN
     TYPE(MAGNET_CHART),INTENT(IN):: EL
     INTEGER, INTENT(IN) :: K1
-    INTEGER I,J
+    INTEGER J
     TYPE(REAL_8) A,B,C,D,DEL,X2
     TYPE(REAL_8) RX,IX,DRX,DIX,U,V,DU,DV
     TYPE(REAL_8) DUX,DUY,DVX,DVY,FX_X,FX_Y,FY_X,FY_Y,FX,FY
     REAL(DP) NF
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) i
 
 
 
@@ -3030,14 +3042,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        I=-EL%CHARGE
     ENDIF
 
-    FX=ZERO
-    FY=ZERO
-    FX_X=ZERO
-    FX_Y=ZERO
-    FY_X=ZERO
-    FY_Y=ZERO
-    RX=ONE
-    IX=ZERO
+    FX=0.0_dp
+    FY=0.0_dp
+    FX_X=0.0_dp
+    FX_Y=0.0_dp
+    FY_X=0.0_dp
+    FY_Y=0.0_dp
+    RX=1.0_dp
+    IX=0.0_dp
 
     !   RX=X(1)
     !   IX=X(3)
@@ -3060,10 +3072,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           DV =  BN(J)*DIX  +  AN(J)*DRX
        ENDIF
 
-       U  = (-I/FOUR/(J+1))*U
-       V  = (-I/FOUR/(J+1))*V
-       DU = (-I/FOUR/(J+1))*DU
-       DV = (-I/FOUR/(J+1))*DV
+       U  = (-I/4.0_dp/(J+1))*U
+       V  = (-I/4.0_dp/(J+1))*V
+       DU = (-I/4.0_dp/(J+1))*DU
+       DV = (-I/4.0_dp/(J+1))*DV
 
        DUX = J*DU
        DVX = J*DV
@@ -3084,17 +3096,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ENDDO
 
     if(k%TIME) then
-       del=one/SQRT(one+two*X(5)/el%beta0+x(5)**2)
+       del=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)
     else
-       DEL=one/(one+X(5))
+       DEL=1.0_dp/(1.0_dp+X(5))
     endif
 
 
 
 
-    A=one-FX_X*DEL
+    A=1.0_dp-FX_X*DEL
     B=-FY_X*DEL
-    D=one-FY_Y*DEL
+    D=1.0_dp-FY_Y*DEL
     C=-FX_Y*DEL
 
     X(1)=X(1)-FX*DEL
@@ -3103,7 +3115,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X2
     X(3)=X(3)-FY*DEL
     if(k%TIME) then
-       X(6)=X(6)-(one/el%beta0+x(5))*(X(2)*FX+X(4)*FY)*DEL**3
+       X(6)=X(6)-(1.0_dp/el%beta0+x(5))*(X(2)*FX+X(4)*FY)*DEL**3
     else
        X(6)=X(6)-(X(2)*FX+X(4)*FY)*DEL**2
     endif
@@ -3127,29 +3139,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(EL%DIR==1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
-       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
+       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/2.0_dp)*X(1)**2
     ENDIF
 
     IF(k%TIME) THEN
-       PM=ROOT(ONE+TWO*X(5)/el%beta0+x(5)**2-X(2)**2)
-       XI=EL%DIR*EL%CHARGE*ROOT(ONE+TWO*X(5)/el%beta0+x(5)**2)*BN(1)*H/PM**2
-       DXI_PX=TWO*X(2)/PM**2 * XI
-       DXI_DDEL=-TWO*(ONE+X(5))/PM**2 * XI
+       PM=ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2-X(2)**2)
+       XI=EL%DIR*EL%CHARGE*ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)*BN(1)*H/PM**2
+       DXI_PX=2.0_dp*X(2)/PM**2 * XI
+       DXI_DDEL=-2.0_dp*(1.0_dp+X(5))/PM**2 * XI
     ELSE
-       PM=ROOT((ONE+X(5))**2-X(2)**2)
-       XI=EL%DIR*EL%CHARGE*(ONE+X(5))*BN(1)*H/PM**2
-       DXI_PX=TWO*X(2)/PM**2 * XI
-       DXI_DDEL=-TWO*(ONE/EL%BETA0+X(5))/PM**2 * XI
+       PM=ROOT((1.0_dp+X(5))**2-X(2)**2)
+       XI=EL%DIR*EL%CHARGE*(1.0_dp+X(5))*BN(1)*H/PM**2
+       DXI_PX=2.0_dp*X(2)/PM**2 * XI
+       DXI_DDEL=-2.0_dp*(1.0_dp/EL%BETA0+X(5))/PM**2 * XI
     ENDIF
 
-    X(1)=X(1)/(ONE-DXI_PX*X(3)**2)
+    X(1)=X(1)/(1.0_dp-DXI_PX*X(3)**2)
     X(2)=X(2)-XI*X(3)**2
-    X(4)=X(4)-TWO*XI*X(1)*X(3)
+    X(4)=X(4)-2.0_dp*XI*X(1)*X(3)
     X(6)=X(6)-DXI_DDEL*X(1)*X(3)**2
 
     IF(EL%DIR==-1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
-       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
+       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/2.0_dp)*X(1)**2
     ENDIF
     !    CALL check_stability(X)
     call check_root_drift(el,X,k)
@@ -3169,29 +3181,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(EL%DIR==1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
-       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
+       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/2.0_dp)*X(1)**2
     ENDIF
 
     IF(k%TIME) THEN
-       PM=SQRT(ONE+TWO*X(5)/el%beta0+x(5)**2-X(2)**2)
-       XI=EL%DIR*EL%CHARGE* SQRT(ONE+TWO*X(5)/el%beta0+x(5)**2)*BN(1)*H/PM**2
-       DXI_PX=TWO*X(2)/PM**2 * XI
-       DXI_DDEL=-TWO*(ONE+X(5))/PM**2 * XI
+       PM=SQRT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2-X(2)**2)
+       XI=EL%DIR*EL%CHARGE* SQRT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)*BN(1)*H/PM**2
+       DXI_PX=2.0_dp*X(2)/PM**2 * XI
+       DXI_DDEL=-2.0_dp*(1.0_dp+X(5))/PM**2 * XI
     ELSE
-       PM=SQRT((ONE+X(5))**2-X(2)**2)
-       XI=EL%DIR*EL%CHARGE*(ONE+X(5))*BN(1)*H/PM**2
-       DXI_PX=TWO*X(2)/PM**2 * XI
-       DXI_DDEL=-TWO*(ONE/EL%BETA0+X(5))/PM**2 * XI
+       PM=SQRT((1.0_dp+X(5))**2-X(2)**2)
+       XI=EL%DIR*EL%CHARGE*(1.0_dp+X(5))*BN(1)*H/PM**2
+       DXI_PX=2.0_dp*X(2)/PM**2 * XI
+       DXI_DDEL=-2.0_dp*(1.0_dp/EL%BETA0+X(5))/PM**2 * XI
     ENDIF
 
-    X(1)=X(1)/(ONE-DXI_PX*X(3)**2)
+    X(1)=X(1)/(1.0_dp-DXI_PX*X(3)**2)
     X(2)=X(2)-XI*X(3)**2
-    X(4)=X(4)-TWO*XI*X(1)*X(3)
+    X(4)=X(4)-2.0_dp*XI*X(1)*X(3)
     X(6)=X(6)-DXI_DDEL*X(1)*X(3)**2
 
     IF(EL%DIR==-1) THEN   ! NOT IMPORTANT; JUST TO INSURE REVERSAL SYMMETRY
        ! HORIZONTAL WEDGE
-       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/TWO)*X(1)**2
+       X(2)=X(2)+(EL%DIR*EL%CHARGE*BN(1)*H/2.0_dp)*X(1)**2
     ENDIF
 
     CALL KILL(XI,PM,DXI_PX,DXI_DDEL)
@@ -3204,15 +3216,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp),INTENT(INOUT):: X(6)
     real(dp),INTENT(IN)::H,E
     real(dp),INTENT(IN),dimension(:)::BN
-    INTEGER,INTENT(IN):: DIR
+    real(dp),INTENT(IN):: DIR
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
-    C=one/COS(E)**3
+    C=1.0_dp/COS(E)**3
 
-    X(2)=X(2)+(DIR*BN(1)*H/two)*X(1)**2
-    X(2)=X(2)-(DIR*BN(1)*H*C/two)*X(3)**2
+    X(2)=X(2)+(DIR*BN(1)*H/2.0_dp)*X(1)**2
+    X(2)=X(2)-(DIR*BN(1)*H*C/2.0_dp)*X(3)**2
     X(4)=X(4)-(DIR*BN(1)*H*C)*X(1)*X(3)
 
   END SUBROUTINE FACER
@@ -3223,15 +3235,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(REAL_8),INTENT(IN)::H
     TYPE(REAL_8),INTENT(IN),dimension(:)::BN
     real(dp),INTENT(IN):: E
-    INTEGER,INTENT(IN):: DIR
+    real(dp),INTENT(IN):: DIR
     real(dp) C
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
 
-    C=one/COS(E)**3
+    C=1.0_dp/COS(E)**3
 
-    X(2)=X(2)+(DIR*BN(1)*H/two)*X(1)**2
-    X(2)=X(2)-(DIR*BN(1)*H*C/two)*X(3)**2
+    X(2)=X(2)+(DIR*BN(1)*H/2.0_dp)*X(1)**2
+    X(2)=X(2)-(DIR*BN(1)*H*C/2.0_dp)*X(3)**2
     X(4)=X(4)-(DIR*BN(1)*H*C)*X(1)*X(3)
 
   END SUBROUTINE FACEP
@@ -3267,19 +3279,19 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(k%TIME) then
-       PZ=ROOT(one+two*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
-       TIME_FAC=ONE/el%beta0+X(5)
+       PZ=ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
+       TIME_FAC=1.0_dp/el%beta0+X(5)
     else
-       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-       TIME_FAC=ONE+X(5)
+       PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+       TIME_FAC=1.0_dp+X(5)
     endif
     XP=X(2)/PZ ; YP=X(4)/PZ;
 
-    D(1,1)=(ONE+XP**2)/PZ
+    D(1,1)=(1.0_dp+XP**2)/PZ
     D(2,1)=XP*YP/PZ
     D(3,1)=-XP
     D(1,2)=XP*YP/PZ
-    D(2,2)=(ONE+YP**2)/PZ
+    D(2,2)=(1.0_dp+YP**2)/PZ
     D(3,2)=-YP
     D(1,3)=-TIME_FAC*XP/PZ**2
     D(2,3)=-TIME_FAC*YP/PZ**2
@@ -3287,13 +3299,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
     !    FI0= arctan((XP/(one+yp**2)))    !-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )   *PZ
-    FI0= ATAN((XP/(one+yp**2)))-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
+    FI0= ATAN((XP/(1.0_dp+yp**2)))-B*FINT*HGAP*2.0_dp*( 1.0_dp + XP**2*(2.0_dp+YP**2) )*PZ
     CO2=B/COS(FI0)**2
-    CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
+    CO1=CO2/(1.0_dp+(XP/(1.0_dp+yp**2))**2 )
 
-    FI(1)=CO1/(one+yp**2)-CO2*B*FINT*HGAP*two*( TWO*XP*(TWO+YP**2)*PZ )
-    FI(2)=-CO1*TWO*XP*YP/(one+yp**2)**2-CO2*B*FINT*HGAP*two*( TWO*XP**2*YP)*PZ
-    FI(3)=-CO2*B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )
+    FI(1)=CO1/(1.0_dp+yp**2)-CO2*B*FINT*HGAP*2.0_dp*( 2.0_dp*XP*(2.0_dp+YP**2)*PZ )
+    FI(2)=-CO1*2.0_dp*XP*YP/(1.0_dp+yp**2)**2-CO2*B*FINT*HGAP*2.0_dp*( 2.0_dp*XP**2*YP)*PZ
+    FI(3)=-CO2*B*FINT*HGAP*2.0_dp*( 1.0_dp + XP**2*(2.0_dp+YP**2) )
 
     FI0=B*TAN(FI0)
 
@@ -3301,24 +3313,24 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !       X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
     !       & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,2)+B
     ENDDO
-    X(3)=TWO*X(3)/(ONE+ sqrt(ONE-TWO*B*X(3)) )
+    X(3)=2.0_dp*X(3)/(1.0_dp+ sqrt(1.0_dp-2.0_dp*B*X(3)) )
     X(4)=X(4)-FI0*X(3)
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,1)+B
     ENDDO
-    X(1)=X(1)+HALF*B*X(3)**2
+    X(1)=X(1)+0.5_dp*B*X(3)**2
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,3)+B
     ENDDO
-    X(6)=X(6)-HALF*B*X(3)**2
+    X(6)=X(6)-0.5_dp*B*X(3)**2
     !    CALL check_stability(X)
     call check_root_drift(el,X,k)
   END SUBROUTINE FRINGE_dipoleR
@@ -3366,19 +3378,19 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(k%TIME) then
-       PZ=sqrt(one+two*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
-       TIME_FAC=ONE/el%beta0+X(5)
+       PZ=sqrt(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2-X(2)**2-X(4)**2)
+       TIME_FAC=1.0_dp/el%beta0+X(5)
     else
-       PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
-       TIME_FAC=ONE+X(5)
+       PZ=sqrt((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+       TIME_FAC=1.0_dp+X(5)
     endif
     XP=X(2)/PZ ; YP=X(4)/PZ;
 
-    D(1,1)=(ONE+XP**2)/PZ
+    D(1,1)=(1.0_dp+XP**2)/PZ
     D(2,1)=XP*YP/PZ
     D(3,1)=-XP
     D(1,2)=XP*YP/PZ
-    D(2,2)=(ONE+YP**2)/PZ
+    D(2,2)=(1.0_dp+YP**2)/PZ
     D(3,2)=-YP
     D(1,3)=-TIME_FAC*XP/PZ**2
     D(2,3)=-TIME_FAC*YP/PZ**2
@@ -3387,13 +3399,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    FI0=(B*XP/(one+yp**2)-B2* ( ONE + XP**2*(TWO+YP**2) )/PZ)
     !    FI0=(XP/(one+yp**2))
     !    FI0= ATAN(FI0)-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
-    FI0= ATAN((XP/(one+yp**2)))-B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )*PZ
+    FI0= ATAN((XP/(1.0_dp+yp**2)))-B*FINT*HGAP*2.0_dp*( 1.0_dp + XP**2*(2.0_dp+YP**2) )*PZ
     CO2=B/COS(FI0)**2
-    CO1=CO2/(ONE+(XP/(one+yp**2))**2 )
+    CO1=CO2/(1.0_dp+(XP/(1.0_dp+yp**2))**2 )
 
-    FI(1)=CO1/(one+yp**2)-CO2*B*FINT*HGAP*two*( TWO*XP*(TWO+YP**2)*PZ )
-    FI(2)=-CO1*TWO*XP*YP/(one+yp**2)**2-CO2*B*FINT*HGAP*two*( TWO*XP**2*YP)*PZ
-    FI(3)=-CO2*B*FINT*HGAP*two*( ONE + XP**2*(TWO+YP**2) )
+    FI(1)=CO1/(1.0_dp+yp**2)-CO2*B*FINT*HGAP*2.0_dp*( 2.0_dp*XP*(2.0_dp+YP**2)*PZ )
+    FI(2)=-CO1*2.0_dp*XP*YP/(1.0_dp+yp**2)**2-CO2*B*FINT*HGAP*2.0_dp*( 2.0_dp*XP**2*YP)*PZ
+    FI(3)=-CO2*B*FINT*HGAP*2.0_dp*( 1.0_dp + XP**2*(2.0_dp+YP**2) )
 
     FI0=B*TAN(FI0)
 
@@ -3401,24 +3413,24 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !       X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
     !       & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,2)+B
     ENDDO
-    X(3)=TWO*X(3)/(ONE+ sqrt(ONE-TWO*B*X(3)) )
+    X(3)=2.0_dp*X(3)/(1.0_dp+ sqrt(1.0_dp-2.0_dp*B*X(3)) )
     X(4)=X(4)-FI0*X(3)
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,1)+B
     ENDDO
-    X(1)=X(1)+HALF*B*X(3)**2
+    X(1)=X(1)+0.5_dp*B*X(3)**2
 
-    B=ZERO
+    B=0.0_dp
     DO i=1,3
        B=FI(I)*D(I,3)+B
     ENDDO
-    X(6)=X(6)-HALF*B*X(3)**2
+    X(6)=X(6)-0.5_dp*B*X(3)**2
 
 
     CALL KILL(PZ,XP,YP,TIME_FAC,FI0,B,CO1,CO2)
@@ -3447,11 +3459,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
     if(k%TIME) then
-       PZ=ROOT(one+two*X(5)/el%beta0+x(5)**2)
-       TIME_FAC=(one/el%beta0+X(5))/PZ
+       PZ=ROOT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)
+       TIME_FAC=(1.0_dp/el%beta0+X(5))/PZ
     else
-       PZ=ONE+X(5)
-       TIME_FAC=ONE
+       PZ=1.0_dp+X(5)
+       TIME_FAC=1.0_dp
     endif
 
     B=BSOL**2*FINT*HGAP
@@ -3459,7 +3471,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X(2)+X(1)*B/PZ
     X(4)=X(4)+X(3)*B/PZ
 
-    X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
+    X(6)=X(6)-0.5_dp*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
 
   END SUBROUTINE FRINGE2SOLR
 
@@ -3482,11 +3494,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
     if(k%TIME) then
-       PZ=SQRT(one+two*X(5)/el%beta0+x(5)**2)
-       TIME_FAC=(one/el%beta0+X(5))/PZ
+       PZ=SQRT(1.0_dp+2.0_dp*X(5)/el%beta0+x(5)**2)
+       TIME_FAC=(1.0_dp/el%beta0+X(5))/PZ
     else
-       PZ=ONE+X(5)
-       TIME_FAC=ONE
+       PZ=1.0_dp+X(5)
+       TIME_FAC=1.0_dp
     endif
 
     B=BSOL**2*FINT*HGAP
@@ -3494,7 +3506,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X(2)+X(1)*B/PZ
     X(4)=X(4)+X(3)*B/PZ
 
-    X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
+    X(6)=X(6)-0.5_dp*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2
 
     CALL KILL(PZ,TIME_FAC,B)
 
@@ -3520,13 +3532,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
           IF(I==2) then                !doubling exit angle if second half
              CALL FACE(EL,BN,H2,X,k)
-             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
           endif
        ELSE
           IF(I==2) then                !doubling exit angle if second half
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
-             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              CALL FACE(EL,BN,H2,X,k)
           endif
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
@@ -3562,13 +3574,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
           IF(I==2) then                !doubling exit angle if second half
              CALL FACE(EL,BN,H2,X,k)
-             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
           endif
        ELSE
           IF(I==2) then                !doubling exit angle if second half
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
-             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              CALL FACE(EL,BN,H2,X,k)
           endif
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
@@ -3605,13 +3617,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
           IF(I==2) then                !doubling exit angle if second half
              CALL FACE(EL,BN,H2,X,k)
-             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
           endif
        ELSE
           IF(I==2) then                !doubling exit angle if second half
              call ROT_XZ(EL%EDGE(2),X,EL%BETA0,DONEITT,k%TIME)
-             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
+             x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              CALL FACE(EL,BN,H2,X,k)
           endif
           CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
@@ -3627,8 +3639,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE
           IF(I==1) then
            CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-           if(almost_exact.and.i==1.AND.el%b0/=zero) then
-            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
+            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
             x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
            if(k%time) then
            else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
@@ -3640,13 +3652,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
        ENDIF
 
-       if(el%b0/=zero) then
+       if(el%b0/=0.0_dp) then
                 
           X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
 
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
 
-             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT*HGAP*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
                   & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
           ENDIF
 
@@ -3660,14 +3672,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
           IF(I==2) THEN 
-           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
            if(k%time) then
            else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
             x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
             x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
            endif
            
-            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
             x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
            endif
            CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
@@ -3718,8 +3730,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE
           IF(I==1) then
            CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-           if(almost_exact.and.i==1.AND.el%b0/=zero) then
-            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
+            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
             x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
     !       if(k%time) then
     !       else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
@@ -3731,12 +3743,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
        ENDIF
 
-       if(el%b0/=zero) then
+       if(el%b0/=0.0_dp) then
           X(2)=X(2)+TAN(EL%EDGE(I))*EL%DIR*EL%CHARGE*BN(1)*X(1)   ! SECTOR WEDGE
 
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
 
-             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*two*FINT*HGAP*(ONE+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT*HGAP*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
                   & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
           ENDIF
 
@@ -3751,14 +3763,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
           IF(I==2) THEN 
-           if(almost_exact.and.i==1.AND.el%b0/=zero) then
+           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
            if(k%time) then
            else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
             x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
             x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
            endif
            
-            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/two
+            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
             x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
            endif
            CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
@@ -3778,8 +3790,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(DKD2),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
     real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
 
     DIR=EL%P%DIR*EL%P%CHARGE
@@ -3788,7 +3801,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
@@ -3804,8 +3817,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
@@ -3821,7 +3834,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=X(4)+YL* DIR*BBXTW
 
        if(k%TIME) then
-          X(6)=X(6)+YL*EL%P%B0*X1*(one/EL%P%beta0+x(5))/(one+X5)
+          X(6)=X(6)+YL*EL%P%B0*X1*(1.0_dp/EL%P%beta0+x(5))/(1.0_dp+X5)
        else
           X(6)=X(6)+YL*EL%P%B0*X1
        endif
@@ -3857,7 +3870,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
@@ -3873,8 +3886,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
@@ -3886,7 +3899,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=X(4)+YL* DIR*BBXTW
 
        if(k%TIME) then
-          X(6)=X(6)+YL*EL%P%B0*X1*(one/EL%P%beta0+x(5))/(one+X5)
+          X(6)=X(6)+YL*EL%P%B0*X1*(1.0_dp/EL%P%beta0+x(5))/(1.0_dp+X5)
        else
           X(6)=X(6)+YL*EL%P%B0*X1
        endif
@@ -3937,9 +3950,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
 
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
 
 
@@ -4043,9 +4056,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     CASE(2)
        CALL ALLOC(DH,D)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
        CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        CALL KICK (EL,D,X,k)
@@ -4190,41 +4203,41 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     bsol=EL%B_SOL*EL%P%CHARGE
-    xp=x(2)+bsol*x(3)/two
-    yp=x(4)-bsol*x(1)/two
+    xp=x(2)+bsol*x(3)/2.0_dp
+    yp=x(4)-bsol*x(1)/2.0_dp
 
     ! NO EXACT EL%EXACT
     if(EL%p%exact) then
        if(k%TIME) then
-          h=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-xp**2-yp**2)
-          dl=one
+          h=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-xp**2-yp**2)
+          dl=1.0_dp
        else
-          h=ROOT((one+x(5))**2-xp**2-yp**2)
-          dl=one
+          h=ROOT((1.0_dp+x(5))**2-xp**2-yp**2)
+          dl=1.0_dp
        endif
     else
        if(k%TIME) then
-          h=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          dl=one+(xp**2+yp**2)/two/h**2
+          h=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          dl=1.0_dp+(xp**2+yp**2)/2.0_dp/h**2
        else
-          h=one+x(5)
-          dl=one+(xp**2+yp**2)/two/h**2
+          h=1.0_dp+x(5)
+          dl=1.0_dp+(xp**2+yp**2)/2.0_dp/h**2
        endif
     endif
     yh=yl/h
-    c=cos(yh*bsol/two)
-    sh=SINX_X(yh*bsol/two)
+    c=cos(yh*bsol/2.0_dp)
+    sh=SINX_X(yh*bsol/2.0_dp)
 
     xt(1)=c*x(1)+yh*sh*x(2)
-    xt(2)=c*x(2)-yh*bsol**2*sh*x(1)/four
+    xt(2)=c*x(2)-yh*bsol**2*sh*x(1)/4.0_dp
     xt(3)=c*x(3)+yh*sh*x(4)
-    xt(4)=c*x(4)-yh*bsol**2*sh*x(3)/four
+    xt(4)=c*x(4)-yh*bsol**2*sh*x(3)/4.0_dp
 
     DO I=1,4
        X(I)=XT(I)
     ENDDO
 
-    ANG=Yh*EL%B_SOL*EL%P%CHARGE/two
+    ANG=Yh*EL%B_SOL*EL%P%CHARGE/2.0_dp
 
     c=COS(ANG)
     sh=SIN(ANG)
@@ -4241,9 +4254,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(k%TIME) then
-       x(6)=x(6)+yl*dl*(one/EL%P%beta0+X(5))/h-(1-k%totalpath)*yl/EL%P%beta0
+       x(6)=x(6)+yl*dl*(1.0_dp/EL%P%beta0+X(5))/h-(1-k%totalpath)*yl/EL%P%beta0
     else
-       x(6)=x(6)+yl*dl*(one+X(5))/h-(1-k%totalpath)*yl
+       x(6)=x(6)+yl*dl*(1.0_dp+X(5))/h-(1-k%totalpath)*yl
     endif
 
 
@@ -4263,41 +4276,41 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CALL ALLOC(xt,4)
 
     bsol=EL%B_SOL*EL%P%CHARGE
-    xp=x(2)+bsol*x(3)/two
-    yp=x(4)-bsol*x(1)/two
+    xp=x(2)+bsol*x(3)/2.0_dp
+    yp=x(4)-bsol*x(1)/2.0_dp
 
     ! NO EXACT EL%EXACT
     if(EL%p%exact) then
        if(k%TIME) then
-          h=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2-xp**2-yp**2)
-          dl=one
+          h=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-xp**2-yp**2)
+          dl=1.0_dp
        else
-          h=sqrt((one+x(5))**2-xp**2-yp**2)
-          dl=one
+          h=sqrt((1.0_dp+x(5))**2-xp**2-yp**2)
+          dl=1.0_dp
        endif
     else
        if(k%TIME) then
-          h=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
-          dl=one+(xp**2+yp**2)/two/h**2
+          h=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          dl=1.0_dp+(xp**2+yp**2)/2.0_dp/h**2
        else
-          h=one+x(5)
-          dl=one+(xp**2+yp**2)/two/h**2
+          h=1.0_dp+x(5)
+          dl=1.0_dp+(xp**2+yp**2)/2.0_dp/h**2
        endif
     endif
     yh=yl/h
-    c=cos(yh*bsol/two)
-    sh=SINX_X(yh*bsol/two)
+    c=cos(yh*bsol/2.0_dp)
+    sh=SINX_X(yh*bsol/2.0_dp)
 
     xt(1)=c*x(1)+yh*sh*x(2)
-    xt(2)=c*x(2)-yh*bsol**2*sh*x(1)/four
+    xt(2)=c*x(2)-yh*bsol**2*sh*x(1)/4.0_dp
     xt(3)=c*x(3)+yh*sh*x(4)
-    xt(4)=c*x(4)-yh*bsol**2*sh*x(3)/four
+    xt(4)=c*x(4)-yh*bsol**2*sh*x(3)/4.0_dp
 
     DO I=1,4
        X(I)=XT(I)
     ENDDO
 
-    ANG=Yh*EL%B_SOL*EL%P%CHARGE/two
+    ANG=Yh*EL%B_SOL*EL%P%CHARGE/2.0_dp
 
     c=COS(ANG)
     sh=SIN(ANG)
@@ -4314,9 +4327,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(k%TIME) then
-       x(6)=x(6)+yl*dl*(one/EL%P%beta0+X(5))/h-(1-k%totalpath)*yl/EL%P%beta0
+       x(6)=x(6)+yl*dl*(1.0_dp/EL%P%beta0+X(5))/h-(1-k%totalpath)*yl/EL%P%beta0
     else
-       x(6)=x(6)+yl*dl*(one+X(5))/h-(1-k%totalpath)*yl
+       x(6)=x(6)+yl*dl*(1.0_dp+X(5))/h-(1-k%totalpath)*yl
     endif
 
 
@@ -4348,13 +4361,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
     !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
     !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-    B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    !outvalishev     B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
     !outvalishev    endif !valishev
 
   END SUBROUTINE GETMULB_SOLR
@@ -4382,13 +4395,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
     B(1)=BBXTW;B(2)=BBYTW;B(3)=EL%B_SOL;
     !outvalishev    if(valishev.and.ABS(el%VS)>eps)   then  !valishev
     !outvalishev     call elliptical_b(el%VA,el%VS,x,BBXTW,BBYTW) !valishev
-    B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
+    !outvalishev     B(1)=B(1)+BBXTW; B(2)=B(2)+BBYTW;
     !outvalishev    endif !valishev
 
     CALL KILL(X1,X3,BBYTW,BBXTW,BBYTWT)
@@ -4448,9 +4461,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=(EL%P%LD)/two/EL%P%NST
+       DD=(EL%P%LD)/2.0_dp/EL%P%NST
 
 
        CALL KICK_SOL(EL,DH,X,k)
@@ -4466,7 +4479,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        D2=D*FD2
        DK1=D*FK1
        DK2=D*FK2
-       D2H=DK2/two
+       D2H=DK2/2.0_dp
        DD1=(EL%P%LD)/EL%P%NST*FD1
        DD2=(EL%P%LD)/EL%P%NST*FD2
 
@@ -4485,8 +4498,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(6)
        DO I =1,4
           DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
-          DDF(I)=EL%P%LD*YOSK(I)/two/EL%P%NST
+          DF(I)=DK(I)/2.0_dp
+          DDF(I)=EL%P%LD*YOSK(I)/2.0_dp/EL%P%NST
        ENDDO
 
        !       DO I=1,B%N
@@ -4535,9 +4548,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        CALL ALLOC(DH,D)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=(EL%P%LD)/two/EL%P%NST
+       DD=(EL%P%LD)/2.0_dp/EL%P%NST
 
 
        CALL KICK_SOL(EL,DH,X,k)
@@ -4554,7 +4567,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        D2=D*FD2
        DK1=D*FK1
        DK2=D*FK2
-       D2H=DK2/two
+       D2H=DK2/2.0_dp
        DD1=(EL%P%LD)/EL%P%NST*FD1
        DD2=(EL%P%LD)/EL%P%NST*FD2
 
@@ -4575,8 +4588,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL ALLOC(DF,4);CALL ALLOC(DK,4);
        DO I =1,4
           DK(I)=EL%L*YOSK(I)/EL%P%NST
-          DF(I)=DK(I)/two
-          DDF(I)=EL%P%LD*YOSK(I)/two/EL%P%NST
+          DF(I)=DK(I)/2.0_dp
+          DDF(I)=EL%P%LD*YOSK(I)/2.0_dp/EL%P%NST
        ENDDO
 
        !       DO I=1,B%N
@@ -4688,8 +4701,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(KTK),INTENT(INOUT):: EL
     real(dp) HX(3,3),HY(3,3),HL(6,6),V(6),W(6)
     real(dp) DH,X5,X6
-    INTEGER I,J,DIR
+    INTEGER I,J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -4698,51 +4712,51 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DH=EL%L/EL%P%NST
     ELSE
        IF(EL%P%METHOD/=6) THEN
-          DH=EL%L/EL%P%NST/two
+          DH=EL%L/EL%P%NST/2.0_dp
        ELSE
-          DH=EL%L/EL%P%NST/four
+          DH=EL%L/EL%P%NST/4.0_dp
        ENDIF
     ENDIF
 
     IF(k%TIME) THEN
-       X5=ROOT(one+two*X(5)/el%P%beta0+x(5)**2)-1
+       X5=ROOT(1.0_dp+2.0_dp*X(5)/el%P%beta0+x(5)**2)-1
     ELSE
        X5=X(5)
     ENDIF
 
-    HX(1,1)=zero;HX(1,2)=DH/(one+X5);HX(1,3)=zero;
-    HX(2,1)=DIR*DH*(-EL%BN(2)-EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;
-    HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;
-    HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;
-    HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;
-    HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;
+    HX(1,1)=0.0_dp;HX(1,2)=DH/(1.0_dp+X5);HX(1,3)=0.0_dp;
+    HX(2,1)=DIR*DH*(-EL%BN(2)-EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;
+    HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;
+    HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;
+    HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;
+    HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;
     CALL EXPCOSY(HX,EL%MATX)
     CALL EXPCOSY(HY,EL%MATY)
     DO I=1,6
-       V(I)=zero
+       V(I)=0.0_dp
        DO J=1,6
-          HL(I,J)=zero
+          HL(I,J)=0.0_dp
        ENDDO
     ENDDO
     HL(1,3)=HX(2,3)*X5; HL(2,3)=HX(2,1); HL(3,2)=HX(1,2);
     HL(4,5)=HX(2,1); HL(6,5)=HX(1,2); HL(2,5)=HX(2,3)*X5;
-    HL(5,6)=two*HX(2,1); HL(3,6)=two*HX(2,3)*X5;HL(5,4)=two*HX(1,2);
+    HL(5,6)=2.0_dp*HX(2,1); HL(3,6)=2.0_dp*HX(2,3)*X5;HL(5,4)=2.0_dp*HX(1,2);
     V(2)=HX(2,3)
-    V(6)=HX(1,2)/(one+X5)/two;
+    V(6)=HX(1,2)/(1.0_dp+X5)/2.0_dp;
     CALL EXPCOSY6(HL,V,W)
     do i=1,6
        EL%LX(I)=W(I)
     enddo
     DO I=1,6
-       V(I)=zero
+       V(I)=0.0_dp
        DO J=1,6
-          HL(I,J)=zero
+          HL(I,J)=0.0_dp
        ENDDO
     ENDDO
     HL(2,3)=HY(2,1); HL(3,2)=HY(1,2);
     HL(4,5)=HY(2,1); HL(6,5)=HY(1,2)
-    HL(5,6)=two*HY(2,1);HL(5,4)=two*HY(1,2);
-    V(6)=HY(1,2)/(one+X5)/two;
+    HL(5,6)=2.0_dp*HY(2,1);HL(5,4)=2.0_dp*HY(1,2);
+    V(6)=HY(1,2)/(1.0_dp+X5)/2.0_dp;
     CALL EXPCOSY6(HL,V,W)
 
     do i=1,3
@@ -4751,8 +4765,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     IF(k%TIME) THEN         ! SPECIAL TIME FACTOR
-       X6=(X(5)+two/EL%P%beta0)/(two+X5)              ! DELTA/E
-       X5=(one/EL%P%beta0+X(5))/(one+X5)     ! dDELTA/dE
+       X6=(X(5)+2.0_dp/EL%P%beta0)/(2.0_dp+X5)              ! DELTA/E
+       X5=(1.0_dp/EL%P%beta0+X(5))/(1.0_dp+X5)     ! dDELTA/dE
        EL%MATX(1,3)=EL%MATX(1,3)*X6
        EL%MATX(2,3)=EL%MATX(2,3)*X6
        do i=1,6
@@ -4776,8 +4790,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(KTKP),INTENT(INOUT):: EL
     TYPE(REAL_8) HX(3,3),HY(3,3),HL(6,6),V(6),W(6)
     TYPE(REAL_8) DH,X5,X6
-    INTEGER I,J,DIR
+    INTEGER I,J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -4797,50 +4812,50 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DH=EL%L/EL%P%NST
     ELSE
        IF(EL%P%METHOD/=6) THEN
-          DH=EL%L/EL%P%NST/two
+          DH=EL%L/EL%P%NST/2.0_dp
        ELSE
-          DH=EL%L/EL%P%NST/four
+          DH=EL%L/EL%P%NST/4.0_dp
        ENDIF
     ENDIF
 
     IF(k%TIME) THEN
-       X5=SQRT(one+two*X(5)/el%P%beta0+x(5)**2)-1
+       X5=SQRT(1.0_dp+2.0_dp*X(5)/el%P%beta0+x(5)**2)-1
     ELSE
        X5=X(5)
     ENDIF
-    HX(1,1)=zero;HX(1,2)=DH/(one+X5);HX(1,3)=zero;
-    HX(2,1)=DIR*DH*(-EL%BN(2)-EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;
-    HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;
-    HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;
-    HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;
-    HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;
+    HX(1,1)=0.0_dp;HX(1,2)=DH/(1.0_dp+X5);HX(1,3)=0.0_dp;
+    HX(2,1)=DIR*DH*(-EL%BN(2)-EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;
+    HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;
+    HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;
+    HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;
+    HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;
     CALL EXPCOSY(HX,EL%MATX)
     CALL EXPCOSY(HY,EL%MATY)
     DO I=1,6
-       V(I)=zero
+       V(I)=0.0_dp
        DO J=1,6
-          HL(I,J)=zero
+          HL(I,J)=0.0_dp
        ENDDO
     ENDDO
     HL(1,3)=HX(2,3)*X5; HL(2,3)=HX(2,1); HL(3,2)=HX(1,2);
     HL(4,5)=HX(2,1); HL(6,5)=HX(1,2); HL(2,5)=HX(2,3)*X5;
-    HL(5,6)=two*HX(2,1); HL(3,6)=two*HX(2,3)*X5;HL(5,4)=two*HX(1,2);
+    HL(5,6)=2.0_dp*HX(2,1); HL(3,6)=2.0_dp*HX(2,3)*X5;HL(5,4)=2.0_dp*HX(1,2);
     V(2)=HX(2,3)
-    V(6)=HX(1,2)/(one+X5)/two;
+    V(6)=HX(1,2)/(1.0_dp+X5)/2.0_dp;
     CALL EXPCOSY6(HL,V,W)
     do i=1,6
        EL%LX(I)=W(I)
     enddo
     DO I=1,6
-       V(I)=zero
+       V(I)=0.0_dp
        DO J=1,6
-          HL(I,J)=zero
+          HL(I,J)=0.0_dp
        ENDDO
     ENDDO
     HL(2,3)=HY(2,1); HL(3,2)=HY(1,2);
     HL(4,5)=HY(2,1); HL(6,5)=HY(1,2)
-    HL(5,6)=two*HY(2,1);HL(5,4)=two*HY(1,2);
-    V(6)=HY(1,2)/(one+X5)/two;
+    HL(5,6)=2.0_dp*HY(2,1);HL(5,4)=2.0_dp*HY(1,2);
+    V(6)=HY(1,2)/(1.0_dp+X5)/2.0_dp;
     CALL EXPCOSY6(HL,V,W)
 
     do i=1,3
@@ -4848,8 +4863,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     IF(k%TIME) THEN         ! SPECIAL TIME FACTOR
-       X6=(X(5)+two/EL%P%beta0)/(two+X5)              ! DELTA/E
-       X5=(one/EL%P%beta0+X(5))/(one+X5)     ! dDELTA/dE
+       X6=(X(5)+2.0_dp/EL%P%beta0)/(2.0_dp+X5)              ! DELTA/E
+       X5=(1.0_dp/EL%P%beta0+X(5))/(1.0_dp+X5)     ! dDELTA/dE
        EL%MATX(1,3)=EL%MATX(1,3)*X6
        EL%MATX(2,3)=EL%MATX(2,3)*X6
        do i=1,6
@@ -4891,23 +4906,23 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     DO I=1,2
        DO J=1,3
-          MATOUT(I,J)=zero
+          MATOUT(I,J)=0.0_dp
        ENDDO
     ENDDO
     DO I=1,3
        DO J=1,3
-          AD(I,J)=zero
-          TEMP(I,J)=zero
+          AD(I,J)=0.0_dp
+          TEMP(I,J)=0.0_dp
        ENDDO
     ENDDO
-    MATOUT(1,1)=one
-    MATOUT(2,2)=one
-    AD(1,1)=one
-    AD(2,2)=one
-    AD(3,3)=one
+    MATOUT(1,1)=1.0_dp
+    MATOUT(2,2)=1.0_dp
+    AD(1,1)=1.0_dp
+    AD(2,2)=1.0_dp
+    AD(3,3)=1.0_dp
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,3
@@ -4920,14 +4935,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,3   !2
           DO J=1,3
              AD(I,J)=TEMP(I,J)/N
              IF(I/=3) MATOUT(I,J)=MATOUT(I,J)+AD(I,J)
              IF(I/=3) NORMAT=NORMAT+ABS(MATOUT(I,J))
-             TEMP(I,J)=zero
+             TEMP(I,J)=0.0_dp
           ENDDO
        ENDDO
        NORM=ABS(NORMAT-NORMAT0)
@@ -4964,7 +4979,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     DO I=1,2
        DO J=1,3
-          MATOUT(I,J)=zero
+          MATOUT(I,J)=0.0_dp
        ENDDO
     ENDDO
     DO I=1,3
@@ -4973,14 +4988,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL ALLOC(TEMP(I,J))
        ENDDO
     ENDDO
-    MATOUT(1,1)=one
-    MATOUT(2,2)=one
-    AD(1,1)=one
-    AD(2,2)=one
-    AD(3,3)=one
+    MATOUT(1,1)=1.0_dp
+    MATOUT(2,2)=1.0_dp
+    AD(1,1)=1.0_dp
+    AD(2,2)=1.0_dp
+    AD(3,3)=1.0_dp
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,3
@@ -4993,14 +5008,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,3   !2
           DO J=1,3
              AD(I,J)=TEMP(I,J)/N
              IF(I/=3) MATOUT(I,J)=MATOUT(I,J)+AD(I,J)
              IF(I/=3) NORMAT=NORMAT+ABS(MATOUT(I,J))
-             TEMP(I,J)=zero
+             TEMP(I,J)=0.0_dp
           ENDDO
        ENDDO
        NORM=ABS(NORMAT-NORMAT0)
@@ -5047,11 +5062,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     DO I=1,6
        MATOUT(I)=V(I)
        AD(I)=V(I)
-       TEMP(I)=zero
+       TEMP(I)=0.0_dp
     ENDDO
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,6
@@ -5062,13 +5077,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,6   !2
           AD(I)=TEMP(I)/(N+1)
           MATOUT(I)=MATOUT(I)+AD(I)
           NORMAT=NORMAT+ABS(MATOUT(I))
-          TEMP(I)=zero
+          TEMP(I)=0.0_dp
        ENDDO
        NORM=ABS(NORMAT-NORMAT0)
 
@@ -5109,11 +5124,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     DO I=1,6
        MATOUT(I)=V(I)
        AD(I)=V(I)
-       TEMP(I)=zero
+       TEMP(I)=0.0_dp
     ENDDO
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,6
@@ -5124,13 +5139,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,6   !2
           AD(I)=TEMP(I)/(N+1)
           MATOUT(I)=MATOUT(I)+AD(I)
           NORMAT=NORMAT+ABS(MATOUT(I))
-          TEMP(I)=zero
+          TEMP(I)=0.0_dp
        ENDDO
        NORM=ABS(NORMAT-NORMAT0)
 
@@ -5174,7 +5189,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     SELECT CASE(EL%P%METHOD)
     CASE(2)
        DK2=EL%L/EL%P%NST
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
 
@@ -5196,9 +5211,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF ! OLD_IMPLEMENTATION_OF_SIXTRACK
 
     CASE(4)
-       DK2=EL%L/EL%P%NST/three
-       DK6=two*DK2
-       DK=DK2/two
+       DK2=EL%L/EL%P%NST/3.0_dp
+       DK6=2.0_dp*DK2
+       DK=DK2/2.0_dp
        CALL GETMAT(EL,X,k)
        CALL KICKKTK(EL,DK,X,k)    ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -5210,11 +5225,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL KICKPATH(EL,DK,X,k)
        CALL KICKKTK(EL,DK,X,k) ! NEW
     CASE(6)
-       DK2=c_14*EL%L/EL%P%NST/c_90
-       DK4=c_32*EL%L/EL%P%NST/c_90
-       DK6=twelve*EL%L/EL%P%NST/c_90
-       DK5=DK6/two
-       DK=DK2/two
+       DK2=14.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK4=32.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK5=DK6/2.0_dp
+       DK=DK2/2.0_dp
 
 
        CALL GETMAT(EL,X,k)
@@ -5266,7 +5281,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(2)
        CALL ALLOC(DK2,DK)
        DK2=EL%L/EL%P%NST
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        IF(OLD_IMPLEMENTATION_OF_SIXTRACK) THEN
 
@@ -5292,9 +5307,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     CASE(4)
        CALL ALLOC(DK,DK2,DK6)
-       DK2=EL%L/EL%P%NST/three
-       DK6=two*DK2
-       DK=DK2/two
+       DK2=EL%L/EL%P%NST/3.0_dp
+       DK6=2.0_dp*DK2
+       DK=DK2/2.0_dp
        CALL GETMAT(EL,X,k)
        CALL KICKKTK(EL,DK,X,k)    ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -5308,11 +5323,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL KILL(DK,DK2,DK6)
     CASE(6)
        CALL ALLOC(DK,DK2,DK4,DK5,DK6)
-       DK2=c_14*EL%L/EL%P%NST/c_90
-       DK4=c_32*EL%L/EL%P%NST/c_90
-       DK6=twelve*EL%L/EL%P%NST/c_90
-       DK5=DK6/two
-       DK=DK2/two
+       DK2=14.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK4=32.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK5=DK6/2.0_dp
+       DK=DK2/2.0_dp
 
 
        CALL GETMAT(EL,X,k)
@@ -5440,8 +5455,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(KTK),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
     real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -5449,7 +5465,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
@@ -5466,8 +5482,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
@@ -5490,8 +5506,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(KTKP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -5506,7 +5523,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X1=X(1)
     X3=X(3)
     if(k%TIME) then
-       X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
@@ -5523,8 +5540,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
@@ -5597,9 +5614,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DH=(EL%L/EL%P%NST)  ! method=1,3,5
     ELSEIF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
-       IF(EL%P%METHOD==4) DH=DH*TWO
+       IF(EL%P%METHOD==4) DH=DH*2.0_dp
     ELSE
-       DH=EL%L/EL%P%NST/four
+       DH=EL%L/EL%P%NST/4.0_dp
     ENDIF
 
     DIR=1
@@ -5608,17 +5625,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        S_OMEGA=-1
        OMEGA2=DIR*(EL%BN(2)+EL%P%B0*EL%BN(1))
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
-       if(OMEGA2.eq.zero) then   ! for Lahey bug in quadruple precision
-          OMEGA=zero             ! not done yet on TPSA part
+       if(OMEGA2.eq.0.0_dp) then   ! for Lahey bug in quadruple precision
+          OMEGA=0.0_dp             ! not done yet on TPSA part
        else
           OMEGA=SQRT(OMEGA2)
        endif
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5628,33 +5645,33 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%MATX(1,1)=C;
           EL%MATX(1,2)=S/OMEGA;
-          EL%MATX(1,3)= EL%P%B0*(C-one)/OMEGA2*S_OMEGA;
+          EL%MATX(1,3)= EL%P%B0*(C-1.0_dp)/OMEGA2*S_OMEGA;
 
           EL%MATX(2,1)=S_OMEGA*OMEGA*S; EL%MATX(2,2)=C;
           EL%MATX(2,3)= EL%P%B0*EL%MATX(1,2);
           EL%LX(1)=EL%P%B0*EL%MATX(1,2);   EL%LX(2)=EL%MATX(1,3);
           EL%LX(3)=-EL%P%B0**2*S_OMEGA*(DH-EL%MATX(1,2))/OMEGA2;
        ELSE
-          EL%MATX(1,1)=one;EL%MATX(1,2)=DH;
-          EL%MATX(2,1)=zero
-          EL%MATX(2,2)=one
+          EL%MATX(1,1)=1.0_dp;EL%MATX(1,2)=DH;
+          EL%MATX(2,1)=0.0_dp
+          EL%MATX(2,2)=1.0_dp
           EL%MATX(2,3)= EL%P%B0*DH;
-          EL%MATX(1,3)= EL%MATX(2,3)*DH/two;
+          EL%MATX(1,3)= EL%MATX(2,3)*DH/2.0_dp;
           EL%LX(1)=EL%MATX(2,3);EL%LX(2)=EL%MATX(1,3);
-          EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/three
+          EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5664,14 +5681,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%MATY(1,1)=C;
           EL%MATY(1,2)=S/OMEGA;
-          EL%MATY(1,3)=zero;
+          EL%MATY(1,3)=0.0_dp;
           EL%MATY(2,1)=S_OMEGA*OMEGA*S; EL%MATY(2,2)=C;
-          EL%MATY(2,3)=zero;
+          EL%MATY(2,3)=0.0_dp;
        ELSE
-          EL%MATY(1,3)=zero;
-          EL%MATY(2,3)=zero;
-          EL%MATY(1,1)=one;EL%MATY(1,2)=DH;
-          EL%MATY(2,2)=one;EL%MATY(2,1)=zero;
+          EL%MATY(1,3)=0.0_dp;
+          EL%MATY(2,3)=0.0_dp;
+          EL%MATY(1,1)=1.0_dp;EL%MATY(1,2)=DH;
+          EL%MATY(2,2)=1.0_dp;EL%MATY(2,1)=0.0_dp;
        ENDIF
 
 
@@ -5681,15 +5698,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
 
-       HX(1,1)=zero;HX(1,2)=DH;HX(1,3)=zero;HX(1,4)=zero;
-       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;HX(2,4)=zero;
-       HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;HX(3,4)=zero;
-       HX(4,1)=DH*EL%P%B0;HX(4,2)=zero;HX(4,3)=zero;HX(4,4)=zero;
+       HX(1,1)=0.0_dp;HX(1,2)=DH;HX(1,3)=0.0_dp;HX(1,4)=0.0_dp;
+       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;HX(2,4)=0.0_dp;
+       HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;HX(3,4)=0.0_dp;
+       HX(4,1)=DH*EL%P%B0;HX(4,2)=0.0_dp;HX(4,3)=0.0_dp;HX(4,4)=0.0_dp;
 
-       HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;HY(1,4)=zero;
-       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;HY(2,4)=zero;
-       HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;HY(3,4)=zero;
-       HY(4,1)=zero;HY(4,2)=zero;HY(4,3)=zero;HY(4,4)=zero;
+       HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;HY(1,4)=0.0_dp;
+       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;HY(2,4)=0.0_dp;
+       HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;HY(3,4)=0.0_dp;
+       HY(4,1)=0.0_dp;HY(4,2)=0.0_dp;HY(4,3)=0.0_dp;HY(4,4)=0.0_dp;
 
        ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
 
@@ -5716,18 +5733,18 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        S_OMEGA=-1
        OMEGA2=DIR*(EL%BN(2)+EL%P%B0*EL%BN(1))
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
 
-       if(OMEGA2.eq.zero) then    ! for Lahey bug in quadruple precision
-          OMEGA=zero
+       if(OMEGA2.eq.0.0_dp) then    ! for Lahey bug in quadruple precision
+          OMEGA=0.0_dp
        else
           OMEGA=SQRT(OMEGA2)
        endif
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5737,32 +5754,32 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%RMATX(1,1)=C;
           EL%RMATX(1,2)=S/OMEGA;
-          EL%RMATX(1,3)= EL%P%B0*(C-one)/OMEGA2*S_OMEGA;
+          EL%RMATX(1,3)= EL%P%B0*(C-1.0_dp)/OMEGA2*S_OMEGA;
           EL%RMATX(2,1)=S_OMEGA*OMEGA*S; EL%RMATX(2,2)=C;
           EL%RMATX(2,3)= EL%P%B0*EL%RMATX(1,2);
           EL%RLX(1)=EL%P%B0*EL%RMATX(1,2);   EL%RLX(2)=EL%RMATX(1,3);
           EL%RLX(3)=-EL%P%B0**2*S_OMEGA*(DH-EL%RMATX(1,2))/OMEGA2;
        ELSE
-          EL%RMATX(1,1)=one;EL%RMATX(1,2)=DH;
-          EL%RMATX(2,1)=zero
-          EL%RMATX(2,2)=one
+          EL%RMATX(1,1)=1.0_dp;EL%RMATX(1,2)=DH;
+          EL%RMATX(2,1)=0.0_dp
+          EL%RMATX(2,2)=1.0_dp
           EL%RMATX(2,3)= EL%P%B0*DH;
-          EL%RMATX(1,3)= EL%RMATX(2,3)*DH/two;
+          EL%RMATX(1,3)= EL%RMATX(2,3)*DH/2.0_dp;
           EL%RLX(1)=EL%RMATX(2,3);EL%RLX(2)=EL%RMATX(1,3);
-          EL%RLX(3)=EL%RMATX(1,3)*EL%P%B0*DH/three
+          EL%RLX(3)=EL%RMATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5772,14 +5789,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%RMATY(1,1)=C;
           EL%RMATY(1,2)=S/OMEGA;
-          EL%RMATY(1,3)=zero;
+          EL%RMATY(1,3)=0.0_dp;
           EL%RMATY(2,1)=S_OMEGA*OMEGA*S; EL%RMATY(2,2)=C;
-          EL%RMATY(2,3)=zero;
+          EL%RMATY(2,3)=0.0_dp;
        ELSE
-          EL%RMATY(1,3)=zero;
-          EL%RMATY(2,3)=zero;
-          EL%RMATY(1,1)=one;EL%RMATY(1,2)=DH;
-          EL%RMATY(2,2)=one;EL%RMATY(2,1)=zero;
+          EL%RMATY(1,3)=0.0_dp;
+          EL%RMATY(2,3)=0.0_dp;
+          EL%RMATY(1,1)=1.0_dp;EL%RMATY(1,2)=DH;
+          EL%RMATY(2,2)=1.0_dp;EL%RMATY(2,1)=0.0_dp;
        ENDIF
 
 
@@ -5789,15 +5806,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
 
-       HX(1,1)=zero;HX(1,2)=DH;HX(1,3)=zero;HX(1,4)=zero;
-       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;HX(2,4)=zero;
-       HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;HX(3,4)=zero;
-       HX(4,1)=DH*EL%P%B0;HX(4,2)=zero;HX(4,3)=zero;HX(4,4)=zero;
+       HX(1,1)=0.0_dp;HX(1,2)=DH;HX(1,3)=0.0_dp;HX(1,4)=0.0_dp;
+       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;HX(2,4)=0.0_dp;
+       HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;HX(3,4)=0.0_dp;
+       HX(4,1)=DH*EL%P%B0;HX(4,2)=0.0_dp;HX(4,3)=0.0_dp;HX(4,4)=0.0_dp;
 
-       HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;HY(1,4)=zero;
-       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;HY(2,4)=zero;
-       HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;HY(3,4)=zero;
-       HY(4,1)=zero;HY(4,2)=zero;HY(4,3)=zero;HY(4,4)=zero;
+       HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;HY(1,4)=0.0_dp;
+       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;HY(2,4)=0.0_dp;
+       HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;HY(3,4)=0.0_dp;
+       HY(4,1)=0.0_dp;HY(4,2)=0.0_dp;HY(4,3)=0.0_dp;HY(4,4)=0.0_dp;
 
        ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
 
@@ -5846,9 +5863,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DH=(EL%L/EL%P%NST)  ! method=1,2
     ELSEIF(EL%P%METHOD/=6) THEN
        DH=(EL%L/EL%P%NST)/EL%P%METHOD   ! method=1,2
-       IF(EL%P%METHOD==4) DH=DH*TWO
+       IF(EL%P%METHOD==4) DH=DH*2.0_dp
     ELSE
-       DH=EL%L/EL%P%NST/four
+       DH=EL%L/EL%P%NST/4.0_dp
     ENDIF
 
     DIR=1
@@ -5857,14 +5874,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        S_OMEGA=-1
        OMEGA2=DIR*(EL%BN(2)+EL%P%B0*EL%BN(1))
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5874,33 +5891,33 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%MATX(1,1)=C;
           EL%MATX(1,2)=S/OMEGA;
-          EL%MATX(1,3)= EL%P%B0*(C-one)/OMEGA2*S_OMEGA;
+          EL%MATX(1,3)= EL%P%B0*(C-1.0_dp)/OMEGA2*S_OMEGA;
           EL%MATX(2,1)=S_OMEGA*OMEGA*S; EL%MATX(2,2)=C;
           EL%MATX(2,3)= EL%P%B0*EL%MATX(1,2);
           EL%LX(1)=EL%P%B0*EL%MATX(1,2);   EL%LX(2)=EL%MATX(1,3);
           EL%LX(3)=-EL%P%B0**2*S_OMEGA*(DH-EL%MATX(1,2))/OMEGA2;
        ELSE
-          EL%MATX(1,1)=one;EL%MATX(1,2)=DH;
-          EL%MATX(2,1)=zero
-          EL%MATX(2,2)=one
+          EL%MATX(1,1)=1.0_dp;EL%MATX(1,2)=DH;
+          EL%MATX(2,1)=0.0_dp
+          EL%MATX(2,2)=1.0_dp
           EL%MATX(2,3)= EL%P%B0*DH;
-          EL%MATX(1,3)= EL%MATX(2,3)*DH/two;
+          EL%MATX(1,3)= EL%MATX(2,3)*DH/2.0_dp;
           EL%LX(1)=EL%MATX(2,3);EL%LX(2)=EL%MATX(1,3);
-          EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/three
+          EL%LX(3)=EL%MATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
 
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5910,14 +5927,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%MATY(1,1)=C;
           EL%MATY(1,2)=S/OMEGA;
-          EL%MATY(1,3)=zero;
+          EL%MATY(1,3)=0.0_dp;
           EL%MATY(2,1)=S_OMEGA*OMEGA*S; EL%MATY(2,2)=C;
-          EL%MATY(2,3)=zero;
+          EL%MATY(2,3)=0.0_dp;
        ELSE
-          EL%MATY(1,3)=zero;
-          EL%MATY(2,3)=zero;
-          EL%MATY(1,1)=one;EL%MATY(1,2)=DH;
-          EL%MATY(2,2)=one;EL%MATY(2,1)=zero;
+          EL%MATY(1,3)=0.0_dp;
+          EL%MATY(2,3)=0.0_dp;
+          EL%MATY(1,1)=1.0_dp;EL%MATY(1,2)=DH;
+          EL%MATY(2,2)=1.0_dp;EL%MATY(2,1)=0.0_dp;
        ENDIF
 
 
@@ -5926,15 +5943,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
 
-       HX(1,1)=zero;HX(1,2)=DH;HX(1,3)=zero;HX(1,4)=zero;
-       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;HX(2,4)=zero;
-       HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;HX(3,4)=zero;
-       HX(4,1)=DH*EL%P%B0;HX(4,2)=zero;HX(4,3)=zero;HX(4,4)=zero;
+       HX(1,1)=0.0_dp;HX(1,2)=DH;HX(1,3)=0.0_dp;HX(1,4)=0.0_dp;
+       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;HX(2,4)=0.0_dp;
+       HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;HX(3,4)=0.0_dp;
+       HX(4,1)=DH*EL%P%B0;HX(4,2)=0.0_dp;HX(4,3)=0.0_dp;HX(4,4)=0.0_dp;
 
-       HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;HY(1,4)=zero;
-       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;HY(2,4)=zero;
-       HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;HY(3,4)=zero;
-       HY(4,1)=zero;HY(4,2)=zero;HY(4,3)=zero;HY(4,4)=zero;
+       HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;HY(1,4)=0.0_dp;
+       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;HY(2,4)=0.0_dp;
+       HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;HY(3,4)=0.0_dp;
+       HY(4,1)=0.0_dp;HY(4,2)=0.0_dp;HY(4,3)=0.0_dp;HY(4,4)=0.0_dp;
 
 
        ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
@@ -5957,14 +5974,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        S_OMEGA=-1
        OMEGA2=DIR*(EL%BN(2)+EL%P%B0*EL%BN(1))
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -5974,33 +5991,33 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%RMATX(1,1)=C;
           EL%RMATX(1,2)=S/OMEGA;
-          EL%RMATX(1,3)= EL%P%B0*(C-one)/OMEGA2*S_OMEGA;
+          EL%RMATX(1,3)= EL%P%B0*(C-1.0_dp)/OMEGA2*S_OMEGA;
           EL%RMATX(2,1)=S_OMEGA*OMEGA*S; EL%RMATX(2,2)=C;
           EL%RMATX(2,3)= EL%P%B0*EL%RMATX(1,2);
           EL%RLX(1)=EL%P%B0*EL%RMATX(1,2);   EL%RLX(2)=EL%RMATX(1,3);
           EL%RLX(3)=-EL%P%B0**2*S_OMEGA*(DH-EL%RMATX(1,2))/OMEGA2;
        ELSE
-          EL%RMATX(1,1)=one;EL%RMATX(1,2)=DH;
-          EL%RMATX(2,1)=zero
-          EL%RMATX(2,2)=one
+          EL%RMATX(1,1)=1.0_dp;EL%RMATX(1,2)=DH;
+          EL%RMATX(2,1)=0.0_dp
+          EL%RMATX(2,2)=1.0_dp
           EL%RMATX(2,3)= EL%P%B0*DH;
-          EL%RMATX(1,3)= EL%RMATX(2,3)*DH/two;
+          EL%RMATX(1,3)= EL%RMATX(2,3)*DH/2.0_dp;
           EL%RLX(1)=EL%RMATX(2,3);EL%RLX(2)=EL%RMATX(1,3);
-          EL%RLX(3)=EL%RMATX(1,3)*EL%P%B0*DH/three
+          EL%RLX(3)=EL%RMATX(1,3)*EL%P%B0*DH/3.0_dp
        ENDIF
 
 
        S_OMEGA=-1
        OMEGA2=-DIR*EL%BN(2)
 
-       IF(OMEGA2<zero) THEN
+       IF(OMEGA2<0.0_dp) THEN
           OMEGA2=-OMEGA2
           S_OMEGA=1
        ENDIF
        OMEGA=SQRT(OMEGA2)
 
 
-       IF(OMEGA>zero) THEN
+       IF(OMEGA>0.0_dp) THEN
           IF(S_OMEGA==1) THEN
              C=COSH(OMEGA*DH)
              S=SINH(OMEGA*DH)
@@ -6010,14 +6027,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           EL%RMATY(1,1)=C;
           EL%RMATY(1,2)=S/OMEGA;
-          EL%RMATY(1,3)=zero;
+          EL%RMATY(1,3)=0.0_dp;
           EL%RMATY(2,1)=S_OMEGA*OMEGA*S; EL%RMATY(2,2)=C;
-          EL%RMATY(2,3)=zero;
+          EL%RMATY(2,3)=0.0_dp;
        ELSE
-          EL%RMATY(1,3)=zero;
-          EL%RMATY(2,3)=zero;
-          EL%RMATY(1,1)=one;EL%RMATY(1,2)=DH;
-          EL%RMATY(2,2)=one;EL%RMATY(2,1)=zero;
+          EL%RMATY(1,3)=0.0_dp;
+          EL%RMATY(2,3)=0.0_dp;
+          EL%RMATY(1,1)=1.0_dp;EL%RMATY(1,2)=DH;
+          EL%RMATY(2,2)=1.0_dp;EL%RMATY(2,1)=0.0_dp;
        ENDIF
 
 
@@ -6026,15 +6043,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ELSE     !  SPEED FALSE OR KNOB TRUE
 
 
-       HX(1,1)=zero;HX(1,2)=DH;HX(1,3)=zero;HX(1,4)=zero;
-       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=zero;HX(2,3)=DH*EL%P%B0;HX(2,4)=zero;
-       HX(3,1)=zero;HX(3,2)=zero;HX(3,3)=zero;HX(3,4)=zero;
-       HX(4,1)=DH*EL%P%B0;HX(4,2)=zero;HX(4,3)=zero;HX(4,4)=zero;
+       HX(1,1)=0.0_dp;HX(1,2)=DH;HX(1,3)=0.0_dp;HX(1,4)=0.0_dp;
+       HX(2,1)=-DH*DIR*(EL%BN(2)+EL%P%B0*EL%BN(1));HX(2,2)=0.0_dp;HX(2,3)=DH*EL%P%B0;HX(2,4)=0.0_dp;
+       HX(3,1)=0.0_dp;HX(3,2)=0.0_dp;HX(3,3)=0.0_dp;HX(3,4)=0.0_dp;
+       HX(4,1)=DH*EL%P%B0;HX(4,2)=0.0_dp;HX(4,3)=0.0_dp;HX(4,4)=0.0_dp;
 
-       HY(1,1)=zero;HY(1,2)=HX(1,2);HY(1,3)=zero;HY(1,4)=zero;
-       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=zero;HY(2,3)=zero;HY(2,4)=zero;
-       HY(3,1)=zero;HY(3,2)=zero;HY(3,3)=zero;HY(3,4)=zero;
-       HY(4,1)=zero;HY(4,2)=zero;HY(4,3)=zero;HY(4,4)=zero;
+       HY(1,1)=0.0_dp;HY(1,2)=HX(1,2);HY(1,3)=0.0_dp;HY(1,4)=0.0_dp;
+       HY(2,1)=DH*DIR*EL%BN(2);HY(2,2)=0.0_dp;HY(2,3)=0.0_dp;HY(2,4)=0.0_dp;
+       HY(3,1)=0.0_dp;HY(3,2)=0.0_dp;HY(3,3)=0.0_dp;HY(3,4)=0.0_dp;
+       HY(4,1)=0.0_dp;HY(4,2)=0.0_dp;HY(4,3)=0.0_dp;HY(4,4)=0.0_dp;
 
 
        ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
@@ -6078,7 +6095,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
 
 
-    IF(EL%P%DIR*EL%P%CHARGE==1) THEN
+    IF(EL%P%DIR*EL%P%CHARGE>0) THEN
        IF(k%TIME) THEN
           T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)/el%P%beta0
           T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)/el%P%beta0
@@ -6124,7 +6141,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ! BUG FOUND BY SCHMIDT (SUBTLE ONE; AFFECTS PTC LOGIC; YUCK!)
     !    T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)
     !    T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)
-    IF(EL%P%DIR*EL%P%CHARGE==1) THEN
+    IF(EL%P%DIR*EL%P%CHARGE>0) THEN
        IF(k%TIME) THEN
           T(1)=EL%MATX(1,1)*X(1)+EL%MATX(1,2)*X(2)+EL%MATX(1,3)*X(5)/el%P%beta0
           T(2)=EL%MATX(2,1)*X(1)+EL%MATX(2,2)*X(2)+EL%MATX(2,3)*X(5)/el%P%beta0
@@ -6169,8 +6186,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(TKTF),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
     real(dp) X1,X3,X5,BBYTW,BBXTW,BBYTWT
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -6178,9 +6196,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
        X(2)=X(2)+YL*EL%P%B0*(X5-X(5)/EL%P%BETA0)
-       X(6)=X(6)+YL*EL%P%B0*(  (X(5)+one/EL%P%beta0)/(one+X5) - one/EL%P%beta0  )*X(1)
+       X(6)=X(6)+YL*EL%P%B0*(  (X(5)+1.0_dp/EL%P%beta0)/(1.0_dp+X5) - 1.0_dp/EL%P%beta0  )*X(1)
     else
        X5=X(5)
     endif
@@ -6197,8 +6215,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
@@ -6220,8 +6238,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(TKTFP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(REAL_8) X1,X3,X5,BBYTW,BBXTW,BBYTWT
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -6238,9 +6257,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
        X(2)=X(2)+YL*EL%P%B0*(X5-X(5)/EL%P%BETA0)
-       X(6)=X(6)+YL*EL%P%B0*( (X(5)+one/EL%P%beta0)/(one+X5) - one/EL%P%beta0  )*X(1)
+       X(6)=X(6)+YL*EL%P%B0*( (X(5)+1.0_dp/EL%P%beta0)/(1.0_dp+X5) - 1.0_dp/EL%P%beta0  )*X(1)
     else
        X5=X(5)
     endif
@@ -6257,8 +6276,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
     X(2)=X(2)-YL*DIR*(BBYTW-DIR*EL%P%B0-EL%BN(2)*X(1))
@@ -6291,17 +6310,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ! ETIENNE
     IF(.NOT.EL%P%EXACT) RETURN
     if(k%TIME) then
-       PZ=root(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-       PZ0=root(one+two*X(5)/EL%P%beta0+x(5)**2)
-       X(6)=X(6)+YL*(one/EL%P%beta0+x(5))*(X(2)**2+X(4)**2)*(one/PZ/(PZ+PZ0)-one/PZ0**2/two) &
+       PZ=root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+       PZ0=root(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+       X(6)=X(6)+YL*(1.0_dp/EL%P%beta0+x(5))*(X(2)**2+X(4)**2)*(1.0_dp/PZ/(PZ+PZ0)-1.0_dp/PZ0**2/2.0_dp) &
             &     /PZ0
        PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
        X(1)=X(1)+YL*X(2)*PZ
        X(3)=X(3)+YL*X(4)*PZ
     else
-       PZ=root((one+X(5))**2-X(2)**2-X(4)**2)
-       PZ0=one+X(5)
-       X(6)=X(6)+YL*(X(2)**2+X(4)**2)*(one/PZ/(PZ+PZ0)-one/PZ0**2/two)
+       PZ=root((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+       PZ0=1.0_dp+X(5)
+       X(6)=X(6)+YL*(X(2)**2+X(4)**2)*(1.0_dp/PZ/(PZ+PZ0)-1.0_dp/PZ0**2/2.0_dp)
        PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
        X(1)=X(1)+YL*X(2)*PZ
        X(3)=X(3)+YL*X(4)*PZ
@@ -6320,17 +6339,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(.NOT.EL%P%EXACT) RETURN
     CALL ALLOC(PZ,PZ0)
     if(k%TIME) then
-       PZ=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-       PZ0=sqrt(one+two*X(5)/EL%P%beta0+x(5)**2)
-       X(6)=X(6)+YL*(one/EL%P%beta0+x(5))*(X(2)**2+X(4)**2)*(one/PZ/(PZ+PZ0)-one/PZ0**2/two) &
+       PZ=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+       PZ0=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+       X(6)=X(6)+YL*(1.0_dp/EL%P%beta0+x(5))*(X(2)**2+X(4)**2)*(1.0_dp/PZ/(PZ+PZ0)-1.0_dp/PZ0**2/2.0_dp) &
             &     /PZ0
        PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
        X(1)=X(1)+YL*X(2)*PZ
        X(3)=X(3)+YL*X(4)*PZ
     else
-       PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
-       PZ0=one+X(5)
-       X(6)=X(6)+YL*(X(2)**2+X(4)**2)*(one/PZ/(PZ+PZ0)-one/PZ0**2/two)
+       PZ=sqrt((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+       PZ0=1.0_dp+X(5)
+       X(6)=X(6)+YL*(X(2)**2+X(4)**2)*(1.0_dp/PZ/(PZ+PZ0)-1.0_dp/PZ0**2/2.0_dp)
        PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
        X(1)=X(1)+YL*X(2)*PZ
        X(3)=X(3)+YL*X(4)*PZ
@@ -6349,41 +6368,41 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ! ETIENNE
     if(k%TIME) then
        if(EL%P%EXACT) THEN
-          PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+YL*X(2)*(one/PZ-one)
-          X(3)=X(3)+YL*X(4)*(one/PZ-one)
-          X(6)=X(6)+YL*(one/EL%P%beta0+x(5))/PZ-YL*(1-k%TOTALPATH)/EL%P%beta0
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+YL*X(2)*(1.0_dp/PZ-1.0_dp)
+          X(3)=X(3)+YL*X(4)*(1.0_dp/PZ-1.0_dp)
+          X(6)=X(6)+YL*(1.0_dp/EL%P%beta0+x(5))/PZ-YL*(1-k%TOTALPATH)/EL%P%beta0
        ELSE
-          X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-          X1=(X(5)+one/EL%P%BETA0)/(one+X5)
-          X(1)=X(1)-X5*YL*X(2)/(one+X5)
-          X(3)=X(3)-X5*YL*X(4)/(one+X5)
+          X5=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
+          X1=(X(5)+1.0_dp/EL%P%BETA0)/(1.0_dp+X5)
+          X(1)=X(1)-X5*YL*X(2)/(1.0_dp+X5)
+          X(3)=X(3)-X5*YL*X(4)/(1.0_dp+X5)
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
-          X(6)=X(6)+X1*YL*( one + (X(2)**2+X(4)**2)/two/(one+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
+          X(6)=X(6)+X1*YL*( 1.0_dp + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
 !! temporary shit almost true   
          if(almost_exact) then       
-          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
           x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
          endif 
 !!
        ENDIF
     else
        if(EL%P%EXACT) THEN
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+YL*X(2)*(one/PZ-one)
-          X(3)=X(3)+YL*X(4)*(one/PZ-one)
-          X(6)=X(6)+YL*(one+x(5))/PZ-YL*(1-k%TOTALPATH)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+YL*X(2)*(1.0_dp/PZ-1.0_dp)
+          X(3)=X(3)+YL*X(4)*(1.0_dp/PZ-1.0_dp)
+          X(6)=X(6)+YL*(1.0_dp+x(5))/PZ-YL*(1-k%TOTALPATH)
        ELSE
-          X(1)=X(1)-X(5)*YL*X(2)/(one+X(5))
-          X(3)=X(3)-X(5)*YL*X(4)/(one+X(5))
-          X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X(5))**2 )
+          X(1)=X(1)-X(5)*YL*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)-X(5)*YL*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X(5))**2 )
 !! temporary shit almost true   
          if(almost_exact) then       
-          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
           x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
          endif 
 !!
        endif
@@ -6402,25 +6421,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     if(k%TIME) then
        if(EL%P%EXACT) THEN
           CALL ALLOC(PZ)
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+YL*X(2)*(one/PZ-one)
-          X(3)=X(3)+YL*X(4)*(one/PZ-one)
-          X(6)=X(6)+YL*(one/EL%P%beta0+x(5))/PZ-YL*(1-k%TOTALPATH)/EL%P%beta0
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+YL*X(2)*(1.0_dp/PZ-1.0_dp)
+          X(3)=X(3)+YL*X(4)*(1.0_dp/PZ-1.0_dp)
+          X(6)=X(6)+YL*(1.0_dp/EL%P%beta0+x(5))/PZ-YL*(1-k%TOTALPATH)/EL%P%beta0
           CALL KILL(PZ)
        ELSE
           CALL ALLOC(X1,X5)
-          X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
-          X1=(X(5)+one/EL%P%BETA0)/(one+X5)
-          X(1)=X(1)-X5*YL*X(2)/(one+X5)
-          X(3)=X(3)-X5*YL*X(4)/(one+X5)
+          X5=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
+          X1=(X(5)+1.0_dp/EL%P%BETA0)/(1.0_dp+X5)
+          X(1)=X(1)-X5*YL*X(2)/(1.0_dp+X5)
+          X(3)=X(3)-X5*YL*X(4)/(1.0_dp+X5)
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
-          X(6)=X(6)+X1*YL*( one + (X(2)**2+X(4)**2)/two/(one+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
+          X(6)=X(6)+X1*YL*( 1.0_dp + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
 !! temporary shit almost true   
          if(almost_exact) then       
-          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
           x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
          endif 
 !!
           CALL KILL(X1,X5)
@@ -6428,21 +6447,21 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     else
        if(EL%P%EXACT) THEN
           CALL ALLOC(PZ)
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          X(1)=X(1)+YL*X(2)*(one/PZ-one)
-          X(3)=X(3)+YL*X(4)*(one/PZ-one)
-          X(6)=X(6)+YL*(one+x(5))/PZ-YL*(1-k%TOTALPATH)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          X(1)=X(1)+YL*X(2)*(1.0_dp/PZ-1.0_dp)
+          X(3)=X(3)+YL*X(4)*(1.0_dp/PZ-1.0_dp)
+          X(6)=X(6)+YL*(1.0_dp+x(5))/PZ-YL*(1-k%TOTALPATH)
           CALL KILL(PZ)
        ELSE
-          X(1)=X(1)-X(5)*YL*X(2)/(one+X(5))
-          X(3)=X(3)-X(5)*YL*X(4)/(one+X(5))
-          X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X(5))**2 )
+          X(1)=X(1)-X(5)*YL*X(2)/(1.0_dp+X(5))
+          X(3)=X(3)-X(5)*YL*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X(5))**2 )
        endif
 !! temporary shit almost true   
          if(almost_exact) then       
-          x(1)=x(1)/(one-yl*EL%P%b0*x(2))
+          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
           x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*half*(x(2)**2+x(4)**2)
+          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
          endif 
 !!
     endif
@@ -6470,7 +6489,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           f1=EL%F+1
        endif
        DK2=EL%L/(EL%P%NST/EL%F/2)
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        IF(MOD(POS,2*EL%F)==f1) THEN
           CALL KICKPATH(EL,DK,X,k)
@@ -6480,7 +6499,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL PUSHTKT7(EL,X,k)
     CASE(2)
        DK2=EL%L/EL%P%NST
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        CALL PUSHTKT7(EL,X,k)
        CALL KICKPATH(EL,DK,X,k)
@@ -6495,9 +6514,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        else
           f1=EL%F+1
        endif
-       DK=EL%L/(EL%P%NST/EL%F/2)/six
-       DK2=DK*two
-       DK6=two*DK2
+       DK=EL%L/(EL%P%NST/EL%F/2)/6.0_dp
+       DK2=DK*2.0_dp
+       DK6=2.0_dp*DK2
 
        if(mod(pos,EL%F*2)==F1) then
           CALL KICKPATH(EL,DK2,X,k)
@@ -6527,9 +6546,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     CASE(4)
-       DK2=EL%L/EL%P%NST/three
-       DK6=two*DK2
-       DK=DK2/two
+       DK2=EL%L/EL%P%NST/3.0_dp
+       DK6=2.0_dp*DK2
+       DK=DK2/2.0_dp
 
        CALL KICKTKT7(EL,DK,X,k)    ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -6550,11 +6569,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           f1=3*EL%F+1
        endif
 
-       DK2=c_14*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 14/90
-       DK4=c_32*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 32/90
-       DK6=twelve*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 12/90
-       DK5=DK6/two  ! 6/90
-       DK=DK2/two    ! 7/90
+       DK2=14.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 14/90
+       DK4=32.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 32/90
+       DK6=12.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 12/90
+       DK5=DK6/2.0_dp  ! 6/90
+       DK=DK2/2.0_dp    ! 7/90
 
        if(mod(pos,EL%F*4)==EL%F+1) then
           CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
@@ -6591,11 +6610,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        endif
 
     CASE(6)
-       DK2=c_14*EL%L/EL%P%NST/c_90  ! 14/90
-       DK4=c_32*EL%L/EL%P%NST/c_90  ! 32/90
-       DK6=twelve*EL%L/EL%P%NST/c_90  ! 12/90
-       DK5=DK6/two  ! 6/90
-       DK=DK2/two    ! 7/90
+       DK2=14.0_dp*EL%L/EL%P%NST/90.0_dp  ! 14/90
+       DK4=32.0_dp*EL%L/EL%P%NST/90.0_dp  ! 32/90
+       DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp  ! 12/90
+       DK5=DK6/2.0_dp  ! 6/90
+       DK=DK2/2.0_dp    ! 7/90
 
        CALL KICKTKT7(EL,DK,X,k)  ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -6653,7 +6672,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           f1=EL%F+1
        endif
        DK2=EL%L/(EL%P%NST/EL%F/2)
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        IF(MOD(POS,2*EL%F)==f1) THEN
           CALL KICKPATH(EL,DK,X,k)
@@ -6666,7 +6685,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL ALLOC(DK,DK2)
 
        DK2=EL%L/EL%P%NST
-       DK=DK2/two
+       DK=DK2/2.0_dp
 
        CALL PUSHTKT7(EL,X,k)
        CALL KICKPATH(EL,DK,X,k)
@@ -6686,9 +6705,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        else
           f1=EL%F+1
        endif
-       DK=EL%L/(EL%P%NST/EL%F/2)/six
-       DK2=DK*two
-       DK6=two*DK2
+       DK=EL%L/(EL%P%NST/EL%F/2)/6.0_dp
+       DK2=DK*2.0_dp
+       DK6=2.0_dp*DK2
 
        if(mod(pos,EL%F*2)==F1) then
           CALL KICKPATH(EL,DK2,X,k)
@@ -6721,9 +6740,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(4)
        CALL ALLOC(DK,DK2,DK6)
 
-       DK2=EL%L/EL%P%NST/three
-       DK6=two*DK2
-       DK=DK2/two
+       DK2=EL%L/EL%P%NST/3.0_dp
+       DK6=2.0_dp*DK2
+       DK=DK2/2.0_dp
 
        CALL KICKTKT7(EL,DK,X,k)    ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -6747,11 +6766,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           f1=3*EL%F+1
        endif
 
-       DK2=c_14*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 14/90
-       DK4=c_32*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 32/90
-       DK6=twelve*EL%L/(EL%P%NST/EL%F/4)/c_90  ! 12/90
-       DK5=DK6/two  ! 6/90
-       DK=DK2/two    ! 7/90
+       DK2=14.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 14/90
+       DK4=32.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 32/90
+       DK6=12.0_dp*EL%L/(EL%P%NST/EL%F/4)/90.0_dp  ! 12/90
+       DK5=DK6/2.0_dp  ! 6/90
+       DK=DK2/2.0_dp    ! 7/90
 
        if(mod(pos,EL%F*4)==EL%F+1) then
           CALL KICKTKT7(EL,DK4,X,k)  ! 32/90
@@ -6791,11 +6810,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(6)
        CALL ALLOC(DK,DK2,DK6,DK4,DK5)
 
-       DK2=c_14*EL%L/EL%P%NST/c_90
-       DK4=c_32*EL%L/EL%P%NST/c_90
-       DK6=twelve*EL%L/EL%P%NST/c_90
-       DK5=DK6/two
-       DK=DK2/two
+       DK2=14.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK4=32.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK6=12.0_dp*EL%L/EL%P%NST/90.0_dp
+       DK5=DK6/2.0_dp
+       DK=DK2/2.0_dp
 
        CALL KICKTKT7(EL,DK,X,k)  ! NEW
        CALL KICKPATH(EL,DK,X,k)
@@ -6929,28 +6948,28 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     DO I=1,2
        DO J=1,3
-          MATOUT(I,J)=zero
+          MATOUT(I,J)=0.0_dp
        ENDDO
     ENDDO
     DO I=1,3
-       LX(I)=zero
+       LX(I)=0.0_dp
     ENDDO
 
     DO I=1,4
        DO J=1,4
-          AD(I,J)=zero
-          TEMP(I,J)=zero
+          AD(I,J)=0.0_dp
+          TEMP(I,J)=0.0_dp
        ENDDO
     ENDDO
-    MATOUT(1,1)=one
-    MATOUT(2,2)=one
-    AD(1,1)=one
-    AD(2,2)=one
-    AD(3,3)=one
-    AD(4,4)=one
+    MATOUT(1,1)=1.0_dp
+    MATOUT(2,2)=1.0_dp
+    AD(1,1)=1.0_dp
+    AD(2,2)=1.0_dp
+    AD(3,3)=1.0_dp
+    AD(4,4)=1.0_dp
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,4
@@ -6963,8 +6982,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,4   !2
           DO J=1,4
              AD(I,J)=TEMP(I,J)/N
@@ -6976,7 +6995,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
                 LX(J)=LX(J)+AD(I,J)
                 NORMAT=NORMAT+ABS(LX(J))
              ENDIF
-             TEMP(I,J)=zero
+             TEMP(I,J)=0.0_dp
           ENDDO
        ENDDO
 
@@ -7015,11 +7034,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     DO I=1,2
        DO J=1,3
-          MATOUT(I,J)=zero
+          MATOUT(I,J)=0.0_dp
        ENDDO
     ENDDO
     DO I=1,3
-       LX(I)=zero
+       LX(I)=0.0_dp
     ENDDO
 
     DO I=1,4
@@ -7028,15 +7047,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL ALLOC(TEMP(I,J))
        ENDDO
     ENDDO
-    MATOUT(1,1)=one
-    MATOUT(2,2)=one
-    AD(1,1)=one
-    AD(2,2)=one
-    AD(3,3)=one
-    AD(4,4)=one
+    MATOUT(1,1)=1.0_dp
+    MATOUT(2,2)=1.0_dp
+    AD(1,1)=1.0_dp
+    AD(2,2)=1.0_dp
+    AD(3,3)=1.0_dp
+    AD(4,4)=1.0_dp
     FIRST=.TRUE.
-    NORM=c_1d6
-    NORMAT=c_2d5
+    NORM=1e6_dp
+    NORMAT=2e5_dp
     DO N=1,NMAXI
        !  COMPUTING H**N/N!
        DO I=1,4
@@ -7049,8 +7068,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        NORM0=NORM
        NORMAT0=NORMAT
        !  ADDING TO MATOUT
-       NORM=zero
-       NORMAT=zero
+       NORM=0.0_dp
+       NORMAT=0.0_dp
        DO I=1,4   !2
           DO J=1,4
              AD(I,J)=TEMP(I,J)/N
@@ -7063,7 +7082,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
                 LX(J)=LX(J)+AD(I,J)
                 NORMAT=NORMAT+ABS(LX(J))
              ENDIF
-             TEMP(I,J)=zero
+             TEMP(I,J)=0.0_dp
           ENDDO
        ENDDO
        NORM=ABS(NORMAT-NORMAT0)
@@ -7114,7 +7133,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CRKVE=XL
     CIKVE=ZL
 
-    EKK=-EL%P%DIR*EL%P%CHARGE*EL%BN(EL%P%NMUL)/TWO                      ! ANTI-SIXTRACK UNIT
+    EKK=-EL%P%DIR*EL%P%CHARGE*EL%BN(EL%P%NMUL)/2.0_dp                      ! ANTI-SIXTRACK UNIT
 
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
@@ -7444,7 +7463,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CRKVE=XL
     CIKVE=ZL
 
-    EKK=-EL%P%DIR*EL%P%CHARGE*EL%BN(EL%P%NMUL)/TWO                      ! ANTI-SIXTRACK UNIT
+    EKK=-EL%P%DIR*EL%P%CHARGE*EL%BN(EL%P%NMUL)/2.0_dp                      ! ANTI-SIXTRACK UNIT
 
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
@@ -7776,7 +7795,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CRKVE=XL
     CIKVE=ZL
 
-    EKK=EL%P%DIR*EL%P%CHARGE*EL%AN(EL%P%NMUL)/TWO
+    EKK=EL%P%DIR*EL%P%CHARGE*EL%AN(EL%P%NMUL)/2.0_dp
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     select case(el%P%NMUL)
@@ -8104,7 +8123,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CRKVE=XL
     CIKVE=ZL
 
-    EKK=EL%P%DIR*EL%P%CHARGE*EL%AN(EL%P%NMUL)/TWO
+    EKK=EL%P%DIR*EL%P%CHARGE*EL%AN(EL%P%NMUL)/2.0_dp
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     select case(el%P%NMUL)
@@ -8435,8 +8454,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    ENDIF
 
     DO I=1,S_B(NMUL)%N_MONO
-       EL%BF_X(I)=zero
-       EL%BF_Y(I)=zero
+       EL%BF_X(I)=0.0_dp
+       EL%BF_Y(I)=0.0_dp
     ENDDO
     DO I=1,NMUL
        DO J=1,S_B(NMUL)%N_MONO
@@ -8468,8 +8487,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    ENDIF
 
     DO I=1,S_B(NMUL)%N_MONO
-       EL%BF_X(I)=zero
-       EL%BF_Y(I)=zero
+       EL%BF_X(I)=0.0_dp
+       EL%BF_Y(I)=0.0_dp
     ENDDO
     DO I=1,NMUL
        DO J=1,S_B(NMUL)%N_MONO
@@ -8487,6 +8506,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
   END SUBROUTINE GETANBNP
 
 
+
   SUBROUTINE GETELECTRICR(EL,X)
     IMPLICIT NONE
     TYPE(TEAPOT),INTENT(INOUT):: EL
@@ -8496,7 +8516,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 !    VAL(0,0)=1
 
-    val(0,0)=ONE
+    val(0,0)=1.0_dp
     val(1,0)=x(1)
     val(0,1)=x(3)
     
@@ -8509,9 +8529,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
      enddo
     enddo
 
-      EL%E_X=ZERO
-      EL%E_Y=ZERO
-      EL%PHI=ZERO
+      EL%E_X=0.0_dp
+      EL%E_Y=0.0_dp
+      EL%PHI=0.0_dp
       
       do i=0,NO_E
       do j=0,NO_E  
@@ -8545,7 +8565,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 !    VAL(0,0)=1
 
-    val(0,0)=ONE
+    val(0,0)=1.0_dp
     val(1,0)=x(1)
     val(0,1)=x(3)
     
@@ -8558,9 +8578,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
      enddo
     enddo
 
-      EL%E_X=ZERO
-      EL%E_Y=ZERO
-      EL%PHI=ZERO
+      EL%E_X=0.0_dp
+      EL%E_Y=0.0_dp
+      EL%PHI=0.0_dp
       
       do i=0,NO_E
       do j=0,NO_E  
@@ -8596,14 +8616,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X1=X(1)
     X3=X(3)
 
-    BX=zero
-    BY=zero
+    BX=0.0_dp
+    BY=0.0_dp
 
     k=0
     m=EL%P%nmul-1
     do a=m,1,-1
-       BTX=zero
-       BTY=zero
+       BTX=0.0_dp
+       BTY=0.0_dp
        do j=m-a,1,-1
           k=k+1
           !b%i(k)=a
@@ -8620,8 +8640,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        BX= (BX+BTX)*X1
        BY= (BY+BTY)*X1
     enddo
-    BTX=zero
-    BTY=zero
+    BTX=0.0_dp
+    BTY=0.0_dp
     do j=m,1,-1
        k=k+1
        !  b%i(k)=0
@@ -8660,9 +8680,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
 
-    B(1)=BY/(one+EL%P%B0*X(1))
-    B(2)=-BX/(one+EL%P%B0*X(1))
-    B(3)=zero
+    B(1)=BY/(1.0_dp+EL%P%B0*X(1))
+    B(2)=-BX/(1.0_dp+EL%P%B0*X(1))
+    B(3)=0.0_dp
 
   END SUBROUTINE GETMULB_TEAPOTR
 
@@ -8678,14 +8698,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X1=X(1)
     X3=X(3)
 
-    BX=zero
-    BY=zero
+    BX=0.0_dp
+    BY=0.0_dp
 
     k=0
     m=EL%P%nmul-1
     do a=m,1,-1
-       BTX=zero
-       BTY=zero
+       BTX=0.0_dp
+       BTY=0.0_dp
        do j=m-a,1,-1
           k=k+1
           !b%i(k)=a
@@ -8702,8 +8722,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        BX= (BX+BTX)*X1
        BY= (BY+BTY)*X1
     enddo
-    BTX=zero
-    BTY=zero
+    BTX=0.0_dp
+    BTY=0.0_dp
     do j=m,1,-1
        k=k+1
        !  b%i(k)=0
@@ -8742,9 +8762,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
 
-    B(1)=BY/(one+EL%P%B0*X(1))
-    B(2)=-BX/(one+EL%P%B0*X(1))
-    B(3)=zero
+    B(1)=BY/(1.0_dp+EL%P%B0*X(1))
+    B(2)=-BX/(1.0_dp+EL%P%B0*X(1))
+    B(3)=0.0_dp
 
     CALL KILL(X1,X3,BX,BY,BTX,BTY,BtYT)
 
@@ -8765,24 +8785,24 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
      CALL GETMULB_TEAPOT(EL,B,X)
      IF(EL%P%EXACT) THEN
         if(k%TIME) then
-           H=ONE+EL%P%B0*X(1)
-           DEL=one/EL%P%BETA0+x(5)-EL%PHI
-           PZ=ROOT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
+           H=1.0_dp+EL%P%B0*X(1)
+           DEL=1.0_dp/EL%P%BETA0+x(5)-EL%PHI
+           PZ=ROOT(DEL**2-1.0_dp/EL%P%GAMBET**2-X(2)**2-X(4)**2)
            F(1)=X(2)*H/PZ
            F(3)=X(4)*H/PZ
            F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
            F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-           F(5)=zero
+           F(5)=0.0_dp
            F(6)=H*DEL/PZ
         else
-           H=ONE+X(1)
-           DEL=one+x(5)-EL%PHI
+           H=1.0_dp+X(1)
+           DEL=1.0_dp+x(5)-EL%PHI
            PZ=ROOT(DEL**2-X(2)**2-X(4)**2)
            F(1)=X(2)*H/PZ
            F(3)=X(4)*H/PZ
            F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
            F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-           F(5)=zero
+           F(5)=0.0_dp
            F(6)=H*DEL/PZ
         endif
      ELSE
@@ -8807,24 +8827,24 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
      CALL GETMULB_TEAPOT(EL,B,X)
      IF(EL%P%EXACT) THEN
         if(k%TIME) then
-           H=ONE+EL%P%B0*X(1)
-           DEL=one/EL%P%BETA0+x(5)-EL%PHI
-           PZ=SQRT(DEL**2-ONE/EL%P%GAMBET**2-X(2)**2-X(4)**2)
+           H=1.0_dp+EL%P%B0*X(1)
+           DEL=1.0_dp/EL%P%BETA0+x(5)-EL%PHI
+           PZ=SQRT(DEL**2-1.0_dp/EL%P%GAMBET**2-X(2)**2-X(4)**2)
            F(1)=X(2)*H/PZ
            F(3)=X(4)*H/PZ
            F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
            F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-           F(5)=zero
+           F(5)=0.0_dp
            F(6)=H*DEL/PZ
         else
-           H=ONE+X(1)
-           DEL=one+x(5)-EL%PHI
+           H=1.0_dp+X(1)
+           DEL=1.0_dp+x(5)-EL%PHI
            PZ=SQRT(DEL**2-X(2)**2-X(4)**2)
            F(1)=X(2)*H/PZ
            F(3)=X(4)*H/PZ
            F(2)=EL%P%B0*PZ-B(2)*H+H*DEL*EL%E_X/PZ
            F(4)=B(1)*H+H*DEL*EL%E_Y/PZ
-           F(5)=zero
+           F(5)=0.0_dp
            F(6)=H*DEL/PZ
         endif
      ELSE
@@ -8854,7 +8874,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -8893,7 +8913,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -8931,7 +8951,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -8939,7 +8959,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -8958,7 +8978,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
 
     return
@@ -8988,7 +9008,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -8996,7 +9016,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -9015,7 +9035,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
 
     call kill(yt)
@@ -9054,7 +9074,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9062,7 +9082,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9071,7 +9091,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9080,7 +9100,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9089,7 +9109,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9097,7 +9117,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9105,7 +9125,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
 
@@ -9115,7 +9135,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
 
 
@@ -9154,7 +9174,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9162,7 +9182,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9171,7 +9191,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9180,7 +9200,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9189,7 +9209,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9197,7 +9217,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
 
     call feval_teapot(yt,k,f,gr)
@@ -9205,7 +9225,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
 
@@ -9215,7 +9235,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
 
     call kill(yt,ne)
@@ -9277,26 +9297,26 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) XN(6),PZ,PT
     real(dp)  A,b,R
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    if(EL%P%B0/=zero) then
+    if(EL%P%B0/=0.0_dp) then
        A=YL*EL%P%B0
-       R=one/EL%P%B0
+       R=1.0_dp/EL%P%B0
        if(k%TIME) then
           B=EL%P%BETA0
-          PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           !       XN(1)=(X(1)+R)/COS(A)/PT-R
-          XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+          XN(1)=(X(1)+R*(2.0_dp*sin(a/2.0_dp)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(1.0_dp/b+x(5))
           XN(6)=XN(6)+(k%TOTALPATH-1)*DL/EL%P%BETA0
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R*(two*sin(a/two)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R*(2.0_dp*sin(a/2.0_dp)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(1.0_dp+X(5))*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=XN(6)+(k%TOTALPATH-1)*DL
        endif
        X(1)=XN(1)
@@ -9320,31 +9340,31 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp)  b,R
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    if(EL%P%B0/=zero) then
+    if(EL%P%B0/=0.0_dp) then
        CALL ALLOC( XN,6)
        CALL ALLOC( PZ)
        CALL ALLOC( PT)
        CALL ALLOC( A,ah)
        A=YL*EL%P%B0
-       ah=a/two
-       R=one/EL%P%B0
+       ah=a/2.0_dp
+       R=1.0_dp/EL%P%B0
        if(k%TIME) then
           B=EL%P%BETA0
-          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
+          PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
           !          XN(1)=(X(1)+R)/COS(A)/PT-R
-          XN(1)=(X(1)+R*(two*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+          XN(1)=(X(1)+R*(2.0_dp*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(one/b+x(5))
+          XN(6)=X(6)+(X(1)+R)*TAN(A)/PZ/PT*(1.0_dp/b+x(5))
           XN(6)=XN(6)+(k%TOTALPATH-1)*DL/EL%P%BETA0
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          PT=one-X(2)*TAN(A)/PZ
-          XN(1)=(X(1)+R*(two*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PT=1.0_dp-X(2)*TAN(A)/PZ
+          XN(1)=(X(1)+R*(2.0_dp*sin(ah)**2+X(2)*sin(A)/PZ))/COS(A)/PT
           XN(2)=X(2)*COS(A)+SIN(A)*PZ
           XN(3)=X(3)+X(4)*(X(1)+R)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(one+X(5))*(X(1)+R)*TAN(A)/PZ/PT
+          XN(6)=X(6)+(1.0_dp+X(5))*(X(1)+R)*TAN(A)/PZ/PT
           XN(6)=XN(6)+(k%TOTALPATH-1)*DL
        endif
        X(1)=XN(1)
@@ -9368,39 +9388,39 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(TEAPOT),INTENT(IN):: EL
     real(dp) XN(6),PZ,PZS,DPX,PT
     real(dp)  A,b,R
-    INTEGER DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
     A=YL*EL%P%B0
-    R=one/EL%P%B0
+    R=1.0_dp/EL%P%B0
     if(k%TIME) then
        B=EL%P%BETA0
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+       PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
        XN(2)=X(2)*COS(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*SIN(A)
        DPX=(-X(2)*SIN(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*COS(A))/DIR/EL%BN(1)  !DPX*R/B1
-       PT=ROOT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+       PT=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+       PZS=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
        XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL/EL%P%BETA0
 
        XN(3)=X(3)+X(4)*XN(3)
     else
-       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+       PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
        XN(2)=X(2)*COS(A) + ( PZ-DIR*EL%BN(1)*(R+X(1)) ) *SIN(A)
        DPX=(-X(2)*SIN(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*COS(A))/DIR/EL%BN(1)  !DPX*R/B1
-       PT=ROOT((one+X(5))**2-X(4)**2)
-       PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
+       PT=ROOT((1.0_dp+X(5))**2-X(4)**2)
+       PZS=ROOT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
        XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL
        XN(3)=X(3)+X(4)*XN(3)
 
@@ -9422,8 +9442,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(TEAPOTP),INTENT(IN):: EL
     TYPE(REAL_8) XN(6),PZ,PT,A,PZS,DPX
     real(dp)  b,R
-    INTEGER DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -9432,33 +9452,33 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CALL ALLOC( XN,6)
     CALL ALLOC( PZ,PT,A,PZS,DPX)
     A=YL*EL%P%B0
-    R=one/EL%P%B0
+    R=1.0_dp/EL%P%B0
     if(k%TIME) then
        B=EL%P%BETA0
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+       PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
        XN(2)=X(2)*COS(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*SIN(A)
        DPX=(-X(2)*SIN(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*COS(A))/DIR/EL%BN(1)  !DPX*R/B1
-       PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+       PT=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+       PZS=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
        XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL/EL%P%BETA0
 
        XN(3)=X(3)+X(4)*XN(3)
     else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+       PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
        XN(2)=X(2)*COS(A) + ( PZ-DIR*EL%BN(1)*(R+X(1)) ) *SIN(A)
        DPX=(-X(2)*SIN(A)+(PZ-DIR*EL%BN(1)*(R+X(1)))*COS(A))/DIR/EL%BN(1)  !DPX*R/B1
-       PT=SQRT((one+X(5))**2-X(4)**2)
-       PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
+       PT=SQRT((1.0_dp+X(5))**2-X(4)**2)
+       PZS=SQRT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=PZS/DIR/EL%BN(1)-DPX-R
 
        XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL
        XN(3)=X(3)+X(4)*XN(3)
 
@@ -9478,8 +9498,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp),INTENT(IN):: YL
     TYPE(TEAPOT),INTENT(IN):: EL
     real(dp) X1,X3,X5,BX,BY,BTX,BTY,BtYT
-    INTEGER J,M,A,K1,DIR
+    INTEGER J,M,A,K1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     !    if(abs(x(1))+abs(x(3))+abs(x(2))+abs(x(4))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then
     !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in SKICKR"
@@ -9494,22 +9515,22 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X3=X(3)
 
     if(k%TIME) then
-       X5=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
 
 
-    BX=zero
-    BY=zero
+    BX=0.0_dp
+    BY=0.0_dp
 
     k1=0
 
     m=SECTOR_NMUL-1
     !    m=EL%P%nmul-1
     do a=m,1,-1
-       BTX=zero
-       BTY=zero
+       BTX=0.0_dp
+       BTY=0.0_dp
        do j=m-a,1,-1
           k1=k1+1
           !b%i(k)=a
@@ -9526,8 +9547,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        BX= (BX+BTX)*X1
        BY= (BY+BTY)*X1
     enddo
-    BTX=zero
-    BTY=zero
+    BTX=0.0_dp
+    BTY=0.0_dp
     do j=m,1,-1
        k1=k1+1
        !  b%i(k)=0
@@ -9568,7 +9589,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
     IF(.NOT.EL%DRIFTKICK) THEN
-       X(2)=X(2)+YL*DIR*EL%BN(1)*(one+X(1)*EL%P%B0)
+       X(2)=X(2)+YL*DIR*EL%BN(1)*(1.0_dp+X(1)*EL%P%B0)
     ENDIF
 
   END SUBROUTINE SKICKR
@@ -9580,8 +9601,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(TEAPOTP),INTENT(IN):: EL
     TYPE(REAL_8) X1,X3,BX,BY,BTX,BTY,X5,B(3),B2,BTYt
-    INTEGER J,M,A,K1,DIR
+    INTEGER J,M,A,K1
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
 
     DIR=EL%P%DIR*EL%P%CHARGE
@@ -9596,14 +9618,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !pause  23423423
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if(k%TIME) then
-       X5=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)-one
+       X5=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)-1.0_dp
     else
        X5=X(5)
     endif
 
 
-    BX=zero
-    BY=zero
+    BX=0.0_dp
+    BY=0.0_dp
 
     ! x1=one.mono.'1'
     ! x3=one.mono.'01'
@@ -9611,8 +9633,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     m=SECTOR_NMUL-1
     !    m=EL%P%nmul-1
     do a=m,1,-1
-       BTX=zero
-       BTY=zero
+       BTX=0.0_dp
+       BTY=0.0_dp
        do j=m-a,1,-1
           k1=k1+1
           !b%i(k)=a
@@ -9629,8 +9651,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        BX= (BX+BTX)*X1
        BY= (BY+BTY)*X1
     enddo
-    BTX=zero
-    BTY=zero
+    BTX=0.0_dp
+    BTY=0.0_dp
     do j=m,1,-1
        k1=k1+1
        !  b%i(k)=0
@@ -9678,7 +9700,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     X(2)=X(2)+YL*DIR*BX
     X(4)=X(4)+YL*DIR*BY
     IF(.NOT.EL%DRIFTKICK) THEN
-       X(2)=X(2)+YL*DIR*EL%BN(1)*(one+X(1)*EL%P%B0)
+       X(2)=X(2)+YL*DIR*EL%BN(1)*(1.0_dp+X(1)*EL%P%B0)
     ENDIF
 
     CALL KILL(X1,X3,BX,BY,BTX,BTY,X5,B2,BtYT)
@@ -9715,9 +9737,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF
        CALL SSECH1(EL,DH,DD,X,k)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
        CALL SSECH1(EL,DH,DD,X,k)
        CALL SKICK(EL,D,X,k)
@@ -9807,9 +9829,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        CALL ALLOC(DH,D)
 
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
-       DD=EL%P%LD/two/EL%P%NST
+       DD=EL%P%LD/2.0_dp/EL%P%NST
 
        CALL SSECH1(EL,DH,DD,X,k)
        CALL SKICK(EL,D,X,k)
@@ -10020,17 +10042,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        IF(J==1) THEN
 
-          IF(EL%P%EDGE(1)/=zero) THEN
+          IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
              IF(k%FRINGE.or.el%p%permfringe) then
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-                x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
           ELSE
@@ -10041,15 +10063,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        ELSE ! J=2
 
-          IF(EL%P%EDGE(2)/=zero) THEN
+          IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
              IF(k%FRINGE.or.el%p%permfringe) then
-                x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
@@ -10065,17 +10087,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        IF(J==1) THEN
 
-          IF(EL%P%EDGE(2)/=zero) THEN
+          IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
              IF(k%FRINGE.or.el%p%permfringe) then
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-                x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
           ELSE
@@ -10086,15 +10108,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        ELSE ! J=2
 
-          IF(EL%P%EDGE(1)/=zero) THEN
+          IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
              IF(k%FRINGE.or.el%p%permfringe) then
-                x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
@@ -10124,17 +10146,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        IF(J==1) THEN
 
-          IF(EL%P%EDGE(1)/=zero) THEN
+          IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
              IF(k%FRINGE.or.el%p%permfringe) then
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-                x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)+EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)-EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
           ELSE
@@ -10145,15 +10167,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        ELSE ! J=2
 
-          IF(EL%P%EDGE(2)/=zero) THEN
+          IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
              IF(k%FRINGE.or.el%p%permfringe) then
-                x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
@@ -10169,17 +10191,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        IF(J==1) THEN
 
-          IF(EL%P%EDGE(2)/=zero) THEN
+          IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
              IF(k%FRINGE.or.el%p%permfringe) then
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-                x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)-EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)+EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
           ELSE
@@ -10190,15 +10212,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
        ELSE ! J=2
 
-          IF(EL%P%EDGE(1)/=zero) THEN
+          IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
              IF(k%FRINGE.or.el%p%permfringe) then
-                x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*half)
+                x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(1)*x(1)**2-wedge_coeff(2)*x(3)**2*0.5_dp)
                 x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(wedge_coeff(2)*x(1)*x(3))
                 CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              ELSEIF(MAD8_WEDGE) THEN
                 x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
-                x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(TWO*x(1)*x(3))
+                x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
@@ -10297,8 +10319,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) DH,DD
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==1) then
@@ -10330,8 +10352,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     CALL ALLOC(DH)
 
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==1) then
@@ -10396,8 +10418,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     integer, intent(in) :: i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
@@ -10408,7 +10430,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
        !       ENDIF
     endif
-    CALL CHECK_APERTURE(EL%A,X)
+    CALL CHECK_APERTURE(EL%p%APERTURE,X)
+!    CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==0) then
@@ -10435,8 +10458,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(DH)
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
@@ -10447,7 +10470,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
        !       ENDIF
     endif
-    CALL CHECK_APERTURE(EL%A,X)
+     CALL CHECK_APERTURE(EL%p%APERTURE,X)
+!    CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==0) then
@@ -10545,8 +10569,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     integer, intent(in) :: i
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
@@ -10557,7 +10581,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
        ENDIF
     endif
-    CALL CHECK_APERTURE(EL%A,X)
+    CALL CHECK_APERTURE(EL%p%APERTURE,X)
+!    CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==0) then
@@ -10582,8 +10607,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     CALL ALLOC(DH)
-    DH=EL%L/two/el%p%nst
-    DD=EL%P%LD/two/el%p%nst
+    DH=EL%L/2.0_dp/el%p%nst
+    DD=EL%P%LD/2.0_dp/el%p%nst
 
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
@@ -10594,8 +10619,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
     !       ENDIF
     !    endif
-    CALL CHECK_APERTURE(EL%A,X)
-
+    CALL CHECK_APERTURE(EL%p%APERTURE,X)
+!    CALL CHECK_APERTURE(EL%A,X)
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     !    if(mod(el%p%nst,2)==0) then
     !       IF(PRESENT(MID)) THEN
@@ -10623,25 +10648,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    if(EL%P%EXACT) THEN
     if(.true.) then
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C
 
 
        if(k%TIME) then
-          PZ=ROOT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=ROOT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=ROOT((one+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
-          E1=one+X(5)
+          PZ=ROOT((1.0_dp+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
+          E1=1.0_dp+X(5)
        endif
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
-       ARG=ARG*TWO
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*2.0_dp
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10650,9 +10675,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
@@ -10661,25 +10686,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           endif
        ENDIF
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C    ! added 2004.06.09
 
        if(k%TIME) then
-          PZ=ROOT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=ROOT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=ROOT((one+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
-          E1=one+X(5)
+          PZ=ROOT((1.0_dp+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
+          E1=1.0_dp+X(5)
        endif
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
-       ARG=ARG*TWO
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*2.0_dp
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10688,9 +10713,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
@@ -10700,27 +10725,27 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF
     else
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C
 
 
 
        if(k%TIME) then
-          PZ=root((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=root((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=(one+X(5)+K1*X(3))
-          E1=one+X(5)
+          PZ=(1.0_dp+X(5)+K1*X(3))
+          E1=1.0_dp+X(5)
        endif
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
-       ARG=ARG*TWO
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*2.0_dp
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10729,9 +10754,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
@@ -10741,25 +10766,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF
 
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C    ! added 2004.06.09
 
        if(k%TIME) then
-          PZ=root((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=root((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=(one+X(5)+K1*X(3))
-          E1=one+X(5)
+          PZ=(1.0_dp+X(5)+K1*X(3))
+          E1=1.0_dp+X(5)
        endif
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ
        SH=SINeH(ARG)
        CH=COSeH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
-       ARG=ARG*TWO
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINeHX_X(ARG)/PZ*SINeH(ARG)
+       ARG=ARG*2.0_dp
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10768,9 +10793,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        IF(PRESENT(MID)) THEN
@@ -10799,26 +10824,26 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL ALLOC( K1,SH_X,SH,CH,CHM,PZ,E1)
        CALL ALLOC( XT,2)
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C
 
 
        if(k%TIME) then
-          PZ=SQRT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=SQRT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=SQRT((one+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
-          E1=one+X(5)
+          PZ=SQRT((1.0_dp+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
+          E1=1.0_dp+X(5)
        endif
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
-       ARG=TWO*ARG
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=2.0_dp*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10827,9 +10852,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        !       IF(PRESENT(MID)) THEN
@@ -10839,25 +10864,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !       ENDIF
 
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C    ! added 2004.06.09
        if(k%TIME) then
-          PZ=SQRT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=SQRT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2-X(2)**2-X(4)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=SQRT((one+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
-          E1=one+X(5)
+          PZ=SQRT((1.0_dp+X(5)+K1*X(3))**2-X(2)**2-X(4)**2)
+          E1=1.0_dp+X(5)
        endif
 
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
-       ARG=TWO*ARG
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=2.0_dp*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10866,9 +10891,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
        !       IF(PRESENT(MID)) THEN
        !          if(mod(el%p%nst,2)==0) then
@@ -10884,25 +10909,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        CALL ALLOC( K1,SH_X,SH,CH,CHM,PZ,E1)
        CALL ALLOC( XT,2)
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C
 
        if(k%TIME) then
-          PZ=SQRT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=SQRT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=(one+X(5)+K1*X(3))
-          E1=one+X(5)
+          PZ=(1.0_dp+X(5)+K1*X(3))
+          E1=1.0_dp+X(5)
        endif
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
-       ARG=TWO*ARG
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=2.0_dp*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10911,9 +10936,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        !       IF(PRESENT(MID)) THEN
@@ -10923,25 +10948,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !       ENDIF
 
 
-       K1=EL%P%CHARGE*EL%VOLT*c_1d_3/EL%P%P0C    ! added 2004.06.09
+       K1=EL%P%CHARGE*EL%VOLT*1e-3_dp/EL%P%P0C    ! added 2004.06.09
        if(k%TIME) then
-          PZ=SQRT((one/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
-          E1=one/EL%P%BETA0+X(5)
+          PZ=SQRT((1.0_dp/EL%P%BETA0+X(5)+K1*X(3))**2-(EL%P%GAMMA0I/EL%P%BETA0)**2)
+          E1=1.0_dp/EL%P%BETA0+X(5)
        else
-          PZ=(one+X(5)+K1*X(3))
-          E1=one+X(5)
+          PZ=(1.0_dp+X(5)+K1*X(3))
+          E1=1.0_dp+X(5)
        endif
 
 
-       ARG=(EL%L/two/el%p%nst)*K1/PZ
-       SH_X=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ
+       ARG=(EL%L/2.0_dp/el%p%nst)*K1/PZ
+       SH_X=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ
        SH=SINH(ARG)
        CH=COSH(ARG)
-       ARG=ARG*half
-       CHM=(EL%L/two/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
-       ARG=TWO*ARG
+       ARG=ARG*0.5_dp
+       CHM=(EL%L/2.0_dp/el%p%nst)*SINHX_X(ARG)/PZ*SINH(ARG)
+       ARG=2.0_dp*ARG
 
-       X(1)=X(1)+X(2)*(EL%L/two/el%p%nst)/PZ
+       X(1)=X(1)+X(2)*(EL%L/2.0_dp/el%p%nst)/PZ
        XT(1)=CH*X(3)+SH_X*X(4)+CHM*E1
        XT(2)=CH*X(4)+K1*SH*X(3)+SH*E1
        X(6)=X(6)+CHM*X(4)+SH*X(3)+E1*SH_X
@@ -10950,9 +10975,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=XT(2)
 
        if(k%TIME) then
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/EL%P%BETA0/2.0_dp/el%p%nst
        else
-          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/TWO/el%p%nst
+          X(6)=X(6)-(1-k%TOTALPATH)*EL%P%LD/2.0_dp/el%p%nst
        endif
 
        !       IF(PRESENT(MID)) THEN
@@ -11012,8 +11037,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(STREX),INTENT(IN):: EL
     real(dp),INTENT(IN):: YL
     real(dp) X1,X3,BBYTW,BBXTW,BBYTWT !,X5
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -11037,8 +11063,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
 
@@ -11062,8 +11088,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(STREXP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: YL
     TYPE(REAL_8) X1,X3,BBYTW,BBXTW,BBYTWT !5
-    INTEGER J,DIR
+    INTEGER J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -11094,8 +11121,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           BBYTW=BBYTWT
        ENDDO
     ELSE
-       BBYTW=zero
-       BBXTW=zero
+       BBYTW=0.0_dp
+       BBXTW=0.0_dp
     ENDIF
 
     X(2)=X(2)-YL*DIR*BBYTW
@@ -11147,9 +11174,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ENDIF
           CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
        CASE(2)
-          DH=EL%L/two/EL%P%NST
+          DH=EL%L/2.0_dp/EL%P%NST
           D=EL%L/EL%P%NST
-          DD=EL%P%LD/two/EL%P%NST
+          DD=EL%P%LD/2.0_dp/EL%P%NST
 
           CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
           CALL KICKEX (EL,D,X,k)
@@ -11200,9 +11227,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ELSE
        SELECT CASE(EL%P%METHOD)
        CASE(2)
-          DH=EL%L/two/EL%P%NST
+          DH=EL%L/2.0_dp/EL%P%NST
           D=EL%L/EL%P%NST
-          DD=EL%P%LD/two/EL%P%NST
+          DD=EL%P%LD/2.0_dp/EL%P%NST
 
           CALL SPAR(EL,DH,DD,X,k)
           CALL KICKEX (EL,D,X,k)
@@ -11288,9 +11315,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           CALL kill(DH,D)
        CASE(2)
           CALL ALLOC(DH,D)
-          DH=EL%L/two/EL%P%NST
+          DH=EL%L/2.0_dp/EL%P%NST
           D=EL%L/EL%P%NST
-          DD=EL%P%LD/two/EL%P%NST
+          DD=EL%P%LD/2.0_dp/EL%P%NST
 
           CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
           CALL KICKEX (EL,D,X,k)
@@ -11347,9 +11374,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        SELECT CASE(EL%P%METHOD)
        CASE(2)
           CALL ALLOC(DH,D)
-          DH=EL%L/two/EL%P%NST
+          DH=EL%L/2.0_dp/EL%P%NST
           D=EL%L/EL%P%NST
-          DD=EL%P%LD/two/EL%P%NST
+          DD=EL%P%LD/2.0_dp/EL%P%NST
 
           CALL SPAR(EL,DH,DD,X,k)
           CALL KICKEX (EL,D,X,k)
@@ -11463,7 +11490,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
           IF(EL%LIKEMAD) THEN
 
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
@@ -11479,7 +11506,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
           IF(EL%LIKEMAD) THEN
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
              IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
@@ -11498,7 +11525,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
           IF(EL%LIKEMAD) THEN
 
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
@@ -11513,7 +11540,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE ! J==2
 
           IF(EL%LIKEMAD) THEN
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
              IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
@@ -11546,7 +11573,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
           IF(EL%LIKEMAD) THEN
 
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
@@ -11562,7 +11589,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
           IF(EL%LIKEMAD) THEN
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
              IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
@@ -11581,7 +11608,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
           IF(EL%LIKEMAD) THEN
 
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(2)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
@@ -11596,7 +11623,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE ! J==2
 
           IF(EL%LIKEMAD) THEN
-             ANGH=EL%P%B0*EL%P%LD*half-EL%P%EDGE(1)
+             ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
              IF(k%FRINGE.or.el%p%permfringe) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
@@ -11655,35 +11682,35 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(STREX),INTENT(IN):: EL
     real(dp) XN(6),PZ,PZS,PT
     real(dp)  b
-    INTEGER DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
     if(k%TIME) then
        B=EL%P%BETA0
-       PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+       PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
        XN(2)=X(2)-YL*DIR*EL%BN(1)
-       PT=ROOT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+       PT=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+       PZS=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
        XN(3)=(ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL/b
 
        XN(3)=X(3)+X(4)*XN(3)
     else
-       PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+       PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
        XN(2)=X(2)-YL*DIR*EL%BN(1)
-       PT=ROOT((one+X(5))**2-X(4)**2)
-       PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
+       PT=ROOT((1.0_dp+X(5))**2-X(4)**2)
+       PZS=ROOT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
        XN(3)=(ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL
 
        XN(3)=X(3)+X(4)*XN(3)
@@ -11704,8 +11731,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(STREXP),INTENT(IN):: EL
     TYPE(REAL_8) XN(6),PZ,PZS,PT
     real(dp)  b
-    INTEGER DIR
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    real(dp) dir
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
@@ -11714,28 +11741,28 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     if(k%TIME) then
        B=EL%P%BETA0
-       PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+       PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
        XN(2)=X(2)-YL*DIR*EL%BN(1)
-       PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
-       PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+       PT=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+       PZS=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
        XN(3)=(ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one/b+x(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL/b
 
        XN(3)=X(3)+X(4)*XN(3)
     else
-       PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+       PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
        XN(2)=X(2)-YL*DIR*EL%BN(1)
-       PT=SQRT((one+X(5))**2-X(4)**2)
-       PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
+       PT=SQRT((1.0_dp+X(5))**2-X(4)**2)
+       PZS=SQRT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
        XN(1)=X(1)+(PZS-PZ)/DIR/EL%BN(1)
 
        XN(3)=(ASIN(X(2)/PT)-ASIN(XN(2)/PT))/DIR/EL%BN(1)
 
-       XN(6)=X(6)+XN(3)*(one+X(5))
+       XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
        XN(6)=XN(6)+(k%TOTALPATH-1)*DL
 
        XN(3)=X(3)+X(4)*XN(3)
@@ -11761,13 +11788,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(P%EXACT) THEN
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/P%BETA0+x(5)**2-X(2)**2-X(4)**2)
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
        endif
     ENDIF
     !       write(30,*) x(1:5),c_%check_stable
-    if(.not.c_%check_stable)x=zero
+    if(.not.c_%check_stable)x=0.0_dp
 
   END SUBROUTINE check_root_drift
 
@@ -11813,38 +11840,38 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ! call !write_e(101)
     ENDIF
 
-    IF(B1==ZERO) THEN
+    IF(B1==0.0_dp) THEN
        call ROT_XZ(A,X,B,EXACT,time)
 
     ELSE
 
 
        if(TIME) then
-          PZ=ROOT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
 
           XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
 
-          PT=ROOT(one+two*x(5)/b+X(5)**2-X(4)**2)
-          PZS=ROOT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+          PT=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+          PZS=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
 
-          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2) )&
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(2.0_dp*A)+SIN(A)**2*(2.0_dp*X(1)*PZ-B1*X(1)**2) )&
                & /(PZS+PZ*COS(A)-X(2)*SIN(A))
           XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/B1
 
-          XN(6)=X(6)+XN(3)*(one/b+x(5))
+          XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
 
           XN(3)=X(3)+X(4)*XN(3)
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-          PT=ROOT((one+X(5))**2-X(4)**2)
-          PZS=ROOT((one+X(5))**2-XN(2)**2-X(4)**2)
-          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+          PT=ROOT((1.0_dp+X(5))**2-X(4)**2)
+          PZS=ROOT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(2.0_dp*A)+SIN(A)**2*(2.0_dp*X(1)*PZ-B1*X(1)**2))&
                & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
           XN(3)=(A+ARCSIN(X(2)/PT)-ARCSIN(XN(2)/PT))/B1
 
-          XN(6)=X(6)+XN(3)*(one+X(5))
+          XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
 
           XN(3)=X(3)+X(4)*XN(3)
 
@@ -11897,35 +11924,35 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ! call !write_e(102)
     ENDIF
 
-    IF(B1==ZERO) THEN
+    IF(B1==0.0_dp) THEN
        call ROT_XZ(A,X,B,EXACT,time)
 
     ELSE
 
        if(TIME) then
-          PZ=SQRT(one+two*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
           XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-          PT=SQRT(one+two*x(5)/b+X(5)**2-X(4)**2)
-          PZS=SQRT(one+two*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
-          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+          PT=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(4)**2)
+          PZS=SQRT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(2.0_dp*A)+SIN(A)**2*(2.0_dp*X(1)*PZ-B1*X(1)**2))&
                & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
           XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-          XN(6)=X(6)+XN(3)*(one/b+x(5))
+          XN(6)=X(6)+XN(3)*(1.0_dp/b+x(5))
 
           XN(3)=X(3)+X(4)*XN(3)
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           XN(2)=X(2)*COS(A)+(PZ-B1*X(1))*SIN(A)
-          PT=SQRT((one+X(5))**2-X(4)**2)
-          PZS=SQRT((one+X(5))**2-XN(2)**2-X(4)**2)
-          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(two*A)+SIN(A)**2*(two*X(1)*PZ-B1*X(1)**2))&
+          PT=SQRT((1.0_dp+X(5))**2-X(4)**2)
+          PZS=SQRT((1.0_dp+X(5))**2-XN(2)**2-X(4)**2)
+          XN(1)=X(1)*COS(A)+(X(1)*X(2)*SIN(2.0_dp*A)+SIN(A)**2*(2.0_dp*X(1)*PZ-B1*X(1)**2))&
                & /(PZS+PZ*COS(A)-X(2)*SIN(A))
 
           XN(3)=(A+ASIN(X(2)/PT)-ASIN(XN(2)/PT))/B1
 
-          XN(6)=X(6)+XN(3)*(one+X(5))
+          XN(6)=X(6)+XN(3)*(1.0_dp+X(5))
 
           XN(3)=X(3)+X(4)*XN(3)
 
@@ -12144,8 +12171,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
-       Z0=ZERO
-       dv=zero
+       Z0=0.0_dp
+       dv=0.0_dp
     else
        Z0=EL%L
        dv=EL%dvds*z0
@@ -12155,17 +12182,17 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     SPSI=SIN(EL%PSI)
 
     O=EL%freq*twopi/CLIGHT
-    C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
-    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
+    C1=(eps1+(EL%P%DIR-eps1)*0.5_dp)*COS(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
+    C2=(eps2+(EL%P%DIR-eps2)*0.5_dp)*COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
-    S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
-    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+ Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
+    S1=(eps1+(EL%P%DIR-eps1)*0.5_dp)*SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
+    S2=(eps2+(EL%P%DIR-eps2)*0.5_dp)*SIN(O*(x(6)+ Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
-    V=I*EL%P%CHARGE*(EL%volt-dv)*c_1d_3/EL%P%P0C
+    V=I*EL%P%CHARGE*(EL%volt-dv)*1e-3_dp/EL%P%P0C
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
-    x(5)=x(5)-HALF*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
+    x(5)=x(5)-0.5_dp*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
 
   END SUBROUTINE FRINGECAVR_TRAV
 
@@ -12190,8 +12217,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
-       Z0=ZERO
-       dv=zero
+       Z0=0.0_dp
+       dv=0.0_dp
     else
        Z0=EL%L
        dv=EL%dvds*z0
@@ -12201,18 +12228,18 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     SPSI=SIN(EL%PSI)
 
     O=EL%freq*twopi/CLIGHT
-    C1=(eps1+(EL%P%DIR-eps1)*half)*COS(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
-    C2=(eps2+(EL%P%DIR-eps2)*half)*COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
+    C1=(eps1+(EL%P%DIR-eps1)*0.5_dp)*COS(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
+    C2=(eps2+(EL%P%DIR-eps2)*0.5_dp)*COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION  ULTRA RELATIVISTIC
-    S1=(eps1+(EL%P%DIR-eps1)*half)*SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
-    S2=(eps2+(EL%P%DIR-eps2)*half)*SIN(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
+    S1=(eps1+(EL%P%DIR-eps1)*0.5_dp)*SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
+    S2=(eps2+(EL%P%DIR-eps2)*0.5_dp)*SIN(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
-    V=I*EL%P%CHARGE*(EL%volt-dv)*c_1d_3/EL%P%P0C
+    V=I*EL%P%CHARGE*(EL%volt-dv)*1e-3_dp/EL%P%P0C
 
 
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
-    x(5)=x(5)-HALF*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
+    x(5)=x(5)-0.5_dp*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
 
 
 
@@ -12357,15 +12384,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(RCOL), INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
     !integer k
+     return
     IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
+     !  if(ASSOCIATED(EL%A)) THEN
+     !     CALL KILL(EL%A)
+     !     deallocate(EL%A)
+     !  ENDIF
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%A)
+     !  NULLIFY(EL%A)
 
     endif
 
@@ -12377,15 +12405,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(RCOLP), INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
     !integer k,j
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
+    return 
+   IF(I==-1) THEN
+!       if(ASSOCIATED(EL%A)) THEN
+!          CALL KILL(EL%A)
+!          deallocate(EL%A)
+!       ENDIF
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%A)
+ !      NULLIFY(EL%A)
 
     endif
 
@@ -12397,15 +12426,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(ECOL), INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
     !integer k
-    IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
+     return 
+   IF(I==-1) THEN
+  !     if(ASSOCIATED(EL%A)) THEN
+  !        CALL KILL(EL%A)
+  !        deallocate(EL%A)
+  !     ENDIF
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%A)
+   !    NULLIFY(EL%A)
 
     endif
 
@@ -12417,14 +12447,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     INTEGER, INTENT(IN)::I
     !integer k,j
     IF(I==-1) THEN
-       if(ASSOCIATED(EL%A)) THEN
-          CALL KILL(EL%A)
-          deallocate(EL%A)
-       ENDIF
+     !  if(ASSOCIATED(EL%A)) THEN
+     !     CALL KILL(EL%A)
+     !     deallocate(EL%A)
+     !  ENDIF
 
     elseif(i==0)       then          ! nullifies
 
-       NULLIFY(EL%A)
+     !  NULLIFY(EL%A)
 
     endif
 
@@ -12717,7 +12747,20 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
   END SUBROUTINE KILLTKT7
 
-  SUBROUTINE ZEROr_teapot(EL,I)
+
+
+
+!       if(ASSOCIATED(EL%bf_x)) then
+!          CALL KILL(EL%bf_x,S_B0%N_MONO)   ! not used, will be used locally only
+!          deallocate(EL%bf_x)
+!       endif
+!       if(ASSOCIATED(EL%bf_Y)) then
+!          CALL KILL(EL%bf_Y,S_B0%N_MONO)   ! not used, will be used locally only
+!          deallocate(EL%bf_Y)
+!       endif
+
+
+SUBROUTINE ZEROr_teapot(EL,I)
     IMPLICIT NONE
     TYPE(TEAPOT), INTENT(INOUT)::EL
     INTEGER, INTENT(IN)::I
@@ -12786,6 +12829,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     endif
 
   END SUBROUTINE ZEROP_teapot
+
 
   SUBROUTINE ZEROR_CAV4(EL,I)
     IMPLICIT NONE
@@ -12942,13 +12986,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    allocate(acc%w2)
    allocate(acc%pos)
    nullify(acc%next)
-   acc%de=zero
-   acc%e_in=zero
+   acc%de=0.0_dp
+   acc%e_in=0.0_dp
    acc%nst=nst
    acc%pos=0
 !   acc%w1=0   not yet defined, done later
 !   acc%w2=0
-   acc%r=one
+   acc%r=1.0_dp
    acc%fichier=' '
    
    if(len(filename)>255) then
@@ -12968,11 +13012,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    type(temps_energie), target, intent(inout) :: tableau
    integer n
    allocate(tableau%volt(n),tableau%phase(n),tableau%temps,tableau%energie,tableau%tc)
-    tableau%volt=zero
-    tableau%phase=zero
-    tableau%temps=zero
-    tableau%energie=zero
-    tableau%tc=zero
+    tableau%volt=0.0_dp
+    tableau%phase=0.0_dp
+    tableau%temps=0.0_dp
+    tableau%energie=0.0_dp
+    tableau%tc=0.0_dp
    end SUBROUTINE alloc_tableau
  
    SUBROUTINE kill_tableau(tableau)
@@ -13132,7 +13176,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     else
      read(mf,*) acc%tableau(i)%temps,acc%tableau(i)%energie,   &
      (acc%tableau(i)%volt(js(j)),acc%tableau(i)%phase(js(j)),j=1,n_mode )
-     acc%tableau(i)%tc=zero
+     acc%tableau(i)%tc=0.0_dp
     endif 
   !  acc%tableau(i)%phase(2)=-acc%tableau(i)%phase(2)
   !  write(6,*) acc%tableau(i)%phase(2)
@@ -13148,7 +13192,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    endif
 
      ! write(6,*) " initial time shift in cavity ",el%c4%t
-      tc=zero   !el%c4%t
+      tc=0.0_dp   !el%c4%t
       call copy_acceleration(acc,elp%c4%acc)
 
       if(size(acc%tableau(1)%volt)/=el%c4%nf) then
@@ -13157,25 +13201,25 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        call kill(elp%c4%f)
        deallocate(elp%c4%f)
        deallocate(el%c4%f)
-       allocate(el%c4%f(el%c4%nf));el%c4%f=zero;el%c4%f(1)=one;
+       allocate(el%c4%f(el%c4%nf));el%c4%f=0.0_dp;el%c4%f(1)=1.0_dp;
        allocate(elp%c4%f(el%c4%nf))
        call alloc(elp%c4%f,el%c4%nf)
-       elp%c4%f(1)=one    
+       elp%c4%f(1)=1.0_dp    
 
        call kill(elp%c4%ph)
        deallocate(elp%c4%ph)
        deallocate(el%c4%ph)
-       allocate(el%c4%ph(el%c4%nf));el%c4%ph=zero; 
+       allocate(el%c4%ph(el%c4%nf));el%c4%ph=0.0_dp; 
        allocate(elp%c4%ph(el%c4%nf))
        call alloc(elp%c4%ph,el%c4%nf)
       endif
       
-      el%c4%volt =one
-      elp%c4%volt =one
-      el%c4%phas  =zero
-      elp%c4%phas =zero
-      el%c4%phase0  =zero
-      elp%c4%phase0 =zero      
+      el%c4%volt =1.0_dp
+      elp%c4%volt =1.0_dp
+      el%c4%phas  =0.0_dp
+      elp%c4%phas =0.0_dp
+      el%c4%phase0  =0.0_dp
+      elp%c4%phase0 =0.0_dp      
       el%c4%t  =tc
       elp%c4%t =tc
      
@@ -13213,7 +13257,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    allocate(acc%file)
    allocate(acc%r,acc%t_max)
    allocate(acc%unit_time)
-   acc%r=one
+   acc%r=1.0_dp
    acc%t_max=t_max
    acc%unit_time=unit_time
    acc%file=' '
@@ -13235,11 +13279,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    type(time_energy), target, intent(inout) :: tableau
    integer n
    allocate(tableau%an(n),tableau%bn(n),tableau%time,tableau%energy,tableau%b_t)
-    tableau%an=zero
-    tableau%bn=zero
-    tableau%time=zero
-    tableau%energy=zero
-    tableau%b_t=zero
+    tableau%an=0.0_dp
+    tableau%bn=0.0_dp
+    tableau%time=0.0_dp
+    tableau%energy=0.0_dp
+    tableau%b_t=0.0_dp
    end SUBROUTINE alloc_table 
  
    SUBROUTINE kill_table(tableau)
@@ -13369,8 +13413,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
    
    if(n_max<el%p%nmul) n_max = el%p%nmul
    
-   call alloc_ramping(acc,unit_time,zero,n,n_max,fichier)
-   acc%r=one
+   call alloc_ramping(acc,unit_time,0.0_dp,n,n_max,fichier)
+   acc%r=1.0_dp
    do i=1,acc%n
     if(timepatch) then
      read(mf,*) acc%table(i)%time,   &
@@ -13378,7 +13422,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     else
      read(mf,*) acc%table(i)%time,   &
      (acc%table(i)%bn(js(j)),acc%table(i)%an(js(j)),j=1,n_mode )
-        acc%table(i)%b_t=zero
+        acc%table(i)%b_t=0.0_dp
     endif
     acc%table(i)%energy=0.d0
    enddo
@@ -13515,10 +13559,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
   SUBROUTINE ALLOCTEAPOT(EL)
     IMPLICIT NONE
     TYPE(TEAPOTP), INTENT(INOUT)::EL
-    CALL ALLOC(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)
-    CALL ALLOC(EL%bf_Y,S_B(SECTOR_NMUL)%N_MONO)
-    !    CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
-    !    CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
+   ! CALL ALLOC(EL%bf_x,S_B0%N_MONO)
+   ! CALL ALLOC(EL%bf_Y,S_B0%N_MONO)
+        CALL ALLOC(EL%bf_x,S_B(EL%P%NMUL)%N_MONO)
+        CALL ALLOC(EL%bf_Y,S_B(EL%P%NMUL)%N_MONO)
     ! 2010 January 6
   END SUBROUTINE ALLOCTEAPOT
 
@@ -13528,6 +13572,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     CALL KILL(EL%bf_x,S_B(SECTOR_NMUL)%N_MONO)
     CALL KILL(EL%bf_Y,S_B(SECTOR_NMUL)%N_MONO)
+!    CALL KILL(EL%bf_x,S_B0%N_MONO)
+!    CALL KILL(EL%bf_Y,S_B0%N_MONO)
     ! 2010 January 6
 
   END SUBROUTINE KILLTEAPOT
@@ -13547,14 +13593,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     if(k%time) then
        beta0=p%beta0;GAMMA0I=p%GAMMA0I;
     else
-       beta0=one;GAMMA0I=zero;
+       beta0=1.0_dp;GAMMA0I=0.0_dp;
     endif
 
     hcurv=p%b0
 
-    d(1)=root(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
-    d(2)=(d(1)**3)/root(one+2*x(5)/beta0+x(5)**2)
-    d(3)=one+hcurv*x(1)
+    d(1)=root(x(2)**2+x(4)**2+(1.0_dp+hcurv*x(1))**2)
+    d(2)=(d(1)**3)/root(1.0_dp+2*x(5)/beta0+x(5)**2)
+    d(3)=1.0_dp+hcurv*x(1)
 
     c(1)=d(1)**2-x(2)**2
     c(2)=-x(2)*x(4)
@@ -13568,7 +13614,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     f(2)=(c(4)*c(5)-c(2)*c(6))/d(3)
     f(3)=x(4)
     f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
-    d(2)=one+two*x(5)/beta0+x(5)**2
+    d(2)=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
     d(2)=gamma0I/beta0/d(2)
     f(6)=root((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
 
@@ -13582,7 +13628,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !       B2=(B(3)*c(1)-B(1)*c(3))**2+B2
     !       f(5)=-CRADF(P)*(one+X(5))**2*B2*f(6)
     !    else
-    f(5)=zero
+    f(5)=0.0_dp
     !    endif
 
 
@@ -13605,12 +13651,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     if(k%time) then
        beta0=p%beta0;GAMMA0I=p%GAMMA0I;
     else
-       beta0=one;GAMMA0I=zero;
+       beta0=1.0_dp;GAMMA0I=0.0_dp;
     endif
 
-    d(1)=SQRT(x(2)**2+x(4)**2+(one+hcurv*x(1))**2)
-    d(2)=(d(1)**3)/SQRT(one+2*x(5)/beta0+x(5)**2)
-    d(3)=one+hcurv*x(1)
+    d(1)=SQRT(x(2)**2+x(4)**2+(1.0_dp+hcurv*x(1))**2)
+    d(2)=(d(1)**3)/SQRT(1.0_dp+2*x(5)/beta0+x(5)**2)
+    d(3)=1.0_dp+hcurv*x(1)
 
     c(1)=d(1)**2-x(2)**2
     c(2)=-x(2)*x(4)
@@ -13624,15 +13670,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     f(2)=(c(4)*c(5)-c(2)*c(6))/d(3)
     f(3)=x(4)
     f(4)=(c(1)*c(6)-c(3)*c(5))/d(3)
-    f(5)=zero
-    d(2)=one+two*x(5)/beta0+x(5)**2
+    f(5)=0.0_dp
+    d(2)=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
     !   d(2)=SQRT((one+d(2)*gambet)/d(2)/gambet)
     !   f(6)=d(2)*d(1)
 
     d(2)=gamma0I/beta0/d(2)
     f(6)=SQRT((1+d(2)**2))*d(1)  ! (time)-prime = dt/dz
 
-    f(5)=zero
+    f(5)=0.0_dp
 
     call kill(d,3)
     call kill(c,6)
@@ -13750,7 +13796,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
 
-    EL%SCALE=ONE
+    EL%SCALE=1.0_dp
     !    EL%D_IN=ZERO
     !    EL%D_OUT=ZERO
     !    EL%ANG_IN=ZERO
@@ -13875,7 +13921,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     B(1)=X(1);
     B(2)=X(3);
-    B(3)=ZERO;
+    B(3)=0.0_dp;
 
     !       CALL track3(EL%B(POS),B)
     CALL trackg(EL%B(POS),B)
@@ -13900,7 +13946,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CALL ALLOC(B)
     B(1)=X(1);
     B(2)=X(3);
-    B(3)=ZERO;
+    B(3)=0.0_dp;
 
     !       CALL track3(EL%B(POS),B)
     CALL trackg(EL%B(POS),B)
@@ -13937,7 +13983,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     tt=tI+GR%p%dir
@@ -13946,7 +13992,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -13966,7 +14012,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=ti+2*GR%p%dir
 
@@ -14005,7 +14051,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
     tt=tI+GR%p%dir
@@ -14014,7 +14060,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -14035,7 +14081,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=ti+2*GR%p%dir
 
@@ -14062,13 +14108,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     real(dp) ti
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     if(k%TIME) then
-       ti=ROOT(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
-       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+       ti=ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
     else
-       ti=ROOT((one+x(5))**2-X(2)**2-X(4)**2)
-       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
-       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+       ti=ROOT((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
     endif
 
   end SUBROUTINE conv_to_xpr
@@ -14081,13 +14127,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     call alloc(ti)
     if(k%TIME) then
-       ti=sqrt(one+two*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
-       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+       ti=sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
     else
-       ti=sqrt((one+x(5))**2-X(2)**2-X(4)**2)
-       x(2)=(ONE+el%p%B0*X(1))*x(2)/ti
-       x(4)=(ONE+el%p%B0*X(1))*x(4)/ti
+       ti=sqrt((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
+       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
     endif
     call kill(ti)
 
@@ -14099,13 +14145,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(PANCAKE),INTENT(INOUT):: EL
     real(dp) ti
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    ti=ROOT((ONE+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    ti=ROOT((1.0_dp+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
     if(k%TIME) then
-       x(2)=x(2)*ROOT(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-       x(4)=x(4)*ROOT(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+       x(2)=x(2)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
     else
-       x(2)=x(2)*(one+x(5))/ti
-       x(4)=x(4)*(one+x(5))/ti
+       x(2)=x(2)*(1.0_dp+x(5))/ti
+       x(4)=x(4)*(1.0_dp+x(5))/ti
     endif
   end SUBROUTINE conv_to_pxr
 
@@ -14116,13 +14162,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     type(real_8) ti
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     call alloc(ti)
-    ti=SQRT((ONE+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    ti=SQRT((1.0_dp+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
     if(k%TIME) then
-       x(2)=x(2)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
-       x(4)=x(4)*sqrt(one+two*X(5)/el%p%beta0+x(5)**2)/ti
+       x(2)=x(2)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
+       x(4)=x(4)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
     else
-       x(2)=x(2)*(one+x(5))/ti
-       x(4)=x(4)*(one+x(5))/ti
+       x(2)=x(2)*(1.0_dp+x(5))/ti
+       x(4)=x(4)*(1.0_dp+x(5))/ti
     endif
     call kill(ti)
 
@@ -14366,7 +14412,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(CAV_TRAV),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    A=zero;AD=zero;
+    A=0.0_dp;AD=0.0_dp;
     CALL A_TRANS(D,Z0,X,k,A,AD)
 
     X(2)=X(2)-A(1)
@@ -14374,39 +14420,39 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(D%P%EXACT) THEN
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
+          F(6)=(1.0_dp/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one+X(5))/PZ-(1-k%TOTALPATH)
+          F(6)=(1.0_dp+X(5))/PZ-(1-k%TOTALPATH)
        endif
     ELSE
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/D%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))/pz
+          F(6)=((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/D%P%BETA0+x(5))/pz
           F(6)=F(6)-(1-k%TOTALPATH)/D%P%BETA0
        else
-          F(1)=X(2)/(one+X(5))
-          F(3)=X(4)/(one+X(5))
+          F(1)=X(2)/(1.0_dp+X(5))
+          F(3)=X(4)/(1.0_dp+X(5))
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(ONE/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+k%TOTALPATH
+          F(6)=(1.0_dp/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+k%TOTALPATH
        endif
     ENDIF
 
@@ -14436,39 +14482,39 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     IF(D%P%EXACT) THEN
        if(k%TIME) then
-          PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
+          F(6)=(1.0_dp/D%P%BETA0+X(5))/PZ-(1-k%TOTALPATH)/D%P%BETA0
        else
-          PZ=sqrt((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=sqrt((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(one+X(5))/PZ-(1-k%TOTALPATH)
+          F(6)=(1.0_dp+X(5))/PZ-(1-k%TOTALPATH)
        endif
     ELSE
        if(k%TIME) then
-          PZ=sqrt(one+two*X(5)/D%P%BETA0+x(5)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/D%P%BETA0+x(5)**2)
           F(1)=X(2)/PZ
           F(3)=X(4)/PZ
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=((X(2)*X(2)+X(4)*X(4))/two/pz**2+one)*(one/D%P%BETA0+x(5))/pz
+          F(6)=((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/D%P%BETA0+x(5))/pz
           F(6)=F(6)-(1-k%TOTALPATH)/D%P%BETA0
        else
-          F(1)=X(2)/(one+X(5))
-          F(3)=X(4)/(one+X(5))
+          F(1)=X(2)/(1.0_dp+X(5))
+          F(3)=X(4)/(1.0_dp+X(5))
           F(2)=F(1)*AD(1)
           F(4)=F(3)*AD(1)
           F(5)=-(F(1)*X(1)+F(3)*X(3))*AD(2)+A(3)
-          F(6)=(ONE/(one+X(5)))*(X(2)*X(2)+X(4)*X(4))/two/(one+X(5))+k%TOTALPATH
+          F(6)=(1.0_dp/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))+k%TOTALPATH
        endif
     ENDIF
 
@@ -14498,10 +14544,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     C2=COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     S1=SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
     S2=SIN(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
-    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*1e-3_dp/EL%P%P0C
 
-    AD(1)=HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
-    AD(2)=O*HALF*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
+    AD(1)=0.5_dp*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
+    AD(2)=O*0.5_dp*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
     A(1)=AD(1)*X(1)
     A(2)=AD(1)*X(3)
     A(3)=-EL%P%DIR*V*(COS(EL%PSI)*S1+SIN(EL%PSI)*S2)
@@ -14527,10 +14573,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     C2=COS(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
     S1=SIN(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
     S2=SIN(O*(x(6)+Z0)+EL%PHAS+EL%phase0+EL%DPHAS)
-    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*c_1d_3/EL%P%P0C
+    V=EL%P%CHARGE*(EL%volt-el%dvds*z0)*1e-3_dp/EL%P%P0C
 
-    AD(1)=HALF*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
-    AD(2)=O*HALF*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
+    AD(1)=0.5_dp*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
+    AD(2)=O*0.5_dp*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
     A(1)=AD(1)*X(1)
     A(2)=AD(1)*X(3)
     A(3)=-EL%P%DIR*V*(COS(EL%PSI)*S1+SIN(EL%PSI)*S2)
@@ -14558,10 +14604,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -14601,10 +14647,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
@@ -14644,16 +14690,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -14674,7 +14720,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=tt
 
@@ -14708,16 +14754,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/two
+       yt(j)=y(j)+a(j)/2.0_dp
     enddo
 
-    tt=tI+h/two
+    tt=tI+h/2.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + b(j)/two
+       yt(j)=y(j) + b(j)/2.0_dp
     enddo
 
 
@@ -14738,7 +14784,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     do  j=1,ne
-       y(j) = y(j)+(a(j)+two*b(j)+two*c(j)+d(j))/six
+       y(j) = y(j)+(a(j)+2.0_dp*b(j)+2.0_dp*c(j)+d(j))/6.0_dp
     enddo
     tI=tt
 
@@ -14780,59 +14826,59 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
-    tt=tI+h/nine
+    tt=tI+h/9.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
-    tt=tI+h/six
+    tt=tI+h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
-    tt=tI+h/three
+    tt=tI+h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
-    tt=tI+half*h
+    tt=tI+0.5_dp*h
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
-    tt = tI+two*h/three
+    tt = tI+2.0_dp*h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
-    tt = tI + five*h/six
+    tt = tI + 5.0_dp*h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
     tt = tI + h
@@ -14842,7 +14888,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
     tI=ti+h
 
@@ -14883,59 +14929,59 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        a(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j)=y(j)+a(j)/nine
+       yt(j)=y(j)+a(j)/9.0_dp
     enddo
-    tt=tI+h/nine
+    tt=tI+h/9.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        b(j)=h*f(j)
     enddo
     do   j=1,ne
-       yt(j)=y(j) + (a(j) + three*b(j))/c_24
+       yt(j)=y(j) + (a(j) + 3.0_dp*b(j))/24.0_dp
     enddo
-    tt=tI+h/six
+    tt=tI+h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        c(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j)+(a(j)-three*b(j)+four*c(j))/six
+       yt(j)=y(j)+(a(j)-3.0_dp*b(j)+4.0_dp*c(j))/6.0_dp
     enddo
 
-    tt=tI+h/three
+    tt=tI+h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        d(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (-five*a(j) + c_27*b(j) - c_24*c(j) + six*d(j))/eight
+       yt(j)=y(j) + (-5.0_dp*a(j) + 27.0_dp*b(j) - 24.0_dp*c(j) + 6.0_dp*d(j))/8.0_dp
     enddo
-    tt=tI+half*h
+    tt=tI+0.5_dp*h
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        e(j)=h*f(j)
     enddo
 
     do  j=1,ne
-       yt(j)=y(j) + (c_221*a(j) - c_981*b(j) + c_867*c(j)- c_102*d(j) + e(j))/nine
+       yt(j)=y(j) + (221.0_dp*a(j) - 981.0_dp*b(j) + 867.0_dp*c(j)- 102.0_dp*d(j) + e(j))/9.0_dp
     enddo
-    tt = tI+two*h/three
+    tt = tI+2.0_dp*h/3.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do   j=1,ne
        g(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(-c_183*a(j)+c_678*b(j)-c_472*c(j)-c_66*d(j)+c_80*e(j) + three*g(j))/c_48
+       yt(j) = y(j)+(-183.0_dp*a(j)+678.0_dp*b(j)-472.0_dp*c(j)-66.0_dp*d(j)+80.0_dp*e(j) + 3.0_dp*g(j))/48.0_dp
     enddo
-    tt = tI + five*h/six
+    tt = tI + 5.0_dp*h/6.0_dp
     call feval_cav(tt,yt,k,f,gr)
     do  j=1,ne
        o(j)=h*f(j)
     enddo
     do  j=1,ne
-       yt(j) = y(j)+(c_716*a(j)-c_2079*b(j)+c_1002*c(j)+c_834*d(j)-c_454*e(j)-nine*g(j)+c_72*o(j))/c_82
+       yt(j) = y(j)+(716.0_dp*a(j)-2079.0_dp*b(j)+1002.0_dp*c(j)+834.0_dp*d(j)-454.0_dp*e(j)-9.0_dp*g(j)+72.0_dp*o(j))/82.0_dp
     enddo
 
     tt = tI + h
@@ -14945,7 +14991,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     enddo
 
     do  j=1,ne
-       y(j) = y(j)+(c_41*a(j)+c_216*c(j)+c_27*d(j)+c_272*e(j)+c_27*g(j)+c_216*o(j)+c_41*p(j))/c_840
+       y(j) = y(j)+(41.0_dp*a(j)+216.0_dp*c(j)+27.0_dp*d(j)+272.0_dp*e(j)+27.0_dp*g(j)+216.0_dp*o(j)+41.0_dp*p(j))/840.0_dp
     enddo
     tI=ti+h
     call kill(tt)
@@ -15012,7 +15058,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     R2=x1**2+y1**2
     k=EL%FREQ
     DF=k**2/4.0_DP
-    F=ONE+DF*R2/2.0_DP+DF*DF*R2**2/12.0_DP
+    F=1.0_dp+DF*R2/2.0_DP+DF*DF*R2**2/12.0_DP
     DFR=DF+DF*DF*R2/3.0_DP
     DFR2=DF+DF*DF*R2
 
@@ -15028,7 +15074,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ENDIF
 
     IF(PRESENT(B).or.present(d)) THEN
-       da=zero
+       da=0.0_dp
        DA(1,1)=-k*F*(EL%BN(1)*X(1)*SI +PHIR) &
             -X(1)**2*k*PHIR*DFR
        DA(1,2)=-k*F*(EL%AN(1)*X(1)*CO ) &
@@ -15042,15 +15088,15 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DA(1,3)=k**2*PHIZ*F*X(1)
        DA(2,3)=k**2*PHIZ*F*X(3)
 
-       DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
-       DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
+       DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(2.0_dp*DFR+DFR2)*X(1)
+       DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(2.0_dp*DFR+DFR2)*X(3)
        if(present(d)) d=da
     ENDIF
     IF(PRESENT(DA2)) THEN  !!
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
-       DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
-       DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
+       DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(2.0_dp*DFR+DFR2)*X(1)
+       DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(2.0_dp*DFR+DFR2)*X(3)
     ENDIF
 
     IF(PRESENT(B)) THEN
@@ -15066,13 +15112,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(present(int_ax_dy)) then
-       int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
+       int_f=r2/2.0_dp+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_x2_f_by_x_dy=(x1**3*(140*k**4*Y1**3+1680*k**2*Y1)+84*k**4*x1**5*Y1)/20160.0_dp
        int_ax_dy=k*EL%BN(1)*SI*int_x2_f_by_x_dy+ k*EL%AN(1)*CO*(int_f+Y1**2*F)
        int_ax_dy=-int_ax_dy
     endif
     if(present(int_aY_dX)) then
-       int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
+       int_f=r2/2.0_dp+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_y2_f_by_y_dx=(84*k**4*x1*Y1**5+(140*k**4*x1**3+1680*k**2*x1)*Y1**3)/20160.0_dp
        int_aY_dX=k*EL%BN(1)*SI*(int_f+x1**2*F) + k*EL%AN(1)*CO*int_y2_f_by_y_dx
        int_aY_dX=-int_aY_dX
@@ -15098,9 +15144,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     R2=x1**2+y1**2
     k=EL%FREQ
     DF=k**2/4.0_DP
-    F=ONE  +DF*R2/2.0_DP +DF*DF*R2**2/12.0_DP
-    DFR=zero+DF  +DF*DF*R2/3.0_DP
-    DFR2=zero+DF +DF*DF*R2
+    F=1.0_dp  +DF*R2/2.0_DP +DF*DF*R2**2/12.0_DP
+    DFR=0.0_dp+DF  +DF*DF*R2/3.0_DP
+    DFR2=0.0_dp+DF +DF*DF*R2
 
 
 
@@ -15133,8 +15179,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        DA(1,3)=k**2*PHIZ*F*X(1)
        DA(2,3)=k**2*PHIZ*F*X(3)
 
-       DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
-       DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
+       DA(3,1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(2.0_dp*DFR+DFR2)*X(1)
+       DA(3,2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(2.0_dp*DFR+DFR2)*X(3)
 
        do j=1,3
           do kk=1,3
@@ -15148,8 +15194,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IF(PRESENT(DA2)) THEN  !!
        PHIZ=-EL%BN(1)*X(1)*CO +EL%AN(1)*X(3)*SI
 
-       DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(TWO*DFR+DFR2)*X(1)
-       DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(TWO*DFR+DFR2)*X(3)
+       DA2(1)=(F+R2*DFR)*(-EL%BN(1)*CO)+PHIZ*(2.0_dp*DFR+DFR2)*X(1)
+       DA2(2)=(F+R2*DFR)*(EL%AN(1)*SI)+ PHIZ*(2.0_dp*DFR+DFR2)*X(3)
     ENDIF
 
     IF(PRESENT(B)) THEN
@@ -15176,13 +15222,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
 
     if(present(int_ax_dy)) then
-       int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
+       int_f=r2/2.0_dp+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_x2_f_by_x_dy=(x1**3*(140*k**4*Y1**3+1680*k**2*Y1)+84*k**4*x1**5*Y1)/20160.0_dp
        int_ax_dy=k*EL%BN(1)*SI*int_x2_f_by_x_dy+ k*EL%AN(1)*CO*(int_f+Y1**2*F)
        int_ax_dy=-int_ax_dy
     endif
     if(present(int_aY_dX)) then
-       int_f=r2/two+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
+       int_f=r2/2.0_dp+k**2*r2**2/32.0_dp+k**4*r2**3/24.0_dp/48.0_dp
        int_y2_f_by_y_dx=(84*k**4*x1*Y1**5+(140*k**4*x1**3+1680*k**2*x1)*Y1**3)/20160.0_dp
        int_aY_dX=k*EL%BN(1)*SI*(int_f+x1**2*F) + k*EL%AN(1)*CO*int_y2_f_by_y_dx
        int_aY_dX=-int_aY_dX
@@ -15244,7 +15290,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
@@ -15266,9 +15312,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        D=EL%L/EL%P%NST
 
        DK1=D*FK1
-       D1=DK1/two
+       D1=DK1/2.0_dp
        DK2=D*FK2
-       D2=DK2/two
+       D2=DK2/2.0_dp
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
        ELSE
@@ -15303,7 +15349,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(6)
        DO j =1,4
           DK(j)=EL%L*YOSK(J)/EL%P%NST
-          DF(j)=DK(j)/two
+          DF(j)=DK(j)/2.0_dp
        ENDDO
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
@@ -15361,7 +15407,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !    CALL SET_W(EL%W)
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
@@ -15383,9 +15429,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        D=EL%L/EL%P%NST
 
        DK1=D*FK1
-       D1=DK1/two
+       D1=DK1/2.0_dp
        DK2=D*FK2
-       D2=DK2/two
+       D2=DK2/2.0_dp
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
        ELSE
@@ -15420,7 +15466,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CASE(6)
        DO j =1,4
           DK(j)=EL%L*YOSK(j)/EL%P%NST
-          DF(j)=DK(j)/two
+          DF(j)=DK(j)/2.0_dp
        ENDDO
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
@@ -15520,29 +15566,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        !  X(4)=X(4)-el%p%charge*A(2)
 
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ0=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
           DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*DPZ
           X(3)=X(3)+L*X(4)*DPZ
 
-          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)*   &
-               (ONE/EL%P%BETA0+X(5))/PZ0 +(k%TOTALPATH-1)*L/EL%P%BETA0
+          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/2.0_dp)*   &
+               (1.0_dp/EL%P%BETA0+X(5))/PZ0 +(k%TOTALPATH-1)*L/EL%P%BETA0
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PZ0=1.0_dp+X(5)
           DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*DPZ
           X(3)=X(3)+L*X(4)*DPZ
-          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)+(k%TOTALPATH-1)*L
+          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/2.0_dp)+(k%TOTALPATH-1)*L
        endif
        !      CALL compute_f4(EL,X,Z,A=A) !,int_ax_dy=int_ax_dy)
        !       X(2)=X(2)+el%p%charge*A(1)
        !       X(4)=X(4)+el%p%charge*A(2)
     ELSE
        if(k%TIME) then
-          PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ0+(k%TOTALPATH-1)*L/EL%P%BETA0
+          PZ0=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+x(5))/PZ0+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
           X(6)=X(6)+k%TOTALPATH*L
        endif
@@ -15565,28 +15611,28 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(2)=X(2) -el%p%charge*A(1)
        X(4)=X(4) -el%p%charge*A(2)
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           ! multiply by el%p%charge forgotten
           X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
           X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
-          X(6)=X(6)+L*(one/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
           X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
-          X(6)=X(6)+L*(one+X(5))/PZ+(k%TOTALPATH-1)*L
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ+(k%TOTALPATH-1)*L
        endif
        !      CALL compute_f4(EL,X,Z,A=A) !,int_ax_dy=int_ax_dy)
        X(2)=X(2) +el%p%charge*A(1)
        X(4)=X(4) +el%p%charge*A(2)
     ELSE
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
           X(6)=X(6)+k%TOTALPATH*L
        endif
@@ -15617,20 +15663,20 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(2)=X(2) -el%p%charge*A(1)
        X(4)=X(4) -el%p%charge*A(2)
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           ! multiply by el%p%charge forgotten
           X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
           X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
-          X(6)=X(6)+L*(one/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+X(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           X(1)=X(1)+L*X(2)/PZ
           X(3)=X(3)+L*X(4)/PZ
           X(2)=X(2)+el%p%charge*(L*X(4)/PZ*da(2,1)+L*X(2)/PZ*da(1,1))
           X(4)=X(4)+el%p%charge*(L*X(4)/PZ*da(2,2)+L*X(2)/PZ*da(1,2))
-          X(6)=X(6)+L*(one+X(5))/PZ+(k%TOTALPATH-1)*L
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ+(k%TOTALPATH-1)*L
        endif
        do j=1,3
           do kk=1,3
@@ -15643,8 +15689,8 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        call kill(a)
     ELSE
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+x(5))/PZ+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
           X(6)=X(6)+k%TOTALPATH*L
        endif
@@ -15665,26 +15711,26 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     CALL ALLOC(PZ,PZ0,DPZ)
     IF(EL%P%EXACT) THEN
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ0=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
           DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*DPZ
           X(3)=X(3)+L*X(4)*DPZ
 
-          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)*   &
-               (ONE/EL%P%BETA0+X(5))/PZ0 +(k%TOTALPATH-1)*L/EL%P%BETA0
+          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/2.0_dp)*   &
+               (1.0_dp/EL%P%BETA0+X(5))/PZ0 +(k%TOTALPATH-1)*L/EL%P%BETA0
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PZ0=1.0_dp+X(5)
           DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*DPZ
           X(3)=X(3)+L*X(4)*DPZ
-          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/TWO)+(k%TOTALPATH-1)*L
+          X(6)=X(6)+L*(PZ0/PZ-(X(2)**2+X(4)**2)/PZ0**2/2.0_dp)+(k%TOTALPATH-1)*L
        endif
     ELSE
        if(k%TIME) then
-          PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
-          X(6)=X(6)+L*(one/EL%P%BETA0+x(5))/PZ0+(k%TOTALPATH-1)*L/EL%P%BETA0
+          PZ0=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+x(5))/PZ0+(k%TOTALPATH-1)*L/EL%P%BETA0
        else
           X(6)=X(6)+k%TOTALPATH*L
        endif
@@ -15709,12 +15755,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(2)=X(2)-el%p%charge*A(1)
        X(4)=X(4)-el%p%charge*int_ax_dy
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
        X(2)=X(2)+el%p%charge*A(1)
@@ -15724,12 +15770,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(2)=X(2)-el%p%charge*int_aY_dX
        X(4)=X(4)-el%p%charge*A(2)
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL compute_f4(EL,X,Z,A=A,int_aY_dX=int_aY_dX)
        X(2)=X(2)+el%p%charge*int_aY_dX
@@ -15757,12 +15803,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(4)=X(4)-el%p%charge*int_ax_dy
 
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL compute_f4(EL,X,Z,A=A,int_ax_dy=int_ax_dy)
        X(2)=X(2)+el%p%charge*A(1)
@@ -15772,12 +15818,12 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        X(2)=X(2)-el%p%charge*int_aY_dX
        X(4)=X(4)-el%p%charge*A(2)
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL compute_f4(EL,X,Z,A=A,int_aY_dX=int_aY_dX)
        X(2)=X(2)+el%p%charge*int_aY_dX
@@ -15795,16 +15841,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     type(my_1D_taylor)z,dz
     integer i
 
-    EL%F=zero
+    EL%F=0.0_dp
     z=z0
-    dz=one
-    z%a(1)=one
+    dz=1.0_dp
+    z%a(1)=1.0_dp
 
     do i=0,N_ENGE
        EL%F=EL%F+EL%A(I)*DZ
-       dz=dz*(Z-EL%L/TWO)/EL%D
+       dz=dz*(Z-EL%L/2.0_dp)/EL%D
     enddo
-    EL%F=ONE/(ONE+EXP(EL%F))
+    EL%F=1.0_dp/(1.0_dp+EXP(EL%F))
   end subroutine enge_f
 
   SUBROUTINE ZEROr_enge(EL,I)
@@ -15870,29 +15916,29 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     real(dp) dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
 
-    bx=zero
-    by=zero
+    bx=0.0_dp
+    by=0.0_dp
     IF(ABS(SC)<=eps) RETURN
     x = coord(1)/sc
     y =  coord(3)/sc
-    u=half*sqrt((x-one)**2+y**2)+half*sqrt((x+one)**2+y**2)
-    v=half*sqrt((x+one)**2+y**2)-half*sqrt((x-one)**2+y**2)
-    if (u.eq.one) then
-       dd=zero
+    u=0.5_dp*sqrt((x-1.0_dp)**2+y**2)+0.5_dp*sqrt((x+1.0_dp)**2+y**2)
+    v=0.5_dp*sqrt((x+1.0_dp)**2+y**2)-0.5_dp*sqrt((x-1.0_dp)**2+y**2)
+    if (u.eq.1.0_dp) then
+       dd=0.0_dp
     else
-       dd=u**2*log(u+sqrt(u*u-one))/sqrt(u**2-one)
+       dd=u**2*log(u+sqrt(u*u-1.0_dp))/sqrt(u**2-1.0_dp)
     end if
-    dUu=(u+log(u+sqrt(u*u-one))*sqrt(u**2-one)+dd)/(u**2-v**2) &
-         -two*u*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
-         +v*(acos(v)-half*pi)*sqrt(one-v**2)) /(u**2-v**2)**2
-    dUv=two*v*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
-         +v*(acos(v)-half*pi)*sqrt(one-v**2)) /(u**2-v**2)**2 &
-         -(v-(acos(v)-half*pi)*sqrt(one-v**2)+v**2*(acos(v)-half*pi)/sqrt(one-v**2))&
+    dUu=(u+log(u+sqrt(u*u-1.0_dp))*sqrt(u**2-1.0_dp)+dd)/(u**2-v**2) &
+         -2.0_dp*u*(u*log(u+sqrt(u*u-1.0_dp))*sqrt(u**2-1.0_dp) &
+         +v*(acos(v)-0.5_dp*pi)*sqrt(1.0_dp-v**2)) /(u**2-v**2)**2
+    dUv=2.0_dp*v*(u*log(u+sqrt(u*u-1.0_dp))*sqrt(u**2-1.0_dp) &
+         +v*(acos(v)-0.5_dp*pi)*sqrt(1.0_dp-v**2)) /(u**2-v**2)**2 &
+         -(v-(acos(v)-0.5_dp*pi)*sqrt(1.0_dp-v**2)+v**2*(acos(v)-0.5_dp*pi)/sqrt(1.0_dp-v**2))&
          /(u**2-v**2)
-    dux=half*(x-one)/sqrt((x-one)**2+y**2) +half*(x+one)/sqrt((x+one)**2+y**2)
-    duy=half*y/sqrt((x-one)**2+y**2) +half*y/sqrt((x+one)**2+y**2)
-    dvx=half*(x+one)/sqrt((x+one)**2+y**2) -half*(x-one)/sqrt((x-one)**2+y**2)
-    dvy=half*y/sqrt((x+one)**2+y**2) -half*y/sqrt((x-one)**2+y**2)
+    dux=0.5_dp*(x-1.0_dp)/sqrt((x-1.0_dp)**2+y**2) +0.5_dp*(x+1.0_dp)/sqrt((x+1.0_dp)**2+y**2)
+    duy=0.5_dp*y/sqrt((x-1.0_dp)**2+y**2) +0.5_dp*y/sqrt((x+1.0_dp)**2+y**2)
+    dvx=0.5_dp*(x+1.0_dp)/sqrt((x+1.0_dp)**2+y**2) -0.5_dp*(x-1.0_dp)/sqrt((x-1.0_dp)**2+y**2)
+    dvy=0.5_dp*y/sqrt((x+1.0_dp)**2+y**2) -0.5_dp*y/sqrt((x-1.0_dp)**2+y**2)
 
     by=-st*(dUu*dux+dUv*dvx)/sc
     bx=st*(dUu*duy+dUv*dvy)/sc
@@ -15919,60 +15965,60 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     integer i,n
     real(dp) xu,x1,x2
 
-    bx=zero
-    by=zero
+    bx=0.0_dp
+    by=0.0_dp
     IF(ABS(SC)<=eps) RETURN
 
     call alloc(u, v, dUu, dUv, dux, duy, dvx, dvy, x, y)
     call alloc(dd,dv,uv,uv2,ac,sqv,sqb,sqbm)
 
-    bx=st*two/sc**2*coord(3)
-    by=st*two/sc**2*coord(1)
+    bx=st*2.0_dp/sc**2*coord(3)
+    by=st*2.0_dp/sc**2*coord(1)
 
     x = coord(1)/sc
     y =  coord(3)/sc
-    sqb=sqrt((x+one)**2+y**2)
-    sqbm=sqrt((x-one)**2+y**2)
+    sqb=sqrt((x+1.0_dp)**2+y**2)
+    sqbm=sqrt((x-1.0_dp)**2+y**2)
 
-    u=half*sqbm+half*sqb
-    v=half*sqb-half*sqbm
+    u=0.5_dp*sqbm+0.5_dp*sqb
+    v=0.5_dp*sqb-0.5_dp*sqbm
     xu=u
     if (xu<1.1_dp) then
        !if (valishev) then
        !write(6,*) " xu expanded", xu
-       dUu=u-one
-       dUv=one
-       dv=zero
+       dUu=u-1.0_dp
+       dUv=1.0_dp
+       dv=0.0_dp
        !   do i=0,(nvalishev-1)/2
        do i=0,(size(val_del%a)-1)/2
           dv=val_del%a(i)*duv+dv
           duv=duv*dUu
           ! write(6,*) i, val_del%a(i)
        enddo
-       dd=dv*u**2/sqrt(u+one)
-       dv=dv*sqrt(u+one)*(u-one)
+       dd=dv*u**2/sqrt(u+1.0_dp)
+       dv=dv*sqrt(u+1.0_dp)*(u-1.0_dp)
     else
        ! write(6,*) " xu normal", xu
-       dd=u**2*log(u+sqrt(u*u-one))/sqrt(u**2-one)
-       dv=log(u+sqrt(u*u-one))/sqrt(u-one)
-       dv=dv*sqrt(u+one)*(u-one)
+       dd=u**2*log(u+sqrt(u*u-1.0_dp))/sqrt(u**2-1.0_dp)
+       dv=log(u+sqrt(u*u-1.0_dp))/sqrt(u-1.0_dp)
+       dv=dv*sqrt(u+1.0_dp)*(u-1.0_dp)
     end if
     uv=(u**2-v**2)
     uv2=uv**2
     ac=acos(v)
 
 
-    sqv=sqrt(one-v**2)
+    sqv=sqrt(1.0_dp-v**2)
 
-    dUu=(u+dv+dd)/uv-two*u*(u*dv+v*(ac-half*pi)*sqv) /uv2
-    dUv=two*v*(u*dv+v*(ac-half*pi)*sqv) /uv2
-    dUv=dUv-(v-(ac-half*pi)*sqv+v**2*(ac-half*pi)/sqv)/uv
+    dUu=(u+dv+dd)/uv-2.0_dp*u*(u*dv+v*(ac-0.5_dp*pi)*sqv) /uv2
+    dUv=2.0_dp*v*(u*dv+v*(ac-0.5_dp*pi)*sqv) /uv2
+    dUv=dUv-(v-(ac-0.5_dp*pi)*sqv+v**2*(ac-0.5_dp*pi)/sqv)/uv
 
-    dux=half*(x-one)/sqbm +half*(x+one)/sqb
+    dux=0.5_dp*(x-1.0_dp)/sqbm +0.5_dp*(x+1.0_dp)/sqb
 
-    duy=half*y/sqbm +half*y/sqb
-    dvx=half*(x+one)/sqb -half*(x-one)/sqbm
-    dvy=half*y/sqb -half*y/sqbm
+    duy=0.5_dp*y/sqbm +0.5_dp*y/sqb
+    dvx=0.5_dp*(x+1.0_dp)/sqb -0.5_dp*(x-1.0_dp)/sqbm
+    dvy=0.5_dp*y/sqb -0.5_dp*y/sqbm
 
     by=-st*(dUu*dux+dUv*dvx)/sc
     bx=st*(dUu*duy+dUv*dvy)/sc
@@ -16006,10 +16052,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
  np=0
  h0=1.d-1
  call init(no,nd,np,0)
- asn=zero
- bsn=zero
- a=zero
- b=zero
+ asn=0.0_dp
+ bsn=0.0_dp
+ a=0.0_dp
+ b=0.0_dp
  call alloc(as,no)
  call alloc(bs,no)
  call alloc(m)
@@ -16020,16 +16066,16 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
  call alloc(fh,x,y,h)
  h=h0 !+one.mono.3
  m=1
- m%v(2)=zero
+ m%v(2)=0.0_dp
  
  do n=1,no
- x=one.mono.1
- y=one.mono.2
+ x=1.0_dp.mono.1
+ y=1.0_dp.mono.2
  fhc=-(x+i_*y)**n/n
  
  fh=fhc%r
  fhr=fh
- phi=zero 
+ phi=0.0_dp 
 
 do k=1,c_%no+2
  call integrate_electric_teapot(fh,phi,h)
@@ -16049,7 +16095,7 @@ enddo
 
  fh=fhc%i
  fhr=fh
- phi=zero 
+ phi=0.0_dp 
 
 do k=1,c_%no
  call integrate_electric_teapot(fh,phi,h)
@@ -16133,11 +16179,11 @@ enddo
   
   f=fh+phi
   f=f.d.1
-  f=-(h/(one+h*(one.mono.1))  )*f
+  f=-(h/(1.0_dp+h*(1.0_dp.mono.1))  )*f
   
   tr=f
   allocate(jc(c_%nv))
- u=zero
+ u=0.0_dp
     call taylor_cycle(tr%cos,size=n1)
 
     do i=1,n1
@@ -16147,7 +16193,7 @@ enddo
        
        jc(1)=jc(1)+1
        jc(2)=jc(2)+1
-        val=val/four/jc(1)/jc(2)
+        val=val/4.0_dp/jc(1)/jc(2)
         u=u+(val.mono.jc)  
     enddo
 
@@ -16160,7 +16206,7 @@ enddo
        
        jc(1)=jc(1)+1
        jc(2)=jc(2)+1
-        val=val/four/jc(1)/jc(2)
+        val=val/4.0_dp/jc(1)/jc(2)
         u=u+i_*(val.mono.jc)  
     enddo
     

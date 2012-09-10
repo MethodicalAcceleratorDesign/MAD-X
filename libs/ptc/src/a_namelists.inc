@@ -1,8 +1,9 @@
+
+
   TYPE fibrelist
      real(dp) GAMMA0I_GAMBET_MASS_AG(4)  !GAMMA0I,GAMBET,MASS ,AG  BETA0 is computed
-     integer  DIR_CHARGE(2)  !DIR,CHARGE
-!	 integer pos  ! layout position
-!	 integer loc  ! tied universed
+     real(dp)  CHARGE
+     integer  DIR !DIR,CHARGE
   END TYPE fibrelist
 type(fibrelist) fib0
 namelist / fibrename / fib0
@@ -61,4 +62,12 @@ namelist / tp100_list / tp100
   END TYPE k16_list
 type(k16_list) k160
 namelist / k160_list / k160
+
+  TYPE ap_list
+   integer KIND
+   real(dp) r(2)
+   real(dp) x,y,dx,dy
+  END TYPE ap_list
+ type(ap_list) aplist
+ namelist / aperture_list / aplist
 

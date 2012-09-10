@@ -3,7 +3,7 @@
 module S_status
   use s_frame
   USE S_extend_poly
-  use anbn
+!  use anbn
   ! use my_own_1D_TPSA
   !  USE S_pol_user1
   !  USE S_pol_user2
@@ -61,7 +61,7 @@ module S_status
   LOGICAL(lp), target :: EXACT_MODEL = .false.
   INTEGER, target:: NSTD,METD
   ! TYPE(B_CYL) SECTOR_B
-  TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
+  !TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
   !  INTEGER, TARGET :: NDPT_OTHER = 0
   real(dp) CRAD,CFLUC
   !  real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
@@ -76,7 +76,7 @@ module S_status
   PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
-  real(dp), target :: muon=one
+  real(dp), target :: muon=1.0_dp
   LOGICAL(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   ! include "a_def_all_kind.inc"    ! sept 2007
   ! include "a_def_sagan.inc"
@@ -131,6 +131,15 @@ module S_status
   type(my_1D_taylor) val_del
   logical(lp) :: ramp=my_false
   logical(lp) :: accelerate=my_false, first_particle=my_false
+
+  TYPE B_CYL
+     integer firsttime
+     integer, POINTER ::  nmul,n_mono
+     integer, DIMENSION(:), POINTER   :: i,j
+     real(dp), DIMENSION(:,:), POINTER   :: a_x,a_y,b_x,b_y
+  END  TYPE B_CYL
+
+  TYPE(B_CYL),ALLOCATABLE ::  S_B(:)
 
   INTERFACE OPERATOR (.min.)
      MODULE PROCEDURE minu                       ! to define the minus of Schmidt
@@ -237,9 +246,9 @@ CONTAINS
     allocate(p)
     CALL NULL_A(p)
     ALLOCATE(P%R(2));ALLOCATE(P%X);ALLOCATE(P%Y);ALLOCATE(P%KIND);
-    P%KIND=0; P%R=ZERO;P%X=ZERO;P%Y=ZERO;
+    P%KIND=0; P%R=0.0_dp;P%X=0.0_dp;P%Y=0.0_dp;
     ALLOCATE(P%DX);ALLOCATE(P%DY);
-    P%DX=ZERO;P%DY=ZERO;
+    P%DX=0.0_dp;P%DY=0.0_dp;
   end subroutine alloc_A
 
   SUBROUTINE  dealloc_A(p)
@@ -287,8 +296,8 @@ CONTAINS
     CALL NULL_P(P)
 
     ALLOCATE(P%LD);ALLOCATE(P%B0);ALLOCATE(P%LC);
-    P%LD=zero;P%B0=zero;P%LC=zero;
-    ALLOCATE(P%TILTD);P%TILTD=zero;
+    P%LD=0.0_dp;P%B0=0.0_dp;P%LC=0.0_dp;
+    ALLOCATE(P%TILTD);P%TILTD=0.0_dp;
     ! ALLOCATE(P%beta0);
     ! ALLOCATE(P%MASS0);
     ! ALLOCATE(P%gamma0I);
@@ -297,8 +306,8 @@ CONTAINS
     ! P%beta0 =one;
     ! P%MASS0 =one;
     !P%gamma0I=zero;P%gambet =zero;
-    P%P0C =zero;
-    ALLOCATE(P%EDGE(2));P%EDGE(1)=zero;P%EDGE(2)=zero;
+    P%P0C =0.0_dp;
+    ALLOCATE(P%EDGE(2));P%EDGE(1)=0.0_dp;P%EDGE(2)=0.0_dp;
     !    ALLOCATE(P%TOTALPATH); ! PART OF A STATE INITIALIZED BY EL=DEFAULT
     ALLOCATE(P%EXACT);  !ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
         ALLOCATE(P%permFRINGE);
@@ -509,10 +518,10 @@ CONTAINS
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
        SELECT CASE(E%KIND)
        CASE(1)  ! ellipse circles
-          IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE) THEN
+          IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>1.0_dp) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
-             xlost=zero
+             xlost=0.0_dp
              xlost=x
              messagelost="Lost in real kind=1 elliptic Aperture"
           ENDIF
@@ -520,25 +529,25 @@ CONTAINS
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
-             xlost=zero
+             xlost=0.0_dp
              xlost=x
              messagelost="Lost in real kind=2 rectangular Aperture"
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
-               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>ONE)) THEN
+               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>1.0_dp)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
-             xlost=zero
+             xlost=0.0_dp
              xlost=x
              messagelost="Lost in real kind=3 rect-ellipse Aperture"
           ENDIF
        CASE(4) ! MARGUERITE
-          IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>ONE).OR.  &
-               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>ONE)) THEN
+          IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>1.0_dp).OR.  &
+               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>1.0_dp)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
-             xlost=zero
+             xlost=0.0_dp
              xlost=x
              messagelost="Lost in real kind=4 marguerite Aperture"
           ENDIF
@@ -551,7 +560,7 @@ CONTAINS
                .and. abs(x(3)-e%dy) .gt. e%y)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
-             xlost=zero
+             xlost=0.0_dp
              xlost=x
              messagelost="Lost in real kind=5 racetrack Aperture"
           ENDIF
@@ -659,7 +668,7 @@ CONTAINS
     MADTHIN_NORMAL=>MADKIND3N
     MADTHIN_SKEW=>MADKIND3S
 
-    MADFAC=one   ! to prevent overflow (David Sagan)
+    MADFAC=1.0_dp   ! to prevent overflow (David Sagan)
     DO I=2,NMAX
        MADFAC(I)=(I-1)*MADFAC(I-1)
     ENDDO
@@ -692,7 +701,7 @@ CONTAINS
     !       w_p%c(1) = " THIS IS A PROTON "
     !    ENDIF
     tilt%natural=.true.
-    tilt%tilt(0)=zero
+    tilt%tilt(0)=0.0_dp
     do i=1,nmax
        tilt%tilt(i)=pih/i
     enddo
@@ -702,7 +711,7 @@ CONTAINS
 
     IF(SECTOR_NMUL>0.and.firsttime_coef) THEN
      call alloc(e_muon_scale)
-     e_muon_scale=one
+     e_muon_scale=1.0_dp
        !  verb=global_verbose
        !  global_verbose=.false.
        if(firsttime_coef.or.(.not.allocated(S_B))) then
@@ -717,12 +726,17 @@ CONTAINS
           ALLOCATE(S_B(SECTOR_NMUL_MAX))
           lda_old=lda_used
           lda_used=3000
+       !        ALLOCATE(S_B0)
+       !        S_B0%firsttime=0
+       !        call nul_coef(S_B0)
+       !        call make_coef(S_B0,SECTOR_NMUL_MAX)
+       !        call get_bend_coeff(S_B0,SECTOR_NMUL_MAX)
           DO I=1,SECTOR_NMUL_MAX
              !             if(i==SECTOR_NMUL_MAX)     global_verbose=.true.
              S_B(I)%firsttime=0
              call nul_coef(S_B(I))
              call make_coef(S_B(I),I)
-             call curvebend(S_B(I),I)
+             call get_bend_coeff(S_B(I),I)
           ENDDO
           lda_used=lda_old
           call print_curv("Maxwellian_bend_for_ptc.txt")
@@ -733,14 +747,14 @@ CONTAINS
     else
          call kill(e_muon_scale)
          call alloc(e_muon_scale)
-     e_muon_scale=one
+     e_muon_scale=1.0_dp
     ENDIF
     call clear_states
     !  global_verbose=verb
 
   END  SUBROUTINE MAKE_STATES_0
   
-  SUBROUTINE print_curv(filename)
+ SUBROUTINE print_curv(filename)
     IMPLICIT NONE
     INTEGER I,J,nmul,mf
     character(*) filename
@@ -757,7 +771,7 @@ CONTAINS
          enddo
     DO I=1,NMUL
        DO J=1,S_B(NMUL)%N_MONO
-        if(S_B(NMUL)%A_X(I,J)/=zero) then
+        if(S_B(NMUL)%A_X(I,J)/=0.0_dp) then
          write(line,*) "S_B(" , NMUL , ")%A_X(" ,I,",",J, ")=",S_B(NMUL)%A_X(I,J),"e0_dp"
          call context(line)
          if(index(line,"E-")/=0) then
@@ -766,7 +780,7 @@ CONTAINS
          endif
          write(mf,*) line(1:len_trim(line))
         endif
-        if(S_B(NMUL)%B_X(I,J)/=zero) then
+        if(S_B(NMUL)%B_X(I,J)/=0.0_dp) then
          write(line,*) "S_B(" , NMUL , ")%B_X(" ,I,",",J, ")=",S_B(NMUL)%B_X(I,J),"e0_dp"
          call context(line)
          if(index(line,"E-")/=0) then
@@ -775,7 +789,7 @@ CONTAINS
          endif
          write(mf,*) line(1:len_trim(line))
         endif
-        if(S_B(NMUL)%A_y(I,J)/=zero) then
+        if(S_B(NMUL)%A_y(I,J)/=0.0_dp) then
          write(line,*) "S_B(" , NMUL , ")%A_y(" ,I,",",J, ")=",S_B(NMUL)%A_y(I,J),"e0_dp"
          call context(line)
          if(index(line,"E-")/=0) then
@@ -784,7 +798,7 @@ CONTAINS
          endif
          write(mf,*) line(1:len_trim(line))
         endif
-        if(S_B(NMUL)%B_y(I,J)/=zero) then
+        if(S_B(NMUL)%B_y(I,J)/=0.0_dp) then
          write(line,*) "S_B(" , NMUL , ")%B_y(" ,I,",",J, ")=",S_B(NMUL)%B_y(I,J),"e0_dp"
          call context(line)
          if(index(line,"E-")/=0) then
@@ -818,10 +832,10 @@ CONTAINS
     allocate(b%b_x(no,b%n_mono),b%b_y(no,b%n_mono))
     b%i=0
     b%j=0
-    b%a_x=zero
-    b%b_x=zero
-    b%a_y=zero
-    b%b_y=zero
+    b%a_x=0.0_dp
+    b%b_x=0.0_dp
+    b%a_y=0.0_dp
+    b%b_y=0.0_dp
   end subroutine make_set_coef
   
  
@@ -861,7 +875,7 @@ CONTAINS
  !   if(CAVITY_TOTALPATH==0) write(mf,'((1X,a24))' ) ' Fake Pill Box Cavities '
 
     If(electron) then
-       if(muon==one)  then
+       if(muon==1.0_dp)  then
           write(mf,*)"This is an electron (positron actually if charge=1) "
        else
           write(mf,'((1X,a21,1x,G21.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
@@ -1163,11 +1177,11 @@ CONTAINS
     TYPE(MAGNET_CHART), INTENT(IN) :: P
     real(dp) E(3)
     !---  GOOD FOR TIME=FALSE
-    E(1)=P%DIR*X(2)/(one+X5)
-    E(2)=P%DIR*X(4)/(one+X5)
-    E(3)=P%DIR*ROOT((one+X5)**2-X(2)**2-X(4)**2)/(one+X5)
+    E(1)=P%DIR*X(2)/(1.0_dp+X5)
+    E(2)=P%DIR*X(4)/(1.0_dp+X5)
+    E(3)=P%DIR*ROOT((1.0_dp+X5)**2-X(2)**2-X(4)**2)/(1.0_dp+X5)
 
-    B2=zero
+    B2=0.0_dp
     B2=(B(2)*E(3)-B(3)*E(2))**2+B2
     B2=(B(1)*E(2)-B(2)*E(1))**2+B2
     B2=(B(3)*E(1)-B(1)*E(3))**2+B2
@@ -1184,12 +1198,12 @@ CONTAINS
     TYPE(REAL_8)  E(3)
     CALL ALLOC(E,3)
     !---  GOOD FOR TIME=FALSE
-    E(1)=P%DIR*X(2)/(one+X5)
-    E(2)=P%DIR*X(4)/(one+X5)
-    E(3)=P%DIR*SQRT((one+X5)**2-X(2)**2-X(4)**2)/(one+X5)
+    E(1)=P%DIR*X(2)/(1.0_dp+X5)
+    E(2)=P%DIR*X(4)/(1.0_dp+X5)
+    E(3)=P%DIR*SQRT((1.0_dp+X5)**2-X(2)**2-X(4)**2)/(1.0_dp+X5)
 
 
-    B2=zero
+    B2=0.0_dp
     B2=(B(2)*E(3)-B(3)*E(2))**2+B2
     B2=(B(1)*E(2)-B(2)*E(1))**2+B2
     B2=(B(3)*E(1)-B(1)*E(3))**2+B2
@@ -1205,7 +1219,7 @@ CONTAINS
     real(dp) YS
 
 
-    IF(TILTD==zero) RETURN
+    IF(TILTD==0.0_dp) RETURN
     IF(I==1) THEN
        ys=COS(DIR*TILTD)*x(1)+SIN(DIR*TILTD)*x(3)
        x(3)=COS(DIR*TILTD)*x(3)-SIN(DIR*TILTD)*x(1)
@@ -1231,7 +1245,7 @@ CONTAINS
     REAL(DP),INTENT(IN) :: TILTD
     TYPE(REAL_8) YS
 
-    IF(TILTD==zero) RETURN
+    IF(TILTD==0.0_dp) RETURN
     CALL ALLOC(YS)
 
     IF(I==1) THEN
@@ -1265,11 +1279,11 @@ CONTAINS
     integer i,n
 
     call set_my_taylor_no(N_my_1D_taylor)
-    del=zero
-    del%a(1)=one
-    logdel=zero
-    val_del=zero
-    logdel=log(one+del**2+del*sqrt(two)*sqrt(one+del**2/two))
+    del=0.0_dp
+    del%a(1)=1.0_dp
+    logdel=0.0_dp
+    val_del=0.0_dp
+    logdel=log(1.0_dp+del**2+del*sqrt(2.0_dp)*sqrt(1.0_dp+del**2/2.0_dp))
 
     do i=0,N_my_1D_taylor
        n=2*i+1
@@ -1277,8 +1291,8 @@ CONTAINS
        val_del%a(i)=logdel%a(n)
     enddo
   end SUBROUTINE dd_p  !valishev
-  
- subroutine set_s_b
+
+subroutine set_s_b
   implicit none
   integer i,s1,s2
  
@@ -1911,7 +1925,229 @@ CONTAINS
  S_B(10)%A_X(10,46)=1.00000000000000E0_DP
  S_B(10)%B_Y(10,46)=1.00000000000000E0_DP
 
+end subroutine set_s_b  
+ 
 
-end subroutine set_s_b
+
+!!!!!!!!!!!!!!!  New routines for solving Maxwell's Equations !!!!!!!!!!!!!!!
+
+ SUBROUTINE  get_bend_coeff(s_b0t,NO1)
+    implicit none
+    integer no,n,i,k,j(2),NO1,l
+    type(taylor) x,y,h,df,ker,sol
+    type(complextaylor) z 
+    type(taylor) f,kick_x,kick_y
+    type(damap) y0
+    real(dp) h0,cker,cker0
+     TYPE(B_CYL), intent(inout) :: s_b0t
+  
+    no=NO1
+
+
+    call init(no,1,0,0)
+
+
+    call alloc(x,y,kick_x,kick_y)
+    call alloc(z)
+    call alloc(f,h,df,ker,sol)
+    call alloc(y0)
+
+
+      x=1.d0.mono.1
+      y=1.d0.mono.2
+      y0=1
+      y0%v(2)=0
+     z=x-i_*y   
+    
+!!!  
+
+
+
+    
+    h0=1.d0
+    h=(1.d0+h0*x)
+    do k=1,no
+    !  erect multipole
+    f=dreal(-z**K/K)
+    
+    df=f
+
+    do i=k,no-1 !k+1
+     df=h0*(df.d.1)/h
+     call  invert_laplace(df)
+      sol=f+df
+      sol=-(sol.d.1)/h
+      j=0
+      j(1)=i
+      cker=(sol.sub.j)
+      df=df-cker*dreal(-z**(I+1)/(I+1))
+      f=f+df
+     enddo
+
+  !     write(16,*) " Erect ",k
+  !     call clean_taylor(f,f,1.d-6)
+  !     call print(f,16)
+  !   y=((f.d.1).d.1)+((f.d.2).d.2)-h0*(f.d.1)/h
+  !  y=y.cut.(no-1)
+!       call print(y,6)
+!       write(6,*) full_abs(y)
+       kick_x=(f.d.1)
+       kick_y=(f.d.2)
+       call clean_taylor(kick_x,kick_x,1.d-6)
+       call clean_taylor(kick_y,kick_y,1.d-6)
+       do l=1,s_b0t%n_mono
+        j(1)=s_b0t%i(l)
+        j(2)=s_b0t%j(l)
+        s_b0t%b_x(k,l)=kick_x.sub.j
+        s_b0t%b_y(k,l)=kick_y.sub.j
+       enddo
+
+   !    bx=bx*y0
+   !    call clean_taylor(bx,bx,1.d-6)
+   !    call print(bx,6)
+enddo    
+
+
+    do k=1,no
+    !  Skew multipole 
+    f=aimag(-z**K/K)
+    df=f
+    do i=k,no-1 !k+1
+     df=h0*(df.d.1)/h
+     call  invert_laplace(df)
+      sol=f+df
+      sol=(sol.d.2)/h
+      j=0
+      j(1)=i
+      cker=(sol.sub.j)
+      df=df-cker*aimag(-z**(I+1)/(I+1))
+      f=f+df
+     enddo
+  !     write(16,*) " Skew ",k
+  !     call clean_taylor(f,f,1.d-6)
+  !     call print(f,16)
+  !   y=((f.d.1).d.1)+((f.d.2).d.2)-h0*(f.d.1)/h
+  !  y=y.cut.(no-1)
+ !      call print(y,6)
+  !     write(6,*) full_abs(y)
+       kick_x=(f.d.1)
+       kick_y=(f.d.2)
+       call clean_taylor(kick_x,kick_x,1.d-6)
+       call clean_taylor(kick_y,kick_y,1.d-6)
+       do l=1,s_b0t%n_mono
+        j(1)=s_b0t%i(l)
+        j(2)=s_b0t%j(l)
+        s_b0t%a_x(k,l)=kick_x.sub.j
+        s_b0t%a_y(k,l)=kick_y.sub.j
+       enddo
+
+     !  write(6,*) k
+     !  write(6,*) S_B0%A_X(k,7)
+     !  write(6,*) S_B0%A_Y(k,8)    !   bx=bx*y0
+    !   call clean_taylor(bx,bx,1.d-6)
+    !   call print(bx,6)
+enddo    
+
+
+    call kill(x,y,kick_x,kick_y)
+    call kill(z)
+    call kill(f,h,df,ker,sol)
+    call kill(y0)
+
+    end subroutine get_bend_coeff
+
+
+    subroutine invert_laplace(df)
+    implicit none
+    type(taylor), intent(inout) :: df
+    type(taylorresonance) dfr
+     call alloc(dfr)
+
+     dfr=df
+       dfr%cos=((dfr%cos.i.1).i.2)/4.0_dp
+       dfr%sin=((dfr%sin.i.1).i.2)/4.0_dp
+      df=dfr
+
+     call kill(dfr)
+    end subroutine invert_laplace
+
+  subroutine make_coef(b,no)
+    implicit none
+    integer no
+    integer i,j,k,a,m , ic
+
+    type(B_CYL) b
+
+    ic=1
+    b%firsttime=-100
+    allocate(b%nmul)
+    allocate(b%n_mono)
+    b%nmul=no
+    b%n_mono=((no+2-ic)*(no+1-ic))/2
+    allocate(b%i(b%n_mono),b%j(b%n_mono))
+    allocate(b%a_x(no,b%n_mono),b%a_y(no,b%n_mono))
+    allocate(b%b_x(no,b%n_mono),b%b_y(no,b%n_mono))
+
+    do i=1,no
+       do j=1,b%n_mono
+          b%a_x(i,j)=0.0_dp
+          b%a_y(i,j)=0.0_dp
+          b%b_x(i,j)=0.0_dp
+          b%b_y(i,j)=0.0_dp
+       enddo
+    enddo
+
+
+    k=0
+    m=no-1
+    do a=m,1,-1
+       do j=m-a,1,-1
+          k=k+1
+          b%i(k)=a
+          b%j(k)=j
+       enddo
+       k=k+1
+       b%i(k)=a
+       b%j(k)=0
+    enddo
+    do j=m,1,-1
+       k=k+1
+       b%i(k)=0
+       b%j(k)=j
+    enddo
+    k=k+1
+    b%i(k)=0
+    b%j(k)=0
+
+  end subroutine make_coef
+
+  subroutine nul_coef(b)
+    implicit none
+    type(B_CYL) b
+    if(b%firsttime/=-100) then
+       nullify(b%nmul)
+       nullify(b%n_mono)
+       nullify(b%i)
+       nullify(b%j)
+       nullify(b%a_x)
+       nullify(b%a_y)
+       nullify(b%b_x)
+       nullify(b%b_y)
+       b%firsttime=-100
+    else
+       deallocate(b%nmul)
+       deallocate(b%n_mono)
+       deallocate(b%i)
+       deallocate(b%j)
+       deallocate(b%a_x)
+       deallocate(b%a_y)
+       deallocate(b%b_x)
+       deallocate(b%b_y)
+
+    endif
+
+
+  end subroutine nul_coef
+
 
 end module S_status

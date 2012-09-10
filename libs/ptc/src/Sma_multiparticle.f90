@@ -23,7 +23,7 @@ module ptc_multiparticle
   logical(lp),private, parameter :: aperture_all_case0=.false.
   type(probe) :: xsm,xsm0
   real(dp) :: unit_time =1.0e-3_dp
-  REAL(dp) :: x_orbit_sync(6)= zero,dt_orbit_sync=zero
+  REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
   
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
@@ -108,8 +108,8 @@ CONTAINS
        V=EL%DC_ac+EL%A_ac*DV
        DV=el%D_ac*DV
      else
-       V=zero
-       DV=zero
+       V=0.0_dp
+       DV=0.0_dp
      endif
 
     CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
@@ -132,7 +132,7 @@ CONTAINS
     if(.not.associated(EL%ramp)) return
 
        V=EL%DC_ac
-       DV=zero
+       DV=0.0_dp
        call set_ramp(C,t)
 
     CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
@@ -159,7 +159,7 @@ CONTAINS
 
 
        V=elp%DC_ac
-       DV=zero
+       DV=0.0_dp
          call set_ramp(C,t)
 
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
@@ -176,8 +176,8 @@ CONTAINS
     TYPE(fibre), POINTER  :: p
     integer i
     REAL(DP) v,dv
-    v=zero
-    dv=zero     
+    v=0.0_dp
+    dv=0.0_dp     
      p=>r%start
      do i=1,r%n
      
@@ -221,32 +221,32 @@ CONTAINS
     if(ti>=a%t_max.or.ti<a%table(1)%time) then
 !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then
       if(ti>=a%t_max) then
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
           enddo 
             a%table(0)%b_t= a%table(a%n)%b_t
            a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(a%n)%bn(i)*a%r
            a%table(0)%an(i)= a%table(a%n)%an(i)*a%r
           enddo 
           a%table(0)%b_t= a%table(a%n)%b_t
       else
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
           enddo 
          a%table(0)%b_t= a%table(1)%b_t
           a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)= a%table(1)%bn(i)*a%r
            a%table(0)%an(i)= a%table(1)%an(i)*a%r
@@ -268,8 +268,8 @@ CONTAINS
            rat=(ti-it)    
            
 
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
@@ -277,8 +277,8 @@ CONTAINS
            a%table(0)%b_t=((a%table(it+1)%b_t-a%table(it)%b_t)*rat + a%table(it)%b_t)
 
           a=>t%parent_fibre%magp%ramp
-           a%table(0)%bn=zero
-           a%table(0)%an=zero
+           a%table(0)%bn=0.0_dp
+           a%table(0)%an=0.0_dp
           do i=1,size(a%table(0)%bn)
            a%table(0)%bn(i)=((a%table(it+1)%bn(i)-a%table(it)%bn(i))*rat + a%table(it)%bn(i))*a%r
            a%table(0)%an(i)= ((a%table(it+1)%an(i)-a%table(it)%an(i))*rat + a%table(it)%an(i))*a%r
@@ -309,8 +309,8 @@ CONTAINS
        DV=elp%D_ac*DV
 
        else  ! ramp
-          V=zero
-          DV=zero
+          V=0.0_dp
+          DV=0.0_dp
        endif
  
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
@@ -405,18 +405,18 @@ CONTAINS
     !  track_it=.false.
     sp=mod(s,L%END%S(3))
 
-    if(sp==zero.and.s/=zero) then
+    if(sp==0.0_dp.and.s/=0.0_dp) then
        current=>l%end
        i=l%n+1
-       ds=zero
+       ds=0.0_dp
        !  track_it=.true.
        return
     endif
 
-    if(sp==zero) then
+    if(sp==0.0_dp) then
        current=>l%start
        i=1
-       ds=zero
+       ds=0.0_dp
        return
     endif
 
@@ -426,7 +426,7 @@ CONTAINS
 
     k=L%LASTPOS
     I=K
-    ds=zero
+    ds=0.0_dp
 
     IF(SP>CURRENT%S(3) ) then
 
@@ -437,7 +437,7 @@ CONTAINS
 
        if(current%next%s(3)/=sp) ds=sp-current%s(3)
        if(current%next%s(3)==sp) THEN
-          ds=ZERO
+          ds=0.0_dp
           CURRENT=>current%next
           I=I+1
        ENDIF
@@ -455,14 +455,14 @@ CONTAINS
 
     L%LASTPOS=I; L%LAST => Current;
 
-    if(ds>zero) then
-       if(CURRENT%S(4)-ds.feq.zero) then
-          ds=zero
+    if(ds>0.0_dp) then
+       if(CURRENT%S(4)-ds.feq.0.0_dp) then
+          ds=0.0_dp
           current=>Current%next
           i=i+1
           L%LAST => Current;
-       ELSEIF(ds.feq.zero) THEN
-          DS=ZERO
+       ELSEIF(ds.feq.0.0_dp) THEN
+          DS=0.0_dp
        ENDIF
     endif
 
@@ -471,7 +471,7 @@ CONTAINS
     !DOIT=.FALSE.
 
     if(iabs(CURRENT%cas)==0.OR.iabs(CURRENT%cas)==1) then
-       do while(DS==ZERO.AND.DOIT)    ! PUTS AT BEGINNING IF DS=ZERO
+       do while(DS==0.0_dp.AND.DOIT)    ! PUTS AT BEGINNING IF DS=ZERO
           CURRENT=>CURRENT%PREVIOUS
           IF(ASSOCIATED(CURRENT)) THEN
 
@@ -489,7 +489,7 @@ CONTAINS
 
        enddo
     elseif(iabs(CURRENT%cas)==2) then
-       do while(DS==ZERO.AND.DOIT)    ! PUTS AT BEGINNING IF DS=ZERO
+       do while(DS==0.0_dp.AND.DOIT)    ! PUTS AT BEGINNING IF DS=ZERO
           CURRENT=>CURRENT%next
           IF(ASSOCIATED(CURRENT)) THEN
 
@@ -563,11 +563,11 @@ CONTAINS
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=root(one+two*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAG%P%P0C-one !X(5) = DP/P0C_NEW
-                X(5)=(two*X(5)+X(5)**2)/(root(one/C%MAG%P%BETA0**2+two*X(5)+X(5)**2)+one/C%MAG%P%BETA0)
+                X(5)=root(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAG%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
              ELSE
-                X(5)=(one+X(5))*P0/C%MAG%P%P0C-one
+                X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
        ENDIF ! ASSOCIATED
@@ -637,11 +637,11 @@ CONTAINS
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=SQRT(one+two*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAGP%P%P0C-one !X(5) = DP/P0C_NEW
-                X(5)=(two*X(5)+X(5)**2)/(SQRT(one/C%MAGP%P%BETA0**2+two*X(5)+X(5)**2)+one/C%MAGP%P%BETA0)
+                X(5)=SQRT(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAGP%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
              ELSE
-                X(5)=(one+X(5))*P0/C%MAGP%P%P0C-one
+                X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
        ENDIF ! ASSOCIATED
@@ -732,11 +732,11 @@ CONTAINS
        X(2)=X(2)*C%MAG%P%P0C/P0
        X(4)=X(4)*C%MAG%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
-          X(5)=root(one+two*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-          X(5)=X(5)*C%MAG%P%P0C/P0-one !X(5) = DP/P0C_NEW
-          X(5)=(two*X(5)+X(5)**2)/(root(one/B0**2+two*X(5)+X(5)**2)+one/B0)
+          X(5)=root(1.0_dp+2.0_dp*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+          X(5)=X(5)*C%MAG%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW
+          X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)
        ELSE
-          X(5)=(one+X(5))*C%MAG%P%P0C/P0-one
+          X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp
        ENDIF
     ENDIF
 
@@ -800,11 +800,11 @@ CONTAINS
        X(2)=X(2)*C%MAGP%P%P0C/P0
        X(4)=X(4)*C%MAGP%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
-          X(5)=sqrt(one+two*X(5)/C%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-          X(5)=X(5)*C%MAGP%P%P0C/P0-one !X(5) = DP/P0C_NEW
-          X(5)=(two*X(5)+X(5)**2)/(sqrt(one/B0**2+two*X(5)+X(5)**2)+one/B0)
+          X(5)=sqrt(1.0_dp+2.0_dp*X(5)/C%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+          X(5)=X(5)*C%MAGP%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW
+          X(5)=(2.0_dp*X(5)+X(5)**2)/(sqrt(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)
        ELSE
-          X(5)=(one+X(5))*C%MAGP%P%P0C/P0-one
+          X(5)=(1.0_dp+X(5))*C%MAGP%P%P0C/P0-1.0_dp
        ENDIF
     ENDIF
 
@@ -852,8 +852,8 @@ CONTAINS
        STOP 101
     ENDIF
 
-    SC=ONE
-    IF(v%SCALE/=zero) SC=v%SCALE
+    SC=1.0_dp
+    IF(v%SCALE/=0.0_dp) SC=v%SCALE
     !      t=>B%POS(1)%NODE%previous
 
     V%r0=t%A+(reference_ray(1)-SC*reference_ray(1))*t%ENT(1,1:3)+ SC*X(1)*t%ENT(1,1:3)
@@ -1282,7 +1282,7 @@ CONTAINS
     REAL(DP), intent(inout) :: ds_ac_tot
 
     t=>r%t%start
-    ds_ac_tot=zero
+    ds_ac_tot=0.0_dp
     do i=1,r%t%n
 
        ds_ac_tot=ds_ac_tot+t%ds_ac
@@ -1318,14 +1318,14 @@ CONTAINS
 
     allocate(L)
     CALL Set_Up_NODE_LAYOUT( L )
-    S=zero
-    SL=ZERO  !  INTEGRATION LENGTH
+    S=0.0_dp
+    SL=0.0_dp  !  INTEGRATION LENGTH
     P=>R%START
     k=1
     DO I=1,R%N
 
        TEAPOT_LIKE=0
-       IF(P%MAG%P%B0/=ZERO) TEAPOT_LIKE=1
+       IF(P%MAG%P%B0/=0.0_dp) TEAPOT_LIKE=1
        IF(P%MAG%KIND==KIND16.OR.P%MAG%KIND==KIND16)TEAPOT_LIKE=0
        IF(P%MAG%KIND==KIND0.AND.P%MAG%P%NST/=1) THEN
           WRITE(6,*) "MARKER SHOULD HAVE NST=1 OTHERWISE PROBLEMS "
@@ -1333,7 +1333,7 @@ CONTAINS
           STOP 500
        ENDIF
        IF(P%DIR==1) THEN
-          LI=zero;
+          LI=0.0_dp;
        ELSE
           LI=P%MAG%L;
        ENDIF
@@ -1341,8 +1341,8 @@ CONTAINS
        DLD=P%MAG%P%LD/P%MAG%P%NST
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;    ! s(1) total ld
-       L%END%S(5)=zero;L%END%DS_AC=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=0.0_dp;    ! s(1) total ld
+       L%END%S(5)=0.0_dp;L%END%DS_AC=0.0_dp;
        T1=>L%END                            ! s(2) local integration distance
        ! s(3) total integration distance
        L%END%CAS=CASEP1                       ! s(4) end of step =  DL
@@ -1353,7 +1353,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=0.0_dp;L%END%S(5)=0.0_dp;L%END%DS_AC=0.0_dp;
        L%END%CAS=CASE1
        L%END%pos_in_fibre=2
        L%END%pos=k;k=k+1;
@@ -1381,7 +1381,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=0.0_dp;L%END%S(5)=0.0_dp;L%END%DS_AC=0.0_dp;
        L%END%CAS=CASE2
        L%END%pos_in_fibre=P%MAG%P%NST+3
        L%END%pos=k;k=k+1;
@@ -1389,7 +1389,7 @@ CONTAINS
 
        CALL APPEND_EMPTY_THIN( L )
        L%END%TEAPOT_LIKE=TEAPOT_LIKE
-       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=zero;L%END%S(5)=zero;L%END%DS_AC=zero;
+       L%END%S(1)=S;L%END%S(2)=LI;L%END%S(3)=SL;L%END%S(4)=0.0_dp;L%END%S(5)=0.0_dp;L%END%DS_AC=0.0_dp;
        L%END%CAS=CASEP2
        L%END%pos_in_fibre=P%MAG%P%NST+4
        L%END%pos=k;k=k+1;
@@ -1450,7 +1450,7 @@ CONTAINS
     IF(k%TIME) then
        B=P%BETA0
     ELSE
-       B=one
+       B=1.0_dp
     ENDIF
 
 
@@ -1474,13 +1474,13 @@ CONTAINS
     !    else
 
 
-    PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+    PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
-    YL=DT/(one/b+X(5))*PZ
+    YL=DT/(1.0_dp/b+X(5))*PZ
 
     X(1)=X(1)+YL*X(2)/PZ
     X(3)=X(3)+YL*X(4)/PZ
-    X(6)=X(6)+YL*(one/b+X(5))/PZ
+    X(6)=X(6)+YL*(1.0_dp/b+X(5))/PZ
 
 
 
@@ -1510,7 +1510,7 @@ CONTAINS
     IF(k%TIME) then
        B=T%PARENT_FIBRE%BETA0
     ELSE
-       B=one
+       B=1.0_dp
     ENDIF
 
 
@@ -1535,12 +1535,12 @@ CONTAINS
     !      X(6)=XN(6)
     !   else
     !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
-    PZ=ROOT(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+    PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
 
     X(1)=X(1)-YL*X(2)/PZ
     X(3)=X(3)-YL*X(4)/PZ
-    X(6)=X(6)-YL*(one/b+X(5))/PZ
+    X(6)=X(6)-YL*(1.0_dp/b+X(5))/PZ
 
     !  endif
 
@@ -1568,7 +1568,7 @@ CONTAINS
     IF(k%TIME) then
        B=P%BETA0
     ELSE
-       B=one
+       B=1.0_dp
     ENDIF
 
     call alloc(xn,6); call alloc(pz,pt);
@@ -1594,12 +1594,12 @@ CONTAINS
     !      X(6)=XN(6)
     !   else
     !       CALL DRIFT(YL,DL,P%beta0,1,P%EXACT,P%TIME,X)
-    PZ=sqrt(one+two*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
+    PZ=sqrt(1.0_dp+2.0_dp*X(5)/b+x(5)**2-X(2)**2-X(4)**2)
 
 
     X(1)=X(1)-YL*X(2)/PZ
     X(3)=X(3)-YL*X(4)/PZ
-    X(6)=X(6)-YL*(one/b+X(5))/PZ
+    X(6)=X(6)-YL*(1.0_dp/b+X(5))/PZ
 
     !   endif
 
@@ -1640,7 +1640,7 @@ CONTAINS
     vers%E%L(-1)=0.d0 !Starts beam line at z=0   fake distance along ld for cheap work
 
     do k=1,r%n
-       x=zero
+       x=0.0_dp
        CALL TRACK(r,x,k,k+1,default,vers)
        if(.not.check_stable) then
           Write(6,*) " fake instability at ",c%mag%name, " ",k
@@ -1784,9 +1784,9 @@ CONTAINS
        CALL ALLOCATE_BEAM(B,N)
     ENDIF
 
-    CL=ZERO; AS=ZERO;
+    CL=0.0_dp; AS=0.0_dp;
     DO I=1,6
-       AS(I,I)=ONE
+       AS(I,I)=1.0_dp
     ENDDO
 
     IF(PRESENT(A)) AS=A
@@ -1835,7 +1835,7 @@ CONTAINS
        CALL ALLOCATE_BEAM(B,N)
     ENDIF
     write(6,*) n," particles created"
-    Y=ZERO
+    Y=0.0_dp
     IF(.not.PRESENT(A)) THEN
 
        DO I=1,N
@@ -1843,7 +1843,7 @@ CONTAINS
              CALL GRNF(X,cut)
              B%X(I,J)=X*SIG(J)
           ENDDO
-          B%X(I,7)=ZERO
+          B%X(I,7)=0.0_dp
        enddo
     ELSE
        call alloc(monkey)
@@ -1854,9 +1854,9 @@ CONTAINS
        DO I=1,N
           DO J=1,C_%ND
              CALL GRNF(X,cut)
-             Y(2*j-1)=X*sqrt(SIG(j)/two)
+             Y(2*j-1)=X*sqrt(SIG(j)/2.0_dp)
              CALL GRNF(X,cut)
-             Y(2*j)=X*sqrt(SIG(j)/two)
+             Y(2*j)=X*sqrt(SIG(j)/2.0_dp)
           ENDDO
           y=monkey*Y
           B%X(I,1:C_%ND2)=y(1:c_%nd2)
@@ -1865,7 +1865,7 @@ CONTAINS
              CALL GRNF(X,cut)
              B%X(I,J)=X*SIG(J)
           ENDDO
-          B%X(I,7)=ZERO
+          B%X(I,7)=0.0_dp
        enddo
        CALL KILL(MONKEY)
     ENDIF
@@ -1950,9 +1950,9 @@ CONTAINS
     real(dp), allocatable :: av(:,:)
     real(dp) em(2),beta(2),xma(6)
     allocate(av(n,n))
-    av=zero
+    av=0.0_dp
     notlost=0
-    xma(:)=-one
+    xma(:)=-1.0_dp
     DO K=1,b%n
        IF(.not.B%U(K)) THEN
           do i=1,6
@@ -1988,10 +1988,10 @@ CONTAINS
     WRITE(MF,*) " LOST ",B%LOST
     if(mf/=6)WRITE(6,*) " LOST ",B%LOST
     av=av/notlost
-    em(1)=two*sqrt(av(1,1)*av(2,2)-av(1,2)**2)
-    em(2)=two*sqrt(av(3,3)*av(4,4)-av(3,4)**2)
-    beta(1)=two*av(1,1)/em(1)
-    beta(2)=two*av(3,3)/em(2)
+    em(1)=2.0_dp*sqrt(av(1,1)*av(2,2)-av(1,2)**2)
+    em(2)=2.0_dp*sqrt(av(3,3)*av(4,4)-av(3,4)**2)
+    beta(1)=2.0_dp*av(1,1)/em(1)
+    beta(2)=2.0_dp*av(3,3)/em(2)
 
     write(mf,*) " average arrays "
     write(mf,*) "betas ",beta
@@ -2091,17 +2091,17 @@ CONTAINS
   subroutine alloc_three_d_info(v)
     IMPLICIT NONE
     TYPE(three_d_info) , INTENT (INOUT) :: V
-    v%a=zero
-    v%b=zero
-    v%o=zero
+    v%a=0.0_dp
+    v%b=0.0_dp
+    v%o=0.0_dp
     v%ent=global_frame
     v%exi=global_frame
     v%mid=global_frame
-    v%reference_ray=zero
-    v%r0=zero
-    v%r=zero
-    v%x=zero
-    v%scale=one
+    v%reference_ray=0.0_dp
+    v%r0=0.0_dp
+    v%r=0.0_dp
+    v%x=0.0_dp
+    v%scale=1.0_dp
     v%u=my_false
     v%wx=0.1_dp
     v%wy=0.1_dp
@@ -2138,7 +2138,7 @@ CONTAINS
     !   ALLOCATE(B%CHARGE)
     !   ALLOCATE(B%TIME_INSTEAD_OF_S)
 
-    B%X  = ZERO
+    B%X  = 0.0_dp
     B%U  = .FALSE.
     !    B%CHARGE=1
     !    B%TIME_INSTEAD_OF_S=.FALSE.
@@ -2288,12 +2288,12 @@ CONTAINS
        write(6,*) tmin%pos,tmin%parent_fibre%mag%name,' created'
        b_b=my_true
 
-       cos=zero
+       cos=0.0_dp
        do j=1,3
           cos=cos+ (a(j)-tmin%a(j))*tmin%ent(1,j)
        enddo
        tl=>tp
-       if(cos<zero) then
+       if(cos<0.0_dp) then
           write(6,*) " Beam-Beam position replaced at ",tl%parent_fibre%mag%name,tl%cas
           write(6,*) tl%pos,tl%parent_fibre%mag%name,' created'
        endif

@@ -7,8 +7,8 @@ module madx_keywords
   public
   logical(lp)::mad8=my_false
   integer :: ifield_name=0
-  logical(lp),private :: do_survey =.false.
-  logical(lp) :: print_marker =.true.
+  logical(lp),private :: do_survey =my_false
+  logical(lp) :: print_marker =my_true
 
   type keywords
      character*20 magnet
@@ -36,10 +36,11 @@ module madx_keywords
 contains
 
 
-  subroutine create_fibre_append(append,m_u,key,EXCEPTION,magnet_only)  
+  subroutine create_fibre_append(append,mylat,key,EXCEPTION,magnet_only)  
     implicit none
 
-    type(mad_universe), target, intent(inout)  :: m_u
+!    type(mad_universe), target, intent(inout)  :: m_u
+    type(layout), target, intent(inout)  :: mylat
     logical(lp), optional :: magnet_only
     type(keywords) key
     INTEGER EXCEPTION  !,NSTD0,METD0
@@ -47,28 +48,30 @@ contains
     type(fibre), pointer :: current
 
     if(append) then
-     call append_empty(m_u%end)
+     call append_empty(mylat)
     else
-     if(associated(m_u%end%end)) then
-      IF(ASSOCIATED(m_u%end%T)) THEN
-         CALL kill_NODE_LAYOUT(m_u%end%T)  !  KILLING THIN LAYOUT
-         nullify(m_u%end%T)
+     if(associated(mylat%end)) then
+      IF(ASSOCIATED(mylat%T)) THEN
+         CALL kill_NODE_LAYOUT(mylat%T)  !  KILLING THIN LAYOUT
+         nullify(mylat%T)
         if(lielib_print(12)==1) WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
        ENDIF      
-        m_u%end%end=-1
+        mylat%end=-1
        else
-        call append_empty(m_u%end)
+        call append_empty(mylat)
      endif
     endif
-     call  create_fibre(m_u%end%end,key,EXCEPTION,magnet_only)
+     call  create_fibre(mylat%end,key,EXCEPTION,magnet_only)
+     
+    if(.not.append) then
+     mylat%closed=my_true
 
-    m_u%end%closed=.true.
+     doneit=my_true
+     call ring_l(mylat,doneit)
 
-    doneit=.true.
-    call ring_l(m_u%end,doneit)
-
-    call survey(m_u%end)
-    call MAKE_NODE_LAYOUT( m_u%end)
+     call survey(mylat)
+     call MAKE_NODE_LAYOUT( mylat)     
+    endif
   end subroutine create_fibre_append
 
 
@@ -84,7 +87,7 @@ contains
     INTEGER EXCEPTION  !,NSTD0,METD0
     LOGICAL(LP) EXACT0,magnet0
     logical(lp) FIBRE_flip0,MAD0
-    logical(lp) :: t=.true.,f=.false.
+    logical(lp) :: t=my_true,f=my_false
     INTEGER FIBRE_DIR0,IL
     real(dp) e1_true,norm
 
@@ -94,7 +97,7 @@ contains
     if(present(magnet_only)) then
        magnet0=magnet_only
     else
-       magnet0=.false.
+       magnet0=my_false
     endif
 
     blank=0
@@ -155,7 +158,7 @@ contains
     !     INTEGER N_BESSEL
 
     if(sixtrack_compatible) then
-       EXACT_MODEL=.false.
+       EXACT_MODEL=my_false
        KEY%LIST%method=2
        MADTHICK=drift_kick_drift
     endif
@@ -166,7 +169,7 @@ contains
        BLANK=DRIFT(KEY%LIST%NAME,LIST=KEY%LIST)
     CASE("SOLENOID       ")
        if(sixtrack_compatible) stop 1
-       if(KEY%LIST%L/=zero) then
+       if(KEY%LIST%L/=0.0_dp) then
           BLANK=SOLENOID(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
           !  BLANK%bend_fringe=key%list%bend_fringe
        else
@@ -192,7 +195,7 @@ contains
     CASE("TRUERBEND     ")
        if(sixtrack_compatible) stop 2
 
-       e1_true= KEY%LIST%b0/two+ KEY%LIST%t1
+       e1_true= KEY%LIST%b0/2.0_dp+ KEY%LIST%t1
        BLANK=rbend(KEY%LIST%NAME,l=KEY%LIST%l,angle=KEY%LIST%b0,e1=e1_true,list=KEY%LIST)
 
     CASE("WEDGRBEND     ")
@@ -202,8 +205,8 @@ contains
 
     CASE("RBEND         ")
        if(sixtrack_compatible) stop 4
-       KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/two
-       KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/two
+       KEY%LIST%T1=KEY%LIST%T1+KEY%LIST%B0/2.0_dp
+       KEY%LIST%T2=KEY%LIST%T2+KEY%LIST%B0/2.0_dp
        BLANK=SBEND(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
     CASE("KICKER         ","VKICKER        ","HKICKER        ")
        BLANK=KICKER(KEY%LIST%NAME,t=tilt.is.KEY%tiltd,LIST=KEY%LIST)
@@ -239,14 +242,14 @@ contains
        BLANK=CHANGEREF(KEY%LIST%NAME,KEY%LIST%ANG,KEY%LIST%T,KEY%LIST%PATCHG)
     CASE("RFCAVITY       ")
        if(sixtrack_compatible) then
-          If(KEY%LIST%L/=zero) stop 60
-          If(KEY%LIST%N_BESSEL/=zero) stop 61
-          norm=zero
+          If(KEY%LIST%L/=0.0_dp) stop 60
+          If(KEY%LIST%N_BESSEL/=0.0_dp) stop 61
+          norm=0.0_dp
           do i=1,nmax
              norm=norm+abs(KEY%LIST%k(i))+abs(KEY%LIST%ks(i))
           enddo
           norm=norm-abs(KEY%LIST%k(2))
-          if(norm/=zero) then
+          if(norm/=0.0_dp) then
              write(6,*) norm
              stop 62
           endif
@@ -358,7 +361,7 @@ contains
     key%madLENGTH=madLENGTH
     key%LIST%NMUL = 1
     key%mad8 = mad8
-    key%tiltd=ZERO
+    key%tiltd=0.0_dp
     key%LIST=0
 
   end subroutine zero_key
@@ -452,7 +455,7 @@ nmark=0
        P=>P%NEXT
     ENDDO 
     if(L%START%mag%kind==kind0) then
-        write(6,*) "Removing ",nmark, "markers (first one left in) "
+        write(6,*) "Removing ",nmark, "markers (first 1.0_dp left in) "
     else
         write(6,*) "Removing ",nmark, "markers "
     endif
@@ -478,7 +481,9 @@ nmark=0
 
     write(line,*) l%start%mass,L%START%mag%p%p0c,l%start%ag, " MASS, P0C, AG(spin)"
     write(MF,'(a255)') line
-    write(MF,*) phase0,compute_stoch_kick,l%start%charge, " PHASE0, compute_stoch_kick, CHARGE"
+    write(line,*) phase0,compute_stoch_kick,l%start%charge, " PHASE0, compute_stoch_kick, CHARGE"
+    write(MF,'(a255)') line
+!     write(MF,*) phase0,compute_stoch_kick,l%start%charge, " PHASE0, compute_stoch_kick, CHARGE"
     write(MF,*) CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING, &
          "CAVITY_TOTALPATH,ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING"
     write(line,*) SECTOR_NMUL_MAX,SECTOR_NMUL,&
@@ -581,7 +586,7 @@ nmark=0
     read(MF,'(a255)') line
     original=default
     if(allocated(s_b)) then
-       firsttime_coef=.true.
+       firsttime_coef=my_true
        deallocate(s_b)
     endif
     !    L%MASS=MASSF
@@ -600,7 +605,7 @@ nmark=0
 
     L%closed=RING_IT
 
-    doneit=.true.
+    doneit=my_true
     call ring_l(L,doneit)
     ! if(do_survey) call survey(L)
 
@@ -638,7 +643,7 @@ nmark=0
        CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0)
        ! if(do_survey) call survey(u%end)
     endif
-    do_survey=.false.
+    do_survey=my_false
     return
 2001 continue
 
@@ -780,14 +785,14 @@ nmark=0
     character*255 line
     real(dp) norm
 
-    norm=zero
+    norm=0.0_dp
     do i=1,3
        norm=abs(M%D_IN(i))+norm
        norm=abs(M%ANG_IN(i))+norm
        norm=abs(M%ANG_OUT(i))+norm
        norm=abs(M%D_OUT(i))+norm
     enddo
-    if(norm>zero.OR.print_frame) then
+    if(norm>0.0_dp.OR.print_frame) then
        write(mf,*) " THIS IS A CHART THIS IS A CHART THIS IS A CHART THIS IS A CHART "
        CALL print_magnet_frame(m%F,mf)
        WRITE(LINE,*) M%D_IN,M%ANG_IN
@@ -812,7 +817,7 @@ nmark=0
        READ(MF,*) M%D_OUT,M%ANG_OUT
        READ(mf,*) LINE
     else
-       do_survey=.true.
+       do_survey=my_true
     endif
   end subroutine READ_chart
 
@@ -833,7 +838,7 @@ nmark=0
        READ(MF,*) d1,d2
        READ(mf,*) LINE
     else
-       do_survey=.true.
+       do_survey=my_true
     endif
     call kill(f)
   end subroutine READ_chart_fake
@@ -876,7 +881,7 @@ nmark=0
     IF(ASSOCIATED(M%B_SOL)) THEN
        WRITE(MF,*)  " SOLENOID_PRESENT ",M%B_SOL, " B_SOL"
     ELSE
-       WRITE(MF,*) " NO_SOLENOID_PRESENT ",zero
+       WRITE(MF,*) " NO_SOLENOID_PRESENT ",0.0_dp
     ENDIF
     CALL print_magnet_chart(P,m%P,mf)
     if(p%MAG%KIND==KIND7) then
@@ -935,17 +940,17 @@ nmark=0
 
     nst=2*el%p%nst+1
 
-    cl=(clight/c_1d8)
-    BRHO=el%p%p0c*ten/cl
+    cl=(clight/1e8_dp)
+    BRHO=el%p%p0c*10.0_dp/cl
 
     call init(EL%B(1)%no,2)
     CALL ALLOC(B)
 
-    write(mf,*) nst,el%p%ld,el%p%b0,EL%B(1)%no,.false.
+    write(mf,*) nst,el%p%ld,el%p%b0,EL%B(1)%no,my_false
     do i=1,nst
-       B(1)=morph(one.mono.1)
-       B(2)=morph(one.mono.2)
-       B(3)=ZERO;
+       B(1)=morph(1.0_dp.mono.1)
+       B(2)=morph(1.0_dp.mono.2)
+       B(3)=0.0_dp;
        CALL trackg(EL%B(i),B)
        do j=1,3
           b(j)=b(j)*brho
@@ -1042,11 +1047,11 @@ nmark=0
     case(kind16,kind20)
        WRITE(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD, " driftkick,likemad"
     case(kind18)
-       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
-       CALL print_aperture(EL%RCOL18%A,mf)
+!       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
+!       CALL print_aperture(EL%RCOL18%A,mf)
     case(kind19)
-       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
-       CALL print_aperture(EL%ECOL19%A,mf)
+ !      WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
+ !      CALL print_aperture(EL%ECOL19%A,mf)
     case(kind21)
        WRITE(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
     case(KINDWIGGLER)
@@ -1075,7 +1080,7 @@ nmark=0
     case(kind3)
        IF(.NOT.ASSOCIATED(el%B_SOL)) then
           ALLOCATE(el%B_SOL)
-          el%B_SOL=zero
+          el%B_SOL=0.0_dp
        endif
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        READ(MF,"(a255)") LINE
@@ -1094,8 +1099,8 @@ nmark=0
     case(kind4)
        NB=0
        NH=0
-       x3=zero
-       x4=one
+       x3=0.0_dp
+       x4=1.0_dp
        READ(MF,'(a255)') LINE
 
        IF(INDEX(LINE, 'HARMON')/=0) THEN
@@ -1110,7 +1115,7 @@ nmark=0
           read(MF,*) x1,x2,i1
        ELSE
           read(LINE,*) NB
-          x1=zero
+          x1=0.0_dp
           x2=c_%phase0
           i1=CAVITY_TOTALPATH
        ENDIF
@@ -1134,12 +1139,12 @@ nmark=0
        read(MF,*) el%k16%DRIFTKICK,el%k16%LIKEMAD
     case(kind18)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
-       READ(MF,*) LINE
-       CALL READ_aperture(EL%RCOL18%A,mf)
+  !     READ(MF,*) LINE
+  !     CALL READ_aperture(EL%RCOL18%A,mf)
     case(kind19)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
-       READ(MF,*) LINE
-       CALL READ_aperture(EL%ECOL19%A,mf)
+    !   READ(MF,*) LINE
+    !   CALL READ_aperture(EL%ECOL19%A,mf)
     case(kind21)
        CALL SETFAMILY(EL)   ! POINTERS MUST BE ESTABLISHED BETWEEN GENERIC ELEMENT M AND SPECIFIC ELEMENTS
        read(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
@@ -1177,8 +1182,8 @@ nmark=0
     TYPE(TAYLOR) B(3)
     type(tree_element), allocatable :: t_e(:)
 
-    cl=(clight/c_1d8)
-    BRHO=el%p%p0c*ten/cl
+    cl=(clight/1e8_dp)
+    BRHO=el%p%p0c*10.0_dp/cl
 
 
     call kanalnummer(mf)
@@ -1410,7 +1415,7 @@ nmark=0
        READ(LINE,*) M%LD, M%LC, M%B0,til,M%tiltd
     else
        READ(LINE,*) M%LD, M%LC, M%B0
-       M%tiltd=zero
+       M%tiltd=0.0_dp
     endif
 
 
@@ -1479,7 +1484,7 @@ nmark=0
        enddo
        read(mf,'(a120)') line
     else
-       do_survey=.true.
+       do_survey=my_true
     endif
   end subroutine read_magnet_frame
 
@@ -1686,7 +1691,7 @@ nmark=0
     READ(MF,*) N,LMAX0t
     write(6,*) N,LMAX0t
     IF(PRESENT(LMAX0)) then
-       if(LMAX0t/=zero) LMAX0=LMAX0T
+       if(LMAX0t/=0.0_dp) LMAX0=LMAX0T
     ENDIF
     read(MF,'(a120)') line
     call context(line)
@@ -1728,7 +1733,7 @@ nmark=0
     original=default
     call input_sector(se2,se1)
     if(allocated(s_b)) then
-       firsttime_coef=.true.
+       firsttime_coef=my_true
        deallocate(s_b)
     endif
     !    L%MASS=MASSF
@@ -1780,7 +1785,7 @@ nmark=0
 
     L%closed=RING_IT
 
-    doneit=.true.
+    doneit=my_true
     call ring_l(L,doneit)
     if(do_survey) call survey(L)
 
@@ -1834,13 +1839,13 @@ nmark=0
        if(el%mag%name(1:nm)==name(1:nm)) then
           if(sext.and.el%mag%p%nmul>2)then
              write(6,*) el%mag%name
-             call add(el,3,0,zero)
-             call add(el,-3,0,zero)
+             call add(el,3,0,0.0_dp)
+             call add(el,-3,0,0.0_dp)
           else
              write(6,*) el%mag%name, " not changed "
           endif
        endif
-       if(el%mag%p%b0/=zero.or.el%mag%name(1:nm)==name(1:nm)) return
+       if(el%mag%p%b0/=0.0_dp.or.el%mag%name(1:nm)==name(1:nm)) return
        write(6,*) el%mag%name
        if(el%mag%p%nmul/=size(el%mag%an)) then
           write(6,*) "error in switch_to_cavity "
@@ -1851,14 +1856,14 @@ nmark=0
        bn=el%mag%bn*el%mag%p%p0c
        call zero_key(key)
        key%magnet="rfcavity"
-       key%list%volt=zero
-       key%list%lag=zero
-       key%list%freq0=zero
+       key%list%volt=0.0_dp
+       key%list%lag=0.0_dp
+       key%list%freq0=0.0_dp
        IF(PRESENT(FREQ)) THEN
           key%list%freq0=FREQ
        ENDIF
        key%list%n_bessel=0
-       key%list%harmon=one
+       key%list%harmon=1.0_dp
        key%list%l=el%mag%L
        key%list%name=el%mag%name
        key%list%vorname=el%mag%vorname
@@ -1876,20 +1881,20 @@ nmark=0
           call add(el,-i,0,an(i))
           call add(el,i,0,bn(i))
        enddo
-       el%mag%c4%a=one
-       el%magp%c4%a=one
+       el%mag%c4%a=1.0_dp
+       el%magp%c4%a=1.0_dp
        IF(PRESENT(a)) THEN
           el%mag%c4%a=a
           el%magp%c4%a=a
        ENDIF
-       el%mag%c4%r=ZERO
-       el%magp%c4%r=ZERO
+       el%mag%c4%r=0.0_dp
+       el%magp%c4%r=0.0_dp
        IF(PRESENT(r)) THEN
           el%mag%c4%r=r
           el%magp%c4%r=r
        ENDIF
-       el%mag%c4%PHASE0=ZERO
-       el%mag%c4%PHASE0=ZERO
+       el%mag%c4%PHASE0=0.0_dp
+       el%mag%c4%PHASE0=0.0_dp
        el%mag%c4%always_on=my_true
        el%magp%c4%always_on=my_true
        IF(PRESENT(FREQ)) THEN
@@ -1937,7 +1942,7 @@ nmark=0
        el%magp=-1
        el%mag%L=el%mag%p%ld
        el%mag%p%lc=el%mag%p%ld
-       el%mag%p%exact=.false.
+       el%mag%p%exact=my_false
        el%magp=0
     end select
 
@@ -1970,18 +1975,29 @@ type(layout), target :: ring
 type(fibre), pointer :: f
 character(*) filename
 integer i,mf
+character(120) line
 
 !goto 1
 call kanalnummer(mf,filename)
 
 
+   write(mf,'(a120)') ring%name
+   write(mf,*) highest_fringe  , " highest fringe "
+   write(mf,*) lmax, " Maximum Length for Orbit "
+   write(MF,*) ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING  , "ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING "
+   write(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL , " SECTOR_NMUL_MAX,SECTOR_NMUL "
+    
+ write(mf,*) " $$$$$$$$$ START OF LAYOUT $$$$$$$$$"
+
+  
 f=>ring%start
 
 do i=1,ring%n
   call el_el0(f%mag,my_true,mf)
   call fib_fib0(f,my_true,mf)
   CALL MC_MC0(f%MAG%P,my_true,mf)
-  CALL print_ElementLIST(f%mag,my_true,mf)
+  CALL print_ElementLIST(f%mag,MY_TRUE,mf)
+ write(mf,*) " $$$$$$$$$ END OF FIBRE $$$$$$$$$"
  f=>f%next    
 enddo
 
@@ -1991,18 +2007,26 @@ close(mf)
 1 call kanalnummer(mf,filename)
 
 
+ 
 f=>ring%start
+  read(mf,'(a120)') ring%name
+   read(mf,*) highest_fringe   
+   read(mf,*) lmax
+   read(MF,*) ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING   
+   read(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL  
 
+ read(mf,'(a120)') line
+ 
 do i=1,ring%n
   write(6,*) f%MAG%NAME
   write(6,*) f%beta0,f%MAG%P%B0
-  
+
   call el_el0(f%mag,my_false,mf)
   call fib_fib0(f,my_false,mf)
   CALL MC_MC0(f%MAG%P,my_false,mf) 
   CALL print_ElementLIST(f%mag,my_false,mf)
 
- 
+ read(mf,'(a120)') line
  
   write(6,*) f%MAG%NAME
   write(6,*) f%beta0,f%MAG%P%B0
@@ -2012,6 +2036,7 @@ enddo
 
 close(mf)
 end subroutine print_new_flat
+
 
 subroutine  fib_fib0(f,dir,mf)
 implicit none
@@ -2026,8 +2051,8 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  fib0%GAMMA0I_GAMBET_MASS_AG(2)=f%GAMBET
  fib0%GAMMA0I_GAMBET_MASS_AG(3)=f%MASS
  fib0%GAMMA0I_GAMBET_MASS_AG(4)=f%AG
- fib0%DIR_CHARGE(1)=f%DIR
- fib0%DIR_CHARGE(2)=f%CHARGE
+ fib0%DIR=f%DIR
+ fib0%CHARGE=f%CHARGE
  !fib0%pos=f%pos
  !fib0%loc=f%loc
     if(present(mf)) then
@@ -2042,9 +2067,9 @@ else
  f%GAMBET=fib0%GAMMA0I_GAMBET_MASS_AG(2)
  f%MASS=fib0%GAMMA0I_GAMBET_MASS_AG(3)
  f%AG=fib0%GAMMA0I_GAMBET_MASS_AG(4)
- f%BETA0=sqrt(one-f%GAMMA0I**2)   
- f%DIR=fib0%DIR_CHARGE(1)
- f%CHARGE=fib0%DIR_CHARGE(2)
+ f%BETA0=sqrt(1.0_dp-f%GAMMA0I**2)   
+ f%DIR=fib0%DIR 
+ f%CHARGE=fib0%CHARGE
  !f%pos=fib0%pos
  !f%loc=fib$%loc
 endif
@@ -2119,12 +2144,12 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  ELE0%KIND=F%KIND
  ELE0%name_vorname(1)=f%name
  ELE0%name_vorname(2)=f%vorname
- ele0%an=zero
- ele0%an=zero
+ ele0%an=0.0_dp
+ ele0%an=0.0_dp
  ele0%an(1:f%p%nmul)=f%an(1:f%p%nmul)
  ele0%bn(1:f%p%nmul)=f%bn(1:f%p%nmul)
- ele0%VOLT_FREQ_PHAS_LAG=zero
- ele0%B_SOL=ZERO
+ ele0%VOLT_FREQ_PHAS_LAG=0.0_dp
+ ele0%B_SOL=0.0_dp
  
    ele0%fint_hgap_h1_h2(1)=f%fint
    ele0%fint_hgap_h1_h2(2)=f%hgap
@@ -2194,13 +2219,13 @@ end subroutine el_el0
     implicit none
     type(element), pointer :: el
     integer mf,i
-    LOGICAL(KIND=4) dir
+    LOGICAL dir
     character*255 line
 
 
     select case(el%kind)
     CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
-    case(kind3)
+  case(kind3)
      call thin3_thin30(el,dir,mf)
     case(kind4)
         call cav4_cav40(EL,dir,mf)
@@ -2212,7 +2237,7 @@ end subroutine el_el0
 
     case(kind18)
 !       WRITE(MF,*) " RCOLLIMATOR HAS AN INTRINSIC APERTURE "
-!       CALL print_aperture(EL%RCOL18%A,mf)
+  !     CALL  ap_aplist(el,dir,mf) 
     case(kind19)
 !       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
 !       CALL print_aperture(EL%ECOL19%A,mf)
@@ -2226,6 +2251,9 @@ end subroutine el_el0
        write(MF,*) " not supported in print_specific_element",el%kind
  !      stop 101
     end select
+    
+    CALL  ap_aplist(el,dir,mf) 
+
 
   END SUBROUTINE print_ElementLIST
 
@@ -2239,8 +2267,8 @@ integer,optional :: mf
 if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
 
- cav0%f=zero
- cav0%PH=zero   
+ cav0%f=0.0_dp
+ cav0%PH=0.0_dp   
  cav0%N_BESSEL=F%c4%N_BESSEL
  cav0%NF=F%c4%NF
  cav0%CAVITY_TOTALPATH=F%c4%CAVITY_TOTALPATH
@@ -2364,8 +2392,110 @@ endif
 endif
 end subroutine k16_k160
 
+subroutine  ap_aplist(f,dir,mf)
+implicit none
+type(element), target :: f
+type(MADX_APERTURE), pointer :: a
+logical(lp),optional ::  dir
+integer,optional :: mf
+logical(LP) :: here
+CHARACTER(120) LINE
+
+here=associated(f%p%APERTURE)
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+ 
+if(here) then
+ a=>f%p%aperture
+
+    aplist%kind=a%kind
+    aplist%r=a%r
+    aplist%x=a%x
+    aplist%y=a%y
+    aplist%dx=a%dx
+    aplist%dy=a%dy
+     if(present(mf)) then
+     Write(mf,*) " APERTURE "  
+     write(mf,NML=aperture_list)
+    endif   
+else
+ Write(mf,*) " NO APERTURE "
+endif
+ 
+ else
+   if(present(mf)) then     
+      READ(MF,'(a120)') LINE 
+      CALL CONTEXT(LINE)
+   ENDIF
+    IF(LINE(1:2)/='NO') THEN
+       IF(.NOT.HERE) THEN
+          CALL alloc(A)
+       ENDIF
+    
+    
+    if(present(mf)) then     
+     read(mf,NML=aperture_list)
+    endif   
+      a%kind=aplist%kind
+      a%r=aplist%r
+      a%x=aplist%x
+      a%y=aplist%y
+      a%dx=aplist%dx
+      a%dy=aplist%dy      
+    ENDIF
+endif
+endif
+end subroutine ap_aplist
+
+ 
+ !   CALL CONTEXT(LINE)
+
+ !   IF(LINE(1:2)/='NO') THEN
+ !      IF(.NOT.ASSOCIATED(M)) THEN
+ !         CALL alloc(M)
+ !      ENDIF
 
 
+
+
+subroutine  read_lattice(r,filename)
+implicit none
+type(layout),target :: r
+character(*) filename
+logical(lp) doneit
+
+
+integer mf,n
+
+ 
+!-----------------------------------
+call kanalnummer(mf,filename(1:len_trim(filename)))
+n=0
+do while(.true.) 
+
+         read(mf,NML=ELEname,end=999)
+    n=n+1
+!        call create_fibre(r%end,key,EXCEPTION)
+        
+
+    enddo
+   
+   100 CONTINUE
+    r%closed=.true.
+
+    doneit=.true.
+    call ring_l(r,doneit)
+
+    call survey(r)
+
+999 write(6,*) "Read ",n
+
+
+1000 continue
+
+close(mf)
+end subroutine read_lattice
 
 
 end module madx_keywords

@@ -149,7 +149,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.0_dp
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);call alloc(eq,5);
     ID=1
@@ -183,7 +183,7 @@ contains
 
     !WRITE(6,*) BEX,BEY
     !WRITE(6,*) ALX,ALY
-    x=zero
+    x=0.0_dp
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
@@ -192,8 +192,8 @@ contains
 
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
-    eq(1)=(eq(1)*8 + (one+nf%dhdj%v(1)))*3-targ(1)
-    eq(2)=(eq(2)*8 + (one+nf%dhdj%v(2)))*3-targ(2)
+    eq(1)=(eq(1)*8 + (1.0_dp+nf%dhdj%v(1)))*3-targ(1)
+    eq(2)=(eq(2)*8 + (1.0_dp+nf%dhdj%v(2)))*3-targ(2)
     eq(3)=eq(3)-ta(1)
 
     eq(4)=eq(4)-(nf%A_T%V(1).par.'1000')**2-(nf%A_T%V(1).par.'0100')**2
@@ -225,15 +225,15 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.0_dp-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -387,7 +387,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.0_dp
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);call alloc(eq,5);
     ID=1
@@ -422,7 +422,7 @@ contains
 
     !WRITE(6,*) BEX,BEY
     !WRITE(6,*) ALX,ALY
-    x=zero
+    x=0.0_dp
     ID=1
     Y=X+ID
     !( R,X,U,K,POS1,POS2,T1,T2,P1,P2,IN_P1,IN_P2,POS1_FIBRE,POS2_FIBRE)
@@ -431,15 +431,15 @@ contains
 
     !    CALL TRACK_BEAM_x(R,Y,U,+STATE,POS1=IT3,POS2=IT4)
     nf=y
-    eq(1)=(eq(1)*8 + (one+nf%dhdj%v(1)))*3-targ(1)
-    eq(2)=(eq(2)*8 + (one+nf%dhdj%v(2)))*3-targ(2)
+    eq(1)=(eq(1)*8 + (1.0_dp+nf%dhdj%v(1)))*3-targ(1)
+    eq(2)=(eq(2)*8 + (1.0_dp+nf%dhdj%v(2)))*3-targ(2)
     eq(3)=eq(3)-ta(1)
 
     eq(4)=eq(4)-(nf%A_T%V(1).par.'1000')**2-(nf%A_T%V(1).par.'0100')**2
     eq(5)=eq(5)-(nf%A_T%V(3).par.'0010')**2-(nf%A_T%V(3).par.'0001')**2
     !call print(eq(4),6)
     !call print(eq(5),6)
-    nxx=zero
+    nxx=0.0_dp
     do i=1,5
        eq(i)=eq(i)<=4
        xx=eq(i)
@@ -465,15 +465,15 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.0_dp-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -572,7 +572,7 @@ contains
 
 111 STATE=DEFAULT0+ONLY_4D0
 
-    X=zero
+    X=0.0_dp
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);
     ID=1
@@ -624,16 +624,16 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.0_dp-sc)*(g%v(i).sub.'0')
     enddo
 
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -676,7 +676,7 @@ contains
     ENDDO
 
 112 continue
-    X=zero
+    X=0.0_dp
     CALL INIT(STATE,2,NU,BERZ,N2,NP2)
     CALL ALLOC(ID); call alloc(nf);call alloc(Y);
     ID=1
@@ -697,8 +697,8 @@ contains
 
     call alloc(eq,4)
 
-    eq(1)=(TA(1)*8 + (one+nf%dhdj%v(1)))*3
-    eq(2)=(TA(2)*8 + (one+nf%dhdj%v(2)))*3
+    eq(1)=(TA(1)*8 + (1.0_dp+nf%dhdj%v(1)))*3
+    eq(2)=(TA(2)*8 + (1.0_dp+nf%dhdj%v(2)))*3
 
     nux=eq(1)
     nuy=eq(2)
@@ -739,15 +739,15 @@ contains
     open(unit=mf,file='eq.txt')
     do i=np+1,nt
        call read(g%v(i),mf)
-       g%v(i)=g%v(i)-(one-sc)*(g%v(i).sub.'0')
+       g%v(i)=g%v(i)-(1.0_dp-sc)*(g%v(i).sub.'0')
     enddo
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -809,12 +809,12 @@ contains
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
-    CLOSED(:)=zero
+    CLOSED(:)=0.0_dp
     it=0
 100 continue
     it=it+1
 
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) CLOSED
 
@@ -878,10 +878,10 @@ contains
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
@@ -940,8 +940,8 @@ contains
        if(doit) then
           ij=ij+1
           do k=p%mag%p%nmul,1,-1
-             an=p%mag%an(k)/p1%mag%l*two
-             bn=p%mag%bn(k)/p1%mag%l*two
+             an=p%mag%an(k)/p1%mag%l*2.0_dp
+             bn=p%mag%bn(k)/p1%mag%l*2.0_dp
              call add(p1,-k,1,an)
              call add(p1,k,1,bn)
              !   call add(p,-k,0,zero)
@@ -951,11 +951,11 @@ contains
           enddo
           ! el%k3%thin_h_foc,el%k3%thin_v_foc,el%k3%thin_h_angle,el%k3%thin_v_angle
           if(p%mag%kind==kind3) then
-             bn=p%mag%k3%thin_h_angle/p1%mag%l*two
+             bn=p%mag%k3%thin_h_angle/p1%mag%l*2.0_dp
              call add(p1,1,1,bn)
-             an=p%mag%k3%thin_v_angle/p1%mag%l*two
+             an=p%mag%k3%thin_v_angle/p1%mag%l*2.0_dp
              call add(p1,-1,1,an)
-             doit=(p%mag%k3%thin_h_foc/=zero.or.p%mag%k3%thin_v_foc/=zero)  !.or.p%mag%k3%thin_v_angle/=zero)
+             doit=(p%mag%k3%thin_h_foc/=0.0_dp.or.p%mag%k3%thin_v_foc/=0.0_dp)  !.or.p%mag%k3%thin_v_angle/=zero)
              if(doit) then
                 write(6,*) " cannot handle the stuff in kind3 related to fake thinlens tracking of MAD8 "
                 stop 8
@@ -983,11 +983,11 @@ contains
              call add(p,1,1,bn)
              an=p%mag%k3%thin_v_angle
              call add(p,-1,1,an)
-             p%mag%k3%thin_v_angle=zero
-             p%mag%k3%thin_h_angle=zero
-             p%magp%k3%thin_v_angle=zero
-             p%magp%k3%thin_h_angle=zero
-             doit=(p%mag%k3%thin_h_foc/=zero.or.p%mag%k3%thin_v_foc/=zero)
+             p%mag%k3%thin_v_angle=0.0_dp
+             p%mag%k3%thin_h_angle=0.0_dp
+             p%magp%k3%thin_v_angle=0.0_dp
+             p%magp%k3%thin_h_angle=0.0_dp
+             doit=(p%mag%k3%thin_h_foc/=0.0_dp.or.p%mag%k3%thin_v_foc/=0.0_dp)
              if(doit) then
                 write(6,*) " cannot handle the stuff in kind3 related to fake thinlens tracking of MAD8 "
                 stop 9
@@ -1008,7 +1008,7 @@ contains
     do i=1,main%n
        ij=ij+1
        p%pos=i
-       if(p%mag%l==zero.and.p%mag%kind>kind1) then
+       if(p%mag%l==0.0_dp.and.p%mag%kind>kind1) then
           write(mf,*) i,p%mag%name,p%mag%kind,p%next%mag%name
        endif
        p=>p%next
@@ -1034,7 +1034,7 @@ contains
     nturn=SIZE (monitors(1)%r,dim=2)
     nm=size(monitors)
     y=x
-    CALL FIND_ORBIT(R,y,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,y,1,STATE,1e-5_dp)
     write(6,*)" closed orbit "
     write(6,*) y(1:3)
     write(6,*) y(4:6)
@@ -1084,62 +1084,62 @@ contains
 
     if(kind==1) then
        !write(6,*) zf(1:4)
-       zx=zero
+       zx=0.0_dp
        zx(1)=zf(1)
        zx(2)=zf(2)   !!!
        ex=0
        ex=zx
-       ex%v(3)=ex%v(3)+(one.mono.3)
-       ex%v(4)=ex%v(4)+(one.mono.4)
-       gi%v(2)=(gi%v(2).o.ex)-(one.mono.2)
-       zx=zero
+       ex%v(3)=ex%v(3)+(1.0_dp.mono.3)
+       ex%v(4)=ex%v(4)+(1.0_dp.mono.4)
+       gi%v(2)=(gi%v(2).o.ex)-(1.0_dp.mono.2)
+       zx=0.0_dp
        zx(1)=zf(1)
        zx(3)=zf(3)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(4)=ex%v(4)+(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.0_dp.mono.2)
+       ex%v(4)=ex%v(4)+(1.0_dp.mono.4)
 
-       gi%v(3)=(gi%v(3).o.ex)-(one.mono.3)
-       zx=zero
+       gi%v(3)=(gi%v(3).o.ex)-(1.0_dp.mono.3)
+       zx=0.0_dp
        zx(1)=zf(1)
        zx(4)=zf(4)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(3)=ex%v(3)+(one.mono.3)
-       gi%v(4)=(gi%v(4).o.ex)-(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.0_dp.mono.2)
+       ex%v(3)=ex%v(3)+(1.0_dp.mono.3)
+       gi%v(4)=(gi%v(4).o.ex)-(1.0_dp.mono.4)
        !call print(gi,6)
        gi%v(1)=gi%v(1)-zf(1)
 
     else
        !write(6,*) zf(1:4)
 
-       zx=zero
+       zx=0.0_dp
        zx(3)=zf(3)
        zx(4)=zf(4)   !!!
        ex=0
        ex=zx
-       ex%v(1)=ex%v(1)+(one.mono.1)
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       gi%v(4)=(gi%v(4).o.ex)-(one.mono.4)
-       zx=zero
+       ex%v(1)=ex%v(1)+(1.0_dp.mono.1)
+       ex%v(2)=ex%v(2)+(1.0_dp.mono.2)
+       gi%v(4)=(gi%v(4).o.ex)-(1.0_dp.mono.4)
+       zx=0.0_dp
        zx(1)=zf(1)
        zx(3)=zf(3)   !!!
        ex=0
        ex=zx
-       ex%v(2)=ex%v(2)+(one.mono.2)
-       ex%v(4)=ex%v(4)+(one.mono.4)
+       ex%v(2)=ex%v(2)+(1.0_dp.mono.2)
+       ex%v(4)=ex%v(4)+(1.0_dp.mono.4)
 
-       gi%v(1)=(gi%v(1).o.ex)-(one.mono.1)
-       zx=zero
+       gi%v(1)=(gi%v(1).o.ex)-(1.0_dp.mono.1)
+       zx=0.0_dp
        zx(3)=zf(3)
        zx(2)=zf(2)   !!!
        ex=0
        ex=zx
-       ex%v(4)=ex%v(4)+(one.mono.4)
-       ex%v(1)=ex%v(1)+(one.mono.1)
-       gi%v(2)=(gi%v(2).o.ex)-(one.mono.2)
+       ex%v(4)=ex%v(4)+(1.0_dp.mono.4)
+       ex%v(1)=ex%v(1)+(1.0_dp.mono.1)
+       gi%v(2)=(gi%v(2).o.ex)-(1.0_dp.mono.2)
        !call print(gi,6)
 
        gi%v(3)=gi%v(3)-zf(3)
@@ -1180,7 +1180,7 @@ contains
     r=>monitors(jm)%xf
     a=>monitors(jm)%a
     at=>monitors(jm)%at
-    mom=zero
+    mom=0.0_dp
     do i=1,4
        do j=i,4
           do k=1,nt
@@ -1222,15 +1222,15 @@ contains
        a=a6(1:4,1:4)
        at=matmul(at,a)
     else
-       h%h=zero
+       h%h=0.0_dp
 
        do i=1,2
           do j=1,2
              if(with_c==0.and.i/=j) cycle
-             h%h=h%h + mom(2*i-1,2*j-1)*(one.mono.(2*i))*(one.mono.(2*j))
-             h%h=h%h + mom(2*i,2*j)*(one.mono.(2*i-1))*(one.mono.(2*j-1))
-             h%h=h%h - mom(2*i,2*j-1)*(one.mono.(2*i-1))*(one.mono.(2*j))
-             h%h=h%h - mom(2*i-1,2*j)*(one.mono.(2*i))*(one.mono.(2*j-1))
+             h%h=h%h + mom(2*i-1,2*j-1)*(1.0_dp.mono.(2*i))*(1.0_dp.mono.(2*j))
+             h%h=h%h + mom(2*i,2*j)*(1.0_dp.mono.(2*i-1))*(1.0_dp.mono.(2*j-1))
+             h%h=h%h - mom(2*i,2*j-1)*(1.0_dp.mono.(2*i-1))*(1.0_dp.mono.(2*j))
+             h%h=h%h - mom(2*i-1,2*j)*(1.0_dp.mono.(2*i))*(1.0_dp.mono.(2*j-1))
           enddo
        enddo
 
@@ -1485,8 +1485,8 @@ contains
     if(present(nav)) na=nav
 
 
-    x=zero
-    y=zero
+    x=0.0_dp
+    y=0.0_dp
     do i=1,m_turn+m_skip
        read(mf1,*)i1,i2,bpmx
        read(mf2,*)i1,i2,bpmy
@@ -1572,8 +1572,8 @@ write(6,*) size(monitors), "monitors "
     enddo
     do jm=1,size(monitors)
 
-       x=zero
-       y=zero
+       x=0.0_dp
+       y=0.0_dp
        do i=1,n
           x=monitors(jm)%r(1,i)+x
           y=monitors(jm)%r(3,i)+y
@@ -1615,19 +1615,19 @@ write(6,*) size(monitors), "monitors "
     allocate(c%At(4,4))
     c%turn=0
     c%kind=0
-    c%r=zero
-    c%bpm=zero
-    c%xf=zero
-    c%xn=zero
-    c%mom=zero
-    c%A=zero
+    c%r=0.0_dp
+    c%bpm=0.0_dp
+    c%xf=0.0_dp
+    c%xn=0.0_dp
+    c%mom=0.0_dp
+    c%A=0.0_dp
     c%full=.true.
     do i=1,4
-       c%a(i,i)=one
+       c%a(i,i)=1.0_dp
     enddo
-    c%At=zero
+    c%At=0.0_dp
     do i=1,4
-       c%at(i,i)=one
+       c%at(i,i)=1.0_dp
     enddo
   end subroutine alloc_fibre_monitor_data
 
@@ -1673,7 +1673,7 @@ write(6,*) size(monitors), "monitors "
     type(gmap) g
 !!! will produce the real data at jm
 
-    z0=zero
+    z0=0.0_dp
 
     nm=size(monitors)
 
@@ -1686,7 +1686,7 @@ write(6,*) size(monitors), "monitors "
     call alloc(map1)
     call alloc(g)
 
-    CALL FIND_ORBIT(ring,x,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(ring,x,1,STATE,1e-5_dp)
     write(6,*) monitors(jm)%kind
     if(monitors(jm)%kind==1.or.monitors(jm)%kind==3) then
        jn(1)=jm
@@ -1773,16 +1773,16 @@ write(6,*) size(monitors), "monitors "
 
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.2
+       ex%v(2)=1.0_dp.mono.1
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m11=m11*ex
        m11=m11**jinv
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.2
+       ex%v(2)=1.0_dp.mono.1
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m11=ex*m11*ex
 
        ! m11 is now the map from x,x11,y,py
@@ -1793,16 +1793,16 @@ write(6,*) size(monitors), "monitors "
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.4
+       ex%v(4)=1.0_dp.mono.3
        m22=m22*ex
        m22=m22**jinv
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.4
+       ex%v(4)=1.0_dp.mono.3
        m22=ex*m22*ex
        ! m22 is now the map from x,px,y,y22
 
@@ -1813,17 +1813,17 @@ write(6,*) size(monitors), "monitors "
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m2=m2*ex
        m2=m2**jinv
        !m11=m11**(-1)
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m2=ex*m2*ex
 
        ! m2 is now the map from x,px,y2,py
@@ -1914,16 +1914,16 @@ write(6,*) size(monitors), "monitors "
 
        jinv=0
        jinv(3)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.4
+       ex%v(4)=1.0_dp.mono.3
        m22=m22*ex
        m22=m22**jinv
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.4
-       ex%v(4)=one.mono.3
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.4
+       ex%v(4)=1.0_dp.mono.3
        m22=ex*m22*ex
 
        g%v(4)=m22%v(4)     !   py_0(x_0,p_x0,y_0,y_p22)
@@ -1934,16 +1934,16 @@ write(6,*) size(monitors), "monitors "
 
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.2
+       ex%v(2)=1.0_dp.mono.1
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m1=m1*ex
        m1=m1**jinv
-       ex%v(1)=one.mono.2
-       ex%v(2)=one.mono.1
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.2
+       ex%v(2)=1.0_dp.mono.1
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m1=ex*m1*ex
        ! m1 is now the map from x,x1,y,py
 
@@ -1953,17 +1953,17 @@ write(6,*) size(monitors), "monitors "
 !!!!!!!!!!!!   testing and computing m11  !!!!!!!!!!!!!!!!!
        jinv=0
        jinv(1)=1
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m11=m11*ex
        m11=m11**jinv
 
-       ex%v(1)=one.mono.1
-       ex%v(2)=one.mono.2
-       ex%v(3)=one.mono.3
-       ex%v(4)=one.mono.4
+       ex%v(1)=1.0_dp.mono.1
+       ex%v(2)=1.0_dp.mono.2
+       ex%v(3)=1.0_dp.mono.3
+       ex%v(4)=1.0_dp.mono.4
        m11=ex*m11*ex
 
        ! m11 is now the map from x2,px,y,py
@@ -1975,7 +1975,7 @@ write(6,*) size(monitors), "monitors "
 
     !call kanalnummer(mf1,"original.dat")
     !call kanalnummer(mf2,"new.dat")
-    zf=zero
+    zf=0.0_dp
     zf(1)=monitors(jn(1))%r(1,1)
     zf(2)=monitors(jn(2))%r(1,1)
     zf(3)=monitors(jn(3))%r(3,1)
@@ -1989,7 +1989,7 @@ write(6,*) size(monitors), "monitors "
 
     write(6,*) " M_turn used in Eikonal",m_turn
     do i=1,nt
-       zf=zero
+       zf=0.0_dp
        zf(1)=monitors(jn(1))%r(1,i)
        zf(2)=monitors(jn(2))%r(1,i)
        zf(3)=monitors(jn(3))%r(3,i)
@@ -2044,8 +2044,8 @@ write(6,*) size(monitors), "monitors "
     if(present(nav)) na=nav
 
     if(present(filename)) then
-       x=zero
-       y=zero
+       x=0.0_dp
+       y=0.0_dp
        do i=1,n
           read(mf1,*)jj,monitors(jm)%r(1,i),monitors(jm)%r(3,i)
           monitors(jm)%r(3,i)=sc*monitors(jm)%r(3,i)
@@ -2065,8 +2065,8 @@ write(6,*) size(monitors), "monitors "
 
 
     if(na>0) then
-       xa=zero
-       ya=zero
+       xa=0.0_dp
+       ya=0.0_dp
 
        do i=1,na
           xa(1)=monitors(jm)%r(1,i)**2+xa(1)
@@ -2078,8 +2078,8 @@ write(6,*) size(monitors), "monitors "
        ya(2)=sqrt(ya(1)/ya(2))
 
        write(6,*) " scales ",xa(2),ya(2)
-       xa(1)=(-one+xa(2) )/(n-1)
-       ya(1)=(-one+ya(2) )/(n-1)
+       xa(1)=(-1.0_dp+xa(2) )/(n-1)
+       ya(1)=(-1.0_dp+ya(2) )/(n-1)
        xa(2)=(n-xa(2))/(n-1)
        ya(2)=(n-ya(2))/(n-1)
 
@@ -2088,8 +2088,8 @@ write(6,*) size(monitors), "monitors "
           monitors(jm)%r(3,i)=monitors(jm)%r(3,i) * (i*ya(1)+ya(2))
        enddo
 
-       x=zero
-       y=zero
+       x=0.0_dp
+       y=0.0_dp
        do i=1,n
           x=monitors(jm)%r(1,i)+x
           y=monitors(jm)%r(3,i)+y
@@ -2112,13 +2112,13 @@ write(6,*) size(monitors), "monitors "
 
   end   subroutine  alex_read_r
 
-  SUBROUTINE compute_twiss(r,my_state,filename,pos,del,no,thinlens,name)
+  SUBROUTINE compute_twiss(r,my_state,filename,pos,del,no,thinlens,name,teng,notusingteng)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
-    integer pos,no,I,mf,ind
+    integer pos,no,I,mf,ind,j
     TYPE(internal_state) state
-    real(dp) closed(6),del,bx,by,ax,ay,s,px,py,ex,exp,dpx,dpy,phi
+    real(dp) closed(6),del,bx,by,ax,ay,s,px,py,ex,exp,dpx,dpy,phi,E1(6,6),E2(6,6)
     type(DAMAP) ID,a_f,a_l,a_nl,DR,R_TE,cs_te
     logical(lp) COSLIKE,thinlens, doname, printres
     TYPE(REAL_8) Y(6)
@@ -2128,23 +2128,27 @@ write(6,*) size(monitors), "monitors "
     TYPE(NORMALFORM) NORM
     character(nlp) name
     character(9) typec
+    logical(lp) printmap,teng,notusingteng
+    printmap=my_false
     if(.not.associated(r%t)) then
        call make_node_layout(r)
     endif
     printres=my_false
     doname=my_true
     call context(name)
-    if(name(1:len_trim(name))=="######") then
+    if(index(name,'###')/=0) then
        doname=my_false
        printres=my_true
     endif
+    typec=' '
     call kanalnummer(mf,filename)
 
-    STATE=my_state+delta0
-
-    closed=zero
+    STATE=my_state+nocavity0
+    call print(state,6)
+   ! pause 777
+    closed=0.0_dp
     closed(5)=del
-    CALL FIND_ORBIT(R,CLOSED,pos,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,pos,STATE,1e-5_dp)
     write(6,*) "closed orbit "
     write(6,*) CLOSED
 
@@ -2156,20 +2160,30 @@ write(6,*) size(monitors), "monitors "
 
     CALL TRACK(R,Y,pos,STATE)
     id=y
+    if(index(filename,'MAP')/=0.or.index(filename,'map')/=0) then
+      printmap=my_true
+    endif
 
     NORM=ID
     write(mf,*) " fractional tunes ",norm%tune(1:2)
     p=>r%start
-    s=zero
+    s=0.0_dp
     do i=1,pos-1
        s=s+p%mag%p%ld
        p=>p%next
     enddo
-    px=zero
-    py=zero
-
-    call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
-
+    px=0.0_dp
+    py=0.0_dp
+    if(teng) then
+     call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
+    else
+     if(notusingteng) then
+      call factor_am_special(norm%a_t,a_f,a_l,a_nl,DR=dr)
+       else
+      call factor(norm%a_t,a_f,a_l,a_nl,DR=dr)
+     endif
+    endif
+    
     Y=CLOSED+norm%a_t
     !    bx,by,ay,ay,s,px,py
     bx=(norm%a_t%v(1).sub.'1')**2+(norm%a_t%v(1).sub.'01')**2
@@ -2178,20 +2192,31 @@ write(6,*) size(monitors), "monitors "
     ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
     ex=a_f%v(1).sub.'00001'
     exp=a_f%v(2).sub.'00001'
-    phi=(r_te%v(1).sub.'1')-one   !acos
-    if(abs(phi)<epsflo) phi=zero
-    if(COSLIKE) then
-       typec=' = COS-1 '
+    if(teng) then
+     phi=(r_te%v(1).sub.'1')-1.0_dp   !acos
     else
+     phi=(norm%a_t%v(1).sub.'001')**2+(norm%a_t%v(1).sub.'0001')**2
+    endif
+    if(abs(phi)<epsflo) phi=0.0_dp
+    if(teng) then
+     if(COSLIKE) then
+       typec=' = COS-1 '
+     else
        typec=' = COSH-1'
+     endif
     endif
     if(doname) then
        if(index(p%mag%name,name(1:len_trim(name)))/=0) then
           printres=my_true
        endif
     endif
+    if(teng) then
     write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)') &
          "name", "s", "betax","betay","alphax","alphay","eta_x ","etap_x","Phase x","Phase y","Teng-Edwards Cos or Cosh "
+    else
+    write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)') &
+         "name", "s", "betax","betay","alphax","alphay","eta_x ","etap_x","Phase x","Phase y","  d<x**2>/de_y (Ripken)  "
+    endif
     if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
     if(doname) printres=my_false
 
@@ -2205,11 +2230,20 @@ write(6,*) size(monitors), "monitors "
           endif
           closed=y
           norm%a_t=y
-          call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
+        if(teng) then
+         call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
+        else
+          if(notusingteng) then
+           call factor_am_special(norm%a_t,a_f,a_l,a_nl,DR=dr)
+            else
+           call factor(norm%a_t,a_f,a_l,a_nl,DR=dr)
+          endif        
+        endif
+
+!          call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
           px=px+asin(dr%v(1).sub.'01')/twopi
           py=py+asin(dr%v(3).sub.'0001')/twopi
           Y=CLOSED+norm%a_t
-
 
           if(thinlens) then
              t=>t%next
@@ -2226,13 +2260,19 @@ write(6,*) size(monitors), "monitors "
        ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
        ex=a_f%v(1).sub.'00001'
        exp=a_f%v(2).sub.'00001'
-       phi=(r_te%v(1).sub.'1')-one   !acos
-       if(abs(phi)<epsflo) phi=zero
-       if(COSLIKE) then
-          typec=' = COS-1 '
+       if(teng) then
+        phi=(r_te%v(1).sub.'1')-1.0_dp   !acos
        else
-          typec=' = COSH-1'
+        phi=(norm%a_t%v(1).sub.'001')**2+(norm%a_t%v(1).sub.'0001')**2
        endif
+       if(abs(phi)<epsflo) phi=0.0_dp
+        if(teng) then
+         if(COSLIKE) then
+           typec=' = COS-1 '
+         else
+           typec=' = COSH-1'
+         endif
+        endif
        if(doname) then
           if(index(p%mag%name,name(1:len_trim(name)))/=0) then
              printres=my_true
@@ -2241,10 +2281,54 @@ write(6,*) size(monitors), "monitors "
        if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
        if(doname) printres=my_false
     enddo
+    if(printmap) then
+        write(6,*) "stable_da, check_stable",stable_da, check_stable
+        stable_da=my_true
+        check_stable=my_true
+        call print(id,mf)
+    endif
 
+    a_l=norm%a_t
+    a_f=a_l**(-1)
+    a_nl=0
+    a_nl%v(1)=1.0_dp.mono.2
+    a_nl%v(2)=-(1.0_dp.mono.1)
+    a_nl%v(3)=1.0_dp.mono.4
+    a_nl%v(4)=-(1.0_dp.mono.3)
+    
+    id=1
+    id%v(3)=0
+    id%v(4)=0    
+    DR=A_l*a_nl*id*a_f*a_nl
+    e1=dr
+    e1=-e1
+    id=1
+    id%v(1)=0
+    id%v(2)=0    
+    DR=A_l*a_nl*id*a_f*a_nl
+    e2=dr
+    e2=-e2
+    
+  !! write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)')
+          write(mf,*)  "   "
+          write(mf,*)  "  All 4x4 Ripken Lattice Functions  "
+          write(mf,*)  "   "
+          write(mf,*)  " i , j, d<x_i x_j>/dJ_1  , d<x_i x_j>/dJ_2  "
+    do i=1,4
+    do j=i,4
+        write(mf,'(1x,i2,2x,i2,2x,(1x,g12.5),(9x,g12.5))')  i,j,e1(i,j),e2(i,j)
+    enddo
+    enddo
+          write(mf,*)  "   "
+          write(mf,*)  "   4x4 Dispersions  "
+          write(mf,*)  "   "
+     do i=1,4
+         e1(1,1)=a_l%v(i).sub.'00001'
+        write(mf,'(1x,i2,(1x,g12.5))')  i,e1(1,1)
+    enddo
+    
     CLOSE(mf)
-
-
+ 
     CALL kill(Y)
     call kill(NORM)
     call kill(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
@@ -2319,7 +2403,7 @@ targ(6)=-0.1837954391003473e0_dp    ! 4 3
 100 continue
     it=it+1
 
-    CLOSED=zero
+    CLOSED=0.0_dp
 
 
     CALL INIT(STATE,no,NP)
@@ -2346,7 +2430,7 @@ targ(6)=-0.1837954391003473e0_dp    ! 4 3
     eq(5)=(y(3)%t.par.'0001')-targ(5)
     eq(6)=(y(4)%t.par.'0010')-targ(6)
 
-    epsnow=zero
+    epsnow=0.0_dp
     do i=1,neq
      epsnow=epsnow+abs(eq(i)) 
     enddo
@@ -2382,16 +2466,16 @@ targ(6)=-0.1837954391003473e0_dp    ! 4 3
 
     call alloc(t)
     do i=1,np
-       g%v(i)=one.mono.i
+       g%v(i)=1.0_dp.mono.i
        do j=np+1,nt
           t=g%v(j).d.i
-          g%v(i)=g%v(i)+(one.mono.j)*t
+          g%v(i)=g%v(i)+(1.0_dp.mono.j)*t
        enddo
     enddo
     CALL KILL(t)
 
     g=g.oo.(-1)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.
@@ -2468,10 +2552,10 @@ SET_TPSAFIT=.FALSE.
     STATE=only_4d0
 
 
-    CALL FIND_ORBIT(R0,X0,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R0,X0,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) X0
-    CALL FIND_ORBIT(R1,X1,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R1,X1,1,STATE,1e-5_dp)
     write(6,*) "closed orbit ", CHECK_STABLE
     write(6,*) X1
 
@@ -2575,7 +2659,7 @@ SET_TPSAFIT=.FALSE.
 100 continue
     it=it+1
 
-    x1=zero
+    x1=0.0_dp
 
 
     CALL INIT(STATE,no,NP)
@@ -2589,7 +2673,7 @@ SET_TPSAFIT=.FALSE.
     call alloc(norm)
     call alloc(t,v)
 
-    CALL FIND_ORBIT(R1,X1,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R1,X1,1,STATE,1e-5_dp)
 
     id0=1
     Y0=x0+id0
@@ -2659,7 +2743,7 @@ SET_TPSAFIT=.FALSE.
     eq(2)=       ((NORM%dhdj%v(2)).par.'0000')-targ(2)
     bp(1)=bp(1)/s0
     bp(2)=bp(2)/s0
-    epsnow=zero
+    epsnow=0.0_dp
     do i=1,neq
      epsnow=epsnow+abs(eq(i)) 
     enddo
@@ -2668,9 +2752,9 @@ SET_TPSAFIT=.FALSE.
 !write(6,*) " scale "
 !read(5,*) sca
     do i=1,neq
-     eq(i)=eq(i)-(one-sca)*(eq(i).sub.'0')
+     eq(i)=eq(i)-(1.0_dp-sca)*(eq(i).sub.'0')
     enddo
-    epsnow=zero
+    epsnow=0.0_dp
     do i=1,neq
      epsnow=epsnow+abs(eq(i)) 
     enddo
@@ -2727,10 +2811,10 @@ SET_TPSAFIT=.FALSE.
     enddo
 
     do i=1,np
-      t=zero
+      t=0.0_dp
       do j=1,neq
        v=(dr(np+j).d.i)
-       t=(one.mono.(np+j))*v+t
+       t=(1.0_dp.mono.(np+j))*v+t
       enddo 
        g%v(i)=dr(i)+t
     enddo
@@ -2741,7 +2825,7 @@ SET_TPSAFIT=.FALSE.
 
 
     g=g.oo.(-1)
-    tpsafit=zero
+    tpsafit=0.0_dp
     tpsafit(1:nt)=g
 
     SET_TPSAFIT=.true.

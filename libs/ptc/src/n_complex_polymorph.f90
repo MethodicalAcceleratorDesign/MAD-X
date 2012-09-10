@@ -1042,7 +1042,7 @@ contains
     if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
     s2%kind=0
-    s2%r=zero
+    s2%r=0.0_dp
     !s2%s=one
     !s2%i=0
     !s2%j=0
@@ -1076,10 +1076,10 @@ contains
     if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
     s2%kind=0
-    s2%r=zero
+    s2%r=0.0_dp
     s2%i=0
     s2%j=0
-    s2%s=one
+    s2%s=1.0_dp
 
   END SUBROUTINE resetpoly0
 
@@ -1218,7 +1218,7 @@ contains
     integer i,j
     !  integer localmaster
 
-    GETchar=zero
+    GETchar=0.0_dp
     if(s1%kind==m2) then
        ! GETchar%t=s1%t.sub.s2   !  OLD
        GETchar=s1%t.sub.s2   !  CHANGE
@@ -1227,7 +1227,7 @@ contains
        do i=1,len_trim(s2)
           CALL  CHARINT(s2(i:i),j)
           if(j/=0) then
-             GETchar=zero
+             GETchar=0.0_dp
              exit
           endif
        enddo
@@ -1243,14 +1243,14 @@ contains
     integer  , INTENT (IN) ::  S2(:)
     integer i
 
-    GETint=zero
+    GETint=0.0_dp
     if(s1%kind==m2) then
        GETint=s1%t.sub.s2   !  CHANGE
     elseif(s1%kind==m1) then
        GETint=s1
        do i=1,size(s2)
           if(S2(i)/=0) then
-             GETint=zero
+             GETint=0.0_dp
              exit
           endif
        enddo
@@ -1273,7 +1273,7 @@ contains
        GETORDER%t=s1%t.sub.s2
     else
        GETORDER%kind=m1
-       GETORDER%r=zero
+       GETORDER%r=0.0_dp
        if(s2==0) GETORDER%r=s1%r
     endif
 
@@ -1292,7 +1292,7 @@ contains
     localmaster=master
     call ass(CUTORDER)
 
-    CUTORDER=zero
+    CUTORDER=0.0_dp
     if(s1%kind==m2) then
        cutorder%kind=m2
        CUTORDER%t=s1%t.CUT.s2
@@ -1367,11 +1367,11 @@ contains
     if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
     s2%kind=1
-    s2%r=zero
+    s2%r=0.0_dp
     IF(.NOT.FL) THEN
        s2%i=0
        s2%j=0
-       s2%s=one
+       s2%s=1.0_dp
     ENDIF
 
   END SUBROUTINE resetpoly_R
@@ -1408,11 +1408,11 @@ contains
     !  if(s2%alloc) call killcomplex(s2%t)
     s2%alloc=f
     s2%kind=1
-    s2%r=zero
+    s2%r=0.0_dp
     s2%i=0
     s2%j=0
     s2%g=0
-    s2%s=one
+    s2%s=1.0_dp
 
   END SUBROUTINE allocpoly
 
@@ -1674,7 +1674,7 @@ contains
              s2%kind=1
           elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
              call alloc(s2%t)
-             s2%t=(/cmplx(S1%R,zero,kind=dp),S2%S/).var.(/s2%i,s2%j/)
+             s2%t=(/cmplx(S1%R,0.0_dp,kind=dp),S2%S/).var.(/s2%i,s2%j/)
              !             call var(s2%t,cmplx(S1%R,zero,kind=dp),S2%S,s2%i,s2%j)
              !      s2%i=0
              !      s2%j=0
@@ -2131,7 +2131,7 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          s2%t=(/cmplx(R1,zero,kind=dp),s2%s/).var.(/s2%i,s2%j/)
+          s2%t=(/cmplx(R1,0.0_dp,kind=dp),s2%s/).var.(/s2%i,s2%j/)
           !          call var(s2%t,cmplx(R1,zero,kind=dp),s2%s,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
@@ -2182,7 +2182,7 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          s2%t=(/cmplx(REAL(R1,kind=DP),zero,kind=dp),S2%S/).var.(/s2%i,s2%j/)
+          s2%t=(/cmplx(REAL(R1,kind=DP),0.0_dp,kind=dp),S2%S/).var.(/s2%i,s2%j/)
           !          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),S2%S,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
@@ -2232,7 +2232,7 @@ contains
           s2%kind=1
        elseif((s2%i>0.and.s2%i<=nv).and.(s2%j>0.and.s2%j<=nv))  then
           call alloc(s2%t)
-          s2%t=(/cmplx(REAL(R1,kind=DP),zero,kind=dp),s2%s/).var.(/s2%i,s2%j/)
+          s2%t=(/cmplx(REAL(R1,kind=DP),0.0_dp,kind=dp),s2%s/).var.(/s2%i,s2%j/)
           !          call var(s2%t,cmplx(REAL(R1,kind=DP),zero,kind=dp),s2%s,s2%i,s2%j)
           !      s2%i=0
           !      s2%j=0
@@ -5474,7 +5474,7 @@ contains
 
     select case(s1%kind)
     case(m1)
-       if(abs(t%r)<prec) t%r=zero
+       if(abs(t%r)<prec) t%r=0.0_dp
     case(m2)
        call clean_complextaylor(t%t,t%t,prec)
     case(m3)

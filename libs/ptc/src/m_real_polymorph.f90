@@ -59,8 +59,8 @@ module polymorphic_taylor
   PRIVATE SIN_HR
   ! PROBE_8 STUFF
   PRIVATE RADTAYLORprobe_8,beamprobe_8
-  real(dp) :: sinhx_x_min=c_0_0001
-  real(dp) :: sinhx_x_minp=one  !  1.e-9  !c_0_0001
+  real(dp) :: sinhx_x_min=1e-4_dp
+  real(dp) :: sinhx_x_minp=1.0_dp  !  1.e-9  !c_0_0001
 
 
   INTERFACE assignment (=)
@@ -821,7 +821,7 @@ contains
     TYPE (real_8), intent(inout) :: k
     real(dp), optional :: s
     integer, intent(in) :: i
-    k%s=one
+    k%s=1.0_dp
     if(present(s)) k%s=s
     k%i=i
     k%kind=3
@@ -830,7 +830,7 @@ contains
   subroutine kill_knob(k)
     implicit none
     TYPE (real_8), intent(inout) :: k
-    k%s=one
+    k%s=1.0_dp
     k%i=0
     k%kind=1
   end subroutine kill_knob
@@ -916,7 +916,7 @@ contains
     CHARACTER(*)  , INTENT (IN) ::  S2
     !  integer localmaster
 
-    GETchar=zero
+    GETchar=0.0_dp
     if(s1%kind==m2) then
        ! GETchar%t=s1%t.sub.s2   !  OLD
        GETchar=s1%t.sub.s2   !  CHANGE
@@ -932,7 +932,7 @@ contains
     integer  , INTENT (IN) ::  S2(:)
     integer i
 
-    GETint=zero
+    GETint=0.0_dp
     if(s1%kind==m2) then
        GETint=s1%t.sub.s2   !  CHANGE
     elseif(s1%kind==m1) then
@@ -940,7 +940,7 @@ contains
        GETint=s1
        do i=1,size(s2)
           if(S2(i)/=0) then
-             GETint=zero
+             GETint=0.0_dp
              exit
           endif
        enddo
@@ -962,7 +962,7 @@ contains
        GETORDER%t=s1%t.sub.s2
     else
        GETORDER%kind=m1
-       GETORDER%r=zero
+       GETORDER%r=0.0_dp
        if(s2==0) GETORDER%r=s1%r
     endif
 
@@ -983,7 +983,7 @@ contains
     localmaster=master
     call ass(CUTORDER)
 
-    CUTORDER=zero
+    CUTORDER=0.0_dp
     if(s1%kind==m2) then
        cutorder%kind=m2
        CUTORDER%t=s1%t.CUT.s2
@@ -4224,7 +4224,7 @@ contains
     if(s2%alloc) call killtpsa(s2%t)
     s2%alloc=f
     s2%kind=0
-    s2%r=zero
+    s2%r=0.0_dp
     !s2%s=one
     !s2%i=0
 
@@ -4261,11 +4261,11 @@ contains
     if(s2%alloc) call killtpsa(s2%t)
     s2%alloc=f
     s2%kind=1
-    s2%r=zero
+    s2%r=0.0_dp
 
     IF(.NOT.FL) THEN
        s2%i=0
-       s2%s=one
+       s2%s=1.0_dp
     ENDIF
 
   END SUBROUTINE resetpoly_R
@@ -4305,7 +4305,7 @@ contains
        endif
        s2%kind=1
        s2%i=0
-       s2%s=one
+       s2%s=1.0_dp
     ENDIF
   END SUBROUTINE resetpoly_R31
 
@@ -4339,10 +4339,10 @@ contains
     if(s2%alloc) call killtpsa(s2%t)
     s2%alloc=f
     s2%kind=0
-    s2%r=zero
+    s2%r=0.0_dp
 
     s2%i=0
-    s2%s=one
+    s2%s=1.0_dp
 
   END SUBROUTINE resetpoly0
 
@@ -4427,11 +4427,11 @@ contains
     !if(s2%alloc) call killtpsa(s2%t)     ADDED ETIENNE
     s2%alloc=f
     s2%kind=1
-    s2%r=zero
+    s2%r=0.0_dp
     s2%i=0
     s2%g=0
     s2%nb=0
-    s2%s=one
+    s2%s=1.0_dp
 
   END SUBROUTINE allocpoly
 
@@ -5212,7 +5212,7 @@ contains
 
     select case(s1%kind)
     case(m1)
-       datanht%r=log((1+s1%r)/(1-s1%r))/two
+       datanht%r=log((1+s1%r)/(1-s1%r))/2.0_dp
        datanht%kind=1
     case(m2)
        localmaster=master
@@ -5227,7 +5227,7 @@ contains
           datanht%t=atanh(varf1)
           master=localmaster
        else
-          datanht%r=log((1+s1%r)/sqrt(1-s1%r))/two
+          datanht%r=log((1+s1%r)/sqrt(1-s1%r))/2.0_dp
           datanht%kind=1
        endif
     case default
@@ -5308,7 +5308,7 @@ contains
     TYPE (complextaylor) w
     real(dp) ANG
     integer localmaster ,si
-    si=one
+    si=1.0_dp
     if(s2%kind==0.or.S1%kind==0) then
        line=  " Problems in datan2t "
        ipause=mypauses(0,line)
@@ -5329,7 +5329,7 @@ contains
              datan2t%t=w%r
              datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
           else
-             if((s2%t.sub.'0')<zero) si=-one
+             if((s2%t.sub.'0')<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%t**2+s1%t**2)
              w=acos(w)
              datan2t%t=w%r
@@ -5351,7 +5351,7 @@ contains
                 datan2t%t=w%r
                 datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
              else
-                if((varf2.sub.'0')<zero) si=-one
+                if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                 w%r=varf1/SQRT(varf2**2+varf1**2)
                 w=acos(w)
                 datan2t%t=w%r
@@ -5378,7 +5378,7 @@ contains
              datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
 
           else
-             if((s2%t.sub.'0')<zero) si=-one
+             if((s2%t.sub.'0')<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%t**2+s1%r**2)
              w=acos(w)
              datan2t%t=w%r
@@ -5397,7 +5397,7 @@ contains
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
 
                 else    !!!
-                   if((varf2.sub.'0')<zero) si=-one
+                   if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=s1%R/SQRT(varf2**2+s1%R**2)   !   etienne error here????
                    w=acos(w)
                    datan2t%t=w%r
@@ -5413,7 +5413,7 @@ contains
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
 
                 else    !!!
-                   if((varf2.sub.'0')<zero) si=-one
+                   if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=s1%t/SQRT(varf2**2+s1%t**2)
                    w=acos(w)
                    datan2t%t=w%r
@@ -5436,7 +5436,7 @@ contains
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
 
                 else    !!!
-                   if((S2%R)<zero) si=-one
+                   if((S2%R)<0.0_dp) si=-1.0_dp
                    w%r=s1%t/SQRT(S2%R**2+s1%t**2)
                    w=acos(w)
                    datan2t%t=w%r
@@ -5463,7 +5463,7 @@ contains
              datan2t%t=w%r
              datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
           else
-             if(s2%r<zero) si=-one
+             if(s2%r<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%r**2+s1%t**2)
              w=acos(w)
              datan2t%t=w%r
@@ -5481,7 +5481,7 @@ contains
                    datan2t%t=w%r
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
                 else  !!!
-                   if(s2%r<zero) si=-one
+                   if(s2%r<0.0_dp) si=-1.0_dp
                    w%r=varf1/SQRT(s2%r**2+varf1**2)
                    w=acos(w)
                    datan2t%t=w%r
@@ -5496,7 +5496,7 @@ contains
                    datan2t%t=w%r
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
                 else  !!!
-                   if((S2%t.sub.'0')<zero) si=-one
+                   if((S2%t.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=varf1/SQRT(s2%t**2+varf1**2)
                    w=acos(w)
                    datan2t%t=w%r
@@ -5517,7 +5517,7 @@ contains
                    datan2t%t=w%r
                    datan2t%t=datan2t%t-(datan2t%t.SUB.'0')+ ANG
                 else  !!!
-                   if((S2%t.sub.'0')<zero) si=-one
+                   if((S2%t.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=S1%r/SQRT(s2%t**2+S1%r**2)
                    w=acos(w)
                    datan2t%t=w%r
@@ -5548,7 +5548,7 @@ contains
     TYPE (complextaylor) w
     real(dp) ANG
     integer localmaster ,si
-    si=one
+    si=1.0_dp
     if(s2%kind==0.or.S1%kind==0) then
        line=  " Problems in datand2t "
        ipause=mypauses(0,line)
@@ -5570,7 +5570,7 @@ contains
              datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
              datan2dt%t=datan2dt%t*RAD_TO_DEG_
           else
-             if((s2%t.sub.'0')<zero) si=-one
+             if((s2%t.sub.'0')<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%t**2+s1%t**2)
              w=acos(w)
              datan2dt%t=w%r
@@ -5594,7 +5594,7 @@ contains
                 datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                 datan2dt%t=datan2dt%t*RAD_TO_DEG_
              else
-                if((varf2.sub.'0')<zero) si=-one
+                if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                 w%r=varf1/SQRT(varf2**2+varf1**2)
                 w=acos(w)
                 datan2dt%t=w%r
@@ -5626,7 +5626,7 @@ contains
              datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
              datan2dt%t=datan2dt%t*RAD_TO_DEG_
           else
-             if((s2%t.sub.'0')<zero) si=-one
+             if((s2%t.sub.'0')<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%t**2+s1%r**2)
              w=acos(w)
              datan2dt%t=w%r
@@ -5646,7 +5646,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else !!!
-                   if((varf2.sub.'0')<zero) si=-one
+                   if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=s1%t/SQRT(varf2**2+s1%t**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -5662,7 +5662,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else !!!
-                   if((varf2.sub.'0')<zero) si=-one
+                   if((varf2.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=s1%t/SQRT(varf2**2+s1%t**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -5686,7 +5686,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else !!!
-                   if((S2%R)<zero) si=-one
+                   if((S2%R)<0.0_dp) si=-1.0_dp
                    w%r=s1%t/SQRT(S2%R**2+s1%t**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -5715,7 +5715,7 @@ contains
              datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
              datan2dt%t=datan2dt%t*RAD_TO_DEG_
           else
-             if(s2%r<zero) si=-one
+             if(s2%r<0.0_dp) si=-1.0_dp
              w%r=s1%t/SQRT(s2%r**2+s1%t**2)
              w=acos(w)
              datan2dt%t=w%r
@@ -5735,7 +5735,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else
-                   if(s2%r<zero) si=-one
+                   if(s2%r<0.0_dp) si=-1.0_dp
                    w%r=varf1/SQRT(s2%r**2+varf1**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -5752,7 +5752,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else
-                   if((S2%t.sub.'0')<zero) si=-one
+                   if((S2%t.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=varf1/SQRT(s2%T**2+varf1**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -5774,7 +5774,7 @@ contains
                    datan2dt%t=datan2dt%t-(datan2dt%t.SUB.'0')+ ANG
                    datan2dt%t=datan2dt%t*RAD_TO_DEG_
                 else
-                   if((S2%t.sub.'0')<zero) si=-one
+                   if((S2%t.sub.'0')<0.0_dp) si=-1.0_dp
                    w%r=S1%r/SQRT(s2%T**2+S1%r**2)
                    w=acos(w)
                    datan2dt%t=w%r
@@ -6324,7 +6324,7 @@ contains
        endif
     else ! Not a knob
        stop 333
-       varf1=(/S2%R,zero/).var.0  ! this is a buggy line never used
+       varf1=(/S2%R,0.0_dp/).var.0  ! this is a buggy line never used
     endif
 
 
@@ -6345,7 +6345,7 @@ contains
        endif
     else ! Not a knob
        stop 334
-       varf2=(/S2%R,zero/).var.0   ! this is a buggy line never used
+       varf2=(/S2%R,0.0_dp/).var.0   ! this is a buggy line never used
     endif
 
 
@@ -6364,10 +6364,10 @@ contains
        NOTDONE=.TRUE.
        CHECK=.TRUE.
 
-       SINH_HR=one
-       Y=one
+       SINH_HR=1.0_dp
+       Y=1.0_dp
        I=1
-       NORM0=c_1d5
+       NORM0=1e5_dp
        DO WHILE(I<NMAX_pol.AND.NOTDONE)
           Y=Y*X**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
           SINH_HR0=SINH_HR+Y
@@ -6408,10 +6408,10 @@ contains
        NOTDONE=.TRUE.
        CHECK=.TRUE.
 
-       SIN_HR=one
-       Y=one
+       SIN_HR=1.0_dp
+       Y=1.0_dp
        I=1
-       NORM0=c_1d5
+       NORM0=1e5_dp
        DO WHILE(I<NMAX_pol.AND.NOTDONE)
           Y=-Y*X**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
           SINH_HR0=SIN_HR+Y
@@ -6464,10 +6464,10 @@ contains
           NOTDONE=.TRUE.
           CHECK=.TRUE.
 
-          SIN_HP=one
-          Y=one
+          SIN_HP=1.0_dp
+          Y=1.0_dp
           I=1
-          NORM0=c_1d5
+          NORM0=1e5_dp
           DO WHILE(I<NMAX_pol.AND.NOTDONE)
              Y=-Y*S1%T**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
              SINH_HP0=SIN_HP+Y
@@ -6505,10 +6505,10 @@ contains
              NOTDONE=.TRUE.
              CHECK=.TRUE.
 
-             SIN_HP=one
-             Y=one
+             SIN_HP=1.0_dp
+             Y=1.0_dp
              I=1
-             NORM0=c_1d5
+             NORM0=1e5_dp
              DO WHILE(I<NMAX_pol.AND.NOTDONE)
                 Y=-Y*varf1**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
                 SINH_HP0=SIN_HP+Y
@@ -6576,10 +6576,10 @@ contains
           NOTDONE=.TRUE.
           CHECK=.TRUE.
 
-          SIN_HP=one
-          Y=one
+          SIN_HP=1.0_dp
+          Y=1.0_dp
           I=1
-          NORM0=c_1d5
+          NORM0=1e5_dp
           DO WHILE(I<NMAX_pol.AND.NOTDONE)
              Y=Y*S1%T**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
              SINH_HP0=SIN_HP+Y
@@ -6618,10 +6618,10 @@ contains
              NOTDONE=.TRUE.
              CHECK=.TRUE.
 
-             SIN_HP=one
-             Y=one
+             SIN_HP=1.0_dp
+             Y=1.0_dp
              I=1
-             NORM0=c_1d5
+             NORM0=1e5_dp
              DO WHILE(I<NMAX_pol.AND.NOTDONE)
                 Y=Y*varf1**2/REAL(I+1,kind=DP)/REAL(I+2,kind=DP)
                 SINH_HP0=SIN_HP+Y
@@ -6679,7 +6679,7 @@ contains
 
     select case(s1%kind)
     case(m1)
-       if(abs(t%r)<prec) t%r=zero
+       if(abs(t%r)<prec) t%r=0.0_dp
     case(m2)
        call clean_taylor(t%t,t%t,prec)
     case(m3)

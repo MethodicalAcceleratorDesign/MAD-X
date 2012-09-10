@@ -48,6 +48,9 @@ contains
        call nul_coef(s_b(i))
     enddo
     deallocate(s_b)
+
+
+
     firsttime_coef=.true.
 
   end subroutine ptc_end

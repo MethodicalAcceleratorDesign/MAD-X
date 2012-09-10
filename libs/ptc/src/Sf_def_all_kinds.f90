@@ -45,7 +45,7 @@ contains
 
     INTEGER I
     P=>R%START
-    L=zero
+    L=0.0_dp
     DO I=1,R%N
        IF(P%MAG%KIND/=KIND23) THEN
           L=L+P%MAG%P%LD
@@ -165,10 +165,10 @@ contains
     x_in%E%DO_SURVEY=.TRUE.
     x_in%nst=0
     x_in%POS=0
-    x_in%RAY=zero
-    x_in%E%L=zero
-    x_in%E%FRAME=zero
-    x_in%E%ORIGIN=zero
+    x_in%RAY=0.0_dp
+    x_in%E%L=0.0_dp
+    x_in%E%FRAME=0.0_dp
+    x_in%E%ORIGIN=0.0_dp
     x_in%e%nst=>x_in%nst
 
   END SUBROUTINE ALLOC_midr
@@ -194,10 +194,10 @@ contains
     x_in%E%DO_SURVEY=.TRUE.
     x_in%nst=0
     x_in%POS=0
-    x_in%RAY=zero
-    x_in%E%L=zero
-    x_in%E%FRAME=zero
-    x_in%E%ORIGIN=zero
+    x_in%RAY=0.0_dp
+    x_in%E%L=0.0_dp
+    x_in%E%FRAME=0.0_dp
+    x_in%E%ORIGIN=0.0_dp
     x_in%e%nst=>x_in%nst
 
   END SUBROUTINE ALLOC_FIBRE
@@ -238,12 +238,12 @@ contains
 
     CL=> C  ! CHART OF ELEMENT 1
 
-    HA=DIR*P%LD*P%B0/TWO
-    D=ZERO
-    D(3)=DIR*P%LC/TWO
+    HA=DIR*P%LD*P%B0/2.0_dp
+    D=0.0_dp
+    D(3)=DIR*P%LC/2.0_dp
     IF(ASSOCIATED(CL%F)) THEN     !!!! DOING SURVEY
        IF(DIR==1) THEN
-          A=ZERO;A(3)=P%TILTD  ;
+          A=0.0_dp;A(3)=P%TILTD  ;
           CALL GEO_ROT(CL%F%ENT,ENT      ,A  ,CL%F%ENT)
           IF(PRESENT(E_IN) ) THEN
 
@@ -254,12 +254,12 @@ contains
 
              !         PAUSE 123
           ENDIF
-          A=ZERO;A(2)=HA ;
+          A=0.0_dp;A(2)=HA ;
           CALL GEO_ROT(ENT     ,CL%F%MID ,A     ,ENT)
           CALL GEO_ROT(CL%F%MID,EXI     , A     ,CL%F%MID)
 
           IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT=EXI,I=E_IN%nst-4)
-          A=ZERO;A(3)=-P%TILTD  ;
+          A=0.0_dp;A(3)=-P%TILTD  ;
           CALL GEO_ROT(EXI     ,CL%F%EXI ,A,EXI)
 
           CL%F%O=CL%F%A
@@ -270,15 +270,15 @@ contains
           IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,A=CL%F%B,I=E_IN%nst-4)
 
        ELSE
-          A=ZERO;A(3)=P%TILTD  ;
+          A=0.0_dp;A(3)=P%TILTD  ;
           CALL GEO_ROT(CL%F%EXI,EXI      ,A  ,CL%F%EXI)
           IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,EXI,CL%F%B,-2)
-          A=ZERO;A(2)=HA ;
+          A=0.0_dp;A(2)=HA ;
           CALL GEO_ROT(EXI     ,CL%F%MID ,A     ,EXI)
           CALL GEO_ROT(CL%F%MID,ENT     , A     ,CL%F%MID)
 
           IF(PRESENT(E_IN) ) CALL XFRAME(E_IN,ENT=ENT,I=E_IN%nst-4)
-          A=ZERO;A(3)=-P%TILTD  ;
+          A=0.0_dp;A(3)=-P%TILTD  ;
           CALL GEO_ROT(ENT     ,CL%F%ENT ,A ,ENT)
 
           CL%F%O=CL%F%B
@@ -355,7 +355,7 @@ contains
        CALL GEO_TRA(OMEGA,ENT,C%D_OUT,1)
        ENT=ENT-EXI
        OMEGA=OMEGA-CL%F%B
-       N=ZERO
+       N=0.0_dp
        DO I=1,3
           N(2)=ABS(OMEGA(I))+N(2)
           DO J=1,3
@@ -461,15 +461,15 @@ contains
           !             STOP 331
           !          ENDIF
        CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler)
-          LH=P%LC/TWO
+          LH=P%LC/2.0_dp
           A=O
-          D=ZERO;D(3)=-LH
+          D=0.0_dp;D(3)=-LH
           CALL GEO_TRA(A,MID,D,1)
           CALL XFRAME(E_IN,MID,A,start)
 
           HA=P%LC/NST
           E_IN%L(start)=start*P%LD/nst  +E_IN%L(-1)
-          D=ZERO;D(3)=HA
+          D=0.0_dp;D(3)=HA
           DO I=1,NST
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
@@ -477,14 +477,14 @@ contains
              CALL XFRAME(E_IN,MID,A,start)
           ENDDO
        CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
-          IF(P%B0==ZERO) THEN
-             LH=P%LC/TWO
+          IF(P%B0==0.0_dp) THEN
+             LH=P%LC/2.0_dp
              A=O
-             D=ZERO;D(3)=-LH
+             D=0.0_dp;D(3)=-LH
              CALL GEO_TRA(A,MID,D,1)
              CALL XFRAME(E_IN,MID,A,start)
              HA=P%LC/NST
-             D=ZERO;D(3)=HA
+             D=0.0_dp;D(3)=HA
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
              DO I=1,NST
                 start=start+E_IN%F%dir
@@ -493,12 +493,12 @@ contains
                 CALL XFRAME(E_IN,MID,A,start)
              ENDDO
           ELSE
-             RHO=ONE/P%B0
-             ANG=ZERO; D=ZERO;
-             LH=P%LC/TWO
+             RHO=1.0_dp/P%B0
+             ANG=0.0_dp; D=0.0_dp;
+             LH=P%LC/2.0_dp
              A=O
              D(3)=-LH
-             ANGH=P%LD*P%B0/two
+             ANGH=P%LD*P%B0/2.0_dp
              ANG(2)=-ANGH
              CALL GEO_TRA(A,MID,D,1)
              O=A
@@ -506,15 +506,15 @@ contains
              CALL XFRAME(E_IN,ENT,A,start)
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
 
-             ANG(2)=TWO*ANGH/NST
+             ANG(2)=2.0_dp*ANGH/NST
              DO I=1,NST
                 start=start+E_IN%F%dir
                 E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
                 HA=ANGH-I*ANG(2)
                 CALL GEO_ROT(ENT,ENT      ,ANG  ,MID)
-                D=ZERO
+                D=0.0_dp
                 D(1)=RHO*(COS(ha)-COS(ANGH))
-                D(3)=P%LC/TWO-sin(ha)*rho
+                D(3)=P%LC/2.0_dp-sin(ha)*rho
                 A=O
                 CALL GEO_TRA(A,MID,D,1)
                 CALL XFRAME(E_IN,ENT,A,start)
@@ -523,18 +523,18 @@ contains
           ENDIF
 
        CASE(KIND16)
-          ANGH=P%LD*P%B0/two
-          LH=P%LC/TWO
+          ANGH=P%LD*P%B0/2.0_dp
+          LH=P%LC/2.0_dp
           A=O
-          D=ZERO;D(3)=-LH
+          D=0.0_dp;D(3)=-LH
           CALL GEO_TRA(A,MID,D,1)
-          ANG=ZERO;ANG(2)=-(ANGH-P%EDGE(1))
+          ANG=0.0_dp;ANG(2)=-(ANGH-P%EDGE(1))
           CALL GEO_ROT(MID,MID      ,ANG  ,MID)
 
           CALL XFRAME(E_IN,MID,A,start)
           HA=E_IN%F%MAG%L/NST
           E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
-          D=ZERO;D(3)=HA
+          D=0.0_dp;D(3)=HA
           DO I=1,NST
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
@@ -574,7 +574,7 @@ contains
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
           ENDDO
        CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
-          IF(P%B0==ZERO) THEN
+          IF(P%B0==0.0_dp) THEN
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
              DO I=1,NST
                 start=start+E_IN%F%dir

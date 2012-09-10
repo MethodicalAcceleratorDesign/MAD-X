@@ -216,11 +216,11 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=zero
+    FREQ=0.0_dp
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
-             IF(FREQ==ZERO) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
+             IF(FREQ==0.0_dp) THEN
                 FREQ=P%MAG%FREQ
              ELSEIF(FREQ>P%MAG%FREQ) THEN
                 FREQ=P%MAG%FREQ
@@ -238,8 +238,8 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    energy=zero
-    deltap=zero
+    energy=0.0_dp
+    deltap=0.0_dp
     DO I=1,R%N
        IF(P%MAG%kind==kind4) THEN
           energy=energy+p%mag%delta_e
@@ -258,12 +258,12 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=zero;VOLT=zero;PHAS=zero;
+    FREQ=0.0_dp;VOLT=0.0_dp;PHAS=0.0_dp;
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              FREQ=TWOPI*P%MAG%FREQ/CLIGHT
-             VOLT=-P%MAG%VOLT*C_1D_3/P%MAG%P%P0C
+             VOLT=-P%MAG%VOLT*1e-3_dp/P%MAG%P%P0C
              PHAS=P%MAG%PHAS
           ENDIF
        ENDIF
@@ -278,10 +278,10 @@ CONTAINS
     TYPE(FIBRE), POINTER:: P
     INTEGER I
     P=>R%START
-    FREQ=zero;VOLT=zero;PHAS=zero;
+    FREQ=0.0_dp;VOLT=0.0_dp;PHAS=0.0_dp;
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              FREQ=P%MAG%FREQ
              VOLT=P%MAG%VOLT
              PHAS=-P%MAG%PHAS
@@ -302,7 +302,7 @@ CONTAINS
     DO I=1,R%N
        if(associated(p)) then
           IF(ASSOCIATED(P%MAG%FREQ)) THEN
-             IF(P%MAG%FREQ/=zero) THEN
+             IF(P%MAG%FREQ/=0.0_dp) THEN
                 exit
              ENDIF
           ENDIF
@@ -322,7 +322,7 @@ CONTAINS
     P=>r%start
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              ic=ic+1
           ENDIF
        ENDIF
@@ -334,7 +334,7 @@ CONTAINS
     P=>r%start
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              ic=ic+1
              pos(ic)=i
           ENDIF
@@ -354,7 +354,7 @@ CONTAINS
     P=>R%START
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              P%MAG%FREQ=FREQ
              P%MAGP%FREQ=FREQ
           ENDIF
@@ -372,7 +372,7 @@ CONTAINS
     P=>R%START
     DO I=1,R%N
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
-          IF(P%MAG%FREQ/=zero) THEN
+          IF(P%MAG%FREQ/=0.0_dp) THEN
              P%MAG%FREQ=P%MAG%FREQ+FREQ
              P%MAGP%FREQ=P%MAGP%FREQ+FREQ
           ENDIF
@@ -400,8 +400,8 @@ CONTAINS
     INTEGER,INTENT(IN):: KIND
     TYPE(FIBRE),target,INTENT(INOUT):: EL
 
-    CALL PUT_APERTURE(EL%MAG,KIND,R,X,Y,zero,zero)
-    CALL PUT_APERTURE(EL%MAGP,KIND,R,X,Y,zero,zero)
+    CALL PUT_APERTURE(EL%MAG,KIND,R,X,Y,0.0_dp,0.0_dp)
+    CALL PUT_APERTURE(EL%MAGP,KIND,R,X,Y,0.0_dp,0.0_dp)
 
   END  SUBROUTINE PUT_APERTURE_FIB
 
@@ -466,7 +466,7 @@ CONTAINS
     TYPE(WORK),INTENT(INOUT):: S2
 
     S2=S1%MAG
-    IF(ABS(S1%MAG%P%P0C-S1%MAGP%P%P0C)>C_1D_10) THEN
+    IF(ABS(S1%MAG%P%P0C-S1%MAGP%P%P0C)>1e-10_dp) THEN
        W_P=0
        W_P%NC=3
        W_P%FC='(2(1X,A72,/),(1X,A72))'
@@ -637,7 +637,7 @@ CONTAINS
           e2=caf%girder_frame%exi
           !         call INVERSE_FIND_PATCH(a1,e1,dg1,ag1,a2,e2)
           call FIND_PATCH(a1,e1,a2,e2,dg1,ag1)
-          mis=zero
+          mis=0.0_dp
           call MISALIGN_siamese(S2,MIS)
           MIS(1:3)=DG1
           MIS(4:6)=AG1
@@ -917,7 +917,7 @@ CONTAINS
           e2=caf%girder_frame%exi
           !         call INVERSE_FIND_PATCH(a1,e1,dg1,ag1,a2,e2)
           call FIND_PATCH(a1,e1,a2,e2,dg1,ag1)
-          mis=zero
+          mis=0.0_dp
           call MISALIGN_fibre(S2,MIS)
           MIS(1:3)=DG1
           MIS(4:6)=AG1
@@ -943,8 +943,8 @@ CONTAINS
           D(I)=S1(I);   D(I)=S1(I);
           R(I)=S1(3+I); R(I)=S1(3+I);
        ENDDO
-       S2%CHART%D_IN=zero;S2%CHART%D_OUT=zero;
-       S2%CHART%ANG_IN=zero;S2%CHART%ANG_OUT=zero;
+       S2%CHART%D_IN=0.0_dp;S2%CHART%D_OUT=0.0_dp;
+       S2%CHART%ANG_IN=0.0_dp;S2%CHART%ANG_OUT=0.0_dp;
        S2%MAG%MIS=.TRUE.
        S2%MAGP%MIS=.TRUE.
 
@@ -1049,15 +1049,15 @@ CONTAINS
     MAD_ANGLE(3)=S1(6)
 
     CALL CHANGE_BASIS(T,ENT,T_GLOBAL,GLOBAL_FRAME)
-    ANGLE=ZERO; ANGLE(3)=MAD_ANGLE(3)
+    ANGLE=0.0_dp; ANGLE(3)=MAD_ANGLE(3)
     ent1=ent
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
-    ANGLE=ZERO; ANGLE(1)=MAD_ANGLE(1)
+    ANGLE=0.0_dp; ANGLE(1)=MAD_ANGLE(1)
     ent1=ent
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
-    ANGLE=ZERO; ANGLE(2)=MAD_ANGLE(2)
+    ANGLE=0.0_dp; ANGLE(2)=MAD_ANGLE(2)
     ent1=ent
     ent2=ent
     CALL GEO_ROT(ENT1,ENT,ANGLE,ENT2)
@@ -1871,13 +1871,13 @@ CONTAINS
        IF(ASSOCIATED(C%PATCH)) THEN
           P=>C%PATCH
           IF(P%PATCH/=0) THEN
-             NORM=ZERO
+             NORM=0.0_dp
              DO I=1,3
                 NORM=NORM+ABS(P%A_ANG(I))
                 NORM=NORM+ABS(P%A_D(I))
              ENDDO
              NORM=NORM+ABS(P%A_X1-1)+ABS(P%A_X2-1)
-             IF(NORM/=ZERO) THEN
+             IF(NORM/=0.0_dp) THEN
                 WRITE(6,*) " NORM IN SURVEY ", NORM
                 WRITE(6,*) " THE SURVEY SKIPS THE FIRST PATCH"
                 WRITE(6,*) " IT IS NOT A SELF-CHECK ANYMORE"
@@ -1954,7 +1954,7 @@ CONTAINS
        IF(ASSOCIATED(C%PATCH)) THEN
           P=>C%PATCH
           IF(P%PATCH==1.or.P%PATCH==2.or.P%PATCH==3) THEN
-             ANG=ZERO
+             ANG=0.0_dp
              ANG=P%A_ANG ;
 
              DT=P%A_D
@@ -1967,7 +1967,7 @@ CONTAINS
                 DT(3)=-DT(3)
              endif
 
-             D=ZERO
+             D=0.0_dp
              ent0=ent
              CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! for frank's flags
              ent=ent0
@@ -2007,7 +2007,7 @@ CONTAINS
 
     IF(ASSOCIATED(C%PATCH)) THEN
        IF(P%PATCH==1.or.P%PATCH==2.or.P%PATCH==3) THEN
-          ANG=ZERO
+          ANG=0.0_dp
           ANG=P%B_ANG ;
 
           DT=P%B_D
@@ -2019,7 +2019,7 @@ CONTAINS
              DT(3)=-DT(3)
           endif
 
-          D=ZERO
+          D=0.0_dp
           ent0=ent
           CALL GEO_ROT(ENT0,D,ANG,1,ENT)  ! for frank's flags
           ent=ent0
@@ -2324,7 +2324,7 @@ CONTAINS
     vers%E%L(-1)=0.d0 !Starts beam line at z=0   fake distance along ld for cheap work
 
     !    do k=1,r%n
-    x=zero
+    x=0.0_dp
     CALL TRACK_FIBRE_RR(C,x,default,vers)
 
     t=>c%t1

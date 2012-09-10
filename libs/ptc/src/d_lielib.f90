@@ -46,6 +46,8 @@ module lielib_yang_berz
   real(dp), private :: stmem(ndim)
   logical(lp) :: courant_snyder=.true.
   logical(lp) :: check_krein=.true.
+  logical(lp) :: size_krein=1.e-10_dp
+
   real(dp),dimension(ndim2)::rr_eigen,ri_eigen
 contains
 
@@ -73,9 +75,9 @@ contains
 
     do i=1,ndim
        nplane(i)=2*i-1
-       ang(i)=zero
-       ra(i)=zero
-       st(i)=one
+       ang(i)=0.0_dp
+       ra(i)=0.0_dp
+       st(i)=1.0_dp
     enddo
     no=no1
     nv=nv1
@@ -150,15 +152,15 @@ contains
     endif
 
     do i=0,20
-       xintex(i)=zero
+       xintex(i)=0.0_dp
     enddo
-    xintex(0) =one
-    xintex(1) =half
-    xintex(2) =one/twelve
-    xintex(4) =-one/c_720
-    xintex(6) =one/c_30240
-    xintex(8) =-one/c_1209600
-    xintex(10)=one/c_21772800
+    xintex(0) =1.0_dp
+    xintex(1) =0.5_dp
+    xintex(2) =1.0_dp/12.0_dp
+    xintex(4) =-1.0_dp/720e0_dp
+    xintex(6) =1.0_dp/30240e0_dp
+    xintex(8) =-1.0_dp/1209600e0_dp
+    xintex(10)=1.0_dp/21772800e0_dp
 
 
     return
@@ -253,7 +255,7 @@ contains
        call liepeek(i1,i2)
        nd2=i1(4)
        do i=nd2+1,-n
-          call davar(x(i),zero,i)
+          call davar(x(i),0.0_dp,i)
        enddo
     endif
     return
@@ -281,7 +283,7 @@ contains
        call liepeek(i1,i2)
        nd2=i1(4)
        do i=nd2+1,-n
-          call davar(x(i),zero,i)
+          call davar(x(i),0.0_dp,i)
        enddo
     endif
     return
@@ -311,7 +313,7 @@ contains
     if(nt.gt.0) then
        call etallnom(ie,nt) !,'IE        ')
        do i=nd2+1,nv
-          call davar(ie(i-nd2),zero,i)
+          call davar(ie(i-nd2),0.0_dp,i)
        enddo
        do i=nd2+1,nv
           iv(i)=ie(i-nd2)
@@ -339,7 +341,7 @@ contains
     if(nt.gt.0) then
        call etallnom(ie,nt)  !,'IE        ')
        do i=n+1,nv
-          call davar(ie(i-n),zero,i)
+          call davar(ie(i-n),0.0_dp,i)
        enddo
        do i=n+1,nv
           iv(i)=ie(i-n)
@@ -369,7 +371,7 @@ contains
     if(nt.gt.0) then
        call etallnom(ie,nt)  !,'IE        ')
        do i=nd2+1,nv
-          call davar(ie(i-nd2),zero,i)
+          call davar(ie(i-nd2),0.0_dp,i)
        enddo
        do i=nd2+1,nv
           iv(i)=ie(i-nd2)
@@ -400,7 +402,7 @@ contains
     if(nt.gt.0) then
        call etallnom(ie,nt)  !,'IE        ')
        do i=n+1,nv
-          call davar(ie(i-n),zero,i)
+          call davar(ie(i-n),0.0_dp,i)
        enddo
        do i=n+1,nv
           iv(i)=ie(i-n)
@@ -481,7 +483,7 @@ contains
     if(.not.c_%stable_da) return
 
     do i=1,nd2
-       call davar(x(i),zero,i)
+       call davar(x(i),0.0_dp,i)
     enddo
     return
   end subroutine etini
@@ -502,7 +504,7 @@ contains
        call etallnom(ie1,nt) !,'IE1       ')
        call etallnom(ie2,nt) !,'IE2       ')
        do i=nd2+1,nv
-          call davar(ie1(i-nd2),zero,i)
+          call davar(ie1(i-nd2),0.0_dp,i)
        enddo
        do i=nd2+1,nv
           iv1(i)=ie1(i-nd2)
@@ -539,7 +541,7 @@ contains
        call etallnom(ie1,nt) !,'IE1       ')
        call etallnom(ie2,nt) !,'IE2       ')
        do i=nd2+1,nv
-          call davar(ie1(i-nd2),zero,i)
+          call davar(ie1(i-nd2),0.0_dp,i)
        enddo
        do i=nd2+1,nv
           iv1(i)=ie1(i-nd2)
@@ -577,7 +579,7 @@ contains
        call etallnom(ie1,nt) !,'IE1       ')
        call etallnom(ie2,nt) !,'IE2       ')
        do i=n+1,nv
-          call davar(ie1(i-n),zero,i)
+          call davar(ie1(i-n),0.0_dp,i)
        enddo
        do i=n+1,nv
           iv1(i)=ie1(i-n)
@@ -643,7 +645,7 @@ contains
        jd(i)=0
     enddo
     do i=1,jj
-       call dapok(v(i),jd,zero)
+       call dapok(v(i),jd,0.0_dp)
     enddo
     return
   end subroutine dapokzer
@@ -961,7 +963,7 @@ contains
        call dacfu(v(2*i),dlie,b1)
        call damul(b1,x(2*i-1),b2)
        call damul(b3,x(2*i),b1)
-       call dalin(b2,one,b1,sca,b3)
+       call dalin(b2,1.0_dp,b1,sca,b3)
        call daadd(b3,b4,b2)
        call dacop(b2,b4)
     enddo
@@ -1012,9 +1014,9 @@ contains
     call dacop(x,b4)
     call dacop(x,b1)
     more=.true.
-    rbefore=c_1d30
+    rbefore=1e30_dp
     do i=1,nrmax
-       coe=one/REAL(i,kind=DP)
+       coe=1.0_dp/REAL(i,kind=DP)
        call dacmu(b1,coe,b2)
        call daflo(h,b2,b1)
        call daadd(b4,b1,b3)
@@ -1152,7 +1154,7 @@ contains
     nrmi=nrmin-1
     nrma=nrmax-1
     call etall(v,nd2)
-    call difd(h,v,-one)
+    call difd(h,v,-1.0_dp)
     call facflod(v,x,w,nrmi,nrma,sca,ifac)
 
     call dadal(v,nd2)
@@ -1178,7 +1180,7 @@ contains
           call dader(i,y(j),t2)
           call damul(x(i),t2,t2)
           call damul(y(i),t1,t1)
-          call dalin(t2,one,t1,-one,t1)
+          call dalin(t2,1.0_dp,t1,-1.0_dp,t1)
           call daadd(t1,t3(j),t3(j))
 
        enddo
@@ -1207,12 +1209,12 @@ contains
        call dader(2*i,y,t2)
        call damul(t1,t2,t1)
 
-       call dalin(t1,one,t3,one,t3)
+       call dalin(t1,1.0_dp,t3,1.0_dp,t3)
        call dader(2*i-1,y,t1)
        call dader(2*i,x,t2)
        call damul(t1,t2,t1)
 
-       call dalin(t1,-one,t3,one,t3)
+       call dalin(t1,-1.0_dp,t3,1.0_dp,t3)
 
     enddo
 
@@ -1232,7 +1234,7 @@ contains
     if(.not.c_%stable_da) return
 
     call etall(v,nd2)
-    call difd(h,v,-one)
+    call difd(h,v,-1.0_dp)
     call expflo(v,x,y,eps,non)
 
     call dadal(v,nd2)
@@ -1283,22 +1285,22 @@ contains
 
     call etini(v)
     call daclrd(w)
-    xnorm1=zero
+    xnorm1=0.0_dp
     do i=1,nd2
        call daabs(xy(i),r)
        xnorm1=xnorm1+r
     enddo
-    xnbefore=c_1d36
+    xnbefore=1e36_dp
     more=.false.
-    eps=c_1d_5
+    eps=1e-5_dp
     nrmax=1000
-    xn=c_1d4
+    xn=1e4_dp
 
-    if(epsone>zero) then  !epsone>zero
+    if(epsone>0.0_dp) then  !epsone>zero
        do k=1,nrmax
-          call dacmud(h,-one,t)
+          call dacmud(h,-1.0_dp,t)
           call expflod(t,xy,x,eps,nrmax)
-          call dalind(x,one,v,-one,t)
+          call dalind(x,1.0_dp,v,-1.0_dp,t)
           ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
           ! call daprid(t,1,1,20)
           if(xn.lt.epsone) then
@@ -1310,7 +1312,7 @@ contains
                 ! CALL !WRITE_a
              endif
              call daflod(t,t,w)
-             call dalind(t,one,w,-half,t)
+             call dalind(t,1.0_dp,w,-0.5_dp,t)
              call dacopd(t,z)
              call dacopd(t,w)
              !  second order in W
@@ -1320,15 +1322,15 @@ contains
 
              do kk=1,3   !10
                 call etcom(h,w,w)
-                call dalind(z,one,w,xintex(kk),z)
+                call dalind(z,1.0_dp,w,xintex(kk),z)
              enddo
              call dacopd(z,t)
-             xx=one/twelve
-             call dalind(x,xx,h,one,h)
+             xx=1.0_dp/12.0_dp
+             call dalind(x,xx,h,1.0_dp,h)
           endif
 
-          call dalind(t,one,h,one,h)
-          xnorm=zero
+          call dalind(t,1.0_dp,h,1.0_dp,h)
+          xnorm=0.0_dp
           do i=1,nd2
              call daabs(t(i),r)
              xnorm=xnorm+r
@@ -1350,13 +1352,13 @@ contains
 1000   continue
     else  !epsone>zero
        do k=1,nint(abs(epsone))-1
-          call dacmud(h,-one,t)
+          call dacmud(h,-1.0_dp,t)
           call expflod(t,xy,x,eps,nrmax)
-          call dalind(x,one,v,-one,t)
+          call dalind(x,1.0_dp,v,-1.0_dp,t)
           ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
           ! call daprid(t,1,1,20)
 
-          call dalind(t,one,h,one,h)
+          call dalind(t,1.0_dp,h,1.0_dp,h)
        enddo
     endif
     if(lielib_print(3)==1) WRITE(6,*) " K ", K,epsone
@@ -1405,8 +1407,8 @@ contains
     call daclrd(h)
     do k=2,no
        call taked(w,k,v)
-       call dalind(v,one,h,one,h)
-       call facflod(h,w,v,k,k,-one,-1)
+       call dalind(v,1.0_dp,h,1.0_dp,h)
+       call facflod(h,w,v,k,k,-1.0_dp,-1)
        call dacopd(v,w)
     enddo
     call dadal(w,nd2)
@@ -1424,7 +1426,7 @@ contains
     call etall(v,nd2)
 
     call flofac(xy,x,v)
-    call intd(v,h,-one)
+    call intd(v,h,-1.0_dp)
     !
     call dadal(v,nd2)
 
@@ -1443,8 +1445,8 @@ contains
     call etall(hf,nd2)
     isi=0
     call mapnormf(x,ftf,a2,a1,xy,hf,nord,isi)
-    call intd(hf,h,-one)
-    call intd(ftf,ft,-one)
+    call intd(hf,h,-1.0_dp)
+    call intd(ftf,ft,-1.0_dp)
     call dadal(ftf,nd2)
     call dadal(hf,nd2)
 
@@ -1482,11 +1484,11 @@ contains
        endif
        do ik=1,nd
           if(ik/=time_plane) then
-             if(st(ik)+c_1d_3.gt.one.and.psq(ik).lt.zero) psq(ik)=psq(ik)+one
+             if(st(ik)+1e-3_dp.gt.1.0_dp.and.psq(ik).lt.0.0_dp) psq(ik)=psq(ik)+1.0_dp
           endif
        enddo
        if(time_plane>0) then
-          if(st(time_plane)+c_1d_3.gt.one.and.psq(time_plane).lt.-half) psq(time_plane)=psq(time_plane)+one
+          if(st(time_plane)+1e-3_dp.gt.1.0_dp.and.psq(time_plane).lt.-0.5_dp) psq(time_plane)=psq(time_plane)+1.0_dp
        endif
     else
        do ik=1,nd
@@ -1539,12 +1541,12 @@ contains
     call etallnom(a2i,nd2) !  ,'A2I       ')
     !     frank/etienne
     do itu=1,ndim
-       angle(itu)=zero
-       p(itu)=zero
-       st(itu)=zero
-       rad(itu)=zero
-       ps(itu)=zero
-       rads(itu)=zero
+       angle(itu)=0.0_dp
+       p(itu)=0.0_dp
+       st(itu)=0.0_dp
+       rad(itu)=0.0_dp
+       ps(itu)=0.0_dp
+       rads(itu)=0.0_dp
     enddo
     jtune=isi
     call dacopd(x,xy)
@@ -1559,7 +1561,7 @@ contains
     ! linear part
     call midbflo(xy,a2,a2i,angle,rad,st)
     do ij=1,nd-ndc
-       p(ij)=angle(ij)*(st(ij)*(twopii-one)+one)
+       p(ij)=angle(ij)*(st(ij)*(twopii-1.0_dp)+1.0_dp)
     enddo
     stmem=st
     if(ndc.eq.1) p(nd)=angle(nd)
@@ -1645,10 +1647,10 @@ contains
 
     call etini(x)
 
-    call davar(x(npt_pos),zero,ndpt)
-    call davar(x(nt_pos),zero,ndt)
-    call davar(x(ndpt),zero,npt_pos)
-    call davar(x(ndt),zero,nt_pos)
+    call davar(x(npt_pos),0.0_dp,ndpt)
+    call davar(x(nt_pos),0.0_dp,ndt)
+    call davar(x(ndpt),0.0_dp,npt_pos)
+    call davar(x(ndt),0.0_dp,nt_pos)
     call etinv(x,xi)
 
     call simil(x,xy,xi,xyf)
@@ -1669,7 +1671,7 @@ contains
     if(.not.c_%stable_da) return
 
     if(nt_pos>=nd2-1) return
-    x=zero
+    x=0.0_dp
     x(1:nd) = xy(1:nd)
     xyf(1:nd) = xy(1:nd)
     if(mod(ndpt,2)==0) then
@@ -1744,10 +1746,10 @@ contains
 
     call etini(x)
 
-    call davar(x(npt_pos),zero,ndpt)
-    call davar(x(nt_pos),zero,ndt)
-    call davar(x(ndpt),zero,npt_pos)
-    call davar(x(ndt),zero,nt_pos)
+    call davar(x(npt_pos),0.0_dp,ndpt)
+    call davar(x(nt_pos),0.0_dp,ndt)
+    call davar(x(ndpt),0.0_dp,npt_pos)
+    call davar(x(ndt),0.0_dp,nt_pos)
     call etinv(x,xi)
 
     if(i==1) then
@@ -1777,10 +1779,10 @@ contains
 
     call etini(x)
 
-    call davar(x(npt_pos),zero,ndpt)
-    call davar(x(nt_pos),zero,ndt)
-    call davar(x(ndpt),zero,npt_pos)
-    call davar(x(ndt),zero,nt_pos)
+    call davar(x(npt_pos),0.0_dp,ndpt)
+    call davar(x(nt_pos),0.0_dp,ndt)
+    call davar(x(ndpt),0.0_dp,npt_pos)
+    call davar(x(ndt),0.0_dp,nt_pos)
     call etinv(x,xi)
 
     if(i==1) then
@@ -1839,21 +1841,21 @@ contains
     do i=1,nd2-ndc2
        !       call dacop(xy(i),x(i))
        call datrunc(xy(i),nord+1,x(i))
-       call dalin(x(i),one,rel(i),-one,v(i))
+       call dalin(x(i),1.0_dp,rel(i),-1.0_dp,v(i))
     enddo
     call etinv(v,w)
     call datruncd(w,nord+1,w)
     call daclrd(x)
     if(ndc.eq.1) then
-       call davar(x(ndpt),zero,ndpt)
+       call davar(x(ndpt),0.0_dp,ndpt)
     endif
     call etcct(w,x,v)
     if(ndc.eq.1) then
        call daclr(v(nd2))
        call daclr(v(nd2-ndc))
     endif
-    call dalind(rel,one,v,one,a1)
-    call dalind(rel,one,v,-one,a1i)
+    call dalind(rel,1.0_dp,v,1.0_dp,a1)
+    call dalind(rel,1.0_dp,v,-1.0_dp,a1i)
 
     if(ndpt.ne.0) then
 
@@ -1863,7 +1865,7 @@ contains
        call daclrd(x)
 
        do i=1,nd2-ndc2
-          call dalin(a1(i),one,rel(i),-one,w(i))
+          call dalin(a1(i),1.0_dp,rel(i),-1.0_dp,w(i))
        enddo
 
        !      COMPUTE Deta/Ddelta
@@ -1875,8 +1877,8 @@ contains
        !      COMPUTE J*Deta/dDELTA
 
        do i=1,nd-ndc
-          call dacmu(w(2*i),one,v(2*i-1) )
-          call dacmu(w(2*i-1),-one,v(2*i) )
+          call dacmu(w(2*i),1.0_dp,v(2*i-1) )
+          call dacmu(w(2*i-1),-1.0_dp,v(2*i) )
        enddo
 
        xic=(-1)**(ndt)
@@ -1888,7 +1890,7 @@ contains
        enddo
        call dacmu(w(ndt),xic,w(ndt))
 
-       call expflod(w,rel,a1,c_1d_7,10000)
+       call expflod(w,rel,a1,1e-7_dp,10000)
        ! END OF  CORRECTIONS
 
        call datruncd(a1,nord+1,a1)
@@ -1938,7 +1940,7 @@ contains
     call etcct(x,roi,x)
     do k=2,no
        ! IF K>2 V = H(K)^-1 X(K)
-       call facflod(h,x,v,2,k-1,-one,-1)
+       call facflod(h,x,v,2,k-1,-1.0_dp,-1)
        ! EXTRACTING K TH DEGREE OF V ----> W
        call taked(v,k,w)
        !  write(16,*) "$$$$$$$$  K  $$$$$$$$$$", k
@@ -1948,13 +1950,13 @@ contains
        ! B5 ON EXIT IS THE NEW CONTRIBUTION TO H
        ! B6 IS THE NEW CONTRIBUTION TO FT
        call nuanaflo(b5,b6)
-       call dalind(b5,one,h,one,b1)
+       call dalind(b5,1.0_dp,h,1.0_dp,b1)
        call dacopd(b1,h)
        ! EXP(B9) = EXP( : ROTI B6 :)
        call trxflo(b6,b9,roi)
 
        ! V = EXP(-B6) REL
-       call facflod(b6,rel,v,k,k,-one,1)
+       call facflod(b6,rel,v,k,k,-1.0_dp,1)
        ! W = V o X
        call etcct(v,x,w)
        if(lielib_print(5)==1) then
@@ -1965,9 +1967,9 @@ contains
           !CALL !WRITE_a
        endif
        ! X = EXP(B9) W
-       call facflod(b9,w,x,k,k,one,1)
+       call facflod(b9,w,x,k,k,1.0_dp,1)
        ! B6 IS THE NEW CONTRIBUTION TO FT
-       call dalind(b6,one,ft,one,b1)
+       call dalind(b6,1.0_dp,ft,1.0_dp,b1)
        call dacopd(b1,ft)
     enddo
     call dadal(b9,nd2)
@@ -2044,9 +2046,9 @@ contains
     real(dp) ad,ans,as,ex,exh
     if(.not.c_%stable_da) return
 
-    xgam=zero
-    ad=zero
-    as=zero
+    xgam=0.0_dp
+    ad=0.0_dp
+    as=0.0_dp
     ic=0
     do i=1,nd-ndc
        ik=2*i-1
@@ -2065,16 +2067,16 @@ contains
        as=sta(i)*REAL(jj(i),kind=DP)*angle(i)+as
     enddo
 
-    exh=EXP(ad/two)
+    exh=EXP(ad/2.0_dp)
     ex=exh**2
-    ans=four*ex*(SINH(ad/two)**2+SIN(as/two)**2)
-    if(ans.eq.zero) then
+    ans=4.0_dp*ex*(SINH(ad/2.0_dp)**2+SIN(as/2.0_dp)**2)
+    if(ans.eq.0.0_dp) then
        print*,"NormalForm makes no sense!"
        print*,"no,nv,nd,nd2",no,nv,nd,nd2
        print*,"ndc,ndc2,ndt,ndpt",ndc,ndc2,ndt,ndpt
        stop
     endif
-    xgam=two*(-exh*SINH(ad/two)+ex*SIN(as/two)**2)/ans
+    xgam=2.0_dp*(-exh*SINH(ad/2.0_dp)+ex*SIN(as/2.0_dp)**2)/ans
 
     return
   end function xgam
@@ -2087,9 +2089,9 @@ contains
     integer,dimension(ndim)::jj,jp
     if(.not.c_%stable_da) return
 
-    xgbm=zero
-    ad=zero
-    as=zero
+    xgbm=0.0_dp
+    ad=0.0_dp
+    as=0.0_dp
     ic=0
     do i=1,nd-ndc
        ik=2*i-1
@@ -2108,10 +2110,10 @@ contains
        as=sta(i)*REAL(jj(i),kind=DP)*angle(i)+as
     enddo
 
-    exh=EXP(ad/two)
+    exh=EXP(ad/2.0_dp)
     ex=exh**2
-    ans=four*ex*(SINH(ad/two)**2+SIN(as/two)**2)
-    if(ans.eq.zero) then
+    ans=4.0_dp*ex*(SINH(ad/2.0_dp)**2+SIN(as/2.0_dp)**2)
+    if(ans.eq.0.0_dp) then
        print*,"NormalForm makes no sense!"
        print*,"no,nv,nd,nd2",no,nv,nd,nd2
        print*,"ndc,ndc2,ndt,ndpt",ndc,ndc2,ndt,ndpt
@@ -2131,7 +2133,7 @@ contains
     integer,dimension(ndim)::jj
     if(.not.c_%stable_da) return
 
-    filt=one
+    filt=1.0_dp
 
     ic=0
     do i=1,nd-ndc
@@ -2158,7 +2160,7 @@ contains
 3      continue
     enddo
 
-    filt=zero
+    filt=0.0_dp
     return
   end function filt
 
@@ -2172,10 +2174,10 @@ contains
     if(.not.c_%stable_da) return
 
     fil=filt(j)
-    if(fil.gt.half) then
-       dfilt=zero
+    if(fil.gt.0.5_dp) then
+       dfilt=0.0_dp
     else
-       dfilt=one
+       dfilt=1.0_dp
     endif
     return
   end function dfilt
@@ -2268,7 +2270,7 @@ contains
     if(.not.c_%stable_da) return
 
     do i=1,nd
-       st(i)=two*sta(i)-one
+       st(i)=2.0_dp*sta(i)-1.0_dp
     enddo
 
     do i=1,ntt
@@ -2345,12 +2347,12 @@ contains
 
     if(ndc.eq.1) then
        j(ndt)=1
-       call dapok(ro(ndt),j,one)
-       call dapok(ro(ndpt),j,zero)
+       call dapok(ro(ndt),j,1.0_dp)
+       call dapok(ro(ndpt),j,0.0_dp)
        j(ndt)=0
        j(ndpt)=1
        call dapok(ro(ndt),j,ang(nd))
-       call dapok(ro(ndpt),j,one)
+       call dapok(ro(ndpt),j,1.0_dp)
        j(ndpt)=0
     endif
 
@@ -2402,12 +2404,12 @@ contains
 
     if(ndc.eq.1) then
        j(ndt)=1
-       call dapok(roi(ndt),j,one)
-       call dapok(roi(ndpt),j,zero)
+       call dapok(roi(ndt),j,1.0_dp)
+       call dapok(roi(ndpt),j,0.0_dp)
        j(ndt)=0
        j(ndpt)=1
        call dapok(roi(ndt),j,-ang(nd))
-       call dapok(roi(ndpt),j,one)
+       call dapok(roi(ndpt),j,1.0_dp)
        j(ndpt)=0
     endif
 
@@ -2420,9 +2422,9 @@ contains
     if(.not.c_%stable_da) return
     !   USED IN ROTIFLO AND ROTFLO
     x=EXP(a)
-    xi=one/x
-    ch=(x+xi)/two
-    sh=(x-xi)/two
+    xi=1.0_dp/x
+    ch=(x+xi)/2.0_dp
+    sh=(x-xi)/2.0_dp
     return
   end subroutine hyper
 
@@ -2451,8 +2453,8 @@ contains
     call ctoi(c1,b1)
     call etcjg(x)
     call trx(b1,b2,x)
-    call dalin(b1,half,b2,half,r2)
-    call dalin(b1,half,b2,-half,i2)
+    call dalin(b1,0.5_dp,b2,0.5_dp,r2)
+    call dalin(b1,0.5_dp,b2,-0.5_dp,i2)
 
     if(doflip) then
        call flip_i(c1,c1,-1)
@@ -2634,14 +2636,14 @@ contains
     call etall(ei,nd2)
 
     do i=1,nd-ndc
-       call dalin(c(2*i-1),half,c(2*i),half,e(2*i-1))
-       call dalin(ci(2*i-1),half,ci(2*i),half,ei(2*i-1))
+       call dalin(c(2*i-1),0.5_dp,c(2*i),0.5_dp,e(2*i-1))
+       call dalin(ci(2*i-1),0.5_dp,ci(2*i),0.5_dp,ei(2*i-1))
        if(ista(i).eq.1) then
-          call dalin(ci(2*i-1),half,ci(2*i),-half,e(2*i))
-          call dalin(c(2*i-1),-half,c(2*i),half,ei(2*i))
+          call dalin(ci(2*i-1),0.5_dp,ci(2*i),-0.5_dp,e(2*i))
+          call dalin(c(2*i-1),-0.5_dp,c(2*i),0.5_dp,ei(2*i))
        else
-          call dalin(ci(2*i-1),half,ci(2*i),-half,ei(2*i))
-          call dalin(c(2*i-1),half,c(2*i),-half,e(2*i))
+          call dalin(ci(2*i-1),0.5_dp,ci(2*i),-0.5_dp,ei(2*i))
+          call dalin(c(2*i-1),0.5_dp,c(2*i),-0.5_dp,e(2*i))
        endif
     enddo
 
@@ -2689,18 +2691,18 @@ contains
 
     !     frank/etienne
     do i=1,ndim
-       st(i)=zero
-       q(i)=zero
-       a(i)=zero
+       st(i)=0.0_dp
+       q(i)=0.0_dp
+       a(i)=0.0_dp
     enddo
     !     frank/etienne
     do i=1,ndim2
        !     frank/etienne
        do j=1,ndim2
-          sai(i,j)=zero
-          sa(i,j)=zero
-          cm(i,j)=zero
-          cr(i,j)=zero
+          sai(i,j)=0.0_dp
+          sa(i,j)=0.0_dp
+          cm(i,j)=0.0_dp
+          cr(i,j)=0.0_dp
        enddo
     enddo
 
@@ -2715,11 +2717,11 @@ contains
 
     call mapflol(sa,sai,cr,cm,st)
     do i=1,nd-ndc
-       if(st(i)+c_1d_3.gt.one) then
+       if(st(i)+1e-3_dp.gt.1.0_dp) then
           a(i)=sqrt(cr(2*i-1,2*i-1)**2+cr(2*i-1,2*i)**2)
           q(i)=ARCCOS_lielib(cr(2*i-1,2*i-1)/a(i))
           a(i)=LOGE_lielib(a(i))
-          if(cr(2*i-1,2*i).lt.zero) q(i)=twopi-q(i)
+          if(cr(2*i-1,2*i).lt.0.0_dp) q(i)=twopi-q(i)
        else
           a(i)=sqrt(cr(2*i-1,2*i-1)**2-cr(2*i-1,2*i)**2)
           ch=cr(2*i-1,2*i-1)/a(i)
@@ -2740,9 +2742,9 @@ contains
              !          write(6,*) i,q(i)/twopi
              !          pause 77
              !      enddo
-             if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+             if(st(time_plane)+1e-3_dp.gt.1.0_dp.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
           else
-             if(st(time_plane)+c_1d_3.gt.one.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
+             if(st(time_plane)+1e-3_dp.gt.1.0_dp.and.nd.ge.3.and.q(time_plane).gt.pi) q(time_plane)=q(time_plane)-twopi
           endif
        endif
     else
@@ -2761,10 +2763,10 @@ contains
        do j=1,nd2
           jx(j)=1
           r=sa(i,j)
-          if(r.ne.zero)call  dapok(a2(i),jx,r)
+          if(r.ne.0.0_dp)call  dapok(a2(i),jx,r)
           jx(j)=1
           r=sai(i,j)
-          if(r.ne.zero)call  dapok(a2i(i),jx,r)
+          if(r.ne.0.0_dp)call  dapok(a2i(i),jx,r)
           jx(j)=0
        enddo
     enddo
@@ -2790,29 +2792,29 @@ contains
     do i=1,ndim2
        do j=1,ndim2
           cr(j,i)=cm(i,j)
-          xj(i,j)=zero
-          s1(i,j)=zero
+          xj(i,j)=0.0_dp
+          s1(i,j)=0.0_dp
        enddo
     enddo
 
     !     frank/etienne
     do i=1,ndim
        n(i)=0
-       xj(2*i-1,2*i)=one
-       xj(2*i,2*i-1)=-one
+       xj(2*i-1,2*i)=1.0_dp
+       xj(2*i,2*i-1)=-1.0_dp
     enddo
     !     frank/etienne
     do i=1,ndim2
        do j=1,ndim2
-          sai(i,j)=zero
+          sai(i,j)=0.0_dp
           w(i,j)=cm(i,j)
        enddo
     enddo
     if(ndc.eq.1) then
-       s1(nd2-ndc,nd2-ndc)=one
-       s1(nd2,nd2)=one
-       sai(nd2-ndc,nd2-ndc)=one
-       sai(nd2,nd2)=one
+       s1(nd2-ndc,nd2-ndc)=1.0_dp
+       s1(nd2,nd2)=1.0_dp
+       sai(nd2-ndc,nd2-ndc)=1.0_dp
+       sai(nd2,nd2)=1.0_dp
     endif
     call mulnd2(xj,w)
     call mulnd2(cr,w)
@@ -2822,7 +2824,7 @@ contains
        w_p%fc='(1((1X,A72),/))'
        w_p%c(1)= 'Check of the symplectic condition on the linear part'
        !CALL !WRITE_a
-       xsu=zero
+       xsu=0.0_dp
        do i=1,nd2
           w_p=0
           w_p%nr=nd2
@@ -2840,18 +2842,18 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-       write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
+       write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
-    rr_eigen=zero
-    ri_eigen=zero
+    rr_eigen=0.0_dp
+    ri_eigen=0.0_dp
     rr_eigen=rr
     ri_eigen=ri
        hyp=.false.
        !      write(6,*) " checking no_hyperbolic_in_normal_form "
        do i=1,nd2-ndc2
-          if(ri(i)==zero) then
+          if(ri(i)==0.0_dp) then
              hyp=.true.
              c_%stable_da=.false.
              c_%check_stable=.false.
@@ -2879,14 +2881,14 @@ contains
 if(check_krein.and.(.not.hyp)) then
    
      if(.not.hyp.and.nd2>2) then
-      xsu=zero
-      xd=zero
+      xsu=0.0_dp
+      xd=0.0_dp
        do i=1,4
         xsu=log(rr(i)**2+ri(i)**2)+xsu
         xd=abs(log(rr(i)**2+ri(i)**2))+xd
        enddo
        
-       if(xsu<1.0e-10_dp.and.xd>1.e-10_dp) then
+       if(xsu<size_krein.and.xd>size_krein) then
          write(6,*) " A Krein collision seemed to have happened "
          write(6,*) " All calculations interrupted "
        do i=1,nd2-ndc
@@ -2939,7 +2941,7 @@ endif
        !    elseif(idpr.eq.-101.or.idpr.eq.-102) then
     else  ! new line
        do i=1,nd-ndc
-          if(ri(2*i).ne.zero) then
+          if(ri(2*i).ne.0.0_dp) then
              n(i)=2*i-1
           else
              n(i)=-2*i+1
@@ -2954,33 +2956,33 @@ endif
     do i=1,nd-ndc                  ! Frank NDC  kept
        if(n(i).lt.0) then
           n(i)=-n(i)
-          st(i)=zero
+          st(i)=0.0_dp
           iunst=1
        else
-          st(i)=one
+          st(i)=1.0_dp
        endif
-       x(i)=zero
-       xx(i)=one
+       x(i)=0.0_dp
+       xx(i)=1.0_dp
        do j=1,nd-ndc
           x(i)=vr(2*j-1,n(i))*vi(2*j,n(i))-vr(2*j,n(i))*vi(2*j-1,n(i))+x(i)
        enddo
     enddo
 
     do i=1,nd-ndc
-       if(x(i).lt.zero) xx(i)=-one
+       if(x(i).lt.0.0_dp) xx(i)=-1.0_dp
        x(i)=SQRT(abs(x(i)))
-       if(.not.courant_snyder) x(i)=one
+       if(.not.courant_snyder) x(i)=1.0_dp
     enddo
     do i=1,nd2-ndc2
        do j=1,nd-ndc
-          if(st(j)+c_1d_3.gt.one) then
+          if(st(j)+1e-3_dp.gt.1.0_dp) then
              sai(2*j-1,i)=vr(i,n(j))*xx(j)/x(j)
              sai(2*j,i)=vi(i,n(j))/x(j)
           else
              ax=vr(i,n(j))*xx(j)/x(j)
              ap=vi(i,n(j))/x(j)
-             sai(2*j-1,i)=(ax+ap)/SQRT(two)
-             sai(2*j,i)=(ap-ax)/SQRT(two)
+             sai(2*j-1,i)=(ax+ap)/SQRT(2.0_dp)
+             sai(2*j,i)=(ap-ax)/SQRT(2.0_dp)
           endif
        enddo
     enddo
@@ -3000,11 +3002,11 @@ endif
        call mulnd2(s1,sai)
        ! adjust sa to have sa(1,1)>0 and sa(3,3)>0 rotate by pi if necessary.
        do i=1,nd-ndc
-          xd=one
-          if(sai(2*i-1,2*i-1).lt.zero) xd=-one
+          xd=1.0_dp
+          if(sai(2*i-1,2*i-1).lt.0.0_dp) xd=-1.0_dp
           s1(2*i-1,2*i-1)=xd
-          s1(2*i-1,2*i)=zero
-          s1(2*i,2*i-1)=zero
+          s1(2*i-1,2*i)=0.0_dp
+          s1(2*i,2*i-1)=0.0_dp
           s1(2*i,2*i)=xd
        enddo
        if(courant_snyder) call mulnd2(s1,sai)
@@ -3037,7 +3039,7 @@ endif
 
     do i=1,nd2
        do j=1,nd2
-          rtt(i,j)=zero
+          rtt(i,j)=0.0_dp
        enddo
     enddo
     do i=1,nd2
@@ -3070,120 +3072,120 @@ endif
 
     do i=1,nd2
        do j=1,nd2
-          s(i,j)=zero
-          s(i,i)=one
+          s(i,j)=0.0_dp
+          s(i,i)=1.0_dp
        enddo
     enddo
-    xt=zero;yt=zero;zt=zero;xy=zero;xz=zero;yz=zero;
-    xyzt=zero;xytz=zero;xzyt=zero;xzty=zero;xtzy=zero;xtyz=zero;
-    xyz=zero;xzy=zero;xyt=zero;yxt=zero;yzt=zero;zyt=zero;xzt=zero;zxt=zero;
+    xt=0.0_dp;yt=0.0_dp;zt=0.0_dp;xy=0.0_dp;xz=0.0_dp;yz=0.0_dp;
+    xyzt=0.0_dp;xytz=0.0_dp;xzyt=0.0_dp;xzty=0.0_dp;xtzy=0.0_dp;xtyz=0.0_dp;
+    xyz=0.0_dp;xzy=0.0_dp;xyt=0.0_dp;yxt=0.0_dp;yzt=0.0_dp;zyt=0.0_dp;xzt=0.0_dp;zxt=0.0_dp;
 
     do i=0,1
 
-       xy(1+i,3+i)=one
-       xy(3+i,1+i)=one
-       xy(5+i,5+i)=one
-       xy(7+i,7+i)=one
+       xy(1+i,3+i)=1.0_dp
+       xy(3+i,1+i)=1.0_dp
+       xy(5+i,5+i)=1.0_dp
+       xy(7+i,7+i)=1.0_dp
 
-       xz(1+i,5+i)=one
-       xz(5+i,1+i)=one
-       xz(3+i,3+i)=one
-       xz(7+i,7+i)=one
+       xz(1+i,5+i)=1.0_dp
+       xz(5+i,1+i)=1.0_dp
+       xz(3+i,3+i)=1.0_dp
+       xz(7+i,7+i)=1.0_dp
 
-       xt(1+i,7+i)=one
-       xt(7+i,1+i)=one
-       xt(3+i,3+i)=one
-       xt(5+i,5+i)=one
+       xt(1+i,7+i)=1.0_dp
+       xt(7+i,1+i)=1.0_dp
+       xt(3+i,3+i)=1.0_dp
+       xt(5+i,5+i)=1.0_dp
 
-       yz(3+i,5+i)=one
-       yz(5+i,3+i)=one
-       yz(1+i,1+i)=one
-       yz(7+i,7+i)=one
+       yz(3+i,5+i)=1.0_dp
+       yz(5+i,3+i)=1.0_dp
+       yz(1+i,1+i)=1.0_dp
+       yz(7+i,7+i)=1.0_dp
 
-       yt(3+i,7+i)=one
-       yt(7+i,3+i)=one
-       yt(1+i,1+i)=one
-       yt(5+i,5+i)=one
+       yt(3+i,7+i)=1.0_dp
+       yt(7+i,3+i)=1.0_dp
+       yt(1+i,1+i)=1.0_dp
+       yt(5+i,5+i)=1.0_dp
 
-       zt(5+i,7+i)=one
-       zt(7+i,5+i)=one
-       zt(1+i,1+i)=one
-       zt(3+i,3+i)=one
+       zt(5+i,7+i)=1.0_dp
+       zt(7+i,5+i)=1.0_dp
+       zt(1+i,1+i)=1.0_dp
+       zt(3+i,3+i)=1.0_dp
 
-       xyz(1+i,3+i)=one
-       xyz(3+i,5+i)=one
-       xyz(5+i,1+i)=one
-       xyz(7+i,7+i)=one
+       xyz(1+i,3+i)=1.0_dp
+       xyz(3+i,5+i)=1.0_dp
+       xyz(5+i,1+i)=1.0_dp
+       xyz(7+i,7+i)=1.0_dp
 
-       xyz(1+i,3+i)=one
-       xyz(3+i,5+i)=one
-       xyz(5+i,1+i)=one
-       xyz(7+i,7+i)=one
+       xyz(1+i,3+i)=1.0_dp
+       xyz(3+i,5+i)=1.0_dp
+       xyz(5+i,1+i)=1.0_dp
+       xyz(7+i,7+i)=1.0_dp
 
-       xzy(1+i,5+i)=one
-       xzy(5+i,3+i)=one
-       xzy(3+i,1+i)=one
-       xzy(7+i,7+i)=one
+       xzy(1+i,5+i)=1.0_dp
+       xzy(5+i,3+i)=1.0_dp
+       xzy(3+i,1+i)=1.0_dp
+       xzy(7+i,7+i)=1.0_dp
 
-       xyt(1+i,3+i)=one
-       xyt(3+i,7+i)=one
-       xyt(7+i,1+i)=one
-       xyt(5+i,5+i)=one
+       xyt(1+i,3+i)=1.0_dp
+       xyt(3+i,7+i)=1.0_dp
+       xyt(7+i,1+i)=1.0_dp
+       xyt(5+i,5+i)=1.0_dp
 
-       yxt(3+i,1+i)=one
-       yxt(1+i,7+i)=one
-       yxt(7+i,3+i)=one
-       yxt(5+i,5+i)=one
+       yxt(3+i,1+i)=1.0_dp
+       yxt(1+i,7+i)=1.0_dp
+       yxt(7+i,3+i)=1.0_dp
+       yxt(5+i,5+i)=1.0_dp
 
-       yzt(3+i,5+i)=one
-       yzt(5+i,7+i)=one
-       yzt(7+i,3+i)=one
-       yzt(1+i,1+i)=one
+       yzt(3+i,5+i)=1.0_dp
+       yzt(5+i,7+i)=1.0_dp
+       yzt(7+i,3+i)=1.0_dp
+       yzt(1+i,1+i)=1.0_dp
 
-       zyt(5+i,3+i)=one
-       zyt(3+i,7+i)=one
-       zyt(7+i,5+i)=one
-       zyt(1+i,1+i)=one
+       zyt(5+i,3+i)=1.0_dp
+       zyt(3+i,7+i)=1.0_dp
+       zyt(7+i,5+i)=1.0_dp
+       zyt(1+i,1+i)=1.0_dp
 
-       xzt(1+i,5+i)=one
-       xzt(5+i,7+i)=one
-       xzt(7+i,1+i)=one
-       xzt(3+i,3+i)=one
+       xzt(1+i,5+i)=1.0_dp
+       xzt(5+i,7+i)=1.0_dp
+       xzt(7+i,1+i)=1.0_dp
+       xzt(3+i,3+i)=1.0_dp
 
-       zxt(5+i,1+i)=one
-       zxt(1+i,7+i)=one
-       zxt(7+i,5+i)=one
-       zxt(3+i,3+i)=one
+       zxt(5+i,1+i)=1.0_dp
+       zxt(1+i,7+i)=1.0_dp
+       zxt(7+i,5+i)=1.0_dp
+       zxt(3+i,3+i)=1.0_dp
 
-       xyzt(1+i,3+i)=one
-       xyzt(3+i,5+i)=one
-       xyzt(5+i,7+i)=one
-       xyzt(7+i,1+i)=one
+       xyzt(1+i,3+i)=1.0_dp
+       xyzt(3+i,5+i)=1.0_dp
+       xyzt(5+i,7+i)=1.0_dp
+       xyzt(7+i,1+i)=1.0_dp
 
-       xytz(1+i,3+i)=one
-       xytz(3+i,7+i)=one
-       xytz(7+i,5+i)=one
-       xytz(5+i,1+i)=one
+       xytz(1+i,3+i)=1.0_dp
+       xytz(3+i,7+i)=1.0_dp
+       xytz(7+i,5+i)=1.0_dp
+       xytz(5+i,1+i)=1.0_dp
 
-       xzyt(1+i,5+i)=one
-       xzyt(5+i,3+i)=one
-       xzyt(3+i,7+i)=one
-       xzyt(7+i,1+i)=one
+       xzyt(1+i,5+i)=1.0_dp
+       xzyt(5+i,3+i)=1.0_dp
+       xzyt(3+i,7+i)=1.0_dp
+       xzyt(7+i,1+i)=1.0_dp
 
-       xzty(1+i,5+i)=one
-       xzty(5+i,7+i)=one
-       xzty(7+i,3+i)=one
-       xzty(3+i,1+i)=one
+       xzty(1+i,5+i)=1.0_dp
+       xzty(5+i,7+i)=1.0_dp
+       xzty(7+i,3+i)=1.0_dp
+       xzty(3+i,1+i)=1.0_dp
 
-       xtzy(1+i,7+i)=one
-       xtzy(7+i,5+i)=one
-       xtzy(5+i,3+i)=one
-       xtzy(3+i,1+i)=one
+       xtzy(1+i,7+i)=1.0_dp
+       xtzy(7+i,5+i)=1.0_dp
+       xtzy(5+i,3+i)=1.0_dp
+       xtzy(3+i,1+i)=1.0_dp
 
-       xtyz(1+i,7+i)=one
-       xtyz(7+i,3+i)=one
-       xtyz(3+i,5+i)=one
-       xtyz(5+i,1+i)=one
+       xtyz(1+i,7+i)=1.0_dp
+       xtyz(7+i,3+i)=1.0_dp
+       xtyz(3+i,5+i)=1.0_dp
+       xtyz(5+i,1+i)=1.0_dp
     enddo
 
     !do i=1,8
@@ -3193,7 +3195,7 @@ endif
     !100  FORMAT(8(1x, E12.6))
 
     ic=0
-    xrold=c_1d9
+    xrold=1e9_dp
     call movemul(rt,s,rto,xr)
 
     if(xr.lt.xrold) then
@@ -3392,7 +3394,7 @@ endif
 
     do i=1,nd2
        do j=1,nd2
-          rto(i,j)=zero
+          rto(i,j)=0.0_dp
        enddo
     enddo
 
@@ -3404,7 +3406,7 @@ endif
        enddo
     enddo
 
-    xr=zero
+    xr=0.0_dp
     do i=1,nd2
        do j=1,nd2
           xr=xr+abs(rto(i,j))
@@ -3461,10 +3463,10 @@ endif
     enddo
     !      frank/Etienne
     do i=1,ndim
-       angle(i)=zero
-       rad(i)=zero
-       sta(i)=zero
-       dsta(i)=one-sta(i)
+       angle(i)=0.0_dp
+       rad(i)=0.0_dp
+       sta(i)=0.0_dp
+       dsta(i)=1.0_dp-sta(i)
        ista(i)=0
        idsta(i)=0
     enddo
@@ -3472,11 +3474,11 @@ endif
        angle(i)=ang(i)
        rad(i)=ra(i)
        sta(i)=st(i)
-       dsta(i)=one-sta(i)
+       dsta(i)=1.0_dp-sta(i)
     enddo
     do i=1,nd
-       ista(i)=int(sta(i)+c_1d_2)
-       idsta(i)=int(dsta(i)+c_1d_2)
+       ista(i)=int(sta(i)+1e-2_dp)
+       idsta(i)=int(dsta(i)+1e-2_dp)
     enddo
     return
   end subroutine initpert
@@ -3488,12 +3490,12 @@ endif
     integer,dimension(:)::j
     if(.not.c_%stable_da) return
 
-    dlie=zero
+    dlie=0.0_dp
     do i=1,nd
        dlie=REAL(j(2*i-1)+j(2*i),kind=DP)+dlie
     enddo
-    dlie=dlie+one
-    dlie=one/dlie
+    dlie=dlie+1.0_dp
+    dlie=1.0_dp/dlie
     return
   end function dlie
 
@@ -3511,9 +3513,9 @@ endif
     !frs
     select case(mo)
     case(1,4)
-       rext = one
+       rext = 1.0_dp
     case(2,3)
-       rext = -one
+       rext = -1.0_dp
     end select
     return
     !frs      goto(11,12,13,14),mo
@@ -3601,8 +3603,8 @@ endif
     call etini(rel)
     call etini(x)
     do i=1,nd-ndc
-       call dalin(rel(2*i-1),half,rel(2*i),half,x(2*i-1))
-       call dalin(rel(2*i-1),half,rel(2*i),-half,x(2*i))
+       call dalin(rel(2*i-1),0.5_dp,rel(2*i),0.5_dp,x(2*i-1))
+       call dalin(rel(2*i-1),0.5_dp,rel(2*i),-0.5_dp,x(2*i))
     enddo
     call dadal(rel,nd2)
     return
@@ -3687,7 +3689,7 @@ endif
        enddo
     enddo
     do i=1,nd2-ndc2
-       if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
+       if(abs(reval(i)**2+aieval(i)**2 -1.0_dp).gt.1e-10_dp) then
           w_p=0
           w_p%nc=1
           w_p%fc='((1X,A120))'
@@ -3752,15 +3754,15 @@ endif
     if (la .lt. kp1) go to 200
     !
     do m = kp1, la
-       h = zero
-       ort(m) = zero
-       scale = zero
+       h = 0.0_dp
+       ort(m) = 0.0_dp
+       scale = 0.0_dp
        !     ********** scale column (algol tol then not needed) **********
        do i = m, igh
           scale = scale + abs(a(i,m-1))
        enddo
        !
-       if (scale .eq. zero) go to 180
+       if (scale .eq. 0.0_dp) go to 180
        mp = m + igh
        !     ********** for i=igh step -1 until m do -- **********
        do ii = m, igh
@@ -3774,7 +3776,7 @@ endif
        ort(m) = ort(m) - g
        !     ********** form (i-(u*ut)/h) * a **********
        do j = m, n
-          f = zero
+          f = 0.0_dp
           !     ********** for i=igh step -1 until m do -- **********
           do ii = m, igh
              i = mp - ii
@@ -3790,7 +3792,7 @@ endif
        enddo
        !     ********** form (i-(u*ut)/h)*a*(i-(u*ut)/h) **********
        do i = 1, igh
-          f = zero
+          f = 0.0_dp
           !     ********** for j=igh step -1 until m do -- **********
           do jj = m, igh
              j = mp - jj
@@ -3866,10 +3868,10 @@ endif
     do i = 1, n
        !
        do j = 1, n
-          z(i,j) = zero
+          z(i,j) = 0.0_dp
        enddo
        !
-       z(i,i) = one
+       z(i,i) = 1.0_dp
     enddo
     !
     kl = igh - low - 1
@@ -3877,7 +3879,7 @@ endif
     !     ********** for mp=igh-1 step -1 until low+1 do -- **********
     do mm = 1, kl
        mp = igh - mm
-       if (a(mp,mp-1) .eq. zero) go to 140
+       if (a(mp,mp-1) .eq. 0.0_dp) go to 140
        mp1 = mp + 1
        !
        do i = mp1, igh
@@ -3885,7 +3887,7 @@ endif
        enddo
        !
        do j = mp, igh
-          g = zero
+          g = 0.0_dp
           !
           do i = mp, igh
              g = g + ort(i) * z(i,j)
@@ -3988,7 +3990,7 @@ endif
     !     machep = r1mach(4)
     !
     ierr = 0
-    norm = zero
+    norm = 0.0_dp
     k = 1
     !     ********** store roots isolated by balanc
     !                and compute matrix norm **********
@@ -4001,12 +4003,12 @@ endif
        k = i
        if (i .ge. low .and. i .le. igh) go to 50
        wr(i) = h(i,i)
-       wi(i) = zero
+       wi(i) = 0.0_dp
 50     continue
     enddo
     !
     en = igh
-    t = zero
+    t = 0.0_dp
     !     ********** search for next eigenvalues **********
 60  if (en .lt. low) go to 340
     its = 0
@@ -4018,7 +4020,7 @@ endif
        l = en + low - ll
        if (l .eq. low) go to 100
        s = abs(h(l-1,l-1)) + abs(h(l,l))
-       if (s .eq. zero) s = norm
+       if (s .eq. 0.0_dp) s = norm
        if (abs(h(l,l-1)) .le. machep * s) go to 100
     enddo
     !     ********** form shift **********
@@ -4037,9 +4039,9 @@ endif
     enddo
     !
     s = abs(h(en,na)) + abs(h(na,enm2))
-    x = c_0_75 * s
+    x = 0.75_dp * s
     y = x
-    w = -c_0_4375 * s * s
+    w = -0.4375_dp * s * s
 130 its = its + 1
     !     ********** look for two consecutive small
     !                sub-diagonal elements.
@@ -4063,9 +4065,9 @@ endif
 150 mp2 = m + 2
     !
     do i = mp2, en
-       h(i,i-2) = zero
+       h(i,i-2) = 0.0_dp
        if (i .eq. mp2) go to 160
-       h(i,i-3) = zero
+       h(i,i-3) = 0.0_dp
 160    continue
     enddo
     !     ********** double qr step involving rows l to en and
@@ -4075,10 +4077,10 @@ endif
        if (k .eq. m) go to 170
        p = h(k,k-1)
        q = h(k+1,k-1)
-       r = zero
+       r = 0.0_dp
        if (notlas) r = h(k+2,k-1)
        x = abs(p) + abs(q) + abs(r)
-       if (x .eq. zero) go to 260
+       if (x .eq. 0.0_dp) go to 260
        p = p / x
        q = q / x
        r = r / x
@@ -4130,24 +4132,24 @@ endif
     !     ********** one root found **********
 270 h(en,en) = x + t
     wr(en) = h(en,en)
-    wi(en) = zero
+    wi(en) = 0.0_dp
     en = na
     go to 60
     !     ********** two roots found **********
-280 p = (y - x) / two
+280 p = (y - x) / 2.0_dp
     q = p * p + w
     zz = SQRT(abs(q))
     h(en,en) = x + t
     x = h(en,en)
     h(na,na) = y + t
-    if (q .lt. zero) go to 320
+    if (q .lt. 0.0_dp) go to 320
     !     ********** real pair **********
     zz = p + sign(zz,p)
     wr(na) = x + zz
     wr(en) = wr(na)
-    if (zz .ne. zero) wr(en) = x - w / zz
-    wi(na) = zero
-    wi(en) = zero
+    if (zz .ne. 0.0_dp) wr(en) = x - w / zz
+    wi(na) = 0.0_dp
+    wi(en) = 0.0_dp
     x = h(en,na)
     s = abs(x) + abs(zz)
     p = x / s
@@ -4184,7 +4186,7 @@ endif
     go to 60
     !     ********** all roots found.  backsubstitute to find
     !                vectors of upper triangular form **********
-340 if (norm .eq. zero) go to 1001
+340 if (norm .eq. 0.0_dp) go to 1001
     !     ********** for en=n step -1 until 1 do -- **********
     do nn = 1, n
        en = n + 1 - nn
@@ -4196,7 +4198,7 @@ endif
        if (q.gt.0) goto 800
        !     ********** real vector **********
 600    m = en
-       h(en,en) = one
+       h(en,en) = 1.0_dp
        if (na .eq. 0) go to 800
        !     ********** for i=en-1 step -1 until 1 do -- **********
        do ii = 1, na
@@ -4209,14 +4211,14 @@ endif
              r = r + h(i,j) * h(j,en)
           enddo
           !
-620       if (wi(i) .ge. zero) go to 630
+620       if (wi(i) .ge. 0.0_dp) go to 630
           zz = w
           s = r
           go to 700
 630       m = i
-          if (wi(i) .ne. zero) go to 640
+          if (wi(i) .ne. 0.0_dp) go to 640
           t = w
-          if (w .eq. zero) t = machep * norm
+          if (w .eq. 0.0_dp) t = machep * norm
           h(i,en) = -r / t
           go to 700
           !     ********** solve real equations **********
@@ -4244,18 +4246,18 @@ endif
        ! 720    z3 = cmplx(zero,-h(na,en)) / cmplx(h(na,na)-p,q)
        !        h(na,na) = real(z3,kind=dp)
        !        h(na,en) = aimag(z3)
-720    call etdiv(z3r,z3i,zero,-h(na,en),h(na,na)-p,q)
+720    call etdiv(z3r,z3i,0.0_dp,-h(na,en),h(na,na)-p,q)
        h(na,na) = z3r
        h(na,en) = z3i
-730    h(en,na) = zero
-       h(en,en) = one
+730    h(en,na) = 0.0_dp
+       h(en,en) = 1.0_dp
        enm2 = na - 1
        if (enm2 .eq. 0) go to 800
        !     ********** for i=en-2 step -1 until 1 do -- **********
        do ii = 1, enm2
           i = na - ii
           w = h(i,i) - p
-          ra = zero
+          ra = 0.0_dp
           sa = h(i,en)
           !
           do j = m, na
@@ -4263,13 +4265,13 @@ endif
              sa = sa + h(i,j) * h(j,en)
           enddo
           !
-          if (wi(i) .ge. zero) go to 770
+          if (wi(i) .ge. 0.0_dp) go to 770
           zz = w
           r = ra
           s = sa
           go to 790
 770       m = i
-          if (wi(i) .ne. zero) go to 780
+          if (wi(i) .ne. 0.0_dp) go to 780
           !           z3 = cmplx(-ra,-sa) / cmplx(w,q)
           !           h(i,na) = real(z3,kind=dp)
           !           h(i,en) = aimag(z3)
@@ -4281,8 +4283,8 @@ endif
 780       x = h(i,i+1)
           y = h(i+1,i)
           vr = (wr(i) - p) * (wr(i) - p) + wi(i) * wi(i) - q * q
-          vi = (wr(i) - p) * two * q
-          if (vr .eq. zero .and. vi .eq. zero) vr = machep * norm  * (abs(w) + abs(q) + abs(x) + abs(y) + abs(zz))
+          vi = (wr(i) - p) * 2.0_dp * q
+          if (vr .eq. 0.0_dp .and. vi .eq. 0.0_dp) vr = machep * norm  * (abs(w) + abs(q) + abs(x) + abs(y) + abs(zz))
           !           z3 = cmplx(x*r-zz*ra+q*sa,x*s-zz*sa-q*ra) / cmplx(vr,vi)
           !           h(i,na) = real(z3,kind=dp)
           !           h(i,en) = aimag(z3)
@@ -4323,7 +4325,7 @@ endif
        m = min0(j,igh)
        !
        do i = low, igh
-          zz = zero
+          zz = 0.0_dp
           !
           do k = low, m
              zz = zz + z(i,k) * h(k,j)
@@ -4366,8 +4368,8 @@ endif
        dd = c
        flip = 1
     endif
-    s = one/ee
-    t = one/(ee+ ff*(ff*s))
+    s = 1.0_dp/ee
+    t = 1.0_dp/(ee+ ff*(ff*s))
     if ( abs(ff) .ge. abs(s) ) then
        temp = ff
        ff = s
@@ -4418,10 +4420,10 @@ endif
        kq = kp-1
        do lp=2,kp-2,2
           lq = lp-1
-          qq = zero
-          pq = zero
-          qp = zero
-          pp = zero
+          qq = 0.0_dp
+          pq = 0.0_dp
+          qp = 0.0_dp
+          pp = 0.0_dp
           do jp=2,2*n,2
              jq = jp-1
              qq = qq + m(lq,jq)*m(kq,jp) - m(lq,jp)*m(kq,jq)
@@ -4435,7 +4437,7 @@ endif
              m(kp,i) = m(kp,i) - qp*m(lp,i) + pp*m(lq,i)
           enddo
        enddo
-       qp = zero
+       qp = 0.0_dp
        do jp=2,2*n,2
           jq = jp-1
           qp = qp + m(kq,jq)*m(kp,jp) - m(kq,jp)*m(kp,jq)
@@ -4461,8 +4463,8 @@ endif
     xj=0.0_dp
 
     do i=1,3
-       xj(2*i,2*i-1)=-one
-       xj(2*i-1,2*i)=one
+       xj(2*i,2*i-1)=-1.0_dp
+       xj(2*i-1,2*i)=1.0_dp
     enddo
 
 
@@ -4509,19 +4511,19 @@ endif
           cr(j,i)=cm(i,j)
        enddo
     enddo
-    xj=zero
-    s1=zero
+    xj=0.0_dp
+    s1=0.0_dp
 
     !     frank/etienne
     do i=1,ndimt
        n(i)=0
-       xj(2*i-1,2*i)=one
-       xj(2*i,2*i-1)=-one
+       xj(2*i-1,2*i)=1.0_dp
+       xj(2*i,2*i-1)=-1.0_dp
     enddo
     !     frank/etienne
 
 
-    sai=zero
+    sai=0.0_dp
     w=cm
 
     w=matmul(xj,w)
@@ -4539,21 +4541,21 @@ endif
 
     do i=1,ndimt
        n(i)=2*i-1
-       st(i)=one
+       st(i)=1.0_dp
     enddo
     !    elseif(idpr.eq.-101.or.idpr.eq.-102) then
 
     iunst=0
     do i=1,ndimt                 ! Frank NDC  kept
-       x(i)=zero
-       xx(i)=one
+       x(i)=0.0_dp
+       xx(i)=1.0_dp
        do j=1,ndimt
           x(i)=vr(2*j-1,n(i))*vi(2*j,n(i))-vr(2*j,n(i))*vi(2*j-1,n(i))+x(i)
        enddo
     enddo
 
     do i=1,ndimt
-       if(x(i).lt.zero) xx(i)=-one
+       if(x(i).lt.0.0_dp) xx(i)=-1.0_dp
        x(i)=SQRT(abs(x(i)))
     enddo
     do i=1,ndimt2
@@ -4636,7 +4638,7 @@ endif
        enddo
     enddo
     do i=1,ndimt2
-       if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
+       if(abs(reval(i)**2+aieval(i)**2 -1.0_dp).gt.1e-10_dp) then
           w_p=0
           w_p%nc=1
           w_p%fc='((1X,A120))'
@@ -4665,120 +4667,120 @@ endif
 
     do i=1,ndimt2
        do j=1,ndimt2
-          s(i,j)=zero
-          s(i,i)=one
+          s(i,j)=0.0_dp
+          s(i,i)=1.0_dp
        enddo
     enddo
-    xt=zero;yt=zero;zt=zero;xy=zero;xz=zero;yz=zero;
-    xyzt=zero;xytz=zero;xzyt=zero;xzty=zero;xtzy=zero;xtyz=zero;
-    xyz=zero;xzy=zero;xyt=zero;yxt=zero;yzt=zero;zyt=zero;xzt=zero;zxt=zero;
+    xt=0.0_dp;yt=0.0_dp;zt=0.0_dp;xy=0.0_dp;xz=0.0_dp;yz=0.0_dp;
+    xyzt=0.0_dp;xytz=0.0_dp;xzyt=0.0_dp;xzty=0.0_dp;xtzy=0.0_dp;xtyz=0.0_dp;
+    xyz=0.0_dp;xzy=0.0_dp;xyt=0.0_dp;yxt=0.0_dp;yzt=0.0_dp;zyt=0.0_dp;xzt=0.0_dp;zxt=0.0_dp;
 
     do i=0,1
 
-       xy(1+i,3+i)=one
-       xy(3+i,1+i)=one
-       xy(5+i,5+i)=one
+       xy(1+i,3+i)=1.0_dp
+       xy(3+i,1+i)=1.0_dp
+       xy(5+i,5+i)=1.0_dp
        !  xy(7+i,7+i)=one
 
-       xz(1+i,5+i)=one
-       xz(5+i,1+i)=one
-       xz(3+i,3+i)=one
+       xz(1+i,5+i)=1.0_dp
+       xz(5+i,1+i)=1.0_dp
+       xz(3+i,3+i)=1.0_dp
        !  xz(7+i,7+i)=one
 
        !   xt(1+i,7+i)=one
        !   xt(7+i,1+i)=one
-       xt(3+i,3+i)=one
-       xt(5+i,5+i)=one
+       xt(3+i,3+i)=1.0_dp
+       xt(5+i,5+i)=1.0_dp
 
-       yz(3+i,5+i)=one
-       yz(5+i,3+i)=one
-       yz(1+i,1+i)=one
+       yz(3+i,5+i)=1.0_dp
+       yz(5+i,3+i)=1.0_dp
+       yz(1+i,1+i)=1.0_dp
        !   yz(7+i,7+i)=one
 
        !   yt(3+i,7+i)=one
        !   yt(7+i,3+i)=one
-       yt(1+i,1+i)=one
-       yt(5+i,5+i)=one
+       yt(1+i,1+i)=1.0_dp
+       yt(5+i,5+i)=1.0_dp
 
        !   zt(5+i,7+i)=one
        !   zt(7+i,5+i)=one
-       zt(1+i,1+i)=one
-       zt(3+i,3+i)=one
+       zt(1+i,1+i)=1.0_dp
+       zt(3+i,3+i)=1.0_dp
 
-       xyz(1+i,3+i)=one
-       xyz(3+i,5+i)=one
-       xyz(5+i,1+i)=one
+       xyz(1+i,3+i)=1.0_dp
+       xyz(3+i,5+i)=1.0_dp
+       xyz(5+i,1+i)=1.0_dp
        !   xyz(7+i,7+i)=one
 
-       xyz(1+i,3+i)=one
-       xyz(3+i,5+i)=one
-       xyz(5+i,1+i)=one
+       xyz(1+i,3+i)=1.0_dp
+       xyz(3+i,5+i)=1.0_dp
+       xyz(5+i,1+i)=1.0_dp
        !   xyz(7+i,7+i)=one
 
-       xzy(1+i,5+i)=one
-       xzy(5+i,3+i)=one
-       xzy(3+i,1+i)=one
+       xzy(1+i,5+i)=1.0_dp
+       xzy(5+i,3+i)=1.0_dp
+       xzy(3+i,1+i)=1.0_dp
        !   xzy(7+i,7+i)=one
 
-       xyt(1+i,3+i)=one
+       xyt(1+i,3+i)=1.0_dp
        !  xyt(3+i,7+i)=one
        !   xyt(7+i,1+i)=one
-       xyt(5+i,5+i)=one
+       xyt(5+i,5+i)=1.0_dp
 
-       yxt(3+i,1+i)=one
+       yxt(3+i,1+i)=1.0_dp
        !   yxt(1+i,7+i)=one
        !   yxt(7+i,3+i)=one
-       yxt(5+i,5+i)=one
+       yxt(5+i,5+i)=1.0_dp
 
-       yzt(3+i,5+i)=one
+       yzt(3+i,5+i)=1.0_dp
        !   yzt(5+i,7+i)=one
        !   yzt(7+i,3+i)=one
-       yzt(1+i,1+i)=one
+       yzt(1+i,1+i)=1.0_dp
 
-       zyt(5+i,3+i)=one
+       zyt(5+i,3+i)=1.0_dp
        !   zyt(3+i,7+i)=one
        !   zyt(7+i,5+i)=one
-       zyt(1+i,1+i)=one
+       zyt(1+i,1+i)=1.0_dp
 
-       xzt(1+i,5+i)=one
+       xzt(1+i,5+i)=1.0_dp
        !    xzt(5+i,7+i)=one
        !    xzt(7+i,1+i)=one
-       xzt(3+i,3+i)=one
+       xzt(3+i,3+i)=1.0_dp
 
-       zxt(5+i,1+i)=one
+       zxt(5+i,1+i)=1.0_dp
        !    zxt(1+i,7+i)=one
        !    zxt(7+i,5+i)=one
-       zxt(3+i,3+i)=one
+       zxt(3+i,3+i)=1.0_dp
 
-       xyzt(1+i,3+i)=one
-       xyzt(3+i,5+i)=one
+       xyzt(1+i,3+i)=1.0_dp
+       xyzt(3+i,5+i)=1.0_dp
        !   xyzt(5+i,7+i)=one
        !   xyzt(7+i,1+i)=one
 
-       xytz(1+i,3+i)=one
+       xytz(1+i,3+i)=1.0_dp
        !   xytz(3+i,7+i)=one
        !   xytz(7+i,5+i)=one
-       xytz(5+i,1+i)=one
+       xytz(5+i,1+i)=1.0_dp
 
-       xzyt(1+i,5+i)=one
-       xzyt(5+i,3+i)=one
+       xzyt(1+i,5+i)=1.0_dp
+       xzyt(5+i,3+i)=1.0_dp
        !   xzyt(3+i,7+i)=one
        !   xzyt(7+i,1+i)=one
 
-       xzty(1+i,5+i)=one
+       xzty(1+i,5+i)=1.0_dp
        !   xzty(5+i,7+i)=one
        !   xzty(7+i,3+i)=one
-       xzty(3+i,1+i)=one
+       xzty(3+i,1+i)=1.0_dp
 
        !  xtzy(1+i,7+i)=one
        !  xtzy(7+i,5+i)=one
-       xtzy(5+i,3+i)=one
-       xtzy(3+i,1+i)=one
+       xtzy(5+i,3+i)=1.0_dp
+       xtzy(3+i,1+i)=1.0_dp
 
        !  xtyz(1+i,7+i)=one
        !  xtyz(7+i,3+i)=one
-       xtyz(3+i,5+i)=one
-       xtyz(5+i,1+i)=one
+       xtyz(3+i,5+i)=1.0_dp
+       xtyz(5+i,1+i)=1.0_dp
     enddo
 
     !do i=1,8
@@ -4788,7 +4790,7 @@ endif
     !100  FORMAT(8(1x, E12.6))
 
     ic=0
-    xrold=c_1d9
+    xrold=1e9_dp
     call movemuls(rt,s,rto,xr)
 
     if(xr.lt.xrold) then
@@ -4988,7 +4990,7 @@ endif
 
     do i=1,ndimt2
        do j=1,ndimt2
-          rto(i,j)=zero
+          rto(i,j)=0.0_dp
        enddo
     enddo
 
@@ -5000,7 +5002,7 @@ endif
        enddo
     enddo
 
-    xr=zero
+    xr=0.0_dp
     do i=1,ndimt2
        do j=1,ndimt2
           xr=xr+abs(rto(i,j))

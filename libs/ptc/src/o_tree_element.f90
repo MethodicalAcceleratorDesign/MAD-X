@@ -343,7 +343,7 @@ CONTAINS
        localmaster=master
        call ass(daddsco(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          daddsco(i)=s2(i)+(one.mono.'00001')
+          daddsco(i)=s2(i)+(1.0_dp.mono.'00001')
        else
           daddsco(i)=s2(i)
        endif
@@ -371,7 +371,7 @@ CONTAINS
        localmaster=master
        call ass(scdaddo(i))
        if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          scdaddo(i)=s2(i)+(one.mono.'00001')
+          scdaddo(i)=s2(i)+(1.0_dp.mono.'00001')
        else
           scdaddo(i)=s2(i)
        endif
@@ -496,7 +496,7 @@ CONTAINS
     T%N=N
     T%ND2=ND2
     T%no=0
-    T%fix=zero
+    T%fix=0.0_dp
   END SUBROUTINE ALLOC_TREE
 
   SUBROUTINE SET_TREE(T,MA)
@@ -555,9 +555,9 @@ CONTAINS
     REAL(DP) XT(lno),XF(lnv),XM(lno+1),XX
     INTEGER JC,I,IV
 
-    XT=zero
-    XF=zero
-    XM=zero
+    XT=0.0_dp
+    XF=0.0_dp
+    XM=0.0_dp
 
     do i=1,T%ND2
        xt(i)=xi(i)
@@ -566,7 +566,7 @@ CONTAINS
        xf(i) = T%cc(i)
     enddo
 
-    XM(1) = one
+    XM(1) = 1.0_dp
     JC=T%ND2
     do i=1,(T%N-T%ND2)/T%ND2
        !
@@ -608,7 +608,7 @@ CONTAINS
        xf(i) = T%cc(i)
     enddo
 
-    XM(1) = one
+    XM(1) = 1.0_dp
     JC=T%ND2
 
     do i=1,(T%N-T%ND2)/T%ND2
@@ -684,9 +684,9 @@ CONTAINS
     if(present(n)) n1=n
     do k=1,n1
        if(.not.c_%CHECK_STABLE) return
-       XT=zero
-       XF=zero
-       XM=zero
+       XT=0.0_dp
+       XF=0.0_dp
+       XM=0.0_dp
 
        do i=1,T%ND2
           xt(i)=xi(i)
@@ -695,7 +695,7 @@ CONTAINS
           xf(i) = T%cc(i)
        enddo
 
-       XM(1) = one
+       XM(1) = 1.0_dp
        JC=T%ND2
        do i=1,(T%N-T%ND2)/T%ND2
           !
@@ -746,7 +746,7 @@ CONTAINS
           xf(i) = T%cc(i)
        enddo
 
-       XM(1) = one
+       XM(1) = 1.0_dp
        JC=T%ND2
 
        do i=1,(T%N-T%ND2)/T%ND2
@@ -826,7 +826,7 @@ CONTAINS
     call alloc(uno); call alloc(id);
 
     if(present(eps))then
-       if(eps>zero) uno%eps=eps
+       if(eps>0.0_dp) uno%eps=eps
     endif
     uno=m
     id=1
@@ -941,7 +941,7 @@ CONTAINS
     TYPE (damapspin), INTENT (IN) :: S1
     integer i,j
 
-    FULL_ABST=ZERO
+    FULL_ABST=0.0_dp
 
     do i=1,3
        do j=1,3
@@ -1076,9 +1076,9 @@ CONTAINS
     !     S%G=A_PARTICLE
     IF(R==1.or.r==2.or.r==3) THEN
        DO I=1,3    !C_%NSPIN
-          S%X(I)=ZERO
+          S%X(I)=0.0_dp
        enddo
-       S%X(r)=one
+       S%X(r)=1.0_dp
        !        write(6,*) " in EQUAL_IDENTITY_SPINOR_8"
        !        stop 888
        !       DO I=1,C_%NSPIN
@@ -1086,7 +1086,7 @@ CONTAINS
        !       ENDDO
     ELSEIF(R==0) THEN
        DO I=1,3    !C_%NSPIN
-          S%X(I)=ZERO
+          S%X(I)=0.0_dp
        enddo
     ELSE
        write(6,*) " stopped in EQUAL_IDENTITY_SPINOR_8"
@@ -1120,12 +1120,12 @@ CONTAINS
     IF(R==1.or.r==2.or.r==3) THEN
 
        DO I=1,3    !C_%NSPIN
-          S%X(I)=ZERO
+          S%X(I)=0.0_dp
        enddo
-       S%X(r)=one
+       S%X(r)=1.0_dp
     ELSEIF(R==0) THEN
        DO I=1,3   !C_%NSPIN
-          S%X(I)=ZERO
+          S%X(I)=0.0_dp
        enddo
     ELSE
        STOP 100
@@ -1143,11 +1143,11 @@ CONTAINS
     !       P%s(0)%x(n0_normal)=one
 
     DO I=1,ISPIN1R
-       P%s(i)%x=zero
-       P%s(i)%x(i)=one
+       P%s(i)%x=0.0_dp
+       P%s(i)%x(i)=1.0_dp
     enddo
     P%X=X
-    P%ac%t=zero
+    P%ac%t=0.0_dp
 
   END    subroutine EQUAL_PROBE_REAL6
 
@@ -1165,17 +1165,17 @@ CONTAINS
 
     DO I=1,3
        P%s(i)=0
-       P%s(i)%x(i)=one
+       P%s(i)%x(i)=1.0_dp
     enddo
 
     DO I=1,6
        P%X(i)=X(i)
     enddo
 
-    P%AC%X(1)=ZERO
-    P%AC%X(2)=ZERO
-    P%AC%t=ZERO
-    p%e_ij=zero
+    P%AC%X(1)=0.0_dp
+    P%AC%X(2)=0.0_dp
+    P%AC%t=0.0_dp
+    p%e_ij=0.0_dp
   END    subroutine EQUAL_PROBE8_REAL6
 
   subroutine EQUAL_PROBE8_PROBE8(P8,P)
@@ -1270,7 +1270,7 @@ CONTAINS
 
 
     P8%u=P%u
-    P8%e_ij=zero
+    P8%e_ij=0.0_dp
   END subroutine EQUAL_PROBE8_PROBE
 
   subroutine EQUAL_PROBE_PROBE8 (P,P8)
@@ -1299,7 +1299,7 @@ CONTAINS
     R%S(2)=0
     R%S(3)=0
     DO I=1,6
-       R%X(I)=zero
+       R%X(I)=0.0_dp
     ENDDO
     IF(S==1) THEN
        !      R%S(0)%x(n0_normal)=one
@@ -1325,11 +1325,11 @@ CONTAINS
     R%S(2)=0
     R%S(3)=0
     DO I=1,6  !-C_%NSPIN
-       R%X(I)=ZERO
+       R%X(I)=0.0_dp
     enddo
     IF(S==1) THEN
        DO I=1,c_%npara_fpp  !-C_%NSPIN
-          R%X(I)=ONE.MONO.I
+          R%X(I)=1.0_dp.MONO.I
        ENDDO
        !      R%S(0)%x(n0_normal)=one
        R%S(1)=1
@@ -1343,7 +1343,7 @@ CONTAINS
     ELSE
        STOP 100
     ENDIF
-    R%e_ij=zero
+    R%e_ij=0.0_dp
   END    subroutine EQUAL_IDENTITY_probe_8
 
 
@@ -1505,10 +1505,10 @@ CONTAINS
 
     DO I=1,3
        if(i1==1) then
-          DS%S%s(I,I)=ONE
+          DS%S%s(I,I)=1.0_dp
        endif
     ENDDO
-    DS%e_ij=zero
+    DS%e_ij=0.0_dp
 
   END SUBROUTINE EQUAL_DAmapSPIN_int
 
@@ -1522,7 +1522,7 @@ CONTAINS
 
 
     scdadd%u=my_false
-    scdadd%E_ij=zero
+    scdadd%E_ij=0.0_dp
 
     if(doing_ac_modulation_in_ptc) then
        dc=2
@@ -1553,7 +1553,7 @@ CONTAINS
        localmaster=master
        call ass(scdadd%x(i))
        if((c_%npara==5+dc).AND.I==5) then   ! npr
-          scdadd%x(i)=s2%x(i)+(one.mono.c_%npara)
+          scdadd%x(i)=s2%x(i)+(1.0_dp.mono.c_%npara)
        else
           scdadd%x(i)=s2%x(i)
        endif
@@ -1608,7 +1608,7 @@ CONTAINS
 
     !   call ass(daddsc)
     daddsc%u=my_false
-    daddsc%E_ij=zero
+    daddsc%E_ij=0.0_dp
 
     if(doing_ac_modulation_in_ptc) then
        dc=2
@@ -1639,7 +1639,7 @@ CONTAINS
        localmaster=master
        call ass(daddsc%x(i))
        if((c_%npara==5+dc).AND.I==5) then   ! npr
-          daddsc%x(i)=s2%x(i)+(one.mono.c_%npara)
+          daddsc%x(i)=s2%x(i)+(1.0_dp.mono.c_%npara)
        else
           daddsc%x(i)=s2%x(i)
        endif
@@ -1873,7 +1873,7 @@ CONTAINS
           call read(ds%m%v(i),mf1)
        enddo
        do i=nd2+1,c_%nd2
-          ds%m%v(i)=one.mono.i
+          ds%m%v(i)=1.0_dp.mono.i
        enddo
     endif
     READ(MF1,*) LINE
@@ -1968,7 +1968,7 @@ CONTAINS
 
 
     do i=1,3
-       ss(i,i)=ss(i,i)-one
+       ss(i,i)=ss(i,i)-1.0_dp
     enddo
     det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
     is=1
@@ -1984,7 +1984,7 @@ CONTAINS
        is=3
     endif
 
-    n0(is)=one
+    n0(is)=1.0_dp
     if(is==1) then
        n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
        n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
@@ -2032,7 +2032,7 @@ CONTAINS
 
 
     do i=1,3
-       ss(i,i)=ss(i,i)-one
+       ss(i,i)=ss(i,i)-1.0_dp
     enddo
 
     det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
@@ -2050,7 +2050,7 @@ CONTAINS
 
 
 
-    n0(is)=one
+    n0(is)=1.0_dp
     if(is==1) then
        n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
        n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
@@ -2105,7 +2105,7 @@ CONTAINS
 
 
     do i=1,3
-       ss(i,i)=ss(i,i)-one
+       ss(i,i)=ss(i,i)-1.0_dp
     enddo
 
     det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
@@ -2123,7 +2123,7 @@ CONTAINS
 
 
 
-    n0(is)=one
+    n0(is)=1.0_dp
     if(is==1) then
        n0(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
        n0(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
@@ -2211,16 +2211,16 @@ CONTAINS
     s%m=1
     sf=0
     do i=1,3
-       s%s%s(i,i)=s%s%s(i,i)-one
+       s%s%s(i,i)=s%s%s(i,i)-1.0_dp
     enddo
 
     st=s
     do i=1,nmax
        SA=SF
-       sf=sf + (one/i)*st
+       sf=sf + (1.0_dp/i)*st
        st= s*st
-       st=(-one)*st
-       SA=SA+((-one)*SF)
+       st=(-1.0_dp)*st
+       SA=SA+((-1.0_dp)*SF)
        eps1=FULL_ABS(SA)
        IF(EPS1>deps_tracking) THEN
           EPS0=EPS1
@@ -2281,7 +2281,7 @@ CONTAINS
     h_axis=(clockwise*theta)*y_axis
 
     if(present(spin_tune)) then
-       spin_tune=(one/twopi)*theta
+       spin_tune=(1.0_dp/twopi)*theta
     endif
 
     call kill(cos,sin,theta)
@@ -2321,7 +2321,7 @@ CONTAINS
     h_axis=(clockwise*theta)*y_axis
 
     if(present(spin_tune)) then
-       spin_tune=(one/twopi)*theta
+       spin_tune=(1.0_dp/twopi)*theta
     endif
 
     call kill(y_axis)
@@ -2364,15 +2364,15 @@ CONTAINS
     do i=1,nmax
        call find_exponent_only(as_y,n_expo)
        !     call dalog_spinor_8(as_y,n_expo)
-       norm2=zero
-       n_tune%x(1)=zero
-       n_tune%x(3)=zero
+       norm2=0.0_dp
+       n_tune%x(1)=0.0_dp
+       n_tune%x(3)=0.0_dp
        ! do j=1,3
        j=2     ! do loop was a theory error
        t=n_expo%x(j)
        tr=t
        call cfu(tr%cos,phase_shift,tr%cos)
-       tr%sin=zero
+       tr%sin=0.0_dp
        t=tr
        n_tune%x(j)=t
        !  enddo
@@ -2435,8 +2435,8 @@ CONTAINS
     rot_y=1
     do i=1,nmax
        call find_exponent_only(as_y,n_expo)
-       n_expo%x(1)=zero
-       n_expo%x(3)=zero
+       n_expo%x(1)=0.0_dp
+       n_expo%x(3)=0.0_dp
        temp=exp(n_expo)
        rot_y=temp*rot_y
        call inv_as(temp%s%s,temp%s%s)
@@ -2461,15 +2461,15 @@ CONTAINS
     norm1=mybig
     do i=1,nmax
        call dalog_spinor_8(as_nl,n_expo)
-       norm2=zero
-       n_tune%x(1)=zero
-       n_tune%x(3)=zero
+       norm2=0.0_dp
+       n_tune%x(1)=0.0_dp
+       n_tune%x(3)=0.0_dp
        ! do j=1,3
        j=2     ! do loop was a theory error
        t=n_expo%x(j)
        tr=t
        call cfu(tr%cos,phase_shift,tr%cos)
-       tr%sin=zero
+       tr%sin=0.0_dp
        t=tr
        n_tune%x(j)=t
        norm2=norm2+full_abs(t)
@@ -2535,14 +2535,14 @@ CONTAINS
     dh%s%s(3,1)=-h_axis%x(2)
     dh%s%s(2,3)=-h_axis%x(1)
     dhn=1
-    c=one
+    c=1.0_dp
     norm1=mybig
     do i=1,nmax
        dhn=dhn*dh
        c=c/i
        dr=ds
        ds=ds+c*dhn
-       dr=ds+(-one)*dr
+       dr=ds+(-1.0_dp)*dr
        call norm_damapspin(dr,norm2)
        if(check) then
           if(norm2<eps) then
@@ -2571,7 +2571,7 @@ CONTAINS
     real(dp) norm
     integer i,j
 
-    norm=zero
+    norm=0.0_dp
 
     do i=1,3
        do j=1,3
@@ -2587,7 +2587,7 @@ CONTAINS
     real(dp) norm
     integer i
 
-    norm=zero
+    norm=0.0_dp
 
     do i=1,3
        norm=norm+full_abs( s%x(i) )
@@ -2615,12 +2615,12 @@ CONTAINS
     endif
 
     !  put n1 in along that value
-    n1=zero
-    n1(is)=one
+    n1=0.0_dp
+    n1(is)=1.0_dp
 
     s=n2(is)*n1(is)
 
-    n=zero
+    n=0.0_dp
     do i=1,3
        n1(i)=n1(i)-s*n2(i)
        n=n1(i)**2+n
@@ -2631,7 +2631,7 @@ CONTAINS
     n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
     n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
 
-    n=zero
+    n=0.0_dp
     do i=1,3
        n=n3(i)**2+n
     enddo
@@ -2678,13 +2678,13 @@ CONTAINS
 
     !  put n1 in along that value
     do i=1,3
-       n1(i)=zero
+       n1(i)=0.0_dp
     enddo
-    n1(is)=one
+    n1(is)=1.0_dp
 
     s=n2(is)*n1(is)
 
-    n=zero
+    n=0.0_dp
     do i=1,3
        n1(i)=n1(i)-s*n2(i)
        n=n1(i)**2+n
@@ -2697,7 +2697,7 @@ CONTAINS
     n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
     n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
 
-    n=zero
+    n=0.0_dp
     do i=1,3
        n=n3(i)**2+n
     enddo
@@ -2828,9 +2828,9 @@ CONTAINS
 
     do i=1,size(a,dim=1)
        do j=1,size(a,dim=2)
-          a(i,j)=zero
+          a(i,j)=0.0_dp
        enddo
-       if(present(r)) a(i,i)=one
+       if(present(r)) a(i,i)=1.0_dp
     enddo
   end subroutine zero_33t
 
@@ -2843,9 +2843,9 @@ CONTAINS
 
     do i=1,size(a,dim=1)
        do j=1,size(a,dim=2)
-          a(i,j)=zero
+          a(i,j)=0.0_dp
        enddo
-       if(present(r)) a(i,i)=one
+       if(present(r)) a(i,i)=1.0_dp
     enddo
 
   end subroutine zero_33p
@@ -2883,7 +2883,7 @@ CONTAINS
     real(dp), optional :: sc
     real(dp) sc0
     integer i,j,k
-    sc0=one
+    sc0=1.0_dp
     allocate(a(size(m,dim=1),size(n,dim=2)))
 
     call alloc_33(a)
@@ -3035,15 +3035,15 @@ CONTAINS
 
        call matmulp(m,mt,mt)
 
-       call smatp(-half,mt,mt)
+       call smatp(-0.5_dp,mt,mt)
 
-       call smatmulp(one,mt,id,mt)
+       call smatmulp(1.0_dp,mt,id,mt)
 
        call matmulp(mt,m,m)
 
        call transpose_p(m,mt)
        call matmulp(mt,m,mt)
-       call smatmulp(-one/1.5e0_dp,id,mt,mt)
+       call smatmulp(-1.0_dp/1.5e0_dp,id,mt,mt)
        call absolute_p(mt,r)
        if(r<eps.and.doit) then
           doit=.false.
@@ -3079,8 +3079,8 @@ CONTAINS
 
     call alloc_33(mt)
 
-    r=zero
-    rt=zero
+    r=0.0_dp
+    rt=0.0_dp
     call transpose_p(m,mt)
 
     call matmulp(m,mt,mt)
@@ -3106,7 +3106,7 @@ CONTAINS
     type(real_8) m(3,3)
     real(dp) r
 
-    r=zero
+    r=0.0_dp
 
     do i=1,3
        do j=1,3
@@ -3125,7 +3125,7 @@ CONTAINS
 
     call alloc_33(mt)
 
-    call smatp(one,m,mt)
+    call smatp(1.0_dp,m,mt)
 
     do i=1,3
        do j=1,3
@@ -3232,7 +3232,7 @@ CONTAINS
     DO I=1,3
        DO J=1,3
           CALL ALLOC(D%S%s(I,J))
-          d%e_ij(i,j)=zero
+          d%e_ij(i,j)=0.0_dp
        ENDDO
     ENDDO
 
@@ -3248,7 +3248,7 @@ CONTAINS
     DO I=1,3
        DO J=1,3
           CALL KILL(D%S%s(I,J))
-          d%e_ij(i,j)=zero
+          d%e_ij(i,j)=0.0_dp
        ENDDO
     ENDDO
 
@@ -3288,7 +3288,7 @@ CONTAINS
        R%S(I)=0
     ENDDO
     CALL ALLOC(R%ac)
-    r%e_ij=zero
+    r%e_ij=0.0_dp
 
   END    subroutine ALLOC_probe_8
 
@@ -3334,7 +3334,7 @@ CONTAINS
     CALL KILL(R%X,6)
 
     CALL KILL(R%ac)
-    r%e_ij=zero
+    r%e_ij=0.0_dp
   END    subroutine KILL_probe_8
 
   subroutine kill_rf_phasor_8(R)
@@ -3398,7 +3398,7 @@ CONTAINS
     a13=(s(1,3))
 
     theta0=clockwise*atan2(a13,a11)
-    if(force_positive.and.theta0<zero) theta0 = theta0 + twopi    !!!! allow negative theta0
+    if(force_positive.and.theta0<0.0_dp) theta0 = theta0 + twopi    !!!! allow negative theta0
 
     ! at this stage the spin map is:
 
@@ -3441,7 +3441,7 @@ CONTAINS
     s=matmul(ai,a)    !
 
     theta0=clockwise*atan2(s(1,3),s(1,1))
-    if(force_positive.and.theta0<zero)  theta0 = theta0 + twopi   !!!! allow negative theta0
+    if(force_positive.and.theta0<0.0_dp)  theta0 = theta0 + twopi   !!!! allow negative theta0
 
 
   end subroutine get_spin_nx_r
@@ -3486,7 +3486,7 @@ CONTAINS
     s=matmul(ai,a)    !
 
     theta0=clockwise*atan2(s(1,3),s(1,1))
-    if(force_positive.and.theta0<zero)  theta0 = theta0 + twopi   !!!! allow negative theta0
+    if(force_positive.and.theta0<0.0_dp)  theta0 = theta0 + twopi   !!!! allow negative theta0
 
 
 
@@ -3551,7 +3551,7 @@ CONTAINS
 
     INTEGER I
 
-    dot_spinor=ZERO
+    dot_spinor=0.0_dp
 
     DO I=1,3
        dot_spinor=dot_spinor+s1%x(i)*s2%x(i)
@@ -3576,7 +3576,7 @@ CONTAINS
 
     call ass(dot_spinor_8)
 
-    dot_spinor_8=ZERO
+    dot_spinor_8=0.0_dp
 
     DO I=1,3
        dot_spinor_8=dot_spinor_8+s1%x(i)*s2%x(i)
@@ -3633,7 +3633,7 @@ CONTAINS
           enddo
        enddo
     enddo
-    call smatp(one,s,concat%s%s)
+    call smatp(1.0_dp,s,concat%s%s)
     !    concat%s0=s1%s0
 
     call concat_envelope(S2,S1,concat)
@@ -3653,8 +3653,8 @@ CONTAINS
     real(dp) s1mi(ndim2,ndim2)
     real(dp) e(ndim2,ndim2)
 
-    s1mi=zero
-    e=zero
+    s1mi=0.0_dp
+    e=0.0_dp
 
     s1mi=(s1%m.sub.1)**(-1)
 
@@ -3673,8 +3673,8 @@ CONTAINS
     real(dp) s1m(ndim2,ndim2)
     real(dp) e(ndim2,ndim2)
 
-    s1m=zero
-    e=zero
+    s1m=0.0_dp
+    e=0.0_dp
 
 
     s1m=s1%m.sub.1
@@ -3776,9 +3776,9 @@ CONTAINS
     call assp_no_master(damapspin_spinor8_mul%x(2))
     call assp_no_master(damapspin_spinor8_mul%x(3))
 
-    damapspin_spinor8_mul%x(1)=zero
-    damapspin_spinor8_mul%x(2)=zero
-    damapspin_spinor8_mul%x(3)=zero
+    damapspin_spinor8_mul%x(1)=0.0_dp
+    damapspin_spinor8_mul%x(2)=0.0_dp
+    damapspin_spinor8_mul%x(3)=0.0_dp
 
     do i=1,3
        do j=1,3
@@ -3808,9 +3808,9 @@ CONTAINS
     call assp_no_master(damapspin_spinor_mul%x(2))
     call assp_no_master(damapspin_spinor_mul%x(3))
 
-    damapspin_spinor_mul%x(1)=zero
-    damapspin_spinor_mul%x(2)=zero
-    damapspin_spinor_mul%x(3)=zero
+    damapspin_spinor_mul%x(1)=0.0_dp
+    damapspin_spinor_mul%x(2)=0.0_dp
+    damapspin_spinor_mul%x(3)=0.0_dp
 
     do i=1,3
        do j=1,3
@@ -3859,9 +3859,9 @@ CONTAINS
     call assp_no_master(spin8_mul_map%x(2))
     call assp_no_master(spin8_mul_map%x(3))
 
-    spin8_mul_map%x(1)=zero
-    spin8_mul_map%x(2)=zero
-    spin8_mul_map%x(3)=zero
+    spin8_mul_map%x(1)=0.0_dp
+    spin8_mul_map%x(2)=0.0_dp
+    spin8_mul_map%x(3)=0.0_dp
 
     do i=1,3
        if(S2%x(i)%kind==2) then
@@ -3891,9 +3891,9 @@ CONTAINS
     call assp_no_master(spin8_scal8_map%x(2))
     call assp_no_master(spin8_scal8_map%x(3))
 
-    spin8_scal8_map%x(1)=zero
-    spin8_scal8_map%x(2)=zero
-    spin8_scal8_map%x(3)=zero
+    spin8_scal8_map%x(1)=0.0_dp
+    spin8_scal8_map%x(2)=0.0_dp
+    spin8_scal8_map%x(3)=0.0_dp
 
     do i=1,3
        spin8_scal8_map%x(i)=s1*S2%x(i)
@@ -3919,9 +3919,9 @@ CONTAINS
     call assp_no_master(add_spin8_spin8%x(2))
     call assp_no_master(add_spin8_spin8%x(3))
 
-    add_spin8_spin8%x(1)=zero
-    add_spin8_spin8%x(2)=zero
-    add_spin8_spin8%x(3)=zero
+    add_spin8_spin8%x(1)=0.0_dp
+    add_spin8_spin8%x(2)=0.0_dp
+    add_spin8_spin8%x(3)=0.0_dp
 
     do i=1,3
        add_spin8_spin8%x(i)=s1%x(i)+S2%x(i)
@@ -3945,9 +3945,9 @@ CONTAINS
     call assp_no_master(mul_spin8_spin8%x(2))
     call assp_no_master(mul_spin8_spin8%x(3))
 
-    mul_spin8_spin8%x(1)=zero
-    mul_spin8_spin8%x(2)=zero
-    mul_spin8_spin8%x(3)=zero
+    mul_spin8_spin8%x(1)=0.0_dp
+    mul_spin8_spin8%x(2)=0.0_dp
+    mul_spin8_spin8%x(3)=0.0_dp
 
     mul_spin8_spin8%x(1)=s1%x(2)*S2%x(3)-s1%x(3)*S2%x(2)
     mul_spin8_spin8%x(2)=s1%x(3)*S2%x(1)-s1%x(1)*S2%x(3)
@@ -3972,9 +3972,9 @@ CONTAINS
     call assp_no_master(sub_spin8_spin8%x(2))
     call assp_no_master(sub_spin8_spin8%x(3))
 
-    sub_spin8_spin8%x(1)=zero
-    sub_spin8_spin8%x(2)=zero
-    sub_spin8_spin8%x(3)=zero
+    sub_spin8_spin8%x(1)=0.0_dp
+    sub_spin8_spin8%x(2)=0.0_dp
+    sub_spin8_spin8%x(3)=0.0_dp
 
     do i=1,3
        sub_spin8_spin8%x(i)=s1%x(i)-S2%x(i)
@@ -4054,14 +4054,14 @@ CONTAINS
     integer,dimension(:)::j
     if(.not.c_%stable_da) return
 
-    purge_transverse=one
+    purge_transverse=1.0_dp
 
 
     do i=1,c_%nd2
 
        if(i/=c_%ndpt) then
           if(j(i)/=0) then
-             purge_transverse=zero
+             purge_transverse=0.0_dp
              exit
           endif
        endif
@@ -4133,16 +4133,16 @@ CONTAINS
     D%NRES=0
     D%M=0
     D%Ms=0
-    D%s_ij0=zero
-    D%s_ijr=zero
-    D%emittance=zero
-    D%tune=zero
-    D%damping=zero
+    D%s_ij0=0.0_dp
+    D%s_ijr=0.0_dp
+    D%emittance=0.0_dp
+    D%tune=0.0_dp
+    D%damping=0.0_dp
     D%AUTO=my_true
     D%STOCHASTIC=my_false
-    D%STOCH=zero
-    D%STOCH_inv=zero
-    D%nu=zero
+    D%STOCH=0.0_dp
+    D%STOCH_inv=0.0_dp
+    D%nu=0.0_dp
 
   END    subroutine alloc_normal_spin
 
@@ -4267,7 +4267,7 @@ CONTAINS
 
        ns%theta0=clockwise*atan2(a13,a11)
        ns%nu=ns%theta0/twopi
-       if(force_positive.and.ns%theta0<zero)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
+       if(force_positive.and.ns%theta0<0.0_dp)  ns%theta0 = ns%theta0 + twopi  !!!! allow negative theta0
 
        ns%as=ns%as*a
 
@@ -4277,10 +4277,10 @@ CONTAINS
        ns%ar=1
        ns%ar%m=ns%as%m**(-1)*ns%n%a_t
 
-       ns%theta0=zero  ! arbitrary junk
-       ns%n0(1)=zero   ! arbitrary junk
-       ns%n0(2)=one    ! arbitrary junk
-       ns%n0(3)=zero   ! arbitrary junk
+       ns%theta0=0.0_dp  ! arbitrary junk
+       ns%n0(1)=0.0_dp   ! arbitrary junk
+       ns%n0(2)=1.0_dp    ! arbitrary junk
+       ns%n0(3)=0.0_dp   ! arbitrary junk
     endif
 
     call kill(a1i)
@@ -4314,15 +4314,15 @@ CONTAINS
     ci=0.0_dp
     do i=1,3
        do j=1,3
-          xj(2*i,2*i-1)=-one
-          xj(2*i-1,2*i)=one
-          c(2*i-1,2*i-1)=half
-          c(2*i-1,2*i)=half
-          c(2*i,2*i-1)=half/i_
-          c(2*i,2*i)=-half/i_
-          ci(2*i-1,2*i-1)=one
+          xj(2*i,2*i-1)=-1.0_dp
+          xj(2*i-1,2*i)=1.0_dp
+          c(2*i-1,2*i-1)=0.5_dp
+          c(2*i-1,2*i)=0.5_dp
+          c(2*i,2*i-1)=0.5_dp/i_
+          c(2*i,2*i)=-0.5_dp/i_
+          ci(2*i-1,2*i-1)=1.0_dp
           ci(2*i-1,2*i)=i_
-          ci(2*i,2*i-1)=one
+          ci(2*i,2*i-1)=1.0_dp
           ci(2*i,2*i)=-i_
        enddo
     enddo
@@ -4350,7 +4350,7 @@ CONTAINS
        enddo
     enddo
     do i=1,3
-       norm_spin%emittance(i)=sigma_inf_phasor(2*i-1,2*i)/two
+       norm_spin%emittance(i)=sigma_inf_phasor(2*i-1,2*i)/2.0_dp
     enddo
 
     sigma_inf=matmul(matmul(c,sigma_inf_phasor),ct)
@@ -4362,37 +4362,7 @@ CONTAINS
     norm_spin%tune=norm_spin%n%tune(1:3)
     norm_spin%damping=norm_spin%n%damping(1:3)
 
-    !    if(norm_spin%STOCHASTIC) then
-    !    call alloc(norm)
-    !    call alloc(m)
-    !           jb=matmul(xj,b)
-    !      xn=mat_norm(jb)
-    !      jb=jb/xn
-    !
-    !        mj=0.0_dp
-    !        xj=0.0_dp
-    !        do i=1,6
-    !         xj(i,i)=one
-    !        enddo
-    !         mj=xj
-    !        do i=1,1000
-    !         xj=matmul(xj,jb)/i
-    !         mj=mj+xj
-    !        enddo
-    !        m=mj
-    !        norm=m
-    !
-    !        ai=norm%a_t**(-1)
-    !        a = norm%a_t
-    !        b=matmul(matmul(ai,jb),a)
-    !        do i=1,3
-    !         norm_spin%kick(i)=sqrt(abs(b(2*i-1,2*i)*xn))
-    !        enddo
-    !        write(6,*) " Stochastic kick ", norm_spin%kick
-    !    call kill(norm)
-    !    call kill(m)
-    !
-    !    endif
+
 
     if(norm_spin%STOCHASTIC) then
        call diagonalise_envelope_a(bs,br,a,ai,norm_spin%kick)   !diagonalise_envelope_a(b,br,a,ai,kick)
@@ -4516,11 +4486,11 @@ CONTAINS
     dh%m=1
     h=0
     dhn=1
-    dh%s%s(1,1)=dh%s%s(1,1)-one
-    dh%s%s(2,2)=dh%s%s(2,2)-one
-    dh%s%s(3,3)=dh%s%s(3,3)-one
+    dh%s%s(1,1)=dh%s%s(1,1)-1.0_dp
+    dh%s%s(2,2)=dh%s%s(2,2)-1.0_dp
+    dh%s%s(3,3)=dh%s%s(3,3)-1.0_dp
 
-    c=one
+    c=1.0_dp
     do i=1,c_%no
        dhn=dhn*dh
        cl=c/i
@@ -4557,7 +4527,7 @@ CONTAINS
     dh%s%s(3,1)=-om(2)
     dh%s%s(2,3)=-om(1)
     dhn=1
-    c=one
+    c=1.0_dp
     do i=1,c_%no
        dhn=dhn*dh
        c=c/i
@@ -4626,11 +4596,11 @@ CONTAINS
        call test_jc(ns,jc,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-one)
+          denom=value/(exp(-i_*ang)-1.0_dp)
           omr(2)=omr(2)+ (denom.mono.jc)
        endif
     enddo
@@ -4644,11 +4614,11 @@ CONTAINS
        call test_jc(ns,jc,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
-          denom=value/(exp(-i_*ang)-one)
+          denom=value/(exp(-i_*ang)-1.0_dp)
           omr(2)=omr(2)+ i_*(denom.mono.jc)
        endif
     enddo
@@ -4663,7 +4633,7 @@ CONTAINS
        call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4680,7 +4650,7 @@ CONTAINS
        call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4699,7 +4669,7 @@ CONTAINS
        call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4716,7 +4686,7 @@ CONTAINS
        call test_jc_spin(ns,jc,clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4735,7 +4705,7 @@ CONTAINS
        call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4752,7 +4722,7 @@ CONTAINS
        call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4771,7 +4741,7 @@ CONTAINS
        call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4788,7 +4758,7 @@ CONTAINS
        call test_jc_spin(ns,jc,-clockwise,nd,doit)
 
        if(doit) then
-          ang=zero
+          ang=0.0_dp
           do j=1,nd
              ang=(jc(j*2-1)-jc(j*2))*twopi*ns%n%tune(j)+ang
           enddo
@@ -4800,8 +4770,8 @@ CONTAINS
     call kill(omc,3)
     call alloc(omc,3)
 
-    omc(1)= (omr(3)+omr(1))/two
-    omc(3)= (omr(3)-omr(1))/two/i_
+    omc(1)= (omr(3)+omr(1))/2.0_dp
+    omc(3)= (omr(3)-omr(1))/2.0_dp/i_
     omc(2)=omr(2)
 
     do i=1,3
@@ -4902,13 +4872,13 @@ CONTAINS
     real(dp) norm
 
     spin_in=.true.
-    norm=zero
+    norm=0.0_dp
     do i=1,3
        do j=1,3
           norm=norm+full_abs(DS%s%s(i,j))
        enddo
     enddo
-    norm=abs(norm-three)
+    norm=abs(norm-3.0_dp)
 
     if(norm<=eps_tpsalie) then
        write(6,*) " Spin Map is identity : not normalized "
@@ -4925,15 +4895,15 @@ CONTAINS
     real(dp) norm
 
     rad_in=.true.
-    norm=zero
+    norm=0.0_dp
     do i=1,6
        do j=1,6
           norm=norm+abs(e_ij(i,j))
        enddo
     enddo
 
-    if(norm==zero) then
-       if(global_verbose) write(6,*) " Radiation Envelope  is zero : not printed "
+    if(norm==0.0_dp) then
+       if(global_verbose) write(6,*) " Radiation Envelope  is 0.0_dp : not printed "
        rad_in=.false.
     endif
 
@@ -5029,7 +4999,7 @@ CONTAINS
     call alloc(a_temp)
 
     do i=c_%nv+1,lnv
-       x(i)=zero
+       x(i)=0.0_dp
     enddo
 
     a_temp=a_in
@@ -5203,7 +5173,7 @@ CONTAINS
     TYPE(damap), INTENT(INout) :: a_t,a_nl,a_l,a_f
     integer i,n,k,nt,j
     integer, allocatable :: jc(:)
-    real(dp) value,alpha0
+    real(dp) value,alpha0,sip
     logical doit
     TYPE(damap) atemp,s1,s1i,m1
     TYPE(taylor)a12,a11,p(ndim)
@@ -5262,18 +5232,18 @@ CONTAINS
     !   in case we have ndpt/=0
 
     if(c_%ndpt==c_%nd2-1) then   ! ptc convention
-       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(one.mono.(c_%nd2-1))
-       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(one.mono.(c_%nd2))
+       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(1.0_dp.mono.(c_%nd2))
        do i=1,c_%nd-1
           atemp%v(c_%ndpt+1)=atemp%v(c_%ndpt+1) &
-               +(atemp%v(2*i).d.c_%ndpt)*(one.mono.2*i-1)-(atemp%v(2*i-1).d.c_%ndpt)*(one.mono.2*i)
+               +(atemp%v(2*i).d.c_%ndpt)*(1.0_dp.mono.2*i-1)-(atemp%v(2*i-1).d.c_%ndpt)*(1.0_dp.mono.2*i)
        enddo
     elseif(c_%ndpt==c_%nd2) then      ! Marylie convention
-       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(one.mono.(c_%nd2-1))
-       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(one.mono.(c_%nd2))
+       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(1.0_dp.mono.(c_%nd2))
        do i=1,c_%nd-1
           atemp%v(c_%ndpt-1)=atemp%v(c_%ndpt-1) &
-               -(atemp%v(2*i).d.c_%ndpt)*(one.mono.2*i-1)+(atemp%v(2*i-1).d.c_%ndpt)*(one.mono.2*i)
+               -(atemp%v(2*i).d.c_%ndpt)*(1.0_dp.mono.2*i-1)+(atemp%v(2*i-1).d.c_%ndpt)*(1.0_dp.mono.2*i)
        enddo
     endif
 
@@ -5297,8 +5267,8 @@ CONTAINS
     !   in case we have ndpt/=0
 
     if(c_%ndpt/=0) then   ! ptc convention
-       atemp%v(c_%nd2-1)=(one.mono.(c_%nd2-1))
-       atemp%v(c_%nd2)= (one.mono.(c_%nd2))
+       atemp%v(c_%nd2-1)=(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)= (1.0_dp.mono.(c_%nd2))
 
        if(c_%ndpt==c_%nd2) then
           k=c_%nd2-1
@@ -5331,8 +5301,8 @@ CONTAINS
        s1i=1
 
        if(C_%ndpt/=0) then
-          s1%v(C_%ndpt)=one.mono.C_%ndpt
-          s1i%v(C_%ndpt)=one.mono.C_%ndpt
+          s1%v(C_%ndpt)=1.0_dp.mono.C_%ndpt
+          s1i%v(C_%ndpt)=1.0_dp.mono.C_%ndpt
        endif
 
        do i=1,nt
@@ -5340,19 +5310,21 @@ CONTAINS
           a12=a_l%v(2*i-1).d.(2*i)
           p(i)=-a12/a11
           p(i)=atan(p(i))
+          sip=a11*cos(p(i))-a12*sin(p(i))
+          if(sip<0) p(i)=p(i)+pi
           if(C_%ndpt/=0) then
              if(mod(C_%ndpt,2)==1) then
-                s1%v(C_%ndpt+1)=s1%v(C_%ndpt+1)-(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
-                s1i%v(C_%ndpt+1)=s1i%v(C_%ndpt+1)+(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+                s1%v(C_%ndpt+1)=s1%v(C_%ndpt+1)-(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+                s1i%v(C_%ndpt+1)=s1i%v(C_%ndpt+1)+(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
              else
-                s1%v(C_%ndpt-1)=s1%v(C_%ndpt-1)+(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
-                s1i%v(C_%ndpt-1)=s1i%v(C_%ndpt-1)-(p(i).d.C_%ndpt)*((one.mono.(2*i))**2+(one.mono.(2*i-1))**2)*half
+                s1%v(C_%ndpt-1)=s1%v(C_%ndpt-1)+(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+                s1i%v(C_%ndpt-1)=s1i%v(C_%ndpt-1)-(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
              endif
           endif
-          s1%v(2*i-1)=COS(p(i))*(one.mono.(2*i-1))+SIN(p(i))*(one.mono.(2*i))
-          s1%v(2*i)  =COS(p(i))*(one.mono.(2*i))-SIN(p(i))*(one.mono.(2*i-1))
-          s1i%v(2*i-1)=COS(p(i))*(one.mono.(2*i-1))-SIN(p(i))*(one.mono.(2*i))
-          s1i%v(2*i)  =COS(p(i))*(one.mono.(2*i))+SIN(p(i))*(one.mono.(2*i-1))
+          s1%v(2*i-1)=COS(p(i))*(1.0_dp.mono.(2*i-1))+SIN(p(i))*(1.0_dp.mono.(2*i))
+          s1%v(2*i)  =COS(p(i))*(1.0_dp.mono.(2*i))-SIN(p(i))*(1.0_dp.mono.(2*i-1))
+          s1i%v(2*i-1)=COS(p(i))*(1.0_dp.mono.(2*i-1))-SIN(p(i))*(1.0_dp.mono.(2*i))
+          s1i%v(2*i)  =COS(p(i))*(1.0_dp.mono.(2*i))+SIN(p(i))*(1.0_dp.mono.(2*i-1))
        enddo
        if(.not.courant_snyder) then
         s1i=1
@@ -5389,8 +5361,8 @@ CONTAINS
                 enddo
 
                 do k=nd_used*2+1,c_%nd2   !  fix coasting later
-                   vr%cos%v(k)=zero
-                   vr%sin%v(k)=zero
+                   vr%cos%v(k)=0.0_dp
+                   vr%sin%v(k)=0.0_dp
                 enddo
 
                 un%vector=vr
@@ -5404,8 +5376,8 @@ CONTAINS
              else  !  coasting
                 un%eps=-c_%no
                 un=s1
-                alpha0=one
-                if(mod(c_%ndpt,2)==0) alpha0=-one
+                alpha0=1.0_dp
+                if(mod(c_%ndpt,2)==0) alpha0=-1.0_dp
                 do i=1,c_%nd2-2
                    un%vector%v(i)=alpha0*(un%vector%v(i).d.c_%ndpt)
                 enddo
@@ -5449,8 +5421,8 @@ CONTAINS
                 enddo
 
                 do k=nd_used*2+1,c_%nd2   !  fix coasting later
-                   vr%cos%v(k)=zero
-                   vr%sin%v(k)=zero
+                   vr%cos%v(k)=0.0_dp
+                   vr%sin%v(k)=0.0_dp
                 enddo
 
                 rdf%nonlinear=vr
@@ -5463,8 +5435,8 @@ CONTAINS
                 a_nl=s1i
              else  !  coasting
                 rdf=s1
-                alpha0=one
-                if(mod(c_%ndpt,2)==0) alpha0=-one
+                alpha0=1.0_dp
+                if(mod(c_%ndpt,2)==0) alpha0=-1.0_dp
                 do i=1,c_%nd2-2
                    rdf%nonlinear%v(i)=alpha0*(rdf%nonlinear%v(i).d.c_%ndpt)
                 enddo
@@ -5514,7 +5486,7 @@ CONTAINS
        endif 
 
 
-       call matmul_nn(dt,ati,ati,sc=-one)
+       call matmul_nn(dt,ati,ati,sc=-1.0_dp)
        call matmul_nn(ati,ct,ct)
        call matmul_nn(ct,bti,ct)
        if(.not.c_%STABLE_DA) then
@@ -5526,17 +5498,17 @@ CONTAINS
        alpha=ct(1,1)
        alpha0=alpha
 
-       if(alpha0<=-one) then
+       if(alpha0<=-1.0_dp) then
         t_e=my_false
         goto 888
        endif
         
-       det=sqrt(one/(one+alpha))
+       det=sqrt(1.0_dp/(1.0_dp+alpha))
 
 
 
 
-       if(alpha0>=zero) then
+       if(alpha0>=0.0_dp) then
           COSLIKE=my_true
        else
           ! det=sqrt(one/(one-alpha))
@@ -5546,8 +5518,8 @@ CONTAINS
         CS_TE=0
        do i=1,2
           do j=1,2
-             CS_TE%v(i)=at(i,j)*(one.mono.j)/det+CS_TE%v(i)
-             CS_TE%v(i+2)=bt(i,j)*(one.mono.(j+2))/det+CS_TE%v(i+2)
+             CS_TE%v(i)=at(i,j)*(1.0_dp.mono.j)/det+CS_TE%v(i)
+             CS_TE%v(i+2)=bt(i,j)*(1.0_dp.mono.(j+2))/det+CS_TE%v(i+2)
           enddo
        enddo
  
@@ -5562,22 +5534,28 @@ CONTAINS
           ! read(5,*) un%eps
           un%eps=-c_%no
           do i=1,c_%nv
-             g%v(i)=one.mono.i
+             g%v(i)=1.0_dp.mono.i
           enddo
-          g%v(c_%ndpt)=zero
+          g%v(c_%ndpt)=0.0_dp
 
           do i=1,c_%nd2
              s1%v(i) = CS_TE%v(i)*g
           enddo
-          s1%v(c_%ndpt)=one.mono.c_%ndpt
+!          s1%v(c_%ndpt)=one.mono.c_%ndpt
+!!!!!new
+           s1%v(c_%nd2)=1.0_dp.mono.c_%nd2
+           s1%v(c_%nd2-1)=1.0_dp.mono.c_%nd2-1
+
+
+           CS_TE%v(c_%nd2)=1.0_dp.mono.c_%nd2
+           CS_TE%v(c_%nd2-1)=1.0_dp.mono.c_%nd2-1
+!!!!!
           s1i=s1**(-1)
           s1i=s1i*CS_TE    ! s1i is completely nonlinear.
           un=s1i
 
-
-
-          alpha0=one
-          if(mod(c_%ndpt,2)==0) alpha0=-one
+          alpha0=1.0_dp
+          if(mod(c_%ndpt,2)==0) alpha0=-1.0_dp
           do i=1,c_%nd2-2
              un%vector%v(i)=alpha0*(un%vector%v(i).d.c_%ndpt)
           enddo
@@ -5589,6 +5567,7 @@ CONTAINS
              s1i%v(c_%ndpt+1)=s1i%v(c_%ndpt+1)+un%pb%h
           endif
 
+   
           CS_TE=s1*s1i
 
 
@@ -5615,8 +5594,8 @@ CONTAINS
     endif
 
     if(doing_ac_modulation_in_ptc.and.present(CS_TE)) then   ! removing useless tiny numbers
-       CS_TE%v(c_%nd2-1)=one.mono.(c_%nd2-1)
-       CS_TE%v(c_%nd2)=one.mono.(c_%nd2)
+       CS_TE%v(c_%nd2-1)=1.0_dp.mono.(c_%nd2-1)
+       CS_TE%v(c_%nd2)=1.0_dp.mono.(c_%nd2)
     endif
 
     if(doflip) then
@@ -5646,6 +5625,208 @@ CONTAINS
 
   end subroutine factor_am
 
+  subroutine factor_am_special(a_t,a_f,a_l,a_nl,DR)
+    implicit none
+    TYPE(damap), INTENT(INout) :: a_t,a_nl,a_l,a_f
+    integer i,n,k,nt,j
+    integer, allocatable :: jc(:)
+    real(dp) value,alpha0
+    logical doit
+    TYPE(damap) atemp,s1,s1i,m1
+    TYPE(taylor)a12,a11,p(ndim)
+    logical(lp) doflip,dote,lagrange0
+    TYPE(damap), optional, intent(inout) ::DR
+ !   type(taylor) m(ndim2,ndim2)
+ !   type(taylor) at(2,2),bt(2,2),ct(2,2),dt(2,2),ati(2,2),bti(2,2),alpha,det
+ !   type(gmap) g
+ !   type(onelieexponent) un
+ !   type(reversedragtfinn) rdf
+ !   type(vecresonance) vr
+
+
+    lagrange0=my_false
+    if(present(dr)) lagrange0=my_true
+
+    call alloc(atemp,s1,s1i,m1)
+    call alloc(a12,a11)
+    call alloc(p,ndim)
+!    call alloc_nn(m)
+!    call alloc_nn(at)
+!    call alloc_nn(bt)
+!    call alloc_nn(ct)
+!    call alloc_nn(dt)
+!    call alloc_nn(ati)
+!    call alloc_nn(bti)
+!    call alloc(alpha,det)
+    allocate(jc(c_%nv))
+
+
+
+    if(perform_flip.and.new_ndpt.and.c_%ndpt/=0) then
+       !    write(6,*) " flipping ",c_%ndpt,c_%nd2-1
+       !    pause 7123
+
+       perform_flip=.false.
+       call flip_damap(a_t,a_t)
+       doflip=.true.
+    else
+       doflip=.false.
+    endif
+
+    atemp=1
+    do k=1,c_%nd2
+       call taylor_cycle(a_t%v(k),N)
+
+       do i=1,n
+          call taylor_cycle(a_t%v(k),ii=i,value=value,j=jc)
+          call check_fix(jc,0,doit)
+          if(doit) atemp%v(k)= atemp%v(k) + (value.mono.jc)
+       enddo
+    enddo
+
+    !   in case we have ndpt/=0
+
+    if(c_%ndpt==c_%nd2-1) then   ! ptc convention
+       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(1.0_dp.mono.(c_%nd2))
+       do i=1,c_%nd-1
+          atemp%v(c_%ndpt+1)=atemp%v(c_%ndpt+1) &
+               +(atemp%v(2*i).d.c_%ndpt)*(1.0_dp.mono.2*i-1)-(atemp%v(2*i-1).d.c_%ndpt)*(1.0_dp.mono.2*i)
+       enddo
+    elseif(c_%ndpt==c_%nd2) then      ! Marylie convention
+       atemp%v(c_%nd2-1)=atemp%v(c_%nd2-1)-(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)=atemp%v(c_%nd2)-(1.0_dp.mono.(c_%nd2))
+       do i=1,c_%nd-1
+          atemp%v(c_%ndpt-1)=atemp%v(c_%ndpt-1) &
+               -(atemp%v(2*i).d.c_%ndpt)*(1.0_dp.mono.2*i-1)+(atemp%v(2*i-1).d.c_%ndpt)*(1.0_dp.mono.2*i)
+       enddo
+    endif
+
+
+    a_f=atemp   !!!  not exact ! temporal part could be wrong!!!
+
+    a_l=a_f**(-1)*a_t
+
+    atemp=0
+    do k=1,c_%nd2
+       call taylor_cycle(a_l%v(k),N)
+
+       do i=1,n
+          call taylor_cycle(a_l%v(k),ii=i,value=value,j=jc)
+          call check_fix(jc,1,doit)
+          if(doit) atemp%v(k)= atemp%v(k) + (value.mono.jc)
+       enddo
+    enddo
+
+
+    !   in case we have ndpt/=0
+
+    if(c_%ndpt/=0) then   ! ptc convention
+       atemp%v(c_%nd2-1)=(1.0_dp.mono.(c_%nd2-1))
+       atemp%v(c_%nd2)= (1.0_dp.mono.(c_%nd2))
+
+       if(c_%ndpt==c_%nd2) then
+          k=c_%nd2-1
+       else
+          k=c_%nd2
+       endif
+
+       call taylor_cycle(a_l%v(k),N)
+
+       do i=1,n
+          call taylor_cycle(a_l%v(k),ii=i,value=value,j=jc)
+          call check_fix(jc,2,doit)
+          if(doit) atemp%v(k)= atemp%v(k) + (value.mono.jc)
+       enddo
+
+    endif
+
+    a_nl=atemp**(-1)*a_l
+    a_l=atemp
+
+!!! a_t=a_f*a_l*a_nl at this stage
+
+    !   if(present(lagrange)) then
+    if(lagrange0) then
+       !   enforce Teng-Edwards to all orders in  parameters i.e. A_12=0 and A_3_4=0 etc....
+       nt=c_%nd
+       if(C_%ndpt/=0) nt=nt-1
+
+       s1=1
+       s1i=1
+
+       if(C_%ndpt/=0) then
+          s1%v(C_%ndpt)=1.0_dp.mono.C_%ndpt
+          s1i%v(C_%ndpt)=1.0_dp.mono.C_%ndpt
+       endif
+
+       do i=1,nt
+          a11=a_l%v(2*i-1).d.(2*i-1)
+          a12=a_l%v(2*i-1).d.(2*i)
+          p(i)=-a12/a11
+          p(i)=atan(p(i))
+          if(C_%ndpt/=0) then
+             if(mod(C_%ndpt,2)==1) then
+                s1%v(C_%ndpt+1)=s1%v(C_%ndpt+1)-(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+                s1i%v(C_%ndpt+1)=s1i%v(C_%ndpt+1)+(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+             else
+                s1%v(C_%ndpt-1)=s1%v(C_%ndpt-1)+(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+                s1i%v(C_%ndpt-1)=s1i%v(C_%ndpt-1)-(p(i).d.C_%ndpt)*((1.0_dp.mono.(2*i))**2+(1.0_dp.mono.(2*i-1))**2)*0.5_dp
+             endif
+          endif
+          s1%v(2*i-1)=COS(p(i))*(1.0_dp.mono.(2*i-1))+SIN(p(i))*(1.0_dp.mono.(2*i))
+          s1%v(2*i)  =COS(p(i))*(1.0_dp.mono.(2*i))-SIN(p(i))*(1.0_dp.mono.(2*i-1))
+          s1i%v(2*i-1)=COS(p(i))*(1.0_dp.mono.(2*i-1))-SIN(p(i))*(1.0_dp.mono.(2*i))
+          s1i%v(2*i)  =COS(p(i))*(1.0_dp.mono.(2*i))+SIN(p(i))*(1.0_dp.mono.(2*i-1))
+       enddo
+       if(.not.courant_snyder) then
+        s1i=1
+        s1=1
+       endif
+       a_nl=s1i*a_nl*s1
+       a_l=a_l*s1
+       dr=s1i
+       !       a_t_cs= a_f*a_l_cs* a_nl     ! a_nl is not yet " standard "
+!!!!!   nonlinear part if s1i !!!!!!
+
+
+
+!!!!
+    endif   ! it (te)
+ 
+
+
+
+    if(lagrange0) then
+       a_t=a_f*a_l*a_nl
+    endif
+
+
+    if(doflip) then
+       call flip_damap(a_t,a_t)
+       call flip_damap(a_nl,a_nl)
+       call flip_damap(a_l,a_l)
+       call flip_damap(a_f,a_f)
+       if(present(dr))  call flip_damap(dr,dr)
+
+       perform_flip=.true.
+    endif
+
+    deallocate(jc)
+    call kill(atemp,s1,s1i,m1)
+    call kill(a12,a11)
+    call kill(p,ndim)
+!    call kill_nn(m)
+!    call kill_nn(at)
+!    call kill_nn(bt)
+!    call kill_nn(ct)
+!    call kill_nn(dt)
+!    call kill_nn(ati)
+!    call kill_nn(bti)
+!    call kill(alpha,det)
+
+
+  end subroutine factor_am_special
 
   subroutine int_partial(v,h,nd0)
     implicit none
@@ -5709,12 +5890,12 @@ CONTAINS
     integer,dimension(:)::j
     if(.not.c_%stable_da) return
 
-    dlie=zero
+    dlie=0.0_dp
     do i=1,nd_used
        dlie=REAL(j(2*i-1)+j(2*i),kind=DP)+dlie
     enddo
-    dlie=dlie+one
-    dlie=one/dlie
+    dlie=dlie+1.0_dp
+    dlie=1.0_dp/dlie
     return
   end function dlie
 
@@ -5729,7 +5910,7 @@ CONTAINS
 
     t=-decal
     tu=0
-    dphase=zero
+    dphase=0.0_dp
     do i=1,nd_used
        t=abs(j(2*i-1)-j(2*i))+t
     enddo
@@ -5740,9 +5921,9 @@ CONTAINS
        else
           tu=tu+1
        endif
-       if(tu==0) dphase=-one
+       if(tu==0) dphase=-1.0_dp
     else
-       if(t==0) dphase=-one
+       if(t==0) dphase=-1.0_dp
     endif
 
     return
@@ -5759,12 +5940,12 @@ CONTAINS
     if(c_%ndpt/=0) nd=nd-1
 
 
-    phase_shift=zero
+    phase_shift=0.0_dp
     t=0
     do i=1,nd
        t=abs(j(2*i-1)-j(2*i))+t
     enddo
-    if(t==0) phase_shift=one
+    if(t==0) phase_shift=1.0_dp
 
     return
   end function phase_shift
@@ -5875,14 +6056,14 @@ CONTAINS
     tr%sin=H_RES%X(3)%t%i
     t=tr
     H%X(2)=morph(t)
-    c=(H_RES%X(1)+H_RES%X(2))/two
+    c=(H_RES%X(1)+H_RES%X(2))/2.0_dp
 
     tr%cos=c%r
     tr%sin=c%i
     t=tr
     H%X(1)=morph(t)
 
-    c=i_*(H_RES%X(1)-H_RES%X(2))/two
+    c=i_*(H_RES%X(1)-H_RES%X(2))/2.0_dp
 
     tr%cos=c%r
     tr%sin=c%i
@@ -5925,8 +6106,8 @@ CONTAINS
 
     nc=ns%a_t**(-1)*ds*ns%a_t
 
-    h%h=muc*((one.mono.'002')+(one.mono.'0002'))/two
-    h%h=h%h+muc*((one.mono.'2')+(one.mono.'02'))/two
+    h%h=muc*((1.0_dp.mono.'002')+(1.0_dp.mono.'0002'))/2.0_dp
+    h%h=h%h+muc*((1.0_dp.mono.'2')+(1.0_dp.mono.'02'))/2.0_dp
 
     nc%m=texp(h,nc%m)
 
@@ -5935,7 +6116,7 @@ CONTAINS
     !     nf=nc%m
 
     uno=nc%m
-    uno%pb%h=uno%pb%h-muc*((one.mono.'2')+(one.mono.'02'))/two
+    uno%pb%h=uno%pb%h-muc*((1.0_dp.mono.'2')+(1.0_dp.mono.'02'))/2.0_dp
     tr=uno%pb%h
 
     call print(ns%theta0,6)
@@ -5944,7 +6125,7 @@ CONTAINS
     !    a13=(s(1,3))
 
     theta0=atan2(nc%s%s(1,3),nc%s%s(1,1))
-    if((theta0.sub.'0')<zero) theta0 = theta0 + twopi
+    if((theta0.sub.'0')<0.0_dp) theta0 = theta0 + twopi
 
     theta0r=theta0
 
@@ -6035,7 +6216,7 @@ CONTAINS
 
 
     fq=F*A
-    fq%sin=zero
+    fq%sin=0.0_dp
 
     call taylor_cycle(fq%cos,size=n)
 
@@ -6154,7 +6335,7 @@ CONTAINS
     integer ju(:),nv
     integer i,k,no
     
-    mul_fac=one
+    mul_fac=1.0_dp
     if(firstfac) then
      call make_fac
      firstfac=.false.
@@ -6178,11 +6359,11 @@ CONTAINS
 
 end function mul_fac
 
-subroutine make_fac
+subroutine make_fac()
     implicit none
     integer i
 
-    fac(0)=one
+    fac(0)=1.0_dp
     do i=1,nfac
     fac(i)=i*fac(i-1)
     enddo

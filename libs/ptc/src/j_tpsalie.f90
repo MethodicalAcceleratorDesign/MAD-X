@@ -282,7 +282,7 @@ contains
     localmaster=master
     call ass(mul_PBf_t)
 
-    mul_PBf_t=zero
+    mul_PBf_t=0.0_dp
 
     mul_PBf_t=s1%h.pb.s2
 
@@ -300,7 +300,7 @@ contains
 
     call ass(mul_VECf_t)
 
-    mul_VECf_t=zero
+    mul_VECf_t=0.0_dp
 
     do i=1,c_%nd2
        mul_VECf_t=mul_VECf_t+s1%v(i)*(s2.d.i)
@@ -816,8 +816,8 @@ contains
     INTEGER I
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    DABSMAP=zero
-    R1=zero
+    DABSMAP=0.0_dp
+    R1=0.0_dp
     ! if(old) then
     if(s1%V(1)%i==0) call crap1("DABSMAP 1")  !call etall(s1%V%i,ND2)
 
@@ -1140,9 +1140,9 @@ contains
 
     do i=1,s2%n
        if(s1==1) then
-          s2%v(i)=one.mono.i
+          s2%v(i)=1.0_dp.mono.i
        else
-          s2%v(i)=zero
+          s2%v(i)=0.0_dp
 
        endif
     enddo
@@ -1158,14 +1158,14 @@ contains
     integer i
     IF(.NOT.C_%STABLE_DA) RETURN
     do i=1,ndim2
-       zero_(i)=zero
+       zero_(i)=0.0_dp
     enddo
     ! if(old) then
     if(s2%V(1)%i==0) call crap1("zeroEQUALMAP 1") !call etall(s2%V%i,ND2)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("zeroEQUALMAP 2") !call newetall(s2%V%j,ND2)
     !    endif
-    IF(S1.EQ.zero) s2=zero_
+    IF(S1.EQ.0.0_dp) s2=zero_
   END SUBROUTINE zeroEQUALMAP
 
 
@@ -1195,7 +1195,7 @@ contains
 
     ! if(old) then
     if(s2%V(1)%i==0) call crap1("EQUALvecpb 1")  !call etall(s2%V%i,ND2)
-    CALL DIFD(S1%h%i,S2%v%i,-one)
+    CALL DIFD(S1%h%i,S2%v%i,-1.0_dp)
     !    else
     !       if(.NOT. ASSOCIATED(s2%V(1)%J%r)) call crap1("EQUALvecpb 2")  !call newetall(s2%V%j,ND2)
     !       CALL NEWDIFD(S1%h%J,S2%v%J,-one)
@@ -1214,7 +1214,7 @@ contains
 
     ! if(old) then
     if(s2%h%i==0) call crap1("EQUALpbvec 1")  !call etall1(s2%h%i)
-    CALL intd(S1%v%i,s2%h%i,-one)
+    CALL intd(S1%v%i,s2%h%i,-1.0_dp)
     !    else
     !       if(.NOT. ASSOCIATED(s2%h%J%r)) call crap1("EQUALpbvec 2")  !call newetall(s2%h%J,1)
     !       CALL NEWintd(S1%v%J,s2%h%J,-one)
@@ -1473,10 +1473,10 @@ contains
     real(dp) pushmatrixr(ndim2) ,junk(ndim2)
     integer i,j
 
-    pushmatrixr=zero
+    pushmatrixr=0.0_dp
 
     do i=1,nd2
-       junk(i)=zero
+       junk(i)=0.0_dp
     enddo
     do i=1,nd2
        do j=1,nd2
@@ -1566,8 +1566,8 @@ contains
 
 
     do i=1,ndim2
-       v1(i)=zero
-       zero_(i)=zero
+       v1(i)=0.0_dp
+       zero_(i)=0.0_dp
     enddo
     t1=s1;t2=s2;
     v1=s1     ! change oct 2004.10
@@ -1601,8 +1601,8 @@ contains
     call alloc(t1,S1%n);call alloc(t2,S1%n);call alloc(tempnew,S1%n);
 
 
-    v1=zero
-    zero_=zero
+    v1=0.0_dp
+    zero_=0.0_dp
 
     t1=s1;t2=s2;
     v1=s2
@@ -1702,7 +1702,7 @@ contains
     call assdamap(trxflow)
 
     do i=1,nd2
-       zero_(i)=zero
+       zero_(i)=0.0_dp
     enddo
     s22=s2
     s22=zero_
@@ -1761,7 +1761,7 @@ contains
 
 
     do i=1,nd2
-       zero_(i)=zero
+       zero_(i)=0.0_dp
     enddo
 
 
@@ -1807,7 +1807,7 @@ contains
     allocate(zero_(S22%n))
 
     do i=1,S22%n
-       zero_(i)=zero
+       zero_(i)=0.0_dp
     enddo
 
 
@@ -1958,7 +1958,7 @@ contains
     call assdamap(explieflo)
     call alloc(tempnew)
     if(s1%ifac/=0) then
-       explieflo=texpdf( S1, S2,2,no1,one,s1%ifac )
+       explieflo=texpdf( S1, S2,2,no1,1.0_dp,s1%ifac )
        !         write(6,*) "Improper usage: map is factorized "
        !     write(6,*) "Sorry, we will implement in later version "
        !     write(6,*) "Use a Dragt-Finn or Reverse-Dragt-Finn scratch variable "
@@ -1993,7 +1993,7 @@ contains
     call assdamap(expflot)
 
     if(s1%ifac/=0) then
-       expflot=texpdft( S1, S2,2,no1,one,s1%ifac )
+       expflot=texpdft( S1, S2,2,no1,1.0_dp,s1%ifac )
        !         write(6,*) "Improper usage: map is factorized "
        !    write(6,*) "Sorry, we will implement in later version "
        !     write(6,*) "Use a Dragt-Finn or Reverse-Dragt-Finn scratch variable "
@@ -2073,7 +2073,7 @@ contains
     call assdamap(ADDMAP)
 
     ! if(old) then
-    call DALIND(s1%v%i,one,s2%v%i,one,ADDMAP%v%i)
+    call DALIND(s1%v%i,1.0_dp,s2%v%i,1.0_dp,ADDMAP%v%i)
     !   else
     !      call newDALIND(s1%v%j,one,s2%v%j,one,ADDMAP%v%j)
     !   endif
@@ -2096,7 +2096,7 @@ contains
     call assdamap(SUBMAP)
 
     ! if(old) then
-    call DALIND(s1%v%i,one,s2%v%i,-one,SUBMAP%v%i)
+    call DALIND(s1%v%i,1.0_dp,s2%v%i,-1.0_dp,SUBMAP%v%i)
     !   else
     !      call newDALIND(s1%v%j,one,s2%v%j,-one,SUBMAP%v%j)
     !   endif
@@ -2428,7 +2428,7 @@ contains
     ENDIF
 
     do i=1,s1%n
-       s0%v(i)=(one.mono.i)-v(i)
+       s0%v(i)=(1.0_dp.mono.i)-v(i)
        !s11%v(i)=s11%v(i)-(s11%v(i).sub.'0')
     enddo
 
@@ -2510,19 +2510,19 @@ contains
     if(present(orthogonal)) then
        if(orthogonal) then
           do i=1,nd
-             xj(2*i-1,2*i-1)=one
-             xj(2*i,2*i)=one
+             xj(2*i-1,2*i-1)=1.0_dp
+             xj(2*i,2*i)=1.0_dp
           enddo
        else
           do i=1,nd
-             xj(2*i-1,2*i)=one
-             xj(2*i,2*i-1)=-one
+             xj(2*i-1,2*i)=1.0_dp
+             xj(2*i,2*i-1)=-1.0_dp
           enddo
        endif
     else
        do i=1,nd
-          xj(2*i-1,2*i)=one
-          xj(2*i,2*i-1)=-one
+          xj(2*i-1,2*i)=1.0_dp
+          xj(2*i,2*i-1)=-1.0_dp
        enddo
     endif
     xj= MATMUL( transpose(mat),MATMUL(xj,mat))

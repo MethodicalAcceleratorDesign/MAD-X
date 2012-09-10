@@ -276,7 +276,7 @@ contains
 
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
@@ -298,9 +298,9 @@ contains
        D=EL%L/EL%P%NST
 
        DK1=D*FK1
-       D1=DK1/two
+       D1=DK1/2.0_dp
        DK2=D*FK2
-       D2=DK2/two
+       D2=DK2/2.0_dp
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
        ELSE
@@ -335,7 +335,7 @@ contains
     CASE(6)
        DO j =1,4
           DK(j)=EL%L*YOSK(J)/EL%P%NST
-          DF(j)=DK(j)/two
+          DF(j)=DK(j)/2.0_dp
        ENDDO
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
@@ -415,7 +415,7 @@ contains
     !    CALL SET_W(EL%W)
     SELECT CASE(EL%P%METHOD)
     CASE(2)
-       DH=EL%L/two/EL%P%NST
+       DH=EL%L/2.0_dp/EL%P%NST
        D=EL%L/EL%P%NST
 
        IF(EL%P%DIR==1) THEN
@@ -437,9 +437,9 @@ contains
        D=EL%L/EL%P%NST
 
        DK1=D*FK1
-       D1=DK1/two
+       D1=DK1/2.0_dp
        DK2=D*FK2
-       D2=DK2/two
+       D2=DK2/2.0_dp
 
        IF(EL%P%DIR==1) THEN
           Z=(i-1)*d
@@ -475,7 +475,7 @@ contains
     CASE(6)
        DO j =1,4
           DK(j)=EL%L*YOSK(J)/EL%P%NST
-          DF(j)=DK(j)/two
+          DF(j)=DK(j)/2.0_dp
        ENDDO
        D=EL%L/EL%P%NST
        IF(EL%P%DIR==1) THEN
@@ -736,8 +736,8 @@ contains
     TYPE(SAGAN), INTENT(INOUT)::EL
 
     ALLOCATE(EL%INTERNAL(3))
-    EL%INTERNAL=zero
-    EL%INTERNAL(3)=one
+    EL%INTERNAL=0.0_dp
+    EL%INTERNAL(3)=1.0_dp
     ALLOCATE(EL%W)
     !CALL POINTERS_W(EL%W)
     el%w=0
@@ -772,10 +772,10 @@ contains
     ALLOCATE(EL%offset)
     ALLOCATE(EL%FORM(N))
     ALLOCATE(EL%K(3,N))
-    EL%K=zero
-    EL%A=zero
-    EL%F=zero
-    EL%offset=zero
+    EL%K=0.0_dp
+    EL%A=0.0_dp
+    EL%F=0.0_dp
+    EL%offset=0.0_dp
     EL%FORM=0
 
   END SUBROUTINE INIT_SAGAN_POINTERS
@@ -808,7 +808,7 @@ contains
     IMPLICIT NONE
     TYPE(SAGANP), INTENT(INOUT)::EL
     CALL ALLOC(EL%INTERNAL,3)
-    EL%INTERNAL(3)=one
+    EL%INTERNAL(3)=1.0_dp
     ! CALL ALLOC(EL%W)
     ! ALLOC INTERNAL POLYMORPHS IF ANY
   END SUBROUTINE ALLOC_SAGAN
@@ -996,12 +996,12 @@ contains
        X(2)=X(2)-A
        X(4)=X(4)-AP
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL  COMPX(EL,Z,X,A,AP)
        X(2)=X(2)+A
@@ -1011,12 +1011,12 @@ contains
        X(2)=X(2)-BP
        X(4)=X(4)-B
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL  COMPY(EL,Z,X,B,BP)
        X(2)=X(2)+BP
@@ -1039,12 +1039,12 @@ contains
        X(2)=X(2)-A
        X(4)=X(4)-AP
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(1)=X(1)+L*X(2)/pz
-          X(6)=X(6)+((X(2)*X(2))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(2)*X(2))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(1)=X(1)+L*X(2)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(2)*X(2))/two/(one+X(5))
+          X(1)=X(1)+L*X(2)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(2)*X(2))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL  COMPX(EL,Z,X,A,AP)
        X(2)=X(2)+A
@@ -1054,12 +1054,12 @@ contains
        X(2)=X(2)-BP
        X(4)=X(4)-B
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%BETA0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)
           X(3)=X(3)+L*X(4)/pz
-          X(6)=X(6)+((X(4)*X(4))/two/pz**2)*(one/EL%P%BETA0+x(5))*L/pz
+          X(6)=X(6)+((X(4)*X(4))/2.0_dp/pz**2)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          X(3)=X(3)+L*X(4)/(one+X(5))
-          X(6)=X(6)+(L/(one+X(5)))*(X(4)*X(4))/two/(one+X(5))
+          X(3)=X(3)+L*X(4)/(1.0_dp+X(5))
+          X(6)=X(6)+(L/(1.0_dp+X(5)))*(X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
        CALL  COMPY(EL,Z,X,B,BP)
        X(2)=X(2)+BP
@@ -1080,20 +1080,20 @@ contains
     ! ETIENNE
     IF(EL%P%EXACT) THEN
        if(k%TIME) then
-          PZ=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=ROOT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ0=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
+          X(6)=X(6)+L*(1.0_dp/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
        else
-          PZ=ROOT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PZ0=1.0_dp+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*L
+          X(6)=X(6)+L*(1.0_dp+x(5))*PZ+k%TOTALPATH*L
        endif
     ELSE
        if(k%TIME) then
@@ -1116,20 +1116,20 @@ contains
     IF(EL%P%EXACT) THEN
        CALL ALLOC(PZ,PZ0)
        if(k%TIME) then
-          PZ=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=SQRT(one+two*X(5)/EL%P%beta0+x(5)**2)
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ0=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
 
-          X(6)=X(6)+L*(one/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
+          X(6)=X(6)+L*(1.0_dp/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
        else
-          PZ=SQRT((one+X(5))**2-X(2)**2-X(4)**2)
-          PZ0=one+X(5)
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PZ0=1.0_dp+X(5)
           PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
           X(1)=X(1)+L*X(2)*PZ
           X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(one+x(5))*PZ+k%TOTALPATH*L
+          X(6)=X(6)+L*(1.0_dp+x(5))*PZ+k%TOTALPATH*L
        endif
        CALL KILL(PZ,PZ0)
     ELSE
@@ -1149,9 +1149,9 @@ contains
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: A,B
-    A=zero
+    A=0.0_dp
     A=A*EL%P%CHARGE*el%internal(3)
-    B=zero
+    B=0.0_dp
     B=A*EL%P%CHARGE*el%internal(3)
   END SUBROUTINE COMPX_R
 
@@ -1161,9 +1161,9 @@ contains
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: A,B
-    A=zero
+    A=0.0_dp
     A=A*EL%P%CHARGE*el%internal(3)
-    B=zero
+    B=0.0_dp
     B=A*EL%P%CHARGE*el%internal(3)
   END SUBROUTINE COMPX_P
 
@@ -1175,23 +1175,23 @@ contains
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: A,B
     INTEGER I
-    A=zero
-    B=zero
+    A=0.0_dp
+    B=0.0_dp
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN
           A = -EL%W%K(3,i)*X(1)*X(3) * SINX_X(EL%W%K(1,i)*X(1)) * SINeHX_X(EL%W%K(2,i)*X(3)) * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + A
-          B = -half*EL%W%K(3,i)*X(3)**2 * COS(EL%W%K(1,i)*X(1)) * (SINeHX_X(EL%W%K(2,i)*X(3)*half))**2 * &
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COS(EL%W%K(1,i)*X(1)) * (SINeHX_X(EL%W%K(2,i)*X(3)*0.5_dp))**2 * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + B
        elseif (EL%W%FORM(I) == hyperbolic_xydollar) THEN
           A = -EL%W%K(3,i)*X(1)*X(3) * SINeHX_X(EL%W%K(1,i)*X(1)) * SINeHX_X(EL%W%K(2,i)*X(3)) * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + A
-          B = -half*EL%W%K(3,i)*X(3)**2 * COSeH(EL%W%K(1,i)*X(1)) * (SINeHX_X(EL%W%K(2,i)*X(3)*half))**2 * &
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COSeH(EL%W%K(1,i)*X(1)) * (SINeHX_X(EL%W%K(2,i)*X(3)*0.5_dp))**2 * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + B
        elseif (EL%W%FORM(I) == hyperbolic_xdollar) THEN
           A = -EL%W%K(3,i)*X(1)*X(3) * SINeHX_X(EL%W%K(1,i)*X(1)) * SINX_X(EL%W%K(2,i)*X(3)) * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + A
-          B = -half*EL%W%K(3,i)*X(3)**2 * COSeH(EL%W%K(1,i)*X(1)) * (SINX_X(EL%W%K(2,i)*X(3)*half))**2 * &
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COSeH(EL%W%K(1,i)*X(1)) * (SINX_X(EL%W%K(2,i)*X(3)*0.5_dp))**2 * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + B
        else
           print *, 'ERROR IN COMPY_R: UNKNOWN FORM FOR WIGGLER TERM!'
@@ -1210,8 +1210,8 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: A,B
     INTEGER I
     TYPE(REAL_8) s1,s2,s3
-    A=zero
-    B=zero
+    A=0.0_dp
+    B=0.0_dp
     call alloc(s1,s2,s3)
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN
@@ -1219,18 +1219,18 @@ contains
           s2=EL%W%K(2,i)*X(3)
           s3=EL%W%K(3,i)*Z+EL%W%F(I)
           A = -EL%W%K(3,i)*X(1)*X(3) * SINX_X(s1) * SINHX_X(s2) * SIN(s3) * EL%W%A(I) + A
-          s2=s2*half
-          B = -half*EL%W%K(3,i)*X(3)**2 * COS(s1) * (SINHX_X(s2))**2 * &
+          s2=s2*0.5_dp
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COS(s1) * (SINHX_X(s2))**2 * &
                SIN(s3) * EL%W%A(I) + B
        elseif (EL%W%FORM(I) == hyperbolic_xydollar) THEN
           A = -EL%W%K(3,i)*X(1)*X(3) * SINHX_X(EL%W%K(1,i)*X(1)) * SINHX_X(EL%W%K(2,i)*X(3)) * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + A
-          B = -half*EL%W%K(3,i)*X(3)**2 * COSH(EL%W%K(1,i)*X(1)) * (SINHX_X(EL%W%K(2,i)*X(3)*half))**2 * &
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COSH(EL%W%K(1,i)*X(1)) * (SINHX_X(EL%W%K(2,i)*X(3)*0.5_dp))**2 * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + B
        elseif (EL%W%FORM(I) == hyperbolic_xdollar) THEN
           A = -EL%W%K(3,i)*X(1)*X(3) * SINHX_X(EL%W%K(1,i)*X(1)) * SINX_X(EL%W%K(2,i)*X(3)) * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + A
-          B = -half*EL%W%K(3,i)*X(3)**2 * COSH(EL%W%K(1,i)*X(1)) * (SINX_X(EL%W%K(2,i)*X(3)*half))**2 * &
+          B = -0.5_dp*EL%W%K(3,i)*X(3)**2 * COSH(EL%W%K(1,i)*X(1)) * (SINX_X(EL%W%K(2,i)*X(3)*0.5_dp))**2 * &
                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) * EL%W%A(I) + B
        else
           print *, 'ERROR IN COMPY_P: UNKNOWN FORM FOR WIGGLER TERM!'
@@ -1251,8 +1251,8 @@ contains
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: A,B
     INTEGER I
-    A=zero
-    B=zero
+    A=0.0_dp
+    B=0.0_dp
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN
           A = -COS(EL%W%K(1,i)*X(1)) * COSeH(EL%W%K(2,i)*X(3)) * &
@@ -1288,8 +1288,8 @@ contains
     INTEGER I
     TYPE(REAL_8) s1,s2,s3
     call alloc(s1,s2,s3)
-    A=zero
-    B=zero
+    A=0.0_dp
+    B=0.0_dp
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN
           s1=EL%W%K(1,i)*X(1)
@@ -1325,7 +1325,7 @@ contains
     real(dp),INTENT(INOUT):: B
     INTEGER I
 
-    B=zero
+    B=0.0_dp
 
     DO I=1,SIZE(EL%W%A)
        B= (SIN(EL%W%K(3,i)*EL%L+EL%W%F(I))-SIN(EL%W%F(I)))*EL%W%A(I)/EL%W%K(3,i)+B
@@ -1341,7 +1341,7 @@ contains
     real(dp),INTENT(IN):: Z
     real(dp),INTENT(INOUT):: B(3)
     INTEGER I
-    B=zero
+    B=0.0_dp
 
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN
@@ -1384,7 +1384,7 @@ contains
     TYPE(REAL_8),INTENT(IN):: Z
     TYPE(REAL_8),INTENT(INOUT):: B(3)
     INTEGER I
-    B(1)=zero;B(2)=zero;B(3)=zero;
+    B(1)=0.0_dp;B(2)=0.0_dp;B(3)=0.0_dp;
 
     DO I=1,SIZE(EL%W%A)
        if (EL%W%FORM(I) == hyperbolic_ydollar) THEN

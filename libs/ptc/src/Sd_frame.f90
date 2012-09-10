@@ -120,8 +120,8 @@ CONTAINS
        P%EXI=global_FRAME
     else
        ALLOCATE(P%ANGLE(3));ALLOCATE(P%D(3));
-       P%D=ZERO
-       P%ANGLE=ZERO
+       P%D=0.0_dp
+       P%ANGLE=0.0_dp
     endif
 
   end subroutine alloc_af
@@ -256,13 +256,13 @@ CONTAINS
        ALLOCATE(F%A_T,F%B_T)
        ALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        ALLOCATE(F%TIME,F%ENERGY,F%PATCH)
-       F%A_T=zero
-       F%B_T=zero
+       F%A_T=0.0_dp
+       F%B_T=0.0_dp
        F%A_X1=1; F%A_X2=1; F%B_X1=1; F%B_X2=1;
-       F%A_D=zero
-       F%B_D=zero
-       F%A_ANG=zero
-       F%B_ANG=zero
+       F%A_D=0.0_dp
+       F%B_D=0.0_dp
+       F%A_ANG=0.0_dp
+       F%B_ANG=0.0_dp
        f%patch=0
        f%ENERGY=0
        f%TIME=0
@@ -305,10 +305,10 @@ CONTAINS
        !         F%L=zero
        !         F%ALPHA=zero
        !         F%A_XY=zero
-       F%Ang_in=zero
-       F%d_in=zero
-       F%Ang_out=zero
-       F%d_out=zero
+       F%Ang_in=0.0_dp
+       F%d_in=0.0_dp
+       F%Ang_out=0.0_dp
+       F%d_out=0.0_dp
        IF(associated(f%f)) THEN   ! R==1.and.
           F%f%ENT=global_frame
           F%f%EXI=global_frame
@@ -343,10 +343,10 @@ CONTAINS
        !         F%L=zero
        !         F%ALPHA=zero
        !         F%A_XY=zero
-       F%Ang_in=zero
-       F%d_in=zero
-       F%Ang_out=zero
-       F%d_out=zero
+       F%Ang_in=0.0_dp
+       F%d_in=0.0_dp
+       F%Ang_out=0.0_dp
+       F%d_out=0.0_dp
        IF(associated(f%f)) THEN   ! R==1.and.
           F%f%ENT=global_frame
           F%f%EXI=global_frame
@@ -393,7 +393,7 @@ CONTAINS
     real(dp) T(3)
     INTEGER L,K,N
     T=A
-    B=ZERO
+    B=0.0_dp
     DO L=1,3
        DO N=1,3
           DO K=1,3
@@ -414,7 +414,7 @@ CONTAINS
     INTEGER, INTENT(IN):: I
     real(dp) B(3)
     INTEGER J,K
-    B=zero
+    B=0.0_dp
     DO J=1,3
        DO K=1,3
           B(K)=D(J)*ENT(J,K)+B(K)
@@ -434,7 +434,7 @@ CONTAINS
     real(dp) V(3)
     real(dp), optional, INTENT(IN):: basis(3,3)
 
-    v=zero
+    v=0.0_dp
     CALL GEO_ROT(ENT,V,ANG,i,basis)
 
   END SUBROUTINE GEO_ROTA_no_vec
@@ -457,7 +457,7 @@ CONTAINS
        CALL GEO_ROT(ENT0,ENT,Aa,A,ANG,basis)
     ELSE
        DO J=1,3
-          AT=ZERO;AT(J)=-ANG(J);
+          AT=0.0_dp;AT(J)=-ANG(J);
           CALL GEO_ROT(ENT0,ENT,Aa,A,AT,basis)
        ENDDO
     ENDIF
@@ -474,8 +474,8 @@ CONTAINS
     real(dp), optional, INTENT(IN):: basis(3,3)
 
 
-    v=zero
-    vv=zero
+    v=0.0_dp
+    vv=0.0_dp
 
     CALL GEO_ROT(ENT,Exi,VV,V,ANG,basis)    !A_X2,A_X1,A_xy,
 
@@ -555,9 +555,9 @@ CONTAINS
     implicit none
     real(dp), INTENT(INOUT):: r(3,3)
     real(dp), INTENT(IN):: a
-    r=zero
+    r=0.0_dp
 
-    r(1,1)= one
+    r(1,1)= 1.0_dp
 
     r(2,2)=cos(a)
     r(3,3)=cos(a)
@@ -570,9 +570,9 @@ CONTAINS
     implicit none
     real(dp), INTENT(INOUT):: r(3,3)
     real(dp), INTENT(IN):: a
-    r=zero
+    r=0.0_dp
 
-    r(2,2)= one
+    r(2,2)= 1.0_dp
 
     r(1,1)=cos(a)
     r(3,3)=cos(a)
@@ -585,9 +585,9 @@ CONTAINS
     implicit none
     real(dp), INTENT(INOUT):: r(3,3)
     real(dp), INTENT(IN):: a
-    r=zero
+    r=0.0_dp
 
-    r(3,3)= one
+    r(3,3)= 1.0_dp
 
     r(1,1)=cos(a)
     r(2,2)=cos(a)
@@ -613,10 +613,10 @@ CONTAINS
     ! Original order now changed was xy,xz,yz
     ! TRANSPOSED OF GEO_ROTB
 
-    exii(:,:)=zero
-    enti(:,:)=zero
-    exii(:,:)=zero
-    temp(:,:)=zero
+    exii(:,:)=0.0_dp
+    enti(:,:)=0.0_dp
+    exii(:,:)=0.0_dp
+    temp(:,:)=0.0_dp
 
 
     call make_rot_z(enti,ANG(3))
@@ -624,9 +624,9 @@ CONTAINS
     if(present(basis)) then
        basist=basis
     else
-       basist=zero
+       basist=0.0_dp
        do i=1,3
-          basist(i,i)=one
+          basist(i,i)=1.0_dp
        enddo
     endif
 
@@ -638,7 +638,7 @@ CONTAINS
        ENDDO
     ENDDO
     enti=temp
-    temp(:,:)=zero
+    temp(:,:)=0.0_dp
 
 
     DO I=1,3
@@ -660,7 +660,7 @@ CONTAINS
     ENDDO
 
 
-    temp=zero
+    temp=0.0_dp
     DO I=1,3
        DO j=1,3
           DO k=1,3
@@ -671,7 +671,7 @@ CONTAINS
     exii=temp
 
 
-    T(:)=zero
+    T(:)=0.0_dp
 
     do i=1,3; do j=1,3;
        T(i)=A(j)*exii(j,i)+T(i)
@@ -679,7 +679,7 @@ CONTAINS
 
     B=T
 
-    temp(:,:)=zero
+    temp(:,:)=0.0_dp
 
     do i=1,3; do j=1,3;do k=1,3
        temp(i,k)=ent(i,j)*exii(j,k)+temp(i,k)
@@ -696,7 +696,7 @@ CONTAINS
     real(dp) ent(3,3),n(3),s,ss
     integer i,j
 
-    n=zero
+    n=0.0_dp
     do i=1,3
        do j=1,3
           n(i)=ent(i,j)**2+n(i)
@@ -747,7 +747,7 @@ CONTAINS
     real(dp) n(3),s
     integer i
 
-    s=zero
+    s=0.0_dp
     do i=1,3
        s=s+n(i)**2
     enddo
@@ -756,7 +756,7 @@ CONTAINS
        s=sqrt(s)
        n=n/s
     else
-       s=zero
+       s=0.0_dp
     endif
   end subroutine make_normal
 
@@ -771,19 +771,19 @@ CONTAINS
     T1=ENTL
     T10=ENTL
     T2=ENTL
-    D=ZERO
+    D=0.0_dp
 
     CALL COMPUTE_SCALAR(T1,2,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
 
-    if(S_IJ==zero.and.S_JJ==zero) then
-       A(1)=zero
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(1)=0.0_dp
     else
        A(1)=ATAN2(-S_IJ,S_JJ)
     endif
 
     !   A(1)=ATAN2(-S_IJ,S_JJ)
-    AT=ZERO;AT(1)=A(1);
+    AT=0.0_dp;AT(1)=A(1);
 
     CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
@@ -792,14 +792,14 @@ CONTAINS
     CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
 
-    if(S_IJ==zero.and.S_JJ==zero) then
-       A(2)=zero
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(2)=0.0_dp
     else
        A(2)=ATAN2(-S_IJ,S_JJ)
     endif
 
     !    A(2)=ATAN2(-S_IJ,S_JJ)
-    AT=ZERO;AT(2)=A(2);
+    AT=0.0_dp;AT(2)=A(2);
 
     CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
@@ -808,13 +808,13 @@ CONTAINS
     CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
     CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
 
-    if(S_IJ==zero.and.S_JJ==zero) then
-       A(3)=zero
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(3)=0.0_dp
     else
        A(3)=ATAN2(S_IJ,S_JJ)
     endif
     !    A(3)=ATAN2(S_IJ,S_JJ)
-    AT=ZERO;AT(3)=A(3);
+    AT=0.0_dp;AT(3)=A(3);
 
     CALL GEO_ROT(T10,T1,AT,T2)
     !   T2=T1
@@ -830,7 +830,7 @@ CONTAINS
     real(dp),INTENT(inOUT) :: S_IJ
     INTEGER K
 
-    S_IJ=ZERO
+    S_IJ=0.0_dp
     DO K=1,3
        S_IJ=ENTL(I,K)*ENTB(J,K)+S_IJ
     ENDDO

@@ -272,6 +272,9 @@ contains
 !          my_default=default
 !          my_estate=>my_default
           ! Orbit stuff
+
+       case('UPDATETWISS','UPDATETWISSFORORBIT')
+           call update_twiss_for_orbit
        case('USEORBITUNITS')
           MY_ERING%t%ORBIT_LATTICE%ORBIT_USE_ORBIT_UNITS=.true.
        case('DONOTUSEORBITUNITS')
@@ -291,17 +294,29 @@ contains
        case('SETORBITPHASORTIME','ORBITTIME')
           read(mf,*) xsm%ac%t
           xsm0%ac%t=xsm%ac%t
-          x_orbit_sync=zero
+          x_orbit_sync=0.0_dp
           x_orbit_sync(6)=xsm%ac%t
           ptc_node_old=-1
           first_particle=my_false       
+       case('MAKEORBITMARKER')
+            extra_node=1
+            if(associated(my_ering%t)) then
+             if(associated(my_ering%t%ORBIT_LATTICE)) then
+             write(6,*) "The orbit nodes have been already created "
+             write(6,*) '"MAKE ORBIT MARKER" will not work!' 
+             write(6,*) 'If running orbit put this command in the special ' 
+             write(6,*) ' PTC script called pre_orbit_set.txt ' 
+             write(6,*) ' Execution now interrupted ' 
+               stop
+             endif   
+            endif    
        case('TIMEINUNITS','TIMEINSECONDS')
        
           read(mf,*) xsm%ac%t
           write(6,*) " Using ",unit_time," seconds"
           xsm%ac%t=xsm%ac%t*clight*unit_time
           xsm0%ac%t=xsm%ac%t
-          x_orbit_sync=zero
+          x_orbit_sync=0.0_dp
           x_orbit_sync(6)=xsm%ac%t
           ptc_node_old=-1
           first_particle=my_false
@@ -359,7 +374,7 @@ contains
           write(6,*) " Using ",unit_time," seconds"
           xsm%ac%t=xsm%ac%t*clight*unit_time
           xsm0%ac%t=xsm%ac%t
-          x_orbit_sync=zero
+          x_orbit_sync=0.0_dp
           x_orbit_sync(6)=xsm%ac%t
           ptc_node_old=-1
           first_particle=my_false
@@ -436,7 +451,7 @@ contains
           open(unit=ii,file=def_orbit_node)
 
           tL=>my_ORBIT_LATTICE%ORBIT_NODES(1)%NODE
-          write(ii,*) " Number of PTC Nodes  ",my_ORBIT_LATTICE%ORBIT_N_NODE-1
+          write(ii,*) " Number of PTC Nodes  from 0 to ",my_ORBIT_LATTICE%ORBIT_N_NODE-1
 
           do j=1,my_ORBIT_LATTICE%ORBIT_N_NODE
              write(ii,*) "****************************************************"
@@ -616,7 +631,7 @@ contains
           CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int)
        case('THINLENS')
           READ(MF,*) THIN
-          xbend=-one
+          xbend=-1.0_dp
           if(thin<0) then
              READ(MF,*) sexr0,xbend
              if(xbend<0) then
@@ -630,7 +645,7 @@ contains
           radiation_bend_split=MY_false
        case('EVENTHINLENS')
           READ(MF,*) THIN
-          xbend=-one
+          xbend=-1.0_dp
           if(thin<0) then
              READ(MF,*) sexr0,xbend
              if(xbend<0) then
@@ -643,7 +658,7 @@ contains
           CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax0=lmax,sexr=sexr0,xbend=xbend)
        case('ODDTHINLENS')
           READ(MF,*) THIN
-          xbend=-one
+          xbend=-1.0_dp
           if(thin<0) then
              READ(MF,*) sexr0,xbend
              if(xbend<0) then
@@ -738,21 +753,33 @@ contains
        case('GAUSSIANSEED')
           READ(MF,*) I1
           CALL gaussian_seed(i1)
+  !     case('RANDOMMULTIPOLE')
+  !        read(mf,*) name,i1,i2
+  !        read(mf,*) n,cns,cn,sc     ! sc percentage
+  !        read(mf,*) addi,integrated
+  !        read(mf,*) cut
+  !        write(6,*) " Distribution cut at ",cut," sigmas"
+  !        call lattice_random_error(my_ering,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
        case('RANDOMMULTIPOLE')
-          read(mf,*) name,i1,i2
-          read(mf,*) n,cns,cn,sc     ! sc percentage
-          read(mf,*) addi,integrated
-          read(mf,*) cut
-          write(6,*) " Distribution cut at ",cut," sigmas"
-          call lattice_random_error(my_ering,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
+          read(mf,*) i1, cut,STRAIGHT     !!!   seed, cut on sigma, print
+          read(mf,*) name,fixp    !!!  name, full=> logical true full name compared
+          read(mf,*) sc  !!!  percentage 
+
+          if(sc<=0) then
+            read(mf,*) addi,integrated
+            read(mf,*) n,cns,cn      !!! n (negative means skew) bn=cns+cn*x
+          endif
+          call lattice_random_error_new(my_ering,name,fixp,i1,cut,n,addi,integrated,cn,cns,sc,STRAIGHT)
        case('MISALIGNEVERYTHING')
+ 
           read(mf,*) SIG(1:6),cut
           CALL MESS_UP_ALIGNMENT(my_ering,SIG,cut)
           ! end of random stuff
        case('MISALIGN','MISALIGNONE')
-          read(mf,*) name,i1,i2
-          read(mf,*) SIG(1:6),cut
-          CALL MESS_UP_ALIGNMENT_name(my_ering,name,i1,i2,SIG,cut)
+          read(mf,*) i1, cut,STRAIGHT
+          read(mf,*) name,fixp
+          read(mf,*) SIG(1:6) 
+          call  MESS_UP_ALIGNMENT_name(my_ering,name,i1,fixp,sig,cut,STRAIGHT)
        case('ALWAYS_EXACTMIS',"ALWAYSEXACTMISALIGNMENTS")
           ! end of random stuff
           read(mf,*) ALWAYS_EXACTMIS
@@ -965,10 +992,10 @@ contains
              call context(name)
              N_NAME=len_trim(name)
           ENDIF
-            DC_ac=one
-            A_ac=zero
-            theta_ac=zero
-            D_ac=zero
+            DC_ac=1.0_dp
+            A_ac=0.0_dp
+            theta_ac=0.0_dp
+            D_ac=0.0_dp
             n_ac=0
            ! n_coeff=0
           p=>my_ering%start
@@ -1019,7 +1046,7 @@ contains
                    P%MAGP%slow_ac=.true.
 
                    if(i2>p%mag%p%nmul) then
-                      CALL ADD(P,i2,0,zero)
+                      CALL ADD(P,i2,0,0.0_dp)
                    endif
                    allocate(P%MAG%d_an(p%mag%p%nmul))
                    allocate(P%MAG%d_bn(p%mag%p%nmul))
@@ -1031,8 +1058,8 @@ contains
                    allocate(P%MAGp%d0_bn(p%mag%p%nmul))
 
 
-                   P%MAG%d_an=zero
-                   P%MAG%d_bn=zero
+                   P%MAG%d_an=0.0_dp
+                   P%MAG%d_bn=0.0_dp
 
                    call alloc(P%MAGp%d_an,p%mag%p%nmul)
                    call alloc(P%MAGp%d_bn,p%mag%p%nmul)
@@ -1073,8 +1100,8 @@ contains
           if(n_ac>0) then        !n_ac>0
              allocate(an(n_ac))
              allocate(bn(n_ac))
-             an=zero
-             bn=zero
+             an=0.0_dp
+             bn=0.0_dp
              do while(.true.)
                 read(mf,*) i1,dtu(1:2)
                 if(i1<=0) exit
@@ -1128,7 +1155,7 @@ contains
                    P%MAGP%slow_ac=.true.
 
                    if(i2>p%mag%p%nmul) then
-                      CALL ADD(P,i2,0,zero)
+                      CALL ADD(P,i2,0,0.0_dp)
                    endif
                    allocate(P%MAG%d_an(p%mag%p%nmul))
                    allocate(P%MAG%d_bn(p%mag%p%nmul))
@@ -1140,8 +1167,8 @@ contains
                    allocate(P%MAGp%d0_bn(p%mag%p%nmul))
 
 
-                   P%MAG%d_an=zero
-                   P%MAG%d_bn=zero
+                   P%MAG%d_an=0.0_dp
+                   P%MAG%d_bn=0.0_dp
 
                    call alloc(P%MAGp%d_an,p%mag%p%nmul)
                    call alloc(P%MAGp%d_bn,p%mag%p%nmul)
@@ -1254,11 +1281,22 @@ contains
        case('DEALLOCATEFAMILIES')
           call kill_para(my_ering)
           deallocate(POL_)
-       case('PTCTWISS','TWISS')  !
+       case('PTCTWISSTENGEDWARDS','TWISSTENGEDWARDS')  !
           read(mf,*) filename, NAME, integrated
           read(mf,*) del
 
-          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name)
+          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_true,my_false)
+       case('PTCTWISS','TWISS','PTCTWISSRIPKEN','TWISSRIPKEN')  !
+          read(mf,*) filename, NAME, integrated
+          read(mf,*) del
+
+          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_false)
+
+       case('PTCTWISSSASHA','TWISSSASHA','PTCTWISSRIPKENSASHA','TWISSRIPKENSASHA')  !
+          read(mf,*) filename, NAME, integrated
+          read(mf,*) del
+
+          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_true)
 
        case('FITTUNESCAN','SEARCHAPERTUREX=Y')
           read(mf,*) epsf
@@ -1369,13 +1407,13 @@ contains
        case('FITTUNE')
           read(mf,*) epsf
           read(mf,*) targ_tune
-          if(targ_tune(1)<=zero) targ_tune=tune(1:2)
+          if(targ_tune(1)<=0.0_dp) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap(my_ering,my_estate,epsf,pol_,NPOL,targ_tune,NP)
        case('FITTUNEAUTO')
           read(mf,*) epsf
           read(mf,*) targ_tune
           read(mf,*) namet(1), namet(2)
-          if(targ_tune(1)<=zero) targ_tune=tune(1:2)
+          if(targ_tune(1)<=0.0_dp) targ_tune=tune(1:2)
           call lattice_fit_TUNE_gmap_auto(my_ering,my_estate,EPSF,targ_tune,namet)
        case('FITTUNECOUPLING')
           read(mf,*) epsf
@@ -1387,7 +1425,7 @@ contains
           read(mf,*) nstep
           read(mf,*) tune_ini,tune_fin
           read(mf,*) name_root,SUFFIX
-          dtu=zero
+          dtu=0.0_dp
           IF(NSTEP(2)/=0) THEN
              if(nstep(1)/=1) dtu(1)=(tune_fin(1)-tune_ini(1))/(nstep(1)-1)
              if(nstep(2)/=1) dtu(2)=(tune_fin(2)-tune_ini(2))/(nstep(2)-1)
@@ -1519,7 +1557,7 @@ contains
           CALL PTC_END()
           goto 100
        case('TRACK4DNORMALIZED')
-          emit=zero
+          emit=0.0_dp
           read(mf,*) IB
           read(mf,*) POS,NTURN,ITMAX,resmax
           read(mf,*) EMIT(1:2),APER(1:2),emit(3),emit(6)
@@ -1527,7 +1565,7 @@ contains
           ! emit(3)=1.d38
           CALL track_aperture(my_ering,my_estate,beta,dbeta,tune,ib,ITMAX,emit,aper,pos,nturn,FILENAME,filetune,FILESMEAR,resmax)
        case('SCANTRACK4DNORMALIZED')
-          emit=zero
+          emit=0.0_dp
 
           read(mf,*) POS,NTURN,ITMAX,resmax
           read(mf,*) EMIT0(1:2),APER,emit(3),emit(6)
@@ -1681,7 +1719,7 @@ contains
           write(6,*) " At the ends of all solenoids kick of the form "
           write(6,*) " X(2)=X(2)+X(1)*B/PZ      where pz=1+delta"
           write(6,*) " X(4)=X(4)+X(3)*B/PZ "
-          write(6,*) " X(6)=X(6)-HALF*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2 "
+          write(6,*) " X(6)=X(6)-0.5_dp*B*(X(1)**2+X(3)**2)*TIME_FAC/PZ**2 "
 
           read(mf,*) fint,hgap
 
@@ -1790,9 +1828,9 @@ contains
           READ(MF,*)A1,B1
           CALL MOVE_TO(my_ering,P,POS)
           a1=p%mag%bn(2)
-          cns=zero
+          cns=0.0_dp
           CALL ADD(P,2,0,cns)
-          a1=half*a1*b1**2
+          a1=0.5_dp*a1*b1**2
           p%mag%VA=A1
           p%mag%VS=B1
           p%magp%VA=A1
@@ -1806,9 +1844,9 @@ contains
              if(.not.associated(p%mag%volt).and.associated(p%mag%bn)) then
                 if(p%mag%p%nmul>=2) then
                    a1=p%mag%bn(2)
-                   cns=zero
+                   cns=0.0_dp
                    CALL ADD(P,2,0,cns)
-                   a1=half*a1*b1**2
+                   a1=0.5_dp*a1*b1**2
                    p%mag%VA=A1
                    p%mag%VS=B1
                    p%magp%VA=A1
@@ -1828,11 +1866,11 @@ contains
                 if(p%mag%p%nmul>=2) then
                    a1= p%magp%VA
                    B1=p%magp%VS
-                   a1=a1*two/b1**2
-                   p%mag%VA=zero
-                   p%mag%VS=zero
-                   p%magp%VA=zero
-                   p%magp%VS=zero
+                   a1=a1*2.0_dp/b1**2
+                   p%mag%VA=0.0_dp
+                   p%mag%VS=0.0_dp
+                   p%magp%VA=0.0_dp
+                   p%magp%VS=0.0_dp
                    cns=a1
                    i2=i2+1
                    CALL ADD(P,2,1,cns)
@@ -1872,9 +1910,9 @@ contains
                 if(p%mag%p%nmul>=2) then
                    i2=i2+1
                    a1=p%mag%bn(2)
-                   cns=zero
+                   cns=0.0_dp
                    CALL ADD(P,2,0,cns)
-                   a1=half*a1*b1**2
+                   a1=0.5_dp*a1*b1**2
                    p%mag%VA=A1
                    p%mag%VS=B1
                    p%magp%VA=A1
@@ -2033,8 +2071,8 @@ contains
 
        if(p%mag%kind==kind4) then
           write(6,*) " cavity found ",p%mag%name,p%mag%vorname
-          p%mag%c4%CAVITY_TOTALPATH=0
-          p%magp%c4%CAVITY_TOTALPATH=0
+          p%mag%c4%CAVITY_TOTALPATH=mod(j,2)
+          p%magp%c4%CAVITY_TOTALPATH=mod(j,2)
        endif
 
        p=>P%NEXT
@@ -2061,7 +2099,7 @@ contains
     accuracy=1.0e-10_dp
     if(present(prec)) accuracy=prec
     closed=0.0_dp
-    CALL FIND_ORBIT(R,CLOSED,1,STATE,c_1d_5)
+    CALL FIND_ORBIT(R,CLOSED,1,STATE,1e-5_dp)
 
     closed(6)=0.d0
     call track(r,closed,1,state+totalpath0+time0)
@@ -2072,7 +2110,7 @@ contains
     ip=0
     p=>r%start
     do i=1,r%n
-       closed(6)=zero
+       closed(6)=0.0_dp
        call track(r,closed,i,i+1,state)
        s=closed(6)
        circum=circum+s
@@ -2110,7 +2148,7 @@ contains
           ! write(6,*) " phas    = ",p%mag%phas
           ! write(6,*) " ref p0c = ",p%mag%p%p0c
           ! write(6,*) "electron = ", c_%electron
-          if(p%mag%l/=zero) then
+          if(p%mag%l/=0.0_dp) then
              p%mag%volt=VOLT/p%mag%l
              p%magp%volt=p%mag%volt
           else
@@ -2128,19 +2166,19 @@ contains
           write(6,*) " freq    = ",p%mag%freq
           write(6,*) " phas    = ",p%mag%phas
           write(6,*) " ref p0c = ",p%mag%p%p0c
-          p%mag%c4%phase0=zero
-          p%magp%c4%phase0=zero
-          p%mag%c4%f(1)=one
-          p%magp%c4%f(1)=one
-          p%mag%c4%ph(1)=zero
-          p%magp%c4%ph(1)=zero
+          p%mag%c4%phase0=0.0_dp
+          p%magp%c4%phase0=0.0_dp
+          p%mag%c4%f(1)=1.0_dp
+          p%magp%c4%f(1)=1.0_dp
+          p%mag%c4%ph(1)=0.0_dp
+          p%magp%c4%ph(1)=0.0_dp
           p%mag%c4%CAVITY_TOTALPATH=0
           p%magp%c4%CAVITY_TOTALPATH=0
           do j=2,p%mag%c4%nf
-             p%mag%c4%f(j)=zero
-             p%magp%c4%f(j)=zero
-             p%mag%c4%ph(j)=zero
-             p%magp%c4%ph(j)=zero
+             p%mag%c4%f(j)=0.0_dp
+             p%magp%c4%f(j)=0.0_dp
+             p%mag%c4%ph(j)=0.0_dp
+             p%magp%c4%ph(j)=0.0_dp
           enddo
           !          write(6,*) "electron = ", c_%electron
           !          write(6,*) " phase0  = ", c_%phase0
@@ -2240,10 +2278,10 @@ contains
     write(6,*) " 'USING SURVEY' TYPE 1 / 'USING GEOMETRY' TYPE 0 "
     READ(5,*) IG
     do i=1,r%n
-       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1.and.P%MAG%p%b0==zero) THEN
+       IF(P%MAG%KIND/=KIND0.AND.P%MAG%KIND/=KIND1.and.P%MAG%p%b0==0.0_dp) THEN
 
           CALL APPEND( NR, P )
-       elseif(P%MAG%p%b0/=zero) then
+       elseif(P%MAG%p%b0/=0.0_dp) then
           bend%mag%p%bend_fringe=.true.
           bend%magp%p%bend_fringe=.true.
           bend%mag%L=P%MAG%p%lc
@@ -2771,8 +2809,11 @@ contains
     state=state+envelope0
 
     CALL TRACK_PROBE(r,xs,state, fibre1=loc)
+    write(mf1,*) " Full Map "
+     id=xs    
+     call print(id,mf1)
+    write(mf1,*) " End of Full Map "
 
-    id=xs
     normal=id
     write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
     write(mf1,*)" Tunes "

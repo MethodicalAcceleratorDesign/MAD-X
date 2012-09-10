@@ -32,7 +32,7 @@ module Mad_like
   logical(lp),TARGET ::FIBRE_flip=.true.
   !  logical(lp) :: FIBRE_SURVEY=.true.
   INTEGER,TARGET ::FIBRE_DIR=1
-  INTEGER,TARGET ::INITIAL_CHARGE=1
+  real(dp),TARGET ::INITIAL_CHARGE=1
   real(dp),PRIVATE::ENERGY,P0C,BRHO,KINETIC,gamma0I,gamBET,beta0,MC2
 
   !real(dp),PRIVATE::TOTAL_EPS
@@ -46,10 +46,10 @@ module Mad_like
   logical(lp):: symplectic_print=.false.
   logical(lp):: symplectify=.false.
   integer :: symplectic_order = 0
-  REAL(DP) :: symplectic_eps = -one
+  REAL(DP) :: symplectic_eps = -1.0_dp
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
-
+  logical(lp) :: set_ap=my_false
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
      real(dp) ang(3),t(3)
@@ -367,7 +367,7 @@ CONTAINS
   real(dp) function fac(n)    ! David Sagan
     implicit none
     integer n
-    fac=one
+    fac=1.0_dp
     if(mad) then
        fac=madfac(iabs(n))
     endif
@@ -649,43 +649,43 @@ CONTAINS
     endif
 
     IF(S1==0) THEN
-       S2%L=zero
-       S2%LD=zero
-       S2%LC=zero
+       S2%L=0.0_dp
+       S2%LD=0.0_dp
+       S2%LC=0.0_dp
        DO I=1,NMAX
-          S2%K(I)=zero;S2%KS(I)=zero
+          S2%K(I)=0.0_dp;S2%KS(I)=0.0_dp
        ENDDO
        do i=1,3              ! needed???
-          S2%ang(i)=zero
-          S2%t(i)=zero
-          S2%angi(i)=zero
-          S2%ti(i)=zero
+          S2%ang(i)=0.0_dp
+          S2%t(i)=0.0_dp
+          S2%angi(i)=0.0_dp
+          S2%ti(i)=0.0_dp
        enddo
        s2%CAVITY_TOTALPATH=1
        S2%patchg=0
-       S2%T1=zero
-       S2%T2=zero
-       S2%B0=zero
-       S2%volt=zero
-       S2%freq0=zero
-       S2%harmon=one
-       S2%lag=zero
-       S2%DELTA_E=zero
-       S2%BSOL=zero
-       S2%TILT=zero
-       s2%FINT=half
-       s2%hgap=zero
-       s2%h1=zero
-       s2%h2=zero
-       s2%X_COL=zero    !!!! missing !!!
-       s2%Y_COL=zero   !!!! missing !!!
-       s2%thin_h_foc=zero
-       s2%thin_v_foc=zero
-       s2%thin_h_angle=zero
-       s2%thin_v_angle=zero
-       s2%hf=zero
-       s2%vf=zero
-       s2%ls=one
+       S2%T1=0.0_dp
+       S2%T2=0.0_dp
+       S2%B0=0.0_dp
+       S2%volt=0.0_dp
+       S2%freq0=0.0_dp
+       S2%harmon=1.0_dp
+       S2%lag=0.0_dp
+       S2%DELTA_E=0.0_dp
+       S2%BSOL=0.0_dp
+       S2%TILT=0.0_dp
+       s2%FINT=0.5_dp
+       s2%hgap=0.0_dp
+       s2%h1=0.0_dp
+       s2%h2=0.0_dp
+       s2%X_COL=0.0_dp    !!!! missing !!!
+       s2%Y_COL=0.0_dp   !!!! missing !!!
+       s2%thin_h_foc=0.0_dp
+       s2%thin_v_foc=0.0_dp
+       s2%thin_h_angle=0.0_dp
+       s2%thin_v_angle=0.0_dp
+       s2%hf=0.0_dp
+       s2%vf=0.0_dp
+       s2%ls=1.0_dp
        s2%file=' '
        s2%file_rev=' '
        s2%NAME=' '
@@ -704,9 +704,9 @@ CONTAINS
        s2%KILL_EXI_FRINGE=my_false
        s2%BEND_FRINGE=my_false
        s2%PERMFRINGE=my_false
-       s2%DPHAS=ZERO
-       s2%PSI=ZERO
-       s2%dvds=ZERO
+       s2%DPHAS=0.0_dp
+       s2%PSI=0.0_dp
+       s2%dvds=0.0_dp
        s2%N_BESSEL=0
 
     ENDIF
@@ -798,24 +798,24 @@ CONTAINS
     LOGICAL(LP) SEARCH
     REAL(DP) K11
     NN=0
-    K11=zero
+    K11=0.0_dp
     IF(PRESENT(N)) NN=N
     IF(PRESENT(K1)) K11=K1
 
     IF(PRESENT(LIST)) THEN   !
        SMITILT=LIST    !  SPECIAL SINCE SMI CAN ONLY BE A SINGLE POLE
-       SMITILT%L=zero
-       SMITILT%LD=zero
-       SMITILT%LC=zero
+       SMITILT%L=0.0_dp
+       SMITILT%LD=0.0_dp
+       SMITILT%LC=0.0_dp
        NN=1
        SEARCH=.TRUE.
        DO I=NMAX,1,-1
-          IF(LIST%K(I)/=zero.AND.SEARCH) THEN
+          IF(LIST%K(I)/=0.0_dp.AND.SEARCH) THEN
              SEARCH=.FALSE.
              K11=LIST%K(I)
              NN=I
           ENDIF
-          IF(LIST%KS(I)/=zero.AND.SEARCH) THEN
+          IF(LIST%KS(I)/=0.0_dp.AND.SEARCH) THEN
              SEARCH=.FALSE.
              K11=LIST%KS(I)
              NN=-I
@@ -853,9 +853,9 @@ CONTAINS
 
     ELSE    !
        SMITILT=0
-       SMITILT%L=zero
-       SMITILT%LD=zero
-       SMITILT%LC=zero
+       SMITILT%L=0.0_dp
+       SMITILT%LD=0.0_dp
+       SMITILT%LC=0.0_dp
        IF(NN>=1.AND.NN<=10) THEN
           SMITILT%K(NN)=K11 !/fac(Nn)
           SMITILT%KIND=kind8
@@ -907,9 +907,9 @@ CONTAINS
     LOGICAL(LP) COUNT
     if(present(list)) then   !1
        BLTILT=list
-       BLTILT%L=zero
-       BLTILT%LD=zero
-       BLTILT%LC=zero
+       BLTILT%L=0.0_dp
+       BLTILT%LD=0.0_dp
+       BLTILT%LC=0.0_dp
 
        BLTILT%KIND=kind3
        BLTILT%BSOL=LIST%bsol
@@ -920,7 +920,7 @@ CONTAINS
           BLTILT%K(I)=LIST%K(I) !/fac(i)
           BLTILT%KS(I)=LIST%KS(I) !/fac(i)
           IF(COUNT) THEN
-             IF(BLTILT%K(I)/=zero.OR.BLTILT%KS(I)/=zero) THEN
+             IF(BLTILT%K(I)/=0.0_dp.OR.BLTILT%KS(I)/=0.0_dp) THEN
                 COUNT=.FALSE.
                 BLTILT%nmul=I
              ENDIF
@@ -945,9 +945,9 @@ CONTAINS
 
     else   !1
        BLTILT=0
-       BLTILT%L=zero
-       BLTILT%LD=zero
-       BLTILT%LC=zero
+       BLTILT%L=0.0_dp
+       BLTILT%LD=0.0_dp
+       BLTILT%LC=0.0_dp
 
        BLTILT%KIND=kind3
        BLTILT%nmul=K%NMUL
@@ -988,8 +988,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,OPTIONAL, INTENT(IN):: L,kick
     real(dp) L1,K11
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(kick)) K11=kick
     madkick=.true.
@@ -997,7 +997,7 @@ CONTAINS
     HKICKTILT%L=L1
     HKICKTILT%LD=L1
     HKICKTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        HKICKTILT%K(1)=-K11        ! MAD convention K1>0 means px > 0
        HKICKTILT%KIND=MADKIND3N
        HKICKTILT%nmul=1
@@ -1035,8 +1035,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,OPTIONAL, INTENT(IN):: L,kick
     real(dp) L1,K11
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(kick)) K11=kick
 
@@ -1045,7 +1045,7 @@ CONTAINS
     VKICKTILT%L=L1
     VKICKTILT%LD=L1
     VKICKTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        VKICKTILT%KS(1)=K11        ! MAD convention K1>0 means px > 0
        VKICKTILT%KIND=MADKIND3S
        VKICKTILT%nmul=1
@@ -1084,9 +1084,9 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,OPTIONAL, INTENT(IN):: L ,hkick ,vkick
     real(dp) L1,K11,K21
-    L1=zero
-    K11=zero
-    K21=zero
+    L1=0.0_dp
+    K11=0.0_dp
+    K21=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(hkick)) K11=hkick
     IF(PRESENT(vkick)) K21=vkick
@@ -1105,7 +1105,7 @@ CONTAINS
     GKICKTILT%L=L1
     GKICKTILT%LD=L1
     GKICKTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        GKICKTILT%K(1)=-K11        ! MAD convention K1>0 means px > 0
        GKICKTILT%KS(1)=K21        ! MAD convention K1>0 means px > 0
        GKICKTILT%KIND=KIND3
@@ -1147,8 +1147,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L,K1
     real(dp) L1,K11
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(K1)) K11=K1
     if(present(list)) then
@@ -1162,7 +1162,7 @@ CONTAINS
     QUADTILT%LD=L1
     QUADTILT%LC=L1
     QUADTILT%K(2)=K11
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        QUADTILT%K(2)=K11
        QUADTILT%KIND=MADKIND3N
     ELSE
@@ -1198,15 +1198,15 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
 
     real(dp) L1,K11
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     multipoleTILT=list
     l1=list%L
 
     multipoleTILT%L=L1
     multipoleTILT%LD=L1
     multipoleTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        multipoleTILT%KIND=MADKIND3N
     ELSE
        multipoleTILT%KIND=MADKIND2
@@ -1238,8 +1238,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L,K1,ks1,PHASE,omega
     real(dp) L1,K11,Ks11,LAG1,FREQ01
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(K1)) K11=K1
     IF(PRESENT(Ks1)) Ks11=Ks1
@@ -1263,7 +1263,7 @@ CONTAINS
     HELICALTILT%LAG=LAG1
     HELICALTILT%FREQ0=FREQ01
     !   RFCAVITYL%P0C=P0C
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        stop 999
     ELSE
        HELICALTILT%K(1)=K11
@@ -1297,9 +1297,9 @@ CONTAINS
     real(dp) ,optional, INTENT(IN):: L,KS,K1
     real(dp) L1,K11,kq
 
-    L1=zero
-    K11=zero
-    KQ=zero
+    L1=0.0_dp
+    K11=0.0_dp
+    KQ=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(KS)) K11=KS
     IF(PRESENT(k1)) kq=K1
@@ -1317,7 +1317,7 @@ CONTAINS
     SOLTILT%LC=L1
     SOLTILT%BSOL=K11
     SOLTILT%nmul=2
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        SOLTILT%KIND=KIND3    ! used to be kind0
     ELSE
        SOLTILT%K(2)=KQ !/FAC(2)    ! MAD FACTOR
@@ -1329,7 +1329,7 @@ CONTAINS
     ENDIF
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN
-          SOLTILT%tilt=zero   ! NO NATURAL TILT
+          SOLTILT%tilt=0.0_dp   ! NO NATURAL TILT
        ELSE
           SOLTILT%tilt=t%tilt(0)
        ENDIF
@@ -1357,8 +1357,8 @@ CONTAINS
     real(dp),optional , INTENT(IN):: L,K2
     real(dp) L1,K11
 
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(K2)) K11=K2
     if(present(list)) then
@@ -1371,7 +1371,7 @@ CONTAINS
     SEXTTILT%L=L1
     SEXTTILT%LD=L1
     SEXTTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        SEXTTILT%K(3)=K11  !/FAC(3)    ! MAD FACTOR
        SEXTTILT%KIND=MADKIND3N
     ELSE
@@ -1409,8 +1409,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L,K3
     real(dp) L1,K11
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(K3)) K11=K3
     if(present(list)) then
@@ -1423,7 +1423,7 @@ CONTAINS
     OCTUTILT%L=L1
     OCTUTILT%LD=L1
     OCTUTILT%LC=L1
-    IF(L1==zero) THEN
+    IF(L1==0.0_dp) THEN
        OCTUTILT%K(4)=K11 !/FAC(4)         ! MAD FACTOR
        OCTUTILT%KIND=MADKIND3N
     ELSE
@@ -1462,10 +1462,10 @@ CONTAINS
     real(dp) ,optional, INTENT(IN):: L,angle,E1,E2
     real(dp) L1,ANG1,E11,E22
     CURVED_ELEMENT=.TRUE.
-    L1=zero
-    ANG1=zero
-    E11=zero
-    E22=zero
+    L1=0.0_dp
+    ANG1=0.0_dp
+    E11=0.0_dp
+    E22=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(angle)) ANG1=angle
 
@@ -1512,10 +1512,10 @@ CONTAINS
     real(dp),optional , INTENT(IN):: L,ANG
     real(dp) E11,E22,L1,ANG1
 
-    E11=zero
-    E22=zero
-    L1=zero
-    ANG1=zero
+    E11=0.0_dp
+    E22=0.0_dp
+    L1=0.0_dp
+    ANG1=0.0_dp
     IF(PRESENT(E1)) E11=E1 ;
     IF(PRESENT(E2)) E22=E2 ;
     IF(PRESENT(ANG)) ANG1=ANG ;
@@ -1538,8 +1538,8 @@ CONTAINS
     POTTILT%T1=E11;
     POTTILT%T2=E22;
 
-    IF(ANG/=zero) THEN
-       POTTILT%LC=two*SIN(ANG/two)/POTTILT%B0
+    IF(ANG/=0.0_dp) THEN
+       POTTILT%LC=2.0_dp*SIN(ANG/2.0_dp)/POTTILT%B0
     ELSE
        POTTILT%LC=POTTILT%L
     ENDIF
@@ -1584,15 +1584,15 @@ CONTAINS
        w_p%fc='(4(1X,a72,/),(1X,a72))'
        w_p%c(1)= " *************************************************** "
        w_p%c(2)= " * In PTC, under the exact option                  * "
-       w_p%c(3)= " * One must distinguish between RBEND and SBEND    * "
+       w_p%c(3)= " * 1.0_dp must distinguish between RBEND and SBEND    * "
        w_p%c(4)= " * This is call is thus completely forbidden       * "
        w_p%c(5)= " *************************************************** "
        ! call !write_e(101)
     endif
-    L1=zero
-    ANG1=zero
-    t11=zero
-    t21=zero
+    L1=0.0_dp
+    ANG1=0.0_dp
+    t11=0.0_dp
+    t21=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(angle)) ANG1=angle
     IF(PRESENT(e1)) t11=e1
@@ -1610,8 +1610,8 @@ CONTAINS
     GBTILT%B0=ANG1/L1
     GBTILT%L=L1
     GBTILT%LD=L1
-    IF(ANG1/=zero) THEN
-       GBTILT%LC=two*SIN(ANG1/two)/GBTILT%B0
+    IF(ANG1/=0.0_dp) THEN
+       GBTILT%LC=2.0_dp*SIN(ANG1/2.0_dp)/GBTILT%B0
     ELSE
        GBTILT%LC=GBTILT%L
     ENDIF
@@ -1650,24 +1650,24 @@ CONTAINS
     real(dp) ,optional, INTENT(IN):: L,angle,E1,E2
     real(dp) L1,LM,ANG1,E11,E22
 
-    L1=zero
-    ANG1=zero
+    L1=0.0_dp
+    ANG1=0.0_dp
     IF(PRESENT(L)) LM=L
     IF(PRESENT(angle)) ANG1=angle
-    E11=zero
-    E22=zero
+    E11=0.0_dp
+    E22=0.0_dp
 
     IF(PRESENT(E1)) E11=E1
     IF(PRESENT(E2)) E22=E2
 
-    IF(MADLENGTH.or.ang1==zero) THEN
+    IF(MADLENGTH.or.ang1==0.0_dp) THEN
        L1=LM
     ELSE
-       L1=two*LM*SIN(ANG1/two)/ANG1
+       L1=2.0_dp*LM*SIN(ANG1/2.0_dp)/ANG1
     ENDIF
 
     RECTTILT=0
-    RECTTILT%B0=two*SIN(ANG1/two)/L1
+    RECTTILT%B0=2.0_dp*SIN(ANG1/2.0_dp)/L1
     !    IF(ANG1==zero) THEN
     !       RECTTILT%L=L1
     !       RECTTILT%LD=L1
@@ -1682,7 +1682,7 @@ CONTAINS
           w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
           ! call ! WRITE_I
        endif
-       if(ang1==zero) then
+       if(ang1==0.0_dp) then
           RECTTILT%LD=L1
        else
           RECTTILT%LD=ANG1/RECTTILT%B0
@@ -1691,11 +1691,11 @@ CONTAINS
        RECTTILT%LC=L1
        RECTTILT%K(1)=RECTTILT%B0+RECTTILT%K(1)
        if(LIKEMAD) then
-          RECTTILT%T1=ANG1/two+E11    !one
-          RECTTILT%T2=ANG1/two+E22    !zero
+          RECTTILT%T1=ANG1/2.0_dp+E11    !one
+          RECTTILT%T2=ANG1/2.0_dp+E22    !zero
        else
-          RECTTILT%T1=ANG1/two+E11    !one
-          RECTTILT%T2=ANG1/two+E22    !zero
+          RECTTILT%T1=ANG1/2.0_dp+E11    !one
+          RECTTILT%T2=ANG1/2.0_dp+E22    !zero
 
           !             RECTTILT%T1=one   !wrong???
           !             RECTTILT%T2=zero
@@ -1703,14 +1703,14 @@ CONTAINS
        RECTTILT%nmul=2
     ELSE
        RECTTILT%LC=L1
-       IF(ANG1==ZERO) THEN
+       IF(ANG1==0.0_dp) THEN
           RECTTILT%L=L1
           RECTTILT%LD=L1
        ELSE
           RECTTILT%L=ANG1/RECTTILT%B0
           RECTTILT%LD=ANG1/RECTTILT%B0
        ENDIF
-       RECTTILT%T1=ANG1/two+E11 ; RECTTILT%T2=ANG1/two+E22;
+       RECTTILT%T1=ANG1/2.0_dp+E11 ; RECTTILT%T2=ANG1/2.0_dp+E22;
        RECTTILT%K(1)=RECTTILT%B0+RECTTILT%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
        RECTTILT%nmul=2   ! 0 before
     ENDIF
@@ -1754,11 +1754,11 @@ CONTAINS
 
     CURVED_ELEMENT=.TRUE.
 
-    E11=zero
-    E22=zero
+    E11=0.0_dp
+    E22=0.0_dp
     tempkind=madkind2
     IF(PRESENT(ANGLE)) THEN
-       if(ANGLE==zero) then
+       if(ANGLE==0.0_dp) then
           madkind2=kind2
           w_p=0
           w_p%nc=2
@@ -1794,8 +1794,8 @@ CONTAINS
 
     ELSE  !  1
 
-       LM1=zero
-       ANG1=zero
+       LM1=0.0_dp
+       ANG1=0.0_dp
        IF(PRESENT(L)) LM1=L
        IF(PRESENT(angle)) ANG1=angle
 
@@ -1804,13 +1804,13 @@ CONTAINS
 
        rectaETILT=0
        ANGE=ANG1-ANGI1
-       SPE=ANG1/two-ANGI1
+       SPE=ANG1/2.0_dp-ANGI1
 
        IF(MADLENGTH) THEN
           rectaETILT%L=LM1
           rectaETILT%LC=rectaETILT%L/COS(SPE)
-          rectaETILT%B0=two*SIN(ANG1/two)/rectaETILT%LC
-          if(ang1/=zero) then
+          rectaETILT%B0=2.0_dp*SIN(ANG1/2.0_dp)/rectaETILT%LC
+          if(ang1/=0.0_dp) then
              rectaETILT%LD=ANG1/rectaETILT%B0
           else
              rectaETILT%LD=rectaETILT%LC
@@ -1818,8 +1818,8 @@ CONTAINS
        ELSE
           rectaETILT%LD=LM1
           rectaETILT%B0=ANG1/rectaETILT%LD
-          if(ang1/=zero) then
-             rectaETILT%LC=two*SIN(ANG1/two)/rectaETILT%B0
+          if(ang1/=0.0_dp) then
+             rectaETILT%LC=2.0_dp*SIN(ANG1/2.0_dp)/rectaETILT%B0
           else
              rectaETILT%LC=rectaETILT%LD
           endif
@@ -1907,7 +1907,7 @@ CONTAINS
     TYPE(EL_LIST) ,optional, INTENT(IN):: LIST
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
     IF(PRESENT(L)) L1=L
 
     if(present(list)) then
@@ -1946,7 +1946,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
+    set_ap=my_true
     IF(PRESENT(L)) L1=L
 
     if(present(list)) then
@@ -1990,7 +1991,8 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
+    set_ap=my_true
     IF(PRESENT(L)) L1=L
 
     if(present(list)) then
@@ -2035,7 +2037,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
     IF(PRESENT(L)) L1=L
 
     if(present(list)) then
@@ -2075,7 +2077,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
     IF(PRESENT(L)) L1=L
 
 
@@ -2106,7 +2108,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
     IF(PRESENT(L)) L1=L
 
 
@@ -2137,7 +2139,7 @@ CONTAINS
     CHARACTER(*), INTENT(IN):: NAME
     real(dp) ,optional, INTENT(IN):: L
     real(dp)  L1
-    L1=zero
+    L1=0.0_dp
     IF(PRESENT(L)) L1=L
 
 
@@ -2245,10 +2247,10 @@ CONTAINS
     INTEGER,optional, INTENT(IN):: HARMON
     real(dp)  L1,VOLT1,LAG1,FREQ01
     INTEGER  HARMON1
-    L1=zero
-    VOLT1=zero
-    LAG1=zero
-    FREQ01=zero
+    L1=0.0_dp
+    VOLT1=0.0_dp
+    LAG1=0.0_dp
+    FREQ01=0.0_dp
     HARMON1=1
     IF(PRESENT(L)) L1=L
     IF(PRESENT(VOLT)) THEN
@@ -2274,8 +2276,8 @@ CONTAINS
        LAG1=LIST%LAG
        FREQ01=LIST%FREQ0
        HARMON1=LIST%HARMON
-       if(LIST%delta_e/=zero) then
-          if(volt1==zero) then
+       if(LIST%delta_e/=0.0_dp) then
+          if(volt1==0.0_dp) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
              w_p=0
@@ -2310,7 +2312,7 @@ CONTAINS
     RFCAVITYL%HARMON=HARMON1
     RFCAVITYL%FREQ0=FREQ01
     !   RFCAVITYL%P0C=P0C
-    RFCAVITYL%DELTA_E=zero
+    RFCAVITYL%DELTA_E=0.0_dp
 
   END FUNCTION RFCAVITYL
 
@@ -2323,10 +2325,10 @@ CONTAINS
     INTEGER,optional, INTENT(IN):: HARMON
     real(dp)  L1,VOLT1,LAG1,FREQ01
     INTEGER  HARMON1
-    L1=zero
-    VOLT1=zero
-    LAG1=zero
-    FREQ01=zero
+    L1=0.0_dp
+    VOLT1=0.0_dp
+    LAG1=0.0_dp
+    FREQ01=0.0_dp
     HARMON1=1
     IF(PRESENT(L)) L1=L
     IF(PRESENT(VOLT)) THEN
@@ -2352,8 +2354,8 @@ CONTAINS
        LAG1=LIST%LAG
        FREQ01=LIST%FREQ0
        HARMON1=LIST%HARMON
-       if(LIST%delta_e/=zero) then
-          if(volt1==zero) then
+       if(LIST%delta_e/=0.0_dp) then
+          if(volt1==0.0_dp) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
              w_p=0
@@ -2366,7 +2368,7 @@ CONTAINS
     else
        TWCAVITYL=0
     endif
-    IF(L1==ZERO) THEN
+    IF(L1==0.0_dp) THEN
        WRITE(6,*) " TWCAVITY MUST HAVE A LENGTH "
        STOP 555
     ENDIF
@@ -2391,7 +2393,7 @@ CONTAINS
     TWCAVITYL%HARMON=HARMON1
     TWCAVITYL%FREQ0=FREQ01
     !   RFCAVITYL%P0C=P0C
-    TWCAVITYL%DELTA_E=zero
+    TWCAVITYL%DELTA_E=0.0_dp
 
   END FUNCTION TWCAVITYL
 
@@ -2406,8 +2408,8 @@ CONTAINS
     real(dp) ,optional, INTENT(IN):: L,E
     real(dp) L1,K11
 
-    L1=zero
-    K11=zero
+    L1=0.0_dp
+    K11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(E)) K11=E
 
@@ -2564,7 +2566,7 @@ CONTAINS
     DONE=.FALSE.
 
     DO I=NMAX,1,-1
-       IF(S1%K(I)/=zero.or.S1%KS(I)/=zero) THEN
+       IF(S1%K(I)/=0.0_dp.or.S1%KS(I)/=0.0_dp) THEN
           if(I>=S1%NMUL) THEN
              S2 = I
              DONE=.TRUE.
@@ -2617,7 +2619,7 @@ CONTAINS
        !frs
        S2%DELTA_E=S1%DELTA_E
        S2%THIN=.FALSE.
-       IF(S2%L==zero) then
+       IF(S2%L==0.0_dp) then
           S2%THIN=.TRUE.
 
        else
@@ -2627,7 +2629,7 @@ CONTAINS
 
     if(s1%kind==kind21) then
        ALLOCATE(S2%VOLT,S2%FREQ,S2%PHAS,S2%LAG,S2%DELTA_E,S2%THIN)
-       S2%lag=zero
+       S2%lag=0.0_dp
        S2%volt=flip*S1%volt
        S2%freq=S1%freq0*S1%harmon
        S2%phas=-S1%lag
@@ -2637,7 +2639,7 @@ CONTAINS
        S2%THIN=.FALSE.
        !skowron 14.03.06
        S2%lag=s1%lag
-       IF(S2%L==zero) then
+       IF(S2%L==0.0_dp) then
           S2%THIN=.TRUE.
        else
           S2%volt=S2%volt/S2%L
@@ -2675,7 +2677,7 @@ CONTAINS
        S2%KIND=KIND16
     endif
 
-    if((S2%KIND==KIND6.or.S2%KIND==KIND7.or.S2%KIND==KIND17).AND.EXACT_MODEL.AND.S2%P%B0/=zero) then
+    if((S2%KIND==KIND6.or.S2%KIND==KIND7.or.S2%KIND==KIND17).AND.EXACT_MODEL.AND.S2%P%B0/=0.0_dp) then
        if(S2%KIND==KIND17) then
           write(6,*) " kind17 not permitted here in madlike "
           stop 17
@@ -2727,7 +2729,7 @@ CONTAINS
     if(S2%KIND==KIND10) then
        S2%TP10%DRIFTKICK=DRIFT_KICK
        IF(madkind2==kind6.or.madkind2==kind7)   S2%TP10%DRIFTKICK=.FALSE.   ! 2002.11.04
-       IF(S2%p%b0==zero)   then
+       IF(S2%p%b0==0.0_dp)   then
           S2%TP10%DRIFTKICK=.true.
           w_p=0
           w_p%nc=2
@@ -2748,14 +2750,14 @@ CONTAINS
     ENDIF
 
     IF(S2%KIND==KIND18) THEN
-       S2%RCOL18%A%KIND=2
-       S2%RCOL18%A%X=ABSOLUTE_APERTURE
-       S2%RCOL18%A%Y=ABSOLUTE_APERTURE
+ !      S2%RCOL18%A%KIND=2
+ !      S2%RCOL18%A%X=ABSOLUTE_APERTURE
+ !      S2%RCOL18%A%Y=ABSOLUTE_APERTURE
     ENDIF
     IF(S2%KIND==KIND19) THEN
-       S2%ECOL19%A%KIND=1
-       S2%ECOL19%A%R(1)=ABSOLUTE_APERTURE
-       S2%ECOL19%A%R(2)=ABSOLUTE_APERTURE
+ !      S2%ECOL19%A%KIND=1
+ !      S2%ECOL19%A%R(1)=ABSOLUTE_APERTURE
+ !      S2%ECOL19%A%R(2)=ABSOLUTE_APERTURE
     ENDIF
 
     IF(MADX) then
@@ -2784,6 +2786,21 @@ CONTAINS
     !   goto 113 ! sagan
     s2p=0
     ! 113 continue
+    if(set_ap) then
+     allocate(s2%p%aperture)
+     call alloc(s2%p%aperture)
+       if(S2%KIND==KIND18) then
+          S2%p%aperture%KIND=2
+         S2%p%aperture%X=ABSOLUTE_APERTURE
+         S2%p%aperture%Y=ABSOLUTE_APERTURE   
+       endif
+      if(S2%KIND==KIND19) then
+          S2%p%aperture%KIND=1
+         S2%p%aperture%r(1)=ABSOLUTE_APERTURE
+         S2%p%aperture%r(2)=ABSOLUTE_APERTURE   
+       endif
+     set_ap=MY_FALSE
+    endif
     call copy(s2,s2p)
 
     ! end of machida stuff here
@@ -2833,7 +2850,7 @@ CONTAINS
        s22%mag%p%nst=1
        s22%magp%p%nst=1
     endif
-    if(s22%mag%L==ZERO) then
+    if(s22%mag%L==0.0_dp) then
        s22%mag%p%nst=1
        s22%magp%p%nst=1
     endif
@@ -2923,11 +2940,11 @@ CONTAINS
     logical(lp) all
 
     IF(MAD8_WEDGE) THEN
-       WEDGE_COEFF(1)=ONE+ONE/FOUR
-       WEDGE_COEFF(2)=TWO-HALF
+       WEDGE_COEFF(1)=1.0_dp+1.0_dp/4.0_dp
+       WEDGE_COEFF(2)=2.0_dp-0.5_dp
     ELSE
-       WEDGE_COEFF(1)=ONE
-       WEDGE_COEFF(2)=ONE
+       WEDGE_COEFF(1)=1.0_dp
+       WEDGE_COEFF(2)=1.0_dp
     ENDIF
 
     call set_pointers
@@ -2941,11 +2958,11 @@ CONTAINS
     ns=nstd
     met=METD
     verb=verbose
-    Energy1=zero
-    kinetic1=zero
-    p0c1=zero
-    BRHO1=zero
-    BETa1=zero
+    Energy1=0.0_dp
+    kinetic1=0.0_dp
+    p0c1=0.0_dp
+    BRHO1=0.0_dp
+    BETa1=0.0_dp
     all=.true.
     if(present(Energy)) then
        Energy1=-Energy
@@ -3010,11 +3027,11 @@ CONTAINS
     logical(lp) all
 
     IF(MAD8_WEDGE) THEN
-       WEDGE_COEFF(1)=ONE+ONE/FOUR
-       WEDGE_COEFF(2)=TWO-HALF
+       WEDGE_COEFF(1)=1.0_dp+1.0_dp/4.0_dp
+       WEDGE_COEFF(2)=2.0_dp-0.5_dp
     ELSE
-       WEDGE_COEFF(1)=ONE
-       WEDGE_COEFF(2)=ONE
+       WEDGE_COEFF(1)=1.0_dp
+       WEDGE_COEFF(2)=1.0_dp
     ENDIF
 
     call set_pointers
@@ -3023,11 +3040,11 @@ CONTAINS
     ns=nstd
     met=METD
     verb=verbose
-    Energy1=zero
-    kinetic1=zero
-    p0c1=zero
-    BRHO1=zero
-    BETa1=zero
+    Energy1=0.0_dp
+    kinetic1=0.0_dp
+    p0c1=0.0_dp
+    BRHO1=0.0_dp
+    BETa1=0.0_dp
     all=.true.
     if(present(Energy)) then
        Energy1=-Energy
@@ -3148,8 +3165,8 @@ CONTAINS
     p0c=p0c1
 
     PROTON=.NOT.ELECTRON
-    cl=(clight/c_1d8)
-    CU=c_55/c_24/SQRT(three)
+    cl=(clight/1e8_dp)
+    CU=55.0_dp/24.0_dp/SQRT(3.0_dp)
     w_p=0
     w_p%nc=8
     w_p%fc='(7((1X,A72,/)),1X,A72)'
@@ -3172,12 +3189,12 @@ CONTAINS
     endif
     if(brho<0) then
        brho=-brho
-       p0c=BRHO*(cl/ten)    !SQRT(BRHO**2*(cl/ten)**2)
+       p0c=BRHO*(cl/10.0_dp)    !SQRT(BRHO**2*(cl/ten)**2)
     endif
     if(beta0<0) then
        beta0=-beta0
-       p0c=(one-beta0**2)
-       if(p0c<=zero) then
+       p0c=(1.0_dp-beta0**2)
+       if(p0c<=0.0_dp) then
           w_p=0
           w_p%nc=2
           w_p%fc='(((1X,A72,/)),1X,A72)'
@@ -3191,17 +3208,17 @@ CONTAINS
     erg=SQRT(p0c**2+XMC2**2)
     ENERGY=ERG
     KINETIC=ERG-xmc2
-    beta0=SQRT(KINETIC**2+two*KINETIC*XMC2)/erg
-    beta0i=one/beta0
+    beta0=SQRT(KINETIC**2+2.0_dp*KINETIC*XMC2)/erg
+    beta0i=1.0_dp/beta0
     GAMMA=erg/XMC2
     write(W_P%C(2),'(A16,g21.14)') ' Kinetic Energy ',kinetic
     write(W_P%C(3),'(A7,g21.14)') ' gamma ',gamma
     write(W_P%C(4),'(A7,g21.14)')' beta0 ',BETa0
-    CON=three*CU*CGAM*HBC/two*TWOPII/XMC2**3
+    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
-    BRHO=SQRT(ERG**2-XMC2**2)*ten/cl
+    BRHO=SQRT(ERG**2-XMC2**2)*10.0_dp/cl
     write(W_P%C(5),'(A7,g21.14)') ' p0c = ',p0c
     write(W_P%C(6),'(A9,g21.14)')' GAMMA = ',SQRT(GAMMA2)
     write(W_P%C(7),'(A8,g21.14)')' BRHO = ',brho
@@ -3270,8 +3287,8 @@ CONTAINS
 
 
     !    IF(ANG/=zero.AND.R/=zero) THEN
-    if(hc/=zero) then
-       arbitrary_tilt%LC=two*SIN(ANGLE/two)/hc
+    if(hc/=0.0_dp) then
+       arbitrary_tilt%LC=2.0_dp*SIN(ANGLE/2.0_dp)/hc
     else
        arbitrary_tilt%LC=L
     endif
@@ -3338,7 +3355,7 @@ CONTAINS
 
     if(use_info) then
        c=>R%start
-       c%i%s=zero
+       c%i%s=0.0_dp
        do i=1,R%n
           if(i<R%n.and.use_info) c%next%i%s=c%i%s+c%mag%p%ld
 
