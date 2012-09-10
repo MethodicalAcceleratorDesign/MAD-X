@@ -46,7 +46,7 @@ module lielib_yang_berz
   real(dp), private :: stmem(ndim)
   logical(lp) :: courant_snyder=.true.
   logical(lp) :: check_krein=.true.
-  logical(lp) :: size_krein=1.e-10_dp
+  real(dp), private :: size_krein=1.e-10_dp
 
   real(dp),dimension(ndim2)::rr_eigen,ri_eigen
 contains
