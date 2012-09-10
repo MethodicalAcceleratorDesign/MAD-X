@@ -1,13 +1,10 @@
 
 # list of source files
-file(GLOB mad_src
+file(GLOB src_files
     mad_*.c
     *.f90
     *.F90
     *.cpp)
-file(GLOB mad_fpp_src [a-z]_*.f90 [a-z]_*.F90 tpsa.cpp)
-file(GLOB mad_ptc_core_src S[a-f]_*.f90)
-file(GLOB mad_ptc_src S[g-o]_*.f90 Sma*.f90)
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
     file(GLOB gxx_remove gxx11c.c gxx11.f90)
@@ -46,23 +43,15 @@ if (MADX_NTPSA )
 endif  (MADX_NTPSA )
 
 set(remove_list ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
-list(REMOVE_ITEM mad_src ${remove_list} ${mad_fpp_src} ${mad_ptc_core_src} ${mad_ptc_src})
-list(REMOVE_ITEM mad_fpp_src ${remove_list})
-list(REMOVE_ITEM mad_ptc_core_src ${remove_list})
-list(REMOVE_ITEM mad_ptc_src ${remove_list})
+list(REMOVE_ITEM src_files ${remove_list})
 
 # header files...
 file(GLOB headerfiles *.h)
 
 # adding library:
-add_library(madx ${mad_src})
-add_library(madx_fpp ${mad_fpp_src})
-add_library(madx_ptc_core ${mad_ptc_core_src})
-add_library(madx_ptc ${mad_ptc_src})
+add_library(madx ${src_files})
 
-target_link_libraries(madx_ptc_core madx_fpp)
-target_link_libraries(madx_ptc madx_ptc_core)
-target_link_libraries(madx madx_ptc)
+target_link_libraries(madx ptc)
 
 
 # not sure if this is needed...
@@ -70,7 +59,6 @@ set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 # set library version:
 set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
-set_target_properties(madx_fpp PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
 
 # adding an executable:
 if(MADX_BUNDLE)

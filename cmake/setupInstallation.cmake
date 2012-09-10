@@ -7,24 +7,14 @@ set(CMAKE_Fortran_MODULE_DIRECTORY
     ${PROJECT_BINARY_DIR}/include/fortran/madX CACHE PATH "Single Directory for all fortran modules."
 )
 
-install(TARGETS madxbin madx madx_fpp madx_ptc_core madx_ptc
-  BUNDLE DESTINATION . COMPONENT Runtime
-  RUNTIME DESTINATION bin COMPONENT Runtime
-  LIBRARY DESTINATION lib COMPONENT Libraries
-  ARCHIVE DESTINATION lib COMPONENT Libraries
-)
+madx_install_targets(madxbin madx)
 
-# This installs the header files to <prefix>/include/madX
-# We only want this in the development version...
-if(NOT ${MADX_PATCH_LEVEL} EQUAL 00)
-INSTALL (FILES ${headerfiles} 
-  DESTINATION "include/${PROJECT_NAME}"
-  COMPONENT Files)
-endif()
+madx_install_headers(${headerfiles})
 
 INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
     DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}"
     COMPONENT Files)
+
 if(APPLE AND MADX_BUNDLE)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}")  # paths to executables
   set(DIRS "")

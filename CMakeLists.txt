@@ -30,6 +30,9 @@ endif()
 # Some initializations specific for Mad-X
 include(madxInit)
 
+# predefined macros...
+include(install_macros)
+
 # Defining project options:
 include(setupOptions)
 
@@ -45,6 +48,7 @@ include(setupArchSpecifics)
 
 
 # Add sources subdirectory:
+add_subdirectory(libs)
 add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(syntax)
