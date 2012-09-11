@@ -61,4 +61,4 @@ numdiff_test(test-rfmultipole-3 "sectormap" 0)
 numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
 numdiff_test(test-twiss "sample_optics.tfs" 0)
-numdiff_test(test-match "str.ip8.b1.dat twiss.ir8.b1.data" 1)
+numdiff_test(test-match "" 0)
