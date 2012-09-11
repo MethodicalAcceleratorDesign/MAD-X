@@ -591,6 +591,7 @@ tests/test-ibs/test-ibs.ref -text
 tests/test-jacobian-2/test-jacobian-2.cfg -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
 tests/test-jacobian-2/test-jacobian-2.ref -text
+tests/test-jacobian-knobs/knobfile.cfg -text
 tests/test-jacobian-knobs/knobfile.ref -text
 tests/test-jacobian-knobs/test-jacobian-knobs.cfg -text
 tests/test-jacobian-knobs/test-jacobian-knobs.madx -text
