@@ -16,7 +16,8 @@
 # | $Id$
 # |
 
-.PHONY: clean cleandir cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
+.PHONY: clean cleandir cleantest
+.PHONY: cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
 
 clean:
 	$E "** Cleaning local files"
@@ -26,6 +27,11 @@ clean:
 cleandir: clean
 	$E "** Cleaning files in depth"
 	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
+
+cleantest:
+	$E "** Cleaning tests files in depth"
+	$_ $(FIND) . -name '*.out' -exec $(RM) {} \;
+	$_ $(FIND) . -name '*.ref' -exec $(RM) `basename {} .ref` \;
 
 cleanc:
 	$E "** Cleaning C generated files"

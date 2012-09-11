@@ -19,17 +19,24 @@
 #################################################
 # testsuite
 
-# test case must be short and should test features only
-# user test can be longer and should test if studies are working
+# variables:
+# tests-all  : contains all tests
+# tests-long : contains all long tests
+
+# rules:
+# tests      : runs all tests not in tests-long
+# tests-all  : runs all tests
 
 ifndef TESTS
 
-tests-case := \
+tests-all := \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
-test-match \
-test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4
+test-match test-match-2 \
+test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
+test-ptc-twiss
 
-tests-user := \
+tests-long := \
+test-match-2 \
 test-ptc-twiss
 
 endif

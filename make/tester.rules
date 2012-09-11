@@ -16,34 +16,29 @@
 # | $Id$
 # |
 
-.PHONY: tests tests-case tests-user $(TESTS)
+.PHONY: tests tests-case $(tests-all) $(TESTS)
 
 #
 # all tests
 #
-tests: tests-case tests-user
+tests-all: $(tests-all)
 
 #
-# test cases only, sorted
+# fast tests only
 #
-tests-case: $(sort $(tests-case))
-
-#
-# user tests only, sorted
-#
-tests-user: $(sort $(tests-user))
+tests: $(filter-out $(tests-long),$(tests-all))
 
 #
 # rule for one test
 #
-$(tests-case) $(tests-user):
+$(tests-all):
 	$(run-test)
 
 #
 # check for directory existence
 #
 check-test-dirs := \
-   $(foreach dir,$(tests-case) $(tests-user),\
+   $(foreach dir,$(tests-all),\
      $(call exists,tests/$(dir),invalid test directory tests/$(dir)))
 
 # end of makefile
