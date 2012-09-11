@@ -1,12 +1,5 @@
 # Installation:
 
-#FILE(GLOB files "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_BINARY_DIR}/*.h" "${CMAKE_CURRENT_BINARY_DIR}/*.mod")
-#INSTALL(FILES ${files} DESTINATION include/madx)
-
-set(CMAKE_Fortran_MODULE_DIRECTORY
-    ${PROJECT_BINARY_DIR}/include/fortran/madX CACHE PATH "Single Directory for all fortran modules."
-)
-
 madx_install_targets(madxbin madx)
 
 madx_install_headers(${headerfiles})
