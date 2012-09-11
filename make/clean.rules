@@ -29,9 +29,9 @@ cleandir: clean
 	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
 
 cleantest:
-	$E "** Cleaning tests files in depth"
-	$_ $(FIND) . -name '*.out' -exec $(RM) {} \;
-	$_ $(FIND) . -name '*.ref' -exec $(RM) `basename {} .ref` \;
+	$E "** Cleaning tests files"
+	$_ $(RM) $(wildcard tests/*/*.out)
+	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/*/*.ref)))
 
 cleanc:
 	$E "** Cleaning C generated files"
