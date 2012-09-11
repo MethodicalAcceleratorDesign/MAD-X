@@ -1,3 +1,19 @@
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     manage contexts of constraints
+     print, scan contexts from file
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdlib.h>
 #include <assert.h>
 

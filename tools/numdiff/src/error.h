@@ -1,6 +1,21 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     manage error level and log error messages
+ 
+ o---------------------------------------------------------------------o
+*/
+
 // ----- constants
 
 enum {

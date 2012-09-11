@@ -1,3 +1,19 @@
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     numerical diff of files
+     provides the main numdiff loop
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>

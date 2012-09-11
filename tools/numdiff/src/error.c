@@ -1,3 +1,18 @@
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     manage error level and log error messages
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

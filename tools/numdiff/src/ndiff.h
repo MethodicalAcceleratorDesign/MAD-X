@@ -1,6 +1,22 @@
 #ifndef NDIFF_H
 #define NDIFF_H
 
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     numerical diff of files
+     provides the main numdiff loop
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdio.h>
 #include "types.h"
 

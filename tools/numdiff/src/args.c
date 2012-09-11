@@ -1,3 +1,20 @@
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+    manage arguments and options
+    display the help
+    run unit tests (immediate)
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdlib.h>
 #include <string.h>
 

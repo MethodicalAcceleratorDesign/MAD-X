@@ -1,6 +1,22 @@
 #ifndef CONSTRAINT_H
 #define CONSTRAINT_H
 
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     create constraints content
+     print, scan constraints from file
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include "slice.h"

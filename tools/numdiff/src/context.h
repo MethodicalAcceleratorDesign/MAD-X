@@ -1,6 +1,22 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     manage contexts of constraints
+     print, scan contexts from file
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <stdio.h>
 #include "types.h"
 

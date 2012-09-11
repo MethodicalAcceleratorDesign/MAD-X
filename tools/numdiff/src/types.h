@@ -1,6 +1,21 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+/*
+ o---------------------------------------------------------------------o
+ |
+ | Numdiff
+ |
+ | Copyright (c) 2012+ Laurent Deniau
+ |
+ o---------------------------------------------------------------------o
+  
+   Purpose:
+     provides portable types and limits
+ 
+ o---------------------------------------------------------------------o
+*/
+
 #include <limits.h>
 
 typedef unsigned char          bool;
