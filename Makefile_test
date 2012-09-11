@@ -20,8 +20,8 @@
 # testsuite
 
 # variables:
-# tests-all  : contains all tests
-# tests-long : contains all long tests
+# tests-all  : contains all tests        (includes tests-long)
+# tests-long : contains all long tests   (overlaps tests-all)
 
 # rules:
 # tests      : runs all tests not in tests-long
