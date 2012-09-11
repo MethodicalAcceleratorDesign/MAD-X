@@ -323,7 +323,6 @@ ndiff_gotoLine (T *dif, const char *tag)
     if (strstr(dif->rhs_b, tag)) break;
   }
 
-  // single line
   dif->col_i  = 0;
   dif->row_i += i1 < i2 ? i1 : i2;
 
