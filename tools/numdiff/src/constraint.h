@@ -2,6 +2,7 @@
 #define CONSTRAINT_H
 
 #include <stdio.h>
+#include <string.h>
 #include "slice.h"
 #include "error.h"
 
@@ -9,12 +10,17 @@
 
 enum eps_cmd {
   eps_invalid =   0u,  // invalid command
+
+// must be firsts (weak commands)
   eps_dig     =   1u,  // relative input eps
   eps_rel     =   2u,  // relative eps
   eps_abs     =   4u,  // absolute eps
   eps_equ     =   8u,  // equal string
   eps_ign     =  16u,  // ignore value
+
+// must be lasts (strong commands)
   eps_skip    =  32u,  // skip line
+  eps_goto    =  64u,  // goto line
   eps_last
 };
 
@@ -23,6 +29,7 @@ enum eps_cmd {
 struct eps {
   enum eps_cmd cmd;
   double dig, rel, abs;
+  char   tag[32];
 };
 
 struct constraint {
@@ -39,14 +46,24 @@ static inline struct eps
 eps_init(enum eps_cmd cmd, double val)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0 };
+  return (struct eps) { cmd, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0, {0} };
 }
 
 static inline struct eps
 eps_initNum(enum eps_cmd cmd, double dig, double rel, double abs)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, dig, rel, abs };
+  return (struct eps) { cmd, dig, rel, abs, {0} };
+}
+
+static inline struct eps
+eps_initTag(enum eps_cmd cmd, const char *tag)
+{
+  ensure(cmd == eps_goto, "invalid eps goto command");
+  struct eps eps = (struct eps) { .cmd = cmd };
+  enum { sz = sizeof eps.tag };
+  strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
+  return eps;
 }
 
 static inline const char*

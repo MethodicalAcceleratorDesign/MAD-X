@@ -162,8 +162,8 @@ context_setupRow (T *cxt, int row_i)
     const C *act = cxt->act[i];
     if (!slice_isEnum(&act->row, row_i)) continue; // not active
 
-    // skip-line always dominates
-    if (act->eps.cmd == eps_skip) {
+    // skip|goto line always dominates
+    if (act->eps.cmd >= eps_skip) {
       cxt->row[0] = act;
       cxt->row_n  = 1;
       return;
@@ -223,13 +223,13 @@ context_getAtCst (T *cxt, int row_i, int col_i)
   // select last-added active constraint, brute force...
   for (; cur >= cxt->dat; --cur)
     if (slice_isElem(&cur->row, row_i)) {
-      if (cur->eps.cmd == eps_skip) return cur;
+      if (cur->eps.cmd >= eps_skip) return cur;
       if (slice_isElem(&cur->col, col_i)) { cst = cur--; break; }
     }
 
-  // check for pending skip-line
+  // check for pending skip|goto line
   for (; cur >= cxt->dat; --cur)
-    if (cur->eps.cmd == eps_skip && slice_isElem(&cur->row, row_i)) return cur;
+    if (cur->eps.cmd >= eps_skip && slice_isElem(&cur->row, row_i)) return cur;
 
   return cst;
 }
@@ -286,7 +286,7 @@ context_add (T *cxt, const C *cst)
   cxt->dat[cxt->dat_n++] = *cst;
 
   // expand to all columns
-  if (cst->eps.cmd == eps_skip)
+  if (cst->eps.cmd >= eps_skip)
     cxt->dat[cxt->dat_n-1].col = slice_initAll();
 
   return cxt;

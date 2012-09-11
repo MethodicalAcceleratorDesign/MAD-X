@@ -25,6 +25,7 @@ void  ndiff_loop     (T*, struct context*, int blank, int check);
 // low level API
 int   ndiff_skipLine (T*);
 int   ndiff_readLine (T*);
+int   ndiff_gotoLine (T*, const char *tag);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
 
 void  ndiff_diffLine (T*, int blank);

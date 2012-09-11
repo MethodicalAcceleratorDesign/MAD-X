@@ -21,6 +21,7 @@ const char * const eps_cmd_cstr[] = {
   [eps_equ]                 = "equ",
   [eps_ign]                 = "ign",
   [eps_skip]                = "skip",
+  [eps_goto]                = "goto",
 };
 
 // ----- private
@@ -127,6 +128,10 @@ readEps(struct eps *e, FILE *in, int row)
     else if (strcmp(str, "abs") == 0 && (r = fscanf(in, "=%lf", &e->abs)) == 1) {
       e->cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
     }
+    else if (strcmp(str, "goto") == 0 && (r = fscanf(in, "='%32[^']'", e->tag)) == 1) {
+      e->cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
+                          trace("[%d] goto='%s'", row, e->tag);
+    }
     else {
                           trace("[%d] invalid '%s'", row, str);
       e->cmd = eps_invalid;
@@ -160,6 +165,9 @@ constraint_print(const T* cst, FILE *out)
     if (cst->eps.cmd & eps_dig) fprintf(out, "dig=%g ", cst->eps.dig);    
     if (cst->eps.cmd & eps_rel) fprintf(out, "rel=%g ", cst->eps.rel);    
     if (cst->eps.cmd & eps_abs) fprintf(out, "abs=%g ", cst->eps.abs);    
+  } else
+  if (cst->eps.cmd == eps_goto) {
+    fprintf(out, "goto='%s' ", cst->eps.tag);
   } else
     fprintf(out, "%s", eps_cstr(cst->eps.cmd));
 }

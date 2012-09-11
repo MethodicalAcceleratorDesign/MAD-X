@@ -276,6 +276,61 @@ ndiff_readLine (T *dif)
 }
 
 int
+ndiff_gotoLine (T *dif, const char *tag)
+{
+  assert(dif && tag);
+
+  int c1=0, c2=0;
+
+  // lhs
+  while (1) {
+    int s = 0, n = 0;
+
+    dif->lhs_i    = 0;
+    dif->lhs_b[0] = 0;
+
+    if (c1 == EOF) break;
+
+    while (1) {
+      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_s-s, &n); s += n;
+      if (c1 == '\n' || c1 == EOF) break;
+      ndiff_grow(dif, 2*dif->buf_s);
+    }
+
+    if (strstr(dif->lhs_b, tag)) break;
+  }
+
+  // rhs
+  while (1) {
+    int s = 0, n = 0;
+
+    dif->rhs_i    = 0;
+    dif->rhs_b[0] = 0;
+
+    if (c2 == EOF) break;
+
+    while (1) {
+      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_s-s, &n); s += n;
+      if (c2 == '\n' || c2 == EOF) break;
+      ndiff_grow(dif, 2*dif->buf_s);
+    }
+
+    if (strstr(dif->rhs_b, tag)) break;
+  }
+
+  // single line
+  dif->col_i  = 0;
+  dif->row_i += 1;
+
+  // return with last lhs and rhs lines loaded if tag was found
+
+  trace("<-gotoLine line %d", dif->row_i);
+  trace("  buffers: '%.30s'|'%.30s'", dif->lhs_b, dif->rhs_b);
+
+  return c1 == EOF || c2 == EOF ? EOF : !EOF;
+}
+
+int
 ndiff_fillLine (T *dif, const char *lhs_b, const char *rhs_b)
 {
   assert(dif);
@@ -576,8 +631,11 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
       continue;
     }
 
-    // normal constraint(s), read line
-    ndiff_readLine(dif);
+    // goto or read line(s)
+    if (c->eps.cmd == eps_goto)
+      ndiff_gotoLine(dif, c->eps.tag);
+    else
+      ndiff_readLine(dif);
 
     // for each number column, diff-chars between numbers
     while((n = ndiff_nextNum(dif, blank))) {
