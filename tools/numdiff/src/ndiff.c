@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "args.h"
 #include "ndiff.h"
 #include "constraint.h"
 #include "context.h"
@@ -33,7 +34,7 @@ struct ndiff {
 static inline int
 is_separator (int c)
 {
-  return isblank(c) || (ispunct(c) && c != '.' && c != '_');
+  return isblank(c) || (ispunct(c) && !strchr(option.chr, c));
 }
 
 static inline int
@@ -280,7 +281,7 @@ ndiff_gotoLine (T *dif, const char *tag)
 {
   assert(dif && tag);
 
-  int c1=0, c2=0;
+  int c1=0, c2=0, i1=0, i2=0;
 
   // lhs
   while (1) {
@@ -296,6 +297,8 @@ ndiff_gotoLine (T *dif, const char *tag)
       if (c1 == '\n' || c1 == EOF) break;
       ndiff_grow(dif, 2*dif->buf_s);
     }
+
+    i1 += s != 0;
 
     if (strstr(dif->lhs_b, tag)) break;
   }
@@ -315,12 +318,14 @@ ndiff_gotoLine (T *dif, const char *tag)
       ndiff_grow(dif, 2*dif->buf_s);
     }
 
+    i2 += s != 0;
+
     if (strstr(dif->rhs_b, tag)) break;
   }
 
   // single line
   dif->col_i  = 0;
-  dif->row_i += 1;
+  dif->row_i += i1 < i2 ? i1 : i2;
 
   // return with last lhs and rhs lines loaded if tag was found
 

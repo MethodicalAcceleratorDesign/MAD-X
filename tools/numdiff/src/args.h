@@ -7,6 +7,7 @@ struct option {
   int check, debug, serie, list, blank, utest, keep;
   const char *suite, *test;
   const char *fmt;
+  const char *chr;
   const char *out_e, *ref_e, *cfg_e;
   char indexed_filename[FILENAME_MAX+100];
   int argi;

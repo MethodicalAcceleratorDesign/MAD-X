@@ -11,6 +11,9 @@ struct option option = {
   // names and series numbering
   .fmt = "%d",
 
+  // punctuation part of identifiers
+  .chr = "._",
+
   // number of diff displayed
   .keep = 25,
 
@@ -67,6 +70,7 @@ usage(void)
   inform("\t-l    -list         enable list mode (list of filenames)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-o    -outext ext   specify the output file extension, default is .out");
+  inform("\t-p    -punct chrs   punctuation characters part of identifiers, default is \"._\"");
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
   inform("\t-r    -refext ext   specify the reference file extension, default is .ref");
   inform("\t-s    -suite name   set testsuite name for output message (title)");
@@ -191,6 +195,13 @@ parse_args(int argc, const char *argv[])
         option.argi++;
         inform("serie mode is off, format ignored");
       }
+      continue;
+    }
+
+    // set punctuation characters [setup]
+    if (!strcmp(argv[option.argi], "-p") || !strcmp(argv[option.argi], "-punct")) {
+      option.chr = argv[++option.argi]; 
+      debug("punctuation characters set to '%s'", option.chr);
       continue;
     }
 
