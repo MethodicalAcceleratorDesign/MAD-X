@@ -596,13 +596,9 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
-tests/test-match/str.ip8.b1.dat.cfg -text
-tests/test-match/str.ip8.b1.dat.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text
-tests/test-match/twiss.ir8.b1.data.cfg -text
-tests/test-match/twiss.ir8.b1.data.ref -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-normal/distort_1_f_end.cfg -text
 tests/test-ptc-normal/distort_1_f_end.ref -text
