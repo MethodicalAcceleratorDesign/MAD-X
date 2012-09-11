@@ -581,6 +581,8 @@ testing/underConstruction.gif -text svneol=unset#unset
 tests/share/eng/lhc/optics/V6.503/V6.5.coll.str -text
 tests/share/eng/lhc/optics/V6.503/V6.5.inj.str -text
 tests/share/eng/lhc/optics/V6.503/V6.5.seq -text
+tests/share/eng/lhc/optics/V6.503/toolkit/select.ir8.b1.madx -text
+tests/share/eng/lhc/optics/V6.503/toolkit/twissini.ir8.b1.madx -text
 tests/test-ibs/ibs_output.tfs.cfg -text
 tests/test-ibs/ibs_output.tfs.ref -text
 tests/test-ibs/test-ibs.cfg -text
@@ -596,6 +598,13 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
+tests/test-match-2/str.ip8.b1.dat.cfg -text
+tests/test-match-2/str.ip8.b1.dat.ref -text
+tests/test-match-2/test-match-2.cfg -text
+tests/test-match-2/test-match-2.madx -text
+tests/test-match-2/test-match-2.ref -text
+tests/test-match-2/twiss.ir8.b1.data.cfg -text
+tests/test-match-2/twiss.ir8.b1.data.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text

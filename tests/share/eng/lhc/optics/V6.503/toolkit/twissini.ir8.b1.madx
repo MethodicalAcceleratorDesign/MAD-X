@@ -1,0 +1,6 @@
+SELECT, FLAG=TWISS,clear;
+SELECT, FLAG=TWISS,column=name,s,betx,bety,alfx,alfy,dx,dpx,x,px,y,py,mux,muy;
+TWISS,sequence=lhcb1,file=twiss.ir8.b1.data,beta0=bir8b1,save;
+!System,"cat twiss.ir8.b1.data";
+return;
+

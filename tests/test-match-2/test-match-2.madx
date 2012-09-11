@@ -1,0 +1,80 @@
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+Option,  warn,info;
+
+Title, "Matching an insertion of the LHC 6.5 lattice with MADX";
+
+!---------------------------------------------------------------;
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+!---------------------------------------------------------------;
+option, -echo;
+call, file = "../share/eng/lhc/optics/V6.503/V6.5.seq";
+call, file = "../share/eng/lhc/optics/V6.503/V6.5.coll.str";
+option, echo;
+
+Beam, particle = proton, sequence=lhcb1, energy = 7000.0;
+Beam, particle = proton, sequence=lhcb2, energy = 7000.0;
+! the 'bv' parameter indicates that beam2 rotates counter-clockwise
+
+! select IR8 of beam1:
+call,file="../share/eng/lhc/optics/V6.503/toolkit/select.ir8.b1.madx";
+call,file="../share/eng/lhc/optics/V6.503/toolkit/twissini.ir8.b1.madx";
+
+
+! Create table for storing data
+n=0;
+create,table=str.ip8.b1,column=n,kq4.l8b1, kq5.l8b1, kq6.l8b1, kq7.l8b1, kq8.l8b1, kq9.l8b1, kq10.l8b1, kqtl11.l8b1, kqt12.l8b1, kqt13.l8b1,kq4.r8b1, kq5.r8b1, kq6.r8b1, kq7.r8b1, kq8.r8b1, kq9.r8b1, kq10.r8b1, kqtl11.r8b1, kqt12.r8b1, kqt13.r8b1,beta.ip8,tar;
+
+! fill the table
+fill,table=str.ip8.b1;
+
+! set match variables
+muxip8 := 3.204; ! Horizontal phase advance over IR8
+muyip8 := 2.804; ! Vertical phase advance over IR8
+scale := 23348.89927;
+qtlimit1 := 1.0*220.0/scale;
+qtlimit2 := 1.0*200.0/scale;
+qtlimit3 := 1.0*130.0/scale;
+qtlimit4 := 1.0*160.0/scale;
+
+tar=0;
+while( n < 2 ) {  ! tar < 1E-10 ) {
+n=n+1;
+beta.ip8=beta.ip8*.6;
+match,sequence=lhcb1,beta0=bir8b1;
+constraint,sequence=lhcb1,range=ip8,betx=beta.ip8,bety=beta.ip8;
+constraint,sequence=lhcb1,range=ip8,alfx=0.0,alfy=0.0;
+constraint,sequence=lhcb1,range=ip8,dx=0.0,dpx=0.0;
+
+constraint,sequence=lhcb1,range=e.DS.R8.B1,
+                            alfx=eir8b1->alfx,alfy=eir8b1->alfy,
+                            betx=eir8b1->betx,bety=eir8b1->bety; 
+constraint,sequence=lhcb1,range=e.DS.R8.B1,dx=eir8b1->dx,dpx=eir8b1->dpx;
+constraint,sequence=lhcb1,range=e.DS.R8.B1,mux=muxip8,muy=muyip8;
+
+vary,name=KQ4.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ5.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ6.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ7.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ8.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ9.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ10.L8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQTL11.L8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+vary,name=KQT12.L8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+vary,name=KQT13.L8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+
+vary,name=KQ4.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ5.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ6.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ7.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ8.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ9.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQ10.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
+vary,name=KQTL11.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+vary,name=KQT12.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+vary,name=KQT13.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
+jacobian,calls=30,tolerance=1.e-24;
+endmatch;
+fill,table=str.ip8.b1;
+};
+write,table=str.ip8.b1,file="str.ip8.b1.dat";
+stop;
