@@ -5,8 +5,6 @@ Option, -warn,-info,-echo;
 lq1=0.50;
 lq2=0.50;
 endseq=165;
-!sequence
-!ffocus: sequence,refer = CENTRE, L = 172.227;
 ffocus: sequence,refer = CENTRE, L := endseq;
 q11 :quadrupole,l:=l1/2,k1:= k1,at:=lstar+l1/4;
 q12 :quadrupole,l:=l1/2,k1:= k1,at:=lstar+l1*3/4+lq1;
@@ -19,57 +17,9 @@ q32 :quadrupole,l:=l3/2,k1:= k3,at:=lstar+l1+2*lq1+2*lq2+d12+2*l2+d22+d23+l3*3/4
 endsequence;
 beam;
 
-
 r_tol_IT=0.0006;
 h_tol_IT=0.0010;
 v_tol_IT=0.0010;
-
-OCTAGON(xx1,yy1,xx2,yy2): macro = {
- print,text=" 0.0xx1   0.0yy1";
- print,text=" 0.0xx2   0.0yy2";
- print,text="-0.0xx2   0.0yy2";
- print,text="-0.0xx1   0.0yy1";
- print,text="-0.0xx1  -0.0yy1";
- print,text="-0.0xx2  -0.0yy2";
- print,text=" 0.0xx2  -0.0yy2";
- print,text=" 0.0xx1  -0.0yy1";
-};
-
-def_apocta(q11): macro={
-  q11, APERTYPE="Q1_APERTURE",
-       APER_TOL={r_tol_IT,h_tol_IT,v_tol_IT};
-};
-
-def_aprect(q11): macro={
-  q11,  APERTYPE=RECTELLIPSE,
-        APERTURE={r_Q1,r_Q1,r_Q1,r_Q1},
-        APER_TOL={r_tol_IT,h_tol_IT,v_tol_IT};
-};
-
-def_apcircle(q11): macro={
-  q11, APERTYPE=CIRCLE,
-       APERTURE={r_Q1},
-       APER_TOL={r_tol_IT,h_tol_IT,v_tol_IT};
-};
-
-set_aperture(ap_dmm,appppp): macro={
- angle1=22.5;angle2=67.5;
- r_Q1=ap_dmm/2000;
- xx1=r_Q1*1000*cos(angle1/180*pi);
- yy1=r_Q1*1000*sin(angle1/180*pi);
- xx2=r_Q1*1000*cos(angle2/180*pi);
- yy2=r_Q1*1000*sin(angle2/180*pi);
- value,xx1,yy1,xx2,yy2;
- system, "rm  -f Q1_APERTURE";
- assign, echo="Q1_APERTURE";
- exec, OCTAGON($xx1, $yy1, $xx2, $yy2);
- assign, echo=terminal;
- exec,def_apappppp(q11 ); exec,def_apappppp(q12 );
- exec,def_apappppp(q2a1); exec,def_apappppp(q2a2);
- exec,def_apappppp(q2b1); exec,def_apappppp(q2b2);
- exec,def_apappppp(q31 ); exec,def_apappppp(q32 );
-};
-
 
 calc_triplet(bxs,bys): macro= {
    use,sequence=ffocus;
@@ -103,12 +53,7 @@ betymax:=tbety+talfy^2/tbety/abs(tk1l/tl);
 select,flag=twiss,clear;
 select,flag=twiss,column=name,s,l,angle,k1l,hkick,vkick,kick,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py,betxmax,betymax;
 
-
-!bxs=0.60; !bys=0.60; !grad=100;
-!betxq4=700; !betyq4=1200; 
 brho=7e12/clight; k=grad/brho;
-!if (grad>=120 ) { l1=7.0; l2=6; };
-!if (grad>=400 ) { l1=4.2; l2=4.2; };
 
 lstar=23;
 
@@ -189,34 +134,12 @@ value,alfyend;
 value,bq3max*bxs;
 };
 
-calc_aperture(bxs,bys,dsep,cangle,psep):macro={
-cx=cos(cangle/180*pi);sx=sin(cangle/180*pi);
-xip=psep*sx; yip=psep*cx;
-gemit=emittance_norm/NRJ*pmass;
-pxip=sqrt(gemit/bxs)*dsep*cx;
-pyip=sqrt(gemit/bys)*dsep*sx;
-value,xip,yip,pxip,pyip;
-select,flag=twiss,clear;
-select,flag=twiss,column=name,s,l,angle,k1l,k2l,hkick,vkick,kick,betx,bety,dx,dy,x,y;
-beam, sequence=ffocus,particle=proton,energy=NRJ,
-      NPART=1.15E11, sige=4.5e-4*sqrt(450./NRJ);
-twiss,betx=bxs,bety=bys,x=xip,y=yip,px=pxip,py=pyip,file=temp/twiss_triplet.tfs;
-select,flag=aperture,clear;
-select,flag=aperture,column=name,s,betx,bety,dx,dy,x,y,n1,apertype,aper_1,aper_2,aper_3,aper_4,Rtol,xtol,ytol;
-aperture,cor=COmax, dp=dPmax, spec=SPECIF,interval=1.0,
-         halo={6,halor,halox,haloy},bbeat=apbbeat,
-         exn=emittance_norm,eyn=emittance_norm,
-         file=temp/ap_triplet.tfs;
-};
-
 __round(xv,xn): macro={ if ( xv-xn > 0.5) { xv=xn+1; } else { xv=xn; }; };
 round(xv,digits): macro={
-!  xv=round(xv*digits)/digits;
   xtmp=xv*digits;
   exec,__round(xtmp,$xtmp);
   xv=xtmp/digits;
 };
 
 exec,mk_triplet(0.60,0.60,150,120,1913,1234);
-
 
