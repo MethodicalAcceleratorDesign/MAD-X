@@ -103,9 +103,9 @@ contains
      WRITE(6,'(a20,(1x,g21.14))') "Synchrotron period = ",1.d0/abs(norm%tune(3))
      else
      if(norm%tune(3)/=0.0_dp.and.c_%ndpt==0) then
-       WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:3)
+       WRITE(mf,'(4(1x,g21.14))') xsm0%ac%t/clight,norm%tune(1:3)
      else
-       WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight/unit_time,norm%tune(1:2)
+       WRITE(mf,'(3(1x,g21.14))') xsm0%ac%t/clight,norm%tune(1:2)
      endif
     endif
     CALL kill(NORM)
@@ -1599,7 +1599,7 @@ eta2=0.0_dp
        endif
 
 
-       if(f1) then
+       if(f1.and.per<=0) then
           call GRNF(X,cut)
           bn=cns+cn*x
           if(integrated.and.p%mag%p%ld/=0.0_dp) then

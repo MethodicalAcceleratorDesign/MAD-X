@@ -9,7 +9,7 @@
   
   TYPE acceleration
      integer,pointer :: n,POS,nst 
-     real(dp), pointer :: r, unit_time,de(:),e_in(:)
+     real(dp), pointer :: r,de(:),e_in(:)  !, unit_time
      type(work),pointer :: w1,w2      
      TYPE(FIBRE), pointer :: PREVIOUS    
      TYPE(FIBRE), pointer :: NEXT    

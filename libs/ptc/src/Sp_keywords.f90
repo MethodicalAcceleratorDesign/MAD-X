@@ -636,10 +636,12 @@ nmark=0
     close(mf)
 
     if(res==1) then
+ 
        call read_COMPLEX_SINGLE_STRUCTURE(U,filename,RING,LMAX0)
     else
-       call APPEND_EMPTY_LAYOUT(U)
 
+       call APPEND_EMPTY_LAYOUT(U)
+ 
        CALL READ_INTO_VIRGIN_LAYOUT(U%END,FILENAME,RING,LMAX0)
        ! if(do_survey) call survey(u%end)
     endif
@@ -2037,6 +2039,97 @@ enddo
 close(mf)
 end subroutine print_new_flat
 
+subroutine  read_lattice(r,filename)
+implicit none
+type(layout),target :: r
+character(*) filename
+logical(lp) doneit
+character(120) line
+
+integer mf,n
+
+
+
+!-----------------------------------
+call kanalnummer(mf,filename(1:len_trim(filename)))
+
+   read(mf,'(a120)') r%name
+   read(mf,*) highest_fringe  
+   read(mf,*) lmax  
+   read(MF,*) ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING  
+   read(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL  
+    
+ read(mf,'(a120)') line
+n=0
+do while(.true.) 
+   read(mf,NML=ELEname,end=999)
+ write(6,NML=ELEname)
+   read(mf,NML=FIBRENAME,end=999)
+ write(6,NML=FIBRENAME)
+   read(mf,NML=MAGLNAME,end=999)
+ write(6,NML=MAGLNAME)
+ call read_ElementLIST(ELE0%kind,MF)
+ read(mf,'(a120)') line
+n=n+1
+enddo
+
+
+   100 CONTINUE
+  !  r%closed=.true.
+
+  !  doneit=.true.
+  !  call ring_l(r,doneit)
+
+!    call survey(r)
+
+999 write(6,*) "Read ",n
+
+
+1000 continue
+
+close(mf)
+end subroutine read_lattice
+
+  subroutine read_ElementLIST(kind,mf)
+    implicit none
+
+    integer mf,i,kind
+    LOGICAL dir
+    character*255 line
+
+
+    select case(kind)
+    CASE(KIND0,KIND1,kind2,kind5,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
+  case(kind3)
+     read(mf,NML=thin30name)
+    case(kind4)
+     read(mf,NML=CAVname)
+    case(kind10)
+      read(mf,NML=tp100name)
+
+    case(kind16,kind20)
+
+     read(mf,NML=k160name)
+
+    case(kind18)
+
+    case(kind19)
+
+    case(kind21)
+
+    case(KINDWIGGLER)
+
+    case(KINDpa)
+ 
+   case default
+       write(MF,*) " not supported in print_specific_element",kind
+ !      stop 101
+    end select
+    
+    CALL  r_ap_aplist(mf) 
+
+
+  END SUBROUTINE read_ElementLIST
 
 subroutine  fib_fib0(f,dir,mf)
 implicit none
@@ -2321,7 +2414,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  thin30%hf=F%k3%hf
  thin30%vf=F%k3%vf
  thin30%patch=F%k3%patch
- thin30%ls=F%k3%ls
+ thin30%ls=F%k3%ls 
     if(present(mf)) then
      write(mf,NML=thin30name)
     endif   
@@ -2355,12 +2448,12 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
 
  tp100%DRIFTKICK=F%tp10%DRIFTKICK
      if(present(mf)) then
-     write(mf,NML=tp100_list)
+     write(mf,NML=tp100name)
     endif   
  
  else
     if(present(mf)) then
-     read(mf,NML=tp100_list)
+     read(mf,NML=tp100name)
     endif   
  F%tp10%DRIFTKICK=tp100%DRIFTKICK
 endif
@@ -2379,12 +2472,12 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  k160%DRIFTKICK=F%k16%DRIFTKICK
  k160%LIKEMAD=F%k16%LIKEMAD
      if(present(mf)) then
-     write(mf,NML=k160_list)
+     write(mf,NML=k160name)
     endif   
  
  else
     if(present(mf)) then
-     read(mf,NML=k160_list)
+     read(mf,NML=k160name)
     endif   
  F%k16%DRIFTKICK=k160%DRIFTKICK
  F%k16%LIKEMAD=k160%LIKEMAD
@@ -2417,7 +2510,7 @@ if(here) then
     aplist%dy=a%dy
      if(present(mf)) then
      Write(mf,*) " APERTURE "  
-     write(mf,NML=aperture_list)
+     write(mf,NML=aperturename)
     endif   
 else
  Write(mf,*) " NO APERTURE "
@@ -2435,7 +2528,7 @@ endif
     
     
     if(present(mf)) then     
-     read(mf,NML=aperture_list)
+     read(mf,NML=aperturename)
     endif   
       a%kind=aplist%kind
       a%r=aplist%r
@@ -2448,55 +2541,24 @@ endif
 endif
 end subroutine ap_aplist
 
- 
- !   CALL CONTEXT(LINE)
 
- !   IF(LINE(1:2)/='NO') THEN
- !      IF(.NOT.ASSOCIATED(M)) THEN
- !         CALL alloc(M)
- !      ENDIF
-
-
-
-
-subroutine  read_lattice(r,filename)
+subroutine  r_ap_aplist(mf)
 implicit none
-type(layout),target :: r
-character(*) filename
-logical(lp) doneit
-
-
-integer mf,n
-
- 
-!-----------------------------------
-call kanalnummer(mf,filename(1:len_trim(filename)))
-n=0
-do while(.true.) 
-
-         read(mf,NML=ELEname,end=999)
-    n=n+1
-!        call create_fibre(r%end,key,EXCEPTION)
-        
-
-    enddo
+integer  mf
+CHARACTER(120) LINE
    
-   100 CONTINUE
-    r%closed=.true.
+      READ(MF,'(a120)') LINE 
+      CALL CONTEXT(LINE)
 
-    doneit=.true.
-    call ring_l(r,doneit)
-
-    call survey(r)
-
-999 write(6,*) "Read ",n
-
-
-1000 continue
-
-close(mf)
-end subroutine read_lattice
-
+    IF(LINE(1:2)/='NO') THEN
+        read(mf,NML=aperturename)
+       aplist%on=.true.
+       write(6,nml=aperturename)
+    else
+     aplist%on=.false.
+    endif
+    
+end subroutine r_ap_aplist
 
 end module madx_keywords
 

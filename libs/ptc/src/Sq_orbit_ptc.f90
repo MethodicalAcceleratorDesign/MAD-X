@@ -906,7 +906,7 @@ contains
     a=>el%c4%acc
 
 
-    ti=t_fin/clight/a%unit_time    ! time in milliseconds
+    ti=t_fin/clight    ! time in milliseconds
     if(ti>a%tableau(a%n)%temps.or.ti<a%tableau(1)%temps) then
        ! write(6,*) " Acceleration must stop time =",ti
        if(ti>a%tableau(a%n)%temps) then
@@ -1373,7 +1373,7 @@ p=>p%next
 enddo
 !write(6,*) closed
 close(mf)
-!pause 123
+pause 123
 
     ID=1
     Y=CLOSED+ID

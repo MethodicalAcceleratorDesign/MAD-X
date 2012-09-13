@@ -22,7 +22,7 @@ module ptc_multiparticle
   logical(lp),private, parameter :: dobb=.true.
   logical(lp),private, parameter :: aperture_all_case0=.false.
   type(probe) :: xsm,xsm0
-  real(dp) :: unit_time =1.0e-3_dp
+  !real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
   
   INTERFACE TRACK_NODE_SINGLE
@@ -209,7 +209,7 @@ CONTAINS
     dtot=(a%table(a%n)%time-a%table(1)%time)  !/(a%n-1)
     
  !   ti=XSM0%ac%t/clight/a%unit_time    ! time in milliseconds
-    ti=t0/clight/a%unit_time    ! time in milliseconds
+    ti=t0/clight    !/a%unit_time    ! time in milliseconds
     
 !    if(ti>a%t_max.or.ti<a%table(1)%time) then
 !    if(ti>a%table(a%n)%time.or.ti<a%table(1)%time) then

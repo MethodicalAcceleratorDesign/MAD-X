@@ -144,7 +144,7 @@ END TYPE tilting
   
   TYPE ramping
      integer,pointer :: n
-     real(dp), pointer :: r, unit_time,t_max    
+     real(dp), pointer :: r,t_max    !, unit_time
      type(time_energy),pointer :: table(:)
      character(255), pointer :: file
   END TYPE ramping

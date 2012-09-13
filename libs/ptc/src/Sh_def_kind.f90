@@ -12978,7 +12978,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    allocate(acc%tableau(n))
    allocate(acc%fichier)
    allocate(acc%r)
-   allocate(acc%unit_time)
+!   allocate(acc%unit_time)
    allocate(acc%w1)
    allocate(acc%nst)
    allocate(acc%de(nst))
@@ -13039,7 +13039,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    nullify(acc%next)
    nullify(acc%previous)
    deallocate(acc%pos)
-   deallocate(acc%unit_time)
+!   deallocate(acc%unit_time)
    deallocate(acc%n)
    deallocate(acc%r)
    deallocate(acc%w1)
@@ -13062,7 +13062,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    nullify(acc%POS)
    nullify(acc%NEXT)
    nullify(acc%previous)
-   nullify(acc%unit_time)
+!   nullify(acc%unit_time)
    nullify(acc%nst)
    nullify(acc%de)
    nullify(acc%e_in)
@@ -13100,7 +13100,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    acc2%nst=acc1%nst
    acc2%de=acc1%de
    acc2%e_in=acc1%e_in
-   acc2%unit_time=acc1%unit_time
+!   acc2%unit_time=acc1%unit_time
    acc2%r=acc1%r
    do i=1,acc2%n
 !    acc2%tableau(i)=acc1%tableau(i)
@@ -13164,7 +13164,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    call alloc_acceleration(acc,el%p%nst,n,n_max,fichier)
    
 
-    acc%unit_time=ut
+!    acc%unit_time=ut
 
    
    acc%pos=pos
@@ -13180,6 +13180,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     endif 
   !  acc%tableau(i)%phase(2)=-acc%tableau(i)%phase(2)
   !  write(6,*) acc%tableau(i)%phase(2)
+     acc%tableau(i)%temps=acc%tableau(i)%temps*ut
    enddo
    
    close(mf)
@@ -13244,22 +13245,23 @@ SUBROUTINE ZEROr_teapot(EL,I)
  
  !!!!!!!!!!!!! ramping !!!!!!!!!!!!! 
  
-   SUBROUTINE alloc_ramping(acc,unit_time,t_max,n,n_max,filename)
+ !  SUBROUTINE alloc_ramping(acc,unit_time,t_max,n,n_max,filename)
+  SUBROUTINE alloc_ramping(acc,t_max,n,n_max,filename)
    implicit none
    type(ramping), target :: acc
    integer i,n,n_max
    character(*) filename
-   real(dp) unit_time,t_max
+   real(dp) t_max   !unit_time,
    
    allocate(acc%n)
    acc%n=n
    allocate(acc%table(0:n))
    allocate(acc%file)
    allocate(acc%r,acc%t_max)
-   allocate(acc%unit_time)
+!   allocate(acc%unit_time)
    acc%r=1.0_dp
    acc%t_max=t_max
-   acc%unit_time=unit_time
+!   acc%unit_time=unit_time
    acc%file=' '
    
    if(len(filename)>255) then
@@ -13306,7 +13308,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    deallocate(acc%n)
    deallocate(acc%r)
    deallocate(acc%t_max)
-   deallocate(acc%unit_time)
+!   deallocate(acc%unit_time)
    deallocate(acc%file)
    
    end SUBROUTINE kill_ramping
@@ -13334,7 +13336,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    nullify(acc%n)
    nullify(acc%file)
    nullify(acc%table)
-   nullify(acc%unit_time)
+!   nullify(acc%unit_time)
    
    
    end SUBROUTINE nullify_ramping
@@ -13361,7 +13363,8 @@ SUBROUTINE ZEROr_teapot(EL,I)
    integer i
    
    if(associated(acc2%n)) call kill_ramping(acc2)
-   call alloc_ramping(acc2,acc1%unit_time,acc1%t_max,acc1%n,size(acc1%table(1)%an),acc1%file)
+   call alloc_ramping(acc2,acc1%t_max,acc1%n,size(acc1%table(1)%an),acc1%file)
+!   call alloc_ramping(acc2,acc1%unit_time,acc1%t_max,acc1%n,size(acc1%table(1)%an),acc1%file)
    
    do i=0,acc2%n
 !    acc2%tableau(i)=acc1%tableau(i)
@@ -13380,7 +13383,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
    character(*) fichier
    integer mf,i,n_mode,n_max,j,n,cavpath,pos,np
    integer, allocatable :: js(:)
-   real(dp) unit_time
+   real(dp) ut
    character(255) line
    character(7) car
    logical timepatch
@@ -13392,9 +13395,9 @@ SUBROUTINE ZEROr_teapot(EL,I)
    call kanalnummer(mf,fichier)
    read(mf,'(a255)') line
     if(index(line,"#")/=0) then
-     read(line,*) n,unit_time,n_mode,car,np
+     read(line,*) n,ut,n_mode,car,np
     else
-     read(line,*) n,unit_time,n_mode
+     read(line,*) n,ut,n_mode
     endif
     if(index(line,"T")/=0.or.index(line,"t")/=0) timepatch=.true.
 !   read(mf,*) n,unit_time,n_mode
@@ -13413,7 +13416,8 @@ SUBROUTINE ZEROr_teapot(EL,I)
    
    if(n_max<el%p%nmul) n_max = el%p%nmul
    
-   call alloc_ramping(acc,unit_time,0.0_dp,n,n_max,fichier)
+!   call alloc_ramping(acc,unit_time,0.0_dp,n,n_max,fichier)
+   call alloc_ramping(acc,0.0_dp,n,n_max,fichier)
    acc%r=1.0_dp
    do i=1,acc%n
     if(timepatch) then
@@ -13425,6 +13429,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
         acc%table(i)%b_t=0.0_dp
     endif
     acc%table(i)%energy=0.d0
+    acc%table(i)%time=acc%table(i)%time*ut
    enddo
    
    close(mf)

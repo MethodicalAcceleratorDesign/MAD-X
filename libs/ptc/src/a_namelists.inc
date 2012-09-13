@@ -55,19 +55,20 @@ namelist / thin30name / thin30
    logical(lp) DRIFTKICK
   END TYPE tp10_list
 type(tp10_list) tp100
-namelist / tp100_list / tp100
+namelist / tp100name / tp100
 
   TYPE k16_list
    logical(lp) DRIFTKICK,LIKEMAD
   END TYPE k16_list
 type(k16_list) k160
-namelist / k160_list / k160
+namelist / k160name / k160
 
   TYPE ap_list
    integer KIND
    real(dp) r(2)
    real(dp) x,y,dx,dy
+   logical on
   END TYPE ap_list
  type(ap_list) aplist
- namelist / aperture_list / aplist
+ namelist / aperturename / aplist
 

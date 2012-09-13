@@ -532,7 +532,17 @@ CONTAINS
   SUBROUTINE Set_Up( L ) ! Sets up a layout: gives a unique negative index
     implicit none
     TYPE (layout),TARGET, INTENT(INOUT):: L
+    type(mad_universe), pointer :: madu
+!  new 2012.9.7
+    nullify(madu)
+   if(associated(L%parent_universe) ) madu=>L%parent_universe
+!    
+
     CALL NULLIFY_LAYOUT(L)
+    
+    if(associated(madu) ) L%parent_universe=>madu
+     nullify(madu)   
+
     ALLOCATE(L%closed);  ALLOCATE(L%lastpos);ALLOCATE(L%NAME);ALLOCATE(L%HARMONIC_NUMBER);
     ALLOCATE(L%NTHIN);ALLOCATE(L%THIN);ALLOCATE(L%INDEX);
     ALLOCATE(L%n);

@@ -313,8 +313,8 @@ contains
        case('TIMEINUNITS','TIMEINSECONDS')
        
           read(mf,*) xsm%ac%t
-          write(6,*) " Using ",unit_time," seconds"
-          xsm%ac%t=xsm%ac%t*clight*unit_time
+!          write(6,*) " Using ",unit_time," seconds"
+          xsm%ac%t=xsm%ac%t*clight  !*unit_time
           xsm0%ac%t=xsm%ac%t
           x_orbit_sync=0.0_dp
           x_orbit_sync(6)=xsm%ac%t
@@ -326,7 +326,8 @@ contains
              write(6,*) "file ", INITIAL_setting(1:len_trim(FINAL_setting)), &
                   " exists, interrupt execution if you do not want to overwrite!"
             call kanalnummer(i1,INITIAL_setting)
-            read(i1,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+   !         read(i1,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+            read(i1,*) xsm%ac%t,n_used_patch,include_patch
             read(i1,*) nc
             if(nc/=0) then
                  allocate(tc(nc))
@@ -369,10 +370,11 @@ contains
 
             endif
            else
-           read(mf,*) xsm%ac%t,unit_time,n_used_patch,include_patch
+         read(mf,*) xsm%ac%t,n_used_patch,include_patch
+!             read(mf,*) xsm%ac%t,unit_time,n_used_patch,include_patch
           endif
-          write(6,*) " Using ",unit_time," seconds"
-          xsm%ac%t=xsm%ac%t*clight*unit_time
+ !         write(6,*) " Using ",unit_time," seconds"
+          xsm%ac%t=xsm%ac%t*clight 
           xsm0%ac%t=xsm%ac%t
           x_orbit_sync=0.0_dp
           x_orbit_sync(6)=xsm%ac%t
@@ -384,9 +386,9 @@ contains
       ! INQUIRE (FILE = FINAL_setting, EXIST = exists)
       !    if(exists) then
             call kanalnummer(i1,FINAL_setting)
-             write(i1,*) x_orbit_sync(6)/clight/unit_time,unit_time,n_used_patch,include_patch
+             write(i1,*) x_orbit_sync(6)/clight,n_used_patch,include_patch
              write(6,*) "x_orbit_sync(6) = " , x_orbit_sync(6)
-             write(6,*) "t_fin = " , x_orbit_sync(6)/clight/unit_time
+             write(6,*) "t_fin = " , x_orbit_sync(6)/clight
              
              call find_all_tc_for_restarting(my_ering,tc,nc)
              write(i1,*) nc
@@ -406,8 +408,8 @@ contains
           RAMP=my_true          
        case('SETORBITNORAMPING','NORAMPING')
           RAMP=my_false          
-       case('SETORBITTIMEUNIT')
-            read(mf,*) unit_time
+ !      case('SETORBITTIMEUNIT')
+ !           read(mf,*) unit_time
        case('SETORBITSTATE')
           my_ORBIT_LATTICE%state=my_estate
        case('PUTORBITSTATE','USEORBITSTATE')
@@ -728,7 +730,15 @@ contains
 
           CALL Stat_beam_raw(MY_BEAMS(USE_BEAM),4,6)
 
+       case('CHECKKREIN')
+          WRITE(6,*) "OLD CHECK_KREIN ",check_krein
+          READ(MF,*) check_krein
+          WRITE(6,*) "NEW CHECK_KREIN ",CHECK_KREIN
 
+       case('KREINSIZE')
+          WRITE(6,*) "OLD KREIN SIZE PARAMETER ",size_krein
+          READ(MF,*) size_krein
+          WRITE(6,*) "NEW KREIN SIZE PARAMETER",size_krein
 
        case('ABSOLUTEAPERTURE')
           WRITE(6,*) "OLD C_%ABSOLUTE_APERTURE ",C_%ABSOLUTE_APERTURE
@@ -753,13 +763,7 @@ contains
        case('GAUSSIANSEED')
           READ(MF,*) I1
           CALL gaussian_seed(i1)
-  !     case('RANDOMMULTIPOLE')
-  !        read(mf,*) name,i1,i2
-  !        read(mf,*) n,cns,cn,sc     ! sc percentage
-  !        read(mf,*) addi,integrated
-  !        read(mf,*) cut
-  !        write(6,*) " Distribution cut at ",cut," sigmas"
-  !        call lattice_random_error(my_ering,name,i1,i2,cut,n,addi,integrated,cn,cns,sc)
+ 
        case('RANDOMMULTIPOLE')
           read(mf,*) i1, cut,STRAIGHT     !!!   seed, cut on sigma, print
           read(mf,*) name,fixp    !!!  name, full=> logical true full name compared
@@ -1479,7 +1483,7 @@ contains
        case('OPENTUNEFILE')
           read(mf,*) filename
           call kanalnummer(mftune,filename)
-          write(mftune,*) " Time unit = ",unit_time ," seconds "
+!          write(mftune,*) " Time unit = ",unit_time ," seconds "
        case('CLOSETUNEFILE')
            close(mftune)
            mftune=6
@@ -2801,6 +2805,8 @@ contains
     CALL INIT(state,1,0)
     CALL ALLOC(NORMAL)
     CALL ALLOC(ID)
+    call alloc(xs)
+
     if(i1==1) normal%stochastic=my_true
     xs0=x
     ID=1
@@ -2862,7 +2868,7 @@ contains
 
     CALL KILL(NORMAL)
     CALL KILL(ID)
-
+    CALL KILL(xs)
 
   end subroutine radia_new
 
