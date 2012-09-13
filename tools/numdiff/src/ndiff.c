@@ -529,8 +529,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
 
-  // ...required or got an integer value and no absolute constraint >= 0.5
-  if (c->eps.cmd == eps_equ || (!f1 && !f2 && !(c->eps.cmd == eps_abs && c->eps.abs >= 0.5))) {
+  // ...required
+  if (c->eps.cmd == eps_equ) {
     if (dif->cnt_i+1 <= dif->max_i) warning("(%d) numbers strict representation differ", dif->cnt_i+1);
     goto quit_diff;
   }
@@ -544,8 +544,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // if one number is zero -> relative becomes absolute
   if (!(min_a > 0)) min_a = 1.0;
 
-  // input-specific relative comparison
-  if (c->eps.cmd & eps_dig) {
+  // input-specific relative comparison (does not apply to integers)
+  if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
     double rel = c->eps.dig * pow10(-imax(n1, n2));
     if (dif_a > rel * min_a) {
       if (dif->cnt_i+1 <= dif->max_i) 

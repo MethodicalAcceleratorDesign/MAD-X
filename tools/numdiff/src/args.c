@@ -83,7 +83,7 @@ usage(void)
   inform("\t-e    -cfgext ext   specify the config file extension, default is .cfg");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
   inform("\t-h    -help         display this help");
-  inform("\t-k    -keep num     specify the number of diffs to display by file, default is 25");
+  inform("\t-k    -keep num     specify the number of diffs to display per file, default is 25");
   inform("\t-l    -list         enable list mode (list of filenames)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-o    -outext ext   specify the output file extension, default is .out");
