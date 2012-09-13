@@ -1,46 +1,40 @@
 
 # list of source files
 file(GLOB src_files
-    mad_*.c
-    *.f90
-    *.F90
-    *.cpp)
+   mad_*.c
+   *.f90
+   *.F90
+   *.cpp)
 file(GLOB main_file mad_main.c)
 if(WIN32 OR CYGWIN)
-    file(GLOB gxx_remove gxx11c.c gxx11.f90)
+   file(GLOB gxx_remove gxx11c.c gxx11.f90)
 else()
-    file(GLOB gxx_remove gxx11psc.c gxx11ps.f90)
+   file(GLOB gxx_remove gxx11psc.c gxx11ps.f90)
 endif()
 
 # Some source files which should not be included:
 file(GLOB sdds_remove matchsdds.c)
 
-# Some weird problem with this file with gfortran < 4.6..
-    if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU" AND 
-            CMAKE_Fortran_COMPILER_VERSION VERSION_LESS "4.6")
-    set_source_files_properties(l_complex_taylor.f90 COMPILE_FLAGS "-O2")
-endif()
-
 if(NOT MADX_FORCE_32)
-# find laplas and blas
-    find_package(LAPACK)
+   # find laplas and blas
+   find_package(LAPACK)
 endif()
 
 if(LAPACK_FOUND AND BLAS_FOUND)
-    message(STATUS "LAPACK uses ${LAPACK_LIBRARIES}")
-    file(GLOB lapack_remove matchlib.f90 matchlib2.f90)
+   message(STATUS "LAPACK uses ${LAPACK_LIBRARIES}")
+   file(GLOB lapack_remove matchlib.f90 matchlib2.f90)
 else()
-# Note, this only APPENDS -O0 to the compile flags, same as Makefile currently does.
-    set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0")
+   # Note, this only APPENDS -O0 to the compile flags, same as Makefile currently does.
+   set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0")
 endif()
 
 # remove source files according to NTPSA option...
-if (MADX_NTPSA )
-    message(STATUS "NTPSA turned on")
-    file(GLOB ntpsa_remove c_dabnew.f90)
-    else (MADX_NTPSA )
-    file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
-endif  (MADX_NTPSA )
+if(MADX_NTPSA)
+   message(STATUS "NTPSA turned on")
+   file(GLOB ntpsa_remove c_dabnew.f90)
+else()
+   file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
+endif()
 
 set(remove_list ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
 list(REMOVE_ITEM src_files ${remove_list})
@@ -62,9 +56,9 @@ set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
 
 # adding an executable:
 if(MADX_BUNDLE)
-    add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
+   add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
 else()
-    add_executable(madxbin mad_main.c)
+   add_executable(madxbin mad_main.c)
 endif()
 set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran VERSION ${MADX_VERSION})
 
@@ -77,26 +71,26 @@ target_link_libraries(madxbin madx)
 # I turn off search for libraries in case you are on Linux,
 # to make sure we make use of the lib/lib64 folders
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    #necessary to search for X11 for OSX instead of directly including it
-    find_package(X11)
-    if(X11_FOUND)
-        include_directories(${X11_INCLUDE_DIR})
-        target_link_libraries(madx ${X11_X11_LIB})
-    endif()
+   #necessary to search for X11 for OSX instead of directly including it
+   find_package(X11)
+   if(X11_FOUND)
+      include_directories(${X11_INCLUDE_DIR})
+      target_link_libraries(madx ${X11_X11_LIB})
+   endif()
 else()
-    target_link_libraries(madx X11)
+   target_link_libraries(madx X11)
 endif()
 
 if(LAPACK_FOUND AND BLAS_FOUND)
-    target_link_libraries(madx ${LAPACK_LIBRARIES})
+   target_link_libraries(madx ${LAPACK_LIBRARIES})
 endif()
 
 # Online libraries:
 if(MADX_ONLINE)
-    target_link_libraries(madx ${SDDS_LIBRARIES}) 
+   target_link_libraries(madx ${SDDS_LIBRARIES}) 
 endif()
 if(NOT WIN32)
-    target_link_libraries(madx z)
+   target_link_libraries(madx z)
 endif()
 # new additions from Frank:
 # On Debian Stable, stdc++ is not linked by default...
@@ -107,9 +101,9 @@ target_link_libraries(madx pthread stdc++ gcc_eh)
 # before targets are defined.
 include(setupPackaging)
 
-# 
+#
 # we call a subscript that sets up installation stuff:
-# 
+#
 # Should be called after targets are defined
-# 
+#
 include(setupInstallation)
