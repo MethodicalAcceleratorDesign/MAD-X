@@ -198,8 +198,9 @@ madx_finish(void)
       printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
     }
     if (get_option("trace")) time_stamp("end");
-    printf("\n  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    printf("  + %s %s finished normally +\n", version_name, version_arch);
+    printf("\n"
+           "  ++++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("  + %s (%s bit) finished normally +\n", version_name, version_arch);
     printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
   }
 }
