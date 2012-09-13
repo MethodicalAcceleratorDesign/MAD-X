@@ -24,8 +24,8 @@ NDIFF := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),..$/..$/$(ND)$(ARCH)$(BINARY
 #
 # numdiff flags
 # quiet, ingore blanks, check constraints, list mode, serie mode, debug mode, test title
-NDFLAGS = -q -b -c -l -n $(if $(call eq,$(NDIFF_DEBUG),yes),-debug,) \
-                         $(if $(call eq,$(NDIFF_TRACE),yes),-trace,) -t $@
+NDFLAGS = -q -b -c -l -n $(if $(call eq,$(NDDEBUG),yes),-debug,) \
+                         $(if $(call eq,$(NDTRACE),yes),-trace,) -t $@
 
 #
 # run-test macro
