@@ -24,10 +24,8 @@
 # tests-long : contains all long tests   (overlaps tests-all)
 
 # rules:
-# tests      : runs all tests not in tests-long
-# tests-all  : runs all tests
-
-ifndef TESTS
+# tests      : runs tests-all not in tests-long
+# tests-all  : runs tests-all
 
 tests-all := \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
@@ -38,8 +36,6 @@ test-ptc-twiss
 tests-long := \
 test-match-2 \
 test-ptc-twiss
-
-endif
 
 # testsuite titles (attached to first rule of your suite)
 test-jacobian:     TESTSUITE := Jacobian testsuite
