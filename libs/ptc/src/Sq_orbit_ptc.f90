@@ -1373,7 +1373,7 @@ p=>p%next
 enddo
 !write(6,*) closed
 close(mf)
-pause 123
+!pause 123
 
     ID=1
     Y=CLOSED+ID
