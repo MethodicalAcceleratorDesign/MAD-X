@@ -28,19 +28,22 @@
 # tests-all  : runs tests-all
 
 tests-all := \
+test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
+test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
-test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 test-ptc-twiss
 
 tests-long := \
+test-twiss \
 test-match-2 \
 test-ptc-twiss
 
 # testsuite titles (attached to first rule of your suite)
+test-rfmultipole:  TESTSUITE := RF multipole testsuite
+test-twiss:        TESTSUITE := Twiss testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-match:        TESTSUITE := Matching testsuite
-test-rfmultipole:  TESTSUITE := RF multipole testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 
 # end of testsuite
