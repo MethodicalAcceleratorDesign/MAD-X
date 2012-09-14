@@ -636,6 +636,8 @@ tests/test-ptc-twiss/ptc-twiss-table.ref -text
 tests/test-ptc-twiss/test-ptc-twiss.cfg -text
 tests/test-ptc-twiss/test-ptc-twiss.madx -text
 tests/test-ptc-twiss/test-ptc-twiss.ref -text
+tests/test-ptc-twiss/twiss-table.cfg -text
+tests/test-ptc-twiss/twiss-table.ref -text
 tests/test-rfmultipole-2/sectormap.cfg -text
 tests/test-rfmultipole-2/sectormap.ref -text
 tests/test-rfmultipole-2/test-rfmultipole-2.cfg -text
