@@ -3435,44 +3435,43 @@ subroutine ttrfmult(track, ktrack, turn)
      call dcopy(f_errors,field,n_ferr)
   endif
   nord = max(nn, ns, n_ferr/2-1);
-  
-  !---- Vector with strengths + field errors
-  do iord = 0, nord;
-     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z));
-     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord));
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z));
-  enddo
       
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
     x = track(1,jtrk);
     y = track(3,jtrk);
     z = track(5,jtrk);
-    Cm2 = 0.0;
-    Sm2 = 0.0;
-    Cm1 = 0.0;
-    Sm1 = 0.0;
-    Cp0 = 0.0;
-    Sp0 = 0.0;
-    Cp1 = 0.0;
-    Sp1 = 0.0;
+    !---- Vector with strengths + field errors
+    do iord = 0, nord;
+      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
+      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z));
+      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord));
+      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z));
+    enddo
+    Cm2 = 0d0;
+    Sm2 = 0d0;
+    Cm1 = 0d0;
+    Sm1 = 0d0;
+    Cp0 = 0d0;
+    Sp0 = 0d0;
+    Cp1 = 0d0;
+    Sp1 = 0d0;
     do iord = nord, 0, -1
       if (iord.ge.2) then
-        Cm2 = Cm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-        Sm2 = Sm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+        Cm2 = Cm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+        Sm2 = Sm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
       endif
       if (iord.ge.1) then
-        Cm1 = Cm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-        Sm1 = Sm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+        Cm1 = Cm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+        Sm1 = Sm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
       endif
-      Cp0 = Cp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sp0 = Sp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
-      Cp1 = Cp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sp1 = Sp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      Cp0 = Cp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+      Sp0 = Sp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
+      Cp1 = Cp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+      Sp1 = Sp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
     enddo
-    Sp1 = Sp1 * DCMPLX(x, y);
-    Cp1 = Cp1 * DCMPLX(x, y);
+    Sp1 = Sp1 * CMPLX(x, y, kind=8);
+    Cp1 = Cp1 * CMPLX(x, y, kind=8);
 
     !---- The kick    
     dpx = -DREAL(Cp0) / (one + track(6,jtrk));
