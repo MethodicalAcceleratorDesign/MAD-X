@@ -263,7 +263,7 @@
 !      call DGELSS (effcon,effvar,1,effjac,M,effsol,N+M,SV,RCOND,        &
 !     &RANK,WORK,1000*(N+M),INFO)
       write(*,*) "Rank  ",RANK,                                         &
-     &"  Condition number",condnum
+     &"  Condition number ",condnum
 
 !---- Debug
 !      write(*,*) "!!! solve routine"
@@ -385,7 +385,7 @@
 
       xnorm=DNRM2(N, x, 1)
       dxnorm=DNRM2(effvar, effsol, 1)/xnorm
-      write(*,*) 'Step length', dxnorm
+      write(*,*) 'Step length ', dxnorm
 
       ! Bisection search
       fmin_old2=1E20
