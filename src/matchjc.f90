@@ -410,7 +410,7 @@
 37    continue
 
       if (j.gt.0) then
-        write(*,*) 'Bisec iteration', j
+        write(*,*) 'Bisec iteration ', j
       endif
 
 

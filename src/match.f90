@@ -474,7 +474,7 @@
 
 !---- Beginning of the outer loop.
    30 continue
-!      write(*,*) 'outer',calls,fmin,fmin_old
+!      write(*,*) 'outer ',calls,fmin,fmin_old
 
 !---- Calculate the Jacobian matrix.
       call fdjac2(fcn,m,n,x,fvec,fjac,ldfjac,iflag,xtol,wa4)
@@ -548,7 +548,7 @@
 
 !---- Beginning of the inner loop.
   200 continue
-!      write(*,*) 'inner',calls,fmin,fmin_old
+!      write(*,*) 'inner ',calls,fmin,fmin_old
 !      if (fmin.lt.p90*fmin_old) write(*,830) calls,fmin
       fmin_old = fmin
 

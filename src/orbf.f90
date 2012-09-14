@@ -999,7 +999,7 @@
           xrms(k+1)  = rmss(k)
           xptp(k+1)  = ptop(k)
         endif
-!     write(*,*) 'orbit back in normal space',prtlev,k
+!     write(*,*) 'orbit back in normal space ',prtlev,k
 
 ! --- write intermediate results to 61 files
 !     IF(.TRUE.)THEN

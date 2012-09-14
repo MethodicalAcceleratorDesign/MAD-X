@@ -103,7 +103,7 @@ contains
 
        if ( getdebug() > 2 ) then
           write (*,*) 'Current cavity no is j=',j
-          write (*,*) 'Setting beam momentum AND tracking', nfen%p0c,' till the cavity (',poscav(j),')'
+          write (*,*) 'Setting beam momentum AND tracking ', nfen%p0c,' till the cavity (',poscav(j),')'
        endif
 
 
