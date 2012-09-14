@@ -39,7 +39,7 @@ SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
 
 select,flag=twiss,column=name,s,betx,bety,dx,dy;
 
-TWISS; 
+TWISS, FILE="twiss-table.out"; 
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
 
