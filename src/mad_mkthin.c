@@ -1092,11 +1092,25 @@ seq_diet(struct sequence* thick_sequ)
 
 /* return at relative shifts from center of unsliced magnet */
 static double
-simple_at_shift(int slices,int slice_no)
+simple_at_shift(int slices, int slice_no)
 {
-  return (2.0*slice_no-1)/(2.0*slices)-0.5;
+  int n = slices;
+  int i = slice_no;
+
+  return (2.0*i-1)/(2.0*n)-0.5;
 }
 
+static double
+teapot_at_shift(int slices, int slice_no)
+{
+  int n = slices;
+  int i = slice_no;
+
+  // Formula taken from HBU presentation at LCU, 2012.09.18
+  return n>1 ? 0.5*n*(1-2*i+n)/(1.0-n*n) : 0.0;
+}
+
+/* previous Teapot limited to 4 slices.
 static double
 teapot_at_shift(int slices,int slice_no)
 {
@@ -1122,10 +1136,11 @@ teapot_at_shift(int slices,int slice_no)
       if (slice_no == 4) at = +2./5.;
       break;
   }
-  /* return the simple style if slices > 4 */
+  // return the simple style if slices > 4
   if (slices > 4) at = simple_at_shift(slices,slice_no);
   return at;
 }
+*/
 
 static double
 collim_at_shift(int slices,int slice_no)
