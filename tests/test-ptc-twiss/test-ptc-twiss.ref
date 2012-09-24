@@ -84,7 +84,7 @@ select,flag=twiss,column=name,s,betx,bety,dx,dy;
 
 
 
-TWISS; 
+TWISS, FILE="twiss-table.out"; 
 
 enter Twiss module
   
