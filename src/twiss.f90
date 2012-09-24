@@ -6558,26 +6558,26 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   Sp1 = 0.0;
   do iord = nord, 0, -1
     if (iord.ge.2) then
-      Cm2 = Cm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sm2 = Sm2 * DCMPLX(x, y) / (iord-1) + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      Cm2 = Cm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+      Sm2 = Sm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
     endif
     if (iord.ge.1) then
-      Cm1 = Cm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-      Sm1 = Sm1 * DCMPLX(x, y) / (iord)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+      Cm1 = Cm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+      Sm1 = Sm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
     endif
-    Cp0 = Cp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-    Sp0 = Sp0 * DCMPLX(x, y) / (iord+1)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
-    Cp1 = Cp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_cos(1,iord), field_cos(2,iord));
-    Sp1 = Sp1 * DCMPLX(x, y) / (iord+2)   + DCMPLX(field_sin(1,iord), field_sin(2,iord));
+    Cp0 = Cp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+    Sp0 = Sp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
+    Cp1 = Cp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
+    Sp1 = Sp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
   enddo
-  Sp1 = Sp1 * DCMPLX(x, y);
-  Cp1 = Cp1 * DCMPLX(x, y);
+  Sp1 = Sp1 * CMPLX(x, y, kind=8);
+  Cp1 = Cp1 * CMPLX(x, y, kind=8);
   
   !---- Track orbit.
   if (ftrk) then
      !---- The kick
      dpx = -REAL(Cp0);
-     dpy =  AIMAG(Cp0);
+     dpy = AIMAG(Cp0);
      dpt =  vrf * sin(lag * 2 * pi - krf * z) - krf * REAL(Sp1);
      
      !---- Radiation effects at entrance.
