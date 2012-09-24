@@ -2312,7 +2312,7 @@ end subroutine el_el0
     implicit none
     type(element), pointer :: el
     integer mf,i
-    LOGICAL dir
+    LOGICAL(lp) dir
     character*255 line
 
 
