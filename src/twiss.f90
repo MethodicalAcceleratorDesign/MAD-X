@@ -6477,11 +6477,12 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   double precision field_cos(2,0:maxmul)
   double precision field_sin(2,0:maxmul)
   double precision pnl(0:maxmul), psl(0:maxmul)
-  complex*16 Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+  complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
     
   parameter ( pi = 3.14159265358979d0 )
   parameter ( clight = 299792458d0 )
   parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
+  parameter ( ii=(0d0,1d0) )
   
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
@@ -6558,20 +6559,20 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   Sp1 = 0.0;
   do iord = nord, 0, -1
     if (iord.ge.2) then
-      Cm2 = Cm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
-      Sm2 = Sm2 * CMPLX(x, y, kind=8) / (iord-1) + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
+      Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
+      Sm2 = Sm2 * (x+ii*y) / (iord-1) + field_sin(1,iord)+ii*field_sin(2,iord);
     endif
     if (iord.ge.1) then
-      Cm1 = Cm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
-      Sm1 = Sm1 * CMPLX(x, y, kind=8) / (iord)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
+      Cm1 = Cm1 * (x+ii*y) / (iord)   + field_cos(1,iord)+ii*field_cos(2,iord);
+      Sm1 = Sm1 * (x+ii*y) / (iord)   + field_sin(1,iord)+ii*field_sin(2,iord);
     endif
-    Cp0 = Cp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
-    Sp0 = Sp0 * CMPLX(x, y, kind=8) / (iord+1)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
-    Cp1 = Cp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_cos(1,iord), field_cos(2,iord), kind=8);
-    Sp1 = Sp1 * CMPLX(x, y, kind=8) / (iord+2)   + CMPLX(field_sin(1,iord), field_sin(2,iord), kind=8);
+    Cp0 = Cp0 * (x+ii*y) / (iord+1)   + field_cos(1,iord)+ii*field_cos(2,iord);
+    Sp0 = Sp0 * (x+ii*y) / (iord+1)   + field_sin(1,iord)+ii*field_sin(2,iord);
+    Cp1 = Cp1 * (x+ii*y) / (iord+2)   + field_cos(1,iord)+ii*field_cos(2,iord);
+    Sp1 = Sp1 * (x+ii*y) / (iord+2)   + field_sin(1,iord)+ii*field_sin(2,iord);
   enddo
-  Sp1 = Sp1 * CMPLX(x, y, kind=8);
-  Cp1 = Cp1 * CMPLX(x, y, kind=8);
+  Sp1 = Sp1 * (x+ii*y);
+  Cp1 = Cp1 * (x+ii*y);
   
   !---- Track orbit.
   if (ftrk) then
