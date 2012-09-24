@@ -90,8 +90,27 @@ main(int argc, const char* argv[])
       rhs_fp = open_indexedFile(rhs_s, n, option.ref_e, !option.list, 1);
       if (cfg_s) cfg_fp = open_indexedFile(cfg_s, n, option.cfg_e, !option.list, 0);
 
-      if (!lhs_fp) invalid_file(lhs_s);
-      if (!rhs_fp) invalid_file(rhs_s);
+      if (!lhs_fp) {
+        if (option.list) {
+          warning("output file '%s[.out]' not found, skipping diff", lhs_s);
+          if (rhs_fp) fclose(rhs_fp);
+          if (cfg_fp) fclose(cfg_fp);
+          ++failed;
+          break;
+        } else
+          invalid_file(lhs_s);
+      }
+
+      if (!rhs_fp) {
+        if (option.list) {
+          warning("reference file '%s.ref' not found, skipping diff", rhs_s);
+          if (lhs_fp) fclose(lhs_fp);
+          if (cfg_fp) fclose(cfg_fp);
+          ++failed;
+          break;
+        } else
+          invalid_file(rhs_s);
+      }
 
       // create context of constraints (using default size)
       struct context *cxt = context_alloc(0);
