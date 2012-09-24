@@ -18,7 +18,7 @@ contains
     type(layout),target  :: my_ring
     type(internal_state) :: localis ! internal state to be use in this routine = intstate+totalpath+time
     logical(lp)          :: maxaccel
-    integer              :: charge    ! charge of an accelerated particle
+    real(dp)             :: charge    ! charge of an accelerated particle
     !      use madx_keywords
     integer              :: i,j!,currentelement=1       !iterators
     integer              :: mf1,mf2
@@ -336,7 +336,7 @@ contains
       real(dp)                 :: x(6)      ! reference particle coordinates (closed orbit for a circular machine)
       real(dp)                 :: phase_rel ! final relative phase
       real(dp)                 :: phase_old ! for printing old phase
-      integer, target          :: charge    ! charge of an particle
+      real(dp)                 :: charge    ! charge of an particle
       logical(lp)              :: ene       ! switches if cavity should always maximally accelerate
       ! the reference track; lag is calculated
       !      logical(lp)              :: givendene = .false. ! makes cavity always accelerate about a given value;
@@ -393,16 +393,16 @@ contains
       !    write (*,*) 'energy (t/f)? :',ene, 'charge: ', charge
       if ( getdebug() > 1 ) then
          write(6,*) 'Cavity settings:'
-         write(6,*)                  '    Name   ', f%mag%name
-         write(6,'(a12,i12,a10,l1)') '    Charge ', charge,' max ene? : ',ene
-         write(6,'(a12,f12.5,a10)') '    Volt ',   f%mag%volt,' MV '
-         write(6,'(a12,f12.5,a10)') '    DELTAE ', f%mag%delta_e, ' GeV '
-         write(6,'(a12,f12.5,a10)') '    Length ', f%mag%l,' m'
-         write(6,'(a12,f12.3,a10)') '    Phase ',  f%mag%phas, ' rad '
-         write(6,'(a12,f12.3,a10)') '    Old Ph ', phase_old, ' rad '
-         write(6,'(a12,f12.0,a10)') '    Freq ',   f%mag%freq, ' Hz '
+         write(6,*)                    '    Name   ', f%mag%name
+         write(6,'(a12,f12.5,a10,l1)') '    Charge ', charge,' max ene? : ',ene
+         write(6,'(a12,f12.5,a10)')    '    Volt ',   f%mag%volt,' MV '
+         write(6,'(a12,f12.5,a10)')    '    DELTAE ', f%mag%delta_e, ' GeV '
+         write(6,'(a12,f12.5,a10)')    '    Length ', f%mag%l,' m'
+         write(6,'(a12,f12.3,a10)')    '    Phase ',  f%mag%phas, ' rad '
+         write(6,'(a12,f12.3,a10)')    '    Old Ph ', phase_old, ' rad '
+         write(6,'(a12,f12.0,a10)')    '    Freq ',   f%mag%freq, ' Hz '
          write(6,'(a12,f12.5,a10,f12.4,a10)') '    Lag ',    f%mag%lag/twopi*c_360,' deg ', f%mag%lag,' rad '
-         write(6,'(a12,f12.5,a10)') '    P0c ',    f%mag%p%p0c, 'GeV/c'
+         write(6,'(a12,f12.5,a10)')    '    P0c ',    f%mag%p%p0c, 'GeV/c'
       endif
 
     end subroutine setcavity

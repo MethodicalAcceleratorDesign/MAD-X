@@ -28,7 +28,7 @@ contains
     implicit none
     integer, intent (IN) :: nobs ! the maximum number of observation points >=1
     INTEGER, ALLOCATABLE :: observedelements(:)
-    integer  :: charge    ! charge of an accelerated particle
+    real(dp)             :: charge    ! charge of an accelerated particle
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
@@ -500,7 +500,7 @@ contains
     implicit none
     integer, intent (IN) :: nobs ! the maximum number of observation points >=1
     INTEGER, ALLOCATABLE :: observedelements(:)
-    integer  :: charge    ! charge of an accelerated particle
+    real(dp)             :: charge    ! charge of an accelerated particle
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
     real (dp)            :: xini(1:6)
