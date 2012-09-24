@@ -1596,11 +1596,11 @@ CONTAINS
 
 
     ! if(old) then
-    if(nd2par>c_%nv) then
-        r1=0.0_dp
-    else
+!    if(nd2par>c_%nv) then
+!        r1=0.0_dp
+!    else
      CALL dapek(S1%I,j,r1)
-    endif
+!    endif
     !    else
     !       CALL newdapek(S1%j,j,r1)
     !    endif
