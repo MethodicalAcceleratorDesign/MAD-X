@@ -3474,9 +3474,8 @@ subroutine ttrfmult(track, ktrack, turn)
     Cp1 = Cp1 * CMPLX(x, y, kind=8);
 
     !---- The kick    
-    dpx = -DREAL(Cp0) / (one + track(6,jtrk));
-    dpy =  DIMAG(Cp0) / (one + track(6,jtrk));
-    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * DREAL(Sp1)) / (one + track(6,jtrk));
+    dpx = -REAL(Cp0) / (one + track(6,jtrk));
+    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * REAL(Sp1)) / (one + track(6,jtrk));
 
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. zero) then
