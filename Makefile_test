@@ -32,11 +32,14 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
+test-ibs \
+\
 test-ptc-twiss
 
 tests-long := \
 test-twiss \
 test-match-2 \
+test-ibs \
 test-ptc-twiss
 
 # testsuite titles (attached to first rule of your suite)
