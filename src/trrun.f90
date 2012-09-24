@@ -3371,7 +3371,7 @@ subroutine ttrfmult(track, ktrack, turn)
   !    Track particle through a general thin rf-multipole.               *
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
-  !   KTRACK    (integer) Number of surviving tracks.                    *
+  !   KTRACK    (integer)   Number of surviving tracks.                  *
   !----------------------------------------------------------------------*
 
   double precision beta, angle, cangle, sangle, dtmp
@@ -3473,8 +3473,9 @@ subroutine ttrfmult(track, ktrack, turn)
     Sp1 = Sp1 * CMPLX(x, y, kind=8);
     Cp1 = Cp1 * CMPLX(x, y, kind=8);
 
-    !---- The kick    
+    !---- The kick
     dpx = -REAL(Cp0) / (one + track(6,jtrk));
+    dpy = AIMAG(Cp0) / (one + track(6,jtrk));
     dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * REAL(Sp1)) / (one + track(6,jtrk));
 
     !---- Radiation effects at entrance.
