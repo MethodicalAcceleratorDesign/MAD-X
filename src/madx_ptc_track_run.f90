@@ -1364,10 +1364,10 @@ CONTAINS
             !                                                                                !   !
             call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                              !   !
             !                                                                                !   !
-            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  !   !
-            if (ptc_track_debug) then                                                 !XXXX  !   !
-                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
-            endif                                                                            !   !
+!            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX !   !
+!            if (ptc_track_debug) then                                                 !XXXX !   !
+!                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX !   !
+!            endif                                                                           !   !
             !                                                                                !   !
             if(flag_index_ptc_aperture/=0) c_%watch_user=.false.                             !   !
             !                                                                                !   !
@@ -1392,6 +1392,14 @@ CONTAINS
                endif !=== print diagnostics =====================================! !         +   !
                !                                                                   !         +   !
             endif ! debug printing ------------------------------------------------!         !   !
+            !                                                                                !   !
+            ! added 2012.09.24                                                               !   !
+            if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  !   !
+            if (ptc_track_debug) then                                                 !XXXX  !   !
+                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
+            endif                                                                            !   !
+            if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
+                abs(current_x_coord_incl_co(3)).ge.maxaper(3)) flag_index_ptc_aperture = 50  !   !
             !                                                                                !   !
             if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! =========!         +   ^
                ! => particle is lost !!(?)                                         !         +   !
@@ -1616,10 +1624,10 @@ CONTAINS
                !     print*,"real aperture flag: ",c_%aperture_flag                              !  ! e
                !end if                                                                           !  ! n
                !                                                                                 +  ^ t
-               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX   +  ! s
-               if (ptc_track_debug) then                                                 !XXXX   +  ! !
-                    print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX   !  ! !
-               endif                                                                             !  ! !
+!               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  +  ! s
+!               if (ptc_track_debug) then                                                 !XXXX  +  ! !
+!                    print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !  ! !
+!               endif                                                                            !  ! !
                !                                                                                 !  ! !
                if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !
                !                                                                                 !  ! !
@@ -1639,6 +1647,15 @@ CONTAINS
                   !                                                                   !          +  ! !
                endif ! debug printing ------------------------------------------------!          !  ! !
                !                                                                                 !  ! !
+               ! added 2012.09.24                                                                !    !
+               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX   !    !
+               if (ptc_track_debug) then                                                 !XXXX   !    !
+                  print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture   !XXXX   !    !
+               endif                                                                             !    !
+               if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                           !    !
+                   abs(current_x_coord_incl_co(3)).ge.maxaper(3)) flag_index_ptc_aperture = 50   !    !
+               ! endof add 2012.09.24                                                           !    !
+               !                                                                                 !    !
                if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! ========!           +  ^ !
                   ! => particle is lost !!(?)                                        !           +  ! !
                   n_temp=j_last_particle_buffer                                      !           +  ! l
