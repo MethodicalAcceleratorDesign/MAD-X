@@ -475,7 +475,7 @@ CONTAINS
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
-       case("rectangular")
+       case("rectangle")
           key%list%aperture_on=.true.
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
