@@ -6,6 +6,9 @@ if(UNIX)
       DESTINATION "share/apps/katepart/syntax/"
       OPTIONAL)
   endif()
+  install(FILES emacs/madx.el
+    DESTINATION "share/emacs/site-lisp/"
+    OPTIONAL)
   install(FILES vim/madx.vim
     DESTINATION "share/vim/vimfiles/syntax/"
     OPTIONAL)

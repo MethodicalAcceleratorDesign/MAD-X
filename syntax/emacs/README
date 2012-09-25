@@ -1,0 +1,42 @@
+# This is the README file
+  for MAD-X highlighting in emacs
+
+# Files in this folder
++ .emacs
++ madx.el
++ README
+
+
+# Version description
+V   Date        Description
+1.0 22.08.2012  First release
+
+# Installation
++ emacs  v 23.X.X 
+  1. Copy madx.el to ~/.emacs.d/
+       $ cp madx.el ~/.emacs.d/
+     NOTE: If ~/.emacs.d directory  doesn't exists, you can create with
+           mkdir command
+           $ mkdir ~/.emacs.d
+  2. Add the lines on .emacs to your ~./.emacs.d/.emacs
+     If ~/.emacs file doesn't exists , just copy this file
+       $ cp .emacs ~
+
++ emacs v 21.X.X
+  1. Execute steps 1) and 2) of emacs v 23.X.X installation
+  2. Make a softlink to the .emacs file
+       $ cd ~
+       $ ln -s ~/.emacs.d/.emacs .emacs
+
+You should now restart emacs in order to reload the environment variables.
+
+# Use
+Automatically loads highlighting for ".madx" files.
+If you want to highlight another buffer with this syntax, just do in emacs
+
+M+X madx-mode
+
+# Author
+Oscar Blanco
+oscar.roberto.blanco.garcia@cern.ch
+
