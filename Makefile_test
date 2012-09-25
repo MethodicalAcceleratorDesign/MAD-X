@@ -34,7 +34,9 @@ test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
 test-ibs \
 \
-test-ptc-twiss
+test-ptc-twiss \
+test-ptc-normal
+
 
 tests-long := \
 test-twiss \
@@ -48,6 +50,7 @@ test-twiss:        TESTSUITE := Twiss testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-match:        TESTSUITE := Matching testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
+test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 
 # end of testsuite
 #################################################
