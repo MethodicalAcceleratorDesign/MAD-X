@@ -521,6 +521,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
 
   trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.30s'|'%.30s'", lhs_p, rhs_p);
+  trace("  rule [#%d]", context_findIdx(cxt,c));
 
   // parse numbers
   int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
@@ -633,11 +634,12 @@ ndiff_getInfo (const T *dif, int *row_, int *col_, int *cnt_)
 }
 
 int
-ndiff_feof (const T *dif)
+ndiff_feof (const T *dif, int both)
 {
   assert(dif);
 
-  return feof(dif->lhs_f) || feof(dif->rhs_f);
+  return both ? feof(dif->lhs_f) && feof(dif->rhs_f)
+              : feof(dif->lhs_f) || feof(dif->rhs_f);
 }
 
 int
@@ -652,7 +654,7 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
   const struct constraint *c, *c2;
   int row=0, col;
 
-  while(!ndiff_feof(dif)) {
+  while(!ndiff_feof(dif, 0)) {
     ++row, col=0;
 
     c = context_getInc(cxt, row, col);
@@ -694,8 +696,6 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
         static const struct constraint cst_equ = { .eps = { .cmd = eps_equ } };
         c = &cst_equ;
       }
-
-      trace("* apply rule [#%d]", context_findIdx(cxt,c));
 
       ndiff_testNum(dif, cxt, c);
     }

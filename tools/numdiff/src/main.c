@@ -31,6 +31,11 @@ diff_summary(const struct ndiff *dif)
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c);
 
+  if (!ndiff_feof(dif, 1)) {
+    c += 1;
+    warning("     diff of %s ended prematurely (truncated output?)", option.indexed_filename);
+  }
+
   if (c) {
     warning("% 6d lines have been diffed   in %s", n, option.indexed_filename);
     warning("% 6d diffs have been detected in %s", c, option.indexed_filename);
