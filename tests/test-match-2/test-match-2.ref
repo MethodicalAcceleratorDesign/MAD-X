@@ -709,6 +709,7 @@ START JACOBIAN:
  JACOBIAN Strategy =           3
 Initial Penalty Function =   0.3549501226823980E+02
 
+
  Final difference norm:  6.542308913977370E-002
 
 MATCH SUMMARY
@@ -779,6 +780,7 @@ START JACOBIAN:
 
  JACOBIAN Strategy =           3
 Initial Penalty Function =   0.1152000000000002E+02
+
 
  Final difference norm:  3.184119310110842E-002
 

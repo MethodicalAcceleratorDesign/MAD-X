@@ -256,6 +256,8 @@ ndiff_skipLine (T *dif)
   int s1 = 0, s2 = 0;
   int c1, c2;
 
+  // trace("->skipLine line %d", dif->row_i);
+
   ndiff_reset_buf(dif);
 
   c1 = skipLine(dif->lhs_f, &s1);
@@ -263,6 +265,8 @@ ndiff_skipLine (T *dif)
 
   dif->col_i  = 0;
   dif->row_i += 1;
+
+  // trace("<-skipLine line %d", dif->row_i);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -273,6 +277,8 @@ ndiff_readLine (T *dif)
   assert(dif);
   int s1 = 0, s2 = 0;
   int c1, c2, n = 0;
+
+  trace("->readLine line %d", dif->row_i);
 
   ndiff_reset_buf(dif);
 
@@ -299,6 +305,8 @@ ndiff_gotoLine (T *dif, const char *tag)
 
   int c1=0, c2=0, i1=0, i2=0;
 
+  trace("->gotoLine line %d", dif->row_i);
+
   // lhs
   while (1) {
     int s = 0, n = 0;
@@ -314,7 +322,8 @@ ndiff_gotoLine (T *dif, const char *tag)
       ndiff_grow(dif, 2*dif->buf_s);
     }
 
-    i1 += s != 0;
+    i1 += 1;
+    trace("  lhs[%d]: '%s'", dif->row_i+i1, dif->lhs_b);
 
     if (strstr(dif->lhs_b, tag)) break;
   }
@@ -334,7 +343,8 @@ ndiff_gotoLine (T *dif, const char *tag)
       ndiff_grow(dif, 2*dif->buf_s);
     }
 
-    i2 += s != 0;
+    i2 += 1;
+    trace("  rhs[%d]: '%s'", dif->row_i+i2, dif->rhs_b);
 
     if (strstr(dif->rhs_b, tag)) break;
   }
@@ -344,7 +354,7 @@ ndiff_gotoLine (T *dif, const char *tag)
 
   // return with last lhs and rhs lines loaded if tag was found
 
-  trace("<-gotoLine line %d", dif->row_i);
+  trace("<-gotoLine line %d (%+d|%+d)", dif->row_i, i1, i2);
   trace("  buffers: '%.30s'|'%.30s'", dif->lhs_b, dif->rhs_b);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
@@ -413,6 +423,8 @@ retry:
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
   }
+
+  trace("<-diffLine line %d", dif->row_i);
 }
 
 int
@@ -425,6 +437,8 @@ ndiff_nextNum (T *dif, int blank)
 
   trace("->nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strings: '%.30s'|'%.30s'", lhs_p, rhs_p);
+
+  if (ndiff_isempty(dif)) goto quit;
 
 retry:
 
@@ -486,9 +500,9 @@ quit_diff:
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.20s'|'%.20s'", dif->cnt_i, lhs_p, rhs_p);
   }
-  return dif->col_i = 0;
 
 quit:
+  trace("<-nextNum line %d", dif->row_i);
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   return dif->col_i = 0;
@@ -586,12 +600,13 @@ quit_diff:
     sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
     warning(str, dif->cnt_i, lhs_p, rhs_p);
   }
-quit:
-  trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  numbers: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
 
+quit:
   dif->lhs_i += l1;
   dif->rhs_i += l2;
+
+  trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("  numbers: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
 
   return ret;
 }
@@ -625,23 +640,30 @@ ndiff_feof (const T *dif)
   return feof(dif->lhs_f) || feof(dif->rhs_f);
 }
 
+int
+ndiff_isempty (const T *dif)
+{
+  return !dif->lhs_b[dif->lhs_i] && !dif->rhs_b[dif->rhs_i];
+}
+
 void
 ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
 {
   const struct constraint *c, *c2;
-  int row = 0, col, n;
+  int row=0, col;
 
   while(!ndiff_feof(dif)) {
-    ++row, col = 0;
+    ++row, col=0;
 
     c = context_getInc(cxt, row, col);
     if (check && c != (c2 = context_getAt(cxt, row, col)))
-      ndiff_error(cxt, c, c2, row, col); 
+      ndiff_error(cxt, c, c2, row, col);
 
     // no constraint, diff-lines
     if (!c) {
       ndiff_readLine(dif);
-      ndiff_diffLine(dif, blank);
+      if (!ndiff_isempty(dif))
+        ndiff_diffLine(dif, blank);
       continue;
     }
 
@@ -652,16 +674,17 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
     }
 
     // goto or read line(s)
-    if (c->eps.cmd == eps_goto)
+    if (c->eps.cmd == eps_goto) {
       ndiff_gotoLine(dif, c->eps.tag);
-    else
+      ndiff_getInfo(dif, &row, 0, 0);
+    } else {
       ndiff_readLine(dif);
+      if (ndiff_isempty(dif)) continue;
+    }
+
 
     // for each number column, diff-chars between numbers
-    while((n = ndiff_nextNum(dif, blank))) {
-      ++col;
-      assert(n == col);
-
+    while((col = ndiff_nextNum(dif, blank))) {
       c = context_getInc(cxt, row, col);
       if (check && c != (c2 = context_getAt(cxt, row, col)))
         ndiff_error(cxt, c, c2, row, col); 
@@ -671,6 +694,8 @@ ndiff_loop(struct ndiff *dif, struct context *cxt, int blank, int check)
         static const struct constraint cst_equ = { .eps = { .cmd = eps_equ } };
         c = &cst_equ;
       }
+
+      trace("* apply rule [#%d]", context_findIdx(cxt,c));
 
       ndiff_testNum(dif, cxt, c);
     }
