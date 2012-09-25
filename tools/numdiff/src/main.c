@@ -13,12 +13,10 @@
  o---------------------------------------------------------------------o
 */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <float.h>
-#include <time.h>
 
 #include "args.h"
 #include "utils.h"
@@ -45,8 +43,9 @@ diff_summary(const struct ndiff *dif)
 int
 main(int argc, const char* argv[])
 {
-  // start timer
-  double t0 = clock();
+  // start timers
+  option.dat_t0 = time(0);
+  option.clk_t0 = clock();
 
   // parse arguments
   parse_args(argc, argv);
@@ -155,16 +154,20 @@ main(int argc, const char* argv[])
     total += n;
   }
 
-  double t1 = clock();
-  double t = (t1 - t0) / CLOCKS_PER_SEC;
+  option.clk_t1 = clock();
 
-  if (option.test)
+  if (option.test) {
+    double t = (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
     printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
 #ifdef _WIN32
             failed ? "FAIL" : "PASS");
 #else
             failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
 #endif
+  }
+
+  if (option.acc)
+    accum_summary(total, failed);
 
   return EXIT_SUCCESS;
 }

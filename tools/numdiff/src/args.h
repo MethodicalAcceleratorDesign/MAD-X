@@ -19,6 +19,7 @@
 */
 
 #include <stdio.h>
+#include <time.h>
 
 struct option {
   int check, debug, serie, list, blank, utest, keep;
@@ -28,6 +29,10 @@ struct option {
   const char *out_e, *ref_e, *cfg_e;
   char indexed_filename[FILENAME_MAX+100];
   int argi;
+
+  const char *acc;
+  time_t dat_t0;
+  double clk_t0, clk_t1;
 };
 
 extern struct option option;

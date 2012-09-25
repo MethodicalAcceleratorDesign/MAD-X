@@ -35,7 +35,7 @@ struct option option = {
   .keep = 25,
 
   // file extensions
-  .out_e  = ".out", .ref_e =  ".ref", .cfg_e = ".cfg",
+  .out_e  = ".out", .ref_e =  ".ref", .cfg_e = ".cfg"
 };
 
 static void
@@ -77,6 +77,7 @@ usage(void)
   inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
   inform("\tnumdiff [options] -list file1 file2 ...");
   inform("options:");
+  inform("\t-a    -accum file   accumulate tests information in file");
   inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
   inform("\t-c    -check        enable check mode");
   inform("\t-d    -debug        enable debug mode (include check mode)");
@@ -240,6 +241,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "-e") || !strcmp(argv[option.argi], "-cfgext")) {
       option.cfg_e = argv[++option.argi]; 
       debug("config extension set to '%s'", option.cfg_e);
+      continue;
+    }
+
+    // set accumulation filename [setup]
+    if (!strcmp(argv[option.argi], "-a") || !strcmp(argv[option.argi], "-accum")) {
+      option.acc = argv[++option.argi]; 
+      debug("accumulation filename set to '%s'", option.acc);
       continue;
     }
 

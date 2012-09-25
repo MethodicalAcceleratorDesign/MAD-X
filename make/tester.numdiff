@@ -17,15 +17,37 @@
 # |
 
 #
-# numdiff path
+# numdiff paths
 #
-NDIFF := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),..$/..$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
+NDIFF_R := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),..$/..$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
+NDIFF_I := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),.$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
+
+#
+# numdiff summary
+#
+NDSUM = tests-summary.txt
 
 #
 # numdiff flags
 # quiet, ingore blanks, check constraints, list mode, serie mode, debug mode, test title
 NDFLAGS = -q -b -c -l -n $(if $(call eq,$(NDDEBUG),yes),-debug,) \
-                         $(if $(call eq,$(NDTRACE),yes),-trace,) -t $@
+                         $(if $(call eq,$(NDTRACE),yes),-trace,) -a ..$/$(NDSUM) -t $@
+
+#
+# init-test macro
+#
+define init-test
+$_ $(RM) tests/$(NDSUM) \
+     $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
+   $(call ND_tr,$(NDIFF_I) -q -a tests$/$(NDSUM))
+endef
+
+#
+# fini-test macro
+#
+define fini-test
+$_ echo && $(CAT) tests$/$(NDSUM)
+endef
 
 #
 # run-test macro
@@ -48,7 +70,7 @@ $_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
 $(RM) $(notdir $(NDFILES_OUT)) \
   $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
 $(TESTCMD) > $@.out && \
-$(call ND_tr,$(NDIFF) $(NDFLAGS)) $(notdir $(NDFILES))
+$(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES))
 endef
 
 # end of makefile

@@ -103,3 +103,59 @@ open_indexedFile(const char* str, int idx, const char *ext, int optext, int requ
   return fp;
 }
 
+void
+accum_summary(int total, int failed)
+{
+  if (!option.acc) return;
+
+  int n;
+  struct tm tm;
+  double tz = 0;
+  int total_test=0, total_passed=0, total_failed=0;
+
+  FILE *fp = fopen(option.acc, "r+");
+  if (fp) {
+    // read time stamps
+    n = fscanf(fp, " = tests summary (started at %d.%d.%d %d:%d:%d)\n",
+                   &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+                   &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
+    ensure(n == 6, "invalid summary file format %s", option.acc);
+    tm.tm_year -= 1900;
+    tm.tm_mon  -= 1;
+
+    // correct for TZ shift (i.e. emulate non-standard timegm)
+    struct tm tm2 = tm;
+    time_t now = time(0);
+    option.dat_t0 = mktime(&tm2);
+    tz = difftime(now, mktime(gmtime(&now)));
+
+    // read tests counts
+    n = fscanf(fp, "   total time %*lf s - total tests %4d - PASSED %4d - FAILED %4d\n",
+                   &total_test, &total_passed, &total_failed);
+    ensure(n == 3, "invalid summary file format %s", option.acc);
+    ensure(total_test == total_passed+total_failed, "invalid summary count in file %s", option.acc);
+
+    // reset file
+    rewind(fp);
+  }
+  else {
+    // create the file
+    fp = fopen(option.acc, "w+");
+    ensure(fp, "failed to create or read summary file %s", option.acc);
+
+    // init the time stamp
+    tm = *localtime(&option.dat_t0);
+  }
+
+  double total_time = difftime(time(0), option.dat_t0) + tz;
+
+  fprintf(fp, " = tests summary (started at %04d.%02d.%02d %02d:%02d:%02d)\n",
+          tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+  fprintf(fp, "   total time %7.0f s  -  total tests %5d  -  PASSED %4d  -  FAILED %4d\n",
+              total_time, total_test+total, total_passed+(total-failed), total_failed+failed);
+
+  fclose(fp);
+}
+
+

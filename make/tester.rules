@@ -16,23 +16,35 @@
 # | $Id$
 # |
 
-.PHONY: tests tests-all check-tests-dirs $(tests-all) $(TESTS)
+.PHONY: tests tests-all init-test fini-test check-tests-dirs $(tests-all) $(TESTS)
 
 #
 # all tests
 #
-tests-all: check-tests-dirs $(if $(TESTS),$(TESTS),$(tests-all))
+tests-all: init-test $(if $(TESTS),$(TESTS),$(tests-all)) fini-test
 
 #
 # fast tests only
 #
-tests: check-tests-dirs $(if $(TESTS),$(TESTS),$(filter-out $(tests-long),$(tests-all)))
+tests: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-long),$(tests-all))) fini-test
 
 #
 # rule for one test
 #
 $(if $(TESTS),$(TESTS),$(tests-all)):
 	$(run-test)
+
+#
+# rule for init test
+#
+init-test: check-tests-dirs
+	$(init-test)
+
+#
+# rule for fini test
+#
+fini-test:
+	$(fini-test)
 
 #
 # check for directory existence
