@@ -573,8 +573,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (c->eps.cmd & eps_rel)
     if (dif_a > c->eps.rel * min_a) {
       if (dif->cnt_i+1 <= dif->max_i) 
-        warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g]",
-                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a);   
+        warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
       ret = 1; 
     }
 
@@ -582,8 +582,8 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   if (c->eps.cmd & eps_abs)
     if (dif_a > c->eps.abs) {
       if (dif->cnt_i+1 <= dif->max_i) 
-        warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g]",
-                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a);   
+        warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
       ret = 1;
     }
 
