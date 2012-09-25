@@ -66,12 +66,12 @@ EFCOMP, DKS:={0,0,0,0,-1.};
 
 !   twiss,rmatrix,file,sectormap;
 
-   setplot,post=1,ascale=1.5, lscale=1.5,rscale=1.5, sscale=1.5, lwidth=3;
+!   setplot,post=1,ascale=1.5, lscale=1.5,rscale=1.5, sscale=1.5, lwidth=3;
 !   PLOT, HAXIS=S,VAXIS1=BETX,VAXIS2=BETY,colour=100;
 
 TWISS;
-sodd, distort1,multipole_order_range=-8,8,start_stop= 0.,27000.,
-      print_at_end;
+!sodd, distort1,multipole_order_range=-8,8,start_stop= 0.,27000.,
+!      print_at_end;
    ptc_create_universe;
    ptc_create_layout,model=1,method=2,nst=1;!,exact;
 !	select_ptc_normal, dx=1, dpx=1;
