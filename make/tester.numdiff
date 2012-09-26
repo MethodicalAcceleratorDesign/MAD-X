@@ -37,7 +37,7 @@ NDFLAGS = -q -b -c -l -n $(if $(call eq,$(NDDEBUG),yes),-debug,) \
 # init-test macro
 #
 define init-test
-$_ $(RM) tests/$(NDSUM) \
+$_ $(RM) tests$/$(NDSUM) \
      $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
    $(call ND_tr,$(NDIFF_I) -q -a tests$/$(NDSUM))
 endef
