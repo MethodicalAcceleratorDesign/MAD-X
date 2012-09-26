@@ -58,7 +58,8 @@ LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
 endif
 
 ifeq ($(SHARED),yes)
-LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared)
+LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared) -fPIC
+LDLIBS  += -lifcore_pic -lifcoremt_pic
 endif
 
 ifeq ($(PLUGIN),yes)
