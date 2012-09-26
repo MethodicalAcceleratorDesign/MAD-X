@@ -1097,7 +1097,7 @@ simple_at_shift(int slices, int slice_no)
   int n = slices;
   int i = slice_no;
 
-  return (2.0*i-1)/(2.0*n)-0.5;
+  return n>1 ? (2.0*i-1)/(2.0*n)-0.5 : 0.0;
 }
 
 static double
@@ -1108,6 +1108,22 @@ teapot_at_shift(int slices, int slice_no)
 
   // Formula taken from HBU presentation at LCU, 2012.09.18
   return n>1 ? 0.5*n*(1-2*i+n)/(1.0-n*n) : 0.0;
+}
+
+static double
+collim_at_shift(int slices,int slice_no)
+{
+  int n = slices;
+  int i = slice_no;
+
+  return n>1 ? (i-1.0)/(n-1.0)-0.5 : 0.0;
+}
+
+static double
+default_at_shift(int slices, int slice_no)
+{
+  return slices>4 ? simple_at_shift(slices, slice_no)
+                  : teapot_at_shift(slices, slice_no);
 }
 
 /* previous Teapot limited to 4 slices.
@@ -1142,58 +1158,53 @@ teapot_at_shift(int slices,int slice_no)
 }
 */
 
-static double
-collim_at_shift(int slices,int slice_no)
-{
-  double at = 0;
-  if (slices==1)
-  {
-    at = 0.0;
-  }
-  else
-  {
-    at = (slice_no-1.0)/(slices-1.0)-0.5;
-  }
-  return at;
-}
-
 /* return at relative strength shifts from unsliced magnet */
-static double
-teapot_q_shift(int slices,int slice_no)
-{
-  (void)slice_no;
-  return 1./slices;
-}
-
 static double
 simple_q_shift(int slices,int slice_no)
 {
   (void)slice_no;
-  return 1./slices;
+  return 1.0/slices;
+}
+
+static double
+teapot_q_shift(int slices,int slice_no)
+{
+  (void)slice_no;
+  return 1.0/slices;
 }
 
 static double
 collim_q_shift(int slices,int slice_no)
 { /* pointless actually, but it pleases symmetrically */
   (void)slice_no;
-  return 1./slices;
+  return 1.0/slices;
 }
 
+static double
+default_q_shift(int slices, int slice_no)
+{
+  return slices>4 ? simple_q_shift(slices, slice_no)
+                  : teapot_q_shift(slices, slice_no);
+}
 
 /* return at relative shifts from center of unsliced magnet */
 static double
 at_shift(int slices,int slice_no)
 {
-  if (thin_style == NULL || strcmp(thin_style,"teapot")==0)
-  {
-    return teapot_at_shift(slices,slice_no);
+  if (!slices || !slice_no) {
+    fatal_error("makethin: invalid slicing for zero slices",thin_style);
   }
-  else if (strcmp(thin_style,"simple")==0)
-  {
+
+  if (thin_style == NULL) {
+    return default_at_shift(slices,slice_no);
+  }
+  else if (strcmp(thin_style,"simple")==0) {
     return simple_at_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"collim")==0)
-  {
+  else if (strcmp(thin_style,"teapot")==0) {
+    return teapot_at_shift(slices,slice_no);
+  }
+  else if (strcmp(thin_style,"collim")==0) {
     return collim_at_shift(slices,slice_no);
   }
   else
@@ -1207,20 +1218,23 @@ at_shift(int slices,int slice_no)
 static double
 q_shift(int slices,int slice_no)
 {
-  if (thin_style == NULL || strcmp(thin_style,"teapot")==0)
-  {
-    return teapot_q_shift(slices,slice_no);
+  if (!slices || !slice_no) {
+    fatal_error("makethin: invalid slicing for zero slices",thin_style);
   }
-  else if (strcmp(thin_style,"simple")==0)
-  {
+
+  if (thin_style == NULL) {
+    return default_q_shift(slices,slice_no);
+  }
+  else if (strcmp(thin_style,"simple")==0) {
     return simple_q_shift(slices,slice_no);
   }
-  else if (strcmp(thin_style,"collim")==0)
-  {
+  else if (strcmp(thin_style,"teapot")==0) {
+    return teapot_q_shift(slices,slice_no);
+  }
+  else if (strcmp(thin_style,"collim")==0) {
     return collim_q_shift(slices,slice_no);
   }
-  else
-  {
+  else {
     fatal_error("makethin: Style chosen not known:",thin_style);
   }
   return 0;
