@@ -59,7 +59,9 @@ endif
 
 ifeq ($(SHARED),yes)
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared) -fPIC
+ifeq ($(OSTYPE),Linux)
 LDLIBS  += -lifcore_pic -lifcoremt_pic
+endif
 endif
 
 ifeq ($(PLUGIN),yes)
