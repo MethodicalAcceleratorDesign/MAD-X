@@ -27,10 +27,9 @@ The parameters are defined as:
     <LI>COLLIM : this is the default slicing for collimators. If only one slice is 
 chosen it is placed in the middle of the old element. If two slices are chosen they 
 are placed at either end. Three slices or more are treated as one slice.
+    <LI>TEAPOT : this is the slicing algorithm described in <a href="../Introduction/bibliography.html#TEAPOT">[TEAPOT]</a> but generalized to any number of slices.
     <LI>
-    <a href="../Introduction/bibliography.html#TEAPOT">[TEAPOT]</a>
-    (default): this is the standard slicing as used by MAD9. N.B. This
-    has a maximum of four slices for any one object.
+    (default): this is the standard default slicing for all elements (except collimators). It uses TEAPOT if the number of slices &le; 4, and SIMPLE otherwise. 
   </UL>
 </ul>
 
