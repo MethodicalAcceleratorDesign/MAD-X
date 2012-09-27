@@ -512,8 +512,15 @@ static void
 set_selected_rows(struct table* t, struct command_list* select, struct command_list* deselect)
 {
   int i, j;
+
+  if (!current_sequ) {
+    warning("No current selection available, skipping select", t->name);
+    return;
+  }
+
   c_range_start = get_node_count(current_sequ->range_start);
   c_range_end = get_node_count(current_sequ->range_end);
+
   get_select_t_ranges(select, deselect, t);
   if (select != 0)
   {
@@ -569,10 +576,8 @@ new_table(char* name, char* type, int rows, struct name_list* cols)
   t->row_out = new_int_array(rows);
   t->col_out = new_int_array(n);
   t->node_nm = new_char_p_array(rows);
-  t->p_nodes = (struct node**) mycalloc(rout_name,rows, sizeof(struct nodes*));
-  t->l_head
-    = (struct char_p_array**)
-    mycalloc(rout_name,rows, sizeof(struct char_p_array*));
+  t->p_nodes = mycalloc(rout_name,rows, sizeof(struct nodes*));
+  t->l_head  = mycalloc(rout_name,rows, sizeof(struct char_p_array*));
   return t;
 }
 
