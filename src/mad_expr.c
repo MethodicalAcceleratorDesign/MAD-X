@@ -7,7 +7,7 @@ is_operand(char c) {
 
 static int
 is_operator(char c) {
-  return strchr("-+*/^", c) ? 1 : 0;
+  return strchr("-+*/^", c) != 0;
 }
 
 static int
@@ -212,15 +212,12 @@ expr_combine(struct expression* exp1, double val1, char* oper,
     *exp_comb = NULL;
     switch(oper[1])
     {
-      case '+':
-	val = val1 + val2;
-        break;
-      case '-':
-        val = val1 - val2;
+      case '+': val = val1 + val2; break;
+      case '-': val = val1 - val2; break;
     }
   }
-  else if(exp1 == NULL) val = combine_val_expr(val1, oper, exp2, exp_comb);
-  else if(exp2 == NULL) val = combine_expr_val(exp1, oper, val2, exp_comb);
+  else if(exp1 == NULL) val = combine_val_expr (val1, oper, exp2, exp_comb);
+  else if(exp2 == NULL) val = combine_expr_val (exp1, oper, val2, exp_comb);
   else                  val = combine_expr_expr(exp1, oper, exp2, exp_comb);
   return val;
 }
@@ -431,13 +428,13 @@ scan_expr(int c_item, char** item)   /* split input */
     }
     else if (is_operator(c))
     {
-      if (l_cat == cat->max) grow_int_array(cat);
+      if (l_cat == cat->max ) grow_int_array(cat);
       if (l_cat == oper->max) grow_int_array(oper);
       cat->i[l_cat] = 4;
       oper->i[l_cat++] = str_pos(op_string, c);
       /* oper->i[l_cat++] = (int)strchr(op_string, c) -(int)op_string;*/
     }
-    else   return 2;  /* illegal character */
+    else return 2;  /* illegal character */
   }
   if (level != 0)  return 1;  /* unclosed parentheses */
   cat->curr = l_cat;
