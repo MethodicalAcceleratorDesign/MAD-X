@@ -386,15 +386,13 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
       {
         if (type == 2) /* deferred: expression kept */
         {
-          expr = new_expression(join(&cmd->tok_list->p[start],
-                                     end + 1 - start), deco);
-          val = expression_value(expr, type);
+          expr = new_expression(join(&cmd->tok_list->p[start], end + 1 - start), deco);
+          val = 0; // LD 2012.10.16: drop warning due to expression_value(expr, type);
         }
         else
         {
           expr = NULL;
-          val = polish_value(deco,
-                             join(&cmd->tok_list->p[start],end + 1 - start));
+          val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
         }
         if (val_type == 0)
         {
