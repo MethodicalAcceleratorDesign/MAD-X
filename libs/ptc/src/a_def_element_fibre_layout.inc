@@ -475,3 +475,11 @@ TYPE fibre_array
    type(fibre), pointer :: p
    integer, pointer :: pos
 END TYPE fibre_array
+
+!!!!  graphical arrays used in Su_hiromi only now
+  real(sp), allocatable :: z_hiromi(:,:),z_hiromi0(:,:)
+  integer n_hiromi,above_kicker,n_hiromi_lost
+  logical(lp) :: fill_hiromi =my_false
+  real(dp) :: r_hiromi=10.0,h_hiromi=10.0,kicker_hiromi=0.4d0,angle_hiromi(3)=0.d0
+  real(dp) :: ent_hiromi(3,3),x0_hiromi(6),t0_hiromi,dt_hiromi
+  type(internal_state) state_hiromi

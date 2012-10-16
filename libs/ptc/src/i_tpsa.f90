@@ -1569,73 +1569,87 @@ CONTAINS
 
 
 
+  FUNCTION GETchar( S1, S2 ) 
 
-  FUNCTION GETchar( S1, S2 )
     implicit none
     real(dp) GETchar,r1
     TYPE (taylor), INTENT (IN) :: S1
     CHARACTER(*)  , INTENT (IN) ::  S2
     CHARACTER (LEN = LNV)  resul
-    integer j(lnv),i
+    integer j(lnv),i,c
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    !    call check(s1)
+ 
 
-    resul = trim(ADJUSTL (s2))
+    resul = s2    
+    call context(resul) 
 
     do i=1,lnv
        j(i)=0
     enddo
 
-    !frs get around compiler problem
-    nd2par= len(trim(ADJUSTL (s2)))
-    !frs    do i=1,len(trim(ADJUSTl (s2)))
+ 
+    nd2par= len_trim(resul)  
+
+
+
+
+ 
     do i=1,nd2par
        CALL  CHARINT(RESUL(I:I),J(I))
     enddo
 
+c=0
+    do i=c_%nv+1,lnv
+       c=j(i)+c
+    enddo
 
-    ! if(old) then
-!    if(nd2par>c_%nv) then
-!        r1=0.0_dp
-!    else
-     CALL dapek(S1%I,j,r1)
-!    endif
-    !    else
-    !       CALL newdapek(S1%j,j,r1)
-    !    endif
+if(c>0) then
+r1=0.0_dp
+else
+    CALL dapek(S1%I,j,r1)
+endif
+
+
     GETchar=r1
 
   END FUNCTION GETchar
+
+
+ 
 
   FUNCTION GETint( S1, S2 )
     implicit none
     real(dp) GETint,r1
     TYPE (taylor), INTENT (IN) :: S1
     integer , INTENT (IN) ::  S2(:)
-    integer j(lnv),i
+    integer j(lnv),i,c
     IF(.NOT.C_%STABLE_DA) RETURN
 
-    !    call check(s1)
-
+ 
 
     do i=1,lnv
        j(i)=0
     enddo
 
-    !frs get around compiler problem
+   
     nd2par= size(s2)
-    !frs    do i=1,len(trim(ADJUSTl (s2)))
+   
     do i=1,nd2par
        J(I)=s2(i)
     enddo
 
+    c=0
+    do i=c_%nv+1,lnv
+       c=j(i)+c
+    enddo
 
-    ! if(old) then
+if(c>0) then
+r1=0.0_dp
+else
     CALL dapek(S1%I,j,r1)
-    !    else
-    !       CALL newdapek(S1%j,j,r1)
-    !    endif
+endif
+ 
     GETint=r1
 
   END FUNCTION GETint

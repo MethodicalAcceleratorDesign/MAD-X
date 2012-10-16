@@ -21,6 +21,7 @@ module orbit_ptc
   integer :: n_fill_patch=0
   integer :: n_used_patch=0, extra_node=0  
   real(dp) :: t0_main=0.0_dp
+  character(nlp) :: orbitname="xxx"
   !   integer mfff
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
@@ -181,8 +182,10 @@ contains
 
   SUBROUTINE GET_CHARGE(X)
     IMPLICIT NONE
-    real(dp) X
-    X=my_ORBIT_LATTICE%ORBIT_CHARGE
+    integer X
+ !   real(dp) X
+!    X=my_ORBIT_LATTICE%ORBIT_CHARGE
+   X=nint(my_ORBIT_LATTICE%ORBIT_CHARGE)
   END SUBROUTINE GET_CHARGE
 
   SUBROUTINE GET_MASS_AMU(X)
@@ -1231,6 +1234,7 @@ integer mf
 !!!!!
 
        doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       doit=(t%parent_fibre%mag%name==orbitname.and.T%CAS==CASEP1).or.doit
        if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
           DOIT=.TRUE.
        ENDIF
@@ -1283,6 +1287,7 @@ integer mf
 !!!!!
 
        doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
+       doit=(t%parent_fibre%mag%name==orbitname.and.T%CAS==CASEP1).or.doit
        if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
           DOIT=.TRUE.
        ENDIF

@@ -9,7 +9,8 @@ module madx_keywords
   integer :: ifield_name=0
   logical(lp),private :: do_survey =my_false
   logical(lp) :: print_marker =my_true
-
+  type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
+ 
   type keywords
      character*20 magnet
      character*20 model
@@ -117,6 +118,7 @@ contains
     CASE("DELTA_MATRIX_KICK")
        MADTHICK=kick_sixtrack_kick
     CASE DEFAULT
+ 
        EXCEPTION=1
        ipause=mypause(444)
        RETURN
@@ -1989,7 +1991,7 @@ call kanalnummer(mf,filename)
    write(MF,*) ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING  , "ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING "
    write(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL , " SECTOR_NMUL_MAX,SECTOR_NMUL "
     
- write(mf,*) " $$$$$$$$$ START OF LAYOUT $$$$$$$$$"
+ write(mf,*) " $$$$$$$$$$$$$$$$$ START OF LAYOUT $$$$$$$$$$$$$$$$$"
 
   
 f=>ring%start
@@ -1999,12 +2001,15 @@ do i=1,ring%n
   call fib_fib0(f,my_true,mf)
   CALL MC_MC0(f%MAG%P,my_true,mf)
   CALL print_ElementLIST(f%mag,MY_TRUE,mf)
- write(mf,*) " $$$$$$$$$ END OF FIBRE $$$$$$$$$"
+  if(f%patch%patch/=0) call patch_patch0(f%patch,my_true,mf)
+  if(f%mag%mis) call CHART_CHART0(f%chart,my_true,mf)
+ write(mf,*) " $$$$$$$$$$$$$$$$$ END OF FIBRE $$$$$$$$$$$$$$$$$"
  f=>f%next    
 enddo
 
 close(mf)
 
+return
 
 1 call kanalnummer(mf,filename)
 
@@ -2038,17 +2043,31 @@ enddo
 
 close(mf)
 end subroutine print_new_flat
+subroutine  read_lattice_append(un,filename)
+implicit none
+type(mad_universe),target :: un
+character(*) filename
 
-subroutine  read_lattice(r,filename)
+          call append_empty_layout(un)  
+          call set_up(un%end)
+          call read_lattice(un%end,filename)
+
+end subroutine  read_lattice_append
+
+subroutine  read_lattice(r,filename,arpent)
 implicit none
 type(layout),target :: r
 character(*) filename
-logical(lp) doneit
+logical(lp), optional :: arpent
+logical(lp) doneit,surv
 character(120) line
+type(fibre),pointer :: s22
+type(element),pointer :: s2
+type(elementp), pointer :: s2p
 
 integer mf,n
 
-
+surv=my_true
 
 !-----------------------------------
 call kanalnummer(mf,filename(1:len_trim(filename)))
@@ -2063,27 +2082,100 @@ call kanalnummer(mf,filename(1:len_trim(filename)))
 n=0
 do while(.true.) 
    read(mf,NML=ELEname,end=999)
- write(6,NML=ELEname)
+ !write(6,NML=ELEname)
    read(mf,NML=FIBRENAME,end=999)
- write(6,NML=FIBRENAME)
+ !write(6,NML=FIBRENAME)
    read(mf,NML=MAGLNAME,end=999)
- write(6,NML=MAGLNAME)
+ !write(6,NML=MAGLNAME)
  call read_ElementLIST(ELE0%kind,MF)
+ if(fib0%patch/=0) read(mf,NML=patchname,end=999)
+
  read(mf,'(a120)') line
+
+ call append_empty(r)
+ s22=>r%end
+  call  nullify_for_madx(s22)
+
+
+  
+
+    s2=>s22%mag;
+    s2p=>s22%magp;
+
+
+
+ !pause 78
+! fib0%GAMMA0I_GAMBET_MASS_AG(1)=f%GAMMA0I
+ !fib0%GAMMA0I_GAMBET_MASS_AG(2)=f%GAMBET
+ !fib0%GAMMA0I_GAMBET_MASS_AG(3)=f%MASS
+ !fib0%GAMMA0I_GAMBET_MASS_AG(4)=f%AG
+ !!fib0%DIR=f%DIR
+ !fib0%CHARGE=f%CHARGE
+
+    call fib_fib0(s22,my_false)
+
+     S2 = MAGL0%METHOD_NST_NMUL(3)    
+     
+
+!write(6,*) associated(s2%p)
+ !pause 78
+    call MC_MC0(s2%p,my_false)
+
+ !pause 79
+    call el_el0(s2,my_false)
+
+
+    if(s2%kind/=kindpa) then
+       CALL SETFAMILY(S2)  !,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
+    else
+       CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
+       S2%P%METHOD=4
+       deallocate(T_E,t_ax,t_ay)
+    endif    
+!     write(6,*) s2%kind,kind4,associated(s2%volt)
+! pause 80
+    call print_ElementLIST(s2,my_false)
+
+    s2p=0   
+ !  write(6,*) associated(s2%name)
+ !  write(6,*) associated(s2p%name)
+ !pause 665
+
+    call copy(s2,s2p)
+    s22%mag%parent_fibre =>s22
+    s22%magp%parent_fibre=>s22
+       s22%CHART=0
+       s22%PATCH=0
+     if(fib0%patch/=0) then
+       s22%PATCH%patch=fib0%patch
+      call patch_patch0(s22%patch,my_false)
+    endif
+   if(ele0%slowac_recut_even_electric_MIS(5)) call CHART_CHART0(s22%chart,my_false)
+
+!   write(6,*) associated(s22%chart%f)
+!   write(6,*) s22%paTCH%patch
+!   write(6,*) s22%paTCH%a_d
+! pause 666
+
 n=n+1
 enddo
 
 
    100 CONTINUE
-  !  r%closed=.true.
 
-  !  doneit=.true.
-  !  call ring_l(r,doneit)
-
-!    call survey(r)
 
 999 write(6,*) "Read ",n
 
+ if(present(arpent)) surv=arpent
+
+   if(surv) then
+    r%closed=.true.
+
+    doneit=.true.
+    call ring_l(r,doneit)
+
+     call survey(r)
+   endif
 
 1000 continue
 
@@ -2116,7 +2208,7 @@ end subroutine read_lattice
     case(kind19)
 
     case(kind21)
-
+     read(mf,NML=tCAVname)
     case(KINDWIGGLER)
 
     case(KINDpa)
@@ -2146,6 +2238,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  fib0%GAMMA0I_GAMBET_MASS_AG(4)=f%AG
  fib0%DIR=f%DIR
  fib0%CHARGE=f%CHARGE
+ fib0%patch=f%patch%patch
  !fib0%pos=f%pos
  !fib0%loc=f%loc
     if(present(mf)) then
@@ -2163,11 +2256,94 @@ else
  f%BETA0=sqrt(1.0_dp-f%GAMMA0I**2)   
  f%DIR=fib0%DIR 
  f%CHARGE=fib0%CHARGE
- !f%pos=fib0%pos
- !f%loc=fib$%loc
+ !f%patch%patch=fib0%patch     ! f%patch%patch is not yet allocated
 endif
 endif
 end subroutine fib_fib0
+
+subroutine  patch_patch0(f,dir,mf)
+implicit none
+type(PATCH), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+! fib0%t(1)=f%BETA0
+ 
+ patch0%A_X1=f%A_X1
+ patch0%A_X2=f%A_X2
+ patch0%B_X1=f%B_X1
+ patch0%B_X2=f%B_X2
+ patch0%A_D=f%A_D
+ patch0%B_D=f%B_D
+ patch0%A_ANG=f%A_ANG
+ patch0%B_ANG=f%B_ANG
+ patch0%A_T=f%A_T
+ patch0%B_T=f%B_T
+ patch0%ENERGY=f%ENERGY
+ patch0%TIME=f%TIME
+
+    if(present(mf)) then
+     write(mf,NML=patchname)
+    endif   
+else
+    if(present(mf)) then
+     read(mf,NML=patchname)
+    endif   
+
+f%A_X1= patch0%A_X1
+f%A_X2= patch0%A_X2
+f%B_X1= patch0%B_X1
+f%B_X2= patch0%B_X2
+
+ f%A_D=patch0%A_D
+ f%B_D=patch0%B_D
+ f%A_ANG=patch0%A_ANG
+ f%B_ANG=patch0%B_ANG
+ f%A_T=patch0%A_T
+ f%B_T=patch0%B_T
+ f%ENERGY=patch0%ENERGY
+ f%TIME=patch0%TIME
+
+endif
+endif
+end subroutine patch_patch0
+
+
+subroutine  CHART_CHART0(f,dir,mf)
+implicit none
+type(chart), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then    
+
+ CHART0%D_IN=f%D_IN
+ CHART0%D_OUT=f%D_OUT
+ CHART0%ANG_IN=f%ANG_IN
+ CHART0%ANG_OUT=f%ANG_OUT
+ 
+    if(present(mf)) then
+     write(mf,NML=CHARTname)
+    endif   
+else
+    if(present(mf)) then
+     read(mf,NML=CHARTname)
+    endif   
+
+ f%D_IN=CHART0%D_IN
+ f%D_OUT=CHART0%D_OUT
+ f%ANG_IN=CHART0%ANG_IN
+ f%ANG_OUT=CHART0%ANG_OUT
+ 
+
+endif
+endif
+end subroutine CHART_CHART0
+
+
 
 subroutine  MC_MC0(f,dir,mf)
 implicit none
@@ -2241,7 +2417,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  ele0%an=0.0_dp
  ele0%an(1:f%p%nmul)=f%an(1:f%p%nmul)
  ele0%bn(1:f%p%nmul)=f%bn(1:f%p%nmul)
- ele0%VOLT_FREQ_PHAS_LAG=0.0_dp
+ ele0%VOLT_FREQ_PHAS=0.0_dp
  ele0%B_SOL=0.0_dp
  
    ele0%fint_hgap_h1_h2(1)=f%fint
@@ -2252,14 +2428,12 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
    ele0%L=f%L
    IF(ASSOCIATED(f%B_SOL)) ele0%B_SOL=f%B_SOL
  
- if(associated(f%volt)) then
-   ele0%VOLT_FREQ_PHAS_LAG(1)=f%VOLT
-   ele0%VOLT_FREQ_PHAS_LAG(2)=f%FREQ
-   ele0%VOLT_FREQ_PHAS_LAG(3)=f%PHAS
-   ele0%VOLT_FREQ_PHAS_LAG(4)=f%LAG
-   ele0%THIN=f%THIN
- endif
- 
+ if(associated(f%volt)) ele0%VOLT_FREQ_PHAS(1)=f%VOLT
+ if(associated(f%FREQ)) ele0%VOLT_FREQ_PHAS(2)=f%FREQ
+ if(associated(f%PHAS)) ele0%VOLT_FREQ_PHAS(3)=f%PHAS
+ if(associated(f%THIN)) ele0%THIN=f%THIN
+
+
 ele0%slowac_recut_even_electric_MIS(1) = f%slow_ac
 ele0%slowac_recut_even_electric_MIS(2) = f%recut
 ele0%slowac_recut_even_electric_MIS(3) = f%even
@@ -2270,9 +2444,11 @@ ele0%slowac_recut_even_electric_MIS(5) = f%MIS
      write(mf,NML=ELEname)
     endif   
 else
+ 
     if(present(mf)) then
      read(mf,NML=ELEname)
     endif   
+ F%KIND=ELE0%KIND  
  f%name=ELE0%name_vorname(1)
  f%vorname=ELE0%name_vorname(2)
  f%an(1:f%p%nmul)=ele0%an(1:f%p%nmul)
@@ -2282,15 +2458,32 @@ f%fint= ele0%fint_hgap_h1_h2(1)
 f%hgap= ele0%fint_hgap_h1_h2(2)
 f%h1  = ele0%fint_hgap_h1_h2(3)
 f%h2  = ele0%fint_hgap_h1_h2(4)
- 
-if(associated(f%volt)) then
-  f%VOLT=ele0%VOLT_FREQ_PHAS_LAG(1)
-  f%FREQ=ele0%VOLT_FREQ_PHAS_LAG(2)
-  f%PHAS=ele0%VOLT_FREQ_PHAS_LAG(3)
-  f%LAG =ele0%VOLT_FREQ_PHAS_LAG(4)
+
+
+if(f%kind==kind4.or.f%kind==kind21) then ! cavities
+ if(.not.associated(f%volt)) then
+  ALLOCATE(f%VOLT,f%FREQ,f%PHAS,f%DELTA_E,f%THIN,f%lag)
+ endif
+  f%VOLT=ele0%VOLT_FREQ_PHAS(1)
+  f%FREQ=ele0%VOLT_FREQ_PHAS(2)
+  f%PHAS=ele0%VOLT_FREQ_PHAS(3)
   f%THIN=ele0%THIN
+  f%delta_e=0.0_dp
 endif
 
+if(f%kind==KIND15) then   ! electrip separetor
+ if(.not.associated(f%volt)) then
+  ALLOCATE(f%VOLT,f%PHAS)
+ endif
+  f%VOLT=ele0%VOLT_FREQ_PHAS(1)
+  f%PHAS=ele0%VOLT_FREQ_PHAS(3)
+endif
+
+    if(f%kind==kind22) then  ! helical dipole
+       if(.not.associated(f%freq)) ALLOCATE(f%FREQ,f%PHAS)
+       f%FREQ=ele0%VOLT_FREQ_PHAS(2)
+       f%PHAS=ele0%VOLT_FREQ_PHAS(3)
+    endif
 
  f%slow_ac = ele0%slowac_recut_even_electric_MIS(1)
  f%recut = ele0%slowac_recut_even_electric_MIS(2)
@@ -2299,9 +2492,13 @@ endif
  f%MIS = ele0%slowac_recut_even_electric_MIS(5)
 
    F%L=ele0%L
-   IF(ASSOCIATED(f%B_SOL)) F%B_SOL=ele0%B_SOL
 
-   F%KIND=ELE0%KIND   
+   
+    if(f%kind==kind3.or.f%kind==kind5) then   
+        IF(.not.ASSOCIATED(f%B_SOL)) ALLOCATE(f%B_SOL);
+       F%B_SOL=ele0%B_SOL
+    endif
+
    
 endif
 endif
@@ -2311,8 +2508,9 @@ end subroutine el_el0
   subroutine print_ElementLIST(el,dir,mf)
     implicit none
     type(element), pointer :: el
-    integer mf,i
-    LOGICAL(lp) dir
+    integer i
+     logical(lp),optional ::  dir
+     integer,optional :: mf
     character*255 line
 
 
@@ -2335,6 +2533,7 @@ end subroutine el_el0
 !       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
 !       CALL print_aperture(EL%ECOL19%A,mf)
     case(kind21)
+        call tcav4_tcav40(EL,dir,mf)
 !       WRITE(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
     case(KINDWIGGLER)
  !      call print_wig(el%wi,mf)
@@ -2394,6 +2593,37 @@ endif
 endif
 end subroutine cav4_cav40
 
+subroutine  tcav4_tcav40(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+
+ tcav0%PSI_DPHAS_DVDS(1)=F%cav21%psi
+ tcav0%PSI_DPHAS_DVDS(2)=F%cav21%dphas
+ tcav0%PSI_DPHAS_DVDS(3)=F%cav21%dvds
+
+    if(present(mf)) then
+     write(mf,NML=tCAVname)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=tCAVname)
+    endif   
+
+ F%cav21%psi=tcav0%PSI_DPHAS_DVDS(1)
+ F%cav21%dphas=tcav0%PSI_DPHAS_DVDS(2)
+ F%cav21%dvds=tcav0%PSI_DPHAS_DVDS(3)
+
+endif
+
+endif
+end subroutine tcav4_tcav40
 
 
 subroutine  thin3_thin30(f,dir,mf)
@@ -2455,6 +2685,9 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
     if(present(mf)) then
      read(mf,NML=tp100name)
     endif   
+
+
+
  F%tp10%DRIFTKICK=tp100%DRIFTKICK
 endif
 endif
@@ -2516,14 +2749,15 @@ else
  Write(mf,*) " NO APERTURE "
 endif
  
- else
+ else   ! dir=false
    if(present(mf)) then     
       READ(MF,'(a120)') LINE 
       CALL CONTEXT(LINE)
    ENDIF
     IF(LINE(1:2)/='NO') THEN
        IF(.NOT.HERE) THEN
-          CALL alloc(A)
+          CALL alloc(f%p%aperture)
+           a=>f%p%aperture
        ENDIF
     
     
@@ -2553,7 +2787,7 @@ CHARACTER(120) LINE
     IF(LINE(1:2)/='NO') THEN
         read(mf,NML=aperturename)
        aplist%on=.true.
-       write(6,nml=aperturename)
+   !    write(6,nml=aperturename)
     else
      aplist%on=.false.
     endif

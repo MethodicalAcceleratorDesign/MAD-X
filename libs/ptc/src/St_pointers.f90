@@ -45,7 +45,8 @@ module pointer_lattice
      MODULE PROCEDURE read_ptc_command
   END INTERFACE
 
-  
+   
+
 contains
   subroutine set_lattice_pointers
     implicit none
@@ -286,6 +287,9 @@ contains
           xsm0%ac%x(1:2)=xsm%ac%x(1:2)
           ptc_node_old=-1
           first_particle=my_false
+       case('SETORBITMARKER')   !!! TO CREATE A NODE
+         READ(MF,*) orbitname
+         call context(orbitname)
        case('SETORBITPHASORFREQUENCY')
           read(mf,*) xsm%ac%om
           xsm0%ac%om=xsm%ac%om
@@ -1678,12 +1682,26 @@ contains
           READ(MF,*) FILENAME
           CALL print_frames(my_ering,filename)
 
+
+       case('PRINTNEWFLATFILE')
+
+          READ(MF,*) FILENAME
+
+          call print_new_flat(my_ering,filename)
+
+       case('READNEWFLATFILE')
+
+          READ(MF,*) FILENAME
+          call read_lattice_append(M_U,filename)
+          WRITE(6,*) M_U%END%N, M_U%END%END%POS
+
        case('READFLATFILE')
 
           READ(MF,*) FILENAME
           CALL  READ_AND_APPEND_VIRGIN_general(M_U,filename)
 
           WRITE(6,*) M_U%END%N, M_U%END%END%POS
+
        case('PRINTFLATFILE')
 
           READ(MF,*) FILENAME
