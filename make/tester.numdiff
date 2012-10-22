@@ -20,11 +20,12 @@
 # numdiff paths
 #
 ifndef NDIFF
-NDIFFCMD := $(firstword $(wildcard $(ND)_dev$(ARCH) $(ND)_dev \
-                                   $(ND)-dev$(ARCH) $(ND)-dev \
-                                   $(ND)$(ARCH)     $(ND) ))
-NDIFF_R  := $(if $(NDIFFCMD),..$/..$/$(NDIFFCMD),$(ND))
-NDIFF_I  := $(if $(NDIFFCMD),.$/$(NDIFFCMD),$(ND))
+NDIFFCMD := $(firstword $(wildcard \
+              $(ND)_dev$(ARCH)$(BINARY_EXT) $(ND)_dev$(BINARY_EXT) \
+              $(ND)-dev$(ARCH)$(BINARY_EXT) $(ND)-dev$(BINARY_EXT) \
+              $(ND)$(ARCH)$(BINARY_EXT)     $(ND)$(BINARY_EXT) ))
+NDIFF_R  := $(if $(NDIFFCMD),..$/..$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
+NDIFF_I  := $(if $(NDIFFCMD),.$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
 else
 NDIFF_R  := $(NDIFF)
 NDIFF_I  := $(NDIFF)

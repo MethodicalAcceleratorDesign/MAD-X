@@ -58,10 +58,10 @@ test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 ifndef MADX
 # madx supported command for tests
 MADXCMD := $(firstword $(wildcard \
-             $(PROJECT)_dev$(ARCH) $(PROJECT)_dev \
-             $(PROJECT)-dev$(ARCH) $(PROJECT)-dev \
-             $(PROJECT)$(ARCH)     $(PROJECT) ))
-MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH))
+             $(PROJECT)_dev$(ARCH)$(BINARY_EXT) $(PROJECT)_dev$(BINARY_EXT) \
+             $(PROJECT)-dev$(ARCH)$(BINARY_EXT) $(PROJECT)-dev$(BINARY_EXT) \
+             $(PROJECT)$(ARCH)$(BINARY_EXT)     $(PROJECT)$(BINARY_EXT) ))
+MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH)$(BINARY_EXT))
 endif
 
 TESTCMD = $(MADX) < $(@F).madx
