@@ -19,8 +19,16 @@
 #
 # numdiff paths
 #
-NDIFF_R := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),..$/..$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
-NDIFF_I := $(if $(wildcard $(ND)$(ARCH)$(BINARY_EXT)),.$/$(ND)$(ARCH)$(BINARY_EXT),$(ND))
+ifndef NDIFF
+NDIFFCMD := $(firstword $(wildcard $(ND)_dev$(ARCH) $(ND)_dev \
+                                   $(ND)-dev$(ARCH) $(ND)-dev \
+                                   $(ND)$(ARCH)     $(ND) ))
+NDIFF_R  := $(if $(NDIFFCMD),..$/..$/$(NDIFFCMD),$(ND))
+NDIFF_I  := $(if $(NDIFFCMD),.$/$(NDIFFCMD),$(ND))
+else
+NDIFF_R  := $(NDIFF)
+NDIFF_I  := $(NDIFF)
+endif
 
 #
 # numdiff summary

@@ -55,12 +55,15 @@ test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 # end of testsuite
 #################################################
 
-# madx command for tests
 ifndef MADX
-MADX    = $(PRJNAME)$(BINARY_EXT)
-TESTCMD = $(if $(wildcard $(MADX)),..$/..$/$(MADX),$(MADX)) < $(@F).madx
-else
-TESTCMD = $(MADX) < $(@F).madx
+# madx supported command for tests
+MADXCMD := $(firstword $(wildcard \
+             $(PROJECT)_dev$(ARCH) $(PROJECT)_dev \
+             $(PROJECT)-dev$(ARCH) $(PROJECT)-dev \
+             $(PROJECT)$(ARCH)     $(PROJECT) ))
+MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH))
 endif
+
+TESTCMD = $(MADX) < $(@F).madx
 
 # end of makefile
