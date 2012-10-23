@@ -32,7 +32,6 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
-test-ibs \
 \
 test-ptc-twiss \
 test-ptc-normal
@@ -41,8 +40,10 @@ test-ptc-normal
 tests-long := \
 test-twiss \
 test-match-2 \
-test-ibs \
 test-ptc-twiss
+
+test-to-setup := \
+test-ibs
 
 # testsuite titles (attached to first rule of your suite)
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
