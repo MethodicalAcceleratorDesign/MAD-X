@@ -42,7 +42,7 @@ test-twiss \
 test-match-2 \
 test-ptc-twiss
 
-test-to-setup := \
+tests-to-setup := \
 test-ibs
 
 # testsuite titles (attached to first rule of your suite)
