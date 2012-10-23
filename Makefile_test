@@ -36,7 +36,6 @@ test-match test-match-2 \
 test-ptc-twiss \
 test-ptc-normal
 
-
 tests-long := \
 test-twiss \
 test-match-2 \
@@ -48,6 +47,7 @@ test-ibs
 # testsuite titles (attached to first rule of your suite)
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
 test-twiss:        TESTSUITE := Twiss testsuite
+test-ibs:          TESTSUITE := IBS testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-match:        TESTSUITE := Matching testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
