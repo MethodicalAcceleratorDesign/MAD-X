@@ -266,7 +266,7 @@ Beam, particle = proton, sequence=lhcb2, energy = 7000.0;
 
 ! select IR8 of beam1:
 
-call,file="../share/eng/lhc/optics/V6.503/toolkit/select.ir8.b1.madx";
+call,file="../share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx";
 
 use, period=lhcb1, range = s.cell.78.B1/e.cell.78.B1;
 
@@ -538,7 +538,7 @@ Use, period=lhcb1, RANGE=s.DS.L8.B1/e.DS.R8.B1;
 
 return;
 
-call,file="../share/eng/lhc/optics/V6.503/toolkit/twissini.ir8.b1.madx";
+call,file="../share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx";
 
 SELECT, FLAG=TWISS,clear;
 

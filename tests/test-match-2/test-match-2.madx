@@ -7,8 +7,8 @@ Title, "Matching an insertion of the LHC 6.5 lattice with MADX";
 !           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
 !---------------------------------------------------------------;
 option, -echo;
-call, file = "../share/eng/lhc/optics/V6.503/V6.5.seq";
-call, file = "../share/eng/lhc/optics/V6.503/V6.5.coll.str";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str";
 option, echo;
 
 Beam, particle = proton, sequence=lhcb1, energy = 7000.0;
@@ -16,8 +16,8 @@ Beam, particle = proton, sequence=lhcb2, energy = 7000.0;
 ! the 'bv' parameter indicates that beam2 rotates counter-clockwise
 
 ! select IR8 of beam1:
-call,file="../share/eng/lhc/optics/V6.503/toolkit/select.ir8.b1.madx";
-call,file="../share/eng/lhc/optics/V6.503/toolkit/twissini.ir8.b1.madx";
+call,file="../share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx";
+call,file="../share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx";
 
 
 ! Create table for storing data
