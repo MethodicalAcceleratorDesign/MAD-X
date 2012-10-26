@@ -29,6 +29,7 @@
 
 tests-all := \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
+\
 test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
@@ -43,6 +44,9 @@ test-ptc-twiss
 
 tests-to-setup := \
 test-ibs
+
+# test dependencies
+# test-match: test-twiss
 
 # testsuite titles (attached to first rule of your suite)
 test-rfmultipole:  TESTSUITE := RF multipole testsuite

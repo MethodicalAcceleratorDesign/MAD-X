@@ -31,7 +31,7 @@ tests: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-long),$(tests-all))
 #
 # rule for one test
 #
-$(if $(TESTS),$(TESTS),$(tests-all)):
+$(sort $(TESTS) $(tests-all)):
 	$(run-test)
 
 #
