@@ -67,3 +67,6 @@ numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
 numdiff_test(test-twiss "sample_optics.tfs" 1)
 
+numdiff_test(test-track-1 "out_test-track_ap_collimatorone" 0)
+numdiff_test(test-track-2 "track.obs0001.p0001" 1)
+

@@ -1,0 +1,146 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 23.10.12 16.22.23 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
+
+! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
+
+
+
+option, -echo,-warn,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   7.798832E-04 deltap:   0.000000E+00
+orbit:  -1.915404E-03 -1.243104E-04  6.545798E-04  3.793152E-05 -1.690224E-05  3.960100E-06
+  
+iteration:   2 error:   1.908349E-05 deltap:   0.000000E+00
+orbit:  -1.916562E-03 -1.261102E-04  6.460820E-04  3.859654E-05 -1.642122E-05  4.275503E-06
+  
+iteration:   3 error:   1.286463E-09 deltap:   0.000000E+00
+orbit:  -1.916566E-03 -1.261105E-04  6.460810E-04  3.859652E-05 -1.642158E-05  4.275494E-06
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832    1.642158211e-05     0.000317164634         56.1510165 
+
+                q1                dq1            betxmax              dxmax 
+       64.27408448        2.043562979        590.8201105        2.881223065 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351228475      0.01475643753      0.00427766603        59.30618148 
+
+               dq2            betymax              dymax              dyrms 
+       1.879764414        612.5858351       0.4173224963       0.1047102777 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03299507936     0.007988972773                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+use, sequence= lhcb1;
+
+vrf400= 8.0;
+
+++++++ info: vrf400 redefined
+track, onepass,dump;
+
+enter TRACK module
+one pass is on
+!track, dump;
+
+
+
+!--------------------6-D orbit for LHC V6.501---from normal madx
+
+!start, x=-0.00250002334,px=1.70517533E-10,
+
+!y=-9.81634914E-11,py=0.000159998881,
+
+!t=1.14893938E-05,pt=9.03907774E-07;
+
+
+
+!--------------------6-D orbit for LHC V6.501---from yisun new code
+
+!start, x=-0.00250002205,px=1.7180735E-10,
+
+!y=-4.03240664E-10,py=0.000159998942,
+
+!t=1.14893971E-05,pt=9.03910221E-07;
+
+
+
+
+
+!--------------------6-D orbit for LHC V6.501---from normal madx
+
+!---------with all corrector kicks set to be 40urad--------
+
+!start, x=-0.00494453278,px=-0.000133497299,
+
+!y=0.000516988853,py=0.000161741089,
+
+!t=-1.51295413E-05,pt=4.50953026E-06;
+
+
+
+!--------------------6-D orbit for LHC V6.501---from yisun new code
+
+!---------with all corrector kicks set to be 40urad--------
+
+start, x=-4.944516E-03,px=-1.334966E-04,
+
+y=5.169909E-04,py=1.617393E-04,
+
+t=-1.512923E-05,pt=4.509911E-06;
+
+
+
+
+
+!start, x=0,px=0,y=0,py=0,t=0,pt=0;
+
+
+
+
+
+run,   turns= 10;
+
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0       -0.004944516      -0.0001334966 
+         1         10    -0.002116468767   -0.0003395080912 
+
+                 y                 py                  t                 pt 
+      0.0005169909       0.0001617393      -1.512923e-05       4.509911e-06 
+    0.001570183133    0.0002258441273    4.330075944e-05    4.465852757e-06 
+
+                 s                  e 
+                 0                  0 
+        26658.8832                  0 
+
+*****  end of trrun  *****
+endtrack; 
+
+exit TRACK module
+
+
+
+
+
+return;
+
+
+  Number of warnings: 0
+
+  +++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.00 finished normally +
+  +++++++++++++++++++++++++++++++++++

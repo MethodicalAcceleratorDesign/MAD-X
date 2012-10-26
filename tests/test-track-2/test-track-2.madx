@@ -1,0 +1,107 @@
+! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
+! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
+
+option, -echo,-warn,-info;
+vrf400= 8.0;
+
+! ---------- sequence
+call, file="../share/eng/lhc/optics/V6.503/V6.5.thin.seq";
+!---------nominal strength--------
+call, file="../share/eng/lhc/optics/V6.503/V6.5.thin.inj.str";
+
+!---------set all 0 corrector kicks to be 40urad to create larger orbits--------
+corr_kick = 40e-6;
+acbch7.l1b2          :=  corr_kick ;
+acbyh4.l1b1          :=  corr_kick ;
+acbyv4.l1b2          :=  corr_kick ;
+acbyv4.r1b1          :=  corr_kick ;
+acbyh4.r1b2          :=  corr_kick ;
+acbch7.r1b1          :=  corr_kick ;
+
+acbyvs5.l2b1         :=  corr_kick ;
+acbyh5.l2b1          :=  corr_kick ;
+acbyv4.l2b1          :=  corr_kick ;
+acbyh4.r2b1          :=  corr_kick ;
+acbcv5.r2b1          :=  corr_kick ;
+acbch6.r2b1          :=  corr_kick ;
+acbch6.l2b2          :=  corr_kick ;
+acbyv5.l2b2          :=  corr_kick ;
+acbyh4.l2b2          :=  corr_kick ;
+acbyv4.r2b2          :=  corr_kick ;
+acbch5.r2b2          :=  corr_kick ;
+acbcvs5.r2b2         :=  corr_kick ;
+
+acbyv4.l5b2          :=  corr_kick ;
+acbyh4.l5b1          :=  corr_kick ;
+acbyv4.r5b1          :=  corr_kick ;
+acbyh4.r5b2          :=  corr_kick ;
+
+acbcvs5.l8b1         :=  corr_kick ;
+acbyh4.l8b2          :=  corr_kick ;
+acbyv4.l8b1          :=  corr_kick ;
+acbyh4.r8b1          :=  corr_kick ;
+acbyv4.r8b2          :=  corr_kick ;
+acbyvs5.r8b2         :=  corr_kick ;
+acbch5.l8b1          :=  corr_kick ;
+acbcv5.l8b2          :=  corr_kick ;
+acbyh5.r8b2          :=  corr_kick ;
+acbyv5.r8b1          :=  corr_kick ;
+!----------------------------------------------------------
+
+
+! ------------ beam
+beam, sequence= lhcb1, particle= proton, energy= 450;
+
+
+
+! ----------- Twiss
+use, sequence= lhcb1;
+!set,    format="30.26f";
+select, flag= twiss, clear;
+select, flag= twiss, pattern= "IP\.*", column= name,s,x,px,y,py,t,pt;
+select, flag= twiss, pattern= "BPM\.*", column= name,s,x,px,y,py,t,pt;
+select, flag= twiss, class= rfcavity,  column= name,s,x,px,y,py,t,pt;
+TWISS,  file= "twiss";
+
+
+
+
+! ---------- Track
+option, echo,warn,info;
+use, sequence= lhcb1;
+vrf400= 8.0;
+track, onepass,dump;
+!track, dump;
+
+!--------------------6-D orbit for LHC V6.501---from normal madx
+!start, x=-0.00250002334,px=1.70517533E-10,
+!y=-9.81634914E-11,py=0.000159998881,
+!t=1.14893938E-05,pt=9.03907774E-07;
+
+!--------------------6-D orbit for LHC V6.501---from yisun new code
+!start, x=-0.00250002205,px=1.7180735E-10,
+!y=-4.03240664E-10,py=0.000159998942,
+!t=1.14893971E-05,pt=9.03910221E-07;
+
+
+!--------------------6-D orbit for LHC V6.501---from normal madx
+!---------with all corrector kicks set to be 40urad--------
+!start, x=-0.00494453278,px=-0.000133497299,
+!y=0.000516988853,py=0.000161741089,
+!t=-1.51295413E-05,pt=4.50953026E-06;
+
+!--------------------6-D orbit for LHC V6.501---from yisun new code
+!---------with all corrector kicks set to be 40urad--------
+start, x=-4.944516E-03,px=-1.334966E-04,
+y=5.169909E-04,py=1.617393E-04,
+t=-1.512923E-05,pt=4.509911E-06;
+
+
+!start, x=0,px=0,y=0,py=0,t=0,pt=0;
+
+
+run,   turns= 10;
+endtrack; 
+
+
+return;

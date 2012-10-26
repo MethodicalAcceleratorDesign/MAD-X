@@ -1,0 +1,36 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 23.10.12 17.07.44 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Simple tracking test for collimator with aper definition.
+
+
+
+option,-echo,-info,-warn;
+
+enter TRACK module
+one pass is on
+aperture tracking is on
+particle #    16 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=  1.631850984000000E-003   Y= -1.511848654600000E-003   T=  0.000000000000000E+000
+particle #    18 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X= -1.719727704000000E-003   Y=  1.426158203000000E-003   T=  0.000000000000000E+000
+particle #    19 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=  1.860536816000000E-003   Y=  1.374886186000000E-003   T=  0.000000000000000E+000
+particle #    20 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X= -6.796463600000000E-004   Y= -1.679636720000000E-003   T=  0.000000000000000E+000
+particle #     2 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X= -2.292887199999997E-004   Y=  1.683343821600000E-003   T=  0.000000000000000E+000
+
+*****  end of trrun  *****
+exit TRACK module
+
+
+  Number of warnings: 0
+
+  +++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.00 finished normally +
+  +++++++++++++++++++++++++++++++++++

@@ -664,6 +664,16 @@ tests/test-rfmultipole/test1_track.obs0001.p0001.cfg -text
 tests/test-rfmultipole/test1_track.obs0001.p0001.ref -text
 tests/test-rfmultipole/test1_track.obs0002.p0001.cfg -text
 tests/test-rfmultipole/test1_track.obs0002.p0001.ref -text
+tests/test-track-1/out_test-track_ap_collimatorone.cfg -text
+tests/test-track-1/out_test-track_ap_collimatorone.ref -text
+tests/test-track-1/test-track-1.cfg -text
+tests/test-track-1/test-track-1.madx -text
+tests/test-track-1/test-track-1.ref -text
+tests/test-track-2/test-track-2.cfg -text
+tests/test-track-2/test-track-2.madx -text
+tests/test-track-2/test-track-2.ref -text
+tests/test-track-2/track.obs0001.p0001.cfg -text
+tests/test-track-2/track.obs0001.p0001.ref -text
 tests/test-twiss/sample_optics.tfs.cfg -text
 tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text
