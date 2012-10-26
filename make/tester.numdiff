@@ -80,7 +80,7 @@ $(RM) $(notdir $(NDFILES_OUT)) \
   $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
 $(TESTCMD) > $@.out && \
 $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES)) || \
-echo error: '$(TESTCMD)' failed, check tests$/$@$/$@.out for details
+echo "error: '$(TESTCMD)' failed, check tests$/$@$/$@.out for details"
 endef
 
 # end of makefile
