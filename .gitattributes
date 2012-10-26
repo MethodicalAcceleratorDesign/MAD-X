@@ -587,6 +587,7 @@ tests/share/LHC/LHCRing/V6.503/V6.5.inj.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.seq -text
 tests/share/LHC/LHCRing/V6.503/V6.5.thin.inj.str -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
+tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
 tests/test-ibs/ibs_output.tfs.cfg -text
 tests/test-ibs/ibs_output.tfs.ref -text

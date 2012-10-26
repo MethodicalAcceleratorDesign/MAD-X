@@ -1,0 +1,23 @@
+//     Slicing for LHC version > 6.500
+
+! saved on 18/05/06 15:01:41 by T.Risselada
+
+ select, flag=makethin, clear;
+
+ select, flag=makethin, pattern=mbx\.,    slice=4;
+ select, flag=makethin, pattern=mbrb\.,   slice=4;
+ select, flag=makethin, pattern=mbrc\.,   slice=4;
+ select, flag=makethin, pattern=mbrs\.,   slice=4;
+
+ select, flag=makethin, pattern=mqxa\.,   slice=4;
+ select, flag=makethin, pattern=mqxb\.,   slice=4;
+ select, flag=makethin, pattern=mqwa\.,   slice=2;
+ select, flag=makethin, pattern=mqwb\.,   slice=2;
+ select, flag=makethin, pattern=mqy\.,    slice=2;
+ select, flag=makethin, pattern=mqm\.,    slice=2;
+ select, flag=makethin, pattern=mqmc\.,   slice=2;
+ select, flag=makethin, pattern=mqml\.,   slice=2;
+ select, flag=makethin, pattern=mqtlh\.,  slice=2;
+ select, flag=makethin, pattern=mqtli\.,  slice=2;
+
+return;
