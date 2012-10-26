@@ -55,7 +55,7 @@ endef
 # fini-test macro
 #
 define fini-test
-$_ echo && $(CAT) tests$/$(NDSUM)
+$_ $(CAT) tests$/$(NDSUM)
 endef
 
 #
