@@ -43,10 +43,11 @@ test-match-2 \
 test-ptc-twiss
 
 tests-to-setup := \
-test-ibs
+test-ibs \
+test-ptc-twiss-2
 
-# test dependencies
-# test-match: test-twiss
+# test dependencies (e.g. match-3 depends on twiss and makethin)
+# test-match-3: test-makethin test-twiss
 
 # testsuite titles (attached to first rule of your suite)
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
