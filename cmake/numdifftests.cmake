@@ -49,16 +49,21 @@ endmacro()
 # Third is a bool saying if it is 
 # a long test (test-user).
 
-numdiff_test(test-ibs "ibs_output.tfs" 0)
+#numdiff_test(test-ibs "ibs_output.tfs" 0)
 numdiff_test(test-jacobian "" 0)
 numdiff_test(test-jacobian-2 "" 0)
 numdiff_test(test-jacobian-knobs "knobfile" 0)
-numdiff_test(test-ptc-twiss "Maxwellian_bend_for_ptc.txt fort.18 ptc-twiss-table" 0)
-numdiff_test(test-ptc-normal "distort_1_f_end distort_1_h_end fc.3 fort.18 ptc_map_table.tfs ptc_normal_results.tfs" 0)
+
+numdiff_test(test-match "" 0)
+numdiff_test(test-match-2 "str.ip8.b1.dat twiss.ir8.b1.data" 1)
+
+numdiff_test(test-ptc-twiss "Maxwellian_bend_for_ptc.txt fort.18 ptc-twiss-table" 1)
+numdiff_test(test-ptc-normal "fort.18 Maxwellian_bend_for_ptc.txt ptc_map_table.tfs ptc_normal_results.tfs" 0)
+
 numdiff_test(test-rfmultipole "fc.16 fc.2 fc.34 fc.3 fc.3.aux test1_flat.seq test1_track.obs0001.p0001 test1_track.obs0002.p0001" 0)
 numdiff_test(test-rfmultipole-2 "sectormap" 0)
 numdiff_test(test-rfmultipole-3 "sectormap" 0)
 numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
-numdiff_test(test-twiss "sample_optics.tfs" 0)
-numdiff_test(test-match "" 0)
+numdiff_test(test-twiss "sample_optics.tfs" 1)
+
