@@ -8,7 +8,7 @@ if(WIN32)
          ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
    endif()
    if(NOT EXISTS ${CMAKE_BINARY_DIR}/tests/share)
-      message(STATUS "Copying examples folder, this will take some time...")
+      message(STATUS "Copying tests/share folder, this will take some time...")
       execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
          ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
    endif()
