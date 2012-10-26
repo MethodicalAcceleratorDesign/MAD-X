@@ -5,9 +5,9 @@ option, -echo,-warn,-info;
 vrf400= 8.0;
 
 ! ---------- sequence
-call, file="../share/eng/lhc/optics/V6.503/V6.5.thin.seq";
+call, file="../test-makethin-1/V6.5.thin.b1.seq";
 !---------nominal strength--------
-call, file="../share/eng/lhc/optics/V6.503/V6.5.thin.inj.str";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
 
 !---------set all 0 corrector kicks to be 40urad to create larger orbits--------
 corr_kick = 40e-6;

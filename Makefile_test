@@ -36,12 +36,14 @@ test-match test-match-2 \
 \
 test-ptc-twiss \
 test-ptc-normal \
+test-makethin-1 \
 test-track-1 test-track-2
 
 tests-long := \
 test-twiss \
 test-match-2 \
 test-ptc-twiss \
+test-makethin-1 \
 test-track-2
 
 tests-to-setup := \
@@ -50,6 +52,7 @@ test-ptc-twiss-2
 
 # test dependencies (e.g. match-3 depends on twiss and makethin)
 # test-match-3: test-makethin test-twiss
+test-track-2: test-makethin-1
 
 # testsuite titles (attached to first rule of your suite)
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
@@ -57,6 +60,7 @@ test-twiss:        TESTSUITE := Twiss testsuite
 test-ibs:          TESTSUITE := IBS testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-match:        TESTSUITE := Matching testsuite
+test-makethin-1:   TESTSUITE := Makethin testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 test-track-1:      TESTSUITE := Track testsuite
