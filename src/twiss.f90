@@ -2257,7 +2257,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
   !---- RF-Multipole.
 430 continue
-  call tmrfmult(fsec,ftrk,orbit,fmap,re,te)
+  call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   go to 500
 
   !---- User-defined elements.
@@ -6438,7 +6438,7 @@ SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmnll
 
-SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
+SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
   use twtrrfi
   use twisslfi
@@ -6454,16 +6454,17 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical fsec,ftrk,fmap,dorad
   integer nord,iord,j,nn,ns,node_fd_errors
-  double precision orbit(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
+  double precision orbit(6),ek(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
        field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
        skew(0:maxmul),node_value,get_value,arad,gammas,rfac,bvk, &
        zero,one,two,three, tilt, angle, cangle, sangle, dtmp
-  double precision orbit00(6),re00(6,6),te00(6,6,6)
+  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   double precision f_errors(0:maxferr)
   !double precisio vals(2,0:maxmul)
   integer n_ferr
@@ -6525,9 +6526,15 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   nord = max(nn, ns, n_ferr/2-1);
   
   !---- Particle's coordinates
-  x = orbit(1);
-  y = orbit(3);
-  z = orbit(5);
+  if (ftrk) then
+    x = orbit(1);
+    y = orbit(3);
+    z = orbit(5);
+  else
+    x = zero;
+    y = zero;
+    z = zero;
+  endif
   
   !---- Vector with strengths + field errors
   do iord = 0, nord;
@@ -6549,14 +6556,14 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   enddo
       
   !---- Prepare to calculate the kick and the matrix elements
-  Cm2 = 0.0;
-  Sm2 = 0.0;
-  Cm1 = 0.0;
-  Sm1 = 0.0;
-  Cp0 = 0.0;
-  Sp0 = 0.0;
-  Cp1 = 0.0;
-  Sp1 = 0.0;
+  Cm2 = 0d0;
+  Sm2 = 0d0;
+  Cm1 = 0d0;
+  Sm1 = 0d0;
+  Cp0 = 0d0;
+  Sp0 = 0d0;
+  Cp1 = 0d0;
+  Sp1 = 0d0;
   do iord = nord, 0, -1
     if (iord.ge.2) then
       Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
@@ -6600,14 +6607,12 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
         orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
         orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
      endif
-     
-     !---- Orbit not wanted.
-  else
-     x = zero
-     y = zero
-     nord = min(nord, 2)
   endif
-
+  
+  !---- Element Kick
+  ek(2) = -REAL(Cp0);
+  ek(4) = AIMAG(Cp0);
+  ek(6) =  vrf * sin(lag * 2 * pi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
   re(2,1) = -REAL(Cm1);
@@ -6654,6 +6659,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
   !---- centre option
   if(centre_cptk.or.centre_bttk) then
      call dcopy(orbit,orbit00,6)
+     call dcopy(ek,ek00,6)
      call dcopy(re,re00,36)
      call dcopy(te,te00,216)
      if(centre_cptk) then
@@ -6662,6 +6668,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,re,te)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
+     call dcopy(ek00,ek,6)
      call dcopy(re00,re,36)
      call dcopy(te00,te,216)
   endif
