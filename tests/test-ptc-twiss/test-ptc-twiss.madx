@@ -49,12 +49,12 @@ ptc_create_universe;
 ptc_create_layout,model=2,method=6,nst=10,exact;
 !ptc_align;
 
-select,flag=ptc_twiss,column=name,s,beta11,beta21,
-                                  beta12,beta22,disp1,disp3,x,px,y,py;
+select,flag=ptc_twiss,
+       column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
 
-ptc_twiss,closed_orbit,icase=5,no=1,file="ptc-twiss-table.out";
+ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
 
-PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=1; ! currently cause
+PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
 ! memory access outside program range later
 
 ptc_end;

@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.16  (64 bit, Linux)       +
+  +    MAD-X 5.00.18  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.04.05      +
-  + Execution Time Stamp: 12.06.12 13.18.31 +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 09.11.12 17.10.14 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -166,28 +166,28 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.00000000000000     
+     energy           100.000000000000     
      method                   6
      Num. of steps           10
-     charge           1.0000000000000000     
-  Length of machine:    534.59999999999991     
+     charge           1.00000000000000     
+  Length of machine:    534.600000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
 !ptc_align;
 
 
 
-select,flag=ptc_twiss,column=name,s,beta11,beta21,
+select,flag=ptc_twiss,
 
-                                  beta12,beta22,disp1,disp3,x,px,y,py;
+       column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
 
 
 
-ptc_twiss,closed_orbit,icase=5,no=1,file="ptc-twiss-table.out";
+ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -210,28 +210,29 @@ ptc_twiss,closed_orbit,icase=5,no=1,file="ptc-twiss-table.out";
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.2314815006343451E-11 %
+ Closed orbit:   8.892828933326235E-005  7.277292572735424E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.4579669976578771E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
   NUMBER OF THIN OBJECTS :        1180
-  TOTAL IDEAL LENGTH OF STRUCTURE :   534.60000000000196     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.60000000000196     
-Deviation from symplecticity  0.2314815006343451E-11 %
+  TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
+Deviation from symplecticity  0.4579669976578771E-11 %
+ ALPHA_C dp/dp derivatives : 5D TIME ON
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004431145119    -0.001891935758                  0 
+             534.6    0.0004431145119   -0.0001936171878           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-                 0    0.0003550790748        47.50529435       0.2546195015 
+          -1000000    0.0003550790748        47.50529435       0.2546195015 
 
                 q2                dq1                dq2                 qs 
-      0.2546003529                  0                  0                  0 
+      0.2546003528        1.051169737        1.046958092                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       32.04975092        177.6889149        32.05081524        177.7045042 
+        32.0497509        177.6889149        32.05081522        177.7045042 
 
             deltap            orbit_x           orbit_px            orbit_y 
                  0    8.892828933e-05    7.277292573e-07                  0 
@@ -246,7 +247,7 @@ Deviation from symplecticity  0.2314815006343451E-11 %
                  0    7.281171647e-07                  0 
 
 
-PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=1; ! currently cause
+PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -269,8 +270,8 @@ PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=1; ! currently cause
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.2314815006343451E-11 %
+ Closed orbit:   8.892828933326235E-005  7.277292572735424E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.4579669976578771E-11 %
 ! memory access outside program range later
 
 
@@ -286,5 +287,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.16 64 finished normally +
+  + MAD-X 5.00.18 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
