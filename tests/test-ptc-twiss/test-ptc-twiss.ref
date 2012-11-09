@@ -3,7 +3,7 @@
   +    MAD-X 5.00.18  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 09.11.12 17.10.14 +
+  + Execution Time Stamp: 09.11.12 17.22.50 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -218,7 +218,6 @@ Deviation from symplecticity  0.4579669976578771E-11 %
   TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
   TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
 Deviation from symplecticity  0.4579669976578771E-11 %
- ALPHA_C dp/dp derivatives : 5D TIME ON
 
 ++++++ table: ptc_twiss_summary
 
