@@ -2253,19 +2253,19 @@ contains
          ! so we get alpha_c first from transfer matrix
 
          sd = +1.0*(oneTurnMap(6).sub.coeffSelector(5,:)) ! 5/6 swap MADX/PTC
-         print*,'sd(0)',sd
+         !print*,'sd(0)',sd
          do i=1,4
-            print*, 'Disp',i,'=', dispersion(i)
+            !print*, 'Disp',i,'=', dispersion(i)
             sd = sd + (oneTurnMap(6).sub.coeffSelector(i,:))*dispersion(i)
          enddo
-         print*,'sd(f)',sd
+         !print*,'sd(f)',sd
          alpha_c = sd/suml
          eta_c = alpha_c - one / gammaRelativistic**2
          gamma_tr = one / sqrt(alpha_c)
          
       elseif( (icase.eq.56)  .and. (default%time .eqv. .false.) ) then
 
-         print*,"ALPHA_C, GAMMA TR : 56D TIME OFF"
+         !print*,"ALPHA_C, GAMMA TR : 56D TIME OFF"
 
 
          call alloc(yy)
@@ -2299,7 +2299,7 @@ contains
 
      if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
 
-         print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
+         !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
 
          call kanalnummer(mf1)
          open(unit=mf1,file='oneTurnMap.5dt.txt')
@@ -2390,7 +2390,7 @@ contains
              
      elseif ( (icase.eq.56) .and. (default%time .eqv. .true.) ) then ! here one may obtain the pathlength derivatives from the map
 
-         print*,"ALPHA_C dp/dp derivatives : 56D TIME ON"
+         !print*,"ALPHA_C dp/dp derivatives : 56D TIME ON"
 
          call kanalnummer(mf1)
          open(unit=mf1,file='oneTurnMap.56dt.txt')
