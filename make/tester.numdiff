@@ -68,19 +68,19 @@ NDFILES_REF = $(wildcard   tests/$@/$@.ref) \
               $(filter-out tests/$@/$@.ref, $(sort $(wildcard tests/$@/*.ref)))
 
 # Remarks line-by-line
-# check for .ref files
+# check for .ref files unless NREF=yes
 # check for testsuite name ; go to test directory
 # delete generated files + cleanup output on Windows (case file not found)
 # run the test command (generate outputs)
 # for each reference file, diff with the generated file + constraints
 define run-test
-$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found)
+$(if $(call eq,$(NREF),yes),,$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found))
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
 $(RM) $(notdir $(NDFILES_OUT)) \
   $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
 $(TESTCMD) > $@.out && \
 $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES)) || \
-echo "error: '$(TESTCMD)' failed, check tests$/$@$/$@.out for details"
+echo "error: $@ failed, check tests$/$@$/$@.out for details"
 endef
 
 # end of makefile
