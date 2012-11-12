@@ -587,8 +587,7 @@ polish_value(struct int_array* deco, char* expr_string)
         case 3:
           if (stack[c_stack+1] == 0.0)
           {
-            warning("division by zero, result set to zero, expr:",
-                    expr_string);
+            warning("division by zero, result set to zero, expr:", expr_string);
             stack[c_stack] = 0.0;
             break;
           }
