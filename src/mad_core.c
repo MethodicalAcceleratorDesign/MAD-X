@@ -21,7 +21,12 @@ mad_init_c(void)
   if (stamp_flag == 1)  stamp_file = fopen("madx.stamp", "w");
   else if (stamp_flag == 2)  stamp_file = stdout;
   in = new_in_buff_list(100); /* list of input buffers, dynamic */
-  in->input_files[0] = stdin;
+  // quick and dirty fix to accept jobs from filename
+  in->input_files[0] = mad_argc == 1 ? stdin : fopen(mad_argv[1], "r");
+  if (!in->input_files[0]) {
+    warning("invalid input filename: ", mad_argv[1]);
+    in->input_files[0] = stdin;
+  }
   prt_file = stdout;
   pro = new_in_buff_list(100); /* list of process buffers, dynamic */
   pro->buffers[0] = new_in_buffer(IN_BUFF_SIZE);
@@ -152,8 +157,8 @@ madx_input(int top)
     if (interactive && in->curr == 0) puts("X: ==>");
     if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
     {
-      if (in->curr == 0) return;
-      fclose(in->input_files[in->curr--]);
+      if (in->input_files[in->curr] != stdin)
+        fclose(in->input_files[in->curr--]);
       return_flag = 0;
       if (in->curr == top) return;
     }
@@ -165,6 +170,16 @@ madx_input(int top)
     }
   }
 }
+
+#if 0
+static unsigned long long poly_mul_count = 0;
+
+void poly_mul_incr_(void);
+void poly_mul_incr_(void)
+{
+  ++poly_mul_count;
+}
+#endif
 
 void
 madx_finish(void)
@@ -198,6 +213,9 @@ madx_finish(void)
       printf("%d in C and %d in Fortran\n",warn_numb,warn_numbf);
     }
     if (get_option("trace")) time_stamp("end");
+
+    // printf("poly-mul= %llu\n", poly_mul_count);
+
     printf("\n"
            "  ++++++++++++++++++++++++++++++++++++++++++++\n");
     printf("  + %s (%s bit) finished normally +\n", version_name, version_arch);
