@@ -23,53 +23,55 @@
 # tests-all  : contains all tests        (includes tests-long)
 # tests-long : contains all long tests   (overlaps tests-all)
 
-# rules:
+# rules (commands):
 # tests      : runs tests-all not in tests-long
 # tests-all  : runs tests-all
 
+# tests order
 tests-all := \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 \
+test-makethin \
+test-track test-track-2 \
 test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
 \
 test-ptc-twiss \
-test-ptc-normal \
-test-makethin-1 \
-test-track-1 test-track-2
+test-ptc-normal
 
+# tests dependencies
+test-track-2: test-makethin
+
+# lexicographical order
 tests-long := \
-test-twiss \
+test-makethin \
 test-match-2 \
 test-ptc-twiss \
-test-makethin-1 \
-test-track-2
+test-track-2 \
+test-twiss
 
+# lexicographical order
 tests-to-setup := \
 test-ibs \
 test-ptc-twiss-2
 
-# test dependencies (e.g. match-3 depends on twiss and makethin)
-# test-match-3: test-makethin test-twiss
-test-track-2: test-makethin-1
-
-# testsuite titles (attached to first rule of your suite)
-test-rfmultipole:  TESTSUITE := RF multipole testsuite
-test-twiss:        TESTSUITE := Twiss testsuite
+# testsuite titles (attached to first test of the suite)
 test-ibs:          TESTSUITE := IBS testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
+test-makethin:     TESTSUITE := Makethin testsuite
 test-match:        TESTSUITE := Matching testsuite
-test-makethin-1:   TESTSUITE := Makethin testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 test-ptc-normal:   TESTSUITE := PTC Normal testsuite
-test-track-1:      TESTSUITE := Track testsuite
+test-rfmultipole:  TESTSUITE := RF multipole testsuite
+test-track:        TESTSUITE := Track testsuite
+test-twiss:        TESTSUITE := Twiss testsuite
 
 # end of testsuite
 #################################################
 
-ifndef MADX
 # madx supported command for tests
+ifndef MADX
 MADXCMD := $(firstword $(wildcard \
              $(PROJECT)_dev$(ARCH)$(BINARY_EXT) $(PROJECT)_dev$(BINARY_EXT) \
              $(PROJECT)-dev$(ARCH)$(BINARY_EXT) $(PROJECT)-dev$(BINARY_EXT) \
