@@ -605,11 +605,11 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
-tests/test-makethin-1/lhc_twiss_b1.dat.cfg -text
-tests/test-makethin-1/lhc_twiss_b1.dat.ref -text
-tests/test-makethin-1/test-makethin-1.cfg -text
-tests/test-makethin-1/test-makethin-1.madx -text
-tests/test-makethin-1/test-makethin-1.ref -text
+tests/test-makethin/lhc_twiss_b1.dat.cfg -text
+tests/test-makethin/lhc_twiss_b1.dat.ref -text
+tests/test-makethin/test-makethin.cfg -text
+tests/test-makethin/test-makethin.madx -text
+tests/test-makethin/test-makethin.ref -text
 tests/test-match-2/str.ip8.b1.dat.cfg -text
 tests/test-match-2/str.ip8.b1.dat.ref -text
 tests/test-match-2/test-match-2.cfg -text
