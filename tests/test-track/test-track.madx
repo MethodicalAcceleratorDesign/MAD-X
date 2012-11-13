@@ -1,4 +1,5 @@
 ! Simple tracking test for collimator with aper definition.
+! tstTrack_ap_collimator.madx
 
 option,-echo,-info,-warn;
 
