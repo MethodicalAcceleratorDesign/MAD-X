@@ -71,4 +71,5 @@ numdiff_test(test-makethin "" 1)
 
 numdiff_test(test-track "out_test-track_ap_collimatorone" 0)
 numdiff_test(test-track-2 "track.obs0001.p0001" 1)
+numdiff_test(test-track-3 "out_done out_fone" 0)
 set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin-1_LONG)
