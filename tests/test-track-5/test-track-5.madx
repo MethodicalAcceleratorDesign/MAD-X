@@ -22,9 +22,9 @@ use,  sequence= smachd;
 ! ********** Track 10000 particles
 ! Note the usage of the options
 ! 'onepass': 
-track, onepass, onetable, file= "out_tstTrack_ap_rectellipse", aperture, dump;
+track, onepass, onetable, file= "out_rellipse", aperture, dump;
   n=0;  
-  while(n<10000) {
+  while(n<20) {
      n= n+1; 
      start, x= -0.002+0.004*ranf(), 
             y= -0.0017+0.0034*ranf(),
@@ -32,10 +32,5 @@ track, onepass, onetable, file= "out_tstTrack_ap_rectellipse", aperture, dump;
   }
   run, turns= 1; 
 endtrack;
-
-! ********** Plot the end distribution
-system, "gnuplot < tstTrack_ap_rectellipse.gnuplot";
-
-!system, "rm out_tstTrack_ap_rectellipseone";
 
 return;
