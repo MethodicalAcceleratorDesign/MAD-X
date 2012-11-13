@@ -1,0 +1,41 @@
+! Simple tracking test for rectellipse.
+! tstTrack_ap_rectellipse.madx
+
+option,-echo,-info,-warn;
+
+! **********  Apertures introduced **********
+qd:multipole, knl= {0,-0.0}, apertype= rectellipse,
+         aperture= { 0.00175,  0.00155, 0.0020,  0.0017};
+! ----- syntax: {Hhalfwidthrect, Vhalfheightrect, Hhalfaxis, Vhalfaxis}
+endmk:marker;
+
+! ********** Define sequence
+smachd: sequence, l= 2.0; 
+  qd, at= 1.00;
+  endmk, at= 2.0;
+endsequence;
+
+! ********** Define beam and use the sequence with it 
+beam, sequence= smachd, particle= proton, energy= 450;
+use,  sequence= smachd;
+
+! ********** Track 10000 particles
+! Note the usage of the options
+! 'onepass': 
+track, onepass, onetable, file= "out_tstTrack_ap_rectellipse", aperture, dump;
+  n=0;  
+  while(n<10000) {
+     n= n+1; 
+     start, x= -0.002+0.004*ranf(), 
+            y= -0.0017+0.0034*ranf(),
+            px= 0, py= 0;
+  }
+  run, turns= 1; 
+endtrack;
+
+! ********** Plot the end distribution
+system, "gnuplot < tstTrack_ap_rectellipse.gnuplot";
+
+!system, "rm out_tstTrack_ap_rectellipseone";
+
+return;
