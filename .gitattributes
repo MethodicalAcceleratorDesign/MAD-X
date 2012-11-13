@@ -681,7 +681,11 @@ tests/test-track-3/out_fone.ref -text
 tests/test-track-3/test-track-3.cfg -text
 tests/test-track-3/test-track-3.madx -text
 tests/test-track-3/test-track-3.ref -text
+tests/test-track-4/out_done.cfg -text
+tests/test-track-4/out_done.ref -text
+tests/test-track-4/test-track-4.cfg -text
 tests/test-track-4/test-track-4.madx -text
+tests/test-track-4/test-track-4.ref -text
 tests/test-track-5/out_rellipseone.cfg -text
 tests/test-track-5/out_rellipseone.ref -text
 tests/test-track-5/test-track-5.cfg -text
