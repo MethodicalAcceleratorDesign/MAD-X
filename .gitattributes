@@ -674,6 +674,7 @@ tests/test-track-2/test-track-2.madx -text
 tests/test-track-2/test-track-2.ref -text
 tests/test-track-2/track.obs0001.p0001.cfg -text
 tests/test-track-2/track.obs0001.p0001.ref -text
+tests/test-track-3/test-track-3.madx -text
 tests/test-track/out_test-track_ap_collimatorone.cfg -text
 tests/test-track/out_test-track_ap_collimatorone.ref -text
 tests/test-track/test-track.cfg -text
