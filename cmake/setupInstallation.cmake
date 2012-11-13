@@ -12,10 +12,10 @@ if(APPLE AND MADX_BUNDLE)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/madx${BINARY_POSTFIX}")  # paths to executables
   set(DIRS "")
   INSTALL(CODE " 
-    include(BundleUtilities) 
+    include(BundleUtilities)
     fixup_bundle(\"${APPS}.app\"   \"\"   \"${DIRS}\")
     execute_process(COMMAND mv \"${APPS}.app/Contents\" \"${APPS}\"  )
-    execute_process(COMMAND rm -rf \"${APPS}.app\" \"\${CMAKE_INSTALL_PREFIX}/lib\" )
+    execute_process(COMMAND rm -rf \"${APPS}.app\")
     " COMPONENT Runtime) 
 endif()
 

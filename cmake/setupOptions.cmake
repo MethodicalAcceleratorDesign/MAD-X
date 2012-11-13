@@ -23,7 +23,7 @@ endif()
 option( MADX_NTPSA "Build with NTPSA" ON)
 option( MADX_FORCE_32 "Force 32bit build" OFF )
 if(APPLE)
- option( MADX_BUNDLE "Create bundle on OSX" ON)
+ option( MADX_BUNDLE "Create bundle on OSX" OFF)
 endif()
 
 # double logic: first we set madx_online default on if sdds is found
