@@ -1,0 +1,131 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 13.11.12 18.39.04 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Simple tracking test of tracking with a matrix.
+
+! tstTrack_matrix.madx
+
+
+
+option,-echo,-info,-warn;
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                40                 -0        5.853598184        0.413322023 
+
+                q1                dq1            betxmax              dxmax 
+     0.03306927998     -0.03190979954        202.4790905        477.7717946 
+
+             dxrms             xcomax             xcorms                 q2 
+       468.8578079                  0                  0      0.03154004501 
+
+               dq2            betymax              dymax              dyrms 
+    -0.03188771721        212.2944688                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+dxx1 =        477.7717946 ;
+dxxp1 =        2.391247832 ;
+r111 =       0.9997075052 ;
+r112 =       0.0584322065 ;
+r116 =      1.9894578e-05 ;
+r121 =   -2.888981102e-06 ;
+r122 =        1.000292412 ;
+r126 =     0.000681045193 ;
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                50                 -0        4.689386121       0.4617873195 
+
+                q1                dq1            betxmax              dxmax 
+     0.03311520954     -0.03190979954        202.4790905        477.7717946 
+
+             dxrms             xcomax             xcorms                 q2 
+       469.6396537                  0                  0      0.03158385062 
+
+               dq2            betymax              dymax              dyrms 
+    -0.03188771721        212.2944688                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter TRACK module
+one pass is on
+
+*****  end of trrun  *****
+exit TRACK module
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                50                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+     0.07307727187                  0                110        10.30482363 
+
+             dxrms             xcomax             xcorms                 q2 
+        5.73986844              0.001    0.0009627609415      0.04554476125 
+
+               dq2            betymax              dymax              dyrms 
+                 0        163.7444545                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                50                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+     0.07307727187                  0                110        10.31112131 
+
+             dxrms             xcomax             xcorms                 q2 
+        5.74441488                0.1      0.09627609415      0.04554476125 
+
+               dq2            betymax              dymax              dyrms 
+                 0        163.7444545                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
