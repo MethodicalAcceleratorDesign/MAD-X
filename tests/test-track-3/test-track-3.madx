@@ -28,9 +28,9 @@ beam, sequence= smachd, particle= proton, energy= 450;
 use,  sequence= smachd;
 
 ! ********** Track 10000 particles
-track, onepass, onetable, file= "out_tstTrack_ap_lhcscreen_d", aperture, dump;
+track, onepass, onetable, file= "out_d", aperture, dump;
   n=0;  
-  while(n<10000) {
+  while(n<20) {
      n= n+1; 
      start, x= -0.001+0.002*ranf(), 
             y= -0.001+0.002*ranf(),
@@ -48,9 +48,9 @@ select, flag= error, class= multipole;
 ealign, dx= 0.0002, dy= 0.000; ! ,arex=-0.0003,arey=-0.0002;
 
 ! ********** Track 10000 particles
-track, onepass, onetable, file= "out_tstTrack_ap_lhcscreen_f", aperture, dump;
+track, onepass, onetable, file= "out_f", aperture, dump;
   n=0;  
-  while(n<10000) {
+  while(n<20) {
      n= n+1; 
      start, x= -0.001+0.002*ranf(), 
             y= -0.001+0.002*ranf(),
@@ -59,9 +59,5 @@ track, onepass, onetable, file= "out_tstTrack_ap_lhcscreen_f", aperture, dump;
   run, turns= 1; 
 endtrack;
 
-! ********** Plot the end distribution
-system, "gnuplot < tstTrack_ap_lhcscreen.gnuplot";
-
-!system, "rm out_tstTrack_ap_lhcscreen_fone out_tstTrack_ap_lhcscreen_done";
 
 return;
