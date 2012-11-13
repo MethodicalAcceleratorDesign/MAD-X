@@ -32,7 +32,7 @@ tests-all := \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 \
 test-makethin \
-test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6\
+test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7\
 test-twiss \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
@@ -42,6 +42,7 @@ test-ptc-normal
 
 # tests dependencies
 test-track-2: test-makethin
+test-track-7: test-makethin
 
 # lexicographical order
 tests-long := \
@@ -49,6 +50,7 @@ test-makethin \
 test-match-2 \
 test-ptc-twiss \
 test-track-2 \
+test-track-7 \
 test-twiss
 
 # lexicographical order
