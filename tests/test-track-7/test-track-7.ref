@@ -1,0 +1,168 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 13.11.12 19.42.24 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
+
+! Tracking test SYNCHR. OSC. with LHC  seq.060203  
+
+! tstTrack_synchr_LHC.madx
+
+
+
+option, -echo,-warn,-info;
+
+seqedit, sequence= lhcb1;
+
+  remove, element= ACN.A5L4.B1;
+
+++++++ warning: ignored because of unknown element: acn.a5l4.b1
+  remove, element= ACN.B5L4.B1;
+
+++++++ warning: ignored because of unknown element: acn.b5l4.b1
+  remove, element= ACN.C5L4.B1;
+
+++++++ warning: ignored because of unknown element: acn.c5l4.b1
+  remove, element= ACN.D5L4.B1;
+
+++++++ warning: ignored because of unknown element: acn.d5l4.b1
+  remove, element= ADTH.A5L4.B1;
+
+++++++ warning: ignored because of unknown element: adth.a5l4.b1
+  remove, element= ADTH.B5L4.B1;
+
+++++++ warning: ignored because of unknown element: adth.b5l4.b1
+  remove, element= APW.5R4.B1;
+
+++++++ warning: ignored because of unknown element: apw.5r4.b1
+  remove, element= ADTV.A5R4.B1;
+
+++++++ warning: ignored because of unknown element: adtv.a5r4.b1
+  remove, element= ADTV.B5R4.B1;
+
+++++++ warning: ignored because of unknown element: adtv.b5r4.b1
+endedit;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+
+
+! ********** Twiss
+
+use, sequence= lhcb1;
+
+select, flag= twiss, clear;
+
+select, flag= twiss, pattern= "IP\.*", column= name,betx,bety,alfx,alfy,dx;
+
+select, flag= twiss, class= rfcavity,  column= name,betx,bety,alfx,alfy,dx;
+
+TWISS,  file= "twissprb1.1";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003171305985        56.15402958 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000118        2.000195509        595.2900593        2.860758575 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.347846458                  0                  0        59.31000027 
+
+               dq2            betymax              dymax              dyrms 
+       2.000220745         611.782944                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+! ********** Make a thin sequence
+
+option, -echo,-warn,-info;
+
+makethin: slicing sequence : lhcb1
+use, sequence= lhcb1;
+
+vrf400= 8.0;   !   Qs=0.0057
+
+++++++ info: vrf400 redefined
+track, dump;
+
+enter TRACK module
+  start, pt= 0.0001;
+
+  start, pt= 0.001002; ! edge of bucket
+
+  start, pt= 0.001004; ! just outside of bucket
+
+  run,   turns= 320; !,tolerance={.1,.1,.1,.1,100.,.1};!175=1 synchr. period
+
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:  11 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0                  0                  0 
+         2          0                  0                  0 
+         3          0                  0                  0 
+         1        320    3.781780544e-06    -4.14812229e-08 
+         2        320    9.500959512e-06    1.275619784e-07 
+         3        320    9.627412902e-06    1.250160684e-07 
+
+                 y                 py                  t                 pt 
+                 0                  0                  0             0.0001 
+                 0                  0                  0           0.001002 
+                 0                  0                  0           0.001004 
+   1.447913713e-22   -7.203741152e-24       -1.175105953    0.0009885395055 
+  -1.001771933e-21   -3.727323842e-23       -3.189567294     0.001245397108 
+  -4.727784955e-22    2.175070483e-23       -3.194475804     0.001255311463 
+
+                 s                  e 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+
+*****  end of trrun  *****
+endtrack; 
+
+exit TRACK module
+
+
+
+return;
+
+
+  Number of warnings: 9
+9 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
