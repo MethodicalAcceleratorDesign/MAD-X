@@ -1,20 +1,19 @@
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
- set,  format="12.6f";
+set, format="12.6f";
 
- option, info,  warn, -echo;
-CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.seq";
-CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
- option, info, warn,  echo;
+option, info, warn, -echo;
+call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+option, info, warn, echo;
 
 ! convert to THIN
- option, info,  warn, -echo;
- call,   file="../../tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx";
+ option, info, warn, -echo;
+ call, file="../share/LHC/LHCRing/V6.503/toolkit/slice.madx";
  makethin, sequence=lhcb1;
  makethin, sequence=lhcb2;
  option, echo, warn, info;
-
 
  beam, particle = proton, sequence=lhcb1, energy = 450.0;
  beam, particle = proton, sequence=lhcb2, energy = 450.0, bv = -1;
@@ -24,7 +23,6 @@ CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
  on_sep1 := 0; on_sep2 := 0; on_sep5 := 0; on_sep8 := 0;
  on_alice:= 0; on_lhcb := 0;
 
-
  use,    period=lhcb1;
  select, flag=twiss, clear;
 
@@ -32,9 +30,6 @@ CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
  select, flag=twiss, pattern="s.ds.l\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
  select, flag=twiss, pattern="e.ds.r\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
  twiss,  sequence=lhcb1, file=twiss.b1.data, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
-
-
-
 
  use,    period=lhcb2;
  select, flag=twiss, clear;
