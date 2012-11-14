@@ -115,10 +115,8 @@ finish:
 static int
 readEps(struct eps *e, FILE *in, int row)
 {
-  int c = 0, n = 0;
+  int c = 0, n = 0, cmd = eps_invalid;
   char str[16];
-
-  e->cmd = eps_invalid;
 
   while (1) {
     // parse next constraint
@@ -127,30 +125,33 @@ readEps(struct eps *e, FILE *in, int row)
     if (n == EOF || *str == 0) break;
 
          if (strcmp(str, "skip") == 0) {
-      e->cmd |= eps_skip; trace("[%d] skip", row);
+      cmd |= eps_skip; trace("[%d] skip", row);
     }
     else if (strcmp(str, "ign") == 0) {
-      e->cmd |= eps_ign;  trace("[%d] ign", row);
+      cmd |= eps_ign;  trace("[%d] ign", row);
     }
     else if (strcmp(str, "equ") == 0) {
-      e->cmd |= eps_equ;  trace("[%d] equ", row);
+      cmd |= eps_equ;  trace("[%d] equ", row);
+    }
+    else if (strcmp(str, "either") == 0) {
+      e->either = 1;  trace("[%d] or", row);
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
-      e->cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
+      cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
-      e->cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
+      cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
     }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
-      e->cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
+      cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
     }
-    else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%32[^']'", e->tag)) == 1) {
-      e->cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
+    else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
+      cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
                           trace("[%d] goto='%s'", row, e->tag);
     }
     else {
                           trace("[%d] invalid '%s'", row, str);
-      e->cmd = eps_invalid;
+      cmd = eps_invalid;
       break;
     }
 
@@ -159,9 +160,11 @@ readEps(struct eps *e, FILE *in, int row)
     if (c == EOF || (isspace(c) && !isblank(c)) || c == '#' || c == '!') break; 
   }
 
-  trace("<-readEps cmd = %d, str = '%s', c = '%c'", e->cmd, str, c);
+  e->cmd = (enum eps_cmd)cmd;  // because of icc spurious warnings
 
-  return e->cmd == eps_invalid || n == EOF ? EOF : 0;
+  trace("<-readEps cmd = %d, str = '%s', c = '%c'", cmd, str, c);
+
+  return cmd == eps_invalid || n == EOF ? EOF : 0;
 }
 
 // ----- interface
@@ -178,6 +181,7 @@ constraint_print(const T* cst, FILE *out)
   putc(' ', out);
 
   if (cst->eps.cmd >= eps_dig && cst->eps.cmd < eps_equ) {
+    if (cst->eps.either) fprintf(out, "either ");    
     if (cst->eps.cmd & eps_dig) fprintf(out, "dig=%g ", cst->eps.dig);    
     if (cst->eps.cmd & eps_rel) fprintf(out, "rel=%g ", cst->eps.rel);    
     if (cst->eps.cmd & eps_abs) fprintf(out, "abs=%g ", cst->eps.abs);    

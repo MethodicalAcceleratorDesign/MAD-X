@@ -37,15 +37,19 @@ enum eps_cmd {
 // must be lasts (strong commands)
   eps_skip    =  32u,  // skip line
   eps_goto    =  64u,  // goto line
-  eps_last
+  eps_last,
+
+// unions
+  eps_dra     =  eps_dig|eps_rel|eps_abs
 };
 
 // ----- types
 
 struct eps {
   enum eps_cmd cmd;
+  bool   either;
   double dig, rel, abs;
-  char   tag[32];
+  char   tag[48];
 };
 
 struct constraint {
@@ -62,14 +66,14 @@ static inline struct eps
 eps_init(enum eps_cmd cmd, double val)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0, {0} };
+  return (struct eps) { cmd, 0, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0, {0} };
 }
 
 static inline struct eps
-eps_initNum(enum eps_cmd cmd, double dig, double rel, double abs)
+eps_initNum(enum eps_cmd cmd, bool either, double dig, double rel, double abs)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, dig, rel, abs, {0} };
+  return (struct eps) { cmd, either, dig, rel, abs, {0} };
 }
 
 static inline struct eps

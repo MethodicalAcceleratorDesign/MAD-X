@@ -517,7 +517,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   char *rhs_p = dif->rhs_b+dif->rhs_i;
   char *end;
 
-  double lhs_d, rhs_d, dif_a, min_a;
+  double lhs_d, rhs_d, dif_a, min_a, pow_a;
 
   trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.30s'|'%.30s'", lhs_p, rhs_p);
@@ -532,7 +532,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   // invalid numbers
   if (!l1 || !l2) {
     l1 = l2 = 20;
-    if (dif->cnt_i+1 <= dif->max_i) warning("(%d) one number is missing", dif->cnt_i+1);
+    ret |= eps_ign;
     goto quit_diff;
   }
 
@@ -546,7 +546,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
 
   // ...required
   if (c->eps.cmd == eps_equ) {
-    if (dif->cnt_i+1 <= dif->max_i) warning("(%d) numbers strict representation differ", dif->cnt_i+1);
+    ret |= eps_equ;
     goto quit_diff;
   }
 
@@ -555,59 +555,61 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
   dif_a = fabs(lhs_d - rhs_d);
   min_a = fmin(fabs(lhs_d),fabs(rhs_d));
+  pow_a = pow10(-imax(n1, n2));
 
   // if one number is zero -> relative becomes absolute
   if (!(min_a > 0)) min_a = 1.0;
 
   // input-specific relative comparison (does not apply to integers)
-  if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
-    double rel = c->eps.dig * pow10(-imax(n1, n2));
-    if (dif_a > rel * min_a) {
-      if (dif->cnt_i+1 <= dif->max_i) 
-        warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
-                dif->cnt_i+1, context_findIdx(cxt, c), rel, dif_a, dif_a/min_a, imax(n1, n2));   
-      ret = 1; 
-    }
-  }
+  if ((c->eps.cmd & eps_dig) && (f1 || f2))
+    if (dif_a > c->eps.dig * min_a * pow_a) ret |= eps_dig;
 
   // relative comparison 
   if (c->eps.cmd & eps_rel)
-    if (dif_a > c->eps.rel * min_a) {
-      if (dif->cnt_i+1 <= dif->max_i) 
-        warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
-                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
-      ret = 1; 
-    }
+    if (dif_a > c->eps.rel * min_a) ret |= eps_rel;
 
   // absolute comparison
   if (c->eps.cmd & eps_abs)
-    if (dif_a > c->eps.abs) {
-      if (dif->cnt_i+1 <= dif->max_i) 
-        warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
-                dif->cnt_i+1, context_findIdx(cxt, c), c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
-      ret = 1;
-    }
+    if (dif_a > c->eps.abs) ret |= eps_abs;
 
   if (!ret) goto quit;
+  if (c->eps.either && (ret & eps_dra) != (c->eps.cmd & eps_dra)) goto quit;
 
 quit_diff:
-  ret = 1;
-  dif->cnt_i += 1;
-  if (dif->cnt_i <= dif->max_i) {
+  if (++dif->cnt_i <= dif->max_i) {
     warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
             dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
     char str[128];
     sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1,l2);
     warning(str, dif->cnt_i, lhs_p, rhs_p);
+
+    if (ret & eps_ign)
+      warning("(%d) one number is missing", dif->cnt_i);
+
+    if (ret & eps_equ)
+      warning("(%d) numbers strict representation differ", dif->cnt_i);
+
+    if (ret & eps_dig)
+      warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+              dif->cnt_i, context_findIdx(cxt, c), c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
+ 
+    if (ret & eps_rel)
+      warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+              dif->cnt_i, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
+
+    if (ret & eps_abs)
+      warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+              dif->cnt_i, context_findIdx(cxt, c), c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
   }
+  ret = 1;
 
 quit:
   dif->lhs_i += l1;
   dif->rhs_i += l2;
 
   trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  numbers: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
+  trace("  strnums: [%d|%d] '%.30s'|'%.30s'", l1, l2, lhs_p, rhs_p);
 
   return ret;
 }
