@@ -33,7 +33,7 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 \
 test-makethin \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7 \
-test-twiss test-twiss-2 test-twiss-4 \
+test-twiss test-twiss-2 test-twiss-3 test-twiss-4 \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
 \
@@ -53,6 +53,7 @@ test-track-2 \
 test-track-7 \
 test-twiss\
 test-twiss-2\
+test-twiss-3\
 test-twiss-4
 
 # lexicographical order
