@@ -231,13 +231,14 @@ getcurrentelementname(void)
 }
 #endif
 
-static int
-copytrackstoarray(void)
+/**
+ * copies track positions from commands to array
+ * returns number of copied tracks, value <= 0 in case of error
+ *
+ * Used by gettrack
+ */
+static int copytrackstoarray(void)
 {
-  /*copies track positions from commands to array
-    returns number of copied tracks, value <= 0 in case of error
-  */
-  /**/
   int ntracks = 0;/*number of tracks : returned value */
   int n = 0; /*interator over tracks*/
   struct command* comm;
