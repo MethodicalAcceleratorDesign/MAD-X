@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "mad_extrn_f.h"
-#include "mad_util.h"
+#include "madx.h"
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -8,8 +7,8 @@
 int
 intrac(void)
 {
-  /* returns non-zero inf program is used interactively, else 0 */
-  return isatty(STDIN_FILENO);
+  /* returns non-zero if program is used interactively, else 0 */
+  return isatty(fileno(in->input_files[0]));
 }
 
 #else // _WIN32
@@ -18,8 +17,8 @@ intrac(void)
 int
 intrac(void)
 {
-  /* returns non-zero inf program is used interactively, else 0 */
-  return _isatty(_fileno(stdin));
+  /* returns non-zero if program is used interactively, else 0 */
+  return _isatty(_fileno(in->input_files[0]));
 }
 
 #endif

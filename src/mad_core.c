@@ -14,7 +14,6 @@ mad_init_c(void)
   // make stdout unbuffered for proper I/O synchronization with fortran
   setvbuf(stdout, 0, _IONBF, 0);
 
-  interactive = intrac();
   init55(123456789);          /* random generator */
   if (watch_flag == 1)  debug_file = fopen("madx.debug", "w");
   else if (watch_flag == 2)  debug_file = stdout;
@@ -27,6 +26,7 @@ mad_init_c(void)
     warning("invalid input filename: ", mad_argv[1]);
     in->input_files[0] = stdin;
   }
+  interactive = intrac();
   prt_file = stdout;
   pro = new_in_buff_list(100); /* list of process buffers, dynamic */
   pro->buffers[0] = new_in_buffer(IN_BUFF_SIZE);
