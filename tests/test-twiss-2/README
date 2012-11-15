@@ -1,0 +1,28 @@
+hort run with five fodo cells:
+
+Date: 15.09.2005
+
+Run command:
+madx < fv9.madx >! fv9.out
+ 
+Special tasks:
+
+a.) Twiss parameters calculated at the center of the element.
+b.) The internal table "my_table" is used as a twiss table ergo this name
+    is used in the "select" command.
+c.) The components of the one-turn map, at the location of each element, here
+    just re11, re12, re13, re14, are written to the twiss output file. 
+d.) The cumulative sectormaps are written at the center of the drifts to the 
+    sectorfile = "my_sectorfile".
+
+run output:       fv9.out
+twiss output:     twiss_fv9
+sectormap output: my_sectorfile
+
+Comment V2.00: sector map has been corrected for closed orbit error
+Comment V3.00.00: 1) Results are now closer again to those of V2.10 and earlier.
+                  For unknown reasons old executable do not reproduce the
+                  bad results.
+                  2) Results are different since the center option was incorrect
+                  before when a closed orbit was present.
+
