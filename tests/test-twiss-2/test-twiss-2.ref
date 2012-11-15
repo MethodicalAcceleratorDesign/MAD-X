@@ -1,0 +1,171 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 15.11.12 17.38.27 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!TITLE,'Test input for MAD-X';
+
+
+
+ eg   :=  100;
+
+ bg   :=  eg/pmass;
+
+ en   := 3.75e-06;
+
+ epsx := en/bg;
+
+ epsy := en/bg;
+
+beam, particle = proton, energy =   eg        , 
+
+                         sigt=      0.077     , 
+
+                         sige=      1.1e-4    , 
+
+                         npart=     1.05e11   , 
+
+                         exn=4*en,  eyn=4*en  , 
+
+                         kbunch = 10,
+
+                         et = 0.002, bv = -1,
+
+                         ex=epsx,   ey=epsy;
+
+value,epsx,epsy;
+
+epsx =    3.518520049e-08 ;
+epsy =    3.518520049e-08 ;
+option,-echo;
+
+
+
+use,period=fivecell;
+
+// alignment errors
+
+
+
+select,flag=error,clear;
+
+select,flag=error,pattern="q.*",range=qf.1;
+
+ealign,dx=0.0001;
+
+Assigned alignment errors to 1 elements
+select,flag=error,class=quadrupole,range=qf.4/qf.5;
+
+ealign,dy=0.0002,dtheta=0.0003;
+
+Assigned alignment errors to 3 elements
+Replaced alignment errors for 1 elements
+
+
+/*
+
+select,flag=error,clear;
+
+
+
+// field errors
+
+gcutr=3.0;
+
+b1r=1.e-4;
+
+b2r=2.e-4;
+
+b3r=3.e-4;
+
+b4r=4.e-4;
+
+b5r=5.e-4;
+
+a1r=1.e-4;
+
+a2r=2.e-4;
+
+a3r=3.e-4;
+
+a4r=4.e-4;
+
+a5r=5.e-4;
+
+
+
+Select, flag=error, clear = true;
+
+select, flag=error, pattern="q.*\..*";
+
+efcomp, order:=1, radius:=0.010, 
+
+dknr={0,1e-1*b2r},
+
+dksr={0,1e-1*a2r};
+
+esave;
+
+*/
+
+
+
+select,flag=my_table,class=quadrupole,
+
+column=name,parent,keyword,s,betx,bety,dx,dy,k1l,
+
+re11,re12,re13,re14;
+
+
+
+select,flag=my_sect_table,!class=drift,
+
+column=name,pos,k1,r11,r66,t111,t666;
+
+
+
+twiss,centre,rmatrix,
+
+sectormap,sectortable=my_sect_table,sectorfile=my_sect_file,
+
+table=my_table,file=twiss_fv9;
+
+enter Twiss module
+  
+iteration:   1 error:   1.646937E-03 deltap:   0.000000E+00
+orbit:  -1.966105E-04  2.378502E-07  4.833405E-04  9.585886E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.848410E-07 deltap:   0.000000E+00
+orbit:  -1.967992E-04  2.414294E-07  4.837652E-04  1.007908E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004436742712        47.47531748 
+
+                q1                dq1            betxmax              dxmax 
+       1.253934631       -7.810108771        181.5167874        2.224387301 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.661132647     0.001135107338    0.0005825813871        1.254640048 
+
+               dq2            betymax              dymax              dyrms 
+      -2.008153625        181.6896079     0.003815311527     0.002201693134 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001154084592    0.0004595899128                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

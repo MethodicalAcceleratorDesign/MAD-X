@@ -730,6 +730,15 @@ tests/test-track/out_test-track_ap_collimatorone.ref -text
 tests/test-track/test-track.cfg -text
 tests/test-track/test-track.madx -text
 tests/test-track/test-track.ref -text
+tests/test-twiss-2/fv9.opt -text
+tests/test-twiss-2/fv9.seq -text
+tests/test-twiss-2/my_sect_file.cfg -text
+tests/test-twiss-2/my_sect_file.ref -text
+tests/test-twiss-2/test-twiss-2.cfg -text
+tests/test-twiss-2/test-twiss-2.madx -text
+tests/test-twiss-2/test-twiss-2.ref -text
+tests/test-twiss-2/twiss_fv9.cfg -text
+tests/test-twiss-2/twiss_fv9.ref -text
 tests/test-twiss-4/test-twiss-4.cfg -text
 tests/test-twiss-4/test-twiss-4.madx -text
 tests/test-twiss-4/test-twiss-4.ref -text

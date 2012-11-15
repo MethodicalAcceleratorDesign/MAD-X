@@ -1,0 +1,66 @@
+!TITLE,'Test input for MAD-X';
+
+ eg   :=  100;
+ bg   :=  eg/pmass;
+ en   := 3.75e-06;
+ epsx := en/bg;
+ epsy := en/bg;
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = -1,
+                         ex=epsx,   ey=epsy;
+value,epsx,epsy;
+option,-echo;
+call file=fv9.opt;  // string without blanks does not need ".."
+call file="fv9.seq";
+option,echo;
+
+use,period=fivecell;
+// alignment errors
+
+select,flag=error,clear;
+select,flag=error,pattern="q.*",range=qf.1;
+ealign,dx=0.0001;
+select,flag=error,class=quadrupole,range=qf.4/qf.5;
+ealign,dy=0.0002,dtheta=0.0003;
+
+/*
+select,flag=error,clear;
+
+// field errors
+gcutr=3.0;
+b1r=1.e-4;
+b2r=2.e-4;
+b3r=3.e-4;
+b4r=4.e-4;
+b5r=5.e-4;
+a1r=1.e-4;
+a2r=2.e-4;
+a3r=3.e-4;
+a4r=4.e-4;
+a5r=5.e-4;
+
+Select, flag=error, clear = true;
+select, flag=error, pattern="q.*\..*";
+efcomp, order:=1, radius:=0.010, 
+dknr={0,1e-1*b2r},
+dksr={0,1e-1*a2r};
+esave;
+*/
+
+select,flag=my_table,class=quadrupole,
+column=name,parent,keyword,s,betx,bety,dx,dy,k1l,
+re11,re12,re13,re14;
+
+select,flag=my_sect_table,!class=drift,
+column=name,pos,k1,r11,r66,t111,t666;
+
+twiss,centre,rmatrix,
+sectormap,sectortable=my_sect_table,sectorfile=my_sect_file,
+table=my_table,file=twiss_fv9;
+
+stop;
