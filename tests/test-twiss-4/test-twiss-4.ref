@@ -3,7 +3,7 @@
   +    MAD-X 5.00.18  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 14.11.12 15.30.32 +
+  + Execution Time Stamp: 15.11.12 18.03.12 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
@@ -11,11 +11,11 @@
 
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
- set,  format="12.6f";
+set, format="12.6f";
 
 
 
- option, info,  warn, -echo;
+option, info, warn, -echo;
 
 ++++++ warning: implicit element re-definition ignored: ip1
 ++++++ warning: implicit element re-definition ignored: mbas2.1r1
@@ -248,7 +248,7 @@ title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
 ! convert to THIN
 
- option, info,  warn, -echo;
+ option, info, warn, -echo;
 
 ++++++ warning: makethin selection without active sequence, ignored
 ++++++ warning: makethin selection list empty, slicing all to one thin lens.
@@ -256,8 +256,6 @@ makethin: slicing sequence : lhcb1
 ++++++ warning: makethin selection without active sequence, ignored
 ++++++ warning: makethin selection list empty, slicing all to one thin lens.
 makethin: slicing sequence : lhcb2
-
-
 
 
  beam, particle = proton, sequence=lhcb1, energy = 450.0;
@@ -284,8 +282,6 @@ makethin: slicing sequence : lhcb2
 
 ++++++ info: on_alice redefined
 ++++++ info: on_lhcb redefined
-
-
 
 
  use,    period=lhcb1;
@@ -328,12 +324,6 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
-
-
-
-
-
-
 
 
  use,    period=lhcb2;
