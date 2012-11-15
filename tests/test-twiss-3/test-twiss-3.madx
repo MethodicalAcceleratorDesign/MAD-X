@@ -1,0 +1,68 @@
+!TITLE,'Test input for MAD-X';
+
+ eg   :=  100;
+ bg   :=  eg/pmass;
+ en   := 3.75e-06;
+ epsx := en/bg;
+ epsy := en/bg;
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = -1,
+                         ex=epsx,   ey=epsy;
+value,epsx,epsy;
+option,-echo;
+call file=fv9.opt;  // string without blanks does not need ".."
+call file="fv9.seq";
+option,echo;
+
+use,period=fivecell;
+SAVEBETA, LABEL=BETA1,sequence=fivecell, PLACE =partstart;
+TWISS;
+
+BETAXX1=BETA1->BETX;
+ALFAXX1=BETA1->ALFX;
+DXX1=BETA1->DX;
+DXXP1=BETA1->DPX;
+BETAYY1=BETA1->BETY;
+ALFAYY1=BETA1->ALFY;
+MUXX=BETA1->MUX;
+MUYY=BETA1->MUY;
+
+MUXX1:=MUXX/360.;! changed on request of Oliver Bruening
+MUYY1:=MUYY/360.;! changed on request of Oliver Bruening
+!MUXX1:=MUXX*TWOPI/360.;
+!MUYY1:=MUYY*TWOPI/360.;
+value, muxx,muyy,muxx1,muyy1;
+
+R111:=cos(MUXX1)+ALFAXX1*sin(MUXX1);
+R112:=BETAXX1*sin(MUXX1);
+R116:=(1.-R111)*DXX1-R112*DXXP1;
+R121:=-sin(MUXX1)/BETAXX1*(1+ALFAXX1^2);
+R122:=cos(MUXX1)-ALFAXX1*sin(MUXX1);
+R126:=(1.-R122)*DXXP1-R121*DXX1;
+R151:=R121*R116-R111*R126;
+R152:=R122*R116-R112*R126;
+R133:=cos(MUYY1)+ALFAYY1*sin(MUYY1);
+R134:=BETAYY1*sin(MUYY1);
+R143:=-sin(MUYY1)/BETAYY1*(1+ALFAYY1^2);
+R144:=cos(MUYY1)-ALFAYY1*sin(MUYY1);
+value,DXX1,DXXP1,R111,R112,R116,R121,R122,R126;
+
+MATSUP1 : MATRIX,RM11=R111,RM12=R112,RM21=R121,RM22=R122,
+                 RM16=R116,RM26=R126,RM51=R151,RM52=R152,
+                 RM33=R133,RM34=R134,RM43=R143,RM44=R144,
+                 RM55=1.,RM66=1.;
+
+SEQEDIT,SEQUENCE=fivecell;
+INSTALL, element=MATSUP1,  at=0.0,from=partstart;
+ENDEDIT;
+
+use,period=fivecell;
+select,flag=twiss,class=mq,pattern="d.*",
+column=name,parent,keyword,s,betx,bety,dx,dy,k1l;
+twiss,file;
+stop;

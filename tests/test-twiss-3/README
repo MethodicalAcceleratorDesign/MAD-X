@@ -1,0 +1,17 @@
+iDate: 15.09.2005
+
+Run command:
+madx < fv9_matrix.madx > ! fv9_matrix.out
+
+Special task:
+
+Introduce a matched arbitrary matrix at position "partstart" of the above example
+"fv9.madx". The effect of this matrix can be found in the output file
+"fv9_matrix.out" by inspecting the TWISS output before and after the introduction
+of the element.
+
+Comment V2.00: The phase advance in the beta0 block has been changed to be in units
+               of 2 *pi (request Oliver Bruening).
+Comment V3.00.00: All okay here!
+Comment V3.02.03: the command "value" must have a comma now!
+
