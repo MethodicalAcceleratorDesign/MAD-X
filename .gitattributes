@@ -96,6 +96,12 @@ doc/usrguide/Introduction/monitors.html -text
 doc/usrguide/Introduction/multipole.html -text
 doc/usrguide/Introduction/name.html -text
 doc/usrguide/Introduction/news.html -text
+doc/usrguide/Introduction/nllens.html -text
+doc/usrguide/Introduction/nllens_eta.png -text
+doc/usrguide/Introduction/nllens_potential-2D.png -text
+doc/usrguide/Introduction/nllens_potential-expansion.png -text
+doc/usrguide/Introduction/nllens_potential.png -text
+doc/usrguide/Introduction/nllens_xi.png -text
 doc/usrguide/Introduction/notsimple0.jpg -text
 doc/usrguide/Introduction/notsimple1.jpg -text
 doc/usrguide/Introduction/notsimple2.jpg -text

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd"
+    >
+<html lang="en">
+<head>
+    <title>NLLENS</title>
+</head>
+<body bgcolor="#ffffff">
+<h2>NLLENS: Nonlinear Lens with Elliptic Potential</h2>
+
+<pre>
+label: NLLENS, KNLL=real, CNLL=real;
+</pre>
+    
+The NLLENS element represents a thin nonlinear lens with the potential of
+'Elliptic' type as specified in [1].
+The lens is used to create fully integrable 2D nonlinear accelerator lattice with very large nonlinear tune spread/shift.
+The NLLENS element is recognized by the thin tracking module. The quadrupole term of the potential is included in the TRANSPORT map
+and, consequently, effects the calculation of tunes and Twiss functions.
+
+<ul>
+    <li>KNLL: The integrated strength of lens (m). The strength is parametrized so that
+    the quadrupole term of the multipole expansion is k1=2*KNLL/CNLL^2.
+    <li>CNLL: The dimensional parameter of lens (m). The singularities of the potential are
+    located at X=-CNLL,+CNLL and Y=0.
+</ul>
+
+<p>The scalar potential function of the element is given by<br>
+<img src="nllens_potential.png" height="65" align=middle border=0 alt="Expression for Potential"/><br>
+where <img src="nllens_xi.png" height="60" align=middle border=0 alt="Expression for xi"/>,
+<img src="nllens_eta.png" height="60" align=middle border=0 alt="Expression for eta"/>,
+and <i>k</i> = KNLL, <i>c</i> = CNLL.
+<p>Figure below shows the contour plot of the scalar potential:<br>
+<img src="nllens_potential-2D.png" width="25%" border="0" alt="Contour plot of 2D Elliptic Potential." />
+<p>The multipole expansion of the scalar potential is<br>
+<img src="nllens_potential-expansion.png" height="65" align=middle border="0" alt="Multipole Expansion of the Potential." /><br>
+Note that this expansion is only valid inside the <i>r=c</i> circle on the x,y plane. 
+
+<p>In order to create integrable optics, one needs to shape the potential along z axis according to the beta-function.
+Below is an example nonlinear section representing the necessary nonlinear field with 20 thin lenses:
+<pre>
+    mu0=0.3;  ! phase advance over straight section
+    l0=2.0;   ! length of the straight section
+    nn=20;    !number of nonlinear elements
+    tn=0.45;  ! strength of nonlinear lens
+    cn=0.01;  ! dimentional parameter of nonlinear lens
+
+    musect=mu0+0.5;
+    f0=l0/4.0*(1.0+1.0/tan(pi*mu0)^2);
+    betae=l0/sqrt(1.0-(1.0-l0/2.0/f0)^2);
+    alfae=l0/2.0/f0/sqrt(1.0-(1.0-l0/2.0/f0)^2);
+    betas=l0*(1-l0/4.0/f0)/sqrt(1.0-(1.0-l0/2.0/f0)^2);
+    value,f0,betae,alfae,betas;
+
+ncreate(ii,kk,cc): macro = {n.ii: nllens, knll=kk, cnll=cc;};
+i=0;
+while(i < nn)
+    {
+    i=i+1;
+    sn=l0/nn*(i-0.5);
+    bn=l0*(1-sn*(l0-sn)/l0/f0)/sqrt(1.0-(1.0-l0/2.0/f0)^2);
+    knn=l0*tn*cn^2/nn/bn;
+    cnn=cn*sqrt(bn);
+    exec,ncreate($i,knn,cnn);
+    value,i,bn,cnn,knn;
+    };
+</pre>
+
+<p>References:
+<ol>
+    <li>V. Danilov, S. Nagaitsev, Phys. Rev. ST Accel. Beams <b>13</b>, 084002 (2010).
+    <li>A. Valishev, S. Nagaitsev, V. Kashikhin, V. Danilov, in Proceedings of 2011 Particle Accelerator Conference, New York, NY, USA, WEP070.
+</ol>
+<address>
+A. Valishev, March 19, 2012
+</address>
+
+</body>
+</html>
