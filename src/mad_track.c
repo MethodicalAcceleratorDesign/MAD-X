@@ -215,22 +215,6 @@ track_track(struct in_cmd* cmd)
   track_fileext = permbuff(track_fileext);
 }
 
-#if 0 // not used...
-static const char*
-getcurrentelementname(void)
-{
-/*returns number of input tracks */
-
-  if (current_node == 0x0)
-  {
-    return 0x0;
-  }
-
-  return current_node->name;
-
-}
-#endif
-
 /**
  * copies track positions from commands to array
  * returns number of copied tracks, value <= 0 in case of error
