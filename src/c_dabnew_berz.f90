@@ -252,6 +252,9 @@ contains
     last_tpsa=2
     if(nv.eq.0) return
 
+    ! LD: trace
+    ! write(6,*) "no=", no, "nv=", nv
+
     call alloc_all(no,nv)
     ndamaxi=0
     !
@@ -1863,6 +1866,10 @@ contains
        endif
        return
     endif
+
+    ! LD: count number of calls
+    ! call poly_mul_incr
+
     if(nomax.eq.1) then
        ipoa=idapo(ina)
        ipob=idapo(inb)
