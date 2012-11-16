@@ -1,5 +1,4 @@
 #define _POSIX_C_SOURCE 200112L
-#include <stdio.h>
 #include "madx.h"
 
 #ifndef _WIN32
@@ -8,8 +7,6 @@
 int
 intrac(void)
 {
-//  extern int fileno(FILE*);
-
   /* returns non-zero if program is used interactively, else 0 */
   return isatty(fileno(in->input_files[0]));
 }
