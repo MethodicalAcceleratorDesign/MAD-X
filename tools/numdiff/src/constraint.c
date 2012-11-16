@@ -138,19 +138,23 @@ readEps(struct eps *e, FILE *in, int row)
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
       cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
+      ensure(e->dig > 1.0, "invalid digital error, line %d", row);
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
       cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
+      ensure(e->rel > 0.0 && e->rel < 1.0, "invalid relative error, line %d", row);
     }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
+      ensure(e->abs > 0.0 && e->abs < 1.0, "invalid absolute error, line %d", row);
     }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
       cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
-                          trace("[%d] goto='%s'", row, e->tag);
+                       trace("[%d] goto='%s'", row, e->tag);
+      ensure(*e->tag, "invalid empty tag, line %d", row);
     }
     else {
-                          trace("[%d] invalid '%s'", row, str);
+                       trace("[%d] invalid '%s'", row, str);
       cmd = eps_invalid;
       break;
     }
@@ -217,9 +221,9 @@ retry:
     goto retry;
   }
 
-  ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row constraint line %d"   , *row);
-  ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column constraint line %d", *row);
-  ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid eps constraint line %d"   , *row);
+  ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row constraint, line %d"   , *row);
+  ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column constraint, line %d", *row);
+  ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid eps constraint, line %d"   , *row);
   if (skipLine(in, 0) == '\n') ++*row;
 }
 

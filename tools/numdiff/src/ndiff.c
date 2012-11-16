@@ -517,7 +517,7 @@ ndiff_testNum (T *dif, const struct context *cxt, const struct constraint *c)
   char *rhs_p = dif->rhs_b+dif->rhs_i;
   char *end;
 
-  double lhs_d, rhs_d, dif_a, min_a, pow_a;
+  double lhs_d, rhs_d, dif_a=0, min_a=0, pow_a=0;
 
   trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.30s'|'%.30s'", lhs_p, rhs_p);
