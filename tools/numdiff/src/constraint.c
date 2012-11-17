@@ -20,6 +20,7 @@
 #include "constraint.h"
 #include "utils.h"
 #include "error.h"
+#include "args.h"
 
 #define T struct constraint
 
@@ -142,11 +143,11 @@ readEps(struct eps *e, FILE *in, int row)
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
       cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
-      ensure(e->rel > 0.0 && e->rel < 1.0, "invalid relative error, line %d", row);
+      ensure(e->rel > 0.0 && (option.largerr || e->rel < 1.0), "invalid relative constraint, line %d", row);
     }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
-      ensure(e->abs > 0.0 && e->abs < 1.0, "invalid absolute error, line %d", row);
+      ensure(e->abs > 0.0 && (option.largerr || e->abs < 1.0), "invalid absolute constraint, line %d", row);
     }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
       cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;

@@ -22,7 +22,7 @@
 #include <time.h>
 
 struct option {
-  int check, debug, serie, list, blank, utest, keep;
+  int check, debug, serie, list, blank, utest, keep, largerr;
   const char *suite, *test;
   const char *fmt;
   const char *chr;

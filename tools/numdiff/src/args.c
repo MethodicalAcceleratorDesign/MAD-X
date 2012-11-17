@@ -81,8 +81,9 @@ usage(void)
   inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
   inform("\t-c    -check        enable check mode");
   inform("\t-d    -debug        enable debug mode (include check mode)");
-  inform("\t-e    -cfgext ext   specify the config file extension, default is .cfg");
+  inform("\t-e    -largerr      allow abs and rel error specifier >= 1.0");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
+  inform("\t-g    -cfgext ext   specify the config file extension, default is .cfg");
   inform("\t-h    -help         display this help");
   inform("\t-k    -keep num     specify the number of diffs to display per file, default is 25");
   inform("\t-l    -list         enable list mode (list of filenames)");
@@ -119,7 +120,7 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set debug mode [setup]
+    // set trace mode [setup]
     if (!strcmp(argv[option.argi], "-trace")) {
       logmsg_config.level = trace_level;
       logmsg_config.locate = 1;
@@ -157,6 +158,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "-b") || !strcmp(argv[option.argi], "-blank")) {
       debug("blank space ignored");
       option.blank = !option.blank;
+      continue;
+    }
+
+    // allow large errors [setup]
+    if (!strcmp(argv[option.argi], "-e") || !strcmp(argv[option.argi], "-largerr")) {
+      debug("large errors allowed");
+      option.largerr = 1;
       continue;
     }
 
@@ -238,7 +246,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set config extension [setup]
-    if (!strcmp(argv[option.argi], "-e") || !strcmp(argv[option.argi], "-cfgext")) {
+    if (!strcmp(argv[option.argi], "-g") || !strcmp(argv[option.argi], "-cfgext")) {
       option.cfg_e = argv[++option.argi]; 
       debug("config extension set to '%s'", option.cfg_e);
       continue;
