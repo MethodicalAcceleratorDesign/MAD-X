@@ -9,6 +9,8 @@ static struct aper_e_d* true_tab;
 /* struct aper_e_d* offs_tab;*/
 static struct table* offs_tab;
 
+static struct aper_node*
+aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt, struct aper_node*);
 
 /* next function replaced 19 june 2007 BJ */
 /* Improved for potential zero divide 20feb08 BJ */
@@ -880,17 +882,17 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
 }
 
 static void
-aper_header(struct table* aper_t, struct aper_node *lim_)
+aper_header(struct table* aper_t, struct aper_node *lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
   int i, nint=1, h_length = 25;
-  double dtmp, vtmp[4], deltap_twiss, n1min, n1, s;
+  double dtmp, vtmp[4], deltap_twiss, n1min;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
-  n1 = lim_->n1;
-  s  = lim_->s;
-  strncpy(name, lim_->name, sizeof name);
-  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",name,n1,s);
+  double n1 = lim->n1;
+  double s  = lim->s;
+  strncpy(name, lim->name, sizeof name);
+  printf("\nWRITE HEADER : APERTURE LIMIT ***** : %0p, %0p, %s, n1: %g, at: %g\n",aper_t,lim,name,n1,s);
 
   /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
@@ -991,7 +993,7 @@ aper_header(struct table* aper_t, struct aper_node *lim_)
   if (stmp)
   {
     strncpy(tmp, stmp, sizeof tmp);
-    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
+    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""), strlen(tmp), stoupper(tmp) );
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
@@ -1004,7 +1006,7 @@ aper_header(struct table* aper_t, struct aper_node *lim_)
   n1min = n1;
   set_value("beam","n1min",&n1min);
 
-  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""),strlen(name),stoupper(name) );
+  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""), strlen(name), stoupper(name) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 }
 
@@ -1257,7 +1259,6 @@ get_aperture(struct node* node, char* par)
 void
 pro_aperture(struct in_cmd* cmd)
 {
-  struct aper_node* limit_node;
   struct node *use_range[2];
   struct table* tw_cp;
   char *file, *range, tw_name[NAME_L], *table="aperture";
@@ -1325,13 +1326,17 @@ pro_aperture(struct in_cmd* cmd)
   add_to_table_list(aperture_table, table_register);
 
   /* calculate apertures and fill table */
-  limit_node = aperture(table, use_range, tw_cp, &tw_cnt);
+  struct aper_node limit_node = { "none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1} };
+  struct aper_node *limit_pt = &limit_node;
 
-  if (limit_node->n1 != -1)
+  limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
+
+  if (limit_pt->n1 != -1)
   {
-    printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n",
-           limit_node->name,limit_node->n1,limit_node->s);
-    aper_header(aperture_table, limit_node);
+    printf("\nWRITE HEADER : APERTURE LIMIT ** : %0p, %0p", aperture_table, limit_pt);
+    printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
+
+    aper_header(aperture_table, limit_pt);
     
     file = command_par_string("file", this_cmd->clone);
     if (file != NULL)
@@ -1346,8 +1351,8 @@ pro_aperture(struct in_cmd* cmd)
   current_sequ->tw_table=tw_cp;
 }
 
-struct aper_node*
-aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt)
+static struct aper_node*
+aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt, struct aper_node *lim_pt)
 {
   int stop=0, nint=1, jslice=1, first, ap=1; // , err not used
   int true_flag, true_node=0, offs_node=0, do_survey=0;
@@ -1381,15 +1386,15 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   char tol_err_mess[80] = "";
 
   struct node* rng_glob[2];
-  struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1},{-1,-1,-1}};
-  struct aper_node* lim_pt = &limit_node;
+// struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}};
+// struct aper_node* lim_pt = &limit_node;
 
   int is_zero_len;
 
   true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
   /* offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));*/
 
-  setbuf(stdout,(char*)NULL);
+//  setbuf(stdout,(char*)NULL);
 
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
 
