@@ -36,6 +36,7 @@ test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
+test-aperture \
 \
 test-ptc-twiss \
 test-ptc-normal
@@ -62,6 +63,7 @@ test-ibs \
 test-ptc-twiss-2
 
 # testsuite titles (attached to first test of the suite)
+test-aperture:     TESTSUITE := Aperture testsuite
 test-ibs:          TESTSUITE := IBS testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-makethin:     TESTSUITE := Makethin testsuite
