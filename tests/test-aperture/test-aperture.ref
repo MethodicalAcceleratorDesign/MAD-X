@@ -1,0 +1,179 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 22.11.12 18.08.36 +
+  +++++++++++++++++++++++++++++++++++++++++++
+title,'LHC Cell APERTURE exemple, BJ Aug2009';
+
+
+
+REAL CONST ANGLE.MB = TWOPI/8/(23*6+2*2*4);
+
+
+
+REAL CONST l.MB = 14.30;
+
+REAL CONST l.MQ = 3.10;
+
+
+
+REAL CONST drift1 = 3.67;
+
+REAL CONST drift2 = 1.02;
+
+REAL CONST drift3 = 1.74;
+
+
+
+len_half_cell = l.MQ+drift1+3*l.MB+2*drift2+drift3;
+
+value, len_half_cell;
+
+len_half_cell =              53.45 ;
+
+
+!!!! apertures
+
+a = 0.022; b = 0.018; h = 0.022; v= 0.022;
+
+!!!! tolerances
+
+th= 0.001; tv=0.0005; tr=0.001 ;
+
+
+
+MB :	SBEND, L := l.MB, angle = ANGLE.MB;
+
+MQ : 	QUADRUPOLE, L := l.MQ,
+
+	apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+
+
+kqf =     0.008703550815 ;
+
+kqd =    -0.008705002933 ;
+
+
+
+LHCCELL : SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+
+ 
+
+  MQ1 : MQ, k1:= kqf, at= 0.;
+
+
+
+  MB1 : MB,  at= l.MQ+drift1 ,
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+  MB2 : MB,  at= l.MQ+drift1+l.mb+drift2,
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+  MB3 : MB,  at= l.MQ+drift1+2*(l.mb+drift2),
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+
+
+  MQ2 : MQ, k1 := kqd,  at=  len_half_cell;
+
+
+
+  MB4 : MB,  at= len_half_cell + l.MQ+drift1 ,
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+  MB5 : MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+  MB6 : MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
+
+	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+
+
+
+endsequence;
+
+
+
+beam,particle=proton,energy=450.;
+
+
+
+set, format="9.5f";
+
+use,period=LHCCELL;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
+
+twiss, sequence=LHCCELL;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+   length    orbit5      alfa   gammatr 
+106.90000  -0.00000   0.00045  47.39218 
+
+       q1       dq1   betxmax     dxmax 
+  0.25000  -0.31791 177.45326   2.18723 
+
+    dxrms    xcomax    xcorms        q2 
+  1.69855   0.00000   0.00000   0.25000 
+
+      dq2   betymax     dymax     dyrms 
+ -0.31804 177.46816   0.00000   0.00000 
+
+   ycomax    ycorms    deltap   synch_1 
+  0.00000   0.00000   0.00000   0.00000 
+
+  synch_2   synch_3   synch_4   synch_5 
+  0.00000   0.00000   0.00000   0.00000 
+
+
+!!! uses default beam and halo data (lhc at injection)
+
+select, flag=aperture, clear;
+
+select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
+
+aperture,offsetelem="offset.tfs",file="ap.tfs";
+
+
+Processing apertures from lhccell$start:1 to lhccell$end:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "offset.tfs"
+
+reference node: lhccell$start:1
+
+
+APERTURE LIMIT: mq1:1, n1: 4.85636, at: 3.1
+
+
+header 29 
+
+
+WRITE HEADER : APERTURE LIMIT: mq1:1, n1: 4.85636, at: 3.1
+
+
+curr 21 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

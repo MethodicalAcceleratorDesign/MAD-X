@@ -1,0 +1,6 @@
+@ NAME             %06s "OFFSET" 
+@ TYPE             %06s "OFFSET" 
+@ REFERENCE        %10s "LHCCELL$START" 
+* NAME         S_IP       X_OFF    DX_OFF     DDX_OFF   Y_OFF   DY_OFF   DDY_OFF 
+$ %s           %le        %le      %le        %le       %le     %le      %le 
+ "MQ1"         0.000      0.001      0.001      0.0      0.0      0.0      0.0 
