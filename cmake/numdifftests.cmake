@@ -66,6 +66,11 @@ numdiff_test(test-rfmultipole-3 "sectormap" 0)
 numdiff_test(test-rfmultipole-4 "sectormap" 0)
 
 numdiff_test(test-twiss "sample_optics.tfs" 1)
+numdiff_test(test-twiss-2 "my_sect_file test-twiss-2 twiss_fv9" 0)
+numdiff_test(test-twiss-3 "twiss" 0)
+numdiff_test(test-twiss-4 "twiss.b1.data twiss.b2.data" 1)
+
+numdiff_test(test-aperture "ap.tfs" 0)
 
 numdiff_test(test-makethin "" 1)
 
