@@ -892,7 +892,7 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   double n1 = lim->n1;
   double s  = lim->s;
   strncpy(name, lim->name, sizeof name);
-  printf("\nWRITE HEADER : APERTURE LIMIT ***** : %0p, %0p, %s, n1: %g, at: %g\n",aper_t,lim,name,n1,s);
+//  printf("\nWRITE HEADER : APERTURE LIMIT ***** : %0p, %0p, %s, n1: %g, at: %g\n",aper_t,name,n1,s);
 
   /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
@@ -1333,7 +1333,7 @@ pro_aperture(struct in_cmd* cmd)
 
   if (limit_pt->n1 != -1)
   {
-    printf("\nWRITE HEADER : APERTURE LIMIT ** : %0p, %0p", aperture_table, limit_pt);
+//    printf("\nWRITE HEADER : APERTURE LIMIT ** : %0p, %0p", aperture_table, limit_pt);
     printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
 
     aper_header(aperture_table, limit_pt);
