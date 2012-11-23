@@ -642,6 +642,11 @@ tests/test-ptc-normal/ptc_normal_results.tfs.ref -text
 tests/test-ptc-normal/test-ptc-normal.cfg -text
 tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-normal/test-ptc-normal.ref -text
+tests/test-ptc-trackline-2/test-ptc-trackline-2.cfg -text
+tests/test-ptc-trackline-2/test-ptc-trackline-2.madx -text
+tests/test-ptc-trackline-2/test-ptc-trackline-2.ref -text
+tests/test-ptc-trackline-2/trackone.cfg -text
+tests/test-ptc-trackline-2/trackone.ref -text
 tests/test-ptc-trackline/test-ptc-trackline.cfg -text
 tests/test-ptc-trackline/test-ptc-trackline.madx -text
 tests/test-ptc-trackline/test-ptc-trackline.ref -text

@@ -1,0 +1,45 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 23.11.12 17.32.12 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!Example script showing usage of tracking with PTC
+
+!author: Piotr Skowronski (CERN)
+
+! examples/ptc_accel/track/track.ptc.madx
+
+
+
+option,-echo;
+
+ Now PTC
+ MAD-X Beam Parameters
+                  Energy : 0.200000E-01
+          Kinetic Energy : 0.194890E-01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.199935E-01
+ Setting MADx with 
+     energy          2.000000000000000E-002
+     method                   6
+     Num. of steps           20
+     charge          -1.00000000000000     
+  Length of machine:    9.00000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   9.00000000000000     
+obs_points: 2 
+obs_points: 3 
+ Killing LayoutNo name assigned                                                                                                        
+ Layout killed 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
