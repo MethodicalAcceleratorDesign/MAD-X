@@ -60,6 +60,7 @@ numdiff_test(test-match-2 "str.ip8.b1.dat twiss.ir8.b1.data" 1)
 numdiff_test(test-ptc-twiss "Maxwellian_bend_for_ptc.txt fort.18 ptc-twiss-table" 1)
 numdiff_test(test-ptc-normal "fort.18 Maxwellian_bend_for_ptc.txt ptc_map_table.tfs ptc_normal_results.tfs" 0)
 numdiff_test(test-ptc-trackline "trackone" 0)
+numdiff_test(test-ptc-trackline-2 "trackone" 0)
 
 numdiff_test(test-rfmultipole "fc.16 fc.2 fc.34 fc.3 fc.3.aux test1_flat.seq test1_track.obs0001.p0001 test1_track.obs0002.p0001" 0)
 numdiff_test(test-rfmultipole-2 "sectormap" 0)

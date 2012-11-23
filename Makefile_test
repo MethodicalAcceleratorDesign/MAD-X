@@ -40,7 +40,7 @@ test-aperture \
 \
 test-ptc-twiss \
 test-ptc-normal \
-test-ptc-trackline
+test-ptc-trackline test-ptc-trackline-2
 
 # tests dependencies
 test-track-2: test-makethin
@@ -71,6 +71,7 @@ test-makethin:     TESTSUITE := Makethin testsuite
 test-match:        TESTSUITE := Matching testsuite
 test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 test-ptc-normal:   TESTSUITE := PTC Normal testsuite
+test-ptc-trackline: TESTSUITE := PTC Trackline testsuite
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
 test-track:        TESTSUITE := Track testsuite
 test-twiss:        TESTSUITE := Twiss testsuite
