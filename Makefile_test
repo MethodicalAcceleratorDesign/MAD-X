@@ -39,7 +39,8 @@ test-match test-match-2 \
 test-aperture \
 \
 test-ptc-twiss \
-test-ptc-normal
+test-ptc-normal \
+test-ptc-trackline
 
 # tests dependencies
 test-track-2: test-makethin
