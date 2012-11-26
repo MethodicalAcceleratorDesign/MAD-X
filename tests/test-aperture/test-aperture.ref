@@ -160,18 +160,6 @@ Processing apertures from lhccell$start:1 to lhccell$end:1...
 
 reference node: lhccell$start:1
 
-
-APERTURE LIMIT: mq1:1, n1: 4.85636, at: 3.1
-
-
-header 29 
-
-
-WRITE HEADER : APERTURE LIMIT: mq1:1, n1: 4.85636, at: 3.1
-
-
-curr 21 
-
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
