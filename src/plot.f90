@@ -1441,8 +1441,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
   !---  definitions of function primitives
 
   integer double_from_table
-  integer interp_node
-  integer reset_interpolation
+  integer interpolate_node, reset_interpolation
   integer embedded_twiss
   double precision get_value
 
@@ -1522,7 +1521,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
 
   !---  get intermediate s values, and interpolate twiss parameters
 
-  k = interp_node(nint)
+  k = interpolate_node(nint)
   k = embedded_twiss()
   do i = 1, nint
      k = double_from_table('embedded_twiss_table ',                  &

@@ -121,8 +121,7 @@ fatal_error(const char* t1, const char* t2)
 void
 warning(const char* t1, const char* t2)
 {
-  if (get_option("warn"))
-  {
+  if (get_option("warn")) {
     printf("++++++ warning: %s %s\n",t1,t2);
     warn_numb++;
   }

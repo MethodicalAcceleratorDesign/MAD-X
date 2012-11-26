@@ -1563,6 +1563,8 @@ string_to_table(char* table, char* name, char* string)
     mycpy(c_dum->c, string);
     if (strcmp(c_dum->c, "name") == 0)
       t->s_cols[pos][t->curr] = tmpbuff(current_node->name);
+    else if (strcmp(c_dum->c, "stdout") == 0)
+      printf("%-32s", current_node->name);
     else t->s_cols[pos][t->curr] = tmpbuff(c_dum->c);
   }
 }

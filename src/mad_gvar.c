@@ -70,8 +70,6 @@ struct el_list* element_list;
 struct el_list* base_type_list;
 struct el_list* selected_elements;
 
-struct expression* backup_expr;
-
 struct in_buff_list* in;      /* list of all active input buffers */
 struct in_buff_list* pro;     /* list of active processing buffers */
 
@@ -233,9 +231,6 @@ const double ten_m_16 = 1.e-16;
 const double ten_m_19 = 1.e-19;
 
 int add_error_opt = 0;      /* ADD error option, set with eoption */
-int backup_type;
-
-int rbend = 0;              /* flag (= 1 when the element is a rectangular bending magnet) */
 int embedded_flag = 0;      /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 int min_order = 1;          /* minimum required order */
 int print_correct_opt = 1;  /* PRINT options for orbit correction */

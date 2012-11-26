@@ -56,6 +56,10 @@
 #define cbyt     cbyt_
 #define mydtime  mydtime_
 
+// from mad_inter.c
+#define interpolate_node interpolate_node_
+#define reset_interpolation reset_interpolation_
+
 // from mad_match.c
 #define mtcond mtcond_
 #define mtputconsname mtputconsname_
@@ -83,9 +87,7 @@
 // from mad_plot.c
 #define get_title get_title_
 #define get_version get_version_
-#define interp_node interp_node_
 #define plot_option plot_option_
-#define reset_interpolation reset_interpolation_
 
 // from mad_ptc.c
 #define augmentcountmomtabs augmentcountmomtabs_

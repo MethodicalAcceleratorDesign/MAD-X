@@ -90,6 +90,7 @@
 #include "mad_dynap.h"
 #include "mad_emit.h"
 #include "mad_ibs.h"
+#include "mad_inter.h"
 #include "mad_match.h"
 #include "mad_match2.h"
 #include "mad_mkthin.h"

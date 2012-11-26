@@ -1123,45 +1123,49 @@ use_sequ(struct in_cmd* cmd)
   char rout_name[] = "use_sequ";
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
+  struct command* keep_beam = current_beam;
   int pos, lp;
   char* name;
-  struct command* keep_beam = current_beam;
+
   if (sequ_is_on)
     fatal_error("no endsequence yet for sequence:", current_sequ->name);
+
   pos = name_list_pos("period", nl);
   if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
-  if (nl->inform[pos])  /* parameter has been read */
-  {
-    if (current_range != NULL)
-    {
+
+  if (nl->inform[pos]) {  /* parameter has been read */
+    if (current_range != NULL) {
       myfree(rout_name, current_range); current_range = NULL;
     }
+
     name = pl->parameters[pos]->string;
-    if ((pos = name_list_pos(name, line_list->list)) > -1
-        && line_list->macros[pos]->dead == 0)
+    if ((pos = name_list_pos(name, line_list->list)) > -1 && line_list->macros[pos]->dead == 0)
       make_sequ_from_line(name); /* only if not disabled */
-    if ((lp = name_list_pos(name, sequences->list)) > -1)
-    {
+
+    if ((lp = name_list_pos(name, sequences->list)) > -1) {
       current_sequ = sequences->sequs[lp];
+
       if (attach_beam(current_sequ) == 0)
         fatal_error("USE - sequence without beam:", current_sequ->name);
+
       current_sequ->beam = current_beam;
       pos = name_list_pos("range", nl);
+
       if (nl->inform[pos])  /* parameter has been read */
         current_range = tmpbuff(pl->parameters[pos]->string);
+
       expand_curr_sequ(0);
       pos = name_list_pos("survey", nl);
-      if (nl->inform[pos])  /* parameter has been read */
-	{
-	 pro_use_survey();
+      if (nl->inform[pos]) {  /* parameter has been read */
+         pro_use_survey();
          pos = name_list_pos("survtest", nl);
          if (nl->inform[pos]) survtest_();
          exec_delete_table("survey");
- 	}
-
+     	}
     }
     else warning("unknown sequence skipped:", name);
   }
+
   current_beam = keep_beam;
 }
 

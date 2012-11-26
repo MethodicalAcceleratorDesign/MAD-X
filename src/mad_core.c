@@ -21,9 +21,9 @@ mad_init_c(void)
   else if (stamp_flag == 2)  stamp_file = stdout;
   in = new_in_buff_list(100); /* list of input buffers, dynamic */
   // quick and dirty fix to accept jobs from filename
-  in->input_files[0] = mad_argc == 1 ? stdin : fopen(mad_argv[1], "r");
+  in->input_files[0] = mad_argc > 1 ? fopen(mad_argv[1], "r") : stdin;
   if (!in->input_files[0]) {
-    warning("invalid input filename: ", mad_argv[1]);
+    error("invalid input filename ", " %s", mad_argv[1]);
     in->input_files[0] = stdin;
   }
   interactive = intrac();
@@ -157,8 +157,14 @@ madx_input(int top)
     if (interactive && in->curr == 0) puts("X: ==>");
     if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
     {
-      if (in->input_files[in->curr] != stdin)
-        fclose(in->input_files[in->curr--]);
+      if (in->input_files[in->curr] != stdin) {
+        fclose(in->input_files[in->curr]);
+        in->input_files[in->curr] = 0;
+      }
+      if (in->curr == 0)
+        return;
+      else
+        in->curr -= 1;
       return_flag = 0;
       if (in->curr == top) return;
     }

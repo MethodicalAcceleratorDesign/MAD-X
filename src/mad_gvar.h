@@ -236,7 +236,6 @@ extern const double ten_m_19;
 extern int add_error_opt;          /* ADD error option, set with eoption */
 extern int backup_type;
 
-extern int rbend;                  /* flag (= 1 when the element is a rectangular bending magnet) */
 extern int embedded_flag;          /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 extern int min_order;              /* minimum required order */
 extern int print_correct_opt;      /* PRINT options for orbit correction */
