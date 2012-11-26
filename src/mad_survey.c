@@ -11,7 +11,7 @@ pro_survey(struct in_cmd* cmd)
   int pos, w_file;
   int iarc = 1, keep;
 
-printf("ENTERING USE\n");
+// printf("ENTERING USE\n");
 
   (void)cmd;
   if (current_sequ == NULL)
@@ -50,7 +50,7 @@ printf("ENTERING USE\n");
   if (w_file) out_table(table_name, survey_table, filename);
   set_option("rbarc", &keep);
 
-printf("LEAVING USE\n");
+// printf("LEAVING USE\n");
 
 
 }
