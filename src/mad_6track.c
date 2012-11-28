@@ -1520,9 +1520,9 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[9]  = maxks>=1?(-ks_param->double_array->a[1]/1.0):0.0;
     c6t_elem->value[10] = maxks>=2?(-ks_param->double_array->a[2]/2.0):0.0;
     c6t_elem->value[11] = maxks>=3?(-ks_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[12] = maxps>=1?ps_param->double_array->a[1]:0.0;
-    c6t_elem->value[13] = maxps>=2?ps_param->double_array->a[2]:0.0;
-    c6t_elem->value[14] = maxps>=3?ps_param->double_array->a[3]:0.0;
+    c6t_elem->value[12] = maxps>=1?(ps_param->double_array->a[1]*2*M_PI):0.0;
+    c6t_elem->value[13] = maxps>=2?(ps_param->double_array->a[2]*2*M_PI):0.0;
+    c6t_elem->value[14] = maxps>=3?(ps_param->double_array->a[3]*2*M_PI):0.0;
   }
   else
   {
