@@ -977,8 +977,8 @@ att_rfquadrupole(struct c6t_element* el)
     el->out_2 = el->value[9];
   }
   el->out_3 = el->value[2];
-  el->out_4 = el->value[6];
-  el->out_5 = el->value[1];
+  el->out_4 = el->value[1];
+  el->out_5 = el->value[6];
 }
 
 static void
@@ -1001,7 +1001,7 @@ att_rfsextupole(struct c6t_element* el)
   }
   el->out_3 = el->value[2];
   el->out_4 = el->value[7];
-  el->out_5 = el->value[1];
+  el->out_5 = el->value[6];
 }
 
 static void
@@ -1024,7 +1024,7 @@ att_rfoctupole(struct c6t_element* el)
   }
   el->out_3 = el->value[2];
   el->out_4 = el->value[8];
-  el->out_5 = el->value[1];
+  el->out_5 = el->value[6];
 }
 
 static void
@@ -1492,12 +1492,12 @@ convert_madx_to_c6t(struct node* p)
     /* 
     ** we have 9 parameters
     ** value[0] = el_par_value_recurse("l",p->p_elem);
-    ** value[1] = el_par_value_recurse("tilt",p->p_elem);
+    ** value[6] = el_par_value_recurse("tilt",p->p_elem);
     ** value[2] = frequency in MhZ
     ** value[3] = integrated quadrupole strength
     ** value[4] = integrated sextupole strength
     ** value[5] = integrated octupole strength
-    ** value[6] = phase for quadrupole
+    ** value[1] = phase for quadrupole
     ** value[7] = phase for sextupole
     ** value[8] = phase for octupole
     */ 
@@ -1507,13 +1507,13 @@ convert_madx_to_c6t(struct node* p)
     strcpy(c6t_elem->org_name,t_name);
  
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
-    c6t_elem->value[1] = el_par_value_recurse("tilt",p->p_elem);
+    c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
     // normal components
     c6t_elem->value[3] = maxkn>=1?(-kn_param->double_array->a[1]/1.0):0.0;
     c6t_elem->value[4] = maxkn>=2?(-kn_param->double_array->a[2]/2.0):0.0;
     c6t_elem->value[5] = maxkn>=3?(-kn_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[6] = maxpn>=1?(pn_param->double_array->a[1]*2*M_PI):0.0;
+    c6t_elem->value[1] = maxpn>=1?(pn_param->double_array->a[1]*2*M_PI):0.0;
     c6t_elem->value[7] = maxpn>=2?(pn_param->double_array->a[2]*2*M_PI):0.0;
     c6t_elem->value[8] = maxpn>=3?(pn_param->double_array->a[3]*2*M_PI):0.0;
     // skew component
@@ -2723,42 +2723,42 @@ static void write_rfmultipole(struct c6t_element* el)
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 26, el->value[3], el->value[2], el->value[6], el->value[1], 0.0, 0.0);
+	    name, 26, el->value[3], el->value[2], el->value[1], el->value[6], 0.0, 0.0);
   }
   if (fabs(el->value[4])>eps_9) {
     /* att_rfsextupole(el); */
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 27, el->value[4], el->value[2], el->value[7], el->value[1], 0.0, 0.0);
+	    name, 27, el->value[4], el->value[2], el->value[7], el->value[6], 0.0, 0.0);
   }
   if (fabs(el->value[5])>eps_9) {
     /* att_rfoctupole(el); */
     strcpy(name, el->name);
     strcat(name, "_o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 28, el->value[5], el->value[2], el->value[8], el->value[1], 0.0, 0.0);
+	    name, 28, el->value[5], el->value[2], el->value[8], el->value[6], 0.0, 0.0);
   }
   if (fabs(el->value[9])>eps_9) {
     /* att_rfquadrupole(el); */
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -26, el->value[9], el->value[2], el->value[12], el->value[1], 0.0, 0.0);
+	    name, -26, el->value[9], el->value[2], el->value[12], el->value[6], 0.0, 0.0);
   }
   if (fabs(el->value[10])>eps_9) {
     /* att_rfsextupole(el); */
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -27, el->value[10], el->value[2], el->value[13], el->value[1], 0.0, 0.0);
+	    name, -27, el->value[10], el->value[2], el->value[13], el->value[6], 0.0, 0.0);
   }
   if (fabs(el->value[11])>eps_9) {
     /* att_rfoctupole(el); */
     strcpy(name, el->name);
     strcat(name, "_o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -28, el->value[11], el->value[2], el->value[14], el->value[1], 0.0, 0.0);
+	    name, -28, el->value[11], el->value[2], el->value[14], el->value[6], 0.0, 0.0);
   }
 }
 
