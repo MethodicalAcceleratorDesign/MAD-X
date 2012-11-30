@@ -1139,11 +1139,11 @@ CONTAINS
            j_tot_numb_starting_particles ! => initial number of particles          !
          !                                                                         !
          doublenum = j_th_particle                                                 !
-         call double_to_table('tracksumm ', 'number ', doublenum)                  !
+         call double_to_table_curr('tracksumm ', 'number ', doublenum)                  !
          ! tmp_d = 1 <=  turn=1  in the original 2005 trrun.f                      !
          !                                                                         !
          doublenum = zero ! <=  turn=0  for starting particles                     !
-         call double_to_table('tracksumm ', 'turn ', doublenum)                    !
+         call double_to_table_curr('tracksumm ', 'turn ', doublenum)                    !
          DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>>!   !
             !tmp_d = z(k_th_coord,j_th_particle) - orbit0(k_th_coord)          !   !
             !z(1:6,1:j_tot) - coordinates                                      !   !
@@ -1157,24 +1157,16 @@ CONTAINS
          DO k_th_coord = 1, 6 !>>>>> loop over coord. components >>>>>>>>>>>>>>!   !
             doublenum  = X_MAD(k_th_coord)                                     !   !
             !                                                                  !   !
-            call double_to_table('tracksumm ',vec_names(k_th_coord),doublenum) !   !
-            !madxn.c:1385: void                                                !   !
-            !double_to_table(char* table,char* name,double* val)               !   !
-            ! /* puts val at current position in column                        !   !
-            !    with name "name". The table count is increased                !   !
-            !    separately with "augment_count" */                            !   !
+            call double_to_table_curr('tracksumm ',vec_names(k_th_coord),doublenum) !   !
          enddo !>>>>> END loop over components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!   !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C, &                    !
               gamma0I,gambet) ! to get "energy" value                              !
          doublenum=energy                !
-         call double_to_table('tracksumm ', 'e ', doublenum)                       !
+         call double_to_table_curr('tracksumm ', 'e ', doublenum)                       !
          !                                                                         !
          !hbu add s                                                                !
          doublenum = spos_current_position             !
-         call double_to_table('tracksumm ',vec_names(7),doublenum)                 !
-         ! madxd.h:12:#define double_to_table       double_to_table_               !
-         ! madxd.h:150:void double_to_table(char*, char*, double*);                !
-         ! ???????????????                                                         !
+         call double_to_table_curr('tracksumm ',vec_names(7),doublenum)                 !
          call augment_count('tracksumm ')                                          !
          ! madxn.c:1094:void augment_count(char* table)                            !
          ! increase table occ. by 1, fill missing *                                !
@@ -1985,11 +1977,11 @@ CONTAINS
       do  j_part_tmp = 1,j_tot_numb_starting_particles  !###########################!
          !tmp_d = i ! convert INTEGER to DBLE                                       !
          doublenum  = j_part_tmp                                                    !
-         call  double_to_table('tracksumm ', 'number ', doublenum)                  !
+         call  double_to_table_curr('tracksumm ', 'number ', doublenum)                  !
          !tmp_d = last_turn(i)                                                      !
          doublenum=last_turn_of_lost_particle(j_part_tmp)                           !
-         call double_to_table('tracksumm ', 'turn ', doublenum)                     !
-         ! call double_to_table('tracksumm ', 'turn ', tmp_d)                       !
+         call double_to_table_curr('tracksumm ', 'turn ', doublenum)                     !
+         ! call double_to_table_curr('tracksumm ', 'turn ', tmp_d)                       !
          !                                                                          !
          !do j       = 1, 6 !>>>> loop over coord. components >>>>>>>>>>>>>>>>>!    !
          DO i_coord = 1, 6                                                     !    !
@@ -2002,8 +1994,8 @@ CONTAINS
          !                                                                          !
          DO i_coord = 1, 6 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
             doublenum = X_MAD(i_coord)                                         !    !
-            call double_to_table('tracksumm ', vec_names(i_coord), doublenum)  !    !
-            !call double_to_table('tracksumm ', vec_names(j), tmp_d)           !    !
+            call double_to_table_curr('tracksumm ', vec_names(i_coord), doublenum)  !    !
+            !call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)           !    !
             !                                                                  !    !
          enddo ! END loop over coord. components >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!    !
          !hbu                                                                       !
@@ -2011,13 +2003,13 @@ CONTAINS
          spos_current_position = last_position_of_lost_particle(j_part_tmp)         !
          !hbu                                                                       !
          doublenum = spos_current_position  !
-         call double_to_table('tracksumm ',vec_names(7),doublenum)                  !
+         call double_to_table_curr('tracksumm ',vec_names(7),doublenum)                  !
          !                                                                          !
          ! to get "energy" value                                                    !
          Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
          !                                                                          !
          doublenum= energy                !
-         call double_to_table('tracksumm ', 'e ',  doublenum)                       !
+         call double_to_table_curr('tracksumm ', 'e ',  doublenum)                       !
          !                                                                          !
          call augment_count('tracksumm ')                                           !
       enddo !#### loop over all started particles ##################################!
@@ -2611,15 +2603,15 @@ CONTAINS
       !write(comment, '(''!segment'',4i8,1X,A)')   &
       write(comment, '(''#segment'',4i8,1X,A)')   &
            &segment,tot_segm,npart,ielem,el_name
-      call comment_to_table(table_putone, comment, length)
+      call comment_to_table_curr(table_putone, comment, length)
       Call GET_ONE(MASS_GeV,energy,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
       do i = 1, npart
          doublenum=turn
-         call double_to_table(table_putone, 'turn ', doublenum)
+         call double_to_table_curr(table_putone, 'turn ', doublenum)
          doublenum=energy
-         call double_to_table(table_putone, 'e ', doublenum)
+         call double_to_table_curr(table_putone, 'e ', doublenum)
          doublenum = part_id(i)
-         call double_to_table(table_putone, 'number ', doublenum)
+         call double_to_table_curr(table_putone, 'number ', doublenum)
 
          do j = 1, 6
             tmp=zero
@@ -2632,7 +2624,7 @@ CONTAINS
          do j = 1, 6
             doublenum=X_MAD(j)
             IF( (.NOT.closed_orbit) .OR. (.NOT.NORM_OUT)) THEN
-               call double_to_table(table_putone, vec_names(j), doublenum)
+               call double_to_table_curr(table_putone, vec_names(j), doublenum)
             END IF
          enddo
 
@@ -2648,13 +2640,13 @@ CONTAINS
             DO j = 1, 6
                !tmp_norm=zero
                doublenum=X_MAD(j)
-               call double_to_table(table_putone, vec_names(j), doublenum)
+               call double_to_table_curr(table_putone, vec_names(j), doublenum)
             END DO
          END IF
 
          !hbu spos
          doublenum=spos
-         call double_to_table(table_putone,vec_names(7),doublenum)
+         call double_to_table_curr(table_putone,vec_names(7),doublenum)
          call augment_count(table_putone)
       enddo
     END SUBROUTINE tt_putone_coord
@@ -2703,11 +2695,11 @@ CONTAINS
 
       Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet) ! to get "energy" value
       doublenum=energy
-      call double_to_table(table_puttab, 'e ', doublenum)
+      call double_to_table_curr(table_puttab, 'e ', doublenum)
       doublenum=npart
-      call double_to_table(table_puttab, 'number ', doublenum) ! number of the current particle
+      call double_to_table_curr(table_puttab, 'number ', doublenum) ! number of the current particle
       doublenum=turn
-      call double_to_table(table_puttab, 'turn ', doublenum)   ! the number of the current turn
+      call double_to_table_curr(table_puttab, 'turn ', doublenum)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
          !IF (j.LE.icase_ptc) tmp = orbit(j) - orbit0(j)
@@ -2729,16 +2721,16 @@ CONTAINS
          IF (closed_orbit .AND. NORM_OUT) THEN
             !tmp_norm=zero
             doublenum=X_MAD(j)
-            call double_to_table(table_puttab, vec_names(j), doublenum)
+            call double_to_table_curr(table_puttab, vec_names(j), doublenum)
          ELSE
             !tmp=zero
             doublenum = X_MAD(j) ! orbit(j) - orbit0(j)
-            call double_to_table(table_puttab, vec_names(j), doublenum)
+            call double_to_table_curr(table_puttab, vec_names(j), doublenum)
          END IF
       enddo
       !hbu spos
       doublenum=spos
-      call double_to_table(table_puttab,vec_names(7),doublenum)
+      call double_to_table_curr(table_puttab,vec_names(7),doublenum)
       call augment_count(table_puttab)
     END SUBROUTINE tt_puttab_coord
     !==============================================================================

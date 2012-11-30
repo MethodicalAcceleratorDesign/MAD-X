@@ -25,11 +25,11 @@ test_line : line=( m1, rfm1 );
 !!! TEST 1: prints some of the RF-Multipole attributes
 !!!
 
-use, period=test_line;
 value, rfm1->l;
 value, rfm1->freq;
 value, rfm1->knl;
 value, rfm1->pnl;
+use, period=test_line;
 
 !!! creeates the twiss table
 

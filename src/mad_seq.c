@@ -322,8 +322,7 @@ expand_sequence(struct sequence* sequ, int flag)
   struct node *p, *q = sequ->start;
   p = sequ->ex_start = clone_node(sequ->start, 0);
   add_to_node_list(p, 0, sequ->ex_nodes);
-  while (p != NULL)
-  {
+  while (p != NULL) {
     if (q == sequ->end) break;
     p->next = clone_node(q->next, flag);
     p->next->previous = p;
@@ -336,12 +335,21 @@ expand_sequence(struct sequence* sequ, int flag)
   sequ->ex_end->next = sequ->ex_start;
   sequ->ex_start->previous = sequ->ex_end;
   p = sequ->ex_start;
-  while (p != sequ->ex_end)
-  {
-    if (strstr(p->base_name, "kicker") ||strstr(p->base_name, "monitor"))
+  while (p != sequ->ex_end) {
+    if (strstr(p->base_name, "kicker") || strstr(p->base_name, "monitor"))
       p->enable = 1; /* flag for orbit correction module */
     p = p->next;
   }
+
+  /*
+    Attempt to discard attached twiss table not anymore valid...
+    note: it cannot be done properly as table_register keep references
+          on-pointer-to-table (address of address) not to-table itself...
+          hence 
+          if (sequ->tw_table) sequ->tw_table = NULL;
+          breaks the list of table_register used everywhere,
+          leading to bus error in many places (pointers are almost never checked)
+  */
 }
 
 static void
@@ -1130,6 +1138,7 @@ use_sequ(struct in_cmd* cmd)
   if (sequ_is_on)
     fatal_error("no endsequence yet for sequence:", current_sequ->name);
 
+  // YIL: calling use screws up any twiss table calculated.. this is a "quick fix"
   pos = name_list_pos("period", nl);
   if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
 
@@ -1150,11 +1159,12 @@ use_sequ(struct in_cmd* cmd)
 
       current_sequ->beam = current_beam;
       pos = name_list_pos("range", nl);
-
       if (nl->inform[pos])  /* parameter has been read */
         current_range = tmpbuff(pl->parameters[pos]->string);
 
+      current_sequ->tw_valid = 0;
       expand_curr_sequ(0);
+
       pos = name_list_pos("survey", nl);
       if (nl->inform[pos]) {  /* parameter has been read */
          pro_use_survey();
@@ -1167,6 +1177,12 @@ use_sequ(struct in_cmd* cmd)
   }
 
   current_beam = keep_beam;
+}
+
+int
+sequ_check_valid_twiss(struct sequence * sequ)
+{
+  return sequ->tw_table != NULL && sequ->tw_valid;
 }
 
 int
@@ -1678,39 +1694,37 @@ expand_curr_sequ(int flag)
   char rout_name[] = "expand_curr_sequ";
   struct node* c_node;
   int j;
-  current_sequ->end->at_value = current_sequ->end->position
-    = sequence_length(current_sequ);
-  if (current_sequ->ex_start != NULL)
-  {
+  current_sequ->end->at_value = current_sequ->end->position = sequence_length(current_sequ);
+
+  if (current_sequ->ex_start != NULL) {
     current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
     current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
     current_sequ->orbits = delete_vector_list(current_sequ->orbits);
   }
-  if (current_sequ->ex_start == NULL)
-  {
+
+  if (current_sequ->ex_start == NULL) {
     use_count++;
     if (occ_list == NULL)
       occ_list = new_name_list("occ_list",10000);  /* for occurrence count */
-    else occ_list->curr = 0;
+    else
+      occ_list->curr = 0;
     make_occ_list(current_sequ);
     all_node_pos(current_sequ);
     current_sequ->ex_nodes = new_node_list(2*current_sequ->nodes->curr);
     expand_sequence(current_sequ, flag);
-    current_sequ->n_nodes =
-      add_drifts(current_sequ->ex_start, current_sequ->ex_end);
+    current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end);
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
     current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof(struct node*));
     c_node = current_sequ->ex_start;
-    for (j = 0; j < current_sequ->n_nodes; j++)
-    {
+    for (j = 0; j < current_sequ->n_nodes; j++) {
       current_sequ->all_nodes[j] = c_node;
       c_node = c_node->next;
     }
   }
   set_node_bv(current_sequ); /* set bv factors for all nodes */
-  if (current_range) set_range(current_range, current_sequ);
-  else
-  {
+  if (current_range)
+    set_range(current_range, current_sequ);
+  else {
     current_sequ->range_start = current_sequ->ex_start;
     current_sequ->range_end = current_sequ->ex_end;
   }

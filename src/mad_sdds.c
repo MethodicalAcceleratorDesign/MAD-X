@@ -261,9 +261,9 @@ sdds_readt(char *filename, char *tfsname)
            for(i2=0;i2<arr->elements; i2++) {
                    for(i1=0;i1<narr;i1++) {
                      if((arrtyp[i1] >= 1) && (arrtyp[i1] < SDDS_STRING)) {
-                        double_to_table(tfsname,c1[i1],&datd[i1][i2]);
+                        double_to_table_curr(tfsname,c1[i1],&datd[i1][i2]);
                      } else if(arrtyp[i1] == SDDS_STRING)                {
-                        string_to_table(tfsname,c1[i1],datstr[i1][i2]);
+                        string_to_table_curr(tfsname,c1[i1],datstr[i1][i2]);
                      } else {
                         fatal_error("Type not valid or compatible for: ",c1[i1]);
                      }

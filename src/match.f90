@@ -112,10 +112,10 @@
 
       logical fprt,local,psum, slow_match
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
-     &flag,get_option,restart_sequ,advance_to_pos,double_from_table,    &
-     &char_from_table
+     &flag,get_option,restart_sequ,advance_to_pos,double_from_table_row,    &
+     &string_from_table_row
       double precision fsum,fvect(*),val,valhg,c_min,c_max,weight,f_val
-      character*(name_len) name,node_name
+      character*(name_len) name, node_name
       integer n_pos, next_constr_namepos, advance_node
       local=get_option('match_local ') .ne. 0
       fprt=get_option('match_print ') .ne. 0
@@ -129,8 +129,8 @@
  20       continue
           i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
           if(i.ne.0)  then
-             flag=char_from_table('twiss ','name ',pos,node_name)
-             flag=double_from_table('twiss ',name,pos,val)
+             flag=string_from_table_row('twiss ','name ',pos, node_name)
+             flag=double_from_table_row('twiss ', name, pos, val)
             if (type.eq.1) then
               f_val =weight*dim(c_min,val)
               if(fprt) write(*,880) name,weight,val,c_min,f_val**2
@@ -205,7 +205,7 @@
       i=next_global(name,name_len,type,valhg,c_min,c_max,weight)
       if(i.ne.0)  then
         pos=1
-        flag=double_from_table('summ ',name,pos,val)
+        flag=double_from_table_row('summ ',name,pos,val)
         if(type.eq.1) then
           f_val=weight*dim(c_min,val)
           if(fprt) write(*,880) name,weight,val,c_min,f_val**2

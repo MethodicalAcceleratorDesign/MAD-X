@@ -123,15 +123,15 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !--- enter start coordinates in summary table
   do  i = 1,j_tot
      tmp_d = i
-     call double_to_table('tracksumm ', 'number ', tmp_d)
+     call double_to_table_curr('tracksumm ', 'number ', tmp_d)
      tmp_d = 0
-     call double_to_table('tracksumm ', 'turn ', tmp_d)
+     call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
      do j = 1, 6
         tmp_d = z(j,i) - orbit0(j)
-        call double_to_table('tracksumm ', vec_names(j), tmp_d)
+        call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
      enddo
      !hbu add s
-     call double_to_table('tracksumm ',vec_names(7),spos)
+     call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
   !--- enter first turn, and possibly eigen in tables
@@ -324,17 +324,17 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !--- enter last turn in summary table
   do  i = 1,j_tot
      tmp_d = i
-     call double_to_table('tracksumm ', 'number ', tmp_d)
+     call double_to_table_curr('tracksumm ', 'number ', tmp_d)
      tmp_d = last_turn(i)
-     call double_to_table('tracksumm ', 'turn ', tmp_d)
+     call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
      do j = 1, 6
         tmp_d = last_orbit(j,i) - orbit0(j)
-        call double_to_table('tracksumm ', vec_names(j), tmp_d)
+        call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
      enddo
      !hbu
      spos=last_pos(i)
      !hbu
-     call double_to_table('tracksumm ',vec_names(7),spos)
+     call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
 999 end subroutine trrun
@@ -2453,19 +2453,19 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
 
 
   ! the number of the current particle
-  call double_to_table(table, 'number ', tn)
+  call double_to_table_curr(table, 'number ', tn)
   ! the number of the current turn
-  call double_to_table(table, 'turn ', tt)
+  call double_to_table_curr(table, 'turn ', tt)
   !hbu spos
 
-  call double_to_table(table,vec_names(7),spos)
+  call double_to_table_curr(table,vec_names(7),spos)
 
   do j = 1, 6
      tmp = orbit(j)
-     call double_to_table(table, vec_names(j), tmp)
+     call double_to_table_curr(table, vec_names(j), tmp)
   enddo
-  call double_to_table(table, 'e ', energy)
-  call string_to_table(table, 'element ', el_name)
+  call double_to_table_curr(table, 'e ', energy)
+  call string_to_table_curr(table, 'element ', el_name)
 
   call augment_count(table)
 end subroutine tt_ploss
@@ -2511,18 +2511,18 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   !hbu
   write(comment, '(''#segment'',4i8,1X,A)')                         &
        segment,tot_segm,npart,ielem,el_name
-  call comment_to_table(table, comment, length)
+  call comment_to_table_curr(table, comment, length)
   tt = turn
   do i = 1, npart
-     call double_to_table(table, 'turn ', tt)
+     call double_to_table_curr(table, 'turn ', tt)
      ss = part_id(i)
-     call double_to_table(table, 'number ', ss)
+     call double_to_table_curr(table, 'number ', ss)
      do j = 1, 6
         tmp = z(j,i) - orbit0(j)
-        call double_to_table(table, vec_names(j), tmp)
+        call double_to_table_curr(table, vec_names(j), tmp)
      enddo
      !hbu spos
-     call double_to_table(table,vec_names(7),spos)
+     call double_to_table_curr(table,vec_names(7),spos)
      call augment_count(table)
   enddo
 end subroutine tt_putone
@@ -2563,16 +2563,16 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
 
   energy = get_value('probe ','energy ')
 
-  call double_to_table(table, 'turn ', tt)   ! the number of the cur
-  call double_to_table(table, 'number ', tn) ! the number of the cur
-  call double_to_table(table, 'e ', energy)
+  call double_to_table_curr(table, 'turn ', tt)   ! the number of the cur
+  call double_to_table_curr(table, 'number ', tn) ! the number of the cur
+  call double_to_table_curr(table, 'e ', energy)
 
   do j = 1, 6
      tmp = orbit(j) - orbit0(j)
-     call double_to_table(table, vec_names(j), tmp)
+     call double_to_table_curr(table, vec_names(j), tmp)
   enddo
   !hbu spos
-  call double_to_table(table,vec_names(7),spos)
+  call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
 subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &

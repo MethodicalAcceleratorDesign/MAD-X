@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.00.18  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 23.11.12 15.11.38 +
+  + Execution Time Stamp: 30.11.12 18.05.51 +
   +++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_SETSWITCH command 
 
@@ -27,6 +27,7 @@ option,-echo;
           Kinetic Energy : 0.194890E-01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199935E-01
+++++++ warning: double_from_table_row: table not found: summ
  Setting MADx with 
      energy          2.000000000000000E-002
      method                   6
@@ -55,7 +56,8 @@ Now is 1.000000
   NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.00.18 (32 bit) finished normally +

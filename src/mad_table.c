@@ -48,7 +48,7 @@ get_table_string(char* left, char* right)
 }
 
 static int
-tab_name_code(char* name, char* t_name)
+tab_name_code(const char* name, const char* t_name)
   /* returns 1 if name corresponds to t_name, else 0 */
 {
   char tmp[2*NAME_L];
@@ -66,7 +66,7 @@ tab_name_code(char* name, char* t_name)
 }
 
 static int
-table_row(struct table* table, char* name)
+table_row(struct table* table, const char* name)
 {
   int i, j, ret = -1;
   for (i = 0; i < table->num_cols; i++)
@@ -279,31 +279,26 @@ write_table(struct table* t, char* filename)
         for (i = 0; i < col->curr; i++)
         {
 /*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
-          if (t->columns->inform[col->i[i]] == 1)
-          {
+          if (t->columns->inform[col->i[i]] == 1) {
             tmp = t->d_cols[col->i[i]][j];
             fprintf(out_file, v_format(" %I"), tmp);
           }
-          else
-            if (t->columns->inform[col->i[i]] == 2)
-            {
-              fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
-              /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+          else if (t->columns->inform[col->i[i]] == 2) {
+            fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
+            /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+          }
+          else if (t->columns->inform[col->i[i]] == 3) {
+            pc[0] = c_dum->c[0] = '\"';
+            if (t->s_cols[col->i[i]][j] != NULL) {
+              strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+              stoupper(c_dum->c);
+              pc = strip(c_dum->c); /* remove :<occ_count> */
+              k = strlen(pc);
             }
-            else if (t->columns->inform[col->i[i]] == 3)
-            {
-              pc[0] = c_dum->c[0] = '\"';
-              if (t->s_cols[col->i[i]][j] != NULL)
-              {
-                strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-                stoupper(c_dum->c);
-                pc = strip(c_dum->c); /* remove :<occ_count> */
-                k = strlen(pc);
-              }
-              else k = 1;
-              pc[k++] = '\"'; pc[k] = '\0';
-              fprintf(out_file, v_format(" %S "), pc);
-            }
+            else k = 1;
+            pc[k++] = '\"'; pc[k] = '\0';
+            fprintf(out_file, v_format(" %S "), pc);
+          }
         }
         fprintf(out_file, "\n");
       }
@@ -311,29 +306,6 @@ write_table(struct table* t, char* filename)
     if (strcmp(filename, "terminal") != 0) fclose(out_file);
   }
 }
-
-#if 0 // not used...
-static void
-string_to_table_row(char* table, char* name, int* row, char* string)
-  /* puts string at current position in column with name "name".
-     The table count is increased separately with "augment_count" */
-{
-  int pos;
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] == 3)
-  {
-    mycpy(c_dum->c, string);
-    t->s_cols[pos][*row-1] = tmpbuff(c_dum->c);
-  }
-}
-#endif
 
 #if 0 // not used...
 static int
@@ -360,24 +332,24 @@ result_from_normal(char* name_var, int* order, double* val)
   mycpy(n_var, name_var);
   for (row = 1; row <= t->curr; row++)
   {
-    k = string_from_table("normal_results","name", &row, string);
+    k = string_from_table_row("normal_results","name", &row, string);
     if (k != 0) return k;
     if (strcmp(string,n_var) == 0)
     {
       found = 1;
-      k = double_from_table("normal_results","order1", &row, &d_val);
+      k = double_from_table_row("normal_results","order1", &row, &d_val);
       if ((int)d_val != order[0]) found = 0;
-      k = double_from_table("normal_results","order2", &row, &d_val);
+      k = double_from_table_row("normal_results","order2", &row, &d_val);
       if ((int)d_val != order[1]) found = 0;
-      k = double_from_table("normal_results","order3", &row, &d_val);
+      k = double_from_table_row("normal_results","order3", &row, &d_val);
       if ((int)d_val != order[2]) found = 0;
-      k = double_from_table("normal_results","order4", &row, &d_val);
+      k = double_from_table_row("normal_results","order4", &row, &d_val);
       if ((int)d_val != order[3]) found = 0;
     }
     if (found == 1) break;
   }
   if (found == 1)
-    k = double_from_table("normal_results","value", &row, &d_val);
+    k = double_from_table_row("normal_results","value", &row, &d_val);
   *val = d_val;
   return 0;
 }
@@ -693,6 +665,10 @@ table_value(void)
     supp_char(',', c_dum->c);
     mysplit(c_dum->c, tmp_p_array);
     toks = tmp_p_array->p; ntok = tmp_p_array->curr;
+    /* toks[0] -> table name
+       toks[1] -> row name
+       toks[2] -> col name
+    */
     if (ntok > 1) {
       if ((pos = name_list_pos(toks[0], table_register->names)) > -1) {
         table = table_register->tables[pos];
@@ -797,52 +773,6 @@ augmentcountonly(char* table) /* increase table occ. by 1 */
   if (++t->curr == t->max) grow_table(t);
 }
 
-int
-char_from_table(char* table, char* name, int* row, char* val)
-  /* returns val at position row in column with name "name".
-     function value return:
-     0  OK
-     -1 table  does not exist
-     -2 column does not exist
-     -3 row    does not exist
-  */
-{
-  int pos;
-  struct table* t;
-
-  strcpy(val,"No-Name");
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return -1;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
-  if (*row > t->curr)  return -3;
-  strncpy(val,t->node_nm->p[*row-1],NAME_L);
-  while (strlen(val)<=NAME_L) val[strlen(val)]=' ';
-  return 0;
-}
-
-void
-comment_to_table(char* table, char* comment, int* length)
-  /* Saves the comment string at the current line.
-     This comment is then printed in front of this line.
-     Several calls to the same current line are possible. */
-{
-  int pos;
-  struct table* t;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  strncpy(c_dum->c, comment, *length); c_dum->c[*length] = '\0';
-  if (t->l_head[t->curr] == NULL)
-    t->l_head[t->curr] = new_char_p_array(2);
-  else if (t->l_head[t->curr]->curr == t->l_head[t->curr]->max)
-    grow_char_p_array(t->l_head[t->curr]);
-  t->l_head[t->curr]->p[t->l_head[t->curr]->curr++] = tmpbuff(c_dum->c);
-}
-
 void
 add_to_table_list(struct table* t, struct table_list* tl)
   /* adds table t to table list tl */
@@ -923,25 +853,23 @@ delete_table(struct table* t)
   if (t->col_out != NULL) t->col_out = delete_int_array(t->col_out);
   if (t->row_out != NULL) t->row_out = delete_int_array(t->row_out);
   if (t->node_nm != NULL) t->node_nm = delete_char_p_array(t->node_nm, 0);
-  for (i = 0; i < t->curr; i++)
-  {
+  for (i = 0; i < t->curr; i++) {
     if (t->l_head[i] != NULL)
       t->l_head[i] = delete_char_p_array(t->l_head[i], 1);
   }
   if (t->l_head)  myfree(rout_name, t->l_head);
   if (t->p_nodes) myfree(rout_name, t->p_nodes);
-  if (t->d_cols)
-  {
+
+  if (t->d_cols) {
     for (i = 0; i < t->num_cols; i++)
-      if (t->columns->inform[i] < 3 && t->d_cols[i]) myfree(rout_name, t->d_cols[i]);
+      if (t->columns->inform[i] < 3 && t->d_cols[i])
+        myfree(rout_name, t->d_cols[i]);
     myfree(rout_name, t->d_cols);
   }
-  if (t->s_cols)
-  {
-    for (i = 0; i < t->num_cols; i++)
-    {
-      if (t->columns->inform[i] == 3 && t->s_cols[i])
-      {
+
+  if (t->s_cols) {
+    for (i = 0; i < t->num_cols; i++) {
+      if (t->columns->inform[i] == 3 && t->s_cols[i]) {
         for (j = 0; j < t->curr; j++)
           if (t->s_cols[i][j]) myfree(rout_name, t->s_cols[i][j]);
         myfree(rout_name, t->s_cols[i]);
@@ -1058,106 +986,6 @@ print_table(struct table* t)
 }
 
 void
-double_to_table(char* table, char* name, double* val)
-  /* puts val at current position in column with name "name".
-     The table count is increased separately with "augment_count" */
-{
-  int pos;
-  struct table* t;
-
-  /*  printf("double_to_table <%s> <%s> <%f>\n",table,name,*val);*/
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-  }
-  else
-  {
-    printf("Can not find table %s\n",table);
-    return;
-  }
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0 && t->columns->inform[pos] < 3)
-  {
-    t->d_cols[pos][t->curr] = *val;
-  }
-  else
-  {
-    printf("Position of column %s is %d\n",name,pos);
-  }
-}
-
-void
-double_to_table_row(char* table, char* name, int* row, double* val)
-  /* puts val at row position in column with name "name".
-     The table count is increased separately with "augment_count" */
-{
-  int pos;
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] < 3) t->d_cols[pos][*row-1] = *val;
-}
-
-int
-double_from_table(char* table, char* name, int* row, double* val)
-  /* returns val at position row in column with name "name".
-     function value return:
-     0  OK
-     -1 table  does not exist
-     -2 column does not exist
-     -3 row    does not exist
-  */
-{
-  int pos;
-  struct table* t;
-
-  *val = zero;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return -1;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
-  if (*row > t->curr)  return -3;
-  *val = t->d_cols[pos][*row-1];
-  return 0;
-}
-
-int
-string_from_table(char* table, char* name, int* row, char* string)
-  /* returns val at position row in column with name "name".
-     function value return:
-     0  OK
-     -1 table  does not exist
-     -2 column does not exist
-     -3 row    does not exist
-     struct command_parameter* cp;
-     struct double_array* arr = NULL;
-  */
-{
-  int pos; //,l; not used
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return -1;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
-  if (*row > t->curr)  return -3;
-  // l = strlen(t->s_cols[pos][*row-1]); not used
-  mycpy(string, t->s_cols[pos][*row-1]);
-  return 0;
-}
-
-void
 make_map_table(int* map_table_max_rows)
 {
   int k, pos;
@@ -1198,51 +1026,6 @@ make_table(char* name, char* type, char** table_cols, int* table_types, int rows
   return t;
 }
 
-int
-get_table_range(char* range, struct table* table, int* rows)
-  /* returns start and end row (rows[0] and rows[1])
-     of a range in a table; 0 if not found, 1 (1 row) or 2 ( > 1) */
-{
-  int i, n;
-  char* c[2];
-  char tmp[NAME_L], dumtex[3*NAME_L];;
-  rows[0] = rows[1] = 0;
-  mycpy(c_dum->c, range); stolower(c_dum->c); strcpy(dumtex, c_dum->c);
-  c[0] = strtok(c_dum->c, "/");
-  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
-    n = 1;
-  else n = 2;
-  for (i = 0; i < n; i++)
-  {
-    if (*c[i] == '#')
-    {
-      if (strncmp(c[i], "#s", 2) == 0) rows[i] = 0;
-      else if (strncmp(c[i], "#e", 2) == 0) rows[i] = table->curr - 1;
-      else
-      {
-        warning("illegal table range ignored:", dumtex);
-        return 0;
-      }
-    }
-    else
-    {
-      strcpy(tmp, c[i]);
-      if (square_to_colon(tmp) == 0)
-      {
-        warning("illegal table range ignored:", dumtex);
-        return 0;
-      }
-      if ((rows[i] = char_p_pos(tmp, table->node_nm)) < 0)
-      {
-        warning("illegal table range ignored:", dumtex);
-        return 0;
-      }
-    }
-  }
-  if (n == 1) rows[1] = rows[0];
-  return n;
-}
-
 void
 reset_count(char* table) /* resets table counter to zero */
 {
@@ -1268,8 +1051,8 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
 
   char * elementName = current_node->p_elem->name;
 
-  string_to_table( sector_table_name, "name", elementName );
-  double_to_table( sector_table_name, "pos", pos );
+  string_to_table_curr( sector_table_name, "name", elementName );
+  double_to_table_curr( sector_table_name, "pos", pos );
 
   /* 6 kicks */
   for (i=0; i<6; i++){
@@ -1277,7 +1060,7 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
     sprintf(kickStr,"k%i",i+1);
     kickStr[2]='\0';
     index = i;
-    double_to_table( sector_table_name, kickStr,&kick[index]);
+    double_to_table_curr( sector_table_name, kickStr,&kick[index]);
   }
   /* 36 R-matrix terms */
   for (j=0; j<6; j++){
@@ -1286,7 +1069,7 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
       sprintf(rStr,"r%i%i",i+1,j+1);
       rStr[3]='\0';
       index = i+j*6;
-      double_to_table( sector_table_name, rStr,&rmatrix[index]);
+      double_to_table_curr( sector_table_name, rStr,&rmatrix[index]);
     }
   }
   /* 216 T-matrix terms */
@@ -1297,7 +1080,7 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
 	sprintf(tStr,"t%i%i%i",i+1,j+1,k+1);
 	tStr[4]='\0';
 	index = i+j*6+k*36;
-	double_to_table( sector_table_name, tStr,&tmatrix[index]);
+	double_to_table_curr( sector_table_name, tStr,&tmatrix[index]);
       }
     }
   }
@@ -1543,32 +1326,6 @@ read_table(struct in_cmd* cmd)
   return NULL;
 }
 
-void
-string_to_table(char* table, char* name, char* string)
-  /* buffers + puts "string"
-     at current position in column with name "name".
-     The table count is increased separately with "augment_count" */
-{
-  int pos;
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) >= 0
-      && t->columns->inform[pos] == 3)
-  {
-    mycpy(c_dum->c, string);
-    if (strcmp(c_dum->c, "name") == 0)
-      t->s_cols[pos][t->curr] = tmpbuff(current_node->name);
-    else if (strcmp(c_dum->c, "stdout") == 0)
-      printf("%-32s", current_node->name);
-    else t->s_cols[pos][t->curr] = tmpbuff(c_dum->c);
-  }
-}
-
 int
 table_length(char* table)
   /* returns no. of rows in table */
@@ -1581,6 +1338,45 @@ table_length(char* table)
   return length;
 }
 
+int
+get_table_range(char* range, struct table* table, int* rows)
+  /* returns start and end row (rows[0] and rows[1])
+     of a range in a table; 0 if not found, 1 (1 row) or 2 ( > 1) */
+{
+  int i, n;
+  char* c[2];
+  char tmp[NAME_L], dumtex[3*NAME_L];;
+  rows[0] = rows[1] = 0;
+  mycpy(c_dum->c, range); stolower(c_dum->c); strcpy(dumtex, c_dum->c);
+  c[0] = strtok(c_dum->c, "/");
+  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
+    n = 1;
+  else n = 2;
+  for (i = 0; i < n; i++) {
+    if (*c[i] == '#') {
+      if (strncmp(c[i], "#s", 2) == 0) rows[i] = 0;
+      else if (strncmp(c[i], "#e", 2) == 0) rows[i] = table->curr - 1;
+      else {
+        warning("illegal table range ignored:", dumtex);
+        return 0;
+      }
+    }
+    else {
+      strcpy(tmp, c[i]);
+      if (square_to_colon(tmp) == 0) {
+        warning("illegal table range ignored:", dumtex);
+        return 0;
+      }
+      if ((rows[i] = char_p_pos(tmp, table->node_nm)) < 0) {
+        warning("illegal table range ignored:", dumtex);
+        return 0;
+      }
+    }
+  }
+  if (n == 1) rows[1] = rows[0];
+  return n;
+}
+
 void
 table_range(char* table, char* range, int* rows)
   /* returns first and last row numbers (start=1) in rows
@@ -1591,83 +1387,11 @@ table_range(char* table, char* range, int* rows)
 
   rows[0] = rows[1] = 0;
   mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-  {
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1) {
     t = table_register->tables[pos];
     get_table_range(range, t, rows);
     rows[0]++; rows[1]++;
   }
-}
-
-void
-vector_to_table(char* table, char* col, int* nval, double* vals)
-  /* puts nval values of array vals at the current line into columns
-     starting with column whose name is in "col";
-     The table count is increased separately with "augment_count" */
-{
-  int j, pos, c_pos, last = 0;
-  struct table* t;
-
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return;
-  mycpy(c_dum->c, col);
-  if ((c_pos = name_list_pos(c_dum->c, t->columns)) > -1)
-    last = imin(c_pos + *nval, t->num_cols);
-  for (j = c_pos; j < last; j++)
-    if (t->columns->inform[j] < 3) t->d_cols[j][t->curr] = vals[j-c_pos];
-}
-
-int
-str_from_table(char* table, char* name, int* row, char* val)
-     /* WH 22.06.2004, corrected from: char_from_table */
-     /* returns val at position row in column with name "name".
-        function value return:
-        0  OK
-        -1 table  does not exist
-        -2 column does not exist
-        -3 row    does not exist
-     */
-{
-  int pos;
-  struct table* t;
-
-  strcpy(val,"No-Name");
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    t = table_register->tables[pos];
-  else return -1;
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
-  if (*row > t->curr)  return -3;
-   strncpy(val,t->s_cols[pos][*row-1],NAME_L);
-  while (strlen(val)<NAME_L) val[strlen(val)]=' ';
-  val[NAME_L-1] = '\0';
-  return 0;
-}
-
-int
-str_from_tablet(struct table *t, char* name, int* row, char* val)
-     /* WH 22.06.2004, corrected from: char_from_table */
-     /* returns val at position row in column with name "name".
-        function value return:
-        0  OK
-        -1 table  does not exist
-        -2 column does not exist
-        -3 row    does not exist
-     */
-{
-  int pos;
-
-  strcpy(val,"No-Name");
-  mycpy(c_dum->c, name);
-  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
-  if (*row > t->curr)  return -3;
-   strncpy(val,t->s_cols[pos][*row-1],NAME_L);
-  while (strlen(val)<NAME_L) val[strlen(val)]=' ';
-  val[NAME_L-1] = '\0';
-  return 0;
 }
 
 struct table*
@@ -1888,4 +1612,477 @@ set_selected_columns(struct table* t, struct command_list* select)
     t->col_out->curr = n;
   }
 }
+
+/*
+  Grouping accessors
+*/
+
+#if 0
+int
+str_from_table(char* table, char* name, int* row, char* val)
+     /* WH 22.06.2004, corrected from: char_from_table */
+     /* returns val at position row in column with name "name".
+        function value return:
+        0  OK
+        -1 table  does not exist
+        -2 column does not exist
+        -3 row    does not exist
+     */
+{
+  int pos;
+  struct table* t;
+
+  strcpy(val,"No-Name");
+  mycpy(c_dum->c, table);
+  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+    t = table_register->tables[pos];
+  else return -1;
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
+  if (*row > t->curr)  return -3;
+   strncpy(val,t->s_cols[pos][*row-1],NAME_L);
+  // completely buggy and slow
+  // while (strlen(val)<NAME_L) val[strlen(val)]=' ';
+  val[NAME_L-1] = '\0';
+  return 0;
+}
+
+int
+str_from_tablet(struct table *t, char* name, int* row, char* val)
+     /* WH 22.06.2004, corrected from: char_from_table */
+     /* returns val at position row in column with name "name".
+        function value return:
+        0  OK
+        -1 table  does not exist
+        -2 column does not exist
+        -3 row    does not exist
+     */
+{
+  int pos;
+
+  strcpy(val,"No-Name");
+  mycpy(c_dum->c, name);
+  if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
+  if (*row > t->curr)  return -3;
+   strncpy(val,t->s_cols[pos][*row-1],NAME_L);
+  // competely buggy, useless and slow
+  // while (strlen(val)<NAME_L) val[strlen(val)]=' ';
+  val[NAME_L-1] = '\0';
+  return 0;
+}
+
+// dangerous function that uses table->node_nm sometimes corrupted or unmaintained
+int
+nodename_from_table_row(const char* table, const int* row, char* string)
+  /* returns NODE NAME at position row (name is DISCARDED).
+     function value return:
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist // not used...
+     -3 row    does not exist
+  */
+{
+  char buf[NAME_L];
+  struct table* tbl;
+  int pos;
+
+  *string = '\0';
+
+  mycpy(buf, table);
+  if ((pos = name_list_pos(buf, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("nodename_from_table_row: name of table not found:" , buf);
+    return -1;
+  }
+  if (*row < 1 || *row > tbl->curr) {
+    warning("nodename_from_table_row: row out of range", "");
+    return -3;
+  }
+
+  strcpy(string, tbl->node_nm->p[*row-1]);
+  return 0;
+}
+
+#endif
+
+int
+double_from_table_row(const char* table, const char* name, const int* row, double* val)
+  /* returns val at position row in column with name "name".
+     function value return:
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table *tbl;
+  int pos, col;
+
+  *val = 0.0;
+  
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("double_from_table_row: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("double_from_table_row: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] >= 3) {
+    warning("double_from_table_row: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (*row < 1 || *row > tbl->curr) {
+    warning("double_from_table_row: row out of range:", (sprintf(buf,"%s->%s[1>=%d<=%d]",tbl_s,col_s,*row,tbl->curr),buf));
+    return -3;
+  }
+
+  *val = tbl->d_cols[col][*row-1];
+  return 0;
+}
+
+int
+string_from_table_row(const char* table, const char* name, const int* row, char* string)
+  /* returns string at position row in column with name "name".
+     assumes string to be long enough...
+     function value return:
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col;
+
+  *string = '\0';
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("string_from_table_row: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("string_from_table_row: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] != 3) {
+    warning("string_from_table_row: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (*row < 1 || *row > tbl->curr) {
+    warning("string_from_table_row: row out of range:", (sprintf(buf,"%s->%s[1>=%d<=%d]",tbl_s,col_s,*row,tbl->curr),buf));
+    return -3;
+  }
+
+  strcpy(string, tbl->s_cols[col][*row-1]);
+  return 0;
+}
+
+int
+double_to_table_row(const char* table, const char* name, const int* row, const double* val)
+  /* puts val at row position in column with name "name".
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("double_to_table_row: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("double_to_table_row: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] >= 3) {
+    warning("double_to_table_row: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (*row < 1 || *row > tbl->curr) {
+    warning("double_to_table_row: row out of range:", (sprintf(buf,"%s->%s[1>=%d<=%d]",tbl_s,col_s,*row,tbl->curr),buf));
+    return -3;
+  }
+
+  tbl->d_cols[col][*row-1] = *val;
+  return 0;
+}
+
+int
+string_to_table_row(const char* table, const char* name, const int *row, const char* string)
+  /* puts string at row position in column with name "name".
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("string_to_table_row: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("string_to_table_row: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] != 3) {
+    warning("string_to_table_row: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (*row < 1 || *row > tbl->curr) {
+    warning("string_to_table_row: row out of range:", (sprintf(buf,"%s->%s[1>=%d<=%d]",tbl_s,col_s,*row,tbl->curr),buf));
+    return -3;
+  }
+
+  if (tbl->s_cols[col][*row-1])
+    myfree("string_to_table_row", tbl->s_cols[col][*row-1]);
+
+  mycpy(buf, string);
+  if (strcmp(buf, "name") == 0)
+    tbl->s_cols[col][*row-1] = tmpbuff(current_node->name);
+  else
+    tbl->s_cols[col][*row-1] = tmpbuff(string);
+  return 0;
+}
+
+int
+double_to_table_curr(const char* table, const char* name, const double* val)
+  /* puts val at current position in column with name "name".
+     The table count is increased separately with "augment_count"
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist (need expansion)
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("double_to_table_curr: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("double_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] >= 3) {
+    warning("double_to_table_curr: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->curr >= tbl->max) {
+    warning("double_to_table_curr: row out of range (need expansion):", (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,tbl->curr,tbl->max),buf));
+    return -3;
+  }
+
+  tbl->d_cols[col][tbl->curr] = *val;
+  return 0;
+}
+
+int
+vector_to_table_curr(const char* table, const char* name, const double* vals, const int* nval)
+  /* puts nval values of array vals at the current line into columns starting with column name
+     The table count is increased separately with "augment_count"
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist (need expansion)
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col, last, j;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("vector_to_table_curr: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("vector_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->curr >= tbl->max) {
+    warning("vector_to_table_curr: row out of range (need expansion):",
+      (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,tbl->curr,tbl->max),buf));
+    return -3;
+  }
+
+  if (col + *nval > tbl->num_cols) {
+    warning("vector_to_table_curr: too many values provided - vector truncated:",
+      (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,col + *nval,tbl->num_cols),buf));
+    last = tbl->num_cols;
+  } else
+    last = col + *nval;
+
+  for (j = col; j < last; j++) {
+    if (tbl->columns->inform[j] >= 3)
+      warning("vector_to_table_curr: invalid column type - value skipped:",
+        (sprintf(buf,"%s->%s",tbl_s,tbl->columns->names[j]),buf));
+    else
+      tbl->d_cols[j][tbl->curr] = vals[j-col];
+  }
+
+  return 0;
+}
+
+int
+string_to_table_curr(const char* table, const char* name, const char* string)
+  /* puts string at current position in column with name "name".
+     The table count is increased separately with "augment_count"
+     0  OK
+     -1 table  does not exist
+     -2 column does not exist
+     -3 row    does not exist (need expansion)
+  */
+{
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int pos, col;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("string_to_table_curr: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    warning("string_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->columns->inform[col] != 3) {
+    warning("string_to_table_curr: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->curr >= tbl->max) {
+    warning("string_to_table_curr: row out of range (need expansion):", (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,tbl->curr,tbl->max),buf));
+    return -3;
+  }
+
+  if (tbl->s_cols[col][tbl->curr])
+    myfree("string_to_table_curr", tbl->s_cols[col][tbl->curr]);
+
+  mycpy(buf, string);
+  if (strcmp(buf, "name") == 0)
+    tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->name);
+  else
+    tbl->s_cols[col][tbl->curr] = tmpbuff(string);
+  return 0;
+}
+
+int
+comment_to_table_curr(const char* table, const char* comment, const int* length)
+  /* Saves the comment string at the current line.
+     This comment is then printed in front of this line.
+     Several calls to the same current line are possible.
+     0  OK
+     -1 table does not exist
+  */
+{
+  char tbl_s[NAME_L];
+  struct table* tbl;
+  int pos;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("comment_to_table_curr: table not found:" , tbl_s);
+    return -1;
+  }
+
+  strncpy(c_dum->c, comment, *length); c_dum->c[*length] = '\0';
+  if (tbl->l_head[tbl->curr] == NULL)
+    tbl->l_head[tbl->curr] = new_char_p_array(2);
+  else if (tbl->l_head[tbl->curr]->curr == tbl->l_head[tbl->curr]->max)
+    grow_char_p_array(tbl->l_head[tbl->curr]);
+  tbl->l_head[tbl->curr]->p[tbl->l_head[tbl->curr]->curr++] = tmpbuff(c_dum->c);
+  return 0;
+}
+
+/*
+  LD: 2012.11.29
+  - These "slow" accessors were added for stable access of "muting" tables
+    that is tables where columns and rows may change during data processing
+  - As for other access-by-name, it looks for the first column of strings
+  - The row name used for searching is the mangled name as stored in the
+    table, that is with the trailing :# (count number), if any.
+*/
+static int
+get_table_row(const struct table* tbl, const char* name)
+{
+  int col, row = tbl->curr;
+
+  for (col = 0; col < tbl->num_cols; col++)
+    if(tbl->columns->inform[col] == 3) break;
+
+  if (col < tbl->num_cols)
+    for (row = 0; row < tbl->curr; row++)
+      if (!strcmp(name, tbl->s_cols[col][row])) break;
+
+  return row == tbl->curr ? -1 : row;
+}
+
+double
+get_table_value(const char* tbl_s, const char *row_s, const char *col_s)
+{
+  int pos, row, col;
+
+  if ((pos = name_list_pos(tbl_s, table_register->names)) > -1) {
+    const struct table *tbl = table_register->tables[pos];
+    if ((col = name_list_pos(col_s, tbl->columns)) > -1) {
+      if ((row = get_table_row(tbl, row_s)) > -1)
+        return tbl->d_cols[col][row];
+
+      else warning("get_table_value: name of row not found:"   , row_s);
+    } else warning("get_table_value: name of column not found:", col_s);
+  }   else warning("get_table_value: name of table not found:" , tbl_s);
+
+  return 0;
+}
+
+void
+set_table_value(const char* tbl_s, const char *row_s, const char *col_s, double *val)
+{
+  int pos, row, col;
+
+  if ((pos = name_list_pos(tbl_s, table_register->names)) > -1) {
+    const struct table *tbl = table_register->tables[pos];
+    if ((col = name_list_pos(col_s, tbl->columns)) > -1) {
+      if ((row = get_table_row(tbl, row_s)) > -1)
+        tbl->d_cols[col][row] = *val;
+
+      else warning("get_table_value: name of row not found:"   , row_s);
+    } else warning("get_table_value: name of column not found:", col_s);
+  }   else warning("get_table_value: name of table not found:" , tbl_s);
+}
+
 

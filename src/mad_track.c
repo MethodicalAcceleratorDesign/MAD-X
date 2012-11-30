@@ -221,7 +221,8 @@ track_track(struct in_cmd* cmd)
  *
  * Used by gettrack
  */
-static int copytrackstoarray(void)
+static int
+copytrackstoarray(void)
 {
   int ntracks = 0;/*number of tracks : returned value */
   int n = 0; /*interator over tracks*/

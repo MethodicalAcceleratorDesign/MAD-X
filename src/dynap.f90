@@ -64,21 +64,21 @@ subroutine dynapfill()
   !   yapunov   (real)    : interpolated Lyapunov exponent               *
   !----------------------------------------------------------------------*
 
-  call double_to_table('dynap ', 'dynapfrac ', dynapfrac)
-  call double_to_table('dynap ', 'dktrturns ', dktrturns)
-  call double_to_table('dynap ', 'xend ', xend )
-  call double_to_table('dynap ', 'pxend ', pxend )
-  call double_to_table('dynap ', 'yend ', yend )
-  call double_to_table('dynap ', 'pyend ',pyend )
-  call double_to_table('dynap ', 'tend ', ptend )
-  call double_to_table('dynap ', 'wxmin ', wxmin )
-  call double_to_table('dynap ', 'wxmax ', wxmax )
-  call double_to_table('dynap ', 'wymin ', wymin )
-  call double_to_table('dynap ', 'wymax ', wymax )
-  call double_to_table('dynap ', 'wxymin ', wxymin )
-  call double_to_table('dynap ', 'wxymax ', wxymax )
-  call double_to_table('dynap ', 'smear ', smear )
-  call double_to_table('dynap ', 'yapunov ', yapunov )
+  call double_to_table_curr('dynap ', 'dynapfrac ', dynapfrac)
+  call double_to_table_curr('dynap ', 'dktrturns ', dktrturns)
+  call double_to_table_curr('dynap ', 'xend ', xend )
+  call double_to_table_curr('dynap ', 'pxend ', pxend )
+  call double_to_table_curr('dynap ', 'yend ', yend )
+  call double_to_table_curr('dynap ', 'pyend ',pyend )
+  call double_to_table_curr('dynap ', 'tend ', ptend )
+  call double_to_table_curr('dynap ', 'wxmin ', wxmin )
+  call double_to_table_curr('dynap ', 'wxmax ', wxmax )
+  call double_to_table_curr('dynap ', 'wymin ', wymin )
+  call double_to_table_curr('dynap ', 'wymax ', wymax )
+  call double_to_table_curr('dynap ', 'wxymin ', wxymin )
+  call double_to_table_curr('dynap ', 'wxymax ', wxymax )
+  call double_to_table_curr('dynap ', 'smear ', smear )
+  call double_to_table_curr('dynap ', 'yapunov ', yapunov )
 
   write(*,*) ' yapunov = ', yapunov
 
@@ -104,11 +104,11 @@ subroutine dynaptunefill
   if (tunx .gt. 0.5d0)  tx_tmp = 1.d0 - tunx
   ty_tmp = tuny
   if (tuny .gt. 0.5d0)  ty_tmp = 1.d0 - tuny
-  call double_to_table('dynaptune ', 'x '    , x0)
-  call double_to_table('dynaptune ', 'y '    , y0)
-  call double_to_table('dynaptune ', 'tunx ', tx_tmp)
-  call double_to_table('dynaptune ', 'tuny ', ty_tmp)
-  call double_to_table('dynaptune ', 'dtune ', dtune )
+  call double_to_table_curr('dynaptune ', 'x '    , x0)
+  call double_to_table_curr('dynaptune ', 'y '    , y0)
+  call double_to_table_curr('dynaptune ', 'tunx ', tx_tmp)
+  call double_to_table_curr('dynaptune ', 'tuny ', ty_tmp)
+  call double_to_table_curr('dynaptune ', 'dtune ', dtune )
 
   write(*,*) ' tunes = ', tunx, tuny, dtune
 

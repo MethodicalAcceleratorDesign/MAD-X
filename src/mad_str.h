@@ -9,7 +9,7 @@ struct char_p_array;
 
 // interface
 
-void  mycpy(char* sout, char* sin);
+void  mycpy(char* sout, const char* sin);
 char* mystrchr(char* string, char c);
 void  mystrcpy(struct char_array* target, char* source);
 char* mystrstr(char* string, char* s);
@@ -25,7 +25,7 @@ char* supp_tb(char* string);      /* suppress trailing blanks in string */
 int   zero_string(char* string);  /* returns 1 if string defaults to '0', else 0 */
 char* buffer(char* string);       /* obsolete, replaced by permbuff */
 char* permbuff(char* string);     /* copy string to permanent buffer */
-char* tmpbuff(char* string);      /* copy string to temporary allocated buffer */
+char* tmpbuff(const char* string);      /* copy string to temporary allocated buffer */
 // int   compare_no_case(char* string_1, char* string_2); // replaced by string_icmp
 int   is_token(char* pb, char* string, int slen);
 char* join(char** it_list, int n);

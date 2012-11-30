@@ -1,8 +1,29 @@
 #include "madx.h"
 
-// static interface
+// types and constants
 
 #define MIN_DOUBLE 1.e-36
+
+struct table;
+struct aper_node            /* aperture limit node */
+{
+  char name[NAME_L];
+  double n1;
+  double s;
+  char apertype[NAME_L];
+  double aperture[4];
+  double aper_tol[3];
+  double deltap_twiss;
+};
+
+struct aper_e_d             /* element displacement */
+{
+  char name[NAME_L];        /* element name */
+  int curr;                 /* # of rows */
+  double tab[E_D_MAX][3];   /* the table of read values */
+};
+
+// static interface
 
 static struct aper_e_d* true_tab;
 
@@ -378,13 +399,13 @@ static void
 aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
                 double* betx, double* bety, double* dx, double* dy)
 {
-  double_from_table(table, "s", jslice, s);
-  double_from_table(table, "x", jslice, x);
-  double_from_table(table, "y", jslice, y);
-  double_from_table(table, "betx", jslice, betx);
-  double_from_table(table, "bety", jslice, bety);
-  double_from_table(table, "dx", jslice, dx);
-  double_from_table(table, "dy", jslice, dy);
+  double_from_table_row(table, "s", jslice, s);
+  double_from_table_row(table, "x", jslice, x);
+  double_from_table_row(table, "y", jslice, y);
+  double_from_table_row(table, "betx", jslice, betx);
+  double_from_table_row(table, "bety", jslice, bety);
+  double_from_table_row(table, "dx", jslice, dx);
+  double_from_table_row(table, "dy", jslice, dy);
 }
 
 static int
@@ -954,8 +975,10 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   dtmp = command_par_value("dp", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  double_from_table("summ","deltap",&nint,&deltap_twiss);
-  sprintf(c_dum->c, v_format("@ TWISS_DELTAP     %%le  %F"), deltap_twiss);
+
+  // LD: summary table is corrupted by embedded twiss, use saved value
+  // double_from_table_row("summ","deltap",&nint,&deltap_twiss);
+  sprintf(c_dum->c, v_format("@ TWISS_DELTAP     %%le  %F"), lim->deltap_twiss);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   dtmp = command_par_value("cor", this_cmd->clone);
@@ -1062,12 +1085,12 @@ aper_surv(double init[], int nint)
   current_survey=aper_survey->clone;
   pro_survey(aper_survey);
 
-  double_from_table("survey","x",&nint, &init[0]);
-  double_from_table("survey","y",&nint, &init[1]);
-  double_from_table("survey","z",&nint, &init[2]);
-  double_from_table("survey","theta",&nint, &init[3]);
-  double_from_table("survey","phi",&nint, &init[4]);
-  double_from_table("survey","psi",&nint, &init[5]);
+  double_from_table_row("survey","x",&nint, &init[0]);
+  double_from_table_row("survey","y",&nint, &init[1]);
+  double_from_table_row("survey","z",&nint, &init[2]);
+  double_from_table_row("survey","theta",&nint, &init[3]);
+  double_from_table_row("survey","phi",&nint, &init[4]);
+  double_from_table_row("survey","psi",&nint, &init[5]);
 }
 
 static void
@@ -1079,10 +1102,10 @@ aper_trim_ws(char* string, int len)
   /* thus translating a FORTRAN-like attribute string to */
   /* C compatibility, or washes the ':1' from node names */
 
-  while (string[c]!=' ' && string[c]!='\0' && c<=len) c++;
+  while (string[c] && string[c]!=' ' && c<len-1) c++;
 
-  string[c]='\0';
-  if (c<len) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
+  string[c]=0;
+  if (c<len-1) string[c+1]=' '; /*adds a ws to avoid two \0 in a row*/
 }
 
 static void
@@ -1093,28 +1116,28 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
                   double* x, double* y, double* betx, double* bety,double* dx, double* dy,
                   char *table)
 {
-  string_to_table(table, "name", name);
-  double_to_table(table, "n1", n1);
-  double_to_table(table, "n1x_m", n1x_m);
-  double_to_table(table, "n1y_m", n1y_m);
-  double_to_table(table, "rtol", rtol);
-  double_to_table(table, "xtol", xtol);
-  double_to_table(table, "ytol", ytol);
-  string_to_table(table, "apertype", apertype);
-  double_to_table(table, "aper_1", ap1);
-  double_to_table(table, "aper_2", ap2);
-  double_to_table(table, "aper_3", ap3);
-  double_to_table(table, "aper_4", ap4);
-  double_to_table(table, "on_ap", on_ap);
-  double_to_table(table, "on_elem", on_elem);
-  double_to_table(table, "spec", spec);
-  double_to_table(table, "s", s);
-  double_to_table(table, "x", x);
-  double_to_table(table, "y", y);
-  double_to_table(table, "betx", betx);
-  double_to_table(table, "bety", bety);
-  double_to_table(table, "dx", dx);
-  double_to_table(table, "dy", dy);
+  string_to_table_curr(table, "name", name);
+  double_to_table_curr(table, "n1", n1);
+  double_to_table_curr(table, "n1x_m", n1x_m);
+  double_to_table_curr(table, "n1y_m", n1y_m);
+  double_to_table_curr(table, "rtol", rtol);
+  double_to_table_curr(table, "xtol", xtol);
+  double_to_table_curr(table, "ytol", ytol);
+  string_to_table_curr(table, "apertype", apertype);
+  double_to_table_curr(table, "aper_1", ap1);
+  double_to_table_curr(table, "aper_2", ap2);
+  double_to_table_curr(table, "aper_3", ap3);
+  double_to_table_curr(table, "aper_4", ap4);
+  double_to_table_curr(table, "on_ap", on_ap);
+  double_to_table_curr(table, "on_elem", on_elem);
+  double_to_table_curr(table, "spec", spec);
+  double_to_table_curr(table, "s", s);
+  double_to_table_curr(table, "x", x);
+  double_to_table_curr(table, "y", y);
+  double_to_table_curr(table, "betx", betx);
+  double_to_table_curr(table, "bety", bety);
+  double_to_table_curr(table, "dx", dx);
+  double_to_table_curr(table, "dy", dy);
 
   augment_count(table);
 }
@@ -1267,16 +1290,16 @@ pro_aperture(struct in_cmd* cmd)
   embedded_twiss_cmd = cmd;
 
   /* check for valid sequence, beam and Twiss table */
-  if (current_sequ != NULL && sequence_length(current_sequ) != zero)
+  if (current_sequ != NULL && current_sequ->ex_start != NULL && sequence_length(current_sequ) != 0)
   {
     if (attach_beam(current_sequ) == 0)
       fatal_error("Aperture module - sequence without beam:", current_sequ->name);
   }
-  else fatal_error("Aperture module - no active sequence:", current_sequ->name);
+  else fatal_error("Aperture module - no active sequence", "");
 
-  if (current_sequ->tw_table == NULL)
+  if (!sequ_check_valid_twiss(current_sequ))
   {
-    warning("No TWISS table present","Aperture command ignored");
+    warning("Aperture module, no valid TWISS table present", "Aperture command ignored");
     return;
   }
 
@@ -1286,30 +1309,24 @@ pro_aperture(struct in_cmd* cmd)
     warning("Illegal range.","Aperture command ignored");
     return;
   }
+ 
   current_node = use_range[0];
 
   /* navigate to starting point in Twiss table */
   tw_cp=current_sequ->tw_table;
+  tw_cnt=1; /* table starts at 1 */
 
-  tw_cnt=1; /* table starts at 1 seen from char_from_table function */
-  if (char_from_table(tw_cp->name, "name", &tw_cnt, tw_name) != 0)
-  {
-    warning("Erroneus Twiss table.","Aperture command ignored.");
-    return;
-  }
-  aper_trim_ws(tw_name, NAME_L);
-  while (strcmp(tw_name,current_node->name))
-  {
-    tw_cnt++;
-    if (tw_cnt > tw_cp->curr)
-    {
-      warning("Could not find range start in Twiss table", "Aperture command ignored.");
+  while (1) {
+    string_from_table_row(tw_cp->name, "name", &tw_cnt, tw_name);
+    aper_trim_ws(tw_name, NAME_L);
+
+    if (!strcmp(tw_name,current_node->name)) break;
+
+    if (++tw_cnt > tw_cp->curr) {
+      warning("Aperture command ignored: could not find range start in Twiss table:", current_node->name);
       return;
     }
-    char_from_table(tw_cp->name, "name", &tw_cnt, tw_name);
-    aper_trim_ws(tw_name, NAME_L);
   }
-  tw_cnt--; /* jumps back to "real" value */
 
   /* approximate # of needed rows in aperture table */
   interval = command_par_value("interval", this_cmd->clone);
@@ -1321,7 +1338,7 @@ pro_aperture(struct in_cmd* cmd)
   add_to_table_list(aperture_table, table_register);
 
   /* calculate apertures and fill table */
-  struct aper_node limit_node = { "none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1} };
+  struct aper_node limit_node = { "none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}, 0.0 };
   struct aper_node *limit_pt = &limit_node;
 
   limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
@@ -1369,7 +1386,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
   double haloxadj[MAXARRAY], haloyadj[MAXARRAY], newhalox[MAXARRAY], newhaloy[MAXARRAY];
   double pipex[MAXARRAY], pipey[MAXARRAY];
-  double parxd,paryd,deltap_twiss;
+  double parxd,paryd;
   char *halofile, *truefile, *offsfile;
   char refnode[NAME_L];
   char *cmd_refnode;
@@ -1383,7 +1400,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   int is_zero_len;
 
-  true_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
+  true_tab = mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
   /* offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));*/
 
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
@@ -1417,8 +1434,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   /* fetch deltap as set by user in the former TWISS command */
   /* will be used below for displacement associated to parasitic dipersion */
 
-  double_from_table("summ","deltap",&nint,&deltap_twiss);
-  printf ("+++++++ deltap from TWISS %12.6g\n",deltap_twiss);
+  double_from_table_row("summ","deltap",&nint,&lim_pt->deltap_twiss);
+  printf ("+++++++ deltap from TWISS %12.6g\n",lim_pt->deltap_twiss);
 
   /* calculate emittance and delta angle */
   ex=mass*exn/energy; ey=mass*eyn/energy;
@@ -1428,7 +1445,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
   /* offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);*/
   offs_tab = aper_e_d_read_tfs(offsfile, &offs_cnt, refnode);
-
 
   if (cmd_refnode != NULL) {
       strcpy(refnode, cmd_refnode);
@@ -1458,7 +1474,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
-  (*tw_cnt)++;
+// LD: shift further results by one step (?) and finish outside the table
+//  (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
   /* calculate initial normal+parasitic disp. */
@@ -1483,7 +1500,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (current_sequ->range_start == current_node) first=1; else first=0;
 
     length=node_value("l");
-    double_from_table(current_sequ->tw_table->name, "s", tw_cnt, &s_end);
+    double_from_table_row(tw_cp->name, "s", tw_cnt, &s_end);
     s_start=s_end-length;
     s_curr=s_start;
 
@@ -1495,7 +1512,6 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
     if ( (offs_tab != NULL) && (strcmp(refnode, name) == 0)) do_survey=1;
     /* printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);*/
-
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);
@@ -1538,8 +1554,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         rng_glob[1] = current_sequ->range_end;
         current_sequ->range_start = current_sequ->range_end = current_node;
         aper_surv(surv_init, nint);
-        double_from_table("survey","x",&nint, &surv_x);
-        double_from_table("survey","y",&nint, &surv_y);
+        double_from_table_row("survey","x",&nint, &surv_x);
+        double_from_table_row("survey","y",&nint, &surv_y);
         current_sequ->range_start = rng_glob[0];
         current_sequ->range_end = rng_glob[1];
       }
@@ -1604,8 +1620,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           paryd = dpary*sqrt(bety/betaqfx)*dqf;
 
           if (do_survey) {
-            double_from_table("survey","x",&jslice, &surv_x);
-            double_from_table("survey","y",&jslice, &surv_y);
+            double_from_table_row("survey","x",&jslice, &surv_x);
+            double_from_table_row("survey","y",&jslice, &surv_y);
           }
         }
         else {
@@ -1636,8 +1652,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
         for (angle=0; angle < twopi; angle += dangle) {
           /* new 27feb08 BJ */
-          dispx = bbeat*(fabs(dx)*dp + parxd*(fabs(deltap_twiss)+dp) );
-          dispy = bbeat*(fabs(dy)*dp + paryd*(fabs(deltap_twiss)+dp) );
+          dispx = bbeat*(fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
+          dispy = bbeat*(fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
 
           /*adjust dispersion to worst-case for quadrant*/
           aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
@@ -1687,12 +1703,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   	      } // if is_zero_len
       } // for jslice
 
-// LD !!!
-//struct element *el = find_element("mdlh.660306", element_list);
-//if (el && n==115) dump_element(el);
-      // !!!! BUG !!!!!
       reset_interpolation(&nint);
-//if (el && n==115) dump_element(el);
 
       /* insert minimum node value into Twiss table */
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);

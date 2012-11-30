@@ -16,18 +16,15 @@ mystrcpy(struct char_array* target, char* source)
 }
 
 void
-mycpy(char* sout, char* sin)
+mycpy(char* out, const char* in)
   /* copies string, ends at any non-ascii character including 0 */
 {
-  char *p, *q;
-  int l = 1;
+  int i;
 
-  p = sin;  q = sout;
-  while (*p > ' ' && *p <= '~' && l < 2*NAME_L)
-  {
-    *q++ = *p++;  l++;
-  }
-  *q = '\0';
+  for (i=0; i<NAME_L && in[i]>' ' && in[i]<='~'; i++)
+    out[i] = in[i];
+
+  out[i] = '\0';
 }
 
 char*
@@ -150,12 +147,12 @@ permbuff(char* string)  /* string -> general buffer, returns address */
 }
 
 char*
-tmpbuff(char* string)
+tmpbuff(const char* string)
   /* buffers string in a temporary (i.e. allocated) buffer */
   // aka strdup
 {
   char* p;
-  p = (char*) mymalloc("tmpbuff",strlen(string)+1);
+  p = mymalloc("tmpbuff",strlen(string)+1);
   strcpy(p, string);
   return p;
 }

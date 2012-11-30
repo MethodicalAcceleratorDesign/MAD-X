@@ -368,7 +368,7 @@ contains
        endif
 
 
-       call double_to_table(moments(i)%table,moments(i)%column,v)
+       call double_to_table_curr(moments(i)%table,moments(i)%column,v)
 
        if (debug > 2) then
           print*, "Final  ",i," =  ", v

@@ -913,7 +913,7 @@ contains
 
     subroutine initmap(dt)
       implicit none
-      integer  :: double_from_table
+      integer  :: double_from_table_row
       integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
       integer  :: mmap
       real(dp) :: dt
@@ -953,7 +953,7 @@ contains
       !        print*, "initial_distrib_manual is ",initial_distrib_manual
 
       if(initial_matrix_table) then
-         k = double_from_table("map_table ", "nv ", 1, doublenum)
+         k = double_from_table_row("map_table ", "nv ", 1, doublenum)
          if(k.ne.-1) then
             call liepeek(iia,icoast)
             my_nv=int(doublenum)
@@ -1129,10 +1129,10 @@ contains
 
       deltae = getdeltae()
 
-      call double_to_table(table_name, 's ', suml)
+      call double_to_table_curr(table_name, 's ', suml)
 
       doublenum = deltae * startfen%energy
-      call double_to_table(table_name, 'energy ', doublenum)
+      call double_to_table_curr(table_name, 'energy ', doublenum)
 
 
       opt_fun(:)=zero
@@ -1150,7 +1150,7 @@ contains
       deallocate(j)
 
       ioptfun=6
-      call vector_to_table(table_name, 'x ', ioptfun, opt_fun(1))
+      call vector_to_table_curr(table_name, 'x ', opt_fun(1), ioptfun)
 
 
       opt_fun(1) = transfermap(1).sub.fo(1,:)
@@ -1199,7 +1199,7 @@ contains
       opt_fun(36)= transfermap(5).sub.fo(5,:)
 
       ioptfun=36
-      call vector_to_table(table_name, 're11 ', ioptfun, opt_fun(1))
+      call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
 
 
 
@@ -1351,7 +1351,7 @@ contains
       ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
 
 
-      call vector_to_table(table_name, 'beta11 ', ioptfun, opt_fun(1)) ! fill contiguous data in one-go, up to mu1, mu2, mu3
+      call vector_to_table_curr(table_name, 'beta11 ', opt_fun(1), ioptfun) ! fill contiguous data in one-go, up to mu1, mu2, mu3
 
 
       ! convert between the Ripken and Edwards-Teng parametrization
@@ -1446,14 +1446,14 @@ contains
       endif
 
       ! Edwards-Teng parameters go into betx, bety, alfx, alfy which are at the beginning of twiss_table_cols in madxl.h
-      call double_to_table(table_name, 'betx ', betx ) ! non contiguous with the above table entries
-      call double_to_table(table_name, 'bety ', bety ) ! hence we must store these values one by one
-      call double_to_table(table_name, 'alfx ', alfx )
-      call double_to_table(table_name, 'alfy ', alfy )
-      call double_to_table(table_name, 'r11 ', r11 )
-      call double_to_table(table_name, 'r12 ', r12 )
-      call double_to_table(table_name, 'r21 ', r21 )
-      call double_to_table(table_name, 'r22 ', r22 )
+      call double_to_table_curr(table_name, 'betx ', betx ) ! non contiguous with the above table entries
+      call double_to_table_curr(table_name, 'bety ', bety ) ! hence we must store these values one by one
+      call double_to_table_curr(table_name, 'alfx ', alfx )
+      call double_to_table_curr(table_name, 'alfy ', alfy )
+      call double_to_table_curr(table_name, 'r11 ', r11 )
+      call double_to_table_curr(table_name, 'r12 ', r12 )
+      call double_to_table_curr(table_name, 'r21 ', r21 )
+      call double_to_table_curr(table_name, 'r22 ', r22 )
 
       call augment_count(table_name)
 
@@ -1625,7 +1625,7 @@ contains
       ! because the format of the map_table has now changed to contain all terms,
       ! and not only the zeroth and first order ones...
       implicit none
-      integer  :: double_from_table
+      integer  :: double_from_table_row
 
       ! following added 26 april 2010
       !integer :: i1,i2,i3,i4,i5,i6
@@ -1647,7 +1647,7 @@ contains
       j(:)=0
 
       do i = 1,my_nv
-         k   = double_from_table("map_table ", "coef ", i, doublenum)
+         k   = double_from_table_row("map_table ", "coef ", i, doublenum)
          d_val=doublenum
          if(i.le.c_%npara) then
             x(i) = d_val-(y(i)%T.sub.j)
@@ -1658,7 +1658,7 @@ contains
          do ii = 1,nv_min
             j(ii)  = 1
             row    = i*my_nv+ii
-            k   = double_from_table("map_table ", "coef ", row, doublenum)
+            k   = double_from_table_row("map_table ", "coef ", row, doublenum)
             d_val=doublenum
             d_val  = d_val-(y(i)%T.sub.j)
             y(i)%T = y(i)%T + (d_val.mono.j)
@@ -1674,29 +1674,29 @@ contains
       row = 1 ! starts at one
 
       do while(k.eq.0) ! k=0 when read okay. k=-3 when the table has no row
-         k = double_from_table("map_table ","coef ", row,doublenum)
+         k = double_from_table_row("map_table ","coef ", row,doublenum)
          !write(0,*) 'k=',k
          !write(0,*) 'coef=',doublenum
          coeff=doublenum
-         k = double_from_table("map_table ","n_vector ",row,doublenum)
+         k = double_from_table_row("map_table ","n_vector ",row,doublenum)
          index = int(doublenum)
-         k = double_from_table("map_table ","nx ",row,doublenum)
+         k = double_from_table_row("map_table ","nx ",row,doublenum)
          nx = int(doublenum)
          !write(0,*) 'index=',index
          !write(0,*) 'nx=',nx
-         k = double_from_table("map_table ","nxp ",row,doublenum)
+         k = double_from_table_row("map_table ","nxp ",row,doublenum)
          nxp = int(doublenum)
          !write(0,*) 'nxp=',nxp
-         k = double_from_table("map_table ","ny ",row,doublenum)
+         k = double_from_table_row("map_table ","ny ",row,doublenum)
          ny = int(doublenum)
          !write(0,*) 'ny=',ny
-         k = double_from_table("map_table ","nyp ",row,doublenum)
+         k = double_from_table_row("map_table ","nyp ",row,doublenum)
          nyp = int(doublenum)
          !write(0,*) 'nyp=',nyp
-         k = double_from_table("map_table ","ndeltap ",row,doublenum)
+         k = double_from_table_row("map_table ","ndeltap ",row,doublenum)
          ndeltap = int(doublenum)
          !write(0,*) 'ndeltap=',ndeltap
-         k = double_from_table("map_table ","nt ",row,doublenum)
+         k = double_from_table_row("map_table ","nt ",row,doublenum)
          nt = int(doublenum)
          !write(0,*) 'nt=',nt
 
@@ -2070,48 +2070,48 @@ contains
       
       rdp_mmilion= -1e6;
       
-      call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
+      call double_to_table_curr( summary_table_name, 'length ', suml ) ! total length of the machine
 
 
-      call double_to_table( summary_table_name, 'alpha_c ',    rdp_mmilion ) ! momemtum compaction factor
-      call double_to_table( summary_table_name, 'alpha_c_p ',  rdp_mmilion) ! derivative w.r.t delta-p/p
-      call double_to_table( summary_table_name, 'alpha_c_p2 ', rdp_mmilion) ! 2nd order derivative
-      call double_to_table( summary_table_name, 'alpha_c_p3 ', rdp_mmilion) ! 3rd order derivative
-      call double_to_table( summary_table_name, 'eta_c ',      rdp_mmilion) ! associated phase-slip factor
-      call double_to_table( summary_table_name, 'gamma_tr ',   rdp_mmilion) ! associated transition energy
+      call double_to_table_curr( summary_table_name, 'alpha_c ',    rdp_mmilion ) ! momemtum compaction factor
+      call double_to_table_curr( summary_table_name, 'alpha_c_p ',  rdp_mmilion) ! derivative w.r.t delta-p/p
+      call double_to_table_curr( summary_table_name, 'alpha_c_p2 ', rdp_mmilion) ! 2nd order derivative
+      call double_to_table_curr( summary_table_name, 'alpha_c_p3 ', rdp_mmilion) ! 3rd order derivative
+      call double_to_table_curr( summary_table_name, 'eta_c ',      rdp_mmilion) ! associated phase-slip factor
+      call double_to_table_curr( summary_table_name, 'gamma_tr ',   rdp_mmilion) ! associated transition energy
 
-      call double_to_table( summary_table_name, 'q1 ', tw%mu(1))
-      call double_to_table( summary_table_name, 'q2 ', tw%mu(2))
-      call double_to_table( summary_table_name, 'dq1 ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'dq2 ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'q1 ', tw%mu(1))
+      call double_to_table_curr( summary_table_name, 'q2 ', tw%mu(2))
+      call double_to_table_curr( summary_table_name, 'dq1 ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'dq2 ', rdp_mmilion)
 
-      call double_to_table( summary_table_name, 'qs ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'beta_x_min ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'beta_x_max ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'beta_y_min ', rdp_mmilion)
-      call double_to_table( summary_table_name, 'beta_y_max ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'qs ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'beta_x_min ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'beta_x_max ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'beta_y_min ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name, 'beta_y_max ', rdp_mmilion)
 
       deltap = get_value('ptc_twiss ','deltap ')
-      call double_to_table( summary_table_name, 'deltap ', deltap)
+      call double_to_table_curr( summary_table_name, 'deltap ', deltap)
 
 
-      call double_to_table( summary_table_name,'orbit_x ',  rdp_mmilion)
-      call double_to_table( summary_table_name,'orbit_px ', rdp_mmilion)
-      call double_to_table( summary_table_name,'orbit_y ', rdp_mmilion)
-      call double_to_table( summary_table_name,'orbit_py ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_x ',  rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_px ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_y ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_py ', rdp_mmilion)
 
-      call double_to_table( summary_table_name,'xcorms ',  rdp_mmilion)
-      call double_to_table( summary_table_name,'ycorms ', rdp_mmilion)
-      call double_to_table( summary_table_name,'pxcorms ', rdp_mmilion)
-      call double_to_table( summary_table_name,'pycorms ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'xcorms ',  rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'ycorms ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'pxcorms ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'pycorms ', rdp_mmilion)
 
-      call double_to_table( summary_table_name,'xcomax ',  rdp_mmilion)
-      call double_to_table( summary_table_name,'ycomax ', rdp_mmilion)
-      call double_to_table( summary_table_name,'pxcomax ', rdp_mmilion)
-      call double_to_table( summary_table_name,'pycomax ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'xcomax ',  rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'ycomax ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'pxcomax ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'pycomax ', rdp_mmilion)
 
-      call double_to_table( summary_table_name,'orbit_pt ', rdp_mmilion)
-      call double_to_table( summary_table_name,'orbit_-cT ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_pt ', rdp_mmilion)
+      call double_to_table_curr( summary_table_name,'orbit_-cT ', rdp_mmilion)
 
       call augment_count( summary_table_name ); ! only one row actually...
 
@@ -2477,35 +2477,35 @@ contains
 
       ! write the data into the ptc_twiss_summary table
       ! warning: must preserve the order EXACTLY
-      call double_to_table( summary_table_name, 'length ', suml ) ! total length of the machine
-      call double_to_table( summary_table_name, 'alpha_c ', alpha_c ) ! momemtum compaction factor
-      call double_to_table( summary_table_name, 'alpha_c_p ', alpha_c_p) ! derivative w.r.t delta-p/p
-      call double_to_table( summary_table_name, 'alpha_c_p2 ', alpha_c_p2) ! 2nd order derivative
-      call double_to_table( summary_table_name, 'alpha_c_p3 ', alpha_c_p3) ! 3rd order derivative
-      call double_to_table( summary_table_name, 'eta_c ', eta_c ) ! associated phase-slip factor
-      call double_to_table( summary_table_name, 'gamma_tr ', gamma_tr) ! associated transition energy
-      call double_to_table( summary_table_name, 'q1 ', fractionalTunes(1))
-      call double_to_table( summary_table_name, 'q2 ', fractionalTunes(2))
-      call double_to_table( summary_table_name, 'dq1 ', chromaticities(1))
-      call double_to_table( summary_table_name, 'dq2 ', chromaticities(2))
+      call double_to_table_curr( summary_table_name, 'length ', suml ) ! total length of the machine
+      call double_to_table_curr( summary_table_name, 'alpha_c ', alpha_c ) ! momemtum compaction factor
+      call double_to_table_curr( summary_table_name, 'alpha_c_p ', alpha_c_p) ! derivative w.r.t delta-p/p
+      call double_to_table_curr( summary_table_name, 'alpha_c_p2 ', alpha_c_p2) ! 2nd order derivative
+      call double_to_table_curr( summary_table_name, 'alpha_c_p3 ', alpha_c_p3) ! 3rd order derivative
+      call double_to_table_curr( summary_table_name, 'eta_c ', eta_c ) ! associated phase-slip factor
+      call double_to_table_curr( summary_table_name, 'gamma_tr ', gamma_tr) ! associated transition energy
+      call double_to_table_curr( summary_table_name, 'q1 ', fractionalTunes(1))
+      call double_to_table_curr( summary_table_name, 'q2 ', fractionalTunes(2))
+      call double_to_table_curr( summary_table_name, 'dq1 ', chromaticities(1))
+      call double_to_table_curr( summary_table_name, 'dq2 ', chromaticities(2))
       ! 26 november 2009
-      call double_to_table( summary_table_name, 'qs ', fractionalTunes(3))
+      call double_to_table_curr( summary_table_name, 'qs ', fractionalTunes(3))
       ! write the extremas of the Twiss functions
       ! for the time-being, do not bother about the coupling terms
-      call double_to_table( summary_table_name, 'beta_x_min ', minBeta(1,1))
-      call double_to_table( summary_table_name, 'beta_x_max ', maxBeta(1,1))
-      call double_to_table( summary_table_name, 'beta_y_min ', minBeta(2,2))
-      call double_to_table( summary_table_name, 'beta_y_max ', maxBeta(2,2))
-      call double_to_table( summary_table_name, 'deltap ', deltap)
+      call double_to_table_curr( summary_table_name, 'beta_x_min ', minBeta(1,1))
+      call double_to_table_curr( summary_table_name, 'beta_x_max ', maxBeta(1,1))
+      call double_to_table_curr( summary_table_name, 'beta_y_min ', minBeta(2,2))
+      call double_to_table_curr( summary_table_name, 'beta_y_max ', maxBeta(2,2))
+      call double_to_table_curr( summary_table_name, 'deltap ', deltap)
       ! the 6-d closed orbit
-      call double_to_table( summary_table_name,'orbit_x ',state(1))
-      call double_to_table( summary_table_name,'orbit_px ', state(2))
-      call double_to_table( summary_table_name,'orbit_y ', state(3))
-      call double_to_table( summary_table_name,'orbit_py ', state(4))
+      call double_to_table_curr( summary_table_name,'orbit_x ',state(1))
+      call double_to_table_curr( summary_table_name,'orbit_px ', state(2))
+      call double_to_table_curr( summary_table_name,'orbit_y ', state(3))
+      call double_to_table_curr( summary_table_name,'orbit_py ', state(4))
       ! warning: if 'time=false', the last two phase-space state-variables
       ! should be deltap/p and path-length respectively
-      call double_to_table( summary_table_name,'orbit_pt ', state(5))
-      call double_to_table( summary_table_name,'orbit_-cT ', state(6))
+      call double_to_table_curr( summary_table_name,'orbit_pt ', state(5))
+      call double_to_table_curr( summary_table_name,'orbit_-cT ', state(6))
 
       call augment_count( summary_table_name ); ! only one row actually...
 
@@ -2706,14 +2706,14 @@ contains
 
     if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
        ! for a line or if we don't mention the closed_orbit, xcorms makes no sense
-       call double_to_table(summary_table_name,'xcorms ',0d0)
-       call double_to_table(summary_table_name,'pxcorms ',0d0)
-       call double_to_table(summary_table_name,'ycorms ',0d0)
-       call double_to_table(summary_table_name,'pycorms ',0d0)
-       call double_to_table(summary_table_name,'xcomax ',0d0)
-       call double_to_table(summary_table_name,'pxcomax ',0d0)
-       call double_to_table(summary_table_name,'ycomax ',0d0)
-       call double_to_table(summary_table_name,'pycomax ',0d0)
+       call double_to_table_curr(summary_table_name,'xcorms ',0d0)
+       call double_to_table_curr(summary_table_name,'pxcorms ',0d0)
+       call double_to_table_curr(summary_table_name,'ycorms ',0d0)
+       call double_to_table_curr(summary_table_name,'pycorms ',0d0)
+       call double_to_table_curr(summary_table_name,'xcomax ',0d0)
+       call double_to_table_curr(summary_table_name,'pxcomax ',0d0)
+       call double_to_table_curr(summary_table_name,'ycomax ',0d0)
+       call double_to_table_curr(summary_table_name,'pycomax ',0d0)
     else
 
 
@@ -2751,14 +2751,14 @@ contains
 
        xrms = sqrt(xrms / my_ring%n)
 
-       call double_to_table(summary_table_name,'xcorms ',xrms(1))
-       call double_to_table(summary_table_name,'pxcorms ',xrms(2))
-       call double_to_table(summary_table_name,'ycorms ',xrms(3))
-       call double_to_table(summary_table_name,'pycorms ',xrms(4))
-       call double_to_table(summary_table_name,'xcomax ',xcomax)
-       call double_to_table(summary_table_name,'pxcomax ',pxcomax)
-       call double_to_table(summary_table_name,'ycomax ',ycomax)
-       call double_to_table(summary_table_name,'pycomax ',pycomax)
+       call double_to_table_curr(summary_table_name,'xcorms ',xrms(1))
+       call double_to_table_curr(summary_table_name,'pxcorms ',xrms(2))
+       call double_to_table_curr(summary_table_name,'ycorms ',xrms(3))
+       call double_to_table_curr(summary_table_name,'pycorms ',xrms(4))
+       call double_to_table_curr(summary_table_name,'xcomax ',xcomax)
+       call double_to_table_curr(summary_table_name,'pxcomax ',pxcomax)
+       call double_to_table_curr(summary_table_name,'ycomax ',ycomax)
+       call double_to_table_curr(summary_table_name,'pycomax ',pycomax)
 
 
     endif

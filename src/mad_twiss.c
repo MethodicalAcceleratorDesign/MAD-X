@@ -46,8 +46,7 @@ exec_savebeta(void)
     if (find_command(label, beta0_list) == NULL) /* fill only once */
     {
       pos = name_list_pos("sequence", nl);
-      if (nl->inform[pos] == 0
-          || strcmp(pl->parameters[pos]->string, current_sequ->name) == 0)
+      if (nl->inform[pos] == 0 || strcmp(pl->parameters[pos]->string, current_sequ->name) == 0)
       {
         pos = name_list_pos("place", nl);
         if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
@@ -251,6 +250,10 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
+
+  if(get_option("twiss_print"))
+    fprintf(prt_file, "enter Twiss module\n");
+
   /*
     start command decoding
   */
@@ -266,14 +269,19 @@ pro_embedded_twiss(struct command* current_global_twiss)
       return;
     }
   }
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-  {
+
+  if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "Twiss ignored");
     return;
   }
-  if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
+
   if (attach_beam(current_sequ) == 0)
     fatal_error("TWISS - sequence without beam:", current_sequ->name);
+
+  if (!current_sequ->tw_table) {
+    warning("no TWISS table present", "TWISS command ignored");
+    return;
+  }
 
   table_name = current_sequ->tw_table->name;
   table_embedded_name = "embedded_twiss_table";
@@ -317,7 +325,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
     }
   }
   pos = name_list_pos("keeporbit", nl);
-  if(nl->inform[pos]) /* orbit specified */
+  if(nl->inform[pos]) /* orbit specified tw_table*/
   {
     name = pl->parameters[pos]->string;
     if (current_sequ->orbits == NULL)
@@ -387,39 +395,39 @@ pro_embedded_twiss(struct command* current_global_twiss)
   if (jt <= 0) err = 1;
   if (err == 0)
   {
-    err = double_from_table(table_name, "betx", &jt, &betx);
-    err = double_from_table(table_name, "bety", &jt, &bety);
-    err = double_from_table(table_name, "alfx", &jt, &alfx);
-    err = double_from_table(table_name, "mux", &jt, &mux);
+    err = double_from_table_row(table_name, "betx", &jt, &betx);
+    err = double_from_table_row(table_name, "bety", &jt, &bety);
+    err = double_from_table_row(table_name, "alfx", &jt, &alfx);
+    err = double_from_table_row(table_name, "mux", &jt, &mux);
     /* mux = mux*twopi; frs 19.10.2006 */
-    err = double_from_table(table_name, "alfy", &jt, &alfy);
-    err = double_from_table(table_name, "muy", &jt, &muy);
+    err = double_from_table_row(table_name, "alfy", &jt, &alfy);
+    err = double_from_table_row(table_name, "muy", &jt, &muy);
     /* muy = muy*twopi; frs 19.10.2006 */
-    err = double_from_table(table_name, "x", &jt, &x);
-    err = double_from_table(table_name, "px", &jt, &px);
-    err = double_from_table(table_name, "y", &jt, &y);
-    err = double_from_table(table_name, "py", &jt, &py);
-    err = double_from_table(table_name, "t", &jt, &t);
-    err = double_from_table(table_name, "pt", &jt, &pt);
-    err = double_from_table(table_name, "dx", &jt, &dx);
-    err = double_from_table(table_name, "dpx", &jt, &dpx);
-    err = double_from_table(table_name, "dy", &jt, &dy);
-    err = double_from_table(table_name, "dpy", &jt, &dpy);
-    err = double_from_table(table_name, "wx", &jt, &wx);
-    err = double_from_table(table_name, "phix", &jt, &phix);
-    err = double_from_table(table_name, "dmux", &jt, &dmux);
-    err = double_from_table(table_name, "wy", &jt, &wy);
-    err = double_from_table(table_name, "phiy", &jt, &phiy);
-    err = double_from_table(table_name, "dmuy", &jt, &dmuy);
-    err = double_from_table(table_name, "ddx", &jt, &ddx);
-    err = double_from_table(table_name, "ddpx", &jt, &ddpx);
-    err = double_from_table(table_name, "ddy", &jt, &ddy);
-    err = double_from_table(table_name, "ddpy", &jt, &ddpy);
-    err = double_from_table(table_name, "r11",&jt, &r11);
-    err = double_from_table(table_name, "r12",&jt, &r12);
-    err = double_from_table(table_name, "r21",&jt, &r21);
-    err = double_from_table(table_name, "r22",&jt, &r22);
-    err = double_from_table(table_name, "s",&jt, &s);
+    err = double_from_table_row(table_name, "x", &jt, &x);
+    err = double_from_table_row(table_name, "px", &jt, &px);
+    err = double_from_table_row(table_name, "y", &jt, &y);
+    err = double_from_table_row(table_name, "py", &jt, &py);
+    err = double_from_table_row(table_name, "t", &jt, &t);
+    err = double_from_table_row(table_name, "pt", &jt, &pt);
+    err = double_from_table_row(table_name, "dx", &jt, &dx);
+    err = double_from_table_row(table_name, "dpx", &jt, &dpx);
+    err = double_from_table_row(table_name, "dy", &jt, &dy);
+    err = double_from_table_row(table_name, "dpy", &jt, &dpy);
+    err = double_from_table_row(table_name, "wx", &jt, &wx);
+    err = double_from_table_row(table_name, "phix", &jt, &phix);
+    err = double_from_table_row(table_name, "dmux", &jt, &dmux);
+    err = double_from_table_row(table_name, "wy", &jt, &wy);
+    err = double_from_table_row(table_name, "phiy", &jt, &phiy);
+    err = double_from_table_row(table_name, "dmuy", &jt, &dmuy);
+    err = double_from_table_row(table_name, "ddx", &jt, &ddx);
+    err = double_from_table_row(table_name, "ddpx", &jt, &ddpx);
+    err = double_from_table_row(table_name, "ddy", &jt, &ddy);
+    err = double_from_table_row(table_name, "ddpy", &jt, &ddpy);
+    err = double_from_table_row(table_name, "r11",&jt, &r11);
+    err = double_from_table_row(table_name, "r12",&jt, &r12);
+    err = double_from_table_row(table_name, "r21",&jt, &r21);
+    err = double_from_table_row(table_name, "r22",&jt, &r22);
+    err = double_from_table_row(table_name, "s",&jt, &s);
 
     /* Store these Twiss parameters as initial values */
 
@@ -557,6 +565,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
     if (twiss_success && get_option("twiss_print")) print_table(summ_table);
   }
   else warning("Embedded Twiss failed: ", "MAD-X continues");
+
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
@@ -976,13 +985,12 @@ pro_twiss(void)
 
   for (i = 0; i < twiss_deltas->curr; i++)
   {
-    if (chrom_flg) /* calculate chromaticity from tune difference - HG 6.2.09*/
-    {
-      twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                               twiss_table_types, current_sequ->n_nodes);
+    if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
       add_to_table_list(twiss_table, table_register);
       current_sequ->tw_table = twiss_table;
+      current_sequ->tw_valid = 1;
       twiss_table->org_sequ = current_sequ;
       adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
       adjust_rfc(); /* sets freq in rf-cavities from probe */
@@ -995,15 +1003,14 @@ pro_twiss(void)
       pos = name_list_pos("q2", summ_table->columns);
       q2_val_p = summ_table->d_cols[pos][i];
     }
-    if (k_save)
-      {
-    twiss_table = make_table(table_name, "twiss", twiss_table_cols,
-                             twiss_table_types, current_sequ->n_nodes);
-    twiss_table->dynamic = 1; /* flag for table row access to current row */
-    add_to_table_list(twiss_table, table_register);
-    current_sequ->tw_table = twiss_table;
-    twiss_table->org_sequ = current_sequ;
-      }
+    if (k_save) {
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
+      twiss_table->dynamic = 1; /* flag for table row access to current row */
+      add_to_table_list(twiss_table, table_register);
+      current_sequ->tw_table = twiss_table;
+      current_sequ->tw_valid = 1;
+      twiss_table->org_sequ = current_sequ;
+    }
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;

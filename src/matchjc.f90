@@ -498,8 +498,8 @@
       integer n,ivar,nvar,match_mode
       logical local
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
-     &flag,get_option,restart_sequ,advance_to_pos,char_from_table
-!      integer double_from_table
+     &flag,get_option,restart_sequ,advance_to_pos,string_from_table_row
+!      integer double_from_table_row
       double precision value,c_min,c_max,weight
       character*(name_len) namevar,name,node_name
       integer next_vary,slope
@@ -526,10 +526,9 @@
                 ncon=1
                 oldpos=pos
               endif
-              flag=char_from_table('twiss ','name ',pos,node_name)
+              flag=string_from_table_row('twiss ','name ',pos,node_name)
               do nvar=1,n
- 22             ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,   &
-     &opt)
+ 22             ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,opt)
                 if (ivar.eq.0) then
                   goto 22
                 endif

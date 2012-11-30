@@ -145,7 +145,7 @@ CONTAINS
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
     !    integer get_option
-    integer double_from_table
+    integer double_from_table_row
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
@@ -320,7 +320,7 @@ CONTAINS
         print*,'  gamma: ',gamma
     endif
 
-    k         = double_from_table('summ ','gammatr ',1,gammatr)
+    k         = double_from_table_row('summ ','gammatr ',1,gammatr)
     if (getdebug() > 1) then
         print*,'  gammatr: ',gammatr
     endif
@@ -608,8 +608,8 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k0l ',bvk*key%list%b0)
+             call string_to_table_curr('errors_dipole ', 'name ', key%list%name)
+             call double_to_table_curr('errors_dipole ', 'k0l ', bvk*key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
@@ -663,8 +663,8 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             call string_to_table('errors_dipole ', 'name ',key%list%name)
-             call double_to_table('errors_dipole ', 'k0l ',bvk*key%list%b0)
+             call string_to_table_curr('errors_dipole ', 'name ', key%list%name)
+             call double_to_table_curr('errors_dipole ', 'k0l ', bvk*key%list%b0)
              call augment_count('errors_dipole ')
           endif
        endif
@@ -727,13 +727,13 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             call string_to_table('errors_total ', 'name ',key%list%name)
+             call string_to_table_curr('errors_total ', 'name ', key%list%name)
              myfield(:) = zero
              do kk=1,maxmul
                 myfield(2*kk-1) = key%list%k(kk)
                 myfield(2*kk)   = key%list%ks(kk)
              enddo
-             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call vector_to_table_curr('errors_total ', 'k0l ', myfield(1), i)
              call augment_count('errors_total ')
           endif
        endif
@@ -815,21 +815,21 @@ CONTAINS
        if(errors_out) then
           if(key%list%name(:len_trim(magnet_name)-1).eq. &
                magnet_name(:len_trim(magnet_name)-1)) then
-             call string_to_table('errors_field ', 'name ',key%list%name)
-             call string_to_table('errors_total ', 'name ',key%list%name)
+             call string_to_table_curr('errors_field ', 'name ', key%list%name)
+             call string_to_table_curr('errors_total ', 'name ', key%list%name)
              i=2*maxmul+2
              myfield(:) = zero
              do kk=1,nd+1
                 myfield(2*kk-1) = field(1,kk-1)
                 myfield(2*kk)   = field(2,kk-1)
              enddo
-             call vector_to_table('errors_field ', 'k0l ', i, myfield(1))
+             call vector_to_table_curr('errors_field ', 'k0l ', myfield(1), i)
              myfield(:) = zero
              do kk=1,nd+1
                 myfield(2*kk-1) = key%list%k(kk)
                 myfield(2*kk)   = key%list%ks(kk)
              enddo
-             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call vector_to_table_curr('errors_total ', 'k0l ', myfield(1), i)
              call augment_count('errors_field ')
              call augment_count('errors_total ')
           endif
@@ -940,8 +940,8 @@ CONTAINS
              myfield(:) = zero
              myfield(1)=-key%list%k(1)
              myfield(2)=key%list%ks(1)
-             call string_to_table('errors_total ', 'name ',key%list%name)
-             call vector_to_table('errors_total ', 'k0l ', i, myfield(1))
+             call string_to_table_curr('errors_total ', 'name ', key%list%name)
+             call vector_to_table_curr('errors_total ', 'k0l ', myfield(1), i)
              call augment_count('errors_total ')
           endif
        endif
@@ -2218,7 +2218,7 @@ CONTAINS
        map_coor(8)=ja(4)
        map_coor(9)=ja(5)
        map_coor(10)=ja(6)
-       call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
+       call vector_to_table_curr("ptc_normal ", 'coef ', map_coor(1), i_map_coor)
        call augment_count("ptc_normal ")
     enddo
 
@@ -2238,7 +2238,7 @@ CONTAINS
           map_coor(8)=ja(4)
           map_coor(9)=ja(5)
           map_coor(10)=ja(6)
-          call vector_to_table("ptc_normal ", 'coef ', i_map_coor, map_coor(1))
+          call vector_to_table_curr("ptc_normal ", 'coef ', map_coor(1), i_map_coor)
           call augment_count("ptc_normal ")
           j(:)  = 0
           ja(ii) = j(ii)
@@ -2292,7 +2292,7 @@ CONTAINS
                                      map_coor(8)=j(4)
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
-                                     call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                     call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
@@ -2327,7 +2327,7 @@ CONTAINS
                                   map_coor(8)=j(4)
                                   map_coor(9)=j(5)
                                   map_coor(10) = 0
-                                  call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                                  call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
                                   call augment_count("map_table ")
                                endif
                             endif
@@ -2358,7 +2358,7 @@ CONTAINS
                                map_coor(8)=j(4)
                                map_coor(9)=0
                                map_coor(10)=0
-                               call vector_to_table("map_table ", 'coef ', i_map_coor, map_coor(1))
+                               call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
                                call augment_count("map_table ")
                             endif
                          endif
@@ -2411,7 +2411,7 @@ CONTAINS
     use twtrrfi
     use name_lenfi
     implicit none
-    integer i,k,pos,nfac(maxmul),flag,string_from_table,double_from_table,l
+    integer i,k,pos,nfac(maxmul),flag,string_from_table_row,double_from_table_row,l
     real(dp) d(2*maxmul),b(maxmul),a(maxmul),tilt,ab,bvk
     character(name_len) name,name2
     type(fibre),pointer :: p
@@ -2431,7 +2431,7 @@ CONTAINS
        nfac(i)=nfac(i-1)*(i-1)
     enddo
 
-    flag = string_from_table('errors_read ', 'name ',1,name)
+    flag = string_from_table_row('errors_read ', 'name ',1,name)
 
     if(flag.ne.0) call aafail('fill_errors reports: ',' The >>> errors_read <<< table is empty ')
     i=0
@@ -2443,15 +2443,15 @@ CONTAINS
        a(:)=zero
        d(:)=zero
        name2=" "
-       flag = string_from_table('errors_read ', 'name ',i,name2)
+       flag = string_from_table_row('errors_read ', 'name ',i,name2)
        if(flag.ne.0) goto 100
        do k=1,maxmul
           if(k<=10) then
-             flag = double_from_table('errors_read ',mag_index1(k),i,d(2*k-1))
-             flag = double_from_table('errors_read ',mag_index2(k),i,d(2*k))
+             flag = double_from_table_row('errors_read ',mag_index1(k),i,d(2*k-1))
+             flag = double_from_table_row('errors_read ',mag_index2(k),i,d(2*k))
           else
-             flag = double_from_table('errors_read ',mag_index3(k-10),i,d(2*k-1))
-             flag = double_from_table('errors_read ',mag_index4(k-10),i,d(2*k))
+             flag = double_from_table_row('errors_read ',mag_index3(k-10),i,d(2*k-1))
+             flag = double_from_table_row('errors_read ',mag_index4(k-10),i,d(2*k))
           endif
        enddo
        if(flag.ne.0) goto 100

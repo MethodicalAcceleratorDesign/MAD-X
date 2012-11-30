@@ -378,19 +378,19 @@ SUBROUTINE twfill(case,opt_fun,position,flag)
   if (flag .ne. 0)  then
      if(case.eq.1) then
         i = 17
-        call vector_to_table(table_name, 's ', i, opt_fun(2))
+        call vector_to_table_curr(table_name, 's ', opt_fun(2), i)
         i = 5
-        call vector_to_table(table_name, 'r11 ', i, opt_fun(29))
+        call vector_to_table_curr(table_name, 'r11 ', opt_fun(29), i)
         i = 5
-        call vector_to_table(table_name, 'kmax ', i, opt_fun(70))
+        call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), i)
         if(rmatrix) then
            i = 36
-           call vector_to_table(table_name, 're11 ', i, opt_fun(34))
+           call vector_to_table_curr(table_name, 're11 ', opt_fun(34), i)
         endif
         if(ripken) call twfill_ripken(opt_fun)
      elseif(case.eq.2) then
         i = 10
-        call vector_to_table(table_name, 'wx ', i, opt_fun(19))
+        call vector_to_table_curr(table_name, 'wx ', opt_fun(19), i)
      endif
 
      !---- Augment table twiss
@@ -450,18 +450,18 @@ SUBROUTINE twfill_ripken(opt_fun)
   if(beta21.ne.zero) gama21=((one-kappa)**2+alfa21**2)/beta21
   gama22=kappa*gamy
   
-  call double_to_table('twiss ','beta11 ' ,beta11)
-  call double_to_table('twiss ','beta12 ' ,beta12)
-  call double_to_table('twiss ','beta21 ' ,beta21)
-  call double_to_table('twiss ','beta22 ' ,beta22)
-  call double_to_table('twiss ','alfa11 ' ,alfa11)
-  call double_to_table('twiss ','alfa12 ' ,alfa12)
-  call double_to_table('twiss ','alfa21 ' ,alfa21)
-  call double_to_table('twiss ','alfa22 ' ,alfa22)
-  call double_to_table('twiss ','gama11 ' ,gama11)
-  call double_to_table('twiss ','gama12 ' ,gama12)
-  call double_to_table('twiss ','gama21 ' ,gama21)
-  call double_to_table('twiss ','gama22 ' ,gama22)
+  call double_to_table_curr('twiss ','beta11 ' ,beta11)
+  call double_to_table_curr('twiss ','beta12 ' ,beta12)
+  call double_to_table_curr('twiss ','beta21 ' ,beta21)
+  call double_to_table_curr('twiss ','beta22 ' ,beta22)
+  call double_to_table_curr('twiss ','alfa11 ' ,alfa11)
+  call double_to_table_curr('twiss ','alfa12 ' ,alfa12)
+  call double_to_table_curr('twiss ','alfa21 ' ,alfa21)
+  call double_to_table_curr('twiss ','alfa22 ' ,alfa22)
+  call double_to_table_curr('twiss ','gama11 ' ,gama11)
+  call double_to_table_curr('twiss ','gama12 ' ,gama12)
+  call double_to_table_curr('twiss ','gama21 ' ,gama21)
+  call double_to_table_curr('twiss ','gama22 ' ,gama22)
 
 end SUBROUTINE twfill_ripken
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
@@ -2080,30 +2080,30 @@ SUBROUTINE tw_summ(rt,tt)
   !     endif
 
   !---- Fill summary table
-  call double_to_table('summ ','length ' ,suml)
-  call double_to_table('summ ','orbit5 ' ,orbit5)
-  call double_to_table('summ ','alfa '   ,alfa)
-  call double_to_table('summ ','gammatr ',gamtr)
-  call double_to_table('summ ','q1 '     ,qx)
-  call double_to_table('summ ','dq1 '    ,xix)
-  call double_to_table('summ ','betxmax ',bxmax)
-  call double_to_table('summ ','dxmax '  ,dxmax)
-  call double_to_table('summ ','dxrms '  ,sigdx)
-  call double_to_table('summ ','xcomax ' ,xcomax)
-  call double_to_table('summ ','xcorms ' ,sigxco)
-  call double_to_table('summ ','q2 '     ,qy)
-  call double_to_table('summ ','dq2 '    ,xiy)
-  call double_to_table('summ ','betymax ',bymax)
-  call double_to_table('summ ','dymax '  ,dymax)
-  call double_to_table('summ ','dyrms '  ,sigdy)
-  call double_to_table('summ ','ycomax ' ,ycomax)
-  call double_to_table('summ ','ycorms ' ,sigyco)
-  call double_to_table('summ ','deltap ' ,deltap)
-  call double_to_table('summ ','synch_1 ' ,synch_1)
-  call double_to_table('summ ','synch_2 ' ,synch_2)
-  call double_to_table('summ ','synch_3 ' ,synch_3)
-  call double_to_table('summ ','synch_4 ' ,synch_4)
-  call double_to_table('summ ','synch_5 ' ,synch_5)
+  call double_to_table_curr('summ ','length ' ,suml)
+  call double_to_table_curr('summ ','orbit5 ' ,orbit5)
+  call double_to_table_curr('summ ','alfa '   ,alfa)
+  call double_to_table_curr('summ ','gammatr ',gamtr)
+  call double_to_table_curr('summ ','q1 '     ,qx)
+  call double_to_table_curr('summ ','dq1 '    ,xix)
+  call double_to_table_curr('summ ','betxmax ',bxmax)
+  call double_to_table_curr('summ ','dxmax '  ,dxmax)
+  call double_to_table_curr('summ ','dxrms '  ,sigdx)
+  call double_to_table_curr('summ ','xcomax ' ,xcomax)
+  call double_to_table_curr('summ ','xcorms ' ,sigxco)
+  call double_to_table_curr('summ ','q2 '     ,qy)
+  call double_to_table_curr('summ ','dq2 '    ,xiy)
+  call double_to_table_curr('summ ','betymax ',bymax)
+  call double_to_table_curr('summ ','dymax '  ,dymax)
+  call double_to_table_curr('summ ','dyrms '  ,sigdy)
+  call double_to_table_curr('summ ','ycomax ' ,ycomax)
+  call double_to_table_curr('summ ','ycorms ' ,sigyco)
+  call double_to_table_curr('summ ','deltap ' ,deltap)
+  call double_to_table_curr('summ ','synch_1 ' ,synch_1)
+  call double_to_table_curr('summ ','synch_2 ' ,synch_2)
+  call double_to_table_curr('summ ','synch_3 ' ,synch_3)
+  call double_to_table_curr('summ ','synch_4 ' ,synch_4)
+  call double_to_table_curr('summ ','synch_5 ' ,synch_5)
 
 end SUBROUTINE tw_summ
 SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)

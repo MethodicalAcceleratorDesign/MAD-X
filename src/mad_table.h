@@ -79,22 +79,30 @@ int     get_table_range(char* range, struct table*, int* rows);
 void    headvalue(char* table_name, char* par, double* value);
 void    out_table(char* tname, struct table*, char* filename);
 void    reset_count(char* table); /* resets table counter to zero */
-int     str_from_table(char* table, char* name, int* row, char* val);
-int     str_from_tablet(struct table*, char* name, int* row, char* val);
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
 int     table_length(char* table);
 void    table_range(char* table, char* range, int* rows);
-void    string_to_table(char* table, char* name, char* string);
-void    vector_to_table(char* table, char* col, int* nval, double* vals);
 
 void    augment_count(char* table);
 void    augmentcountonly(char* table);
-int     char_from_table(char* table, char* name, int* row, char* val);
-void    comment_to_table(char* table, char* comment, int* length);
-void    double_to_table(char* table, char* name, double* val);
-void    double_to_table_row(char* table, char* name, int* row, double* val);
-int     double_from_table(char* table, char* name, int* row, double* val);
-int     string_from_table(char* table, char* name, int* row, char* string);
+
+//int     str_from_table     (const char* table, const char* name, int* row, char* val);
+//int     str_from_tablet    (struct table *tbl, const char* name, int* row, char* val);
+//int     nodename_from_table_row(const char* table, /* no name   */ const int* row, char* string);
+
+int     double_from_table_row(const char* table, const char* name, const int* row, double* val);
+int     string_from_table_row(const char* table, const char* name, const int* row, char* string);
+
+int     double_to_table_row  (const char* table, const char* name, const int* row, const double* val);
+int     string_to_table_row  (const char* table, const char* name, const int* row, const char* string);
+
+int     double_to_table_curr (const char* table, const char* name, const double* val);
+int     vector_to_table_curr (const char* table, const char* name, const double* vals, const int* nval);
+int     string_to_table_curr (const char* table, const char* name, const char* string);
+int     comment_to_table_curr(const char* table, const char* comment, const int* length);
+
+double  get_table_value(const char* table_s, const char *row_s, const char *col_s);
+void    set_table_value(const char* table_s, const char *row_s, const char *col_s, double *val);
 
 struct column_info{
   void* data;

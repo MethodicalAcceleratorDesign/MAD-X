@@ -234,7 +234,7 @@ subroutine ibs
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer step,i,j,flag,testtype,range(2),n,get_option,double_from_table,    &
+  integer step,i,j,flag,testtype,range(2),n,get_option,double_from_table_row,    &
        restart_sequ,advance_to_pos
   double precision tol,alx,alxbar,alxwtd,aly,alybar,ax1,ax2,ay1,ay2,&
        betax,betay,beteff,bx1,bx2,bxbar,bxinv,by1,by2,bybar,byinv,bywtd, &
@@ -367,33 +367,33 @@ subroutine ibs
   !     print *, 'steps: ', step, '  tolerance: ', tol
   call table_range('twiss ', '#s/#e ', range)
   !     print *, 'Range for Table ', range
-  flag = double_from_table('twiss ', 's ', range(1), s1)
+  flag = double_from_table_row('twiss ', 's ', range(1), s1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'l ', range(1), l1)
+  flag = double_from_table_row('twiss ', 'l ', range(1), l1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'betx ', range(1), bx1)
+  flag = double_from_table_row('twiss ', 'betx ', range(1), bx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'bety ', range(1), by1)
+  flag = double_from_table_row('twiss ', 'bety ', range(1), by1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'alfx ', range(1), ax1)
+  flag = double_from_table_row('twiss ', 'alfx ', range(1), ax1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'alfy ', range(1), ay1)
+  flag = double_from_table_row('twiss ', 'alfy ', range(1), ay1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dx ', range(1), dx1)
+  flag = double_from_table_row('twiss ', 'dx ', range(1), dx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dpx ', range(1), dpx1)
+  flag = double_from_table_row('twiss ', 'dpx ', range(1), dpx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dy ', range(1), dy1)
+  flag = double_from_table_row('twiss ', 'dy ', range(1), dy1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dpy ', range(1), dpy1)
+  flag = double_from_table_row('twiss ', 'dpy ', range(1), dpy1)
   if (flag .ne. 0)  goto 102
   
   j = restart_sequ()
   do i=range(1)+1, range(2)     
      j = advance_to_pos('twiss ', i)
-     flag = double_from_table('twiss ', 's ', i, ss2)
+     flag = double_from_table_row('twiss ', 's ', i, ss2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'l ', i, ll2)
+     flag = double_from_table_row('twiss ', 'l ', i, ll2)
      if (flag .gt. 0)  goto 102
      if (ll2 .gt. 0.0001) goto 103 
   enddo
@@ -425,25 +425,25 @@ subroutine ibs
   j = restart_sequ()
   do i = range(1)+1, range(2)
      j = advance_to_pos('twiss ', i)
-     flag = double_from_table('twiss ', 's ', i, s2)
+     flag = double_from_table_row('twiss ', 's ', i, s2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'l ', i, l2)
+     flag = double_from_table_row('twiss ', 'l ', i, l2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'betx ', i, bx2)
+     flag = double_from_table_row('twiss ', 'betx ', i, bx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'bety ', i, by2)
+     flag = double_from_table_row('twiss ', 'bety ', i, by2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'alfx ', i, ax2)
+     flag = double_from_table_row('twiss ', 'alfx ', i, ax2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'alfy ', i, ay2)
+     flag = double_from_table_row('twiss ', 'alfy ', i, ay2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dx ', i, dx2)
+     flag = double_from_table_row('twiss ', 'dx ', i, dx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dpx ', i, dpx2)
+     flag = double_from_table_row('twiss ', 'dpx ', i, dpx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dy ', i, dy2)
+     flag = double_from_table_row('twiss ', 'dy ', i, dy2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dpy ', i, dpy2)
+     flag = double_from_table_row('twiss ', 'dpy ', i, dpy2)
      if (flag .ne. 0)  goto 102
 
     
@@ -523,20 +523,20 @@ subroutine ibs
      ! *************** Fill "ibs_table" if required *********************
 
      if(n.ne.0) then
-        call string_to_table('ibs ', 'name ', 'name ')
-        call double_to_table('ibs ','s ', sdum)
-        call double_to_table('ibs ','dels ', dels)
-        call double_to_table('ibs ','tli ', tlidc)
-        call double_to_table('ibs ','txi ', txidc)
-        call double_to_table('ibs ','tyi ', tyidc)        
-        call double_to_table('ibs ','betx ', betax)
-        call double_to_table('ibs ','alfx ', alx)
-        call double_to_table('ibs ','dx ', dx)
-        call double_to_table('ibs ','dpx ', dpx)
-        call double_to_table('ibs ','bety ', betay)
-        call double_to_table('ibs ','alfy ', aly)
-        call double_to_table('ibs ','dy ', dy)
-        call double_to_table('ibs ','dpy ', dpy)
+        call string_to_table_curr('ibs ', 'name ', 'name ')
+        call double_to_table_curr('ibs ','s ', sdum)
+        call double_to_table_curr('ibs ','dels ', dels)
+        call double_to_table_curr('ibs ','tli ', tlidc)
+        call double_to_table_curr('ibs ','txi ', txidc)
+        call double_to_table_curr('ibs ','tyi ', tyidc)        
+        call double_to_table_curr('ibs ','betx ', betax)
+        call double_to_table_curr('ibs ','alfx ', alx)
+        call double_to_table_curr('ibs ','dx ', dx)
+        call double_to_table_curr('ibs ','dpx ', dpx)
+        call double_to_table_curr('ibs ','bety ', betay)
+        call double_to_table_curr('ibs ','alfy ', aly)
+        call double_to_table_curr('ibs ','dy ', dy)
+        call double_to_table_curr('ibs ','dpy ', dpy)
         call augment_count('ibs ')
      endif
 

@@ -116,21 +116,22 @@
 // warning:augment_counts is provided by madx_ptc_knobs.f90
 #define augment_count augment_count_
 #define augmentcountonly augmentcountonly_
-#define char_from_table char_from_table_
-#define comment_to_table comment_to_table_
-#define double_from_table double_from_table_ // *
-#define double_table double_table_
-#define double_to_table double_to_table_ // **
+#define double_from_table_row double_from_table_row_ // *
+#define string_from_table_row string_from_table_row_
 #define double_to_table_row double_to_table_row_
+#define string_to_table_row string_to_table_row_
+#define double_to_table_curr double_to_table_curr_ // **
+#define vector_to_table_curr vector_to_table_curr_
+#define string_to_table_curr string_to_table_curr_
+#define comment_to_table_curr comment_to_table_curr_
+
+#define double_table double_table_
 #define headvalue headvalue_
 #define make_map_table make_map_table_
 #define reset_count reset_count_
 #define sector_out sector_out_
-#define string_from_table string_from_table_
-#define string_to_table string_to_table_
 #define table_length table_length_
 #define table_range table_range_
-#define vector_to_table vector_to_table_
 
 // from mad_track.c
 #define deletetrackstrarpositions deletetrackstrarpositions_

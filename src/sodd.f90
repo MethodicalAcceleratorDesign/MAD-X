@@ -2964,9 +2964,9 @@ subroutine write_table(table_name,table_type,int_to_write,        &
   goto(50,80,90,110) table_type_index(table_type)
 50 do k = 1,5
      if(tab_types_5(k) .eq. 2) then
-        call double_to_table(table_name,name_5(k),double_to_write(k))
+        call double_to_table_curr(table_name,name_5(k),double_to_write(k))
      else
-        call double_to_table(table_name,name_5(k),                    &
+        call double_to_table_curr(table_name,name_5(k),                    &
              &dble(int_to_write(k)))
      endif
   enddo
@@ -2974,9 +2974,9 @@ subroutine write_table(table_name,table_type,int_to_write,        &
 
 80 do k = 1,8
      if(tab_types_8(k) .eq. 2) then
-        call double_to_table(table_name,name_8(k),double_to_write(k))
+        call double_to_table_curr(table_name,name_8(k),double_to_write(k))
      else
-        call double_to_table(table_name,name_8(k),                    &
+        call double_to_table_curr(table_name,name_8(k),                    &
              &dble(int_to_write(k)))
      endif
   enddo
@@ -2984,9 +2984,9 @@ subroutine write_table(table_name,table_type,int_to_write,        &
 
 90 do k = 1,9
      if(tab_types_9(k) .eq. 2) then
-        call double_to_table(table_name,name_9(k),double_to_write(k))
+        call double_to_table_curr(table_name,name_9(k),double_to_write(k))
      else
-        call double_to_table(table_name,name_9(k),                    &
+        call double_to_table_curr(table_name,name_9(k),                    &
              &dble(int_to_write(k)))
      endif
   enddo
@@ -2994,9 +2994,9 @@ subroutine write_table(table_name,table_type,int_to_write,        &
 
 110 do k = 1,11
      if(tab_types_11(k) .eq. 2) then
-        call double_to_table(table_name,name_11(k),double_to_write(k))
+        call double_to_table_curr(table_name,name_11(k),double_to_write(k))
      else
-        call double_to_table(table_name,name_11(k),                   &
+        call double_to_table_curr(table_name,name_11(k),                   &
              &dble(int_to_write(k)))
      endif
   enddo

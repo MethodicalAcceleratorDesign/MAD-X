@@ -24,7 +24,7 @@ contains
     integer i,ii,j1,k,l,starti
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
-         string_from_table, double_from_table
+         string_from_table_row, double_from_table_row
     real(dp) x(6),deltap0,deltap,dt
     integer :: indexa(4)
     integer :: row_haml(101)
@@ -128,7 +128,7 @@ contains
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
-             k = string_from_table('normal_results ', 'name ', row, name_var)
+             k = string_from_table_row('normal_results ', 'name ', row, name_var)
 
 
              if (name_var(:4) .eq. 'gnfu') n_gnfu = n_gnfu + 1
@@ -145,18 +145,18 @@ contains
              call alloc(pbrh)
              do j1 =1,n_haml
                 row = row_haml(j1)
-                k = double_from_table("normal_results ", "value ", row, doublenum)
+                k = double_from_table_row("normal_results ", "value ", row, doublenum)
                 mynres = int(doublenum)
                 row = row_haml(j1) - 3*mynres + 2
                 starti = 1
                 if (j1 .eq. 1) then
-                   k = double_from_table("normal_results ", "order1 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
                    indexa(1) = int(doublenum)
-                   k = double_from_table("normal_results ", "order2 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
                    indexa(2) = int(doublenum)
-                   k = double_from_table("normal_results ", "order3 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
                    indexa(3) = int(doublenum)
-                   k = double_from_table("normal_results ", "order4 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
                    indexa(4) = int(doublenum)
                    index1(1,1) = indexa(1) - indexa(2)
                    index1(1,2) = indexa(3) - indexa(4)
@@ -171,13 +171,13 @@ contains
                 if (mynres .ge. starti) then
                    do i = starti,mynres
                       ii = row + 3*(i-1)
-                      k = double_from_table("normal_results ", "order1 ", ii, doublenum)
+                      k = double_from_table_row("normal_results ", "order1 ", ii, doublenum)
                       indexa(1) = int(doublenum)
-                      k = double_from_table("normal_results ", "order2 ", ii, doublenum)
+                      k = double_from_table_row("normal_results ", "order2 ", ii, doublenum)
                       indexa(2) = int(doublenum)
-                      k = double_from_table("normal_results ", "order3 ", ii, doublenum)
+                      k = double_from_table_row("normal_results ", "order3 ", ii, doublenum)
                       indexa(3) = int(doublenum)
-                      k = double_from_table("normal_results ", "order4 ", ii, doublenum)
+                      k = double_from_table_row("normal_results ", "order4 ", ii, doublenum)
                       indexa(4) = int(doublenum)
                       n1 = indexa(1) - indexa(2)
                       n2 = indexa(3) - indexa(4)
@@ -228,7 +228,7 @@ contains
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
-             k = string_from_table("normal_results ", "name ", row, name_var)
+             k = string_from_table_row("normal_results ", "name ", row, name_var)
              val_ptc = double_from_ptc_normal(name_var,row,icase)
              if (name_var(:4) .ne. 'haml'.and.name_var(:4) .ne. 'gnfu')    &
                   call double_to_table_row("normal_results ", "value ", row, val_ptc)
@@ -271,7 +271,7 @@ contains
     real(dp) double_from_ptc_normal, d_val, d_val1, d_val2
     integer ii,i1,i2,jj
     integer j,k,ind(6)
-    integer double_from_table
+    integer double_from_table_row
     character(len = 4)  name_var
     character(len = 2)  name_var1
     character(len = 3)  name_var2
@@ -283,14 +283,14 @@ contains
     SELECT CASE (name_var1)
     CASE ("dx")
        ind(:)=0
-       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
        ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
        d_val = n%A1%V(1).sub.ind
     CASE ('dy')
        ind(:)=0
-       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
        ind(5) = int(doublenum)
        if (ind(5) == 0) ind(5) = 1
        ind(6) = 0
@@ -310,27 +310,27 @@ contains
        SELECT CASE (name_var2)
        CASE ('dpx')
           ind(:)=0
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(2).sub.ind
        CASE ('dpy')
           ind(:)=0
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%A1%V(4).sub.ind
        CASE ('dq1')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(:)=0
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('dq2')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(:)=0
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
@@ -343,39 +343,39 @@ contains
     if (name_l) then
        SELECT CASE (name_var)
        CASE ('anhx')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
              ind(j) =  int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           do j = 3,4
              ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(3).sub.ind
        CASE ('anhy')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
              ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           do j = 3,4
              ind(j) = int(doublenum)
           enddo
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
           d_val = n%dhdj%V(4).sub.ind
        CASE ('hamc')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -383,13 +383,13 @@ contains
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hams')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -397,13 +397,13 @@ contains
           double_from_ptc_normal = d_val
           RETURN
        CASE ('hama')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -415,13 +415,13 @@ contains
           double_from_ptc_normal = zero
           RETURN
        CASE ('gnfc')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -429,13 +429,13 @@ contains
           double_from_ptc_normal = d_val
           RETURN
        CASE ('gnfs')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -443,13 +443,13 @@ contains
           double_from_ptc_normal = d_val
           RETURN
        CASE ('gnfa')
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           ind(2) = int(doublenum)
-          k = double_from_table("normal_results ", "order3 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(3) = int(doublenum)
-          k = double_from_table("normal_results ", "order4 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
@@ -462,14 +462,14 @@ contains
           RETURN
        CASE ('eign')
           ii=(icase/2)*2
-          k = double_from_table("normal_results ", "order1 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           i1 = int(doublenum)
           if(i1.gt.ii) call aafail('return from double_from_ptc_normal: ',' wrong # of eigenvectors')
           jj=0
           if(i1.eq.5) jj=6
           if(i1.eq.6) i1=5
           if(jj.eq.6) i1=jj
-          k = double_from_table("normal_results ", "order2 ", row, doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
           i2 = int(doublenum)
           if(i2.gt.ii) call aafail('return from double_from_ptc_normal: ',' eigenvectors too many components')
           jj=0
@@ -490,7 +490,7 @@ contains
 
   SUBROUTINE display_table_results()
     implicit none
-    integer, external :: select_ptc_idx, string_from_table, double_from_table
+    integer, external :: select_ptc_idx, string_from_table_row, double_from_table_row
     character(len = 4) name_var
     integer row,k
     integer :: ord(3)
@@ -498,14 +498,14 @@ contains
     print *,"Variable name  Order 1  order 2  order 3        Value      "
     do row = 1 , select_ptc_idx()
        name_var=" "
-       k = string_from_table("normal_results ", "name ", row, name_var)
-       k = double_from_table("normal_results ", "order1 ", row, doublenum)
+       k = string_from_table_row("normal_results ", "name ", row, name_var)
+       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
        ord(1) = int(doublenum)
-       k = double_from_table("normal_results ", "order2 ", row, doublenum)
+       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
        ord(2) = int(doublenum)
-       k = double_from_table("normal_results ", "order3 ", row, doublenum)
+       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
        ord(3) = int(doublenum)
-       k = double_from_table("normal_results ", "value ", row, doublenum)
+       k = double_from_table_row("normal_results ", "value ", row, doublenum)
        WRITE(*,100) name_var,ord(1),ord(2),ord(3),doublenum
     enddo
 100 FORMAT(3X,A4,14X,I1,8X,I1,8X,I1,5X,f25.18)

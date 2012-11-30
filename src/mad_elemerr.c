@@ -28,7 +28,7 @@ pro_error_make_efield_table(void)
 
       while (nanf != nend) {
         if(nanf->sel_err == 1) {
-           string_to_table("efield","name",nanf->name);
+           string_to_table_curr("efield","name",nanf->name);
 /* */
                   /*
            printf("=> %s %e %e %e\n",nanf->name,nanf->p_fd_err,nanf->p_al_err);
@@ -155,7 +155,7 @@ error_seterr(struct in_cmd* cmd)
   i = 1; /* watch out ! i is the ROW number, not the C index !!! */
   ix=0;
   while(ix == 0) {
-      ix =   str_from_table(namtab, "name", &i, name);
+      ix =   string_from_table_row(namtab, "name", &i, name);
       if(ix == 0) {
              stolower(name);
              strcpy(slname,strip(name));

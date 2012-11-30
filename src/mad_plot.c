@@ -152,7 +152,7 @@ exec_plot(struct in_cmd* cmd)
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
-    fatal_error("TWISS - sequence without beam:", current_sequ->name);
+    fatal_error("PLOT - sequence without beam:", current_sequ->name);
   /* end part1 of HG 031127 */
 
   /* Check table name is the same as in the last twiss command */
@@ -203,12 +203,18 @@ exec_plot(struct in_cmd* cmd)
 
     if(nointerp == 0 && s_haxis == 0)
     {
+      if (!current_sequ->tw_table) {
+        warning("PLOT - no TWISS table present", "PLOT command ignored");
+        return;
+      }
+
       last_twiss_table = current_sequ->tw_table->name;
       if (strcmp(table_name,"aperture") != 0 )
       {
         if(strcmp(table_name,last_twiss_table) != 0)
         {
-          printf("Only allowed table attribute in plot command is \"aperture\". Else, table name is automatically changed to %s \n",last_twiss_table );
+          printf("Only allowed table attribute in plot command is \"aperture\"."
+                 " Else, table name is automatically changed to %s \n", last_twiss_table);
           if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
             pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
         }
@@ -216,12 +222,17 @@ exec_plot(struct in_cmd* cmd)
     }
 
     /* HG 21.10.09 allow plot from external table, part1 */
-    if ((pos = name_list_pos(table_name, table_register->names)) > -1)
+    if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
         p_table = table_register->tables[pos];
-    else
+        if (!p_table) {
+           warning("Plot - potentially alredy destroyed table:", table_name);
+           return;
+        }
+    } else
       {
 /*       fatal_error("Plot - non-existing table:", table_name); return; */
        warning("Plot - potentially non-existing table:", table_name);
+       return;
        /*p_table = table_register->tables[pos];*/
 
       }
@@ -390,6 +401,7 @@ exec_plot(struct in_cmd* cmd)
   {
     embedded_twiss_cmd = cmd;
     /* HG 21.10.09 allow plot from external table, part 2 */
+//    printf("P_TABLE CHECK %p\n", p_table);
     if (p_table->origin) title = p_table->name;
     else if (nt && current_sequ != NULL) title = current_sequ->name;
     pesopt_(&ierr);

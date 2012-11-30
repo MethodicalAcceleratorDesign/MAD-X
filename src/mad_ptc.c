@@ -73,20 +73,20 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     row = 1; /* this particular table has only one row filled-in */
 
     /* length of the machine */
-    double_from_table("ptc_twiss_summary","length",&row,&dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","length",&row,&dtmp); // returnStatus = not used
     /* returnStatus should always be equal to zero */
     sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
 
     /* momentum compaction factor, phase-slip factor and energy transition */
-    double_from_table("ptc_twiss_summary","alpha_c", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","alpha_c", &row, &dtmp); // returnStatus = not used
     /* returnStatus should always be equal to zero */
     sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     
     /* momentum compaction factor first order derivative w.r.t delta-p/p */
-    double_from_table("ptc_twiss_summary","alpha_c_p", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","alpha_c_p", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ALPHA_C_P        %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     
@@ -94,121 +94,121 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
      /* WARNING when restoring the following two lines don't forget to replace 39+1  by 39+2 for h_length */
      /* momentum compaction factor second order derivative w.r.t delta-p/p */
      /* uncomment the following once computation of alpha_c_p2 is reliable */
-    double_from_table("ptc_twiss_summary","alpha_c_p2", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","alpha_c_p2", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ALPHA_C_P2       %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c); 
     
      /* WARNING when restoring the following two lines don't forget to replace 39+2  by 39+3 for h_length */
     /* momentum compaction factor third order derivative w.r.t delta-p/p */
     /* uncomment the following once computation of alpha_c_p3 is reliable */
-    double_from_table("ptc_twiss_summary","alpha_c_p3", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","alpha_c_p3", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ALPHA_C_P3       %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
        
-    double_from_table("ptc_twiss_summary","eta_c", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","eta_c", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","gamma_tr", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","gamma_tr", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     
     /* tunes and chromaticities */
-    double_from_table("ptc_twiss_summary","q1", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","q1", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","q2", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","q2", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","dq1", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","dq1", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","dq2", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","dq2", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
     /* 26 november 2009 */
-    double_from_table("ptc_twiss_summary","qs", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","qs", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ QS               %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);    
 
 
     /* extremas of the beta-function */
-    double_from_table("ptc_twiss_summary","beta_x_min", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","beta_x_min", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ BETA_X_MIN       %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","beta_x_max", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","beta_x_max", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ BETA_X_MAX       %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","beta_y_min", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","beta_y_min", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ BETA_Y_MIN       %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","beta_y_max", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","beta_y_max", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
     /* now for the 6 closed orbits */
-    double_from_table("ptc_twiss_summary","orbit_x", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_x", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_X          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","orbit_px", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_px", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_PX         %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","orbit_y", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_y", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_Y          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","orbit_py", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_py", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_PY         %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","orbit_pt", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_pt", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_PT         %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","orbit_-cT", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","orbit_-cT", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
 /* orbits RMS */
-    double_from_table("ptc_twiss_summary","xcorms", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","xcorms", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","pxcorms", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","pxcorms", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ PXCORMS          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","ycorms", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","ycorms", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","pycorms", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","pycorms", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ PYCORMS          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
 /* orbits MAX */
-    double_from_table("ptc_twiss_summary","xcomax", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","xcomax", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","pxcomax", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","pxcomax", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ PXCOMAX          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","ycomax", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","ycomax", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
-    double_from_table("ptc_twiss_summary","pycomax", &row, &dtmp); // returnStatus = not used
+    double_from_table_row("ptc_twiss_summary","pycomax", &row, &dtmp); // returnStatus = not used
     sprintf(c_dum->c, v_format("@ PYCOMAX          %%le  %F"),dtmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
 
@@ -737,32 +737,32 @@ select_ptc_normal(struct in_cmd* cmd)
               n2 = (double)indexa[1][jj];
               n3 = (double)indexa[2][jj];
               n4 = (double)indexa[3][jj];
-              string_to_table("normal_results", "name", "hamc");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "hamc");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
-              string_to_table("normal_results", "name", "hams");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "hams");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
-              string_to_table("normal_results", "name", "hama");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "hama");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
-            string_to_table("normal_results", "name", "haml");
-            double_to_table("normal_results", "order1", &order[0]);
-            double_to_table("normal_results", "order2", &order[1]);
-            double_to_table("normal_results", "order3", &order[2]);
-            double_to_table("normal_results", "order4", &order[3]);
+            string_to_table_curr("normal_results", "name", "haml");
+            double_to_table_curr("normal_results", "order1", &order[0]);
+            double_to_table_curr("normal_results", "order2", &order[1]);
+            double_to_table_curr("normal_results", "order3", &order[2]);
+            double_to_table_curr("normal_results", "order4", &order[3]);
             n1 = (double)mynres;
-            double_to_table("normal_results", "value", &n1);
+            double_to_table_curr("normal_results", "value", &n1);
             augment_count("normal_results");
           }
           if (j == 11)
@@ -773,32 +773,32 @@ select_ptc_normal(struct in_cmd* cmd)
               n2 = (double)indexa[1][jj];
               n3 = (double)indexa[2][jj];
               n4 = (double)indexa[3][jj];
-              string_to_table("normal_results", "name", "gnfc");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "gnfc");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
-              string_to_table("normal_results", "name", "gnfs");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "gnfs");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
-              string_to_table("normal_results", "name", "gnfa");
-              double_to_table("normal_results", "order1", &n1);
-              double_to_table("normal_results", "order2", &n2);
-              double_to_table("normal_results", "order3", &n3);
-              double_to_table("normal_results", "order4", &n4);
+              string_to_table_curr("normal_results", "name", "gnfa");
+              double_to_table_curr("normal_results", "order1", &n1);
+              double_to_table_curr("normal_results", "order2", &n2);
+              double_to_table_curr("normal_results", "order3", &n3);
+              double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
-            string_to_table("normal_results", "name", "gnfu");
-            double_to_table("normal_results", "order1", &order[0]);
-            double_to_table("normal_results", "order2", &order[1]);
-            double_to_table("normal_results", "order3", &order[2]);
-            double_to_table("normal_results", "order4", &order[3]);
+            string_to_table_curr("normal_results", "name", "gnfu");
+            double_to_table_curr("normal_results", "order1", &order[0]);
+            double_to_table_curr("normal_results", "order2", &order[1]);
+            double_to_table_curr("normal_results", "order3", &order[2]);
+            double_to_table_curr("normal_results", "order4", &order[3]);
             n1 = (double)mynres;
-            double_to_table("normal_results", "value", &n1);
+            double_to_table_curr("normal_results", "value", &n1);
             augment_count("normal_results");
           }
         }
@@ -806,11 +806,11 @@ select_ptc_normal(struct in_cmd* cmd)
       else
       {
         if(((strcmp(names[j], "dq1") == zero)|| (strcmp(names[j], "dq2") == zero)) && order[0] == zero) order[0]=one;
-        string_to_table("normal_results", "name", names[j]);
-        double_to_table("normal_results", "order1", &order[0]);
-        double_to_table("normal_results", "order2", &order[1]);
-        double_to_table("normal_results", "order3", &order[2]);
-        double_to_table("normal_results", "order4", &order[3]);
+        string_to_table_curr("normal_results", "name", names[j]);
+        double_to_table_curr("normal_results", "order1", &order[0]);
+        double_to_table_curr("normal_results", "order2", &order[1]);
+        double_to_table_curr("normal_results", "order3", &order[2]);
+        double_to_table_curr("normal_results", "order4", &order[3]);
         augment_count("normal_results");
         if(j == 12)
         {

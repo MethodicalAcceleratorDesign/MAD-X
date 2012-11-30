@@ -361,7 +361,7 @@ subroutine pefill(ierr)
   !
   ! Output:  ierr  (int)     =0: OK, >0: error
   !
-  ! calls the functions double_from_table, advance_to_pos
+  ! calls the functions double_from_table_row, advance_to_pos
   ! table_length and restart_sequ defined in file madxn.c.
   ! calls the function lastnb defined in file util.F.
   ! calls the routines peintp in this file.
@@ -382,7 +382,7 @@ subroutine pefill(ierr)
 
   !--- definitions of function primitives
 
-  integer double_from_table, restart_sequ,advance_to_pos
+  integer double_from_table_row, restart_sequ,advance_to_pos
   integer lastnb, table_length
   integer advance_node, get_option
   double precision node_value
@@ -470,7 +470,7 @@ subroutine pefill(ierr)
      interf = 0
      pos_flag = 2
   endif
-  k = double_from_table(tabname, horname, 1, d_val)
+  k = double_from_table_row(tabname, horname, 1, d_val)
   if (k .lt. 0)  then
      if (k .eq. -1)  then
         print *, 'Warning: table ', tabname, ' not found'
@@ -489,7 +489,7 @@ subroutine pefill(ierr)
   if(horname .eq. 'deltap') dpp_flag=.true.
   rselect = machp .and. hrange(2) .gt. hrange(1)
   do l = 1, nivvar
-     k = double_from_table(tabname, sname(l), 1, d_val)
+     k = double_from_table_row(tabname, sname(l), 1, d_val)
      if (k .lt. 0)  then
         print *, 'Warning: vertical variable: ',                      &
              sname(l)(:lastnb(sname(l))), ' not in table ',                    &
@@ -507,7 +507,7 @@ subroutine pefill(ierr)
      new2 = nrrang(2)
      crow = nrrang(1)
      do j = nrrang(1), nrrang(2)
-        k = double_from_table(tabname, horname, j, d_val)
+        k = double_from_table_row(tabname, horname, j, d_val)
         tval = d_val
         if (tval .lt. hrange(1)) new1 = j
         if (tval .lt. hrange(2)) new2 = j
@@ -524,8 +524,8 @@ subroutine pefill(ierr)
   !--- get interpolation interval size
 
   if (machp)  then
-     k = double_from_table(tabname, horname, nrrang(1), d_val)
-     k = double_from_table(tabname, horname, nrrang(2), d_val1)
+     k = double_from_table_row(tabname, horname, nrrang(1), d_val)
+     k = double_from_table_row(tabname, horname, nrrang(2), d_val1)
      step = (d_val1 - d_val) / (maxpnt / 2)
   endif
   fact = pos_flag - 1
@@ -535,7 +535,7 @@ subroutine pefill(ierr)
      crow = j
      if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
           goto 10
-     k = double_from_table(tabname, horname, j, currpos)
+     k = double_from_table_row(tabname, horname, j, currpos)
 
      if (itbv .eq. 1)  then
         currtyp = node_value('mad8_type ')
@@ -549,17 +549,17 @@ subroutine pefill(ierr)
         if (currleng .gt. 0.d0 .and. currtyp .gt. 1                   &
              .and. currtyp .lt. 8) then
            currtilt = node_value('tilt ')
-           k = double_from_table(tabname, 'k1l ' , j, currk1l)
+           k = double_from_table_row(tabname, 'k1l ' , j, currk1l)
            currk1l = currk1l/currleng
-           k = double_from_table(tabname, 'k1sl ', j, currk1sl)
+           k = double_from_table_row(tabname, 'k1sl ', j, currk1sl)
            currk1sl = currk1sl/currleng
-           k = double_from_table(tabname, 'k2l ' , j, currk2l)
+           k = double_from_table_row(tabname, 'k2l ' , j, currk2l)
            currk2l = currk2l/currleng
-           k = double_from_table(tabname, 'k2sl ', j, currk2sl)
+           k = double_from_table_row(tabname, 'k2sl ', j, currk2sl)
            currk2sl = currk2sl/currleng
-           k = double_from_table(tabname, 'k3l ' , j, currk3l)
+           k = double_from_table_row(tabname, 'k3l ' , j, currk3l)
            currk3l = currk3l/currleng
-           k = double_from_table(tabname, 'k3sl ', j, currk3sl)
+           k = double_from_table_row(tabname, 'k3sl ', j, currk3sl)
            currk3sl = currk3sl/currleng
         endif
 
@@ -619,7 +619,7 @@ subroutine pefill(ierr)
         elseif (nqval(l) .eq. 0)  then
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
-           k = double_from_table(tabname, sname(l), j, d_val)
+           k = double_from_table_row(tabname, sname(l), j, d_val)
            k = p(l)
            qvval(nqval(l),l) = d_val
            if (proc_flag(1,l) .eq. 1) then
@@ -629,7 +629,7 @@ subroutine pefill(ierr)
              .gt. mystep .or. (marker_plot .and. currtyp .eq. 25)) then
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
-           k = double_from_table(tabname, sname(l), j, d_val)
+           k = double_from_table_row(tabname, sname(l), j, d_val)
            k = p(l)
            qvval(nqval(l),l) = d_val
            if (proc_flag(1,l) .eq. 1) then
@@ -1418,7 +1418,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
   !     ierr        (int)   0 if ok, else > 0
   !     the results are stored in qhval and qvval
   !
-  !     calls the functions double_from_table and get_value
+  !     calls the functions double_from_table_row and get_value
   !     defined in file madxn.c.
   !     calls the function peelma in this file.
   !
@@ -1440,7 +1440,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
 
   !---  definitions of function primitives
 
-  integer double_from_table
+  integer double_from_table_row
   integer interpolate_node, reset_interpolation
   integer embedded_twiss
   double precision get_value
@@ -1452,21 +1452,21 @@ subroutine peintp(crow, nint, proc, length, ierr)
   !---  Routine body
 
   if (crow .eq. 1) then
-     k = double_from_table(tabname, 'x ', 1, tw1(11))
-     k = double_from_table(tabname, 'px ', 1, tw1(12))
-     k = double_from_table(tabname, 'betx ', 1, tw1(1))
-     k = double_from_table(tabname, 'alfx ', 1, tw1(2))
-     k = double_from_table(tabname, 'mux ', 1, tw1(3))
-     k = double_from_table(tabname, 'dx ', 1, tw1(4))
-     k = double_from_table(tabname, 'dpx ', 1, tw1(5))
-     k = double_from_table(tabname, 'y ', 1, tw1(13))
-     k = double_from_table(tabname, 'py ', 1, tw1(14))
-     k = double_from_table(tabname, 'bety ', 1, tw1(6))
-     k = double_from_table(tabname, 'alfy ', 1, tw1(7))
-     k = double_from_table(tabname, 'muy ', 1, tw1(8))
-     k = double_from_table(tabname, 'dy ', 1, tw1(9))
-     k = double_from_table(tabname, 'dpy ', 1, tw1(10))
-     k = double_from_table(tabname, 's ', 1, s_incr)
+     k = double_from_table_row(tabname, 'x ', 1, tw1(11))
+     k = double_from_table_row(tabname, 'px ', 1, tw1(12))
+     k = double_from_table_row(tabname, 'betx ', 1, tw1(1))
+     k = double_from_table_row(tabname, 'alfx ', 1, tw1(2))
+     k = double_from_table_row(tabname, 'mux ', 1, tw1(3))
+     k = double_from_table_row(tabname, 'dx ', 1, tw1(4))
+     k = double_from_table_row(tabname, 'dpx ', 1, tw1(5))
+     k = double_from_table_row(tabname, 'y ', 1, tw1(13))
+     k = double_from_table_row(tabname, 'py ', 1, tw1(14))
+     k = double_from_table_row(tabname, 'bety ', 1, tw1(6))
+     k = double_from_table_row(tabname, 'alfy ', 1, tw1(7))
+     k = double_from_table_row(tabname, 'muy ', 1, tw1(8))
+     k = double_from_table_row(tabname, 'dy ', 1, tw1(9))
+     k = double_from_table_row(tabname, 'dpy ', 1, tw1(10))
+     k = double_from_table_row(tabname, 's ', 1, s_incr)
      s = 0.0
      ex = get_value('beam ','ex ')
      ey = get_value('beam ','ey ')
@@ -1514,7 +1514,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
      goto 999
   endif
   if (length .eq. zero)  goto 999
-  k = double_from_table(tabname, horname, crow - 1, s_elem)
+  k = double_from_table_row(tabname, horname, crow - 1, s_elem)
 
   !---  set flag for correct interpolation
 
@@ -1524,35 +1524,35 @@ subroutine peintp(crow, nint, proc, length, ierr)
   k = interpolate_node(nint)
   k = embedded_twiss()
   do i = 1, nint
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'x ', i, tw1(11))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'px ', i, tw1(12))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'betx ', i, tw1(1))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'alfx ', i, tw1(2))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'mux ', i, tw1(3))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'dx ', i, tw1(4))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'dpx ', i, tw1(5))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'y ', i, tw1(13))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'py ', i, tw1(14))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'bety ', i, tw1(6))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'alfy ', i, tw1(7))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'muy ', i, tw1(8))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'dy ', i, tw1(9))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           'dpy ', i, tw1(10))
-     k = double_from_table('embedded_twiss_table ',                  &
+     k = double_from_table_row('embedded_twiss_table ',                  &
           's ', i, s_incr)
      s = s_elem + s_incr
      ex = get_value('beam ','ex ')
@@ -1772,7 +1772,7 @@ subroutine peplot
   !--- definitions of function primitives
 
   double precision plot_option
-  integer double_from_table
+  integer double_from_table_row
 
 
   !--- Initialisation of local variables
@@ -1811,7 +1811,7 @@ subroutine peplot
   deltap=zero
   if(.not.ptc_flag) then
      if(tabname.eq."summ") then
-        k = double_from_table('summ ','deltap ',1,deltap)
+        k = double_from_table_row('summ ','deltap ',1,deltap)
      else
         call headvalue(tabname,'deltap ', deltap)
         if(deltap.eq.1d+12) then

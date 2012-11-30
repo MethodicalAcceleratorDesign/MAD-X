@@ -205,7 +205,7 @@ contains
                      &        " for fibre no ",n
              endif
 
-             call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+             call double_to_table_curr(pushes(i)%tabname, pushes(i)%colname, coeff);
           endif
 
           if ( pblockson .and. (pushes(i)%index > 0) ) then
@@ -267,7 +267,7 @@ contains
                     &        " for fibre no ",n
             endif
 
-            call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+            call double_to_table_curr(pushes(i)%tabname, pushes(i)%colname, coeff);
          endif
 
          if ( pblockson .and. (pushes(i)%index > 0) ) then
@@ -309,7 +309,7 @@ contains
           if ( (pushes(i)%pushtab) .and. (pushes(i)%index > 0) ) then
              t => results(e,pushes(i)%index)
              coeff = gettaylorvalue(t)
-             call double_to_table(pushes(i)%tabname, pushes(i)%colname, coeff);
+             call double_to_table_curr(pushes(i)%tabname, pushes(i)%colname, coeff);
           endif
        enddo
 
@@ -324,6 +324,7 @@ contains
     implicit none
     integer              :: i,ii !iterator
     integer              :: nelems !iterator
+    integer, parameter   :: n = 6 !counts
     integer, parameter   :: fillntwisses  = disp4 - beta11 + 1
     integer, parameter   :: ntwissesde = gama33 - beta11 + 1
     real(kind(1d0))      :: opt_fun(fundim)
@@ -356,8 +357,8 @@ contains
           opt_fun(ii) = opt_fun(ii)*deltaes(i)
        enddo
 
-       call vector_to_table(twisstablename, 'beta11 ', fillntwisses, opt_fun(beta11))
-       call vector_to_table(twisstablename, 'x ', 6, opt_fun(kn_x))
+       call vector_to_table_curr(twisstablename, 'beta11 ', opt_fun(beta11), fillntwisses)
+       call vector_to_table_curr(twisstablename, 'x ', opt_fun(kn_x), n)
 
        call augmentcountonly(twisstablename)
 
@@ -425,7 +426,7 @@ contains
        if (getdebug()>2) then
            print *,"Putting name in ",tables(i)
        end if
-       call string_to_table(tables(i),"name ",name)
+       call string_to_table_curr(tables(i),"name ",name)
     enddo
 
   end subroutine setnameintbles
@@ -440,7 +441,7 @@ contains
        end if
        !puts automatically name of the current element
        !does not work for ptc_normal
-       call string_to_table(tables(i),"name ","name ")
+       call string_to_table_curr(tables(i),"name ","name ")
     enddo
 
   end subroutine putnameintables

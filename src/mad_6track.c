@@ -661,8 +661,8 @@ att_beambeam(struct c6t_element* el)
 {
 
   double beamx=zero,beamy=zero;
-  if (double_from_table("twiss","x",&(el->twtab_row),&beamx) != 0 ||
-      double_from_table("twiss","y",&(el->twtab_row),&beamy) != 0)
+  if (double_from_table_row("twiss","x",&(el->twtab_row),&beamx) != 0 ||
+      double_from_table_row("twiss","y",&(el->twtab_row),&beamy) != 0)
   {
     warning("c6t: beambeam element not found in twiss table","");
   }
@@ -2925,15 +2925,15 @@ write_f34_special(void)
         {
           strcpy(t_name, current_element->name);
           if ((cp = strchr(t_name, '+')) != NULL) *cp = '\0';
-          if ((err=double_from_table("twiss","s",&(current_element->twtab_row),&spos)))
+          if ((err=double_from_table_row("twiss","s",&(current_element->twtab_row),&spos)))
             printf ("Not found double_from table = %i\n",err);
-          if ((err=double_from_table("twiss","betx",&(current_element->twtab_row),&betx)))
+          if ((err=double_from_table_row("twiss","betx",&(current_element->twtab_row),&betx)))
             printf ("Not found double_from table = %i\n",err);
-          if ((err=double_from_table("twiss","bety",&(current_element->twtab_row),&bety)))
+          if ((err=double_from_table_row("twiss","bety",&(current_element->twtab_row),&bety)))
             printf ("Not found double_from table = %i\n",err);
-          if ((err=double_from_table("twiss","mux",&(current_element->twtab_row),&mux)))
+          if ((err=double_from_table_row("twiss","mux",&(current_element->twtab_row),&mux)))
             printf ("Not found double_from table = %i\n",err);
-          if ((err=double_from_table("twiss","muy",&(current_element->twtab_row),&muy)))
+          if ((err=double_from_table_row("twiss","muy",&(current_element->twtab_row),&muy)))
             printf ("Not found double_from table = %i\n",err);
           fprintf(f34,
                   " %20.13e  %-16s %3d %20.13e %20.13e %20.13e %20.13e %20.13e\n",
@@ -2945,15 +2945,15 @@ write_f34_special(void)
   }
   if (last_in_sequ_org->twtab_row > 0)
   {
-    if ((err=double_from_table("twiss","s",&(last_in_sequ_org->twtab_row),&spos)))
+    if ((err=double_from_table_row("twiss","s",&(last_in_sequ_org->twtab_row),&spos)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","betx",&(last_in_sequ_org->twtab_row),&betx)))
+    if ((err=double_from_table_row("twiss","betx",&(last_in_sequ_org->twtab_row),&betx)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","bety",&(last_in_sequ_org->twtab_row),&bety)))
+    if ((err=double_from_table_row("twiss","bety",&(last_in_sequ_org->twtab_row),&bety)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","mux",&(last_in_sequ_org->twtab_row),&mux)))
+    if ((err=double_from_table_row("twiss","mux",&(last_in_sequ_org->twtab_row),&mux)))
       printf ("Not found double_from table = %i\n",err);
-    if ((err=double_from_table("twiss","muy",&(last_in_sequ_org->twtab_row),&muy)))
+    if ((err=double_from_table_row("twiss","muy",&(last_in_sequ_org->twtab_row),&muy)))
       printf ("Not found double_from table = %i\n",err);
   }
   fprintf(f34,
@@ -2998,17 +2998,17 @@ write_f3aux(void)
   double aux_val[4] = {-1.e20, -1.e20, -1.e20, -1.e20};
   double tw_alfa;
   int row=1;
-  if ((double_from_table("summ","q1", &row, &(aux_val[0])) !=0) ||
-      (double_from_table("summ","q2",  &row, &(aux_val[1])) !=0) ||
-      (double_from_table("summ","dq1", &row, &(aux_val[2])) !=0) ||
-      (double_from_table("summ","dq2", &row, &(aux_val[3])) !=0))
+  if ((double_from_table_row("summ","q1", &row, &(aux_val[0])) !=0) ||
+      (double_from_table_row("summ","q2",  &row, &(aux_val[1])) !=0) ||
+      (double_from_table_row("summ","dq1", &row, &(aux_val[2])) !=0) ||
+      (double_from_table_row("summ","dq2", &row, &(aux_val[3])) !=0))
   {
     printf("c6t error: tunes or chromaticities not found!\n");
   }
   if (current_beam != NULL)
   {
     if (f3aux_cnt++ == 0)     f3aux  = fopen("fc.3.aux", "w");
-    if (double_from_table("summ","alfa", &row, &tw_alfa) !=0)
+    if (double_from_table_row("summ","alfa", &row, &tw_alfa) !=0)
       printf("c6t warning: alfa not found in twiss\n");
     fprintf(f3aux, "SYNC\n");
     fprintf(f3aux,"%12.0f%10.6f%10.3f 0.  %12.6f%12.6f  1\n",

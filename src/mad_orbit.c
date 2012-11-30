@@ -370,9 +370,9 @@ correct_setcorr(struct in_cmd* cmd)
 
   i = 1; ix=0;
   while(ix == 0) {
-      ix =   str_from_table(namtab, "name", &i, name);
-      ix = double_from_table(namtab, "px.correction", &i, &xnew);
-      ix = double_from_table(namtab, "py.correction", &i, &ynew);
+      ix = string_from_table_row(namtab, "name", &i, name);
+      ix = double_from_table_row(namtab, "px.correction", &i, &xnew);
+      ix = double_from_table_row(namtab, "py.correction", &i, &ynew);
       if(ix == 0) {
              stolower(name);
              strcpy(slname,strip(name));
@@ -457,9 +457,9 @@ correct_readcorr(struct in_cmd* cmd)
   (void)cmd;
   i = 1; ix=0;
   while(ix == 0) {
-      ix =   str_from_table("corr", "name", &i, name);
-      ix = double_from_table("corr", "px.correction", &i, &xnew);
-      ix = double_from_table("corr", "py.correction", &i, &ynew);
+      ix = string_from_table_row("corr", "name", &i, name);
+      ix = double_from_table_row("corr", "px.correction", &i, &xnew);
+      ix = double_from_table_row("corr", "py.correction", &i, &ynew);
       if(ix == 0) {
           /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */   
           nextnode = mysequ->ex_start;
@@ -594,10 +594,10 @@ correct_correct2(struct in_cmd* cmd)
      if((nnnseq = get_variable("n")) == 0) {
          nnnseq = twism;
      }
-     double_from_table("summ", "xcomax",&j,&tmp1); // err = not used
-     double_from_table("summ", "xcorms",&j,&tmp2); // err = not used
-     double_from_table("summ", "ycomax",&j,&tmp3); // err = not used
-     double_from_table("summ", "ycorms",&j,&tmp4); // err = not used
+     double_from_table_row("summ", "xcomax",&j,&tmp1); // err = not used
+     double_from_table_row("summ", "xcorms",&j,&tmp2); // err = not used
+     double_from_table_row("summ", "ycomax",&j,&tmp3); // err = not used
+     double_from_table_row("summ", "ycorms",&j,&tmp4); // err = not used
      fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
      return;
   }
@@ -1562,10 +1562,10 @@ correct_correct1(struct in_cmd* cmd)
      if((nnnseq = get_variable("n")) == 0) {
          nnnseq = twism;
      }
-     double_from_table("summ", "xcomax",&j,&tmp1); // err = not used
-     double_from_table("summ", "xcorms",&j,&tmp2); // err = not used
-     double_from_table("summ", "ycomax",&j,&tmp3); // err = not used
-     double_from_table("summ", "ycorms",&j,&tmp4); // err = not used
+     double_from_table_row("summ", "xcomax",&j,&tmp1); // err = not used
+     double_from_table_row("summ", "xcorms",&j,&tmp2); // err = not used
+     double_from_table_row("summ", "ycomax",&j,&tmp3); // err = not used
+     double_from_table_row("summ", "ycorms",&j,&tmp4); // err = not used
      fprintf(ftdata," T: %d %e %e %e %e\n",nnnseq,tmp1,tmp2,tmp3,tmp4);
      return;
   }
@@ -2320,7 +2320,7 @@ pro_correct_getorbit_ext(struct in_cmd* cmd)
   if (get_option("debug")) {
     printf("Number in table: %d\n",ttb->curr);
     for (j=1; j < (ttb->curr)+1; j++) {
-      i = str_from_tablet(ttb, "name", &j, name);
+      i = string_from_table_row(ttb->name, "name", &j, name);
     }
   }
 
@@ -2341,7 +2341,7 @@ pro_correct_getorbit_ext(struct in_cmd* cmd)
     yok = 0;
 
     for (j=1; j < (ttb->curr)+1; j++) {
-      i = str_from_tablet(ttb, "name", &j, name);
+      i = string_from_table_row(ttb->name, "name", &j, name);
       strcpy(l3name,name);
       stolower(l3name);
       strcpy(l4name,strip(l3name));
@@ -2789,7 +2789,7 @@ pro_correct_make_corr_table(void)
     if((strncmp(atc[0],ttb->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atc[1],ttb->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atc[2],ttb->p_nodes[j]->base_name,4) == 0))  {
-      string_to_table("corr","name",ttb->p_nodes[j]->name);
+      string_to_table_curr("corr","name",ttb->p_nodes[j]->name);
       augment_count("corr");
     }
   }
@@ -2811,12 +2811,12 @@ pro_correct2_make_corr_table(void)
        (strncmp(atc[1],ttb->p_node->base_name,4) == 0) ||
        (strncmp(atc[2],ttb->p_node->base_name,4) == 0))  {
        if(ttb->id_ttb[0] > 0) {
-         string_to_table("corr1","name",ttb->p_node->name);
+         string_to_table_curr("corr1","name",ttb->p_node->name);
          augment_count("corr1");
        }
 
        if(ttb->id_ttb[1] > 0) {
-         string_to_table("corr2","name",ttb->p_node->name);
+         string_to_table_curr("corr2","name",ttb->p_node->name);
          augment_count("corr2");
        }
     }
@@ -2840,7 +2840,7 @@ pro_correct_make_mon_table(void)
     if((strncmp(atm[0],ttb->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atm[1],ttb->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atm[2],ttb->p_nodes[j]->base_name,4) == 0))  {
-      string_to_table("mon","name",ttb->p_nodes[j]->name);
+      string_to_table_curr("mon","name",ttb->p_nodes[j]->name);
       augment_count("mon");
     }
   }
@@ -2860,7 +2860,7 @@ pro_correct2_make_mon_table(void)
     if((strncmp(atm[0],ttb->p_node->base_name,4) == 0) ||
        (strncmp(atm[1],ttb->p_node->base_name,4) == 0) ||
        (strncmp(atm[2],ttb->p_node->base_name,4) == 0))  {
-      string_to_table("mon","name",ttb->p_node->name);
+      string_to_table_curr("mon","name",ttb->p_node->name);
       augment_count("mon");
     }
     ttb = ttb->next;

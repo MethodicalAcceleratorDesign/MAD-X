@@ -6,7 +6,7 @@ subroutine cavtouschek (um,uloss,iflag)
   implicit none
 
   integer i,lg,code,get_string,restart_sequ,advance_node,           &
-       double_from_table,flag,iflag
+       double_from_table_row,flag,iflag
   double precision get_value,node_value,el,rfv,rff,rfl,             &
        um,harmonl,get_variable,pi,                                       &
        phirf, c0, vrf, pc, omega, orbit5,                                &
@@ -27,7 +27,7 @@ subroutine cavtouschek (um,uloss,iflag)
   umt = 0.d0
   iflag = 0
 
-  flag = double_from_table('summ ','synch_2 ',1 ,synch_2)
+  flag = double_from_table_row('summ ','synch_2 ',1,synch_2)
   if (synch_2 .eq. 0) then
      iflag = 1
      uloss = 0d0
@@ -61,7 +61,7 @@ subroutine cavtouschek (um,uloss,iflag)
      omega = rff * ten6p * twopi / clight
      vrf   = rfv * ten3m / (pc * (one + deltap))
 
-     flag = double_from_table('twiss ','t ',1,orbit5)
+     flag = double_from_table_row('twiss ','t ',1,orbit5)
      phirf = rfl * twopi - omega * orbit5
      c0 =   vrf*charge
      if (cos(phirf).lt.0) vrf=-vrf
@@ -108,8 +108,8 @@ subroutine touschek
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer i,j,flag,range(2),n,get_option,double_from_table,lp,      &
-       restart_sequ,char_from_table,advance_to_pos,get_string,iflag
+  integer i,j,flag,range(2),n,get_option,double_from_table_row,lp,      &
+       restart_sequ,string_from_table_row,advance_to_pos,get_string,iflag
   double precision get_value,get_variable,                          &
        ccost,rr,bx,by,ax,ay,dx,dpx,dy,dpy,pi,                            &
        sigx2,sigy2,ddx2,ddy2,disigh2,sigh2,fact,                         &
@@ -193,23 +193,23 @@ subroutine touschek
   !
   call table_range('twiss ', '#s/#e ', range)
   !      print *, 'Range for Table ', range(1), range(2)
-  flag = double_from_table('twiss ', 's ', range(1), s1)
+  flag = double_from_table_row('twiss ', 's ', range(1), s1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'betx ', range(1), bx1)
+  flag = double_from_table_row('twiss ', 'betx ', range(1), bx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'bety ', range(1), by1)
+  flag = double_from_table_row('twiss ', 'bety ', range(1), by1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'alfx ', range(1), ax1)
+  flag = double_from_table_row('twiss ', 'alfx ', range(1), ax1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'alfy ', range(1), ay1)
+  flag = double_from_table_row('twiss ', 'alfy ', range(1), ay1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dx ', range(1), dx1)
+  flag = double_from_table_row('twiss ', 'dx ', range(1), dx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dpx ', range(1), dpx1)
+  flag = double_from_table_row('twiss ', 'dpx ', range(1), dpx1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dy ', range(1), dy1)
+  flag = double_from_table_row('twiss ', 'dy ', range(1), dy1)
   if (flag .ne. 0)  goto 102
-  flag = double_from_table('twiss ', 'dpy ', range(1), dpy1)
+  flag = double_from_table_row('twiss ', 'dpy ', range(1), dpy1)
   if (flag .ne. 0)  goto 102
 
   ! ********** Start Do loop ***************
@@ -217,24 +217,24 @@ subroutine touschek
   j = restart_sequ()
   do i = range(1)+1, range(2)
      j = advance_to_pos('twiss ', i)
-     flag = char_from_table('twiss ', 'name ', i, name)
-     flag = double_from_table('twiss ', 's ', i, s2)
+     flag = string_from_table_row('twiss ', 'name ', i, name)
+     flag = double_from_table_row('twiss ', 's ', i, s2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'betx ', i, bx2)
+     flag = double_from_table_row('twiss ', 'betx ', i, bx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'bety ', i, by2)
+     flag = double_from_table_row('twiss ', 'bety ', i, by2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'alfx ', i, ax2)
+     flag = double_from_table_row('twiss ', 'alfx ', i, ax2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'alfy ', i, ay2)
+     flag = double_from_table_row('twiss ', 'alfy ', i, ay2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dx ', i, dx2)
+     flag = double_from_table_row('twiss ', 'dx ', i, dx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dpx ', i, dpx2)
+     flag = double_from_table_row('twiss ', 'dpx ', i, dpx2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dy ', i, dy2)
+     flag = double_from_table_row('twiss ', 'dy ', i, dy2)
      if (flag .ne. 0)  goto 102
-     flag = double_from_table('twiss ', 'dpy ', i, dpy2)
+     flag = double_from_table_row('twiss ', 'dpy ', i, dpy2)
      if (flag .ne. 0)  goto 102
 
      dels = s2-s1
@@ -293,11 +293,11 @@ subroutine touschek
      ! *************** Fill "touschek_table"  *********************
 
      if(n.ne.0) then
-        call string_to_table('touschek ', 'name ', name )
-        call double_to_table('touschek ','s ', sdum)
-        call double_to_table('touschek ','tli ', litousch)
-        call double_to_table('touschek ','tliw ', litouschw)
-        call double_to_table('touschek ','tlitot ', tlitouschek)
+        call string_to_table_curr('touschek ', 'name ', name )
+        call double_to_table_curr('touschek ','s ', sdum)
+        call double_to_table_curr('touschek ','tli ', litousch)
+        call double_to_table_curr('touschek ','tliw ', litouschw)
+        call double_to_table_curr('touschek ','tlitot ', tlitouschek)
         call augment_count('touschek ')
      endif
 

@@ -214,16 +214,16 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
        normal(0:maxmul),globaltilt,tmp, surv_vect(7)
 
   el = node_value('l ')
-  call string_to_table('survey ', 'name ', 'name ')
-  call double_to_table('survey ', 's ',suml )
-  call double_to_table('survey ', 'l ',el )
-  call double_to_table('survey ', 'x ',v(1) )
-  call double_to_table('survey ', 'y ',v(2) )
-  call double_to_table('survey ', 'z ',v(3) )
-  call double_to_table('survey ', 'theta ',theta)
-  call double_to_table('survey ', 'phi ',phi)
-  call double_to_table('survey ', 'psi ',psi)
-  call double_to_table('survey ', 'globaltilt ',globaltilt)
+  call string_to_table_curr('survey ', 'name ', 'name ')
+  call double_to_table_curr('survey ', 's ',suml )
+  call double_to_table_curr('survey ', 'l ',el )
+  call double_to_table_curr('survey ', 'x ',v(1) )
+  call double_to_table_curr('survey ', 'y ',v(2) )
+  call double_to_table_curr('survey ', 'z ',v(3) )
+  call double_to_table_curr('survey ', 'theta ',theta)
+  call double_to_table_curr('survey ', 'phi ',phi)
+  call double_to_table_curr('survey ', 'psi ',psi)
+  call double_to_table_curr('survey ', 'globaltilt ',globaltilt)
   i = node_value('pass_flag ')
   if (i .eq. 0) then
      surv_vect(1) = v(1)
@@ -253,24 +253,24 @@ subroutine sufill(suml,v, theta, phi, psi,globaltilt)
   else
      ang = 0d0
   endif
-  call double_to_table('survey ', 'angle ',ang)
+  call double_to_table_curr('survey ', 'angle ',ang)
 
   !---------------- --------------------------
   !     copy over the attributes 'mech_sep' and 'assembly_id'
   !     FT 06.06.2008
 
   tmp = node_value('slot_id ')
-  call double_to_table('survey ', 'slot_id ',tmp)
+  call double_to_table_curr('survey ', 'slot_id ',tmp)
 
   tmp = node_value('assembly_id ')
-  call double_to_table('survey ', 'assembly_id ',tmp)
+  call double_to_table_curr('survey ', 'assembly_id ',tmp)
 
   tmp = node_value('mech_sep ')
-  call double_to_table('survey ', 'mech_sep ',tmp)
+  call double_to_table_curr('survey ', 'mech_sep ',tmp)
 
   !== jln dealt with the new property v_pos as for mech_sep
   tmp = node_value('v_pos ')
-  call double_to_table('survey ', 'v_pos ',tmp)
+  call double_to_table_curr('survey ', 'v_pos ',tmp)
   !==
 
   call augment_count('survey ')

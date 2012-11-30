@@ -396,25 +396,25 @@ contains
     !"number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
 
     doublenum = npart
-    call double_to_table(table, 'number ' , doublenum)
+    call double_to_table_curr(table, 'number ' , doublenum)
     doublenum = turn
-    call double_to_table(table, 'turn ' , doublenum)
+    call double_to_table_curr(table, 'turn ' , doublenum)
     doublenum = x(1)
-    call double_to_table(table, 'x ' , doublenum)
+    call double_to_table_curr(table, 'x ' , doublenum)
     doublenum = x(2)
-    call double_to_table(table, 'px ' , doublenum)
+    call double_to_table_curr(table, 'px ' , doublenum)
     doublenum = x(3)
-    call double_to_table(table, 'y ' , doublenum)
+    call double_to_table_curr(table, 'y ' , doublenum)
     doublenum = x(4)
-    call double_to_table(table, 'py ' , doublenum)
+    call double_to_table_curr(table, 'py ' , doublenum)
     doublenum = -x(6)
-    call double_to_table(table, 't ' , doublenum)
+    call double_to_table_curr(table, 't ' , doublenum)
     doublenum = x(5)
-    call double_to_table(table, 'pt ' , doublenum)
+    call double_to_table_curr(table, 'pt ' , doublenum)
     doublenum = spos
-    call double_to_table(table, 's ' , doublenum)
+    call double_to_table_curr(table, 's ' , doublenum)
     doublenum = e
-    call double_to_table(table, 'e ' , doublenum)
+    call double_to_table_curr(table, 'e ' , doublenum)
 
     call augment_count(table)
     
@@ -457,35 +457,35 @@ contains
     tt = turn
 
     doublenum = nobs
-    call double_to_table(table, 'number ' , doublenum)
+    call double_to_table_curr(table, 'number ' , doublenum)
 
     doublenum = npart
-    call double_to_table(table, 'number ' , doublenum)
+    call double_to_table_curr(table, 'number ' , doublenum)
 
-    call double_to_table(table, 'turn ', tt)
+    call double_to_table_curr(table, 'turn ', tt)
     doublenum = x
-    call double_to_table(table, 'x ' , doublenum)
+    call double_to_table_curr(table, 'x ' , doublenum)
 
     doublenum = px
-    call double_to_table(table, 'px ', doublenum)
+    call double_to_table_curr(table, 'px ', doublenum)
 
     doublenum = y
-    call double_to_table(table, 'y ' , doublenum)
+    call double_to_table_curr(table, 'y ' , doublenum)
 
     doublenum = py
-    call double_to_table(table, 'py ', doublenum)
+    call double_to_table_curr(table, 'py ', doublenum)
 
     doublenum = -t
-    call double_to_table(table, 't ' , doublenum)
+    call double_to_table_curr(table, 't ' , doublenum)
 
     doublenum = pt
-    call double_to_table(table, 'pt ', doublenum)
+    call double_to_table_curr(table, 'pt ', doublenum)
 
     doublenum = spos
-    call double_to_table(table, 's ' , doublenum)
+    call double_to_table_curr(table, 's ' , doublenum)
 
     doublenum = e
-    call double_to_table(table, 'e ' , doublenum)
+    call double_to_table_curr(table, 'e ' , doublenum)
     call augment_count(table)
 
   end subroutine putintracktable
