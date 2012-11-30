@@ -906,14 +906,11 @@ static void
 aper_header(struct table* aper_t, struct aper_node *lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
-  int i, nint=1, h_length = 25;
-  double dtmp, vtmp[4], deltap_twiss, n1min;
+  int i, h_length = 25; // not used, nint=1;
+  double dtmp, vtmp[4]; // not used, deltap_twiss;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
-  double n1 = lim->n1;
-  double s  = lim->s;
   strncpy(name, lim->name, sizeof name);
-//  printf("\nWRITE HEADER : APERTURE LIMIT ***** : %0p, %0p, %s, n1: %g, at: %g\n",aper_t,name,n1,s);
 
   /* =================================================================*/
   /* ATTENTION: if you add header lines, augment h_length accordingly */
@@ -1020,14 +1017,9 @@ aper_header(struct table* aper_t, struct aper_node *lim)
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-//  printf("\n\nWRITE HEADER : APERTURE LIMIT: %s, n1: %g, at: %g\n\n",name,n1,s);
-//  printf("\ncurr %d \n",aper_t->header->curr);
-
-
-  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), n1);
+  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim->n1);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  n1min = n1;
-  set_value("beam","n1min",&n1min);
+  set_value("beam","n1min",&lim->n1);
 
   sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""), strlen(name), stoupper(name) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);

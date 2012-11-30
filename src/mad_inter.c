@@ -155,10 +155,10 @@ reset_interpolation(int *nint)
   struct node *c_node, *second_node;
   struct command_parameter* cp;
   int i, j, rbend_flag, bend_flag = 0;
-  double angle=0,e1,e2,numint, h1, h2, fint, hgap, bvk;
+  double e1, e2, h1, h2, fint, hgap; // not used, angle=0, numint, bvk;
 
   // Deletes the interpolating nodes expanded by the routine interp_node
-  numint = *nint;
+  // numint = *nint;
 
   // reset first and last node in the sequence range
   current_sequ->range_start = current_sequ->ex_start;
@@ -230,7 +230,7 @@ reset_interpolation(int *nint)
 
   // Updates the values of e1 and e2 and stores them in first node
   //  bv = node_value("dipole_bv");
-  bvk = node_value("other_bv");
+  // bvk = node_value("other_bv");
 
   if (bend_flag) {
     if (rbend_flag) {
