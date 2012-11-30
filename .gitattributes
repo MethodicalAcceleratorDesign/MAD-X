@@ -603,6 +603,9 @@ tests/test-aperture/offset.tfs -text
 tests/test-aperture/test-aperture.cfg -text
 tests/test-aperture/test-aperture.madx -text
 tests/test-aperture/test-aperture.ref -text
+tests/test-emit/ALBA-25.4th.madx -text
+tests/test-emit/test-emit.madx -text
+tests/test-emit/test-emit.ref -text
 tests/test-ibs/ibs_output.tfs.cfg -text
 tests/test-ibs/ibs_output.tfs.ref -text
 tests/test-ibs/test-ibs.cfg -text

@@ -1,0 +1,16 @@
+beam, SEQUENCE=Machine ,PARTICLE=electron, energy=3, RADIATE=True;
+option, RBARC=FALSE;
+call, file= "ALBA-25.4th.madx";
+
+
+! Put the RF cavity
+RFC: RFCAVITY, L=0.5, VOLT=3.6, LAG=0.480,HARMON=448;
+L_IDRF : DRIFT, L=L_ID->L-RFC->L;
+L_ID   : LINE =(RFC, L_IDRF);
+
+
+use, period=Machine;
+twiss;
+EMIT,DELTAP=0.0 ;
+
+
