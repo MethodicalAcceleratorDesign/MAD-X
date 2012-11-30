@@ -34,6 +34,7 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 test-makethin \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7 \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 \
+test-emit \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 \
 test-aperture \
@@ -65,6 +66,7 @@ test-ptc-twiss-2
 
 # testsuite titles (attached to first test of the suite)
 test-aperture:     TESTSUITE := Aperture testsuite
+test-emit:         TESTSUITE := Emit testsuite
 test-ibs:          TESTSUITE := IBS testsuite
 test-jacobian:     TESTSUITE := Jacobian testsuite
 test-makethin:     TESTSUITE := Makethin testsuite
@@ -75,6 +77,8 @@ test-ptc-trackline: TESTSUITE := PTC Trackline testsuite
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
 test-track:        TESTSUITE := Track testsuite
 test-twiss:        TESTSUITE := Twiss testsuite
+
+
 
 # end of testsuite
 #################################################
