@@ -1,7 +1,7 @@
 ! Simple tracking test of tracking with a matrix.
 ! tstTrack_matrix.madx
 
-option,-echo,-info,-warn;
+option,-echo,-info,warn;
 
 ! **********  Elements (FODO cell for simple tracking test) 
 corh:  hkicker,    kick= 0.000;

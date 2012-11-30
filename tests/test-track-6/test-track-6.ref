@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.00.18  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 13.11.12 18.39.04 +
+  + Execution Time Stamp: 30.11.12 16.09.51 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test of tracking with a matrix.
 
@@ -11,7 +11,7 @@
 
 
 
-option,-echo,-info,-warn;
+option,-echo,-info,warn;
 
 enter Twiss module
   
@@ -75,6 +75,8 @@ one pass is on
 *****  end of trrun  *****
 exit TRACK module
 
+++++++ warning: illegal expression set to 0 in: method = "TRACK" 
+++++++ warning: illegal expression set to 0 in: method = "TRACK" 
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
@@ -99,6 +101,7 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+++++++ warning: illegal expression set to 0 in: method = "TWISS" 
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
@@ -123,9 +126,11 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+++++++ warning: illegal expression set to 0 in: method = "TWISS" 
 
-  Number of warnings: 0
+  Number of warnings: 4
+4 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.00.18 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
