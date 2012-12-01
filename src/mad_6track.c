@@ -1505,24 +1505,24 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem = new_c6t_element(14,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
- 
+
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
     c6t_elem->value[6] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[2] = el_par_value_recurse("freq",p->p_elem);
     // normal components
-    c6t_elem->value[3] = maxkn>=1?(-kn_param->double_array->a[1]/1.0):0.0;
-    c6t_elem->value[4] = maxkn>=2?(-kn_param->double_array->a[2]/2.0):0.0;
-    c6t_elem->value[5] = maxkn>=3?(-kn_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[1] = maxpn>=1?(pn_param->double_array->a[1]*2*M_PI):0.0;
-    c6t_elem->value[7] = maxpn>=2?(pn_param->double_array->a[2]*2*M_PI):0.0;
-    c6t_elem->value[8] = maxpn>=3?(pn_param->double_array->a[3]*2*M_PI):0.0;
+    c6t_elem->value[3] = maxkn>1?(-kn_param->double_array->a[1]/1.0):0.0;
+    c6t_elem->value[4] = maxkn>2?(-kn_param->double_array->a[2]/2.0):0.0;
+    c6t_elem->value[5] = maxkn>3?(-kn_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[1] = maxpn>1?(pn_param->double_array->a[1]*2*M_PI):0.0;
+    c6t_elem->value[7] = maxpn>2?(pn_param->double_array->a[2]*2*M_PI):0.0;
+    c6t_elem->value[8] = maxpn>3?(pn_param->double_array->a[3]*2*M_PI):0.0;
     // skew component
-    c6t_elem->value[9]  = maxks>=1?(-ks_param->double_array->a[1]/1.0):0.0;
-    c6t_elem->value[10] = maxks>=2?(-ks_param->double_array->a[2]/2.0):0.0;
-    c6t_elem->value[11] = maxks>=3?(-ks_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[12] = maxps>=1?(ps_param->double_array->a[1]*2*M_PI):0.0;
-    c6t_elem->value[13] = maxps>=2?(ps_param->double_array->a[2]*2*M_PI):0.0;
-    c6t_elem->value[14] = maxps>=3?(ps_param->double_array->a[3]*2*M_PI):0.0;
+    c6t_elem->value[9]  = maxks>1?(-ks_param->double_array->a[1]/1.0):0.0;
+    c6t_elem->value[10] = maxks>2?(-ks_param->double_array->a[2]/2.0):0.0;
+    c6t_elem->value[11] = maxks>3?(-ks_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[12] = maxps>1?(ps_param->double_array->a[1]*2*M_PI):0.0;
+    c6t_elem->value[13] = maxps>2?(ps_param->double_array->a[2]*2*M_PI):0.0;
+    c6t_elem->value[14] = maxps>3?(ps_param->double_array->a[3]*2*M_PI):0.0;
   }
   else
   {
