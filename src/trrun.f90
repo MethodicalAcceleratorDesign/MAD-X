@@ -38,7 +38,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
        node_value,one,                                                   &
        get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
-       zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap
+       zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap,thick
   parameter(zero=0d0,one=1d0)
   character(12) tol_a, char_a
   !hbu
@@ -185,7 +185,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         l_buf(nlm+1) = el
         !hbu get current node name
         call element_name(el_name,len(el_name))
-        if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
+        !al: thick quadrupole is allowed
+        thick = node_value('thick ');
+        if ((code .ne. 1 .and. code .ne. 4 .and. code .ne. 5) .and. (el .ne. zero .and. thick .ne. zero)) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            sum = node_value('name ')
@@ -608,7 +610,9 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   call tttrak(ek,re,track,ktrack)
   go to 500
   !---- Quadrupole. OBSOLETE, to be kept for go to
+  !---- AL: not so fast, if here it's a thick quadrupole
 50 continue
+  call tttquad(track,ktrack)
   go to 500
   !---- Sextupole. OBSOLETE, to be kept for go to
 60 continue
@@ -3086,7 +3090,7 @@ subroutine trclor(orbit0)
 
   integer i,k, irank
 
-  double precision cotol, err
+  double precision cotol, err, thick
 
   print *," "
   !      print *," AK special version 2007/12/13"
@@ -3185,9 +3189,10 @@ subroutine trclor(orbit0)
      if(code.eq.39) code=15
      if(code.eq.38) code=24
      el      = node_value('l ')
-
+     !al: thick quadrupole is allowed
+     thick = node_value('thick ');
      if (itra .eq. 1)  then
-        if ((code .ne. 1 .and. code .ne. 4) .and. el .ne. zero) then
+        if ((code .ne. 1 .and. code .ne. 4 .and. code .ne. 5) .and. (el .ne. zero .and. thick .ne. zero)) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            print*," "
@@ -3366,6 +3371,9 @@ subroutine ttrfmult(track, ktrack, turn)
   use trackfi
   implicit none
 
+  !--------------------*
+  ! Andrea Latina 2012 *
+  !--------------------*
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !    Track particle through a general thin rf-multipole.               *
@@ -3501,3 +3509,140 @@ subroutine ttrfmult(track, ktrack, turn)
   enddo   
 
 end subroutine ttrfmult
+
+subroutine tttquad(track, ktrack)
+  
+  use twtrrfi
+  use trackfi
+  implicit none
+  
+  !--------------------*
+  ! Andrea Latina 2012 *
+  !--------------------*
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !    Track particle through a general thick quadrupole.                *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer)   Number of surviving tracks.                  *
+  !----------------------------------------------------------------------*
+  
+  double precision track(6,*)
+  integer ktrack
+  
+  double precision node_value, get_value
+  double precision k1, k1s, length, ksqrt, tmp
+  double precision sx, cx, sy, cy, ct, st
+  double precision x, xp, y, yp
+  logical skew, focusing
+  integer jtrk
+  
+  double precision zero, one, two, sqrt2
+  parameter ( zero=0d0, one=1d0, two=2d0 )
+  parameter ( sqrt2=1.41421356237310d0 )
+  
+  !---- Read-in the parameters
+  k1 = node_value('k1 ');
+  k1s = node_value('k1s ');
+  length = node_value('l ');
+  
+  if ((k1.ne.zero).and.(k1s.ne.zero)) then
+     call aawarn('trrun: ',&
+          'a quadrupole cannot have both K1 and K1S different than zero');
+     return  
+  endif
+  
+  if (k1s.ne.zero) then
+     skew = .true.
+     focusing = k1s.gt.zero
+  else
+     skew = .false.
+     focusing = k1.gt.zero
+  endif
+  
+  !---- Prepare to calculate the kick and the matrix elements
+  do jtrk = 1,ktrack
+     !---- The particle position
+     x  = track(1,jtrk);
+     xp = track(2,jtrk);
+     y  = track(3,jtrk);
+     yp = track(4,jtrk);
+     
+!!$    !---- Radiation effects at entrance.
+!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
+!!$    endif
+     
+     !---- If SKEW rotates by -45 degrees
+     if (skew) then
+        ct =  sqrt2 / two;
+        st = -sqrt2 / two;
+        tmp = x
+        x = ct * tmp + st * y
+        y = ct * y - st * tmp
+        tmp = xp
+        xp = ct * tmp + st * yp
+        yp = ct * yp - st * tmp
+     endif
+     
+     !---- Computes the kick
+     if (skew) then
+        ksqrt = sqrt(abs(k1s / (one + track(6, jtrk))));
+     else
+        ksqrt = sqrt(abs(k1  / (one + track(6, jtrk))));
+     endif
+     if (focusing) then
+        cx = cos(ksqrt*length);
+        sx = sin(ksqrt*length);
+        cy = cosh(ksqrt*length);
+        sy = sinh(ksqrt*length);
+        tmp = -sx * ksqrt * x + xp * cx;
+        x  = x * cx + xp * sx / ksqrt;
+        xp = tmp;
+        tmp = sy * ksqrt * y + yp * cy;
+        y  = y * cy + yp * sy / ksqrt;
+        yp = tmp;
+     else
+        cx = cosh(ksqrt*length);
+        sx = sinh(ksqrt*length);
+        cy = cos(ksqrt*length);
+        sy = sin(ksqrt*length);
+        tmp = sx * ksqrt * x + xp * cx;
+        x  = x * cx + xp * sx / ksqrt;
+        xp = tmp;
+        tmp = -sy * ksqrt * y + yp * cy;
+        y  = y * cy + yp * sy / ksqrt;
+        yp = tmp;
+     endif
+     
+     !---- If SKEW rotates by +45 degrees
+     if (skew) then
+        ct = sqrt2 / two;
+        st = sqrt2 / two;
+        tmp = x
+        x = ct * tmp + st * y
+        y = ct * y - st * tmp
+        tmp = xp
+        xp = ct * tmp + st * yp
+        yp = ct * yp - st * tmp
+     endif
+     
+     !---- Applies the kick
+     track(1,jtrk) = x;
+     track(2,jtrk) = xp;
+     track(3,jtrk) = y;
+     track(4,jtrk) = yp;
+     
+!!$    !---- Radiation effects at exit.
+!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
+!!$    endif
+     
+  enddo
+  
+end subroutine tttquad
