@@ -21,7 +21,6 @@ option,-echo;
           Kinetic Energy : 0.194890E-01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199935E-01
-++++++ warning: double_from_table_row: table not found: summ
  Setting MADx with 
      energy          2.000000000000000E-002
      method                   6
@@ -39,8 +38,7 @@ obs_points: 3
  Killing LayoutNo name assigned                                                                                                        
  Layout killed 
 
-  Number of warnings: 1
-1 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.00.18 (32 bit) finished normally +
