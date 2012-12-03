@@ -65,7 +65,7 @@ CFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enable
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += /debug:all
+CFLAGS += /debug:full
 endif
 
 ifeq ($(PROFILE),yes)
@@ -118,7 +118,7 @@ CXXFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enab
 #
 
 ifeq ($(DEBUG),yes)
-CXXFLAGS += /debug:all
+CXXFLAGS += /debug:full
 endif
 
 ifeq ($(PROFILE),yes)

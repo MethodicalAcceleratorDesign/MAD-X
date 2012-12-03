@@ -92,7 +92,7 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += /debug:all /check:all
+LDFLAGS += /debug:full /check:all
 endif
 
 ifeq ($(PROFILE),yes)

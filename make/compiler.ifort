@@ -103,7 +103,7 @@ FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += /debug:all /check:all
+FFLAGS += /debug:full /check:all
 endif
 
 ifeq ($(PROFILE),yes)
