@@ -1714,7 +1714,7 @@ table_header_exists(const char* table, const char *name)
 {
   char tbl_s[NAME_L], hdr_s[NAME_L], buf[256];
   struct table *tbl;
-  int pos, hdr, i;
+  int pos, hdr;
   char *p;
 
   mycpy(tbl_s, table);
@@ -1724,8 +1724,8 @@ table_header_exists(const char* table, const char *name)
  
   mycpy(hdr_s, name);
   if (tbl->header)
-    for (i = 0; i < tbl->header->curr; i++) {
-      strcpy(buf, &tbl->header->p[i][1]);
+    for (hdr = 0; hdr < tbl->header->curr; hdr++) {
+      strcpy(buf, &tbl->header->p[hdr][1]);
       if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0)
         return 1;
     }
@@ -1744,7 +1744,7 @@ double_from_table_header(const char* table, const char* name, double* val)
 {
   char tbl_s[NAME_L], hdr_s[NAME_L], buf[256];
   struct table *tbl;
-  int pos, hdr, i;
+  int pos, hdr;
   char *p;
 
   *val = 0.0;
@@ -1758,8 +1758,8 @@ double_from_table_header(const char* table, const char* name, double* val)
 
   mycpy(hdr_s, name);
   if (tbl->header) {
-    for (i = 0; i < tbl->header->curr; i++) {
-      strcpy(buf, &tbl->header->p[i][1]);
+    for (hdr = 0; hdr < tbl->header->curr; hdr++) {
+      strcpy(buf, &tbl->header->p[hdr][1]);
       if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0) {
         if (strstr(strtok(NULL, " \"\n"), "%le") == NULL) {
           warning("double_from_table_header: parameter without value in table header:", (sprintf(buf,"%s->%s",tbl_s,hdr_s),buf));
