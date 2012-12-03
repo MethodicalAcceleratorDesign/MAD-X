@@ -1978,7 +1978,7 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
 
   if (col + *nval > tbl->num_cols) {
     warning("vector_to_table_curr: too many values provided - vector truncated:",
-      (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,col + *nval,tbl->num_cols),buf));
+      (sprintf(buf,"%s->%s[%d<=%d]",tbl_s,col_s,col + *nval,tbl->num_cols),buf));
     last = tbl->num_cols;
   } else
     last = col + *nval;

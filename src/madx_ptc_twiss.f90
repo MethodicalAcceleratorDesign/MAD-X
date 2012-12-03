@@ -1350,9 +1350,12 @@ contains
       ! overwrote the above for which I am not sure where the value comes from
       ioptfun = 79 + 36 ! 79 as for ntwisses in madx_ptc_knobs.inc + 36 eigenvalues
 
-
-      call vector_to_table_curr(table_name, 'beta11 ', opt_fun(1), ioptfun) ! fill contiguous data in one-go, up to mu1, mu2, mu3
-
+      ! LD: update columns access from twiss column description in mad_gcst.c
+      ! WAS: fill contiguous data in one-go, from beta11 up to mu1, mu2, mu3
+      ! NOW: fill contiguous data in one-go, from beta11 up to the end
+      !      eigenvalue seems to be retrieve ~50 lines above...
+      ioptfun = 18*3+16+3+36+1 ! = 110
+      call vector_to_table_curr(table_name, 'beta11 ', opt_fun(1), ioptfun)
 
       ! convert between the Ripken and Edwards-Teng parametrization
       ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
