@@ -1722,7 +1722,7 @@ table_header_exists(const char* table, const char *name)
      !(tbl = table_register->tables[pos]))
     return 0;
  
-  mycpy(hdr_s, table);
+  mycpy(hdr_s, name);
   if (tbl->header)
     for (i = 0; i < tbl->header->curr; i++) {
       strcpy(buf, &tbl->header->p[i][1]);
