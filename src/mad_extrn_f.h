@@ -116,6 +116,9 @@
 // warning:augment_counts is provided by madx_ptc_knobs.f90
 #define augment_count augment_count_
 #define augmentcountonly augmentcountonly_
+#define table_length table_length_
+#define table_exists table_exists_
+#define table_column_exists table_column_exists_
 #define double_from_table_row double_from_table_row_ // *
 #define string_from_table_row string_from_table_row_
 #define double_to_table_row double_to_table_row_

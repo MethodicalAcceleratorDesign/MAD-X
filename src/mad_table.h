@@ -80,7 +80,6 @@ void    headvalue(char* table_name, char* par, double* value);
 void    out_table(char* tname, struct table*, char* filename);
 void    reset_count(char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
-int     table_length(char* table);
 void    table_range(char* table, char* range, int* rows);
 
 void    augment_count(char* table);
@@ -89,6 +88,10 @@ void    augmentcountonly(char* table);
 //int     str_from_table     (const char* table, const char* name, int* row, char* val);
 //int     str_from_tablet    (struct table *tbl, const char* name, int* row, char* val);
 //int     nodename_from_table_row(const char* table, /* no name   */ const int* row, char* string);
+
+int     table_length(const char* table);
+int     table_exists(const char* table);
+int     table_column_exists(const char* table, const char* name);
 
 int     double_from_table_row(const char* table, const char* name, const int* row, double* val);
 int     string_from_table_row(const char* table, const char* name, const int* row, char* string);

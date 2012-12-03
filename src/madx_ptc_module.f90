@@ -145,7 +145,7 @@ CONTAINS
     logical(lp) particle,doneit,isclosedlayout
     integer i,j,k,code,nt,icount,nn,ns,nd,mg,get_string
     !    integer get_option
-    integer double_from_table_row
+    integer double_from_table_row,table_column_exists
     integer restart_sequ,advance_node,n_ferr,node_fd_errors
     integer, parameter :: nt0=20000
     real(dp) l,l_machine,energy,kin,brho,beta0,p0c,pma,e0f,lrad,charge
@@ -320,7 +320,12 @@ CONTAINS
         print*,'  gamma: ',gamma
     endif
 
-    k         = double_from_table_row('summ ','gammatr ',1,gammatr)
+    if (table_column_exists('summ ', 'gammatr ', 1, gammatr).ne.0) then
+      k       = double_from_table_row('summ ','gammatr ',1,gammatr)
+    else
+      gammatr = 0
+    endif
+
     if (getdebug() > 1) then
         print*,'  gammatr: ',gammatr
     endif

@@ -1327,18 +1327,6 @@ read_table(struct in_cmd* cmd)
 }
 
 int
-table_length(char* table)
-  /* returns no. of rows in table */
-{
-  int pos;
-  int length = 0;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    length = table_register->tables[pos]->curr;
-  return length;
-}
-
-int
 get_table_range(char* range, struct table* table, int* rows)
   /* returns start and end row (rows[0] and rows[1])
      of a range in a table; 0 if not found, 1 (1 row) or 2 ( > 1) */
@@ -1704,6 +1692,58 @@ nodename_from_table_row(const char* table, const int* row, char* string)
 }
 
 #endif
+
+int
+table_length(const char* table)
+  /* returns no. of rows in table */
+{
+  char tbl_s[NAME_L];
+  struct table *tbl;
+  int pos;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("table_length: table not found:", tbl_s);
+    return 0;
+  }
+  return tbl->curr;
+}
+
+int
+table_exists(const char* table)
+  /* returns no. of rows in table */
+{
+  char tbl_s[NAME_L];
+  int pos;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !table_register->tables[pos])
+    return 0;
+
+  return 1;
+}
+
+int
+table_column_exists(const char* table, const char *name)
+  /* returns no. of rows in table */
+{
+  char tbl_s[NAME_L], col_s[NAME_L];
+  struct table *tbl;
+  int pos, col;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos]))
+    return 0;
+
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0)
+    return 0;
+
+  return 1;
+}
 
 int
 double_from_table_row(const char* table, const char* name, const int* row, double* val)
