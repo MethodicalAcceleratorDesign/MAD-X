@@ -204,12 +204,14 @@ madx_finish(void)
     if (plots_made)
     {
       gxterm_();
+#ifndef _WIN32
       if(system("which ps2ps > tmp_plot.ps") == 0)
 	    {
          system("cp madx.ps tmp_plot.ps");
          system("ps2ps tmp_plot.ps madx.ps");
 	    }
       system("rm tmp_plot.ps");
+#endif
     }
     mad_err_getwarn(&warn_numb, &warn_numbf);
     nwarnings = warn_numb + warn_numbf;
