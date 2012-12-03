@@ -1089,41 +1089,6 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
 }
 
 void
-headvalue(char* table_name, char* par, double* value)
-/* returns the value of header parameter par from table table_name if present,
-   else 10^12 */
-{
-  int i, pos;
-  char lpar[NAME_L], ltab[NAME_L];
-  char* tp;
-  struct table* tab;
-  *value = ten_p_12;
-  mycpy(ltab, table_name);
-  stolower(ltab);
-  if ((pos = name_list_pos(ltab, table_register->names)) > -1)
-  {
-    tab = table_register->tables[pos];
-    mycpy(lpar, par);
-    if (tab->header)
-    {
-      for (i = 0; i < tab->header->curr; i++)
-      {
-        strcpy(aux_buff->c, &tab->header->p[i][1]);
-        if ((tp =strtok(aux_buff->c, " \"\n")) && string_icmp(tp, lpar) == 0)
-        {
-          if (strstr(strtok(NULL, " \"\n"), "%le") != NULL)
-          {
-            sscanf(strtok(NULL, " \"\n"), "%le", value);
-            break;
-          }
-        }
-      }
-    }
-  }
-  return;
-}
-
-void
 out_table(char* tname, struct table* t, char* filename)
   /* output of a table */
 {
@@ -1727,7 +1692,6 @@ table_exists(const char* table)
 
 int
 table_column_exists(const char* table, const char *name)
-  /* returns no. of rows in table */
 {
   char tbl_s[NAME_L], col_s[NAME_L];
   struct table *tbl;
@@ -1743,6 +1707,77 @@ table_column_exists(const char* table, const char *name)
     return 0;
 
   return 1;
+}
+
+int
+table_header_exists(const char* table, const char *name)
+{
+  char tbl_s[NAME_L], hdr_s[NAME_L], buf[256];
+  struct table *tbl;
+  int pos, hdr, i;
+  char *p;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos]))
+    return 0;
+ 
+  mycpy(hdr_s, table);
+  if (tbl->header)
+    for (i = 0; i < tbl->header->curr; i++) {
+      strcpy(buf, &tbl->header->p[i][1]);
+      if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0)
+        return 1;
+    }
+  return 0;
+}
+
+int
+double_from_table_header(const char* table, const char* name, double* val)
+  /* returns val from table header at position "name", if present.
+     function value return:
+     0  OK
+     -1 table does not exist
+     -2 header or parameter does not exist
+     -3 parameter value does not exist or is not a number
+  */
+{
+  char tbl_s[NAME_L], hdr_s[NAME_L], buf[256];
+  struct table *tbl;
+  int pos, hdr, i;
+  char *p;
+
+  *val = 0.0;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos])) {
+    warning("double_from_table_header: table not found:", tbl_s);
+    return -1;
+  }
+
+  mycpy(hdr_s, table);
+  if (tbl->header) {
+    for (i = 0; i < tbl->header->curr; i++) {
+      strcpy(buf, &tbl->header->p[i][1]);
+      if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0) {
+        if (strstr(strtok(NULL, " \"\n"), "%le") == NULL) {
+          warning("double_from_table_header: parameter without value in table header:", (sprintf(buf,"%s->%s",tbl_s,hdr_s),buf));
+          return -3;
+        }
+        if (sscanf(strtok(NULL, " \"\n"), "%le", val) != 1) {
+          warning("double_from_table_header: invalid parameter value in table header:", (sprintf(buf,"%s->%s",tbl_s,hdr_s),buf));
+          return -3;
+        }
+        return 0;
+      }
+    }
+    warning("double_from_table_header: parameter not found in table header:", (sprintf(buf,"%s->%s",tbl_s,hdr_s),buf));
+    return -2;
+  } else {
+    warning("double_from_table_header: table has no header:", tbl_s);
+    return -2;
+  }
 }
 
 int

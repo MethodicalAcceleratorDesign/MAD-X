@@ -1772,7 +1772,8 @@ subroutine peplot
   !--- definitions of function primitives
 
   double precision plot_option
-  integer double_from_table_row
+  integer double_from_table_row, double_from_table_header
+  integer table_column_exists, table_header_exists
 
 
   !--- Initialisation of local variables
@@ -1810,24 +1811,17 @@ subroutine peplot
   !--- Acquire deltap
   deltap=zero
   if(.not.ptc_flag) then
-     if(tabname.eq."summ") then
-        k = double_from_table_row('summ ','deltap ',1,deltap)
-     else
-        call headvalue(tabname,'deltap ', deltap)
-        if(deltap.eq.1d+12) then
-           call aawarn('PEPLOT: ',                                     &
-                'deltap is not part of the twiss header')
-           deltap=zero
-        endif
-     endif
-  else
-     call headvalue(tabname,'deltap ', deltap)
-     if(deltap.eq.1d+12) then
-        call aawarn('PEPLOT: ',                                       &
-             'deltap is not part of the ptc_twiss header')
-        deltap=zero
-     endif
+    if(tabname.eq."summ") then
+      if (table_column_exists('summ ', 'deltap ').ne.0) then
+        k = double_from_table_row('summ ', 'deltap ', 1, deltap)
+      endif
+    else if (table_header_exists(tabname).ne.0) then
+        k = double_from_table_header(tabname, 'deltap ', deltap)
+    endif
+  else if (table_header_exists(tabname).ne.0) then
+        k = double_from_table_header(tabname, 'deltap ', deltap)
   endif
+
   deltap = deltap*100.0
   write(ch,'(f9.4)') deltap
   if(dpp_flag) then

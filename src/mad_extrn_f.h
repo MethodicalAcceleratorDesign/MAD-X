@@ -119,6 +119,8 @@
 #define table_length table_length_
 #define table_exists table_exists_
 #define table_column_exists table_column_exists_
+#define table_header_exists table_header_exists_
+#define double_from_table_header double_from_table_header_
 #define double_from_table_row double_from_table_row_ // *
 #define string_from_table_row string_from_table_row_
 #define double_to_table_row double_to_table_row_
@@ -127,9 +129,7 @@
 #define vector_to_table_curr vector_to_table_curr_
 #define string_to_table_curr string_to_table_curr_
 #define comment_to_table_curr comment_to_table_curr_
-
 #define double_table double_table_
-#define headvalue headvalue_
 #define make_map_table make_map_table_
 #define reset_count reset_count_
 #define sector_out sector_out_

@@ -76,7 +76,6 @@ void    grow_table(struct table*); /* doubles number of rows */
 void    print_table(struct table*);
 void    make_map_table(int* map_table_max_rows);
 int     get_table_range(char* range, struct table*, int* rows);
-void    headvalue(char* table_name, char* par, double* value);
 void    out_table(char* tname, struct table*, char* filename);
 void    reset_count(char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
@@ -92,6 +91,9 @@ void    augmentcountonly(char* table);
 int     table_length(const char* table);
 int     table_exists(const char* table);
 int     table_column_exists(const char* table, const char* name);
+int     table_header_exists(const char* table, const char *name);
+
+int     double_from_table_header(const char* table, const char* name, double* val);
 
 int     double_from_table_row(const char* table, const char* name, const int* row, double* val);
 int     string_from_table_row(const char* table, const char* name, const int* row, char* string);
