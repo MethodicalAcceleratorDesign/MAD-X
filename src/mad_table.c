@@ -1723,12 +1723,13 @@ table_header_exists(const char* table, const char *name)
     return 0;
  
   mycpy(hdr_s, name);
-  if (tbl->header)
+  if (tbl->header) {
     for (hdr = 0; hdr < tbl->header->curr; hdr++) {
       strcpy(buf, &tbl->header->p[hdr][1]);
       if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0)
         return 1;
     }
+  }
   return 0;
 }
 

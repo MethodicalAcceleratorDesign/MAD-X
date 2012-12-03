@@ -21,7 +21,7 @@ mycpy(char* out, const char* in)
 {
   int i;
 
-  for (i=0; i<NAME_L && in[i]>' ' && in[i]<='~'; i++)
+  for (i=0; i<NAME_L-1 && in[i]>' ' && in[i]<='~'; i++)
     out[i] = in[i];
 
   out[i] = '\0';

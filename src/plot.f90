@@ -442,6 +442,7 @@ subroutine pefill(ierr)
   new2 = 0
   currtyp = 0
   nint = 0
+  step = 0
   crow = 0
   pltyp = 0
   pos_flag = 3
@@ -522,7 +523,6 @@ subroutine pefill(ierr)
   if (nrrang(1) .eq. 0) nrrang(1) = 1
 
   !--- get interpolation interval size
-
   if (machp)  then
      k = double_from_table_row(tabname, horname, nrrang(1), d_val)
      k = double_from_table_row(tabname, horname, nrrang(2), d_val1)
@@ -611,6 +611,7 @@ subroutine pefill(ierr)
            endif
         endif
      endif
+
      mystep=0.1d0 * step
      do l = 1, nivvar
         if (nqval(l) .eq. maxseql)  then
@@ -1815,10 +1816,10 @@ subroutine peplot
       if (table_column_exists('summ ', 'deltap ').ne.0) then
         k = double_from_table_row('summ ', 'deltap ', 1, deltap)
       endif
-    else if (table_header_exists(tabname).ne.0) then
+    else if (table_header_exists(tabname, 'deltap ').ne.0) then
         k = double_from_table_header(tabname, 'deltap ', deltap)
     endif
-  else if (table_header_exists(tabname).ne.0) then
+  else if (table_header_exists(tabname, 'deltap ').ne.0) then
         k = double_from_table_header(tabname, 'deltap ', deltap)
   endif
 
