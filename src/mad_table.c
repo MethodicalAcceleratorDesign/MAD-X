@@ -1756,7 +1756,7 @@ double_from_table_header(const char* table, const char* name, double* val)
     return -1;
   }
 
-  mycpy(hdr_s, table);
+  mycpy(hdr_s, name);
   if (tbl->header) {
     for (i = 0; i < tbl->header->curr; i++) {
       strcpy(buf, &tbl->header->p[i][1]);
