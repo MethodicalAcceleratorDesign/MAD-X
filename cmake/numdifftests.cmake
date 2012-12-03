@@ -85,3 +85,5 @@ numdiff_test(test-track-6 "mytab.tfs twiss1.tfs twiss2.tfs track.obs0001.p0001 t
 numdiff_test(test-track-7 "track.obs0001.p0001 track.obs0001.p0002 track.obs0001.p0003 twissprb1.1" 1)
 set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin_LONG)
 set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin_LONG)
+
+numdiff_test(test-emit "" 0)
