@@ -3,14 +3,11 @@
 static int
 find_index_in_table(char *cols[], const char *name )
 {
-  int ret = -1; // returns -1 if not found
-  for (int i = 0; strcmp(cols[i], " ") != 0; i++) {
-    if (string_icmp(cols[i], name) == 0) {
-      ret = i;
-      break;
-    }
-  }
-  return ret;
+  for (int i = 0; strcmp(cols[i], " "); i++)
+    if (string_icmp(cols[i], name) == 0)
+      return i;
+
+  return -1; // not found
 }
 
 static void
@@ -88,11 +85,9 @@ error_seterr(struct in_cmd* cmd)
    ===> (unless table exists in memory !)
 */
 
-  int i, ix;
-  int j;
+  int from_col, to_col, ncols, row, col;
 
-  struct node *ndexe;
-  struct node *nextnode;
+  struct node *node, *node_end;
 
   char     name[NAME_L];
   char   slname[NAME_L];
@@ -104,141 +99,94 @@ error_seterr(struct in_cmd* cmd)
   int      t1;
   int      new_table_type;
 
-  struct   table  *err;
+  struct   table *err;
 
 /* set up pointers to current sequence for later use */
   struct sequence* mysequ = current_sequ;
-  nextnode = mysequ->ex_start;
-  ndexe = mysequ->ex_end;
-
-/* printf("Pointers: %d %d %d\n",mysequ,nextnode,ndexe); */
+  node     = mysequ->ex_start;
+  node_end = mysequ->ex_end;
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
-       printf("Want to use named table: %s\n",namtab);
-       if ((t1 = name_list_pos(namtab, table_register->names)) > -1) {
-          printf("The table ==> %s <=== was found \n",namtab);
-       } else {
-          /* fatal_error("Error table requested, but not existing:",namtab); */
-          /* exit(-77); */ 
-          printf("No such error table in memory: %s\n",namtab);
-          /* try now, better a clean exit afterwards ... */
-          exit(-77);
-       }
-
-  } else {
-       if (get_option("debug")) {
-         printf("No table name requested\n");
-         printf("Use default name\n");
-       }
-       strcpy(namtab,"error");
-       if ((t1 = name_list_pos(namtab, table_register->names)) > -1) {
-          printf("The default table ==> %s <=== was found \n",namtab);
-       } else {
-          /* fatal_error("Error table requested, but not existing:",namtab); */
-          /* exit(-77); */ 
-          printf("No default error table in memory: %s\n",namtab);
-          /* try now, better a clean exit afterwards ... */
-          exit(-77);
-       }
+    printf("Want to use named table: %s\n",namtab);
+    if ((t1 = name_list_pos(namtab, table_register->names)) > -1)
+      printf("The table ==> %s <=== was found \n",namtab);
+    else {
+      warning("No such error table in memory:", namtab);
+      exit(-77);
+    }
+  }
+  else {
+    if (get_option("debug")) {
+      printf("No table name requested\n");
+      printf("Use default name\n");
+    }
+    strcpy(namtab,"error");
+    if ((t1 = name_list_pos(namtab, table_register->names)) > -1)
+      printf("The default table ==> %s <=== was found \n",namtab);
+    else {
+      warning("No default error table in memory:", namtab);
+      exit(-77);
+    }
   }
  
   err = table_register->tables[t1];
-  if(err->num_cols == (FIELD_MAX + ALIGN_MAX + RFPHASE_MAX + 1) ) {
-       new_table_type = 1;
-  } else {
-       new_table_type = 0;
-       warning("old type of input error table", "empty fields zeroed ...");
+
+  for (row = 1; row <= err->curr; row++) {
+    if (string_from_table_row(namtab, "name", &row, name)) break;
+
+    // probably useless...
+    stolower(name);
+    strcpy(slname,strip(name));
+    supp_tb(slname);
+
+    for (node = mysequ->ex_start; node != node_end; node = node->next) {
+    // probably useless...
+      strcpy(nname,node->name);
+      stolower(nname);
+      strcpy(slnname,strip(nname));
+      supp_tb(slnname);
+
+      if(strcmp(slname, slnname) == 0) break;
+    }
+
+    /* We have now the input and the node, generate array and selection flag */
+    if (!strcmp(slname, slnname)) {
+      node->sel_err = 1;
+      node->p_fd_err = new_double_array(FIELD_MAX); // zero initialized
+      node->p_fd_err->curr = FIELD_MAX;
+      node->p_al_err = new_double_array(ALIGN_MAX); // zero initialized
+      node->p_al_err->curr = ALIGN_MAX;
+      node->p_ph_err = new_double_array(RFPHASE_MAX); // zero initialized
+      node->p_ph_err->curr = RFPHASE_MAX;
+
+      from_col = find_index_in_table(efield_table_cols, "k0l");
+      to_col   = find_index_in_table(efield_table_cols, "k20sl");
+      if (from_col > 0 && to_col > 0)
+        for (int i=0, col=from_col; col <= to_col; col++, i++)
+          node->p_fd_err->a[i] = err->d_cols[col][row-1];
+
+      from_col = find_index_in_table(efield_table_cols, "dx");
+      to_col   = find_index_in_table(efield_table_cols, "mscaly");
+      if (from_col > 0 && to_col > 0)
+        for (int i=0, col=from_col; col <= to_col; col++, i++)
+          node->p_al_err->a[i] = err->d_cols[col][row-1];
+
+      col = find_index_in_table(efield_table_cols, "rfm_freq");
+      node->rfm_freq   = col < 0 ? 0 : err->d_cols[col][row-1];
+
+      col = find_index_in_table(efield_table_cols, "rfm_harmon");
+      node->rfm_harmon = col < 0 ? 0 : err->d_cols[col][row-1];
+
+      col = find_index_in_table(efield_table_cols, "rfm_lag");
+      node->rfm_lag    = col < 0 ? 0 : err->d_cols[col][row-1];
+
+      from_col = find_index_in_table(efield_table_cols, "p0l");
+      to_col   = find_index_in_table(efield_table_cols, "p20sl");
+      if (from_col > 0 && to_col > 0)
+        for (int i=0, col=from_col; col <= to_col; col++, i++)
+          node->p_ph_err->a[i] = err->d_cols[col][row-1];
+    }
   }
-
-
-
-  i = 1; /* watch out ! i is the ROW number, not the C index !!! */
-  ix=0;
-  while(ix == 0) {
-      ix =   string_from_table_row(namtab, "name", &i, name);
-      if(ix == 0) {
-             stolower(name);
-             strcpy(slname,strip(name));
-             supp_tb(slname);
-          nextnode = mysequ->ex_start;
-          while (nextnode != ndexe) {
-            
-             strcpy(nname,nextnode->name);
-             stolower(nname);
-             strcpy(slnname,strip(nname));
-             supp_tb(slnname);
-          
-/*
-             printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
-             printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); 
-*/
-       
-             if(strcmp(slname,slnname) == 0) {
-
-/*              printf("O.K.:  %s in sequence and input table\n",slname); */
-                /*
-                ===>  now we have the match of the elements ..
-                */
-
-                /* We have now the input and the node, generate array and selection flag */
-                nextnode->sel_err = 1;
-                nextnode->p_fd_err = new_double_array(FIELD_MAX);
-                nextnode->p_fd_err->curr = FIELD_MAX;
-                nextnode->p_al_err = new_double_array(ALIGN_MAX);
-                nextnode->p_al_err->curr = ALIGN_MAX;
-                nextnode->p_ph_err = new_double_array(RFPHASE_MAX);
-                nextnode->p_ph_err->curr = RFPHASE_MAX;
-
-		if (new_table_type) {
-                  {
-                    int from_col = find_index_in_table(efield_table_cols, "k0l");
-                    int to_col = find_index_in_table(efield_table_cols, "k20sl");
-                    int ncols = to_col - from_col + 1;
-                    for (j=0; j < ncols; j++) {
-                      nextnode->p_fd_err->a[j] = err->d_cols[from_col+j][i-1];
-                    }
-                  }
-                  {
-                    int from_col = find_index_in_table(efield_table_cols, "dx");
-                    int to_col = find_index_in_table(efield_table_cols, "mscaly");
-                    int ncols = to_col - from_col + 1;
-                    for (j=0; j < ncols; j++) {
-                      nextnode->p_al_err->a[j] = err->d_cols[from_col+j][i-1];
-                    }
-                    nextnode->rfm_freq = err->d_cols[find_index_in_table(efield_table_cols, "rfm_freq")][i-1];
-                    nextnode->rfm_harmon = err->d_cols[find_index_in_table(efield_table_cols, "rfm_harmon")][i-1];
-                    nextnode->rfm_lag = err->d_cols[find_index_in_table(efield_table_cols, "rfm_lag")][i-1];
-                  }
-                  {
-                    int from_col = find_index_in_table(efield_table_cols, "p0l");
-                    int to_col = find_index_in_table(efield_table_cols, "p20sl");
-                    int ncols = to_col - from_col + 1;
-                    for (j=0; j < ncols; j++) {
-                      nextnode->p_ph_err->a[j] = err->d_cols[from_col+j][i-1];
-                    }
-                  }
-                } else {
-                  for (j = 1; j < 23; j++) {
-                    nextnode->p_fd_err->a[j-1] = err->d_cols[j][i-1];
-                  }
-                  for (j = 1; j < err->num_cols-22; j++) {
-                     /*printf("ealign errors: %d %e\n",j,err->d_cols[j+22][i-1]); */
-                     nextnode->p_al_err->a[j-1] = err->d_cols[j+22][i-1];
-                  }
-                }
-                
-                nextnode = ndexe;
-             } else {
-                nextnode = nextnode->next;
-             }
-          }
-    
-      } 
-        i++;
-  }
-
-
-return;
 }
 
 static void

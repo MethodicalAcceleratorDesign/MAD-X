@@ -698,14 +698,15 @@ comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, 
      ATTENTION: no check on sufficient array sizes
   */
 {
+  char buf[NAME_L];
   int i, l, pos;
   struct command_parameter* cp;
   struct double_array* arr = NULL;
   *n_int = *n_double = *n_string = 0;
-  mycpy(c_dum->c, name);
+  mycpy(buf, name);
   if (this_cmd != NULL && this_cmd->clone != NULL)
   {
-    if ((pos = name_list_pos(c_dum->c, this_cmd->clone->par_names)) > -1)
+    if ((pos = name_list_pos(buf, this_cmd->clone->par_names)) > -1)
     {
       cp = this_cmd->clone->par->parameters[pos];
       switch (cp->type)
