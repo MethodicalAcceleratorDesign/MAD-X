@@ -95,7 +95,7 @@ error_seterr(struct in_cmd* cmd)
   char     nname[NAME_L];
   char   slnname[NAME_L];
 
-  char*    namtab;
+  char    *namtab, namtab_buf[NAME_L];
   int      t1;
   int      new_table_type;
 
@@ -120,7 +120,8 @@ error_seterr(struct in_cmd* cmd)
       printf("No table name requested\n");
       printf("Use default name\n");
     }
-    strcpy(namtab,"error");
+
+    strcpy(namtab=namtab_buf,"error");
     if ((t1 = name_list_pos(namtab, table_register->names)) > -1)
       printf("The default table ==> %s <=== was found \n",namtab);
     else {
