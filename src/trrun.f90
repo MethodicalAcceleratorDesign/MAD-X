@@ -1,3 +1,28 @@
+LOGICAL FUNCTION  is_drift()
+  double precision node_value, code
+  code = node_value('mad8_type ')
+  is_drift = code.eq.1;
+END FUNCTION is_drift
+
+LOGICAL FUNCTION  is_matrix()
+  double precision node_value, code
+  code = node_value('mad8_type ')
+  is_matrix = code.eq.4;
+END FUNCTION is_matrix
+
+LOGICAL FUNCTION  is_quad()
+  double precision node_value, code
+  code = node_value('mad8_type ')
+  is_quad = code.eq.5;
+END FUNCTION is_quad
+
+LOGICAL FUNCTION  is_thin()
+  double precision node_value, el, zero
+  parameter(zero=0d0)
+  el = node_value('l ')
+  is_thin = el.eq.zero;
+END FUNCTION is_thin
+
 subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
 
@@ -38,7 +63,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
        node_value,one,                                                   &
        get_variable,last_pos(*),last_orbit(6,*),maxaper(6),get_value,    &
-       zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap,thick
+       zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),deltap
   parameter(zero=0d0,one=1d0)
   character(12) tol_a, char_a
   !hbu
@@ -52,6 +77,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
 
+  logical is_drift, is_thin, is_quad, is_matrix
 
   !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
@@ -185,9 +211,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         l_buf(nlm+1) = el
         !hbu get current node name
         call element_name(el_name,len(el_name))
-        !al: thick quadrupole is allowed
-        thick = node_value('thick ');
-        if ((code .ne. 1 .and. code .ne. 4 .and. code .ne. 5) .and. (el .ne. zero .and. thick .ne. zero)) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            sum = node_value('name ')
@@ -3090,7 +3114,9 @@ subroutine trclor(orbit0)
 
   integer i,k, irank
 
-  double precision cotol, err, thick
+  double precision cotol, err
+
+  logical is_drift, is_thin, is_quad, is_matrix
 
   print *," "
   !      print *," AK special version 2007/12/13"
@@ -3189,10 +3215,8 @@ subroutine trclor(orbit0)
      if(code.eq.39) code=15
      if(code.eq.38) code=24
      el      = node_value('l ')
-     !al: thick quadrupole is allowed
-     thick = node_value('thick ');
      if (itra .eq. 1)  then
-        if ((code .ne. 1 .and. code .ne. 4 .and. code .ne. 5) .and. (el .ne. zero .and. thick .ne. zero)) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            print*," "
@@ -3533,7 +3557,7 @@ subroutine tttquad(track, ktrack)
   double precision node_value, get_value
   double precision k1, k1s, length, ksqrt, tmp
   double precision sx, cx, sy, cy, ct, st
-  double precision x, xp, y, yp
+  double precision x, px, y, py, z, pz
   logical skew, focusing
   integer jtrk
   
@@ -3551,7 +3575,7 @@ subroutine tttquad(track, ktrack)
           'a quadrupole cannot have both K1 and K1S different than zero');
      return  
   endif
-  
+
   if (k1s.ne.zero) then
      skew = .true.
      focusing = k1s.gt.zero
@@ -3564,10 +3588,12 @@ subroutine tttquad(track, ktrack)
   do jtrk = 1,ktrack
      !---- The particle position
      x  = track(1,jtrk);
-     xp = track(2,jtrk);
+     px = track(2,jtrk);
      y  = track(3,jtrk);
-     yp = track(4,jtrk);
-     
+     py = track(4,jtrk);
+     z  = track(5,jtrk);
+     pz = track(6,jtrk);
+  
 !!$    !---- Radiation effects at entrance.
 !!$    if (dorad  .and.  elrad .ne. zero) then
 !!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
@@ -3578,63 +3604,63 @@ subroutine tttquad(track, ktrack)
      
      !---- If SKEW rotates by -45 degrees
      if (skew) then
-        ct =  sqrt2 / two;
-        st = -sqrt2 / two;
+        ct =  sqrt2 / two
+        st = -sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
-        y = ct * y - st * tmp
-        tmp = xp
-        xp = ct * tmp + st * yp
-        yp = ct * yp - st * tmp
+        y = ct * y   - st * tmp
+        tmp = px
+        px = ct * tmp + st * py
+        py = ct * py  - st * tmp
      endif
      
      !---- Computes the kick
      if (skew) then
-        ksqrt = sqrt(abs(k1s / (one + track(6, jtrk))));
+        ksqrt = sqrt(abs(k1s / (one + track(6, jtrk))))
      else
-        ksqrt = sqrt(abs(k1  / (one + track(6, jtrk))));
+        ksqrt = sqrt(abs(k1  / (one + track(6, jtrk))))
      endif
      if (focusing) then
-        cx = cos(ksqrt*length);
-        sx = sin(ksqrt*length);
-        cy = cosh(ksqrt*length);
-        sy = sinh(ksqrt*length);
-        tmp = -sx * ksqrt * x + xp * cx;
-        x  = x * cx + xp * sx / ksqrt;
-        xp = tmp;
-        tmp = sy * ksqrt * y + yp * cy;
-        y  = y * cy + yp * sy / ksqrt;
-        yp = tmp;
+        cx = cos(ksqrt*length)
+        sx = sin(ksqrt*length)
+        cy = cosh(ksqrt*length)
+        sy = sinh(ksqrt*length)
+        tmp = x
+        x  = tmp * cx + px * sx / ksqrt
+        px = -sx * ksqrt * tmp + px * cx
+        tmp = y
+        y  = tmp * cy + py * sy / ksqrt
+        py =  sy * ksqrt * tmp + py * cy
      else
-        cx = cosh(ksqrt*length);
-        sx = sinh(ksqrt*length);
-        cy = cos(ksqrt*length);
-        sy = sin(ksqrt*length);
-        tmp = sx * ksqrt * x + xp * cx;
-        x  = x * cx + xp * sx / ksqrt;
-        xp = tmp;
-        tmp = -sy * ksqrt * y + yp * cy;
-        y  = y * cy + yp * sy / ksqrt;
-        yp = tmp;
+        cx = cosh(ksqrt*length)
+        sx = sinh(ksqrt*length)
+        cy = cos(ksqrt*length)
+        sy = sin(ksqrt*length)
+        tmp = x
+        x  = tmp * cx + px * sx / ksqrt
+        px =  sx * ksqrt * tmp + px * cx
+        tmp = y
+        y  = tmp * cy + py * sy / ksqrt
+        py = -sy * ksqrt * tmp + py * cy
      endif
      
      !---- If SKEW rotates by +45 degrees
      if (skew) then
-        ct = sqrt2 / two;
-        st = sqrt2 / two;
+        ct = sqrt2 / two
+        st = sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
-        y = ct * y - st * tmp
-        tmp = xp
-        xp = ct * tmp + st * yp
-        yp = ct * yp - st * tmp
+        y = ct * y   - st * tmp
+        tmp = px
+        px = ct * tmp + st * py
+        py = ct * py  - st * tmp
      endif
      
      !---- Applies the kick
-     track(1,jtrk) = x;
-     track(2,jtrk) = xp;
-     track(3,jtrk) = y;
-     track(4,jtrk) = yp;
+     track(1,jtrk) = x
+     track(2,jtrk) = px
+     track(3,jtrk) = y
+     track(4,jtrk) = py
      
 !!$    !---- Radiation effects at exit.
 !!$    if (dorad  .and.  elrad .ne. zero) then
