@@ -64,12 +64,12 @@ contains
     t = 1
     !------------------------------------------------------
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_trackline: ',' no universe created')
        print*,"Max number of nobs ", nobs
        return
     endif
-    if(index_mad.le.0) then
+    if(index_mad.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_trackline: ',' no layout created')
        return
     endif
@@ -537,12 +537,12 @@ contains
     t = 1
     !------------------------------------------------------
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_trackline: ',' no universe created')
        print *, nobs
        return
     endif
-    if(index_mad.le.0) then
+    if(index_mad.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_trackline: ',' no layout created')
        return
     endif

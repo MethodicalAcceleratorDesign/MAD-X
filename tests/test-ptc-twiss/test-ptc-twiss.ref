@@ -271,10 +271,6 @@ PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
        ACCELERATE  =  FALSE
  Closed orbit:   8.892828933326235E-005  7.277292572735424E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 Deviation from symplecticity  0.4579669976578771E-11 %
-! memory access outside program range later
-
-
-
 ptc_end;
 
  Killing LayoutNo name assigned                                                                                                        

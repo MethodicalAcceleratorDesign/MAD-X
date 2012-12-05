@@ -420,6 +420,7 @@ pro_ptc_twiss(void)
   */
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
+
   if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
   {
     if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))

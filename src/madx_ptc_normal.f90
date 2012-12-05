@@ -36,11 +36,11 @@ contains
 
     !------------------------------------------------------------------------------
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_normal: ',' no universe created')
        return
     endif
-    if(index_mad.le.0) then
+    if(index_mad.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_normal: ',' no layout created')
        return
     endif

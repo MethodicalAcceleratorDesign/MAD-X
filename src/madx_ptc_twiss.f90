@@ -337,6 +337,17 @@ contains
     character(12)           :: tmfile='transfer.map'
     character(48) charconv !routine
     
+    if(universe.le.0.or.EXCEPTION.ne.0) then
+       call fort_warn('return from ptc_twiss: ',' no universe created')
+       call seterrorflag(1,"ptc_twiss ","no universe created till now");
+       return
+    endif
+    if(index_mad.le.0.or.EXCEPTION.ne.0) then
+       call fort_warn('return from ptc_twiss: ',' no layout created')
+       call seterrorflag(2,"ptc_twiss ","no layout created till now");
+       return
+    endif
+
     call resetBetaExtremas()
 
     !skipnormalform = my_false
@@ -361,17 +372,6 @@ contains
     if (getdebug() > 1) then
        print*,"ptc_twiss: Table name is ",table_name
        print*,"ptc_twiss: Summary table name is", summary_table_name
-    endif
-
-    if(universe.le.0) then
-       call fort_warn('return from ptc_twiss: ',' no universe created')
-       call seterrorflag(1,"ptc_twiss ","no universe created till now");
-       return
-    endif
-    if(index_mad.le.0) then
-       call fort_warn('return from ptc_twiss: ',' no layout created')
-       call seterrorflag(2,"ptc_twiss ","no layout created till now");
-       return
     endif
 
     call cleartables() !defined in madx_ptc_knobs

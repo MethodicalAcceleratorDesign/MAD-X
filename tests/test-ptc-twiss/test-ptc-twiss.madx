@@ -55,8 +55,6 @@ select,flag=ptc_twiss,
 ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
 
 PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
-! memory access outside program range later
-
 ptc_end;
 stop;
 

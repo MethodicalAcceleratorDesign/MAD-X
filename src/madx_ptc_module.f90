@@ -86,7 +86,7 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_create_layout: ',' no universe created')
        return
     endif
@@ -119,7 +119,7 @@ CONTAINS
     real(kind(1d0)) get_value
     integer my_index
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_move_to_layout: ',' no universe created')
        return
     endif
@@ -167,7 +167,7 @@ CONTAINS
     integer             exact1
     integer             sector_nmul_max0,sector_nmul0
     integer             model
-    integer             method0,method1
+    integer             method,method0,method1
     integer             nst0,nst1,ord_max,kk
     REAL (dp) :: tempdp,bvk
     logical(lp):: ptcrbend,truerbend,errors_out
@@ -273,20 +273,37 @@ CONTAINS
     CASE DEFAULT
        PRINT *, 'EXCEPTION occured: Can not recognize model type ',model
        EXCEPTION=1
+       index_mad=-1
        ipause=mypause(444)
        RETURN
     END SELECT
-
-
 
     if (getdebug() > 1) then
         print*,'  Global Model name (keymod0) is : ',keymod0
     endif
 
-    method0   = get_value('ptc_create_layout ','method ')
+    method   = get_value('ptc_create_layout ','method ')
     if (getdebug() > 1) then
-        print*,'  Global method is: ',method0
+        print*,'  Global method is: ',method
     endif
+
+    !*****************************
+    !  METHOD Settings
+    !*****************************
+    select case(method)
+    CASE(2)
+       method0 = method
+    CASE(4)
+       method0 = method
+    CASE(6)
+       method0 = method
+    CASE DEFAULT
+       PRINT *, 'EXCEPTION occured: Can not recognize method order ',method
+       EXCEPTION=1
+       index_mad=-1
+       ipause=mypause(444)
+       RETURN
+    END SELECT
 
     exact0    = get_value('ptc_create_layout ','exact ') .ne. 0
     if (getdebug() > 1) then
@@ -1783,11 +1800,11 @@ CONTAINS
     !------------------------------------------------------------------------------
 
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_track: ',' no universe created')
        return
     endif
-    if(index_mad.le.0) then
+    if(index_mad.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_track: ',' no layout created')
        return
     endif
@@ -1863,7 +1880,7 @@ CONTAINS
     implicit none
     integer i
 
-    if(universe.le.0) then
+    if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_end: ',' no universe can be killed')
        return
     endif

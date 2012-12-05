@@ -251,7 +251,7 @@ CONTAINS
   SUBROUTINE ptc_track_run(max_obs)
 
     !USE MADX_PTC_MODULE ==================================================================!
-    USE  madx_ptc_module, ONLY: universe, my_ring, default, index_mad, c_                  !
+    USE  madx_ptc_module, ONLY: universe, EXCEPTION, my_ring, default, index_mad, c_       !
     !                                                                                      !
     USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,            !
          FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"        !
@@ -632,7 +632,7 @@ CONTAINS
          print *, 'PTC Universe universe=', universe
          print *, 'PTC Layout      index=', index_mad
       end if
-      if(universe.le.0) then
+      if(universe.le.0.or.EXCEPTION.ne.0) then
          call fort_warn('return from ptc_track: ',' no universe created')
          ! return
          return_from_subr_ptc_track=.TRUE.
@@ -641,7 +641,7 @@ CONTAINS
       ! 2) ptc_create_layout:     creates PTC layout and fills it
       !                                          with current MAD-X sequence
 
-      if(index_mad.le.0) then
+      if(index_mad.le.0.or.EXCEPTION.ne.0) then
          call fort_warn('return from ptc_track: ',' no layout created')
          ! return
          return_from_subr_ptc_track=.TRUE.
