@@ -997,17 +997,9 @@ seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
             find_element(thin_node->p_elem->name, thin_sequ->crabcavities) == NULL)
           add_to_el_list(&thin_node->p_elem, 0, thin_sequ->crabcavities, 0);
       }
-      /* AL: if the quadrupole has the flag 'thick' set to 1 it accepts is a thick element */
-      else if (strcmp(thick_node->base_name,"quadrupole") == 0)
-      {
-	double thick = el_par_value_recurse("thick", thick_node->p_elem);
-        if (thick == 1.0)
-	  seq_diet_add(thick_node,thin_sequ);
-	else 
-	  seq_diet_add_elem(thick_node,thin_sequ);
-      }       
       else if (strcmp(thick_node->base_name,"rbend") == 0       ||
                strcmp(thick_node->base_name,"sbend") == 0       ||
+               strcmp(thick_node->base_name,"quadrupole") == 0  ||
                strcmp(thick_node->base_name,"sextupole") == 0   ||
                strcmp(thick_node->base_name,"octupole") == 0    ||
                strcmp(thick_node->base_name,"solenoid") == 0    || /*hbu */
