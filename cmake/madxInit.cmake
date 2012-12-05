@@ -38,12 +38,6 @@ if(NOT MADX_PATCH_LEVEL EQUAL 00)
     set (PKG_POSTFIX "-dev")
 endif()
 
-# Build type for Coverage checks:
-set(CMAKE_CXX_FLAGS_DEBUGCOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -Wall -fprofile-arcs -ftest-coverage")
-set(CMAKE_C_FLAGS_DEBUGCOVERAGE "${CMAKE_C_FLAGS_DEBUG} -Wall -fprofile-arcs -ftest-coverage")
-set(CMAKE_Fortran_FLAGS_DEBUGCOVERAGE "${CMAKE_Fortran_FLAGS_DEBUG} -Wall -fprofile-arcs -ftest-coverage")
-set(LINK_FLAGS_DEBUGCOVERAGE "${LINK_FLAGS_DEBUG} -Wall -fprofile-arcs -ftest-coverage")
-
 # Location of fortran modules:
 set(CMAKE_Fortran_MODULE_DIRECTORY
     ${PROJECT_BINARY_DIR}/include/fortran/madX CACHE PATH "Single Directory for all fortran modules."

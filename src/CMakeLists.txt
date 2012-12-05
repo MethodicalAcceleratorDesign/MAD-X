@@ -1,4 +1,8 @@
 
+# We want to run coverage analysis of
+# the files compiled here..
+include(buildtypeCoverage)
+
 # list of source files
 file(GLOB src_files
    mad_*.c
