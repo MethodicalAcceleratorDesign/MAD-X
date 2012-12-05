@@ -346,7 +346,7 @@ int
 attach_beam(struct sequence* sequ)
   /* attaches the beam belonging to the current sequence */
 {
-  if ((current_beam = find_command(sequ->name, beam_list)) == NULL)
+  if (!sequ || (current_beam = find_command(sequ->name, beam_list)) == NULL)
     current_beam = find_command("default_beam", beam_list);
   return current_beam->beam_def;
 }

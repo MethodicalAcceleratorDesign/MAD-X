@@ -152,8 +152,7 @@ exec_command(void)
         set_option("tell", &izero); /* reset every time */
         p->clone = options; p->clone_flag = 1;
       }
-      else if (strcmp(cmd_name, "setplot") == 0
-               && plot_options != NULL)
+      else if (strcmp(cmd_name, "setplot") == 0 && plot_options != NULL)
       {
         p->clone = plot_options; p->clone_flag = 1;
       }
