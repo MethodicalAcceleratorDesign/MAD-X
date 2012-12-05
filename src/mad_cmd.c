@@ -63,31 +63,45 @@ control(struct in_cmd* cmd)
 {
   char** toks = cmd->tok_list->p;
   int k = cmd->decl_start - 1;
+
+  // known control command in the same order as in mad_dict.c
   if      (strcmp(toks[k], "assign")      == 0) exec_assign(cmd);
   else if (strcmp(toks[k], "beam")        == 0) exec_beam(cmd, 0);
-  else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
-  else if (strcmp(toks[k], "option")      == 0) exec_option();
-  else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
-  else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
-  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
-  else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
-  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
-  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
-  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
-  else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
-  else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
+  else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
   else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
+  else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
+  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
+  else if (strcmp(toks[k], "dumpsequ")    == 0) exec_dumpsequ(cmd);
+  else if (strcmp(toks[k], "exec")        == 0) ;
+  else if (strcmp(toks[k], "exit")        == 0) ;
+  else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
-  else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
+  else if (strcmp(toks[k], "help")        == 0) ;
+  else if (strcmp(toks[k], "option")      == 0) exec_option();
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
+  else if (strcmp(toks[k], "quit")        == 0) ;
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
+  else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
+  else if (strcmp(toks[k], "resplot")     == 0) ;
+  else if (strcmp(toks[k], "return")      == 0) ;
+  else if (strcmp(toks[k], "save")        == 0) exec_save(cmd);
   else if (strcmp(toks[k], "savebeta")    == 0) store_savebeta(cmd);
   else if (strcmp(toks[k], "select")      == 0) store_select(cmd);
-  else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
+  else if (strcmp(toks[k], "set")         == 0) store_set(cmd->clone, 1);
+  else if (strcmp(toks[k], "setplot")     == 0) ;
+  else if (strcmp(toks[k], "sodd")        == 0) exec_sodd(cmd);
+  else if (strcmp(toks[k], "show")        == 0) ;
+  else if (strcmp(toks[k], "stop")        == 0) ;
+  else if (strcmp(toks[k], "system")      == 0) ;
+  else if (strcmp(toks[k], "title")       == 0) ;
+  else if (strcmp(toks[k], "threader")    == 0) store_threader(cmd);
+  else if (strcmp(toks[k], "use")         == 0) use_sequ(cmd);
+  else if (strcmp(toks[k], "value")       == 0) ;
+  else if (strcmp(toks[k], "write")       == 0) exec_dump(cmd);
   /* insert your proper command action here */
   else fprintf(stderr, "++++++++++++++ unknown command '%s', skipped in parser version\n", toks[k]);
 }
@@ -109,8 +123,7 @@ exec_command(void)
   {
     while (strcmp(p->cmd_def->name, "exec") == 0)
     {
-      if ((pos = name_list_pos(p->tok_list->p[p->decl_start],
-                               macro_list->list)) > -1)
+      if ((pos = name_list_pos(p->tok_list->p[p->decl_start], macro_list->list)) > -1)
       {
         exec_macro(p, pos);
         return;
@@ -121,8 +134,7 @@ exec_command(void)
     this_cmd = p;
     toks = p->tok_list->p;
     cmd_name = p->cmd_def->name;
-    if (strcmp(cmd_name, "stop") == 0 || strcmp(cmd_name, "quit") == 0
-        || strcmp(cmd_name, "exit") == 0)
+    if (strcmp(cmd_name, "stop") == 0 || strcmp(cmd_name, "quit") == 0 || strcmp(cmd_name, "exit") == 0)
     {
       madx_finish(); stop_flag = 1; return;
     }
@@ -146,8 +158,7 @@ exec_command(void)
     {
       if (get_option("trace")) time_stamp(cmd_name);
       /* clones with defaults for most commands */
-      if (strcmp(cmd_name, "option") == 0
-          && options != NULL)
+      if (strcmp(cmd_name, "option") == 0 && options != NULL)
       {
         set_option("tell", &izero); /* reset every time */
         p->clone = options; p->clone_flag = 1;
