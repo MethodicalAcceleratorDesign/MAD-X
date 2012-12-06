@@ -220,7 +220,7 @@ MAD-X will save a <a href="#beta0">beta0</a> block with the <a
  href="../Introduction/label.html">label</a> name:
 This block is filled with the values of all lattice parameters
 in place.
-Example 1:
+<p>Example 1:
 <pre>USE,period=CELL;<br>SAVEBETA,LABEL=END,PLACE=#E,SEQUENCE=CELL;<br>TWISS;<br>USE,period=INSERT;<br>TWISS,BETA0=END;<br></pre>
 This first example calculates the <a href="#periodic">periodic solution</a>
 of the line CELL,
@@ -228,8 +228,31 @@ and then track lattice parameters through INSERT, using all end
 conditions (including orbit) in CELL to start.
 <p>Example 2:
 </p>
-<pre>USE,period=CELL;<br>SAVEBETA,LABEL=END,PLACE=#E,SEQUENCE=CELL;<br>TWISS;<br>USE,period=INSERT;<br>TWISS,BETX=END-&gt;BETY,BETY=END-&gt;BETX;<br></pre>
-<pre>This is similar to the first example,<br>but the beta functions are interchanged (overwritten).<br></pre>
+<pre>
+USE,period=CELL;
+SAVEBETA,LABEL=END,PLACE=#E,SEQUENCE=CELL;
+TWISS;
+USE,period=INSERT;
+TWISS,BETX=END-&gt;BETY,BETY=END-&gt;BETX;
+</pre>
+<p>This is similar to the first example,but the beta functions are interchanged (overwritten).
+
+<h2><a name="beta0cmd">BETA0: Set Initial Lattice Parameters</a></h2>
+Initial lattice parameters can be set 'manually' for later commands, in
+particular for twiss or the <a href="../match/match.html">match module</a>,
+by using the BETA0 command attached to a label.
+<p>Example 3:
+<pre>
+INITIAL: BETA0, BETX=BX0,ALFX=0.0,MUX=0.0,BETY=BY0,ALFY=0.0,DX=DX0,DPX=0.0;
+TWISS,BETA0=INITIAL;
+</pre>
+<p>Example 4:
+<pre>
+INITIAL: BETA0, BETX=BX0,ALFX=0.0,MUX=0.0,BETY=BY0,ALFY=0.0,DX=DX0,DPX=0.0;
+TWISS,BETX=INITIAL-&gt;BETY,BETY=INITIAL-&gt;BETX;
+</pre>
+
+
 <hr>
 <address><a href="http://cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
 06-Apr-2003. Revised in February 2007.
