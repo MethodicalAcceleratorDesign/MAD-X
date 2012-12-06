@@ -1,0 +1,44 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.18  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.09.26      +
+  + Execution Time Stamp: 06.12.12 18.19.12 +
+  +++++++++++++++++++++++++++++++++++++++++++
+
+
+// only dipoles to make 360 degres BOTH THICK and THIN *** TEST MADX *****
+
+option,-echo, warn;
+
+beam,particle=proton;
+
+use,period=musr;select,flag=survey,column=name,l,angle,x,z,theta;
+
+survey,psi0=0.0,file="test-survey_1.tfs";
+
+!***************     CHECKS    **************************
+
+!  x(dip3) = -19.098593   , z(dip3) =  19.098593        *
+
+!  x(dip6) = -38.19718634 , z(dip6) = -3.948578443e-12  *
+
+!********************************************************
+
+makethin,sequence=musr;
+
+++++++ warning: makethin: no selection list, slicing all to one thin lens.
+makethin: slicing sequence : musr
+use,period=musr;select,flag=survey,column=name,l,angle,x,z,theta;
+
+survey,psi0=0.0,file="test-survey_2.tfs";
+
+stop;
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.18 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

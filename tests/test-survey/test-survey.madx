@@ -1,0 +1,38 @@
+
+// only dipoles to make 360 degres BOTH THICK and THIN *** TEST MADX *****
+option,-echo, warn;
+
+dip : sbend,l=10,angle=2.0*3.14159265359/12.0;
+dipt : sbend,l=10,angle=2.0*3.14159265359/12.0,tilt=0.1;
+
+seqend: marker;  ! bending radius = 19.098593
+midseq: marker;
+
+musr : SEQUENCE, REFER=CENTRE ,l=120;
+dip1 : dip, at=5;  
+dip2 : dip, at=5+10;
+dip3 : dip, at=5+20;
+dip4 : dip, at=5+30;
+dip5 : dip, at=5+40;
+dip6 : dip, at=5+50;
+midseq , at=60;
+dip7 : dip, at=5+60;
+dip8 : dip, at=5+70;
+dip9 : dip, at=5+80;
+dip10 : dip, at=5+90;
+dip11 : dip, at=5+100;
+dip12 : dip, at=5+110;
+ENDSEQUENCE;
+
+option,echo;
+beam,particle=proton;
+use,period=musr;select,flag=survey,column=name,l,angle,x,z,theta;
+survey,psi0=0.0,file="test-survey_1.tfs";
+!***************     CHECKS    **************************
+!  x(dip3) = -19.098593   , z(dip3) =  19.098593        *
+!  x(dip6) = -38.19718634 , z(dip6) = -3.948578443e-12  *
+!********************************************************
+makethin,sequence=musr;
+use,period=musr;select,flag=survey,column=name,l,angle,x,z,theta;
+survey,psi0=0.0,file="test-survey_2.tfs";
+stop;
