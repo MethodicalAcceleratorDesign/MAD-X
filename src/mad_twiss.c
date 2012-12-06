@@ -1215,20 +1215,19 @@ store_savebeta(struct in_cmd* cmd)
     delete_command_list(beta0_list);
     beta0_list = new_command_list("beta0_list", 10);
   }
-  else if (nl->inform[name_list_pos("place", nl)] == 0)
-    warning("savebeta without place:", "ignored");
-  else
-  {
-    pos = name_list_pos("label", nl);
-    if (nl->inform[pos])  name = pl->parameters[pos]->string;
-    else warning("savebeta without label:", "ignored");
-    if (name != NULL)
-    {
-      cmd->clone_flag = 1; /* do not delete */
-      if (find_command(name, beta0_list)) // (comm = not used
-        remove_from_command_list(name, beta0_list);
-      add_to_command_list(permbuff(name), cmd->clone, savebeta_list, 0);
+  else {
+    if ((pos = name_list_pos("place", nl)) < 0 || !nl->inform[pos]) {
+      warning("savebeta without place:", "ignored");
+      return;
     }
+    if ((pos = name_list_pos("label", nl)) < 0 || !nl->inform[pos] || !(name = pl->parameters[pos]->string)) {
+      warning("savebeta without label:", "ignored");
+      return;
+    }
+
+    cmd->clone_flag = 1; /* do not delete */
+    if ( find_command(name, beta0_list) ) remove_from_command_list(name, beta0_list);
+    add_to_command_list(permbuff(name), cmd->clone, savebeta_list, 0);
   }
 }
 
