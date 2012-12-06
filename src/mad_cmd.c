@@ -118,7 +118,6 @@ exec_command(void)
   struct in_cmd* pp;
   int izero = 0, pos; // ret, not used
 
-
   if (p->cmd_def != NULL)
   {
     while (strcmp(p->cmd_def->name, "exec") == 0)
@@ -170,6 +169,7 @@ exec_command(void)
       else p->clone = clone_command(p->cmd_def);
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
+
       if (strcmp(p->cmd_def->module, "control") == 0) control(p);
       else if (strcmp(p->cmd_def->module, "c6t") == 0) conv_sixtrack(p);
       else if (strcmp(p->cmd_def->module, "edit") == 0) seq_edit_main(p);

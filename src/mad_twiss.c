@@ -761,21 +761,21 @@ pro_twiss(void)
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
 
-  if (current_twiss == 0x0)
+  if (current_twiss == NULL)
   {
     seterrorflag(2,"pro_twiss","No twiss command seen yet");
     warning("pro_twiss","No twiss command seen yet!");
     return;
   }
 
-  if (current_twiss->par_names == 0x0)
+  if (current_twiss->par_names == NULL)
   {
     seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
     warning("pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
     return;
   }
 
-  if (current_twiss->par == 0x0)
+  if (current_twiss->par == NULL)
   {
     seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
     warning("pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
@@ -805,6 +805,7 @@ pro_twiss(void)
       return;
     }
   }
+
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
     warning("sequence not active,", "Twiss ignored");
@@ -813,20 +814,21 @@ pro_twiss(void)
   if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
   if (attach_beam(current_sequ) == 0)
     fatal_error("TWISS - sequence without beam:", current_sequ->name);
+
   pos = name_list_pos("table", nl);
   if(nl->inform[pos]) /* table name specified - overrides save */
   {
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
   }
-  else if((pos = name_list_pos("save", nl)) > -1 &&
-          nl->inform[pos]) /* save name specified */
+  else if((pos = name_list_pos("save", nl)) > -1 && nl->inform[pos]) /* save name specified */
   {
     k_save = 1;
     if ((table_name = pl->parameters[pos]->string) == NULL)
       table_name = pl->parameters[pos]->call_def->string;
   }
   else table_name = "twiss";
+
   if ((k_sect = get_value(current_command->name,"sectormap")) != 0)
   {
     set_option("twiss_sector", &k_sect);

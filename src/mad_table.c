@@ -593,7 +593,6 @@ void
 check_table(char* string)
   /* replaces argument of "table" if any by a string variable */
 {
-
   char *pa, *pb, *pt, *pl, *pr, *sv;
   pa = string;
   while ((pb = strstr(pa, "table")) != NULL)

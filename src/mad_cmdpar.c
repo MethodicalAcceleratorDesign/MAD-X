@@ -567,8 +567,7 @@ store_comm_par_def(char* toks[], int start, int end)
           i = 0;
           for (j = 0; j < pl[0]->m_string->max; j++)
           {
-            if (*toks[s_start+j] != ',' &&
-                strcmp(toks[s_start+j], none) != 0)
+            if (*toks[s_start+j] != ',' && strcmp(toks[s_start+j], none) != 0)
               pl[0]->m_string->p[i++] = permbuff(toks[s_start+j]);
           }
           pl[0]->m_string->curr = i;
@@ -826,9 +825,10 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
       {
         i += 2;
         for (j = i; j < number; j++)
-          if (name_list_pos(alias(toks[j]),
-                            cmd->cmd_def->par_names) >= 0) break;
-        if (*toks[j-1] == ',') j--;
+          if (name_list_pos(alias(toks[j]), cmd->cmd_def->par_names) >= 0) break;
+//        dirty quick fix for ticket #165
+//        if (*toks[j-1] == ',') j--;
+          while (*toks[j-1] == ',') j--;
         tot_end = j - 1;
         clp->string = permbuff(noquote(join(&toks[i], j - i)));
       }
