@@ -52,7 +52,7 @@ add_drifts(struct node* c_node, struct node* end)
     }
     else 
       // length in [-tol, tol], nothing to do (no drift inserted)
-      ;
+      (void)0;
   }
 
   return cnt;

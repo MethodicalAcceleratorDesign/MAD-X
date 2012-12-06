@@ -85,7 +85,7 @@ error_seterr(struct in_cmd* cmd)
    ===> (unless table exists in memory !)
 */
 
-  int from_col, to_col, ncols, row, col;
+  int from_col, to_col, row, col;
 
   struct node *node, *node_end;
 
@@ -97,7 +97,6 @@ error_seterr(struct in_cmd* cmd)
 
   char    *namtab, namtab_buf[NAME_L];
   int      t1;
-  int      new_table_type;
 
   struct   table *err;
 
