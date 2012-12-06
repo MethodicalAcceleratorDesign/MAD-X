@@ -4,15 +4,16 @@ static struct element*
 get_drift(double length)
   /* makes a drift space with the required length */
 {
+  const double tol = 1e-12; // length tolerance for sharing implicit drift
   struct element *p, *bt;
   struct command* clone;
   char key[NAME_L];
-  int i;
-  for (i = 0; i < drift_list->curr; i++)
-  {
+
+  for (int i = 0; i < drift_list->curr; i++) {
     p = drift_list->elem[i];
-    if (fabs(p->length - length) < ten_m_12) return p;
+    if (fabs(p->length - length) < tol) return p;
   }
+
   sprintf(key, "drift_%d", drift_list->curr);
   bt = find_element("drift", base_type_list);
   clone = clone_command(bt->def);
@@ -26,35 +27,34 @@ int
 add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
-  struct node *d1;
-  struct element *drift;
-  double pos, dl, el2;
   int cnt = 0;
-  pos = c_node->position - c_node->length / 2;
-  while (c_node != NULL)
-  {
-//    printf("******* %s, %.9f, %.9f\n", c_node->name, c_node->position, c_node->length);
-    cnt++;
-    el2 = c_node->length / 2;
-    dl = c_node->position - el2 - pos;
-    if (dl + tol < 0)
-    {
-      sprintf(c_dum->c, " %s and %s, length %e", c_node->previous->name, c_node->name, dl);
-      fatal_error("negative drift between elements", c_dum->c);
+
+  if (!c_node) return cnt;
+
+  for (; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
+    double drift_beg = c_node->position + c_node->length / 2;
+    double drift_end = c_node->next->position - c_node->next->length / 2;
+    double drift_len = drift_end-drift_beg;
+
+    if (drift_len < -tol) {
+      // implicit drift with negative length
+      char buf[256];
+      sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
+      fatal_error("negative drift between elements", buf);
     }
-    else if (dl > tol)
-    {
+    else if (drift_len > tol) {
+      // create or share 'long-enough' implicit drift
+      struct element *drift = get_drift(drift_len);
+      struct node *drift_node = new_elem_node(drift, 0);
+      link_in_front(drift_node, c_node->next);
+      drift_node->position = drift_beg + drift_len / 2;
       cnt++;
-      drift = get_drift(dl);
-      d1 = new_elem_node(drift, 0);
-      link_in_front(d1, c_node);
-      d1->position = pos + dl / 2;
     }
-    pos = c_node->position + el2;
-    if (c_node == end) break;
-    c_node = c_node->next;
+    else 
+      // length in [-tol, tol], nothing to do (no drift inserted)
+      ;
   }
+
   return cnt;
 }
-
 
