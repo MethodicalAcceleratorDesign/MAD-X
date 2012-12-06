@@ -186,8 +186,9 @@ module plotfi
   integer mtype, m_adble
   parameter (mtype = 50, m_adble = 20)
 
+  !--- mcnam adjusted to NAME_L
   integer mcnam, maxpnt
-  parameter (mcnam = 16, maxpnt = 500)
+  parameter (mcnam = 48, maxpnt = 500)
 
   !--- szcompar is the size of the arrays returned by the routine comm_para
   integer szcompar

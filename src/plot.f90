@@ -2419,8 +2419,7 @@ subroutine pesopt(ierr)
   qtscl = plot_option('rscale ')
 
   char_a = ' '
-  call comm_para('range ', nint, ndble, k, int_arr, d_arr,          &
-       char_a, char_l)
+  call comm_para('range ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   call table_range(tabname, char_a, nrrang)
   if (nrrang(1) .eq. 0 .and. nrrang(2) .eq. 0)  then
      print *, 'unknown table or illegal range, skipped'
