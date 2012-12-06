@@ -591,15 +591,15 @@ quit_diff:
       warning("(%d) numbers strict representation differ", dif->cnt_i);
 
     if (ret & eps_dig)
-      warning("(%d) numdigit error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+      warning("(%d) numdigit error (rule #%d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(cxt, c), c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
  
     if (ret & eps_rel)
-      warning("(%d) relative error [rule #%d] rel = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+      warning("(%d) relative error (rule #%d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(cxt, c), c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
 
     if (ret & eps_abs)
-      warning("(%d) absolute error [rule #%d] abs = %g [|abs_err|=%.2g, |rel_err|=%.2g, ndig=%d]",
+      warning("(%d) absolute error (rule #%d: abs = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(cxt, c), c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
   }
   ret = 1;
