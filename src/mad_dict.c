@@ -1052,6 +1052,7 @@ char command_def[] =
 "knl      = [r, {0}], "
 "ksl      = [r, {0}], "
 "slice    = [i, 1],  "
+"thick    = [l, false, true], "
 "magnet   = [i, 1],  "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
