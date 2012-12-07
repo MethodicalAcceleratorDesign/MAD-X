@@ -70,7 +70,6 @@ test-twiss-4
 # lexicographical order
 tests-to-setup := \
 test-ibs \
-test-touschek \
 test-ptc-twiss-2
 
 # testsuite titles (attached to first test of the suite)
