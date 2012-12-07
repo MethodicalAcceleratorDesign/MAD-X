@@ -313,6 +313,7 @@ char command_def[] =
 "class    = [s, none, none], "
 "pattern  = [s, any, none], "
 "slice    = [i, 1, 1], "
+"thick    = [l, false, true], "
 "column   = [s,{none}], "
 "sequence = [s, none], "
 "full     = [l, false, true], "
