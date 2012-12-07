@@ -1694,7 +1694,7 @@ table_column_exists(const char* table, const char *name)
 {
   char tbl_s[NAME_L], col_s[NAME_L];
   struct table *tbl;
-  int pos, col;
+  int pos;
 
   mycpy(tbl_s, table);
   if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
@@ -1702,7 +1702,7 @@ table_column_exists(const char* table, const char *name)
     return 0;
 
   mycpy(col_s, name);
-  if ((col = name_list_pos(col_s, tbl->columns)) < 0)
+  if (name_list_pos(col_s, tbl->columns) < 0)
     return 0;
 
   return 1;
