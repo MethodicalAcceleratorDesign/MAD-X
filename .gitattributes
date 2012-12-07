@@ -641,6 +641,7 @@ tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.ref -text
+tests/test-ptc-normal/fort.18.cfg -text
 tests/test-ptc-normal/fort.18.ref -text
 tests/test-ptc-normal/ptc_map_table.tfs.cfg -text
 tests/test-ptc-normal/ptc_map_table.tfs.ref -text
