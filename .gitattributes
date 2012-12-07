@@ -713,6 +713,13 @@ tests/test-thick-quad/test1_track.obs0001.p0001.cfg -text
 tests/test-thick-quad/test1_track.obs0001.p0001.ref -text
 tests/test-thick-quad/test1_track.obs0002.p0001.cfg -text
 tests/test-thick-quad/test1_track.obs0002.p0001.ref -text
+tests/test-touschek-2/README -text
+tests/test-touschek-2/test-touschek-2.cfg -text
+tests/test-touschek-2/test-touschek-2.madx -text
+tests/test-touschek-2/test-touschek-2.ref -text
+tests/test-touschek-2/touschek.cfg -text
+tests/test-touschek-2/touschek.ref -text
+tests/test-touschek/README -text
 tests/test-touschek/test-touschek.cfg -text
 tests/test-touschek/test-touschek.madx -text
 tests/test-touschek/test-touschek.ref -text

@@ -1,0 +1,45 @@
+Option,  warn,info;
+
+!System,"rm -rf ldb";
+! System,"rm -rf lt";
+
+!System,"ln -fns ldb2 ldb";
+! System,"ln -fns /afs/cern.ch/user/b/bruening/madx/toolkit lt";
+
+Option, echo;
+Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
+
+!---------------------------------------------------------------;
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+!---------------------------------------------------------------;
+   Option, echo,warn,info;
+
+option,-echo;
+call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+option,echo;
+
+Beam, particle = proton, sequence=lhcb1, energy = 450.0,
+          NPART=1.15E11, ex=7.82e-9, ey=7.82e-9,
+          et=5.302e-5, sige=4.7164e-4, sigt=0.1124, radiate=false ;
+!
+
+ use, period=lhcb1;
+twiss,chrom,table;
+
+
+! crossing angles
+ on_x1                = 1;
+ on_x5                = 1 ;
+ on_x2                = 1 ;
+ on_x8                = 1 ;
+ on_alice= 1; on_lhcb = 1;
+
+vrf400:= 8.;
+
+! reduce size of output table:
+select,flag=touschek,pattern="MCB",column=S, TLI, TLIW, TLITOT;
+touschek,file;
+
+stop;
+

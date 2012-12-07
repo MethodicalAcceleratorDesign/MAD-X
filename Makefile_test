@@ -43,7 +43,11 @@ test-aperture \
 \
 test-ptc-twiss \
 test-ptc-normal \
-test-ptc-trackline test-ptc-trackline-2
+test-ptc-trackline \
+test-ptc-trackline-2 \
+test-touschek \
+test-touschek-2
+
 
 # tests dependencies
 test-track-2: test-makethin
@@ -55,6 +59,7 @@ test-makethin \
 test-match-2 \
 test-ptc-twiss \
 test-touschek \
+test-touschek-2 \
 test-track-2 \
 test-track-7 \
 test-twiss\
