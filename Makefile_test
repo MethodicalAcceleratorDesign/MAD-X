@@ -54,6 +54,7 @@ tests-long := \
 test-makethin \
 test-match-2 \
 test-ptc-twiss \
+test-touschek \
 test-track-2 \
 test-track-7 \
 test-twiss\
@@ -64,6 +65,7 @@ test-twiss-4
 # lexicographical order
 tests-to-setup := \
 test-ibs \
+test-touschek \
 test-ptc-twiss-2
 
 # testsuite titles (attached to first test of the suite)
@@ -79,6 +81,7 @@ test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 test-ptc-trackline: TESTSUITE := PTC Trackline testsuite
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
 test-survey:       TESTSUITE := Survey testsuite
+test-touschek:     TESTSUITE := Touschek testsuite
 test-track:        TESTSUITE := Track testsuite
 test-twiss:        TESTSUITE := Twiss testsuite
 
