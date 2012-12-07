@@ -1,0 +1,72 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 07.12.12 14.11.53 +
+  +++++++++++++++++++++++++++++++++++++++++++
+option,-info,-warn,-echo;
+
+enter Twiss module
+  
+iteration:   1 error:   2.781154E-08 deltap:   1.000000E-06
+orbit:   3.355090E-09  1.010527E-11  0.000000E+00  0.000000E+00  7.771032E-09  2.922077E-09
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       357.4574272                 -0    7.394308645e-05        116.2923677 
+
+                q1                dq1            betxmax              dxmax 
+       72.69004215       0.4339070472        29.99644003      0.01188303857 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.005493987199                  0                  0        35.41801892 
+
+               dq2            betymax              dymax              dyrms 
+       1.616935762        9.214102536                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0      0.03167054981 
+
+           synch_2            synch_3            synch_4            synch_5 
+       4.507883438       0.9276843614                  0    0.0001051189251 
+NO centre off 
+   
+ TOUSCHEK MODULE 
+ particle positron
+ Charge    1.00000000000000     
+ gammas    4743.65004027112     
+ gamma    4743.65004027112     
+ Energy    2.42400000000000     
+ Mass   5.109989100000000E-004
+ Ex   1.200000000000000E-010
+ Ey   6.750000000000000E-013
+ Et   1.600000000000000E-006
+ sigt   1.146360796258867E-003
+ sige   1.395721142263045E-003
+ parnum    3100000000.00000     
+ circ    357.457427210059     
+ currnt   4.165512248038627E-004
+ betas   0.999999977779966     
+ beta   0.999999977779966     
+ clight    299792458.000000     
+ arad   2.817940286685957E-015
+ alfa   7.394329653660130E-005
+ freq0   0.838680157462302     
+ kbunch         1386
+ deltap   0.000000000000000E+000
+   
+ Energy radiated per turn [MeV]
+   2.19120856352282     
+ Touschek Lifetime [seconds/hours]
+   183.507608413267       5.097433567035192E-002
+
+  Number of warnings: 0
+
+  +++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.00 finished normally +
+  +++++++++++++++++++++++++++++++++++
