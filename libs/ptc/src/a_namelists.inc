@@ -91,3 +91,16 @@ namelist / k160name / k160
 type(tcav_list) tcav0
 namelist / tCAVname / tcav0
 
+  TYPE siam_list   
+   real(dp) angle(3)
+   real(dp) d(3)
+  END TYPE siam_list
+type(siam_list) siam0
+namelist / siamname / siam0
+
+  TYPE track_list   
+   character(120) name
+   integer range(3),direction
+  END TYPE track_list
+ type(track_list) track0
+ namelist / trackname / track0

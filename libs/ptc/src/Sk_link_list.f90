@@ -12,7 +12,7 @@ MODULE S_FIBRE_BUNDLE
   PRIVATE kill_layout,kill_info,alloc_info,copy_info
   private dealloc_fibre,append_fibre   !, alloc_fibre public now also as alloc
   !  private null_it0
-  private move_to_p,move_to_name_old,move_to_nameS,move_to_name_FIRSTNAME
+  private move_to_p,move_to_name_old,move_to_nameS,move_to_name_FIRSTNAME 
   PRIVATE append_EMPTY_FIBRE
   PRIVATE FIND_PATCH_0
   PRIVATE FIND_PATCH_p_new
@@ -66,7 +66,7 @@ MODULE S_FIBRE_BUNDLE
      MODULE PROCEDURE move_to_name_old
      MODULE PROCEDURE move_to_nameS
      MODULE PROCEDURE move_to_name_FIRSTNAME
-  END INTERFACE
+   END INTERFACE
 
   INTERFACE FIND_PATCH
      MODULE PROCEDURE FIND_PATCH_0
@@ -525,6 +525,44 @@ CONTAINS
        pos=0
     endif
   END SUBROUTINE move_to_nameS
+
+ SUBROUTINE move_to_i( L,current,POS) !      move_to_i   ! move to ith fibre
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET, intent(inout):: L
+    integer, intent(inout):: pos
+    integer i
+
+    logical(lp) foundit
+    TYPE (fibre), POINTER :: p
+
+    foundit=.false.
+
+    nullify(p)
+    p=>l%START
+    if(.not.associated(p)) goto 100
+
+    do i=1,l%n
+       if(p%pos==pos) then
+         foundit=my_true
+         exit
+       endif
+       if(l%lastpos>=pos) then
+        p=>p%previous
+       else
+        p=>p%next
+       endif
+       if(.not.associated(p)) goto 100
+    enddo
+100 continue
+    if(foundit) then
+       current=>p
+       l%lastpos=pos
+       l%last=>current
+    else
+       pos=0
+    endif
+  END SUBROUTINE move_to_i
 
 
 
@@ -1708,6 +1746,7 @@ CONTAINS
     ENDIF
   END SUBROUTINE MOVE_TO_LAYOUT_I
 
+
   SUBROUTINE MOVE_TO_LAYOUT_name( L,current,name ) ! Moves current to the i^th position
     implicit none
     TYPE (LAYOUT), POINTER :: Current
@@ -1807,14 +1846,25 @@ CONTAINS
     TYPE (fibre), POINTER :: C
     TYPE (fibre), POINTER :: P
     NULLIFY(P);
-    P=>C
-    !    CALL LINE_L(L,doneit)  ! TGV
 
-    DO WHILE(.NOT.ASSOCIATED(P,L%START))
+    !    CALL LINE_L(L,doneit)  ! TGV
+    I=0
+    IF(ASSOCIATED(C,L%START)) THEN
+     I=1
+     RETURN
+    ENDIF
+    P=>L%start%NEXT
+    I=2
+    DO WHILE(.NOT.ASSOCIATED(P,C))
        I=I+1
-       P=>P%PREVIOUS
+       P=>P%NEXT
+       if(i>1000000) then
+        write(6,*) " not found in FIND_POS_in_layout "
+        i=0
+        exit
+       endif
     ENDDO
-    I=I+1
+
     !    CALL RING_L(L,doneit)
   END SUBROUTINE FIND_POS_in_layout
 
@@ -1858,18 +1908,7 @@ CONTAINS
        if(associated(c0,c)) exit
     enddo
     write(6,*) "universe has ",k," fibres"
-    k=0
-    l=>m_u%start
 
-    k=0
-    c0=>l%start
-    c=>l%start
-    do while(.true.)
-       k=k+1
-       c=>c%P
-       if(associated(c0,c)) exit
-    enddo
-    write(6,*) "universe has ",k," fibres"
   end  SUBROUTINE unify_mad_universe
 
   SUBROUTINE TIE_MAD_UNIVERSE(M_U,N)
@@ -1912,6 +1951,40 @@ CONTAINS
     m_u%last=>m_u%start%start
     m_u%lastpos=1
   end SUBROUTINE TIE_MAD_UNIVERSE
+
+  subroutine gUniverse_max_n(u,n)
+    !use build_lattice
+    implicit none
+    integer n,i
+    type(mad_universe), target :: u
+    type(layout), pointer :: L
+    n=0
+
+    l=>u%start
+    do i=1,u%n
+       n=n+l%n
+       l=>l%next
+    enddo
+
+  end subroutine gUniverse_max_n
+
+
+  subroutine gUniverse_max_node_n(u,n)
+    !use build_lattice
+    implicit none
+    integer n,i
+    type(mad_universe), target :: u
+    type(layout), pointer :: L
+    n=0
+
+    l=>u%start
+    do i=1,u%n
+       if(associated(l%t) ) n=n+l%t%n
+       l=>l%next
+    enddo
+
+  end subroutine gUniverse_max_node_n
+
 
   SUBROUTINE move_to_name( m_u,current,name,pos,next)
     ! moves to next one in list called name in tied universe

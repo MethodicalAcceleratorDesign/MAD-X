@@ -10,7 +10,9 @@ module madx_keywords
   logical(lp),private :: do_survey =my_false
   logical(lp) :: print_marker =my_true
   type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
- 
+  real(dp), private :: a_(3),ent_(3,3), b_(3),exi_(3,3)
+
+
   type keywords
      character*20 magnet
      character*20 model
@@ -32,6 +34,11 @@ module madx_keywords
   END type MADX_SURVEY
 
   include "a_namelists.inc"
+
+
+  INTERFACE read_lattice_append
+     MODULE PROCEDURE read_universe_database 
+  END  INTERFACE
 
 
 contains
@@ -1971,19 +1978,27 @@ nmark=0
 
   END SUBROUTINE switch_to_kind7
 
+!!!!!! New flat file for data base universe  M_T !!!!!!!!!!!!!!!!! 
   
-subroutine  print_new_flat(ring,filename)
+subroutine  print_new_flat(ring,filename,last,com)
 
 implicit none
 type(layout), target :: ring
 type(fibre), pointer :: f
+logical(lp), optional ::last
+character(6), optional ::com
 character(*) filename
 integer i,mf
 character(120) line
-
+logical(lp) fin
+character (6) comt
+comt='REWIND'
+fin=my_true
+if(present(last)) fin=last
 !goto 1
-call kanalnummer(mf,filename)
-
+if(present(com)) comt=com
+call kanalnummer(mf)
+open(unit=mf,file=filename,position=comt)
 
    write(mf,'(a120)') ring%name
    write(mf,*) highest_fringe  , " highest fringe "
@@ -1993,8 +2008,11 @@ call kanalnummer(mf,filename)
     
  write(mf,*) " $$$$$$$$$$$$$$$$$ START OF LAYOUT $$$$$$$$$$$$$$$$$"
 
+
   
 f=>ring%start
+
+call Print_initial_chart(f,mf)
 
 do i=1,ring%n
   call el_el0(f%mag,my_true,mf)
@@ -2007,70 +2025,384 @@ do i=1,ring%n
  f=>f%next    
 enddo
 
-close(mf)
+ write(mf,*) "&ELENAME"
+if(fin) then
+ write(mf,*) "ELE0%NAME_VORNAME    = alldone"
+else
+ write(mf,*) "ELE0%NAME_VORNAME    = endhere"
+endif 
+write(mf,*) "/"
 
-return
-
-1 call kanalnummer(mf,filename)
-
-
- 
-f=>ring%start
-  read(mf,'(a120)') ring%name
-   read(mf,*) highest_fringe   
-   read(mf,*) lmax
-   read(MF,*) ALWAYS_EXACTMIS,ALWAYS_EXACT_PATCHING   
-   read(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL  
-
- read(mf,'(a120)') line
- 
-do i=1,ring%n
-  write(6,*) f%MAG%NAME
-  write(6,*) f%beta0,f%MAG%P%B0
-
-  call el_el0(f%mag,my_false,mf)
-  call fib_fib0(f,my_false,mf)
-  CALL MC_MC0(f%MAG%P,my_false,mf) 
-  CALL print_ElementLIST(f%mag,my_false,mf)
-
- read(mf,'(a120)') line
- 
-  write(6,*) f%MAG%NAME
-  write(6,*) f%beta0,f%MAG%P%B0
-  
- f=>f%next    
-enddo
 
 close(mf)
+
+
 end subroutine print_new_flat
-subroutine  read_lattice_append(un,filename)
+
+subroutine  print_universe(un,filename)
+!call print_universe(m_u,'junk2.txt')
+!call print_universe_pointed(m_u,m_t,'junk3.txt')
 implicit none
 type(mad_universe),target :: un
+type(layout),pointer :: r
 character(*) filename
+integer i
 
-          call append_empty_layout(un)  
-          call set_up(un%end)
-          call read_lattice(un%end,filename)
 
-end subroutine  read_lattice_append
 
-subroutine  read_lattice(r,filename,arpent)
+r=>un%start
+
+
+if(associated(r,un%end)) then
+ call  print_new_flat(r,filename,last=my_true)
+else
+          do while(.not.associated(r,un%end))
+            if(associated(r,un%start)) then
+              call  print_new_flat(r,filename,last=my_false)  
+            else
+              call  print_new_flat(r,filename,last=my_false,com="APPEND")  
+            endif
+            r=>r%next
+          enddo
+              call  print_new_flat(r,filename,last=my_true,com="APPEND")  
+ 
+endif
+call print_universe_siamese(un,filename)
+call print_universe_girders(un,filename)
+end subroutine  print_universe
+
+subroutine  print_universe_girders(un,filename)
+implicit none
+type(mad_universe),target :: un
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+character(*) filename
+integer i,k,i1,i2,j1,j2,MF
+
+
+
+call TIE_MAD_UNIVERSE(un)
+
+p=>un%start%start
+p0=>p
+p=>p%next
+
+
+k=0
+do while(.not.associated(p0,p))
+
+
+if(associated(p%mag%girders)) then
+ 
+ if(associated(p%mag%GIRDER_FRAME)) then
+ k=k+1
+
+endif
+endif
+ 
+ p=>p%n
+enddo
+
+call kanalnummer(mf)
+open(unit=mf,file=filename,position='APPEND')
+write(MF,*) k, " girders in the universe "
+
+
+
+
+p=>un%start%start
+p0=>p
+p=>p%next
+
+
+i=0
+do while(.not.associated(p0,p))
+i=i+1
+
+if(associated(p%mag%girders)) then
+ 
+ 
+ if(associated(p%mag%GIRDER_FRAME)) then
+  j1=0
+  j2=0
+  ps=>p
+  call locate_in_universe(ps,i1,i2)
+     write(MF,*) p%mag%girder_frame%a    
+     write(MF,*) p%mag%girder_frame%ent(1,1:3)
+     write(MF,*) p%mag%girder_frame%ent(2,1:3)
+     write(MF,*) p%mag%girder_frame%ent(3,1:3)
+     write(MF,*) p%mag%girder_frame%b    
+     write(MF,*) p%mag%girder_frame%exi(1,1:3)
+     write(MF,*) p%mag%girder_frame%exi(2,1:3)
+     write(MF,*) p%mag%girder_frame%exi(3,1:3)
+
+
+
+     write(MF,*) i1,i2,ps%loc,PS%MAG%NAME
+  do while(j1/=i1.or.j2/=i2)
+      ps=>ps%mag%girders%parent_fibre    
+      call locate_in_universe(ps,j1,j2)
+      if (j1/=i1.or.j2/=i2) then
+        write(MF,*) j1,j2 ,ps%loc
+      else
+        write(MF,*) 0,0,0
+      endif
+  enddo
+ endif
+
+endif
+ 
+ p=>p%n
+enddo
+
+
+CLOSE(MF)
+
+end subroutine  print_universe_girders
+
+subroutine  read_universe_girders(un,mf,ns)
+implicit none
+type(mad_universe),target :: un
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+integer i,k,j,i1,i2,j1,MF,ns
+
+
+call TIE_MAD_UNIVERSE(un)
+
+
+
+
+do i=1,ns
+
+call read_initial_chart(mf)
+
+read(mf,*) i1,i2,j1
+
+ p0=>un%start%start 
+ do j=2,j1
+  p0=>p0%n
+ enddo
+ ps=>p0
+
+ do k=1,1000000 
+  read(mf,*) i1,i2,j1
+  if(i1==0) exit
+  p=>un%start%start
+  do j=2,j1
+   p=>p%n
+  enddo
+  ps%mag%girders=>p%mag
+  ps=>p
+ enddo
+  ps%mag%girders=>p0%mag
+
+  allocate(p0%mag%girder_frame)
+  call NULL_af(p0%mag%girder_frame)
+  allocate(p0%mag%girder_frame%a(3))
+  allocate(p0%mag%girder_frame%b(3))
+  allocate(p0%mag%girder_frame%ent(3,3))
+  allocate(p0%mag%girder_frame%exi(3,3))
+  p0%mag%girder_frame%a=a_
+  p0%mag%girder_frame%ent(1,1:3)=ent_(1,1:3)
+  p0%mag%girder_frame%ent(2,1:3)=ent_(2,1:3)
+  p0%mag%girder_frame%ent(3,1:3)=ent_(3,1:3)
+  p0%mag%girder_frame%b=b_
+  p0%mag%girder_frame%exi(1,1:3)=exi_(1,1:3)
+  p0%mag%girder_frame%exi(2,1:3)=exi_(2,1:3)
+  p0%mag%girder_frame%exi(3,1:3)=exi_(3,1:3)
+
+enddo
+
+
+end subroutine  read_universe_girders
+
+subroutine  print_universe_siamese(un,filename)
+implicit none
+type(mad_universe),target :: un
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+character(*) filename
+integer i,k,i1,i2,j1,j2,MF
+
+
+
+call TIE_MAD_UNIVERSE(un)
+
+p=>un%start%start
+p0=>p
+p=>p%next
+
+
+k=0
+do while(.not.associated(p0,p))
+
+
+if(associated(p%mag%siamese)) then
+ 
+ if(associated(p%mag%SIAMESE_FRAME)) then
+ k=k+1
+
+endif
+endif
+ 
+ p=>p%n
+enddo
+
+call kanalnummer(mf)
+open(unit=mf,file=filename,position='APPEND')
+write(MF,*) k, " siamese in the universe "
+
+
+
+
+p=>un%start%start
+p0=>p
+p=>p%next
+
+
+i=0
+do while(.not.associated(p0,p))
+i=i+1
+
+if(associated(p%mag%siamese)) then
+ 
+ 
+ if(associated(p%mag%SIAMESE_FRAME)) then
+  j1=0
+  j2=0
+  ps=>p
+  call locate_in_universe(ps,i1,i2)
+     write(MF,*) p%mag%SIAMESE_FRAME%ANGLE
+     write(MF,*) p%mag%SIAMESE_FRAME%d
+     write(MF,*) i1,i2,ps%loc,PS%MAG%NAME
+  do while(j1/=i1.or.j2/=i2)
+      ps=>ps%mag%siamese%parent_fibre    
+      call locate_in_universe(ps,j1,j2)
+      if (j1/=i1.or.j2/=i2) then
+        write(MF,*) j1,j2 ,ps%loc
+      else
+        write(MF,*) 0,0,0
+      endif
+  enddo
+ endif
+
+endif
+ 
+ p=>p%n
+enddo
+
+
+CLOSE(MF)
+
+end subroutine  print_universe_siamese
+
+subroutine  read_universe_siamese(un,mf,ns)
+implicit none
+type(mad_universe),target :: un
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+integer i,k,j,i1,i2,j1,MF,ns
+real(dp) a(3),d(3)
+
+
+call TIE_MAD_UNIVERSE(un)
+
+
+
+
+do i=1,ns
+
+read(mf,*) a
+read(mf,*) d
+
+read(mf,*) i1,i2,j1
+
+ p0=>un%start%start 
+ do j=2,j1
+  p0=>p0%n
+ enddo
+ ps=>p0
+
+ do k=1,1000000 
+  read(mf,*) i1,i2,j1
+  if(i1==0) exit
+  p=>un%start%start
+  do j=2,j1
+   p=>p%n
+  enddo
+  ps%mag%siamese=>p%mag
+  ps=>p
+ enddo
+  ps%mag%siamese=>p0%mag
+
+  allocate(p0%mag%siamese_frame)
+  call NULL_af(p0%mag%siamese_frame)
+  allocate(p0%mag%siamese_frame%angle(3))
+  allocate(p0%mag%siamese_frame%d(3))
+  p0%mag%siamese_frame%angle=a
+  p0%mag%siamese_frame%d=d
+enddo
+
+
+end subroutine  read_universe_siamese
+
+subroutine  read_universe_database(un,filename,arpent)
+! the universes should be empty
+!call read_universe_database(m_u,'junk2.txt',arpent=my_false)
+!call read_universe_pointed(M_u,M_t,'junk3.txt')
+!call create_dna(M_u,m_t)
+!arpent= false => the databaseshould not be surveyed.
+! DNA is automatically created in create_dna
+implicit none
+type(mad_universe),target :: un
+logical(lp), optional :: arpent
+character(*) filename
+integer mf,ns
+ELE0%NAME_VORNAME(1)=' '
+
+ call kanalnummer(mf,filename(1:len_trim(filename)))
+          do while(ELE0%NAME_VORNAME(1)/="alldone")
+           call append_empty_layout(un)  
+           call set_up(un%end)
+           call read_lattice(un%end,filename,mf,arpent)
+          enddo
+read(mf,*) ns   ! number of siamese
+ call read_universe_siamese(un,mf,ns)
+read(mf,*) ns   ! number of girders
+call read_universe_girders(un,mf,ns)
+close(mf)
+end subroutine  read_universe_database
+
+
+
+subroutine  read_lattice(r,filename,mfile,arpent)
 implicit none
 type(layout),target :: r
 character(*) filename
 logical(lp), optional :: arpent
+integer , optional :: mfile
 logical(lp) doneit,surv
 character(120) line
 type(fibre),pointer :: s22
 type(element),pointer :: s2
 type(elementp), pointer :: s2p
 
+
 integer mf,n
 
+call make_states(.false.)
+call set_mad(energy=2.0d0)
+
+if(present(mfile)) then
+ mf=mfile
+else
+ call kanalnummer(mf,filename(1:len_trim(filename)))
+endif
 surv=my_true
 
 !-----------------------------------
-call kanalnummer(mf,filename(1:len_trim(filename)))
+
 
    read(mf,'(a120)') r%name
    read(mf,*) highest_fringe  
@@ -2079,9 +2411,21 @@ call kanalnummer(mf,filename(1:len_trim(filename)))
    read(mf,*) SECTOR_NMUL_MAX,SECTOR_NMUL  
     
  read(mf,'(a120)') line
+
+
+ 
+ read(mf,'(a120)') line
+call read_initial_chart(mf)
+ read(mf,'(a120)') line
+
+
+
 n=0
 do while(.true.) 
    read(mf,NML=ELEname,end=999)
+
+
+   if(ELE0%NAME_VORNAME(1)== "endhere".or.ELE0%NAME_VORNAME(1)=="alldone") goto 99
  !write(6,NML=ELEname)
    read(mf,NML=FIBRENAME,end=999)
  !write(6,NML=FIBRENAME)
@@ -2132,13 +2476,13 @@ do while(.true.)
        S2%P%METHOD=4
        deallocate(T_E,t_ax,t_ay)
     endif    
-!     write(6,*) s2%kind,kind4,associated(s2%volt)
-! pause 80
-    call print_ElementLIST(s2,my_false)
 
+ 
+
+    call print_ElementLIST(s2,my_false)
+ 
     s2p=0   
- !  write(6,*) associated(s2%name)
- !  write(6,*) associated(s2p%name)
+ 
  !pause 665
 
     call copy(s2,s2p)
@@ -2152,6 +2496,8 @@ do while(.true.)
     endif
    if(ele0%slowac_recut_even_electric_MIS(5)) call CHART_CHART0(s22%chart,my_false)
 
+!  write(6,*) associated(s2%p%f%o)
+!pause 777
 !   write(6,*) associated(s22%chart%f)
 !   write(6,*) s22%paTCH%patch
 !   write(6,*) s22%paTCH%a_d
@@ -2164,22 +2510,33 @@ enddo
    100 CONTINUE
 
 
+99 write(6,*) ELE0%NAME_VORNAME(1)
 999 write(6,*) "Read ",n
 
- if(present(arpent)) surv=arpent
-
-   if(surv) then
+ s22=>r%start
+! if(s22%dir==1) then
+  s22%chart%f%a=a_
+  s22%chart%f%ent=ent_
+! else
+  s22%chart%f%b=b_
+  s22%chart%f%exi=exi_
+! endif
     r%closed=.true.
 
     doneit=.true.
     call ring_l(r,doneit)
+ if(present(arpent)) surv=arpent
+
+   if(surv) then
+
 
      call survey(r)
    endif
 
 1000 continue
 
-close(mf)
+if(.not.present(mfile)) close(mf)
+
 end subroutine read_lattice
 
   subroutine read_ElementLIST(kind,mf)
@@ -2543,9 +2900,10 @@ end subroutine el_el0
        write(MF,*) " not supported in print_specific_element",el%kind
  !      stop 101
     end select
-    
+ 
     CALL  ap_aplist(el,dir,mf) 
 
+ 
 
   END SUBROUTINE print_ElementLIST
 
@@ -2750,11 +3108,11 @@ else
 endif
  
  else   ! dir=false
-   if(present(mf)) then     
-      READ(MF,'(a120)') LINE 
-      CALL CONTEXT(LINE)
-   ENDIF
-    IF(LINE(1:2)/='NO') THEN
+ !  if(present(mf)) then     
+ !     READ(MF,'(a120)') LINE 
+ !     CALL CONTEXT(LINE)
+ !  ENDIF
+    IF(aplist%on) THEN
        IF(.NOT.HERE) THEN
           CALL alloc(f%p%aperture)
            a=>f%p%aperture
@@ -2783,7 +3141,6 @@ CHARACTER(120) LINE
    
       READ(MF,'(a120)') LINE 
       CALL CONTEXT(LINE)
-
     IF(LINE(1:2)/='NO') THEN
         read(mf,NML=aperturename)
        aplist%on=.true.
@@ -2793,6 +3150,277 @@ CHARACTER(120) LINE
     endif
     
 end subroutine r_ap_aplist
+
+!!!!!!!!!!!!!!!!!!!!!    pointed lattices !!!!!!!!!!!!!!!!!!!!!
+
+subroutine  print_universe_pointed(ud,un,filename,com)
+! call print_universe_pointed(m_u,m_t,'junk3.txt')
+implicit none
+type(mad_universe),target :: ud,un
+type(layout),pointer :: r
+character(6), optional ::com
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+character(*) filename
+integer i,j,i0,j0,i1,j1,jb,MF
+character (6) comt
+logical(lp) before,just
+
+comt='REWIND'
+if(present(com)) comt=com
+
+call kanalnummer(mf)
+open(unit=mf,file=filename,position=comt)
+
+
+call TIE_MAD_UNIVERSE(ud)
+
+
+r=>un%start
+
+write(mf,*) un%n, "trackable Layouts"
+
+
+do i=1,un%n
+
+p0=>r%start
+p=>p0
+call locate_in_universe(p,i0,j0)
+jb=j0
+j1=j0
+   write(mf,*) i,r%n," New "
+
+
+  call Print_initial_chart(p,mf)
+  write(mf,*) i0,p%dir*j0,p%patch%patch,p%mag%name
+  call fib_fib0(p,my_true,mf)
+  before=my_false
+  just=my_false
+ if(p%patch%patch/=0) call patch_patch0(p%patch,my_true,mf)
+
+ do j=2,r%n
+  p=>p%next
+    jb=j1
+   call locate_in_universe(p,i1,j1)
+    write(mf,*) i1,p%dir*j1,p%patch%patch,p%mag%name
+       
+       just=my_false
+       if(before) then 
+        call fib_fib0(p,my_true,mf)
+        just=my_true
+        before=my_false
+       endif
+    if(p%patch%patch/=0) then
+       if(.not.just) call fib_fib0(p,my_true,mf)  
+       call patch_patch0(p%patch,my_true,mf)   
+       before=my_true   
+    endif
+ enddo
+
+write(mf,*) " !!!!!!! End of Pointed Layout !!!!!!!"
+
+ r=>r%next
+
+enddo
+
+close(mf)
+
+
+end subroutine  print_universe_pointed
+
+
+subroutine  read_universe_pointed(ud,un,filename)
+implicit none
+type(mad_universe),target :: ud,un
+type(layout),pointer :: r,rd
+type(fibre),pointer :: p,p0,ps
+type(element),pointer :: m,m0
+character(*) filename
+integer i,j,i0,MF,n,n_u,k(3)
+integer pos
+character(120) line
+logical(lp) doneit
+character(nlp) name
+
+call kanalnummer(mf)
+open(unit=mf,file=filename)
+
+
+call TIE_MAD_UNIVERSE(ud)
+
+
+
+
+read(mf,*)n_u
+
+
+do i=1,n_u
+
+   read(mf,*) i0,n 
+
+  read(mf,'(a120)') line
+ call read_initial_chart(mf)
+  read(mf,'(a120)') line
+
+call append_empty_layout(un) 
+call set_up(un%end)  !
+
+       R => un%end
+
+ do j=1,n 
+       read(mf,*) k    ,name
+if(j==1.or.k(3)>0) then
+ read(mf,NML=FIBRENAME)
+else
+ if(r%end%patch%patch>0) read(mf,NML=FIBRENAME)    ! previous had a patch
+endif
+
+       call MOVE_TO_LAYOUT_I( ud,rd,k(1) )
+       pos=iabs(k(2))   
+       call move_to( rd,p,POS)
+       call append_point(r, p)  
+       if( p%mag%name/=name) then
+         write(6,*) " serious error in read_universe_pointed "
+         write(6,*) i,p%mag%name,name,k 
+         pause 666
+         stop 666   
+       endif
+!       write(6,*) p%mag%name,name,pos,k(2)
+!pause 12
+      
+        if(k(3)/=0) then
+        read(mf,NML=patchname)
+        call patch_patch0(r%end%patch,my_false)
+        endif
+        r%end%patch%patch=k(3)
+
+       call fib_fib0(r%end,my_false) 
+       if(k(2)>0) then   ! because fib0 could have the wrong dir
+        r%end%dir=1
+       else
+        r%end%dir=-1
+       endif
+ enddo
+
+
+    r%closed=my_true
+    doneit=my_true
+    call ring_l(r,doneit)
+
+  p=>r%start
+  p%chart%f%a=a_
+  p%chart%f%ent=ent_
+! else
+  p%chart%f%b=b_
+  p%chart%f%exi=exi_
+call survey(r)
+read(mf,'(a10)') line(1:10)
+
+enddo
+
+
+
+close(mf)
+
+
+end subroutine  read_universe_pointed
+
+
+ subroutine Print_initial_chart(f,mf)
+ implicit none
+ type(fibre), target :: f
+ integer mf
+
+ write(mf,*) " $$$$$$$$$$$$$$$$$ INITIAL CHART $$$$$$$$$$$$$$$$$"
+!  IF(F%DIR==1) THEN
+   write(mf,*) f%chart%f%A
+   write(mf,*) f%chart%f%ENT(1,1:3)
+   write(mf,*) f%chart%f%ENT(2,1:3)
+   write(mf,*) f%chart%f%ENT(3,1:3)
+!  ELSE
+   write(mf,*) f%chart%f%B
+   write(mf,*) f%chart%f%EXI(1,1:3)
+   write(mf,*) f%chart%f%EXI(2,1:3)
+   write(mf,*) f%chart%f%EXI(3,1:3)
+!  ENDIF
+ write(mf,*) " $$$$$$$$$$$$$$$$$ END OF INITIAL CHART $$$$$$$$$$$$$$$$$"
+
+ end subroutine Print_initial_chart
+
+ subroutine read_initial_chart(mf)
+ implicit none
+ integer mf
+ 
+   read(mf,*) A_
+   read(mf,*) ENT_(1,1:3)
+   read(mf,*) ENT_(2,1:3)
+   read(mf,*) ENT_(3,1:3)
+
+   read(mf,*) B_
+   read(mf,*) EXI_(1,1:3)
+   read(mf,*) EXI_(2,1:3)
+   read(mf,*) EXI_(3,1:3)
+
+ end subroutine read_initial_chart
+
+
+subroutine create_dna(ud,ut)
+implicit none
+type(mad_universe), target :: ut,ud
+type(layout), pointer :: r,rd
+type(fibre), pointer :: ps
+integer i,j,j1,j2,k,kn
+logical(lp), allocatable :: here(:)
+
+
+
+call TIE_MAD_UNIVERSE(ut)
+
+allocate(here(ud%n))
+
+r=>ut%start
+do i=1,ut%n
+
+here=my_false
+
+ps => r%start
+
+do j=1,r%n
+ call locate_in_universe(ps,j1,j2)
+ here(j1)=my_true
+ps=>ps%next
+enddo
+
+kn=0
+do k=1,size(here)
+ if(here(k)) kn=kn+1
+enddo
+
+if(associated(r%DNA)) then 
+deallocate(r%DNA)
+write(6,*) "deallocated DNA"
+endif
+allocate(r%DNA(kn))
+
+rd=>ud%start
+kn=0
+do k=1,size(here)
+ if(here(k)) then
+    kn=kn+1
+    r%dna(kn)%L=>rd
+    r%dna(kn)%counter=k
+  endif
+ rd=>rd%next
+enddo
+
+
+ r=>r%next
+
+enddo
+
+deallocate(here)
+
+end subroutine create_dna
 
 end module madx_keywords
 

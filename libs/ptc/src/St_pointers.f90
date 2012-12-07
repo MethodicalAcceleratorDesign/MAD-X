@@ -288,8 +288,13 @@ contains
           ptc_node_old=-1
           first_particle=my_false
        case('SETORBITMARKER')   !!! TO CREATE A NODE
-         READ(MF,*) orbitname
-         call context(orbitname)
+         READ(MF,*) i1
+         allocate(orbitname(i1))
+          do i1=1,size(orbitname)
+           READ(MF,*) name
+           call context(name)
+           orbitname(i1)=name
+          enddo
        case('SETORBITPHASORFREQUENCY')
           read(mf,*) xsm%ac%om
           xsm0%ac%om=xsm%ac%om

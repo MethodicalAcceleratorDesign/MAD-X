@@ -21,7 +21,7 @@ module orbit_ptc
   integer :: n_fill_patch=0
   integer :: n_used_patch=0, extra_node=0  
   real(dp) :: t0_main=0.0_dp
-  character(nlp) :: orbitname="xxx"
+  character(nlp), allocatable :: orbitname(:)
   !   integer mfff
   INTERFACE ORBIT_TRACK_NODE
      !LINKED
@@ -1194,7 +1194,7 @@ contains
     REAL(DP) BET(2),ALF(2),ETA,ETAP
     TYPE(ORBIT_NODE), pointer :: ORBIT_NODES(:)
     logical(lp) doit,cav
-integer mf
+     integer mf,i1
 
     END_MAG=.not.no_end_mag
     ALLOCATE(R%T%ORBIT_LATTICE)
@@ -1234,7 +1234,11 @@ integer mf
 !!!!!
 
        doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       doit=(t%parent_fibre%mag%name==orbitname.and.T%CAS==CASEP1).or.doit
+       if(allocated(orbitname)) then
+        do i1=1,size(orbitname)
+         doit=(t%parent_fibre%mag%name==orbitname(i1).and.T%CAS==CASEP1).or.doit
+        enddo
+       endif
        if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
           DOIT=.TRUE.
        ENDIF
@@ -1287,7 +1291,11 @@ integer mf
 !!!!!
 
        doit=((T%CAS==CASEP1.AND.END_MAG).OR.T%NEXT%S(1)-L>=LMAX)
-       doit=(t%parent_fibre%mag%name==orbitname.and.T%CAS==CASEP1).or.doit
+       if(allocated(orbitname)) then
+        do i1=1,size(orbitname)
+         doit=(t%parent_fibre%mag%name==orbitname(i1).and.T%CAS==CASEP1).or.doit
+        enddo
+       endif
        if(t%parent_fibre%mag%kind==kind4.or.T%previous%parent_fibre%MAG%KIND==KIND4) then
           DOIT=.TRUE.
        ENDIF
@@ -1456,6 +1464,7 @@ close(mf)
     write(6,*) r%start%mass,w1_orbit%mass
     my_ORBIT_LATTICE%state=default
 
+    if(allocated(orbitname)) deallocate(orbitname)
   END SUBROUTINE ORBIT_MAKE_NODE_LAYOUT_accel
 
 
