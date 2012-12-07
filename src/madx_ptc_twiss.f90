@@ -899,7 +899,8 @@ contains
     endif
 
 
-    call f90flush(20,my_false)
+! f90flush is not portable, and useless...
+!    call f90flush(20,my_false)
 
     if (getdebug() > 2) close(mf1)
 

@@ -257,8 +257,10 @@ contains
        call kill(n)
     endif
     CALL kill(y)
-    call f90flush(18,my_false)
-    call f90flush(19,my_false)
+
+! f90flush is not portable, and useless...
+!    call f90flush(18,my_false)
+!    call f90flush(19,my_false)
 
   END subroutine ptc_normal
   !________________________________________________________________________________
