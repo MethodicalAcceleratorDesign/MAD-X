@@ -91,3 +91,5 @@ set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin_LONG)
 numdiff_test(test-emit "" 0)
 
 numdiff_test(test-touschek "touschek.dat" 1)
+numdiff_test(test-touschek-2 "touschek" 1)
+
