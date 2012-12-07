@@ -134,12 +134,13 @@ track_ripple(struct in_cmd* cmd)
 {
   (void)cmd;
   
+  warning("track_ripple routine is not implemented", "ignored");
+
   if (track_is_on == 0)
   {
     warning("track_ripple: no TRACK command seen yet", "ignored");
     return;
   }
-  puts("entered track_ripple routine");
 }
 
 static void
