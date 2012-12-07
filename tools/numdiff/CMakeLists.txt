@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 2.4)
 
 PROJECT(numdiff C)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+if(NOT "${CMAKE_C_FLAGS}" MATCHES "-std=c99")
+   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+endif()
 
 file(GLOB numdiff_src src/*.c)
 
