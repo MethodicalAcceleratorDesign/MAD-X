@@ -662,6 +662,7 @@ tests/test-ptc-trackline/trackone.cfg -text
 tests/test-ptc-trackline/trackone.ref -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
+tests/test-ptc-twiss/fort.18.cfg -text
 tests/test-ptc-twiss/fort.18.ref -text
 tests/test-ptc-twiss/ptc-twiss-table.cfg -text
 tests/test-ptc-twiss/ptc-twiss-table.ref -text
