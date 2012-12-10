@@ -700,6 +700,9 @@ tests/test-rfmultipole/test1_track.obs0001.p0001.cfg -text
 tests/test-rfmultipole/test1_track.obs0001.p0001.ref -text
 tests/test-rfmultipole/test1_track.obs0002.p0001.cfg -text
 tests/test-rfmultipole/test1_track.obs0002.p0001.ref -text
+tests/test-setvars_lin/test-setvars_lin.cfg -text
+tests/test-setvars_lin/test-setvars_lin.madx -text
+tests/test-setvars_lin/test-setvars_lin.ref -text
 tests/test-survey/test-survey.cfg -text
 tests/test-survey/test-survey.madx -text
 tests/test-survey/test-survey.ref -text

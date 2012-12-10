@@ -2694,4 +2694,10 @@ char command_def[] =
 "use_macro: match match 0 0 "
 "name     = [s, none, none]; "
 " "
+"setvars_lin: control none 0 0 "
+"table = [s, none], "
+"row1 = [i, 0], "
+"row2 = [i, 0], "
+"param = [s, t]; "
+" "
 ;

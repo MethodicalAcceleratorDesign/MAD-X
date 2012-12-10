@@ -29,6 +29,7 @@
 
 # tests order
 tests-all := \
+test-setvars_lin \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 \
 test-makethin \
@@ -84,6 +85,7 @@ test-ptc-twiss:    TESTSUITE := PTC Twiss testsuite
 test-ptc-normal:   TESTSUITE := PTC Normal testsuite
 test-ptc-trackline: TESTSUITE := PTC Trackline testsuite
 test-rfmultipole:  TESTSUITE := RF multipole testsuite
+test-setvars_lin:  TESTSUITE := Special features
 test-survey:       TESTSUITE := Survey testsuite
 test-touschek:     TESTSUITE := Touschek testsuite
 test-track:        TESTSUITE := Track testsuite

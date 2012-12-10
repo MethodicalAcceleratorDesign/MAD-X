@@ -384,6 +384,72 @@ exec_setvars_table(struct in_cmd* cmd)
   return;
 }
 
+
+void
+exec_setvars_lin_table(struct in_cmd* cmd)
+  /* set variables from a table */
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos,row1,row2,i;
+  char* name = NULL;
+  char* param = NULL;
+  char* colname = NULL;
+  double val1,val2;
+  char expr[10*NAME_L];
+  i=0;
+
+  pos = name_list_pos("table", nl);
+  if (nl->inform[pos] == 0)
+  {
+    warning("no table name:", "ignored");
+    return;
+  }
+  if ((name = pl->parameters[pos]->string) == NULL)
+  {
+    warning("no table name: ", "ignored");
+    return;
+  }
+  /*current_node = NULL;  to distinguish from other table fills ????*/
+  pos=name_list_pos("row1", nl);
+  row1=(int) pl->parameters[pos]->double_value-1;
+  pos=name_list_pos("row2", nl);
+  row2=(int) pl->parameters[pos]->double_value-1;
+  pos = name_list_pos("param", nl);
+  param = pl->parameters[pos]->string;
+  if ((pos = name_list_pos(name, table_register->names)) > -1)
+  {
+    t = table_register->tables[pos];
+    if (row1<0){ row1=t->curr+row1;}
+    if (row2<0){ row2=t->curr+row2;}
+    /*printf("Using row1=%d, row2=%d\n",row1,row2); */
+    if (row1<0 || row1>=t->curr){
+      warning("row1 index out of bounds:", " ignored");
+      return;
+    }
+    if (row2<0 || row2>=t->curr){
+      warning("row2 index out of bounds:", " ignored");
+      return;
+    }
+    /* printf("Using row1=%d, row2=%d\n",row1,row2); */
+    for (i = 0; i < t->num_cols; i++) {
+      if (t->columns->inform[i] <3){
+        colname=t->columns->names[i];
+        val1=t->d_cols[i][row1];
+        val2=t->d_cols[i][row2];
+        sprintf(expr,"%s:=%10.16g*(%s)+%10.16g*(1-%s);",
+            colname,val1,param,val2,param);
+        /* printf("%s\n",expr); */
+        pro_input(expr);
+      }
+    }
+  }
+  else warning("table not found: ", "ignored");
+  return;
+}
+
+
 void
 exec_print(struct in_cmd* cmd)
   /* prints text from "print" command to current output unit */
