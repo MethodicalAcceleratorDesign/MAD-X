@@ -751,7 +751,7 @@ pro_twiss(void)
   struct int_array* tarr_sector;
   struct node *nodes[2], *use_range[2];
   char *filename = NULL, *name, *table_name, *sector_name = NULL;
-  char *sector_table_name = "dummy"; /* second string required by twiss() */
+  char dummy[NAME_L] = "dummy", *sector_table_name = dummy; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 

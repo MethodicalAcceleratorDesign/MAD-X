@@ -16,7 +16,7 @@ char* mystrstr(char* string, char* s);
 void  myrepl(char* in, char* out, char* string_in, char* string_out);
 int   mysplit(char* buf, struct char_p_array* list);
 
-void  conv_char(char* string, struct int_array* tint);
+void  conv_char(const char* string, struct int_array* tint);
 void  stolower_nq(char* s);
 char* strip(char* name);
 int   supp_lt(char* inbuf, int flag);

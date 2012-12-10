@@ -158,7 +158,7 @@ tmpbuff(const char* string)
 }
 
 void
-conv_char(char* string, struct int_array* tint)
+conv_char(const char* string, struct int_array* tint)
   /*converts character string to integer array, using ascii code */
 {
   int i, l = strlen(string);
@@ -166,7 +166,7 @@ conv_char(char* string, struct int_array* tint)
   
   tint->i[0] = n;
   for (i = 0; i < n; i++) 
-    tint->i[i+1] = (int) string[i];
+    tint->i[i+1] = (unsigned char) string[i];
 }
 
 void

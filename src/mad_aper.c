@@ -1275,7 +1275,7 @@ pro_aperture(struct in_cmd* cmd)
 {
   struct node *use_range[2];
   struct table* tw_cp;
-  char *file, *range, tw_name[NAME_L], *table="aperture";
+  char *file, *range, tw_name[NAME_L], table_ap[NAME_L]="aperture", *table=table_ap;
   int tw_cnt, rows;
   double interval;
 
