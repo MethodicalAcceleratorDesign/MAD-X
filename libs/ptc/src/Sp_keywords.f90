@@ -2391,7 +2391,7 @@ type(elementp), pointer :: s2p
 
 integer mf,n
 
-call make_states(.false.)
+call make_states(my_false)
 call set_mad(energy=2.0d0)
 
 if(present(mfile)) then
