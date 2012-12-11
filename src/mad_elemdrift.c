@@ -27,11 +27,11 @@ int
 add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
-  int cnt = 0;
+  int cnt;
 
-  if (!c_node) return cnt;
+  if (!c_node) return 0;
 
-  for (; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
+  for (cnt=1; c_node != end && c_node->next; c_node = c_node->next, cnt++) {
     double drift_beg = c_node->position + c_node->length / 2;
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;

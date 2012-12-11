@@ -47,20 +47,21 @@ track_run(struct in_cmd* cmd)
   int e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
-  double d_dummy, *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, *buf5,
-    *buf6;
+  double *buf1, *buf2, *buf_dxt, *buf_dyt, *buf3, *buf4, buf5, *buf6;
   struct table* t;
+
   int turns = command_par_value("turns", cmd->clone);
-  if (track_is_on == 0)
-  {
+
+  if (track_is_on == 0) {
     warning("track_run: no TRACK command seen yet", "ignored");
     return;
   }
-  if (npart == 0)
-  {
+
+  if (npart == 0) {
     warning("track_run: no START command seen yet", "ignored");
     return;
   }
+
   adjust_beam();
   if (probe_beam) probe_beam = delete_command(probe_beam);
   probe_beam = clone_command(current_beam);
@@ -68,36 +69,46 @@ track_run(struct in_cmd* cmd)
   adjust_rfc(); /* sets freq in rf-cavities from probe */
   zero_double(orbit0, 6);
   zero_double(oneturnmat, 36);
-  if (get_option("onepass") == 0)
-  {
+
+  if (get_option("onepass") == 0) {
     tmrefo_(&izero,orbit0,orbit,oneturnmat);
     /* closed orbit and one-turn linear transfer map */
   }
+
   track_tables_create(cmd);
+
   /* allocate buffers */
-  ibuf1 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf2 = (int*) mymalloc(rout_name,npart*sizeof(int));
-  ibuf3 = (int*) mymalloc(rout_name,current_sequ->n_nodes*sizeof(int));
-  buf1 = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf2 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf_dxt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf_dyt = (double*) mymalloc(rout_name,npart*sizeof(double));
-  buf3 = (double*) mymalloc(rout_name,6*npart*sizeof(double));
-  buf4 = (double*) mymalloc(rout_name,36*sizeof(double));
-  buf5 = &d_dummy;
-  buf6 = (double*) mymalloc(rout_name, current_sequ->n_nodes*sizeof(double));
+  ibuf1   = mymalloc(rout_name,npart*sizeof(int));
+  ibuf2   = mymalloc(rout_name,npart*sizeof(int));
+  ibuf3   = mymalloc(rout_name,current_sequ->n_nodes*sizeof(int));
+  buf1    = mymalloc(rout_name,npart*sizeof(double));
+  buf2    = mymalloc(rout_name,6*npart*sizeof(double));
+  buf_dxt = mymalloc(rout_name,npart*sizeof(double));
+  buf_dyt = mymalloc(rout_name,npart*sizeof(double));
+  buf3    = mymalloc(rout_name,6*npart*sizeof(double));
+  buf4    = mymalloc(rout_name,36*sizeof(double));
+  buf6    = mymalloc(rout_name,current_sequ->n_nodes*sizeof(double));
+
+  // run track rountine
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
-         buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
-  t =
-    table_register->tables[name_list_pos("tracksumm", table_register->names)];
-  if (get_option("info"))  print_table(t);
+         buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, buf6);
+
+  // summary
+  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
+
   /* free buffers */
-  myfree(rout_name, ibuf1); myfree(rout_name, ibuf2); myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1); myfree(rout_name, buf2);
-  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, ibuf1);
+  myfree(rout_name, ibuf2);
+  myfree(rout_name, ibuf3);
+  myfree(rout_name, buf1);
+  myfree(rout_name, buf2);
+  myfree(rout_name, buf_dxt);
+  myfree(rout_name, buf_dyt);
   myfree(rout_name, buf3);
-  myfree(rout_name, buf4); myfree(rout_name, buf6);
+  myfree(rout_name, buf4);
+  myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
