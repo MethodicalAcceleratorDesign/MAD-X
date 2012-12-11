@@ -24,12 +24,12 @@ contains
     integer i,ii,j1,k,l,starti
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2
     integer,external :: select_ptc_idx, minimum_acceptable_order, &
-         string_from_table_row, double_from_table_row
+         string_from_table_row, double_from_table_row, double_to_table_row
     real(dp) x(6),deltap0,deltap,dt
     integer :: indexa(4)
     integer :: row_haml(101)
     integer :: index1(1000,2)
-    real(kind(1d0)) get_value,val_ptc
+    real(kind(1d0)) get_value,val_ptc,tmp
     character(len = 5) name_var
     type(real_8) y(6)
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
@@ -229,9 +229,10 @@ contains
           do row = 1,n_rows
              name_var=" "
              k = string_from_table_row("normal_results ", "name ", row, name_var)
-             val_ptc = double_from_ptc_normal(name_var,row,icase)
-             if (name_var(:4) .ne. 'haml'.and.name_var(:4) .ne. 'gnfu')    &
-                  call double_to_table_row("normal_results ", "value ", row, val_ptc)
+             val_ptc = double_from_ptc_normal(name_var, row, icase)
+             if (name_var(:4) .ne. 'haml'.and. name_var(:4) .ne. 'gnfu') then
+               k = double_to_table_row("normal_results ", "value ", row, val_ptc)
+             endif
           enddo
        endif
 
@@ -299,10 +300,10 @@ contains
        d_val = n%A1%V(3).sub.ind
     CASE ('q1')
        ind(:)=0
-       d_val = n%dhdj%V(3).sub.ind
+       d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
     CASE ('q2')
        ind(:)=0
-       d_val = n%dhdj%V(4).sub.ind
+       d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
     CASE DEFAULT
        name_l = .true.
     END SELECT
@@ -330,14 +331,14 @@ contains
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%dhdj%V(3).sub.ind
+          d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
        CASE ('dq2')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(:)=0
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%dhdj%V(4).sub.ind
+          d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
        CASE DEFAULT
           name_l = .true.
        END SELECT
