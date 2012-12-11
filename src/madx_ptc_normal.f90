@@ -357,7 +357,7 @@ contains
           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
-          d_val = n%dhdj%V(3).sub.ind
+          d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
        CASE ('anhy')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
@@ -370,7 +370,7 @@ contains
           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
-          d_val = n%dhdj%V(4).sub.ind
+          d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
        CASE ('hamc')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
