@@ -1,0 +1,63 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 12.12.12 13.56.55 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
+
+! ac dipole tracking..
+
+
+
+option, -echo,-warn,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003171305985        56.15402958 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000118        2.000195509        595.2900593        2.860758575 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.347846458                  0                  0        59.31000027 
+
+               dq2            betymax              dymax              dyrms 
+       2.000220745         611.782944                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+makethin: slicing sequence : lhcb1
+enter TRACK module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+  Singular matrix occurred during closed orbit search.
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:   2 error:   2.324825E-07 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+*****  end of trrun  *****
+exit TRACK module
+
+
+  Number of warnings: 0
+
+  +++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.00 finished normally +
+  +++++++++++++++++++++++++++++++++++

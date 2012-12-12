@@ -1,0 +1,69 @@
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
+! ac dipole tracking..
+
+option, -echo,-warn,-info;
+
+! ********** Define sequence
+call, file="../test-makethin/V6.5.thin.b1.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+
+! ********** Define beam
+beam, sequence= lhcb1, particle= proton, energy= 450;
+
+
+! ********** If present, remove some elements using seqedit
+seqedit, sequence= lhcb1;
+  remove, element= ACN.A5L4.B1;
+  remove, element= ACN.B5L4.B1;
+  remove, element= ACN.C5L4.B1;
+  remove, element= ACN.D5L4.B1;
+  remove, element= ADTH.A5L4.B1;
+  remove, element= ADTH.B5L4.B1;
+  remove, element= APW.5R4.B1;
+  remove, element= ADTV.A5R4.B1;
+  remove, element= ADTV.B5R4.B1;
+endedit;
+
+! ********** Twiss
+use, sequence= lhcb1;
+select, flag= twiss, clear;
+twiss;
+
+! ********** Make a thin sequence
+select, flag= makethin, pattern= "MQXA.*", slice= 12;
+select, flag= makethin, pattern= "MQXB.*", slice= 12;
+select, flag= makethin, class= quadrupole, slice= 2;
+makethin, sequence= lhcb1;
+
+!---- AC dipole
+    seqedit, sequence=lhcb1; flatten;
+hac: hacdipole, l:=0,
+    volt:=0.0002*450*0.03*1.0, !-- BL[T-m] ~ 0.0002*Ebeam*|Qd-Q|*amp[mm]
+    freq:=0.27,
+    lag:=0,
+    ramp1=0,
+    ramp2=100,
+    ramp3=200,
+    ramp4=300;
+vac: vacdipole, l:=0,
+    volt:=0.0002*450*0.02*1.0, !-- BL[T-m] ~ 0.0002*Ebeam*|Qd-Q|*amp[mm]
+    freq:=0.32,
+    lag:=0,
+    ramp1=0,
+    ramp2=100,
+    ramp3=200,
+    ramp4=300;
+install, element=hac, at=0.0, from=MKQA.6L4.B1;
+install, element=vac, at=0.0, from=MKQA.6L4.B1;
+endedit;
+
+! ********** Track three particles
+use, sequence= lhcb1;
+track, dump;
+  !start, x=-1e-4,y=4e-4;
+  start;
+  run,   turns= 400, ffile=20; !,tolerance={.1,.1,.1,.1,100.,.1};!175=1 synchr. period
+endtrack; 
+
+return;
+

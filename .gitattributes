@@ -781,6 +781,11 @@ tests/test-track-7/track.obs0001.p0003.cfg -text
 tests/test-track-7/track.obs0001.p0003.ref -text
 tests/test-track-7/twissprb1.1.cfg -text
 tests/test-track-7/twissprb1.1.ref -text
+tests/test-track-8/test-track-8.cfg -text
+tests/test-track-8/test-track-8.madx -text
+tests/test-track-8/test-track-8.ref -text
+tests/test-track-8/track.obs0001.p0001.cfg -text
+tests/test-track-8/track.obs0001.p0001.ref -text
 tests/test-track/out_test-track_ap_collimatorone.cfg -text
 tests/test-track/out_test-track_ap_collimatorone.ref -text
 tests/test-track/test-track.cfg -text

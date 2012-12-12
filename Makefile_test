@@ -33,7 +33,7 @@ test-setvars_lin \
 \
 test-makethin \
 test-survey \
-test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7 \
+test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7 test-track-8 \
 test-twiss test-twiss-2 test-twiss-3 test-twiss-4 \
 test-emit \
 test-thick-quad \
@@ -54,6 +54,7 @@ test-touschek-2
 # tests dependencies
 test-track-2: test-makethin
 test-track-7: test-makethin
+test-track-8: test-makethin
 
 # lexicographical order
 tests-long := \
@@ -64,6 +65,7 @@ test-touschek \
 test-touschek-2 \
 test-track-2 \
 test-track-7 \
+test-track-8 \
 test-twiss\
 test-twiss-2\
 test-twiss-3\
