@@ -734,6 +734,8 @@ tests/test-track-2/test-track-2.madx -text
 tests/test-track-2/test-track-2.ref -text
 tests/test-track-2/track.obs0001.p0001.cfg -text
 tests/test-track-2/track.obs0001.p0001.ref -text
+tests/test-track-2/track.obs0002.p0001.cfg -text
+tests/test-track-2/track.obs0002.p0001.ref -text
 tests/test-track-3/out_done.cfg -text
 tests/test-track-3/out_done.ref -text
 tests/test-track-3/out_fone.cfg -text

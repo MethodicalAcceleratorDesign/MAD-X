@@ -79,7 +79,7 @@ numdiff_test(test-makethin "" 1)
 numdiff_test(test-survey "test-survey_1.tfs test-survey_2.tfs" 0)
 
 numdiff_test(test-track "out_test-track_ap_collimatorone" 0)
-numdiff_test(test-track-2 "track.obs0001.p0001" 1)
+numdiff_test(test-track-2 "track.obs0001.p0001 track.obs0002.p0001" 1)
 numdiff_test(test-track-3 "out_done out_fone" 0)
 numdiff_test(test-track-4 "out_done" 0)
 numdiff_test(test-track-5 "out_rellipseone" 0)

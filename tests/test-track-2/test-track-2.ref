@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.00.19  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 26.10.12 13.45.34 +
+  + Code Modification Date: 2012.12.07      +
+  + Execution Time Stamp: 12.12.12 11.28.33 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 
@@ -43,104 +43,15 @@ orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-use, sequence= lhcb1;
-
-vrf400= 8.0;
-
-++++++ info: vrf400 redefined
-track, onepass,dump;
-
 enter TRACK module
 one pass is on
-!track, dump;
-
-
-
-!--------------------6-D orbit for LHC V6.501---from normal madx
-
-!start, x=-0.00250002334,px=1.70517533E-10,
-
-!y=-9.81634914E-11,py=0.000159998881,
-
-!t=1.14893938E-05,pt=9.03907774E-07;
-
-
-
-!--------------------6-D orbit for LHC V6.501---from yisun new code
-
-!start, x=-0.00250002205,px=1.7180735E-10,
-
-!y=-4.03240664E-10,py=0.000159998942,
-
-!t=1.14893971E-05,pt=9.03910221E-07;
-
-
-
-
-
-!--------------------6-D orbit for LHC V6.501---from normal madx
-
-!---------with all corrector kicks set to be 40urad--------
-
-!start, x=-0.00494453278,px=-0.000133497299,
-
-!y=0.000516988853,py=0.000161741089,
-
-!t=-1.51295413E-05,pt=4.50953026E-06;
-
-
-
-!--------------------6-D orbit for LHC V6.501---from yisun new code
-
-!---------with all corrector kicks set to be 40urad--------
-
-start, x=-4.944516E-03,px=-1.334966E-04,
-
-y=5.169909E-04,py=1.617393E-04,
-
-t=-1.512923E-05,pt=4.509911E-06;
-
-
-
-
-
-!start, x=0,px=0,y=0,py=0,t=0,pt=0;
-
-
-
-
-
-run,   turns= 10;
-
-
-++++++ table: tracksumm
-
-    number       turn                  x                 px 
-         1          0       -0.004944516      -0.0001334966 
-         1         10    -0.002116484474   -0.0003395079678 
-
-                 y                 py                  t                 pt 
-      0.0005169909       0.0001617393      -1.512923e-05       4.509911e-06 
-    0.001570185575    0.0002258439897     4.33388133e-05    4.465828122e-06 
-
-                 s                  e 
-                 0                  0 
-        26658.8832                  0 
 
 *****  end of trrun  *****
-endtrack; 
-
 exit TRACK module
-
-
-
-
-
-return;
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.00.19 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
