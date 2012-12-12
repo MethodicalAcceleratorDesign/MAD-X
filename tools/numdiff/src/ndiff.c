@@ -68,16 +68,11 @@ is_number (char *buf)
   // sign
   if (buf[i] == '-' || buf[i] == '+') i++;
 
-  // digits
-  if(isdigit(buf[i])) return 1;
-
   // dot
   if (buf[i] == '.') ++i;
 
-  // decimals
-  if(isdigit(buf[i])) return 1;
-
-  return 0;
+  // digits
+  return isdigit(buf[i]);
 }
 
 static inline char*
@@ -95,6 +90,7 @@ static inline int
 parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 {
   int i = 0, d = 0, n = 0, e = 0;
+  char c;
 
   // sign
   if (buf[i] == '+' || buf[i] == '-') i++;
@@ -107,7 +103,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 
   // decimals
   if (d) { 
-    if (!n) n = 1;
+    if (!n) n = 1; // implicit 0.
     while(isdigit(buf[i])) i++, n++;
   }
 
@@ -117,7 +113,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 
   // exponent
   if (buf[i] == 'e' || buf[i] == 'E' || buf[i] == 'd' || buf[i] == 'D')
-    buf[i] = 'e', e = ++i;
+    c = buf[i], buf[i] = 'e', e = ++i;
 
   if (e) {
     // sign
@@ -126,8 +122,9 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
     // digits
     while(isdigit(buf[i])) i++;
 
-    // ensure e# or e±#
-    if (!isdigit(buf[i-1])) return 0;
+    // ensure e# or e±# otherwise backtrack
+    if (!isdigit(buf[i-1]))
+      i = e-1, buf[i] = c, e = 0;
   }
 
   if (n_) *n_ = n;
