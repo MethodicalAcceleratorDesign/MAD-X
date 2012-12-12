@@ -89,22 +89,32 @@ backtrace_number (char *buf, const char *beg)
 static inline int
 parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 {
-  int i = 0, d = 0, n = 0, e = 0;
+  int i = 0, d = 0, n = 0, e = 0, nz=0;
   char c;
 
   // sign
   if (buf[i] == '+' || buf[i] == '-') i++;
 
+  // drop leading zeros
+  while(buf[i] == '0') i++;
+  if (isdigit(buf[i])) nz = 1;
+
   // digits
-  while(isdigit(buf[i])) i++, n++;
+  while(isdigit(buf[i])) n += nz, i++;
 
   // dot
   if (buf[i] == '.') d = ++i;
 
   // decimals
-  if (d) { 
-    if (!n) n = 1; // implicit 0.
-    while(isdigit(buf[i])) i++, n++;
+  if (d) {
+    if (!nz) {
+      // drop leading zeros
+      while(buf[i] == '0') i++;
+      if (isdigit(buf[i])) nz = 1;
+    }
+
+    // digits
+    while(isdigit(buf[i])) n += nz, i++;
   }
 
   // ensure at least ±# or ±#. or ±.#

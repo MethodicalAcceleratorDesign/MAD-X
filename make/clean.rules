@@ -30,8 +30,8 @@ cleandir: clean
 
 cleantest:
 	$E "** Cleaning tests files"
-	$_ $(RM) $(wildcard tests/*/*.out tests/$(NDSUM))
-	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/*/*.ref)))
+	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
+	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
 
 cleanc:
 	$E "** Cleaning C generated files"
