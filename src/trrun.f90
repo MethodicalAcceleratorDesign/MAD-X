@@ -365,7 +365,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
-999 end subroutine trrun
+end subroutine trrun
 
 
 subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
@@ -682,9 +682,6 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   call ttcorr(el, track, ktrack, turn)
   go to 500
   !---- ECollimator, RCollimator, BeamBeam, Lump. ??
-200 continue
-210 continue
-220 continue
 230 continue
   go to 500
   !---- Instrument
