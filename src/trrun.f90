@@ -273,11 +273,13 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
            call tt_putone(jmax, turn, tot_segm, segment, part_id,      &
                 z, obs_orb,spos,nlm,el_name)
         else
-           do i = 1, jmax
-              !hbu add spos
-              call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
-                   spos)
-           enddo
+          if (mod(turn, ffile) .eq. 0)  then
+            do i = 1, jmax
+                !hbu add spos
+                call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
+                    spos)
+            enddo
+           endif
         endif
      endif
      if (advance_node().ne.0)  then
