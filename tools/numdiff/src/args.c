@@ -78,7 +78,7 @@ usage(void)
   inform("\tnumdiff [options] -list file1 file2 ...");
   inform("options:");
   inform("\t-a    -accum file   accumulate tests information in file");
-  inform("\t-b    -blank        toggle ignore/no-ignore blank spaces (space and tabs)");
+  inform("\t-b    -blank        ignore blank spaces (space and tabs)");
   inform("\t-c    -check        enable check mode");
   inform("\t-d    -debug        enable debug mode (include check mode)");
   inform("\t-e    -largerr      allow abs and rel error specifier >= 1.0");
@@ -156,8 +156,8 @@ parse_args(int argc, const char *argv[])
 
     // set blank mode [setup]
     if (!strcmp(argv[option.argi], "-b") || !strcmp(argv[option.argi], "-blank")) {
-      debug("blank space ignored");
-      option.blank = !option.blank;
+      debug("blank spaces ignored");
+      option.blank = 1;
       continue;
     }
 

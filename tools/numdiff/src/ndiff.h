@@ -34,7 +34,7 @@ struct constraint;
 T*    ndiff_alloc    (FILE *lhs, FILE *rhs, struct context*, int n_);
 void  ndiff_clear    (T*);
 void  ndiff_free     (T*);
-void  ndiff_option   (T*, int *keep_, int *blank_, int *check_);
+void  ndiff_option   (T*, const int *keep_, const int *blank_, const int *check_);
 
 // high level API
 void  ndiff_loop     (T*);

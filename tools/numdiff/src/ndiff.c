@@ -654,21 +654,15 @@ quit:
 }
 
 void
-ndiff_option  (T *dif, int *keep_, int *blank_, int *check_)
+ndiff_option  (T *dif, const int *keep_, const int *blank_, const int *check_)
 {
   assert(dif);
-  int tmp;
-
-  if (keep_) {
-    ensure(*keep_ > 0, "number of kept diff must be positive");
-    tmp = dif->max_i, dif->max_i = *keep_, *keep_ = tmp; 
-  }
   
-  if (blank_)
-    tmp = dif->blank, dif->blank = *blank_, *blank_ = tmp; 
+  if (keep_ ) dif->max_i = *keep_;
+  if (blank_) dif->blank = *blank_; 
+  if (check_) dif->check = *check_; 
 
-  if (check_)
-    tmp = dif->check, dif->check = *check_, *check_ = tmp; 
+  ensure(dif->max_i > 0, "number of kept diff must be positive");
 }
 
 void
