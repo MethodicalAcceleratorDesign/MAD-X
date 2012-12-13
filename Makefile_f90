@@ -181,7 +181,7 @@ $(warning MAD-X requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran
 FC     := gfortran44
 FCNAME := gfortran
 else
-$(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
+$(warning MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
 endif # lxplus
 endif # version
 endif # gfortran

@@ -47,9 +47,7 @@ test-ptc-twiss \
 test-ptc-normal \
 test-ptc-trackline \
 test-ptc-trackline-2 \
-test-touschek \
-test-touschek-2
-
+test-touschek
 
 # tests dependencies
 test-track-2: test-makethin
@@ -74,7 +72,8 @@ test-twiss-4
 # lexicographical order
 tests-to-setup := \
 test-ibs \
-test-ptc-twiss-2
+test-ptc-twiss-2 \
+test-touschek-2
 
 # testsuite titles (attached to first test of the suite)
 test-aperture:       TESTSUITE := Aperture testsuite
