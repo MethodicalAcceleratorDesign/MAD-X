@@ -473,8 +473,8 @@ ut_testEqu(struct utest *utest, T* cxt, int i, int j)
   const C* cst2 = context_getInc(cxt, i, j);
 
   UTEST( (cst1 == cst2 ||
-          (cst1 && cst1->eps.cmd == eps_skip &&
-           cst2 && cst2->eps.cmd == eps_skip) ) );
+          (cst1 && (cst1->eps.cmd & eps_skip) &&
+           cst2 && (cst2->eps.cmd & eps_skip)) ) );
 
   if (cst1 != cst2)
     ut_trace(cxt, i, j, cst1, cst2);

@@ -134,9 +134,9 @@ main(int argc, const char* argv[])
       }
 
       // numdiff loop
-      struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, 0);
-      ndiff_maxDisp(dif, option.keep);
-      ndiff_loop(dif, cxt, option.blank, option.check);
+      struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, cxt, 0);
+      ndiff_option(dif, &option.keep, &option.blank, &option.check);
+      ndiff_loop(dif);
 
       // print summary
       if (diff_summary(dif) > 0) ++failed;

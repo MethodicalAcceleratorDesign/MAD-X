@@ -37,6 +37,7 @@ const char * const eps_cmd_cstr[] = {
   [eps_abs|eps_rel|eps_dig] = "abs&rel&dig",
   [eps_equ]                 = "equ",
   [eps_ign]                 = "ign",
+  [eps_omit]                = "omit",
   [eps_skip]                = "skip",
   [eps_goto]                = "goto",
 };
@@ -149,6 +150,11 @@ readEps(struct eps *e, FILE *in, int row)
       cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
       ensure(e->abs > 0.0 && (option.largerr || e->abs < 1.0), "invalid absolute constraint, line %d", row);
     }
+    else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
+      cmd |= eps_omit; e->tag[sizeof e->tag-1] = 0;
+                       trace("[%d] omit='%s'", row, e->tag);
+      ensure(*e->tag, "invalid empty tag, line %d", row);
+    }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
       cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
                        trace("[%d] goto='%s'", row, e->tag);
@@ -185,16 +191,15 @@ constraint_print(const T* cst, FILE *out)
   printSlc(&cst->col, out);
   putc(' ', out);
 
-  if (cst->eps.cmd >= eps_dig && cst->eps.cmd < eps_equ) {
-    if (cst->eps.either) fprintf(out, "either ");    
-    if (cst->eps.cmd & eps_dig) fprintf(out, "dig=%g ", cst->eps.dig);    
-    if (cst->eps.cmd & eps_rel) fprintf(out, "rel=%g ", cst->eps.rel);    
-    if (cst->eps.cmd & eps_abs) fprintf(out, "abs=%g ", cst->eps.abs);    
-  } else
-  if (cst->eps.cmd == eps_goto) {
-    fprintf(out, "goto='%s' ", cst->eps.tag);
-  } else
-    fprintf(out, "%s", eps_cstr(cst->eps.cmd));
+  if (cst->eps.either)         fprintf(out, "either ");
+  if (cst->eps.cmd & eps_dig)  fprintf(out, "dig=%g ", cst->eps.dig);    
+  if (cst->eps.cmd & eps_rel)  fprintf(out, "rel=%g ", cst->eps.rel);    
+  if (cst->eps.cmd & eps_abs)  fprintf(out, "abs=%g ", cst->eps.abs);    
+  if (cst->eps.cmd & eps_equ)  fprintf(out, "equ ");    
+  if (cst->eps.cmd & eps_ign)  fprintf(out, "ign ");    
+  if (cst->eps.cmd & eps_omit) fprintf(out, "omit='%s' ", cst->eps.tag);
+  if (cst->eps.cmd & eps_skip) fprintf(out, "skip ");    
+  if (cst->eps.cmd & eps_goto) fprintf(out, "goto='%s' ", cst->eps.tag);
 }
 
 void
@@ -203,7 +208,7 @@ constraint_scan(T* cst, FILE *in, int *row)
   int c;
   assert(cst && row);
 
-  cst->eps.cmd = eps_invalid;
+  *cst = (T){ .eps.cmd = (enum eps_cmd)eps_invalid };  // because of icc spurious warnings
 
   if (!in) in = stdin;
 

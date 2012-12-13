@@ -17,6 +17,7 @@
 */
 
 #include <stdio.h>
+#include <ctype.h>
 #include <math.h>
 
 // extern functions
@@ -66,6 +67,21 @@ pow10(int i)
 }
 
 // ----- public (read helpers)
+
+static inline int
+skipSpace (FILE *fp, int *i_)
+{
+  int c = 0, i = 0;
+
+  while ((c = getc(fp)) != EOF) {
+    if (!isspace(c)) break;
+    i++;
+  }
+
+  if (i_) *i_ = i;
+
+  return c; 
+}
 
 static inline int
 skipLine (FILE *fp, int *i_)

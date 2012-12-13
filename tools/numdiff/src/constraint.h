@@ -34,9 +34,12 @@ enum eps_cmd {
   eps_equ     =   8u,  // equal string
   eps_ign     =  16u,  // ignore value
 
+// intermediate (in between commands)
+  eps_omit    =  32u,  // omit indentifier
+
 // must be lasts (strong commands)
-  eps_skip    =  32u,  // skip line
-  eps_goto    =  64u,  // goto line
+  eps_skip    =  64u,  // skip line
+  eps_goto    = 128u,  // goto line
   eps_last,
 
 // unions
@@ -79,7 +82,7 @@ eps_initNum(enum eps_cmd cmd, bool either, double dig, double rel, double abs)
 static inline struct eps
 eps_initTag(enum eps_cmd cmd, const char *tag)
 {
-  ensure(cmd == eps_goto, "invalid eps goto command");
+  ensure((cmd & eps_goto) || (cmd & eps_omit), "invalid eps goto or omit command");
   struct eps eps = (struct eps) { .cmd = cmd };
   enum { sz = sizeof eps.tag };
   strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
