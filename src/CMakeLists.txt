@@ -40,7 +40,7 @@ else()
    file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
 endif()
 
-set(remove_list ${main_file} ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
+set(remove_list ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
 list(REMOVE_ITEM src_files ${remove_list})
 
 # header files...
@@ -60,9 +60,9 @@ set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
 
 # adding an executable:
 if(MADX_BUNDLE)
-   add_executable(madxbin MACOSX_BUNDLE  mad_main.c)
+   add_executable(madxbin MACOSX_BUNDLE  ${main_file})
 else()
-   add_executable(madxbin mad_main.c)
+   add_executable(madxbin ${main_file})
 endif()
 set_target_properties(madxbin PROPERTIES LINKER_LANGUAGE Fortran VERSION ${MADX_VERSION})
 
