@@ -2247,7 +2247,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 280 continue
 290 continue
   go to 500
-300 call tmdpdg(ftrk,orbit,fmap,re)
+300 call tmdpdg(ftrk,orbit,fmap,ek,re,te)
   go to 500
 
   !---- non-linear thin lens
@@ -6257,7 +6257,7 @@ SUBROUTINE twwmap(pos, orbit)
   call dzero(stmat, 216)
 
 end SUBROUTINE twwmap
-SUBROUTINE tmdpdg(ftrk,orbit,fmap,rw)
+SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
   implicit none
 
@@ -6267,15 +6267,18 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,rw)
   !     Input:                                                           *
   !     ftrk         (logical) if true, track orbit.                     *
   !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     rw(6,6)      (double)  transfer matrix.                          *
+  !     fmap         (logical) if true, element has a map.               *
+  !     re(6,6)      (double)  transfer matrix.                          *
   !----------------------------------------------------------------------*
   logical ftrk,fmap
-  double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),orbit(6),  &
-       bvk,node_value,zero,one
+  double precision fint,tilt,e1,h,hgap,corr,ek0(6),rw(6,6),tw(6,6,6),orbit(6), &
+       ek(6),re(6,6),te(6,6,6),bvk,node_value,zero,one
   parameter(zero=0d0,one=1d0)
 
+  !-- LD: modified to include corrections from Frank.
+  call dzero(ek0,6)
   call m66one(rw)
+  call dzero(tw,6*6*6)
 
   e1 = node_value('e1 ')
   h = node_value('h ')
@@ -6283,6 +6286,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,rw)
   h = bvk * h
   hgap = node_value('hgap ')
   fint = node_value('fint ')
+  tilt = node_value('tilt ')
   corr = (h + h) * hgap * fint
   fmap = h .ne. zero .and. ( e1 .ne. zero .or. corr .ne. zero )
   if (.not. fmap) return
@@ -6291,10 +6295,18 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,rw)
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
-  if (ftrk) then
-     orbit(2) = orbit(2) + rw(2,1) * orbit(1)
-     orbit(4) = orbit(4) + rw(4,3) * orbit(3)
+  call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+  !---- Apply tilt.
+  if (tilt .ne. zero) then
+     call tmtilt(.true.,tilt,ek,re,te)
   endif
+  if (ftrk) then
+     call tmtrak(ek,re,te,orbit,orbit)
+  endif
+!  if (ftrk) then
+!     orbit(2) = orbit(2) + rw(2,1) * orbit(1)
+!     orbit(4) = orbit(4) + rw(4,3) * orbit(3)
+!  endif
   return
 end SUBROUTINE tmdpdg
 SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
