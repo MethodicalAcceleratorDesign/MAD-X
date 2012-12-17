@@ -120,6 +120,7 @@ mysplit(char* buf, struct char_p_array* list)
   for (j = 0; j < list->curr; j++)
     if(*list->p[j] == '\"' || *list->p[j] == '\'') /* quote */
       replace(list->p[j], '@', ' ');
+
   return list->curr;
 }
 

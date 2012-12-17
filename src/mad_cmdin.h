@@ -47,6 +47,6 @@ void                grow_in_cmd_list(struct in_cmd_list*);
 
 void  buffer_in_cmd (struct in_cmd*);
 void  scan_in_cmd   (struct in_cmd*);
-// void  dump_in_cmd  (struct in_cmd*);           // not used...
+void  dump_in_cmd   (struct in_cmd*); // for debugging
 
 #endif // MAD_CMDIN_H

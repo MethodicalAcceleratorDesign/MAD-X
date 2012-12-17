@@ -31,6 +31,7 @@ make_constraint(int type, struct command_parameter* par)
 {
   struct constraint* new = new_constraint(par->c_type);
   strcpy(new->name, par->name);
+
   switch(par->c_type)
   {
     case 1: /* minimum */
@@ -176,55 +177,44 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
   struct constraint* c_c;
   int j,k;/* RDM fork */
   char s, takenextmacro, nomore; /* RDM fork */
+
   /* RDM fork */
   if (match_is_on==2) {
     i=match2_cons_curr[0];
     j=match2_cons_curr[1];
     k=match2_cons_curr[2];
-    if(match2_cons_name[i][j]==NULL)
-    {
-      j++;
-      if(j>=MAX_MATCH_CONS)
-      {
-        takenextmacro = 1;
-      }
-      else if (match2_cons_name[i][j]==NULL) /*if above is true this one can cause seg fault*/
-      {
-        takenextmacro = 1;
-      }
-      else
-      {
-        takenextmacro = 0;
-      }
 
-      if(takenextmacro)
-      {
-        i++;j=0;
+    if(match2_cons_name[i][j] == NULL) {
+      j++;
+
+      if(j >= MAX_MATCH_CONS)
+        takenextmacro = 1;
+      else if (match2_cons_name[i][j]==NULL) // if above is true this one can cause seg fault
+        takenextmacro = 1;
+      else
+        takenextmacro = 0;
+
+      if(takenextmacro) {
+        i++; j=0;
 
         if(i>=MAX_MATCH_MACRO)
-        {
           nomore = 1;
-        }
         else if(match2_cons_name[i][j]==NULL)
-        {
           nomore = 1;
-        }
-        else
-        {/*i,j is the next constraint*/
+        else // i,j is the next constraint
           nomore = 0;
-        }
 
-        if( nomore == 0 ){
-          name=match2_cons_name[i][j];
-          *name_l=strlen(name);
-          *type=2; /* to be changed according to s or <,=,>*/
-          *value=match2_cons_value[i][j];
-          s =match2_cons_sign[i][j];
-          if (s == '>' && *value > 0) *value=0;
+        if(nomore == 0) {
+          name = match2_cons_name[i][j];
+          *name_l = strlen(name);
+          *type = 2; /* to be changed according to s or <,=,>*/
+          *value = match2_cons_value[i][j];
+          s = match2_cons_sign[i][j];
+               if (s == '>' && *value > 0) *value=0;
           else if (s == '<' && *value < 0) *value=0;
-          c_min=value; /* unknown use */
-          c_max=value; /* unknown use */
-          *weight=1; /*hardcode no weight with this interface */
+          c_min = value; /* unknown use */
+          c_max = value; /* unknown use */
+          *weight = 1; /*hardcode no weight with this interface */
           k++;
           match2_cons_curr[0]=i;
           match2_cons_curr[1]=j;
@@ -239,28 +229,38 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
       }
     }
   }
-  else  /* RDM old match */
-  {
+  else { /* RDM old match */
     int len;
+
     if (current_node->cl == NULL) return 0;
-    if (current_node->con_cnt == current_node->cl->curr)
-    {
-      current_node->con_cnt = 0; return 0;
+
+    if (current_node->con_cnt == current_node->cl->curr) {
+      current_node->con_cnt = 0;
+      return 0;
     }
+
     c_c = current_node->cl->constraints[current_node->con_cnt];
     len = strlen(c_c->name);
-    ncp = len < *name_l ? len : *name_l; // min(len, name_l)
+    ncp = len < *name_l ? len : *name_l;
     nbl = *name_l - ncp;
     strncpy(name, c_c->name, ncp);
-    for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+
+    for (i = 0; i < nbl; i++)
+      name[ncp+i] = ' ';
+
     *type = c_c->type;
+
     if (c_c->ex_value == NULL) *value = c_c->value;
     else                       *value = expression_value(c_c->ex_value,2);
+
     if (c_c->ex_c_min == NULL) *c_min = c_c->c_min;
     else                       *c_min = expression_value(c_c->ex_c_min,2);
+
     if (c_c->ex_c_max == NULL) *c_max = c_c->c_max;
     else                       *c_max = expression_value(c_c->ex_c_max,2);
+
     *weight = c_c->weight;
+
     return ++current_node->con_cnt;
   }
   /* RDM fork */
@@ -270,89 +270,94 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
 int
 next_constr_namepos(char* name)
 /* returns the Fortran (!) position of the named variable 
-   in the opt_fun array of twiss */
+   in the opt_fun array of twiss (LD: weak!) */
 {
   int pos = 0;
-  switch (*name)
-    {
+  switch (*name) {
     case 'a':
-      if      (name[3] == 'x') pos = 4;
-      else if (name[3] == 'y') pos = 7;
+           if (name[3] == 'x') pos = 4;       // a??x
+      else if (name[3] == 'y') pos = 7;       // a??y
       break;
+
     case 'b':
-      if      (name[3] == 'x') pos = 3;
-      else if (name[3] == 'y') pos = 6;
+           if (name[3] == 'x') pos = 3;       // b??x
+      else if (name[3] == 'y') pos = 6;       // b??y
       break;
+
     case 'd':
-      if      (name[1] == 'x') pos = 15;
-      else if (name[1] == 'y') pos = 17;
-      else if (name[1] == 'p')
-	{
-          if      (name[2] == 'x') pos = 16;
-          else if (name[2] == 'y') pos = 18;
-	}
-      else if (name[1] == 'm')
-        {
-          if      (name[3] == 'x') pos = 21;
-          else if (name[3] == 'y') pos = 24;
-        }
-      else if (name[1] == 'd')
-	{
-	  if	  (name[2] == 'x') pos = 25;
-	  else if (name[2] == 'y') pos = 27;
-	  else if (name[2] == 'p')
-	    {
-	      if      (name[3] == 'x') pos = 26;
-	      else if (name[3] == 'y') pos = 28;
+      if      (name[1] == 'x') pos = 15;      // dx
+      else if (name[1] == 'y') pos = 17;      // dy
+      else if (name[1] == 'p') {
+             if (name[2] == 'x') pos = 16;    // dpx
+        else if (name[2] == 'y') pos = 18;    // dpy
+      }
+      else if (name[1] == 'm') {
+             if (name[3] == 'x') pos = 21;    // dm?x
+        else if (name[3] == 'y') pos = 24;    // dm?y
+      }
+      else if (name[1] == 'd') {
+	           if (name[2] == 'x') pos = 25;    // ddx
+	      else if (name[2] == 'y') pos = 27;    // ddy
+	      else if (name[2] == 'p') {
+	        if      (name[3] == 'x') pos = 26;  // ddpx
+	        else if (name[3] == 'y') pos = 28;  // ddpy
+	      }
 	    }
-	}
       break;
+
     case 'e':
-      pos = 33;
+      pos = 33;                               // e
       break;
+
     case 'm':
-      if      (name[2] == 'x') pos = 5;
-      else if (name[2] == 'y') pos = 8;
+           if (name[2] == 'x') pos = 5;       // m?x
+      else if (name[2] == 'y') pos = 8;       // m?y
+      else if (name[1] == 'v' && name[2] == 'a' && name[3] == 'r' && name[4] >= '1' && name[4] <= '4')
+        pos = -(name[4]-'1'+1); 
       break;
+
     case 'p':
-      if      (name[1] == 'x') pos = 10;
-      else if (name[1] == 'y') pos = 12;
-      else if (name[1] == 't') pos = 14;
-      else if (name[1] == 'h') pos = 14;
-        {
-	  if      (name[3] == 'x') pos = 20;
-	  else if (name[3] == 'y') pos = 23;
-	}
+           if (name[1] == 'x') pos = 10;      // px
+      else if (name[1] == 'y') pos = 12;      // py
+      else if (name[1] == 't') pos = 14;      // pt
+      else if (name[1] == 'h') {              // was 14 (LD: BUG)
+	      if      (name[3] == 'x') pos = 20;    // ph?x
+	      else if (name[3] == 'y') pos = 23;    // ph?y
+      	}
       break;
+
     case 'r':
-      if      (name[1] == '1')
-	{
-          if      (name[2] == '1') pos = 29;
-          else if (name[2] == '2') pos = 30;
-	}
-      else if      (name[1] == '2')
-	{
-          if      (name[2] == '1') pos = 31;
-          else if (name[2] == '2') pos = 32;
-	}
-    /* start mod HG 10.10.2010 - trying to be ascii-independent */
-      else if      (name[1] == 'e')
-	  pos = ((int)name[2]-(int)'1')*6+(int)name[3]-(int)'1'+34;
-    /* end mod HG 10.10.2010 */
+      if (name[1] == '1') {
+             if (name[2] == '1') pos = 29;    // r11
+        else if (name[2] == '2') pos = 30;    // r12
+	    }
+      else if (name[1] == '2') {
+          if      (name[2] == '1') pos = 31;  // r21
+          else if (name[2] == '2') pos = 32;  // r22
+	    }
+      else if (name[1] == 'e')
+        /* start mod HG 10.10.2010 - trying to be ascii-independent */
+        pos = (name[2]-'1')*6 + name[3]-'1' + 34;  // re11-re66, no range check...
       break;
+
     case 't':
       pos = 13;
       break;
+
     case 'w':
-      if      (name[1] == 'x') pos = 19;
-      else if (name[1] == 'y') pos = 22;
+           if (name[1] == 'x') pos = 19;      // wx
+      else if (name[1] == 'y') pos = 22;      // wy
       break;
+
     case 'x':
-      pos = 9;
+      pos = 9;                                // x
       break;
-    case 'y':
+
+    case 'y':                                 // y
       pos = 11;
+      break;
     }
+
   return pos;
 }
 

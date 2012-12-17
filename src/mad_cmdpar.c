@@ -777,6 +777,8 @@ store_comm_par_vector(const char* parameter, double* val, struct command* cmd)
   }
 }
 
+
+// LD: this function is horrible and probably buggy...
 int
 decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
 {
@@ -789,8 +791,9 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   struct command_parameter* lp = cmd->cmd_def->par->parameters[pos];
   struct command_parameter* clp = cmd->clone->par->parameters[pos];
   int j, k, ks, i = start, e_type, ival, end, e_end, tot_end = 0, c_type = 0,
-    val_type = 0, cnt = 0, con_flag = 0, t_num;
+      val_type = 0, cnt = 0, con_flag = 0, t_num;
   double val = zero;
+
   if (lp->type < 10)
   {
     if (lp->type == 0)
@@ -876,52 +879,51 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
         tot_end = i;
       }
     }
-    else if (lp->type == 4)  /* one constraint */
-    {
+    else if (lp->type == 4) { /* one constraint */
       if (i+1 < number && *toks[i+1] == ':')
-      {
-        con_flag = 1; i++;
-      }
-      else con_flag = 0; /* if != zero, := or :< or :> */
-      if (i+2 < number)
-      {
-        if (*toks[i+1] == '=') c_type = 4;
+        con_flag = 1, i++;
+      else
+        con_flag = 0; /* if != zero, := or :< or :> */
+
+      if (i+2 < number) {
+             if (*toks[i+1] == '=') c_type = 4;
         else if (*toks[i+1] == '>') c_type = 1;
         else if (*toks[i+1] == '<') c_type = 2;
-        if (c_type)
-        {
+
+        if (c_type) {
           start = i + 2;
-          for (t_num = start; t_num < number; t_num++) if(*toks[t_num] == ',')
-            break;
+
+          for (t_num = start; t_num < number; t_num++)
+            if(*toks[t_num] == ',') break;
+
           if ((e_type = loc_expr(toks, t_num, start, &end)) == 0)
             return -i;
+
           tot_end = end;
-          if (e_type == 1) /* simple number */
-          {
+          if (e_type == 1) { /* simple number */
             val = simple_double(toks, start, end);
             expr = NULL;
           }
-          else /* expression */
-          {
-            if ((expr =
-                 make_expression(end + 1 - start, &toks[start])) == NULL)
+          else { /* expression */
+            if ((expr = make_expression(end + 1 - start, &toks[start])) == NULL)
               return -i;
             val = expression_value(expr, 2);
           }
         }
       }
-      else
-      {
+      else {
         c_type = 4;
         val = zero;
         expr = NULL;
         tot_end = i;
       }
     }
-    if (clp->c_type == 1 && c_type == 2) clp->c_type = 3; /* min present */
+
+         if (clp->c_type == 1 && c_type == 2) clp->c_type = 3; /* min */
     else if (clp->c_type == 2 && c_type == 1) clp->c_type = 3; /* max */
-    else clp->c_type = c_type;
-    if (con_flag == 0)  expr = NULL;
+    else                                      clp->c_type = c_type;
+    if (con_flag == 0) expr = NULL;
+
     switch(c_type)
     {
       case 1:

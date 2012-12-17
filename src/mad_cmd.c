@@ -168,6 +168,8 @@ exec_command(void)
         p->clone = plot_options; p->clone_flag = 1;
       }
       else p->clone = clone_command(p->cmd_def);
+
+      // parser of parameters (mad_cmdin.c)
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
 

@@ -330,43 +330,37 @@ match_constraint(struct in_cmd* cmd)
   else
   { /* old match */
     pos = name_list_pos("sequence", nl);
-    if(nl->inform[pos]) /* sequence specified */
-    {
+    if(nl->inform[pos]) { /* sequence specified */
       cp = cmd->clone->par->parameters[pos];
       for (n = 0; n < match_sequs->curr; n++)
-      {
         if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
-        {
           break;
-        }
-      }
-      if (n == match_sequs->curr)
-      {
+
+      if (n == match_sequs->curr) {
         warning(cp->string," :sequence not selected by MATCH, skipped");
         return;
       }
+
       low = up = n;
     }
-    else
-    {
+    else {
       low = 0; up = match_sequs->curr - 1;
     }
-    for (n = low; n <= up; n++)
-    {
+
+    for (n = low; n <= up; n++) {
       sequ = match_sequs->sequs[n];
       pos = name_list_pos("range", nl);
-      if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-      {
+      if (pos > -1 && nl->inform[pos]) { /* parameter has been read */
         name = pl->parameters[pos]->string;
         if (get_ex_range(name, sequ, nodes) == 0)  return; // (k = not used
       }
-      else
-      {
+      else {
         nodes[0] = sequ->ex_start; nodes[1] = sequ->ex_end;
       }
       c_node = nodes[0];
       comm_constraints->curr=0;
       fill_constraint_list(1, cmd->clone, comm_constraints);
+
       while (c_node)
       {
         if (pass_select(c_node->p_elem->name, cmd->clone) != 0)

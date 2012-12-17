@@ -375,6 +375,7 @@ process(void)  /* steering routine: processes one command */
   struct element* el;
   if (this_cmd != NULL)
   {
+
     switch (this_cmd->type)
     {
       case 0: /* executable commands */

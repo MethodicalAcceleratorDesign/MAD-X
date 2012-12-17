@@ -418,8 +418,8 @@ CONTAINS
        !                                                         !
        call Get_map_from_NormalForm &                            !
             (ptc_track_debug, Normal_Order_n0, x_coord_co, &     !
-                                !INTENT:   IN,             IN,             IN        !
-                                !               1=> Normal_Order_n0  for Linear      !
+       ! INTENT:   IN,             IN,             IN            !
+       !                1=> Normal_Order_n0  for Linear          !
             Map_Y, Normal_Form_N, A_t_map,   A_t_map_rev)        !
        !     OUT,     OUT,          OUT,       OUT               !
        !                                                         !

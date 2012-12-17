@@ -1,7 +1,8 @@
 #include "madx.h"
 
-#if 0 // not used...
-static void
+// public debug
+
+void
 dump_in_cmd(struct in_cmd* p_inp)
 {
   fprintf(prt_file, "%s: type =%d, sub_type = %d, decl_start = %d\n",
@@ -9,10 +10,9 @@ dump_in_cmd(struct in_cmd* p_inp)
   if (p_inp->cmd_def != NULL)
   {
     fprintf(prt_file, "defining command: %s\n", p_inp->cmd_def->name);
-    /* dump_command(p_inp->cmd_def); */
+    dump_command(p_inp->cmd_def);
   }
 }
-#endif
 
 // public interface
 
@@ -107,32 +107,28 @@ scan_in_cmd(struct in_cmd* cmd)
   n = cmd->tok_list->curr;
   i = cmd->decl_start;
   cmd->tok_list->p[n] = blank;
-  while (i < n)
-  {
+
+  while (i < n) {
     log = 0;
-    if (i+1 < n && *cmd->tok_list->p[i] == '-')
-    {
+
+    if (i+1 < n && *cmd->tok_list->p[i] == '-') {
       log = 1; i++;
     }
-    if (*cmd->tok_list->p[i] != ',')
-    {
-      if ((k = name_list_pos(cmd->tok_list->p[i], cmd->cmd_def->par_names)) < 0)  /* try alias */
-      {
-        k = name_list_pos(alias(cmd->tok_list->p[i]), cmd->cmd_def->par_names);
-        if (k < 0)
+
+    if (*cmd->tok_list->p[i] != ',') {
+      if ((k = name_list_pos(cmd->tok_list->p[i], cmd->cmd_def->par_names)) < 0) { /* try alias */
+        if ((k = name_list_pos(alias(cmd->tok_list->p[i]), cmd->cmd_def->par_names)) < 0)
           fatal_error("illegal keyword:", cmd->tok_list->p[i]);
         break;
       }
-      else if ((i = decode_par(cmd, i, n, k, log)) < 0)
-      {
+      else if ((i = decode_par(cmd, i, n, k, log)) < 0) {
         fatal_error("illegal format near:", cmd->tok_list->p[-i]);
         break;
       }
+
       cmd->clone->par_names->inform[k] = ++cnt; /* mark parameter as read */
-      if (strcmp(cmd->tok_list->p[i], "true_") == 0
-          || strcmp(cmd->tok_list->p[i], "false_") == 0)
-         cmd->cmd_def->par->parameters[k]->double_value =
-	   cmd->clone->par->parameters[k]->double_value;
+      if (strcmp(cmd->tok_list->p[i], "true_") == 0 || strcmp(cmd->tok_list->p[i], "false_") == 0)
+        cmd->cmd_def->par->parameters[k]->double_value = cmd->clone->par->parameters[k]->double_value;
     }
     i++;
   }

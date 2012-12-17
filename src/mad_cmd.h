@@ -58,7 +58,7 @@ void                      add_to_command_list_list(char* label, struct command_l
 
 void    exec_command(void);
 int     decode_command(void);
-void    dump_command(struct command*);
+void    dump_command(struct command*); // for debugging
 void    print_command(struct command*);
 void    store_command_def(char* cmd_string);  /* processes command definition */
 int     make_line(char* statement);

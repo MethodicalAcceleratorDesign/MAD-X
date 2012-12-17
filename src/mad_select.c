@@ -186,54 +186,6 @@ get_select_t_ranges(struct command_list* select, struct command_list* deselect, 
   }
 }
 
-int
-get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
-  /* returns start and end node (nodes[0] and nodes[1])
-     of a range in the full expanded sequence */
-{
-  int i, n, pos;
-  char* c[2];
-  char tmp[NAME_L];
-  if (sequ == NULL) return 0;
-  strcpy(c_dum->c, range); stolower(c_dum->c);
-  c[0] = strtok(c_dum->c, "/");
-  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
-    n = 1;
-  else n = 2;
-  for (i = 0; i < n; i++)
-  {
-    if (*c[i] == '#')
-    {
-      if (strncmp(c[i], "#s", 2) == 0) nodes[i] = sequ->ex_start;
-      else if (strncmp(c[i], "#e", 2) == 0) nodes[i] = sequ->ex_end;
-      else
-      {
-        warning("illegal expand range ignored:", range);
-        return 0;
-      }
-    }
-    else
-    {
-      strcpy(tmp, c[i]);
-      if (square_to_colon(tmp) == 0)
-      {
-        warning("illegal expand range ignored:", range);
-        return 0;
-      }
-      if ((pos =
-           name_list_pos(tmp, sequ->ex_nodes->list)) > -1)
-        nodes[i] = sequ->ex_nodes->nodes[pos];
-      else
-      {
-        warning("illegal expand range ignored:", range);
-        return 0;
-      }
-    }
-  }
-  if (n == 1) nodes[1] = nodes[0];
-  return n;
-}
-
 void
 set_selected_errors(void)
 {
@@ -269,50 +221,100 @@ set_sector(void)
 }
 
 int
+get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
+  /* returns start and end node (nodes[0] and nodes[1])
+     of a range in the full expanded sequence */
+{
+  int i, n, pos;
+  char tmp[NAME_L], buf[5*NAME_L], *c[2];
+
+  if (sequ == NULL) return 0;
+
+  strcpy(buf, range); stolower(buf);
+  c[0] = strtok(buf, "/");
+
+  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
+    n = 1;
+  else
+    n = 2;
+
+  for (i = 0; i < n; i++) {
+    if (*c[i] == '#') {
+      if (strncmp(c[i], "#s", 2) == 0)
+        nodes[i] = sequ->ex_start;
+      else if (strncmp(c[i], "#e", 2) == 0)
+        nodes[i] = sequ->ex_end;
+      else {
+        warning("illegal expand range ignored:", range);
+        return 0;
+      }
+    }
+    else {
+      strcpy(tmp, c[i]);
+      if (square_to_colon(tmp) == 0) {
+        warning("illegal expand range ignored:", range);
+        return 0;
+      }
+
+      if ((pos = name_list_pos(tmp, sequ->ex_nodes->list)) > -1)
+        nodes[i] = sequ->ex_nodes->nodes[pos];
+      else {
+        warning("illegal expand range ignored:", range);
+        return 0;
+      }
+    }
+  }
+  if (n == 1) nodes[1] = nodes[0];
+  return n;
+}
+
+int
 get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 {
   /* returns start and end node (nodes[0] and nodes[1])
      of a range between range_start and range_end of an expanded sequence */
   int i, n;
-  char* c[2];
   struct node* c_node;
-  char tmp[NAME_L];
+  char tmp[NAME_L], buf[5*NAME_L], *c[2];
+
   if (sequ == NULL) return 0;
-  strcpy(c_dum->c, range); stolower(c_dum->c);
-  c[0] = strtok(c_dum->c, "/");
+  strcpy(buf, range); stolower(buf);
+
+  c[0] = strtok(buf, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
-  else n = 2;
-  for (i = 0; i < n; i++)
-  {
-    if (*c[i] == '#')
-    {
-      if (strncmp(c[i], "#s", 2) == 0) nodes[i] = sequ->range_start;
-      else if (strncmp(c[i], "#e", 2) == 0) nodes[i] = sequ->range_end;
-      else
-      {
+  else
+    n = 2;
+
+  for (i = 0; i < n; i++) {
+    if (*c[i] == '#') {
+      if (strncmp(c[i], "#s", 2) == 0)
+        nodes[i] = sequ->range_start;
+      else if (strncmp(c[i], "#e", 2) == 0)
+        nodes[i] = sequ->range_end;
+      else {
         warning("illegal expand range ignored:", range);
         return 0;
       }
     }
-    else
-    {
+    else {
       strcpy(tmp, c[i]);
-      if (square_to_colon(tmp) == 0)
-      {
+      if (square_to_colon(tmp) == 0) {
         warning("illegal expand range ignored:", range);
         return 0;
       }
+
       c_node = sequ->range_start;
-      while(c_node)
-      {
+
+      while(c_node) {
         if (strcmp(c_node->name, tmp) == 0) break;
-        if ((c_node = c_node->next) == sequ->range_end)
-        {
+
+        if ((c_node = c_node->next) == sequ->range_end) {
           warning("illegal expand range ignored:", range);
           return 0;
         }
       }
+
       nodes[i] = c_node;
     }
   }
@@ -325,40 +327,38 @@ get_range(char* range, struct sequence* sequ, struct node** nodes)
   /* returns start and end node (nodes[0] and nodes[1])
      of a range in the non-expanded sequence */
 {
+  char tmp[NAME_L], buf[5*NAME_L], *c[2];
   int i, n, pos;
-  char* c[2];
-  char tmp[NAME_L];
   if (sequ == NULL) return 0;
-  strcpy(c_dum->c, range); stolower(c_dum->c);
-  c[0] = strtok(c_dum->c, "/");
+
+  strcpy(buf, range); stolower(buf);
+  c[0] = strtok(buf, "/");
+
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
     n = 1;
-  else n = 2;
-  for (i = 0; i < n; i++)
-  {
-    if (*c[i] == '#')
-    {
-      if (strncmp(c[i], "#s", 2) == 0) nodes[i] = sequ->start;
-      else if (strncmp(c[i], "#e", 2) == 0) nodes[i] = sequ->end;
-      else
-      {
+  else
+    n = 2;
+
+  for (i = 0; i < n; i++) {
+    if (*c[i] == '#') {
+      if (strncmp(c[i], "#s", 2) == 0)
+        nodes[i] = sequ->start;
+      else if (strncmp(c[i], "#e", 2) == 0)
+        nodes[i] = sequ->end;
+      else {
         warning("illegal range ignored:", range);
         return 0;
       }
     }
-    else
-    {
+    else {
       strcpy(tmp, c[i]);
-      if (square_to_colon(tmp) == 0)
-      {
+      if (square_to_colon(tmp) == 0) {
         warning("illegal range ignored:", range);
         return 0;
       }
-      if ((pos =
-           name_list_pos(tmp, sequ->nodes->list)) > -1)
+      if ((pos = name_list_pos(tmp, sequ->nodes->list)) > -1)
         nodes[i] = sequ->nodes->nodes[pos];
-      else
-      {
+      else {
         warning("illegal range ignored:", range);
         return 0;
       }

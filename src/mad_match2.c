@@ -218,7 +218,6 @@ match2_disasambleconstraint(struct in_cmd* cmd)
 
   if ( strlen(name) > 0 )  /* parameter has been read */
   {
-
     k = get_ex_range(name, sequ, nodes);
     if (k == 0)
     {
