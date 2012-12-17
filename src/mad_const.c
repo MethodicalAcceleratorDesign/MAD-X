@@ -312,8 +312,6 @@ next_constr_namepos(char* name)
     case 'm':
            if (name[2] == 'x') pos = 5;       // m?x
       else if (name[2] == 'y') pos = 8;       // m?y
-      else if (name[1] == 'v' && name[2] == 'a' && name[3] == 'r' && name[4] >= '1' && name[4] <= '4')
-        pos = -(name[4]-'1'+1); 
       break;
 
     case 'p':

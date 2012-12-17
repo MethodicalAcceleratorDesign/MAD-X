@@ -166,13 +166,13 @@
         i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
         if(i.ne.0)  then
           n_pos = next_constr_namepos(name)
-          if (n_pos  > 0) val = opt_fun(n_pos)
-          if (n_pos  < 0) val = valhg
-          if (n_pos == 0) then
+          if (n_pos.eq.0) then
             print *, ' +-+-+- fatal error'
             print *, 'match - collect: illegal name = ', name
+            print *, '      - try with the "slow" option'
             stop
           endif
+          val = opt_fun(n_pos)
           call current_node_name(node_name, name_len);
           if (type.eq.1) then
               f_val=weight*dim(c_min,val)
