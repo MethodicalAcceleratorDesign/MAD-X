@@ -151,17 +151,15 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
   return i;
 }
 
-static inline int
-skip_identifier(const char *lhs, const char *rhs, int strict)
+static inline void
+skip_identifier(char *restrict *lhs, char *restrict *rhs, int strict)
 {
-  int i = 0;
-
   if (strict)
-    while (lhs[i] == rhs[i] && !is_separator(lhs[i])) i++;
-  else
-    while (!is_separator(lhs[i])) i++;
-
-  return i;
+    while (**lhs == **rhs && !is_separator(**lhs)) ++*lhs, ++*rhs;
+  else {
+    while (!is_separator(**lhs)) ++*lhs;
+    while (!is_separator(**rhs)) ++*rhs;
+  }
 }
 
 static inline int
@@ -509,10 +507,9 @@ retry:
     int strict = true;
     if (c->eps.cmd & eps_omit)
       strict = !is_valid_omit(lhs_p, rhs_p, dif, c->eps.tag);
-    int i = skip_identifier(lhs_p, rhs_p, strict);
-    int j = !strict ? strlen(c->eps.tag) : 0;
+    int j = strict ? 0 : strlen(c->eps.tag);
     trace("  %s strings '%.25s'|'%.25s'", strict ? "skipping" : "omitting", lhs_p-j, rhs_p-j);
-    lhs_p += i; rhs_p += i;
+    skip_identifier(&lhs_p, &rhs_p, strict);
     if (!isdigit(*lhs_p)) goto retry;
     goto quit_diff;
   }
@@ -546,8 +543,8 @@ ndiff_testNum (T *dif, const struct constraint *c)
 {
   assert(dif);
 
-  char *lhs_p = dif->lhs_b+dif->lhs_i;
-  char *rhs_p = dif->rhs_b+dif->rhs_i;
+  char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
+  char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
   char *end;
 
   double lhs_d, rhs_d, dif_a=0, min_a=0, pow_a=0;
