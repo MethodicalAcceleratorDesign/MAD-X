@@ -3,7 +3,7 @@
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 set, format="12.6f";
 
-option, info, warn, -echo;
+option, info, -warn, -echo;
 call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
 call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
 option, info, warn, echo;
