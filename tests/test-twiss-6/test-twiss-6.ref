@@ -1,0 +1,161 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 20.12.12 16.55.05 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Threader example
+
+OPTION, -ECHO, -WARN, INFO;
+
+
+
+// forces and other constants
+
+
+
+l.bpm:=.3;
+
+bang:=.509998807401e-2;
+
+kqf:=.872651312e-2;
+
+kqd:=-.872777242e-2;
+
+ksf:=.0198492943;
+
+ksd:=-.039621283;
+
+acbv1:=1.e-3*gauss(1.);
+
+acbh1:=1.e-3*gauss(1.);
+
+acbv2:=1.e-3;
+
+acbh2:=1.e-3;
+
+!select,flag=save,class=variable,pattern="bh.*";
+
+!select,flag=save,clear;
+
+!save,beam,file=save;
+
+! action
+
+
+
+!threader,vector=4e-3,4e-3;
+
+use, period=fivecell;
+
+select, flag=twiss, range=#s, column=name,x, px, y, py;
+
+select, flag=twiss, range=#e, column=name,x, px, y, py;
+
+!coguess,x=1.e-3;
+
+!twiss;!,keeporbit;
+
+acbv1:=1.e-3;
+
+++++++ info: acbv1 redefined
+acbh1:=1.e-3;
+
+++++++ info: acbh1 redefined
+acbv2:=1.e-3;
+
+++++++ info: acbv2 redefined
+acbh2:=1.e-3;
+
+++++++ info: acbh2 redefined
+coguess,x=0;
+
+twiss, file = twiss.1;!,keeporbit;
+
+enter Twiss module
+  
+iteration:   1 error:   1.300217E-01 deltap:   0.000000E+00
+orbit:   1.742856E-01  2.538799E-03  4.625988E-02  1.065936E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.088835E-02 deltap:   0.000000E+00
+orbit:   1.329838E-01  2.009119E-03  2.703068E-02  1.303526E-03  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.079167E-03 deltap:   0.000000E+00
+orbit:   1.302342E-01  1.974440E-03  2.736348E-02  1.294279E-03  0.000000E+00  0.000000E+00
+  
+iteration:   4 error:   2.404011E-06 deltap:   0.000000E+00
+orbit:   1.302335E-01  1.974439E-03  2.736300E-02  1.294316E-03  0.000000E+00  0.000000E+00
+  
+iteration:   5 error:   1.040179E-11 deltap:   0.000000E+00
+orbit:   1.302335E-01  1.974439E-03  2.736300E-02  1.294316E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004548526276        46.88831716 
+
+                q1                dq1            betxmax              dxmax 
+       1.270619113       0.4848928104        232.1500505        2.773428819 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.764963932        0.145922216      0.08446266233        1.314472002 
+
+               dq2            betymax              dymax              dyrms 
+       1.068686869        235.4447502       0.5438331254       0.3047833038 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.1436430725       0.0792428365                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+!acbv1:=1.e-4;
+
+!acbh1:=1.e-4;
+
+!acbv2:=1.e-4;
+
+!acbh2:=1.e-4;
+
+option,threader;
+
+twiss, file = twiss.2;
+enter Twiss module
+++++++ info: -threader- pickup: bph[ 1]  kicker: cbh[ 1] total x-kick:  -9.813651E-04              
+++++++ info: -threader- pickup: bpv[ 1]  kicker: cbv[ 1] total y-kick:  -1.000000E-03              
+++++++ info: -threader- pickup: bph[ 2]  kicker: cbh.2[ 1] total x-kick:  -9.816179E-04              
+++++++ info: -threader- pickup: bpv[ 2]  kicker: cbv.2[ 1] total y-kick:  -1.000000E-03              
+  
+iteration:   1 error:   3.244315E-03 deltap:   0.000000E+00
+orbit:   2.577913E-03  3.848409E-05 -2.267222E-08 -3.819306E-10  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.770786E-07 deltap:   0.000000E+00
+orbit:   2.578233E-03  3.848899E-05 -2.257435E-08 -3.834450E-10  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000424601471        48.52988395 
+
+                q1                dq1            betxmax              dxmax 
+       1.291984069       0.4063753269        184.2538246        2.598063473 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.624119207     0.002643348562       0.0016093582        1.248803029 
+
+               dq2            betymax              dymax              dyrms 
+       1.032676465        185.6362163    3.698203196e-07     1.93037958e-07 
+
+            ycomax             ycorms             deltap            synch_1 
+   7.947370568e-08    4.492681364e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -821,6 +821,13 @@ tests/test-twiss-5/sample_optics.tfs.ref -text
 tests/test-twiss-5/test-twiss-5.cfg -text
 tests/test-twiss-5/test-twiss-5.madx -text
 tests/test-twiss-5/test-twiss-5.ref -text
+tests/test-twiss-6/test-twiss-6.cfg -text
+tests/test-twiss-6/test-twiss-6.madx -text
+tests/test-twiss-6/test-twiss-6.ref -text
+tests/test-twiss-6/twiss.1.cfg -text
+tests/test-twiss-6/twiss.1.ref -text
+tests/test-twiss-6/twiss.2.cfg -text
+tests/test-twiss-6/twiss.2.ref -text
 tests/test-twiss/sample_optics.tfs.cfg -text
 tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text
