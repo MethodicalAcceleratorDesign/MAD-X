@@ -828,6 +828,13 @@ tests/test-twiss-6/twiss.1.cfg -text
 tests/test-twiss-6/twiss.1.ref -text
 tests/test-twiss-6/twiss.2.cfg -text
 tests/test-twiss-6/twiss.2.ref -text
+tests/test-twiss-7/ALBA-25.4th.madx -text
+tests/test-twiss-7/README -text
+tests/test-twiss-7/test-twiss-7.cfg -text
+tests/test-twiss-7/test-twiss-7.madx -text
+tests/test-twiss-7/test-twiss-7.ref -text
+tests/test-twiss-7/twiss1.cfg -text
+tests/test-twiss-7/twiss1.ref -text
 tests/test-twiss/sample_optics.tfs.cfg -text
 tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text

@@ -1,0 +1,16 @@
+R. Tomas                                        August the 15th, 2007
+
+
+            Test of the TILT option for the EMIT module
+            *******************************************
+
+To check that TILT is properly used in the EMIT module 
+the example defines the lattice elements as skew quadrupoles 
+and sextupoles with tilts of pi/4 amd pi/6, respectively, 
+which correspond exactly to normal quadrupoles and sextupoles. 
+The result therefore should be the same as for the normal 
+lattice with normal elements, and this is indeed the case.
+EMIT treats TILTs in the proper way.
+
+
+

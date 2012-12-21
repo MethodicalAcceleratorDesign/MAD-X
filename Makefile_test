@@ -34,7 +34,7 @@ test-setvars_lin \
 test-makethin \
 test-survey \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 test-track-7 test-track-8 \
-test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 \
+test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test-twiss-7 \
 test-emit \
 test-thick-quad \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
@@ -69,7 +69,8 @@ test-twiss-2 \
 test-twiss-3 \
 test-twiss-4 \
 test-twiss-5 \
-test-twiss-6
+test-twiss-6 \
+test-twiss-7
 
 # lexicographical order
 tests-to-setup := \
