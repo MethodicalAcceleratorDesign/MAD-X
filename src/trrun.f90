@@ -2248,142 +2248,138 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
   end do
 
 end subroutine ttbb_hollowparabolic
-subroutine ttbb_old(track,ktrack,parvec)
-
-  use bbfi
-  implicit none
-
-  !----------------------------------------------------------------------*
-  ! purpose:                                                             *
-  !   track a set of particle through a beam-beam interaction region.    *
-  !   see mad physicist's manual for the formulas used.                  *
-  !input:                                                                *
-  ! input/output:                                                        *
-  !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
-  !   ktrack    (integer) number of tracks.                              *
-  !----------------------------------------------------------------------*
-  logical bborbit
-  integer ktrack,itrack,ipos,get_option
-  double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
-       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
-       get_variable,node_value,zero,one,two,three,ten3m,explim
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
-       explim=150d0)
-  !     if x > explim, exp(-x) is outside machine limits.
-
-  !---- initialize.
-  bborbit = get_option('bborbit ') .ne. 0
-  pi=get_variable('pi ')
-  sx = node_value('sigx ')
-  sy = node_value('sigy ')
-  xm = node_value('xma ')
-  ym = node_value('yma ')
-  fk = two * parvec(5) * parvec(6) / parvec(7)
-  if (fk .eq. zero)  return
-  ipos = 0
-  if (.not. bborbit)  then
-     !--- find position of closed orbit bb_kick
-     do ipos = 1, bbd_cnt
-        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
-     enddo
-     ipos = 0
-1    continue
-  endif
-  sx2 = sx*sx
-  sy2 = sy*sy
-  !---- limit formulae for sigma(x) = sigma(y).
-  if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
-     do itrack = 1, ktrack
-        xs = track(1,itrack) - xm
-        ys = track(3,itrack) - ym
-        rho2 = xs * xs + ys * ys
-        tk = rho2 / (two * sx2)
-        if (tk .gt. explim) then
-           phix = xs * fk / rho2
-           phiy = ys * fk / rho2
-        else if (rho2 .ne. zero) then
-           phix = xs * fk / rho2 * (one - exp(-tk) )
-           phiy = ys * fk / rho2 * (one - exp(-tk) )
-        else
-           phix = zero
-           phiy = zero
-        endif
-        if (ipos .ne. 0)  then
-           !--- subtract closed orbit kick
-           phix = phix - bb_kick(1,ipos)
-           phiy = phiy - bb_kick(2,ipos)
-        endif
-        track(2,itrack) = track(2,itrack) + phix
-        track(4,itrack) = track(4,itrack) + phiy
-     enddo
-
-     !---- case sigma(x) > sigma(y).
-  else if (sx2 .gt. sy2) then
-     r2 = two * (sx2 - sy2)
-     r  = sqrt(r2)
-     rk = fk * sqrt(pi) / r
-     do itrack = 1, ktrack
-        xs = track(1,itrack) - xm
-        ys = track(3,itrack) - ym
-        xr = abs(xs) / r
-        yr = abs(ys) / r
-        call ccperrf(xr, yr, crx, cry)
-        tk = (xs * xs / sx2 + ys * ys / sy2) / two
-        if (tk .gt. explim) then
-           phix = rk * cry
-           phiy = rk * crx
-        else
-           xb = (sy / sx) * xr
-           yb = (sx / sy) * yr
-           call ccperrf(xb, yb, cbx, cby)
-           phix = rk * (cry - exp(-tk) * cby)
-           phiy = rk * (crx - exp(-tk) * cbx)
-        endif
-        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-        if (ipos .ne. 0)  then
-           !--- subtract closed orbit kick
-           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-        endif
-     enddo
-
-     !---- case sigma(x) < sigma(y).
-  else
-     r2 = two * (sy2 - sx2)
-     r  = sqrt(r2)
-     rk = fk * sqrt(pi) / r
-     do itrack = 1, ktrack
-        xs = track(1,itrack) - xm
-        ys = track(3,itrack) - ym
-        xr = abs(xs) / r
-        yr = abs(ys) / r
-        call ccperrf(yr, xr, cry, crx)
-        tk = (xs * xs / sx2 + ys * ys / sy2) / two
-        if (tk .gt. explim) then
-           phix = rk * cry
-           phiy = rk * crx
-        else
-           xb  = (sy / sx) * xr
-           yb  = (sx / sy) * yr
-           call ccperrf(yb, xb, cby, cbx)
-           phix = rk * (cry - exp(-tk) * cby)
-           phiy = rk * (crx - exp(-tk) * cbx)
-        endif
-        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
-        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
-        if (ipos .ne. 0)  then
-           !--- subtract closed orbit kick
-           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-        endif
-     enddo
-  endif
-end subroutine ttbb_old
-
-
-
-
+!!$subroutine ttbb_old(track,ktrack,parvec)
+!!$
+!!$  use bbfi
+!!$  implicit none
+!!$
+!!$  !----------------------------------------------------------------------*
+!!$  ! purpose:                                                             *
+!!$  !   track a set of particle through a beam-beam interaction region.    *
+!!$  !   see mad physicist's manual for the formulas used.                  *
+!!$  !input:                                                                *
+!!$  ! input/output:                                                        *
+!!$  !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
+!!$  !   ktrack    (integer) number of tracks.                              *
+!!$  !----------------------------------------------------------------------*
+!!$  logical bborbit
+!!$  integer ktrack,itrack,ipos,get_option
+!!$  double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
+!!$       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
+!!$       get_variable,node_value,zero,one,two,three,ten3m,explim
+!!$  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+!!$       explim=150d0)
+!!$  !     if x > explim, exp(-x) is outside machine limits.
+!!$
+!!$  !---- initialize.
+!!$  bborbit = get_option('bborbit ') .ne. 0
+!!$  pi=get_variable('pi ')
+!!$  sx = node_value('sigx ')
+!!$  sy = node_value('sigy ')
+!!$  xm = node_value('xma ')
+!!$  ym = node_value('yma ')
+!!$  fk = two * parvec(5) * parvec(6) / parvec(7)
+!!$  if (fk .eq. zero)  return
+!!$  ipos = 0
+!!$  if (.not. bborbit)  then
+!!$     !--- find position of closed orbit bb_kick
+!!$     do ipos = 1, bbd_cnt
+!!$        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
+!!$     enddo
+!!$     ipos = 0
+!!$1    continue
+!!$  endif
+!!$  sx2 = sx*sx
+!!$  sy2 = sy*sy
+!!$  !---- limit formulae for sigma(x) = sigma(y).
+!!$  if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        rho2 = xs * xs + ys * ys
+!!$        tk = rho2 / (two * sx2)
+!!$        if (tk .gt. explim) then
+!!$           phix = xs * fk / rho2
+!!$           phiy = ys * fk / rho2
+!!$        else if (rho2 .ne. zero) then
+!!$           phix = xs * fk / rho2 * (one - exp(-tk) )
+!!$           phiy = ys * fk / rho2 * (one - exp(-tk) )
+!!$        else
+!!$           phix = zero
+!!$           phiy = zero
+!!$        endif
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           phix = phix - bb_kick(1,ipos)
+!!$           phiy = phiy - bb_kick(2,ipos)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix
+!!$        track(4,itrack) = track(4,itrack) + phiy
+!!$     enddo
+!!$
+!!$     !---- case sigma(x) > sigma(y).
+!!$  else if (sx2 .gt. sy2) then
+!!$     r2 = two * (sx2 - sy2)
+!!$     r  = sqrt(r2)
+!!$     rk = fk * sqrt(pi) / r
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        xr = abs(xs) / r
+!!$        yr = abs(ys) / r
+!!$        call ccperrf(xr, yr, crx, cry)
+!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+!!$        if (tk .gt. explim) then
+!!$           phix = rk * cry
+!!$           phiy = rk * crx
+!!$        else
+!!$           xb = (sy / sx) * xr
+!!$           yb = (sx / sy) * yr
+!!$           call ccperrf(xb, yb, cbx, cby)
+!!$           phix = rk * (cry - exp(-tk) * cby)
+!!$           phiy = rk * (crx - exp(-tk) * cbx)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+!!$        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+!!$        endif
+!!$     enddo
+!!$
+!!$     !---- case sigma(x) < sigma(y).
+!!$  else
+!!$     r2 = two * (sy2 - sx2)
+!!$     r  = sqrt(r2)
+!!$     rk = fk * sqrt(pi) / r
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        xr = abs(xs) / r
+!!$        yr = abs(ys) / r
+!!$        call ccperrf(yr, xr, cry, crx)
+!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+!!$        if (tk .gt. explim) then
+!!$           phix = rk * cry
+!!$           phiy = rk * crx
+!!$        else
+!!$           xb  = (sy / sx) * xr
+!!$           yb  = (sx / sy) * yr
+!!$           call ccperrf(yb, xb, cby, cbx)
+!!$           phix = rk * (cry - exp(-tk) * cby)
+!!$           phiy = rk * (crx - exp(-tk) * cbx)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+!!$        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+!!$        endif
+!!$     enddo
+!!$  endif
+!!$end subroutine ttbb_old
 subroutine trkill(n, turn, sum, jmax, part_id,                    &
      last_turn, last_pos, last_orbit, z, aptype)
 
