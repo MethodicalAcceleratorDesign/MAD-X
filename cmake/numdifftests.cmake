@@ -22,20 +22,18 @@ endif()
 
 set(BASESCRIPT ${CMAKE_SOURCE_DIR}/cmake/ctestbase.cmake)
 
-macro(numdiff_test testname testout islong)
+macro(numdiff_test testname islong)
    if(${islong})
       set(_testname ${testname}_LONG)
    else()
       set(_testname ${testname})
    endif()
-   set(_testout "${testname} ${testout}")
    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/${testname}
       ${CMAKE_CURRENT_BINARY_DIR}/tests/${testname})
    add_test(${_testname}
       ${CMAKE_COMMAND}
       -DTEST_PROG=${binaryname}
-      -DTEST_OUTPUT=${_testout}
       -DSOURCEDIR=${CMAKE_CURRENT_BINARY_DIR}/tests/${testname}
       -DTEST_NAME=${testname}
       -DNUMDIFF=${ndiffbin}
@@ -50,49 +48,49 @@ endmacro()
 # a long test (test-user).
 
 #numdiff_test(test-ibs "ibs_output.tfs" 0)
-numdiff_test(test-jacobian "" 0)
-numdiff_test(test-jacobian-2 "" 0)
-numdiff_test(test-jacobian-knobs "knobfile" 0)
+numdiff_test(test-jacobian 0)
+numdiff_test(test-jacobian-2 0)
+numdiff_test(test-jacobian-knobs 0)
 
-numdiff_test(test-match "" 0)
-numdiff_test(test-match-2 "str.ip8.b1.dat twiss.ir8.b1.data" 1)
+numdiff_test(test-match 0)
+numdiff_test(test-match-2 1)
 
-numdiff_test(test-ptc-twiss "Maxwellian_bend_for_ptc.txt fort.18 ptc-twiss-table" 1)
-numdiff_test(test-ptc-normal "fort.18 Maxwellian_bend_for_ptc.txt ptc_map_table.tfs ptc_normal_results.tfs" 0)
-numdiff_test(test-ptc-trackline "trackone" 0)
-numdiff_test(test-ptc-trackline-2 "trackone" 0)
+numdiff_test(test-ptc-twiss 1)
+numdiff_test(test-ptc-normal 1)
+numdiff_test(test-ptc-trackline 0)
+numdiff_test(test-ptc-trackline-2 0)
 
-numdiff_test(test-rfmultipole "fc.16 fc.2 fc.34 fc.3 fc.3.aux test1_flat.seq test1_track.obs0001.p0001 test1_track.obs0002.p0001" 0)
-numdiff_test(test-rfmultipole-2 "sectormap" 0)
-numdiff_test(test-rfmultipole-3 "sectormap" 0)
-numdiff_test(test-rfmultipole-4 "sectormap" 0)
+numdiff_test(test-rfmultipole 0)
+numdiff_test(test-rfmultipole-2 0)
+numdiff_test(test-rfmultipole-3 0)
+numdiff_test(test-rfmultipole-4 0)
 
-numdiff_test(test-twiss "sample_optics.tfs" 1)
-numdiff_test(test-twiss-2 "my_sect_file test-twiss-2 twiss_fv9" 0)
-numdiff_test(test-twiss-3 "twiss" 0)
-numdiff_test(test-twiss-4 "twiss.b1.data twiss.b2.data" 1)
+numdiff_test(test-twiss 1)
+numdiff_test(test-twiss-2 0)
+numdiff_test(test-twiss-3 0)
+numdiff_test(test-twiss-4 1)
 
-numdiff_test(test-aperture "ap.tfs" 0)
+numdiff_test(test-aperture 0)
 
-numdiff_test(test-makethin "" 1)
+numdiff_test(test-makethin 1)
 
-numdiff_test(test-survey "test-survey_1.tfs test-survey_2.tfs" 0)
+numdiff_test(test-survey 0)
 
-numdiff_test(test-track "out_test-track_ap_collimatorone" 0)
-numdiff_test(test-track-2 "track.obs0001.p0001 track.obs0002.p0001" 1)
-numdiff_test(test-track-3 "out_done out_fone" 0)
-numdiff_test(test-track-4 "out_done" 0)
-numdiff_test(test-track-5 "out_rellipseone" 0)
-numdiff_test(test-track-6 "mytab.tfs twiss1.tfs twiss2.tfs track.obs0001.p0001 track.obs0002.p0001 track.obs0001.p0002  track.obs0002.p0002" 0)
-numdiff_test(test-track-7 "track.obs0001.p0001 track.obs0001.p0002 track.obs0001.p0003 twissprb1.1" 1)
-numdiff_test(test-track-8 "track.obs0001.p0001" 1)
+numdiff_test(test-track 0)
+numdiff_test(test-track-2 1)
+numdiff_test(test-track-3 0)
+numdiff_test(test-track-4 0)
+numdiff_test(test-track-5 0)
+numdiff_test(test-track-6 0)
+numdiff_test(test-track-7 1)
+numdiff_test(test-track-8  1)
 
 set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin_LONG)
 set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin_LONG)
 set_tests_properties(test-track-8_LONG PROPERTIES DEPENDS test-makethin_LONG)
 
-numdiff_test(test-emit "" 0)
+numdiff_test(test-emit 0)
 
-numdiff_test(test-touschek "touschek.dat" 1)
-numdiff_test(test-touschek-2 "touschek" 1)
+numdiff_test(test-touschek 1)
+numdiff_test(test-touschek-2 1)
 
