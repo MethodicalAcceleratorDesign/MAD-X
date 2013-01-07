@@ -1,15 +1,13 @@
 
 # List output files..
-file(GLOB TEST_OUTPUT ${SOURCEDIR}/*.ref)
+file(GLOB TEST_OUTPUT RELATIVE ${SOURCEDIR} ${SOURCEDIR}/*.ref)
+string(REGEX REPLACE ".ref" ".out" OLD_OUTPUT "${TEST_OUTPUT}")
+string(REGEX REPLACE ".ref" "" TEST_OUTPUT "${TEST_OUTPUT}")
 
 # String version for message:
-file(GLOB STRING_TEST_OUTPUT RELATIVE ${SOURCEDIR} ${SOURCEDIR}/*.ref)
-string(REGEX REPLACE ";" " " STRING_TEST_OUTPUT "${STRING_TEST_OUTPUT}")
+string(REGEX REPLACE ";" " " STRING_TEST_OUTPUT "${TEST_OUTPUT}")
 
-string(REGEX REPLACE ".ref" "" OLD_OUTPUT "${TEST_OUTPUT}")
-file(REMOVE ${OLD_OUTPUT})
-string(REGEX REPLACE ".ref" ".out" OLD_OUTPUT "${TEST_OUTPUT}")
-file(REMOVE ${OLD_OUTPUT})
+file(REMOVE ${OLD_OUTPUT} ${TEST_OUTPUT})
 
 # Run simulation..
 message("COMMAND ${TEST_PROG} < ${SOURCEDIR}/${TEST_NAME}.madx")
