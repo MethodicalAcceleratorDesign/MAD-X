@@ -69,6 +69,9 @@ numdiff_test(test-twiss 1)
 numdiff_test(test-twiss-2 0)
 numdiff_test(test-twiss-3 0)
 numdiff_test(test-twiss-4 1)
+numdiff_test(test-twiss-5 1)
+numdiff_test(test-twiss-6 0)
+numdiff_test(test-twiss-7 0)
 
 numdiff_test(test-aperture 0)
 
@@ -94,3 +97,5 @@ numdiff_test(test-emit 0)
 numdiff_test(test-touschek 1)
 numdiff_test(test-touschek-2 1)
 
+numdiff_test(test-setvars_lin 0)
+numdiff_test(test-thick-quad 0)
