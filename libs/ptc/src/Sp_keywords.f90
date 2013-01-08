@@ -3282,7 +3282,7 @@ endif
        if( p%mag%name/=name) then
          write(6,*) " serious error in read_universe_pointed "
          write(6,*) i,p%mag%name,name,k 
-         pause 666
+!         pause 666
          stop 666   
        endif
 !       write(6,*) p%mag%name,name,pos,k(2)
