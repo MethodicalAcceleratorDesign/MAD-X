@@ -55,6 +55,10 @@ endif
 #
 
 CXXFLAGS += -pipe $(addprefix -I,$(CXX_DIR))
+
+ifeq ($(OSTYPE),Darwin)
+CXXFLAGS += -mmacosx-version-min=10.5
+endif
  
 #
 # diagnostics (g++ is the reference)

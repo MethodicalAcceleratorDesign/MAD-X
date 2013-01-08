@@ -56,6 +56,10 @@ endif
 
 CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
  
+ifeq ($(OSTYPE),Darwin)
+CFLAGS += -mmacosx-version-min=10.5
+endif
+
 #
 # diagnostics (gcc is the reference)
 #

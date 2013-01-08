@@ -69,8 +69,12 @@ endif
 #
 # extra flags
 #
- 
+
 CFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CC_DIR))
+
+ifeq ($(OSTYPE),Darwin)
+CFLAGS += -mmacosx-version-min=10.5
+endif
 
 endif
 
@@ -119,6 +123,10 @@ endif
 #
  
 CXXFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CXX_DIR))
+
+ifeq ($(OSTYPE),Darwin)
+CXXFLAGS += -mmacosx-version-min=10.5
+endif
 
 endif
 

@@ -65,4 +65,8 @@ endif
 FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check \
           -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
 
+ifeq ($(OSTYPE),Darwin)
+FFLAGS += -mmacosx-version-min=10.5
+endif
+
 # end of makefile

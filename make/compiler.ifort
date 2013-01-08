@@ -71,6 +71,10 @@ ifneq ($(CXXNAME),)
 FFLAGS += -fexceptions
 endif
 
+ifeq ($(OSTYPE),Darwin)
+FFLAGS += -mmacosx-version-min=10.5
+endif
+
 endif # Unix Settings
 
 # |
