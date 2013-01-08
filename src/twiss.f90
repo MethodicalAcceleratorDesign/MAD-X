@@ -2330,8 +2330,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      e2 = g_elpar(b_e2)
 
      if(code.eq.2) then
-        e1 = e1 + bvk * g_elpar(b_angle) / two
-        e2 = e2 + bvk * g_elpar(b_angle) / two
+        e1 = e1 + an / two
+        e2 = e2 + an / two
      endif
 
      !---  bvk also applied further down
