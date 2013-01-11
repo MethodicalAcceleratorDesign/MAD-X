@@ -393,7 +393,7 @@ contains
 
     CALL UPDATE_STATES
 
-    ! check that deltap-dependency selected iff icase=5, which stands for
+    ! check that deltap-dependency selected if icase=5, which stands for
     ! 4 dimensions and deltap/p as an external parameter.
     ! indeed the simplified formulas we applied for derivation w.r.t deltap assume
     ! that deltap is an externally supplied constant parameter, which is no longer
