@@ -413,8 +413,8 @@ contains
     else
        dt=deltap
     endif
-    if(icase.eq.5) x(5)=dt
-
+    if(icase.eq.5 .or. icase.eq.56) x(5)=dt
+    
     closed_orbit = get_value('ptc_twiss ','closed_orbit ') .ne. 0
 
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
@@ -440,7 +440,7 @@ contains
        x(6)=get_value('ptc_twiss ','t ')
        x(5)=x(5)+get_value('ptc_twiss ','pt ')
 
-
+       
 
        !print*, "Looking for orbit"
        !w_p = 0
