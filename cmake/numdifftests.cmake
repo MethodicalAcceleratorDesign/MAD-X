@@ -88,6 +88,7 @@ numdiff_test(test-track-6 0)
 numdiff_test(test-track-7 1)
 numdiff_test(test-track-8  1)
 numdiff_test(test-track-9  0)
+numdiff_test(test-track-10  1)
 
 set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin_LONG)
 set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin_LONG)
