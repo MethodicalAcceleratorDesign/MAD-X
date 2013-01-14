@@ -1,0 +1,122 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 14.01.13 11.23.10 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! based on examples/emit/LEP/
+
+option, -echo,-warn,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   5.244643E-02 deltap:   0.000000E+00
+orbit:  -3.616223E-03  1.067291E-04  0.000000E+00  0.000000E+00  1.238209E-01  5.244595E-04
+  
+iteration:   2 error:   1.134307E-02 deltap:   0.000000E+00
+orbit:   3.052082E-04 -4.175058E-07  0.000000E+00  0.000000E+00  1.519456E-01  7.079259E-04
+  
+iteration:   3 error:   3.291071E-04 deltap:   0.000000E+00
+orbit:   5.140846E-05 -3.990556E-07  0.000000E+00  0.000000E+00  1.525054E-01  7.174183E-04
+  
+iteration:   4 error:   1.610917E-06 deltap:   0.000000E+00
+orbit:   4.954735E-05 -4.288381E-07  0.000000E+00  0.000000E+00  1.525201E-01  7.171494E-04
+  
+iteration:   5 error:   2.423622E-08 deltap:   0.000000E+00
+orbit:   4.954587E-05 -4.291724E-07  0.000000E+00  0.000000E+00  1.525203E-01  7.171422E-04
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       26658.87208      -0.1525203343    0.0001453616145        82.94211987 
+
+                q1                dq1            betxmax              dxmax 
+       98.27669996        1.173642706        408.9237524        1.033786685 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.6196813406     0.004087031068      0.00127672863         96.1858885 
+
+               dq2            betymax              dymax              dyrms 
+      0.8233879222        216.0098468                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+makethin: slicing sequence : lep
+enter Twiss module
+  
+iteration:   1 error:   5.191029E-02 deltap:   0.000000E+00
+orbit:  -3.356076E-03  9.040838E-05  0.000000E+00  0.000000E+00  1.238474E-01  5.288390E-04
+  
+iteration:   2 error:   1.010160E-02 deltap:   0.000000E+00
+orbit:   2.262692E-04 -1.515045E-06  0.000000E+00  0.000000E+00  1.510015E-01  7.102148E-04
+  
+iteration:   3 error:   3.221395E-04 deltap:   0.000000E+00
+orbit:   5.106447E-05 -3.272041E-07  0.000000E+00  0.000000E+00  1.524812E-01  7.175860E-04
+  
+iteration:   4 error:   7.258600E-06 deltap:   0.000000E+00
+orbit:   4.955088E-05 -3.460429E-07  0.000000E+00  0.000000E+00  1.525350E-01  7.169685E-04
+  
+iteration:   5 error:   1.102800E-07 deltap:   0.000000E+00
+orbit:   4.954693E-05 -3.462818E-07  0.000000E+00  0.000000E+00  1.525361E-01  7.169433E-04
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       26658.87208       -0.152536108    0.0001438658812        83.37216799 
+
+                q1                dq1            betxmax              dxmax 
+       98.29138988        1.221256067        411.4477668        1.040746242 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.6254095595     0.004112791378      0.00128846017        96.19746455 
+
+               dq2            betymax              dymax              dyrms 
+      0.6913997528        219.9578306                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter TRACK module
+damp is on
+  
+iteration:   1 error:   5.191029E-02 deltap:   0.000000E+00
+orbit:  -3.356076E-03  9.040838E-05  0.000000E+00  0.000000E+00  1.238474E-01  5.288390E-04
+  
+iteration:   2 error:   1.010160E-02 deltap:   0.000000E+00
+orbit:   2.262692E-04 -1.515045E-06  0.000000E+00  0.000000E+00  1.510015E-01  7.102148E-04
+  
+iteration:   3 error:   3.221395E-04 deltap:   0.000000E+00
+orbit:   5.106447E-05 -3.272041E-07  0.000000E+00  0.000000E+00  1.524812E-01  7.175860E-04
+  
+iteration:   4 error:   7.258600E-06 deltap:   0.000000E+00
+orbit:   4.955088E-05 -3.460429E-07  0.000000E+00  0.000000E+00  1.525350E-01  7.169685E-04
+  
+iteration:   5 error:   1.102800E-07 deltap:   0.000000E+00
+orbit:   4.954693E-05 -3.462818E-07  0.000000E+00  0.000000E+00  1.525361E-01  7.169433E-04
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0   4.954692502295698E-005 -3.462818228537084E-007  0.000000000000000E+000  0.000000000000000E+000  0.152536107974691       7.169433365862072E-004
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:  11 error:   3.686832E-07 deltap:   0.000000E+00
+orbit:   4.967993E-05 -3.415600E-07  0.000000E+00  0.000000E+00  1.525363E-01  7.167826E-04
+
+*****  end of trrun  *****
+exit TRACK module
+
+
+  Number of warnings: 2
+0 in C and 2 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

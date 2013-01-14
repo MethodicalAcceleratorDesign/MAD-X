@@ -731,6 +731,15 @@ tests/test-touschek/test-touschek.madx -text
 tests/test-touschek/test-touschek.ref -text
 tests/test-touschek/touschek.dat.cfg -text
 tests/test-touschek/touschek.dat.ref -text
+tests/test-track-10/test-track-10.cfg -text
+tests/test-track-10/test-track-10.madx -text
+tests/test-track-10/test-track-10.ref -text
+tests/test-track-10/track.obs0001.p0001.cfg -text
+tests/test-track-10/track.obs0001.p0001.ref -text
+tests/test-track-10/twiss_lep.cfg -text
+tests/test-track-10/twiss_lep.ref -text
+tests/test-track-10/twiss_lep_thin.cfg -text
+tests/test-track-10/twiss_lep_thin.ref -text
 tests/test-track-2/test-track-2.cfg -text
 tests/test-track-2/test-track-2.madx -text
 tests/test-track-2/test-track-2.ref -text

@@ -1,0 +1,57 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %03s "LEP"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le       0.00051099891
+@ CHARGE           %le                   1
+@ ENERGY           %le                  98
+@ PC               %le                  98
+@ GAMMA            %le          191781.231
+@ KBUNCH           %le                   1
+@ BCURRENT         %le                   0
+@ SIGE             %le                   0
+@ SIGT             %le                   0
+@ NPART            %le                   0
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le                   1
+@ LENGTH           %le         26658.87208
+@ ALFA             %le     0.0001438658692
+@ ORBIT5           %le        -0.152536108
+@ GAMMATR          %le         83.37217147
+@ Q1               %le         98.29138988
+@ Q2               %le         96.19746455
+@ DQ1              %le         1.221256067
+@ DQ2              %le        0.6913997528
+@ DXMAX            %le         1.014833039
+@ DYMAX            %le                   0
+@ XCOMAX           %le      0.004112791378
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         411.4477668
+@ BETYMAX          %le         219.9578306
+@ XCORMS           %le       0.00128846017
+@ YCORMS           %le                   0
+@ DXRMS            %le        0.5850475753
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %51s "F1020B98v1.lep, 102/90 BT optics for 1998 to 97 GeV"
+@ ORIGIN           %19s "MAD-X 5.00.00 Linux"
+@ DATE             %08s "14/01/13"
+@ TIME             %08s "10.53.36"
+*                  S NAME                             BETX               BETY 
+$                %le %s                                %le                %le 
+                  0 "IP1"                      70.67463374        37.67996669
+        3332.359466 "IP2"                      2.013323457       0.1046151088
+        6664.718324 "IP3"                      71.47343142        36.91589037
+        9997.077183 "IP4"                      1.930968655       0.1020130985
+        13329.30954 "BOCSH.IP5"                72.25328524        36.03049213
+        13329.43604 "IP5"                      72.27593504        36.03763759
+        13329.56454 "COLH.IP5"                  72.2994001         36.0458063
+         16661.7949 "IP6"                      1.980643711       0.1013501592
+        19994.15376 "IP7"                      69.05563015        37.34434268
+        23326.51262 "IP8"                      2.047177919       0.1031394962

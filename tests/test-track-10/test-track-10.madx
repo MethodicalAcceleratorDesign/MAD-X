@@ -1,0 +1,32 @@
+! based on examples/emit/LEP/
+option, -echo,-warn,-info;
+call,file='../share/LEP/lep.seq9';
+call,file="../share/LEP/lep.opt9";
+beam, particle = positron, energy = 98.0, radiate;
+use, period=lep;
+vrfc:=2.;
+vrfsc:=45.;
+
+! check twiss table before makethin
+select,flag=twiss,column=s,name,betx,bety,pattern=ip;
+twiss,file=twiss_lep;
+
+!create thin sequence..
+! NOTE: would be better to match a thin sequence
+! with less slices
+select, flag=makethin, class=quadrupole, slice=20;
+makethin, sequence=lep;
+use,sequence=lep;
+
+! check table again
+use,sequence=lep;
+twiss,file=twiss_lep_thin;
+
+use, period=lep;
+track, damp, dump;
+  start;
+  run,   turns= 400, ffile=20;
+endtrack; 
+
+return;
+stop;
