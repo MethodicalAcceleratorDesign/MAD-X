@@ -202,12 +202,17 @@ contains
 
 
        n=y
+       
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           call fort_warn('ptc_normal: ','Fatal Error: DA in NormalForm got unstable')
           stop
        endif
+       
+       
        if (n_gnfu > 0) pbrg = n%a%pb
+
        if (n_haml > 0) pbrh = n%normal%pb
+
        if (getdebug() > 1) then
           write(19,'(/a/)') 'Dispersion, First and Higher Orders'
           call daprint(n%A1,19)
@@ -242,22 +247,33 @@ contains
           write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
           !  call daprint(n%A_t,19)
           !  call daprint(n%A,19)
-          call daprint(n%dhdj,19)
+          call daprint(n%dhdj,19) ! orig one
           !  call daprint(pbrh,19)
        endif
        
+       
+     
        call alloc(theAscript)
        theAscript = X+n%A_t;
        
        
        call putusertable(1,'$end$ ',dt ,dt,y,theAscript)
        call kill(theAscript)
+   
 
        if (n_gnfu > 0) call kill(pbrg)
        if (n_haml > 0) call kill(pbrh)
+ 
+
        call kill(n)
     endif
+    
+
+    
     CALL kill(y)
+
+    close(18)
+    close(19)
 
 ! f90flush is not portable, and useless...
 !    call f90flush(18,my_false)
@@ -300,10 +316,10 @@ contains
        d_val = n%A1%V(3).sub.ind
     CASE ('q1')
        ind(:)=0
-       d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
+       d_val = n%dhdj%V(c_%nd+1).sub.ind ! LD: was V(3)
     CASE ('q2')
        ind(:)=0
-       d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
+       d_val = n%dhdj%V(c_%nd+2).sub.ind ! LD: was V(4)
     CASE DEFAULT
        name_l = .true.
     END SELECT
@@ -331,14 +347,14 @@ contains
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
+          d_val = n%dhdj%V(c_%nd+1).sub.ind ! LD: was V(3)
        CASE ('dq2')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(:)=0
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
+          d_val = n%dhdj%V(c_%nd+2).sub.ind ! LD: was V(4)
        CASE DEFAULT
           name_l = .true.
        END SELECT
@@ -357,7 +373,7 @@ contains
           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
-          d_val = n%dhdj%V(4).sub.ind ! LD: was V(3)
+          d_val = n%dhdj%V(c_%nd+1).sub.ind ! LD: was V(3)
        CASE ('anhy')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           do j = 1,2
@@ -370,7 +386,7 @@ contains
           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
           ind(5) = int(doublenum)
           ind(6) = 0
-          d_val = n%dhdj%V(5).sub.ind ! LD: was V(4)
+          d_val = n%dhdj%V(c_%nd+2).sub.ind ! LD: was V(4)
        CASE ('hamc')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
