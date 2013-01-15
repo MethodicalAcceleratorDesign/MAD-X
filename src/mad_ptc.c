@@ -827,7 +827,10 @@ select_ptc_normal(struct in_cmd* cmd)
       if (min_order < min_req_order) min_order = min_req_order;
     }
   }
-  printf("The minimum required order is %d \n--------------------------------\n",min_order);
+ if (debuglevel > 2) 
+  {
+    printf("The minimum required order is %d \n--------------------------------\n",min_order);
+  }  
 }
 
 void
