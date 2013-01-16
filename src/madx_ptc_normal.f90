@@ -35,7 +35,7 @@ contains
     character(len = 5) name_var
     type(real_8) y(6)
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
-    type(normalform) ::  n_t2  ! normal from type 2 for haml and gnfu
+    type(normalform) ::  n_t2  ! normal from type 2 for hamiltonian terms
 
     !------------------------------------------------------------------------------
 
@@ -132,7 +132,7 @@ contains
     normal = get_value('ptc_normal ','normal ') .ne. 0
     if(normal) then
 
-       !------ Find the number of occurences of the attribute 'haml' or 'gnfu'
+       !------ Find the number of occurences of the attribute 'haml'
 
        n_rows = select_ptc_idx()
        
@@ -164,7 +164,7 @@ contains
 
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-       !! HAML and GNFU
+       !! HAML 
        !!here we do normal type 2
        !! It has resonanses left in the normal form
        !! which are defined with normal%M
@@ -181,15 +181,15 @@ contains
              k = string_from_table_row('normal_results ', 'name ', row, name_var)
 
 
-             if (name_var(:4) .eq. 'gnfu') n_gnfu = n_gnfu + 1
+             if (name_var(:4) .eq. 'gnfu') then
+                if (getdebug() > 2) print*,"ptc_normal: adding gnfu"
+                n_gnfu = n_gnfu + 1
+             endif
              if (name_var(:4) .eq. 'haml') then
                 n_haml = n_haml + 1
                 row_haml(n_haml) = row
              endif
           enddo
-
-
-          if (n_gnfu > 0) call alloc(pbrg)
 
           if (n_haml > 0) then
              call alloc(pbrh)
@@ -249,10 +249,10 @@ contains
 
        endif
        !------------------------------------------------------------------------
-      
-       if (nres > 0) then
+       
+       if (n_haml > 0) then
            
-           if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian and Generating Func.)"
+           if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian Terms)"
            n_t2=y
 
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -260,18 +260,24 @@ contains
               stop
            endif
 
-           if (n_gnfu > 0) pbrg = n_t2%a%pb
+           
 
-           if (n_haml > 0) pbrh = n_t2%normal%pb
+           pbrh = n_t2%normal%pb
 
        endif
-     
+       
+       if (n_gnfu > 0) then
+         call alloc(pbrg)
+         pbrg = n%a%pb
+       endif
+       
        !------ get values and store them in the table 'normal_results' ---------
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
              k = string_from_table_row("normal_results ", "name ", row, name_var)
-             if (name_var(:3) .eq. 'ham'.or. name_var(:3) .eq. 'gnf') then
+
+             if (name_var(:3) .eq. 'ham') then
                val_ptc = double_from_normal_t2(name_var, row, icase)  !!! HERE IS THE RETRIVAL
              else
                val_ptc = double_from_normal_t1(name_var, row, icase)  !!! HERE IS THE RETRIVAL
@@ -444,6 +450,52 @@ contains
           double_from_normal_t1 = n%A_t%V(i1).sub.ind
           if(mytime.and.i2.eq.6) double_from_normal_t1 = -double_from_normal_t1
           RETURN
+        CASE ('gnfc')
+           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+           ind(1) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+           ind(2) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+           ind(3) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+           ind(4) = int(doublenum)
+           ind(5) = 0
+           ind(6) = 0
+           d_val = pbrg%cos%h.sub.ind
+           double_from_normal_t1 = d_val
+           RETURN
+        CASE ('gnfs')
+           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+           ind(1) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+           ind(2) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+           ind(3) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+           ind(4) = int(doublenum)
+           ind(5) = 0
+           ind(6) = 0
+           d_val = pbrg%sin%h.sub.ind
+           double_from_normal_t1 = d_val
+           RETURN
+        CASE ('gnfa')
+           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+           ind(1) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+           ind(2) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+           ind(3) = int(doublenum)
+           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+           ind(4) = int(doublenum)
+           ind(5) = 0
+           ind(6) = 0
+           d_val1 = pbrg%cos%h.sub.ind
+           d_val2 = pbrg%sin%h.sub.ind
+           double_from_normal_t1 = SQRT(d_val1**2 + d_val2**2)
+           RETURN
+        CASE ('gnfu')
+           double_from_normal_t1 = zero ! should never arrive here
+           RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
        END SELECT
@@ -518,52 +570,6 @@ contains
        RETURN
     CASE ('haml')
        double_from_normal_t2 = zero
-       RETURN
-    CASE ('gnfc')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val = pbrg%cos%h.sub.ind
-       double_from_normal_t2 = d_val
-       RETURN
-    CASE ('gnfs')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val = pbrg%sin%h.sub.ind
-       double_from_normal_t2 = d_val
-       RETURN
-    CASE ('gnfa')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val1 = pbrg%cos%h.sub.ind
-       d_val2 = pbrg%sin%h.sub.ind
-       double_from_normal_t2 = SQRT(d_val1**2 + d_val2**2)
-       RETURN
-    CASE ('gnfu')
-       double_from_normal_t2 = zero ! should never arrive here
        RETURN
     CASE DEFAULT
        print *,"--Error in the table normal_results-- Unknown input: ",name_var
