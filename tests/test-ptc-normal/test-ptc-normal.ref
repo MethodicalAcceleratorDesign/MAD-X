@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.16  (32 bit, Linux)       +
+  +    MAD-X 5.00.19  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.04.05      +
-  + Execution Time Stamp: 20.06.12 17.38.36 +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 16.01.13 13.51.45 +
   +++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -224,17 +224,17 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.500000E+04
  Setting MADx with 
-     energy           5000.00000000000     
+     energy           5000.0000000000000     
      method                   2
      Num. of steps            1
-     charge           1.00000000000000     
-  Length of machine:    19.0999877559829     
+     charge           1.0000000000000000     
+  Length of machine:    19.099987755982863     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   0.000000000000000E+000  0.000000000000000E+000   19.0999877559831     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        19.099987755983108     
 !	select_ptc_normal, dx=1, dpx=1;
 
 !	select_ptc_normal, dy=1, dpy=1;	
@@ -273,8 +273,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
  	select_ptc_normal, gnfu=-5,0,0;
 
-The minimum required order is 5 
---------------------------------
 			
 
    ptc_normal,closed_orbit,normal,maptable,icase=5,no=7;
@@ -300,7 +298,8 @@ The minimum required order is 5
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Normal Form Type 1
 Deviation from symplecticity  0.6217248937900877E-12 %
    ptc_end;
 
@@ -316,5 +315,5 @@ Deviation from symplecticity  0.6217248937900877E-12 %
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.16 32 finished normally +
+  + MAD-X 5.00.19 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
