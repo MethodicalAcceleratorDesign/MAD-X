@@ -41,18 +41,18 @@ hac: hacdipole, l:=0,
     volt:=0.0002*450*0.03*1.0, !-- BL[T-m] ~ 0.0002*Ebeam*|Qd-Q|*amp[mm]
     freq:=0.27,
     lag:=0,
-    ramp1=0,
-    ramp2=100,
-    ramp3=200,
-    ramp4=300;
+    ramp1=50,
+    ramp2=150,
+    ramp3=250,
+    ramp4=350;
 vac: vacdipole, l:=0,
     volt:=0.0002*450*0.02*1.0, !-- BL[T-m] ~ 0.0002*Ebeam*|Qd-Q|*amp[mm]
     freq:=0.32,
     lag:=0,
-    ramp1=0,
-    ramp2=100,
-    ramp3=200,
-    ramp4=300;
+    ramp1=40,
+    ramp2=140,
+    ramp3=240,
+    ramp4=340;
 install, element=hac, at=0.0, from=MKQA.6L4.B1;
 install, element=vac, at=0.0, from=MKQA.6L4.B1;
 endedit;
