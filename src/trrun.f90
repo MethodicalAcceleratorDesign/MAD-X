@@ -2547,7 +2547,8 @@ subroutine tttquad(track, ktrack)
   double precision node_value, get_value
   double precision k1, k1s, length, ksqrt, tmp
   double precision sx, cx, sy, cy, ct, st
-  double precision x, px, y, py, z, pz
+  double precision x, px, y, py
+  double precision bet0sqr
   logical skew, focusing
   integer jtrk
   
@@ -2556,6 +2557,7 @@ subroutine tttquad(track, ktrack)
   parameter ( sqrt2=1.41421356237310d0 )
   
   !---- Read-in the parameters
+  bet0sqr = bet0*bet0;
   k1 = node_value('k1 ');
   k1s = node_value('k1s ');
   length = node_value('l ');
@@ -2581,8 +2583,6 @@ subroutine tttquad(track, ktrack)
      px = track(2,jtrk);
      y  = track(3,jtrk);
      py = track(4,jtrk);
-     z  = track(5,jtrk);
-     pz = track(6,jtrk);
   
 !!$    !---- Radiation effects at entrance.
 !!$    if (dorad  .and.  elrad .ne. zero) then
@@ -2651,6 +2651,8 @@ subroutine tttquad(track, ktrack)
      track(2,jtrk) = px
      track(3,jtrk) = y
      track(4,jtrk) = py
+     track(5,jtrk) = track(5,jtrk) + &
+          (one - bet0sqr) * length * track(6,jtrk) / bet0sqr;
      
 !!$    !---- Radiation effects at exit.
 !!$    if (dorad  .and.  elrad .ne. zero) then
