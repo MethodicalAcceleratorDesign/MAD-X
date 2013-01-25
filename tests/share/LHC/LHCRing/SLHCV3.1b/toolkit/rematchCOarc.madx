@@ -1,0 +1,105 @@
+!Rematch the orbit in the arcs, S. Fartoukh July 2010
+!Add simplex matching command to ease correction, S. Fartoukh March 2012 
+
+kmcb_max=80.e-6;
+
+if(mylhcbeam==1)
+{
+!!IR1-left
+match,sequence=lhcb1,range=e.ds.r8.b1/e.ds.l1.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=e.ds.l1.b1,x=0,y=0,px=0,py=0;
+vary, name=acbh14.l1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh12.l1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv15.l1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv13.l1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR1-right
+match,sequence=lhcb1,range=s.ds.r1.b1/s.ds.r2.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=s.ds.r2.b1,x=0,y=0,px=0,py=0;
+vary, name=acbh13.r1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh15.r1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv12.r1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv14.r1b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR5-left
+match,sequence=lhcb1,range=e.ds.r4.b1/e.ds.l5.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=e.ds.l5.b1,x=0,y=0,px=0,py=0;
+vary, name=acbh14.l5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh12.l5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv15.l5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv13.l5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR5-right
+match,sequence=lhcb1,range=s.ds.r5.b1/s.ds.r6.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=s.ds.r6.b1,x=0,y=0,px=0,py=0;
+vary, name=acbh13.r5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh15.r5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv12.r5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv14.r5b1,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+};
+
+if(mylhcbeam==2)
+{
+!!IR1-left
+match,sequence=lhcb2,range=e.ds.r8.b2/e.ds.l1.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=e.ds.l1.b2,x=0,y=0,px=0,py=0;
+vary, name=acbh13.l1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh15.l1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv12.l1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv14.l1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR1-right
+match,sequence=lhcb2,range=s.ds.r1.b2/s.ds.r2.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=s.ds.r2.b2,x=0,y=0,px=0,py=0;
+vary, name=acbh12.r1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh14.r1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv13.r1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv15.r1b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR5-left
+match,sequence=lhcb2,range=e.ds.r4.b2/e.ds.l5.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=e.ds.l5.b2,x=0,y=0,px=0,py=0;
+vary, name=acbh13.l5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh15.l5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv12.l5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv14.l5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+!!IR5-right
+match,sequence=lhcb2,range=s.ds.r5.b2/s.ds.r6.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=s.ds.r6.b2,x=0,y=0,px=0,py=0;
+vary, name=acbh12.r5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbh14.r5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv13.r5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+vary, name=acbv15.r5b2,  step = 0.00001,lower=-kmcb_max,upper=kmcb_max;
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+};
+
+
+return;
+
+

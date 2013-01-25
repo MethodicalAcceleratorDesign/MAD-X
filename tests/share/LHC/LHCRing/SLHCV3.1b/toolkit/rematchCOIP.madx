@@ -1,0 +1,179 @@
+!S. Fartoukh Novembre 2009
+!Rematch the orbit at all IP after the error abd bb implementation
+!S. Fartoukh March 2012
+! Use acbh5.l8b1 for IR8 H crossing
+! Add a SIMPLEX matching command to ease the rematching
+
+limitMCBY   :=  96.3 *1.e-6*1;  ! Existing MCBY in IR2/8
+limitMCBYY  :=  96.3 *1.e-6*1;  ! 2.25Tm for MCBYY (2.5T *0.9 m) @4.5K in IR1/5
+
+limitMCBC :=  89.87*1.e-6*1;
+limitMCBW :=  80.14*1.e-6*1;
+
+if(mylhcbeam==1)
+{
+
+!!IR1
+match,sequence=lhcb1,range=e.ds.l1.b1/s.ds.r1.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=IP1,x=xnom1,y=ynom1,px=pxnom1,py=pynom1;
+constraint,sequence=lhcb1,range=s.ds.r1.b1,x=0.,y=0.,px=0.,py=0.;
+
+vary, name=ACBCH6.L1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV5.L1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCH5.R1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV6.R1B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBYHS4.L1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYHS4.R1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.L1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.R1B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+
+!!IR2
+match,sequence=lhcb1,range=e.ds.l2.b1/s.ds.r2.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=IP2,x=xnom2,y=ynom2,px=pxnom2,py=pynom2;
+constraint,sequence=lhcb1,range=s.ds.r2.b1,x=0.,y=0.,px=0.,py=0.;
+
+vary,   name=acbyhs5.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbchs5.r2b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyvs5.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbcvs5.r2b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyhs4.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs4.r2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.l2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.r2b1, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+
+!!IR5
+match,sequence=lhcb1,range=e.ds.l5.b1/s.ds.r5.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=IP5,x=xnom5,y=ynom5,px=pxnom5,py=pynom5;
+constraint,sequence=lhcb1,range=s.ds.r5.b1,x=0.,y=0.,px=0.,py=0.;
+
+vary, name=ACBCH6.L5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV5.L5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCH5.R5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV6.R5B1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBYHS4.L5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYHS4.R5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.L5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.R5B1, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+
+!!IR8
+match,sequence=lhcb1,range=e.ds.l8.b1/s.ds.r8.b1,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb1,range=IP8,x=xnom8,y=ynom8,px=pxnom8,py=pynom8;
+constraint,sequence=lhcb1,range=s.ds.r8.b1,x=0.,y=0.,px=0.,py=0.;
+
+!vary,   name=acbchs5.l8b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;  ! temporarily unavailable
+!vary,   name=acbwh5.l8b1,   step = 0.00001,lower=-limitMCBW,upper=limitMCBW; ! temporary   replacement
+vary,   name=acbch5.l8b1, step = 0.00001,lower=-limitMCBC,upper=limitMCBC; 
+vary,   name=acbyhs4.l8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs4.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs5.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbcvs5.l8b1,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyvs4.l8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs5.r8b1,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 100, tolerance=1.E-30;
+Endmatch;
+
+};
+
+if(mylhcbeam==2)
+{
+
+!!IR1
+match,sequence=lhcb2,range=e.ds.l1.b2/s.ds.r1.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=IP1,x=xnom1,y=ynom1,px=pxnom1,py=pynom1;
+constraint,sequence=lhcb2,range=s.ds.r1.b2,x=0.,y=0.,px=0.,py=0.;
+
+vary, name=ACBCH6.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV5.R1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCH5.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV6.L1b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBYHS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYHS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.L1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.R1b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 2000, tolerance=1.E-30;
+Endmatch;
+
+!!IR2
+match,sequence=lhcb2,range=e.ds.l2.b2/s.ds.r2.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=IP2,x=xnom2,y=ynom2,px=pxnom2,py=pynom2;
+constraint,sequence=lhcb2,range=s.ds.r2.b2,x=0.,y=0.,px=0.,py=0.;
+ 
+vary,   name=acbyhs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbchs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyvs5.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbcvs5.r2b2, step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyhs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.l2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.r2b2, step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 2000, tolerance=1.E-30;
+Endmatch;
+
+!!IR5
+match,sequence=lhcb2,range=e.ds.l5.b2/s.ds.r5.b2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=IP5,x=xnom5,y=ynom5,px=pxnom5,py=pynom5;
+constraint,sequence=lhcb2,range=s.ds.r5.b2,x=0.,y=0.,px=0.,py=0.;
+
+vary, name=ACBCH6.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV5.R5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCH5.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBCV6.L5b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary, name=ACBYHS4.L5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYHS4.R5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.L5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+vary, name=ACBYVS4.R5b2, step = 0.00001,lower=-limitMCBYY,upper=limitMCBYY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 2000, tolerance=1.E-30;
+Endmatch;
+
+!!IR8
+match,sequence=lhcb2,betx=100,bety=100,x=0,px=0,y=0,py=0;
+WEIGHT,     x = 1, px =  10, y = 1, py = 10;
+constraint,sequence=lhcb2,range=IP8,x=xnom8,y=ynom8,px=pxnom8,py=pynom8;
+constraint,sequence=lhcb2,range=s.ds.r8.b2,x=0.,y=0.,px=0.,py=0.;
+
+vary,   name=acbchs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC; 
+vary,   name=acbyhs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbcvs5.l8b2,  step = 0.00001,lower=-limitMCBC,upper=limitMCBC;
+vary,   name=acbyvs5.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyhs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.l8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+vary,   name=acbyvs4.r8b2,  step = 0.00001,lower=-limitMCBY,upper=limitMCBY;
+
+simplex, calls = 100, tolerance=1.E-30;
+lmdif, calls = 2000, tolerance=1.E-30;
+Endmatch;
+
+};
+
+return;
+
+

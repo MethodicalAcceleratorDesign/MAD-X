@@ -1,0 +1,54 @@
+crab_make_cc(NNN,SIDE,IRN,BIM,FFF): macro {
+    crabrf:=HRF400/LHCLENGTH*clight;
+    sigmas=0.075;
+    ahcrabref_SIDEIRNBIM:=ahcrab_SIDEIRNBIM/FFF*cosiIRN;
+    avcrabref_SIDEIRNBIM:=avcrab_SIDEIRNBIM/FFF*sinuIRN;
+    acrabref_SIDEIRNBIM:=sqrt(ahcrabref_SIDEIRNBIM^2+avcrabref_SIDEIRNBIM^2);
+!    vcrabref_SIDEIRNBIM:=acrabref_SIDEIRNBIM/sigmas*nrj*1e9*clight/(2*pi*crabrf);
+    vcrabref_SIDEIRNBIM:=acrabref_SIDEIRNBIM*7e12;
+    acrabccNNN.SIDEIRNBIM: crabcavity, l=0, volt:=on_crabIRN*vcrabref_SIDEIRNBIM/1e6,
+    lag=0.0,freq=crabrf/1e6,tilt:=phi_irIRN/180*pi;
+};
+
+crab_install_cc(NNN,PFFF,PBBB): macro ={
+seqedit, sequence=lhcb1;
+install,element=acrabccNNN.l5b1,at=-PBBB,from=IP5;
+install,element=acrabccNNN.r5b1,at= PFFF,from=IP5;
+install,element=acrabccNNN.l1b1,at=-PBBB,from=IP1.L1;
+install,element=acrabccNNN.r1b1,at= PFFF,from=IP1;
+endedit;
+};
+
+crab_remove_cc(NNN): macro ={
+seqedit, sequence=lhcb1;
+remove,element=acrabccNNN.l5b1;
+remove,element=acrabccNNN.r5b1;
+remove,element=acrabccNNN.l1b1;
+remove,element=acrabccNNN.r1b1;
+endedit;
+};
+
+
+crab_make(NNN,FFF): macro {
+exec,crab_make_cc(NNN,l,5,b1,FFF);
+exec,crab_make_cc(NNN,l,5,b2,FFF);
+exec,crab_make_cc(NNN,r,5,b1,FFF);
+exec,crab_make_cc(NNN,r,5,b2,FFF);
+exec,crab_make_cc(NNN,l,1,b1,FFF);
+exec,crab_make_cc(NNN,l,1,b2,FFF);
+exec,crab_make_cc(NNN,r,1,b1,FFF);
+exec,crab_make_cc(NNN,r,1,b2,FFF);
+};
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! EXECUTE THE MACROS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+exec,crab_make(A,3); exec,crab_make(B,3); exec,crab_make(C,3);
+
+exec,crab_remove(A); exec,crab_remove(B); exec,crab_remove(C);
+exec,crab_remove_cc(A); exec,crab_remove_cc(B); exec,crab_remove_cc(C);
+
+exec,crab_install_cc(A,posCRABA1,posCRABA2);
+exec,crab_install_cc(B,posCRABB1,posCRABB2);
+exec,crab_install_cc(C,posCRABC1,posCRABC2);

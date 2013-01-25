@@ -597,6 +597,10 @@ testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
 tests/share/LEP/lep.opt9 -text
 tests/share/LEP/lep.seq9 -text
+tests/share/LHC/LHCRing/SLHCV3.1b/opt_0150_0150thin.madx -text
+tests/share/LHC/LHCRing/SLHCV3.1b/opt_5500_5500thin.madx -text
+tests/share/LHC/LHCRing/SLHCV3.1b/toolkit/rematchCOIP.madx -text
+tests/share/LHC/LHCRing/SLHCV3.1b/toolkit/rematchCOarc.madx -text
 tests/share/LHC/LHCRing/V6.503/V6.5.coll.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.inj.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.seq -text
@@ -744,6 +748,15 @@ tests/test-track-10/twiss_lep.cfg -text
 tests/test-track-10/twiss_lep.ref -text
 tests/test-track-10/twiss_lep_thin.cfg -text
 tests/test-track-10/twiss_lep_thin.ref -text
+tests/test-track-11/README -text
+tests/test-track-11/crab_install_all_Riccardo.madx -text
+tests/test-track-11/macro.madx -text
+tests/test-track-11/slhc_sequence.madx -text
+tests/test-track-11/test-track-11.cfg -text
+tests/test-track-11/test-track-11.madx -text
+tests/test-track-11/test-track-11.ref -text
+tests/test-track-11/track.obs0001.p0001.cfg -text
+tests/test-track-11/track.obs0001.p0001.ref -text
 tests/test-track-2/test-track-2.cfg -text
 tests/test-track-2/test-track-2.madx -text
 tests/test-track-2/test-track-2.ref -text
