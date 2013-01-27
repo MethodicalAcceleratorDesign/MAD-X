@@ -46,6 +46,8 @@ const C* context_getInc  (T*, int row, int col);
 const C* context_getIdx  (const T*, int idx);
 // return the index of the contraint
 int      context_findIdx (const T*, const C*); // -1 for invalid constraint
+// return the line of the contraint
+int      context_findLine(const T*, const C*); // -1 for invalid constraint
 
 // input/output context of (registered) constraints
 T*       context_scan (      T*, FILE *fp);

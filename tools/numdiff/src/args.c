@@ -29,7 +29,7 @@ struct option option = {
   .fmt = "%d",
 
   // punctuation part of identifiers
-  .chr = "._",
+  .chr = "._$",
 
   // number of diff displayed
   .keep = 25,
@@ -82,14 +82,14 @@ usage(void)
   inform("\t-c    -check        enable check mode");
   inform("\t-d    -debug        enable debug mode (include check mode)");
   inform("\t-e    -largerr      allow abs and rel error specifier >= 1.0");
-  inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%%d\"");
+  inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t-g    -cfgext ext   specify the config file extension, default is .cfg");
   inform("\t-h    -help         display this help");
   inform("\t-k    -keep num     specify the number of diffs to display per file, default is 25");
   inform("\t-l    -list         enable list mode (list of filenames)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
   inform("\t-o    -outext ext   specify the output file extension, default is .out");
-  inform("\t-p    -punct chrs   punctuation characters part of identifiers, default is \"._\"");
+  inform("\t-p    -punct chrs   punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
   inform("\t-r    -refext ext   specify the reference file extension, default is .ref");
   inform("\t-s    -suite name   set testsuite name for output message (title)");

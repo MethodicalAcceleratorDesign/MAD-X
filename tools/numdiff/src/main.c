@@ -37,10 +37,10 @@ diff_summary(const struct ndiff *dif)
   }
 
   if (c) {
-    warning("% 6d lines have been diffed   in %s", n, option.indexed_filename);
-    warning("% 6d diffs have been detected in %s", c, option.indexed_filename);
+    warning("% 6d lines have been diffed   in files %s", n, option.indexed_filename);
+    warning("% 6d diffs have been detected in files %s", c, option.indexed_filename);
   } else
-    inform ("% 6d lines have been diffed in %s", n, option.indexed_filename);
+    inform ("% 6d lines have been diffed in files %s", n, option.indexed_filename);
 
   return c;
 }
@@ -121,7 +121,7 @@ main(int argc, const char* argv[])
 
       // add rule #0: "* * abs=DBL_MIN"
       const struct constraint c =
-        constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN));
+        constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN), 0);
       context_add(cxt, &c);
 
       // load constraints

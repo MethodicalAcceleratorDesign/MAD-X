@@ -59,6 +59,7 @@ struct constraint {
   struct slice row;
   struct slice col;
   struct eps   eps;
+  int          line;
 };
 
 // ----- interface
@@ -99,9 +100,9 @@ eps_cstr(enum eps_cmd cmd)
 }
 
 static inline T
-constraint_init(const struct slice row, const struct slice col, const struct eps eps)
+constraint_init(const struct slice row, const struct slice col, const struct eps eps, int line)
 {
-  return (T){ row, col, eps };
+  return (T){ row, col, eps, line };
 }
 
 void constraint_print(const T* cst, FILE *out);

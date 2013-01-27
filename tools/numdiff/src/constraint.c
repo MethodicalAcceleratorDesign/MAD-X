@@ -227,6 +227,7 @@ retry:
     goto retry;
   }
 
+  cst->line = *row;
   ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row constraint, line %d"   , *row);
   ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column constraint, line %d", *row);
   ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid eps constraint, line %d"   , *row);

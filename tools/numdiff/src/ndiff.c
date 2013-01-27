@@ -557,7 +557,7 @@ ndiff_testNum (T *dif, const struct constraint *c)
 
   trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
-  trace("  rule [#%d]", context_findIdx(dif->cxt,c));
+  trace("  rule [#%d, line %d]", context_findIdx(dif->cxt,c), context_findLine(dif->cxt,c));
 
   // parse numbers
   int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
@@ -627,16 +627,19 @@ quit_diff:
       warning("(%d) numbers strict representation differ", dif->cnt_i);
 
     if (ret & eps_dig)
-      warning("(%d) numdigit error (rule #%d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
-              dif->cnt_i, context_findIdx(dif->cxt, c), c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
+      warning("(%d) numdigit error (rule #%d, line %d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
+              c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
  
     if (ret & eps_rel)
-      warning("(%d) relative error (rule #%d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
-              dif->cnt_i, context_findIdx(dif->cxt, c), c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
+      warning("(%d) relative error (rule #%d, line %d: rel = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
+              c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
 
     if (ret & eps_abs)
-      warning("(%d) absolute error (rule #%d: abs = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
-              dif->cnt_i, context_findIdx(dif->cxt, c), c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
+      warning("(%d) absolute error (rule #%d, line %d: abs = %g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
+              c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
   }
   ret = 1;
 

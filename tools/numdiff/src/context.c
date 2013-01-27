@@ -348,6 +348,13 @@ context_findIdx (const T *cxt, const C *cst)
   return cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst-cxt->dat : -1;
 }
 
+int
+context_findLine (const T *cxt, const C *cst)
+{
+  assert(cxt);
+  return cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst->line : -1;
+}
+
 T*
 context_scan(T *cxt, FILE *fp)
 {
@@ -369,7 +376,7 @@ context_print(const T *cxt, FILE *fp)
   const C *c;
 
   for (int i = 0; (c = context_getIdx(cxt, i)) != 0; i++) {
-    fprintf(fp,"[#%d] ", i);
+    fprintf(fp,"[#%d:%d] ", i, c->line);
     constraint_print(c, fp);
     putc('\n', fp);
   }
@@ -489,7 +496,7 @@ ut_setup1(T *cxt)
   struct eps eps = eps_init(eps_dig, 1);
 
   // 3  2
-  cst = constraint_init(slice_init(3), slice_init(2), eps);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -502,13 +509,13 @@ ut_setup2(T *cxt)
   struct eps eps = eps_init(eps_dig, 2);
 
   // 1-2  2
-  cst = constraint_init(slice_initLast(1, 2), slice_init(2), eps);
+  cst = constraint_init(slice_initLast(1, 2), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 3    2
-  cst = constraint_init(slice_init(3), slice_init(2), eps);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 4-5  2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -521,13 +528,13 @@ ut_setup3(T *cxt)
   struct eps eps = eps_init(eps_dig, 3);
 
   // 2  1-2
-  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 2  3
-  cst = constraint_init(slice_init(2), slice_init(3), eps);
+  cst = constraint_init(slice_init(2), slice_init(3), eps, 0);
   cxt = context_add(cxt, &cst);
   // 2  4-5
-  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -541,25 +548,25 @@ ut_setup4(T *cxt)
   struct eps skp = eps_init(eps_skip, 4);
 
   // 2    4-5
-  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 1-2  2
-  cst = constraint_init(slice_initSize(1, 2), slice_init(2), eps);
+  cst = constraint_init(slice_initSize(1, 2), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 2    3
-  cst = constraint_init(slice_init(2), slice_init(3), skp);
+  cst = constraint_init(slice_init(2), slice_init(3), skp, 0);
   cxt = context_add(cxt, &cst);
   // 3    2
-  cst = constraint_init(slice_init(3), slice_init(2), eps);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 2    1-2
-  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 4-5  2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 1-3  2-4
-  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps);
+  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -573,25 +580,25 @@ ut_setup5(T *cxt)
   struct eps skp = eps_init(eps_skip, 5);
 
   // 2-4/2    4-5
-  cst = constraint_init(slice_initSizeStride(2, 2, 2), slice_initSize(4, 2), eps);
+  cst = constraint_init(slice_initSizeStride(2, 2, 2), slice_initSize(4, 2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 4-5      2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 1-3      2-4
-  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps);
+  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, 0);
   cxt = context_add(cxt, &cst);
   // 1-6/2    2
-  cst = constraint_init(slice_initSizeStride(1, 2, 3), slice_init(2), eps);
+  cst = constraint_init(slice_initSizeStride(1, 2, 3), slice_init(2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 2        3-7/2
-  cst = constraint_init(slice_init(2), slice_initSizeStride(3, 2, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSizeStride(3, 2, 2), eps, 0);
   cxt = context_add(cxt, &cst);
   // 3        2
-  cst = constraint_init(slice_init(3), slice_init(2), skp);
+  cst = constraint_init(slice_init(3), slice_init(2), skp, 0);
   cxt = context_add(cxt, &cst);
   // 2        1-5/2
-  cst = constraint_init(slice_init(2), slice_initSizeStride(1, 2, 2), eps);
+  cst = constraint_init(slice_init(2), slice_initSizeStride(1, 2, 2), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -607,7 +614,7 @@ ut_setup6(T *cxt)
   ut_setup2(cxt);
 
   // 1-5    1-5
-  cst = constraint_init(slice_initSize(1, 5), slice_initSize(1, 5), eps);
+  cst = constraint_init(slice_initSize(1, 5), slice_initSize(1, 5), eps, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
