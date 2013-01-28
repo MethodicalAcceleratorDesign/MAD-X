@@ -20,11 +20,11 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -static-intel
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-intel -static-libgcc
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5
+LDFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
 endif
 
 #
@@ -39,15 +39,15 @@ ifeq ($(PROFILE),yes)
 LDFLAGS += -p
 endif
 
-ifeq ($(STATIC),yes)
+ifeq ($(STATIC),yes) # build static library
 LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
 endif
 
-ifeq ($(SHARED),yes)
+ifeq ($(SHARED),yes) # build shared library
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared)
 endif
 
-ifeq ($(PLUGIN),yes)
+ifeq ($(PLUGIN),yes) # allow to load dynamically shared library (plugin)
 LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
 endif

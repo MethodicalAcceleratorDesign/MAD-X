@@ -20,11 +20,11 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgcc 
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
+LDFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
 endif
 
 ifneq ($(CXXNAME),)

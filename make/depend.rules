@@ -16,8 +16,6 @@
 # | $Id$
 # |
 
-.PRECIOUS: %.d %.mod
-
 vpath %.d   $(OBJDIR)
 vpath %.mod $(OBJDIR)
 

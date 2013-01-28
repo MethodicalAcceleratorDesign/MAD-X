@@ -25,17 +25,16 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel
+LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel -static-libgcc
 LDLIBS  =
 
 ifneq ($(CXXNAME),)
 LDFLAG += -cxxlib
-LDLIBS += -lstdc++
-#LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
+LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
 endif
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5
+LDFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
 ifeq ($(ARCH),32)
 LDLIBS += -L$(GNULIBDIR) -lgcc_eh
 endif
@@ -53,18 +52,18 @@ ifeq ($(PROFILE),yes)
 LDFLAGS += -p
 endif
 
-ifeq ($(STATIC),yes)
+ifeq ($(STATIC),yes) # build static library
 LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
 endif
 
-ifeq ($(SHARED),yes)
+ifeq ($(SHARED),yes) # build shared library
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared) -fPIC
 ifeq ($(OSTYPE),Linux)
 LDLIBS  += -lifcore_pic -lifcoremt_pic
 endif
 endif
 
-ifeq ($(PLUGIN),yes)
+ifeq ($(PLUGIN),yes) # allow to load dynamically shared library (plugin)
 LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
 endif
