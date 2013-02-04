@@ -1,3 +1,5 @@
+! Macros from Javier Barranco
+
 crab_make_cc(NNN,SIDE,IRN,BIM,FFF): macro {
     crabrf:=HRF400/LHCLENGTH*clight;
     sigmas=0.075;

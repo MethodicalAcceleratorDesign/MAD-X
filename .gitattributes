@@ -749,7 +749,7 @@ tests/test-track-10/twiss_lep.ref -text
 tests/test-track-10/twiss_lep_thin.cfg -text
 tests/test-track-10/twiss_lep_thin.ref -text
 tests/test-track-11/README -text
-tests/test-track-11/crab_install_all_Riccardo.madx -text
+tests/test-track-11/crab_install_all.madx -text
 tests/test-track-11/macro.madx -text
 tests/test-track-11/slhc_sequence.madx -text
 tests/test-track-11/test-track-11.cfg -text

@@ -30,7 +30,7 @@ exec,crab_remove(B);
 exec,crab_remove(C);
 
 
-call, file="crab_install_all_Riccardo.madx";
+call, file="crab_install_all.madx";
 
 on_crab1 := 1;
 on_crab5 := 1;
