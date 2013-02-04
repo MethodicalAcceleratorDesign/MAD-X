@@ -13,40 +13,39 @@ len_half_cell = l.MQ+drift1+3*l.MB+2*drift2+drift3;
 value, len_half_cell;
 
 !!!! apertures
-a = 0.022; b = 0.018; h = 0.022; v= 0.022;
+a=0.022; b=0.018; h=0.022; v=0.022;
 !!!! tolerances
-th= 0.001; tv=0.0005; tr=0.001 ;
+th=0.001; tv=0.0005; tr=0.001;
 
-MB :	SBEND, L := l.MB, angle = ANGLE.MB;
-MQ : 	QUADRUPOLE, L := l.MQ,
-	apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+MB: SBEND, L := l.MB, angle = ANGLE.MB;
+MQ: QUADRUPOLE, L := l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
 
-kqf =     0.008703550815 ;
-kqd =    -0.008705002933 ;
+kqf =  0.008703550815;
+kqd = -0.008705002933;
 
-LHCCELL : SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
  
-  MQ1 : MQ, k1:= kqf, at= 0.;
+  MQ1: MQ, k1:= kqf, at= 0.;
 
-  MB1 : MB,  at= l.MQ+drift1 ,
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
-  MB2 : MB,  at= l.MQ+drift1+l.mb+drift2,
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
-  MB3 : MB,  at= l.MQ+drift1+2*(l.mb+drift2),
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB1: MB,  at= l.MQ+drift1 ,
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB2: MB,  at= l.MQ+drift1+l.mb+drift2,
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB3: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
 
-  MQ2 : MQ, k1 := kqd,  at=  len_half_cell;
+  MQ2: MQ, k1 := kqd,  at=  len_half_cell;
 
-  MB4 : MB,  at= len_half_cell + l.MQ+drift1 ,
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
-  MB5 : MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
-  MB6 : MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
-	apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+  MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
+	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
 
 endsequence;
 
-beam,particle=proton,energy=450.;
+beam,particle=proton,energy=450.0;
 
 set, format="9.5f";
 use,period=LHCCELL;
