@@ -618,14 +618,14 @@ tests/test-emit/ALBA-25.4th.madx -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
-tests/test-ibs-2/ibs-table.tfs -text
 tests/test-ibs-2/ibs-table.tfs.cfg -text
+tests/test-ibs-2/ibs-table.tfs.ref -text
 tests/test-ibs-2/input/ibs-tme.seq -text
 tests/test-ibs-2/test-ibs-2.cfg -text
 tests/test-ibs-2/test-ibs-2.madx -text
 tests/test-ibs-2/test-ibs-2.ref -text
-tests/test-ibs-2/tme-twiss.tfs -text
 tests/test-ibs-2/tme-twiss.tfs.cfg -text
+tests/test-ibs-2/tme-twiss.tfs.ref -text
 tests/test-ibs-3/ibs-table.tfs.cfg -text
 tests/test-ibs-3/ibs-table.tfs.ref -text
 tests/test-ibs-3/input/pdr-ibs.seq -text
