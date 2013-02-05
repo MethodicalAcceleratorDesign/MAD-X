@@ -618,11 +618,6 @@ tests/test-emit/ALBA-25.4th.madx -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
-tests/test-ibs/ibs_output.tfs.cfg -text
-tests/test-ibs/ibs_output.tfs.ref -text
-tests/test-ibs/test-ibs.cfg -text
-tests/test-ibs/test-ibs.madx -text
-tests/test-ibs/test-ibs.ref -text
 tests/test-jacobian-2/test-jacobian-2.cfg -text
 tests/test-jacobian-2/test-jacobian-2.madx -text
 tests/test-jacobian-2/test-jacobian-2.ref -text
