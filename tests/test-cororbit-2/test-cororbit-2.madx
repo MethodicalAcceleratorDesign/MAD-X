@@ -1,0 +1,180 @@
+Option,  warn,info,echo;
+Title, "LHC 6.503 with errors and two beam orbit correction using MADX";
+
+// CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+Option, -echo,-warn,-info;
+
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str"; 
+
+option,warn,echo;
+
+Beam, particle=proton, sequence=lhcb1, energy=7000.0, NPART=1.05E11, sige=4.5e-4;
+Beam, particle=proton, sequence=lhcb2, energy=7000.0, NPART=1.05E11, sige=4.5e-4, bv=-1;
+! the 'bv' parameter indicates that beam2 rotates counter-clockwise
+
+// Removing classes of correctors
+select, flag=seqedit, clear;
+select, flag=seqedit, class=MU;
+select, flag=seqedit, class=MKI;
+select, flag=seqedit, class=MKI__192;
+select, flag=seqedit, class=MKI__193;
+select, flag=seqedit, class=MKA;
+select, flag=seqedit, class=MKD;
+select, flag=seqedit, class=MKQ;
+select, flag=seqedit, class=MKQA;
+select, flag=seqedit, class=MSDA;
+select, flag=seqedit, class=MSDB;
+select, flag=seqedit, class=MSDB2;
+select, flag=seqedit, class=MSDC;
+select, flag=seqedit, class=MSIA;
+select, flag=seqedit, class=MSIB;
+select, flag=seqedit, class=MCBV;
+select, flag=seqedit, class=MCBH;
+select, flag=seqedit, class=MCBCA;
+select, flag=seqedit, class=MCBCB;
+select, flag=seqedit, class=MCBCC;
+select, flag=seqedit, class=MCBCD;
+select, flag=seqedit, class=MCBCH;
+select, flag=seqedit, class=MCBCV;
+select, flag=seqedit, class=MCBYA;
+select, flag=seqedit, class=MCBYB;
+select, flag=seqedit, class=MCBYH;
+select, flag=seqedit, class=MCBYV;
+select, flag=seqedit, class=MCBWH;
+select, flag=seqedit, class=MCBWV;
+seqedit, sequence=lhcb1;
+remove, element=selected;
+seqedit, sequence=lhcb2;
+remove, element=selected;
+endedit;
+
+select, flag=seqedit, clear;
+select, flag=seqedit, class=MBXWH;
+select, flag=seqedit, class=MBXWS;
+select, flag=seqedit, class=MBXWT;
+select, flag=seqedit, class=MBAW;
+select, flag=seqedit, class=MBLW;
+select, flag=seqedit, class=MBWMD;
+seqedit, sequence=lhcb1;
+remove, element=selected;
+seqedit, sequence=lhcb1;
+remove, element=selected;
+seqedit, sequence=lhcb2;
+remove, element=selected;
+seqedit, sequence=lhcb2;
+remove, element=selected;
+endedit;
+
+// assign alignment errors in ring 1 and ring 2 at Q1 
+Use, period=lhcb2;
+Select, flag=ERROR, clear;
+Select, flag=ERROR, range=MQXA.1L1;
+ealign, dy:=0.100e-3, dx:=0.070e-3;
+Select, flag=ERROR, clear;
+Select, flag=ERROR, range=MQXA.1R5;
+ealign, dy:=0.050e-3, dx:=0.035e-3;
+Use, period=lhcb1;
+Select, flag=ERROR, clear;
+Select, flag=ERROR, range=MQXA.1L1;
+ealign, dy:=0.100e-3, dx:=0.070e-3;
+Select, flag=ERROR, clear;
+Select, flag=ERROR, range=MQXA.1R5;
+ealign, dy:=0.050e-3, dx:=0.035e-3;
+
+// enable only MCBX at Q1
+ USEKICK,CLASS=mcbx, status=OFF;
+ USEKICK,CLASS=mcbxv, status=OFF;
+ USEKICK,CLASS=mcbxh, status=OFF;
+ USEKICK,CLASS=mcbxa, status=OFF;
+ USEKICK,class=mbxws, status=OFF;
+ USEKICK,class=mbxwt, status=OFF;
+ USEKICK,class=mbaw, status=OFF;
+ USEKICK,class=mbwmd, status=OFF;
+!USEKICK,RANGE=mcbx.3l1, status=ON;
+!USEKICK,RANGE=mcbx.3r1, status=ON;
+!USEKICK,RANGE=mcbx.3l5, status=ON;
+!USEKICK,RANGE=mcbx.3r5, status=ON;
+!USEKICK,RANGE=mcbx.2l1, status=ON;
+!USEKICK,RANGE=mcbx.2r1, status=ON;
+!USEKICK,RANGE=mcbx.2l5, status=ON;
+!USEKICK,RANGE=mcbx.2r5, status=ON;
+!USEKICK,RANGE=mcbx.1l1, status=ON;
+!USEKICK,RANGE=mcbx.1r1, status=ON;
+!USEKICK,RANGE=mcbx.1l5, status=ON;
+!USEKICK,RANGE=mcbx.1r5, status=ON;
+ USEKICK,RANGE=mcbxv.3l1, status=ON;
+ USEKICK,RANGE=mcbxv.3r1, status=ON;
+ USEKICK,RANGE=mcbxv.2l1, status=ON;
+ USEKICK,RANGE=mcbxv.2r1, status=ON;
+ USEKICK,RANGE=mcbxv.1l1, status=ON;
+ USEKICK,RANGE=mcbxv.1r1, status=ON;
+ USEKICK,RANGE=mcbxv.3l5, status=ON;
+ USEKICK,RANGE=mcbxv.2l5, status=ON;
+ USEKICK,RANGE=mcbxv.1l5, status=ON;
+ USEKICK,RANGE=mcbxv.1r5, status=ON;
+ USEKICK,RANGE=mcbxh.3l1, status=ON;
+ USEKICK,RANGE=mcbxh.3r1, status=ON;
+ USEKICK,RANGE=mcbxh.2l1, status=ON;
+ USEKICK,RANGE=mcbxh.2r1, status=ON;
+ USEKICK,RANGE=mcbxh.1l1, status=ON;
+ USEKICK,RANGE=mcbxh.1r1, status=ON;
+ USEKICK,RANGE=mcbxh.3l5, status=ON;
+ USEKICK,RANGE=mcbxh.2l5, status=ON;
+ USEKICK,RANGE=mcbxh.1l5, status=ON;
+ USEKICK,RANGE=mcbxh.1r5, status=ON;
+
+// calculate TWISS table for correction, beam 1 
+on_x1 = 0.0;
+on_x2 = 0.0;
+on_x5 = 0.0;
+on_x8 = 0.0;
+on_sep1 = 0.0;
+on_sep2 = 0.0;
+on_sep5 = 0.0;
+on_sep8 = 0.0;
+on_alice = 0.0;
+on_lhcb = 0.0;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+TWISS,table=twb1,sequence=lhcb1;
+!plot,table=twb1,title="Orbit ..L1..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
+
+coption,print=1;
+!CORRECT, FLAG=ring,
+!         MODE=micado,cond=0,NCORR=  1,ERROR=1E-6,PLANE=y,
+!         mlist='my1.tab',clist='cy1.tab', RESOUT=1,corzero=1;
+
+USEKICK,RANGE=mcbxv.1l5, status=ON;
+
+// calculate TWISS table for correction, beam 2 
+on_x1 = 0.0;
+on_x2 = 0.0;
+on_x5 = 0.0;
+on_x8 = 0.0;
+on_sep1 = 0.0;
+on_sep2 = 0.0;
+on_sep5 = 0.0;
+on_sep8 = 0.0;
+on_alice = 0.0;
+on_lhcb = 0.0;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+TWISS,table=twb2,sequence=lhcb2;
+!plot,table=twb2,title="Orbit ..L2..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
+
+CORRECT, FLAG=ring,
+         tworing,beam1tab=twb1,beam2tab=twb2,
+         MODE=micado,cond=0,NCORR=  4,ERROR=1E-6,PLANE=x,
+         mlist='mx12.tab',clist='cx12.tab', RESOUT=1,corzero=1;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+TWISS,sequence=lhcb1;
+!plot,title="Orbit ..L1..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+TWISS,sequence=lhcb2;
+!plot,title="Orbit ..L2..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
+
