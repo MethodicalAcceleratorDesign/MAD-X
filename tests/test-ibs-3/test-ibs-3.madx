@@ -1,0 +1,37 @@
+!! **************************************************************************************
+!! 										
+!! CLIC Pre-Damping Ring design following the resonance free lattice concept	
+!!
+!! Racetrack configuration with 2 arc sections and two straight sections
+!! Arc cells: TME cells
+!! Straight Sections: FODO cells filled with damping wigglers
+!! Two Dispersion suppressions with space to add RF cavities, injection and extraction
+!!
+!! **************************************************************************************
+
+!! *****************
+!! Beam definition
+!! *****************
+
+beam, particle=positron, energy=2.86,bunched,npart=4.5E+11, 
+      kbunch=312, EX = 1.250699e-6, EY = 1.250699e-3, ET = 7.5E-05,
+      SIGT=0.009, SIGE=0.015,radiate=TRUE;
+
+call, file="input/pdr-ibs.seq";
+
+SELECT,FLAG=TWISS,RANGE=#S/#E,
+       COLUMN=NAME,KEYWORD,S,L,ANGLE,K1L,BETX,ALFX,MUX,BETY,ALFY,MUY,DX,DPX,DY,DPY;
+
+use, sequence=PDR;
+
+twiss,sequence=PDR,file=pdr-twiss.tfs;
+
+!plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,title="TME cell",noversion=true;!,interpolate=true;
+
+Qx=table(summ,q1);
+Qy=table(summ,q2);
+show, Qx, Qy;
+
+twiss,centre;
+ibs,file=ibs-table.tfs;
+

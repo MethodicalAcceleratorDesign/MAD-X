@@ -1,0 +1,238 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 05.02.13 15.38.35 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!! **************************************************************************************
+
+!! 										
+
+!! CLIC Pre-Damping Ring design following the resonance free lattice concept	
+
+!!
+
+!! Racetrack configuration with 2 arc sections and two straight sections
+
+!! Arc cells: TME cells
+
+!! Straight Sections: FODO cells filled with damping wigglers
+
+!! Two Dispersion suppressions with space to add RF cavities, injection and extraction
+
+!!
+
+!! **************************************************************************************
+
+
+
+!! *****************
+
+!! Beam definition
+
+!! *****************
+
+
+
+beam, particle=positron, energy=2.86,bunched,npart=4.5E+11, 
+
+      kbunch=312, EX = 1.250699e-6, EY = 1.250699e-3, ET = 7.5E-05,
+
+      SIGT=0.009, SIGE=0.015,radiate=TRUE;
+
+
+
+call, file="input/ibs-tme.seq";
+
+none = 0;
+
+ksx1 = 0;
+
+kqfa = 2.492383104;
+
+kqda = -2.069408822;
+
+ksy1 = 0;
+
+dip2: sbend,l:= 0.6572331108,angle:= 0.08267349088,e1:= 0,e2:= 0.04133674544;
+
+sx1: sextupole,l:= 0.3,k2:=ksx1 ;
+
+qfa: quadrupole,l:= 0.28,k1:=kqfa ;
+
+qda: quadrupole,l:= 0.28,k1:=kqda ;
+
+sy1: sextupole,l:= 0.3,k2:=ksy1 ;
+
+dip1: sbend,l:= 0.6572331108,angle:= 0.08267349088,e1:= 0.04133674544,e2:= 0;
+
+tme: sequence, l = 5.314466222;
+
+dip2, at = 0.3286165554;
+
+sx1, at = 1.107233111;
+
+qfa, at = 1.557233111;
+
+qda, at = 2.157233111;
+
+sy1, at = 2.657233111;
+
+qda, at = 3.157233111;
+
+qfa, at = 3.757233111;
+
+sx1, at = 4.207233111;
+
+dip1, at = 4.985849666;
+
+endsequence;
+
+
+
+SELECT,FLAG=TWISS,RANGE=#S/#E,
+
+       COLUMN=NAME,KEYWORD,S,L,ANGLE,K1L,BETX,ALFX,MUX,BETY,ALFY,MUY,DX,DPX,DY,DPY;
+
+
+
+
+
+use, sequence=TME;
+
+
+
+twiss,sequence=TME,file=tme-twiss.tfs;
+
+enter Twiss module
+  
+iteration:   1 error:   6.253860E-07 deltap:   0.000000E+00
+orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       5.314466221                 -0     0.007866510402         11.2748024 
+
+                q1                dq1            betxmax              dxmax 
+       0.294117647      -0.2485530769        4.004112697       0.3322876002 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2845484323    1.170021688e-06    9.749735582e-07       0.1764705882 
+
+               dq2            betymax              dymax              dyrms 
+     -0.3357680436        9.503633189                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+!plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,title="TME cell",noversion=true;!,interpolate=true;
+
+
+
+mux=table(summ,q1);
+
+muy=table(summ,q2);
+
+show, mux, muy;
+
+mux =        0.294117647 ;
+muy =       0.1764705882 ;
+
+
+twiss,centre;
+
+enter Twiss module
+  
+iteration:   1 error:   6.253860E-07 deltap:   0.000000E+00
+orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       5.314466221                 -0     0.007866510402         11.2748024 
+
+                q1                dq1            betxmax              dxmax 
+       0.294117647      -0.2485530769        4.004112697        0.335514865 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2845484323    1.178865175e-06    9.749735582e-07       0.1764705882 
+
+               dq2            betymax              dymax              dyrms 
+     -0.3357680436        9.503633189                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+ibs,file=ibs-table.tfs;
+
+ sige    1.5000000478849628E-002
+ Twiss was calculated at the center of the elements. No interpolation is used
+ 
+ Global parameters for the machine: 
+
+radiate = T:
+ 
+     C               5.314466 m              f0             56.410642 MHz            T0              0.017727 microseconds
+     alfa            0.786651E-02            eta             0.786648E-02            gamma(tr)      11.274802
+     Bcurrent        4.067091 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
+     E               2.860000 GeV            gamma        5596.880823                beta            1.000000
+ 
+ Emittances:
+ 
+     Ex            0.125070E+01 pi*mm*mrad     sigx            4.162845 mm
+     Ey            0.125070E+04 pi*mm*mrad     sigy           83.181554 mm
+     Et            0.750000E+02 pi*mm*mrad     sigt            9.000000 mm             sigE         15.000000 1/1000
+ sequence name: tme
+ 
+     CONST               =   5.177147E-12
+ 
+     ENERGY              =       2.860000 GeV
+     BETA                =       1.000000
+     GAMMA               =       5596.881
+     COULOMB LOG         =         25.168
+ 
+     X-emittance         =   1.250699E-06 m*rad
+     Y-emittance         =   1.250699E-03 m*rad
+ 
+     Momentum spread     =   1.500000E-02
+     Bunch length        =       0.009000 m
+ 
+     Particles per bunch =   4.500000E+11
+     Bunch current       =   4.067091E+00 A
+ 
+ Ring average values (m)
+ 
+     betx   =   3.13943E+00    bety   =   5.53224E+00    Dx  =  2.81016E-01    Dy  =  0.00000E+00
+     alfx   =  -3.89429E-08    alfy   =  -3.85904E-08    Dpx =  1.74809E-08
+     Dpy =  0.00000E+00
+     1/betx =   3.47774E-01    1/bety =   2.08759E-01
+ 
+     (Weighted) average rates (1/sec):
+     Longitudinal=    4.676897E-09
+     Horizontal  =    2.776352E-08
+     Vertical    =   -1.937972E-16
+ 
+     (Weighted) average lifetimes (sec):
+     Longitudinal=    2.138170E+08
+     Horizontal  =    3.601849E+07
+     Vertical    =   -5.160034E+15
+ 
+
+
+
+  Number of warnings: 2
+0 in C and 2 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
