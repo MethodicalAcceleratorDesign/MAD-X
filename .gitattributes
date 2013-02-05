@@ -626,6 +626,16 @@ tests/test-cororbit-2/stren.ref -text
 tests/test-cororbit-2/test-cororbit-2.cfg -text
 tests/test-cororbit-2/test-cororbit-2.madx -text
 tests/test-cororbit-2/test-cororbit-2.ref -text
+tests/test-cororbit-3/c.tab.cfg -text
+tests/test-cororbit-3/c.tab.ref -text
+tests/test-cororbit-3/input/coc4.opt -text
+tests/test-cororbit-3/input/coc4.seq -text
+tests/test-cororbit-3/input/orbps.in -text
+tests/test-cororbit-3/m.tab.cfg -text
+tests/test-cororbit-3/m.tab.ref -text
+tests/test-cororbit-3/test-cororbit-3.cfg -text
+tests/test-cororbit-3/test-cororbit-3.madx -text
+tests/test-cororbit-3/test-cororbit-3.ref -text
 tests/test-cororbit/corr.ref -text
 tests/test-cororbit/cx.tab.cfg -text
 tests/test-cororbit/cx.tab.ref -text

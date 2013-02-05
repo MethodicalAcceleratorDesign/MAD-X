@@ -1,0 +1,21 @@
+TITLE, s='MAD-X test';
+call file="input/coc4.opt";
+call file="input/coc4.seq";
+option,-echo;
+//option,debug,-echo;
+
+Beam, particle = proton, sequence=fivecell, energy = 450.0;
+//        NPART=1.05E11, sige=      4.5e-4 ;
+
+use, period=fivecell;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+TWISS,table=my_model,sequence=fivecell;
+
+readmytable,file="input/orbps.in",table=orbint;
+
+coption,print=2,debug=1;
+correct,flag=ring,model=my_model,orbit=orbint,extern,mode=micado,
+        cond=0,error=1.0e-7,ncorr=5,plane=x,clist="c.tab",mlist="m.tab";
+
