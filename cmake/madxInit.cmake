@@ -38,6 +38,11 @@ if(NOT MADX_PATCH_LEVEL EQUAL 00)
     set (PKG_POSTFIX "-dev")
 endif()
 
+# add 32 to the name for 32bit binaries..
+if(IS32BIT)
+   set(BINARY_POSTFIX "${BINARY_POSTFIX}32")
+endif()
+
 # Location of fortran modules:
 set(CMAKE_Fortran_MODULE_DIRECTORY
     ${PROJECT_BINARY_DIR}/include/fortran/madX CACHE PATH "Single Directory for all fortran modules."
