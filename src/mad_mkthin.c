@@ -553,7 +553,7 @@ create_thin_solenoid(struct element* thick_elem, int slice_no)
     {
       ks_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(ks_param); /* start from clone of ks */
       strcpy(ks_par->name,"ksi"); /* change name to ksi */
-      if (length_param->expr && ks_par->expr) /* first step is ks * l calculation, expression or value */
+      if (length_param->expr || ks_par->expr) /* first step is ks * l calculation, expression or value */
       {
         ks_par->expr = compound_expr(ks_par->expr,ks_par->double_value,"*",length_param->expr,length_param->double_value); /* multiply expression with length */
       }
