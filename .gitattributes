@@ -648,8 +648,8 @@ tests/test-cororbit/mx.tab.cfg -text
 tests/test-cororbit/mx.tab.ref -text
 tests/test-cororbit/my.tab.cfg -text
 tests/test-cororbit/my.tab.ref -text
-tests/test-cororbit/result.file -text
 tests/test-cororbit/result.file.cfg -text
+tests/test-cororbit/result.file.ref -text
 tests/test-cororbit/stren.ref -text
 tests/test-cororbit/test-cororbit.cfg -text
 tests/test-cororbit/test-cororbit.madx -text
