@@ -45,7 +45,7 @@ test-aperture \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
 \
-test-ptc-twiss test-ptc-twiss-5D \
+test-ptc-twiss test-ptc-twiss-5D test-ptc-twiss-56D\
 test-ptc-normal \
 test-ptc-trackline \
 test-ptc-trackline-2 \
