@@ -604,7 +604,9 @@ tests/share/LHC/LHCRing/SLHCV3.1b/toolkit/rematchCOarc.madx -text
 tests/share/LHC/LHCRing/V6.503/V6.5.coll.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.inj.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.seq -text
+tests/share/LHC/LHCRing/V6.503/V6.5.thin.coll.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.thin.inj.str -text
+tests/share/LHC/LHCRing/V6.503/V6.5.thin.seq -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
