@@ -1,26 +1,14 @@
-Option,  warn,info,echo;
-
-Option, -echo,-warn;
-!SU=1.0;
-
-call file="../../examples/ibs/thin62.madx";
-
-call,file="../../examples/ibs/K450Is64-59nV6.2.opt";
-! injection Optics:
-Call,file="../../examples/ibs/kinj.b1b2.v6.2.thin";
-Call,file="../../examples/ibs/kinj.corr.ir2.ir8.thin";
-Call,file="../../examples/ibs/kinj.corr.ir1.ir5.thin";
+Option, -echo,-warn,-info;
+call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+Option, warn,info;
 
 select,flag=ibs,clear;
 select,flag=ibs,column=S,TLI,TXI,TYI;
 
+beam,particle=proton,energy=450,npart=1.1e11,ex=7.82e-09,ey=7.82e-09,sigt=0.115,sige=4.68e-4,bunched;
+Use, sequence=lhcb1;
 twiss, sequence=lhcb1;
-beam,particle=proton, 
-energy=450,npart=1.1e11,
-ex=7.82e-09,ey=7.82e-09,
-sigt=0.115,sige=4.68e-4,bunched;
 Use, period=lhcb1;
 twiss;
-ibs,file="ibs_output.tfs";
-
-stop;
+ibs,file="ibs-table.tfs";

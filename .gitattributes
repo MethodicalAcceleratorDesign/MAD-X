@@ -674,8 +674,8 @@ tests/test-ibs-3/pdr-twiss.tfs.ref -text
 tests/test-ibs-3/test-ibs-3.cfg -text
 tests/test-ibs-3/test-ibs-3.madx -text
 tests/test-ibs-3/test-ibs-3.ref -text
-tests/test-ibs-4/ibs_output.tfs.cfg -text
-tests/test-ibs-4/ibs_output.tfs.ref -text
+tests/test-ibs-4/ibs-table.tfs.cfg -text
+tests/test-ibs-4/ibs-table.tfs.ref -text
 tests/test-ibs-4/test-ibs-4.cfg -text
 tests/test-ibs-4/test-ibs-4.madx -text
 tests/test-ibs-4/test-ibs-4.ref -text
