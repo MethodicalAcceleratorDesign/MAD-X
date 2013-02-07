@@ -1,0 +1,104 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 07.02.13 18.42.44 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! H. Burkhardt.  Updated for improved makethin select in summer 2005
+
+
+
+title,"Five cell test";
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053600864        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.660602214                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050583704        177.9027092      0.09011673644      0.06712058421 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell;
+
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000438984401        47.72824396 
+
+                q1                dq1            betxmax              dxmax 
+       1.261337896        1.045148981        187.9959217        2.199912715 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.681319003                  0                  0        1.250009714 
+
+               dq2            betymax              dymax              dyrms 
+       1.038571822        181.8341684       0.0901650166      0.06741349785 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+save,sequence=fivecell,file="fivecell_thin.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+
+
+stop;
+
+
+  Number of warnings: 2
+2 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,0 +1,20 @@
+! H. Burkhardt.  Updated for improved makethin select in summer 2005
+
+title,"Five cell test";
+
+option,-echo,-warn;
+option,-echo;
+call,file="fivecell.seq";   ! load the sequence
+option,echo,warn,info;
+
+beam;
+use,sequence=fivecell;      ! for twiss and makethin
+twiss,sequence=fivecell;
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+makethin,sequence=fivecell;
+use,sequence=fivecell;      ! use the thin sequence
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+save,sequence=fivecell,file="fivecell_thin.seq";
+
+stop;

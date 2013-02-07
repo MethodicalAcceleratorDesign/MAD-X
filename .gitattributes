@@ -703,6 +703,12 @@ tests/test-makethin-2/lhc_twiss_b1.dat.ref -text
 tests/test-makethin-2/test-makethin-2.cfg -text
 tests/test-makethin-2/test-makethin-2.madx -text
 tests/test-makethin-2/test-makethin-2.ref -text
+tests/test-makethin/fivecell.seq -text
+tests/test-makethin/fivecell_thin.seq.cfg -text
+tests/test-makethin/fivecell_thin.seq.ref -text
+tests/test-makethin/test-makethin.cfg -text
+tests/test-makethin/test-makethin.madx -text
+tests/test-makethin/test-makethin.ref -text
 tests/test-match-2/str.ip8.b1.dat.cfg -text
 tests/test-match-2/str.ip8.b1.dat.ref -text
 tests/test-match-2/test-match-2.cfg -text
