@@ -72,7 +72,7 @@ open_indexedFile(const char* str, int idx, const char *ext, int optext, int requ
   // add formatted index
   if (idx > 0) pos += sprintf(buf+pos, option.fmt, idx);
 
-  // copy filename into option
+  // copy filename into option for further reporting
   strncpy(option.indexed_filename, buf, sizeof option.indexed_filename);
 
   // add extension
