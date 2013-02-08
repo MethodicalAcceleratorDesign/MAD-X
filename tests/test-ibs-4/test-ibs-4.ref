@@ -3,7 +3,7 @@
   +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 07.02.13 17.19.41 +
+  + Execution Time Stamp: 08.02.13 16.49.17 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -15,16 +15,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003171291476        56.15415803 
+        26658.8832                 -0     0.000321634169        55.75950503 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000109                  2        595.2900286        2.860703678 
+       64.28000068                  2        595.1194258        2.859817065 
 
              dxrms             xcomax             xcorms                 q2 
-       1.347842317                  0                  0        59.31000027 
+       1.396821985                  0                  0        59.31000012 
 
                dq2            betymax              dymax              dyrms 
-                 2        611.7829647                 -0                  0 
+                 2        609.5259281                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -39,16 +39,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003171291476        56.15415803 
+        26658.8832                 -0     0.000321634169        55.75950503 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000109                  2        595.2900286        2.860703678 
+       64.28000068                  2        595.1194258        2.859817065 
 
              dxrms             xcomax             xcorms                 q2 
-       1.347842317                  0                  0        59.31000027 
+       1.396821985                  0                  0        59.31000012 
 
                dq2            betymax              dymax              dyrms 
-                 2        611.7829647                 -0                  0 
+                 2        609.5259281                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -63,35 +63,35 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 radiate = F:
  
      C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
-     alfa            0.317129E-03            eta             0.312782E-03            gamma(tr)      56.154158
+     alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
      E             450.000000 GeV            gamma         479.605055                beta            0.999998
  
  Emittances:
  
-     Ex            0.782000E-02 pi*mm*mrad     sigx            0.872431 mm
-     Ey            0.782000E-02 pi*mm*mrad     sigy            0.891308 mm
+     Ex            0.782000E-02 pi*mm*mrad     sigx            0.876942 mm
+     Ey            0.782000E-02 pi*mm*mrad     sigy            0.895105 mm
      Et            0.100000E+07 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
  sequence name: lhcb1
-acnca.d5l4.b1   0.00000       0.00000       200.394      0.500000       0.00000    
-acnca.c5l4.b1   0.00000       0.00000       200.394      0.500000       0.00000    
-acnca.b5l4.b1   0.00000       0.00000       200.394      0.500000       0.00000    
-acnca.a5l4.b1   0.00000       0.00000       200.394      0.500000       0.00000    
-acsca.d5l4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.c5l4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.b5l4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.a5l4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.a5r4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.b5r4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.c5r4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
-acsca.d5r4.b1   0.00000       0.00000       400.789       0.00000       0.00000    
+acnca.d5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.c5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.b5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acnca.a5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
+acsca.d5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.c5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.b5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.a5l4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.a5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.b5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.c5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
+acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
  
-     CONST               =   4.123447E-07
+     CONST               =   4.122769E-07
  
      ENERGY              =     450.000000 GeV
      BETA                =       0.999998
      GAMMA               =        479.605
-     COULOMB LOG         =         23.234
+     COULOMB LOG         =         23.231
  
      X-emittance         =   7.820000E-09 m*rad
      Y-emittance         =   7.820000E-09 m*rad
@@ -104,20 +104,20 @@ acsca.d5r4.b1   0.00000       0.00000       400.789       0.00000       0.00000
  
  Ring average values (m)
  
-     betx   =   9.73320E+01    bety   =   1.01589E+02    Dx  =  1.14178E+00    Dy  =  0.00000E+00
-     alfx   =   4.29810E-15    alfy   =   5.71972E-15    Dpx = -2.13779E-17
+     betx   =   9.83411E+01    bety   =   1.02457E+02    Dx  =  1.15329E+00    Dy  =  0.00000E+00
+     alfx   =   2.44286E-06    alfy   =   1.36010E-05    Dpx = -4.75563E-08
      Dpy =  0.00000E+00
-     1/betx =   1.48257E-02    1/bety =   1.37111E-02
+     1/betx =   1.44932E-02    1/bety =   1.34416E-02
  
      (Weighted) average rates (1/sec):
-     Longitudinal=    8.275517E-06
-     Horizontal  =    5.165991E-06
-     Vertical    =   -3.646414E-08
+     Longitudinal=    8.208515E-06
+     Horizontal  =    5.074060E-06
+     Vertical    =   -3.693278E-08
  
      (Weighted) average lifetimes (sec):
-     Longitudinal=    1.208384E+05
-     Horizontal  =    1.935737E+05
-     Vertical    =   -2.742420E+07
+     Longitudinal=    1.218247E+05
+     Horizontal  =    1.970808E+05
+     Vertical    =   -2.707621E+07
  
 
   Number of warnings: 0
