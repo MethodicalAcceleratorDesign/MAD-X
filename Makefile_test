@@ -54,6 +54,7 @@ test-ptc-trackline-2 \
 test-touschek
 
 # tests dependencies
+test-c6t:     test-makethin-2
 test-track-2: test-makethin-2
 test-track-7: test-makethin-2
 test-track-8: test-makethin-2
@@ -75,6 +76,7 @@ test-touschek-2
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite
+test-c6t:            TESTSUITE := SixTrack Conversion testsuite
 test-cororbit:       TESTSUITE := Orbit Correction testsuite
 test-emit:           TESTSUITE := Emit testsuite
 test-ibs:            TESTSUITE := IBS testsuite
@@ -87,7 +89,6 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-setvars_lin:    TESTSUITE := Special features
 test-survey:         TESTSUITE := Survey testsuite
-test-c6t:            TESTSUITE := SixTrack Conversion testsuite
 test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite
