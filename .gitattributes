@@ -756,6 +756,14 @@ tests/test-ptc-twiss-56D/leir.56d.ptc.twiss.ref -text
 tests/test-ptc-twiss-56D/test-ptc-twiss-56D.cfg -text
 tests/test-ptc-twiss-56D/test-ptc-twiss-56D.madx -text
 tests/test-ptc-twiss-56D/test-ptc-twiss-56D.ref -text
+tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.ref -text
+tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.cfg -text
+tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.ref -text
+tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.cfg -text
+tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.madx -text
+tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.out -text
+tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.ref -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.twiss.cfg -text
