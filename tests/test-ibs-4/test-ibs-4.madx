@@ -1,6 +1,6 @@
 Option, -echo,-warn,-info;
-call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
-call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+call,file="../share/LHC/LHCRing/V6.503/V6.5.seq";
+call,file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
 Option, warn,info;
 
 select,flag=ibs,clear;
