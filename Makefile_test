@@ -53,9 +53,9 @@ test-ptc-trackline-2 \
 test-touschek
 
 # tests dependencies
-test-track-2: test-makethin
-test-track-7: test-makethin
-test-track-8: test-makethin
+test-track-2: test-makethin-2
+test-track-7: test-makethin-2
+test-track-8: test-makethin-2
 
 # lexicographical order
 tests-long := \

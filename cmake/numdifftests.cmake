@@ -75,7 +75,8 @@ numdiff_test(test-twiss-7 0)
 
 numdiff_test(test-aperture 0)
 
-numdiff_test(test-makethin 1)
+numdiff_test(test-makethin 0)
+numdiff_test(test-makethin-2 1)
 
 numdiff_test(test-survey 0)
 
@@ -91,9 +92,9 @@ numdiff_test(test-track-9  0)
 numdiff_test(test-track-10 1)
 numdiff_test(test-track-11 1)
 
-set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin_LONG)
-set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin_LONG)
-set_tests_properties(test-track-8_LONG PROPERTIES DEPENDS test-makethin_LONG)
+set_tests_properties(test-track-2_LONG PROPERTIES DEPENDS test-makethin-2_LONG)
+set_tests_properties(test-track-7_LONG PROPERTIES DEPENDS test-makethin-2_LONG)
+set_tests_properties(test-track-8_LONG PROPERTIES DEPENDS test-makethin-2_LONG)
 
 numdiff_test(test-emit 0)
 
