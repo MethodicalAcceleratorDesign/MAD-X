@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.00.19  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 09.11.12 17.22.50 +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 08.02.13 16.06.25 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -210,14 +210,14 @@ ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892828933326235E-005  7.277292572735424E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.4579669976578771E-11 %
+ Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.5251354906476990E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
   NUMBER OF THIN OBJECTS :        1180
   TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
   TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
-Deviation from symplecticity  0.4579669976578771E-11 %
+Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -269,8 +269,9 @@ PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892828933326235E-005  7.277292572735424E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.4579669976578771E-11 %
+ Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Normal Form Type 1
+Deviation from symplecticity  0.5251354906476990E-11 %
 ptc_end;
 
  Killing LayoutNo name assigned                                                                                                        
@@ -282,5 +283,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.00.19 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
