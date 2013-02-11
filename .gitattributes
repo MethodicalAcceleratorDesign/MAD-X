@@ -781,8 +781,6 @@ tests/test-ptc-twiss-5D/leir.5d.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.twiss.cfg -text
 tests/test-ptc-twiss-5D/leir.5d.ptc.twiss.ref -text
-tests/test-ptc-twiss-5D/leir.C.cfg -text
-tests/test-ptc-twiss-5D/leir.C.ref -text
 tests/test-ptc-twiss-5D/leir.summ.twiss.cfg -text
 tests/test-ptc-twiss-5D/leir.summ.twiss.ref -text
 tests/test-ptc-twiss-5D/leir.twiss.cfg -text
