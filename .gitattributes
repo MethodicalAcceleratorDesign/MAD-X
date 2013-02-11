@@ -648,6 +648,7 @@ tests/test-cororbit-3/m.tab.ref -text
 tests/test-cororbit-3/test-cororbit-3.cfg -text
 tests/test-cororbit-3/test-cororbit-3.madx -text
 tests/test-cororbit-3/test-cororbit-3.ref -text
+tests/test-cororbit/corr.cfg -text
 tests/test-cororbit/corr.ref -text
 tests/test-cororbit/cx.tab.cfg -text
 tests/test-cororbit/cx.tab.ref -text
@@ -659,6 +660,7 @@ tests/test-cororbit/my.tab.cfg -text
 tests/test-cororbit/my.tab.ref -text
 tests/test-cororbit/result.file.cfg -text
 tests/test-cororbit/result.file.ref -text
+tests/test-cororbit/stren.cfg -text
 tests/test-cororbit/stren.ref -text
 tests/test-cororbit/test-cororbit.cfg -text
 tests/test-cororbit/test-cororbit.madx -text
