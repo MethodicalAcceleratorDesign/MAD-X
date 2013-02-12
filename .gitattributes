@@ -671,7 +671,7 @@ tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
 tests/test-ibs-2/ibs-table.tfs.cfg -text
 tests/test-ibs-2/ibs-table.tfs.ref -text
-tests/test-ibs-2/input/ibs-tme.seq -text
+tests/test-ibs-2/input/tme-ibs.seq -text
 tests/test-ibs-2/test-ibs-2.cfg -text
 tests/test-ibs-2/test-ibs-2.madx -text
 tests/test-ibs-2/test-ibs-2.ref -text
