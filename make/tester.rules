@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: tests tests-all init-test fini-test check-tests-dirs $(tests-all) $(TESTS)
+.PHONY: tests tests-all init-test fini-test check-tests-dirs check-tests-lists $(tests-all) $(TESTS)
 
 #
 # all tests
@@ -37,7 +37,7 @@ $(sort $(TESTS) $(tests-all)):
 #
 # rule for init test
 #
-init-test: check-tests-dirs
+init-test: check-tests-dirs check-tests-lists
 	$(init-test)
 
 #
@@ -52,5 +52,14 @@ fini-test:
 check-tests-dirs:
 	$(foreach dir,$(if $(TESTS),$(TESTS),$(tests-all)),\
      $(call exists,tests/$(dir),invalid test directory tests/$(dir)))
+
+#
+# check for lists consistency
+#
+check-tests-lists:
+ifneq ($(filter-out $(tests-all),$(tests-long)),)
+	$E "warning: Inconsistency detected between tests-long and tests-all (includes tests-long)"
+	$E "warning: Missing files: $(filter-out $(tests-all),$(tests-long))"
+endif
 
 # end of makefile
