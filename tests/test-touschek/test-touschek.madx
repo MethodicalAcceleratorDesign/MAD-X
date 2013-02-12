@@ -282,7 +282,6 @@ twiss,chrom,table;
 
 ! reduce size of output table:
 select,flag=touschek,pattern="HKR",column=S, TLI, TLIW, TLITOT;
-
 touschek,file="touschek.dat";
 
 stop

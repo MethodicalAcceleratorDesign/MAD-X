@@ -3,7 +3,7 @@
   +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 12.12.12 15.00.15 +
+  + Execution Time Stamp: 12.02.13 17.17.45 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -25,9 +25,9 @@ option,-echo,-warn;
 
 Beam, particle = proton, sequence=lhcb1, energy = 450.0,
 
-          NPART=1.15E11, ex=7.82e-9, ey=7.82e-9,
+          npart=1.15e11, ex=7.82e-9, ey=7.82e-9,
 
-          et=5.302e-5, sige=4.7164e-4, sigt=0.1124, radiate=false ;
+          et=5.302e-5, sige=4.7164e-4, sigt=0.1124; !, radiate=false ;
 
 
 
@@ -55,7 +55,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.396821985                  0                  0        59.31000012 
 
                dq2            betymax              dymax              dyrms 
-       2.000047274        609.5259281                 -0                  0 
+       2.000047274        609.5259281                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        8.612620901 
@@ -69,13 +69,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
  on_x1                = 1;
 
 ++++++ info: on_x1 redefined
- on_x5                = 1 ;
+ on_x5                = 1;
 
 ++++++ info: on_x5 redefined
- on_x2                = 1 ;
+ on_x2                = 1;
 
 ++++++ info: on_x2 redefined
- on_x8                = 1 ;
+ on_x8                = 1;
 
 ++++++ info: on_x8 redefined
  on_alice= 1; on_lhcb = 1;
@@ -92,41 +92,39 @@ vrf400:= 8.;
 
 select,flag=touschek,pattern="MCB",column=S, TLI, TLIW, TLITOT;
 
-touschek,file;
+touschek,tolerance=1e-7,file="touschek.dat";
 
 NO centre off 
    
  TOUSCHEK MODULE 
  particle proton
- Charge    1.00000000000000     
- gammas    479.605054573870     
- gamma    479.605054573870     
- Energy    450.000000000000     
- Mass   0.938272013000000     
- Ex   7.820000000000000E-009
- Ey   7.820000000000000E-009
- Et   5.302000000000000E-005
- sigt   0.112332283417380     
- sige   4.719925420103827E-004
- parnum    115000000000.000     
- circ    26658.8832000000     
- currnt   2.071982109786821E-004
- betas   0.999997826283143     
- beta   0.999997826283143     
- clight    299792458.000000     
- arad   1.534698248472228E-018
- alfa   3.216341690092563E-004
- freq0   1.124547506686553E-002
+ Charge    1.0000000000000000     
+ gammas    479.60505457387023     
+ gamma    479.60505457387023     
+ Energy    450.00000000000000     
+ Mass   0.93827201299999996     
+ Ex    7.8199999999999999E-009
+ Ey    7.8199999999999999E-009
+ Et    5.3019999999999997E-005
+ sigt   0.11233228341738011     
+ sige    4.7199254201038266E-004
+ parnum    115000000000.00000     
+ circ    26658.883200000000     
+ currnt    2.0719821097868208E-004
+ betas   0.99999782628314271     
+ beta   0.99999782628314271     
+ clight    299792458.00000000     
+ arad    1.5346982484722282E-018
+ alfa    3.2163416900925630E-004
+ freq0    1.1245475066865532E-002
  kbunch            1
- deltap   0.000000000000000E+000
+ deltap    0.0000000000000000     
 
  Energy radiated per turn [MeV]
-  1.140214447132823E-007
+   1.1402144471328228E-007
  Touschek Lifetime [seconds/hours]
-   19213793.5181282        5337.16486614673     
+   19213793.518128220        5337.1648661467279     
 
-
-stop;
 
 
   Number of warnings: 0
