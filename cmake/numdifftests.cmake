@@ -2,19 +2,12 @@ get_target_property(binaryname madxbin LOCATION)
 get_target_property(ndiffbin numdiff LOCATION)
 
 if(WIN32)
-   if(NOT EXISTS ${CMAKE_BINARY_DIR}/examples)
-      message(STATUS "Copying examples folder, this will take some time...")
-      execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
-         ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
-   endif()
    if(NOT EXISTS ${CMAKE_BINARY_DIR}/tests/share)
       message(STATUS "Copying tests/share folder, this will take some time...")
       execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory
          ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
    endif()
 else()
-   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
-      ${CMAKE_SOURCE_DIR}/examples ${CMAKE_BINARY_DIR}/examples)
    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink 
       ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
