@@ -737,6 +737,11 @@ tests/test-match-4/fv9.seq -text
 tests/test-match-4/test-match-4.cfg -text
 tests/test-match-4/test-match-4.madx -text
 tests/test-match-4/test-match-4.ref -text
+tests/test-match-5/fv9.opt -text
+tests/test-match-5/fv9.seq -text
+tests/test-match-5/test-match-5.cfg -text
+tests/test-match-5/test-match-5.madx -text
+tests/test-match-5/test-match-5.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text

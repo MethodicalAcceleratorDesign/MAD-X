@@ -1,0 +1,27 @@
+TITLE,'Global tune matching with MAD-X';
+
+option,-echo,-info,-warn;
+call file=fv9.opt;  
+call file=fv9.seq;
+option,echo,info,warn;
+
+kqf = 0.009077570142;
+kqd = -0.01092574987;
+
+Beam, particle = proton, sequence=fivecell, energy = 450.0,
+          NPART=1.05E11, sige=      4.5e-4 ;
+
+use,period=fivecell;
+
+match,sequence=fivecell;
+global,sequence=fivecell,Q1=1.27;
+global,sequence=fivecell,Q2=1.30;
+vary,name=kqf,step=1.0e-6;
+vary,name=kqd,step=1.0e-6;
+lmdif,calls=500,tolerance=1.e-21;
+endmatch;
+
+value, kqf;
+value, kqd;
+
+stop;
