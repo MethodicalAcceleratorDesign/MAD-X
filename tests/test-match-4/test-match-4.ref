@@ -1,0 +1,64 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 13.02.13 22.05.40 +
+  +++++++++++++++++++++++++++++++++++++++++++
+TITLE,'CELL matching with MAD-X';
+
+
+
+option,-echo,-info,-warn;
+
+++++++ info: kqf redefined
+++++++ info: kqd redefined
+START MATCHING
+
+number of sequences: 1
+sequence name: fivecell
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.24356070E-01
+
+
+call:       4   Penalty function =   0.26743394E-08
+call:       7   Penalty function =   0.81289032E-17
+call:      10   Penalty function =   0.18749745E-24
+ ++++++++++ LMDIF ended: converged successfully
+call:      10   Penalty function =   0.18749745E-24
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     1.97215226E-29
+fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     1.87477725E-25
+
+
+Final Penalty Function =   1.87497446e-25
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqf                       9.13833e-03  9.07757e-03 -1.00000e+20  1.00000e+20
+kqd                      -1.09178e-02 -1.09257e-02 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   1.87497446e-25
+kqf =     0.009138327024 ;
+kqd =      -0.0109177935 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
