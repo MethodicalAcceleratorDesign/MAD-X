@@ -751,6 +751,9 @@ tests/test-ptc-trackline/test-ptc-trackline.madx -text
 tests/test-ptc-trackline/test-ptc-trackline.ref -text
 tests/test-ptc-trackline/trackone.cfg -text
 tests/test-ptc-trackline/trackone.ref -text
+tests/test-ptc-twiss-2/test-ptc-twiss-2.cfg -text
+tests/test-ptc-twiss-2/test-ptc-twiss-2.madx -text
+tests/test-ptc-twiss-2/test-ptc-twiss-2.ref -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.twiss.cfg -text
