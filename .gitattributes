@@ -727,6 +727,11 @@ tests/test-match-2/test-match-2.madx -text
 tests/test-match-2/test-match-2.ref -text
 tests/test-match-2/twiss.ir8.b1.data.cfg -text
 tests/test-match-2/twiss.ir8.b1.data.ref -text
+tests/test-match-3/fv9.opt -text
+tests/test-match-3/fv9.seq -text
+tests/test-match-3/test-match-3.cfg -text
+tests/test-match-3/test-match-3.madx -text
+tests/test-match-3/test-match-3.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text

@@ -1,0 +1,30 @@
+TITLE,'Transferline matching with MAD-X';
+
+option,-info,-warn;
+
+call file="fv9.opt";  
+call file="fv9.seq";
+
+option,info,warn;
+
+kqf = 0.0089;
+kqd = -0.0097;
+
+Beam, particle = proton, sequence=fivecell, energy = 450.0,
+          NPART=1.05E11, sige=      4.5e-4 ;
+
+use,period=fivecell;
+
+savebeta,label=abc,place=#s;
+select,flag=twiss,range=full,column=name,s,betx,bety;
+twiss, sequence=fivecell;
+
+match,sequence=fivecell,beta0=abc;
+constraint,sequence=fivecell,range=#e,betx=180.0,bety=30.0;
+vary,name=kqf,step=1.0e-6;
+vary,name=kqd,step=1.0e-6;
+lmdif,calls=500,tolerance=1.e-15;
+endmatch;
+
+value, kqf;
+value, kqd;
