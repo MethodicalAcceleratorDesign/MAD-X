@@ -1,0 +1,59 @@
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+Option,  warn,info;
+
+Title, "Matching the tune for the LHC 6.4 lattice with MADX";
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+!                        TARGET TUNE;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+Option, echo;
+QX0 = 64.280;
+QY0 = 59.310;
+
+!---------------------------------------------------------------;
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+!---------------------------------------------------------------;
+option, -echo,-warn;
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str";
+option, echo;
+
+Beam, particle = proton, sequence=lhcb1, energy = 450.0,
+          NPART=1.05E11, sige=      4.5e-4 ;
+Beam, particle = proton, sequence=lhcb2, energy = 450.0,
+          bv = -1, NPART=1.05E11, sige=      4.5e-4;         !<<<<
+! the 'bv' parameter indicates that beam2 rotates counter-clockwise
+
+! Select a sequence:
+USE, period=lhcb1;
+
+! Generate a twiss table:
+select, flag=twiss, clear;
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+TWISS,sequence=lhcb1,file=twiss.b1.data;
+
+! Match the tune:
+match,sequence=lhcb1;
+global, q1=QX0,q2=QY0;
+vary, name=KQF;
+vary, name=KQD;
+lmdif,calls=10,tolerance=1.0e-21;
+endmatch;
+
+Title, " Chromaticity correction";
+match,sequence=lhcb1;
+    vary, name=KSF.B1, step=0.00001;
+    vary, name=KSD.B1, step=0.00001;
+    global,sequence=lhcb1,DQ1=QPRIME;
+    global,sequence=lhcb1,DQ2=QPRIME;
+    Lmdif, calls=10, tolerance=1.0e-21;
+endmatch;
+
+! Generate a twiss table:
+select, flag=twiss, clear;
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+TWISS,sequence=lhcb1,file=twiss.b1.data;
+
+stop;
+

@@ -1,0 +1,263 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 13.02.13 22.59.48 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+
+Option,  warn,info;
+
+
+
+Title, "Matching the tune for the LHC 6.4 lattice with MADX";
+
+
+
+
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+!                        TARGET TUNE;
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++;
+
+Option, echo;
+
+QX0 = 64.280;
+
+QY0 = 59.310;
+
+
+
+!---------------------------------------------------------------;
+
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+
+!---------------------------------------------------------------;
+
+option, -echo,-warn;
+
+
+
+Beam, particle = proton, sequence=lhcb1, energy = 450.0,
+
+          NPART=1.05E11, sige=      4.5e-4 ;
+
+Beam, particle = proton, sequence=lhcb2, energy = 450.0,
+
+          bv = -1, NPART=1.05E11, sige=      4.5e-4;         !<<<<
+
+! the 'bv' parameter indicates that beam2 rotates counter-clockwise
+
+
+
+! Select a sequence:
+
+USE, period=lhcb1;
+
+
+
+! Generate a twiss table:
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+
+TWISS,sequence=lhcb1,file=twiss.b1.data;
+
+enter Twiss module
+  
+iteration:   1 error:   8.714678E-04 deltap:   0.000000E+00
+orbit:  -4.929560E-04  8.092901E-06  2.107938E-06  1.445684E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.297756E-05 deltap:   0.000000E+00
+orbit:  -4.999995E-04 -1.916166E-09 -1.671521E-10  1.424984E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.548596E-09 deltap:   0.000000E+00
+orbit:  -4.999999E-04  1.982147E-10  8.002226E-12  1.425000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003213813572        55.78143208 
+
+                q1                dq1            betxmax              dxmax 
+        64.3100005        1.918738979        4402.810724        2.890204757 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.399969148      0.01141004839    0.0008146081283        59.32000005 
+
+               dq2            betymax              dymax              dyrms 
+       2.145014314        4402.812514        1.318436553       0.1774138225 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006931834736    0.0004834742802                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+! Match the tune:
+
+match,sequence=lhcb1;
+
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+global, q1=QX0,q2=QY0;
+
+vary, name=KQF;
+
+vary, name=KQD;
+
+lmdif,calls=10,tolerance=1.0e-21;
+
+number of variables:    2
+user given constraints: 2
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.10000310E+00
+
+
+call:       4   Penalty function =   0.22508176E-08
+call:       7   Penalty function =   0.14544945E-18
+call:      10   Penalty function =   0.31150539E-23
+ ++++++++++ LMDIF ended: converged successfully
+call:      10   Penalty function =   0.31150539E-23
+endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     1.29246971E-24
+Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     1.82258424E-24
+
+
+Final Penalty Function =   3.11505394e-24
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kqf                       8.98631e-03  8.99010e-03 -1.00000e+20  1.00000e+20
+kqd                      -8.59912e-03 -8.60096e-03 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   3.11505394e-24
+
+
+Title, " Chromaticity correction";
+
+match,sequence=lhcb1;
+
+START MATCHING
+
+number of sequences: 1
+sequence name: lhcb1
+    vary, name=KSF.B1, step=0.00001;
+
+    vary, name=KSD.B1, step=0.00001;
+
+    global,sequence=lhcb1,DQ1=QPRIME;
+
+    global,sequence=lhcb1,DQ2=QPRIME;
+
+    Lmdif, calls=10, tolerance=1.0e-21;
+
+number of variables:    2
+user given constraints: 1
+total constraints:      2
+
+START LMDIF:
+
+Initial Penalty Function =   0.83427511E-01
+
+
+call:       4   Penalty function =   0.32817134E-21
+ ++++++++++ LMDIF ended: converged successfully
+call:       4   Penalty function =   0.32817134E-21
+endmatch;
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.76789693E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.10492371E-22
+
+
+Final Penalty Function =   3.28171340e-22
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+ksf.b1                    1.03439e-01  1.03481e-01 -1.00000e+20  1.00000e+20
+ksd.b1                   -1.70566e-01 -1.70877e-01 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   3.28171340e-22
+
+
+! Generate a twiss table:
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety;
+
+TWISS,sequence=lhcb1,file=twiss.b1.data;
+
+enter Twiss module
+  
+iteration:   1 error:   9.132144E-04 deltap:   0.000000E+00
+orbit:  -4.940097E-04  5.441415E-06  2.134811E-06  1.443832E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.715078E-05 deltap:   0.000000E+00
+orbit:  -4.999997E-04 -1.118293E-09 -3.195106E-11  1.424988E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.757368E-09 deltap:   0.000000E+00
+orbit:  -4.999999E-04  2.133986E-10  8.054964E-12  1.425000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003216950826         55.7542257 
+
+                q1                dq1            betxmax              dxmax 
+             64.28                  2        4405.642411        2.915608702 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.402207092      0.01141004811    0.0008146081649              59.31 
+
+               dq2            betymax              dymax              dyrms 
+                 2        4405.200974        1.345196746       0.1817561601 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.006931834704    0.0004834742781                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
