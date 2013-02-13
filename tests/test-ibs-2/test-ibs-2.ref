@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 05.02.13 15.38.35 +
+  + Execution Time Stamp: 13.02.13 15.39.16 +
   +++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -43,7 +43,7 @@ beam, particle=positron, energy=2.86,bunched,npart=4.5E+11,
 
 
 
-call, file="input/ibs-tme.seq";
+call, file="input/tme-ibs.seq";
 
 none = 0;
 
@@ -175,7 +175,7 @@ orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.5000000478849628E-002
+ sige   1.500000047884963E-002
  Twiss was calculated at the center of the elements. No interpolation is used
  
  Global parameters for the machine: 
@@ -234,5 +234,5 @@ radiate = T:
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.00.19 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
