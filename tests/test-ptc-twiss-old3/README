@@ -1,0 +1,18 @@
+PTC_TWISS Example3 for the task of the matching between 
+a ring and a transferline.
+
+Run command:
+../madxp < example3.madx [> example3.out]
+
+with the Mad-X output directed to the terminal or to the "*.out" file.
+
+In this example, the PTC_TWISS command is applied to calculate 
+the Ripken-style parameters along the transferline. A transfer matrix 
+generated from the one-turn map-table produced at the ring end by the 
+previous PTC_NORMAL-command is used as initial conditions.
+
+Example3 demonstrates an internal ("automatic") method for 
+the input of the transfer matrix. The matrix is accepted by the 
+PTC_TWISS command due to the option "initial_matrix_table": 
+
+  PTC_TWISS,icase=5,no=1,initial_matrix_table, file=twiss_ptc_line; 
