@@ -98,7 +98,8 @@ if(NOT WIN32)
 endif()
 # new additions from Frank:
 # On Debian Stable, stdc++ is not linked by default...
-target_link_libraries(madx pthread stdc++ gcc_eh)
+find_package(Threads)
+target_link_libraries(madx  ${CMAKE_THREAD_LIBS_INIT} stdc++ gcc_eh)
 
 # Defining specific stuff for packaging:
 # Should be called after sources are defined,
