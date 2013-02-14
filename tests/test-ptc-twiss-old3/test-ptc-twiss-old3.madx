@@ -38,11 +38,12 @@ call, file = "../share/line_lattice/line.seq";
 
 select,flag=ptc_twiss,clear;
 select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
-
 ptc_create_universe;
 ptc_create_layout,model=2,method=6,nst=5,exact;
                                     
 ! Example 3: Read transfer matrix from table ============================
+
+!ptc_setswitch, debuglevel=3;
 
 ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
 
