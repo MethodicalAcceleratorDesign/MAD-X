@@ -3,9 +3,9 @@
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "unknown")
     STRING(REGEX REPLACE ".*/([^ ])" "\\1" fcompilername "${CMAKE_Fortran_COMPILER}" )
-    SET(BUILDNAME "${osname}-${cpu}-${fcompilername}")
+    SET(BUILDNAME "${fcompilername}")
 else()
-    SET(BUILDNAME "${osname}-${cpu}-${CMAKE_Fortran_COMPILER_ID}")
+   SET(BUILDNAME "${CMAKE_Fortran_COMPILER_ID}-${CMAKE_Fortran_COMPILER_VERSION}")
 endif()
 
 if (MADX_FORCE_32 AND NOT ${CMAKE_SIZEOF_VOID_P} EQUAL 4)
