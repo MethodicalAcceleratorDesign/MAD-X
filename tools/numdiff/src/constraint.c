@@ -123,7 +123,7 @@ readEps(struct eps *e, FILE *in, int row)
   while (1) {
     // parse next constraint
     *str = 0;
-    n = fscanf(in, "%*[ \t]%10[^= \t\n\r#!]", str);
+    n = fscanf(in, "%*[ \t]%10[^= \t\n\r!#]", str);
     if (n == EOF || *str == 0) break;
 
          if (strcmp(str, "skip") == 0) {
