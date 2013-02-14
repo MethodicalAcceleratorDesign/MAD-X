@@ -967,7 +967,6 @@ contains
       if(initial_matrix_table) then
 
          if (getdebug() > 1) then
-
             print*,"Initializing map with initial_matrix_table=true"
          endif
          call readmatrixfromtable()
@@ -1629,55 +1628,21 @@ contains
       ! because the format of the map_table has now changed to contain all terms,
       ! and not only the zeroth and first order ones...
       implicit none
-      integer  :: double_from_table_row
-
+      integer  :: double_from_table_row, table_length
       ! following added 26 april 2010
-      !integer :: i1,i2,i3,i4,i5,i6
-      integer :: order
+      integer :: order, nrows
       integer :: nx, nxp, ny, nyp, ndeltap, nt, index
       real(dp):: coeff
       !character(6) :: selector
       integer, dimension(6) :: jj ! 3 may 2010
 
-      !real(dp) :: oldv
-      !type(taylor)::newtoset
-
-
-
-      goto 200 ! skip code that was used before 26 april 2010
-
-      x(:)=zero
-      allocate(j(c_%npara))
-      j(:)=0
-
-      do i = 1,my_nv
-         k   = double_from_table_row("map_table ", "coef ", i, doublenum)
-         d_val=doublenum
-         if(i.le.c_%npara) then
-            x(i) = d_val-(y(i)%T.sub.j)
-         endif
-      enddo
-
-      do i = 1,nv_min
-         do ii = 1,nv_min
-            j(ii)  = 1
-            row    = i*my_nv+ii
-            k   = double_from_table_row("map_table ", "coef ", row, doublenum)
-            d_val=doublenum
-            d_val  = d_val-(y(i)%T.sub.j)
-            y(i)%T = y(i)%T + (d_val.mono.j)
-            j(ii)=0
-         enddo
-      enddo
-      deallocate(j)
-
-200   order = get_value('ptc_twiss ','no ')
-
-      ! call daprint(y,27) ! check the map is empty
+      order = get_value('ptc_twiss ','no ')
 
       row = 1 ! starts at one
+      
+      nrows = table_length("map_table ")
 
-      do while(k.eq.0) ! k=0 when read okay. k=-3 when the table has no row
+      do while(row .le. nrows) ! k=0 when read okay. k=-3 when the table has no row
          k = double_from_table_row("map_table ","coef ", row,doublenum)
          !write(0,*) 'k=',k
          !write(0,*) 'coef=',doublenum
