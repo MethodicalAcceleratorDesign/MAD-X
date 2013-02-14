@@ -38,12 +38,12 @@ diff_summary(const struct ndiff *dif)
 
   if (c) {
     if (option.test)
-    warning("files %s from test %s differ", option.indexed_filename, option.test);
+    warning("files %s from %s differ", option.indexed_filename, option.test);
     warning("% 6d lines have been diffed   in files %s", n, option.indexed_filename);
     warning("% 6d diffs have been detected in files %s", c, option.indexed_filename);
   } else {
     if (option.test)
-    inform ("files %s from test %s do not differ", option.indexed_filename, option.test);
+    inform ("files %s from %s do not differ", option.indexed_filename, option.test);
     inform ("% 6d lines have been diffed in files %s", n, option.indexed_filename);
   }
 
