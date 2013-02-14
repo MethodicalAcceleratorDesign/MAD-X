@@ -1,0 +1,66 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (32 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 08.02.13 12.15.02 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
+
+! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
+
+
+
+option, -echo,-warn,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   7.798851E-04 deltap:   0.000000E+00
+orbit:  -1.915256E-03 -1.243177E-04  6.545522E-04  3.794227E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.904512E-05 deltap:   0.000000E+00
+orbit:  -1.916437E-03 -1.261074E-04  6.460952E-04  3.861005E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.226311E-09 deltap:   0.000000E+00
+orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003170732066        56.15911144 
+
+                q1                dq1            betxmax              dxmax 
+       64.27407572        2.043754365        590.8766071        2.881272756 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.350857298       0.0147573664     0.004277769582        59.30617357 
+
+               dq2            betymax              dymax              dyrms 
+       1.879695282        612.6303882       0.4172312662       0.1047075788 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.03299605107     0.007989090846                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+max_mult_ord set to : 11
+Reference radius set to : 0.017000
+
+total block length: 26658.883200
+
+c6t terminated - total number of elements: 14477
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 8
+                alignment errors SixTrack: 0
+                          sequence length: 26658.883200 [m]
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

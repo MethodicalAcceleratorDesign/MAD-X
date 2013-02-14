@@ -39,7 +39,7 @@ test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test
 test-cororbit test-cororbit-2 test-cororbit-3 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
-test-c6t \
+test-c6t test-c6t-2 \
 test-thick-quad \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
