@@ -1,0 +1,16 @@
+ title, "TI8 test of globaltilt";
+
+ option, -echo, -info, -warn;
+ call, file ="TI8.seq";
+ option, echo, info, warn;
+
+ beam, sequence=ti8, bv=-1;
+ use,  sequence=ti8, range=newti8start/#e;
+
+! the TED element should have globaltilt = 0
+ select, flag=survey, range=ted.87765, column=name,s,l,angle,x,y,z,theta,phi,psi,globaltilt;
+
+ survey, file = 'ti8_ted.out', x0=-2316.27746417, y0=2401.75219835, z0=4455.02592365,
+ theta0=-2.1748203, phi0=0.00017850;
+
+stop;
