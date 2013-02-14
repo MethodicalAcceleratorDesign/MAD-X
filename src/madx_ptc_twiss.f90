@@ -2304,13 +2304,13 @@ contains
      if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
 
          !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
-
-         call kanalnummer(mf1)
-         open(unit=mf1,file='oneTurnMap.5dt.txt')
-         call daprint(oneTurnMap,mf1)
          
-         close(mf1)
-
+         if (getdebug() > 2) then
+           call kanalnummer(mf1)
+           open(unit=mf1,file='oneTurnMap.5dt.txt')
+           call daprint(oneTurnMap,mf1)
+           close(mf1)
+         endif
          
          ! compute delta-p/p dependency of alpha_c
          ! first order derivatives of the dispersions
@@ -2395,12 +2395,13 @@ contains
      elseif ( (icase.eq.56) .and. (default%time .eqv. .true.) ) then ! here one may obtain the pathlength derivatives from the map
 
          !print*,"ALPHA_C dp/dp derivatives : 56D TIME ON"
-
-         call kanalnummer(mf1)
-         open(unit=mf1,file='oneTurnMap.56dt.txt')
-         call daprint(oneTurnMap,mf1)
-         close(mf1)
-
+         if (getdebug() > 2) then
+           call kanalnummer(mf1)
+           open(unit=mf1,file='oneTurnMap.56dt.txt')
+           call daprint(oneTurnMap,mf1)
+           close(mf1)
+         endif
+         
          call alloc(yy)
          do i=1,c_%nd2 ! c_%nd2 is 6 when icase is 56 or 6 (but 4 when icase=5)
             yy%v(i) = oneTurnMap(i)%t
