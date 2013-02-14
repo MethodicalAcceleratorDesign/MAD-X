@@ -1,0 +1,619 @@
+! Creates a footprint for head-on + parasitic collisions at IP1+5 
+! of lhc.6.4; both lhcb1 (for tracking) and lhcb2 (to define the
+! beam-beam elements, i.e. weak-strong) are used; there are flags to
+! select head-on, left, and right parasitic separately at all IPs.
+! The bunch spacing can be given in nanosec and automatically creates
+! the beam-beam interaction points at the correct positions.
+! It is important to set the correct BEAM parameters, i.e. number
+! of particles, emittances, bunch length, energy.
+
+!--- For completeness, all files needed by this job are copied
+!    to the local directory ldb. The links to the the originals
+!    in offdb (official database) are commented out.
+
+Option, -echo,-info,-warn;
+
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+
+Option, info,warn;
+
+!+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
+! 	define beam constants
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+b_t_dist = 25.e-9;                  !--- bunch distance in [sec]
+b_h_dist = clight * b_t_dist / 2 ;  !--- bunch half-distance in [m]
+ip1_range = 58.;                     ! range for parasitic collisions
+ip5_range = ip1_range;
+ip2_range = 60.;
+ip8_range = ip2_range;
+
+npara_1 = ip1_range / b_h_dist;     ! # parasitic either side
+npara_2 = ip2_range / b_h_dist;
+npara_5 = ip5_range / b_h_dist;
+npara_8 = ip8_range / b_h_dist;
+
+value,npara_1,npara_2,npara_5,npara_8;
+
+eg   =  7000;
+bg   =  eg/pmass;
+en   = 3.75e-06;
+epsx = en/bg;
+epsy = en/bg;
+
+Beam, particle = proton, sequence=lhcb1, energy = eg,
+          sigt=      0.077     , 
+          bv = +1, NPART=1.1E11, sige=      1.1e-4, 
+          ex=epsx,   ey=epsy;
+
+Beam, particle = proton, sequence=lhcb2, energy = eg,
+          sigt=      0.077     , 
+          bv = -1, NPART=1.1E11, sige=      1.1e-4, 
+          ex=epsx,   ey=epsy;
+
+beamx = beam%lhcb1->ex;   beamy%lhcb1 = beam->ey;
+sigz  = beam%lhcb1->sigt; sige = beam%lhcb1->sige;
+
+!--- split5, 4d
+long_a= 0.53 * sigz/2;
+long_b= 1.40 * sigz/2;
+value,long_a,long_b;
+
+ho_charge = 0.2;
+
+!+++++++++++++++++++++++++ Step 2 +++++++++++++++++++++++
+! 	slice, flatten sequence, and cycle start to ip3
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+use,sequence=lhcb1;
+
+option,-warn,-echo,-info;
+
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";
+
+option,warn;
+
+abas :=  2.0*clight/(7e12)*on_atlas ;
+abcs :=  4.0*clight/(7e12)*on_cms ;
+
+on_x1:=1; on_sep1:=0; on_atlas  :=  1 ;
+on_x2:=1; on_sep2:=0; on_alice  :=  1 ;
+on_x5:=1; on_sep5:=0; on_cms    :=  1 ;
+on_x8:=1; on_sep8:=0; on_lhcb   :=  1 ;
+
+! keep sextupoles
+ksf0=ksf; ksd0=ksd;
+use,period=lhcb1;
+select,flag=twiss,column=name,x,y,betx,bety;
+twiss,file="twiss-table-1";
+!plot,haxis=s,vaxis=x,y,colour=100,noline;
+
+use,period=lhcb2;
+select,flag=twiss,column=name,x,y,betx,bety;
+twiss,file="twiss-table-2";
+!plot,haxis=s,vaxis=x,y,colour=100,noline;
+
+seqedit,sequence=lhcb1;
+flatten;
+endedit;
+
+seqedit,sequence=lhcb1;
+cycle,start=ip3;
+endedit;
+
+seqedit,sequence=lhcb2;
+flatten;
+endedit;
+
+seqedit,sequence=lhcb2;
+cycle,start=ip3;
+endedit;
+
+bbmarker: marker;  /* for subsequent remove */
+
+
+!+++++++++++++++++++++++++ Step 3 +++++++++++++++++++++++
+! 	define the beam-beam elements
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!
+!===========================================================
+! read macro definitions
+call,file="bb.macros";
+
+!
+!===========================================================
+!   this sets CHARGE in the head-on beam-beam elements. 
+!   set +1 * ho_charge   for parasitic on, 0 for off
+
+ on_ho1  = +1 * ho_charge; ! ho_charge depends on split
+ on_ho2  = +0 * ho_charge; ! because of the "by hand" splitting
+ on_ho5  = +1 * ho_charge;
+ on_ho8  = +0 * ho_charge;
+
+!
+!===========================================================
+!   set CHARGE in the parasitic beam-beam elements. 
+!   set +1 for parasitic on, 0 for off
+ on_lr1l = +1;
+ on_lr1r = +1;
+ on_lr2l = +0;
+ on_lr2r = +0;
+ on_lr5l = +1;
+ on_lr5r = +1;
+ on_lr8l = +0;
+ on_lr8r = +0;
+
+!
+!===========================================================
+!   define markers and savebetas
+option, echo;
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+  exec, mkho(1);
+  exec, sbhomk(1);
+}
+if (on_lr1l <> 0 || on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, mkl(1,$n);
+   exec, sbl(1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0 || on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, mkr(1,$n);
+   exec, sbr(1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+  exec, mkho(5);
+  exec, sbhomk(5);
+}
+if (on_lr5l <> 0 || on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, mkl(5,$n);
+   exec, sbl(5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0 || on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, mkr(5,$n);
+   exec, sbr(5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+  exec, mkho(2);
+  exec, sbhomk(2);
+}
+if (on_lr2l <> 0 || on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, mkl(2,$n);
+   exec, sbl(2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0 || on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, mkr(2,$n);
+   exec, sbr(2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+  exec, mkho(8);
+  exec, sbhomk(8);
+}
+if (on_lr8l <> 0 || on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, mkl(8,$n);
+   exec, sbl(8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0 || on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, mkr(8,$n);
+   exec, sbr(8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+call,file=temp.bb.install;
+!system, "rm temp.bb.install";
+!
+!===========================================================
+!   install bb markers
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, inho(mk,1);
+}
+if (on_lr1l <> 0 || on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inl(mk,1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0 || on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inr(mk,1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, inho(mk,5);
+}
+if (on_lr5l <> 0 || on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inl(mk,5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0 || on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inr(mk,5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, inho(mk,2);
+}
+if (on_lr2l <> 0 || on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inl(mk,2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0 || on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inr(mk,2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, inho(mk,8);
+}
+if (on_lr8l <> 0 || on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inl(mk,8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0 || on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inr(mk,8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+seqedit,sequence=lhcb2;
+call,file=temp.bb.install;
+endedit;
+!system, "rm temp.bb.install";
+
+!
+!===========================================================
+!--- get beta functions at bb in all four IPs
+use,period=lhcb2;
+select,flag=twiss,class=bbmarker,column=name,s,x,y;
+twiss, sequence=lhcb2; !,file;
+!--- separation for halo collisions at IP2
+on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
+value,on_sep2;
+!===========================================================
+!   define bb elements
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, bbho(1);
+}
+if (on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, bbl(1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, bbr(1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, bbho(5);
+}
+if (on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, bbl(5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, bbr(5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, bbho(2);
+}
+if (on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, bbl(2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, bbr(2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, bbho(8);
+}
+if (on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, bbl(8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, bbr(8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+call,file=temp.bb.install;
+!system, "rm temp.bb.install";
+!
+!===========================================================
+!   install bb elements
+assign,echo=temp.bb.install;
+!--- ip1
+if (on_ho1 <> 0)
+{
+exec, inho(bb,1);
+}
+if (on_lr1l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inl(bb,1,$n);
+   n=n+1;
+  };
+}
+if (on_lr1r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_1)
+  {
+   exec, inr(bb,1,$n);
+   n=n+1;
+  };
+}
+!--- ip5
+if (on_ho5 <> 0)
+{
+exec, inho(bb,5);
+}
+if (on_lr5l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inl(bb,5,$n);
+   n=n+1;
+  };
+}
+if (on_lr5r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_5)
+  {
+   exec, inr(bb,5,$n);
+   n=n+1;
+  };
+}
+!--- ip2
+if (on_ho2 <> 0)
+{
+exec, inho(bb,2);
+}
+if (on_lr2l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inl(bb,2,$n);
+   n=n+1;
+  };
+}
+if (on_lr2r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_2)
+  {
+   exec, inr(bb,2,$n);
+   n=n+1;
+  };
+}
+!--- ip8
+if (on_ho8 <> 0)
+{
+exec, inho(bb,8);
+}
+if (on_lr8l <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inl(bb,8,$n);
+   n=n+1;
+  };
+}
+if (on_lr8r <> 0)
+{
+  n=1; ! counter
+  while (n < npara_8)
+  {
+   exec, inr(bb,8,$n);
+   n=n+1;
+  };
+}
+assign,echo=terminal;
+select,flag=seqedit,class=bbmarker;
+seqedit,sequence=lhcb2;
+remove,element=selected;
+endedit;
+select,flag=seqedit,clear;
+
+seqedit,sequence=lhcb1;
+call,file=temp.bb.install;
+endedit;
+
+!--- Now the beam-beam element installation is complete
+
+!system, "rm temp.bb.install";
+
+seqedit,sequence=lhcb1;
+cycle,start=ip1;
+endedit;
+
+use,period=lhcb1;
+twiss, sequence=lhcb1;
+
+!
+!  make footprint
+!
+
+option,trace;
+small=0.05;
+big=sqrt(1.-small^2);
+track;
+xs=small; ys=small;
+value,xs,ys;
+start,fx=xs,fy=ys;  // zero amplitude
+nsigmax=6;
+n=1; // sigma multiplier
+m=0; // angle multiplier
+while (n <= nsigmax)
+{
+  angle = 15*m*pi/180;
+  if (m == 0) {xs=n*big; ys=n*small;}
+  elseif (m == 6) {xs=n*small; ys=n*big;}
+  else
+  {
+    xs=n*cos(angle);
+    ys=n*sin(angle);
+  }
+  value,xs,ys;
+  start,fx=xs,fy=ys;
+  m=m+1;
+  if (m == 7) { m=0; n=n+1;}
+};
+dynap,fastune,turns=1024;
+endtrack;
+write,table=dynap,file;
+write,table=dynaptune,file;
+!system,"foot < dynaptune > footprint";
+!stop;

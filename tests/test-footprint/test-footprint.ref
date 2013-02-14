@@ -1,0 +1,4077 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 14.02.13 18.12.53 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! Creates a footprint for head-on + parasitic collisions at IP1+5 
+
+! of lhc.6.4; both lhcb1 (for tracking) and lhcb2 (to define the
+
+! beam-beam elements, i.e. weak-strong) are used; there are flags to
+
+! select head-on, left, and right parasitic separately at all IPs.
+
+! The bunch spacing can be given in nanosec and automatically creates
+
+! the beam-beam interaction points at the correct positions.
+
+! It is important to set the correct BEAM parameters, i.e. number
+
+! of particles, emittances, bunch length, energy.
+
+
+
+!--- For completeness, all files needed by this job are copied
+
+!    to the local directory ldb. The links to the the originals
+
+!    in offdb (official database) are commented out.
+
+
+
+Option, -echo,-info,-warn;
+
+npara_1 =        15.47737402 ;
+npara_2 =        16.01107657 ;
+npara_5 =        15.47737402 ;
+npara_8 =        16.01107657 ;
+long_a =           0.020405 ;
+long_b =             0.0539 ;
+enter Twiss module
+  
+iteration:   1 error:   2.032630E-04 deltap:   0.000000E+00
+orbit:  -2.119803E-07 -1.418085E-07  4.229801E-08  1.424855E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.637364E-07 deltap:   0.000000E+00
+orbit:   6.782494E-09 -6.153986E-11  5.155355E-08  1.424932E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003168544238        56.17849657 
+
+                q1                dq1            betxmax              dxmax 
+       64.30999865        1.887789711        4433.756243         2.89416396 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.351092461       0.0114390057     0.001062864639        59.32000294 
+
+               dq2            betymax              dymax              dyrms 
+       2.135357839        4433.760327        1.137359544       0.1620686244 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008280801168    0.0008247965535                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   2.030303E-04 deltap:   0.000000E+00
+orbit:   1.880095E-07 -2.190664E-07  4.707791E-08 -1.424434E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.598967E-07 deltap:   0.000000E+00
+orbit:   6.878381E-09  1.095079E-10  4.144078E-08 -1.424439E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003165594587        56.20466358 
+
+                q1                dq1            betxmax              dxmax 
+        64.3099964         2.04067144         4433.75706        3.235225074 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.373272085      0.01143930169     0.001069942879        59.32000235 
+
+               dq2            betymax              dymax              dyrms 
+       1.914449067        4433.754174         1.43003785       0.2381673061 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008279311249    0.0008250781778                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+assign,echo=temp.bb.install;
+
+!--- ip1
+
+if (on_ho1 <> 0)
+
+{
+
+  exec, mkho(1);
+
+  exec, sbhomk(1);
+
+}
+
+if (on_lr1l <> 0 || on_lr1r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, mkl(1,$n);
+
+   exec, sbl(1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr1r <> 0 || on_lr1l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, mkr(1,$n);
+
+   exec, sbr(1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip5
+
+if (on_ho5 <> 0)
+
+{
+
+  exec, mkho(5);
+
+  exec, sbhomk(5);
+
+}
+
+if (on_lr5l <> 0 || on_lr5r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, mkl(5,$n);
+
+   exec, sbl(5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr5r <> 0 || on_lr5l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, mkr(5,$n);
+
+   exec, sbr(5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip2
+
+if (on_ho2 <> 0)
+
+{
+
+  exec, mkho(2);
+
+  exec, sbhomk(2);
+
+}
+
+if (on_lr2l <> 0 || on_lr2r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, mkl(2,$n);
+
+   exec, sbl(2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr2r <> 0 || on_lr2l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, mkr(2,$n);
+
+   exec, sbr(2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip8
+
+if (on_ho8 <> 0)
+
+{
+
+  exec, mkho(8);
+
+  exec, sbhomk(8);
+
+}
+
+if (on_lr8l <> 0 || on_lr8r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, mkl(8,$n);
+
+   exec, sbl(8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr8r <> 0 || on_lr8l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, mkr(8,$n);
+
+   exec, sbr(8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+assign,echo=terminal;
+
+call,file=temp.bb.install;
+
+mkip1l2: bbmarker;
+
+mkip1l1: bbmarker;
+
+mkip1:   bbmarker;
+
+mkip1r1: bbmarker;
+
+mkip1r2: bbmarker;
+
+savebeta, label=r1ip1l2, place=mkip1l2;
+
+savebeta, label=r1ip1l1, place=mkip1l1;
+
+savebeta, label=r1ip1,   place=mkip1;
+
+savebeta, label=r1ip1r1, place=mkip1r1;
+
+savebeta, label=r1ip1r2, place=mkip1r2;
+
+mkip1pl1: bbmarker;
+
+savebeta, label=r1ip1pl1, place=mkip1pl1;
+
+mkip1pl2: bbmarker;
+
+savebeta, label=r1ip1pl2, place=mkip1pl2;
+
+mkip1pl3: bbmarker;
+
+savebeta, label=r1ip1pl3, place=mkip1pl3;
+
+mkip1pl4: bbmarker;
+
+savebeta, label=r1ip1pl4, place=mkip1pl4;
+
+mkip1pl5: bbmarker;
+
+savebeta, label=r1ip1pl5, place=mkip1pl5;
+
+mkip1pl6: bbmarker;
+
+savebeta, label=r1ip1pl6, place=mkip1pl6;
+
+mkip1pl7: bbmarker;
+
+savebeta, label=r1ip1pl7, place=mkip1pl7;
+
+mkip1pl8: bbmarker;
+
+savebeta, label=r1ip1pl8, place=mkip1pl8;
+
+mkip1pl9: bbmarker;
+
+savebeta, label=r1ip1pl9, place=mkip1pl9;
+
+mkip1pl10: bbmarker;
+
+savebeta, label=r1ip1pl10, place=mkip1pl10;
+
+mkip1pl11: bbmarker;
+
+savebeta, label=r1ip1pl11, place=mkip1pl11;
+
+mkip1pl12: bbmarker;
+
+savebeta, label=r1ip1pl12, place=mkip1pl12;
+
+mkip1pl13: bbmarker;
+
+savebeta, label=r1ip1pl13, place=mkip1pl13;
+
+mkip1pl14: bbmarker;
+
+savebeta, label=r1ip1pl14, place=mkip1pl14;
+
+mkip1pl15: bbmarker;
+
+savebeta, label=r1ip1pl15, place=mkip1pl15;
+
+mkip1pr1: bbmarker;
+
+savebeta, label=r1ip1pr1, place=mkip1pr1;
+
+mkip1pr2: bbmarker;
+
+savebeta, label=r1ip1pr2, place=mkip1pr2;
+
+mkip1pr3: bbmarker;
+
+savebeta, label=r1ip1pr3, place=mkip1pr3;
+
+mkip1pr4: bbmarker;
+
+savebeta, label=r1ip1pr4, place=mkip1pr4;
+
+mkip1pr5: bbmarker;
+
+savebeta, label=r1ip1pr5, place=mkip1pr5;
+
+mkip1pr6: bbmarker;
+
+savebeta, label=r1ip1pr6, place=mkip1pr6;
+
+mkip1pr7: bbmarker;
+
+savebeta, label=r1ip1pr7, place=mkip1pr7;
+
+mkip1pr8: bbmarker;
+
+savebeta, label=r1ip1pr8, place=mkip1pr8;
+
+mkip1pr9: bbmarker;
+
+savebeta, label=r1ip1pr9, place=mkip1pr9;
+
+mkip1pr10: bbmarker;
+
+savebeta, label=r1ip1pr10, place=mkip1pr10;
+
+mkip1pr11: bbmarker;
+
+savebeta, label=r1ip1pr11, place=mkip1pr11;
+
+mkip1pr12: bbmarker;
+
+savebeta, label=r1ip1pr12, place=mkip1pr12;
+
+mkip1pr13: bbmarker;
+
+savebeta, label=r1ip1pr13, place=mkip1pr13;
+
+mkip1pr14: bbmarker;
+
+savebeta, label=r1ip1pr14, place=mkip1pr14;
+
+mkip1pr15: bbmarker;
+
+savebeta, label=r1ip1pr15, place=mkip1pr15;
+
+mkip5l2: bbmarker;
+
+mkip5l1: bbmarker;
+
+mkip5:   bbmarker;
+
+mkip5r1: bbmarker;
+
+mkip5r2: bbmarker;
+
+savebeta, label=r5ip5l2, place=mkip5l2;
+
+savebeta, label=r5ip5l1, place=mkip5l1;
+
+savebeta, label=r5ip5,   place=mkip5;
+
+savebeta, label=r5ip5r1, place=mkip5r1;
+
+savebeta, label=r5ip5r2, place=mkip5r2;
+
+mkip5pl1: bbmarker;
+
+savebeta, label=r5ip5pl1, place=mkip5pl1;
+
+mkip5pl2: bbmarker;
+
+savebeta, label=r5ip5pl2, place=mkip5pl2;
+
+mkip5pl3: bbmarker;
+
+savebeta, label=r5ip5pl3, place=mkip5pl3;
+
+mkip5pl4: bbmarker;
+
+savebeta, label=r5ip5pl4, place=mkip5pl4;
+
+mkip5pl5: bbmarker;
+
+savebeta, label=r5ip5pl5, place=mkip5pl5;
+
+mkip5pl6: bbmarker;
+
+savebeta, label=r5ip5pl6, place=mkip5pl6;
+
+mkip5pl7: bbmarker;
+
+savebeta, label=r5ip5pl7, place=mkip5pl7;
+
+mkip5pl8: bbmarker;
+
+savebeta, label=r5ip5pl8, place=mkip5pl8;
+
+mkip5pl9: bbmarker;
+
+savebeta, label=r5ip5pl9, place=mkip5pl9;
+
+mkip5pl10: bbmarker;
+
+savebeta, label=r5ip5pl10, place=mkip5pl10;
+
+mkip5pl11: bbmarker;
+
+savebeta, label=r5ip5pl11, place=mkip5pl11;
+
+mkip5pl12: bbmarker;
+
+savebeta, label=r5ip5pl12, place=mkip5pl12;
+
+mkip5pl13: bbmarker;
+
+savebeta, label=r5ip5pl13, place=mkip5pl13;
+
+mkip5pl14: bbmarker;
+
+savebeta, label=r5ip5pl14, place=mkip5pl14;
+
+mkip5pl15: bbmarker;
+
+savebeta, label=r5ip5pl15, place=mkip5pl15;
+
+mkip5pr1: bbmarker;
+
+savebeta, label=r5ip5pr1, place=mkip5pr1;
+
+mkip5pr2: bbmarker;
+
+savebeta, label=r5ip5pr2, place=mkip5pr2;
+
+mkip5pr3: bbmarker;
+
+savebeta, label=r5ip5pr3, place=mkip5pr3;
+
+mkip5pr4: bbmarker;
+
+savebeta, label=r5ip5pr4, place=mkip5pr4;
+
+mkip5pr5: bbmarker;
+
+savebeta, label=r5ip5pr5, place=mkip5pr5;
+
+mkip5pr6: bbmarker;
+
+savebeta, label=r5ip5pr6, place=mkip5pr6;
+
+mkip5pr7: bbmarker;
+
+savebeta, label=r5ip5pr7, place=mkip5pr7;
+
+mkip5pr8: bbmarker;
+
+savebeta, label=r5ip5pr8, place=mkip5pr8;
+
+mkip5pr9: bbmarker;
+
+savebeta, label=r5ip5pr9, place=mkip5pr9;
+
+mkip5pr10: bbmarker;
+
+savebeta, label=r5ip5pr10, place=mkip5pr10;
+
+mkip5pr11: bbmarker;
+
+savebeta, label=r5ip5pr11, place=mkip5pr11;
+
+mkip5pr12: bbmarker;
+
+savebeta, label=r5ip5pr12, place=mkip5pr12;
+
+mkip5pr13: bbmarker;
+
+savebeta, label=r5ip5pr13, place=mkip5pr13;
+
+mkip5pr14: bbmarker;
+
+savebeta, label=r5ip5pr14, place=mkip5pr14;
+
+mkip5pr15: bbmarker;
+
+savebeta, label=r5ip5pr15, place=mkip5pr15;
+
+!system, "rm temp.bb.install";
+
+!
+
+!===========================================================
+
+!   install bb markers
+
+assign,echo=temp.bb.install;
+
+!--- ip1
+
+if (on_ho1 <> 0)
+
+{
+
+exec, inho(mk,1);
+
+}
+
+if (on_lr1l <> 0 || on_lr1r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, inl(mk,1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr1r <> 0 || on_lr1l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, inr(mk,1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip5
+
+if (on_ho5 <> 0)
+
+{
+
+exec, inho(mk,5);
+
+}
+
+if (on_lr5l <> 0 || on_lr5r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, inl(mk,5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr5r <> 0 || on_lr5l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, inr(mk,5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip2
+
+if (on_ho2 <> 0)
+
+{
+
+exec, inho(mk,2);
+
+}
+
+if (on_lr2l <> 0 || on_lr2r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, inl(mk,2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr2r <> 0 || on_lr2l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, inr(mk,2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip8
+
+if (on_ho8 <> 0)
+
+{
+
+exec, inho(mk,8);
+
+}
+
+if (on_lr8l <> 0 || on_lr8r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, inl(mk,8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr8r <> 0 || on_lr8l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, inr(mk,8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+assign,echo=terminal;
+
+seqedit,sequence=lhcb2;
+
+call,file=temp.bb.install;
+
+mkip1l2: bbmarker;
+
+mkip1l1: bbmarker;
+
+mkip1:   bbmarker;
+
+mkip1r1: bbmarker;
+
+mkip1r2: bbmarker;
+
+savebeta, label=r1ip1l2, place=mkip1l2;
+
+savebeta, label=r1ip1l1, place=mkip1l1;
+
+savebeta, label=r1ip1,   place=mkip1;
+
+savebeta, label=r1ip1r1, place=mkip1r1;
+
+savebeta, label=r1ip1r2, place=mkip1r2;
+
+mkip1pl1: bbmarker;
+
+savebeta, label=r1ip1pl1, place=mkip1pl1;
+
+mkip1pl2: bbmarker;
+
+savebeta, label=r1ip1pl2, place=mkip1pl2;
+
+mkip1pl3: bbmarker;
+
+savebeta, label=r1ip1pl3, place=mkip1pl3;
+
+mkip1pl4: bbmarker;
+
+savebeta, label=r1ip1pl4, place=mkip1pl4;
+
+mkip1pl5: bbmarker;
+
+savebeta, label=r1ip1pl5, place=mkip1pl5;
+
+mkip1pl6: bbmarker;
+
+savebeta, label=r1ip1pl6, place=mkip1pl6;
+
+mkip1pl7: bbmarker;
+
+savebeta, label=r1ip1pl7, place=mkip1pl7;
+
+mkip1pl8: bbmarker;
+
+savebeta, label=r1ip1pl8, place=mkip1pl8;
+
+mkip1pl9: bbmarker;
+
+savebeta, label=r1ip1pl9, place=mkip1pl9;
+
+mkip1pl10: bbmarker;
+
+savebeta, label=r1ip1pl10, place=mkip1pl10;
+
+mkip1pl11: bbmarker;
+
+savebeta, label=r1ip1pl11, place=mkip1pl11;
+
+mkip1pl12: bbmarker;
+
+savebeta, label=r1ip1pl12, place=mkip1pl12;
+
+mkip1pl13: bbmarker;
+
+savebeta, label=r1ip1pl13, place=mkip1pl13;
+
+mkip1pl14: bbmarker;
+
+savebeta, label=r1ip1pl14, place=mkip1pl14;
+
+mkip1pl15: bbmarker;
+
+savebeta, label=r1ip1pl15, place=mkip1pl15;
+
+mkip1pr1: bbmarker;
+
+savebeta, label=r1ip1pr1, place=mkip1pr1;
+
+mkip1pr2: bbmarker;
+
+savebeta, label=r1ip1pr2, place=mkip1pr2;
+
+mkip1pr3: bbmarker;
+
+savebeta, label=r1ip1pr3, place=mkip1pr3;
+
+mkip1pr4: bbmarker;
+
+savebeta, label=r1ip1pr4, place=mkip1pr4;
+
+mkip1pr5: bbmarker;
+
+savebeta, label=r1ip1pr5, place=mkip1pr5;
+
+mkip1pr6: bbmarker;
+
+savebeta, label=r1ip1pr6, place=mkip1pr6;
+
+mkip1pr7: bbmarker;
+
+savebeta, label=r1ip1pr7, place=mkip1pr7;
+
+mkip1pr8: bbmarker;
+
+savebeta, label=r1ip1pr8, place=mkip1pr8;
+
+mkip1pr9: bbmarker;
+
+savebeta, label=r1ip1pr9, place=mkip1pr9;
+
+mkip1pr10: bbmarker;
+
+savebeta, label=r1ip1pr10, place=mkip1pr10;
+
+mkip1pr11: bbmarker;
+
+savebeta, label=r1ip1pr11, place=mkip1pr11;
+
+mkip1pr12: bbmarker;
+
+savebeta, label=r1ip1pr12, place=mkip1pr12;
+
+mkip1pr13: bbmarker;
+
+savebeta, label=r1ip1pr13, place=mkip1pr13;
+
+mkip1pr14: bbmarker;
+
+savebeta, label=r1ip1pr14, place=mkip1pr14;
+
+mkip1pr15: bbmarker;
+
+savebeta, label=r1ip1pr15, place=mkip1pr15;
+
+mkip5l2: bbmarker;
+
+mkip5l1: bbmarker;
+
+mkip5:   bbmarker;
+
+mkip5r1: bbmarker;
+
+mkip5r2: bbmarker;
+
+savebeta, label=r5ip5l2, place=mkip5l2;
+
+savebeta, label=r5ip5l1, place=mkip5l1;
+
+savebeta, label=r5ip5,   place=mkip5;
+
+savebeta, label=r5ip5r1, place=mkip5r1;
+
+savebeta, label=r5ip5r2, place=mkip5r2;
+
+mkip5pl1: bbmarker;
+
+savebeta, label=r5ip5pl1, place=mkip5pl1;
+
+mkip5pl2: bbmarker;
+
+savebeta, label=r5ip5pl2, place=mkip5pl2;
+
+mkip5pl3: bbmarker;
+
+savebeta, label=r5ip5pl3, place=mkip5pl3;
+
+mkip5pl4: bbmarker;
+
+savebeta, label=r5ip5pl4, place=mkip5pl4;
+
+mkip5pl5: bbmarker;
+
+savebeta, label=r5ip5pl5, place=mkip5pl5;
+
+mkip5pl6: bbmarker;
+
+savebeta, label=r5ip5pl6, place=mkip5pl6;
+
+mkip5pl7: bbmarker;
+
+savebeta, label=r5ip5pl7, place=mkip5pl7;
+
+mkip5pl8: bbmarker;
+
+savebeta, label=r5ip5pl8, place=mkip5pl8;
+
+mkip5pl9: bbmarker;
+
+savebeta, label=r5ip5pl9, place=mkip5pl9;
+
+mkip5pl10: bbmarker;
+
+savebeta, label=r5ip5pl10, place=mkip5pl10;
+
+mkip5pl11: bbmarker;
+
+savebeta, label=r5ip5pl11, place=mkip5pl11;
+
+mkip5pl12: bbmarker;
+
+savebeta, label=r5ip5pl12, place=mkip5pl12;
+
+mkip5pl13: bbmarker;
+
+savebeta, label=r5ip5pl13, place=mkip5pl13;
+
+mkip5pl14: bbmarker;
+
+savebeta, label=r5ip5pl14, place=mkip5pl14;
+
+mkip5pl15: bbmarker;
+
+savebeta, label=r5ip5pl15, place=mkip5pl15;
+
+mkip5pr1: bbmarker;
+
+savebeta, label=r5ip5pr1, place=mkip5pr1;
+
+mkip5pr2: bbmarker;
+
+savebeta, label=r5ip5pr2, place=mkip5pr2;
+
+mkip5pr3: bbmarker;
+
+savebeta, label=r5ip5pr3, place=mkip5pr3;
+
+mkip5pr4: bbmarker;
+
+savebeta, label=r5ip5pr4, place=mkip5pr4;
+
+mkip5pr5: bbmarker;
+
+savebeta, label=r5ip5pr5, place=mkip5pr5;
+
+mkip5pr6: bbmarker;
+
+savebeta, label=r5ip5pr6, place=mkip5pr6;
+
+mkip5pr7: bbmarker;
+
+savebeta, label=r5ip5pr7, place=mkip5pr7;
+
+mkip5pr8: bbmarker;
+
+savebeta, label=r5ip5pr8, place=mkip5pr8;
+
+mkip5pr9: bbmarker;
+
+savebeta, label=r5ip5pr9, place=mkip5pr9;
+
+mkip5pr10: bbmarker;
+
+savebeta, label=r5ip5pr10, place=mkip5pr10;
+
+mkip5pr11: bbmarker;
+
+savebeta, label=r5ip5pr11, place=mkip5pr11;
+
+mkip5pr12: bbmarker;
+
+savebeta, label=r5ip5pr12, place=mkip5pr12;
+
+mkip5pr13: bbmarker;
+
+savebeta, label=r5ip5pr13, place=mkip5pr13;
+
+mkip5pr14: bbmarker;
+
+savebeta, label=r5ip5pr14, place=mkip5pr14;
+
+mkip5pr15: bbmarker;
+
+savebeta, label=r5ip5pr15, place=mkip5pr15;
+
+install, element= mkip1l2, at=-long_b, from=ip1;
+
+install, element= mkip1l1, at=-long_a, from=ip1;
+
+install, element= mkip1,   at=1.e-9,   from=ip1;
+
+install, element= mkip1r1, at=+long_a, from=ip1;
+
+install, element= mkip1r2, at=+long_b, from=ip1;
+
+install, element= mkip1pl1, at=-1*b_h_dist, from=ip1;
+
+install, element= mkip1pl2, at=-2*b_h_dist, from=ip1;
+
+install, element= mkip1pl3, at=-3*b_h_dist, from=ip1;
+
+install, element= mkip1pl4, at=-4*b_h_dist, from=ip1;
+
+install, element= mkip1pl5, at=-5*b_h_dist, from=ip1;
+
+install, element= mkip1pl6, at=-6*b_h_dist, from=ip1;
+
+install, element= mkip1pl7, at=-7*b_h_dist, from=ip1;
+
+install, element= mkip1pl8, at=-8*b_h_dist, from=ip1;
+
+install, element= mkip1pl9, at=-9*b_h_dist, from=ip1;
+
+install, element= mkip1pl10, at=-10*b_h_dist, from=ip1;
+
+install, element= mkip1pl11, at=-11*b_h_dist, from=ip1;
+
+install, element= mkip1pl12, at=-12*b_h_dist, from=ip1;
+
+install, element= mkip1pl13, at=-13*b_h_dist, from=ip1;
+
+install, element= mkip1pl14, at=-14*b_h_dist, from=ip1;
+
+install, element= mkip1pl15, at=-15*b_h_dist, from=ip1;
+
+install, element= mkip1pr1, at=1*b_h_dist, from=ip1;
+
+install, element= mkip1pr2, at=2*b_h_dist, from=ip1;
+
+install, element= mkip1pr3, at=3*b_h_dist, from=ip1;
+
+install, element= mkip1pr4, at=4*b_h_dist, from=ip1;
+
+install, element= mkip1pr5, at=5*b_h_dist, from=ip1;
+
+install, element= mkip1pr6, at=6*b_h_dist, from=ip1;
+
+install, element= mkip1pr7, at=7*b_h_dist, from=ip1;
+
+install, element= mkip1pr8, at=8*b_h_dist, from=ip1;
+
+install, element= mkip1pr9, at=9*b_h_dist, from=ip1;
+
+install, element= mkip1pr10, at=10*b_h_dist, from=ip1;
+
+install, element= mkip1pr11, at=11*b_h_dist, from=ip1;
+
+install, element= mkip1pr12, at=12*b_h_dist, from=ip1;
+
+install, element= mkip1pr13, at=13*b_h_dist, from=ip1;
+
+install, element= mkip1pr14, at=14*b_h_dist, from=ip1;
+
+install, element= mkip1pr15, at=15*b_h_dist, from=ip1;
+
+install, element= mkip5l2, at=-long_b, from=ip5;
+
+install, element= mkip5l1, at=-long_a, from=ip5;
+
+install, element= mkip5,   at=1.e-9,   from=ip5;
+
+install, element= mkip5r1, at=+long_a, from=ip5;
+
+install, element= mkip5r2, at=+long_b, from=ip5;
+
+install, element= mkip5pl1, at=-1*b_h_dist, from=ip5;
+
+install, element= mkip5pl2, at=-2*b_h_dist, from=ip5;
+
+install, element= mkip5pl3, at=-3*b_h_dist, from=ip5;
+
+install, element= mkip5pl4, at=-4*b_h_dist, from=ip5;
+
+install, element= mkip5pl5, at=-5*b_h_dist, from=ip5;
+
+install, element= mkip5pl6, at=-6*b_h_dist, from=ip5;
+
+install, element= mkip5pl7, at=-7*b_h_dist, from=ip5;
+
+install, element= mkip5pl8, at=-8*b_h_dist, from=ip5;
+
+install, element= mkip5pl9, at=-9*b_h_dist, from=ip5;
+
+install, element= mkip5pl10, at=-10*b_h_dist, from=ip5;
+
+install, element= mkip5pl11, at=-11*b_h_dist, from=ip5;
+
+install, element= mkip5pl12, at=-12*b_h_dist, from=ip5;
+
+install, element= mkip5pl13, at=-13*b_h_dist, from=ip5;
+
+install, element= mkip5pl14, at=-14*b_h_dist, from=ip5;
+
+install, element= mkip5pl15, at=-15*b_h_dist, from=ip5;
+
+install, element= mkip5pr1, at=1*b_h_dist, from=ip5;
+
+install, element= mkip5pr2, at=2*b_h_dist, from=ip5;
+
+install, element= mkip5pr3, at=3*b_h_dist, from=ip5;
+
+install, element= mkip5pr4, at=4*b_h_dist, from=ip5;
+
+install, element= mkip5pr5, at=5*b_h_dist, from=ip5;
+
+install, element= mkip5pr6, at=6*b_h_dist, from=ip5;
+
+install, element= mkip5pr7, at=7*b_h_dist, from=ip5;
+
+install, element= mkip5pr8, at=8*b_h_dist, from=ip5;
+
+install, element= mkip5pr9, at=9*b_h_dist, from=ip5;
+
+install, element= mkip5pr10, at=10*b_h_dist, from=ip5;
+
+install, element= mkip5pr11, at=11*b_h_dist, from=ip5;
+
+install, element= mkip5pr12, at=12*b_h_dist, from=ip5;
+
+install, element= mkip5pr13, at=13*b_h_dist, from=ip5;
+
+install, element= mkip5pr14, at=14*b_h_dist, from=ip5;
+
+install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
+
+endedit;
+
+!system, "rm temp.bb.install";
+
+
+
+!
+
+!===========================================================
+
+!--- get beta functions at bb in all four IPs
+
+use,period=lhcb2;
+
+!select,flag=twiss,class=bbmarker,column=name,s,x,y;
+
+twiss, sequence=lhcb2; !,file;
+
+enter Twiss module
+  
+iteration:   1 error:   7.132156E-07 deltap:   0.000000E+00
+orbit:   2.717797E-08 -9.667610E-10 -1.467977E-07 -2.890228E-09  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003165594587        56.20466358 
+
+                q1                dq1            betxmax              dxmax 
+        64.3099964        2.040757803         4433.75706        3.235225074 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.369007242      0.01143930169     0.001098270423        59.32000235 
+
+               dq2            betymax              dymax              dyrms 
+       1.914360331        4433.754173        1.430037853       0.2467597516 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008279311251    0.0008640263699                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+!--- separation for halo collisions at IP2
+
+on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
+
+value,on_sep2;
+
+on_sep2 =                  0 ;
+!===========================================================
+
+!   define bb elements
+
+assign,echo=temp.bb.install;
+
+!--- ip1
+
+if (on_ho1 <> 0)
+
+{
+
+exec, bbho(1);
+
+}
+
+if (on_lr1l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, bbl(1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr1r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, bbr(1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip5
+
+if (on_ho5 <> 0)
+
+{
+
+exec, bbho(5);
+
+}
+
+if (on_lr5l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, bbl(5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr5r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, bbr(5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip2
+
+if (on_ho2 <> 0)
+
+{
+
+exec, bbho(2);
+
+}
+
+if (on_lr2l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, bbl(2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr2r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, bbr(2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip8
+
+if (on_ho8 <> 0)
+
+{
+
+exec, bbho(8);
+
+}
+
+if (on_lr8l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, bbl(8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr8r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, bbr(8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+assign,echo=terminal;
+
+call,file=temp.bb.install;
+
+mkip1l2: bbmarker;
+
+mkip1l1: bbmarker;
+
+mkip1:   bbmarker;
+
+mkip1r1: bbmarker;
+
+mkip1r2: bbmarker;
+
+savebeta, label=r1ip1l2, place=mkip1l2;
+
+savebeta, label=r1ip1l1, place=mkip1l1;
+
+savebeta, label=r1ip1,   place=mkip1;
+
+savebeta, label=r1ip1r1, place=mkip1r1;
+
+savebeta, label=r1ip1r2, place=mkip1r2;
+
+mkip1pl1: bbmarker;
+
+savebeta, label=r1ip1pl1, place=mkip1pl1;
+
+mkip1pl2: bbmarker;
+
+savebeta, label=r1ip1pl2, place=mkip1pl2;
+
+mkip1pl3: bbmarker;
+
+savebeta, label=r1ip1pl3, place=mkip1pl3;
+
+mkip1pl4: bbmarker;
+
+savebeta, label=r1ip1pl4, place=mkip1pl4;
+
+mkip1pl5: bbmarker;
+
+savebeta, label=r1ip1pl5, place=mkip1pl5;
+
+mkip1pl6: bbmarker;
+
+savebeta, label=r1ip1pl6, place=mkip1pl6;
+
+mkip1pl7: bbmarker;
+
+savebeta, label=r1ip1pl7, place=mkip1pl7;
+
+mkip1pl8: bbmarker;
+
+savebeta, label=r1ip1pl8, place=mkip1pl8;
+
+mkip1pl9: bbmarker;
+
+savebeta, label=r1ip1pl9, place=mkip1pl9;
+
+mkip1pl10: bbmarker;
+
+savebeta, label=r1ip1pl10, place=mkip1pl10;
+
+mkip1pl11: bbmarker;
+
+savebeta, label=r1ip1pl11, place=mkip1pl11;
+
+mkip1pl12: bbmarker;
+
+savebeta, label=r1ip1pl12, place=mkip1pl12;
+
+mkip1pl13: bbmarker;
+
+savebeta, label=r1ip1pl13, place=mkip1pl13;
+
+mkip1pl14: bbmarker;
+
+savebeta, label=r1ip1pl14, place=mkip1pl14;
+
+mkip1pl15: bbmarker;
+
+savebeta, label=r1ip1pl15, place=mkip1pl15;
+
+mkip1pr1: bbmarker;
+
+savebeta, label=r1ip1pr1, place=mkip1pr1;
+
+mkip1pr2: bbmarker;
+
+savebeta, label=r1ip1pr2, place=mkip1pr2;
+
+mkip1pr3: bbmarker;
+
+savebeta, label=r1ip1pr3, place=mkip1pr3;
+
+mkip1pr4: bbmarker;
+
+savebeta, label=r1ip1pr4, place=mkip1pr4;
+
+mkip1pr5: bbmarker;
+
+savebeta, label=r1ip1pr5, place=mkip1pr5;
+
+mkip1pr6: bbmarker;
+
+savebeta, label=r1ip1pr6, place=mkip1pr6;
+
+mkip1pr7: bbmarker;
+
+savebeta, label=r1ip1pr7, place=mkip1pr7;
+
+mkip1pr8: bbmarker;
+
+savebeta, label=r1ip1pr8, place=mkip1pr8;
+
+mkip1pr9: bbmarker;
+
+savebeta, label=r1ip1pr9, place=mkip1pr9;
+
+mkip1pr10: bbmarker;
+
+savebeta, label=r1ip1pr10, place=mkip1pr10;
+
+mkip1pr11: bbmarker;
+
+savebeta, label=r1ip1pr11, place=mkip1pr11;
+
+mkip1pr12: bbmarker;
+
+savebeta, label=r1ip1pr12, place=mkip1pr12;
+
+mkip1pr13: bbmarker;
+
+savebeta, label=r1ip1pr13, place=mkip1pr13;
+
+mkip1pr14: bbmarker;
+
+savebeta, label=r1ip1pr14, place=mkip1pr14;
+
+mkip1pr15: bbmarker;
+
+savebeta, label=r1ip1pr15, place=mkip1pr15;
+
+mkip5l2: bbmarker;
+
+mkip5l1: bbmarker;
+
+mkip5:   bbmarker;
+
+mkip5r1: bbmarker;
+
+mkip5r2: bbmarker;
+
+savebeta, label=r5ip5l2, place=mkip5l2;
+
+savebeta, label=r5ip5l1, place=mkip5l1;
+
+savebeta, label=r5ip5,   place=mkip5;
+
+savebeta, label=r5ip5r1, place=mkip5r1;
+
+savebeta, label=r5ip5r2, place=mkip5r2;
+
+mkip5pl1: bbmarker;
+
+savebeta, label=r5ip5pl1, place=mkip5pl1;
+
+mkip5pl2: bbmarker;
+
+savebeta, label=r5ip5pl2, place=mkip5pl2;
+
+mkip5pl3: bbmarker;
+
+savebeta, label=r5ip5pl3, place=mkip5pl3;
+
+mkip5pl4: bbmarker;
+
+savebeta, label=r5ip5pl4, place=mkip5pl4;
+
+mkip5pl5: bbmarker;
+
+savebeta, label=r5ip5pl5, place=mkip5pl5;
+
+mkip5pl6: bbmarker;
+
+savebeta, label=r5ip5pl6, place=mkip5pl6;
+
+mkip5pl7: bbmarker;
+
+savebeta, label=r5ip5pl7, place=mkip5pl7;
+
+mkip5pl8: bbmarker;
+
+savebeta, label=r5ip5pl8, place=mkip5pl8;
+
+mkip5pl9: bbmarker;
+
+savebeta, label=r5ip5pl9, place=mkip5pl9;
+
+mkip5pl10: bbmarker;
+
+savebeta, label=r5ip5pl10, place=mkip5pl10;
+
+mkip5pl11: bbmarker;
+
+savebeta, label=r5ip5pl11, place=mkip5pl11;
+
+mkip5pl12: bbmarker;
+
+savebeta, label=r5ip5pl12, place=mkip5pl12;
+
+mkip5pl13: bbmarker;
+
+savebeta, label=r5ip5pl13, place=mkip5pl13;
+
+mkip5pl14: bbmarker;
+
+savebeta, label=r5ip5pl14, place=mkip5pl14;
+
+mkip5pl15: bbmarker;
+
+savebeta, label=r5ip5pl15, place=mkip5pl15;
+
+mkip5pr1: bbmarker;
+
+savebeta, label=r5ip5pr1, place=mkip5pr1;
+
+mkip5pr2: bbmarker;
+
+savebeta, label=r5ip5pr2, place=mkip5pr2;
+
+mkip5pr3: bbmarker;
+
+savebeta, label=r5ip5pr3, place=mkip5pr3;
+
+mkip5pr4: bbmarker;
+
+savebeta, label=r5ip5pr4, place=mkip5pr4;
+
+mkip5pr5: bbmarker;
+
+savebeta, label=r5ip5pr5, place=mkip5pr5;
+
+mkip5pr6: bbmarker;
+
+savebeta, label=r5ip5pr6, place=mkip5pr6;
+
+mkip5pr7: bbmarker;
+
+savebeta, label=r5ip5pr7, place=mkip5pr7;
+
+mkip5pr8: bbmarker;
+
+savebeta, label=r5ip5pr8, place=mkip5pr8;
+
+mkip5pr9: bbmarker;
+
+savebeta, label=r5ip5pr9, place=mkip5pr9;
+
+mkip5pr10: bbmarker;
+
+savebeta, label=r5ip5pr10, place=mkip5pr10;
+
+mkip5pr11: bbmarker;
+
+savebeta, label=r5ip5pr11, place=mkip5pr11;
+
+mkip5pr12: bbmarker;
+
+savebeta, label=r5ip5pr12, place=mkip5pr12;
+
+mkip5pr13: bbmarker;
+
+savebeta, label=r5ip5pr13, place=mkip5pr13;
+
+mkip5pr14: bbmarker;
+
+savebeta, label=r5ip5pr14, place=mkip5pr14;
+
+mkip5pr15: bbmarker;
+
+savebeta, label=r5ip5pr15, place=mkip5pr15;
+
+install, element= mkip1l2, at=-long_b, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1l1, at=-long_a, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1,   at=1.e-9,   from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1r1, at=+long_a, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1r2, at=+long_b, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl1, at=-1*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl2, at=-2*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl3, at=-3*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl4, at=-4*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl5, at=-5*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl6, at=-6*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl7, at=-7*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl8, at=-8*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl9, at=-9*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl10, at=-10*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl11, at=-11*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl12, at=-12*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl13, at=-13*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl14, at=-14*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pl15, at=-15*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr1, at=1*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr2, at=2*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr3, at=3*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr4, at=4*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr5, at=5*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr6, at=6*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr7, at=7*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr8, at=8*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr9, at=9*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr10, at=10*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr11, at=11*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr12, at=12*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr13, at=13*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr14, at=14*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip1pr15, at=15*b_h_dist, from=ip1;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5l2, at=-long_b, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5l1, at=-long_a, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5,   at=1.e-9,   from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5r1, at=+long_a, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5r2, at=+long_b, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl1, at=-1*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl2, at=-2*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl3, at=-3*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl4, at=-4*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl5, at=-5*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl6, at=-6*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl7, at=-7*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl8, at=-8*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl9, at=-9*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl10, at=-10*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl11, at=-11*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl12, at=-12*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl13, at=-13*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl14, at=-14*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pl15, at=-15*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr1, at=1*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr2, at=2*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr3, at=3*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr4, at=4*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr5, at=5*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr6, at=6*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr7, at=7*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr8, at=8*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr9, at=9*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr10, at=10*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr11, at=11*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr12, at=12*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr13, at=13*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr14, at=14*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
+
+++++++ warning: seqedit command outside edit ignored
+bbip1l2: beambeam, sigx=sqrt(r1ip1l2->betx*epsx),
+
+          sigy=sqrt(r1ip1l2->bety*epsy),
+
+          xma=r1ip1l2->x,yma=r1ip1l2->y,
+
+          charge:=on_ho1;
+
+bbip1l1: beambeam, sigx=sqrt(r1ip1l1->betx*epsx),
+
+          sigy=sqrt(r1ip1l1->bety*epsy),
+
+          xma=r1ip1l1->x,yma=r1ip1l1->y,
+
+          charge:=on_ho1;
+
+bbip1:   beambeam, sigx=sqrt(r1ip1->betx*epsx),
+
+          sigy=sqrt(r1ip1->bety*epsy),
+
+          xma=r1ip1->x,yma=r1ip1->y,
+
+          charge:=on_ho1;
+
+bbip1r1: beambeam, sigx=sqrt(r1ip1r1->betx*epsx),
+
+          sigy=sqrt(r1ip1r1->bety*epsy),
+
+          xma=r1ip1r1->x,yma=r1ip1r1->y,
+
+          charge:=on_ho1;
+
+bbip1r2: beambeam, sigx=sqrt(r1ip1r2->betx*epsx),
+
+          sigy=sqrt(r1ip1r2->bety*epsy),
+
+          xma=r1ip1r2->x,yma=r1ip1r2->y,
+
+          charge:=on_ho1;
+
+bbip1pl1: beambeam, sigx=sqrt(r1ip1pl1->betx*epsx),
+
+          sigy=sqrt(r1ip1pl1->bety*epsy),
+
+          xma=r1ip1pl1->x,yma=r1ip1pl1->y,
+
+          charge:=on_lr1l;
+
+bbip1pl2: beambeam, sigx=sqrt(r1ip1pl2->betx*epsx),
+
+          sigy=sqrt(r1ip1pl2->bety*epsy),
+
+          xma=r1ip1pl2->x,yma=r1ip1pl2->y,
+
+          charge:=on_lr1l;
+
+bbip1pl3: beambeam, sigx=sqrt(r1ip1pl3->betx*epsx),
+
+          sigy=sqrt(r1ip1pl3->bety*epsy),
+
+          xma=r1ip1pl3->x,yma=r1ip1pl3->y,
+
+          charge:=on_lr1l;
+
+bbip1pl4: beambeam, sigx=sqrt(r1ip1pl4->betx*epsx),
+
+          sigy=sqrt(r1ip1pl4->bety*epsy),
+
+          xma=r1ip1pl4->x,yma=r1ip1pl4->y,
+
+          charge:=on_lr1l;
+
+bbip1pl5: beambeam, sigx=sqrt(r1ip1pl5->betx*epsx),
+
+          sigy=sqrt(r1ip1pl5->bety*epsy),
+
+          xma=r1ip1pl5->x,yma=r1ip1pl5->y,
+
+          charge:=on_lr1l;
+
+bbip1pl6: beambeam, sigx=sqrt(r1ip1pl6->betx*epsx),
+
+          sigy=sqrt(r1ip1pl6->bety*epsy),
+
+          xma=r1ip1pl6->x,yma=r1ip1pl6->y,
+
+          charge:=on_lr1l;
+
+bbip1pl7: beambeam, sigx=sqrt(r1ip1pl7->betx*epsx),
+
+          sigy=sqrt(r1ip1pl7->bety*epsy),
+
+          xma=r1ip1pl7->x,yma=r1ip1pl7->y,
+
+          charge:=on_lr1l;
+
+bbip1pl8: beambeam, sigx=sqrt(r1ip1pl8->betx*epsx),
+
+          sigy=sqrt(r1ip1pl8->bety*epsy),
+
+          xma=r1ip1pl8->x,yma=r1ip1pl8->y,
+
+          charge:=on_lr1l;
+
+bbip1pl9: beambeam, sigx=sqrt(r1ip1pl9->betx*epsx),
+
+          sigy=sqrt(r1ip1pl9->bety*epsy),
+
+          xma=r1ip1pl9->x,yma=r1ip1pl9->y,
+
+          charge:=on_lr1l;
+
+bbip1pl10: beambeam, sigx=sqrt(r1ip1pl10->betx*epsx),
+
+          sigy=sqrt(r1ip1pl10->bety*epsy),
+
+          xma=r1ip1pl10->x,yma=r1ip1pl10->y,
+
+          charge:=on_lr1l;
+
+bbip1pl11: beambeam, sigx=sqrt(r1ip1pl11->betx*epsx),
+
+          sigy=sqrt(r1ip1pl11->bety*epsy),
+
+          xma=r1ip1pl11->x,yma=r1ip1pl11->y,
+
+          charge:=on_lr1l;
+
+bbip1pl12: beambeam, sigx=sqrt(r1ip1pl12->betx*epsx),
+
+          sigy=sqrt(r1ip1pl12->bety*epsy),
+
+          xma=r1ip1pl12->x,yma=r1ip1pl12->y,
+
+          charge:=on_lr1l;
+
+bbip1pl13: beambeam, sigx=sqrt(r1ip1pl13->betx*epsx),
+
+          sigy=sqrt(r1ip1pl13->bety*epsy),
+
+          xma=r1ip1pl13->x,yma=r1ip1pl13->y,
+
+          charge:=on_lr1l;
+
+bbip1pl14: beambeam, sigx=sqrt(r1ip1pl14->betx*epsx),
+
+          sigy=sqrt(r1ip1pl14->bety*epsy),
+
+          xma=r1ip1pl14->x,yma=r1ip1pl14->y,
+
+          charge:=on_lr1l;
+
+bbip1pl15: beambeam, sigx=sqrt(r1ip1pl15->betx*epsx),
+
+          sigy=sqrt(r1ip1pl15->bety*epsy),
+
+          xma=r1ip1pl15->x,yma=r1ip1pl15->y,
+
+          charge:=on_lr1l;
+
+bbip1pr1: beambeam, sigx=sqrt(r1ip1pr1->betx*epsx),
+
+          sigy=sqrt(r1ip1pr1->bety*epsy),
+
+          xma=r1ip1pr1->x,yma=r1ip1pr1->y,
+
+          charge:=on_lr1r;
+
+bbip1pr2: beambeam, sigx=sqrt(r1ip1pr2->betx*epsx),
+
+          sigy=sqrt(r1ip1pr2->bety*epsy),
+
+          xma=r1ip1pr2->x,yma=r1ip1pr2->y,
+
+          charge:=on_lr1r;
+
+bbip1pr3: beambeam, sigx=sqrt(r1ip1pr3->betx*epsx),
+
+          sigy=sqrt(r1ip1pr3->bety*epsy),
+
+          xma=r1ip1pr3->x,yma=r1ip1pr3->y,
+
+          charge:=on_lr1r;
+
+bbip1pr4: beambeam, sigx=sqrt(r1ip1pr4->betx*epsx),
+
+          sigy=sqrt(r1ip1pr4->bety*epsy),
+
+          xma=r1ip1pr4->x,yma=r1ip1pr4->y,
+
+          charge:=on_lr1r;
+
+bbip1pr5: beambeam, sigx=sqrt(r1ip1pr5->betx*epsx),
+
+          sigy=sqrt(r1ip1pr5->bety*epsy),
+
+          xma=r1ip1pr5->x,yma=r1ip1pr5->y,
+
+          charge:=on_lr1r;
+
+bbip1pr6: beambeam, sigx=sqrt(r1ip1pr6->betx*epsx),
+
+          sigy=sqrt(r1ip1pr6->bety*epsy),
+
+          xma=r1ip1pr6->x,yma=r1ip1pr6->y,
+
+          charge:=on_lr1r;
+
+bbip1pr7: beambeam, sigx=sqrt(r1ip1pr7->betx*epsx),
+
+          sigy=sqrt(r1ip1pr7->bety*epsy),
+
+          xma=r1ip1pr7->x,yma=r1ip1pr7->y,
+
+          charge:=on_lr1r;
+
+bbip1pr8: beambeam, sigx=sqrt(r1ip1pr8->betx*epsx),
+
+          sigy=sqrt(r1ip1pr8->bety*epsy),
+
+          xma=r1ip1pr8->x,yma=r1ip1pr8->y,
+
+          charge:=on_lr1r;
+
+bbip1pr9: beambeam, sigx=sqrt(r1ip1pr9->betx*epsx),
+
+          sigy=sqrt(r1ip1pr9->bety*epsy),
+
+          xma=r1ip1pr9->x,yma=r1ip1pr9->y,
+
+          charge:=on_lr1r;
+
+bbip1pr10: beambeam, sigx=sqrt(r1ip1pr10->betx*epsx),
+
+          sigy=sqrt(r1ip1pr10->bety*epsy),
+
+          xma=r1ip1pr10->x,yma=r1ip1pr10->y,
+
+          charge:=on_lr1r;
+
+bbip1pr11: beambeam, sigx=sqrt(r1ip1pr11->betx*epsx),
+
+          sigy=sqrt(r1ip1pr11->bety*epsy),
+
+          xma=r1ip1pr11->x,yma=r1ip1pr11->y,
+
+          charge:=on_lr1r;
+
+bbip1pr12: beambeam, sigx=sqrt(r1ip1pr12->betx*epsx),
+
+          sigy=sqrt(r1ip1pr12->bety*epsy),
+
+          xma=r1ip1pr12->x,yma=r1ip1pr12->y,
+
+          charge:=on_lr1r;
+
+bbip1pr13: beambeam, sigx=sqrt(r1ip1pr13->betx*epsx),
+
+          sigy=sqrt(r1ip1pr13->bety*epsy),
+
+          xma=r1ip1pr13->x,yma=r1ip1pr13->y,
+
+          charge:=on_lr1r;
+
+bbip1pr14: beambeam, sigx=sqrt(r1ip1pr14->betx*epsx),
+
+          sigy=sqrt(r1ip1pr14->bety*epsy),
+
+          xma=r1ip1pr14->x,yma=r1ip1pr14->y,
+
+          charge:=on_lr1r;
+
+bbip1pr15: beambeam, sigx=sqrt(r1ip1pr15->betx*epsx),
+
+          sigy=sqrt(r1ip1pr15->bety*epsy),
+
+          xma=r1ip1pr15->x,yma=r1ip1pr15->y,
+
+          charge:=on_lr1r;
+
+bbip5l2: beambeam, sigx=sqrt(r5ip5l2->betx*epsx),
+
+          sigy=sqrt(r5ip5l2->bety*epsy),
+
+          xma=r5ip5l2->x,yma=r5ip5l2->y,
+
+          charge:=on_ho5;
+
+bbip5l1: beambeam, sigx=sqrt(r5ip5l1->betx*epsx),
+
+          sigy=sqrt(r5ip5l1->bety*epsy),
+
+          xma=r5ip5l1->x,yma=r5ip5l1->y,
+
+          charge:=on_ho5;
+
+bbip5:   beambeam, sigx=sqrt(r5ip5->betx*epsx),
+
+          sigy=sqrt(r5ip5->bety*epsy),
+
+          xma=r5ip5->x,yma=r5ip5->y,
+
+          charge:=on_ho5;
+
+bbip5r1: beambeam, sigx=sqrt(r5ip5r1->betx*epsx),
+
+          sigy=sqrt(r5ip5r1->bety*epsy),
+
+          xma=r5ip5r1->x,yma=r5ip5r1->y,
+
+          charge:=on_ho5;
+
+bbip5r2: beambeam, sigx=sqrt(r5ip5r2->betx*epsx),
+
+          sigy=sqrt(r5ip5r2->bety*epsy),
+
+          xma=r5ip5r2->x,yma=r5ip5r2->y,
+
+          charge:=on_ho5;
+
+bbip5pl1: beambeam, sigx=sqrt(r5ip5pl1->betx*epsx),
+
+          sigy=sqrt(r5ip5pl1->bety*epsy),
+
+          xma=r5ip5pl1->x,yma=r5ip5pl1->y,
+
+          charge:=on_lr5l;
+
+bbip5pl2: beambeam, sigx=sqrt(r5ip5pl2->betx*epsx),
+
+          sigy=sqrt(r5ip5pl2->bety*epsy),
+
+          xma=r5ip5pl2->x,yma=r5ip5pl2->y,
+
+          charge:=on_lr5l;
+
+bbip5pl3: beambeam, sigx=sqrt(r5ip5pl3->betx*epsx),
+
+          sigy=sqrt(r5ip5pl3->bety*epsy),
+
+          xma=r5ip5pl3->x,yma=r5ip5pl3->y,
+
+          charge:=on_lr5l;
+
+bbip5pl4: beambeam, sigx=sqrt(r5ip5pl4->betx*epsx),
+
+          sigy=sqrt(r5ip5pl4->bety*epsy),
+
+          xma=r5ip5pl4->x,yma=r5ip5pl4->y,
+
+          charge:=on_lr5l;
+
+bbip5pl5: beambeam, sigx=sqrt(r5ip5pl5->betx*epsx),
+
+          sigy=sqrt(r5ip5pl5->bety*epsy),
+
+          xma=r5ip5pl5->x,yma=r5ip5pl5->y,
+
+          charge:=on_lr5l;
+
+bbip5pl6: beambeam, sigx=sqrt(r5ip5pl6->betx*epsx),
+
+          sigy=sqrt(r5ip5pl6->bety*epsy),
+
+          xma=r5ip5pl6->x,yma=r5ip5pl6->y,
+
+          charge:=on_lr5l;
+
+bbip5pl7: beambeam, sigx=sqrt(r5ip5pl7->betx*epsx),
+
+          sigy=sqrt(r5ip5pl7->bety*epsy),
+
+          xma=r5ip5pl7->x,yma=r5ip5pl7->y,
+
+          charge:=on_lr5l;
+
+bbip5pl8: beambeam, sigx=sqrt(r5ip5pl8->betx*epsx),
+
+          sigy=sqrt(r5ip5pl8->bety*epsy),
+
+          xma=r5ip5pl8->x,yma=r5ip5pl8->y,
+
+          charge:=on_lr5l;
+
+bbip5pl9: beambeam, sigx=sqrt(r5ip5pl9->betx*epsx),
+
+          sigy=sqrt(r5ip5pl9->bety*epsy),
+
+          xma=r5ip5pl9->x,yma=r5ip5pl9->y,
+
+          charge:=on_lr5l;
+
+bbip5pl10: beambeam, sigx=sqrt(r5ip5pl10->betx*epsx),
+
+          sigy=sqrt(r5ip5pl10->bety*epsy),
+
+          xma=r5ip5pl10->x,yma=r5ip5pl10->y,
+
+          charge:=on_lr5l;
+
+bbip5pl11: beambeam, sigx=sqrt(r5ip5pl11->betx*epsx),
+
+          sigy=sqrt(r5ip5pl11->bety*epsy),
+
+          xma=r5ip5pl11->x,yma=r5ip5pl11->y,
+
+          charge:=on_lr5l;
+
+bbip5pl12: beambeam, sigx=sqrt(r5ip5pl12->betx*epsx),
+
+          sigy=sqrt(r5ip5pl12->bety*epsy),
+
+          xma=r5ip5pl12->x,yma=r5ip5pl12->y,
+
+          charge:=on_lr5l;
+
+bbip5pl13: beambeam, sigx=sqrt(r5ip5pl13->betx*epsx),
+
+          sigy=sqrt(r5ip5pl13->bety*epsy),
+
+          xma=r5ip5pl13->x,yma=r5ip5pl13->y,
+
+          charge:=on_lr5l;
+
+bbip5pl14: beambeam, sigx=sqrt(r5ip5pl14->betx*epsx),
+
+          sigy=sqrt(r5ip5pl14->bety*epsy),
+
+          xma=r5ip5pl14->x,yma=r5ip5pl14->y,
+
+          charge:=on_lr5l;
+
+bbip5pl15: beambeam, sigx=sqrt(r5ip5pl15->betx*epsx),
+
+          sigy=sqrt(r5ip5pl15->bety*epsy),
+
+          xma=r5ip5pl15->x,yma=r5ip5pl15->y,
+
+          charge:=on_lr5l;
+
+bbip5pr1: beambeam, sigx=sqrt(r5ip5pr1->betx*epsx),
+
+          sigy=sqrt(r5ip5pr1->bety*epsy),
+
+          xma=r5ip5pr1->x,yma=r5ip5pr1->y,
+
+          charge:=on_lr5r;
+
+bbip5pr2: beambeam, sigx=sqrt(r5ip5pr2->betx*epsx),
+
+          sigy=sqrt(r5ip5pr2->bety*epsy),
+
+          xma=r5ip5pr2->x,yma=r5ip5pr2->y,
+
+          charge:=on_lr5r;
+
+bbip5pr3: beambeam, sigx=sqrt(r5ip5pr3->betx*epsx),
+
+          sigy=sqrt(r5ip5pr3->bety*epsy),
+
+          xma=r5ip5pr3->x,yma=r5ip5pr3->y,
+
+          charge:=on_lr5r;
+
+bbip5pr4: beambeam, sigx=sqrt(r5ip5pr4->betx*epsx),
+
+          sigy=sqrt(r5ip5pr4->bety*epsy),
+
+          xma=r5ip5pr4->x,yma=r5ip5pr4->y,
+
+          charge:=on_lr5r;
+
+bbip5pr5: beambeam, sigx=sqrt(r5ip5pr5->betx*epsx),
+
+          sigy=sqrt(r5ip5pr5->bety*epsy),
+
+          xma=r5ip5pr5->x,yma=r5ip5pr5->y,
+
+          charge:=on_lr5r;
+
+bbip5pr6: beambeam, sigx=sqrt(r5ip5pr6->betx*epsx),
+
+          sigy=sqrt(r5ip5pr6->bety*epsy),
+
+          xma=r5ip5pr6->x,yma=r5ip5pr6->y,
+
+          charge:=on_lr5r;
+
+bbip5pr7: beambeam, sigx=sqrt(r5ip5pr7->betx*epsx),
+
+          sigy=sqrt(r5ip5pr7->bety*epsy),
+
+          xma=r5ip5pr7->x,yma=r5ip5pr7->y,
+
+          charge:=on_lr5r;
+
+bbip5pr8: beambeam, sigx=sqrt(r5ip5pr8->betx*epsx),
+
+          sigy=sqrt(r5ip5pr8->bety*epsy),
+
+          xma=r5ip5pr8->x,yma=r5ip5pr8->y,
+
+          charge:=on_lr5r;
+
+bbip5pr9: beambeam, sigx=sqrt(r5ip5pr9->betx*epsx),
+
+          sigy=sqrt(r5ip5pr9->bety*epsy),
+
+          xma=r5ip5pr9->x,yma=r5ip5pr9->y,
+
+          charge:=on_lr5r;
+
+bbip5pr10: beambeam, sigx=sqrt(r5ip5pr10->betx*epsx),
+
+          sigy=sqrt(r5ip5pr10->bety*epsy),
+
+          xma=r5ip5pr10->x,yma=r5ip5pr10->y,
+
+          charge:=on_lr5r;
+
+bbip5pr11: beambeam, sigx=sqrt(r5ip5pr11->betx*epsx),
+
+          sigy=sqrt(r5ip5pr11->bety*epsy),
+
+          xma=r5ip5pr11->x,yma=r5ip5pr11->y,
+
+          charge:=on_lr5r;
+
+bbip5pr12: beambeam, sigx=sqrt(r5ip5pr12->betx*epsx),
+
+          sigy=sqrt(r5ip5pr12->bety*epsy),
+
+          xma=r5ip5pr12->x,yma=r5ip5pr12->y,
+
+          charge:=on_lr5r;
+
+bbip5pr13: beambeam, sigx=sqrt(r5ip5pr13->betx*epsx),
+
+          sigy=sqrt(r5ip5pr13->bety*epsy),
+
+          xma=r5ip5pr13->x,yma=r5ip5pr13->y,
+
+          charge:=on_lr5r;
+
+bbip5pr14: beambeam, sigx=sqrt(r5ip5pr14->betx*epsx),
+
+          sigy=sqrt(r5ip5pr14->bety*epsy),
+
+          xma=r5ip5pr14->x,yma=r5ip5pr14->y,
+
+          charge:=on_lr5r;
+
+bbip5pr15: beambeam, sigx=sqrt(r5ip5pr15->betx*epsx),
+
+          sigy=sqrt(r5ip5pr15->bety*epsy),
+
+          xma=r5ip5pr15->x,yma=r5ip5pr15->y,
+
+          charge:=on_lr5r;
+
+!system, "rm temp.bb.install";
+
+!
+
+!===========================================================
+
+!   install bb elements
+
+assign,echo=temp.bb.install;
+
+!--- ip1
+
+if (on_ho1 <> 0)
+
+{
+
+exec, inho(bb,1);
+
+}
+
+if (on_lr1l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, inl(bb,1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr1r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_1)
+
+  {
+
+   exec, inr(bb,1,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip5
+
+if (on_ho5 <> 0)
+
+{
+
+exec, inho(bb,5);
+
+}
+
+if (on_lr5l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, inl(bb,5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr5r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_5)
+
+  {
+
+   exec, inr(bb,5,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip2
+
+if (on_ho2 <> 0)
+
+{
+
+exec, inho(bb,2);
+
+}
+
+if (on_lr2l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, inl(bb,2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr2r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_2)
+
+  {
+
+   exec, inr(bb,2,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+!--- ip8
+
+if (on_ho8 <> 0)
+
+{
+
+exec, inho(bb,8);
+
+}
+
+if (on_lr8l <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, inl(bb,8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+if (on_lr8r <> 0)
+
+{
+
+  n=1; ! counter
+
+  while (n < npara_8)
+
+  {
+
+   exec, inr(bb,8,$n);
+
+   n=n+1;
+
+  };
+
+}
+
+assign,echo=terminal;
+
+select,flag=seqedit,class=bbmarker;
+
+seqedit,sequence=lhcb2;
+
+remove,element=selected;
+
+endedit;
+
+select,flag=seqedit,clear;
+
+
+
+seqedit,sequence=lhcb1;
+
+call,file=temp.bb.install;
+
+mkip1l2: bbmarker;
+
+mkip1l1: bbmarker;
+
+mkip1:   bbmarker;
+
+mkip1r1: bbmarker;
+
+mkip1r2: bbmarker;
+
+savebeta, label=r1ip1l2, place=mkip1l2;
+
+savebeta, label=r1ip1l1, place=mkip1l1;
+
+savebeta, label=r1ip1,   place=mkip1;
+
+savebeta, label=r1ip1r1, place=mkip1r1;
+
+savebeta, label=r1ip1r2, place=mkip1r2;
+
+mkip1pl1: bbmarker;
+
+savebeta, label=r1ip1pl1, place=mkip1pl1;
+
+mkip1pl2: bbmarker;
+
+savebeta, label=r1ip1pl2, place=mkip1pl2;
+
+mkip1pl3: bbmarker;
+
+savebeta, label=r1ip1pl3, place=mkip1pl3;
+
+mkip1pl4: bbmarker;
+
+savebeta, label=r1ip1pl4, place=mkip1pl4;
+
+mkip1pl5: bbmarker;
+
+savebeta, label=r1ip1pl5, place=mkip1pl5;
+
+mkip1pl6: bbmarker;
+
+savebeta, label=r1ip1pl6, place=mkip1pl6;
+
+mkip1pl7: bbmarker;
+
+savebeta, label=r1ip1pl7, place=mkip1pl7;
+
+mkip1pl8: bbmarker;
+
+savebeta, label=r1ip1pl8, place=mkip1pl8;
+
+mkip1pl9: bbmarker;
+
+savebeta, label=r1ip1pl9, place=mkip1pl9;
+
+mkip1pl10: bbmarker;
+
+savebeta, label=r1ip1pl10, place=mkip1pl10;
+
+mkip1pl11: bbmarker;
+
+savebeta, label=r1ip1pl11, place=mkip1pl11;
+
+mkip1pl12: bbmarker;
+
+savebeta, label=r1ip1pl12, place=mkip1pl12;
+
+mkip1pl13: bbmarker;
+
+savebeta, label=r1ip1pl13, place=mkip1pl13;
+
+mkip1pl14: bbmarker;
+
+savebeta, label=r1ip1pl14, place=mkip1pl14;
+
+mkip1pl15: bbmarker;
+
+savebeta, label=r1ip1pl15, place=mkip1pl15;
+
+mkip1pr1: bbmarker;
+
+savebeta, label=r1ip1pr1, place=mkip1pr1;
+
+mkip1pr2: bbmarker;
+
+savebeta, label=r1ip1pr2, place=mkip1pr2;
+
+mkip1pr3: bbmarker;
+
+savebeta, label=r1ip1pr3, place=mkip1pr3;
+
+mkip1pr4: bbmarker;
+
+savebeta, label=r1ip1pr4, place=mkip1pr4;
+
+mkip1pr5: bbmarker;
+
+savebeta, label=r1ip1pr5, place=mkip1pr5;
+
+mkip1pr6: bbmarker;
+
+savebeta, label=r1ip1pr6, place=mkip1pr6;
+
+mkip1pr7: bbmarker;
+
+savebeta, label=r1ip1pr7, place=mkip1pr7;
+
+mkip1pr8: bbmarker;
+
+savebeta, label=r1ip1pr8, place=mkip1pr8;
+
+mkip1pr9: bbmarker;
+
+savebeta, label=r1ip1pr9, place=mkip1pr9;
+
+mkip1pr10: bbmarker;
+
+savebeta, label=r1ip1pr10, place=mkip1pr10;
+
+mkip1pr11: bbmarker;
+
+savebeta, label=r1ip1pr11, place=mkip1pr11;
+
+mkip1pr12: bbmarker;
+
+savebeta, label=r1ip1pr12, place=mkip1pr12;
+
+mkip1pr13: bbmarker;
+
+savebeta, label=r1ip1pr13, place=mkip1pr13;
+
+mkip1pr14: bbmarker;
+
+savebeta, label=r1ip1pr14, place=mkip1pr14;
+
+mkip1pr15: bbmarker;
+
+savebeta, label=r1ip1pr15, place=mkip1pr15;
+
+mkip5l2: bbmarker;
+
+mkip5l1: bbmarker;
+
+mkip5:   bbmarker;
+
+mkip5r1: bbmarker;
+
+mkip5r2: bbmarker;
+
+savebeta, label=r5ip5l2, place=mkip5l2;
+
+savebeta, label=r5ip5l1, place=mkip5l1;
+
+savebeta, label=r5ip5,   place=mkip5;
+
+savebeta, label=r5ip5r1, place=mkip5r1;
+
+savebeta, label=r5ip5r2, place=mkip5r2;
+
+mkip5pl1: bbmarker;
+
+savebeta, label=r5ip5pl1, place=mkip5pl1;
+
+mkip5pl2: bbmarker;
+
+savebeta, label=r5ip5pl2, place=mkip5pl2;
+
+mkip5pl3: bbmarker;
+
+savebeta, label=r5ip5pl3, place=mkip5pl3;
+
+mkip5pl4: bbmarker;
+
+savebeta, label=r5ip5pl4, place=mkip5pl4;
+
+mkip5pl5: bbmarker;
+
+savebeta, label=r5ip5pl5, place=mkip5pl5;
+
+mkip5pl6: bbmarker;
+
+savebeta, label=r5ip5pl6, place=mkip5pl6;
+
+mkip5pl7: bbmarker;
+
+savebeta, label=r5ip5pl7, place=mkip5pl7;
+
+mkip5pl8: bbmarker;
+
+savebeta, label=r5ip5pl8, place=mkip5pl8;
+
+mkip5pl9: bbmarker;
+
+savebeta, label=r5ip5pl9, place=mkip5pl9;
+
+mkip5pl10: bbmarker;
+
+savebeta, label=r5ip5pl10, place=mkip5pl10;
+
+mkip5pl11: bbmarker;
+
+savebeta, label=r5ip5pl11, place=mkip5pl11;
+
+mkip5pl12: bbmarker;
+
+savebeta, label=r5ip5pl12, place=mkip5pl12;
+
+mkip5pl13: bbmarker;
+
+savebeta, label=r5ip5pl13, place=mkip5pl13;
+
+mkip5pl14: bbmarker;
+
+savebeta, label=r5ip5pl14, place=mkip5pl14;
+
+mkip5pl15: bbmarker;
+
+savebeta, label=r5ip5pl15, place=mkip5pl15;
+
+mkip5pr1: bbmarker;
+
+savebeta, label=r5ip5pr1, place=mkip5pr1;
+
+mkip5pr2: bbmarker;
+
+savebeta, label=r5ip5pr2, place=mkip5pr2;
+
+mkip5pr3: bbmarker;
+
+savebeta, label=r5ip5pr3, place=mkip5pr3;
+
+mkip5pr4: bbmarker;
+
+savebeta, label=r5ip5pr4, place=mkip5pr4;
+
+mkip5pr5: bbmarker;
+
+savebeta, label=r5ip5pr5, place=mkip5pr5;
+
+mkip5pr6: bbmarker;
+
+savebeta, label=r5ip5pr6, place=mkip5pr6;
+
+mkip5pr7: bbmarker;
+
+savebeta, label=r5ip5pr7, place=mkip5pr7;
+
+mkip5pr8: bbmarker;
+
+savebeta, label=r5ip5pr8, place=mkip5pr8;
+
+mkip5pr9: bbmarker;
+
+savebeta, label=r5ip5pr9, place=mkip5pr9;
+
+mkip5pr10: bbmarker;
+
+savebeta, label=r5ip5pr10, place=mkip5pr10;
+
+mkip5pr11: bbmarker;
+
+savebeta, label=r5ip5pr11, place=mkip5pr11;
+
+mkip5pr12: bbmarker;
+
+savebeta, label=r5ip5pr12, place=mkip5pr12;
+
+mkip5pr13: bbmarker;
+
+savebeta, label=r5ip5pr13, place=mkip5pr13;
+
+mkip5pr14: bbmarker;
+
+savebeta, label=r5ip5pr14, place=mkip5pr14;
+
+mkip5pr15: bbmarker;
+
+savebeta, label=r5ip5pr15, place=mkip5pr15;
+
+install, element= mkip1l2, at=-long_b, from=ip1;
+
+install, element= mkip1l1, at=-long_a, from=ip1;
+
+install, element= mkip1,   at=1.e-9,   from=ip1;
+
+install, element= mkip1r1, at=+long_a, from=ip1;
+
+install, element= mkip1r2, at=+long_b, from=ip1;
+
+install, element= mkip1pl1, at=-1*b_h_dist, from=ip1;
+
+install, element= mkip1pl2, at=-2*b_h_dist, from=ip1;
+
+install, element= mkip1pl3, at=-3*b_h_dist, from=ip1;
+
+install, element= mkip1pl4, at=-4*b_h_dist, from=ip1;
+
+install, element= mkip1pl5, at=-5*b_h_dist, from=ip1;
+
+install, element= mkip1pl6, at=-6*b_h_dist, from=ip1;
+
+install, element= mkip1pl7, at=-7*b_h_dist, from=ip1;
+
+install, element= mkip1pl8, at=-8*b_h_dist, from=ip1;
+
+install, element= mkip1pl9, at=-9*b_h_dist, from=ip1;
+
+install, element= mkip1pl10, at=-10*b_h_dist, from=ip1;
+
+install, element= mkip1pl11, at=-11*b_h_dist, from=ip1;
+
+install, element= mkip1pl12, at=-12*b_h_dist, from=ip1;
+
+install, element= mkip1pl13, at=-13*b_h_dist, from=ip1;
+
+install, element= mkip1pl14, at=-14*b_h_dist, from=ip1;
+
+install, element= mkip1pl15, at=-15*b_h_dist, from=ip1;
+
+install, element= mkip1pr1, at=1*b_h_dist, from=ip1;
+
+install, element= mkip1pr2, at=2*b_h_dist, from=ip1;
+
+install, element= mkip1pr3, at=3*b_h_dist, from=ip1;
+
+install, element= mkip1pr4, at=4*b_h_dist, from=ip1;
+
+install, element= mkip1pr5, at=5*b_h_dist, from=ip1;
+
+install, element= mkip1pr6, at=6*b_h_dist, from=ip1;
+
+install, element= mkip1pr7, at=7*b_h_dist, from=ip1;
+
+install, element= mkip1pr8, at=8*b_h_dist, from=ip1;
+
+install, element= mkip1pr9, at=9*b_h_dist, from=ip1;
+
+install, element= mkip1pr10, at=10*b_h_dist, from=ip1;
+
+install, element= mkip1pr11, at=11*b_h_dist, from=ip1;
+
+install, element= mkip1pr12, at=12*b_h_dist, from=ip1;
+
+install, element= mkip1pr13, at=13*b_h_dist, from=ip1;
+
+install, element= mkip1pr14, at=14*b_h_dist, from=ip1;
+
+install, element= mkip1pr15, at=15*b_h_dist, from=ip1;
+
+install, element= mkip5l2, at=-long_b, from=ip5;
+
+install, element= mkip5l1, at=-long_a, from=ip5;
+
+install, element= mkip5,   at=1.e-9,   from=ip5;
+
+install, element= mkip5r1, at=+long_a, from=ip5;
+
+install, element= mkip5r2, at=+long_b, from=ip5;
+
+install, element= mkip5pl1, at=-1*b_h_dist, from=ip5;
+
+install, element= mkip5pl2, at=-2*b_h_dist, from=ip5;
+
+install, element= mkip5pl3, at=-3*b_h_dist, from=ip5;
+
+install, element= mkip5pl4, at=-4*b_h_dist, from=ip5;
+
+install, element= mkip5pl5, at=-5*b_h_dist, from=ip5;
+
+install, element= mkip5pl6, at=-6*b_h_dist, from=ip5;
+
+install, element= mkip5pl7, at=-7*b_h_dist, from=ip5;
+
+install, element= mkip5pl8, at=-8*b_h_dist, from=ip5;
+
+install, element= mkip5pl9, at=-9*b_h_dist, from=ip5;
+
+install, element= mkip5pl10, at=-10*b_h_dist, from=ip5;
+
+install, element= mkip5pl11, at=-11*b_h_dist, from=ip5;
+
+install, element= mkip5pl12, at=-12*b_h_dist, from=ip5;
+
+install, element= mkip5pl13, at=-13*b_h_dist, from=ip5;
+
+install, element= mkip5pl14, at=-14*b_h_dist, from=ip5;
+
+install, element= mkip5pl15, at=-15*b_h_dist, from=ip5;
+
+install, element= mkip5pr1, at=1*b_h_dist, from=ip5;
+
+install, element= mkip5pr2, at=2*b_h_dist, from=ip5;
+
+install, element= mkip5pr3, at=3*b_h_dist, from=ip5;
+
+install, element= mkip5pr4, at=4*b_h_dist, from=ip5;
+
+install, element= mkip5pr5, at=5*b_h_dist, from=ip5;
+
+install, element= mkip5pr6, at=6*b_h_dist, from=ip5;
+
+install, element= mkip5pr7, at=7*b_h_dist, from=ip5;
+
+install, element= mkip5pr8, at=8*b_h_dist, from=ip5;
+
+install, element= mkip5pr9, at=9*b_h_dist, from=ip5;
+
+install, element= mkip5pr10, at=10*b_h_dist, from=ip5;
+
+install, element= mkip5pr11, at=11*b_h_dist, from=ip5;
+
+install, element= mkip5pr12, at=12*b_h_dist, from=ip5;
+
+install, element= mkip5pr13, at=13*b_h_dist, from=ip5;
+
+install, element= mkip5pr14, at=14*b_h_dist, from=ip5;
+
+install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
+
+bbip1l2: beambeam, sigx=sqrt(r1ip1l2->betx*epsx),
+
+          sigy=sqrt(r1ip1l2->bety*epsy),
+
+          xma=r1ip1l2->x,yma=r1ip1l2->y,
+
+          charge:=on_ho1;
+
+bbip1l1: beambeam, sigx=sqrt(r1ip1l1->betx*epsx),
+
+          sigy=sqrt(r1ip1l1->bety*epsy),
+
+          xma=r1ip1l1->x,yma=r1ip1l1->y,
+
+          charge:=on_ho1;
+
+bbip1:   beambeam, sigx=sqrt(r1ip1->betx*epsx),
+
+          sigy=sqrt(r1ip1->bety*epsy),
+
+          xma=r1ip1->x,yma=r1ip1->y,
+
+          charge:=on_ho1;
+
+bbip1r1: beambeam, sigx=sqrt(r1ip1r1->betx*epsx),
+
+          sigy=sqrt(r1ip1r1->bety*epsy),
+
+          xma=r1ip1r1->x,yma=r1ip1r1->y,
+
+          charge:=on_ho1;
+
+bbip1r2: beambeam, sigx=sqrt(r1ip1r2->betx*epsx),
+
+          sigy=sqrt(r1ip1r2->bety*epsy),
+
+          xma=r1ip1r2->x,yma=r1ip1r2->y,
+
+          charge:=on_ho1;
+
+bbip1pl1: beambeam, sigx=sqrt(r1ip1pl1->betx*epsx),
+
+          sigy=sqrt(r1ip1pl1->bety*epsy),
+
+          xma=r1ip1pl1->x,yma=r1ip1pl1->y,
+
+          charge:=on_lr1l;
+
+bbip1pl2: beambeam, sigx=sqrt(r1ip1pl2->betx*epsx),
+
+          sigy=sqrt(r1ip1pl2->bety*epsy),
+
+          xma=r1ip1pl2->x,yma=r1ip1pl2->y,
+
+          charge:=on_lr1l;
+
+bbip1pl3: beambeam, sigx=sqrt(r1ip1pl3->betx*epsx),
+
+          sigy=sqrt(r1ip1pl3->bety*epsy),
+
+          xma=r1ip1pl3->x,yma=r1ip1pl3->y,
+
+          charge:=on_lr1l;
+
+bbip1pl4: beambeam, sigx=sqrt(r1ip1pl4->betx*epsx),
+
+          sigy=sqrt(r1ip1pl4->bety*epsy),
+
+          xma=r1ip1pl4->x,yma=r1ip1pl4->y,
+
+          charge:=on_lr1l;
+
+bbip1pl5: beambeam, sigx=sqrt(r1ip1pl5->betx*epsx),
+
+          sigy=sqrt(r1ip1pl5->bety*epsy),
+
+          xma=r1ip1pl5->x,yma=r1ip1pl5->y,
+
+          charge:=on_lr1l;
+
+bbip1pl6: beambeam, sigx=sqrt(r1ip1pl6->betx*epsx),
+
+          sigy=sqrt(r1ip1pl6->bety*epsy),
+
+          xma=r1ip1pl6->x,yma=r1ip1pl6->y,
+
+          charge:=on_lr1l;
+
+bbip1pl7: beambeam, sigx=sqrt(r1ip1pl7->betx*epsx),
+
+          sigy=sqrt(r1ip1pl7->bety*epsy),
+
+          xma=r1ip1pl7->x,yma=r1ip1pl7->y,
+
+          charge:=on_lr1l;
+
+bbip1pl8: beambeam, sigx=sqrt(r1ip1pl8->betx*epsx),
+
+          sigy=sqrt(r1ip1pl8->bety*epsy),
+
+          xma=r1ip1pl8->x,yma=r1ip1pl8->y,
+
+          charge:=on_lr1l;
+
+bbip1pl9: beambeam, sigx=sqrt(r1ip1pl9->betx*epsx),
+
+          sigy=sqrt(r1ip1pl9->bety*epsy),
+
+          xma=r1ip1pl9->x,yma=r1ip1pl9->y,
+
+          charge:=on_lr1l;
+
+bbip1pl10: beambeam, sigx=sqrt(r1ip1pl10->betx*epsx),
+
+          sigy=sqrt(r1ip1pl10->bety*epsy),
+
+          xma=r1ip1pl10->x,yma=r1ip1pl10->y,
+
+          charge:=on_lr1l;
+
+bbip1pl11: beambeam, sigx=sqrt(r1ip1pl11->betx*epsx),
+
+          sigy=sqrt(r1ip1pl11->bety*epsy),
+
+          xma=r1ip1pl11->x,yma=r1ip1pl11->y,
+
+          charge:=on_lr1l;
+
+bbip1pl12: beambeam, sigx=sqrt(r1ip1pl12->betx*epsx),
+
+          sigy=sqrt(r1ip1pl12->bety*epsy),
+
+          xma=r1ip1pl12->x,yma=r1ip1pl12->y,
+
+          charge:=on_lr1l;
+
+bbip1pl13: beambeam, sigx=sqrt(r1ip1pl13->betx*epsx),
+
+          sigy=sqrt(r1ip1pl13->bety*epsy),
+
+          xma=r1ip1pl13->x,yma=r1ip1pl13->y,
+
+          charge:=on_lr1l;
+
+bbip1pl14: beambeam, sigx=sqrt(r1ip1pl14->betx*epsx),
+
+          sigy=sqrt(r1ip1pl14->bety*epsy),
+
+          xma=r1ip1pl14->x,yma=r1ip1pl14->y,
+
+          charge:=on_lr1l;
+
+bbip1pl15: beambeam, sigx=sqrt(r1ip1pl15->betx*epsx),
+
+          sigy=sqrt(r1ip1pl15->bety*epsy),
+
+          xma=r1ip1pl15->x,yma=r1ip1pl15->y,
+
+          charge:=on_lr1l;
+
+bbip1pr1: beambeam, sigx=sqrt(r1ip1pr1->betx*epsx),
+
+          sigy=sqrt(r1ip1pr1->bety*epsy),
+
+          xma=r1ip1pr1->x,yma=r1ip1pr1->y,
+
+          charge:=on_lr1r;
+
+bbip1pr2: beambeam, sigx=sqrt(r1ip1pr2->betx*epsx),
+
+          sigy=sqrt(r1ip1pr2->bety*epsy),
+
+          xma=r1ip1pr2->x,yma=r1ip1pr2->y,
+
+          charge:=on_lr1r;
+
+bbip1pr3: beambeam, sigx=sqrt(r1ip1pr3->betx*epsx),
+
+          sigy=sqrt(r1ip1pr3->bety*epsy),
+
+          xma=r1ip1pr3->x,yma=r1ip1pr3->y,
+
+          charge:=on_lr1r;
+
+bbip1pr4: beambeam, sigx=sqrt(r1ip1pr4->betx*epsx),
+
+          sigy=sqrt(r1ip1pr4->bety*epsy),
+
+          xma=r1ip1pr4->x,yma=r1ip1pr4->y,
+
+          charge:=on_lr1r;
+
+bbip1pr5: beambeam, sigx=sqrt(r1ip1pr5->betx*epsx),
+
+          sigy=sqrt(r1ip1pr5->bety*epsy),
+
+          xma=r1ip1pr5->x,yma=r1ip1pr5->y,
+
+          charge:=on_lr1r;
+
+bbip1pr6: beambeam, sigx=sqrt(r1ip1pr6->betx*epsx),
+
+          sigy=sqrt(r1ip1pr6->bety*epsy),
+
+          xma=r1ip1pr6->x,yma=r1ip1pr6->y,
+
+          charge:=on_lr1r;
+
+bbip1pr7: beambeam, sigx=sqrt(r1ip1pr7->betx*epsx),
+
+          sigy=sqrt(r1ip1pr7->bety*epsy),
+
+          xma=r1ip1pr7->x,yma=r1ip1pr7->y,
+
+          charge:=on_lr1r;
+
+bbip1pr8: beambeam, sigx=sqrt(r1ip1pr8->betx*epsx),
+
+          sigy=sqrt(r1ip1pr8->bety*epsy),
+
+          xma=r1ip1pr8->x,yma=r1ip1pr8->y,
+
+          charge:=on_lr1r;
+
+bbip1pr9: beambeam, sigx=sqrt(r1ip1pr9->betx*epsx),
+
+          sigy=sqrt(r1ip1pr9->bety*epsy),
+
+          xma=r1ip1pr9->x,yma=r1ip1pr9->y,
+
+          charge:=on_lr1r;
+
+bbip1pr10: beambeam, sigx=sqrt(r1ip1pr10->betx*epsx),
+
+          sigy=sqrt(r1ip1pr10->bety*epsy),
+
+          xma=r1ip1pr10->x,yma=r1ip1pr10->y,
+
+          charge:=on_lr1r;
+
+bbip1pr11: beambeam, sigx=sqrt(r1ip1pr11->betx*epsx),
+
+          sigy=sqrt(r1ip1pr11->bety*epsy),
+
+          xma=r1ip1pr11->x,yma=r1ip1pr11->y,
+
+          charge:=on_lr1r;
+
+bbip1pr12: beambeam, sigx=sqrt(r1ip1pr12->betx*epsx),
+
+          sigy=sqrt(r1ip1pr12->bety*epsy),
+
+          xma=r1ip1pr12->x,yma=r1ip1pr12->y,
+
+          charge:=on_lr1r;
+
+bbip1pr13: beambeam, sigx=sqrt(r1ip1pr13->betx*epsx),
+
+          sigy=sqrt(r1ip1pr13->bety*epsy),
+
+          xma=r1ip1pr13->x,yma=r1ip1pr13->y,
+
+          charge:=on_lr1r;
+
+bbip1pr14: beambeam, sigx=sqrt(r1ip1pr14->betx*epsx),
+
+          sigy=sqrt(r1ip1pr14->bety*epsy),
+
+          xma=r1ip1pr14->x,yma=r1ip1pr14->y,
+
+          charge:=on_lr1r;
+
+bbip1pr15: beambeam, sigx=sqrt(r1ip1pr15->betx*epsx),
+
+          sigy=sqrt(r1ip1pr15->bety*epsy),
+
+          xma=r1ip1pr15->x,yma=r1ip1pr15->y,
+
+          charge:=on_lr1r;
+
+bbip5l2: beambeam, sigx=sqrt(r5ip5l2->betx*epsx),
+
+          sigy=sqrt(r5ip5l2->bety*epsy),
+
+          xma=r5ip5l2->x,yma=r5ip5l2->y,
+
+          charge:=on_ho5;
+
+bbip5l1: beambeam, sigx=sqrt(r5ip5l1->betx*epsx),
+
+          sigy=sqrt(r5ip5l1->bety*epsy),
+
+          xma=r5ip5l1->x,yma=r5ip5l1->y,
+
+          charge:=on_ho5;
+
+bbip5:   beambeam, sigx=sqrt(r5ip5->betx*epsx),
+
+          sigy=sqrt(r5ip5->bety*epsy),
+
+          xma=r5ip5->x,yma=r5ip5->y,
+
+          charge:=on_ho5;
+
+bbip5r1: beambeam, sigx=sqrt(r5ip5r1->betx*epsx),
+
+          sigy=sqrt(r5ip5r1->bety*epsy),
+
+          xma=r5ip5r1->x,yma=r5ip5r1->y,
+
+          charge:=on_ho5;
+
+bbip5r2: beambeam, sigx=sqrt(r5ip5r2->betx*epsx),
+
+          sigy=sqrt(r5ip5r2->bety*epsy),
+
+          xma=r5ip5r2->x,yma=r5ip5r2->y,
+
+          charge:=on_ho5;
+
+bbip5pl1: beambeam, sigx=sqrt(r5ip5pl1->betx*epsx),
+
+          sigy=sqrt(r5ip5pl1->bety*epsy),
+
+          xma=r5ip5pl1->x,yma=r5ip5pl1->y,
+
+          charge:=on_lr5l;
+
+bbip5pl2: beambeam, sigx=sqrt(r5ip5pl2->betx*epsx),
+
+          sigy=sqrt(r5ip5pl2->bety*epsy),
+
+          xma=r5ip5pl2->x,yma=r5ip5pl2->y,
+
+          charge:=on_lr5l;
+
+bbip5pl3: beambeam, sigx=sqrt(r5ip5pl3->betx*epsx),
+
+          sigy=sqrt(r5ip5pl3->bety*epsy),
+
+          xma=r5ip5pl3->x,yma=r5ip5pl3->y,
+
+          charge:=on_lr5l;
+
+bbip5pl4: beambeam, sigx=sqrt(r5ip5pl4->betx*epsx),
+
+          sigy=sqrt(r5ip5pl4->bety*epsy),
+
+          xma=r5ip5pl4->x,yma=r5ip5pl4->y,
+
+          charge:=on_lr5l;
+
+bbip5pl5: beambeam, sigx=sqrt(r5ip5pl5->betx*epsx),
+
+          sigy=sqrt(r5ip5pl5->bety*epsy),
+
+          xma=r5ip5pl5->x,yma=r5ip5pl5->y,
+
+          charge:=on_lr5l;
+
+bbip5pl6: beambeam, sigx=sqrt(r5ip5pl6->betx*epsx),
+
+          sigy=sqrt(r5ip5pl6->bety*epsy),
+
+          xma=r5ip5pl6->x,yma=r5ip5pl6->y,
+
+          charge:=on_lr5l;
+
+bbip5pl7: beambeam, sigx=sqrt(r5ip5pl7->betx*epsx),
+
+          sigy=sqrt(r5ip5pl7->bety*epsy),
+
+          xma=r5ip5pl7->x,yma=r5ip5pl7->y,
+
+          charge:=on_lr5l;
+
+bbip5pl8: beambeam, sigx=sqrt(r5ip5pl8->betx*epsx),
+
+          sigy=sqrt(r5ip5pl8->bety*epsy),
+
+          xma=r5ip5pl8->x,yma=r5ip5pl8->y,
+
+          charge:=on_lr5l;
+
+bbip5pl9: beambeam, sigx=sqrt(r5ip5pl9->betx*epsx),
+
+          sigy=sqrt(r5ip5pl9->bety*epsy),
+
+          xma=r5ip5pl9->x,yma=r5ip5pl9->y,
+
+          charge:=on_lr5l;
+
+bbip5pl10: beambeam, sigx=sqrt(r5ip5pl10->betx*epsx),
+
+          sigy=sqrt(r5ip5pl10->bety*epsy),
+
+          xma=r5ip5pl10->x,yma=r5ip5pl10->y,
+
+          charge:=on_lr5l;
+
+bbip5pl11: beambeam, sigx=sqrt(r5ip5pl11->betx*epsx),
+
+          sigy=sqrt(r5ip5pl11->bety*epsy),
+
+          xma=r5ip5pl11->x,yma=r5ip5pl11->y,
+
+          charge:=on_lr5l;
+
+bbip5pl12: beambeam, sigx=sqrt(r5ip5pl12->betx*epsx),
+
+          sigy=sqrt(r5ip5pl12->bety*epsy),
+
+          xma=r5ip5pl12->x,yma=r5ip5pl12->y,
+
+          charge:=on_lr5l;
+
+bbip5pl13: beambeam, sigx=sqrt(r5ip5pl13->betx*epsx),
+
+          sigy=sqrt(r5ip5pl13->bety*epsy),
+
+          xma=r5ip5pl13->x,yma=r5ip5pl13->y,
+
+          charge:=on_lr5l;
+
+bbip5pl14: beambeam, sigx=sqrt(r5ip5pl14->betx*epsx),
+
+          sigy=sqrt(r5ip5pl14->bety*epsy),
+
+          xma=r5ip5pl14->x,yma=r5ip5pl14->y,
+
+          charge:=on_lr5l;
+
+bbip5pl15: beambeam, sigx=sqrt(r5ip5pl15->betx*epsx),
+
+          sigy=sqrt(r5ip5pl15->bety*epsy),
+
+          xma=r5ip5pl15->x,yma=r5ip5pl15->y,
+
+          charge:=on_lr5l;
+
+bbip5pr1: beambeam, sigx=sqrt(r5ip5pr1->betx*epsx),
+
+          sigy=sqrt(r5ip5pr1->bety*epsy),
+
+          xma=r5ip5pr1->x,yma=r5ip5pr1->y,
+
+          charge:=on_lr5r;
+
+bbip5pr2: beambeam, sigx=sqrt(r5ip5pr2->betx*epsx),
+
+          sigy=sqrt(r5ip5pr2->bety*epsy),
+
+          xma=r5ip5pr2->x,yma=r5ip5pr2->y,
+
+          charge:=on_lr5r;
+
+bbip5pr3: beambeam, sigx=sqrt(r5ip5pr3->betx*epsx),
+
+          sigy=sqrt(r5ip5pr3->bety*epsy),
+
+          xma=r5ip5pr3->x,yma=r5ip5pr3->y,
+
+          charge:=on_lr5r;
+
+bbip5pr4: beambeam, sigx=sqrt(r5ip5pr4->betx*epsx),
+
+          sigy=sqrt(r5ip5pr4->bety*epsy),
+
+          xma=r5ip5pr4->x,yma=r5ip5pr4->y,
+
+          charge:=on_lr5r;
+
+bbip5pr5: beambeam, sigx=sqrt(r5ip5pr5->betx*epsx),
+
+          sigy=sqrt(r5ip5pr5->bety*epsy),
+
+          xma=r5ip5pr5->x,yma=r5ip5pr5->y,
+
+          charge:=on_lr5r;
+
+bbip5pr6: beambeam, sigx=sqrt(r5ip5pr6->betx*epsx),
+
+          sigy=sqrt(r5ip5pr6->bety*epsy),
+
+          xma=r5ip5pr6->x,yma=r5ip5pr6->y,
+
+          charge:=on_lr5r;
+
+bbip5pr7: beambeam, sigx=sqrt(r5ip5pr7->betx*epsx),
+
+          sigy=sqrt(r5ip5pr7->bety*epsy),
+
+          xma=r5ip5pr7->x,yma=r5ip5pr7->y,
+
+          charge:=on_lr5r;
+
+bbip5pr8: beambeam, sigx=sqrt(r5ip5pr8->betx*epsx),
+
+          sigy=sqrt(r5ip5pr8->bety*epsy),
+
+          xma=r5ip5pr8->x,yma=r5ip5pr8->y,
+
+          charge:=on_lr5r;
+
+bbip5pr9: beambeam, sigx=sqrt(r5ip5pr9->betx*epsx),
+
+          sigy=sqrt(r5ip5pr9->bety*epsy),
+
+          xma=r5ip5pr9->x,yma=r5ip5pr9->y,
+
+          charge:=on_lr5r;
+
+bbip5pr10: beambeam, sigx=sqrt(r5ip5pr10->betx*epsx),
+
+          sigy=sqrt(r5ip5pr10->bety*epsy),
+
+          xma=r5ip5pr10->x,yma=r5ip5pr10->y,
+
+          charge:=on_lr5r;
+
+bbip5pr11: beambeam, sigx=sqrt(r5ip5pr11->betx*epsx),
+
+          sigy=sqrt(r5ip5pr11->bety*epsy),
+
+          xma=r5ip5pr11->x,yma=r5ip5pr11->y,
+
+          charge:=on_lr5r;
+
+bbip5pr12: beambeam, sigx=sqrt(r5ip5pr12->betx*epsx),
+
+          sigy=sqrt(r5ip5pr12->bety*epsy),
+
+          xma=r5ip5pr12->x,yma=r5ip5pr12->y,
+
+          charge:=on_lr5r;
+
+bbip5pr13: beambeam, sigx=sqrt(r5ip5pr13->betx*epsx),
+
+          sigy=sqrt(r5ip5pr13->bety*epsy),
+
+          xma=r5ip5pr13->x,yma=r5ip5pr13->y,
+
+          charge:=on_lr5r;
+
+bbip5pr14: beambeam, sigx=sqrt(r5ip5pr14->betx*epsx),
+
+          sigy=sqrt(r5ip5pr14->bety*epsy),
+
+          xma=r5ip5pr14->x,yma=r5ip5pr14->y,
+
+          charge:=on_lr5r;
+
+bbip5pr15: beambeam, sigx=sqrt(r5ip5pr15->betx*epsx),
+
+          sigy=sqrt(r5ip5pr15->bety*epsy),
+
+          xma=r5ip5pr15->x,yma=r5ip5pr15->y,
+
+          charge:=on_lr5r;
+
+install, element= bbip1l2, at=-long_b, from=ip1;
+
+install, element= bbip1l1, at=-long_a, from=ip1;
+
+install, element= bbip1,   at=1.e-9,   from=ip1;
+
+install, element= bbip1r1, at=+long_a, from=ip1;
+
+install, element= bbip1r2, at=+long_b, from=ip1;
+
+install, element= bbip1pl1, at=-1*b_h_dist, from=ip1;
+
+install, element= bbip1pl2, at=-2*b_h_dist, from=ip1;
+
+install, element= bbip1pl3, at=-3*b_h_dist, from=ip1;
+
+install, element= bbip1pl4, at=-4*b_h_dist, from=ip1;
+
+install, element= bbip1pl5, at=-5*b_h_dist, from=ip1;
+
+install, element= bbip1pl6, at=-6*b_h_dist, from=ip1;
+
+install, element= bbip1pl7, at=-7*b_h_dist, from=ip1;
+
+install, element= bbip1pl8, at=-8*b_h_dist, from=ip1;
+
+install, element= bbip1pl9, at=-9*b_h_dist, from=ip1;
+
+install, element= bbip1pl10, at=-10*b_h_dist, from=ip1;
+
+install, element= bbip1pl11, at=-11*b_h_dist, from=ip1;
+
+install, element= bbip1pl12, at=-12*b_h_dist, from=ip1;
+
+install, element= bbip1pl13, at=-13*b_h_dist, from=ip1;
+
+install, element= bbip1pl14, at=-14*b_h_dist, from=ip1;
+
+install, element= bbip1pl15, at=-15*b_h_dist, from=ip1;
+
+install, element= bbip1pr1, at=1*b_h_dist, from=ip1;
+
+install, element= bbip1pr2, at=2*b_h_dist, from=ip1;
+
+install, element= bbip1pr3, at=3*b_h_dist, from=ip1;
+
+install, element= bbip1pr4, at=4*b_h_dist, from=ip1;
+
+install, element= bbip1pr5, at=5*b_h_dist, from=ip1;
+
+install, element= bbip1pr6, at=6*b_h_dist, from=ip1;
+
+install, element= bbip1pr7, at=7*b_h_dist, from=ip1;
+
+install, element= bbip1pr8, at=8*b_h_dist, from=ip1;
+
+install, element= bbip1pr9, at=9*b_h_dist, from=ip1;
+
+install, element= bbip1pr10, at=10*b_h_dist, from=ip1;
+
+install, element= bbip1pr11, at=11*b_h_dist, from=ip1;
+
+install, element= bbip1pr12, at=12*b_h_dist, from=ip1;
+
+install, element= bbip1pr13, at=13*b_h_dist, from=ip1;
+
+install, element= bbip1pr14, at=14*b_h_dist, from=ip1;
+
+install, element= bbip1pr15, at=15*b_h_dist, from=ip1;
+
+install, element= bbip5l2, at=-long_b, from=ip5;
+
+install, element= bbip5l1, at=-long_a, from=ip5;
+
+install, element= bbip5,   at=1.e-9,   from=ip5;
+
+install, element= bbip5r1, at=+long_a, from=ip5;
+
+install, element= bbip5r2, at=+long_b, from=ip5;
+
+install, element= bbip5pl1, at=-1*b_h_dist, from=ip5;
+
+install, element= bbip5pl2, at=-2*b_h_dist, from=ip5;
+
+install, element= bbip5pl3, at=-3*b_h_dist, from=ip5;
+
+install, element= bbip5pl4, at=-4*b_h_dist, from=ip5;
+
+install, element= bbip5pl5, at=-5*b_h_dist, from=ip5;
+
+install, element= bbip5pl6, at=-6*b_h_dist, from=ip5;
+
+install, element= bbip5pl7, at=-7*b_h_dist, from=ip5;
+
+install, element= bbip5pl8, at=-8*b_h_dist, from=ip5;
+
+install, element= bbip5pl9, at=-9*b_h_dist, from=ip5;
+
+install, element= bbip5pl10, at=-10*b_h_dist, from=ip5;
+
+install, element= bbip5pl11, at=-11*b_h_dist, from=ip5;
+
+install, element= bbip5pl12, at=-12*b_h_dist, from=ip5;
+
+install, element= bbip5pl13, at=-13*b_h_dist, from=ip5;
+
+install, element= bbip5pl14, at=-14*b_h_dist, from=ip5;
+
+install, element= bbip5pl15, at=-15*b_h_dist, from=ip5;
+
+install, element= bbip5pr1, at=1*b_h_dist, from=ip5;
+
+install, element= bbip5pr2, at=2*b_h_dist, from=ip5;
+
+install, element= bbip5pr3, at=3*b_h_dist, from=ip5;
+
+install, element= bbip5pr4, at=4*b_h_dist, from=ip5;
+
+install, element= bbip5pr5, at=5*b_h_dist, from=ip5;
+
+install, element= bbip5pr6, at=6*b_h_dist, from=ip5;
+
+install, element= bbip5pr7, at=7*b_h_dist, from=ip5;
+
+install, element= bbip5pr8, at=8*b_h_dist, from=ip5;
+
+install, element= bbip5pr9, at=9*b_h_dist, from=ip5;
+
+install, element= bbip5pr10, at=10*b_h_dist, from=ip5;
+
+install, element= bbip5pr11, at=11*b_h_dist, from=ip5;
+
+install, element= bbip5pr12, at=12*b_h_dist, from=ip5;
+
+install, element= bbip5pr13, at=13*b_h_dist, from=ip5;
+
+install, element= bbip5pr14, at=14*b_h_dist, from=ip5;
+
+install, element= bbip5pr15, at=15*b_h_dist, from=ip5;
+
+endedit;
+
+
+
+!--- Now the beam-beam element installation is complete
+
+
+
+!system, "rm temp.bb.install";
+
+
+
+seqedit,sequence=lhcb1;
+
+cycle,start=ip1;
+
+endedit;
+
+
+
+use,period=lhcb1;
+
+twiss, sequence=lhcb1;
+
+enter Twiss module
+ Singular matrix occurred during closed orbit search.
+++++++ warning: Twiss failed:  MAD-X continues
+
+
+!
+
+!  make footprint
+
+!
+
+
+
+option,trace;
+
+small=0.05;
+
+big=sqrt(1.-small^2);
+
+track;
+
+sec.s since start: 5   since last call: 5
+enter TRACK module
+xs=small; ys=small;
+
+value,xs,ys;
+
+xs =               0.05 ;
+ys =               0.05 ;
+start,fx=xs,fy=ys;  // zero amplitude
+
+sec.s since start: 5   since last call: 0
+nsigmax=6;
+
+n=1; // sigma multiplier
+
+m=0; // angle multiplier
+
+while (n <= nsigmax)
+
+{
+
+  angle = 15*m*pi/180;
+
+  if (m == 0) {xs=n*big; ys=n*small;}
+
+  elseif (m == 6) {xs=n*small; ys=n*big;}
+
+  else
+
+  {
+
+    xs=n*cos(angle);
+
+    ys=n*sin(angle);
+
+  }
+
+  value,xs,ys;
+
+  start,fx=xs,fy=ys;
+
+  m=m+1;
+
+  if (m == 7) { m=0; n=n+1;}
+
+};
+
+xs =       0.9987492178 ;
+ys =               0.05 ;
+sec.s since start: 5   since last call: 0
+xs =       0.9659258263 ;
+ys =       0.2588190451 ;
+sec.s since start: 5   since last call: 0
+xs =       0.8660254038 ;
+ys =                0.5 ;
+sec.s since start: 5   since last call: 0
+xs =       0.7071067812 ;
+ys =       0.7071067812 ;
+sec.s since start: 5   since last call: 0
+xs =                0.5 ;
+ys =       0.8660254038 ;
+sec.s since start: 5   since last call: 0
+xs =       0.2588190451 ;
+ys =       0.9659258263 ;
+sec.s since start: 5   since last call: 0
+xs =               0.05 ;
+ys =       0.9987492178 ;
+sec.s since start: 5   since last call: 0
+xs =        1.997498436 ;
+ys =                0.1 ;
+sec.s since start: 5   since last call: 0
+xs =        1.931851653 ;
+ys =       0.5176380902 ;
+sec.s since start: 5   since last call: 0
+xs =        1.732050808 ;
+ys =                  1 ;
+sec.s since start: 5   since last call: 0
+xs =        1.414213562 ;
+ys =        1.414213562 ;
+sec.s since start: 5   since last call: 0
+xs =                  1 ;
+ys =        1.732050808 ;
+sec.s since start: 5   since last call: 0
+xs =       0.5176380902 ;
+ys =        1.931851653 ;
+sec.s since start: 5   since last call: 0
+xs =                0.1 ;
+ys =        1.997498436 ;
+sec.s since start: 5   since last call: 0
+xs =        2.996247653 ;
+ys =               0.15 ;
+sec.s since start: 5   since last call: 0
+xs =        2.897777479 ;
+ys =       0.7764571353 ;
+sec.s since start: 5   since last call: 0
+xs =        2.598076211 ;
+ys =                1.5 ;
+sec.s since start: 5   since last call: 0
+xs =        2.121320344 ;
+ys =        2.121320344 ;
+sec.s since start: 5   since last call: 0
+xs =                1.5 ;
+ys =        2.598076211 ;
+sec.s since start: 5   since last call: 0
+xs =       0.7764571353 ;
+ys =        2.897777479 ;
+sec.s since start: 5   since last call: 0
+xs =               0.15 ;
+ys =        2.996247653 ;
+sec.s since start: 5   since last call: 0
+xs =        3.994996871 ;
+ys =                0.2 ;
+sec.s since start: 5   since last call: 0
+xs =        3.863703305 ;
+ys =         1.03527618 ;
+sec.s since start: 5   since last call: 0
+xs =        3.464101615 ;
+ys =                  2 ;
+sec.s since start: 5   since last call: 0
+xs =        2.828427125 ;
+ys =        2.828427125 ;
+sec.s since start: 5   since last call: 0
+xs =                  2 ;
+ys =        3.464101615 ;
+sec.s since start: 5   since last call: 0
+xs =         1.03527618 ;
+ys =        3.863703305 ;
+sec.s since start: 5   since last call: 0
+xs =                0.2 ;
+ys =        3.994996871 ;
+sec.s since start: 5   since last call: 0
+xs =        4.993746089 ;
+ys =               0.25 ;
+sec.s since start: 5   since last call: 0
+xs =        4.829629131 ;
+ys =        1.294095226 ;
+sec.s since start: 5   since last call: 0
+xs =        4.330127019 ;
+ys =                2.5 ;
+sec.s since start: 5   since last call: 0
+xs =        3.535533906 ;
+ys =        3.535533906 ;
+sec.s since start: 5   since last call: 0
+xs =                2.5 ;
+ys =        4.330127019 ;
+sec.s since start: 5   since last call: 0
+xs =        1.294095226 ;
+ys =        4.829629131 ;
+sec.s since start: 5   since last call: 0
+xs =               0.25 ;
+ys =        4.993746089 ;
+sec.s since start: 5   since last call: 0
+xs =        5.992495307 ;
+ys =                0.3 ;
+sec.s since start: 5   since last call: 0
+xs =        5.795554958 ;
+ys =        1.552914271 ;
+sec.s since start: 5   since last call: 0
+xs =        5.196152423 ;
+ys =                  3 ;
+sec.s since start: 5   since last call: 0
+xs =        4.242640687 ;
+ys =        4.242640687 ;
+sec.s since start: 5   since last call: 0
+xs =                  3 ;
+ys =        5.196152423 ;
+sec.s since start: 5   since last call: 0
+xs =        1.552914271 ;
+ys =        5.795554958 ;
+sec.s since start: 5   since last call: 0
+xs =                0.3 ;
+ys =        5.992495307 ;
+sec.s since start: 5   since last call: 0
+dynap,fastune,turns=1024;
+
+sec.s since start: 5   since last call: 0
+ Singular matrix occurred during closed orbit search.
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  Singular matrix occurred during closed orbit search.
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+ Maximum Iteration exceeded in HQR2, increase MAXITER:          150
+Unable to find eigenvalues for matrix:
+         NaN         NaN         NaN         NaN         NaN         NaN
+         NaN         NaN         NaN         NaN         NaN         NaN
+         NaN         NaN         NaN         NaN         NaN         NaN
+         NaN         NaN         NaN         NaN         NaN         NaN
+         NaN         NaN         NaN         NaN         NaN         NaN
+         NaN         NaN         NaN         NaN         NaN         NaN
+  
+ +-+-+- fatal: LADEIG Unable to find eigenvalues for matrix
+  
+  

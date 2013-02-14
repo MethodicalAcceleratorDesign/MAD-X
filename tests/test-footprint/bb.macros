@@ -1,0 +1,96 @@
+bbho(nn): macro = {
+!--- macro defining head-on beam-beam elements; nn = IP number
+print, text="bbipnnl2: beambeam, sigx=sqrt(rnnipnnl2->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnl2->bety*epsy),";
+print, text="          xma=rnnipnnl2->x,yma=rnnipnnl2->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnl1: beambeam, sigx=sqrt(rnnipnnl1->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnl1->bety*epsy),";
+print, text="          xma=rnnipnnl1->x,yma=rnnipnnl1->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnn:   beambeam, sigx=sqrt(rnnipnn->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnn->bety*epsy),";
+print, text="          xma=rnnipnn->x,yma=rnnipnn->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnr1: beambeam, sigx=sqrt(rnnipnnr1->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnr1->bety*epsy),";
+print, text="          xma=rnnipnnr1->x,yma=rnnipnnr1->y,";
+print, text="          charge:=on_honn;";
+print, text="bbipnnr2: beambeam, sigx=sqrt(rnnipnnr2->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnr2->bety*epsy),";
+print, text="          xma=rnnipnnr2->x,yma=rnnipnnr2->y,";
+print, text="          charge:=on_honn;";
+};
+
+mkho(nn): macro = {
+!--- macro defining head-on markers; nn = IP number
+print, text="mkipnnl2: bbmarker;";
+print, text="mkipnnl1: bbmarker;";
+print, text="mkipnn:   bbmarker;";
+print, text="mkipnnr1: bbmarker;";
+print, text="mkipnnr2: bbmarker;";
+};
+
+inho(xx,nn): macro = {
+!--- macro installing bb or markers for head-on beam-beam (split into 5)
+print, text="install, element= xxipnnl2, at=-long_b, from=ipnn;";
+print, text="install, element= xxipnnl1, at=-long_a, from=ipnn;";
+print, text="install, element= xxipnn,   at=1.e-9,   from=ipnn;";
+print, text="install, element= xxipnnr1, at=+long_a, from=ipnn;"; 
+print, text="install, element= xxipnnr2, at=+long_b, from=ipnn;"; 
+};
+
+sbhomk(nn): macro = {
+!--- macro to create savebetas for ho markers
+print, text="savebeta, label=rnnipnnl2, place=mkipnnl2;";
+print, text="savebeta, label=rnnipnnl1, place=mkipnnl1;";
+print, text="savebeta, label=rnnipnn,   place=mkipnn;";
+print, text="savebeta, label=rnnipnnr1, place=mkipnnr1;";
+print, text="savebeta, label=rnnipnnr2, place=mkipnnr2;";    
+};
+
+mkl(nn,cc): macro = {
+!--- macro to create parasitic bb marker on left side of ip nn; cc = count
+print, text="mkipnnplcc: bbmarker;";
+};
+
+mkr(nn,cc): macro = {
+!--- macro to create parasitic bb marker on right side of ip nn; cc = count
+print, text="mkipnnprcc: bbmarker;";
+};
+
+sbl(nn,cc): macro = {
+!--- macro to create savebetas for left parasitic
+print, text="savebeta, label=rnnipnnplcc, place=mkipnnplcc;";
+};
+
+sbr(nn,cc): macro = {
+!--- macro to create savebetas for right parasitic
+print, text="savebeta, label=rnnipnnprcc, place=mkipnnprcc;";
+};
+
+inl(xx,nn,cc): macro = {
+!--- macro installing bb and markers for left side parasitic beam-beam
+print, text="install, element= xxipnnplcc, at=-cc*b_h_dist, from=ipnn;";
+};
+
+inr(xx,nn,cc): macro = {
+!--- macro installing bb and markers for right side parasitic beam-beam
+print, text="install, element= xxipnnprcc, at=cc*b_h_dist, from=ipnn;";
+};
+
+bbl(nn,cc): macro = {
+!--- macro defining parasitic beam-beam elements; nn = IP number
+print, text="bbipnnplcc: beambeam, sigx=sqrt(rnnipnnplcc->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnplcc->bety*epsy),";
+print, text="          xma=rnnipnnplcc->x,yma=rnnipnnplcc->y,";
+print, text="          charge:=on_lrnnl;";
+};
+
+bbr(nn,cc): macro = {
+!--- macro defining parasitic beam-beam elements; nn = IP number
+print, text="bbipnnprcc: beambeam, sigx=sqrt(rnnipnnprcc->betx*epsx),";
+print, text="          sigy=sqrt(rnnipnnprcc->bety*epsy),";
+print, text="          xma=rnnipnnprcc->x,yma=rnnipnnprcc->y,";
+print, text="          charge:=on_lrnnr;";
+};

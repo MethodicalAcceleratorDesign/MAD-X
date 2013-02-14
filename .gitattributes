@@ -684,6 +684,9 @@ tests/test-emit/ALBA-25.4th.seq -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
+tests/test-footprint/bb.macros -text
+tests/test-footprint/test-footprint.madx -text
+tests/test-footprint/test-footprint.ref -text
 tests/test-ibs-2/ibs-table.tfs.cfg -text
 tests/test-ibs-2/ibs-table.tfs.ref -text
 tests/test-ibs-2/input/tme-ibs.seq -text
