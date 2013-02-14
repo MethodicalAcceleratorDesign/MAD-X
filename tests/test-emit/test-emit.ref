@@ -9,7 +9,7 @@ beam, SEQUENCE=Machine ,PARTICLE=electron, energy=3, RADIATE=True;
 
 option, RBARC=FALSE;
 
-call, file= "ALBA-25.4th.madx";
+call, file= "ALBA-25.4th.seq";
 
 TITLE "ALBA-24                          ";
 

@@ -676,7 +676,11 @@ tests/test-cororbit/stren.ref -text
 tests/test-cororbit/test-cororbit.cfg -text
 tests/test-cororbit/test-cororbit.madx -text
 tests/test-cororbit/test-cororbit.ref -text
-tests/test-emit/ALBA-25.4th.madx -text
+tests/test-emit-2/ALBA-25.4th.seq -text
+tests/test-emit-2/test-emit-2.cfg -text
+tests/test-emit-2/test-emit-2.madx -text
+tests/test-emit-2/test-emit-2.ref -text
+tests/test-emit/ALBA-25.4th.seq -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
