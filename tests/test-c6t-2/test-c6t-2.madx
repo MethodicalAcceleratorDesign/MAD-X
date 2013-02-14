@@ -1,0 +1,12 @@
+TITLE;
+option,-echo,-warn;
+option, rbarc=false;
+call, file="../share/RHIC/rhic.madx";
+option,echo,warn;
+beam;
+use, period=YELLOW;
+select, flag=twiss, clear;
+select, flag=twiss, columns=name, s, betx, bety, mux, muy;
+twiss;
+sixtrack,split;
+stop;

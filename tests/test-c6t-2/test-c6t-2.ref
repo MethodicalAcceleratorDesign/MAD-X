@@ -1,0 +1,74 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 14.02.13 22.19.42 +
+  +++++++++++++++++++++++++++++++++++++++++++
+TITLE;
+
+option,-echo,-warn;
+
+beam;
+
+use, period=YELLOW;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, columns=name, s, betx, bety, mux, muy;
+
+twiss;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       3833.845181                 -0     0.001917147181        22.83874694 
+
+                q1                dq1            betxmax              dxmax 
+       28.18999998       -2.999997042        146.6853147        1.834973135 
+
+             dxrms             xcomax             xcorms                 q2 
+        1.07347826                  0                  0        29.17999998 
+
+               dq2            betymax              dymax              dyrms 
+      -2.999999737        146.0782497                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+sixtrack,split;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: c6t - split flag selected 
+max_mult_ord set to : 11
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 3833.845181
+
+c6t terminated - total number of elements: 5839
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 0
+                alignment errors SixTrack: 0
+                          sequence length: 3833.845181 [m]
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

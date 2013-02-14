@@ -636,8 +636,9 @@ tests/test-c6t-2/fc.3.aux.ref -text
 tests/test-c6t-2/fc.3.aux.ref.aux -text
 tests/test-c6t-2/fc.34.cfg -text
 tests/test-c6t-2/fc.34.ref -text
-tests/test-c6t-2/test-c6t.cfg -text
-tests/test-c6t-2/test-c6t.ref -text
+tests/test-c6t-2/test-c6t-2.cfg -text
+tests/test-c6t-2/test-c6t-2.madx -text
+tests/test-c6t-2/test-c6t-2.ref -text
 tests/test-c6t/fc.2.cfg -text
 tests/test-c6t/fc.2.ref -text
 tests/test-c6t/fc.3.aux.cfg -text
