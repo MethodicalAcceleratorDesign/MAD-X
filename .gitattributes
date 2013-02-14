@@ -806,7 +806,6 @@ tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.cfg -text
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.ref -text
 tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.cfg -text
 tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.madx -text
-tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.out -text
 tests/test-ptc-twiss-56Dt/test-ptc-twiss-56Dt.ref -text
 tests/test-ptc-twiss-56Dtl/leir.56dtl.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56Dtl/leir.56dtl.ptc.summ.twiss.ref -text
