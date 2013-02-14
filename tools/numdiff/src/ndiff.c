@@ -243,6 +243,15 @@ ndiff_error(const struct context    *cxt,
   error("please report to mad@cern.ch");
 }
 
+static void
+ndiff_header(void)
+{
+  if (option.test)
+    warning("(*) files %s from test %s differ", option.indexed_filename, option.test);
+  else
+    warning("(*) files %s differ", option.indexed_filename);
+}
+
 // -----------------------------------------------------------------------------
 // ----- interface
 // -----------------------------------------------------------------------------
@@ -445,8 +454,8 @@ retry:
 
   dif->lhs_i += 1;
   dif->rhs_i += 1;
-  dif->cnt_i += 1;
-  if (dif->cnt_i <= dif->max_i) {
+  if (++dif->cnt_i <= dif->max_i) {
+    if (dif->cnt_i == 1) ndiff_header();
     warning("(%d) files differ at line %d at char-column %d|%d",
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
@@ -524,8 +533,8 @@ retry:
 quit_diff:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
-  dif->cnt_i += 1;
-  if (dif->cnt_i <= dif->max_i) {
+  if (++dif->cnt_i <= dif->max_i) {
+    if (dif->cnt_i == 1) ndiff_header();
     warning("(%d) files differ at line %d and char-columns %d|%d",
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
@@ -613,6 +622,7 @@ ndiff_testNum (T *dif, const struct constraint *c)
 
 quit_diff:
   if (++dif->cnt_i <= dif->max_i) {
+    if (dif->cnt_i == 1) ndiff_header();
     warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
             dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
