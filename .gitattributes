@@ -25,6 +25,7 @@ cmake/FindCYTHON.cmake -text
 cmake/FindGSL.cmake -text
 cmake/FindLAPACK.cmake -text
 cmake/FindSDDS.cmake -text
+cmake/FindSTDCPP.cmake -text
 cmake/MadX.icns -text svneol=unset#unset
 cmake/README -text
 cmake/ToolChains/Linux-LF95.cmake -text

@@ -96,10 +96,10 @@ endif()
 if(NOT WIN32)
    target_link_libraries(madx z)
 endif()
-# new additions from Frank:
-# On Debian Stable, stdc++ is not linked by default...
+
 find_package(Threads)
-target_link_libraries(madx  ${CMAKE_THREAD_LIBS_INIT} stdc++ gcc_eh)
+find_package(STDCPP)
+target_link_libraries(madx  ${CMAKE_THREAD_LIBS_INIT} ${STDCPP_LIBS})
 
 # Defining specific stuff for packaging:
 # Should be called after sources are defined,
