@@ -42,7 +42,7 @@ option, warn, info;
 use, sequence=lhcb1;
 select, flag=twiss, clear;
 select,flag=twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
-twiss, sequence=lhcb1, file="sample_optics.tfs";
+twiss, sequence=lhcb1, file="twiss-table.out";
 
 ! Initialize PTC
 ptc_create_universe;
