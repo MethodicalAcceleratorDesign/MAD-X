@@ -839,16 +839,12 @@ tests/test-ptc-twiss-old1/README -text
 tests/test-ptc-twiss-old1/end.map -text
 tests/test-ptc-twiss-old1/fort.18.ref -text
 tests/test-ptc-twiss-old1/ptctwiss.txt -text
-tests/test-ptc-twiss-old1/ptctwiss.txt_align.ref -text
 tests/test-ptc-twiss-old1/ring_matrix_at_end.ref -text
 tests/test-ptc-twiss-old1/test-ptc-twiss-old1.madx -text
 tests/test-ptc-twiss-old1/test-ptc-twiss-old1.ref -text
 tests/test-ptc-twiss-old1/twiss_madx_ring.ref -text
-tests/test-ptc-twiss-old1/twiss_madx_ring_align.ref -text
 tests/test-ptc-twiss-old1/twiss_ptc_line.ref -text
-tests/test-ptc-twiss-old1/twiss_ptc_line_align.ref -text
 tests/test-ptc-twiss-old1/twiss_ptc_ring.ref -text
-tests/test-ptc-twiss-old1/twiss_ptc_ring_align.ref -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss/fort.18.cfg -text
