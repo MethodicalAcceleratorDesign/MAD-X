@@ -1,0 +1,53 @@
+!TITLE,'Test input for PTC_TWISS';
+
+!=========== RING PARAMETERS ===========================================
+call, file = "../ring_lattice/ring.seq";
+
+
+! At the end of the ring the data_block is produced
+
+SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
+
+select,flag=twiss,column=name,s,betx,bety,dx,dy;
+
+TWISS,file=twiss_madx_ring; 
+
+SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
+
+
+! Initialize PTC
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+ptc_align;
+
+select,flag=ptc_twiss,column=name,s,beta11,beta21,
+                                  beta12,beta22,disp1,disp3,x,px,y,py;
+
+ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
+
+PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
+
+ptc_end;
+
+!write,table="map_table",file="map_table";
+write,table="map_table",file="ring_matrix_at_end";
+
+!=========== TRANSFER-LINE PARAMETERS ==================================== 
+
+call, file = "../line_lattice/line.seq";
+
+select,flag=ptc_twiss,clear;
+select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=5,exact;
+                                    
+! Example 2: Input twiss parameters manually  ==============================
+ptc_twiss,icase=5,no=1, 
+          betx=177.6823337,bety=32.05718846,alfx=-2.411683347,alfy=0.4797516839,
+          dx=2.176379444,dpx=0.02964538223,mux=1.254518853,muy=1.25446531,
+          x= 8.897806712109201E-05,px=7.283918352660537E-07, 
+          y=5.216050332314255E-05, py=-6.748041062611770E-07, 
+          file=twiss_ptc_line;
+ptc_end;
+stop;
