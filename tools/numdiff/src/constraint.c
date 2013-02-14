@@ -222,7 +222,7 @@ retry:
   ungetc(c, in);
 
   // comment or empty line
-  if (c == '\n' || c == '\r' || c == '!' || c == '#') {
+  if (c == '\n' || c == '\r' || c == '#' || c == '!') {
     if (skipLine(in, 0) == '\n') ++*row;
     goto retry;
   }
