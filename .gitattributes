@@ -611,6 +611,10 @@ tests/share/LHC/LHCRing/V6.503/V6.5.thin.seq -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
+tests/share/ring_lattice/README -text
+tests/share/ring_lattice/fv9.opt -text
+tests/share/ring_lattice/fv9.seq -text
+tests/share/ring_lattice/ring.seq -text
 tests/test-aperture/ap.tfs.cfg -text
 tests/test-aperture/ap.tfs.ref -text
 tests/test-aperture/offset.tfs -text
