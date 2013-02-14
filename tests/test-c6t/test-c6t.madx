@@ -61,7 +61,7 @@ select, flag= twiss, clear;
 select, flag= twiss, pattern= "IP\.*", column= name,s,x,px,y,py,t,pt;
 select, flag= twiss, pattern= "BPM\.*", column= name,s,x,px,y,py,t,pt;
 select, flag= twiss, class= rfcavity,  column= name,s,x,px,y,py,t,pt;
-TWISS,  file= "twiss";
+TWISS;
 
 
 
