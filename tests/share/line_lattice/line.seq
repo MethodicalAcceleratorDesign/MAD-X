@@ -34,10 +34,10 @@
   BPMWS:monitor;
   BPME:monitor;
   BPMVIRT:monitor;
-  CALL, FILE="../line_lattice/ebsy.madx";
-  CALL, FILE="../line_lattice/eirt1.madx";
-  CALL, FILE="../line_lattice/eff1.madx";
-  CALL, FILE="../line_lattice/edl1.madx";
+  CALL, FILE="../share/line_lattice/ebsy.madx";
+  CALL, FILE="../share/line_lattice/eirt1.madx";
+  CALL, FILE="../share/line_lattice/eff1.madx";
+  CALL, FILE="../share/line_lattice/edl1.madx";
 !stop;
   TBETX:=50.525915605603;
   TALFX:=-2.379589233378;
