@@ -1,0 +1,183 @@
+  MBETX:=19.903055360355;
+  MALFX:=0;
+  MBETY:=23.515062700786;
+  MALFY:=0;
+  PCETA:=5.0; //peak polarimeter dispersion (mm)
+  PCRMM:=0.485436893589E-4; //d(ANGLE)/d(ETA) (rad/mm)
+  PCANG:=PCETA*PCRMM; //polarimeter bend angle (rad)
+  ZBPC1:=3.0; //pole "Z" length (m)
+  RBPC1:=ZBPC1/SIN(PCANG); //bend radius (m)
+  LBPC1:=RBPC1*PCANG; //effective length (m)
+  ABPC1a:=ASIN(0.5*ZBPC1/RBPC1); //bend angle ("short" half)
+  LBPC1a:=RBPC1*ABPC1a; //effective length ("short" half)
+  ABPC1b:=PCANG-ABPC1a; //bend angle ("long" half)
+  LBPC1b:=LBPC1-LBPC1a; //effective length ("long" half)
+  BPC1a:sbend, L:=LBPC1a, ANGLE:=+ABPC1a, E1:=0, FINT:=0.5, FINTX:=0;
+  BPC1b:sbend, L:=LBPC1b, ANGLE:=+ABPC1b, E2:=+PCANG, FINT:=0, FINTX:=0.5;
+  BPC4a:sbend, L:=LBPC1b, ANGLE:=+ABPC1b, E1:=+PCANG, FINT:=0.5, FINTX:=0;
+  BPC4b:sbend, L:=LBPC1a, ANGLE:=+ABPC1a, E2:=0, FINT:=0, FINTX:=0.5;
+  ZBPC2:=6.0; //pole "Z" length (m)
+  RBPC2:=ZBPC2/SIN(PCANG); //bend radius (m)
+  LBPC2:=RBPC2*PCANG; //effective length (m)
+  ABPC2a:=ASIN(0.5*ZBPC2/RBPC2); //bend angle ("short" half)
+  LBPC2a:=RBPC2*ABPC2a; //effective length ("short" half)
+  ABPC2b:=PCANG-ABPC2a; //bend angle ("long" half)
+  LBPC2b:=LBPC2-LBPC2a; //effective length ("long" half)
+  BPC2a:sbend, L:=LBPC2b, ANGLE:=-ABPC2b, E1:=-PCANG, FINT:=0.5, FINTX:=0;
+  BPC2b:sbend, L:=LBPC2a, ANGLE:=-ABPC2a, E2:=0, FINT:=0, FINTX:=0.5;
+  BPC3a:sbend, L:=LBPC2a, ANGLE:=-ABPC2a, E1:=0, FINT:=0.5, FINTX:=0;
+  BPC3b:sbend, L:=LBPC2b, ANGLE:=-ABPC2b, E2:=-PCANG, FINT:=0, FINTX:=0.5;
+  ZPCBBo:=16.1; //outer bend-to-bend "Z" spacing (m)
+  LPCBBo:=ZPCBBo/COS(PCANG); //outer bend-to-bend path length (m)
+  LPCBBi:=1.4; //inner bend-to-bend "Z" spacing (m)
+  DPCBBo:drift, L:=LPCBBo;
+  DPCBBi:drift, L:=LPCBBi/2;
+  BQMD5:=0;
+  BQMD6:=5.740786749717*Efact;
+  BQMD7:=0;
+  BQMD8:=-4.203944338118*Efact;
+  BQXL1:=6.735960550255*Efact;
+  BQXL2:=-5.452921577815*Efact;
+  BQXL3:=3.771317642955*Efact;
+  BQXL4:=-3.503813918485*Efact;
+  BQXL5:=3.654338100519*Efact;
+  BQXL6:=-4.710648221004*Efact;
+  BQXL7:=BQXL5;
+  BQXL8:=BQXL4;
+  BQXL9:=BQXL3;
+  BQXL10:=BQXL2;
+  BQXL11:=BQXL1;
+  BQXL12:=-3.429907903986*Efact;
+  QMD5:QBDS3, K1=BQMD5*QFACT3;
+  QMD6:QBDS3, K1=BQMD6*QFACT3;
+  QMD7:QBDS3, K1=BQMD7*QFACT3;
+  QMD8:QBDS3, K1=BQMD8*QFACT3;
+  QXL1:QBDS2, K1=BQXL1*QFACT2;
+  QXL2:QBDS2, K1=BQXL2*QFACT2;
+  QXL3:QBDS2, K1=BQXL3*QFACT2;
+  QXL4:QBDS2, K1=BQXL4*QFACT2;
+  QXL5:QBDS2, K1=BQXL5*QFACT2;
+  QXL6:QBDS2, K1=BQXL6*QFACT2;
+  QXL7:QBDS2, K1=BQXL7*QFACT2;
+  QXL8:QBDS2, K1=BQXL8*QFACT2;
+  QXL9:QBDS2, K1=BQXL9*QFACT2;
+  QXL10:QBDS2, K1=BQXL10*QFACT2;
+  QXL11:QBDS2, K1=BQXL11*QFACT2;
+  QXL12:QBDS2, K1=BQXL12*QFACT2;
+  LQFF2:=2.0;
+  rQFF2:=0.01;
+  BQPFFa:=5.041841659975*Efact;
+  BQPFFb:=-5.165565767885*Efact;
+  BQPFFc:=-7.106519464711*Efact;
+  BQPFFd:=7.177783791084*Efact;
+  BQPFFe:=-6.571602982266*Efact;
+  BQPFF0:=BQPFFa;
+  BQPFF1:=BQPFFa;
+  BQPFF2:=BQPFFb;
+  BQPFF3:=BQPFFb;
+  BQPFF4:=BQPFFc;
+  BQPFF5:=BQPFFc;
+  BQPFF6:=BQPFFd;
+  BQPFF7:=BQPFFd;
+  BQPFF8:=BQPFFe;
+  BQPFF9:=BQPFFe;
+  KQPFF0:=(BQPFF0/rQFF2)/Brho;
+  KQPFF1:=(BQPFF1/rQFF2)/Brho;
+  KQPFF2:=(BQPFF2/rQFF2)/Brho;
+  KQPFF3:=(BQPFF3/rQFF2)/Brho;
+  KQPFF4:=(BQPFF4/rQFF2)/Brho;
+  KQPFF5:=(BQPFF5/rQFF2)/Brho;
+  KQPFF6:=(BQPFF6/rQFF2)/Brho;
+  KQPFF7:=(BQPFF7/rQFF2)/Brho;
+  KQPFF8:=(BQPFF8/rQFF2)/Brho;
+  KQPFF9:=(BQPFF9/rQFF2)/Brho;
+  QPFF0:quadrupole, L:=LQFF2/2, K1:=KQPFF0, aperture:=rQFF2;
+  QPFF1:quadrupole, L:=LQFF2/2, K1:=KQPFF1, aperture:=rQFF2;
+  QPFF2:quadrupole, L:=LQFF2/2, K1:=KQPFF2, aperture:=rQFF2;
+  QPFF3:quadrupole, L:=LQFF2/2, K1:=KQPFF3, aperture:=rQFF2;
+  QPFF4:quadrupole, L:=LQFF2/2, K1:=KQPFF4, aperture:=rQFF2;
+  QPFF5:quadrupole, L:=LQFF2/2, K1:=KQPFF5, aperture:=rQFF2;
+  QPFF6:quadrupole, L:=LQFF2/2, K1:=KQPFF6, aperture:=rQFF2;
+  QPFF7:quadrupole, L:=LQFF2/2, K1:=KQPFF7, aperture:=rQFF2;
+  QPFF8:quadrupole, L:=LQFF2/2, K1:=KQPFF8, aperture:=rQFF2;
+  QPFF9:quadrupole, L:=LQFF2/2, K1:=KQPFF9, aperture:=rQFF2;
+  LLMD:=2.505;
+  LLXL:=21.552047436833;
+  LMD0:drift, L:=LLMD-0.5;
+  LMD1:drift, L:=LLMD;
+  LXL1:drift, L:=LLXL-0.5;
+  LXL2:drift, L:=LLXL;
+  LPOL:=54.4; //estimated length of polarimeter chicane (m)
+  DPCBPM:drift, L:=1.4;
+  LPFF0:=34.0570551849;
+  LPFFQ:=0.5;
+  LPFF1:=1.0;
+  LPFFB:=0.5;
+  LPFF2:=1.0;
+  LPFF3:=10.0;
+  LPFF4:=2.1481;
+  DPFF0:drift, L:=LPFF0;
+  DPFFQ:drift, L:=LPFFQ;
+  DPFF1:drift, L:=LPFF1;
+  DPFFB:drift, L:=LPFFB;
+  DPFF2:drift, L:=LPFF2;
+  DPFF3:drift, L:=LPFF3;
+  DPFF4:drift, L:=LPFF4;
+  LEGEO1:=3.041816244269E2;
+  EGEO1:drift, L:=LEGEO1;
+  PCBPM1:monitor;
+  PCBPM2:monitor;
+  PCBPM3:monitor;
+  BEGEIRT1:marker;
+  POL:marker;
+  ENDEIRT1:marker;
+  POLCHIC:LINE=(PCBPM1,DPCBPM,BPC1a,BPC1b,DPCBBo,BPC2a,BPC2b,DPCBBi,PCBPM2,
+                                    POL,DPCBBi,BPC3a,BPC3b,DPCBBo,BPC4a,BPC4b,DPCBPM,PCBPM3);
+  BBDGN:LINE=(LMD0,
+                                QMD5,BPMQ079,MMOVER,QMD5,LMD1,
+                                QMD6,BPMQ079,MMOVER,QMD6,LMD1,
+                                QMD7,BPMQ079,MMOVER,QMD7,LMD1,
+                                QMD8,BPMQ079,MMOVER,QMD8,LXL1,
+                                QXL1,BPMQ079,MMOVER,QXL1,LXL2,
+                                QXL2,BPMQ079,MMOVER,QXL2,LXL2,
+                                QXL3,BPMQ079,MMOVER,QXL3,LXL2,
+                                QXL4,BPMQ079,MMOVER,QXL4,LXL2,
+                                QXL5,BPMQ079,MMOVER,QXL5,LXL2,
+                                QXL6,BPMQ079,MMOVER,QXL6,LXL2,
+                                QXL7,BPMQ079,MMOVER,QXL7,LXL2,
+                                QXL8,BPMQ079,MMOVER,QXL8,LXL2,
+                                QXL9,BPMQ079,MMOVER,QXL9,LXL2,
+                                QXL10,BPMQ079,MMOVER,QXL10,LXL2,
+                                QXL11,BPMQ079,MMOVER,QXL11,LXL2,
+                                QXL12,BPMQ079,MMOVER,QXL12,DPFF0,
+                                QPFF0,BPMQ079,MMOVER,QPFF0,DPFFQ,
+                                QPFF1,BPMQ079,MMOVER,QPFF1,DPFF1,
+                                QPFF2,BPMQ079,MMOVER,QPFF2,DPFFQ,
+                                QPFF3,BPMQ079,MMOVER,QPFF3,DPFFB,
+                                POLCHIC,DPFFB,
+                                QPFF4,BPMQ079,MMOVER,QPFF4,DPFFQ,
+                                QPFF5,BPMQ079,MMOVER,QPFF5,DPFF2,
+                                QPFF6,BPMQ079,MMOVER,QPFF6,DPFFQ,
+                                QPFF7,BPMQ079,MMOVER,QPFF7,DPFF3,
+                                QPFF8,BPMQ079,MMOVER,QPFF8,DPFFQ,
+                                QPFF9,BPMQ079,MMOVER,QPFF9,DPFF4);
+  EIRT1:LINE=(BEGEIRT1,BBDGN,ENDEIRT1);
+  EIRT1G:LINE=(BEGEIRT1,
+                                  LMD0,
+                                  QMD5,QMD5,LMD1,
+                                  QMD6,QMD6,LMD1,
+                                  QMD7,QMD7,LMD1,
+                                  QMD8,QMD8,EGEO1,
+                                  QPFF0,QPFF0,DPFFQ,
+                                  QPFF1,QPFF1,DPFF1,
+                                  QPFF2,QPFF2,DPFFQ,
+                                  QPFF3,QPFF3,DPFFB,
+                                  POLCHIC,DPFFB,
+                                  QPFF4,QPFF4,DPFFQ,
+                                  QPFF5,QPFF5,DPFF2,
+                                  QPFF6,QPFF6,DPFFQ,
+                                  QPFF7,QPFF7,DPFF3,
+                                  QPFF8,QPFF8,DPFFQ,
+                                  QPFF9,QPFF9,DPFF4,
+                                  ENDEIRT1);
+  RETURN;

@@ -611,6 +611,12 @@ tests/share/LHC/LHCRing/V6.503/V6.5.thin.seq -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
+tests/share/line_lattice/README -text
+tests/share/line_lattice/ebsy.madx -text
+tests/share/line_lattice/edl1.madx -text
+tests/share/line_lattice/eff1.madx -text
+tests/share/line_lattice/eirt1.madx -text
+tests/share/line_lattice/line.seq -text
 tests/share/ring_lattice/README -text
 tests/share/ring_lattice/fv9.opt -text
 tests/share/ring_lattice/fv9.seq -text

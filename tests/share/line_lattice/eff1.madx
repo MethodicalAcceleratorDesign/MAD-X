@@ -1,0 +1,488 @@
+/*
+ reduce, BS1, bends;
+ rematch, sextupoles;
+ add, energy, spectrometer, chicane;
+ move, element=crab, cavity, upstream, of, ST4;
+ increase;
+ add, PPS, stoppers;
+ split, name=OC0, in, half;
+ per, A.Seryi:change, aperture;
+ increase, strength, of, OC7;
+ change, aperture, of, B5/QD8/QF7/QD6/QF5/;
+ added, SPE, energy, spoiler, to;
+ added, assorted, instrumentation, and, controls;
+*/ 
+ LB12:=12.0;
+  GB1:=0.01;
+  GB1p25:=0.0125;
+  GB3:=0.03;
+  TBS1:=Bsign*(-0.8394601319E-4);
+  TB5:=Bsign*( 0.1213152148E-3);
+  TB2:=Bsign*( 0.991473613E-4 );
+  TB1:=Bsign*( 0.357678789E-4 );
+  BS1:sbend, L:=LB12/2, ANGLE:=TBS1/2, HGAP:=GB1, FINT:=0, FINTX:=0, TYPE="H20";
+  B5:sbend, L:=LB12/2, ANGLE:=TB5/2, HGAP:=GB1p25, FINT:=0, FINTX:=0, TYPE="H25";
+  B2:sbend, L:=LB12/2, ANGLE:=TB2/2, HGAP:=GB3, FINT:=0, FINTX:=0, TYPE="H60";
+  B1:sbend, L:=LB12/2, ANGLE:=TB1/2, HGAP:=GB3, FINT:=0, FINTX:=0, TYPE="H60";
+  ECETA:=5.0; //peak dispersion (mm)
+  ECRMM:=0.485436893589E-4; //d(ANGLE)/d(ETA) (rad/mm)
+  ECANG:=ECETA*ECRMM; //chicane bend angle (rad)
+  ZBEC1:=3.0; //pole "Z" length (m)
+  RBEC1:=ZBEC1/SIN(ECANG); //bend radius (m)
+  LBEC1:=RBEC1*ECANG; //effective length (m)
+  ABEC1a:=ASIN(0.5*ZBEC1/RBEC1); //bend angle ("short" half)
+  LBEC1a:=RBEC1*ABEC1a; //effective length ("short" half)
+  ABEC1b:=ECANG-ABEC1a; //bend angle ("long" half)
+  LBEC1b:=LBEC1-LBEC1a; //effective length ("long" half)
+                BEC1a:sbend, L:=LBEC1a, ANGLE:=+ABEC1a, HGAP:=GB1, TYPE="H20"E1:=0, FINT:=0.5, FINTX:=0;
+                BEC1b:sbend, L:=LBEC1b, ANGLE:=+ABEC1b, HGAP:=GB1, TYPE="H20"E2:=+ECANG, FINT:=0, FINTX:=0.5;
+                BEC4a:sbend, L:=LBEC1b, ANGLE:=+ABEC1b, HGAP:=GB1, TYPE="H20"E1:=+ECANG, FINT:=0.5, FINTX:=0;
+                BEC4b:sbend, L:=LBEC1a, ANGLE:=+ABEC1a, HGAP:=GB1, TYPE="H20"E2:=0, FINT:=0, FINTX:=0.5;
+  ZBEC2:=6.0; //pole "Z" length (m)
+  RBEC2:=ZBEC2/SIN(ECANG); //bend radius (m)
+  LBEC2:=RBEC2*ECANG; //effective length (m)
+  ABEC2a:=ASIN(0.5*ZBEC2/RBEC2); //bend angle ("short" half)
+  LBEC2a:=RBEC2*ABEC2a; //effective length ("short" half)
+  ABEC2b:=ECANG-ABEC2a; //bend angle ("long" half)
+  LBEC2b:=LBEC2-LBEC2a; //effective length ("long" half)
+                BEC2a:sbend, L:=LBEC2b, ANGLE:=-ABEC2b, HGAP:=GB1, TYPE="H20"E1:=-ECANG, FINT:=0.5, FINTX:=0;
+                BEC2b:sbend, L:=LBEC2a, ANGLE:=-ABEC2a, HGAP:=GB1, TYPE="H20"E2:=0, FINT:=0, FINTX:=0.5;
+                BEC3a:sbend, L:=LBEC2a, ANGLE:=-ABEC2a, HGAP:=GB1, TYPE="H20"E1:=0, FINT:=0.5, FINTX:=0;
+                BEC3b:sbend, L:=LBEC2b, ANGLE:=-ABEC2b, HGAP:=GB1, TYPE="H20"E2:=-ECANG, FINT:=0, FINTX:=0.5;
+  ZECBBo:=16.1; //outer bend-to-bend "Z" spacing (m)
+  LECBBo:=ZECBBo/COS(ECANG); //outer bend-to-bend path length (m)
+  LECBBi:=1.4; //inner bend-to-bend "Z" spacing (m)
+  DECBBo:drift, L:=LECBBo;
+  DECBBi:drift, L:=LECBBi/2;
+ !this, one, sends, the, beam, to, a, 120, Hz;
+  SBD_FF:drift, L:=3.0/2, TYPE="H25"; //this is just a placeholder
+  LQ2:=2.0;
+  LQF1:=2.0;
+  LQD0:=2.2;
+  rQ1:=0.01;
+  rQ1p25:=0.0125;
+  rQ2:=0.02;
+  rQ3:=0.03;
+  KQB3:=-0.024980261682;
+  KQB2:=0.982705007366E-3;
+  KQB1:=0.022717941178;
+  KQB0:=-0.021939156638;
+  KQB0M:=KQB0;
+  KQB1M:=KQB1;
+  KQB2M:=-0.122420786593E-2;
+  KQB3M:=-0.030076318908;
+  KQS1:=0.01097678;
+  KQS2:=-0.01201029;
+  KQS3:=0.01195141;
+  KQM16:=-0.932086368071E-2;
+  KQM15:=0.499235704254E-2;
+  KQM14:=-0.306167094467E-2;
+  KQM13a:=-0.616285306201E-2;
+  KQM13b:=0.042946171654;
+  KQM12:=-0.018120377666;
+  KQM11:=0.016996304506;
+  KQD10:=-0.914613E-2;
+  KQF9:=0.01112554;
+  KQD8:=-0.01596707;
+  KQF7:=0.02085692;
+  KQD6:=-0.01596707;
+  KQF5:=0.0109844;
+  KQD4:=-0.8664E-2;
+  KQD2B:=-0.20227E-2;
+  KQF3:=0.01252071;
+  KQD2A:=-0.01126068;
+  KQF1:=0.09626012;
+  KQD0:=-0.16982715;
+  QB3:quadrupole, L:=LQ2/2, K1:=KQB3, aperture:=rQ1, TYPE="D20";
+  QB2:quadrupole, L:=LQ2/2, K1:=KQB2, aperture:=rQ1, TYPE="D20";
+  QB1:quadrupole, L:=LQ2/2, K1:=KQB1, aperture:=rQ1, TYPE="D20";
+  QB0:quadrupole, L:=LQ2/2, K1:=KQB0, aperture:=rQ1, TYPE="D20";
+  QB0M:quadrupole, L:=LQ2/2, K1:=KQB0M, aperture:=rQ1, TYPE="D20";
+  QB1M:quadrupole, L:=LQ2/2, K1:=KQB1M, aperture:=rQ1, TYPE="D20";
+  QB2M:quadrupole, L:=LQ2/2, K1:=KQB2M, aperture:=rQ1, TYPE="D20";
+  QB3M:quadrupole, L:=LQ2/2, K1:=KQB3M, aperture:=rQ1, TYPE="D20";
+  QS1:quadrupole, L:=LQ2/2, K1:=KQS1, aperture:=rQ1, TYPE="D20";
+  QS2:quadrupole, L:=LQ2/2, K1:=KQS2, aperture:=rQ1, TYPE="D20";
+  QS3:quadrupole, L:=LQ2/2, K1:=KQS3, aperture:=rQ1, TYPE="D20";
+  QM16:quadrupole, L:=LQ2/2, K1:=KQM16, aperture:=rQ2, TYPE="D40";
+  QM15:quadrupole, L:=LQ2/2, K1:=KQM15, aperture:=rQ2, TYPE="D40";
+  QM14:quadrupole, L:=LQ2/2, K1:=KQM14, aperture:=rQ2, TYPE="D40";
+  QM13a:quadrupole, L:=LQ2/2, K1:=KQM13a, aperture:=rQ2, TYPE="D40";
+  QM13b:quadrupole, L:=LQ2/2, K1:=KQM13b, aperture:=rQ2, TYPE="D40";
+  QM12:quadrupole, L:=LQ2/2, K1:=KQM12, aperture:=rQ2, TYPE="D40";
+  QM11:quadrupole, L:=LQ2/2, K1:=KQM11, aperture:=rQ2, TYPE="D40";
+  QD10:quadrupole, L:=LQ2/2, K1:=KQD10, aperture:=rQ1, TYPE="D20";
+  QF9:quadrupole, L:=LQ2/2, K1:=KQF9, aperture:=rQ1, TYPE="D20";
+  QD8:quadrupole, L:=LQ2/2, K1:=KQD8, aperture:=rQ1p25, TYPE="D25";
+  QF7:quadrupole, L:=LQ2/2, K1:=KQF7, aperture:=rQ1p25, TYPE="D25";
+  QD6:quadrupole, L:=LQ2/2, K1:=KQD6, aperture:=rQ1p25, TYPE="D25";
+  QF5:quadrupole, L:=LQ2/2, K1:=KQF5, aperture:=rQ1p25, TYPE="D25";
+  QD4:quadrupole, L:=LQ2/2, K1:=KQD4, aperture:=rQ1p25, TYPE="D25";
+  QD2B:quadrupole, L:=LQ2/2, K1:=KQD2B, aperture:=rQ3, TYPE="D60";
+  QF3:quadrupole, L:=LQ2/2, K1:=KQF3, aperture:=rQ3, TYPE="D60";
+  QD2A:quadrupole, L:=LQ2/2, K1:=KQD2A, aperture:=rQ3, TYPE="D60";
+  QF1:quadrupole, L:=LQF1/2, K1:=KQF1, aperture:=rQ1, TYPE="D20";
+  QD0:quadrupole, L:=LQD0/2, K1:=KQD0, aperture:=rQ1, TYPE="D20";
+  SQ3FF:drift, L:=0.3/2; //this is just a placeholder
+  LS1:=1.0;
+  LSF1:=0.3;
+  LSD0:=0.6;
+  rS1:=0.01;
+  rS1p25:=0.0125;
+  KSF6:=Bsign*(-1.69939443454 );
+  KSF5:=Bsign*( 0.419515957698);
+  KSD4:=Bsign*(-3.301438410805);
+  KSF1:=Bsign*( 7.252873476491);
+  KSD0:=Bsign*(-7.740702674458);
+  SF6:sextupole, L:=LS1/2, K2:=KSF6, aperture:=rS1, TYPE="D20";
+  SF5:sextupole, L:=LS1/2, K2:=KSF5, aperture:=rS1p25, TYPE="D25";
+  SD4:sextupole, L:=LS1/2, K2:=KSD4, aperture:=rS1p25, TYPE="D25";
+  SF1:sextupole, L:=LSF1/2, K2:=KSF1, aperture:=rS1, TYPE="D20";
+  SD0:sextupole, L:=LSD0/2, K2:=KSD0, aperture:=rS1, TYPE="D20";
+  LO3:=3.0;
+  LO2:=2.0;
+  LO1:=1.0;
+  LOp3:=0.3;
+  LOp1:=0.1;
+  rO1:=0.01;
+  rOp7:=0.007;
+  KOC7E:=-4.0753E3;
+  KOC7D:=3.3727E3;
+  KOC7C:=-3.8645E3;
+  KOC7B:=4.0261E3;
+  KOC7A:=-1.7566E3;
+  KOC10:=5.91716;
+  KOC1:=-32.54437;
+  KOC0:=3.0769222E2;
+  OC7E:octupole, L:=LO3/2, K3:=KOC7E, aperture:=rOp7, TYPE="D14";
+  OC7D:octupole, L:=LO3/2, K3:=KOC7D, aperture:=rOp7, TYPE="D14";
+  OC7C:octupole, L:=LO2/2, K3:=KOC7C, aperture:=rOp7, TYPE="D14";
+  OC7B:octupole, L:=LO2/2, K3:=KOC7B, aperture:=rOp7, TYPE="D14";
+  OC7A:octupole, L:=LOp3/2, K3:=KOC7A, aperture:=rOp7, TYPE="D14";
+  OC10:octupole, L:=LO1/2, K3:=KOC10, aperture:=rOp7, TYPE="D14";
+  OC4:drift, L:=LOp1;
+  OC1:octupole, L:=LOp3/2, K3:=KOC1, aperture:=rO1, TYPE="D20";
+  OC0:octupole, L:=LOp1/2, K3:=KOC0, aperture:=rO1, TYPE="D20";
+  VDEC46:=-1.77514E5;
+  KDEC6L:=Bsign*VDEC46/2;
+  KDEC4L:=Bsign*VDEC46/2;
+  DEC6:MULTIPOLE;
+  DEC4:MULTIPOLE;
+  XGAPSP1:=0.300e-3;
+ YGAPSP1:=0.250e-3;
+  XGAPAB2:=4.000e-3;
+ YGAPAB2:=4.000e-3;
+  XGAPSP2:=0.300e-3;
+ YGAPSP2:=0.200e-3;
+  RPC1:=5.000e-3;
+  XGAPAB3:=4.000e-3;
+ YGAPAB3:=4.000e-3;
+  XGAPSP3:=0.300e-3;
+ YGAPSP3:=0.250e-3;
+  RPC2:=5.000e-3;
+  RPC3:=5.000e-3;
+  XGAPAB4:=4.000e-3;
+ YGAPAB4:=4.000e-3;
+  XGAPSP4:=0.300e-3;
+ YGAPSP4:=0.200e-3;
+  RPC4:=5.000e-3;
+  RPC5:=5.000e-3;
+  XGAPAB5:=4.000e-3;
+ YGAPAB5:=4.000e-3;
+  XGAPSP5:=0.420e-3;
+ YGAPSP5:=0.250e-3;
+  RPC6:=5.000e-3;
+  RPDUMP:=10.000e-3;
+  RPC7:=5.000e-3;
+  XGAPSPEX:=3.200e-3;
+  RPC8:=5.000e-3;
+  RPC9:=5.000e-3;
+  RPC10:=5.000e-3;
+  XGAPABE:=1.000e-3;
+ YGAPABE:=1.000e-3;
+  RPC11:=5.000e-3;
+  XGAPAB10:=4.400e-3;
+ YGAPAB10:=4.400e-3;
+  XGAPAB9:=6.600e-3;
+ YGAPAB9:=3.000e-3;
+  XGAPAB7:=4.500e-3;
+ YGAPAB7:=3.000e-3;
+  XGAPMSK1:=8.300e-3;
+  XGAPMSK2:=8.500e-3;
+ YGAPSP1=0.750e-3;
+ YGAPSP2=0.750e-3;
+ YGAPSP3=0.750e-3;
+ YGAPSP4=0.750e-3;
+ YGAPSP5=0.750e-3;
+  LSPB:=0.0086; // 0.6 r.l. Cu
+  LSPE:=0.0356; // 1.0 r.l. Ti
+  LAB:=0.4290; //30.0 r.l. Cu
+  LABFF:=0.1050; //30.0 r.l. W
+  LPC:=0.2145; //15.0 r.l. Cu
+  LMSK:=0.1050; //30.0 r.l. W
+  SP1:rcollimator, L:=LSPB, TYPE="X0.6Y0.5"XSIZE:=XGAPSP1, YSIZE:=YGAPSP1;
+  AB2:rcollimator, L:=LAB, TYPE="X8Y8"XSIZE:=XGAPAB2, YSIZE:=YGAPAB2;
+  SP2:rcollimator, L:=LSPB, TYPE="X0.6Y0.4"XSIZE:=XGAPSP2, YSIZE:=YGAPSP2;
+  PC1:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC1, YSIZE:=RPC1;
+  AB3:rcollimator, L:=LAB, TYPE="X8Y8"XSIZE:=XGAPAB3, YSIZE:=YGAPAB3;
+  SP3:rcollimator, L:=LSPB, TYPE="X0.6Y0.5"XSIZE:=XGAPSP3, YSIZE:=YGAPSP3;
+  PC2:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC2, YSIZE:=RPC2;
+  PC3:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC3, YSIZE:=RPC3;
+  AB4:rcollimator, L:=LAB, TYPE="X8Y8"XSIZE:=XGAPAB4, YSIZE:=YGAPAB4;
+  SP4:rcollimator, L:=LSPB, TYPE="X0.6Y0.4"XSIZE:=XGAPSP4, YSIZE:=YGAPSP4;
+  PC4:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC4, YSIZE:=RPC4;
+  PC5:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC5, YSIZE:=RPC5;
+  AB5:rcollimator, L:=LAB, TYPE="X8Y8"XSIZE:=XGAPAB5, YSIZE:=YGAPAB5;
+  SP5:rcollimator, L:=LSPB, TYPE="X0.84Y0.5"XSIZE:=XGAPSP5, YSIZE:=YGAPSP5;
+  PC6:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC6, YSIZE:=RPC6;
+  PDUMP:ecollimator, L:=LPC, TYPE="X20Y20"XSIZE:=RPDUMP, YSIZE:=RPDUMP;
+  PC7:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC7, YSIZE:=RPC7;
+  SPEX:rcollimator, L:=LSPE, TYPE="X6.4Y0"XSIZE:=XGAPSPEX;
+  PC8:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC8, YSIZE:=RPC8;
+  PC9:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC9, YSIZE:=RPC9;
+  PC10:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC10, YSIZE:=RPC10;
+  ABE:rcollimator, L:=LABFF, TYPE="X2Y2"XSIZE:=XGAPABE, YSIZE:=YGAPABE;
+  PC11:ecollimator, L:=LPC, TYPE="X10Y10"XSIZE:=RPC11, YSIZE:=RPC11;
+  AB10:rcollimator, L:=LABFF, TYPE="X8.8Y8.8"XSIZE:=XGAPAB10, YSIZE:=YGAPAB10;
+  AB9:rcollimator, L:=LABFF, TYPE="X13.2Y6"XSIZE:=XGAPAB9, YSIZE:=YGAPAB9;
+  AB7:rcollimator, L:=LABFF, TYPE="X9Y6"XSIZE:=XGAPAB7, YSIZE:=YGAPAB7;
+  MSK1:rcollimator, L:=LMSK, TYPE="X16.6Y0"XSIZE:=XGAPMSK1;
+  MSK2:rcollimator, L:=LMSK, TYPE="X17Y0"XSIZE:=XGAPMSK2;
+  LDBM:=2.1481;
+  LDB0:=2.1481;
+  dLDB0:=25.752235097059;
+  LDB1:=79.8744;
+  LDB2:=4.3039;
+  LDBMM:=2.1481;
+  LDB1M:=35.25883770713;
+  LDB0M:=42.220804966667;
+  dLmdw:=0;
+  DBM:drift, L:=LDBM;
+  DB0:drift, L:=LDB0+dLDB0;
+  DB1:drift, L:=LDB1-dLDB0;
+  DB2:drift, L:=LDB2;
+  DBMM:drift, L:=LDBMM;
+  DB1M:drift, L:=LDB1M;
+  DB0M:drift, L:=LDB0M;
+  LX0:drift, L:=0.3;
+  DS3:drift, L:=12.0;
+  DSM:drift, L:=1.0;
+  D12:drift, L:=10.797027991439+dLmdw;
+  D11:drift, L:=12.0;
+  D10:drift, L:=12.0;
+  D9:drift, L:=12.0;
+  D8:drift, L:=12.0;
+  D7E:drift, L:=10.7;
+  D7D:drift, L:=4.0;
+  D7C:drift, L:=37.0;
+  D7B:drift, L:=3.0;
+  D7A:drift, L:=37.0;
+  D7:drift, L:=12.0;
+  D710:drift, L:=3.0;
+  D6A:drift, L:=0.86777;
+  D6:drift, L:=9.23999;
+  D5B:drift, L:=6.89534-4*SBD_FF->L-2*LX0->L;
+  D5A:drift, L:=6.89534;
+  D4:drift, L:=9.23999;
+  D4A:drift, L:=0.86777;
+  D3:drift, L:=20.01176;
+  D3B:drift, L:=28.6;
+  D2:drift, L:=77.08464;
+  D1C:drift, L:=0.15;
+  D1B:drift, L:=1.35;
+  D1A:drift, L:=0.05;
+  D0:drift, L:=3.51;
+  DBMa:drift, L:=DBM->L-LSPB;
+  DBMb:drift, L:=DBM->L-(LAB+LSPB);
+  DB0a:drift, L:=DB0->L-0.5;
+  DB0b:drift, L:=0.5-LPC;
+  DB1a:drift, L:=DB1->L/2;
+  DB1b:drift, L:=DB1->L-DB1a->L;
+  DB1d:drift, L:=0.5-LPC;
+  DB1c:drift, L:=DB1->L-(DB1a->L+LPC+DB1d->L);
+  DB2a:drift, L:=DB2->L-0.5;
+  DB2b:drift, L:=0.5-LPC;
+  DBMMa:drift, L:=DBMM->L-(LAB+LSPB);
+  DB1Ma:drift, L:=DB1M->L-0.5;
+  DB1Mb:drift, L:=0.5-LPC;
+  DB0Mb:drift, L:=3.0-(LAB+LSPB);
+  DB0Ma:drift, L:=DB0M->L-3.0;
+  LX0a:drift, L:=LX0->L-LPC;
+  DSMa:drift, L:=DSM->L-LSPE;
+  DS3a:drift, L:=DS3->L-0.5;
+  DS3b:drift, L:=0.5-LPC;
+  LX0b:drift, L:=LX0->L-LABFF;
+  D710a:drift, L:=D710->L-LABFF;
+  D3c:drift, L:=24.89536;
+  D2b:drift, L:=34.825;
+  D2a:drift, L:=40.295;
+  DMSQ:drift, L:=1.45464;
+  MUSP1:drift, L:=9.0, TYPE="muon spoiler";
+  D7Ea:drift, L:=(D7E->L-MUSP1->L)/2;
+  MUSP2:drift, L:=18.0, TYPE="muon spoiler";
+  D3a:drift, L:=5.7164;
+  DSPECT:drift, L:=0.5;
+  DECBPM:drift, L:=1.4;
+  LX0h:drift, L:=LX0->L/2;
+  BEGEFF1:marker;
+  BCOL1:marker;
+  BCOL2:marker;
+  MDW:marker;
+  ESPECT:marker;
+  IP:marker;
+  ENDEFF1:marker;
+  MR1i:marker;
+  MR1f:marker;
+  MR2i:marker;
+  MR2f:marker;
+!  PHASEMON:INST; //beam arrival phase monitor
+  PHASEMON:MONITOR; //beam arrival phase monitor
+!  WS_DIV:WIRE; //divergence wire scanner
+!  WS_ESP:WIRE; //energy spread wire scanner
+  WS_DIV:monitor; //divergence wire scanner
+  WS_ESP:monitor; //energy spread wire scanner
+  ST1:marker; //PPS
+  ST2:marker; //PPS
+  ST3:marker; //PPS
+  ST4:marker; //tune-up (1 bunch   750 GeV, 10 Hz = 20 kW)
+  CRAB_CAV:drift, L:=1.26;
+  XCORFB:hkicker;
+  YCORFB:vkicker;
+  XCORIP:hkicker;
+  YCORIP:vkicker;
+  QDMY_IP:quadrupole, L:=1.E-06, K1:=0, aperture:=1, TYPE="VIRTUAL";
+  BPM_IP:monitor, TYPE="DEFLECTION"; //for deflection monitoring simulations
+!  WS_IP:WIRE; //IP beam size via lumi or deflection scans
+  WS_IP:monitor; //IP beam size via lumi or deflection scans
+  IP_PKG:LINE=(QDMY_IP,BPM_IP,QDMY_IP,WS_IP);
+  ECBPM1:monitor;
+  ECBPM2:monitor;
+  ECBPM3:monitor;
+  QF1PKG:LINE=(QF1,BPMQ079,QF1);
+  QD0PKG:LINE=(QD0,BPMQ079,QD0);
+  EFFu:LINE=(BEGEFF1,
+                              BPMMB079,XCORFB,YCORFB,MR1i,SP1,DBMa,
+                              QB3,BPMQ079,QB3,DB0,
+                              QB2,BPMQ079,QB2,DB1a,ST1,DB1b,
+                              QB1,BPMQ079,QB1,DB2,
+                              QB0,BPMQ079,QB0,DBM,BCOL1,BPMMB079,XCORFB,YCORFB,AB2,SP2,DBMb,
+                              QB0,BPMQ079,QB0,DB2,
+                              QB1,BPMQ079,QB1,DB1a,ST2,DB1c,PC1,DB1d,
+                              QB2,BPMQ079,QB2,DB0,
+                              QB3,BPMQ079,QB3,DBMM,MR1f,BPMMB079,XCORFB,YCORFB,AB3,SP3,DBMMa,
+                              QB3,BPMQ079,QB3,DB0a,PC2,DB0b,
+                              QB2,BPMQ079,QB2,DB1a,ST3,DB1c,PC3,DB1d,
+                              QB1,BPMQ079,QB1,DB2,
+                              QB0,BPMQ079,QB0,DBM,BCOL2,BPMMB079,XCORFB,YCORFB,AB4,SP4,DBMb,
+                              QB0M,BPMQ079,QB0M,DB2a,PC4,DB2b,
+                              QB1M,BPMQ079,QB1M,DB1Ma,PC5,DB1Mb,
+                              QB2M,BPMQ079,QB2M,DB0Ma,BPMMB079,AB5,SP5,DB0Mb,
+                              QB3M,BPMQ079,QB3M,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PC6,LX0a,
+                              QS1,BPMQ079,QS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PDUMP,LX0a,BPME,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,BPME,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,BPME,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,BPME,WS_ESP,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PC7,LX0a,
+                              QS2,BPMQ079,QS2,DS3,
+                              QS3,BPMQ079,QS3,DSM,SPEX,DSMa,
+                              QS3,BPMQ079,QS3,DS3a,PC8,DS3b,
+                              QS2,BPMQ079,QS2,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PC9,LX0a,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PC10,LX0a,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,ABE,LX0b,
+                              QS1,BPMQ079,QS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,LX0,
+                              BS1,BS1,PC11,LX0a);
+  EFFs:LINE=(MDW,DSPECT,
+                              ECBPM1,DECBPM,BEC1a,BEC1b,DECBBo,BEC2a,BEC2b,DECBBi,ECBPM2,
+                              ESPECT,DECBBi,BEC3a,BEC3b,DECBBo,BEC4a,BEC4b,DECBPM,ECBPM3,
+                              DSPECT,MDW);
+  EFFm:LINE=(QM16,BPMQ079,QM16,D12,
+                              QM15,BPMQ079,QM15,D11,
+                              QM14,BPMQ079,QM14,D10,
+                              QM13a,BPMQ079,QM13a,LX0h,EFFs,LX0h,
+                              QM13b,BPMQ079,QM13b,D9,
+                              QM12,BPMQ079,QM12,D8,
+                              QM11,BPMQ079,QM11);
+  EFFd:LINE=(D7Ea,MUSP1,D7Ea,
+                              OC7E,BPMVIRT,OC7E,D7D,
+                              OC7D,BPMVIRT,OC7D,D7C,
+                              OC7C,BPMVIRT,OC7C,D7B,
+                              OC7B,BPMVIRT,OC7B,D7A,
+                              OC7A,BPMVIRT,OC7A,D7,AB10,D710a,
+                              QD10,BPMQ079,QD10,LX0,
+                              OC10,BPMVIRT,OC10,LX0,WS_DIV,
+                              QD10,BPMQ079,QD10,D6A,DEC6,BPMVIRT,DEC6,BPMMB079,D6,
+                              QF9,BPMQ079,QF9,AB9,LX0b,
+                              SF6,MR2i,BPMVIRT,SF6,BPMMB079,LX0,
+                              QF9,BPMQ079,QF9,D5B,2*(SBD_FF),LX0,2*(SBD_FF),LX0,
+                              B5,B5,LX0,
+                              B5,B5,LX0,
+                              B5,B5,LX0,
+                              QD8,BPMQ079,QD8,LX0,
+                              B5,B5,LX0,
+                              B5,B5,AB7,LX0b,
+                              QF7,BPMQ079,QF7,XCORFB,YCORFB,LX0,
+                              B5,B5,LX0,
+                              B5,B5,LX0,
+                              QD6,BPMQ079,QD6,LX0,
+                              B5,B5,LX0,
+                              B5,B5,LX0,
+                              B5,B5,D5A,
+                              QF5,BPMQ079,QF5,LX0,
+                              SF5,MR2f,BPMVIRT,SF5,BPMMB079,LX0,
+                              QF5,BPMQ079,QF5,D4,DEC4,BPMVIRT,DEC4,D4A,
+                              QD4,BPMQ079,QD4,LX0,
+                              SD4,BPMVIRT,SD4,BPMMB079,LX0,
+                              QD4,BPMQ079,QD4,OC4,D3a,MUSP2,D3c,LX0,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              B2,B2,LX0,XCORFB,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              QD2B,BPMQ079,QD2B,LX0,YCORFB,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              QF3,BPMQ079,QF3,LX0,
+                              B2,B2,LX0,
+                              B2,B2,LX0,
+                              QD2A,BPMQ079,QD2A,LX0,
+                              B1,B1,LX0,
+                              B1,B1,LX0,
+                              B1,B1,LX0,
+                              B1,B1,LX0,
+                              B1,B1,LX0,
+                              B1,B1,D2a,MSK1,D2b,CRAB_CAV,LX0,ST4,LX0,MSK2,DMSQ,
+                              SQ3FF,SQ3FF,LX0,PHASEMON,
+                              OC1,BPMVIRT,OC1,LX0,BPMMB079,
+                              SF1,BPMVIRT,SF1,D1C,
+                              QF1PKG,D1B,
+                              SD0,BPMVIRT,SD0,BPMMB079,OC0,BPMVIRT,OC0,D1A,
+                              QD0PKG,XCORIP,YCORIP,D0,IP,
+                              ENDEFF1);
+  EFF1:LINE=(EFFu,EFFm,EFFd);
+  EFF1S:LINE=(EFF1,IP_PKG);
+  RETURN;

@@ -1,0 +1,117 @@
+! split, name=bsy, at;
+  BQF90:=9.32870009865*Efact;
+  BQD90:=-BQF90;
+  BQF180:=6.383722143932*Efact;
+  BQD180:=-4.784844946028*Efact;
+  QF90:QBDS2, K1:=BQF90*QFACT2;
+  QD90:QBDS2, K1:=BQD90*QFACT2;
+  QF180:QBDS3, K1:=BQF180*QFACT3;
+  QD180:QBDS3, K1:=BQD180*QFACT3;
+  BSQ1:=0; //1.0E-6
+  BSQ2:=0; //1.0E-6
+  BSQ3:=0; //1.0E-6
+  BSQ4:=0; //1.0E-6
+  SQ1:QBDS1, K1:=BSQ1*QFACT1, TILT=PI/4.;
+  SQ2:QBDS1, K1:=BSQ2*QFACT1, TILT=PI/4.;
+  SQ3:QBDS1, K1:=BSQ3*QFACT1, TILT=PI/4.;
+  SQ4:QBDS1, K1:=BSQ4*QFACT1, TILT=PI/4.;
+  BQD9045:=-8.819060050165*Efact;
+  BQF9045:=9.523039801269*Efact;
+  QD9045:QBDS2, K1:=BQD9045*QFACT2;
+  QF9045:QBDS2, K1:=BQF9045*QFACT2;
+  BQD45:=-8.460739400782*Efact;
+  BQF45:=-BQD45;
+  QD45:QBDS2, K1:=BQD45*QFACT2;
+  QF45:QBDS2, K1:=BQF45*QFACT2;
+  LQ90XD:=1.5;
+  rQ90XD:=0.01;
+  BQF90X:=3.951848838681*Efact;
+  BQD90X:=-3.549392190031*Efact;
+  QF90X:quadrupole, L:=LQ90XD/2, K1:=BQF90X/(Brho*rQ90XD),aperture:=rQ90XD;
+  QD90X:QBDS2, K1:=BQD90X*QFACT2;
+  BQF4590:=5.706803270611*Efact;
+  BQD4590:=-5.393167349956*Efact;
+  QF4590:QBDS2, K1:=BQF4590*QFACT2;
+  QD4590:QBDS2, K1:=BQD4590*QFACT2;
+  LMLS:=0.168588725; //NLC2001 value was 0.5
+  L90:=14.508; //90 degree cell drift
+  L180A:=9.567631278909; //180 degree cell drift (1)
+  L180B:=8.960829921929; //180 degree cell drift (2)
+  L9045A:=14.499467191263; //90/45 matching drift (1)
+  L9045B:=11.240943258947; //90/45 matching drift (2)
+  L45:=8.39216; //45 degree cell drift
+  L4590A:=20.205817611648; //45/90 matching drift (1)
+  L4590B:=19.453436301042; //45/90 matching drift (2)
+  L90X:=39.0; //90 degree SBD cell drift
+  DMLS:drift, L:=LMLS;
+  D90:drift, L:=L90;
+  D180A:drift, L:=L180A;
+  D180B:drift, L:=L180B;
+  D9045A:drift, L:=L9045A;
+  D9045B:drift, L:=L9045B;
+  D45:drift, L:=L45;
+  D4590A:drift, L:=L4590A;
+  D4590B:drift, L:=L4590B;
+  D90X:drift, L:=L90X;
+  LQSQ:=2.313; //skew-quad-to-quad drift
+  LQWS:=0.5; //quad-to-wire-scanner drift
+  LWS45:=2.99; //location adjustment for first wire scanner
+  LFBQ:=0.5; //feedback-kicker-to-quad drift
+  LDSBD:=0.5; //quad-to-SBD and SBD-to-SBD drift
+  D90a:drift, L:=L90-(LQSQ+L50CM);
+  D90b:drift, L:=LQSQ;
+  D180Aa:drift, L:=L180A-(LQSQ+L50CM);
+  D180Ab:drift, L:=LQSQ;
+  D9045Ba:drift, L:=LQWS+LWS45;
+  D9045Bb:drift, L:=L9045B-(LQWS+LWS45);
+  D45a:drift, L:=LQWS;
+  D45b:drift, L:=L45-LQWS;
+  D90Xa:drift, L:=LDSBD;
+  D90Xb:drift, L:=L90X-LDSBD;
+  DFB1:drift, L:=LQSQ-(LFBC/2+Lspace+LFBK+LFBQ);
+  DFB2:drift, L:=LFBC/2+Lspace+LFBK/2;
+  DFB3:drift, L:=LFBQ;
+  DFB4:drift, L:=L9045A-(LFBC/2+Lspace+LFBK+LFBQ);
+  BEGEBSY:marker;
+  EXT0:marker; // SBD kicker entry face
+  ENDEBSY:marker;
+  WSEBSY1:WS;
+  WSEBSY2:WS;
+  WSEBSY3:WS;
+  WSEBSY4:WS;
+! quads, rematched;
+  SKSRCA:LINE=(BPMQ079,MMOVER,QF90,D90a,
+                                  SQ1,SQ1,D90b,
+                                  QD90,BPMQ079,MMOVER,QD90,D90,
+                                  QF90,BPMQ079,MMOVER,QF90,D90a,
+                                  SQ2,SQ2,D90b,
+                                  QD90,BPMQ079,MMOVER,QD90,D180A,
+                                  QF180,BPMQ079,MMOVER,QF180,D180B,
+                                  QD180,BPMQ079,MMOVER,QD180,D180B,
+                                  QF180,BPMQ079,MMOVER,QF180,D180Aa,
+                                  SQ3,SQ3,D180Ab,
+                                  QD90,BPMQ079,MMOVER,QD90,D90,
+                                  QF90,BPMQ079,MMOVER,QF90,D90a,
+                                  SQ4,SQ4,DFB1,FBCXY,DFB2,FBKXY,DFB3,
+                                  QD90,BPMMB079,MMOVER,QD90,D90,
+                                  QF90,BPMMB079,MMOVER,QF90,DFB4,FBCXY,DFB2,FBKXY,DFB3,
+                                  QD9045,BPMMB079,MMOVER,QD9045,D9045Ba,WSEBSY1,
+                                  BPMWS,D9045Bb,
+                                  QF9045,BPMMB079,MMOVER,QF9045,D45,
+                                  QD45,BPMMB079,MMOVER,QD45,D45a,WSEBSY2,BPMWS,D45b,
+                                  QF45,BPMMB079,MMOVER,QF45,D45,
+                                  QD45,BPMMB079,MMOVER,QD45,D45a,WSEBSY3,BPMWS,D45b,
+                                  QF45,BPMMB079,MMOVER,QF45,D45,
+                                  QD45,BPMMB079,MMOVER,QD45,D45a,WSEBSY4,BPMWS,D4590A,
+                                  QF4590,BPMQ079,QF4590,D4590B,
+                                  QD4590,BPMQ079,QD4590,D90Xa,EXT0);
+  SKSRCB:LINE=(D90Xb,
+                                  QF90X,BPMQ079,QF90X,D90X,
+                                  QD4590,BPMQ079,QD4590,D4590B,
+                                  QF4590,BPMQ079,QF4590,D4590A,D45a,
+                                  QD45,BPMQ079,QD45,D45a);
+  SKSRC:LINE=(SKSRCA,SKSRCB);
+  L2SS:LINE=(DMLS,QF90);
+  EBSYx:LINE=(BEGEBSY,L2SS,SKSRCA);
+  EBSY:LINE=(BEGEBSY,L2SS,SKSRC,ENDEBSY);
+  RETURN;
