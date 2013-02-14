@@ -49,8 +49,7 @@ ptc_create_universe;
 ptc_create_layout,model=2,method=2,nst=2,exact;
 
 select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
-
-ptc_twiss ,closed_orbit,                icase=6,no=5, file="ptc-twiss-table.out";
-ptc_normal,closed_orbit,maptable,normal,icase=6,no=5;
+ptc_twiss ,closed_orbit,                icase=6,no=3, file="ptc-twiss-table.out";
+ptc_normal,closed_orbit,maptable,normal,icase=6,no=3;
 
 ptc_end;

@@ -1,11 +1,14 @@
 !TITLE,'Test input for PTC_TWISS ';
 
 !=========== RING PARAMETERS ===========================================
- eg   :=  100;
- bg   :=  eg/pmass;
- en   := 3.75e-06;
- epsx := en/bg;
- epsy := en/bg;
+option, -echo, -warn, -info;
+
+eg   :=  100;
+bg   :=  eg/pmass;
+en   := 3.75e-06;
+epsx := en/bg;
+epsy := en/bg;
+
 beam, particle = proton, energy =   eg        , 
                          sigt=      0.077     , 
                          sige=      1.1e-4    , 
@@ -14,11 +17,11 @@ beam, particle = proton, energy =   eg        ,
                          kbunch = 10,
                          et = 0.002, bv = 1,
                          ex=epsx,   ey=epsy;
-value,epsx,epsy;
-option,-echo;
-call file="fv9.opt";
-call file="fv9.seq";
-option,echo;
+
+call file="input/fv9.opt";
+call file="input/fv9.seq";
+
+option, warn, info;
 
 use,period=fivecell;
 // alignment errors
@@ -34,27 +37,21 @@ acbh4=1e-6;
 acbh5=1e-6;
 
 ! At the end of the ring the data_block is produced
-
-SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
+savebeta, label=twssip, place=#e,sequence=fivecell;
 
 select,flag=twiss,column=name,s,betx,bety,dx,dy;
+twiss, file="twiss-table.out"; 
 
-TWISS, FILE="twiss-table.out"; 
-
-SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
-
+show,twssip;     ! show parameters (see "*.out" file)
 
 ! Initialize PTC
 ptc_create_universe;
 ptc_create_layout,model=2,method=6,nst=10,exact;
 !ptc_align;
 
-select,flag=ptc_twiss,
-       column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
-
-ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
-
-PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
+select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
+ptc_twiss ,closed_orbit,                icase=5,no=3,file="ptc-twiss-table.out";
+ptc_normal,closed_orbit,maptable,normal,icase=5,no=3;
 ptc_end;
 stop;
 

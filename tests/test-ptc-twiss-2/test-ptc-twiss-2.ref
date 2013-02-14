@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 13.02.13 16.07.57 +
+  + Execution Time Stamp: 14.02.13 12.25.11 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -12,6 +12,8 @@ TITLE, "LHC Version 6.503 -  July 2009" ;
 option, -echo, -warn, -info;
 
 enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
 orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
@@ -60,7 +62,9 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
  Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   1.217034119481917E-004  2.933730797772849E-014 -7.969069843483112E-005
+ After    end:   1.217034119481913E-004  2.933730797772849E-014 -7.969069843483112E-005
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
  F
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
@@ -84,13 +88,13 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-Deviation from symplecticity  0.1048361356161705E-08 %
+Deviation from symplecticity  0.2850940646692440E-09 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :       13209
   NUMBER OF THIN OBJECTS :       70514
   TOTAL IDEAL LENGTH OF STRUCTURE :   26658.8831999999     
   TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   26658.8831999999     
-Deviation from symplecticity  0.1048361356161705E-08 %
+Deviation from symplecticity  0.2850940646692440E-09 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -98,25 +102,25 @@ Deviation from symplecticity  0.1048361356161705E-08 %
         26658.8832    0.0003216320505           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003172846404        55.75968867        0.280001024 
+          -1000000    0.0003172846404        55.75968867       0.2800010241 
 
                 q2                dq1                dq2                 qs 
       0.3100006055                  0                  0                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       9.999992762        595.1202014        9.999993276        609.5257298 
+       9.999992761        595.1202013        9.999993275        609.5257296 
 
             deltap            orbit_x           orbit_px            orbit_y 
-                 0    -0.001999999063   -5.509066378e-12   -6.470088556e-10 
+                 0    -0.001999999044   -4.836986048e-12   -6.470088644e-10 
 
           orbit_py           orbit_pt          orbit_-cT             xcorms 
-   0.0001700000459                  0                  0    0.0007074564927 
+   0.0001700000459                  0                  0    0.0007074564939 
 
             ycorms            pxcorms            pycorms             xcomax 
-    0.000713726789    2.376320075e-05    2.414012503e-05     0.007390738727 
+    0.000713726789    2.376320073e-05    2.414012503e-05     0.007390738713 
 
             ycomax            pxcomax            pycomax 
-    0.008056958782    0.0004263339837    0.0004558719032 
+    0.008056958782    0.0004263339863    0.0004558719032 
  F
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
@@ -141,7 +145,7 @@ Deviation from symplecticity  0.1048361356161705E-08 %
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Normal Form Type 1
-Deviation from symplecticity  0.1048361356161705E-08 %
+Deviation from symplecticity  0.2850940646692440E-09 %
  Killing LayoutNo name assigned                                                                                                        
   NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
@@ -150,5 +154,5 @@ Deviation from symplecticity  0.1048361356161705E-08 %
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.00.19 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

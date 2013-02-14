@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.00.19  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 08.02.13 16.06.25 +
+  + Execution Time Stamp: 14.02.13 15.11.18 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -11,81 +11,9 @@
 
 !=========== RING PARAMETERS ===========================================
 
- eg   :=  100;
-
- bg   :=  eg/pmass;
-
- en   := 3.75e-06;
-
- epsx := en/bg;
-
- epsy := en/bg;
-
-beam, particle = proton, energy =   eg        , 
-
-                         sigt=      0.077     , 
-
-                         sige=      1.1e-4    , 
-
-                         npart=     1.05e11   , 
-
-                         exn=4*en,  eyn=4*en  , 
-
-                         kbunch = 10,
-
-                         et = 0.002, bv = 1,
-
-                         ex=epsx,   ey=epsy;
-
-value,epsx,epsy;
-
-epsx =    3.518520049e-08 ;
-epsy =    3.518520049e-08 ;
-option,-echo;
-
-
-
-use,period=fivecell;
-
-// alignment errors
-
-
-
-select,flag=error,clear;
-
-select,flag=error,pattern="q.*",range=qf.1;
-
-ealign,dx=0.0001;
+option, -echo, -warn, -info;
 
 Assigned alignment errors to 1 elements
-
-
-acbh1=1e-6;
-
-acbh2=1e-6;
-
-acbh3=1e-6;
-
-acbh4=1e-6;
-
-acbh5=1e-6;
-
-
-
-! At the end of the ring the data_block is produced
-
-
-
-SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
-
-
-
-select,flag=twiss,column=name,s,betx,bety,dx,dy;
-
-
-
-TWISS, FILE="twiss-table.out"; 
-
 enter Twiss module
   
 iteration:   1 error:   6.606181E-04 deltap:   0.000000E+00
@@ -113,10 +41,6 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-
-
-SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
-
 command: beta0  module: control
 parameter: betx   double value:        177.7010914
 parameter: alfx   double value:        -2.41257182
@@ -149,17 +73,7 @@ parameter: r12   double value:                  0
 parameter: r21   double value:                 -0
 parameter: r22   double value:                  0
 parameter: energy   double value:                100
-
-
-
-
-! Initialize PTC
-
-ptc_create_universe;
-
  Now PTC
-ptc_create_layout,model=2,method=6,nst=10,exact;
-
  MAD-X Beam Parameters
                   Energy : 0.100000E+03
           Kinetic Energy : 0.990617E+02
@@ -177,18 +91,6 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
  Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
-!ptc_align;
-
-
-
-select,flag=ptc_twiss,
-
-       column=name,s,beta11,beta21,beta12,beta22,disp1,disp3,x,px,y,py;
-
-
-
-ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
-
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -211,13 +113,13 @@ ptc_twiss,closed_orbit,icase=5,no=3,file="ptc-twiss-table.out";
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5606626274357041E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
   NUMBER OF THIN OBJECTS :        1180
   TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
   TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
-Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5606626274357041E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -244,10 +146,6 @@ Deviation from symplecticity  0.5251354906476990E-11 %
 
             ycomax            pxcomax            pycomax 
                  0    7.281171647e-07                  0 
-
-
-PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
-
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -271,17 +169,13 @@ PTC_NORMAL,closed_orbit,maptable,normal,icase=5,no=3; ! currently cause
        ACCELERATE  =  FALSE
  Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  Normal Form Type 1
-Deviation from symplecticity  0.5251354906476990E-11 %
-ptc_end;
-
+Deviation from symplecticity  0.5606626274357041E-11 %
  Killing LayoutNo name assigned                                                                                                        
   NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
-stop;
-
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.00.19 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
