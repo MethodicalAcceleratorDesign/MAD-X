@@ -2,8 +2,8 @@
 @ TYPE             %07s "MAP_TAB"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %23s "MAD-X 5.00.19 Darwin 64"
-@ DATE             %08s "14/02/13"
-@ TIME             %08s "16.53.12"
+@ DATE             %08s "15/02/13"
+@ TIME             %08s "11.54.18"
 *               COEF   N_VECTOR         NV      ORDER         NX        NXP         NY        NYP    NDELTAP         NT 
 $                %le         %d         %d         %d         %d         %d         %d         %d         %d         %d 
     0.0003260715511          1          5          0          0          0          0          0          0          0
