@@ -1,5 +1,6 @@
 #include "mad_extrn_f.h"
 #include "mad_core.h"
+#include "mad_err.h"
 
 #define const // disable const for this module
 #include "mad_main.h"
@@ -51,7 +52,7 @@ main(int argc, char *argv[])
   mad_run ();
   mad_fini();
 
-  return EXIT_SUCCESS;
+  return geterrorflag() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 void
@@ -68,10 +69,16 @@ mad_init(int argc, char *argv[])
 
   // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
   if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
-    // YIL-2012: Using putenv instead, also available on Windows. Declaration first..
-    int putenv(char*);
+#ifdef _WIN32
+    int putenv(char *string);
     putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
+#else
+    setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
+#endif
     execvp(argv[0], argv);
+    // should never be reached...
+    fprintf(stderr, "fatal error: unable to synchronize Fortran versus C I/O\n");
+    exit(EXIT_FAILURE);
   }
 #endif
 

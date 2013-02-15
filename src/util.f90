@@ -1292,7 +1292,7 @@ subroutine aafail(rout,text)
   print *,  '+-+-+- fatal: ',rout,text
   print *,' '
   print *,' '
-  stop
+  stop  1
 
 end subroutine aafail
 double precision function proxim(x,y)
