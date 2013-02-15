@@ -20,6 +20,16 @@
 #include <ctype.h>
 #include <math.h>
 
+// macros
+
+#ifdef _WIN32
+#define CSTR_RED(s) s
+#define CSTR_GREEN(s) s
+#else
+#define CSTR_RED(s)   "\033[31m" s "\033[0m"
+#define CSTR_GREEN(s) "\033[32m" s "\033[0m"
+#endif
+
 // extern functions
 
 FILE* open_indexedFile(const char* str, int idx, const char *ext, int optext, int required);

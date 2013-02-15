@@ -247,9 +247,9 @@ static void
 ndiff_header(void)
 {
   if (option.test)
-    warning("(*) files %s from %s differ", option.indexed_filename, option.test);
+    warning("(*) files " CSTR_RED("%s") " from %s differ", option.indexed_filename, option.test);
   else
-    warning("(*) files %s differ", option.indexed_filename);
+    warning("(*) files " CSTR_RED("%s") " differ", option.indexed_filename);
 }
 
 // -----------------------------------------------------------------------------

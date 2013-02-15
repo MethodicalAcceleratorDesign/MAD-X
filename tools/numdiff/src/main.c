@@ -169,11 +169,7 @@ main(int argc, const char* argv[])
   if (option.test) {
     double t = (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
     printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
-#ifdef _WIN32
-            failed ? "FAIL" : "PASS");
-#else
-            failed ? "\033[31mFAIL\033[0m" : "\033[32mPASS\033[0m");
-#endif
+            failed ? CSTR_RED("FAIL") : CSTR_GREEN("PASS"));
   }
 
   if (option.acc)
