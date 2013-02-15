@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 14.02.13 17.13.56 +
+  + Execution Time Stamp: 15.02.13 11.54.18 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -258,17 +258,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.00000000000000     
+     energy           100.000000000000     
      method                   6
      Num. of steps           10
-     charge           1.0000000000000000     
-  Length of machine:    534.59999999999991     
+     charge           1.00000000000000     
+  Length of machine:    534.600000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
 ptc_align;
 
 
@@ -302,13 +302,13 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 Deviation from symplecticity  0.5251354906476990E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
   NUMBER OF THIN OBJECTS :        1180
-  TOTAL IDEAL LENGTH OF STRUCTURE :   534.60000000000196     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.60000000000196     
+  TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
 Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
@@ -361,7 +361,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 
 
 ptc_end;
@@ -399,17 +399,17 @@ call, file = "../share/line_lattice/line.seq";
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.250000E+03
  Setting MADx with 
-     energy           250.00000000000000     
+     energy           250.000000000000     
      method                   6
      Num. of steps            5
-     charge          -1.0000000000000000     
-  Length of machine:    534.59999999999991     
+     charge          -1.00000000000000     
+  Length of machine:    534.600000000000     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -432,14 +432,6 @@ call, file = "../share/line_lattice/line.seq";
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit specified by the user!
-++++++ warning: double_from_table_row: row out of range: map_table->coef[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->n_vector[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->nx[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->nxp[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->ny[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->nyp[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->ndeltap[1>=44<=43]
-++++++ warning: double_from_table_row: row out of range: map_table->nt[1>=44<=43]
 Deviation from symplecticity  0.5251354906476990E-11 %
  Reduced SUMM Table (closed orbit not requested)
 
@@ -471,8 +463,7 @@ Deviation from symplecticity  0.5251354906476990E-11 %
  Killing LayoutNo name assigned                                                                                                        
  Layout killed 
 
-  Number of warnings: 8
-8 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.00.19 (64 bit) finished normally +
