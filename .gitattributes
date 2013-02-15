@@ -687,6 +687,10 @@ tests/test-cororbit/stren.ref -text
 tests/test-cororbit/test-cororbit.cfg -text
 tests/test-cororbit/test-cororbit.madx -text
 tests/test-cororbit/test-cororbit.ref -text
+tests/test-dynap/bb.macros -text
+tests/test-dynap/test-dynap.cfg -text
+tests/test-dynap/test-dynap.madx -text
+tests/test-dynap/test-dynap.ref -text
 tests/test-emit-2/ALBA-25.4th.seq -text
 tests/test-emit-2/test-emit-2.cfg -text
 tests/test-emit-2/test-emit-2.madx -text
@@ -695,9 +699,6 @@ tests/test-emit/ALBA-25.4th.seq -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
-tests/test-footprint/bb.macros -text
-tests/test-footprint/test-footprint.madx -text
-tests/test-footprint/test-footprint.ref -text
 tests/test-ibs-2/ibs-table.tfs.cfg -text
 tests/test-ibs-2/ibs-table.tfs.ref -text
 tests/test-ibs-2/input/tme-ibs.seq -text

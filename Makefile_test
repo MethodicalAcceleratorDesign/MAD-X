@@ -73,7 +73,7 @@ test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test
 
 # lexicographical order
 tests-to-setup := \
-test-footprint__is_crashing_twiss
+test-dynap__is_crashing_twiss
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite

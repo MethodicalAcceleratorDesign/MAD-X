@@ -3,7 +3,7 @@
   +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 14.02.13 18.12.53 +
+  + Execution Time Stamp: 15.02.13 13.58.12 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Creates a footprint for head-on + parasitic collisions at IP1+5 
 
@@ -1221,7 +1221,7 @@ endedit;
 
 use,period=lhcb2;
 
-!select,flag=twiss,class=bbmarker,column=name,s,x,y;
+select,flag=twiss,class=bbmarker,column=name,s,x,y;
 
 twiss, sequence=lhcb2; !,file;
 
@@ -4057,7 +4057,7 @@ sec.s since start: 5   since last call: 0
   
   Full 6D closed orbit search.
   Initial value of 6-D closed orbit from Twiss: 
-  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  orbit0   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
   Singular matrix occurred during closed orbit search.
   
  6D closed orbit found by subroutine trclor 
