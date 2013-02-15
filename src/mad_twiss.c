@@ -699,6 +699,8 @@ complete_twiss_table(struct table* t)
     else if (strcmp(tmp, "v_pos") == 0 ) val = el_par_value(tmp, c_node->p_elem);
     /*==*/
     else if (strcmp(tmp, "lrad") == 0) val =  el_par_value(tmp, c_node->p_elem);
+    else if (strcmp(tmp, "h1") == 0 &&
+             strcmp(c_node->base_name, "dipedge") == 0) val = el_par_value("h", c_node->p_elem);
     else if(mult)
     {
       if(j<=twiss_mult_end)
