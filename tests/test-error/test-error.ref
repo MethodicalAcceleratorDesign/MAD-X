@@ -1,0 +1,123 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 15.02.13 17.45.36 +
+  +++++++++++++++++++++++++++++++++++++++++++
+option,debug;
+
+TITLE, s='Elettra - Sincrotrone Trieste';
+
+fact:=1.0;
+
+q1:quadrupole, l=0.1,  k1:=-1.58789*0.34*fact*10;
+
+q2:quadrupole, l=0.1,k1:=2.2453*0.5*fact;
+
+q3:multipole, l=0.2, knl:={0,-.896051*0.34*fact};
+
+q4:quadrupole, l=0.1,  k1:=1.80457*0.5*fact;
+
+q5:multipole, knl:={0,-1.11814*0.17*fact};
+
+bd:multipole, knl:={.261799};
+
+// bed:sbend, l:=0.1, k0:=10.0*0.261799;
+
+bed:sbend, l:=0.1, angle:=0.261799;
+
+qd:quadrupole,  k1:=+1.58789*0.34*fact*10;
+
+sf: sextupole,l=0.1,k2=0.1500;
+
+of: octupole, l=0.1,k3=0.2000;
+
+s0:multipole, knl:={1.e-2};
+
+s1:multipole, knl:={0,1.e-3};
+
+s2:multipole, knl:={0,0,2.e-4};
+
+s3:multipole, knl:={0,0,0,6.e-5};
+
+s0t:multipole, ksl:={1.e-2};
+
+s1t:multipole, ksl:={0,1.e-3};
+
+s2t:multipole, ksl:={0,0,2.e-4};
+
+s3t:multipole, ksl:={0,0,0,6.e-5};
+
+ rfc:rfcavity, type=aas, l:=0.0, volt:=.070833333333, 
+
+     harmon:=432, shunt:=26.166, tfill:=90.0;
+
+//rfc:marker
+
+
+
+Beam, particle=electron, energy:=10.0, 
+
+ exn:=6.88E-6*4, eyn:=3.75E-6*4, NPART:=1.05E11, sige:=4.5e-4; //<<<<
+
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:      0.00051099891
+parameter: charge   double value:                 -1
+parameter: energy   double value:                 10
+parameter: pc   double value:        9.999999987
+parameter: gamma   double value:        19569.51337
+parameter: ex   double value:    3.515672505e-10
+parameter: exn   double value:          2.752e-05
+parameter: ey   double value:    1.916245915e-10
+parameter: eyn   double value:            1.5e-05
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:            0.00045
+parameter: kbunch   double value:                  1
+parameter: npart   double value:           1.05e+11
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: beta   double value:       0.9999999987
+parameter: alfa   double value:     2.61119886e-09
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    2.817940287e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+option,-debug,-echo;
+
+bed__________1->k0 =                  0 ;
+bed->k0 =                  0 ;
+bed__________1->k0l =                  0 ;
+bed->k0l =                  0 ;
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+ ++++++ warning: TWCPIN: Both modes are unstable for delta(p)/p =     0.000000, cosmux = ************, cosmuy =  2048.000000                     
+++++++ warning: Twiss failed:  MAD-X continues
+Assigned alignment errors to 24 elements
+Assigned alignment errors to 24 elements
+Assigned field errors to 2 elements
+Assigned field errors to 1 elements
+Assigned field errors to 144 elements
+Added field errors to 144 elements
+Added field errors to 24 elements
+
+  Number of warnings: 4
+3 in C and 1 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

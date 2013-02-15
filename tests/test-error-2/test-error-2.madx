@@ -1,0 +1,24 @@
+TITLE, s='MAD-X test';
+call file="input/coc4.opt";
+call file="input/coc4.seq";
+option,-echo;
+
+Beam, particle = proton, sequence=fivecell, energy = 450.0,
+          NPART=1.05E11, sige=      4.5e-4 ;
+
+use, period=fivecell;
+select,flag=error,pattern="^q.*";
+ealign dx:=tgauss(5.0)*1.1e-3,dy:=tgauss(2.5)*0.3e-3;
+
+select, flag=error, pattern="^q.*";
+efcomp, order:=1, radius:=0.020, hyster:=1,
+hcoeffn:={0.000,0.000,0.00,0.00,
+         0.0006,0.000,0.000,0.000},
+dknr:={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+dksr:={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+eprint;
+
+// save the errors in a file
+esave,file="err.file5ac";
+

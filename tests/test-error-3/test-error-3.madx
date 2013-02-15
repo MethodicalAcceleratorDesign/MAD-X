@@ -1,0 +1,47 @@
+Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
+
+Option,  -warn,-info,-echo;
+
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+
+Option, warn,info;
+
+!+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
+! 	define beam constants
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ eg   =  7000;
+ bg   =  eg/pmass;
+ en   = 3.75e-06;
+ epsx = en/bg;
+ epsy = en/bg;
+ prot_radius = 1.551E-18;
+ nppb = 1.05E11;
+ nb = 2808;
+
+Beam, particle = proton, sequence=lhcb1, energy = eg,
+          sigt=      0.075     , 
+          bv = +1, NPART=nppb, sige=      1.1e-4, 
+          ex=epsx,   ey=epsy;
+
+option,-warn,-echo,-info;
+
+call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";
+
+Option, warn,info;
+
+Use, period=lhcb1;
+                                                                                                     
+seqedit,sequence=lhcb1;
+cycle,start=ip3;
+endedit;
+                                                                                                     
+Use, period=lhcb1;
+                                                                                                     
+Select, flag=ERROR, clear;
+
+readmytable,file="input/err.file.in",table=newerr;
+seterr,table=newerr;
+
+esave,file=err.file.out;
+

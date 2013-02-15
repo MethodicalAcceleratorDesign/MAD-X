@@ -1,0 +1,21 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.12.11      +
+  + Execution Time Stamp: 15.02.13 18.08.14 +
+  +++++++++++++++++++++++++++++++++++++++++++
+Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
+
+
+
+Option,  -warn,-info,-echo;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+Want to make named table: newerr
+Want to use named table: newerr
+The table ==> newerr <=== was found 
++++ memory access outside program range, fatal +++
+good bye
