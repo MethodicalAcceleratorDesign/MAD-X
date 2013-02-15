@@ -907,7 +907,6 @@ tests/test-ptc-twiss-old2/end.map -text
 tests/test-ptc-twiss-old2/fort.18.cfg -text
 tests/test-ptc-twiss-old2/fort.18.ref -text
 tests/test-ptc-twiss-old2/ptctwiss.txt -text
-tests/test-ptc-twiss-old2/ring_matrix_at_end -text
 tests/test-ptc-twiss-old2/ring_matrix_at_end.cfg -text
 tests/test-ptc-twiss-old2/ring_matrix_at_end.ref -text
 tests/test-ptc-twiss-old2/test-ptc-twiss-old2.cfg -text
