@@ -323,7 +323,7 @@ value bed__________1->k0;
 value bed->k0;
 value bed__________1->k0l;
 value bed->k0l;
-twiss,file=twiss.out;
+//twiss,file=twiss.out;
 
 // field errors
 gcutr=3.0;

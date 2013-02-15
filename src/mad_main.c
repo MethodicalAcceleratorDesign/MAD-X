@@ -52,7 +52,8 @@ main(int argc, char *argv[])
   mad_run ();
   mad_fini();
 
-  return geterrorflag() ? EXIT_FAILURE : EXIT_SUCCESS;
+  return EXIT_SUCCESS;
+//  return geterrorflag() ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
 void
