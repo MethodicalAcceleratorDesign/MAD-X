@@ -1,0 +1,57 @@
+!TITLE,'Test input for PTC_TWISS';
+
+!=========== RING PARAMETERS ===========================================
+call, file = "../ring_lattice/ring.seq";
+
+
+! At the end of the ring the data_block is produced
+
+SAVEBETA, label=TWSSip, place=#E,sequence=fivecell;
+
+select,flag=twiss,column=name,s,betx,bety,dx,dy;
+
+TWISS,file=twiss_madx_ring; 
+
+SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
+
+
+! Initialize PTC
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+ptc_align;
+
+select,flag=ptc_twiss,column=name,s,beta11,beta21,
+                                  beta12,beta22,disp1,disp3,x,px,y,py;
+
+ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
+
+PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
+
+ptc_end;
+
+!write,table="map_table",file="map_table";
+write,table="map_table",file="ring_matrix_at_end";
+
+!=========== TRANSFER-LINE PARAMETERS ==================================== 
+
+call, file = "../line_lattice/line.seq";
+
+select,flag=ptc_twiss,clear;
+select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=5,exact;
+                                    
+! Example 4: Input transfer matrix coef manually ========================
+
+ptc_twiss,icase=5,no=2,initial_matrix_manual,              
+    re11=-2.4571122533365,re12=176.79612000630,re13=0.23000824922475E-01,
+    re14=1.0688611352549,re16=2.3391750911139,re21=-.38675166732927E-01,
+    re22=2.3757451844819,re23=0.59429549540250E-03,re24=0.21234193844153E-01,
+    re26=0.44298917404022E-01,re31= -.13869369418419E-01,re32=1.1108843741365,
+    re33=0.44540891438146,re34=32.763919904586,re36=0.23713296091797E-02,
+    re41=-.10425674606620E-03,re42=0.18936158169385E-01,re43=-.37799347979450E-01,
+    re44=-.53503193709587,re46=-.94686370477940E-03,
+                                                     file=twiss_ptc_line;
+ptc_end;
+stop;
