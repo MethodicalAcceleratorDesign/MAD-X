@@ -988,7 +988,6 @@ tests/test-ptc-twiss-old6/twiss_lhc.ref -text
 tests/test-ptc-twiss-old7/README -text
 tests/test-ptc-twiss-old7/end.map -text
 tests/test-ptc-twiss-old7/fort.18.ref -text
-tests/test-ptc-twiss-old7/fort.24.ref -text
 tests/test-ptc-twiss-old7/ptctwiss.txt -text
 tests/test-ptc-twiss-old7/ring_matrix_at_end.ref -text
 tests/test-ptc-twiss-old7/test-ptc-twiss-old7.madx -text
