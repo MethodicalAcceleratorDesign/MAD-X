@@ -1,0 +1,21 @@
+PTC_TWISS Example2 for the task of the matching between 
+a ring and a transferline.
+
+Run command:
+../madxp < example2.madx [ > example2.out ]
+
+with the Mad-X output directed to the terminal or to the "*.out" file.
+
+In this example, the PTC_TWISS command is applied to calculate 
+the Ripken-style parameters along the transferline using Twiss 
+parameters of the ring at its end as the initial conditions.
+
+Example2 demonstrates an external ("manual") input of the 
+initial conditions. The Twiss parameters at the end of ring 
+are given as arguments of the PTC_TWISS command-line with 
+the following PTC_TWISS command:
+
+  PTC_TWISS,icase=5,no=1, betx=177,bety=32,alfx=-2.4,alfy=0.4,
+             dx=2.1,dpx=0.02,mux=1.2, muy=1.25, x=8.8E-05,
+             px=7.2E-07,y=5.25E-05,py=-6.7E-07, 
+                                       file=twiss_ptc_line; 

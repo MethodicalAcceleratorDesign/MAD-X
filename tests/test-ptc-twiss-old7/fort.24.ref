@@ -1,0 +1,876 @@
+  0.000000000000000E+000           1 located at the beginning of 
+ FIVECELL$START          
+  0.000000000000000E+000           1 located at the middle of 
+ FIVECELL$START          
+  0.000000000000000E+000           4 located at the end of 
+ FIVECELL$START          
+  0.000000000000000E+000           6 located at the beginning of 
+ SEQSTART                
+  0.000000000000000E+000           6 located at the middle of 
+ SEQSTART                
+  0.000000000000000E+000           9 located at the end of 
+ SEQSTART                
+  0.000000000000000E+000          11 located at the beginning of 
+ QF.1                    
+   1.55000000000000               17 located at the middle of 
+ QF.1                    
+   3.10000000000000               23 located at the end of 
+ QF.1                    
+   3.10000000000000               25 located at the beginning of 
+ DRIFT_0                 
+   3.10000000000000               25 located at the middle of 
+ DRIFT_0                 
+   3.26500000000000               28 located at the end of 
+ DRIFT_0                 
+   3.26500000000000               30 located at the beginning of 
+ MSCBH                   
+   3.81500000000000               36 located at the middle of 
+ MSCBH                   
+   4.36500000000000               42 located at the end of 
+ MSCBH                   
+   4.36500000000000               44 located at the beginning of 
+ CBH.1                   
+   4.36500000000000               44 located at the middle of 
+ CBH.1                   
+   4.36500000000000               47 located at the end of 
+ CBH.1                   
+   4.36500000000000               49 located at the beginning of 
+ DRIFT_1                 
+   4.36500000000000               49 located at the middle of 
+ DRIFT_1                 
+   5.52000000000000               52 located at the end of 
+ DRIFT_1                 
+   5.52000000000000               54 located at the beginning of 
+ MB                      
+   12.6200000000000               60 located at the middle of 
+ MB                      
+   19.7200000000000               66 located at the end of 
+ MB                      
+   19.7200000000000               68 located at the beginning of 
+ DRIFT_2                 
+   19.7200000000000               68 located at the middle of 
+ DRIFT_2                 
+   21.1800000000000               71 located at the end of 
+ DRIFT_2                 
+   21.1800000000000               73 located at the beginning of 
+ MB                      
+   28.2800000000000               79 located at the middle of 
+ MB                      
+   35.3800000000000               85 located at the end of 
+ MB                      
+   35.3800000000000               87 located at the beginning of 
+ DRIFT_2                 
+   35.3800000000000               87 located at the middle of 
+ DRIFT_2                 
+   36.8400000000000               90 located at the end of 
+ DRIFT_2                 
+   36.8400000000000               92 located at the beginning of 
+ MB                      
+   43.9400000000000               98 located at the middle of 
+ MB                      
+   51.0400000000000              104 located at the end of 
+ MB                      
+   51.0400000000000              106 located at the beginning of 
+ DRIFT_3                 
+   51.0400000000000              106 located at the middle of 
+ DRIFT_3                 
+   52.2100000000000              109 located at the end of 
+ DRIFT_3                 
+   52.2100000000000              111 located at the beginning of 
+ INS$START               
+   52.2100000000000              111 located at the middle of 
+ INS$START               
+   52.2100000000000              114 located at the end of 
+ INS$START               
+   52.2100000000000              116 located at the beginning of 
+ DRIFT_4                 
+   52.2100000000000              116 located at the middle of 
+ DRIFT_4                 
+   52.3100000000000              119 located at the end of 
+ DRIFT_4                 
+   52.3100000000000              121 located at the beginning of 
+ BPV.1                   
+   52.3100000000000              121 located at the middle of 
+ BPV.1                   
+   52.6100000000000              124 located at the end of 
+ BPV.1                   
+   52.6100000000000              126 located at the beginning of 
+ DRIFT_5                 
+   52.6100000000000              126 located at the middle of 
+ DRIFT_5                 
+   53.4600000000000              129 located at the end of 
+ DRIFT_5                 
+   53.4600000000000              131 located at the beginning of 
+ QD.1                    
+   55.0100000000000              137 located at the middle of 
+ QD.1                    
+   56.5600000000001              143 located at the end of 
+ QD.1                    
+   56.5600000000001              145 located at the beginning of 
+ DRIFT_4                 
+   56.5600000000001              145 located at the middle of 
+ DRIFT_4                 
+   56.6600000000001              148 located at the end of 
+ DRIFT_4                 
+   56.6600000000001              150 located at the beginning of 
+ BB                      
+   56.6600000000001              150 located at the middle of 
+ BB                      
+   56.6600000000001              153 located at the end of 
+ BB                      
+   56.6600000000001              155 located at the beginning of 
+ DRIFT_6                 
+   56.6600000000001              155 located at the middle of 
+ DRIFT_6                 
+   56.6800000000001              158 located at the end of 
+ DRIFT_6                 
+   56.6800000000001              160 located at the beginning of 
+ QTM                     
+   56.6800000000001              160 located at the middle of 
+ QTM                     
+   56.6800000000001              163 located at the end of 
+ QTM                     
+   56.6800000000001              165 located at the beginning of 
+ DRIFT_7                 
+   56.6800000000001              165 located at the middle of 
+ DRIFT_7                 
+   56.7250000000001              168 located at the end of 
+ DRIFT_7                 
+   56.7250000000001              170 located at the beginning of 
+ MSCBV.1                 
+   57.2750000000001              176 located at the middle of 
+ MSCBV.1                 
+   57.8250000000001              182 located at the end of 
+ MSCBV.1                 
+   57.8250000000001              184 located at the beginning of 
+ INS$END                 
+   57.8250000000001              184 located at the middle of 
+ INS$END                 
+   57.8250000000001              187 located at the end of 
+ INS$END                 
+   57.8250000000001              189 located at the beginning of 
+ CBV.1                   
+   57.8250000000001              189 located at the middle of 
+ CBV.1                   
+   57.8250000000001              192 located at the end of 
+ CBV.1                   
+   57.8250000000001              194 located at the beginning of 
+ DRIFT_1                 
+   57.8250000000001              194 located at the middle of 
+ DRIFT_1                 
+   58.9800000000001              197 located at the end of 
+ DRIFT_1                 
+   58.9800000000001              199 located at the beginning of 
+ MB                      
+   66.0800000000001              205 located at the middle of 
+ MB                      
+   73.1800000000001              211 located at the end of 
+ MB                      
+   73.1800000000001              213 located at the beginning of 
+ DRIFT_2                 
+   73.1800000000001              213 located at the middle of 
+ DRIFT_2                 
+   74.6400000000001              216 located at the end of 
+ DRIFT_2                 
+   74.6400000000001              218 located at the beginning of 
+ MB                      
+   81.7400000000001              224 located at the middle of 
+ MB                      
+   88.8400000000001              230 located at the end of 
+ MB                      
+   88.8400000000001              232 located at the beginning of 
+ DRIFT_2                 
+   88.8400000000001              232 located at the middle of 
+ DRIFT_2                 
+   90.3000000000001              235 located at the end of 
+ DRIFT_2                 
+   90.3000000000001              237 located at the beginning of 
+ MB                      
+   97.4000000000001              243 located at the middle of 
+ MB                      
+   104.500000000000              249 located at the end of 
+ MB                      
+   104.500000000000              251 located at the beginning of 
+ DRIFT_8                 
+   104.500000000000              251 located at the middle of 
+ DRIFT_8                 
+   105.770000000000              254 located at the end of 
+ DRIFT_8                 
+   105.770000000000              256 located at the beginning of 
+ BPH                     
+   105.770000000000              256 located at the middle of 
+ BPH                     
+   106.070000000000              259 located at the end of 
+ BPH                     
+   106.070000000000              261 located at the beginning of 
+ DRIFT_5                 
+   106.070000000000              261 located at the middle of 
+ DRIFT_5                 
+   106.920000000000              264 located at the end of 
+ DRIFT_5                 
+   106.920000000000              266 located at the beginning of 
+ BB                      
+   106.920000000000              266 located at the middle of 
+ BB                      
+   106.920000000000              269 located at the end of 
+ BB                      
+   106.920000000000              271 located at the beginning of 
+ STARTEND                
+   106.920000000000              271 located at the middle of 
+ STARTEND                
+   106.920000000000              274 located at the end of 
+ STARTEND                
+   106.920000000000              276 located at the beginning of 
+ PARTSTART               
+   106.920000000000              276 located at the middle of 
+ PARTSTART               
+   106.920000000000              279 located at the end of 
+ PARTSTART               
+   106.920000000000              281 located at the beginning of 
+ QF.2                    
+   108.470000000000              287 located at the middle of 
+ QF.2                    
+   110.020000000000              293 located at the end of 
+ QF.2                    
+   110.020000000000              295 located at the beginning of 
+ DRIFT_0                 
+   110.020000000000              295 located at the middle of 
+ DRIFT_0                 
+   110.185000000000              298 located at the end of 
+ DRIFT_0                 
+   110.185000000000              300 located at the beginning of 
+ MSCBH                   
+   110.735000000000              306 located at the middle of 
+ MSCBH                   
+   111.285000000000              312 located at the end of 
+ MSCBH                   
+   111.285000000000              314 located at the beginning of 
+ CBH.2                   
+   111.285000000000              314 located at the middle of 
+ CBH.2                   
+   111.285000000000              317 located at the end of 
+ CBH.2                   
+   111.285000000000              319 located at the beginning of 
+ DRIFT_1                 
+   111.285000000000              319 located at the middle of 
+ DRIFT_1                 
+   112.440000000000              322 located at the end of 
+ DRIFT_1                 
+   112.440000000000              324 located at the beginning of 
+ MB                      
+   119.540000000000              330 located at the middle of 
+ MB                      
+   126.640000000000              336 located at the end of 
+ MB                      
+   126.640000000000              338 located at the beginning of 
+ DRIFT_2                 
+   126.640000000000              338 located at the middle of 
+ DRIFT_2                 
+   128.100000000000              341 located at the end of 
+ DRIFT_2                 
+   128.100000000000              343 located at the beginning of 
+ MB                      
+   135.200000000000              349 located at the middle of 
+ MB                      
+   142.300000000000              355 located at the end of 
+ MB                      
+   142.300000000000              357 located at the beginning of 
+ DRIFT_2                 
+   142.300000000000              357 located at the middle of 
+ DRIFT_2                 
+   143.760000000000              360 located at the end of 
+ DRIFT_2                 
+   143.760000000000              362 located at the beginning of 
+ MB                      
+   150.860000000000              368 located at the middle of 
+ MB                      
+   157.960000000000              374 located at the end of 
+ MB                      
+   157.960000000000              376 located at the beginning of 
+ DRIFT_8                 
+   157.960000000000              376 located at the middle of 
+ DRIFT_8                 
+   159.230000000000              379 located at the end of 
+ DRIFT_8                 
+   159.230000000000              381 located at the beginning of 
+ BPV                     
+   159.230000000000              381 located at the middle of 
+ BPV                     
+   159.530000000000              384 located at the end of 
+ BPV                     
+   159.530000000000              386 located at the beginning of 
+ DRIFT_5                 
+   159.530000000000              386 located at the middle of 
+ DRIFT_5                 
+   160.380000000000              389 located at the end of 
+ DRIFT_5                 
+   160.380000000000              391 located at the beginning of 
+ QD.2                    
+   161.930000000000              397 located at the middle of 
+ QD.2                    
+   163.480000000000              403 located at the end of 
+ QD.2                    
+   163.480000000000              405 located at the beginning of 
+ BB                      
+   163.480000000000              405 located at the middle of 
+ BB                      
+   163.480000000000              408 located at the end of 
+ BB                      
+   163.480000000000              410 located at the beginning of 
+ DRIFT_0                 
+   163.480000000000              410 located at the middle of 
+ DRIFT_0                 
+   163.645000000000              413 located at the end of 
+ DRIFT_0                 
+   163.645000000000              415 located at the beginning of 
+ MSCBV                   
+   164.195000000000              421 located at the middle of 
+ MSCBV                   
+   164.745000000000              427 located at the end of 
+ MSCBV                   
+   164.745000000000              429 located at the beginning of 
+ CBV.2                   
+   164.745000000000              429 located at the middle of 
+ CBV.2                   
+   164.745000000000              432 located at the end of 
+ CBV.2                   
+   164.745000000000              434 located at the beginning of 
+ DRIFT_1                 
+   164.745000000000              434 located at the middle of 
+ DRIFT_1                 
+   165.900000000000              437 located at the end of 
+ DRIFT_1                 
+   165.900000000000              439 located at the beginning of 
+ MB                      
+   173.000000000000              445 located at the middle of 
+ MB                      
+   180.100000000000              451 located at the end of 
+ MB                      
+   180.100000000000              453 located at the beginning of 
+ DRIFT_2                 
+   180.100000000000              453 located at the middle of 
+ DRIFT_2                 
+   181.560000000000              456 located at the end of 
+ DRIFT_2                 
+   181.560000000000              458 located at the beginning of 
+ MB                      
+   188.660000000000              464 located at the middle of 
+ MB                      
+   195.760000000000              470 located at the end of 
+ MB                      
+   195.760000000000              472 located at the beginning of 
+ DRIFT_2                 
+   195.760000000000              472 located at the middle of 
+ DRIFT_2                 
+   197.220000000000              475 located at the end of 
+ DRIFT_2                 
+   197.220000000000              477 located at the beginning of 
+ MB                      
+   204.320000000000              483 located at the middle of 
+ MB                      
+   211.420000000000              489 located at the end of 
+ MB                      
+   211.420000000000              491 located at the beginning of 
+ DRIFT_8                 
+   211.420000000000              491 located at the middle of 
+ DRIFT_8                 
+   212.690000000000              494 located at the end of 
+ DRIFT_8                 
+   212.690000000000              496 located at the beginning of 
+ BPH                     
+   212.690000000000              496 located at the middle of 
+ BPH                     
+   212.990000000000              499 located at the end of 
+ BPH                     
+   212.990000000000              501 located at the beginning of 
+ DRIFT_5                 
+   212.990000000000              501 located at the middle of 
+ DRIFT_5                 
+   213.840000000000              504 located at the end of 
+ DRIFT_5                 
+   213.840000000000              506 located at the beginning of 
+ PARTEND                 
+   213.840000000000              506 located at the middle of 
+ PARTEND                 
+   213.840000000000              509 located at the end of 
+ PARTEND                 
+   213.840000000000              511 located at the beginning of 
+ QF.3                    
+   215.390000000000              517 located at the middle of 
+ QF.3                    
+   216.940000000000              523 located at the end of 
+ QF.3                    
+   216.940000000000              525 located at the beginning of 
+ DRIFT_0                 
+   216.940000000000              525 located at the middle of 
+ DRIFT_0                 
+   217.105000000000              528 located at the end of 
+ DRIFT_0                 
+   217.105000000000              530 located at the beginning of 
+ MSCBH                   
+   217.655000000000              536 located at the middle of 
+ MSCBH                   
+   218.205000000000              542 located at the end of 
+ MSCBH                   
+   218.205000000000              544 located at the beginning of 
+ CBH.3                   
+   218.205000000000              544 located at the middle of 
+ CBH.3                   
+   218.205000000000              547 located at the end of 
+ CBH.3                   
+   218.205000000000              549 located at the beginning of 
+ DRIFT_1                 
+   218.205000000000              549 located at the middle of 
+ DRIFT_1                 
+   219.360000000000              552 located at the end of 
+ DRIFT_1                 
+   219.360000000000              554 located at the beginning of 
+ MB                      
+   226.460000000000              560 located at the middle of 
+ MB                      
+   233.560000000000              566 located at the end of 
+ MB                      
+   233.560000000000              568 located at the beginning of 
+ DRIFT_2                 
+   233.560000000000              568 located at the middle of 
+ DRIFT_2                 
+   235.020000000000              571 located at the end of 
+ DRIFT_2                 
+   235.020000000000              573 located at the beginning of 
+ MB                      
+   242.120000000000              579 located at the middle of 
+ MB                      
+   249.220000000000              585 located at the end of 
+ MB                      
+   249.220000000000              587 located at the beginning of 
+ DRIFT_2                 
+   249.220000000000              587 located at the middle of 
+ DRIFT_2                 
+   250.680000000000              590 located at the end of 
+ DRIFT_2                 
+   250.680000000000              592 located at the beginning of 
+ MB                      
+   257.780000000000              598 located at the middle of 
+ MB                      
+   264.880000000000              604 located at the end of 
+ MB                      
+   264.880000000000              606 located at the beginning of 
+ DRIFT_8                 
+   264.880000000000              606 located at the middle of 
+ DRIFT_8                 
+   266.150000000000              609 located at the end of 
+ DRIFT_8                 
+   266.150000000000              611 located at the beginning of 
+ BPV                     
+   266.150000000000              611 located at the middle of 
+ BPV                     
+   266.450000000000              614 located at the end of 
+ BPV                     
+   266.450000000000              616 located at the beginning of 
+ DRIFT_5                 
+   266.450000000000              616 located at the middle of 
+ DRIFT_5                 
+   267.300000000000              619 located at the end of 
+ DRIFT_5                 
+   267.300000000000              621 located at the beginning of 
+ QD.3                    
+   268.850000000000              627 located at the middle of 
+ QD.3                    
+   270.400000000000              633 located at the end of 
+ QD.3                    
+   270.400000000000              635 located at the beginning of 
+ DRIFT_0                 
+   270.400000000000              635 located at the middle of 
+ DRIFT_0                 
+   270.565000000000              638 located at the end of 
+ DRIFT_0                 
+   270.565000000000              640 located at the beginning of 
+ MSCBV                   
+   271.115000000000              646 located at the middle of 
+ MSCBV                   
+   271.665000000000              652 located at the end of 
+ MSCBV                   
+   271.665000000000              654 located at the beginning of 
+ CBV.3                   
+   271.665000000000              654 located at the middle of 
+ CBV.3                   
+   271.665000000000              657 located at the end of 
+ CBV.3                   
+   271.665000000000              659 located at the beginning of 
+ DRIFT_1                 
+   271.665000000000              659 located at the middle of 
+ DRIFT_1                 
+   272.820000000000              662 located at the end of 
+ DRIFT_1                 
+   272.820000000000              664 located at the beginning of 
+ MB                      
+   279.920000000000              670 located at the middle of 
+ MB                      
+   287.020000000000              676 located at the end of 
+ MB                      
+   287.020000000000              678 located at the beginning of 
+ DRIFT_2                 
+   287.020000000000              678 located at the middle of 
+ DRIFT_2                 
+   288.480000000000              681 located at the end of 
+ DRIFT_2                 
+   288.480000000000              683 located at the beginning of 
+ MB                      
+   295.580000000000              689 located at the middle of 
+ MB                      
+   302.680000000000              695 located at the end of 
+ MB                      
+   302.680000000000              697 located at the beginning of 
+ DRIFT_2                 
+   302.680000000000              697 located at the middle of 
+ DRIFT_2                 
+   304.140000000000              700 located at the end of 
+ DRIFT_2                 
+   304.140000000000              702 located at the beginning of 
+ MB                      
+   311.240000000000              708 located at the middle of 
+ MB                      
+   318.340000000000              714 located at the end of 
+ MB                      
+   318.340000000000              716 located at the beginning of 
+ DRIFT_8                 
+   318.340000000000              716 located at the middle of 
+ DRIFT_8                 
+   319.610000000000              719 located at the end of 
+ DRIFT_8                 
+   319.610000000000              721 located at the beginning of 
+ BPH                     
+   319.610000000000              721 located at the middle of 
+ BPH                     
+   319.910000000000              724 located at the end of 
+ BPH                     
+   319.910000000000              726 located at the beginning of 
+ DRIFT_5                 
+   319.910000000000              726 located at the middle of 
+ DRIFT_5                 
+   320.760000000000              729 located at the end of 
+ DRIFT_5                 
+   320.760000000000              731 located at the beginning of 
+ QF.4                    
+   322.310000000000              737 located at the middle of 
+ QF.4                    
+   323.860000000000              743 located at the end of 
+ QF.4                    
+   323.860000000000              745 located at the beginning of 
+ DRIFT_0                 
+   323.860000000000              745 located at the middle of 
+ DRIFT_0                 
+   324.025000000000              748 located at the end of 
+ DRIFT_0                 
+   324.025000000000              750 located at the beginning of 
+ MSCBH                   
+   324.575000000000              756 located at the middle of 
+ MSCBH                   
+   325.125000000001              762 located at the end of 
+ MSCBH                   
+   325.125000000001              764 located at the beginning of 
+ CBH.4                   
+   325.125000000001              764 located at the middle of 
+ CBH.4                   
+   325.125000000001              767 located at the end of 
+ CBH.4                   
+   325.125000000001              769 located at the beginning of 
+ DRIFT_1                 
+   325.125000000001              769 located at the middle of 
+ DRIFT_1                 
+   326.280000000000              772 located at the end of 
+ DRIFT_1                 
+   326.280000000000              774 located at the beginning of 
+ MB                      
+   333.380000000001              780 located at the middle of 
+ MB                      
+   340.480000000001              786 located at the end of 
+ MB                      
+   340.480000000001              788 located at the beginning of 
+ DRIFT_2                 
+   340.480000000001              788 located at the middle of 
+ DRIFT_2                 
+   341.940000000001              791 located at the end of 
+ DRIFT_2                 
+   341.940000000001              793 located at the beginning of 
+ MB                      
+   349.040000000001              799 located at the middle of 
+ MB                      
+   356.140000000001              805 located at the end of 
+ MB                      
+   356.140000000001              807 located at the beginning of 
+ DRIFT_2                 
+   356.140000000001              807 located at the middle of 
+ DRIFT_2                 
+   357.600000000001              810 located at the end of 
+ DRIFT_2                 
+   357.600000000001              812 located at the beginning of 
+ MB                      
+   364.700000000001              818 located at the middle of 
+ MB                      
+   371.800000000001              824 located at the end of 
+ MB                      
+   371.800000000001              826 located at the beginning of 
+ DRIFT_8                 
+   371.800000000001              826 located at the middle of 
+ DRIFT_8                 
+   373.070000000001              829 located at the end of 
+ DRIFT_8                 
+   373.070000000001              831 located at the beginning of 
+ BPV                     
+   373.070000000001              831 located at the middle of 
+ BPV                     
+   373.370000000001              834 located at the end of 
+ BPV                     
+   373.370000000001              836 located at the beginning of 
+ DRIFT_5                 
+   373.370000000001              836 located at the middle of 
+ DRIFT_5                 
+   374.220000000001              839 located at the end of 
+ DRIFT_5                 
+   374.220000000001              841 located at the beginning of 
+ QD.4                    
+   375.770000000001              847 located at the middle of 
+ QD.4                    
+   377.320000000001              853 located at the end of 
+ QD.4                    
+   377.320000000001              855 located at the beginning of 
+ DRIFT_0                 
+   377.320000000001              855 located at the middle of 
+ DRIFT_0                 
+   377.485000000001              858 located at the end of 
+ DRIFT_0                 
+   377.485000000001              860 located at the beginning of 
+ MSCBV                   
+   378.035000000001              866 located at the middle of 
+ MSCBV                   
+   378.585000000001              872 located at the end of 
+ MSCBV                   
+   378.585000000001              874 located at the beginning of 
+ CBV.4                   
+   378.585000000001              874 located at the middle of 
+ CBV.4                   
+   378.585000000001              877 located at the end of 
+ CBV.4                   
+   378.585000000001              879 located at the beginning of 
+ DRIFT_1                 
+   378.585000000001              879 located at the middle of 
+ DRIFT_1                 
+   379.740000000001              882 located at the end of 
+ DRIFT_1                 
+   379.740000000001              884 located at the beginning of 
+ MB                      
+   386.840000000001              890 located at the middle of 
+ MB                      
+   393.940000000001              896 located at the end of 
+ MB                      
+   393.940000000001              898 located at the beginning of 
+ DRIFT_2                 
+   393.940000000001              898 located at the middle of 
+ DRIFT_2                 
+   395.400000000001              901 located at the end of 
+ DRIFT_2                 
+   395.400000000001              903 located at the beginning of 
+ MB                      
+   402.500000000001              909 located at the middle of 
+ MB                      
+   409.600000000001              915 located at the end of 
+ MB                      
+   409.600000000001              917 located at the beginning of 
+ DRIFT_2                 
+   409.600000000001              917 located at the middle of 
+ DRIFT_2                 
+   411.060000000001              920 located at the end of 
+ DRIFT_2                 
+   411.060000000001              922 located at the beginning of 
+ MB                      
+   418.160000000001              928 located at the middle of 
+ MB                      
+   425.260000000002              934 located at the end of 
+ MB                      
+   425.260000000002              936 located at the beginning of 
+ DRIFT_8                 
+   425.260000000002              936 located at the middle of 
+ DRIFT_8                 
+   426.530000000002              939 located at the end of 
+ DRIFT_8                 
+   426.530000000002              941 located at the beginning of 
+ BPH                     
+   426.530000000002              941 located at the middle of 
+ BPH                     
+   426.830000000002              944 located at the end of 
+ BPH                     
+   426.830000000002              946 located at the beginning of 
+ DRIFT_5                 
+   426.830000000002              946 located at the middle of 
+ DRIFT_5                 
+   427.680000000002              949 located at the end of 
+ DRIFT_5                 
+   427.680000000002              951 located at the beginning of 
+ QF.5                    
+   429.230000000002              957 located at the middle of 
+ QF.5                    
+   430.780000000002              963 located at the end of 
+ QF.5                    
+   430.780000000002              965 located at the beginning of 
+ DRIFT_0                 
+   430.780000000002              965 located at the middle of 
+ DRIFT_0                 
+   430.945000000002              968 located at the end of 
+ DRIFT_0                 
+   430.945000000002              970 located at the beginning of 
+ MSCBH                   
+   431.495000000002              976 located at the middle of 
+ MSCBH                   
+   432.045000000002              982 located at the end of 
+ MSCBH                   
+   432.045000000002              984 located at the beginning of 
+ CBH.5                   
+   432.045000000002              984 located at the middle of 
+ CBH.5                   
+   432.045000000002              987 located at the end of 
+ CBH.5                   
+   432.045000000002              989 located at the beginning of 
+ DRIFT_1                 
+   432.045000000002              989 located at the middle of 
+ DRIFT_1                 
+   433.200000000002              992 located at the end of 
+ DRIFT_1                 
+   433.200000000002              994 located at the beginning of 
+ MB                      
+   440.300000000002             1000 located at the middle of 
+ MB                      
+   447.400000000002             1006 located at the end of 
+ MB                      
+   447.400000000002             1008 located at the beginning of 
+ DRIFT_2                 
+   447.400000000002             1008 located at the middle of 
+ DRIFT_2                 
+   448.860000000002             1011 located at the end of 
+ DRIFT_2                 
+   448.860000000002             1013 located at the beginning of 
+ MB                      
+   455.960000000002             1019 located at the middle of 
+ MB                      
+   463.060000000002             1025 located at the end of 
+ MB                      
+   463.060000000002             1027 located at the beginning of 
+ DRIFT_2                 
+   463.060000000002             1027 located at the middle of 
+ DRIFT_2                 
+   464.520000000002             1030 located at the end of 
+ DRIFT_2                 
+   464.520000000002             1032 located at the beginning of 
+ MB                      
+   471.620000000002             1038 located at the middle of 
+ MB                      
+   478.720000000002             1044 located at the end of 
+ MB                      
+   478.720000000002             1046 located at the beginning of 
+ DRIFT_8                 
+   478.720000000002             1046 located at the middle of 
+ DRIFT_8                 
+   479.990000000002             1049 located at the end of 
+ DRIFT_8                 
+   479.990000000002             1051 located at the beginning of 
+ BPV                     
+   479.990000000002             1051 located at the middle of 
+ BPV                     
+   480.290000000002             1054 located at the end of 
+ BPV                     
+   480.290000000002             1056 located at the beginning of 
+ DRIFT_5                 
+   480.290000000002             1056 located at the middle of 
+ DRIFT_5                 
+   481.140000000002             1059 located at the end of 
+ DRIFT_5                 
+   481.140000000002             1061 located at the beginning of 
+ QD.5                    
+   482.690000000002             1067 located at the middle of 
+ QD.5                    
+   484.240000000002             1073 located at the end of 
+ QD.5                    
+   484.240000000002             1075 located at the beginning of 
+ DRIFT_0                 
+   484.240000000002             1075 located at the middle of 
+ DRIFT_0                 
+   484.405000000002             1078 located at the end of 
+ DRIFT_0                 
+   484.405000000002             1080 located at the beginning of 
+ MSCBV                   
+   484.955000000002             1086 located at the middle of 
+ MSCBV                   
+   485.505000000002             1092 located at the end of 
+ MSCBV                   
+   485.505000000002             1094 located at the beginning of 
+ CBV.5                   
+   485.505000000002             1094 located at the middle of 
+ CBV.5                   
+   485.505000000002             1097 located at the end of 
+ CBV.5                   
+   485.505000000002             1099 located at the beginning of 
+ DRIFT_1                 
+   485.505000000002             1099 located at the middle of 
+ DRIFT_1                 
+   486.660000000002             1102 located at the end of 
+ DRIFT_1                 
+   486.660000000002             1104 located at the beginning of 
+ MB                      
+   493.760000000002             1110 located at the middle of 
+ MB                      
+   500.860000000002             1116 located at the end of 
+ MB                      
+   500.860000000002             1118 located at the beginning of 
+ DRIFT_2                 
+   500.860000000002             1118 located at the middle of 
+ DRIFT_2                 
+   502.320000000002             1121 located at the end of 
+ DRIFT_2                 
+   502.320000000002             1123 located at the beginning of 
+ MB                      
+   509.420000000003             1129 located at the middle of 
+ MB                      
+   516.520000000002             1135 located at the end of 
+ MB                      
+   516.520000000002             1137 located at the beginning of 
+ DRIFT_2                 
+   516.520000000002             1137 located at the middle of 
+ DRIFT_2                 
+   517.980000000002             1140 located at the end of 
+ DRIFT_2                 
+   517.980000000002             1142 located at the beginning of 
+ MB                      
+   525.080000000002             1148 located at the middle of 
+ MB                      
+   532.180000000002             1154 located at the end of 
+ MB                      
+   532.180000000002             1156 located at the beginning of 
+ DRIFT_8                 
+   532.180000000002             1156 located at the middle of 
+ DRIFT_8                 
+   533.450000000002             1159 located at the end of 
+ DRIFT_8                 
+   533.450000000002             1161 located at the beginning of 
+ BPH                     
+   533.450000000002             1161 located at the middle of 
+ BPH                     
+   533.750000000002             1164 located at the end of 
+ BPH                     
+   533.750000000002             1166 located at the beginning of 
+ DRIFT_5                 
+   533.750000000002             1166 located at the middle of 
+ DRIFT_5                 
+   534.600000000002             1169 located at the end of 
+ DRIFT_5                 
+   534.600000000002             1171 located at the beginning of 
+ END_FIVECELL            
+   534.600000000002             1171 located at the middle of 
+ END_FIVECELL            
+   534.600000000002             1174 located at the end of 
+ END_FIVECELL            
+   534.600000000002             1176 located at the beginning of 
+ FIVECELL$END            
+   534.600000000002             1176 located at the middle of 
+ FIVECELL$END            
+   534.600000000002             1179 located at the end of 
+ FIVECELL$END            
