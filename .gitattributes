@@ -980,6 +980,7 @@ tests/test-ptc-twiss-old6/read.magnet.errors -text
 tests/test-ptc-twiss-old6/slice_new.madx -text
 tests/test-ptc-twiss-old6/summaryMomentumCompaction.cfg -text
 tests/test-ptc-twiss-old6/summaryMomentumCompaction.ref -text
+tests/test-ptc-twiss-old6/test-ptc-twiss-old6.cfg -text
 tests/test-ptc-twiss-old6/test-ptc-twiss-old6.madx -text
 tests/test-ptc-twiss-old6/test-ptc-twiss-old6.ref -text
 tests/test-ptc-twiss-old6/twiss_lhc.cfg -text
