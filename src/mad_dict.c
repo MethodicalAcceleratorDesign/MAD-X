@@ -116,7 +116,8 @@ char command_def[] =
 "refnode = [s, none, none]; "     /* read reference element for the offset file */
 " "
 "assign: control none 0 0 "
-"echo     = [s, terminal, none]; "
+"echo     = [s, terminal, none], "
+"truncate = [l, false, true]; "
 " "
 "beam: control none 0 0 "
 "particle = [s, positron, positron], "

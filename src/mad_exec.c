@@ -96,18 +96,22 @@ exec_assign(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("echo", nl);
+  int cut = name_list_pos("truncate", nl);
+
   if (prt_file != stdout)  fclose(prt_file);
-  if (nl->inform[pos])
-  {
+  if (nl->inform[pos]) {
     p = pl->parameters[pos]->string; strcpy(tmp, p);
-    if (strcmp(stolower(tmp), "terminal") == 0)  prt_file = stdout;
-    else
-    {
-      if (assign_start == 0)
-      {
-        assign_start = 1; prt_file = fopen(p, "w");
+    if (strcmp(stolower(tmp), "terminal") == 0)
+      prt_file = stdout;
+    else {
+      if (assign_start == 0) {
+        assign_start = 1;
+        prt_file = fopen(p, "w");
       }
-      else prt_file = fopen(p, "a");
+      else if (!nl->inform[cut] || !pl->parameters[cut]->double_value)
+        prt_file = fopen(p, "a");
+      else
+        prt_file = fopen(p, "w");
     }
   }
   else prt_file = stdout;
