@@ -3,34 +3,8 @@
   +    MAD-X 5.00.19  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 15.02.13 13.58.12 +
+  + Execution Time Stamp: 18.02.13 18.46.07 +
   +++++++++++++++++++++++++++++++++++++++++++
-! Creates a footprint for head-on + parasitic collisions at IP1+5 
-
-! of lhc.6.4; both lhcb1 (for tracking) and lhcb2 (to define the
-
-! beam-beam elements, i.e. weak-strong) are used; there are flags to
-
-! select head-on, left, and right parasitic separately at all IPs.
-
-! The bunch spacing can be given in nanosec and automatically creates
-
-! the beam-beam interaction points at the correct positions.
-
-! It is important to set the correct BEAM parameters, i.e. number
-
-! of particles, emittances, bunch length, energy.
-
-
-
-!--- For completeness, all files needed by this job are copied
-
-!    to the local directory ldb. The links to the the originals
-
-!    in offdb (official database) are commented out.
-
-
-
 Option, -echo,-info,-warn;
 
 npara_1 =        15.47737402 ;
@@ -39,61 +13,71 @@ npara_5 =        15.47737402 ;
 npara_8 =        16.01107657 ;
 long_a =           0.020405 ;
 long_b =             0.0539 ;
+makethin: slicing sequence : lhcb1
+makethin: slicing sequence : lhcb2
 enter Twiss module
   
-iteration:   1 error:   2.032630E-04 deltap:   0.000000E+00
-orbit:  -2.119803E-07 -1.418085E-07  4.229801E-08  1.424855E-04  0.000000E+00  0.000000E+00
+iteration:   1 error:   8.750387E-04 deltap:   0.000000E+00
+orbit:  -4.930721E-04  1.091419E-05  2.269338E-06  1.446057E-04  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.637364E-07 deltap:   0.000000E+00
-orbit:   6.782494E-09 -6.153986E-11  5.155355E-08  1.424932E-04  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.663938E-05 deltap:   0.000000E+00
+orbit:  -5.000000E-04 -3.147371E-09 -1.183569E-10  1.424981E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.337991E-09 deltap:   0.000000E+00
+orbit:  -5.000000E-04  4.852583E-15  6.363372E-15  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003168544238        56.17849657 
+        26658.8832                 -0    0.0003168553684        56.17841282 
 
                 q1                dq1            betxmax              dxmax 
-       64.30999865        1.887789711        4433.756243         2.89416396 
+       64.31000109        1.884854804        4433.753982        2.894670651 
 
              dxrms             xcomax             xcorms                 q2 
-       1.351092461       0.0114390057     0.001062864639        59.32000294 
+       1.350959804      0.01143909564     0.001084569987        59.32000027 
 
                dq2            betymax              dymax              dyrms 
-       2.135357839        4433.760327        1.137359544       0.1620686244 
+       2.136706339        4433.753982        1.152860046       0.1645493033 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008280801168    0.0008247965535                  0                  0 
+    0.008279776355    0.0008511532798                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 enter Twiss module
   
-iteration:   1 error:   2.030303E-04 deltap:   0.000000E+00
-orbit:   1.880095E-07 -2.190664E-07  4.707791E-08 -1.424434E-04  0.000000E+00  0.000000E+00
+iteration:   1 error:   8.560154E-04 deltap:   0.000000E+00
+orbit:   4.909808E-04  1.080914E-06 -3.258877E-06 -1.465257E-04  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   3.598967E-07 deltap:   0.000000E+00
-orbit:   6.878381E-09  1.095079E-10  4.144078E-08 -1.424439E-04  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.377126E-05 deltap:   0.000000E+00
+orbit:   4.999983E-04 -2.590849E-10  1.282237E-09 -1.424999E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   3.145287E-09 deltap:   0.000000E+00
+orbit:   5.000000E-04 -5.001955E-14 -8.221311E-15 -1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003165594587        56.20466358 
+        26658.8832                 -0     0.000316560054        56.20461074 
 
                 q1                dq1            betxmax              dxmax 
-        64.3099964         2.04067144         4433.75706        3.235225074 
+       64.30999909        2.043094364        4433.753982        3.240669733 
 
              dxrms             xcomax             xcorms                 q2 
-       1.373272085      0.01143930169     0.001069942879        59.32000235 
+       1.371870521      0.01143909564     0.001091636247        59.31999927 
 
                dq2            betymax              dymax              dyrms 
-       1.914449067        4433.754174         1.43003785       0.2381673061 
+       1.907393204        4433.753982        1.437529033       0.2441699224 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008279311249    0.0008250781778                  0                  0 
+    0.008279776355    0.0008520064901                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-assign,echo=temp.bb.install;
+assign,echo="temp.bb.install",truncate;
+
+
 
 !--- ip1
 
@@ -303,9 +287,11 @@ if (on_lr8r <> 0 || on_lr8l <> 0)
 
 }
 
+
+
 assign,echo=terminal;
 
-call,file=temp.bb.install;
+call,file="temp.bb.install";
 
 mkip1l2: bbmarker;
 
@@ -587,7 +573,7 @@ mkip5pr15: bbmarker;
 
 savebeta, label=r5ip5pr15, place=mkip5pr15;
 
-!system, "rm temp.bb.install";
+
 
 !
 
@@ -595,7 +581,11 @@ savebeta, label=r5ip5pr15, place=mkip5pr15;
 
 !   install bb markers
 
-assign,echo=temp.bb.install;
+
+
+assign,echo="temp.bb.install",truncate;
+
+
 
 !--- ip1
 
@@ -781,291 +771,13 @@ if (on_lr8r <> 0 || on_lr8l <> 0)
 
 }
 
+
+
 assign,echo=terminal;
 
 seqedit,sequence=lhcb2;
 
-call,file=temp.bb.install;
-
-mkip1l2: bbmarker;
-
-mkip1l1: bbmarker;
-
-mkip1:   bbmarker;
-
-mkip1r1: bbmarker;
-
-mkip1r2: bbmarker;
-
-savebeta, label=r1ip1l2, place=mkip1l2;
-
-savebeta, label=r1ip1l1, place=mkip1l1;
-
-savebeta, label=r1ip1,   place=mkip1;
-
-savebeta, label=r1ip1r1, place=mkip1r1;
-
-savebeta, label=r1ip1r2, place=mkip1r2;
-
-mkip1pl1: bbmarker;
-
-savebeta, label=r1ip1pl1, place=mkip1pl1;
-
-mkip1pl2: bbmarker;
-
-savebeta, label=r1ip1pl2, place=mkip1pl2;
-
-mkip1pl3: bbmarker;
-
-savebeta, label=r1ip1pl3, place=mkip1pl3;
-
-mkip1pl4: bbmarker;
-
-savebeta, label=r1ip1pl4, place=mkip1pl4;
-
-mkip1pl5: bbmarker;
-
-savebeta, label=r1ip1pl5, place=mkip1pl5;
-
-mkip1pl6: bbmarker;
-
-savebeta, label=r1ip1pl6, place=mkip1pl6;
-
-mkip1pl7: bbmarker;
-
-savebeta, label=r1ip1pl7, place=mkip1pl7;
-
-mkip1pl8: bbmarker;
-
-savebeta, label=r1ip1pl8, place=mkip1pl8;
-
-mkip1pl9: bbmarker;
-
-savebeta, label=r1ip1pl9, place=mkip1pl9;
-
-mkip1pl10: bbmarker;
-
-savebeta, label=r1ip1pl10, place=mkip1pl10;
-
-mkip1pl11: bbmarker;
-
-savebeta, label=r1ip1pl11, place=mkip1pl11;
-
-mkip1pl12: bbmarker;
-
-savebeta, label=r1ip1pl12, place=mkip1pl12;
-
-mkip1pl13: bbmarker;
-
-savebeta, label=r1ip1pl13, place=mkip1pl13;
-
-mkip1pl14: bbmarker;
-
-savebeta, label=r1ip1pl14, place=mkip1pl14;
-
-mkip1pl15: bbmarker;
-
-savebeta, label=r1ip1pl15, place=mkip1pl15;
-
-mkip1pr1: bbmarker;
-
-savebeta, label=r1ip1pr1, place=mkip1pr1;
-
-mkip1pr2: bbmarker;
-
-savebeta, label=r1ip1pr2, place=mkip1pr2;
-
-mkip1pr3: bbmarker;
-
-savebeta, label=r1ip1pr3, place=mkip1pr3;
-
-mkip1pr4: bbmarker;
-
-savebeta, label=r1ip1pr4, place=mkip1pr4;
-
-mkip1pr5: bbmarker;
-
-savebeta, label=r1ip1pr5, place=mkip1pr5;
-
-mkip1pr6: bbmarker;
-
-savebeta, label=r1ip1pr6, place=mkip1pr6;
-
-mkip1pr7: bbmarker;
-
-savebeta, label=r1ip1pr7, place=mkip1pr7;
-
-mkip1pr8: bbmarker;
-
-savebeta, label=r1ip1pr8, place=mkip1pr8;
-
-mkip1pr9: bbmarker;
-
-savebeta, label=r1ip1pr9, place=mkip1pr9;
-
-mkip1pr10: bbmarker;
-
-savebeta, label=r1ip1pr10, place=mkip1pr10;
-
-mkip1pr11: bbmarker;
-
-savebeta, label=r1ip1pr11, place=mkip1pr11;
-
-mkip1pr12: bbmarker;
-
-savebeta, label=r1ip1pr12, place=mkip1pr12;
-
-mkip1pr13: bbmarker;
-
-savebeta, label=r1ip1pr13, place=mkip1pr13;
-
-mkip1pr14: bbmarker;
-
-savebeta, label=r1ip1pr14, place=mkip1pr14;
-
-mkip1pr15: bbmarker;
-
-savebeta, label=r1ip1pr15, place=mkip1pr15;
-
-mkip5l2: bbmarker;
-
-mkip5l1: bbmarker;
-
-mkip5:   bbmarker;
-
-mkip5r1: bbmarker;
-
-mkip5r2: bbmarker;
-
-savebeta, label=r5ip5l2, place=mkip5l2;
-
-savebeta, label=r5ip5l1, place=mkip5l1;
-
-savebeta, label=r5ip5,   place=mkip5;
-
-savebeta, label=r5ip5r1, place=mkip5r1;
-
-savebeta, label=r5ip5r2, place=mkip5r2;
-
-mkip5pl1: bbmarker;
-
-savebeta, label=r5ip5pl1, place=mkip5pl1;
-
-mkip5pl2: bbmarker;
-
-savebeta, label=r5ip5pl2, place=mkip5pl2;
-
-mkip5pl3: bbmarker;
-
-savebeta, label=r5ip5pl3, place=mkip5pl3;
-
-mkip5pl4: bbmarker;
-
-savebeta, label=r5ip5pl4, place=mkip5pl4;
-
-mkip5pl5: bbmarker;
-
-savebeta, label=r5ip5pl5, place=mkip5pl5;
-
-mkip5pl6: bbmarker;
-
-savebeta, label=r5ip5pl6, place=mkip5pl6;
-
-mkip5pl7: bbmarker;
-
-savebeta, label=r5ip5pl7, place=mkip5pl7;
-
-mkip5pl8: bbmarker;
-
-savebeta, label=r5ip5pl8, place=mkip5pl8;
-
-mkip5pl9: bbmarker;
-
-savebeta, label=r5ip5pl9, place=mkip5pl9;
-
-mkip5pl10: bbmarker;
-
-savebeta, label=r5ip5pl10, place=mkip5pl10;
-
-mkip5pl11: bbmarker;
-
-savebeta, label=r5ip5pl11, place=mkip5pl11;
-
-mkip5pl12: bbmarker;
-
-savebeta, label=r5ip5pl12, place=mkip5pl12;
-
-mkip5pl13: bbmarker;
-
-savebeta, label=r5ip5pl13, place=mkip5pl13;
-
-mkip5pl14: bbmarker;
-
-savebeta, label=r5ip5pl14, place=mkip5pl14;
-
-mkip5pl15: bbmarker;
-
-savebeta, label=r5ip5pl15, place=mkip5pl15;
-
-mkip5pr1: bbmarker;
-
-savebeta, label=r5ip5pr1, place=mkip5pr1;
-
-mkip5pr2: bbmarker;
-
-savebeta, label=r5ip5pr2, place=mkip5pr2;
-
-mkip5pr3: bbmarker;
-
-savebeta, label=r5ip5pr3, place=mkip5pr3;
-
-mkip5pr4: bbmarker;
-
-savebeta, label=r5ip5pr4, place=mkip5pr4;
-
-mkip5pr5: bbmarker;
-
-savebeta, label=r5ip5pr5, place=mkip5pr5;
-
-mkip5pr6: bbmarker;
-
-savebeta, label=r5ip5pr6, place=mkip5pr6;
-
-mkip5pr7: bbmarker;
-
-savebeta, label=r5ip5pr7, place=mkip5pr7;
-
-mkip5pr8: bbmarker;
-
-savebeta, label=r5ip5pr8, place=mkip5pr8;
-
-mkip5pr9: bbmarker;
-
-savebeta, label=r5ip5pr9, place=mkip5pr9;
-
-mkip5pr10: bbmarker;
-
-savebeta, label=r5ip5pr10, place=mkip5pr10;
-
-mkip5pr11: bbmarker;
-
-savebeta, label=r5ip5pr11, place=mkip5pr11;
-
-mkip5pr12: bbmarker;
-
-savebeta, label=r5ip5pr12, place=mkip5pr12;
-
-mkip5pr13: bbmarker;
-
-savebeta, label=r5ip5pr13, place=mkip5pr13;
-
-mkip5pr14: bbmarker;
-
-savebeta, label=r5ip5pr14, place=mkip5pr14;
-
-mkip5pr15: bbmarker;
-
-savebeta, label=r5ip5pr15, place=mkip5pr15;
+call,file="temp.bb.install";
 
 install, element= mkip1l2, at=-long_b, from=ip1;
 
@@ -1209,8 +921,6 @@ install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
 
 endedit;
 
-!system, "rm temp.bb.install";
-
 
 
 !
@@ -1227,25 +937,25 @@ twiss, sequence=lhcb2; !,file;
 
 enter Twiss module
   
-iteration:   1 error:   7.132156E-07 deltap:   0.000000E+00
-orbit:   2.717797E-08 -9.667610E-10 -1.467977E-07 -2.890228E-09  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.029087E-12 deltap:   0.000000E+00
+orbit:  -4.916159E-13  2.718783E-15 -8.248169E-13  9.167213E-15  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003165594587        56.20466358 
+        26658.8832                 -0     0.000316560054        56.20461074 
 
                 q1                dq1            betxmax              dxmax 
-        64.3099964        2.040757803         4433.75706        3.235225074 
+       64.30999909        2.043094364        4433.753982        3.240669734 
 
              dxrms             xcomax             xcorms                 q2 
-       1.369007242      0.01143930169     0.001098270423        59.32000235 
+       1.367419094      0.01143909565     0.001119790702        59.31999927 
 
                dq2            betymax              dymax              dyrms 
-       1.914360331        4433.754173        1.430037853       0.2467597516 
+       1.907393214        4433.753981        1.437529035       0.2530740257 
 
             ycomax             ycorms             deltap            synch_1 
-    0.008279311251    0.0008640263699                  0                  0 
+    0.008279776356    0.0008902838643                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1260,7 +970,11 @@ on_sep2 =                  0 ;
 
 !   define bb elements
 
-assign,echo=temp.bb.install;
+
+
+assign,echo="temp.bb.install",truncate;
+
+
 
 !--- ip1
 
@@ -1446,500 +1160,12 @@ if (on_lr8r <> 0)
 
 }
 
+
+
 assign,echo=terminal;
 
-call,file=temp.bb.install;
+call,file="temp.bb.install";
 
-mkip1l2: bbmarker;
-
-mkip1l1: bbmarker;
-
-mkip1:   bbmarker;
-
-mkip1r1: bbmarker;
-
-mkip1r2: bbmarker;
-
-savebeta, label=r1ip1l2, place=mkip1l2;
-
-savebeta, label=r1ip1l1, place=mkip1l1;
-
-savebeta, label=r1ip1,   place=mkip1;
-
-savebeta, label=r1ip1r1, place=mkip1r1;
-
-savebeta, label=r1ip1r2, place=mkip1r2;
-
-mkip1pl1: bbmarker;
-
-savebeta, label=r1ip1pl1, place=mkip1pl1;
-
-mkip1pl2: bbmarker;
-
-savebeta, label=r1ip1pl2, place=mkip1pl2;
-
-mkip1pl3: bbmarker;
-
-savebeta, label=r1ip1pl3, place=mkip1pl3;
-
-mkip1pl4: bbmarker;
-
-savebeta, label=r1ip1pl4, place=mkip1pl4;
-
-mkip1pl5: bbmarker;
-
-savebeta, label=r1ip1pl5, place=mkip1pl5;
-
-mkip1pl6: bbmarker;
-
-savebeta, label=r1ip1pl6, place=mkip1pl6;
-
-mkip1pl7: bbmarker;
-
-savebeta, label=r1ip1pl7, place=mkip1pl7;
-
-mkip1pl8: bbmarker;
-
-savebeta, label=r1ip1pl8, place=mkip1pl8;
-
-mkip1pl9: bbmarker;
-
-savebeta, label=r1ip1pl9, place=mkip1pl9;
-
-mkip1pl10: bbmarker;
-
-savebeta, label=r1ip1pl10, place=mkip1pl10;
-
-mkip1pl11: bbmarker;
-
-savebeta, label=r1ip1pl11, place=mkip1pl11;
-
-mkip1pl12: bbmarker;
-
-savebeta, label=r1ip1pl12, place=mkip1pl12;
-
-mkip1pl13: bbmarker;
-
-savebeta, label=r1ip1pl13, place=mkip1pl13;
-
-mkip1pl14: bbmarker;
-
-savebeta, label=r1ip1pl14, place=mkip1pl14;
-
-mkip1pl15: bbmarker;
-
-savebeta, label=r1ip1pl15, place=mkip1pl15;
-
-mkip1pr1: bbmarker;
-
-savebeta, label=r1ip1pr1, place=mkip1pr1;
-
-mkip1pr2: bbmarker;
-
-savebeta, label=r1ip1pr2, place=mkip1pr2;
-
-mkip1pr3: bbmarker;
-
-savebeta, label=r1ip1pr3, place=mkip1pr3;
-
-mkip1pr4: bbmarker;
-
-savebeta, label=r1ip1pr4, place=mkip1pr4;
-
-mkip1pr5: bbmarker;
-
-savebeta, label=r1ip1pr5, place=mkip1pr5;
-
-mkip1pr6: bbmarker;
-
-savebeta, label=r1ip1pr6, place=mkip1pr6;
-
-mkip1pr7: bbmarker;
-
-savebeta, label=r1ip1pr7, place=mkip1pr7;
-
-mkip1pr8: bbmarker;
-
-savebeta, label=r1ip1pr8, place=mkip1pr8;
-
-mkip1pr9: bbmarker;
-
-savebeta, label=r1ip1pr9, place=mkip1pr9;
-
-mkip1pr10: bbmarker;
-
-savebeta, label=r1ip1pr10, place=mkip1pr10;
-
-mkip1pr11: bbmarker;
-
-savebeta, label=r1ip1pr11, place=mkip1pr11;
-
-mkip1pr12: bbmarker;
-
-savebeta, label=r1ip1pr12, place=mkip1pr12;
-
-mkip1pr13: bbmarker;
-
-savebeta, label=r1ip1pr13, place=mkip1pr13;
-
-mkip1pr14: bbmarker;
-
-savebeta, label=r1ip1pr14, place=mkip1pr14;
-
-mkip1pr15: bbmarker;
-
-savebeta, label=r1ip1pr15, place=mkip1pr15;
-
-mkip5l2: bbmarker;
-
-mkip5l1: bbmarker;
-
-mkip5:   bbmarker;
-
-mkip5r1: bbmarker;
-
-mkip5r2: bbmarker;
-
-savebeta, label=r5ip5l2, place=mkip5l2;
-
-savebeta, label=r5ip5l1, place=mkip5l1;
-
-savebeta, label=r5ip5,   place=mkip5;
-
-savebeta, label=r5ip5r1, place=mkip5r1;
-
-savebeta, label=r5ip5r2, place=mkip5r2;
-
-mkip5pl1: bbmarker;
-
-savebeta, label=r5ip5pl1, place=mkip5pl1;
-
-mkip5pl2: bbmarker;
-
-savebeta, label=r5ip5pl2, place=mkip5pl2;
-
-mkip5pl3: bbmarker;
-
-savebeta, label=r5ip5pl3, place=mkip5pl3;
-
-mkip5pl4: bbmarker;
-
-savebeta, label=r5ip5pl4, place=mkip5pl4;
-
-mkip5pl5: bbmarker;
-
-savebeta, label=r5ip5pl5, place=mkip5pl5;
-
-mkip5pl6: bbmarker;
-
-savebeta, label=r5ip5pl6, place=mkip5pl6;
-
-mkip5pl7: bbmarker;
-
-savebeta, label=r5ip5pl7, place=mkip5pl7;
-
-mkip5pl8: bbmarker;
-
-savebeta, label=r5ip5pl8, place=mkip5pl8;
-
-mkip5pl9: bbmarker;
-
-savebeta, label=r5ip5pl9, place=mkip5pl9;
-
-mkip5pl10: bbmarker;
-
-savebeta, label=r5ip5pl10, place=mkip5pl10;
-
-mkip5pl11: bbmarker;
-
-savebeta, label=r5ip5pl11, place=mkip5pl11;
-
-mkip5pl12: bbmarker;
-
-savebeta, label=r5ip5pl12, place=mkip5pl12;
-
-mkip5pl13: bbmarker;
-
-savebeta, label=r5ip5pl13, place=mkip5pl13;
-
-mkip5pl14: bbmarker;
-
-savebeta, label=r5ip5pl14, place=mkip5pl14;
-
-mkip5pl15: bbmarker;
-
-savebeta, label=r5ip5pl15, place=mkip5pl15;
-
-mkip5pr1: bbmarker;
-
-savebeta, label=r5ip5pr1, place=mkip5pr1;
-
-mkip5pr2: bbmarker;
-
-savebeta, label=r5ip5pr2, place=mkip5pr2;
-
-mkip5pr3: bbmarker;
-
-savebeta, label=r5ip5pr3, place=mkip5pr3;
-
-mkip5pr4: bbmarker;
-
-savebeta, label=r5ip5pr4, place=mkip5pr4;
-
-mkip5pr5: bbmarker;
-
-savebeta, label=r5ip5pr5, place=mkip5pr5;
-
-mkip5pr6: bbmarker;
-
-savebeta, label=r5ip5pr6, place=mkip5pr6;
-
-mkip5pr7: bbmarker;
-
-savebeta, label=r5ip5pr7, place=mkip5pr7;
-
-mkip5pr8: bbmarker;
-
-savebeta, label=r5ip5pr8, place=mkip5pr8;
-
-mkip5pr9: bbmarker;
-
-savebeta, label=r5ip5pr9, place=mkip5pr9;
-
-mkip5pr10: bbmarker;
-
-savebeta, label=r5ip5pr10, place=mkip5pr10;
-
-mkip5pr11: bbmarker;
-
-savebeta, label=r5ip5pr11, place=mkip5pr11;
-
-mkip5pr12: bbmarker;
-
-savebeta, label=r5ip5pr12, place=mkip5pr12;
-
-mkip5pr13: bbmarker;
-
-savebeta, label=r5ip5pr13, place=mkip5pr13;
-
-mkip5pr14: bbmarker;
-
-savebeta, label=r5ip5pr14, place=mkip5pr14;
-
-mkip5pr15: bbmarker;
-
-savebeta, label=r5ip5pr15, place=mkip5pr15;
-
-install, element= mkip1l2, at=-long_b, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1l1, at=-long_a, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1,   at=1.e-9,   from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1r1, at=+long_a, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1r2, at=+long_b, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl1, at=-1*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl2, at=-2*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl3, at=-3*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl4, at=-4*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl5, at=-5*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl6, at=-6*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl7, at=-7*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl8, at=-8*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl9, at=-9*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl10, at=-10*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl11, at=-11*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl12, at=-12*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl13, at=-13*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl14, at=-14*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pl15, at=-15*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr1, at=1*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr2, at=2*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr3, at=3*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr4, at=4*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr5, at=5*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr6, at=6*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr7, at=7*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr8, at=8*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr9, at=9*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr10, at=10*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr11, at=11*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr12, at=12*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr13, at=13*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr14, at=14*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip1pr15, at=15*b_h_dist, from=ip1;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5l2, at=-long_b, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5l1, at=-long_a, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5,   at=1.e-9,   from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5r1, at=+long_a, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5r2, at=+long_b, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl1, at=-1*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl2, at=-2*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl3, at=-3*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl4, at=-4*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl5, at=-5*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl6, at=-6*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl7, at=-7*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl8, at=-8*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl9, at=-9*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl10, at=-10*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl11, at=-11*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl12, at=-12*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl13, at=-13*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl14, at=-14*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pl15, at=-15*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr1, at=1*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr2, at=2*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr3, at=3*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr4, at=4*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr5, at=5*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr6, at=6*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr7, at=7*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr8, at=8*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr9, at=9*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr10, at=10*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr11, at=11*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr12, at=12*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr13, at=13*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr14, at=14*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
-install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
-
-++++++ warning: seqedit command outside edit ignored
 bbip1l2: beambeam, sigx=sqrt(r1ip1l2->betx*epsx),
 
           sigy=sqrt(r1ip1l2->bety*epsy),
@@ -2500,7 +1726,7 @@ bbip5pr15: beambeam, sigx=sqrt(r5ip5pr15->betx*epsx),
 
           charge:=on_lr5r;
 
-!system, "rm temp.bb.install";
+
 
 !
 
@@ -2508,7 +1734,11 @@ bbip5pr15: beambeam, sigx=sqrt(r5ip5pr15->betx*epsx),
 
 !   install bb elements
 
-assign,echo=temp.bb.install;
+
+
+assign,echo="temp.bb.install",truncate;
+
+
 
 !--- ip1
 
@@ -2694,6 +1924,8 @@ if (on_lr8r <> 0)
 
 }
 
+
+
 assign,echo=terminal;
 
 select,flag=seqedit,class=bbmarker;
@@ -2710,987 +1942,7 @@ select,flag=seqedit,clear;
 
 seqedit,sequence=lhcb1;
 
-call,file=temp.bb.install;
-
-mkip1l2: bbmarker;
-
-mkip1l1: bbmarker;
-
-mkip1:   bbmarker;
-
-mkip1r1: bbmarker;
-
-mkip1r2: bbmarker;
-
-savebeta, label=r1ip1l2, place=mkip1l2;
-
-savebeta, label=r1ip1l1, place=mkip1l1;
-
-savebeta, label=r1ip1,   place=mkip1;
-
-savebeta, label=r1ip1r1, place=mkip1r1;
-
-savebeta, label=r1ip1r2, place=mkip1r2;
-
-mkip1pl1: bbmarker;
-
-savebeta, label=r1ip1pl1, place=mkip1pl1;
-
-mkip1pl2: bbmarker;
-
-savebeta, label=r1ip1pl2, place=mkip1pl2;
-
-mkip1pl3: bbmarker;
-
-savebeta, label=r1ip1pl3, place=mkip1pl3;
-
-mkip1pl4: bbmarker;
-
-savebeta, label=r1ip1pl4, place=mkip1pl4;
-
-mkip1pl5: bbmarker;
-
-savebeta, label=r1ip1pl5, place=mkip1pl5;
-
-mkip1pl6: bbmarker;
-
-savebeta, label=r1ip1pl6, place=mkip1pl6;
-
-mkip1pl7: bbmarker;
-
-savebeta, label=r1ip1pl7, place=mkip1pl7;
-
-mkip1pl8: bbmarker;
-
-savebeta, label=r1ip1pl8, place=mkip1pl8;
-
-mkip1pl9: bbmarker;
-
-savebeta, label=r1ip1pl9, place=mkip1pl9;
-
-mkip1pl10: bbmarker;
-
-savebeta, label=r1ip1pl10, place=mkip1pl10;
-
-mkip1pl11: bbmarker;
-
-savebeta, label=r1ip1pl11, place=mkip1pl11;
-
-mkip1pl12: bbmarker;
-
-savebeta, label=r1ip1pl12, place=mkip1pl12;
-
-mkip1pl13: bbmarker;
-
-savebeta, label=r1ip1pl13, place=mkip1pl13;
-
-mkip1pl14: bbmarker;
-
-savebeta, label=r1ip1pl14, place=mkip1pl14;
-
-mkip1pl15: bbmarker;
-
-savebeta, label=r1ip1pl15, place=mkip1pl15;
-
-mkip1pr1: bbmarker;
-
-savebeta, label=r1ip1pr1, place=mkip1pr1;
-
-mkip1pr2: bbmarker;
-
-savebeta, label=r1ip1pr2, place=mkip1pr2;
-
-mkip1pr3: bbmarker;
-
-savebeta, label=r1ip1pr3, place=mkip1pr3;
-
-mkip1pr4: bbmarker;
-
-savebeta, label=r1ip1pr4, place=mkip1pr4;
-
-mkip1pr5: bbmarker;
-
-savebeta, label=r1ip1pr5, place=mkip1pr5;
-
-mkip1pr6: bbmarker;
-
-savebeta, label=r1ip1pr6, place=mkip1pr6;
-
-mkip1pr7: bbmarker;
-
-savebeta, label=r1ip1pr7, place=mkip1pr7;
-
-mkip1pr8: bbmarker;
-
-savebeta, label=r1ip1pr8, place=mkip1pr8;
-
-mkip1pr9: bbmarker;
-
-savebeta, label=r1ip1pr9, place=mkip1pr9;
-
-mkip1pr10: bbmarker;
-
-savebeta, label=r1ip1pr10, place=mkip1pr10;
-
-mkip1pr11: bbmarker;
-
-savebeta, label=r1ip1pr11, place=mkip1pr11;
-
-mkip1pr12: bbmarker;
-
-savebeta, label=r1ip1pr12, place=mkip1pr12;
-
-mkip1pr13: bbmarker;
-
-savebeta, label=r1ip1pr13, place=mkip1pr13;
-
-mkip1pr14: bbmarker;
-
-savebeta, label=r1ip1pr14, place=mkip1pr14;
-
-mkip1pr15: bbmarker;
-
-savebeta, label=r1ip1pr15, place=mkip1pr15;
-
-mkip5l2: bbmarker;
-
-mkip5l1: bbmarker;
-
-mkip5:   bbmarker;
-
-mkip5r1: bbmarker;
-
-mkip5r2: bbmarker;
-
-savebeta, label=r5ip5l2, place=mkip5l2;
-
-savebeta, label=r5ip5l1, place=mkip5l1;
-
-savebeta, label=r5ip5,   place=mkip5;
-
-savebeta, label=r5ip5r1, place=mkip5r1;
-
-savebeta, label=r5ip5r2, place=mkip5r2;
-
-mkip5pl1: bbmarker;
-
-savebeta, label=r5ip5pl1, place=mkip5pl1;
-
-mkip5pl2: bbmarker;
-
-savebeta, label=r5ip5pl2, place=mkip5pl2;
-
-mkip5pl3: bbmarker;
-
-savebeta, label=r5ip5pl3, place=mkip5pl3;
-
-mkip5pl4: bbmarker;
-
-savebeta, label=r5ip5pl4, place=mkip5pl4;
-
-mkip5pl5: bbmarker;
-
-savebeta, label=r5ip5pl5, place=mkip5pl5;
-
-mkip5pl6: bbmarker;
-
-savebeta, label=r5ip5pl6, place=mkip5pl6;
-
-mkip5pl7: bbmarker;
-
-savebeta, label=r5ip5pl7, place=mkip5pl7;
-
-mkip5pl8: bbmarker;
-
-savebeta, label=r5ip5pl8, place=mkip5pl8;
-
-mkip5pl9: bbmarker;
-
-savebeta, label=r5ip5pl9, place=mkip5pl9;
-
-mkip5pl10: bbmarker;
-
-savebeta, label=r5ip5pl10, place=mkip5pl10;
-
-mkip5pl11: bbmarker;
-
-savebeta, label=r5ip5pl11, place=mkip5pl11;
-
-mkip5pl12: bbmarker;
-
-savebeta, label=r5ip5pl12, place=mkip5pl12;
-
-mkip5pl13: bbmarker;
-
-savebeta, label=r5ip5pl13, place=mkip5pl13;
-
-mkip5pl14: bbmarker;
-
-savebeta, label=r5ip5pl14, place=mkip5pl14;
-
-mkip5pl15: bbmarker;
-
-savebeta, label=r5ip5pl15, place=mkip5pl15;
-
-mkip5pr1: bbmarker;
-
-savebeta, label=r5ip5pr1, place=mkip5pr1;
-
-mkip5pr2: bbmarker;
-
-savebeta, label=r5ip5pr2, place=mkip5pr2;
-
-mkip5pr3: bbmarker;
-
-savebeta, label=r5ip5pr3, place=mkip5pr3;
-
-mkip5pr4: bbmarker;
-
-savebeta, label=r5ip5pr4, place=mkip5pr4;
-
-mkip5pr5: bbmarker;
-
-savebeta, label=r5ip5pr5, place=mkip5pr5;
-
-mkip5pr6: bbmarker;
-
-savebeta, label=r5ip5pr6, place=mkip5pr6;
-
-mkip5pr7: bbmarker;
-
-savebeta, label=r5ip5pr7, place=mkip5pr7;
-
-mkip5pr8: bbmarker;
-
-savebeta, label=r5ip5pr8, place=mkip5pr8;
-
-mkip5pr9: bbmarker;
-
-savebeta, label=r5ip5pr9, place=mkip5pr9;
-
-mkip5pr10: bbmarker;
-
-savebeta, label=r5ip5pr10, place=mkip5pr10;
-
-mkip5pr11: bbmarker;
-
-savebeta, label=r5ip5pr11, place=mkip5pr11;
-
-mkip5pr12: bbmarker;
-
-savebeta, label=r5ip5pr12, place=mkip5pr12;
-
-mkip5pr13: bbmarker;
-
-savebeta, label=r5ip5pr13, place=mkip5pr13;
-
-mkip5pr14: bbmarker;
-
-savebeta, label=r5ip5pr14, place=mkip5pr14;
-
-mkip5pr15: bbmarker;
-
-savebeta, label=r5ip5pr15, place=mkip5pr15;
-
-install, element= mkip1l2, at=-long_b, from=ip1;
-
-install, element= mkip1l1, at=-long_a, from=ip1;
-
-install, element= mkip1,   at=1.e-9,   from=ip1;
-
-install, element= mkip1r1, at=+long_a, from=ip1;
-
-install, element= mkip1r2, at=+long_b, from=ip1;
-
-install, element= mkip1pl1, at=-1*b_h_dist, from=ip1;
-
-install, element= mkip1pl2, at=-2*b_h_dist, from=ip1;
-
-install, element= mkip1pl3, at=-3*b_h_dist, from=ip1;
-
-install, element= mkip1pl4, at=-4*b_h_dist, from=ip1;
-
-install, element= mkip1pl5, at=-5*b_h_dist, from=ip1;
-
-install, element= mkip1pl6, at=-6*b_h_dist, from=ip1;
-
-install, element= mkip1pl7, at=-7*b_h_dist, from=ip1;
-
-install, element= mkip1pl8, at=-8*b_h_dist, from=ip1;
-
-install, element= mkip1pl9, at=-9*b_h_dist, from=ip1;
-
-install, element= mkip1pl10, at=-10*b_h_dist, from=ip1;
-
-install, element= mkip1pl11, at=-11*b_h_dist, from=ip1;
-
-install, element= mkip1pl12, at=-12*b_h_dist, from=ip1;
-
-install, element= mkip1pl13, at=-13*b_h_dist, from=ip1;
-
-install, element= mkip1pl14, at=-14*b_h_dist, from=ip1;
-
-install, element= mkip1pl15, at=-15*b_h_dist, from=ip1;
-
-install, element= mkip1pr1, at=1*b_h_dist, from=ip1;
-
-install, element= mkip1pr2, at=2*b_h_dist, from=ip1;
-
-install, element= mkip1pr3, at=3*b_h_dist, from=ip1;
-
-install, element= mkip1pr4, at=4*b_h_dist, from=ip1;
-
-install, element= mkip1pr5, at=5*b_h_dist, from=ip1;
-
-install, element= mkip1pr6, at=6*b_h_dist, from=ip1;
-
-install, element= mkip1pr7, at=7*b_h_dist, from=ip1;
-
-install, element= mkip1pr8, at=8*b_h_dist, from=ip1;
-
-install, element= mkip1pr9, at=9*b_h_dist, from=ip1;
-
-install, element= mkip1pr10, at=10*b_h_dist, from=ip1;
-
-install, element= mkip1pr11, at=11*b_h_dist, from=ip1;
-
-install, element= mkip1pr12, at=12*b_h_dist, from=ip1;
-
-install, element= mkip1pr13, at=13*b_h_dist, from=ip1;
-
-install, element= mkip1pr14, at=14*b_h_dist, from=ip1;
-
-install, element= mkip1pr15, at=15*b_h_dist, from=ip1;
-
-install, element= mkip5l2, at=-long_b, from=ip5;
-
-install, element= mkip5l1, at=-long_a, from=ip5;
-
-install, element= mkip5,   at=1.e-9,   from=ip5;
-
-install, element= mkip5r1, at=+long_a, from=ip5;
-
-install, element= mkip5r2, at=+long_b, from=ip5;
-
-install, element= mkip5pl1, at=-1*b_h_dist, from=ip5;
-
-install, element= mkip5pl2, at=-2*b_h_dist, from=ip5;
-
-install, element= mkip5pl3, at=-3*b_h_dist, from=ip5;
-
-install, element= mkip5pl4, at=-4*b_h_dist, from=ip5;
-
-install, element= mkip5pl5, at=-5*b_h_dist, from=ip5;
-
-install, element= mkip5pl6, at=-6*b_h_dist, from=ip5;
-
-install, element= mkip5pl7, at=-7*b_h_dist, from=ip5;
-
-install, element= mkip5pl8, at=-8*b_h_dist, from=ip5;
-
-install, element= mkip5pl9, at=-9*b_h_dist, from=ip5;
-
-install, element= mkip5pl10, at=-10*b_h_dist, from=ip5;
-
-install, element= mkip5pl11, at=-11*b_h_dist, from=ip5;
-
-install, element= mkip5pl12, at=-12*b_h_dist, from=ip5;
-
-install, element= mkip5pl13, at=-13*b_h_dist, from=ip5;
-
-install, element= mkip5pl14, at=-14*b_h_dist, from=ip5;
-
-install, element= mkip5pl15, at=-15*b_h_dist, from=ip5;
-
-install, element= mkip5pr1, at=1*b_h_dist, from=ip5;
-
-install, element= mkip5pr2, at=2*b_h_dist, from=ip5;
-
-install, element= mkip5pr3, at=3*b_h_dist, from=ip5;
-
-install, element= mkip5pr4, at=4*b_h_dist, from=ip5;
-
-install, element= mkip5pr5, at=5*b_h_dist, from=ip5;
-
-install, element= mkip5pr6, at=6*b_h_dist, from=ip5;
-
-install, element= mkip5pr7, at=7*b_h_dist, from=ip5;
-
-install, element= mkip5pr8, at=8*b_h_dist, from=ip5;
-
-install, element= mkip5pr9, at=9*b_h_dist, from=ip5;
-
-install, element= mkip5pr10, at=10*b_h_dist, from=ip5;
-
-install, element= mkip5pr11, at=11*b_h_dist, from=ip5;
-
-install, element= mkip5pr12, at=12*b_h_dist, from=ip5;
-
-install, element= mkip5pr13, at=13*b_h_dist, from=ip5;
-
-install, element= mkip5pr14, at=14*b_h_dist, from=ip5;
-
-install, element= mkip5pr15, at=15*b_h_dist, from=ip5;
-
-bbip1l2: beambeam, sigx=sqrt(r1ip1l2->betx*epsx),
-
-          sigy=sqrt(r1ip1l2->bety*epsy),
-
-          xma=r1ip1l2->x,yma=r1ip1l2->y,
-
-          charge:=on_ho1;
-
-bbip1l1: beambeam, sigx=sqrt(r1ip1l1->betx*epsx),
-
-          sigy=sqrt(r1ip1l1->bety*epsy),
-
-          xma=r1ip1l1->x,yma=r1ip1l1->y,
-
-          charge:=on_ho1;
-
-bbip1:   beambeam, sigx=sqrt(r1ip1->betx*epsx),
-
-          sigy=sqrt(r1ip1->bety*epsy),
-
-          xma=r1ip1->x,yma=r1ip1->y,
-
-          charge:=on_ho1;
-
-bbip1r1: beambeam, sigx=sqrt(r1ip1r1->betx*epsx),
-
-          sigy=sqrt(r1ip1r1->bety*epsy),
-
-          xma=r1ip1r1->x,yma=r1ip1r1->y,
-
-          charge:=on_ho1;
-
-bbip1r2: beambeam, sigx=sqrt(r1ip1r2->betx*epsx),
-
-          sigy=sqrt(r1ip1r2->bety*epsy),
-
-          xma=r1ip1r2->x,yma=r1ip1r2->y,
-
-          charge:=on_ho1;
-
-bbip1pl1: beambeam, sigx=sqrt(r1ip1pl1->betx*epsx),
-
-          sigy=sqrt(r1ip1pl1->bety*epsy),
-
-          xma=r1ip1pl1->x,yma=r1ip1pl1->y,
-
-          charge:=on_lr1l;
-
-bbip1pl2: beambeam, sigx=sqrt(r1ip1pl2->betx*epsx),
-
-          sigy=sqrt(r1ip1pl2->bety*epsy),
-
-          xma=r1ip1pl2->x,yma=r1ip1pl2->y,
-
-          charge:=on_lr1l;
-
-bbip1pl3: beambeam, sigx=sqrt(r1ip1pl3->betx*epsx),
-
-          sigy=sqrt(r1ip1pl3->bety*epsy),
-
-          xma=r1ip1pl3->x,yma=r1ip1pl3->y,
-
-          charge:=on_lr1l;
-
-bbip1pl4: beambeam, sigx=sqrt(r1ip1pl4->betx*epsx),
-
-          sigy=sqrt(r1ip1pl4->bety*epsy),
-
-          xma=r1ip1pl4->x,yma=r1ip1pl4->y,
-
-          charge:=on_lr1l;
-
-bbip1pl5: beambeam, sigx=sqrt(r1ip1pl5->betx*epsx),
-
-          sigy=sqrt(r1ip1pl5->bety*epsy),
-
-          xma=r1ip1pl5->x,yma=r1ip1pl5->y,
-
-          charge:=on_lr1l;
-
-bbip1pl6: beambeam, sigx=sqrt(r1ip1pl6->betx*epsx),
-
-          sigy=sqrt(r1ip1pl6->bety*epsy),
-
-          xma=r1ip1pl6->x,yma=r1ip1pl6->y,
-
-          charge:=on_lr1l;
-
-bbip1pl7: beambeam, sigx=sqrt(r1ip1pl7->betx*epsx),
-
-          sigy=sqrt(r1ip1pl7->bety*epsy),
-
-          xma=r1ip1pl7->x,yma=r1ip1pl7->y,
-
-          charge:=on_lr1l;
-
-bbip1pl8: beambeam, sigx=sqrt(r1ip1pl8->betx*epsx),
-
-          sigy=sqrt(r1ip1pl8->bety*epsy),
-
-          xma=r1ip1pl8->x,yma=r1ip1pl8->y,
-
-          charge:=on_lr1l;
-
-bbip1pl9: beambeam, sigx=sqrt(r1ip1pl9->betx*epsx),
-
-          sigy=sqrt(r1ip1pl9->bety*epsy),
-
-          xma=r1ip1pl9->x,yma=r1ip1pl9->y,
-
-          charge:=on_lr1l;
-
-bbip1pl10: beambeam, sigx=sqrt(r1ip1pl10->betx*epsx),
-
-          sigy=sqrt(r1ip1pl10->bety*epsy),
-
-          xma=r1ip1pl10->x,yma=r1ip1pl10->y,
-
-          charge:=on_lr1l;
-
-bbip1pl11: beambeam, sigx=sqrt(r1ip1pl11->betx*epsx),
-
-          sigy=sqrt(r1ip1pl11->bety*epsy),
-
-          xma=r1ip1pl11->x,yma=r1ip1pl11->y,
-
-          charge:=on_lr1l;
-
-bbip1pl12: beambeam, sigx=sqrt(r1ip1pl12->betx*epsx),
-
-          sigy=sqrt(r1ip1pl12->bety*epsy),
-
-          xma=r1ip1pl12->x,yma=r1ip1pl12->y,
-
-          charge:=on_lr1l;
-
-bbip1pl13: beambeam, sigx=sqrt(r1ip1pl13->betx*epsx),
-
-          sigy=sqrt(r1ip1pl13->bety*epsy),
-
-          xma=r1ip1pl13->x,yma=r1ip1pl13->y,
-
-          charge:=on_lr1l;
-
-bbip1pl14: beambeam, sigx=sqrt(r1ip1pl14->betx*epsx),
-
-          sigy=sqrt(r1ip1pl14->bety*epsy),
-
-          xma=r1ip1pl14->x,yma=r1ip1pl14->y,
-
-          charge:=on_lr1l;
-
-bbip1pl15: beambeam, sigx=sqrt(r1ip1pl15->betx*epsx),
-
-          sigy=sqrt(r1ip1pl15->bety*epsy),
-
-          xma=r1ip1pl15->x,yma=r1ip1pl15->y,
-
-          charge:=on_lr1l;
-
-bbip1pr1: beambeam, sigx=sqrt(r1ip1pr1->betx*epsx),
-
-          sigy=sqrt(r1ip1pr1->bety*epsy),
-
-          xma=r1ip1pr1->x,yma=r1ip1pr1->y,
-
-          charge:=on_lr1r;
-
-bbip1pr2: beambeam, sigx=sqrt(r1ip1pr2->betx*epsx),
-
-          sigy=sqrt(r1ip1pr2->bety*epsy),
-
-          xma=r1ip1pr2->x,yma=r1ip1pr2->y,
-
-          charge:=on_lr1r;
-
-bbip1pr3: beambeam, sigx=sqrt(r1ip1pr3->betx*epsx),
-
-          sigy=sqrt(r1ip1pr3->bety*epsy),
-
-          xma=r1ip1pr3->x,yma=r1ip1pr3->y,
-
-          charge:=on_lr1r;
-
-bbip1pr4: beambeam, sigx=sqrt(r1ip1pr4->betx*epsx),
-
-          sigy=sqrt(r1ip1pr4->bety*epsy),
-
-          xma=r1ip1pr4->x,yma=r1ip1pr4->y,
-
-          charge:=on_lr1r;
-
-bbip1pr5: beambeam, sigx=sqrt(r1ip1pr5->betx*epsx),
-
-          sigy=sqrt(r1ip1pr5->bety*epsy),
-
-          xma=r1ip1pr5->x,yma=r1ip1pr5->y,
-
-          charge:=on_lr1r;
-
-bbip1pr6: beambeam, sigx=sqrt(r1ip1pr6->betx*epsx),
-
-          sigy=sqrt(r1ip1pr6->bety*epsy),
-
-          xma=r1ip1pr6->x,yma=r1ip1pr6->y,
-
-          charge:=on_lr1r;
-
-bbip1pr7: beambeam, sigx=sqrt(r1ip1pr7->betx*epsx),
-
-          sigy=sqrt(r1ip1pr7->bety*epsy),
-
-          xma=r1ip1pr7->x,yma=r1ip1pr7->y,
-
-          charge:=on_lr1r;
-
-bbip1pr8: beambeam, sigx=sqrt(r1ip1pr8->betx*epsx),
-
-          sigy=sqrt(r1ip1pr8->bety*epsy),
-
-          xma=r1ip1pr8->x,yma=r1ip1pr8->y,
-
-          charge:=on_lr1r;
-
-bbip1pr9: beambeam, sigx=sqrt(r1ip1pr9->betx*epsx),
-
-          sigy=sqrt(r1ip1pr9->bety*epsy),
-
-          xma=r1ip1pr9->x,yma=r1ip1pr9->y,
-
-          charge:=on_lr1r;
-
-bbip1pr10: beambeam, sigx=sqrt(r1ip1pr10->betx*epsx),
-
-          sigy=sqrt(r1ip1pr10->bety*epsy),
-
-          xma=r1ip1pr10->x,yma=r1ip1pr10->y,
-
-          charge:=on_lr1r;
-
-bbip1pr11: beambeam, sigx=sqrt(r1ip1pr11->betx*epsx),
-
-          sigy=sqrt(r1ip1pr11->bety*epsy),
-
-          xma=r1ip1pr11->x,yma=r1ip1pr11->y,
-
-          charge:=on_lr1r;
-
-bbip1pr12: beambeam, sigx=sqrt(r1ip1pr12->betx*epsx),
-
-          sigy=sqrt(r1ip1pr12->bety*epsy),
-
-          xma=r1ip1pr12->x,yma=r1ip1pr12->y,
-
-          charge:=on_lr1r;
-
-bbip1pr13: beambeam, sigx=sqrt(r1ip1pr13->betx*epsx),
-
-          sigy=sqrt(r1ip1pr13->bety*epsy),
-
-          xma=r1ip1pr13->x,yma=r1ip1pr13->y,
-
-          charge:=on_lr1r;
-
-bbip1pr14: beambeam, sigx=sqrt(r1ip1pr14->betx*epsx),
-
-          sigy=sqrt(r1ip1pr14->bety*epsy),
-
-          xma=r1ip1pr14->x,yma=r1ip1pr14->y,
-
-          charge:=on_lr1r;
-
-bbip1pr15: beambeam, sigx=sqrt(r1ip1pr15->betx*epsx),
-
-          sigy=sqrt(r1ip1pr15->bety*epsy),
-
-          xma=r1ip1pr15->x,yma=r1ip1pr15->y,
-
-          charge:=on_lr1r;
-
-bbip5l2: beambeam, sigx=sqrt(r5ip5l2->betx*epsx),
-
-          sigy=sqrt(r5ip5l2->bety*epsy),
-
-          xma=r5ip5l2->x,yma=r5ip5l2->y,
-
-          charge:=on_ho5;
-
-bbip5l1: beambeam, sigx=sqrt(r5ip5l1->betx*epsx),
-
-          sigy=sqrt(r5ip5l1->bety*epsy),
-
-          xma=r5ip5l1->x,yma=r5ip5l1->y,
-
-          charge:=on_ho5;
-
-bbip5:   beambeam, sigx=sqrt(r5ip5->betx*epsx),
-
-          sigy=sqrt(r5ip5->bety*epsy),
-
-          xma=r5ip5->x,yma=r5ip5->y,
-
-          charge:=on_ho5;
-
-bbip5r1: beambeam, sigx=sqrt(r5ip5r1->betx*epsx),
-
-          sigy=sqrt(r5ip5r1->bety*epsy),
-
-          xma=r5ip5r1->x,yma=r5ip5r1->y,
-
-          charge:=on_ho5;
-
-bbip5r2: beambeam, sigx=sqrt(r5ip5r2->betx*epsx),
-
-          sigy=sqrt(r5ip5r2->bety*epsy),
-
-          xma=r5ip5r2->x,yma=r5ip5r2->y,
-
-          charge:=on_ho5;
-
-bbip5pl1: beambeam, sigx=sqrt(r5ip5pl1->betx*epsx),
-
-          sigy=sqrt(r5ip5pl1->bety*epsy),
-
-          xma=r5ip5pl1->x,yma=r5ip5pl1->y,
-
-          charge:=on_lr5l;
-
-bbip5pl2: beambeam, sigx=sqrt(r5ip5pl2->betx*epsx),
-
-          sigy=sqrt(r5ip5pl2->bety*epsy),
-
-          xma=r5ip5pl2->x,yma=r5ip5pl2->y,
-
-          charge:=on_lr5l;
-
-bbip5pl3: beambeam, sigx=sqrt(r5ip5pl3->betx*epsx),
-
-          sigy=sqrt(r5ip5pl3->bety*epsy),
-
-          xma=r5ip5pl3->x,yma=r5ip5pl3->y,
-
-          charge:=on_lr5l;
-
-bbip5pl4: beambeam, sigx=sqrt(r5ip5pl4->betx*epsx),
-
-          sigy=sqrt(r5ip5pl4->bety*epsy),
-
-          xma=r5ip5pl4->x,yma=r5ip5pl4->y,
-
-          charge:=on_lr5l;
-
-bbip5pl5: beambeam, sigx=sqrt(r5ip5pl5->betx*epsx),
-
-          sigy=sqrt(r5ip5pl5->bety*epsy),
-
-          xma=r5ip5pl5->x,yma=r5ip5pl5->y,
-
-          charge:=on_lr5l;
-
-bbip5pl6: beambeam, sigx=sqrt(r5ip5pl6->betx*epsx),
-
-          sigy=sqrt(r5ip5pl6->bety*epsy),
-
-          xma=r5ip5pl6->x,yma=r5ip5pl6->y,
-
-          charge:=on_lr5l;
-
-bbip5pl7: beambeam, sigx=sqrt(r5ip5pl7->betx*epsx),
-
-          sigy=sqrt(r5ip5pl7->bety*epsy),
-
-          xma=r5ip5pl7->x,yma=r5ip5pl7->y,
-
-          charge:=on_lr5l;
-
-bbip5pl8: beambeam, sigx=sqrt(r5ip5pl8->betx*epsx),
-
-          sigy=sqrt(r5ip5pl8->bety*epsy),
-
-          xma=r5ip5pl8->x,yma=r5ip5pl8->y,
-
-          charge:=on_lr5l;
-
-bbip5pl9: beambeam, sigx=sqrt(r5ip5pl9->betx*epsx),
-
-          sigy=sqrt(r5ip5pl9->bety*epsy),
-
-          xma=r5ip5pl9->x,yma=r5ip5pl9->y,
-
-          charge:=on_lr5l;
-
-bbip5pl10: beambeam, sigx=sqrt(r5ip5pl10->betx*epsx),
-
-          sigy=sqrt(r5ip5pl10->bety*epsy),
-
-          xma=r5ip5pl10->x,yma=r5ip5pl10->y,
-
-          charge:=on_lr5l;
-
-bbip5pl11: beambeam, sigx=sqrt(r5ip5pl11->betx*epsx),
-
-          sigy=sqrt(r5ip5pl11->bety*epsy),
-
-          xma=r5ip5pl11->x,yma=r5ip5pl11->y,
-
-          charge:=on_lr5l;
-
-bbip5pl12: beambeam, sigx=sqrt(r5ip5pl12->betx*epsx),
-
-          sigy=sqrt(r5ip5pl12->bety*epsy),
-
-          xma=r5ip5pl12->x,yma=r5ip5pl12->y,
-
-          charge:=on_lr5l;
-
-bbip5pl13: beambeam, sigx=sqrt(r5ip5pl13->betx*epsx),
-
-          sigy=sqrt(r5ip5pl13->bety*epsy),
-
-          xma=r5ip5pl13->x,yma=r5ip5pl13->y,
-
-          charge:=on_lr5l;
-
-bbip5pl14: beambeam, sigx=sqrt(r5ip5pl14->betx*epsx),
-
-          sigy=sqrt(r5ip5pl14->bety*epsy),
-
-          xma=r5ip5pl14->x,yma=r5ip5pl14->y,
-
-          charge:=on_lr5l;
-
-bbip5pl15: beambeam, sigx=sqrt(r5ip5pl15->betx*epsx),
-
-          sigy=sqrt(r5ip5pl15->bety*epsy),
-
-          xma=r5ip5pl15->x,yma=r5ip5pl15->y,
-
-          charge:=on_lr5l;
-
-bbip5pr1: beambeam, sigx=sqrt(r5ip5pr1->betx*epsx),
-
-          sigy=sqrt(r5ip5pr1->bety*epsy),
-
-          xma=r5ip5pr1->x,yma=r5ip5pr1->y,
-
-          charge:=on_lr5r;
-
-bbip5pr2: beambeam, sigx=sqrt(r5ip5pr2->betx*epsx),
-
-          sigy=sqrt(r5ip5pr2->bety*epsy),
-
-          xma=r5ip5pr2->x,yma=r5ip5pr2->y,
-
-          charge:=on_lr5r;
-
-bbip5pr3: beambeam, sigx=sqrt(r5ip5pr3->betx*epsx),
-
-          sigy=sqrt(r5ip5pr3->bety*epsy),
-
-          xma=r5ip5pr3->x,yma=r5ip5pr3->y,
-
-          charge:=on_lr5r;
-
-bbip5pr4: beambeam, sigx=sqrt(r5ip5pr4->betx*epsx),
-
-          sigy=sqrt(r5ip5pr4->bety*epsy),
-
-          xma=r5ip5pr4->x,yma=r5ip5pr4->y,
-
-          charge:=on_lr5r;
-
-bbip5pr5: beambeam, sigx=sqrt(r5ip5pr5->betx*epsx),
-
-          sigy=sqrt(r5ip5pr5->bety*epsy),
-
-          xma=r5ip5pr5->x,yma=r5ip5pr5->y,
-
-          charge:=on_lr5r;
-
-bbip5pr6: beambeam, sigx=sqrt(r5ip5pr6->betx*epsx),
-
-          sigy=sqrt(r5ip5pr6->bety*epsy),
-
-          xma=r5ip5pr6->x,yma=r5ip5pr6->y,
-
-          charge:=on_lr5r;
-
-bbip5pr7: beambeam, sigx=sqrt(r5ip5pr7->betx*epsx),
-
-          sigy=sqrt(r5ip5pr7->bety*epsy),
-
-          xma=r5ip5pr7->x,yma=r5ip5pr7->y,
-
-          charge:=on_lr5r;
-
-bbip5pr8: beambeam, sigx=sqrt(r5ip5pr8->betx*epsx),
-
-          sigy=sqrt(r5ip5pr8->bety*epsy),
-
-          xma=r5ip5pr8->x,yma=r5ip5pr8->y,
-
-          charge:=on_lr5r;
-
-bbip5pr9: beambeam, sigx=sqrt(r5ip5pr9->betx*epsx),
-
-          sigy=sqrt(r5ip5pr9->bety*epsy),
-
-          xma=r5ip5pr9->x,yma=r5ip5pr9->y,
-
-          charge:=on_lr5r;
-
-bbip5pr10: beambeam, sigx=sqrt(r5ip5pr10->betx*epsx),
-
-          sigy=sqrt(r5ip5pr10->bety*epsy),
-
-          xma=r5ip5pr10->x,yma=r5ip5pr10->y,
-
-          charge:=on_lr5r;
-
-bbip5pr11: beambeam, sigx=sqrt(r5ip5pr11->betx*epsx),
-
-          sigy=sqrt(r5ip5pr11->bety*epsy),
-
-          xma=r5ip5pr11->x,yma=r5ip5pr11->y,
-
-          charge:=on_lr5r;
-
-bbip5pr12: beambeam, sigx=sqrt(r5ip5pr12->betx*epsx),
-
-          sigy=sqrt(r5ip5pr12->bety*epsy),
-
-          xma=r5ip5pr12->x,yma=r5ip5pr12->y,
-
-          charge:=on_lr5r;
-
-bbip5pr13: beambeam, sigx=sqrt(r5ip5pr13->betx*epsx),
-
-          sigy=sqrt(r5ip5pr13->bety*epsy),
-
-          xma=r5ip5pr13->x,yma=r5ip5pr13->y,
-
-          charge:=on_lr5r;
-
-bbip5pr14: beambeam, sigx=sqrt(r5ip5pr14->betx*epsx),
-
-          sigy=sqrt(r5ip5pr14->bety*epsy),
-
-          xma=r5ip5pr14->x,yma=r5ip5pr14->y,
-
-          charge:=on_lr5r;
-
-bbip5pr15: beambeam, sigx=sqrt(r5ip5pr15->betx*epsx),
-
-          sigy=sqrt(r5ip5pr15->bety*epsy),
-
-          xma=r5ip5pr15->x,yma=r5ip5pr15->y,
-
-          charge:=on_lr5r;
+call,file="temp.bb.install";
 
 install, element= bbip1l2, at=-long_b, from=ip1;
 
@@ -3834,13 +2086,11 @@ install, element= bbip5pr15, at=15*b_h_dist, from=ip5;
 
 endedit;
 
+removefile, file="temp.bb.install";
+
 
 
 !--- Now the beam-beam element installation is complete
-
-
-
-!system, "rm temp.bb.install";
 
 
 
@@ -3854,11 +2104,8 @@ endedit;
 
 use,period=lhcb1;
 
-twiss, sequence=lhcb1;
+!twiss, sequence=lhcb1;
 
-enter Twiss module
- Singular matrix occurred during closed orbit search.
-++++++ warning: Twiss failed:  MAD-X continues
 
 
 !
@@ -3877,7 +2124,7 @@ big=sqrt(1.-small^2);
 
 track;
 
-sec.s since start: 5   since last call: 5
+sec.s since start: 7   since last call: 7
 enter TRACK module
 xs=small; ys=small;
 
@@ -3887,7 +2134,7 @@ xs =               0.05 ;
 ys =               0.05 ;
 start,fx=xs,fy=ys;  // zero amplitude
 
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 nsigmax=6;
 
 n=1; // sigma multiplier
@@ -3926,152 +2173,825 @@ while (n <= nsigmax)
 
 xs =       0.9987492178 ;
 ys =               0.05 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.9659258263 ;
 ys =       0.2588190451 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.8660254038 ;
 ys =                0.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.7071067812 ;
 ys =       0.7071067812 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                0.5 ;
 ys =       0.8660254038 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.2588190451 ;
 ys =       0.9659258263 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =               0.05 ;
 ys =       0.9987492178 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.997498436 ;
 ys =                0.1 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.931851653 ;
 ys =       0.5176380902 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.732050808 ;
 ys =                  1 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.414213562 ;
 ys =        1.414213562 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                  1 ;
 ys =        1.732050808 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.5176380902 ;
 ys =        1.931851653 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                0.1 ;
 ys =        1.997498436 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        2.996247653 ;
 ys =               0.15 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        2.897777479 ;
 ys =       0.7764571353 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        2.598076211 ;
 ys =                1.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        2.121320344 ;
 ys =        2.121320344 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                1.5 ;
 ys =        2.598076211 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =       0.7764571353 ;
 ys =        2.897777479 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =               0.15 ;
 ys =        2.996247653 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        3.994996871 ;
 ys =                0.2 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        3.863703305 ;
 ys =         1.03527618 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        3.464101615 ;
 ys =                  2 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        2.828427125 ;
 ys =        2.828427125 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                  2 ;
 ys =        3.464101615 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =         1.03527618 ;
 ys =        3.863703305 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                0.2 ;
 ys =        3.994996871 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        4.993746089 ;
 ys =               0.25 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        4.829629131 ;
 ys =        1.294095226 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        4.330127019 ;
 ys =                2.5 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        3.535533906 ;
 ys =        3.535533906 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                2.5 ;
 ys =        4.330127019 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.294095226 ;
 ys =        4.829629131 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =               0.25 ;
 ys =        4.993746089 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        5.992495307 ;
 ys =                0.3 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        5.795554958 ;
 ys =        1.552914271 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        5.196152423 ;
 ys =                  3 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        4.242640687 ;
 ys =        4.242640687 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                  3 ;
 ys =        5.196152423 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =        1.552914271 ;
 ys =        5.795554958 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 xs =                0.3 ;
 ys =        5.992495307 ;
-sec.s since start: 5   since last call: 0
+sec.s since start: 7   since last call: 0
 dynap,fastune,turns=1024;
 
-sec.s since start: 5   since last call: 0
- Singular matrix occurred during closed orbit search.
+sec.s since start: 7   since last call: 0
+  
+iteration:   1 error:   8.750387E-04 deltap:   0.000000E+00
+orbit:  -4.912200E-04  1.221052E-05 -1.026010E-06  1.418253E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.154322E-05 deltap:   0.000000E+00
+orbit:  -5.000265E-04  1.426134E-07 -9.934771E-09  1.424566E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.503362E-07 deltap:   0.000000E+00
+orbit:  -4.999994E-04  5.687285E-10 -4.737468E-10  1.424999E-04  0.000000E+00  0.000000E+00
   
   Full 6D closed orbit search.
   Initial value of 6-D closed orbit from Twiss: 
-  orbit0   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+  orbit0  -4.999994337700015E-004  5.687285445479818E-010 -4.737468090792007E-010  1.424999163038001E-004  0.000000000000000E+000  0.000000000000000E+000
   Singular matrix occurred during closed orbit search.
   
  6D closed orbit found by subroutine trclor 
-iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
-orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
- Maximum Iteration exceeded in HQR2, increase MAXITER:          150
-Unable to find eigenvalues for matrix:
-         NaN         NaN         NaN         NaN         NaN         NaN
-         NaN         NaN         NaN         NaN         NaN         NaN
-         NaN         NaN         NaN         NaN         NaN         NaN
-         NaN         NaN         NaN         NaN         NaN         NaN
-         NaN         NaN         NaN         NaN         NaN         NaN
-         NaN         NaN         NaN         NaN         NaN         NaN
-  
- +-+-+- fatal: LADEIG Unable to find eigenvalues for matrix
-  
-  
+iteration:   2 error:   7.152176E-06 deltap:   0.000000E+00
+orbit:  -4.999994E-04  5.687285E-10 -4.737468E-10  1.424999E-04  0.000000E+00  0.000000E+00
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0    8.306578034e-07   -1.875986013e-08 
+         2          0    9.306578034e-07   -1.875986013e-08 
+         3          0    1.658367368e-05   -3.921700183e-07 
+         4          0    1.668367368e-05   -3.921700183e-07 
+         5          0    1.604059016e-05   -3.754123427e-07 
+         6          0    1.614059016e-05   -3.754123427e-07 
+         7          0    1.438405761e-05   -3.316594357e-07 
+         8          0    1.448405761e-05   -3.316594357e-07 
+         9          0    1.174727531e-05   -2.653044863e-07 
+        10          0    1.184727531e-05   -2.653044863e-07 
+        11          0    8.309935611e-06   -1.808694745e-07 
+        12          0    8.409935611e-06   -1.808694745e-07 
+        13          0     4.30628753e-06   -8.410850702e-08 
+        14          0     4.40628753e-06   -8.410850702e-08 
+        15          0     8.39360747e-07   -1.317754462e-09 
+        16          0     9.39360747e-07   -1.317754462e-09 
+        17          0    3.316734737e-05   -7.843400367e-07 
+        18          0    3.326734737e-05   -7.843400367e-07 
+        19          0    3.208118032e-05   -7.508246854e-07 
+        20          0    3.218118032e-05   -7.508246854e-07 
+        21          0    2.876811523e-05   -6.633188714e-07 
+        22          0    2.886811523e-05   -6.633188714e-07 
+        23          0    2.349455062e-05   -5.306089726e-07 
+        24          0    2.359455062e-05   -5.306089726e-07 
+        25          0    1.661987122e-05   -3.617389491e-07 
+        26          0    1.671987122e-05   -3.617389491e-07 
+        27          0     8.61257506e-06    -1.68217014e-07 
+        28          0     8.71257506e-06    -1.68217014e-07 
+        29          0    1.678721494e-06   -2.635508925e-09 
+        30          0    1.778721494e-06   -2.635508925e-09 
+        31          0    4.975102105e-05   -1.176510055e-06 
+        32          0    4.985102105e-05   -1.176510055e-06 
+        33          0    4.812177048e-05   -1.126237028e-06 
+        34          0    4.822177048e-05   -1.126237028e-06 
+        35          0    4.315217284e-05   -9.949783071e-07 
+        36          0    4.325217284e-05   -9.949783071e-07 
+        37          0    3.524182594e-05   -7.959134588e-07 
+        38          0    3.534182594e-05   -7.959134588e-07 
+        39          0    2.492980683e-05   -5.426084236e-07 
+        40          0    2.502980683e-05   -5.426084236e-07 
+        41          0    1.291886259e-05   -2.523255211e-07 
+        42          0    1.301886259e-05   -2.523255211e-07 
+        43          0    2.518082241e-06   -3.953263387e-09 
+        44          0    2.618082241e-06   -3.953263387e-09 
+        45          0    6.633469473e-05   -1.568680073e-06 
+        46          0    6.643469473e-05   -1.568680073e-06 
+        47          0    6.416236065e-05   -1.501649371e-06 
+        48          0    6.426236065e-05   -1.501649371e-06 
+        49          0    5.753623046e-05   -1.326637743e-06 
+        50          0    5.763623046e-05   -1.326637743e-06 
+        51          0    4.698910125e-05   -1.061217945e-06 
+        52          0    4.708910125e-05   -1.061217945e-06 
+        53          0    3.323974244e-05   -7.234778982e-07 
+        54          0    3.333974244e-05   -7.234778982e-07 
+        55          0    1.722515012e-05   -3.364340281e-07 
+        56          0    1.732515012e-05   -3.364340281e-07 
+        57          0    3.357442988e-06   -5.271017849e-09 
+        58          0    3.457442988e-06   -5.271017849e-09 
+        59          0    8.291836842e-05   -1.960850092e-06 
+        60          0    8.301836842e-05   -1.960850092e-06 
+        61          0    8.020295081e-05   -1.877061713e-06 
+        62          0    8.030295081e-05   -1.877061713e-06 
+        63          0    7.192028807e-05   -1.658297179e-06 
+        64          0    7.202028807e-05   -1.658297179e-06 
+        65          0    5.873637656e-05   -1.326522431e-06 
+        66          0    5.883637656e-05   -1.326522431e-06 
+        67          0    4.154967805e-05   -9.043473727e-07 
+        68          0    4.164967805e-05   -9.043473727e-07 
+        69          0    2.153143765e-05   -4.205425351e-07 
+        70          0    2.163143765e-05   -4.205425351e-07 
+        71          0    4.196803735e-06   -6.588772311e-09 
+        72          0    4.296803735e-06   -6.588772311e-09 
+        73          0     9.95020421e-05    -2.35302011e-06 
+        74          0     9.96020421e-05    -2.35302011e-06 
+        75          0    9.624354097e-05   -2.252474056e-06 
+        76          0    9.634354097e-05   -2.252474056e-06 
+        77          0    8.630434569e-05   -1.989956614e-06 
+        78          0    8.640434569e-05   -1.989956614e-06 
+        79          0    7.048365187e-05   -1.591826918e-06 
+        80          0    7.058365187e-05   -1.591826918e-06 
+        81          0    4.985961366e-05   -1.085216847e-06 
+        82          0    4.995961366e-05   -1.085216847e-06 
+        83          0    2.583772518e-05   -5.046510421e-07 
+        84          0    2.593772518e-05   -5.046510421e-07 
+        85          0    5.036164482e-06   -7.906526774e-09 
+        86          0    5.136164482e-06   -7.906526774e-09 
+         1       1024   -6.827957788e-07   -8.411179079e-07 
+         2       1024   -7.645452879e-07   -9.440403091e-07 
+         3       1024   -1.545033135e-05    -1.01651309e-05 
+         4       1024   -1.555985332e-05   -1.014391325e-05 
+         5       1024   -1.469962577e-05   -1.092318263e-05 
+         6       1024   -1.480820647e-05   -1.091536851e-05 
+         7       1024   -1.248692759e-05   -1.241078502e-05 
+         8       1024   -1.259078168e-05   -1.243944144e-05 
+         9       1024   -9.238432005e-06   -1.283397385e-05 
+        10       1024     -9.3312504e-06   -1.290888044e-05 
+        11       1024   -5.709942391e-06   -1.078130923e-05 
+        12       1024   -5.786840704e-06   -1.089686926e-05 
+        13       1024   -2.594357536e-06   -6.148363548e-06 
+        14       1024     -2.6567799e-06   -6.289286295e-06 
+        15       1024   -4.619034558e-07   -1.213901058e-06 
+        16       1024   -5.186479076e-07   -1.362909617e-06 
+        17       1024     -3.1014193e-05    2.258679063e-05 
+        18       1024   -3.104142936e-05    2.297939158e-05 
+        19       1024   -3.129071632e-05    1.327738947e-05 
+        20       1024   -3.135258752e-05    1.363939632e-05 
+        21       1024   -2.784293801e-05   -1.068001563e-05 
+        22       1024    -2.79717073e-05   -1.045589407e-05 
+        23       1024   -1.603704915e-05   -3.073167576e-05 
+        24       1024    -1.61750247e-05   -3.073703281e-05 
+        25       1024   -2.695673366e-06   -3.008341363e-05 
+        26       1024   -2.760555735e-06   -3.024652965e-05 
+        27       1024    2.403546565e-06   -1.551497827e-05 
+        28       1024    2.418260386e-06   -1.569858445e-05 
+        29       1024    7.690517185e-07   -3.059033422e-06 
+        30       1024    8.121666518e-07   -3.226605743e-06 
+        31       1024   -2.917359919e-08    8.935391761e-05 
+        32       1024    4.191284222e-07    8.951153506e-05 
+        33       1024   -1.653810999e-05    8.206278063e-05 
+        34       1024   -1.618349614e-05    8.245536228e-05 
+        35       1024   -4.159730004e-05    2.175239954e-05 
+        36       1024   -4.161577804e-05    2.237982245e-05 
+        37       1024   -1.731551311e-05   -5.574076446e-05 
+        38       1024   -1.755302555e-05    -5.56947432e-05 
+        39       1024    1.815028743e-05   -3.247980555e-05 
+        40       1024    1.814213329e-05   -3.275699407e-05 
+        41       1024    1.253548287e-05    5.630043922e-06 
+        42       1024    1.264128342e-05    5.613300055e-06 
+        43       1024    1.907314489e-06    2.877110399e-06 
+        44       1024    1.988189559e-06    2.982880848e-06 
+        45       1024    6.509993232e-05    -1.94801493e-05 
+        46       1024      6.5032175e-05   -2.097371034e-05 
+        47       1024    5.816852892e-05    5.086078794e-05 
+        48       1024    5.857458268e-05    4.974684146e-05 
+        49       1024   -3.488212569e-05    8.548081031e-05 
+        50       1024   -3.446577562e-05    8.620294472e-05 
+        51       1024   -9.506960117e-06   -8.420909216e-05 
+        52       1024   -9.900537378e-06   -8.425899106e-05 
+        53       1024    2.722822804e-05    3.313272197e-05 
+        54       1024    2.742896302e-05    3.289676553e-05 
+        55       1024   -1.552742384e-05    1.838902282e-05 
+        56       1024     -1.5570712e-05    1.859975312e-05 
+        57       1024   -4.055623744e-06   -1.351179481e-06 
+        58       1024   -4.159141006e-06   -1.364826245e-06 
+        59       1024   -6.798259272e-05   -7.758792166e-05 
+        60       1024   -6.883362399e-05   -7.531962663e-05 
+        61       1024    5.601495779e-06   -0.0001481956186 
+        62       1024     4.41940508e-06   -0.0001485469339 
+        63       1024    1.892691746e-05    0.0001234767727 
+        64       1024    1.983779752e-05    0.0001231818997 
+        65       1024    9.458477405e-06   -0.0001064048776 
+        66       1024     8.88932132e-06    -0.000106831154 
+        67       1024   -2.970127835e-05    5.592936864e-05 
+        68       1024   -2.949087353e-05    5.651454028e-05 
+        69       1024     1.67705043e-05   -2.218005763e-05 
+        70       1024    1.677419643e-05    -2.25062918e-05 
+        71       1024    2.918921037e-06    4.276643598e-06 
+        72       1024    3.001266782e-06     4.39655839e-06 
+        73       1024    9.024618854e-05    8.497292453e-05 
+        74       1024    9.114014107e-05    8.226019201e-05 
+        75       1024   -6.098109663e-05    0.0001401303513 
+        76       1024   -5.968020819e-05    0.0001419651123 
+        77       1024    8.528328529e-05    4.356924097e-05 
+        78       1024    8.560884852e-05    4.144053021e-05 
+        79       1024    3.635977383e-05   -0.0001108344189 
+        80       1024    3.567252959e-05   -0.0001118459826 
+        81       1024   -1.425079336e-05   -8.494168436e-05 
+        82       1024   -1.486447819e-05   -8.482970487e-05 
+        83       1024   -2.112221771e-05   -2.308788609e-05 
+        84       1024   -2.133610267e-05   -2.277541942e-05 
+        85       1024    2.210327876e-06   -5.648408823e-07 
+        86       1024    2.322751327e-06   -5.889111213e-07 
+
+                 y                 py                  t                 pt 
+   8.221271987e-07    2.413099025e-09                  0                  0 
+   8.221271987e-07    2.413099025e-09                  0                  0 
+    8.18623952e-07    2.022449552e-08                  0                  0 
+    8.18623952e-07    2.022449552e-08                  0                  0 
+   4.253032546e-06    2.576602841e-08                  0                  0 
+   4.253032546e-06    2.576602841e-08                  0                  0 
+   8.219920441e-06    3.100258864e-08                  0                  0 
+   8.219920441e-06    3.100258864e-08                  0                  0 
+   1.162663434e-05    3.412637369e-08                  0                  0 
+   1.162663434e-05    3.412637369e-08                  0                  0 
+   1.424101233e-05    3.492450277e-08                  0                  0 
+   1.424101233e-05    3.492450277e-08                  0                  0 
+   1.588488886e-05     3.33425847e-08                  0                  0 
+   1.588488886e-05     3.33425847e-08                  0                  0 
+   1.642548118e-05    3.039021878e-08                  0                  0 
+   1.642548118e-05    3.039021878e-08                  0                  0 
+   1.637247904e-06    4.044899105e-08                  0                  0 
+   1.637247904e-06    4.044899105e-08                  0                  0 
+   8.506065091e-06    5.153205682e-08                  0                  0 
+   8.506065091e-06    5.153205682e-08                  0                  0 
+   1.643984088e-05    6.200517728e-08                  0                  0 
+   1.643984088e-05    6.200517728e-08                  0                  0 
+   2.325326869e-05    6.825274738e-08                  0                  0 
+   2.325326869e-05    6.825274738e-08                  0                  0 
+   2.848202466e-05    6.984900554e-08                  0                  0 
+   2.848202466e-05    6.984900554e-08                  0                  0 
+   3.176977772e-05     6.66851694e-08                  0                  0 
+   3.176977772e-05     6.66851694e-08                  0                  0 
+   3.285096236e-05    6.078043756e-08                  0                  0 
+   3.285096236e-05    6.078043756e-08                  0                  0 
+   2.455871856e-06    6.067348657e-08                  0                  0 
+   2.455871856e-06    6.067348657e-08                  0                  0 
+   1.275909764e-05    7.729808523e-08                  0                  0 
+   1.275909764e-05    7.729808523e-08                  0                  0 
+   2.465976132e-05    9.300776592e-08                  0                  0 
+   2.465976132e-05    9.300776592e-08                  0                  0 
+   3.487990303e-05    1.023791211e-07                  0                  0 
+   3.487990303e-05    1.023791211e-07                  0                  0 
+   4.272303699e-05    1.047735083e-07                  0                  0 
+   4.272303699e-05    1.047735083e-07                  0                  0 
+   4.765466657e-05    1.000277541e-07                  0                  0 
+   4.765466657e-05    1.000277541e-07                  0                  0 
+   4.927644353e-05    9.117065634e-08                  0                  0 
+   4.927644353e-05    9.117065634e-08                  0                  0 
+   3.274495808e-06    8.089798209e-08                  0                  0 
+   3.274495808e-06    8.089798209e-08                  0                  0 
+   1.701213018e-05    1.030641136e-07                  0                  0 
+   1.701213018e-05    1.030641136e-07                  0                  0 
+   3.287968177e-05    1.240103546e-07                  0                  0 
+   3.287968177e-05    1.240103546e-07                  0                  0 
+   4.650653737e-05    1.365054948e-07                  0                  0 
+   4.650653737e-05    1.365054948e-07                  0                  0 
+   5.696404931e-05    1.396980111e-07                  0                  0 
+   5.696404931e-05    1.396980111e-07                  0                  0 
+   6.353955543e-05    1.333703388e-07                  0                  0 
+   6.353955543e-05    1.333703388e-07                  0                  0 
+   6.570192471e-05    1.215608751e-07                  0                  0 
+   6.570192471e-05    1.215608751e-07                  0                  0 
+    4.09311976e-06    1.011224776e-07                  0                  0 
+    4.09311976e-06    1.011224776e-07                  0                  0 
+   2.126516273e-05    1.288301421e-07                  0                  0 
+   2.126516273e-05    1.288301421e-07                  0                  0 
+   4.109960221e-05    1.550129432e-07                  0                  0 
+   4.109960221e-05    1.550129432e-07                  0                  0 
+   5.813317172e-05    1.706318684e-07                  0                  0 
+   5.813317172e-05    1.706318684e-07                  0                  0 
+   7.120506164e-05    1.746225138e-07                  0                  0 
+   7.120506164e-05    1.746225138e-07                  0                  0 
+   7.942444429e-05    1.667129235e-07                  0                  0 
+   7.942444429e-05    1.667129235e-07                  0                  0 
+   8.212740589e-05    1.519510939e-07                  0                  0 
+   8.212740589e-05    1.519510939e-07                  0                  0 
+   4.911743712e-06    1.213469731e-07                  0                  0 
+   4.911743712e-06    1.213469731e-07                  0                  0 
+   2.551819527e-05    1.545961705e-07                  0                  0 
+   2.551819527e-05    1.545961705e-07                  0                  0 
+   4.931952265e-05    1.860155318e-07                  0                  0 
+   4.931952265e-05    1.860155318e-07                  0                  0 
+   6.975980606e-05    2.047582421e-07                  0                  0 
+   6.975980606e-05    2.047582421e-07                  0                  0 
+   8.544607397e-05    2.095470166e-07                  0                  0 
+   8.544607397e-05    2.095470166e-07                  0                  0 
+   9.530933315e-05    2.000555082e-07                  0                  0 
+   9.530933315e-05    2.000555082e-07                  0                  0 
+   9.855288707e-05    1.823413127e-07                  0                  0 
+   9.855288707e-05    1.823413127e-07                  0                  0 
+  -2.592050813e-07    1.449484245e-06     0.007464207504                  0 
+  -2.595499849e-07    1.449389991e-06     0.007464208562                  0 
+  -5.690675232e-07    1.086683288e-06      0.00746719188                  0 
+  -5.720003466e-07    1.080964232e-06     0.007467229032                  0 
+  -2.538351439e-06    6.309502092e-06     0.007467257166                  0 
+   -2.55240984e-06    6.289068684e-06      0.00746729306                  0 
+  -4.109378032e-06    1.320174367e-05     0.007467362608                  0 
+  -4.135418315e-06    1.317299263e-05     0.007467394581                  0 
+  -4.257246825e-06    2.008242986e-05     0.007467488449                  0 
+  -4.289653685e-06    2.005847483e-05     0.007467514154                  0 
+  -3.206914453e-06      2.5746471e-05     0.007467624583                  0 
+  -3.236487681e-06     2.57338875e-05     0.007467642142                  0 
+  -1.881733451e-06    2.925110459e-05     0.007467755138                  0 
+  -1.899300925e-06    2.924738328e-05       0.0074677633                  0 
+  -1.319314528e-06    3.035397754e-05     0.007467841369                  0 
+  -1.322975662e-06    3.035355078e-05     0.007467841511                  0 
+  -1.461168204e-06   -9.004702384e-07     0.007476564525                  0 
+  -1.455680392e-06   -9.256726287e-07     0.007476639958                  0 
+  -8.301423749e-06    -1.57539523e-07     0.007476683942                  0 
+  -8.298705711e-06   -2.862240342e-07     0.007476756398                  0 
+  -1.471004816e-05    1.282541405e-05     0.007476911299                  0 
+  -1.475821851e-05    1.262147917e-05     0.007476975841                  0 
+  -1.202486145e-05    3.685911688e-05     0.007477212831                  0 
+  -1.214204642e-05    3.672444914e-05     0.007477265228                  0 
+   1.198255307e-06    5.268222039e-05     0.007477563123                  0 
+   1.076218946e-06    5.269095702e-05     0.007477599083                  0 
+    1.46486164e-05    5.238811929e-05     0.007477953882                  0 
+   1.458461102e-05    5.244691247e-05     0.007477970887                  0 
+   1.951061145e-05    4.934424046e-05     0.007478225044                  0 
+   1.949799197e-05    4.936030677e-05     0.007478225969                  0 
+   1.283938887e-06   -3.484917205e-06     0.007492050486                  0 
+    1.30952525e-06   -3.456736571e-06     0.007492157636                  0 
+   4.865798653e-07      -2.281201e-05     0.007492179253                  0 
+   6.420022623e-07   -2.280701664e-05     0.007492285293                  0 
+  -1.983912227e-05   -2.509595581e-05     0.007492508945                  0 
+  -1.968368674e-05   -2.550708951e-05     0.007492602984                  0 
+   -2.56848198e-05    4.316515982e-05      0.00749326305                  0 
+  -2.588543312e-05    4.273392829e-05      0.00749334066                  0 
+   1.988696284e-05     6.98169497e-05     0.007494149947                  0 
+   1.963865797e-05    7.003976635e-05     0.007494203229                  0 
+   4.749042833e-05    1.065252194e-05     0.007495279069                  0 
+     4.7474662e-05    1.095524528e-05     0.007495306171                  0 
+   4.757690467e-05   -2.169976696e-05     0.007495718725                  0 
+   4.758720598e-05   -2.163017287e-05     0.007495723607                  0 
+   6.054605288e-07    4.586929446e-06     0.007509526529                  0 
+   5.515991509e-07    4.592319277e-06     0.007509631546                  0 
+   1.331256264e-05    1.834989683e-05     0.007511578501                  0 
+   1.314530045e-05    1.873711198e-05     0.007511683675                  0 
+   1.534637435e-05   -5.377383736e-05     0.007513874758                  0 
+   1.576982507e-05   -5.337150746e-05     0.007514000661                  0 
+  -4.339462729e-05    2.559618627e-05      0.00751546503                  0 
+  -4.353645945e-05    2.462119025e-05     0.007515563634                  0 
+   4.984918514e-05    5.225985234e-05     0.007518445177                  0 
+   4.960628603e-05    5.303116177e-05     0.007518515532                  0 
+    1.75079014e-05   -0.0001144359253     0.007520354763                  0 
+   1.780907111e-05   -0.0001142632261     0.007520392234                  0 
+  -2.559277712e-05   -0.0001127883661     0.007521113575                  0 
+  -2.552278035e-05   -0.0001128456043     0.007521117775                  0 
+   5.258885106e-07   -7.508369801e-06     0.007532459805                  0 
+   6.225706813e-07   -7.440389791e-06     0.007532613515                  0 
+  -1.681283299e-05   -2.116478653e-05     0.007533421798                  0 
+  -1.653148948e-05   -2.190745889e-05     0.007533577917                  0 
+   2.860484666e-05    5.029695398e-05     0.007541194135                  0 
+   2.806924759e-05    5.129180103e-05      0.00754134061                  0 
+  -5.370549418e-05   -3.054895363e-05     0.007543550234                  0 
+  -5.343792869e-05   -3.206835041e-05      0.00754366621                  0 
+   6.930191275e-05   -2.011946566e-05     0.007549119124                  0 
+   6.944080611e-05   -1.860451906e-05     0.007549210934                  0 
+  -7.919645693e-05    9.022348641e-06     0.007552770983                  0 
+  -7.919892433e-05     7.96959876e-06      0.00755280463                  0 
+  -2.354651512e-05    0.0001441594969      0.00755518595                  0 
+  -2.369420684e-05    0.0001440775733     0.007555193132                  0 
+  -1.892574956e-06   -1.104888113e-05     0.007558323573                  0 
+  -1.748225227e-06   -1.125263868e-05     0.007558412057                  0 
+  -4.623398913e-06    4.410838151e-05     0.007562896576                  0 
+  -5.472977376e-06    4.389009834e-05     0.007563103566                  0 
+  -4.863126853e-05   -2.542127751e-07     0.007570510134                  0 
+  -4.872272339e-05   -2.294093763e-06     0.007570611926                  0 
+  -3.259771924e-05   -0.0001114941493     0.007577701145                  0 
+   -3.15710144e-05   -0.0001124985725     0.007577839962                  0 
+   4.888062807e-05   -0.0001239048218      0.00758615911                  0 
+   4.981267621e-05   -0.0001223960176     0.007586256521                  0 
+    7.63370832e-05    0.0001097341893     0.007592144132                  0 
+   7.573807286e-05    0.0001110823488     0.007592209491                  0 
+   1.757515026e-05   -0.0001842109706     0.007596485277                  0 
+   1.783182462e-05   -0.0001840909327     0.007596488655                  0 
+
+                 s                  e 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+  entered dynap 
+  0.309965151818530       0.309965151824376         0.320018746244777       0.320018746276534     
+  tunes =   0.309965151818007       0.320018746245417       3.229066651158457E-011
+  yapunov =   0.000000000000000E+000
+  0.310002460600046       0.310002460607077         0.319964608562590       0.319964622804039     
+  tunes =   0.310002460791216       0.319964642062814       1.424145119934233E-008
+  yapunov =   0.000000000000000E+000
+  0.309996568915863       0.309996569233733         0.319970488127768       0.319970490969694     
+  tunes =   0.309996569746790       0.319970494330683       2.859647447120983E-009
+  yapunov =   0.000000000000000E+000
+  0.309979818922539       0.309979819655521         0.319987118116202       0.319987119021793     
+  tunes =   0.309979820329230       0.319987121126350       1.165057169771494E-009
+  yapunov =   0.000000000000000E+000
+  0.309956884288977       0.309956885296480         0.320009864238592       0.320009864224156     
+  tunes =   0.309956885948723       0.320009866231166       1.007606825495899E-009
+  yapunov =   0.000000000000000E+000
+  0.309933871684512       0.309933872518800         0.320032656967429       0.320032656681149     
+  tunes =   0.309933873394456       0.320032658410955       8.820388851721789E-010
+  yapunov =   0.000000000000000E+000
+  0.309916938992081       0.309916938833317         0.320049394105355       0.320049394051554     
+  tunes =   0.309916941087741       0.320049395002012       1.676320179675514E-010
+  yapunov =   0.000000000000000E+000
+  0.309910896275405       0.309910890628066         0.320055330876598       0.320055331149401     
+  tunes =   0.309910904731717       0.320055331228766       5.653924292218519E-009
+  yapunov =   0.000000000000000E+000
+  0.310113930809282       0.310113930985508         0.319802428110438       0.319802436355511     
+  tunes =   0.310113931567550       0.319802537313506       8.246955796780615E-009
+  yapunov =   0.000000000000000E+000
+  0.310090572491956       0.310090572527482         0.319825828921355       0.319825828513412     
+  tunes =   0.310090575899561       0.319825849839931       4.094872799982523E-010
+  yapunov =   0.000000000000000E+000
+  0.310024048028370       0.310024048440548         0.319892092184450       0.319892091425676     
+  tunes =   0.310024054013218       0.319892102858543       8.634982731795278E-010
+  yapunov =   0.000000000000000E+000
+  0.309932789075410       0.309932792700926         0.319982683303269       0.319982682648919     
+  tunes =   0.309932795740333       0.319982691131193       3.684093228995021E-009
+  yapunov =   0.000000000000000E+000
+  0.309840711280587       0.309840719258619         0.320073699045179       0.320073700441637     
+  tunes =   0.309840717635103       0.320073705350426       8.099326258233866E-009
+  yapunov =   0.000000000000000E+000
+  0.309772321161168       0.309772332695006         0.320140946596654       0.320140949831556     
+  tunes =   0.309772329242357       0.320140950450625       1.197889837818787E-008
+  yapunov =   0.000000000000000E+000
+  0.309747563831845       0.309747602826147         0.320165023174980       0.320165023891737     
+  tunes =   0.309747594579442       0.320165024060878       3.900088883134806E-008
+  yapunov =   0.000000000000000E+000
+  0.310300715901848       0.310300717324708         0.319530025132623       0.319530233721611     
+  tunes =   0.310300716436370       0.319530093640519       2.085938407236161E-007
+  yapunov =   0.000000000000000E+000
+  0.310247998144230       0.310248006180289         0.319583298274657       0.319583336500031     
+  tunes =   0.310248001913903       0.319583309301742       3.906094548204715E-008
+  yapunov =   0.000000000000000E+000
+  0.310098625159446       0.310098628397100         0.319733273450976       0.319733284111455     
+  tunes =   0.310098637187210       0.319733287433869       1.114128421814549E-008
+  yapunov =   0.000000000000000E+000
+  0.309894720552673       0.309894725801434         0.319936145728641       0.319936145193102     
+  tunes =   0.309894734940646       0.319936164422772       5.276011319571475E-009
+  yapunov =   0.000000000000000E+000
+  0.309687197459546       0.309687218585798         0.320140413280311       0.320140436460936     
+  tunes =   0.309687209019181       0.320140428698974       3.136335239636084E-008
+  yapunov =   0.000000000000000E+000
+  0.309529706107652       0.309529709681837         0.320293730858729       0.320293746339247     
+  tunes =   0.309529710610423       0.320293738723545       1.588776948880067E-008
+  yapunov =   0.000000000000000E+000
+  0.309471315173899       0.309471287596807         0.320349696713425       0.320349696701185     
+  tunes =   0.309471300236425       0.320349696658906       2.757709465938256E-008
+  yapunov =   0.000000000000000E+000
+  0.310570232294200       0.310570241775243         0.319133573400510       0.319133630044258     
+  tunes =   0.310570236663463       0.319133615910384       5.743173690202389E-008
+  yapunov =   0.000000000000000E+000
+  0.310473028354024       0.310473033610045         0.319234344049870       0.319234331519897     
+  tunes =   0.310473030886195       0.319234343661779       1.358771417272663E-008
+  yapunov =   0.000000000000000E+000
+  0.310204172952580       0.310204201571744         0.319509334860866       0.319509367536164     
+  tunes =   0.310204181028745       0.319509322956378       4.343652422376837E-008
+  yapunov =   0.000000000000000E+000
+  0.309845153254595       0.309845167851066         0.319868409317655       0.319868395924505     
+  tunes =   0.309845180270649       0.319868441712558       1.980993249561857E-008
+  yapunov =   0.000000000000000E+000
+  0.309474912484596       0.309474921130638         0.320229900876617       0.320229942014088     
+  tunes =   0.309474918286819       0.320229920038740       4.203624147982276E-008
+  yapunov =   0.000000000000000E+000
+  0.309180716744089       0.309180738040044         0.320511152667827       0.320511155218569     
+  tunes =   0.309180713038314       0.320511150536275       2.144817010969488E-008
+  yapunov =   0.000000000000000E+000
+  0.309066293591328       0.309066394655459         0.320618151563772       0.320618148569705     
+  tunes =   0.309066291712613       0.320618150085202       1.011084719176585E-007
+  yapunov =   0.000000000000000E+000
+  0.310945259921223       0.310945263375903         0.318570203378521       0.318570629702429     
+  tunes =   0.310945256348700       0.318570467736516       4.263379058530613E-007
+  yapunov =   0.000000000000000E+000
+  0.310777267520829       0.310777255594760         0.318753901927937       0.318753876033906     
+  tunes =   0.310777289358999       0.318753962767744       2.850845396727796E-008
+  yapunov =   0.000000000000000E+000
+  0.310340516147935       0.310340519950506         0.319217552270297       0.319217525040480     
+  tunes =   0.310340516109647       0.319217529329039       2.749404437863818E-008
+  yapunov =   0.000000000000000E+000
+  0.309787194878337       0.309787439023192         0.319776738000996       0.319776350533403     
+  tunes =   0.309787359999797       0.319776595535926       4.579714470798430E-007
+  yapunov =   0.000000000000000E+000
+  0.309205160118682       0.309205171360206         0.320336640548584       0.320336642979558     
+  tunes =   0.309205159677287       0.320336640196469       1.150136832073990E-008
+  yapunov =   0.000000000000000E+000
+  0.308701321375987       0.308701264792733         0.320804342656568       0.320804157381741     
+  tunes =   0.308701347943395       0.320804045706639       1.937225493201927E-007
+  yapunov =   0.000000000000000E+000
+  0.308488276687447       0.308487593445856         0.320997300282716       0.320997301156206     
+  tunes =   0.308487912787679       0.320997302706199       6.832421495498834E-007
+  yapunov =   0.000000000000000E+000
+  0.311442391970895       0.311442268643037         0.317730489614196       0.317725077571167     
+  tunes =   0.311442397682079       0.317734366887289       5.413448023932636E-006
+  yapunov =   0.000000000000000E+000
+  0.311170975051737       0.311171063874009         0.318085440179694       0.318087491663659     
+  tunes =   0.311171020709766       0.318086435784492       2.053405915973999E-006
+  yapunov =   0.000000000000000E+000
+  0.310505645374220       0.310505649184854         0.318854273227390       0.318854413352949     
+  tunes =   0.310505661506042       0.318854422767818       1.401773639168684E-007
+  yapunov =   0.000000000000000E+000
+  0.309725138149441       0.309724846857724         0.319657042363883       0.319657582177630     
+  tunes =   0.309725434983833       0.319656761729705       6.133919997798683E-007
+  yapunov =   0.000000000000000E+000
+  0.308879310093988       0.308879301133434         0.320449333296426       0.320449404214395     
+  tunes =   0.308879373908658       0.320449265172605       7.148181494435542E-008
+  yapunov =   0.000000000000000E+000
+  0.308037742004852       0.308036014710925         0.321182372610896       0.321182494937804     
+  tunes =   0.308036827062949       0.321182428965066       1.731620103564792E-006
+  yapunov =   0.000000000000000E+000
+  0.307634458171990       0.307634379280339         0.321498251316342       0.321498254429936     
+  tunes =   0.307634885878987       0.321498256386198       7.895306820489828E-008
+  yapunov =   0.000000000000000E+000
+  end dynap 
+endtrack;
+
+sec.s since start: 41   since last call: 34
+exit TRACK module
+
+write,table=dynap,file;
+
+sec.s since start: 41   since last call: 0
+write,table=dynaptune,file;
+
+sec.s since start: 41   since last call: 0
+!system,"foot < dynaptune > footprint";
+
+!stop;
+
+
+  Number of warnings: 0
+sec.s since start: 41   since last call: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.00.19 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

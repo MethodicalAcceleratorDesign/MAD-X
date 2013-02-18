@@ -1,19 +1,8 @@
-! Creates a footprint for head-on + parasitic collisions at IP1+5 
-! of lhc.6.4; both lhcb1 (for tracking) and lhcb2 (to define the
-! beam-beam elements, i.e. weak-strong) are used; there are flags to
-! select head-on, left, and right parasitic separately at all IPs.
-! The bunch spacing can be given in nanosec and automatically creates
-! the beam-beam interaction points at the correct positions.
-! It is important to set the correct BEAM parameters, i.e. number
-! of particles, emittances, bunch length, energy.
-
-!--- For completeness, all files needed by this job are copied
-!    to the local directory ldb. The links to the the originals
-!    in offdb (official database) are commented out.
-
 Option, -echo,-info,-warn;
 
-call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+!call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file = "../share/LHC/LHCRing/V6.503/toolkit/slice.madx";
 
 Option, info,warn;
 
@@ -35,8 +24,8 @@ npara_8 = ip8_range / b_h_dist;
 
 value,npara_1,npara_2,npara_5,npara_8;
 
-eg   =  7000;
-bg   =  eg/pmass;
+eg   = 7000;
+bg   = eg/pmass;
 en   = 3.75e-06;
 epsx = en/bg;
 epsy = en/bg;
@@ -55,8 +44,8 @@ beamx = beam%lhcb1->ex;   beamy%lhcb1 = beam->ey;
 sigz  = beam%lhcb1->sigt; sige = beam%lhcb1->sige;
 
 !--- split5, 4d
-long_a= 0.53 * sigz/2;
-long_b= 1.40 * sigz/2;
+long_a = 0.53 * sigz/2;
+long_b = 1.40 * sigz/2;
 value,long_a,long_b;
 
 ho_charge = 0.2;
@@ -66,20 +55,21 @@ ho_charge = 0.2;
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 use,sequence=lhcb1;
+makethin,sequence=lhcb1;
+use,sequence=lhcb2;
+makethin,sequence=lhcb2;
 
 option,-warn,-echo,-info;
-
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";
-
 option,warn;
 
-abas :=  2.0*clight/(7e12)*on_atlas ;
-abcs :=  4.0*clight/(7e12)*on_cms ;
+abas := 2.0*clight/(7e12)*on_atlas ;
+abcs := 4.0*clight/(7e12)*on_cms ;
 
-on_x1:=1; on_sep1:=0; on_atlas  :=  1 ;
-on_x2:=1; on_sep2:=0; on_alice  :=  1 ;
-on_x5:=1; on_sep5:=0; on_cms    :=  1 ;
-on_x8:=1; on_sep8:=0; on_lhcb   :=  1 ;
+!on_x1:=1; on_sep1:=0; on_atlas  :=  1 ;
+!on_x2:=1; on_sep2:=0; on_alice  :=  1 ;
+!on_x5:=1; on_sep5:=0; on_cms    :=  1 ;
+!on_x8:=1; on_sep8:=0; on_lhcb   :=  1 ;
 
 ! keep sextupoles
 ksf0=ksf; ksd0=ksd;
@@ -134,6 +124,7 @@ call,file="bb.macros";
 !===========================================================
 !   set CHARGE in the parasitic beam-beam elements. 
 !   set +1 for parasitic on, 0 for off
+
  on_lr1l = +1;
  on_lr1r = +1;
  on_lr2l = +0;
@@ -146,8 +137,10 @@ call,file="bb.macros";
 !
 !===========================================================
 !   define markers and savebetas
-option, echo;
-assign,echo=temp.bb.install;
+
+option,echo;
+assign,echo="temp.bb.install",truncate;
+
 !--- ip1
 if (on_ho1 <> 0)
 {
@@ -252,13 +245,16 @@ if (on_lr8r <> 0 || on_lr8l <> 0)
    n=n+1;
   };
 }
+
 assign,echo=terminal;
-call,file=temp.bb.install;
-!system, "rm temp.bb.install";
+call,file="temp.bb.install";
+
 !
 !===========================================================
 !   install bb markers
-assign,echo=temp.bb.install;
+
+assign,echo="temp.bb.install",truncate;
+
 !--- ip1
 if (on_ho1 <> 0)
 {
@@ -351,11 +347,11 @@ if (on_lr8r <> 0 || on_lr8l <> 0)
    n=n+1;
   };
 }
+
 assign,echo=terminal;
 seqedit,sequence=lhcb2;
-call,file=temp.bb.install;
+call,file="temp.bb.install";
 endedit;
-!system, "rm temp.bb.install";
 
 !
 !===========================================================
@@ -368,7 +364,9 @@ on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;
 value,on_sep2;
 !===========================================================
 !   define bb elements
-assign,echo=temp.bb.install;
+
+assign,echo="temp.bb.install",truncate;
+
 !--- ip1
 if (on_ho1 <> 0)
 {
@@ -461,13 +459,16 @@ if (on_lr8r <> 0)
    n=n+1;
   };
 }
+
 assign,echo=terminal;
-call,file=temp.bb.install;
-!system, "rm temp.bb.install";
+call,file="temp.bb.install";
+
 !
 !===========================================================
 !   install bb elements
-assign,echo=temp.bb.install;
+
+assign,echo="temp.bb.install",truncate;
+
 !--- ip1
 if (on_ho1 <> 0)
 {
@@ -560,6 +561,7 @@ if (on_lr8r <> 0)
    n=n+1;
   };
 }
+
 assign,echo=terminal;
 select,flag=seqedit,class=bbmarker;
 seqedit,sequence=lhcb2;
@@ -568,19 +570,18 @@ endedit;
 select,flag=seqedit,clear;
 
 seqedit,sequence=lhcb1;
-call,file=temp.bb.install;
+call,file="temp.bb.install";
 endedit;
+removefile, file="temp.bb.install";
 
 !--- Now the beam-beam element installation is complete
-
-!system, "rm temp.bb.install";
 
 seqedit,sequence=lhcb1;
 cycle,start=ip1;
 endedit;
 
 use,period=lhcb1;
-twiss, sequence=lhcb1;
+!twiss, sequence=lhcb1;
 
 !
 !  make footprint
