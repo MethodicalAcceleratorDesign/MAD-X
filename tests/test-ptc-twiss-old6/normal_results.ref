@@ -1,0 +1,10 @@
+@ NAME             %14s "NORMAL_RESULTS"
+@ TYPE             %10s "NORMAL_RES"
+@ TITLE            %24s " Chromaticity correction"
+@ ORIGIN           %19s "MAD-X 4.01.41 Linux"
+@ DATE             %08s "04/02/11"
+@ TIME             %08s "17.32.24"
+* NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
+$ %s                         %d         %d         %d         %d                %le 
+ "DQ1"                        1          0          0          0        2.000002171
+ "DQ2"                        1          0          0          0        1.999998517

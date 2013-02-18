@@ -1,0 +1,529 @@
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|----8
+!-------------------------------------------------------------------------------
+!
+!           Specifications of field imperfections for LHC v6.-2
+!                   -----------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------HISTORY-----------------------------------------
+! 06/03/96/afg-jpk 17:15 created following the strategy defined by AP/MA W.G.
+! 08/03/96/jpk     14:30 MQX(T) random distribution cut at 2 sigmas (3 before)
+!                        Uncertainties now added quadratically
+!                        ON_BDOT treated like a scaling factor
+!                        SET_ERR_MAX: set worst case for each multipole
+! 11/03/96/jpk     12:10 Fix a bug with drawing the systematic per arc:
+!                        No statist. consequence but the random gen. slips
+!                        Improve clarity (selection ranges, names of subroutines)
+!                        Suppress redundancies in the calculation of the sigmas
+!                        of the random components.
+! 14/04/96/jpk     13:45 Bug corrected in setting the seed for randoms; before that
+!                        time, all octants had the same suite of randoms.
+! 13/08/96/jpk     09:40 Improve the control output of set_err_max
+! 06/06/96/jm            Converted from v4.3 to v5.0 (THIN Lens)
+! 06/06/97/jm            Updated to v5.0 (THIN Lens)
+! 16/10/98/jm            Updated to V6.-2 (THIN Lens)
+! 23/02/99/ew,jpk  11;30 Change to "radius=Rr" in SetEfcomp_B & SetEfcomp_Q
+! 28/08/01/ew            Addition of routine for inverted MQXA and MQXB
+!                        Single_MQXA_inv and Single_MQXB_inv.
+! 18/07/02/tr            Split MQW into 4 groups: MQWA_l, MQWA_r, MQWB_l, MQWB_r
+! 21/10/02/ob            Define SetEfcomp_ABS for absolute error definitions
+! 06/11/02/tr            introduced ON_PERS switch for persistent current errors
+! 20/12/02/tr            introduced ON_DEC  switch for decay of the MBs
+! 21.10.04/al            mail by Alessandra Lombardi (reference system correction) :
+!                        new SetEfcomp_B, SetEfcomp_Q, SetEfcomp_ABS, SetEfcomp_Qinv
+!
+!------------------------------ENDHISTORY---------------------------------------
+!
+!
+!
+!1/ SET ALL IMPERFECTIONS FOR ALL MAGNETS:
+!---------------
+! ON_ALL                     ! select all magnets and all multipolar orders
+!
+!2/ SET A SELECTION OF IMPERF. FOR A SELECTION OF MAGNETS:
+!---------------
+!   The selection is carried out thru switches described later.
+! <select a class of magnets, e.g. MB's>
+!    Set, ON_MB, 1;
+! <select the imperfections: normal, skew, order for this class>
+!    Set, ON_B1s, 1;         ! normal (B) systematic (s) order 1
+!       etc....
+!
+! <select another class of magnets, e.g. MQ's>
+! Set, ON_MQ, 1;
+! <select the imperfections for the MQ's>
+!    Set, ON_B1s, 0;
+!       etc....
+!
+!3/ SET ALL IMPERFECTIONS FOR A SELECTION OF MAGNETS
+!---------------------------------------------------
+! <select a class of magnets, e.g. MB's>
+!    Set, ON_MB, 1;
+! ON_MULT                    ! select all imperfection orders
+!
+!--------------------------------SWITCHES----------------------------------------
+!SELECTION OF A CLASS OF ELEMENTS (on=1/off=0, default value)
+! *Main and Disp. Suppr. Dipoles (MB)                                   : ON_MB
+! *Separator: single channel RHIC dipoles (MBX)                         : ON_MBX
+! *Separator: single channel RHIC dipoles lead end (MBX)                : ON_MBXLEND
+! *Separator: single channel RHIC dipoles return end (MBX)              : ON_MBXREND
+! *Separator: 2-1 RHIC dipoles (MBRS: D3)                               : ON_MBRS
+! *Separator: 2-1 RHIC dipoles lead end (MBRS: D3)                      : ON_MBRSLEND
+! *Separator: 2-1 RHIC dipoles return end (MBRS: D3)                    : ON_MBRSREND
+! *Separator: 2-1 RHIC dipoles (MBRB: D4)                               : ON_MBRB
+! *Separator: 2-1 RHIC dipoles lead end (MBRB: D4)                      : ON_MBRBLEND
+! *Separator: 2-1 RHIC dipoles return end (MBRB: D4)                    : ON_MBRBREND
+! *Separator: 2-1 RHIC dipoles (MBRC: D2)                               : ON_MBRC
+! *Separator: 2-1 RHIC dipoles lead end (MBRC: D2)                      : ON_MBRCLEND
+! *Separator: 2-1 RHIC dipoles return end (MBRC: D2)                    : ON_MBRCREND
+! *Separator: single channel (MBXW) and 2-1  warm Dipoles (MBW)         : ON_MBW
+!
+! *Arc (MQ) and DS Quadrupoles (MQML, MQM, MQMC)                        : ON_MQ
+! *Insertion 2-1 Quadrupoles (MQ, MQML, MQM, MQMC)                      : ON_MQIP
+! *Arc Tune shift (MQT), DS (MQT) and DS trim Quads(MQTL)               : ON_MQTL
+! *Single apertureRF/Quadrupoles(MQR, MQRL)                             : ON_MQR
+! *Low-Beta Quadupoles (MQX, MQXL)                                      : ON_MQX
+! *Wide Aperture Quadrupoles (MQY)                                      : ON_MQY
+! *Warm Quadrupoles (MQW)                                               : ON_MQW
+!
+!SELECTION OF IMPERFECTION ORDERS (i=1..11)
+! *normal systematic                                                    : ON_BiS
+! *normal random                                                        : ON_BiR
+! *skew systematic                                                      : ON_AiS
+! *skew random                                                          : ON_AiR
+!
+!SELECTION OF RAMP INDUCED IMPERFECTIONS                                : ON_BDOT
+!
+!SELECTION OF PERSISTENT CURRENT IMPERFECTIONS                          : ON_PERS
+!
+!SUBROUTINES FOR FAST SELECTIONS
+! *ALL multipole orders  set to 1                                       : ON_MULT
+! *ALL multipole orders for ALL elements  set to 1                      : ON_ALL
+!
+!---------------------STRATEGY FOR SETTING ERRORS A LA V4.2----------------------
+!
+! Random and systematic imperfections are defined for each production line
+! of magnets.
+! Production lines defined:
+!  - MB's  : 8 lines, one per arc
+!  - MQ's  : 8 lines, one per arc
+!  - all others: 1 line per kind of magnet
+!
+! Each line is defined by systematic (mean) and random (spread) imperfections:
+! - RANDOM imperfections: The spread  is assumed the same for all production
+!   lines of a given kind of magnets. For each magnet, an imperfection is
+!   drawn from a gaussian distribution with sigma= Bir(Air),
+!   cut a GCUTR sigma (3 by default). Bir(Air) is formed by quadratic addition of
+!   persistent current (pc), geometric (g) and ramp induced (t) contributions
+!   the latter depending on the switch ON_BDOT.
+! - SYSTEMATIC imperfections: they are computed for each production line from
+!   the MEAN value for the OUTER channel and the UNCERTAINTY found in the table.
+!   The UNCERTAIN part is computed by adding quadratically the uncertainties for
+!   pc, g, t; the value obtained is considered to be 1.5 sigmas of a gaussian
+!   distribution cut at 1.5 sigmas; the uncertainty is drawn from this
+!   distribution for each line.
+!   The MEAN part is computed by adding linearly the pc, g, t components for
+!   the OUTER channel. For the INNER channel the GEOMETRIC MEAN component is
+!   deduced from that of the outer channel; it follows the following sign rules:
+!      * dipoles:  -  b2, b4        (2-1 design)
+!                  -  other b(2n)   (assumption; no consequence)
+!                  +  b(2n+1)       (design)
+!                  +  a(2n)         (wild assumption; no consequence)
+!                  -  a(2n+1)       (wild assumption; no consequence)
+!      * quads     +  b(2[2n+1])    (design)
+!                  +  b(4n), a(2n+1)(wild assumption; no consequence)
+!                  -  b(2n+1), a(2n)(wild assumption; no consequence)
+!   The other MEAN components (PERSISTENT CURRENT, RAMP) keep the sign of the
+!   tables for both channels.
+!---------------------STRATEGY FOR THE WORST CASE------------------------------
+! For each component (pc, g, t), the uncertainty and 3 rms (2 for MQX) of the
+! bias due to randoms are
+! added to the mean in such  a way as to produce the largest number in
+! absolute value with the sign of the dominant component.
+! The contributions of the three components are then added linearly
+! THE SIGN RULE IS APPLIED to the mean b2 in the dipoles which is the only one
+! to change sign for sure.
+!------------------------------------------------------------------------------
+ON_MULT: macro = {
+ ON_A1s  = 1 ; ON_A1r  = 1 ; ON_B1s  = 1 ; ON_B1r  = 1 ;
+ ON_A2s  = 1 ; ON_A2r  = 1 ; ON_B2s  = 1 ; ON_B2r  = 1 ;
+ ON_A3s  = 1 ; ON_A3r  = 1 ; ON_B3s  = 1 ; ON_B3r  = 1 ;
+ ON_A4s  = 1 ; ON_A4r  = 1 ; ON_B4s  = 1 ; ON_B4r  = 1 ;
+ ON_A5s  = 1 ; ON_A5r  = 1 ; ON_B5s  = 1 ; ON_B5r  = 1 ;
+ ON_A6s  = 1 ; ON_A6r  = 1 ; ON_B6s  = 1 ; ON_B6r  = 1 ;
+ ON_A7s  = 1 ; ON_A7r  = 1 ; ON_B7s  = 1 ; ON_B7r  = 1 ;
+ ON_A8s  = 1 ; ON_A8r  = 1 ; ON_B8s  = 1 ; ON_B8r  = 1 ;
+ ON_A9s  = 1 ; ON_A9r  = 1 ; ON_B9s  = 1 ; ON_B9r  = 1 ;
+ ON_A10s = 1 ; ON_A10r = 1 ; ON_B10s = 1 ; ON_B10r = 1 ;
+ ON_A11s = 1 ; ON_A11r = 1 ; ON_B11s = 1 ; ON_B11r = 1 ;
+}
+
+ON_SYST: macro = {
+ ON_A1s  = 1 ; ON_A1r  = 0 ; ON_B1s  = 1 ; ON_B1r  = 0 ;
+ ON_A2s  = 1 ; ON_A2r  = 0 ; ON_B2s  = 1 ; ON_B2r  = 0 ;
+ ON_A3s  = 1 ; ON_A3r  = 0 ; ON_B3s  = 1 ; ON_B3r  = 0 ;
+ ON_A4s  = 1 ; ON_A4r  = 0 ; ON_B4s  = 1 ; ON_B4r  = 0 ;
+ ON_A5s  = 1 ; ON_A5r  = 0 ; ON_B5s  = 1 ; ON_B5r  = 0 ;
+ ON_A6s  = 1 ; ON_A6r  = 0 ; ON_B6s  = 1 ; ON_B6r  = 0 ;
+ ON_A7s  = 1 ; ON_A7r  = 0 ; ON_B7s  = 1 ; ON_B7r  = 0 ;
+ ON_A8s  = 1 ; ON_A8r  = 0 ; ON_B8s  = 1 ; ON_B8r  = 0 ;
+ ON_A9s  = 1 ; ON_A9r  = 0 ; ON_B9s  = 1 ; ON_B9r  = 0 ;
+ ON_A10s = 1 ; ON_A10r = 0 ; ON_B10s = 1 ; ON_B10r = 0 ;
+ ON_A11s = 1 ; ON_A11r = 0 ; ON_B11s = 1 ; ON_B11r = 0 ;
+}
+
+ON_ALL : macro = {
+ exec ON_MULT;
+ ON_MB      = 1 ; ON_MBW      = 1 ;
+ ON_MBX     = 1 ; ON_MBRS     = 1 ; ON_MBRB     = 1 ; ON_MBRC     = 1 ;
+ ON_MBXLEND = 1 ; ON_MBRSLEND = 1 ; ON_MBRBLEND = 1 ; ON_MBRCLEND = 1 ;
+ ON_MBXREND = 1 ; ON_MBRSREND = 1 ; ON_MBRBREND = 1 ; ON_MBRCREND = 1 ;
+
+ ON_MQ      = 1 ; ON_MQIP     = 1 ; ON_MQTL     = 1 ; ON_MQR      = 1 ;
+ ON_MQX     = 1 ; ON_MQY      = 1 ; ON_MQW      = 1 ;
+}
+
+
+SetEfcomp_B: macro = {
+   Efcomp,  radius = Rr, order= 0,
+        dknr:={1E-4*( B1s  *ON_B1S  + B1r  *ON_B1R  * TGAUSS(GCUTR)),
+               1E-4*(-B2s  *ON_B2S  + B2r  *ON_B2R  * TGAUSS(GCUTR)),
+               1E-4*( B3s  *ON_B3S  + B3r  *ON_B3R  * TGAUSS(GCUTR)),
+               1E-4*(-B4s  *ON_B4S  + B4r  *ON_B4R  * TGAUSS(GCUTR)),
+               1E-4*( B5s  *ON_B5S  + B5r  *ON_B5R  * TGAUSS(GCUTR)),
+               1E-4*(-B6s  *ON_B6S  + B6r  *ON_B6R  * TGAUSS(GCUTR)),
+               1E-4*( B7s  *ON_B7S  + B7r  *ON_B7R  * TGAUSS(GCUTR)),
+               1E-4*(-B8s  *ON_B8S  + B8r  *ON_B8R  * TGAUSS(GCUTR)),
+               1E-4*( B9s  *ON_B9S  + B9r  *ON_B9R  * TGAUSS(GCUTR)),
+               1E-4*(-B10s *ON_B10S + B10r *ON_B10R * TGAUSS(GCUTR)),
+               1E-4*( B11s *ON_B11S + B11r *ON_B11R * TGAUSS(GCUTR))},
+        dksr:={1E-4*(-A1s  *ON_A1S  + A1r  *ON_A1R  * TGAUSS(GCUTR)),
+               1E-4*( A2s  *ON_A2S  + A2r  *ON_A2R  * TGAUSS(GCUTR)),
+               1E-4*(-A3s  *ON_A3S  + A3r  *ON_A3R  * TGAUSS(GCUTR)),
+               1E-4*( A4s  *ON_A4S  + A4r  *ON_A4R  * TGAUSS(GCUTR)),
+               1E-4*(-A5s  *ON_A5S  + A5r  *ON_A5R  * TGAUSS(GCUTR)),
+               1E-4*( A6s  *ON_A6S  + A6r  *ON_A6R  * TGAUSS(GCUTR)),
+               1E-4*(-A7s  *ON_A7S  + A7r  *ON_A7R  * TGAUSS(GCUTR)),
+               1E-4*( A8s  *ON_A8S  + A8r  *ON_A8R  * TGAUSS(GCUTR)),
+               1E-4*(-A9s  *ON_A9S  + A9r  *ON_A9R  * TGAUSS(GCUTR)),
+               1E-4*( A10s *ON_A10S + A10r *ON_A10R * TGAUSS(GCUTR)),
+               1E-4*(-A11s *ON_A11S + A11r *ON_A11R * TGAUSS(GCUTR))};
+        }
+
+SetEfcomp_Binv: macro = {
+   Efcomp,  radius = Rr, order= 0,
+        dknr:= {1E-4*( B1s  *ON_B1S  + B1r  *ON_B1R  * TGAUSS(GCUTR)),
+               -1E-4*(-B2s  *ON_B2S  + B2r  *ON_B2R  * TGAUSS(GCUTR)),
+                1E-4*( B3s  *ON_B3S  + B3r  *ON_B3R  * TGAUSS(GCUTR)),
+               -1E-4*(-B4s  *ON_B4S  + B4r  *ON_B4R  * TGAUSS(GCUTR)),
+                1E-4*( B5s  *ON_B5S  + B5r  *ON_B5R  * TGAUSS(GCUTR)),
+               -1E-4*(-B6s  *ON_B6S  + B6r  *ON_B6R  * TGAUSS(GCUTR)),
+                1E-4*( B7s  *ON_B7S  + B7r  *ON_B7R  * TGAUSS(GCUTR)),
+               -1E-4*(-B8s  *ON_B8S  + B8r  *ON_B8R  * TGAUSS(GCUTR)),
+                1E-4*( B9s  *ON_B9S  + B9r  *ON_B9R  * TGAUSS(GCUTR)),
+               -1E-4*(-B10s *ON_B10S + B10r *ON_B10R * TGAUSS(GCUTR)),
+                1E-4*( B11s *ON_B11S + B11r *ON_B11R * TGAUSS(GCUTR))},
+        dksr:={-1E-4*(-A1s  *ON_A1S  + A1r  *ON_A1R  * TGAUSS(GCUTR)),
+                1E-4*( A2s  *ON_A2S  + A2r  *ON_A2R  * TGAUSS(GCUTR)),
+               -1E-4*(-A3s  *ON_A3S  + A3r  *ON_A3R  * TGAUSS(GCUTR)),
+                1E-4*( A4s  *ON_A4S  + A4r  *ON_A4R  * TGAUSS(GCUTR)),
+               -1E-4*(-A5s  *ON_A5S  + A5r  *ON_A5R  * TGAUSS(GCUTR)),
+                1E-4*( A6s  *ON_A6S  + A6r  *ON_A6R  * TGAUSS(GCUTR)),
+               -1E-4*(-A7s  *ON_A7S  + A7r  *ON_A7R  * TGAUSS(GCUTR)),
+                1E-4*( A8s  *ON_A8S  + A8r  *ON_A8R  * TGAUSS(GCUTR)),
+               -1E-4*(-A9s  *ON_A9S  + A9r  *ON_A9R  * TGAUSS(GCUTR)),
+                1E-4*( A10s *ON_A10S + A10r *ON_A10R * TGAUSS(GCUTR)),
+               -1E-4*(-A11s *ON_A11S + A11r *ON_A11R * TGAUSS(GCUTR))};
+        }
+
+SetEfcomp_ABS: macro = {
+   Efcomp,  radius = Rr, order= 0,
+        dkn:={1E-4*alpha*      1/Rr^0/ml *( B1s  * ON_B1S + B1r  * ON_B1R * TGAUSS(GCUTR)),
+              1E-4*alpha*      1/Rr^1/ml *(-B2s  * ON_B2S + B2r  * ON_B2R * TGAUSS(GCUTR)),
+              1E-4*alpha*      2/Rr^2/ml *( B3s  * ON_B3S + B3r  * ON_B3R * TGAUSS(GCUTR)),
+              1E-4*alpha*      6/Rr^3/ml *(-B4s  * ON_B4S + B4r  * ON_B4R * TGAUSS(GCUTR)),
+              1E-4*alpha*     24/Rr^4/ml *( B5s  * ON_B5S + B5r  * ON_B5R * TGAUSS(GCUTR)),
+              1E-4*alpha*    120/Rr^5/ml *(-B6s  * ON_B6S + B6r  * ON_B6R * TGAUSS(GCUTR)),
+              1E-4*alpha*    720/Rr^6/ml *( B7s  * ON_B7S + B7r  * ON_B7R * TGAUSS(GCUTR)),
+              1E-4*alpha*   5040/Rr^7/ml *(-B8s  * ON_B8S + B8r  * ON_B8R * TGAUSS(GCUTR)),
+              1E-4*alpha*  40320/Rr^8/ml *( B9s  * ON_B9S + B9r  * ON_B9R * TGAUSS(GCUTR)),
+              1E-4*alpha* 362880/Rr^9/ml *(-B10s *ON_B10S + B10r *ON_B10R * TGAUSS(GCUTR)),
+              1E-4*alpha*3628800/Rr^10/ml*( B11s *ON_B11S + B11r *ON_B11R * TGAUSS(GCUTR))},
+        dks:={1E-4*alpha*      1/Rr^0/ml *(-A1s  * ON_A1S + A1r  * ON_A1R * TGAUSS(GCUTR)),
+              1E-4*alpha*      1/Rr^1/ml *( A2s  * ON_A2S + A2r  * ON_A2R * TGAUSS(GCUTR)),
+              1E-4*alpha*      2/Rr^2/ml *(-A3s  * ON_A3S + A3r  * ON_A3R * TGAUSS(GCUTR)),
+              1E-4*alpha*      6/Rr^3/ml *( A4s  * ON_A4S + A4r  * ON_A4R * TGAUSS(GCUTR)),
+              1E-4*alpha*     24/Rr^4/ml *(-A5s  * ON_A5S + A5r  * ON_A5R * TGAUSS(GCUTR)),
+              1E-4*alpha*    120/Rr^5/ml *( A6s  * ON_A6S + A6r  * ON_A6R * TGAUSS(GCUTR)),
+              1E-4*alpha*    720/Rr^6/ml *(-A7s  * ON_A7S + A7r  * ON_A7R * TGAUSS(GCUTR)),
+              1E-4*alpha*   5040/Rr^7/ml *( A8s  * ON_A8S + A8r  * ON_A8R * TGAUSS(GCUTR)),
+              1E-4*alpha*  40320/Rr^8/ml *(-A9s  * ON_A9S + A9r  * ON_A9R * TGAUSS(GCUTR)),
+              1E-4*alpha* 362880/Rr^9/ml *( A10s *ON_A10S + A10r *ON_A10R * TGAUSS(GCUTR)),
+              1E-4*alpha*3628800/Rr^10/ml*(-A11s *ON_A11S + A11r *ON_A11R * TGAUSS(GCUTR))};
+}
+
+
+SetEfcomp_Qinv: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+         1E-4*( B2s  *ON_B2S  + B2r  *ON_B2R  * TGAUSS(GCUTR)),
+        -1E-4*(-B3s  *ON_B3S  + B3r  *ON_B3R  * TGAUSS(GCUTR)),
+         1E-4*( B4s  *ON_B4S  + B4r  *ON_B4R  * TGAUSS(GCUTR)),
+        -1E-4*(-B5s  *ON_B5S  + B5r  *ON_B5R  * TGAUSS(GCUTR)),
+         1E-4*( B6s  *ON_B6S  + B6r  *ON_B6R  * TGAUSS(GCUTR)),
+        -1E-4*(-B7s  *ON_B7S  + B7r  *ON_B7R  * TGAUSS(GCUTR)),
+         1E-4*( B8s  *ON_B8S  + B8r  *ON_B8R  * TGAUSS(GCUTR)),
+        -1E-4*(-B9s  *ON_B9S  + B9r  *ON_B9R  * TGAUSS(GCUTR)),
+         1E-4*( B10s *ON_B10S + B10r *ON_B10R * TGAUSS(GCUTR)),
+        -1E-4*(-B11s *ON_B11S + B11r *ON_B11R * TGAUSS(GCUTR))},
+        dksr:={0,
+        -1E-4*(-A2s  *ON_A2S  + A2r  *ON_A2R  * TGAUSS(GCUTR)),
+         1E-4*( A3s  *ON_A3S  + A3r  *ON_A3R  * TGAUSS(GCUTR)),
+        -1E-4*(-A4s  *ON_A4S  + A4r  *ON_A4R  * TGAUSS(GCUTR)),
+         1E-4*( A5s  *ON_A5S  + A5r  *ON_A5R  * TGAUSS(GCUTR)),
+        -1E-4*(-A6s  *ON_A6S  + A6r  *ON_A6R  * TGAUSS(GCUTR)),
+         1E-4*( A7s  *ON_A7S  + A7r  *ON_A7R  * TGAUSS(GCUTR)),
+        -1E-4*(-A8s  *ON_A8S  + A8r  *ON_A8R  * TGAUSS(GCUTR)),
+         1E-4*( A9s  *ON_A9S  + A9r  *ON_A9R  * TGAUSS(GCUTR)),
+        -1E-4*(-A10s *ON_A10S + A10r *ON_A10R * TGAUSS(GCUTR)),
+         1E-4*( A11s *ON_A11S + A11r *ON_A11R * TGAUSS(GCUTR))};
+}
+
+SetEfcomp_Q: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+        1E-4*( B2s  *ON_B2S  + B2r  *ON_B2R  * TGAUSS(GCUTR)),
+        1E-4*(-B3s  *ON_B3S  + B3r  *ON_B3R  * TGAUSS(GCUTR)),
+        1E-4*( B4s  *ON_B4S  + B4r  *ON_B4R  * TGAUSS(GCUTR)),
+        1E-4*(-B5s  *ON_B5S  + B5r  *ON_B5R  * TGAUSS(GCUTR)),
+        1E-4*( B6s  *ON_B6S  + B6r  *ON_B6R  * TGAUSS(GCUTR)),
+        1E-4*(-B7s  *ON_B7S  + B7r  *ON_B7R  * TGAUSS(GCUTR)),
+        1E-4*( B8s  *ON_B8S  + B8r  *ON_B8R  * TGAUSS(GCUTR)),
+        1E-4*(-B9s  *ON_B9S  + B9r  *ON_B9R  * TGAUSS(GCUTR)),
+        1E-4*( B10s *ON_B10S + B10r *ON_B10R * TGAUSS(GCUTR)),
+        1E-4*(-B11s *ON_B11S + B11r *ON_B11R * TGAUSS(GCUTR))},
+        dksr:={0,
+        1E-4*(-A2s  *ON_A2S  + A2r  *ON_A2R  * TGAUSS(GCUTR)),
+        1E-4*( A3s  *ON_A3S  + A3r  *ON_A3R  * TGAUSS(GCUTR)),
+        1E-4*(-A4s  *ON_A4S  + A4r  *ON_A4R  * TGAUSS(GCUTR)),
+        1E-4*( A5s  *ON_A5S  + A5r  *ON_A5R  * TGAUSS(GCUTR)),
+        1E-4*(-A6s  *ON_A6S  + A6r  *ON_A6R  * TGAUSS(GCUTR)),
+        1E-4*( A7s  *ON_A7S  + A7r  *ON_A7R  * TGAUSS(GCUTR)),
+        1E-4*(-A8s  *ON_A8S  + A8r  *ON_A8R  * TGAUSS(GCUTR)),
+        1E-4*( A9s  *ON_A9S  + A9r  *ON_A9R  * TGAUSS(GCUTR)),
+        1E-4*(-A10s *ON_A10S + A10r *ON_A10R * TGAUSS(GCUTR)),
+        1E-4*( A11s *ON_A11S + A11r *ON_A11R * TGAUSS(GCUTR))};
+        }
+
+
+New_Magnet: macro = {
+   B1rr    =   B1r *TGAUSS(GCUTR);
+   B2rr    =   B2r *TGAUSS(GCUTR);
+   B3rr    =   B3r *TGAUSS(GCUTR);
+   B4rr    =   B4r *TGAUSS(GCUTR);
+   B5rr    =   B5r *TGAUSS(GCUTR);
+   B6rr    =   B6r *TGAUSS(GCUTR);
+   B7rr    =   B7r *TGAUSS(GCUTR);
+   B8rr    =   B8r *TGAUSS(GCUTR);
+   B9rr    =   B9r *TGAUSS(GCUTR);
+   B10rr   =   B10r*TGAUSS(GCUTR);
+   B11rr   =   B11r*TGAUSS(GCUTR);
+
+   A1rr    =   A1r *TGAUSS(GCUTR);
+   A2rr    =   A2r *TGAUSS(GCUTR);
+   A3rr    =   A3r *TGAUSS(GCUTR);
+   A4rr    =   A4r *TGAUSS(GCUTR);
+   A5rr    =   A5r *TGAUSS(GCUTR);
+   A6rr    =   A6r *TGAUSS(GCUTR);
+   A7rr    =   A7r *TGAUSS(GCUTR);
+   A8rr    =   A8r *TGAUSS(GCUTR);
+   A9rr    =   A9r *TGAUSS(GCUTR);
+   A10rr   =   A10r*TGAUSS(GCUTR);
+   A11rr   =   A11r*TGAUSS(GCUTR);
+        }
+
+New_Quad: macro = {
+   B2rr    =   B2r *TGAUSS(GCUTR);
+   B3rr    =   B3r *TGAUSS(GCUTR);
+   B4rr    =   B4r *TGAUSS(GCUTR);
+   B5rr    =   B5r *TGAUSS(GCUTR);
+   B6rr    =   B6r *TGAUSS(GCUTR);
+   B7rr    =   B7r *TGAUSS(GCUTR);
+   B8rr    =   B8r *TGAUSS(GCUTR);
+   B9rr    =   B9r *TGAUSS(GCUTR);
+   B10rr   =   B10r*TGAUSS(GCUTR);
+   B11rr   =   B11r*TGAUSS(GCUTR);
+
+   A2rr    =   A2r *TGAUSS(GCUTR);
+   A3rr    =   A3r *TGAUSS(GCUTR);
+   A4rr    =   A4r *TGAUSS(GCUTR);
+   A5rr    =   A5r *TGAUSS(GCUTR);
+   A6rr    =   A6r *TGAUSS(GCUTR);
+   A7rr    =   A7r *TGAUSS(GCUTR);
+   A8rr    =   A8r *TGAUSS(GCUTR);
+   A9rr    =   A9r *TGAUSS(GCUTR);
+   A10rr   =   A10r*TGAUSS(GCUTR);
+   A11rr   =   A11r*TGAUSS(GCUTR);
+        }
+
+
+SetEfcomp_B_Slice: macro = {
+   Efcomp,  radius = Rr, order= 0,
+        dknr:={1E-4*( B1s  *ON_B1S  + B1rr  *ON_B1R  ),
+               1E-4*(-B2s  *ON_B2S  + B2rr  *ON_B2R  ),
+               1E-4*( B3s  *ON_B3S  + B3rr  *ON_B3R  ),
+               1E-4*(-B4s  *ON_B4S  + B4rr  *ON_B4R  ),
+               1E-4*( B5s  *ON_B5S  + B5rr  *ON_B5R  ),
+               1E-4*(-B6s  *ON_B6S  + B6rr  *ON_B6R  ),
+               1E-4*( B7s  *ON_B7S  + B7rr  *ON_B7R  ),
+               1E-4*(-B8s  *ON_B8S  + B8rr  *ON_B8R  ),
+               1E-4*( B9s  *ON_B9S  + B9rr  *ON_B9R  ),
+               1E-4*(-B10s *ON_B10S + B10rr *ON_B10R ),
+               1E-4*( B11s *ON_B11S + B11rr *ON_B11R )},
+        dksr:={1E-4*(-A1s  *ON_A1S  + A1rr  *ON_A1R  ),
+               1E-4*( A2s  *ON_A2S  + A2rr  *ON_A2R  ),
+               1E-4*(-A3s  *ON_A3S  + A3rr  *ON_A3R  ),
+               1E-4*( A4s  *ON_A4S  + A4rr  *ON_A4R  ),
+               1E-4*(-A5s  *ON_A5S  + A5rr  *ON_A5R  ),
+               1E-4*( A6s  *ON_A6S  + A6rr  *ON_A6R  ),
+               1E-4*(-A7s  *ON_A7S  + A7rr  *ON_A7R  ),
+               1E-4*( A8s  *ON_A8S  + A8rr  *ON_A8R  ),
+               1E-4*(-A9s  *ON_A9S  + A9rr  *ON_A9R  ),
+               1E-4*( A10s *ON_A10S + A10rr *ON_A10R ),
+               1E-4*(-A11s *ON_A11S + A11rr *ON_A11R )};
+        }
+
+
+
+SetEfcomp_Binv_Slice: macro = {
+   Efcomp,  radius = Rr, order= 0,
+        dknr:= {1E-4*( B1s  *ON_B1S  + B1rr  *ON_B1R  ),
+               -1E-4*(-B2s  *ON_B2S  + B2rr  *ON_B2R  ),
+                1E-4*( B3s  *ON_B3S  + B3rr  *ON_B3R  ),
+               -1E-4*(-B4s  *ON_B4S  + B4rr  *ON_B4R  ),
+                1E-4*( B5s  *ON_B5S  + B5rr  *ON_B5R  ),
+               -1E-4*(-B6s  *ON_B6S  + B6rr  *ON_B6R  ),
+                1E-4*( B7s  *ON_B7S  + B7rr  *ON_B7R  ),
+               -1E-4*(-B8s  *ON_B8S  + B8rr  *ON_B8R  ),
+                1E-4*( B9s  *ON_B9S  + B9rr  *ON_B9R  ),
+               -1E-4*(-B10s *ON_B10S + B10rr *ON_B10R ),
+                1E-4*( B11s *ON_B11S + B11rr *ON_B11R )},
+        dksr:={-1E-4*(-A1s  *ON_A1S  + A1rr  *ON_A1R  ),
+                1E-4*( A2s  *ON_A2S  + A2rr  *ON_A2R  ),
+               -1E-4*(-A3s  *ON_A3S  + A3rr  *ON_A3R  ),
+                1E-4*( A4s  *ON_A4S  + A4rr  *ON_A4R  ),
+               -1E-4*(-A5s  *ON_A5S  + A5rr  *ON_A5R  ),
+                1E-4*( A6s  *ON_A6S  + A6rr  *ON_A6R  ),
+               -1E-4*(-A7s  *ON_A7S  + A7rr  *ON_A7R  ),
+                1E-4*( A8s  *ON_A8S  + A8rr  *ON_A8R  ),
+               -1E-4*(-A9s  *ON_A9S  + A9rr  *ON_A9R  ),
+                1E-4*( A10s *ON_A10S + A10rr *ON_A10R ),
+               -1E-4*(-A11s *ON_A11S + A11rr *ON_A11R )};
+        }
+
+
+
+SetEfcomp_Q_Slice: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+        1E-4*( B2s *ON_B2S   +  B2rr *ON_B2R ),
+        1E-4*(-B3s *ON_B3S   +  B3rr *ON_B3R ),
+        1E-4*( B4s *ON_B4S   +  B4rr *ON_B4R ),
+        1E-4*(-B5s *ON_B5S   +  B5rr *ON_B5R ),
+        1E-4*( B6s *ON_B6S   +  B6rr *ON_B6R ),
+        1E-4*(-B7s *ON_B7S   +  B7rr *ON_B7R ),
+        1E-4*( B8s *ON_B8S   +  B8rr *ON_B8R ),
+        1E-4*(-B9s *ON_B9S   +  B9rr *ON_B9R ),
+        1E-4*( B10s*ON_B10S  +  B10rr*ON_B10R),
+        1E-4*(-B11s*ON_B11S  +  B11rr*ON_B11R)},
+        dksr:={0,
+        1E-4*(-A2s *ON_A2S   +  A2rr *ON_A2R ),
+        1E-4*( A3s *ON_A3S   +  A3rr *ON_A3R ),
+        1E-4*(-A4s *ON_A4S   +  A4rr *ON_A4R ),
+        1E-4*( A5s *ON_A5S   +  A5rr *ON_A5R ),
+        1E-4*(-A6s *ON_A6S   +  A6rr *ON_A6R ),
+        1E-4*( A7s *ON_A7S   +  A7rr *ON_A7R ),
+        1E-4*(-A8s *ON_A8S   +  A8rr *ON_A8R ),
+        1E-4*( A9s *ON_A9S   +  A9rr *ON_A9R ),
+        1E-4*(-A10s*ON_A10S  +  A10rr*ON_A10R),
+        1E-4*( A11s*ON_A11S  +  A11rr*ON_A11R)};
+        }
+
+SetEfcomp_Qinv_Slice: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+         1E-4*( B2s *ON_B2S   +  B2rr *ON_B2R ),
+        -1E-4*(-B3s *ON_B3S   +  B3rr *ON_B3R ),
+         1E-4*( B4s *ON_B4S   +  B4rr *ON_B4R ),
+        -1E-4*(-B5s *ON_B5S   +  B5rr *ON_B5R ),
+         1E-4*( B6s *ON_B6S   +  B6rr *ON_B6R ),
+        -1E-4*(-B7s *ON_B7S   +  B7rr *ON_B7R ),
+         1E-4*( B8s *ON_B8S   +  B8rr *ON_B8R ),
+        -1E-4*(-B9s *ON_B9S   +  B9rr *ON_B9R ),
+         1E-4*( B10s*ON_B10S  +  B10rr*ON_B10R),
+        -1E-4*(-B11s*ON_B11S  +  B11rr*ON_B11R)},
+        dksr:={0,
+        -1E-4*(-A2s *ON_A2S   +  A2rr *ON_A2R ),
+         1E-4*( A3s *ON_A3S   +  A3rr *ON_A3R ),
+        -1E-4*(-A4s *ON_A4S   +  A4rr *ON_A4R ),
+         1E-4*( A5s *ON_A5S   +  A5rr *ON_A5R ),
+        -1E-4*(-A6s *ON_A6S   +  A6rr *ON_A6R ),
+         1E-4*( A7s *ON_A7S   +  A7rr *ON_A7R ),
+        -1E-4*(-A8s *ON_A8S   +  A8rr *ON_A8R ),
+         1E-4*( A9s *ON_A9S   +  A9rr *ON_A9R ),
+        -1E-4*(-A10s*ON_A10S  +  A10rr*ON_A10R),
+         1E-4*( A11s*ON_A11S  +  A11rr*ON_A11R)};
+}
+
+SetEfcomp_Q_Slice_Srot: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+        1E-4*( B2s *ON_B2S   +  B2rr *ON_B2R ),
+       -1E-4*(-B3s *ON_B3S   +  B3rr *ON_B3R ),
+        1E-4*( B4s *ON_B4S   +  B4rr *ON_B4R ),
+       -1E-4*(-B5s *ON_B5S   +  B5rr *ON_B5R ),
+        1E-4*( B6s *ON_B6S   +  B6rr *ON_B6R ),
+       -1E-4*(-B7s *ON_B7S   +  B7rr *ON_B7R ),
+        1E-4*( B8s *ON_B8S   +  B8rr *ON_B8R ),
+       -1E-4*(-B9s *ON_B9S   +  B9rr *ON_B9R ),
+        1E-4*( B10s*ON_B10S  +  B10rr*ON_B10R),
+       -1E-4*(-B11s*ON_B11S  +  B11rr*ON_B11R)},
+        dksr:={0,
+        1E-4*(-A2s *ON_A2S   +  A2rr *ON_A2R ),
+       -1E-4*( A3s *ON_A3S   +  A3rr *ON_A3R ),
+        1E-4*(-A4s *ON_A4S   +  A4rr *ON_A4R ),
+       -1E-4*( A5s *ON_A5S   +  A5rr *ON_A5R ),
+        1E-4*(-A6s *ON_A6S   +  A6rr *ON_A6R ),
+       -1E-4*( A7s *ON_A7S   +  A7rr *ON_A7R ),
+        1E-4*(-A8s *ON_A8S   +  A8rr *ON_A8R ),
+       -1E-4*( A9s *ON_A9S   +  A9rr *ON_A9R ),
+        1E-4*(-A10s*ON_A10S  +  A10rr*ON_A10R),
+       -1E-4*( A11s*ON_A11S  +  A11rr*ON_A11R)};
+        }
+
+SetEfcomp_Qinv_Slice_Srot: macro = {
+   Efcomp,  radius = Rr, order= 1,
+        dknr:={0,
+         1E-4*( B2s *ON_B2S   +  B2rr *ON_B2R ),
+         1E-4*(-B3s *ON_B3S   +  B3rr *ON_B3R ),
+         1E-4*( B4s *ON_B4S   +  B4rr *ON_B4R ),
+         1E-4*(-B5s *ON_B5S   +  B5rr *ON_B5R ),
+         1E-4*( B6s *ON_B6S   +  B6rr *ON_B6R ),
+         1E-4*(-B7s *ON_B7S   +  B7rr *ON_B7R ),
+         1E-4*( B8s *ON_B8S   +  B8rr *ON_B8R ),
+         1E-4*(-B9s *ON_B9S   +  B9rr *ON_B9R ),
+         1E-4*( B10s*ON_B10S  +  B10rr*ON_B10R),
+         1E-4*(-B11s*ON_B11S  +  B11rr*ON_B11R)},
+        dksr:={0,
+        -1E-4*(-A2s *ON_A2S   +  A2rr *ON_A2R ),
+        -1E-4*( A3s *ON_A3S   +  A3rr *ON_A3R ),
+        -1E-4*(-A4s *ON_A4S   +  A4rr *ON_A4R ),
+        -1E-4*( A5s *ON_A5S   +  A5rr *ON_A5R ),
+        -1E-4*(-A6s *ON_A6S   +  A6rr *ON_A6R ),
+        -1E-4*( A7s *ON_A7S   +  A7rr *ON_A7R ),
+        -1E-4*(-A8s *ON_A8S   +  A8rr *ON_A8R ),
+        -1E-4*( A9s *ON_A9S   +  A9rr *ON_A9R ),
+        -1E-4*(-A10s*ON_A10S  +  A10rr*ON_A10R),
+        -1E-4*( A11s*ON_A11S  +  A11rr*ON_A11R)};
+}
+
+Return;

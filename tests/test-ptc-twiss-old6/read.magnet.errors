@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+open(INPUT,$ARGV[0]) or die "Cannot find $ARGV[0]\n";
+@b=@a=(0,0,0,0,0,0,0,0,0,0);
+while(<INPUT>) {
+    if (/^[^\@\%\$\*]/) {
+        @vals=(split); shift @vals; $count = $mult = 0;
+	foreach $num (@vals) {
+	    if ( $count ) {
+		$a[$mult]+=$num; $count=0; $mult++;
+	    } else {
+		$b[$mult]+=$num; $count=1;
+	    }
+	}
+	$line++;
+    }
+}
+open(OUTPUT,"> ".$ARGV[0].".mad");
+print OUTPUT "icount=$line;\n";
+($arc = $ARGV[0]) =~ s/.*MB\.//;
+for ($i=0; $i<@a; $i++) {
+    print OUTPUT "b".($i+1)."sum_mb.".$arc."=".$b[$i].";\n";
+    print OUTPUT "a".($i+1)."sum_mb.".$arc."=".$a[$i].";\n";
+}
+close(INPUT);
+close(OUTPUT);

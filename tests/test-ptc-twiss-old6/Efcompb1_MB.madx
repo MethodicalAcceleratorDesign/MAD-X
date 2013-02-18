@@ -1,0 +1,203 @@
+ 
+NewFamily_MB: macro = { 
+ b1ss  = 0;a1ss  = 0; 
+ b2ss  = 0;a2ss  = 0; 
+ b3ss  = 0;a3ss  = 0; 
+ b4ss  = 0;a4ss  = 0; 
+ b5ss  = 0;a5ss  = 0; 
+ b6ss  = 0;a6ss  = 0; 
+ b7ss  = 0;a7ss  = 0; 
+ b8ss  = 0;a8ss  = 0; 
+ b9ss  = 0;a9ss  = 0; 
+ b10ss = 0;a10ss = 0; 
+ b11ss = 0;a11ss = 0; 
+ } 
+ 
+Outer_MB: macro = { 
+ B1s   =  ON_MB*(ON_PERS*( b1M_inj_MB_V1 + ON_DEC * b1M_dec_MB)+ 
+             (1-ON_PERS)*( b1M_col_MB_V1 + ON_BDOT* b1M_ramp_MB)); 
+ B2s   =  ON_MB*(ON_PERS*( b2M_inj_MB_V1 + ON_DEC * b2M_dec_MB)+ 
+             (1-ON_PERS)*( b2M_col_MB_V1 + ON_BDOT* b2M_ramp_MB)); 
+ B3s   =  ON_MB*(ON_PERS*( b3M_inj_MB_V1 + ON_DEC * b3M_dec_MB)+ 
+             (1-ON_PERS)*( b3M_col_MB_V1 + ON_BDOT* b3M_ramp_MB)); 
+ B4s   =  ON_MB*(ON_PERS*( b4M_inj_MB_V1 + ON_DEC * b4M_dec_MB)+ 
+             (1-ON_PERS)*( b4M_col_MB_V1 + ON_BDOT* b4M_ramp_MB)); 
+ B5s   =  ON_MB*(ON_PERS*( b5M_inj_MB_V1 + ON_DEC * b5M_dec_MB)+ 
+             (1-ON_PERS)*( b5M_col_MB_V1 + ON_BDOT* b5M_ramp_MB)); 
+ B6s   =  ON_MB*(ON_PERS*( b6M_inj_MB_V1 + ON_DEC * b6M_dec_MB)+ 
+             (1-ON_PERS)*( b6M_col_MB_V1 + ON_BDOT* b6M_ramp_MB)); 
+ B7s   =  ON_MB*(ON_PERS*( b7M_inj_MB_V1 + ON_DEC * b7M_dec_MB)+ 
+             (1-ON_PERS)*( b7M_col_MB_V1 + ON_BDOT* b7M_ramp_MB)); 
+ B8s   =  ON_MB*(ON_PERS*( b8M_inj_MB_V1 + ON_DEC * b8M_dec_MB)+ 
+             (1-ON_PERS)*( b8M_col_MB_V1 + ON_BDOT* b8M_ramp_MB)); 
+ B9s   =  ON_MB*(ON_PERS*( b9M_inj_MB_V1 + ON_DEC * b9M_dec_MB)+ 
+             (1-ON_PERS)*( b9M_col_MB_V1 + ON_BDOT* b9M_ramp_MB)); 
+B10s   =  ON_MB*(ON_PERS*(b10M_inj_MB_V1 + ON_DEC *b10M_dec_MB)+ 
+             (1-ON_PERS)*(b10M_col_MB_V1 + ON_BDOT*b10M_ramp_MB)); 
+B11s   =  ON_MB*(ON_PERS*(b11M_inj_MB_V1 + ON_DEC *b11M_dec_MB)+ 
+             (1-ON_PERS)*(b11M_col_MB_V1 + ON_BDOT*b11M_ramp_MB)); 
+ 
+ A1s   =  ON_MB*(ON_PERS*( a1M_inj_MB_V1 + ON_DEC * a1M_dec_MB)+ 
+             (1-ON_PERS)*( a1M_col_MB_V1 + ON_BDOT* a1M_ramp_MB)); 
+ A2s   =  ON_MB*(ON_PERS*( a2M_inj_MB_V1 + ON_DEC * a2M_dec_MB)+ 
+             (1-ON_PERS)*( a2M_col_MB_V1 + ON_BDOT* a2M_ramp_MB)); 
+ A3s   =  ON_MB*(ON_PERS*( a3M_inj_MB_V1 + ON_DEC * a3M_dec_MB)+ 
+             (1-ON_PERS)*( a3M_col_MB_V1 + ON_BDOT* a3M_ramp_MB)); 
+ A4s   =  ON_MB*(ON_PERS*( a4M_inj_MB_V1 + ON_DEC * a4M_dec_MB)+ 
+             (1-ON_PERS)*( a4M_col_MB_V1 + ON_BDOT* a4M_ramp_MB)); 
+ A5s   =  ON_MB*(ON_PERS*( a5M_inj_MB_V1 + ON_DEC * a5M_dec_MB)+ 
+             (1-ON_PERS)*( a5M_col_MB_V1 + ON_BDOT* a5M_ramp_MB)); 
+ A6s   =  ON_MB*(ON_PERS*( a6M_inj_MB_V1 + ON_DEC * a6M_dec_MB)+ 
+             (1-ON_PERS)*( a6M_col_MB_V1 + ON_BDOT* a6M_ramp_MB)); 
+ A7s   =  ON_MB*(ON_PERS*( a7M_inj_MB_V1 + ON_DEC * a7M_dec_MB)+ 
+             (1-ON_PERS)*( a7M_col_MB_V1 + ON_BDOT* a7M_ramp_MB)); 
+ A8s   =  ON_MB*(ON_PERS*( a8M_inj_MB_V1 + ON_DEC * a8M_dec_MB)+ 
+             (1-ON_PERS)*( a8M_col_MB_V1 + ON_BDOT* a8M_ramp_MB)); 
+ A9s   =  ON_MB*(ON_PERS*( a9M_inj_MB_V1 + ON_DEC * a9M_dec_MB)+ 
+             (1-ON_PERS)*( a9M_col_MB_V1 + ON_BDOT* a9M_ramp_MB)); 
+A10s   =  ON_MB*(ON_PERS*(a10M_inj_MB_V1 + ON_DEC *a10M_dec_MB)+ 
+             (1-ON_PERS)*(a10M_col_MB_V1 + ON_BDOT*a10M_ramp_MB)); 
+A11s   =  ON_MB*(ON_PERS*(a11M_inj_MB_V1 + ON_DEC *a11M_dec_MB)+ 
+             (1-ON_PERS)*(a11M_col_MB_V1 + ON_BDOT*a11M_ramp_MB)); 
+} 
+ 
+Inner_MB: macro = { 
+ B1s   =  ON_MB*(ON_PERS*( b1M_inj_MB_V2 + ON_DEC * b1M_dec_MB)+ 
+             (1-ON_PERS)*( b1M_col_MB_V2 + ON_BDOT* b1M_ramp_MB)); 
+ B2s   =  ON_MB*(ON_PERS*( b2M_inj_MB_V2 + ON_DEC * b2M_dec_MB)+ 
+             (1-ON_PERS)*( b2M_col_MB_V2 + ON_BDOT* b2M_ramp_MB)); 
+ B3s   =  ON_MB*(ON_PERS*( b3M_inj_MB_V2 + ON_DEC * b3M_dec_MB)+ 
+             (1-ON_PERS)*( b3M_col_MB_V2 + ON_BDOT* b3M_ramp_MB)); 
+ B4s   =  ON_MB*(ON_PERS*( b4M_inj_MB_V2 + ON_DEC * b4M_dec_MB)+ 
+             (1-ON_PERS)*( b4M_col_MB_V2 + ON_BDOT* b4M_ramp_MB)); 
+ B5s   =  ON_MB*(ON_PERS*( b5M_inj_MB_V2 + ON_DEC * b5M_dec_MB)+ 
+             (1-ON_PERS)*( b5M_col_MB_V2 + ON_BDOT* b5M_ramp_MB)); 
+ B6s   =  ON_MB*(ON_PERS*( b6M_inj_MB_V2 + ON_DEC * b6M_dec_MB)+ 
+             (1-ON_PERS)*( b6M_col_MB_V2 + ON_BDOT* b6M_ramp_MB)); 
+ B7s   =  ON_MB*(ON_PERS*( b7M_inj_MB_V2 + ON_DEC * b7M_dec_MB)+ 
+             (1-ON_PERS)*( b7M_col_MB_V2 + ON_BDOT* b7M_ramp_MB)); 
+ B8s   =  ON_MB*(ON_PERS*( b8M_inj_MB_V2 + ON_DEC * b8M_dec_MB)+ 
+             (1-ON_PERS)*( b8M_col_MB_V2 + ON_BDOT* b8M_ramp_MB)); 
+ B9s   =  ON_MB*(ON_PERS*( b9M_inj_MB_V2 + ON_DEC * b9M_dec_MB)+ 
+             (1-ON_PERS)*( b9M_col_MB_V2 + ON_BDOT* b9M_ramp_MB)); 
+B10s   =  ON_MB*(ON_PERS*(b10M_inj_MB_V2 + ON_DEC *b10M_dec_MB)+ 
+             (1-ON_PERS)*(b10M_col_MB_V2 + ON_BDOT*b10M_ramp_MB)); 
+B11s   =  ON_MB*(ON_PERS*(b11M_inj_MB_V2 + ON_DEC *b11M_dec_MB)+ 
+             (1-ON_PERS)*(b11M_col_MB_V2 + ON_BDOT*b11M_ramp_MB)); 
+ 
+ A1s   =  ON_MB*(ON_PERS*( a1M_inj_MB_V2 + ON_DEC * a1M_dec_MB)+ 
+             (1-ON_PERS)*( a1M_col_MB_V2 + ON_BDOT* a1M_ramp_MB)); 
+ A2s   =  ON_MB*(ON_PERS*( a2M_inj_MB_V2 + ON_DEC * a2M_dec_MB)+ 
+             (1-ON_PERS)*( a2M_col_MB_V2 + ON_BDOT* a2M_ramp_MB)); 
+ A3s   =  ON_MB*(ON_PERS*( a3M_inj_MB_V2 + ON_DEC * a3M_dec_MB)+ 
+             (1-ON_PERS)*( a3M_col_MB_V2 + ON_BDOT* a3M_ramp_MB)); 
+ A4s   =  ON_MB*(ON_PERS*( a4M_inj_MB_V2 + ON_DEC * a4M_dec_MB)+ 
+             (1-ON_PERS)*( a4M_col_MB_V2 + ON_BDOT* a4M_ramp_MB)); 
+ A5s   =  ON_MB*(ON_PERS*( a5M_inj_MB_V2 + ON_DEC * a5M_dec_MB)+ 
+             (1-ON_PERS)*( a5M_col_MB_V2 + ON_BDOT* a5M_ramp_MB)); 
+ A6s   =  ON_MB*(ON_PERS*( a6M_inj_MB_V2 + ON_DEC * a6M_dec_MB)+ 
+             (1-ON_PERS)*( a6M_col_MB_V2 + ON_BDOT* a6M_ramp_MB)); 
+ A7s   =  ON_MB*(ON_PERS*( a7M_inj_MB_V2 + ON_DEC * a7M_dec_MB)+ 
+             (1-ON_PERS)*( a7M_col_MB_V2 + ON_BDOT* a7M_ramp_MB)); 
+ A8s   =  ON_MB*(ON_PERS*( a8M_inj_MB_V2 + ON_DEC * a8M_dec_MB)+ 
+             (1-ON_PERS)*( a8M_col_MB_V2 + ON_BDOT* a8M_ramp_MB)); 
+ A9s   =  ON_MB*(ON_PERS*( a9M_inj_MB_V2 + ON_DEC * a9M_dec_MB)+ 
+             (1-ON_PERS)*( a9M_col_MB_V2 + ON_BDOT* a9M_ramp_MB)); 
+A10s   =  ON_MB*(ON_PERS*(a10M_inj_MB_V2 + ON_DEC *a10M_dec_MB)+ 
+             (1-ON_PERS)*(a10M_col_MB_V2 + ON_BDOT*a10M_ramp_MB)); 
+A11s   =  ON_MB*(ON_PERS*(a11M_inj_MB_V2 + ON_DEC *a11M_dec_MB)+ 
+             (1-ON_PERS)*(a11M_col_MB_V2 + ON_BDOT*a11M_ramp_MB)); 
+} 
+ 
+ 
+ R_ALL =  3.0;    !default cut of the distribution (RANDOM); 
+ GCUTR =  R_ALL; 
+ GCUTS =  1.5;    !default cut of the distribution (SYSTEMATIC); 
+ Rr    =  0.017; 
+ 
+ ON_MB:=1; 
+ 
+!****************Main and Disp. Suppr. Dipoles (MB)******************* 
+!  System,"echo ' Efcomp : Main and Disp. Suppr. Dipoles (MB)'"; 
+! Define sigma for random componentSet, bscale, 10E-4; 
+ B1r  =  ON_MB*(ON_PERS*sqrt( b1R_inj_MB^2+ ON_DEC^2* b1R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b1R_col_MB^2+ON_BDOT^2* b1R_ramp_MB^2)); 
+ B2r  =  ON_MB*(ON_PERS*sqrt( b2R_inj_MB^2+ ON_DEC^2* b2R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b2R_col_MB^2+ON_BDOT^2* b2R_ramp_MB^2)); 
+ B3r  =  ON_MB*(ON_PERS*sqrt( b3R_inj_MB^2+ ON_DEC^2* b3R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b3R_col_MB^2+ON_BDOT^2* b3R_ramp_MB^2)); 
+ B4r  =  ON_MB*(ON_PERS*sqrt( b4R_inj_MB^2+ ON_DEC^2* b4R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b4R_col_MB^2+ON_BDOT^2* b4R_ramp_MB^2)); 
+ B5r  =  ON_MB*(ON_PERS*sqrt( b5R_inj_MB^2+ ON_DEC^2* b5R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b5R_col_MB^2+ON_BDOT^2* b5R_ramp_MB^2)); 
+ B6r  =  ON_MB*(ON_PERS*sqrt( b6R_inj_MB^2+ ON_DEC^2* b6R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b6R_col_MB^2+ON_BDOT^2* b6R_ramp_MB^2)); 
+ B7r  =  ON_MB*(ON_PERS*sqrt( b7R_inj_MB^2+ ON_DEC^2* b7R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b7R_col_MB^2+ON_BDOT^2* b7R_ramp_MB^2)); 
+ B8r  =  ON_MB*(ON_PERS*sqrt( b8R_inj_MB^2+ ON_DEC^2* b8R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b8R_col_MB^2+ON_BDOT^2* b8R_ramp_MB^2)); 
+ B9r  =  ON_MB*(ON_PERS*sqrt( b9R_inj_MB^2+ ON_DEC^2* b9R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( b9R_col_MB^2+ON_BDOT^2* b9R_ramp_MB^2)); 
+B10r  =  ON_MB*(ON_PERS*sqrt(b10R_inj_MB^2+ ON_DEC^2*b10R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt(b10R_col_MB^2+ON_BDOT^2*b10R_ramp_MB^2)); 
+B11r  =  ON_MB*(ON_PERS*sqrt(b11R_inj_MB^2+ ON_DEC^2*b11R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt(b11R_col_MB^2+ON_BDOT^2*b11R_ramp_MB^2)); 
+ 
+ A1r  =  ON_MB*(ON_PERS*sqrt( a1R_inj_MB^2+ ON_DEC^2* a1R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a1R_col_MB^2+ON_BDOT^2* a1R_ramp_MB^2)); 
+ A2r  =  ON_MB*(ON_PERS*sqrt( a2R_inj_MB^2+ ON_DEC^2* a2R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a2R_col_MB^2+ON_BDOT^2* a2R_ramp_MB^2)); 
+ A3r  =  ON_MB*(ON_PERS*sqrt( a3R_inj_MB^2+ ON_DEC^2* a3R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a3R_col_MB^2+ON_BDOT^2* a3R_ramp_MB^2)); 
+ A4r  =  ON_MB*(ON_PERS*sqrt( a4R_inj_MB^2+ ON_DEC^2* a4R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a4R_col_MB^2+ON_BDOT^2* a4R_ramp_MB^2)); 
+ A5r  =  ON_MB*(ON_PERS*sqrt( a5R_inj_MB^2+ ON_DEC^2* a5R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a5R_col_MB^2+ON_BDOT^2* a5R_ramp_MB^2)); 
+ A6r  =  ON_MB*(ON_PERS*sqrt( a6R_inj_MB^2+ ON_DEC^2* a6R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a6R_col_MB^2+ON_BDOT^2* a6R_ramp_MB^2)); 
+ A7r  =  ON_MB*(ON_PERS*sqrt( a7R_inj_MB^2+ ON_DEC^2* a7R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a7R_col_MB^2+ON_BDOT^2* a7R_ramp_MB^2)); 
+ A8r  =  ON_MB*(ON_PERS*sqrt( a8R_inj_MB^2+ ON_DEC^2* a8R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a8R_col_MB^2+ON_BDOT^2* a8R_ramp_MB^2)); 
+ A9r  =  ON_MB*(ON_PERS*sqrt( a9R_inj_MB^2+ ON_DEC^2* a9R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt( a9R_col_MB^2+ON_BDOT^2* a9R_ramp_MB^2)); 
+A10r  =  ON_MB*(ON_PERS*sqrt(a10R_inj_MB^2+ ON_DEC^2*a10R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt(a10R_col_MB^2+ON_BDOT^2*a10R_ramp_MB^2)); 
+A11r  =  ON_MB*(ON_PERS*sqrt(a11R_inj_MB^2+ ON_DEC^2*a11R_dec_MB^2)+ 
+            (1-ON_PERS)*sqrt(a11R_col_MB^2+ON_BDOT^2*a11R_ramp_MB^2)); 
+ 
+! Define systematic component per arc and set errors for MB's 
+   select, flag=error, clear; select, flag=error,  range= IP1/IP2,        class= MB; 
+      eoption, seed= SEEDSYS    ; exec NewFamily_MB; exec Outer_MB; 
+      eoption, seed= SEEDRAN    ; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP2/IP3.B1,     class= MB; 
+      eoption, seed= SEEDSYS+100; exec NewFamily_MB; exec Inner_MB; 
+      eoption, seed= SEEDRAN+1100; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP3.B1/IP4.B1,  class= MB; 
+      eoption, seed= SEEDSYS+200; exec NewFamily_MB; exec Inner_MB; 
+      eoption, seed= SEEDRAN+1200; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP4.B1/IP5,     class= MB; 
+      eoption, seed= SEEDSYS+300; exec NewFamily_MB; exec Inner_MB; 
+      eoption, seed= SEEDRAN+1300; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP5/IP6.B1,     class= MB; 
+      eoption, seed= SEEDSYS+400; exec NewFamily_MB; exec Outer_MB; 
+      eoption, seed= SEEDRAN+1400; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP6.B1/IP7.B1,  class= MB; 
+      eoption, seed= SEEDSYS+500; exec NewFamily_MB; exec Outer_MB; 
+      eoption, seed= SEEDRAN+1500; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP7.B1/IP8,     class= MB; 
+      eoption, seed= SEEDSYS+600; exec NewFamily_MB; exec Outer_MB; 
+      eoption, seed= SEEDRAN+1600; exec SetEfcomp_B; 
+ 
+   select, flag=error, clear; select, flag=error,  range= IP8/IP1.L1,     class= MB; 
+      eoption, seed= SEEDSYS+700; exec NewFamily_MB; exec Inner_MB; 
+      eoption, seed= SEEDRAN+1700; exec SetEfcomp_B; 
+ 
+ 
+ 

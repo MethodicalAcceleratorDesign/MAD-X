@@ -1,0 +1,2207 @@
+! -----------------------------------------------------------------------
+! Error type  : M - AVERAGE
+!               R - STANDARD
+!               U - UNCERTAINTY
+! Error source: g - Cst (End + Geometric + Collar + Screen Static + Deform)
+!               p - Persistent
+!               t - Accel (Ramp + Screen Dynamic)
+! -----------------------------------------------------------------------
+! Units : relative field error for Rr = 0.017 in units of 10^-4
+Rr_nomin := 0.017; ! reference radius
+Rr_large := 0.025; ! reference radius
+Rr := Rr_nomin;
+! -----------------------------------------------------------------------
+
+
+! 10.06.05/tr   new MQW error tables
+! 20.06.05/tr   separation of MQXA1 and MQXA3
+
+
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MB old **************************
+! ***** Generated   : 16-APR-99
+! ***** Version     : 9901AP
+! -----------------------------------------------------------------------
+!                                      AVERAGE
+b1pM_MB  :=   -8.6300;    b1gM_MB  :=   0.0000;    b1tM_MB :=   5.0000 ;
+b2pM_MB  :=   -0.0030;    b2gM_MB  :=  -1.4021;    b2tM_MB :=   0.0000 ;
+b3pM_MB  :=  -11.0300;    b3gM_MB  :=   1.3295;    b3tM_MB :=   0.7970 ;
+b4pM_MB  :=    0.0022;    b4gM_MB  :=   0.2212;    b4tM_MB :=   0.0000 ;
+b5pM_MB  :=    1.1900;    b5gM_MB  :=  -0.3026;    b5tM_MB :=  -0.1290 ;
+b6pM_MB  :=    0.0004;    b6gM_MB  :=  -0.0110;    b6tM_MB :=   0.0000 ;
+b7pM_MB  :=   -0.4790;    b7gM_MB  :=   0.3206;    b7tM_MB :=  -0.1710 ;
+b8pM_MB  :=    0.0000;    b8gM_MB  :=  -0.0003;    b8tM_MB :=   0.0000 ;
+b9pM_MB  :=    0.2290;    b9gM_MB  :=   0.1328;    b9tM_MB :=   0.4050 ;
+b10pM_MB :=    0.0000;    b10gM_MB :=   0.0000;    b10tM_MB:=   0.0000 ;
+b11pM_MB :=    0.0350;    b11gM_MB :=   0.5322;    b11tM_MB:=   0.9880 ;
+!                                    UNCERTAINTY
+b1pU_MB  :=   0.8600;     b1gU_MB :=  10.0000;     b1tU_MB :=   1.6000;
+b2pU_MB  :=        0;     b2gU_MB :=   0.8500;     b2tU_MB :=   0.6630;
+b3pU_MB  :=   1.0690;     b3gU_MB :=   0.8670;     b3tU_MB :=   0.2460;
+b4pU_MB  :=        0;     b4gU_MB :=   0.3440;     b4tU_MB :=   0.0930;
+b5pU_MB  :=   0.1250;     b5gU_MB :=   0.4180;     b5tU_MB :=   0.1500;
+b6pU_MB  :=        0;     b6gU_MB :=   0.0570;     b6tU_MB :=        0;
+b7pU_MB  :=   0.0530;     b7gU_MB :=        0;     b7tU_MB :=        0;
+b8pU_MB  :=        0;     b8gU_MB :=        0;     b8tU_MB :=        0;
+b9pU_MB  :=   0.0280;     b9gU_MB :=        0;     b9tU_MB :=        0;
+b10pU_MB :=        0;     b10gU_MB:=        0;     b10tU_MB:=        0;
+b11pU_MB :=   0.0000;     b11gU_MB:=        0;     b11tU_MB:=        0;
+!                                STANDARD DEVIATION
+b1pR_MB  :=   0.4900;     b1gR_MB :=   5.0000;     b1tR_MB :=   1.1000;
+b2pR_MB  :=   0.3060;     b2gR_MB :=   0.6800;     b2tR_MB :=   1.5346;
+b3pR_MB  :=   0.2890;     b3gR_MB :=   1.4450;     b3tR_MB :=   0.5490;
+b4pR_MB  :=   0.1470;     b4gR_MB :=   0.4910;     b4tR_MB :=   0.2060;
+b5pR_MB  :=   0.0920;     b5gR_MB :=   0.4180;     b5tR_MB :=   0.3420;
+b6pR_MB  :=   0.0230;     b6gR_MB :=   0.0850;     b6tR_MB :=        0;
+b7pR_MB  :=   0.0270;     b7gR_MB :=   0.2170;     b7tR_MB :=        0;
+b8pR_MB  :=   0.0120;     b8gR_MB :=   0.0410;     b8tR_MB :=        0;
+b9pR_MB  :=   0.0140;     b9gR_MB :=   0.0700;     b9tR_MB :=        0;
+b10pR_MB :=   0.0000;     b10gR_MB:=        0;     b10tR_MB:=        0;
+b11pR_MB :=   0.0000;     b11gR_MB:=        0;     b11tR_MB:=        0;
+!                                      AVERAGE
+a1pM_MB  :=   0.0000;     a1gM_MB :=   0.7520;     a1tM_MB :=   0.0000;
+a2pM_MB  :=   0.0000;     a2gM_MB :=  -0.0020;     a2tM_MB :=   0.0000;
+a3pM_MB  :=   0.0000;     a3gM_MB :=  -0.0820;     a3tM_MB :=   0.0000;
+a4pM_MB  :=   0.0000;     a4gM_MB :=   0.0000;     a4tM_MB :=   0.0000;
+a5pM_MB  :=   0.0000;     a5gM_MB :=   0.0070;     a5tM_MB :=   0.0000;
+a6pM_MB  :=   0.0000;     a6gM_MB :=   0.0000;     a6tM_MB :=   0.0000;
+a7pM_MB  :=   0.0000;     a7gM_MB :=   0.0170;     a7tM_MB :=   0.0000;
+a8pM_MB  :=   0.0000;     a8gM_MB :=   0.0000;     a8tM_MB :=   0.0000;
+a9pM_MB  :=   0.0000;     a9gM_MB :=  -0.0060;     a9tM_MB :=   0.0000;
+a10pM_MB :=   0.0000;     a10gM_MB:=   0.0000;     a10tM_MB:=   0.0000;
+a11pM_MB :=   0.0000;     a11gM_MB:=   0.0020;     a11tM_MB:=   0.0000;
+!                                    UNCERTAINTY
+a1pU_MB  :=     0 ;     a1gU_MB :=   5.0000 ;     a1tU_MB :=        0 ;
+a2pU_MB  :=     0 ;     a2gU_MB :=   0.5100 ;     a2tU_MB :=   0.7480 ;
+a3pU_MB  :=     0 ;     a3gU_MB :=   0.8670 ;     a3tU_MB :=   0.1160 ;
+a4pU_MB  :=     0 ;     a4gU_MB :=   0.1300 ;     a4tU_MB :=   0.0700 ;
+a5pU_MB  :=     0 ;     a5gU_MB :=   0.4180 ;     a5tU_MB :=   0.0500 ;
+a6pU_MB  :=     0 ;     a6gU_MB :=   0.0570 ;     a6tU_MB :=        0 ;
+a7pU_MB  :=     0 ;     a7gU_MB :=        0 ;     a7tU_MB :=        0 ;
+a8pU_MB  :=     0 ;     a8gU_MB :=        0 ;     a8tU_MB :=        0 ;
+a9pU_MB  :=     0 ;     a9gU_MB :=        0 ;     a9tU_MB :=        0 ;
+a10pU_MB :=     0 ;     a10gU_MB:=        0 ;     a10tU_MB:=        0 ;
+a11pU_MB :=     0 ;     a11gU_MB:=        0 ;     a11tU_MB:=        0 ;
+!                                STANDARD DEVIATION
+a1pR_MB  :=   0.4000;     a1gR_MB :=        0;     a1tR_MB :=   0.1340;
+a2pR_MB  :=   0.7650;     a2gR_MB :=   1.7000;     a2tR_MB :=   1.7042;
+a3pR_MB  :=   0.2020;     a3gR_MB :=   0.4340;     a3tR_MB :=   0.2600;
+a4pR_MB  :=   0.1470;     a4gR_MB :=   0.4910;     a4tR_MB :=   0.5400;
+a5pR_MB  :=   0.0670;     a5gR_MB :=   0.3340;     a5tR_MB :=   0.1170;
+a6pR_MB  :=   0.0850;     a6gR_MB :=   0.1420;     a6tR_MB :=        0;
+a7pR_MB  :=   0.0310;     a7gR_MB :=   0.0720;     a7tR_MB :=        0;
+a8pR_MB  :=   0.0160;     a8gR_MB :=   0.0820;     a8tR_MB :=        0;
+a9pR_MB  :=   0.0910;     a9gR_MB :=   0.0700;     a9tR_MB :=        0;
+a10pR_MB :=   0.0120;     a10gR_MB:=        0;     a10tR_MB:=        0;
+a11pR_MB :=   0.0000;     a11gR_MB:=        0;     a11tR_MB:=        0;
+
+
+! *********************** Magnet type : MB new (SF 14/01/2003) **********
+! Field error in the MB's extrapolated from the
+! measurement of the first 60 coolared coils
+! (mix of Xs1 and Xs2 MB's)
+! Values extracted from LPR625
+! except for the random b3 set to 1.4 at injection and 7 TeV
+
+
+!MB error table at injection
+
+!Systenatic errors of aperture V1 (outer channel) and V2 (inner channel) at beginining of injection
+ b1M_inj_MB_V1:=   0.00; a1M_inj_MB_V1:=   0.00; b1M_inj_MB_V2:=   0.00; a1M_inj_MB_V2:=   0.00;
+ b2M_inj_MB_V1:=   1.31; a2M_inj_MB_V1:=  -0.37; b2M_inj_MB_V2:=  -1.10; a2M_inj_MB_V2:=  -0.37;
+ b3M_inj_MB_V1:=  -3.86; a3M_inj_MB_V1:=  -0.26; b3M_inj_MB_V2:=  -3.69; a3M_inj_MB_V2:=  -0.23;
+ b4M_inj_MB_V1:=  -0.01; a4M_inj_MB_V1:=  -0.03; b4M_inj_MB_V2:=  -0.01; a4M_inj_MB_V2:=  -0.04;
+ b5M_inj_MB_V1:=   1.33; a5M_inj_MB_V1:=   0.03; b5M_inj_MB_V2:=   1.43; a5M_inj_MB_V2:=   0.02;
+ b6M_inj_MB_V1:=  -0.02; a6M_inj_MB_V1:=  -0.01; b6M_inj_MB_V2:=   0.00; a6M_inj_MB_V2:=   0.00;
+ b7M_inj_MB_V1:=   0.32; a7M_inj_MB_V1:=   0.04; b7M_inj_MB_V2:=   0.34; a7M_inj_MB_V2:=   0.04;
+ b8M_inj_MB_V1:=  -0.01; a8M_inj_MB_V1:=   0.01; b8M_inj_MB_V2:=   0.01; a8M_inj_MB_V2:=   0.00;
+ b9M_inj_MB_V1:=   0.77; a9M_inj_MB_V1:=  -0.01; b9M_inj_MB_V2:=   0.77; a9M_inj_MB_V2:=  -0.01;
+b10M_inj_MB_V1:=   0.00;a10M_inj_MB_V1:=   0.00;b10M_inj_MB_V2:=   0.01;a10M_inj_MB_V2:=  -0.01;
+b11M_inj_MB_V1:=   0.59;a11M_inj_MB_V1:=  -0.04;b11M_inj_MB_V2:=   0.59;a11M_inj_MB_V2:=  -0.04;
+
+!Random error at beginining of injection
+ b1R_inj_MB:=  8.00; a1R_inj_MB:=  8.00;
+ b2R_inj_MB:=  0.63; a2R_inj_MB:=  1.21;
+ b3R_inj_MB:=  1.40; a3R_inj_MB:=  0.33;
+ b4R_inj_MB:=  0.11; a4R_inj_MB:=  0.28;
+ b5R_inj_MB:=  0.50; a5R_inj_MB:=  0.10;
+ b6R_inj_MB:=  0.04; a6R_inj_MB:=  0.08;
+ b7R_inj_MB:=  0.24; a7R_inj_MB:=  0.04;
+ b8R_inj_MB:=  0.02; a8R_inj_MB:=  0.03;
+ b9R_inj_MB:=  0.12; a9R_inj_MB:=  0.03;
+b10R_inj_MB:=  0.02;a10R_inj_MB:=  0.01;
+b11R_inj_MB:=  0.03;a11R_inj_MB:=  0.04;
+
+!Systematic effect of Decay
+ b1M_dec_MB:=  0.80;  a1M_dec_MB:=  0.00;
+ b2M_dec_MB:= -0.03;  a2M_dec_MB:=  0.00;
+ b3M_dec_MB:=  1.73;  a3M_dec_MB:=  0.03;
+ b4M_dec_MB:= -0.01;  a4M_dec_MB:=  0.05;
+ b5M_dec_MB:= -0.29;  a5M_dec_MB:=  0.00;
+ b6M_dec_MB:=  0.00;  a6M_dec_MB:=  0.00;
+ b7M_dec_MB:=  0.04;  a7M_dec_MB:= -0.01;
+ b8M_dec_MB:=  0.00;  a8M_dec_MB:=  0.00;
+ b9M_dec_MB:= -0.02;  a9M_dec_MB:=  0.00;
+b10M_dec_MB:=  0.00; a10M_dec_MB:=  0.00;
+b11M_dec_MB:=  0.00; a11M_dec_MB:=  0.00;
+
+!Random effect of Decay
+ b1R_dec_MB:=  0.74;  a1R_dec_MB:=  0.00;
+ b2R_dec_MB:=  0.11;  a2R_dec_MB:=  0.24;
+ b3R_dec_MB:=  0.44;  a3R_dec_MB:=  0.07;
+ b4R_dec_MB:=  0.05;  a4R_dec_MB:=  0.09;
+ b5R_dec_MB:=  0.10;  a5R_dec_MB:=  0.03;
+ b6R_dec_MB:=  0.02;  a6R_dec_MB:=  0.04;
+ b7R_dec_MB:=  0.03;  a7R_dec_MB:=  0.01;
+ b8R_dec_MB:=  0.01;  a8R_dec_MB:=  0.01;
+ b9R_dec_MB:=  0.01;  a9R_dec_MB:=  0.01;
+b10R_dec_MB:=  0.01; a10R_dec_MB:=  0.02;
+b11R_dec_MB:=  0.02; a11R_dec_MB:=  0.02;
+
+!MB error table in collision with ramp induced effects
+
+!Systenatic errors of aperture V1 (outer channel) and V2 (inner channel) at flat top
+ b1M_col_MB_V1:=   0.00; a1M_col_MB_V1:=   0.00; b1M_col_MB_V2:=   0.00; a1M_col_MB_V2:=   0.00;
+ b2M_col_MB_V1:=  -0.29; a2M_col_MB_V1:=  -0.47; b2M_col_MB_V2:=   0.52; a2M_col_MB_V2:=  -0.31;
+ b3M_col_MB_V1:=   3.73; a3M_col_MB_V1:=  -0.29; b3M_col_MB_V2:=   3.87; a3M_col_MB_V2:=  -0.22;
+ b4M_col_MB_V1:=   0.20; a4M_col_MB_V1:=  -0.05; b4M_col_MB_V2:=  -0.22; a4M_col_MB_V2:=   0.01;
+ b5M_col_MB_V1:=   0.07; a5M_col_MB_V1:=   0.04; b5M_col_MB_V2:=   0.17; a5M_col_MB_V2:=   0.03;
+ b6M_col_MB_V1:=  -0.01; a6M_col_MB_V1:=  -0.01; b6M_col_MB_V2:=   0.00; a6M_col_MB_V2:=   0.00;
+ b7M_col_MB_V1:=   0.69; a7M_col_MB_V1:=   0.03; b7M_col_MB_V2:=   0.70; a7M_col_MB_V2:=   0.04;
+ b8M_col_MB_V1:=   0.00; a8M_col_MB_V1:=   0.01; b8M_col_MB_V2:=   0.01; a8M_col_MB_V2:=   0.01;
+ b9M_col_MB_V1:=   0.53; a9M_col_MB_V1:=   0.00; b9M_col_MB_V2:=   0.53; a9M_col_MB_V2:=   0.00;
+b10M_col_MB_V1:=   0.00;a10M_col_MB_V1:=   0.00;b10M_col_MB_V2:=   0.01;a10M_col_MB_V2:=  -0.01;
+b11M_col_MB_V1:=   0.56;a11M_col_MB_V1:=  -0.03;b11M_col_MB_V2:=   0.57;a11M_col_MB_V2:=  -0.04;
+
+!Random error at flat top
+ b1R_col_MB:=  8.00; a1R_col_MB:=  8.00;
+ b2R_col_MB:=  0.69; a2R_col_MB:=  1.16;
+ b3R_col_MB:=  1.40; a3R_col_MB:=  0.33;
+ b4R_col_MB:=  0.10; a4R_col_MB:=  0.24;
+ b5R_col_MB:=  0.50; a5R_col_MB:=  0.10;
+ b6R_col_MB:=  0.04; a6R_col_MB:=  0.07;
+ b7R_col_MB:=  0.24; a7R_col_MB:=  0.04;
+ b8R_col_MB:=  0.02; a8R_col_MB:=  0.02;
+ b9R_col_MB:=  0.12; a9R_col_MB:=  0.03;
+b10R_col_MB:=  0.02;a10R_col_MB:=  0.01;
+b11R_col_MB:=  0.03;a11R_col_MB:=  0.05;
+
+!Systematic effect of Ramp at 10 A/s (to be rescaled by 0.45/7 if used at 7 Tev)
+ b1M_ramp_MB:=  0.00;  a1M_ramp_MB:=  0.00;
+ b2M_ramp_MB:=  0.01;  a2M_ramp_MB:=  0.05;
+ b3M_ramp_MB:= -0.04;  a3M_ramp_MB:=  0.00;
+ b4M_ramp_MB:=  0.00;  a4M_ramp_MB:=  0.03;
+ b5M_ramp_MB:= -0.02;  a5M_ramp_MB:=  0.00;
+ b6M_ramp_MB:=  0.00;  a6M_ramp_MB:=  0.01;
+ b7M_ramp_MB:=  0.00;  a7M_ramp_MB:=  0.00;
+ b8M_ramp_MB:=  0.00;  a8M_ramp_MB:=  0.00;
+ b9M_ramp_MB:=  0.00;  a9M_ramp_MB:=  0.00;
+b10M_ramp_MB:=  0.00; a10M_ramp_MB:=  0.00;
+b11M_ramp_MB:=  0.00; a11M_ramp_MB:=  0.00;
+
+!Random effect of Ramp at 10 A/s (to be rescaled by 0.45/7 if used at 7 Tev)
+ b1R_ramp_MB:=  1.00;  a1R_ramp_MB:=  0.00;
+ b2R_ramp_MB:=  0.06;  a2R_ramp_MB:=  0.19;
+ b3R_ramp_MB:=  0.18;  a3R_ramp_MB:=  0.02;
+ b4R_ramp_MB:=  0.02;  a4R_ramp_MB:=  0.07;
+ b5R_ramp_MB:=  0.04;  a5R_ramp_MB:=  0.01;
+ b6R_ramp_MB:=  0.01;  a6R_ramp_MB:=  0.02;
+ b7R_ramp_MB:=  0.02;  a7R_ramp_MB:=  0.00;
+ b8R_ramp_MB:=  0.00;  a8R_ramp_MB:=  0.00;
+ b9R_ramp_MB:=  0.00;  a9R_ramp_MB:=  0.00;
+b10R_ramp_MB:=  0.00; a10R_ramp_MB:=  0.00;
+b11R_ramp_MB:=  0.00; a11R_ramp_MB:=  0.00;
+
+
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBX (D1 IR2/IR8) ****************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl  V1.0
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBX  :=         0.0000;        b1gM_MBX  :=         0.0000;
+  b2pM_MBX  :=        -0.1088;        b2gM_MBX  :=         0.1904;
+  b3pM_MBX  :=        -4.1431;        b3gM_MBX  :=        -2.1825;
+  b4pM_MBX  :=        -0.0377;        b4gM_MBX  :=         0.0220;
+  b5pM_MBX  :=         0.0748;        b5gM_MBX  :=         0.0599;
+  b6pM_MBX  :=         0.0189;        b6gM_MBX  :=        -0.0189;
+  b7pM_MBX  :=        -0.1443;        b7gM_MBX  :=         0.1058;
+  b8pM_MBX  :=        -0.0013;        b8gM_MBX  :=        -0.0007;
+  b9pM_MBX  :=         0.0064;        b9gM_MBX  :=         0.0014;
+ b10pM_MBX  :=        -0.0003;       b10gM_MBX  :=         0.0016;
+ b11pM_MBX  :=        -0.0013;       b11gM_MBX  :=        -0.0123;
+!                UNCERTAINTY
+  b1pU_MBX  :=         0.0000;        b1gU_MBX  :=         0.0000;
+  b2pU_MBX  :=         0.0000;        b2gU_MBX  :=         0.5440;
+  b3pU_MBX  :=         1.9465;        b3gU_MBX  :=         1.5860;
+  b4pU_MBX  :=         0.0000;        b4gU_MBX  :=         0.0786;
+  b5pU_MBX  :=         0.0551;        b5gU_MBX  :=         0.1732;
+  b6pU_MBX  :=         0.0000;        b6gU_MBX  :=         0.0174;
+  b7pU_MBX  :=         0.0091;        b7gU_MBX  :=         0.0198;
+  b8pU_MBX  :=         0.0000;        b8gU_MBX  :=         0.0027;
+  b9pU_MBX  :=         0.0023;        b9gU_MBX  :=         0.0055;
+ b10pU_MBX  :=         0.0000;       b10gU_MBX  :=         0.0019;
+ b11pU_MBX  :=         0.0006;       b11gU_MBX  :=         0.0008;
+!          STANDARD DEVIATION
+  b1pR_MBX  :=         0.0000;        b1gR_MBX  :=         0.0000;
+  b2pR_MBX  :=         0.0000;        b2gR_MBX  :=         0.1904;
+  b3pR_MBX  :=         0.3606;        b3gR_MBX  :=         0.8416;
+  b4pR_MBX  :=         0.0000;        b4gR_MBX  :=         0.0283;
+  b5pR_MBX  :=         0.0195;        b5gR_MBX  :=         0.0877;
+  b6pR_MBX  :=         0.0000;        b6gR_MBX  :=         0.0058;
+  b7pR_MBX  :=         0.0000;        b7gR_MBX  :=         0.0109;
+  b8pR_MBX  :=         0.0000;        b8gR_MBX  :=         0.0007;
+  b9pR_MBX  :=         0.0000;        b9gR_MBX  :=         0.0023;
+ b10pR_MBX  :=         0.0000;       b10gR_MBX  :=         0.0006;
+ b11pR_MBX  :=         0.0000;       b11gR_MBX  :=         0.0004;
+!                    AVERAGE
+  a1pM_MBX  :=         0.0000;        a1gM_MBX  :=         0.0000;
+  a2pM_MBX  :=        -0.2720;        a2gM_MBX  :=         0.4080;
+  a3pM_MBX  :=         0.1064;        a3gM_MBX  :=        -0.1387;
+  a4pM_MBX  :=         0.0377;        a4gM_MBX  :=         0.0063;
+  a5pM_MBX  :=         0.0043;        a5gM_MBX  :=        -0.0150;
+  a6pM_MBX  :=         0.0029;        a6gM_MBX  :=        -0.0073;
+  a7pM_MBX  :=         0.0010;        a7gM_MBX  :=        -0.0010;
+  a8pM_MBX  :=         0.0000;        a8gM_MBX  :=        -0.0007;
+  a9pM_MBX  :=         0.0009;        a9gM_MBX  :=        -0.0009;
+ a10pM_MBX  :=        -0.0006;       a10gM_MBX  :=         0.0012;
+ a11pM_MBX  :=         0.0000;       a11gM_MBX  :=        -0.0002;
+!                UNCERTAINTY
+  a1pU_MBX  :=         0.0000;        a1gU_MBX  :=         0.0000;
+  a2pU_MBX  :=         1.5230;        a2gU_MBX  :=         2.3596;
+  a3pU_MBX  :=         0.0000;        a3gU_MBX  :=         0.2682;
+  a4pU_MBX  :=         0.1495;        a4gU_MBX  :=         0.3396;
+  a5pU_MBX  :=         0.0000;        a5gU_MBX  :=         0.0406;
+  a6pU_MBX  :=         0.0000;        a6gU_MBX  :=         0.0814;
+  a7pU_MBX  :=         0.0000;        a7gU_MBX  :=         0.0069;
+  a8pU_MBX  :=         0.0000;        a8gU_MBX  :=         0.0101;
+  a9pU_MBX  :=         0.0000;        a9gU_MBX  :=         0.0014;
+ a10pU_MBX  :=         0.0009;       a10gU_MBX  :=         0.0012;
+ a11pU_MBX  :=         0.0000;       a11gU_MBX  :=         0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBX  :=         0.0000;        a1gR_MBX  :=         0.0000;
+  a2pR_MBX  :=         0.1199;        a2gR_MBX  :=         1.0540;
+  a3pR_MBX  :=         0.0000;        a3gR_MBX  :=         0.0971;
+  a4pR_MBX  :=         0.0000;        a4gR_MBX  :=         0.1321;
+  a5pR_MBX  :=         0.0000;        a5gR_MBX  :=         0.0128;
+  a6pR_MBX  :=         0.0000;        a6gR_MBX  :=         0.0247;
+  a7pR_MBX  :=         0.0000;        a7gR_MBX  :=         0.0030;
+  a8pR_MBX  :=         0.0000;        a8gR_MBX  :=         0.0034;
+  a9pR_MBX  :=         0.0000;        a9gR_MBX  :=         0.0005;
+ a10pR_MBX  :=         0.0000;       a10gR_MBX  :=         0.0006;
+ a11pR_MBX  :=         0.0000;       a11gR_MBX  :=         0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBXLEND *************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl 25mm reference radius
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBXLEND  :=     0.0000;        b1gM_MBXLEND  :=     0.0000;
+  b2pM_MBXLEND  :=     0.0952;        b2gM_MBXLEND  :=    -0.3196;
+  b3pM_MBXLEND  :=    -1.5953;        b3gM_MBXLEND  :=    10.3346;
+  b4pM_MBXLEND  :=     0.0031;        b4gM_MBXLEND  :=     0.0126;
+  b5pM_MBXLEND  :=     0.0363;        b5gM_MBXLEND  :=    -0.0919;
+  b6pM_MBXLEND  :=    -0.0029;        b6gM_MBXLEND  :=     0.0029;
+  b7pM_MBXLEND  :=     0.0138;        b7gM_MBXLEND  :=     0.0910;
+  b8pM_MBXLEND  :=     0.0000;        b8gM_MBXLEND  :=     0.0000;
+  b9pM_MBXLEND  :=    -0.0009;        b9gM_MBXLEND  :=    -0.0018;
+ b10pM_MBXLEND  :=     0.0000;       b10gM_MBXLEND  :=    -0.0003;
+ b11pM_MBXLEND  :=     0.0000;       b11gM_MBXLEND  :=    -0.0013;
+!                UNCERTAINTY
+  b1pU_MBXLEND  :=     0.0000;        b1gU_MBXLEND  :=     0.0000;
+  b2pU_MBXLEND  :=     0.0000;        b2gU_MBXLEND  :=     1.5368;
+  b3pU_MBXLEND  :=     0.0000;        b3gU_MBXLEND  :=     1.3548;
+  b4pU_MBXLEND  :=     0.0000;        b4gU_MBXLEND  :=     0.2295;
+  b5pU_MBXLEND  :=     0.0252;        b5gU_MBXLEND  :=     0.1475;
+  b6pU_MBXLEND  :=     0.0000;        b6gU_MBXLEND  :=     0.0422;
+  b7pU_MBXLEND  :=     0.0000;        b7gU_MBXLEND  :=     0.0109;
+  b8pU_MBXLEND  :=     0.0000;        b8gU_MBXLEND  :=     0.0040;
+  b9pU_MBXLEND  :=     0.0000;        b9gU_MBXLEND  :=     0.0037;
+ b10pU_MBXLEND  :=     0.0000;       b10gU_MBXLEND  :=     0.0025;
+ b11pU_MBXLEND  :=     0.0000;       b11gU_MBXLEND  :=     0.0006;
+!          STANDARD DEVIATION
+  b1pR_MBXLEND  :=     0.0000;        b1gR_MBXLEND  :=     0.0000;
+  b2pR_MBXLEND  :=     0.0000;        b2gR_MBXLEND  :=     0.6732;
+  b3pR_MBXLEND  :=     0.0000;        b3gR_MBXLEND  :=     0.5086;
+  b4pR_MBXLEND  :=     0.0000;        b4gR_MBXLEND  :=     0.0723;
+  b5pR_MBXLEND  :=     0.0000;        b5gR_MBXLEND  :=     0.0470;
+  b6pR_MBXLEND  :=     0.0000;        b6gR_MBXLEND  :=     0.0174;
+  b7pR_MBXLEND  :=     0.0000;        b7gR_MBXLEND  :=     0.0049;
+  b8pR_MBXLEND  :=     0.0000;        b8gR_MBXLEND  :=     0.0020;
+  b9pR_MBXLEND  :=     0.0000;        b9gR_MBXLEND  :=     0.0014;
+ b10pR_MBXLEND  :=     0.0000;       b10gR_MBXLEND  :=     0.0009;
+ b11pR_MBXLEND  :=     0.0000;       b11gR_MBXLEND  :=     0.0002;
+!                    AVERAGE
+  a1pM_MBXLEND  :=     0.0000;        a1gM_MBXLEND  :=     0.0000;
+  a2pM_MBXLEND  :=    -0.6596;        a2gM_MBXLEND  :=    -0.9656;
+  a3pM_MBXLEND  :=    -0.0370;        a3gM_MBXLEND  :=    -4.5546;
+  a4pM_MBXLEND  :=    -0.0660;        a4gM_MBXLEND  :=     0.0283;
+  a5pM_MBXLEND  :=     0.0064;        a5gM_MBXLEND  :=     0.4768;
+  a6pM_MBXLEND  :=    -0.0044;        a6gM_MBXLEND  :=     0.0015;
+  a7pM_MBXLEND  :=     0.0030;        a7gM_MBXLEND  :=    -0.0850;
+  a8pM_MBXLEND  :=     0.0007;        a8gM_MBXLEND  :=    -0.0013;
+  a9pM_MBXLEND  :=    -0.0005;        a9gM_MBXLEND  :=     0.0114;
+ a10pM_MBXLEND  :=     0.0000;       a10gM_MBXLEND  :=    -0.0003;
+ a11pM_MBXLEND  :=     0.0000;       a11gM_MBXLEND  :=    -0.0008;
+!                UNCERTAINTY
+  a1pU_MBXLEND  :=     0.0000;        a1gU_MBXLEND  :=     0.0000;
+  a2pU_MBXLEND  :=     0.0000;        a2gU_MBXLEND  :=     2.9036;
+  a3pU_MBXLEND  :=     0.0000;        a3gU_MBXLEND  :=     0.4670;
+  a4pU_MBXLEND  :=     0.0386;        a4gU_MBXLEND  :=     0.2358;
+  a5pU_MBXLEND  :=     0.0167;        a5gU_MBXLEND  :=     0.0641;
+  a6pU_MBXLEND  :=     0.0159;        a6gU_MBXLEND  :=     0.0422;
+  a7pU_MBXLEND  :=     0.0000;        a7gU_MBXLEND  :=     0.0129;
+  a8pU_MBXLEND  :=     0.0000;        a8gU_MBXLEND  :=     0.0054;
+  a9pU_MBXLEND  :=     0.0000;        a9gU_MBXLEND  :=     0.0023;
+ a10pU_MBXLEND  :=     0.0009;       a10gU_MBXLEND  :=     0.0012;
+ a11pU_MBXLEND  :=     0.0005;       a11gU_MBXLEND  :=     0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBXLEND  :=     0.0000;        a1gR_MBXLEND  :=     0.0000;
+  a2pR_MBXLEND  :=     0.0000;        a2gR_MBXLEND  :=     1.2036;
+  a3pR_MBXLEND  :=     0.0000;        a3gR_MBXLEND  :=     0.1803;
+  a4pR_MBXLEND  :=     0.0000;        a4gR_MBXLEND  :=     0.0912;
+  a5pR_MBXLEND  :=     0.0000;        a5gR_MBXLEND  :=     0.0278;
+  a6pR_MBXLEND  :=     0.0000;        a6gR_MBXLEND  :=     0.0145;
+  a7pR_MBXLEND  :=     0.0000;        a7gR_MBXLEND  :=     0.0059;
+  a8pR_MBXLEND  :=     0.0000;        a8gR_MBXLEND  :=     0.0020;
+  a9pR_MBXLEND  :=     0.0000;        a9gR_MBXLEND  :=     0.0009;
+ a10pR_MBXLEND  :=     0.0000;       a10gR_MBXLEND  :=     0.0006;
+ a11pR_MBXLEND  :=     0.0000;       a11gR_MBXLEND  :=     0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBXREND *************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl 25mm reference radius
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBXREND  :=     0.0000;        b1gM_MBXREND  :=     0.0000;
+  b2pM_MBXREND  :=     0.0136;        b2gM_MBXREND  :=     0.1496;
+  b3pM_MBXREND  :=    -0.9849;        b3gM_MBXREND  :=     2.8114;
+  b4pM_MBXREND  :=     0.0031;        b4gM_MBXREND  :=     0.0000;
+  b5pM_MBXREND  :=     0.0321;        b5gM_MBXREND  :=     0.0064;
+  b6pM_MBXREND  :=    -0.0073;        b6gM_MBXREND  :=     0.0044;
+  b7pM_MBXREND  :=     0.0099;        b7gM_MBXREND  :=    -0.0040;
+  b8pM_MBXREND  :=     0.0000;        b8gM_MBXREND  :=    -0.0020;
+  b9pM_MBXREND  :=     0.0000;        b9gM_MBXREND  :=    -0.0078;
+ b10pM_MBXREND  :=     0.0000;       b10gM_MBXREND  :=    -0.0022;
+ b11pM_MBXREND  :=     0.0000;       b11gM_MBXREND  :=    -0.0025;
+!                UNCERTAINTY
+  b1pU_MBXREND  :=     0.0000;        b1gU_MBXREND  :=     0.0000;
+  b2pU_MBXREND  :=     0.4555;        b2gU_MBXREND  :=     1.2308;
+  b3pU_MBXREND  :=     0.0000;        b3gU_MBXREND  :=     1.2346;
+  b4pU_MBXREND  :=     0.0000;        b4gU_MBXREND  :=     0.1132;
+  b5pU_MBXREND  :=     0.0000;        b5gU_MBXREND  :=     0.1411;
+  b6pU_MBXREND  :=     0.0000;        b6gU_MBXREND  :=     0.0247;
+  b7pU_MBXREND  :=     0.0000;        b7gU_MBXREND  :=     0.0129;
+  b8pU_MBXREND  :=     0.0026;        b8gU_MBXREND  :=     0.0047;
+  b9pU_MBXREND  :=     0.0000;        b9gU_MBXREND  :=     0.0037;
+ b10pU_MBXREND  :=     0.0000;       b10gU_MBXREND  :=     0.0025;
+ b11pU_MBXREND  :=     0.0000;       b11gU_MBXREND  :=     0.0008;
+!          STANDARD DEVIATION
+  b1pR_MBXREND  :=     0.0000;        b1gR_MBXREND  :=     0.0000;
+  b2pR_MBXREND  :=     0.0000;        b2gR_MBXREND  :=     0.4488;
+  b3pR_MBXREND  :=     0.0000;        b3gR_MBXREND  :=     0.5364;
+  b4pR_MBXREND  :=     0.0000;        b4gR_MBXREND  :=     0.0503;
+  b5pR_MBXREND  :=     0.0000;        b5gR_MBXREND  :=     0.0492;
+  b6pR_MBXREND  :=     0.0000;        b6gR_MBXREND  :=     0.0087;
+  b7pR_MBXREND  :=     0.0000;        b7gR_MBXREND  :=     0.0059;
+  b8pR_MBXREND  :=     0.0000;        b8gR_MBXREND  :=     0.0020;
+  b9pR_MBXREND  :=     0.0000;        b9gR_MBXREND  :=     0.0014;
+ b10pR_MBXREND  :=     0.0000;       b10gR_MBXREND  :=     0.0012;
+ b11pR_MBXREND  :=     0.0000;       b11gR_MBXREND  :=     0.0002;
+!                    AVERAGE
+  a1pM_MBXREND  :=     0.0000;        a1gM_MBXREND  :=     0.0000;
+  a2pM_MBXREND  :=    -0.8500;        a2gM_MBXREND  :=     0.6188;
+  a3pM_MBXREND  :=    -0.0139;        a3gM_MBXREND  :=     0.1341;
+  a4pM_MBXREND  :=    -0.0755;        a4gM_MBXREND  :=     0.0755;
+  a5pM_MBXREND  :=    -0.0021;        a5gM_MBXREND  :=     0.0000;
+  a6pM_MBXREND  :=    -0.0029;        a6gM_MBXREND  :=    -0.0015;
+  a7pM_MBXREND  :=     0.0000;        a7gM_MBXREND  :=    -0.0030;
+  a8pM_MBXREND  :=     0.0000;        a8gM_MBXREND  :=    -0.0013;
+  a9pM_MBXREND  :=     0.0000;        a9gM_MBXREND  :=     0.0000;
+ a10pM_MBXREND  :=     0.0000;       a10gM_MBXREND  :=    -0.0006;
+ a11pM_MBXREND  :=     0.0000;       a11gM_MBXREND  :=     0.0002;
+!                UNCERTAINTY
+  a1pU_MBXREND  :=     0.0000;        a1gU_MBXREND  :=     0.0000;
+  a2pU_MBXREND  :=     0.5796;        a2gU_MBXREND  :=     3.0600;
+  a3pU_MBXREND  :=     0.0665;        a3gU_MBXREND  :=     0.4763;
+  a4pU_MBXREND  :=     0.0000;        a4gU_MBXREND  :=     0.2295;
+  a5pU_MBXREND  :=     0.0000;        a5gU_MBXREND  :=     0.0663;
+  a6pU_MBXREND  :=     0.0000;        a6gU_MBXREND  :=     0.0349;
+  a7pU_MBXREND  :=     0.0000;        a7gU_MBXREND  :=     0.0119;
+  a8pU_MBXREND  :=     0.0000;        a8gU_MBXREND  :=     0.0074;
+  a9pU_MBXREND  :=     0.0000;        a9gU_MBXREND  :=     0.0023;
+ a10pU_MBXREND  :=     0.0000;       a10gU_MBXREND  :=     0.0031;
+ a11pU_MBXREND  :=     0.0000;       a11gU_MBXREND  :=     0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBXREND  :=     0.0000;        a1gR_MBXREND  :=     0.0000;
+  a2pR_MBXREND  :=     0.0000;        a2gR_MBXREND  :=     1.2988;
+  a3pR_MBXREND  :=     0.0000;        a3gR_MBXREND  :=     0.1572;
+  a4pR_MBXREND  :=     0.0000;        a4gR_MBXREND  :=     0.0975;
+  a5pR_MBXREND  :=     0.0000;        a5gR_MBXREND  :=     0.0235;
+  a6pR_MBXREND  :=     0.0000;        a6gR_MBXREND  :=     0.0145;
+  a7pR_MBXREND  :=     0.0000;        a7gR_MBXREND  :=     0.0049;
+  a8pR_MBXREND  :=     0.0000;        a8gR_MBXREND  :=     0.0027;
+  a9pR_MBXREND  :=     0.0000;        a9gR_MBXREND  :=     0.0009;
+ a10pR_MBXREND  :=     0.0000;       a10gR_MBXREND  :=     0.0016;
+ a11pR_MBXREND  :=     0.0000;       a11gR_MBXREND  :=     0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRS (D3 IR4)********************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRS  :=        0.0000;        b1gM_MBRS  :=        0.0000;
+  b2pM_MBRS  :=       -0.1088;        b2gM_MBRS  :=        0.1904;
+  b3pM_MBRS  :=       -4.1431;        b3gM_MBRS  :=       -2.1825;
+  b4pM_MBRS  :=       -0.0377;        b4gM_MBRS  :=        0.0220;
+  b5pM_MBRS  :=        0.0748;        b5gM_MBRS  :=        0.0599;
+  b6pM_MBRS  :=        0.0189;        b6gM_MBRS  :=       -0.0189;
+  b7pM_MBRS  :=       -0.1443;        b7gM_MBRS  :=        0.1058;
+  b8pM_MBRS  :=       -0.0013;        b8gM_MBRS  :=       -0.0007;
+  b9pM_MBRS  :=        0.0064;        b9gM_MBRS  :=        0.0014;
+ b10pM_MBRS  :=       -0.0003;       b10gM_MBRS  :=        0.0016;
+ b11pM_MBRS  :=       -0.0013;       b11gM_MBRS  :=       -0.0123;
+!                UNCERTAINTY
+  b1pU_MBRS  :=        0.0000;        b1gU_MBRS  :=        0.0000;
+  b2pU_MBRS  :=        0.0000;        b2gU_MBRS  :=        0.5440;
+  b3pU_MBRS  :=        1.9465;        b3gU_MBRS  :=        1.5860;
+  b4pU_MBRS  :=        0.0000;        b4gU_MBRS  :=        0.0786;
+  b5pU_MBRS  :=        0.0551;        b5gU_MBRS  :=        0.1732;
+  b6pU_MBRS  :=        0.0000;        b6gU_MBRS  :=        0.0174;
+  b7pU_MBRS  :=        0.0091;        b7gU_MBRS  :=        0.0198;
+  b8pU_MBRS  :=        0.0000;        b8gU_MBRS  :=        0.0027;
+  b9pU_MBRS  :=        0.0023;        b9gU_MBRS  :=        0.0055;
+ b10pU_MBRS  :=        0.0000;       b10gU_MBRS  :=        0.0019;
+ b11pU_MBRS  :=        0.0006;       b11gU_MBRS  :=        0.0008;
+!          STANDARD DEVIATION
+  b1pR_MBRS  :=        0.0000;        b1gR_MBRS  :=        0.0000;
+  b2pR_MBRS  :=        0.0000;        b2gR_MBRS  :=        0.1904;
+  b3pR_MBRS  :=        0.3606;        b3gR_MBRS  :=        0.8416;
+  b4pR_MBRS  :=        0.0000;        b4gR_MBRS  :=        0.0283;
+  b5pR_MBRS  :=        0.0195;        b5gR_MBRS  :=        0.0877;
+  b6pR_MBRS  :=        0.0000;        b6gR_MBRS  :=        0.0058;
+  b7pR_MBRS  :=        0.0000;        b7gR_MBRS  :=        0.0109;
+  b8pR_MBRS  :=        0.0000;        b8gR_MBRS  :=        0.0007;
+  b9pR_MBRS  :=        0.0000;        b9gR_MBRS  :=        0.0023;
+ b10pR_MBRS  :=        0.0000;       b10gR_MBRS  :=        0.0006;
+ b11pR_MBRS  :=        0.0000;       b11gR_MBRS  :=        0.0004;
+!                    AVERAGE
+  a1pM_MBRS  :=        0.0000;        a1gM_MBRS  :=        0.0000;
+  a2pM_MBRS  :=       -0.2720;        a2gM_MBRS  :=        0.4080;
+  a3pM_MBRS  :=        0.1064;        a3gM_MBRS  :=       -0.1387;
+  a4pM_MBRS  :=        0.0377;        a4gM_MBRS  :=        0.0063;
+  a5pM_MBRS  :=        0.0043;        a5gM_MBRS  :=       -0.0150;
+  a6pM_MBRS  :=        0.0029;        a6gM_MBRS  :=       -0.0073;
+  a7pM_MBRS  :=        0.0010;        a7gM_MBRS  :=       -0.0010;
+  a8pM_MBRS  :=        0.0000;        a8gM_MBRS  :=       -0.0007;
+  a9pM_MBRS  :=        0.0009;        a9gM_MBRS  :=       -0.0009;
+ a10pM_MBRS  :=       -0.0006;       a10gM_MBRS  :=        0.0012;
+ a11pM_MBRS  :=        0.0000;       a11gM_MBRS  :=       -0.0002;
+!                UNCERTAINTY
+  a1pU_MBRS  :=        0.0000;        a1gU_MBRS  :=        0.0000;
+  a2pU_MBRS  :=        1.5230;        a2gU_MBRS  :=        2.3596;
+  a3pU_MBRS  :=        0.0000;        a3gU_MBRS  :=        0.2682;
+  a4pU_MBRS  :=        0.1495;        a4gU_MBRS  :=        0.3396;
+  a5pU_MBRS  :=        0.0000;        a5gU_MBRS  :=        0.0406;
+  a6pU_MBRS  :=        0.0000;        a6gU_MBRS  :=        0.0814;
+  a7pU_MBRS  :=        0.0000;        a7gU_MBRS  :=        0.0069;
+  a8pU_MBRS  :=        0.0000;        a8gU_MBRS  :=        0.0101;
+  a9pU_MBRS  :=        0.0000;        a9gU_MBRS  :=        0.0014;
+ a10pU_MBRS  :=        0.0009;       a10gU_MBRS  :=        0.0012;
+ a11pU_MBRS  :=        0.0000;       a11gU_MBRS  :=        0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBRS  :=        0.0000;        a1gR_MBRS  :=        0.0000;
+  a2pR_MBRS  :=        0.1199;        a2gR_MBRS  :=        1.0540;
+  a3pR_MBRS  :=        0.0000;        a3gR_MBRS  :=        0.0971;
+  a4pR_MBRS  :=        0.0000;        a4gR_MBRS  :=        0.1321;
+  a5pR_MBRS  :=        0.0000;        a5gR_MBRS  :=        0.0128;
+  a6pR_MBRS  :=        0.0000;        a6gR_MBRS  :=        0.0247;
+  a7pR_MBRS  :=        0.0000;        a7gR_MBRS  :=        0.0030;
+  a8pR_MBRS  :=        0.0000;        a8gR_MBRS  :=        0.0034;
+  a9pR_MBRS  :=        0.0000;        a9gR_MBRS  :=        0.0005;
+ a10pR_MBRS  :=        0.0000;       a10gR_MBRS  :=        0.0006;
+ a11pR_MBRS  :=        0.0000;       a11gR_MBRS  :=        0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRSLEND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRSLEND :=     0.0000;        b1gM_MBRSLEND :=     0.0000;
+  b2pM_MBRSLEND :=     0.0952;        b2gM_MBRSLEND :=    -0.3196;
+  b3pM_MBRSLEND :=    -1.5953;        b3gM_MBRSLEND :=    10.3346;
+  b4pM_MBRSLEND :=     0.0031;        b4gM_MBRSLEND :=     0.0126;
+  b5pM_MBRSLEND :=     0.0363;        b5gM_MBRSLEND :=    -0.0919;
+  b6pM_MBRSLEND :=    -0.0029;        b6gM_MBRSLEND :=     0.0029;
+  b7pM_MBRSLEND :=     0.0138;        b7gM_MBRSLEND :=     0.0910;
+  b8pM_MBRSLEND :=     0.0000;        b8gM_MBRSLEND :=     0.0000;
+  b9pM_MBRSLEND :=    -0.0009;        b9gM_MBRSLEND :=    -0.0018;
+ b10pM_MBRSLEND :=     0.0000;       b10gM_MBRSLEND :=    -0.0003;
+ b11pM_MBRSLEND :=     0.0000;       b11gM_MBRSLEND :=    -0.0013;
+!                UNCERTAINTY
+  b1pU_MBRSLEND :=     0.0000;        b1gU_MBRSLEND :=     0.0000;
+  b2pU_MBRSLEND :=     0.0000;        b2gU_MBRSLEND :=     1.5368;
+  b3pU_MBRSLEND :=     0.0000;        b3gU_MBRSLEND :=     1.3548;
+  b4pU_MBRSLEND :=     0.0000;        b4gU_MBRSLEND :=     0.2295;
+  b5pU_MBRSLEND :=     0.0252;        b5gU_MBRSLEND :=     0.1475;
+  b6pU_MBRSLEND :=     0.0000;        b6gU_MBRSLEND :=     0.0422;
+  b7pU_MBRSLEND :=     0.0000;        b7gU_MBRSLEND :=     0.0109;
+  b8pU_MBRSLEND :=     0.0000;        b8gU_MBRSLEND :=     0.0040;
+  b9pU_MBRSLEND :=     0.0000;        b9gU_MBRSLEND :=     0.0037;
+ b10pU_MBRSLEND :=     0.0000;       b10gU_MBRSLEND :=     0.0025;
+ b11pU_MBRSLEND :=     0.0000;       b11gU_MBRSLEND :=     0.0006;
+!          STANDARD DEVIATION
+  b1pR_MBRSLEND :=     0.0000;        b1gR_MBRSLEND :=     0.0000;
+  b2pR_MBRSLEND :=     0.0000;        b2gR_MBRSLEND :=     0.6732;
+  b3pR_MBRSLEND :=     0.0000;        b3gR_MBRSLEND :=     0.5086;
+  b4pR_MBRSLEND :=     0.0000;        b4gR_MBRSLEND :=     0.0723;
+  b5pR_MBRSLEND :=     0.0000;        b5gR_MBRSLEND :=     0.0470;
+  b6pR_MBRSLEND :=     0.0000;        b6gR_MBRSLEND :=     0.0174;
+  b7pR_MBRSLEND :=     0.0000;        b7gR_MBRSLEND :=     0.0049;
+  b8pR_MBRSLEND :=     0.0000;        b8gR_MBRSLEND :=     0.0020;
+  b9pR_MBRSLEND :=     0.0000;        b9gR_MBRSLEND :=     0.0014;
+ b10pR_MBRSLEND :=     0.0000;       b10gR_MBRSLEND :=     0.0009;
+ b11pR_MBRSLEND :=     0.0000;       b11gR_MBRSLEND :=     0.0002;
+!                    AVERAGE
+  a1pM_MBRSLEND :=     0.0000;        a1gM_MBRSLEND :=     0.0000;
+  a2pM_MBRSLEND :=    -0.6596;        a2gM_MBRSLEND :=    -0.9656;
+  a3pM_MBRSLEND :=    -0.0370;        a3gM_MBRSLEND :=    -4.5546;
+  a4pM_MBRSLEND :=    -0.0660;        a4gM_MBRSLEND :=     0.0283;
+  a5pM_MBRSLEND :=     0.0064;        a5gM_MBRSLEND :=     0.4768;
+  a6pM_MBRSLEND :=    -0.0044;        a6gM_MBRSLEND :=     0.0015;
+  a7pM_MBRSLEND :=     0.0030;        a7gM_MBRSLEND :=    -0.0850;
+  a8pM_MBRSLEND :=     0.0007;        a8gM_MBRSLEND :=    -0.0013;
+  a9pM_MBRSLEND :=    -0.0005;        a9gM_MBRSLEND :=     0.0114;
+ a10pM_MBRSLEND :=     0.0000;       a10gM_MBRSLEND :=    -0.0003;
+ a11pM_MBRSLEND :=     0.0000;       a11gM_MBRSLEND :=    -0.0008;
+!                UNCERTAINTY
+  a1pU_MBRSLEND :=     0.0000;        a1gU_MBRSLEND :=     0.0000;
+  a2pU_MBRSLEND :=     0.0000;        a2gU_MBRSLEND :=     2.9036;
+  a3pU_MBRSLEND :=     0.0000;        a3gU_MBRSLEND :=     0.4670;
+  a4pU_MBRSLEND :=     0.0386;        a4gU_MBRSLEND :=     0.2358;
+  a5pU_MBRSLEND :=     0.0167;        a5gU_MBRSLEND :=     0.0641;
+  a6pU_MBRSLEND :=     0.0159;        a6gU_MBRSLEND :=     0.0422;
+  a7pU_MBRSLEND :=     0.0000;        a7gU_MBRSLEND :=     0.0129;
+  a8pU_MBRSLEND :=     0.0000;        a8gU_MBRSLEND :=     0.0054;
+  a9pU_MBRSLEND :=     0.0000;        a9gU_MBRSLEND :=     0.0023;
+ a10pU_MBRSLEND :=     0.0009;       a10gU_MBRSLEND :=     0.0012;
+ a11pU_MBRSLEND :=     0.0005;       a11gU_MBRSLEND :=     0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBRSLEND :=     0.0000;        a1gR_MBRSLEND :=     0.0000;
+  a2pR_MBRSLEND :=     0.0000;        a2gR_MBRSLEND :=     1.2036;
+  a3pR_MBRSLEND :=     0.0000;        a3gR_MBRSLEND :=     0.1803;
+  a4pR_MBRSLEND :=     0.0000;        a4gR_MBRSLEND :=     0.0912;
+  a5pR_MBRSLEND :=     0.0000;        a5gR_MBRSLEND :=     0.0278;
+  a6pR_MBRSLEND :=     0.0000;        a6gR_MBRSLEND :=     0.0145;
+  a7pR_MBRSLEND :=     0.0000;        a7gR_MBRSLEND :=     0.0059;
+  a8pR_MBRSLEND :=     0.0000;        a8gR_MBRSLEND :=     0.0020;
+  a9pR_MBRSLEND :=     0.0000;        a9gR_MBRSLEND :=     0.0009;
+ a10pR_MBRSLEND :=     0.0000;       a10gR_MBRSLEND :=     0.0006;
+ a11pR_MBRSLEND :=     0.0000;       a11gR_MBRSLEND :=     0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRSREND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRSREND  :=    0.0000;        b1gM_MBRSREND  :=    0.0000;
+  b2pM_MBRSREND  :=    0.0136;        b2gM_MBRSREND  :=    0.1496;
+  b3pM_MBRSREND  :=   -0.9849;        b3gM_MBRSREND  :=    2.8114;
+  b4pM_MBRSREND  :=    0.0031;        b4gM_MBRSREND  :=    0.0000;
+  b5pM_MBRSREND  :=    0.0321;        b5gM_MBRSREND  :=    0.0064;
+  b6pM_MBRSREND  :=   -0.0073;        b6gM_MBRSREND  :=    0.0044;
+  b7pM_MBRSREND  :=    0.0099;        b7gM_MBRSREND  :=   -0.0040;
+  b8pM_MBRSREND  :=    0.0000;        b8gM_MBRSREND  :=   -0.0020;
+  b9pM_MBRSREND  :=    0.0000;        b9gM_MBRSREND  :=   -0.0078;
+ b10pM_MBRSREND  :=    0.0000;       b10gM_MBRSREND  :=   -0.0022;
+ b11pM_MBRSREND  :=    0.0000;       b11gM_MBRSREND  :=   -0.0025;
+!                UNCERTAINTY
+  b1pU_MBRSREND  :=    0.0000;        b1gU_MBRSREND  :=    0.0000;
+  b2pU_MBRSREND  :=    0.4555;        b2gU_MBRSREND  :=    1.2308;
+  b3pU_MBRSREND  :=    0.0000;        b3gU_MBRSREND  :=    1.2346;
+  b4pU_MBRSREND  :=    0.0000;        b4gU_MBRSREND  :=    0.1132;
+  b5pU_MBRSREND  :=    0.0000;        b5gU_MBRSREND  :=    0.1411;
+  b6pU_MBRSREND  :=    0.0000;        b6gU_MBRSREND  :=    0.0247;
+  b7pU_MBRSREND  :=    0.0000;        b7gU_MBRSREND  :=    0.0129;
+  b8pU_MBRSREND  :=    0.0026;        b8gU_MBRSREND  :=    0.0047;
+  b9pU_MBRSREND  :=    0.0000;        b9gU_MBRSREND  :=    0.0037;
+ b10pU_MBRSREND  :=    0.0000;       b10gU_MBRSREND  :=    0.0025;
+ b11pU_MBRSREND  :=    0.0000;       b11gU_MBRSREND  :=    0.0008;
+!          STANDARD DEVIATION
+  b1pR_MBRSREND  :=    0.0000;        b1gR_MBRSREND  :=    0.0000;
+  b2pR_MBRSREND  :=    0.0000;        b2gR_MBRSREND  :=    0.4488;
+  b3pR_MBRSREND  :=    0.0000;        b3gR_MBRSREND  :=    0.5364;
+  b4pR_MBRSREND  :=    0.0000;        b4gR_MBRSREND  :=    0.0503;
+  b5pR_MBRSREND  :=    0.0000;        b5gR_MBRSREND  :=    0.0492;
+  b6pR_MBRSREND  :=    0.0000;        b6gR_MBRSREND  :=    0.0087;
+  b7pR_MBRSREND  :=    0.0000;        b7gR_MBRSREND  :=    0.0059;
+  b8pR_MBRSREND  :=    0.0000;        b8gR_MBRSREND  :=    0.0020;
+  b9pR_MBRSREND  :=    0.0000;        b9gR_MBRSREND  :=    0.0014;
+ b10pR_MBRSREND  :=    0.0000;       b10gR_MBRSREND  :=    0.0012;
+ b11pR_MBRSREND  :=    0.0000;       b11gR_MBRSREND  :=    0.0002;
+!                    AVERAGE
+  a1pM_MBRSREND  :=    0.0000;        a1gM_MBRSREND  :=    0.0000;
+  a2pM_MBRSREND  :=   -0.8500;        a2gM_MBRSREND  :=    0.6188;
+  a3pM_MBRSREND  :=   -0.0139;        a3gM_MBRSREND  :=    0.1341;
+  a4pM_MBRSREND  :=   -0.0755;        a4gM_MBRSREND  :=    0.0755;
+  a5pM_MBRSREND  :=   -0.0021;        a5gM_MBRSREND  :=    0.0000;
+  a6pM_MBRSREND  :=   -0.0029;        a6gM_MBRSREND  :=   -0.0015;
+  a7pM_MBRSREND  :=    0.0000;        a7gM_MBRSREND  :=   -0.0030;
+  a8pM_MBRSREND  :=    0.0000;        a8gM_MBRSREND  :=   -0.0013;
+  a9pM_MBRSREND  :=    0.0000;        a9gM_MBRSREND  :=    0.0000;
+ a10pM_MBRSREND  :=    0.0000;       a10gM_MBRSREND  :=   -0.0006;
+ a11pM_MBRSREND  :=    0.0000;       a11gM_MBRSREND  :=    0.0002;
+!                UNCERTAINTY
+  a1pU_MBRSREND  :=    0.0000;        a1gU_MBRSREND  :=    0.0000;
+  a2pU_MBRSREND  :=    0.5796;        a2gU_MBRSREND  :=    3.0600;
+  a3pU_MBRSREND  :=    0.0665;        a3gU_MBRSREND  :=    0.4763;
+  a4pU_MBRSREND  :=    0.0000;        a4gU_MBRSREND  :=    0.2295;
+  a5pU_MBRSREND  :=    0.0000;        a5gU_MBRSREND  :=    0.0663;
+  a6pU_MBRSREND  :=    0.0000;        a6gU_MBRSREND  :=    0.0349;
+  a7pU_MBRSREND  :=    0.0000;        a7gU_MBRSREND  :=    0.0119;
+  a8pU_MBRSREND  :=    0.0000;        a8gU_MBRSREND  :=    0.0074;
+  a9pU_MBRSREND  :=    0.0000;        a9gU_MBRSREND  :=    0.0023;
+ a10pU_MBRSREND  :=    0.0000;       a10gU_MBRSREND  :=    0.0031;
+ a11pU_MBRSREND  :=    0.0000;       a11gU_MBRSREND  :=    0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBRSREND  :=    0.0000;        a1gR_MBRSREND  :=    0.0000;
+  a2pR_MBRSREND  :=    0.0000;        a2gR_MBRSREND  :=    1.2988;
+  a3pR_MBRSREND  :=    0.0000;        a3gR_MBRSREND  :=    0.1572;
+  a4pR_MBRSREND  :=    0.0000;        a4gR_MBRSREND  :=    0.0975;
+  a5pR_MBRSREND  :=    0.0000;        a5gR_MBRSREND  :=    0.0235;
+  a6pR_MBRSREND  :=    0.0000;        a6gR_MBRSREND  :=    0.0145;
+  a7pR_MBRSREND  :=    0.0000;        a7gR_MBRSREND  :=    0.0049;
+  a8pR_MBRSREND  :=    0.0000;        a8gR_MBRSREND  :=    0.0027;
+  a9pR_MBRSREND  :=    0.0000;        a9gR_MBRSREND  :=    0.0009;
+ a10pR_MBRSREND  :=    0.0000;       a10gR_MBRSREND  :=    0.0016;
+ a11pR_MBRSREND  :=    0.0000;       a11gR_MBRSREND  :=    0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRCL (D2) **********************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2 left channel
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRCL  :=       0.0000;        b1gM_MBRCL  :=       0.0000;
+  b2pM_MBRCL  :=       3.0170;        b2gM_MBRCL  :=      -0.2310;
+  b3pM_MBRCL  :=      -8.0580;        b3gM_MBRCL  :=      -2.8700;
+  b4pM_MBRCL  :=      -0.0220;        b4gM_MBRCL  :=      -0.0070;
+  b5pM_MBRCL  :=       0.2750;        b5gM_MBRCL  :=      -0.0960;
+  b6pM_MBRCL  :=      -0.0004;        b6gM_MBRCL  :=       0.0081;
+  b7pM_MBRCL  :=      -0.0567;        b7gM_MBRCL  :=       0.0042;
+  b8pM_MBRCL  :=      -0.0019;        b8gM_MBRCL  :=      -0.0003;
+  b9pM_MBRCL  :=       0.0118;        b9gM_MBRCL  :=      -0.0036;
+ b10pM_MBRCL  :=      -0.0005;       b10gM_MBRCL  :=      -0.0001;
+ b11pM_MBRCL  :=      -0.0032;       b11gM_MBRCL  :=      -0.0126;
+!                UNCERTAINTY
+  b1pU_MBRCL  :=       0.0000;        b1gU_MBRCL  :=       0.0000;
+  b2pU_MBRCL  :=       1.1457;        b2gU_MBRCL  :=       0.6950;
+  b3pU_MBRCL  :=       0.4242;        b3gU_MBRCL  :=       0.7550;
+  b4pU_MBRCL  :=       0.0670;        b4gU_MBRCL  :=       0.0910;
+  b5pU_MBRCL  :=       0.0775;        b5gU_MBRCL  :=       0.2440;
+  b6pU_MBRCL  :=       0.0290;        b6gU_MBRCL  :=       0.0067;
+  b7pU_MBRCL  :=       0.0097;        b7gU_MBRCL  :=       0.0120;
+  b8pU_MBRCL  :=       0.0007;        b8gU_MBRCL  :=       0.0023;
+  b9pU_MBRCL  :=       0.0034;        b9gU_MBRCL  :=       0.0058;
+ b10pU_MBRCL  :=       0.0019;       b10gU_MBRCL  :=       0.0015;
+ b11pU_MBRCL  :=       0.0006;       b11gU_MBRCL  :=       0.0004;
+!          STANDARD DEVIATION
+  b1pR_MBRCL  :=       0.0000;        b1gR_MBRCL  :=       0.0000;
+  b2pR_MBRCL  :=       0.3660;        b2gR_MBRCL  :=       0.2200;
+  b3pR_MBRCL  :=       0.1229;        b3gR_MBRCL  :=       0.6810;
+  b4pR_MBRCL  :=       0.0268;        b4gR_MBRCL  :=       0.0570;
+  b5pR_MBRCL  :=       0.0000;        b5gR_MBRCL  :=       0.1820;
+  b6pR_MBRCL  :=       0.0176;        b6gR_MBRCL  :=       0.0037;
+  b7pR_MBRCL  :=       0.0025;        b7gR_MBRCL  :=       0.0102;
+  b8pR_MBRCL  :=       0.0000;        b8gR_MBRCL  :=       0.0019;
+  b9pR_MBRCL  :=       0.0000;        b9gR_MBRCL  :=       0.0046;
+ b10pR_MBRCL  :=       0.0007;       b10gR_MBRCL  :=       0.0010;
+ b11pR_MBRCL  :=       0.0005;       b11gR_MBRCL  :=       0.0002;
+!                    AVERAGE
+  a1pM_MBRCL  :=       0.0000;        a1gM_MBRCL  :=       0.0000;
+  a2pM_MBRCL  :=       0.5960;        a2gM_MBRCL  :=      -0.5610;
+  a3pM_MBRCL  :=       0.0720;        a3gM_MBRCL  :=      -0.0400;
+  a4pM_MBRCL  :=      -0.1310;        a4gM_MBRCL  :=      -0.1480;
+  a5pM_MBRCL  :=       0.0000;        a5gM_MBRCL  :=      -0.0080;
+  a6pM_MBRCL  :=       0.0185;        a6gM_MBRCL  :=      -0.0073;
+  a7pM_MBRCL  :=      -0.0026;        a7gM_MBRCL  :=      -0.0007;
+  a8pM_MBRCL  :=      -0.0017;        a8gM_MBRCL  :=       0.0006;
+  a9pM_MBRCL  :=      -0.0007;        a9gM_MBRCL  :=       0.0006;
+ a10pM_MBRCL  :=       0.0006;       a10gM_MBRCL  :=       0.0000;
+ a11pM_MBRCL  :=       0.0005;       a11gM_MBRCL  :=      -0.0001;
+!                UNCERTAINTY
+  a1pU_MBRCL  :=       0.0000;        a1gU_MBRCL  :=       0.0000;
+  a2pU_MBRCL  :=       0.5254;        a2gU_MBRCL  :=       4.0420;
+  a3pU_MBRCL  :=       0.1336;        a3gU_MBRCL  :=       0.3170;
+  a4pU_MBRCL  :=       0.1029;        a4gU_MBRCL  :=       0.1750;
+  a5pU_MBRCL  :=       0.0177;        a5gU_MBRCL  :=       0.0510;
+  a6pU_MBRCL  :=       0.0491;        a6gU_MBRCL  :=       0.0840;
+  a7pU_MBRCL  :=       0.0051;        a7gU_MBRCL  :=       0.0062;
+  a8pU_MBRCL  :=       0.0073;        a8gU_MBRCL  :=       0.0169;
+  a9pU_MBRCL  :=       0.0011;        a9gU_MBRCL  :=       0.0010;
+ a10pU_MBRCL  :=       0.0019;       a10gU_MBRCL  :=       0.0016;
+ a11pU_MBRCL  :=       0.0000;       a11gU_MBRCL  :=       0.0006;
+!          STANDARD DEVIATION
+  a1pR_MBRCL  :=       0.0000;        a1gR_MBRCL  :=       0.0000;
+  a2pR_MBRCL  :=       0.1217;        a2gR_MBRCL  :=       1.0540;
+  a3pR_MBRCL  :=       0.0491;        a3gR_MBRCL  :=       0.1980;
+  a4pR_MBRCL  :=       0.0320;        a4gR_MBRCL  :=       0.1260;
+  a5pR_MBRCL  :=       0.0088;        a5gR_MBRCL  :=       0.0380;
+  a6pR_MBRCL  :=       0.0106;        a6gR_MBRCL  :=       0.0558;
+  a7pR_MBRCL  :=       0.0017;        a7gR_MBRCL  :=       0.0047;
+  a8pR_MBRCL  :=       0.0026;        a8gR_MBRCL  :=       0.0113;
+  a9pR_MBRCL  :=       0.0004;        a9gR_MBRCL  :=       0.0007;
+ a10pR_MBRCL  :=       0.0010;       a10gR_MBRCL  :=       0.0010;
+ a11pR_MBRCL  :=       0.0000;       a11gR_MBRCL  :=       0.0004;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRCR (D2) **********************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2 right channel
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRCR  :=       0.0000;        b1gM_MBRCR  :=       0.0000;
+  b2pM_MBRCR  :=      -3.0170;        b2gM_MBRCR  :=      -0.4160;
+  b3pM_MBRCR  :=      -8.0580;        b3gM_MBRCR  :=      -2.8700;
+  b4pM_MBRCR  :=       0.0220;        b4gM_MBRCR  :=      -0.2010;
+  b5pM_MBRCR  :=       0.2750;        b5gM_MBRCR  :=      -0.0960;
+  b6pM_MBRCR  :=       0.0004;        b6gM_MBRCR  :=      -0.0222;
+  b7pM_MBRCR  :=      -0.0567;        b7gM_MBRCR  :=       0.0042;
+  b8pM_MBRCR  :=       0.0008;        b8gM_MBRCR  :=      -0.0030;
+  b9pM_MBRCR  :=       0.0118;        b9gM_MBRCR  :=      -0.0036;
+ b10pM_MBRCR  :=      -0.0005;       b10gM_MBRCR  :=      -0.0001;
+ b11pM_MBRCR  :=      -0.0032;       b11gM_MBRCR  :=      -0.0126;
+!                UNCERTAINTY
+  b1pU_MBRCR  :=       0.0000;        b1gU_MBRCR  :=       0.0000;
+  b2pU_MBRCR  :=       1.1457;        b2gU_MBRCR  :=       0.6950;
+  b3pU_MBRCR  :=       0.4242;        b3gU_MBRCR  :=       0.7550;
+  b4pU_MBRCR  :=       0.0670;        b4gU_MBRCR  :=       0.0910;
+  b5pU_MBRCR  :=       0.0775;        b5gU_MBRCR  :=       0.2440;
+  b6pU_MBRCR  :=       0.0290;        b6gU_MBRCR  :=       0.0067;
+  b7pU_MBRCR  :=       0.0097;        b7gU_MBRCR  :=       0.0120;
+  b8pU_MBRCR  :=       0.0007;        b8gU_MBRCR  :=       0.0023;
+  b9pU_MBRCR  :=       0.0034;        b9gU_MBRCR  :=       0.0058;
+ b10pU_MBRCR  :=       0.0019;       b10gU_MBRCR  :=       0.0015;
+ b11pU_MBRCR  :=       0.0006;       b11gU_MBRCR  :=       0.0004;
+!          STANDARD DEVIATION
+  b1pR_MBRCR  :=       0.0000;        b1gR_MBRCR  :=       0.0000;
+  b2pR_MBRCR  :=       0.3660;        b2gR_MBRCR  :=       0.2200;
+  b3pR_MBRCR  :=       0.1229;        b3gR_MBRCR  :=       0.6810;
+  b4pR_MBRCR  :=       0.0268;        b4gR_MBRCR  :=       0.0570;
+  b5pR_MBRCR  :=       0.0000;        b5gR_MBRCR  :=       0.1820;
+  b6pR_MBRCR  :=       0.0176;        b6gR_MBRCR  :=       0.0037;
+  b7pR_MBRCR  :=       0.0025;        b7gR_MBRCR  :=       0.0102;
+  b8pR_MBRCR  :=       0.0000;        b8gR_MBRCR  :=       0.0019;
+  b9pR_MBRCR  :=       0.0000;        b9gR_MBRCR  :=       0.0046;
+ b10pR_MBRCR  :=       0.0007;       b10gR_MBRCR  :=       0.0010;
+ b11pR_MBRCR  :=       0.0005;       b11gR_MBRCR  :=       0.0002;
+!                    AVERAGE
+  a1pM_MBRCR  :=       0.0000;        a1gM_MBRCR  :=       0.0000;
+  a2pM_MBRCR  :=       0.5960;        a2gM_MBRCR  :=      -0.5610;
+  a3pM_MBRCR  :=       0.0720;        a3gM_MBRCR  :=      -0.0400;
+  a4pM_MBRCR  :=      -0.1310;        a4gM_MBRCR  :=      -0.1480;
+  a5pM_MBRCR  :=       0.0000;        a5gM_MBRCR  :=      -0.0080;
+  a6pM_MBRCR  :=       0.0185;        a6gM_MBRCR  :=      -0.0073;
+  a7pM_MBRCR  :=      -0.0026;        a7gM_MBRCR  :=      -0.0007;
+  a8pM_MBRCR  :=      -0.0017;        a8gM_MBRCR  :=       0.0006;
+  a9pM_MBRCR  :=      -0.0007;        a9gM_MBRCR  :=       0.0006;
+ a10pM_MBRCR  :=       0.0006;       a10gM_MBRCR  :=       0.0000;
+ a11pM_MBRCR  :=       0.0005;       a11gM_MBRCR  :=      -0.0001;
+!                UNCERTAINTY
+  a1pU_MBRCR  :=       0.0000;        a1gU_MBRCR  :=       0.0000;
+  a2pU_MBRCR  :=       0.5254;        a2gU_MBRCR  :=       4.0420;
+  a3pU_MBRCR  :=       0.1336;        a3gU_MBRCR  :=       0.3170;
+  a4pU_MBRCR  :=       0.1029;        a4gU_MBRCR  :=       0.1750;
+  a5pU_MBRCR  :=       0.0177;        a5gU_MBRCR  :=       0.0510;
+  a6pU_MBRCR  :=       0.0491;        a6gU_MBRCR  :=       0.0840;
+  a7pU_MBRCR  :=       0.0051;        a7gU_MBRCR  :=       0.0062;
+  a8pU_MBRCR  :=       0.0073;        a8gU_MBRCR  :=       0.0169;
+  a9pU_MBRCR  :=       0.0011;        a9gU_MBRCR  :=       0.0010;
+ a10pU_MBRCR  :=       0.0019;       a10gU_MBRCR  :=       0.0016;
+ a11pU_MBRCR  :=       0.0000;       a11gU_MBRCR  :=       0.0006;
+!          STANDARD DEVIATION
+  a1pR_MBRCR  :=       0.0000;        a1gR_MBRCR  :=       0.0000;
+  a2pR_MBRCR  :=       0.1217;        a2gR_MBRCR  :=       1.0540;
+  a3pR_MBRCR  :=       0.0491;        a3gR_MBRCR  :=       0.1980;
+  a4pR_MBRCR  :=       0.0320;        a4gR_MBRCR  :=       0.1260;
+  a5pR_MBRCR  :=       0.0088;        a5gR_MBRCR  :=       0.0380;
+  a6pR_MBRCR  :=       0.0106;        a6gR_MBRCR  :=       0.0558;
+  a7pR_MBRCR  :=       0.0017;        a7gR_MBRCR  :=       0.0047;
+  a8pR_MBRCR  :=       0.0026;        a8gR_MBRCR  :=       0.0113;
+  a9pR_MBRCR  :=       0.0004;        a9gR_MBRCR  :=       0.0007;
+ a10pR_MBRCR  :=       0.0010;       a10gR_MBRCR  :=       0.0010;
+ a11pR_MBRCR  :=       0.0000;       a11gR_MBRCR  :=       0.0004;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRCLEND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2/D4a/D4b
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRCLEND  :=    0.0000;        b1gM_MBRCLEND  :=    0.0000;
+  b2pM_MBRCLEND  :=    0.0930;        b2gM_MBRCLEND  :=   -0.5610;
+  b3pM_MBRCLEND  :=   -1.5940;        b3gM_MBRCLEND  :=    7.8260;
+  b4pM_MBRCLEND  :=    0.0040;        b4gM_MBRCLEND  :=    0.0590;
+  b5pM_MBRCLEND  :=    0.0370;        b5gM_MBRCLEND  :=    0.4860;
+  b6pM_MBRCLEND  :=   -0.0037;        b6gM_MBRCLEND  :=   -0.0045;
+  b7pM_MBRCLEND  :=    0.0139;        b7gM_MBRCLEND  :=    0.0920;
+  b8pM_MBRCLEND  :=    0.0002;        b8gM_MBRCLEND  :=    0.0020;
+  b9pM_MBRCLEND  :=   -0.0011;        b9gM_MBRCLEND  :=    0.0036;
+ b10pM_MBRCLEND  :=   -0.0001;       b10gM_MBRCLEND  :=   -0.0007;
+ b11pM_MBRCLEND  :=    0.0001;       b11gM_MBRCLEND  :=   -0.0016;
+!                UNCERTAINTY
+  b1pU_MBRCLEND  :=    0.0000;        b1gU_MBRCLEND  :=    0.0000;
+  b2pU_MBRCLEND  :=    0.0000;        b2gU_MBRCLEND  :=    1.5370;
+  b3pU_MBRCLEND  :=    0.0000;        b3gU_MBRCLEND  :=    1.3560;
+  b4pU_MBRCLEND  :=    0.0000;        b4gU_MBRCLEND  :=    0.2290;
+  b5pU_MBRCLEND  :=    0.0298;        b5gU_MBRCLEND  :=    0.1470;
+  b6pU_MBRCLEND  :=    0.0000;        b6gU_MBRCLEND  :=    0.0425;
+  b7pU_MBRCLEND  :=    0.0000;        b7gU_MBRCLEND  :=    0.0108;
+  b8pU_MBRCLEND  :=    0.0000;        b8gU_MBRCLEND  :=    0.0043;
+  b9pU_MBRCLEND  :=    0.0000;        b9gU_MBRCLEND  :=    0.0035;
+ b10pU_MBRCLEND  :=    0.0000;       b10gU_MBRCLEND  :=    0.0025;
+ b11pU_MBRCLEND  :=    0.0000;       b11gU_MBRCLEND  :=    0.0007;
+!          STANDARD DEVIATION
+  b1pR_MBRCLEND  :=    0.0000;        b1gR_MBRCLEND  :=    0.0000;
+  b2pR_MBRCLEND  :=    0.0000;        b2gR_MBRCLEND  :=    0.6710;
+  b3pR_MBRCLEND  :=    0.0000;        b3gR_MBRCLEND  :=    0.5100;
+  b4pR_MBRCLEND  :=    0.0000;        b4gR_MBRCLEND  :=    0.0710;
+  b5pR_MBRCLEND  :=    0.0000;        b5gR_MBRCLEND  :=    0.0470;
+  b6pR_MBRCLEND  :=    0.0000;        b6gR_MBRCLEND  :=    0.0174;
+  b7pR_MBRCLEND  :=    0.0010;        b7gR_MBRCLEND  :=    0.0048;
+  b8pR_MBRCLEND  :=    0.0000;        b8gR_MBRCLEND  :=    0.0017;
+  b9pR_MBRCLEND  :=    0.0000;        b9gR_MBRCLEND  :=    0.0012;
+ b10pR_MBRCLEND  :=    0.0000;       b10gR_MBRCLEND  :=    0.0008;
+ b11pR_MBRCLEND  :=    0.0000;       b11gR_MBRCLEND  :=    0.0003;
+!                    AVERAGE
+  a1pM_MBRCLEND  :=    0.0000;        a1gM_MBRCLEND  :=    0.0000;
+  a2pM_MBRCLEND  :=   -0.6580;        a2gM_MBRCLEND  :=    0.7260;
+  a3pM_MBRCLEND  :=   -0.0400;        a3gM_MBRCLEND  :=   -3.9080;
+  a4pM_MBRCLEND  :=   -0.0660;        a4gM_MBRCLEND  :=    0.2360;
+  a5pM_MBRCLEND  :=    0.0050;        a5gM_MBRCLEND  :=    0.4910;
+  a6pM_MBRCLEND  :=   -0.0045;        a6gM_MBRCLEND  :=    0.0189;
+  a7pM_MBRCLEND  :=    0.0026;        a7gM_MBRCLEND  :=   -0.0942;
+  a8pM_MBRCLEND  :=    0.0004;        a8gM_MBRCLEND  :=    0.0016;
+  a9pM_MBRCLEND  :=   -0.0004;        a9gM_MBRCLEND  :=    0.0107;
+ a10pM_MBRCLEND  :=    0.0000;       a10gM_MBRCLEND  :=    0.0000;
+ a11pM_MBRCLEND  :=    0.0000;       a11gM_MBRCLEND  :=   -0.0006;
+!                UNCERTAINTY
+  a1pU_MBRCLEND  :=    0.0000;        a1gU_MBRCLEND  :=    0.0000;
+  a2pU_MBRCLEND  :=    0.0000;        a2gU_MBRCLEND  :=    2.9050;
+  a3pU_MBRCLEND  :=    0.0000;        a3gU_MBRCLEND  :=    0.4680;
+  a4pU_MBRCLEND  :=    0.0309;        a4gU_MBRCLEND  :=    0.2370;
+  a5pU_MBRCLEND  :=    0.0114;        a5gU_MBRCLEND  :=    0.0640;
+  a6pU_MBRCLEND  :=    0.0135;        a6gU_MBRCLEND  :=    0.0423;
+  a7pU_MBRCLEND  :=    0.0000;        a7gU_MBRCLEND  :=    0.0129;
+  a8pU_MBRCLEND  :=    0.0000;        a8gU_MBRCLEND  :=    0.0052;
+  a9pU_MBRCLEND  :=    0.0000;        a9gU_MBRCLEND  :=    0.0025;
+ a10pU_MBRCLEND  :=    0.0009;       a10gU_MBRCLEND  :=    0.0013;
+ a11pU_MBRCLEND  :=    0.0000;       a11gU_MBRCLEND  :=    0.0005;
+!          STANDARD DEVIATION
+  a1pR_MBRCLEND  :=    0.0000;        a1gR_MBRCLEND  :=    0.0000;
+  a2pR_MBRCLEND  :=    0.0000;        a2gR_MBRCLEND  :=    1.2030;
+  a3pR_MBRCLEND  :=    0.0000;        a3gR_MBRCLEND  :=    0.1810;
+  a4pR_MBRCLEND  :=    0.0000;        a4gR_MBRCLEND  :=    0.0920;
+  a5pR_MBRCLEND  :=    0.0074;        a5gR_MBRCLEND  :=    0.0270;
+  a6pR_MBRCLEND  :=    0.0000;        a6gR_MBRCLEND  :=    0.0144;
+  a7pR_MBRCLEND  :=    0.0000;        a7gR_MBRCLEND  :=    0.0057;
+  a8pR_MBRCLEND  :=    0.0000;        a8gR_MBRCLEND  :=    0.0022;
+  a9pR_MBRCLEND  :=    0.0000;        a9gR_MBRCLEND  :=    0.0010;
+ a10pR_MBRCLEND  :=    0.0000;       a10gR_MBRCLEND  :=    0.0005;
+ a11pR_MBRCLEND  :=    0.0000;       a11gR_MBRCLEND  :=    0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRCREND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2/D4a/D4b
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRCREND  :=    0.0000;        b1gM_MBRCREND  :=    0.0000;
+  b2pM_MBRCREND  :=    0.8100;        b2gM_MBRCREND  :=   -0.4730;
+  b3pM_MBRCREND  :=   -1.3750;        b3gM_MBRCREND  :=    1.0590;
+  b4pM_MBRCREND  :=   -0.0090;        b4gM_MBRCREND  :=   -0.0350;
+  b5pM_MBRCREND  :=   -0.0070;        b5gM_MBRCREND  :=    0.1550;
+  b6pM_MBRCREND  :=    0.0094;        b6gM_MBRCREND  :=   -0.0130;
+  b7pM_MBRCREND  :=    0.0140;        b7gM_MBRCREND  :=    0.0069;
+  b8pM_MBRCREND  :=   -0.0018;        b8gM_MBRCREND  :=    0.0017;
+  b9pM_MBRCREND  :=   -0.0023;        b9gM_MBRCREND  :=   -0.0084;
+ b10pM_MBRCREND  :=   -0.0016;       b10gM_MBRCREND  :=   -0.0004;
+ b11pM_MBRCREND  :=    0.0001;       b11gM_MBRCREND  :=   -0.0029;
+!                UNCERTAINTY
+  b1pU_MBRCREND  :=    0.0000;        b1gU_MBRCREND  :=    0.0000;
+  b2pU_MBRCREND  :=    0.4676;        b2gU_MBRCREND  :=    1.2280;
+  b3pU_MBRCREND  :=    0.0000;        b3gU_MBRCREND  :=    1.2330;
+  b4pU_MBRCREND  :=    0.0000;        b4gU_MBRCREND  :=    0.1140;
+  b5pU_MBRCREND  :=    0.0000;        b5gU_MBRCREND  :=    0.1420;
+  b6pU_MBRCREND  :=    0.0000;        b6gU_MBRCREND  :=    0.0246;
+  b7pU_MBRCREND  :=    0.0000;        b7gU_MBRCREND  :=    0.0130;
+  b8pU_MBRCREND  :=    0.0030;        b8gU_MBRCREND  :=    0.0047;
+  b9pU_MBRCREND  :=    0.0000;        b9gU_MBRCREND  :=    0.0035;
+ b10pU_MBRCREND  :=    0.0010;       b10gU_MBRCREND  :=    0.0024;
+ b11pU_MBRCREND  :=    0.0000;       b11gU_MBRCREND  :=    0.0007;
+!          STANDARD DEVIATION
+  b1pR_MBRCREND  :=    0.0000;        b1gR_MBRCREND  :=    0.0000;
+  b2pR_MBRCREND  :=    0.0300;        b2gR_MBRCREND  :=    0.4500;
+  b3pR_MBRCREND  :=    0.0000;        b3gR_MBRCREND  :=    0.5370;
+  b4pR_MBRCREND  :=    0.0000;        b4gR_MBRCREND  :=    0.0500;
+  b5pR_MBRCREND  :=    0.0000;        b5gR_MBRCREND  :=    0.0490;
+  b6pR_MBRCREND  :=    0.0000;        b6gR_MBRCREND  :=    0.0091;
+  b7pR_MBRCREND  :=    0.0000;        b7gR_MBRCREND  :=    0.0062;
+  b8pR_MBRCREND  :=    0.0008;        b8gR_MBRCREND  :=    0.0017;
+  b9pR_MBRCREND  :=    0.0000;        b9gR_MBRCREND  :=    0.0015;
+ b10pR_MBRCREND  :=    0.0000;       b10gR_MBRCREND  :=    0.0011;
+ b11pR_MBRCREND  :=    0.0000;       b11gR_MBRCREND  :=    0.0003;
+!                    AVERAGE
+  a1pM_MBRCREND  :=    0.0000;        a1gM_MBRCREND  :=    0.0000;
+  a2pM_MBRCREND  :=   -0.8920;        a2gM_MBRCREND  :=    0.3010;
+  a3pM_MBRCREND  :=   -0.1400;        a3gM_MBRCREND  :=    0.6150;
+  a4pM_MBRCREND  :=   -0.0460;        a4gM_MBRCREND  :=    0.0280;
+  a5pM_MBRCREND  :=   -0.0150;        a5gM_MBRCREND  :=    0.0210;
+  a6pM_MBRCREND  :=   -0.0138;        a6gM_MBRCREND  :=    0.0251;
+  a7pM_MBRCREND  :=    0.0020;        a7gM_MBRCREND  :=    0.0026;
+  a8pM_MBRCREND  :=    0.0014;        a8gM_MBRCREND  :=    0.0001;
+  a9pM_MBRCREND  :=   -0.0008;        a9gM_MBRCREND  :=    0.0039;
+ a10pM_MBRCREND  :=   -0.0003;       a10gM_MBRCREND  :=    0.0001;
+ a11pM_MBRCREND  :=    0.0000;       a11gM_MBRCREND  :=    0.0004;
+!                UNCERTAINTY
+  a1pU_MBRCREND  :=    0.0000;        a1gU_MBRCREND  :=    0.0000;
+  a2pU_MBRCREND  :=    0.5882;        a2gU_MBRCREND  :=    3.0610;
+  a3pU_MBRCREND  :=    0.0759;        a3gU_MBRCREND  :=    0.4770;
+  a4pU_MBRCREND  :=    0.0000;        a4gU_MBRCREND  :=    0.2310;
+  a5pU_MBRCREND  :=    0.0115;        a5gU_MBRCREND  :=    0.0660;
+  a6pU_MBRCREND  :=    0.0000;        a6gU_MBRCREND  :=    0.0355;
+  a7pU_MBRCREND  :=    0.0000;        a7gU_MBRCREND  :=    0.0122;
+  a8pU_MBRCREND  :=    0.0000;        a8gU_MBRCREND  :=    0.0072;
+  a9pU_MBRCREND  :=    0.0000;        a9gU_MBRCREND  :=    0.0022;
+ a10pU_MBRCREND  :=    0.0008;       a10gU_MBRCREND  :=    0.0031;
+ a11pU_MBRCREND  :=    0.0003;       a11gU_MBRCREND  :=    0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBRCREND  :=    0.0000;        a1gR_MBRCREND  :=    0.0000;
+  a2pR_MBRCREND  :=    0.0000;        a2gR_MBRCREND  :=    1.3000;
+  a3pR_MBRCREND  :=    0.0000;        a3gR_MBRCREND  :=    0.1560;
+  a4pR_MBRCREND  :=    0.0000;        a4gR_MBRCREND  :=    0.0980;
+  a5pR_MBRCREND  :=    0.0000;        a5gR_MBRCREND  :=    0.0230;
+  a6pR_MBRCREND  :=    0.0000;        a6gR_MBRCREND  :=    0.0143;
+  a7pR_MBRCREND  :=    0.0000;        a7gR_MBRCREND  :=    0.0045;
+  a8pR_MBRCREND  :=    0.0000;        a8gR_MBRCREND  :=    0.0025;
+  a9pR_MBRCREND  :=    0.0004;        a9gR_MBRCREND  :=    0.0008;
+ a10pR_MBRCREND  :=    0.0005;       a10gR_MBRCREND  :=    0.0014;
+ a11pR_MBRCREND  :=    0.0000;       a11gR_MBRCREND  :=    0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRBL (D4 IR4) ******************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D4 left channel
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRBL  :=       0.0000;        b1gM_MBRBL  :=       0.0000;
+  b2pM_MBRBL  :=       3.0170;        b2gM_MBRBL  :=      -0.2310;
+  b3pM_MBRBL  :=      -8.0580;        b3gM_MBRBL  :=      -2.8700;
+  b4pM_MBRBL  :=      -0.0220;        b4gM_MBRBL  :=      -0.0070;
+  b5pM_MBRBL  :=       0.2750;        b5gM_MBRBL  :=      -0.0960;
+  b6pM_MBRBL  :=      -0.0004;        b6gM_MBRBL  :=       0.0081;
+  b7pM_MBRBL  :=      -0.0567;        b7gM_MBRBL  :=       0.0042;
+  b8pM_MBRBL  :=      -0.0019;        b8gM_MBRBL  :=      -0.0003;
+  b9pM_MBRBL  :=       0.0118;        b9gM_MBRBL  :=      -0.0036;
+ b10pM_MBRBL  :=      -0.0005;       b10gM_MBRBL  :=      -0.0001;
+ b11pM_MBRBL  :=      -0.0032;       b11gM_MBRBL  :=      -0.0126;
+!                UNCERTAINTY
+  b1pU_MBRBL  :=       0.0000;        b1gU_MBRBL  :=       0.0000;
+  b2pU_MBRBL  :=       1.1457;        b2gU_MBRBL  :=       0.6950;
+  b3pU_MBRBL  :=       0.4242;        b3gU_MBRBL  :=       0.7550;
+  b4pU_MBRBL  :=       0.0670;        b4gU_MBRBL  :=       0.0910;
+  b5pU_MBRBL  :=       0.0775;        b5gU_MBRBL  :=       0.2440;
+  b6pU_MBRBL  :=       0.0290;        b6gU_MBRBL  :=       0.0067;
+  b7pU_MBRBL  :=       0.0097;        b7gU_MBRBL  :=       0.0120;
+  b8pU_MBRBL  :=       0.0007;        b8gU_MBRBL  :=       0.0023;
+  b9pU_MBRBL  :=       0.0034;        b9gU_MBRBL  :=       0.0058;
+ b10pU_MBRBL  :=       0.0019;       b10gU_MBRBL  :=       0.0015;
+ b11pU_MBRBL  :=       0.0006;       b11gU_MBRBL  :=       0.0004;
+!          STANDARD DEVIATION
+  b1pR_MBRBL  :=       0.0000;        b1gR_MBRBL  :=       0.0000;
+  b2pR_MBRBL  :=       0.3660;        b2gR_MBRBL  :=       0.2200;
+  b3pR_MBRBL  :=       0.1229;        b3gR_MBRBL  :=       0.6810;
+  b4pR_MBRBL  :=       0.0268;        b4gR_MBRBL  :=       0.0570;
+  b5pR_MBRBL  :=       0.0000;        b5gR_MBRBL  :=       0.1820;
+  b6pR_MBRBL  :=       0.0176;        b6gR_MBRBL  :=       0.0037;
+  b7pR_MBRBL  :=       0.0025;        b7gR_MBRBL  :=       0.0102;
+  b8pR_MBRBL  :=       0.0000;        b8gR_MBRBL  :=       0.0019;
+  b9pR_MBRBL  :=       0.0000;        b9gR_MBRBL  :=       0.0046;
+ b10pR_MBRBL  :=       0.0007;       b10gR_MBRBL  :=       0.0010;
+ b11pR_MBRBL  :=       0.0005;       b11gR_MBRBL  :=       0.0002;
+!                    AVERAGE
+  a1pM_MBRBL  :=       0.0000;        a1gM_MBRBL  :=       0.0000;
+  a2pM_MBRBL  :=       0.5960;        a2gM_MBRBL  :=      -0.5610;
+  a3pM_MBRBL  :=       0.0720;        a3gM_MBRBL  :=      -0.0400;
+  a4pM_MBRBL  :=      -0.1310;        a4gM_MBRBL  :=      -0.1480;
+  a5pM_MBRBL  :=       0.0000;        a5gM_MBRBL  :=      -0.0080;
+  a6pM_MBRBL  :=       0.0185;        a6gM_MBRBL  :=      -0.0073;
+  a7pM_MBRBL  :=      -0.0026;        a7gM_MBRBL  :=      -0.0007;
+  a8pM_MBRBL  :=      -0.0017;        a8gM_MBRBL  :=       0.0006;
+  a9pM_MBRBL  :=      -0.0007;        a9gM_MBRBL  :=       0.0006;
+ a10pM_MBRBL  :=       0.0006;       a10gM_MBRBL  :=       0.0000;
+ a11pM_MBRBL  :=       0.0005;       a11gM_MBRBL  :=      -0.0001;
+!                UNCERTAINTY
+  a1pU_MBRBL  :=       0.0000;        a1gU_MBRBL  :=       0.0000;
+  a2pU_MBRBL  :=       0.5254;        a2gU_MBRBL  :=       4.0420;
+  a3pU_MBRBL  :=       0.1336;        a3gU_MBRBL  :=       0.3170;
+  a4pU_MBRBL  :=       0.1029;        a4gU_MBRBL  :=       0.1750;
+  a5pU_MBRBL  :=       0.0177;        a5gU_MBRBL  :=       0.0510;
+  a6pU_MBRBL  :=       0.0491;        a6gU_MBRBL  :=       0.0840;
+  a7pU_MBRBL  :=       0.0051;        a7gU_MBRBL  :=       0.0062;
+  a8pU_MBRBL  :=       0.0073;        a8gU_MBRBL  :=       0.0169;
+  a9pU_MBRBL  :=       0.0011;        a9gU_MBRBL  :=       0.0010;
+ a10pU_MBRBL  :=       0.0019;       a10gU_MBRBL  :=       0.0016;
+ a11pU_MBRBL  :=       0.0000;       a11gU_MBRBL  :=       0.0006;
+!          STANDARD DEVIATION
+  a1pR_MBRBL  :=       0.0000;        a1gR_MBRBL  :=       0.0000;
+  a2pR_MBRBL  :=       0.1217;        a2gR_MBRBL  :=       1.0540;
+  a3pR_MBRBL  :=       0.0491;        a3gR_MBRBL  :=       0.1980;
+  a4pR_MBRBL  :=       0.0320;        a4gR_MBRBL  :=       0.1260;
+  a5pR_MBRBL  :=       0.0088;        a5gR_MBRBL  :=       0.0380;
+  a6pR_MBRBL  :=       0.0106;        a6gR_MBRBL  :=       0.0558;
+  a7pR_MBRBL  :=       0.0017;        a7gR_MBRBL  :=       0.0047;
+  a8pR_MBRBL  :=       0.0026;        a8gR_MBRBL  :=       0.0113;
+  a9pR_MBRBL  :=       0.0004;        a9gR_MBRBL  :=       0.0007;
+ a10pR_MBRBL  :=       0.0010;       a10gR_MBRBL  :=       0.0010;
+ a11pR_MBRBL  :=       0.0000;       a11gR_MBRBL  :=       0.0004;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRBR (D4 IR4) ******************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D4 right channel
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRBR  :=       0.0000;        b1gM_MBRBR  :=       0.0000;
+  b2pM_MBRBR  :=      -3.0170;        b2gM_MBRBR  :=      -0.4160;
+  b3pM_MBRBR  :=      -8.0580;        b3gM_MBRBR  :=      -2.8700;
+  b4pM_MBRBR  :=       0.0220;        b4gM_MBRBR  :=      -0.2010;
+  b5pM_MBRBR  :=       0.2750;        b5gM_MBRBR  :=      -0.0960;
+  b6pM_MBRBR  :=       0.0004;        b6gM_MBRBR  :=      -0.0222;
+  b7pM_MBRBR  :=      -0.0567;        b7gM_MBRBR  :=       0.0042;
+  b8pM_MBRBR  :=       0.0008;        b8gM_MBRBR  :=      -0.0030;
+  b9pM_MBRBR  :=       0.0118;        b9gM_MBRBR  :=      -0.0036;
+ b10pM_MBRBR  :=      -0.0005;       b10gM_MBRBR  :=      -0.0001;
+ b11pM_MBRBR  :=      -0.0032;       b11gM_MBRBR  :=      -0.0126;
+!                UNCERTAINTY
+  b1pU_MBRBR  :=       0.0000;        b1gU_MBRBR  :=       0.0000;
+  b2pU_MBRBR  :=       1.1457;        b2gU_MBRBR  :=       0.6950;
+  b3pU_MBRBR  :=       0.4242;        b3gU_MBRBR  :=       0.7550;
+  b4pU_MBRBR  :=       0.0670;        b4gU_MBRBR  :=       0.0910;
+  b5pU_MBRBR  :=       0.0775;        b5gU_MBRBR  :=       0.2440;
+  b6pU_MBRBR  :=       0.0290;        b6gU_MBRBR  :=       0.0067;
+  b7pU_MBRBR  :=       0.0097;        b7gU_MBRBR  :=       0.0120;
+  b8pU_MBRBR  :=       0.0007;        b8gU_MBRBR  :=       0.0023;
+  b9pU_MBRBR  :=       0.0034;        b9gU_MBRBR  :=       0.0058;
+ b10pU_MBRBR  :=       0.0019;       b10gU_MBRBR  :=       0.0015;
+ b11pU_MBRBR  :=       0.0006;       b11gU_MBRBR  :=       0.0004;
+!          STANDARD DEVIATION
+  b1pR_MBRBR  :=       0.0000;        b1gR_MBRBR  :=       0.0000;
+  b2pR_MBRBR  :=       0.3660;        b2gR_MBRBR  :=       0.2200;
+  b3pR_MBRBR  :=       0.1229;        b3gR_MBRBR  :=       0.6810;
+  b4pR_MBRBR  :=       0.0268;        b4gR_MBRBR  :=       0.0570;
+  b5pR_MBRBR  :=       0.0000;        b5gR_MBRBR  :=       0.1820;
+  b6pR_MBRBR  :=       0.0176;        b6gR_MBRBR  :=       0.0037;
+  b7pR_MBRBR  :=       0.0025;        b7gR_MBRBR  :=       0.0102;
+  b8pR_MBRBR  :=       0.0000;        b8gR_MBRBR  :=       0.0019;
+  b9pR_MBRBR  :=       0.0000;        b9gR_MBRBR  :=       0.0046;
+ b10pR_MBRBR  :=       0.0007;       b10gR_MBRBR  :=       0.0010;
+ b11pR_MBRBR  :=       0.0005;       b11gR_MBRBR  :=       0.0002;
+!                    AVERAGE
+  a1pM_MBRBR  :=       0.0000;        a1gM_MBRBR  :=       0.0000;
+  a2pM_MBRBR  :=       0.5960;        a2gM_MBRBR  :=      -0.5610;
+  a3pM_MBRBR  :=       0.0720;        a3gM_MBRBR  :=      -0.0400;
+  a4pM_MBRBR  :=      -0.1310;        a4gM_MBRBR  :=      -0.1480;
+  a5pM_MBRBR  :=       0.0000;        a5gM_MBRBR  :=      -0.0080;
+  a6pM_MBRBR  :=       0.0185;        a6gM_MBRBR  :=      -0.0073;
+  a7pM_MBRBR  :=      -0.0026;        a7gM_MBRBR  :=      -0.0007;
+  a8pM_MBRBR  :=      -0.0017;        a8gM_MBRBR  :=       0.0006;
+  a9pM_MBRBR  :=      -0.0007;        a9gM_MBRBR  :=       0.0006;
+ a10pM_MBRBR  :=       0.0006;       a10gM_MBRBR  :=       0.0000;
+ a11pM_MBRBR  :=       0.0005;       a11gM_MBRBR  :=      -0.0001;
+!                UNCERTAINTY
+  a1pU_MBRBR  :=       0.0000;        a1gU_MBRBR  :=       0.0000;
+  a2pU_MBRBR  :=       0.5254;        a2gU_MBRBR  :=       4.0420;
+  a3pU_MBRBR  :=       0.1336;        a3gU_MBRBR  :=       0.3170;
+  a4pU_MBRBR  :=       0.1029;        a4gU_MBRBR  :=       0.1750;
+  a5pU_MBRBR  :=       0.0177;        a5gU_MBRBR  :=       0.0510;
+  a6pU_MBRBR  :=       0.0491;        a6gU_MBRBR  :=       0.0840;
+  a7pU_MBRBR  :=       0.0051;        a7gU_MBRBR  :=       0.0062;
+  a8pU_MBRBR  :=       0.0073;        a8gU_MBRBR  :=       0.0169;
+  a9pU_MBRBR  :=       0.0011;        a9gU_MBRBR  :=       0.0010;
+ a10pU_MBRBR  :=       0.0019;       a10gU_MBRBR  :=       0.0016;
+ a11pU_MBRBR  :=       0.0000;       a11gU_MBRBR  :=       0.0006;
+!          STANDARD DEVIATION
+  a1pR_MBRBR  :=       0.0000;        a1gR_MBRBR  :=       0.0000;
+  a2pR_MBRBR  :=       0.1217;        a2gR_MBRBR  :=       1.0540;
+  a3pR_MBRBR  :=       0.0491;        a3gR_MBRBR  :=       0.1980;
+  a4pR_MBRBR  :=       0.0320;        a4gR_MBRBR  :=       0.1260;
+  a5pR_MBRBR  :=       0.0088;        a5gR_MBRBR  :=       0.0380;
+  a6pR_MBRBR  :=       0.0106;        a6gR_MBRBR  :=       0.0558;
+  a7pR_MBRBR  :=       0.0017;        a7gR_MBRBR  :=       0.0047;
+  a8pR_MBRBR  :=       0.0026;        a8gR_MBRBR  :=       0.0113;
+  a9pR_MBRBR  :=       0.0004;        a9gR_MBRBR  :=       0.0007;
+ a10pR_MBRBR  :=       0.0010;       a10gR_MBRBR  :=       0.0010;
+ a11pR_MBRBR  :=       0.0000;       a11gR_MBRBR  :=       0.0004;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRBLEND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2/D4a/D4b
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRBLEND  :=    0.0000;        b1gM_MBRBLEND  :=    0.0000;
+  b2pM_MBRBLEND  :=    0.0930;        b2gM_MBRBLEND  :=   -0.5610;
+  b3pM_MBRBLEND  :=   -1.5940;        b3gM_MBRBLEND  :=    7.8260;
+  b4pM_MBRBLEND  :=    0.0040;        b4gM_MBRBLEND  :=    0.0590;
+  b5pM_MBRBLEND  :=    0.0370;        b5gM_MBRBLEND  :=    0.4860;
+  b6pM_MBRBLEND  :=   -0.0037;        b6gM_MBRBLEND  :=   -0.0045;
+  b7pM_MBRBLEND  :=    0.0139;        b7gM_MBRBLEND  :=    0.0920;
+  b8pM_MBRBLEND  :=    0.0002;        b8gM_MBRBLEND  :=    0.0020;
+  b9pM_MBRBLEND  :=   -0.0011;        b9gM_MBRBLEND  :=    0.0036;
+ b10pM_MBRBLEND  :=   -0.0001;       b10gM_MBRBLEND  :=   -0.0007;
+ b11pM_MBRBLEND  :=    0.0001;       b11gM_MBRBLEND  :=   -0.0016;
+!                UNCERTAINTY
+  b1pU_MBRBLEND  :=    0.0000;        b1gU_MBRBLEND  :=    0.0000;
+  b2pU_MBRBLEND  :=    0.0000;        b2gU_MBRBLEND  :=    1.5370;
+  b3pU_MBRBLEND  :=    0.0000;        b3gU_MBRBLEND  :=    1.3560;
+  b4pU_MBRBLEND  :=    0.0000;        b4gU_MBRBLEND  :=    0.2290;
+  b5pU_MBRBLEND  :=    0.0298;        b5gU_MBRBLEND  :=    0.1470;
+  b6pU_MBRBLEND  :=    0.0000;        b6gU_MBRBLEND  :=    0.0425;
+  b7pU_MBRBLEND  :=    0.0000;        b7gU_MBRBLEND  :=    0.0108;
+  b8pU_MBRBLEND  :=    0.0000;        b8gU_MBRBLEND  :=    0.0043;
+  b9pU_MBRBLEND  :=    0.0000;        b9gU_MBRBLEND  :=    0.0035;
+ b10pU_MBRBLEND  :=    0.0000;       b10gU_MBRBLEND  :=    0.0025;
+ b11pU_MBRBLEND  :=    0.0000;       b11gU_MBRBLEND  :=    0.0007;
+!          STANDARD DEVIATION
+  b1pR_MBRBLEND  :=    0.0000;        b1gR_MBRBLEND  :=    0.0000;
+  b2pR_MBRBLEND  :=    0.0000;        b2gR_MBRBLEND  :=    0.6710;
+  b3pR_MBRBLEND  :=    0.0000;        b3gR_MBRBLEND  :=    0.5100;
+  b4pR_MBRBLEND  :=    0.0000;        b4gR_MBRBLEND  :=    0.0710;
+  b5pR_MBRBLEND  :=    0.0000;        b5gR_MBRBLEND  :=    0.0470;
+  b6pR_MBRBLEND  :=    0.0000;        b6gR_MBRBLEND  :=    0.0174;
+  b7pR_MBRBLEND  :=    0.0010;        b7gR_MBRBLEND  :=    0.0048;
+  b8pR_MBRBLEND  :=    0.0000;        b8gR_MBRBLEND  :=    0.0017;
+  b9pR_MBRBLEND  :=    0.0000;        b9gR_MBRBLEND  :=    0.0012;
+ b10pR_MBRBLEND  :=    0.0000;       b10gR_MBRBLEND  :=    0.0008;
+ b11pR_MBRBLEND  :=    0.0000;       b11gR_MBRBLEND  :=    0.0003;
+!                    AVERAGE
+  a1pM_MBRBLEND  :=    0.0000;        a1gM_MBRBLEND  :=    0.0000;
+  a2pM_MBRBLEND  :=   -0.6580;        a2gM_MBRBLEND  :=    0.7260;
+  a3pM_MBRBLEND  :=   -0.0400;        a3gM_MBRBLEND  :=   -3.9080;
+  a4pM_MBRBLEND  :=   -0.0660;        a4gM_MBRBLEND  :=    0.2360;
+  a5pM_MBRBLEND  :=    0.0050;        a5gM_MBRBLEND  :=    0.4910;
+  a6pM_MBRBLEND  :=   -0.0045;        a6gM_MBRBLEND  :=    0.0189;
+  a7pM_MBRBLEND  :=    0.0026;        a7gM_MBRBLEND  :=   -0.0942;
+  a8pM_MBRBLEND  :=    0.0004;        a8gM_MBRBLEND  :=    0.0016;
+  a9pM_MBRBLEND  :=   -0.0004;        a9gM_MBRBLEND  :=    0.0107;
+ a10pM_MBRBLEND  :=    0.0000;       a10gM_MBRBLEND  :=    0.0000;
+ a11pM_MBRBLEND  :=    0.0000;       a11gM_MBRBLEND  :=   -0.0006;
+!                UNCERTAINTY
+  a1pU_MBRBLEND  :=    0.0000;        a1gU_MBRBLEND  :=    0.0000;
+  a2pU_MBRBLEND  :=    0.0000;        a2gU_MBRBLEND  :=    2.9050;
+  a3pU_MBRBLEND  :=    0.0000;        a3gU_MBRBLEND  :=    0.4680;
+  a4pU_MBRBLEND  :=    0.0309;        a4gU_MBRBLEND  :=    0.2370;
+  a5pU_MBRBLEND  :=    0.0114;        a5gU_MBRBLEND  :=    0.0640;
+  a6pU_MBRBLEND  :=    0.0135;        a6gU_MBRBLEND  :=    0.0423;
+  a7pU_MBRBLEND  :=    0.0000;        a7gU_MBRBLEND  :=    0.0129;
+  a8pU_MBRBLEND  :=    0.0000;        a8gU_MBRBLEND  :=    0.0052;
+  a9pU_MBRBLEND  :=    0.0000;        a9gU_MBRBLEND  :=    0.0025;
+ a10pU_MBRBLEND  :=    0.0009;       a10gU_MBRBLEND  :=    0.0013;
+ a11pU_MBRBLEND  :=    0.0000;       a11gU_MBRBLEND  :=    0.0005;
+!          STANDARD DEVIATION
+  a1pR_MBRBLEND  :=    0.0000;        a1gR_MBRBLEND  :=    0.0000;
+  a2pR_MBRBLEND  :=    0.0000;        a2gR_MBRBLEND  :=    1.2030;
+  a3pR_MBRBLEND  :=    0.0000;        a3gR_MBRBLEND  :=    0.1810;
+  a4pR_MBRBLEND  :=    0.0000;        a4gR_MBRBLEND  :=    0.0920;
+  a5pR_MBRBLEND  :=    0.0074;        a5gR_MBRBLEND  :=    0.0270;
+  a6pR_MBRBLEND  :=    0.0000;        a6gR_MBRBLEND  :=    0.0144;
+  a7pR_MBRBLEND  :=    0.0000;        a7gR_MBRBLEND  :=    0.0057;
+  a8pR_MBRBLEND  :=    0.0000;        a8gR_MBRBLEND  :=    0.0022;
+  a9pR_MBRBLEND  :=    0.0000;        a9gR_MBRBLEND  :=    0.0010;
+ a10pR_MBRBLEND  :=    0.0000;       a10gR_MBRBLEND  :=    0.0005;
+ a11pR_MBRBLEND  :=    0.0000;       a11gR_MBRBLEND  :=    0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBRBREND ************************
+! ***** Generated   : 19-OCT-02
+! ***** Version     : Feb 04 1998 agsrhichome.bnl.gov/LHC/bnl
+!                     V2.0 D2/D4a/D4b
+! ***** Rescaled to 17mm reference radius
+! -----------------------------------------------------------------------
+!                    AVERAGE
+  b1pM_MBRBREND  :=    0.0000;        b1gM_MBRBREND  :=    0.0000;
+  b2pM_MBRBREND  :=    0.8100;        b2gM_MBRBREND  :=   -0.4730;
+  b3pM_MBRBREND  :=   -1.3750;        b3gM_MBRBREND  :=    1.0590;
+  b4pM_MBRBREND  :=   -0.0090;        b4gM_MBRBREND  :=   -0.0350;
+  b5pM_MBRBREND  :=   -0.0070;        b5gM_MBRBREND  :=    0.1550;
+  b6pM_MBRBREND  :=    0.0094;        b6gM_MBRBREND  :=   -0.0130;
+  b7pM_MBRBREND  :=    0.0140;        b7gM_MBRBREND  :=    0.0069;
+  b8pM_MBRBREND  :=   -0.0018;        b8gM_MBRBREND  :=    0.0017;
+  b9pM_MBRBREND  :=   -0.0023;        b9gM_MBRBREND  :=   -0.0084;
+ b10pM_MBRBREND  :=   -0.0016;       b10gM_MBRBREND  :=   -0.0004;
+ b11pM_MBRBREND  :=    0.0001;       b11gM_MBRBREND  :=   -0.0029;
+!                UNCERTAINTY
+  b1pU_MBRBREND  :=    0.0000;        b1gU_MBRBREND  :=    0.0000;
+  b2pU_MBRBREND  :=    0.4676;        b2gU_MBRBREND  :=    1.2280;
+  b3pU_MBRBREND  :=    0.0000;        b3gU_MBRBREND  :=    1.2330;
+  b4pU_MBRBREND  :=    0.0000;        b4gU_MBRBREND  :=    0.1140;
+  b5pU_MBRBREND  :=    0.0000;        b5gU_MBRBREND  :=    0.1420;
+  b6pU_MBRBREND  :=    0.0000;        b6gU_MBRBREND  :=    0.0246;
+  b7pU_MBRBREND  :=    0.0000;        b7gU_MBRBREND  :=    0.0130;
+  b8pU_MBRBREND  :=    0.0030;        b8gU_MBRBREND  :=    0.0047;
+  b9pU_MBRBREND  :=    0.0000;        b9gU_MBRBREND  :=    0.0035;
+ b10pU_MBRBREND  :=    0.0010;       b10gU_MBRBREND  :=    0.0024;
+ b11pU_MBRBREND  :=    0.0000;       b11gU_MBRBREND  :=    0.0007;
+!          STANDARD DEVIATION
+  b1pR_MBRBREND  :=    0.0000;        b1gR_MBRBREND  :=    0.0000;
+  b2pR_MBRBREND  :=    0.0300;        b2gR_MBRBREND  :=    0.4500;
+  b3pR_MBRBREND  :=    0.0000;        b3gR_MBRBREND  :=    0.5370;
+  b4pR_MBRBREND  :=    0.0000;        b4gR_MBRBREND  :=    0.0500;
+  b5pR_MBRBREND  :=    0.0000;        b5gR_MBRBREND  :=    0.0490;
+  b6pR_MBRBREND  :=    0.0000;        b6gR_MBRBREND  :=    0.0091;
+  b7pR_MBRBREND  :=    0.0000;        b7gR_MBRBREND  :=    0.0062;
+  b8pR_MBRBREND  :=    0.0008;        b8gR_MBRBREND  :=    0.0017;
+  b9pR_MBRBREND  :=    0.0000;        b9gR_MBRBREND  :=    0.0015;
+ b10pR_MBRBREND  :=    0.0000;       b10gR_MBRBREND  :=    0.0011;
+ b11pR_MBRBREND  :=    0.0000;       b11gR_MBRBREND  :=    0.0003;
+!                    AVERAGE
+  a1pM_MBRBREND  :=    0.0000;        a1gM_MBRBREND  :=    0.0000;
+  a2pM_MBRBREND  :=   -0.8920;        a2gM_MBRBREND  :=    0.3010;
+  a3pM_MBRBREND  :=   -0.1400;        a3gM_MBRBREND  :=    0.6150;
+  a4pM_MBRBREND  :=   -0.0460;        a4gM_MBRBREND  :=    0.0280;
+  a5pM_MBRBREND  :=   -0.0150;        a5gM_MBRBREND  :=    0.0210;
+  a6pM_MBRBREND  :=   -0.0138;        a6gM_MBRBREND  :=    0.0251;
+  a7pM_MBRBREND  :=    0.0020;        a7gM_MBRBREND  :=    0.0026;
+  a8pM_MBRBREND  :=    0.0014;        a8gM_MBRBREND  :=    0.0001;
+  a9pM_MBRBREND  :=   -0.0008;        a9gM_MBRBREND  :=    0.0039;
+ a10pM_MBRBREND  :=   -0.0003;       a10gM_MBRBREND  :=    0.0001;
+ a11pM_MBRBREND  :=    0.0000;       a11gM_MBRBREND  :=    0.0004;
+!                UNCERTAINTY
+  a1pU_MBRBREND  :=    0.0000;        a1gU_MBRBREND  :=    0.0000;
+  a2pU_MBRBREND  :=    0.5882;        a2gU_MBRBREND  :=    3.0610;
+  a3pU_MBRBREND  :=    0.0759;        a3gU_MBRBREND  :=    0.4770;
+  a4pU_MBRBREND  :=    0.0000;        a4gU_MBRBREND  :=    0.2310;
+  a5pU_MBRBREND  :=    0.0115;        a5gU_MBRBREND  :=    0.0660;
+  a6pU_MBRBREND  :=    0.0000;        a6gU_MBRBREND  :=    0.0355;
+  a7pU_MBRBREND  :=    0.0000;        a7gU_MBRBREND  :=    0.0122;
+  a8pU_MBRBREND  :=    0.0000;        a8gU_MBRBREND  :=    0.0072;
+  a9pU_MBRBREND  :=    0.0000;        a9gU_MBRBREND  :=    0.0022;
+ a10pU_MBRBREND  :=    0.0008;       a10gU_MBRBREND  :=    0.0031;
+ a11pU_MBRBREND  :=    0.0003;       a11gU_MBRBREND  :=    0.0004;
+!          STANDARD DEVIATION
+  a1pR_MBRBREND  :=    0.0000;        a1gR_MBRBREND  :=    0.0000;
+  a2pR_MBRBREND  :=    0.0000;        a2gR_MBRBREND  :=    1.3000;
+  a3pR_MBRBREND  :=    0.0000;        a3gR_MBRBREND  :=    0.1560;
+  a4pR_MBRBREND  :=    0.0000;        a4gR_MBRBREND  :=    0.0980;
+  a5pR_MBRBREND  :=    0.0000;        a5gR_MBRBREND  :=    0.0230;
+  a6pR_MBRBREND  :=    0.0000;        a6gR_MBRBREND  :=    0.0143;
+  a7pR_MBRBREND  :=    0.0000;        a7gR_MBRBREND  :=    0.0045;
+  a8pR_MBRBREND  :=    0.0000;        a8gR_MBRBREND  :=    0.0025;
+  a9pR_MBRBREND  :=    0.0004;        a9gR_MBRBREND  :=    0.0008;
+ a10pR_MBRBREND  :=    0.0005;       a10gR_MBRBREND  :=    0.0014;
+ a11pR_MBRBREND  :=    0.0000;       a11gR_MBRBREND  :=    0.0002;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MBXW ****************************
+! ***** Generated   : 27-01-05  MG
+! ***** Version     : inj. values are from 40 A meas.
+!                     coll values are form 830 A meas
+! Magnetic errors from measurements of MBXW001 and MBXW009 by D. Cornuet
+! -----------------------------------------------------------------------
+!               AVERAGE
+b1pM_MBXW  :=   0.000;       b1gM_MBXW :=       0.000;       b1tM_MBXW :=       0.000;
+b2pM_MBXW  :=   0.000;       b2gM_MBXW :=       0.000;       b2tM_MBXW :=       0.000;
+b3pM_MBXW  :=   0.955;       b3gM_MBXW :=      -0.934;       b3tM_MBXW :=       0.000;
+b4pM_MBXW  :=  -0.041;       b4gM_MBXW :=       0.014;       b4tM_MBXW :=       0.000;
+b5pM_MBXW  :=  -0.043;       b5gM_MBXW :=       0.116;       b5tM_MBXW :=       0.000;
+b6pM_MBXW  :=  -0.023;       b6gM_MBXW :=      -0.007;       b6tM_MBXW :=       0.000;
+b7pM_MBXW  :=  -0.014;       b7gM_MBXW :=      -0.012;       b7tM_MBXW :=       0.000;
+b8pM_MBXW  :=   0.010;       b8gM_MBXW :=       0.003;       b8tM_MBXW :=       0.000;
+b9pM_MBXW  :=  -0.014;       b9gM_MBXW :=       0.006;       b9tM_MBXW :=       0.000;
+b10pM_MBXW :=   0.006;       b10gM_MBXW:=       0.001;       b10tM_MBXW:=       0.000;
+b11pM_MBXW :=   0.000;       b11gM_MBXW:=       0.000;       b11tM_MBXW:=       0.000;
+!               UNCERTAINTY
+b1pU_MBXW  :=   0.000;       b1gU_MBXW :=       0.000;       b1tU_MBXW :=       0.000;
+b2pU_MBXW  :=   0.000;       b2gU_MBXW :=       0.000;       b2tU_MBXW :=       0.000;
+b3pU_MBXW  :=   0.000;       b3gU_MBXW :=       0.000;       b3tU_MBXW :=       0.000;
+b4pU_MBXW  :=   0.000;       b4gU_MBXW :=       0.000;       b4tU_MBXW :=       0.000;
+b5pU_MBXW  :=   0.000;       b5gU_MBXW :=       0.000;       b5tU_MBXW :=       0.000;
+b6pU_MBXW  :=   0.000;       b6gU_MBXW :=       0.000;       b6tU_MBXW :=       0.000;
+b7pU_MBXW  :=   0.000;       b7gU_MBXW :=       0.000;       b7tU_MBXW :=       0.000;
+b8pU_MBXW  :=   0.000;       b8gU_MBXW :=       0.000;       b8tU_MBXW :=       0.000;
+b9pU_MBXW  :=   0.000;       b9gU_MBXW :=       0.000;       b9tU_MBXW :=       0.000;
+b10pU_MBXW :=   0.000;       b10gU_MBXW:=       0.000;       b10tU_MBXW:=       0.000;
+b11pU_MBXW :=   0.000;       b11gU_MBXW:=       0.000;       b11tU_MBXW:=       0.000;
+!               STANDARD DEVIATION
+b1pR_MBXW  :=   0.000;       b1gR_MBXW :=       0.000;       b1tR_MBXW :=       0.000;
+b2pR_MBXW  :=   0.000;       b2gR_MBXW :=       0.000;       b2tR_MBXW :=       0.000;
+b3pR_MBXW  :=   0.309;       b3gR_MBXW :=       0.276;       b3tR_MBXW :=       0.000;
+b4pR_MBXW  :=   0.000;       b4gR_MBXW :=       0.041;       b4tR_MBXW :=       0.000;
+b5pR_MBXW  :=   0.162;       b5gR_MBXW :=       0.137;       b5tR_MBXW :=       0.000;
+b6pR_MBXW  :=   0.038;       b6gR_MBXW :=       0.009;       b6tR_MBXW :=       0.000;
+b7pR_MBXW  :=   0.025;       b7gR_MBXW :=       0.029;       b7tR_MBXW :=       0.000;
+b8pR_MBXW  :=   0.008;       b8gR_MBXW :=       0.004;       b8tR_MBXW :=       0.000;
+b9pR_MBXW  :=   0.012;       b9gR_MBXW :=       0.008;       b9tR_MBXW :=       0.000;
+b10pR_MBXW :=   0.006;       b10gR_MBXW:=       0.001;       b10tR_MBXW:=       0.000;
+b11pR_MBXW :=   0.000;       b11gR_MBXW:=       0.000;       b11tR_MBXW:=       0.000;
+!               AVERAGE
+a1pM_MBXW  :=   0.000;       a1gM_MBXW :=       0.000;       a1tM_MBXW :=       0.000;
+a2pM_MBXW  :=   0.000;       a2gM_MBXW :=       0.000;       a2tM_MBXW :=       0.000;
+a3pM_MBXW  :=   0.014;       a3gM_MBXW :=       0.001;       a3tM_MBXW :=       0.000;
+a4pM_MBXW  :=  -0.037;       a4gM_MBXW :=      -0.007;       a4tM_MBXW :=       0.000;
+a5pM_MBXW  :=  -0.023;       a5gM_MBXW :=       0.005;       a5tM_MBXW :=       0.000;
+a6pM_MBXW  :=   0.003;       a6gM_MBXW :=      -0.001;       a6tM_MBXW :=       0.000;
+a7pM_MBXW  :=  -0.014;       a7gM_MBXW :=      -0.002;       a7tM_MBXW :=       0.000;
+a8pM_MBXW  :=  -0.001;       a8gM_MBXW :=       0.001;       a8tM_MBXW :=       0.000;
+a9pM_MBXW  :=  -0.008;       a9gM_MBXW :=       0.000;       a9tM_MBXW :=       0.000;
+a10pM_MBXW :=  -0.002;       a10gM_MBXW:=       0.000;       a10tM_MBXW:=       0.000;
+a11pM_MBXW :=   0.000;       a11gM_MBXW:=       0.000;       a11tM_MBXW:=       0.000;
+!               UNCERTAINTY
+a1pU_MBXW  :=   0.000;       a1gU_MBXW :=       0.000;       a1tU_MBXW :=       0.000;
+a2pU_MBXW  :=   0.000;       a2gU_MBXW :=       0.000;       a2tU_MBXW :=       0.000;
+a3pU_MBXW  :=   0.000;       a3gU_MBXW :=       0.000;       a3tU_MBXW :=       0.000;
+a4pU_MBXW  :=   0.000;       a4gU_MBXW :=       0.000;       a4tU_MBXW :=       0.000;
+a5pU_MBXW  :=   0.000;       a5gU_MBXW :=       0.000;       a5tU_MBXW :=       0.000;
+a6pU_MBXW  :=   0.000;       a6gU_MBXW :=       0.000;       a6tU_MBXW :=       0.000;
+a7pU_MBXW  :=   0.000;       a7gU_MBXW :=       0.000;       a7tU_MBXW :=       0.000;
+a8pU_MBXW  :=   0.000;       a8gU_MBXW :=       0.000;       a8tU_MBXW :=       0.000;
+a9pU_MBXW  :=   0.000;       a9gU_MBXW :=       0.000;       a9tU_MBXW :=       0.000;
+a10pU_MBXW :=   0.000;       a10gU_MBXW:=       0.000;       a10tU_MBXW:=       0.000;
+a11pU_MBXW :=   0.000;       a11gU_MBXW:=       0.000;       a11tU_MBXW:=       0.000;
+!               STANDARD DEVIATION
+a1pR_MBXW  :=   0.000;       a1gR_MBXW :=       0.000;       a1tR_MBXW :=       0.000;
+a2pR_MBXW  :=   0.000;       a2gR_MBXW :=       0.000;       a2tR_MBXW :=       0.000;
+a3pR_MBXW  :=   0.000;       a3gR_MBXW :=       0.037;       a3tR_MBXW :=       0.000;
+a4pR_MBXW  :=   0.055;       a4gR_MBXW :=       0.019;       a4tR_MBXW :=       0.000;
+a5pR_MBXW  :=   0.027;       a5gR_MBXW :=       0.008;       a5tR_MBXW :=       0.000;
+a6pR_MBXW  :=   0.044;       a6gR_MBXW :=       0.001;       a6tR_MBXW :=       0.000;
+a7pR_MBXW  :=   0.005;       a7gR_MBXW :=       0.001;       a7tR_MBXW :=       0.000;
+a8pR_MBXW  :=   0.022;       a8gR_MBXW :=       0.002;       a8tR_MBXW :=       0.000;
+a9pR_MBXW  :=   0.000;       a9gR_MBXW :=       0.001;       a9tR_MBXW :=       0.000;
+a10pR_MBXW :=   0.004;       a10gR_MBXW:=       0.001;       a10tR_MBXW:=       0.000;
+a11pR_MBXW :=   0.000;       a11gR_MBXW:=       0.000;       a11tR_MBXW:=       0.000;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MQ ******************************
+! ***** Generated   : 23-2-04
+! ***** Version     : ???????
+! -----------------------------------------------------------------------
+!                                      AVERAGE
+b1pM_MQ  :=   0.0000;     b1gM_MQ :=   0.4830;     b1tM_MQ :=   0.0000;
+b2pM_MQ  :=  -5.6000;     b2gM_MQ :=   0.0000;     b2tM_MQ :=  16.8200;
+b3pM_MQ  :=   0.0000;     b3gM_MQ :=   0.0000;     b3tM_MQ :=   0.0000;
+b4pM_MQ  :=   0.0000;     b4gM_MQ :=   0.0000;     b4tM_MQ :=   0.2000;
+b5pM_MQ  :=   0.0000;     b5gM_MQ :=   0.0000;     b5tM_MQ :=   0.0000;
+b6pM_MQ  :=  -4.5000;     b6gM_MQ :=   3.5000;     b6tM_MQ :=   0.1670;
+b7pM_MQ  :=   0.0000;     b7gM_MQ :=   0.0000;     b7tM_MQ :=   0.0000;
+b8pM_MQ  :=   0.0000;     b8gM_MQ :=   0.2170;     b8tM_MQ :=   0.0000;
+b9pM_MQ  :=   0.0000;     b9gM_MQ :=   0.0000;     b9tM_MQ :=   0.0000;
+b10pM_MQ :=   0.1260;     b10gM_MQ:=  -0.4180;     b10tM_MQ:=  -0.0560;
+b11pM_MQ :=   0.0000;     b11gM_MQ:=   0.0000;     b11tM_MQ:=   0.0000;
+!                                    UNCERTAINTY
+b1pU_MQ  :=        0;     b1gU_MQ :=        0;     b1tU_MQ :=        0;
+b2pU_MQ  :=   0.5600;     b2gU_MQ :=  10.0000;     b2tU_MQ :=   5.0100;
+b3pU_MQ  :=        0;     b3gU_MQ :=   2.00  ;     b3tU_MQ :=        0;
+b4pU_MQ  :=        0;     b4gU_MQ :=   1.0   ;     b4tU_MQ :=        0;
+b5pU_MQ  :=        0;     b5gU_MQ :=   1.0   ;     b5tU_MQ :=        0;
+b6pU_MQ  :=   0.45  ;     b6gU_MQ :=   2.0   ;     b6tU_MQ :=   0.0490;
+b7pU_MQ  :=        0;     b7gU_MQ :=   0.4   ;     b7tU_MQ :=        0;
+b8pU_MQ  :=        0;     b8gU_MQ :=        0;     b8tU_MQ :=        0;
+b9pU_MQ  :=        0;     b9gU_MQ :=        0;     b9tU_MQ :=        0;
+b10pU_MQ :=   0.0140;     b10gU_MQ:=   0.6980;     b10tU_MQ:=   0.0210;
+b11pU_MQ :=        0;     b11gU_MQ:=        0;     b11tU_MQ:=        0;
+!                                STANDARD DEVIATION
+b1pR_MQ  :=   0.7470;     b1gR_MQ :=        0;     b1tR_MQ :=   0.9410;
+b2pR_MQ  :=   0.5000;     b2gR_MQ :=  10.0000;     b2tR_MQ :=   2.7000;
+b3pR_MQ  :=   0.3620;     b3gR_MQ :=   1.3   ;     b3tR_MQ :=   1.7000;
+b4pR_MQ  :=   0.0000;     b4gR_MQ :=   0.3   ;     b4tR_MQ :=   0.5780;
+b5pR_MQ  :=   0.1330;     b5gR_MQ :=   0.5   ;     b5tR_MQ :=   0.2460;
+b6pR_MQ  :=   0.0580;     b6gR_MQ :=   0.6   ;     b6tR_MQ :=   0.1000;
+b7pR_MQ  :=        0;     b7gR_MQ :=   0.1420;     b7tR_MQ :=        0;
+b8pR_MQ  :=        0;     b8gR_MQ :=   0.2410;     b8tR_MQ :=        0;
+b9pR_MQ  :=        0;     b9gR_MQ :=   0.4100;     b9tR_MQ :=        0;
+b10pR_MQ :=        0;     b10gR_MQ:=   0.3490;     b10tR_MQ:=        0;
+b11pR_MQ :=        0;     b11gR_MQ:=   0.2370;     b11tR_MQ:=        0;
+!                                      AVERAGE
+a1pM_MQ  :=   0.0000;     a1gM_MQ :=   0.0000;     a1tM_MQ :=   0.0000;
+a2pM_MQ  :=   0.0000;     a2gM_MQ :=   0.0000;     a2tM_MQ :=   0.0000;
+a3pM_MQ  :=   0.0000;     a3gM_MQ :=   0.0000;     a3tM_MQ :=   0.0000;
+a4pM_MQ  :=   0.0000;     a4gM_MQ :=   0.0000;     a4tM_MQ :=   0.0000;
+a5pM_MQ  :=   0.0000;     a5gM_MQ :=   0.0000;     a5tM_MQ :=   0.0000;
+a6pM_MQ  :=   0.0000;     a6gM_MQ :=   0.0000;     a6tM_MQ :=   0.0000;
+a7pM_MQ  :=   0.0000;     a7gM_MQ :=   0.0000;     a7tM_MQ :=   0.0000;
+a8pM_MQ  :=   0.0000;     a8gM_MQ :=   0.0000;     a8tM_MQ :=   0.0000;
+a9pM_MQ  :=   0.0000;     a9gM_MQ :=   0.0000;     a9tM_MQ :=   0.0000;
+a10pM_MQ :=   0.0000;     a10gM_MQ:=   0.0000;     a10tM_MQ:=   0.0000;
+a11pM_MQ :=   0.0000;     a11gM_MQ:=   0.0000;     a11tM_MQ:=   0.0000;
+!                                    UNCERTAINTY
+a1pU_MQ  :=        0;    a1gU_MQ  :=        0;      a1tU_MQ :=      0;
+a2pU_MQ  :=        0;    a2gU_MQ  :=        0;      a2tU_MQ :=      0;
+a3pU_MQ  :=        0;    a3gU_MQ  :=   4.0   ;      a3tU_MQ :=      0;
+a4pU_MQ  :=        0;    a4gU_MQ  :=   1.0   ;      a4tU_MQ :=      0;
+a5pU_MQ  :=        0;    a5gU_MQ  :=   1.0   ;      a5tU_MQ :=      0;
+a6pU_MQ  :=        0;    a6gU_MQ  :=   2.0   ;      a6tU_MQ :=      0;
+a7pU_MQ  :=        0;    a7gU_MQ  :=   0.4   ;      a7tU_MQ :=      0;
+a8pU_MQ  :=        0;    a8gU_MQ  :=        0;      a8tU_MQ :=      0;
+a9pU_MQ  :=        0;    a9gU_MQ  :=        0;      a9tU_MQ :=      0;
+a10pU_MQ :=        0;    a10gU_MQ :=        0;      a10tU_MQ:=      0;
+a11pU_MQ :=        0;    a11gU_MQ :=        0;      a11tU_MQ:=      0;
+!                                STANDARD DEVIATION
+a1pR_MQ  :=   0.7470;     a1gR_MQ :=        0;     a1tR_MQ :=   0.9410;
+a2pR_MQ  :=        0;     a2gR_MQ :=        0;     a2tR_MQ :=   0.5000;
+a3pR_MQ  :=   0.3620;     a3gR_MQ :=   1.4   ;     a3tR_MQ :=   1.7000;
+a4pR_MQ  :=   0.3840;     a4gR_MQ :=   1.3   ;     a4tR_MQ :=   1.1560;
+a5pR_MQ  :=   0.1330;     a5gR_MQ :=   0.5   ;     a5tR_MQ :=   0.2460;
+a6pR_MQ  :=        0;     a6gR_MQ :=   0.4180;     a6tR_MQ :=   0.1000;
+a7pR_MQ  :=        0;     a7gR_MQ :=   0.1420;     a7tR_MQ :=        0;
+a8pR_MQ  :=        0;     a8gR_MQ :=   0.2410;     a8tR_MQ :=        0;
+a9pR_MQ  :=        0;     a9gR_MQ :=   0.4100;     a9tR_MQ :=        0;
+a10pR_MQ :=        0;     a10gR_MQ:=   0.3490;     a10tR_MQ:=        0;
+a11pR_MQ :=        0;     a11gR_MQ:=   0.2370;     a11tR_MQ:=        0;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MQXA1 ***************************
+! Measured field quality for MQXA in Q1
+! -----------------------------------------------------------------------
+!
+!                                AVERAGE
+b1pM_MQXA1  :=   0.000; b1gM_MQXA1 :=    0.000; b1tM_MQXA1 :=   0.000;
+b2pM_MQXA1  :=   0.000; b2gM_MQXA1 :=    0.000; b2tM_MQXA1 :=   0.000;
+b3pM_MQXA1  :=  -0.120; b3gM_MQXA1 :=    0.037; b3tM_MQXA1 :=   0.000;
+b4pM_MQXA1  :=  -0.018; b4gM_MQXA1 :=    1.266; b4tM_MQXA1 :=   0.000;
+b5pM_MQXA1  :=   0.031; b5gM_MQXA1 :=   -0.011; b5tM_MQXA1 :=   0.000;
+b6pM_MQXA1  :=  -1.066; b6gM_MQXA1 :=    0.363; b6tM_MQXA1 :=   0.000;
+b7pM_MQXA1  :=  -0.006; b7gM_MQXA1 :=   -0.004; b7tM_MQXA1 :=   0.000;
+b8pM_MQXA1  :=   0.006; b8gM_MQXA1 :=    0.022; b8tM_MQXA1 :=   0.000;
+b9pM_MQXA1  :=  -0.007; b9gM_MQXA1 :=   -0.001; b9tM_MQXA1 :=   0.000;
+b10pM_MQXA1 :=   0.061; b10gM_MQXA1:=   -0.014; b10tM_MQXA1:=   0.000;
+b11pM_MQXA1 :=   0.000; b11gM_MQXA1:=    0.000; b11tM_MQXA1:=   0.000;
+!                                    UNCERTAINTY
+b1pU_MQXA1  :=   0.000; b1gU_MQXA1 :=    0.000; b1tU_MQXA1 :=   0.000;
+b2pU_MQXA1  :=   0.000; b2gU_MQXA1 :=    0.000; b2tU_MQXA1 :=   0.000;
+b3pU_MQXA1  :=   0.000; b3gU_MQXA1 :=    0.000; b3tU_MQXA1 :=   0.000;
+b4pU_MQXA1  :=   0.000; b4gU_MQXA1 :=    0.000; b4tU_MQXA1 :=   0.000;
+b5pU_MQXA1  :=   0.000; b5gU_MQXA1 :=    0.000; b5tU_MQXA1 :=   0.000;
+b6pU_MQXA1  :=   0.000; b6gU_MQXA1 :=    0.000; b6tU_MQXA1 :=   0.000;
+b7pU_MQXA1  :=   0.000; b7gU_MQXA1 :=    0.000; b7tU_MQXA1 :=   0.000;
+b8pU_MQXA1  :=   0.000; b8gU_MQXA1 :=    0.000; b8tU_MQXA1 :=   0.000;
+b9pU_MQXA1  :=   0.000; b9gU_MQXA1 :=    0.000; b9tU_MQXA1 :=   0.000;
+b10pU_MQXA1 :=   0.000; b10gU_MQXA1:=    0.000; b10tU_MQXA1:=   0.000;
+b11pU_MQXA1 :=   0.000; b11gU_MQXA1:=    0.000; b11tU_MQXA1:=   0.000;
+!                                STANDARD DEVIATION
+b1pR_MQXA1  :=   0.000; b1gR_MQXA1 :=    0.000; b1tR_MQXA1 :=   0.000;
+b2pR_MQXA1  :=   0.000; b2gR_MQXA1 :=    0.000; b2tR_MQXA1 :=   0.000;
+b3pR_MQXA1  :=   0.681; b3gR_MQXA1 :=    0.378; b3tR_MQXA1 :=   0.000;
+b4pR_MQXA1  :=   0.000; b4gR_MQXA1 :=    0.112; b4tR_MQXA1 :=   0.000;
+b5pR_MQXA1  :=   0.300; b5gR_MQXA1 :=    0.021; b5tR_MQXA1 :=   0.000;
+b6pR_MQXA1  :=   0.102; b6gR_MQXA1 :=    0.104; b6tR_MQXA1 :=   0.000;
+b7pR_MQXA1  :=   0.024; b7gR_MQXA1 :=    0.008; b7tR_MQXA1 :=   0.000;
+b8pR_MQXA1  :=   0.025; b8gR_MQXA1 :=    0.003; b8tR_MQXA1 :=   0.000;
+b9pR_MQXA1  :=   0.027; b9gR_MQXA1 :=    0.009; b9tR_MQXA1 :=   0.000;
+b10pR_MQXA1 :=   0.011; b10gR_MQXA1:=    0.007; b10tR_MQXA1:=   0.000;
+b11pR_MQXA1 :=   0.000; b11gR_MQXA1:=    0.000; b11tR_MQXA1:=   0.000;
+!                                AVERAGE
+a1pM_MQXA1  :=   0.000; a1gM_MQXA1 :=    0.000; a1tM_MQXA1 :=   0.000;
+a2pM_MQXA1  :=   0.000; a2gM_MQXA1 :=    0.000; a2tM_MQXA1 :=   0.000;
+a3pM_MQXA1  :=  -0.223; a3gM_MQXA1 :=    0.327; a3tM_MQXA1 :=   0.000;
+a4pM_MQXA1  :=  -1.880; a4gM_MQXA1 :=   -0.054; a4tM_MQXA1 :=   0.000;
+a5pM_MQXA1  :=   0.011; a5gM_MQXA1 :=    0.002; a5tM_MQXA1 :=   0.000;
+a6pM_MQXA1  :=   0.025; a6gM_MQXA1 :=   -0.025; a6tM_MQXA1 :=   0.000;
+a7pM_MQXA1  :=  -0.012; a7gM_MQXA1 :=    0.001; a7tM_MQXA1 :=   0.000;
+a8pM_MQXA1  :=   0.007; a8gM_MQXA1 :=    0.001; a8tM_MQXA1 :=   0.000;
+a9pM_MQXA1  :=  -0.006; a9gM_MQXA1 :=    0.001; a9tM_MQXA1 :=   0.000;
+a10pM_MQXA1 :=   0.000; a10gM_MQXA1:=   -0.004; a10tM_MQXA1:=   0.000;
+a11pM_MQXA1 :=   0.000; a11gM_MQXA1:=    0.000; a11tM_MQXA1:=   0.000;
+!                                    UNCERTAINTY
+a1pU_MQXA1  :=   0.000; a1gU_MQXA1 :=    0.000; a1tU_MQXA1 :=   0.000;
+a2pU_MQXA1  :=   0.000; a2gU_MQXA1 :=    0.000; a2tU_MQXA1 :=   0.000;
+a3pU_MQXA1  :=   0.000; a3gU_MQXA1 :=    0.000; a3tU_MQXA1 :=   0.000;
+a4pU_MQXA1  :=   0.000; a4gU_MQXA1 :=    0.000; a4tU_MQXA1 :=   0.000;
+a5pU_MQXA1  :=   0.000; a5gU_MQXA1 :=    0.000; a5tU_MQXA1 :=   0.000;
+a6pU_MQXA1  :=   0.000; a6gU_MQXA1 :=    0.000; a6tU_MQXA1 :=   0.000;
+a7pU_MQXA1  :=   0.000; a7gU_MQXA1 :=    0.000; a7tU_MQXA1 :=   0.000;
+a8pU_MQXA1  :=   0.000; a8gU_MQXA1 :=    0.000; a8tU_MQXA1 :=   0.000;
+a9pU_MQXA1  :=   0.000; a9gU_MQXA1 :=    0.000; a9tU_MQXA1 :=   0.000;
+a10pU_MQXA1 :=   0.000; a10gU_MQXA1:=    0.000; a10tU_MQXA1:=   0.000;
+a11pU_MQXA1 :=   0.000; a11gU_MQXA1:=    0.000; a11tU_MQXA1:=   0.000;
+!                                STANDARD DEVIATION
+a1pR_MQXA1  :=   0.000; a1gR_MQXA1 :=    0.000; a1tR_MQXA1 :=   0.000;
+a2pR_MQXA1  :=   0.000; a2gR_MQXA1 :=    0.000; a2tR_MQXA1 :=   0.000;
+a3pR_MQXA1  :=   0.522; a3gR_MQXA1 :=    0.338; a3tR_MQXA1 :=   0.000;
+a4pR_MQXA1  :=   1.035; a4gR_MQXA1 :=    0.342; a4tR_MQXA1 :=   0.000;
+a5pR_MQXA1  :=   0.142; a5gR_MQXA1 :=    0.047; a5tR_MQXA1 :=   0.000;
+a6pR_MQXA1  :=   0.025; a6gR_MQXA1 :=    0.024; a6tR_MQXA1 :=   0.000;
+a7pR_MQXA1  :=   0.020; a7gR_MQXA1 :=    0.007; a7tR_MQXA1 :=   0.000;
+a8pR_MQXA1  :=   0.021; a8gR_MQXA1 :=    0.014; a8tR_MQXA1 :=   0.000;
+a9pR_MQXA1  :=   0.015; a9gR_MQXA1 :=    0.005; a9tR_MQXA1 :=   0.000;
+a10pR_MQXA1 :=   0.000; a10gR_MQXA1:=    0.002; a10tR_MQXA1:=   0.000;
+a11pR_MQXA1 :=   0.000; a11gR_MQXA1:=    0.000; a11tR_MQXA1:=   0.000;
+
+
+! *********************** Magnet type : MQXA3 ***************************
+! Measured field quality for MQXA in Q3 including rotation by pi along the
+! longitudinal axis
+!
+!                                AVERAGE
+b1pM_MQXA3  :=   0.000; b1gM_MQXA3 :=    0.000; b1tM_MQXA3 :=   0.000;
+b2pM_MQXA3  :=   0.000; b2gM_MQXA3 :=    0.000; b2tM_MQXA3 :=   0.000;
+b3pM_MQXA3  :=   0.224; b3gM_MQXA3 :=   -0.061; b3tM_MQXA3 :=   0.000;
+b4pM_MQXA3  :=  -0.035; b4gM_MQXA3 :=    1.343; b4tM_MQXA3 :=   0.000;
+b5pM_MQXA3  :=  -0.061; b5gM_MQXA3 :=   -0.006; b5tM_MQXA3 :=   0.000;
+b6pM_MQXA3  :=  -1.174; b6gM_MQXA3 :=    0.285; b6tM_MQXA3 :=   0.000;
+b7pM_MQXA3  :=  -0.009; b7gM_MQXA3 :=   -0.004; b7tM_MQXA3 :=   0.000;
+b8pM_MQXA3  :=   0.002; b8gM_MQXA3 :=    0.022; b8tM_MQXA3 :=   0.000;
+b9pM_MQXA3  :=  -0.002; b9gM_MQXA3 :=    0.002; b9tM_MQXA3 :=   0.000;
+b10pM_MQXA3 :=   0.054; b10gM_MQXA3:=   -0.014; b10tM_MQXA3:=   0.000;
+b11pM_MQXA3 :=   0.000; b11gM_MQXA3:=    0.000; b11tM_MQXA3:=   0.000;
+!                                    UNCERTAINTY
+b1pU_MQXA3  :=   0.000; b1gU_MQXA3 :=    0.000; b1tU_MQXA3 :=   0.000;
+b2pU_MQXA3  :=   0.000; b2gU_MQXA3 :=    0.000; b2tU_MQXA3 :=   0.000;
+b3pU_MQXA3  :=   0.000; b3gU_MQXA3 :=    0.000; b3tU_MQXA3 :=   0.000;
+b4pU_MQXA3  :=   0.000; b4gU_MQXA3 :=    0.000; b4tU_MQXA3 :=   0.000;
+b5pU_MQXA3  :=   0.000; b5gU_MQXA3 :=    0.000; b5tU_MQXA3 :=   0.000;
+b6pU_MQXA3  :=   0.000; b6gU_MQXA3 :=    0.000; b6tU_MQXA3 :=   0.000;
+b7pU_MQXA3  :=   0.000; b7gU_MQXA3 :=    0.000; b7tU_MQXA3 :=   0.000;
+b8pU_MQXA3  :=   0.000; b8gU_MQXA3 :=    0.000; b8tU_MQXA3 :=   0.000;
+b9pU_MQXA3  :=   0.000; b9gU_MQXA3 :=    0.000; b9tU_MQXA3 :=   0.000;
+b10pU_MQXA3 :=   0.000; b10gU_MQXA3:=    0.000; b10tU_MQXA3:=   0.000;
+b11pU_MQXA3 :=   0.000; b11gU_MQXA3:=    0.000; b11tU_MQXA3:=   0.000;
+!                                STANDARD DEVIATION
+b1pR_MQXA3  :=   0.000; b1gR_MQXA3 :=    0.000; b1tR_MQXA3 :=   0.000;
+b2pR_MQXA3  :=   0.000; b2gR_MQXA3 :=    0.000; b2tR_MQXA3 :=   0.000;
+b3pR_MQXA3  :=   1.226; b3gR_MQXA3 :=    0.221; b3tR_MQXA3 :=   0.000;
+b4pR_MQXA3  :=   0.142; b4gR_MQXA3 :=    0.092; b4tR_MQXA3 :=   0.000;
+b5pR_MQXA3  :=   0.321; b5gR_MQXA3 :=    0.051; b5tR_MQXA3 :=   0.000;
+b6pR_MQXA3  :=   0.244; b6gR_MQXA3 :=    0.025; b6tR_MQXA3 :=   0.000;
+b7pR_MQXA3  :=   0.031; b7gR_MQXA3 :=    0.010; b7tR_MQXA3 :=   0.000;
+b8pR_MQXA3  :=   0.006; b8gR_MQXA3 :=    0.003; b8tR_MQXA3 :=   0.000;
+b9pR_MQXA3  :=   0.000; b9gR_MQXA3 :=    0.003; b9tR_MQXA3 :=   0.000;
+b10pR_MQXA3 :=   0.010; b10gR_MQXA3:=    0.006; b10tR_MQXA3:=   0.000;
+b11pR_MQXA3 :=   0.000; b11gR_MQXA3:=    0.000; b11tR_MQXA3:=   0.000;
+!                                AVERAGE
+a1pM_MQXA3  :=   0.000; a1gM_MQXA3 :=    0.000; a1tM_MQXA3 :=   0.000;
+a2pM_MQXA3  :=   0.000; a2gM_MQXA3 :=    0.000; a2tM_MQXA3 :=   0.000;
+a3pM_MQXA3  :=  -0.541; a3gM_MQXA3 :=   -0.081; a3tM_MQXA3 :=   0.000;
+a4pM_MQXA3  :=  -0.797; a4gM_MQXA3 :=    0.020; a4tM_MQXA3 :=   0.000;
+a5pM_MQXA3  :=  -0.167; a5gM_MQXA3 :=   -0.018; a5tM_MQXA3 :=   0.000;
+a6pM_MQXA3  :=   0.015; a6gM_MQXA3 :=   -0.028; a6tM_MQXA3 :=   0.000;
+a7pM_MQXA3  :=   0.002; a7gM_MQXA3 :=    0.001; a7tM_MQXA3 :=   0.000;
+a8pM_MQXA3  :=  -0.003; a8gM_MQXA3 :=   -0.003; a8tM_MQXA3 :=   0.000;
+a9pM_MQXA3  :=  -0.002; a9gM_MQXA3 :=    0.002; a9tM_MQXA3 :=   0.000;
+a10pM_MQXA3 :=  -0.001; a10gM_MQXA3:=   -0.001; a10tM_MQXA3:=   0.000;
+a11pM_MQXA3 :=   0.000; a11gM_MQXA3:=    0.000; a11tM_MQXA3:=   0.000;
+!                                    UNCERTAINTY
+a1pU_MQXA3  :=   0.000; a1gU_MQXA3 :=    0.000; a1tU_MQXA3 :=   0.000;
+a2pU_MQXA3  :=   0.000; a2gU_MQXA3 :=    0.000; a2tU_MQXA3 :=   0.000;
+a3pU_MQXA3  :=   0.000; a3gU_MQXA3 :=    0.000; a3tU_MQXA3 :=   0.000;
+a4pU_MQXA3  :=   0.000; a4gU_MQXA3 :=    0.000; a4tU_MQXA3 :=   0.000;
+a5pU_MQXA3  :=   0.000; a5gU_MQXA3 :=    0.000; a5tU_MQXA3 :=   0.000;
+a6pU_MQXA3  :=   0.000; a6gU_MQXA3 :=    0.000; a6tU_MQXA3 :=   0.000;
+a7pU_MQXA3  :=   0.000; a7gU_MQXA3 :=    0.000; a7tU_MQXA3 :=   0.000;
+a8pU_MQXA3  :=   0.000; a8gU_MQXA3 :=    0.000; a8tU_MQXA3 :=   0.000;
+a9pU_MQXA3  :=   0.000; a9gU_MQXA3 :=    0.000; a9tU_MQXA3 :=   0.000;
+a10pU_MQXA3 :=   0.000; a10gU_MQXA3:=    0.000; a10tU_MQXA3:=   0.000;
+a11pU_MQXA3 :=   0.000; a11gU_MQXA3:=    0.000; a11tU_MQXA3:=   0.000;
+!                                STANDARD DEVIATION
+a1pR_MQXA3  :=   0.000; a1gR_MQXA3 :=    0.000; a1tR_MQXA3 :=   0.000;
+a2pR_MQXA3  :=   0.000; a2gR_MQXA3 :=    0.000; a2tR_MQXA3 :=   0.000;
+a3pR_MQXA3  :=   0.522; a3gR_MQXA3 :=    0.357; a3tR_MQXA3 :=   0.000;
+a4pR_MQXA3  :=   1.035; a4gR_MQXA3 :=    0.163; a4tR_MQXA3 :=   0.000;
+a5pR_MQXA3  :=   0.142; a5gR_MQXA3 :=    0.026; a5tR_MQXA3 :=   0.000;
+a6pR_MQXA3  :=   0.025; a6gR_MQXA3 :=    0.023; a6tR_MQXA3 :=   0.000;
+a7pR_MQXA3  :=   0.020; a7gR_MQXA3 :=    0.009; a7tR_MQXA3 :=   0.000;
+a8pR_MQXA3  :=   0.021; a8gR_MQXA3 :=    0.013; a8tR_MQXA3 :=   0.000;
+a9pR_MQXA3  :=   0.015; a9gR_MQXA3 :=    0.003; a9tR_MQXA3 :=   0.000;
+a10pR_MQXA3 :=   0.000; a10gR_MQXA3:=    0.002; a10tR_MQXA3:=   0.000;
+a11pR_MQXA3 :=   0.000; a11gR_MQXA3:=    0.000; a11tR_MQXA3:=   0.000;
+
+
+
+! *********************** Magnet type : MQXB ****************************
+
+! ********** *** Magnet type : MQXB as from measurements
+! ***** Generated   : 13-Jul-05; inj -> 669 A; col -> 11345 A
+! ***** Version     : 3
+! ***** Author      : Frank Schmidt
+!-----------------------------------------------------------------------
+!       AVERAGE
+b1pM_MQXB  :=  0.000; b1gM_MQXB :=  0.000; b1tM_MQXB := 0.000;
+b2pM_MQXB  :=  0.000; b2gM_MQXB :=  0.000; b2tM_MQXB := 0.000;
+b3pM_MQXB  :=  0.210; b3gM_MQXB := -0.116; b3tM_MQXB := 0.000;
+b4pM_MQXB  := -0.064; b4gM_MQXB :=  0.096; b4tM_MQXB := 0.000;
+b5pM_MQXB  := -0.022; b5gM_MQXB := -0.032; b5tM_MQXB := 0.000;
+b6pM_MQXB  := -1.710; b6gM_MQXB :=  0.093; b6tM_MQXB := 0.000;
+b7pM_MQXB  :=  0.027; b7gM_MQXB := -0.017; b7tM_MQXB := 0.000;
+b8pM_MQXB  := -0.014; b8gM_MQXB := -0.002; b8tM_MQXB := 0.000;
+b9pM_MQXB  := -0.008; b9gM_MQXB :=  0.004; b9tM_MQXB := 0.000;
+b10pM_MQXB :=  0.041; b10gM_MQXB:=  0.027; b10tM_MQXB:= 0.000;
+b11pM_MQXB :=  0.000; b11gM_MQXB:=  0.000; b11tM_MQXB:= 0.000;
+!       UNCERTAINTY
+b1pU_MQXB  :=  0.000; b1gU_MQXB :=     0.000; b1tU_MQXB := 0.000;
+b2pU_MQXB  :=  0.000; b2gU_MQXB :=     0.000; b2tU_MQXB := 0.000;
+b3pU_MQXB  :=  0.000; b3gU_MQXB :=     0.000; b3tU_MQXB := 0.000;
+b4pU_MQXB  :=  0.000; b4gU_MQXB :=     0.000; b4tU_MQXB := 0.000;
+b5pU_MQXB  :=  0.000; b5gU_MQXB :=     0.000; b5tU_MQXB := 0.000;
+b6pU_MQXB  :=  0.000; b6gU_MQXB :=     0.000; b6tU_MQXB := 0.000;
+b7pU_MQXB  :=  0.000; b7gU_MQXB :=     0.000; b7tU_MQXB := 0.000;
+b8pU_MQXB  :=  0.000; b8gU_MQXB :=     0.000; b8tU_MQXB := 0.000;
+b9pU_MQXB  :=  0.000; b9gU_MQXB :=     0.000; b9tU_MQXB := 0.000;
+b10pU_MQXB :=  0.000; b10gU_MQXB:=     0.000; b10tU_MQXB:= 0.000;
+b11pU_MQXB :=  0.000; b11gU_MQXB:=     0.000; b11tU_MQXB:= 0.000;
+!       STANDARD DEVIATION
+b1pR_MQXB  :=  0.000; b1gR_MQXB :=     0.000; b1tR_MQXB := 0.000;
+b2pR_MQXB  :=  0.000; b2gR_MQXB :=     0.000; b2tR_MQXB := 0.000;
+b3pR_MQXB  :=  0.000; b3gR_MQXB :=     0.787; b3tR_MQXB := 0.000;
+b4pR_MQXB  :=  0.000; b4gR_MQXB :=     0.156; b4tR_MQXB := 0.000;
+b5pR_MQXB  :=  0.000; b5gR_MQXB :=     0.217; b5tR_MQXB := 0.000;
+b6pR_MQXB  :=  0.223; b6gR_MQXB :=     0.309; b6tR_MQXB := 0.000;
+b7pR_MQXB  :=  0.000; b7gR_MQXB :=     0.037; b7tR_MQXB := 0.000;
+b8pR_MQXB  :=  0.010; b8gR_MQXB :=     0.010; b8tR_MQXB := 0.000;
+b9pR_MQXB  :=  0.000; b9gR_MQXB :=     0.012; b9tR_MQXB := 0.000;
+b10pR_MQXB :=  0.014; b10gR_MQXB:=     0.009; b10tR_MQXB:= 0.000;
+b11pR_MQXB :=  0.000; b11gR_MQXB:=     0.000; b11tR_MQXB:= 0.000;
+!       AVERAGE
+a1pM_MQXB  :=  0.000; a1gM_MQXB :=  0.000; a1tM_MQXB := 0.000;
+a2pM_MQXB  :=  0.000; a2gM_MQXB :=  0.000; a2tM_MQXB := 0.000;
+a3pM_MQXB  :=  0.090; a3gM_MQXB :=  0.283; a3tM_MQXB := 0.000;
+a4pM_MQXB  := -0.033; a4gM_MQXB := -0.296; a4tM_MQXB := 0.000;
+a5pM_MQXB  := -0.043; a5gM_MQXB :=  0.034; a5tM_MQXB := 0.000;
+a6pM_MQXB  :=  0.074; a6gM_MQXB := -0.131; a6tM_MQXB := 0.000;
+a7pM_MQXB  := -0.005; a7gM_MQXB :=  0.010; a7tM_MQXB := 0.000;
+a8pM_MQXB  := -0.029; a8gM_MQXB := -0.003; a8tM_MQXB := 0.000;
+a9pM_MQXB  :=  0.002; a9gM_MQXB :=  0.010; a9tM_MQXB := 0.000;
+a10pM_MQXB :=  0.002; a10gM_MQXB:= -0.003; a10tM_MQXB:= 0.000;
+a11pM_MQXB :=  0.000; a11gM_MQXB:=  0.000; a11tM_MQXB:= 0.000;
+!        UNCERTAINTY
+a1pU_MQXB  :=  0.000; a1gU_MQXB :=     0.000; a1tU_MQXB := 0.000;
+a2pU_MQXB  :=  0.000; a2gU_MQXB :=     0.000; a2tU_MQXB := 0.000;
+a3pU_MQXB  :=  0.000; a3gU_MQXB :=     0.000; a3tU_MQXB := 0.000;
+a4pU_MQXB  :=  0.000; a4gU_MQXB :=     0.000; a4tU_MQXB := 0.000;
+a5pU_MQXB  :=  0.000; a5gU_MQXB :=     0.000; a5tU_MQXB := 0.000;
+a6pU_MQXB  :=  0.000; a6gU_MQXB :=     0.000; a6tU_MQXB := 0.000;
+a7pU_MQXB  :=  0.000; a7gU_MQXB :=     0.000; a7tU_MQXB := 0.000;
+a8pU_MQXB  :=  0.000; a8gU_MQXB :=     0.000; a8tU_MQXB := 0.000;
+a9pU_MQXB  :=  0.000; a9gU_MQXB :=     0.000; a9tU_MQXB := 0.000;
+a10pU_MQXB :=  0.000; a10gU_MQXB:=     0.000; a10tU_MQXB:= 0.000;
+a11pU_MQXB :=  0.000; a11gU_MQXB:=     0.000; a11tU_MQXB:= 0.000;
+!       STANDARD DEVIATION
+a1pR_MQXB  :=  0.000; a1gR_MQXB :=     0.000; a1tR_MQXB := 0.000;
+a2pR_MQXB  :=  0.000; a2gR_MQXB :=     0.000; a2tR_MQXB := 0.000;
+a3pR_MQXB  :=  0.349; a3gR_MQXB :=     0.635; a3tR_MQXB := 0.000;
+a4pR_MQXB  :=  0.147; a4gR_MQXB :=     0.388; a4tR_MQXB := 0.000;
+a5pR_MQXB  :=  0.000; a5gR_MQXB :=     0.142; a5tR_MQXB := 0.000;
+a6pR_MQXB  :=  0.000; a6gR_MQXB :=     0.264; a6tR_MQXB := 0.000;
+a7pR_MQXB  :=  0.000; a7gR_MQXB :=     0.041; a7tR_MQXB := 0.000;
+a8pR_MQXB  :=  0.000; a8gR_MQXB :=     0.028; a8tR_MQXB := 0.000;
+a9pR_MQXB  :=  0.013; a9gR_MQXB :=     0.008; a9tR_MQXB := 0.000;
+a10pR_MQXB :=  0.000; a10gR_MQXB:=     0.018; a10tR_MQXB:= 0.000;
+a11pR_MQXB :=  0.000; a11gR_MQXB:=     0.000; a11tR_MQXB:= 0.000;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MQY *****************************
+! ************* Measured errors from LHCPR 735
+! -----------------------------------------------------------------------
+!                                      AVERAGE
+b1pM_MQY  :=  0.000;     b1gM_MQY :=  0.000;     b1tM_MQY :=  0.000;
+b2pM_MQY  :=  0.000;     b2gM_MQY :=  0.000;     b2tM_MQY :=  0.000;
+b3pM_MQY  :=  0.000;     b3gM_MQY := -0.020;     b3tM_MQY :=  0.000;
+b4pM_MQY  :=  0.000;     b4gM_MQY :=  0.030;     b4tM_MQY :=  0.000;
+b5pM_MQY  :=  0.000;     b5gM_MQY :=  0.010;     b5tM_MQY :=  0.000;
+b6pM_MQY  := -1.600;     b6gM_MQY :=  1.220;     b6tM_MQY :=  0.000;
+b7pM_MQY  :=  0.000;     b7gM_MQY := -0.010;     b7tM_MQY :=  0.000;
+b8pM_MQY  :=  0.000;     b8gM_MQY :=  0.030;     b8tM_MQY :=  0.000;
+b9pM_MQY  :=  0.000;     b9gM_MQY :=  0.010;     b9tM_MQY :=  0.000;
+b10pM_MQY :=  0.000;     b10gM_MQY:= -0.370;     b10tM_MQY:=  0.000;
+b11pM_MQY :=  0.000;     b11gM_MQY:=  0.000;     b11tM_MQY:=  0.000;
+!                                    UNCERTAINTY
+b1pU_MQY  :=  0.000;     b1gU_MQY :=  0.000;     b1tU_MQY :=  0.000;
+b2pU_MQY  :=  0.000;     b2gU_MQY :=  0.000;     b2tU_MQY :=  0.000;
+b3pU_MQY  :=  0.000;     b3gU_MQY :=  0.000;     b3tU_MQY :=  0.000;
+b4pU_MQY  :=  0.000;     b4gU_MQY :=  0.000;     b4tU_MQY :=  0.000;
+b5pU_MQY  :=  0.000;     b5gU_MQY :=  0.000;     b5tU_MQY :=  0.000;
+b6pU_MQY  :=  0.000;     b6gU_MQY :=  0.000;     b6tU_MQY :=  0.000;
+b7pU_MQY  :=  0.000;     b7gU_MQY :=  0.000;     b7tU_MQY :=  0.000;
+b8pU_MQY  :=  0.000;     b8gU_MQY :=  0.000;     b8tU_MQY :=  0.000;
+b9pU_MQY  :=  0.000;     b9gU_MQY :=  0.000;     b9tU_MQY :=  0.000;
+b10pU_MQY :=  0.000;     b10gU_MQY:=  0.000;     b10tU_MQY:=  0.000;
+b11pU_MQY :=  0.000;     b11gU_MQY:=  0.000;     b11tU_MQY:=  0.000;
+!                                STANDARD DEVIATION
+b1pR_MQY  :=  0.000;     b1gR_MQY :=  0.000;     b1tR_MQY :=  0.000;
+b2pR_MQY  :=  0.000;     b2gR_MQY :=  0.000;     b2tR_MQY :=  0.000;
+b3pR_MQY  :=  0.000;     b3gR_MQY :=  1.130;     b3tR_MQY :=  0.000;
+b4pR_MQY  :=  0.000;     b4gR_MQY :=  0.160;     b4tR_MQY :=  0.000;
+b5pR_MQY  :=  0.000;     b5gR_MQY :=  0.170;     b5tR_MQY :=  0.000;
+b6pR_MQY  :=  0.000;     b6gR_MQY :=  0.220;     b6tR_MQY :=  0.000;
+b7pR_MQY  :=  0.000;     b7gR_MQY :=  0.020;     b7tR_MQY :=  0.000;
+b8pR_MQY  :=  0.000;     b8gR_MQY :=  0.050;     b8tR_MQY :=  0.000;
+b9pR_MQY  :=  0.000;     b9gR_MQY :=  0.010;     b9tR_MQY :=  0.000;
+b10pR_MQY :=  0.000;     b10gR_MQY:=  0.010;     b10tR_MQY:=  0.000;
+b11pR_MQY :=  0.000;     b11gR_MQY:=  0.000;     b11tR_MQY:=  0.000;
+!                                      AVERAGE
+a1pM_MQY  :=  0.000;     a1gM_MQY :=  0.000;     a1tM_MQY :=  0.000;
+a2pM_MQY  :=  0.000;     a2gM_MQY :=  0.000;     a2tM_MQY :=  0.000;
+a3pM_MQY  :=  0.000;     a3gM_MQY := -0.100;     a3tM_MQY :=  0.000;
+a4pM_MQY  :=  0.000;     a4gM_MQY :=  0.000;     a4tM_MQY :=  0.000;
+a5pM_MQY  :=  0.000;     a5gM_MQY := -0.100;     a5tM_MQY :=  0.000;
+a6pM_MQY  :=  0.000;     a6gM_MQY := -0.160;     a6tM_MQY :=  0.000;
+a7pM_MQY  :=  0.000;     a7gM_MQY :=  0.000;     a7tM_MQY :=  0.000;
+a8pM_MQY  :=  0.000;     a8gM_MQY := -0.010;     a8tM_MQY :=  0.000;
+a9pM_MQY  :=  0.000;     a9gM_MQY :=  0.000;     a9tM_MQY :=  0.000;
+a10pM_MQY :=  0.000;     a10gM_MQY:=  0.010;     a10tM_MQY:=  0.000;
+a11pM_MQY :=  0.000;     a11gM_MQY:=  0.000;     a11tM_MQY:=  0.000;
+!                                    UNCERTAINTY
+a1pU_MQY  :=  0.000;     a1gU_MQY :=  0.000;     a1tU_MQY :=  0.000;
+a2pU_MQY  :=  0.000;     a2gU_MQY :=  0.000;     a2tU_MQY :=  0.000;
+a3pU_MQY  :=  0.000;     a3gU_MQY :=  0.000;     a3tU_MQY :=  0.000;
+a4pU_MQY  :=  0.000;     a4gU_MQY :=  0.000;     a4tU_MQY :=  0.000;
+a5pU_MQY  :=  0.000;     a5gU_MQY :=  0.000;     a5tU_MQY :=  0.000;
+a6pU_MQY  :=  0.000;     a6gU_MQY :=  0.000;     a6tU_MQY :=  0.000;
+a7pU_MQY  :=  0.000;     a7gU_MQY :=  0.000;     a7tU_MQY :=  0.000;
+a8pU_MQY  :=  0.000;     a8gU_MQY :=  0.000;     a8tU_MQY :=  0.000;
+a9pU_MQY  :=  0.000;     a9gU_MQY :=  0.000;     a9tU_MQY :=  0.000;
+a10pU_MQY :=  0.000;     a10gU_MQY:=  0.000;     a10tU_MQY:=  0.000;
+a11pU_MQY :=  0.000;     a11gU_MQY:=  0.000;     a11tU_MQY:=  0.000;
+!                                STANDARD DEVIATION
+a1pR_MQY  :=  0.000;     a1gR_MQY :=  0.000;     a1tR_MQY :=  0.000;
+a2pR_MQY  :=  0.000;     a2gR_MQY :=  0.000;     a2tR_MQY :=  0.000;
+a3pR_MQY  :=  0.000;     a3gR_MQY :=  0.600;     a3tR_MQY :=  0.000;
+a4pR_MQY  :=  0.000;     a4gR_MQY :=  0.310;     a4tR_MQY :=  0.000;
+a5pR_MQY  :=  0.000;     a5gR_MQY :=  0.180;     a5tR_MQY :=  0.000;
+a6pR_MQY  :=  0.000;     a6gR_MQY :=  0.070;     a6tR_MQY :=  0.000;
+a7pR_MQY  :=  0.000;     a7gR_MQY :=  0.020;     a7tR_MQY :=  0.000;
+a8pR_MQY  :=  0.000;     a8gR_MQY :=  0.040;     a8tR_MQY :=  0.000;
+a9pR_MQY  :=  0.000;     a9gR_MQY :=  0.010;     a9tR_MQY :=  0.000;
+a10pR_MQY :=  0.000;     a10gR_MQY:=  0.010;     a10tR_MQY:=  0.000;
+a11pR_MQY :=  0.000;     a11gR_MQY:=  0.000;     a11tR_MQY:=  0.000;
+
+
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type : MQM *****************************
+! ***** Generated   : 23-2-04 by Alessandra Lombardi
+! ***** Version     : ???????
+! ***** Initial estimate taken from MQ errors
+! ************* Hysteresis coefficients added on 01/11/04 mg
+! -----------------------------------------------------------------------
+!                                      AVERAGE
+b1pM_MQM  :=   0.0000;     b1gM_MQM :=   0.0000;     b1tM_MQM :=   0.0000;
+b2pM_MQM  :=   0.0000;     b2gM_MQM :=   0.0000;     b2tM_MQM :=   0.0000;
+b3pM_MQM  :=   0.0000;     b3gM_MQM :=  -0.1900;     b3tM_MQM :=   0.0000;
+b4pM_MQM  :=   0.0000;     b4gM_MQM :=   0.2400;     b4tM_MQM :=   0.0000;
+b5pM_MQM  :=   0.0000;     b5gM_MQM :=   0.0200;     b5tM_MQM :=   0.0000;
+b6pM_MQM  :=  -7.4000;     b6gM_MQM :=   5.3100;     b6tM_MQM :=   0.0000;
+b7pM_MQM  :=   0.0000;     b7gM_MQM :=   0.0100;     b7tM_MQM :=   0.0000;
+b8pM_MQM  :=   0.0000;     b8gM_MQM :=   0.0100;     b8tM_MQM :=   0.0000;
+b9pM_MQM  :=   0.0000;     b9gM_MQM :=  -0.0100;     b9tM_MQM :=   0.0000;
+b10pM_MQM :=   0.0000;     b10gM_MQM:=   0.3000;     b10tM_MQM:=   0.0000;
+b11pM_MQM :=   0.0000;     b11gM_MQM:=   0.0000;     b11tM_MQM:=   0.0000;
+!                                    UNCERTAINTY
+b1pU_MQM  :=   0.0000;     b1gU_MQM :=   0.0000;     b1tU_MQM :=   0.0000;
+b2pU_MQM  :=   0.0000;     b2gU_MQM :=   0.0000;     b2tU_MQM :=   0.0000;
+b3pU_MQM  :=   0.0000;     b3gU_MQM :=   0.0000;     b3tU_MQM :=   0.0000;
+b4pU_MQM  :=   0.0000;     b4gU_MQM :=   0.0000;     b4tU_MQM :=   0.0000;
+b5pU_MQM  :=   0.0000;     b5gU_MQM :=   0.0000;     b5tU_MQM :=   0.0000;
+b6pU_MQM  :=   0.0000;     b6gU_MQM :=   0.0000;     b6tU_MQM :=   0.0000;
+b7pU_MQM  :=   0.0000;     b7gU_MQM :=   0.0000;     b7tU_MQM :=   0.0000;
+b8pU_MQM  :=   0.0000;     b8gU_MQM :=   0.0000;     b8tU_MQM :=   0.0000;
+b9pU_MQM  :=   0.0000;     b9gU_MQM :=   0.0000;     b9tU_MQM :=   0.0000;
+b10pU_MQM :=   0.0000;     b10gU_MQM:=   0.0000;     b10tU_MQM:=   0.0000;
+b11pU_MQM :=   0.0000;     b11gU_MQM:=   0.0000;     b11tU_MQM:=   0.0000;
+!                                STANDARD DEVIATION
+b1pR_MQM  :=   0.0000;     b1gR_MQM :=   0.0000;     b1tR_MQM :=   0.0000;
+b2pR_MQM  :=   0.0000;     b2gR_MQM :=   0.0000;     b2tR_MQM :=   0.0000;
+b3pR_MQM  :=   0.0000;     b3gR_MQM :=   1.0900;     b3tR_MQM :=   0.0000;
+b4pR_MQM  :=   0.0000;     b4gR_MQM :=   0.5700;     b4tR_MQM :=   0.0000;
+b5pR_MQM  :=   0.0000;     b5gR_MQM :=   0.4500;     b5tR_MQM :=   0.0000;
+b6pR_MQM  :=   0.0000;     b6gR_MQM :=   0.8400;     b6tR_MQM :=   0.0000;
+b7pR_MQM  :=   0.0000;     b7gR_MQM :=   0.1200;     b7tR_MQM :=   0.0000;
+b8pR_MQM  :=   0.0000;     b8gR_MQM :=   0.0700;     b8tR_MQM :=   0.0000;
+b9pR_MQM  :=   0.0000;     b9gR_MQM :=   0.0500;     b9tR_MQM :=   0.0000;
+b10pR_MQM :=   0.0000;     b10gR_MQM:=   0.0900;     b10tR_MQM:=   0.0000;
+b11pR_MQM :=   0.0000;     b11gR_MQM:=   0.0000;     b11tR_MQM:=   0.0000;
+!                                      AVERAGE
+a1pM_MQM  :=   0.0000;     a1gM_MQM :=   0.0000;     a1tM_MQM :=   0.0000;
+a2pM_MQM  :=   0.0000;     a2gM_MQM :=   0.0000;     a2tM_MQM :=   0.0000;
+a3pM_MQM  :=   0.0000;     a3gM_MQM :=  -0.1000;     a3tM_MQM :=   0.0000;
+a4pM_MQM  :=   0.0000;     a4gM_MQM :=  -0.3800;     a4tM_MQM :=   0.0000;
+a5pM_MQM  :=   0.0000;     a5gM_MQM :=   0.2500;     a5tM_MQM :=   0.0000;
+a6pM_MQM  :=   0.0000;     a6gM_MQM :=  -0.0900;     a6tM_MQM :=   0.0000;
+a7pM_MQM  :=   0.0000;     a7gM_MQM :=   0.0000;     a7tM_MQM :=   0.0000;
+a8pM_MQM  :=   0.0000;     a8gM_MQM :=  -0.0500;     a8tM_MQM :=   0.0000;
+a9pM_MQM  :=   0.0000;     a9gM_MQM :=   0.0000;     a9tM_MQM :=   0.0000;
+a10pM_MQM :=   0.0000;     a10gM_MQM:=   0.0200;     a10tM_MQM:=   0.0000;
+a11pM_MQM :=   0.0000;     a11gM_MQM:=   0.0000;     a11tM_MQM:=   0.0000;
+!                                    UNCERTAINTY
+a1pU_MQM  :=   0.0000;     a1gU_MQM :=   0.0000;     a1tU_MQM :=   0.0000;
+a2pU_MQM  :=   0.0000;     a2gU_MQM :=   0.0000;     a2tU_MQM :=   0.0000;
+a3pU_MQM  :=   0.0000;     a3gU_MQM :=   0.0000;     a3tU_MQM :=   0.0000;
+a4pU_MQM  :=   0.0000;     a4gU_MQM :=   0.0000;     a4tU_MQM :=   0.0000;
+a5pU_MQM  :=   0.0000;     a5gU_MQM :=   0.0000;     a5tU_MQM :=   0.0000;
+a6pU_MQM  :=   0.0000;     a6gU_MQM :=   0.0000;     a6tU_MQM :=   0.0000;
+a7pU_MQM  :=   0.0000;     a7gU_MQM :=   0.0000;     a7tU_MQM :=   0.0000;
+a8pU_MQM  :=   0.0000;     a8gU_MQM :=   0.0000;     a8tU_MQM :=   0.0000;
+a9pU_MQM  :=   0.0000;     a9gU_MQM :=   0.0000;     a9tU_MQM :=   0.0000;
+a10pU_MQM :=   0.0000;     a10gU_MQM:=   0.0000;     a10tU_MQM:=   0.0000;
+a11pU_MQM :=   0.0000;     a11gU_MQM:=   0.0000;     a11tU_MQM:=   0.0000;
+!                                STANDARD DEVIATION
+a1pR_MQM  :=   0.0000;     a1gR_MQM :=   0.0000;     a1tR_MQM :=   0.0000;
+a2pR_MQM  :=   0.0000;     a2gR_MQM :=   0.0000;     a2tR_MQM :=   0.0000;
+a3pR_MQM  :=   0.0000;     a3gR_MQM :=   1.5600;     a3tR_MQM :=   0.0000;
+a4pR_MQM  :=   0.0000;     a4gR_MQM :=   0.9800;     a4tR_MQM :=   0.0000;
+a5pR_MQM  :=   0.0000;     a5gR_MQM :=   0.4000;     a5tR_MQM :=   0.0000;
+a6pR_MQM  :=   0.0000;     a6gR_MQM :=   0.2100;     a6tR_MQM :=   0.0000;
+a7pR_MQM  :=   0.0000;     a7gR_MQM :=   0.1300;     a7tR_MQM :=   0.0000;
+a8pR_MQM  :=   0.0000;     a8gR_MQM :=   0.1100;     a8tR_MQM :=   0.0000;
+a9pR_MQM  :=   0.0000;     a9gR_MQM :=   0.0500;     a9tR_MQM :=   0.0000;
+a10pR_MQM :=   0.0000;     a10gR_MQM:=   0.0200;     a10tR_MQM:=   0.0000;
+a11pR_MQM :=   0.0000;     a11gR_MQM:=   0.0000;     a11tR_MQM:=   0.0000;
+
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type:  MQWA left  channel **************
+!       Inj=40 A        Coll = 710 A
+!Generated:     9/6/2005        M. Giovannozzi
+!Version:       data by S. Ramberger on the whole production
+! -----------------------------------------------------------------------
+!
+!                                AVERAGE
+b1pM_MQWA_l  := -179.017; b1gM_MQWA_l  :=  4.621; b1tM_MQWA_l  := 0.000;
+b2pM_MQWA_l  :=   -2.526; b2gM_MQWA_l  :=  0.623; b2tM_MQWA_l  := 0.000;
+b3pM_MQWA_l  :=  -41.669; b3gM_MQWA_l  := 39.730; b3tM_MQWA_l  := 0.000;
+b4pM_MQWA_l  :=   -3.999; b4gM_MQWA_l  :=  4.224; b4tM_MQWA_l  := 0.000;
+b5pM_MQWA_l  :=   -3.124; b5gM_MQWA_l  :=  5.766; b5tM_MQWA_l  := 0.000;
+b6pM_MQWA_l  :=   -0.326; b6gM_MQWA_l  := -1.104; b6tM_MQWA_l  := 0.000;
+b7pM_MQWA_l  :=    1.269; b7gM_MQWA_l  := -1.843; b7tM_MQWA_l  := 0.000;
+b8pM_MQWA_l  :=    0.055; b8gM_MQWA_l  :=  0.035; b8tM_MQWA_l  := 0.000;
+b9pM_MQWA_l  :=    0.000; b9gM_MQWA_l  :=  0.000; b9tM_MQWA_l  := 0.000;
+b10pM_MQWA_l :=    0.041; b10gM_MQWA_l :=  0.967; b10tM_MQWA_l := 0.000;
+b11pM_MQWA_l :=   -0.058; b11gM_MQWA_l :=  0.020; b11tM_MQWA_l := 0.000;
+!                              UNCERTAINTY
+b1pU_MQWA_l  :=    0.000; b1gU_MQWA_l  :=  0.000; b1tU_MQWA_l  := 0.000;
+b2pU_MQWA_l  :=    0.000; b2gU_MQWA_l  :=  0.000; b2tU_MQWA_l  := 0.000;
+b3pU_MQWA_l  :=    0.000; b3gU_MQWA_l  :=  0.000; b3tU_MQWA_l  := 0.000;
+b4pU_MQWA_l  :=    0.000; b4gU_MQWA_l  :=  0.000; b4tU_MQWA_l  := 0.000;
+b5pU_MQWA_l  :=    0.000; b5gU_MQWA_l  :=  0.000; b5tU_MQWA_l  := 0.000;
+b6pU_MQWA_l  :=    0.000; b6gU_MQWA_l  :=  0.000; b6tU_MQWA_l  := 0.000;
+b7pU_MQWA_l  :=    0.000; b7gU_MQWA_l  :=  0.000; b7tU_MQWA_l  := 0.000;
+b8pU_MQWA_l  :=    0.000; b8gU_MQWA_l  :=  0.000; b8tU_MQWA_l  := 0.000;
+b9pU_MQWA_l  :=    0.000; b9gU_MQWA_l  :=  0.000; b9tU_MQWA_l  := 0.000;
+b10pU_MQWA_l :=    0.000; b10gU_MQWA_l :=  0.000; b10tU_MQWA_l := 0.000;
+b11pU_MQWA_l :=    0.000; b11gU_MQWA_l :=  0.000; b11tU_MQWA_l := 0.000;
+!                          STANDARD DEVIATION
+b1pR_MQWA_l  :=   25.184; b1gR_MQWA_l  := 67.953; b1tR_MQWA_l  := 0.000;
+b2pR_MQWA_l  :=   22.408; b2gR_MQWA_l  := 16.636; b2tR_MQWA_l  := 0.000;
+b3pR_MQWA_l  :=    0.000; b3gR_MQWA_l  :=  5.048; b3tR_MQWA_l  := 0.000;
+b4pR_MQWA_l  :=    0.115; b4gR_MQWA_l  :=  1.832; b4tR_MQWA_l  := 0.000;
+b5pR_MQWA_l  :=    0.000; b5gR_MQWA_l  :=  0.550; b5tR_MQWA_l  := 0.000;
+b6pR_MQWA_l  :=    0.000; b6gR_MQWA_l  :=  0.412; b6tR_MQWA_l  := 0.000;
+b7pR_MQWA_l  :=    0.000; b7gR_MQWA_l  :=  0.202; b7tR_MQWA_l  := 0.000;
+b8pR_MQWA_l  :=    0.012; b8gR_MQWA_l  :=  0.080; b8tR_MQWA_l  := 0.000;
+b9pR_MQWA_l  :=    0.001; b9gR_MQWA_l  :=  0.000; b9tR_MQWA_l  := 0.000;
+b10pR_MQWA_l :=    0.047; b10gR_MQWA_l :=  0.030; b10tR_MQWA_l := 0.000;
+b11pR_MQWA_l :=    0.027; b11gR_MQWA_l :=  0.025; b11tR_MQWA_l := 0.000;
+!                                AVERAGE
+a1pM_MQWA_l  :=    6.654; a1gM_MQWA_l  :=  4.082; a1tM_MQWA_l  := 0.000;
+a2pM_MQWA_l  :=    0.000; a2gM_MQWA_l  :=  0.000; a2tM_MQWA_l  := 0.000;
+a3pM_MQWA_l  :=    0.519; a3gM_MQWA_l  := -0.675; a3tM_MQWA_l  := 0.000;
+a4pM_MQWA_l  :=   -0.112; a4gM_MQWA_l  :=  0.056; a4tM_MQWA_l  := 0.000;
+a5pM_MQWA_l  :=   -0.016; a5gM_MQWA_l  :=  0.048; a5tM_MQWA_l  := 0.000;
+a6pM_MQWA_l  :=    0.009; a6gM_MQWA_l  := -0.046; a6tM_MQWA_l  := 0.000;
+a7pM_MQWA_l  :=    0.030; a7gM_MQWA_l  := -0.036; a7tM_MQWA_l  := 0.000;
+a8pM_MQWA_l  :=   -0.035; a8gM_MQWA_l  :=  0.014; a8tM_MQWA_l  := 0.000;
+a9pM_MQWA_l  :=    0.000; a9gM_MQWA_l  :=  0.000; a9tM_MQWA_l  := 0.000;
+a10pM_MQWA_l :=   -0.010; a10gM_MQWA_l :=  0.027; a10tM_MQWA_l := 0.000;
+a11pM_MQWA_l :=   -0.013; a11gM_MQWA_l := -0.008; a11tM_MQWA_l := 0.000;
+!                              UNCERTAINTY
+a1pU_MQWA_l  :=    0.000; a1gU_MQWA_l  :=  0.000; a1tU_MQWA_l  := 0.000;
+a2pU_MQWA_l  :=    0.000; a2gU_MQWA_l  :=  0.000; a2tU_MQWA_l  := 0.000;
+a3pU_MQWA_l  :=    0.000; a3gU_MQWA_l  :=  0.000; a3tU_MQWA_l  := 0.000;
+a4pU_MQWA_l  :=    0.000; a4gU_MQWA_l  :=  0.000; a4tU_MQWA_l  := 0.000;
+a5pU_MQWA_l  :=    0.000; a5gU_MQWA_l  :=  0.000; a5tU_MQWA_l  := 0.000;
+a6pU_MQWA_l  :=    0.000; a6gU_MQWA_l  :=  0.000; a6tU_MQWA_l  := 0.000;
+a7pU_MQWA_l  :=    0.000; a7gU_MQWA_l  :=  0.000; a7tU_MQWA_l  := 0.000;
+a8pU_MQWA_l  :=    0.000; a8gU_MQWA_l  :=  0.000; a8tU_MQWA_l  := 0.000;
+a9pU_MQWA_l  :=    0.000; a9gU_MQWA_l  :=  0.000; a9tU_MQWA_l  := 0.000;
+a10pU_MQWA_l :=    0.000; a10gU_MQWA_l :=  0.000; a10tU_MQWA_l := 0.000;
+a11pU_MQWA_l :=    0.000; a11gU_MQWA_l :=  0.000; a11tU_MQWA_l := 0.000;
+!                          STANDARD DEVIATION
+a1pR_MQWA_l  :=   31.536; a1gR_MQWA_l  := 59.720; a1tR_MQWA_l  := 0.000;
+a2pR_MQWA_l  :=    0.000; a2gR_MQWA_l  :=  0.000; a2tR_MQWA_l  := 0.000;
+a3pR_MQWA_l  :=    1.896; a3gR_MQWA_l  :=  4.448; a3tR_MQWA_l  := 0.000;
+a4pR_MQWA_l  :=    0.000; a4gR_MQWA_l  :=  1.449; a4tR_MQWA_l  := 0.000;
+a5pR_MQWA_l  :=    0.239; a5gR_MQWA_l  :=  0.796; a5tR_MQWA_l  := 0.000;
+a6pR_MQWA_l  :=    0.000; a6gR_MQWA_l  :=  0.207; a6tR_MQWA_l  := 0.000;
+a7pR_MQWA_l  :=    0.051; a7gR_MQWA_l  :=  0.061; a7tR_MQWA_l  := 0.000;
+a8pR_MQWA_l  :=    0.000; a8gR_MQWA_l  :=  0.182; a8tR_MQWA_l  := 0.000;
+a9pR_MQWA_l  :=    0.001; a9gR_MQWA_l  :=  0.000; a9tR_MQWA_l  := 0.000;
+a10pR_MQWA_l :=    0.026; a10gR_MQWA_l :=  0.059; a10tR_MQWA_l := 0.000;
+a11pR_MQWA_l :=    0.007; a11gR_MQWA_l :=  0.014; a11tR_MQWA_l := 0.000;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type:  MQWA right channel **************
+!       Inj=40 A        Coll = 710 A
+!Generated:     04/06/2004      M. Giovannozzi
+!Version:       data by S. Ramberger on the whole production
+! -----------------------------------------------------------------------
+!
+!                                AVERAGE
+b1pM_MQWA_r  :=  162.034; b1gM_MQWA_r  :=   -5.916; b1tM_MQWA_r  := 0.000;
+b2pM_MQWA_r  :=   -1.735; b2gM_MQWA_r  :=    0.608; b2tM_MQWA_r  := 0.000;
+b3pM_MQWA_r  :=   46.291; b3gM_MQWA_r  :=  -38.886; b3tM_MQWA_r  := 0.000;
+b4pM_MQWA_r  :=   -4.015; b4gM_MQWA_r  :=    4.666; b4tM_MQWA_r  := 0.000;
+b5pM_MQWA_r  :=    3.461; b5gM_MQWA_r  :=   -5.646; b5tM_MQWA_r  := 0.000;
+b6pM_MQWA_r  :=   -0.350; b6gM_MQWA_r  :=   -1.122; b6tM_MQWA_r  := 0.000;
+b7pM_MQWA_r  :=   -1.368; b7gM_MQWA_r  :=    1.824; b7tM_MQWA_r  := 0.000;
+b8pM_MQWA_r  :=    0.064; b8gM_MQWA_r  :=    0.023; b8tM_MQWA_r  := 0.000;
+b9pM_MQWA_r  :=    0.001; b9gM_MQWA_r  :=    0.000; b9tM_MQWA_r  := 0.000;
+b10pM_MQWA_r :=    0.054; b10gM_MQWA_r :=    0.968; b10tM_MQWA_r := 0.000;
+b11pM_MQWA_r :=    0.116; b11gM_MQWA_r :=   -0.012; b11tM_MQWA_r := 0.000;
+!                              UNCERTAINTY
+b1pU_MQWA_r  :=    0.000; b1gU_MQWA_r  :=    0.000; b1tU_MQWA_r  := 0.000;
+b2pU_MQWA_r  :=    0.000; b2gU_MQWA_r  :=    0.000; b2tU_MQWA_r  := 0.000;
+b3pU_MQWA_r  :=    0.000; b3gU_MQWA_r  :=    0.000; b3tU_MQWA_r  := 0.000;
+b4pU_MQWA_r  :=    0.000; b4gU_MQWA_r  :=    0.000; b4tU_MQWA_r  := 0.000;
+b5pU_MQWA_r  :=    0.000; b5gU_MQWA_r  :=    0.000; b5tU_MQWA_r  := 0.000;
+b6pU_MQWA_r  :=    0.000; b6gU_MQWA_r  :=    0.000; b6tU_MQWA_r  := 0.000;
+b7pU_MQWA_r  :=    0.000; b7gU_MQWA_r  :=    0.000; b7tU_MQWA_r  := 0.000;
+b8pU_MQWA_r  :=    0.000; b8gU_MQWA_r  :=    0.000; b8tU_MQWA_r  := 0.000;
+b9pU_MQWA_r  :=    0.000; b9gU_MQWA_r  :=    0.000; b9tU_MQWA_r  := 0.000;
+b10pU_MQWA_r :=    0.000; b10gU_MQWA_r :=    0.000; b10tU_MQWA_r := 0.000;
+b11pU_MQWA_r :=    0.000; b11gU_MQWA_r :=    0.000; b11tU_MQWA_r := 0.000;
+!                          STANDARD DEVIATION
+b1pR_MQWA_r  :=    0.000; b1gR_MQWA_r  :=   67.493; b1tR_MQWA_r  := 0.000;
+b2pR_MQWA_r  :=    4.714; b2gR_MQWA_r  :=   19.060; b2tR_MQWA_r  := 0.000;
+b3pR_MQWA_r  :=    0.000; b3gR_MQWA_r  :=    5.208; b3tR_MQWA_r  := 0.000;
+b4pR_MQWA_r  :=    0.000; b4gR_MQWA_r  :=    1.936; b4tR_MQWA_r  := 0.000;
+b5pR_MQWA_r  :=    0.000; b5gR_MQWA_r  :=    0.562; b5tR_MQWA_r  := 0.000;
+b6pR_MQWA_r  :=    0.000; b6gR_MQWA_r  :=    0.438; b6tR_MQWA_r  := 0.000;
+b7pR_MQWA_r  :=    0.000; b7gR_MQWA_r  :=    0.179; b7tR_MQWA_r  := 0.000;
+b8pR_MQWA_r  :=    0.025; b8gR_MQWA_r  :=    0.068; b8tR_MQWA_r  := 0.000;
+b9pR_MQWA_r  :=    0.004; b9gR_MQWA_r  :=    0.000; b9tR_MQWA_r  := 0.000;
+b10pR_MQWA_r :=    0.052; b10gR_MQWA_r :=    0.033; b10tR_MQWA_r := 0.000;
+b11pR_MQWA_r :=    0.029; b11gR_MQWA_r :=    0.025; b11tR_MQWA_r := 0.000;
+!                                AVERAGE
+a1pM_MQWA_r  :=   18.583; a1gM_MQWA_r  :=    1.970; a1tM_MQWA_r  := 0.000;
+a2pM_MQWA_r  :=    0.000; a2gM_MQWA_r  :=    0.000; a2tM_MQWA_r  := 0.000;
+a3pM_MQWA_r  :=    0.144; a3gM_MQWA_r  :=    0.636; a3tM_MQWA_r  := 0.000;
+a4pM_MQWA_r  :=   -0.127; a4gM_MQWA_r  :=    0.105; a4tM_MQWA_r  := 0.000;
+a5pM_MQWA_r  :=   -0.093; a5gM_MQWA_r  :=   -0.043; a5tM_MQWA_r  := 0.000;
+a6pM_MQWA_r  :=   -0.001; a6gM_MQWA_r  :=   -0.063; a6tM_MQWA_r  := 0.000;
+a7pM_MQWA_r  :=   -0.072; a7gM_MQWA_r  :=    0.061; a7tM_MQWA_r  := 0.000;
+a8pM_MQWA_r  :=   -0.032; a8gM_MQWA_r  :=   -0.018; a8tM_MQWA_r  := 0.000;
+a9pM_MQWA_r  :=    0.003; a9gM_MQWA_r  :=    0.000; a9tM_MQWA_r  := 0.000;
+a10pM_MQWA_r :=   -0.012; a10gM_MQWA_r :=    0.040; a10tM_MQWA_r := 0.000;
+a11pM_MQWA_r :=    0.004; a11gM_MQWA_r :=   -0.014; a11tM_MQWA_r := 0.000;
+!                              UNCERTAINTY
+a1pU_MQWA_r  :=    0.000; a1gU_MQWA_r  :=    0.000; a1tU_MQWA_r  := 0.000;
+a2pU_MQWA_r  :=    0.000; a2gU_MQWA_r  :=    0.000; a2tU_MQWA_r  := 0.000;
+a3pU_MQWA_r  :=    0.000; a3gU_MQWA_r  :=    0.000; a3tU_MQWA_r  := 0.000;
+a4pU_MQWA_r  :=    0.000; a4gU_MQWA_r  :=    0.000; a4tU_MQWA_r  := 0.000;
+a5pU_MQWA_r  :=    0.000; a5gU_MQWA_r  :=    0.000; a5tU_MQWA_r  := 0.000;
+a6pU_MQWA_r  :=    0.000; a6gU_MQWA_r  :=    0.000; a6tU_MQWA_r  := 0.000;
+a7pU_MQWA_r  :=    0.000; a7gU_MQWA_r  :=    0.000; a7tU_MQWA_r  := 0.000;
+a8pU_MQWA_r  :=    0.000; a8gU_MQWA_r  :=    0.000; a8tU_MQWA_r  := 0.000;
+a9pU_MQWA_r  :=    0.000; a9gU_MQWA_r  :=    0.000; a9tU_MQWA_r  := 0.000;
+a10pU_MQWA_r :=    0.000; a10gU_MQWA_r :=    0.000; a10tU_MQWA_r := 0.000;
+a11pU_MQWA_r :=    0.000; a11gU_MQWA_r :=    0.000; a11tU_MQWA_r := 0.000;
+!                          STANDARD DEVIATION
+a1pR_MQWA_r  :=   36.770; a1gR_MQWA_r  :=   58.884; a1tR_MQWA_r  := 0.000;
+a2pR_MQWA_r  :=    0.000; a2gR_MQWA_r  :=    0.000; a2tR_MQWA_r  := 0.000;
+a3pR_MQWA_r  :=    2.636; a3gR_MQWA_r  :=    4.799; a3tR_MQWA_r  := 0.000;
+a4pR_MQWA_r  :=    0.000; a4gR_MQWA_r  :=    1.333; a4tR_MQWA_r  := 0.000;
+a5pR_MQWA_r  :=    0.354; a5gR_MQWA_r  :=    0.827; a5tR_MQWA_r  := 0.000;
+a6pR_MQWA_r  :=    0.000; a6gR_MQWA_r  :=    0.179; a6tR_MQWA_r  := 0.000;
+a7pR_MQWA_r  :=    0.056; a7gR_MQWA_r  :=    0.075; a7tR_MQWA_r  := 0.000;
+a8pR_MQWA_r  :=    0.017; a8gR_MQWA_r  :=    0.167; a8tR_MQWA_r  := 0.000;
+a9pR_MQWA_r  :=    0.005; a9gR_MQWA_r  :=    0.000; a9tR_MQWA_r  := 0.000;
+a10pR_MQWA_r :=    0.021; a10gR_MQWA_r :=    0.053; a10tR_MQWA_r := 0.000;
+a11pR_MQWA_r :=    0.009; a11gR_MQWA_r :=    0.017; a11tR_MQWA_r := 0.000;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type:  MQWB left  channel **************
+!       Inj=40 A        Coll = 600 A
+!Generated:     04/06/2004      M. Giovannozzi
+!Version:       data by S. Ramberger on the whole production
+! -----------------------------------------------------------------------
+!
+!                                AVERAGE
+b1pM_MQWB_l  :=   43.458; b1gM_MQWB_l  := -183.193; b1tM_MQWB_l  := 0.000;
+b2pM_MQWB_l  :=   -1.380; b2gM_MQWB_l  :=    0.556; b2tM_MQWB_l  := 0.000;
+b3pM_MQWB_l  :=   13.089; b3gM_MQWB_l  :=   -9.366; b3tM_MQWB_l  := 0.000;
+b4pM_MQWB_l  :=   -2.728; b4gM_MQWB_l  :=    2.910; b4tM_MQWB_l  := 0.000;
+b5pM_MQWB_l  :=    0.716; b5gM_MQWB_l  :=    2.337; b5tM_MQWB_l  := 0.000;
+b6pM_MQWB_l  :=   -0.348; b6gM_MQWB_l  :=   -1.066; b6tM_MQWB_l  := 0.000;
+b7pM_MQWB_l  :=   -0.435; b7gM_MQWB_l  :=   -0.305; b7tM_MQWB_l  := 0.000;
+b8pM_MQWB_l  :=    0.058; b8gM_MQWB_l  :=    0.036; b8tM_MQWB_l  := 0.000;
+b9pM_MQWB_l  :=    0.000; b9gM_MQWB_l  :=    0.000; b9tM_MQWB_l  := 0.000;
+b10pM_MQWB_l :=   -0.008; b10gM_MQWB_l :=    1.020; b10tM_MQWB_l := 0.000;
+b11pM_MQWB_l :=    0.045; b11gM_MQWB_l :=   -0.073; b11tM_MQWB_l := 0.000;
+!                              UNCERTAINTY
+b1pU_MQWB_l  :=    0.000; b1gU_MQWB_l  :=    0.000; b1tU_MQWB_l  := 0.000;
+b2pU_MQWB_l  :=    0.000; b2gU_MQWB_l  :=    0.000; b2tU_MQWB_l  := 0.000;
+b3pU_MQWB_l  :=    0.000; b3gU_MQWB_l  :=    0.000; b3tU_MQWB_l  := 0.000;
+b4pU_MQWB_l  :=    0.000; b4gU_MQWB_l  :=    0.000; b4tU_MQWB_l  := 0.000;
+b5pU_MQWB_l  :=    0.000; b5gU_MQWB_l  :=    0.000; b5tU_MQWB_l  := 0.000;
+b6pU_MQWB_l  :=    0.000; b6gU_MQWB_l  :=    0.000; b6tU_MQWB_l  := 0.000;
+b7pU_MQWB_l  :=    0.000; b7gU_MQWB_l  :=    0.000; b7tU_MQWB_l  := 0.000;
+b8pU_MQWB_l  :=    0.000; b8gU_MQWB_l  :=    0.000; b8tU_MQWB_l  := 0.000;
+b9pU_MQWB_l  :=    0.000; b9gU_MQWB_l  :=    0.000; b9tU_MQWB_l  := 0.000;
+b10pU_MQWB_l :=    0.000; b10gU_MQWB_l :=    0.000; b10tU_MQWB_l := 0.000;
+b11pU_MQWB_l :=    0.000; b11gU_MQWB_l :=    0.000; b11tU_MQWB_l := 0.000;
+!                          STANDARD DEVIATION
+b1pR_MQWB_l  :=   21.014; b1gR_MQWB_l  :=   55.280; b1tR_MQWB_l  := 0.000;
+b2pR_MQWB_l  :=   21.721; b2gR_MQWB_l  :=   15.941; b2tR_MQWB_l  := 0.000;
+b3pR_MQWB_l  :=    0.936; b3gR_MQWB_l  :=    3.265; b3tR_MQWB_l  := 0.000;
+b4pR_MQWB_l  :=    0.000; b4gR_MQWB_l  :=    1.996; b4tR_MQWB_l  := 0.000;
+b5pR_MQWB_l  :=    0.000; b5gR_MQWB_l  :=    0.892; b5tR_MQWB_l  := 0.000;
+b6pR_MQWB_l  :=    0.000; b6gR_MQWB_l  :=    0.772; b6tR_MQWB_l  := 0.000;
+b7pR_MQWB_l  :=    0.000; b7gR_MQWB_l  :=    0.157; b7tR_MQWB_l  := 0.000;
+b8pR_MQWB_l  :=    0.000; b8gR_MQWB_l  :=    0.095; b8tR_MQWB_l  := 0.000;
+b9pR_MQWB_l  :=    0.000; b9gR_MQWB_l  :=    0.002; b9tR_MQWB_l  := 0.000;
+b10pR_MQWB_l :=    0.000; b10gR_MQWB_l :=    0.178; b10tR_MQWB_l := 0.000;
+b11pR_MQWB_l :=    0.026; b11gR_MQWB_l :=    0.023; b11tR_MQWB_l := 0.000;
+!                                AVERAGE
+a1pM_MQWB_l  :=   11.621; a1gM_MQWB_l  :=    3.157; a1tM_MQWB_l  := 0.000;
+a2pM_MQWB_l  :=    0.000; a2gM_MQWB_l  :=    0.000; a2tM_MQWB_l  := 0.000;
+a3pM_MQWB_l  :=   -0.426; a3gM_MQWB_l  :=    0.260; a3tM_MQWB_l  := 0.000;
+a4pM_MQWB_l  :=   -0.076; a4gM_MQWB_l  :=    0.025; a4tM_MQWB_l  := 0.000;
+a5pM_MQWB_l  :=   -0.038; a5gM_MQWB_l  :=    0.069; a5tM_MQWB_l  := 0.000;
+a6pM_MQWB_l  :=   -0.004; a6gM_MQWB_l  :=   -0.031; a6tM_MQWB_l  := 0.000;
+a7pM_MQWB_l  :=   -0.004; a7gM_MQWB_l  :=   -0.011; a7tM_MQWB_l  := 0.000;
+a8pM_MQWB_l  :=   -0.025; a8gM_MQWB_l  :=    0.004; a8tM_MQWB_l  := 0.000;
+a9pM_MQWB_l  :=    0.000; a9gM_MQWB_l  :=    0.000; a9tM_MQWB_l  := 0.000;
+a10pM_MQWB_l :=   -0.013; a10gM_MQWB_l :=    0.030; a10tM_MQWB_l := 0.000;
+a11pM_MQWB_l :=   -0.006; a11gM_MQWB_l :=   -0.014; a11tM_MQWB_l := 0.000;
+!                              UNCERTAINTY
+a1pU_MQWB_l  :=    0.000; a1gU_MQWB_l  :=    0.000; a1tU_MQWB_l  := 0.000;
+a2pU_MQWB_l  :=    0.000; a2gU_MQWB_l  :=    0.000; a2tU_MQWB_l  := 0.000;
+a3pU_MQWB_l  :=    0.000; a3gU_MQWB_l  :=    0.000; a3tU_MQWB_l  := 0.000;
+a4pU_MQWB_l  :=    0.000; a4gU_MQWB_l  :=    0.000; a4tU_MQWB_l  := 0.000;
+a5pU_MQWB_l  :=    0.000; a5gU_MQWB_l  :=    0.000; a5tU_MQWB_l  := 0.000;
+a6pU_MQWB_l  :=    0.000; a6gU_MQWB_l  :=    0.000; a6tU_MQWB_l  := 0.000;
+a7pU_MQWB_l  :=    0.000; a7gU_MQWB_l  :=    0.000; a7tU_MQWB_l  := 0.000;
+a8pU_MQWB_l  :=    0.000; a8gU_MQWB_l  :=    0.000; a8tU_MQWB_l  := 0.000;
+a9pU_MQWB_l  :=    0.000; a9gU_MQWB_l  :=    0.000; a9tU_MQWB_l  := 0.000;
+a10pU_MQWB_l :=    0.000; a10gU_MQWB_l :=    0.000; a10tU_MQWB_l := 0.000;
+a11pU_MQWB_l :=    0.000; a11gU_MQWB_l :=    0.000; a11tU_MQWB_l := 0.000;
+!                          STANDARD DEVIATION
+a1pR_MQWB_l  :=   11.298; a1gR_MQWB_l  :=   63.808; a1tR_MQWB_l  := 0.000;
+a2pR_MQWB_l  :=    0.000; a2gR_MQWB_l  :=    0.000; a2tR_MQWB_l  := 0.000;
+a3pR_MQWB_l  :=    0.000; a3gR_MQWB_l  :=    5.215; a3tR_MQWB_l  := 0.000;
+a4pR_MQWB_l  :=    0.114; a4gR_MQWB_l  :=    1.423; a4tR_MQWB_l  := 0.000;
+a5pR_MQWB_l  :=    0.000; a5gR_MQWB_l  :=    0.907; a5tR_MQWB_l  := 0.000;
+a6pR_MQWB_l  :=    0.030; a6gR_MQWB_l  :=    0.192; a6tR_MQWB_l  := 0.000;
+a7pR_MQWB_l  :=    0.057; a7gR_MQWB_l  :=    0.056; a7tR_MQWB_l  := 0.000;
+a8pR_MQWB_l  :=    0.000; a8gR_MQWB_l  :=    0.181; a8tR_MQWB_l  := 0.000;
+a9pR_MQWB_l  :=    0.000; a9gR_MQWB_l  :=    0.002; a9tR_MQWB_l  := 0.000;
+a10pR_MQWB_l :=    0.018; a10gR_MQWB_l :=    0.061; a10tR_MQWB_l := 0.000;
+a11pR_MQWB_l :=    0.000; a11gR_MQWB_l :=    0.015; a11tR_MQWB_l := 0.000;
+
+! -----------------------------------------------------------------------
+! *********************** Magnet type:  MQWB right channel **************
+!       Inj=40 A        Coll = 600 A
+!Generated:     04/06/2004      M. Giovannozzi
+!Version:       data by S. Ramberger on the whole production
+! -----------------------------------------------------------------------
+!
+!                                AVERAGE
+b1pM_MQWB_r  :=  -91.058; b1gM_MQWB_r  :=  182.411; b1tM_MQWB_r  := 0.000;
+b2pM_MQWB_r  :=   -2.869; b2gM_MQWB_r  :=    0.263; b2tM_MQWB_r  := 0.000;
+b3pM_MQWB_r  :=  -14.247; b3gM_MQWB_r  :=    9.482; b3tM_MQWB_r  := 0.000;
+b4pM_MQWB_r  :=   -2.734; b4gM_MQWB_r  :=    3.388; b4tM_MQWB_r  := 0.000;
+b5pM_MQWB_r  :=   -0.848; b5gM_MQWB_r  :=   -2.158; b5tM_MQWB_r  := 0.000;
+b6pM_MQWB_r  :=   -0.442; b6gM_MQWB_r  :=   -0.995; b6tM_MQWB_r  := 0.000;
+b7pM_MQWB_r  :=    0.521; b7gM_MQWB_r  :=    0.290; b7tM_MQWB_r  := 0.000;
+b8pM_MQWB_r  :=    0.066; b8gM_MQWB_r  :=    0.023; b8tM_MQWB_r  := 0.000;
+b9pM_MQWB_r  :=   -0.001; b9gM_MQWB_r  :=    0.002; b9tM_MQWB_r  := 0.000;
+b10pM_MQWB_r :=    0.009; b10gM_MQWB_r :=    0.997; b10tM_MQWB_r := 0.000;
+b11pM_MQWB_r :=    0.000; b11gM_MQWB_r :=    0.081; b11tM_MQWB_r := 0.000;
+!                              UNCERTAINTY
+b1pU_MQWB_r  :=    0.000; b1gU_MQWB_r  :=    0.000; b1tU_MQWB_r  := 0.000;
+b2pU_MQWB_r  :=    0.000; b2gU_MQWB_r  :=    0.000; b2tU_MQWB_r  := 0.000;
+b3pU_MQWB_r  :=    0.000; b3gU_MQWB_r  :=    0.000; b3tU_MQWB_r  := 0.000;
+b4pU_MQWB_r  :=    0.000; b4gU_MQWB_r  :=    0.000; b4tU_MQWB_r  := 0.000;
+b5pU_MQWB_r  :=    0.000; b5gU_MQWB_r  :=    0.000; b5tU_MQWB_r  := 0.000;
+b6pU_MQWB_r  :=    0.000; b6gU_MQWB_r  :=    0.000; b6tU_MQWB_r  := 0.000;
+b7pU_MQWB_r  :=    0.000; b7gU_MQWB_r  :=    0.000; b7tU_MQWB_r  := 0.000;
+b8pU_MQWB_r  :=    0.000; b8gU_MQWB_r  :=    0.000; b8tU_MQWB_r  := 0.000;
+b9pU_MQWB_r  :=    0.000; b9gU_MQWB_r  :=    0.000; b9tU_MQWB_r  := 0.000;
+b10pU_MQWB_r :=    0.000; b10gU_MQWB_r :=    0.000; b10tU_MQWB_r := 0.000;
+b11pU_MQWB_r :=    0.000; b11gU_MQWB_r :=    0.000; b11tU_MQWB_r := 0.000;
+!                          STANDARD DEVIATION
+b1pR_MQWB_r  :=   38.919; b1gR_MQWB_r  :=   57.304; b1tR_MQWB_r  := 0.000;
+b2pR_MQWB_r  :=   20.278; b2gR_MQWB_r  :=   15.758; b2tR_MQWB_r  := 0.000;
+b3pR_MQWB_r  :=    1.539; b3gR_MQWB_r  :=    3.350; b3tR_MQWB_r  := 0.000;
+b4pR_MQWB_r  :=    0.000; b4gR_MQWB_r  :=    1.655; b4tR_MQWB_r  := 0.000;
+b5pR_MQWB_r  :=    0.152; b5gR_MQWB_r  :=    0.443; b5tR_MQWB_r  := 0.000;
+b6pR_MQWB_r  :=    0.000; b6gR_MQWB_r  :=    0.504; b6tR_MQWB_r  := 0.000;
+b7pR_MQWB_r  :=    0.084; b7gR_MQWB_r  :=    0.119; b7tR_MQWB_r  := 0.000;
+b8pR_MQWB_r  :=    0.041; b8gR_MQWB_r  :=    0.063; b8tR_MQWB_r  := 0.000;
+b9pR_MQWB_r  :=    0.000; b9gR_MQWB_r  :=    0.004; b9tR_MQWB_r  := 0.000;
+b10pR_MQWB_r :=    0.071; b10gR_MQWB_r :=    0.047; b10tR_MQWB_r := 0.000;
+b11pR_MQWB_r :=    0.021; b11gR_MQWB_r :=    0.024; b11tR_MQWB_r := 0.000;
+!                                AVERAGE
+a1pM_MQWB_r  :=   12.910; a1gM_MQWB_r  :=    5.959; a1tM_MQWB_r  := 0.000;
+a2pM_MQWB_r  :=    0.000; a2gM_MQWB_r  :=    0.000; a2tM_MQWB_r  := 0.000;
+a3pM_MQWB_r  :=    1.070; a3gM_MQWB_r  :=   -0.430; a3tM_MQWB_r  := 0.000;
+a4pM_MQWB_r  :=   -0.052; a4gM_MQWB_r  :=    0.075; a4tM_MQWB_r  := 0.000;
+a5pM_MQWB_r  :=   -0.093; a5gM_MQWB_r  :=   -0.020; a5tM_MQWB_r  := 0.000;
+a6pM_MQWB_r  :=    0.010; a6gM_MQWB_r  :=   -0.066; a6tM_MQWB_r  := 0.000;
+a7pM_MQWB_r  :=   -0.025; a7gM_MQWB_r  :=    0.032; a7tM_MQWB_r  := 0.000;
+a8pM_MQWB_r  :=   -0.041; a8gM_MQWB_r  :=   -0.012; a8tM_MQWB_r  := 0.000;
+a9pM_MQWB_r  :=    0.001; a9gM_MQWB_r  :=    0.000; a9tM_MQWB_r  := 0.000;
+a10pM_MQWB_r :=   -0.009; a10gM_MQWB_r :=    0.040; a10tM_MQWB_r := 0.000;
+a11pM_MQWB_r :=   -0.003; a11gM_MQWB_r :=   -0.009; a11tM_MQWB_r := 0.000;
+!                              UNCERTAINTY
+a1pU_MQWB_r  :=    0.000; a1gU_MQWB_r  :=    0.000; a1tU_MQWB_r  := 0.000;
+a2pU_MQWB_r  :=    0.000; a2gU_MQWB_r  :=    0.000; a2tU_MQWB_r  := 0.000;
+a3pU_MQWB_r  :=    0.000; a3gU_MQWB_r  :=    0.000; a3tU_MQWB_r  := 0.000;
+a4pU_MQWB_r  :=    0.000; a4gU_MQWB_r  :=    0.000; a4tU_MQWB_r  := 0.000;
+a5pU_MQWB_r  :=    0.000; a5gU_MQWB_r  :=    0.000; a5tU_MQWB_r  := 0.000;
+a6pU_MQWB_r  :=    0.000; a6gU_MQWB_r  :=    0.000; a6tU_MQWB_r  := 0.000;
+a7pU_MQWB_r  :=    0.000; a7gU_MQWB_r  :=    0.000; a7tU_MQWB_r  := 0.000;
+a8pU_MQWB_r  :=    0.000; a8gU_MQWB_r  :=    0.000; a8tU_MQWB_r  := 0.000;
+a9pU_MQWB_r  :=    0.000; a9gU_MQWB_r  :=    0.000; a9tU_MQWB_r  := 0.000;
+a10pU_MQWB_r :=    0.000; a10gU_MQWB_r :=    0.000; a10tU_MQWB_r := 0.000;
+a11pU_MQWB_r :=    0.000; a11gU_MQWB_r :=    0.000; a11tU_MQWB_r := 0.000;
+!                          STANDARD DEVIATION
+a1pR_MQWB_r  :=   32.122; a1gR_MQWB_r  :=   63.233; a1tR_MQWB_r  := 0.000;
+a2pR_MQWB_r  :=    0.000; a2gR_MQWB_r  :=    0.000; a2tR_MQWB_r  := 0.000;
+a3pR_MQWB_r  :=    0.000; a3gR_MQWB_r  :=    5.593; a3tR_MQWB_r  := 0.000;
+a4pR_MQWB_r  :=    0.276; a4gR_MQWB_r  :=    1.283; a4tR_MQWB_r  := 0.000;
+a5pR_MQWB_r  :=    0.112; a5gR_MQWB_r  :=    0.899; a5tR_MQWB_r  := 0.000;
+a6pR_MQWB_r  :=    0.000; a6gR_MQWB_r  :=    0.178; a6tR_MQWB_r  := 0.000;
+a7pR_MQWB_r  :=    0.055; a7gR_MQWB_r  :=    0.078; a7tR_MQWB_r  := 0.000;
+a8pR_MQWB_r  :=    0.034; a8gR_MQWB_r  :=    0.166; a8tR_MQWB_r  := 0.000;
+a9pR_MQWB_r  :=    0.003; a9gR_MQWB_r  :=    0.003; a9tR_MQWB_r  := 0.000;
+a10pR_MQWB_r :=    0.022; a10gR_MQWB_r :=    0.053; a10tR_MQWB_r := 0.000;
+a11pR_MQWB_r :=    0.003; a11gR_MQWB_r :=    0.018; a11tR_MQWB_r := 0.000;
+

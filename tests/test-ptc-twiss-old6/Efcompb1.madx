@@ -1,0 +1,24 @@
+if (ON_MB       <> 0)    { call, file="Efcompb1_MB.madx";        }
+!if (ON_MBX      <> 0)    { call, file="Efcompb1_MBX.madx";       }
+!f (ON_MBXLEND  <> 0)    { call, file="Efcompb1_MBXLEND.madx";   }
+!f (ON_MBXREND  <> 0)    { call, file="Efcompb1_MBXREND.madx";   }
+!if (ON_MBRC     <> 0)    { call, file="Efcompb1_MBRC.madx";      }
+!f (ON_MBRCLEND <> 0)    { call, file="Efcompb1_MBRCLEND.madx";  }
+!f (ON_MBRCREND <> 0)    { call, file="Efcompb1_MBRCREND.madx";  }
+!if (ON_MBRS     <> 0)    { call, file="Efcompb1_MBRS.madx";      }
+!if (ON_MBREND   <> 0)    { call, file="Efcompb1_ends.madx";  }
+!f (ON_MBRSREND <> 0)    { call, file="Efcompb1_MBRSREND.madx";  }
+!if (ON_MBRB     <> 0)    { call, file="Efcompb1_MBRB.madx";      }
+!f (ON_MBRBLEND <> 0)    { call, file="Efcompb1_MBRBLEND.madx";  }
+!f (ON_MBRBREND <> 0)    { call, file="Efcompb1_MBRBREND.madx";  }
+!if (ON_MBW      <> 0)    { call, file="Efcompb1_MBW.madx";       }
+!if (ON_MQ       <> 0)    { call, file="Efcompb1_MQ.madx";        }
+!if (ON_MQML     <> 0)    { call, file="Efcompb1_MQML.madx";      }
+!if (ON_MQM      <> 0)    { call, file="Efcompb1_MQM.madx";       }
+!if (ON_MQMC     <> 0)    { call, file="Efcompb1_MQMC.madx";      }
+!if (ON_MQTL     <> 0)    { call, file="Efcompb1_MQTL.madx";      }
+if (ON_MQX      <> 0)    { ON_MQXA = 1; ON_MQXB = 1;                    }
+!if (ON_MQXA     <> 0)    { call, file="Efcompb1_MQXA.madx";      }
+!if (ON_MQXB     <> 0)    { call, file="Efcompb1_MQXB.madx";      }
+!if (ON_MQY      <> 0)    { call, file="Efcompb1_MQY.madx";       }
+!if (ON_MQW      <> 0)    { call, file="Efcompb1_MQW.madx";       }

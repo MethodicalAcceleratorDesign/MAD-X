@@ -1,0 +1,40 @@
+!------------------------------------------------------------------------
+!      SIMULATE THE RESULTS OF OFF/ON-LINE MAGNETIC MEASUREMENTS
+!------------------------------------------------------------------------
+Select,flag=ERROR, clear;
+Select,flag=ERROR, class=MB;
+Esave,file="temp/MB.errors",order=0,radius=Rr;
+System,"grep R1 temp/MB.errors > temp/MB.12";
+System,"grep L2 temp/MB.errors >> temp/MB.12";
+
+System,"grep R2 temp/MB.errors > temp/MB.23";
+System,"grep L3 temp/MB.errors >> temp/MB.23";
+
+System,"grep R3 temp/MB.errors > temp/MB.34";
+System,"grep L4 temp/MB.errors >> temp/MB.34";
+
+System,"grep R4 temp/MB.errors > temp/MB.45";
+System,"grep L5 temp/MB.errors >> temp/MB.45";
+
+System,"grep R5 temp/MB.errors > temp/MB.56";
+System,"grep L6 temp/MB.errors >> temp/MB.56";
+
+System,"grep R6 temp/MB.errors > temp/MB.67";
+System,"grep L7 temp/MB.errors >> temp/MB.67";
+
+System,"grep R7 temp/MB.errors > temp/MB.78";
+System,"grep L8 temp/MB.errors >> temp/MB.78";
+
+System,"grep R8 temp/MB.errors > temp/MB.81";
+System,"grep L1 temp/MB.errors >> temp/MB.81";
+
+System,"perl read.magnet.errors temp/MB.12"; Call,file="temp/MB.12.mad";
+System,"perl read.magnet.errors temp/MB.23"; Call,file="temp/MB.23.mad";
+System,"perl read.magnet.errors temp/MB.34"; Call,file="temp/MB.34.mad";
+System,"perl read.magnet.errors temp/MB.45"; Call,file="temp/MB.45.mad";
+System,"perl read.magnet.errors temp/MB.56"; Call,file="temp/MB.56.mad";
+System,"perl read.magnet.errors temp/MB.67"; Call,file="temp/MB.67.mad";
+System,"perl read.magnet.errors temp/MB.78"; Call,file="temp/MB.78.mad";
+System,"perl read.magnet.errors temp/MB.81"; Call,file="temp/MB.81.mad";
+
+return;

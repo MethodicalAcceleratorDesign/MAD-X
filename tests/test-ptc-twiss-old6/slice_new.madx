@@ -1,0 +1,103 @@
+// Thys Risselada  (25/08/2005)  Slicing a la V6.4
+
+// USE ONLY WITH MAD-X version > June 2005
+
+ select, flag=makethin, clear;
+
+ select, flag=makethin, class=mbx,   slice=4;
+ select, flag=makethin, class=mbrs,  slice=4;
+ select, flag=makethin, class=mbrc,  slice=4;
+ select, flag=makethin, class=mbrb,  slice=4;
+
+ select, flag=makethin, class=mqxa,  slice=4;
+ select, flag=makethin, class=mqxb,  slice=4;
+
+ select, flag=makethin, class=mqwa,  slice=2;
+
+ select, flag=makethin, class=mqwb,  slice=2;
+
+ select, flag=makethin, class=mqy,   slice=2;
+
+ select, flag=makethin, class=mqtlh, slice=2;
+
+
+// 'reproduce' bug from V6.4 slice file
+ select, flag=makethin, pattern="MQWB.5L3.B2", slice=1;
+ select, flag=makethin, pattern="MQWB.5R3.B2", slice=1;
+ select, flag=makethin, pattern="MQWB.5L7.B2", slice=1;
+ select, flag=makethin, pattern="MQWB.5R7.B2", slice=1;
+
+
+! beam 1
+ select, flag=makethin, pattern="MQM.A7.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.B7.*\.B1", slice=2;
+
+ select, flag=makethin, pattern="MQM.6L2.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.6R2.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.A5R2.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.B5R2.*\.B1", slice=2;
+
+ select, flag=makethin, pattern="MQM.6L8.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.6R8.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.A5L8.*\.B1", slice=2;
+ select, flag=makethin, pattern="MQM.B5L8.*\.B1", slice=2;
+
+ select, flag=makethin, pattern="MQM.7L4.B1", slice=2;
+ select, flag=makethin, pattern="MQM.7R4.B1", slice=2;
+ select, flag=makethin, pattern="MQM.9L6.B1", slice=2;
+ select, flag=makethin, pattern="MQM.9R6.B1", slice=2;
+
+ select, flag=makethin, pattern="MQML\.6L1\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.5L1\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.5R1\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.6R1\.B1", slice=2;
+
+ select, flag=makethin, pattern="MQML\.6L5\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.5L5\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.5R5\.B1", slice=2;
+ select, flag=makethin, pattern="MQML\.6R5\.B1", slice=2;
+
+ select, flag=makethin, pattern="MQML.8L6.B1", slice=2;
+ select, flag=makethin, pattern="MQML.8R6.B1", slice=2;
+
+ select, flag=makethin, pattern="MQTLI\.7.3\.B1",slice=2;
+ select, flag=makethin, pattern="MQTLI\.7.7\.B1",slice=2;
+
+
+! beam 2
+ select, flag=makethin, pattern="MQM.A7.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.B7.*\.B2", slice=2;
+
+ select, flag=makethin, pattern="MQM.6L2.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.6R2.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.A5R2.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.B5R2.*\.B2", slice=2;
+
+ select, flag=makethin, pattern="MQM.6L8.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.6R8.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.A5L8.*\.B2", slice=2;
+ select, flag=makethin, pattern="MQM.B5L8.*\.B2", slice=2;
+
+ select, flag=makethin, pattern="MQM.7L4.B2", slice=2;
+ select, flag=makethin, pattern="MQM.7R4.B2", slice=2;
+ select, flag=makethin, pattern="MQM.9L6.B2", slice=2;
+ select, flag=makethin, pattern="MQM.9R6.B2", slice=2;
+
+ select, flag=makethin, pattern="MQML\.6L1\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.5L1\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.5R1\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.6R1\.B2", slice=2;
+
+ select, flag=makethin, pattern="MQML\.6L5\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.5L5\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.5R5\.B2", slice=2;
+ select, flag=makethin, pattern="MQML\.6R5\.B2", slice=2;
+
+ select, flag=makethin, pattern="MQML.8L6.B2", slice=2;
+ select, flag=makethin, pattern="MQML.8R6.B2", slice=2;
+
+ select, flag=makethin, pattern="MQTLI\.7.3\.B2",slice=2;
+ select, flag=makethin, pattern="MQTLI\.7.7\.B2",slice=2;
+
+
+

@@ -1,0 +1,25 @@
+PTC_TWISS Example6 6D ptc_twiss for LHC lattice
+
+Run command:
+../madxp < lhc.madx [> lhc.out]
+
+with the Mad-X output directed to the terminal or to 
+the "*.out" file.
+
+In this example, the PTC_TWISS command is applied to calculate 
+the Ripken-style 6D parameters.
+
+Input:
+******
+
+Lattice: the usual LHC input files
+Control: lhc.madx
+
+Output:
+*******
+
+twiss_lhc:      6D PTC_TWISS output
+end.map:        Matrix at end
+normal_results: First order chromaticity
+fort.18:        Debug map till second order
+
