@@ -972,12 +972,17 @@ tests/test-ptc-twiss-old6/README -text
 tests/test-ptc-twiss-old6/V6.5.seq -text
 tests/test-ptc-twiss-old6/V6.5.thin.inj.str -text
 tests/test-ptc-twiss-old6/end.map -text
+tests/test-ptc-twiss-old6/fort.18.cfg -text
 tests/test-ptc-twiss-old6/fort.18.ref -text
+tests/test-ptc-twiss-old6/normal_results.cfg -text
 tests/test-ptc-twiss-old6/normal_results.ref -text
 tests/test-ptc-twiss-old6/read.magnet.errors -text
 tests/test-ptc-twiss-old6/slice_new.madx -text
+tests/test-ptc-twiss-old6/summaryMomentumCompaction.cfg -text
 tests/test-ptc-twiss-old6/summaryMomentumCompaction.ref -text
 tests/test-ptc-twiss-old6/test-ptc-twiss-old6.madx -text
+tests/test-ptc-twiss-old6/test-ptc-twiss-old6.ref -text
+tests/test-ptc-twiss-old6/twiss_lhc.cfg -text
 tests/test-ptc-twiss-old6/twiss_lhc.ref -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
