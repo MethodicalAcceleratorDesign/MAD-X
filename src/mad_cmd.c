@@ -86,6 +86,8 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
   else if (strcmp(toks[k], "quit")        == 0) ;
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
+  else if (strcmp(toks[k], "removefile")  == 0) exec_removefile(cmd);
+  else if (strcmp(toks[k], "renamefile")  == 0) exec_renamefile(cmd);
   else if (strcmp(toks[k], "resbeam")     == 0) exec_beam(cmd, 1);
   else if (strcmp(toks[k], "resplot")     == 0) ;
   else if (strcmp(toks[k], "return")      == 0) ;

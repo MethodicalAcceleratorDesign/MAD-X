@@ -118,6 +118,33 @@ exec_assign(struct in_cmd* cmd)
 }
 
 void
+exec_removefile(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+
+  if (nl->inform[pos]) {
+    if (remove(pl->parameters[pos]->string))
+      warning("unable to remove file: ", pl->parameters[pos]->string);
+  }
+}
+
+void
+exec_renamefile(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+  int new = name_list_pos("name", nl);
+
+  if (nl->inform[pos] && nl->inform[new]) {
+    if (rename(pl->parameters[pos]->string, pl->parameters[new]->string))
+      warning("unable to rename file: ", pl->parameters[pos]->string);
+  }
+}
+
+void
 exec_call(struct in_cmd* cmd)
   /* handles calling external files */
 {
