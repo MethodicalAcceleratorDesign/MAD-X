@@ -953,9 +953,15 @@ tests/test-ptc-twiss-old4/twiss_ptc_ring.ref -text
 tests/test-ptc-twiss-old5/README -text
 tests/test-ptc-twiss-old5/dls811.seq -text
 tests/test-ptc-twiss-old5/end.map -text
+tests/test-ptc-twiss-old5/fort.18.cfg -text
 tests/test-ptc-twiss-old5/fort.18.ref -text
+tests/test-ptc-twiss-old5/normal_results.cfg -text
 tests/test-ptc-twiss-old5/normal_results.ref -text
+tests/test-ptc-twiss-old5/test-ptc-twiss-old5.cfg -text
 tests/test-ptc-twiss-old5/test-ptc-twiss-old5.madx -text
+tests/test-ptc-twiss-old5/twiss_diamond.cfg -text
+tests/test-ptc-twiss-old5/twiss_diamond.ref -text
+tests/test-ptc-twiss-old5/twiss_madx.cfg -text
 tests/test-ptc-twiss-old5/twiss_madx.ref -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss/Maxwellian_bend_for_ptc.txt.ref -text
