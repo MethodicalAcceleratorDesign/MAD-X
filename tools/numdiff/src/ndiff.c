@@ -574,7 +574,7 @@ ndiff_testNum (T *dif, const struct constraint *c)
   int l2 = parse_number(rhs_p, &d2, &n2, &e2, &f2);
   int ret = 0;
 
-  // invalid numbers
+  // missing numbers
   if (!l1 || !l2) {
     l1 = l2 = 20;
     ret |= eps_ign;
@@ -582,15 +582,25 @@ ndiff_testNum (T *dif, const struct constraint *c)
   }
 
   // ignore difference
-  if (c->eps.cmd & eps_ign)
+  if (c->eps.cmd & eps_ign) {
+    trace("  ignoring numbers '%.25s'|'%.25s'", lhs_p, rhs_p);
     goto quit;
+  }
+
+  // omit difference
+  if (c->eps.cmd & eps_omit) {
+    if (is_valid_omit(lhs_p, rhs_p, dif, c->eps.tag)) {
+      trace("  omitting numbers '%.25s'|'%.25s'", lhs_p, rhs_p);
+      goto quit;
+    }
+  }
 
   // strict comparison...
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
 
   // ...required
-  if (c->eps.cmd & eps_equ) {
+  if ((c->eps.cmd & eps_equ) && !(c->eps.cmd & eps_dra)) {
     ret |= eps_equ;
     goto quit_diff;
   }

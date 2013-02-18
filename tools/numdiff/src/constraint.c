@@ -136,7 +136,7 @@ readEps(struct eps *e, FILE *in, int row)
       cmd |= eps_equ;  trace("[%d] equ", row);
     }
     else if (strcmp(str, "either") == 0) {
-      e->either = 1;  trace("[%d] or", row);
+      e->either = 1;  trace("[%d] either", row);
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
       cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
@@ -151,7 +151,7 @@ readEps(struct eps *e, FILE *in, int row)
       ensure(e->abs > 0.0 && (option.largerr || e->abs < 1.0), "invalid absolute constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
-      cmd |= eps_omit; e->tag[sizeof e->tag-1] = 0;
+      cmd |= eps_omit | eps_equ; e->tag[sizeof e->tag-1] = 0;
                        trace("[%d] omit='%s'", row, e->tag);
       ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.indexed_filename, row);
     }
