@@ -1,0 +1,25 @@
+PTC_TWISS Example5 6D ptc_twiss for DIAMOND lattice
+
+Run command:
+../madxp < diamond.madx [> diamond.out]
+
+with the Mad-X output directed to the terminal or to 
+the "*.out" file.
+
+In this example, the PTC_TWISS command is applied to calculate 
+the Ripken-style 6D parameters.
+
+Input:
+******
+
+Lattice: dls811.seq
+Control: diamond.madx
+
+Output:
+*******
+
+twiss_madx:        Classical MAD-X 4D Twiss output
+twiss_diamond.out: 6D PTC_TWISS output
+end.map:           Matrix at end
+normal_results:    First order chromaticity
+fort.18:           Debug map till second order

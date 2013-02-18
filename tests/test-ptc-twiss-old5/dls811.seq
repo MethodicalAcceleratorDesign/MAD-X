@@ -1,0 +1,146 @@
+! DIAMOND STORAGE RING LATTICE
+! non zero dispersion in straights
+! six families of harmonic sextupoles
+! starting point at the middle of the long straight
+! thin lenses
+
+option,rbarc=false;
+
+! ***** drifts
+D1D2:      drift, Type=D1D2, L=.4377500E+01;
+D1BCentre: drift, Type=D1BCentre, L=.1000000E+01;
+D1BEnd2:   drift, Type=D1BEnd2, L=.1877500E+01;
+KD1:       drift, Type=KD1,  L=.8930000E+00;
+KD2:       drift, Type=KD2,  L=.4010000E+00;
+D2B:       drift, Type=D2B,  L=.1500000E+00;
+D3B:       drift, Type=D3B,  L=.2350000E+00;
+D4B:       drift, Type=D4B,  L=.4650000E+00;
+D4Ba:      drift, Type=D4Ba, L=.1765000E+00;
+D4Bb:      drift, Type=D4Bb, L=.2885000E+00;
+D5B:       drift, Type=D5B,  L=.2000000E+00;
+D6B:       drift, Type=D6B,  L=.6675000E+00;
+D6Ba:      drift, Type=D6Ba, L=.1125000E+00;
+D6Bb:      drift, Type=D6Bb, L=.5550000E+00;
+D1A:       drift, Type=D1A,  L=.2385000E+00;
+D1Aa:      drift, Type=D1Aa, L=.1225000E+00;
+D1Ab:      drift, Type=D1Ab, L=.1160000E+00;
+D2A:       drift, Type=D2A,  L=.1990000E+00;
+D3A:       drift, Type=D3A,  L=.4250000E+00;
+D3Aa:      drift, Type=D3Aa, L=.1615000E+00;
+D3Ab:      drift, Type=D3Ab, L=.2635000E+00;
+D4A:       drift, Type=D4A,  L=.5875000E+00;
+D4Aa:      drift, Type=D4Aa, L=.1050000E+00;
+D4Ab:      drift, Type=D4Ab, L=.4825000E+00;
+
+! ***** Quads
+! QF and QD valus set to have the tune at (27.2256,12.3632)
+Q1D:     quadrupole, Type=Q1D , L=0.400, K1=-.7126250E+00;!/1.0005;
+Q2D:     quadrupole, Type=Q2D , L=0.600, K1= .1272800E+01;!/1.0005;
+Q3D:     quadrupole, Type=Q3D , L=0.300, K1=-.1007140E+01;!/1.0005;
+Q2AD:    quadrupole, Type=Q2AD, L=0.400, K1=-.9896300E+00;!/1.0005;
+Q1AD:    quadrupole, Type=Q1AD, L=0.400, K1= .1263560E+01;!/1.0005;
+Q1AB:    quadrupole, Type=Q1AB, L=0.400, K1= .1286190E+01;!/1.0005;
+Q2AB:    quadrupole, Type=Q2AB, L=0.400, K1=-.1044950E+01;!/1.0005;
+Q3B:     quadrupole, Type=Q3B , L=0.300, K1=-.8843700E+00;!/1.0005;
+Q2B:     quadrupole, Type=Q2B , L=0.600, K1= .1475330E+01;!/1.0005;
+Q1B:     quadrupole, Type=Q1B , L=0.400, K1=-.1246210E+01;!/1.0005;
+
+! ***** Sext
+! Fitted values to produce normalized chromaticities 0,0 
+TS1A:     sextupole, Type=S1A , L= .3, K2=0.;!  2*19.29;!  2* 5.449444/.3;
+TS2A:     sextupole, Type=S2A , L= .2, K2=0.;!  -2*18.08;! -2* 3.349528/.2; 
+TS1B:     sextupole, Type=S1B , L= .3, K2=0.;!   2*10.50;!  2* 3.148519/.3; 
+TS2B:     sextupole, Type=S2B , L= .3, K2=0.;!  -2*16.64;! -2* 4.993126/.3; 
+TS1C:     sextupole, Type=S1C , L= .3, K2=0.;!   2*8.49;!  2* 2.546022/.3; 
+TS2C:     sextupole, Type=S2C , L= .3, K2=0.;!  -2*10.88;! -2* 3.263168/.3; 
+TS1D:     sextupole, Type=S1D , L= .3, K2=0.;!   2*6.90;!  2* 2.069871/.3;
+TS2D:     sextupole, Type=S2D , L= .3, K2=0.;!  -2*16.76;! -2* 5.028928/.3; 
+!DSEXT1:    drift, Type=DSEXT  , L=0.15 - 1.5e-8;
+!DSEXT2:    drift, Type=DSEXT  , L=0.10 - 1.5e-8;
+DSEXT1:    drift, Type=DSEXT  , L=0.;
+DSEXT2:    drift, Type=DSEXT  , L=0.;
+
+! ***** Correctors inside the sextupoles
+HSTR:  drift, Type=HSTR, L=0.;!, VKick=0, HKick=0;
+VSTR:  drift, Type=VSTR, L=0.;!, VKick=0, HKick=0;
+
+S1A: Line=(DSEXT1,TS1A,HSTR,VSTR,DSEXT1);
+S2A: Line=(DSEXT2,TS2A,HSTR,VSTR,DSEXT2);
+S1B: Line=(DSEXT1,TS1B,HSTR,VSTR,DSEXT1);
+S2B: Line=(DSEXT1,TS2B,HSTR,VSTR,DSEXT1);
+S1C: Line=(DSEXT1,TS1C,HSTR,VSTR,DSEXT1);
+S2C: Line=(DSEXT1,TS2C,HSTR,VSTR,DSEXT1);
+S1D: Line=(DSEXT1,TS1D,HSTR,VSTR,DSEXT1);
+S2D: Line=(DSEXT1,TS2D,HSTR,VSTR,DSEXT1);
+
+! ***** Bending
+!A=0.13089969;
+A=2.*pi/48.;
+N=100;
+!BB: sbend, Type=BB, L=0.936, K1=0., Angle=A, E1=A/2, E2=A/2;
+BB: rbend, Type=BB, L=0.936, K1=0., Angle=A,ptcrbend,truerbend;
+BBs: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N;!, E1=A/2, E2=0;
+BBm: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N, E1=0, E2=0;
+BBe: sbend, Type=BB, L=0.936/N, K1=0., Angle=A/N;!, E1=0, E2=A/2;
+
+
+! ***** BPM
+BPM: monitor, Type=BPM, L=0;
+
+! ***** Fast correctors
+K1HC: KICKER, Type=K1HC, L=0., VKick=0, HKick=0;
+K1VC: KICKER, Type=K1VC, L=0., VKick=0, HKick=0;
+K1:   Line=(K1HC,K1VC);
+
+! ***** RF cavity
+!CAV:   rfcavity, Type=RF, L=0, Volt=3.3, Harmon=936, Lag=0.549959;
+!CAV:   rfcavity, Volt=3.3, freq=499.65, Lag=0.4509;
+CAV:   rfcavity, Volt=3.3, freq=499.65, Lag=0.549959;
+
+
+! ***** Begin Lattice
+SPERIOD: Line= (D1D2,&
+ BPM,     K1,        KD1,       K1,       KD2,&
+ Q1D,     D2B,       S1D,       D3B,      Q2D,      D4B,&
+ Q3D,     D5B,       S2D,       D6Ba,     BPM,      D6Bb,    BB,&
+ D4A,     Q2AD,      D3Aa,      BPM,      D3Ab,     S2A,     D2A,&
+ Q1AD,    D1Aa,      BPM,       D1Ab,     S1A,      D1A,     Q1AB,&
+ D2A,     S2A,       D3A,       Q2AB,     D4Aa,     BPM,     D4Ab,&
+ BB,      D6B,       S2C,       D5B,      Q3B,      D4Ba,    BPM,&
+ D4Bb,    Q2B,       D3B,       S1C,      D2B,      Q1B,&
+ KD2,     K1,        KD1,       K1,       BPM,&
+ D1BEnd2, D1BCentre, D1BCentre, D1BEnd2,&
+ BPM,     K1,        KD1,& 
+ K1,      KD2,       Q1B,       D2B,      S1B,      D3B,&
+ Q2B,     D4B,       Q3B,       D5B,      S2B,      D6Ba,    BPM,&
+ D6Bb,    BB,        D4A,       Q2AB,     D3Aa,     BPM,     D3Ab,&
+ S2A,     D2A,       Q1AB,      D1Aa,     BPM,      D1Ab,    S1A,&
+ D1A,     Q1AB,      D2A,       S2A,      D3A,      Q2AB,    D4Aa,&  
+ BPM,     D4Ab,      BB,        D6B,      S2B,      D5B,     Q3B,&      
+ D4Ba,    BPM,       D4Bb,      Q2B,      D3B,      S1B,&
+ D2B,     Q1B,       KD2,       K1,       KD1,      K1,      BPM,&
+ D1BEnd2, D1BCentre, D1BCentre, D1BEnd2,&
+ BPM,     K1,        KD1,       K1,       KD2,      Q1B,     D2B,&
+ S1B,     D3B,       Q2B,       D4B,      Q3B,      D5B,     S2B,&    
+ D6Ba,    BPM,       D6Bb,      BB,       D4A,      Q2AB,&
+ D3Aa,    BPM,       D3Ab,      S2A,      D2A,      Q1AB,    D1Aa,&
+ BPM,     D1Ab,      S1A,       D1A,      Q1AB,     D2A,&
+ S2A,     D3A,       Q2AB,      D4Aa,     BPM,      D4Ab,    BB,&       
+ D6B,     S2B,       D5B,       Q3B,      D4Ba,     BPM,     D4Bb,&
+ Q2B,     D3B,       S1B,       D2B,      Q1B,      KD2,     K1,&
+ KD1,     K1,        BPM,&
+ D1BEnd2, D1BCentre, D1BCentre, D1BEnd2,&
+ BPM,     K1,        KD1,       K1,       KD2,&
+ Q1B,     D2B,       S1C,       D3B,      Q2B,      D4B,&
+ Q3B,     D5B,       S2C,       D6Ba,     BPM,      D6Bb,     BB,&
+ D4A,     Q2AB,      D3Aa,      BPM,      D3Ab,     S2A,      D2A,&
+ Q1AB,    D1Aa,      BPM,       D1Ab,     S1A,      D1A,      Q1AD,&
+ D2A,     S2A,       D3A,       Q2AD,     D4Aa,     BPM,      D4Ab,&
+ BB,      D6B,       S2D,       D5B,      Q3D,      D4Ba,     BPM,&
+ D4Bb,    Q2D,       D3B,       S1D,      D2B,      Q1D,&
+ KD2,     K1,        KD1,       K1,       BPM,      D1D2);
+
+
+DIAMOND: Line=(SPERIOD,SPERIOD,SPERIOD,SPERIOD,SPERIOD,SPERIOD,CAV);
+
+
