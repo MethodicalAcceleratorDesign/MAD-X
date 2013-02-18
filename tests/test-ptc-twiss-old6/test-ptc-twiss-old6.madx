@@ -29,8 +29,11 @@ SU=1.0;
 
 Title, "Thin lens Optics for the LHC 6.4 lattice with MADX";
 Option, -echo, info;
-call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
-call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+!call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+!call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+call, file = "V6.5.seq";
+call, file = "V6.5.thin.inj.str";
+
 call, file = "slice_new.madx";
 
 ! switch crossing angles ON

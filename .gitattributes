@@ -969,6 +969,8 @@ tests/test-ptc-twiss-old6/Efcompb1_MB.madx -text
 tests/test-ptc-twiss-old6/Esubroutines.madx -text
 tests/test-ptc-twiss-old6/MB.measurementsb1.fix.madx -text
 tests/test-ptc-twiss-old6/README -text
+tests/test-ptc-twiss-old6/V6.5.seq -text
+tests/test-ptc-twiss-old6/V6.5.thin.inj.str -text
 tests/test-ptc-twiss-old6/end.map -text
 tests/test-ptc-twiss-old6/fort.18.ref -text
 tests/test-ptc-twiss-old6/normal_results.ref -text
