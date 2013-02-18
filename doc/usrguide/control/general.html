@@ -191,6 +191,24 @@ of the table itself.
 This feature allows to store multiple tables of the same type
 in memory without overwriting existing ones.
 <p>
+<li><h4><a name=removefile>REMOVEFILE</a></h4>
+<pre>
+removefile,file=filename;
+</pre>
+remove a file from the disk. It is more portable than
+<pre>
+system("rm filename"); // Unix specific
+</pre>
+<p>
+<li><h4><a name=renamefile>RENAMEFILE</a></h4>
+<pre>
+renamefile,file=filename,name=newfilename;
+</pre>
+rename the file "filename" to "newfilename" on the disk. It is more portable than
+<pre>
+system("mv filename newfilename"); // Unix specific
+</pre>
+<p>
 <li><h4><a name=resbeam>RESBEAM</a></h4>
 <pre>
 resbeam,sequence=s_name;
