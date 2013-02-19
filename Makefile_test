@@ -75,7 +75,7 @@ test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test
 
 # lexicographical order
 tests-to-setup := \
-test-error-3__get_invalid_table_access
+test-error-3__needs_generated_error_file_from_Riccardo
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite

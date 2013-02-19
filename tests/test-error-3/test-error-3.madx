@@ -2,7 +2,7 @@ Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
 Option,  -warn,-info,-echo;
 
-call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
 
 Option, warn,info;
 
@@ -10,8 +10,8 @@ Option, warn,info;
 ! 	define beam constants
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
- eg   =  7000;
- bg   =  eg/pmass;
+ eg   = 7000;
+ bg   = eg/pmass;
  en   = 3.75e-06;
  epsx = en/bg;
  epsy = en/bg;
