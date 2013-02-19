@@ -29,7 +29,7 @@ static int
 diff_summary(const struct ndiff *dif)
 {
   int n, c;
-  ndiff_getInfo(dif, &n, 0, &c);
+  ndiff_getInfo(dif, &n, 0, &c, 0);
 
   if (!ndiff_feof(dif, 1)) {
     c += 1;
@@ -62,6 +62,7 @@ main(int argc, const char* argv[])
 
   // test counter
   int total = 0, failed = 0;
+  long lines = 0, numbers = 0;
 
   trace("arguments: total=%d, left=%d, right=%d, curr=%s",
         argc, option.argi, argc-option.argi, argv[option.argi]);
@@ -146,6 +147,12 @@ main(int argc, const char* argv[])
       // print summary
       if (diff_summary(dif) > 0) ++failed;
 
+      // collect stats
+      { int row; long num;
+        ndiff_getInfo(dif, &row, 0, 0, &num);
+        lines += row-1; numbers += num;
+      }
+
       // destroy components
       ndiff_free(dif);
       context_free(cxt);
@@ -173,7 +180,7 @@ main(int argc, const char* argv[])
   }
 
   if (option.acc)
-    accum_summary(total, failed);
+    accum_summary(total, failed, lines, numbers);
 
   return EXIT_SUCCESS;
 }

@@ -33,7 +33,7 @@
 // extern functions
 
 FILE* open_indexedFile(const char* str, int idx, const char *ext, int optext, int required);
-void  accum_summary(int total, int failed);
+void  accum_summary(int total, int failed, long lines, long numbers);
 
 // inline functions
 

@@ -49,7 +49,7 @@ void  ndiff_diffLine (T*);
 int   ndiff_nextNum  (T*, const struct constraint*); // return 0 if no number is found
 int   ndiff_testNum  (T*, const struct constraint*);
 
-void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_);
+void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_, long *num_);
 int   ndiff_feof     (const T*, int both);
 int   ndiff_isempty  (const T*);
 

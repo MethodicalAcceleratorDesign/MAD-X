@@ -45,6 +45,9 @@ struct ndiff {
   // diff counter
   int   cnt_i, max_i;
 
+  // numbers counter
+  long  num_i;
+
   // buffers
   int   lhs_i,  rhs_i; // char-columns
   int   buf_s;         // capacity
@@ -528,7 +531,7 @@ retry:
   dif->rhs_i = rhs_p-dif->rhs_b;
   trace("<-nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
-  return ++dif->col_i;
+  return ++dif->num_i, ++dif->col_i;
 
 quit_diff:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
@@ -686,13 +689,14 @@ ndiff_option  (T *dif, const int *keep_, const int *blank_, const int *check_)
 }
 
 void
-ndiff_getInfo (const T *dif, int *row_, int *col_, int *cnt_)
+ndiff_getInfo (const T *dif, int *row_, int *col_, int *cnt_, long *num_)
 {
   assert(dif);
 
   if (row_) *row_ = dif->row_i;
   if (col_) *col_ = dif->col_i;
   if (cnt_) *cnt_ = dif->cnt_i;
+  if (num_) *num_ = dif->num_i;
 }
 
 int
@@ -744,7 +748,7 @@ ndiff_loop(T *dif)
     // goto or read line(s)
     if (c->eps.cmd & eps_goto) {
       ndiff_gotoLine(dif, c->eps.tag);
-      ndiff_getInfo(dif, &row, 0, 0);
+      ndiff_getInfo(dif, &row, 0, 0, 0);
     } else {
       ndiff_readLine(dif);
       if (ndiff_isempty(dif)) continue;
