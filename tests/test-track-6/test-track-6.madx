@@ -113,7 +113,7 @@ track, onepass, dump; ! onepass = no closed orbit computed before tracking!
   start, x= 0.001,px= 4.492437849e-06;
   start, x= 0.1,  px= 4.492437849e-04;
   observe, place= endmk;
-  run,   turns= 1;
+  run,   turns= 10;
 endtrack;
 
 method = "TRACK";
