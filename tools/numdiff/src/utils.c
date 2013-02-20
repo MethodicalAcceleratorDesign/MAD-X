@@ -116,6 +116,7 @@ accum_summary(int total, int failed, long lines, long numbers)
   time_t now = time(0);
   int total_tests=0, total_passed=0, total_failed=0;
   long total_lines=0, total_numbers=0;
+  double total_ndtime=0;
 
   FILE *fp = fopen(option.acc, "r+");
   if (fp) {
@@ -133,14 +134,14 @@ accum_summary(int total, int failed, long lines, long numbers)
 //    tm2 = *gmtime(&now);
 //    tz = difftime(now, mktime(&tm2));
 
-    // read line and number counts
-    n = fscanf(fp, "   total lines %ld    -  total numbers %ld\n", &total_lines, &total_numbers);
-    ensure(n == 2, "invalid summary file format %s", option.acc);
-
+    // read diff time, line and number counts
+    n = fscanf(fp, "   total diff time %lf s  -  total lines %ld  -  total numbers %ld\n",
+                   &total_ndtime, &total_lines, &total_numbers);
+    ensure(n == 3, "invalid summary file format %s (lines)", option.acc);
     // read tests counts
-    n = fscanf(fp, "   total time %*f s  -  total tests %4d - PASSED %4d - FAILED %4d\n",
+    n = fscanf(fp, "   total run  time %*f s  -  total files %d - PASSED %d - FAILED %d\n",
                    &total_tests, &total_passed, &total_failed);
-    ensure(n == 3, "invalid summary file format %s", option.acc);
+    ensure(n == 3, "invalid summary file format %s (files)", option.acc);
     ensure(total_tests == total_passed+total_failed, "invalid summary count in file %s", option.acc);
 
     // reset file
@@ -157,13 +158,17 @@ accum_summary(int total, int failed, long lines, long numbers)
   }
 
   double total_time = difftime(now, option.dat_t0); // + tz;
-  total_lines += lines;
+  total_ndtime  += (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
+  total_lines   += lines;
   total_numbers += numbers;
 
   fprintf(fp, " = tests summary (started at %04d.%02d.%02d %02d:%02d:%02d)\n",
           tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-  fprintf(fp, "   total lines %6ld    -  total numbers %6ld\n", total_lines, total_numbers);
-  fprintf(fp, "   total time %7.0f s  -  total tests %5d  -  PASSED %4d  -  FAILED %4d\n",
+
+  fprintf(fp, "   total diff time %6.2lf s  -  total lines %6ld  -  total numbers %8ld\n",
+              total_ndtime, total_lines, total_numbers);
+
+  fprintf(fp, "   total run  time %6.0f s  -  total files %6d  -  PASSED %4d  -  FAILED %4d\n",
               total_time, total_tests+total, total_passed+(total-failed), total_failed+failed);
 
   fclose(fp);
