@@ -692,6 +692,7 @@ tests/test-dynap/dynap.cfg -text
 tests/test-dynap/dynap.ref -text
 tests/test-dynap/dynaptune.cfg -text
 tests/test-dynap/dynaptune.ref -text
+tests/test-dynap/lyapunov.data.cfg -text
 tests/test-dynap/lyapunov.data.ref -text
 tests/test-dynap/test-dynap.cfg -text
 tests/test-dynap/test-dynap.madx -text
