@@ -3,7 +3,8 @@
  |
  | Numdiff
  |
- | Copyright (c) 2012+ Laurent Deniau
+ | Copyright (c) 2012+ laurent.deniau@cern.ch
+ | Gnu General Public License
  |
  o---------------------------------------------------------------------o
   
@@ -29,7 +30,7 @@ struct logmsg_config logmsg_config = {
   .level  = inform_level,
   .locate = 0,
 #endif
-  .flush  = 1             // flush stdout
+  .flush  = 1             // always flush stdout
 };
 
 void

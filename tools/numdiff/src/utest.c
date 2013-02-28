@@ -3,7 +3,8 @@
  |
  | Numdiff
  |
- | Copyright (c) 2012+ Laurent Deniau
+ | Copyright (c) 2012+ laurent.deniau@cern.ch
+ | Gnu General Public License
  |
  o---------------------------------------------------------------------o
   
@@ -20,15 +21,20 @@
 #include <assert.h>
 #include <time.h>
 
+#include "utils.h"
 #include "utest.h"
 #include "error.h"
 
 // ----- constants
 
-enum { UTEST_KEEP = 25 };
+#ifndef MAXUTESTKEEP
+#define MAXUTESTKEEP 25
+#endif
 
-static const char *const fail_str = "\033[31mFAIL\033[0m";
-static const char *const pass_str = "\033[32mPASS\033[0m";
+enum { UTEST_KEEP = MAXUTESTKEEP };
+
+static const char *const fail_str = CSTR_RED  ("FAIL");
+static const char *const pass_str = CSTR_GREEN("PASS");
 
 // ----- types
 
@@ -151,12 +157,11 @@ utest_stat(struct utest *ut)
   assert(ut);
 
   fprintf(ut->out,
-         " = %5d total, %5d passed, %5d failed"
-         "            (%.2f s)             %s\n",
-         ut->total_pass+ut->total_fail,
-         ut->total_pass,
-         ut->total_fail,
-         ut->total_time,
-         ut->total_fail ? fail_str : pass_str);
+  " = %5d total, %5d passed, %5d failed            (%.2f s)             %s\n",
+    ut->total_pass+ut->total_fail,
+    ut->total_pass,
+    ut->total_fail,
+    ut->total_time,
+    ut->total_fail ? fail_str : pass_str);
 }
 

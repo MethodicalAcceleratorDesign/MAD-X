@@ -3,7 +3,8 @@
  |
  | Numdiff
  |
- | Copyright (c) 2012+ Laurent Deniau
+ | Copyright (c) 2012+ laurent.deniau@cern.ch
+ | Gnu General Public License
  |
  o---------------------------------------------------------------------o
   

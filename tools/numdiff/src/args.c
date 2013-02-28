@@ -3,7 +3,8 @@
  |
  | Numdiff
  |
- | Copyright (c) 2012+ Laurent Deniau
+ | Copyright (c) 2012+ laurent.deniau@cern.ch
+ | Gnu General Public License
  |
  o---------------------------------------------------------------------o
   
@@ -24,18 +25,42 @@
 #include "ndiff.h"
 #include "context.h"
 
+#ifndef PUNCTCHRS
+#define PUNCTCHRS "._$"
+#endif
+
+#ifndef SERIEFMT
+#define SERIEFMT "%d"
+#endif
+
+#ifndef MAXKEEP
+#define MAXKEEP 25
+#endif
+
+#ifndef OUTFILEEXT
+#define OUTFILEEXT ".out"
+#endif
+
+#ifndef REFFILEEXT
+#define REFFILEEXT ".ref"
+#endif
+
+#ifndef CFGFILEEXT
+#define CFGFILEEXT ".cfg"
+#endif
+
 struct option option = {
   // names and series numbering
-  .fmt = "%d",
+  .fmt = SERIEFMT,
 
   // punctuation part of identifiers
-  .chr = "._$",
+  .chr = PUNCTCHRS,
 
   // number of diff displayed
-  .keep = 25,
+  .keep = MAXKEEP,
 
   // file extensions
-  .out_e  = ".out", .ref_e =  ".ref", .cfg_e = ".cfg"
+  .out_e  = OUTFILEEXT, .ref_e =  REFFILEEXT, .cfg_e = CFGFILEEXT
 };
 
 static void
@@ -45,7 +70,7 @@ run_utest(void)
 
   inform("Running unit tests (incomplete)");
 
-  // list of unit tests: TODO
+  // list of unit tests: TODO: more utests
   context_utest(ut);
   ndiff_utest(ut);
 
@@ -83,18 +108,18 @@ usage(void)
   inform("\t-d    -debug        enable debug mode (include check mode)");
   inform("\t-e    -largerr      allow abs and rel error specifier >= 1.0");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
-  inform("\t-g    -cfgext ext   specify the config file extension, default is .cfg");
+  inform("\t-g    -cfgext ext   specify the config file extension, default is \"%s\"", option.cfg_e);
   inform("\t-h    -help         display this help");
-  inform("\t-k    -keep num     specify the number of diffs to display per file, default is 25");
+  inform("\t-k    -keep num     specify the number of diffs to display per file, default is %d", option.keep);
   inform("\t-l    -list         enable list mode (list of filenames)");
   inform("\t-n    -serie        enable series mode (indexed filenames)");
-  inform("\t-o    -outext ext   specify the output file extension, default is .out");
+  inform("\t-o    -outext ext   specify the output file extension, default is \"%s\"", option.out_e);
   inform("\t-p    -punct chrs   punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
-  inform("\t-r    -refext ext   specify the reference file extension, default is .ref");
+  inform("\t-r    -refext ext   specify the reference file extension, default is \"%s\"", option.ref_e);
   inform("\t-s    -suite name   set testsuite name for output message (title)");
   inform("\t-t    -test name    set test name for output message (item)");
-  inform("\t-u    -utest        run the test suite");
+  inform("\t-u    -utest        run the test suite (still incomplete)");
 
   exit(EXIT_FAILURE);
 }

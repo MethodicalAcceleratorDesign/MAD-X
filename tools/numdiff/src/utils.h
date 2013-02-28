@@ -6,7 +6,8 @@
  |
  | Numdiff
  |
- | Copyright (c) 2012+ Laurent Deniau
+ | Copyright (c) 2012+ laurent.deniau@cern.ch
+ | Gnu General Public License
  |
  o---------------------------------------------------------------------o
   
@@ -22,7 +23,7 @@
 
 // macros
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(NOCOLORS)
 #define CSTR_RED(s) s
 #define CSTR_GREEN(s) s
 #else
