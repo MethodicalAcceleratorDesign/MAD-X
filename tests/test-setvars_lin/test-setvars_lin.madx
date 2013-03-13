@@ -1,7 +1,7 @@
 create,table=t,column=a,b;
 a=1; b=2; fill,table=t;
 a=2; b=4; fill,table=t;
-a=5.32; b=3.2; fill,table=t;
+a=5.32; b=-3.2; fill,table=t;
 
 t=0.37;
 setvars_lin,table=t,row1=1,row2=1,param=t;

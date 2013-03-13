@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.07      +
-  + Execution Time Stamp: 10.12.12 15.06.19 +
+  +    MAD-X 5.01.00  (64 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2013.03.13      +
+  + Execution Time Stamp: 13.03.13 17.47.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 create,table=t,column=a,b;
 
@@ -13,7 +13,7 @@ a=2; b=4; fill,table=t;
 
 ++++++ info: a redefined
 ++++++ info: b redefined
-a=5.32; b=3.2; fill,table=t;
+a=5.32; b=-3.2; fill,table=t;
 
 ++++++ info: a redefined
 ++++++ info: b redefined
@@ -27,8 +27,8 @@ setvars_lin,table=t,row1=1,row2=1,param=t;
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+1*(1-t) ;
-b := 2*(t)+2*(1-t) ;
+a := 1*(t)+1*(1-(t)) ;
+b := 2*(t)+2*(1-(t)) ;
 a =                  1 ;
 b =                  2 ;
 setvars_lin,table=t,row1=1,row2=2,param=t;
@@ -37,8 +37,8 @@ setvars_lin,table=t,row1=1,row2=2,param=t;
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+2*(1-t) ;
-b := 2*(t)+4*(1-t) ;
+a := 1*(t)+2*(1-(t)) ;
+b := 2*(t)+4*(1-(t)) ;
 a =               1.63 ;
 b =               3.26 ;
 setvars_lin,table=t,row1=1,row2=3,param=t;
@@ -47,28 +47,28 @@ setvars_lin,table=t,row1=1,row2=3,param=t;
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+5.32*(1-t) ;
-b := 2*(t)+3.2*(1-t) ;
+a := 1*(t)+5.32*(1-(t)) ;
+b := 2*(t)-3.2*(1-(t)) ;
 a =             3.7216 ;
-b =              2.756 ;
+b =             -1.276 ;
 setvars_lin,table=t,row1=1,row2=0,param=t;
 
 ++++++ info: a redefined
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+5.32*(1-t) ;
-b := 2*(t)+3.2*(1-t) ;
+a := 1*(t)+5.32*(1-(t)) ;
+b := 2*(t)-3.2*(1-(t)) ;
 a =             3.7216 ;
-b =              2.756 ;
+b =             -1.276 ;
 setvars_lin,table=t,row1=1,row2=-1,param=t;
 
 ++++++ info: a redefined
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+2*(1-t) ;
-b := 2*(t)+4*(1-t) ;
+a := 1*(t)+2*(1-(t)) ;
+b := 2*(t)+4*(1-(t)) ;
 a =               1.63 ;
 b =               3.26 ;
 setvars_lin,table=t,row1=1,row2=-2,param=t;
@@ -77,8 +77,8 @@ setvars_lin,table=t,row1=1,row2=-2,param=t;
 ++++++ info: b redefined
 show,a,b; value,a,b;
 
-a := 1*(t)+1*(1-t) ;
-b := 2*(t)+2*(1-t) ;
+a := 1*(t)+1*(1-(t)) ;
+b := 2*(t)+2*(1-(t)) ;
 a =                  1 ;
 b =                  2 ;
 setvars_lin,table=t,row1=1,row2=-3,param=t;
@@ -86,8 +86,8 @@ setvars_lin,table=t,row1=1,row2=-3,param=t;
 ++++++ warning: row2 index out of bounds:  ignored
 show,a,b; value,a,b;
 
-a := 1*(t)+1*(1-t) ;
-b := 2*(t)+2*(1-t) ;
+a := 1*(t)+1*(1-(t)) ;
+b := 2*(t)+2*(1-(t)) ;
 a =                  1 ;
 b =                  2 ;
 
@@ -99,5 +99,5 @@ value,a
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.01.00 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
