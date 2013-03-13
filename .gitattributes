@@ -558,6 +558,7 @@ src/twiss.f90 -text
 src/user2_photon.f90 -text
 src/util.f90 -text
 src/wrap.f90 -text
+syntax/.htaccess -text
 syntax/CMakeLists.txt -text
 syntax/README.txt -text
 syntax/emacs/.emacs -text
