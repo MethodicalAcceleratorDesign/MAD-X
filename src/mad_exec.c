@@ -469,7 +469,7 @@ exec_setvars_lin_table(struct in_cmd* cmd)
         colname=t->columns->names[i];
         val1=t->d_cols[i][row1];
         val2=t->d_cols[i][row2];
-        sprintf(expr,"%s:=%10.16g*(%s)+%10.16g*(1-%s);",
+        sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));",
             colname,val1,param,val2,param);
         /* printf("%s\n",expr); */
         pro_input(expr);
