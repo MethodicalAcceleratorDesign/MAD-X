@@ -19,61 +19,61 @@
 #
 # all
 #
-.PHONY: all-dev-linux32 all-dev-linux64
+.PHONY: all-linux32 all-linux64
 
-all-dev-linux32: madx-dev-linux32 libmadx-dev-linux32 libptc-dev-linux32 numdiff-dev-linux32
-all-dev-linux64: madx-dev-linux64 libmadx-dev-linux64 libptc-dev-linux64 numdiff-dev-linux64
+all-linux32: madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
+all-linux64: madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64
 
 #
 # madx
 #
-.PHONY:                 madx-dev-linux          madx-dev-linux-gnu
-.PHONY:                 madx-dev-linux-lahey    madx-dev-linux-nagfor
-.PHONY:                 madx-dev-linux32        madx-dev-linux64
-.PHONY:                 madx-dev-linux32-gnu    madx-dev-linux64-gnu
-.PHONY:                 madx-dev-linux32-lahey  madx-dev-linux64-lahey
-.PHONY:                 madx-dev-linux32-nagfor madx-dev-linux64-nagfor
-madx-dev-linux:         madx-dev-linux32        madx-dev-linux64
-madx-dev-linux-gnu:     madx-dev-linux32-gnu    madx-dev-linux64-gnu
-madx-dev-linux-lahey:   madx-dev-linux32-lahey  madx-dev-linux64-lahey
-madx-dev-linux-nagfor:  madx-dev-linux32-nagfor madx-dev-linux64-nagfor
+.PHONY:             madx-linux          madx-linux-gnu
+.PHONY:             madx-linux-lahey    madx-linux-nagfor
+.PHONY:             madx-linux32        madx-linux64
+.PHONY:             madx-linux32-gnu    madx-linux64-gnu
+.PHONY:             madx-linux32-lahey  madx-linux64-lahey
+.PHONY:             madx-linux32-nagfor madx-linux64-nagfor
+madx-linux:         madx-linux32        madx-linux64
+madx-linux-gnu:     madx-linux32-gnu    madx-linux64-gnu
+madx-linux-lahey:   madx-linux32-lahey  madx-linux64-lahey
+madx-linux-nagfor:  madx-linux32-nagfor madx-linux64-nagfor
 
-madx-dev-linux32:
+madx-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-linux64:
+madx-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
      $(CP) madx64 $@
 
-madx-dev-linux32-gnu:
+madx-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-linux64-gnu:
+madx-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes GNU=yes APPENDLD=yes && \
      $(CP) madx64 $@
 
-madx-dev-linux32-nagfor:
+madx-linux32-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-linux64-nagfor:
+madx-linux64-nagfor:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=nagfor APPENDLD=yes && \
      $(CP) madx64 $@
 
-madx-dev-linux32-lahey:
+madx-linux32-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-linux64-lahey:
+madx-linux64-lahey:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=yes STATIC=yes FC=lf95 APPENDLD=yes && \
      $(CP) madx64 $@
@@ -81,31 +81,31 @@ madx-dev-linux64-lahey:
 #
 # libmadx
 #
-.PHONY:                 libmadx-dev-linux        libmadx-dev-linux-gnu
-.PHONY:                 libmadx-dev-linux32      libmadx-dev-linux64
-.PHONY:                 libmadx-dev-linux32-gnu  libmadx-dev-linux64-gnu
-libmadx-dev-linux:      libmadx-dev-linux32      libmadx-dev-linux64
-libmadx-dev-linux-gnu:  libmadx-dev-linux32-gnu  libmadx-dev-linux64-gnu
+.PHONY:             libmadx-linux        libmadx-linux-gnu
+.PHONY:             libmadx-linux32      libmadx-linux64
+.PHONY:             libmadx-linux32-gnu  libmadx-linux64-gnu
+libmadx-linux:      libmadx-linux32      libmadx-linux64
+libmadx-linux-gnu:  libmadx-linux32-gnu  libmadx-linux64-gnu
 
-libmadx-dev-linux32:
+libmadx-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=yes STATIC=yes Intel=yes APPENDLD=yes && \
      $(CP) libs/madx/libmadx32.a  $@.a  && ln -sf $@.a  libmadx32.a && \
      $(CP) libs/madx/libmadx32.so $@.so && ln -sf $@.so libmadx32.so
 
-libmadx-dev-linux64:
+libmadx-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a  $@.a  && ln -sf $@.a  libmadx64.a && \
      $(CP) libs/madx/libmadx64.so $@.so && ln -sf $@.so libmadx64.so
 
-libmadx-dev-linux32-gnu:
+libmadx-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx32.a  $@.a  && ln -sf $@.a  libmadx32.a && \
      $(CP) libs/madx/libmadx32.so $@.so && ln -sf $@.so libmadx32.so
 
-libmadx-dev-linux64-gnu:
+libmadx-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a  $@.a  && ln -sf $@.a  libmadx64.a && \
@@ -114,32 +114,32 @@ libmadx-dev-linux64-gnu:
 #
 # libptc
 #
-.PHONY:                 libptc-dev-linux        libptc-dev-linux-gnu
-.PHONY:                 libptc-dev-linux32      libptc-dev-linux64
-.PHONY:                 libptc-dev-linux32-gnu  libptc-dev-linux64-gnu
-libptc-dev-linux:       libptc-dev-linux32      libptc-dev-linux64
-libptc-dev-linux-gnu:   libptc-dev-linux32-gnu  libptc-dev-linux64-gnu
+.PHONY:             libptc-linux        libptc-linux-gnu
+.PHONY:             libptc-linux32      libptc-linux64
+.PHONY:             libptc-linux32-gnu  libptc-linux64-gnu
+libptc-linux:       libptc-linux32      libptc-linux64
+libptc-linux-gnu:   libptc-linux32-gnu  libptc-linux64-gnu
 
-libptc-dev-linux32:
+libptc-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc32.a  $@.a  && ln -sf $@.a  libptc32.a  && \
      $(CP) libs/ptc/libptc32.so $@.so && ln -sf $@.so libptc32.so
 
 
-libptc-dev-linux64:
+libptc-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc64.a  $@.a  && ln -sf $@.a  libptc64.a  && \
      $(CP) libs/ptc/libptc64.so $@.so && ln -sf $@.so libptc64.so
 
-libptc-dev-linux32-gnu:
+libptc-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 GNU=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc32.a  $@.a  && ln -sf $@.a  libptc32.a  && \
      $(CP) libs/ptc/libptc32.so $@.so && ln -sf $@.so libptc32.so
 
-libptc-dev-linux64-gnu:
+libptc-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 GNU=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc64.a  $@.a  && ln -sf $@.a  libptc64.a  && \
@@ -148,28 +148,28 @@ libptc-dev-linux64-gnu:
 #
 # numdiff
 #
-.PHONY:                 numdiff-dev-linux         numdiff-dev-linux-gnu
-.PHONY:                 numdiff-dev-linux32       numdiff-dev-linux64
-.PHONY:                 numdiff-dev-linux32-gnu   numdiff-dev-linux64-gnu
-numdiff-dev-linux:      numdiff-dev-linux32       numdiff-dev-linux64
-numdiff-dev-linux-gnu:  numdiff-dev-linux32-gnu   numdiff-dev-linux64-gnu
+.PHONY:             numdiff-linux         numdiff-linux-gnu
+.PHONY:             numdiff-linux32       numdiff-linux64
+.PHONY:             numdiff-linux32-gnu   numdiff-linux64-gnu
+numdiff-linux:      numdiff-linux32       numdiff-linux64
+numdiff-linux-gnu:  numdiff-linux32-gnu   numdiff-linux64-gnu
 
-numdiff-dev-linux32:
+numdiff-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
-numdiff-dev-linux64:
+numdiff-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
-numdiff-dev-linux32-gnu:
+numdiff-linux32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 GNU=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
-numdiff-dev-linux64-gnu:
+numdiff-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 GNU=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64

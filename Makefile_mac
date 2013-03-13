@@ -28,35 +28,35 @@ endif
 #
 # all
 #
-.PHONY: all-dev-macosx
+.PHONY: all-macosx
 
-all-dev-macosx: madx-dev-macosx libmadx-dev-macosx libptc-dev-macosx numdiff-dev-macosx
+all-macosx: madx-macosx libmadx-macosx libptc-macosx numdiff-macosx
 
 #
 # madx
 #
-.PHONY:                 madx-dev-macosx           madx-dev-macosx-gnu
-.PHONY:                 madx-dev-macosx32         madx-dev-macosx64
-.PHONY:                 madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
-madx-dev-macosx:        madx-dev-macosx32         madx-dev-macosx64
-madx-dev-macosx-gnu:    madx-dev-macosx32-gnu     madx-dev-macosx64-gnu
+.PHONY:             madx-macosx           madx-macosx-gnu
+.PHONY:             madx-macosx32         madx-macosx64
+.PHONY:             madx-macosx32-gnu     madx-macosx64-gnu
+madx-macosx:        madx-macosx32         madx-macosx64
+madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
 
-madx-dev-macosx32:
+madx-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-macosx64:
+madx-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) madx64 $@
 
-madx-dev-macosx32-gnu:
+madx-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) madx32 $@
 
-madx-dev-macosx64-gnu:
+madx-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) madx64 $@
@@ -64,31 +64,31 @@ madx-dev-macosx64-gnu:
 #
 # libmadx
 #
-.PHONY:                 libmadx-dev-macosx        libmadx-dev-macosx-gnu
-.PHONY:                 libmadx-dev-macosx32      libmadx-dev-macosx64
-.PHONY:                 libmadx-dev-macosx32-gnu  libmadx-dev-macosx64-gnu
-libmadx-dev-macosx:     libmadx-dev-macosx32      libmadx-dev-macosx64
-libmadx-dev-macosx-gnu: libmadx-dev-macosx32-gnu  libmadx-dev-macosx64-gnu
+.PHONY:             libmadx-macosx        libmadx-macosx-gnu
+.PHONY:             libmadx-macosx32      libmadx-macosx64
+.PHONY:             libmadx-macosx32-gnu  libmadx-macosx64-gnu
+libmadx-macosx:     libmadx-macosx32      libmadx-macosx64
+libmadx-macosx-gnu: libmadx-macosx32-gnu  libmadx-macosx64-gnu
 
-libmadx-dev-macosx32:
+libmadx-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) libs/madx/libmadx32.a     $@.a     && ln -sf $@.a     libmadx32.a && \
      $(CP) libs/madx/libmadx32.dylib $@.dylib && ln -sf $@.dylib libmadx32.dylib
 
-libmadx-dev-macosx64:
+libmadx-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no Intel=yes APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a     $@.a     && ln -sf $@.a     libmadx64.a && \
      $(CP) libs/madx/libmadx64.dylib $@.dylib && ln -sf $@.dylib libmadx64.dylib
 
-libmadx-dev-macosx32-gnu:
+libmadx-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=32 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx32.a     $@.a     && ln -sf $@.a      libmadx32.a && \
      $(CP) libs/madx/libmadx32.dylib $@.dylib && ln -sf $@.dylib libmadx32.dylib
 
-libmadx-dev-macosx64-gnu:
+libmadx-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/madx --no-print-directory -j5 ARCH=64 ONLINE=no STATIC=no $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/madx/libmadx64.a     $@.a     && ln -sf $@.a     libmadx64.a && \
@@ -97,31 +97,31 @@ libmadx-dev-macosx64-gnu:
 #
 # libptc
 #
-.PHONY:                 libptc-dev-macosx        libptc-dev-macosx-gnu
-.PHONY:                 libptc-dev-macosx32      libptc-dev-macosx64
-.PHONY:                 libptc-dev-macosx32-gnu  libptc-dev-macosx64-gnu
-libptc-dev-macosx:      libptc-dev-macosx32      libptc-dev-macosx64
-libptc-dev-macosx-gnu:  libptc-dev-macosx32-gnu  libptc-dev-macosx64-gnu
+.PHONY:             libptc-macosx        libptc-macosx-gnu
+.PHONY:             libptc-macosx32      libptc-macosx64
+.PHONY:             libptc-macosx32-gnu  libptc-macosx64-gnu
+libptc-macosx:      libptc-macosx32      libptc-macosx64
+libptc-macosx-gnu:  libptc-macosx32-gnu  libptc-macosx64-gnu
 
-libptc-dev-macosx32:
+libptc-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc32.a     $@.a     && ln -sf $@.a     libptc32.a && \
      $(CP) libs/ptc/libptc32.dylib $@.dylib && ln -sf $@.dylib libptc32.dylib
 
-libptc-dev-macosx64:
+libptc-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
      $(CP) libs/ptc/libptc64.a     $@.a     && ln -sf $@.a     libptc64.a && \
      $(CP) libs/ptc/libptc64.dylib $@.dylib && ln -sf $@.dylib libptc64.dylib
 
-libptc-dev-macosx32-gnu:
+libptc-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=32 $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/ptc/libptc32.a     $@.a     && ln -sf $@.a     libptc32.a && \
      $(CP) libs/ptc/libptc32.dylib $@.dylib && ln -sf $@.dylib libptc32.dylib
 
-libptc-dev-macosx64-gnu:
+libptc-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C libs/ptc --no-print-directory -j5 ARCH=64 $(GNUMAC) APPENDLD=yes && \
      $(CP) libs/ptc/libptc64.a     $@.a     && ln -sf $@.a     libptc64.a && \
@@ -130,28 +130,28 @@ libptc-dev-macosx64-gnu:
 #
 # numdiff
 #
-.PHONY:                 numdiff-dev-macosx numdiff-dev-macosx-gnu
-.PHONY:                 numdiff-dev-macosx32      numdiff-dev-macosx64
-.PHONY:                 numdiff-dev-macosx32-gnu  numdiff-dev-macosx64-gnu
-numdiff-dev-macosx:     numdiff-dev-macosx32      numdiff-dev-macosx64
-numdiff-dev-macosx-gnu: numdiff-dev-macosx32-gnu  numdiff-dev-macosx64-gnu
+.PHONY:             numdiff-macosx        numdiff-macosx-gnu
+.PHONY:             numdiff-macosx32      numdiff-macosx64
+.PHONY:             numdiff-macosx32-gnu  numdiff-macosx64-gnu
+numdiff-macosx:     numdiff-macosx32      numdiff-macosx64
+numdiff-macosx-gnu: numdiff-macosx32-gnu  numdiff-macosx64-gnu
 
-numdiff-dev-macosx32:
+numdiff-macosx32:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
-numdiff-dev-macosx64:
+numdiff-macosx64:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
 
-numdiff-dev-macosx32-gnu:
+numdiff-macosx32-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 $(GNUMAC) APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
 
-numdiff-dev-macosx64-gnu:
+numdiff-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 $(GNUMAC) APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff64 $@ && ln -sf $@ numdiff64
