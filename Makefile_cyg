@@ -16,6 +16,13 @@
 # | $Id$
 # |
 
+#
+# all
+#
+.PHONY: all-win
+
+all-win:  madx-win numdiff-win
+
 # madx
 .PHONY:   madx-win
 .PHONY:   madx-win32.exe
@@ -35,4 +42,3 @@ numdiff-win32.exe:
 	$E "*** Building $@"
 	$_ $(MAKE) --no-print-directory ARCH=32 ONLINE=no STATIC=yes GNU=yes APPENDLD=yes && \
      $(CP) tools/numdiff/numdiff32 $@ && ln -sf $@ numdiff32
-

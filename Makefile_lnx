@@ -19,7 +19,10 @@
 #
 # all
 #
-.PHONY: all-linux32 all-linux64
+.PHONY: all-linux all-linux-gnu all-linux32 all-linux64
+
+all-linux:     madx-linux     libmadx-linux     libptc-linux     numdiff-linux
+all-linux-gnu: madx-linux-gnu libmadx-linux-gnu libptc-linux-gnu numdiff-linux-gnu
 
 all-linux32: madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
 all-linux64: madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64

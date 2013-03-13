@@ -17,6 +17,15 @@
 # |
 
 #
+# all
+#
+.PHONY: all-win all-win32 all-win64
+
+all-win:    madx-win       numdiff-win
+all-win32:  madx-win32.exe numdiff-win32.exe
+all-win64:  madx-win64.exe numdiff-win64.exe
+
+#
 # madx
 #
 .PHONY:     madx-win

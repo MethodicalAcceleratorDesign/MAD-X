@@ -28,9 +28,10 @@ endif
 #
 # all
 #
-.PHONY: all-macosx
+.PHONY: all-macosx all-macosx-gnu
 
-all-macosx: madx-macosx libmadx-macosx libptc-macosx numdiff-macosx
+all-macosx:     madx-macosx     libmadx-macosx     libptc-macosx     numdiff-macosx
+all-macosx-gnu: madx-macosx-gnu libmadx-macosx-gnu libptc-macosx-gnu numdiff-macosx-gnu
 
 #
 # madx
