@@ -50,6 +50,7 @@ cmake/setupOptions.cmake -text
 cmake/setupPackaging.cmake -text
 cmake/setupProcessorCount.cmake -text
 cmake/setupTesting.cmake -text
+doc/.htaccess -text
 doc/usrguide/Introduction/aperexample.jpg -text
 doc/usrguide/Introduction/aperture.html -text
 doc/usrguide/Introduction/attribute.html -text
@@ -372,6 +373,7 @@ make/system.Linux -text
 make/system.Windows -text
 make/tester.numdiff -text
 make/tester.rules -text
+src/.htaccess -text
 src/CMakeLists.txt -text
 src/SDDS.h -text
 src/SDDStypes.h -text
@@ -596,6 +598,7 @@ testing/repository.gif -text svneol=unset#unset
 testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
+tests/.htaccess -text
 tests/share/LEIR/LEIR.seqx -text
 tests/share/LEP/lep.opt9 -text
 tests/share/LEP/lep.seq9 -text
