@@ -138,9 +138,11 @@ madx_start(void)
   int pad_idx = strlen("Windows")-strlen(version_ostype);
   if (pad_idx >= pad_sz) pad_idx = pad_sz-1; 
 
+  int version_is_pro = !strcmp(strrchr(version_name, '.'), ".00");
+
   printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
   printf("  +    %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
-  printf("  +    %s     +\n", version_name[strlen(version_name)-1]=='0' ? version_type_pro : version_type_dev);
+  printf("  +    %s     +\n", version_is_pro ? version_type_pro : version_type_dev);
   printf("  + %s      +\n", version_date_mod);
   printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
