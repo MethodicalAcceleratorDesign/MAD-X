@@ -16,7 +16,10 @@
 # | $Id$
 # |
 
-# MAD-X custom rules
+# MAD-X custom macro-rules
+
+# recursive make defining PRJNAME
+ifeq ($(origin PRJNAME),file)
 
 ifeq ($(OSTYPE),Linux)
 include Makefile_lnx
@@ -36,5 +39,7 @@ endif
 
 # not mandatory
 -include Makefile_local
+
+endif
 
 # end of makefile

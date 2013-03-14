@@ -32,15 +32,17 @@ all-win64:  madx-win64.exe numdiff-win64.exe
 .PHONY:     madx-win32.exe  madx-win64.exe
 madx-win:   madx-win32.exe  madx-win64.exe
 
+madx-win%: MAKE_OPTS = -j5
+madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes APPENDLD=yes
+madx-win%: MAKE_POST = $(if $(DESTDIR),$(CP) $(DESTDIR)$@ $@ &&,) $(CP) $@
+
 madx-win32.exe:
 	$E "*** Building $@"
-	$_ $(MAKE) --no-print-directory ARCH=32 ONLINE=no STATIC=yes Intel=yes APPENDLD=yes && \
-     $(CP) madx32.exe $@
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST) madx32.exe
 
 madx-win64.exe:
 	$E "*** Building $@"
-	$_ $(MAKE) --no-print-directory ARCH=64 ONLINE=no STATIC=yes Intel=yes APPENDLD=yes && \
-     $(CP) madx64.exe $@
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST) madx64.exe
 
 #
 # numdiff
@@ -49,13 +51,16 @@ madx-win64.exe:
 .PHONY:       numdiff-win32.exe   numdiff-win64.exe
 numdiff-win:  numdiff-win32.exe   numdiff-win64.exe
 
+numdiff-win%: DESTDIR  := $(DESTDIR)tools$/numdiff
+numdiff-win%: MAKE_OPTS = -j5 --no-print-directory -C tools/numdiff
+numdiff-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) APPENDLD=yes
+numdiff-win%: MAKE_POST = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@ $@ &&,) $(CP) $@
+
 numdiff-win32.exe:
 	$E "*** Building $@"
-	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=32 Intel=yes APPENDLD=yes && \
-     $(CP) tools$/numdiff$/numdiff32.exe $@ && $(CP) $@ numdiff32.exe
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST) numdiff32.exe
 
 numdiff-win64.exe:
 	$E "*** Building $@"
-	$_ $(MAKE) -C tools/numdiff --no-print-directory -j5 ARCH=64 Intel=yes APPENDLD=yes && \
-     $(CP) tools$/numdiff$/numdiff64.exe $@ && $(CP) $@ numdiff64.exe
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST) numdiff64.exe
 

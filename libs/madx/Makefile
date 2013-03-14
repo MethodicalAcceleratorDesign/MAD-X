@@ -53,6 +53,6 @@ export
 
 $(PROJECT):
 	@ $(MAKE) -C ../.. $(MAKEFLAGS) $(MAKEOVERRIDES) \
-                     PROJECT=$(PROJECT) SHARED=$(SHARED) DESTDIR=libs/madx/
+                     PROJECT=$(PROJECT) SHARED=$(SHARED) DESTDIR=libs/madx/$(DESTDIR)
 
 # end of makefile
