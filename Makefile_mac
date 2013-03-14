@@ -44,23 +44,23 @@ madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
 
 madx-macosx%: MAKE_OPTS = -j5
 madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=no APPENDLD=yes
-madx-macosx%: MAKE_POST = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
+madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST) madx32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
 
 madx-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST) madx64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
 
 madx-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_POST) madx32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK) madx32
 
 madx-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_POST) madx64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK) madx64
 
 #
 # libmadx
@@ -74,24 +74,24 @@ libmadx-macosx-gnu: libmadx-macosx32-gnu  libmadx-macosx64-gnu
 libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-macosx%: MAKE_OPTS  = -j5 --no-print-directory -C libs/madx
 libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no APPENDLD=yes
-libmadx-macosx%: MAKE_POST1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
-libmadx-macosx%: MAKE_POST2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
+libmadx-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
+libmadx-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
 libmadx-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST1) libmadx32.a && $(MAKE_POST2) libmadx32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
 
 libmadx-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
 libmadx-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_POST1) libmadx32.a && $(MAKE_POST2) libmadx32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
 
 libmadx-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
 #
 # libptc
@@ -105,24 +105,24 @@ libptc-macosx-gnu:  libptc-macosx32-gnu  libptc-macosx64-gnu
 libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc
 libptc-macosx%: MAKE_OPTS  = -j5 --no-print-directory -C libs/ptc
 libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
-libptc-macosx%: MAKE_POST1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
-libptc-macosx%: MAKE_POST2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
+libptc-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
+libptc-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
 libptc-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST1) libptc32.a && $(MAKE_POST2) libptc32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
 
 libptc-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST1) libptc64.a && $(MAKE_POST2) libptc64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
 libptc-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_POST1) libptc32.a && $(MAKE_POST2) libptc32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
 
 libptc-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_POST1) libptc64.a && $(MAKE_POST2) libptc64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
 #
 # numdiff
@@ -136,22 +136,22 @@ numdiff-macosx-gnu: numdiff-macosx32-gnu  numdiff-macosx64-gnu
 numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff
 numdiff-macosx%: MAKE_OPTS = -j5 --no-print-directory -C tools/numdiff
 numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
-numdiff-macosx%: MAKE_POST = ln -sf $(DESTDIR)/$@ && ln -sf $@
+numdiff-macosx%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST) numdiff32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK) numdiff32
 
 numdiff-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST) numdiff64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK) numdiff64
 
 numdiff-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_POST) numdiff32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK) numdiff32
 
 numdiff-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_POST) numdiff64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK) numdiff64
 
 # end of makefile
