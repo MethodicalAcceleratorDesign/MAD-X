@@ -106,7 +106,7 @@ libmadx-linux32-gnu:
 
 libmadx-linux64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes STATIC=no && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
 
 #
 # libptc
