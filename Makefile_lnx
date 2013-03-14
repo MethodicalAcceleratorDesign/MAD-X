@@ -96,17 +96,17 @@ libmadx-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_POST1) libmadx32.a && $(MAKE_POST2) libmadx32.so
 
-libmadx-linux64:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
-
 libmadx-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_POST1) libmadx32.a && $(MAKE_POST2) libmadx32.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes   && $(MAKE_POST1) libmadx32.a && $(MAKE_POST2) libmadx32.so
+
+libmadx-linux64:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes STATIC=no && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
 
 libmadx-linux64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes STATIC=no && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes   STATIC=no && $(MAKE_POST1) libmadx64.a && $(MAKE_POST2) libmadx64.so
 
 #
 # libptc
