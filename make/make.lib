@@ -42,6 +42,6 @@ trunc  = $(if $(and $1,$2),$(if $(findstring $1,$(lastword $2)),$2,\
 
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))
-mkdir  = $(if $(wildcard $1),,$(shell mkdir -p $1))
+mkdir  = $(if $(wildcard $1),,$(shell mkdir $(if $(windir),,-p) $1))
 
 # end of makefile
