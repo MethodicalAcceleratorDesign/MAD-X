@@ -31,6 +31,7 @@ struct constraint;
 // ----- interface
 
 #define T struct ndiff
+#define C struct constraint
 
 T*    ndiff_alloc    (FILE *lhs, FILE *rhs, struct context*, int n_);
 void  ndiff_clear    (T*);
@@ -46,15 +47,15 @@ int   ndiff_readLine (T*);
 int   ndiff_gotoLine (T*, const char *tag);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
 
-void  ndiff_diffLine (T*);
-int   ndiff_nextNum  (T*, const struct constraint*); // return 0 if no number is found
-int   ndiff_testNum  (T*, const struct constraint*);
+int   ndiff_nextNum  (T*, const C*); // return 0 if no number is found
+int   ndiff_testNum  (T*, const C*);
 
 void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_, long *num_);
 int   ndiff_feof     (const T*, int both);
 int   ndiff_isempty  (const T*);
 
 #undef T
+#undef C
 
 // ----- testsuite
 

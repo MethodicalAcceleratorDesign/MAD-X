@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <float.h>
 
 #include "context.h"
 #include "constraint.h"
@@ -125,6 +126,15 @@ context_grow (T *cxt, int n)
   }
 
   return cxt;  
+}
+
+static void
+context_add0(T *cxt)
+{
+  // add rule #0: "* * abs=DBL_MIN"
+  const C c = constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN), 0);
+
+  context_add(cxt, &c);
 }
 
 // ----- private (eps helpers)
@@ -266,6 +276,8 @@ context_alloc (int n)
   ensure(cxt, "out of memory");
 
   *cxt = (T) { .dat_sz = n };
+
+  context_add0(cxt);
 
   return cxt;
 }

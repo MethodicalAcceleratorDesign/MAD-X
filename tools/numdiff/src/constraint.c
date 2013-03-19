@@ -18,30 +18,14 @@
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
+#include <float.h>
+
 #include "constraint.h"
 #include "utils.h"
 #include "error.h"
 #include "args.h"
 
 #define T struct constraint
-
-// ----- constants
-
-const char * const eps_cmd_cstr[] = {
-  [eps_invalid]             = "invalid",
-  [eps_dig]                 = "dig",
-  [eps_rel]                 = "rel",
-  [eps_rel|eps_dig]         = "rel&dig",
-  [eps_abs]                 = "abs",
-  [eps_abs|eps_dig]         = "abs&dig",
-  [eps_abs|eps_rel]         = "abs&rel",
-  [eps_abs|eps_rel|eps_dig] = "abs&rel&dig",
-  [eps_equ]                 = "equ",
-  [eps_ign]                 = "ign",
-  [eps_omit]                = "omit",
-  [eps_skip]                = "skip",
-  [eps_goto]                = "goto",
-};
 
 // ----- private
 
@@ -136,8 +120,14 @@ readEps(struct eps *e, FILE *in, int row)
     else if (strcmp(str, "equ") == 0) {
       cmd |= eps_equ;  trace("[%d] equ", row);
     }
-    else if (strcmp(str, "either") == 0) {
-      e->either = 1;  trace("[%d] either", row);
+    else if (strcmp(str, "any") == 0) {
+      cmd |= eps_any;  trace("[%d] any", row);
+    }
+    else if (strcmp(str, "all") == 0) {
+      cmd &= ~eps_any;  trace("[%d] all", row);
+    }
+    else if (strcmp(str, "trace") == 0) {
+      cmd |= eps_trace;  trace("[%d] trace", row);
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
       cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
@@ -192,15 +182,16 @@ constraint_print(const T* cst, FILE *out)
   printSlc(&cst->col, out);
   putc(' ', out);
 
-  if (cst->eps.either)         fprintf(out, "either ");
-  if (cst->eps.cmd & eps_dig)  fprintf(out, "dig=%g ", cst->eps.dig);    
-  if (cst->eps.cmd & eps_rel)  fprintf(out, "rel=%g ", cst->eps.rel);    
-  if (cst->eps.cmd & eps_abs)  fprintf(out, "abs=%g ", cst->eps.abs);    
-  if (cst->eps.cmd & eps_equ)  fprintf(out, "equ ");    
-  if (cst->eps.cmd & eps_ign)  fprintf(out, "ign ");    
-  if (cst->eps.cmd & eps_omit) fprintf(out, "omit='%s' ", cst->eps.tag);
-  if (cst->eps.cmd & eps_skip) fprintf(out, "skip ");    
-  if (cst->eps.cmd & eps_goto) fprintf(out, "goto='%s' ", cst->eps.tag);
+  if (cst->eps.cmd & eps_any)    fprintf(out, "any ");
+  if (cst->eps.cmd & eps_dig)    fprintf(out, "dig=%g ", cst->eps.dig);    
+  if (cst->eps.cmd & eps_rel)    fprintf(out, "rel=%g ", cst->eps.rel);    
+  if (cst->eps.cmd & eps_abs)    fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps" : "abs=%g ", cst->eps.abs);    
+  if (cst->eps.cmd & eps_equ)    fprintf(out, "equ ");    
+  if (cst->eps.cmd & eps_ign)    fprintf(out, "ign ");    
+  if (cst->eps.cmd & eps_goto)   fprintf(out, "goto='%s' ", cst->eps.tag);
+  if (cst->eps.cmd & eps_omit)   fprintf(out, "omit='%s' ", cst->eps.tag);
+  if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");    
+  if (cst->eps.cmd & eps_trace)  fprintf(out, "trace ");    
 }
 
 void
@@ -209,7 +200,7 @@ constraint_scan(T* cst, FILE *in, int *row)
   int c;
   assert(cst && row);
 
-  *cst = (T){ .eps.cmd = (enum eps_cmd)eps_invalid };  // because of icc spurious warnings
+  *cst = (T){ .eps = { .cmd = eps_invalid } };
 
   if (!in) in = stdin;
 

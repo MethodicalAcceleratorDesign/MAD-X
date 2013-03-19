@@ -297,8 +297,6 @@ ndiff_skipLine (T *dif)
   int s1 = 0, s2 = 0;
   int c1, c2;
 
-  // trace("->skipLine line %d", dif->row_i);
-
   ndiff_reset_buf(dif);
 
   c1 = skipLine(dif->lhs_f, &s1);
@@ -306,8 +304,6 @@ ndiff_skipLine (T *dif)
 
   dif->col_i  = 0;
   dif->row_i += 1;
-
-  // trace("<-skipLine line %d", dif->row_i);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -333,8 +329,8 @@ ndiff_readLine (T *dif)
   dif->col_i  = 0;
   dif->row_i += 1;
 
-  trace("<-readLine line %d", dif->row_i);
   trace("  buffers: '%.25s'|'%.25s'", dif->lhs_b, dif->rhs_b);
+  trace("<-readLine line %d", dif->row_i);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -395,8 +391,8 @@ ndiff_gotoLine (T *dif, const char *tag)
 
   // return with last lhs and rhs lines loaded if tag was found
 
-  trace("<-gotoLine line %d (%+d|%+d)", dif->row_i, i1, i2);
   trace("  buffers: '%.25s'|'%.25s'", dif->lhs_b, dif->rhs_b);
+  trace("<-gotoLine line %d (%+d|%+d)", dif->row_i, i1, i2);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -421,53 +417,6 @@ ndiff_fillLine (T *dif, const char *lhs_b, const char *rhs_b)
   return 0; // never fails
 }
 
-void
-ndiff_diffLine (T *dif)
-{
-  assert(dif);
-
-  char *lhs_p = dif->lhs_b+dif->lhs_i;
-  char *rhs_p = dif->rhs_b+dif->rhs_i;
-
-  trace("->diffLine line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  buffers: '%.25s'|'%.25s'", lhs_p, rhs_p);
-
-retry:
-
-  // fast search
-  if (!strcmp(lhs_p, rhs_p)) {
-    int n = strlen(lhs_p);
-    dif->lhs_i += n;
-    dif->rhs_i += n;
-    return;
-  }
-
-  // slow search (find index)
-  int i;
-  for(i = 0; lhs_p[i] == rhs_p[i]; i++) ;
-
-  lhs_p += i; dif->lhs_i += i;
-  rhs_p += i; dif->rhs_i += i;
-  i = 0;
-
-  if (dif->blank && (isblank(*lhs_p) || isblank(*rhs_p))) {
-    while (isblank(*lhs_p)) ++lhs_p, ++dif->lhs_i;
-    while (isblank(*rhs_p)) ++rhs_p, ++dif->rhs_i;
-    goto retry;
-  }
-
-  dif->lhs_i += 1;
-  dif->rhs_i += 1;
-  if (++dif->cnt_i <= dif->max_i) {
-    if (dif->cnt_i == 1) ndiff_header();
-    warning("(%d) files differ at line %d at char-column %d|%d",
-            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
-    warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
-  }
-
-  trace("<-diffLine line %d", dif->row_i);
-}
-
 int
 ndiff_nextNum (T *dif, const struct constraint *c)
 {
@@ -476,7 +425,7 @@ ndiff_nextNum (T *dif, const struct constraint *c)
   char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
 
-  trace("->nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
+  trace("->nextNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
   trace("  strings: '%.25s'|'%.25s'", lhs_p, rhs_p);
 
   if (ndiff_isempty(dif)) goto quit;
@@ -530,8 +479,8 @@ retry:
   // numbers found
   dif->lhs_i = lhs_p-dif->lhs_b;
   dif->rhs_i = rhs_p-dif->rhs_b;
-  trace("<-nextNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
+  trace("<-nextNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
   return ++dif->num_i, ++dif->col_i;
 
 quit_diff:
@@ -545,9 +494,9 @@ quit_diff:
   }
 
 quit:
-  trace("<-nextNum line %d", dif->row_i);
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
+  trace("<-nextNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
   return dif->col_i = 0;
 }
 
@@ -562,15 +511,14 @@ ndiff_testNum (T *dif, const struct constraint *c)
 
   double lhs_d, rhs_d, dif_a=0, min_a=0, pow_a=0;
 
+  trace("->testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
+  trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
+
   // no constraint means equal
   if (!c) {
     static const struct constraint equ = { .eps = { .cmd = eps_equ } };
     c = &equ;
   }
-
-  trace("->testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
-  trace("  rule [#%d, line %d]", context_findIdx(dif->cxt,c), context_findLine(dif->cxt,c));
 
   // parse numbers
   int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
@@ -619,6 +567,8 @@ ndiff_testNum (T *dif, const struct constraint *c)
   // if one number is zero -> relative becomes absolute
   if (!(min_a > 0)) min_a = 1.0;
 
+  trace("  numdiff: |abs|=%.2g, |rel|=%.2g, ndig=%d", dif_a, dif_a/min_a, imax(n1, n2));   
+
   // input-specific relative comparison (does not apply to integers)
   if ((c->eps.cmd & eps_dig) && (f1 || f2))
     if (dif_a > c->eps.dig * min_a * pow_a) ret |= eps_dig;
@@ -632,7 +582,7 @@ ndiff_testNum (T *dif, const struct constraint *c)
     if (dif_a > c->eps.abs) ret |= eps_abs;
 
   if (!ret) goto quit;
-  if (c->eps.either && (ret & eps_dra) != (c->eps.cmd & eps_dra)) goto quit;
+  if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) goto quit;
 
 quit_diff:
   if (++dif->cnt_i <= dif->max_i) {
@@ -651,17 +601,17 @@ quit_diff:
       warning("(%d) numbers strict representation differ", dif->cnt_i);
 
     if (ret & eps_dig)
-      warning("(%d) numdigit error (rule #%d, line %d: rel=%g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+      warning("(%d) numdigit error (rule #%d, line %d: rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
  
     if (ret & eps_rel)
-      warning("(%d) relative error (rule #%d, line %d: rel=%g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+      warning("(%d) relative error (rule #%d, line %d: rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
 
     if (ret & eps_abs)
-      warning("(%d) absolute error (rule #%d, line %d: abs=%g) |abs_err|=%.2g, |rel_err|=%.2g, ndig=%d",
+      warning("(%d) absolute error (rule #%d, line %d: abs=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
   }
@@ -670,9 +620,7 @@ quit_diff:
 quit:
   dif->lhs_i += l1;
   dif->rhs_i += l2;
-
-  trace("<-testNum line %d char-column %d|%d", dif->row_i, dif->lhs_i, dif->rhs_i);
-  trace("  strnums: [%d|%d] '%.25s'|'%.25s'", l1, l2, lhs_p, rhs_p);
+  trace("<-testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
 
   return ret;
 }
@@ -724,20 +672,22 @@ ndiff_loop(T *dif)
 
   const struct constraint *c, *c2;
   int row=0, col;
+  int saved_level = logmsg_config.level;
 
   while(!ndiff_feof(dif, 0)) {
     ++row, col=0;
 
     c = context_getInc(dif->cxt, row, col);
+    ensure(c, "invalid context");
     if (dif->check && c != (c2 = context_getAt(dif->cxt, row, col)))
       ndiff_error(dif->cxt, c, c2, row, col);
 
-    // no constraint, diff-lines
-    if (!c) {
-      ndiff_readLine(dif);
-      if (!ndiff_isempty(dif))
-        ndiff_diffLine(dif);
-      continue;
+    // trace rule
+    if (c->eps.cmd & eps_trace && c->eps.cmd & (eps_skip|eps_goto)) {
+      logmsg_config.level = trace_level;
+      trace("~>active:  rule #%d, line %d, cmd = %d",
+            context_findIdx(dif->cxt,c), context_findLine(dif->cxt,c), c->eps.cmd);
+      logmsg_config.level = saved_level;
     }
 
     // skip this line
@@ -758,10 +708,22 @@ ndiff_loop(T *dif)
     // for each number column, diff-chars between numbers
     while((col = ndiff_nextNum(dif, c))) {
       c = context_getInc(dif->cxt, row, col);
+      ensure(c, "invalid context");
       if (dif->check && c != (c2 = context_getAt(dif->cxt, row, col)))
         ndiff_error(dif->cxt, c, c2, row, col); 
 
+      // trace rule
+      if (c->eps.cmd & eps_trace) {
+        logmsg_config.level = trace_level;
+        trace("~>active:  rule #%d, line %d, cmd = %d",
+              context_findIdx(dif->cxt,c), context_findLine(dif->cxt,c), c->eps.cmd);
+      }
+
+      // check numbers
       ndiff_testNum(dif, c);
+
+      // restore logmsg
+      logmsg_config.level = saved_level;
     }
   }
 

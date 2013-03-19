@@ -29,29 +29,30 @@ enum eps_cmd {
   eps_invalid =   0u,  // invalid command
 
 // must be firsts (weak commands)
-  eps_dig     =   1u,  // relative input eps
-  eps_rel     =   2u,  // relative eps
-  eps_abs     =   4u,  // absolute eps
-  eps_equ     =   8u,  // equal string
-  eps_ign     =  16u,  // ignore value
+  eps_abs    =    1u,  // absolute eps
+  eps_rel    =    2u,  // relative eps
+  eps_dig    =    4u,  // relative input eps
+  eps_equ    =    8u,  // equal string
+  eps_ign    =   16u,  // ignore value
+  eps_any    =   32u,  // any qualifier
 
-// intermediate (in between commands)
-  eps_omit    =  32u,  // omit indentifier
+// intermediate (other commands)
+  eps_omit   =   64u,  // omit indentifier
+  eps_trace  =  128u,  // trace rule
 
 // must be lasts (strong commands)
-  eps_skip    =  64u,  // skip line
-  eps_goto    = 128u,  // goto line
+  eps_skip   =  256u,  // skip line
+  eps_goto   =  512u,  // goto line
   eps_last,
 
 // unions
-  eps_dra     =  eps_dig|eps_rel|eps_abs
+  eps_dra     =  eps_abs|eps_rel|eps_dig
 };
 
 // ----- types
 
 struct eps {
   enum eps_cmd cmd;
-  bool   either;
   double dig, rel, abs;
   char   tag[48];
 };
@@ -71,14 +72,14 @@ static inline struct eps
 eps_init(enum eps_cmd cmd, double val)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, 0, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0, {0} };
+  return (struct eps) { cmd, cmd&eps_dig ? val : 0, cmd&eps_rel ? val : 0, cmd&eps_abs ? val : 0, {0} };
 }
 
 static inline struct eps
-eps_initNum(enum eps_cmd cmd, bool either, double dig, double rel, double abs)
+eps_initNum(enum eps_cmd cmd, double dig, double rel, double abs)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { cmd, either, dig, rel, abs, {0} };
+  return (struct eps) { cmd, dig, rel, abs, {0} };
 }
 
 static inline struct eps
@@ -89,15 +90,6 @@ eps_initTag(enum eps_cmd cmd, const char *tag)
   enum { sz = sizeof eps.tag };
   strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
   return eps;
-}
-
-static inline const char*
-eps_cstr(enum eps_cmd cmd)
-{
-  extern const char * const eps_cmd_cstr[];
-  return cmd > eps_invalid && cmd < eps_last && eps_cmd_cstr[cmd]
-         ? eps_cmd_cstr[cmd]
-         : eps_cmd_cstr[eps_invalid];
 }
 
 static inline T
