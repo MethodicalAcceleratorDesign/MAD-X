@@ -24,7 +24,7 @@ LDFLAGS = -m$(ARCH) -O3
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
+LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
 endif
 
 ifneq ($(CXXNAME),)

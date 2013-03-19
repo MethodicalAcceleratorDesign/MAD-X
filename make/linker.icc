@@ -24,7 +24,7 @@ LDFLAGS = -m$(ARCH) -O$(NOPT) -static-intel -static-libgcc
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+LDFLAGS += -mmacosx-version-min=10.5
 endif
 
 #
