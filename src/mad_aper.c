@@ -437,6 +437,7 @@ aper_external_file(char *file, double tablex[], double tabley[])
     tabley[i]=tabley[0];
     fclose(filept);
   }
+
   return i-1;
 }
 

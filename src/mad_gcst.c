@@ -91,6 +91,7 @@ char* ap_table_cols[] =
 {
   "name", "n1", "n1x_m", "n1y_m", "apertype",
   "aper_1", "aper_2", "aper_3", "aper_4",
+  "aper_offset1", "aper_offset2",
   "rtol", "xtol", "ytol",
   "s", "betx", "bety", "dx", "dy", "x", "y",
   "on_ap", "on_elem", "spec",
