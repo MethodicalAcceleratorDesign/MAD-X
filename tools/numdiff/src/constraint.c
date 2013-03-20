@@ -112,52 +112,52 @@ readEps(struct eps *e, FILE *in, int row)
     if (n == EOF || *str == 0) break;
 
          if (strcmp(str, "skip") == 0) {
-      cmd |= eps_skip; trace("[%d] skip", row);
+      cmd |= eps_skip;  trace("[%d] skip", row);
     }
     else if (strcmp(str, "ign") == 0) {
-      cmd |= eps_ign;  trace("[%d] ign", row);
+      cmd |= eps_ign;   trace("[%d] ign", row);
     }
     else if (strcmp(str, "equ") == 0) {
-      cmd |= eps_equ;  trace("[%d] equ", row);
+      cmd |= eps_equ;   trace("[%d] equ", row);
     }
     else if (strcmp(str, "any") == 0) {
-      cmd |= eps_any;  trace("[%d] any", row);
+      cmd |= eps_any;   trace("[%d] any", row);
     }
     else if (strcmp(str, "all") == 0) {
       cmd &= ~eps_any;  trace("[%d] all", row);
     }
     else if (strcmp(str, "large") == 0) {
-      cmd |= eps_large;  trace("[%d] large", row);
+      cmd |= eps_large; trace("[%d] large", row);
     }
     else if (strcmp(str, "trace") == 0) {
-      cmd |= eps_trace;  trace("[%d] trace", row);
+      cmd |= eps_trace; trace("[%d] trace", row);
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
-      cmd |= eps_dig;  trace("[%d] dig=%g", row, e->dig);
+      cmd |= eps_dig;   trace("[%d] dig=%g", row, e->dig);
       ensure(e->dig > 1.0, "invalid digital error (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
-      cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
-      ensure(e->rel > 0.0 && (option.largerr || cmd & eps_large || e->rel < 1.0),
+      cmd |= eps_rel;   trace("[%d] rel=%g", row, e->rel);
+      ensure(e->rel > 0.0 && (cmd & eps_large || e->rel < 1.0),
              "invalid relative constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
-      cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
-      ensure(e->abs > 0.0 && (option.largerr || cmd & eps_large || e->abs < 1.0),
+      cmd |= eps_abs;   trace("[%d] abs=%g", row, e->abs);
+      ensure(e->abs > 0.0 && (cmd & eps_large || e->abs < 1.0),
              "invalid absolute constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "=%*['\"]%48[^'\"]%*['\"]", e->tag)) == 1) {
       cmd |= eps_omit | eps_equ; e->tag[sizeof e->tag-1] = 0;
-                       trace("[%d] omit='%s'", row, e->tag);
+                        trace("[%d] omit='%s'", row, e->tag);
       ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "=%*['\"]%48[^'\"]%*['\"]", e->tag)) == 1) {
       cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
-                       trace("[%d] goto='%s'", row, e->tag);
+                        trace("[%d] goto='%s'", row, e->tag);
       ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.indexed_filename, row);
     }
     else {
-                       trace("[%d] invalid '%s'", row, str);
+                        trace("[%d] invalid '%s'", row, str);
       cmd = eps_invalid;
       break;
     }

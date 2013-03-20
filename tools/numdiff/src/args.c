@@ -101,12 +101,13 @@ usage(void)
   inform("usage:");
   inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
   inform("\tnumdiff [options] -list file1 file2 ...");
+
+  inform("");
   inform("options:");
   inform("\t-a    -accum file   accumulate tests information in file");
   inform("\t-b    -blank        ignore blank spaces (space and tabs)");
-  inform("\t-c    -check        enable check mode");
+  inform("\t-c    -check        enable check mode (algorithms crosscheck)");
   inform("\t-d    -debug        enable debug mode (include check mode)");
-  inform("\t-e    -largerr      allow abs and rel error specifier >= 1.0");
   inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t-g    -cfgext ext   specify the config file extension, default is \"%s\"", option.cfg_e);
   inform("\t-h    -help         display this help");
@@ -121,6 +122,38 @@ usage(void)
   inform("\t-t    -test name    set test name for output message (item)");
   inform("\t      -trace        enable trace mode (very verbose, include debug mode)");
   inform("\t-u    -utest        run the test suite (still incomplete)");
+
+  inform("");
+  inform("rules (%s):", option.cfg_e);
+  inform("\t#row-range  column-range  commands");
+  inform("\t 1-5        *             skip                            # banner");
+  inform("\t *          2-$           any abs=1e-15 rel=1e-12 dig=1.5 # global");
+  inform("\t 41         *             goto='penalty function'         # jump");
+  inform("\t 109:20/5   2-8/3         abs=1e-8                        # specific");
+
+  inform("ranges:");
+  inform("\tnum                 row or column number, num >= 0");
+  inform("\trange               start - end  [/ stride]");
+  inform("\tslice               start : size [/ stride]");
+  inform("\t$, *                last row or column, alias for 0-$");
+
+  inform("commands:");
+  inform("\tabs=num             absolute error (num < 1)");
+  inform("\tall                 conjunctive constraints (default, qualifier)");
+  inform("\tany                 disjunctive constraints (qualifier)");
+  inform("\tdig=num             input-defined relative error (num > 1)");
+  inform("\tequ                 strict numbers equality (same text)");
+  inform("\tgoto='tag'          skip lines until 'tag' is found (action)");
+  inform("\tign                 ignore numbers");
+  inform("\tlarge               allow num >= 1 in abs and rel (qualifier)");
+  inform("\tomit='tag'          ignore digits if preceded by 'tag'");
+  inform("\trel=num             relative error (num < 1)");
+  inform("\tskip                skip lines (action)");
+  inform("\ttrace               trace rules (debug, qualifier)");
+
+  inform("");
+  inform("information:\thttp://cern.ch/mad");
+  inform("contact    :\tmad@cern.ch");
 
   exit(EXIT_FAILURE);
 }
@@ -185,13 +218,6 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "-b") || !strcmp(argv[option.argi], "-blank")) {
       debug("blank spaces ignored");
       option.blank = 1;
-      continue;
-    }
-
-    // allow large errors [setup]
-    if (!strcmp(argv[option.argi], "-e") || !strcmp(argv[option.argi], "-largerr")) {
-      debug("large errors allowed");
-      option.largerr = 1;
       continue;
     }
 
