@@ -569,17 +569,17 @@ ndiff_testNum (T *dif, const struct constraint *c)
 
   trace("  numdiff: |abs|=%.2g, |rel|=%.2g, ndig=%d", dif_a, dif_a/min_a, imax(n1, n2));   
 
-  // input-specific relative comparison (does not apply to integers)
-  if ((c->eps.cmd & eps_dig) && (f1 || f2))
-    if (dif_a > c->eps.dig * min_a * pow_a) ret |= eps_dig;
+  // absolute comparison
+  if (c->eps.cmd & eps_abs)
+    if (dif_a > c->eps.abs) ret |= eps_abs;
 
   // relative comparison 
   if (c->eps.cmd & eps_rel)
     if (dif_a > c->eps.rel * min_a) ret |= eps_rel;
 
-  // absolute comparison
-  if (c->eps.cmd & eps_abs)
-    if (dif_a > c->eps.abs) ret |= eps_abs;
+  // input-specific relative comparison (does not apply to integers)
+  if ((c->eps.cmd & eps_dig) && (f1 || f2))
+    if (dif_a > c->eps.dig * min_a * pow_a) ret |= eps_dig;
 
   if (!ret) goto quit;
   if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) goto quit;

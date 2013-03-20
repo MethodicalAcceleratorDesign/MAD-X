@@ -26,27 +26,30 @@
 // ----- constants
 
 enum eps_cmd {
-  eps_invalid =   0u,  // invalid command
+  eps_invalid = 0u,       // invalid command
 
 // must be firsts (weak commands)
-  eps_abs    =    1u,  // absolute eps
-  eps_rel    =    2u,  // relative eps
-  eps_dig    =    4u,  // relative input eps
-  eps_equ    =    8u,  // equal string
-  eps_ign    =   16u,  // ignore value
-  eps_any    =   32u,  // any qualifier
+  eps_abs    = 1u <<  0,  // absolute eps
+  eps_rel    = 1u <<  1,  // relative eps
+  eps_dig    = 1u <<  2,  // relative input eps
+  eps_equ    = 1u <<  3,  // equal string
+  eps_ign    = 1u <<  4,  // ignore value
+  eps_any    = 1u <<  5,  // any qualifier
 
 // intermediate (other commands)
-  eps_omit   =   64u,  // omit indentifier
-  eps_trace  =  128u,  // trace rule
+  eps_omit   = 1u <<  6,  // omit indentifier
+  eps_large  = 1u <<  7,  // trace rule
+  eps_trace  = 1u <<  8,  // trace rule
 
 // must be lasts (strong commands)
-  eps_skip   =  256u,  // skip line
-  eps_goto   =  512u,  // goto line
+  eps_skip   = 1u <<  9,  // skip line
+  eps_goto   = 1u << 10,  // goto line
+
+// marker
   eps_last,
 
 // unions
-  eps_dra     =  eps_abs|eps_rel|eps_dig
+  eps_dra    =  eps_abs|eps_rel|eps_dig
 };
 
 // ----- types

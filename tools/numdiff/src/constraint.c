@@ -126,6 +126,9 @@ readEps(struct eps *e, FILE *in, int row)
     else if (strcmp(str, "all") == 0) {
       cmd &= ~eps_any;  trace("[%d] all", row);
     }
+    else if (strcmp(str, "large") == 0) {
+      cmd |= eps_large;  trace("[%d] large", row);
+    }
     else if (strcmp(str, "trace") == 0) {
       cmd |= eps_trace;  trace("[%d] trace", row);
     }
@@ -135,11 +138,13 @@ readEps(struct eps *e, FILE *in, int row)
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
       cmd |= eps_rel;  trace("[%d] rel=%g", row, e->rel);
-      ensure(e->rel > 0.0 && (option.largerr || e->rel < 1.0), "invalid relative constraint (%s.cfg:%d)", option.indexed_filename, row);
+      ensure(e->rel > 0.0 && (option.largerr || cmd & eps_large || e->rel < 1.0),
+             "invalid relative constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;  trace("[%d] abs=%g", row, e->abs);
-      ensure(e->abs > 0.0 && (option.largerr || e->abs < 1.0), "invalid absolute constraint (%s.cfg:%d)", option.indexed_filename, row);
+      ensure(e->abs > 0.0 && (option.largerr || cmd & eps_large || e->abs < 1.0),
+             "invalid absolute constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
     else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
       cmd |= eps_omit | eps_equ; e->tag[sizeof e->tag-1] = 0;
@@ -182,6 +187,7 @@ constraint_print(const T* cst, FILE *out)
   printSlc(&cst->col, out);
   putc(' ', out);
 
+  if (cst->eps.cmd & eps_large)  fprintf(out, "large ");
   if (cst->eps.cmd & eps_any)    fprintf(out, "any ");
   if (cst->eps.cmd & eps_dig)    fprintf(out, "dig=%g ", cst->eps.dig);    
   if (cst->eps.cmd & eps_rel)    fprintf(out, "rel=%g ", cst->eps.rel);    
