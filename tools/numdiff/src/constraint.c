@@ -146,12 +146,12 @@ readEps(struct eps *e, FILE *in, int row)
       ensure(e->abs > 0.0 && (option.largerr || cmd & eps_large || e->abs < 1.0),
              "invalid absolute constraint (%s.cfg:%d)", option.indexed_filename, row);
     }
-    else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
+    else if (strcmp(str, "omit") == 0 && (n = fscanf(in, "=%*['\"]%48[^'\"]%*['\"]", e->tag)) == 1) {
       cmd |= eps_omit | eps_equ; e->tag[sizeof e->tag-1] = 0;
                        trace("[%d] omit='%s'", row, e->tag);
       ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.indexed_filename, row);
     }
-    else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "='%48[^']'", e->tag)) == 1) {
+    else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "=%*['\"]%48[^'\"]%*['\"]", e->tag)) == 1) {
       cmd |= eps_goto; e->tag[sizeof e->tag-1] = 0;
                        trace("[%d] goto='%s'", row, e->tag);
       ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.indexed_filename, row);

@@ -119,6 +119,7 @@ usage(void)
   inform("\t-r    -refext ext   specify the reference file extension, default is \"%s\"", option.ref_e);
   inform("\t-s    -suite name   set testsuite name for output message (title)");
   inform("\t-t    -test name    set test name for output message (item)");
+  inform("\t      -trace        enable trace mode (very verbose, include debug mode)");
   inform("\t-u    -utest        run the test suite (still incomplete)");
 
   exit(EXIT_FAILURE);
@@ -151,6 +152,7 @@ parse_args(int argc, const char *argv[])
       logmsg_config.locate = 1;
       debug("trace mode on");
       option.debug = 1;
+      option.check = 1;
       continue;
     }
 
