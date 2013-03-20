@@ -30,7 +30,7 @@ CC_SRC +=
 mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
                         -D_VERSION_DATE=$(VERSION_DATE) \
                         -D_VERSION_OSTYPE=$(OSTYPE)
-mad_gxx11c.o: CFLAGS += -I/usr/X11/include
+mad_gxx11c.o: CFLAGS += -I/usr/X11/include -I/opt/local/X11/include
 
 # special dependency
 mad_gcst.o: VERSION
