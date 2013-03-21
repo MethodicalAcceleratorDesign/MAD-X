@@ -154,6 +154,7 @@ usage(void)
   inform("");
   inform("information:\thttp://cern.ch/mad");
   inform("contact    :\tmad@cern.ch");
+  inform("version    :\t2013.03.20");
 
   exit(EXIT_FAILURE);
 }

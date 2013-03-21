@@ -51,11 +51,13 @@ static const double pow10_tbl[2*99+1] = {
 const double *const pow10_table99 = &pow10_tbl[99];
 
 FILE*
-open_indexedFile(const char* str, int idx, const char *ext, int optext, int required)
+open_indexedFile(const char* str, int *idx, const char *ext, int optext, int required)
 {
   char buf[FILENAME_MAX+100];
 
   assert(str && ext);
+
+retry:
 
   // copy filename
   strncpy(buf, str, sizeof buf);
@@ -71,7 +73,7 @@ open_indexedFile(const char* str, int idx, const char *ext, int optext, int requ
   }
 
   // add formatted index
-  if (idx > 0) pos += sprintf(buf+pos, option.fmt, idx);
+  if (option.serie && idx && *idx > 0) pos += sprintf(buf+pos, option.fmt, *idx);
 
   // copy filename into option for further reporting
   strncpy(option.indexed_filename, buf, sizeof option.indexed_filename);
@@ -88,7 +90,10 @@ open_indexedFile(const char* str, int idx, const char *ext, int optext, int requ
     fp = fopen(buf, "r");
   }
 
-  if (!fp && required) ensure(fp, "failed to open %s", buf);
+  if (!fp) {
+    if (option.serie && idx && *idx == 0) { ++*idx; goto retry; }
+    if (required) ensure(fp, "failed to open %s", buf);
+  }
 
   // resize buffer for faster read
   if (fp && BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
