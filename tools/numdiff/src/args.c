@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "args.h"
+#include "utils.h"
 #include "utest.h"
 #include "error.h"
 #include "ndiff.h"
@@ -27,6 +28,10 @@
 
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
+#endif
+
+#ifndef SUITEFMT
+#define SUITEFMT "[ %s ]"
 #endif
 
 #ifndef SERIEFMT
@@ -50,8 +55,14 @@
 #endif
 
 struct option option = {
+  // index of processed option
+  .argi = 1,
+
   // names and series numbering
   .fmt = SERIEFMT,
+
+  // names and series numbering
+  .sfmt = SUITEFMT,
 
   // punctuation part of identifiers
   .chr = PUNCTCHRS,
@@ -100,28 +111,32 @@ usage(void)
 
   inform("usage:");
   inform("\tnumdiff [options] lhs_file rhs_file [cfg_file]");
-  inform("\tnumdiff [options] -list file1 file2 ...");
+  inform("\tnumdiff [options] --list file1 file2 ...");
+  inform("\tnumdiff [options] --list --test '1st' file1 file2 --test '2nd' file3 ...");
 
   inform("");
   inform("options:");
-  inform("\t-a    -accum file   accumulate tests information in file");
-  inform("\t-b    -blank        ignore blank spaces (space and tabs)");
-  inform("\t-c    -check        enable check mode (algorithms crosscheck)");
-  inform("\t-d    -debug        enable debug mode (include check mode)");
-  inform("\t-f    -format fmt   specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
-  inform("\t-g    -cfgext ext   specify the config file extension, default is \"%s\"", option.cfg_e);
-  inform("\t-h    -help         display this help");
-  inform("\t-k    -keep num     specify the number of diffs to display per file, default is %d", option.keep);
-  inform("\t-l    -list         enable list mode (list of filenames)");
-  inform("\t-n    -serie        enable series mode (indexed filenames)");
-  inform("\t-o    -outext ext   specify the output file extension, default is \"%s\"", option.out_e);
-  inform("\t-p    -punct chrs   punctuation characters part of identifiers, default is \"%s\"", option.chr);
-  inform("\t-q    -quiet        enable quiet mode (no output if no diff)");
-  inform("\t-r    -refext ext   specify the reference file extension, default is \"%s\"", option.ref_e);
-  inform("\t-s    -suite name   set testsuite name for output message (title)");
-  inform("\t-t    -test name    set test name for output message (item)");
-  inform("\t      -trace        enable trace mode (very verbose, include debug mode)");
-  inform("\t-u    -utest        run the test suite (still incomplete)");
+  inform("\t-a   --accum file    accumulate tests information in file");
+  inform("\t-b   --blank         ignore blank spaces (space and tabs)");
+  inform("\t-c   --check         enable check mode (algorithms crosscheck)");
+  inform("\t-d   --debug         enable debug mode (include check mode)");
+  inform("\t-g   --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
+  inform("\t-h   --help          display this help");
+  inform("\t-i   --info          enable info mode (default)");
+  inform("\t-k   --keep num      specify the number of diffs to display per file, default is %d", option.keep);
+  inform("\t-l   --list          enable list mode (list of filenames)");
+  inform("\t-n   --serie         enable series mode (indexed filenames)");
+  inform("\t-f   --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
+  inform("\t-o   --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
+  inform("\t-p   --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
+  inform("\t-q   --quiet         enable quiet mode (no output if no diff)");
+  inform("\t-r   --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
+  inform("\t-s   --suite name    set testsuite name for output message (title)");
+  inform("\t     --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
+  inform("\t-t   --test name     set test name for output message (item)");
+  inform("\t     --trace         enable trace mode (very verbose, include debug mode)");
+  inform("\t-u   --utest         run the test suite (still incomplete)");
+  inform("\t-z   --reset         reset accumulated information");
 
   inform("");
   inform("rules (%s):", option.cfg_e);
@@ -154,7 +169,7 @@ usage(void)
   inform("");
   inform("information:\thttp://cern.ch/mad");
   inform("contact    :\tmad@cern.ch");
-  inform("version    :\t2013.03.20");
+  inform("version    :\t2013.03.22");
 
   exit(EXIT_FAILURE);
 }
@@ -162,26 +177,40 @@ usage(void)
 void
 parse_args(int argc, const char *argv[])
 {
-  logmsg_config.level = inform_level;
-
   // parse command line arguments
-  for (option.argi = 1; option.argi < argc; option.argi++) {
+  for (; option.argi < argc; option.argi++) {
 
-    // display help [immediate]
-    if (!strcmp(argv[option.argi], "-h") || !strcmp(argv[option.argi], "-help")) {
+    // not an option
+    if (argv[option.argi][0] != '-') return;
+
+// ---- [action]
+
+    // display help [action]
+    if (!strcmp(argv[option.argi], "-h") || !strcmp(argv[option.argi], "--help")) {
       usage();
       continue;
     }
 
-    // run utests [immediate]
-    if (!strcmp(argv[option.argi], "-u") || !strcmp(argv[option.argi], "-utest")) {
+    // run utests [action]
+    if (!strcmp(argv[option.argi], "-u") || !strcmp(argv[option.argi], "--utest")) {
       run_utest();
       option.utest += 1;
       continue;
     }
 
+    // reset accumulation information [action]
+    if (!strcmp(argv[option.argi], "-z") || !strcmp(argv[option.argi], "--reset")) {
+      ensure(option.accum, "no accumulation file specified");
+      debug("reseting file '%s'", option.accum);
+      option.reset = 1;
+      accum_summary(0, 0, 0, 0);
+      continue;
+    }
+
+// ---- [setup]
+
     // set trace mode [setup]
-    if (!strcmp(argv[option.argi], "-trace")) {
+    if (!strcmp(argv[option.argi], "--trace")) {
       logmsg_config.level = trace_level;
       logmsg_config.locate = 1;
       debug("trace mode on");
@@ -191,7 +220,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set debug mode [setup]
-    if (!strcmp(argv[option.argi], "-d") || !strcmp(argv[option.argi], "-debug")) {
+    if (!strcmp(argv[option.argi], "-d") || !strcmp(argv[option.argi], "--debug")) {
       logmsg_config.level = debug_level;
       logmsg_config.locate = 1;
       debug("debug mode on");
@@ -200,124 +229,122 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set check mode [setup]
-    if (!strcmp(argv[option.argi], "-c") || !strcmp(argv[option.argi], "-check")) {
-      debug("check mode on");
-      option.check = 1;
-      continue;
-    }
-
     // set info mode [setup]
-    if (!strcmp(argv[option.argi], "-i") || !strcmp(argv[option.argi], "-info")) {
+    if (!strcmp(argv[option.argi], "-i") || !strcmp(argv[option.argi], "--info")) {
       debug("info mode on");
       logmsg_config.level = inform_level;
       logmsg_config.locate = 0;
       continue;
     }
 
-    // set blank mode [setup]
-    if (!strcmp(argv[option.argi], "-b") || !strcmp(argv[option.argi], "-blank")) {
-      debug("blank spaces ignored");
-      option.blank = 1;
-      continue;
-    }
-
     // set quiet mode [setup]
-    if (!strcmp(argv[option.argi], "-q") || !strcmp(argv[option.argi], "-quiet")) {
+    if (!strcmp(argv[option.argi], "-q") || !strcmp(argv[option.argi], "--quiet")) {
       debug("quiet mode on");
       logmsg_config.level = warning_level;
       logmsg_config.locate = 0;
       continue;
     }
 
+    // set check mode [setup]
+    if (!strcmp(argv[option.argi], "-c") || !strcmp(argv[option.argi], "--check")) {
+      debug("check mode on");
+      option.check = 1;
+      continue;
+    }
+
+    // set blank mode [setup]
+    if (!strcmp(argv[option.argi], "-b") || !strcmp(argv[option.argi], "--blank")) {
+      debug("blank spaces ignored");
+      option.blank = 1;
+      continue;
+    }
+
+    // set accumulation filename [setup]
+    if (!strcmp(argv[option.argi], "-a") || !strcmp(argv[option.argi], "--accum")) {
+      option.accum = argv[++option.argi]; 
+      debug("accumulation filename set to '%s'", option.accum);
+      continue;
+    }
+
+    // set suite name [setup]
+    if (!strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite")) {
+      option.suite = argv[++option.argi];
+      debug("suite name set to '%s'", option.suite);
+      continue;
+    }
+
+    // set suite format [setup]
+    if (!strcmp(argv[option.argi], "--suitefmt")) {
+      option.sfmt = argv[++option.argi];
+      debug("suite format set to '%s'", option.sfmt);
+      continue;
+    }
+
     // set serie mode [setup]
-    if (!strcmp(argv[option.argi], "-n") || !strcmp(argv[option.argi], "-serie")) {
+    if (!strcmp(argv[option.argi], "-n") || !strcmp(argv[option.argi], "--serie")) {
       debug("serie mode on");
       option.serie = 1;
       continue;
     }
 
+    // set serie format [setup]
+    if (!strcmp(argv[option.argi], "--seriefmt")) {
+      option.fmt = argv[++option.argi];
+      debug("serie format set to '%s'", option.fmt);
+      continue;
+    }
+
     // set list mode [setup]
-    if (!strcmp(argv[option.argi], "-l") || !strcmp(argv[option.argi], "-list")) {
+    if (!strcmp(argv[option.argi], "-l") || !strcmp(argv[option.argi], "--list")) {
       debug("list mode on");
       option.list = 1;
       continue;
     }
 
-    // set suite name [setup]
-    if (!strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "-suite")) {
-      option.suite = argv[++option.argi];
-      debug("suite name set to '%s'", option.suite);
-      fprintf(stdout, " [ %s ]\n", option.suite);
-      continue;
-    }
-
     // set test name [setup]
-    if (!strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "-test")) {
+    if (!strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test")) {
       option.test = argv[++option.argi];
       debug("test name set to '%s'", option.test);
       continue;
     }
 
     // set keep number [setup]
-    if (!strcmp(argv[option.argi], "-k") || !strcmp(argv[option.argi], "-keep")) {
+    if (!strcmp(argv[option.argi], "-k") || !strcmp(argv[option.argi], "--keep")) {
       option.keep = strtoul(argv[++option.argi],0,0);
       debug("keep set to %d", option.keep);
       continue;
     }
 
-    // set serie format [setup]
-    if (!strcmp(argv[option.argi], "-f") || !strcmp(argv[option.argi], "-format")) {
-      if (option.serie) {
-        option.fmt = argv[++option.argi];
-        debug("format set to '%s'", option.fmt);
-      } else {
-        option.argi++;
-        inform("serie mode is off, format ignored");
-      }
-      continue;
-    }
-
     // set punctuation characters [setup]
-    if (!strcmp(argv[option.argi], "-p") || !strcmp(argv[option.argi], "-punct")) {
+    if (!strcmp(argv[option.argi], "-p") || !strcmp(argv[option.argi], "--punct")) {
       option.chr = argv[++option.argi]; 
       debug("punctuation characters set to '%s'", option.chr);
       continue;
     }
 
     // set output extension [setup]
-    if (!strcmp(argv[option.argi], "-o") || !strcmp(argv[option.argi], "-outext")) {
+    if (!strcmp(argv[option.argi], "-o") || !strcmp(argv[option.argi], "--outext")) {
       option.out_e = argv[++option.argi]; 
       debug("output extension set to '%s'", option.out_e);
       continue;
     }
 
     // set reference extension [setup]
-    if (!strcmp(argv[option.argi], "-r") || !strcmp(argv[option.argi], "-refext")) {
+    if (!strcmp(argv[option.argi], "-r") || !strcmp(argv[option.argi], "--refext")) {
       option.ref_e = argv[++option.argi]; 
       debug("reference extension set to '%s'", option.ref_e);
       continue;
     }
 
     // set config extension [setup]
-    if (!strcmp(argv[option.argi], "-g") || !strcmp(argv[option.argi], "-cfgext")) {
+    if (!strcmp(argv[option.argi], "-g") || !strcmp(argv[option.argi], "--cfgext")) {
       option.cfg_e = argv[++option.argi]; 
       debug("config extension set to '%s'", option.cfg_e);
       continue;
     }
 
-    // set accumulation filename [setup]
-    if (!strcmp(argv[option.argi], "-a") || !strcmp(argv[option.argi], "-accum")) {
-      option.acc = argv[++option.argi]; 
-      debug("accumulation filename set to '%s'", option.acc);
-      continue;
-    }
-
     // unknown option
-    if (argv[option.argi][0] == '-')
-      invalid_option(argv[option.argi]);
-
-    break;
+    invalid_option(argv[option.argi]);
   }
 }
 

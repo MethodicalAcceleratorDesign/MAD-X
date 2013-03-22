@@ -23,15 +23,15 @@
 #include <time.h>
 
 struct option {
-  int check, debug, serie, list, blank, utest, keep;
+  int check, debug, serie, list, blank, utest, keep, reset;
   const char *suite, *test;
-  const char *fmt;
+  const char *fmt, *sfmt;
   const char *chr;
   const char *out_e, *ref_e, *cfg_e;
   char indexed_filename[FILENAME_MAX+100];
   int argi;
 
-  const char *acc;
+  const char *accum;
   time_t dat_t0;
   double clk_t0, clk_t1;
 };

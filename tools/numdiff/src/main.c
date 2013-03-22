@@ -50,6 +50,14 @@ diff_summary(const struct ndiff *dif)
   return c;
 }
 
+static void
+test_summary(int total, int failed)
+{
+  double t = (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
+  printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
+          failed ? CSTR_RED("FAIL") : CSTR_GREEN("PASS"));
+}
+
 int
 main(int argc, const char* argv[])
 {
@@ -57,20 +65,32 @@ main(int argc, const char* argv[])
   option.dat_t0 = time(0);
   option.clk_t0 = clock();
 
-  // parse arguments
-  parse_args(argc, argv);
+  // set logging level
+  logmsg_config.level = inform_level;
 
   // test counter
-  int total = 0, failed = 0;
+  int  total = 0, failed  = 0;
   long lines = 0, numbers = 0;
+  int  files = 0;
 
-  trace("arguments: total=%d, left=%d, right=%d, curr=%s",
-        argc, option.argi, argc-option.argi, argv[option.argi]);
-
-  // file list loop
+  // argument list loop
   while (option.argi < argc) {
     const char *lhs_s = 0, *rhs_s = 0, *cfg_s = 0;
     int n = 0;
+
+    // check for another suite or test name (chain)
+    if (argv[option.argi][0] == '-' && option.test && total && (
+        !strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test" ) ||
+        !strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite"))) {
+      option.clk_t1 = clock();
+      test_summary(total, failed);
+      if (option.accum) accum_summary(total, failed, lines, numbers);
+      total = failed = 0;
+      option.clk_t0 = clock();
+    }
+
+    // parse arguments [incremental]
+    parse_args(argc, argv);
 
     // setup filenames [incremental]
     if (!option.list) {
@@ -81,13 +101,20 @@ main(int argc, const char* argv[])
       if (option.argi < argc) lhs_s = rhs_s = cfg_s = argv[option.argi++];
 
     trace("arguments: total=%d, left=%d, right=%d, curr=%s",
-          argc, option.argi, argc-option.argi, argv[option.argi]);
+          argc, option.argi, argc-option.argi, option.argi < argc ? argv[option.argi] : "nil");
 
-    // checks
+    // checks (fragile, to improve)
     if (!lhs_s || !rhs_s) {
-      if (option.argi == argc-option.utest)
+      if (option.argi == argc-option.utest && !option.accum)
         invalid_option(argv[option.argi-1]);
       else exit(EXIT_SUCCESS);
+    }
+
+    // suite title (first time only)
+    if (option.suite) {
+      fprintf(stdout, option.sfmt, option.suite);
+      fputc('\n', stdout);
+      option.suite = 0;
     }
 
     // serie loop
@@ -170,13 +197,10 @@ main(int argc, const char* argv[])
 
   option.clk_t1 = clock();
 
-  if (option.test) {
-    double t = (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
-    printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
-            failed ? CSTR_RED("FAIL") : CSTR_GREEN("PASS"));
-  }
+  if (option.test)
+    test_summary(total, failed);
 
-  if (option.acc)
+  if (option.accum)
     accum_summary(total, failed, lines, numbers);
 
   return EXIT_SUCCESS;

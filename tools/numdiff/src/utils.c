@@ -114,7 +114,7 @@ retry:
 void
 accum_summary(int total, int failed, long lines, long numbers)
 {
-  if (!option.acc) return;
+  if (!option.accum) return;
 
   int n;
 //  double tz;
@@ -124,13 +124,13 @@ accum_summary(int total, int failed, long lines, long numbers)
   long total_lines=0, total_numbers=0;
   double total_ndtime=0;
 
-  FILE *fp = fopen(option.acc, "r+");
-  if (fp) {
+  FILE *fp;
+  if (!option.reset && (fp = fopen(option.accum, "r+"))) {
     // read time stamps
     n = fscanf(fp, " = tests summary (started at %d.%d.%d %d:%d:%d)\n",
                    &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
                    &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
-    ensure(n == 6, "invalid summary file format %s", option.acc);
+    ensure(n == 6, "invalid summary file format %s", option.accum);
     tm.tm_year -= 1900;
     tm.tm_mon  -= 1;
 
@@ -143,20 +143,21 @@ accum_summary(int total, int failed, long lines, long numbers)
     // read diff time, line and number counts
     n = fscanf(fp, "   total diff time %lf s  -  total lines %ld  -  total numbers %ld\n",
                    &total_ndtime, &total_lines, &total_numbers);
-    ensure(n == 3, "invalid summary file format %s (lines)", option.acc);
+    ensure(n == 3, "invalid summary file format %s (lines)", option.accum);
     // read tests counts
     n = fscanf(fp, "   total run  time %*f s  -  total files %d - PASSED %d - FAILED %d\n",
                    &total_tests, &total_passed, &total_failed);
-    ensure(n == 3, "invalid summary file format %s (files)", option.acc);
-    ensure(total_tests == total_passed+total_failed, "invalid summary count in file %s", option.acc);
+    ensure(n == 3, "invalid summary file format %s (files)", option.accum);
+    ensure(total_tests == total_passed+total_failed, "invalid summary count in file %s", option.accum);
 
     // reset file
     rewind(fp);
   }
   else {
     // create the file
-    fp = fopen(option.acc, "w+");
-    ensure(fp, "failed to create or read summary file %s", option.acc);
+    fp = fopen(option.accum, "w+");
+    ensure(fp, "failed to create or read summary file %s", option.accum);
+    option.reset = 0;
 
     // init the time stamp
     tm = *localtime(&option.dat_t0);
