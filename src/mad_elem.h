@@ -59,7 +59,7 @@ void    element_name(char* name, int* l);
 double  element_value(struct node*, char* par);
 int     element_vector(struct element*, char* par, double* vector);
 
-int     belongs_to_class(struct element*, char* class);
+int     belongs_to_class(struct element*, char*);
 double  get_refpos(struct sequence*);
 void    get_node_vector(char* par, int* length, double* vector);
 int     el_par_vector(int* total, double* vect);
