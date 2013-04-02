@@ -288,6 +288,7 @@ context_clear (T *cxt)
   assert(cxt);
   context_teardown(cxt);
   cxt->dat_n = 0;
+  context_add0(cxt);
 }
 
 void
@@ -480,9 +481,11 @@ ut_testNul(struct utest *utest, T* cxt, int i, int j)
   const C* cst1 = context_getAt (cxt, i, j);
   const C* cst2 = context_getInc(cxt, i, j);
 
-  UTEST(!cst1 && !cst2);
+  UTEST(cst1 == cst2 &&
+        cst1 == context_getIdx(cxt,0) &&
+           0 == context_findIdx(cxt, cst1));
 
-  if (cst1 || cst2)
+  if (cst1 != cst2)
     ut_trace(cxt, i, j, cst1, cst2);
 }
 

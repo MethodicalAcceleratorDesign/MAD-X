@@ -71,7 +71,6 @@ main(int argc, const char* argv[])
   // test counter
   int  total = 0, failed  = 0;
   long lines = 0, numbers = 0;
-  int  files = 0;
 
   // argument list loop
   while (option.argi < argc) {

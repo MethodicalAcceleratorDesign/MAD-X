@@ -118,15 +118,14 @@ usage(void)
   inform("options:");
   inform("\t-a   --accum file    accumulate tests information in file");
   inform("\t-b   --blank         ignore blank spaces (space and tabs)");
-  inform("\t-c   --check         enable check mode (algorithms crosscheck)");
-  inform("\t-d   --debug         enable debug mode (include check mode)");
-  inform("\t-g   --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
+  inform("\t-c   --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
+  inform("\t-d   --debug         enable debug mode (include crosscheck mode)");
   inform("\t-h   --help          display this help");
   inform("\t-i   --info          enable info mode (default)");
   inform("\t-k   --keep num      specify the number of diffs to display per file, default is %d", option.keep);
   inform("\t-l   --list          enable list mode (list of filenames)");
   inform("\t-n   --serie         enable series mode (indexed filenames)");
-  inform("\t-f   --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
+  inform("\t     --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t-o   --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
   inform("\t-p   --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q   --quiet         enable quiet mode (no output if no diff)");
@@ -135,7 +134,8 @@ usage(void)
   inform("\t     --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
   inform("\t-t   --test name     set test name for output message (item)");
   inform("\t     --trace         enable trace mode (very verbose, include debug mode)");
-  inform("\t-u   --utest         run the test suite (still incomplete)");
+  inform("\t     --utest         run the test suite (still incomplete)");
+  inform("\t     --xcheck        enable crosscheck mode (algorithms crosscheck)");
   inform("\t-z   --reset         reset accumulated information");
 
   inform("");
@@ -192,7 +192,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // run utests [action]
-    if (!strcmp(argv[option.argi], "-u") || !strcmp(argv[option.argi], "--utest")) {
+    if (!strcmp(argv[option.argi], "--utest")) {
       run_utest();
       option.utest += 1;
       continue;
@@ -246,7 +246,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set check mode [setup]
-    if (!strcmp(argv[option.argi], "-c") || !strcmp(argv[option.argi], "--check")) {
+    if (!strcmp(argv[option.argi], "--xcheck")) {
       debug("check mode on");
       option.check = 1;
       continue;
@@ -337,7 +337,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set config extension [setup]
-    if (!strcmp(argv[option.argi], "-g") || !strcmp(argv[option.argi], "--cfgext")) {
+    if (!strcmp(argv[option.argi], "-c") || !strcmp(argv[option.argi], "--cfgext")) {
       option.cfg_e = argv[++option.argi]; 
       debug("config extension set to '%s'", option.cfg_e);
       continue;
