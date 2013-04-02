@@ -99,7 +99,7 @@ backtrace_number (char *buf, const char *beg)
 static inline int
 parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 {
-  int i = 0, d = 0, n = 0, e = 0, nz=0;
+  int i = 0, d = 0, e = 0, n = 0;
   char c;
 
   // sign
@@ -107,24 +107,20 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 
   // drop leading zeros
   while(buf[i] == '0') i++;
-  if (isdigit(buf[i])) nz = 1;
 
   // digits
-  while(isdigit(buf[i])) n += nz, i++;
+  while(isdigit(buf[i])) n++, i++;
 
   // dot
   if (buf[i] == '.') d = ++i;
 
   // decimals
   if (d) {
-    if (!nz) {
-      // drop leading zeros
-      while(buf[i] == '0') i++;
-      if (isdigit(buf[i])) nz = 1;
-    }
+    // drop leading zeros
+    if (!n) while(buf[i] == '0') i++;
 
     // digits
-    while(isdigit(buf[i])) n += nz, i++;
+    while(isdigit(buf[i])) n++, i++;
   }
 
   // ensure at least ±# or ±#. or ±.#
