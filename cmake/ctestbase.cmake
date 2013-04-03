@@ -18,8 +18,8 @@ if(HAD_ERROR)
     message(FATAL_ERROR "Test failed with error ${HAD_ERROR}")
 else()
     # Run numdiff if all went well..
-    message("COMMAND ${NUMDIFF} -q -b --xcheck -l -n -t ${TEST_NAME} ${STRING_TEST_OUTPUT}")
-    execute_process(COMMAND ${NUMDIFF} -q -b --xcheck -l -n -t ${TEST_NAME} ${TEST_OUTPUT}
+    message("COMMAND ${NUMDIFF} -b -l -t ${TEST_NAME} ${STRING_TEST_OUTPUT}")
+    execute_process(COMMAND ${NUMDIFF} -b -l -t ${TEST_NAME} ${TEST_OUTPUT}
         WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE NUMDIFF_ERROR)
     if(NUMDIFF_ERROR)
        message(FATAL_ERROR "Test failed with numdiff error ${NUMDIFF_ERROR}")
