@@ -42,7 +42,7 @@ NDSUM = tests-summary.txt
 NDFLAGS = --quiet \
           $(if $(call eq,$(NDDEBUG),yes),--debug,) \
           $(if $(call eq,$(NDTRACE),yes),--trace,) \
-          --blank --check --list --serie --accum ..$/$(NDSUM) --test $@
+          --blank --xcheck --list --serie --accum ..$/$(NDSUM) --test $@
 
 #
 # init-test macro
