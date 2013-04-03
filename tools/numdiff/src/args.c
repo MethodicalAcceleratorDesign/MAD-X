@@ -26,6 +26,8 @@
 #include "ndiff.h"
 #include "context.h"
 
+#define VERSION "2013.04.02"
+
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
 #endif
@@ -169,7 +171,7 @@ usage(void)
   inform("");
   inform("information:\thttp://cern.ch/mad");
   inform("contact    :\tmad@cern.ch");
-  inform("version    :\t2013.03.22");
+  inform("version    :\t" VERSION);
 
   exit(EXIT_FAILURE);
 }
