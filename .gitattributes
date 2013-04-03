@@ -41,6 +41,7 @@ cmake/ctestbase.cmake -text
 cmake/install_macros.cmake -text
 cmake/madX.gif -text svneol=unset#unset
 cmake/madxInit.cmake -text
+cmake/numdiff_macros.cmake -text
 cmake/numdifftests.cmake -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
