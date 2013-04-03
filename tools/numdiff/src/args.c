@@ -135,7 +135,7 @@ usage(void)
   inform("\t-t   --test name     set test name for output message (item)");
   inform("\t     --trace         enable trace mode (very verbose, include debug mode)");
   inform("\t     --utest         run the test suite (still incomplete)");
-  inform("\t     --xcheck        enable crosscheck mode (algorithms crosscheck)");
+  inform("\t-x   --xcheck        enable crosscheck mode (algorithms crosscheck)");
   inform("\t-z   --reset         reset accumulated information");
 
   inform("");
@@ -246,7 +246,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set check mode [setup]
-    if (!strcmp(argv[option.argi], "--xcheck")) {
+    if (!strcmp(argv[option.argi], "-x") || !strcmp(argv[option.argi], "--xcheck")) {
       debug("check mode on");
       option.check = 1;
       continue;
@@ -346,5 +346,7 @@ parse_args(int argc, const char *argv[])
     // unknown option
     invalid_option(argv[option.argi]);
   }
+
+  exit(EXIT_SUCCESS);
 }
 

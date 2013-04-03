@@ -58,9 +58,27 @@ test_summary(int total, int failed)
           failed ? CSTR_RED("FAIL") : CSTR_GREEN("PASS"));
 }
 
-int
-main(int argc, const char* argv[])
+static void
+check_transition(const char* argv[], int *total, int *failed, long lines, long numbers)
 {
+  if (argv[option.argi][0] == '-' && option.test && *total && (
+      !strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test" ) ||
+      !strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite"))) {
+    option.clk_t1 = clock();
+    test_summary(*total, *failed);
+    if (option.accum) accum_summary(*total, *failed, lines, numbers);
+    *total = *failed = 0;
+    option.clk_t0 = clock();
+  }
+}
+
+int
+main(int argc_, char** argv_)
+{
+  // get const copy
+  const int    argc = argc_;
+  const char **argv = (void*)argv_;
+
   // start timers
   option.dat_t0 = time(0);
   option.clk_t0 = clock();
@@ -72,21 +90,13 @@ main(int argc, const char* argv[])
   int  total = 0, failed  = 0;
   long lines = 0, numbers = 0;
 
-  // argument list loop
+  // argument list loop (too long, should refactored)
   while (option.argi < argc) {
     const char *lhs_s = 0, *rhs_s = 0, *cfg_s = 0;
     int n = 0;
 
-    // check for another suite or test name (chain)
-    if (argv[option.argi][0] == '-' && option.test && total && (
-        !strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test" ) ||
-        !strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite"))) {
-      option.clk_t1 = clock();
-      test_summary(total, failed);
-      if (option.accum) accum_summary(total, failed, lines, numbers);
-      total = failed = 0;
-      option.clk_t0 = clock();
-    }
+    // check for test or test suite transition (chaining)
+    check_transition(argv, &total, &failed, lines, numbers);
 
     // parse arguments [incremental]
     parse_args(argc, argv);
@@ -102,12 +112,8 @@ main(int argc, const char* argv[])
     trace("arguments: total=%d, left=%d, right=%d, curr=%s",
           argc, option.argi, argc-option.argi, option.argi < argc ? argv[option.argi] : "nil");
 
-    // checks (fragile, to improve)
-    if (!lhs_s || !rhs_s) {
-      if (option.argi == argc-option.utest && !option.accum)
-        invalid_option(argv[option.argi-1]);
-      else exit(EXIT_SUCCESS);
-    }
+    // no more files
+    if (!lhs_s || !rhs_s) exit(EXIT_SUCCESS);
 
     // suite title (first time only)
     if (option.suite) {
