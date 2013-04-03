@@ -31,11 +31,11 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 #include our specific folders:
-    if( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
-        set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib32/)
-    else()
-        set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib64/)
-    endif()
+   if( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
+       set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib32/)
+   else()
+       set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib64/)
+   endif()
 endif()
 # normal search:
 find_package(SDDS)

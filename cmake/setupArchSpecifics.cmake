@@ -1,8 +1,8 @@
 if ( IS32BIT )
     message(STATUS "32 bit build" ) 
-    
+
     set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "i386")
-            
+
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         if ( MADX_STATIC )
             set (CPACK_RPM_PACKAGE_ARCHITECTURE "noarch")
@@ -16,24 +16,16 @@ if ( IS32BIT )
             endif ()
         endif ()
     endif()
-    
+
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
-    if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND MADX_STATIC)
-        LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib32)
-    endif ()
-  
 else()
 
     message(STATUS "64 bit build")
-    
+
     set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
     set (CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-    
-    if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND MADX_STATIC)
-            LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/lib64)
-    endif ()
 endif ()
 
 
