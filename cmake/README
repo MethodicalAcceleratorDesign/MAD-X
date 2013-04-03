@@ -1,53 +1,83 @@
 CMake:
 
- CMake is a build tool that can be used instead of make. 
- In principle it can also be used on Windows, however we do not 
- currently aim to support this. We do try to support all linux 
- flavours in addition to Mac OSX.
+ CMake is an alternative build system which provides some advanced functionality.
 
-Basic usage:
- Create a temporary folder and enter it in terminal. Write the command
-  cmake <path to source>
- You can then build mad-x with
-  make
- If you wish, you can use "-j <nprocs>" to utilise several processors for faster compilation.
- If you wish, you can use "VERBOSE=yes" to see all commands that are used, e.g. for making sure you use the correct flags and compiler.
- If you want to see the commands without actually running them (dry-run), use "make -n".
- If you wish to edit something in your current build configuration, you can use the command
-  ccmake .
- Inside there, you can toggle advanced mode with "t", edit an option with "c", and quit with "q"
- In order to use a different compiler, you can use instead of the first command
-  cmake -DCMAKE_Fortran_COMPILER=ifort <path to source>
- This is general for all options, -D<option>=value will automatically set this option.
- If you want to use the NAG compiler, please use -DCMAKE_Fortran_COMPILER=nagfor, not f95 (which is usually just a link to your default fortran compiler..)
- 
+ Amongst others, a front end for testing the code (ctest), packaging tools (cpack),
+ and a web server for aggregating and analyzing results of building and testing (cdash).
+
+Installing CMake:
+
+ In addition to the dependencies of Mad-X, added dependencies are only cmake.
+ Version 2.6 or newer is required. Most package managers include cmake, otherwise
+ you can download from http://www.cmake.org/
+
+ For SLC6 there are two packages, cmake and cmake28. We recommend the latter. This package
+ has appended '28' to all the binaries (so e.g. cmake28 instead of just cmake)
+
+Basic usage (GUI):
+
+ Configuring can be done using the GUI. Select source and build folder, click on configure,
+ select your options (default should be fine), if you changed any options click on configure again,
+ and finally click generate. If you e.g. selected "Unix Makefiles" you then go to your source folder
+ in a terminal and run 'make'
+
+Basic usage (Terminal):
+
+
+ Default configure&build commands (terminal) are:
+
+   cd madX
+   mkdir build
+   cd build
+   cmake ../
+   make
+
+ To edit options you are recommended to use the command 'ccmake <path/to/build/directory>'
+ If you are already in the build folder it is simply 'ccmake .'
+ cmake also respects environment variables, so if you e.g. want to build a 32 bit binary, one way
+ of doing so is (after you entered an empty build folder):
+
+  export CFLAGS=-m32
+  export CXXFLAGS=-m32
+  export FCFLAGS=-m32
+  cmake ../
+
+ To run the tests use the command 'ctest'. For help about ctest run 'ctest --help'
+
  OSX specific:
- On OSX you can build a binary for multiple architectures. This requires that your compilers are built with the universal option on (e.g. for macports: "port install gcc +universal")
- You can compile for multiple architectures with the flag CMAKE_OSX_ARCHITECTURES, so e.g. 
-    cmake -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" <srcdir>
 
- In case of LF95:
-  If you want to use lf95 32bit compiler on a 64bit system, please use the initial command:
-    cmake -DCMAKE_TOOLCHAIN_FILE=<path-to-source>/cmake/ToolChains/LinuxLF95.cmake <path-to-source>
-  This is so far only known to work with CMake newer than or equal to version 2.8.1. 
-  That means it will not work on lxplus at the moment. 
-  For a 32bit system the compiler can be used in the usual way, with the option "-DCMAKE_Fortran_COMPILER=lf95"
-  Toolchain files must be generated if you want to do cross-platform compiling in general.
+  On OSX you can build a binary for multiple architectures. This requires that your compilers are built with the universal option on (e.g. for macports: "port install gcc +universal")
+  You can compile for multiple architectures with the flag CMAKE_OSX_ARCHITECTURES, so e.g. 
+     cmake -DCMAKE_OSX_ARCHITECTURES="i386;x86_64" <srcdir>
 
 Submitting to cdash:
-    A testing server is set up, where a client can publish the results from updating, compiling, and testing. For this, a configuration script is needed. 
-    An example script is given in madX/cmake/cdash_madx.cmake. In this file you need to edit the following:
-    - CTEST_SITE "myname.maymachine" - select a useful name and machine name. Keep this fixed for all configurations on your machine. It is important that it is unique for you.
-    - CTEST_BUILD_NAME "SLC5-64bit-gfortran" - select a useful name for the build. Change this for all different configurations you have.
-    - CTEST_SOURCE_DIRECTORY "/path/to/source/madX/" - select a temporary folder where the madX source is checked out from svn. 
-                                                       It is important that you do not need password to update from svn. 
-                                                       Hence it is recommended that you check out from this url: 
-                                                       http://svnweb.cern.ch/guest/madx/trunk/madX/
-    - If you want to start a cron job, replace "Experimental" with "Nightly".
-    
-    After that, you can run the script using the following command: "ctest -S cdash_madx.cmake"
-    
-    You can optionally set this as a nightly cron job. To do so, place this script in a folder of choice, 
-    and then add the following to your cron table ("crontab -e"):
-    @daily ID=madx_cmake cd /path/to/script/;ctest -S cdash_madx.cmake
-    This will run the test script every night at 00:00, and submit results to the server.
+
+ A testing server is set up, where a client can publish the results from updating, compiling, and testing.
+
+ You can try to submit your own build result using the command:
+
+  make Experimental
+
+ (if you have already built we recommend 'make clean' first)
+
+ For advanced usage of cdash, a configuration script is needed.
+ An example script is given in madX/cmake/cdash_madx.cmake. In this file you need to edit the following:
+ - CTEST_SITE "myname.maymachine" - select a useful name and machine name. Keep this fixed for all configurations on your machine. It is important that it is unique for you.
+ - CTEST_BUILD_NAME "SLC5-64bit-gfortran" - select a useful name for the build. Change this for all different configurations you have.
+ - CTEST_SOURCE_DIRECTORY "/path/to/source/madX/" - select a temporary folder where the madX source is checked out from svn.
+                                                    It is important that you do not need password to update from svn.
+                                                    Hence it is recommended that you check out from this url:
+                                                    http://svnweb.cern.ch/guest/madx/trunk/madX/
+ - If you want to start a cron job, replace "Experimental" with "Nightly" or "Continuous" depending on what you wish.
+
+ After that, you can run the script using the following command: "ctest -S cdash_madx.cmake"
+
+ You can optionally set this as a nightly cron job. To do so, place this script in a folder of choice,
+ and then add the following to your cron table ("crontab -e"):
+ @daily ID=madx_cmake cd /path/to/script/;ctest -S cdash_madx.cmake
+ This will run the test script every night at 00:00, and submit results to the server.
+
+
+
+
+
