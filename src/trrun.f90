@@ -1020,6 +1020,144 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   endif
 
 end subroutine ttmult
+subroutine trphot(el,curv,rfac,deltap)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Generate random energy loss for photons, using a look-up table to  *
+  !   invert the function Y.  Ultra-basic interpolation computed;        *
+  !   leads to an extrapolation outside the table using the two outmost  *
+  !   point on each side (low and high).                                 *
+  !   Assumes ultra-relativistic particles (beta = 1).                   *
+  ! Author: Ghislain Roy                                                 *
+  ! Input:                                                               *
+  !   EL     (double)       Element length.                              *
+  !   CURV   (double)       Local curvature of orbit.                    *
+  ! Output:                                                              *
+  !   RFAC   (double)       Relative energy loss due to photon emissions.*
+  !----------------------------------------------------------------------*
+  !---- Generate pseudo-random integers in batches of NR.                *
+  !     The random integers are generated in the range [0, MAXRAN).      *
+  !---- Table definition: maxtab, taby(maxtab), tabxi(maxtab)            *
+  !----------------------------------------------------------------------*
+  integer i,ierror,j,nphot,nr,maxran,maxtab
+  parameter(nr=55,maxran=1000000000,maxtab=101)
+  double precision amean,curv,dlogr,el,frndm,rfac,scalen,scaleu,    &
+       slope,ucrit,xi,deltap,hbar,clight,arad,pc,gamma,amass,real_am,    &
+       get_value,get_variable,tabxi(maxtab),taby(maxtab),zero,one,two,   &
+       three,five,twelve,fac1
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,five=5d0,twelve=12d0,&
+       fac1=3.256223d0)
+  character(20) text
+  data (taby(i), i = 1, 52)                                         &
+       / -1.14084005d0,  -0.903336763d0, -0.769135833d0, -0.601840854d0, &
+       -0.448812515d0, -0.345502228d0, -0.267485678d0, -0.204837948d0,   &
+       -0.107647471d0, -0.022640628d0,  0.044112321d0,  0.0842842236d0,  &
+       0.132941082d0,  0.169244036d0,  0.196492359d0,  0.230918407d0,    &
+       0.261785239d0,  0.289741248d0,  0.322174788d0,  0.351361096d0,    &
+       0.383441716d0,  0.412283719d0,  0.442963421d0,  0.472622454d0,    &
+       0.503019691d0,  0.53197819d0,   0.561058342d0,  0.588547111d0,    &
+       0.613393188d0,  0.636027336d0,  0.675921738d0,  0.710166812d0,    &
+       0.725589216d0,  0.753636241d0,  0.778558254d0,  0.811260045d0,    &
+       0.830520391d0,  0.856329501d0,  0.879087269d0,  0.905612588d0,    &
+       0.928626955d0,  0.948813677d0,  0.970829248d0,  0.989941061d0,    &
+       1.0097903d0,    1.02691281d0,   1.04411256d0,   1.06082714d0,     &
+       1.0750246d0,    1.08283985d0,   1.0899564d0,    1.09645379d0 /
+  data (taby(i), i = 53, 101)                                       &
+       /  1.10352755d0,   1.11475027d0,   1.12564385d0,   1.1306442d0,   &
+       1.13513422d0,   1.13971806d0,   1.14379156d0,   1.14741969d0,     &
+       1.15103698d0,   1.15455759d0,   1.15733826d0,   1.16005647d0,     &
+       1.16287541d0,   1.16509759d0,   1.16718769d0,   1.16911888d0,     &
+       1.17075884d0,   1.17225218d0,   1.17350936d0,   1.17428589d0,     &
+       1.17558432d0,   1.17660713d0,   1.17741513d0,   1.17805469d0,     &
+       1.17856193d0,   1.17896497d0,   1.17928565d0,   1.17954147d0,     &
+       1.17983139d0,   1.1799767d0,    1.18014216d0,   1.18026078d0,     &
+       1.18034601d0,   1.1804074d0,    1.18045175d0,   1.1804837d0,      &
+       1.18051291d0,   1.18053186d0,   1.18054426d0,   1.18055236d0,     &
+       1.18055761d0,   1.18056166d0,   1.18056381d0,   1.1805656d0,      &
+       1.18056655d0,   1.18056703d0,   1.18056726d0,   1.1805675d0,      &
+       1.18056762d0 /
+  data (tabxi(i), i = 1, 52)                                        &
+       / -7.60090017d0,  -6.90775537d0,  -6.50229025d0,  -5.99146461d0,  &
+       -5.52146101d0,  -5.20300722d0,  -4.96184492d0,  -4.76768923d0,    &
+       -4.46540833d0,  -4.19970512d0,  -3.98998451d0,  -3.86323285d0,    &
+       -3.70908213d0,  -3.59356928d0,  -3.50655794d0,  -3.39620972d0,    &
+       -3.29683733d0,  -3.20645332d0,  -3.10109282d0,  -3.0057826d0,     &
+       -2.9004221d0,   -2.80511189d0,  -2.70306253d0,  -2.60369015d0,    &
+       -2.50103593d0,  -2.4024055d0 ,  -2.30258512d0,  -2.20727491d0,    &
+       -2.12026358d0,  -2.04022098d0,  -1.89712d0   ,  -1.7719568d0,     &
+       -1.71479833d0,  -1.60943794d0,  -1.51412773d0,  -1.38629436d0,    &
+       -1.30933332d0,  -1.20397282d0,  -1.10866261d0,  -0.99425226d0,    &
+       -0.89159810d0,  -0.79850775d0,  -0.69314718d0,  -0.59783697d0,    &
+       -0.49429631d0,  -0.40047753d0,  -0.30110508d0,  -0.19845095d0,    &
+       -0.10536054d0,  -0.05129330d0,   0.0d0,          0.048790119d0 /
+  data (tabxi(i), i = 53, 101)                                      &
+       /  0.104360029d0,  0.198850885d0,  0.300104618d0,  0.350656837d0, &
+       0.398776114d0,  0.451075643d0,  0.500775278d0,  0.548121393d0,    &
+       0.598836541d0,  0.652325153d0,  0.69813472d0 ,  0.746687889d0,    &
+       0.802001595d0,  0.850150883d0,  0.900161386d0,  0.951657832d0,    &
+       1.00063193d0,   1.05082154d0,   1.09861231d0,   1.13140213d0,     &
+       1.1939224d0,    1.25276291d0,   1.3083328d0,    1.36097658d0,     &
+       1.4109869d0,    1.45861506d0,   1.50407743d0,   1.54756248d0,     &
+       1.60943794d0,   1.64865863d0,   1.70474803d0,   1.75785792d0,     &
+       1.80828881d0,   1.85629797d0,   1.90210748d0,   1.9459101d0,      &
+       2.0014801d0,    2.05412364d0,   2.10413408d0,   2.15176225d0,     &
+       2.19722462d0,   2.25129175d0,   2.29253483d0,   2.35137534d0,     &
+       2.40694523d0,   2.45100522d0,   2.501436d0,     2.60268974d0,     &
+       2.64617491d0 /
+
+  !Get constants
+  clight = get_variable('clight ')
+  hbar   = get_variable('hbar ')
+  arad   = get_value('probe ','arad ')
+  pc     = get_value('probe ','pc ')
+  amass  = get_value('probe ','mass ')
+  gamma  = get_value('probe ','gamma ')
+  deltap = get_value('probe ','deltap ')
+  scalen = five / (twelve * hbar * clight)
+  scaleu = hbar * three * clight / two
+
+  !---- AMEAN is the average number of photons emitted.,
+  !     NPHOT is the integer number generated from Poisson's law.
+  amean = scalen * abs(arad*pc*(one+deltap)*el*curv) * sqrt(three)
+  rfac = zero
+  real_am = amean
+  if (real_am .gt. zero) then
+     call dpoissn(real_am, nphot, ierror)
+
+     if (ierror .ne. 0) then
+        write(text, '(1p,d20.12)') amean
+        call aafail('TRPHOT: ','Fatal: Poisson input mean =' // text)
+     endif
+
+     !---- For all photons, sum the radiated photon energy,
+     !     in units of UCRIT (relative to total energy).
+
+     if (nphot .ne. 0) then
+        ucrit = scaleu * gamma**2 * abs(curv) / amass
+        xi = zero
+        do i = 1, nphot
+
+           !---- Find a uniform random number in the range [ 0,3.256223 ].
+           !     Note that the upper limit is not exactly 15*sqrt(3)/8
+           !     because of imprecision in the integration of F.
+           dlogr = log(fac1 * frndm())
+
+           !---- Now look for the energy of the photon in the table TABY/TABXI
+           do j = 2, maxtab
+              if (dlogr .le. taby(j) ) go to 20
+           enddo
+
+           !---- Perform linear interpolation and sum up energy lost.
+20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
+           xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
+           rfac = rfac + ucrit * xi
+        enddo
+     endif
+  endif
+end subroutine trphot
 
 subroutine ttsrot(track,ktrack)
 
@@ -1324,6 +1462,135 @@ subroutine ttcrabrf(track,ktrack,turn)
      track(6,itrack) = pt
   enddo
 end subroutine ttcrabrf
+subroutine tthacdip(track,ktrack,turn)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Track a set of trajectories through a thin h ac dipole (zero l.)   *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  ! Added by Yipeng SUN on 11 Nov 2009                                   *
+  !----------------------------------------------------------------------*
+  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
+  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
+       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
+  !      double precision px,py,ttt,beti,el1
+  parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
+
+  !---- Initialize
+  clight=get_variable('clight ')
+  twopi=get_variable('twopi ')
+
+  !---- Fetch data.
+  rfv = node_value('volt ')
+  rff = node_value('freq ')
+  rfl = node_value('lag ')
+  pc0 = get_value('beam ','pc ')
+
+  turn1 = node_value('ramp1 ')
+  turn2 = node_value('ramp2 ')
+  turn3 = node_value('ramp3 ')
+  turn4 = node_value('ramp4 ')
+  !---- Set up.
+  omega = rff * twopi
+  vrf   = 300 * rfv * ten3m / pc0
+  phirf = rfl * twopi
+
+  if (turn .lt. turn1)  then
+     vrf = 0
+  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+     vrf = (turn-turn1) * vrf / (turn2-turn1)
+  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+     vrf = vrf
+  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+     vrf = (turn4-turn) * vrf / (turn4-turn3)
+  else
+     vrf = 0
+  endif
+  !      if (turn .le. 10 .or. turn .gt. 1990) then
+  !       print*," turn: ",turn, " vrf: ", vrf
+  !      endif
+  do itrack = 1, ktrack
+     px  = track(2,itrack)                                           &
+          + vrf * sin(phirf + omega * turn)
+
+     !---- track(2,jtrk) = track(2,jtrk)
+     !        pt = track(6,itrack)
+     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+
+     track(2,itrack) = px
+  enddo
+end subroutine tthacdip
+subroutine ttvacdip(track,ktrack,turn)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Track a set of trajectories through a thin v ac dipole (zero l.)   *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  ! Added by Yipeng SUN on 11 Nov 2009                                   *
+  !----------------------------------------------------------------------*
+  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
+  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
+       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
+       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,py
+  !      double precision px,py,ttt,beti,el1
+  parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
+
+  !---- Initialize
+  clight=get_variable('clight ')
+  twopi=get_variable('twopi ')
+
+  !---- Fetch data.
+  rfv = node_value('volt ')
+  rff = node_value('freq ')
+  rfl = node_value('lag ')
+  pc0 = get_value('beam ','pc ')
+
+  turn1 = node_value('ramp1 ')
+  turn2 = node_value('ramp2 ')
+  turn3 = node_value('ramp3 ')
+  turn4 = node_value('ramp4 ')
+  !---- Set up.
+  omega = rff * twopi
+  vrf   = 300 * rfv * ten3m / pc0
+  phirf = rfl * twopi
+
+
+  if (turn .lt. turn1)  then
+     vrf = 0
+  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+     vrf = (turn-turn1) * vrf / (turn2-turn1)
+  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+     vrf = vrf
+  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+     vrf = (turn4-turn) * vrf / (turn4-turn3)
+  else
+     vrf = 0
+  endif
+  !      if (turn .le. 10 .or. turn .gt. 1990) then
+  !       print*," turn: ",turn, " vrf: ", vrf
+  !      endif
+  do itrack = 1, ktrack
+     py  = track(4,itrack)                                           &
+          + vrf * sin(phirf + omega * turn)
+
+     !---- track(2,jtrk) = track(2,jtrk)
+     !        pt = track(6,itrack)
+     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+
+     track(4,itrack) = py
+  enddo
+end subroutine ttvacdip
 subroutine ttsep(el,track,ktrack)
 
   use twtrrfi
@@ -1591,6 +1858,642 @@ subroutine ttcorr(el,track,ktrack,turn)
   endif
 
 end subroutine ttcorr
+subroutine dpoissn (amu,n,ierror)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !    POISSON GENERATOR                                                 *
+  !    CODED FROM LOS ALAMOS REPORT      LA-5061-MS                      *
+  !    PROB(N)=EXP(-AMU)*AMU**N/FACT(N)                                  *
+  !        WHERE FACT(N) STANDS FOR FACTORIAL OF N                       *
+  !    ON RETURN IERROR.EQ.0 NORMALLY                                    *
+  !              IERROR.EQ.1 IF AMU.LE.0.                                *
+  !----------------------------------------------------------------------*
+  integer n, ierror
+  double precision amu,ran,pir,frndm,grndm,expma,amax,zero,one,half
+  parameter(zero=0d0,one=1d0,half=5d-1)
+  !    AMAX IS THE VALUE ABOVE WHICH THE NORMAL DISTRIBUTION MUST BE USED
+  data amax/88d0/
+
+  ierror= 0
+  if(amu.le.zero) then
+     !    MEAN SHOULD BE POSITIVE
+     ierror=1
+     n = 0
+     go to 999
+  endif
+  if(amu.gt.amax) then
+     !   NORMAL APPROXIMATION FOR AMU.GT.AMAX
+     ran = grndm()
+     n=ran*sqrt(amu)+amu+half
+     goto 999
+  endif
+  expma=exp(-amu)
+  pir=one
+  n=-1
+10 n=n+1
+  pir=pir*frndm()
+  if(pir.gt.expma) go to 10
+999 end subroutine dpoissn
+subroutine ttbb(track,ktrack,parvec)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! purpose:                                                             *
+  !   track a set of particle through a beam-beam interaction region.    *
+  !   see mad physicist's manual for the formulas used.                  *
+  !input:                                                                *
+  ! input/output:                                                        *
+  !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
+  !   ktrack    (integer) number of tracks.                              *
+  !----------------------------------------------------------------------*
+  integer ktrack,beamshape,b_dir_int
+  double precision track(6,*),parvec(*),fk,dp
+  double precision gamma0,beta0,beta_dp,ptot,b_dir
+  double precision q,q_prime,get_value,node_value,get_variable
+  double precision zero,one,two
+  logical first
+  save first
+  data first / .true. /
+  parameter(zero=0.0d0,one=1.0d0,two=2.0d0)
+  !     if x > explim, exp(-x) is outside machine limits.
+
+  !---- Calculate momentum deviation and according changes
+  !     of the relativistic factor beta0
+  dp  = get_variable('track_deltap ')
+  q = get_value('probe ','charge ')
+  q_prime = node_value('charge ')
+  gamma0 = parvec(7)
+  beta0 = sqrt(one-one/gamma0**2)
+  ptot = beta0*gamma0*(one+dp)
+  beta_dp = ptot / sqrt(one + ptot**2)
+  b_dir_int = node_value('bbdir ')
+  b_dir=dble(b_dir_int)
+  b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
+  !---- pre-factor, if zero, anything else does not need to be calculated
+  fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+       (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
+  !
+  if (fk .eq. zero)  return
+  !---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
+  beamshape = node_value('bbshape ')
+  if(beamshape.lt.1.or.beamshape.gt.3) then
+     beamshape=1
+     if(first) then
+        first = .false.
+        call aawarn('TTBB: ',                                         &
+             'beamshape out of range, set to default=1')
+     endif
+  endif
+  if(beamshape.eq.1) call ttbb_gauss(track,ktrack,fk)
+  if(beamshape.eq.2) call ttbb_flattop(track,ktrack,fk)
+  if(beamshape.eq.3) call ttbb_hollowparabolic(track,ktrack,fk)
+
+end subroutine ttbb
+subroutine ttbb_gauss(track,ktrack,fk)
+
+  use bbfi
+  implicit none
+
+  ! ---------------------------------------------------------------------*
+  ! purpose: kicks the particles of the beam considered with a beam      *
+  !          having a Gaussian perpendicular shape                       *
+  ! input and output as those of subroutine ttbb                         *
+  ! ---------------------------------------------------------------------*
+  logical bborbit
+  integer ktrack,itrack,ipos,get_option
+  double precision track(6,*),pi,sx,sy,xm,ym,sx2,sy2,xs,            &
+       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
+       get_variable,node_value,zero,one,two,three,ten3m,explim
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+       explim=150d0)
+  !     if x > explim, exp(-x) is outside machine limits.
+
+  !---- initialize.
+  bborbit = get_option('bborbit ') .ne. 0
+  pi=get_variable('pi ')
+  sx = node_value('sigx ')
+  sy = node_value('sigy ')
+  xm = node_value('xma ')
+  ym = node_value('yma ')
+  ipos = 0
+  if (.not. bborbit)  then
+     !--- find position of closed orbit bb_kick
+     do ipos = 1, bbd_cnt
+        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
+     enddo
+     ipos = 0
+1    continue
+  endif
+  sx2 = sx*sx
+  sy2 = sy*sy
+  !---- limit formulae for sigma(x) = sigma(y).
+  if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
+     do itrack = 1, ktrack
+        xs = track(1,itrack) - xm
+        ys = track(3,itrack) - ym
+        rho2 = xs * xs + ys * ys
+        tk = rho2 / (two * sx2)
+        if (tk .gt. explim) then
+           phix = xs * fk / rho2
+           phiy = ys * fk / rho2
+        else if (rho2 .ne. zero) then
+           phix = xs * fk / rho2 * (one - exp(-tk) )
+           phiy = ys * fk / rho2 * (one - exp(-tk) )
+        else
+           phix = zero
+           phiy = zero
+        endif
+        if (ipos .ne. 0)  then
+           !--- subtract closed orbit kick
+           phix = phix - bb_kick(1,ipos)
+           phiy = phiy - bb_kick(2,ipos)
+        endif
+        track(2,itrack) = track(2,itrack) + phix
+        track(4,itrack) = track(4,itrack) + phiy
+     enddo
+
+     !---- case sigma(x) > sigma(y).
+  else if (sx2 .gt. sy2) then
+     r2 = two * (sx2 - sy2)
+     r  = sqrt(r2)
+     rk = fk * sqrt(pi) / r
+     do itrack = 1, ktrack
+        xs = track(1,itrack) - xm
+        ys = track(3,itrack) - ym
+        xr = abs(xs) / r
+        yr = abs(ys) / r
+        call ccperrf(xr, yr, crx, cry)
+        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+        if (tk .gt. explim) then
+           phix = rk * cry
+           phiy = rk * crx
+        else
+           xb = (sy / sx) * xr
+           yb = (sx / sy) * yr
+           call ccperrf(xb, yb, cbx, cby)
+           phix = rk * (cry - exp(-tk) * cby)
+           phiy = rk * (crx - exp(-tk) * cbx)
+        endif
+        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+        if (ipos .ne. 0)  then
+           !--- subtract closed orbit kick
+           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+        endif
+     enddo
+
+     !---- case sigma(x) < sigma(y).
+  else
+     r2 = two * (sy2 - sx2)
+     r  = sqrt(r2)
+     rk = fk * sqrt(pi) / r
+     do itrack = 1, ktrack
+        xs = track(1,itrack) - xm
+        ys = track(3,itrack) - ym
+        xr = abs(xs) / r
+        yr = abs(ys) / r
+        call ccperrf(yr, xr, cry, crx)
+        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+        if (tk .gt. explim) then
+           phix = rk * cry
+           phiy = rk * crx
+        else
+           xb  = (sy / sx) * xr
+           yb  = (sx / sy) * yr
+           call ccperrf(yb, xb, cby, cbx)
+           phix = rk * (cry - exp(-tk) * cby)
+           phiy = rk * (crx - exp(-tk) * cbx)
+        endif
+        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+        if (ipos .ne. 0)  then
+           !--- subtract closed orbit kick
+           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+        endif
+     enddo
+  endif
+end subroutine ttbb_gauss
+subroutine ttbb_flattop(track,ktrack,fk)
+
+  use bbfi
+  implicit none
+
+  ! ---------------------------------------------------------------------*
+  ! purpose: kicks the particles of the beam considered with a beam      *
+  !          having an trapezoidal and, so flat top radial profile       *
+  ! input and output as those of subroutine ttbb                         *
+  ! ---------------------------------------------------------------------*
+  logical bborbit,first
+  integer ktrack,itrack,ipos,get_option
+  double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
+       r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
+       node_value,zero,one,two,three,ten3m,explim,norm,r1,zz
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+       explim=150d0)
+  save first
+  data first / .true. /
+  !     if x > explim, exp(-x) is outside machine limits.
+
+  !---- initialize.
+  bborbit = get_option('bborbit ') .ne. 0
+  pi=get_variable('pi ')
+  ! mean radii of the is given via variables sigx and sigy
+  r0x = node_value('sigx ')
+  r0y = node_value('sigy ')
+  wi = node_value('width ')
+  xm = node_value('xma ')
+  ym = node_value('yma ')
+  ipos = 0
+  if (.not. bborbit)  then
+     !--- find position of closed orbit bb_kick
+     do ipos = 1, bbd_cnt
+        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
+     enddo
+     ipos = 0
+1    continue
+  endif
+  r0x2 = r0x*r0x
+  r0y2 = r0y*r0y
+  wx = r0x*wi
+  wy = r0y*wi
+  !---- limit formulae for mean radius(x) = mean radius(y),
+  !-----      preliminary the only case considered.
+  !
+  if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+     zz = 0.5*(r0x + r0y)
+     r0x=zz
+     r0y=zz
+     r0x2=r0x*r0x
+     r0y2=r0y*r0y
+     if(first) then
+        first=.false.
+        call aawarn('TTBB_FLATTOP: ','beam is assumed to be circular')
+     endif
+  endif
+  norm = (12.0*r0x**2 + wx**2)/24.0
+  r1=r0x-wx/2.0
+  do itrack = 1, ktrack
+     xs = track(1,itrack) - xm
+     ys = track(3,itrack) - ym
+     rho2 = xs * xs + ys * ys
+     rho  = sqrt(rho2)
+     if(rho.le.r1) then
+        phir = 0.5/norm
+        phix = phir*xs
+        phiy = phir*ys
+     else if(rho.gt.r1.and.rho.lt.r1+wx) then
+        phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +            &
+             wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
+             rho/3.0/wx)/norm
+        phix = phir*xs
+        phiy = phir*ys
+     else if(rho.ge.r1+wx) then
+        phir = 1.0/rho2
+        phix = xs*phir
+        phiy = ys*phir
+     endif
+     track(2,itrack) = track(2,itrack)+phix*fk
+     track(4,itrack) = track(4,itrack)+phiy*fk
+  end do
+
+end subroutine ttbb_flattop
+subroutine ttbb_hollowparabolic(track,ktrack,fk)
+
+  use bbfi
+  implicit none
+
+  ! ---------------------------------------------------------------------*
+  ! purpose: kicks the particles of the beam considered with a beam      *
+  !          having a hollow-parabolic perpendicular shape               *
+  ! input and output as those of subroutine ttbb                         *
+  ! ---------------------------------------------------------------------*
+  logical bborbit,first
+  integer ktrack,itrack,ipos,get_option
+  double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,            &
+       r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,          &
+       node_value,zero,one,two,three,ten3m,explim,zz
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+       explim=150d0)
+  save first
+  data first / .true. /
+  !     if x > explim, exp(-x) is outside machine limits.
+
+  !---- initialize.
+  bborbit = get_option('bborbit ') .ne. 0
+  pi=get_variable('pi ')
+  ! mean radii of the is given via variables sigx and sigy
+  r0x = node_value('sigx ')
+  r0y = node_value('sigy ')
+  wi = node_value('width ')
+  ! width is given as FWHM of parabolic density profile, but formulas were
+  ! derived with half width at the bottom of the parabolic density profile
+  wi = wi/sqrt(2.0)
+  xm = node_value('xma ')
+  ym = node_value('yma ')
+  ipos = 0
+  if (.not. bborbit)  then
+     !--- find position of closed orbit bb_kick
+     do ipos = 1, bbd_cnt
+        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
+     enddo
+     ipos = 0
+1    continue
+  endif
+  r0x2 = r0x*r0x
+  r0y2 = r0y*r0y
+  wx  = wi*r0x
+  wy  = wi*r0y
+  !---- limit formulae for mean radius(x) = mean radius(y),
+  !-----      preliminary the only case considered.
+  !
+  if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
+     zz = 0.5*(r0x + r0y)
+     r0x=zz
+     r0y=zz
+     r0x2=r0x*r0x
+     r0y2=r0y*r0y
+     if(first) then
+        first=.false.
+        call aawarn('TTBB_HOLLOWPARABOLIC: ',                         &
+             'beam is assumed to be circular')
+     endif
+  endif
+  do itrack = 1, ktrack
+     xs = track(1,itrack) - xm
+     ys = track(3,itrack) - ym
+     rho2 = xs * xs + ys * ys
+     rho  = sqrt(rho2)
+     if(rho.le.r0x-wx) then
+        phix = zero
+        phiy = zero
+     else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
+        phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0 +       &
+             2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -                      &
+             r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -                        &
+             rho**4/4.0/wx**2)
+        phix = phir*xs
+        phiy = phir*ys
+     else
+        phir = 1.0/rho2
+        phix = xs*phir
+        phiy = ys*phir
+     endif
+     track(2,itrack) = track(2,itrack)+phix*fk
+     track(4,itrack) = track(4,itrack)+phiy*fk
+  end do
+
+end subroutine ttbb_hollowparabolic
+!!$subroutine ttbb_old(track,ktrack,parvec)
+!!$
+!!$  use bbfi
+!!$  implicit none
+!!$
+!!$  !----------------------------------------------------------------------*
+!!$  ! purpose:                                                             *
+!!$  !   track a set of particle through a beam-beam interaction region.    *
+!!$  !   see mad physicist's manual for the formulas used.                  *
+!!$  !input:                                                                *
+!!$  ! input/output:                                                        *
+!!$  !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
+!!$  !   ktrack    (integer) number of tracks.                              *
+!!$  !----------------------------------------------------------------------*
+!!$  logical bborbit
+!!$  integer ktrack,itrack,ipos,get_option
+!!$  double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
+!!$       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
+!!$       get_variable,node_value,zero,one,two,three,ten3m,explim
+!!$  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
+!!$       explim=150d0)
+!!$  !     if x > explim, exp(-x) is outside machine limits.
+!!$
+!!$  !---- initialize.
+!!$  bborbit = get_option('bborbit ') .ne. 0
+!!$  pi=get_variable('pi ')
+!!$  sx = node_value('sigx ')
+!!$  sy = node_value('sigy ')
+!!$  xm = node_value('xma ')
+!!$  ym = node_value('yma ')
+!!$  fk = two * parvec(5) * parvec(6) / parvec(7)
+!!$  if (fk .eq. zero)  return
+!!$  ipos = 0
+!!$  if (.not. bborbit)  then
+!!$     !--- find position of closed orbit bb_kick
+!!$     do ipos = 1, bbd_cnt
+!!$        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
+!!$     enddo
+!!$     ipos = 0
+!!$1    continue
+!!$  endif
+!!$  sx2 = sx*sx
+!!$  sy2 = sy*sy
+!!$  !---- limit formulae for sigma(x) = sigma(y).
+!!$  if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        rho2 = xs * xs + ys * ys
+!!$        tk = rho2 / (two * sx2)
+!!$        if (tk .gt. explim) then
+!!$           phix = xs * fk / rho2
+!!$           phiy = ys * fk / rho2
+!!$        else if (rho2 .ne. zero) then
+!!$           phix = xs * fk / rho2 * (one - exp(-tk) )
+!!$           phiy = ys * fk / rho2 * (one - exp(-tk) )
+!!$        else
+!!$           phix = zero
+!!$           phiy = zero
+!!$        endif
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           phix = phix - bb_kick(1,ipos)
+!!$           phiy = phiy - bb_kick(2,ipos)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix
+!!$        track(4,itrack) = track(4,itrack) + phiy
+!!$     enddo
+!!$
+!!$     !---- case sigma(x) > sigma(y).
+!!$  else if (sx2 .gt. sy2) then
+!!$     r2 = two * (sx2 - sy2)
+!!$     r  = sqrt(r2)
+!!$     rk = fk * sqrt(pi) / r
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        xr = abs(xs) / r
+!!$        yr = abs(ys) / r
+!!$        call ccperrf(xr, yr, crx, cry)
+!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+!!$        if (tk .gt. explim) then
+!!$           phix = rk * cry
+!!$           phiy = rk * crx
+!!$        else
+!!$           xb = (sy / sx) * xr
+!!$           yb = (sx / sy) * yr
+!!$           call ccperrf(xb, yb, cbx, cby)
+!!$           phix = rk * (cry - exp(-tk) * cby)
+!!$           phiy = rk * (crx - exp(-tk) * cbx)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+!!$        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+!!$        endif
+!!$     enddo
+!!$
+!!$     !---- case sigma(x) < sigma(y).
+!!$  else
+!!$     r2 = two * (sy2 - sx2)
+!!$     r  = sqrt(r2)
+!!$     rk = fk * sqrt(pi) / r
+!!$     do itrack = 1, ktrack
+!!$        xs = track(1,itrack) - xm
+!!$        ys = track(3,itrack) - ym
+!!$        xr = abs(xs) / r
+!!$        yr = abs(ys) / r
+!!$        call ccperrf(yr, xr, cry, crx)
+!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / two
+!!$        if (tk .gt. explim) then
+!!$           phix = rk * cry
+!!$           phiy = rk * crx
+!!$        else
+!!$           xb  = (sy / sx) * xr
+!!$           yb  = (sx / sy) * yr
+!!$           call ccperrf(yb, xb, cby, cbx)
+!!$           phix = rk * (cry - exp(-tk) * cby)
+!!$           phiy = rk * (crx - exp(-tk) * cbx)
+!!$        endif
+!!$        track(2,itrack) = track(2,itrack) + phix * sign(one,xs)
+!!$        track(4,itrack) = track(4,itrack) + phiy * sign(one,ys)
+!!$        if (ipos .ne. 0)  then
+!!$           !--- subtract closed orbit kick
+!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
+!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+!!$        endif
+!!$     enddo
+!!$  endif
+!!$end subroutine ttbb_old
+subroutine trkill(n, turn, sum, jmax, part_id,                    &
+     last_turn, last_pos, last_orbit, z, aptype)
+
+  use name_lenfi
+  implicit none
+
+  !hbu--- kill particle:  print, modify part_id list
+  logical recloss
+  integer i,j,n,turn,part_id(*),jmax,last_turn(*),get_option
+  double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
+       torb(6) !, theta, node_value, st, ct, tmp
+  character(name_len) aptype
+  !hbu
+  character(name_len) el_name
+
+  recloss = get_option('recloss ') .ne. 0
+
+  !!--- As elements might have a tilt we have to transform back
+  !!--- into the original coordinate system!
+  !      theta = node_value('tilt ')
+  !      if (theta .ne. 0.d0)  then
+  !          st = sin(theta)
+  !          ct = cos(theta)
+  !!--- rotate trajectory (at exit)
+  !            tmp = z(1,n)
+  !            z(1,n) = ct * tmp - st * z(3,n)
+  !            z(3,n) = ct * z(3,n) + st * tmp
+  !            tmp = z(2,n)
+  !            z(2,n) = ct * tmp - st * z(4,n)
+  !            z(4,n) = ct * z(4,n) + st * tmp
+  !      endif
+
+  last_turn(part_id(n)) = turn
+  last_pos(part_id(n)) = sum
+  do j = 1, 6
+     torb(j) = z(j,n)
+     last_orbit(j,part_id(n)) = z(j,n)
+  enddo
+
+  !hbu
+  call element_name(el_name,len(el_name))
+  !hbu
+  write(6,'(''particle #'',i6,'' lost turn '',i6,''  at pos. s ='', f10.2,'' element='',a,'' aperture ='',a)') &
+       part_id(n),turn,sum,el_name,aptype
+  print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
+
+  if(recloss) then
+     call tt_ploss(part_id(n),turn,sum,torb,el_name)
+  endif
+
+  do i = n+1, jmax
+     part_id(i-1) = part_id(i)
+     do j = 1, 6
+        z(j,i-1) = z(j,i)
+     enddo
+  enddo
+  jmax = jmax - 1
+
+end subroutine trkill
+
+
+subroutine tt_ploss(npart,turn,spos,orbit,el_name)
+
+  use name_lenfi
+  implicit none
+
+  !hbu added spos
+  !----------------------------------------------------------------------*
+  !--- purpose: enter lost particle coordinates in table                 *
+  !    input:                                                            *
+  !    npart  (int)           particle number                            *
+  !    turn   (int)           turn number                                *
+  !    spos    (double)       s-coordinate when loss happens             *
+  !    orbit  (double array)  particle orbit                             *
+  !    orbit0 (double array)  reference orbit                            *
+  !----------------------------------------------------------------------*
+  integer npart,turn,j
+  double precision orbit(6),tmp,tt,tn
+  double precision energy,get_value
+  character(36) table
+  character(name_len) el_name
+  !hbu
+  double precision spos
+  !hbu
+  character(4) vec_names(7)
+  !hbu
+  data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
+  data table / 'trackloss' /
+
+  tn = npart
+  tt = turn
+
+  energy = get_value('probe ','energy ')
+
+
+  ! the number of the current particle
+  call double_to_table_curr(table, 'number ', tn)
+  ! the number of the current turn
+  call double_to_table_curr(table, 'turn ', tt)
+  !hbu spos
+
+  call double_to_table_curr(table,vec_names(7),spos)
+
+  do j = 1, 6
+     tmp = orbit(j)
+     call double_to_table_curr(table, vec_names(j), tmp)
+  enddo
+  call double_to_table_curr(table, 'e ', energy)
+  call string_to_table_curr(table, 'element ', el_name)
+
+  call augment_count(table)
+end subroutine tt_ploss
+
+
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
      spos,ielem,el_name)
 
@@ -1695,6 +2598,108 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
+subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
+     last_pos, last_orbit, z, ntrk,al_errors,offx,offy)
+
+  use twiss0fi
+  use name_lenfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   test for collimator aperture limits.                               *
+  ! input:                                                               *
+  !   flag      (integer)   aperture type flag:                          *
+  !                         1: elliptic, 2: rectangular                  *
+  !   apx       (double)    x aperture or half axis                      *
+  !   apy       (double)    y aperture or half axis                      *
+  !   turn      (integer)   current turn number.                         *
+  !   sum       (double)    accumulated length.                          *
+  ! input/output:                                                        *
+  !   part_id   (int array) particle identification list                 *
+  !   last_turn (int array) storage for number of last turn              *
+  !   last_pos  (dp. array) storage for last position (= sum)            *
+  !   last_orbit(dp. array) storage for last orbit                       *
+  !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
+  !   ntrk      (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
+  double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
+       one,al_errors(align_max),offx,offy
+  parameter(one=1d0)
+  character(name_len) aptype
+
+  n = 1
+10 continue
+  do i = n, ntrk
+
+     !---- Is particle outside aperture?
+     if (flag .eq. 1.and.((z(1,i)-al_errors(11)- offx)/apx)**2             &
+          +((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one) then
+        go to 99
+     else if(flag .eq. 2                                             &
+          .and. (abs(z(1,i)-al_errors(11)- offx) .gt. apx                         &
+          .or. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
+        go to 99
+        !***  Introduction of marguerite : two ellipses
+     else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)- offx) / apx)**2      &
+          + ((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one .and.                &
+          ((z(1,i)-al_errors(11)- offx) / apy)**2 +                               &
+          ((z(3,i)-al_errors(12)- offy) / apx)**2 .gt. one) then
+        go to 99
+     endif
+     go to 98
+99   n = i
+     nn=name_len
+     call node_string('apertype ',aptype,nn)
+     call trkill(n, turn, sum, ntrk, part_id,                        &
+          last_turn, last_pos, last_orbit, z, aptype)
+     goto 10
+98   continue
+  enddo
+end subroutine trcoll
+
+subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
+     last_pos, last_orbit, z, ntrk,al_errors, apr,offx,offy)
+
+  use twiss0fi
+  use name_lenfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Similar with trcoll, for racetrack type aperture
+  !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
+  !----------------------------------------------------------------------*
+  integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
+  double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
+       one,al_errors(align_max),apr,offx,offy
+  parameter(one=1d0)
+  character(name_len) aptype
+
+  n = 1
+10 continue
+  do i = n, ntrk
+
+     !---- Is particle outside aperture?
+     if (flag .eq. 4                                                 &
+          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. (apr+apx)                  &
+          .or. abs(z(3,i)-al_errors(12)- offy) .gt. (apy+apr) .or.                &
+          ((((abs(z(1,i)-al_errors(11)- offx)-apx)**2+                            &
+          (abs(z(3,i)-al_errors(12)- offy)-apy)**2) .gt. apr**2)                  &
+          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. apx                        &
+          .and. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
+        go to 99
+     endif
+     go to 98
+99   n = i
+     nn=name_len
+     call node_string('apertype ',aptype,nn)
+     call trkill(n, turn, sum, ntrk, part_id,                        &
+          last_turn, last_pos, last_orbit, z, aptype)
+     goto 10
+98   continue
+  enddo
+end subroutine trcoll1
 
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
 

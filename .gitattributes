@@ -551,10 +551,6 @@ src/touschek.f90 -text
 src/tpsa.cpp -text
 src/tpsa.h -text
 src/trrun.f90 -text
-src/trrun_acdip.f90 -text
-src/trrun_bb.f90 -text
-src/trrun_coll.f90 -text
-src/trrun_phot.f90 -text
 src/twiss.f90 -text
 src/user2_photon.f90 -text
 src/util.f90 -text
