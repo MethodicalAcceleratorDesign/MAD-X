@@ -55,28 +55,34 @@ open_indexedFile(const char* str, int *idx, const char *ext, int optext, int req
 {
   char buf[FILENAME_MAX+100];
 
-  assert(str && ext);
+  if (!str) return 0;
+  assert(ext);
 
 retry:
 
   // copy filename
   strncpy(buf, str, sizeof buf);
 
-  // find extension, if any
+  // find and save extension, if any
   const char *dot = strrchr(buf, '.');
-  int pos = (int)strlen(buf);
+  int pos;
 
   // remove extension if it matches ext
   if (dot && !strcmp(dot, ext)) {
     pos = dot-buf; 
     buf[pos] = 0;
+  } else {
+    pos = (int)strlen(buf);
+    dot = 0;
   }
 
-  // add formatted index
-  if (option.serie && idx && *idx > 0) pos += sprintf(buf+pos, option.fmt, *idx);
+  // add formatted index, if in serie
+  if (option.serie && idx && *idx > 0)
+    pos += sprintf(buf+pos, option.fmt, *idx);
 
   // copy filename into option for further reporting
-  strncpy(option.indexed_filename, buf, sizeof option.indexed_filename);
+  if (ext == option.ref_e)
+    strncpy(option.reference_filename, buf, sizeof option.reference_filename);
 
   // add extension
   strncat(buf+pos, ext, sizeof buf - pos);
@@ -90,6 +96,7 @@ retry:
     fp = fopen(buf, "r");
   }
 
+  // allow failure on first non-numbered file for serie
   if (!fp) {
     if (option.serie && idx && *idx == 0) { ++*idx; goto retry; }
     if (required) ensure(fp, "failed to open %s", buf);
@@ -101,9 +108,12 @@ retry:
     error("unable to resize the stream buffer size");
   }
 
+  // copy filename into option for further reporting
+  strncpy(option.current_filename, buf, sizeof option.current_filename);
+
   // debug information
   if (fp) {
-    if (optext) inform("processing %s", option.indexed_filename);
+    if (optext) inform("processing %s", option.current_filename);
     debug("file %s open for reading", buf);
   } else
     trace("<-open_indexedFile: unable to open file %s for reading", buf);

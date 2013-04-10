@@ -64,19 +64,12 @@ is_separator (int c)
 }
 
 static inline int
-is_number_start(char *buf, const char *beg)
-{
-  // number starts by a '-' or is at the beginning or is preceded by a separator
-  return *buf == '-' || *buf == '+' || buf == beg || (buf > beg && is_separator(buf[-1]));
-}
-
-static inline int
 is_number (char *buf)
 {
   int i = 0;
 
   // sign
-  if (buf[i] == '-' || buf[i] == '+') i++;
+  if (buf[i] == '-' || buf[i] == '+' || buf[i] == ' ') i++;
 
   // dot
   if (buf[i] == '.') ++i;
@@ -86,14 +79,31 @@ is_number (char *buf)
 }
 
 static inline char*
+// assume that buf has been validated by is_number
 backtrace_number (char *buf, const char *beg)
 {
+  if (*buf == ' ') ++buf;
+
+  else
+  if (*buf == '.') {
+    if (buf > beg && (buf[-1] == '-' || buf[-1] == '+')) --buf;
+  }
+
+  else
   if (isdigit(*buf)) {
-    if (buf > beg && buf[-1] == '.') --buf;
-    if (buf > beg && buf[-1] == '-') --buf;
+    if (buf > beg &&  buf[-1] == '.') --buf;
+    if (buf > beg && (buf[-1] == '-' || buf[-1] == '+')) --buf;
   }
 
   return buf;
+}
+
+static inline int
+// assume that buf has been validated by is_number and backtraced
+is_number_start(char *buf, const char *beg)
+{
+  // number is at the beginning or is preceded by a separator
+  return *buf == '-' || *buf == '+' || buf == beg || (buf > beg && is_separator(buf[-1]));
 }
 
 static inline int
@@ -103,7 +113,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
   char c;
 
   // sign
-  if (buf[i] == '+' || buf[i] == '-') i++;
+  if (buf[i] == '-' || buf[i] == '+') i++;
 
   // drop leading zeros
   while(buf[i] == '0') i++;
@@ -133,7 +143,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
 
   if (e) {
     // sign
-    if (buf[i] == '+' || buf[i] == '-') i++;
+    if (buf[i] == '-' || buf[i] == '+') i++;
 
     // digits
     while(isdigit(buf[i])) i++;
@@ -247,9 +257,9 @@ static void
 ndiff_header(void)
 {
   if (option.test)
-    warning("(*) files " CSTR_RED("%s") " from %s differ", option.indexed_filename, option.test);
+    warning("(*) files " CSTR_RED("%s") " from %s differ", option.reference_filename, option.test);
   else
-    warning("(*) files " CSTR_RED("%s") " differ", option.indexed_filename);
+    warning("(*) files " CSTR_RED("%s") " differ", option.reference_filename);
 }
 
 // -----------------------------------------------------------------------------
@@ -302,6 +312,26 @@ ndiff_skipLine (T *dif)
   dif->row_i += 1;
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
+}
+
+int
+ndiff_fillLine (T *dif, const char *lhs_b, const char *rhs_b)
+{
+  assert(dif);
+  assert(lhs_b && rhs_b);
+
+  ndiff_reset_buf(dif);
+
+  int s1 = strlen(lhs_b)+1; 
+  int s2 = strlen(rhs_b)+1; 
+  ndiff_grow(dif, imax(s1,s2));
+  memcpy(dif->lhs_b, lhs_b, s1);
+  memcpy(dif->rhs_b, rhs_b, s2);
+
+  dif->col_i  = 0;
+  dif->row_i += 1;
+
+  return 0; // never fails
 }
 
 int
@@ -394,26 +424,6 @@ ndiff_gotoLine (T *dif, const char *tag)
 }
 
 int
-ndiff_fillLine (T *dif, const char *lhs_b, const char *rhs_b)
-{
-  assert(dif);
-  assert(lhs_b && rhs_b);
-
-  ndiff_reset_buf(dif);
-
-  int s1 = strlen(lhs_b)+1; 
-  int s2 = strlen(rhs_b)+1; 
-  ndiff_grow(dif, imax(s1,s2));
-  memcpy(dif->lhs_b, lhs_b, s1);
-  memcpy(dif->rhs_b, rhs_b, s2);
-
-  dif->col_i  = 0;
-  dif->row_i += 1;
-
-  return 0; // never fails
-}
-
-int
 ndiff_nextNum (T *dif, const struct constraint *c)
 {
   assert(dif);
@@ -499,22 +509,16 @@ quit:
 int
 ndiff_testNum (T *dif, const struct constraint *c)
 {
-  assert(dif);
+  assert(dif && c);
 
   char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
   char *end;
 
-  double lhs_d, rhs_d, dif_a=0, min_a=0, pow_a=0;
+  double lhs_d, rhs_d, dif_a=0, abs_a=0, min_a=0, pow_a=0;
 
   trace("->testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
   trace("  strnums: '%.25s'|'%.25s'", lhs_p, rhs_p);
-
-  // no constraint means equal
-  if (!c) {
-    static const struct constraint equ = { .eps = { .cmd = eps_equ } };
-    c = &equ;
-  }
 
   // parse numbers
   int d1=0, d2=0, n1=0, n2=0, e1=0, e2=0, f1=0, f2=0;
@@ -556,26 +560,27 @@ ndiff_testNum (T *dif, const struct constraint *c)
   // convert numbers
   lhs_d = strtod(lhs_p, &end); assert(end == lhs_p+l1);
   rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
-  dif_a = fabs(lhs_d - rhs_d);
+  dif_a = lhs_d - rhs_d;
+  abs_a = fabs(dif_a);
   min_a = fmin(fabs(lhs_d),fabs(rhs_d));
   pow_a = pow10(-imax(n1, n2));
 
   // if one number is zero -> relative becomes absolute
   if (!(min_a > 0)) min_a = 1.0;
 
-  trace("  numdiff: |abs|=%.2g, |rel|=%.2g, ndig=%d", dif_a, dif_a/min_a, imax(n1, n2));   
+  trace("  numdiff: |abs|=%.2g, |rel|=%.2g, ndig=%d", abs_a, abs_a/min_a, imax(n1, n2));   
 
   // absolute comparison
   if (c->eps.cmd & eps_abs)
-    if (dif_a > c->eps.abs) ret |= eps_abs;
+    if (dif_a > c->eps.abs || dif_a < c->eps._abs) ret |= eps_abs;
 
   // relative comparison 
   if (c->eps.cmd & eps_rel)
-    if (dif_a > c->eps.rel * min_a) ret |= eps_rel;
+    if (dif_a > c->eps.rel * min_a || dif_a < c->eps._rel * min_a) ret |= eps_rel;
 
   // input-specific relative comparison (does not apply to integers)
   if ((c->eps.cmd & eps_dig) && (f1 || f2))
-    if (dif_a > c->eps.dig * min_a * pow_a) ret |= eps_dig;
+    if (dif_a > c->eps.dig * min_a * pow_a || dif_a < c->eps._dig * min_a * pow_a) ret |= eps_dig;
 
   if (!ret) goto quit;
   if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) goto quit;
@@ -596,20 +601,21 @@ quit_diff:
     if (ret & eps_equ)
       warning("(%d) numbers strict representation differ", dif->cnt_i);
 
-    if (ret & eps_dig)
-      warning("(%d) numdigit error (rule #%d, line %d: rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
-              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              c->eps.dig*pow_a, dif_a, dif_a/min_a, imax(n1, n2));   
- 
-    if (ret & eps_rel)
-      warning("(%d) relative error (rule #%d, line %d: rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
-              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              c->eps.rel, dif_a, dif_a/min_a, imax(n1, n2));   
-
     if (ret & eps_abs)
-      warning("(%d) absolute error (rule #%d, line %d: abs=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+      warning("(%d) absolute error (rule #%d, line %d: abs=%g, -abs=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              c->eps.abs, dif_a, dif_a/min_a, imax(n1, n2));   
+              c->eps.abs, c->eps._abs, abs_a, abs_a/min_a, imax(n1, n2));   
+
+    if (ret & eps_rel)
+      warning("(%d) relative error (rule #%d, line %d: rel=%g, -rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
+              c->eps.rel, c->eps._rel, abs_a, abs_a/min_a, imax(n1, n2));   
+
+    if (ret & eps_dig)
+      warning("(%d) numdigit error (rule #%d, line %d: rel=%g, -rel=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+              dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
+              c->eps.dig*pow_a, c->eps._dig*pow_a, abs_a, abs_a/min_a, imax(n1, n2));   
+ 
   }
   ret = 1;
 
@@ -679,7 +685,7 @@ ndiff_loop(T *dif)
       ndiff_error(dif->cxt, c, c2, row, col);
 
     // trace rule
-    if (c->eps.cmd & eps_trace && c->eps.cmd & (eps_skip|eps_goto)) {
+    if (c->eps.cmd & eps_trace && c->eps.cmd & eps_sggg) {
       logmsg_config.level = trace_level;
       trace("~>active:  rule #%d, line %d, cmd = %d",
             context_findIdx(dif->cxt,c), context_findLine(dif->cxt,c), c->eps.cmd);
@@ -693,7 +699,7 @@ ndiff_loop(T *dif)
     }
 
     // goto or read line(s)
-    if (c->eps.cmd & eps_goto) {
+    if (c->eps.cmd & eps_gostr) {
       ndiff_gotoLine(dif, c->eps.tag);
       ndiff_getInfo(dif, &row, 0, 0, 0);
     } else {

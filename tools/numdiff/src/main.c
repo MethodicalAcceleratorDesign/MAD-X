@@ -33,18 +33,18 @@ diff_summary(const struct ndiff *dif)
 
   if (!ndiff_feof(dif, 1)) {
     c += 1;
-    warning("diff of files %s ended prematurely (truncated output?)", option.indexed_filename);
+    warning("diff of files %s ended prematurely (truncated output?)", option.reference_filename);
   }
 
   if (c) {
     if (option.test)
-    warning("files %s from test %s differ", option.indexed_filename, option.test);
-    warning("% 6d lines have been diffed   in files %s", n, option.indexed_filename);
-    warning("% 6d diffs have been detected in files %s", c, option.indexed_filename);
+    warning("files %s from test %s differ", option.reference_filename, option.test);
+    warning("% 6d lines have been diffed   in files %s", n, option.reference_filename);
+    warning("% 6d diffs have been detected in files %s", c, option.reference_filename);
   } else {
     if (option.test)
-    inform ("files %s from test %s do not differ", option.indexed_filename, option.test);
-    inform ("% 6d lines have been diffed in files %s", n, option.indexed_filename);
+    inform ("files %s from test %s do not differ", option.reference_filename, option.test);
+    inform ("% 6d lines have been diffed in files %s", n, option.reference_filename);
   }
 
   return c;
@@ -64,10 +64,21 @@ check_transition(const char* argv[], int *total, int *failed, long lines, long n
   if (argv[option.argi][0] == '-' && option.test && *total && (
       !strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test" ) ||
       !strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite"))) {
+
+    // stop timer
     option.clk_t1 = clock();
+
+    // test stats
     test_summary(*total, *failed);
-    if (option.accum) accum_summary(*total, *failed, lines, numbers);
+
+    // suites stats
+    if (option.accum)
+      accum_summary(*total, *failed, lines, numbers);
+
+    // cleanup
     *total = *failed = 0;
+
+    // start timer
     option.clk_t0 = clock();
   }
 }
@@ -129,9 +140,10 @@ main(int argc_, char** argv_)
 
       // open files
       lhs_fp = open_indexedFile(lhs_s, &nn, option.out_e, 1, 0);
-      if (!lhs_fp && n) break;
+      if (!lhs_fp && n) break; // end of serie
+
       rhs_fp = open_indexedFile(rhs_s, &nn, option.ref_e, !option.list, 1);
-      if (cfg_s) cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, 0);
+      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, 0);
       if (n != nn) { n = nn; --total; }
 
       if (!lhs_fp) {

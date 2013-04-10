@@ -23,12 +23,13 @@
 #include <time.h>
 
 struct option {
-  int check, debug, serie, list, blank, utest, keep, reset;
+  int check, debug, serie, list, blank, utest, keep, reset, lgopt;
   const char *suite, *test;
   const char *fmt, *sfmt;
   const char *chr;
   const char *out_e, *ref_e, *cfg_e;
-  char indexed_filename[FILENAME_MAX+100];
+  char   current_filename[FILENAME_MAX];
+  char reference_filename[FILENAME_MAX];
   int argi;
 
   const char *accum;
