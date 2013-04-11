@@ -44,11 +44,13 @@ void  ndiff_loop     (T*);
 // low level API
 int   ndiff_skipLine (T*);
 int   ndiff_readLine (T*);
-int   ndiff_gotoLine (T*, const char *tag);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
 
+int   ndiff_gotoLine (T*, const C*);
+int   ndiff_gotoNum  (T*, const C*);
+
 int   ndiff_nextNum  (T*, const C*); // return 0 if no number is found
-int   ndiff_testNum  (T*, const C*);
+int   ndiff_testNum  (T*, const C*, double scl); // scale the difference
 
 void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_, long *num_);
 int   ndiff_feof     (const T*, int both);

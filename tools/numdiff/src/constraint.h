@@ -34,25 +34,28 @@ enum eps_cmd {
   eps_dig    = 1u <<  2,  // relative input eps
   eps_equ    = 1u <<  3,  // equal string
   eps_ign    = 1u <<  4,  // ignore value
-  eps_any    = 1u <<  5,  // any qualifier
+  eps_istr   = 1u <<  5,  // ignore strings
+  eps_any    = 1u <<  6,  // any qualifier
 
 // intermediate (commands, qualifiers)
-  eps_omit   = 1u <<  6,  // omit indentifier
-  eps_large  = 1u <<  7,  // large tolerance
+  eps_omit   = 1u <<  7,  // omit indentifier
   eps_trace  = 1u <<  8,  // trace rule
 
 // must be lasts (actions)
   eps_skip   = 1u <<  9,  // skip line, must be first action
-  eps_gostr  = 1u << 10,  // goto tag
-  eps_gonum  = 1u << 11,  // goto number
-  eps_goreg  = 1u << 12,  // goto register
+  eps_goto   = 1u << 10,  // go to tag
+  eps_gonum  = 1u << 11,  // go to number
 
-// marker
-  eps_last,
+// marker & mask
+  eps_last   = 1u << 12,  // the end
+  eps_mask   = eps_last - 1,
+
+// non-persistent
+  eps_large  = eps_last << 0,  // large tolerance
 
 // unions
-  eps_dra    =  eps_abs  | eps_rel   | eps_dig,
-  eps_sggg   =  eps_skip | eps_gostr | eps_gonum | eps_goreg
+  eps_dra  =  eps_abs  | eps_rel  | eps_dig,
+  eps_sgg  =  eps_skip | eps_goto | eps_gonum,
 };
 
 // ----- types
@@ -61,8 +64,6 @@ struct eps {
   enum eps_cmd cmd;
   double  abs,  rel,  dig;
   double _abs, _rel, _dig;
-  double  num;
-  int     reg;
   char    tag[64];
 };
 
@@ -78,20 +79,6 @@ struct constraint {
 #define T struct constraint
 
 static inline struct eps
-eps_init(enum eps_cmd cmd, double val)
-{
-  ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { .cmd=cmd, .abs=cmd&eps_abs?val:0, .rel=cmd&eps_rel?val:0, .dig=cmd&eps_dig?val:0 };
-}
-
-static inline struct eps
-eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig)
-{
-  ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { .cmd=cmd, .abs=abs, .rel=rel, .dig=dig };
-}
-
-static inline struct eps
 eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs, double _rel, double _dig)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
@@ -99,10 +86,34 @@ eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs
 }
 
 static inline struct eps
-eps_initTag(enum eps_cmd cmd, const char *tag)
+eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig)
 {
-  ensure((cmd & eps_gostr) || (cmd & eps_omit), "invalid eps goto or omit command");
-  struct eps eps = (struct eps) { .cmd = cmd };
+  return eps_initAllNum(cmd, abs, rel, dig, -abs, -rel, -dig);
+}
+
+static inline struct eps
+eps_init(enum eps_cmd cmd, double val)
+{
+  return eps_initNum(cmd, cmd&eps_abs?val:0, cmd&eps_rel?val:0, cmd&eps_dig?val:0);
+}
+
+static inline struct eps
+eps_initStrTag(enum eps_cmd cmd, const char *tag)
+{
+  ensure((cmd & eps_goto) || (cmd & eps_omit), "invalid eps goto or omit command");
+  struct eps eps = (struct eps) { .cmd=cmd };
+  enum { sz = sizeof eps.tag };
+  strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
+  return eps;
+}
+
+static inline struct eps
+eps_initNumTag(enum eps_cmd cmd, const char *tag)
+{
+  char *end;
+  strtod(tag, &end);
+  ensure((cmd & eps_gonum) && !*end, "invalid eps goto command");
+  struct eps eps = (struct eps) { .cmd=cmd };
   enum { sz = sizeof eps.tag };
   strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
   return eps;

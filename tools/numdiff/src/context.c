@@ -215,7 +215,7 @@ context_setupCol (T *cxt, int col_i)
   return cst;
 }
 
-static inline const struct constraint*
+static inline const C*
 context_getIncCst (T *cxt, int row_i, int col_i)
 {
   const C *cst = 0;
@@ -241,7 +241,7 @@ context_getIncCst (T *cxt, int row_i, int col_i)
   return cst;
 }
 
-static inline const struct constraint*
+static inline const C*
 context_getAtCst (T *cxt, int row_i, int col_i)
 {
   const C *cur = cxt->dat+cxt->dat_n-1;

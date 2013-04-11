@@ -80,10 +80,6 @@ retry:
   if (option.serie && idx && *idx > 0)
     pos += sprintf(buf+pos, option.fmt, *idx);
 
-  // copy filename into option for further reporting
-  if (ext == option.ref_e)
-    strncpy(option.reference_filename, buf, sizeof option.reference_filename);
-
   // add extension
   strncat(buf+pos, ext, sizeof buf - pos);
 
@@ -108,12 +104,19 @@ retry:
     error("unable to resize the stream buffer size");
   }
 
-  // copy filename into option for further reporting
-  strncpy(option.current_filename, buf, sizeof option.current_filename);
+  // copy filenames into option for further reporting
+  if (ext == option.out_e)
+    strncpy(option.lhs_file, buf, sizeof option.lhs_file);
+
+  if (ext == option.ref_e)
+    strncpy(option.rhs_file, buf, sizeof option.rhs_file);
+
+  if (ext == option.cfg_e)
+    strncpy(option.cfg_file, buf, sizeof option.cfg_file);
 
   // debug information
   if (fp) {
-    if (optext) inform("processing %s", option.current_filename);
+    if (ext == option.out_e) inform("processing %s", buf);
     debug("file %s open for reading", buf);
   } else
     trace("<-open_indexedFile: unable to open file %s for reading", buf);

@@ -118,6 +118,9 @@ readEps(struct eps *e, FILE *in, int row)
     else if (strcmp(str, "ign") == 0) {
       cmd |= eps_ign;   trace("[%d] ign", row);
     }
+    else if (strcmp(str, "istr") == 0) {
+      cmd |= eps_istr;  trace("[%d] istr", row);
+    }
     else if (strcmp(str, "equ") == 0) {
       cmd |= eps_equ;   trace("[%d] equ", row);
     }
@@ -141,31 +144,31 @@ readEps(struct eps *e, FILE *in, int row)
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;   trace("[%d] abs=%g", row, e->abs);      e->_abs = -e->abs;
       ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0),
-             "invalid absolute constraint (%s.cfg:%d)", option.current_filename, row);
+             "invalid absolute constraint (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
       cmd |= eps_rel;   trace("[%d] rel=%g", row, e->rel);      e->_rel = -e->rel;
       ensure(e->rel >= 0.0 && (cmd & eps_large || e->rel <= 1.0),
-             "invalid relative constraint (%s.cfg:%d)", option.current_filename, row);
+             "invalid relative constraint (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
       cmd |= eps_dig;   trace("[%d] dig=%g", row, e->dig);      e->_dig = -e->dig;
-      ensure(e->dig >= 1.0, "invalid digital error (%s.cfg:%d)", option.current_filename, row);
+      ensure(e->dig >= 1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
     }
 
     else if (strcmp(str, "-abs") == 0 && (n = fscanf(in, "=%lf", &e->_abs)) == 1) {
       cmd |= eps_abs;   trace("[%d] -abs=%g", row, e->_abs);
       ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0),
-             "invalid absolute constraint (%s.cfg:%d)", option.current_filename, row);
+             "invalid absolute constraint (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "-rel") == 0 && (n = fscanf(in, "=%lf", &e->_rel)) == 1) {
       cmd |= eps_rel;   trace("[%d] -rel=%g", row, e->_rel);
       ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0),
-             "invalid relative constraint (%s.cfg:%d)", option.current_filename, row);
+             "invalid relative constraint (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "-dig") == 0 && (n = fscanf(in, "=%lf", &e->_dig)) == 1) {
       cmd |= eps_dig;   trace("[%d] -dig=%g", row, e->_dig);
-      ensure(e->_dig <= -1.0, "invalid digital error (%s.cfg:%d)", option.current_filename, row);
+      ensure(e->_dig <= -1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
     }
 
 // actions
@@ -173,17 +176,16 @@ readEps(struct eps *e, FILE *in, int row)
       e->tag[sizeof e->tag-1] = 0;
       cmd |= eps_omit | eps_equ;
       trace("[%d] omit='%s'", row, e->tag);
-      ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.current_filename, row);
+      ensure(*e->tag, "invalid empty tag (%s:%d)", option.cfg_file, row);
+      ensure(!(cmd & (eps_goto | eps_gonum)), "omit tag conflicting with goto (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "=%*['\"]%64[^'\"]%*['\"]", e->tag)) == 1) {
       e->tag[sizeof e->tag-1] = 0;
-      if (strncmp(e->tag, "reg", 3) == 0)
-        e->reg = strtol(e->tag+3, &end, 10) & 0xFF;
-      else
-        e->num = strtod(e->tag, &end);
-      cmd |= *end ? eps_gostr : e->reg > 0 ? eps_goreg : eps_gonum; 
-      trace("[%d] goto='%s'%s", row, e->tag, cmd & eps_gonum ? " (num)" : cmd & eps_goreg ? " (reg)" : "");
-      ensure(*e->tag, "invalid empty tag (%s.cfg:%d)", option.current_filename, row);
+      strtod(e->tag, &end);
+      cmd |= *end ? eps_goto : eps_gonum | eps_istr; 
+      trace("[%d] goto='%s'%s", row, e->tag, cmd & eps_gonum ? " (num)" : "");
+      ensure(*e->tag, "invalid empty tag (%s:%d)", option.cfg_file, row);
+      ensure(!(cmd & eps_omit), "goto tag conflicting with omit (%s:%d)", option.cfg_file, row);
     }
     else {
       cmd = eps_invalid;
@@ -196,7 +198,8 @@ readEps(struct eps *e, FILE *in, int row)
     if (c == EOF || (isspace(c) && !isblank(c)) || c == '#' || c == '!') break; 
   }
 
-  e->cmd = (enum eps_cmd)cmd;  // because of icc spurious warnings
+  // cleanup non-persistant flags (e.g. large)
+  e->cmd = (enum eps_cmd)(cmd & eps_mask);  // cast needed because of icc spurious warnings
 
   trace("<-readEps cmd = %d, str = '%s', c = '%c'", cmd, str, c);
 
@@ -217,15 +220,15 @@ constraint_print(const T* cst, FILE *out)
   putc(' ', out);
 
   if (cst->eps.cmd & eps_any)    fprintf(out, "any ");
-  if (cst->eps.cmd & eps_equ)    fprintf(out, "equ ");    
-  if (cst->eps.cmd & eps_ign)    fprintf(out, "ign ");    
-  if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");    
-  if (cst->eps.cmd & eps_trace)  fprintf(out, "trace ");    
+  if (cst->eps.cmd & eps_equ)    fprintf(out, "equ ");
+  if (cst->eps.cmd & eps_ign)    fprintf(out, "ign ");
+  if (cst->eps.cmd & eps_istr)   fprintf(out, "istr ");
+  if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");
+  if (cst->eps.cmd & eps_trace)  fprintf(out, "trace ");
 
   if (cst->eps.cmd & eps_omit)   fprintf(out, "omit='%s' ", cst->eps.tag);
-  if (cst->eps.cmd & eps_gostr)  fprintf(out, "goto='%s' ", cst->eps.tag);
+  if (cst->eps.cmd & eps_goto)   fprintf(out, "goto='%s' ", cst->eps.tag);
   if (cst->eps.cmd & eps_gonum)  fprintf(out, "goto='%s' (num) ", cst->eps.tag);
-  if (cst->eps.cmd & eps_goreg)  fprintf(out, "goto='%s' (reg) ", cst->eps.tag);
 
   if (cst->eps.cmd & eps_abs) {
     fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
@@ -272,9 +275,9 @@ retry:
   }
 
   cst->line = *row;
-  ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row range (%s.cfg:%d)"   , option.current_filename, *row);
-  ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column range (%s.cfg:%d)", option.current_filename, *row);
-  ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid constraint or command (%s.cfg:%d)", option.current_filename, *row);
+  ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row range (%s:%d)"   , option.cfg_file, *row);
+  ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column range (%s:%d)", option.cfg_file, *row);
+  ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid constraint or command (%s:%d)", option.cfg_file, *row);
   if (skipLine(in, 0) == '\n') ++*row;
 }
 

@@ -33,18 +33,18 @@ diff_summary(const struct ndiff *dif)
 
   if (!ndiff_feof(dif, 1)) {
     c += 1;
-    warning("diff of files %s ended prematurely (truncated output?)", option.reference_filename);
+    warning("diff of '%s'|'%s' ended prematurely (truncated output?)", option.lhs_file, option.rhs_file);
   }
 
   if (c) {
-    if (option.test)
-    warning("files %s from test %s differ", option.reference_filename, option.test);
-    warning("% 6d lines have been diffed   in files %s", n, option.reference_filename);
-    warning("% 6d diffs have been detected in files %s", c, option.reference_filename);
+//    if (option.test)
+//    warning("(*) files '%s'|'%s' from test '%s' differ", option.lhs_file, option.rhs_file, option.test);
+    warning("(=) % 6d lines have been diffed", n);
+    warning("(=) % 6d diffs have been detected", c);
   } else {
     if (option.test)
-    inform ("files %s from test %s do not differ", option.reference_filename, option.test);
-    inform ("% 6d lines have been diffed in files %s", n, option.reference_filename);
+    inform ("files '%s'|'%s' from test '%s' do not differ", option.lhs_file, option.rhs_file, option.test);
+    inform ("% 6d lines have been diffed", n);
   }
 
   return c;

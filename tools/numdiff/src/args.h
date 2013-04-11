@@ -28,9 +28,10 @@ struct option {
   const char *fmt, *sfmt;
   const char *chr;
   const char *out_e, *ref_e, *cfg_e;
-  char   current_filename[FILENAME_MAX];
-  char reference_filename[FILENAME_MAX];
-  int argi;
+  char lhs_file[FILENAME_MAX];
+  char rhs_file[FILENAME_MAX];
+  char cfg_file[FILENAME_MAX];
+  int  argi;
 
   const char *accum;
   time_t dat_t0;
