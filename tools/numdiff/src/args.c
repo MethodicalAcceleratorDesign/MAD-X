@@ -26,7 +26,7 @@
 #include "ndiff.h"
 #include "context.h"
 
-#define VERSION "2013.04.10"
+#define VERSION "2013.04.12"
 
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
@@ -178,9 +178,9 @@ usage(void)
   inform("\ttrace               trace rule when active (debug, qualifier)");
 
   inform("");
-  inform("information:\thttp://cern.ch/mad");
-  inform("contact    :\tmad@cern.ch");
-  inform("version    :\t" VERSION);
+  inform("info   :\thttp://cern.ch/mad/numdiff");
+  inform("author :\tlaurent.deniau@cern.ch");
+  inform("version:\t" VERSION);
 
   exit(EXIT_FAILURE);
 }
