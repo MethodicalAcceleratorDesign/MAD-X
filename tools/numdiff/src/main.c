@@ -50,6 +50,12 @@ diff_summary(const struct ndiff *dif)
   return c;
 }
 
+static bool
+is_option(const char *arg)
+{
+  return arg[0] == '-' && (arg[1] == '-' || !option.lgopt);
+}
+
 static void
 test_summary(int total, int failed)
 {
@@ -62,8 +68,8 @@ static void
 check_transition(const char* argv[], int *total, int *failed, long lines, long numbers)
 {
   if (argv[option.argi][0] == '-' && option.test && *total && (
-      !strcmp(argv[option.argi], "-t") || !strcmp(argv[option.argi], "--test" ) ||
-      !strcmp(argv[option.argi], "-s") || !strcmp(argv[option.argi], "--suite"))) {
+      (!strcmp(argv[option.argi], "-t") && !option.lgopt) || !strcmp(argv[option.argi], "--test" ) ||
+      (!strcmp(argv[option.argi], "-s") && !option.lgopt) || !strcmp(argv[option.argi], "--suite"))) {
 
     // stop timer
     option.clk_t1 = clock();
@@ -114,9 +120,12 @@ main(int argc_, char** argv_)
 
     // setup filenames [incremental]
     if (!option.list) {
-      if (option.argi < argc) lhs_s = argv[option.argi++];
-      if (option.argi < argc) rhs_s = argv[option.argi++];
-      if (option.argi < argc) cfg_s = argv[option.argi++];
+      int i;
+      for (i = option.argi; i < option.argi+3; i++)
+        if (i >= argc || is_option(argv[i])) break;
+      if (option.argi < i) lhs_s = argv[option.argi++];
+      if (option.argi < i) rhs_s = argv[option.argi++];
+      if (option.argi < i) cfg_s = argv[option.argi++];
     } else
       if (option.argi < argc) lhs_s = rhs_s = cfg_s = argv[option.argi++];
 
@@ -146,7 +155,7 @@ main(int argc_, char** argv_)
       if (!lhs_fp && n) break; // end of serie
 
       rhs_fp = open_indexedFile(rhs_s, &nn, option.ref_e, !option.list, 1);
-      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, !option.list);
+      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, 0);
       if (n != nn) { n = nn; --total; }
 
       if (!lhs_fp) {

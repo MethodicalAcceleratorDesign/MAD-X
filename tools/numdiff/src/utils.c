@@ -80,7 +80,7 @@ retry:
   if (option.serie && idx && *idx > 0)
     pos += sprintf(buf+pos, option.fmt, *idx);
 
-  // add extension
+  // add extension (always for first attempt: procedure is safer)
   strncat(buf+pos, ext, sizeof buf - pos);
 
   // try to open
@@ -110,12 +110,11 @@ retry:
 
   if (ext == option.ref_e) {
     strncpy(option.rhs_file, buf, sizeof option.rhs_file);
-    ensure(strcmp(option.lhs_file, option.rhs_file), "lhs and rhs files are the same");
+    ensure(strcmp(option.lhs_file, option.rhs_file), "lhs and rhs files have same name");
   }
 
   if (ext == option.cfg_e)
     strncpy(option.cfg_file, buf, sizeof option.cfg_file);
-
 
   // debug information
   if (fp) {
