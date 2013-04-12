@@ -112,9 +112,9 @@ usage(void)
   logmsg_config.level = inform_level;
 
   inform("usage:");
-  inform("\tnumdiff [options] file1[.out] file2[.ref] [file3[.cfg]]");
-  inform("\tnumdiff [options] --list file1 file2 ...");
-  inform("\tnumdiff [options] --list --test '1st' file1 file2 --test '2nd' file3 ...");
+  inform("\tnumdiff [options] fileA[.out] fileB[.ref] [fileC[.cfg]]");
+  inform("\tnumdiff [options] --list fileA fileB ...");
+  inform("\tnumdiff [options] --test '1st' fileA fileB --test '2nd' fileC ...");
 
   inform("");
   inform("options:");
