@@ -27,13 +27,14 @@
 #include "args.h"
 
 #define T struct constraint
+#define S struct slice
 
 // ----- private
 
 static void
-printSlc(const struct slice *s, FILE *out)
+printSlc(const S *s, FILE *out)
 {
-  if (slice_first(s) <= 1 && slice_isInfinite(s) && slice_isDense(s)) {
+  if (slice_isFullOne(s)) {
     putc('*', out);
     return;
   }
@@ -53,7 +54,7 @@ printSlc(const struct slice *s, FILE *out)
 }
 
 static int
-readSlcOrRng(struct slice *s, FILE *in)
+readSlcOrRng(S *s, FILE *in)
 {
   int c, r = 1;
   uint first=0, last=0, stride=1;

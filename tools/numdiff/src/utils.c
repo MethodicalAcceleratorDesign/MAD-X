@@ -108,11 +108,14 @@ retry:
   if (ext == option.out_e)
     strncpy(option.lhs_file, buf, sizeof option.lhs_file);
 
-  if (ext == option.ref_e)
+  if (ext == option.ref_e) {
     strncpy(option.rhs_file, buf, sizeof option.rhs_file);
+    ensure(strcmp(option.lhs_file, option.rhs_file), "lhs and rhs files are the same");
+  }
 
   if (ext == option.cfg_e)
     strncpy(option.cfg_file, buf, sizeof option.cfg_file);
+
 
   // debug information
   if (fp) {

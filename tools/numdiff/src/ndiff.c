@@ -435,6 +435,9 @@ ndiff_gotoNum (T *dif, const C *c)
 {
   assert(dif && c);
 
+  if ((c->eps.cmd & eps_equ) && slice_isFullOne(&c->col))
+    return ndiff_gotoLine(dif, c);
+
   int c1=0, c2=0, i1=0, i2=0;
 
   trace("->gotoNum line %d", dif->row_i);

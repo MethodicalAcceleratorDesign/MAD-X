@@ -138,12 +138,15 @@ main(int argc_, char** argv_)
       FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
       int nn = n;
 
+      // clean filenames
+      *option.lhs_file = *option.rhs_file = *option.cfg_file = 0;
+
       // open files
       lhs_fp = open_indexedFile(lhs_s, &nn, option.out_e, 1, 0);
       if (!lhs_fp && n) break; // end of serie
 
       rhs_fp = open_indexedFile(rhs_s, &nn, option.ref_e, !option.list, 1);
-      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, 0);
+      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, !option.list);
       if (n != nn) { n = nn; --total; }
 
       if (!lhs_fp) {

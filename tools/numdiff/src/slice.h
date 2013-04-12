@@ -170,6 +170,18 @@ slice_isInfinite(const T* s)
 }
 
 static inline bool
+slice_isFull(const T* s)
+{
+  return slice_first(s) == 0 && slice_isInfinite(s) && slice_isDense(s);
+}
+
+static inline bool
+slice_isFullOne(const T* s)
+{
+  return slice_first(s) <= 1 && slice_isInfinite(s) && slice_isDense(s);
+}
+
+static inline bool
 slice_isWithin(const T* s, uint n)
 {
   return n >= s->first && n <= s->last;
