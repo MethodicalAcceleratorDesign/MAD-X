@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include "types.h"
 
 struct option {
   int check, debug, serie, list, blank, utest, keep, reset, lgopt;
@@ -44,5 +45,11 @@ void usage(void);
 void invalid_file(const char*);
 void invalid_option(const char*);
 void parse_args(int argc, const char *argv[]);
+
+static inline bool
+is_option(const char *arg)
+{
+  return arg[0] == '-' && (arg[1] == '-' || !arg[1] || !option.lgopt);
+}
 
 #endif

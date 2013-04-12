@@ -54,9 +54,19 @@ FILE*
 open_indexedFile(const char* str, int *idx, const char *ext, int optext, int required)
 {
   char buf[FILENAME_MAX+100];
+  FILE *fp;
 
-  if (!str) return 0;
   assert(ext);
+
+  // no file
+  if (!str) return 0;
+
+  // stdin
+  if (str[0] == '-' && str[1] == 0) {
+    fp = stdin;
+    strncpy(buf, str, sizeof buf);
+    goto filename;
+  }
 
 retry:
 
@@ -83,10 +93,8 @@ retry:
   // add extension (always for first attempt: procedure is safer)
   strncat(buf+pos, ext, sizeof buf - pos);
 
-  // try to open
-  FILE *fp = fopen(buf, "r");
-
-  // try again upon failure if extension is optional
+  // try to open, try again upon failure if extension is optional
+  fp = fopen(buf, "r");
   if (!fp && optext) {
     buf[pos] = 0;
     fp = fopen(buf, "r");
@@ -103,6 +111,8 @@ retry:
     fclose(fp);
     error("unable to resize the stream buffer size");
   }
+
+filename:
 
   // copy filenames into option for further reporting
   if (ext == option.out_e)

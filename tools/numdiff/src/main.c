@@ -50,12 +50,6 @@ diff_summary(const struct ndiff *dif)
   return c;
 }
 
-static bool
-is_option(const char *arg)
-{
-  return arg[0] == '-' && (arg[1] == '-' || !option.lgopt);
-}
-
 static void
 test_summary(int total, int failed)
 {
@@ -65,9 +59,15 @@ test_summary(int total, int failed)
 }
 
 static void
+close_ifile(FILE *fp)
+{
+  if (fp && fp != stdin) fclose(fp);
+}
+
+static void
 check_transition(const char* argv[], int *total, int *failed, long lines, long numbers)
 {
-  if (argv[option.argi][0] == '-' && option.test && *total && (
+  if (is_option(argv[option.argi]) && option.test && *total && (
       (!strcmp(argv[option.argi], "-t") && !option.lgopt) || !strcmp(argv[option.argi], "--test" ) ||
       (!strcmp(argv[option.argi], "-s") && !option.lgopt) || !strcmp(argv[option.argi], "--suite"))) {
 
@@ -161,8 +161,8 @@ main(int argc_, char** argv_)
       if (!lhs_fp) {
         if (option.list) {
           warning("output file '%s[.out]' not found, skipping diff", lhs_s);
-          if (rhs_fp) fclose(rhs_fp);
-          if (cfg_fp) fclose(cfg_fp);
+          close_ifile(rhs_fp);
+          close_ifile(cfg_fp);
           ++failed;
           break;
         } else
@@ -172,8 +172,8 @@ main(int argc_, char** argv_)
       if (!rhs_fp) {
         if (option.list) {
           warning("reference file '%s.ref' not found, skipping diff", rhs_s);
-          if (lhs_fp) fclose(lhs_fp);
-          if (cfg_fp) fclose(cfg_fp);
+          close_ifile(lhs_fp);
+          close_ifile(cfg_fp);
           ++failed;
           break;
         } else
@@ -211,9 +211,9 @@ main(int argc_, char** argv_)
       context_free(cxt);
 
       // close files
-      fclose(lhs_fp);
-      fclose(rhs_fp);
-      if (cfg_fp) fclose(cfg_fp);
+      close_ifile(lhs_fp);
+      close_ifile(rhs_fp);
+      close_ifile(cfg_fp);
 
       n += 1;
 

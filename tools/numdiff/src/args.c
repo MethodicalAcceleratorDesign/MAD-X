@@ -192,7 +192,7 @@ parse_args(int argc, const char *argv[])
   for (; option.argi < argc; option.argi++) {
 
     // not an option
-    if (argv[option.argi][0] != '-') return;
+    if (!is_option(argv[option.argi])) return;
 
 // ---- [action]
 
