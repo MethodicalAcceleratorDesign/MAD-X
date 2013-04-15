@@ -157,9 +157,9 @@ usage(void)
   inform("\t     --utest         run the numdiff unit tests (still incomplete)");
   inform("\t-x   --xcheck        enable cross check mode (algorithms cross check)");
   inform("\t-z   --reset         reset accumulated information");
-  inform("\t     --unzip  cmd    specify primary command to uncompress files, default is \"%s\"", option.unzip[0]);
-  inform("\t     --unzip2 cmd    specify secondary command to uncompress files, default is \"%s\"", option.unzip[1]);
-  inform("\t     --unzip3 cmd    specify tertiary command to uncompress files, default is \"%s\"", option.unzip[2]);
+  inform("\t     --unzip cmd     command to uncompress .zip files, default is \"%s\"", option.unzip[0]);
+  inform("\t     --gzip  cmd     command to uncompress .gz .z .Z .tgz .taz .taZ files, default is \"%s\"", option.unzip[1]);
+  inform("\t     --bzip2 cmd     command to uncompress .bz .bz2 .tbz .tbz2 files, default is \"%s\"", option.unzip[2]);
 
   inform("");
   inform("rules (%s):", option.cfg_e);
@@ -192,7 +192,7 @@ usage(void)
   inform("\tomit='tag'          ignore strings or numbers if preceded by 'tag'");
   inform("\trel=num             relative error (0 <= num <= 1)");
   inform("\t-rel=num            negative relative error (-1 <= num <= 0)");
-  inform("\tscl=num             set error scaling factor (non-zero)");
+  inform("\tscl=num             set error scaling factor (non-zero, default 1)");
   inform("\tskip                skip lines (action)");
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
   inform("\t                    num < -1 in -abs and -rel (default, qualifier)");

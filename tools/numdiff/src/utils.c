@@ -29,6 +29,37 @@
 #define pclose(fp)        _pclose(fp)
 #endif
 
+static struct {
+  const char *ext;
+  int         cmd;
+}
+const zipext[] = {
+  { ""        ,  0 },     // no compression
+  { ".zip"    ,  1 },     // unzip      (unzip[0])
+  { ".gz"     ,  2 },     // gzip       (unzip[1])
+  { ".z"      ,  2 },     // gzip       (unzip[1])
+  { ".Z"      ,  2 },     // gzip       (unzip[1])
+  { ".tgz"    ,  2 },     // gzip       (unzip[1])
+  { ".taz"    ,  2 },     // gzip       (unzip[1])
+  { ".taZ"    ,  2 },     // gzip       (unzip[1])
+  { ".bz"     ,  3 },     // bzip2      (unzip[2])
+  { ".bz2"    ,  3 },     // bzip2      (unzip[2])
+  { ".tbz"    ,  3 },     // bzip2      (unzip[2])
+  { ".tbz2"   ,  3 },     // bzip2      (unzip[2])
+  { ""        ,  0 },     // no compression, for clean error reporting
+  {  NULL     ,  0 }      // end marker
+};
+
+static bool
+is_zipext(const char *str)
+{
+  for (int i = 0; zipext[i].ext; i++)
+    if (!strcmp(zipext[i].ext, str))
+      return i;
+
+  return 0;
+}
+
 void
 close_indexedFile(FILE *fp, int zip)
 {
@@ -42,8 +73,8 @@ FILE*
 open_indexedFile(const char* str, int *idx, const char *ext, int optext, int required)
 {
   char buf[FILENAME_MAX+100];
-  const char *dot = 0;
-  int pos = 0;
+  const char *dot = 0, *zdot = 0;
+  int pos = 0, zpos = 0, zid = 0;
   FILE *fp = 0;
 
   assert(ext);
@@ -60,67 +91,103 @@ open_indexedFile(const char* str, int *idx, const char *ext, int optext, int req
 
 retry:
 
-  // copy filename
-  strncpy(buf, str, sizeof buf);
+  for (int i=0; zipext[i].ext; i++) {
 
-  // find and save extension, if any
-  dot = strrchr(buf, '.');
+    // copy filename
+    sprintf(buf, "%s%s", str, zipext[i].ext);
 
-  // remove extension if it matches ext
-  if (dot && !strcmp(dot, ext)) {
-    pos = dot-buf; 
-    buf[pos] = 0;
-  } else {
-    pos = (int)strlen(buf);
-    dot = 0;
-  }
+    // find and save zip extension, if any
+    zdot = strrchr(buf, '.');
+    if (zdot && (zid = is_zipext(zdot))) {
+      zpos = zdot-buf;
+      buf[zpos] = 0;
+    } else {
+      zpos = (int)strlen(buf);
+      zdot = 0;
+    }
 
-  // add formatted index, if in serie
-  if (option.serie && idx && *idx > 0)
-    pos += sprintf(buf+pos, option.fmt, *idx);
+    // find and save expected extension, if any
+    dot = strrchr(buf, '.');
+    if (dot && !strcmp(dot, ext)) {
+      pos = dot-buf; 
+      buf[pos] = 0;
+    } else {
+      pos = (int)strlen(buf);
+      dot = 0;
+    }
 
-  // add extension (always for first attempt: procedure is safer)
-  strncat(buf+pos, ext, sizeof buf - pos);
+    // add formatted index, if in serie
+    if (option.serie && idx && *idx > 0) {
+      int n = sprintf(buf+pos, option.fmt, *idx);
+      pos += n; zpos += n;
+    }
 
-  // try to open, try again upon failure if extension is optional
-  fp = fopen(buf, "r");
-  if (!fp && optext) {
-    buf[pos] = 0;
+    // add extensions (always for first attempt: procedure is safer)
+    strncat(buf+pos , ext            , sizeof buf -  pos);
+    strncat(buf+zpos, zipext[zid].ext, sizeof buf - zpos);
+
+    // try to open, try again upon failure if extension is optional
+    debug("trying to open file '%s' for reading", buf);
     fp = fopen(buf, "r");
+    if (!fp && optext) {
+      buf[pos] = 0;
+      strncat(buf+pos, zipext[zid].ext, sizeof buf - pos);
+      debug("trying to open file '%s' for reading", buf);
+      fp = fopen(buf, "r");
+    }
+
+    if (fp || !option.list) break;
   }
 
   // allow failure on first non-numbered file for serie
   if (!fp) {
     if (option.serie && idx && *idx == 0) { ++*idx; goto retry; }
-    if (required) ensure(fp, "failed to open %s", buf);
+    ensure(!required, "failed to open '%s'", buf);
+  }
+
+  // debug information
+  if (!fp) {
+    trace("<-open_indexedFile: unable to open file '%s' for reading", buf);
+    return 0;
+  }
+
+  // close file if zipped, reopen through popen
+  if (zid) {
+    char zbuf[2*(FILENAME_MAX+100)];
+    fclose(fp);
+    sprintf(zbuf, "%s %s", option.unzip[zid-1], buf);
+    debug("trying to open compressed file '%s' for reading", zbuf);
+    fp = popen(zbuf, "r");
+    ensure(fp, "failed to execute '%s'", zbuf);
   }
 
   // resize buffer for faster read
-  if (fp && BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
-    fclose(fp);
+  if (BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
+    close_indexedFile(fp, zid);
     error("unable to resize the stream buffer size");
   }
 
 filename:
 
   // copy filenames into option for further reporting
-  if (ext == option.out_e)
+  if (ext == option.out_e) {
+    option.lhs_zip = zid;
     strncpy(option.lhs_file, buf, sizeof option.lhs_file);
+  }
 
   if (ext == option.ref_e) {
+    option.rhs_zip = zid;
     strncpy(option.rhs_file, buf, sizeof option.rhs_file);
     ensure(strcmp(option.lhs_file, option.rhs_file), "lhs and rhs files have same name");
   }
 
-  if (ext == option.cfg_e)
+  if (ext == option.cfg_e) {
+    option.cfg_zip = zid;
     strncpy(option.cfg_file, buf, sizeof option.cfg_file);
+  }
 
   // debug information
-  if (fp) {
-    if (ext == option.out_e) inform("processing %s", buf);
-    debug("file %s open for reading", buf);
-  } else
-    trace("<-open_indexedFile: unable to open file %s for reading", buf);
+  debug("file %s open for reading", buf);
 
   return fp;
 }

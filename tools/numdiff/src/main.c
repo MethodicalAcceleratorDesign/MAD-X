@@ -143,6 +143,7 @@ main(int argc_, char** argv_)
 
       // clean filenames
       *option.lhs_file = *option.rhs_file = *option.cfg_file = 0;
+       option.lhs_zip  =  option.rhs_zip  =  option.cfg_zip  = 0;
 
       // open files
       lhs_fp = open_indexedFile(lhs_s, &nn, option.out_e, 1, 0);
@@ -173,6 +174,8 @@ main(int argc_, char** argv_)
         } else
           invalid_file(rhs_s);
       }
+
+      inform("processing '%s'|'%s'", option.lhs_file, option.rhs_file);
 
       // create context of constraints (using default size)
       struct context *cxt = context_alloc(0);
