@@ -159,7 +159,7 @@ usage(void)
   inform("\t-z   --reset         reset accumulated information");
 
   inform("");
-  inform("options for file decompression:");
+  inform("decompression:");
   inform("\t     --bzip2 cmd     command to uncompress .bz .bz2 .tbz .tbz2 files, default is \"%s\"", option.unzip[2]);
   inform("\t     --gzip  cmd     command to uncompress .gz .z .Z .tgz .taz .taZ files, default is \"%s\"", option.unzip[1]);
   inform("\t     --unzip cmd     command to uncompress .zip files, default is \"%s\"", option.unzip[0]);
