@@ -26,7 +26,9 @@
 #include "ndiff.h"
 #include "context.h"
 
+#ifndef VERSION
 #define VERSION "2013.04.12"
+#endif
 
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
@@ -56,6 +58,18 @@
 #define CFGFILEEXT ".cfg"
 #endif
 
+#ifndef UNZIPCMD
+#define UNZIPCMD "unzip -cq"
+#endif
+
+#ifndef UNZIP2CMD
+#define UNZIP2CMD "gzip -cdq"
+#endif
+
+#ifndef UNZIP3CMD
+#define UNZIP3CMD "bzip2 -cdq"
+#endif
+
 struct option option = {
   // index of processed option
   .argi = 1,
@@ -73,7 +87,10 @@ struct option option = {
   .keep = MAXKEEP,
 
   // file extensions
-  .out_e  = OUTFILEEXT, .ref_e =  REFFILEEXT, .cfg_e = CFGFILEEXT
+  .out_e  = OUTFILEEXT, .ref_e =  REFFILEEXT, .cfg_e = CFGFILEEXT,
+
+  // unzip commands
+  .unzip = { UNZIPCMD, UNZIP2CMD, UNZIP3CMD}
 };
 
 static void
@@ -140,6 +157,9 @@ usage(void)
   inform("\t     --utest         run the numdiff unit tests (still incomplete)");
   inform("\t-x   --xcheck        enable cross check mode (algorithms cross check)");
   inform("\t-z   --reset         reset accumulated information");
+  inform("\t     --unzip  cmd    specify primary command to uncompress files, default is \"%s\"", option.unzip[0]);
+  inform("\t     --unzip2 cmd    specify secondary command to uncompress files, default is \"%s\"", option.unzip[1]);
+  inform("\t     --unzip3 cmd    specify tertiary command to uncompress files, default is \"%s\"", option.unzip[2]);
 
   inform("");
   inform("rules (%s):", option.cfg_e);
@@ -172,6 +192,7 @@ usage(void)
   inform("\tomit='tag'          ignore strings or numbers if preceded by 'tag'");
   inform("\trel=num             relative error (0 <= num <= 1)");
   inform("\t-rel=num            negative relative error (-1 <= num <= 0)");
+  inform("\tscl=num             set error scaling factor (non-zero)");
   inform("\tskip                skip lines (action)");
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
   inform("\t                    num < -1 in -abs and -rel (default, qualifier)");
@@ -358,6 +379,27 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--cfgext") || (!option.lgopt && !strcmp(argv[option.argi], "-c"))) {
       option.cfg_e = argv[++option.argi]; 
       debug("config extension set to '%s'", option.cfg_e);
+      continue;
+    }
+
+    // set primary unzip command [setup]
+    if (!strcmp(argv[option.argi], "--unzip")) {
+      option.unzip[0] = argv[++option.argi]; 
+      debug("primary unzip command set to '%s'", option.unzip[0]);
+      continue;
+    }
+
+    // set secondary unzip command [setup]
+    if (!strcmp(argv[option.argi], "--unzip2")) {
+      option.unzip[1] = argv[++option.argi]; 
+      debug("secondary unzip command set to '%s'", option.unzip[1]);
+      continue;
+    }
+
+    // set tertiary unzip command [setup]
+    if (!strcmp(argv[option.argi], "--unzip3")) {
+      option.unzip[2] = argv[++option.argi]; 
+      debug("tertiary unzip command set to '%s'", option.unzip[2]);
       continue;
     }
 

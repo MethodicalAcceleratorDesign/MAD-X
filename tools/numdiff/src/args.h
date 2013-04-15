@@ -29,9 +29,11 @@ struct option {
   const char *fmt, *sfmt;
   const char *chr;
   const char *out_e, *ref_e, *cfg_e;
+  const char *unzip[3];
   char lhs_file[FILENAME_MAX];
   char rhs_file[FILENAME_MAX];
   char cfg_file[FILENAME_MAX];
+  int  lhs_zip, rhs_zip, cfg_zip;
   int  argi;
 
   const char *accum;

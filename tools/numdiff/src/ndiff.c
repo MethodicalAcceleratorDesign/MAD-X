@@ -466,7 +466,7 @@ ndiff_gotoNum (T *dif, const C *c)
     int col = 0;
     for (dif->rhs_i=0; (col = ndiff_nextNum(dif, c)); dif->rhs_i=0) {
       if (slice_isElem(&c->col, col)) {
-        if (ndiff_testNum(dif, c, 1.0) == 0) goto lhs_done;
+        if (ndiff_testNum(dif, c) == 0) goto lhs_done;
       }
       else
         dif->lhs_i += parse_number(dif->lhs_b+dif->lhs_i, 0,0,0,0);
@@ -478,6 +478,8 @@ lhs_done: ;
   char tag[sizeof c->eps.tag];
   memcpy(tag, dif->lhs_b, sizeof tag);
   strcpy(dif->lhs_b, c->eps.tag);
+  C _c = *c;
+  _c.eps.scl = -_c.eps.scl;
 
   while (1) {
     int s = 0, n = 0;
@@ -500,7 +502,7 @@ lhs_done: ;
     int col = 0;
     for (dif->lhs_i=0; (col = ndiff_nextNum(dif, c)); dif->lhs_i=0) {
       if (slice_isElem(&c->col, col)) {
-        if (ndiff_testNum(dif, c, -1.0) == 0) goto rhs_done;
+        if (ndiff_testNum(dif, &_c) == 0) goto rhs_done;
       }
       else
         dif->rhs_i += parse_number(dif->rhs_b+dif->rhs_i, 0,0,0,0);
@@ -611,7 +613,7 @@ quit:
 }
 
 int
-ndiff_testNum (T *dif, const C *c, double scl)
+ndiff_testNum (T *dif, const C *c)
 {
   assert(dif && c);
 
@@ -664,7 +666,7 @@ ndiff_testNum (T *dif, const C *c, double scl)
   // convert numbers
   lhs_d = strtod(lhs_p, &end); assert(end == lhs_p+l1);
   rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
-  dif_a = (lhs_d - rhs_d) * scl;
+  dif_a = (lhs_d - rhs_d) * c->eps.scl;
   abs_a = fabs(dif_a);
   min_a = fmin(fabs(lhs_d),fabs(rhs_d));
   pow_a = pow10(-imax(n1, n2));
@@ -832,7 +834,7 @@ ndiff_loop(T *dif)
       }
 
       // check numbers
-      ndiff_testNum(dif, c, 1.0);
+      ndiff_testNum(dif, c);
 
       // restore logmsg
       logmsg_config.level = saved_level;

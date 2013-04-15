@@ -142,6 +142,10 @@ readEps(struct eps *e, FILE *in, int row)
     }
 
 // numeric constraints
+    else if (strcmp(str, "scl") == 0 && (n = fscanf(in, "=%lf", &e->scl)) == 1) {
+                        trace("[%d] scl=%g", row, e->scl);
+      ensure(e->scl != 0.0, "invalid zero error scale (%s:%d)", option.cfg_file, row);
+    }
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;   trace("[%d] abs=%g", row, e->abs);      e->_abs = -e->abs;
       ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0),
@@ -231,6 +235,8 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_goto)   fprintf(out, "goto='%s' ", cst->eps.tag);
   if (cst->eps.cmd & eps_gonum)  fprintf(out, "goto='%s' (num) ", cst->eps.tag);
 
+  if (cst->eps.scl != 1.0)       fprintf(out, "scl=%g ", cst->eps.scl);
+
   if (cst->eps.cmd & eps_abs) {
     fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
                  cst->eps.abs > 1 ? "large " : "", cst->eps.abs);
@@ -256,7 +262,7 @@ constraint_scan(T* cst, FILE *in, int *row)
   int c;
   assert(cst && row);
 
-  *cst = (T){ .eps = { .cmd = eps_invalid } };
+  *cst = (T){ .eps = { .cmd = eps_invalid, .scl=1.0 } };
 
   if (!in) in = stdin;
 
@@ -275,10 +281,18 @@ retry:
     goto retry;
   }
 
+  cst->idx  = -1;
   cst->line = *row;
+
   ensure(readSlcOrRng(&cst->row, in      ) != EOF, "invalid row range (%s:%d)"   , option.cfg_file, *row);
   ensure(readSlcOrRng(&cst->col, in      ) != EOF, "invalid column range (%s:%d)", option.cfg_file, *row);
   ensure(readEps     (&cst->eps, in, *row) != EOF, "invalid constraint or command (%s:%d)", option.cfg_file, *row);
+
+  // expand to all columns
+  if (cst->eps.cmd & eps_skip || cst->eps.cmd & eps_goto)
+    cst->col = slice_initAll();
+
+  // adjust row count
   if (skipLine(in, 0) == '\n') ++*row;
 }
 

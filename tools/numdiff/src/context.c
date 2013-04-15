@@ -132,7 +132,7 @@ static void
 context_add0(T *cxt)
 {
   // add rule #0: "* * abs=DBL_MIN"
-  const C c = constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN), 0);
+  const C c = constraint_init(slice_initAll(), slice_initAll(), eps_init(eps_abs, DBL_MIN), -1, 0);
 
   context_add(cxt, &c);
 }
@@ -312,12 +312,10 @@ context_add (T *cxt, const C *cst)
   if (cxt->dat_n == cxt->dat_sz)
     cxt = context_grow(cxt, 1.75*cxt->dat_sz); // +75%
 
-  // add constraint
-  cxt->dat[cxt->dat_n++] = *cst;
-
-  // expand to all columns
-  if (cst->eps.cmd >= eps_skip)
-    cxt->dat[cxt->dat_n-1].col = slice_initAll();
+  // add constraint and setup index
+  cxt->dat[cxt->dat_n] = *cst;
+  cxt->dat[cxt->dat_n].idx = cxt->dat_n;
+  cxt->dat_n++;
 
   return cxt;
 }
@@ -358,14 +356,15 @@ context_getIdx (const T *cxt, int idx)
 int
 context_findIdx (const T *cxt, const C *cst)
 {
-  assert(cxt);
-  return cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst-cxt->dat : -1;
+  assert(cxt && cst);
+  return cst->idx >= 0   && cst->idx < cxt->dat_n     ? cst->idx :
+         cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst-cxt->dat : -1;
 }
 
 int
 context_findLine (const T *cxt, const C *cst)
 {
-  assert(cxt);
+  assert(cxt && cst);
   return cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst->line : -1;
 }
 
@@ -512,7 +511,7 @@ ut_setup1(T *cxt)
   struct eps eps = eps_init(eps_dig, 1);
 
   // 3  2
-  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -525,13 +524,13 @@ ut_setup2(T *cxt)
   struct eps eps = eps_init(eps_dig, 2);
 
   // 1-2  2
-  cst = constraint_init(slice_initLast(1, 2), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initLast(1, 2), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 3    2
-  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 4-5  2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -544,13 +543,13 @@ ut_setup3(T *cxt)
   struct eps eps = eps_init(eps_dig, 3);
 
   // 2  1-2
-  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2  3
-  cst = constraint_init(slice_init(2), slice_init(3), eps, 0);
+  cst = constraint_init(slice_init(2), slice_init(3), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2  4-5
-  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -564,25 +563,25 @@ ut_setup4(T *cxt)
   struct eps skp = eps_init(eps_skip, 4);
 
   // 2    4-5
-  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSize(4, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 1-2  2
-  cst = constraint_init(slice_initSize(1, 2), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initSize(1, 2), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2    3
-  cst = constraint_init(slice_init(2), slice_init(3), skp, 0);
+  cst = constraint_init(slice_init(2), slice_init(3), skp, -1, 0);
   cxt = context_add(cxt, &cst);
   // 3    2
-  cst = constraint_init(slice_init(3), slice_init(2), eps, 0);
+  cst = constraint_init(slice_init(3), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2    1-2
-  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSize(1, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 4-5  2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 1-3  2-4
-  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, 0);
+  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -596,25 +595,25 @@ ut_setup5(T *cxt)
   struct eps skp = eps_init(eps_skip, 5);
 
   // 2-4/2    4-5
-  cst = constraint_init(slice_initSizeStride(2, 2, 2), slice_initSize(4, 2), eps, 0);
+  cst = constraint_init(slice_initSizeStride(2, 2, 2), slice_initSize(4, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 4-5      2
-  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initSize(4, 2), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 1-3      2-4
-  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, 0);
+  cst = constraint_init(slice_initSize(1, 3), slice_initSize(2, 3), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 1-6/2    2
-  cst = constraint_init(slice_initSizeStride(1, 2, 3), slice_init(2), eps, 0);
+  cst = constraint_init(slice_initSizeStride(1, 2, 3), slice_init(2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2        3-7/2
-  cst = constraint_init(slice_init(2), slice_initSizeStride(3, 2, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSizeStride(3, 2, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
   // 3        2
-  cst = constraint_init(slice_init(3), slice_init(2), skp, 0);
+  cst = constraint_init(slice_init(3), slice_init(2), skp, -1, 0);
   cxt = context_add(cxt, &cst);
   // 2        1-5/2
-  cst = constraint_init(slice_init(2), slice_initSizeStride(1, 2, 2), eps, 0);
+  cst = constraint_init(slice_init(2), slice_initSizeStride(1, 2, 2), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;
@@ -630,7 +629,7 @@ ut_setup6(T *cxt)
   ut_setup2(cxt);
 
   // 1-5    1-5
-  cst = constraint_init(slice_initSize(1, 5), slice_initSize(1, 5), eps, 0);
+  cst = constraint_init(slice_initSize(1, 5), slice_initSize(1, 5), eps, -1, 0);
   cxt = context_add(cxt, &cst);
 
   return cxt;

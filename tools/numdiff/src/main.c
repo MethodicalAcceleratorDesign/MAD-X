@@ -59,12 +59,6 @@ test_summary(int total, int failed)
 }
 
 static void
-close_ifile(FILE *fp)
-{
-  if (fp && fp != stdin) fclose(fp);
-}
-
-static void
 check_transition(const char* argv[], int *total, int *failed, long lines, long numbers)
 {
   if (is_option(argv[option.argi]) && option.test && *total && (
@@ -161,8 +155,8 @@ main(int argc_, char** argv_)
       if (!lhs_fp) {
         if (option.list) {
           warning("output file '%s[.out]' not found, skipping diff", lhs_s);
-          close_ifile(rhs_fp);
-          close_ifile(cfg_fp);
+          close_indexedFile(rhs_fp, option.rhs_zip);
+          close_indexedFile(cfg_fp, option.cfg_zip);
           ++failed;
           break;
         } else
@@ -172,8 +166,8 @@ main(int argc_, char** argv_)
       if (!rhs_fp) {
         if (option.list) {
           warning("reference file '%s.ref' not found, skipping diff", rhs_s);
-          close_ifile(lhs_fp);
-          close_ifile(cfg_fp);
+          close_indexedFile(lhs_fp, option.lhs_zip);
+          close_indexedFile(cfg_fp, option.cfg_zip);
           ++failed;
           break;
         } else
@@ -211,9 +205,9 @@ main(int argc_, char** argv_)
       context_free(cxt);
 
       // close files
-      close_ifile(lhs_fp);
-      close_ifile(rhs_fp);
-      close_ifile(cfg_fp);
+      close_indexedFile(lhs_fp, option.lhs_zip);
+      close_indexedFile(rhs_fp, option.rhs_zip);
+      close_indexedFile(cfg_fp, option.cfg_zip);
 
       n += 1;
 

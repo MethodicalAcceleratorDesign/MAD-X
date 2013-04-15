@@ -64,6 +64,7 @@ struct eps {
   enum eps_cmd cmd;
   double  abs,  rel,  dig;
   double _abs, _rel, _dig;
+  double  scl;
   char    tag[64];
 };
 
@@ -71,7 +72,7 @@ struct constraint {
   struct slice row;
   struct slice col;
   struct eps   eps;
-  int          line;
+  int    idx, line;
 };
 
 // ----- interface
@@ -79,22 +80,22 @@ struct constraint {
 #define T struct constraint
 
 static inline struct eps
-eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs, double _rel, double _dig)
+eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs, double _rel, double _dig, double scl)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { .cmd=cmd, .abs=abs, .rel=rel, .dig=dig, ._abs=_abs, ._rel=_rel, ._dig=_dig };
+  return (struct eps) { .cmd=cmd, .abs=abs, .rel=rel, .dig=dig, ._abs=_abs, ._rel=_rel, ._dig=_dig, .scl=scl };
 }
 
 static inline struct eps
-eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig)
+eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig, double scl)
 {
-  return eps_initAllNum(cmd, abs, rel, dig, -abs, -rel, -dig);
+  return eps_initAllNum(cmd, abs, rel, dig, -abs, -rel, -dig, scl);
 }
 
 static inline struct eps
 eps_init(enum eps_cmd cmd, double val)
 {
-  return eps_initNum(cmd, cmd&eps_abs?val:0, cmd&eps_rel?val:0, cmd&eps_dig?val:0);
+  return eps_initNum(cmd, cmd&eps_abs?val:0, cmd&eps_rel?val:0, cmd&eps_dig?val:0, 1.0);
 }
 
 static inline struct eps
@@ -120,9 +121,10 @@ eps_initNumTag(enum eps_cmd cmd, const char *tag)
 }
 
 static inline T
-constraint_init(const struct slice row, const struct slice col, const struct eps eps, int line)
+constraint_init(const struct slice row, const struct slice col, const struct eps eps, int idx, int line)
 {
-  return (T){ row, col, eps, line };
+  bool allcol = eps.cmd & eps_skip || eps.cmd & eps_goto;
+  return (T){ row, allcol ? slice_initAll() : col, eps, idx, line };
 }
 
 void constraint_print(const T* cst, FILE *out);

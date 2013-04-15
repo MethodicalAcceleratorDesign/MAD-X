@@ -50,7 +50,7 @@ int   ndiff_gotoLine (T*, const C*);
 int   ndiff_gotoNum  (T*, const C*);
 
 int   ndiff_nextNum  (T*, const C*); // return 0 if no number is found
-int   ndiff_testNum  (T*, const C*, double scl); // scale the difference
+int   ndiff_testNum  (T*, const C*);
 
 void  ndiff_getInfo  (const T*, int *row_, int *col_, int *cnt_, long *num_);
 int   ndiff_feof     (const T*, int both);
