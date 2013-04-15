@@ -158,7 +158,8 @@ usage(void)
   inform("\t-x   --xcheck        enable cross check mode (algorithms cross check)");
   inform("\t-z   --reset         reset accumulated information");
 
-  inform("options for decompression:");
+  inform("");
+  inform("options for file decompression:");
   inform("\t     --bzip2 cmd     command to uncompress .bz .bz2 .tbz .tbz2 files, default is \"%s\"", option.unzip[2]);
   inform("\t     --gzip  cmd     command to uncompress .gz .z .Z .tgz .taz .taZ files, default is \"%s\"", option.unzip[1]);
   inform("\t     --unzip cmd     command to uncompress .zip files, default is \"%s\"", option.unzip[0]);
