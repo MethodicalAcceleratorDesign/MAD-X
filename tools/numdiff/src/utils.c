@@ -127,16 +127,16 @@ retry:
     strncat(buf+zpos, zipext[zid].ext, sizeof buf - zpos);
 
     // try to open, try again upon failure if extension is optional
-    debug("trying to open file '%s' for reading", buf);
+    trace("trying to open file '%s' for reading", buf);
     fp = fopen(buf, "r");
     if (!fp && optext) {
       buf[pos] = 0;
       strncat(buf+pos, zipext[zid].ext, sizeof buf - pos);
-      debug("trying to open file '%s' for reading", buf);
+      trace("trying to open file '%s' for reading", buf);
       fp = fopen(buf, "r");
     }
 
-    if (!option.list) break;
+    if (fp || !option.list) break;
   }
 
   // allow failure on first non-numbered file for serie

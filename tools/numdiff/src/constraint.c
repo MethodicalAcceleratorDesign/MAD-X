@@ -34,7 +34,7 @@
 static void
 printSlc(const S *s, FILE *out)
 {
-  if (slice_isFullOne(s)) {
+  if (slice_isFull(s)) {
     putc('*', out);
     return;
   }

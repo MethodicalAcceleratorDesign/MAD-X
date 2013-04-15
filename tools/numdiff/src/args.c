@@ -62,12 +62,12 @@
 #define UNZIPCMD "unzip -cq"
 #endif
 
-#ifndef UNZIP2CMD
-#define UNZIP2CMD "gzip -cdq"
+#ifndef GZIPCMD
+#define GZIPCMD "gzip -cdq"
 #endif
 
-#ifndef UNZIP3CMD
-#define UNZIP3CMD "bzip2 -cdq"
+#ifndef BZIP2CMD
+#define BZIP2CMD "bzip2 -cdq"
 #endif
 
 struct option option = {
@@ -90,7 +90,7 @@ struct option option = {
   .out_e  = OUTFILEEXT, .ref_e =  REFFILEEXT, .cfg_e = CFGFILEEXT,
 
   // unzip commands
-  .unzip = { UNZIPCMD, UNZIP2CMD, UNZIP3CMD}
+  .unzip = { UNZIPCMD, GZIPCMD, BZIP2CMD}
 };
 
 static void
