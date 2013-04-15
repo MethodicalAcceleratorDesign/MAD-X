@@ -136,7 +136,7 @@ retry:
       fp = fopen(buf, "r");
     }
 
-    if (fp || !option.list) break;
+    if (!option.list) break;
   }
 
   // allow failure on first non-numbered file for serie

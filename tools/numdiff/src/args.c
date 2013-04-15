@@ -27,7 +27,7 @@
 #include "context.h"
 
 #ifndef VERSION
-#define VERSION "2013.04.12"
+#define VERSION "2013.04.15"
 #endif
 
 #ifndef PUNCTCHRS
@@ -157,9 +157,11 @@ usage(void)
   inform("\t     --utest         run the numdiff unit tests (still incomplete)");
   inform("\t-x   --xcheck        enable cross check mode (algorithms cross check)");
   inform("\t-z   --reset         reset accumulated information");
-  inform("\t     --unzip cmd     command to uncompress .zip files, default is \"%s\"", option.unzip[0]);
-  inform("\t     --gzip  cmd     command to uncompress .gz .z .Z .tgz .taz .taZ files, default is \"%s\"", option.unzip[1]);
+
+  inform("options for decompression:");
   inform("\t     --bzip2 cmd     command to uncompress .bz .bz2 .tbz .tbz2 files, default is \"%s\"", option.unzip[2]);
+  inform("\t     --gzip  cmd     command to uncompress .gz .z .Z .tgz .taz .taZ files, default is \"%s\"", option.unzip[1]);
+  inform("\t     --unzip cmd     command to uncompress .zip files, default is \"%s\"", option.unzip[0]);
 
   inform("");
   inform("rules (%s):", option.cfg_e);
@@ -385,21 +387,21 @@ parse_args(int argc, const char *argv[])
     // set primary unzip command [setup]
     if (!strcmp(argv[option.argi], "--unzip")) {
       option.unzip[0] = argv[++option.argi]; 
-      debug("primary unzip command set to '%s'", option.unzip[0]);
+      debug("unzip command set to '%s'", option.unzip[0]);
       continue;
     }
 
     // set secondary unzip command [setup]
-    if (!strcmp(argv[option.argi], "--unzip2")) {
+    if (!strcmp(argv[option.argi], "--gzip")) {
       option.unzip[1] = argv[++option.argi]; 
-      debug("secondary unzip command set to '%s'", option.unzip[1]);
+      debug("gzip command set to '%s'", option.unzip[1]);
       continue;
     }
 
     // set tertiary unzip command [setup]
-    if (!strcmp(argv[option.argi], "--unzip3")) {
+    if (!strcmp(argv[option.argi], "--bzip2")) {
       option.unzip[2] = argv[++option.argi]; 
-      debug("tertiary unzip command set to '%s'", option.unzip[2]);
+      debug("bzip2 command set to '%s'", option.unzip[2]);
       continue;
     }
 
