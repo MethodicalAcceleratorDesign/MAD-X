@@ -244,7 +244,7 @@ readEps(struct eps *e, FILE *in, int row)
 
            if (strcmp (buf, "lhs"   ) == 0) { e->lhs_reg = rn; cmd |= eps_lhs; }
       else if (strcmp (buf, "rhs"   ) == 0) { e->rhs_reg = rn; cmd |= eps_rhs; }
-      else if (strncmp(buf, "reg", 3) == 0) { e->dst_reg = rn; cmd |= eps_move;
+      else if (strncmp(buf, "reg", 3) == 0) { e->dst_reg = rn; cmd |= eps_cpy;
         int rn_p = 0, rn_q = 0;
         int k = sscanf(buf, "reg%d-%d", &rn_p, &rn_q);
         ensure((k == 1 && is_reg(rn_p) && rn_q == 0   ) ||
@@ -340,7 +340,7 @@ constraint_print(const T* cst, FILE *out)
 
   if (cst->eps.cmd & eps_lhs)  fprintf(out, "reg%d=lhs ", cst->eps.lhs_reg);
   if (cst->eps.cmd & eps_rhs)  fprintf(out, "reg%d=rhs ", cst->eps.rhs_reg);
-  if (cst->eps.cmd & eps_move) {
+  if (cst->eps.cmd & eps_cpy) {
     if (cst->eps.cnt_reg > 1)
       fprintf(out, "reg%d=reg%d-%d ", cst->eps.dst_reg, cst->eps.src_reg, cst->eps.src_reg+cst->eps.cnt_reg);
     else

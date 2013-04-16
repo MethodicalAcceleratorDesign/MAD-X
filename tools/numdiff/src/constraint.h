@@ -40,7 +40,7 @@ enum eps_cmd {
 // intermediate (commands)
   eps_lhs    = 1u <<  7,  // save lhs number
   eps_rhs    = 1u <<  8,  // save rhs number
-  eps_move   = 1u <<  9,  // move register(s)
+  eps_cpy    = 1u <<  9,  // copy register(s)
   eps_omit   = 1u << 10,  // omit qualifier
   eps_trace  = 1u << 11,  // trace rule
 

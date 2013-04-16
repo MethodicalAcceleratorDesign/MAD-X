@@ -732,13 +732,19 @@ quit_diff:
   ret = 1;
 
 quit:
+  if (c->eps.cmd & eps_cpy) {
+    int rn_d = c->eps.dst_reg;
+    int rn_s = c->eps.src_reg;
+    int rn_c = c->eps.cnt_reg;
+    memmove(dif->reg[rn_d], dif->reg[rn_s], rn_c*sizeof *dif->reg);
+  }
   if (c->eps.cmd & eps_lhs) {
-    int rn = c->eps.dst_reg;
+    int rn = c->eps.lhs_reg;
     memcpy(dif->reg[rn], lhs_p, l1);
     dif->reg[rn][l1] = 0;
   }
   if (c->eps.cmd & eps_rhs) {
-    int rn = c->eps.dst_reg;
+    int rn = c->eps.rhs_reg;
     memcpy(dif->reg[rn], rhs_p, l2);
     dif->reg[rn][l2] = 0;
   }
