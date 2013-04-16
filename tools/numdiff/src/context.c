@@ -31,7 +31,7 @@ struct context {
   // heaps of contraints
   const C **fut; // future, sorted
   const C **act; // active, sorted
-  const C **row; // active, sorted    
+  const C **row; // active, sorted
   int fut_n, act_n, row_n;
 
   // current status

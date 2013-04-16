@@ -101,16 +101,24 @@ finish:
   return 0;
 }
 
+static bool
+is_reg(int n)
+{
+  return n > 0 && n < 100;
+}
+
 static int
 readEps(struct eps *e, FILE *in, int row)
 {
-  int c = 0, n = 0, cmd = eps_invalid;
-  char str[16], *end;
+  int c = 0, n = 0, rn = 0, cmd = eps_invalid;
+  char str[16], buf[16], *end;
 
   while (1) {
     // parse next constraint
     *str = 0;
-    n = fscanf(in, "%*[ \t]%10[^= \t\n\r!#]", str);
+    n = fscanf(in, "%*[ \t]%16[^= \t\n\r!#]", str);
+    str[sizeof str-1]=0;
+
     if (n == EOF || *str == 0) break;
 
          if (strcmp(str, "skip") == 0) {
@@ -146,19 +154,38 @@ readEps(struct eps *e, FILE *in, int row)
                         trace("[%d] scl=%g", row, e->scl);
       ensure(e->scl != 0.0, "invalid zero error scale (%s:%d)", option.cfg_file, row);
     }
+    else if (strcmp(str, "scl") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+                        trace("[%d] scl=reg%d", row, rn); e->scl_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+
     else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "=%lf", &e->abs)) == 1) {
       cmd |= eps_abs;   trace("[%d] abs=%g", row, e->abs);      e->_abs = -e->abs;
       ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0),
              "invalid absolute constraint (%s:%d)", option.cfg_file, row);
     }
+    else if (strcmp(str, "abs") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_abs;   trace("[%d] abs=reg%d", row, rn);  e->abs_reg = rn; e->_abs_reg = -rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+
     else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "=%lf", &e->rel)) == 1) {
       cmd |= eps_rel;   trace("[%d] rel=%g", row, e->rel);      e->_rel = -e->rel;
       ensure(e->rel >= 0.0 && (cmd & eps_large || e->rel <= 1.0),
              "invalid relative constraint (%s:%d)", option.cfg_file, row);
     }
+    else if (strcmp(str, "rel") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_rel;   trace("[%d] rel=reg%d", row, rn);  e->rel_reg = rn; e->_rel_reg = -rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+
     else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "=%lf", &e->dig)) == 1) {
       cmd |= eps_dig;   trace("[%d] dig=%g", row, e->dig);      e->_dig = -e->dig;
       ensure(e->dig >= 1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+    }
+    else if (strcmp(str, "dig") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_dig;   trace("[%d] dig=reg%d", row, rn);  e->dig_reg = rn; e->_dig_reg = -rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
     }
 
     else if (strcmp(str, "-abs") == 0 && (n = fscanf(in, "=%lf", &e->_abs)) == 1) {
@@ -166,14 +193,28 @@ readEps(struct eps *e, FILE *in, int row)
       ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0),
              "invalid absolute constraint (%s:%d)", option.cfg_file, row);
     }
+    else if (strcmp(str, "-abs") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_abs;   trace("[%d] -abs=reg%d", row, rn);  e->_abs_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+
     else if (strcmp(str, "-rel") == 0 && (n = fscanf(in, "=%lf", &e->_rel)) == 1) {
       cmd |= eps_rel;   trace("[%d] -rel=%g", row, e->_rel);
       ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0),
              "invalid relative constraint (%s:%d)", option.cfg_file, row);
     }
+    else if (strcmp(str, "-rel") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_rel;   trace("[%d] -rel=reg%d", row, rn);  e->_rel_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+
     else if (strcmp(str, "-dig") == 0 && (n = fscanf(in, "=%lf", &e->_dig)) == 1) {
       cmd |= eps_dig;   trace("[%d] -dig=%g", row, e->_dig);
       ensure(e->_dig <= -1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+    }
+    else if (strcmp(str, "-dig") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
+      cmd |= eps_dig;   trace("[%d] -dig=reg%d", row, rn);  e->_dig_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
     }
 
 // actions
@@ -185,13 +226,37 @@ readEps(struct eps *e, FILE *in, int row)
       ensure(!(cmd & (eps_goto | eps_gonum)), "omit tag conflicting with goto (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "=%*['\"]%64[^'\"]%*['\"]", e->tag)) == 1) {
-      e->tag[sizeof e->tag-1] = 0;
-      strtod(e->tag, &end);
-      cmd |= *end ? eps_goto : eps_gonum | eps_istr; 
+      e->tag[sizeof e->tag-1] = 0; rn = 0;
+      int is_num = (strtod(e->tag, &end), !*end) || (sscanf(e->tag, "reg%d", &rn) == 1 && is_reg(rn));
+      cmd |= is_num ? eps_goto : eps_gonum | eps_istr;
+      if (is_num && is_reg(rn)) e->gto_reg = rn;
       trace("[%d] goto='%s'%s", row, e->tag, cmd & eps_gonum ? " (num)" : "");
       ensure(*e->tag, "invalid empty tag (%s:%d)", option.cfg_file, row);
       ensure(!(cmd & eps_omit), "goto tag conflicting with omit (%s:%d)", option.cfg_file, row);
     }
+
+// indirections
+    else if (strncmp(str, "reg", 3) == 0 && (n = fscanf(in, "=%16[^ \t\n\r!#]", buf)) == 1) {
+      buf[sizeof buf-1] = 0;
+      rn = strtol(str+3, &end, 10);
+      trace("[%d] reg%d=%s", row, rn, buf);
+      ensure(is_reg(rn) && !*end, "invalid register number (%s:%d)", option.cfg_file, row);
+
+           if (strcmp (buf, "lhs"   ) == 0) { e->lhs_reg = rn; cmd |= eps_lhs; }
+      else if (strcmp (buf, "rhs"   ) == 0) { e->rhs_reg = rn; cmd |= eps_rhs; }
+      else if (strncmp(buf, "reg", 3) == 0) { e->dst_reg = rn; cmd |= eps_move;
+        int rn_p = 0, rn_q = 0;
+        int k = sscanf(buf, "reg%d-%d", &rn_p, &rn_q);
+        ensure((k == 1 && is_reg(rn_p) && rn_q == 0   ) ||
+               (k == 2 && is_reg(rn_p) && is_reg(rn_q) && rn_p <= rn_q),
+               "invalid registers range (%s:%d)", option.cfg_file, row);
+        e->src_reg = rn_p;
+        e->cnt_reg = rn_q ? rn_q-rn_p+1 : 1;
+      }
+      else error("invalid register assigment (%s:%d)", option.cfg_file, row);
+    }
+
+// invalid command
     else {
       cmd = eps_invalid;
       trace("[%d] invalid '%s'", row, str);
@@ -236,24 +301,51 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_gonum)  fprintf(out, "goto='%s' (num) ", cst->eps.tag);
 
   if (cst->eps.scl != 1.0)       fprintf(out, "scl=%g ", cst->eps.scl);
+  if (cst->eps.scl_reg)          fprintf(out, "scl=reg%d ", cst->eps.scl_reg);
 
   if (cst->eps.cmd & eps_abs) {
-    fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
-                 cst->eps.abs > 1 ? "large " : "", cst->eps.abs);
-    if (cst->eps._abs != -cst->eps.abs)
-      fprintf(out, cst->eps._abs == -DBL_MIN ? "-abs=-eps " : "%s-abs=%g ",
-                   cst->eps._abs < -1 ? "large " : "", cst->eps._abs);
+    if (cst->eps.abs_reg) fprintf(out, "abs=reg%d ", cst->eps.abs_reg);
+    else fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
+                      cst->eps.abs > 1        ? "large " : "", cst->eps.abs);
+
+    if (cst->eps._abs_reg && cst->eps._abs_reg != -cst->eps.abs_reg)
+      fprintf(out, "-abs=%sreg%d ", cst->eps._abs_reg < 0 ? "-" : "",
+                                    cst->eps._abs_reg < 0 ? -cst->eps._abs_reg : cst->eps._abs_reg); 
+    else if (cst->eps._abs != -cst->eps.abs)
+        fprintf(out, cst->eps._abs == -DBL_MIN ? "-abs=-eps " : "%s-abs=%g ",
+                     cst->eps._abs < -1        ? "large " : "", cst->eps._abs);
   }
+
   if (cst->eps.cmd & eps_rel) {
-    fprintf(out, "%srel=%g ", cst->eps.rel > 1 ? "large " : "", cst->eps.rel);
-    if (cst->eps._rel != -cst->eps.rel)
+    if (cst->eps.rel_reg) fprintf(out, "rel=reg%d ", cst->eps.rel_reg);
+    else fprintf(out, "%srel=%g ", cst->eps.rel > 1 ? "large " : "", cst->eps.rel);
+
+    if (cst->eps._rel_reg && cst->eps._rel_reg != -cst->eps.rel_reg)
+      fprintf(out, "-rel=%sreg%d ", cst->eps._rel_reg < 0 ? "-" : "",
+                                    cst->eps._rel_reg < 0 ? -cst->eps._rel_reg : cst->eps._rel_reg); 
+    else if (cst->eps._rel != -cst->eps.rel)
       fprintf(out, "%s-rel=%g ", cst->eps._rel < -1 ? "large " : "", cst->eps._rel);
   }
+
   if (cst->eps.cmd & eps_dig) {
-    fprintf(out, "dig=%g ", cst->eps.dig);
-    if (cst->eps._dig != -cst->eps.dig)
+    if (cst->eps.dig_reg) fprintf(out, "dig=reg%d ", cst->eps.dig_reg);
+    else fprintf(out, "dig=%g ", cst->eps.dig);
+
+    if (cst->eps._dig_reg && cst->eps._dig_reg != -cst->eps.dig_reg)
+      fprintf(out, "-dig=%sreg%d ", cst->eps._dig_reg < 0 ? "-" : "",
+                                    cst->eps._dig_reg < 0 ? -cst->eps._dig_reg : cst->eps._dig_reg); 
+    else if (cst->eps._dig != -cst->eps.dig)
       fprintf(out, "-dig=%g ", cst->eps._dig);
   }   
+
+  if (cst->eps.cmd & eps_lhs)  fprintf(out, "reg%d=lhs ", cst->eps.lhs_reg);
+  if (cst->eps.cmd & eps_rhs)  fprintf(out, "reg%d=rhs ", cst->eps.rhs_reg);
+  if (cst->eps.cmd & eps_move) {
+    if (cst->eps.cnt_reg > 1)
+      fprintf(out, "reg%d=reg%d-%d ", cst->eps.dst_reg, cst->eps.src_reg, cst->eps.src_reg+cst->eps.cnt_reg);
+    else
+      fprintf(out, "reg%d=reg%d ", cst->eps.dst_reg, cst->eps.src_reg);
+  }
 }
 
 void

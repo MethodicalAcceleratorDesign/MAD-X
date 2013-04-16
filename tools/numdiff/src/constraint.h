@@ -28,7 +28,7 @@
 enum eps_cmd {
   eps_invalid = 0u,       // invalid command
 
-// must be firsts (constrains, qualifiers)
+// must be firsts (constrains)
   eps_abs    = 1u <<  0,  // absolute eps
   eps_rel    = 1u <<  1,  // relative eps
   eps_dig    = 1u <<  2,  // relative input eps
@@ -37,17 +37,20 @@ enum eps_cmd {
   eps_istr   = 1u <<  5,  // ignore strings
   eps_any    = 1u <<  6,  // any qualifier
 
-// intermediate (commands, qualifiers)
-  eps_omit   = 1u <<  7,  // omit indentifier
-  eps_trace  = 1u <<  8,  // trace rule
+// intermediate (commands)
+  eps_lhs    = 1u <<  7,  // save lhs number
+  eps_rhs    = 1u <<  8,  // save rhs number
+  eps_move   = 1u <<  9,  // move register(s)
+  eps_omit   = 1u << 10,  // omit qualifier
+  eps_trace  = 1u << 11,  // trace rule
 
 // must be lasts (actions)
-  eps_skip   = 1u <<  9,  // skip line, must be first action
-  eps_goto   = 1u << 10,  // go to tag
-  eps_gonum  = 1u << 11,  // go to number
+  eps_skip   = 1u << 12,  // skip line, must be first action!!
+  eps_goto   = 1u << 13,  // go to tag
+  eps_gonum  = 1u << 14,  // go to number
 
 // marker & mask
-  eps_last   = 1u << 12,  // the end
+  eps_last   = 1u << 15,  // the end
   eps_mask   = eps_last - 1,
 
 // non-persistent
@@ -62,9 +65,17 @@ enum eps_cmd {
 
 struct eps {
   enum eps_cmd cmd;
+
+  double  scl;
   double  abs,  rel,  dig;
   double _abs, _rel, _dig;
-  double  scl;
+
+  char    lhs_reg,  rhs_reg;
+  char    src_reg,  dst_reg,  cnt_reg;
+  char    abs_reg,  rel_reg,  dig_reg;
+  char   _abs_reg, _rel_reg, _dig_reg;
+  char    scl_reg,  gto_reg;
+
   char    tag[64];
 };
 

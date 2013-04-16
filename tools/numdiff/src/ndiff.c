@@ -41,6 +41,9 @@ struct ndiff {
   // context
   struct context* cxt;
 
+  // registers
+  char reg[100][64];
+
   // options
   int blank, check;
 
@@ -653,6 +656,9 @@ ndiff_testNum (T *dif, const C *c)
     }
   }
 
+  // indirections
+  // TODO
+
   // strict comparison...
   if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
@@ -726,6 +732,17 @@ quit_diff:
   ret = 1;
 
 quit:
+  if (c->eps.cmd & eps_lhs) {
+    int rn = c->eps.dst_reg;
+    memcpy(dif->reg[rn], lhs_p, l1);
+    dif->reg[rn][l1] = 0;
+  }
+  if (c->eps.cmd & eps_rhs) {
+    int rn = c->eps.dst_reg;
+    memcpy(dif->reg[rn], rhs_p, l2);
+    dif->reg[rn][l2] = 0;
+  }
+
   dif->lhs_i += l1;
   dif->rhs_i += l2;
   trace("<-testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
