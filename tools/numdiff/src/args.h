@@ -24,7 +24,7 @@
 #include "types.h"
 
 struct option {
-  int check, debug, serie, list, blank, utest, keep, reset, lgopt;
+  int check, debug, serie, list, blank, utest, keep, reset, lgopt, trunc;
   const char *suite, *test;
   const char *fmt, *sfmt;
   const char *chr;

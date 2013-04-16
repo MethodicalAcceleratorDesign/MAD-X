@@ -154,6 +154,7 @@ usage(void)
   inform("\t    --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
   inform("\t-t  --test name     set test name for output message (item)");
   inform("\t    --trace         enable trace mode (very verbose, include debug mode)");
+  inform("\t    --trunc         allow premature ending of one of the input file");
   inform("\t    --utest         run the numdiff unit tests (still incomplete)");
   inform("\t-x  --xcheck        enable cross check mode (algorithms cross check)");
   inform("\t-z  --reset         reset accumulated information");
@@ -248,6 +249,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--long")) {
       debug("short options disabled");
       option.lgopt = 1;
+      continue;
+    }
+
+    // enable truncation [setup]
+    if (!strcmp(argv[option.argi], "--trunc")) {
+      debug("premature truncation allowed");
+      option.trunc = 1;
       continue;
     }
 

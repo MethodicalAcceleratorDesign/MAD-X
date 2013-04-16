@@ -31,7 +31,7 @@ diff_summary(const struct ndiff *dif)
   int n, c;
   ndiff_getInfo(dif, &n, 0, &c, 0);
 
-  if (!ndiff_feof(dif, 1)) {
+  if (!ndiff_feof(dif, 1) && !option.trunc) {
     c += 1;
     warning("diff of '%s'|'%s' ended prematurely (truncated output?)", option.lhs_file, option.rhs_file);
   }
