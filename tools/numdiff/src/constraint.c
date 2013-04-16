@@ -152,7 +152,6 @@ readEps(struct eps *e, FILE *in, int row)
 // numeric constraints
     else if (strcmp(str, "scl") == 0 && (n = fscanf(in, "=%lf", &e->scl)) == 1) {
                         trace("[%d] scl=%g", row, e->scl);
-      ensure(e->scl != 0.0, "invalid zero error scale (%s:%d)", option.cfg_file, row);
     }
     else if (strcmp(str, "scl") == 0 && (n = fscanf(in, "reg%d", &rn)) == 1) {
                         trace("[%d] scl=reg%d", row, rn); e->scl_reg = rn;
@@ -236,22 +235,34 @@ readEps(struct eps *e, FILE *in, int row)
     }
 
 // indirections
+    else if (strcmp(str, "lhs") == 0 && (n = fscanf(in, "=reg%d", &rn)) == 1) {
+      cmd |= eps_llhs; trace("[%d] lhs=reg%d", row, rn);  e->llhs_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
+    else if (strcmp(str, "rhs") == 0 && (n = fscanf(in, "=reg%d", &rn)) == 1) {
+      cmd |= eps_lrhs; trace("[%d] rhs=reg%d", row, rn);  e->lrhs_reg = rn;
+      ensure(is_reg(rn), "invalid register number (%s:%d)", option.cfg_file, row);
+    }
     else if (strncmp(str, "reg", 3) == 0 && (n = fscanf(in, "=%16[^ \t\n\r!#]", buf)) == 1) {
       buf[sizeof buf-1] = 0;
       rn = strtol(str+3, &end, 10);
       trace("[%d] reg%d=%s", row, rn, buf);
       ensure(is_reg(rn) && !*end, "invalid register number (%s:%d)", option.cfg_file, row);
 
-           if (strcmp (buf, "lhs"   ) == 0) { e->lhs_reg = rn; cmd |= eps_lhs; }
-      else if (strcmp (buf, "rhs"   ) == 0) { e->rhs_reg = rn; cmd |= eps_rhs; }
-      else if (strncmp(buf, "reg", 3) == 0) { e->dst_reg = rn; cmd |= eps_cpy;
+           if (strcmp (buf, "lhs"   ) == 0) { e->slhs_reg = rn; cmd |= eps_slhs; }
+      else if (strcmp (buf, "rhs"   ) == 0) { e->srhs_reg = rn; cmd |= eps_srhs; }
+      else if (strncmp(buf, "reg", 3) == 0) {                   cmd |= eps_move;
         int rn_p = 0, rn_q = 0;
         int k = sscanf(buf, "reg%d-%d", &rn_p, &rn_q);
         ensure((k == 1 && is_reg(rn_p) && rn_q == 0   ) ||
                (k == 2 && is_reg(rn_p) && is_reg(rn_q) && rn_p <= rn_q),
                "invalid registers range (%s:%d)", option.cfg_file, row);
-        e->src_reg = rn_p;
-        e->cnt_reg = rn_q ? rn_q-rn_p+1 : 1;
+        ensure(e->n_reg < 5, "too many move commands (%s:%d)", option.cfg_file, row);
+        int nr = e->n_reg;
+        e->dst_reg[nr] = rn;
+        e->src_reg[nr] = rn_p;
+        e->cnt_reg[nr] = rn_q ? rn_q-rn_p+1 : 1;
+        e->n_reg++;
       }
       else error("invalid register assigment (%s:%d)", option.cfg_file, row);
     }
@@ -338,13 +349,17 @@ constraint_print(const T* cst, FILE *out)
       fprintf(out, "-dig=%g ", cst->eps._dig);
   }   
 
-  if (cst->eps.cmd & eps_lhs)  fprintf(out, "reg%d=lhs ", cst->eps.lhs_reg);
-  if (cst->eps.cmd & eps_rhs)  fprintf(out, "reg%d=rhs ", cst->eps.rhs_reg);
-  if (cst->eps.cmd & eps_cpy) {
-    if (cst->eps.cnt_reg > 1)
-      fprintf(out, "reg%d=reg%d-%d ", cst->eps.dst_reg, cst->eps.src_reg, cst->eps.src_reg+cst->eps.cnt_reg);
-    else
-      fprintf(out, "reg%d=reg%d ", cst->eps.dst_reg, cst->eps.src_reg);
+  if (cst->eps.cmd & eps_llhs)  fprintf(out, "lhs=reg%d ", cst->eps.llhs_reg);
+  if (cst->eps.cmd & eps_lrhs)  fprintf(out, "rhs=reg%d ", cst->eps.lrhs_reg);
+  if (cst->eps.cmd & eps_slhs)  fprintf(out, "reg%d=lhs ", cst->eps.slhs_reg);
+  if (cst->eps.cmd & eps_srhs)  fprintf(out, "reg%d=rhs ", cst->eps.srhs_reg);
+  if (cst->eps.cmd & eps_move) {
+    for (int i=0; i < cst->eps.n_reg; i++) {
+      if (cst->eps.cnt_reg[i] > 1)
+        fprintf(out, "reg%d=reg%d-%d ", cst->eps.dst_reg[i], cst->eps.src_reg[i], cst->eps.src_reg[i]+cst->eps.cnt_reg[i]);
+      else
+        fprintf(out, "reg%d=reg%d ", cst->eps.dst_reg[i], cst->eps.src_reg[i]);
+    }
   }
 }
 

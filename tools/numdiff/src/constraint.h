@@ -35,30 +35,32 @@ enum eps_cmd {
   eps_equ    = 1u <<  3,  // equal string
   eps_ign    = 1u <<  4,  // ignore value
   eps_istr   = 1u <<  5,  // ignore strings
-  eps_any    = 1u <<  6,  // any qualifier
 
-// intermediate (commands)
-  eps_lhs    = 1u <<  7,  // save lhs number
-  eps_rhs    = 1u <<  8,  // save rhs number
-  eps_cpy    = 1u <<  9,  // copy register(s)
-  eps_omit   = 1u << 10,  // omit qualifier
-  eps_trace  = 1u << 11,  // trace rule
+// intermediate (commands & qualifiers)
+  eps_any    = 1u <<  6,  // any qualifier
+  eps_llhs   = 1u <<  7,  // load reg in x
+  eps_lrhs   = 1u <<  8,  // load reg in y
+  eps_slhs   = 1u <<  9,  // save x in reg
+  eps_srhs   = 1u << 10,  // save y in reg
+  eps_move   = 1u << 11,  // copy register(s)
+  eps_omit   = 1u << 12,  // omit qualifier
+  eps_trace  = 1u << 13,  // trace qualifier
 
 // must be lasts (actions)
-  eps_skip   = 1u << 12,  // skip line, must be first action!!
-  eps_goto   = 1u << 13,  // go to tag
-  eps_gonum  = 1u << 14,  // go to number
+  eps_skip   = 1u << 14,  // skip line, must be first action!!
+  eps_goto   = 1u << 15,  // go to tag
+  eps_gonum  = 1u << 16,  // go to number
 
 // marker & mask
-  eps_last   = 1u << 15,  // the end
+  eps_last   = 1u << 17,  // the end
   eps_mask   = eps_last - 1,
 
-// non-persistent
+// non-persistent commands & qualifiers
   eps_large  = eps_last << 0,  // large tolerance
 
 // unions
-  eps_dra  =  eps_abs  | eps_rel  | eps_dig,
-  eps_sgg  =  eps_skip | eps_goto | eps_gonum,
+  eps_dra    =  eps_abs  | eps_rel  | eps_dig,
+  eps_sgg    =  eps_skip | eps_goto | eps_gonum,
 };
 
 // ----- types
@@ -70,11 +72,13 @@ struct eps {
   double  abs,  rel,  dig;
   double _abs, _rel, _dig;
 
-  char    lhs_reg,  rhs_reg;
-  char    src_reg,  dst_reg,  cnt_reg;
+  char    scl_reg,  gto_reg;
   char    abs_reg,  rel_reg,  dig_reg;
   char   _abs_reg, _rel_reg, _dig_reg;
-  char    scl_reg,  gto_reg;
+
+  char    slhs_reg, srhs_reg;
+  char    llhs_reg, lrhs_reg;
+  char    src_reg[5], dst_reg[5], cnt_reg[5], n_reg;
 
   char    tag[64];
 };
