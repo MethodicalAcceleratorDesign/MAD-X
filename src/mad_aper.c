@@ -81,19 +81,31 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   if ( (*ap1) >= (*ap3) ) {
     alfa = 0.;
   }
-  else {
-    y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
-    alfa=atan2(y,*ap1);
+  else { // 2013-Apr-16  15:38:43  ghislain: following formula is wrong and has been replaced
+    // y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
+    // alfa=atan2(y,*ap1);
+    // 2013-Apr-15  16:24:49 ghislain -- 
+    y = (*ap4)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
+    if (y>(*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
+      alfa=atan2((*ap2),(*ap1)); 
+    else // the rectangle extends beyond the ellipse; there is a curved part
+      alfa = atan2(y,*ap1);
   }
 
   if ( (*ap2) >= (*ap4) ) {
     theta = 0.;
   }
-  else {
-    x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
-    y=sqrt((*ap3)*(*ap3)-x*x);
-    theta=atan2(x,y);
-  }
+  else { // 2013-Apr-16  15:41:13  ghislain: following formula is wrong and has been replaced
+    // x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
+    // y=sqrt((*ap3)*(*ap3)-x*x);
+    // theta=atan2(x,y);
+    // 2013-Apr-15  16:26:26 ghislain -- 
+      x = (*ap3)*sqrt(1-((*ap2)*(*ap2))/((*ap4)*(*ap4)));
+      if (x>(*ap1)) // the rectangle is contained within the ellipse; there is no curved part.
+	theta=atan2((*ap1),(*ap2)); 
+      else // the rectangle extends beyond the ellipse; there is a curved part 
+	theta = atan2(x,*ap2);
+ }
 
   dangle=(pi/2-(alfa+theta))/napex;
 
