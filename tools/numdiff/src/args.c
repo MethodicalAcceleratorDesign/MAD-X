@@ -25,6 +25,7 @@
 #include "error.h"
 #include "ndiff.h"
 #include "context.h"
+#include "register.h"
 
 #ifndef VERSION
 #define VERSION "2013.04.15"
@@ -46,6 +47,10 @@
 #define MAXKEEP 25
 #endif
 
+#ifndef MAXREGS
+#define MAXREGS 99
+#endif
+
 #ifndef OUTFILEEXT
 #define OUTFILEEXT ".out"
 #endif
@@ -56,6 +61,10 @@
 
 #ifndef CFGFILEEXT
 #define CFGFILEEXT ".cfg"
+#endif
+
+#ifndef RESFILEEXT
+#define RESFILEEXT ".res"
 #endif
 
 #ifndef UNZIPCMD
@@ -83,11 +92,15 @@ struct option option = {
   // punctuation part of identifiers
   .chr = PUNCTCHRS,
 
-  // number of diff displayed
+  // number of diff displayed by default
   .keep = MAXKEEP,
 
+  // number of registers allocated by default
+  .nregs = MAXREGS > REG_MAX ? REG_MAX : MAXREGS,
+
   // file extensions
-  .out_e  = OUTFILEEXT, .ref_e =  REFFILEEXT, .cfg_e = CFGFILEEXT,
+  .out_e = OUTFILEEXT, .ref_e = REFFILEEXT,
+  .cfg_e = CFGFILEEXT, .res_e = RESFILEEXT,
 
   // unzip commands
   .unzip = { UNZIPCMD, GZIPCMD, BZIP2CMD}
@@ -137,19 +150,24 @@ usage(void)
   inform("options:");
   inform("\t-a  --accum file    accumulate tests information in file");
   inform("\t-b  --blank         ignore blank spaces (space and tabs)");
-  inform("\t-c  --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
+  inform("\t    --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
   inform("\t-d  --debug         enable debug mode (include xcheck mode)");
   inform("\t-h  --help          display this help");
   inform("\t-i  --info          enable info mode (default)");
   inform("\t-k  --keep num      specify the number of diffs to display per file, default is %d", option.keep);
+  inform("\t    --lhsout        output valid lines of left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
+  inform("\t-w  --nowarn        disable warnings");
+  inform("\t-m  --regs num      specify the number of registers to allocate");
   inform("\t-n  --serie         enable serie mode (indexed filenames)");
   inform("\t    --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
-  inform("\t-o  --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
-  inform("\t-p  --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
+  inform("\t    --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
+  inform("\t    --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q  --quiet         enable quiet mode (no output if no diff)");
-  inform("\t-r  --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
+  inform("\t    --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
+  inform("\t    --resext ext    specify the result file extension, default is \"%s\"", option.res_e);
+  inform("\t    --rhsout        output valid lines of right file to its result file");
   inform("\t-s  --suite name    set test suite name for output message (title)");
   inform("\t    --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
   inform("\t-t  --test name     set test name for output message (item)");
@@ -167,18 +185,20 @@ usage(void)
 
   inform("");
   inform("rules (%s):", option.cfg_e);
-  inform("\t#row-range  column-range  commands");
+  inform("\t#rows       cols          commands");
   inform("\t 1-5        *             skip                            # banner");
   inform("\t *          2-$           any abs=1e-15 rel=1e-12 dig=1.5 # global");
   inform("\t 41         *             goto='penalty function'         # jump");
   inform("\t 109:20/5   2-8/3         abs=1e-8                        # specific");
 
+  inform("");
   inform("ranges:");
   inform("\tnum                 row or column number, num >= 0");
   inform("\trange               start - end  [/ stride]");
   inform("\tslice               start : size [/ stride]");
   inform("\t$, *                last row or column, alias for 0-$");
 
+  inform("");
   inform("commands:");
   inform("\tabs=num or reg      absolute error (0 <= num <= 1)");
   inform("\t-abs=num or reg    negative absolute error (-1 <= num <= 0)");
@@ -193,18 +213,33 @@ usage(void)
   inform("\tistr                ignore strings while scanning for numbers");
   inform("\tlarge               allow num > 1 in  abs and  rel ");
   inform("\t                    and  num < -1 in -abs and -rel (qualifier)");
+  inform("\tlhs=num or reg      set left hand side 'x'");
+  inform("\toff=num or reg      set error offset 'b'");
   inform("\tomit='tag'          ignore strings or numbers if preceded by 'tag'");
-  inform("\tregN=lhs            assign number read from left file to register N");
-  inform("\tregN=rhs            assign number read from left file to register N");
-  inform("\tregN=regP           copy number from register P to register N");
-  inform("\tregN=regP-Q         copy numbers from registers P..Q to N..N+Q-P");
   inform("\trel=num or reg      relative error (0 <= num <= 1)");
   inform("\t-rel=num or reg     negative relative error (-1 <= num <= 0)");
-  inform("\tscl=num or reg      set error scaling factor (non-zero, default 1)");
+  inform("\trhs=num or reg      set right hand side 'y'");
+  inform("\tscl=num or reg      set error scaling factor 'a'");
   inform("\tskip                skip lines (action)");
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
   inform("\t                    num < -1 in -abs and -rel (default, qualifier)");
   inform("\ttrace               trace rule when active (debug, qualifier)");
+
+  inform("");
+  inform("indirections:");
+  inform("\t=-Rn                load or move negated value from register n");
+  inform("\t=/Rn                load or move inverted value from register n");
+  inform("\t=-/Rn               load or move negated and inverted value from register n");
+  inform("\tRn=num              save number to register n");
+  inform("\tRn=lhs              save number read from left file to register n");
+  inform("\tRn=rhs              save number read from right file to register n");
+  inform("\tRn=dif              save x-y to register n");
+  inform("\tRn=err              save a(x-y) to register n");
+  inform("\tRn=abs              save computed absolute error to register n");
+  inform("\tRn=rel              save computed relative error to register n");
+  inform("\tRn=dig              save computed digital relative error to register n");
+  inform("\tRn=Rp               move number from register p to register n");
+  inform("\tRn=Rp..Rq           move numbers from registers p..q to n..n+q-p");
 
   inform("");
   inform("info   :\thttp://cern.ch/mad/numdiff");
@@ -223,53 +258,24 @@ parse_args(int argc, const char *argv[])
     // not an option
     if (!is_option(argv[option.argi])) return;
 
-// ---- [action]
-
-    // display help [action]
-    if (!strcmp(argv[option.argi], "--help") || (!option.lgopt && !strcmp(argv[option.argi], "-h"))) {
-      usage();
+    // set accumulation filename [setup]
+    if (!strcmp(argv[option.argi], "--accum") || (!option.lgopt && !strcmp(argv[option.argi], "-a"))) {
+      option.accum = argv[++option.argi]; 
+      debug("accumulation filename set to '%s'", option.accum);
       continue;
     }
 
-    // run utests [action]
-    if (!strcmp(argv[option.argi], "--utest")) {
-      run_utest();
-      option.utest += 1;
+    // set blank mode [setup]
+    if (!strcmp(argv[option.argi], "--blank") || (!option.lgopt && !strcmp(argv[option.argi], "-b"))) {
+      debug("blank spaces ignored");
+      option.blank = 1;
       continue;
     }
 
-    // reset accumulation information [action]
-    if (!strcmp(argv[option.argi], "--reset") || (!option.lgopt && !strcmp(argv[option.argi], "-z"))) {
-      ensure(option.accum, "no accumulation file specified");
-      debug("reseting file '%s'", option.accum);
-      option.reset = 1;
-      accum_summary(0, 0, 0, 0);
-      continue;
-    }
-
-// ---- [setup]
-
-    // disable short options [setup]
-    if (!strcmp(argv[option.argi], "--long")) {
-      debug("short options disabled");
-      option.lgopt = 1;
-      continue;
-    }
-
-    // enable truncation [setup]
-    if (!strcmp(argv[option.argi], "--trunc")) {
-      debug("premature truncation allowed");
-      option.trunc = 1;
-      continue;
-    }
-
-    // set trace mode [setup]
-    if (!strcmp(argv[option.argi], "--trace")) {
-      logmsg_config.level = trace_level;
-      logmsg_config.locate = 1;
-      debug("trace mode on");
-      option.debug = 1;
-      option.check = 1;
+    // set config extension [setup]
+    if (!strcmp(argv[option.argi], "--cfgext")) {
+      option.cfg_e = argv[++option.argi]; 
+      debug("config extension set to '%s'", option.cfg_e);
       continue;
     }
 
@@ -283,11 +289,75 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
+    // display help [action]
+    if (!strcmp(argv[option.argi], "--help") || (!option.lgopt && !strcmp(argv[option.argi], "-h"))) {
+      usage();
+      continue;
+    }
+
     // set info mode [setup]
     if (!strcmp(argv[option.argi], "--info") || (!option.lgopt && !strcmp(argv[option.argi], "-i"))) {
       debug("info mode on");
       logmsg_config.level = inform_level;
       logmsg_config.locate = 0;
+      continue;
+    }
+
+    // set keep number [setup]
+    if (!strcmp(argv[option.argi], "--keep") || (!option.lgopt && !strcmp(argv[option.argi], "-k"))) {
+      option.keep = strtoul(argv[++option.argi],0,0);
+      debug("keep set to %d", option.keep);
+      continue;
+    }
+
+    // set list mode [setup]
+    if (!strcmp(argv[option.argi], "--list") || (!option.lgopt && !strcmp(argv[option.argi], "-l"))) {
+      debug("list mode on");
+      option.list = 1;
+      continue;
+    }
+
+    // disable short options [setup]
+    if (!strcmp(argv[option.argi], "--long")) {
+      debug("short options disabled");
+      option.lgopt = 1;
+      continue;
+    }
+
+    // set debug mode [setup]
+    if (!strcmp(argv[option.argi], "--nowarn") || (!option.lgopt && !strcmp(argv[option.argi], "-w"))) {
+      debug("no warning mode on");
+      logmsg_config.level = error_level;
+      logmsg_config.locate = 0;
+      option.nowarn = 1;
+      continue;
+    }
+
+    // set output extension [setup]
+    if (!strcmp(argv[option.argi], "--outext")) {
+      option.out_e = argv[++option.argi]; 
+      debug("output extension set to '%s'", option.out_e);
+      continue;
+    }
+
+    // enable left result [setup]
+    if (!strcmp(argv[option.argi], "--lhsout")) {
+      debug("left results enabled");
+      option.lhs_out = 1;
+      continue;
+    }
+
+    // enable right result [setup]
+    if (!strcmp(argv[option.argi], "--rhsout")) {
+      debug("right results enabled");
+      option.rhs_out = 1;
+      continue;
+    }
+
+    // set punctuation characters [setup]
+    if (!strcmp(argv[option.argi], "--punct")) {
+      option.chr = argv[++option.argi]; 
+      debug("punctuation characters set to '%s'", option.chr);
       continue;
     }
 
@@ -299,38 +369,33 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set check mode [setup]
-    if (!strcmp(argv[option.argi], "--xcheck") || (!option.lgopt && !strcmp(argv[option.argi], "-x"))) {
-      debug("check mode on");
-      option.check = 1;
+    // set reference extension [setup]
+    if (!strcmp(argv[option.argi], "--refext")) {
+      option.ref_e = argv[++option.argi]; 
+      debug("reference extension set to '%s'", option.ref_e);
       continue;
     }
 
-    // set blank mode [setup]
-    if (!strcmp(argv[option.argi], "--blank") || (!option.lgopt && !strcmp(argv[option.argi], "-b"))) {
-      debug("blank spaces ignored");
-      option.blank = 1;
+    // set result extension [setup]
+    if (!strcmp(argv[option.argi], "--resext")) {
+      option.res_e = argv[++option.argi]; 
+      debug("result extension set to '%s'", option.res_e);
       continue;
     }
 
-    // set accumulation filename [setup]
-    if (!strcmp(argv[option.argi], "--accum") || (!option.lgopt && !strcmp(argv[option.argi], "-a"))) {
-      option.accum = argv[++option.argi]; 
-      debug("accumulation filename set to '%s'", option.accum);
+    // set number of registers [setup]
+    if (!strcmp(argv[option.argi], "--regs") || (!option.lgopt && !strcmp(argv[option.argi], "-m"))) {
+      option.nregs = imin(REG_MAX, strtoul(argv[++option.argi],0,0));
+      debug("number of registers set to %d", option.nregs);
       continue;
     }
 
-    // set suite name [setup]
-    if (!strcmp(argv[option.argi], "--suite") || (!option.lgopt && !strcmp(argv[option.argi], "-s"))) {
-      option.suite = argv[++option.argi];
-      debug("suite name set to '%s'", option.suite);
-      continue;
-    }
-
-    // set suite format [setup]
-    if (!strcmp(argv[option.argi], "--suitefmt")) {
-      option.sfmt = argv[++option.argi];
-      debug("suite format set to '%s'", option.sfmt);
+    // reset accumulation information [action]
+    if (!strcmp(argv[option.argi], "--reset") || (!option.lgopt && !strcmp(argv[option.argi], "-r"))) {
+      ensure(option.accum, "no accumulation file specified");
+      debug("reseting file '%s'", option.accum);
+      option.reset = 1;
+      accum_summary(0, 0, 0, 0);
       continue;
     }
 
@@ -348,10 +413,17 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set list mode [setup]
-    if (!strcmp(argv[option.argi], "--list") || (!option.lgopt && !strcmp(argv[option.argi], "-l"))) {
-      debug("list mode on");
-      option.list = 1;
+    // set suite name [setup]
+    if (!strcmp(argv[option.argi], "--suite") || (!option.lgopt && !strcmp(argv[option.argi], "-s"))) {
+      option.suite = argv[++option.argi];
+      debug("suite name set to '%s'", option.suite);
+      continue;
+    }
+
+    // set suite format [setup]
+    if (!strcmp(argv[option.argi], "--suitefmt")) {
+      option.sfmt = argv[++option.argi];
+      debug("suite format set to '%s'", option.sfmt);
       continue;
     }
 
@@ -362,45 +434,43 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set keep number [setup]
-    if (!strcmp(argv[option.argi], "--keep") || (!option.lgopt && !strcmp(argv[option.argi], "-k"))) {
-      option.keep = strtoul(argv[++option.argi],0,0);
-      debug("keep set to %d", option.keep);
+    // set trace mode [setup]
+    if (!strcmp(argv[option.argi], "--trace")) {
+      logmsg_config.level = trace_level;
+      logmsg_config.locate = 1;
+      debug("trace mode on");
+      option.debug = 1;
+      option.check = 1;
       continue;
     }
 
-    // set punctuation characters [setup]
-    if (!strcmp(argv[option.argi], "--punct") || (!option.lgopt && !strcmp(argv[option.argi], "-p"))) {
-      option.chr = argv[++option.argi]; 
-      debug("punctuation characters set to '%s'", option.chr);
+    // enable truncation [setup]
+    if (!strcmp(argv[option.argi], "--trunc")) {
+      debug("premature truncation allowed");
+      option.trunc = 1;
       continue;
     }
 
-    // set output extension [setup]
-    if (!strcmp(argv[option.argi], "--outext") || (!option.lgopt && !strcmp(argv[option.argi], "-o"))) {
-      option.out_e = argv[++option.argi]; 
-      debug("output extension set to '%s'", option.out_e);
+    // run utests [action]
+    if (!strcmp(argv[option.argi], "--utest")) {
+      run_utest();
+      option.utest += 1;
       continue;
     }
 
-    // set reference extension [setup]
-    if (!strcmp(argv[option.argi], "--refext") || (!option.lgopt && !strcmp(argv[option.argi], "-r"))) {
-      option.ref_e = argv[++option.argi]; 
-      debug("reference extension set to '%s'", option.ref_e);
+    // set check mode [setup]
+    if (!strcmp(argv[option.argi], "--xcheck") || (!option.lgopt && !strcmp(argv[option.argi], "-x"))) {
+      debug("check mode on");
+      option.check = 1;
       continue;
     }
 
-    // set config extension [setup]
-    if (!strcmp(argv[option.argi], "--cfgext") || (!option.lgopt && !strcmp(argv[option.argi], "-c"))) {
-      option.cfg_e = argv[++option.argi]; 
-      debug("config extension set to '%s'", option.cfg_e);
-      continue;
-    }
+// ---- [decompression]
 
-    // set primary unzip command [setup]
-    if (!strcmp(argv[option.argi], "--unzip")) {
-      option.unzip[0] = argv[++option.argi]; 
-      debug("unzip command set to '%s'", option.unzip[0]);
+    // set tertiary unzip command [setup]
+    if (!strcmp(argv[option.argi], "--bzip2")) {
+      option.unzip[2] = argv[++option.argi]; 
+      debug("bzip2 command set to '%s'", option.unzip[2]);
       continue;
     }
 
@@ -411,14 +481,14 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set tertiary unzip command [setup]
-    if (!strcmp(argv[option.argi], "--bzip2")) {
-      option.unzip[2] = argv[++option.argi]; 
-      debug("bzip2 command set to '%s'", option.unzip[2]);
+    // set primary unzip command [setup]
+    if (!strcmp(argv[option.argi], "--unzip")) {
+      option.unzip[0] = argv[++option.argi]; 
+      debug("unzip command set to '%s'", option.unzip[0]);
       continue;
     }
 
-    // unknown option
+// ---- [unknown]
     invalid_option(argv[option.argi]);
   }
 

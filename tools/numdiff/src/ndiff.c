@@ -22,11 +22,12 @@
 #include <math.h>
 
 #include "args.h"
-#include "ndiff.h"
-#include "constraint.h"
-#include "context.h"
 #include "error.h"
 #include "utils.h"
+#include "ndiff.h"
+#include "context.h"
+#include "register.h"
+#include "constraint.h"
 
 #define T struct ndiff
 #define C struct constraint
@@ -42,7 +43,8 @@ struct ndiff {
   struct context* cxt;
 
   // registers
-  char reg[100][64];
+  double *reg;
+  int     reg_n;
 
   // options
   int blank, check;
@@ -55,7 +57,7 @@ struct ndiff {
 
   // buffers
   int   lhs_i,  rhs_i; // char-columns
-  int   buf_s;         // capacity
+  int   buf_n;         // capacity
   char *lhs_b, *rhs_b;
 };
 
@@ -193,23 +195,38 @@ is_valid_omit(const char *lhs_p, const char *rhs_p, const T *dif, const char *ta
 // ----- private (ctor & dtor helpers)
 
 static inline void
-ndiff_setup (T *dif, int n)
+ndiff_reset_buf (T *dif)
 {
-  enum { min_alloc = 65536 };
+  dif->lhs_i = dif->rhs_i = 0;
+  dif->lhs_b[0] = dif->rhs_b[0] = 0;
+}
+
+static inline void
+ndiff_setup (T *dif, int n, int r)
+{
+  enum { min_alloc = 65536, min_regs = 99 };
 
   if (n < min_alloc) n = min_alloc;
+  if (r < min_regs ) r = min_regs;
+  if (r > REG_MAX  ) r = REG_MAX;
 
   dif->lhs_b = malloc(n * sizeof *dif->lhs_b);
   dif->rhs_b = malloc(n * sizeof *dif->rhs_b);
-  ensure(dif->lhs_b && dif->rhs_b, "out of memory");
+  dif->reg   = malloc(r * sizeof *dif->reg  );
+  ensure(dif->lhs_b && dif->rhs_b && dif->reg, "out of memory");
+
+  dif->lhs_b[0] = 0;
+  dif->rhs_b[0] = 0;
+  memset(dif->reg, 0, r * sizeof *dif->reg);
 
   *dif = (T) {
     .lhs_f = dif->lhs_f, .rhs_f = dif->rhs_f,
     .lhs_b = dif->lhs_b, .rhs_b = dif->rhs_b,
     .blank = dif->blank, .check = dif->check,
+    .max_i = dif->max_i,
+    .reg = dif->reg, .reg_n = r,
     .cxt = dif->cxt,      
-    .buf_s = n,
-    .max_i = 25
+    .buf_n = n
   };
 }
 
@@ -218,6 +235,7 @@ ndiff_teardown (T *dif)
 {
   free(dif->lhs_b);
   free(dif->rhs_b);
+  free(dif->reg  );
 
   *dif = (T) {
     .lhs_f = dif->lhs_f, .rhs_f = dif->rhs_f,
@@ -229,19 +247,12 @@ ndiff_teardown (T *dif)
 static inline void
 ndiff_grow (T *dif, int n)
 {
-  if (n > dif->buf_s) { // enlarge on need
+  if (n > dif->buf_n) { // enlarge on need
     dif->lhs_b = realloc(dif->lhs_b, n * sizeof *dif->lhs_b);
     dif->rhs_b = realloc(dif->rhs_b, n * sizeof *dif->rhs_b);
     ensure(dif->lhs_b && dif->rhs_b, "out of memory");
-    dif->buf_s = n;
+    dif->buf_n = n;
   }
-}
-
-static inline void
-ndiff_reset_buf (T *dif)
-{
-  dif->lhs_i = dif->rhs_i = 0;
-  dif->lhs_b[0] = dif->rhs_b[0] = 0;
 }
 
 // ----- private (error helpers)
@@ -275,7 +286,7 @@ ndiff_header(void)
 // -----------------------------------------------------------------------------
 
 T*
-ndiff_alloc (FILE *lhs_f, FILE *rhs_f, struct context *cxt, int n_)
+ndiff_alloc (FILE *lhs_f, FILE *rhs_f, struct context *cxt, int n_, int r_)
 {
   assert(lhs_f && rhs_f);
 
@@ -284,7 +295,7 @@ ndiff_alloc (FILE *lhs_f, FILE *rhs_f, struct context *cxt, int n_)
 
   *dif = (T) { .lhs_f = lhs_f, .rhs_f = rhs_f, .cxt = cxt };
 
-  ndiff_setup(dif, n_);
+  ndiff_setup(dif, n_, r_);
   return dif;
 }
 
@@ -300,8 +311,9 @@ void
 ndiff_clear (T *dif)
 {
   assert(dif);
+  int rn = dif->reg_n;
   ndiff_teardown(dif);
-  ndiff_setup(dif, 0);
+  ndiff_setup(dif, 0, rn);
 }
 
 int
@@ -354,10 +366,10 @@ ndiff_readLine (T *dif)
   ndiff_reset_buf(dif);
 
   while (1) {
-    c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_s-s1, &n); s1 += n;
-    c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_s-s2, &n); s2 += n;
+    c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_n-s1, &n); s1 += n;
+    c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_n-s2, &n); s2 += n;
     if (c1 == '\n' || c2 == '\n' || c1 == EOF || c2 == EOF) break;
-    ndiff_grow(dif, 2*dif->buf_s);
+    ndiff_grow(dif, 2*dif->buf_n);
   }
 
   dif->col_i  = 0;
@@ -365,6 +377,17 @@ ndiff_readLine (T *dif)
 
   trace("  buffers: '%.25s'|'%.25s'", dif->lhs_b, dif->rhs_b);
   trace("<-readLine line %d", dif->row_i);
+
+  return c1 == EOF || c2 == EOF ? EOF : !EOF;
+}
+
+int
+ndiff_outLine(T *dif, FILE *lhs_fp, FILE *rhs_fp)
+{
+  int c1=0, c2=0;
+
+  if (lhs_fp) c1 = fprintf(lhs_fp, "%s\n", dif->lhs_b);
+  if (rhs_fp) c2 = fprintf(rhs_fp, "%s\n", dif->rhs_b);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -388,9 +411,9 @@ ndiff_gotoLine (T *dif, const C *c)
     if (c1 == EOF) break;
 
     while (1) {
-      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_s-s, &n); s += n;
+      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_n-s, &n); s += n;
       if (c1 == '\n' || c1 == EOF) break;
-      ndiff_grow(dif, 2*dif->buf_s);
+      ndiff_grow(dif, 2*dif->buf_n);
     }
 
     i1 += 1;
@@ -410,9 +433,9 @@ ndiff_gotoLine (T *dif, const C *c)
     if (c2 == EOF) break;
 
     while (1) {
-      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_s-s, &n); s += n;
+      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_n-s, &n); s += n;
       if (c2 == '\n' || c2 == EOF) break;
-      ndiff_grow(dif, 2*dif->buf_s);
+      ndiff_grow(dif, 2*dif->buf_n);
     }
 
     i2 += 1;
@@ -438,19 +461,21 @@ ndiff_gotoNum (T *dif, const C *c)
 {
   assert(dif && c);
 
-  C _c = *c;
-  if (_c.eps.gto_reg)
-    memcpy(_c.eps.tag, dif->reg[(int)_c.eps.gto_reg], sizeof _c.eps.tag);
-
-  if ((_c.eps.cmd & eps_equ) && slice_isFull(&_c.col))
-    return ndiff_gotoLine(dif, &_c);
-
-  int c1=0, c2=0, i1=0, i2=0;
-
   trace("->gotoNum line %d", dif->row_i);
 
+  int c1=0, c2=0, i1=0, i2=0;
+  C _c = *c;
+
+  if (c->eps.gto_reg)
+    sprintf(_c.eps.tag, "%.17g", reg_getval(dif->reg, dif->reg_n, c->eps.gto_reg, 0));
+
+  if ((c->eps.cmd & eps_equ) && slice_isFull(&c->col))
+    return ndiff_gotoLine(dif, &_c);
+
+//  warning("gotoNum not yet implemented");
+
   // --- lhs ---
-  memcpy(dif->rhs_b, _c.eps.gto_reg ? dif->reg[(int)_c.eps.gto_reg] : _c.eps.tag, sizeof _c.eps.tag);
+  memcpy(dif->rhs_b, _c.eps.tag, sizeof _c.eps.tag);
 
   while (1) {
     int s = 0, n = 0;
@@ -461,9 +486,9 @@ ndiff_gotoNum (T *dif, const C *c)
     if (c1 == EOF) break;
 
     while (1) {
-      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_s-s, &n); s += n;
+      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_n-s, &n); s += n;
       if (c1 == '\n' || c1 == EOF) break;
-      ndiff_grow(dif, 2*dif->buf_s);
+      ndiff_grow(dif, 2*dif->buf_n);
     }
 
     i1 += 1;
@@ -484,7 +509,7 @@ lhs_done: ;
   // --- rhs ---
   char tag[sizeof _c.eps.tag];
   memcpy(tag, dif->lhs_b, sizeof tag);
-  memcpy(dif->lhs_b, _c.eps.gto_reg ? dif->reg[(int)_c.eps.gto_reg] : _c.eps.tag, sizeof _c.eps.tag);
+  memcpy(dif->lhs_b, _c.eps.tag, sizeof _c.eps.tag);
   _c.eps.scl = -_c.eps.scl;
   _c.eps.scl_reg = -_c.eps.scl_reg;
 
@@ -497,9 +522,9 @@ lhs_done: ;
     if (c2 == EOF) break;
 
     while (1) {
-      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_s-s, &n); s += n;
+      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_n-s, &n); s += n;
       if (c2 == '\n' || c2 == EOF) break;
-      ndiff_grow(dif, 2*dif->buf_s);
+      ndiff_grow(dif, 2*dif->buf_n);
     }
 
     i2 += 1;
@@ -628,8 +653,8 @@ ndiff_testNum (T *dif, const C *c)
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
   char *end;
 
-  double lhs_d, rhs_d, scl_d;
-  double dif_d=0, abs_d=0, min_d=0, pow_d=0;
+  double lhs_d=0, rhs_d=0, scl_d=0, off_d=0, min_d=0, pow_d=0;
+  double dif_d=0, err_d=0, abs_d=0, rel_d=0, dig_d=0;
   double abs=0, _abs=0, rel=0, _rel=0, dig=0, _dig=0;
 
   trace("->testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
@@ -641,39 +666,29 @@ ndiff_testNum (T *dif, const C *c)
   int l2 = parse_number(rhs_p, &d2, &n2, &e2, &f2);
   int ret = 0;
 
-  // indirections
-  char *restrict llhs_p = c->eps.llhs_reg ? dif->reg[(int)c->eps.llhs_reg] : lhs_p;
-  char *restrict lrhs_p = c->eps.lrhs_reg ? dif->reg[(int)c->eps.lrhs_reg] : rhs_p;
-  int ll1 = l1;
-  int ll2 = l2;
-
   // missing numbers
-  if (!ll1 || !ll2) {
-    l1 = ll1 = l2 = ll2 = 25;
+  if (!l1 || !l2) {
+    l1 = l2 = 25;
     ret |= eps_ign;
     goto quit_diff;
   }
 
   // ignore difference
   if (c->eps.cmd & eps_ign) {
-    trace("  ignoring numbers '%.25s'|'%.25s'", llhs_p, lrhs_p);
+    trace("  ignoring numbers '%.25s'|'%.25s'", lhs_p, rhs_p);
     goto quit;
   }
 
   // omit difference
   if (c->eps.cmd & eps_omit) {
     if (is_valid_omit(lhs_p, rhs_p, dif, c->eps.tag)) {
-      trace("  omitting numbers '%.25s'|'%.25s'", llhs_p, lrhs_p);
+      trace("  omitting numbers '%.25s'|'%.25s'", lhs_p, rhs_p);
       goto quit;
     }
   }
 
-  // (re)load numbers from registers
-  if (llhs_p != lhs_p) ll1 = parse_number(llhs_p, &d1, &n1, &e1, &f1);
-  if (lrhs_p != rhs_p) ll2 = parse_number(lrhs_p, &d2, &n2, &e2, &f2);
-
   // strict comparison...
-  if (ll1 == ll2 && memcmp(llhs_p, lrhs_p, ll1) == 0)
+  if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
     goto quit;
 
   // ...required
@@ -683,43 +698,50 @@ ndiff_testNum (T *dif, const C *c)
   }
 
   // convert numbers
-  lhs_d = strtod(llhs_p, &end); assert(end == llhs_p+ll1);
-  rhs_d = strtod(lrhs_p, &end); assert(end == lrhs_p+ll2);
-  scl_d = c->eps.scl_reg<0 ? -strtod(dif->reg[(int)-c->eps.scl_reg],0) :
-          c->eps.scl_reg>0 ?  strtod(dif->reg[(int) c->eps.scl_reg],0) : c->eps.scl;
+  lhs_d = strtod(lhs_p, &end); assert(end == lhs_p+l1);
+  rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
 
-  dif_d = (lhs_d - rhs_d) * scl_d;
-  abs_d = fabs(dif_d);
+  // indirections
+  lhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.lhs_reg, c->eps.cmd & eps_lhs ? c->eps.lhs : lhs_d);
+  rhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.rhs_reg, c->eps.cmd & eps_rhs ? c->eps.rhs : rhs_d);
+  scl_d = reg_getval(dif->reg, dif->reg_n, c->eps.scl_reg, c->eps.scl);
+  off_d = reg_getval(dif->reg, dif->reg_n, c->eps.off_reg, c->eps.off);
+
+  // components
   min_d = fmin(fabs(lhs_d),fabs(rhs_d));
   pow_d = pow10(-imax(n1, n2));
 
   // if one number is zero -> relative becomes absolute
   if (!(min_d > 0.0)) min_d = 1.0;
 
-  trace("  numdiff: |abs|=%.2g, |rel|=%.2g, ndig=%d", abs_d, abs_d/min_d, imax(n1, n2));   
+  // compute errors
+  dif_d = lhs_d - rhs_d;
+  err_d = scl_d * dif_d;
+  abs_d = err_d + off_d;
+  rel_d = abs_d/ min_d;
+  dig_d = abs_d/(min_d*pow_d);
+
+  trace("  numdiff: abs=%.2g, rel=%.2g, ndig=%d", abs_d, rel_d, imax(n1, n2));   
 
   // absolute comparison
   if (c->eps.cmd & eps_abs) {
-    double  abs = c->eps. abs_reg   ?  strtod(dif->reg[(int) c->eps. abs_reg],0) : c->eps. abs;
-    double _abs = c->eps._abs_reg<0 ? -strtod(dif->reg[(int)-c->eps._abs_reg],0) :
-                  c->eps._abs_reg>0 ?  strtod(dif->reg[(int) c->eps._abs_reg],0) : c->eps._abs;
-    if (dif_d > abs || dif_d < _abs) ret |= eps_abs;
+     abs = reg_getval(dif->reg, dif->reg_n, c->eps. abs_reg, c->eps. abs);
+    _abs = reg_getval(dif->reg, dif->reg_n, c->eps._abs_reg, c->eps._abs);
+    if (abs_d > abs || abs_d < _abs) ret |= eps_abs;
   }
 
   // relative comparison 
   if (c->eps.cmd & eps_rel) {
-    double  rel = c->eps. rel_reg   ?  strtod(dif->reg[(int) c->eps. rel_reg],0) : c->eps. rel;
-    double _rel = c->eps._rel_reg<0 ? -strtod(dif->reg[(int)-c->eps._rel_reg],0) :
-                  c->eps._rel_reg>0 ?  strtod(dif->reg[(int) c->eps._rel_reg],0) : c->eps._rel;
-    if (dif_d > rel * min_d || dif_d < _rel * min_d) ret |= eps_rel;
+     rel = reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg, c->eps. rel);
+    _rel = reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg, c->eps._rel);
+    if (rel_d > rel || rel_d < _rel) ret |= eps_rel;
   }
 
   // input-specific relative comparison (does not apply to integers)
   if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
-    double  dig = c->eps. dig_reg   ?  strtod(dif->reg[(int) c->eps. dig_reg],0) : c->eps. dig;
-    double _dig = c->eps._dig_reg<0 ? -strtod(dif->reg[(int)-c->eps._dig_reg],0) :
-                  c->eps._dig_reg>0 ?  strtod(dif->reg[(int) c->eps._dig_reg],0) : c->eps._dig;
-    if (dif_d > dig * min_d * pow_d || dif_d < _dig * min_d * pow_d) ret |= eps_dig;
+     dig = reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg, c->eps. dig);
+    _dig = reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg, c->eps._dig);
+    if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
   if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) ret = 0;
@@ -732,8 +754,8 @@ quit_diff:
             dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
     char str[128];
-    sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", ll1, ll2);
-    warning(str, dif->cnt_i, llhs_p, lrhs_p);
+    sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1, l2);
+    warning(str, dif->cnt_i, lhs_p, rhs_p);
 
     if (ret & eps_ign)
       warning("(%d) one number is missing (column no can be wrong)", dif->cnt_i);
@@ -744,45 +766,40 @@ quit_diff:
     if (ret & eps_abs)
       warning("(%d) absolute error (rule #%d, line %d: %g<=abs<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _abs, abs, abs_d, abs_d/min_d, imax(n1, n2));   
+              _abs, abs, abs_d, rel_d, imax(n1, n2));   
 
     if (ret & eps_rel)
       warning("(%d) relative error (rule #%d, line %d: %g<=rel<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _rel, rel, abs_d, abs_d/min_d, imax(n1, n2));   
+              _rel, rel, abs_d, rel_d, imax(n1, n2));   
 
     if (ret & eps_dig)
       warning("(%d) numdigit error (rule #%d, line %d: %g<=rel<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _dig*pow_d, dig*pow_d, abs_d, abs_d/min_d, imax(n1, n2));   
+              _dig*pow_d, dig*pow_d, abs_d, rel_d, imax(n1, n2));   
  
   }
   ret = 1;
 
 quit:
   if (!ret) {
-    if (c->eps.cmd & eps_move) {
-      for (int i=0; i < c->eps.n_reg; i++) {
-        int rn_d = c->eps.dst_reg[i];
-        int rn_s = c->eps.src_reg[i];
-        int rn_c = c->eps.cnt_reg[i];
-        memmove(dif->reg[rn_d], dif->reg[rn_s], rn_c*sizeof *dif->reg);
-        dif->reg[rn_d][rn_c*sizeof *dif->reg-1] = 0;
-      }
-    }
-    if (c->eps.cmd & eps_slhs) {
-      int rn = c->eps.slhs_reg;
-      int n = imin(l1, sizeof dif->reg[rn]);
-      memcpy(dif->reg[rn], lhs_p, n);
-      dif->reg[rn][n] = 0;
-    }
-    if (c->eps.cmd & eps_srhs) {
-      int rn = c->eps.srhs_reg;
-      int n = imin(l2, sizeof dif->reg[rn]);
-      memcpy(dif->reg[rn], rhs_p, n);
-      dif->reg[rn][n] = 0;
+    // moves
+    if (c->eps.cmd & eps_move)
+      for (int i=0; i < c->eps.reg_n; i++)
+        reg_move(dif->reg, dif->reg_n, c->eps.dst_reg[i], c->eps.src_reg[i], c->eps.cnt_reg[i]);
+
+    // saves
+    if (c->eps.cmd & eps_sss) {
+      if (c->eps.cmd & eps_slhs) reg_setval(dif->reg, dif->reg_n, c->eps.slhs_reg, lhs_d);
+      if (c->eps.cmd & eps_srhs) reg_setval(dif->reg, dif->reg_n, c->eps.srhs_reg, rhs_d);
+      if (c->eps.cmd & eps_sdif) reg_setval(dif->reg, dif->reg_n, c->eps.sdif_reg, dif_d);
+      if (c->eps.cmd & eps_serr) reg_setval(dif->reg, dif->reg_n, c->eps.serr_reg, err_d);
+      if (c->eps.cmd & eps_sabs) reg_setval(dif->reg, dif->reg_n, c->eps.sabs_reg, abs_d);
+      if (c->eps.cmd & eps_srel) reg_setval(dif->reg, dif->reg_n, c->eps.srel_reg, rel_d);
+      if (c->eps.cmd & eps_sdig) reg_setval(dif->reg, dif->reg_n, c->eps.sdig_reg, dig_d);
     }
   }
+
   dif->lhs_i += l1;
   dif->rhs_i += l2;
   trace("<-testNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
@@ -833,16 +850,16 @@ ndiff_isempty (const T *dif)
 // --- main ndiff loop --------------------------------------------------------
 
 void
-ndiff_loop(T *dif)
+ndiff_loop(T *dif, FILE *lhs_fp, FILE *rhs_fp)
 {
   assert(dif);
 
   const C *c, *c2;
-  int row=0, col;
+  int row=0, col, ret;
   int saved_level = logmsg_config.level;
 
   while(!ndiff_feof(dif, 0)) {
-    ++row, col=0;
+    ++row, col=0, ret=0;
 
     c = context_getInc(dif->cxt, row, col);
     ensure(c, "invalid context");
@@ -873,7 +890,7 @@ ndiff_loop(T *dif)
       ndiff_getInfo(dif, &row, 0, 0, 0);
     } else {
       ndiff_readLine(dif);
-      if (ndiff_isempty(dif)) continue;
+      if (ndiff_isempty(dif)) goto result;
     }
 
     // for each number column, diff-chars between numbers
@@ -891,11 +908,14 @@ ndiff_loop(T *dif)
       }
 
       // check numbers
-      ndiff_testNum(dif, c);
+      ret |= ndiff_testNum(dif, c);
 
       // restore logmsg
       logmsg_config.level = saved_level;
     }
+
+result:
+    if (!ret) ndiff_outLine(dif, lhs_fp, rhs_fp);
   }
 
   if (dif->blank) {
@@ -964,7 +984,7 @@ void
 ndiff_utest(struct utest *ut)
 {
   assert(ut);
-  T *dif = ndiff_alloc(stdout, stdout, 0, 0);
+  T *dif = ndiff_alloc(stdout, stdout, 0, 0, 0);
 
   utest_title(ut, "File diff");
 

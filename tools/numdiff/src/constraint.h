@@ -25,10 +25,13 @@
 
 // ----- constants
 
+#define TAG_LEN   64
+#define TAG_LEN_2 128
+
 enum eps_cmd {
   eps_invalid = 0u,       // invalid command
 
-// must be firsts (constrains)
+// must be firsts (constraints)
   eps_abs    = 1u <<  0,  // absolute eps
   eps_rel    = 1u <<  1,  // relative eps
   eps_dig    = 1u <<  2,  // relative input eps
@@ -38,29 +41,37 @@ enum eps_cmd {
 
 // intermediate (commands & qualifiers)
   eps_any    = 1u <<  6,  // any qualifier
-  eps_llhs   = 1u <<  7,  // load reg in x
-  eps_lrhs   = 1u <<  8,  // load reg in y
+  eps_lhs    = 1u <<  7,  // load x
+  eps_rhs    = 1u <<  8,  // load y
+
   eps_slhs   = 1u <<  9,  // save x in reg
   eps_srhs   = 1u << 10,  // save y in reg
-  eps_move   = 1u << 11,  // copy register(s)
-  eps_omit   = 1u << 12,  // omit qualifier
-  eps_trace  = 1u << 13,  // trace qualifier
+  eps_sdif   = 1u << 11,  // save x-y in reg
+  eps_serr   = 1u << 12,  // save a(x-y) in reg
+  eps_sabs   = 1u << 13,  // save abs error in reg
+  eps_srel   = 1u << 14,  // save rel error in reg
+  eps_sdig   = 1u << 15,  // save dif error in reg
+
+  eps_move   = 1u << 16,  // move register(s)
+  eps_omit   = 1u << 17,  // omit qualifier
+  eps_trace  = 1u << 18,  // trace qualifier
 
 // must be lasts (actions)
-  eps_skip   = 1u << 14,  // skip line, must be first action!!
-  eps_goto   = 1u << 15,  // go to tag
-  eps_gonum  = 1u << 16,  // go to number
+  eps_skip   = 1u << 19,  // skip line, must be first action!!
+  eps_goto   = 1u << 20,  // go to tag
+  eps_gonum  = 1u << 21,  // go to number
 
 // marker & mask
-  eps_last   = 1u << 17,  // the end
+  eps_last   = 1u << 22,  // the end
   eps_mask   = eps_last - 1,
 
 // non-persistent commands & qualifiers
   eps_large  = eps_last << 0,  // large tolerance
 
 // unions
-  eps_dra    =  eps_abs  | eps_rel  | eps_dig,
-  eps_sgg    =  eps_skip | eps_goto | eps_gonum,
+  eps_dra    = eps_abs  | eps_rel  | eps_dig,
+  eps_sgg    = eps_skip | eps_goto | eps_gonum,
+  eps_sss    = (2*eps_sdig-1) & ~(2*eps_slhs-1),
 };
 
 // ----- types
@@ -68,19 +79,30 @@ enum eps_cmd {
 struct eps {
   enum eps_cmd cmd;
 
-  double  scl;
+  // values
+  double  lhs,  rhs;
+  double  scl,  off;
   double  abs,  rel,  dig;
   double _abs, _rel, _dig;
+  double  num;
 
-  char    scl_reg,  gto_reg;
-  char    abs_reg,  rel_reg,  dig_reg;
-  char   _abs_reg, _rel_reg, _dig_reg;
+  // loads
+  short   lhs_reg,  rhs_reg;
+  short   scl_reg,  off_reg;
+  short   abs_reg,  rel_reg,  dig_reg;
+  short  _abs_reg, _rel_reg, _dig_reg;
+  short   gto_reg;
 
-  char    slhs_reg, srhs_reg;
-  char    llhs_reg, lrhs_reg;
-  char    src_reg[5], dst_reg[5], cnt_reg[5], n_reg;
+  // saves
+  short   slhs_reg, srhs_reg;
+  short   sdif_reg, serr_reg;
+  short   sabs_reg, srel_reg, sdig_reg;
 
-  char    tag[64];
+  // moves
+  short   src_reg[5], dst_reg[5], cnt_reg[5], reg_n;
+
+  // tags
+  char    tag[TAG_LEN];
 };
 
 struct constraint {
@@ -95,22 +117,22 @@ struct constraint {
 #define T struct constraint
 
 static inline struct eps
-eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs, double _rel, double _dig, double scl)
+eps_initAllNum(enum eps_cmd cmd, double abs, double rel, double dig, double _abs, double _rel, double _dig, double scl, double off)
 {
   ensure(cmd > eps_invalid && cmd < eps_last, "invalid eps command");
-  return (struct eps) { .cmd=cmd, .abs=abs, .rel=rel, .dig=dig, ._abs=_abs, ._rel=_rel, ._dig=_dig, .scl=scl };
+  return (struct eps) { .cmd=cmd, .abs=abs, .rel=rel, .dig=dig, ._abs=_abs, ._rel=_rel, ._dig=_dig, .scl=scl, .off=off };
 }
 
 static inline struct eps
-eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig, double scl)
+eps_initNum(enum eps_cmd cmd, double abs, double rel, double dig, double scl, double off)
 {
-  return eps_initAllNum(cmd, abs, rel, dig, -abs, -rel, -dig, scl);
+  return eps_initAllNum(cmd, abs, rel, dig, -abs, -rel, -dig, scl, off);
 }
 
 static inline struct eps
 eps_init(enum eps_cmd cmd, double val)
 {
-  return eps_initNum(cmd, cmd&eps_abs?val:0, cmd&eps_rel?val:0, cmd&eps_dig?val:0, 1.0);
+  return eps_initNum(cmd, cmd&eps_abs?val:0, cmd&eps_rel?val:0, cmd&eps_dig?val:0, 1.0, 0.0);
 }
 
 static inline struct eps
@@ -127,9 +149,9 @@ static inline struct eps
 eps_initNumTag(enum eps_cmd cmd, const char *tag)
 {
   char *end;
-  strtod(tag, &end);
-  ensure((cmd & eps_gonum) && !*end, "invalid eps goto command");
   struct eps eps = (struct eps) { .cmd=cmd };
+  eps.num = strtod(tag, &end);
+  ensure((cmd & eps_gonum) && !*end, "invalid eps goto command");
   enum { sz = sizeof eps.tag };
   strncpy(eps.tag, tag, sz); eps.tag[sz-1] = 0;
   return eps;

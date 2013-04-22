@@ -138,7 +138,7 @@ main(int argc_, char** argv_)
 
     // serie loop
     while (option.serie || !n) {
-      FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0;
+      FILE *lhs_fp=0, *rhs_fp=0, *cfg_fp=0, *lhs_rfp=0, *rhs_rfp=0;
       int nn = n;
 
       // clean filenames
@@ -146,18 +146,18 @@ main(int argc_, char** argv_)
        option.lhs_zip  =  option.rhs_zip  =  option.cfg_zip  = 0;
 
       // open files
-      lhs_fp = open_indexedFile(lhs_s, &nn, option.out_e, 1, 0);
+      lhs_fp = open_file(lhs_s, option.lhs_out ? &lhs_rfp : 0, &nn, option.out_e, 1, 0);
       if (!lhs_fp && n) break; // end of serie
-
-      rhs_fp = open_indexedFile(rhs_s, &nn, option.ref_e, !option.list, 1);
-      cfg_fp = open_indexedFile(cfg_s, &nn, option.cfg_e, !option.list, 0);
+      rhs_fp = open_file(rhs_s, option.rhs_out ? &rhs_rfp : 0, &nn, option.ref_e, !option.list, 1);
+      cfg_fp = open_file(cfg_s,                             0, &nn, option.cfg_e, !option.list, 0);
       if (n != nn) { n = nn; --total; }
 
       if (!lhs_fp) {
         if (option.list) {
           warning("output file '%s[.out]' not found, skipping diff", lhs_s);
-          close_indexedFile(rhs_fp, option.rhs_zip);
-          close_indexedFile(cfg_fp, option.cfg_zip);
+          close_file(rhs_fp, option.rhs_zip);
+          close_file(cfg_fp, option.cfg_zip);
+          close_file(rhs_rfp, 0);
           ++failed;
           break;
         } else
@@ -167,8 +167,9 @@ main(int argc_, char** argv_)
       if (!rhs_fp) {
         if (option.list) {
           warning("reference file '%s.ref' not found, skipping diff", rhs_s);
-          close_indexedFile(lhs_fp, option.lhs_zip);
-          close_indexedFile(cfg_fp, option.cfg_zip);
+          close_file(lhs_fp, option.lhs_zip);
+          close_file(cfg_fp, option.cfg_zip);
+          close_file(lhs_rfp, 0);
           ++failed;
           break;
         } else
@@ -190,9 +191,9 @@ main(int argc_, char** argv_)
       }
 
       // numdiff loop
-      struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, cxt, 0);
+      struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, cxt, 0, option.nregs);
       ndiff_option(dif, &option.keep, &option.blank, &option.check);
-      ndiff_loop(dif);
+      ndiff_loop(dif, lhs_rfp, rhs_rfp);
 
       // print summary
       if (diff_summary(dif) > 0) ++failed;
@@ -208,9 +209,11 @@ main(int argc_, char** argv_)
       context_free(cxt);
 
       // close files
-      close_indexedFile(lhs_fp, option.lhs_zip);
-      close_indexedFile(rhs_fp, option.rhs_zip);
-      close_indexedFile(cfg_fp, option.cfg_zip);
+      close_file(lhs_fp, option.lhs_zip);
+      close_file(rhs_fp, option.rhs_zip);
+      close_file(cfg_fp, option.cfg_zip);
+      close_file(lhs_rfp, 0);
+      close_file(rhs_rfp, 0);
 
       n += 1;
 

@@ -31,10 +31,13 @@
 #define CSTR_GREEN(s) "\033[32m" s "\033[0m"
 #endif
 
+#define MkString(a) MkString_(a)
+#define MkString_(a) #a
+
 // extern functions
 
-FILE* open_indexedFile(const char* str, int *idx, const char *ext, int optext, int required);
-void  close_indexedFile(FILE *fp, int zip);
+FILE*  open_file(const char* str, FILE **res_fp, int *idx, const char *ext, int optext, int required);
+void  close_file(FILE *fp, int zip);
 
 void  accum_summary(int total, int failed, long lines, long numbers);
 

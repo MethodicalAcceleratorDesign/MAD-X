@@ -33,18 +33,19 @@ struct constraint;
 #define T struct ndiff
 #define C struct constraint
 
-T*    ndiff_alloc    (FILE *lhs, FILE *rhs, struct context*, int n_);
+T*    ndiff_alloc    (FILE *lhs, FILE *rhs, struct context*, int n_, int r_);
 void  ndiff_clear    (T*);
 void  ndiff_free     (T*);
 void  ndiff_option   (T*, const int *keep_, const int *blank_, const int *check_);
 
 // high level API
-void  ndiff_loop     (T*);
+void  ndiff_loop     (T*, FILE *lhs_res_, FILE *rhs_res_);
 
 // low level API
 int   ndiff_skipLine (T*);
 int   ndiff_readLine (T*);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
+int   ndiff_outLine  (T*, FILE *lhs_res_, FILE *rhs_res_);
 
 int   ndiff_gotoLine (T*, const C*);
 int   ndiff_gotoNum  (T*, const C*);

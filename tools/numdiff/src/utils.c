@@ -63,18 +63,19 @@ is_zipext(const char *str)
 }
 
 void
-close_indexedFile(FILE *fp, int zip)
+close_file(FILE *fp, int zip)
 {
-  if (fp && fp != stdin) {
+  if (fp && fp != stdin && fp != stdout) {
     if (zip) pclose(fp);
     else     fclose(fp);
   }
 }
 
 FILE*
-open_indexedFile(const char* str, int *idx, const char *ext, int optext, int required)
+open_file(const char* str, FILE **res_fp, int *idx, const char *ext, int optext, int required)
 {
-  char buf[FILENAME_MAX+100];
+  char  buf[FILENAME_MAX+100];
+  char rbuf[FILENAME_MAX+100];
   const char *dot = 0, *zdot = 0;
   int pos = 0, zpos = 0, zid = 0;
   FILE *fp = 0;
@@ -87,7 +88,7 @@ open_indexedFile(const char* str, int *idx, const char *ext, int optext, int req
   // stdin
   if (str[0] == '-' && str[1] == 0) {
     fp = stdin;
-    strncpy(buf, str, sizeof buf);
+    strncpy(buf, str, sizeof buf-1);
     goto filename;
   }
 
@@ -149,7 +150,7 @@ retry:
 
   // debug information
   if (!fp) {
-    trace("<-open_indexedFile: unable to open file '%s' for reading", buf);
+    trace("<-open_file: unable to open file '%s' for reading", buf);
     return 0;
   }
 
@@ -165,7 +166,7 @@ retry:
 
   // resize buffer for faster read
   if (BUFSIZ < 65536 && setvbuf(fp, 0, _IOFBF, 65536)) {
-    close_indexedFile(fp, zid);
+    close_file(fp, zid);
     error("unable to resize the stream buffer size");
   }
 
@@ -174,22 +175,33 @@ filename:
   // copy filenames into option for further reporting
   if (ext == option.out_e) {
     option.lhs_zip = zid;
-    strncpy(option.lhs_file, buf, sizeof option.lhs_file);
+    strncpy(option.lhs_file, buf, sizeof option.lhs_file-1);
+    option.lhs_file[sizeof option.lhs_file-1] = 0;
   }
 
   if (ext == option.ref_e) {
     option.rhs_zip = zid;
-    strncpy(option.rhs_file, buf, sizeof option.rhs_file);
+    strncpy(option.rhs_file, buf, sizeof option.rhs_file-1);
+    option.rhs_file[sizeof option.rhs_file-1] = 0;
     ensure(strcmp(option.lhs_file, option.rhs_file), "lhs and rhs files have same name");
   }
 
   if (ext == option.cfg_e) {
     option.cfg_zip = zid;
-    strncpy(option.cfg_file, buf, sizeof option.cfg_file);
+    strncpy(option.cfg_file, buf, sizeof option.cfg_file-1);
+    option.cfg_file[sizeof option.cfg_file-1] = 0;
+  }
+
+  // open result file, if any
+  if (res_fp) {
+    strncpy(rbuf, buf         , sizeof rbuf-1); rbuf[sizeof rbuf-1]=0;
+    strncat(rbuf, option.res_e, sizeof rbuf-1); rbuf[sizeof rbuf-1]=0;
+    *res_fp = fopen(rbuf, "w");
   }
 
   // debug information
   debug("file %s open for reading", buf);
+  if (res_fp && *res_fp) debug("file %s open for writing", rbuf);
 
   return fp;
 }

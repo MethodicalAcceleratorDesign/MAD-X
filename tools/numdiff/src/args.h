@@ -24,16 +24,18 @@
 #include "types.h"
 
 struct option {
-  int check, debug, serie, list, blank, utest, keep, reset, lgopt, trunc;
+  int check, debug, nowarn, keep, lgopt;
+  int serie, list, blank, utest, reset, trunc, nregs;
   const char *suite, *test;
   const char *fmt, *sfmt;
   const char *chr;
-  const char *out_e, *ref_e, *cfg_e;
+  const char *out_e, *ref_e, *cfg_e, *res_e;
   const char *unzip[3];
   char lhs_file[FILENAME_MAX];
   char rhs_file[FILENAME_MAX];
   char cfg_file[FILENAME_MAX];
   int  lhs_zip, rhs_zip, cfg_zip;
+  int  lhs_out, rhs_out;
   int  argi;
 
   const char *accum;
