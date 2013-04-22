@@ -48,12 +48,10 @@ NDFLAGS = --quiet \
 # init-test macro
 #
 define init-test
-$_ $(RM) tests$/$(NDSUM) \
-     $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
-   $(call ND_tr,$(NDIFF_I) --quiet \
+$_ $(call ND_tr,$(NDIFF_I) --quiet \
                            $(if $(call eq,$(NDDEBUG),yes),--debug,) \
                            $(if $(call eq,$(NDTRACE),yes),--trace,) \
-                           --accum tests$/$(NDSUM))
+                           --accum tests$/$(NDSUM)) --reset
 endef
 
 #
@@ -91,12 +89,13 @@ NDFILES_OUT  = $(addsuffix .out,$(NDFILES_BAS)) $(NDFILES_BAS)
 
 define run-test
 $(if $(call eq,$(NREF),yes),,$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found))
--$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) cd tests$/$@ && \
-$(RM) $(notdir $(NDFILES_OUT)) \
-  $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,) && \
-$(TESTCMD) > $@.out && \
-$(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES_BAS)) || \
-echo "error: $@ failed, check tests$/$@ for details"
+-$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) \
+    cd tests$/$@ && $(RM) $(notdir $(NDFILES_OUT)) \
+    $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,)
+-$_ cd tests$/$@ && $(TESTCMD) > $@.out
+-$_ cd tests$/$@ && \
+    $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES_BAS)) || \
+    echo "error: $@ failed, check tests$/$@ for details"
 endef
 
 # end of makefile
