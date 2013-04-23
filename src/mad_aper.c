@@ -61,7 +61,7 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
       // 2013-Apr-23  12:15:51 ghislain --
       y = (*ap3)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
       if (y > (*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
-	alfa = atan2((*ap2),(*ap1)); 
+	alfa = atan2((*ap2),(*ap1));
       else // the rectangle extends beyond the ellipse; there is a curved part
 	alfa = atan2(y,*ap1); // this angle is not the geometrical angle
     }
@@ -101,19 +101,31 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
 
   /*write coordinates for first quadrant*/
   //printf("\n");
-  for ( i=0 ; i<=napex; i++ )
-    {
-      angle = alfa + i*dangle; // this angle is not the geometrical angle
-      tablex[i]=(*ap3)*cos(angle);
-      tabley[i]=(*ap4)*sin(angle);
-
-      // the geometrical angle alfag is such that tan(alfag) = tabley[i]/tablex[i] = ap4/ap3 * tan(alfa)
-
+  
+  if ( napex == 0)
+    { // case of rectangle
+      i=0;
+      tablex[i] = *ap1;
+      tabley[i] = *ap2;
       // printf("  %d %10.5f %10.5f %10.5f\n", i, angle, tablex[i], tabley[i]);
-
-      if (i >= MAXARRAY/4) fatal_error("Memory full in aper_rectellipse", "Number of coordinates exceeds set limit");      
-      // should give the value of the MAXARRAY set limit that is exceeded
-      // warn("aper_rectellipse: number of coordinates exceeds MAXARRAY = ", MAXARRAY)
+      i++;
+    }
+  else 
+    { // there is a curved part.
+      for ( i=0 ; i<=napex; i++ )
+	{
+	  angle = alfa + i*dangle; // this angle is not the geometrical angle
+	  tablex[i]=(*ap3)*cos(angle);
+	  tabley[i]=(*ap4)*sin(angle);
+	  
+	  // the geometrical angle alfag is such that tan(alfag) = tabley[i]/tablex[i] = ap4/ap3 * tan(alfa)
+	  
+	  // printf("  %d %10.5f %10.5f %10.5f\n", i, angle, tablex[i], tabley[i]);
+	  
+	  if (i >= MAXARRAY/4) fatal_error("Memory full in aper_rectellipse", "Number of coordinates exceeds set limit");      
+	  // should give the value of the MAXARRAY set limit that is exceeded
+	  // warn("aper_rectellipse: number of coordinates exceeds MAXARRAY = ", MAXARRAY)
+	}
     }
 
   *quarterlength=i-1; 
@@ -405,7 +417,8 @@ int i=quarterlength+1, j;
 
   *halolength=i-1;
 
-  // for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
+  for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
+  printf("\n");
 }
 
 static void
