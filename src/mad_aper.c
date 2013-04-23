@@ -33,103 +33,95 @@ static struct table* offs_tab;
 static struct aper_node*
 aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt, struct aper_node*);
 
-/* next function replaced 19 june 2007 BJ */
-/* Improved for potential zero divide 20feb08 BJ */
-
 static int
 aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarterlength, double tablex[], double tabley[])
-{
+{ // build a quadrant of a polygon based on a rectangular-ellipse shape; aper_fill_quadrants() completes the polygon.
   double x, y, angle, alfa, theta, dangle;
-  int i,napex;
+  int i, napex;
 
-  /*  printf("++ %10.5f  %10.5f  %10.5f  %10.5f\n",*ap1,*ap2,*ap3,*ap4);*/
+  // printf("++ %10.5f  %10.5f  %10.5f  %10.5f %d\n",*ap1,*ap2,*ap3,*ap4,*quarterlength);
 
   if ( *ap1 < MIN_DOUBLE*1.e10 || *ap2 < MIN_DOUBLE*1.e10) {
-    fatal_error("Illegal zero or too small value value for ap1 or ap2"," ");
+    fatal_error("Illegal negative or too small value in aper_rectellipse", "for ap1 or ap2 (rectangle)");
   }
   if ( *ap3 < MIN_DOUBLE*1.e10 || *ap4 < MIN_DOUBLE*1.e10) {
-    fatal_error("Illegal zero or too small value value for ap3 or ap4"," ");
+    fatal_error("Illegal negative or too small value in aper_rectellipse", "for ap3 or ap4 (ellipse)");
   }
 
+  /* find angles where rectangle and ellipse cross */
 
-  /* Produces a table of only the first quadrant coordinates */
-  /* aper_fill_quads() completes the polygon          */
+  if ( (*ap1) >= (*ap3) ) alfa = 0. ;
+  // the horizontal rectangle extent is larger than the ellipse
+  // the curved part starts at angle 0 
+  else 
+    { 
+      // 2013-Apr-16  15:38:43  ghislain: following formula is correct but can be rewritten
+      // y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
+      // alfa=atan2(y,*ap1);
+      // 2013-Apr-23  12:15:51 ghislain --
+      y = (*ap3)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
+      if (y > (*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
+	alfa = atan2((*ap2),(*ap1)); 
+      else // the rectangle extends beyond the ellipse; there is a curved part
+	alfa = atan2(y,*ap1); // this angle is not the geometrical angle
+    }
 
-  if (*quarterlength) napex=9;
-  else napex=19;
-
-  /* PIECE OF USELESS CODE NOW THAT CASE RECTANGLE IS CORRECT, BJ 28feb08
-     special case : rectangle
-     does not work -- to be reworked
-
-     if ( *ap3 < 0.) {
-     tablex[0]=(*ap1);
-     tabley[0]=(*ap2-0.0001);
-     tablex[1]=(*ap1-0.00002);
-     tabley[1]=(*ap2-0.00002);
-     tablex[2]=(*ap1-0.0001);
-     tabley[2]=(*ap2);
-     *quarterlength=2;
-     return 0;
-     }
-     END OF PIECE OF USELESS CODE, to be removed after some use
-     (I expect no negative feedback ...)
-  */
-
-  /* find angles where rectangle and circle crosses */
-
-  if ( (*ap1) >= (*ap3) ) {
-    alfa = 0.;
-  }
-  else { // 2013-Apr-16  15:38:43  ghislain: following formula is wrong and has been replaced
-    // y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
-    // alfa=atan2(y,*ap1);
-    // 2013-Apr-15  16:24:49 ghislain -- 
-    y = (*ap4)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
-    if (y>(*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
-      alfa=atan2((*ap2),(*ap1)); 
-    else // the rectangle extends beyond the ellipse; there is a curved part
-      alfa = atan2(y,*ap1);
-  }
-
-  if ( (*ap2) >= (*ap4) ) {
-    theta = 0.;
-  }
-  else { // 2013-Apr-16  15:41:13  ghislain: following formula is wrong and has been replaced
-    // x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
-    // y=sqrt((*ap3)*(*ap3)-x*x);
-    // theta=atan2(x,y);
-    // 2013-Apr-15  16:26:26 ghislain -- 
-      x = (*ap3)*sqrt(1-((*ap2)*(*ap2))/((*ap4)*(*ap4)));
-      if (x>(*ap1)) // the rectangle is contained within the ellipse; there is no curved part.
+  if ( (*ap2) >= (*ap4) ) theta = 0.; 
+  // the vertical rectangle extent is larger than the ellipse
+  // the curved part extends all the way to pi/2
+  else 
+    { 
+      // 2013-Apr-16  15:41:13  ghislain: following formula is correct but can be rewritten
+      // x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
+      // y=sqrt((*ap3)*(*ap3)-x*x);
+      // theta=atan2(x,y);
+      // 2013-Apr-23  12:15:51 ghislain --
+      x = (*ap4)*sqrt(1-((*ap2)*(*ap2))/((*ap4)*(*ap4)));
+      if (x > (*ap1)) // the rectangle is contained within the ellipse; there is no curved part.
 	theta=atan2((*ap1),(*ap2)); 
-      else // the rectangle extends beyond the ellipse; there is a curved part 
-	theta = atan2(x,*ap2);
- }
+      else // the rectangle extends beyond the ellipse; there is a curved part
+	theta = atan2(x,*ap2); // this angle is not the geometrical angle
+    }
 
-  dangle=(pi/2-(alfa+theta))/napex;
-
-  if (!((0 < dangle) && (dangle < pi/2)))
-  {
-    return -1;
-  }
+  // at this point we know if we have a full ellipse (alfa=0, theta=0), a full rectangle (alfa+theta=pi/2) or a mixed curve.
+  // we can calculate the number of apexes (napex+1) and the interval depending on the shape
+  
+  if (*quarterlength) //
+    { napex=9 ; 
+      dangle=((pi/2)-(alfa+theta))/napex; } 
+  else if (fabs(alfa+theta-pi/2) < MIN_DOUBLE * 1.e10) //rectangle, single point, zero interval  
+    { napex=0 ; 
+      dangle=0.; } 
+  else if (fabs(alfa+theta) < MIN_DOUBLE * 1.e10) // ellipse, 20 points, 19 intervals            
+    { napex=19 ; 
+      dangle=(pi/2)/napex; } 
+  else // general rectellipse,  2 <= napex <= 19, napex intervals
+    { napex = 1 + floor(18 * fabs(1-(alfa+theta)/(pi/2))) ; 
+      dangle=((pi/2)-(alfa+theta))/napex; } 
 
   /*write coordinates for first quadrant*/
-
-  for ( i=0 ; i<=napex; i++ ) {
-    angle = alfa + i*dangle;
-    tablex[i]=(*ap3)*cos(angle);
-    tabley[i]=(*ap4)*sin(angle);
-
-    if (i >= MAXARRAY/4)
+  //printf("\n");
+  for ( i=0 ; i<=napex; i++ )
     {
-      fatal_error("Memory full in aper_rectellipse", "Number of coordinates exceeds set limit");      }
-  }
+      angle = alfa + i*dangle; // this angle is not the geometrical angle
+      tablex[i]=(*ap3)*cos(angle);
+      tabley[i]=(*ap4)*sin(angle);
 
-  *quarterlength=i-1;
+      // the geometrical angle alfag is such that tan(alfag) = tabley[i]/tablex[i] = ap4/ap3 * tan(alfa)
+
+      // printf("  %d %10.5f %10.5f %10.5f\n", i, angle, tablex[i], tabley[i]);
+
+      if (i >= MAXARRAY/4) fatal_error("Memory full in aper_rectellipse", "Number of coordinates exceeds set limit");      
+      // should give the value of the MAXARRAY set limit that is exceeded
+      // warn("aper_rectellipse: number of coordinates exceeds MAXARRAY = ", MAXARRAY)
+    }
+
+  *quarterlength=i-1; 
+  // printf("quarterlength : %d\n", *quarterlength);
 
   return 0;
 }
+
 
 static void
 aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
@@ -365,37 +357,44 @@ aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
 }
 
 static void
-aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* halolength)
-{
-  int i=quarterlength+1, j;
+aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halolength)
+{/* 2013-03-21 ghislain: given the data for the upper right quadrant computed in aper_rectellipse 
+     and contained in the polyx and polyy tables,
+     mirrors this data to the other three quadrants across the x and y axes.
+     quarterlength is the length of, or number of points in, the first quadrant.*/
 
-  /* receives two tables with coordinates for the first quadrant */
-  /* and mirrors them across x and y axes                         */
+// 2013-Apr-18  16:41:15  ghislain: suppressed the call to aper_adj_quads since the quadrant is explicit.
+
+int i=quarterlength+1, j;
+
+  // printf("-- in aper_fill_quadrants: quarterlength = %d , i = %d", quarterlength, i);
+
+  // The counter i starts at quarterlength+1, ie the first point to be mirrored.
 
   /*copying first quadrant coordinates to second quadrant*/
   for (j=quarterlength;j>=0;j--)
   {
-    polyx[i]=polyx[j];
-    polyy[i]=polyy[j];
-    aper_adj_quad(pi/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    polyx[i]= -polyx[j];
+    polyy[i]=  polyy[j];
+    // aper_adj_quad(pi/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
     i++;
   }
 
   /*copying first quadrant coordinates to third quadrant*/
   for (j=0;j<=quarterlength;j++)
   {
-    polyx[i]=polyx[j];
-    polyy[i]=polyy[j];
-    aper_adj_quad(pi, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    polyx[i]= -polyx[j];
+    polyy[i]= -polyy[j];
+    // aper_adj_quad(pi, polyx[i], polyy[i], &polyx[i], &polyy[i]);
     i++;
   }
 
   /*copying first quadrant coordinates to fourth quadrant*/
   for (j=quarterlength;j>=0;j--)
   {
-    polyx[i]=polyx[j];
-    polyy[i]=polyy[j];
-    aper_adj_quad(pi*3/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
+    polyx[i]=  polyx[j];
+    polyy[i]= -polyy[j];
+    // aper_adj_quad(pi*3/2, polyx[i], polyy[i], &polyx[i], &polyy[i]);
     i++;
   }
 
@@ -405,6 +404,8 @@ aper_fill_quads(double polyx[], double polyy[], int quarterlength, int* haloleng
   polyy[i]=polyy[0];
 
   *halolength=i-1;
+
+  // for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
 }
 
 static void
@@ -422,41 +423,47 @@ aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
 
 static int
 aper_external_file(char *file, double tablex[], double tabley[])
-{
-  /* receives the name of file containing coordinates. Puts coordinates into tables. */
+{ /* receives the name of file containing coordinates. Puts coordinates into tables. */
+  /* returns status -1 in case of error and number of points read otherwise */
   int i=0;
   FILE *filept;
 
-  if (file != NULL)
-  {
-    if ((filept=fopen(file, "r")) == NULL)
+  /* no file provided */
+  if (file == NULL) return -1;
+  
+  /* file cannot be opened in read mode */
+  if ((filept=fopen(file, "r")) == NULL)
     {
-      warning("Can not find file: ", file);
+      warning("Can not open file: ", file);
       return -1;
     }
 
-    /*start making table*/
-    while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i]))
+  /* build table */
+  while (2==fscanf(filept, "%lf %lf", &tablex[i], &tabley[i]))
     {
       i++;
       if (i >= MAXARRAY)
-      {
-        fatal_error("Memory full. ", "Number of coordinates exceeds set limit");
-      }
+	{ // should give the value of the MAXARRAY set limit that is exceeded
+	  // warn("Memory full in aper_external_file; number of coordinates exceeds MAXARRAY = ", MAXARRAY)
+	  fatal_error("Memory full in aper_external_file. ", "Number of coordinates exceeds set limit");
+	}
     }
 
+  /* closing the shape: a last point is inserted in table 
+     with coordinates equal to those of the first point */
     tablex[i]=tablex[0];
     tabley[i]=tabley[0];
     fclose(filept);
-  }
 
-  return i-1;
+    return i-1;
 }
 
 static int
-aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, int* pipelength, double pipex[], double pipey[])
+aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, int* pipelength, double pipex[], double pipey[])
 {
   int i, err, quarterlength=0;
+
+  /* 2013-03-21 -- ghislain: changed name from aper_bs; the same function is referenced as build_pipe in the documentation of Ivar Waarum */
 
   /* "var1 .. 4" represents values in the aperture array of each element  */
   /*  After they are read:                                                */
@@ -466,123 +473,167 @@ aper_bs(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, int*
   /* *ap4 = half vertical axis ellipse                                    */
   /*      returns 1 on success, 0 on failure          */
 
+  // 2013-Apr-18  14:23:40  ghislain: added check for invalid values.
+  // 2013-Apr-18  14:25:14  ghislain: added RECTCIRCLE type
+
   (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
 
-  /*   printf("-- #%s#\n",apertype); */
+  // printf("-- in aper_build_screen; apertype = #%s#  %d\n",apertype, quarterlength);
 
   if (!strcmp(apertype,"circle"))
-  {
-    *ap3=get_aperture(current_node, "var1"); /*radius circle*/
-
-    *ap1 = *ap2 = *ap4 = *ap3;
-
-    if (*ap3) /* check if r = 0, skip calc if r = 0 */
     {
-      err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+      *ap3 = get_aperture(current_node, "var1"); /*radius circle*/
+      if ( (*ap3) <= 0. ) 
+	{ // these quiet returns should be turned into at least a warning! 
+	  // printf("-- in aper_build screen, circle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;  
+	}
+      else 
+	{ // make a square just containing the circle
+	  *ap1 = *ap2 = *ap4 = *ap3;
+	  
+	  err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+	  if (!err) aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+
+	  return 1;
+	}
     }
-    else err = -1;
-  }
 
   else if (!strcmp(apertype,"ellipse"))
-  {
-    *ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
-    *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
+    {
+      *ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
+      *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
+      if ( (*ap3) <= 0 || (*ap4) <= 0) 
+	{ 
+	  printf("-- in aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;
+	}
+      else
+	{ // make a rectangle just containing the ellipse
+	  *ap1 = *ap3;   *ap2 = *ap4; 
+	  
+	  err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+	  if (!err) aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
 
-    *ap1 = *ap3; *ap2 = *ap4;
-
-    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-  }
+	  return 1;
+	}
+    }
 
   else if (!strcmp(apertype,"rectangle"))
-  {
+    {
+      *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
+      *ap2 = get_aperture(current_node, "var2");      /*half height rect*/
+      if ( (*ap1) <= 0 || (*ap2) <= 0) // return 0;
+	{ 
+	  printf("-- in aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;
+	}
+      else
+	{ // make a circle containing the rectangle
+	  *ap3 = *ap4 = sqrt( (*ap1)*(*ap1) + (*ap2)*(*ap2) ); 
 
-    *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
-    *ap2 = get_aperture(current_node, "var2");      /*half height rect*/
-/* next changed 28 feb 2008 BJ */
-    *ap3 = *ap4 = sqrt((*ap1) * (*ap1) + ((*ap2) * (*ap2))) - 1.e-15;
-    /*   printf("-- %10.5f  %10.5f  %10.5f  %10.5f\n",*ap1,*ap2,*ap3,*ap4); */
+	  err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+	  if (!err) aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+	
+	  return 1;
+	}
+    }
 
-    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-  }
+  else if (!strcmp(apertype,"lhcscreen") || !strcmp(apertype, "rectcircle"))
+    { // the type lhcscreen should be deprecated at some point to keep MAD agnostic...
+      *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+      *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+      *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+      if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0) // return 0;
+	{ 
+	  printf("-- in aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;
+	}
+      else 
+	{ // ensure the ellipse is a circle
+	  *ap4 = *ap3;
 
-  else if (!strcmp(apertype,"lhcscreen"))
-  {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+	  err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+	  if (!err) aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
 
-    (*ap4) = (*ap3);
-
-    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-  }
+	  return 1;
+	}
+    }
 
   else if (!strcmp(apertype,"marguerite"))
-  {
-    printf("\nApertype %s not yet supported.", apertype);
-    err=-1;
-  }
+    {
+      printf("\nApertype %s not supported.", apertype);
+      return 0;
+    }
 
   else if (!strcmp(apertype,"rectellipse"))
-  {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*half hor axis ellipse*/
-    *ap4=get_aperture(current_node, "var4"); /*half ver axis ellipse*/
-
-    if (*ap1==0) /*this will not be 0 in the future*/
     {
-      *ap1=*ap3;
+      *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+      *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+      *ap3=get_aperture(current_node, "var3"); /*half hor axis ellipse*/
+      *ap4=get_aperture(current_node, "var4"); /*half ver axis ellipse*/
+      
+      if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0 || (*ap4) <= 0)
+	{ 
+	  printf("-- in aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;
+	}
+      else
+	{
+	  err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+	  if (!err) aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+	  
+	  return 1;
+	}
     }
-    if (*ap2==0) /*this will not be 0 in the future*/
-    {
-      *ap2=*ap4;
-    }
-
-    err=aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-    if (!err) aper_fill_quads(pipex, pipey, quarterlength, pipelength);
-  }
 
   else if (!strcmp(apertype,"racetrack"))
-  {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
-
-    *ap4 = *ap3;
-
-    err=aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
-
-    if (!err)
     {
-      /*displaces the quartercircle*/
-      for (i=0;i<=quarterlength;i++)
-      {
-        pipex[i] += (*ap1);
-        pipey[i] += (*ap2);
-      }
+      *ap1=get_aperture(current_node, "var1"); /*half width rect*/
+      *ap2=get_aperture(current_node, "var2"); /*half height rect*/
+      *ap3=get_aperture(current_node, "var3"); /*radius circle*/
 
-      aper_fill_quads(pipex, pipey, quarterlength, pipelength);
+      // no check for radius at this point, a zero radius should be allowed. 
+      *ap4 = *ap3;
+
+      if ( (*ap1) <= 0 || (*ap2) <= 0 ) 
+	{ 
+	  printf("-- in aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  return 0;
+	}
+
+      // special call to build a circle first: note that we cannot invoque ap1 or ap2
+      err=aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
+      
+      if (!err)
+	{ /*displaces the quartercircle*/
+	  for (i=0;i<=quarterlength;i++)
+	    {
+	      pipex[i] += (*ap1); 
+	      pipey[i] += (*ap2); 
+	    }
+
+	  aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);
+	
+	  return 1;
+	}
     }
-  }
-
-  else if (strlen(apertype))
-  {
-    *pipelength = aper_external_file(apertype, pipex, pipey);
-    *ap1 = *ap2 = *ap3 = *ap4 = 0;
-    if (*pipelength > -1) err=0; else err=-1;
-  }
-
+  
+  else if (strlen(apertype)) // general case, assume the given type is a filename
+    {
+      *pipelength = aper_external_file(apertype, pipex, pipey);
+      *ap1 = *ap2 = *ap3 = *ap4 = 0;
+      if (*pipelength > -1) return 1; else return 0;
+    }
+  
   else
-  {
-    *pipelength = -1;
-    err=-1;
-  }
+    {
+      *pipelength = -1;
+      return 0;
+    }
 
-  return err+1;
+  // anything else was not foreseen: raise error.
+  return 0;
 }
 
 static int
@@ -1470,7 +1521,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
     return lim_pt;
   }
-  else aper_fill_quads(halox, haloy, halo_q_length, &halolength);
+  else aper_fill_quadrants(halox, haloy, halo_q_length, &halolength);
 
   /* check for externally given pipe polygon */
   /* changed this recently, IW 240205 */
@@ -1530,7 +1581,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     /*read aperture data and make polygon tables for beam pipe*/
     /* IW 250205 */
     /*  if (ext_pipe == 0) */
-    ap=aper_bs(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
+    ap=aper_build_screen(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
 
     if (ap == 0 || first == 1) {
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
