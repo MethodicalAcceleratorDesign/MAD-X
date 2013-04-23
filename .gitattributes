@@ -52,6 +52,7 @@ cmake/setupPackaging.cmake -text
 cmake/setupProcessorCount.cmake -text
 cmake/setupTesting.cmake -text
 doc/.htaccess -text
+doc/CMakeLists.txt -text
 doc/usrguide/Introduction/aperexample.jpg -text
 doc/usrguide/Introduction/aperture.html -text
 doc/usrguide/Introduction/attribute.html -text

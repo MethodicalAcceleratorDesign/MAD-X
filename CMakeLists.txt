@@ -53,6 +53,9 @@ add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(syntax)
 
+# Install documentation as well:
+add_subdirectory(doc)
+
 # External projects...
 include(setupExternalProjects)
 
