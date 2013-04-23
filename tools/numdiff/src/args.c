@@ -155,11 +155,11 @@ usage(void)
   inform("\t-h  --help          display this help");
   inform("\t-i  --info          enable info mode (default)");
   inform("\t-k  --keep num      specify the number of diffs to display per file, default is %d", option.keep);
-  inform("\t    --lhsout        output valid lines of left file to its result file");
+  inform("\t    --lhsres        echo valid lines of left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
-  inform("\t-w  --nowarn        disable warnings");
-  inform("\t-m  --regs num      specify the number of registers to allocate");
+  inform("\t    --nowarn        disable warnings");
+  inform("\t    --nregs num     specify the number of registers to allocate");
   inform("\t-n  --serie         enable serie mode (indexed filenames)");
   inform("\t    --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t    --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
@@ -167,7 +167,7 @@ usage(void)
   inform("\t-q  --quiet         enable quiet mode (no output if no diff)");
   inform("\t    --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
   inform("\t    --resext ext    specify the result file extension, default is \"%s\"", option.res_e);
-  inform("\t    --rhsout        output valid lines of right file to its result file");
+  inform("\t    --rhsres        echo valid lines of right file to its result file");
   inform("\t-s  --suite name    set test suite name for output message (title)");
   inform("\t    --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
   inform("\t-t  --test name     set test name for output message (item)");
@@ -219,6 +219,7 @@ usage(void)
   inform("\trel=num or reg      relative error (0 <= num <= 1)");
   inform("\t-rel=num or reg     negative relative error (-1 <= num <= 0)");
   inform("\trhs=num or reg      set right hand side 'y'");
+  inform("\tsave                perform save and operations even if rule fails");
   inform("\tscl=num or reg      set error scaling factor 'a'");
   inform("\tskip                skip lines (action)");
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
@@ -226,20 +227,17 @@ usage(void)
   inform("\ttrace               trace rule when active (debug, qualifier)");
 
   inform("");
-  inform("indirections:");
-  inform("\t=-Rn                load or move negated value from register n");
-  inform("\t=/Rn                load or move inverted value from register n");
-  inform("\t=-/Rn               load or move negated and inverted value from register n");
-  inform("\tRn=num              save number to register n");
-  inform("\tRn=lhs              save number read from left file to register n");
-  inform("\tRn=rhs              save number read from right file to register n");
-  inform("\tRn=dif              save x-y to register n");
-  inform("\tRn=err              save a(x-y) to register n");
-  inform("\tRn=abs              save computed absolute error to register n");
-  inform("\tRn=rel              save computed relative error to register n");
-  inform("\tRn=dig              save computed digital relative error to register n");
-  inform("\tRn=Rp               move number from register p to register n");
-  inform("\tRn=Rp..Rq           move numbers from registers p..q to n..n+q-p");
+  inform("registers:");
+  inform("\tR1..R9              contain lhs, rhs, dif, err, abs, rel, dig, min, prec");
+  inform("\t=Rn                 load value from register n");
+  inform("\t=-Rn                load negated value from register n");
+  inform("\t=/Rn                load inverted value from register n");
+  inform("\t=-/Rn               load negated and inverted value from register n");
+  inform("\tRn=Rp+Rq            load the sum of registers p and q to register n");
+  inform("\tRn=Rp-Rq            load the difference of registers p and q to register n");
+  inform("\tRn=Rp*Rq            load the product of registers p and q to register n");
+  inform("\tRn=Rp/Rq            load the ratio of registers p and q to register n");
+  inform("\tRn=Rp~Rq            move registers p..q to registers n..n+q-p");
 
   inform("");
   inform("info   :\thttp://cern.ch/mad/numdiff");
@@ -310,6 +308,13 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
+    // enable left result [setup]
+    if (!strcmp(argv[option.argi], "--lhsres")) {
+      debug("left results enabled");
+      option.lhs_res = 1;
+      continue;
+    }
+
     // set list mode [setup]
     if (!strcmp(argv[option.argi], "--list") || (!option.lgopt && !strcmp(argv[option.argi], "-l"))) {
       debug("list mode on");
@@ -325,7 +330,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set debug mode [setup]
-    if (!strcmp(argv[option.argi], "--nowarn") || (!option.lgopt && !strcmp(argv[option.argi], "-w"))) {
+    if (!strcmp(argv[option.argi], "--nowarn")) {
       debug("no warning mode on");
       logmsg_config.level = error_level;
       logmsg_config.locate = 0;
@@ -333,24 +338,17 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
+    // set number of registers [setup]
+    if (!strcmp(argv[option.argi], "--nregs")) {
+      option.nregs = imin(REG_MAX, strtoul(argv[++option.argi],0,0));
+      debug("number of registers set to %d", option.nregs);
+      continue;
+    }
+
     // set output extension [setup]
     if (!strcmp(argv[option.argi], "--outext")) {
       option.out_e = argv[++option.argi]; 
       debug("output extension set to '%s'", option.out_e);
-      continue;
-    }
-
-    // enable left result [setup]
-    if (!strcmp(argv[option.argi], "--lhsout")) {
-      debug("left results enabled");
-      option.lhs_out = 1;
-      continue;
-    }
-
-    // enable right result [setup]
-    if (!strcmp(argv[option.argi], "--rhsout")) {
-      debug("right results enabled");
-      option.rhs_out = 1;
       continue;
     }
 
@@ -383,19 +381,19 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set number of registers [setup]
-    if (!strcmp(argv[option.argi], "--regs") || (!option.lgopt && !strcmp(argv[option.argi], "-m"))) {
-      option.nregs = imin(REG_MAX, strtoul(argv[++option.argi],0,0));
-      debug("number of registers set to %d", option.nregs);
-      continue;
-    }
-
     // reset accumulation information [action]
     if (!strcmp(argv[option.argi], "--reset") || (!option.lgopt && !strcmp(argv[option.argi], "-r"))) {
       ensure(option.accum, "no accumulation file specified");
       debug("reseting file '%s'", option.accum);
       option.reset = 1;
       accum_summary(0, 0, 0, 0);
+      continue;
+    }
+
+    // enable right result [setup]
+    if (!strcmp(argv[option.argi], "--rhsres")) {
+      debug("right results enabled");
+      option.rhs_res = 1;
       continue;
     }
 

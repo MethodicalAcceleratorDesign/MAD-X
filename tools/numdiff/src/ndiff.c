@@ -267,7 +267,7 @@ ndiff_error(const struct context *cxt,
   warning("getAt   select [#%d]", context_findIdx(cxt, c2));
   warning("rules list:");
   context_print(cxt, stderr);
-  error("please report to mad@cern.ch");
+  error("please report bug to mad@cern.ch");
 }
 
 static void
@@ -651,7 +651,7 @@ ndiff_testNum (T *dif, const C *c)
 
   char *restrict lhs_p = dif->lhs_b+dif->lhs_i;
   char *restrict rhs_p = dif->rhs_b+dif->rhs_i;
-  char *end;
+  char *end=0;
 
   double lhs_d=0, rhs_d=0, scl_d=0, off_d=0, min_d=0, pow_d=0;
   double dif_d=0, err_d=0, abs_d=0, rel_d=0, dig_d=0;
@@ -666,12 +666,32 @@ ndiff_testNum (T *dif, const C *c)
   int l2 = parse_number(rhs_p, &d2, &n2, &e2, &f2);
   int ret = 0;
 
-  // missing numbers
+  // missing numbers (no eval)
   if (!l1 || !l2) {
     l1 = l2 = 25;
     ret |= eps_ign;
     goto quit_diff;
   }
+
+  // load/interpret numbers
+  lhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.lhs_reg, c->eps.cmd & eps_lhs ? (end=lhs_p+l1, c->eps.lhs) : strtod(lhs_p, &end)); assert(lhs_p+l1 == end);
+  rhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.rhs_reg, c->eps.cmd & eps_rhs ? (end=rhs_p+l2, c->eps.rhs) : strtod(rhs_p, &end)); assert(rhs_p+l2 == end);
+  scl_d = reg_getval(dif->reg, dif->reg_n, c->eps.scl_reg, c->eps.scl);
+  off_d = reg_getval(dif->reg, dif->reg_n, c->eps.off_reg, c->eps.off);
+  min_d = fmin(fabs(lhs_d),fabs(rhs_d));
+  pow_d = pow10(-imax(n1, n2));
+
+  // if one number is zero -> relative becomes absolute
+  if (!(min_d > 0.0)) min_d = 1.0;
+
+  // compute errors
+  dif_d = lhs_d - rhs_d;
+  err_d = scl_d * dif_d;
+  abs_d = err_d + off_d;
+  rel_d = abs_d/ min_d;
+  dig_d = abs_d/(min_d*pow_d);
+
+  trace("  numdiff: abs=%.2g, rel=%.2g, ndig=%d", abs_d, rel_d, imax(n1, n2));   
 
   // ignore difference
   if (c->eps.cmd & eps_ign) {
@@ -687,41 +707,14 @@ ndiff_testNum (T *dif, const C *c)
     }
   }
 
-  // strict comparison...
-  if (l1 == l2 && memcmp(lhs_p, rhs_p, l1) == 0)
-    goto quit;
+  // strict comparison
+  if (c->eps.cmd & eps_equ) {
+    if (l1 != l2 || memcmp(lhs_p, rhs_p, l1))
+      ret |= eps_equ;
 
-  // ...required
-  if ((c->eps.cmd & eps_equ) && !(c->eps.cmd & eps_dra)) {
-    ret |= eps_equ;
-    goto quit_diff;
+    if (ret) goto quit_diff;
+    else     goto quit;
   }
-
-  // convert numbers
-  lhs_d = strtod(lhs_p, &end); assert(end == lhs_p+l1);
-  rhs_d = strtod(rhs_p, &end); assert(end == rhs_p+l2);
-
-  // indirections
-  lhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.lhs_reg, c->eps.cmd & eps_lhs ? c->eps.lhs : lhs_d);
-  rhs_d = reg_getval(dif->reg, dif->reg_n, c->eps.rhs_reg, c->eps.cmd & eps_rhs ? c->eps.rhs : rhs_d);
-  scl_d = reg_getval(dif->reg, dif->reg_n, c->eps.scl_reg, c->eps.scl);
-  off_d = reg_getval(dif->reg, dif->reg_n, c->eps.off_reg, c->eps.off);
-
-  // components
-  min_d = fmin(fabs(lhs_d),fabs(rhs_d));
-  pow_d = pow10(-imax(n1, n2));
-
-  // if one number is zero -> relative becomes absolute
-  if (!(min_d > 0.0)) min_d = 1.0;
-
-  // compute errors
-  dif_d = lhs_d - rhs_d;
-  err_d = scl_d * dif_d;
-  abs_d = err_d + off_d;
-  rel_d = abs_d/ min_d;
-  dig_d = abs_d/(min_d*pow_d);
-
-  trace("  numdiff: abs=%.2g, rel=%.2g, ndig=%d", abs_d, rel_d, imax(n1, n2));   
 
   // absolute comparison
   if (c->eps.cmd & eps_abs) {
@@ -782,22 +775,21 @@ quit_diff:
   ret = 1;
 
 quit:
-  if (!ret) {
-    // moves
-    if (c->eps.cmd & eps_move)
-      for (int i=0; i < c->eps.reg_n; i++)
-        reg_move(dif->reg, dif->reg_n, c->eps.dst_reg[i], c->eps.src_reg[i], c->eps.cnt_reg[i]);
-
+  if (!ret || c->eps.cmd & eps_save) {
     // saves
-    if (c->eps.cmd & eps_sss) {
-      if (c->eps.cmd & eps_slhs) reg_setval(dif->reg, dif->reg_n, c->eps.slhs_reg, lhs_d);
-      if (c->eps.cmd & eps_srhs) reg_setval(dif->reg, dif->reg_n, c->eps.srhs_reg, rhs_d);
-      if (c->eps.cmd & eps_sdif) reg_setval(dif->reg, dif->reg_n, c->eps.sdif_reg, dif_d);
-      if (c->eps.cmd & eps_serr) reg_setval(dif->reg, dif->reg_n, c->eps.serr_reg, err_d);
-      if (c->eps.cmd & eps_sabs) reg_setval(dif->reg, dif->reg_n, c->eps.sabs_reg, abs_d);
-      if (c->eps.cmd & eps_srel) reg_setval(dif->reg, dif->reg_n, c->eps.srel_reg, rel_d);
-      if (c->eps.cmd & eps_sdig) reg_setval(dif->reg, dif->reg_n, c->eps.sdig_reg, dig_d);
-    }
+    reg_setval(dif->reg, dif->reg_n, 1, lhs_d);
+    reg_setval(dif->reg, dif->reg_n, 2, rhs_d);
+    reg_setval(dif->reg, dif->reg_n, 3, dif_d);
+    reg_setval(dif->reg, dif->reg_n, 4, err_d);
+    reg_setval(dif->reg, dif->reg_n, 5, abs_d);
+    reg_setval(dif->reg, dif->reg_n, 6, rel_d);
+    reg_setval(dif->reg, dif->reg_n, 7, dig_d);
+    reg_setval(dif->reg, dif->reg_n, 8, min_d);
+    reg_setval(dif->reg, dif->reg_n, 9, pow_d);
+
+    // operations
+    for (int i=0; i < c->eps.op_n; i++)
+      reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
   }
 
   dif->lhs_i += l1;

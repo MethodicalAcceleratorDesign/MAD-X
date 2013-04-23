@@ -109,11 +109,10 @@ finish:
   break; \
 }
 
-
 static int
 readEps(struct eps *e, FILE *in, int row)
 {
-  static const char *const op[] = { "", "-", "/", "-/" };
+  static const char *const op_str[] = { "", "-", "/", "-/" };
   int c = 0, n = 0, cmd = eps_invalid;
   char str[16], buf[TAG_LEN_2], *end;
 
@@ -147,6 +146,9 @@ readEps(struct eps *e, FILE *in, int row)
       else if (strcmp(str, "all") == 0) {
         cmd &= ~eps_any;  trace("[%d] all", row);
       }
+      else if (strcmp(str, "save") == 0) {
+        cmd |= eps_save; trace("[%d] save", row);
+      }
       else if (strcmp(str, "large") == 0) {
         cmd |= eps_large; trace("[%d] large", row);
       }
@@ -157,9 +159,10 @@ readEps(struct eps *e, FILE *in, int row)
         cmd |= eps_trace; trace("[%d] trace", row);
       }
       else EPS_INVALID;
+    }
 
 // commands with tag [='...'] or [="..."]
-    } else if ((c = ungetc(getc(in), in)) == '\'' || c == '"') {
+    else if ((c = ungetc(getc(in), in)) == '\'' || c == '"') {
       char c2 = 0;
 
       if (strcmp(str, "omit") == 0 && (n = fscanf(in, "%*['\"]%" MkString(TAG_LEN_2) "[^'\"]%c", e->tag, &c2)) == 2) {
@@ -190,59 +193,38 @@ readEps(struct eps *e, FILE *in, int row)
 
       ensure(n == 1 && *buf, "invalid assignment '%s' (%s:%d)", buf, option.cfg_file, row);
 
-      // --- save registers
-      if (*str == 'R' && !strchr(buf,'R')) {
-        int rn = strtoul(str+1, &end, 10);
-        ensure(reg_isvalid(rn) && !*end, "invalid register number %d (%s:%d)", rn, option.cfg_file, row);
+      // --- eval registers
+      if (*str == 'R' && strchr(buf,'R')) {
+        ensure(e->op_n < (int)sizeof e->op, "rule has too many operations (%s:%d)", option.cfg_file, row);
 
-             if (strcmp(buf, "lhs") == 0) {
-           cmd |= eps_slhs;  e->slhs_reg = rn;  trace("[%d] R%d=lhs", row, e->slhs_reg);
-        }
-        else if (strcmp(buf, "rhs") == 0) {
-           cmd |= eps_srhs;  e->srhs_reg = rn;  trace("[%d] R%d=rhs", row, e->srhs_reg);
-        }
-        else if (strcmp(buf, "dif") == 0) {
-           cmd |= eps_sdif;  e->sdif_reg = rn;  trace("[%d] R%d=dif", row, e->sdif_reg);
-        }
-        else if (strcmp(buf, "err") == 0) {
-           cmd |= eps_serr;  e->serr_reg = rn;  trace("[%d] R%d=err", row, e->serr_reg);
-        }
-        else if (strcmp(buf, "abs") == 0) {
-           cmd |= eps_sabs;  e->sabs_reg = rn;  trace("[%d] R%d=abs", row, e->sabs_reg);
-        }
-        else if (strcmp(buf, "rel") == 0) {
-           cmd |= eps_srel;  e->srel_reg = rn;  trace("[%d] R%d=rel", row, e->srel_reg);
-        }
-        else if (strcmp(buf, "dig") == 0) {
-           cmd |= eps_sdig;  e->sdig_reg = rn;  trace("[%d] R%d=dig", row, e->sdig_reg);
-        }
-        else EPS_INVALID;
-      }
+        int dst = strtoul(str+1, &end, 10);
+        ensure(reg_isvalid(dst) && !*end, "invalid register reference '%s' (%s:%d)", str, option.cfg_file, row);
 
-      // --- move registers
-      else if (*str == 'R' && strchr(buf,'R')) {
-        ensure(e->reg_n < 5, "rule has too many moves (%s:%d)", option.cfg_file, row);
-
-        int rn = strtoul(str+1, &end, 10);
-        ensure(reg_isvalid(rn) && !*end, "invalid register reference '%s' (%s:%d)", str, option.cfg_file, row);
-
-        int rn1=0, rn2=0;
+        char op=0;
+        int src=0, src2=0;
         int s = *buf == '-' || (*buf && buf[1] == '-');
         int i = *buf == '/' || (*buf && buf[1] == '/');
-        int n = sscanf(buf+s+i, "R%d..R%d", &rn1, &rn2);
-        ensure(reg_isvalid(rn1) && (n == 1 || (reg_isvalid(rn2) && rn1 < rn2)),
-               "invalid register reference(s) '%s' (%s:%d)", buf, option.cfg_file, row);
 
-        // move single register
+        int n = sscanf(buf+s+i, "R%d%cR%d", &src, &op, &src2);
+
         if (n == 1) {
-          cmd |= eps_move; trace("[%d] R%d=R%d", row, rn, rn1);
-          e->dst_reg[e->reg_n] = rn; e->src_reg[e->reg_n] = reg_encode(rn1, s, i); e->cnt_reg[e->reg_n] = 1; e->reg_n++;
+          trace("[%d] R%d=%sR%d", row, dst, op_str[s+2*i], src);
+          e->dst [e->op_n] = dst;
+          e->src [e->op_n] = reg_encode(src, s, i);
+          e->src2[e->op_n] = 0;
+          e->op  [e->op_n] = 0;
+          e->op_n++;
         }
-
-        // move sequence of registers
-        else if (n == 2) {
-          cmd |= eps_move; trace("[%d] R%d=R%d..R%d", row, rn, rn1, rn2);
-          e->dst_reg[e->reg_n] = rn; e->src_reg[e->reg_n] = reg_encode(rn1, s, i); e->cnt_reg[e->reg_n] = rn2-rn1+1; e->reg_n++;
+        else if (n == 3) {
+          trace("[%d] R%d=R%d%cR%d", row, dst, src, op, src2);
+          ensure(!s && !i, "invalid prefix operations '%s'", buf, option.cfg_file, row);
+          ensure(reg_isvalid(src ), "invalid register reference '%d' (%s:%d)", src , option.cfg_file, row);
+          ensure(reg_isvalid(src2), "invalid register reference '%d' (%s:%d)", src2, option.cfg_file, row);
+          e->dst [e->op_n] = dst;
+          e->src [e->op_n] = src;
+          e->src2[e->op_n] = src2;
+          e->op  [e->op_n] = op;
+          e->op_n++;
         }
         else EPS_INVALID;
       }
@@ -254,45 +236,45 @@ readEps(struct eps *e, FILE *in, int row)
         int rn = strtoul(buf+s+i, &end, 10);
         ensure(reg_isvalid(rn) && !*end, "invalid register reference '%s' (%s:%d)", buf, option.cfg_file, row);
 
-             if (strcmp(str, "lhs") == 0) {
-           cmd |= eps_lhs;  e->lhs_reg = reg_encode(rn, s, i);  trace("[%d] lhs=%sR%d", row, op[s+2*i], rn);
+             if (strcmp(str, "goto") == 0) {
+          cmd |= eps_gonum | eps_istr;
+                            e->gto_reg = reg_encode(rn, s, i);  trace("[%d] goto=%sR%d", row, op_str[s+2*i], rn);
+        }
+        else if (strcmp(str, "lhs") == 0) {
+           cmd |= eps_lhs;  e->lhs_reg = reg_encode(rn, s, i);  trace("[%d] lhs=%sR%d", row, op_str[s+2*i], rn);
         }
         else if (strcmp(str, "rhs") == 0) {
-           cmd |= eps_rhs;  e->rhs_reg = reg_encode(rn, s, i);  trace("[%d] rhs=%sR%d", row, op[s+2*i], rn);
-        }
-        else if (strcmp(str, "goto") == 0) {
-          cmd |= eps_gonum | eps_istr;
-                            e->gto_reg = reg_encode(rn, s, i);  trace("[%d] goto=%sR%d", row, op[s+2*i], rn);
+           cmd |= eps_rhs;  e->rhs_reg = reg_encode(rn, s, i);  trace("[%d] rhs=%sR%d", row, op_str[s+2*i], rn);
         }
         else if (strcmp(str, "scl") == 0) {
-                            e->scl_reg = reg_encode(rn, s, i);  trace("[%d] scl=%sR%d", row, op[s+2*i], rn);
+                            e->scl_reg = reg_encode(rn, s, i);  trace("[%d] scl=%sR%d", row, op_str[s+2*i], rn);
         }
         else if (strcmp(str, "off") == 0) {
-                            e->off_reg = reg_encode(rn, s, i);  trace("[%d] off=%sR%d", row, op[s+2*i], rn);
+                            e->off_reg = reg_encode(rn, s, i);  trace("[%d] off=%sR%d", row, op_str[s+2*i], rn);
         }
         else if (strcmp(str, "abs") == 0) {
-          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, s, i);  trace("[%d] abs=%sR%d", row, op[s+2*i], rn);  e->_abs_reg = reg_encode(rn, -s, i);
+          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, s, i);  trace("[%d] abs=%sR%d", row, op_str[s+2*i], rn);  e->_abs_reg = reg_encode(rn, -s, i);
           ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0), "invalid absolute constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-abs") == 0) {
-          cmd |= eps_abs;   e->_abs_reg = reg_encode(rn, s, i);  trace("[%d] -abs=%sR%d", row, op[s+2*i], rn);
-          ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0), "invalid absolute constraint (%s:%d)", option.cfg_file, row);
+          cmd |= eps_abs;   e->_abs_reg = reg_encode(rn, s, i);  trace("[%d] -abs=%sR%d", row, op_str[s+2*i], rn);
+          ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0), "invalid negative absolute constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "rel") == 0) {
-          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, s, i);  trace("[%d] rel=%sR%d", row, op[s+2*i], rn);  e->_rel = reg_encode(rn, -s, i);
+          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, s, i);  trace("[%d] rel=%sR%d", row, op_str[s+2*i], rn);  e->_rel = reg_encode(rn, -s, i);
           ensure(e->rel >= 0.0 && (cmd & eps_large || e->rel <= 1.0), "invalid relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-rel") == 0) {
-          cmd |= eps_rel;   e->_rel_reg = reg_encode(rn, s, i);  trace("[%d] -rel=%sR%d", row, op[s+2*i], rn);
-          ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0), "invalid relative constraint (%s:%d)", option.cfg_file, row);
+          cmd |= eps_rel;   e->_rel_reg = reg_encode(rn, s, i);  trace("[%d] -rel=%sR%d", row, op_str[s+2*i], rn);
+          ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0), "invalid negative relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "dig") == 0) {
-          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, s, i);  trace("[%d] dig=%sR%d", row, op[s+2*i], rn);  e->_dig = reg_encode(rn, -s, i);
-          ensure(e->dig >= 1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, s, i);  trace("[%d] dig=%sR%d", row, op_str[s+2*i], rn);  e->_dig = reg_encode(rn, -s, i);
+          ensure(e->dig >= 1.0, "invalid digital relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-dig") == 0) {
-          cmd |= eps_dig;   e->_dig_reg = reg_encode(rn, s, i);  trace("[%d] -dig=%sR%d", row, op[s+2*i], rn);
-          ensure(e->_dig <= -1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+          cmd |= eps_dig;   e->_dig_reg = reg_encode(rn, s, i);  trace("[%d] -dig=%sR%d", row, op_str[s+2*i], rn);
+          ensure(e->_dig <= -1.0, "invalid negative digital relative constraint (%s:%d)", option.cfg_file, row);
         }
         else EPS_INVALID;
       }
@@ -308,41 +290,38 @@ readEps(struct eps *e, FILE *in, int row)
         else if (strcmp(str, "rhs") == 0) {
            cmd |= eps_rhs;  e->rhs = val;  trace("[%d] rhs=%g", row, val);
         }
-
         else if (strcmp(str, "scl") == 0) {
                             e->scl = val;  trace("[%d] scl=%g", row, val);
         }
         else if (strcmp(str, "off") == 0) {
                             e->off = val;  trace("[%d] off=%g", row, val);
         }
-
         else if (strcmp(str, "abs") == 0) {
           cmd |= eps_abs;   e->abs = val;  trace("[%d] abs=%g", row, val);  e->_abs = -val;
           ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0), "invalid absolute constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-abs") == 0) {
           cmd |= eps_abs;   e->_abs = val;  trace("[%d] -abs=%g", row, val);
-          ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0), "invalid absolute constraint (%s:%d)", option.cfg_file, row);
+          ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0), "invalid negative absolute constraint (%s:%d)", option.cfg_file, row);
         }
-
         else if (strcmp(str, "rel") == 0) {
           cmd |= eps_rel;   e->rel = val;  trace("[%d] rel=%g", row, val);  e->_rel = -val;
           ensure(e->rel >= 0.0 && (cmd & eps_large || e->rel <= 1.0), "invalid relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-rel") == 0) {
           cmd |= eps_rel;   e->_rel = val;  trace("[%d] -rel=%g", row, val);
-          ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0), "invalid relative constraint (%s:%d)", option.cfg_file, row);
+          ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0), "invalid negative relative constraint (%s:%d)", option.cfg_file, row);
         }
-
         else if (strcmp(str, "dig") == 0) {
           cmd |= eps_dig;   e->dig = val;  trace("[%d] dig=%g", row, val);  e->_dig = -val;
-          ensure(e->dig >= 1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+          ensure(e->dig >= 1.0, "invalid digital relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "-dig") == 0) {
           cmd |= eps_dig;   e->_dig = val;  trace("[%d] -dig=%g", row, val);
-          ensure(e->_dig <= -1.0, "invalid digital error (%s:%d)", option.cfg_file, row);
+          ensure(e->_dig <= -1.0, "invalid negative digital relative constraint (%s:%d)", option.cfg_file, row);
         }
         else EPS_INVALID;
+
       }
       else EPS_INVALID;
     }
@@ -365,7 +344,7 @@ readEps(struct eps *e, FILE *in, int row)
 void
 constraint_print(const T* cst, FILE *out)
 {
-  static const char *const op[] = { "", "-", "/", "-/" };
+  static const char *const op_str[] = { "", "-", "/", "-/" };
   int rn, s, i;
 
   if (!out) out = stdout;
@@ -381,6 +360,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_ign)    fprintf(out, "ign ");
   if (cst->eps.cmd & eps_istr)   fprintf(out, "istr ");
   if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");
+  if (cst->eps.cmd & eps_save)   fprintf(out, "save ");
   if (cst->eps.cmd & eps_trace)  fprintf(out, "trace ");
 
   if (cst->eps.cmd & eps_omit)   fprintf(out, "omit='%s' ", cst->eps.tag);
@@ -390,7 +370,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_gonum)  {
     if (cst->eps.gto_reg) {
       rn = reg_decode(cst->eps.gto_reg, &s, &i);
-      fprintf(out, "goto=%sR%d (num) ", op[s+2*i], rn);
+      fprintf(out, "goto=%sR%d (num) ", op_str[s+2*i], rn);
     }
     else fprintf(out, "goto='%s' (num) ", cst->eps.tag);
   }
@@ -398,7 +378,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_lhs) {
     if (cst->eps.lhs_reg) {
       rn = reg_decode(cst->eps.lhs_reg, &s, &i);
-      fprintf(out, "lhs=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "lhs=%sR%d ", op_str[s+2*i], rn);
     }
     else fprintf(out, "lhs=%g ", cst->eps.lhs);
   }
@@ -406,7 +386,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_rhs) {
     if (cst->eps.rhs_reg) {
       rn = reg_decode(cst->eps.rhs_reg, &s, &i);
-      fprintf(out, "rhs=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "rhs=%sR%d ", op_str[s+2*i], rn);
     }
     else fprintf(out, "rhs=%g ", cst->eps.rhs);
   }
@@ -414,28 +394,28 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.scl != 1.0) fprintf(out, "scl=%g ", cst->eps.scl);
   if (cst->eps.scl_reg) {
     rn = reg_decode(cst->eps.scl_reg, &s, &i);
-    fprintf(out, "scl=%sR%d ", op[s+2*i], rn);
+    fprintf(out, "scl=%sR%d ", op_str[s+2*i], rn);
   }
   else fprintf(out, "scl=%g ", cst->eps.scl);
 
   if (cst->eps.off != 1.0) fprintf(out, "off=%g ", cst->eps.off);
   if (cst->eps.off_reg) {
     rn = reg_decode(cst->eps.off_reg, &s, &i);
-    fprintf(out, "off=%sR%d ", op[s+2*i], rn);
+    fprintf(out, "off=%sR%d ", op_str[s+2*i], rn);
   }
   else fprintf(out, "off=%g ", cst->eps.off);
 
   if (cst->eps.cmd & eps_abs) {
     if (cst->eps.abs_reg) {
       rn = reg_decode(cst->eps.abs_reg, &s, &i);
-      fprintf(out, "abs=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "abs=%sR%d ", op_str[s+2*i], rn);
     }
     else fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
                       cst->eps.abs > 1        ? "large " : "", cst->eps.abs);
 
     if (cst->eps._abs_reg && cst->eps._abs_reg != -cst->eps.abs_reg) {
       rn = reg_decode(cst->eps._abs_reg, &s, &i);
-      fprintf(out, "-abs=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "-abs=%sR%d ", op_str[s+2*i], rn);
     }
     else if (cst->eps._abs != -cst->eps.abs)
         fprintf(out, cst->eps._abs == -DBL_MIN ? "-abs=-eps " : "%s-abs=%g ",
@@ -445,13 +425,13 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_rel) {
     if (cst->eps.rel_reg) {
       rn = reg_decode(cst->eps.rel_reg, &s, &i);
-      fprintf(out, "rel=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "rel=%sR%d ", op_str[s+2*i], rn);
     }
     else fprintf(out, "%srel=%g ", cst->eps.rel > 1 ? "large " : "", cst->eps.rel);
 
     if (cst->eps._rel_reg && cst->eps._rel_reg != -cst->eps.rel_reg) {
       rn = reg_decode(cst->eps._rel_reg, &s, &i);
-      fprintf(out, "-rel=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "-rel=%sR%d ", op_str[s+2*i], rn);
     }
     else if (cst->eps._rel != -cst->eps.rel)
       fprintf(out, "%s-rel=%g ", cst->eps._rel < -1 ? "large " : "", cst->eps._rel);
@@ -460,37 +440,27 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_dig) {
     if (cst->eps.dig_reg) {
       rn = reg_decode(cst->eps.dig_reg, &s, &i);
-      fprintf(out, "dig=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "dig=%sR%d ", op_str[s+2*i], rn);
     }
     else fprintf(out, "dig=%g ", cst->eps.dig);
 
     if (cst->eps._dig_reg && cst->eps._dig_reg != -cst->eps.dig_reg) {
       rn = reg_decode(cst->eps._dig_reg, &s, &i);
-      fprintf(out, "-dig=%sR%d ", op[s+2*i], rn);
+      fprintf(out, "-dig=%sR%d ", op_str[s+2*i], rn);
     }
     else if (cst->eps._dig != -cst->eps.dig)
       fprintf(out, "-dig=%g ", cst->eps._dig);
   }   
 
-// --- moves
-  if (cst->eps.cmd & eps_move) {
-    for (int i=0; i < cst->eps.reg_n; i++) {
-      rn = reg_decode(cst->eps.src_reg[i], &s, &i);
-      if (cst->eps.cnt_reg[i] > 1)
-        fprintf(out, "R%d=%sR%d..R%d ", cst->eps.dst_reg[i], op[s+2*i], rn, cst->eps.src_reg[i]+cst->eps.cnt_reg[i]-1);
-      else
-        fprintf(out, "R%d=%sR%d ", cst->eps.dst_reg[i], op[s+2*i], rn);
+// --- operations
+  for (int j=0; j < cst->eps.op_n; j++) {
+    if (cst->eps.op[j])
+      fprintf(out, "R%d=R%d%cR%d ", cst->eps.dst[j], cst->eps.src[j], cst->eps.op[j], cst->eps.src2[j]);
+    else {
+      rn = reg_decode(cst->eps.src[j], &s, &i);
+      fprintf(out, "R%d=%sR%d ", cst->eps.dst[j], op_str[s+2*i], rn);
     }
   }
-
-// --- saves
-  if (cst->eps.cmd & eps_slhs)  fprintf(out, "R%d=lhs ", cst->eps.slhs_reg);
-  if (cst->eps.cmd & eps_srhs)  fprintf(out, "R%d=rhs ", cst->eps.srhs_reg);
-  if (cst->eps.cmd & eps_sdif)  fprintf(out, "R%d=dif ", cst->eps.sdif_reg);
-  if (cst->eps.cmd & eps_serr)  fprintf(out, "R%d=err ", cst->eps.serr_reg);
-  if (cst->eps.cmd & eps_sabs)  fprintf(out, "R%d=abs ", cst->eps.sabs_reg);
-  if (cst->eps.cmd & eps_srel)  fprintf(out, "R%d=rel ", cst->eps.srel_reg);
-  if (cst->eps.cmd & eps_sdig)  fprintf(out, "R%d=dig ", cst->eps.sdig_reg);
 }
 
 void

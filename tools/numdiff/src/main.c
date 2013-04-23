@@ -146,9 +146,9 @@ main(int argc_, char** argv_)
        option.lhs_zip  =  option.rhs_zip  =  option.cfg_zip  = 0;
 
       // open files
-      lhs_fp = open_file(lhs_s, option.lhs_out ? &lhs_rfp : 0, &nn, option.out_e, 1, 0);
+      lhs_fp = open_file(lhs_s, option.lhs_res ? &lhs_rfp : 0, &nn, option.out_e, 1, 0);
       if (!lhs_fp && n) break; // end of serie
-      rhs_fp = open_file(rhs_s, option.rhs_out ? &rhs_rfp : 0, &nn, option.ref_e, !option.list, 1);
+      rhs_fp = open_file(rhs_s, option.rhs_res ? &rhs_rfp : 0, &nn, option.ref_e, !option.list, 1);
       cfg_fp = open_file(cfg_s,                             0, &nn, option.cfg_e, !option.list, 0);
       if (n != nn) { n = nn; --total; }
 

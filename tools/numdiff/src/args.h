@@ -35,7 +35,7 @@ struct option {
   char rhs_file[FILENAME_MAX];
   char cfg_file[FILENAME_MAX];
   int  lhs_zip, rhs_zip, cfg_zip;
-  int  lhs_out, rhs_out;
+  int  lhs_res, rhs_res;
   int  argi;
 
   const char *accum;

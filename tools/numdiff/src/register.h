@@ -27,40 +27,40 @@
 // ----- interface
 
 static inline bool
-reg_isvalid(int n)
+reg_isvalid(int rn)
 {
-  return n > 0 && n < REG_MAX;
+  return rn > 0 && rn < REG_MAX;
 }
 
 static inline int
-reg_encode(int n, int s, int i)
+reg_encode(int rn, int s, int i)
 {
-  ensure(reg_isvalid(n), "invalid register number %d", n);
-  if (i) { n += REG_MAX; }
-  if (s) { n  = -n;      }
-  return n;
+  ensure(reg_isvalid(rn), "invalid register number %d", rn);
+  if (i) { rn += REG_MAX; }
+  if (s) { rn  = -rn;     }
+  return rn;
 }
 
 static inline int
-reg_decode(int n, int *s, int *i)
+reg_decode(int rn, int *s, int *i)
 {
-  if (n < 0      ) { n  = -n;      if (s) *s = 1; }
-  if (n > REG_MAX) { n -= REG_MAX; if (i) *i = 1; }
-  ensure(reg_isvalid(n), "invalid register number %d", n);
-  return n;
+  if (rn < 0      ) { rn  = -rn;     if (s) *s = 1; }
+  if (rn > REG_MAX) { rn -= REG_MAX; if (i) *i = 1; }
+  ensure(reg_isvalid(rn), "invalid register number %d", rn);
+  return rn;
 }
 
 static inline double
-reg_getval(const double *reg, int reg_n, int n, double val)
+reg_getval(const double *reg, int reg_n, int rn, double val)
 {
-  if (n) {
+  if (rn) {
     int s = 0, i = 0;
 
-    if (n < 0      ) { s = 1; n  = -n;      }
-    if (n > REG_MAX) { i = 1; n -= REG_MAX; }
+    if (rn < 0      ) { s = 1; rn  = -rn;     }
+    if (rn > REG_MAX) { i = 1; rn -= REG_MAX; }
 
-    ensure(n > 0 && n <= reg_n, "invalid register number %d", n);
-    val = reg[n-1];
+    ensure(rn > 0 && rn <= reg_n, "invalid register number %d", rn);
+    val = reg[rn-1];
 
     if (i) val = 1/val;
     if (s) val =  -val;
@@ -69,36 +69,40 @@ reg_getval(const double *reg, int reg_n, int n, double val)
 }
 
 static inline void
-reg_setval(double *reg, int reg_n, int n, double val)
+reg_setval(double *reg, int reg_n, int rn, double val)
 {
-  ensure(n > 0 && n <= reg_n, "invalid register number %d", n);
-  reg[n-1] = val;
+  ensure(rn > 0 && rn <= reg_n, "invalid register number %d", rn);
+  reg[rn-1] = val;
 }
 
 static inline void
-reg_copy(double *reg, int reg_n, int from, int to)
+reg_eval(double *reg, int reg_n, int dst, int src, int src2, int op)
 {
-    ensure(to   > 0 && to   <= reg_n, "invalid register %d", to  );
-    ensure(from > 0 && from <= reg_n, "invalid register %d", from);
-    reg[to-1] = reg_getval(reg, reg_n, from, 0);
-}
+  ensure(dst > 0 && dst < reg_n, "invalid register %d", dst);
 
-static inline void
-reg_move(double *reg, int reg_n, int from, int to, int cnt)
-{
-  if (!cnt)
-    reg_copy(reg, reg_n, from, to);
-
+  if (!op) { // nop = copy
+    reg[dst] = reg_getval(reg, reg_n, src, 0);
+  }
   else {
-    ensure(to   > 0 && to  +cnt <= reg_n, "invalid register range %d-%d", to  , to  +cnt);
-    ensure(from > 0 && from+cnt <= reg_n, "invalid register range %d-%d", from, from+cnt);
-
-    if (to <= from) // take care of overlapping registers
-      for (int i=0; i < cnt; i++)    
-        reg[to+i-1] = reg_getval(reg, reg_n, from+i, 0);
-    else
-      for (int i=cnt-1; i >= 0; i--)    
-        reg[to+i-1] = reg_getval(reg, reg_n, from+i, 0);
+    ensure(src  > 0 && src  < reg_n, "invalid register %d", src);
+    ensure(src2 > 0 && src2 < reg_n, "invalid register %d", src2);
+    switch(op) {
+    case '+': reg[dst] = reg[src] + reg[src2]; break;
+    case '-': reg[dst] = reg[src] - reg[src2]; break;
+    case '*': reg[dst] = reg[src] * reg[src2]; break;
+    case '/': reg[dst] = reg[src] / reg[src2]; break;
+    case '~':
+      ensure(src < src2, "invalid range of registers %d~%d", src, src2);
+      if (dst <= src) // take care of overlapping registers
+        for (int i=0; i <= src2-src; i++)    
+          reg[dst+i] = reg[src+i];
+      else
+        for (int i=src2-src; i >= 0; i--)    
+          reg[dst+i] = reg[src+i];
+      break;
+    default:
+      error("invalid register operation '%c'", op);
+    }
   }
 }
 
