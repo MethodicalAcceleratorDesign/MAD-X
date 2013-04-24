@@ -91,11 +91,12 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
       dangle=((pi/2)-(alfa+theta))/napex; } 
   else if (fabs(alfa+theta-pi/2) < MIN_DOUBLE * 1.e10) //rectangle, single point, zero interval  
     { napex=0 ; 
-      dangle=0.; } 
-  else if (fabs(alfa+theta) < MIN_DOUBLE * 1.e10) // ellipse, 20 points, 19 intervals            
-    { napex=19 ; 
-      dangle=(pi/2)/napex; } 
-  else // general rectellipse,  2 <= napex <= 19, napex intervals
+      dangle=0.; }
+  // following case is useless and covered by the general rectellipse. 
+  //  else if (fabs(alfa+theta) < MIN_DOUBLE * 1.e10) // ellipse, 20 points, 19 intervals            
+  //  { napex=19 ; 
+  //    dangle=(pi/2)/napex; } 
+  else // general rectellipse,  1 <= napex <= 19 intervals
     { napex = 1 + floor(18 * fabs(1-(alfa+theta)/(pi/2))) ; 
       dangle=((pi/2)-(alfa+theta))/napex; } 
 
@@ -417,8 +418,8 @@ int i=quarterlength+1, j;
 
   *halolength=i-1;
 
-  for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
-  printf("\n");
+  // for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
+  // printf("\n");
 }
 
 static void
@@ -518,7 +519,7 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
       *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
       if ( (*ap3) <= 0 || (*ap4) <= 0) 
 	{ 
-	  printf("-- in aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  // printf("-- in aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
 	  return 0;
 	}
       else
@@ -536,9 +537,9 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     {
       *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
       *ap2 = get_aperture(current_node, "var2");      /*half height rect*/
-      if ( (*ap1) <= 0 || (*ap2) <= 0) // return 0;
+      if ( (*ap1) <= 0 || (*ap2) <= 0)
 	{ 
-	  printf("-- in aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  // printf("-- in aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
 	  return 0;
 	}
       else
@@ -557,9 +558,9 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
       *ap1=get_aperture(current_node, "var1"); /*half width rect*/
       *ap2=get_aperture(current_node, "var2"); /*half height rect*/
       *ap3=get_aperture(current_node, "var3"); /*radius circle*/
-      if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0) // return 0;
+      if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0)
 	{ 
-	  printf("-- in aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  // printf("-- in aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
 	  return 0;
 	}
       else 
@@ -588,7 +589,7 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
       
       if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0 || (*ap4) <= 0)
 	{ 
-	  printf("-- in aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  // printf("-- in aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
 	  return 0;
 	}
       else
@@ -611,7 +612,7 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
       if ( (*ap1) <= 0 || (*ap2) <= 0 ) 
 	{ 
-	  printf("-- in aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+	  // printf("-- in aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
 	  return 0;
 	}
 
