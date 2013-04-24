@@ -13,7 +13,7 @@
   
    Purpose:
      manage access to registers
-     handle basic operations (-, /)
+     handle arithmetic operations (+, -, *, /) and range (~)
  
  o---------------------------------------------------------------------o
 */
