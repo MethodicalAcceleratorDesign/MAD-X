@@ -365,7 +365,8 @@ int
 context_findLine (const T *cxt, const C *cst)
 {
   assert(cxt && cst);
-  return cst >= cxt->dat && cst < cxt->dat+cxt->dat_n ? cst->line : -1;
+  return cxt->dat_n > 0 && cst->line > 0 &&
+         cst->line <= cxt->dat[cxt->dat_n-1].line ? cst->line : -1;
 }
 
 T*

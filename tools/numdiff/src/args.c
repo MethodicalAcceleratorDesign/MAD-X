@@ -158,6 +158,7 @@ usage(void)
   inform("\t    --lhsres        echo valid lines of left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
+  inform("\t    --nores         disable result files");
   inform("\t    --nowarn        disable warnings");
   inform("\t    --nregs num     specify the number of registers to allocate");
   inform("\t-n  --serie         enable serie mode (indexed filenames)");
@@ -225,6 +226,7 @@ usage(void)
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
   inform("\t                    num < -1 in -abs and -rel (default, qualifier)");
   inform("\ttrace               trace rule when active (debug, qualifier)");
+  inform("\ttraceR              trace rule and modified registers when active");
 
   inform("");
   inform("registers:");
@@ -329,7 +331,15 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
-    // set debug mode [setup]
+    // disable result files [setup]
+    if (!strcmp(argv[option.argi], "--nores")) {
+      debug("result files disables");
+      option.lhs_res = 0;
+      option.rhs_res = 0;
+      continue;
+    }
+
+    // disable warnings [setup]
     if (!strcmp(argv[option.argi], "--nowarn")) {
       debug("no warning mode on");
       logmsg_config.level = error_level;

@@ -255,7 +255,7 @@ ndiff_grow (T *dif, int n)
   }
 }
 
-// ----- private (error helpers)
+// ----- private (error & trace helpers)
 
 static void
 ndiff_error(const struct context *cxt,
@@ -274,11 +274,22 @@ static void
 ndiff_header(void)
 {
   if (option.test)
-    warning("(*) files '" CSTR_RED("%s") "'|'" CSTR_RED("%s") "' from '%s' differ",
+    warning("(*) files '%s'|'%s' from '%s' differ",
             option.lhs_file, option.rhs_file, option.test);
   else
-    warning("(*) files '" CSTR_RED("%s") "'|'" CSTR_RED("%s") "' differ",
+    warning("(*) files '%s'|'%s' differ",
             option.lhs_file, option.rhs_file);
+}
+
+static void
+ndiff_traceR(const T *dif, double abs, double _abs, double rel, double _rel, double dig, double _dig)
+{
+  trace("  abs=%.17g, _abs=%.17g, rel=%.17g, _rel=%.17g, dig=%.17g, _dig=%.17g",
+           abs, _abs, rel, _rel, dig, _dig);
+  trace("  R1=%.17g, R2=%.17g, R3=%.17g, R4=%.17g, R5=%.17g, "
+           "R6=%.17g, R7=%.17g, R8=%.17g, R9=%.17g",
+           dif->reg[1], dif->reg[2], dif->reg[3], dif->reg[4], dif->reg[5],
+           dif->reg[6], dif->reg[7], dif->reg[8], dif->reg[9]);
 }
 
 // -----------------------------------------------------------------------------
@@ -472,8 +483,6 @@ ndiff_gotoNum (T *dif, const C *c)
   if ((c->eps.cmd & eps_equ) && slice_isFull(&c->col))
     return ndiff_gotoLine(dif, &_c);
 
-//  warning("gotoNum not yet implemented");
-
   // --- lhs ---
   memcpy(dif->rhs_b, _c.eps.tag, sizeof _c.eps.tag);
 
@@ -511,7 +520,10 @@ lhs_done: ;
   memcpy(tag, dif->lhs_b, sizeof tag);
   memcpy(dif->lhs_b, _c.eps.tag, sizeof _c.eps.tag);
   _c.eps.scl = -_c.eps.scl;
-  _c.eps.scl_reg = -_c.eps.scl_reg;
+  { // reverse the register value
+    int sgn, inv, rn = reg_decode(_c.eps.scl_reg, &sgn, &inv);
+    _c.eps.scl_reg = reg_encode(rn, -sgn, inv);
+  }
 
   while (1) {
     int s = 0, n = 0;
@@ -548,7 +560,7 @@ rhs_done: ;
   dif->col_i  = 0;
   dif->row_i += i1 < i2 ? i1 : i2;
 
-  // return with last lhs and rhs lines loaded if number was found
+  // return with last lhs and rhs lines loaded
 
   trace("  buffers: '%.25s'|'%.25s'", dif->lhs_b, dif->rhs_b);
   trace("<-gotoNum line %d (%+d|%+d)", dif->row_i, i1, i2);
@@ -668,7 +680,9 @@ ndiff_testNum (T *dif, const C *c)
 
   // missing numbers (no eval)
   if (!l1 || !l2) {
-    l1 = l2 = 25;
+    if ((c->eps.cmd & (eps_ign | eps_istr)) == (eps_ign | eps_istr))
+      goto quit;
+
     ret |= eps_ign;
     goto quit_diff;
   }
@@ -691,7 +705,7 @@ ndiff_testNum (T *dif, const C *c)
   rel_d = abs_d/ min_d;
   dig_d = abs_d/(min_d*pow_d);
 
-  trace("  numdiff: abs=%.2g, rel=%.2g, ndig=%d", abs_d, rel_d, imax(n1, n2));   
+  trace("  abs=%.2g, rel=%.2g, ndig=%d", abs_d, rel_d, imax(n1, n2));   
 
   // ignore difference
   if (c->eps.cmd & eps_ign) {
@@ -751,23 +765,23 @@ quit_diff:
     warning(str, dif->cnt_i, lhs_p, rhs_p);
 
     if (ret & eps_ign)
-      warning("(%d) one number is missing (column no can be wrong)", dif->cnt_i);
+      warning("(%d) one number is missing (column count can be wrong)", dif->cnt_i);
 
     if (ret & eps_equ)
       warning("(%d) numbers strict representation differ", dif->cnt_i);
 
     if (ret & eps_abs)
-      warning("(%d) absolute error (rule #%d, line %d: %g<=abs<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+      warning("(%d) absolute error (rule #%d, line %d: %.2g<=abs<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               _abs, abs, abs_d, rel_d, imax(n1, n2));   
 
     if (ret & eps_rel)
-      warning("(%d) relative error (rule #%d, line %d: %g<=rel<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+      warning("(%d) relative error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               _rel, rel, abs_d, rel_d, imax(n1, n2));   
 
     if (ret & eps_dig)
-      warning("(%d) numdigit error (rule #%d, line %d: %g<=rel<=%g) |abs|=%.2g, |rel|=%.2g, ndig=%d",
+      warning("(%d) numdigit error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
               _dig*pow_d, dig*pow_d, abs_d, rel_d, imax(n1, n2));   
  
@@ -777,8 +791,8 @@ quit_diff:
 quit:
   if (!ret || c->eps.cmd & eps_save) {
     // saves
-    reg_setval(dif->reg, dif->reg_n, 1, lhs_d);
-    reg_setval(dif->reg, dif->reg_n, 2, rhs_d);
+    reg_setval(dif->reg, dif->reg_n, 1, c->eps.lhs_reg || c->eps.cmd & eps_lhs ? strtod(lhs_p, 0) : lhs_d);
+    reg_setval(dif->reg, dif->reg_n, 2, c->eps.rhs_reg || c->eps.cmd & eps_rhs ? strtod(rhs_p, 0) : rhs_d);
     reg_setval(dif->reg, dif->reg_n, 3, dif_d);
     reg_setval(dif->reg, dif->reg_n, 4, err_d);
     reg_setval(dif->reg, dif->reg_n, 5, abs_d);
@@ -787,9 +801,24 @@ quit:
     reg_setval(dif->reg, dif->reg_n, 8, min_d);
     reg_setval(dif->reg, dif->reg_n, 9, pow_d);
 
-    // operations
-    for (int i=0; i < c->eps.op_n; i++)
-      reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
+    // operations with registers trace
+    if (c->eps.cmd & eps_traceR) {
+      ndiff_traceR(dif, abs, _abs, rel, _rel, dig, _dig);
+
+      char buf[50*sizeof c->eps.op] = "  ";
+      int pos = 2;
+
+      for (int i=0; i < c->eps.op_n; i++) {
+        reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
+        pos += sprintf(buf+pos, "R%d=%.17g, ", c->eps.dst[i], dif->reg[c->eps.dst[i]]);
+      }
+      if (pos>2) { buf[pos-2] = 0; trace(buf); }
+    }
+
+    // operations without trace
+    else
+      for (int i=0; i < c->eps.op_n; i++)
+        reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
   }
 
   dif->lhs_i += l1;

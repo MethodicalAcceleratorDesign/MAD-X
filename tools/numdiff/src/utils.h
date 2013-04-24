@@ -34,6 +34,9 @@
 #define MkString(a) MkString_(a)
 #define MkString_(a) #a
 
+#define MkConcat(a,b) MkConcat_(a,b)
+#define MkConcat_(a,b) a ## b
+
 // extern functions
 
 FILE*  open_file(const char* str, FILE **res_fp, int *idx, const char *ext, int optext, int required);

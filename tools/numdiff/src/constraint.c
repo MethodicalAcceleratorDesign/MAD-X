@@ -158,6 +158,9 @@ readEps(struct eps *e, FILE *in, int row)
       else if (strcmp(str, "trace") == 0) {
         cmd |= eps_trace; trace("[%d] trace", row);
       }
+      else if (strcmp(str, "traceR") == 0) {
+        cmd |= eps_trace | eps_traceR; trace("[%d] traceR", row);
+      }
       else EPS_INVALID;
     }
 
@@ -253,28 +256,22 @@ readEps(struct eps *e, FILE *in, int row)
                             e->off_reg = reg_encode(rn, s, i);  trace("[%d] off=%sR%d", row, op_str[s+2*i], rn);
         }
         else if (strcmp(str, "abs") == 0) {
-          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, s, i);  trace("[%d] abs=%sR%d", row, op_str[s+2*i], rn);  e->_abs_reg = reg_encode(rn, -s, i);
-          ensure(e->abs >= 0.0 && (cmd & eps_large || e->abs <= 1.0), "invalid absolute constraint (%s:%d)", option.cfg_file, row);
+          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, s, i);  trace("[%d] abs=%sR%d", row, op_str[s+2*i], rn);  e->_abs_reg = reg_encode(rn, !s, i);
         }
         else if (strcmp(str, "-abs") == 0) {
           cmd |= eps_abs;   e->_abs_reg = reg_encode(rn, s, i);  trace("[%d] -abs=%sR%d", row, op_str[s+2*i], rn);
-          ensure(e->_abs <= 0.0 && (cmd & eps_large || e->_abs >= -1.0), "invalid negative absolute constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "rel") == 0) {
-          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, s, i);  trace("[%d] rel=%sR%d", row, op_str[s+2*i], rn);  e->_rel = reg_encode(rn, -s, i);
-          ensure(e->rel >= 0.0 && (cmd & eps_large || e->rel <= 1.0), "invalid relative constraint (%s:%d)", option.cfg_file, row);
+          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, s, i);  trace("[%d] rel=%sR%d", row, op_str[s+2*i], rn);  e->_rel = reg_encode(rn, !s, i);
         }
         else if (strcmp(str, "-rel") == 0) {
           cmd |= eps_rel;   e->_rel_reg = reg_encode(rn, s, i);  trace("[%d] -rel=%sR%d", row, op_str[s+2*i], rn);
-          ensure(e->_rel <= 0.0 && (cmd & eps_large || e->_rel >= -1.0), "invalid negative relative constraint (%s:%d)", option.cfg_file, row);
         }
         else if (strcmp(str, "dig") == 0) {
-          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, s, i);  trace("[%d] dig=%sR%d", row, op_str[s+2*i], rn);  e->_dig = reg_encode(rn, -s, i);
-          ensure(e->dig >= 1.0, "invalid digital relative constraint (%s:%d)", option.cfg_file, row);
+          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, s, i);  trace("[%d] dig=%sR%d", row, op_str[s+2*i], rn);  e->_dig = reg_encode(rn, !s, i);
         }
         else if (strcmp(str, "-dig") == 0) {
           cmd |= eps_dig;   e->_dig_reg = reg_encode(rn, s, i);  trace("[%d] -dig=%sR%d", row, op_str[s+2*i], rn);
-          ensure(e->_dig <= -1.0, "invalid negative digital relative constraint (%s:%d)", option.cfg_file, row);
         }
         else EPS_INVALID;
       }
@@ -331,6 +328,11 @@ readEps(struct eps *e, FILE *in, int row)
     if (c == EOF || (isspace(c) && !isblank(c)) || c == '#' || c == '!') break; 
   }
 
+  // default: abs=eps
+  if (!(cmd & (eps_chk | eps_sgg))) {
+    cmd |= eps_abs;  e->abs = DBL_MIN;  trace("[%d] abs=%g", row, e->abs);
+  }
+
   // cleanup non-persistant flags (e.g. large)
   e->cmd = (enum eps_cmd)(cmd & eps_mask);  // cast needed because of icc spurious warnings
 
@@ -361,7 +363,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_istr)   fprintf(out, "istr ");
   if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");
   if (cst->eps.cmd & eps_save)   fprintf(out, "save ");
-  if (cst->eps.cmd & eps_trace)  fprintf(out, "trace ");
+  if (cst->eps.cmd & eps_trace)  fprintf(out, "trace%s ", cst->eps.cmd & eps_traceR ? "R":"");
 
   if (cst->eps.cmd & eps_omit)   fprintf(out, "omit='%s' ", cst->eps.tag);
   if (cst->eps.cmd & eps_goto)   fprintf(out, "goto='%s' ", cst->eps.tag);

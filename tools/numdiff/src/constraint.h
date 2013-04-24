@@ -41,20 +41,21 @@ enum eps_cmd {
 
 // intermediate (commands & qualifiers)
   eps_any    = 1u <<  6,  // any qualifier
-  eps_lhs    = 1u <<  7,  // load x
-  eps_rhs    = 1u <<  8,  // load y
+  eps_lhs    = 1u <<  7,  // load x command
+  eps_rhs    = 1u <<  8,  // load y command
 
-  eps_save   = 1u <<  9,  // save values
+  eps_save   = 1u <<  9,  // save qualifier
   eps_omit   = 1u << 10,  // omit qualifier
   eps_trace  = 1u << 11,  // trace qualifier
+  eps_traceR = 1u << 12,  // trace Rn qualifier
 
 // must be lasts (actions)
-  eps_skip   = 1u << 12,  // skip line, must be first action!!
-  eps_goto   = 1u << 13,  // go to tag
-  eps_gonum  = 1u << 14,  // go to number
+  eps_skip   = 1u << 13,  // skip line, must be first action!!
+  eps_goto   = 1u << 14,  // go to tag
+  eps_gonum  = 1u << 15,  // go to number
 
 // marker & mask
-  eps_last   = 1u << 15,  // the end
+  eps_last   = 1u << 16,  // the end
   eps_mask   = eps_last - 1,
 
 // non-persistent commands & qualifiers
@@ -62,6 +63,7 @@ enum eps_cmd {
 
 // unions
   eps_dra    = eps_abs  | eps_rel  | eps_dig,
+  eps_chk    = eps_dra  | eps_equ  | eps_ign,
   eps_sgg    = eps_skip | eps_goto | eps_gonum,
 };
 

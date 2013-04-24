@@ -212,7 +212,7 @@ accum_summary(int total, int failed, long lines, long numbers)
   if (!option.accum) return;
 
   int n;
-//  double tz;
+  double tz;
   struct tm tm;
   time_t now = time(0);
   int total_tests=0, total_passed=0, total_failed=0;
@@ -222,18 +222,18 @@ accum_summary(int total, int failed, long lines, long numbers)
   FILE *fp;
   if (!option.reset && (fp = fopen(option.accum, "r+"))) {
     // read time stamps
-    n = fscanf(fp, " = tests summary (started at %d.%d.%d %d:%d:%d)\n",
+    n = fscanf(fp, " = tests summary (started at %d.%d.%d %d:%d:%d %d)\n",
                    &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-                   &tm.tm_hour, &tm.tm_min, &tm.tm_sec);
-    ensure(n == 6, "invalid summary file format %s", option.accum);
+                   &tm.tm_hour, &tm.tm_min, &tm.tm_sec, &tm.tm_isdst);
+    ensure(n == 7, "invalid summary file format %s", option.accum);
     tm.tm_year -= 1900;
     tm.tm_mon  -= 1;
 
     // correct for TZ shift (i.e. emulate non-standard timegm)
     struct tm tm2 = tm;
     option.dat_t0 = mktime(&tm2);
-//    tm2 = *gmtime(&now);
-//    tz = difftime(now, mktime(&tm2));
+    tm2 = *gmtime(&now);
+    tz = difftime(now, mktime(&tm2));
 
     // read diff time, line and number counts
     n = fscanf(fp, "   total diff time %lf s  -  total lines %ld  -  total numbers %ld\n",
@@ -256,16 +256,16 @@ accum_summary(int total, int failed, long lines, long numbers)
 
     // init the time stamp
     tm = *localtime(&option.dat_t0);
-//    tz = 0;
+    tz = 0;
   }
 
-  double total_time = difftime(now, option.dat_t0); // + tz;
+  double total_time = difftime(now, option.dat_t0) + tz - tm.tm_isdst*3600;
   total_ndtime  += (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
   total_lines   += lines;
   total_numbers += numbers;
 
-  fprintf(fp, " = tests summary (started at %04d.%02d.%02d %02d:%02d:%02d)\n",
-          tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+  fprintf(fp, " = tests summary (started at %04d.%02d.%02d %02d:%02d:%02d %+d)\n",
+          tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, tm.tm_isdst);
 
   fprintf(fp, "   total diff time %6.2lf s  -  total lines %6ld  -  total numbers %8ld\n",
               total_ndtime, total_lines, total_numbers);
