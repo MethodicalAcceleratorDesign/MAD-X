@@ -25,8 +25,9 @@
 
 // ----- constants
 
-#define TAG_LEN   64
-#define TAG_LEN_2 128
+#ifndef MAXTAGLEN
+#define MAXTAGLEN 64
+#endif
 
 enum eps_cmd {
   eps_invalid = 0u,       // invalid command
@@ -91,7 +92,7 @@ struct eps {
   char    op [10];
 
   // tags
-  char    tag[TAG_LEN];
+  char    tag[MAXTAGLEN];
 }; // ~ 250 bytes
 
 struct constraint {

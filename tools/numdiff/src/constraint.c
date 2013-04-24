@@ -114,7 +114,7 @@ readEps(struct eps *e, FILE *in, int row)
 {
   static const char *const op_str[] = { "", "-", "/", "-/" };
   int c = 0, n = 0, cmd = eps_invalid;
-  char str[16], buf[TAG_LEN_2], *end;
+  char str[16], buf[MkConcat(1,MAXTAGLEN)], *end;
 
   while (1) {
     // parse next command
@@ -168,7 +168,7 @@ readEps(struct eps *e, FILE *in, int row)
     else if ((c = ungetc(getc(in), in)) == '\'' || c == '"') {
       char c2 = 0;
 
-      if (strcmp(str, "omit") == 0 && (n = fscanf(in, "%*['\"]%" MkString(TAG_LEN_2) "[^'\"]%c", e->tag, &c2)) == 2) {
+      if (strcmp(str, "omit") == 0 && (n = fscanf(in, "%*['\"]%" MkString(MkConcat(1,MAXTAGLEN)) "[^'\"]%c", e->tag, &c2)) == 2) {
         e->tag[sizeof e->tag-1] = 0;
         cmd |= eps_omit | eps_equ;
         trace("[%d] omit='%s'", row, e->tag);
@@ -176,7 +176,7 @@ readEps(struct eps *e, FILE *in, int row)
         ensure(c == c2, "invalid tag quotes (%s:%d)", option.cfg_file, row);
         ensure(!(cmd & (eps_goto | eps_gonum)), "omit tag conflicting with goto (%s:%d)", option.cfg_file, row);
       }
-      else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "%*['\"]%" MkString(TAG_LEN_2) "[^'\"]%c", e->tag, &c2)) == 2) {
+      else if (strcmp(str, "goto") == 0 && (n = fscanf(in, "%*['\"]%" MkString(MkConcat(1,MAXTAGLEN)) "[^'\"]%c", e->tag, &c2)) == 2) {
         e->tag[sizeof e->tag-1] = 0;
         e->num = strtod(e->tag, &end);
         cmd |= !*end ? eps_gonum | eps_istr : eps_goto;
@@ -191,7 +191,7 @@ readEps(struct eps *e, FILE *in, int row)
 // commands with [=...]
     else {
       *buf = 0;
-      n = fscanf(in, "%" MkString(TAG_LEN_2) "[^ \t\n\r!#]", buf);
+      n = fscanf(in, "%" MkString(MkConcat(1,MAXTAGLEN)) "[^ \t\n\r!#]", buf);
       buf[sizeof buf-1]=0;
 
       ensure(n == 1 && *buf, "invalid assignment '%s' (%s:%d)", buf, option.cfg_file, row);

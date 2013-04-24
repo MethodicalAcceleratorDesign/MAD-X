@@ -31,6 +31,14 @@
 #define VERSION "2013.04.15"
 #endif
 
+#ifndef MAXKEEP
+#define MAXKEEP 25
+#endif
+
+#ifndef MAXREGS
+#define MAXREGS 99
+#endif
+
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
 #endif
@@ -41,14 +49,6 @@
 
 #ifndef SERIEFMT
 #define SERIEFMT "%d"
-#endif
-
-#ifndef MAXKEEP
-#define MAXKEEP 25
-#endif
-
-#ifndef MAXREGS
-#define MAXREGS 99
 #endif
 
 #ifndef OUTFILEEXT
@@ -210,7 +210,7 @@ usage(void)
   inform("\tequ                 strict numbers equality (same representation)");
   inform("\tgoto='tag'          skip lines until string 'tag' is found (action)");
   inform("\tgoto='num' or reg   skip lines until number 'num' is found (action)");
-  inform("\tign                 ignore numbers");
+  inform("\tign                 ignore numbers, accept missing number if with istr");
   inform("\tistr                ignore strings while scanning for numbers");
   inform("\tlarge               allow num > 1 in  abs and  rel ");
   inform("\t                    and  num < -1 in -abs and -rel (qualifier)");
@@ -244,7 +244,7 @@ usage(void)
   inform("");
   inform("info   :\thttp://cern.ch/mad/numdiff");
   inform("author :\tlaurent.deniau@cern.ch");
-  inform("version:\t" VERSION);
+  inform("version:\t%s", VERSION);
 
   exit(EXIT_FAILURE);
 }
