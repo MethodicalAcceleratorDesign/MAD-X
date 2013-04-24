@@ -27,6 +27,14 @@
 
 #ifndef MAXTAGLEN
 #define MAXTAGLEN 64
+
+#elif   MAXTAGLEN < 48
+#undef  MAXTAGLEN
+#define MAXTAGLEN 48
+
+#elif   MAXTAGLEN > 256
+#undef  MAXTAGLEN
+#define MAXTAGLEN 256
 #endif
 
 enum eps_cmd {

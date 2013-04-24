@@ -31,12 +31,15 @@
 #define VERSION "2013.04.15"
 #endif
 
-#ifndef MAXKEEP
-#define MAXKEEP 25
-#endif
-
 #ifndef MAXREGS
 #define MAXREGS 99
+#elif   MAXREGS > REG_MAX
+#undef  MAXREGS
+#define MAXREGS REG_MAX
+#endif
+
+#ifndef MAXKEEP
+#define MAXKEEP 25
 #endif
 
 #ifndef PUNCTCHRS
