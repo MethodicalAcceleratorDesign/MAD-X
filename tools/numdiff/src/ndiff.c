@@ -698,7 +698,7 @@ ndiff_testNum (T *dif, const C *c)
 
   // swap lhs and rhs (gtonum)
   if (c->eps.cmd & eps_swap) {
-    double tmp = lhs_d; lhd_d = rhs_d; rhs_d = tmp;
+    double tmp = lhs_d; lhs_d = rhs_d; rhs_d = tmp;
   }
 
   // compute errors
