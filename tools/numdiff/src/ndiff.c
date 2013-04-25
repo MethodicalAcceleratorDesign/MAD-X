@@ -519,14 +519,8 @@ lhs_done: ;
   char tag[sizeof _c.eps.tag];
   memcpy(tag, dif->lhs_b, sizeof tag);
   memcpy(dif->lhs_b, _c.eps.tag, sizeof _c.eps.tag);
-  _c.eps.scl = -_c.eps.scl;
-  { // reverse the register value, not always possible!!!!
-    char op=0; short rn = reg_decode(_c.eps.scl_reg, &op);
-         if (op == '-' ) op =  0 ;
-    else if (op == '\\') op = '/';
-    else if (op) error("unable to change sign of register operation");
-    _c.eps.scl_reg = reg_encode(rn, op);
-  }
+  int cmd = _c.eps.cmd | eps_swap; 
+  _c.eps.cmd = (enum eps_cmd)cmd;
 
   while (1) {
     int s = 0, n = 0;
@@ -703,7 +697,7 @@ ndiff_testNum (T *dif, const C *c)
   if (!(min_d > 0.0)) min_d = 1.0;
 
   // compute errors
-  dif_d = lhs_d - rhs_d;
+  dif_d = c->eps.cmd & eps_swap ? rhs_d-lhs_d : lhs_d-rhs_d;
   err_d = scl_d * dif_d;
   abs_d = err_d + off_d;
   rel_d = abs_d/ min_d;
