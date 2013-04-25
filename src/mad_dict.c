@@ -238,6 +238,7 @@ char command_def[] =
 "verify   = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
 "freemematstop= [l, false, true], "
+"twiss_print  = [l, true, true], "
 "warn     = [l, true, true]; "
 " "
 "plot: control none 0 0 "
