@@ -39,6 +39,9 @@ void     context_free   (T*);
 // populate with constraints, invoke grow on need
 T*       context_add     (T*, const C*);
 
+// process constraint on failure
+void     context_onfail  (T*, const C*);
+
 // return 0 if no constraint are found, getInc requires increasing (row,col)
 const C* context_getAt   (T*, int row, int col);
 const C* context_getInc  (T*, int row, int col);

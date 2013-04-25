@@ -33,6 +33,11 @@
 
 #ifndef MAXREGS
 #define MAXREGS 99
+
+#elif   MAXREGS < 20
+#undef  MAXREGS
+#define MAXREGS 20
+
 #elif   MAXREGS > REG_MAX
 #undef  MAXREGS
 #define MAXREGS REG_MAX
@@ -99,7 +104,7 @@ struct option option = {
   .keep = MAXKEEP,
 
   // number of registers allocated by default
-  .nregs = MAXREGS > REG_MAX ? REG_MAX : MAXREGS,
+  .nregs = MAXREGS,
 
   // file extensions
   .out_e = OUTFILEEXT, .ref_e = REFFILEEXT,
@@ -205,8 +210,9 @@ usage(void)
   inform("");
   inform("commands:");
   inform("\tabs=num or reg      absolute error (0 <= num <= 1)");
-  inform("\t-abs=num or reg    negative absolute error (-1 <= num <= 0)");
+  inform("\t-abs=num or reg     negative absolute error (-1 <= num <= 0)");
   inform("\tall                 constraints are conjunctive (default, qualifier)");
+  inform("\talt                 declare the rule as an alternate rule (qualifier)");
   inform("\tany                 constraints are disjunctive (qualifier)");
   inform("\tdig=num or reg      input-defined relative error (num >= 1)");
   inform("\t-dig=num or reg     input-defined negative relative error (num <= -1)");
@@ -218,6 +224,7 @@ usage(void)
   inform("\tlarge               allow num > 1 in  abs and  rel ");
   inform("\t                    and  num < -1 in -abs and -rel (qualifier)");
   inform("\tlhs=num or reg      set left hand side 'x'");
+  inform("\tnofail              do not count nor display warning for failure");
   inform("\toff=num or reg      set error offset 'b'");
   inform("\tomit='tag'          ignore strings or numbers if preceded by 'tag'");
   inform("\trel=num or reg      relative error (0 <= num <= 1)");
@@ -237,11 +244,19 @@ usage(void)
   inform("\t=Rn                 load value from register n");
   inform("\t=-Rn                load negated value from register n");
   inform("\t=/Rn                load inverted value from register n");
-  inform("\t=-/Rn               load negated and inverted value from register n");
+  inform("\t=\\Rn                load negated and inverted value from register n");
+  inform("\t=^Rn                load the exponential value from register n");
+  inform("\t=|Rn                load the absolute value from register n");
+  inform("\t=[Rn                load the value from register n rounded toward zero");
+  inform("\t=]Rn                load the value from register n rounded toward infty");
   inform("\tRn=Rp+Rq            load the sum of registers p and q to register n");
   inform("\tRn=Rp-Rq            load the difference of registers p and q to register n");
   inform("\tRn=Rp*Rq            load the product of registers p and q to register n");
   inform("\tRn=Rp/Rq            load the ratio of registers p and q to register n");
+  inform("\tRn=Rp%Rq            load the reminder of registers p and q to register n");
+  inform("\tRn=Rp^Rq            load the power of registers p and q to register n");
+  inform("\tRn=Rp<Rq            load the min of registers p and q to register n");
+  inform("\tRn=Rp>Rq            load the max of registers p and q to register n");
   inform("\tRn=Rp~Rq            move registers p..q to registers n..n+q-p");
 
   inform("");

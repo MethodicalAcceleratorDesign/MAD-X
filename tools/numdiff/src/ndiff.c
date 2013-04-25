@@ -520,9 +520,12 @@ lhs_done: ;
   memcpy(tag, dif->lhs_b, sizeof tag);
   memcpy(dif->lhs_b, _c.eps.tag, sizeof _c.eps.tag);
   _c.eps.scl = -_c.eps.scl;
-  { // reverse the register value
-    int sgn, inv, rn = reg_decode(_c.eps.scl_reg, &sgn, &inv);
-    _c.eps.scl_reg = reg_encode(rn, -sgn, inv);
+  { // reverse the register value, not always possible!!!!
+    char op=0; short rn = reg_decode(_c.eps.scl_reg, &op);
+         if (op == '-' ) op =  0 ;
+    else if (op == '\\') op = '/';
+    else if (op) error("unable to change sign of register operation");
+    _c.eps.scl_reg = reg_encode(rn, op);
   }
 
   while (1) {
@@ -579,7 +582,7 @@ ndiff_nextNum (T *dif, const C *c)
   trace("->nextNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
   trace("  strings: '%.25s'|'%.25s'", lhs_p, rhs_p);
 
-  if (ndiff_isempty(dif)) goto quit;
+  if (ndiff_isempty(dif)) goto quit_str;
 
 retry:
 
@@ -603,7 +606,7 @@ retry:
 
   // end-of-line
   if (!*lhs_p && !*rhs_p)
-    goto quit;
+    goto quit_str;
 
   // difference in not-a-number
   if (*lhs_p != *rhs_p && (!is_number(lhs_p) || !is_number(rhs_p)))
@@ -642,14 +645,15 @@ retry:
 quit_diff:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
-  if (!(c->eps.cmd & eps_gonum) && ++dif->cnt_i <= dif->max_i) {
+  if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
     if (dif->cnt_i == 1) ndiff_header();
     warning("(%d) files differ at line %d and char-columns %d|%d",
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
   }
+  if (c->eps.cmd & eps_onfail) context_onfail(dif->cxt, c);
 
-quit:
+quit_str:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   trace("<-nextNum  line %d, column %d, char-column %d|%d", dif->row_i, dif->col_i, dif->lhs_i, dif->rhs_i);
@@ -733,21 +737,24 @@ ndiff_testNum (T *dif, const C *c)
   // absolute comparison
   if (c->eps.cmd & eps_abs) {
      abs = reg_getval(dif->reg, dif->reg_n, c->eps. abs_reg, c->eps. abs);
-    _abs = reg_getval(dif->reg, dif->reg_n, c->eps._abs_reg, c->eps._abs);
+    _abs = c->eps._abs_reg && c->eps._abs_reg == c->eps.abs_reg ? -abs :
+           reg_getval(dif->reg, dif->reg_n, c->eps._abs_reg, c->eps._abs);
     if (abs_d > abs || abs_d < _abs) ret |= eps_abs;
   }
 
   // relative comparison 
   if (c->eps.cmd & eps_rel) {
      rel = reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg, c->eps. rel);
-    _rel = reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg, c->eps._rel);
+    _rel = c->eps._rel_reg && c->eps._rel_reg == c->eps.rel_reg ? -rel :
+           reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg, c->eps._rel);
     if (rel_d > rel || rel_d < _rel) ret |= eps_rel;
   }
 
   // input-specific relative comparison (does not apply to integers)
   if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
      dig = reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg, c->eps. dig);
-    _dig = reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg, c->eps._dig);
+    _dig = c->eps._dig_reg && c->eps._dig_reg == c->eps.dig_reg ? -dig :
+           reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg, c->eps._dig);
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
@@ -755,7 +762,7 @@ ndiff_testNum (T *dif, const C *c)
   if (!ret) goto quit;
 
 quit_diff:
-  if (!(c->eps.cmd & eps_gonum) && ++dif->cnt_i <= dif->max_i) {
+  if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
     if (dif->cnt_i == 1) ndiff_header();
     warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
             dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
@@ -773,20 +780,19 @@ quit_diff:
     if (ret & eps_abs)
       warning("(%d) absolute error (rule #%d, line %d: %.2g<=abs<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _abs, abs, abs_d, rel_d, imax(n1, n2));   
+              _abs, abs, abs_d, rel_d, imax(n1, n2));
 
     if (ret & eps_rel)
       warning("(%d) relative error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _rel, rel, abs_d, rel_d, imax(n1, n2));   
+              _rel, rel, abs_d, rel_d, imax(n1, n2));
 
     if (ret & eps_dig)
       warning("(%d) numdigit error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, context_findIdx(dif->cxt, c), context_findLine(dif->cxt, c),
-              _dig*pow_d, dig*pow_d, abs_d, rel_d, imax(n1, n2));   
- 
+              _dig*pow_d, dig*pow_d, abs_d, rel_d, imax(n1, n2));
   }
-  ret = 1;
+  if (c->eps.cmd & eps_onfail) context_onfail(dif->cxt, c);
 
 quit:
   if (!ret || c->eps.cmd & eps_save) {
@@ -919,7 +925,10 @@ ndiff_loop(T *dif, FILE *lhs_fp, FILE *rhs_fp)
       c = context_getInc(dif->cxt, row, col);
       ensure(c, "invalid context");
       if (dif->check && c != (c2 = context_getAt(dif->cxt, row, col)))
-        ndiff_error(dif->cxt, c, c2, row, col); 
+        ndiff_error(dif->cxt, c, c2, row, col);
+
+      // newly activated action
+      if (c->eps.cmd & eps_sgg) break;
 
       // trace rule
       if (c->eps.cmd & eps_trace) {

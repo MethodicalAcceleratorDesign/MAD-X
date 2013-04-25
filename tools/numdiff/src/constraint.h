@@ -25,6 +25,18 @@
 
 // ----- constants
 
+#ifndef MAXREGOP
+#define MAXREGOP 10
+
+#elif   MAXREGOP < 5
+#undef  MAXREGOP
+#define MAXREGOP 5
+
+#elif   MAXREGOP > 32
+#undef  MAXREGOP
+#define MAXREGOP 32
+#endif
+
 #ifndef MAXTAGLEN
 #define MAXTAGLEN 64
 
@@ -53,18 +65,21 @@ enum eps_cmd {
   eps_lhs    = 1u <<  7,  // load x command
   eps_rhs    = 1u <<  8,  // load y command
 
-  eps_save   = 1u <<  9,  // save qualifier
-  eps_omit   = 1u << 10,  // omit qualifier
-  eps_trace  = 1u << 11,  // trace qualifier
-  eps_traceR = 1u << 12,  // trace Rn qualifier
+  eps_alt    = 1u <<  9,  // alt qualifier
+  eps_save   = 1u << 10,  // save qualifier
+  eps_omit   = 1u << 11,  // omit qualifier
+  eps_nofail = 1u << 12,  // no failure
+  eps_onfail = 1u << 13,  // check for alt on failure
+  eps_trace  = 1u << 14,  // trace qualifier
+  eps_traceR = 1u << 15,  // trace Rn qualifier
 
 // must be lasts (actions)
-  eps_skip   = 1u << 13,  // skip line, must be first action!!
-  eps_goto   = 1u << 14,  // go to tag
-  eps_gonum  = 1u << 15,  // go to number
+  eps_skip   = 1u << 16,  // skip line, must be the first action!!
+  eps_goto   = 1u << 17,  // go to tag
+  eps_gonum  = 1u << 18,  // go to number
 
 // marker & mask
-  eps_last   = 1u << 16,  // the end
+  eps_last   = 1u << 19,  // the end
   eps_mask   = eps_last - 1,
 
 // non-persistent commands & qualifiers
@@ -96,8 +111,8 @@ struct eps {
   short   gto_reg;
 
   // operations
-  short   dst[10], src[10], src2[10], op_n;
-  char    op [10];
+  short   dst[MAXREGOP], src[MAXREGOP], src2[MAXREGOP], op_n;
+  char    op [MAXREGOP];
 
   // tags
   char    tag[MAXTAGLEN];

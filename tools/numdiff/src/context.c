@@ -189,8 +189,8 @@ context_setupRow (T *cxt, int row_i)
     const C *act = cxt->act[i];
     if (!slice_isEnum(&act->row, row_i)) continue; // not active
 
-    // skip|goto line always dominates
-    if (act->eps.cmd >= eps_skip) {
+    // action always dominates, unless hidden...
+    if (act->eps.cmd >= eps_skip && !(act->eps.cmd & eps_alt)) {
       cxt->row[0] = act;
       cxt->row_n  = 1;
       return;
@@ -208,8 +208,8 @@ context_setupCol (T *cxt, int col_i)
 
   // select last-added active constraint for this col
   for (int i = 0; i < cxt->row_n; ++i) {
-    const C *row = cxt->row[i];
-    if (row > cst && slice_isElem(&row->col, col_i)) cst = row;
+    const C *act = cxt->row[i];
+    if (act > cst && !(act->eps.cmd & eps_alt) && slice_isElem(&act->col, col_i)) cst = act;
   }
 
   return cst;
@@ -249,14 +249,15 @@ context_getAtCst (T *cxt, int row_i, int col_i)
 
   // select last-added active constraint, brute force...
   for (; cur >= cxt->dat; --cur)
-    if (slice_isElem(&cur->row, row_i)) {
+    if (!(cur->eps.cmd & eps_alt) && slice_isElem(&cur->row, row_i)) {
       if (cur->eps.cmd >= eps_skip) return cur;
       if (slice_isElem(&cur->col, col_i)) { cst = cur--; break; }
     }
 
-  // check for pending skip|goto line
+  // check for pending actions
   for (; cur >= cxt->dat; --cur)
-    if (cur->eps.cmd >= eps_skip && slice_isElem(&cur->row, row_i)) return cur;
+    if (cur->eps.cmd >= eps_skip && !(cur->eps.cmd & eps_alt) && slice_isElem(&cur->row, row_i))
+      return cur;
 
   return cst;
 }
@@ -315,9 +316,27 @@ context_add (T *cxt, const C *cst)
   // add constraint and setup index
   cxt->dat[cxt->dat_n] = *cst;
   cxt->dat[cxt->dat_n].idx = cxt->dat_n;
+
+  // check for alternate qualifier, set onfail on previous rule
+  if (cst->eps.cmd & eps_alt) {
+    assert(cxt->dat_n > 0);
+    int cmd = cxt->dat[cxt->dat_n-1].eps.cmd | eps_onfail;
+    cxt->dat[cxt->dat_n-1].eps.cmd = (enum eps_cmd)cmd;
+  }
+
   cxt->dat_n++;
 
   return cxt;
+}
+
+void
+context_onfail(T *cxt, const C* cst)
+{
+  assert(cst->idx > 0);
+
+  // clear alt qualifier of previous rule
+  int cmd = cxt->dat[cst->idx-1].eps.cmd & ~eps_alt;
+  cxt->dat[cst->idx-1].eps.cmd = (enum eps_cmd)cmd;
 }
 
 const C*
