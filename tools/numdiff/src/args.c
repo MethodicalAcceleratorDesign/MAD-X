@@ -253,7 +253,7 @@ usage(void)
   inform("\tRn=Rp-Rq            load the difference of registers p and q to register n");
   inform("\tRn=Rp*Rq            load the product of registers p and q to register n");
   inform("\tRn=Rp/Rq            load the ratio of registers p and q to register n");
-  inform("\tRn=Rp%Rq            load the reminder of registers p and q to register n");
+  inform("\tRn=Rp%%Rq            load the reminder of registers p and q to register n");
   inform("\tRn=Rp^Rq            load the power of registers p and q to register n");
   inform("\tRn=Rp<Rq            load the min of registers p and q to register n");
   inform("\tRn=Rp>Rq            load the max of registers p and q to register n");
