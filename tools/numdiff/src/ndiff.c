@@ -696,8 +696,13 @@ ndiff_testNum (T *dif, const C *c)
   // if one number is zero -> relative becomes absolute
   if (!(min_d > 0.0)) min_d = 1.0;
 
+  // swap lhs and rhs (gtonum)
+  if (c->eps.cmd & eps_swap) {
+    double tmp = lhs_d; lhd_d = rhs_d; rhs_d = tmp;
+  }
+
   // compute errors
-  dif_d = c->eps.cmd & eps_swap ? rhs_d-lhs_d : lhs_d-rhs_d;
+  dif_d = lhs_d - rhs_d;
   err_d = scl_d * dif_d;
   abs_d = err_d + off_d;
   rel_d = abs_d/ min_d;
@@ -730,7 +735,7 @@ ndiff_testNum (T *dif, const C *c)
 
   // absolute comparison
   if (c->eps.cmd & eps_abs) {
-     abs = reg_getval(dif->reg, dif->reg_n, c->eps. abs_reg, c->eps. abs);
+     abs = reg_getval(dif->reg, dif->reg_n, c->eps.abs_reg, c->eps.abs);
     _abs = c->eps._abs_reg && c->eps._abs_reg == c->eps.abs_reg ? -abs :
            reg_getval(dif->reg, dif->reg_n, c->eps._abs_reg, c->eps._abs);
     if (abs_d > abs || abs_d < _abs) ret |= eps_abs;
@@ -738,7 +743,7 @@ ndiff_testNum (T *dif, const C *c)
 
   // relative comparison 
   if (c->eps.cmd & eps_rel) {
-     rel = reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg, c->eps. rel);
+     rel = reg_getval(dif->reg, dif->reg_n, c->eps.rel_reg, c->eps.rel);
     _rel = c->eps._rel_reg && c->eps._rel_reg == c->eps.rel_reg ? -rel :
            reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg, c->eps._rel);
     if (rel_d > rel || rel_d < _rel) ret |= eps_rel;
@@ -746,7 +751,7 @@ ndiff_testNum (T *dif, const C *c)
 
   // input-specific relative comparison (does not apply to integers)
   if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
-     dig = reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg, c->eps. dig);
+     dig = reg_getval(dif->reg, dif->reg_n, c->eps.dig_reg, c->eps.dig);
     _dig = c->eps._dig_reg && c->eps._dig_reg == c->eps.dig_reg ? -dig :
            reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg, c->eps._dig);
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
@@ -791,8 +796,8 @@ quit_diff:
 quit:
   if (!ret || c->eps.cmd & eps_save) {
     // saves
-    reg_setval(dif->reg, dif->reg_n, 1, c->eps.lhs_reg || c->eps.cmd & eps_lhs ? strtod(lhs_p, 0) : lhs_d);
-    reg_setval(dif->reg, dif->reg_n, 2, c->eps.rhs_reg || c->eps.cmd & eps_rhs ? strtod(rhs_p, 0) : rhs_d);
+    reg_setval(dif->reg, dif->reg_n, 1, c->eps.lhs_reg || c->eps.cmd & eps_lhs ? strtod(c->eps.cmd & eps_swap ? rhs_p : lhs_p, 0) : lhs_d);
+    reg_setval(dif->reg, dif->reg_n, 2, c->eps.rhs_reg || c->eps.cmd & eps_rhs ? strtod(c->eps.cmd & eps_swap ? lhs_p : rhs_p, 0) : rhs_d);
     reg_setval(dif->reg, dif->reg_n, 3, dif_d);
     reg_setval(dif->reg, dif->reg_n, 4, err_d);
     reg_setval(dif->reg, dif->reg_n, 5, abs_d);
