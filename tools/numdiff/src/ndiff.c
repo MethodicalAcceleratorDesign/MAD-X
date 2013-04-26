@@ -801,7 +801,7 @@ quit:
   if (!ret || c->eps.cmd & eps_eval) {
     // operations with registers trace
     if (c->eps.cmd & eps_traceR) {
-      char buf[50*sizeof c->eps.op] = "  ";
+      char buf[2*50*sizeof c->eps.op] = "  ";
       int pos = 2;
 
       ndiff_traceR(dif, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
@@ -809,6 +809,11 @@ quit:
       for (int i=0; i < c->eps.op_n; i++) {
         reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
         pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
+        if (c->eps.op[i]=='~') {
+          pos -= 2;
+          int rn = c->eps.dst[i]+c->eps.src2[i]-c->eps.src[i];
+          pos += sprintf(buf+pos, " .. R%d=%.2g, ", rn, reg_getval(dif->reg, dif->reg_n, rn));
+        }
       }
       if (pos>2) { buf[pos-2] = 0; trace(buf); }
     }
@@ -821,13 +826,19 @@ quit:
   else {
     // trace registers (only)
     if (c->eps.cmd & eps_traceR) {
-      char buf[50*sizeof c->eps.op] = "  ";
+      char buf[2*50*sizeof c->eps.op] = "  ";
       int pos = 2;
 
       ndiff_traceR(dif, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
 
-      for (int i=0; i < c->eps.op_n; i++)
+      for (int i=0; i < c->eps.op_n; i++) {
         pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
+        if (c->eps.op[i]=='~') {
+          pos -= 2;
+          int rn = c->eps.dst[i]+c->eps.src2[i]-c->eps.src[i];
+          pos += sprintf(buf+pos, " .. R%d=%.2g, ", rn, reg_getval(dif->reg, dif->reg_n, rn));
+        }
+      }
       if (pos>2) { buf[pos-2] = 0; trace(buf); }
     }
   }
