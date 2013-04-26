@@ -9,7 +9,7 @@
 # |
 # | Copyright (c) 2011+ CERN, mad@cern.ch
 # |
-# | For more information, see http://cern.ch/mad
+# | For more information, see http://cern.ch/mad/numdiff
 # |
 # o---------------------------------------------------------------------o
 # |

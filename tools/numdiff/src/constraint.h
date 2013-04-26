@@ -66,7 +66,7 @@ enum eps_cmd {
 
   eps_any    = 1u <<  8,  // any qualifier
   eps_alt    = 1u <<  9,  // alt qualifier
-  eps_save   = 1u << 10,  // save qualifier
+  eps_eval   = 1u << 10,  // eval qualifier
   eps_omit   = 1u << 11,  // omit qualifier
   eps_nofail = 1u << 12,  // no failure qualifier
   eps_trace  = 1u << 13,  // trace qualifier

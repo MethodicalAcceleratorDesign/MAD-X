@@ -166,6 +166,7 @@ usage(void)
   inform("\t    --lhsres        echo valid lines of left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
+  inform("\t    --noloc         disable trace of C file location");
   inform("\t    --nores         disable result files");
   inform("\t    --nowarn        disable warnings");
   inform("\t    --nregs num     specify the number of registers to allocate");
@@ -217,6 +218,7 @@ usage(void)
   inform("\tdig=num or reg      input-defined relative error (num >= 1)");
   inform("\t-dig=num or reg     input-defined negative relative error (num <= -1)");
   inform("\tequ                 strict numbers equality (same representation)");
+  inform("\teval                perform operations even if rule fails");
   inform("\tgoto='tag'          skip lines until string 'tag' is found (action)");
   inform("\tgoto='num' or reg   skip lines until number 'num' is found (action)");
   inform("\tign                 ignore numbers, accept missing number if with istr");
@@ -230,7 +232,6 @@ usage(void)
   inform("\trel=num or reg      relative error (0 <= num <= 1)");
   inform("\t-rel=num or reg     negative relative error (-1 <= num <= 0)");
   inform("\trhs=num or reg      set right hand side 'y'");
-  inform("\tsave                perform save and operations even if rule fails");
   inform("\tscl=num or reg      set error scaling factor 'a'");
   inform("\tskip                skip lines (action)");
   inform("\tsmall               forbid num > 1 in  abs and  rel and");
@@ -263,6 +264,7 @@ usage(void)
   inform("info   :\thttp://cern.ch/mad/numdiff");
   inform("author :\tlaurent.deniau@cern.ch");
   inform("version:\t%s", VERSION);
+  inform("license:\tGPLv3");
 
   exit(EXIT_FAILURE);
 }
@@ -346,6 +348,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--long")) {
       debug("short options disabled");
       option.lgopt = 1;
+      continue;
+    }
+
+    // disable location trace [setup]
+    if (!strcmp(argv[option.argi], "--noloc")) {
+      debug("trace of location disabled");
+      logmsg_config.locate = 0;
       continue;
     }
 

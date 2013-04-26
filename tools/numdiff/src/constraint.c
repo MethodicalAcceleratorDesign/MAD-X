@@ -148,8 +148,8 @@ readEps(struct eps *e, FILE *in, int row)
       else if (strcmp(str, "alt") == 0) {
         cmd |= eps_alt;  trace("[%d] alt", row);
       }
-      else if (strcmp(str, "save") == 0) {
-        cmd |= eps_save; trace("[%d] save", row);
+      else if (strcmp(str, "eval") == 0) {
+        cmd |= eps_eval; trace("[%d] eval", row);
       }
       else if (strcmp(str, "nofail") == 0) {
         cmd |= eps_nofail; trace("[%d] nofail", row);
@@ -207,31 +207,33 @@ readEps(struct eps *e, FILE *in, int row)
 
         short dst = strtoul(str+1, &end, 10);
         ensure(reg_isvalid(dst) && !*end, "invalid register reference '%s' (%s:%d)", str, option.cfg_file, row);
+        ensure(dst>9, "invalid assignment to read-only register R%d (%s:%d)", dst, option.cfg_file, row);
 
-        char  op=0;
+        char  bop=0;
         short src=0, src2=0;
         bool  pfx = *buf != 'R';
-        int   n = sscanf(buf+pfx, "R%hd%cR%hd", &src, &op, &src2);
+        char  op[2] = { pfx ? *buf : 0, 0 };
+        int   n = sscanf(buf+pfx, "R%hd%cR%hd", &src, &bop, &src2);
 
         if (n == 1) {
-          trace("[%d] R%d=%cR%d", row, dst, pfx ? *buf : ' ', src);
-          ensure(strchr(REG_UNARY_OP,*buf), "invalid unary operation '%c' (%s:%d)", *buf, option.cfg_file, row);
+          trace("[%d] R%d=%sR%d", row, dst, op, src);
+          ensure(!pfx || strchr(REG_UNARY_OP,*buf), "invalid unary operation '%c' (%s:%d)", *buf, option.cfg_file, row);
           e->dst [e->op_n] = dst;
-          e->src [e->op_n] = reg_encode(src, pfx ? *buf : ' ');
+          e->src [e->op_n] = reg_encode(src, *op);
           e->src2[e->op_n] = 0;
           e->op  [e->op_n] = 0;
           e->op_n++;
         }
         else if (n == 3) {
-          trace("[%d] R%d=R%d%cR%d", row, dst, src, op, src2);
+          trace("[%d] R%d=R%d%cR%d", row, dst, src, bop, src2);
           ensure(!pfx, "unallowed prefix operation '%s' (%s:%d)", buf, option.cfg_file, row);
-          ensure(strchr(REG_BINARY_OP,op), "invalid binary operation '%c' (%s:%d)", op, option.cfg_file, row);
+          ensure(strchr(REG_BINARY_OP,bop), "invalid binary operation '%c' (%s:%d)", bop, option.cfg_file, row);
           ensure(reg_isvalid(src ), "invalid register reference '%d' (%s:%d)", src , option.cfg_file, row);
           ensure(reg_isvalid(src2), "invalid register reference '%d' (%s:%d)", src2, option.cfg_file, row);
           e->dst [e->op_n] = dst;
           e->src [e->op_n] = src;
           e->src2[e->op_n] = src2;
-          e->op  [e->op_n] = op;
+          e->op  [e->op_n] = bop;
           e->op_n++;
         }
         else EPS_INVALID;
@@ -240,43 +242,44 @@ readEps(struct eps *e, FILE *in, int row)
       // --- load registers
       else if (*str != 'R' && strchr(buf,'R')) {
         bool  pfx = *buf != 'R';
+        char  op[2] = { pfx ? *buf : 0, 0 };
         short rn = strtoul(buf+pfx+1, &end, 10);
         ensure(reg_isvalid(rn) && !*end, "invalid register reference '%s' (%s:%d)", buf, option.cfg_file, row);
-        if (pfx) ensure(strchr(REG_UNARY_OP,*buf), "invalid unary operation '%c' (%s:%d)", *buf, option.cfg_file, row);
+        ensure(!pfx || strchr(REG_UNARY_OP,*buf), "invalid unary operation '%c' (%s:%d)", *buf, option.cfg_file, row);
 
              if (strcmp(str, "goto") == 0) {
           cmd |= eps_gonum | eps_istr | eps_nofail;
-                            e->gto_reg = reg_encode(rn, *buf);  trace("[%d] goto=%s", row, buf);
+                            e->gto_reg = reg_encode(rn, *op);  trace("[%d] goto=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "lhs") == 0) {
-           cmd |= eps_lhs;  e->lhs_reg = reg_encode(rn, *buf);  trace("[%d] lhs=%s", row, buf);
+           cmd |= eps_lhs;  e->lhs_reg = reg_encode(rn, *op);  trace("[%d] lhs=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "rhs") == 0) {
-           cmd |= eps_rhs;  e->rhs_reg = reg_encode(rn, *buf);  trace("[%d] rhs=%s", row, buf);
+           cmd |= eps_rhs;  e->rhs_reg = reg_encode(rn, *op);  trace("[%d] rhs=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "scl") == 0) {
-                            e->scl_reg = reg_encode(rn, *buf);  trace("[%d] scl=%s", row, buf);
+                            e->scl_reg = reg_encode(rn, *op);  trace("[%d] scl=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "off") == 0) {
-                            e->off_reg = reg_encode(rn, *buf);  trace("[%d] off=%s", row, buf);
+                            e->off_reg = reg_encode(rn, *op);  trace("[%d] off=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "abs") == 0) {
-          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, *buf);  trace("[%d] abs=%s", row, buf);  e->_abs_reg = e->abs_reg;
+          cmd |= eps_abs;   e->abs_reg = reg_encode(rn, *op);  trace("[%d] abs=%sR%d", row, op, rn);  e->_abs_reg = e->abs_reg;
         }
         else if (strcmp(str, "-abs") == 0) {
-          cmd |= eps_abs;   e->_abs_reg = reg_encode(rn, *buf);  trace("[%d] -abs=%s", row, buf);
+          cmd |= eps_abs;   e->_abs_reg = reg_encode(rn, *op);  trace("[%d] -abs=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "rel") == 0) {
-          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, *buf);  trace("[%d] rel=%s", row, buf);  e->_rel_reg = e->rel_reg;
+          cmd |= eps_rel;   e->rel_reg = reg_encode(rn, *op);  trace("[%d] rel=%sR%d", row, op, rn);  e->_rel_reg = e->rel_reg;
         }
         else if (strcmp(str, "-rel") == 0) {
-          cmd |= eps_rel;   e->_rel_reg = reg_encode(rn, *buf);  trace("[%d] -rel=%s", row, buf);
+          cmd |= eps_rel;   e->_rel_reg = reg_encode(rn, *op);  trace("[%d] -rel=%sR%d", row, op, rn);
         }
         else if (strcmp(str, "dig") == 0) {
-          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, *buf);  trace("[%d] dig=%s", row, buf);  e->_dig_reg = e->dig_reg;
+          cmd |= eps_dig;   e->dig_reg = reg_encode(rn, *op);  trace("[%d] dig=%sR%d", row, op, rn);  e->_dig_reg = e->dig_reg;
         }
         else if (strcmp(str, "-dig") == 0) {
-          cmd |= eps_dig;   e->_dig_reg = reg_encode(rn, *buf);  trace("[%d] -dig=%s", row, buf);
+          cmd |= eps_dig;   e->_dig_reg = reg_encode(rn, *op);  trace("[%d] -dig=%sR%d", row, op, rn);
         }
         else EPS_INVALID;
       }
@@ -351,7 +354,7 @@ readEps(struct eps *e, FILE *in, int row)
 void
 constraint_print(const T* cst, FILE *out)
 {
-  char op=0;
+  char op[2] = { 0, 0 };
   short rn=0;
 
   if (!out) out = stdout;
@@ -368,7 +371,7 @@ constraint_print(const T* cst, FILE *out)
   if (cst->eps.cmd & eps_ign)    fprintf(out, "ign ");
   if (cst->eps.cmd & eps_istr)   fprintf(out, "istr ");
   if (cst->eps.cmd & eps_skip)   fprintf(out, "skip ");
-  if (cst->eps.cmd & eps_save)   fprintf(out, "save ");
+  if (cst->eps.cmd & eps_eval)   fprintf(out, "eval ");
   if (cst->eps.cmd & eps_nofail) fprintf(out, "nofail ");
   if (cst->eps.cmd & eps_trace)  fprintf(out, "trace%s ", cst->eps.cmd & eps_traceR ? "R":"");
 
@@ -378,53 +381,53 @@ constraint_print(const T* cst, FILE *out)
 // --- loads
   if (cst->eps.cmd & eps_gonum)  {
     if (cst->eps.gto_reg) {
-      rn = reg_decode(cst->eps.gto_reg, &op);
-      fprintf(out, "goto=%cR%d (num) ", op, rn);
+      rn = reg_decode(cst->eps.gto_reg, op);
+      fprintf(out, "goto=%sR%d (num) ", op, rn);
     }
     else fprintf(out, "goto='%s' (num) ", cst->eps.tag);
   }
 
   if (cst->eps.cmd & eps_lhs) {
     if (cst->eps.lhs_reg) {
-      rn = reg_decode(cst->eps.lhs_reg, &op);
-      fprintf(out, "lhs=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps.lhs_reg, op);
+      fprintf(out, "lhs=%sR%d ", op, rn);
     }
     else fprintf(out, "lhs=%g ", cst->eps.lhs);
   }
 
   if (cst->eps.cmd & eps_rhs) {
     if (cst->eps.rhs_reg) {
-      rn = reg_decode(cst->eps.rhs_reg, &op);
-      fprintf(out, "rhs=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps.rhs_reg, op);
+      fprintf(out, "rhs=%sR%d ", op, rn);
     }
     else fprintf(out, "rhs=%g ", cst->eps.rhs);
   }
 
-  if (cst->eps.scl != 1.0) fprintf(out, "scl=%g ", cst->eps.scl);
   if (cst->eps.scl_reg) {
-    rn = reg_decode(cst->eps.scl_reg, &op);
-    fprintf(out, "scl=%cR%d ", op, rn);
+    rn = reg_decode(cst->eps.scl_reg, op);
+    fprintf(out, "scl=%sR%d ", op, rn);
   }
-  else fprintf(out, "scl=%g ", cst->eps.scl);
+  else if (cst->eps.scl != 1.0)
+    fprintf(out, "scl=%g ", cst->eps.scl);
 
-  if (cst->eps.off != 1.0) fprintf(out, "off=%g ", cst->eps.off);
   if (cst->eps.off_reg) {
-    rn = reg_decode(cst->eps.off_reg, &op);
-    fprintf(out, "off=%cR%d ", op, rn);
+    rn = reg_decode(cst->eps.off_reg, op);
+    fprintf(out, "off=%sR%d ", op, rn);
   }
-  else fprintf(out, "off=%g ", cst->eps.off);
+  else if (cst->eps.off != 0.0)
+    fprintf(out, "off=%g ", cst->eps.off);
 
   if (cst->eps.cmd & eps_abs) {
     if (cst->eps.abs_reg) {
-      rn = reg_decode(cst->eps.abs_reg, &op);
-      fprintf(out, "abs=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps.abs_reg, op);
+      fprintf(out, "abs=%sR%d ", op, rn);
     }
     else fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
                       cst->eps.abs > 1        ? "large " : "", cst->eps.abs);
 
     if (cst->eps._abs_reg && cst->eps._abs_reg != cst->eps.abs_reg) {
-      rn = reg_decode(cst->eps._abs_reg, &op);
-      fprintf(out, "-abs=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps._abs_reg, op);
+      fprintf(out, "-abs=%sR%d ", op, rn);
     }
     else if (cst->eps._abs != -cst->eps.abs)
         fprintf(out, cst->eps._abs == -DBL_MIN ? "-abs=-eps " : "%s-abs=%g ",
@@ -433,14 +436,14 @@ constraint_print(const T* cst, FILE *out)
 
   if (cst->eps.cmd & eps_rel) {
     if (cst->eps.rel_reg) {
-      rn = reg_decode(cst->eps.rel_reg, &op);
-      fprintf(out, "rel=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps.rel_reg, op);
+      fprintf(out, "rel=%sR%d ", op, rn);
     }
     else fprintf(out, "%srel=%g ", cst->eps.rel > 1 ? "large " : "", cst->eps.rel);
 
     if (cst->eps._rel_reg && cst->eps._rel_reg != cst->eps.rel_reg) {
-      rn = reg_decode(cst->eps._rel_reg, &op);
-      fprintf(out, "-rel=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps._rel_reg, op);
+      fprintf(out, "-rel=%sR%d ", op, rn);
     }
     else if (cst->eps._rel != -cst->eps.rel)
       fprintf(out, "%s-rel=%g ", cst->eps._rel < -1 ? "large " : "", cst->eps._rel);
@@ -448,14 +451,14 @@ constraint_print(const T* cst, FILE *out)
 
   if (cst->eps.cmd & eps_dig) {
     if (cst->eps.dig_reg) {
-      rn = reg_decode(cst->eps.dig_reg, &op);
-      fprintf(out, "dig=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps.dig_reg, op);
+      fprintf(out, "dig=%sR%d ", op, rn);
     }
     else fprintf(out, "dig=%g ", cst->eps.dig);
 
     if (cst->eps._dig_reg && cst->eps._dig_reg != cst->eps.dig_reg) {
-      rn = reg_decode(cst->eps._dig_reg, &op);
-      fprintf(out, "-dig=%cR%d ", op, rn);
+      rn = reg_decode(cst->eps._dig_reg, op);
+      fprintf(out, "-dig=%sR%d ", op, rn);
     }
     else if (cst->eps._dig != -cst->eps.dig)
       fprintf(out, "-dig=%g ", cst->eps._dig);
@@ -466,8 +469,8 @@ constraint_print(const T* cst, FILE *out)
     if (cst->eps.op[j])
       fprintf(out, "R%d=R%d%cR%d ", cst->eps.dst[j], cst->eps.src[j], cst->eps.op[j], cst->eps.src2[j]);
     else {
-      rn = reg_decode(cst->eps.src[j], &op);
-      fprintf(out, "R%d=%cR%d ", cst->eps.dst[j], op, rn);
+      rn = reg_decode(cst->eps.src[j], op);
+      fprintf(out, "R%d=%sR%d ", cst->eps.dst[j], op, rn);
     }
   }
 }

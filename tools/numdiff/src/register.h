@@ -18,6 +18,7 @@
  o---------------------------------------------------------------------o
 */
 
+#include <stdlib.h>
 #include <math.h>
 #include "error.h"
 
@@ -49,9 +50,8 @@ reg_encode(short rn, char op)
   case '|' : return 5 * REG_MAX + rn;
   case '[' : return 6 * REG_MAX + rn;
   case ']' : return 7 * REG_MAX + rn;
-  default: error("invalid register unary operation '%c'", op);
+  default: error("invalid register unary operation '%c'", op); exit(EXIT_FAILURE);
   }
-  return 0;
 }
 
 static inline short
@@ -73,26 +73,26 @@ reg_decode(short rn, char *op)
   return rn;
 }
 
-static double
-reg_getval(const double *reg, short reg_n, short rn, double val)
+#ifdef __GNUC__
+__attribute__((always_inline))
+#endif
+static inline double
+reg_getval(const double *reg, short reg_n, short rn)
 {
-  if (rn) {
-    short r = rn & (REG_MAX-1);
-    ensure(r > 0 && r <= reg_n, "invalid register number %d", r);
+  short r = rn & (REG_MAX-1);
+  ensure(r > 0 && r <= reg_n, "invalid register number %d", r);
 
-    switch(rn / REG_MAX) {
-    case 1: val = -reg[r-1];       break;
-    case 2: val = 1/reg[r-1];      break;
-    case 3: val = -1/reg[r-1];     break;
-    case 4: val = exp(reg[r-1]);   break;
-    case 5: val = fabs(reg[r-1]);  break;
-    case 6: val = floor(reg[r-1]); break;
-    case 7: val = ceil(reg[r-1]);  break;
-    default: error("invalid register unary operation '%c'", rn/REG_MAX);
-    }
+  switch(rn / REG_MAX) {
+  case 0: return reg[r-1];
+  case 1: return -reg[r-1];
+  case 2: return 1/reg[r-1];
+  case 3: return -1/reg[r-1];
+  case 4: return exp(reg[r-1]);
+  case 5: return fabs(reg[r-1]);
+  case 6: return floor(reg[r-1]);
+  case 7: return ceil(reg[r-1]);
+  default: error("invalid register unary operation '%c'", rn/REG_MAX); exit(EXIT_FAILURE);
   }
-
-  return val;
 }
 
 static inline void
@@ -102,13 +102,16 @@ reg_setval(double *reg, short reg_n, short rn, double val)
   reg[rn-1] = val;
 }
 
+#ifdef __GNUC__
+__attribute__((always_inline))
+#endif
 static inline void
 reg_eval(double *reg, short reg_n, short dst, short src, short src2, char op)
 {
   ensure(dst > 0 && dst <= reg_n, "invalid register %d", dst);
 
   if (!op) { // nop = getval
-    reg[dst-1] = reg_getval(reg, reg_n, src, 0);
+    reg[dst-1] = reg_getval(reg, reg_n, src);
   }
   else {
     ensure(src  > 0 && src  <= reg_n, "invalid register %d", src);
