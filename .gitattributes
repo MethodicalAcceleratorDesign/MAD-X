@@ -1253,6 +1253,9 @@ tools/numdiff/src/utest.c -text
 tools/numdiff/src/utest.h -text
 tools/numdiff/src/utils.c -text
 tools/numdiff/src/utils.h -text
+tools/numdiff/tests/test-register-2/test-register-2.nd.cfg -text
+tools/numdiff/tests/test-register-2/test-register-2.nd.lhs -text
+tools/numdiff/tests/test-register-2/test-register-2.nd.rhs -text
 tools/numdiff/tests/test-register/test-register.nd.cfg -text
 tools/numdiff/tests/test-register/test-register.nd.lhs -text
 tools/numdiff/tests/test-register/test-register.nd.rhs -text
