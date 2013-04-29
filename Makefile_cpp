@@ -28,8 +28,8 @@ ifeq ($(NTPSA),yes)
 CPPFLAGS += -D_NTPSA
 endif
 
-ifeq ($(MEMLEAKS),yes)
-CPPFLAGS += -D_MEMLEAKS
+ifeq ($(USEGC),yes)
+CPPFLAGS += -D_USEGC -Ilibs/gc/gc-7.2/include
 endif
 
 # end of makefile

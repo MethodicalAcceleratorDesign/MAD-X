@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "mad_err.h"
 #include "mad_mem.h"
 #include "mad_regex.h"
 

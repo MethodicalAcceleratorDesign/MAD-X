@@ -545,7 +545,7 @@ madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks)
   {
     knob->nKN++;
     ptr = (void*)knob->KN;
-    knob->KN = (int*)realloc(knob->KN, knob->nKN * sizeof(int));
+    knob->KN = (int*)myrealloc("madx_mpk_addfieldcomp", knob->KN, knob->nKN * sizeof(int));
     knob->KN[knob->nKN - 1] = kn;
 
     if (ptr != knob->KN)
@@ -558,7 +558,7 @@ madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks)
   {
     knob->nKS++;
     ptr = (void*)knob->KS;
-    knob->KS = (int*)realloc(knob->KS, knob->nKS * sizeof(int));
+    knob->KS = (int*)myrealloc("madx_mpk_addfieldcomp", knob->KS, knob->nKS * sizeof(int));
     knob->KS[knob->nKS - 1] = ks;
 
     if (ptr != knob->KS)

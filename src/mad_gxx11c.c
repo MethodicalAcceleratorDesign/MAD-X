@@ -13,6 +13,7 @@
 
 #include "mad_extrn_f.h"
 #include "mad_gxx11c.h"
+#include "mad_err.h"
 #include "mad_mem.h"
 
 // #define MAXCOL 256 // not used

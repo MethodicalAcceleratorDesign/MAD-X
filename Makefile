@@ -57,8 +57,8 @@ ONLINE   := no
 # alternative DA package: yes/no (default is yes)
 NTPSA    := yes
 
-# memory leaks debug: yes/no (default is no)
-MEMLEAKS := no
+# use garbage collector: yes/no (default is yes)
+USEGC    := no
 
 #################
 # Build settings

@@ -5,7 +5,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | Polymorphic Tracking Code from Etienne Forest
+# | MADX as a library
 # |
 # | For more information, see http://cern.ch/mad
 # |
@@ -14,7 +14,7 @@
 # | $Id$
 # |
 
-# Note: this makefile
+# Note: this makefile defines a "virtual project"
 #   - is not supposed to be used directly
 #   - assume that the madx environment is already setup
 #   - add settings to the original madx environment (PROJECT, SHARED, DESTDIR)
