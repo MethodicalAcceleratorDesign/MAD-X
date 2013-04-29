@@ -163,21 +163,23 @@ usage(void)
   inform("\t-h  --help          display this help");
   inform("\t-i  --info          enable info mode (default)");
   inform("\t-k  --keep num      specify the number of diffs to display per file, default is %d", option.keep);
-  inform("\t    --lhsres        echo valid lines of left file to its result file");
+  inform("\t    --lhsrec        recycle next left file (exclusive with --rhsrec)");
+  inform("\t    --lhsres        echo valid lines of next left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
-  inform("\t    --noloc         disable trace of C file location");
-  inform("\t    --nores         disable result files");
+  inform("\t    --noloc         disable C file location during trace");
   inform("\t    --nowarn        disable warnings");
   inform("\t    --nregs num     specify the number of registers to allocate");
-  inform("\t-n  --serie         enable serie mode (indexed filenames)");
-  inform("\t    --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t    --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
   inform("\t    --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q  --quiet         enable quiet mode (no output if no diff)");
   inform("\t    --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
+  inform("\t-r  --reset         reset accumulated information");
   inform("\t    --resext ext    specify the result file extension, default is \"%s\"", option.res_e);
-  inform("\t    --rhsres        echo valid lines of right file to its result file");
+  inform("\t    --rhsrec        recycle next right file (exclusive with --lhsrec)");
+  inform("\t    --rhsres        echo valid lines of next right file to its result file");
+  inform("\t-n  --serie         enable serie mode (indexed filenames)");
+  inform("\t    --seriefmt fmt  specify the (printf) format fmt for indexes, default is \"%s\"", option.fmt);
   inform("\t-s  --suite name    set test suite name for output message (title)");
   inform("\t    --suitefmt fmt  specify the (printf) format fmt for testsuite, default is \"%s\"", option.sfmt);
   inform("\t-t  --test name     set test name for output message (item)");
@@ -185,7 +187,6 @@ usage(void)
   inform("\t    --trunc         allow premature ending of one of the input file");
   inform("\t    --utest         run the numdiff unit tests (still incomplete)");
   inform("\t-x  --xcheck        enable cross check mode (algorithms cross check)");
-  inform("\t-z  --reset         reset accumulated information");
 
   inform("");
   inform("decompression:");
@@ -259,6 +260,7 @@ usage(void)
   inform("\tRn=Rp<Rq            load the min of registers p and q to register n");
   inform("\tRn=Rp>Rq            load the max of registers p and q to register n");
   inform("\tRn=Rp~Rq            move registers p..q to registers n..n+q-p");
+  inform("\tRn=...              if n > nregs, print the value(s) on the console");
 
   inform("");
   inform("info   :\thttp://cern.ch/mad/numdiff");
@@ -267,6 +269,21 @@ usage(void)
   inform("license:\tGPLv3");
 
   exit(EXIT_FAILURE);
+}
+
+void
+clear_args(void)
+{
+  if (option.lhs_res || option.rhs_res) {
+    debug("results file(s) cleared");
+    option.lhs_res = 0;
+    option.rhs_res = 0;
+  }
+
+  if (option.recycle) {
+    debug("recycling file(s) cleared");
+    option.recycle = ndiff_norecycle;
+  }
 }
 
 void
@@ -331,6 +348,13 @@ parse_args(int argc, const char *argv[])
     }
 
     // enable left result [setup]
+    if (!strcmp(argv[option.argi], "--lhsrec")) {
+      debug("recycling left file enabled");
+      option.recycle = ndiff_recycle_left;
+      continue;
+    }
+
+    // enable left result [setup]
     if (!strcmp(argv[option.argi], "--lhsres")) {
       debug("left results enabled");
       option.lhs_res = 1;
@@ -355,14 +379,6 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--noloc")) {
       debug("trace of location disabled");
       logmsg_config.locate = 0;
-      continue;
-    }
-
-    // disable result files [setup]
-    if (!strcmp(argv[option.argi], "--nores")) {
-      debug("result files disables");
-      option.lhs_res = 0;
-      option.rhs_res = 0;
       continue;
     }
 
@@ -424,6 +440,13 @@ parse_args(int argc, const char *argv[])
       debug("reseting file '%s'", option.accum);
       option.reset = 1;
       accum_summary(0, 0, 0, 0);
+      continue;
+    }
+
+    // enable right result [setup]
+    if (!strcmp(argv[option.argi], "--rhsrec")) {
+      debug("recycling right file enabled");
+      option.recycle = ndiff_recycle_right;
       continue;
     }
 

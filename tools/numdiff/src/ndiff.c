@@ -37,6 +37,7 @@
 struct ndiff {
   // files
   FILE *lhs_f, *rhs_f;
+  FILE *lhs_r, *rhs_r; // result files
   int   row_i,  col_i; // line, num-column
 
   // context
@@ -47,7 +48,7 @@ struct ndiff {
   int     reg_n;
 
   // options
-  int blank, check;
+  int blank, check, recycle;
 
   // diff counter
   int   cnt_i, max_i;
@@ -282,14 +283,33 @@ ndiff_header(void)
 }
 
 static void
-ndiff_traceR(const T *dif, double lhs_d, double rhs_d, double scl_d, double off_d,
+ndiff_traceR(const T *dif, const C *c, bool eval,
+             double lhs_d, double rhs_d, double scl_d, double off_d,
              double abs, double _abs, double rel, double _rel, double dig, double _dig)
 {
+  char buf[2*50*sizeof c->eps.op] = "  ";
+  int pos = 2;
+
   trace("  lhs=%.2g, rhs=%.2g, scl=%.2g, off=%.2g, abs=%.2g, _abs=%.2g, rel=%.2g, _rel=%.2g, dig=%.2g, _dig=%.2g",
            lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
   trace("  R1=%.2g, R2=%.2g, R3=%.2g, R4=%.2g, R5=%.2g, R6=%.2g, R7=%.2g, R8=%.2g, R9=%.2g",
            dif->reg[0], dif->reg[1], dif->reg[2], dif->reg[3], dif->reg[4],
            dif->reg[5], dif->reg[6], dif->reg[7], dif->reg[8]);
+
+  for (int i=0; i < c->eps.op_n; i++) {
+    if (eval)
+      reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
+
+    if (c->eps.dst[i] <= dif->reg_n) {
+      pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
+      if (c->eps.op[i]=='~') {
+        pos -= 2;
+        int rn = c->eps.dst[i]+c->eps.src2[i]-c->eps.src[i];
+        pos += sprintf(buf+pos, " .. R%d=%.2g, ", rn, reg_getval(dif->reg, dif->reg_n, rn));
+      }
+    }
+  }
+  if (pos>2) { buf[pos-2] = 0; trace(buf); }
 }
 
 // -----------------------------------------------------------------------------
@@ -393,12 +413,12 @@ ndiff_readLine (T *dif)
 }
 
 int
-ndiff_outLine(T *dif, FILE *lhs_fp, FILE *rhs_fp)
+ndiff_outLine(T *dif)
 {
   int c1=0, c2=0;
 
-  if (lhs_fp) c1 = fprintf(lhs_fp, "%s\n", dif->lhs_b);
-  if (rhs_fp) c2 = fprintf(rhs_fp, "%s\n", dif->rhs_b);
+  if (dif->lhs_r) c1 = fprintf(dif->lhs_r, "%s\n", dif->lhs_b);
+  if (dif->rhs_r) c2 = fprintf(dif->rhs_r, "%s\n", dif->rhs_b);
 
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
@@ -699,8 +719,8 @@ ndiff_testNum (T *dif, const C *c)
   rel_d = abs_d/ min_d;
   dig_d = abs_d/(min_d*pow_d);
 
-  trace("  lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, abs_d=%.2g, rel_d=%.2g, ndig=%d",
-           lhs_d, rhs_d, scl_d, off_d, abs_d, rel_d, imax(n1, n2));
+//  trace("  lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, abs_d=%.2g, rel_d=%.2g, ndig=%d",
+//           lhs_d, rhs_d, scl_d, off_d, abs_d, rel_d, imax(n1, n2));
 
   // save R3..R9
   reg_setval(dif->reg, dif->reg_n, 3, dif_d);
@@ -800,47 +820,18 @@ quit_diff:
 quit:
   if (!ret || c->eps.cmd & eps_eval) {
     // operations with registers trace
-    if (c->eps.cmd & eps_traceR) {
-      char buf[2*50*sizeof c->eps.op] = "  ";
-      int pos = 2;
+    if (c->eps.cmd & eps_traceR)
+      ndiff_traceR(dif, c, true, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
 
-      ndiff_traceR(dif, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
-
-      for (int i=0; i < c->eps.op_n; i++) {
-        reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
-        pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
-        if (c->eps.op[i]=='~') {
-          pos -= 2;
-          int rn = c->eps.dst[i]+c->eps.src2[i]-c->eps.src[i];
-          pos += sprintf(buf+pos, " .. R%d=%.2g, ", rn, reg_getval(dif->reg, dif->reg_n, rn));
-        }
-      }
-      if (pos>2) { buf[pos-2] = 0; trace(buf); }
-    }
-
-    // operations without trace
+    // operations
     else
       for (int i=0; i < c->eps.op_n; i++)
         reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
   }
   else {
     // trace registers (only)
-    if (c->eps.cmd & eps_traceR) {
-      char buf[2*50*sizeof c->eps.op] = "  ";
-      int pos = 2;
-
-      ndiff_traceR(dif, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
-
-      for (int i=0; i < c->eps.op_n; i++) {
-        pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
-        if (c->eps.op[i]=='~') {
-          pos -= 2;
-          int rn = c->eps.dst[i]+c->eps.src2[i]-c->eps.src[i];
-          pos += sprintf(buf+pos, " .. R%d=%.2g, ", rn, reg_getval(dif->reg, dif->reg_n, rn));
-        }
-      }
-      if (pos>2) { buf[pos-2] = 0; trace(buf); }
-    }
+    if (c->eps.cmd & eps_traceR)
+      ndiff_traceR(dif, c, false, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
   }
 
   dif->lhs_i += l1;
@@ -851,15 +842,23 @@ quit:
 }
 
 void
-ndiff_option  (T *dif, const int *keep_, const int *blank_, const int *check_)
+ndiff_option  (T *dif, const int *keep_, const int *blank_, const int *check_, const int *recycle_)
 {
   assert(dif);
   
-  if (keep_ ) dif->max_i = *keep_;
-  if (blank_) dif->blank = *blank_; 
-  if (check_) dif->check = *check_; 
+  if (keep_ )   dif->max_i   = *keep_;
+  if (blank_)   dif->blank   = *blank_; 
+  if (check_)   dif->check   = *check_;
+  if (recycle_) dif->recycle = *recycle_;
 
   ensure(dif->max_i > 0, "number of kept diff must be positive");
+}
+
+void
+ndiff_result (T *dif, FILE *lhs_rfp, FILE *rhs_rfp)
+{
+  dif->lhs_r = lhs_rfp;
+  dif->rhs_r = rhs_rfp;
 }
 
 void
@@ -893,13 +892,15 @@ ndiff_isempty (const T *dif)
 // --- main ndiff loop --------------------------------------------------------
 
 void
-ndiff_loop(T *dif, FILE *lhs_fp, FILE *rhs_fp)
+ndiff_loop(T *dif)
 {
   assert(dif);
 
   const C *c, *c2;
   int row=0, col, ret;
   int saved_level = logmsg_config.level;
+
+recycle:
 
   while(!ndiff_feof(dif, 0)) {
     ++row, col=0, ret=0;
@@ -961,7 +962,20 @@ ndiff_loop(T *dif, FILE *lhs_fp, FILE *rhs_fp)
     }
 
 result:
-    if (!ret) ndiff_outLine(dif, lhs_fp, rhs_fp);
+    if (!ret) ndiff_outLine(dif);
+  }
+
+  // recycle file
+  if (dif->recycle) {
+    if (feof(dif->lhs_f) && !feof(dif->rhs_f) && dif->recycle == ndiff_recycle_left) {
+      if (fseek(dif->lhs_f, 0, SEEK_SET)) error("unable to recycle left file");
+      goto recycle;
+    }
+
+    if (feof(dif->rhs_f) && !feof(dif->lhs_f) && dif->recycle == ndiff_recycle_right) {
+      if (fseek(dif->rhs_f, 0, SEEK_SET)) error("unable to recycle right file");
+      goto recycle;
+    }
   }
 
   if (dif->blank) {

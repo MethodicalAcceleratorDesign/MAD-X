@@ -192,8 +192,9 @@ main(int argc_, char** argv_)
 
       // numdiff loop
       struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, cxt, 0, option.nregs);
-      ndiff_option(dif, &option.keep, &option.blank, &option.check);
-      ndiff_loop(dif, lhs_rfp, rhs_rfp);
+      ndiff_option(dif, &option.keep, &option.blank, &option.check, &option.recycle);
+      ndiff_result(dif, lhs_rfp, rhs_rfp);
+      ndiff_loop(dif);
 
       // print summary
       if (diff_summary(dif) > 0) ++failed;
@@ -214,6 +215,9 @@ main(int argc_, char** argv_)
       close_file(cfg_fp, option.cfg_zip);
       close_file(lhs_rfp, 0);
       close_file(rhs_rfp, 0);
+
+      // clear options
+      clear_args();
 
       n += 1;
 

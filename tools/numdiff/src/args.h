@@ -25,7 +25,7 @@
 
 struct option {
   int check, debug, nowarn, keep, lgopt;
-  int serie, list, blank, utest, reset, trunc, nregs;
+  int serie, list, blank, utest, reset, trunc, nregs, recycle;
   const char *suite, *test;
   const char *fmt, *sfmt;
   const char *chr;
@@ -49,6 +49,7 @@ void usage(void);
 void invalid_file(const char*);
 void invalid_option(const char*);
 void parse_args(int argc, const char *argv[]);
+void clear_args(void);
 
 static inline bool
 is_option(const char *arg)

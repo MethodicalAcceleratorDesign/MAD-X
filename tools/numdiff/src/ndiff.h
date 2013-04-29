@@ -28,6 +28,12 @@ struct ndiff;
 struct context;
 struct constraint;
 
+// ----- constrant
+
+enum ndiff_options {
+  ndiff_recycle_left = -1, ndiff_norecycle = 0, ndiff_recycle_right = 1
+};
+
 // ----- interface
 
 #define T struct ndiff
@@ -36,16 +42,17 @@ struct constraint;
 T*    ndiff_alloc    (FILE *lhs, FILE *rhs, struct context*, int n_, int r_);
 void  ndiff_clear    (T*);
 void  ndiff_free     (T*);
-void  ndiff_option   (T*, const int *keep_, const int *blank_, const int *check_);
+void  ndiff_option   (T*, const int *keep_, const int *blank_, const int *check_, const int *recycle_);
+void  ndiff_result   (T*, FILE *lhs, FILE *rhs);
 
 // high level API
-void  ndiff_loop     (T*, FILE *lhs_res_, FILE *rhs_res_);
+void  ndiff_loop     (T*);
 
 // low level API
+int   ndiff_outLine  (T*);
 int   ndiff_skipLine (T*);
 int   ndiff_readLine (T*);
 int   ndiff_fillLine (T*, const char *lhs, const char *rhs);
-int   ndiff_outLine  (T*, FILE *lhs_res_, FILE *rhs_res_);
 
 int   ndiff_gotoLine (T*, const C*);
 int   ndiff_gotoNum  (T*, const C*);
