@@ -9,7 +9,7 @@
 #define mycalloc(fn, n, sz)       mad_mem_check_ptr(fn, GC_MALLOC((n)*(sz))  )
 #define myrealloc(fn, p, sz)      mad_mem_check_ptr(fn, GC_REALLOC((p),(sz)) )
 #define mymalloc_atomic(fn, sz)   mad_mem_check_ptr(fn, GC_MALLOC_ATOMIC(sz) )
-#define myfree(fn, p)
+#define myfree(fn, p)             (void)(GC_FREE(p), fn)
 
 #else
 
@@ -19,7 +19,7 @@
 #define mycalloc(fn, n, sz)       mad_mem_check_ptr(fn, calloc((n),(sz))     )
 #define myrealloc(fn, p, sz)      mad_mem_check_ptr(fn, realloc((p),(sz))    )
 #define mymalloc_atomic(fn, sz)   mad_mem_check_ptr(fn, malloc(sz)           )
-#define myfree(fn, p)
+#define myfree(fn, p)             (void)(free(p), fn)
 
 #endif
 
