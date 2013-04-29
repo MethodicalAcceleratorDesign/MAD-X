@@ -51,6 +51,10 @@
 #define PUNCTCHRS "._$"
 #endif
 
+#ifndef REG0FMT
+#define REG0FMT "%g "
+#endif
+
 #ifndef SUITEFMT
 #define SUITEFMT "[ %s ]"
 #endif
@@ -91,11 +95,14 @@ struct option option = {
   // index of processed option
   .argi = 1,
 
-  // names and series numbering
+  // series numbering
   .fmt = SERIEFMT,
 
-  // names and series numbering
+  // suite title
   .sfmt = SUITEFMT,
+
+  // register print format
+  .rfmt = REG0FMT,
 
   // punctuation part of identifiers
   .chr = PUNCTCHRS,
@@ -174,6 +181,7 @@ usage(void)
   inform("\t    --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
   inform("\t-q  --quiet         enable quiet mode (no output if no diff)");
   inform("\t    --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
+  inform("\t    --regfmt fmt    specify the (printf) format fmt for register 0, default is \"%s\"", option.rfmt);
   inform("\t-r  --reset         reset accumulated information");
   inform("\t    --resext ext    specify the result file extension, default is \"%s\"", option.res_e);
   inform("\t    --rhsrec        recycle next right file (exclusive with --lhsrec)");
@@ -251,6 +259,7 @@ usage(void)
   inform("\t=|Rn                load the absolute value from register n");
   inform("\t=[Rn                load the value from register n rounded toward zero");
   inform("\t=]Rn                load the value from register n rounded toward infty");
+  inform("\tR0=                 print the value(s) on the console");
   inform("\tRn=Rp+Rq            load the sum of registers p and q to register n");
   inform("\tRn=Rp-Rq            load the difference of registers p and q to register n");
   inform("\tRn=Rp*Rq            load the product of registers p and q to register n");
@@ -260,7 +269,6 @@ usage(void)
   inform("\tRn=Rp<Rq            load the min of registers p and q to register n");
   inform("\tRn=Rp>Rq            load the max of registers p and q to register n");
   inform("\tRn=Rp~Rq            move registers p..q to registers n..n+q-p");
-  inform("\tRn=...              if n > nregs, print the value(s) on the console");
 
   inform("");
   inform("info   :\thttp://cern.ch/mad/numdiff");
@@ -424,6 +432,13 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--refext")) {
       option.ref_e = argv[++option.argi]; 
       debug("reference extension set to '%s'", option.ref_e);
+      continue;
+    }
+
+    // set register format [setup]
+    if (!strcmp(argv[option.argi], "--regfmt")) {
+      option.rfmt = argv[++option.argi];
+      debug("register format set to '%s'", option.rfmt);
       continue;
     }
 

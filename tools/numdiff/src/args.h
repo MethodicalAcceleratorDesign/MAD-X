@@ -27,7 +27,7 @@ struct option {
   int check, debug, nowarn, keep, lgopt;
   int serie, list, blank, utest, reset, trunc, nregs, recycle;
   const char *suite, *test;
-  const char *fmt, *sfmt;
+  const char *fmt, *sfmt, *rfmt;
   const char *chr;
   const char *out_e, *ref_e, *cfg_e, *res_e;
   const char *unzip[3];

@@ -300,7 +300,7 @@ ndiff_traceR(const T *dif, const C *c, bool eval,
     if (eval)
       reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
 
-    if (c->eps.dst[i] <= dif->reg_n) {
+    if (c->eps.dst[i]) {
       pos += sprintf(buf+pos, "R%d=%.2g, ", c->eps.dst[i], reg_getval(dif->reg, dif->reg_n, c->eps.dst[i]));
       if (c->eps.op[i]=='~') {
         pos -= 2;

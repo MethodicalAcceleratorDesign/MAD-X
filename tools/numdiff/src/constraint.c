@@ -206,8 +206,8 @@ readEps(struct eps *e, FILE *in, int row)
         ensure(e->op_n < (short)sizeof e->op, "rule has too many operations (%s:%d)", option.cfg_file, row);
 
         short dst = strtoul(str+1, &end, 10);
-        ensure(reg_isvalid(dst) && !*end, "invalid register reference '%s' (%s:%d)", str, option.cfg_file, row);
-        ensure(dst>9, "invalid assignment to read-only register R%d (%s:%d)", dst, option.cfg_file, row);
+        ensure(dst>=0 && dst < REG_MAX && !*end, "invalid register reference '%s' (%s:%d)", str, option.cfg_file, row);
+        ensure(!dst || dst>9, "invalid assignment to read-only register R%d (%s:%d)", dst, option.cfg_file, row);
 
         char  bop=0;
         short src=0, src2=0;
