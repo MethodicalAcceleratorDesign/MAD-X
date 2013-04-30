@@ -1,0 +1,59 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD GC makefile for Linux
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Garbage collector for MAD-X (Boehm GC)
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+GCDIR=gc-7.2
+GCARCH=linux
+
+#
+# Linux
+#
+ifneq ($(OSTYPE),Linux)
+$(error *** garbage collector not supported on $(OSTYPE))
+endif
+
+.PHONY: libgc-intel    libgc-gnu
+.PHONY: libgc-intel32  libgc-gnu32
+.PHONY: libgc-intel64  libgc-gnu64
+
+$(PROJECT):     libgc-intel
+
+libgc-intel:    libgc-intel32 libgc-intel64
+libgc-gnu:      libgc-gnu32   libgc-gnu64
+
+libgc-%32:      ARCH := 32
+libgc-%64:      ARCH := 64
+
+libgc-intel32 libgc-intel64:
+	$E "*** Building $@"
+	$_ cd $(GCDIR) ; \
+    env CC="icc -m$(ARCH)" ./configure --enable-static --disable-shared ; \
+    make clean ; \
+    make ; \
+    cd - ; \
+    cp -f $(GCDIR)/.libs/libgc.a libgc-$(GCARCH)$(ARCH).a ; \
+    ln -sf libgc-$(GCARCH)$(ARCH).a libgc$(ARCH).a
+
+libgc-gnu32 libgc-gnu64:
+	$E "*** Building $@"
+	$_ cd $(GCDIR) ; \
+    env CC="gcc -m$(ARCH)" ./configure --enable-static --disable-shared ; \
+    make clean ; \
+    make ; \
+    cd - ; \
+    cp -f $(GCDIR)/.libs/libgc.a libgc-$(GCARCH)$(ARCH)-gnu.a ; \
+    ln -sf libgc-$(GCARCH)$(ARCH)-gnu.a libgc$(ARCH).a
+
+# end of makefile
