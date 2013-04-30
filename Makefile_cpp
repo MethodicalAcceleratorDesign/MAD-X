@@ -29,7 +29,7 @@ CPPFLAGS += -D_NTPSA
 endif
 
 ifeq ($(USEGC),yes)
-CPPFLAGS += -D_USEGC -Ilibs/gc/gc-7.2/include
+CPPFLAGS += -D_USEGC -Ilibs/gc/gc/include
 endif
 
 # end of makefile
