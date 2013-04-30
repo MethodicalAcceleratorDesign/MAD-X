@@ -141,28 +141,29 @@ copk(double *r, int m)
 static int
 c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,int *nx,float rms,int imon,int icor,int niter)
 {
-  char rout_name[] = "c_micit";
+  const char *rout_name = "c_micit";
   int *ny;
   int ifail;
   float *ax,*cinx,*xinx,*resx;
   float *rho,*ptop,*rmss,*xrms,*xptp,*xiter;
 
   /* allocate auxiliary vectors used by correction algorithms */
-  ny    = mycalloc("c_micit_ny",icor,sizeof(int));
-  ax    = mycalloc("c_micit_ax",imon*icor,sizeof(float));
-  cinx  = mycalloc("c_micit_cinx",icor,sizeof(float));
-  xinx  = mycalloc("c_micit_xinx",imon,sizeof(float));
-  resx  = mycalloc("c_micit_resx",imon,sizeof(float));
-  rho   = mycalloc("c_micit_rho",3*icor,sizeof(float));
-  ptop  = mycalloc("c_micit_ptop",icor,sizeof(float));
-  rmss  = mycalloc("c_micit_rmss",icor,sizeof(float));
-  xrms  = mycalloc("c_micit_xrms",icor,sizeof(float));
-  xptp  = mycalloc("c_micit_xptp",icor,sizeof(float));
-  xiter = mycalloc("c_micit_xiter",icor,sizeof(float));
+  ny    = mycalloc_atomic("c_micit_ny"   , icor     , sizeof *ny);
+  ax    = mycalloc_atomic("c_micit_ax"   , imon*icor, sizeof *ax);
+  cinx  = mycalloc_atomic("c_micit_cinx" , icor     , sizeof *cinx);
+  xinx  = mycalloc_atomic("c_micit_xinx" , imon     , sizeof *xinx);
+  resx  = mycalloc_atomic("c_micit_resx" , imon     , sizeof *resx);
+  rho   = mycalloc_atomic("c_micit_rho"  , 3*icor   , sizeof *rho);
+  ptop  = mycalloc_atomic("c_micit_ptop" , icor     , sizeof *ptop);
+  rmss  = mycalloc_atomic("c_micit_rmss" , icor     , sizeof *rmss);
+  xrms  = mycalloc_atomic("c_micit_xrms" , icor     , sizeof *xrms);
+  xptp  = mycalloc_atomic("c_micit_xptp" , icor     , sizeof *xptp);
+  xiter = mycalloc_atomic("c_micit_xiter", icor     , sizeof *xiter);
 
-  micit_(dmat, conm, monvec, corvec, resvec, nx, &rms, &imon, &icor, &niter, ny, ax, cinx, xinx, resx,rho,ptop,rmss,xrms,xptp,xiter,&ifail);
+  micit_(dmat, conm, monvec, corvec, resvec, nx, &rms, &imon, &icor, &niter,
+         ny, ax, cinx, xinx, resx, rho, ptop, rmss, xrms, xptp, xiter, &ifail);
 
-  myfree(rout_name,ny); myfree(rout_name,ax); myfree(rout_name,cinx);
+  myfree(rout_name,ny);   myfree(rout_name,ax);   myfree(rout_name,cinx);
   myfree(rout_name,xinx); myfree(rout_name,resx); myfree(rout_name,rho);
   myfree(rout_name,ptop); myfree(rout_name,rmss); myfree(rout_name,xrms);
   myfree(rout_name,xptp); myfree(rout_name,xiter);
@@ -173,29 +174,27 @@ c_micit(double *dmat,char *conm, double *monvec,double *corvec,double *resvec,in
 static void
 c_haveit(double *dmat,double *monvec,double *corvec,double *resvec,int *nx,int imon,int icor)
 {
-  char rout_name[] = "c_haveit";
+  const char *rout_name = "c_haveit";
   double *cb,*xmeas,*xres,*y,*z,*xd;
 
-  cb   = mycalloc("c_haveit_cb",icor,sizeof(double));
-  xmeas= mycalloc("c_haveit_xmeas",imon,sizeof(double));
-  xres = mycalloc("c_haveit_xres",imon,sizeof(double));
-  y    = mycalloc("c_haveit_y",icor*imon,sizeof(double));
-  z    = mycalloc("c_haveit_z",icor*icor,sizeof(double));
-  xd   = mycalloc("c_haveit_xd",icor,sizeof(double));
+  cb    = mycalloc_atomic("c_haveit_cb"   , icor      , sizeof *cb);
+  xmeas = mycalloc_atomic("c_haveit_xmeas", imon      , sizeof *xmeas);
+  xres  = mycalloc_atomic("c_haveit_xres" , imon      , sizeof *xres);
+  y     = mycalloc_atomic("c_haveit_y"    , icor*imon , sizeof *y);
+  z     = mycalloc_atomic("c_haveit_z"    , icor*icor , sizeof *z);
+  xd    = mycalloc_atomic("c_haveit_xd"   , icor      , sizeof *xd);
 
   haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor,cb,xmeas,xres,y,z,xd);
 
-  myfree(rout_name,cb); myfree(rout_name,xmeas); myfree(rout_name,xres);
-  myfree(rout_name,y);  myfree(rout_name,z); myfree(rout_name,xd);
-
-  return;
+  myfree(rout_name,cb); myfree(rout_name,xmeas);  myfree(rout_name,xres);
+  myfree(rout_name,y);  myfree(rout_name,z);      myfree(rout_name,xd);
 }
 
 static int
 c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut, double *sngval)
 
 {
-  char rout_name[] = "c_svddev";
+  const char *rout_name = "c_svddev";
   int    flag;
   int    dbg;
 
@@ -203,37 +202,37 @@ c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut, double *sn
   double *ws, *wv;
   int    *sw;
 
-  s   = mycalloc("c_svddec_s",icor*imon,sizeof(double));
-  u   = mycalloc("c_svddec_u",icor*imon,sizeof(double));
-  v   = mycalloc("c_svddec_v",icor*imon,sizeof(double));
-  w   = mycalloc("c_svddec_w",icor*imon,sizeof(double));
-  ut  = mycalloc("c_svddec_ut",icor*imon,sizeof(double));
-  vt  = mycalloc("c_svddec_vt",icor*imon,sizeof(double));
-  wt  = mycalloc("c_svddec_wt",icor*imon,sizeof(double));
-  ws  = mycalloc("c_svddec_ws",icor,sizeof(double));
-  wv  = mycalloc("c_svddec_wv",icor,sizeof(double));
-  sw  = mycalloc("c_svddec_sw",icor,sizeof(int));
+  s   = mycalloc_atomic("c_svddec_s" , icor*imon, sizeof *s);
+  u   = mycalloc_atomic("c_svddec_u" , icor*imon, sizeof *u);
+  v   = mycalloc_atomic("c_svddec_v" , icor*imon, sizeof *v);
+  w   = mycalloc_atomic("c_svddec_w" , icor*imon, sizeof *w);
+  ut  = mycalloc_atomic("c_svddec_ut", icor*imon, sizeof *ut);
+  vt  = mycalloc_atomic("c_svddec_vt", icor*imon, sizeof *vt);
+  wt  = mycalloc_atomic("c_svddec_wt", icor*imon, sizeof *wt);
+  ws  = mycalloc_atomic("c_svddec_ws", icor     , sizeof *ws);
+  wv  = mycalloc_atomic("c_svddec_wv", icor     , sizeof *wv);
+  sw  = mycalloc_atomic("c_svddec_sw", icor     , sizeof *sw);
 
   dbg = debug_correct_opt;
 
-  if(imon >= icor ) {
-      svddec_m_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
-  } else {
-      svddec_c_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
-  }
-  myfree(rout_name,s); myfree(rout_name,u);
-  myfree(rout_name,v); myfree(rout_name,w);
+  if(imon >= icor )
+    svddec_m_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
+  else
+    svddec_c_(dmat,s,u,v,w,ut,vt,wt,ws,wv,sw,sngcut,sngval,&imon,&icor,&flag,sing,&dbg);
+
+  myfree(rout_name,s);  myfree(rout_name,u);
+  myfree(rout_name,v);  myfree(rout_name,w);
   myfree(rout_name,ut); myfree(rout_name,vt);
   myfree(rout_name,wt); myfree(rout_name,ws);
   myfree(rout_name,wv); myfree(rout_name,sw);
 
-  return(flag);
+  return flag;
 }
 
 static int 
 c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int imon, int icor)
 {
-  char rout_name[] = "c_svdcorr";
+  const char *rout_name = "c_svdcorr";
   int    flag;
   int    dbg;
 
@@ -241,40 +240,38 @@ c_svdcorr(double *dmat, double *xin, double *cor, double *res, int *nx, int imon
   double *xa, *xb, *xp, *wv, *ws;
   int    *sw;
 
-  s   = mycalloc("c_svdcorr_s",icor*imon,sizeof(double));
-  u   = mycalloc("c_svdcorr_u",icor*imon,sizeof(double));
-  v   = mycalloc("c_svdcorr_v",icor*imon,sizeof(double));
-  w   = mycalloc("c_svdcorr_w",icor*imon,sizeof(double));
-  ut  = mycalloc("c_svdcorr_ut",icor*imon,sizeof(double));
-  vt  = mycalloc("c_svdcorr_vt",icor*imon,sizeof(double));
-  wt  = mycalloc("c_svdcorr_wt",icor*imon,sizeof(double));
+  s   = mycalloc_atomic("c_svdcorr_s" , icor*imon, sizeof *s);
+  u   = mycalloc_atomic("c_svdcorr_u" , icor*imon, sizeof *u);
+  v   = mycalloc_atomic("c_svdcorr_v" , icor*imon, sizeof *v);
+  w   = mycalloc_atomic("c_svdcorr_w" , icor*imon, sizeof *w);
+  ut  = mycalloc_atomic("c_svdcorr_ut", icor*imon, sizeof *ut);
+  vt  = mycalloc_atomic("c_svdcorr_vt", icor*imon, sizeof *vt);
+  wt  = mycalloc_atomic("c_svdcorr_wt", icor*imon, sizeof *wt);
 
-  xa  = mycalloc("c_svdcorr_xa",imon,sizeof(double));
-  xb  = mycalloc("c_svdcorr_xb",imon,sizeof(double));
-  xp  = mycalloc("c_svdcorr_xp",imon,sizeof(double));
-  ws  = mycalloc("c_svdcorr_xp",icor,sizeof(double));
-  wv  = mycalloc("c_svdcorr_xp",icor,sizeof(double));
+  xa  = mycalloc_atomic("c_svdcorr_xa", imon, sizeof *xa);
+  xb  = mycalloc_atomic("c_svdcorr_xb", imon, sizeof *xb);
+  xp  = mycalloc_atomic("c_svdcorr_xp", imon, sizeof *xp);
+  ws  = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *ws);
+  wv  = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *wv);
 
-  sw  = mycalloc("c_svdcorr_sw",icor,sizeof(int));
+  sw  = mycalloc_atomic("c_svdcorr_sw", icor, sizeof *sw);
 
   dbg = debug_correct_opt;
 
-  if(imon >= icor ) {
-      svdcorr_m_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,
-                 xa,xb,xp,ws,wv,sw,
-                 nx,&imon,&icor,&flag,&dbg);
-  } else {
-      svdcorr_c_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,
-                 xa,xb,xp,ws,wv,sw,
-                 nx,&imon,&icor,&flag,&dbg);
-  }
-  myfree(rout_name,s); myfree(rout_name,u); myfree(rout_name,v);
-  myfree(rout_name,w); myfree(rout_name,ut); myfree(rout_name,vt);
+  if(imon >= icor )
+    svdcorr_m_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,
+               xa,xb,xp,ws,wv,sw, nx,&imon,&icor,&flag,&dbg);
+  else
+    svdcorr_c_(dmat,s,u,v,w,ut,vt,wt,xin,cor,res,
+               xa,xb,xp,ws,wv,sw, nx,&imon,&icor,&flag,&dbg);
+
+  myfree(rout_name,s);  myfree(rout_name,u);  myfree(rout_name,v);
+  myfree(rout_name,w);  myfree(rout_name,ut); myfree(rout_name,vt);
   myfree(rout_name,wt); myfree(rout_name,sw); myfree(rout_name,xa);
   myfree(rout_name,xb); myfree(rout_name,xp); myfree(rout_name,ws);
   myfree(rout_name,wv);
 
-  return(flag);
+  return flag;
 }
 
 static void
@@ -507,7 +504,7 @@ static void
 correct_correct2(struct in_cmd* cmd)
 /* Steering routine for orbit corrections of two beams */
 {
-  char rout_name[] = "correct_correct2";
+  const char *rout_name = "correct_correct2";
 
 /*
   struct name_list* spos = sequences->list;
@@ -603,34 +600,29 @@ correct_correct2(struct in_cmd* cmd)
   }
 
   /* allocate vectors used by correction algorithms */
-  nx     = mycalloc("correct_correct2_nx",ncorr,sizeof(int));
-  nc     = mycalloc("correct_correct2_nc",ncorr,sizeof(int));
-  nm     = mycalloc("correct_correct2_nm",nmon,sizeof(int));
-  // sing   = mycalloc("correct_correct2_sing",ncorr*2,sizeof(int)); // not used
-  corvec = mycalloc("correct_correct2_corvec",ncorr,sizeof(double));
-  monvec = mycalloc("correct_correct2_monvec",nmon,sizeof(double));
-  resvec = mycalloc("correct_correct2_resvec",nmon,sizeof(double));
-  conm   = mycalloc("correct_correct2_conm",ncorr*16,sizeof(char));
+  nx     = mycalloc_atomic("correct_correct2_nx", ncorr, sizeof *nx);
+  nc     = mycalloc_atomic("correct_correct2_nc", ncorr, sizeof *nc);
+  nm     = mycalloc_atomic("correct_correct2_nm", nmon , sizeof *nm);
+  // sing   = mycalloc_atomic("correct_correct2_sing", ncorr*2, sizeof *sing); // not used
+
+  corvec = mycalloc_atomic("correct_correct2_corvec", ncorr   , sizeof *corvec);
+  monvec = mycalloc_atomic("correct_correct2_monvec", nmon    , sizeof *monvec);
+  resvec = mycalloc_atomic("correct_correct2_resvec", nmon    , sizeof *resvec);
+  conm   = mycalloc_atomic("correct_correct2_conm"  , ncorr*16, sizeof *conm);
 
   /* get original settings of correctors from input Twiss-table */
   pro_correct2_getcorrs(cmd); // it = not used
   /* get input orbit, default is from input Twiss-table */
   pro_correct2_getorbit(cmd);  // it = not used
 
-
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
   icor = ix%10000; imon  = ix/10000;
   printf("%d monitors and %d correctors enabled\n",imon,icor);
 
-
-    if (get_option("debug")) {
-  for (i=0;i<icor;i++) {
-    printf("C: %d %d \n",nx[i],nc[i]);
-  }
-  for (i=0;i<imon;i++) {
-    printf("M: %d %e \n",nm[i],monvec[i]);
-  }
+  if (get_option("debug")) {
+    for (i=0; i<icor; i++) printf("C: %d %d \n",nx[i],nc[i]);
+    for (i=0; i<imon; i++) printf("M: %d %e \n",nm[i],monvec[i]);
   }
 
   if(strcmp("ring",command_par_string("flag",cmd->clone)) == 0) {
@@ -638,8 +630,7 @@ correct_correct2(struct in_cmd* cmd)
     /* icor and imon used to set up correct matrix size !! */
     dmat =  pro_correct2_response_ring(ip,icor,imon);
   }
-  else { printf("INVALID MACHINE TYPE\n"); exit(-1);
-  }
+  else { printf("INVALID MACHINE TYPE\n"); exit(-1); }
 
   /* MICADO correction, get desired number of correctors from command */
   corrl = command_par_value("corrlim",cmd->clone);
@@ -740,7 +731,7 @@ static int
 pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 {
 
-  char rout_name[] = "pro_correct2_gettables";
+  const char *rout_name = "pro_correct2_gettables";
 
   struct id_mic2 *cor_l1,  *cor_l2;
   struct id_mic2 *mon_l1,  *mon_l2;
@@ -806,25 +797,20 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   }
  
 /* reserve space for orbit correction structures */
-  if(correct_orbit12 == NULL) {
-    correct_orbit12 = (struct orb_cor2*)mycalloc("pro_correct2_gettables",1, 
-                     sizeof(struct orb_cor2));
-  }
-
-
+  if(correct_orbit12 == NULL)
+    correct_orbit12 = mycalloc("pro_correct2_gettables", 1, sizeof *correct_orbit12);
 
   if(correct_orbit12->cor_table != NULL) myfree(rout_name,correct_orbit12->cor_table);
   if(correct_orbit12->mon_table != NULL) myfree(rout_name,correct_orbit12->mon_table);
 
-  correct_orbit12->cor_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_cor",5200, sizeof(struct id_mic2));
-  correct_orbit12->mon_table = (struct id_mic2 *)mycalloc("pro_correct2_gettables_mon",5200, sizeof(struct id_mic2));
+  correct_orbit12->cor_table = mycalloc("pro_correct2_gettables_cor",5200, sizeof *correct_orbit12->cor_table);
+  correct_orbit12->mon_table = mycalloc("pro_correct2_gettables_mon",5200, sizeof *correct_orbit12->mon_table);
 
 /* orbit table available, get units, if defined */
-   if((ounits = command_par_value("units",cmd->clone)) > 0) {
-          correct_orbit12->units=ounits;                      
-   } else {
-          correct_orbit12->units=1.0;      
-   }
+   if((ounits = command_par_value("units",cmd->clone)) > 0)
+    correct_orbit12->units = ounits;
+   else
+     correct_orbit12->units = 1.0;
 
   // ttb = model_table; // not used
 /* no more need, we have b1 and b2 as pointers .. */
@@ -1215,7 +1201,7 @@ pro_correct2_response_ring(int ip, int nc, int nm)
   double respx1, respy1;
   double respx, respy;
   double *dmat;
-  int  *imat;
+  int    *imat;
   int    mp;
   int    i_zero, i_one;
   int icb;
@@ -1229,8 +1215,8 @@ pro_correct2_response_ring(int ip, int nc, int nm)
   da1 = twiss_table_beam1->d_cols;
   da2 = twiss_table_beam2->d_cols;
 
-  dmat =  mycalloc("pro_correct2_response_ring",nc*nm,sizeof(double));
-  imat =  mycalloc("pro_correct2_response_ring",nc*nm,sizeof(int));
+  dmat =  mycalloc_atomic("pro_correct2_response_ring", nc*nm, sizeof *dmat);
+  imat =  mycalloc_atomic("pro_correct2_response_ring", nc*nm, sizeof *imat);
 
 /* initialize imat: */
   for (i=0; i<nc; i++) {
@@ -1361,12 +1347,15 @@ pro_correct2_response_ring(int ip, int nc, int nm)
     c = c->next;
   };
   if (get_option("debug"))  {
-     primat_(imat,&nm, &nc);
-     prdmat_(dmat,&nm, &nc);
+     primat_(imat, &nm, &nc);
+     prdmat_(dmat, &nm, &nc);
      printf("\n");
      printf("\n");
   }
-  return(dmat);
+
+  myfree("pro_correct2_response_ring", imat);
+
+  return dmat;
 }
 
 static void
@@ -1498,7 +1487,7 @@ static void
 correct_correct1(struct in_cmd* cmd)
 /* Steering routine for orbit corrections of one beam */
 {
-  char rout_name[] = "correct_correct";
+  const char *rout_name = "correct_correct";
   int ix, im, ip, idrop; // , it not used
   int j,nnnseq; // ,err not used
   int imon, icor;
@@ -1769,7 +1758,7 @@ correct_correct(struct in_cmd* cmd)
 /* Steering routine for orbit corrections */
 {
 /*
-  char rout_name[] = "correct_correct";
+  const char *rout_name = "correct_correct";
 */
   char  *orbtab1, *orbtab2;
   
@@ -1873,7 +1862,7 @@ static int
 pro_correct_gettables(int iplane, struct in_cmd* cmd)
 {
 
-  char rout_name[] = "pro_correct_gettables";
+  const char *rout_name = "pro_correct_gettables";
 
   struct id_mic *cor_l;
   struct id_mic *mon_l;
@@ -1967,9 +1956,9 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
        if (get_option("debug")) {
        }
 
-  if(correct_orbit == NULL) {
-    correct_orbit = mycalloc("pro_correct_gettables",1, sizeof(struct orb_cor));
-  }
+        if(correct_orbit == NULL)
+          correct_orbit = mycalloc("pro_correct_gettables", 1, sizeof *correct_orbit);
+
        if (get_option("debug")) {
            printf("-0-\n");
        }
@@ -2013,10 +2002,10 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
        }
 
 
-  if(correct_orbit->cor_table != NULL) myfree(rout_name,correct_orbit->cor_table);
-  if(correct_orbit->mon_table != NULL) myfree(rout_name,correct_orbit->mon_table);
-  correct_orbit->cor_table = (struct id_mic *)mycalloc("pro_correct_gettables_cor",5200, sizeof(struct id_mic));
-  correct_orbit->mon_table = (struct id_mic *)mycalloc("pro_correct_gettables_mon",5200, sizeof(struct id_mic));
+  if(correct_orbit->cor_table != NULL) myfree(rout_name, correct_orbit->cor_table);
+  if(correct_orbit->mon_table != NULL) myfree(rout_name, correct_orbit->mon_table);
+  correct_orbit->cor_table = mycalloc("pro_correct_gettables_cor", 5200, sizeof *correct_orbit->cor_table);
+  correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 5200, sizeof *correct_orbit->mon_table);
 
 /* orbit table available, get units, if defined */
    if((ounits = command_par_value("units",cmd->clone)) > 0) {
@@ -2647,7 +2636,7 @@ pro_correct_response_ring(int ip, int nc, int nm)
   da1 = ttb->d_cols;
   ic = 0; im = 0;
 
-  dmat = mycalloc("pro_correct_response_ring",nc*nm,sizeof(double));
+  dmat = mycalloc_atomic("pro_correct_response_ring", nc*nm, sizeof *dmat);
 
   correct_orbit->qx0 = da1[5][ttb->curr-1];
   correct_orbit->qy0 = da1[8][ttb->curr-1];
@@ -2694,8 +2683,9 @@ pro_correct_response_ring(int ip, int nc, int nm)
       ic++;
     }
     c = c->next;
-  };
-  return(dmat);
+  }
+
+  return dmat;
 }
 
 static double*
@@ -2717,7 +2707,7 @@ pro_correct_response_line(int ip, int nc, int nm)
   da1 = ttb->d_cols;
   ic = 0; im = 0;
 
-  dmat =  mycalloc("pro_correct_response_ring",nc*nm,sizeof(double));
+  dmat =  mycalloc_atomic("pro_correct_response_ring", nc*nm, sizeof *dmat);
 
   correct_orbit->qx0 = da1[5][ttb->curr-1];
   correct_orbit->qy0 = da1[8][ttb->curr-1];
