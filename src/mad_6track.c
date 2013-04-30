@@ -533,9 +533,8 @@ add_split_list(struct c6t_element* el)
   char rout_name[] = "c6t:add_split_list";
   if (split_list == NULL)
   {
-    split_list = (struct c6t_el_list*) mycalloc(rout_name,1, sizeof(struct c6t_el_list));
-    split_list->elem =
-      (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct elem*));
+    split_list = mycalloc(rout_name,1, sizeof *split_list);
+    split_list->elem = mycalloc(rout_name,EL_COUNT, sizeof *split_list->elem);
     split_list->max = EL_COUNT;
   }
   else if (split_list->curr == split_list->max) grow_ellist(split_list);
@@ -570,10 +569,8 @@ add_to_ellist( /* adds element to correct object list */
            p_elem->base_name, types.curr);
     exit(1);
   }
-  types.member[types.curr]
-    = (struct c6t_el_list*) mycalloc(rout_name,1,sizeof(struct c6t_el_list));
-  types.member[types.curr]->elem
-    = (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct c6t_element*));
+  types.member[types.curr] = mycalloc(rout_name,1,sizeof *types.member[0]);
+  types.member[types.curr]->elem = mycalloc(rout_name,EL_COUNT, sizeof *types.member[0]->elem);
   types.member[types.curr]->elem[types.member[types.curr]->curr++] = p_elem;
   types.member[types.curr]->max = EL_COUNT;
   strcpy(types.member[types.curr]->base_name, p_elem->base_name);
@@ -1041,10 +1038,8 @@ block_it(void)
     current_block->next = NULL;
     if (prev_block == NULL) first_block = current_block;
     else                    prev_block->next = current_block;
-    current_block->elements
-      = (struct c6t_el_list*) mycalloc(rout_name,1,sizeof(struct c6t_el_list));
-    current_block->elements->elem
-      = (struct c6t_element**) mycalloc(rout_name,EL_COUNT, sizeof(struct c6t_element*));
+    current_block->elements = mycalloc(rout_name,1,sizeof *current_block->elements);
+    current_block->elements->elem = mycalloc(rout_name,EL_COUNT, sizeof *current_block->elements->elem);
     current_block->elements->max = EL_COUNT;
     current_block->first = el;
     current_block->length = el->equiv->value[0];
@@ -1874,7 +1869,7 @@ grow_ellist( /* doubles object list size */
   puts("+++++++ grow_ellist");
 #endif
   p->max = new;
-  p->elem = (struct c6t_element**) mycalloc(rout_name,new, sizeof(struct c6t_element*));
+  p->elem = mycalloc(rout_name, new, sizeof *p->elem);
   for (j = 0; j < p->curr; j++) p->elem[j] = p_loc[j];
   myfree(rout_name, p_loc);
 }
@@ -2011,18 +2006,14 @@ make_obj(   /* creates a new object */
 #ifdef _call_tree_
   put_info("+++++++ make_object","");
 #endif
-  p = (struct object*)  mycalloc(rout_name, 1, sizeof(struct object));
+  p = mycalloc(rout_name, 1, sizeof *p);
   mycpy(p->key, key);
-  if ((p->l_int = vlint) > 0)
-    p->a_int = (int*) mymalloc(rout_name, p->l_int * sizeof(int));
-  if ((p->l_dble = vldble) > 0)
-    p->a_dble = (double*) mymalloc(rout_name, p->l_dble * sizeof(double));
-  if ((p->l_char = vlchar) > 0)
-    p->a_char = (char*) mymalloc(rout_name, p->l_char);
-  if ((p->l_obj  = vlpobj) > 0)
-  {
-    p->p_obj = (struct object**) mycalloc(rout_name, p->l_obj, sizeof(struct object*));
-    p->names = (char**) mycalloc(rout_name, p->l_obj, sizeof(char*));
+  if ((p->l_int  = vlint ) > 0) p->a_int  = mymalloc_atomic(rout_name, p->l_int  * sizeof *p->a_int );
+  if ((p->l_dble = vldble) > 0) p->a_dble = mymalloc_atomic(rout_name, p->l_dble * sizeof *p->a_dble);
+  if ((p->l_char = vlchar) > 0) p->a_char = mymalloc_atomic(rout_name, p->l_char * sizeof *p->a_char);
+  if ((p->l_obj  = vlpobj) > 0) {
+    p->p_obj = mycalloc(rout_name, p->l_obj, sizeof *p->p_obj);
+    p->names = mycalloc(rout_name, p->l_obj, sizeof *p->names);
   }
   p->parent = NULL;
   /*      my_time(); */
@@ -2141,7 +2132,7 @@ new_block(void)
 {
   struct block* p;
   char rout_name[] = "c6t:new_block";
-  p = (struct block*) mycalloc(rout_name, 1, sizeof(struct block));
+  p = mycalloc(rout_name, 1, sizeof *p);
   sprintf(p->name, "BLOC%d", block_count++);
   return p;
 }
@@ -2151,11 +2142,12 @@ new_c6t_element(int size, char* name, char* base)
 {
   struct c6t_element* p;
   char rout_name[] = "c6t:new_c6t_element";
-  p = (struct c6t_element*) mycalloc(rout_name, 1, sizeof(struct c6t_element));
+  p = mycalloc(rout_name, 1, sizeof *p);
   strcpy(p->name, name);
   p->equiv = p;
   strcpy(p->base_name, base);
-  p->value = (double*) mycalloc(rout_name,++size,sizeof(double));
+  ++size;
+  p->value = mycalloc_atomic(rout_name, size, sizeof *p->value);
   p->n_values = size;
   p->do_not_free = 0;
   return p;
@@ -3286,26 +3278,19 @@ c6t_init(void)
   {
     p_err_zero = make_obj("zero_errors", 0, FIELD_MAX, 0, 0);
     for (j = 0; j < FIELD_MAX; j++)
-    {
       p_err_zero->a_dble[j]=0.0;
-    }
 
-    for (j = 0; j < N_TYPES; j++)
-    {
-      t_info[j] = (struct type_info*) mymalloc(rout_name,sizeof(struct type_info));
+    for (j = 0; j < N_TYPES; j++) {
+      t_info[j] = mymalloc(rout_name, sizeof *t_info[0]);
       sscanf(el_info[j],"%s%d%d%d%d%d%d",t_info[j]->name, &t_info[j]->flag_1,
              &t_info[j]->flag_2, &t_info[j]->flag_3, &t_info[j]->flag_4,
              &t_info[j]->flag_5, &t_info[j]->flag_6);
     }
   }
-  if (current_sequ == NULL)
-    fatal_error("c6t - no current sequence.","");
-  if (current_sequ->ex_start == NULL)
-    fatal_error("c6t - sequence not expanded.","");
-  if (current_sequ->tw_table == NULL)
-    fatal_error("c6t - twiss table not found.","");
-  if (attach_beam(current_sequ) == 0)
-    fatal_error("c6t - sequence without beam command.","");
+  if (current_sequ == NULL)           fatal_error("c6t - no current sequence.","");
+  if (current_sequ->ex_start == NULL) fatal_error("c6t - sequence not expanded.","");
+  if (current_sequ->tw_table == NULL) fatal_error("c6t - twiss table not found.","");
+  if (attach_beam(current_sequ) == 0) fatal_error("c6t - sequence without beam command.","");
 
   /* initialise everything */
   block_count = 0;     /* current block count for naming */
