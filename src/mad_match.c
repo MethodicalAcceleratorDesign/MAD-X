@@ -8,11 +8,9 @@ match_prepare_varypos(void)
   /* keeps constraints from nodes, reexpands, adds constraints to nodes */
 {
   struct node* node = current_sequ->ex_start;
-  struct constraint_list** tmplist = (struct constraint_list**)
-    mymalloc("match_prepare_varypos",current_sequ->n_nodes * sizeof(struct constraint_list*));
+  struct constraint_list** tmplist = mymalloc("match_prepare_varypos", current_sequ->n_nodes * sizeof *tmplist);
   int i = 0;
-  while (node != NULL)
-  {
+  while (node != NULL) {
     tmplist[i] = current_sequ->all_nodes[i]->cl; i++;
     if (node == current_sequ->ex_end) break;
     node = node->next;
@@ -20,8 +18,7 @@ match_prepare_varypos(void)
   expand_curr_sequ(0);
   i = 0;
   node = current_sequ->ex_start;
-  while (node != NULL)
-  {
+  while (node != NULL) {
     current_sequ->all_nodes[i]->cl = tmplist[i]; i++;
     if (node == current_sequ->ex_end) break;
     node = node->next;
@@ -71,9 +68,9 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
   }
   if (jacfilename) fclose(jacfile);
   fprintf(prt_file, "\n\nSINGULAR VALUE DECOMPOSITION:\n");
-  SV=(double *)mymalloc("match_match",(total_const+total_vars)*sizeof(double));
-  VT=(double *)mymalloc("match_match",(total_vars*total_vars)*sizeof(double));
-  U=(double *)mymalloc("match_match",(total_const*total_const)*sizeof(double));
+  SV = mymalloc_atomic("match_match", (total_const+total_vars)  * sizeof *SV);
+  VT = mymalloc_atomic("match_match", (total_vars *total_vars)  * sizeof *VT);
+  U  = mymalloc_atomic("match_match", (total_const*total_const) * sizeof *U );
   mtsvd_(&total_const,&total_vars,jac,SV,U,VT);
   k=0;
   l=0;
@@ -145,6 +142,9 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
     }
     fclose(knobfile);
   }
+  myfree("match_match", SV);
+  myfree("match_match", VT);
+  myfree("match_match", U);
 }
 
 static void
@@ -865,10 +865,9 @@ match_match(struct in_cmd* cmd)
       tnl = local_twiss[i]->cmd_def->par_names;
       tpos = name_list_pos("deltap", tnl);
       local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
-      dpp=mymalloc("match_match",20);
+      dpp = mymalloc_atomic("match_match", 20 * sizeof *dpp);
       sprintf(dpp,"%e",cp->double_array->a[0]);
-      local_twiss[i]->cmd_def->par->parameters[tpos]->string
-        = dpp;
+      local_twiss[i]->cmd_def->par->parameters[tpos]->string = dpp;
       /*       END adding deltap to TWISS input command for each sequence */
       /*      fprintf(prt_file, "entry value: %f\n", cp->double_array->a[0]);*/
       /*      twiss_deltas->curr=1;*/
@@ -1191,12 +1190,12 @@ int
 mtputconsname(char* noden, int* nodei , char* consn, int* consi)
 {
   int i,j;
-  i=(*nodei)-1;
-  j=(*consi)-1;
-  match2_macro_name[i]=(char *)mymalloc("match_match",20);
+  i = *nodei -1;
+  j = *consi -1;
+  match2_macro_name[i] = mymalloc_atomic("match_match", 20 * sizeof *match2_macro_name[0]);
   strncpy(match2_macro_name[i],noden,20);
   match2_macro_name[i][19]='\0';
-  match2_cons_name[i][j]=(char *)mymalloc("match_match",20);
+  match2_cons_name[i][j] = mymalloc_atomic("match_match", 20 * sizeof *match2_cons_name[0][0]);
   strncpy(match2_cons_name[i][j],consn,20);
   match2_cons_name[i][j][19]='\0';
   return 0;
