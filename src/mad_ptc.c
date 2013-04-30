@@ -1821,9 +1821,7 @@ makemomentstables(void)
   int               nmom;
   int i,j; // ,k; not used
 
-
   memset(tables,0x0,maxtables*sizeof(char*));
-
 
   nmom = w_ptc_getnmoments_();
   for (i = 1; i <= nmom; i++)
@@ -1837,9 +1835,8 @@ makemomentstables(void)
     }
     /*printf(" index of this table is %d \n",j);*/
 
-    if (tables[j] == 0x0)
-    {
-      tables[j] = (char*)mycalloc("makemomentstables",strlen(tabname) + 1, sizeof(char));
+    if (tables[j] == 0x0) {
+      tables[j] = mymalloc_atomic("makemomentstables", (strlen(tabname) + 1) * sizeof *tables[0]);
       strcpy(tables[j],tabname);
       cols[j] = new_name_list("columns", 15);
       add_to_name_list(permbuff("name"),3,cols[j]);
@@ -1847,11 +1844,9 @@ makemomentstables(void)
     }
 
     add_to_name_list(permbuff(colname),2,cols[j]); // k = not used
-
   }
 
-  if (moments_tables)
-  {
+  if (moments_tables) {
     myfree("",moments_tables->tables);
     delete_name_list(moments_tables->names);
     myfree("",moments_tables);
@@ -1973,7 +1968,7 @@ pro_ptc_track(struct in_cmd* cmd)
   int k=0, pos, one = 1;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-/*  char rout_name[] = "ptc_track"; */
+/*  const char *rout_name = "ptc_track"; */
   int npart = stored_track_start->curr;
   struct table* t;
 /*  int turns = command_par_value("turns", cmd->clone); */

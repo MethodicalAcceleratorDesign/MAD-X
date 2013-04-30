@@ -28,15 +28,14 @@ clone_name_list(struct name_list* p)
 struct name_list*
 new_name_list(char* list_name, int length)
 {
-  char rout_name[] = "new_name_list";
-  struct name_list* il =
-    (struct name_list*) mycalloc(rout_name,1, sizeof(struct name_list));
+  const char *rout_name = "new_name_list";
+  struct name_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, list_name);
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
-  il->names = (char**) mycalloc(rout_name,length, sizeof(char*));
-  il->index = (int*) mycalloc(rout_name,length, sizeof(int));
-  il->inform = (int*) mycalloc(rout_name,length, sizeof(int));
+  il->names  = mycalloc       (rout_name, length, sizeof *il->names);
+  il->index  = mycalloc_atomic(rout_name, length, sizeof *il->index);
+  il->inform = mycalloc_atomic(rout_name, length, sizeof *il->inform);
   il->max = length;
   return il;
 }
@@ -44,7 +43,7 @@ new_name_list(char* list_name, int length)
 struct name_list*
 delete_name_list(struct name_list* l)
 {
-  char rout_name[] = "delete_name_list";
+  const char *rout_name = "delete_name_list";
   if (l == NULL) return NULL;
   if (stamp_flag && l->stamp != 123456)
     fprintf(stamp_file, "d_n_l double delete --> %s\n", l->name);
@@ -62,23 +61,21 @@ new_vector_list(int length)
      for double arrays with initial length "length".
   */
 {
-  char rout_name[] = "new_vector_list";
-  struct vector_list* vector = mycalloc(rout_name,1, sizeof(struct vector_list));
+  const char *rout_name = "new_vector_list";
+  struct vector_list* vector = mycalloc(rout_name, 1, sizeof *vector);
   vector->max = length;
   vector->names = new_name_list("vector_list", length);
-  vector->vectors = mycalloc(rout_name, length, sizeof(struct double_array*));
+  vector->vectors = mycalloc(rout_name, length, sizeof *vector->vectors);
   return vector;
 }
 
 struct vector_list*
 delete_vector_list(struct vector_list* vector)
 {
-  char rout_name[] = "delete_vector_list";
-  int j;
+  const char *rout_name = "delete_vector_list";
   if (vector == NULL) return NULL;
-  if (vector->names != NULL)
-  {
-    for (j = 0; j < vector->names->curr; j++)
+  if (vector->names != NULL) {
+    for (int j = 0; j < vector->names->curr; j++)
       if (vector->vectors[j]) delete_double_array(vector->vectors[j]);
     delete_name_list(vector->names);
   }
@@ -90,13 +87,9 @@ delete_vector_list(struct vector_list* vector)
 void
 dump_name_list(struct name_list* nl)
 {
-  int i;
   puts(" ");
-  for (i = 0; i < nl->curr; i++)
-  {
-    fprintf(prt_file, v_format("%S %I\n"),
-            nl->names[nl->index[i]], nl->inform[nl->index[i]]);
-  }
+  for (int i = 0; i < nl->curr; i++)
+    fprintf(prt_file, v_format("%S %I\n"), nl->names[nl->index[i]], nl->inform[nl->index[i]]);
 }
 
 void
@@ -114,17 +107,20 @@ copy_name_list(struct name_list* out, struct name_list* in)
 void
 grow_name_list(struct name_list* p)
 {
-  char rout_name[] = "grow_name_list";
+  const char *rout_name = "grow_name_list";
   char** n_loc = p->names;
   int* l_ind = p->index;
   int* l_inf = p->inform;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
 
   p->max = new;
-  p->names = (char**) mycalloc(rout_name,new, sizeof(char*));
-  p->index = (int*) mycalloc(rout_name,new, sizeof(int));
-  p->inform = (int*) mycalloc(rout_name,new, sizeof(int));
-  for (j = 0; j < p->curr; j++)
+//  p->names  = myrealloc(rout_name, p->names,  new * sizeof *p->names);
+//  p->index  = myrealloc(rout_name, p->index,  new * sizeof *p->index);
+//  p->inform = myrealloc(rout_name, p->inform, new * sizeof *p->inform);
+  p->names  = mycalloc(rout_name, new, sizeof *p->names);
+  p->index  = mycalloc(rout_name, new, sizeof *p->index);
+  p->inform = mycalloc(rout_name, new, sizeof *p->inform);
+  for (int j = 0; j < p->curr; j++)
   {
     p->names[j] = n_loc[j];
     p->index[j] = l_ind[j];
@@ -138,15 +134,14 @@ grow_name_list(struct name_list* p)
 void
 grow_vector_list(struct vector_list* p)
 {
-  char rout_name[] = "grow_vector_list";
+  const char *rout_name = "grow_vector_list";
   struct double_array** v_loc = p->vectors;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
 
   p->max = new;
-  p->vectors
-    = (struct double_array**) mycalloc(rout_name,new,
-                                       sizeof(struct double_array*));
-  for (j = 0; j < p->curr; j++) p->vectors[j] = v_loc[j];
+//  p->vectors = myrealloc(rout_name, p->vectors, new * sizeof *p->vectors);
+  p->vectors = mycalloc(rout_name, new, sizeof *p->vectors);
+  for (int j = 0; j < p->curr; j++) p->vectors[j] = v_loc[j];
   myfree(rout_name, v_loc);
 }
 
@@ -160,13 +155,10 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
   if (name == NULL) return -1;
 
   ret = name_list_pos(name, vlist);
-  if ( ret < 0)
-  {
-    while (low <= high)
-    {
+  if (ret < 0) {
+    while (low <= high) {
       mid = (low + high) / 2;
-      if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0)
-      {
+      if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0) {
         high = mid - 1; pos = mid;
       }
       else if (num > 0) {
@@ -188,12 +180,11 @@ int
 name_list_pos(const char* p, struct name_list* vlist)
 {
   int num, mid, low = 0, high = vlist->curr - 1;
-  while (low <= high)
-  {
+  while (low <= high) {
     mid = (low + high) / 2;
     if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
     else if ( num > 0) low  = mid + 1;
-    else               return vlist->index[mid];
+    else return vlist->index[mid];
   }
   return -1;
 }

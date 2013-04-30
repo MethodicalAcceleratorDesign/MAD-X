@@ -3,8 +3,8 @@
 static struct element*
 new_element(char* name)
 {
-  char rout_name[] = "new_element";
-  struct element* el = mycalloc(rout_name,1, sizeof(struct element));
+  const char *rout_name = "new_element";
+  struct element* el = mycalloc(rout_name, 1, sizeof *el);
   strcpy(el->name, name);
   el->stamp = 123456;
   el->def = 0x0;
@@ -17,13 +17,13 @@ new_element(char* name)
 static void
 grow_el_list(struct el_list* p)
 {
-  char rout_name[] = "grow_el_list";
+  const char *rout_name = "grow_el_list";
   struct element** e_loc = p->elem;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
   p->max = new;
-  p->elem
-    = (struct element**) mycalloc(rout_name,new, sizeof(struct element*));
-  for (j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
+//  p->elem = myrealloc(rout_name, p->elem, new * sizeof *p->elem);
+  p->elem = mycalloc(rout_name, new, sizeof *p->elem);
+  for (int j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
   myfree(rout_name, e_loc);
 }
 
@@ -228,13 +228,13 @@ new_elem_node(struct element* el, int occ_cnt)
 struct el_list*
 new_el_list(int length)
 {
-  char rout_name[] = "new_el_list";
-  struct el_list* ell = mycalloc(rout_name,1, sizeof(struct el_list));
+  const char *rout_name = "new_el_list";
+  struct el_list* ell = mycalloc(rout_name, 1, sizeof *ell);
   strcpy(ell->name, "el_list");
   ell->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ell->name);
   ell->list = new_name_list(ell->name, length);
-  ell->elem = mycalloc(rout_name,length, sizeof(struct element*));
+  ell->elem = mycalloc(rout_name, length, sizeof *ell->elem);
   ell->max = length;
   return ell;
 }
@@ -290,7 +290,7 @@ make_elem_node(struct element* el, int occ_cnt)
 struct element*
 delete_element(struct element* el)
 {
-  char rout_name[] = "delete_element";
+  const char *rout_name = "delete_element";
   if (el == NULL)  return NULL;
   if (stamp_flag && el->stamp != 123456)
     fprintf(stamp_file, "d_e double delete --> %s\n", el->name);
@@ -302,7 +302,7 @@ delete_element(struct element* el)
 struct el_list*
 delete_el_list(struct el_list* ell)
 {
-  char rout_name[] = "delete_el_list";
+  const char *rout_name = "delete_el_list";
   if (ell->list == NULL) return NULL;
   if (stamp_flag && ell->stamp != 123456)
     fprintf(stamp_file, "d_e_l double delete --> %s\n", ell->name);

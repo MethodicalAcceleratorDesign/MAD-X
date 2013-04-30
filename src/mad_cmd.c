@@ -47,12 +47,13 @@ cmd_match(int cnt, char** toks, int* cmd_pos, int* decl_start)
 static void
 grow_command_list_list(struct command_list_list* p)
 {
-  char rout_name[] = "grow_command_list_list";
+  const char *rout_name = "grow_command_list_list";
   struct command_list** c_loc = p->command_lists;
   int new = 2*p->max;
 
   p->max = new;
-  p->command_lists = mycalloc(rout_name,new, sizeof(struct command_list*));
+//  p->command_lists = myrealloc(rout_name, p->command_lists, new * sizeof *p->command_lists);
+  p->command_lists = mycalloc(rout_name, new, sizeof *p->command_lists);
   for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
@@ -456,13 +457,13 @@ remove_from_command_list(char* label, struct command_list* list)
 
 void
 get_defined_commands(void)
-  /* reads + stores the commands defined in madxdict.h */
+  /* reads + stores the commands defined in mad_dict.c */
 {
-  char rout_name[] = "get_defined_commands";
+  const char *rout_name = "get_defined_commands";
   int i;
   char** p;
   int n = char_cnt(';', command_def);
-  p = mymalloc(rout_name,n * sizeof(char*));
+  p = mymalloc(rout_name, n * sizeof *p);
   p[0] = strtok(command_def, ";");
   for (i = 1; i < n; i++) /* make temporary list - strtok is called again */
     p[i] = strtok(NULL, ";");
@@ -689,9 +690,9 @@ clone_command(struct command* p)
 struct command*
 new_command(char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8)
 {
-  char rout_name[] = "new_command";
+  const char *rout_name = "new_command";
   char loc_name[2*NAME_L];
-  struct command* new = mycalloc(rout_name,1, sizeof(struct command));
+  struct command* new = mycalloc(rout_name, 1, sizeof *new);
   strcpy(loc_name, name); strcat(loc_name, "_param");
   new->stamp = 123456;
   strcpy(new->name, name);
@@ -709,31 +710,30 @@ new_command(char* name, int nl_length, int pl_length, char* module, char* group,
 struct command_list*
 new_command_list(char* l_name, int length)
 {
-  char rout_name[] = "new_command_list";
-  struct command_list* il = mycalloc(rout_name,1, sizeof(struct command_list));
+  const char *rout_name = "new_command_list";
+  struct command_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, l_name);
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->list = new_name_list(il->name, length);
-  il->commands
-    = (struct command**) mycalloc(rout_name,length, sizeof(struct command*));
+  il->commands = mycalloc(rout_name, length, sizeof *il->commands);
   return il;
 }
 
 struct command_list_list*
 new_command_list_list(int length)
 {
-  char rout_name[] = "new_command_list_list";
-  struct command_list_list* il = mycalloc(rout_name,1, sizeof(struct command_list_list));
+  const char *rout_name = "new_command_list_list";
+  struct command_list_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "command_list_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->list = new_name_list(il->name, length);
-  il->command_lists = mycalloc(rout_name,length, sizeof(struct command_list*));
+  il->command_lists = mycalloc(rout_name, length, sizeof *il->command_lists);
   return il;
 }
 
@@ -741,7 +741,7 @@ new_command_list_list(int length)
 struct command_list_list*
 delete_command_list_list( struct command_list_list* ll)
 {
-  char rout_name[] = "delete_command_list_list";
+  const char *rout_name = "delete_command_list_list";
   
   int i;
   
@@ -765,7 +765,7 @@ delete_command_list_list( struct command_list_list* ll)
 struct command*
 delete_command(struct command* cmd)
 {
-  char rout_name[] = "delete_command";
+  const char *rout_name = "delete_command";
   if (cmd == NULL) return NULL;
   if (stamp_flag && cmd->stamp != 123456)
     fprintf(stamp_file, "d_c double delete --> %s\n", cmd->name);
@@ -779,7 +779,7 @@ delete_command(struct command* cmd)
 struct command_list*
 delete_command_list(struct command_list* cl)
 {
-  char rout_name[] = "delete_command_list";
+  const char *rout_name = "delete_command_list";
   int i;
   if (cl == NULL) return NULL;
   if (stamp_flag && cl->stamp != 123456)
@@ -795,15 +795,15 @@ delete_command_list(struct command_list* cl)
 void
 grow_command_list(struct command_list* p)
 {
-  char rout_name[] = "grow_command_list";
-  struct command** c_loc = p->commands;
-  int j, new = 2*p->max;
+  const char *rout_name = "grow_command_list";
+//  struct command** c_loc = p->commands;
+  int new = 2*p->max;
 
   p->max = new;
-  p->commands
-    = (struct command**) mycalloc(rout_name,new, sizeof(struct command*));
-  for (j = 0; j < p->curr; j++) p->commands[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  p->commands = myrealloc(rout_name, p->commands, new * sizeof *p->commands);
+//  p->commands = mycalloc(rout_name, new, sizeof *p->commands);
+//  for (int j = 0; j < p->curr; j++) p->commands[j] = c_loc[j];
+//  myfree(rout_name, c_loc);
 }
 
 void

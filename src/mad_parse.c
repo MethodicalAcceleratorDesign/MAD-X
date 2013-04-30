@@ -120,14 +120,13 @@ char*
 spec_join(char** it_list, int n)
   /* replaces variable in table(...) by original string */
 {
-  char rout_name[] = "spec_join";
+  const char *rout_name = "spec_join";
   int j;
   char** p;
   struct variable* var;
   *c_join->c = '\0';
-  if (n > 0)
-  {
-    p = (char**) mymalloc(rout_name,n*sizeof(char*));
+  if (n > 0) {
+    p = mymalloc(rout_name, n * sizeof *p);
     for (j = 0; j < n; j++) p[j] = it_list[j];
     for (j = 0; j < n; j++)
       if (strcmp(p[j], "table") == 0 && j+3 < n

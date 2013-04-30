@@ -3,8 +3,8 @@
 static struct constraint*
 new_constraint(int type)
 {
-  char rout_name[] = "new_constraint";
-  struct constraint* new = mycalloc(rout_name,1, sizeof(struct constraint));
+  const char *rout_name = "new_constraint";
+  struct constraint* new = mycalloc(rout_name, 1, sizeof *new);
   strcpy(new->name, "constraint");
   new->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
@@ -15,12 +15,13 @@ new_constraint(int type)
 static void
 grow_constraint_list(struct constraint_list* p)
 {
-  char rout_name[] = "grow_constraint_list";
+  const char *rout_name = "grow_constraint_list";
   struct constraint** c_loc = p->constraints;
   int new = 2*p->max;
 
   p->max = new;
-  p->constraints = mycalloc(rout_name, new, sizeof(struct constraint*));
+//  p->constraints = myrealloc(rout_name, p->constraints, new * sizeof *p->constraints);
+  p->constraints = mycalloc(rout_name, new, sizeof *p->constraints);
   for (int j = 0; j < p->curr; j++) p->constraints[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
@@ -77,24 +78,21 @@ add_to_constraint_list(struct constraint* cs, struct constraint_list* cl)
 struct constraint_list*
 new_constraint_list(int length)
 {
-  char rout_name[] = "new_constraint_list";
-  struct constraint_list* il
-    = (struct constraint_list*)
-    mycalloc(rout_name,1, sizeof(struct constraint_list));
+  const char *rout_name = "new_constraint_list";
+  struct constraint_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "constraint_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->constraints = (struct constraint**)
-    mycalloc(rout_name,length, sizeof(struct constraint*));
+  il->constraints = mycalloc(rout_name, length, sizeof *il->constraints);
   return il;
 }
 
 struct constraint*
 delete_constraint(struct constraint* cst)
 {
-  char rout_name[] = "delete_constraint";
+  const char *rout_name = "delete_constraint";
   if (cst == NULL)  return NULL;
   if (stamp_flag && cst->stamp != 123456)
     fprintf(stamp_file, "d_c double delete --> %s\n", cst->name);
@@ -106,7 +104,7 @@ delete_constraint(struct constraint* cst)
 struct constraint_list*
 delete_constraint_list(struct constraint_list* cl)
 {
-  char rout_name[] = "delete_constraint_list";
+  const char *rout_name = "delete_constraint_list";
   if (cl == NULL)  return NULL;
   if (stamp_flag && cl->stamp != 123456)
     fprintf(stamp_file, "d_c_l double delete --> %s\n", cl->name);

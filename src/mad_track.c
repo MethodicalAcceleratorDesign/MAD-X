@@ -43,7 +43,7 @@ track_observe(struct in_cmd* cmd)
 static void
 track_run(struct in_cmd* cmd)
 {
-  char rout_name[] = "track_run";
+  const char *rout_name = "track_run";
   int e_flag, flag = 1, izero = 0, npart = stored_track_start->curr;
   int *ibuf1, *ibuf2, *ibuf3;
   double orbit[6];
@@ -78,16 +78,17 @@ track_run(struct in_cmd* cmd)
   track_tables_create(cmd);
 
   /* allocate buffers */
-  ibuf1   = mymalloc(rout_name,npart*sizeof(int));
-  ibuf2   = mymalloc(rout_name,npart*sizeof(int));
-  ibuf3   = mymalloc(rout_name,current_sequ->n_nodes*sizeof(int));
-  buf1    = mymalloc(rout_name,npart*sizeof(double));
-  buf2    = mymalloc(rout_name,6*npart*sizeof(double));
-  buf_dxt = mymalloc(rout_name,npart*sizeof(double));
-  buf_dyt = mymalloc(rout_name,npart*sizeof(double));
-  buf3    = mymalloc(rout_name,6*npart*sizeof(double));
-  buf4    = mymalloc(rout_name,36*sizeof(double));
-  buf6    = mymalloc(rout_name,current_sequ->n_nodes*sizeof(double));
+  int nnode = current_sequ->n_nodes;
+  ibuf1   = mymalloc_atomic(rout_name, npart   * sizeof *ibuf1);
+  ibuf2   = mymalloc_atomic(rout_name, npart   * sizeof *ibuf2);
+  ibuf3   = mymalloc_atomic(rout_name, nnode   * sizeof *ibuf3);
+  buf_dxt = mymalloc_atomic(rout_name, npart   * sizeof *buf_dxt);
+  buf_dyt = mymalloc_atomic(rout_name, npart   * sizeof *buf_dyt);
+  buf1    = mymalloc_atomic(rout_name, npart   * sizeof *buf1);
+  buf2    = mymalloc_atomic(rout_name, 6*npart * sizeof *buf2);
+  buf3    = mymalloc_atomic(rout_name, 6*npart * sizeof *buf3);
+  buf4    = mymalloc_atomic(rout_name, 36      * sizeof *buf4);
+  buf6    = mymalloc_atomic(rout_name, nnode   * sizeof *buf6);
 
   // run track rountine
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
@@ -99,16 +100,10 @@ track_run(struct in_cmd* cmd)
   if (get_option("track_dump")) track_tables_dump();
 
   /* free buffers */
-  myfree(rout_name, ibuf1);
-  myfree(rout_name, ibuf2);
-  myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1);
-  myfree(rout_name, buf2);
-  myfree(rout_name, buf_dxt);
-  myfree(rout_name, buf_dyt);
-  myfree(rout_name, buf3);
-  myfree(rout_name, buf4);
-  myfree(rout_name, buf6);
+  myfree(rout_name, ibuf1);   myfree(rout_name, ibuf2);  myfree(rout_name, ibuf3);
+  myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, buf1);    myfree(rout_name, buf2);  myfree(rout_name, buf3);
+  myfree(rout_name, buf4);    myfree(rout_name, buf6);
   fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
@@ -240,21 +235,17 @@ copytrackstoarray(void)
   int n = 0; /*interator over tracks*/
   struct command* comm;
   if (trackstrarpositions)
-  {
     deletetrackstrarpositions();
-  }
 
   ntracks = getnumberoftracks();
-  if (ntracks <= 0)
-  {
+  if (ntracks <= 0) {
     printf("ERROR: copytrackstoarray: number of tracks is 0! Nothing to copy!");
     return 0;
   }
-  trackstrarpositions =  (double**)mymalloc("copytrackstoarray",ntracks*sizeof(double*));
+  trackstrarpositions = mymalloc("copytrackstoarray", ntracks * sizeof *trackstrarpositions);
 
-  for (n = 0; n < ntracks; n++)
-  {
-    trackstrarpositions[n] = (double*)mymalloc("copytrackstoarray",6*sizeof(double));
+  for (n = 0; n < ntracks; n++) {
+    trackstrarpositions[n] = mymalloc_atomic("copytrackstoarray", 6 * sizeof *trackstrarpositions[0]);
 
     comm = stored_track_start->commands[n];
     trackstrarpositions[n][0] = command_par_value("x",  comm);
@@ -263,10 +254,9 @@ copytrackstoarray(void)
     trackstrarpositions[n][3] = command_par_value("py", comm);
     trackstrarpositions[n][4] = command_par_value("t",  comm);
     trackstrarpositions[n][5] = command_par_value("pt", comm);
-
   }
-  return ntracks;
 
+  return ntracks;
 }
 
 // public interface

@@ -345,7 +345,7 @@ error_efcomp(struct in_cmd* cmd)
   int    hyst = 0;
   //  int    flgmgt = 0;
   int chcount[3] = {0,0,0};
-  char rout_name[] = "error_efcomp";
+  const char *rout_name = "error_efcomp";
   //  double norfac; /* factor for normalization at reference radius */
   int    n = -1;     /* order of reference multipole */
   double rr = 0.0;   /* reference radius for multipole error */
@@ -374,7 +374,7 @@ error_efcomp(struct in_cmd* cmd)
   int iattv[attv_len];
   struct sequence* mysequ = current_sequ;
   
-  // double *nvec = (double *)mycalloc("error_efcomp",1000, sizeof(double));
+  // double *nvec = mycalloc_atomic("error_efcomp", 1000, sizeof *nvec);
 
   struct node *ndexe = mysequ->ex_end;
   struct node *nextnode = mysequ->ex_start;
@@ -387,12 +387,10 @@ error_efcomp(struct in_cmd* cmd)
   /*
     i = 0;
     while((cmd->tok_list->p[i]) != NULL) {
-    for(k=0;k<4;k++) {
-    if(strcmp(cmd->tok_list->p[i],attv[k]) == 0) {
-    iattv[k] = 1;
-    }
-    }
-    i++;
+      for(k=0;k<4;k++)
+        if(strcmp(cmd->tok_list->p[i],attv[k]) == 0)
+          iattv[k] = 1;
+      ++i;
     }
   */
   for(unsigned int k=0; k<attv_len; k++) {
@@ -400,7 +398,7 @@ error_efcomp(struct in_cmd* cmd)
     int pos = name_list_pos(attv[k],nl);
     if(nl->inform[pos] > 0) {
       if (opt_debug)
-	fprintf(prt_file, "set iattv %d for %s to 1\n",iattv[k],attv[k]);
+        	fprintf(prt_file, "set iattv %d for %s to 1\n",iattv[k],attv[k]);
       iattv[k] = 1;
     }
   }
@@ -417,92 +415,88 @@ error_efcomp(struct in_cmd* cmd)
     int flgmgt = node_value("magnet");
     if((nextnode->sel_err == 1) && (flgmgt == 1))  {
       if(nextnode->p_fd_err == NULL) {
-	chcount[0]++;
-	nextnode->p_fd_err = new_double_array(FIELD_MAX);
-	nextnode->p_fd_err->curr = FIELD_MAX;
+	      chcount[0]++;
+	      nextnode->p_fd_err = new_double_array(FIELD_MAX);
+	      nextnode->p_fd_err->curr = FIELD_MAX;
       } else {
-	if(add_error_opt == 1) {
-	  chcount[2]++;
-	} else {
-	  chcount[1]++;
-	}
+	      if(add_error_opt == 1) chcount[2]++; else chcount[1]++;
       }
       
       if (opt_debug)
-	fprintf(prt_file, "field for %s %s %d\n",
-		nextnode->name,nextnode->base_name,nextnode->sel_err);
+	      fprintf(prt_file, "field for %s %s %d\n",
+		  nextnode->name,nextnode->base_name,nextnode->sel_err);
       
       /* now get order (n), radius (rr) and hyster flag (hyst) from command, if any */
       /* AL: added 'freq' option for RF-Multipoles */
-      for(unsigned int i=0;i<atts_len;i++){
-	double val = command_par_value(atts[i],cmd->clone);
-	if(i==0) {
-	  n = val;
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "order  is %d\n",n);
-	} else if (i==1) {
-	  rrr = val;
-	  rr  = fabs(rrr);
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "radius is %f\n",val);
-	} else if (i==2) {
-	  hyst = val;
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "hyster flag is %d\n",(int)val);
-	} else if (i==3) {
-	  freq = val;
-          nextnode->rfm_freq = freq;
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "freq flag is %d\n",(int)val);
-	} else if (i==4) {
-	  harmon = (int)val;
-          nextnode->rfm_harmon = harmon;
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "harmon flag is %d\n",(int)val);
-	} else if (i==5) {
-	  lag = lag;
-          nextnode->rfm_lag = lag;
-	  /* debug printout */
-	  if (opt_debug)
-	    fprintf(prt_file, "lag flag is %d\n",(int)val);
-	}
+      for(unsigned int i=0;i<atts_len;i++) {
+        double val = command_par_value(atts[i],cmd->clone);
+        if(i==0) {
+          n = val;
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "order  is %d\n",n);
+        } else if (i==1) {
+          rrr = val;
+          rr  = fabs(rrr);
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "radius is %f\n",val);
+        } else if (i==2) {
+          hyst = val;
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "hyster flag is %d\n",(int)val);
+        } else if (i==3) {
+          freq = val;
+                nextnode->rfm_freq = freq;
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "freq flag is %d\n",(int)val);
+        } else if (i==4) {
+          harmon = (int)val;
+                nextnode->rfm_harmon = harmon;
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "harmon flag is %d\n",(int)val);
+        } else if (i==5) {
+          lag = lag;
+                nextnode->rfm_lag = lag;
+          /* debug printout */
+          if (opt_debug)
+            fprintf(prt_file, "lag flag is %d\n",(int)val);
+        }
       }
       
       /* now get coefficients for time memory effects in magnets */
       {
-	struct double_array *pcoef = command_par_array("hcoeffn",cmd->clone);
-	if(pcoef != NULL) {
-	  double *hco_n = &h_co_n[0][0];
-	  for(int j=0;j<pcoef->curr;j++) {
-	    *hco_n = pcoef->a[j];
-	    hco_n++;
-	  }
-	  if (opt_debug) {
-	    for(int j=0;j<FIELD_MAX/2;j++) {
-	      printf("COEFF: %d %e %e %e %e\n",j,h_co_n[j][0],h_co_n[j][1],h_co_n[j][2],h_co_n[j][3]);
-	    }
-	  }
-	}
+	      struct double_array *pcoef = command_par_array("hcoeffn",cmd->clone);
+	      if(pcoef != NULL) {
+	        double *hco_n = &h_co_n[0][0];
+	        for(int j=0;j<pcoef->curr;j++) {
+	          *hco_n = pcoef->a[j];
+	          hco_n++;
+	        }
+	        if (opt_debug) {
+	          for(int j=0;j<FIELD_MAX/2;j++) {
+	            printf("COEFF: %d %e %e %e %e\n",j,h_co_n[j][0],h_co_n[j][1],h_co_n[j][2],h_co_n[j][3]);
+	          }
+	        }
+	      }
       }
       {
-	struct double_array *pcoef = command_par_array("hcoeffs",cmd->clone);
-	if(pcoef != NULL) {
-	  double *hco_s = &h_co_s[0][0];
-	  for(int j=0;j<pcoef->curr;j++) {
-	    *hco_s = pcoef->a[j];
-	    hco_s++;
-	  }
-	  if (opt_debug) {
-	    for(int j=0;j<FIELD_MAX/2;j++) {
-	      printf("COEFF: %d %e %e %e %e\n",j,h_co_s[j][0],h_co_s[j][1],h_co_s[j][2],h_co_s[j][3]);
-	    }
-	  }
-	}
+	      struct double_array *pcoef = command_par_array("hcoeffs",cmd->clone);
+	      if(pcoef != NULL) {
+	        double *hco_s = &h_co_s[0][0];
+	        for(int j=0;j<pcoef->curr;j++) {
+	          *hco_s = pcoef->a[j];
+	          hco_s++;
+	        }
+	        if (opt_debug) {
+	          for(int j=0;j<FIELD_MAX/2;j++) {
+	            printf("COEFF: %d %e %e %e %e\n",j,h_co_s[j][0],h_co_s[j][1],h_co_s[j][2],h_co_s[j][3]);
+	          }
+	        }
+	      }
       }
       /* get length of node and check if magnet */
       double ref_str  = 0.0;
@@ -510,68 +504,68 @@ error_efcomp(struct in_cmd* cmd)
       double nlength = node_value("l");
       // double ref_len = nlength; // never used
       if (opt_debug)
-	fprintf(prt_file, "original length is %f\n",nlength);
+	      fprintf(prt_file, "original length is %f\n",nlength);
       
       if(strcmp(nextnode->base_name,"multipole") == 0) {
-      	double *nvec;
-        if ((nvec = (double *)mycalloc("error_efcomp",1000, sizeof(double)))) {
-	  int lvec;
-	  if(rrr > 0 ) {
-	    get_node_vector("knl",&lvec,nvec);
-	  } else {
-	    get_node_vector("ksl",&lvec,nvec);
-	  }
-	  if (opt_debug) {
-	    for(int i=0;i<4;i++) {
-	      fprintf(prt_file, "original field = %d is %f\n",i,nvec[i]);
-	    }
-	  }
-	  if (opt_debug)
-	    fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
-	  ref_str = nvec[n];
-	  ref_strn = fabs(ref_str);
-	  myfree(rout_name,nvec);
+      	  double *nvec;
+        if ((nvec = mycalloc_atomic("error_efcomp", 1000, sizeof *nvec))) {
+	        int lvec;
+	        if(rrr > 0 ) {
+	          get_node_vector("knl",&lvec,nvec);
+	        } else {
+	          get_node_vector("ksl",&lvec,nvec);
+	        }
+	        if (opt_debug) {
+	          for(int i=0;i<4;i++) {
+	            fprintf(prt_file, "original field = %d is %f\n",i,nvec[i]);
+	          }
+	        }
+	        if (opt_debug)
+	          fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
+	        ref_str = nvec[n];
+	        ref_strn = fabs(ref_str);
+	        myfree(rout_name,nvec);
         }
       } else if (strcmp(nextnode->base_name,"sbend") == 0) {
-	double nvec0 = node_value("k0");
-	if (opt_debug) {
-	  fprintf(prt_file, "original field0 is %f\n",nvec0);
-	  fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
-	}
-	ref_str = nvec0*nlength;
-	ref_strn = fabs(nvec0);
+	      double nvec0 = node_value("k0");
+	      if (opt_debug) {
+	        fprintf(prt_file, "original field0 is %f\n",nvec0);
+	        fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
+	      }
+	      ref_str = nvec0*nlength;
+	      ref_strn = fabs(nvec0);
       } else if (strcmp(nextnode->base_name,"rbend") == 0) {
-	double nvec0 = node_value("k0");
-	if (opt_debug) {
-	  fprintf(prt_file, "original field0 is %f\n",nvec0);
-	  fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
-	}
-	ref_str = nvec0*nlength;
-	ref_strn = fabs(nvec0);
+	      double nvec0 = node_value("k0");
+	      if (opt_debug) {
+	        fprintf(prt_file, "original field0 is %f\n",nvec0);
+	        fprintf(prt_file, "====0====>>> %d %f %f \n\n",n,nvec0,nlength);
+	      }
+	      ref_str = nvec0*nlength;
+	      ref_strn = fabs(nvec0);
       } else if (strcmp(nextnode->base_name,"quadrupole") == 0) {
-	double nvec1 = node_value("k1");
-	if (opt_debug) {
-	  fprintf(prt_file, "original field1 is %f\n",nvec1);
-	  fprintf(prt_file, "====1====>>> %d %f %f \n\n",n,nvec1,nlength);
-	}
-	ref_str = nvec1*nlength;
-	ref_strn = fabs(nvec1);
+	      double nvec1 = node_value("k1");
+	      if (opt_debug) {
+	        fprintf(prt_file, "original field1 is %f\n",nvec1);
+	        fprintf(prt_file, "====1====>>> %d %f %f \n\n",n,nvec1,nlength);
+	      }
+	      ref_str = nvec1*nlength;
+	      ref_strn = fabs(nvec1);
       } else if (strcmp(nextnode->base_name,"sextupole") == 0) {
-	double nvec2 = node_value("k2");
-	if (opt_debug) {
-	  fprintf(prt_file, "original field2 is %f\n",nvec2);
-	  fprintf(prt_file, "====2====>>> %d %f %f \n\n",n,nvec2,nlength);
-	}
-	ref_str = nvec2*nlength;
-	ref_strn = fabs(nvec2);
+	      double nvec2 = node_value("k2");
+	      if (opt_debug) {
+	        fprintf(prt_file, "original field2 is %f\n",nvec2);
+	        fprintf(prt_file, "====2====>>> %d %f %f \n\n",n,nvec2,nlength);
+	      }
+	      ref_str = nvec2*nlength;
+	      ref_strn = fabs(nvec2);
       } else if (strcmp(nextnode->base_name,"octupole") == 0) {
-	double nvec3 = node_value("k3");
-	if (opt_debug) {
-	  fprintf(prt_file, "original field3 is %f\n",nvec3);
-	  fprintf(prt_file, "====3====>>> %d %f %f \n\n",n,nvec3,nlength);
-	}
-	ref_str = nvec3*nlength;
-	ref_strn = fabs(nvec3);
+	      double nvec3 = node_value("k3");
+	      if (opt_debug) {
+	        fprintf(prt_file, "original field3 is %f\n",nvec3);
+	        fprintf(prt_file, "====3====>>> %d %f %f \n\n",n,nvec3,nlength);
+	      }
+	      ref_str = nvec3*nlength;
+	      ref_strn = fabs(nvec3);
       }
       
       /*  edbug print out field components , not done for production version
@@ -581,100 +575,98 @@ error_efcomp(struct in_cmd* cmd)
       /* AL: the following 'if' is not necessary */
       if(flgmgt == 1) {
 	
-	for(unsigned i=0;i<attv_len;i++)  {   /* loop over possible commands */
-	  
-	  if (opt_debug) fprintf(prt_file, "%s %d\n",attv[i],iattv[i]);
-	  
-	  struct double_array *ptr = command_par_array(attv[i],cmd->clone);
-	  if((ptr != NULL) && (iattv[i] == 1))  { /* command [i] found ? */
-	    
-	    for(int j=0;j<ptr->curr;j++)  { /* loop over all parameters */
-	      
-	      /* start field error assignment */
-	      /* NORMAL COMPONENTS, ABSOLUTE ERRORS */
-	      if(i==0)  {
-		if(add_error_opt == 1) {
-		  nextnode->p_fd_err->a[2*j]   += ptr->a[j];
-		} else {
-		  nextnode->p_fd_err->a[2*j]    = ptr->a[j];
-		}
+	      for(unsigned i=0;i<attv_len;i++)  {   /* loop over possible commands */
+	        
+	        if (opt_debug) fprintf(prt_file, "%s %d\n",attv[i],iattv[i]);
+	        
+	        struct double_array *ptr = command_par_array(attv[i],cmd->clone);
+	        if((ptr != NULL) && (iattv[i] == 1))  { /* command [i] found ? */
+	          
+	          for(int j=0;j<ptr->curr;j++)  { /* loop over all parameters */
+	            
+	            /* start field error assignment */
+	            /* NORMAL COMPONENTS, ABSOLUTE ERRORS */
+	            if(i==0)  {
+		            if(add_error_opt == 1) {
+		              nextnode->p_fd_err->a[2*j]   += ptr->a[j];
+		            } else {
+		              nextnode->p_fd_err->a[2*j]    = ptr->a[j];
+		            }
 		
-		/* SKEW COMPONENTS, ABSOLUTE ERRORS */
-	      } else if(i==1) {
-		if(add_error_opt == 1) {
-		  nextnode->p_fd_err->a[2*j+1] += ptr->a[j];
-		} else {
-		  nextnode->p_fd_err->a[2*j+1]  = ptr->a[j];
-		}
+		      /* SKEW COMPONENTS, ABSOLUTE ERRORS */
+	            } else if(i==1) {
+		            if(add_error_opt == 1) {
+		              nextnode->p_fd_err->a[2*j+1] += ptr->a[j];
+		            } else {
+		              nextnode->p_fd_err->a[2*j+1]  = ptr->a[j];
+		            }
 		
-		/* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
-	      } else if(i==2) {
-		if(fabs(rr) < 1.0E-6) {
-		  printf("++++++ error: trying to assign relative field errors \n");
-		  printf("       with no or zero reference radius specified\n");
-		  exit(-1);
-		}
-		double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
+		      /* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
+	            } else if(i==2) {
+		            if(fabs(rr) < 1.0E-6) {
+		              printf("++++++ error: trying to assign relative field errors \n");
+		              printf("       with no or zero reference radius specified\n");
+		              exit(-1);
+		            }
+		            double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
 		
-		/* if flag for hysteresis correction is set, use coefficients for correction */
-		double deer = 0.0;
-		if(hyst == 1) {
-		  deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + 
-		    h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
-		  if (opt_debug) 
-		    printf("after correction (n): %d %e %e %e %e\n",
-			   j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
-		}
-		/*
-		  if (opt_debug)
-		  fprintf(prt_file, "norm(n): %d %d %f %f\n",n,j,rr,norfac);
-		*/
-		if(add_error_opt == 1) {
-		  nextnode->p_fd_err->a[2*j]   += (ptr->a[j]+deer)*ref_str*norfac;
-		} else {
-		  nextnode->p_fd_err->a[2*j]    = (ptr->a[j]+deer)*ref_str*norfac;
-		}
+		            /* if flag for hysteresis correction is set, use coefficients for correction */
+		            double deer = 0.0;
+		            if(hyst == 1) {
+		              deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
+		              if (opt_debug) 
+		                printf("after correction (n): %d %e %e %e %e\n", j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
+		            }
+		            /*
+		            if (opt_debug)
+		              fprintf(prt_file, "norm(n): %d %d %f %f\n",n,j,rr,norfac);
+		            */
+		            if(add_error_opt == 1) {
+		              nextnode->p_fd_err->a[2*j] += (ptr->a[j]+deer)*ref_str*norfac;
+		            } else {
+		              nextnode->p_fd_err->a[2*j]  = (ptr->a[j]+deer)*ref_str*norfac;
+		            }
 		
-		/* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
-	      } else if(i==3) {
-		if(fabs(rr) < 1.0E-6) {
-		  printf("++++++ error: trying to assign relative field errors \n");
-		  printf("       with no or zero reference radius specified\n");
-		  exit(-1);
-		}
-		double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
+		      /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
+	            } else if(i==3) {
+		            if(fabs(rr) < 1.0E-6) {
+		              printf("++++++ error: trying to assign relative field errors \n");
+		              printf("       with no or zero reference radius specified\n");
+		              exit(-1);
+		            }
+		            double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
 		
-		/* if flag for hysteresis correction is set, use coefficients for correction */
-		double deer = 0.0;
-		if(hyst == 1) {
-		  deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
-		    h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
-		  if (opt_debug) 
-		    printf("after correction (s): %d %e %e %e %e\n",
-			   j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
-		}
-		/*
-		  if (opt_debug)
-		  fprintf(prt_file, "norm(s): %d %d %f %f\n",n,j,rr,norfac);
-		*/
-		if(add_error_opt == 1) {
-		  nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
-		} else {
-		  nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
-		}
+		      /* if flag for hysteresis correction is set, use coefficients for correction */
+		            double deer = 0.0;
+		            if(hyst == 1) {
+		              deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
+		                h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
+		              if (opt_debug) 
+		                printf("after correction (s): %d %e %e %e %e\n",
+			               j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
+		            }
+		            /*
+                if (opt_debug)
+		              fprintf(prt_file, "norm(s): %d %d %f %f\n",n,j,rr,norfac);
+		            */
+		            if(add_error_opt == 1) {
+		              nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
+		            } else {
+		              nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
+		            }
 
-                /* RF-PHASE OF NORMAL COMPONENTS */
-	      } else if(i==4) {
-		nextnode->p_ph_err->a[2*j] = ptr->a[j];     
+                      /* RF-PHASE OF NORMAL COMPONENTS */
+	            } else if(i==4) {
+		            nextnode->p_ph_err->a[2*j] = ptr->a[j];     
 
-                /* RF-PHASE OF SKEW COMPONENTS */
-	      } else if(i==5) {
-		nextnode->p_ph_err->a[2*j+1] = ptr->a[j];     
+                      /* RF-PHASE OF SKEW COMPONENTS */
+	            } else if(i==5) {
+		            nextnode->p_ph_err->a[2*j+1] = ptr->a[j];     
 
               } /*  end  of field error assignment */ 
-	    }
-	  }
-	}
+	          }
+	        }
+	      }
       }
     }  /* end of treatment of selected node */
     nextnode = nextnode->next;
@@ -685,7 +677,7 @@ error_efcomp(struct in_cmd* cmd)
     fprintf(prt_file, "Replaced field errors for %d elements\n",chcount[1]);
   if(chcount[2] != 0)
     fprintf(prt_file, "Added field errors to %d elements\n",chcount[2]);
-  //  myfree(rout_name,nvec);
+  //  myfree(rout_name, nvec);
 }
 
 static void

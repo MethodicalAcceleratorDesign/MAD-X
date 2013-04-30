@@ -4,8 +4,7 @@ static struct macro*
 clone_macro(struct macro* org)
 {
   int i;
-  struct macro* clone
-    = new_macro(org->n_formal, org->body->curr, org->tokens->curr);
+  struct macro* clone = new_macro(org->n_formal, org->body->curr, org->tokens->curr);
   if (org->body->curr > 0) strcpy(clone->body->c, org->body->c);
   clone->body->curr = org->body->curr;
   for (i = 0; i < org->tokens->curr; i++)
@@ -20,7 +19,7 @@ clone_macro(struct macro* org)
 static struct macro*
 delete_macro(struct macro* macro)
 {
-  char rout_name[] = "delete_macro";
+  const char *rout_name = "delete_macro";
   if (macro == NULL)  return NULL;
   if (stamp_flag && macro->stamp != 123456)
     fprintf(stamp_file, "d_m double delete --> %s\n", macro->name);
@@ -35,12 +34,13 @@ delete_macro(struct macro* macro)
 static void
 grow_macro_list(struct macro_list* p)
 {
-  char rout_name[] = "grow_macro_list";
+  const char *rout_name = "grow_macro_list";
   struct macro** n_loc = p->macros;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
   p->max = new;
-  p->macros = (struct macro**) mycalloc(rout_name,new, sizeof(struct macro*));
-  for (j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
+//  p->macros = myrealloc(rout_name, p->macros, new * sizeof *p->macros);
+  p->macros = mycalloc(rout_name, new, sizeof *p->macros);
+  for (int j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
   myfree(rout_name, n_loc);
 }
 
@@ -94,8 +94,8 @@ remove_from_macro_list( /* removes macro from alphabetic macro list */
 struct macro*
 new_macro(int n_formal, int length, int p_length)
 {
-  char rout_name[] = "new_macro";
-  struct macro* m = mycalloc(rout_name,1, sizeof(struct macro));
+  const char *rout_name = "new_macro";
+  struct macro* m = mycalloc(rout_name, 1, sizeof *m);
   strcpy(m->name, "macro");
   m->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", m->name);
@@ -109,14 +109,13 @@ new_macro(int n_formal, int length, int p_length)
 struct macro_list*
 new_macro_list(int length)
 {
-  char rout_name[] = "new_macro_list";
-  struct macro_list* nll = mycalloc(rout_name,1, sizeof(struct macro_list));
+  const char *rout_name = "new_macro_list";
+  struct macro_list* nll = mycalloc(rout_name, 1, sizeof *nll);
   strcpy(nll->name, "macro_list");
   nll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
   nll->list = new_name_list(nll->name, length);
-  nll->macros
-    = (struct macro**) mycalloc(rout_name,length, sizeof(struct macro*));
+  nll->macros = mycalloc(rout_name, length, sizeof *nll->macros);
   nll->max = length;
   return nll;
 }

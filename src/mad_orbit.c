@@ -719,18 +719,15 @@ correct_correct2(struct in_cmd* cmd)
     out_table("mon",mon_table,mlist);
   }
 
-
-  /* Clean up at the end of the module */
-   
-  myfree(rout_name,nm);myfree(rout_name,dmat);myfree(rout_name,nx);
-  myfree(rout_name,nc);myfree(rout_name,corvec);
-  myfree(rout_name,monvec);myfree(rout_name,resvec); myfree(rout_name,conm);
+  /* Clean up at the end of the module */   
+  myfree(rout_name,nm);     myfree(rout_name,dmat);   myfree(rout_name,nx);
+  myfree(rout_name,nc);     myfree(rout_name,corvec);
+  myfree(rout_name,monvec); myfree(rout_name,resvec); myfree(rout_name,conm);
 }
 
 static int
 pro_correct2_gettables(int iplane, struct in_cmd* cmd)
 {
-
   const char *rout_name = "pro_correct2_gettables";
 
   struct id_mic2 *cor_l1,  *cor_l2;
@@ -747,17 +744,16 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
   char* orbtab2;
 
   int t1, t2;   
-
   int ebl1, ebl2;
 
   int j,k;
 //  int set0; // not used
-  int cntm1 = {0};
-  int cntc1 = {0};
-  int cntm2 = {0};
-  int cntc2 = {0};
-  int cntm12 = {0};
-  int cntc12 = {0};
+  int cntm1  = 0;
+  int cntc1  = 0;
+  int cntm2  = 0;
+  int cntc2  = 0;
+  int cntm12 = 0;
+  int cntc12 = 0;
   
   double ounits;
 
@@ -1013,7 +1009,7 @@ pro_correct2_gettables(int iplane, struct in_cmd* cmd)
     pro_correct2_make_mon_table();
   }
 
-  return(10000*(cntm1+ cntm2+ cntm12) + (cntc1 + cntc2 + cntc12));
+  return 10000*(cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
 }
 
 static int
@@ -2756,8 +2752,9 @@ pro_correct_response_line(int ip, int nc, int nm)
       ic++;
     }
     c = c->next;
-  };
-  return(dmat);
+  }
+
+  return dmat;
 }
 
 static void

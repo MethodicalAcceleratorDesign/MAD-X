@@ -31,8 +31,8 @@ spec_node_value(char* par, int* number)
 struct node*
 new_node(char* name)
 {
-  char rout_name[] = "new_node";
-  struct node* p = mycalloc(rout_name,1, sizeof(struct node));
+  const char *rout_name = "new_node";
+  struct node* p = mycalloc(rout_name, 1, sizeof *p);
   strcpy(p->name, name);
   p->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", p->name);
@@ -57,8 +57,7 @@ clone_node(struct node* p, int flag)
   clone->p_elem = p->p_elem;
   clone->p_sequ = p->p_sequ;
   clone->savebeta = p->savebeta;
-  if (flag)
-  {
+  if (flag) {
     clone->p_al_err = p->p_al_err;
     clone->p_fd_err = p->p_fd_err;
     // AL: RF-Multipole errors (EFCOMP)
@@ -78,7 +77,7 @@ clone_node(struct node* p, int flag)
 struct node*
 delete_node(struct node* p)
 {
-  char rout_name[] = "delete_node";
+  const char *rout_name = "delete_node";
   if (p == NULL) return NULL;
   if (stamp_flag && p->stamp != 123456)
     fprintf(stamp_file, "d_n double delete --> %s\n", p->name);
@@ -98,13 +97,13 @@ delete_node(struct node* p)
 struct node_list*
 new_node_list(int length)
 {
-  char rout_name[] = "new_node_list";
-  struct node_list* nll = mycalloc(rout_name,1, sizeof(struct node_list));
+  const char *rout_name = "new_node_list";
+  struct node_list* nll = mycalloc(rout_name, 1, sizeof *nll);
   strcpy(nll->name, "node_list");
   nll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", nll->name);
   nll->list = new_name_list(nll->name, length);
-  nll->nodes = mycalloc(rout_name,length, sizeof(struct node*));
+  nll->nodes = mycalloc(rout_name, length, sizeof *nll->nodes);
   nll->max = length;
   return nll;
 }
@@ -112,7 +111,7 @@ new_node_list(int length)
 struct node_list*
 delete_node_list(struct node_list* l)
 {
-  char rout_name[] = "delete_node_list";
+  const char *rout_name = "delete_node_list";
   if (l == NULL)  return NULL;
   if (stamp_flag && l->stamp != 123456)
     fprintf(stamp_file, "d_no_l double delete --> %s\n", l->name);
@@ -141,12 +140,13 @@ delete_node_ring(struct node* start)
 static void
 grow_node_list(struct node_list* p)
 {
-  char rout_name[] = "grow_node_list";
+  const char *rout_name = "grow_node_list";
   struct node** n_loc = p->nodes;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
   p->max = new;
-  p->nodes = (struct node**) mycalloc(rout_name,new, sizeof(struct node*));
-  for (j = 0; j < p->curr; j++) p->nodes[j] = n_loc[j];
+//  p->nodes = myrealloc(rout_name, p->nodes, new * sizeof *p->nodes);
+  p->nodes = mycalloc(rout_name, new, sizeof *p->nodes);
+  for (int j = 0; j < p->curr; j++) p->nodes[j] = n_loc[j];
   myfree(rout_name, n_loc);
 }
 

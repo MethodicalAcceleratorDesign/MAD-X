@@ -16,7 +16,7 @@ make_sequ_node(struct sequence* sequ, int occ_cnt)
 static struct sequence_list*
 delete_sequence_list(struct sequence_list* sql)
 {
-  char rout_name[] = "delete_sequence_list";
+  const char *rout_name = "delete_sequence_list";
   if (sql == NULL) return NULL;
   if (stamp_flag && sql->stamp != 123456)
     fprintf(stamp_file, "d_s_l double delete --> %s\n", sql->name);
@@ -96,13 +96,12 @@ dump_sequ(struct sequence* c_sequ, int level)
 static void
 grow_sequence_list(struct sequence_list* l)
 {
-  char rout_name[] = "grow_sequence_list";
+  const char *rout_name = "grow_sequence_list";
   struct sequence** sloc = l->sequs;
-  int j, new = 2*l->max;
+  int new = 2*l->max;
   l->max = new;
-  l->sequs
-    = (struct sequence**) mycalloc(rout_name,new, sizeof(struct sequence*));
-  for (j = 0; j < l->curr; j++) l->sequs[j] = sloc[j];
+  l->sequs = mycalloc(rout_name, new, sizeof *l->sequs);
+  for (int j = 0; j < l->curr; j++) l->sequs[j] = sloc[j];
   myfree(rout_name, sloc);
 }
 
@@ -1050,12 +1049,9 @@ seq_replace(struct in_cmd* cmd)
           warning("'by' missing, ","ignored");
           return;
         }
-        rep_nodes = (struct node**)
-          mymalloc("seq_replace", count*sizeof(struct node*));
-        rep_els = (struct element**)
-          mymalloc("seq_replace", count*sizeof(struct element*));
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges)
-            == 0) any = 1;
+        rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+        rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
+        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
         c_node = edit_sequ->start;
         while (c_node != NULL)
         {
@@ -1082,10 +1078,8 @@ seq_replace(struct in_cmd* cmd)
     }
     else
     {
-      rep_nodes = (struct node**)
-        mymalloc("seq_replace", count*sizeof(struct node*));
-      rep_els = (struct element**)
-        mymalloc("seq_replace", count*sizeof(struct element*));
+      rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+      rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
       strcpy(c_dum->c, name);
       square_to_colon(c_dum->c);
       if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
@@ -1128,7 +1122,7 @@ sequence_name(char* name, int* l)
 void
 use_sequ(struct in_cmd* cmd)
 {
-  char rout_name[] = "use_sequ";
+  const char *rout_name = "use_sequ";
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   struct command* keep_beam = current_beam;
@@ -1226,8 +1220,8 @@ set_sequence(char* name)
 struct sequence*
 new_sequence(char* name, int ref)
 {
-  char rout_name[] = "new_sequence";
-  struct sequence* s = mycalloc(rout_name,1, sizeof(struct sequence));
+  const char *rout_name = "new_sequence";
+  struct sequence* s = mycalloc(rout_name, 1, sizeof *s);
   strcpy(s->name, name);
   s->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", s->name);
@@ -1239,16 +1233,14 @@ new_sequence(char* name, int ref)
 struct sequence_list*
 new_sequence_list(int length)
 {
-  char rout_name[] = "new_sequence_list";
-  struct sequence_list* s
-    = mycalloc(rout_name,length, sizeof(struct sequence_list));
+  const char *rout_name = "new_sequence_list";
+  struct sequence_list* s = mycalloc(rout_name, length, sizeof *s);
   strcpy(s->name, "sequence_list");
   s->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", s->name);
   s->max = length;
   s->list = new_name_list(s->name, length);
-  s->sequs
-    = (struct sequence**) mycalloc(rout_name,length, sizeof(struct sequence*));
+  s->sequs = mycalloc(rout_name, length, sizeof *s->sequs);
   return s;
 }
 
@@ -1266,7 +1258,7 @@ new_sequ_node(struct sequence* sequ, int occ_cnt)
 struct sequence*
 delete_sequence(struct sequence* sequ)
 {
-  char rout_name[] = "delete_sequence";
+  const char *rout_name = "delete_sequence";
   int lp;
   if (sequ->ex_start != NULL)
   {
@@ -1691,7 +1683,7 @@ expand_curr_sequ(int flag)
   /* expands the current sequence, i.e. flattens it, inserts drifts etc. */
   /* The sequence length is updated - new feature HG 26.5.03 */
 {
-  char rout_name[] = "expand_curr_sequ";
+  const char *rout_name = "expand_curr_sequ";
   struct node* c_node;
   int j;
   current_sequ->end->at_value = current_sequ->end->position = sequence_length(current_sequ);
@@ -1714,7 +1706,7 @@ expand_curr_sequ(int flag)
     expand_sequence(current_sequ, flag);
     current_sequ->n_nodes = add_drifts(current_sequ->ex_start, current_sequ->ex_end);
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
-    current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof(struct node*));
+    current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof *current_sequ->all_nodes);
     c_node = current_sequ->ex_start;
     for (j = 0; j < current_sequ->n_nodes; j++) {
       current_sequ->all_nodes[j] = c_node;

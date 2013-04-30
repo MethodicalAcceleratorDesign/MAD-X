@@ -3,7 +3,7 @@
 static struct variable*
 delete_variable(struct variable* var)
 {
-  char rout_name[] = "delete_variable";
+  const char *rout_name = "delete_variable";
   if (var == NULL)  return NULL;
   if (stamp_flag && var->stamp != 123456)
     fprintf(stamp_file, "d_v double delete --> %s\n", var->name);
@@ -17,14 +17,13 @@ delete_variable(struct variable* var)
 static void
 grow_var_list(struct var_list* p)
 {
-  char rout_name[] = "grow_var_list";
+  const char *rout_name = "grow_var_list";
   struct variable** v_loc = p->vars;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
 
   p->max = new;
-  p->vars
-    = (struct variable**) mycalloc(rout_name,new, sizeof(struct variable*));
-  for (j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
+  p->vars = mycalloc(rout_name, new, sizeof *p->vars);
+  for (int j = 0; j < p->curr; j++) p->vars[j] = v_loc[j];
   myfree(rout_name, v_loc);
 }
 
@@ -152,7 +151,7 @@ get_defined_constants(void)
 struct var_list*
 delete_var_list(struct var_list* varl)
 {
-  char rout_name[] = "delete_var_list";
+  const char *rout_name = "delete_var_list";
   if (varl == NULL) return NULL;
   if (stamp_flag && varl->stamp != 123456)
     fprintf(stamp_file, "d_v_l double delete --> %s\n", varl->name);
@@ -207,9 +206,8 @@ clone_var_list(struct var_list* vl)
 struct variable*
 new_variable(char* name, double val, int val_type, int type, struct expression* expr, char* string)
 {
-  char rout_name[] = "new_variable";
-  struct variable* var =
-    (struct variable*) mycalloc(rout_name,1, sizeof(struct variable));
+  const char *rout_name = "new_variable";
+  struct variable* var = mycalloc(rout_name, 1, sizeof *var);
   strcpy(var->name, name);
   var->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", var->name);
@@ -224,15 +222,13 @@ new_variable(char* name, double val, int val_type, int type, struct expression* 
 struct var_list*
 new_var_list(int length)
 {
-  char rout_name[] = "new_var_list";
-  struct var_list* var
-    = (struct var_list*) mycalloc(rout_name,1, sizeof(struct var_list));
+  const char *rout_name = "new_var_list";
+  struct var_list* var = mycalloc(rout_name, 1, sizeof *var);
   strcpy(var->name, "var_list");
   var->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", var->name);
   var->list = new_name_list(var->name, length);
-  var->vars
-    = (struct variable**) mycalloc(rout_name,length, sizeof(struct variable*));
+  var->vars = mycalloc(rout_name, length, sizeof *var->vars);
   var->max = length;
   return var;
 }

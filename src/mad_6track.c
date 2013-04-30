@@ -530,7 +530,7 @@ static void
 add_split_list(struct c6t_element* el)
 {
   int i;
-  char rout_name[] = "c6t:add_split_list";
+  const char *rout_name = "c6t:add_split_list";
   if (split_list == NULL)
   {
     split_list = mycalloc(rout_name,1, sizeof *split_list);
@@ -547,7 +547,7 @@ add_to_ellist( /* adds element to correct object list */
   struct c6t_element* p_elem)
 {
   int j;
-  char rout_name[] = "c6t:add_to_ellist";
+  const char *rout_name = "c6t:add_to_ellist";
 
 #ifdef _call_tree_
   puts("+++++++ add_to_ellist");
@@ -1028,7 +1028,7 @@ static void
 block_it(void)
 {
   struct c6t_element* el;
-  char rout_name[] = "c6t:block_it";
+  const char *rout_name = "c6t:block_it";
 
   current_element = first_in_sequ;
   while ((el = current_element) != NULL)
@@ -1863,7 +1863,7 @@ grow_ellist( /* doubles object list size */
 {
   struct c6t_element** p_loc = p->elem;
   int j, new = 2*p->max;
-  char rout_name[] = "c6t:grow_ellist";
+  const char *rout_name = "c6t:grow_ellist";
 
 #ifdef _call_tree_
   puts("+++++++ grow_ellist");
@@ -2001,7 +2001,7 @@ make_obj(   /* creates a new object */
   int vlpobj)      /* length of object pointer array */
 {
   struct object* p;
-  char rout_name[] = "c6t:make_obj";
+  const char *rout_name = "c6t:make_obj";
 
 #ifdef _call_tree_
   put_info("+++++++ make_object","");
@@ -2131,7 +2131,7 @@ static struct block*
 new_block(void)
 {
   struct block* p;
-  char rout_name[] = "c6t:new_block";
+  const char *rout_name = "c6t:new_block";
   p = mycalloc(rout_name, 1, sizeof *p);
   sprintf(p->name, "BLOC%d", block_count++);
   return p;
@@ -2141,7 +2141,7 @@ static struct c6t_element*
 new_c6t_element(int size, char* name, char* base)
 {
   struct c6t_element* p;
-  char rout_name[] = "c6t:new_c6t_element";
+  const char *rout_name = "c6t:new_c6t_element";
   p = mycalloc(rout_name, 1, sizeof *p);
   strcpy(p->name, name);
   p->equiv = p;
@@ -3201,7 +3201,7 @@ my_table_row(struct table* table, char* name)
 static void
 c6t_finish(void)
 {
-  char rout_name[] = "c6t_finish";
+  const char *rout_name = "c6t_finish";
   int i,j;
   struct block* p;
   /* remove elements and elements list */
@@ -3272,7 +3272,7 @@ static void
 c6t_init(void)
 {
   int j;
-  char rout_name[] = "c6t_init";
+  const char *rout_name = "c6t_init";
 
   if (virgin_c6t)
   {

@@ -795,28 +795,22 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
 
           e_d_tab[*cnt].curr=k-2;
 
-          (*cnt)++;
+          ++*cnt;
 
-          if (*cnt == curr_e_d_max) /* grow e_d array */
-          {
+          if (*cnt == curr_e_d_max) { /* grow e_d array */
             /* printf("\nToo many special elements...(less than %d expected)\n", E_D_MAX); */
             new_e_d_max = curr_e_d_max + E_D_LIST_CHUNK;
             printf("\ngrowin e_d_max array to %d\n", new_e_d_max);
 
-            e_d_tab_loc = (struct aper_e_d*) mycalloc("Aperture",new_e_d_max,sizeof(struct aper_e_d) );
+            e_d_tab_loc = mycalloc("Aperture", new_e_d_max, sizeof *e_d_tab_loc);
 
             for( l=0 ; l < curr_e_d_max; l++)
-            {
               e_d_tab_loc[l] = e_d_tab[l];
-            }
 
-
-            myfree("Aperture",e_d_tab);
+            myfree("Aperture", e_d_tab);
 
             e_d_tab = e_d_tab_loc;
-
             curr_e_d_max = new_e_d_max;
-
           }
 
           i=j;
@@ -825,7 +819,7 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
 
       printf("\nUsing extra displacements from file \"%s\"\n",e_d_name);
       e_d_flag=1; fclose(e_d_pt);
-      (*cnt)--;
+      --*cnt;
     }
   }
 
@@ -1470,8 +1464,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   int is_zero_len;
 
-  true_tab = mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d) );
-  /* offs_tab = (struct aper_e_d*) mycalloc("Aperture",E_D_LIST_CHUNK,sizeof(struct aper_e_d));*/
+  true_tab = mycalloc("Aperture", E_D_LIST_CHUNK, sizeof *true_tab);
+  /* offs_tab = mycalloc("Aperture",E_D_LIST_CHUNK,sizeof *offs_tab); */
 
   printf("\nProcessing apertures from %s to %s...\n",use_range[0]->name,use_range[1]->name);
 

@@ -6,22 +6,19 @@
 void
 set_command_par_string(char* parameter, struct command* cmd, char* val)
 {
-  char rout_name[] = "set_command_par_string";
+  const char *rout_name = "set_command_par_string";
   struct command_parameter* cp;
   int i, new_len;
 
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
+  if ((i = name_list_pos(parameter, cmd->par_names)) > -1) {
     cp = cmd->par->parameters[i];
-    if (cp->type == 3)
-    {
+    if (cp->type == 3) {
       int len = strlen(cp->string);
       new_len = strlen(val);
 
-      if(len < new_len)
-      {
+      if(len < new_len) {
         myfree(rout_name,cp->string);
-        cp->string = (char*) mymalloc(rout_name,new_len);
+        cp->string = mymalloc_atomic(rout_name, new_len * sizeof *cp->string);
       }
 
       strcpy(cp->string,val);
@@ -69,8 +66,8 @@ clone_command_parameter(struct command_parameter* p)
 struct command_parameter*
 new_command_parameter(char* name, int type)
 {
-  char rout_name[] = "new_command_parameter";
-  struct command_parameter* new = mycalloc(rout_name,1, sizeof(struct command_parameter));
+  const char *rout_name = "new_command_parameter";
+  struct command_parameter* new = mycalloc(rout_name, 1, sizeof *new);
   strcpy(new->name, name); new->type = type;
   new->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
@@ -80,26 +77,22 @@ new_command_parameter(char* name, int type)
 struct command_parameter_list*
 new_command_parameter_list(int length)
 {
-  int i;
-  char rout_name[] = "new_command_parameter_list";
-  struct command_parameter_list* il = mycalloc(rout_name,1, sizeof(struct command_parameter_list));
+  const char *rout_name = "new_command_parameter_list";
+  struct command_parameter_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "command_parameter_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   if (length > 0)
-  {
-    il->parameters = mycalloc(rout_name,length, sizeof(struct command_parameter*));
-    for (i = 0; i < length; i++) il->parameters[i] = NULL;
-  }
+    il->parameters = mycalloc(rout_name, length, sizeof *il->parameters);
   return il;
 }
 
 struct command_parameter*
 delete_command_parameter(struct command_parameter* par)
 {
-  char rout_name[] = "delete_command_parameter";
+  const char *rout_name = "delete_command_parameter";
   if (par == NULL) return NULL;
   if (stamp_flag && par->stamp != 123456)
     fprintf(stamp_file, "d_c_p double delete --> %s\n", par->name);
@@ -117,7 +110,7 @@ delete_command_parameter(struct command_parameter* par)
 struct command_parameter_list*
 delete_command_parameter_list(struct command_parameter_list* parl)
 {
-  char rout_name[] = "delete_command_parameter_list";
+  const char *rout_name = "delete_command_parameter_list";
   if (parl == NULL) return NULL;
   if (stamp_flag && parl->stamp != 123456)
     fprintf(stamp_file, "d_c_p_l double delete --> %s\n", parl->name);
@@ -229,14 +222,14 @@ print_command_parameter(struct command_parameter* par)
 void
 grow_command_parameter_list(struct command_parameter_list* p)
 {
-  char rout_name[] = "grow_command_parameter_list";
+  const char *rout_name = "grow_command_parameter_list";
   struct command_parameter** c_loc = p->parameters;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
 
   p->max = new;
-  p->parameters = (struct command_parameter**)
-    mycalloc(rout_name,new, sizeof(struct command_parameter*));
-  for (j = 0; j < p->curr; j++) p->parameters[j] = c_loc[j];
+//  p->parameters = myrealloc(rout_name, p->parameters, new * sizeof *p->parameters);
+  p->parameters = mycalloc(rout_name, new, sizeof *p->parameters);
+  for (int j = 0; j < p->curr; j++) p->parameters[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
 

@@ -533,40 +533,22 @@ madx_mpk_addfieldcomp(struct madx_mpk_knob* knob, int kn, int ks)
 /*
   adds a new field component to a knob
 */
-  void* ptr = 0x0;
-
-  if (knob == 0x0)
-  {
+  if (knob == 0x0) {
     warning("madx_mpk_addfieldcomp","knob parameter is null");
     return;
   }
 
-  if (kn >= 0)
-  {
+  if (kn >= 0) {
     knob->nKN++;
-    ptr = (void*)knob->KN;
-    knob->KN = (int*)myrealloc("madx_mpk_addfieldcomp", knob->KN, knob->nKN * sizeof(int));
+    knob->KN = myrealloc("madx_mpk_addfieldcomp", knob->KN, knob->nKN * sizeof *knob->KN);
     knob->KN[knob->nKN - 1] = kn;
-
-    if (ptr != knob->KN)
-    {
-      free(ptr);
-    }
   }
 
-  if (ks >= 0)
-  {
+  if (ks >= 0) {
     knob->nKS++;
-    ptr = (void*)knob->KS;
-    knob->KS = (int*)myrealloc("madx_mpk_addfieldcomp", knob->KS, knob->nKS * sizeof(int));
+    knob->KS = myrealloc("madx_mpk_addfieldcomp", knob->KS, knob->nKS * sizeof *knob->KS);
     knob->KS[knob->nKS - 1] = ks;
-
-    if (ptr != knob->KS)
-    {
-      free(ptr);
-    }
   }
-
 }
 
 static void
@@ -908,7 +890,7 @@ madx_mpk_init(void)
       sprintf(&(vary[strlen(vary)]),"initial=%s; ",madx_mpk_knobs[i].initial);
     }
 
-    madx_mpk_setknobs[i] = (char*)mymalloc("madx_mpk_addvariable",1+strlen(vary)*sizeof(char));
+    madx_mpk_setknobs[i] = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *madx_mpk_setknobs[0]);
     strcpy(madx_mpk_setknobs[i],vary);
 
     if (debuglevel)  printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
@@ -923,7 +905,7 @@ void
 madx_mpk_run(struct in_cmd* cmd)
 {
 /*the main routine of the module, called after at matching action (migrad, lmdif. etc...) */
-  char rout_name[] = "madx_mpk_run";
+  const char *rout_name = "madx_mpk_run";
   int i;
   double  tolerance;
   int     calls = 0, maxcalls;
@@ -1063,14 +1045,13 @@ madx_mpk_run(struct in_cmd* cmd)
     sprintf(callmatchfile,"call, file=\"%s\" ;",matchfilename);
     pro_input_(callmatchfile);
 
-    if (function_vector1 == 0x0)
-    {
-      function_vector1 = (double*)mymalloc("madx_mpk_run",(total_const+1)*sizeof(double));
-      function_vector2 = (double*)mymalloc("madx_mpk_run",(total_const+1)*sizeof(double));
+    if (function_vector1 == 0x0) {
+      function_vector1 = mymalloc_atomic("madx_mpk_run", (total_const+1) * sizeof *function_vector1);
+      function_vector2 = mymalloc_atomic("madx_mpk_run", (total_const+1) * sizeof *function_vector2);
     }
 
     i = match2_evaluate_exressions(0,0,function_vector1);
-    if (debuglevel)  printf("match2_evaluate_exressions returned fun_vector 1 of length %d\n",i);
+    if (debuglevel) printf("match2_evaluate_exressions returned fun_vector 1 of length %d\n",i);
 
 
     pro_input_(ptcend);
@@ -1323,10 +1304,9 @@ madx_mpk_addconstraint(const char* constr)
   l = strlen(constr);
   if (l<1) return;
   l++;
-  buff = (char*)mymalloc("madx_mpk_addconstraint",l*sizeof(char));
+  buff = mymalloc_atomic("madx_mpk_addconstraint", l * sizeof *buff);
   strcpy(buff,constr);
   madx_mpk_constraints[madx_mpk_Nconstraints++] = buff;
-
 }
 
 void
@@ -1396,15 +1376,15 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (initialpar)
   {
-    madx_mpk_knobs[knobidx].initial = (char*)mycalloc("madx_mpk_addvariable",1+strlen(initialpar),sizeof(char));
+    madx_mpk_knobs[knobidx].initial = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(initialpar)) * sizeof *madx_mpk_knobs[0].initial);
     strcpy(madx_mpk_knobs[knobidx].initial, initialpar);
 
     sprintf(vary,"mpk_%s",initialpar);
-    v->name = (char*)mycalloc("madx_mpk_addvariable",1+strlen(vary),sizeof(char));
+    v->name = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *v->name);
     strcpy(v->name,vary);
 
     sprintf(vary,"mpk_%s_0",initialpar);
-    v->namecv = (char*)mycalloc("madx_mpk_addvariable",1+strlen(vary),sizeof(char));
+    v->namecv = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *v->namecv);
     strcpy(v->namecv,vary);
     v->IsIniCond = 1;
     v->kn = -1;
@@ -1413,9 +1393,8 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (ename)
   {
-    madx_mpk_knobs[knobidx].elname = (char*)mymalloc("madx_mpk_addvariable",1+strlen(ename)*sizeof(char));
+    madx_mpk_knobs[knobidx].elname = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(ename)) * sizeof *madx_mpk_knobs[0].elname);
     strcpy(madx_mpk_knobs[knobidx].elname, ename);
-
 
     if (exactnamematch != 0)
     {
@@ -1442,7 +1421,7 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
 
     slen = strlen(vary);
-    string = (char*)mymalloc("madx_mpk_addvariable",(slen+1)*sizeof(char));
+    string = mymalloc_atomic("madx_mpk_addvariable", (slen+1) * sizeof *string);
     strcpy(string,vary);
     v->name = string;
 
@@ -1451,7 +1430,7 @@ madx_mpk_addvariable(struct in_cmd* cmd)
     vary[slen+2] =  0;/*end of string*/
     slen  = slen+2;
 
-    string = (char*)mymalloc("madx_mpk_addvariable",(slen+1)*sizeof(char));
+    string = mymalloc_atomic("madx_mpk_addvariable", (slen+1) * sizeof *string);
     strcpy(string,vary);
     v->namecv = string;
 
@@ -1482,7 +1461,7 @@ void
 madx_mpk_setcreateuniverse(struct in_cmd* cmd)
 {
   cmd->clone_flag = 1; /* do not delete for the moment*/
-  cmd->label =  (char*)mymalloc("madx_mpk_setcreateuniverse",24*sizeof(char));
+  cmd->label = mymalloc_atomic("madx_mpk_setcreateuniverse", 24 * sizeof *cmd->label);
   strcpy(cmd->label,"matchptcknob_ptc_CU");
 
   madx_mpk_comm_createuniverse = cmd;
@@ -1492,7 +1471,7 @@ void
 madx_mpk_setcreatelayout(struct in_cmd* cmd)
 {
   cmd->clone_flag = 1; /* do not delete for the moment*/
-  cmd->label =  (char*)mymalloc("madx_mpk_setcreatelayout",24*sizeof(char));
+  cmd->label = mymalloc_atomic("madx_mpk_setcreatelayout", 24 * sizeof *cmd->label);
   strcpy(cmd->label,"matchptcknob_ptc_CL");
   madx_mpk_comm_createlayout = cmd;
 }
@@ -1501,7 +1480,7 @@ void
 madx_mpk_setsetswitch(struct in_cmd* cmd)
 {
   cmd->clone_flag = 1; /* do not delete for the moment*/
-  cmd->label =  (char*)mymalloc("madx_mpk_setsetswitch",24*sizeof(char));
+  cmd->label = mymalloc_atomic("madx_mpk_setsetswitch", 24 * sizeof *cmd->label);
   strcpy(cmd->label,"matchptcknob_ptc_SSW");
   madx_mpk_comm_setswitch = cmd;
 }
@@ -1510,7 +1489,7 @@ void
 madx_mpk_setcalc(struct in_cmd* cmd)
 {
   cmd->clone_flag = 1; /* do not delete for the moment*/
-  cmd->label =  (char*)mymalloc("madx_mpk_setcalc",24*sizeof(char));
+  cmd->label = mymalloc_atomic("madx_mpk_setcalc", 24 * sizeof *cmd->label);
   strcpy(cmd->label,"matchptcknob_ptc_CMD");
   madx_mpk_comm_calculate = cmd;
 }

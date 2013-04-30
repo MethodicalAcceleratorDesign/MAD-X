@@ -206,7 +206,7 @@ sdds_readt(char *filename, char *tfsname)
            }
         }
 
-        datd[i1] = (double *)mycalloc("double ptr buffer for SDDS",arrele[i1]+8,sizeof(double));
+        datd[i1] = mycalloc_atomic("double ptr buffer for SDDS", arrele[i1]+8, sizeof *datd[0]);
         if(arrtyp[i1] == SDDS_STRING) datstr[i1] = (char **)arr->data;
 
         for(i3=0;i3<arr->elements;i3++){
@@ -469,7 +469,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
 
       if(tfstab->columns->inform[col->i[j1]] == 1) {
           /* need a long buffer for double to long conversion */
-          pl = (long *)mycalloc("long buffer for SDDS",tfstab->curr,sizeof(long));
+          pl = mycalloc_atomic("long buffer for SDDS", tfstab->curr, sizeof *pl);
           for(j2=0;j2<tfstab->curr; j2++) {
             /* convert from double to long */
             pl[j2] = da1[pos[j1]][j2];

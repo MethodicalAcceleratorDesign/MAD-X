@@ -4,7 +4,7 @@ void
 pro_emit(struct in_cmd* cmd)
   /* calls the emit module */
 {
-  char rout_name[] = "pro_emit";
+  const char *rout_name = "pro_emit";
   struct command* emit = cmd->clone;
   double e_deltap, e_tol, u0;
   int j, error, keep;
@@ -13,8 +13,7 @@ pro_emit(struct in_cmd* cmd)
     sig_v[4], pdamp[3], r0mat[4];
   char tmp[100];
 
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-  {
+  if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "EMIT ignored");
     return;
   }
@@ -29,7 +28,7 @@ pro_emit(struct in_cmd* cmd)
   zero_double(orbit0, 6);
   zero_double(disp0, 6);
   zero_double(oneturnmat, 36);
-  tt = (double*) mycalloc("pro_emit", 216, sizeof(double));
+  tt = mycalloc_atomic("pro_emit", 216, sizeof *tt);
   adjust_beam();
   probe_beam = clone_command(current_beam);
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
@@ -37,18 +36,15 @@ pro_emit(struct in_cmd* cmd)
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  printf(v_format("guess: %I %F %F\n"),
-         guess_flag, guess_orbit[0],guess_orbit[1]);
+  printf(v_format("guess: %I %F %F\n"), guess_flag, guess_orbit[0], guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
   myfree(rout_name, tt);
-  if (error == 0)
-  {
+  if (error == 0) {
     current_node = current_sequ->ex_start;
     emit_(&e_deltap, &e_tol, orbit0, disp0, oneturnmat, &u0, emit_v, nemit_v,
           bmax, gmax, dismax, tunes, sig_v, pdamp);
-    if (e_deltap == zero)
-    {
+    if (e_deltap == zero) {
       store_comm_par_value("ex", emit_v[0], current_beam);
       store_comm_par_value("exn", nemit_v[0], current_beam);
       store_comm_par_value("ey", emit_v[1], current_beam);
@@ -60,8 +56,7 @@ pro_emit(struct in_cmd* cmd)
       store_comm_par_value("qs", tunes[2], current_beam);
       store_comm_par_vector("pdamp", pdamp, current_beam);
     }
-    else
-    {
+    else {
       sprintf(tmp, v_format("%F"), e_deltap);
       warning("EMIT: beam not updated, non-zero deltap: ", tmp);
     }
@@ -69,5 +64,4 @@ pro_emit(struct in_cmd* cmd)
   }
   set_option("twiss_print", &keep);
 }
-
 

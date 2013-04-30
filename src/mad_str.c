@@ -152,8 +152,7 @@ tmpbuff(const char* string)
   /* buffers string in a temporary (i.e. allocated) buffer */
   // aka strdup
 {
-  char* p;
-  p = mymalloc("tmpbuff",strlen(string)+1);
+  char* p = mymalloc_atomic("tmpbuff", (strlen(string)+1) * sizeof *p);
   strcpy(p, string);
   return p;
 }
@@ -272,9 +271,9 @@ compare_no_case(char* string_1, char* string_2)
 /* like strcmp, but ignoring case */
 {
   int ret;
-  char rout_name[] = "compare_no_case";
-  char* s1 = mymalloc(rout_name, strlen(string_1)+1);
-  char* s2 = mymalloc(rout_name, strlen(string_2)+1);
+  const char *rout_name = "compare_no_case";
+  char* s1 = mymalloc_atomic(rout_name, (strlen(string_1)+1)*sizeof *s1);
+  char* s2 = mymalloc_atomic(rout_name, (strlen(string_2)+1)*sizeof *s2);
   strcpy(s1, string_1); stolower(s1);
   strcpy(s2, string_2); stolower(s2);
   ret = strcmp(s1, s2);

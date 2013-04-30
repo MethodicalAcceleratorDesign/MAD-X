@@ -22,65 +22,65 @@ char_p_pos(char* name, struct char_p_array* p)
 struct char_array*
 new_char_array(int length)
 {
-  char rout_name[] = "new_char_array";
-  struct char_array* il = mycalloc(rout_name, 1, sizeof(struct char_array));
+  const char *rout_name = "new_char_array";
+  struct char_array* il = mycalloc(rout_name, 1, sizeof *il);
   il->stamp = 123456;
   il->curr = 0;
   il->max = length;
-  il->c = mymalloc(rout_name, length);
+  il->c = mymalloc_atomic(rout_name, length * sizeof *il->c);
   return il;
 }
 
 struct char_p_array*
 new_char_p_array(int length)
 {
-  char rout_name[] = "new_char_p_array";
-  struct char_p_array* il = mycalloc(rout_name,1, sizeof(struct char_p_array));
+  const char *rout_name = "new_char_p_array";
+  struct char_p_array* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "char_p_array");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->p = mycalloc(rout_name, length, sizeof(char*));
-  memset(il->p, 0, length*sizeof(char*));
+  il->p = mycalloc(rout_name, length, sizeof *il->p);
+//  memset(il->p, 0, length*sizeof(char*));
   return il;
 }
 
 struct int_array*
 new_int_array(int length)
 {
-  char rout_name[] = "new_int_array";
-  struct int_array* il = mycalloc(rout_name,1, sizeof(struct int_array));
+  const char *rout_name = "new_int_array";
+  struct int_array* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "int_array");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->i = mymalloc(rout_name,length * sizeof(int));
+  il->i = mymalloc_atomic(rout_name, length * sizeof *il->i);
   return il;
 }
 
 struct double_array*
 new_double_array(int length)
 {
-  char rout_name[] = "new_double_array";
-  struct double_array* il = mycalloc(rout_name,1, sizeof(struct double_array));
+  const char *rout_name = "new_double_array";
+  struct double_array* il = mycalloc(rout_name,1, sizeof *il);
   il->stamp = 123456;
   il->curr = 0;
   il->max = length;
-  il->a = mycalloc(rout_name,length, sizeof(double));
+  il->a = mycalloc_atomic(rout_name, length, sizeof *il->a);
   return il;
 }
 
 struct char_array_list*
 new_char_array_list(int size)
 {
-  char rout_name[] = "new_char_array_list";
-  struct char_array_list* tl = mycalloc(rout_name, 1, sizeof(struct char_array_list));
+  const char *rout_name = "new_char_array_list";
+  struct char_array_list* tl = mycalloc(rout_name, 1, sizeof *tl);
   strcpy(tl->name, "char_array_list");
   tl->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tl->name);
-  tl->ca  = mycalloc(rout_name, size, sizeof(struct char_array*));
+  tl->ca  = mycalloc(rout_name, size, sizeof *tl->ca);
   tl->max = size;
   return tl;
 }
@@ -116,7 +116,7 @@ clone_int_array(struct int_array* p)
 struct char_array*
 delete_char_array(struct char_array* pa)
 {
-  char rout_name[] = "delete_char_array";
+  const char *rout_name = "delete_char_array";
   if (pa == NULL)  return NULL;
   if (pa->c != NULL)  myfree(rout_name, pa->c);
   myfree(rout_name, pa);
@@ -127,7 +127,7 @@ struct char_p_array*
 delete_char_p_array(struct char_p_array* pa, int flag)
   /* flag = 0: delete only pointer array, = 1: delete char. buffers, too */
 {
-  char rout_name[] = "delete_char_p_array";
+  const char *rout_name = "delete_char_p_array";
   if (pa == NULL)  return NULL;
   if (stamp_flag && pa->stamp != 123456)
     fprintf(stamp_file, "d_c_p_a double delete --> %s\n", pa->name);
@@ -143,7 +143,7 @@ delete_char_p_array(struct char_p_array* pa, int flag)
 struct int_array*
 delete_int_array(struct int_array* i)
 {
-  char rout_name[] = "delete_int_array";
+  const char *rout_name = "delete_int_array";
   if (i == NULL)  return NULL;
   if (stamp_flag && i->stamp != 123456)
     fprintf(stamp_file, "d_i_a double delete --> %s\n", i->name);
@@ -156,7 +156,7 @@ delete_int_array(struct int_array* i)
 struct double_array*
 delete_double_array(struct double_array* a)
 {
-  char rout_name[] = "delete_double_array";
+  const char *rout_name = "delete_double_array";
   if (a != NULL)
   {
     if (a->a != NULL) myfree(rout_name, a->a);
@@ -203,25 +203,27 @@ dump_int_array(struct int_array* ia)
 void 
 grow_char_array(struct char_array* p)
 {
-  char rout_name[] = "grow_char_array";
-  char* p_loc = p->c;
+  const char *rout_name = "grow_char_array";
+//  char* p_loc = p->c;
   int new = 2*p->max;
 
   p->max = new;
-  p->c = mymalloc(rout_name, new);
-  for (int j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
-  myfree(rout_name, p_loc);
+  p->c = myrealloc(rout_name, p->c, new * sizeof *p->c);
+//  p->c = mymalloc(rout_name, new * sizeof *p->c);
+//  for (int j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
+//  myfree(rout_name, p_loc);
 }
 
 void
 grow_char_p_array(struct char_p_array* p)
 {
-  char rout_name[] = "grow_char_p_array";
+  const char *rout_name = "grow_char_p_array";
   char** p_loc = p->p;
   int new = 2*p->max;
 
   p->max = new;
-  p->p = mycalloc(rout_name,new, sizeof(char*));
+//  p->p = myrealloc(rout_name, p->p, new * sizeof *p->p);
+  p->p = mycalloc(rout_name,new, new * sizeof *p->p);
   for (int j = 0; j < p->curr; j++) p->p[j] = p_loc[j];
   myfree(rout_name, p_loc);
 }
@@ -229,38 +231,41 @@ grow_char_p_array(struct char_p_array* p)
 void
 grow_int_array(struct int_array* p)
 {
-  char rout_name[] = "grow_int_array";
-  int* i_loc = p->i;
+  const char *rout_name = "grow_int_array";
+//  int* i_loc = p->i;
   int new = 2*p->max;
 
   p->max = new;
-  p->i = mymalloc(rout_name,new * sizeof(int));
-  for (int j = 0; j < p->curr; j++) p->i[j] = i_loc[j];
-  myfree(rout_name, i_loc);
+  p->i = myrealloc(rout_name, p->i, new * sizeof *p->i);
+//  p->i = mymalloc(rout_name, new * sizeof *p->i);
+//  for (int j = 0; j < p->curr; j++) p->i[j] = i_loc[j];
+//  myfree(rout_name, i_loc);
 }
 
 void
 grow_double_array(struct double_array* p)
 {
-  char rout_name[] = "grow_double_array";
-  double* a_loc = p->a;
+  const char *rout_name = "grow_double_array";
+//  double* a_loc = p->a;
   int new = 2*p->max;
 
   p->max = new;
-  p->a = mymalloc(rout_name, new * sizeof(double));
-  for (int j = 0; j < p->curr; j++) p->a[j] = a_loc[j];
-  myfree(rout_name, a_loc);
+  p->a = myrealloc(rout_name, p->a, new * sizeof *p->a);
+//  p->a = mymalloc(rout_name, new * sizeof *p->a);
+//  for (int j = 0; j < p->curr; j++) p->a[j] = a_loc[j];
+//  myfree(rout_name, a_loc);
 }
 
 void
 grow_char_array_list(struct char_array_list* p)
 {
-  char rout_name[] = "grow_char_array_list";
+  const char *rout_name = "grow_char_array_list";
   struct char_array** c_loc = p->ca;
   int new = 2*p->max;
 
   p->max = new;
-  p->ca = mycalloc(rout_name, new, sizeof(struct char_array*));
+//  p->ca = myrealloc(rout_name, p->ca, new * sizeof *p->ca);
+  p->ca = mycalloc(rout_name, new, sizeof *p->ca);
   for (int j = 0; j < p->curr; j++) p->ca[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
@@ -271,7 +276,8 @@ ftoi_array(struct double_array* da, struct int_array* ia)
 {
   int l = da->curr;
   while (l >= ia->max)  grow_int_array(ia);
-  for (int i = 0; i < l; i++) ia->i[i] = da->a[i];
+  for (int i = 0; i < l; i++) 
+    ia->i[i] = da->a[i];
   ia->curr = l;
 }
 
@@ -279,7 +285,8 @@ int
 int_in_array(int k, int n, int* array)
   /* returns 1 if k in first n elements of array, else 0 */
 {
-  for (int j = 0; j < n; j++) if (k == array[j])  return 1;
+  for (int j = 0; j < n; j++)
+    if (k == array[j]) return 1;
   return 0;
 }
 

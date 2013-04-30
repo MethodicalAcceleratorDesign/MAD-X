@@ -113,9 +113,7 @@ get_slices_from_elem(struct element* elem)
   int elem_slice_pos=0,slices=1;
   elem_slice_pos = name_list_pos("slice",elem->def->par_names);
   if(elem_slice_pos > 0)
-  {
-    slices=elem->def->par->parameters[elem_slice_pos]->double_value;
-  }
+    slices = elem->def->par->parameters[elem_slice_pos]->double_value;
   if (slices==0) slices = 1; /* must always slice to thin */
   return slices;
 }
@@ -124,16 +122,11 @@ get_slices_from_elem(struct element* elem)
 static struct element*
 get_thin(struct element* thick_elem, int slice)
 {
-  struct thin_lookup *cur;
-  if (my_list)
-  {
-    cur = my_list;
-    while (cur)
-    {
+  if (my_list) {
+    struct thin_lookup *cur = my_list;
+    while (cur) {
       if (cur->thick_elem == thick_elem && cur->slice == slice)
-      {
         return cur->thin_elem;
-      }
       cur = cur->next;
     }
   }
@@ -145,23 +138,18 @@ static void
 put_thin(struct element* thick_elem, struct element* thin_elem, int slice)
 {
   struct thin_lookup *p,*cur;
-  char rout_name[] = "makethin:put_thin";
-  p = (struct thin_lookup*) mycalloc(rout_name,1, sizeof(struct thin_lookup));
+  const char *rout_name = "makethin:put_thin";
+  p = mycalloc(rout_name, 1, sizeof *p);
   p->thick_elem = thick_elem;
   p->thin_elem = thin_elem;
   p->slice = slice;
   p->next = NULL;
-  if (my_list)
-  {
+  if (my_list) {
     cur = my_list;
     while (cur->next) cur = cur->next;
     cur->next = p;
   }
-  else
-  {
-    my_list = p;
-  }
-  return;
+  else my_list = p;
 }
 
 /* Has this sequence already been dieted? returns NULL for NO.*/
@@ -189,22 +177,17 @@ static void
 put_thin_sequ(struct sequence* thick_sequ, struct sequence* thin_sequ)
 {
   struct thin_sequ_lookup *p,*cur;
-  char rout_name[] = "makethin:put_thin_sequ";
-  p = (struct thin_sequ_lookup*) mycalloc(rout_name,1, sizeof(struct thin_sequ_lookup));
+  const char *rout_name = "makethin:put_thin_sequ";
+  p = mycalloc(rout_name, 1, sizeof *p);
   p->thick_sequ = thick_sequ;
   p->thin_sequ = thin_sequ;
   p->next = NULL;
-  if (my_sequ_list)
-  {
+  if (my_sequ_list) {
     cur = my_sequ_list;
     while (cur->next) cur = cur->next;
     cur->next = p;
   }
-  else
-  {
-    my_sequ_list = p;
-  }
-  return;
+  else my_sequ_list = p;
 }
 
 /* makes node name from element name and slice number*/

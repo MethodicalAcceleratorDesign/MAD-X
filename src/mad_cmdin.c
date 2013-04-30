@@ -44,8 +44,8 @@ buffer_in_cmd(struct in_cmd* cmd)
 struct in_cmd*
 new_in_cmd(int length)
 {
-  char rout_name[] = "new_in_cmd";
-  struct in_cmd* new = mycalloc(rout_name,1, sizeof(struct in_cmd));
+  const char *rout_name = "new_in_cmd";
+  struct in_cmd* new = mycalloc(rout_name, 1, sizeof *new);
   strcpy(new->name, "in_cmd");
   new->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", new->name);
@@ -56,22 +56,22 @@ new_in_cmd(int length)
 struct in_cmd_list*
 new_in_cmd_list(int length)
 {
-  char rout_name[] = "new_in_cmd_list";
-  struct in_cmd_list* il = mycalloc(rout_name,1, sizeof(struct in_cmd_list));
+  const char *rout_name = "new_in_cmd_list";
+  struct in_cmd_list* il = mycalloc(rout_name, 1, sizeof *il);
   strcpy(il->name, "in_cmd_list");
   il->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
   il->labels = new_name_list(il->name, length);
-  il->in_cmds = mycalloc(rout_name,length, sizeof(struct in_cmd*));
+  il->in_cmds = mycalloc(rout_name, length, sizeof *il->in_cmds);
   return il;
 }
 
 struct in_cmd*
 delete_in_cmd(struct in_cmd* cmd)
 {
-  char rout_name[] = "delete_in_cmd";
+  const char *rout_name = "delete_in_cmd";
   if (cmd == NULL) return NULL;
   if (stamp_flag && cmd->stamp != 123456)
     fprintf(stamp_file, "d_i_c double delete --> %s\n", cmd->name);
@@ -85,14 +85,14 @@ delete_in_cmd(struct in_cmd* cmd)
 void
 grow_in_cmd_list(struct in_cmd_list* p)
 {
-  char rout_name[] = "grow_in_cmd_list";
+  const char *rout_name = "grow_in_cmd_list";
   struct in_cmd** c_loc = p->in_cmds;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
 
   p->max = new;
-  p->in_cmds
-    = (struct in_cmd**) mycalloc(rout_name,new, sizeof(struct in_cmd*));
-  for (j = 0; j < p->curr; j++) p->in_cmds[j] = c_loc[j];
+//  p->in_cmds = myrealloc(rout_name, p->in_cmds, new * sizeof *p->in_cmds);
+  p->in_cmds = mycalloc(rout_name, new, sizeof *p->in_cmds);
+  for (int j = 0; j < p->curr; j++) p->in_cmds[j] = c_loc[j];
   myfree(rout_name, c_loc);
 }
 

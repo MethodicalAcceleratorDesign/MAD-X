@@ -170,13 +170,13 @@ void
 wpl(int *np, float *xp, float *yp)
 {
   /* plot PolyLine of np points with coordinates (xp,yp) */
-  char rout_name[] = "wpl";
+  const char *rout_name = "wpl";
 
   XPoint          *points;
   int             i, k;
 
   /* polyline drawing */
-  points = (XPoint *) mycalloc(rout_name,*np, sizeof(XPoint));
+  points = mycalloc(rout_name, *np, sizeof *points);
   for (i = 0;i < *np ;i++ )
   {
     points[i].x = (xp[i] - w_lx) * wx_fact + 0.5;
@@ -192,13 +192,13 @@ void
 wfa(int *np, float *xp, float *yp)
 {
   /* plot area-filled PolyLine of np points with coordinates (xp,yp) */
-  char rout_name[] = "wfa";
+  const char *rout_name = "wfa";
 
   XPoint          *points;
   int             i, k;
 
   /* polyline drawing */
-  points = (XPoint *) mycalloc(rout_name,*np, sizeof(XPoint));
+  points = mycalloc(rout_name, *np, sizeof *points);
   for (i = 0;i < *np ;i++ )
   {
     points[i].x = (xp[i] - w_lx) * wx_fact + 0.5;
@@ -257,16 +257,9 @@ wwait(void)
 void
 wsetci(char *uscol)
 {
-  if(colored)
-  {
-    if (XAllocNamedColor(mydisplay, cmap, uscol, &color, &colore))
-    {
-      for( i = 0; i < 4; i++ )
-      {
-        XSetForeground(mydisplay, mygc[i], color.pixel);
-      }
-    }
-  }
+  if (colored && XAllocNamedColor(mydisplay, cmap, uscol, &color, &colore))
+    for(int i=0; i<4; i++)
+      XSetForeground(mydisplay, mygc[i], color.pixel);
 }
 
 void

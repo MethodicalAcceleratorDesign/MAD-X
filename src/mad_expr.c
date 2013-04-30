@@ -76,16 +76,15 @@ make_expression(int n, char** toks)
 struct expression*
 new_expression(char* in_string, struct int_array* polish)
 {
-  char rout_name[] = "new_expression";
+  const char *rout_name = "new_expression";
   int j;
-  struct expression* ex = mycalloc(rout_name,1,sizeof(struct expression));
+  struct expression* ex = mycalloc(rout_name, 1, sizeof *ex);
   strcpy(ex->name, "expression");
   ex->stamp = 123456;
-  ex->string = mymalloc(rout_name,strlen(in_string)+1);
+  ex->string = mymalloc_atomic(rout_name, (strlen(in_string)+1) * sizeof *ex->string);
   strcpy(ex->string, in_string);
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ex->name);
-  if (polish != NULL)
-  {
+  if (polish != NULL) {
     ex->polish = new_int_array(polish->curr);
     ex->polish->curr = polish->curr;
     for (j = 0; j < polish->curr; j++) ex->polish->i[j] = polish->i[j];
@@ -96,13 +95,12 @@ new_expression(char* in_string, struct int_array* polish)
 struct expr_list*
 new_expr_list(int length)
 {
-  char rout_name[] = "new_expr_list";
-  struct expr_list* ell = mycalloc(rout_name,1, sizeof(struct expr_list));
+  const char *rout_name = "new_expr_list";
+  struct expr_list* ell = mycalloc(rout_name, 1, sizeof *ell);
   strcpy(ell->name, "expr_list");
   ell->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ell->name);
-  ell->list  =
-    (struct expression**) mycalloc(rout_name,length, sizeof(struct expression*));
+  ell->list  = mycalloc(rout_name, length, sizeof *ell->list);
   ell->max = length;
   return ell;
 }
@@ -150,7 +148,7 @@ clone_expr_list(struct expr_list* p)
 struct expression*
 delete_expression(struct expression* expr)
 {
-  char rout_name[] = "delete_expression";
+  const char *rout_name = "delete_expression";
   if (expr == NULL) return NULL;
   if (stamp_flag && expr->stamp != 123456)
     fprintf(stamp_file, "d_ex double delete --> %s\n", expr->name);
@@ -164,7 +162,7 @@ delete_expression(struct expression* expr)
 struct expr_list*
 delete_expr_list(struct expr_list* exprl)
 {
-  char rout_name[] = "delete_expr_list";
+  const char *rout_name = "delete_expr_list";
   int i;
   if (exprl == NULL) return NULL;
   if (stamp_flag && exprl->stamp != 123456)
@@ -183,12 +181,13 @@ delete_expr_list(struct expr_list* exprl)
 void
 grow_expr_list(struct expr_list* p)
 {
-  char rout_name[] = "grow_expr_list";
+  const char *rout_name = "grow_expr_list";
   struct expression** e_loc = p->list;
-  int j, new = 2*p->max;
+  int new = 2*p->max;
   p->max = new;
-  p->list = mycalloc(rout_name,new, sizeof(struct expression*));
-  for (j = 0; j < p->curr; j++) p->list[j] = e_loc[j];
+//  p->list = myrealloc(rout_name, p->list, new * sizeof *p->list);
+  p->list = mycalloc(rout_name,new, sizeof *p->list);
+  for (int j = 0; j < p->curr; j++) p->list[j] = e_loc[j];
   myfree(rout_name, e_loc);
 }
 

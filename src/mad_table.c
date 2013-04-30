@@ -138,27 +138,27 @@ add_table_vars(struct name_list* cols, struct command_list* select)
 static void
 grow_table_list(struct table_list* tl)
 {
-  char rout_name[] = "grow_table_list";
+  const char *rout_name = "grow_table_list";
   struct table** t_loc = tl->tables;
-  int j, new = 2*tl->max;
+  int new = 2*tl->max;
 
   grow_name_list(tl->names);
   tl->max = new;
-  tl->tables = mycalloc(rout_name,new, sizeof(struct table*));
-  for (j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
+  tl->tables = mycalloc(rout_name, new, sizeof *tl->tables);
+  for (int j = 0; j < tl->curr; j++) tl->tables[j] = t_loc[j];
   myfree(rout_name, t_loc);
 }
 
 static void
 grow_table_list_list(struct table_list_list* tll)
 {
-  char rout_name[] = "grow_table_list_list";
+  const char *rout_name = "grow_table_list_list";
   struct table_list** t_loc = tll->table_lists;
-  int j, new = 2*tll->max;
+  int new = 2*tll->max;
 
   tll->max = new;
-  tll->table_lists = mycalloc(rout_name,new, sizeof(struct table_list*));
-  for (j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
+  tll->table_lists = mycalloc(rout_name, new, sizeof *tll->table_lists);
+  for (int j = 0; j < tll->curr; j++) tll->table_lists[j] = t_loc[j];
   myfree(rout_name, t_loc);
 }
 
@@ -524,10 +524,9 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
 struct table*
 new_table(char* name, char* type, int rows, struct name_list* cols)
 {
-  char rout_name[] = "new_table";
+  const char *rout_name = "new_table";
   int i, n = cols->curr;
-  struct table* t
-    = (struct table*) mycalloc(rout_name,1, sizeof(struct table));
+  struct table* t = mycalloc(rout_name, 1, sizeof *t);
 
   strcpy(t->name, name);
   strcpy(t->type, type);
@@ -535,38 +534,35 @@ new_table(char* name, char* type, int rows, struct name_list* cols)
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", "table");
   t->columns = cols;
   t->num_cols = t->org_cols = n;
-  t->s_cols = (char***) mycalloc(rout_name,n, sizeof(char**));
-  t->d_cols = (double**) mycalloc(rout_name,n, sizeof(double*));
+  t->s_cols = mycalloc(rout_name, n, sizeof *t->s_cols);
+  t->d_cols = mycalloc(rout_name, n, sizeof *t->d_cols);
   t->max = ++rows; /* +1 because of separate augment_count */
-  for (i = 0; i < n; i++)
-  {
+  for (i = 0; i < n; i++) {
     if (cols->inform[i] < 3)
-      t->d_cols[i] = (double*) mycalloc(rout_name,rows, sizeof(double));
+      t->d_cols[i] = mycalloc_atomic(rout_name, rows, sizeof *t->d_cols[0]);
     else if (cols->inform[i] == 3)
-      t->s_cols[i] = (char**) mycalloc(rout_name,rows, sizeof(char*));
+      t->s_cols[i] = mycalloc(rout_name, rows, sizeof *t->s_cols[0]);
   }
   t->row_out = new_int_array(rows);
   t->col_out = new_int_array(n);
   t->node_nm = new_char_p_array(rows);
-  t->p_nodes = mycalloc(rout_name,rows, sizeof(struct nodes*));
-  t->l_head  = mycalloc(rout_name,rows, sizeof(struct char_p_array*));
+  t->p_nodes = mycalloc(rout_name, rows, sizeof *t->p_nodes);
+  t->l_head  = mycalloc(rout_name, rows, sizeof *t->l_head);
   return t;
 }
 
 struct table_list*
 new_table_list(int size)
 {
-  char rout_name[] = "new_table_list";
-  struct table_list* tl
-    = (struct table_list*) mycalloc(rout_name,1, sizeof(struct table_list));
+  const char *rout_name = "new_table_list";
+  struct table_list* tl = mycalloc(rout_name, 1, sizeof *tl);
   strcpy(tl->name, "table_list");
   tl->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tl->name);
   tl->max = size;
   tl->curr = 0;
   tl->names = new_name_list(tl->name, size);
-  tl->tables
-    = (struct table**) mycalloc(rout_name,size, sizeof(struct table*));
+  tl->tables = mycalloc(rout_name, size, sizeof *tl->tables);
   add_to_table_list_list(tl, all_table_lists);
   return tl;
 }
@@ -574,18 +570,14 @@ new_table_list(int size)
 struct table_list_list*
 new_table_list_list(int size)
 {
-  char rout_name[] = "new_table_list_list";
-  struct table_list_list* tll
-    = (struct table_list_list*) 
-    mycalloc(rout_name,1, sizeof(struct table_list_list));
+  const char *rout_name = "new_table_list_list";
+  struct table_list_list* tll = mycalloc(rout_name, 1, sizeof *tll);
   strcpy(tll->name, "table_list_list");
   tll->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tll->name);
   tll->max = size;
   tll->curr = 0;
-  tll->table_lists
-    = (struct table_list**) 
-    mycalloc(rout_name,size, sizeof(struct table_list*));
+  tll->table_lists = mycalloc(rout_name, size, sizeof *tll->table_lists);
   return tll;
 }
 
@@ -842,7 +834,7 @@ set_vars_from_table(struct table* t)
 struct table*
 delete_table(struct table* t)
 {
-  char rout_name[] = "delete_table";
+  const char *rout_name = "delete_table";
   int i, j;
   if (t == NULL) return NULL;
   if (stamp_flag && t->stamp != 123456)
@@ -897,7 +889,7 @@ double_table(char* table)
 void
 grow_table(struct table* t) /* doubles number of rows */
 {
-  char rout_name[] = "grow_table";
+  const char *rout_name = "grow_table";
   int i, j, new = 2*t->max;
   char** s_loc;
   struct char_p_array* t_loc = t->node_nm;
@@ -906,14 +898,11 @@ grow_table(struct table* t) /* doubles number of rows */
   struct char_p_array** pa_loc = t->l_head;
 
   t->max = new;
-  t->p_nodes = (struct node**) mycalloc(rout_name,new, sizeof(struct node*));
-  t->l_head
-    = (struct char_p_array**)
-    mycalloc(rout_name,new, sizeof(struct char_p_array*));
+  t->p_nodes = mycalloc(rout_name, new, sizeof *t->p_nodes);
+  t->l_head  = mycalloc(rout_name, new, sizeof *t->l_head);
   t->node_nm = new_char_p_array(new);
 
-  for (i = 0; i < t->curr; i++)
-  {
+  for (i = 0; i < t->curr; i++) {
     t->node_nm->p[i] = t_loc->p[i];
     t->p_nodes[i] = p_loc[i];
     t->l_head[i] = pa_loc[i];
@@ -921,20 +910,16 @@ grow_table(struct table* t) /* doubles number of rows */
   delete_char_p_array(t_loc, 0);
   myfree(rout_name, pa_loc);
   t->node_nm->curr = t->curr; myfree(rout_name, p_loc);
-  for (j = 0; j < t->num_cols; j++)
-  {
-    if ((s_loc = t->s_cols[j]) != NULL)
-    {
-      t->s_cols[j] = (char**) mycalloc(rout_name,new, sizeof(char*));
+  for (j = 0; j < t->num_cols; j++) {
+    if ((s_loc = t->s_cols[j]) != NULL) {
+      t->s_cols[j] = mycalloc(rout_name, new, sizeof *t->s_cols[0]);
       for (i = 0; i < t->curr; i++) t->s_cols[j][i] = s_loc[i];
       myfree(rout_name, s_loc);
     }
   }
-  for (j = 0; j < t->num_cols; j++)
-  {
-    if ((d_loc = t->d_cols[j]) != NULL)
-    {
-      t->d_cols[j] = (double*) mycalloc(rout_name,new, sizeof(double));
+  for (j = 0; j < t->num_cols; j++) {
+    if ((d_loc = t->d_cols[j]) != NULL) {
+      t->d_cols[j] = mycalloc_atomic(rout_name, new, sizeof *t->d_cols[0]);
       for (i = 0; i < t->curr; i++) t->d_cols[j][i] = d_loc[i];
       myfree(rout_name, d_loc);
     }
@@ -1278,8 +1263,7 @@ read_table(struct in_cmd* cmd)
         ((*aux_buff->c == '@') || (*aux_buff->c == '*')))
     {
       if (t->header->curr == t->header->max) grow_char_p_array(t->header);
-      t->header->p[t->header->curr]
-        = (char*) mymalloc("read_table", strlen(aux_buff->c)+1);
+      t->header->p[t->header->curr] = mymalloc_atomic("read_table", (strlen(aux_buff->c)+1)* sizeof *t->header->p[0]);
       strcpy(t->header->p[t->header->curr], aux_buff->c);
       t->header->curr++;
     }

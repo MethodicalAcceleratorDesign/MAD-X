@@ -219,7 +219,7 @@ void
 exec_create_table(struct in_cmd* cmd)
   /* makes a user defined table */
 {
-  char rout_name[] = "exec_create_table";
+  const char *rout_name = "exec_create_table";
   struct table* t;
   int* t_types;
   struct name_list* nl = cmd->clone->par_names;
@@ -255,18 +255,15 @@ exec_create_table(struct in_cmd* cmd)
   m = pl->parameters[pos]->m_string;
   ncols = m->curr;
   /* now make table */
-  t_types = mymalloc(rout_name, ncols*sizeof(int));
-  t_c = mymalloc(rout_name, (ncols+1)*sizeof(char*));
+  t_types = mymalloc_atomic(rout_name, ncols * sizeof *t_types);
+  t_c = mymalloc(rout_name, (ncols+1) * sizeof *t_c);
 
-  for (j = 0; j < m->curr; j++)
-  {
-    if (*m->p[j] == '_')
-    {
+  for (j = 0; j < m->curr; j++) {
+    if (*m->p[j] == '_') {
       t_types[j] = 3; /* type string */
       t_c[j] = permbuff(&m->p[j][1]);
     }
-    else
-    {
+    else {
       t_types[j] = 2; /* type double */
       t_c[j] = permbuff(m->p[j]);
     }
