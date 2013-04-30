@@ -175,7 +175,7 @@ readEps(struct eps *e, FILE *in, int row)
 
       if (strcmp(str, "omit") == 0 && (n = fscanf(in, "%*['\"]%" MkString(MAXTAGLEN) "[^'\"]%c", e->tag, &c2)) == 2) {
         e->tag[sizeof e->tag-1] = 0;
-        cmd |= eps_omit | eps_equ;
+        cmd |= eps_omit;
         trace("[%d] omit='%s'", row, e->tag);
         ensure(*e->tag, "invalid empty tag (%s:%d)", option.cfg_file, row);
         ensure(c == c2, "invalid tag quotes (%s:%d)", option.cfg_file, row);
