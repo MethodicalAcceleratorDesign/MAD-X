@@ -142,6 +142,9 @@ context_add0(T *cxt)
 static inline void
 context_updateAct (T *cxt, int row_i)
 {
+  trace("->updateAct row %d", row_i);
+  int na = cxt->act_n;
+
   // remove obsolete constraints
   for (; cxt->act_n; --cxt->act_n) {
     const C *act = cxt->act[cxt->act_n-1];
@@ -152,6 +155,8 @@ context_updateAct (T *cxt, int row_i)
       break;
     }
   }
+
+  trace("%d obsolete constraints removed", na -= cxt->act_n);
 
   // select future constraints
   for (; cxt->fut_n; --cxt->fut_n) {
@@ -177,11 +182,15 @@ context_updateAct (T *cxt, int row_i)
     }
     ++cxt->act_n;
   }
+
+  trace("%d future constraints added", cxt->act_n-na);
+  trace("<-updateAct row %d", row_i);
 }
 
 static inline void
 context_setupRow (T *cxt, int row_i)
 {
+  trace("->setupRow row %d", row_i);
   cxt->row_n = 0;
 
   // select active constraints for this row
@@ -193,24 +202,33 @@ context_setupRow (T *cxt, int row_i)
     if (act->eps.cmd >= eps_skip && !(act->eps.cmd & eps_alt)) {
       cxt->row[0] = act;
       cxt->row_n  = 1;
-      return;
+      break;
     }
 
     // add active constraint
     cxt->row[cxt->row_n++] = act;
   }
+
+  trace("%d active constraints selected ([0] #%d, line %d)",
+        cxt->row_n, cxt->row[0]->idx, cxt->row[0]->line);
+  trace("<-setupRow row %d", row_i);
 }
 
 static inline const C*
 context_setupCol (T *cxt, int col_i)
 {
+  trace("->setupCol col %d", col_i);
   const C *cst = 0;
 
   // select last-added active constraint for this col
   for (int i = 0; i < cxt->row_n; ++i) {
     const C *act = cxt->row[i];
-    if (act > cst && !(act->eps.cmd & eps_alt) && slice_isElem(&act->col, col_i)) cst = act;
+    if (act > cst && !(act->eps.cmd & eps_alt) && 
+        (act->eps.cmd >= eps_skip || slice_isElem(&act->col, col_i))) cst = act;
   }
+
+  trace("constraint #%d (line %d) selected", cst->idx, cst->line);
+  trace("<-setupCol col %d", col_i);
 
   return cst;
 }
