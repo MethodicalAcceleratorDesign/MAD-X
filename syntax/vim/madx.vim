@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:    Mad-X
 " Maintainer:  Riccardo de Maria <riccardo.de.maria@cern.ch>
-" Last Change: 2005 Feb 11
+" Last Change: 2013 April 30
 
 " Usage:
 "
@@ -49,7 +49,8 @@ syntax region madxCommandReg contained start=/[A-z]/ end=/;/ contains=madxPunt,m
 syntax match madxPunt contained /+[^+]/me=e-1
 syntax match madxPunt contained /=\|(\|)\|:=\|->\|-/
 syntax match madxPunt contained /\\/
-syntax match madxPunt contained /\*\|\//
+" YIL13: This match is breaking // and /* .. */ comments
+"syntax match madxPunt contained /\*\|\//
 syntax match madxPunt contained /:[^=]/me=e-1
 syntax match madxPunt contained /,\|;\|{\|}\|\[\|\]/
 syntax match madxNumber contained /\<[0-9\.\-][0-9\.\-+ED]*\>/
