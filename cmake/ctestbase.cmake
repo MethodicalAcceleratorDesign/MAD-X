@@ -1,8 +1,9 @@
 
 # List output files..
-file(GLOB TEST_OUTPUT RELATIVE ${SOURCEDIR} ${SOURCEDIR}/*.ref)
-string(REGEX REPLACE ".ref" ".out" OLD_OUTPUT "${TEST_OUTPUT}")
-string(REGEX REPLACE ".ref" "" TEST_OUTPUT "${TEST_OUTPUT}")
+file(GLOB TEST_OUTPUT RELATIVE ${SOURCEDIR} "${SOURCEDIR}/*.ref.gz" "${SOURCEDIR}/*.ref")
+string(REGEX REPLACE ".ref(.gz)?" ".out" OLD_OUTPUT "${TEST_OUTPUT}")
+string(REGEX REPLACE ".ref(.gz)?" "" TEST_OUTPUT "${TEST_OUTPUT}")
+
 
 # String version for message:
 string(REGEX REPLACE ";" " " STRING_TEST_OUTPUT "${TEST_OUTPUT}")
