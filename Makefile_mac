@@ -18,9 +18,10 @@
 
 # use macport GCC suite
 ifeq ($(USER),ldeniau)
-%-gnu:        GNUMAC := CC=gcc-mp-4.6 CXX=g++-mp-4.6 FC=gfortran-mp-4.6 LD=gfortran-mp-4.6 \
-			CCNAME=gcc CXXNAME=g++ FCNAME=gfortran LDNAME=gfortran
-numdiff%-gnu: GNUMAC := CC=gcc-mp-4.6 LD=gcc-mp-4.6 CCNAME=gcc LDNAME=gcc
+%-gnu: GNUMAC := CC=gcc-mp-4.6 CXX=g++-mp-4.6 FC=gfortran-mp-4.6 LD=gfortran-mp-4.6 \
+                 CCNAME=gcc    CXXNAME=g++    FCNAME=gfortran    LDNAME=gfortran
+numdiff%-gnu: GNUMAC := CC=gcc-mp-4.6 LD=gcc-mp-4.6 \
+                        CCNAME=gcc    LDNAME=gcc
 else
 %-gnu: GNUMAC := GNU=yes
 endif

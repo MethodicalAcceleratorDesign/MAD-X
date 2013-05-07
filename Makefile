@@ -57,7 +57,7 @@ ONLINE   := no
 # alternative DA package: yes/no (default is yes)
 NTPSA    := yes
 
-# use garbage collector: yes/no (default is yes)
+# use garbage collector: yes/no (default is no)
 USEGC    := no
 
 #################
