@@ -30,11 +30,11 @@ include Makefile_mac
 endif
 
 ifeq ($(OSTYPE),Windows)
-include Makefile_win
+$(error libgc separate built is not supported on $(OSTYPE))
 endif
 
 ifeq ($(OSTYPE),Cygwin)
-include Makefile_cyg
+$(error libgc separate built is not supported on $(OSTYPE))
 endif
 
 # not mandatory

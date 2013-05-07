@@ -21,6 +21,22 @@
 
 PROJECT  := libgc
 
+#################
+# Build settings
+#
+
+# architecture bit: detect/32/64 (default is detect)
+ARCH    := detect
+
+# debugging mode: yes/no (default is no)
+DEBUG   := no
+
+# profiling mode: yes/no (default is no)
+PROFILE := no
+
+# make shared lib: yes/no (default is no)
+SHARED  := no
+
 ####################
 # Makefile includes
 
