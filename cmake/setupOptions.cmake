@@ -59,3 +59,8 @@ endif()
 if(MADX_NTPSA)
     add_definitions("-D_NTPSA")
 endif()
+
+option(USE_GC "Use Garbage Collector" OFF)
+if(USE_GC)
+   add_definitions("-D_USEGC")
+endif()

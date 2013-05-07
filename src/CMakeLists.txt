@@ -51,6 +51,10 @@ add_library(madx ${src_files})
 
 target_link_libraries(madx ptc)
 
+# Garbage Collector:
+if(USE_GC)
+   target_link_libraries(madx gc-lib)
+endif()
 
 # not sure if this is needed...
 set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
@@ -100,6 +104,11 @@ endif()
 find_package(Threads)
 find_package(STDCPP)
 target_link_libraries(madx  ${CMAKE_THREAD_LIBS_INIT} ${STDCPP_LIBS})
+
+# Garbage collector:
+if(USE_GC)
+   include_directories(${CMAKE_SOURCE_DIR}/libs/gc/gc/include)
+endif()
 
 # Defining specific stuff for packaging:
 # Should be called after sources are defined,
