@@ -39,7 +39,9 @@ endif
 # Garbage Collector
 
 ifeq ($(USEGC),yes)
+ifneq ($(OSTYPE),Windows)
 LIBS += -Llibs$/gc -lgc$(ARCH)
+endif
 endif
 
 # end of makefile
