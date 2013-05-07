@@ -108,27 +108,10 @@ void
 grow_name_list(struct name_list* p)
 {
   const char *rout_name = "grow_name_list";
-  char** n_loc = p->names;
-  int* l_ind = p->index;
-  int* l_inf = p->inform;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->names  = myrealloc(rout_name, p->names,  new * sizeof *p->names);
-//  p->index  = myrealloc(rout_name, p->index,  new * sizeof *p->index);
-//  p->inform = myrealloc(rout_name, p->inform, new * sizeof *p->inform);
-  p->names  = mycalloc(rout_name, new, sizeof *p->names);
-  p->index  = mycalloc(rout_name, new, sizeof *p->index);
-  p->inform = mycalloc(rout_name, new, sizeof *p->inform);
-  for (int j = 0; j < p->curr; j++)
-  {
-    p->names[j] = n_loc[j];
-    p->index[j] = l_ind[j];
-    p->inform[j] = l_inf[j];
-  }
-  myfree(rout_name, n_loc);
-  myfree(rout_name, l_ind);
-  myfree(rout_name, l_inf);
+  p->max *= 2;
+  p->names  = myrecalloc(rout_name, p->names,  p->curr * sizeof *p->names,  p->max * sizeof *p->names);
+  p->index  = myrecalloc(rout_name, p->index,  p->curr * sizeof *p->index,  p->max * sizeof *p->index);
+  p->inform = myrecalloc(rout_name, p->inform, p->curr * sizeof *p->inform, p->max * sizeof *p->inform);
 }
 
 void

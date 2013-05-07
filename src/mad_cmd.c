@@ -48,14 +48,12 @@ static void
 grow_command_list_list(struct command_list_list* p)
 {
   const char *rout_name = "grow_command_list_list";
-  struct command_list** c_loc = p->command_lists;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->command_lists = myrealloc(rout_name, p->command_lists, new * sizeof *p->command_lists);
-  p->command_lists = mycalloc(rout_name, new, sizeof *p->command_lists);
-  for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+//  struct command_list** c_loc = p->command_lists;
+  p->max *= 2;
+  p->command_lists = myrecalloc(rout_name, p->command_lists, p->curr * sizeof *p->command_lists, p->max * sizeof *p->command_lists);
+//  p->command_lists = mycalloc(rout_name, new, sizeof *p->command_lists);
+//  for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
+//  myfree(rout_name, c_loc);
 }
 
 static void
@@ -460,14 +458,13 @@ get_defined_commands(void)
   /* reads + stores the commands defined in mad_dict.c */
 {
   const char *rout_name = "get_defined_commands";
-  int i;
-  char** p;
   int n = char_cnt(';', command_def);
-  p = mymalloc(rout_name, n * sizeof *p);
+  char** p = mymalloc(rout_name, n * sizeof *p);
   p[0] = strtok(command_def, ";");
-  for (i = 1; i < n; i++) /* make temporary list - strtok is called again */
+  for (int i = 1; i < n; i++) /* make temporary list - strtok is called again */
     p[i] = strtok(NULL, ";");
-  for (i = 0; i < n; i++) store_command_def(p[i]);
+  for (int i = 0; i < n; i++)
+    store_command_def(p[i]);
   myfree(rout_name, p);
 }
 
@@ -796,14 +793,8 @@ void
 grow_command_list(struct command_list* p)
 {
   const char *rout_name = "grow_command_list";
-//  struct command** c_loc = p->commands;
-  int new = 2*p->max;
-
-  p->max = new;
-  p->commands = myrealloc(rout_name, p->commands, new * sizeof *p->commands);
-//  p->commands = mycalloc(rout_name, new, sizeof *p->commands);
-//  for (int j = 0; j < p->curr; j++) p->commands[j] = c_loc[j];
-//  myfree(rout_name, c_loc);
+  p->max *= 2;
+  p->commands = myrecalloc(rout_name, p->commands, p->curr * sizeof *p->commands, p->max * sizeof *p->commands);
 }
 
 void

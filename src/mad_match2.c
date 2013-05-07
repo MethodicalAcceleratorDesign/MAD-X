@@ -643,16 +643,14 @@ match2_constraint(struct in_cmd* cmd)
   } else {
 /*    printf("given-name %s\n",cname);*/
   }
-  match2_cons_name[i][j] = mymalloc_atomic("match2_constraint", (strlen(cname)+1) * sizeof *match2_cons_name[0][0]);
+  int len = strlen(cname);
+  match2_cons_name[i][j] = mymalloc_atomic("match2_constraint", (len+1) * sizeof *match2_cons_name[0][0]);
 /*  strcpy(match2_cons_name[i][j],cname);*/
   n=0;
-  {
-    int len = strlen(cname);
-    for(k=0; k<len; k++) {
-      if(cname[k]!=' ') {
-        match2_cons_name[i][j][n]=cname[k];
-        n++;
-      }
+  for(k=0; k<len; k++) {
+    if(cname[k] != ' ') {
+      match2_cons_name[i][j][n] = cname[k];
+      n++;
     }
   }
   match2_cons_name[i][j][n]='\0';

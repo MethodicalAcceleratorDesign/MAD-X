@@ -77,17 +77,17 @@ struct expression*
 new_expression(char* in_string, struct int_array* polish)
 {
   const char *rout_name = "new_expression";
-  int j;
   struct expression* ex = mycalloc(rout_name, 1, sizeof *ex);
   strcpy(ex->name, "expression");
   ex->stamp = 123456;
-  ex->string = mymalloc_atomic(rout_name, (strlen(in_string)+1) * sizeof *ex->string);
+  int len = strlen(in_string)+1;
+  ex->string = mymalloc_atomic(rout_name, len * sizeof *ex->string);
   strcpy(ex->string, in_string);
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", ex->name);
   if (polish != NULL) {
     ex->polish = new_int_array(polish->curr);
     ex->polish->curr = polish->curr;
-    for (j = 0; j < polish->curr; j++) ex->polish->i[j] = polish->i[j];
+    for (int j = 0; j < polish->curr; j++) ex->polish->i[j] = polish->i[j];
   }
   return ex;
 }
@@ -182,13 +182,8 @@ void
 grow_expr_list(struct expr_list* p)
 {
   const char *rout_name = "grow_expr_list";
-  struct expression** e_loc = p->list;
-  int new = 2*p->max;
-  p->max = new;
-//  p->list = myrealloc(rout_name, p->list, new * sizeof *p->list);
-  p->list = mycalloc(rout_name,new, sizeof *p->list);
-  for (int j = 0; j < p->curr; j++) p->list[j] = e_loc[j];
-  myfree(rout_name, e_loc);
+  p->max *= 2;
+  p->list = myrecalloc(rout_name, p->list, p->curr * sizeof *p->list, p->max * sizeof *p->list);
 }
 
 void

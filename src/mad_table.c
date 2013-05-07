@@ -1263,7 +1263,8 @@ read_table(struct in_cmd* cmd)
         ((*aux_buff->c == '@') || (*aux_buff->c == '*')))
     {
       if (t->header->curr == t->header->max) grow_char_p_array(t->header);
-      t->header->p[t->header->curr] = mymalloc_atomic("read_table", (strlen(aux_buff->c)+1)* sizeof *t->header->p[0]);
+      int len = strlen(aux_buff->c)+1;
+      t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
       strcpy(t->header->p[t->header->curr], aux_buff->c);
       t->header->curr++;
     }

@@ -1836,7 +1836,8 @@ makemomentstables(void)
     /*printf(" index of this table is %d \n",j);*/
 
     if (tables[j] == 0x0) {
-      tables[j] = mymalloc_atomic("makemomentstables", (strlen(tabname) + 1) * sizeof *tables[0]);
+      int len = strlen(tabname)+1;
+      tables[j] = mymalloc_atomic("makemomentstables", len * sizeof *tables[0]);
       strcpy(tables[j],tabname);
       cols[j] = new_name_list("columns", 15);
       add_to_name_list(permbuff("name"),3,cols[j]);

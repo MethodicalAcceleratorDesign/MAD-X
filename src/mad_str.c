@@ -152,7 +152,8 @@ tmpbuff(const char* string)
   /* buffers string in a temporary (i.e. allocated) buffer */
   // aka strdup
 {
-  char* p = mymalloc_atomic("tmpbuff", (strlen(string)+1) * sizeof *p);
+  size_t len = strlen(string)+1;
+  char* p = mycalloc_atomic("tmpbuff", len, sizeof *p);
   strcpy(p, string);
   return p;
 }
@@ -264,23 +265,6 @@ zero_string(char* string) /* returns 1 if string defaults to '0', else 0 */
     if ((c = string[i]) != '0' && c != ' ' && c != '.') return 0;
   return 1;
 }
-
-#if 0 // veryyyy slloowww, replaced by string_icmp
-int
-compare_no_case(char* string_1, char* string_2)
-/* like strcmp, but ignoring case */
-{
-  int ret;
-  const char *rout_name = "compare_no_case";
-  char* s1 = mymalloc_atomic(rout_name, (strlen(string_1)+1)*sizeof *s1);
-  char* s2 = mymalloc_atomic(rout_name, (strlen(string_2)+1)*sizeof *s2);
-  strcpy(s1, string_1); stolower(s1);
-  strcpy(s2, string_2); stolower(s2);
-  ret = strcmp(s1, s2);
-  myfree(rout_name, s1); myfree(rout_name, s2);
-  return ret;
-}
-#endif
 
 int
 is_token(char* pb, char* string, int slen)

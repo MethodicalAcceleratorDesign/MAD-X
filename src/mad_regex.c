@@ -369,7 +369,8 @@ myregex(char* pattern, char* string)
   struct reg_token *first_token;
   int error, j, l, dollar = 0, res = 0;
   if (pattern == NULL || (l = strlen(pattern)) == 0)  return 0;
-  mypat = mymalloc_atomic(rout_name, (strlen(pattern)+5) * sizeof *mypat);
+  int len = strlen(pattern)+5;
+  mypat = mymalloc_atomic(rout_name, len * sizeof *mypat);
   strcpy(mypat, pattern);
 /* $ at end ? */
   if (mypat[l-1] == '$')

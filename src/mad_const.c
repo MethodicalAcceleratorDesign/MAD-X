@@ -16,14 +16,8 @@ static void
 grow_constraint_list(struct constraint_list* p)
 {
   const char *rout_name = "grow_constraint_list";
-  struct constraint** c_loc = p->constraints;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->constraints = myrealloc(rout_name, p->constraints, new * sizeof *p->constraints);
-  p->constraints = mycalloc(rout_name, new, sizeof *p->constraints);
-  for (int j = 0; j < p->curr; j++) p->constraints[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  p->max *= 2;
+  p->constraints = myrecalloc(rout_name, p->constraints, p->curr * sizeof *p->constraints, p->max * sizeof *p->constraints);
 }
 
 static struct constraint*

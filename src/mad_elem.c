@@ -18,13 +18,8 @@ static void
 grow_el_list(struct el_list* p)
 {
   const char *rout_name = "grow_el_list";
-  struct element** e_loc = p->elem;
-  int new = 2*p->max;
-  p->max = new;
-//  p->elem = myrealloc(rout_name, p->elem, new * sizeof *p->elem);
-  p->elem = mycalloc(rout_name, new, sizeof *p->elem);
-  for (int j = 0; j < p->curr; j++) p->elem[j] = e_loc[j];
-  myfree(rout_name, e_loc);
+  p->max *= 2;
+  p->elem = myrecalloc(rout_name, p->elem, p->curr * sizeof *p->elem, p->max * sizeof *p->elem);
 }
 
 #if 0 // not used...

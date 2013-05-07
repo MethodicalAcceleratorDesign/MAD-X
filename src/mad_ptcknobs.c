@@ -890,7 +890,8 @@ madx_mpk_init(void)
       sprintf(&(vary[strlen(vary)]),"initial=%s; ",madx_mpk_knobs[i].initial);
     }
 
-    madx_mpk_setknobs[i] = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *madx_mpk_setknobs[0]);
+    int len = strlen(vary)+1;
+    madx_mpk_setknobs[i] = mymalloc_atomic("madx_mpk_addvariable", len * sizeof *madx_mpk_setknobs[0]);
     strcpy(madx_mpk_setknobs[i],vary);
 
     if (debuglevel)  printf("madx_mpk_setknobs[%d]= %s\n",i,madx_mpk_setknobs[i]);
@@ -1376,15 +1377,16 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (initialpar)
   {
-    madx_mpk_knobs[knobidx].initial = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(initialpar)) * sizeof *madx_mpk_knobs[0].initial);
+    int len = strlen(initialpar)+1;
+    madx_mpk_knobs[knobidx].initial = mymalloc_atomic("madx_mpk_addvariable", len * sizeof *madx_mpk_knobs[0].initial);
     strcpy(madx_mpk_knobs[knobidx].initial, initialpar);
 
-    sprintf(vary,"mpk_%s",initialpar);
-    v->name = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *v->name);
+    len = sprintf(vary,"mpk_%s", initialpar)+1;
+    v->name = mymalloc_atomic("madx_mpk_addvariable", len * sizeof *v->name);
     strcpy(v->name,vary);
 
-    sprintf(vary,"mpk_%s_0",initialpar);
-    v->namecv = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(vary)) * sizeof *v->namecv);
+    len = sprintf(vary,"mpk_%s_0",initialpar)+1;
+    v->namecv = mymalloc_atomic("madx_mpk_addvariable", len * sizeof *v->namecv);
     strcpy(v->namecv,vary);
     v->IsIniCond = 1;
     v->kn = -1;
@@ -1393,7 +1395,8 @@ madx_mpk_addvariable(struct in_cmd* cmd)
 
   if (ename)
   {
-    madx_mpk_knobs[knobidx].elname = mymalloc_atomic("madx_mpk_addvariable", (1+strlen(ename)) * sizeof *madx_mpk_knobs[0].elname);
+    int len = strlen(ename)+1;
+    madx_mpk_knobs[knobidx].elname = mymalloc_atomic("madx_mpk_addvariable", len * sizeof *madx_mpk_knobs[0].elname);
     strcpy(madx_mpk_knobs[knobidx].elname, ename);
 
     if (exactnamematch != 0)

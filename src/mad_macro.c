@@ -35,13 +35,8 @@ static void
 grow_macro_list(struct macro_list* p)
 {
   const char *rout_name = "grow_macro_list";
-  struct macro** n_loc = p->macros;
-  int new = 2*p->max;
-  p->max = new;
-//  p->macros = myrealloc(rout_name, p->macros, new * sizeof *p->macros);
-  p->macros = mycalloc(rout_name, new, sizeof *p->macros);
-  for (int j = 0; j < p->curr; j++) p->macros[j] = n_loc[j];
-  myfree(rout_name, n_loc);
+  p->max *= 2;
+  p->macros = myrecalloc(rout_name, p->macros, p->curr * sizeof *p->macros, p->max * sizeof *p->macros);
 }
 
 #if 0 // not used...

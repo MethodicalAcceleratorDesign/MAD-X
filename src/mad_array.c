@@ -27,7 +27,7 @@ new_char_array(int length)
   il->stamp = 123456;
   il->curr = 0;
   il->max = length;
-  il->c = mymalloc_atomic(rout_name, length * sizeof *il->c);
+  il->c = mycalloc_atomic(rout_name, length, sizeof *il->c);
   return il;
 }
 
@@ -42,7 +42,6 @@ new_char_p_array(int length)
   il->curr = 0;
   il->max = length;
   il->p = mycalloc(rout_name, length, sizeof *il->p);
-//  memset(il->p, 0, length*sizeof(char*));
   return il;
 }
 
@@ -56,7 +55,7 @@ new_int_array(int length)
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", il->name);
   il->curr = 0;
   il->max = length;
-  il->i = mymalloc_atomic(rout_name, length * sizeof *il->i);
+  il->i = mycalloc_atomic(rout_name, length, sizeof *il->i);
   return il;
 }
 
@@ -80,8 +79,8 @@ new_char_array_list(int size)
   strcpy(tl->name, "char_array_list");
   tl->stamp = 123456;
   if (watch_flag) fprintf(debug_file, "creating ++> %s\n", tl->name);
-  tl->ca  = mycalloc(rout_name, size, sizeof *tl->ca);
   tl->max = size;
+  tl->ca  = mycalloc(rout_name, size, sizeof *tl->ca);
   return tl;
 }
 
@@ -183,8 +182,7 @@ dump_char_array(struct char_array* a)
 void
 dump_char_p_array(struct char_p_array* p)
 {
-  int i;
-  for (i = 0; i < p->curr; i++)
+  for (int i = 0; i < p->curr; i++)
     fprintf(prt_file, "%s\n", p->p[i]);
 }
 
@@ -192,8 +190,7 @@ void
 dump_int_array(struct int_array* ia)
 {
   fprintf(prt_file, "dump integer array, length: %d\n", ia->curr);
-  for (int i = 0; i < ia->curr; i++)
-  {
+  for (int i = 0; i < ia->curr; i++) {
     fprintf(prt_file, v_format("%d "), ia->i[i]);
     if ((i+1)%10 == 0) fprintf(prt_file, "\n");
   }
@@ -204,70 +201,40 @@ void
 grow_char_array(struct char_array* p)
 {
   const char *rout_name = "grow_char_array";
-//  char* p_loc = p->c;
-  int new = 2*p->max;
-
-  p->max = new;
-  p->c = myrealloc(rout_name, p->c, new * sizeof *p->c);
-//  p->c = mymalloc(rout_name, new * sizeof *p->c);
-//  for (int j = 0; j < p->curr; j++) p->c[j] = p_loc[j];
-//  myfree(rout_name, p_loc);
+  p->max *= 2;
+  p->c = myrecalloc(rout_name, p->c, p->curr * sizeof *p->c, p->max * sizeof *p->c);
 }
 
 void
 grow_char_p_array(struct char_p_array* p)
 {
   const char *rout_name = "grow_char_p_array";
-  char** p_loc = p->p;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->p = myrealloc(rout_name, p->p, new * sizeof *p->p);
-  p->p = mycalloc(rout_name,new, new * sizeof *p->p);
-  for (int j = 0; j < p->curr; j++) p->p[j] = p_loc[j];
-  myfree(rout_name, p_loc);
+  p->max *= 2;
+  p->p = myrecalloc(rout_name, p->p, p->curr * sizeof *p->p, p->max * sizeof *p->p);
 }
 
 void
 grow_int_array(struct int_array* p)
 {
   const char *rout_name = "grow_int_array";
-//  int* i_loc = p->i;
-  int new = 2*p->max;
-
-  p->max = new;
-  p->i = myrealloc(rout_name, p->i, new * sizeof *p->i);
-//  p->i = mymalloc(rout_name, new * sizeof *p->i);
-//  for (int j = 0; j < p->curr; j++) p->i[j] = i_loc[j];
-//  myfree(rout_name, i_loc);
+  p->max *= 2;
+  p->i = myrecalloc(rout_name, p->i, p->curr * sizeof *p->i, p->max * sizeof *p->i);
 }
 
 void
 grow_double_array(struct double_array* p)
 {
   const char *rout_name = "grow_double_array";
-//  double* a_loc = p->a;
-  int new = 2*p->max;
-
-  p->max = new;
-  p->a = myrealloc(rout_name, p->a, new * sizeof *p->a);
-//  p->a = mymalloc(rout_name, new * sizeof *p->a);
-//  for (int j = 0; j < p->curr; j++) p->a[j] = a_loc[j];
-//  myfree(rout_name, a_loc);
+  p->max *= 2;
+  p->a = myrecalloc(rout_name, p->a, p->curr * sizeof *p->a, p->max * sizeof *p->a);
 }
 
 void
 grow_char_array_list(struct char_array_list* p)
 {
   const char *rout_name = "grow_char_array_list";
-  struct char_array** c_loc = p->ca;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->ca = myrealloc(rout_name, p->ca, new * sizeof *p->ca);
-  p->ca = mycalloc(rout_name, new, sizeof *p->ca);
-  for (int j = 0; j < p->curr; j++) p->ca[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  p->max *= 2;
+  p->ca = myrecalloc(rout_name, p->ca, p->curr * sizeof *p->ca, p->max * sizeof *p->ca);
 }
 
 void
@@ -275,7 +242,7 @@ ftoi_array(struct double_array* da, struct int_array* ia)
   /* converts and copies double array into integer array */
 {
   int l = da->curr;
-  while (l >= ia->max)  grow_int_array(ia);
+  while (l >= ia->max) grow_int_array(ia);
   for (int i = 0; i < l; i++) 
     ia->i[i] = da->a[i];
   ia->curr = l;
@@ -289,6 +256,3 @@ int_in_array(int k, int n, int* array)
     if (k == array[j]) return 1;
   return 0;
 }
-
-
-

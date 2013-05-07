@@ -4,28 +4,28 @@
 #ifdef _USEGC
 
 // #define GC_DEBUG
-#include <gc.h>
-#include <string.h>
 
-#define mymalloc(fn, sz)            myptrchk(fn, GC_MALLOC(sz)        )
-#define mycalloc(fn, n, sz)         myptrchk(fn, GC_MALLOC((n)*(sz))  )
-#define myrealloc(fn, p, sz)        myptrchk(fn, GC_REALLOC((p),(sz)) )
-#define mymalloc_atomic(fn, sz)     myptrchk(fn, GC_MALLOC_ATOMIC(sz) )
-#define mycalloc_atomic(fn, n, sz)  memset(myptrchk(fn, GC_MALLOC_ATOMIC((n)*(sz))),0,(n)*(sz))
-#define myfree(fn, p)               (void)(GC_FREE(p), fn)
-#define mymemcheck()                GC_gcollect()
+#include <gc.h>
+
+#define mymalloc(fn, sz)            myptrchk(fn, GC_MALLOC_IGNORE_OFF_PAGE(sz))
+#define mymalloc_atomic(fn, sz)     myptrchk(fn, GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE(sz))
+#define myrealloc(fn, p, sz)        myptrchk(fn, GC_REALLOC((p),(sz)))
+#define myfree(fn, p)               (void)((p)=0)
+
+#define mycalloc(fn, n, sz)         memset(mymalloc(fn, (n)*(sz)), 0, (n)*(sz))
+#define mycalloc_atomic(fn, n, sz)  memset(mymalloc_atomic(fn, (n)*(sz)), 0, (n)*(sz))
+#define myrecalloc(fn, p, osz, sz)  ((void*)((char*)memset((char*)myptrchk(fn,GC_REALLOC((p),(sz)))+(osz),0,(sz)-(osz))-(osz)))
 
 #else
 
-#include <stdlib.h>
+#define mymalloc(fn, sz)            myptrchk(fn, malloc(sz))
+#define mymalloc_atomic(fn, sz)     myptrchk(fn, malloc(sz))
+#define myrealloc(fn, p, sz)        myptrchk(fn, realloc((p),(sz)))
+#define myfree(fn, p)               (void)(free(p), (p)=0)
 
-#define mymalloc(fn, sz)            myptrchk(fn, malloc(sz)        )
-#define mycalloc(fn, n, sz)         myptrchk(fn, calloc((n),(sz))  )
-#define myrealloc(fn, p, sz)        myptrchk(fn, realloc((p),(sz)) )
-#define mymalloc_atomic(fn, sz)     myptrchk(fn, malloc(sz)        )
-#define mycalloc_atomic(fn, n, sz)  myptrchk(fn, calloc((n),(sz))  )
-#define myfree(fn, p)               (void)(free(p), fn)
-#define mymemcheck()              
+#define mycalloc(fn, n, sz)         myptrchk(fn, calloc((n),(sz)))
+#define mycalloc_atomic(fn, n, sz)  myptrchk(fn, calloc((n),(sz)))
+#define myrecalloc(fn, p, osz, sz)  ((void*)((char*)memset((char*)myptrchk(fn,realloc((p),(sz)))+(osz),0,(sz)-(osz))-(osz)))
 
 #endif
 
@@ -33,6 +33,9 @@
 void  mad_mem_handler(int sig);
 
 // --- inliners ---------------------------------------------------------------
+
+#include <stdlib.h>
+#include <string.h>
 
 static inline void*
 myptrchk(const char *caller, void *ptr)
@@ -44,4 +47,3 @@ myptrchk(const char *caller, void *ptr)
 }
 
 #endif // MAD_MEM_H
-

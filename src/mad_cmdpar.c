@@ -223,14 +223,8 @@ void
 grow_command_parameter_list(struct command_parameter_list* p)
 {
   const char *rout_name = "grow_command_parameter_list";
-  struct command_parameter** c_loc = p->parameters;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->parameters = myrealloc(rout_name, p->parameters, new * sizeof *p->parameters);
-  p->parameters = mycalloc(rout_name, new, sizeof *p->parameters);
-  for (int j = 0; j < p->curr; j++) p->parameters[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  p->max *= 2;
+  p->parameters = myrecalloc(rout_name, p->parameters, p->curr * sizeof *p->parameters, p->max * sizeof *p->parameters);
 }
 
 void

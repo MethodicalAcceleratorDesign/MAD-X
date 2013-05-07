@@ -121,18 +121,16 @@ spec_join(char** it_list, int n)
   /* replaces variable in table(...) by original string */
 {
   const char *rout_name = "spec_join";
-  int j;
-  char** p;
-  struct variable* var;
   *c_join->c = '\0';
   if (n > 0) {
-    p = mymalloc(rout_name, n * sizeof *p);
-    for (j = 0; j < n; j++) p[j] = it_list[j];
-    for (j = 0; j < n; j++)
-      if (strcmp(p[j], "table") == 0 && j+3 < n
-          && (var = find_variable(p[j+2], variable_list)) != NULL)
+    char** p = mymalloc(rout_name, n * sizeof *p);
+    for (int j = 0; j < n; j++) p[j] = it_list[j];
+    for (int j = 0; j < n; j++) {
+      struct variable* var;
+      if (strcmp(p[j], "table") == 0 && j+3 < n  && (var = find_variable(p[j+2], variable_list)) != NULL)
         p[j+2] = var->string;
-    for (j = 0; j < n; j++) strcat(c_join->c, p[j]);
+    }
+    for (int j = 0; j < n; j++) strcat(c_join->c, p[j]);
     myfree(rout_name, p);
   }
   return c_join->c;

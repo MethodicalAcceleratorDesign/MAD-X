@@ -86,14 +86,8 @@ void
 grow_in_cmd_list(struct in_cmd_list* p)
 {
   const char *rout_name = "grow_in_cmd_list";
-  struct in_cmd** c_loc = p->in_cmds;
-  int new = 2*p->max;
-
-  p->max = new;
-//  p->in_cmds = myrealloc(rout_name, p->in_cmds, new * sizeof *p->in_cmds);
-  p->in_cmds = mycalloc(rout_name, new, sizeof *p->in_cmds);
-  for (int j = 0; j < p->curr; j++) p->in_cmds[j] = c_loc[j];
-  myfree(rout_name, c_loc);
+  p->max *= 2;
+  p->in_cmds = myrecalloc(rout_name, p->in_cmds, p->curr * sizeof *p->in_cmds, p->max * sizeof *p->in_cmds);
 }
 
 void

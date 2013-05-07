@@ -141,13 +141,8 @@ static void
 grow_node_list(struct node_list* p)
 {
   const char *rout_name = "grow_node_list";
-  struct node** n_loc = p->nodes;
-  int new = 2*p->max;
-  p->max = new;
-//  p->nodes = myrealloc(rout_name, p->nodes, new * sizeof *p->nodes);
-  p->nodes = mycalloc(rout_name, new, sizeof *p->nodes);
-  for (int j = 0; j < p->curr; j++) p->nodes[j] = n_loc[j];
-  myfree(rout_name, n_loc);
+  p->max *= 2;
+  p->nodes = myrecalloc(rout_name, p->nodes, p->curr * sizeof *p->nodes, p->max * sizeof *p->nodes);
 }
 
 void
