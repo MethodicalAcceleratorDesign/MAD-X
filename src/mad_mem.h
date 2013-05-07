@@ -10,7 +10,7 @@
 #define mymalloc(fn, sz)            myptrchk(fn, GC_MALLOC_IGNORE_OFF_PAGE(sz))
 #define mymalloc_atomic(fn, sz)     myptrchk(fn, GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE(sz))
 #define myrealloc(fn, p, sz)        myptrchk(fn, GC_REALLOC((p),(sz)))
-#define myfree(fn, p)               (void)((p)=0)
+#define myfree(fn, p)               ((void)((void)fn, (p)=0))
 
 #define mycalloc(fn, n, sz)         memset(mymalloc(fn, (n)*(sz)), 0, (n)*(sz))
 #define mycalloc_atomic(fn, n, sz)  memset(mymalloc_atomic(fn, (n)*(sz)), 0, (n)*(sz))
@@ -21,7 +21,7 @@
 #define mymalloc(fn, sz)            myptrchk(fn, malloc(sz))
 #define mymalloc_atomic(fn, sz)     myptrchk(fn, malloc(sz))
 #define myrealloc(fn, p, sz)        myptrchk(fn, realloc((p),(sz)))
-#define myfree(fn, p)               (void)(free(p), (p)=0)
+#define myfree(fn, p)               ((void)(free(p), (void)fn, (p)=0))
 
 #define mycalloc(fn, n, sz)         myptrchk(fn, calloc((n),(sz)))
 #define mycalloc_atomic(fn, n, sz)  myptrchk(fn, calloc((n),(sz)))
