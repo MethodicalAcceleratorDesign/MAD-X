@@ -36,20 +36,16 @@ libgc-%64:      ARCH := 64
 libgc-intel32 libgc-intel64:
 	$E "*** Building $@"
 	$_ cd gc ; \
-    env CC="icc -m$(ARCH)" ./configure --enable-static --disable-shared ; \
-    make clean ; \
-    make ; \
-    cd - ; \
+    env CC="icc -m$(ARCH)" ./configure --enable-static --disable-shared --disable-threads ; \
+    make clean ; make ; make check ; cd - ; \
     cp -f gc/.libs/libgc.a libgc-macosx$(ARCH).a ; \
     ln -sf libgc-macosx$(ARCH).a libgc$(ARCH).a
 
 libgc-gnu32 libgc-gnu64:
 	$E "*** Building $@"
 	$_ cd gc ; \
-    env CC="gcc -m$(ARCH)" ./configure --enable-static --disable-shared ; \
-    make clean ; \
-    make ; \
-    cd - ; \
+    env CC="gcc -m$(ARCH)" ./configure --enable-static --disable-shared --disable-threads ; \
+    make clean ; make ; make check ; cd - ; \
     cp -f gc/.libs/libgc.a libgc-macosx$(ARCH)-gnu.a ; \
     ln -sf libgc-macosx$(ARCH)-gnu.a libgc$(ARCH).a
 
