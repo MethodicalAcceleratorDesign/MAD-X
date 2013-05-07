@@ -42,7 +42,7 @@ madx-linux-lahey:   madx-linux32-lahey  madx-linux64-lahey
 madx-linux-nagfor:  madx-linux32-nagfor madx-linux64-nagfor
 
 madx-linux%: MAKE_OPTS = -j5
-madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes APPENDLD=yes
+madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
 madx-linux%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-linux32:
@@ -88,7 +88,7 @@ libmadx-linux-gnu:  libmadx-linux32-gnu  libmadx-linux64-gnu
 
 libmadx-linux%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-linux%: MAKE_OPTS  = -j5 --no-print-directory -C libs/madx
-libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no APPENDLD=yes
+libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=no APPENDLD=yes
 libmadx-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 

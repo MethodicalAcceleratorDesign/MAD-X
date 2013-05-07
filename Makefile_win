@@ -33,7 +33,7 @@ all-win64:  madx-win64  numdiff-win64
 madx-win:   madx-win32  madx-win64
 
 madx-win%: MAKE_OPTS = -j5
-madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes APPENDLD=yes
+madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
 madx-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@.exe $@.exe &&,) $(CP) $@.exe
 
 madx-win32:

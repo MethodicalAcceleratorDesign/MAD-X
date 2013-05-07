@@ -37,8 +37,9 @@ LIBS += -L/usr/X11R6/lib -lX11
 endif
 
 # Garbage Collector
+
 ifeq ($(USEGC),yes)
-LIBS += -Llibs/gc -lgc$(ARCH)
+LIBS += -Llibs$/gc -lgc$(ARCH)
 endif
 
 # end of makefile

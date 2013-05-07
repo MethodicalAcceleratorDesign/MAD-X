@@ -44,7 +44,7 @@ madx-macosx:        madx-macosx32         madx-macosx64
 madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
 
 madx-macosx%: MAKE_OPTS = -j5
-madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=no APPENDLD=yes
+madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
 madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-macosx32:
@@ -74,7 +74,7 @@ libmadx-macosx-gnu: libmadx-macosx32-gnu  libmadx-macosx64-gnu
 
 libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-macosx%: MAKE_OPTS  = -j5 --no-print-directory -C libs/madx
-libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no APPENDLD=yes
+libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=no APPENDLD=yes
 libmadx-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
 libmadx-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
