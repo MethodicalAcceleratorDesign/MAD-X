@@ -57,7 +57,7 @@ cleanbuild:
 	$E "** Removing $(PRJNAME)"
 	$_ $(RM) $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 
-cleanall: cleandir cleantest
+cleanall: cleandir cleanbuild cleantest
 	$E "** Removing" $(DESTDIR)
 	$_ $(RMDIR) $(DESTDIR)
   
