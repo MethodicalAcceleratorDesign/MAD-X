@@ -120,6 +120,11 @@ madx_start(void)
 {
   struct tm* tm;
 
+#ifdef _USEGC
+  // init garbage collector
+  GC_INIT();
+#endif
+
   // set signal handlers (temporary)
   set_sigterm();
 

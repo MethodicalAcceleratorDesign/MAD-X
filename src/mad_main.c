@@ -1,8 +1,6 @@
-#include <stdio.h>
 #include "mad_extrn_f.h"
 #include "mad_core.h"
 #include "mad_err.h"
-#include "mad_mem.h"
 
 #define const // disable const for this module
 #include "mad_main.h"
@@ -90,10 +88,6 @@ mad_init(int argc, char *argv[])
 
 #ifdef _G95
   g95_runtime_start(argc, argv);
-#endif
-
-#ifdef _USEGC
-  GC_INIT();
 #endif
 
   madx_start();

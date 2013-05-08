@@ -34,9 +34,6 @@ void  mad_mem_handler(int sig);
 
 // --- inliners ---------------------------------------------------------------
 
-#include <stdlib.h>
-#include <string.h>
-
 static inline void*
 myptrchk(const char *caller, void *ptr)
 {

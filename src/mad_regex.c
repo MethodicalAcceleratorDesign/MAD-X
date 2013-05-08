@@ -1,10 +1,4 @@
-#include <stddef.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "mad_err.h"
-#include "mad_mem.h"
-#include "mad_regex.h"
+#include "madx.h"
 
 // private types
 
