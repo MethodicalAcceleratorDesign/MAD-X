@@ -104,10 +104,7 @@ test-twiss:          TESTSUITE := Twiss testsuite
 
 # madx supported command for tests
 ifndef MADX
-MADXCMD := $(firstword $(wildcard \
-             $(PROJECT)_dev$(ARCH)$(BINARY_EXT) $(PROJECT)_dev$(BINARY_EXT) \
-             $(PROJECT)-dev$(ARCH)$(BINARY_EXT) $(PROJECT)-dev$(BINARY_EXT) \
-             $(PROJECT)$(ARCH)$(BINARY_EXT)     $(PROJECT)$(BINARY_EXT) ))
+MADXCMD := $(firstword $(wildcard $(PROJECT)$(ARCH)$(BINARY_EXT) $(PROJECT)$(BINARY_EXT)))
 MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH)$(BINARY_EXT))
 endif
 

@@ -1547,7 +1547,6 @@ tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
 tools/numdiff/Makefile_lib -text
-tools/numdiff/README -text
 tools/numdiff/src/args.c -text
 tools/numdiff/src/args.h -text
 tools/numdiff/src/constraint.c -text
