@@ -96,13 +96,13 @@ libmadx-linux32:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes ONLINE=yes STATIC=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
-libmadx-linux32-gnu:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes   && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
-
 libmadx-linux64:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+
+libmadx-linux32-gnu:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes   && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-gnu:
 	$E "*** Building $@"
@@ -163,7 +163,7 @@ numdiff-linux64:
 
 numdiff-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32
 
 numdiff-linux64-gnu:
 	$E "*** Building $@"
