@@ -32,7 +32,7 @@ CPPFLAGS += -D_GXX
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -W -pedantic -c
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -W -Wextra -pedantic -c
 
 #
 # options flags
@@ -66,6 +66,7 @@ endif
 
 CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual -Winline \
             -Wfloat-equal -Wconversion -Wno-conversion \
-            -Wchar-subscripts -Wwrite-strings
+            -Wchar-subscripts -Wwrite-strings \
+            -Wimplicit-function-declaration
 
 # end of makefile

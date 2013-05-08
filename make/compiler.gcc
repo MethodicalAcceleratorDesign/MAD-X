@@ -67,7 +67,7 @@ endif
 CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
           -Wchar-subscripts -Wconversion -Wno-conversion -Winline \
           -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
-          -Wstrict-prototypes
+          -Wimplicit-function-declaration
 
 #         -Wfloat-equal -Wformat-nonliteral -Wwrite-strings
 
