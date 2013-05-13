@@ -1138,6 +1138,9 @@ tests/test-match-8/test-match-8.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text
+tests/test-memory/test-memory.cfg -text
+tests/test-memory/test-memory.madx -text
+tests/test-memory/test-memory.ref -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-normal/fort.18.cfg -text
