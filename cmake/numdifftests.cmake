@@ -64,3 +64,8 @@ numdiff_test(test-touschek-2 1)
 
 numdiff_test(test-setvars_lin 0)
 numdiff_test(test-thick-quad 0)
+
+if(USE_GC)
+   numdiff_test(test-memory 1)
+   set_tests_properties(test-memory_LONG PROPERTIES TIMEOUT 60)
+endif()
