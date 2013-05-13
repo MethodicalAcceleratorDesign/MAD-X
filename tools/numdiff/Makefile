@@ -50,6 +50,9 @@ CC := gcc
 # Linker (default is C compiler)
 LD  = $(CC)
 
+# Tester (default is numdiff)
+ND  := numdiff
+
 ####################
 # Makefile includes
 

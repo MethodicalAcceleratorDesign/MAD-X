@@ -1550,6 +1550,7 @@ tools/numdiff/CMakeLists.txt -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
 tools/numdiff/Makefile_lib -text
+tools/numdiff/Makefile_test -text
 tools/numdiff/src/args.c -text
 tools/numdiff/src/args.h -text
 tools/numdiff/src/constraint.c -text
@@ -1572,9 +1573,11 @@ tools/numdiff/src/utils.h -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.cfg -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.lhs -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.rhs -text
+tools/numdiff/tests/test-register-2/test-register-2.ref -text
 tools/numdiff/tests/test-register/test-register.nd.cfg -text
 tools/numdiff/tests/test-register/test-register.nd.lhs -text
 tools/numdiff/tests/test-register/test-register.nd.rhs -text
+tools/numdiff/tests/test-register/test-register.ref -text
 win/tpsa.dll -text svneol=unset#unset
 win/tpsa.lib -text svneol=unset#unset
 win/win32calls.fi -text
