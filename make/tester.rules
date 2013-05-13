@@ -32,6 +32,9 @@ tests: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-long),$(tests-all))
 # rule for one test
 #
 $(sort $(TESTS) $(tests-all)):
+ifeq ($(TRACETEST),yes)
+	$E "running test $(@F)"
+endif
 	$(run-test)
 
 #
