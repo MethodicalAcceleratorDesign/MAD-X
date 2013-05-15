@@ -3265,7 +3265,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   !---- Add the missing focussing component of thin dipoles
   if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
      re(2,1)=re(2,1)-dipr*dipr/elrad
-     re(4,1)=re(4,1)-dipi*dipi/elrad
+     re(4,3)=re(4,3)-dipi*dipi/elrad
   endif
   re(2,6) = + dipr * bi
   re(4,6) = - dipi * bi
