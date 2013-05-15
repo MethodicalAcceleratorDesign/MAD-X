@@ -1540,6 +1540,17 @@ tests/test-twiss-7/test-twiss-7.madx -text
 tests/test-twiss-7/test-twiss-7.ref -text
 tests/test-twiss-7/twiss1.cfg -text
 tests/test-twiss-7/twiss1.ref -text
+tests/test-twiss-8/test-twiss-8.cfg -text
+tests/test-twiss-8/test-twiss-8.madx -text
+tests/test-twiss-8/test-twiss-8.ref -text
+tests/test-twiss-8/thick.seq.cfg -text
+tests/test-twiss-8/thick.seq.ref -text
+tests/test-twiss-8/thin.seq.cfg -text
+tests/test-twiss-8/thin.seq.ref -text
+tests/test-twiss-8/twiss_thick.tfs.cfg -text
+tests/test-twiss-8/twiss_thick.tfs.ref -text
+tests/test-twiss-8/twiss_thin.tfs.cfg -text
+tests/test-twiss-8/twiss_thin.tfs.ref -text
 tests/test-twiss/sample_optics.tfs.cfg -text
 tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text

@@ -1,0 +1,22 @@
+SingleBend: sequence, refer=centre, L=2;
+A: sbend, L=2, angle:=-PI/4, at=1, tilt:=ang;
+endsequence;
+
+beam, particle=proton,energy=2,sequence=SingleBend;
+
+save, sequence=SingleBend, file="thick.seq";
+
+use, sequence=SingleBend;
+twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thick.tfs";
+
+  select, flag=makethin, class=sbend, slice=100;
+! select, flag=makethin, class=sbend, thick=true; !hbu works perfectly with upgraded makethin
+
+makethin, sequence=SingleBend, style=collim;
+use, sequence=SingleBend;
+
+twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thin.tfs";
+
+save, sequence=SingleBend, file="thin.seq";
+
+stop;

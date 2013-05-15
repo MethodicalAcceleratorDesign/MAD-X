@@ -1,0 +1,113 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.05.10      +
+  + Execution Time Stamp: 15.05.13 12.41.03 +
+  +++++++++++++++++++++++++++++++++++++++++++
+SingleBend: sequence, refer=centre, L=2;
+
+A: sbend, L=2, angle:=-PI/4, at=1, tilt:=ang;
+
+endsequence;
+
+
+
+beam, particle=proton,energy=2,sequence=SingleBend;
+
+
+
+save, sequence=SingleBend, file="thick.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+use, sequence=SingleBend;
+
+twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thick.tfs";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+    0.006729866018                  0                 50       0.8445440469 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.6895673268    5.750944903e-06    4.695626851e-06     0.003978044956 
+
+               dq2            betymax              dymax              dyrms 
+                 0                100    1.301042607e-18     1.06229684e-18 
+
+            ycomax             ycorms             deltap            synch_1 
+              0.01               0.01                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+  select, flag=makethin, class=sbend, slice=100;
+
+! select, flag=makethin, class=sbend, thick=true; !hbu works perfectly with upgraded makethin
+
+
+
+makethin, sequence=SingleBend, style=collim;
+
+makethin: style chosen : collim
+makethin: slicing sequence : singlebend
+use, sequence=SingleBend;
+
+
+
+twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thin.tfs";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+    0.006735936976                  0        52.02102055       0.8445612747 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.3893751094                  0                  0     0.003978044956 
+
+               dq2            betymax              dymax              dyrms 
+                 0                100                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+              0.01               0.01                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+save, sequence=SingleBend, file="thin.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+stop;
+
+  Number of warnings: 2
+2 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.01 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
