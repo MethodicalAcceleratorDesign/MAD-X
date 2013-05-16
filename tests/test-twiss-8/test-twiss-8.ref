@@ -3,8 +3,12 @@
   +    MAD-X 5.01.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.05.10      +
-  + Execution Time Stamp: 15.05.13 12.41.03 +
+  + Execution Time Stamp: 16.05.13 10.00.44 +
   +++++++++++++++++++++++++++++++++++++++++++
+ang:=-PI/2;             !     0.000974144    -0.00864182        before bug fix was   0.000974144       -1.41323
+
+
+
 SingleBend: sequence, refer=centre, L=2;
 
 A: sbend, L=2, angle:=-PI/4, at=1, tilt:=ang;
@@ -39,16 +43,16 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
                  2                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-    0.006729866018                  0                 50       0.8445440469 
+     0.00550262678                  0         67.4256823    5.206032104e-17 
 
              dxrms             xcomax             xcorms                 q2 
-      0.6895673268    5.750944903e-06    4.695626851e-06     0.003978044956 
+   4.250707413e-17    1.799465185e-19    1.469257171e-19     0.005476036744 
 
                dq2            betymax              dymax              dyrms 
-                 0                100    1.301042607e-18     1.06229684e-18 
+                 0                100       0.8502144848       0.6941972199 
 
             ycomax             ycorms             deltap            synch_1 
-              0.01               0.01                  0                  0 
+              0.01     0.008159299655                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -83,16 +87,16 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
                  2                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-    0.006735936976                  0        52.02102055       0.8445612747 
+    0.005485927808                  0              67.36    1.633688891e-16 
 
              dxrms             xcomax             xcorms                 q2 
-      0.3893751094                  0                  0     0.003978044956 
+    7.42503965e-17                  0                  0     0.005443305844 
 
                dq2            betymax              dymax              dyrms 
-                 0                100                  0                  0 
+                 0                100       0.8477056261       0.3908470072 
 
             ycomax             ycorms             deltap            synch_1 
-              0.01               0.01                  0                  0 
+              0.01     0.009030550714                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 

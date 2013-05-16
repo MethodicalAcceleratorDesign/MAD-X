@@ -1,4 +1,4 @@
-ang = 0;
+ang := -pi/2;
 a..1: multipole,lrad:= 0.02,knl:={( 0 - pi / 4 ) * ( 0.01 ) },tilt:=ang ;
 a..2: multipole,lrad:= 0.02,knl:={( 0 - pi / 4 ) * ( 0.01 ) },tilt:=ang ;
 a..3: multipole,lrad:= 0.02,knl:={( 0 - pi / 4 ) * ( 0.01 ) },tilt:=ang ;
