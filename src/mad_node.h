@@ -89,6 +89,7 @@ void    link_in_front(struct node*, struct node* el);
 void    resequence_nodes(struct sequence*);
 void    store_node_value(char* par, double* value);
 void    store_node_vector(char* par, int* length, double* vector);
+int     store_no_fd_err(double* errors, int* curr);
 int     count_nodes(struct sequence*);
 void    current_node_name(char* name, int* lg);
 int     get_node_count(struct node*);

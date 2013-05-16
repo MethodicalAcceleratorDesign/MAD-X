@@ -369,7 +369,46 @@ store_node_value(char* par, double* value)
   else if (strcmp(lpar, "rfm_volt") == 0) store_comm_par_value("rfm_volt", *value, el->def);
   else if (strcmp(lpar, "rfm_lag") == 0) store_comm_par_value("rfm_lag", *value, el->def);
   else if (strcmp(lpar, "rfm_harmon") == 0) store_comm_par_value("rfm_harmon", *value, el->def);
-  
+
+ /* added by FRS 29 August 2012 */
+
+  else if (strcmp(lpar, "rm11") == 0) store_comm_par_value("rm11",*value,el->def);
+  else if (strcmp(lpar, "rm12") == 0) store_comm_par_value("rm12",*value,el->def);
+  else if (strcmp(lpar, "rm13") == 0) store_comm_par_value("rm13",*value,el->def);
+  else if (strcmp(lpar, "rm14") == 0) store_comm_par_value("rm14",*value,el->def);
+  else if (strcmp(lpar, "rm15") == 0) store_comm_par_value("rm15",*value,el->def);
+  else if (strcmp(lpar, "rm16") == 0) store_comm_par_value("rm16",*value,el->def);
+  else if (strcmp(lpar, "rm21") == 0) store_comm_par_value("rm21",*value,el->def);
+  else if (strcmp(lpar, "rm22") == 0) store_comm_par_value("rm22",*value,el->def);
+  else if (strcmp(lpar, "rm23") == 0) store_comm_par_value("rm23",*value,el->def);
+  else if (strcmp(lpar, "rm24") == 0) store_comm_par_value("rm24",*value,el->def);
+  else if (strcmp(lpar, "rm25") == 0) store_comm_par_value("rm25",*value,el->def);
+  else if (strcmp(lpar, "rm26") == 0) store_comm_par_value("rm26",*value,el->def);
+  else if (strcmp(lpar, "rm31") == 0) store_comm_par_value("rm31",*value,el->def);
+  else if (strcmp(lpar, "rm32") == 0) store_comm_par_value("rm32",*value,el->def);
+  else if (strcmp(lpar, "rm33") == 0) store_comm_par_value("rm33",*value,el->def);
+  else if (strcmp(lpar, "rm34") == 0) store_comm_par_value("rm34",*value,el->def);
+  else if (strcmp(lpar, "rm35") == 0) store_comm_par_value("rm35",*value,el->def);
+  else if (strcmp(lpar, "rm36") == 0) store_comm_par_value("rm36",*value,el->def);
+  else if (strcmp(lpar, "rm41") == 0) store_comm_par_value("rm41",*value,el->def);
+  else if (strcmp(lpar, "rm42") == 0) store_comm_par_value("rm42",*value,el->def);
+  else if (strcmp(lpar, "rm43") == 0) store_comm_par_value("rm43",*value,el->def);
+  else if (strcmp(lpar, "rm44") == 0) store_comm_par_value("rm44",*value,el->def);
+  else if (strcmp(lpar, "rm45") == 0) store_comm_par_value("rm45",*value,el->def);
+  else if (strcmp(lpar, "rm46") == 0) store_comm_par_value("rm46",*value,el->def);
+  else if (strcmp(lpar, "rm51") == 0) store_comm_par_value("rm51",*value,el->def);
+  else if (strcmp(lpar, "rm52") == 0) store_comm_par_value("rm52",*value,el->def);
+  else if (strcmp(lpar, "rm53") == 0) store_comm_par_value("rm53",*value,el->def);
+  else if (strcmp(lpar, "rm54") == 0) store_comm_par_value("rm54",*value,el->def);
+  else if (strcmp(lpar, "rm55") == 0) store_comm_par_value("rm55",*value,el->def);
+  else if (strcmp(lpar, "rm56") == 0) store_comm_par_value("rm56",*value,el->def);
+  else if (strcmp(lpar, "rm61") == 0) store_comm_par_value("rm61",*value,el->def);
+  else if (strcmp(lpar, "rm62") == 0) store_comm_par_value("rm62",*value,el->def);
+  else if (strcmp(lpar, "rm63") == 0) store_comm_par_value("rm63",*value,el->def);
+  else if (strcmp(lpar, "rm64") == 0) store_comm_par_value("rm64",*value,el->def);
+  else if (strcmp(lpar, "rm65") == 0) store_comm_par_value("rm65",*value,el->def);
+  else if (strcmp(lpar, "rm66") == 0) store_comm_par_value("rm66",*value,el->def);
+
   /* end of additions */
 }
 
@@ -500,6 +539,22 @@ store_node_vector(char* par, int* length, double* vector)
   else if (strcmp(lpar, "surv_data") == 0)  
         copy_double(vector, current_node->surv_data, *length);
 
+}
+
+int
+store_no_fd_err(double* errors, int* curr)
+{
+  if (current_node->p_fd_err == NULL) {
+    current_node->p_fd_err = new_double_array(FIELD_MAX);
+    current_node->p_fd_err->curr = FIELD_MAX;
+  }
+  else {
+    if(current_node->p_fd_err->curr < *curr)
+      grow_double_array(current_node->p_fd_err);
+  }
+  current_node->p_fd_err->curr = *curr;
+  copy_double(errors, current_node->p_fd_err->a,current_node->p_fd_err->curr);
+  return current_node->p_fd_err->curr;
 }
 
 int

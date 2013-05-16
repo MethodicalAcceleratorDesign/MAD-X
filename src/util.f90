@@ -2,7 +2,7 @@ module bbfi
   implicit none
   public
   integer bbd_max
-  parameter(bbd_max=350)
+  parameter(bbd_max=2000)
   integer :: bbd_loc(bbd_max)=0,bbd_cnt=0,bbd_flag=0,bbd_pos=0
   double precision :: bb_kick(2,bbd_max)=0.d0
 end module bbfi
@@ -178,7 +178,60 @@ module trackfi
   double precision :: arad=0.d0,betas=0.d0,beti=0.d0,gammas=0.d0,dtbyds=0.d0,&
        deltas=0.d0,bet0=0.d0,bet0i=0.d0
   logical :: dodamp=.false.,dorad=.false.,dorand=.false.,fsecarb=.false.
+  save arad,betas,beti,gammas,dtbyds,bet0,bet0i
 end module trackfi
+module time_varfi
+  use twtrrfi
+  use name_lenfi
+  implicit none
+  public
+  logical time_var_m,time_var_p,time_var_c
+  integer n_time_var
+  parameter (n_time_var = 10000)
+  integer time_var_m_cnt,time_var_p_cnt,time_var_c_cnt,                  &
+       time_var_m_lnt,time_var_p_lnt,time_var_c_lnt,                     &
+       trrun_nt
+  double precision myfield(n_time_var,2,0:maxmul),                       &
+       phase_tromb(n_time_var,36),cav_volt(n_time_var),                  &
+       time_var_m_ind(n_time_var),time_var_p_ind(n_time_var),            &
+       time_var_c_ind(n_time_var),                                       &
+       time_var_m_nt(n_time_var),time_var_p_nt(n_time_var),              &
+       time_var_c_nt(n_time_var)
+  character*(name_len) time_var_m_ch(n_time_var),                        &
+       time_var_p_ch(n_time_var),time_var_c_ch(n_time_var)
+  save time_var_m_cnt,time_var_p_cnt,time_var_c_cnt,                     &
+       time_var_m_lnt,time_var_p_lnt,time_var_c_lnt,trrun_nt,            &
+       myfield,phase_tromb,cav_volt,time_var_m_ind,                      &
+       time_var_p_ind,time_var_c_ind,time_var_m_nt,time_var_p_nt,        &
+       time_var_c_nt,time_var_m_ch,time_var_p_ch,time_var_c_ch
+end module time_varfi
+module spch_bbfi
+  use name_lenfi
+  use bbfi
+  implicit none
+  public
+  integer i_turn, N_macro_surv, N_for_I, N_macro_max, N_spch, i_spch 
+  parameter(N_macro_max=10000)
+  double precision Ex_rms, Ey_rms, sigma_p, sigma_z
+  double precision Ix_array(N_macro_max), Iy_array(N_macro_max),    &
+       dpi_array(N_macro_max),                          &
+       z_part_array(N_macro_max)
+  double precision alpha, I_div_E_sum_max
+!  parameter(alpha=0.0, I_div_E_sum_max=7.0)
+  double precision betx_bb(bbd_max), bety_bb(bbd_max),              &
+       alfx_bb(bbd_max), alfy_bb(bbd_max),              &
+       gamx_bb(bbd_max), gamy_bb(bbd_max),              &
+       dx_bb(bbd_max),   dy_bb(bbd_max)
+  double precision 	rat_bb_n_ions
+  double precision   sigma_t, mean_t  ! calculate and transfer to BB
+  character*(name_len) spch_bb_name(bbd_max)
+  save i_turn,N_macro_surv,N_for_I,N_spch,i_spch,                                &
+        Ex_rms,Ey_rms,sigma_p,sigma_z,                                           &
+        Ix_array,Iy_array,dpi_array, z_part_array,                               &
+        betx_bb,bety_bb,alfx_bb,alfy_bb,gamx_bb,gamy_bb,dx_bb,dy_bb,             &
+        rat_bb_n_ions,sigma_t, mean_t,spch_bb_name
+  data(rat_bb_n_ions=1d0)
+end module spch_bbfi
 module plotfi
   implicit none
   public

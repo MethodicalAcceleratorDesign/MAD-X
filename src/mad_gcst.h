@@ -55,6 +55,9 @@ extern char*  twiss_sector_table_cols[];
 extern int    ptc_twiss_summary_table_types[];
 extern char*  ptc_twiss_summary_table_cols[];
 
+extern int    bb6d_ixy_types[];
+extern char*  bb6d_ixy_cols[];
+
 extern int    ibs_table_types[];
 extern char*  ibs_table_cols[];
 extern int    map_tab_types[];
@@ -95,7 +98,6 @@ extern int    tracksumm_table_types[];
 extern char*  tracksumm_table_cols[];
 extern int    ptcnodetrack_table_types[];
 extern char*  ptcnodetrack_table_cols[];
-
 
 extern int    trackloss_table_types[];
 extern char*  trackloss_table_cols[];

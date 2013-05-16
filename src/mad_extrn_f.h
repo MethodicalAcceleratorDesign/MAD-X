@@ -24,6 +24,9 @@
 #define next_constr_namepos next_constr_namepos_
 #define next_global next_global_
 
+// from mad_bbeam.c
+#define make_bb6d_ixy make_bb6d_ixy_
+
 // from mad_elem.c
 #define element_name element_name_
 #define el_par_vector el_par_vector_
@@ -74,6 +77,7 @@
 #define retreat_node retreat_node_
 #define store_node_value store_node_value_
 #define store_node_vector store_node_vector_
+#define store_no_fd_err store_no_fd_err_
 
 // from mad_option.c
 #define get_option get_option_ // *

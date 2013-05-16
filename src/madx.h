@@ -96,6 +96,7 @@
 #include "mad_mkthin.h"
 #include "mad_orbit.h"
 #include "mad_sodd.h"
+#include "mad_spch.h"
 #include "mad_survey.h"
 #include "mad_touschek.h"
 #include "mad_track.h"

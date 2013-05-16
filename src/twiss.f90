@@ -588,6 +588,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
   use twiss0fi
   use name_lenfi
   use twisscfi
+  use spch_bbfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -653,6 +654,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
   bbd_cnt=0
   bbd_flag=1
   !---  start
+  i_spch=0
+
   node = restart_sequ()
 10 continue
   bbd_pos=node
@@ -1131,6 +1134,7 @@ SUBROUTINE twcpgo(rt)
   use twisscfi
   use twiss_elpfi
   use twissotmfi
+  use spch_bbfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1213,6 +1217,7 @@ SUBROUTINE twcpgo(rt)
   gammas= get_value('probe ','gamma ')
   centre_cptk=.false.
   i = restart_sequ()
+  i_spch=0
 10 continue
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
@@ -1611,6 +1616,7 @@ SUBROUTINE twchgo
   use twisslfi
   use twissafi
   use twisscfi
+  use spch_bbfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1677,6 +1683,7 @@ SUBROUTINE twchgo
   centre_bttk=.false.
   i = restart_sequ()
   if(centre) currpos = zero
+  i_spch=0
 10 continue
   el = node_value('l ')
   code = node_value('mad8_type ')
@@ -2107,7 +2114,9 @@ SUBROUTINE tw_summ(rt,tt)
 
 end SUBROUTINE tw_summ
 SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
-
+  use twtrrfi
+  use name_lenfi
+  use time_varfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -2134,6 +2143,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   double precision plot_tilt,zero
   parameter (zero = 0.d0)
   !---- Initialization
+  time_var_p=.false.     
   call dzero(ek,6)
   call m66one(re)
   call dzero(te,216)
@@ -3499,6 +3509,9 @@ end SUBROUTINE tmoct
 SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
   use trackfi
+  use twtrrfi
+  use name_lenfi
+  use time_varfi  
   implicit none
 
   !----------------------------------------------------------------------*
@@ -3515,10 +3528,11 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   !     RE(6,6)   (real)    Transfer matrix.                             *
   !     TE(6,6,6) (real)    Second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  integer i1,i2,i3
+  logical fsec,ftrk,fmap,time_var
+  integer i1,i2,i3,mylen
   double precision orbit(6),ek(6),re(6,6),te(6,6,6),node_value,     &
        test,zero
+  character(name_len) name
   parameter(zero=0d0)
 
   !---- Element Kick
@@ -3566,6 +3580,93 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   re(6,4)=node_value('rm64 ')
   re(6,5)=node_value('rm65 ')
   re(6,6)=node_value('rm66 ')
+
+  time_var = node_value('time_var ') .ne. zero
+  if(time_var.and.time_var_p) then
+     time_var_p_cnt=time_var_p_cnt+1
+     time_var_p_lnt=time_var_p_lnt+1
+     if(idnint(time_var_p_ind(time_var_p_cnt)).ne.time_var_p_lnt)    &
+          call aafail('TMARB: ', 'wrong index in Table: time_var_pha')
+     call element_name(name,len(name))
+     mylen=len_trim(name)
+     if(time_var_p_ch(time_var_p_cnt)(:mylen).ne.name(:mylen))       & 
+          call aafail('TMARB: ', 'wrong element name in Table: '//   &
+          'time_var_pha')
+!---- Matrix
+     re(1,1)=phase_tromb(time_var_p_cnt,1)
+     re(1,2)=phase_tromb(time_var_p_cnt,2)
+     re(1,3)=phase_tromb(time_var_p_cnt,3)
+     re(1,4)=phase_tromb(time_var_p_cnt,4)
+     re(1,5)=phase_tromb(time_var_p_cnt,5)
+     re(1,6)=phase_tromb(time_var_p_cnt,6)
+     re(2,1)=phase_tromb(time_var_p_cnt,7)
+     re(2,2)=phase_tromb(time_var_p_cnt,8)
+     re(2,3)=phase_tromb(time_var_p_cnt,9)
+     re(2,4)=phase_tromb(time_var_p_cnt,10)
+     re(2,5)=phase_tromb(time_var_p_cnt,11)
+     re(2,6)=phase_tromb(time_var_p_cnt,12)
+     re(3,1)=phase_tromb(time_var_p_cnt,13)
+     re(3,2)=phase_tromb(time_var_p_cnt,14)
+     re(3,3)=phase_tromb(time_var_p_cnt,15)
+     re(3,4)=phase_tromb(time_var_p_cnt,16)
+     re(3,5)=phase_tromb(time_var_p_cnt,17)
+     re(3,6)=phase_tromb(time_var_p_cnt,18)
+     re(4,1)=phase_tromb(time_var_p_cnt,19)
+     re(4,2)=phase_tromb(time_var_p_cnt,20)
+     re(4,3)=phase_tromb(time_var_p_cnt,21)
+     re(4,4)=phase_tromb(time_var_p_cnt,22)
+     re(4,5)=phase_tromb(time_var_p_cnt,23)
+     re(4,6)=phase_tromb(time_var_p_cnt,24)
+     re(5,1)=phase_tromb(time_var_p_cnt,25)
+     re(5,2)=phase_tromb(time_var_p_cnt,26)
+     re(5,3)=phase_tromb(time_var_p_cnt,27)
+     re(5,4)=phase_tromb(time_var_p_cnt,28)
+     re(5,5)=phase_tromb(time_var_p_cnt,29)
+     re(5,6)=phase_tromb(time_var_p_cnt,30)
+     re(6,1)=phase_tromb(time_var_p_cnt,31)
+     re(6,2)=phase_tromb(time_var_p_cnt,32)
+     re(6,3)=phase_tromb(time_var_p_cnt,33)
+     re(6,4)=phase_tromb(time_var_p_cnt,34)
+     re(6,5)=phase_tromb(time_var_p_cnt,35)
+     re(6,6)=phase_tromb(time_var_p_cnt,36)
+!---- Matrix
+     call store_node_value('rm11 ',re(1,1))
+     call store_node_value('rm12 ',re(1,2))
+     call store_node_value('rm13 ',re(1,3))
+     call store_node_value('rm14 ',re(1,4))
+     call store_node_value('rm15 ',re(1,5))
+     call store_node_value('rm16 ',re(1,6))
+     call store_node_value('rm21 ',re(2,1))
+     call store_node_value('rm22 ',re(2,2))
+     call store_node_value('rm23 ',re(2,3))
+     call store_node_value('rm24 ',re(2,4))
+     call store_node_value('rm25 ',re(2,5))
+     call store_node_value('rm26 ',re(2,6))
+     call store_node_value('rm31 ',re(3,1))
+     call store_node_value('rm32 ',re(3,2))
+     call store_node_value('rm33 ',re(3,3))
+     call store_node_value('rm34 ',re(3,4))
+     call store_node_value('rm35 ',re(3,5))
+     call store_node_value('rm36 ',re(3,6))
+     call store_node_value('rm41 ',re(4,1))
+     call store_node_value('rm42 ',re(4,2))
+     call store_node_value('rm43 ',re(4,3))
+     call store_node_value('rm44 ',re(4,4))
+     call store_node_value('rm45 ',re(4,5))
+     call store_node_value('rm46 ',re(4,6))
+     call store_node_value('rm51 ',re(5,1))
+     call store_node_value('rm52 ',re(5,2))
+     call store_node_value('rm53 ',re(5,3))
+     call store_node_value('rm54 ',re(5,4))
+     call store_node_value('rm55 ',re(5,5))
+     call store_node_value('rm56 ',re(5,6))
+     call store_node_value('rm61 ',re(6,1))
+     call store_node_value('rm62 ',re(6,2))
+     call store_node_value('rm63 ',re(6,3))
+     call store_node_value('rm64 ',re(6,4))
+     call store_node_value('rm65 ',re(6,5))
+     call store_node_value('rm66 ',re(6,6))
+  endif
 
   !---- Second Order Terms
   if (fsec) then
@@ -5239,8 +5340,8 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  integer beamshape, b_dir_int
-  logical fsec,ftrk,fmap,first
+  integer beamshape, b_dir_int,get_option
+  logical fsec,ftrk,fmap,first,bb_ultra_relati
   double precision orbit(6),re(6,6),te(6,6,6),node_value,get_value
   double precision fk,parvec(26),q,q_prime,dp,get_variable
   double precision gamma0,beta0,beta_dp,ptot,b_dir
@@ -5267,8 +5368,13 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   b_dir = dble(b_dir_int)
   b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
   !
-  fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+  bb_ultra_relati=get_option('bb_ultra_relati ').ne.0
+  if(bb_ultra_relati) then
+     fk = two * parvec(5) * parvec(6) / parvec(7)
+  else
+     fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
        (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
+  endif
   !---- chose beamshape
   beamshape = node_value('bbshape ')
   if(beamshape.lt.1.or.beamshape.gt.3) then
@@ -5289,16 +5395,19 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   use bbfi
   use twisslfi
+  use spch_bbfi
   implicit none
 
-  logical fsec,ftrk,fmap,bborbit
-  integer get_option
+  logical fsec,ftrk,fmap,bborbit,bb_sxy_update
+  integer get_option,mylen
   double precision orbit(6),re(6,6),te(6,6,6),pi,sx,sy,  &
        xm,ym,sx2,sy2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,    &
        phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
        yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,   &
        orbit0(6),three,ten3m,explim
   double precision orbit00(6),re00(6,6),te00(6,6,6)
+  character*20 text
+  character*(name_len) name
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
        explim=150d0)
   !     if x > explim, exp(-x) is outside machine limits.
@@ -5317,8 +5426,30 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   endif
   pi=get_variable('pi ')
   fmap = .true.
-  sx = node_value('sigx ')
-  sy = node_value('sigy ')
+  bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  if(bb_sxy_update) then
+     fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
+     name=' '
+     call element_name(name,len(name))
+     mylen=len_trim(name)
+     i_spch=i_spch+1
+     
+     if(i_spch.gt.N_spch) then
+        write(text, '(1p,i8)') i_spch
+        call aafail('TMBB: ', 'Table with too few BB elements: '//  &
+             text)
+     endif
+     if(spch_bb_name(i_spch)(:mylen).ne.name(:mylen)) then
+        call aafail('TMBB: ', 'wrong element name in Table: '//     &
+             'spch_bb')
+     endif
+
+     sx=sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
+     sy=sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
+  else
+     sx = node_value('sigx ')
+     sy = node_value('sigy ')
+  endif
   xm = node_value('xma ')
   ym = node_value('yma ')
   if (fk .ne. zero)  then
@@ -6218,17 +6349,19 @@ SUBROUTINE twwmap(pos, orbit)
   integer i, k, l
   double precision sum1, sum2, pos, orbit(6)
   double precision ek(6)
+  double precision zero,two
+  parameter(zero=0d0,two=2d0)
 
   !---- Track ORBIT0 using zero kick.
   do i = 1, 6
      sum2 = orbit(i)
      do k = 1, 6
-        sum1 = 0.d0
+        sum1 = zero
         do l = 1, 6
            sum1 = sum1 + stmat(i,k,l) * sorb(l)
         enddo
         sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-        !     srmat(i,k) = srmat(i,k) - 2.d0 * sum1
+        !     srmat(i,k) = srmat(i,k) - two * sum1
      enddo
      ek(i) = sum2
   enddo
@@ -6271,7 +6404,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)      (double)  transfer matrix.                          *
   !----------------------------------------------------------------------*
   logical ftrk,fmap
-  double precision fint,tilt,e1,h,hgap,corr,ek0(6),rw(6,6),tw(6,6,6),orbit(6), &
+  double precision fint,tilt,e1,h,hgap,corr,ek0(6),rw(6,6),tw(6,6,6),orbit(6),  &
        ek(6),re(6,6),te(6,6,6),bvk,node_value,zero,one
   parameter(zero=0d0,one=1d0)
 

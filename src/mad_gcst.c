@@ -465,6 +465,17 @@ char* ibs_table_cols[] =
   " "  /* blank terminates */
 };
 
+int bb6d_ixy_types[]=
+{
+  2,2,2,2,2,2,2
+};
+
+char* bb6d_ixy_cols[]=
+{
+  "turn","n_macro_surv","n_for_i","ex_rms","ey_rms","sigma_p","sigma_z",
+  " "  /* blank terminates */
+};
+
 int map_tab_types[]=
 {
   2,1,1,1,1,1,1,1,1,1
