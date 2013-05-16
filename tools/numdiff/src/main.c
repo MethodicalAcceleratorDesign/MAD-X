@@ -18,6 +18,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "main.h"
 #include "args.h"
 #include "utils.h"
 #include "error.h"
@@ -83,6 +84,22 @@ check_transition(const char* argv[], int *total, int *failed, long lines, long n
   }
 }
 
+// counters
+static int  total, failed;
+static long lines, numbers;
+
+void
+quit(int exit_code)
+{
+  if (option.test)
+    test_summary(total, failed);
+
+  if (option.accum)
+    accum_summary(total, failed, lines, numbers);
+
+  exit(exit_code);
+}
+
 int
 main(int argc_, char** argv_)
 {
@@ -96,10 +113,6 @@ main(int argc_, char** argv_)
 
   // set logging level
   logmsg_config.level = inform_level;
-
-  // test counter
-  int  total = 0, failed  = 0;
-  long lines = 0, numbers = 0;
 
   // argument list loop (too long, should refactored)
   while (option.argi < argc) {
@@ -230,12 +243,6 @@ main(int argc_, char** argv_)
 
   option.clk_t1 = clock();
 
-  if (option.test)
-    test_summary(total, failed);
-
-  if (option.accum)
-    accum_summary(total, failed, lines, numbers);
-
-  return EXIT_SUCCESS;
+  quit(EXIT_SUCCESS);
 }
 

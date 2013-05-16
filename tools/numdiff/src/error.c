@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "main.h"
 #include "error.h"
 
 struct logmsg_config logmsg_config = {
@@ -59,7 +60,7 @@ logmsg(unsigned level, const char *file, int line, const char *fmt, ...)
   putc('\n', stderr);
 
   switch(level) {
-  case error_level: exit(EXIT_FAILURE);
+  case error_level: quit(EXIT_FAILURE);
   case abort_level: (abort)();
   }
 }

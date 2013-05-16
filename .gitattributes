@@ -1571,6 +1571,7 @@ tools/numdiff/src/context.h -text
 tools/numdiff/src/error.c -text
 tools/numdiff/src/error.h -text
 tools/numdiff/src/main.c -text
+tools/numdiff/src/main.h -text
 tools/numdiff/src/ndiff.c -text
 tools/numdiff/src/ndiff.h -text
 tools/numdiff/src/register.c -text
