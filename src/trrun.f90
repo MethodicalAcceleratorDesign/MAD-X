@@ -2866,10 +2866,11 @@ subroutine ttdpdg(track, ktrack)
   !                 track , trajectory coordinates                       *
   !----------------------------------------------------------------------*
   integer ktrack,itrack
-  double precision fint,e1,h,hgap,corr,rw(6,6),tw(6,6,6),track(6,*),&
+  double precision fint,e1,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
        node_value,zero,one
   parameter(zero=0d0,one=1d0)
 
+  call dzero(ek,6)
   call m66one(rw)
   !      call dzero(tw, 216)
 
@@ -2877,12 +2878,16 @@ subroutine ttdpdg(track, ktrack)
   h = node_value('h ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
+  tilt = node_value('tilt ')
   corr = (h + h) * hgap * fint
   !          print*,"------------------------------------------ "
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
+  if (tilt .ne. zero) then
+     call tmtilt(.false.,tilt,ek,rw,tw)
+  endif
   do itrack = 1, ktrack
      track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
      track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
