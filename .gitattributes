@@ -805,6 +805,8 @@ src/mad_seq.c -text
 src/mad_seq.h -text
 src/mad_sodd.c -text
 src/mad_sodd.h -text
+src/mad_spch.c -text
+src/mad_spch.h -text
 src/mad_str.c -text
 src/mad_str.h -text
 src/mad_stream.c -text
