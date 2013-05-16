@@ -99,7 +99,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
   save first
-  data first / .true. /
+  data first / .false. /
   save tot_turn
   data tot_turn / 0 /
   save betx_start, bety_start,                             &
@@ -3186,7 +3186,7 @@ subroutine ttdpdg(track, ktrack)
 
   call dzero(ek,6)
   call m66one(rw)
-  call dzero(tw, 216)
+!  call dzero(tw, 216)
 
   e1 = node_value('e1 ')
   h = node_value('h ')
