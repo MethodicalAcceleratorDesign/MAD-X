@@ -433,26 +433,6 @@ track_tables_create(struct in_cmd* cmd)
       add_to_table_list(t, table_register);
     }
   }
-
-#if 0
-  t = make_table("tracksumm", "tracksumm", tracksumm_table_cols,
-                 tracksumm_table_types, 2*stored_track_start->curr);
-  add_to_table_list(t, table_register);
-
-  if (get_option("recloss"))
-  {
-    t = make_table("trackloss", "trackloss", trackloss_table_cols,
-                   trackloss_table_types, stored_track_start->curr*t_size);
-    add_to_table_list(t, table_register);
-  }
-  if (get_option("onetable"))
-  {
-    t = make_table("trackone", "trackone", trackone_table_cols,
-                   trackone_table_types, stored_track_start->curr*t_size);
-    add_to_table_list(t, table_register);
-  }
-#endif
-
   else
   {
     for (i = 0; i < curr_obs_points; i++)
