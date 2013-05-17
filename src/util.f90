@@ -230,7 +230,7 @@ module spch_bbfi
         Ix_array,Iy_array,dpi_array, z_part_array,                               &
         betx_bb,bety_bb,alfx_bb,alfy_bb,gamx_bb,gamy_bb,dx_bb,dy_bb,             &
         rat_bb_n_ions,sigma_t, mean_t,spch_bb_name
-  data(rat_bb_n_ions=1d0)
+  data rat_bb_n_ions / 1d0 /
 end module spch_bbfi
 module plotfi
   implicit none

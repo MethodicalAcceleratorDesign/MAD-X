@@ -6411,7 +6411,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !-- LD: modified to include corrections from Frank.
   call dzero(ek0,6)
   call m66one(rw)
-  call dzero(tw,6*6*6)
+  call dzero(tw,216)
 
   e1 = node_value('e1 ')
   h = node_value('h ')
@@ -6431,7 +6431,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
   !---- Apply tilt.
   if (tilt .ne. zero) then
-     call tmtilt(.true.,tilt,ek,re,te)
+     call tmtilt(.false.,tilt,ek,re,te)
   endif
   if (ftrk) then
      call tmtrak(ek,re,te,orbit,orbit)

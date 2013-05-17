@@ -57,12 +57,13 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   code_buf    int(nelem)  local mad-8 code storage                   *
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
-  logical onepass,onetable,last_out,info,aperflag,doupdate,first,virgin_state
+  logical onepass,onetable,last_out,info,aperflag,doupdate,first,        &
+       bb_sxy_update,virgin_state
   integer j,code,restart_sequ,advance_node,                              &
        node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
        ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
-       segment, e_flag, nobs,lobs,int_arr(1),tot_segm,code_buf(*),tot_turn, &
-       max_turn
+       segment, e_flag, nobs,lobs,int_arr(1),tot_segm,code_buf(*),       &
+       tot_turn,max_turn
   parameter(max_turn=20000)
   integer part_id_keep(max_turn),last_turn_keep(max_turn)
   double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),          &
@@ -99,7 +100,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !hbu
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
   save first
-  data first / .false. /
+  data first / .true. /
   save tot_turn
   data tot_turn / 0 /
   save betx_start, bety_start,                             &
@@ -132,44 +133,22 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      endif
   else
   endif
-  !-------added by Yipeng SUN 01-12-2008--------------
 
-  !---- AK 2006 04 23
-  !---- This version of trrun.F gets rid of all problems concerning delta_p
-  !---- by eliminating any delta_p dependence and using full 6D formulae only!!!
-  !---- Only the parts of the code that deal with radiation effects still use
-  !---- the quantity delta_p
+  bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  if(bb_sxy_update) then
+     virgin_state = get_value('run ', 'virgin_state ') .ne. zero
+     if(virgin_state) first=.true.
 
-  !      print *,"madX::trrun.F"
-  !      print *," "
-  !      print *," AK special version 2006/04/23"
-  !      print *," ============================="
-  !      print *," Full 6D formulae internally only."
+     call table_input(                                 &
+          betx_start, bety_start,                      &
+          alfx_start, alfy_start,                      &
+          gamx_start, gamy_start,                      &
+          dx_start,    dpx_start,                      &
+          dy_start,    dpy_start)
 
-!Read time varying fields and phasors
+     if(first) call make_bb6d_ixy(turns)
+  endif
 
-!  betx_start=one
-!  bety_start=one
-!  alfx_start=zero
-!  alfy_start=zero
-!  gamx_start=one
-!  gamy_start=one
-!  dx_start=zero
-!  dpx_start=zero
-!  dy_start=zero
-!  dpy_start=zero
-
-  virgin_state = get_value('run ', 'virgin_state ') .ne. zero
-  if(virgin_state) first=.true.
-
-  call table_input(                                 &
-       betx_start, bety_start,                      &
-       alfx_start, alfy_start,                      &
-       gamx_start, gamy_start,                      &
-       dx_start,    dpx_start,                      &
-       dy_start,    dpy_start)
-
-  if(first) call make_bb6d_ixy(turns)
   if(fsecarb) then
      write (msg,*) 'Second order terms of arbitrary Matrix not '//   &
           'allowed for tracking.'
@@ -229,7 +208,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   nlm=0
   !hbu
   el_name='start           '
-
   !--- enter start coordinates in summary table
   do  i = 1,j_tot
      tmp_d = i
@@ -244,7 +222,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
-
   !--- enter first turn, and possibly eigen in tables
   if (switch .eq. 1)  then
      if (onetable)  then
@@ -279,116 +256,127 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   !--- loop over turns
   nobs = 0
-  trrun_nt=0
 
-  if(first) then
-     time_var_m_cnt=0
-     time_var_p_cnt=0
-     time_var_c_cnt=0
-     N_macr_prt_ini = get_value('run ', 'n_macr_prt_ini ')
-     !      <<N_macro_part_ini=N_macro_surv+N_macro_lost>>
-     N_ions_in_beam=get_value('probe ', 'npart ') !BEAM->NPART
-     if(N_ions_in_beam .LT. zero) call aafail('TRRUN: ','N_ions_in_beam .LE. 0.0')
-     Npart_gain = get_value('run ', 'n_part_gain ')
-     N_ions_ini=Npart_gain*N_ions_in_beam
-     n_ions_macro=N_ions_ini/N_macr_prt_ini
+  if(bb_sxy_update) then
+     trrun_nt=0
 
-     N_macro_surv=jmax    ! = number of START lines submitted
-     N_for_I=N_macro_surv ! at start (to be redefined in Ixy)
-     if(N_macr_prt_ini .GT. N_macro_max) call aafail('TRRUN: ',&
-          'Number N_macr_prt_ini exceeds N_macro_max (array size)')
-     if(N_macro_surv .GT. N_macr_prt_ini) call aafail('TRRUN: ',&
-          'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
-     t_rms = get_value('run ', 't_rms ')
-     sigma_z_ini=betas*t_rms !betas: BEAM->BETA
-     sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
-     sigma_p=zero       !default
-     z_factor=one !at start sigma_z_ini/sigma_z
-     Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
-     Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
-     first=.false.
+     if(first) then
+        time_var_m_cnt=0
+        time_var_p_cnt=0
+        time_var_c_cnt=0
+        N_macr_prt_ini = get_value('run ', 'n_macr_prt_ini ')
+        !      <<N_macro_part_ini=N_macro_surv+N_macro_lost>>
+        N_ions_in_beam=get_value('probe ', 'npart ') !BEAM->NPART
+        if(N_ions_in_beam .LT. zero) call aafail('TRRUN: ','N_ions_in_beam .LE. 0.0')
+        Npart_gain = get_value('run ', 'n_part_gain ')
+        N_ions_ini=Npart_gain*N_ions_in_beam
+        n_ions_macro=N_ions_ini/N_macr_prt_ini
+
+        N_macro_surv=jmax    ! = number of START lines submitted
+        N_for_I=N_macro_surv ! at start (to be redefined in Ixy)
+        if(N_macr_prt_ini .GT. N_macro_max) call aafail('TRRUN: ',&
+             'Number N_macr_prt_ini exceeds N_macro_max (array size)')
+        if(N_macro_surv .GT. N_macr_prt_ini) call aafail('TRRUN: ',&
+             'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
+        t_rms = get_value('run ', 't_rms ')
+        sigma_z_ini=betas*t_rms !betas: BEAM->BETA
+        sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
+        sigma_p=zero       !default
+        z_factor=one !at start sigma_z_ini/sigma_z
+        Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
+        Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
+        first=.false.
+     endif
   endif
 
   do turn = 1, turns
+
      if (doupdate) call trupdate(turn)
 
      j = restart_sequ()
-     trrun_nt=turn
-     time_var_m_lnt=0
-     time_var_p_lnt=0
-     time_var_c_lnt=0
 
-     N_macro_surv=jmax
-     i_spch = 0 !a special spch-update counter
+     if(bb_sxy_update) then
+        trrun_nt=turn
+        time_var_m_lnt=0
+        time_var_p_lnt=0
+        time_var_c_lnt=0
+
+        N_macro_surv=jmax
+        i_spch = 0 !a special spch-update counter
 
 
-     !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
-     call ixy_calcs(betas, orbit0, z,                                &
-          betx_start, bety_start,                      &
-          alfx_start, alfy_start,                      &
-          gamx_start, gamy_start,                      &
-          dx_start,    dpx_start,                      &
-          dy_start,    dpy_start)
-     call ixy_fitting()
+        !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
+        call ixy_calcs(betas, orbit0, z,                                &
+             betx_start, bety_start,                      &
+             alfx_start, alfy_start,                      &
+             gamx_start, gamy_start,                      &
+             dx_start,    dpx_start,                      &
+             dy_start,    dpy_start)
+        call ixy_fitting()
 
-     call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
-     call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
-     call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
-     call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
-     call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
-     call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
-     call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
-     call augment_count('bb6d_ixy ')
+        call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+        call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
+        call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
+        call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
+        call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
+        call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
+        call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
+        call augment_count('bb6d_ixy ')
 
-     if((sigma_z.GT.zero).AND.(sigma_z_ini.GT.zero)) then
-        z_factor=sigma_z_ini/sigma_z
-     else
-        z_factor=1D0
+        if((sigma_z.GT.zero).AND.(sigma_z_ini.GT.zero)) then
+           z_factor=sigma_z_ini/sigma_z
+        else
+           z_factor=1D0
+        endif
+
+        N_ions_for_bb=n_ions_macro*N_for_I*z_factor
+        if(N_ions_in_beam.le.zero) then
+           rat_bb_n_ions=zero
+        else
+           rat_bb_n_ions=N_ions_for_bb/N_ions_in_beam
+        endif
+
+        if(idnint(time_var_m_nt(time_var_m_cnt+1)).eq.tot_turn+turn) then
+           time_var_m=.true.
+        else
+           time_var_m=.false.
+        endif
+        if(idnint(time_var_p_nt(time_var_p_cnt+1)).eq.tot_turn+turn) then
+           time_var_p=.true.
+        else
+           time_var_p=.false.
+        endif
+        if(idnint(time_var_c_nt(time_var_c_cnt+1)).eq.tot_turn+turn) then
+           time_var_c=.true.
+        else
+           time_var_c=.false.
+        endif
      endif
 
-     N_ions_for_bb=n_ions_macro*N_for_I*z_factor
-     if(N_ions_in_beam.le.zero) then
-        rat_bb_n_ions=zero
-     else
-        rat_bb_n_ions=N_ions_for_bb/N_ions_in_beam
-     endif
-
-     if(idnint(time_var_m_nt(time_var_m_cnt+1)).eq.tot_turn+turn) then
-        time_var_m=.true.
-     else
-        time_var_m=.false.
-     endif
-     if(idnint(time_var_p_nt(time_var_p_cnt+1)).eq.tot_turn+turn) then
-        time_var_p=.true.
-     else
-        time_var_p=.false.
-     endif
-     if(idnint(time_var_c_nt(time_var_c_cnt+1)).eq.tot_turn+turn) then
-        time_var_c=.true.
-     else
-        time_var_c=.false.
-     endif
      nlm = 0
      sum=zero
+
+     if(bb_sxy_update) then
 !VVK 20100321 -------- Find RMS-value of t ----------------------
 ! if we do 1-turn tracking, orbit0(5)=0 always
-     Summ_t_mean=zero
-     do i_part=1, jmax
-        if (abs(z(5,i_part)) .GE. zero) then
-           Summ_t_mean=Summ_t_mean+z(5,i_part)
-        else
-           Print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
-        endif
-     enddo
-     mean_t=Summ_t_mean/dble(jmax)
+        Summ_t_mean=zero
+        do i_part=1, jmax
+           if (abs(z(5,i_part)) .GE. zero) then
+              Summ_t_mean=Summ_t_mean+z(5,i_part)
+           else
+              Print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
+           endif
+        enddo
+        mean_t=Summ_t_mean/dble(jmax)
 
-     Summ_t_square=zero
-     do i_part=1, jmax
-        if (abs(z(5,i_part)) .GE. zero) &
-             Summ_t_square=Summ_t_square+(z(5,i_part)-mean_t)**2
-     enddo
-     sigma_t=sqrt(Summ_t_square/dble(jmax))
+        Summ_t_square=zero
+        do i_part=1, jmax
+           if (abs(z(5,i_part)) .GE. zero) &
+                Summ_t_square=Summ_t_square+(z(5,i_part)-mean_t)**2
+        enddo
+        sigma_t=sqrt(Summ_t_square/dble(jmax))
 !-----------------------------------------------------------------
+     endif
 
      !--- loop over nodes
 10   continue
@@ -405,6 +393,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
+           sum = node_value('name ')
            print*," "
            print*,"Track dies nicely"
            print*,"Thick lenses will get nowhere"
@@ -463,12 +452,12 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
            call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,      &
                 z, obs_orb,spos,nlm,el_name)
         else
-          if (mod(turn, ffile) .eq. 0)  then
-            do i = 1, jmax
-                !hbu add spos
-                call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
-                    spos)
-            enddo
+           if (mod(turn, ffile) .eq. 0)  then
+              do i = 1, jmax
+                 !hbu add spos
+                 call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
+                      spos)
+              enddo
            endif
         endif
      endif
@@ -520,14 +509,18 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      enddo
   enddo
   turn = min(turn, turns)
-  tot_turn=tot_turn+turn
-  do i = 1, jmax
-     part_id_keep(i)=part_id(i) 
-     last_turn_keep(i)=last_turn(i)
-     do j=1,6
-        z_keep(j,i)=z(j,i)
+
+  if(bb_sxy_update) then
+     tot_turn=tot_turn+turn
+     do i = 1, jmax
+        part_id_keep(i)=part_id(i) 
+        last_turn_keep(i)=last_turn(i)
+        do j=1,6
+           z_keep(j,i)=z(j,i)
+        enddo
      enddo
-  enddo
+  endif
+
   !--- enter last turn in tables if not done already
   if (.not. last_out)  then
      if (switch .eq. 1)  then
@@ -1518,7 +1511,6 @@ subroutine ttrf(track,ktrack)
   !---- Fetch data.
   !      el = node_value('l ')
   !      el1 = node_value('l ')
-
   rfv = bvk * node_value('volt ')
   time_var = node_value('time_var ') .ne. zero
   if(time_var.and.time_var_c) then
@@ -2261,10 +2253,6 @@ subroutine ttbb_gauss(track,ktrack,fk)
      sy = node_value('sigy ')
   endif
 
-!  if(i_spch.EQ.1 .OR. i_spch.EQ.N_spch) then
-!     Print *, 'i_spch, sx, sy=', i_spch, sx, sy
-!  endif
-
   xm = node_value('xma ')
   ym = node_value('yma ')
   if(bb_sxy_update) fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
@@ -2280,7 +2268,6 @@ subroutine ttbb_gauss(track,ktrack,fk)
   endif
   sx2 = sx*sx
   sy2 = sy*sy
-
   !---- limit formulae for sigma(x) = sigma(y).
   if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
      do itrack = 1, ktrack
@@ -2289,23 +2276,37 @@ subroutine ttbb_gauss(track,ktrack,fk)
         rho2 = xs * xs + ys * ys
         tk = rho2 / (two * sx2)
 
-          gauss_factor_t=                                 &!VVK 20100321
-          exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+        if(bb_sxy_update) then
+           gauss_factor_t=                                 &!VVK 20100321
+                exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
 
-        if (tk .gt. explim) then
-           phix = xs * fk / rho2 &
-                *gauss_factor_t !VVK 20100321
-           phiy = ys * fk / rho2 &
-                *gauss_factor_t !VVK 20100321
-       else if (rho2 .ne. zero) then
-           phix = xs * fk / rho2 * (one - exp(-tk) ) &
-                *gauss_factor_t !VVK 20100321
-           phiy = ys * fk / rho2 * (one - exp(-tk) ) &
-                *gauss_factor_t !VVK 20100321
+           if (tk .gt. explim) then
+              phix = xs * fk / rho2 &
+                   *gauss_factor_t !VVK 20100321
+              phiy = ys * fk / rho2 &
+                   *gauss_factor_t !VVK 20100321
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) ) &
+                   *gauss_factor_t !VVK 20100321
+              phiy = ys * fk / rho2 * (one - exp(-tk) ) &
+                   *gauss_factor_t !VVK 20100321
+           else
+              phix = zero
+              phiy = zero
+           endif
         else
-           phix = zero
-           phiy = zero
+           if (tk .gt. explim) then
+              phix = xs * fk / rho2
+              phiy = ys * fk / rho2
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) )
+              phiy = ys * fk / rho2 * (one - exp(-tk) )
+           else
+              phix = zero
+              phiy = zero
+           endif
         endif
+
         if (ipos .ne. 0)  then
            !--- subtract closed orbit kick
            phix = phix - bb_kick(1,ipos)
@@ -2322,9 +2323,13 @@ subroutine ttbb_gauss(track,ktrack,fk)
  !        rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
      do itrack = 1, ktrack
-        gauss_factor_t= &                                !VVK 20100321
-             exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
-        rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
+
+        if(bb_sxy_update) then
+           gauss_factor_t= &                                !VVK 20100321
+                exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+           rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
+        endif
+
         xs = track(1,itrack) - xm
         ys = track(3,itrack) - ym
         xr = abs(xs) / r
@@ -2357,9 +2362,13 @@ subroutine ttbb_gauss(track,ktrack,fk)
 !        rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
      do itrack = 1, ktrack
-        gauss_factor_t= &                                !VVK 20100321
-             exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
-        rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
+
+        if(bb_sxy_update) then
+           gauss_factor_t= &                                !VVK 20100321
+                exp(-half*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+           rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
+        endif
+
         xs = track(1,itrack) - xm
         ys = track(3,itrack) - ym
         xr = abs(xs) / r
@@ -3186,7 +3195,7 @@ subroutine ttdpdg(track, ktrack)
 
   call dzero(ek,6)
   call m66one(rw)
-!  call dzero(tw, 216)
+  call dzero(tw, 216)
 
   e1 = node_value('e1 ')
   h = node_value('h ')
