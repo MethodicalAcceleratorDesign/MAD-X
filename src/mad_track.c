@@ -401,7 +401,7 @@ track_tables_create(struct in_cmd* cmd)
   t_size = turns / ffile + 10;
 
   if ((pos = name_list_pos("tracksumm", table_register->names)) > -1) {
-    printf("Table tracksum does exist already\n");
+    printf("Table tracksumm does exist already\n");
   }
   else {
     t = make_table("tracksumm", "tracksumm", tracksumm_table_cols,
