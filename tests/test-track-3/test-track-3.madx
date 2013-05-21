@@ -48,6 +48,8 @@ select, flag= error, class= multipole;
 ealign, dx= 0.0002, dy= 0.000; ! ,arex=-0.0003,arey=-0.0002;
 
 ! ********** Track 10000 particles
+delete, table=trackone;
+delete, table=tracksumm;
 track, onepass, onetable, file= "out_f", aperture, dump;
   n=0;  
   while(n<20) {
