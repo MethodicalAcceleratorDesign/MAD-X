@@ -11,7 +11,7 @@
 
 
 
-option,-echo,-info,-warn;
+option,-echo,-info;
 
 enter TRACK module
 one pass is on
