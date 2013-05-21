@@ -341,9 +341,11 @@ track_pteigen(double* eigen)
 
     if (t->header == NULL)
       t->header = new_char_p_array(45);
-    else
-      while (t->header->max - t->header->curr < 45) // ugly patch...
-        grow_char_p_array(t->header);
+    else {
+      // if (t->header->max - t->header->curr < 45)
+      warning("Table trackone should be deleted before running track multiple times", "header not updated");
+      return;
+    }
 
     sprintf(c_dum->c, v_format("@ XC               %%le  %F"), orbit0[0]);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
