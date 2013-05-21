@@ -343,7 +343,7 @@ track_pteigen(double* eigen)
       t->header = new_char_p_array(45);
     else {
       // if (t->header->max - t->header->curr < 45)
-      warning("Table trackone should be deleted before running track multiple times", "header not updated");
+      warning("Table trackone: multiple runs of track detected", "header values not updated");
       return;
     }
 
