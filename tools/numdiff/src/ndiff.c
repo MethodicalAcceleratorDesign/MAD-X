@@ -637,16 +637,20 @@ retry:
     if (c->eps.cmd & eps_istr) {
       if (!is_number_start(lhs_p, dif->lhs_b)) skip_identifier(&lhs_p, 0, false);
       if (!is_number_start(rhs_p, dif->rhs_b)) skip_identifier(&rhs_p, 0, false);
+      goto retry;
     }
     else {
       int strict = true;
       if (c->eps.cmd & eps_omit)
         strict = !is_valid_omit(lhs_p, rhs_p, dif, c->eps.tag);
       int j = strict ? 0 : strlen(c->eps.tag);
-      trace("  %s strings '%.25s'|'%.25s'", strict ? "skipping" : "omitting", lhs_p-j, rhs_p-j);
+      trace("  %s strings[0-%d] '%.25s'|'%.25s'", strict ? "skipping" : "omitting", j, lhs_p-j, rhs_p-j);
       skip_identifier(&lhs_p, &rhs_p, strict);
+      trace("  strings [%d] '%.25s'|'%.25s'", strict, lhs_p, rhs_p);
+      if (!isdigit(*lhs_p) || !isdigit(*rhs_p)) goto retry;
+      goto quit_diff;
+//      goto retry;
     }
-    goto retry;
   }
 
   // numbers found
@@ -661,8 +665,7 @@ quit_diff:
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
     if (dif->cnt_i == 1) ndiff_header();
-    warning("(%d) files differ at line %d and char-columns %d|%d",
-            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
+    warning("(%d) files differ at line %d and char-columns %d|%d", dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
     warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
   }
   if (c->eps.cmd & eps_onfail) context_onfail(dif->cxt, c);
@@ -819,11 +822,11 @@ quit_diff:
 
 quit:
   if (!ret || c->eps.cmd & eps_eval) {
-    // operations with registers trace
+    // operations with registers and trace
     if (c->eps.cmd & eps_traceR)
       ndiff_traceR(dif, c, true, lhs_d, rhs_d, scl_d, off_d, abs, _abs, rel, _rel, dig, _dig);
 
-    // operations
+    // operations (only)
     else
       for (int i=0; i < c->eps.op_n; i++)
         reg_eval(dif->reg, dif->reg_n, c->eps.dst[i], c->eps.src[i], c->eps.src2[i], c->eps.op[i]);
