@@ -48,6 +48,7 @@ acbyh5.r8b2          :=  corr_kick ;
 acbyv5.r8b1          :=  corr_kick ;
 !----------------------------------------------------------
 
+option, -warn;
 
 ! ------------ beam
 beam, sequence= lhcb1, particle= proton, energy= 450;

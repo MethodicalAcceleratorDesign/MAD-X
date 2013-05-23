@@ -1,7 +1,7 @@
 !TITLE,'Test input for PTC_TWISS ';
 
 !=========== RING PARAMETERS ===========================================
-option, -echo, -warn, -info;
+option, -echo, warn, -info;
 
 eg   :=  100;
 bg   :=  eg/pmass;
@@ -18,9 +18,9 @@ beam, particle = proton, energy =   eg        ,
                          et = 0.002, bv = 1,
                          ex=epsx,   ey=epsy;
 
+option, -echo, -warn, -info;
 call file="input/fv9.opt";
 call file="input/fv9.seq";
-
 option, warn, info;
 
 use,period=fivecell;

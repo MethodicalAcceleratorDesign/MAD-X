@@ -11,7 +11,7 @@
 
 !=========== RING PARAMETERS ===========================================
 
-option, -echo, -warn, -info;
+option, -echo, warn, -info;
 
 Assigned alignment errors to 1 elements
 enter Twiss module

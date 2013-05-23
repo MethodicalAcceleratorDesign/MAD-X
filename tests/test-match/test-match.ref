@@ -9,7 +9,7 @@
 
 
 
-Option, -warn,-info,-echo;
+Option, warn,-info,-echo;
 
 number of variables:    3
 user given constraints: 0

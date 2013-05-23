@@ -29,6 +29,7 @@
 
 # tests order
 tests-all := \
+test-constraint \
 test-register test-register-2
 
 # same order as tests-all, tests that take +10s

@@ -2,6 +2,7 @@
 option, -echo,-warn,-info;
 call,file='../share/LEP/lep.seq9';
 call,file="../share/LEP/lep.opt9";
+option, -echo,warn,-info;
 beam, particle = positron, energy = 98.0, radiate;
 use, period=lep;
 vrfc:=2.;

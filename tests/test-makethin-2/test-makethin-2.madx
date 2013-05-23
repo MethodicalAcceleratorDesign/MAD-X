@@ -1,6 +1,6 @@
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
-option,-echo,-warn;
+option,echo,warn,info;
 
 set, format="12.6f";
 select, flag=twiss, clear;
@@ -8,6 +8,7 @@ select, flag=twiss, pattern="IP\.*",     column=name,s,betx,bety,alfx,alfy,dx,dp
 select, flag=twiss, pattern="s.ds.l\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
 select, flag=twiss, pattern="e.ds.r\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
 
+option,-echo,-warn;
 call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
 call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
 option,echo,warn,info;

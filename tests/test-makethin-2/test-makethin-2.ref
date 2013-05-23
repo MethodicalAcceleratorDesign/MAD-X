@@ -1,11 +1,27 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.01.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 26.10.12 13.39.00 +
+  + Code Modification Date: 2013.05.10      +
+  + Execution Time Stamp: 21.05.13 16.55.48 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
+
+
+
+option,echo,warn,info;
+
+
+
+set, format="12.6f";
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",     column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+select, flag=twiss, pattern="s.ds.l\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+select, flag=twiss, pattern="e.ds.r\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
 
 
 
@@ -108,5 +124,5 @@ stop;
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.01.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

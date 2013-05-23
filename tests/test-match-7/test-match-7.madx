@@ -17,7 +17,7 @@ QY0 = 59.310;
 option, -echo,-warn;
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str";
-option, echo;
+option, echo, warn, -info;
 
 Beam, particle = proton, sequence=lhcb1, energy = 450.0,
           NPART=1.05E11, sige=      4.5e-4 ;

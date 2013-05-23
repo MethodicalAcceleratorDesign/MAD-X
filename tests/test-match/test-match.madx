@@ -1,6 +1,6 @@
 ! 2011/11/22 R. De Maria Generate optimized triplet layouts
 
-Option, -warn,-info,-echo;
+Option, warn,-info,-echo;
 
 lq1=0.50;
 lq2=0.50;
@@ -62,6 +62,9 @@ if (grad<120 )  { l1=9.145; l2=7.735; };
 d12:=d23; l3:=l1;
 
 k1:=k; k2:=k; k3:=k;
+
+option -info,-echo,-warn; ! too many warnings about division by zero.
+
 match,use_macro;
 vary,name=l1;
 vary,name=l2;
