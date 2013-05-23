@@ -335,10 +335,18 @@ track_pteigen(double* eigen)
   int i, j, pos;
   struct table* t;
   double tmp;
-  if ((pos = name_list_pos("trackone", table_register->names)) > -1)
-  {
+
+  if ((pos = name_list_pos("trackone", table_register->names)) > -1) {
     t = table_register->tables[pos];
-    if (t->header == NULL)  t->header = new_char_p_array(45);
+
+    if (t->header == NULL)
+      t->header = new_char_p_array(45);
+    else {
+      // if (t->header->max - t->header->curr < 45)
+      warning("Table trackone: multiple runs of track detected", "header values not updated");
+      return;
+    }
+
     sprintf(c_dum->c, v_format("@ XC               %%le  %F"), orbit0[0]);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     sprintf(c_dum->c, v_format("@ PXC              %%le  %F"), orbit0[1]);
@@ -360,12 +368,9 @@ track_pteigen(double* eigen)
     tmp = get_value("beam", "et");
     sprintf(c_dum->c, v_format("@ ET               %%le  %F"), tmp);
     t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    for (i = 0; i < 6; i++)
-    {
-      for (j = 0; j < 6; j++)
-      {
-        sprintf(c_dum->c, v_format("@ E%d%d              %%le  %F"),
-                i+1, j+1, eigen[6*j+i]);
+    for (i = 0; i < 6; i++) {
+      for (j = 0; j < 6; j++) {
+        sprintf(c_dum->c, v_format("@ E%d%d              %%le  %F"), i+1, j+1, eigen[6*j+i]);
         t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
       }
     }
@@ -408,7 +413,6 @@ track_tables_create(struct in_cmd* cmd)
                    tracksumm_table_types, 2*stored_track_start->curr);
     add_to_table_list(t, table_register);
   }
-
   if (get_option("recloss"))
   {
     if ((pos = name_list_pos("trackloss", table_register->names)) > -1) {
