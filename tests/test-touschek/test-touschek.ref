@@ -5,7 +5,7 @@
   + Code Modification Date: 28.02.2011      +
   + Execution Time Stamp: 07.12.12 14.11.53 +
   +++++++++++++++++++++++++++++++++++++++++++
-option,-info,-warn,-echo;
+option,-info,warn,-echo;
 
 enter Twiss module
   

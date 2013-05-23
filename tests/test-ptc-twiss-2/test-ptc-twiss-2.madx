@@ -1,6 +1,6 @@
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
-option, -echo, -warn, -info;
+option, -echo, warn, -info;
 
 real const l.tanal = 0;
 real const l.tanar = 0;
@@ -18,8 +18,10 @@ real const l.tctvb = 0;
 real const l.x5zdc002 = 0;
 real const l.tcddm = 0;
 
+option, -echo, -warn, -info;
 call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
 call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+option, -echo, warn, -info;
 
 beam, sequence=lhcb1, particle=proton, pc=450;
 beam, sequence=lhcb2, particle=proton, pc=450, bv=-1;

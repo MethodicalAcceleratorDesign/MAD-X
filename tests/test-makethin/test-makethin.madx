@@ -3,7 +3,6 @@
 title,"Five cell test";
 
 option,-echo,-warn;
-option,-echo;
 call,file="fivecell.seq";   ! load the sequence
 option,echo,warn,info;
 
