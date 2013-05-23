@@ -224,6 +224,8 @@ char command_def[] =
 " "
 "option: control none 0 0 "
 "bborbit  = [l, false, true], "
+"bb_ultra_relati = [l, false, true], "
+"bb_sxy_update   = [l, false, true], "
 "echo     = [l, true, true], "
 "info     = [l, true, true], "
 "reset    = [l, false, true], "
@@ -397,7 +399,7 @@ char command_def[] =
 "ntpsa = [l, false, true]; "
 " "
 "ptc_export_xml: ptc_export_xml none 0 0 " /* space after 0! */
-"file = [s,output.xml,output.xml] ; " /* defaults to output.xml */
+"file = [s,output.xml,output.xml]; " /* defaults to output.xml */
 " "
 "ptc_create_layout: ptc_create_layout none 0 0 "
 "time          = [l, true, true], "
@@ -433,7 +435,7 @@ char command_def[] =
 "polynomial = [i, none] , "/*defines the element of the tracked 6D array of polynomials */
 "monomial   = [s, none] , "/*defines the monomial that coefficient will be sent to table */
 "parametric = [l, false, true], "/*Tells if the result should be stored in a parametric form if knobs are present*/
-"quantity   = [s, {none}] ; "
+"quantity   = [s, {none}]; "
 " "
 "ptc_select_moment: ptc_select_moment none 0 0 "
 "table      = [s, moments, none], "
@@ -442,7 +444,7 @@ char command_def[] =
 /*"place    = [s, none], "*/
 "moment_s   = [s, {none}], "
 "moment     = [i, {0}], "
-"quantity   = [s, {none}] ; "
+"quantity   = [s, {none}]; "
 " "
 "ptc_knob: ptc_knob none 0 0 "
 "initial = [s, none] , "/* */
@@ -476,17 +478,17 @@ char command_def[] =
 "kn    = [i, -1], "
 "ks    = [i, -1], "
 "refreshtables  = [l, true, true], "
-"value = [r] ; "
+"value = [r]; "
 " "
 "ptc_refreshpartables: ptc_refreshpartables none 0 0 "
-"refreshtables  = [l, true, true] ;"
+"refreshtables  = [l, true, true]; "
 " "
 "rviewer: rviewer none 0 0 "
-"exactmatch = [l, true, true] ; "
+"exactmatch = [l, true, true]; "
 " "
 "ptc_printparametric: ptc_printparametric none 0 0 "
 "filename = [s, none] , "/* */
-"format = [s, ptc] ; "
+"format = [s, ptc]; "
 " "
 "ptc_setfieldcomp: ptc_setfieldcomp none 0 0 "
 "fromerrtable    = [s, none, efield], "
@@ -494,7 +496,7 @@ char command_def[] =
 "element = [s, none] , "/* */
 "kn    = [i, -1], "
 "ks    = [i, -1], "
-"value = [r] ; "
+"value = [r]; "
 " "
 "ptc_eplacement: ptc_eplacement none 0 0 "
 "range = [s, none] , "/* */
@@ -505,12 +507,12 @@ char command_def[] =
 "onlyposition    = [l, false, true] , "/* if true changes only position and, leaves orinetation untouched */
 "onlyorientation = [l, false, true] , "/* if true changes only orientation and, leaves position untouched */
 "autoplacedownstream = [l, true, true] , "/* if true all the elements downstream are placed at default positions, if false the rest of the layout stays antouched  */
-"refframe = [s, gcs] ; " /* coordinate system, gcs - global coordinate syste, current - current position, previouselement */
+"refframe = [s, gcs]; " /* coordinate system, gcs - global coordinate syste, current - current position, previouselement */
 " "
 "ptc_printframes: ptc_printframes none 0 0 "
 "file = [s, none] , "/* */
 "with = [s, none] , "/* */
-"format = [s, text] ; "
+"format = [s, text]; "
 " "
 "ptc_twiss: ptc_twiss none 0 0 "
 "betx     = [r, 0], alfx     = [r, 0], mux      = [r, 0], "
@@ -1044,7 +1046,8 @@ char command_def[] =
 "permfringe      = [l, false, true], "
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
-"kill_exi_fringe = [l, false, true]; "
+"kill_exi_fringe = [l, false, true], "
+"time_var        = [l, false, true]; "
 " "
 "quadrupole: element none 0 5 "
 "at       = [r, 1.e20], "
@@ -1182,7 +1185,8 @@ char command_def[] =
 "permfringe      = [l, false, true], "
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
-"kill_exi_fringe = [l, false, true]; "
+"kill_exi_fringe = [l, false, true], "
+"time_var        = [l, false, true]; "
 " "
 "solenoid: element none 0 9 "
 "at       = [r, 1.e20], "
@@ -1260,7 +1264,8 @@ char command_def[] =
 "bend_fringe     = [l, false, true], "
 "kill_ent_fringe = [l, false, true], "
 "kill_exi_fringe = [l, false, true], "
-"no_cavity_totalpath = [l, false, true]; "
+"no_cavity_totalpath = [l, false, true], "
+"time_var        = [l, false, true]; "
 " "
 "elseparator: element none 0 11 "
 "at       = [r, 1.e20], "
@@ -2346,7 +2351,6 @@ char command_def[] =
 "table    = [s, none, none], "
 "file     = [s, none]; "
 " "
-" "
 "ibs: ibs none 0 0 "
 "tolerance= [r, 1.e-7], "
 "file     = [s, ibs, ibs], "
@@ -2677,7 +2681,13 @@ char command_def[] =
 "run: track track 0 0 "
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
 "turns    = [i, 1], "
-"ffile    = [i, 1]; "
+"ffile    = [i, 1], "
+"n_macr_prt_ini = [i, 1], "
+"n_part_gain = [r, 1.], "
+"t_rms = [r, 1.], "
+"alpha = [r, 0.], "
+"i_div_e_sum_max = [r, 6.0], "
+"virgin_state = [l, false, true]; "
 " "
 "start: track track 0 0 "
 "x        = [r, 0], "
