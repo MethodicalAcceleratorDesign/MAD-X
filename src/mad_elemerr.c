@@ -610,60 +610,60 @@ error_efcomp(struct in_cmd* cmd)
 		            }
 		            double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
 		
-		            /* if flag for hysteresis correction is set, use coefficients for correction */
-		            double deer = 0.0;
-		            if(hyst == 1) {
-		              deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
-		              if (opt_debug) 
-		                printf("after correction (n): %d %e %e %e %e\n", j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
-		            }
-		            /*
-		            if (opt_debug)
-		              fprintf(prt_file, "norm(n): %d %d %f %f\n",n,j,rr,norfac);
-		            */
-		            if(add_error_opt == 1) {
-		              nextnode->p_fd_err->a[2*j] += (ptr->a[j]+deer)*ref_str*norfac;
-		            } else {
-		              nextnode->p_fd_err->a[2*j]  = (ptr->a[j]+deer)*ref_str*norfac;
-		            }
-		
-		      /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
+			    /* if flag for hysteresis correction is set, use coefficients for correction */
+			    double deer = 0.0 ;
+			    if(hyst == 1) {
+			      deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
+			      if (opt_debug) 
+				printf("after correction (n): %d %e %e %e %e\n", j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
+			    }
+			    
+			    if (opt_debug)
+			      fprintf(prt_file, "norm(n): %d %d %f %f\n",n,j,rr,norfac);
+			    
+			    if(add_error_opt == 1) {
+			      nextnode->p_fd_err->a[2*j]   += (ptr->a[j]+deer)*ref_str*norfac;
+			    } else {
+			      nextnode->p_fd_err->a[2*j]    = (ptr->a[j]+deer)*ref_str*norfac;
+			    }
+			    
+			    /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
 	            } else if(i==3) {
-		            if(fabs(rr) < 1.0E-6) {
-		              printf("++++++ error: trying to assign relative field errors \n");
-		              printf("       with no or zero reference radius specified\n");
-		              exit(-1);
-		            }
-		            double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
+		      if(fabs(rr) < 1.0E-6) {
+			printf("++++++ error: trying to assign relative field errors \n");
+			printf("       with no or zero reference radius specified\n");
+			exit(-1);
+		      }
+		      double norfac = pow(rr,(n-j)) * (fact(j)/fact(n));
 		
 		      /* if flag for hysteresis correction is set, use coefficients for correction */
-		            double deer = 0.0;
-		            if(hyst == 1) {
-		              deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
-		                h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
-		              if (opt_debug) 
-		                printf("after correction (s): %d %e %e %e %e\n",
-			               j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
-		            }
-		            /*
-                if (opt_debug)
-		              fprintf(prt_file, "norm(s): %d %d %f %f\n",n,j,rr,norfac);
-		            */
-		            if(add_error_opt == 1) {
-		              nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
-		            } else {
-		              nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
-		            }
-
+		      double deer = 0.0;
+		      if(hyst == 1) {
+			deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + 
+			  h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
+			if (opt_debug) 
+			  printf("after correction (s): %d %e %e %e %e\n",
+				 j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
+		      }
+		      
+		      if (opt_debug)
+			fprintf(prt_file, "norm(s): %d %d %f %f\n",n,j,rr,norfac);
+		      
+		      if(add_error_opt == 1) {
+			nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
+		      } else {
+			nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
+		      }
+		      
                       /* RF-PHASE OF NORMAL COMPONENTS */
 	            } else if(i==4) {
-		            nextnode->p_ph_err->a[2*j] = ptr->a[j];     
+		      nextnode->p_ph_err->a[2*j] = ptr->a[j];     
 
                       /* RF-PHASE OF SKEW COMPONENTS */
 	            } else if(i==5) {
-		            nextnode->p_ph_err->a[2*j+1] = ptr->a[j];     
+		      nextnode->p_ph_err->a[2*j+1] = ptr->a[j];     
 
-              } /*  end  of field error assignment */ 
+		    } /*  end  of field error assignment */ 
 	          }
 	        }
 	      }

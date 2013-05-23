@@ -560,7 +560,7 @@ end subroutine trrun
 
 
 subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,        &
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,    &
      onepass)
 
   use twtrrfi
@@ -635,35 +635,35 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      go to 500
   endif
 
-  !---- Special colllimator aperture check taken out AK 20071211
-  !!---- Collimator with elliptic aperture.
-  !      if(code.eq.20) then
-  !        apx = node_value('xsize ')
-  !        apy = node_value('ysize ')
-  !        if(apx.eq.zero) then
-  !          apx=maxaper(1)
-  !        endif
-  !        if(apy.eq.zero) then
-  !          apy=maxaper(3)
-  !        endif
-  !        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
-  !     last_pos, last_orbit, track, ktrack,al_errors)
-  !        go to 500
-  !      endif
-  !!---- Collimator with rectangular aperture.
-  !      if(code.eq.21) then
-  !        apx = node_value('xsize ')
-  !        apy = node_value('ysize ')
-  !        if(apx.eq.zero) then
-  !          apx=maxaper(1)
-  !        endif
-  !        if(apy.eq.zero) then
-  !          apy=maxaper(3)
-  !        endif
-  !        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-  !     last_pos, last_orbit, track, ktrack,al_errors)
-  !        go to 500
-  !      endif
+! !  ---- Special colllimator aperture check taken out AK 20071211
+! !  ---- Collimator with elliptic aperture.
+!        if(code.eq.20) then
+!          apx = node_value('xsize ')
+!          apy = node_value('ysize ')
+!          if(apx.eq.zero) then
+!            apx=maxaper(1)
+!          endif
+!          if(apy.eq.zero) then
+!            apy=maxaper(3)
+!          endif
+!          call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,    &
+!               last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
+!          go to 500
+!        endif
+! !  ---- Collimator with rectangular aperture.
+!        if(code.eq.21) then
+!          apx = node_value('xsize ')
+!          apy = node_value('ysize ')
+!          if(apx.eq.zero) then
+!            apx=maxaper(1)
+!          endif
+!          if(apy.eq.zero) then
+!            apy=maxaper(3)
+!          endif
+!          call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,    &
+!               last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
+!          go to 500
+!        endif
 
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS
@@ -680,12 +680,14 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      offy = offset(2)
      !        print *, " TYPE ",aptype &
      !       "values  x y lhc",aperture(1),aperture(2),aperture(3)
+
      !------------  ellipse case ----------------------------------
      if(aptype.eq.'ellipse') then
         apx = aperture(1)
         apy = aperture(2)
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
+
         !------------  circle case ----------------------------------
      else if(aptype.eq.'circle') then
         apx = aperture(1)
@@ -696,21 +698,24 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         endif
         apy = apx
         !        print *,"circle, radius= ",apx
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+
         !------------  rectangle case ----------------------------------
      else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+
         !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
      else if(aptype.eq.'racetrack') then
         apx = aperture(1)
         apy = aperture(2)
         apr = aperture(3)
-        call trcoll1(4, apx, apy, turn, sum, part_id, last_turn,      &
-             last_pos,last_orbit,track,ktrack,al_errors,apr,offx,offy)
+        call trcoll(4, apx, apy, apr, turn, sum, part_id, last_turn, &
+             last_pos,last_orbit,track,ktrack,al_errors,offx,offy)
+
         !------------  LHC screen case ----------------------------------
      else if(aptype.eq.'lhcscreen') then
         !        print *, "LHC screen start, Xrect= ",
@@ -720,7 +725,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     Making essential changes in AV's absence, 16/7/2003
         !JMJ!     this tests whether the particle is outside the circumscribing
         !JMJ!     circle.
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !JMJ!
         !JMJ!     This tests whether particles are outside the space bounded by
@@ -738,67 +743,84 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     ensure that they don't get set to zero.
         if(aperture(1).gt.zero) apx = aperture(1)
         if(aperture(2).gt.zero) apy = aperture(2)
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !        print *, "LHC screen end"
+
         !------------  marguerite case ----------------------------------
      else if(aptype.eq.'marguerite') then
         apx = aperture(1)
         apy = aperture(2)
-        call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(3, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+
         !------------  rectellipse case ----------------------------------
      else if(aptype.eq.'rectellipse') then
         !*****         test ellipse
         apx = aperture(3)
         apy = aperture(4)
-        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !*****         test rectangle
         apx = aperture(1)
         apy = aperture(2)
-        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,       &
+        call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !       print*, " test apertures"
         !       print*, "      apx=",apx, " apy=",apy," apxell=",apxell,
         !              " apyell=",apyell
-        !          call trcoll(3, apx, apy, turn, sum, part_id, last_turn,       &
+        !          call trcoll(3, apx, apy, apr, turn, sum, part_id, last_turn,  &
         !         last_pos, last_orbit, track,ktrack,al_errors)
+
      endif
-     !      else
-     !!---- Check on collimator xsize/ysize even if user did not use 'aperture'
-     !!---- option in track command. This simulates roughly the old MAD-X
-     !!---- behaviour.      	
+
+  !  else 
+     !  ---- 2013-May-22  11:35:54  ghislain: this section for backward compatibility 
+     !       with the MAD8 style definition of R/ECOLLIMATOR with xsize and ysize parameters,
+     !       but ONLY IF apertype and aperture parameters were not specified. 
+     !
+     !       The case where apertype and aperture were specified was 
+     !       already taken into account in preceding section under if(aperflag) where
+     !       the eventual xsize and ysize parameters were simply ignored. 
+     
+     !       Hence the new style definition of collimators 
+     !       COLL : RCOLLIMATOR, apertype=rectangle, aperture={1.e-3,1.e-3} ;
+     !       has precedence over the apertype/aperture old style definition 
+     !       COLL : RCOLLIMATOR, xsize=1.e-3, ysize=1.e-3 ;
+     
+     !  NOTE: this calls for redefinition of the COLLIMATOR element...
+     !        and eventually the demise of the old xsize/ysize syntax
+     
      !!---- Collimator with elliptic aperture.
-     !      if(code.eq.20) then
-     !        apx = node_value('xsize ')
-     !        apy = node_value('ysize ')
-     !        if(apx.eq.zero) then
-     !          apx=maxaper(1)
-     !        endif
-     !        if(apy.eq.zero) then
-     !          apy=maxaper(3)
-     !        endif
-     !        call trcoll(1, apx, apy, turn, sum, part_id, last_turn,         &
-     !     last_pos, last_orbit, track, ktrack,al_errors)
-     !        go to 500
-     !      endif
+     ! if(code.eq.20) then
+     !    apx = node_value('xsize ')
+     !    apy = node_value('ysize ')
+     !    if(apx.eq.zero) then
+     !       apx=maxaper(1)
+     !    endif
+     !    if(apy.eq.zero) then
+     !       apy=maxaper(3)
+     !    endif
+     !    call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,    &
+     !         last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+     ! endif
+
      !!---- Collimator with rectangular aperture.
-     !      if(code.eq.21) then
-     !        apx = node_value('xsize ')
-     !        apy = node_value('ysize ')
-     !        if(apx.eq.zero) then
-     !          apx=maxaper(1)
-     !        endif
-     !        if(apy.eq.zero) then
-     !          apy=maxaper(3)
-     !        endif
-     !        call trcoll(2, apx, apy, turn, sum, part_id, last_turn,         &
-     !      last_pos, last_orbit, track, ktrack,al_errors)
-     !        go to 500
-     !      endif      	
+     ! if(code.eq.21) then
+     !    apx = node_value('xsize ')
+     !    apy = node_value('ysize ')
+     !    if(apx.eq.zero) then
+     !       apx=maxaper(1)
+     !    endif
+     !    if(apy.eq.zero) then
+     !       apy=maxaper(3)
+     !    endif
+     !    call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,    &
+     !         last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
+     ! endif
+
   endif
-  !----  END OF IF(APERFLAG)  ----------------
+  !----  END OF IF(APERFLAG) ... ELSE ...  ----------------
 
 
   !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
@@ -808,13 +830,13 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
        500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
-  !     330, 500, 350, 360, 370,500,500,400,410,500, 500, 500, 500), code
+  !     330, 500, 350, 360, 370,500,500,400,410,      500, 500, 500, 500), code
   ! Use this line to enable non-linear thin lens
-  !     330, 500, 350, 360, 370,500,500,400,410,420,500, 500, 500, 500), code
+  !     330, 500, 350, 360, 370,500,500,400,410, 420, 500, 500, 500, 500), code
   ! Enable non-linear thin lens and RF-Multipole
-       330, 500, 350, 360, 370,500,500,400,410,420,430, 500, 500, 500), code
+        330, 500, 350, 360, 370,500,500,400,410, 420, 430, 500, 500, 500), code
   !
-  !---- Make sure that nothing is execute if element is not known
+  !---- Make sure that nothing is executed if element is not known
   go to 500
   !
   !---- Bending magnet. OBSOLETE, to be kept for go to
@@ -2921,21 +2943,28 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
-subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
+
+subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
      last_pos, last_orbit, z, ntrk,al_errors,offx,offy)
 
   use twiss0fi
   use name_lenfi
   implicit none
 
+  ! 2013-May-22  11:46:15  ghislain: Merged the trcoll and trcoll1 subroutines,
+  ! hence added the apr argument and the code for the type 4 case of 
+  ! racetrack aperture
+
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   test for collimator aperture limits.                               *
   ! input:                                                               *
   !   flag      (integer)   aperture type flag:                          *
-  !                         1: elliptic, 2: rectangular                  *
+  !                         1: elliptic, 2: rectangular, 3: marguerite   *
+  !                         4: racetrack                                 *
   !   apx       (double)    x aperture or half axis                      *
   !   apy       (double)    y aperture or half axis                      *
+  !   apr       (double)    radius of curvature for racetrack corners    *
   !   turn      (integer)   current turn number.                         *
   !   sum       (double)    accumulated length.                          *
   ! input/output:                                                        *
@@ -2947,7 +2976,7 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
   !   ntrk      (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
-  double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
+  double precision apx,apy,apr,sum,last_pos(*),last_orbit(6,*),z(6,*), &
        one,al_errors(align_max),offx,offy
   parameter(one=1d0)
   character(name_len) aptype
@@ -2957,72 +2986,94 @@ subroutine trcoll(flag, apx, apy, turn, sum, part_id, last_turn,  &
   do i = n, ntrk
 
      !---- Is particle outside aperture?
-     if (flag .eq. 1.and.((z(1,i)-al_errors(11)- offx)/apx)**2             &
-          +((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one) then
+
+        !*** case of ellipse
+     if (flag .eq. 1 .and. &
+        ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+        ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. one) then
         go to 99
-     else if(flag .eq. 2                                             &
-          .and. (abs(z(1,i)-al_errors(11)- offx) .gt. apx                         &
-          .or. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
+          !*** case of rectangle
+     else if(flag .eq. 2 .and. &
+          (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
+           abs(z(3,i)-al_errors(12)-offy) .gt. apy)) then
         go to 99
-        !***  Introduction of marguerite : two ellipses
-     else if(flag .eq. 3.and. ((z(1,i)-al_errors(11)- offx) / apx)**2      &
-          + ((z(3,i)-al_errors(12)- offy) / apy)**2 .gt. one .and.                &
-          ((z(1,i)-al_errors(11)- offx) / apy)**2 +                               &
-          ((z(3,i)-al_errors(12)- offy) / apx)**2 .gt. one) then
+          !***  case of marguerite: two ellipses
+     else if(flag .eq. 3 .and. &
+        ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+        ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. one .and. &
+        ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
+        ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. one) then
+        go to 99
+          !*** case of racetrack
+     else if (flag .eq. 4 .and. &
+          abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
+          abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) .or. &
+          ( abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
+            abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
+            (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
+            (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
         go to 99
      endif
+     ! break if particle is inside aperture and continue the loop
      go to 98
+
+     ! lose particle if it is outside aperture
 99   n = i
      nn=name_len
      call node_string('apertype ',aptype,nn)
      call trkill(n, turn, sum, ntrk, part_id,                        &
           last_turn, last_pos, last_orbit, z, aptype)
      goto 10
+
 98   continue
   enddo
 end subroutine trcoll
 
-subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
-     last_pos, last_orbit, z, ntrk,al_errors, apr,offx,offy)
 
-  use twiss0fi
-  use name_lenfi
-  implicit none
+! subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &
+!      last_pos, last_orbit, z, ntrk,al_errors, apr,offx,offy)
 
-  !----------------------------------------------------------------------*
-  ! Similar with trcoll, for racetrack type aperture
-  !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
-  !----------------------------------------------------------------------*
-  integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
-  double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
-       one,al_errors(align_max),apr,offx,offy
-  parameter(one=1d0)
-  character(name_len) aptype
+! 2013-May-22  11:50:43  ghislain: commented out after merging the racetrack case inside the trcoll subroutine
+! will be deleted after tests are done successfully
 
-  n = 1
-10 continue
-  do i = n, ntrk
+!   use twiss0fi
+!   use name_lenfi
+!   implicit none
 
-     !---- Is particle outside aperture?
-     if (flag .eq. 4                                                 &
-          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. (apr+apx)                  &
-          .or. abs(z(3,i)-al_errors(12)- offy) .gt. (apy+apr) .or.                &
-          ((((abs(z(1,i)-al_errors(11)- offx)-apx)**2+                            &
-          (abs(z(3,i)-al_errors(12)- offy)-apy)**2) .gt. apr**2)                  &
-          .and. (abs(z(1,i)-al_errors(11)- offx)) .gt. apx                        &
-          .and. abs(z(3,i)-al_errors(12)- offy) .gt. apy)) then
-        go to 99
-     endif
-     go to 98
-99   n = i
-     nn=name_len
-     call node_string('apertype ',aptype,nn)
-     call trkill(n, turn, sum, ntrk, part_id,                        &
-          last_turn, last_pos, last_orbit, z, aptype)
-     goto 10
-98   continue
-  enddo
-end subroutine trcoll1
+!   !----------------------------------------------------------------------*
+!   ! Similar with trcoll, for racetrack type aperture
+!   !-------------Racetrack type , added by Yipeng SUN 21-10-2008---
+!   !----------------------------------------------------------------------*
+!   integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn
+!   double precision apx,apy,sum,last_pos(*),last_orbit(6,*),z(6,*),  &
+!        one,al_errors(align_max),apr,offx,offy
+!   parameter(one=1d0)
+!   character(name_len) aptype
+!
+!   n = 1
+! 10 continue
+!   do i = n, ntrk
+!
+!      !---- Is particle outside aperture?
+!      if (flag .eq. 4 .and. &
+!          (abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
+!           abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) ) .or. &
+!           (((abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
+!             (abs(z(3,i)-al_errors(12)-offy)-apy)**2) .gt. apr**2) .and. &
+!            abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
+!            abs(z(3,i)-al_errors(12)-offy) .gt. apy) then
+!         go to 99
+!      endif
+!      go to 98
+! 99   n = i
+!      nn=name_len
+!      call node_string('apertype ',aptype,nn)
+!      call trkill(n, turn, sum, ntrk, part_id,                        &
+!           last_turn, last_pos, last_orbit, z, aptype)
+!      goto 10
+! 98   continue
+!   enddo
+! end subroutine trcoll1
 
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
 

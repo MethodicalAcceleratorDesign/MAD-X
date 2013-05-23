@@ -2,6 +2,7 @@
 <title>[RE]COLLIMATOR</title>
 <!-- Changed by: Chris ISELIN,  3-Mar-1998 -->
 <!-- Changed by: Hans Grote, 30-Sep-2002 -->
+<!-- Changed by: Ghislain Roy, 23-May-2013 -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -12,38 +13,43 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 <h2>Collimators</h2>
 </center>
 
-Two types of collimators are defined:
+The definition of collimators in MAD-X has been inherited from MAD8 and two types of collimators are defined:
 <ul>
 <li><a name=ecol>ECOLLIMATOR</a>.
-Elliptic aperture,
 <li><a name=rcol>RCOLLIMATOR</a>.
-Rectangular aperture.
 </ul>
+
+Note that although two types are defined, both behave in exactly the same way within MAD-X and the type name does NOT imply elliptic or rectangular aperture. 
+
 <pre>
 label: ECOLLIMATOR,TYPE=name,L=real,XSIZE=real,YSIZE=real;
 label: RCOLLIMATOR,TYPE=name,L=real,XSIZE=real,YSIZE=real;
 </pre>
-Either type has three real attributes:
+
+Either type has several real attributes:
 <ul>
 <li>L:
 The collimator length (default: 0 m).
 <li>XSIZE:
-The horizontal half-aperture (default: unlimited).
+The horizontal half-aperture (default: unlimited). <b>OBSOLETE : Will be parsed but not used.</b>
 <li>YSIZE:
-The vertical half-aperture (default: unlimited).
+The vertical half-aperture (default: unlimited). <b>OBSOLETE : Will be parsed but not used.</b>
 </ul>
-For elliptic apertures,
-XSIZE and YSIZE denote the half-axes respectively,
-for rectangular apertures they denote the half-width of the rectangle.
-Optically a collimator behaves like a drift space, but during tracking,
-it also introduces an aperture limit.
-The aperture is checked at the entrance.
-If the length is not zero, the aperture is also checked at the exit.
+
+The actual definition of the aperture type and aperture parameters must be done in accordance with <a href="aperture.html">Defining aperture in MAD-X</a>.
+
+<P>
+Optically a collimator behaves like a drift space. 
+However during tracking the aperture is checked at the entrance of the collimator, provided that the aperture type is one of the predefined RECTANGLE, ELLIPSE, RECTELLIPSE or LHCSCREEN types. 
+In particular an aperture model defined in an external file will not be used during tracking.
+<P>
+If the length is not zero, the aperture is also checked at the exit. <b> TO BE CHECKED </b>
 <P>
 Example:
 <pre>
-COLLIM: ECOLLIMATOR,L=0.5,XSIZE=0.01,YSIZE=0.005;
+COLLIM: ECOLLIMATOR,L=0.5,APERTYPE=ELLIPSE,APERTURE={0.01,0.005};
 </pre>
+
 The <a href="local_system.html#straight">straight reference system</a>
 for a collimator is a cartesian coordinate system.
 <P>
@@ -52,9 +58,13 @@ an asymmetric collimator, particle losses in tracking are reported with
 respect to the <b>displaced</b> reference system, not with respect to the
 surrounding beam line.
 
+<!-- <address> -->
+<!-- <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, -->
+<!-- January 24, 1997 -->
+<!-- </address> -->
+
 <address>
-<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
-January 24, 1997
+Ghislain Roy, May 23, 2013
 </address>
 
 </body>

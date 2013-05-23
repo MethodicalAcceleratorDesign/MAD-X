@@ -1353,19 +1353,35 @@ pro_aperture(struct in_cmd* cmd)
 
   embedded_twiss_cmd = cmd;
 
+#if 0
   /* check for valid sequence, beam and Twiss table */
   if (current_sequ != NULL && current_sequ->ex_start != NULL && sequence_length(current_sequ) != 0)
-  {
-    if (attach_beam(current_sequ) == 0)
-      fatal_error("Aperture module - sequence without beam:", current_sequ->name);
-  }
+    {
+      if (attach_beam(current_sequ) == 0)
+	fatal_error("Aperture module - sequence without beam:", current_sequ->name);
+    }
   else fatal_error("Aperture module - no active sequence", "");
 
   if (!sequ_check_valid_twiss(current_sequ))
-  {
-    warning("Aperture module, no valid TWISS table present", "Aperture command ignored");
-    return;
-  }
+    {
+      warning("Aperture module, no valid TWISS table present", "Aperture command ignored");
+      return;
+    }
+#endif
+
+  /* check for valid sequence, beam and Twiss table */
+  if (current_sequ == NULL || current_sequ->ex_start == NULL || sequence_length(current_sequ) == 0)
+    fatal_error("Aperture module - no active sequence", "");
+
+  if (attach_beam(current_sequ) == 0)
+    fatal_error("Aperture module - sequence without beam:", current_sequ->name);
+  
+  if (!sequ_check_valid_twiss(current_sequ))
+    {
+      warning("Aperture module - no valid TWISS table present", "Aperture command ignored");
+      return;
+    }
+
 
   range = command_par_string("range", this_cmd->clone);
   if (get_ex_range(range, current_sequ, use_range) == 0)
@@ -1380,17 +1396,18 @@ pro_aperture(struct in_cmd* cmd)
   tw_cp=current_sequ->tw_table;
   tw_cnt=1; /* table starts at 1 */
 
-  while (1) {
-    string_from_table_row(tw_cp->name, "name", &tw_cnt, tw_name);
-    aper_trim_ws(tw_name, NAME_L);
+  while (1) 
+    {
+      string_from_table_row(tw_cp->name, "name", &tw_cnt, tw_name);
+      aper_trim_ws(tw_name, NAME_L);
 
-    if (!strcmp(tw_name,current_node->name)) break;
+      if (!strcmp(tw_name,current_node->name)) break;
 
-    if (++tw_cnt > tw_cp->curr) {
-      warning("Aperture command ignored: could not find range start in Twiss table:", current_node->name);
-      return;
+      if (++tw_cnt > tw_cp->curr) {
+	warning("Aperture command ignored: could not find range start in Twiss table:", current_node->name);
+	return;
+      }
     }
-  }
 
   /* approximate # of needed rows in aperture table */
   interval = command_par_value("interval", this_cmd->clone);
@@ -1407,17 +1424,17 @@ pro_aperture(struct in_cmd* cmd)
 
   limit_pt = aperture(table, use_range, tw_cp, &tw_cnt, limit_pt);
 
-  if (limit_pt->n1 != -1) {
-//    printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
+  if (limit_pt->n1 != -1) 
+    {
+      printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
 
-    aper_header(aperture_table, limit_pt);
+      aper_header(aperture_table, limit_pt);
     
-    file = command_par_string("file", this_cmd->clone);
-    if (file != NULL) {
-      out_table(table, aperture_table, file);
+      file = command_par_string("file", this_cmd->clone);
+      if (file != NULL) out_table(table, aperture_table, file);
+    
+      if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
     }
-    if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
-  }
   else warning("Could not run aperture command.","Aperture command ignored");
 
   /* set pointer to updated Twiss table */
@@ -1471,8 +1488,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* read command parameters */
   halofile = command_par_string("halofile", this_cmd->clone);
+  
   /* removed IW 240205 */
   /*  pipefile = command_par_string("pipefile", this_cmd->clone); */
+ 
   exn = command_par_value("exn", this_cmd->clone);
   eyn = command_par_value("eyn", this_cmd->clone);
   dqf = command_par_value("dqf", this_cmd->clone);
@@ -1520,15 +1539,16 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1)
     ;
-  else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy)) {
-    warning("Not valid parameters for halo. ", "Unable to make polygon.");
+  else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy)) 
+    {
+      warning("Not valid parameters for halo. ", "Unable to make polygon.");
 
-    /* IA */
-    myfree("Aperture",true_tab);
-    myfree("Aperture",offs_tab);
-
-    return lim_pt;
-  }
+      /* IA */
+      myfree("Aperture",true_tab);
+      myfree("Aperture",offs_tab);
+      
+      return lim_pt;
+    }
   else aper_fill_quadrants(halox, haloy, halo_q_length, &halolength);
 
   /* check for externally given pipe polygon */
@@ -1538,8 +1558,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* get initial twiss parameters, from start of first element in range */
   aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
-// LD: shift further results by one step (?) and finish outside the table
-//  (*tw_cnt)++;
+  // LD: shift further results by one step (?) and finish outside the table
+  //  (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
   /* calculate initial normal+parasitic disp. */
@@ -1672,6 +1692,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       /* Treat each slice, for all angles */
       for (jslice=0; jslice <= nint; jslice++) {
         ratio=999999;
+
         if (jslice != 0) {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &betx, &bety, &dx, &dy);
 
@@ -1750,8 +1771,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         n1x_m=n1*bbeat*sqrt(betx*ex);
         n1y_m=n1*bbeat*sqrt(bety*ey);
 
-/* Change below, BJ 23oct2008                              */
-/* test block 'if (n1 < node_n1)' included in test block   */
+	/* Change below, BJ 23oct2008                              */
+	/* test block 'if (n1 < node_n1)' included in test block   */
 
         if (is_zero_len == 0 || jslice == 1) {
           aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
@@ -1764,7 +1785,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
               node_n1=n1;
               node_s=s_curr;
           }
-  	      } // if is_zero_len
+	} // if is_zero_len
       } // for jslice
 
       reset_interpolation(&nint);
