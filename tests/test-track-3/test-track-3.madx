@@ -27,6 +27,7 @@ endsequence;
 beam, sequence= smachd, particle= proton, energy= 450;
 use,  sequence= smachd;
 
+!option, debug;
 ! ********** Track 10000 particles
 track, onepass, onetable, file= "out_d", aperture, dump;
   n=0;  
