@@ -1426,7 +1426,7 @@ pro_aperture(struct in_cmd* cmd)
 
   if (limit_pt->n1 != -1) 
     {
-      printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
+//      printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
 
       aper_header(aperture_table, limit_pt);
     
