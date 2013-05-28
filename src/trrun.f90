@@ -581,7 +581,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !----------------------------------------------------------------------*
   logical aperflag,fmap,onepass
   integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
-       get_option
+       get_option, optiondebug
   double precision apx,apy,apr,el,sum,node_value,track(6,*),        &
        last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
        aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),st,  &
@@ -589,6 +589,8 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
        offx,offy
   character(name_len) aptype
   parameter(zero = 0d0, one=1d0)
+
+  optiondebug = get_option('debug ')
 
   fmap=.false.
   call dzero(ek,6)
@@ -678,7 +680,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 
      offx = offset(1)
      offy = offset(2)
-     if (get_option('debug ') .ne. 0) then
+     if (optiondebug .ne. 0) then
         print *, " aperture type ",aptype
         print *, "          aperture ",aperture(1),aperture(2),aperture(3),aperture(4)
         print *, "          offsets ", offx, offy 
@@ -689,7 +691,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      if(aptype.eq.'ellipse') then
         apx = aperture(1)
         apy = aperture(2)
-        if (get_option('debug ') .ne. 0) print *, "ellipse: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "ellipse: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
@@ -704,7 +706,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         endif
         apy = apx
         !        print *,"circle, radius= ",apx
-        if (get_option('debug ') .ne. 0) print *, "circle: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "circle: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -713,7 +715,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
-        if (get_option('debug ') .ne. 0) print *, "rectangle: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "rectangle: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -723,7 +725,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         apx = aperture(1)
         apy = aperture(2)
         apr = aperture(3)
-        if (get_option('debug ') .ne. 0) print *, "racetrack: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "racetrack: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(4, apx, apy, apr, turn, sum, part_id, last_turn, &
              last_pos,last_orbit,track,ktrack,al_errors,offx,offy)
@@ -737,7 +739,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     Making essential changes in AV's absence, 16/7/2003
         !JMJ!     this tests whether the particle is outside the circumscribing
         !JMJ!     circle.
-        if (get_option('debug ') .ne. 0) print *, "lhcscreen 1/2: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "lhcscreen 1/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -757,7 +759,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !JMJ!     ensure that they don't get set to zero.
         if(aperture(1).gt.zero) apx = aperture(1)
         if(aperture(2).gt.zero) apy = aperture(2)
-        if (get_option('debug ') .ne. 0) print *, "lhcscreen 2/2: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "lhcscreen 2/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -767,7 +769,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      else if(aptype.eq.'marguerite') then
         apx = aperture(1)
         apy = aperture(2)
-        if (get_option('debug ') .ne. 0) print *, "marguerite: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "marguerite: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(3, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -777,14 +779,14 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !*****         test ellipse
         apx = aperture(3)
         apy = aperture(4)
-        if (get_option('debug ') .ne. 0) print *, "rectellipse 1/2: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "rectellipse 1/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
         !*****         test rectangle
         apx = aperture(1)
         apy = aperture(2)
-        if (get_option('debug ') .ne. 0) print *, "rectellipse 2/2: apx, apy, apr, offx, offy ", &
+        if (optiondebug .ne. 0) print *, "rectellipse 2/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
              last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
@@ -2997,11 +2999,14 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
   !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
   !   ntrk      (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn, get_option
+  integer flag,turn,part_id(*),last_turn(*),ntrk,i,n,nn,  & 
+       get_option, optiondebug
   double precision apx,apy,apr,sum,last_pos(*),last_orbit(6,*),z(6,*), &
        one,al_errors(align_max),offx,offy
   parameter(one=1d0)
   character(name_len) aptype
+
+  optiondebug = get_option('debug ')
 
   n = 1
 10 continue
@@ -3013,7 +3018,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
      if (flag .eq. 1 .and. &
         ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
         ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. one) then
-        if (get_option('debug ') .ne. 0) then 
+        if (optiondebug .ne. 0) then 
           print *, "trcoll ellipse: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
           print *, "                y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
         endif
@@ -3022,7 +3027,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
      else if(flag .eq. 2 .and. &
           (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
            abs(z(3,i)-al_errors(12)-offy) .gt. apy)) then
-          if (get_option('debug ') .ne. 0) then 
+          if (optiondebug .ne. 0) then 
              print *, "trcoll rectangle: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
              print *, "                  y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
           endif
@@ -3033,7 +3038,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
         ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. one .and. &
         ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
         ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. one) then
-        if (get_option('debug ') .ne. 0) then 
+        if (optiondebug .ne. 0) then 
           print *, "trcoll marguerite: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
           print *, "                   y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
         endif
@@ -3046,7 +3051,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
             abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
             (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
             (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
-          if (get_option('debug ') .ne. 0) then 
+          if (optiondebug .ne. 0) then 
              print *, "trcoll racetrack: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
              print *, "                  y, al_err_y, offy, apy, apr : ", z(3,i), al_errors(12), offy, apy, apr 
           endif
