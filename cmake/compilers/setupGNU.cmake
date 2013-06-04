@@ -17,7 +17,11 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     # ON APPLE machines and on 32bit Linux systems, -O2 seems to be the highest optimization level possible
     # for file l_complex_taylor.f90
     if(APPLE OR IS32BIT)
-        set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O2 ")
+        if (${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 4.6)
+          set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O1 ")
+        else()
+          set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O2 ")
+        endif()
     else()
         set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O4 ")
     endif()
