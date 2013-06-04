@@ -21,6 +21,7 @@ set(_dirs ${SDDS_SEARCH_DIRS}
           /usr/local/lib64)
 
 foreach(_lib ${_SDDS_LIBS})
+    set(SDDS_${_lib}_LIB "NOTFOUND")
     find_library(SDDS_${_lib}_LIB NAMES ${_lib} 
       PATHS ${_dirs}
       NO_DEFAULT_PATH
