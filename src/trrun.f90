@@ -3302,9 +3302,7 @@ subroutine ttdpdg(track, ktrack)
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
-  if (tilt .ne. zero) then
-     call tmtilt(.false.,tilt,ek,rw,tw)
-  endif
+  call tmtilt(.false.,tilt,ek,rw,tw)
   do itrack = 1, ktrack
      track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
      track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)

@@ -2910,6 +2910,9 @@ SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   double precision c,ek(6),r(6,6),r1j,r2j,ri1,ri2,s,t(6,6,6),t1jk,  &
        t2jk,ti1k,ti2k,tij1,tij2,tilt,xx
 
+  !YIL13: make sure we don't bother tilting by 0 degrees..
+  if (tilt.eq.0) return
+
   c = cos(tilt)
   s = sin(tilt)
 
