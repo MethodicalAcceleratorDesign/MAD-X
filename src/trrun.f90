@@ -586,10 +586,11 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
        last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
        aperture(maxnaper),one,maxaper(6), zero,al_errors(align_max),st,  &
        theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),offset(2), &
-       offx,offy
+       offx,offy,min_double
   character(name_len) aptype
   parameter(zero = 0d0, one=1d0)
-
+  parameter(min_double = 1.e-36
+  
   optiondebug = get_option('debug ')
 
   fmap=.false.
@@ -699,13 +700,12 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !------------  circle case ----------------------------------
      else if(aptype.eq.'circle') then
         apx = aperture(1)
-        !        print *,"radius of circle in element",apx
-        if(apx.eq.zero) then
+!        if(apx.eq.zero) then     ! This FP comparison was triggering a bug in some conditions...
+        if(apx.lt.min_double) then 
+           if (optiondebug .ne. 0) print *, " zero circle radius ", apx, " replaced by default ", maxaper(1)
            apx = maxaper(1)
-           !        print *,"radius of circle by default",apx
         endif
         apy = apx
-        !        print *,"circle, radius= ",apx
         if (optiondebug .ne. 0) print *, "circle: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
