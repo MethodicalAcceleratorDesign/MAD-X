@@ -287,7 +287,6 @@ lib64/libmdblib.a -text
 lib64/libmdbmth.a -text
 lib64/librpnlib.a -text
 lib64/libz.a -text
-libs/CMakeLists.txt -text
 libs/gc/Makefile -text
 libs/gc/Makefile_lnx -text
 libs/gc/Makefile_mac -text

@@ -38,7 +38,9 @@ include(setupOptions)
 
 # We add libraries before setting up compilers because
 # some of our options are incompatible with e.g. GC
-add_subdirectory(libs)
+if(USE_GC)
+   add_subdirectory(libs/gc/gc)
+endif()
 
 # 
 # we call a subscript that sets up our compiler specific flags...
@@ -52,6 +54,7 @@ include(setupArchSpecifics)
 
 
 # Add sources subdirectory:
+add_subdirectory(libs/ptc)
 add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(syntax)
