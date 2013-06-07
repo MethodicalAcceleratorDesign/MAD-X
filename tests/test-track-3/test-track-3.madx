@@ -1,7 +1,7 @@
 ! Simple tracking test for LHC beam screen.
 ! tstTrack_ap_lhcscreen.madx
 
-option,-echo,-info;
+option,-echo,-info,warn;
 
 ! **********  Apertures introduced **********
 qf:multipole, knl={0,-0.0}, apertype= lhcscreen, aperture={0.000707,0.002,0.001};! V

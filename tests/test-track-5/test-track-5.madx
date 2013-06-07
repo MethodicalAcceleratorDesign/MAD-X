@@ -1,7 +1,7 @@
 ! Simple tracking test for rectellipse.
 ! tstTrack_ap_rectellipse.madx
 
-option,-echo,-info,-warn;
+option,-echo,-info,warn;
 
 ! **********  Apertures introduced **********
 qd:multipole, knl= {0,-0.0}, apertype= rectellipse,

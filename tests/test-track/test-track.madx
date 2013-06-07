@@ -1,7 +1,7 @@
 ! Simple tracking test for collimator with aper definition.
 ! tstTrack_ap_collimator.madx
 
-option,-echo,-info,-warn;
+option,-echo,-info,warn;
 
 ! **********  Apertures introduced **********
 col:rcollimator, l= 0.0, apertype= rectellipse,

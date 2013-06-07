@@ -6,6 +6,7 @@ vrf400= 8.0;
 
 ! ---------- sequence
 call, file="../test-makethin-2/V6.5.thin.b1.seq";
+option, warn;
 !---------nominal strength--------
 call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
 

@@ -1,5 +1,5 @@
 ! YIL13: Taken from tests_old/test_runs/track_example/
-option,-echo,-info,-warn;
+option,-echo,-info;
 
 !--------1---------2---------3---------4---------5---------6---------7---------8
 !-- This job should be run with mad -x version 8.51/02

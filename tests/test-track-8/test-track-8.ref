@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +              MAD-X 5.00.00              +
-  +           Production Version            +
-  + Code Modification Date: 28.02.2011      +
-  + Execution Time Stamp: 16.01.13 09.17.40 +
+  +    MAD-X 5.01.02  (64 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 07.06.13 18.07.22 +
   +++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
 
@@ -13,6 +13,15 @@
 
 option, -echo,-warn,-info;
 
+++++++ warning: ignored because of unknown element: acn.a5l4.b1
+++++++ warning: ignored because of unknown element: acn.b5l4.b1
+++++++ warning: ignored because of unknown element: acn.c5l4.b1
+++++++ warning: ignored because of unknown element: acn.d5l4.b1
+++++++ warning: ignored because of unknown element: adth.a5l4.b1
+++++++ warning: ignored because of unknown element: adth.b5l4.b1
+++++++ warning: ignored because of unknown element: apw.5r4.b1
+++++++ warning: ignored because of unknown element: adtv.a5r4.b1
+++++++ warning: ignored because of unknown element: adtv.b5r4.b1
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -30,7 +39,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.347846458                  0                  0        59.31000027 
 
                dq2            betymax              dymax              dyrms 
-       2.000220745         611.782944                 -0                  0 
+       2.000220745         611.782944                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -45,7 +54,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   
   Full 6D closed orbit search.
   Initial value of 6-D closed orbit from Twiss: 
-  orbit0   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
   Singular matrix occurred during closed orbit search.
   
  6D closed orbit found by subroutine trclor 
@@ -56,8 +65,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 exit TRACK module
 
 
-  Number of warnings: 0
+  Number of warnings: 9
+9 in C and 0 in Fortran
 
-  +++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.00 finished normally +
-  +++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
