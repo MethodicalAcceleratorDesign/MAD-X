@@ -209,20 +209,22 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   nlm=0
   !hbu
   el_name='start           '
-  !--- enter start coordinates in summary table
-  do  i = 1,j_tot
-     tmp_d = i
-     call double_to_table_curr('tracksumm ', 'number ', tmp_d)
-     tmp_d = tot_turn
-     call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
-     do j = 1, 6
-        tmp_d = z(j,i) - orbit0(j)
-        call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
+  if(first) then
+     !--- enter start coordinates in summary table
+     do  i = 1,j_tot
+        tmp_d = i
+        call double_to_table_curr('tracksumm ', 'number ', tmp_d)
+        tmp_d = tot_turn
+        call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
+        do j = 1, 6
+           tmp_d = z(j,i) - orbit0(j)
+           call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
+        enddo
+        !hbu add s
+        call double_to_table_curr('tracksumm ',vec_names(7),spos)
+        call augment_count('tracksumm ')
      enddo
-     !hbu add s
-     call double_to_table_curr('tracksumm ',vec_names(7),spos)
-     call augment_count('tracksumm ')
-  enddo
+  endif
   !--- enter first turn, and possibly eigen in tables
   if (switch .eq. 1)  then
      if (onetable)  then
