@@ -57,7 +57,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
   logical onepass,onetable,last_out,info,aperflag,doupdate,first,        &
-       bb_sxy_update,virgin_state
+       bb_sxy_update,virgin_state,emittance_update
   integer j,code,restart_sequ,advance_node,                              &
        node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
        ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
@@ -73,7 +73,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        dx_start,dpx_start,dy_start,dpy_start,deltap,                     &
        N_ions_in_beam, Npart_gain, t_rms,                                &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,                  &
-       N_ions_for_bb,z_keep(6,max_part)
+       N_ions_for_bb,z_keep(6,max_part),ex_rms0,ey_rms0,sigma_p0,sigma_z0
+  data ex_rms0,ey_rms0,sigma_p0,sigma_z0 / 0d0, 0d0, 0d0, 0d0 / 
+
 
   character(12) tol_a, char_a
   character(20) text
@@ -108,7 +110,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        N_ions_in_beam, Npart_gain, t_rms,                  &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,    &
        N_ions_for_bb,N_macr_prt_ini,z_keep,part_id_keep,   &
-       last_turn_keep,jmax,segment
+       last_turn_keep,jmax,segment,                        &
+       ex_rms0,ey_rms0,sigma_p0,sigma_z0
 
   data betx_start, bety_start,                             &
        alfx_start, alfy_start,                             &
@@ -131,6 +134,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   else
   endif
 
+  emittance_update = get_option('emittance_update ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
   if(bb_sxy_update) then
      virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
@@ -301,7 +305,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         N_macro_surv=jmax
         i_spch = 0 !a special spch-update counter
 
-
+        ex_rms0=ex_rms
+        ey_rms0=ey_rms
+        sigma_z0=sigma_z
         !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
         call ixy_calcs(betas, orbit0, z,                                &
              betx_start, bety_start,                      &
@@ -320,6 +326,13 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
         call augment_count('bb6d_ixy ')
 
+        if(sigma_p0.eq.0d0) sigma_p0=sigma_p
+        if(.not.emittance_update) then
+           ex_rms=ex_rms0
+           ey_rms=ey_rms0
+           sigma_z=sigma_z0
+           sigma_p=sigma_p0
+        endif
         if((sigma_z.GT.0d0).AND.(sigma_z_ini.GT.0d0)) then
            z_factor=sigma_z_ini/sigma_z
         else

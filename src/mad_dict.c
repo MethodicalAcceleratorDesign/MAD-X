@@ -226,6 +226,7 @@ char command_def[] =
 "bborbit  = [l, false, true], "
 "bb_ultra_relati = [l, false, true], "
 "bb_sxy_update   = [l, false, true], "
+"emittance_update   = [l, true, true], "
 "echo     = [l, true, true], "
 "info     = [l, true, true], "
 "reset    = [l, false, true], "
