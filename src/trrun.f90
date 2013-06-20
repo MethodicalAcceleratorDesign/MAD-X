@@ -62,9 +62,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
        ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
        segment, e_flag, nobs,lobs,int_arr(1),tot_segm,code_buf(*),       &
-       tot_turn,max_turn
-  parameter(max_turn=20000)
-  integer part_id_keep(max_turn),last_turn_keep(max_turn)
+       tot_turn,max_part
+  parameter(max_part=20000)
+  integer part_id_keep(max_part),last_turn_keep(max_part)
   double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),          &
        al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
        node_value,get_variable,last_pos(*),last_orbit(6,*),          &
@@ -73,7 +73,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        dx_start,dpx_start,dy_start,dpy_start,deltap,                     &
        N_ions_in_beam, Npart_gain, t_rms,                                &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,                  &
-       N_ions_for_bb,z_keep(6,max_turn)
+       N_ions_for_bb,z_keep(6,max_part)
 
   character(12) tol_a, char_a
   character(20) text
@@ -180,9 +180,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         part_id(k) = k
      enddo
   else
-     if(jmax.gt.max_turn) then
-        write(text, '(1p,d20.12)') max_turn 
-        call aafail('TRRUN: ','Fatal: Maximum Turn number exceeded =' // text)
+     if(jmax.gt.max_part) then
+        write(text, '(1p,d20.12)') max_part 
+        call aafail('TRRUN: ','Fatal: Maximum Particle Number exceeded =' // text)
      endif
      do i = 1, jmax
         last_turn(i)=last_turn_keep(i)
