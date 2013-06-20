@@ -33,4 +33,9 @@ macro(numdiff_test testname islong)
       -P ${BASESCRIPT})
    set_tests_properties (${_testname}
       PROPERTIES PASS_REGULAR_EXPRESSION ".*${testname}.*PASS")
+   if(NOT ${islong})
+      # short tests should never be allowed to take longer than 5 seconds!
+      set_tests_properties (${_testname}
+         PROPERTIES TIMEOUT 5)
+   endif()
 endmacro()
