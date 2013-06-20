@@ -71,7 +71,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        node_value,one,get_variable,last_pos(*),last_orbit(6,*),          &
        maxaper(6),get_value,zero,obs_orb(6),coords(6,0:turns,*),l_buf(*),&
        betx_start,bety_start,alfx_start,alfy_start,gamx_start,gamy_start,&
-       dx_start,dpx_start,dy_start,dpy_start,position,deltap,            &
+       dx_start,dpx_start,dy_start,dpy_start,deltap,                     &
        N_ions_in_beam, Npart_gain, t_rms,                                &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,                  &
        N_ions_for_bb,z_keep(6,max_turn)
@@ -86,15 +86,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
       double precision   Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
-      integer N_macr_prt_ini,ii !VK20121003 -----------------------!
-      integer i_vk
+      integer N_macr_prt_ini !VK20121003 -----------------------!
 
   !hbu
   double precision spos
   !hbu
   character(4) vec_names(7)
   !hbu
-  character(name_len) name,el_name
+  character(name_len) el_name
   character(120) msg
   data tol_a,char_a / 'maxaper ', ' ' /
   !hbu
@@ -1022,7 +1021,7 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
        npeak(100), nlag(100), ntune(100), temp,noise
 
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,half=5d-1)
-  character(name_len) name,aptype
+  character(name_len) name
 
   save first,ordinv
   data first / .true. /
@@ -1765,9 +1764,8 @@ subroutine tthacdip(track,ktrack,turn)
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
   integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
-       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
+  double precision omega,phirf,rff,rfl,rfv,track(6,*),clight,twopi,vrf, &
+      pc0,get_variable,node_value,get_value,one,two,half,ten3m,ten6p,px
   !      double precision px,py,ttt,beti,el1
   parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
 
@@ -1829,9 +1827,8 @@ subroutine ttvacdip(track,ktrack,turn)
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
   integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-  double precision bi2gi2,dl,el,omega,dtbyds,phirf,pt,rff,betas,    &
-       gammas,rfl,rfv,track(6,*),clight,twopi,vrf,deltap,deltas,pc,pc0,  &
-       get_variable,node_value,get_value,one,two,half,ten3m,ten6p,py
+  double precision omega,phirf,rff,rfl,rfv,track(6,*),clight,twopi,vrf, &
+       pc0,get_variable,node_value,get_value,one,two,half,ten3m,ten6p,py
   !      double precision px,py,ttt,beti,el1
   parameter(one=1d0,two=2d0,half=5d-1,ten3m=1d-3,ten6p=1d6)
 
@@ -3757,11 +3754,7 @@ subroutine ixy_fitting()
   use spch_bbfi
   implicit none
 
-  LOGICAL exists
-
-  Character (80) tfs_title (8), turns_info_title(8)
   integer i, iii, jjj
-  integer n_lines_in_turn_table
   ! n_lines_in_turn_table=1
   double precision Summ_dpi_square, Summ_z_part_square
   double precision Summ_x, Summ_y, Hi, one_ex, ex_dist, one_ey,     &
@@ -3769,7 +3762,7 @@ subroutine ixy_fitting()
   double precision Ix(N_macro_max), Iy(N_macro_max),                &
        dpi(N_macro_max), z_part(N_macro_max)
   double precision Ix_sorted(N_macro_max), Iy_sorted(N_macro_max)
-  double precision Ix_min,Iy_min, dpi_min, Ix_min_last,Iy_min_last
+  double precision Ix_min,Iy_min, Ix_min_last,Iy_min_last
   ! I_x/Ex_rms+I_y/Ey_rms <= I_div_E_sum_max
   ! limit for particles taken for Ix, Iy evaluations
   double precision    Ix_i, Iy_i, dpi_i, z_part_i, Ixy_rel_summ,    &
@@ -3799,7 +3792,6 @@ subroutine ixy_fitting()
         z_part(i_for_I)=z_part_i
      endif
   ENDDO
-20 continue
   N_for_I=i_for_I
 
   N_for_I_dble=dble(N_for_I)
@@ -3881,8 +3873,6 @@ subroutine ixy_fitting()
   ey_dist=one/one_ey
   Ey_rms=ey_dist
 !  Print *, 'ey_dist=', ey_dist
-
-10 continue
 
   return
 
@@ -4392,11 +4382,10 @@ subroutine ttrfmult(track, ktrack, turn)
   !   KTRACK    (integer)   Number of surviving tracks.                  *
   !----------------------------------------------------------------------*
 
-  double precision beta, angle, cangle, sangle, dtmp
+  double precision beta
   double precision node_value, get_value
   double precision bvk, deltap, elrad
   double precision f_errors(0:maxferr)
-  double precision vals(2,0:maxmul)
   integer n_ferr, jtrk, iord, nord
 
   !--- AL: RF-multipole
@@ -4540,7 +4529,7 @@ subroutine tttquad(track, ktrack)
   double precision track(6,*)
   integer ktrack
   
-  double precision node_value, get_value
+  double precision node_value
   double precision k1, k1s, length, ksqrt, tmp
   double precision sx, cx, sy, cy, ct, st
   double precision x, px, y, py
