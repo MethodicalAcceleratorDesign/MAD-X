@@ -17,6 +17,14 @@ if(MADX_STATIC)
     if(BUILD_SHARED_LIBS)
        message(FATAL_ERROR "Cannot build shared libs with MADX_STATIC on")
     endif()
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+       # We need to make sure we find libX11.a
+       if(IS32BIT)
+          link_directories(${CMAKE_SOURCE_DIR}/lib32/)
+       else()
+          link_directories(${CMAKE_SOURCE_DIR}/lib64/)
+       endif()
+    endif()
 endif()
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
@@ -31,7 +39,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 #include our specific folders:
-   if( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
+   if(IS32BIT)
        set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib32/)
    else()
        set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib64/)
