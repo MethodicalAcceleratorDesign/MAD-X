@@ -1203,6 +1203,10 @@ pro_correct2_response_ring(int ip, int nc, int nm)
   int icb;
   int    i, j;
 
+  int debug;
+
+  debug = get_option("debug");
+
   setbuf(stdout,(char *)0);
 
   ic = 0; im = 0;
@@ -1225,124 +1229,117 @@ pro_correct2_response_ring(int ip, int nc, int nm)
   ic = 0;
 
   while(c) {
-    if (get_option("debug")) {
-    printf("corrector flag: %d\n",c->enable);
-    }
+    if (debug) printf("corrector flag: %d\n",c->enable);
+    
     if(c->enable == 1) {
 
       for(icb = 0; icb < 2; icb++) {
       if(c->id_ttb[icb] > 0) {
 
-         if(icb == 0) {
-           correct_orbit12->qx0 = da1[5][twiss_table_beam1->curr-1];
-           correct_orbit12->qy0 = da1[8][twiss_table_beam1->curr-1];
-           qx0 = correct_orbit12->qx0;
-           qy0 = correct_orbit12->qy0;
-           if(c->id_ttb[icb] > 0) {
-              bx_c = da1[3][c->id_ttb[icb]];
-              by_c = da1[6][c->id_ttb[icb]];
-              pix_c = da1[5][c->id_ttb[icb]];
-              piy_c = da1[8][c->id_ttb[icb]];
-           } else {
-              bx_c = 0.0;                    
-              by_c = 0.0;                     
-              pix_c = 0.0;                     
-              piy_c = 0.0;                         
-           }
-         } else {
-           correct_orbit12->qx0 = da2[5][twiss_table_beam2->curr-1];
-           correct_orbit12->qy0 = da2[8][twiss_table_beam2->curr-1];
-           qx0 = correct_orbit12->qx0;
-           qy0 = correct_orbit12->qy0;
-           if(c->id_ttb[icb] > 0) {
-              bx_c = da2[3][c->id_ttb[icb]];
-              by_c = da2[6][c->id_ttb[icb]];
-              pix_c = da2[5][c->id_ttb[icb]];
-              piy_c = da2[8][c->id_ttb[icb]];
-           } else {
-              bx_c = 0.0;                    
-              by_c = 0.0;                     
-              pix_c = 0.0;                     
-              piy_c = 0.0;                         
-           }
-         }
-
-         m = correct_orbit12->mon_table;
-         im = 0;
-         while(m) {
-              if (get_option("debug")) {
-            printf("monitor flag: %d\n",m->enable);
-              }
-            if(m->enable == 1) {
-             if((m->id_ttb[icb] > 0) && (c->id_ttb[icb] > 0)) { 
+	if(icb == 0) {
+	  correct_orbit12->qx0 = da1[5][twiss_table_beam1->curr-1];
+	  correct_orbit12->qy0 = da1[8][twiss_table_beam1->curr-1];
+	  qx0 = correct_orbit12->qx0;
+	  qy0 = correct_orbit12->qy0;
+	  if(c->id_ttb[icb] > 0) {
+	    bx_c = da1[3][c->id_ttb[icb]];
+	    by_c = da1[6][c->id_ttb[icb]];
+	    pix_c = da1[5][c->id_ttb[icb]];
+	    piy_c = da1[8][c->id_ttb[icb]];
+	  } else {
+	    bx_c = 0.0;                    
+	    by_c = 0.0;                     
+	    pix_c = 0.0;                     
+	    piy_c = 0.0;                         
+	  }
+	} else {
+	  correct_orbit12->qx0 = da2[5][twiss_table_beam2->curr-1];
+	  correct_orbit12->qy0 = da2[8][twiss_table_beam2->curr-1];
+	  qx0 = correct_orbit12->qx0;
+	  qy0 = correct_orbit12->qy0;
+	  if(c->id_ttb[icb] > 0) {
+	    bx_c = da2[3][c->id_ttb[icb]];
+	    by_c = da2[6][c->id_ttb[icb]];
+	    pix_c = da2[5][c->id_ttb[icb]];
+	    piy_c = da2[8][c->id_ttb[icb]];
+	  } else {
+	    bx_c = 0.0;                    
+	    by_c = 0.0;                     
+	    pix_c = 0.0;                     
+	    piy_c = 0.0;                         
+	  }
+	}
+	
+	m = correct_orbit12->mon_table;
+	im = 0;
+	while(m) {
+	  if (debug) printf("monitor flag: %d\n",m->enable);
+	  
+	  if(m->enable == 1) {
+	    if((m->id_ttb[icb] > 0) && (c->id_ttb[icb] > 0)) { 
               if(m->id_ttb[icb] > 0) { 
                 if(icb == 0) {
-                   mp = m->id_ttb[icb];
-                   bx_m = da1[3][mp];
-                   by_m = da1[6][mp];
-                   pix_m = da1[5][mp];
-                   piy_m = da1[8][mp];
+		  mp = m->id_ttb[icb];
+		  bx_m = da1[3][mp];
+		  by_m = da1[6][mp];
+		  pix_m = da1[5][mp];
+		  piy_m = da1[8][mp];
                 } else {
-                   mp = m->id_ttb[icb];
-                   bx_m = da2[3][mp];
-                   by_m = da2[6][mp];
-                   pix_m = da2[5][mp];
-                   piy_m = da2[8][mp];
+		  mp = m->id_ttb[icb];
+		  bx_m = da2[3][mp];
+		  by_m = da2[6][mp];
+		  pix_m = da2[5][mp];
+		  piy_m = da2[8][mp];
                 }
               } else {
-                   bx_m = 0.0;        
-                   by_m = 0.0;        
+		bx_m = 0.0;        
+		by_m = 0.0;        
                    pix_m = 0.0;       
                    piy_m = 0.0;         
               }
-      
+	      
               respx = 0.0;
               respy = 0.0;
-
+	      
 /*  print Twiss parameters ... */
-              if (get_option("debug"))  {
+              if (debug)  {
                 printf("%s %d %e %e %e %e -- %s %e %e %e %e\n",
-                c->p_node->name,icb,bx_c,by_c,pix_c,piy_c,
-                m->p_node->name,bx_m,by_m,pix_m,piy_m);
+		       c->p_node->name,icb,bx_c,by_c,pix_c,piy_c,
+		       m->p_node->name,bx_m,by_m,pix_m,piy_m);
               }
 
               if(ip == 1) {
-                  respx1 = cos((fabs(pix_m - pix_c)*twopi) - qx0*pi);
-                  respx = respx1*sqrt(bx_m*bx_c)/(2.0*sin(pi*qx0));
-                  if(icb != 0) { respx = respx; }
-                  setup_(&respx, dmat, &im, &ic, &nm, &nc);
+		respx1 = cos((fabs(pix_m - pix_c)*twopi) - qx0*pi);
+		respx = respx1*sqrt(bx_m*bx_c)/(2.0*sin(pi*qx0));
+		if(icb != 0) { respx = respx; }
+		setup_(&respx, dmat, &im, &ic, &nm, &nc);
               }  else if (ip == 2) {
-                  respy1 = cos((fabs(piy_m - piy_c)*twopi) - qy0*pi);
-                  respy = respy1*sqrt(by_m*by_c)/(2.0*sin(pi*qy0));
-                  if(icb != 0) { respy = respy; }
-                  setup_(&respy, dmat, &im, &ic, &nm, &nc);
+		respy1 = cos((fabs(piy_m - piy_c)*twopi) - qy0*pi);
+		respy = respy1*sqrt(by_m*by_c)/(2.0*sin(pi*qy0));
+		if(icb != 0) { respy = respy; }
+		setup_(&respy, dmat, &im, &ic, &nm, &nc);
               }
               if((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) { 
-                 if (get_option("debug"))  {
-                    printf("true %d %d",ic,im); 
-                 }
-                    setupi_(&i_one, imat, &im, &ic, &nm, &nc);
+		if (debug) printf("true %d %d",ic,im); 		
+		setupi_(&i_one, imat, &im, &ic, &nm, &nc);
               } else {
-                 if (get_option("debug"))  {
-                    printf("false "); 
-                 }
-                    setupi_(&i_zero, imat, &im, &ic, &nm, &nc);
+		if (debug) printf("false "); 
+		setupi_(&i_zero, imat, &im, &ic, &nm, &nc);
               }
-              if (get_option("debug"))  {
-                printf("Response:  %d %d %e %e %e \n",ic,im,respx, respy,fabs(respy));
-              }
-         }
-              im++;
-            }
-            m = m->next;
-         };
+              if (debug) printf("Response:  %d %d %e %e %e \n",ic,im,respx, respy,fabs(respy));
+	    }
+	    im++;
+	  }
+	  m = m->next;
+	};
       }
       }
       ic++;
     }
     c = c->next;
   };
-  if (get_option("debug"))  {
+
+  if (debug)  {
      primat_(imat, &nm, &nc);
      prdmat_(dmat, &nm, &nc);
      printf("\n");
@@ -1350,7 +1347,7 @@ pro_correct2_response_ring(int ip, int nc, int nm)
   }
 
   myfree("pro_correct2_response_ring", imat);
-
+  
   return dmat;
 }
 
@@ -1491,7 +1488,7 @@ correct_correct1(struct in_cmd* cmd)
   int niter;
 //  int resout; // not used
   int twism;
-  int dbg = 0;
+  int dbg;
   int ifail, sflag; // , svdflg; // not used
   float  rms;
   double sngcut, sngval;
@@ -1506,14 +1503,20 @@ correct_correct1(struct in_cmd* cmd)
   static int     *nm, *nx, *nc;
   struct id_mic  *corl;
 
+  int debug;
+
+  debug = get_option("debug");
+
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip, cmd);
   ncorr = im%10000; nmon  = im/10000;
   printf("%d monitors and %d correctors found in input\n",nmon,ncorr);
+
   if(nmon == 0) {
     printf("No monitor found in input, no correction done\n");
     return;
   }
+  
   if(ncorr == 0) {
     printf("No corrector found in input, no correction done\n");
     return;
@@ -1521,7 +1524,7 @@ correct_correct1(struct in_cmd* cmd)
 
 
   /* For debugging set output buffer to zero */
-  if (get_option("debug"))  setbuf(stdout,NULL);
+  if (debug)  setbuf(stdout,NULL);
 
 
   /* Prepare file descriptors for the output */
@@ -1601,31 +1604,30 @@ correct_correct1(struct in_cmd* cmd)
     if(dmat != NULL) myfree(rout_name,dmat);
     /* icor and imon used to set up correct matrix size !! */
     dmat  = pro_correct_response_ring(ip,icor,imon);
+
     if(command_par_value("cond",cmd->clone) == 1) { // (svdflg = not used
        sngcut = command_par_value("sngcut", cmd->clone);
        sngval = command_par_value("sngval", cmd->clone);
        printf("SVD conditioning requested ...\n");
-       if (get_option("debug")) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
+       if (debug) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
 
        /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
        sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
        printf("Initially found %d singular values\n",sflag);
        /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
-       /* printf("sflag: %d\n",sflag); */
-        printf("sflag: %d\n",sflag); 
-       for(ix=0;ix<sflag;ix++) {
+
+       for(ix=0; ix<sflag; ix++) {
          corl[nx[sing[2*ix+0]]].enable = 0;
-           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
-                 corl[nx[sing[2*ix+0]]].p_node->name);
-         if(dbg == 1) {
-           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
-                 corl[nx[sing[2*ix+0]]].p_node->name);
-         }
+	 if(dbg == 1) printf("Removed:   %d %s\n",nx[sing[2*ix+0]], 
+			     corl[nx[sing[2*ix+0]]].p_node->name);
        }
+
        ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
        icor = ix%10000; imon  = ix/10000;
+
        printf("After SVD conditioning:             \n");
        printf("%d monitors and %d correctors enabled\n\n",imon,icor);
+
        if(dmat != NULL) myfree(rout_name,dmat);
        /* icor and imon used to set up correct matrix size !! */
        dmat  = pro_correct_response_ring(ip,icor,imon);
@@ -1642,7 +1644,7 @@ correct_correct1(struct in_cmd* cmd)
        sngcut = command_par_value("sngcut", cmd->clone);
        sngval = command_par_value("sngval", cmd->clone);
        printf("SVD conditioning requested ...\n");
-       if (get_option("debug")) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
+       if (debug) printf("Conditioning parameters: %e %e\n",sngcut, sngval);
 
        /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
        sflag=c_svddec(dmat,imon,icor,sing,&sngcut,&sngval);
@@ -1651,10 +1653,9 @@ correct_correct1(struct in_cmd* cmd)
        /* printf("sflag: %d\n",sflag); */
        for(ix=0;ix<sflag;ix++) {
          corl[nx[sing[2*ix+0]]].enable = 0;
-         if(dbg == 1) {
-           printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
-                 corl[nx[sing[2*ix+0]]].p_node->name);
-         }
+         if(dbg == 1) printf("Removed:   %d %s\n",nx[sing[2*ix+0]],
+			     corl[nx[sing[2*ix+0]]].p_node->name);
+         
        }
        ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
        icor = ix%10000; imon  = ix/10000;
@@ -1671,7 +1672,7 @@ correct_correct1(struct in_cmd* cmd)
   else { printf("INVALID MACHINE TYPE\n"); exit(-1);
   }
 
-  if (get_option("debug")) {
+  if (debug) {
     pro_correct_prtwiss();
     pro_correct_write_cocu_table();
   }
@@ -1680,9 +1681,9 @@ correct_correct1(struct in_cmd* cmd)
   /* LSQ correction, use all available correctors */
   if(strcmp("lsq",command_par_string("mode",cmd->clone)) == 0) {
     /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
-    /* printf("Time before lsq:  %-6.3f\n",fextim());   */
+    // if (debug) printf("Time before lsq:  %-6.3f\n",fextim());
     c_haveit(dmat,monvec,corvec,resvec,nx,imon,icor);
-    /* printf("Time after lsq:  %-6.3f\n",fextim());    */
+    // if (debug) printf("Time after lsq:  %-6.3f\n",fextim());
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
   }
 
@@ -1690,9 +1691,9 @@ correct_correct1(struct in_cmd* cmd)
   /* SVD correction, use all available correctors */
   if(strcmp("svd",command_par_string("mode",cmd->clone)) == 0) {
     /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
-    /* printf("Time before svd-corr:  %-6.3f\n",fextim());   */
-       sflag=c_svdcorr(dmat,monvec,corvec,resvec,nx,imon,icor);
-    /* printf("Time after svd-corr:  %-6.3f\n",fextim());    */
+    // if (debug) printf("Time before svd-corr:  %-6.3f\n",fextim());
+    sflag=c_svdcorr(dmat,monvec,corvec,resvec,nx,imon,icor);
+    // if (debug) printf("Time after svd-corr:  %-6.3f\n",fextim());
     pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
   }
 
@@ -1700,6 +1701,7 @@ correct_correct1(struct in_cmd* cmd)
   /* MICADO correction, get desired number of correctors from command */
   corrl = command_par_value("corrlim",cmd->clone);
   set_variable("corrlim",&corrl);
+
   if(strcmp("micado",command_par_string("mode",cmd->clone)) == 0) {
     printf("enter MICADO correction ...\n");
     if((niter = command_par_value("ncorr",cmd->clone)) == 0) {
@@ -1716,30 +1718,31 @@ correct_correct1(struct in_cmd* cmd)
           printf("ncorr reset to %d\n",icor);
           niter = icor;
     }
-    rms  = 1000.0*command_par_value("error",cmd->clone);
-    /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
-    /* printf("Time before micado:  %-6.3f\n",fextim());  */
-    ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
-    /* printf("Time after micado:  %-6.3f\n",fextim());   */
 
-    if(ifail != 0) {
+    rms  = 1000.0*command_par_value("error",cmd->clone);
+
+    /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
+    // if (debug) printf("Time before micado:  %-6.3f\n",fextim());
+    ifail = c_micit(dmat,conm,monvec,corvec,resvec,nx,rms,imon,icor,niter);
+    // if (debug) printf("Time after micado:  %-6.3f\n",fextim());
+
+    if (ifail == 0) pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+    else
+      {
        printf("MICADO correction completed with error code %d\n\n",ifail);
        warning("MICADO back with error",", no correction done");
-    }
-if(ifail == 0) {
-    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
- }
+      }
+    
   }
 
 
   /* write corrector output to tfs table */
-  if ((clist = command_par_string("clist",cmd->clone)) != NULL) {
+  if ((clist = command_par_string("clist",cmd->clone)) != NULL) 
     out_table("corr",corr_table,clist);
-  }
+  
   /* write monitor output to tfs table */
-  if ((mlist = command_par_string("mlist",cmd->clone)) != NULL) {
+  if ((mlist = command_par_string("mlist",cmd->clone)) != NULL) 
     out_table("mon",mon_table,mlist);
-  }
 
 
   /* Clean up at the end of the module */
@@ -1761,30 +1764,35 @@ correct_correct(struct in_cmd* cmd)
 
   /* Call for one or two ring orbit correction */
   if(command_par_value("tworing",cmd->clone)) {
-           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) == NULL) {
-              fatal_error("Two beam correction requested but no table supplied for beam 1",orbtab1);
-           }
-           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) == NULL) {
-              fatal_error("Two beam correction requested but no table supplied for beam 2",orbtab2);
-           }
-           printf("Want to use orbits from: %s and : %s\n",orbtab1,orbtab2);
-           correct_correct2(cmd);
-  }  else {
-           printf("Want to correct orbit of a single ring\n");                    
-           if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) != NULL) {
-              warning(" "," ");
-              warning("Single beam correction requested but beam 1 table supplied:",orbtab1);
-              warning("Requested table ignored:",orbtab1);
-              warning(" "," ");
-           }
-           if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) != NULL) {
-              warning(" "," ");
-              warning("Single beam correction requested but beam 2 table supplied:",orbtab2);
-              warning("Requested table ignored:",orbtab2);
-              warning(" "," ");
-           }
-           correct_correct1(cmd);
-  }
+    if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) == NULL) 
+      fatal_error("Two beam correction requested but no table supplied for beam 1",orbtab1);
+    
+    if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) == NULL)
+      fatal_error("Two beam correction requested but no table supplied for beam 2",orbtab2);
+    
+    printf("Want to use orbits from: %s and : %s\n",orbtab1,orbtab2);
+    correct_correct2(cmd);
+
+  }  else 
+    {
+      printf("Want to correct orbit of a single ring\n");                    
+
+      if ((orbtab1 = command_par_string("beam1tab",cmd->clone)) != NULL) {
+	warning(" "," ");
+	warning("Single beam correction requested but beam 1 table supplied:",orbtab1);
+	warning("Requested table ignored:",orbtab1);
+	warning(" "," ");
+      }
+      
+      if ((orbtab2 = command_par_string("beam2tab",cmd->clone)) != NULL) {
+	warning(" "," ");
+	warning("Single beam correction requested but beam 2 table supplied:",orbtab2);
+	warning("Requested table ignored:",orbtab2);
+	warning(" "," ");
+      }
+
+      correct_correct1(cmd);
+    }
 }
 
 #if 0 // not used...
@@ -1881,149 +1889,130 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
   static char atm[6][4] = {"hmon","vmon","moni","hkic","vkic","kick"};
 */
 
+  int debug;
+
+  debug = get_option("debug");
+
 /* Get access to tables, for orbit and model the default is twiss_table */
 
   if ((orbtab = command_par_string("orbit",cmd->clone)) != NULL) {
-      printf("Want to use orbit from: %s\n",orbtab);
+    printf("Want to use orbit from: %s\n",orbtab);
     if ((pps = name_list_pos(orbtab, table_register->names)) > -1) {
-       orbin_table = table_register->tables[pps];
+      orbin_table = table_register->tables[pps];
     } else {
-       fatal_error("ORBIT table for correction requested, but not provided:",orbtab);
+      fatal_error("ORBIT table for correction requested, but not provided:",orbtab);
     }
   } else {
-       if((orbin_table = twiss_table) == NULL) {
-         printf("FATAL ERROR:\n");
-         printf("You request the ORBIT from a non-existing TWISS table\n");
-         printf("You MUST run TWISS before trying to correct the orbit\n");
-         printf("MAD-X stops\n");
-         exit(81);
-       } else {
-         if (get_option("debug")) {
-            printf("TWISS table: %p\n", (void*)twiss_table);
-         }
-       }
-       pps = -1;
+    if((orbin_table = twiss_table) == NULL) {
+      printf("FATAL ERROR:\n");
+      printf("You request the ORBIT from a non-existing TWISS table\n");
+      printf("You MUST run TWISS before trying to correct the orbit\n");
+      printf("MAD-X stops\n");
+      exit(81);
+    } else {
+      if (debug) printf("TWISS table: %p\n", (void*)twiss_table);
+    }
+    pps = -1;
   }
 
 
   if ((tartab = command_par_string("target",cmd->clone)) != NULL) {
-       printf("Want to use target orbit from: %s\n",tartab);
+    printf("Want to use target orbit from: %s\n",tartab);
     if ((ppt = name_list_pos(tartab, table_register->names)) > -1) {
-       target_table = table_register->tables[ppt];
+      target_table = table_register->tables[ppt];
     } else {
-       fatal_error("TARGET table for correction requested, but not provided:",tartab);
+      fatal_error("TARGET table for correction requested, but not provided:",tartab);
     }
   } else {
-       if (get_option("debug")) {
-         printf("No target orbit requested\n");
-       }
-       ppt = -1;
+    if (debug) printf("No target orbit requested\n");
   }
+  ppt = -1;
+
 
   if ((modtab = command_par_string("model",cmd->clone)) != NULL) {
-       printf("Want to use model orbit from: %s\n",modtab);
+    printf("Want to use model orbit from: %s\n",modtab);
     if ((ppt = name_list_pos(modtab, table_register->names)) > -1) {
-       model_table = table_register->tables[ppt];
+      model_table = table_register->tables[ppt];
     } else {
-       fatal_error("MODEL table for correction requested, but not provided:",modtab);
+      fatal_error("MODEL table for correction requested, but not provided:",modtab);
     }
   } else {
-       if((model_table = twiss_table) == NULL) {
-         printf("FATAL ERROR:\n");
-         printf("You request the MODEL from a non-existing TWISS table\n");
-         printf("You MUST run TWISS before trying to correct the orbit\n");
-         printf("MAD-X stops\n");
-         exit(81);
-       } else {
-         if (get_option("debug")) {
-            printf("TWISS table: %p\n", (void*)twiss_table);
-         }
-       }
-       ppt = -1;
+    if((model_table = twiss_table) == NULL) {
+      printf("FATAL ERROR:\n");
+      printf("You request the MODEL from a non-existing TWISS table\n");
+      printf("You MUST run TWISS before trying to correct the orbit\n");
+      printf("MAD-X stops\n");
+      exit(81);
+    } else {
+      if (debug) printf("TWISS table: %p\n", (void*)twiss_table);
+    }
+    ppt = -1;
   }
 
+  if (debug) printf("The tables are: %p %p %p %p\n",
+		    (void*)orbin_table, (void*)twiss_table,
+		    (void*)target_table, (void*)model_table);
+   
+  
+  if(correct_orbit == NULL)
+    correct_orbit = mycalloc("pro_correct_gettables", 1, sizeof *correct_orbit);
 
+  if (debug) printf("-0-\n");
 
-       if (get_option("debug")) {
-            printf("The tables are: %p %p %p %p\n",
-                    (void*)orbin_table, (void*)twiss_table,
-                    (void*)target_table, (void*)model_table);
-       }
-       if (get_option("debug")) {
-       }
+  /*    if(corr_table == NULL) {   */
+  corr_table = make_table("corr", "corr", corr_table_cols,
+			  corr_table_types, 5000);
+  if (debug) printf("-01-\n");
+  
+  add_to_table_list(corr_table, table_register);
+  if (debug) printf("-02-\n");
+  
+  pro_correct_make_corr_table();
+  if (debug) printf("-03-\n");
+  /* } */
+  
+  if (debug) printf("-1-\n");
+  
 
-        if(correct_orbit == NULL)
-          correct_orbit = mycalloc("pro_correct_gettables", 1, sizeof *correct_orbit);
+  /*    if(mon_table == NULL) { */
+  mon_table = make_table("mon", "mon", mon_table_cols,
+			 mon_table_types, 5000);
+  if (debug) printf("-11-\n");
+  
+  add_to_table_list(mon_table, table_register);
+  if (debug) printf("-12-\n");
+       
+  pro_correct_make_mon_table();
+  if (debug) printf("-13-\n");  
+  /*    }                       */
 
-       if (get_option("debug")) {
-           printf("-0-\n");
-       }
-
-/*    if(corr_table == NULL) {   */
-    corr_table = make_table("corr", "corr", corr_table_cols,
-            corr_table_types, 5000);
-       if (get_option("debug")) {
-           printf("-01-\n");
-       }
-    add_to_table_list(corr_table, table_register);
-       if (get_option("debug")) {
-           printf("-02-\n");
-       }
-    pro_correct_make_corr_table();
-       if (get_option("debug")) {
-           printf("-03-\n");
-       }
-/*    }                          */
-       if (get_option("debug")) {
-           printf("-1-\n");
-       }
-
-/*    if(mon_table == NULL) { */
-    mon_table = make_table("mon", "mon", mon_table_cols,
-           mon_table_types, 5000);
-       if (get_option("debug")) {
-           printf("-11-\n");
-       }
-    add_to_table_list(mon_table, table_register);
-       if (get_option("debug")) {
-           printf("-12-\n");
-       }
-    pro_correct_make_mon_table();
-       if (get_option("debug")) {
-           printf("-13-\n");
-       }
-/*    }                       */
-       if (get_option("debug")) {
-           printf("-2-\n");
-       }
-
+  if (debug) printf("-2-\n");
 
   if(correct_orbit->cor_table != NULL) myfree(rout_name, correct_orbit->cor_table);
   if(correct_orbit->mon_table != NULL) myfree(rout_name, correct_orbit->mon_table);
   correct_orbit->cor_table = mycalloc("pro_correct_gettables_cor", 5200, sizeof *correct_orbit->cor_table);
   correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 5200, sizeof *correct_orbit->mon_table);
 
-/* orbit table available, get units, if defined */
-   if((ounits = command_par_value("units",cmd->clone)) > 0) {
-          correct_orbit->units=ounits;                      
-   } else {
-          correct_orbit->units=1.0;      
-   }
+  /* orbit table available, get units, if defined */
+  if((ounits = command_par_value("units",cmd->clone)) > 0) {
+    correct_orbit->units=ounits;                      
+  } else {
+    correct_orbit->units=1.0;      
+  }
 
   ttb = model_table;
   correct_orbit->mon_table->previous = NULL;
   correct_orbit->mon_table->next = NULL;
   correct_orbit->cor_table->previous = NULL;
   correct_orbit->cor_table->next = NULL;
-       if (get_option("debug")) {
-           printf("-3-\n");
-       }
+
+  if (debug) printf("-3-\n");
 
   mon_l = correct_orbit->mon_table;
   cor_l = correct_orbit->cor_table;
   for (j=0; j < ttb->curr; j++) {
-   if((strncmp(atm[iplane-1],ttb->p_nodes[j]->base_name,4) == 0) ||
-      (strncmp(atm[2],      ttb->p_nodes[j]->base_name,4) == 0))  {
+    if((strncmp(atm[iplane-1],ttb->p_nodes[j]->base_name,4) == 0) ||
+       (strncmp(atm[2],      ttb->p_nodes[j]->base_name,4) == 0))  {
       mon_l->id_ttb = j;
       mon_l->enable = ttb->p_nodes[j]->enable;
       mon_l->p_node = ttb->p_nodes[j];
@@ -2037,23 +2026,22 @@ pro_correct_gettables(int iplane, struct in_cmd* cmd)
       cor_l->enable = ttb->p_nodes[j]->enable;
       cor_l->p_node = ttb->p_nodes[j];
       if(command_par_value("corzero",cmd->clone) > 0) { // (set0 = not used
-        if(iplane == 1) cor_l->p_node->chkick = 0.0;
-        if(iplane == 2) cor_l->p_node->cvkick = 0.0;
+	if(iplane == 1) cor_l->p_node->chkick = 0.0;
+	if(iplane == 2) cor_l->p_node->cvkick = 0.0;
       }
       cor_l->next = cor_l;
       cor_l->next++; cor_l++;
       cntc++;
     }
   }
-       if (get_option("debug")) {
-           printf("-4-\n");
-       }
+ 
+  if (debug) printf("-4-\n");
+
   mon_l--; mon_l->next = NULL;
   cor_l--; cor_l->next = NULL;
-       if (get_option("debug")) {
-         printf("done: %d %d\n",cntm,cntc);
-       }
-
+  
+  if (debug) printf("done: %d %d\n",cntm,cntc);
+  
   return(10000*cntm + cntc);
 }
 
@@ -2080,6 +2068,10 @@ pro_correct_getorbit(struct in_cmd* cmd)
   int    tosy = -1;
   int    tospx, tospy;
 
+  int debug;
+
+  debug = get_option("debug");
+
   ttb = orbin_table;
   da1 = ttb->d_cols;
 
@@ -2101,7 +2093,7 @@ pro_correct_getorbit(struct in_cmd* cmd)
   if((posy = name_list_pos(stry,ttb->columns)) < 0) { 
       fatal_error("orbit y not found in input table",", MAD-X terminates ");
   }
-  if (get_option("debug")) {
+  if (debug) {
     if((pospx = name_list_pos("px",ttb->columns)) < 0) { 
         fatal_error("orbit px not found in input table",", MAD-X terminates ");
     }
@@ -2628,6 +2620,10 @@ pro_correct_response_ring(int ip, int nc, int nm)
   double respx, respy;
   double *dmat;
 
+  int debug;
+
+  debug = get_option("debug");
+  
   ttb = model_table;
   da1 = ttb->d_cols;
   ic = 0; im = 0;
@@ -2641,10 +2637,10 @@ pro_correct_response_ring(int ip, int nc, int nm)
 
   c = correct_orbit->cor_table;
   ic = 0;
+
   while(c) {
-    if (get_option("debug")) {
-    printf("corrector flag: %d\n",c->enable);
-    }
+    if (debug) printf("corrector flag: %d\n",c->enable);
+
     if(c->enable == 1) {
       bx_c = da1[3][c->id_ttb];
       by_c = da1[6][c->id_ttb];
@@ -2653,34 +2649,32 @@ pro_correct_response_ring(int ip, int nc, int nm)
       m = correct_orbit->mon_table;
       im = 0;
       while(m) {
-        if (get_option("debug")) {
-      printf("monitor flag: %d\n",m->enable);
-        }
-      if(m->enable == 1) {
-        bx_m = da1[3][m->id_ttb];
-        by_m = da1[6][m->id_ttb];
-        pix_m = da1[5][m->id_ttb];
-        piy_m = da1[8][m->id_ttb];
-        respx = 0.0;
-        respy = 0.0;
-        if(ip == 1) {
+	if (debug) printf("monitor flag: %d\n",m->enable);
+	if(m->enable == 1) {
+	  bx_m = da1[3][m->id_ttb];
+	  by_m = da1[6][m->id_ttb];
+	  pix_m = da1[5][m->id_ttb];
+	  piy_m = da1[8][m->id_ttb];
+	  respx = 0.0;
+	  respy = 0.0;
+	  if(ip == 1) {
             respx1 = cos((fabs(pix_m - pix_c)*twopi) - qx0*pi);
             respx = respx1*sqrt(bx_m*bx_c)/(2.0*sin(pi*qx0));
             setup_(&respx, dmat, &im, &ic, &nm, &nc);
-        }  else if (ip == 2) {
+	  }  else if (ip == 2) {
             respy1 = cos((fabs(piy_m - piy_c)*twopi) - qy0*pi);
             respy = respy1*sqrt(by_m*by_c)/(2.0*sin(pi*qy0));
             setup_(&respy, dmat, &im, &ic, &nm, &nc);
-        }
-        im++;
-      }
-      m = m->next;
+	  }
+	  im++;
+	}
+	m = m->next;
       };
       ic++;
     }
     c = c->next;
   }
-
+  
   return dmat;
 }
 
@@ -3070,39 +3064,42 @@ correct_option(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   int i, debug;
-  int val, pos, seed;
+  int pos, seed;
 
-  if ((debug=get_option("debug")))  {
-     fprintf(prt_file, "in coption routine\n");
-     for(i=0;i<cmd->tok_list->curr;i++) {
-        fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
-     }
+  debug = get_option("debug");
+
+  if (debug)  {
+    fprintf(prt_file, "in coption routine\n");
+    for(i=0;i<cmd->tok_list->curr;i++) {
+      fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
+    }
   }
+
   if ((pos = name_list_pos("seed", nl)) > -1)
     {
-     if (nl->inform[pos])
-       {
-        seed = command_par_value("seed", cmd->clone);
-        init55(seed);
-       }
+      if (nl->inform[pos])
+	{
+	  seed = command_par_value("seed", cmd->clone);
+	  init55(seed);
+	}
     }
- val = command_par_value("print", cmd->clone);
- if(val == 0) {
-      if (debug)  fprintf(prt_file, "print option not set\n");
-      print_correct_opt = 0;
- }else {
-      if (debug)  fprintf(prt_file, "print option set\n");
-      print_correct_opt = val;
- }
- val = command_par_value("debug", cmd->clone);
- if(val == 0) {
-      if (debug)  fprintf(prt_file, "debug option not set\n");
-      debug_correct_opt = 0;
- }else {
-      if (debug)  fprintf(prt_file, "debug option set\n");
-      debug_correct_opt = val;
- }
 
+  print_correct_opt = command_par_value("print", cmd->clone);
+  
+  if (debug) {
+    if (print_correct_opt == 0) 
+      fprintf(prt_file, "print option not set\n");
+    else fprintf(prt_file, "print option set\n");
+  }
+  
+  debug_correct_opt = command_par_value("debug", cmd->clone);
+
+  if (debug) {
+    if (debug_correct_opt == 0) 
+      fprintf(prt_file, "debug option not set\n");
+    else fprintf(prt_file, "debug option set\n");
+  }
+  
 }
 
 static void
