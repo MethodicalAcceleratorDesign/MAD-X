@@ -42,7 +42,7 @@
     end subroutine setupi
 
     subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
-     &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
+         &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
 ! ****************************************************
 !                                                    *
 !    Driving routine for MICADO correction           *
@@ -55,7 +55,7 @@
 
       integer im,ic,iter,i,j,nx(ic),ny(ic)
       real rms,ax(im,ic),cinx(ic),xinx(im),resx(im),rho(3*ic),ptop(ic), &
-     &rmss(ic),xrms(ic),xptp(ic),xiter(ic),rzero
+           &rmss(ic),xrms(ic),xptp(ic),xiter(ic),rzero
       parameter(rzero=0e0)
       double precision a(im,ic),xin(im),cin(ic),res(im)
       character*16 conm(ic)
@@ -86,7 +86,7 @@
       write(*,*) ' '
 
       call micado(ax,conm,xinx,resx,cinx,ny,rms,im,ic,iter,rho,ptop,    &
-     &rmss,xrms,xptp,xiter,ifail)
+           &rmss,xrms,xptp,xiter,ifail)
 
       do  i = 1,ic
          cin(i) = cinx(i)
@@ -205,12 +205,12 @@
       endif
 
       call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,                 &
-     &matv,vmat,amater,ws)
+           &matv,vmat,amater,ws)
 
- 6001 format(1X,'Corrector: ',I4,'   sing: ',F12.4)
- 6002 format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
- 6003 format(16(2X,F7.2))
- 6004 format(16(2X,F7.2))
+6001  format(1X,'Corrector: ',I4,'   sing: ',F12.4)
+6002  format('VMAT: ',I4,I4,5X,F12.6,2X,F12.6)
+6003  format(16(2X,F7.2))
+6004  format(16(2X,F7.2))
 
       if(amater.ne.0) then
         write(*,*) 'end SVD with error code: ',amater
@@ -218,7 +218,6 @@
 
       if(dbg.eq.1) then
          do  i = 1,ic
-!            write(*,*) i,wvec(i)
             write(*,6001) i,wvec(i)
             wmat(i,i) = wvec(i)
          enddo
@@ -397,7 +396,7 @@
                          write(65,*) 'dependent pair: ',j,jj,rat
                       endif
 
-! Ghislain : wanring compare this line with equivalent  if(iflag.lt.(ic*ic*ic)) then
+! Ghislain : warning compare this line with equivalent  if(iflag.lt.(ic*ic*ic)) then
                       if(iflag.lt.ic) then
                          iflag = iflag + 1
                          sing(1,iflag) =  j - 1
