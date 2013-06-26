@@ -674,7 +674,7 @@ static void correct_correct2(struct in_cmd* cmd)
 			niter = icor;
 		}
 
-		// 2013-Jun-24  10:57:43  ghislain: why the multiplication by 1000 ?
+		// 2013-Jun-24  10:57:43  ghislain: FIXME why the multiplication by 1000 ?
 		rms = 1000.0 * command_par_value("error", cmd->clone);
 		/*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
 		/* printf("Time before micado:  %-6.3f\n",fextim());  */
@@ -793,7 +793,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 	 */
 
 	/* Get access to tables, for orbit and model the default is twiss_table */
-
+// Jun 25, 2013 3:28:07 PM ghislain : FIXME - beam1tab and beam2tab not documented
 	if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
 		printf("Want to use orbit from: %s\n", orbtab1);
 		if ((t1 = name_list_pos(orbtab1, table_register->names)) > -1) {
@@ -803,8 +803,9 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 					orbtab1);
 		}
 	} else {
+		// Jun 25, 2013 2:41:26 PM ghislain : FIXME - ??? empty else statement
+    }
 
-	}
 	if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
 		printf("Want to use orbit from: %s\n", orbtab2);
 		if ((t2 = name_list_pos(orbtab2, table_register->names)) > -1) {
@@ -814,16 +815,16 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 					orbtab2);
 		}
 	} else {
-
+		// Jun 25, 2013 2:41:01 PM ghislain : FIXME - ??? empty else statement
 	}
 
 	/* store as globals for later use */
-	if ((b1 != NULL )&& (b2 != NULL)){
-	twiss_table_beam1 = b1;
-	twiss_table_beam2 = b2;
-} else {
-	fatal_error("Beam 1 and 2 orbit tables not found:",orbtab1);
-}
+	if ((b1 != NULL) && (b2 != NULL)){
+		twiss_table_beam1 = b1;
+		twiss_table_beam2 = b2;
+	} else {
+		fatal_error("Beam 1 and 2 orbit tables not found:",orbtab1);
+	}
 
 	/* reserve space for orbit correction structures */
 	if (correct_orbit12 == NULL )
@@ -954,55 +955,55 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 				|| (strncmp(atm[2], b1->p_nodes[j]->base_name, 4) == 0)) {
 			/*    printf("12m: %s \n", b1->p_nodes[j]->name); */
 			if ((strstr(b1->p_nodes[j]->name, ".b1") == NULL )&&
-			(strstr(b1->p_nodes[j]->name,".b2") == NULL)){
-			mon_l12->id_ttb[0] = j;
-			for (k=0; k < b2->curr; k++) {
-				if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
-					mon_l12->id_ttb[1] = k;
+					(strstr(b1->p_nodes[j]->name,".b2") == NULL)){
+				mon_l12->id_ttb[0] = j;
+				for (k=0; k < b2->curr; k++) {
+					if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+						mon_l12->id_ttb[1] = k;
+					}
 				}
+				mon_l12->enable = b1->p_nodes[j]->enable;
+				mon_l12->p_node = b1->p_nodes[j];
+				mon_l12->next = mon_l12;
+				mon_l12->next++; mon_l12++;
+				cntm12++;
+			} else {
+				/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
 			}
-			mon_l12->enable = b1->p_nodes[j]->enable;
-			mon_l12->p_node = b1->p_nodes[j];
-			mon_l12->next = mon_l12;
-			mon_l12->next++; mon_l12++;
-			cntm12++;
-		} else {
-			/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+		}
+		if((strncmp(atc[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
+				(strncmp(atc[2], b1->p_nodes[j]->base_name,4) == 0)) {
+			/*    printf("12c: %s \n", b1->p_nodes[j]->name);     */
+			if((strstr(b1->p_nodes[j]->name,".b1") == NULL) &&
+					(strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
+				cor_l12->id_ttb[0] = j;
+				for (k=0; k < b2->curr; k++) {
+					if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+						cor_l12->id_ttb[1] = k;
+					}
+				}
+				cor_l12->p_node = b1->p_nodes[j];
+				cor_l12->p_node_s1 = b1->p_nodes[cor_l12->id_ttb[0]];
+				cor_l12->p_node_s2 = b2->p_nodes[cor_l12->id_ttb[1]];
+				ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
+				ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
+				cor_l12->enable = ebl1*ebl2;
+				// 2013-Jun-24  12:09:17  ghislain: corzero option of correct command is not documented!!!
+				if(command_par_value("corzero",cmd->clone) > 0) {
+					if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
+					if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
+					if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
+					if(iplane == 2) cor_l12->p_node_s2->cvkick = 0.0;
+				}
+				cor_l12->next = cor_l12;
+				cor_l12->next++; cor_l12++;
+				cntc12++;
+			} else {
+				/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+			}
 		}
 	}
-	if((strncmp(atc[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
-			(strncmp(atc[2], b1->p_nodes[j]->base_name,4) == 0)) {
-		/*    printf("12c: %s \n", b1->p_nodes[j]->name);     */
-		if((strstr(b1->p_nodes[j]->name,".b1") == NULL) &&
-				(strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
-			cor_l12->id_ttb[0] = j;
-			for (k=0; k < b2->curr; k++) {
-				if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
-					cor_l12->id_ttb[1] = k;
-				}
-			}
-			cor_l12->p_node = b1->p_nodes[j];
-			cor_l12->p_node_s1 = b1->p_nodes[cor_l12->id_ttb[0]];
-			cor_l12->p_node_s2 = b2->p_nodes[cor_l12->id_ttb[1]];
-			ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
-			ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
-			cor_l12->enable = ebl1*ebl2;
-			// 2013-Jun-24  12:09:17  ghislain: corzero option of correct command is not documented!!!
-			if(command_par_value("corzero",cmd->clone) > 0) {
-				if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
-				if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
-				if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
-				if(iplane == 2) cor_l12->p_node_s2->cvkick = 0.0;
-			}
-			cor_l12->next = cor_l12;
-			cor_l12->next++; cor_l12++;
-			cntc12++;
-		} else {
-			/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
-		}
-	}
-}
-			/* terminate linked list   */
+	/* terminate linked list   */
 	mon_l12--;
 	mon_l12->next = NULL;
 	cor_l12--;
@@ -1572,6 +1573,26 @@ static void correct_correct1(struct in_cmd* cmd)
 
 	debug = get_option("debug");
 
+
+	/* If only Twiss summary is required prepare and write it */
+	// Jun 26, 2013 8:06:33 PM ghislain : moved up from **twiss summary**
+	if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
+		if (ftdata == NULL ) {
+			if ((ftdata = fopen("twiss.summ", "w")) == NULL )
+				exit(99);
+		}
+		j = 1;
+		if ((nnnseq = get_variable("n")) == 0) {
+			nnnseq = twism;
+		}
+		double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
+		double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
+		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
+		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
+		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
+		return; // abort the correction here
+	}
+
 	ip = pro_correct_getcommands(cmd);
 	im = pro_correct_gettables(ip, cmd);
 	ncorr = im % 10000;
@@ -1604,23 +1625,7 @@ static void correct_correct1(struct in_cmd* cmd)
 		}
 	}
 
-	/* If only Twiss summary is required prepare and write it */
-	if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
-		if (ftdata == NULL ) {
-			if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-				exit(99);
-		}
-		j = 1;
-		if ((nnnseq = get_variable("n")) == 0) {
-			nnnseq = twism;
-		}
-		double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
-		double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
-		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
-		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
-		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
-		return;
-	}
+    // Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
 
 	/* allocate vectors used by correction algorithms */
 	nx = mycalloc("correct_correct_nx",ncorr,sizeof(int));
@@ -1838,16 +1843,15 @@ static void correct_correct(struct in_cmd* cmd)
 	char *orbtab1, *orbtab2;
 
 	/* Call for one or two ring orbit correction */
+	// Jun 25, 2013 2:51:50 PM ghislain : FIXME - This option is not documented
 	if (command_par_value("tworing", cmd->clone)) {
+
+		// this tests only whether a parameter was supplied; the validity of the parameter is tested in pro_correct2_gettables
 		if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) == NULL )
-			fatal_error(
-					"Two beam correction requested but no table supplied for beam 1",
-					orbtab1);
+			fatal_error("Two beam correction requested but no table supplied for beam 1", orbtab1);
 
 		if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) == NULL )
-			fatal_error(
-					"Two beam correction requested but no table supplied for beam 2",
-					orbtab2);
+			fatal_error("Two beam correction requested but no table supplied for beam 2", orbtab2);
 
 		printf("Want to use orbits from: %s and : %s\n", orbtab1, orbtab2);
 
@@ -1858,19 +1862,15 @@ static void correct_correct(struct in_cmd* cmd)
 
 		if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
 			warning(" ", " ");
-			warning(
-					"Single beam correction requested but beam 1 table supplied:",
-					orbtab1);
-			warning("Requested table ignored:", orbtab1);
+			warning("Single beam correction requested but beam 1 table supplied:", orbtab1);
+			warning("Specified table ignored:", orbtab1);
 			warning(" ", " ");
 		}
 
 		if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
 			warning(" ", " ");
-			warning(
-					"Single beam correction requested but beam 2 table supplied:",
-					orbtab2);
-			warning("Requested table ignored:", orbtab2);
+			warning("Single beam correction requested but beam 2 table supplied:", orbtab2);
+			warning("Specified table ignored:", orbtab2);
 			warning(" ", " ");
 		}
 
@@ -1927,6 +1927,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
 		return (-1);
 	}
 
+	// Jun 25, 2013 3:29:19 PM ghislain : FIXME - documentation only mentions x and y; add h and v
 	strcpy(plane, command_par_string(att[1], cmd->clone));
 	if (strcmp("x", plane) == 0) {
 		iplane = 1;
@@ -2083,7 +2084,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 			mycalloc("pro_correct_gettables_mon", 5200, sizeof *correct_orbit->mon_table);
 
 	/* orbit table available, get units, if defined */
-	//  2013-Jun-24  12:06:03  ghislain: units option of correct command is not documented!!!
+	//  2013-Jun-24  12:06:03  ghislain: FIXME - units option of correct command is not documented!!!
 	if ((ounits = command_par_value("units", cmd->clone)) > 0) {
 		correct_orbit->units = ounits;
 	} else {
@@ -2102,7 +2103,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 	mon_l = correct_orbit->mon_table;
 	cor_l = correct_orbit->cor_table;
 
-	// 2013-Jun-24  12:09:17  ghislain: corzero option of correct command is not documented!!!
+	// 2013-Jun-24  12:09:17  ghislain: FIXME corzero option of correct command is not documented!!!
 	corzero = command_par_value("corzero", cmd->clone);
 
 	// go through the model table and build chained lists of monitors and correctors
@@ -3287,6 +3288,7 @@ static void correct_getorbit(struct in_cmd* cmd) {
 }
 
 static void correct_putorbit(struct in_cmd* cmd) {
+// Jun 25, 2013 3:33:03 PM ghislain : DOC - this option is documented as deprecated but still alive
 	int i;
 	struct name_list* nl;
 	char* filename = command_par_string("file", cmd->clone);
