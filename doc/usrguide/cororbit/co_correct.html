@@ -8,6 +8,7 @@
 <!-- Changed by: Werner Herr, 05-April-2004 -->
 <!-- Changed by: Werner Herr, 01-Dec-2004 -->
 <!-- Changed by: Werner Herr, 22-Oct-2008 -->
+<!-- Changed by: Ghislain Roy, 2013-06-26 -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -26,7 +27,8 @@ CORRECT, ORBIT=myorbit,MODEL=mymodel,TARGET=mytarget,
          FLAG=ring,MODE=lsq,  
          MONERROR=integer,MONON=real,MONSCALE=real,
          PLANE=x,COND=integer,RESOUT=integer,
-         CLIST=file1,MLIST=file2; 
+         CLIST=file1,MLIST=file2
+         TWORING, UNITS=real, CORZERO=integer; 
 </pre>
 The command CORRECT is set up with defaults which should allow a
 reasonable correction for most cases with a minimum of required
@@ -44,32 +46,30 @@ The options used in the CORRECT command are:
 <li>FLAG:
 FLAG can be "ring" or "line", either a circular machine or a trajectory
 is corrected. 
-<br>
-Default flag is "ring".
+<br> Default: "ring".
+<br><br>
 <li>MODE:
-MODE defines the method to be used for corrections.
-<BR>
-Available modes are LSQ, MICADO and SVD. 
-The first performs a least squares minimization
-using all available correctors. The mode SVD uses a Singular Value
-Decomposition to compute a correction using all available correctors.
+defines the method to be used for corrections. Available modes are LSQ, MICADO and SVD. 
+<ul>
+<li> LSQ performs a least squares minimization using all available correctors. 
+<li>SVD uses a Singular Value Decomposition to compute a correction using all available correctors.
 The latter can also be used to condition the response matrix for the
 modes LSQ or MICADO (using COND=1).
-It is highly recommended to precede
+<br> It is highly recommended to precede
 a LSQ correction by a SVD conditioning (set COND=1).
-<br>
-The mode MICADO is a "best kick" algorithm. Naive use or using it with a large number of correctors
+<li> MICADO uses a "best kick" algorithm. Naive use or using it with a large number of correctors
 (see option NCORR) can give unexpected results.
 To avoid the creation of local bumps, it is recommended to precede
 a MICADO correction by a SVD conditioning (set COND=1).
-<br>
-Default mode is MICADO.           
+</ul>
+Default: MICADO.
+<br><br>           
 <li>PLANE:
-If this attribute is x, only the horizontal correction is made;
-if it is y, only the vertical correction is made.
-(This differs from the MAD8 implementation).
-<br>
-Default plane is horizontal.
+If this attribute is x, or h, only the horizontal correction is made;
+if it is y, or v, only the vertical correction is made.
+>br> (This differs from the MAD8 implementation).
+<br> Default: horizontal plane correction
+<br><br>
 <li>COND:
 When COND is 1, a Singular Value Decomposition is performed and 
 the response matrix CONDitioned to avoid linearly dependent
@@ -83,13 +83,19 @@ Both parameters depend on the machine and may need adjustment.
 Default values are adjusted to large machines and "reasonable" performance for
 smaller machines.
 </font>
-<br>
+<br><br>
 <li>NCORR:
 Only used by the MICADO algorithm. Defines the number of correctors
-to be used, unless set to 0 in which case all available correctors
-are used.
+to be used. If NCORR is set to 0, all available correctors
+are used. If NCORR is set to a negative value, no correction is actually performed.
 <br>
-Default is 0 (all available correctors).
+Default: NCORR=0 (all available correctors are used).
+<br><br>
+<li>CORZERO:
+When CORZERO is set to a positive integer, the strengths of specified [TBC] correctors are reset to zero before the correction is calculated. 
+<br>
+Default: CORZERO=0
+<br><br>
 <li>SNGVAL: 
 Used to set the threshold for finding singular values with the COND command.
 (Hint: smaller number finds fewer singular values).
@@ -97,29 +103,30 @@ Used to set the threshold for finding singular values with the COND command.
 <font COLOR="#ff0000">
 Use with care !
 </font>
-<br>
-Default is 2.0
+<br> Default is 2.0
+<br><br>
 <li>SNGCUT: 
 Used to set the threshold for finding redundant correctors with the COND command.
 (Hint: larger number finds fewer redundant correctors).
 <br>
-<font COLOR="#ff0000">
-Use with extreme care !
-</font>
+<font COLOR="#ff0000"> Use with extreme care ! </font>
 <br>
 Default is 50.0
+<br><br>
 <li>MONERROR:
 When MONERROR is 1, the alignment errors on monitors assigned 
 by <a href="../error/error_align.html">EALIGN</a>
 MREX and MREY are taken into account, otherwise they are ignored.
 <br>
 Default is 0.
+<br><br>
 <li>MONSCALE:
 When MONSCALE is 1, the scaling errors on monitors assigned 
 by <a href="../error/error_align.html">EALIGN</a>
 MSCALX and MSCALY are taken into account, otherwise they are ignored.
 <br>
 Default is 0.
+<br><br>
 <li>MONON:
 MONON takes a real number between 0.0 and 1.0. It determines the number
 of available monitors. If the command is given, each monitor is considered
@@ -128,18 +135,23 @@ of the monitors will be disabled for the correction, i.e. they are considered
 not existing.  This allows to study the effect of missing monitors.
 <br>
 Default is 1.0 (100 %).
+<br><br>
 <li>CORRLIM: 
-A limit on the maximum corrector strength can be given and a WARNING
-is issued if it is exceeded by one or more correctors.
+A limit on the maximum corrector strength can be given in units of milliradians, and a WARNING
+is issued if the limit is exceeded by at least one corrector.
 <font COLOR="#ff0000">
 Please note: the strengths computed by the correction algorithms are NOT
 limited, only a warning is printed !
 </font>
 <br>
-Default is 1.0 mrad.
-<br>
-<br>
-<br>
+Default: 1.0 mrad.
+<br><br>
+<li>TWORING: When true, the correction will be done on two rings at once using [TO BE COMPLETED]
+<br>Default: false
+<br><br>
+<li>UNITS: when this parameter is set the value is a multiplier [TO BE COMPLETED] 
+<br>(default unknown)
+<br><br>
 Normally the last active table provides the orbit to be 
 corrected and the model for the correction.
 This can be overwritten by the appropriate options.
@@ -147,17 +159,29 @@ Optionally, these tables can be given names like in:
 TWISS, TABLE=name; (see documentation on TWISS command).
 To use these named tables, one of the following optional parameters must be 
 used:
-<li>ORBIT: When this parameter is given, the orbit to be corrected
-is taken from a named table. The default is the last (named or
+
+<li>ORBIT=table: When this parameter is given, the orbit to be corrected
+is taken from the named table given as argument. The default is the last (named or
 unnamed) Twiss table.
-<li>MODEL: When this parameter is given, the model for the correction
+
+<li>BEAM1TAB=table, BEAM2TAB=table: When TWORING is specified, ORBIT should not be specified and replaced BEAM1TAB and BEAM2TAB 
+giving as arguments the names of tables containing the orbits to be corrected.
+
+<li>MODEL=table: When this parameter is given, the model for the correction
 is taken from a named Twiss table. The default is the last (named or
 unnamed) Twiss table.
-<li>TARGET: When this parameter is given, the correction is made to
+
+<li>TARGET=table: When this parameter is given, the correction is made to
 a named target orbit, pre-computed with a TWISS command. Default
 is correction to the zero orbit.
-<li>EXTERN (default: false): When false, the ORBIT and TARGET table are assumed to be computed by MAD with a previous twiss command. When set to true, that option allows to use twiss tables imported from an external file (with the readmytable command), for example to use measured BPM data. In that case, the imported twiss table is allowed to contain coordinate data only at the location of the monitors.
-<br>
+
+<li>EXTERN (default: false): When false, the ORBIT and TARGET table are assumed to be computed by MAD with a previous twiss command. 
+When set to true, that option allows to use twiss tables imported from an external file (with the readmytable command), 
+for example to use measured BPM data. In that case, the imported twiss table is allowed to contain coordinate data only at the location 
+of the monitors.
+
+</ul>
+
 Example of use of CORRECT to reproduce a measured orbit:
 <pre>
 ! To have a refererence optical model
@@ -168,29 +192,31 @@ readmytable,file="bpm.tsv",table="twiss_bpm";
 correct,flag=ring,mode=micado,ncorr=5,cond=1,plane=x,extern,model=twiss_ref,orbit=twiss_ref,target=twiss_bpm,error=1.0e-21;
 </pre>
 
-</ul>
-Two attributes affect the printing of tables and results:
+
+Some option attributes affect the printing of tables and results:
 <ul>
 <li>CLIST=<b>file</b>:
 Corrector settings (in units of rad) before and after correction printed to <b>file</b>
+<br><br>
 <li>MLIST=<b>file</b>:
 Monitor readings (in units of m) before and after correction printed to <b>file</b>
-<li>RESOUT:
-This command outputs the results for all monitors and all correctors
-in a computer readable format if its integer argument is larger than 0.
-The argument is added to the output.
-Useful to analyze runs with loops to
-produce large statistics.
+<br><br>
+<li>RESOUT=integer:
+If the integer argument is larger than 0, this option outputs the results for all monitors and all correctors
+in a computer readable format in files <b>corr.out</b> and <b>stren.out</b>.
+The argument is added to the output [TBC].
+Useful to analyze runs with loops to produce large statistics.
 <br>
 <b>ATTENTION: May produce gigantic outputs for large machines.</b>
-<br>
-<li>TWISSUM: 
-If the argument of twissum is larger than 0, it
-prints maximum orbit and r.m.s. for both planes taken from the Twiss summary
-table in computer readable form. Allows to analyze orbits etc. at elements
-that are not monitors or correctors.
+<br><br>
+<li>TWISSUM=integer: 
+If the integer argument is larger than 0, this option
+prints maximum and r.m.s. orbit values for both planes, taken from the Twiss summary
+table, in computer readable form in file <b>twiss.summ</b>. 
+Allows to analyze orbits etc. at elements that are not monitors or correctors.
 The argument is added to the output. 
-Only for output: no correction is made, all other commands are ignored.
+No correction is made, and all other CORRECT options are ignored.
+Note that this option is simply ignored if TWORING has been specified. 
 </ul>
 <br>
 <br>
@@ -221,8 +247,7 @@ Example 1 (correct orbit in horizontal plane, taken from most recent Twiss table
 <font COLOR="#ff00ff">
 CORRECT,PLANE=x;
 </font>
-<br>
-<br>
+<br><br>
 <font COLOR="#ff0000">
 Example 2 (no correction, only output of Twiss summary):
 </font>
@@ -230,8 +255,7 @@ Example 2 (no correction, only output of Twiss summary):
 <font COLOR="#ff00ff">
 CORRECT,TWISSUM=1;                                                             
 </font>
-<br>
-<br>
+<br><br>
 <font COLOR="#ff0000">
 Example 3 (correct orbit in horizontal plane, corrector and monitor output on table):
 </font>
@@ -239,27 +263,30 @@ Example 3 (correct orbit in horizontal plane, corrector and monitor output on ta
 <font COLOR="#ff00ff">
 CORRECT,PLANE=x,MODE=lsq,CLIST=corr.out,MLIST=mon.out;
 </font>
-<br>
-<br>
+<br><br>
 <font COLOR="#ff0000">
 Example 4 (correct orbit in horizontal plane, use alignment and scaling errors, 15% of orbit correctors faulty):
 </font>
 <font COLOR="#ff00ff">
 CORRECT,PLANE=x,MONERROR=1,MONSCALE=1,MONON=0.85;
 </font>
-<br>
-<br>
-<br>
+<br><br>
 <font COLOR="#ff0000">
+Example 5: correct orbit in horizontal plane for a two-beam machine, using MICADO with no SVD conditioning, zeroing correctors before the correction.
+</font><br>
+<font COLOR="#ff00ff">
+CORRECT, FLAG=ring,
+         TWORING, BEAM1TAB=twb1, BEAM2TAB=twb2,
+         MODE=micado, COND=0, NCORR=4, ERROR=1E-6, PLANE=x,
+         MLIST='mx12.tab', CLIST='cx12.tab', RESOUT=1, CORZERO=1;
+</font>
+
+
 <br>
 <br>
 <address>
-<a href="http://consult.cern.ch/xwho/people/1808">Last updated:</a>
-22.10.2008
-</address>
-<address>
-<a href="http://consult.cern.ch/xwho/people/1808">Werner Herr</a>
-14.06.2006
+Last updated: 2013-06-26
+<a href="mailto:ghislain.roy@cern.ch">Ghislain Roy</a>
 </address>
 
 </body>
