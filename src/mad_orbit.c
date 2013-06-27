@@ -110,7 +110,7 @@ static double crms(double *r, int m) {
 		xrms = xrms + (xave - r[i]) * (xave - r[i]);
 	}
 	xrms = sqrt(xrms / m);
-
+  
 	return (xrms);
 }
 
@@ -136,7 +136,7 @@ static double copk(double *r, int m) {
 	for (i = 0; i < m; i++) {
 		if (fabs(r[i]) > xpk) xpk = fabs(r[i]);
 	}
-
+  
 	return (xpk);
 }
 
@@ -204,7 +204,6 @@ static void c_haveit(double *dmat, double *monvec, double *corvec,
 
 static int c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut,
 		double *sngval)
-
 {
 	const char *rout_name = "c_svddev";
 	int flag;
@@ -330,7 +329,6 @@ static void fill_orbit_table(struct table* t_out, struct table* t_in)
 /* revert to old version after Thys Risselada's fix of Micado */
 
 static void correct_setcorr(struct in_cmd* cmd) {
-
 	/* read the correctors from named table and stores
 	 them in the nodes of the sequence at
 	 "->chkick" and "->cvkick". Subsequent Twiss will
@@ -433,7 +431,6 @@ static void correct_setcorr(struct in_cmd* cmd) {
 }
 
 static void correct_readcorr(struct in_cmd* cmd) {
-
 	/* read the correctors from table "corr" and stores
 	 them in the nodes of the sequence at
 	 "->chkick" and "->cvkick". Subsequent Twiss will
@@ -558,6 +555,31 @@ static void correct_correct2(struct in_cmd* cmd)
 	 struct id_mic2   *m;
 	 */
 
+	int debug;
+
+	debug = get_option("debug");
+
+
+	/* If only Twiss summary is required prepare and write it */
+	// Jun 26, 2013 8:06:33 PM ghislain : moved up from **twiss summary**
+	if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
+		if (ftdata == NULL ) {
+			if ((ftdata = fopen("twiss.summ", "w")) == NULL )
+				exit(99);
+		}
+		j = 1;
+		if ((nnnseq = get_variable("n")) == 0) {
+			nnnseq = twism;
+		}
+		double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
+		double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
+		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
+		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
+		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
+		printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
+		return; // abort the correction here
+	}
+
 	strcpy(clist1, "\0");
 	strcpy(clist2, "\0");
 
@@ -596,23 +618,6 @@ static void correct_correct2(struct in_cmd* cmd)
 		}
 	}
 
-	/* If only Twiss summary is required prepare and write it */
-	if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
-		if (ftdata == NULL ) {
-			if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-				exit(99);
-		}
-		j = 1;
-		if ((nnnseq = get_variable("n")) == 0) {
-			nnnseq = twism;
-		}
-		double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
-		double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
-		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
-		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
-		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
-		return;
-	}
 
 	/* allocate vectors used by correction algorithms */
 	nx = mycalloc_atomic("correct_correct2_nx", ncorr, sizeof *nx);
@@ -1590,6 +1595,7 @@ static void correct_correct1(struct in_cmd* cmd)
 		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
 		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
 		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
+		printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
 		return; // abort the correction here
 	}
 
@@ -2679,7 +2685,6 @@ static void pro_correct_write_cocu_table(void) {
 
 	da1 = ttb->d_cols;
 	for (j = 0; j < ttb->curr; j++) {
-
 		fprintf(fp1, "\n%s %s ", ttb->s_cols[1][j], ttb->s_cols[0][j]);
 		for (i = 2; i < pr_cols; i++) {
 			if (&da1[cp[i]][0] != NULL ) {
@@ -2868,7 +2873,6 @@ pro_correct_response_line(int ip, int nc, int nm) {
 	double **da1;
 	double bx_c, by_c, pix_c, piy_c;
 	double bx_m, by_m, pix_m, piy_m;
-//  double qx0, qy0; // not used
 	double respx1, respy1;
 	double respx, respy;
 	double *dmat;
@@ -2882,8 +2886,6 @@ pro_correct_response_line(int ip, int nc, int nm) {
 
 	correct_orbit->qx0 = da1[5][ttb->curr - 1];
 	correct_orbit->qy0 = da1[8][ttb->curr - 1];
-//  qx0 = correct_orbit->qx0; // not used
-//  qy0 = correct_orbit->qy0; // not used
 
 	c = correct_orbit->cor_table;
 	ic = 0;
@@ -2991,7 +2993,7 @@ static void pro_correct_make_mon_table(void) {
 	 */
 
 	ttb = model_table;
-
+  
 	for (j = 0; j < ttb->curr; j++) {
 		if ((strncmp(atm[0], ttb->p_nodes[j]->base_name, 4) == 0)
 				|| (strncmp(atm[1], ttb->p_nodes[j]->base_name, 4) == 0)

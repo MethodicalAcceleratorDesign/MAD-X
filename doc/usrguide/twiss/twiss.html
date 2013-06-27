@@ -37,16 +37,18 @@ and a step, which must be constant expressions,
 separated by colons.
 <p>Examples:
 </p>
-<pre>DELTAP=0.001                    ! a single value<br>DELTAP=0.001,0.005              ! two values<br>DELTAP=0.001:0.007:0.002        ! four values<br></pre>
+<pre>
+DELTAP=0.001                    ! a single value
+DELTAP=0.001,0.005              ! two values
+DELTAP=0.001:0.007:0.002        ! four values
+</pre>
 If DELTAP is missing, MAD-X uses the value 0.0.
-<p>Further attributes of the TWISS statements are:
-</p>
+<p>Further attributes of the TWISS statements are:</p>
 <ul>
   <li>CHROM:
 A logical flag.
 If set, MAD-X also computes the
-    <a href="../Introduction/tables.html#chrom">chromatic
-    functions</a>.
+<a href="../Introduction/tables.html#chrom">chromatic functions</a>.
 <p><font color="#ff0000"><i>Please note that this option is needed
 for a proper calculation of the chromaticities in the
 presence of coupling!</i></font></p>
@@ -54,7 +56,7 @@ presence of coupling!</i></font></p>
   <li>FILE:
 If FILE="file_name" appears MAD-X writes a full TFS Twiss table <a
  href="../Introduction/select.html#tfs">Example TFS Twiss table</a> on
-the disk file "file_name". FILE alone is equivalent to
+the disk file "file_name". FILE with no argument is equivalent to
 FILE="twiss": </li>
   <li>TABLE (overrides SAVE):
 MAD-X creates a full <a href="../Introduction/tables.html#linear">Twiss
@@ -84,10 +86,19 @@ and "column, REij" one gets all or the component "ij" respectively.
 This flag initiates the calculation of a sector map as described at: <a
  href="../Introduction/sectormap.html">SECTORMAP</a>.
   </li>
-  <li>SECTORFILE:
-Used to write SECTORMAPs to the file SECTORFILE="file_name", if
-missing the output of SECTORMAP will go to the file "sectormap" with
-the format as found in <a href="../Introduction/sectormap.html">SECTORMAP</a>.
+  <li>SECTORFILE=filename:
+<!-- 2013-Jun-27  12:27:38  ghislain:
+<!-- Used to write SECTORMAPs to the file SECTORFILE="file_name", if -->
+<!-- missing the output of SECTORMAP will go to the file "sectormap" with -->
+<!-- the format as found in <a href="../Introduction/sectormap.html">SECTORMAP</a>. -->
+The sectormap table output is written to the filename given as argument. 
+The format of the output can be adjusted as specified in <a href="../Introduction/sectormap.html">SECTORMAP</a>
+<br>Default: SECTORFILE="sectormap". 
+  </li>
+  <li>SECTORTABLE=tablename:
+The name of the table containing the sectormap values can be specified. The elements (lines) and parameters (columns) 
+of the table can be tailored using the SELECT command as specified in <a href="../Introduction/sectormap.html">SECTORMAP</a>
+<br>Default: SECTORTABLE=sectortable
   </li>
   <li>KEEPORBIT:
 The keeporbit attribute (with an optional name, keeporbit="name")
@@ -102,9 +113,8 @@ the monitors are used by the threader.
 This MAD8 option can no longer be set since TWISS in MAD-X is always
 calculated in coupled mode. MAD-X computes the coupled functions in the
 sense of <a href="../Introduction/bibliography.html#edwards">[Edwards
-and
-Teng]</a>. For the uncoupled cases they reduce to the C and S
-functions.
+and Teng]</a>. 
+For the uncoupled cases they reduce to the C and S functions.
   </li>
   <li><font color="#ff0000"><i> Twiss calculation is 4D only!</i></font>
 :

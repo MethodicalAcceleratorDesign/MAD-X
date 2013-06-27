@@ -166,7 +166,7 @@ TWISS,table=twb2,sequence=lhcb2;
 CORRECT, FLAG=ring,
          tworing,beam1tab=twb1,beam2tab=twb2,
          MODE=micado,cond=0,NCORR=  4,ERROR=1E-6,PLANE=x,
-         mlist='mx12.tab',clist='cx12.tab', RESOUT=1,corzero=1;
+         mlist='mx12.tab',clist='cx12.tab', RESOUT=10,corzero=1;
 
 select, flag=twiss, clear;
 select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
