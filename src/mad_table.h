@@ -117,6 +117,7 @@ struct column_info{
 };
 
 struct column_info  table_get_column(char* table_name,char* column_name);
+struct char_p_array *table_get_header(char* table_name);
 
 #endif // MAD_TABLE_H
 

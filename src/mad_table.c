@@ -718,6 +718,16 @@ table_get_column(char* table_name,char* column_name)
   return info;
 }
 
+struct char_p_array *
+table_get_header(char* table_name)
+{
+  int pos;
+  if ((pos = name_list_pos(table_name, table_register->names)) > -1)
+    return table_register->tables[pos]->header;
+  // table was not found, we return 0 pointer..
+  return NULL;
+}
+
 void
 augment_count(char* table) /* increase table occ. by 1, fill missing */
 {
