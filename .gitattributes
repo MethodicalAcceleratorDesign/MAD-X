@@ -271,6 +271,7 @@ doc/usrguide/twiss/madxdoc.css -text
 doc/usrguide/twiss/twiss.html -text
 doc/usrguide/twiss/twiss_mad8.html -text
 doc/usrguide/uguide.html -text
+doc/usrguide/uguide_old.html -text
 lib32/libSDDS1.a -text
 lib32/libSDDS1c.a -text
 lib32/libX11.a -text
