@@ -1,0 +1,234 @@
+\documentclass[12pt,a4paper,twoside]{book}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\includeonly{
+Introduction/copyright,	%MAD-X Copyright Statement
+%
+Introduction/conventions,	%Conventions
+Introduction/format,		%Command and Statement Format
+control/control,			%Control Statements
+Introduction/defects,		%Known Differences to Other Programs 
+%
+%Elements and Beamlines 
+Introduction/element,		%Physical Elements and Markers
+Introduction/sequence,	        %Sequences
+%
+%Input and Output  
+Introduction/tfs,			%TWISS
+c6t/c6t,				%Conversion to Sixtrack Input Format
+sxf/sxf,				%SXF file input and output
+plot/plot,				%PLOT
+%
+%MAD Modules 
+twiss/twiss,				%TWISS
+match/match,				%MATCHING
+survey/survey,			%SURVEY: geometric layout and survey
+Introduction/aperture,	        %APERTURE: defining and calculating apertures 
+makethin/makethin,		%MAKETHIN: Conversion to Thin Lens
+dynap/dynap,				%DYNAP: Dynamic Aperture
+emit/emit,				%EMIT
+error/error,				%ERRORS
+ibs/ibs,					%IBS: Intra Beam Scattering
+cororbit/cororbit,		%ORBIT CORRECTION
+sodd/sodd,				%SODD
+touschek/touschek,		%TOUSCHEK
+tracking/tracking,		%TRACKING: Overview of MAD-X Tracking Modules
+thintrack/thintrack,		%THINTRACK: Thin-Lens Tracking Module 
+%
+%PTC Commands 
+ptc_general/ptc_general,	%Set-up Parameters
+ptc_track/ptc_track,		%PTC_TRACK: Thick-Lens Tracking Module
+ptc_track_line/ptc_track_line,%PTC_TRACK_LINE: Line Tracking Module
+ptc_twiss/ptc_twiss,		%PTC_TWISS: Ripken Optics Parameters
+ptc_normal/ptc_normal,	%PTC_NORMAL: Non-Linear Machine Parameters
+ptc_auxiliaries/ptc_auxiliaries,%PTC Auxiliary Commands
+%
+% 
+sindex,%Keyword and Subject Index
+Introduction/bibliography%References
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{minitoc}
+%\usepackage{sectsty}
+%\usepackage{fancybox}
+%\usepackage{listings}
+%\usepackage{hyperref}
+
+\usepackage[dvipsnames,svgnames]{xcolor}
+%\usepackage[pdftex]{graphicx}
+\usepackage{a4wide}		% without this no error, but bad look
+\usepackage{hyperref}
+%\usepackage{ulem}
+%\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{color} 
+%\usepackage{graphicx,rotating}
+\usepackage{graphicx} 
+%\usepackage{here} 
+%\usepackage{html}
+\usepackage{multirow}
+\usepackage{longtable}
+
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Introduction/copyright}	%MAD-X Copyright Statement
+%
+\part{Control}
+\include{Introduction/conventions}	%Conventions
+\include{Introduction/format}		%Command and Statement Format
+\include{control/control}			%Control Statements
+\include{Introduction/defects}		%Known Differences to Other Programs 
+
+\part{Declaring elements and beamlines}
+%Elements and Beamlines 
+\include{Introduction/element}		%Physical Elements and Markers
+\include{Introduction/sequence}	%Sequences
+
+\part{Input and Output}
+%Input and Output  
+\include{Introduction/tfs}			%TWISS
+\include{c6t/c6t}					%Conversion to Sixtrack Input Format
+\include{sxf/sxf}					%SXF file input and output
+\include{plot/plot}				%PLOT
+
+\part{MAD Modules}
+%MAD Modules 
+\include{twiss/twiss}				%TWISS
+\include{match/match}				%MATCHING
+\include{survey/survey}			%SURVEY: geometric layout and survey
+\include{Introduction/aperture}	%APERTURE: defining and calculating apertures 
+\include{makethin/makethin}		%MAKETHIN: Conversion to Thin Lens
+\include{dynap/dynap}				%DYNAP: Dynamic Aperture
+\include{emit/emit}				%EMIT
+\include{error/error}				%ERRORS
+\include{ibs/ibs}					%IBS: Intra Beam Scattering
+\include{cororbit/cororbit}		%ORBIT CORRECTION
+\include{sodd/sodd}				%SODD
+\include{touschek/touschek}		%TOUSCHEK
+\include{tracking/tracking}		%TRACKING: Overview of MAD-X Tracking Modules
+\include{thintrack/thintrack}		%THINTRACK: Thin-Lens Tracking Module 
+
+\part{PTC Commands}
+%PTC Commands 
+\include{ptc_general/ptc_general}	%Set-up Parameters
+\include{ptc_track/ptc_track}		%PTC_TRACK: Thick-Lens Tracking Module
+\include{ptc_track_line/ptc_track_line}%PTC_TRACK_LINE: Line Tracking Module
+\include{ptc_twiss/ptc_twiss}		%PTC_TWISS: Ripken Optics Parameters
+\include{ptc_normal/ptc_normal}	%PTC_NORMAL: Non-Linear Machine Parameters
+\include{ptc_auxiliaries/ptc_auxiliaries}%PTC Auxiliary Commands
+
+\part{}
+\include{sindex}%Keyword and Subject Index
+\include{Introduction/bibliography}%References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\include{uguide}
+\include{control/foot}
+%\include{control/general}
+%\include{control/seqedit}
+%\include{control/special}
+%\include{cororbit/co_activate}
+%\include{cororbit/co_correct}
+%\include{cororbit/co_corrsave}
+%\include{cororbit/co_option}
+\include{cororbit/lhct.mad}
+\include{error/errors}
+%\include{error/error_align}
+%\include{error/error_field}
+%\include{error/error_option}
+%\include{error/error_print}
+%\include{error/error_save}
+%\include{Introduction/attribute}
+%\include{Introduction/beam}
+%\include{Introduction/beambeam}
+%\include{Introduction/bend}
+\include{Introduction/bv_flag}
+%\include{Introduction/cavity}
+%\include{Introduction/closed_orbit}
+%\include{Introduction/collimator}
+%\include{Introduction/constraint}
+%\include{Introduction/crabcavity}
+\include{Introduction/declarations}
+%\include{Introduction/dipedge}
+\include{Introduction/doc}
+%\include{Introduction/drift}
+%\include{Introduction/elm_class}
+%\include{Introduction/elm_edit}
+%\include{Introduction/elm_format}
+%\include{Introduction/expression}
+\include{Introduction/fortran-rules}
+%\include{Introduction/global_system}
+%\include{Introduction/integer}
+\include{Introduction/keyword}
+%\include{Introduction/kickers}
+%\include{Introduction/label}
+\include{Introduction/line}
+%\include{Introduction/local_system}
+%\include{Introduction/logical}
+%\include{Introduction/mad_units}
+%\include{Introduction/marker}
+%\include{Introduction/matrix}
+\include{Introduction/module}
+\include{Introduction/module_doc}
+%\include{Introduction/monitors}
+%\include{Introduction/multipole}
+%\include{Introduction/name}
+\include{Introduction/news}
+%\include{Introduction/nllens}
+%\include{Introduction/octupole}
+\include{Introduction/parameter}
+\include{Introduction/pitfalls}
+%\include{Introduction/quadrupole}
+\include{Introduction/ranges}
+\include{Introduction/real}
+%\include{Introduction/resbeam}
+%\include{Introduction/rfmultipole}
+%\include{Introduction/rotation}
+\include{Introduction/sectormap}
+\include{Introduction/select}
+%\include{Introduction/separator}
+\include{Introduction/set}
+%\include{Introduction/sextupole}
+%\include{Introduction/sign_convent}
+%\include{Introduction/solenoid}
+\include{Introduction/source}
+%\include{Introduction/statement}
+%\include{Introduction/string}
+\include{Introduction/support}
+%\include{Introduction/tables}
+\include{Introduction/tfs_columns}
+\include{Introduction/tfs_desc}
+%\include{Introduction/tkickers}
+\include{Introduction/twiss_desc}
+%\include{Introduction/variable}
+%\include{Introduction/wildcard}
+\include{match/bibliography}
+%\include{match/match_con}
+%\include{match/match_main}
+%\include{match/match_um}
+%\include{match/match_vary}
+%\include{match/match_xeq}
+%\include{match/match_xmpl}
+\include{plug-ins/index}
+\include{plug-ins/rplot/index}
+%\include{ptc_auxiliaries/Match_WithPTCKnobs}
+%\include{ptc_auxiliaries/PTC_DumpMaps}
+%\include{ptc_auxiliaries/PTC_EPlacement}
+%\include{ptc_auxiliaries/PTC_Knob}
+%\include{ptc_auxiliaries/PTC_Moments}
+%\include{ptc_auxiliaries/PTC_PrintFrames}
+%\include{ptc_auxiliaries/PTC_PrintParametric}
+%\include{ptc_auxiliaries/PTC_Select}
+%\include{ptc_auxiliaries/PTC_SelectMoment}
+%\include{ptc_auxiliaries/PTC_SetCavities}
+%\include{ptc_auxiliaries/PTC_SetKnobValue}
+%\include{ptc_auxiliaries/PTC_SetSwitch}
+\include{survey/survey_mad8}
+\include{threader/threader}
+\include{twiss/twiss_mad8}
+  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

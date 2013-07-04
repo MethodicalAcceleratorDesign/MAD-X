@@ -1,0 +1,25 @@
+%%\title{BV flag in the Beam command}
+%  Changed by: Thys Risselada 29-Mar-2009 
+
+
+\line(1,0){300}
+
+%%\begin{center}
+ %%EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH 
+%%\includegraphics{http://cern.ch/madx/icons/mx7_25.gif}
+
+\subsection{Effect of the bv flag in MAD-X}
+%%\end{center}
+
+When reversing the direction ("V") of a particle in a magnetic field ("B") while keeping its charge constant, the resulting force V * B changes sign. This is equivalent to flipping the field, but not the direction. 
+
+ For practical reasons the properties of all elements of the LHC are defined in the MADX input as if they apply to a clockwise proton beam ("LHC beam 1"). This allows a single definition for elements traversed by both beams. Their effects on a beam with identical particle charge but running in the opposite direction ("LHC beam 2") must then be reversed inside the program. 
+
+ In MADX this may be taken into account by setting the value of the BV attribute in the Beam commands. In the case of LHC beam 1 (clockwise) and beam 2 (counter-clockwise), treated in MADX both as clockwise proton beams, the Beam commands must look as follows: %\textbf{
+\begin{verbatim}
+
+   Beam, sequence=lhcb1, particle=proton, pc=450, bv=+1;
+   Beam, sequence=lhcb2, particle=proton, pc=450, bv=-1;
+\end{verbatim}
+
+\href{http://www.cern.ch/Frank.Schmidt/frs_sign.html}{frs}, March 29, 2009 
