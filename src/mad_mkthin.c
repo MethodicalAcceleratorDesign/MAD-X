@@ -11,7 +11,6 @@ typedef unsigned char bool;
 static struct element* create_thin_obj(struct element*, int slice_no);
 static struct sequence* seq_diet(struct sequence*);
 static double at_shift(int, int);
-static double q_shift(int, int);
 
 /* this structure is used to store a lookup table of thick to thin
  element conversions already done */
@@ -42,39 +41,46 @@ static char collim_style[] = "collim";
 /* this is used to return how to slice the selected elements */
 static struct el_list *thin_select_list = NULL;
 
-// private interface
-
-static void
-force_consistent_slices(void)
-/* hbu 10/2005
- loop over all elements and check that #slices of child and parent agree
- if not, use the maximum for both
- */
+typedef struct // in C++ this would be the class which defines the distances and positions, depending on number of slices and slicing style
 {
-//  struct element* el_i;
-  struct command_parameter *child,*parent;
-  int i,el_i_slice_pos,slices,slices_parent;
-  for(i=0; i< element_list->curr; i++) /* loop over element_list */
+  int n; // number of slices
+  int teapot_fl; // "bool" 1 for teapot, 0 for simple
+  double delta;
+  double Delta;
+} SliceDistPos;
+
+void Set_SliceDistPos(SliceDistPos* SP,int n,int teapot_fl);
+void Set_SliceDistPos(SliceDistPos* SP,int n,int teapot_fl)
+{
+  SP->n=n;
+  SP->teapot_fl=teapot_fl;
+  SP->delta=0.5;
+  SP->Delta=0;
+  if(n>1)
   {
-    struct element* el_i = element_list->elem[i];
-    el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
-    if(el_i_slice_pos>0 && el_i->parent!=NULL && el_i != el_i->parent )
-    {
-      child=el_i->def->par->parameters[el_i_slice_pos];
-      parent=el_i->parent->def->par->parameters[el_i_slice_pos];
-      slices=child->double_value;
-      slices_parent=parent->double_value;
-      if(slices != slices_parent)
-      {
-        if(slices>slices_parent) slices_parent=slices; else slices=slices_parent;
-        child->double_value=slices;
-        parent->double_value=slices_parent;
-      }
-    }
+	if(teapot_fl) SP->delta=1./(2*(1+n)); else SP->delta=1./(2.*n);
+  }
+  if(n>1)
+  {
+	if(teapot_fl) SP->Delta=n/(n*n-1.); else SP->Delta=1./n;
   }
 }
 
-#if 0 // not used
+void Print_SliceDistPos(SliceDistPos* SP);
+void Print_SliceDistPos(SliceDistPos* SP) // print method for SliceDistPos
+{
+  printf("Print_SliceDistPos  teapot_fl=%d n=%d delta=%f Delta=%f\n",SP->teapot_fl,SP->n,SP->delta,SP->Delta);
+}
+
+// private interface
+static int thick_fl(struct element* el) /* returns 1 if the element has a thick parameter and if the value is positive, 0 otherwise */
+{
+  int iret=0;
+  int thick_pos = name_list_pos("thick",el->def->par_names);
+  if(thick_pos>0 && el->def->par->parameters[thick_pos]->double_value>0) iret=1;
+  return iret;
+}
+
 static void
 dump_slices(void)
 /* Loops over all current elements and prints the number of slices. Used for debug and info */
@@ -83,7 +89,8 @@ dump_slices(void)
   int i,el_i_slice_pos,slices,slices_parent,n_elem_with_slice=0,n_elem_with_slice_gt_1=0;
   char* parent_name;
   printf("++++++ dump_slices");
-  printf("            name #slices  derived from #slices\n");
+  if(get_option("verbose")) printf("   verbose on, all elements are listed\n"); else printf("   only elements with 2 or more slices are shown\n");
+  printf("            name  #slices      derived from  #slices\n");
   for(i=0; i< element_list->curr; i++) /* loop over element_list */
   {
     el_i = element_list->elem[i];
@@ -101,20 +108,61 @@ dump_slices(void)
         parent_name=el_i->parent->name;
       }
       if(slices>1) n_elem_with_slice_gt_1++;
+	  if(get_option("verbose") || slices>1 )
+      {
+        printf(" %15s %2d",el_i->name,slices);
+		if(thick_fl(el_i)) printf(" thick"); else printf(" thin ");
+        if(el_i != el_i->parent)
+		{
+		  printf("%18s %2d",parent_name,slices_parent); /* show also parent if not same as child */
+		  if(thick_fl(el_i->parent)) printf(" thick"); else printf(" thin ");
+		}
+        printf("\n");
+      }
     }
   }
   printf("------ end of dump slices. There were %4d elements, %3d with slice numbers and %2d with slice numbers>1\n\n",element_list->curr,n_elem_with_slice,n_elem_with_slice_gt_1);
 }
-#endif
+
+static void
+force_consistent_slices(void)
+/* hbu 10/2005
+ loop over all elements and check that #slices of child and parent agree
+ if not, use the maximum for both
+ */
+{
+  //  struct element* el_i;
+  struct command_parameter *child,*parent;
+  int i,el_i_slice_pos,slices,slices_parent;
+  for(i=0; i< element_list->curr; i++) /* loop over element_list */
+  {
+    struct element* el_i = element_list->elem[i];
+    el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
+    if(el_i_slice_pos>0 && el_i->parent!=NULL && el_i != el_i->parent )
+    {
+      child=el_i->def->par->parameters[el_i_slice_pos];
+      parent=el_i->parent->def->par->parameters[el_i_slice_pos];
+      slices=child->double_value;
+      slices_parent=parent->double_value;
+      if(slices != slices_parent)
+      {
+        if(slices>slices_parent) slices_parent=slices; else slices=slices_parent;
+        child->double_value=slices;
+        parent->double_value=slices_parent;
+		int el_i_thick_pos = name_list_pos("thick",el_i->def->par_names);
+		if(el_i_thick_pos>0) el_i->parent->def->par->parameters[el_i_thick_pos]->double_value = el_i->def->par->parameters[el_i_thick_pos]->double_value; /* copy thick flag from child to parent */
+      }
+    }
+  }
+  if (get_option("debug")) { printf("end of force_consistent_slices\n"); dump_slices(); }
+}
 
 static int
 get_slices_from_elem(struct element* elem)
 {
   int elem_slice_pos=0,slices=1;
-  elem_slice_pos = name_list_pos("slice",elem->def->par_names);
-  if(elem_slice_pos > 0)
-    slices = elem->def->par->parameters[elem_slice_pos]->double_value;
-  if (slices==0) slices = 1; /* must always slice to thin */
+  if( (elem_slice_pos = name_list_pos("slice",elem->def->par_names)) >0 ) slices=elem->def->par->parameters[elem_slice_pos]->double_value;
+  // if (slices==0) slices = 1; /* must always slice to thin */
   return slices;
 }
 
@@ -122,11 +170,16 @@ get_slices_from_elem(struct element* elem)
 static struct element*
 get_thin(struct element* thick_elem, int slice)
 {
-  if (my_list) {
-    struct thin_lookup *cur = my_list;
-    while (cur) {
+  struct thin_lookup *cur;
+  if (my_list)
+  {
+    cur = my_list;
+    while (cur)
+    {
       if (cur->thick_elem == thick_elem && cur->slice == slice)
+      {
         return cur->thin_elem;
+      }
       cur = cur->next;
     }
   }
@@ -138,18 +191,23 @@ static void
 put_thin(struct element* thick_elem, struct element* thin_elem, int slice)
 {
   struct thin_lookup *p,*cur;
-  const char *rout_name = "makethin:put_thin";
-  p = mycalloc(rout_name, 1, sizeof *p);
+  char rout_name[] = "makethin:put_thin";
+  p = (struct thin_lookup*) mycalloc(rout_name,1, sizeof(struct thin_lookup));
   p->thick_elem = thick_elem;
   p->thin_elem = thin_elem;
   p->slice = slice;
   p->next = NULL;
-  if (my_list) {
+  if (my_list)
+  {
     cur = my_list;
     while (cur->next) cur = cur->next;
     cur->next = p;
   }
-  else my_list = p;
+  else
+  {
+    my_list = p;
+  }
+  return;
 }
 
 /* Has this sequence already been dieted? returns NULL for NO.*/
@@ -177,17 +235,22 @@ static void
 put_thin_sequ(struct sequence* thick_sequ, struct sequence* thin_sequ)
 {
   struct thin_sequ_lookup *p,*cur;
-  const char *rout_name = "makethin:put_thin_sequ";
-  p = mycalloc(rout_name, 1, sizeof *p);
+  char rout_name[] = "makethin:put_thin_sequ";
+  p = (struct thin_sequ_lookup*) mycalloc(rout_name,1, sizeof(struct thin_sequ_lookup));
   p->thick_sequ = thick_sequ;
   p->thin_sequ = thin_sequ;
   p->next = NULL;
-  if (my_sequ_list) {
+  if (my_sequ_list)
+  {
     cur = my_sequ_list;
     while (cur->next) cur = cur->next;
     cur->next = p;
   }
-  else my_sequ_list = p;
+  else
+  {
+    my_sequ_list = p;
+  }
+  return;
 }
 
 /* makes node name from element name and slice number*/
@@ -207,7 +270,7 @@ scale_and_slice(struct command_parameter *kn_param, struct command_parameter *le
   struct expression *kn_i_expr;
   double kn_i_val;
   if (kn_param == NULL) return NULL;
-  
+
   for (i=0; i<kn_param->expr_list->curr; i++)
   {
     kn_i_expr = kn_param->expr_list->list[i];
@@ -230,13 +293,14 @@ scale_and_slice(struct command_parameter *kn_param, struct command_parameter *le
       { /* give the correct weight by slice (multiply with the inverse of the number of slices) */
         if (kn_i_expr)
         {
-          kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"*",NULL,q_shift(slices,slice_no));
+          kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"*",NULL,1./slices);
         }
         else
         {
-          kn_i_val *= q_shift(slices,slice_no);
+          kn_i_val *= 1./slices;
         }
       }
+	  if(get_option("verbose")) { printf("verbose %s %s line %d  kn_i_val=%f  kl_flag=%d\n",__FILE__,__FUNCTION__,__LINE__,kn_i_val,kl_flag); dump_expression(kn_i_expr); }
     }
     if(kn_i_expr) kn_param->expr_list->list[i] = kn_i_expr;
     kn_param->double_array->a[i] = kn_i_val;
@@ -260,10 +324,10 @@ translate_k(struct command_parameter* *kparam,
   int i,angle_conversion=0;
   /*    char *zero[1]; */
   /*    zero[0] = buffer("0"); */
-  
+
   if ((kparam == NULL) && (ksparam == NULL))
     fatal_error("translate_k: no kparams to convert","");
-  
+
   /* if we have a angle we ignore any given k0 */
   if (angle_param)
   {
@@ -275,7 +339,7 @@ translate_k(struct command_parameter* *kparam,
     }
     kparam[0]->double_value = angle_param->double_value;
   }
-  
+
   for (i=0; i<4; i++)
   {
     /* zero all the parameters */
@@ -302,7 +366,7 @@ translate_k(struct command_parameter* *kparam,
     kn_param->expr_list->curr++; kn_param->double_array->curr++;
     ks_param->expr_list->curr++; ks_param->double_array->curr++;
   }
-  
+
   return angle_conversion;
 }
 
@@ -324,7 +388,7 @@ seq_diet_add(struct node* node, struct sequence* sequ)
     sequ->end = node;
   }
   add_to_node_list(node, 0, sequ->nodes);
-  
+
   return;
 }
 
@@ -362,9 +426,9 @@ add_lrad(struct command* cmd,struct command_parameter *length_param,int slices)
   }
 }
 
-/* creates the thin magnetic element - recursively for classes from which dericed (parent) */
+/* creates the thin magnetic element - recursively for classes from which derived (parent), for ThickSLice fill gaps with thick quad pieces */
 static struct element*
-create_thin_multipole(struct element* thick_elem, int slice_no)
+create_thin_multipole(struct element* thick_elem, int slice_no,int ThickSLice)
 {
   struct command_parameter *angle_param, *length_param, *kparam[4], *ksparam[4], *kn_param, *ks_param, *at_param, *fint_param;
   struct element *thin_elem_parent, *thin_elem;
@@ -373,17 +437,20 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
   int angle_conversion = 0;
   int slices, minimizefl;
   int knl_flag = 0,ksl_flag = 0;
-  
+
   /* next is new to handle parent with possibly different slice number than child */
   slices = get_slices_from_elem(thick_elem);
   at_param = return_param("at",thick_elem);
-  
+
+  if (get_option("debug")) printf("debug %s %s line %d %s slices=%d ThickSLice=%d slice_no=%d\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,slices,ThickSLice,slice_no);
+
   if (thick_elem == thick_elem->parent) return NULL; /* no further parent to consider */
   else
   {
-    thin_elem_parent = create_thin_multipole(thick_elem->parent,slice_no); /* slice also the parent */
+	if (get_option("debug")) printf("recursive slice parent:");
+    thin_elem_parent = create_thin_multipole(thick_elem->parent,slice_no,ThickSLice); /* slice also the parent */
   }
-  
+
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
@@ -393,11 +460,11 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
   {
     slice_no=1;
   }
-  
+
   /* check to see if we've already done this one */
   thin_elem = get_thin(thick_elem,slice_no);
   if (thin_elem) return thin_elem;
-  
+
   /* issue a warning in case of element parameter combinations not suitable for slicing */
   fint_param   = return_param_recurse("fint",thick_elem);
   if(fint_param)
@@ -405,7 +472,7 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
     printf("    *** warning %s is a thick %s with fringe fields. These will be lost in the translation to a multipole. Use dipedge.\n",
            thick_elem->name,thick_elem->parent->name);
   }
-  
+
   length_param = return_param_recurse("l",thick_elem);
   angle_param  = return_param_recurse("angle",thick_elem);
   kparam[0]    = return_param_recurse("k0",thick_elem);
@@ -420,7 +487,7 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
   ks_param     = return_param_recurse("ksl",thick_elem);
   if (kn_param) {kn_param = clone_command_parameter(kn_param); knl_flag++;}
   if (ks_param) {ks_param = clone_command_parameter(ks_param); ksl_flag++;}
-  
+
   /* translate k0,k1,k2,k3,angle */
   if ((kparam[0] || kparam[1] || kparam[2] || kparam[3] || angle_param
        || ksparam[0] || ksparam[1] || ksparam[2] || ksparam[3])
@@ -434,12 +501,18 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
     ks_param->double_array = new_double_array(10);
     angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
   }
-  
-  kn_param = scale_and_slice(kn_param,length_param,slices,slice_no,
-                             angle_conversion,knl_flag+ksl_flag);
-  ks_param = scale_and_slice(ks_param,length_param,slices,slice_no,
-                             angle_conversion,knl_flag+ksl_flag);
-  /* set up new multipole command */
+
+  kn_param = scale_and_slice(kn_param,length_param,slices,slice_no, angle_conversion,knl_flag+ksl_flag);
+  ks_param = scale_and_slice(ks_param,length_param,slices,slice_no, angle_conversion,knl_flag+ksl_flag);
+
+  if(ThickSLice)
+  {
+	if (get_option("debug"))  printf("debug %s %s line %d ThickSLice=%d set kn, ks to zero\n",__FILE__,__FUNCTION__,__LINE__,ThickSLice);
+	kn_param=NULL;
+	ks_param=NULL;
+  }
+
+ /* set up new multipole command */
   cmd = new_command(buffer("thin_multipole"), 20, 20, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 8); /* 0 is link, multipole is 8 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
@@ -468,14 +541,16 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
   else
   {
     thin_name = make_thin_name(thick_elem->name,slice_no);
+	if(get_option("verbose")) printf("verbose %s %s line %d make_thin_name(%s,%d)=%s\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,slice_no,thin_name);
   }
-  
   if (thin_elem_parent)
   {
+	if(get_option("verbose")) printf("verbose %s %s line %d make_element(%s,%s,cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name,thin_elem_parent->name);
     thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
   }
   else
   {
+	if(get_option("verbose")) printf("verbose %s %s line %d make_element(%s,\"multipole\",cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name);
     thin_elem = make_element(thin_name,"multipole",cmd,-1);
   }
   thin_elem->length = 0;
@@ -484,6 +559,7 @@ create_thin_multipole(struct element* thick_elem, int slice_no)
   {
     thin_elem->bv = thin_elem_parent->bv;
   }
+  if(get_option("verbose")) printf("verbose %s %s line %d put_thin(%s,%s,%d);\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,thin_elem->name,slice_no);
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
 }
@@ -497,7 +573,7 @@ create_thin_solenoid(struct element* thick_elem, int slice_no)
   struct command* cmd;
   char *thin_name;
   int slices,minimizefl;
-  
+
   if (thick_elem == thick_elem->parent) return NULL;
   else
   {
@@ -510,19 +586,18 @@ create_thin_solenoid(struct element* thick_elem, int slice_no)
   length_param  = return_param_recurse("l",thick_elem);
   ks_param      = return_param_recurse("ks",thick_elem);
   at_param      = return_param("at",thick_elem);
-  
+
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
   }
-  
+
   /* set up new solenoid command */
   cmd = new_command(buffer("thin_solenoid"), 20, 20, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 9); /* 0 is link, solenoid is 9 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
-  
-  
+
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -584,7 +659,7 @@ create_thin_elseparator(struct element* thick_elem, int slice_no)
   struct command* cmd;
   char *thin_name;
   int slices,minimizefl;
-  
+
   if (thick_elem == thick_elem->parent) return NULL;
   else
   {
@@ -599,19 +674,18 @@ create_thin_elseparator(struct element* thick_elem, int slice_no)
   ey_param      = return_param_recurse("ey",thick_elem);
   tilt_param    = return_param_recurse("tilt",thick_elem);
   at_param      = return_param("at",thick_elem);
-  
+
   minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
   }
-  
+
   /* set up new solenoid command */
   cmd = new_command(buffer("thin_elseparator"), 20, 20, /* max num names, max num param */
                     buffer("element"), buffer("none"), 0, 11); /* 0 is link, elseparator is 11 */
   add_cmd_parameter_new(cmd,1.,"magnet",0); /* parameter magnet with value of 1 and inf=0 */
-  
-  
+
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -691,11 +765,11 @@ new_marker(struct node *thick_node, double at, struct expression *at_expr)
 {
   struct node* node=NULL;
   struct element* elem=NULL;
-  
+
   int pos;
   struct command* p;
   struct command* clone;
-  
+
   if (thick_node->p_elem)
   {
     pos = name_list_pos("marker", defined_commands->list);
@@ -729,23 +803,107 @@ new_marker(struct node *thick_node, double at, struct expression *at_expr)
   {
     fatal_error("Oh dear, this is not an element!",thick_node->name);
   }
-  
+
   return node;
+}
+
+static struct element* create_thick_slice(struct element* thick_elem,int i) // create quad slice mqxa.1r1.sq: quadrupole, l:=l.mqxa   * 1/10, k1:=kqx.r1 + ktqx1.r1;      and add to the sequence
+{
+  int n = get_slices_from_elem(thick_elem);
+  char slice_name[128];
+  if(i==0)  sprintf(slice_name,"%s.sq",thick_elem->name); /* add .sq to end    quad name */
+  else sprintf(slice_name,"%s.bq",thick_elem->name);       /* add .bq to middle quad name */
+
+  int teapot_fl=1; // default teapot
+  if (thin_style != NULL && strcmp(thin_style,"simple")==0) teapot_fl=0; // simple equidistant slicing
+  SliceDistPos SP;
+  Set_SliceDistPos(&SP,n,teapot_fl);
+
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d start from thick_elem %s :\n",__FILE__,__FUNCTION__,__LINE__,n,thick_elem->name); dump_element(thick_elem); Print_SliceDistPos(&SP); }
+  int length_i = name_list_pos("l",thick_elem->def->par_names);
+  struct command_parameter* length_param0 = thick_elem->def->par->parameters[length_i]; // pointer to the original length parameter
+  struct expression* l_expr0 = length_param0->expr; // pointer to the original length expression
+  // double length0 = l_expr0->value; // original length value   not used
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_expression(l_expr0):\n",__FILE__,__FUNCTION__,__LINE__,n); dump_expression(l_expr0);}
+
+  struct command_parameter* at_param = return_param("at",thick_elem);
+  if(at_param) at_param = clone_command_parameter( return_param("at",thick_elem) ); // clone of the original at parameter that can be modified
+
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d  dump_command_parameter(at_param):\n",__FILE__,__FUNCTION__,__LINE__,n); if(at_param) dump_command_parameter(at_param); }
+  struct command_parameter* length_param  = clone_command_parameter( length_param0 );  // copy of the original length parameter that can be modified
+  // printf("\n thick_elem \n"); dump_element(thick_elem);
+  if(i==0)
+  { // the quadrupole start and end slice
+    length_param->expr = compound_expr(length_param->expr,0.,"*",NULL,SP.delta);
+  }
+  else
+  { // the middle quadrupole slices
+	length_param->expr = compound_expr(length_param->expr,0.,"*",NULL,SP.Delta);
+  }
+  // clone existing command       result is   mqxa.1r1.sq: quadrupole,polarity:= 1,k1:=kqx.r1 + ktqx1.r1 ;
+  struct command* cmd = clone_command(thick_elem->def); /* command cmd to define this element, gives k1 and polarity */
+  if(get_option("verbose"))
+  {
+	printf("\n\nafter clone\n");
+    dump_command(cmd);
+  }
+  add_cmd_parameter_clone(cmd,length_param,"l",1);
+  cmd->par->parameters[length_i]->expr=length_param->expr; /* use the length expression in cmd */
+
+  if (get_option("verbose")) { printf("\nverbose %s %s line %d thin_style=%s i=%d\n",__FILE__,__FUNCTION__,__LINE__,thin_style,i); dump_command(cmd);}
+
+  struct element* slice_elem = make_element(slice_name,"quadrupole",cmd,-1); // make the element using the command cmd, -1 means avoid warnings
+
+  if(get_option("verbose")) printf("verbose done create_thick_slice %s n=%d slice_name=%s\n",thick_elem->name,n,slice_name);
+
+  return slice_elem;
+}
+
+static void place_thick_slice(struct element* thick_elem, struct node* node, struct sequence* to_sequ, struct element* slice_elem, int i) // create .sq, .bq quadrupole pieces  and place them in the sequence
+{
+  int n = get_slices_from_elem(thick_elem);
+  int teapot_fl=1; // default teapot
+  if (thin_style != NULL && strcmp(thin_style,"simple")==0) teapot_fl=0; // simple equidistant slicing
+  SliceDistPos SP;
+  Set_SliceDistPos(&SP,n,teapot_fl);
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d  start from thick_elem %s :\n",__FILE__,__FUNCTION__,__LINE__,n,thick_elem->name); dump_element(thick_elem);Print_SliceDistPos(&SP); }
+
+  int length_i = name_list_pos("l",thick_elem->def->par_names);
+  struct command_parameter* length_param0 = thick_elem->def->par->parameters[length_i]; // pointer to the original length parameter
+  struct expression* at_expr = clone_expression(node->at_expr);
+  double at = node->at_value;
+  if(i==0)       at_expr = compound_expr(at_expr,at, "+",  scale_expr(length_param0->expr,-0.5 + SP.delta/2.),  0 ); // 1st  piece
+  else if(i==n)  at_expr = compound_expr(at_expr,at, "+",  scale_expr(length_param0->expr, 0.5 - SP.delta/2.),  0 ); // last piece
+  else           at_expr = compound_expr(at_expr,at, "+",  scale_expr(length_param0->expr,-0.5 + SP.delta + (i-0.5)*SP.Delta),  0 ); // middle pieces
+  struct node* thick_node = new_elem_node(slice_elem, node->occ_cnt);
+  thick_node->from_name = buffer(node->from_name);
+  thick_node->at_expr=at_expr;
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_expression(at_expr):\n",__FILE__,__FUNCTION__,__LINE__,n); dump_expression(at_expr);}
+  seq_diet_add(thick_node,to_sequ);
+  //if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_element(%s)  :\n",__FILE__,__FUNCTION__,__LINE__,n,thick_elem->name); dump_element(thick_elem);}
+  //if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_element(%s)  :\n",__FILE__,__FUNCTION__,__LINE__,n,slice_elem->name); dump_element(slice_elem);}
+  //if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_node(node)   :\n",__FILE__,__FUNCTION__,__LINE__,n); dump_node(node);}
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d n=%d dump_node(thick_node)   :\n",__FILE__,__FUNCTION__,__LINE__,n); dump_node(thick_node);}
+  if(get_option("verbose")) { printf("\n done with place_thick_slice i=%d\n",i); }
 }
 
 /* adds a thin elem in sliced nodes to the end of a sequence */
 static void
 seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
 {
-  struct command_parameter *at_param, *length_param;
-  struct expression *l_expr = NULL, *at_expr = NULL;
-  struct node* thin_node;
-  struct element* elem;
-  double length = 0, at = 0;
-  int i,middle=-1,slices = 1;
-  char* old_thin_style;
-  
-  old_thin_style = NULL;
+  struct element* elem; // pointer to new thin element
+  struct element *sq = NULL, *bq = NULL; // pointer to thick quad slices
+  int slices=get_slices_from_elem(node->p_elem);
+  int ThickSLice=thick_fl(node->p_elem);
+  if(ThickSLice && slices<1)
+  {
+	seq_diet_add(node,to_sequ); // just place the thick element
+    if (get_option("debug"))  printf("debug %s %s line %d slices=%d keep the thick version of %s\n",__FILE__,__FUNCTION__,__LINE__,slices,node->p_elem->name);
+	return;
+  }
+  if(slices<1) slices=1; // at least 1 thin slice
+
+  char* old_thin_style = NULL;
   if (strstr(node->base_name,"collimator"))
   {
     elem = create_thin_obj(node->p_elem,1);
@@ -762,49 +920,45 @@ seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
   }
   else
   {
-    elem = create_thin_multipole(node->p_elem,1); /* get info from first slice */
+    elem = create_thin_multipole(node->p_elem,1,ThickSLice); /* get info from first slice */
+    if(ThickSLice)
+    {
+      if (get_option("debug")) printf("debug 0 create_thin_multipole with parent --- in addition create two thick quadrupole types  .sq  .bq elem->name=%s\n",elem->name);
+      sq=create_thick_slice(node->p_elem,0); // thick start/end slice with "name".sq
+      bq=create_thick_slice(node->p_elem,1); // thick middle    slice with "name".bq
+    }
   }
-  slices = get_slices_from_elem(node->p_elem); /*hbu June 2005 */
-  
-  at_param = return_param_recurse("at",elem);
-  length_param = return_param_recurse("l",node->p_elem); /*get original length*/
+
+  struct command_parameter* at_param = return_param_recurse("at",elem);
+  struct command_parameter* length_param = return_param_recurse("l",node->p_elem); /*get original length*/
+  struct expression* l_expr = NULL;
   if (length_param) l_expr  = length_param->expr;
+  struct expression* at_expr = NULL;
   if (at_param)     at_expr = at_param->expr;
-  
-  at     = el_par_value_recurse("at", elem);
-  length = el_par_value_recurse("l",node->p_elem);
-  
+  double at     = el_par_value_recurse("at", elem);
+  double length = el_par_value_recurse("l",node->p_elem);
+
   if (node->at_expr) at_expr = node->at_expr;
   if (node->at_value != zero) at = node->at_value;
   if (node->length   != zero) length = node->length;
   /* note that a properly created clone node will contain the length of the element */
   /* this will override all other definitions and hence the already sliced element length
    is irrelevant */
-  
-  if (slices>1)
-  { /* sets after which element I should put the marker */
-    middle = abs(slices/2);
-  }
-  
-  for (i=0; i<slices; i++)
+
+  int middle=-1;
+  if (slices>1) middle = slices/2; /* sets after which element I should put the marker */
+
+  if(get_option("verbose")) { printf("\nverbose %s %s line %d slices=%d at=%f length=%f dump_element(elem); dump_node(node):\n",__FILE__,__FUNCTION__,__LINE__,slices,at,length); dump_element(elem); dump_node(node); }
+
+  for (int i=0; i<slices; i++)
   {
-    if (strstr(node->base_name,"collimator"))
+    if(ThickSLice)
     {
-      elem = create_thin_obj(node->p_elem,i+1);
+	  if(i==0) place_thick_slice(node->p_elem,node,to_sequ,sq,0); // place initial quad
+	  else     place_thick_slice(node->p_elem,node,to_sequ,bq,i); // place middle quad
     }
-    else if (strstr(node->base_name,"solenoid"))
-    {
-      elem = create_thin_solenoid(node->p_elem,i+1);
-    }
-    else if (strstr(node->base_name,"elseparator"))
-    {
-      elem = create_thin_elseparator(node->p_elem,i+1);
-    }
-    else
-    {
-      elem = create_thin_multipole(node->p_elem,i+1);
-    }
-    thin_node = new_elem_node(elem, node->occ_cnt);
+    elem = create_thin_multipole(node->p_elem,i+1,ThickSLice); // create and place the multipole pieces
+	struct node* thin_node = new_elem_node(elem, node->occ_cnt);
     thin_node->length   = 0.0;
     thin_node->from_name = buffer(node->from_name);
     if (fabs(at_shift(slices,i+1))>0.0)
@@ -812,8 +966,7 @@ seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
       if (at_expr || l_expr)
       {
         thin_node->at_expr =
-        compound_expr(at_expr,at,"+",scale_expr(l_expr,at_shift(slices,i+1)),
-                      length*at_shift(slices,i+1));
+        compound_expr(at_expr,at,"+",scale_expr(l_expr,at_shift(slices,i+1)),length*at_shift(slices,i+1));
       }
     }
     else
@@ -821,9 +974,12 @@ seq_diet_add_elem(struct node* node, struct sequence* to_sequ)
       if (at_expr) thin_node->at_expr = clone_expression(at_expr);
     }
     thin_node->at_value = at + length*at_shift(slices,i+1);
-    if (i==middle) seq_diet_add(new_marker(node,at,at_expr),to_sequ);
+    if (i==middle && !ThickSLice) seq_diet_add(new_marker(node,at,at_expr),to_sequ);  // add a marker in the middle, except for thick slices
+	if(get_option("verbose")) { printf("\nverbose %s %s line %d slices=%d dump_node(thin_node):\n",__FILE__,__FUNCTION__,__LINE__,slices); dump_node(thin_node); }
     seq_diet_add(thin_node,to_sequ);
   }
+  if(ThickSLice) place_thick_slice(node->p_elem,node,to_sequ,sq,slices); // place last quad piece
+
   if (strstr(node->base_name,"collimator")) thin_style=old_thin_style;
   return;
 }
@@ -837,7 +993,7 @@ create_thin_obj(struct element* thick_elem, int slice_no)
   struct command_parameter*  length_param= NULL;
   int length_i = -1,lrad_i = -1,slices=1;
   char* thin_name = NULL;
-  
+
   if (thick_elem == thick_elem->parent)
   {
     return NULL;
@@ -846,11 +1002,11 @@ create_thin_obj(struct element* thick_elem, int slice_no)
   {
     thin_elem_parent = create_thin_obj(thick_elem->parent,slice_no);
   }
-  
+
   /* check to see if we've already done this one */
   thin_elem = get_thin(thick_elem,slice_no);
   if (thin_elem) return thin_elem;
-  
+
   /* set up new multipole command */
   cmd = clone_command(thick_elem->def);
   length_param = return_param_recurse("l",thick_elem);
@@ -886,7 +1042,7 @@ create_thin_obj(struct element* thick_elem, int slice_no)
       }
     }
   }
-  
+
   if (length_i > -1)
   {
     cmd->par->parameters[length_i]->double_value = 0;
@@ -904,7 +1060,7 @@ create_thin_obj(struct element* thick_elem, int slice_no)
   {
     thin_name=make_thin_name(thick_elem->name,slice_no);
   }
-  
+
   if (thin_elem_parent)
   {
     thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
@@ -915,7 +1071,7 @@ create_thin_obj(struct element* thick_elem, int slice_no)
   }
   thin_elem->length = 0;
   thin_elem->bv = el_par_value("bv",thin_elem);
-  
+
   put_thin(thick_elem,thin_elem,slice_no);
   return thin_elem;
 }
@@ -927,14 +1083,14 @@ static struct node*
 copy_thin(struct node* thick_node)
 {
   struct node* thin_node = NULL;
-  
+
   thin_node = clone_node(thick_node, 0);
   thin_node->length=0;
   thin_node->p_elem->length=0;
   /* if we have a non zero length then an lrad has to be created */
   if (el_par_value("l",thick_node->p_elem)>zero)
     thin_node->p_elem = create_thin_obj(thick_node->p_elem,1);
-  
+
   return thin_node;
 }
 
@@ -946,6 +1102,7 @@ seq_diet_node(struct node* thick_node, struct sequence* thin_sequ)
   struct node* thin_node;
   if (thick_node->p_elem)
   { /* this is an element to split and add */
+	if(get_option("verbose")) { printf("\nverbose %s %s line %d thick_node->name=%s thick_node->p_elem=%s \n",__FILE__,__FUNCTION__,__LINE__,thick_node->name,thick_node->p_elem->name); }
     if (el_par_value("l",thick_node->p_elem)==zero) /* if it's already thin copy it directly*/
     {
       seq_diet_add(thin_node = copy_thin(thick_node),thin_sequ);
@@ -1024,10 +1181,10 @@ seq_diet(struct sequence* thick_sequ)
   struct sequence* thin_sequ;
   char name[128];
   int pos;
-  
+
   /* first check to see if it had been already sliced */
   if ((thin_sequ=get_thin_sequ(thick_sequ))) return thin_sequ;
-  
+
   strcpy(name,thick_sequ->name);
   fprintf(prt_file, "makethin: slicing sequence : %s\n",name);
   thin_sequ = new_sequence(name, thick_sequ->ref_flag);
@@ -1062,16 +1219,15 @@ seq_diet(struct sequence* thick_sequ)
     sequences->sequs[pos]= thin_sequ;
     /* delete_sequence(thick_sequ) */
   }
-  
+
   /* add to list of sequences sliced */
   put_thin_sequ(thick_sequ,thin_sequ);
-  
+
   return thin_sequ;
 }
 
 /*************************************************************************/
 /* these are the routines to determine the method of splitting */
-/* note slice number is counted from 1 NOT 0 */
 
 /* return at relative shifts from center of unsliced magnet */
 static double
@@ -1109,67 +1265,6 @@ default_at_shift(int slices, int slice_no)
                   : teapot_at_shift(slices, slice_no);
 }
 
-/* previous Teapot limited to 4 slices.
-static double
-teapot_at_shift(int slices,int slice_no)
-{
-  double at = 0;
-  switch (slices)
-  {
-    case 1:
-      at = 0.;
-      break;
-    case 2:
-      if (slice_no == 1) at = -1./3.;
-      if (slice_no == 2) at = +1./3.;
-      break;
-    case 3:
-      if (slice_no == 1) at = -3./8.;
-      if (slice_no == 2) at = 0.;
-      if (slice_no == 3) at = +3./8.;
-      break;
-    case 4:
-      if (slice_no == 1) at = -2./5.;
-      if (slice_no == 2) at = -2./15.;
-      if (slice_no == 3) at = +2./15.;
-      if (slice_no == 4) at = +2./5.;
-      break;
-  }
-  // return the simple style if slices > 4
-  if (slices > 4) at = simple_at_shift(slices,slice_no);
-  return at;
-}
-*/
-
-/* return at relative strength shifts from unsliced magnet */
-static double
-simple_q_shift(int slices,int slice_no)
-{
-  (void)slice_no;
-  return 1.0/slices;
-}
-
-static double
-teapot_q_shift(int slices,int slice_no)
-{
-  (void)slice_no;
-  return 1.0/slices;
-}
-
-static double
-collim_q_shift(int slices,int slice_no)
-{ /* pointless actually, but it pleases symmetrically */
-  (void)slice_no;
-  return 1.0/slices;
-}
-
-static double
-default_q_shift(int slices, int slice_no)
-{
-  return slices>4 ? simple_q_shift(slices, slice_no)
-                  : teapot_q_shift(slices, slice_no);
-}
-
 /* return at relative shifts from center of unsliced magnet */
 static double
 at_shift(int slices,int slice_no)
@@ -1197,47 +1292,20 @@ at_shift(int slices,int slice_no)
   return 0;
 }
 
-/* return at relative strength shifts from unsliced magnet */
-static double
-q_shift(int slices,int slice_no)
-{
-  if (!slices || !slice_no) {
-    fatal_error("makethin: invalid slicing for zero slices",thin_style);
-  }
-
-  if (thin_style == NULL) {
-    return default_q_shift(slices,slice_no);
-  }
-  else if (strcmp(thin_style,"simple")==0) {
-    return simple_q_shift(slices,slice_no);
-  }
-  else if (strcmp(thin_style,"teapot")==0) {
-    return teapot_q_shift(slices,slice_no);
-  }
-  else if (strcmp(thin_style,"collim")==0) {
-    return collim_q_shift(slices,slice_no);
-  }
-  else {
-    fatal_error("makethin: Style chosen not known:",thin_style);
-  }
-  return 0;
-}
-
 static void
 set_selected_elements(void)
 { /* New set_selected_elements */
   struct element* el_j;
   struct name_list* nl;
   struct command_parameter_list* pl;
-  int i, j, pos_slice, pos_full, pos_range, slice, el_j_slice_pos;
+  int i, j, pos_slice, pos_full, pos_range, slice, el_j_slice_pos, pos_thick;
   bool full_fl,range_fl,slice_fl;
   struct node* c_node;    /* for range check.  current node */
   struct node* nodes[2];  /* for range check.  first and last in range */
-  /* Init curr and list->curr in global el_list structure.  selected_elements is passed to add_to_el_list and used at the end as thin_select_list
-   selected_elements  is only used in makethin (set here and read in and could be named thin_select_list
-   */
+  /* Init curr and list->curr in global el_list structure.  selected_elements are passed to add_to_el_list and used at the end as thin_select_list
+   selected_elements are only used in makethin (set here and read in, could be named thin_select_list */
   selected_elements->curr = 0;
-  selected_elements->list->curr = 0;  /* Reset list->curr in global el_list structure.   selected_elements is passed to add_to_el_list */
+  selected_elements->list->curr = 0;  /* Reset list->curr in global el_list structure.   selected_elements are passed to add_to_el_list */
   if (current_sequ == NULL || current_sequ->ex_start == NULL) /* check that there is an active sequence, otherwise crash in get_ex_range */
   {
     warning("makethin selection without active sequence,", "ignored");
@@ -1258,6 +1326,7 @@ set_selected_elements(void)
     slice_fl  = pos_slice > -1 && nl->inform[pos_slice]; /* selection with slice */
     if (slice_fl) slice = pl->parameters[pos_slice]->double_value; /* Parameter has been read. Slice number from select command */
     else slice = 1;
+	pos_thick = name_list_pos("thick", nl); /* position of thick flag in select command list */
     if(full_fl) /* use full sequence from start to end, the default */
     {
       nodes[0] = current_sequ->ex_start;
@@ -1285,9 +1354,11 @@ set_selected_elements(void)
         {
           el_j = c_node->p_elem;
           el_j_slice_pos = name_list_pos("slice",el_j->def->par_names); /* position of slice parameter in element list */
+		  int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); /* position of thick flag      in element list */
           if (pass_select(el_j->name, slice_select->commands[i]) != 0) /* selection on class and pattern done in pass_select. element el_j selected */
           { /* the element el_j passes the selection */
             if(el_j_slice_pos > 0) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; /* Set the element slice number to the number of slices given in the select statement. */
+			if(el_j_thick_pos > 0) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; /* Set the element thick flag to what is given in the select statement */
             if( name_list_pos(el_j->name, selected_elements->list) < 0) /* el_j not yet in selected_elements */
             {
               add_to_el_list(&el_j, slice, selected_elements, 0);
@@ -1303,9 +1374,11 @@ set_selected_elements(void)
         {
           el_j = element_list->elem[j];
           el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);
+		  int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); /* position of thick flag      in element list */
           if (pass_select(el_j->name, slice_select->commands[i]) != 0) /* selection on class and pattern done in pass_select. element el_j selected */
           { /* the element el_j passes the selection */
             if(el_j_slice_pos > 0) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; /* Set the element slice number to the number of slices given in the select statement. */
+			if(el_j_thick_pos > 0) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; /* Set the element thick flag to what is given in the select statement */
             if( name_list_pos(el_j->name, selected_elements->list) < 0) /* el_j not yet in selected_elements */
             {
               add_to_el_list(&el_j, slice, selected_elements, 0);
@@ -1315,6 +1388,7 @@ set_selected_elements(void)
       } /* range_fl */
     } /* slice_fl */
   } /* end of loop over select slice commands */
+  if (get_option("debug")) dump_slices(); /* shows where 2 or more slices were selected */
 }
 
 /*************************************************************************/
@@ -1327,39 +1401,34 @@ set_selected_elements(void)
 void
 makethin(struct in_cmd* cmd)
 {
-  struct sequence *thick_sequ = NULL ,*thin_sequ = NULL;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  char *name = NULL;
-  int pos,pos2;
-  int k=0;
-  /*    time_t start; */
-  
-  /*    start = time(NULL); */
-  pos = name_list_pos("style", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string))
+
+  double start = clock();
+  int pos = name_list_pos("style", nl);
+  if (nl->inform[pos] &&  pl->parameters[pos]->string )
   {
     thin_style = buffer(pl->parameters[pos]->string);
     fprintf(prt_file, "makethin: style chosen : %s\n",thin_style);
   }
-  
+
   /* first check makethin parameters which influence the selection */
-  
+
   pos = name_list_pos("minimizeparents", nl);
-  /* k = true; */  /* Use this to set minimizeparents to true by default. */
+  int MinPar=0;  /* or =1  to set minimizeparents to true by default. */
   if( pos > -1 && nl->inform[pos])
   {
-    k=pl->parameters[pos]->double_value;
+    MinPar=pl->parameters[pos]->double_value;
   }
-  set_option("minimizeparents", &k);
-  
+  set_option((char*)"minimizeparents", &MinPar);
+
   pos = name_list_pos("makeconsistent", nl);
   if( pos > -1 && nl->inform[pos])
   {
-    k=pl->parameters[pos]->double_value;
-    set_option("makeconsistent", &k);
+    int MakeCons=pl->parameters[pos]->double_value;
+    set_option((char*)"makeconsistent", &MakeCons);
   }
-  
+
   if (slice_select->curr > 0)
   {
     set_selected_elements(); /* makethin selection */
@@ -1373,24 +1442,25 @@ makethin(struct in_cmd* cmd)
   {
     warning("makethin selection list empty,","slicing all to one thin lens.");
   }
-  if(get_option("makeconsistent"))
+  if(get_option((char*)"makeconsistent"))
   {
     force_consistent_slices();
   }
   pos = name_list_pos("sequence", nl);
+  char *name = NULL;
   if (nl->inform[pos] && (name = pl->parameters[pos]->string))
   {
+	int pos2;
     if ((pos2 = name_list_pos(name, sequences->list)) >= 0)
     {
-      thick_sequ = sequences->sequs[pos2];
-      thin_sequ = seq_diet(thick_sequ);
+      struct sequence* thick_sequ = sequences->sequs[pos2];
+      struct sequence* thin_sequ = seq_diet(thick_sequ);
       disable_line(thin_sequ->name, line_list);
     }
     else warning("unknown sequence ignored:", name);
   }
   else warning("makethin without sequence:", "ignored");
-  
-  /* fprintf(prt_file, "makethin: finished in %f seconds.\n",difftime(time(NULL),start)); */
+
+  fprintf(prt_file, "makethin: finished in %f seconds.\n",(clock()-start)/CLOCKS_PER_SEC);
   thin_select_list = NULL;
 }
-
