@@ -269,7 +269,9 @@ doc/usrguide/tracking/madxdoc.css -text
 doc/usrguide/tracking/tracking.html -text
 doc/usrguide/twiss/madxdoc.css -text
 doc/usrguide/twiss/twiss.html -text
+doc/usrguide/twiss/twiss.tex -text
 doc/usrguide/twiss/twiss_mad8.html -text
+doc/usrguide/twiss/twiss_mad8.tex -text
 doc/usrguide/uguide.html -text
 doc/usrguide/uguide_old.html -text
 lib32/libSDDS1.a -text
