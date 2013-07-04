@@ -1886,6 +1886,7 @@ subroutine ttvacdip(track,ktrack,turn)
      track(4,itrack) = py
   enddo
 end subroutine ttvacdip
+!FIXME Unused dummy argument 'el'
 subroutine ttsep(el,track,ktrack)
 
   use twtrrfi
@@ -4360,7 +4361,8 @@ subroutine ttnllens(track,ktrack)
   enddo
 end subroutine ttnllens
 
-subroutine ttrfmult(track, ktrack,turn)
+!FIXME Unused dummy argument 'turn'
+subroutine ttrfmult(track, ktrack, turn)
 
   use twtrrfi
   use trackfi
