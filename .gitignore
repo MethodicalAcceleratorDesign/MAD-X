@@ -1,0 +1,9 @@
+doc/usrguide/c6t/*.aux
+doc/usrguide/control/*.aux
+doc/usrguide/cororbit/*.aux
+doc/usrguide/ptc_track/*.aux
+doc/usrguide/ptc_track_line/*.aux
+doc/usrguide/sindex.aux
+doc/usrguide/uguide.bbl
+doc/usrguide/uguide.dvi
+doc/usrguide/uguide.pdf
