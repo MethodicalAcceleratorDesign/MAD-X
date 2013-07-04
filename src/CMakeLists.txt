@@ -18,6 +18,8 @@ endif()
 
 # Some source files which should not be included:
 file(GLOB sdds_remove matchsdds.c)
+# the old makethin should not be used:
+file(GLOB mkthin_remove mad_mkthin.c)
 
 if(NOT MADX_FORCE_32)
    # find laplas and blas
@@ -40,7 +42,7 @@ else()
    file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
 endif()
 
-set(remove_list ${gxx_remove} ${sdds_remove} ${ntpsa_remove} ${lapack_remove})
+set(remove_list ${gxx_remove} ${sdds_remove} ${mkthin_remove} ${ntpsa_remove} ${lapack_remove})
 list(REMOVE_ITEM src_files ${remove_list})
 
 # header files...
