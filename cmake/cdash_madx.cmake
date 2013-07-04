@@ -24,6 +24,7 @@ set(CTEST_BINARY_DIRECTORY "${CTEST_SOURCE_DIRECTORY}/build")
 ctest_start(Experimental)
 set(cfg_options
  -DCMAKE_BUILD_TYPE=Release
+ -DMADX_STATIC=ON
  )
 
 # Do not edit (unless you know cmake/ctest):
@@ -42,11 +43,11 @@ ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
  
 ctest_update()
  
-ctest_configure(OPTIONS "${cfg_options}")
-ctest_build(NUMBER_ERRORS MADX_BUILD_ERRORS)
-if(NOT ${MADX_BUILD_ERRORS})
-   ctest_test()
-   # coverage test doesn't work at the moment..
-   #ctest_coverage()
+ctest_configure(OPTIONS "${cfg_options}" RETURN_VALUE MADX_CONFIGURE_ERRORS)
+if(NOT ${MADX_CONFIGURE_ERRORS})
+   ctest_build(NUMBER_ERRORS MADX_BUILD_ERRORS)
+   if(NOT ${MADX_BUILD_ERRORS})
+      ctest_test()
+   endif()
 endif()
 ctest_submit()
