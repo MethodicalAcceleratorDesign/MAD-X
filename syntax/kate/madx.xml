@@ -7,455 +7,548 @@
 	<!ENTITY eos      "(?=($|\s))">			<!-- eol or space following -->
 	<!ENTITY noword   "(?![\w$+-])">		<!-- no word, $, + or - following -->
 ]>
-<language name="Mad-X" version="0.1" kateversion="2.4" section="Scientific" extensions="*.madx;*.mad;*.gmad;*.mad8" casesensitive="0" author="Yngve Inntjore Levinsen (ylevinse@cern.ch)" license="LGPL">
-<!-- copy file to ~/.kde/share/apps/katepart/syntax/ -->
-<!-- You must also include the file types in a file association (in system settings) in order to activate the highlighting -->
-<!-- Contact me (Yngve) if any problems/bugs arise -->
-  <highlighting>
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-<!-- *                              L I S T S                            *  -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-	<list name="datatypes">
-      <item> float </item>
-      <item> real </item>
-      <item> const </item>
-	</list>
-    <list name="commands">
-      <item> assign </item>
-      <item> beam </item>
-      <item> call </item>
-      <item> cycle </item>
-	  <item> endedit </item>
-      <item> endmatch </item>
-      <item> exec </item>
-      <item> global </item>
-      <item> lmdif </item>
-      <item> makethin </item>
-      <item> match </item>
-      <item> option </item>
-	  <item> plot </item>
-	  <item> print </item>
-      <item> ptc_create_universe </item>
-      <item> ptc_create_layout </item>
-      <item> ptc_align </item>
-      <item> ptc_start </item>
-      <item> ptc_end </item>
-      <item> ptc_twiss </item>
-      <item> ptc_track </item>
-      <item> savebeta </item>
-      <item> select </item>
-      <item> set </item>
-      <item> seqedit </item>
-      <item> setplot </item>
-      <item> show </item>
-      <item> sixtrack </item>
-      <item> stop </item>
-      <item> system </item>
-      <item> title </item>
-      <item> twiss </item>
-	  <item> use </item>
-      <item> value </item>
-      <item> vary </item>
-    </list>
-	<!-- Keywords for creation of new elements, ... ; -->
-	<list name="beam_keywords">
-		<item> sequence </item>
-		<item> particle </item>
-		<item> mass </item>
-		<item> charge </item>
-		<item> energy </item>
-		<item> gamma </item>
-		<item> sigt </item>
-		<item> sige </item>
-		<item> kbunch </item>
-		<item> npart </item>
-		<item> bcurrent </item>
-		<item> bunched </item>
-		<item> pc  </item>
-		<item> exn </item>
-		<item> ex </item>
-		<item> eyn </item>
-		<item> ey </item>
-		<item> et </item>
-	</list>
-	<list name="beam_attributes">
-		<item> electron </item>
-		<item> proton </item>
-	</list>
-	<list name="ptc_keywords">
-		<item> icase </item>
-		<item> deltap </item>
-		<item> turns </item>
-		<item> maxaper </item>
-		<item> norm </item>
-		<item> file </item>
-		<item> ffile </item>
-		<item> model </item>
-		<item> method </item>
-		<item> nst </item>
-		<item> x </item>
-		<item> y </item>
-		<item> px </item>
-		<item> py </item>
-	</list>
-	<list name="ptc_attributes">
-		<item> exact </item>
-		<item> dump </item>
-		<item> closed_orbit </item>
-		<item> element_by_element </item>
-		<item> norm_out </item>
-		<item> radiation </item>
-		<item> radiation_model1 </item>
-		<item> radiation_energy_loss </item>
-		<item> radiation_quadr </item>
-		<item> beam_envelope </item>
-		<item> space_charge </item>
-	</list>
-	<list name="element_keywords">
-		<item> angle  </item>
-		<item> k1 </item>
-		<item> k2 </item>
-		<item> l </item>
-		<item> e1 </item>
-		<item> e2 </item>
-	</list>
-	<list name="element_attributes">
-	</list>
-	<!-- Common keywords for all commands-->
-	<list name="keywords">
-		<item> file </item>
-	</list>
-	<list name="attributes">
-	</list>
-	<!-- Keywords in twiss, ... ; -->
-	<list name="twiss_keywords">
-		<item> sequence </item>
-		<item> chrom </item>
-		<item> deltap </item>
-		<item> marker_plot </item>
-		<item> save </item>
-	</list>
-	<list name="twiss_attributes">
-		<item> alfx </item>
-		<item> alfy </item>
-		<item> betx </item>
-		<item> bety </item>
-		<item> dx </item>
-		<item> dy </item>
-		<item> dpx </item>
-		<item> dpy </item>
-		<item> pt </item>
-		<item> x </item>
-		<item> y </item>
-	</list>
-	<!-- Keywords in plot, ... ; -->
-	<list name="plot_keywords">
-		<item> colour </item>
-		<item> haxis </item>
-		<item> range </item>
-		<item> table </item>
-		<item> vmin </item>
-		<item> vmax </item>
-		<item> vaxis1 </item>
-		<item> vaxis2 </item>
-    </list>
-	<list name="plot_attributes">
-		<item> alfx </item>
-		<item> alfy </item>
-		<item> betx </item>
-		<item> bety </item>
-		<item> dx </item>
-		<item> dy </item>
-		<item> dpx </item>
-		<item> dpy </item>
-		<item> ptc_twiss </item>
-		<item> rbetx </item>
-		<item> rbety </item>
-		<item> twiss </item>
-		<item> x </item>
-		<item> y </item>
-		<item> s </item>
-		<item> aper_1 </item>
-		<item> aper_2 </item>
-		<item> aper_3 </item>
-		<item> aper_4 </item>
-    </list>
-	<!-- Keywords in savebeta, ... ; -->
-	<list name="savebeta_keywords">
-		<item> label </item>
-		<item> place </item>
-	</list>
-	<list name="savebeta_attributes">
-	</list>
-	<!-- Keywords in select, ... ; -->
-	<list name="select_keywords">
-		<item> clear </item>
-		<item> column </item>
-		<item> flag </item>
-		<item> pattern </item>
-	</list>
-	<list name="select_attributes">
-		<item> alfx </item>
-		<item> alfy </item>
-		<item> betx </item>
-		<item> bety </item>
-		<item> dx </item>
-		<item> dy </item>
-		<item> dpx </item>
-		<item> dpy </item>
-		<item> keyword </item>
-		<item> mux </item>
-		<item> muy </item>
-		<item> name </item>
-		<item> ptc_twiss </item>
-		<item> px </item>
-		<item> py </item>
-		<item> twiss </item>
-		<item> x </item>
-		<item> y </item>
-		<item> s </item>
-		<item> aper_1 </item>
-		<item> aper_2 </item>
-		<item> aper_3 </item>
-		<item> aper_4 </item>
-		<item> n1 </item>
-		<item> xtol </item>
-	</list>
-	<!-- Keywords in setplot, ... ; -->
-	<list name="setplot_keywords">
-		<item> ascale </item>
-		<item> font </item>
-		<item> lwidth </item>
-		<item> post </item>
-		<item> rscale </item>
-		<item> sscale </item>
-		<item> xsize </item>
-		<item> ysize </item>
-    </list>
-	<list name="setplot_attributes">
-    </list>
-	<!-- Keywords in sequence, ... ; -->
-	<list name="savebeta_keywords">
-		<item> label </item>
-		<item> place </item>
-	</list>
-	<list name="savebeta_attributes">
-	</list>
-	<!-- Keywords in use, ... ; -->
-	<list name="use_keywords">
-		<item> period </item>
-		<item> range  </item>
-		<item> sequence </item>
-	</list>
-	<list name="use_attributes">
-	</list>
+<language name="Mad-X" version="0.1" kateversion="2.4" section="Scientific"
+	extensions="*.madx;*.mad;*.gmad;*.mad8" casesensitive="0"
+	author="Yngve Inntjore Levinsen (ylevinse@cern.ch)" license="LGPL">
+	<!-- copy file to ~/.kde/share/apps/katepart/syntax/ -->
+	<!-- You must also include the file types in a file association (in system 
+		settings) in order to activate the highlighting -->
+	<!-- Contact me (Yngve) if any problems/bugs arise -->
+	<highlighting>
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<!-- * L I S T S * -->
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<list name="datatypes">
+			<item> float </item>
+			<item> real </item>
+			<item> const </item>
+		</list>
+		<list name="commands">
+			<item> assign </item>
+			<item> beam </item>
+			<item> call </item>
+			<item> cycle </item>
+			<item> endedit </item>
+			<item> endmatch </item>
+			<item> exec </item>
+			<item> global </item>
+			<item> lmdif </item>
+			<item> makethin </item>
+			<item> match </item>
+			<item> option </item>
+			<item> plot </item>
+			<item> print </item>
+			<item> ptc_create_universe </item>
+			<item> ptc_create_layout </item>
+			<item> ptc_align </item>
+			<item> ptc_start </item>
+			<item> ptc_end </item>
+			<item> ptc_twiss </item>
+			<item> ptc_track </item>
+			<item> savebeta </item>
+			<item> select </item>
+			<item> set </item>
+			<item> seqedit </item>
+			<item> setplot </item>
+			<item> show </item>
+			<item> sixtrack </item>
+			<item> stop </item>
+			<item> system </item>
+			<item> title </item>
+			<item> twiss </item>
+			<item> use </item>
+			<item> value </item>
+			<item> vary </item>
+		</list>
+		<!-- Keywords for creation of new elements, ... ; -->
+		<list name="beam_keywords">
+			<item> sequence </item>
+			<item> particle </item>
+			<item> mass </item>
+			<item> charge </item>
+			<item> energy </item>
+			<item> gamma </item>
+			<item> sigt </item>
+			<item> sige </item>
+			<item> kbunch </item>
+			<item> npart </item>
+			<item> bcurrent </item>
+			<item> bunched </item>
+			<item> pc  </item>
+			<item> exn </item>
+			<item> ex </item>
+			<item> eyn </item>
+			<item> ey </item>
+			<item> et </item>
+		</list>
+		<list name="beam_attributes">
+			<item> electron </item>
+			<item> proton </item>
+		</list>
+		<list name="ptc_keywords">
+			<item> icase </item>
+			<item> deltap </item>
+			<item> turns </item>
+			<item> maxaper </item>
+			<item> norm </item>
+			<item> file </item>
+			<item> ffile </item>
+			<item> model </item>
+			<item> method </item>
+			<item> nst </item>
+			<item> x </item>
+			<item> y </item>
+			<item> px </item>
+			<item> py </item>
+		</list>
+		<list name="ptc_attributes">
+			<item> exact </item>
+			<item> dump </item>
+			<item> closed_orbit </item>
+			<item> element_by_element </item>
+			<item> norm_out </item>
+			<item> radiation </item>
+			<item> radiation_model1 </item>
+			<item> radiation_energy_loss </item>
+			<item> radiation_quadr </item>
+			<item> beam_envelope </item>
+			<item> space_charge </item>
+		</list>
+		<list name="element_keywords">
+			<item> angle  </item>
+			<item> k1 </item>
+			<item> k2 </item>
+			<item> l </item>
+			<item> e1 </item>
+			<item> e2 </item>
+		</list>
+		<list name="element_attributes">
+		</list>
+		<!-- Common keywords for all commands -->
+		<list name="keywords">
+			<item> file </item>
+		</list>
+		<list name="attributes">
+		</list>
+		<!-- Keywords in twiss, ... ; -->
+		<list name="twiss_keywords">
+			<item> sequence </item>
+			<item> chrom </item>
+			<item> deltap </item>
+			<item> marker_plot </item>
+			<item> save </item>
+		</list>
+		<list name="twiss_attributes">
+			<item> alfx </item>
+			<item> alfy </item>
+			<item> betx </item>
+			<item> bety </item>
+			<item> dx </item>
+			<item> dy </item>
+			<item> dpx </item>
+			<item> dpy </item>
+			<item> pt </item>
+			<item> x </item>
+			<item> y </item>
+		</list>
+		<!-- Keywords in plot, ... ; -->
+		<list name="plot_keywords">
+			<item> colour </item>
+			<item> haxis </item>
+			<item> range </item>
+			<item> table </item>
+			<item> vmin </item>
+			<item> vmax </item>
+			<item> vaxis1 </item>
+			<item> vaxis2 </item>
+		</list>
+		<list name="plot_attributes">
+			<item> alfx </item>
+			<item> alfy </item>
+			<item> betx </item>
+			<item> bety </item>
+			<item> dx </item>
+			<item> dy </item>
+			<item> dpx </item>
+			<item> dpy </item>
+			<item> ptc_twiss </item>
+			<item> rbetx </item>
+			<item> rbety </item>
+			<item> twiss </item>
+			<item> x </item>
+			<item> y </item>
+			<item> s </item>
+			<item> aper_1 </item>
+			<item> aper_2 </item>
+			<item> aper_3 </item>
+			<item> aper_4 </item>
+		</list>
+		<!-- Keywords in savebeta, ... ; -->
+		<list name="savebeta_keywords">
+			<item> label </item>
+			<item> place </item>
+		</list>
+		<list name="savebeta_attributes">
+		</list>
+		<!-- Keywords in select, ... ; -->
+		<list name="select_keywords">
+			<item> clear </item>
+			<item> column </item>
+			<item> flag </item>
+			<item> pattern </item>
+		</list>
+		<list name="select_attributes">
+			<item> alfx </item>
+			<item> alfy </item>
+			<item> betx </item>
+			<item> bety </item>
+			<item> dx </item>
+			<item> dy </item>
+			<item> dpx </item>
+			<item> dpy </item>
+			<item> keyword </item>
+			<item> mux </item>
+			<item> muy </item>
+			<item> name </item>
+			<item> ptc_twiss </item>
+			<item> px </item>
+			<item> py </item>
+			<item> twiss </item>
+			<item> x </item>
+			<item> y </item>
+			<item> s </item>
+			<item> aper_1 </item>
+			<item> aper_2 </item>
+			<item> aper_3 </item>
+			<item> aper_4 </item>
+			<item> n1 </item>
+			<item> xtol </item>
+		</list>
+		<!-- Keywords in setplot, ... ; -->
+		<list name="setplot_keywords">
+			<item> ascale </item>
+			<item> font </item>
+			<item> lwidth </item>
+			<item> post </item>
+			<item> rscale </item>
+			<item> sscale </item>
+			<item> xsize </item>
+			<item> ysize </item>
+		</list>
+		<list name="setplot_attributes">
+		</list>
+		<!-- Keywords in sequence, ... ; -->
+		<list name="savebeta_keywords">
+			<item> label </item>
+			<item> place </item>
+		</list>
+		<list name="savebeta_attributes">
+		</list>
+		<!-- Keywords in use, ... ; -->
+		<list name="use_keywords">
+			<item> period </item>
+			<item> range  </item>
+			<item> sequence </item>
+		</list>
+		<list name="use_attributes">
+		</list>
 
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-<!-- *                           C O N T E X T S                         *  -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-	<contexts>
-		<context attribute="Normal Text" lineEndContext="#stay" name="default" >
-			<IncludeRules context="find_alerts" />
-			<IncludeRules context="find_comments" />
-			<IncludeRules context="find_strings" />
-			<IncludeRules context="find_varnames" />
-			<IncludeRules context="find_commands" />
-			<IncludeRules context="find_names" />
-			<IncludeRules context="find_numbers" />
-			<keyword attribute="Data Type" context="#stay" String="datatypes"/>
-		</context>
-<!--************************END OF THE MAIN CONTEXT*************************-->
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<!-- * C O N T E X T S * -->
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<contexts>
+			<context attribute="Normal Text" lineEndContext="#stay" name="default">
+				<IncludeRules context="find_alerts" />
+				<IncludeRules context="find_comments" />
+				<IncludeRules context="find_strings" />
+				<IncludeRules context="find_varnames" />
+				<IncludeRules context="find_commands" />
+				<IncludeRules context="find_names" />
+				<IncludeRules context="find_numbers" />
+				<keyword attribute="Data Type" context="#stay" String="datatypes" />
+			</context>
+			<!--************************END OF THE MAIN CONTEXT************************* -->
 
 
-<!-- The following context matches integer and real numbers -->
-      <context attribute="Normal Text" lineEndContext="#stay" name="find_numbers">
-        <!-- Floating-point numbers with optional kind -->
-		<RegExpr attribute="Normal" context="#stay" String="[+-]?[0-9]*\.[0-9]+\.[0-9]+" insensitive="TRUE"/>
-		<RegExpr context="#pop" String="[A-Za-z]+[0-9]+[A-Za-z0-9]*" insensitive="TRUE"/>
-        <RegExpr attribute="Float" context="#stay" String="[+-]?[0-9]*\.[0-9]+([de][+-]?[0-9]+)?([_]([0-9]+|[a-z][\w_]*))?" insensitive="TRUE"/>
-        <RegExpr attribute="Float" context="#stay" String="[+-]?[0-9]+\.[0-9]*([de][+-]?[0-9]+)?([_]([0-9]+|[a-z][\w_]*))?(?![a-z])" insensitive="TRUE"/>
-        <RegExpr attribute="Float" context="#stay" String="\b[0-9]+[de][+-]?[0-9]+([_]([0-9]+|[a-z][\w_]*))?" insensitive="TRUE"/>
-        <!-- Integers with optional kind specifier -->
-        <RegExpr attribute="Decimal" context="#stay" String="[+-]?[0-9]+([_]([0-9]+|[a-zA-Z][\w_]*))?"/>
-        <!-- Integers in binary, octal and hexadecimal notations -->
-        <RegExpr attribute="Decimal" context="#stay" String="\b[bozx]([&apos;][0-9a-f]+[&apos;]|[&quot;][0-9a-f]+[&quot;])" insensitive="TRUE"/>
-      </context>
-	  
-<!-- This context highlights warnings -->
-	<context attribute="Normal Text" lookAhead="true" lineEndContext="#stay" name="find_alerts">
-		<RegExpr attribute="Alert" context="#stay" String="(warning|todo)" insensitive="true"/>
-	</context>
+			<!-- The following context matches integer and real numbers -->
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_numbers">
+				<!-- Floating-point numbers with optional kind -->
+				<RegExpr attribute="Normal" context="#stay"
+					String="[+-]?[0-9]*\.[0-9]+\.[0-9]+" insensitive="TRUE" />
+				<RegExpr context="#pop" String="[A-Za-z]+[0-9]+[A-Za-z0-9]*"
+					insensitive="TRUE" />
+				<RegExpr attribute="Float" context="#stay"
+					String="[+-]?[0-9]*\.[0-9]+([de][+-]?[0-9]+)?([_]([0-9]+|[a-z][\w_]*))?"
+					insensitive="TRUE" />
+				<RegExpr attribute="Float" context="#stay"
+					String="[+-]?[0-9]+\.[0-9]*([de][+-]?[0-9]+)?([_]([0-9]+|[a-z][\w_]*))?(?![a-z])"
+					insensitive="TRUE" />
+				<RegExpr attribute="Float" context="#stay"
+					String="\b[0-9]+[de][+-]?[0-9]+([_]([0-9]+|[a-z][\w_]*))?"
+					insensitive="TRUE" />
+				<!-- Integers with optional kind specifier -->
+				<RegExpr attribute="Decimal" context="#stay"
+					String="[+-]?[0-9]+([_]([0-9]+|[a-zA-Z][\w_]*))?" />
+				<!-- Integers in binary, octal and hexadecimal notations -->
+				<RegExpr attribute="Decimal" context="#stay"
+					String="\b[bozx]([&apos;][0-9a-f]+[&apos;]|[&quot;][0-9a-f]+[&quot;])"
+					insensitive="TRUE" />
+			</context>
 
-<!-- This context highlights element names -->
-	<context attribute="Normal Text" lineEndContext="#stay" name="find_names">
-		<RegExpr attribute="ElementNames" context="#stay" String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+\.[A-Za-z0-9]+\.[A-Za-z0-9]+"/>
-		<RegExpr attribute="ElementNames" context="#stay" String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+\.[A-Za-z0-9]+"/>
-		<RegExpr attribute="ElementNames" context="#stay" String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+"/>
-		<RegExpr attribute="ElementNames" context="#stay" String="[A-Za-z][A-Za-z0-9]*\_[A-Za-z0-9]*"/>
-		<RegExpr attribute="ElementNames" context="#stay" String="[iI][pP][0-9]+"/>
-		<IncludeRules context="find_numbers" />
-	</context>
+			<!-- This context highlights warnings -->
+			<context attribute="Normal Text" lookAhead="true"
+				lineEndContext="#stay" name="find_alerts">
+				<RegExpr attribute="Alert" context="#stay" String="(warning|todo)"
+					insensitive="true" />
+			</context>
 
-<!-- This context highlights comments -->
-      <context attribute="Normal Text" lineEndContext="#stay" name="find_comments">
-        <RegExpr attribute="Comment" context="ShortComment" String="!"/>
-		<RegExpr attribute="Comment" context="ShortComment" String="//"/>
-		<Detect2Chars attribute="Comment" context="LongComment" char="/" char1="*" beginRegion="LongComment"/>
-      </context>
-	<context name="ShortComment" attribute="Comment" lineEndContext="#pop" endRegion="ShortComment" noIndentationBasedFolding="true">
-		<IncludeRules context="find_alerts" />
-<!-- 		<HlCChar attribute="Comment" context="#stay"/> -->
-	</context>
-	<context name="LongComment" attribute="Comment" lineEndContext="#stay" noIndentationBasedFolding="true">
-<!-- 		<HlCChar attribute="Comment" context="#stay"/> -->
-		<IncludeRules context="find_alerts" />
-		<Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="LongComment"/>
-	</context>
-	
-<!-- The following four contexts implement the complex string multi-line declarations -->
-      <!-- Matches STRINGS (there are 2 types of strings: '...' and "...") -->
-      <context attribute="String" lineEndContext="#stay" name="find_strings">
-        <DetectChar attribute="String" context="string_1" char="&apos;"/>
-        <DetectChar attribute="String" context="string_2" char="&quot;"/>
-      </context>
+			<!-- This context highlights element names -->
+			<context attribute="Normal Text" lineEndContext="#stay" name="find_names">
+				<RegExpr attribute="ElementNames" context="#stay"
+					String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+\.[A-Za-z0-9]+\.[A-Za-z0-9]+" />
+				<RegExpr attribute="ElementNames" context="#stay"
+					String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+\.[A-Za-z0-9]+" />
+				<RegExpr attribute="ElementNames" context="#stay"
+					String="[A-Za-z][A-Za-z0-9]*\.[A-Za-z0-9]+" />
+				<RegExpr attribute="ElementNames" context="#stay"
+					String="[A-Za-z][A-Za-z0-9]*\_[A-Za-z0-9]*" />
+				<RegExpr attribute="ElementNames" context="#stay" String="[iI][pP][0-9]+" />
+				<IncludeRules context="find_numbers" />
+			</context>
 
-      <context attribute="String" lineEndContext="#stay" name="string_1" fallthrough="true" fallthroughContext="#pop">
-        <RegExpr attribute="String" context="#pop" String="[^&apos;]*&apos;"/>
-        <RegExpr attribute="Keyword" context="end_of_string" String="&amp;\s*$"/>
-        <RegExpr attribute="String" context="end_of_string" String=".*(?=&amp;\s*$)"/>
-      </context>
+			<!-- This context highlights comments -->
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_comments">
+				<RegExpr attribute="Comment" context="ShortComment" String="!" />
+				<RegExpr attribute="Comment" context="ShortComment" String="//" />
+				<Detect2Chars attribute="Comment" context="LongComment"
+					char="/" char1="*" beginRegion="LongComment" />
+			</context>
+			<context name="ShortComment" attribute="Comment"
+				lineEndContext="#pop" endRegion="ShortComment"
+				noIndentationBasedFolding="true">
+				<IncludeRules context="find_alerts" />
+				<!-- <HlCChar attribute="Comment" context="#stay"/> -->
+			</context>
+			<context name="LongComment" attribute="Comment"
+				lineEndContext="#stay" noIndentationBasedFolding="true">
+				<!-- <HlCChar attribute="Comment" context="#stay"/> -->
+				<IncludeRules context="find_alerts" />
+				<Detect2Chars attribute="Comment" context="#pop" char="*"
+					char1="/" endRegion="LongComment" />
+			</context>
 
-      <context attribute="String" lineEndContext="#stay" name="string_2" fallthrough="true" fallthroughContext="#pop">
-        <RegExpr attribute="String" context="#pop" String="[^&quot;]*&quot;"/>
-        <RegExpr attribute="Keyword" context="end_of_string" String="&amp;\s*$"/>
-        <RegExpr attribute="String" context="end_of_string" String=".*(?=&amp;\s*$)"/>
-      </context>
+			<!-- The following four contexts implement the complex string multi-line 
+				declarations -->
+			<!-- Matches STRINGS (there are 2 types of strings: '...' and "...") -->
+			<context attribute="String" lineEndContext="#stay" name="find_strings">
+				<DetectChar attribute="String" context="string_1" char="&apos;" />
+				<DetectChar attribute="String" context="string_2" char="&quot;" />
+			</context>
 
-      <context attribute="String" lineEndContext="#stay" name="end_of_string" fallthrough="true" fallthroughContext="#pop#pop">
-        <DetectSpaces />
-        <RegExpr attribute="Keyword" context="#stay" String="&amp;\s*$"/>
-        <DetectChar attribute="Keyword" context="#pop" char="&amp;" firstNonSpace="true"/>
-        <RegExpr attribute="Comment" context="#stay" String="(!.*)?$" firstNonSpace="true"/>
-      </context>
-	  
-		<context attribute="String" lineEndContext="#stay" name="find_commands" >
-			<RegExpr attribute="Command" context="find_command_option" String="\boption\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_plot" String="\bplot\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_savebeta" String="savebeta\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_select" String="select\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_setplot" String="\bsetplot\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_twiss" String="\btwiss\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_use" String="\buse\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_beam" String="\bbeam\s*[,]" insensitive="TRUE"/>
-			<RegExpr attribute="Command" context="find_command_ptc" String="\bptc_[a-z\_]*\s*[,]" insensitive="TRUE"/>
-			<keyword attribute="Command" context="find_command_parent" String="commands"/>
-		</context>
-		
-		<!-- This context matches content in command statements (one for each command) -->
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_parent">
-			<keyword attribute="CommandParameters"  context="#stay" String="keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="attributes"/>
-			<DetectChar attribute="Command" context="#pop" char=";"/>
-			<IncludeRules context="find_strings" />
-			<IncludeRules context="find_names" />
-			<IncludeRules context="find_numbers" />
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_option">
-			<RegExpr attribute="Option Off"  context="#stay" String="(\-echo|\-warn|\-info|\-verify)"/>
-			<RegExpr attribute="CommandParameters"  context="#stay" String="(echo|warn|info|verify)"/>
-			<DetectChar attribute="Command" context="#pop" char=";"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_plot">
-			<keyword attribute="CommandParameters"  context="#stay" String="plot_keywords"/>
-			<IncludeRules context="find_names" />
-			<keyword attribute="CommandAttributes"  context="#stay" String="plot_attributes"/>
-			<IncludeRules context="find_command_parent"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_savebeta">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="savebeta_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="savebeta_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_select">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="select_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="select_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_setplot">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="setplot_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="setplot_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_twiss">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="twiss_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="twiss_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_use">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="use_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="use_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_beam">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="beam_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="beam_attributes"/>
-		</context>
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_command_ptc">
-			<IncludeRules context="find_command_parent"/>
-			<keyword attribute="CommandParameters"  context="#stay" String="ptc_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="ptc_attributes"/>
-		</context>
-		
-		<context attribute="Normal Text" lineEndContext="#stay" name="find_varnames">
-			<!-- handle variable assignments -->
-			<RegExpr attribute="Varname" context="#stay" String="[A-Za-z0-9\_\-]+\s*:?=" />
-			<RegExpr attribute="ElementNames" context="newElement" String="[A-Za-z][A-Za-z0-9]*:"/>
-		</context>
-		<context name="newElement" attribute="ElementTypes" lineEndContext="#stay" noIndentationBasedFolding="true">
-			<HlCChar attribute="ElementTypes" context="#stay"/>
-			<DetectChar attribute="Normal Text" context="thisElement" char="," endRegion="newElement"/>
-			<DetectChar attribute="Normal Text" context="#pop" char="="/>
-			<DetectChar attribute="Normal Text" context="#pop" char=","/>
-			<DetectChar attribute="Normal Text" context="#pop#pop" char=";"/>
-		</context>
-		<context name="thisElement" attribute="Normal Text" lineEndContext="#stay" noIndentationBasedFolding="true">
-			<keyword attribute="CommandParameters"  context="#stay" String="element_keywords"/>
-			<keyword attribute="CommandAttributes"  context="#stay" String="element_attributes"/>
-			<DetectChar attribute="Normal Text" context="#pop#pop" char=";"/>
-			<IncludeRules context="find_strings" />
-<!-- 			<IncludeRules context="find_numbers" /> -->
-			<IncludeRules context="find_names" />
-		</context>
-	</contexts>
+			<context attribute="String" lineEndContext="#stay" name="string_1"
+				fallthrough="true" fallthroughContext="#pop">
+				<RegExpr attribute="String" context="#pop" String="[^&apos;]*&apos;" />
+				<RegExpr attribute="Keyword" context="end_of_string" String="&amp;\s*$" />
+				<RegExpr attribute="String" context="end_of_string" String=".*(?=&amp;\s*$)" />
+			</context>
 
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-<!-- *             S T Y L E   I T E M   D E F I N I T I O N S           *  -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  -->
-    <itemDatas>
-      <itemData name="Normal Text" defStyleNum="dsNormal"/>
-      <itemData name="Keyword" defStyleNum="dsKeyword"/>
-      <itemData name="Command" defStyleNum="dsKeyword"/>
-      <itemData name="CommandParameters" defStyleNum="dsFunction"/>
-      <itemData name="CommandAttributes" defStyleNum="dsNormal" color="#802000"/>
-      <itemData name="ElementNames" defStyleNum="dsKeyword" color="#008000" selColor="#ff00ff" bold="1" italic="0"/>
-      <itemData name="ElementTypes" defStyleNum="dsKeyword" color="#00d000" selColor="#ff00ff" bold="0" italic="0"/>
-      <itemData name="Varname" defStyleNum="dsOthers"/>
-      <itemData name="Option Off" defStyleNum="dsKeyword" color="#900000"/>
-      <itemData name="Data Type" defStyleNum="dsDataType"/>
-      <itemData name="Decimal" defStyleNum="dsDecVal"/>
-      <itemData name="Float" defStyleNum="dsFloat"/>
-      <itemData name="String" defStyleNum="dsString"/>
-      <itemData name="Comment" defStyleNum="dsComment"/>
-      <itemData name="Symbol" defStyleNum="dsNormal"/>
-      <itemData name="Alert" defStyleNum="dsAlert"/>
-    </itemDatas>
-  </highlighting>
-  <general>
-    <comments>
-      <comment name="multiLine" start="/*" end="*/" region="LongComment"/>
-      <comment name="singleLine" start="!"/>
-    </comments>
-    <keywords casesensitive="0"/>
-  </general>
+			<context attribute="String" lineEndContext="#stay" name="string_2"
+				fallthrough="true" fallthroughContext="#pop">
+				<RegExpr attribute="String" context="#pop" String="[^&quot;]*&quot;" />
+				<RegExpr attribute="Keyword" context="end_of_string" String="&amp;\s*$" />
+				<RegExpr attribute="String" context="end_of_string" String=".*(?=&amp;\s*$)" />
+			</context>
+
+			<context attribute="String" lineEndContext="#stay" name="end_of_string"
+				fallthrough="true" fallthroughContext="#pop#pop">
+				<DetectSpaces />
+				<RegExpr attribute="Keyword" context="#stay" String="&amp;\s*$" />
+				<DetectChar attribute="Keyword" context="#pop" char="&amp;"
+					firstNonSpace="true" />
+				<RegExpr attribute="Comment" context="#stay" String="(!.*)?$"
+					firstNonSpace="true" />
+			</context>
+
+			<context attribute="String" lineEndContext="#stay" name="find_commands">
+				<RegExpr attribute="Command" context="find_command_option"
+					String="\boption\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_plot"
+					String="\bplot\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_savebeta"
+					String="savebeta\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_select"
+					String="select\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_setplot"
+					String="\bsetplot\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_twiss"
+					String="\btwiss\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_use"
+					String="\buse\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_beam"
+					String="\bbeam\s*[,]" insensitive="TRUE" />
+				<RegExpr attribute="Command" context="find_command_ptc"
+					String="\bptc_[a-z\_]*\s*[,]" insensitive="TRUE" />
+				<keyword attribute="Command" context="find_command_parent"
+					String="commands" />
+			</context>
+
+			<!-- This context matches content in command statements (one for each 
+				command) -->
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_parent">
+				<keyword attribute="CommandParameters" context="#stay"
+					String="keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="attributes" />
+				<DetectChar attribute="Command" context="#pop" char=";" />
+				<IncludeRules context="find_strings" />
+				<IncludeRules context="find_names" />
+				<IncludeRules context="find_numbers" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_option">
+				<RegExpr attribute="Option Off" context="#stay"
+					String="(\-echo|\-warn|\-info|\-verify)" />
+				<RegExpr attribute="CommandParameters" context="#stay"
+					String="(echo|warn|info|verify)" />
+				<DetectChar attribute="Command" context="#pop" char=";" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_plot">
+				<keyword attribute="CommandParameters" context="#stay"
+					String="plot_keywords" />
+				<IncludeRules context="find_names" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="plot_attributes" />
+				<IncludeRules context="find_command_parent" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_savebeta">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="savebeta_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="savebeta_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_select">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="select_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="select_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_setplot">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="setplot_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="setplot_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_twiss">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="twiss_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="twiss_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_use">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="use_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="use_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_beam">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="beam_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="beam_attributes" />
+			</context>
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_command_ptc">
+				<IncludeRules context="find_command_parent" />
+				<keyword attribute="CommandParameters" context="#stay"
+					String="ptc_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="ptc_attributes" />
+			</context>
+
+			<context attribute="Normal Text" lineEndContext="#stay"
+				name="find_varnames">
+				<!-- handle variable assignments -->
+				<RegExpr attribute="Varname" context="#stay"
+					String="[A-Za-z0-9\_\-]+\s*:?=" />
+				<RegExpr attribute="ElementNames" context="newElement"
+					String="[A-Za-z][A-Za-z0-9]*:" />
+			</context>
+			<context name="newElement" attribute="ElementTypes"
+				lineEndContext="#stay" noIndentationBasedFolding="true">
+				<HlCChar attribute="ElementTypes" context="#stay" />
+				<DetectChar attribute="Normal Text" context="thisElement"
+					char="," endRegion="newElement" />
+				<DetectChar attribute="Normal Text" context="#pop" char="=" />
+				<DetectChar attribute="Normal Text" context="#pop" char="," />
+				<DetectChar attribute="Normal Text" context="#pop#pop"
+					char=";" />
+			</context>
+			<context name="thisElement" attribute="Normal Text"
+				lineEndContext="#stay" noIndentationBasedFolding="true">
+				<keyword attribute="CommandParameters" context="#stay"
+					String="element_keywords" />
+				<keyword attribute="CommandAttributes" context="#stay"
+					String="element_attributes" />
+				<DetectChar attribute="Normal Text" context="#pop#pop"
+					char=";" />
+				<IncludeRules context="find_strings" />
+				<!-- <IncludeRules context="find_numbers" /> -->
+				<IncludeRules context="find_names" />
+			</context>
+		</contexts>
+
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<!-- * S T Y L E I T E M D E F I N I T I O N S * -->
+		<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+			* * -->
+		<itemDatas>
+			<itemData name="Normal Text" defStyleNum="dsNormal" />
+			<itemData name="Keyword" defStyleNum="dsKeyword" />
+			<itemData name="Command" defStyleNum="dsKeyword" />
+			<itemData name="CommandParameters" defStyleNum="dsFunction" />
+			<itemData name="CommandAttributes" defStyleNum="dsNormal"
+				color="#802000" />
+			<itemData name="ElementNames" defStyleNum="dsKeyword" color="#008000"
+				selColor="#ff00ff" bold="1" italic="0" />
+			<itemData name="ElementTypes" defStyleNum="dsKeyword" color="#00d000"
+				selColor="#ff00ff" bold="0" italic="0" />
+			<itemData name="Varname" defStyleNum="dsOthers" />
+			<itemData name="Option Off" defStyleNum="dsKeyword" color="#900000" />
+			<itemData name="Data Type" defStyleNum="dsDataType" />
+			<itemData name="Decimal" defStyleNum="dsDecVal" />
+			<itemData name="Float" defStyleNum="dsFloat" />
+			<itemData name="String" defStyleNum="dsString" />
+			<itemData name="Comment" defStyleNum="dsComment" />
+			<itemData name="Symbol" defStyleNum="dsNormal" />
+			<itemData name="Alert" defStyleNum="dsAlert" />
+		</itemDatas>
+	</highlighting>
+	<general>
+		<comments>
+			<comment name="multiLine" start="/*" end="*/" region="LongComment" />
+			<comment name="singleLine" start="!" />
+		</comments>
+		<keywords casesensitive="0" />
+	</general>
 </language>
