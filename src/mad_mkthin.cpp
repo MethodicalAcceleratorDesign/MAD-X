@@ -99,7 +99,7 @@ private:
   sequence *thick_sequ, *thin_sequ;
   unsigned int verbose;
   const double eps;
-  const bool TranslateDipoles; // translate dipoles   to    dipedge, dipole without edge effects, dipedge
+  bool MakeDipedge; // translate dipoles   to    dipedge, dipole without edge effects, dipedge
 };
 
 class SequenceList
@@ -1383,6 +1383,15 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 	int MakeCons=pl->parameters[ipos_mk]->double_value;
 	set_option(const_cast<char*>("makeconsistent"), &MakeCons);
   }
+  
+  const int ipos_md = name_list_pos("makedipedge", nl);
+  if( ipos_md > -1 && nl->inform[ipos_md])
+  {
+	int iMakeDipedge=pl->parameters[ipos_md]->double_value;
+	if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
+	set_option(const_cast<char*>("makedipedge"), &iMakeDipedge);
+  }
+
   if (slice_select->curr > 0)
   {
 	int iret=set_selected_elements(); // makethin selection
@@ -1406,7 +1415,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 	else warning("unknown sequence ignored:", name);
   }
   else warning("makethin without sequence:", "ignored");
-  cout << "makethin: finished in " << (clock()-CPU_start)/CLOCKS_PER_SEC << " seconds" << '\n';
+  if (debug_fl()) cout << "makethin: finished in " << (clock()-CPU_start)/CLOCKS_PER_SEC << " seconds" << '\n';
 }
 
 //--------  SliceDistPos
@@ -1613,7 +1622,7 @@ void ElementListWithSlices::Print() const
 }
 
 //--------  SeqElList
-SeqElList::SeqElList(const string& seqname,const string& thin_style,sequence* thick_sequ,sequence* thin_sequ,node* thick_node) : verbose(0),eps(1.e-15),TranslateDipoles(true) // SeqElList constructor, eps used to check if values are is compatible with zero
+SeqElList::SeqElList(const string& seqname,const string& thin_style,sequence* thick_sequ,sequence* thin_sequ,node* thick_node) : verbose(0),eps(1.e-15),MakeDipedge(true) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
   this->seqname=seqname;
   this->thin_style=thin_style;
@@ -1625,9 +1634,11 @@ SeqElList::SeqElList(const string& seqname,const string& thin_style,sequence* th
   theSliceList=new ElementListWithSlices(verbose);
   theBendEdgeList =new ElementListWithSlices(verbose);
   // verbose=3; // -- special for code development ---   turn on extra debugging within SeqElList
-  if(verbose>2)
+  MakeDipedge=get_option(const_cast<char*>("makedipedge"));
+  if(verbose && !MakeDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ***  makedipedge is off, should always be on except for backwards compatibility checks  *** " << '\n';
+  if(verbose>1)
   {
-	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << '\n';
+	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << " makedipedge check  MakeDipedge=" << MakeDipedge << '\n';
   }
 }
 
@@ -2047,13 +2058,13 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
   
   element *EntryEdgeElem=NULL, *ExitEdgeElem=NULL, *sbend_el=NULL;
   
-  if( IsBend && TranslateDipoles) // dipedge EntryEdgeElem, ExitEdgeElem     find existing or generate new
+  if( IsBend && MakeDipedge) // dipedge EntryEdgeElem, ExitEdgeElem     find existing or generate new
   {	
 	EntryEdgeElem=theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_l"); // NULL if not yet known or e1=0
 	ExitEdgeElem =theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_r"); // NULL if not yet known or e2=0
 	if(IsRbend) sbend_el=theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_sbend");
 	
-	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " " << setw(20) << thick_elem->name << " TranslateDipoles EntryEdgeElem=" << EntryEdgeElem << " ExitEdgeElem=" << ExitEdgeElem << " sbend_el=" << sbend_el << '\n'; //  has_e1=" << has_e1 << " has_e2=" << has_e2 << '\n';
+	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " " << setw(20) << thick_elem->name << " MakeDipedge EntryEdgeElem=" << EntryEdgeElem << " ExitEdgeElem=" << ExitEdgeElem << " sbend_el=" << sbend_el << '\n'; //  has_e1=" << has_e1 << " has_e2=" << has_e2 << '\n';
 	
 	if(EntryEdgeElem)
 	{
@@ -2080,7 +2091,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 	  {
 		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " sbend_el=" << string(thick_elem->name)+"_sbend" << " does not (yet) exist, make it"<< '\n';
 		sbend_el=sbend_from_rbend(thick_elem); // sbend_el for rbend not yet existing, make the element and put it in global element_list
-		// sbend_el=thick_elem;  //CSPE test, do not use rbend -> sbend, dipedge still there unless  TranslateDipoles = false;
+		// sbend_el=thick_elem;  //CSPE test, do not use rbend -> sbend, dipedge still there unless  MakeDipedge = false;
 		theBendEdgeList->put_slice(thick_elem,sbend_el); // to remember this has been translated
 	  }
 	  if(verbose>2) dump_slices();
