@@ -2364,8 +2364,9 @@ char command_def[] =
 "makethin: makethin none 0 0 "
 "style    = [s, teapot, teapot], "
 "sequence = [s, none, none], "
-"makeconsistent = [l, false, true], " /*hbu */
-"minimizeparents = [l, true, false]; " /*hbu */
+"makeconsistent = [l, false, true],  " /*hbu */
+"minimizeparents = [l, true, false], " /*hbu */
+"makedipedge = [l, false, true],"      /*hbu, 07/2012, in future by default on */
 " "
 "survey: survey none 0 0 "
 "x0       = [r, 0],   y0     = [r, 0], z0       = [r, 0], "
