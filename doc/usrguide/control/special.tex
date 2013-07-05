@@ -4,22 +4,18 @@
 
 \subsection{Program Flow Statements}
 
-\begin{itemize}
-	\item IF
+\subsubsection{ IF }
 \begin{verbatim}
-
 if (logical_expression) {statement 1; statement 2; ...; statement n; }
 \end{verbatim}
-\href{logical}{ where "logical\_expression" } is one of 
+\href{logical}{where "logical\_expression" } is one of 
 \begin{verbatim}
-
-expr1 oper expr2
+expr1  oper expr2
 expr11 oper1 expr12 && expr21 oper2 expr22
 expr11 oper1 expr12 || expr21 oper2 expr22
 \end{verbatim} 
-and oper one of 
+and \verb+oper+ one of 
 \begin{verbatim}
-
 ==          ! equal
 <>          ! not equal
 <           ! less than
@@ -31,9 +27,8 @@ The expressions are arithmetic expressions of type real. The statements
 in the curly brackets are executed if the logical expression is true.  
 
 
-	\item ELSEIF%elseif}{ELSEIF}
+\subsubsection{ ELSEIF }%elseif}{ELSEIF}
 \begin{verbatim}
-
 elseif (logical_expression) {statement 1; statement 2; ...; statement n; }
 \end{verbatim} 
 Only possible (in any number) behind an IF, or another ELSEIF; is
@@ -41,9 +36,8 @@ executed if  logical\_expression is true, and if none of the preceding
 IF or ELSEIF logical conditions was true.  
 
 
-	\item ELSE%else}{ELSE}
+\subsubsection{ ELSE }%else}{ELSE}
 \begin{verbatim}
-
 else {statement 1; statement 2; ...; statement n; }
 \end{verbatim} 
 Only possible (once) behind an IF, or an ELSEIF; is executed if
@@ -53,18 +47,16 @@ logical conditions was true.
 For a real life example, see \href{foot.html}{ELSE example}. 
 
 
-	\item WHILE
+\subsubsection{ WHILE }
 \begin{verbatim}
-
-while (logical_condition){statement 1; statement 2; ...; statement n; }
+while (logical_condition) {statement 1; statement 2; ...; statement n; }
 \end{verbatim}  
 executes the statements in curly brackets while the logical\_expression
 is true. A simple example (in case you have forgotten the first ten
 factorials) would be  
 \begin{verbatim}
-
-option,-info;   ! otherwise you get redifiniton warnings
-n=1; m=1;
+option, -info;   ! avoids redefiniton warnings
+n = 1; m = 1;
 while (n <= 10)
 {
   m = m * n;  value, m;
@@ -74,17 +66,16 @@ while (n <= 10)
 
 For a real life example, see \href{foot.html}{WHILE example}.
 
-	\item MACRO
+\subsubsection{ MACRO }
 
 \begin{verbatim}
-
 label: macro = {statement 1; statement 2; ...; statement n; };
 label(arg1,...,argn): macro = {statement 1; statement 2; ...; statement n; };
 \end{verbatim} 
+
 The first form allows the execution of a group of statements via a
 single command:  
 \begin{verbatim}
-
 exec, label;
 \end{verbatim} 
 will execute the statements in curly brackets exactly once. This command
@@ -96,26 +87,24 @@ execution. This is a powerful construct and should be handled with care.
 
 Simple example: 
 \begin{verbatim}
-
-option,-echo,-info;  ! otherwise the output is somewhat confusing
+option, -echo, -info;  ! for cleaner output
 simple(xx,yy): macro = { xx = yy^2 + xx; value, xx;};
 a = 3;
 b = 5;
 exec, simple(a,b);
 \end{verbatim}
 
-Somewhat more tricky (a "\$" in front of an argument means that the
-truncated integer value of this argument is used for replacement, rather
-than the argument string itself).  
+In the following example we use the fact that a "\$" in front of an
+argument means that the truncated integer value of this argument is used
+for replacement, rather than the argument string itself.  
 \begin{verbatim}
-
 tricky(xx,yy,zz): macro = {mzz.yy: xx, l = 1.yy, kzz = k.yy;};
 n=0;
 while (n < 3)
 {
   n = n+1;
-  exec,tricky(quadrupole,$n,1);
-  exec,tricky(sextupole,$n,2);
+  exec, tricky(quadrupole, $n, 1);
+  exec, tricky(sextupole, $n, 2);
 };
 \end{verbatim} 
 Whereas the actual use of the preceding example is NOT recommended,
@@ -125,31 +114,21 @@ under \href{foot.html#macro}{macro definition} for the
 definition.
 
 
-Beware of the following rules:
-
-	\item Generally speaking: \textit{ special constructs } like IF, WHILE,
-MACRO will only allow one level of inclusion of another \textit{
-special construct }.
-
-	\item  Macros must not be called with numbers, but with strings
-(i.e. variable names in case of numerical values), i.e. 
-
-
-
-NOT
-
+{\bf Beware of the following rules:}
+\begin{itemize}
+   \item Generally speaking: \textit{ special constructs } like IF,
+     WHILE, MACRO will only allow one level of inclusion of another
+     \textit{ special construct }.
+   \item  Macros must not be called with numbers, but with strings
+     (i.e. variable names in case of numerical values), i.e. {\bf NOT }
 \begin{verbatim}
-
-exec,thismacro($99,$129);
+exec, thismacro($99, $129);
 \end{verbatim}
-BUT
-
+{\bf BUT}
 \begin{verbatim}
-
 n1=99; n2=219;
-exec,thismacro($n1,$n2);
+exec, thismacro($n1, $n2);
 \end{verbatim}
-
 \end{itemize}
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002

@@ -2,14 +2,14 @@
 %  Added by: R. Calaga, Sep 2010 
 %  Edited by: A. Latina, Jun 2013
 
-\subsection{Crab Cavity}
+\section{Crab Cavity}
 
 
 \begin{verbatim}
-label: CRABCAVITY, L=real, VOLT=real, LAG=real, FREQ=real,
-                   RV1=integer, RV2=integer, RV3=integer, RV4=integer, 
-                   RPH1=integer, RPH2=integer, 
-                   LAGF=real, HARMON=integer;                 
+label: CRABCAVITY, L = real, VOLT = real, LAG = real, FREQ = real,
+                   RV1 = integer, RV2 = integer, RV3 = integer, RV4 = integer, 
+                   RPH1 = integer, RPH2 = integer, 
+                   LAGF = real, HARMON = integer;                 
 \end{verbatim} 
 
 %  BETRF=real, PG=real,
@@ -71,7 +71,11 @@ A CRABCAVITY has five real attributes and seven integer attributes:
 %and the particle charge (\href{beam.html#charge}{CHARGE}) to be set by
 %a \href{beam.html}{BEAM} command before any calculation is performed. 
 
-Before any calculation is performed with a CRABCAVITY, the particle energy (\href{beam.html#energy}{ENERGY}) and the particle charge (\href{beam.html#charge}{CHARGE}) must be set by a \href{beam.html}{BEAM} command.  
+Before any calculation is performed with a CRABCAVITY, the particle
+energy (\href{beam.html#energy}{ENERGY}) and the particle charge
+(\href{beam.html#charge}{CHARGE}) must be set by a
+\href{beam.html}{BEAM} command.   
+
 Then the effect of the CRABCAVITY on particle coordinates during tracking is
 \\
 \\ delta(\textit{px})  = VOLT * sin( PHI - OMEGA * t) 
@@ -86,14 +90,13 @@ Then the effect of the CRABCAVITY on particle coordinates during tracking is
 
 Example: 
 \begin{verbatim}
-
-BEAM, PARTICLE=PROTON, ENERGY=7000.0;
-CAVITY:  CRABCAVITY, L=10.0, VOLT=5.0, LAG=0.0, FREQ=400,
-         RV1=0, RV2=50, RV3=1000, RV4=50, RPH1=100, RPH2=500, LAGF=0.125;
-
+BEAM, PARTICLE = PROTON, ENERGY = 7000.0;
+CAVITY:  CRABCAVITY, L = 10.0, VOLT = 5.0, LAG = 0.0, FREQ = 400,
+         RV1 = 0, RV2 = 50, RV3 = 1000, RV4 = 50, 
+         RPH1 = 100, RPH2 = 500, LAGF = 0.125;
 \end{verbatim} 
 
-The \href{local_system.html#straight}{straight reference system} for a cavity is a cartesian coordinate system. 
-
-%\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010 
-
+The \href{local_system.html#straight}{straight reference system} for a
+cavity is a cartesian coordinate system.  
+ 
+%\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010

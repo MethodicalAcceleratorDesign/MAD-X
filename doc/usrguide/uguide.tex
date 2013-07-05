@@ -6,7 +6,8 @@ Introduction/copyright,	%MAD-X Copyright Statement
 %
 Introduction/conventions,	%Conventions
 Introduction/format,		%Command and Statement Format
-control/control,			%Control Statements
+control/control,                %Control Statements
+control/seqedit,                %Edit beamline sequences
 Introduction/defects,		%Known Differences to Other Programs 
 %
 %Elements and Beamlines 
@@ -69,6 +70,7 @@ Introduction/bibliography%References
 %\usepackage{html}
 \usepackage{multirow}
 \usepackage{longtable}
+\usepackage{parskip}
 
 % set the indentation at the beginning of a paragraph to zero
 % for better lisibility in a manual style
@@ -76,59 +78,61 @@ Introduction/bibliography%References
 
 \begin{document}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Introduction/doc}              %MAD-X Introduction
+\include{Introduction/copyright}	%MAD-X Copyright Statement
+
 \tableofcontents
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\include{Introduction/copyright}	%MAD-X Copyright Statement
-%
 \part{Control}
 \include{Introduction/conventions}	%Conventions
 \include{Introduction/format}		%Command and Statement Format
 \include{control/control}		%Control Statements
+\include{control/seqedit}               %Edit beamline sequences
 \include{Introduction/defects}		%Known Differences to Other Programs 
 
-\part{Declaring elements and beamlines}
-%Elements and Beamlines 
+\part{Declaring elements and beamlines} %Elements and Beamlines 
 \include{Introduction/element}		%Physical Elements and Markers
-\include{Introduction/sequence}	%Sequences
+\include{Introduction/sequence}	        %Sequences
 
-\part{Input and Output}
-%Input and Output  
-\include{Introduction/tfs}			%TWISS
-\include{c6t/c6t}					%Conversion to Sixtrack Input Format
-\include{sxf/sxf}					%SXF file input and output
-\include{plot/plot}				%PLOT
+\part{Input and Output}                 %Input and Output  
+\include{Introduction/tfs}              %TWISS
+\include{c6t/c6t}			%Conversion to Sixtrack Input Format
+\include{sxf/sxf}			%SXF file input and output
+\include{plot/plot}			%PLOT
 
-\part{MAD Modules}
-%MAD Modules 
-\include{twiss/twiss}				%TWISS
-\include{match/match}				%MATCHING
+\part{MAD Modules}                      %MAD Modules 
+\include{twiss/twiss}			%TWISS
+\include{match/match}			%MATCHING
 \include{survey/survey}			%SURVEY: geometric layout and survey
-\include{Introduction/aperture}	%APERTURE: defining and calculating apertures 
+\include{Introduction/aperture}	        %APERTURE: defining and calculating apertures 
 \include{makethin/makethin}		%MAKETHIN: Conversion to Thin Lens
-\include{dynap/dynap}				%DYNAP: Dynamic Aperture
-\include{emit/emit}				%EMIT
-\include{error/error}				%ERRORS
-\include{ibs/ibs}					%IBS: Intra Beam Scattering
+\include{dynap/dynap}			%DYNAP: Dynamic Aperture
+\include{emit/emit}			%EMIT
+\include{error/error}			%ERRORS
+\include{ibs/ibs}			%IBS: Intra Beam Scattering
 \include{cororbit/cororbit}		%ORBIT CORRECTION
-\include{sodd/sodd}				%SODD
+\include{sodd/sodd}			%SODD
 \include{touschek/touschek}		%TOUSCHEK
 \include{tracking/tracking}		%TRACKING: Overview of MAD-X Tracking Modules
 \include{thintrack/thintrack}		%THINTRACK: Thin-Lens Tracking Module 
 
-\part{PTC Commands}
-%PTC Commands 
+\part{PTC Commands}                     %PTC Commands 
 \include{ptc_general/ptc_general}	%Set-up Parameters
 \include{ptc_track/ptc_track}		%PTC_TRACK: Thick-Lens Tracking Module
-\include{ptc_track_line/ptc_track_line}%PTC_TRACK_LINE: Line Tracking Module
+\include{ptc_track_line/ptc_track_line} %PTC_TRACK_LINE: Line Tracking Module
 \include{ptc_twiss/ptc_twiss}		%PTC_TWISS: Ripken Optics Parameters
-\include{ptc_normal/ptc_normal}	%PTC_NORMAL: Non-Linear Machine Parameters
+\include{ptc_normal/ptc_normal}	        %PTC_NORMAL: Non-Linear Machine Parameters
 \include{ptc_auxiliaries/ptc_auxiliaries}%PTC Auxiliary Commands
 
 \part{}
-\include{sindex}%Keyword and Subject Index
-\include{Introduction/bibliography}%References
+\include{sindex}                        %Keyword and Subject Index
+\include{Introduction/bibliography}     %References
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% Annexes
 
 %\include{uguide}
 \include{control/foot}
@@ -150,7 +154,7 @@ Introduction/bibliography%References
 %\include{Introduction/beam}
 %\include{Introduction/beambeam}
 %\include{Introduction/bend}
-\include{Introduction/bv_flag}
+%\include{Introduction/bv_flag}
 %\include{Introduction/cavity}
 %\include{Introduction/closed_orbit}
 %\include{Introduction/collimator}
@@ -158,7 +162,7 @@ Introduction/bibliography%References
 %\include{Introduction/crabcavity}
 \include{Introduction/declarations}
 %\include{Introduction/dipedge}
-\include{Introduction/doc}
+%\include{Introduction/doc}
 %\include{Introduction/drift}
 %\include{Introduction/elm_class}
 %\include{Introduction/elm_edit}
