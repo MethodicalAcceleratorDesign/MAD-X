@@ -1503,7 +1503,7 @@ subroutine ttdrf(el,track,ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.                    *
   ! Output:                                                              *
-  !   EL        (double)    Length of quadrupole.                        *
+  !   EL        (double)    Length of drift.                             *
   !----------------------------------------------------------------------*
   integer itrack,ktrack
   double precision el,pt,px,py,track(6,*),ttt
@@ -4526,11 +4526,17 @@ subroutine tttquad(track, ktrack)
   integer ktrack
   
   double precision node_value
-  double precision k1, k1s, length, ksqrt, tmp
-  double precision sx, cx, sy, cy, ct, st
-  double precision x, px, y, py
+  double precision k1, k1s, length
+  double precision kk0, kk, ksqrt ! kk0 for the design momentum, kk for this particle's momentum
+  double precision x, px, y, py, z, pt
+  double precision x_, px_, y_, py_, z_, pt_
+  double precision C,  S,  ksqrt_S,  S_over_ksqrt
+  double precision Ch, Sh, ksqrt_Sh, Sh_over_ksqrt
+  double precision delta_p1
   double precision bet0sqr
-  logical skew, focusing
+  double precision ct, st
+  double precision tmp
+  logical skew
   integer jtrk
   
   double precision sqrt2
@@ -4542,18 +4548,21 @@ subroutine tttquad(track, ktrack)
   k1s = node_value('k1s ');
   length = node_value('l ');
   
-  if ((k1.ne.0d0).and.(k1s.ne.0d0)) then
+  if ((k1.eq.0d0).and.(k1s.eq.0d0)) then
+     call ttdrf(length,track,ktrack);
+     return
+  else if ((k1.ne.0d0).and.(k1s.ne.0d0)) then
      call aawarn('trrun: ',&
-          'a quadrupole cannot have both K1 and K1S different than zero');
+          'a quadrupole cannot have *both* K1 and K1S different than zero!');
      return  
   endif
 
   if (k1s.ne.0d0) then
+     kk0 = k1s;
      skew = .true.
-     focusing = k1s.gt.0d0
   else
+     kk0 = k1;
      skew = .false.
-     focusing = k1.gt.0d0
   endif
   
   !---- Prepare to calculate the kick and the matrix elements
@@ -4563,6 +4572,8 @@ subroutine tttquad(track, ktrack)
      px = track(2,jtrk);
      y  = track(3,jtrk);
      py = track(4,jtrk);
+     z  = track(5,jtrk);
+     pt = track(6,jtrk);
   
 !!$    !---- Radiation effects at entrance.
 !!$    if (dorad  .and.  elrad .ne. 0d0) then
@@ -4584,35 +4595,54 @@ subroutine tttquad(track, ktrack)
         py = ct * py  - st * tmp
      endif
 
+     !---- Computes 1+delta and kk
+     delta_p1 = sqrt(pt*pt+2d0*pt/bet0+1d0);
+     kk = kk0 / delta_p1;
+
      !---- Computes the kick
-     if (skew) then
-        ksqrt = sqrt(abs(k1s / (1d0 + track(6, jtrk))))
+     if (kk>0) then
+        ksqrt = sqrt(kk);
+        C = cos(ksqrt*length);
+        S = sin(ksqrt*length);
+        Ch = cosh(ksqrt*length);
+        Sh = sinh(ksqrt*length);
+        ksqrt_S  =  ksqrt*S;
+        ksqrt_Sh = -ksqrt*Sh;
+        S_over_ksqrt  =  S/ksqrt;
+        Sh_over_ksqrt = Sh/ksqrt;
      else
-        ksqrt = sqrt(abs(k1  / (1d0 + track(6, jtrk))))
+        ksqrt = sqrt(-kk);
+        C = cosh(ksqrt*length);
+        S = sinh(ksqrt*length);
+        Ch = cos(ksqrt*length);
+        Sh = sin(ksqrt*length);
+        ksqrt_S  = -ksqrt*S;
+        ksqrt_Sh =  ksqrt*Sh;
+        S_over_ksqrt  =  S/ksqrt;
+        Sh_over_ksqrt = Sh/ksqrt;
      endif
-     if (focusing) then
-        cx = cos(ksqrt*length)
-        sx = sin(ksqrt*length)
-        cy = cosh(ksqrt*length)
-        sy = sinh(ksqrt*length)
-        tmp = x
-        x  = tmp * cx + px * sx / ksqrt
-        px = -sx * ksqrt * tmp + px * cx
-        tmp = y
-        y  = tmp * cy + py * sy / ksqrt
-        py =  sy * ksqrt * tmp + py * cy
-     else
-        cx = cosh(ksqrt*length)
-        sx = sinh(ksqrt*length)
-        cy = cos(ksqrt*length)
-        sy = sin(ksqrt*length)
-        tmp = x
-        x  = tmp * cx + px * sx / ksqrt
-        px =  sx * ksqrt * tmp + px * cx
-        tmp = y
-        y  = tmp * cy + py * sy / ksqrt
-        py = -sy * ksqrt * tmp + py * cy
-     endif
+
+     !---- Equations of motion
+     !---- X
+     x_  =        C * x + S_over_ksqrt * px
+     px_ = -ksqrt_S * x +            C * px
+     !---- Y
+     y_  =        Ch * y + Sh_over_ksqrt * py
+     py_ = -ksqrt_Sh * y +            Ch * py
+     !---- Z
+     z_  = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
+           (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1*delta_p1) * &
+          ((0.5) * ((kk0*x*x+px*px) * (length+C*S_over_ksqrt) - (kk0*y*y-py*py) * (length+Ch*Sh_over_ksqrt) + &
+                    (kk *x*x+px*px) * (length-C*S_over_ksqrt) - (kk *y*y-py*py) * (length-Ch*Sh_over_ksqrt)) + &
+           (x*px*S*S + y*py*Sh*Sh) * (1d0-delta_p1) / delta_p1);
+     !pt_ = pt; ! unchanged
+
+     x = x_;
+     y = y_;
+     z = z_;
+     px = px_;
+     py = py_;
+     !pt = pt_; ! unchanged
 
      !---- If SKEW rotates by +45 degrees
      if (skew) then
@@ -4631,8 +4661,9 @@ subroutine tttquad(track, ktrack)
      track(2,jtrk) = px
      track(3,jtrk) = y
      track(4,jtrk) = py
-     track(5,jtrk) = track(5,jtrk) + &
-          (1d0 - bet0sqr) * length * track(6,jtrk) / bet0sqr;
+     track(5,jtrk) = z
+     !track(5,jtrk) = pt ! unchanged
+
 
 !!$    !---- Radiation effects at exit.
 !!$    if (dorad  .and.  elrad .ne. 0d0) then

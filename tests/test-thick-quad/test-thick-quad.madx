@@ -7,7 +7,7 @@ twss_ebc1 : beta0,
             betx=3.3999, bety=3.7645,
             alfx=-1.0879, alfy= 1.1907;
 
-beam_ebc1 : beam, energy=5, npart=bunchcharge, 
+beam_ebc1 : beam, energy=1000, npart=bunchcharge, particle=proton,
             sige=1.5e-3, sigt=6e-03, 
             ex=8e-6 * emass/5, ey=20e-9 * emass/5;
 
@@ -16,11 +16,9 @@ beam_ebc1 : beam, energy=5, npart=bunchcharge,
 !!!
 
 k:=sqrt(pi);
-rfm1 : rfmultipole, l=0, freq=12, knl:={0, sqrt(1), -sqrt(3)}, ksl:={0, sqrt(5), -sqrt(7), sqrt(11), -sqrt(13) }, pnl:={ 0, 0, 0,0,0,0,0,0,0 }, psl:={0,0,0,0,0,0,0,0};
-m1 : multipole, l=0.0, knl:={0, -sqrt(1), sqrt(3)}, ksl:={0, -sqrt(5), sqrt(7), -sqrt(11), sqrt(13) };
-q1 : quadrupole, l=1.0, k1=0.1;
+q1 : quadrupole, l=1.0, k1=0.05;
 
-test_line : line=( m1, rfm1, q1 );
+test_line : line=( q1 );
 
 !!! 
 !!! TEST 1: prints some of the RF-Multipole attributes
@@ -28,8 +26,8 @@ test_line : line=( m1, rfm1, q1 );
 
 use, sequence=test_line;
 
-track,onepass,file=test1_track;
-start,x=1,t=0;
+track,onepass,file=test1_track,deltap=0.0;
+start,x=1e-3,pt=1e-3;
 observe,place=test_line$END;
 run,turns=10;
 endtrack;

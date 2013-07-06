@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 05.12.12 15.34.27 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 06.07.13 14.00.23 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -15,12 +15,12 @@ one pass is on
 ++++++ table: tracksumm
 
     number       turn                  x                 px 
-         1          0                  1                  0 
-         1         10      -0.9997860729     0.006540706969 
+         1          0              0.001                  0 
+         1         10   -0.0006163935379   -0.0001759885744 
 
                  y                 py                  t                 pt 
-                 0                  0                  0                  0 
-                 0                  0                  0                  0 
+                 0                  0                  0              0.001 
+                 0                  0   -2.405608458e-07              0.001 
 
                  s                  e 
                  0                  0 
@@ -33,5 +33,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
