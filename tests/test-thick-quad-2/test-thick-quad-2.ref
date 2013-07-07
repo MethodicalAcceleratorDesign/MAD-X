@@ -1,0 +1,73 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 07.07.13 16.32.10 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! YIL13: Taken from tests_old/test_runs/track_example/
+
+option,-echo,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   1.502666E-21 deltap:   0.000000E+00
+orbit:   3.729602E-24  1.315902E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1.243713E-23
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               6.5     3.16733115e-17    0.0006277815833        39.91128535 
+
+                q1                dq1            betxmax              dxmax 
+      0.1072467205      -0.1135571662         13.8302683       0.2998762806 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2679078562    5.297618523e-23    3.061450232e-23       0.1058727477 
+
+               dq2            betymax              dymax              dyrms 
+     -0.1107431782        13.59510076                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+makethin: slicing sequence : c314
+enter Twiss module
+  
+iteration:   1 error:   4.718370E-19 deltap:   0.000000E+00
+orbit:   3.259118E-25  2.246997E-28  0.000000E+00  0.000000E+00 -9.945509E-15  1.051876E-24
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+              2041    9.945508501e-15    0.0005945144275        41.01274151 
+
+                q1                dq1            betxmax              dxmax 
+       34.11408742        -35.1207073        13.64472903       0.2891279952 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2622979112    1.360146433e-19     7.14849792e-20        34.09973839 
+
+               dq2            betymax              dymax              dyrms 
+      -35.57770089        13.79106363                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter TRACK module
+one pass is on
+update is on
+
+*****  end of trrun  *****
+exit TRACK module
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

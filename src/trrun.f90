@@ -4662,7 +4662,7 @@ subroutine tttquad(track, ktrack)
      track(3,jtrk) = y
      track(4,jtrk) = py
      track(5,jtrk) = z
-     !track(5,jtrk) = pt ! unchanged
+     !track(6,jtrk) = pt ! unchanged
 
 
 !!$    !---- Radiation effects at exit.

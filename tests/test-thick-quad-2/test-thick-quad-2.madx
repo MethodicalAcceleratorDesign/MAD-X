@@ -1,0 +1,51 @@
+! YIL13: Taken from tests_old/test_runs/track_example/
+option,-echo,-info;
+
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with mad -x version 8.51/02
+!-- translated to madx format ETDA 9 dec 2003
+
+
+!-- Define Carol Johnstone's FFAG lattice, and compute Twiss parameters at
+!   nominal momentum
+
+beam particle=posmuon, energy=16.3;
+
+sf: sextupole, l=0.01, k2=0;
+qf: quadrupole, l=0.15/2, k1=+1.3798;
+bd: sbend l=0.35, angle=2*pi/314, k1=-0.59135;
+d: drift, l=0.75;
+rfvolt:=0.1;
+rflag:=1/2;
+
+rf: rfcavity, l=1.5, volt=rfvolt, lag=rflag, harmon=4;
+
+carol: line=(qf,d,rf,d,bd,d,rf,d,qf);
+
+use, period=carol;
+twiss save;
+
+title "Carol Johnstone's FFAG ring lattice 6 to 20 GeV - apr07k";
+c314: line=(314*carol);
+use, period=c314;
+select, flag=makethin, class=quadrupole, thick=true;
+makethin, sequence=c314;
+use, period=c314;
+
+twiss;
+
+rfvolt:=0.1;
+rflag:= 1/2;
+rflag:=3/8;
+
+tr$macro(turn): macro = {
+}
+
+track, onepass, update, dump;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;
+run, turns=50, ffile=1;
+endtrack;
+stop;
+
