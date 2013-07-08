@@ -1,0 +1,54 @@
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
+! ac dipole tracking..
+
+option, -echo,-warn,-info;
+
+! ********** Define sequence
+OPTION, -ECHO, -WARN, INFO;
+CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.seq";
+CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+OPTION, ECHO, WARN, -INFO, -VERIFY;
+
+! ********** Define beam
+beam, sequence= lhcb1, particle= proton, energy= 450;
+
+! ********** If present, remove some elements using seqedit
+option, echo,warn,info;
+seqedit, sequence= lhcb1;
+  remove, element= ACN.A5L4.B1;
+  remove, element= ACN.B5L4.B1;
+  remove, element= ACN.C5L4.B1;
+  remove, element= ACN.D5L4.B1;
+  remove, element= ADTH.A5L4.B1;
+  remove, element= ADTH.B5L4.B1;
+  remove, element= APW.5R4.B1;
+  remove, element= ADTV.A5R4.B1;
+  remove, element= ADTV.B5R4.B1;
+endedit;
+
+! ********** Twiss
+USE, SEQUENCE=lhcb1;
+twiss;
+
+use, sequence=lhcb1;
+! ********** Make a thin sequence
+select, flag= makethin, pattern= "MQXA.*", thick=true;
+select, flag= makethin, pattern= "MQXB.*", thick=true;
+!select, flag= makethin, pattern= "MQXA.*", slice=12;
+!select, flag= makethin, pattern= "MQXB.*", slice=12;
+makethin, sequence= lhcb1, style=teapot;
+use, sequence=lhcb1;
+
+! ********** Track three particles
+option, echo,warn,info;
+use, sequence= lhcb1;
+vrf400= 8.0;   !   Qs=0.0057
+track, dump;
+  start, pt= 0.0001;
+  start, pt= 0.001002; ! edge of bucket
+  start, pt= 0.001004; ! just outside of bucket
+  run,   turns= 320; !,tolerance={.1,.1,.1,.1,100.,.1};!175=1 synchr. period
+endtrack; 
+
+return;
+
