@@ -4600,7 +4600,7 @@ subroutine tttquad(track, ktrack)
      kk = kk0 / delta_p1;
 
      !---- Computes the kick
-     if (kk>0) then
+     if (kk.gt.0d0) then
         ksqrt = sqrt(kk);
         C = cos(ksqrt*length);
         S = sin(ksqrt*length);
@@ -4630,11 +4630,11 @@ subroutine tttquad(track, ktrack)
      y_  =        Ch * y + Sh_over_ksqrt * py
      py_ = -ksqrt_Sh * y +            Ch * py
      !---- Z
-     z_  = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
-           (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1*delta_p1) * &
-          ((0.5) * ((kk0*x*x+px*px) * (length+C*S_over_ksqrt) - (kk0*y*y-py*py) * (length+Ch*Sh_over_ksqrt) + &
-                    (kk *x*x+px*px) * (length-C*S_over_ksqrt) - (kk *y*y-py*py) * (length-Ch*Sh_over_ksqrt)) + &
-           (x*px*S*S + y*py*Sh*Sh) * (1d0-delta_p1) / delta_p1);
+     z_ = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
+	  (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1*delta_p1) * &
+	  (0.5 * ((-kk0*y*y+py*py)*(length+Ch*Sh_over_ksqrt)+(-kk*y*y+kk0*py*py/kk)*(length-Ch*Sh_over_ksqrt)+ &
+		  (+kk0*x*x+px*px)*(length+C*S_over_ksqrt)+(+kk*x*x+kk0*px*px/kk)*(length-C*S_over_ksqrt))+ &
+	   (x*px*S*S+y*py*Sh*Sh)*(kk0-kk)/kk);
      !pt_ = pt; ! unchanged
 
      x = x_;
