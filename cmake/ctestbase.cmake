@@ -16,7 +16,9 @@ execute_process(COMMAND ${TEST_PROG} INPUT_FILE ${SOURCEDIR}/${TEST_NAME}.madx
    OUTPUT_FILE ${TEST_NAME}.out WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE HAD_ERROR)
 
 if(HAD_ERROR)
-    message(FATAL_ERROR "Test failed with error ${HAD_ERROR}")
+    file(READ ${SOURCEDIR}/${TEST_NAME}.out madxoutput)
+    message("${madxoutput}")
+    message(FATAL_ERROR "\n\t -- CTEST ERROR -- Test failed with error ${HAD_ERROR}")
 else()
     # Run numdiff if all went well..
     message("COMMAND ${NUMDIFF} -b -l -t ${TEST_NAME} ${STRING_TEST_OUTPUT}")
