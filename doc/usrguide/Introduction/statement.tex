@@ -17,7 +17,6 @@ be terminated by a semicolon, except if it contains a block of
 statements itself, like in  
 
 \begin{verbatim}
-
 if (a < 3) {a=b^2; b=2*b+4;}
 \end{verbatim}
 
@@ -29,12 +28,10 @@ The general format for a command is (items enclosed in /rep/ ... /rep/
 can be repeated any number of times, including zero):
 
 \begin{verbatim}
-
 label: keyword /rep/,attribute/rep/ ;
 \end{verbatim}
 
 It has three parts:
-
 \begin{itemize}
    \item A \href{label.html}{label}
      is required for a definition statement.
@@ -47,12 +44,9 @@ It has three parts:
      are normally entered in the form
      "attribute-name=attribute-value"
      and serve to define data for the command, where:
-
      \begin{itemize}
        \item \href{label.html}{attribute-name} selects the attribute,
-
-       \item \href{attribute.html}{attribute-value} gives it a value.
-         
+       \item \href{attribute.html}{attribute-value} gives it a value.       
      \end{itemize}
 \end{itemize}
 
@@ -66,14 +60,13 @@ command dictionary.
 Example: TILT attribute for various magnets.
 
 The command attributes can have one of the following types:
-
 \begin{itemize}
-	\item \href{string.html}{String attribute},
-	\item \href{logical.html}{Logical attribute},
-	\item \href{integer.html}{Integer attribute},
-	\item \href{real.html}{Real attribute},
-	\item \href{expression.html}{Expression},
-	\item \href{select.html}{Range selection},
+  \item \href{string.html}{String attribute},
+  \item \href{logical.html}{Logical attribute},
+  \item \href{integer.html}{Integer attribute},
+  \item \href{real.html}{Real attribute},
+  \item \href{expression.html}{Expression},
+  \item \href{select.html}{Range selection},
 \end{itemize}
 
 Any integer or real attribute can be replaced by
@@ -81,6 +74,7 @@ a \href{expression.html}{real expression}; expressions are
 normally deferred (see \href{expression.html#defer}{deferred
   expression}), except in the 
 definition of constants where they are evaluated immediately.
+
 When a command has a \href{label.html}{label},
 MAD-X keeps it in memory.
 This allows repeated execution of the same command
@@ -88,16 +82,14 @@ by just entering EXEC label. This construct may be nested.
 For an exhaustive list of valid declarations of constants or variables
 see \href{declarations.html}{declarations}.
 
-
-%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg},
-%May 8, 2001
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, May 8, 2001
 
 
 
 % add other files to the end of this file
 
-%\input{Introduction/keyword}
-%\input{Introduction/declarations}
-%\input{Introduction/select}
+\input{Introduction/keyword}
+\input{Introduction/declarations}
+\input{Introduction/select}
 
 

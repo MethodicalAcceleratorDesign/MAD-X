@@ -8,26 +8,22 @@ Many commands in MAD require the setting of logical values (flags) to
 represent the on/off state of an option. A logical value "flag" can be
 set in two ways:  
 \begin{verbatim}
-
 flag | flag = true
 \end{verbatim} 
 
 It can be reset by: 
 \begin{verbatim}
-
 -flag | flag=false
 \end{verbatim} 
 
 Example: 
 \begin{verbatim}
-
-option,-echo;  // switch off copying the input to the standard output
+option, -echo;  // switch off copying the input to the standard output
 \end{verbatim} 
 
 The default for a logical flag is normally false, but can be found e.g. for options by the command  
 \begin{verbatim}
-
-help,option;
+help, option;
 \end{verbatim}
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, May 8, 2001 

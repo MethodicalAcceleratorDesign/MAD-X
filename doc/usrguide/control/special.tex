@@ -4,11 +4,11 @@
 
 \subsection{Program Flow Statements}
 
-\subsubsection{ IF }
+\subsubsection{IF}
 \begin{verbatim}
 if (logical_expression) {statement 1; statement 2; ...; statement n; }
 \end{verbatim}
-\href{logical}{where "logical\_expression" } is one of 
+where \href{logical}{"logical\_expression"} is one of 
 \begin{verbatim}
 expr1  oper expr2
 expr11 oper1 expr12 && expr21 oper2 expr22
@@ -27,7 +27,7 @@ The expressions are arithmetic expressions of type real. The statements
 in the curly brackets are executed if the logical expression is true.  
 
 
-\subsubsection{ ELSEIF }%elseif}{ELSEIF}
+\subsubsection{ELSEIF}
 \begin{verbatim}
 elseif (logical_expression) {statement 1; statement 2; ...; statement n; }
 \end{verbatim} 
@@ -36,7 +36,7 @@ executed if  logical\_expression is true, and if none of the preceding
 IF or ELSEIF logical conditions was true.  
 
 
-\subsubsection{ ELSE }%else}{ELSE}
+\subsubsection{ELSE}
 \begin{verbatim}
 else {statement 1; statement 2; ...; statement n; }
 \end{verbatim} 
@@ -47,7 +47,7 @@ logical conditions was true.
 For a real life example, see \href{foot.html}{ELSE example}. 
 
 
-\subsubsection{ WHILE }
+\subsubsection{WHILE}
 \begin{verbatim}
 while (logical_condition) {statement 1; statement 2; ...; statement n; }
 \end{verbatim}  
@@ -66,19 +66,17 @@ while (n <= 10)
 
 For a real life example, see \href{foot.html}{WHILE example}.
 
-\subsubsection{ MACRO }
-
+\subsubsection{MACRO}
 \begin{verbatim}
 label: macro = {statement 1; statement 2; ...; statement n; };
 label(arg1,...,argn): macro = {statement 1; statement 2; ...; statement n; };
 \end{verbatim} 
-
 The first form allows the execution of a group of statements via a
-single command:  
+single command,  
 \begin{verbatim}
 exec, label;
 \end{verbatim} 
-will execute the statements in curly brackets exactly once. This command
+that executes the statements in curly brackets exactly once. This command
 can be issued any number of times.  
 
 The second form allows to replace strings anywhere inside the statements
@@ -94,6 +92,8 @@ b = 5;
 exec, simple(a,b);
 \end{verbatim}
 
+
+{\bf Passing arguments}\\
 In the following example we use the fact that a "\$" in front of an
 argument means that the truncated integer value of this argument is used
 for replacement, rather than the argument string itself.  

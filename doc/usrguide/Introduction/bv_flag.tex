@@ -1,7 +1,7 @@
 %%\title{BV flag in the Beam command}
 %  Changed by: Thys Risselada 29-Mar-2009 
 
-\subsection{Effect of the bv flag in MAD-X}
+\section{BV FLAG}
 
 When reversing the direction ("V") of a particle in a magnetic field
 ("B") while keeping its charge constant, the resulting force V * B
@@ -21,8 +21,9 @@ and beam 2 (counter-clockwise), treated in MADX both as clockwise proton
 beams, the Beam commands must look as follows: 
 
 \begin{verbatim}
-   beam, sequence = lhcb1, particle = proton, pc = 450, bv = +1;
-   beam, sequence = lhcb2, particle = proton, pc = 450, bv = -1;
+beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;
+
+beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;
 \end{verbatim}
 
 %\href{http://www.cern.ch/Frank.Schmidt/frs_sign.html}{frs}, March 29, 2009 

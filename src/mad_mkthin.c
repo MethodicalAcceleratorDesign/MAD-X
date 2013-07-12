@@ -1461,6 +1461,6 @@ makethin(struct in_cmd* cmd)
   }
   else warning("makethin without sequence:", "ignored");
 
-  fprintf(prt_file, "makethin: finished in %f seconds.\n",(clock()-start)/CLOCKS_PER_SEC);
+  if (get_option("debug")) fprintf(prt_file, "makethin: finished in %f seconds.\n",(clock()-start)/CLOCKS_PER_SEC);
   thin_select_list = NULL;
 }

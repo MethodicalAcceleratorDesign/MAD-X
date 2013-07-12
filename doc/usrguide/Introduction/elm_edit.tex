@@ -16,8 +16,10 @@ An element definition can be changed in two ways:
 This example shows two ways to change the strength of a quadrupole: 
 \begin{verbatim}
 QF: QUADRUPOLE, L = 1, K1 = 0.01;     ! Original definition of QF
-QF: QUADRUPOLE, L = 1, K1 = 0.02;     ! Replace whole definition of QF
-QF, K1 = 0.02;                        ! Replace value of K1
+
+QF: QUADRUPOLE, L = 2, K1 = 0.02;     ! Replace whole definition of QF
+
+QF, K1 = 0.03;                        ! Replace value of K1
 \end{verbatim} 
 
 When the type of the element remains the same, replacement of an

@@ -7,10 +7,6 @@ All physical elements are defined by statements of the form
 \begin{verbatim}
 label: keyword {,attribute};
 \end{verbatim} 
-Example: 
-\begin{verbatim}
-QF: QUADRUPOLE, L = 1.8, K1 = 0.015832;
-\end{verbatim} 
 where 
 \begin{itemize}
 	\item \href{label.html}{label} is a name to be given to the element (in the example QF), 
@@ -32,6 +28,11 @@ where
 \end{itemize} 
 
 Omitted attributes are assigned a default value, normally zero. 
+
+Example: 
+\begin{verbatim}
+QF: QUADRUPOLE, L=1.8, K1=0.015832;
+\end{verbatim} 
 
 A special format is used for a \href{multipole.html}{multipole}: 
 \begin{verbatim}

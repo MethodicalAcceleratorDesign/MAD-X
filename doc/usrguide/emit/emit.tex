@@ -3,40 +3,66 @@
 %  Changed by: Hans Grote, 15-Oct-2002 
 %  Changed by: Ralph Assmann, 02-Sep-2003 
 
-\chapter{Fully Coupled Motion and Radiation}
+\chapter{EMIT: Equilibrium emittances} 
+%Fully Coupled Motion and Radiation}
 
-\subsection{\href{emit}{EMIT: Equilibrium Emittances}} 
-
-The command 
 \begin{verbatim}
-EMIT,DELTAP=real,TOL=tolerance;
+EMIT, DELTAP = real, TOL = tolerance;
 \end{verbatim}
-adjusts the RF frequencies such as to obtain the specified average energy error. More precisely, the revolution frequency \textit{f$_0$} is determined for a fictitious particle with constant momentum error 
 
+\href{emit}{EMIT} calculates the equilibrium emittances: 
+EMIT adjusts the RF frequencies such as to obtain the specified average
+energy error. More precisely, the revolution frequency \textit{f$_0$} is
+determined for a fictitious particle with constant momentum error  
+ 
 DELTAP = delta$_\textit{s}$ = delta(\textit{E}) / \textit{p$_s$ c}
 
-which travels along the design orbit. The RF frequencies are then set to 
+which travels along the design orbit. The RF frequencies are then set to  
 
 \textit{f$_{RF}$ = h f$_0$}. 
 
-If the machine contains at least one RF cavity, and if synchrotron radiation is \href{../Introduction/beam.html#radiate}{on}, the EMIT command computes the equilibrium emittances and other electron beam parameters using the method of \href{../Introduction/bibliography.html#chao}{[Chao]}. In this calculation the effects of quadrupoles, sextupoles, and octupoles along the closed orbit is also considered. Thin multipoles are used only if they have a fictitious length LRAD  different from zero. 
+If the machine contains at least one RF cavity, and if synchrotron
+radiation is \href{../Introduction/beam.html#radiate}{ON}, the EMIT
+command computes the equilibrium emittances and other electron beam
+parameters using the method of
+\href{../Introduction/bibliography.html#chao}{[Chao]}. 
 
-If the machine contains no RF cavity, if synchrotron radiation is  \href{../Introduction/beam.html#radiate}{off}, or if the longitudinal motion is not stable, it only computes the parameters which are not related to radiation. 
+In this calculation the effects of quadrupoles, sextupoles, and
+octupoles along the closed orbit is also considered. Thin multipoles are
+used only if they have a fictitious length LRAD  different from zero.  
 
-The tolerance is for the distinction static/dynamic: if for the eigenvalues of the one-turn matrix, $|$e\_val\_5$|$ \textless tol and $|$e-val\_6$|$ \textless tol, then the longitudinal motion is not considered, otherwise it is. The default for TOL is 1.000001. 
-%  |e\_val\_5| \textless tol and |e-val\_6| \textless tol, then the longitudinal motion is not considered, otherwise it is. The default for TOL is 1.000001. 
+If the machine contains no RF cavity, if synchrotron radiation is
+\href{../Introduction/beam.html#radiate}{off}, or if the longitudinal
+motion is not stable, it only computes the parameters which are not
+related to radiation.  
+
+The tolerance is for the distinction static/dynamic: if for the
+eigenvalues of the one-turn matrix, $|$e\_val\_5$|$ \textless tol and
+$|$e-val\_6$|$ \textless tol, then the longitudinal motion is not
+considered, otherwise it is. The default for TOL is 1.000001.  
+%  |e\_val\_5| \textless tol and |e-val\_6| \textless tol, then the
+%  longitudinal motion is not considered, otherwise it is. The default
+%  for TOL is 1.000001.  
  
-In the current implementation, the BEAM values of the emittances and beam sizes are only updated for deltap = zero. 
+In the current implementation, the BEAM values of the emittances and
+beam sizes are only updated for deltap = zero.  
+
 Example: 
 \begin{verbatim}
-RFC: RFCAVITY,HARMON...,VOLT=...;
-     BEAM,ENERGY=100.0,RADIATE;
-     EMIT,DELTAP=0.01;
+RFC: RFCAVITY, HARMON..., VOLT=...;
+     
+BEAM, ENERGY = 100.0, RADIATE;
+     
+EMIT, DELTAP = 0.01;
 \end{verbatim}
-\textbf{Remark:}  This module assumes nearly constant lattice functions inside elements. This assumption works for many machines,  like LEP (\href{http://cern.ch/frs/mad-X_examples/emit/LEP/}{see example}), but it fails when the lattice funcionts largely vary inside single elements. In the later case it is advised to slice the elements as shown in     \href{http://cern.ch/frs/mad-X_examples/emit/ALBA/}{ALBA}.   
 
-%\line(1,0){300}
+{\bf Remark:}  This module assumes nearly constant lattice functions
+inside elements. This assumption works for many machines, like LEP
+(\href{http://cern.ch/frs/mad-X_examples/emit/LEP/}{see example}), but
+it fails when the lattice funcionts largely vary inside single
+elements. In the later case it is advised to slice the elements as shown
+in the example pertaining to
+\href{http://cern.ch/frs/mad-X_examples/emit/ALBA/}{ALBA}.     
 
-% \begin{tabular}{lr}
 % \href{Rogelio HREF=http://consult.cern.ch/xwho/people/69118}{R. Tom\'as} & \textbf{Last updated:} 03/13/2013 13:47:20
-% \end{tabular}
+

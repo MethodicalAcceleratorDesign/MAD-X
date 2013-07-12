@@ -4,14 +4,14 @@
 
 \section{Regular Expressions}
 
- Some commands allow selection of items via "regular expression"
- strings. Such a pattern string \textbf{must} be enclosed in single or
- double quotes. MAD-X follows regexp (Unix regular expression patterns)
- for matching. The following features are implemented:  
+Some commands allow selection of items via "regular expression"
+strings. Such a pattern string \textbf{must} be enclosed in single or
+double quotes. MAD-X follows regexp (Unix regular expression patterns)
+for matching. The following features are implemented:  
 
- A "search string" below is the string containing the pattern, a "target
- string" is the string being searched for a possible match with the
- pattern. 
+A "search string" below is the string containing the pattern, a "target
+string" is the string being searched for a possible match with the
+pattern. 
 
 \begin{itemize}
    \item "\textasciicircum" at the start of the search string: Match
@@ -45,10 +45,10 @@ All other characters stand for themselves.
 
 Example: 
 \begin{verbatim}
-
-select,flag=twiss,pattern="^d..$" ;
-select,flag=twiss,pattern="^k.*qd.*\.r1$" ;
-\end{verbatim} 
+select, flag=twiss, pattern="^d..$" ;
+select, flag=twiss, pattern="^k.*qd.*\.r1$" ;
+\end{verbatim}
+ 
 The first command selects all elements whose names have exactly three
 characters and begin with the letter "D". The second command selects
 elements beginning with the letter "K", containing the string "QD", and

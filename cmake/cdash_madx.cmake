@@ -13,10 +13,10 @@
 #          ctest -S cdash_madx.cmake
 
 # Necessary edits:
-SET(CTEST_SITE "myname.maymachine")
-set(CTEST_BUILD_NAME "SLC5-64bit-gfortran")
+SET(CTEST_SITE "ghislain.macbookpro")
+set(CTEST_BUILD_NAME "macosx-64bit-gfortran")
 # Your source should be checked out from svn into this directory:
-set(CTEST_SOURCE_DIRECTORY "/path/to/source/madX/")
+set(CTEST_SOURCE_DIRECTORY "/Users/ghislain/MADX/madX/")
 # and compilation will be done in this directory (no need to edit, must be unique for every configuration):
 set(CTEST_BINARY_DIRECTORY "${CTEST_SOURCE_DIRECTORY}/build")
 

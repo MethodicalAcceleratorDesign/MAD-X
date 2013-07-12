@@ -6,9 +6,9 @@
 
 \subsection{ASSIGN}
 \begin{verbatim}
-assign, echo = "file_name", truncate;
+assign, echo="file_name", truncate;
 \end{verbatim} 
-where "file\_name"  is the name of an output file, or "terminal" and
+where "file\_name" is the name of an output file, or "terminal" and
 truncate specifies if the file must be truncated when opened (ignored
 for terminal). This allows switching the echo stream to a file or back,
 but only for the commands value, show, and print. Allows easy
@@ -23,7 +23,8 @@ where "file\_name"  is the name of an input file. This file will be read
 until a "return;" statement, or until end\_of\_file; it may contain any
 number of calls itself, and so on to any depth.  
 
-
+%% 2013-Jul-11  17:23:00  ghislain: I propose to move COGUESS to the
+%% orbit correction part of the manual
 \subsection{COGUESS}
 \begin{verbatim}
 coguess, tolerance = double, 
@@ -37,7 +38,6 @@ sets the required convergence precision in the closed orbit search
 
 The other parameters define a first guess for all future closed orbit
 searches in case they are different from zero.  
-
 
 \subsection{CREATE}
 \begin{verbatim}
@@ -55,9 +55,6 @@ or an example of joining 2 tables of different length in one table
 including the element name:
 \href{../Introduction/select.html#screate}{user table II} 
 
-
-
-
 \subsection{DELETE}
 \begin{verbatim}
 delete, sequence = s_name, table = t_name;
@@ -66,7 +63,8 @@ deletes a sequence with name "s\_name" or a table with name "t\_name"
 from memory. The sequence deletion is done without influence on other
 sequences that may have elements that were in the deleted sequence.  
 
-
+%% 2013-Jul-11  17:24:21  ghislain: I propose to move DUMPSEQU to the
+%% sequence edition and manipulation part of the manual
 \subsection{DUMPSEQU}
 \begin{verbatim}
 dumpsequ, sequence = s_name, level = integer;
@@ -91,13 +89,11 @@ executed again with "exec, label;" any number of times; the executed
 statement may be another "exec", etc.; however, the major usage of this
 statement is the execution of a \href{special.html#macro}{macro}.  
 
-
 \subsection{EXIT}
 \begin{verbatim}
 exit;
 \end{verbatim} 
 ends the program execution. 
-
 
 \subsection{FILL} 
 Every command 
@@ -108,7 +104,6 @@ adds a new line with the current values of all column variables into the
 user table \hyperlink{create}{create}d beforehand. This table one can
 then \hyperlink{write}{write} in TFS format.  See as well the
 \href{../Introduction/select.html#ucreate}{user table} example.  
-
 
 \subsection{OPTION}
 \begin{verbatim}
@@ -218,7 +213,8 @@ portable than
 system("mv file_name new_file_name"); // Unix specific
 \end{verbatim}
 
-
+%% 2013-Jul-11  17:24:21  ghislain: I propose to move RESBEAM to the
+%% beam declaration part of the manual
 \subsection{RESBEAM}
 \begin{verbatim}
 resbeam, sequence = sequence_name;

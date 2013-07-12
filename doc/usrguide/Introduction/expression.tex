@@ -2,7 +2,7 @@
 %  Changed by: Chris ISELIN, 27-Mar-1997 
 %  Changed by: Hans Grote, 25-Sep-2002 
 
-\section{\href{expression}{ Real Expressions}}
+\section{\href{expression}{Real Expressions}}
 
 To facilitate the definition of interdependent quantities, any real
 value and integer value can be entered as an arithmetic expression. When
@@ -16,7 +16,7 @@ An expression is built from a combination of
 \hyperlink{operator}{operator} and \hyperlink{operand}{operand}, and it
 may contain \hyperlink{random}{random generators}.   
 
-\subsection{\href{operator}{ Operators in Arithmetic Expressions}} 
+\subsection{\href{operator}{Operators in Arithmetic Expressions}} 
 An expression can be formed using the following operators: 
 
 \subsubsection{Arithmetic operators}
@@ -28,7 +28,7 @@ An expression can be formed using the following operators:
 	\item \textasciicircum Exponentiation. 
 \end{itemize}
 
-\subsubsection{\href{function}{Ordinary functions}}
+\subsubsection{\href{function}{Ordinary Functions}}
 \begin{itemize}
 	\item sqrt(x) square root, 
 	\item log(x) natural logarithm, 
@@ -46,20 +46,19 @@ An expression can be formed using the following operators:
 	\item abs(x) absolute value; 
 \end{itemize}
 
-\subsubsection{\href{random}{random number generators}}
+\subsubsection{\href{random}{Random Number Generators}}
 \begin{itemize}
 	\item ranf() random number, uniformly distributed in [0,1], 
 	\item gauss() random number, gaussian distribution with unit standard deviation, 
 	\item tgauss(x) random number, gaussian distribution with unit standard deviation, truncated at x standard deviations; 
 \end{itemize} 
 
-
 in the above cases, "x" can be any expression, i.e. contain other
 functions, variable or constant expressions. To initialize the MAD-X
 random generator use the
 \href{../error/error_option.html#EOPTION}{Eoption command}.  
 
-\subsubsection{\href{table}{table access functions}}
+\subsubsection{\href{table}{Table Access Functions}}
 
 \begin{itemize}
 	\item table(x,z): accesses value of the named table column "z"
@@ -109,21 +108,16 @@ one to use a variable instead.
 
 A typical example could look like this, in fact the square root of betx
 (user defined variable myvar) is added to the twiss table:  
-
-
 \begin{verbatim}
-
 myvar := sqrt(table(twiss,betx));
-select,flag=twiss,column=name,s,myvar,betx;
-twiss,file;
+select, flag=twiss, column=name, s, myvar, betx;
+twiss, file;
 \end{verbatim}
 
 Or another arbitrary test case of adding k1l taken from the Twiss table: 
 
-
 Define macro: 
 \begin{verbatim}
-
 mycrap(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
 \end{verbatim}
 
@@ -143,17 +137,16 @@ i = i + 1;
 \subsubsection{Features as of Version 3\_03\_50}
 
 \begin{itemize}
-  \item  FILL,TABLE=t,ROW=n; \\
+  \item  FILL, TABLE=t, ROW=n; \\
     fill a table row with the present variable values. If ROW is
     negative or missing a new row is created. If ROW is greater than the
     number of rows, the last row is selected without creating a new row.  
 
-  \item SETVARS,TABLE=t,ROW=n; \\
+  \item SETVARS, TABLE=t, ROW=n; \\
     set variables according to the column names of the given table and
     the values of the given row. if ROW is negative, missing or greater
     than the number of rows, the last row is selected. 
 \end{itemize}
-
 
 An example can be found at:
 \href{http://cern.ch/frs/mad-X_examples/special_features}{Special
@@ -165,17 +158,16 @@ useful when creating a table from existing ones. See an example at:
 \href{../Introduction/select.html#screate}{user table II} 
 
 
-\subsection{\href{operand}{ Operands in Arithmetic Expressions}} 
+\subsection{\href{operand}{Operands in Arithmetic Expressions}} 
 An expression may contain the following operands:  
 
-\subsubsection{Literal constants} 
+\subsubsection{Literal Constants} 
 Numerical values are entered like FORTRAN constants. Real values are
 accepted in INTEGER or REAL format. The use of a decimal exponent,
 marked by the letter D or E, is permitted.  
 
 Examples: 
 \begin{verbatim}
-
 1, 10.35, 5E3, 314.1592E-2
 \end{verbatim}
 
@@ -193,7 +185,6 @@ defines a real constant with the name given. An existing symbolic constant can b
 
 Example: 
 \begin{verbatim}
-
 const in = 0.0254;
 \end{verbatim}
 
@@ -227,33 +218,28 @@ parameter. Such a parameter must be defined as a
 current value; however, this value may be re-evaluated or not, depending
 on the parameter definition:  
 \begin{verbatim}
-
 x = a;
 \end{verbatim} 
 x is set to the current value of a and not changed, even if a
 changes. This makes assignments such as  
 \begin{verbatim}
-
 x = x + 1;
 \end{verbatim} 
 perfectly valid (this replaces the old SET instruction). 
 
 The definition of the deferred expression  
 \begin{verbatim}
-
 x := a;
 \end{verbatim} 
 assign the current value of a to x every time x is used, i.e. it is
 re-evaluated using the latest value of a; therefore,  
 \begin{verbatim}
-
 x := x + 1;
 \end{verbatim} 
 results in an infinite loop (!) when x is used (error abort). 
 
 Of course, the following definitions are equivalent:  
 \begin{verbatim}
-
 x = 0.1;
 x := 0.1;
 \end{verbatim}
@@ -264,18 +250,17 @@ value of the parameter if the expression is deferred:
 Example: 
 \begin{verbatim}
 
-x:=1.0;
-d1: drift,l = x;
-d2: drift,l := 2.0 - x;
+x := 1.0;
+d1: drift, l=x;
+d2: drift, l:=2.0 - x;
 \end{verbatim} 
-When the value of X is changed, the length of the drift d1 remains
+When the value of x is changed, the length of the drift d1 remains
 unchanged, that of d2 is recalculated.   
 
-\subsubsection{Element or command attributes} 
+\subsubsection{Element or Command Attributes} 
 In arithmetic expressions the attributes of physical elements or
 commands can occur as operands. They are named respectively by  
 \begin{verbatim}
-
 element-name->attribute-name
 command-name->attribute-name
 \end{verbatim} 
@@ -284,9 +269,8 @@ Values are assigned to attributes in element definitions or commands.
 
 Example: 
 \begin{verbatim}
-
-D1: DRIFT,L=1.0;
-D2: DRIFT,L=2.0-D1->L;
+D1: DRIFT, L=1.0;
+D2: DRIFT, L=2.0-D1->L;
 \end{verbatim} 
 D1-\textgreater L refers to the length L of the drift space D1.  
 
@@ -299,14 +283,12 @@ latter case is used by the error generation routines.
 
 Example: 
 \begin{verbatim}
-
 a := 3*ranf();
 \end{verbatim} 
 Every time a is used, it gets a random value assigned from a uniform
 distribution between 0 and 3.  
 
 \begin{verbatim}
-
 error:  ealign,range,dx:=sigma*gauss();
 \end{verbatim} 
 All elements in range are assigned independent random displacements

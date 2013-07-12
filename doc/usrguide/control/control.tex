@@ -10,7 +10,6 @@
 
 
 \section{Control Statements}
-
 MAD-X consists of a core program, and modules for specific tasks such as
 twiss parameter calculation, matching, thin lens tracking, and so on.  
  
@@ -20,7 +19,7 @@ manipulation, statement flow control (e.g. IF, WHILE), MACRO
 declaration, saving sequences onto files in MAD-X or MAD-8 format, and
 so on.  
 
-
+\input{control/special}
 %% \subsection{Program flow control}
 %% \begin{itemize}
 %% 	\item \href{special.html#if}{IF}
@@ -30,7 +29,7 @@ so on.
 %% 	\item \href{special.html#macro}{MACRO}
 %% \end{itemize}
 
-
+\input{control/general}
 %% \subsection{General control}
 %% \begin{itemize}
 %% 	\item \href{general.html#assign}{ASSIGN}
@@ -64,7 +63,9 @@ so on.
 %% \end{itemize}
 
 
-
+\input{Introduction/beam}
+\input{Introduction/resbeam}
+\input{Introduction/bv_flag}
 %% \subsection{Beam specification}
 %% \begin{itemize}
 %% 	\item \href{../Introduction/beam.html}{BEAM}
@@ -72,6 +73,8 @@ so on.
 %% \end{itemize}
 
 
+
+%%% The rest has been relocated in other parts of the manual...
 
 %% \subsection{PLOT}
 %% \begin{itemize}
@@ -95,10 +98,5 @@ so on.
 
 %% \href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
 
-\input{control/special}
-\input{control/general}
-\input{Introduction/beam}
-\input{Introduction/resbeam}
-\input{Introduction/bv_flag}
-%\input{plot/plot}
+
 

@@ -6,14 +6,14 @@
 A thin element describing the edge focusing of a dipole has been
 introduced in order to make it possible to track trajectories in the
 presence of dipoles with pole face angles. Only linear terms are
-considered since the higher order terms would the tracking
+considered since the higher order terms would make the tracking
 non-symplectic. The transformation of the machine elements into thin
 lenses leaves dipedge untouched and splits correctly the SBENDS's.  
 
 It does not make sense to use it alone. It can be specified at the
 entrance and the exit of a SBEND. They are defined by the commands:  
 \begin{verbatim}
-label : dipedge, h = real, e1 = real, fint = real, hgap = real, tilt = real;
+label : dipedge, h=real, e1=real, fint=real, hgap=real, tilt=real;
 \end{verbatim} 
 
 It has zero length and five attributes. 
