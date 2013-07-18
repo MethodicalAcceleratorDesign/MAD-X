@@ -21,13 +21,17 @@ Note the factorial in the denominator. The field coefficients have the following
      positive \textit{y} direction; a positive field bends a positively
      charged particle to the right.  
    \item \textit{B}$_1$: Quadrupole coefficient \\
-     \textit{B}$_1$ = (del \textit{B$_y$} / del \textit{x});\\ 
+%     \textit{B}$_1$ = (del \textit{B$_y$} / del \textit{x});\\ 
+     \( \textit{B}_1 = ( \partial \textit{B}_y / \partial \textit{x} ) \);\\ 
      a positive value corresponds to horizontal focussing of a
      positively charged particle. 
    \item \textit{B}$_2$: Sextupole coefficient \\
-     \textit{B}$_2$ =  (del$^2$\textit{B$_y$} / del \textit{x}$^2$). 
+%     \textit{B}$_2$ =  (del$^2$\textit{B$_y$} / del \textit{x}$^2$). 
+     \( \textit{B}_2 =  ( \partial^2 \textit{B}_y / \partial \textit{x}^2 ) \). 
    \item \textit{B}$_3$: Octupole coefficient \\ 
-     \textit{B}$_3$ =  (del$^3$\textit{B$_y$} / del \textit{x}$^3$). 
+%     \textit{B}$_3$ =  (del$^3$\textit{B$_y$} / del \textit{x}$^3$). 
+     \( \textit{B}_3 =  ( \partial^3 \textit{B}_y / \partial \textit{x}^3 ) \). 
+   \item \ldots
 \end{itemize} 
 
 Using this expansion and the curvature \textit{h} of the reference orbit, the longitudinal component of the vector potential to order 4 is: 
@@ -45,7 +49,8 @@ A_x =
 \end{aligned}
 \]
 
-Taking curl \textit{A} in curvilinear coordinates, the field components can be computed as 
+Taking \(\vec{B} = \nabla \times \vec{A}\) in curvilinear coordinates,
+the field components can be computed as  
 
 %%\includegraphics{null}
 %Taylor_B
@@ -60,12 +65,15 @@ B_y(x,y)=
 \end{aligned}
 \]
 
-It can be easily verified that both curl \textit{B} and div \textit{B}
-are zero to the order of the \textit{B}$_3$ term. Introducing the
-magnetic rigidity \textit{B}rho, the multipole coefficients are computed
-as  
+It can be easily verified that both \(\nabla \times \vec{\textit{B}}\)
+and \(\nabla . \vec{\textit{B}}\) are zero to the order of the
+\(\textit{B}_3\) term.  
 
-\textit{K$_n$} = \textit{e B$_n$ / p$_s$} =  \textit{B$_n$ / B} rho. 
+Introducing the magnetic rigidity \(\textit{B}\rho = p_s / q\) as the
+momentum of the particle divided by its charge, the multipole
+coefficients are computed as   
+%\textit{K$_n$} = \textit{e B$_n$ / p$_s$} =  \textit{B$_n$ / B} rho. 
+\[ \textit{K}_n = \textit{q B}_n / \textit{p}_s  =  \textit{B}_n / \textit{B} \rho \] 
 
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 

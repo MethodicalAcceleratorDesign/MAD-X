@@ -40,7 +40,7 @@ The independent variable is:
           orbit, [m].   
 \end{itemize} 
 
-In the limit of fully relativistic particles (gamma $>$$>$ 1, \textit{v
+In the limit of fully relativistic particles (gamma $\gg$ 1, \textit{v
   = c}, \textit{p c = E}), the variables T, PT used here agree with the
 longitudinal variables used in
 \href{bibliography.html#transport}{[TRANSPORT]}. This means that T
@@ -76,8 +76,9 @@ constant in order to keep the system canonical.
           PHIT = + atan(\textit{p$_{tn}$ / t$_n$}) / 2 pi [1].     
 \end{itemize} 
 
-In the above formulas \textit{Z} is the phase space vector \\
-\textit{Z = ( x, p$_x$, y, p$_y$, t, p$_t$)$^T$},
+In the above formulas \textit{Z} is the phase space vector
+\textit{Z = ( x, p$_x$, y, p$_y$, t, p$_t$)$^T$}, the vectors
+\textit{E$_i$} are the three complex eigenvectors and  
 the matrix \textit{S} is the ``symplectic unit matrix'' 
 %%\includegraphics{../equations/S_matrix.gif}
 %S_matrix
@@ -91,9 +92,8 @@ S =
   0 & 0 & 0 & 0 & 0 & 1 \\
   0 & 0 & 0 & 0 & -1 & 0 \\
  \end{pmatrix}
-,
 \]
-and the vectors \textit{E$_i$} are the three complex eigenvectors. 
+
 
 \subsection{\href{linear}{Linear Lattice Functions (Optical Functions)}} 
 
@@ -143,19 +143,23 @@ The linear lattice functions are known to MAD under the following names:
 
 
 \subsection{\href{chrom}{Chromatic Functions}} 
-Several MAD commands refer to the chromatic functions. (\textit{p$_x$},
-\textit{p$_y$}) instead of the slopes (\textit{x}', \textit{y}'), their
-definitions differ slightly from those in
-\href{bibliography.html#montague}{[Montague]}. Notice that in MAD-X PT
-substitutes DELTAP as longitudinal variable. Dispersive and chromatic
-functions are hence derivatives with respects to PT. Being
-PT=BETA*DELTAP, where BETA is the relativistic Lorentz factor, those
-functions must be multiplied by BETA a number of time equal to the order
-of the derivative. The chromatic functions are known to MAD under the
-following names:  
+Several MAD commands refer to the chromatic functions. 
+
+Because MAD-X uses the (\textit{p$_x$}, \textit{p$_y$}) coordinates
+instead of the slopes (\textit{x}', \textit{y}'), the definition of the
+chromatic functions in MAD-X differ slightly from those in
+\href{bibliography.html#montague}{[Montague]}.  
+
+Notice also that in MAD-X, PT substitutes DELTAP as longitudinal
+variable. Dispersive and chromatic functions are hence derivatives with
+respects to PT. Since we have PT=BETA*DELTAP, where BETA is the
+relativistic Lorentz factor, those functions must be multiplied by BETA
+a number of time equal to the order of the derivative. The chromatic
+functions are known to MAD under the following names:  
 
 \textit{Please note that this option is needed for a proper calculation
   of the chromaticities in the presence of coupling!} 
+
 \begin{itemize}
    \item WX: Chromatic amplitude function \textit{W$_x$}, [1]:\\
      WX = \textit{W$_x$} = sqrt(\textit{a$_x$$^2$ + b$_x$$^2$}),\\

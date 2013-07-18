@@ -110,7 +110,7 @@ static double crms(double *r, int m) {
 		xrms = xrms + (xave - r[i]) * (xave - r[i]);
 	}
 	xrms = sqrt(xrms / m);
-  
+
 	return (xrms);
 }
 
@@ -136,7 +136,7 @@ static double copk(double *r, int m) {
 	for (i = 0; i < m; i++) {
 		if (fabs(r[i]) > xpk) xpk = fabs(r[i]);
 	}
-  
+
 	return (xpk);
 }
 
@@ -1582,21 +1582,21 @@ static void correct_correct1(struct in_cmd* cmd)
 	/* If only Twiss summary is required prepare and write it */
 	// Jun 26, 2013 8:06:33 PM ghislain : moved up from **twiss summary**
 	if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
-		if (ftdata == NULL ) {
-			if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-				exit(99);
-		}
-		j = 1;
-		if ((nnnseq = get_variable("n")) == 0) {
-			nnnseq = twism;
-		}
-		double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
-		double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
-		double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
-		double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
-		fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
-		printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
-		return; // abort the correction here
+	  if (ftdata == NULL ) {
+	    if ((ftdata = fopen("twiss.summ", "w")) == NULL )
+	      exit(99);
+	  }
+	  j = 1;
+	  if ((nnnseq = get_variable("n")) == 0) {
+	    nnnseq = twism;
+	  }
+	  double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
+	  double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
+	  double_from_table_row("summ", "ycomax", &j, &tmp3); // err = not used
+	  double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
+	  fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
+	  printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
+	  return; // abort the correction here
 	}
 
 	ip = pro_correct_getcommands(cmd);
@@ -1606,32 +1606,31 @@ static void correct_correct1(struct in_cmd* cmd)
 	printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
 
 	if (nmon == 0) {
-		printf("No monitor found in input, no correction done\n");
-		return;
+	  printf("No monitor found in input, no correction done\n");
+	  return;
 	}
 
 	if (ncorr == 0) {
-		printf("No corrector found in input, no correction done\n");
-		return;
+	  printf("No corrector found in input, no correction done\n");
+	  return;
 	}
 
 	/* For debugging set output buffer to zero */
-	if (debug)
-		setbuf(stdout, NULL );
+	if (debug) setbuf(stdout, NULL );
 
 	/* Prepare file descriptors for the output */
 	if (command_par_value("resout", cmd->clone) > 0) {
-		if (fddata == NULL ) {
-			if ((fddata = fopen("corr.out", "w")) == NULL )
-				exit(99);
-		}
-		if (fcdata == NULL ) {
-			if ((fcdata = fopen("stren.out", "w")) == NULL )
-				exit(99);
-		}
+	  if (fddata == NULL ) {
+	    if ((fddata = fopen("corr.out", "w")) == NULL )
+	      exit(99);
+	  }
+	  if (fcdata == NULL ) {
+	    if ((fcdata = fopen("stren.out", "w")) == NULL )
+	      exit(99);
+	  }
 	}
 
-    // Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
+	// Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
 
 	/* allocate vectors used by correction algorithms */
 	nx = mycalloc("correct_correct_nx",ncorr,sizeof(int));
@@ -1649,9 +1648,9 @@ static void correct_correct1(struct in_cmd* cmd)
 	/* get input orbit, default is from input Twiss-table */
 	/* if flag "extern" is true: can be from external table */
 	if (command_par_value("extern", cmd->clone))
-		pro_correct_getorbit_ext(cmd); // it = not used
+	  pro_correct_getorbit_ext(cmd); // it = not used
 	else
-		pro_correct_getorbit(cmd); // it = not used
+	  pro_correct_getorbit(cmd); // it = not used
 
 	/* find and prepare enabled correctors and monitors, may be repeated */
 	ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
@@ -1661,163 +1660,173 @@ static void correct_correct1(struct in_cmd* cmd)
 
 	/* normalized cut on beam position, if requested */
 	if ((sigcut = command_par_value("moncut", cmd->clone)) > 0) {
-		idrop = pro_correct_filter(ip, sigcut);
-		printf("Disabled %d monitors with %-2.2f sigma cut\n", idrop, sigcut);
-		ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-		icor = ix % 10000;
-		imon = ix / 10000;
-		printf("After filter of %-2.2f sigma:\n", sigcut);
-		printf("%d monitors and %d correctors enabled\n", imon, icor);
+	  idrop = pro_correct_filter(ip, sigcut);
+	  printf("Disabled %d monitors with %-2.2f sigma cut\n", idrop, sigcut);
+	  ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+	  icor = ix % 10000;
+	  imon = ix / 10000;
+	  printf("After filter of %-2.2f sigma:\n", sigcut);
+	  printf("%d monitors and %d correctors enabled\n", imon, icor);
 	}
 
 	/* set up response matrix for ring or line */
 	corl = correct_orbit->cor_table;
+
 	if (strcmp("ring", command_par_string("flag", cmd->clone)) == 0) {
-		if (dmat != NULL )
-			myfree(rout_name, dmat);
-		/* icor and imon used to set up correct matrix size !! */
-		dmat = pro_correct_response_ring(ip, icor, imon);
+	  if (dmat != NULL ) myfree(rout_name, dmat);
+	  /* icor and imon used to set up correct matrix size !! */
+	  dmat = pro_correct_response_ring(ip, icor, imon);
+	  
+	  if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
+	    sngcut = command_par_value("sngcut", cmd->clone);
+	    sngval = command_par_value("sngval", cmd->clone);
+	    printf("SVD conditioning requested ...\n");
+	    if (debug) printf("Conditioning parameters: %e %e\n", sngcut, sngval);
+	    
+	    /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
+	    sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
+	    printf("Initially found %d singular values\n", sflag);
+	    /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
+	    
+	    for (ix = 0; ix < sflag; ix++) {
+	      corl[nx[sing[2 * ix + 0]]].enable = 0;
+	      if (dbg == 1)
+		printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
+		       corl[nx[sing[2 * ix + 0]]].p_node->name);
+	    }
+	    
+	    ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+	    icor = ix % 10000;
+	    imon = ix / 10000;
+	    
+	    printf("After SVD conditioning:             \n");
+	    printf("%d monitors and %d correctors enabled\n\n", imon, icor);
+	    
+	    if (dmat != NULL ) myfree(rout_name, dmat);
+	    
+	    /* icor and imon used to set up correct matrix size !! */
+	    dmat = pro_correct_response_ring(ip, icor, imon);
+	    sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
+	    printf("Finally found %d singular values\n", sflag);
+	  }
 
-		if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
-			sngcut = command_par_value("sngcut", cmd->clone);
-			sngval = command_par_value("sngval", cmd->clone);
-			printf("SVD conditioning requested ...\n");
-			if (debug)
-				printf("Conditioning parameters: %e %e\n", sngcut, sngval);
-
-			/* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
-			sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
-			printf("Initially found %d singular values\n", sflag);
-			/* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
-
-			for (ix = 0; ix < sflag; ix++) {
-				corl[nx[sing[2 * ix + 0]]].enable = 0;
-				if (dbg == 1)
-					printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
-							corl[nx[sing[2 * ix + 0]]].p_node->name);
-			}
-
-			ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-			icor = ix % 10000;
-			imon = ix / 10000;
-
-			printf("After SVD conditioning:             \n");
-			printf("%d monitors and %d correctors enabled\n\n", imon, icor);
-
-			if (dmat != NULL )
-				myfree(rout_name, dmat);
-			/* icor and imon used to set up correct matrix size !! */
-			dmat = pro_correct_response_ring(ip, icor, imon);
-			sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
-			printf("Finally found %d singular values\n", sflag);
-		}
 	} else if (strcmp("line", command_par_string("flag", cmd->clone)) == 0) {
-		if (dmat != NULL )
-			myfree(rout_name, dmat);
-		printf("make response for line\n");
-		dmat = pro_correct_response_line(ip, icor, imon);
-
-		if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
-			sngcut = command_par_value("sngcut", cmd->clone);
-			sngval = command_par_value("sngval", cmd->clone);
-			printf("SVD conditioning requested ...\n");
-			if (debug)
-				printf("Conditioning parameters: %e %e\n", sngcut, sngval);
-
-			/* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
-			sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
-			printf("Initially found %d singular values\n", sflag);
-			/* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
-			/* printf("sflag: %d\n",sflag); */
-			for (ix = 0; ix < sflag; ix++) {
-				corl[nx[sing[2 * ix + 0]]].enable = 0;
-				if (dbg == 1)
-					printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
-							corl[nx[sing[2 * ix + 0]]].p_node->name);
-
-			}
-			ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-			icor = ix % 10000;
-			imon = ix / 10000;
-			printf("After SVD conditioning:             \n");
-			printf("%d monitors and %d correctors enabled\n\n", imon, icor);
-			if (dmat != NULL )
-				myfree(rout_name, dmat);
-			/* icor and imon used to set up correct matrix size !! */
-			dmat = pro_correct_response_ring(ip, icor, imon);
-			sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
-			printf("Finally found %d singular values\n", sflag);
-		}
+	  if (dmat != NULL ) myfree(rout_name, dmat);
+	  printf("make response for line\n");
+	  dmat = pro_correct_response_line(ip, icor, imon);
+	  
+	  if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
+	    sngcut = command_par_value("sngcut", cmd->clone);
+	    sngval = command_par_value("sngval", cmd->clone);
+	    printf("SVD conditioning requested ...\n");
+	    if (debug)
+	      printf("Conditioning parameters: %e %e\n", sngcut, sngval);
+	    
+	    /* printf("Time before svd-comd:  %-6.3f\n",fextim());    */
+	    sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
+	    printf("Initially found %d singular values\n", sflag);
+	    /* printf("Time after svd-cond:  %-6.3f\n",fextim());     */
+	    /* printf("sflag: %d\n",sflag); */
+	    for (ix = 0; ix < sflag; ix++) {
+	      corl[nx[sing[2 * ix + 0]]].enable = 0;
+	      if (dbg == 1)
+		printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
+		       corl[nx[sing[2 * ix + 0]]].p_node->name);
+	      
+	    }
+	    ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
+	    icor = ix % 10000;
+	    imon = ix / 10000;
+	    printf("After SVD conditioning:             \n");
+	    printf("%d monitors and %d correctors enabled\n\n", imon, icor);
+	    if (dmat != NULL )
+	      myfree(rout_name, dmat);
+	    /* icor and imon used to set up correct matrix size !! */
+	    dmat = pro_correct_response_ring(ip, icor, imon);
+	    sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
+	    printf("Finally found %d singular values\n", sflag);
+	  }
 	}
 
-	else {
-		printf("INVALID MACHINE TYPE\n");
-		exit(-1);
+	else { // neither ring nor line
+	   printf("INVALID MACHINE TYPE\n");
+	   exit(-1);
 	}
 
 	if (debug) {
-		pro_correct_prtwiss();
-		pro_correct_write_cocu_table();
+	   pro_correct_prtwiss();
+	   pro_correct_write_cocu_table();
 	}
 
-	/* LSQ correction, use all available correctors */
-	if (strcmp("lsq", command_par_string("mode", cmd->clone)) == 0) {
-		/*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
-		// if (debug) printf("Time before lsq:  %-6.3f\n",fextim());
-		c_haveit(dmat, monvec, corvec, resvec, nx, imon, icor);
-		// if (debug) printf("Time after lsq:  %-6.3f\n",fextim());
-		pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
-				icor, ip);
-	}
 
-	/* SVD correction, use all available correctors */
-	if (strcmp("svd", command_par_string("mode", cmd->clone)) == 0) {
-		/*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
-		// if (debug) printf("Time before svd-corr:  %-6.3f\n",fextim());
-		sflag = c_svdcorr(dmat, monvec, corvec, resvec, nx, imon, icor);
-		// if (debug) printf("Time after svd-corr:  %-6.3f\n",fextim());
-		pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
-				icor, ip);
-	}
-
-	/* MICADO correction, get desired number of correctors from command */
+	/*  2013-Jul-17  19:41:55  ghislain: moved up from in between the SVD and MICADO corrections */
 	corrl = command_par_value("corrlim", cmd->clone);
 	set_variable("corrlim", &corrl);
 
-	if (strcmp("micado", command_par_string("mode", cmd->clone)) == 0) {
-		printf("enter MICADO correction ...\n");
 
-		niter = command_par_value("ncorr", cmd->clone);
-		if (niter == 0) {
-			printf("Requested %d correctors (\?\?\?) set to %d\n", niter, icor);
-			niter = icor;
-		} else if (niter < 0) {
-			printf("Requested %d correctors (\?\?\?) set to 0\n", niter);
-			niter = 0;
-		} else if (niter > icor) {
-			printf("Fewer correctors available than requested by ncorr\n");
-			printf("you want %d,  you get %d\n", niter, icor);
-			printf("ncorr reset to %d\n", icor);
-			niter = icor;
-		}
+	/* Switch block between LSQ, SVD and MICADO correction methods... */
 
-		// 2013-Jun-24  10:57:43  ghislain: why the multiplication by 1000 ?
-		rms = 1000.0 * command_par_value("error", cmd->clone);
+	/* LSQ correction, use all available correctors */
+	if (strcmp("lsq", command_par_string("mode", cmd->clone)) == 0) {
+	   /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
+	   // if (debug) printf("Time before lsq:  %-6.3f\n",fextim());
+	   c_haveit(dmat, monvec, corvec, resvec, nx, imon, icor);
+	   // if (debug) printf("Time after lsq:  %-6.3f\n",fextim());
+	   pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
+				     icor, ip);
+	}
 
-		/*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
-		// if (debug) printf("Time before micado:  %-6.3f\n",fextim());
-		ifail = c_micit(dmat, conm, monvec, corvec, resvec, nx, rms, imon, icor,
-				niter);
-		// if (debug) printf("Time after micado:  %-6.3f\n",fextim());
+	/* SVD correction, use all available correctors */
+	else if (strcmp("svd", command_par_string("mode", cmd->clone)) == 0) {
+	   /*frs haveit_(dmat,monvec,corvec,resvec,nx,&imon,&icor); */
+	   // if (debug) printf("Time before svd-corr:  %-6.3f\n",fextim());
+	   sflag = c_svdcorr(dmat, monvec, corvec, resvec, nx, imon, icor);
+	   // if (debug) printf("Time after svd-corr:  %-6.3f\n",fextim());
+	   pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
+				     icor, ip);
+	}
 
-		if (ifail == 0)
-			pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
-					icor, ip);
-		else {
-			printf("MICADO correction completed with error code %d\n\n", ifail);
-			warning("MICADO back with error", ", no correction done");
-		}
+	/*  2013-Jul-17  19:41:55  ghislain: why is this appearing here ? it should be above 
+	    before LSQ/SVD/MICADO selection block. Moved... */
+	/* corrl = command_par_value("corrlim", cmd->clone); */
+	/* set_variable("corrlim", &corrl); */
 
+	/* MICADO correction, get desired number of correctors from command */
+	else if (strcmp("micado", command_par_string("mode", cmd->clone)) == 0) {
+	   printf("enter MICADO correction ...\n");
+
+	   niter = command_par_value("ncorr", cmd->clone);
+	   if (niter == 0) {
+	      printf("Requested %d correctors (\?\?\?) set to %d\n", niter, icor);
+	      niter = icor;
+	   } else if (niter < 0) {
+	      printf("Requested %d correctors (\?\?\?) set to 0\n", niter);
+	      niter = 0;
+	   } else if (niter > icor) {
+	      printf("Fewer correctors available than requested by ncorr\n");
+	      printf("you want %d,  you get %d\n", niter, icor);
+	      printf("ncorr reset to %d\n", icor);
+	      niter = icor;
+	   }
+
+	   // 2013-Jun-24  10:57:43  ghislain: why the multiplication by 1000 ?
+	   rms = 1000.0 * command_par_value("error", cmd->clone);
+
+	   /*frs       micit_(dmat,monvec,corvec,resvec,nx,&rms,&imon,&icor,&niter); */
+	   // if (debug) printf("Time before micado:  %-6.3f\n",fextim());
+	   ifail = c_micit(dmat, conm, monvec, corvec, resvec, nx, rms, imon, icor, niter);
+	   // if (debug) printf("Time after micado:  %-6.3f\n",fextim());
+
+	   if (ifail == 0)
+	      pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+	   else {
+	      printf("MICADO correction completed with error code %d\n\n", ifail);
+	      warning("MICADO back with error", ", no correction done");
+	   }
+	}
+	else { // neither ring nor line
+	  printf("INVALID CORRECTION TYPE\n");
+	  exit(-1);
 	}
 
 	/* write corrector output to tfs table */
@@ -1851,11 +1860,12 @@ static void correct_correct(struct in_cmd* cmd)
 	/* Call for one or two ring orbit correction */
 	// Jun 25, 2013 2:51:50 PM ghislain : FIXME - This option is not documented
 	if (command_par_value("tworing", cmd->clone)) {
+		printf("Want to correct orbit for two rings\n");
 
-		// this tests only whether a parameter was supplied; the validity of the parameter is tested in pro_correct2_gettables
+		// the following tests only whether a parameter was supplied;
+	    // the validity of the parameter is tested in pro_correct2_gettables
 		if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) == NULL )
 			fatal_error("Two beam correction requested but no table supplied for beam 1", orbtab1);
-
 		if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) == NULL )
 			fatal_error("Two beam correction requested but no table supplied for beam 2", orbtab2);
 
@@ -2993,7 +3003,7 @@ static void pro_correct_make_mon_table(void) {
 	 */
 
 	ttb = model_table;
-  
+
 	for (j = 0; j < ttb->curr; j++) {
 		if ((strncmp(atm[0], ttb->p_nodes[j]->base_name, 4) == 0)
 				|| (strncmp(atm[1], ttb->p_nodes[j]->base_name, 4) == 0)
@@ -3115,82 +3125,84 @@ static void pro_correct_write_results(double *monvec, double *resvec,
 	c = correct_orbit->cor_table;
 
 	if (fddata != NULL ) {
-		rst = get_variable("n");
-		fprintf(fddata, "%d %d %e %e %e %e %e %e\n", ip, rst,
-				cprp(monvec, imon), cprp(resvec, imon), crms(monvec, imon),
-				crms(resvec, imon), copk(monvec, imon), copk(resvec, imon));
+	   rst = get_variable("n");
+	   fprintf(fddata, "%d %d %e %e %e %e %e %e\n", ip, rst,
+		   cprp(monvec, imon), cprp(resvec, imon), crms(monvec, imon),
+		   crms(resvec, imon), copk(monvec, imon), copk(resvec, imon));
 	}
 
 	if (print_correct_opt > 0) {
-		printf("CORRECTION SUMMARY:   \n\n");
-		printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",
-				crms(monvec, imon), crms(resvec, imon));
-		printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",
-				cprp(monvec, imon), cprp(resvec, imon));
+	   printf("CORRECTION SUMMARY:   \n\n");
+	   printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",
+		  crms(monvec, imon), crms(resvec, imon));
+	   printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",
+		  cprp(monvec, imon), cprp(resvec, imon));
 	}
 
 	if (print_correct_opt > 1) {
-		printf("Monitor:  Before:     After:    Difference:\n");
-		printf("           (mm)        (mm)         (mm)   \n");
+	   printf("Monitor:  Before:     After:    Difference:\n");
+	   printf("           (mm)        (mm)         (mm)   \n");
 	}
 
 	for (i = 0; i < imon; i++) {
-		if (print_correct_opt > 1) {
-			printf("%s   %-4.3f     %-4.3f     %-4.3f\n", m[nm[i]].p_node->name,
-					monvec[i], resvec[i], resvec[i] - monvec[i]);
-		}
-		m[nm[i]].val.after[ip - 1] = resvec[i];
-		pro_correct_fill_mon_table(ip, m[nm[i]].p_node->name, monvec[i],
-				resvec[i]);
+	   if (print_correct_opt > 1) {
+	     printf("%s   %-4.3f     %-4.3f     %-4.3f\n", m[nm[i]].p_node->name,
+		    monvec[i], resvec[i], resvec[i] - monvec[i]);
+	   }
+	   m[nm[i]].val.after[ip - 1] = resvec[i];
+	   pro_correct_fill_mon_table(ip, m[nm[i]].p_node->name, monvec[i],
+				      resvec[i]);
 	}
 
 	corrm = copk(corvec, icor);
 
-	printf("Max strength: %e should be less than %e\n", corrm, corrl);
 	if (corrm > corrl) {
-		printf(
-				"++++++ warning: maximum corrector strength larger than limit\n");
+	   printf("Max strength: %e should be less than corrector strength limit: %e\n", corrm, corrl);
+	   printf("++++++ warning: maximum corrector strength larger than limit\n");
+	} else {
+	   printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
 	}
+
 	set_variable("corrmax", &corrm);
 	if (print_correct_opt > 1) {
-		printf("Max strength: %e\n", copk(corvec, icor));
-		printf("Corrector:  Before:     After:    Difference:\n");
-		printf("             (mrad)     (mrad)       (mrad)  \n");
+	   printf("Max strength: %e\n", copk(corvec, icor));
+	   printf("Corrector:  Before:     After:    Difference:\n");
+	   printf("             (mrad)     (mrad)       (mrad)  \n");
 	}
 
 	for (i = 0; i < icor; i++) { /* loop over all correctors */
 
-		if (print_correct_opt > 1) {
-			printf("%s %-3.6f %-3.6f %-3.6f\n", c[nc[i]].p_node->name,
-					c[nc[i]].val.before[ip - 1],
-					corvec[nx[i] - 1] + c[nc[i]].val.before[ip - 1],
-					corvec[nx[i] - 1]);
-		}
+	   if (print_correct_opt > 1) {
+	      printf("%s %-3.6f %-3.6f %-3.6f\n", c[nc[i]].p_node->name,
+		     c[nc[i]].val.before[ip - 1],
+		     corvec[nx[i] - 1] + c[nc[i]].val.before[ip - 1],
+		     corvec[nx[i] - 1]);
+	   }
 
-		c[nc[i]].val.after[ip - 1] = corvec[nx[i] - 1];
-		if (ip == 1) {
-			c[nc[i]].p_node->chkick += c[nc[i]].p_node->other_bv * 0.001
-					* corvec[nx[i] - 1];
-			pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
-					c[nc[i]].val.before[ip - 1] * 0.001,
-					c[nc[i]].p_node->chkick);
-			/*                                c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
-			if (fcdata != NULL ) {
-				fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
-						c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
-			}
-		} else if (ip == 2) {
-			c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001
-					* corvec[nx[i] - 1];
-			pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
-					c[nc[i]].val.before[ip - 1] * 0.001,
-					c[nc[i]].p_node->cvkick);
-			/*                                c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
-			if (fcdata != NULL ) {
-				fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
-						c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
-			}
-		}
+	   c[nc[i]].val.after[ip - 1] = corvec[nx[i] - 1];
+	   if (ip == 1) {
+	      c[nc[i]].p_node->chkick += c[nc[i]].p_node->other_bv * 0.001
+		* corvec[nx[i] - 1];
+	      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
+					  c[nc[i]].val.before[ip - 1] * 0.001,
+					  c[nc[i]].p_node->chkick);
+	      /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
+	      if (fcdata != NULL ) {
+	 	 fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
+			 c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
+	      }
+	   } else if (ip == 2) {
+	      c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001
+		* corvec[nx[i] - 1];
+	      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
+					  c[nc[i]].val.before[ip - 1] * 0.001,
+					  c[nc[i]].p_node->cvkick);
+	      /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
+	      if (fcdata != NULL ) {
+		 fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
+			 c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
+	      }
+	   }
 	} /* end of loop ove correctors */
 }
 
@@ -3349,9 +3361,9 @@ void pro_correct(struct in_cmd* cmd) {
 	} else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0) {
 		correct_usemonitor(cmd);
 	} else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0) {
-		correct_getorbit(cmd); // obsolete command; should be flagged and not call anything...
+		correct_getorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
 	} else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0) {
-		correct_putorbit(cmd); // obsolete command; should be flagged and not call anything...
+		correct_putorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
 	} else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0) {
 		read_my_table(cmd);
 	} else if (strcmp(cmd->tok_list->p[0], "readcorr") == 0) {

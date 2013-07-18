@@ -15,7 +15,7 @@ for
    \item \href{sextupole.html}{Sextupole}, 
    \item \href{octupole.html}{Octupole}, 
    \item \href{solenoid.html}{Solenoid}, 
-   \item \href{crabcavity.html}{CRABCAVITY}, 
+   \item \href{crabcavity.html}{Crab cavity}, 
    \item \href{cavity.html}{RF cavity}, 
    \item \href{separator.html}{Electrostatic separator}, 
    \item \href{kickers.html}{Closed orbit corrector}, 
@@ -45,6 +45,7 @@ S =
 A rotation of the element about the \textit{S}-axis has no effect on
 \textit{R} and \textit{S}, since the rotations of the reference system
 before and after the element cancel.  
+
 %%\begin{center}
 %%\includegraphics{null}
 \begin{figure}[H]
@@ -53,6 +54,7 @@ before and after the element cancel.
   \caption{Reference System for Straight Beam Elements}
 %\\\textbf{Figure 1:} Reference System for Straight Beam Elements 
 \end{figure}
+
 
 
 \subsection{\href{rbend}{Reference System for Bending Magnets}}
@@ -84,7 +86,9 @@ to the right, i.e. towards negative \textit{x} values. For sector
 bending magnets, the bend radius is given by rho, and for rectangular
 bending magnets it has the value  
 
- rho = \textit{L} / 2 sin(alpha/2). 
+\( \rho = \frac{L}{2 sin(\alpha/2)} \)
+
+ rho = \textit{L} / (2 sin(alpha/2)). 
 
 If the magnet is rotated about the \textit{s}-axis by an angle psi,
 \textit{R} and \textit{S} are transformed by  
@@ -127,21 +131,9 @@ The special value psi = pi/2 represents a bend down.
 \end{figure}
 
 
-\subsection{Elements which do not Change the Local Reference}
-\href{marker.html}{MARKER} elements do not  affect the reference orbit. They are ignored for geometry calculations.  
+%\subsection{Elements which do not Change the Local Reference}
+\subsection{Marker Elements}
+\href{marker.html}{MARKER} elements do not  affect the reference orbit. 
+They are ignored for geometry calculations.  
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, January 24, 1997 
-
-
-% add other files to the end of this file
-
-%\input{Introduction/drift}
-%\input{Introduction/quadrupole}
-%\input{Introduction/sextupole}
-%\input{Introduction/octupole}
-%\input{Introduction/solenoid}
-%\input{Introduction/crabcavity}
-%\input{Introduction/cavity}
-%\input{Introduction/separator}
-%\input{Introduction/kickers}
-%\input{Introduction/monitors}

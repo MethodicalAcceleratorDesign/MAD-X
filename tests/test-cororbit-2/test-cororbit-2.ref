@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 05.02.13 17.31.54 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 17.07.13 20.10.39 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -391,6 +391,7 @@ CORRECT, FLAG=ring,
 
          mlist='mx12.tab',clist='cx12.tab', RESOUT=1,corzero=1;
 
+Want to correct orbit for two rings
 Want to use orbits from: twb1 and : twb2
 for two beams orbit corrections ...
 Want to use orbit from: twb1
@@ -507,5 +508,5 @@ orbit:   3.932110E-05 -8.382999E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
