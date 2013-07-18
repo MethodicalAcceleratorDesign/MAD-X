@@ -67,7 +67,8 @@ update is on
 exit TRACK module
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.01.02 (64 bit) finished normally +
