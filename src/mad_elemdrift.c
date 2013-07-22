@@ -27,7 +27,11 @@ int
 add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
-  int cnt;
+  int cnt; 
+  
+  int debug;
+
+  debug = get_option("debug");
 
   if (!c_node) return 0;
 
@@ -35,12 +39,20 @@ add_drifts(struct node* c_node, struct node* end)
     double drift_beg = c_node->position + c_node->length / 2;
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;
-
+ 
     if (drift_len < -tol) {
       // implicit drift with negative length
       char buf[256];
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
-      fatal_error("negative drift between elements", buf);
+ 
+      if (debug) {
+	printf("\ncurrent node name %s position: %e length %e \n", 
+	       c_node->name, c_node->position, c_node->length);
+	printf("next    node name %s position: %e length %e \n\n", 
+	       c_node->next->name, c_node->next->position, c_node->next->length);    
+      }
+
+     fatal_error("negative drift between elements", buf);
     }
     else if (drift_len > tol) {
       // create or share 'long-enough' implicit drift
@@ -48,7 +60,9 @@ add_drifts(struct node* c_node, struct node* end)
       struct node *drift_node = new_elem_node(drift, 0);
       link_in_front(drift_node, c_node->next);
       drift_node->position = drift_beg + drift_len / 2;
-      cnt++;
+      if (debug) printf("inserting a drift of length %e at position %e \n \n",
+			drift_len,drift_beg + drift_len / 2);
+      cnt++; 
     }
     else 
       // length in [-tol, tol], nothing to do (no drift inserted)

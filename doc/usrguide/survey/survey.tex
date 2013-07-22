@@ -5,40 +5,54 @@
 %  Changed by: Andre Verdier, 14-Jan-2003 
 %  Directory :  /afs/cern.ch/eng/sl/MAD-X/pro/docu/survey/ 
  
-\chapter{GEOMETRIC LAYOUT}
-
-The SURVEY command computes the coordinates of all machine elements in a \href{../Introduction/conventions.html}{global reference system}. These coordinates can be used for installation. In order to produce coordinates in a particular system, the initial coordinates and angles can be specified. The computation results are written on an internal table (survey) and can be written on an external file. Each line contains the coordinates at the end of the element.
-\\ The last "USEd" sequence is used except if another one is specified.
-\\
------------------------------------------------------------------------------------------
-\\ WARNING : in the case a machine geometry is constructed with thick lenses, the circumference will change if the structure is converted into thin lenses (via the \href{../makethin/makethin.html}{makethin} command). This is an unavoidable feature. ONLY the structure with thick lenses must be used for practical purposes.
-\\ INFORMATION : The skew dipole component of a MULTIPOLE element (MULTIPOLE, KSL=\{FLOAT\}) is NOT taken into account in the survey calculation. You should use a tilted normal MULTIPOLE or BEND instead.
-\\
-\\
------------------------------------------------------------------------------------------
-\\ The survey calculation is launched by a single command line with the following syntax : 
-\\
-\\
+\chapter{SURVEY}
 
 \begin{verbatim}
 SURVEY, x0=double, y0=double, z0=double, 
         theta0=double, phi0=double, psi0=double,
         file=string, table=string, sequence=string;
-
-parameter   meaning                                     default value
-x0 	    initial horizontal transverse coordinate    0.0
-y0          initial vertical   transverse coordinate    0.0
-z0          initial longitudinal coordinate             0.0
-theta0      initial horizontal angle                    0.0
-phi0        initial vertical angle                      0.0
-psi0        initial transverse tilt                     0.0
-file        name of external file                       null (default name survey)
-table       name of internal table                      null (ignored, always table='survey')
-sequence    name of sequence to be surveyed             last used sequence
 \end{verbatim}
 
-\section{ Example : average LHC ring with CERN coordinates.}
+The SURVEY command computes the geometrical layout, i.e. the coordinates
+of all machine elements in a 
+\href{../Introduction/conventions.html}{global reference system}. These
+coordinates can be used for installation. In order to produce
+coordinates in a particular system, the initial coordinates and angles
+can be specified. The computation results are written on an internal
+table (survey) and can be written on an external file. Each line
+contains the coordinates at the end of the element. 
 
+The last "USEd" sequence is used except if another one is specified.
+\\
+\hrule
+WARNING : in the case a machine geometry is constructed with thick
+lenses, the circumference will change if the structure is converted into
+thin lenses (via the \href{../makethin/makethin.html}{makethin}
+command). This is an unavoidable feature. ONLY the structure with thick
+lenses must be used for practical purposes.
+
+INFORMATION : The skew dipole component of a MULTIPOLE element
+(MULTIPOLE, KSL=\{FLOAT\}) is NOT taken into account in the survey
+calculation. You should use a tilted normal MULTIPOLE or BEND instead.
+\\
+\hrule
+
+{\bf Parameters and Options:}
+\begin{itemize}
+\item {\bf x0, y0, z0}=real (Default: 0.0, 0.0, 0.0)\\
+initial horizontal, vertical and longitudinal coordinates 
+\item {\bf theta0, phi0, psi0}=real (Default: 0.0, 0.0, 0.0)\\
+initial horizontal and vertical angles  and transverse tilt
+\item {\bf file}=string (Default: survey)\\
+name of external file.
+\item {\bf table}=string (Default: survey)\\
+name of internal table. \\
+{\bf NOTE: this parameter is ignored and default value 'survey' is always used.}
+\item {\bf sequence}=string (Default: last used sequence)\\
+name of sequence to be surveyed.
+\end{itemize}
+
+{\bf Example : average LHC ring with CERN coordinates.}
 \begin{verbatim}
 real const R0 = 1.0;          ! to obtain the average ring
 OPTION, -echo, -info;
@@ -52,10 +66,9 @@ USE, period=lhcb1;
 SURVEY, x0=-2202.21027, z0=2710.63882, y0=2359.00656,
         theta0=-4.315508007, phi0=0.0124279564, psi0=-0.0065309236,
         file=survey.lhcb1;
-\href{../control/general.html#write}{WRITE}, table=survey; ! to display the results immediately
+write, table=survey; ! to display the results immediately
 STOP;
 !*********** The external file "survey.lhcb1" can now be read **************
 \end{verbatim}
-% There is a problem here. the "verbatim" command does not interpret "\href" as latex command. It is output as it is.
 
 %\textit{F.Tecker, March 2006}

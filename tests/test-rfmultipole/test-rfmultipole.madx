@@ -1,5 +1,5 @@
 title, 'test of rf-multipole';
-option, debug, -echo;
+option, -debug, -echo;
 
 bunchcharge := 2.e10;
 

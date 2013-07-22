@@ -493,7 +493,11 @@ get_refpos(struct sequence* sequ)
       fatal_error("'refpos' reference to unknown element:", sequ->refpos);
     return get_node_pos(sequ->nodes->nodes[i], sequ);
   }
-  else return zero;
+  // 2013-Jul-19  20:54:49  ghislain: if no element was specified for the refpos, 
+  // the ref position has to be the middle of the sequence and get_refpos should 
+  // therefore return half the sequence length. (TRAC ticket #206)  
+  // //  else return zero;
+  else return sequ->length/2.;
 }
 
 double

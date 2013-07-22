@@ -7,7 +7,7 @@
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
-option, debug, -echo;
+option, -debug, -echo;
 
 enter TRACK module
 one pass is on

@@ -7,7 +7,7 @@
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
-option, debug, -echo;
+option, -debug, -echo;
 
 rfm1->l =                    0 ;
 rfm1->freq =                 12 ;

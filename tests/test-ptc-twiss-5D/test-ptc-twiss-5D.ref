@@ -724,7 +724,7 @@ call, file="../share/LEIR/LEIR.seqx";
 
 ! Finally the whole LEIR ring
 
-  LEIR : SEQUENCE, REFER=CENTRE, L=8*(LstrH + LbenH);
+  LEIR : SEQUENCE, REFER=ENTRY, L=8*(LstrH + LbenH);
 
     SS10,  AT= 0; 
 

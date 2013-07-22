@@ -54,6 +54,7 @@ pro_use_survey(void)
 {
   /* Constructs artificial survey command for USE,SURVEY. 
      The survey data are stored at the nodes. */
+  /* 2013-Jul-18  19:17:06  ghislain: DOC undocumented feature ? */
   struct in_cmd* pro_use = new_in_cmd(10);
   struct name_list* usenl;
   int usepos;

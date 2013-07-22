@@ -12,45 +12,65 @@ by MAD-X.
 
 The corresponding sequence of statements defining a sequence is 
 \begin{verbatim}
-name: SEQUENCE, REFER = keyword, REFPOS = name, LENGTH = real, ADD_PASS = integer,
-NEXT_SEQU = 'seq_name'
-label: class, AT = real{,attributes} | class, AT = real | sequ_name, AT = real
-    ...
-ENDSEQUENCE
+name: SEQUENCE, REFER=keyword, REFPOS=name, L=real, AT=real, FROM=string
+                ADD_PASS=integer,
+                NEXT_SEQU='seq_name';
+...
+label: class, AT=real{,attributes}; 
+class, AT=real;
+sequ_name, AT=real;
+...
+ENDSEQUENCE;
 \end{verbatim} 
 where "real" means a real number, variable, or expression. 
 
-The first line gives the sequence name, a REFER flag (entry, centre, or
-exit) which specifies at which part of the element its position along
-the beam line will be given (default: centre), a REFPOS argument used
-for sequence insertion, and the total length. The ADD\_PASS=integer
-option specifies a number of additionnal passes (max. 5) through the
-structure; in case of an RBEND the angle will be overwritten in  survey
-using the i-th component (1 \textless = i \textless = add\_pass
-\textless= 5) of its array\_of\_angles (see \href{bend.html}{RBEND}. The
-NEXT\_SEQU='seq\_name' concatenates the sequence with name 'seq\_name'
-to the end of the specified sequence. 
+The first line declares a sequence with the given name and has several
+optional arguments:
+\begin{itemize}
+   \item {\bf REFER}=flag in \{entry, centre, exit\} (Default: centre) \\
+     The flag specifies at which part of the element its position along
+     the beam line will be given
+   \item {\bf REFPOS}=string (Default: none)\\
+     argument used for sequence insertion
+   \item {\bf L}=real (Default: 0.)\\
+     the total length of the sequence in meters. 
+   \item {\bf AT}=real (Default: 0)\\
+     ???
+   \item {\bf FROM=}string (Default: none)\\
+     ???
+   \item {\bf ADD\_PASS}=integer (Default: 0)\\ 
+     specifies a number of additionnal passes (max. 5) through the
+     structure; in case of an RBEND the angle will be overwritten in  survey
+     using the i-th component (1 \textless = i \textless = add\_pass
+     \textless= 5) of its array\_of\_angles (see \href{bend.html}{RBEND}.
+   \item {\bf NEXT\_SEQU}=string (Deafult: none)\\
+     concatenates the sequence with the name given to the end of the
+     specified sequence. 
+\end{itemize}
  
-Inside the sequence ... endsequence bracket three types of commands may
+Inside the ``sequence ... endsequence'' bracket three types of commands may
 be placed:  
 \begin{itemize}
-   \item an element declaration as usual, with an additional "at"
+   \item \verb( label: class, AT=real{,attributes}; (\\
+     an element declaration as usual, with an additional "at"
      attribute giving the element position relative to the start of the
      sequence; CAUTION: an existing definition for an element with the
      same name will be replaced, however, defining the same element
      twice inside the same sequence results in a fatal error, since a
      unique object (this element) would be placed at two different
      positions. 
-   \item a class name with a position; this causes an instance of the
+   \item \verb( class, AT=real; (\\
+     a class name with a position; this causes an instance of the
      class to be placed at the position given. For uses inside ranges,
      instances of the same class can be accessed with an occurrence
      count. 
-   \item a sequence name with a position; this causes the sequence with
+   \item \verb( sequ_name, AT=real; (\\
+     a sequence name with a position; this causes the sequence with
      that name to be placed at the position indicated. The entry,
      centre, or exit of the inserted sequence are placed at the position
      given, UNLESS a "refpos" (the name of an element in the inserted
      sequence) is given, in which case the sequence is inserted such
-     that the refpos element is  at the insertion point. 
+     that the refpos element is at the insertion point. 
 \end{itemize} 
 
 When the sequence is expanded in a
