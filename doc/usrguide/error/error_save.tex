@@ -3,12 +3,13 @@
 %  Changed by: Werner Herr, 19-Jun-2002 
 %  Changed by: Hans Grote, 30-Sep-2002 
 
-\section{Saving and reloading errors to and from tables and files} % ESAVE: Save Machine Imperfections and read back from file}
+\section{Saving and reloading errors to and from tables and files} 
+% ESAVE: Save Machine Imperfections and read back from file}
 
 \subsection{Writing errors to a file}
 
 \begin{verbatim}
-ESAVE, FILE = string;
+ESAVE, FILE=string;
 \end{verbatim}
 
 This command saves a table of errors assigned to elements on a file,
@@ -19,8 +20,8 @@ save is requested by the statement
 
 Example: 
 \begin{verbatim}
-SELECT, FLAG = ERROR, RANGE = range, CLASS = name, PATTERN = string;
-ESAVE, FILE = err.file;
+SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
+ESAVE, FILE=err.file;
 \end{verbatim} 
 and elements selected by the  \href{../Introduction/select.html}{SELECT}
 command are saved to the file.  
@@ -46,7 +47,7 @@ directly attached to the appropriate positions in the sequence with the
 command:  
 
 \begin{verbatim}
-SETERR, TABLE = errtab;
+SETERR, TABLE=errtab;
 \end{verbatim}
 The table \textit{errtab} can be generated internally or from an
 external file (\textit{errfile}) with the generic command READMYTABLE.  
@@ -54,8 +55,8 @@ external file (\textit{errfile}) with the generic command READMYTABLE.
 
 The command sequence: 
 \begin{verbatim}
-READMYTABLE, file = errfile, table = errtab;
-SETERR, TABLE = errtab;
+READMYTABLE, file=errfile, table=errtab;
+SETERR, TABLE=errtab;
 \end{verbatim}
 reads the file \textit{errfile} into the table \textit{errtab} and the
 command SETERR attaches the errors to the elements in the active

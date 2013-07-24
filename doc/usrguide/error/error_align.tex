@@ -23,51 +23,65 @@ EOPTION,ADD=TRUE has been entered.
 Alignment errors are defined by the statement 
 
 \begin{verbatim}
-SELECT,FLAG=ERROR,RANGE=range,CLASS=name,PATTERN=string;
-EALIGN, DX=real,DY=real,DS=real, 
-        DPHI=real,DTHETA=real,DPSI=real, 
-        MREX=real,MREY=real,
-        MSCALX=real,MSCALY=real,
-        AREX=real,AREY=real;
+SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
+EALIGN, DX=real, DY=real, DS=real, 
+        DPHI=real, DTHETA=real, DPSI=real, 
+        MREX=real, MREY=real,
+        MSCALX=real, MSCALY=real,
+        AREX=real, AREY=real;
 \end{verbatim}
 and elements are now selected by the
 \href{../Introduction/select.html}{SELECT} command. 
 
 The attributes are: 
 \begin{itemize}
-\item DX: The misalignment in the \textit{x}-direction for the entry of the beam element (default: 0 m). 
+\item DX: The misalignment in the \textit{x}-direction for the entry of
+  the beam element (default: 0 m).  
 \\ DX$>$0 displaces the element in the positive \textit{x}-direction 
 
-\item DY: The misalignment in the \textit{y}-direction for the entry of the beam element (default: 0 m). 
+\item DY: The misalignment in the \textit{y}-direction for the entry of
+  the beam element (default: 0 m).  
 \\ DY$>$0 displaces the element in the positive \textit{y}-direction 
 
-\item DS: The misalignment in the \textit{s}-direction for the entry of the beam element (default: 0 m). 
+\item DS: The misalignment in the \textit{s}-direction for the entry of
+  the beam element (default: 0 m).  
 \\ DS$>$0 displaces the element in the positive \textit{s}-direction 
 
 \item DPHI: The rotation around the \textit{x}-axis. 
-\\ A positive angle gives a greater \textit{x}-coordinate for the exit than for the entry (default: 0 rad). 
+\\ A positive angle gives a greater \textit{x}-coordinate for the exit
+than for the entry (default: 0 rad).  
 
-\item DTHETA: The rotation around the \textit{y}-axis according to the right hand rule (default: 0 rad). 
+\item DTHETA: The rotation around the \textit{y}-axis according to the
+  right hand rule (default: 0 rad).  
 
-\item DPSI: The rotation around the \textit{s}-axis according to the right hand rule (default: 0 rad). 
+\item DPSI: The rotation around the \textit{s}-axis according to the
+  right hand rule (default: 0 rad).  
 
-\item MREX: The horizontal read error for a monitor. This is ignored if the element is not a monitor 
+\item MREX: The horizontal read error for a monitor. This is ignored if
+  the element is not a monitor  
 \\ If MREX$>$0 the reading for \textit{x} is too high (default: 0 m). 
 
-\item MREY: The vertical read error for a monitor. This is ignored if the element is not a monitor 
+\item MREY: The vertical read error for a monitor. This is ignored if
+  the element is not a monitor  
 \\ If MREY$>$0, the reading for \textit{y} is too high (default: 0 m). 
 
-\item AREX: The misalignment in the \textit{x}-direction for the entry of an aperture limit (default: 0 m). 
+\item AREX: The misalignment in the \textit{x}-direction for the entry
+  of an aperture limit (default: 0 m).  
 \\ AREX$>$0 displaces the element in the positive \textit{x}-direction 
 
-\item AREY: The misalignment in the \textit{y}-direction for the entry of an aperture limit (default: 0 m). 
+\item AREY: The misalignment in the \textit{y}-direction for the entry
+  of an aperture limit (default: 0 m).  
 \\ AREY$>$0 displaces the element in the positive \textit{y}-direction 
 
-\item MSCALX: The relative horizontal scaling error for a monitor. This is ignored if the element is not a monitor. 
-\\ If MSCALX$>$0 the reading for \textit{x} is too high (default: 0). A value of 0.5 implies the actual reading is multiplied by 1.5. 
+\item MSCALX: The relative horizontal scaling error for a monitor. This
+  is ignored if the element is not a monitor.  
+\\ If MSCALX$>$0 the reading for \textit{x} is too high (default: 0). A
+value of 0.5 implies the actual reading is multiplied by 1.5.  
 
-\item MSCALY: The relative vertical scaling error for a monitor. This is ignored if the element is not a monitor.  
-\\ If MSCALY$>$0 the reading for \textit{y} is too high (default: 0). A value of -0.3 implies the actual reading is multiplied by 0.7. 
+\item MSCALY: The relative vertical scaling error for a monitor. This is
+  ignored if the element is not a monitor.   
+\\ If MSCALY$>$0 the reading for \textit{y} is too high (default: 0). A
+value of -0.3 implies the actual reading is multiplied by 0.7.  
 \end{itemize}
 
 Examples: 
@@ -83,7 +97,8 @@ Assigns alignment errors to all elements of class MQ.
 SELECT, FLAG = ERROR, PATTERN = "QF.*";            
 EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
 \end{verbatim} 
-Assigns alignment errors to all elements starting with "QF". TGAUSS(2.5) means a Gaussian distribution cut at 2.5 sigma. 
+Assigns alignment errors to all elements starting with "QF". TGAUSS(2.5)
+means a Gaussian distribution cut at 2.5 sigma.  
 
 
 %\href{xsdisp}{

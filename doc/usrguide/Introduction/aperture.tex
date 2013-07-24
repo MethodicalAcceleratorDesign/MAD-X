@@ -31,21 +31,26 @@ drifts) by the use of the following parameters:
 %http://en.wikibooks.org/wiki/LaTeX/Tables#Text_wrapping_in_tables
 \begin{tabular}{l | l | p{9cm}|}
 \hline 
-\textbf{APERTYPE} & \textbf{\# of parameters} & \textbf{meaning of parameters} \\ 
+\textbf{APERTYPE} & \textbf{\# of parameters} & \textbf{meaning of
+  parameters} \\  
 \hline
 CIRCLE & 1 &  radius \\ 
 \hline
-ELLIPSE & 2 & horizontal half axis, vertical half axis \\ 
+ELLIPSE & 2 & horizontal half axis, vertical half axis \\  
 \hline
 RECTANGLE & 2 & half width and half height \\ 
 \hline
-LHCSCREEN & 3 & half width, half height (of rect.) and radius (of circ.) \\ 
+LHCSCREEN & 3 & half width, half height (of rect.) and radius (of circ.)
+\\  
 \hline
-MARGUERITE & 3 & half width, half height (of rect.) and radius (of circ.) \\ 
+MARGUERITE & 3 & half width, half height (of rect.) and radius (of
+circ.) \\  
 \hline
-RECTELLIPSE & 4 & half width, half height (of rectangle), horizontal half axis, vertical half axis (of ellipse) \\ 
+RECTELLIPSE & 4 & half width, half height (of rectangle), horizontal
+half axis, vertical half axis (of ellipse) \\  
 \hline
-RACETRACK & 3 & horizontal [1] and vertical [2] positions of the circle, radius [3] of the circle (see s, g, r in the figure below) \\ 
+RACETRACK & 3 & horizontal [1] and vertical [2] positions of the circle,
+radius [3] of the circle (see s, g, r in the figure below) \\  
 \hline
 FILENAME & 0 & where the file contains a list of x and y coordinates
 outlining the shape. This option is only supported by the aperture
@@ -400,12 +405,14 @@ plot,table=aperture,noline,vmin=0,vmax=10,haxis=s,vaxis=n1,spec,
 on_elem,style=100;
 \end{verbatim}
 
-The \href{../Introduction/select.html}{select} command can be  used to choose which columns to print in the output file.  
+The \href{../Introduction/select.html}{select} command can be  used to
+choose which columns to print in the output file.   
 \\ Column names: name, n1, n1x\_m, n1y\_m, apertype, aper\_1, aper\_2,
 aper\_3, aper\_4, rtol, xtol, ytol, s, betx, bety, dx, dy, x, y, on\_ap,
 on\_elem, spec  
 
-n1 is the maximum beam size in sigma, while n1x\_m and n1y\_m is the n1 values in si-units in the x- and y-direction. 
+n1 is the maximum beam size in sigma, while n1x\_m and n1y\_m is the n1
+values in si-units in the x- and y-direction.  
 
 aper\_\# means for all apertypes but racetrack:
 \\ aper\_1 = half width rectangle
@@ -413,7 +420,8 @@ aper\_\# means for all apertypes but racetrack:
 \\ aper\_3 = half horizontal axis ellipse (or radius if circle)
 \\ aper\_4 = half vertical axis ellipse
 
-For racetrack, the aperture parameters will have the same meaning as the tolerances:
+For racetrack, the aperture parameters will have the same meaning as the
+tolerances: 
 \\ aper\_1 and xtol = horizontal displacement of radial part 
 \\ aper\_2 and ytol = vertical displacement of radial part 
 \\ aper\_3 and rtol = radius 
@@ -434,7 +442,8 @@ example  provides a plot,
 \includegraphics[width=450px]{Introduction/aperexample.jpg}
 %%\includegraphics{aperexample.jpg align=center width=740}
 
-where we see the n1, beta functions and the hardware symbolized by on\_elem.    
+where we see the n1, beta functions and the hardware symbolized by
+on\_elem.     
 
 
 % Ivar Waarum, 24.02.05  -  Mark Hayes, 19.06.02 

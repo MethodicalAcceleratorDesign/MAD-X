@@ -9,11 +9,13 @@ label: MATRIX, TYPE = name, L = real, KICK1 = real,..., KICK6 = real,
                TM111 = real,..., TM666 = real;
 \end{verbatim} 
 
-The MATRIX permits the definition of an arbitrary transfer matrix. It has four real array attributes: 
+The MATRIX permits the definition of an arbitrary transfer matrix. 
+It has four real array attributes: 
 \begin{itemize}
    \item L: Length of the element, which may be zero. 
-   \item KICKi: Defines the kick of the element acting on the six phase space coordinates. 
-   \item RMik: Defines the linear transfer matrix (6*6) of the element. 
+   \item KICKi: Defines the kick of the element acting on the six phase
+     space coordinates.  
+   \item RMik: Defines the linear transfer matrix (6*6) of the element.  
    \item TMikl: Defines the second-order terms (6*6*6) of the element. 
 \end{itemize} 
 

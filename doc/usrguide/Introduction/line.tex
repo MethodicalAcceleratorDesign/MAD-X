@@ -3,7 +3,7 @@
 %  Changed by: Hans Grote, 11-Jun-2002 
 
 
-\subsection{Beam Lines}
+\chapter{Beam Lines}
 
 The accelerator to be studied is known to MAD-X either as a sequence of
 physical elements called \href{sequence.html}{sequence}, or as a
@@ -33,7 +33,7 @@ The formal argument list (arg\{,arg\}) is optional (see below). Each
 \end{itemize} 
 Beam lines may be nested to any level.  
 
-\subsubsection{\href{simple}{Simple Beam Lines}} 
+\section{\href{simple}{Simple Beam Lines}} 
 The simplest beam line consists of single elements: 
 \begin{verbatim}
 label: LINE=(member{,member});
@@ -49,7 +49,7 @@ all subsequent calculations on the sequence
 a,b,c,d,a,d
 \end{verbatim}
 
-\subsubsection{\href{subline}{Sub-lines}} 
+\section{\href{subline}{Sub-lines}} 
 Instead of referring to an element, a beam line member can refer to
 another beam line defined in a separate command. This provides a
 shorthand notation for sub-lines which occur several times in a beam
@@ -74,7 +74,7 @@ this example produces the following expansion steps:
 a,b,c,d,e,b,a,c,d,e,a,b
 \end{verbatim}
 
-\subsubsection{\href{reflect}{Reflection and Repetition}} 
+\section{\href{reflect}{Reflection and Repetition}} 
 An unsigned repetition count and an asterisk indicate repetition of a
 beam line member. A minus prefix causes reflection, i.e. all elements in
 the subsequence are taken in reverse order. Sub-lines of reflected lines
@@ -110,7 +110,7 @@ c,g,h,d,c,g,h,d,e,f,e,f,d,h,g,c,b,a
 Note that the inner sub-line R is reflected together with the outer
 sub-line S.   
 
-\subsubsection{\href{argument}{Replaceable Arguments}} 
+\section{\href{argument}{Replaceable Arguments}} 
 A beam line definition may contain a formal argument list, consisting of
 labels separated by commas and enclosed in parentheses. Such a line can
 be expanded for different values of its arguments. When this line is
@@ -157,14 +157,14 @@ qf,d,sf2,d,b,d,qd,d,sd2,d,b,d
 qf,d,sf1,d,b,d,qd,d,sd1,d,b,d
 \end{verbatim}
 
-\subsubsection{\href{Line_Depreciation}{Warning: Line Depreciation}} 
+\section{\href{Line_Depreciation}{Warning: Line Depreciation}} 
 MADX has been devolopped using sequences, in fact internally the code
 works with sequences only. Consequently, there may exist some
 inconveniences when only lines are used. It is recommended to convert as
 soon as possible lines into sequences (by means of the save command) in
 a design phase and to use only sequences for a finalised machine.    
 
-\subsubsection{\href{Line_Limits}{ Limits of Construction of Lines}}  
+\section{\href{Line_Limits}{ Limits of Construction of Lines}}  
 Since Lines are in fact depreciated there are some limits of how they
 can be constructed. Please find below a running MADX run which shows an
 example of OK (valid) and WRONG (invalid) cases.   

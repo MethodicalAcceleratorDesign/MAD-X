@@ -28,37 +28,39 @@ ENDMATCH;
 The algorithm for evaluating the penalty function is the following:
  
 \begin{itemize}
-	\item  execute the first macro,
-	\item  evaluate and compute the difference between the lhs and the rhs the first set of expressions,
-	\item in case of other macros, evaluates in order the macro and the expressions
-	\item  the set of differences are  minimized by the selected method using the variables defined in the VARY statements.
+   \item  execute the first macro,
+   \item  evaluate and compute the difference between the lhs and the
+     rhs the first set of expressions, 
+   \item in case of other macros, evaluates in order the macro and the
+     expressions 
+   \item  the set of differences are  minimized by the selected method
+     using the variables defined in the VARY statements. 
 \end{itemize}
 
 \subsection{Initiating the Matching Module with USE\_MACRO}
  
  With:
- 
 \begin{verbatim}
-   MATCH,USE_MACRO;
+   MATCH, USE_MACRO;
 \end{verbatim}
-
 the 'match' command can be used for matching any expression which can be
 defined through expression. It requires a slightly different syntax.
 
 \subsection{VARY statements}
-In the USE\_MACRO mode the vary statement follows the same rules of the other modes explained in the section \href{match_vary.html}{Define Variable Parameter}
+In the USE\_MACRO mode the vary statement follows the same rules of the
+other modes explained in the section \href{match_vary.html}{Define
+  Variable Parameter} 
 
 \subsection{Macro definitions}
 The macro to be used in the matching routine can be defined in two ways:
  
 \begin{itemize}
-	\item using USE\_MACRO statement:
-
+   \item using USE\_MACRO statement:
 \begin{verbatim}
  USE_MACRO, NAME=macro1;
 \end{verbatim}
-
-defining a new macro on the fly using the usual syntax for \href{../control/special.html#macro}{ macros}. 
+defining a new macro on the fly using the usual syntax for
+\href{../control/special.html#macro}{ macros}.  
 \end{itemize}
  
 After a macro definition is necessary to define a set of constraints exclusively with the following syntax:
@@ -66,21 +68,22 @@ After a macro definition is necessary to define a set of constraints exclusively
 \begin{verbatim}
  CONSTRAINT, expr=  "lhs = rhs"; 
 \end{verbatim}
-
 or 
 \begin{verbatim}
  CONSTRAINT, expr=  "lhs < rhs"; 
 \end{verbatim}
-
 or
 \begin{verbatim}
  CONSTRAINT, expr=  "lhs > rhs"; 
 \end{verbatim}
 
-where "lhs" and "rhs" are well defined MadX \href{../Introduction/expression.html}{expressions}. Other set of macro and constraints can be defined afterwards.
+where "lhs" and "rhs" are well defined MadX
+\href{../Introduction/expression.html}{expressions}. Other set of macro
+and constraints can be defined afterwards. 
 
 \subsection{Examples}
-The following example the USE\_MACRO mode can emulate a matching script which uses the normal syntax.
+The following example the USE\_MACRO mode can emulate a matching script
+which uses the normal syntax. 
 
 Normal syntax:
 

@@ -4,15 +4,15 @@
 %  Changed by: Hans Grote, 25-Sep-2002 
 
 \section{Activate/Deactivate Correctors or Monitors}
-
-To provide more flexibility with orbit correction two commands are provided: 
+To provide more flexibility with orbit correction two commands are
+provided:  
 
 \begin{verbatim}
-USEMONITOR, STATUS=flag,
-            [,SEQUENCE=sequence][,RANGE=range][,CLASS=class][,PATTERN=regex]
+USEMONITOR, STATUS=flag, SEQUENCE=sequence, RANGE=range, 
+            CLASS=class, PATTERN=regex;
 
-USEKICK,    STATUS=flag,
-            [,SEQUENCE=sequence][,RANGE=range][,CLASS=class][,PATTERN=regex]
+USEKICK,    STATUS=flag, SEQUENCE=sequence, RANGE=range,
+            CLASS=class, PATTERN=regex;
 \end{verbatim}
 
 The command \href{monitor}{USEMONITOR} activates or deactivates a
@@ -38,19 +38,18 @@ affects elements of types KICKER, HKICKER, or VKICKER.
 
 Both commands have the same attributes: 
 \begin{itemize}
-	\item STATUS: If this flag is true (on), the selected elements
-          are activated. Active orbit monitor readings will be
-          considered, and active correctors can change their strengths
-          in subsequent correction commands. Inactive elements will be
-          ignored subsequently.  
-	\item SEQUENCE: The sequence can be specified, otherwise the
-          currect sequence is used for this operation.  
-	\item RANGE, CLASS, PATTERN: The usual selection commands are
-          used to identify the elements for this operation.  
+   \item STATUS: If this flag is true (on), the selected elements
+     are activated. Active orbit monitor readings will be
+     considered, and active correctors can change their strengths
+     in subsequent correction commands. Inactive elements will be
+     ignored subsequently.  
+   \item SEQUENCE: The sequence can be specified, otherwise the
+     currect sequence is used for this operation.  
+   \item RANGE, CLASS, PATTERN: The usual selection commands are
+     used to identify the elements for this operation.  
 \end{itemize} 
 
-Example:                                                                  
-
+Example:
 \begin{verbatim}
 USE,...                                ! set working beam line 
 ...                                    ! define imperfections 

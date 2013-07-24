@@ -7,35 +7,58 @@
 
 \subsection{CONSTRAINT: Simple Constraint}
 
-Simple constraints are imposed by the CONSTRAINT command. The CONSTRAINT command has three attributes:  
+Simple constraints are imposed by the CONSTRAINT command. The CONSTRAINT
+command has three attributes:   
 \begin{itemize}
-	\item  the SEQUENCE entry specifies the sequence for which the constraint applies. 
-	\item  the RANGE entry specifies the position where the constraint must be satisfied. The RANGE can either be the name of a single element in the sequence or a range between two elements. In the later case the two element names must be separated by a '/': RANGE=nam1/name2 
-	\item the optics functions to be constrained 
+	\item  the SEQUENCE entry specifies the sequence for which the
+          constraint applies.  
+	\item  the RANGE entry specifies the position where the
+          constraint must be satisfied. The RANGE can either be the name
+          of a single element in the sequence or a range between two
+          elements. In the later case the two element names must be
+          separated by a '/': RANGE=nam1/name2  
+	\item the optics functions to be constrained. 
 \end{itemize} 
 
 The optic functions can be constraint in four different ways: 
 \begin{itemize}
 	\item lower limits: 'BETX $>$ value' -\textgreater type1 
 	\item upper limits: 'BETX $<$ value' -\textgreater type2 
-	\item lower and upper limits: 'BETX $<$ value1,BETX $>$ value2' -\textgreater type3 
+	\item lower and upper limits: 'BETX $<$ value1, 
+          BETX $>$ value2' -\textgreater type3  
 	\item target value: BETX=value -\textgreater type 4 
 \end{itemize} 
 
-In case one element is affected my more than one constraint command the last  CONSTRAINT will be chosen. For example, one can specify the maximum acceptable beta function over a range of the sequence and specify the target beta  function for one element that lies inside this range. In this case one must first specify the constraint that affects the whole range and then the constraint for the single element. This way the constraint of the target value overrides the previous constraint on the upper limit for the selected element. For example, the following constraint statements limit the maximum horizontal beta function between 'marker1' and 'marker2' to 200 meter and require a horizontal beta function of 180 meter at element 'name1': 
+In case one element is affected my more than one constraint command the
+last  CONSTRAINT will be chosen. For example, one can specify the
+maximum acceptable beta function over a range of the sequence and
+specify the target beta  function for one element that lies inside this
+range. In this case one must first specify the constraint that affects
+the whole range and then the constraint for the single element. This way
+the constraint of the target value overrides the previous constraint on
+the upper limit for the selected element. For example, the following
+constraint statements limit the maximum horizontal beta function between
+'marker1' and 'marker2' to 200 meter and require a horizontal beta
+function of 180 meter at element 'name1':  
 \begin{verbatim}
 CONSTRAINT,SEQUENCE=sequence-name,RANGE='marker1'/'marker2',BETX<200.0;
 CONSTRAINT,SEQUENCE=sequence-name,RANGE='name1'/'marker2',BETX=100.0;
 \end{verbatim}
 
-When the two constraint statements are interchanged the horizontal beta function at element 'name1' will only be limited to less than 200 meter and NOT constrained to 100 meter!
+When the two constraint statements are interchanged the horizontal beta
+function at element 'name1' will only be limited to less than 200 meter
+and NOT constrained to 100 meter! 
 
-The CONSTRAINTS can either be specified with explicit values for the constraints of the optic functions or via a pre-calculated \href{../control/general.html#savebeta}{SAVEBETA} module. The first options has the form:
+The CONSTRAINTS can either be specified with explicit values for the
+constraints of the optic functions or via a pre-calculated
+\href{../control/general.html#savebeta}{SAVEBETA} module. The first
+options has the form: 
 \begin{verbatim}
-CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETX=real,ALFX=real,MUX=real,
-                                                 BETY=real,ALFY=real,MUY=real,
-                                                 X=real,PX=real,Y=real,PY=real,
-                                                 DX=real,DY=real,DPX=real,DPY=real;
+CONSTRAINT,SEQUENCE=sequence-name, RANGE=position,
+           BETX=real, ALFX=real, MUX=real,                                            
+           BETY=real, ALFY=real, MUY=real,
+           X=real, PX=real, Y=real, PY=real,
+           DX=real, DY=real, DPX=real, DPY=real;
 
 \end{verbatim}
 
@@ -47,7 +70,8 @@ are constrained at the selected range to the corresponding values.
 
 The second form of the CONSTRAINT command has the form
 \begin{verbatim}
-CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETA0=beta0-name,MUX=real,MUY=real
+CONSTRAINT, SEQUENCE=sequence-name, RANGE=position,
+            BETA0=beta0-name, MUX=real, MUY=real
 \end{verbatim}
 
 Here all of (BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
@@ -61,12 +85,22 @@ Normally ``RANGE'' refers to a single
 
 \subsection{User Defined Matching Constraints}
 
-In addition to the nominal TWISS variables the user can define a limited set of 'user-defined' variables in the constrint statement. This allows, for example, the matching of the normalized dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4. The variables can be defined according to the general variable declaration rules of deferred exressions. For example, in order to match the normalized dispersion at a certain location in the sequence one would first define a variable: 
+In addition to the nominal TWISS variables the user can define a limited
+set of 'user-defined' variables in the constrint statement. This allows,
+for example, the matching of the normalized dispersion or the mechanical
+aperture. The MATCH module allows four user defined variables called:
+mvar1, mvar2, mvar3 and mvar4. The variables can be defined according to
+the general variable declaration rules of deferred exressions. For
+example, in order to match the normalized dispersion at a certain
+location in the sequence one would first define a variable:  
 
-In addition to the nominal TWISS variables the user can define a 
-limited set of 'user-defined' variables in the constraint statement. This allows, for example, the matching of the normalized
-dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4.
-The variables can be defined according to the general variable declaration rules of 
+In addition to the nominal TWISS variables the user can define a limited
+set of 'user-defined' variables in the constraint statement. This
+allows, for example, the matching of the normalized dispersion or the
+mechanical aperture. The MATCH module allows four user defined variables
+called: mvar1, mvar2, mvar3 and mvar4. 
+The variables can be defined according to the general variable
+declaration rules of  
 \href{../Introduction/expression.html#defer}{deferred expressions}.
 For example, in order to match the normalized dispersion at a certain
 location in the sequence one would first define a variable:
@@ -114,7 +148,8 @@ WEIGHT, BETX=real,ALFX=real,MUX=real,
 
 changes the weights for subsequent constraints.
 The weights are entered with the same name as the
-\href{../Introduction/tables.html#linear}{linear lattice functions}\href{../Introduction/closed_orbit.html}{orbit coordinate}
+\href{../Introduction/tables.html#linear}{linear lattice functions}
+\href{../Introduction/closed_orbit.html}{orbit coordinate} 
 to which the weight applies.
 Frequently the matching weights serve to select a restricted
 set of functions to be matched.
@@ -138,11 +173,9 @@ MVAR1    & 10.0  & MVAR2    & 10.0  & MVAR3    & 10.0  & MVAR4    & 10.0  & -
 
 In addition to conventional matching constraints that specify the optics 
 functions at a certain position in the sequence the user can also constrain 
-global optics parameters such as, for example, 
-the overall machine tune and the machine chromaticity.
-Such global optics parameters can be constraint via the 
-GLOBAL command, having
-the following syntax:
+global optics parameters such as, for example, the overall machine tune
+and the machine chromaticity. Such global optics parameters can be
+constraint via the  GLOBAL command, having the following syntax:
 
 \begin{verbatim}
 GLOBAL,SEQUENCE=sequence-name,Q1=real,Q2=real,dQ1=real,dQ2=real,&
@@ -150,28 +183,14 @@ GLOBAL,SEQUENCE=sequence-name,Q1=real,Q2=real,dQ1=real,dQ2=real,&
 \end{verbatim}
 
 Global matching weights can be (re)set by the new 
-\href{gweight}{GWEIGHT}
-command, having attributes identical to those of GLOBAL.
+\href{gweight}{GWEIGHT} command, having attributes identical to those of
+GLOBAL. 
 All the attributes are optional and have the following meaning:
-\\\\Q1, Q2, dQ1, dQ2 
-
-enable a correction of tunes and chromaticities in presence of magnetic imperfections or misalignments,
-\\\\ddQ1, ddQ2
-
-enable a correction of nonlinear chromaticities
-
-%\begin{description}
-%	\item[Q1, Q2, dQ1, dQ2]
-%
-% enable a correction of tunes and
-%  chromaticities in presence of magnetic
-%  imperfections or misalignments, 
-%
-%	\item[ddQ1, ddQ2]
-% 
-% enable a correction of 
-%  nonlinear chromaticities
-%
-%\end{description}
-
+\begin{itemize}
+  \item {\bf Q1, Q2, dQ1, dQ2} \\
+    enable a correction of tunes and chromaticities in presence of
+    magnetic imperfections or misalignments, 
+  \item {\bf ddQ1, ddQ2} \\
+    enable a correction of nonlinear chromaticities
+\end{itemize}
 %\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, June, 2002

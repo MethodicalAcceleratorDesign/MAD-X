@@ -9,16 +9,17 @@ corresponding absolute error at definition time. An error print is
 requested by the statement  
 
 \begin{verbatim}
-SELECT, FLAG = ERROR, RANGE = range, CLASS = name, PATTERN = string;
+SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
 EPRINT;
 \end{verbatim}
+and elements are now selected by the
+\href{../Introduction/select.html}{SELECT} command.  
 
-and elements are now selected by the \href{../Introduction/select.html}{SELECT} command. 
 
-
-A listing for ALL elements, i.e. not only the selected, can be obtained with the command 
+A listing for ALL elements, i.e. not only the selected, can be obtained
+with the command  
 \begin{verbatim}
-EPRINT, FULL = TRUE;
+EPRINT, FULL=TRUE;
 \end{verbatim} 
 In that case, the SELECT command has no effect.
 

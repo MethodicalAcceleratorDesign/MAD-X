@@ -36,7 +36,8 @@ the optical parameters and the distorted orbits.
 The options used in the CORRECT command are: 
 
 \begin{itemize}
-   \item FLAG: FLAG can be "ring" or "line", either a circular machine or a trajectory is corrected.  
+   \item FLAG: FLAG can be "ring" or "line", either a circular machine
+     or a trajectory is corrected.   
      \\ Default flag is "ring". 
 
    \item MODE: MODE defines the method to be used for corrections. 
@@ -146,11 +147,14 @@ Example of use of CORRECT to reproduce a measured orbit:
 \begin{verbatim}
 ! To have a refererence optical model
 twiss, table=twiss_ref;
+
 ! The bpm.tsv is a reduced Twiss file containing only lines for the BPMs
-readmytable,file="bpm.tsv",table="twiss_bpm";
+readmytable, file="bpm.tsv", table="twiss_bpm";
+
 ! correct orbit using external measurements
-correct,flag=ring,mode=micado,ncorr=5,cond=1,plane=x,extern,
-model=twiss_ref,orbit=twiss_ref,target=twiss_bpm,error=1.0e-21;
+correct, flag=ring, mode=micado, ncorr=5, cond=1 ,plane=x, extern,
+         model=twiss_ref, orbit=twiss_ref, target=twiss_bpm, 
+         error=1.0e-21;
 \end{verbatim}
 
 
@@ -167,7 +171,8 @@ Two attributes affect the printing of tables and results:
      argument is larger than 0. The argument is added to the
      output. Useful to analyze runs with loops to produce large
      statistics. 
-     \\\textbf{ATTENTION: May produce gigantic outputs for large machines.}
+     \\\textbf{ATTENTION: May produce gigantic outputs for large
+       machines.} 
      \\
 
    \item TWISSUM:  If the argument of twissum is larger than 0, it
@@ -203,7 +208,8 @@ Example 2: no correction, only output of Twiss summary
 CORRECT, TWISSUM = 1; 
 \end{verbatim}
 
-Example 3: correct orbit in horizontal plane, corrector and monitor output on table
+Example 3: correct orbit in horizontal plane, corrector and monitor
+output on table 
 \begin{verbatim}
 CORRECT, PLANE = x, MODE = lsq, CLIST = corr.out, MLIST = mon.out;   
 \end{verbatim}
@@ -214,4 +220,5 @@ errors, 15\% of orbit correctors faulty
 CORRECT, PLANE = x, MONERROR = 1, MONSCALE = 1, MONON = 0.85; 
 \end{verbatim}
 
-%\href{http://consult.cern.ch/xwho/people/1808}{Last updated:} 22.10.2008 \href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 14.06.2006 
+%\href{http://consult.cern.ch/xwho/people/1808}{Last updated:} 22.10.2008 
+

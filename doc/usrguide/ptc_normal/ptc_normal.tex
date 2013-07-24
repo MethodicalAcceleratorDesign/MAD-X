@@ -6,25 +6,25 @@
 The {\bf PTC\_NORMAL module} of MAD-X
 [\hyperlink{F._Schmidt}{a},\hyperlink{d Amico}{b}] is based on PTC
 code. This module takes full advantage of the PTC Normal Form analysis
-which is  a  considerable upgrade of what was available with
-the Lie Algebra   technique used in MAD8. It allows to calculate
-dispersions, chromaticities,   anharmonicities and Hamiltonian terms to
-very high order. In fact, the order is   only limited by the RAM memory
-of your computer and your patience to wait for   the results.  
+which is a considerable upgrade of what was available with
+the Lie Algebra technique used in MAD8. It allows to calculate
+dispersions, chromaticities, anharmonicities and Hamiltonian terms to
+very high order. In fact, the order is only limited by the RAM memory
+of your computer and your patience to wait for the results.  
 
 The number of terms per order increases with some power law. The
-internal MAD-X   tables are not adequate to keep such large amounts of
-data. On the other hand,   only a reduced set of this data is actually
+internal MAD-X tables are not adequate to keep such large amounts of
+data. On the other hand, only a reduced set of this data is actually
 needed by the user. Thus a much   easier and flexible solution is to
-gather the users  requirements with a series   of special MAD-X command
-called \texttt{SELECT\_PTC\_NORMAL}. A   special MAD-X table is
-dynamically built using just those commands and it will   be filled by
+gather the users  requirements with a series of special MAD-X command
+called \texttt{SELECT\_PTC\_NORMAL}. A special MAD-X table is
+dynamically built using just those commands and it will be filled by
 the next call to the \texttt{PTC\_NORMAL}-command.  
 
 Another essential advantage of this table is the fact that it is
-structured to   facilitate exchange of Normal Form (including
-Hamiltonian terms of high order)   between MAD-X modules. The immediate
-goal is to use this table to allow   non-linear matching inside the
+structured to facilitate exchange of Normal Form (including
+Hamiltonian terms of high order) between MAD-X modules. The immediate
+goal is to use this table to allow non-linear matching inside the
 present MAD-X MATCHING module. 
 
 {\bf Synopsis} \\
