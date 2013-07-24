@@ -67,11 +67,11 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   integer part_id_keep(max_part),last_turn_keep(max_part)
   double precision tmp_d,orbit0(6),orbit(6),el,re(6,6),rt(6,6),          &
        al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
-       node_value,get_variable,last_pos(*),last_orbit(6,*),          &
-       maxaper(6),get_value,obs_orb(6),coords(6,0:turns,*),l_buf(*),&
+       node_value,get_variable,last_pos(*),last_orbit(6,*),              &
+       maxaper(6),get_value,obs_orb(6),coords(6,0:turns,*),l_buf(*),     &
        betx_start,bety_start,alfx_start,alfy_start,gamx_start,gamy_start,&
        dx_start,dpx_start,dy_start,dpy_start,deltap,                     &
-       N_ions_in_beam, Npart_gain, t_rms,                                &
+       N_ions_in_beam, Npart_gain, t_rms, pt_rms,                        &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,                  &
        N_ions_for_bb,z_keep(6,max_part),ex_rms0,ey_rms0,sigma_p0,sigma_z0
   data ex_rms0,ey_rms0,sigma_p0,sigma_z0 / 0d0, 0d0, 0d0, 0d0 / 
@@ -107,7 +107,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        gamx_start, gamy_start,                             &
        dx_start,    dpx_start,                             &
        dy_start,    dpy_start,                             &
-       N_ions_in_beam, Npart_gain, t_rms,                  &
+       N_ions_in_beam, Npart_gain, t_rms, pt_rms,          &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,    &
        N_ions_for_bb,N_macr_prt_ini,z_keep,part_id_keep,   &
        last_turn_keep,jmax,segment,                        &
@@ -282,12 +282,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         if(N_macro_surv .GT. N_macr_prt_ini) call aafail('TRRUN: ',&
              'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
         t_rms = get_value('run ', 't_rms ')
+        pt_rms = get_value('run ', 'pt_rms ')
         sigma_z_ini=betas*t_rms !betas: BEAM->BETA
         sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
-        sigma_p=0d0       !default
+        sigma_p=betas*pt_rms       !default
         z_factor=1d0 !at start sigma_z_ini/sigma_z
         Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
         Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
+!        write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
         first=.false.
      endif
   endif
@@ -335,6 +337,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
            sigma_z=sigma_z0
            sigma_p=sigma_p0
         endif
+!        write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
         if((sigma_z.GT.0d0).AND.(sigma_z_ini.GT.0d0)) then
            z_factor=sigma_z_ini/sigma_z
         else
@@ -3753,7 +3756,8 @@ subroutine ixy_fitting()
   use spch_bbfi
   implicit none
 
-  integer i, iii, jjj
+  logical emittance_update
+  integer i, iii, jjj,get_option
   ! n_lines_in_turn_table=1
   double precision Summ_dpi_square, Summ_z_part_square
   double precision Summ_x, Summ_y, Hi, one_ex, ex_dist, one_ey,     &
@@ -3772,6 +3776,7 @@ subroutine ixy_fitting()
   integer i_for_I
 
   !----------------------------------------------------------------------
+  emittance_update = get_option('emittance_update ') .ne. 0
 
   i_for_I=0     ! I-evaluations
   I_div_E_sum_max = get_value('run ', 'i_div_e_sum_max ')
@@ -3802,7 +3807,7 @@ subroutine ixy_fitting()
   ENDDO sigma_p_loop
   Summ_dpi_square=Summ_dpi_square/N_for_I_dble
   if (Summ_dpi_square .GE. 0d0) then
-     sigma_p=sqrt(Summ_dpi_square)
+     if(emittance_update) sigma_p=sqrt(Summ_dpi_square)
   else
      call aafail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
   endif
