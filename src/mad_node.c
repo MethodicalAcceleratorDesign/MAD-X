@@ -178,7 +178,7 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
 
   p = clone_node(q, 0);
   
-  if (debug) printf("\np: %s\n",p); 
+  if (debug) printf("\np->name: %s\n",p->name); 
 
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
     i = add_to_name_list(p->p_elem->name, 1, occ_list);
