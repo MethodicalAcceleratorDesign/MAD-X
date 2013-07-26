@@ -1,0 +1,49 @@
+
+/**********************************************************************
+ * AD lattice with Qx = 5.385, Qy= 5.370
+ *
+ * DATE AND TIME:    14/11/02  16.31.40
+ *
+ * FILE:             ad_quads_3837_ffe.str
+ **********************************************************************/
+
+
+!!!       values are calculated from magnetic measurements
+!R1:=-0.91494 ! this value is true for I=1800A
+!R2:=0.82681  ! this value is true for I=1800A
+!R3:=0.78087  ! this value is true for I=2000A
+
+!!!         this values have been found from response matrix
+!!!                    measurements at 2 GeV/c
+R1:=-0.9206;
+R2:=0.8299;
+R3:=0.7845;
+KF4 := R1*KF123;
+KD5 := R2*KF123;
+KF6 := 0.434013207981;
+KF79 := -0.526485397793;
+KF8 := 0.560993621836;
+KF9 := R3*KF79;
+KF123 := -0.558153759866;
+KDEC := -0.36175160802;
+KFEC := 0.594999986705;
+KD53 := R2*KF123;
+KF54 := R1*KF123;
+
+
+/*********************************************************************************************************
+ * HE correctors
+ *********************************************************************************************************/
+PHIBMAIN:=0.0; !   1./2280.*0.2458 !  1./2280.*PHI
+KICK_QF4:=0.;
+
+
+!!! Parameter FE defines extenrion of magnetic field outside og magent and
+!!! Coprresponds to parameter FINT in MAD
+FE=0.5;
+
+!!!   Parameter MOMENTUM is beam momentum in GeV/c.
+!!!   Very big value of MOMENTUM means no coupling in machine
+MOMENTUM:=1E10;
+
+RETURN;

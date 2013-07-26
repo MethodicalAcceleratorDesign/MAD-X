@@ -56,7 +56,8 @@ test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 
 test-ptc-twiss-5D test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl \
 test-ptc-normal \
 test-ptc-trackline test-ptc-trackline-2 \
-test-touschek test-touschek-2
+test-touschek test-touschek-2 \
+test-sequence test-sequence-2 test-sequence-3
 
 # same order as tests-all, tests that take +10s
 # to know the timing: make tests-all TIMER=time (on Unixes)
@@ -95,6 +96,7 @@ test-ptc-normal:     TESTSUITE := PTC Normal testsuite
 test-ptc-trackline:  TESTSUITE := PTC Trackline testsuite
 test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
+test-sequence:	     TESTSUITE := Sequence testsuite
 test-setvars_lin:    TESTSUITE := Special features
 test-survey:         TESTSUITE := Survey testsuite
 test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite

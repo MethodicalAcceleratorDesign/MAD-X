@@ -1,0 +1,45 @@
+!######################################################
+!# For information only. Protons at 10 GeV/c. User: TSTPS
+!#
+!# Execute file with the command: >madx < 10GeVc_for_OP_group.madx
+!#
+!######################################################
+!#
+!#  IQF       =      0 A
+!#  IQD       =      0 A
+
+
+/******************************************************************
+ * Circulating beam
+ ******************************************************************/
+!call,  file = '../elements/PS.ele';
+!call,  file = '../sequence/PS.seq';
+!call,  file = '../strength/PS_10GeVc_for_OP_group.str';
+
+call,  file = '../share/PS/PS.ele';
+call,  file = '../share/PS/PS_new.seq';
+call,  file = '../share/PS/PS_10GeVc_for_OP_group.str';
+
+
+set,  format="-25s";
+set,  format="23.16f";
+
+
+/******************************************************************
+ * Use
+ ******************************************************************/
+beam, particle=proton, pc=10; 
+
+use, sequence=PS;
+
+
+/***************************************************
+ * SURVEY
+ ***************************************************/
+
+select, flag=survey, column=name,s, l, angle, x,y;
+
+survey, file="test-sequence.tfs";
+
+
+STOP;

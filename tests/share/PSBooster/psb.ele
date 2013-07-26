@@ -1,0 +1,239 @@
+
+ /**********************************************************************************
+  *
+  * PS Booster version STUDY in MAD X SEQUENCE format
+  * Generated the 17-DEC-2012 14:20:08 from LHCLAYOUT@EDMSDB Database
+  *
+  * It consists of 16 identical periods, apart from the equipment
+  * in the straight sections.
+  * The BOOSTER has an average radius of 25m and a circonference of 157.08m
+  * The 4 rings are numbered 1,2,3,4 from the bottom,
+  * with ring 3 at the CPS beam level.
+  * 2.654 + 3.928077 + 1.6177*2 = 9.81748 =period length
+  * Length of straight section L1: 2.654
+  * Length of triplets path: 3.928077
+  * Length of bending magnets: 1.6177
+  *
+  * Converted from MAD8 to MADX                           21/07/2006 O.Berrig
+  * Generated from LHCLAYOUT@EDMSDB since                 04/02/2009 P.Le Roux
+  * BR.BHZ11 etc. defined separately to avoid warnings    16/01/2010 O.Berrig
+  ************************************************************************************/
+
+
+
+
+/************************************************************************************/
+/*                       TYPES DEFINITION                                           */
+/************************************************************************************/
+
+//---------------------- ECOLLIMATOR    ---------------------------------------------
+SPSCRAP   : ECOLLIMATOR , L := 0;         ! PSB Special scraper injection & extraction bump, 128mm X 59mm. Thickness 2mm or 3mm (not yet known)
+                                          ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1420.TIF
+SPSCRAP014: ECOLLIMATOR , L := 0;         ! PSB Special scraper for extraction in P142. Thickness not known. Offset 9mm to the outside.
+                                          ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1421.TIF
+STSCRAP   : ECOLLIMATOR , L := 0;         ! PSB Standard scraper, 122mm X 59mm. Thickness 2mm.
+                                          ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1419.TIF
+//---------------------- HKICKER        ---------------------------------------------
+DBSH      : HKICKER     , L := 0;         ! DBSH Horizontal kicker for the beam scope, Dipoles Type I
+DES       : HKICKER     , L := .565;      ! Electrostatic horizontal/vertical stripline deflector
+DHZ__001  : HKICKER     , L := 0;         ! DHZ Horizontal Kicker type 1(nominal current:10A)
+DHZ__002  : HKICKER     , L := 0;         ! DHZ Horizontal Kicker type 2 (nominal current:10A)
+DHZ__00A  : HKICKER     , L := 0;         ! DHZ Horizontal Kicker type A (Multipole, nominal current:270 A)
+DSHAH     : HKICKER     , L := 0;         ! DSHAH Kicker  type 1
+MKMAG001  : HKICKER     , L := .414;      ! KSW Slow kicker for multiturn injection
+MKMAG002  : HKICKER     , L := .522;      ! KSW Slow kicker for multiturn injection
+MKMAG003  : HKICKER     , L := 2.005789;  ! KFA 800MeV Fast Extraction kicker
+SMH__005  : HKICKER     , L := 1.041;     ! Injection Septum
+SMH__006  : HKICKER     , L := 1.26;      ! Extraction Septum
+//---------------------- INSTRUMENT     ---------------------------------------------
+BTV       : INSTRUMENT  , L := 0;         ! Beam Observation TV Monitors based on Screens
+//---------------------- MARKER         ---------------------------------------------
+MSF       : MARKER      , L := 0;         ! SEMfil (2 SEMfils for incoming+circulating beam)
+VVS       : MARKER      , L := 0;         ! Vacuum Sector valve
+//---------------------- MONITOR        ---------------------------------------------
+BWSH      : MONITOR     , L := 0;         ! Wire scanner horizontal
+BWSV      : MONITOR     , L := 0;         ! Wire scanner vertical
+KQM__002  : MONITOR     , L := 1.23;      ! Q kicker tune measurement
+TDC       : MONITOR     , L := .319357;   ! DC Transformer
+! The following three beam transformers (TFA, TMD and TSW) are inside the same casing. It is the casing that is 0.5293 m long.
+TFA       : MONITOR     , L := .5293;     ! Beam transformer slow, transfo fast (+transfo slow + transfo intermediaire, but obsolete electronics)
+TMD       : MONITOR     , L := .5293;     ! Beam transformer - transformer middle; will be reused with Linac4
+TSW       : MONITOR     , L := .5293;     ! Beam transformer slow (obsolete)
+UES       : MONITOR     , L := 0;         ! UES Pick-up Monitor
+UPH__002  : MONITOR     , L := 0;         ! Phase Pick-up
+UQD       : MONITOR     , L := 0;         ! UQD Pick-up Monitor quadrupolar
+UTFB      : MONITOR     , L := 0;         ! PU Transverse feedback, electrostatic PU; type F
+UWBL      : MONITOR     , L := .3405;     ! Wide band PU, PU wide band (BSM, tomoscope)
+//---------------------- OCTUPOLE       ---------------------------------------------
+ONO       : OCTUPOLE    , L := 0;         ! Normal Octupole
+ONOH0     : OCTUPOLE    , L := 0;         ! Normal Octupole
+OSK       : OCTUPOLE    , L := 0;         ! Skew Octupole
+//---------------------- QUADRUPOLE     ---------------------------------------------
+MQNEC     : QUADRUPOLE  , L := .5036;     ! Quadrupole magnet, 4 apertures, type QFO
+MQNED     : QUADRUPOLE  , L := .5036;     ! Quadrupole magnet, 4 apertures, type QFO extraction
+MQNFA     : QUADRUPOLE  , L := .8789;     ! Quadrupole magnet, 4 apertures, type QDE
+QNO__001  : QUADRUPOLE  , L := 0;         ! Normal Quadrupole
+QSK       : QUADRUPOLE  , L := 0;         ! Skew Quadrupole
+QSKH0     : QUADRUPOLE  , L := 0;         ! QSKH0 Quadrupole Skew
+//---------------------- RBEND          ---------------------------------------------
+MBHGC4WP  : RBEND       , L := 1.617697;  ! Bending magnet , Booster, 4 apertures. Alsthom "Normaux"
+MBHGD4WP  : RBEND       , L := 1.617697;  ! Bending magnet , Booster ejection, 4 apertures. Alsthom "Speciaux"
+MBHGE4WP  : RBEND       , L := 1.617697;  ! Bending magnet , Booster injection, 4 apertures. Alsthom "Speciaux"
+MDBAA     : RBEND       , L := .522;      ! BSW Dipole ejection bump (slow), Dipoles Type 5
+MDBAB     : RBEND       , L := .565;      ! BSW Dipole ejection bump (slow), Dipoles Type II or 6
+//---------------------- RCOLLIMATOR    ---------------------------------------------
+WBS       : RCOLLIMATOR , L := .04;       ! Collimator, window beamscope
+//---------------------- RFCAVITY       ---------------------------------------------
+ACC02     : RFCAVITY    , L := 2.442;     ! 2 MHz cavity
+ACC04     : RFCAVITY    , L := 2.22;      ! 4 MHz cavity
+ACC16     : RFCAVITY    , L := 1.285571;  ! 16 MHz cavity
+//---------------------- SEXTUPOLE      ---------------------------------------------
+XNOH0     : SEXTUPOLE   , L := 0;         ! Normal Sextupole
+XNO__001  : SEXTUPOLE   , L := 0;         ! Normal Sextupole
+XSK       : SEXTUPOLE   , L := 0;         ! Skew sextupole
+//---------------------- VKICKER        ---------------------------------------------
+DBSV      : VKICKER     , L := 0;         ! DBSV Vertical kicker for the beam scope, Dipoles Type I
+DSHAV     : VKICKER     , L := 0;         ! DSHAV Vertical Kicker type 1 (nominal current:10A), Shielding
+DVT__001  : VKICKER     , L := 0;         ! DVT Vertical Kicker type 1 (nominal current:10A)
+DVT__002  : VKICKER     , L := 0;         ! DVT Vertical Kicker type 2  (nominal current:10A)
+DVT__00A  : VKICKER     , L := 0;         ! DVT Vertical Kicker Type A  (Multipole, nominal current:270 A)
+
+
+/************************************************************************************/
+/* IDENTICAL EQUIPMENT IN ALL RINGS. AVOIDS WARNINGS OF RE-DEFINITION               */
+/************************************************************************************/
+
+//-----  Scrapers            ---------------------------------------------------------
+
+ BR.SPSCRAP11        : SPSCRAP;
+ BR.SPSCRAP151       : SPSCRAP;
+ BR.SPSCRAP142       : SPSCRAP014;
+ BR.STSCRAP12        : STSCRAP;
+ BR.STSCRAP21        : STSCRAP;
+ BR.STSCRAP22        : STSCRAP;
+ BR.STSCRAP31        : STSCRAP;
+ BR.STSCRAP32        : STSCRAP;
+ BR.STSCRAP41        : STSCRAP;
+ BR.STSCRAP42        : STSCRAP;
+ BR.STSCRAP51        : STSCRAP;
+ BR.STSCRAP52        : STSCRAP;
+ BR.STSCRAP61        : STSCRAP;
+ BR.STSCRAP62        : STSCRAP;
+ BR.STSCRAP71        : STSCRAP;
+ BR.STSCRAP72        : STSCRAP;
+ BR.STSCRAP81        : STSCRAP;
+ BR.STSCRAP82        : STSCRAP;
+ BR.STSCRAP91        : STSCRAP;
+ BR.STSCRAP92        : STSCRAP;
+ BR.STSCRAP101       : STSCRAP;
+ BR.STSCRAP102       : STSCRAP;
+ BR.STSCRAP111       : STSCRAP;
+ BR.STSCRAP112       : STSCRAP;
+ BR.STSCRAP121       : STSCRAP;
+ BR.STSCRAP122       : STSCRAP;
+ BR.STSCRAP131       : STSCRAP;
+ BR.STSCRAP132       : STSCRAP;
+ BR.STSCRAP141       : STSCRAP;
+ BR.STSCRAP152       : STSCRAP;
+ BR.STSCRAP161       : STSCRAP;
+ BR.STSCRAP162       : STSCRAP;
+
+//-----  Injection septa     ---------------------------------------------------------
+
+ BI.SMH1L1           : SMH__005;
+
+//-----  Others              ---------------------------------------------------------
+
+ BI.BTV50            : BTV;
+ BI.BTV60            : BTV;
+ BR.BTV15L1          : BTV;
+
+//-----  Quadrupole magnets  ---------------------------------------------------------
+
+ BR.QFO11            : MQNEC;
+ BR.QFO12            : MQNEC;
+ BR.QFO21            : MQNEC;
+ BR.QFO22            : MQNEC;
+ BR.QFO31            : MQNEC;
+ BR.QFO32            : MQNEC;
+ BR.QFO41            : MQNEC;
+ BR.QFO42            : MQNEC;
+ BR.QFO51            : MQNEC;
+ BR.QFO52            : MQNEC;
+ BR.QFO61            : MQNEC;
+ BR.QFO62            : MQNEC;
+ BR.QFO71            : MQNEC;
+ BR.QFO72            : MQNEC;
+ BR.QFO81            : MQNEC;
+ BR.QFO82            : MQNEC;
+ BR.QFO91            : MQNEC;
+ BR.QFO92            : MQNEC;
+ BR.QFO101           : MQNEC;
+ BR.QFO102           : MQNEC;
+ BR.QFO111           : MQNEC;
+ BR.QFO112           : MQNEC;
+ BR.QFO121           : MQNEC;
+ BR.QFO122           : MQNEC;
+ BR.QFO131           : MQNEC;
+ BR.QFO132           : MQNEC;
+ BR.QFO142           : MQNEC;
+ BR.QFO151           : MQNEC;
+ BR.QFO152           : MQNEC;
+ BR.QFO161           : MQNEC;
+ BR.QFO162           : MQNEC;
+ BR.QFO141           : MQNED;        ! Bigger cooling pipes. Allow 2.5 times water-flow
+
+ BR.QDE1             : MQNFA;
+ BR.QDE2             : MQNFA;
+ BR.QDE3             : MQNFA;
+ BR.QDE4             : MQNFA;
+ BR.QDE5             : MQNFA;
+ BR.QDE6             : MQNFA;
+ BR.QDE7             : MQNFA;
+ BR.QDE8             : MQNFA;
+ BR.QDE9             : MQNFA;
+ BR.QDE10            : MQNFA;
+ BR.QDE11            : MQNFA;
+ BR.QDE12            : MQNFA;
+ BR.QDE13            : MQNFA;
+ BR.QDE14            : MQNFA;
+ BR.QDE15            : MQNFA;
+ BR.QDE16            : MQNFA;
+
+//-----  Bending magnets     ---------------------------------------------------------
+
+ BR.BHZ11            : MBHGC4WP;
+ BR.BHZ12            : MBHGC4WP;
+ BR.BHZ21            : MBHGC4WP;
+ BR.BHZ22            : MBHGC4WP;
+ BR.BHZ31            : MBHGC4WP;
+ BR.BHZ32            : MBHGC4WP;
+ BR.BHZ41            : MBHGC4WP;
+ BR.BHZ42            : MBHGC4WP;
+ BR.BHZ51            : MBHGC4WP;
+ BR.BHZ52            : MBHGC4WP;
+ BR.BHZ61            : MBHGC4WP;
+ BR.BHZ62            : MBHGC4WP;
+ BR.BHZ71            : MBHGC4WP;
+ BR.BHZ72            : MBHGC4WP;
+ BR.BHZ81            : MBHGC4WP;
+ BR.BHZ82            : MBHGC4WP;
+ BR.BHZ91            : MBHGC4WP;
+ BR.BHZ92            : MBHGC4WP;
+ BR.BHZ101           : MBHGC4WP;
+ BR.BHZ102           : MBHGC4WP;
+ BR.BHZ111           : MBHGC4WP;
+ BR.BHZ112           : MBHGC4WP;
+ BR.BHZ121           : MBHGC4WP;
+ BR.BHZ122           : MBHGC4WP;
+ BR.BHZ131           : MBHGC4WP;
+ BR.BHZ132           : MBHGC4WP;
+ BR.BHZ141           : MBHGC4WP;
+ BR.BHZ142           : MBHGC4WP;
+ BR.BHZ152           : MBHGC4WP;
+ BR.BHZ161           : MBHGC4WP;
+ BR.BHZ151           : MBHGD4WP;     ! Include vacuum pipe for extraction
+
+ BR.BHZ162           : MBHGE4WP;     ! Include vacuum pipe for injection
+
+

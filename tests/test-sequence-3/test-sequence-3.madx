@@ -1,0 +1,111 @@
+
+/*****************************************************
+ *
+ * MADX file for the AD with high energy (HE)
+ *
+ * Execute with:  >madx < 2010_AD_HE.madx
+ * This file is for anti-protons at 3.57 GeV/c
+ * i.e. just produced by the 26 GeV/c proton beam
+ *****************************************************/
+
+
+
+
+/*****************************************************************************
+ * TITLE
+ *****************************************************************************/
+ title, 'AD HE 2010 optics. Anti-Protons - 3.57 GeV/c';
+
+ option, echo;
+ option, RBARC=FALSE;
+
+
+
+/*****************************************************************************
+ * AD
+ * NB! The order of the .ele .str and .seq files matter.
+ *     The reason is a >feature< of MADX
+ *
+ *****************************************************************************/
+ option, echo;
+ call, file = '../share/AD/ad_quads_3837_ffe.str';
+ call, file = '../share/AD/ad.ele';
+ call, file = '../share/AD/ad.dbx';
+ call, file = '../share/AD/ad_new.seq';
+ option, echo;
+
+ set,  format="-21s";
+ set,  format="13.11f";
+
+
+/*****************************************************************************
+ * store initial parameters in memory block
+ *****************************************************************************/
+INITBETA0: BETA0,
+  BETX=   3.85095118133,
+  ALFX=  -0.200025813081E-05,
+  MUX=MUX0,
+  BETY=1.,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=0.115194401814,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+/*******************************************************************************
+ * Beam
+ * NB! beam->ex == (beam->exn)/(beam->gamma*beam->beta*4)
+ *******************************************************************************/
+ Beam, particle=POSITRON, MASS=0.51099906E-3, ENERGY=1.0,PC=0.99999986944, GAMMA=1.956950762297E3;
+ Use, sequence=ad;
+
+ select flag=twiss,column=name, s, l, alfx, betx,dx, alfy, bety;
+ twiss, centre, beta0=initbeta0, file="optics_2010-1.out";
+
+/*******************************************************************************
+ * Seqedit 
+ *******************************************************************************/
+ seqedit, sequence=ad;
+  flatten;
+  cycle, start=STARTAD;
+ endedit;
+ save, sequence=ad, file=ad.save;
+
+ use, sequence=ad, range=#STARTAD/#e;
+
+/*******************************************************************************
+ * twiss
+ *******************************************************************************/
+! ns    ~ longitudinal number of sigma
+! nt    ~ transverse   number of sigma
+! dimxc ~ size-x with dispersion, dimyc ~ size-y with dispersion,
+
+ ns = 2;
+ nt = 3;
+ dimxc := sqrt( nt^2*table(twiss,betx)*beam->ex + ns^2*(beam->sige*table(twiss,dx))^2 );
+ dimyc := sqrt( nt^2*table(twiss,bety)*beam->ey + ns^2*(beam->sige*table(twiss,dy))^2 );
+
+
+ maketwiss: macro=
+ {
+     select flag=twiss,column=name, s, l, alfx, betx,dx, alfy, bety;
+     twiss, centre, beta0=initbeta0, file="optics_2010-2.out";
+ };
+
+ exec, maketwiss;
+
+
+stop;
+
+
+
+
+

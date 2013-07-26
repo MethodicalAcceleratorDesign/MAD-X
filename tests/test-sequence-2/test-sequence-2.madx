@@ -62,10 +62,11 @@
 /******************************************************************************************
  * BOOSTER
  ******************************************************************************************/
- call, file = '/afs/cern.ch/eng/ps/cps/Psb/2013/psb.ele';
- call, file = '/afs/cern.ch/eng/ps/cps/Psb/2013/psb.seq';
- call, file = '/afs/cern.ch/eng/ps/cps/Psb/2013/psb.dbx';
- call, file = '/afs/cern.ch/eng/ps/cps/Psb/2013/strength/psb_extraction.str';
+ call, file = '../share/PSBooster/psb.ele';
+ call, file = '../share/PSBooster/psb_new.seq';
+ call, file = '../share/PSBooster/psb.dbx';
+ call, file = '../share/PSBooster/psb_extraction.str';
+
 
 
 /******************************************************************************************
@@ -91,9 +92,7 @@ psb: sequence, refer=ENTRY,  l = 157.08000;
   P16BOT                   , at = 147.26250;
 endsequence;
 
-!save, sequence=psb, file=psb.save;
-
-
+set,  format="20.12f";
 
 /******************************************************************************************
  * beam, use
@@ -102,122 +101,13 @@ endsequence;
 beam, particle=PROTON, pc=2.14;  ! pc=momentum
 use, sequence=psb;
 
-set,  format="20.10f";
-
-
 
 /******************************************************************************************
- * Match for new working point
+ * survey
  ******************************************************************************************/
 
-MATCH,sequence=psb;
- vary, NAME=kKF, step = 0.0001;
- vary, NAME=kKD, step = 0.0001;
- constraint, range=#E, MUX=4.172, MUY=4.230;
- lmdif, calls = 10000, tolerance = 1.0E-21;
-ENDMATCH;
+select, flag=survey, column=name,s, l, angle, x,y;
+survey, file="test-sequence-2.tfs";
 
 
-
-! Print results on file: match_extraction.prt
-!assign, echo="../output/match_extraction.prt";
-print, text="match_extraction";
-value,  kKF;
-value,  kKD;
-assign, echo=terminal;
-
-
-
-/******************************************************************************************
- * TWISS
- ******************************************************************************************/
-
-PSHIFT=0;
-
-/************************************************************
- * MAD uses pt as the 5th variable NOT delta-p.
- * The result is that all derivatives are with repect to pt.
- * This is the reason for the non-standard dispersion values
- * for non-relativistic machines, like the PSB
- ************************************************************/
-beta=sqrt(1-1/beam->gamma^2);
-disp:=beta*table(twiss,dx); ! Delta_x=Disp*Delta_p/p;
-
-
-select, flag=twiss, clear;
-select, flag=twiss, column=name, s, dx, disp;
-
-twiss , centre
-      , DELTAP = PSHIFT
-      , table=TWISS
-      , file='output_extraction.outxptc';
-!      , file='../output/output_extraction.outxptc';
-
-value,table(TWISS,PSB$START,betx);
-
-
-
-/******************************************************************************************
- * PLOT
- ******************************************************************************************/
-
-/* Use >gv psb2010.ps to plot */
-
-PLOT, table=TWISS, VAXIS=BETX,BETY,HAXIS=S,
-      SPLINE=FALSE, COLOUR=100, RANGE=#S/#E, FILE='psb_extraction';
-!      SPLINE=FALSE, COLOUR=100, RANGE=#S/#E, FILE='../output/psb_extraction';
-PLOT, table=TWISS, VAXIS=DISP,HAXIS=S,
-      SPLINE=FALSE, NOVERSION=TRUE, COLOUR=100, RANGE=#S/#E;
-PLOT, table=TWISS, VAXIS=ALFX,ALFY,HAXIS=S,
-      SPLINE=FALSE, NOVERSION=TRUE, COLOUR=100, RANGE=#S/#E;
-
-
-
-
-
-/******************************************************************************************
- * PTC
- ******************************************************************************************/
-
-!--------------------------------------------------------------------------
-! PTC_TWISS
-!
-! This PTC example illustrates the difference of the calculation
-! of dispersion, either according to p or pt (momentum).
-!
-! The dispersions differs with Beta (relativistic): D_p = D_pt*Beta
-!
-! D_pt corresponds to time=true  i.e. according to pt (same result as TWISS)
-! D_p  corresponds to time=false i.e. according to p
-!
-!--------------------------------------------------------------------------
-
-select,flag=ptc_twiss,clear;
-select,flag=ptc_twiss,column=name,s,disp1;
-
-
-!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ptc_create_universe;
-ptc_create_layout,model=2,method=6,time=true,nst=5,exact; ! time = true
-
-ptc_twiss,icase=5,no=1,file='twiss_ptc_true.outxptc';
-!ptc_twiss,icase=5,no=1,file='../output/twiss_ptc_true.outxptc';
-ptc_end;
-
-
-!- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ptc_create_universe;
-ptc_create_layout,model=2,method=6,time=false,nst=5,exact; ! time = false
-
-ptc_twiss,icase=5,no=1,file='twiss_ptc_false.outxptc';
-!ptc_twiss,icase=5,no=1,file='../output/twiss_ptc_false.outxptc';
-ptc_end;
-
-
-
-
-
-STOP;
-
-
-
+Stop;
