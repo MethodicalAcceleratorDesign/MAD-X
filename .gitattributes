@@ -1058,6 +1058,7 @@ testing/stayAlive.py -text
 testing/testCompileClient.py -text
 testing/underConstruction.gif -text svneol=unset#unset
 tests/.htaccess -text
+tests/share/AD/ad_new.seq -text
 tests/share/LEIR/LEIR.seqx -text
 tests/share/LEP/lep.opt9 -text
 tests/share/LEP/lep.seq9 -text
@@ -1074,6 +1075,9 @@ tests/share/LHC/LHCRing/V6.503/V6.5.thin.seq -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
+tests/share/PS/PS_new.seq -text
+tests/share/PSBooster/psb_extraction.madx -text
+tests/share/PSBooster/psb_new.seq -text
 tests/share/RHIC/rhic.madx -text
 tests/share/line_lattice/README -text
 tests/share/line_lattice/ebsy.madx -text
