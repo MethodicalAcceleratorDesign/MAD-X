@@ -67,6 +67,7 @@
 %\usepackage{sectsty}
 %\usepackage{fancybox}
 %\usepackage{listings}
+
 \usepackage{hyperref}
 
 \usepackage[dvipsnames,svgnames]{xcolor}
@@ -89,6 +90,9 @@
 % set the indentation at the beginning of a paragraph to zero
 % for better lisibility in a manual style
 \setlength{\parindent}{0pt} % Default is 15pt.
+
+\makeindex        % use \index{keyword}
+\makeglossary     % use \glossary{concept}
 
 \begin{document}
 
@@ -154,7 +158,8 @@
 \part{}
 %\include{sindex}                        %Keyword and Subject Index
 \include{Introduction/bibliography}     %References
-\include{match/bibliography}
+\include{match/bibliography}            %Additional References; should
+                                        %be merged with the above
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
