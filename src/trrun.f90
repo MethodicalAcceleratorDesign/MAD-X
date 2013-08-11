@@ -227,7 +227,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      !--- enter start coordinates in summary table
      t_max=get_value('probe ','circ ')/get_value('run ', 'track_harmon ')/betas
      pt_max = get_value('run ', 'deltap_max ')
-     pt_max=sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0
+     pt_max=(sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0)*beti
      do  i = 1,j_tot
         if(z(5,i).gt.t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
@@ -296,7 +296,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
              'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
         t_rms = get_value('run ', 'half_bunch_length_rms ')*beti
         pt_rms = get_value('run ', 'deltap_rms ')
-        pt_rms=sqrt((betas*(pt_rms+1d0))**2+1d0/gammas**2)-1d0
+        pt_rms=(sqrt((betas*(pt_rms+1d0))**2+1d0/gammas**2)-1d0)*beti
         sigma_z_ini=t_rms !betas: BEAM->BETA
         sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
         sigma_p=pt_rms       !default
