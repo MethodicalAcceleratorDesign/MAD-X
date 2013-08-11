@@ -3121,7 +3121,7 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
        get_option, optiondebug
   double precision sum,last_pos(*),last_orbit(6,*),z(6,*), &
        al_errors(align_max),offx,offy
-  character(name_len) :: non_app="NONE"
+  character(name_len) :: non_app="RF-Bucket"
 
   optiondebug = get_option('debug ')
 
