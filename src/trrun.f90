@@ -209,9 +209,34 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   nlm=0
   !hbu
   el_name='start           '
+
+  !---- Initialize kinematics and orbit
+  bet0  = get_value('beam ','beta ')
+  betas = get_value('probe ','beta ')
+  gammas= get_value('probe ','gamma ')
+  bet0i = 1d0 / bet0
+  beti   = 1d0 / betas
+  dtbyds = get_value('probe ','dtbyds ')
+  deltas = get_variable('track_deltap ')
+  arad = get_value('probe ','arad ')
+  dorad = get_value('probe ','radiate ') .ne. 0d0
+  dodamp = get_option('damp ') .ne. 0
+  dorand = get_option('quantum ') .ne. 0
+
   if(first) then
      !--- enter start coordinates in summary table
+     t_max=get_value('probe ','circ ')/get_value('run ', 'track_harmon ')/betas
+     pt_max = get_value('run ', 'deltap_max ')
+     pt_max=sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0
      do  i = 1,j_tot
+        if(z(5,i).gt.t_max) then
+           write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
+           call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger then' // text)
+        endif
+        if(z(6,i).gt.pt_max) then
+           write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
+           call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger then' // text)
+        endif
         tmp_d = i
         call double_to_table_curr('tracksumm ', 'number ', tmp_d)
         tmp_d = tot_turn
@@ -241,18 +266,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         enddo
      endif
   endif
-  !---- Initialize kinematics and orbit
-  bet0  = get_value('beam ','beta ')
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  bet0i = 1d0 / bet0
-  beti   = 1d0 / betas
-  dtbyds = get_value('probe ','dtbyds ')
-  deltas = get_variable('track_deltap ')
-  arad = get_value('probe ','arad ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
   call dcopy(orbit0,orbit,6)
 
   doupdate = get_option('update ') .ne. 0
@@ -281,11 +294,12 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
              'Number N_macr_prt_ini exceeds N_macro_max (array size)')
         if(N_macro_surv .GT. N_macr_prt_ini) call aafail('TRRUN: ',&
              'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
-        t_rms = get_value('run ', 't_rms ')
-        pt_rms = get_value('run ', 'pt_rms ')
-        sigma_z_ini=betas*t_rms !betas: BEAM->BETA
+        t_rms = get_value('run ', 'half_bunch_length_rms ')*beti
+        pt_rms = get_value('run ', 'deltap_rms ')
+        pt_rms=sqrt((betas*(pt_rms+1d0))**2+1d0/gammas**2)-1d0
+        sigma_z_ini=t_rms !betas: BEAM->BETA
         sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
-        sigma_p=betas*pt_rms       !default
+        sigma_p=pt_rms       !default
         z_factor=1d0 !at start sigma_z_ini/sigma_z
         Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
         Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
@@ -914,6 +928,8 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !---- RF cavity.
 100 continue
   call ttrf(track,ktrack)
+  call ttrfloss(turn, sum, part_id, last_turn, &
+       last_pos,last_orbit,track,ktrack)
   go to 500
   !---- Electrostatic separator.
 110 continue
@@ -1532,6 +1548,7 @@ subroutine ttrf(track,ktrack)
   use twtrrfi
   use name_lenfi
   use time_varfi
+  use trackfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -3076,6 +3093,58 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
 98   continue
   enddo
 end subroutine trcoll
+
+subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
+
+  use twiss0fi
+  use name_lenfi
+  use trackfi
+  implicit none
+
+  ! FRS: August 2013
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Find particles outside the bucket.                                 *
+  ! input:                                                               *
+  !   turn      (integer)   current turn number.                         *
+  !   sum       (double)    accumulated length.                          *
+  ! input/output:                                                        *
+  !   part_id   (int array) particle identification list                 *
+  !   last_turn (int array) storage for number of last turn              *
+  !   last_pos  (dp. array) storage for last position (= sum)            *
+  !   last_orbit(dp. array) storage for last orbit                       *
+  !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
+  !   ntrk      (integer) number of surviving tracks.                    *
+  !----------------------------------------------------------------------*
+  integer turn,part_id(*),last_turn(*),ntrk,i,n,nn,  & 
+       get_option, optiondebug
+  double precision sum,last_pos(*),last_orbit(6,*),z(6,*), &
+       al_errors(align_max),offx,offy
+  character(name_len) :: non_app="NONE"
+
+  optiondebug = get_option('debug ')
+
+  n = 1
+10 continue
+  do i = n, ntrk
+
+     !---- Is particle outside the bucket?
+     if(z(5,i).gt.t_max.or.z(6,i).gt.pt_max) goto 99
+
+     ! break if particle is inside aperture and continue the loop
+     go to 98
+
+     ! lose particle if it is outside aperture
+99   n = i
+     nn=name_len
+     call trkill(n, turn, sum, ntrk, part_id,                        &
+          last_turn, last_pos, last_orbit, z, non_app)
+     goto 10
+
+98   continue
+  enddo
+end subroutine ttrfloss
 
 
 ! subroutine trcoll1(flag, apx, apy, turn, sum, part_id, last_turn,  &

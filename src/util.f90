@@ -176,7 +176,7 @@ module trackfi
   implicit none
   public
   double precision :: arad=0.d0,betas=0.d0,beti=0.d0,gammas=0.d0,dtbyds=0.d0,&
-       deltas=0.d0,bet0=0.d0,bet0i=0.d0
+       deltas=0.d0,bet0=0.d0,bet0i=0.d0,t_max=1.d20,pt_max=1.d20
   logical :: dodamp=.false.,dorad=.false.,dorand=.false.,fsecarb=.false.
   save arad,betas,beti,gammas,dtbyds,bet0,bet0i
 end module trackfi

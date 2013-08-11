@@ -68,7 +68,7 @@ USEGC    := no
 ARCH    := detect
 
 # debugging mode: yes/no (default is no)
-DEBUG   := no
+DEBUG   := NO
 
 # profiling mode: yes/no (default is no)
 PROFILE := no

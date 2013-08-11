@@ -534,9 +534,7 @@ CONTAINS
     select case(code)
     case(0,4,25)
        key%magnet="marker"
-    case(22)
-       call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
-       key%magnet="marker"
+       print*,key%list%name
     case(1,11,20,21)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
