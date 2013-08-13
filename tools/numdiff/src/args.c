@@ -333,7 +333,7 @@ parse_args(int argc, const char *argv[])
     }
 
     // set comment characters [setup]
-    if (!strcmp(argv[option.argi], "--comment")) {
+    if (!strcmp(argv[option.argi], "--comment") || (!option.lgopt && !strcmp(argv[option.argi], "-c"))) {
       option.cchr = argv[++option.argi]; 
       debug("comment characters set to '%s'", option.cchr);
       continue;
