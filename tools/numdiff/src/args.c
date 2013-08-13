@@ -1,7 +1,7 @@
 /*
  o---------------------------------------------------------------------o
  |
- | Numdiff
+ | Ndiff
  |
  | Copyright (c) 2012+ laurent.deniau@cern.ch
  | Gnu General Public License
@@ -164,9 +164,9 @@ usage(void)
   logmsg_config.level = inform_level;
 
   inform("usage:");
-  inform("\tnumdiff [options] fileA[.out] fileB[.ref] [fileC[.cfg]]");
-  inform("\tnumdiff [options] --list fileA fileB ...");
-  inform("\tnumdiff [options] --test '1st' fileA fileB --test '2nd' fileC ...");
+  inform("\tndiff [options] fileA[.out] fileB[.ref] [fileC[.cfg]]");
+  inform("\tndiff [options] --list fileA fileB ...");
+  inform("\tndiff [options] --test '1st' fileA fileB --test '2nd' fileC ...");
 
   inform("");
   inform("options:");
@@ -201,7 +201,7 @@ usage(void)
   inform("\t-t  --test name     set test name for output message (item)");
   inform("\t    --trace         enable trace mode (very verbose, include debug mode)");
   inform("\t    --trunc         allow premature ending of one of the input file");
-  inform("\t    --utest         run the numdiff unit tests (still incomplete)");
+  inform("\t    --utest         run the ndiff unit tests (still incomplete)");
   inform("\t-x  --xcheck        enable cross check mode (algorithms cross check)");
 
   inform("");
@@ -279,7 +279,7 @@ usage(void)
   inform("\tRn=Rp~Rq            move registers p..q to registers n..n+q-p");
 
   inform("");
-  inform("info   :\thttp://cern.ch/mad/numdiff");
+  inform("info   :\thttp://cern.ch/mad/ndiff");
   inform("author :\tlaurent.deniau@cern.ch");
   inform("version:\t%s", VERSION);
   inform("license:\tGPLv3");

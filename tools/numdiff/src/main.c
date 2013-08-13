@@ -1,7 +1,7 @@
 /*
  o---------------------------------------------------------------------o
  |
- | Numdiff
+ | Ndiff
  |
  | Copyright (c) 2012+ laurent.deniau@cern.ch
  | Gnu General Public License
@@ -203,7 +203,7 @@ main(int argc_, char** argv_)
         context_print(cxt, stderr);
       }
 
-      // numdiff loop
+      // ndiff loop
       struct ndiff *dif = ndiff_alloc(lhs_fp, rhs_fp, cxt, 0, option.nregs);
       ndiff_option(dif, &option.keep, &option.blank, &option.check, &option.recycle);
       ndiff_result(dif, lhs_rfp, rhs_rfp);

@@ -1,7 +1,7 @@
 /*
  o---------------------------------------------------------------------o
  |
- | Numdiff
+ | Ndiff
  |
  | Copyright (c) 2012+ laurent.deniau@cern.ch
  | Gnu General Public License
@@ -10,7 +10,7 @@
   
    Purpose:
      numerical diff of files
-     provides the main numdiff loop
+     provides the main ndiff loop
  
  o---------------------------------------------------------------------o
 */

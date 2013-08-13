@@ -4,7 +4,7 @@
 /*
  o---------------------------------------------------------------------o
  |
- | Numdiff
+ | Ndiff
  |
  | Copyright (c) 2012+ laurent.deniau@cern.ch
  | Gnu General Public License
