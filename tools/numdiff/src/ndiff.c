@@ -67,7 +67,7 @@ struct ndiff {
 static inline int
 is_separator (int c)
 {
-  return !c || isblank(c) || (ispunct(c) && !strchr(option.chr, c));
+  return !c || isblank(c) || (ispunct(c) && !strchr(option.pchr, c));
 }
 
 static inline int
@@ -390,15 +390,15 @@ ndiff_readLine (T *dif)
 {
   assert(dif);
   int s1 = 0, s2 = 0;
-  int c1, c2, n = 0;
+  int c1, c2;
 
   trace("->readLine line %d", dif->row_i);
 
   ndiff_reset_buf(dif);
 
   while (1) {
-    c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_n-s1, &n); s1 += n;
-    c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_n-s2, &n); s2 += n;
+    c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_n-s1, &s1);
+    c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_n-s2, &s2);
     if (c1 == '\n' || c2 == '\n' || c1 == EOF || c2 == EOF) break;
     ndiff_grow(dif, 2*dif->buf_n);
   }
@@ -434,7 +434,7 @@ ndiff_gotoLine (T *dif, const C *c)
 
   // --- lhs ---
   while (1) {
-    int s = 0, n = 0;
+    int s1 = 0;
 
     dif->lhs_i    = 0;
     dif->lhs_b[0] = 0;
@@ -442,7 +442,7 @@ ndiff_gotoLine (T *dif, const C *c)
     if (c1 == EOF) break;
 
     while (1) {
-      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_n-s, &n); s += n;
+      c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_n-s1, &s1);
       if (c1 == '\n' || c1 == EOF) break;
       ndiff_grow(dif, 2*dif->buf_n);
     }
@@ -456,7 +456,7 @@ ndiff_gotoLine (T *dif, const C *c)
 
   // --- rhs ---
   while (1) {
-    int s = 0, n = 0;
+    int s2 = 0;
 
     dif->rhs_i    = 0;
     dif->rhs_b[0] = 0;
@@ -464,7 +464,7 @@ ndiff_gotoLine (T *dif, const C *c)
     if (c2 == EOF) break;
 
     while (1) {
-      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_n-s, &n); s += n;
+      c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_n-s2, &s2);
       if (c2 == '\n' || c2 == EOF) break;
       ndiff_grow(dif, 2*dif->buf_n);
     }
@@ -477,7 +477,7 @@ ndiff_gotoLine (T *dif, const C *c)
   }
 
   dif->col_i  = 0;
-  dif->row_i += i1 < i2 ? i1 : i2;
+  dif->row_i += imin(i1,i2);
 
   // return with last lhs and rhs lines loaded if tag was found
 
@@ -507,7 +507,7 @@ ndiff_gotoNum (T *dif, const C *c)
   memcpy(dif->rhs_b, _c.eps.tag, sizeof _c.eps.tag);
 
   while (1) {
-    int s = 0, n = 0;
+    int s1 = 0;
 
     dif->lhs_i    = 0;
     dif->lhs_b[0] = 0;
@@ -515,7 +515,7 @@ ndiff_gotoNum (T *dif, const C *c)
     if (c1 == EOF) break;
 
     while (1) {
-      c1 = readLine(dif->lhs_f, dif->lhs_b+s, dif->buf_n-s, &n); s += n;
+      c1 = readLine(dif->lhs_f, dif->lhs_b+s1, dif->buf_n-s1, &s1);
       if (c1 == '\n' || c1 == EOF) break;
       ndiff_grow(dif, 2*dif->buf_n);
     }
@@ -543,7 +543,7 @@ lhs_done: ;
   _c.eps.cmd = (enum eps_cmd)cmd;
 
   while (1) {
-    int s = 0, n = 0;
+    int s2 = 0;
 
     dif->rhs_i    = 0;
     dif->rhs_b[0] = 0;
@@ -551,7 +551,7 @@ lhs_done: ;
     if (c2 == EOF) break;
 
     while (1) {
-      c2 = readLine(dif->rhs_f, dif->rhs_b+s, dif->buf_n-s, &n); s += n;
+      c2 = readLine(dif->rhs_f, dif->rhs_b+s2, dif->buf_n-s2, &s2);
       if (c2 == '\n' || c2 == EOF) break;
       ndiff_grow(dif, 2*dif->buf_n);
     }
@@ -575,7 +575,7 @@ rhs_done: ;
   dif->lhs_i  = 0;
   dif->rhs_i  = 0;
   dif->col_i  = 0;
-  dif->row_i += i1 < i2 ? i1 : i2;
+  dif->row_i += imin(i1,i2);
 
   // return with last lhs and rhs lines loaded
 

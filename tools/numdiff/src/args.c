@@ -47,6 +47,10 @@
 #define MAXKEEP 25
 #endif
 
+#ifndef CMTCHRS
+#define CMTCHRS ""
+#endif
+
 #ifndef PUNCTCHRS
 #define PUNCTCHRS "._$"
 #endif
@@ -104,8 +108,11 @@ struct option option = {
   // register print format
   .rfmt = REG0FMT,
 
-  // punctuation part of identifiers
-  .chr = PUNCTCHRS,
+  // comment characters
+  .cchr = CMTCHRS,
+
+  // punctuation characters part of identifiers
+  .pchr = PUNCTCHRS,
 
   // number of diff displayed by default
   .keep = MAXKEEP,
@@ -166,6 +173,7 @@ usage(void)
   inform("\t-a  --accum file    accumulate tests information in file");
   inform("\t-b  --blank         ignore blank spaces (space and tabs)");
   inform("\t    --cfgext ext    specify the config file extension, default is \"%s\"", option.cfg_e);
+  inform("\t-c  --comment chrs  comment characters, default is \"%s\"", option.cchr);
   inform("\t-d  --debug         enable debug mode (include xcheck mode)");
   inform("\t-h  --help          display this help");
   inform("\t-i  --info          enable info mode (default)");
@@ -178,7 +186,7 @@ usage(void)
   inform("\t    --nowarn        disable warnings");
   inform("\t    --nregs num     specify the number of registers to allocate");
   inform("\t    --outext ext    specify the output file extension, default is \"%s\"", option.out_e);
-  inform("\t    --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.chr);
+  inform("\t    --punct chrs    punctuation characters part of identifiers, default is \"%s\"", option.pchr);
   inform("\t-q  --quiet         enable quiet mode (no output if no diff)");
   inform("\t    --refext ext    specify the reference file extension, default is \"%s\"", option.ref_e);
   inform("\t    --regfmt fmt    specify the (printf) format fmt for register 0, default is \"%s\"", option.rfmt);
@@ -324,6 +332,13 @@ parse_args(int argc, const char *argv[])
       continue;
     }
 
+    // set comment characters [setup]
+    if (!strcmp(argv[option.argi], "--comment")) {
+      option.cchr = argv[++option.argi]; 
+      debug("comment characters set to '%s'", option.cchr);
+      continue;
+    }
+
     // set debug mode [setup]
     if (!strcmp(argv[option.argi], "--debug") || (!option.lgopt && !strcmp(argv[option.argi], "-d"))) {
       logmsg_config.level = debug_level;
@@ -415,8 +430,8 @@ parse_args(int argc, const char *argv[])
 
     // set punctuation characters [setup]
     if (!strcmp(argv[option.argi], "--punct")) {
-      option.chr = argv[++option.argi]; 
-      debug("punctuation characters set to '%s'", option.chr);
+      option.pchr = argv[++option.argi]; 
+      debug("punctuation characters set to '%s'", option.pchr);
       continue;
     }
 

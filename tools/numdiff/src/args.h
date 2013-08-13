@@ -28,7 +28,7 @@ struct option {
   int serie, list, blank, utest, reset, trunc, nregs, recycle;
   const char *suite, *test;
   const char *fmt, *sfmt, *rfmt;
-  const char *chr;
+  const char *pchr, *cchr;
   const char *out_e, *ref_e, *cfg_e, *res_e;
   const char *unzip[3];
   char lhs_file[FILENAME_MAX];

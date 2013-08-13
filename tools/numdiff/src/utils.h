@@ -21,6 +21,8 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "args.h"
+
 // macros
 
 #if defined(_WIN32) || defined(NOCOLORS)
@@ -88,6 +90,15 @@ pow10(int i)
 // ----- public (read helpers)
 
 static inline int
+isComment(const char *buf)
+{
+  if (isspace(*option.cchr))
+    while(isspace(*buf)) ++buf;
+
+  return strchr(option.cchr, *buf) != 0;
+}
+
+static inline int
 skipSpace (FILE *fp, int *i_)
 {
   int c = 0, i = 0;
@@ -138,7 +149,9 @@ readLine (FILE *fp, char *buf, int n, int *i_)
   }
   buf[i] = 0;
 
-  if (i_) *i_ = i;
+  if (isComment(buf)) buf[i=0] = 0;
+
+  if (i_) *i_ += i;
 
   return c;
 }
