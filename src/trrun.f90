@@ -4698,17 +4698,17 @@ subroutine tttquad(track, ktrack)
 
      !---- Equations of motion
      !---- X
-     x_  =        C * x + S_over_ksqrt * px
-     px_ = -ksqrt_S * x +            C * px
+     x_  = C * x + S_over_ksqrt * px / delta_p1;
+     px_ = -ksqrt_S * delta_p1 * x + C * px;
      !---- Y
-     y_  =        Ch * y + Sh_over_ksqrt * py
-     py_ = -ksqrt_Sh * y +            Ch * py
+     y_  = Ch * y + Sh_over_ksqrt * py / delta_p1;
+     py_ = -ksqrt_Sh * delta_p1 * y + Ch * py;
      !---- Z
      z_ = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
-       (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1*delta_p1) * &
-       (0.5 * ((-kk0*y*y+py*py)*(length+Ch*Sh_over_ksqrt)+(-kk*y*y+py*py*delta_p1)*(length-Ch*Sh_over_ksqrt) + &
-	       (+kk0*x*x+px*px)*(length+C*S_over_ksqrt)+(+kk*x*x+px*px*delta_p1)*(length-C*S_over_ksqrt)) + &
-	(x*px*S*S+y*py*Sh*Sh)*(delta_p1-1d0));
+          (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1) * &
+          (0.5 * (kk0*((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt))) + &
+          0.5/delta_p1*((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) - & 
+          (x*px*S*S+y*py*Sh*Sh));
      !pt_ = pt; ! unchanged
 
      x = x_;
