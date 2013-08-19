@@ -4706,9 +4706,9 @@ subroutine tttquad(track, ktrack)
      !---- Z
      z_ = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
           (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1) * &
-          (0.5 * (kk0*((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt))) + &
-          0.5/delta_p1*((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) - & 
-          (x*px*S*S+y*py*Sh*Sh));
+          (0.5 * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
+          0.5 * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
+          (x*px*S*S-y*py*Sh*Sh));
      !pt_ = pt; ! unchanged
 
      x = x_;
