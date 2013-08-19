@@ -4708,7 +4708,7 @@ subroutine tttquad(track, ktrack)
           (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1) * &
           (0.5 * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
           0.5 * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
-          (x*px*S*S-y*py*Sh*Sh));
+          (x*px*(1d0-C*C)+y*py*(1d0-Ch*Ch)));
      !pt_ = pt; ! unchanged
 
      x = x_;
