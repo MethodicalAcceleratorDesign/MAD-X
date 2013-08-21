@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 06.07.13 14.00.23 +
+  + Execution Time Stamp: 21.08.13 15.10.19 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -16,11 +16,11 @@ one pass is on
 
     number       turn                  x                 px 
          1          0              0.001                  0 
-         1         10   -0.0006163935379   -0.0001759885744 
+         1         10   -0.0006163935379   -0.0001761645631 
 
                  y                 py                  t                 pt 
                  0                  0                  0              0.001 
-                 0                  0   -2.405608458e-07              0.001 
+                 0                  0   -1.431911951e-07              0.001 
 
                  s                  e 
                  0                  0 
