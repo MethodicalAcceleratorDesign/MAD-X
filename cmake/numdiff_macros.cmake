@@ -36,6 +36,6 @@ macro(numdiff_test testname islong)
    if(NOT ${islong})
       # short tests should never be allowed to take longer than 5 seconds!
       set_tests_properties (${_testname}
-         PROPERTIES TIMEOUT 5)
+         PROPERTIES TIMEOUT 10)
    endif()
 endmacro()
