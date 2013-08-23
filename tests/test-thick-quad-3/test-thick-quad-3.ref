@@ -1,0 +1,233 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 23.08.13 11.55.21 +
+  +++++++++++++++++++++++++++++++++++++++++++
+! H. Burkhardt.  Updated for improved makethin select in summer 2005, further updated in 2011 for extended teapot and functionality
+
+!
+
+! cd /tmp/$LOGNAME/ ; rm -f /tmp/$LOGNAME/* ; cp -pf ~/mad/makethin/fivecell.* . ; madx < ~/mad/makethin/fivecell.madx >& fivecell.out ; ps2pdf madxplot.ps ; open madxplot.pdf
+
+!
+
+! diff /tmp/hbu/fivecell_thin.seq ~/mad/madX-examples/makethin/fivecell_thin.seq
+
+!
+
+
+
+title,"Five cell test";
+
+
+
+beam;
+
+
+
+option,-echo;
+
+use,period=fivecell;   ! use needed for twiss (not necessarily needed before makethin)
+
+select,flag=twiss,clear; select,flag=twiss,column=name,s,betx,alfx,dx,dpx,bety,alfy,dy,dpy,mux,muy,apertype;
+
+twiss,sequence=fivecell,file="fivecell_thick.tfs";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053600864        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.660602214                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050583704        177.9027092      0.09011673644      0.06712058421 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+!-- Plot thick sequence
+
+  title,"fivecell before makethin";
+
+  plot,file=madxplot,vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0,-4,vmax=350,4, colour=100, range=#s/#e;
+
+Plot - default table plotted: twiss
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+
+ GXPLOT-X11  1.50 initialized
+
+ plot number =            1
+
+
+!--- quads
+
+!  select, flag=makethin, class=quadrupole, slice= 100; ! slice all quadrupoles
+
+select, flag=makethin, class=quadrupole, thick=true;
+
+
+
+! select, flag=makethin, class=quadrupole, slice= 0; ! turn quad slicing off
+
+
+
+!--- bends
+
+! select, flag=makethin, class="rbend", slice=0;    ! bend slicing off --- use this to test only quadrupole slicing   or at least use makedipedge
+
+! select, flag=makethin, class="rbend", slice=2;    ! negative drift with dipedge      refer=centre    problem,   ok with flatten
+
+  select, flag=makethin, class="rbend", slice=1;
+
+
+
+makethin,sequence=fivecell,style=teapot,makedipedge=true;
+
+makethin: style chosen : teapot
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+
+
+use,period=fivecell;
+
+twiss,sequence=fivecell,file="fivecell_thin.tfs";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004195435056        48.82154272 
+
+                q1                dq1            betxmax              dxmax 
+       1.292214036       0.8845710814        191.0244047        2.131197104 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.590558163                  0                  0        1.281100191 
+
+               dq2            betymax              dymax              dyrms 
+      0.8528845629        185.4696234      0.08379860915      0.05793073052 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+!-- Plot thin sequence
+
+  title,"fivecell after makethin";
+
+  plot,file=madxplot,vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0,-4,vmax=350,4, colour=100, range=#s/#e;
+
+Plot - default table plotted: twiss
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ plot number =            2
+
+
+save,sequence=fivecell,file="fivecell_thin.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+use,sequence=fivecell;
+
+
+
+!--- check that the sliced sequence is quitable for SIXTRACK translation  http://mad.web.cern.ch/mad/madx.old/c6t/c6t.html
+
+
+
+sixtrack, aperture;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: c6t - aperture flag selected 
+max_mult_ord set to : 11
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 534.600000
+
+c6t terminated - total number of elements: 156
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 1
+                alignment errors SixTrack: 1
+                          sequence length: 534.600000 [m]
+
+
+!--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
+
+track, onepass, dump; ! onepass=true no closed orbit computed before tracking
+
+enter TRACK module
+one pass is on
+  start, x= 0.001, px= 0.002, y= 0, py= 0, t= 0.001, pt= 0.003;
+
+  observe, place= #e;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  run,   turns= 1;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.001              0.002 
+         1          1       0.4446807496     0.005863629326 
+
+                 y                 py                  t                 pt 
+                 0                  0              0.001              0.003 
+    0.006913532568    0.0001334898171    -0.003571017236              0.003 
+
+                 s                  e 
+                 0                  0 
+             534.6                  0 
+
+*****  end of trrun  *****
+endtrack;
+
+exit TRACK module
+
+
+
+stop;
+
+
+  Number of warnings: 2
+2 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

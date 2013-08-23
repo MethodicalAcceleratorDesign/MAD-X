@@ -24,8 +24,8 @@ twiss,sequence=fivecell,file="fivecell_thick.tfs";
   plot,file=madxplot,vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0,-4,vmax=350,4, colour=100, range=#s/#e;
 
 !--- quads
-!  select, flag=makethin, class=quadrupole, slice= 100; ! slice all quadrupoles
-select, flag=makethin, class=quadrupole, thick=true;
+  select, flag=makethin, class=quadrupole, slice= PARAM1; ! slice all quadrupoles
+!select, flag=makethin, class=quadrupole, thick=true;
 
 ! select, flag=makethin, class=quadrupole, slice= 0; ! turn quad slicing off
 
@@ -52,6 +52,7 @@ sixtrack, aperture;
 
 !--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
 track, onepass, dump; ! onepass=true no closed orbit computed before tracking
+!  start, x= 0.001, px= 0, y= 0, py= 0, t= 0, pt= 0;
   start, x= 0.001, px= 0.002, y= 0, py= 0, t= 0.001, pt= 0.003;
   observe, place= #e;
   run,   turns= 1;

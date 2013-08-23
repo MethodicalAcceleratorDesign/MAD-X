@@ -1576,12 +1576,16 @@ tests/test-thick-quad-2/track.obs0001.p0002.cfg -text
 tests/test-thick-quad-2/track.obs0001.p0002.ref -text
 tests/test-thick-quad-2/track.obs0001.p0003.cfg -text
 tests/test-thick-quad-2/track.obs0001.p0003.ref -text
+tests/test-thick-quad-3/cmp.sh -text
+tests/test-thick-quad-3/fivecell.madx -text
+tests/test-thick-quad-3/fivecell.seq -text
 tests/test-thick-quad-3/teapot/track.obs0001.p0001 -text
 tests/test-thick-quad-3/teapot/track.obs0001.p0001.ref -text
 tests/test-thick-quad-3/teapot/track.obs0001.p0002 -text
 tests/test-thick-quad-3/teapot/track.obs0001.p0003 -text
 tests/test-thick-quad-3/test-thick-quad-3.cfg -text
 tests/test-thick-quad-3/test-thick-quad-3.madx -text
+tests/test-thick-quad-3/test-thick-quad-3.ref -text
 tests/test-thick-quad/test-thick-quad.cfg -text
 tests/test-thick-quad/test-thick-quad.madx -text
 tests/test-thick-quad/test-thick-quad.ref -text
