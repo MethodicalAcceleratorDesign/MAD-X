@@ -3,7 +3,7 @@
   +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 23.08.13 11.55.21 +
+  + Execution Time Stamp: 23.08.13 16.12.22 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005, further updated in 2011 for extended teapot and functionality
 
@@ -121,16 +121,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6                 -0    0.0004195435056        48.82154272 
+             534.6                 -0    0.0004400727603        47.66918823 
 
                 q1                dq1            betxmax              dxmax 
-       1.292214036       0.8845710814        191.0244047        2.131197104 
+       1.248721108        1.051938623        187.7556724        2.204130363 
 
              dxrms             xcomax             xcorms                 q2 
-       1.590558163                  0                  0        1.281100191 
+        1.63755085                  0                  0        1.260063062 
 
                dq2            betymax              dymax              dyrms 
-      0.8528845629        185.4696234      0.08379860915      0.05793073052 
+       1.049588969        181.5689562      0.09030658513      0.06646342865 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -176,11 +176,11 @@ Reference radius set to : 1.000000
 
 total block length: 534.600000
 
-c6t terminated - total number of elements: 156
+c6t terminated - total number of elements: 232
                     field errors    MAD-X: 0
                     field errors SixTrack: 0
-                 alignment errors   MAD-X: 1
-                alignment errors SixTrack: 1
+                 alignment errors   MAD-X: 3
+                alignment errors SixTrack: 2
                           sequence length: 534.600000 [m]
 
 
@@ -205,11 +205,11 @@ one pass is on
 
     number       turn                  x                 px 
          1          0              0.001              0.002 
-         1          1       0.4446807496     0.005863629326 
+         1          1       0.4664294384     0.006531804738 
 
                  y                 py                  t                 pt 
                  0                  0              0.001              0.003 
-    0.006913532568    0.0001334898171    -0.003571017236              0.003 
+     0.00629975399    0.0001216692402    -0.002711649774              0.003 
 
                  s                  e 
                  0                  0 
