@@ -184,6 +184,11 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         part_id(k) = k
      enddo
   else
+     if(jmax.eq.0) then
+        call aawarn('trrun: ',&
+             'Particle Number equals zero: exit from trrun')
+        return
+     endif
      if(jmax.gt.max_part) then
         write(text, '(1p,d20.12)') max_part 
         call aafail('TRRUN: ','Fatal: Maximum Particle Number exceeded =' // text)
@@ -229,11 +234,11 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      pt_max = get_value('run ', 'deltap_max ')
      pt_max=(sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0)*beti
      do  i = 1,j_tot
-        if(z(5,i).gt.t_max) then
+        if(abs(z(5,i)).gt.t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
            call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger then' // text)
         endif
-        if(z(6,i).gt.pt_max) then
+        if(abs(z(6,i)).gt.pt_max) then
            write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
            call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger then' // text)
         endif
@@ -2848,7 +2853,7 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
   integer npart,turn,j
   double precision orbit(6),tmp,tt,tn
   double precision energy,get_value
-  character(36) table
+  character(120) table
   character(name_len) el_name
   !hbu
   double precision spos
@@ -2996,6 +3001,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
 
   use twiss0fi
   use name_lenfi
+  use Inf_NaN_Detection
   implicit none
 
   ! 2013-May-22  11:46:15  ghislain: Merged the trcoll and trcoll1 subroutines,
@@ -3037,6 +3043,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
      !---- Is particle outside aperture?
 
         !*** case of ellipse
+     if(ISNAN(z(1,i)).or.ISNAN(z(3,i))) goto 99
      if (flag .eq. 1 .and. &
         ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
         ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0) then
@@ -3088,6 +3095,11 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
      call node_string('apertype ',aptype,nn)
      call trkill(n, turn, sum, ntrk, part_id,                        &
           last_turn, last_pos, last_orbit, z, aptype)
+     if(ntrk.eq.0) then
+        call aawarn('trcoll: ',&
+             'Particle Number equals zero: exit from trcoll')
+        return
+     endif
      goto 10
 
 98   continue
@@ -3099,6 +3111,7 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
   use twiss0fi
   use name_lenfi
   use trackfi
+  use Inf_NaN_Detection
   implicit none
 
   ! FRS: August 2013
@@ -3130,8 +3143,8 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
   do i = n, ntrk
 
      !---- Is particle outside the bucket?
-     if(z(5,i).gt.t_max.or.z(6,i).gt.pt_max) goto 99
-
+     if(ISNAN(z(5,i)).or.ISNAN(z(6,i))) goto 99
+     if(abs(z(5,i)).gt.t_max.or.abs(z(6,i)).gt.pt_max) goto 99
      ! break if particle is inside aperture and continue the loop
      go to 98
 
@@ -3140,6 +3153,11 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
      nn=name_len
      call trkill(n, turn, sum, ntrk, part_id,                        &
           last_turn, last_pos, last_orbit, z, non_app)
+     if(ntrk.eq.0) then
+        call aawarn('trcoll: ',&
+             'Particle Number equals zero: exit from trcoll')
+        return
+     endif
      goto 10
 
 98   continue
@@ -3865,6 +3883,11 @@ subroutine ixy_fitting()
         z_part(i_for_I)=z_part_i
      endif
   ENDDO
+  if(i_for_I.eq.0) then
+          call aawarn('trrun: ',&
+          'the RMS emittances cannot be calculated: exit from IXY_FITTING');
+     return  
+  endif
   N_for_I=i_for_I
 
   N_for_I_dble=dble(N_for_I)
