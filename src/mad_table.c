@@ -694,7 +694,7 @@ table_value(void)
 }
 
 struct column_info
-table_get_column(char* table_name,char* column_name)
+table_get_column(char* table_name, char* column_name)
 {
   struct column_info info={NULL,0,'V',0};
   int pos, col; // not used , i;
@@ -1797,6 +1797,10 @@ double_from_table_row(const char* table, const char* name, const int* row, doubl
     warning("double_from_table_row: table not found:", tbl_s);
     return -1;
   }
+
+fprintf(stderr, "##### table='%s', len=%d\n", table, table_length(table));
+
+
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("double_from_table_row: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
