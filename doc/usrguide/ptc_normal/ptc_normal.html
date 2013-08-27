@@ -97,7 +97,7 @@ non-linear matching inside the present MAD-X MATCHING module.</p>
          <dd> 
               <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br /> 
               <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> --> 
-              The <var class="command">SELECT_PTC_NORMAL </var>command selects  
+         The <var class="command">SELECT_PTC_NORMAL </var>command selects  
          parameters to be calculated by the next <var class="command"> 
          PTC_NORMAL </var>command. The dispersion and tune parameters are defined  
          by a name and an integer number specifying their  
@@ -110,30 +110,37 @@ non-linear matching inside the present MAD-X MATCHING module.</p>
          the third is the order of <font face="Times New Roman"><i>&nbsp;&#948;</i></font><sub><i>p</i></sub>. For example, the notation &quot;anhx=2,0,0&quot;  
          means second order in <font face="Times New Roman"><i>&#949;</i></font><sub>1</sub>: 
          <font face="Times New Roman">&#8706;</font><sup>(2)</sup><i>q</i><sub>1</sub>/<font face="Times New Roman">&#8706;<i>&#949;</i></font><sub>1</sub><sup>(2)</sup>. </dd> 
+         
          <dd><font color="#FF0000">Components of the eigenvectors at the  
          end of the structure can be specified by two integers:  
          the first integer defines the&nbsp; eigenvector number, the  
          second integer defines the coordinate {<i>x</i>, <i> 
          p<sub>x</sub></i>, <i>y</i>, <i>p<sub>y</sub></i>, <i>t</i>,<i> 
          p<sub>t</sub></i>}.</font></dd> 
-         <dd>The Generating Function can be specified by 
+         
+         <dd>The <b>Generating Function</b> can be specified by 
          <font face="Times New Roman">{ <i>n</i>, 0, 0}. </font>The positive and negative values of&nbsp; 
          <i>n</i>  
          define the order of upright or skew resonances, respectively.  
-         The integers <i>n</i><sub>2</sub> and <i>n</i><sub>3</sub> are  
-         reserved for a future upgrade. 
-              For example, &quot;gnfu=-5, 0, 0&quot; will calculate all  
+         The integers <i>n</i><sub>2</sub> and <i>n</i><sub>3</sub> are reserved for a future upgrade. 
+         For example, &quot;gnfu=-5, 0, 0&quot; will calculate all  
          Generating Function terms for skew decapoles. In the output  
          table, one finds the cosine, sine and amplitude coefficients as  
          denoted by &quot;GNFC&quot;, &quot;GNFS&quot;, and &quot;GNFA&quot;, respectively.</dd> 
-         <dd>Similarily, the Hamiltonian terms can be specified by 
+         
+         <dd>Similarily, the <b>Hamiltonian Terms</b> can be specified by 
          <font face="Times New Roman">{ <i>n</i>, 0, 0}. </font>The positive and negative values of&nbsp; 
          <i>n</i> define the order of upright or skew resonances,  
          respectively. 
-              For example, &quot;haml=3, 0, 0&quot; will calculate all  
+         For example, &quot;haml=3, 0, 0&quot; will calculate all  
          Hamiltonian terms for upright sextupoles. In the output table,  
          one finds the cosine, sine and amplitude coefficients as denoted  
-         by &quot;HAMC&quot;, &quot;HAMS&quot;, and &quot;HAMA&quot;, respectively.</dd> 
+         by &quot;HAMC&quot;, &quot;HAMS&quot;, and &quot;HAMA&quot;, respectively.
+         <b>Caution</b>, if more than one order of terms is selected only the lower one is correct 
+         because higher orders contain "cross terms" from the lower ones.
+
+         
+         </dd> 
         </dl></div></dd> 
        <dd> 
        <div> 
