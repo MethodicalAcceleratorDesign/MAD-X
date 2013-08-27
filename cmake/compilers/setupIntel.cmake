@@ -12,7 +12,7 @@ endif()
 
 if(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
    if(UNIX)
-      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -fp-model precise -fpp")
+      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -assume noold_unit_star -fp-model strict -fpp")
       set(CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops -O3")
       set(CMAKE_Fortran_FLAGS_DEBUG   "-f77rtl -O3 -g")
       set(CMAKE_Fortran_LINK_FLAGS   "${CMAKE_Fortran_LINK_FLAGS} -nofor_main")
