@@ -329,8 +329,6 @@ Want to use model orbit from: my_model
 546 monitors and 258 correctors enabled
 SVD conditioning requested ...
 Initially found 2 singular values
-Removed:   240 mcbxv.2l8:1
-Removed:   0 mcbxv.1r1:1
 After SVD conditioning:             
 546 monitors and 256 correctors enabled
 
@@ -1171,9 +1169,6 @@ Want to use model orbit from: my_model
 546 monitors and 259 correctors enabled
 SVD conditioning requested ...
 Initially found 3 singular values
-Removed:   229 mcbch.9l8.b1:1
-Removed:   4 mcbch.5r1.b1:1
-Removed:   242 mcbxh.1r8:1
 After SVD conditioning:             
 546 monitors and 256 correctors enabled
 
@@ -2101,7 +2096,6 @@ Want to use model orbit from: my_model
 546 monitors and 277 correctors enabled
 SVD conditioning requested ...
 Initially found 1 singular values
-Removed:   246 mcbyv.a5r8.b1:1
 After SVD conditioning:             
 546 monitors and 276 correctors enabled
 
@@ -2963,8 +2957,6 @@ Want to use model orbit from: my_model
 546 monitors and 278 correctors enabled
 SVD conditioning requested ...
 Initially found 2 singular values
-Removed:   235 mcbxh.3l8:1
-Removed:   242 mcbxh.1r8:1
 After SVD conditioning:             
 546 monitors and 276 correctors enabled
 
@@ -3931,9 +3923,6 @@ Want to use model orbit from: my_model
 546 monitors and 277 correctors enabled
 SVD conditioning requested ...
 Initially found 3 singular values
-Removed:   235 mcbxh.3l8:1
-Removed:   4 mcbch.5r1.b1:1
-Removed:   242 mcbxh.1r8:1
 After SVD conditioning:             
 546 monitors and 274 correctors enabled
 
@@ -4793,7 +4782,6 @@ Want to use model orbit from: my_model
 546 monitors and 277 correctors enabled
 SVD conditioning requested ...
 Initially found 1 singular values
-Removed:   246 mcbyv.a5r8.b1:1
 After SVD conditioning:             
 546 monitors and 276 correctors enabled
 
