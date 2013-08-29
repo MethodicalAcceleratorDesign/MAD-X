@@ -715,12 +715,12 @@ print_value(struct in_cmd* cmd)
     if (loc_expr(toks, j, s_start, &end) > 0) // type = // not used 
     {
       nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0)
+      if (polish_expr(nitem, &toks[s_start]) == 0) {
         fprintf(prt_file, v_format("%s = %F ;\n"),
                 spec_join(&toks[s_start], nitem), 
                 polish_value(deco, join(&toks[s_start], nitem)));
-      else
-      {
+      } 
+      else {
         warning("invalid expression:", spec_join(&toks[s_start], nitem));
         return;
       }

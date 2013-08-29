@@ -23,6 +23,7 @@ PRJNAME_AR := $(DESTDIR)$(PRJNAME)$(if $(call eq,lib%,$(PROJECT)),$(STATIC_EXT),
 
 $(PROJECT): $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 
+
 ifneq ($(LD),)
 $(PRJNAME_LD): $(OBJECTS)
 	$E "*** Linking $@"

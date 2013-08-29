@@ -18,9 +18,9 @@
 
 # use macport GCC suite
 ifeq ($(USER),ldeniau)
-%-gnu: GNUMAC := CC=gcc-mp-4.6 CXX=g++-mp-4.6 FC=gfortran-mp-4.6 LD=gfortran-mp-4.6 \
+%-gnu: GNUMAC := CC=gcc-mp-4.8 CXX=g++-mp-4.8 FC=gfortran-mp-4.8 LD=gfortran-mp-4.8 \
                  CCNAME=gcc    CXXNAME=g++    FCNAME=gfortran    LDNAME=gfortran
-numdiff%-gnu: GNUMAC := CC=gcc-mp-4.6 LD=gcc-mp-4.6 \
+numdiff%-gnu: GNUMAC := CC=gcc-mp-4.8 LD=gcc-mp-4.8 \
                         CCNAME=gcc    LDNAME=gcc
 else
 %-gnu: GNUMAC := GNU=yes
@@ -47,21 +47,42 @@ madx-macosx%: MAKE_OPTS = -j5
 madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
 madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
-madx-macosx32:
+madx-macosx32: libs/gc/libgc-macosx32.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
 
-madx-macosx64:
+madx-macosx64: libs/gc/libgc-macosx64.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
 
-madx-macosx32-gnu:
+madx-macosx32-gnu: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK) madx32
 
-madx-macosx64-gnu:
+madx-macosx64-gnu: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK) madx64
+
+#
+# libgc
+#
+libs/gc/libgc-macosx%: MAKE_OPTS = -j5 --no-print-directory -C libs/gc
+
+libs/gc/libgc-macosx32.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
+
+libs/gc/libgc-macosx64.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
+
+libs/gc/libgc-macosx32-gnu.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
+
+libs/gc/libgc-macosx64-gnu.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
 
 #
 # libmadx

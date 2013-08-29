@@ -7,7 +7,7 @@ is_operand(char c) {
 
 static int
 is_operator(char c) {
-  return strchr("-+*/^", c) != 0;
+  return strchr(op_string, c) != 0;
 }
 
 static int
