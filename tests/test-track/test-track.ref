@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 13.11.12 19.56.28 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 02.09.13 11.18.18 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test for collimator with aper definition.
 
@@ -34,5 +34,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
