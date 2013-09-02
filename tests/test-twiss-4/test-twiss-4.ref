@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 20.12.12 10.17.35 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 02.09.13 11.18.28 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
@@ -24,10 +24,8 @@ option, info, -warn, -echo;
  option, info, warn, -echo;
 
 ++++++ warning: makethin selection without active sequence, ignored
-++++++ warning: makethin selection list empty, slicing all to one thin lens.
 makethin: slicing sequence : lhcb1
 ++++++ warning: makethin selection without active sequence, ignored
-++++++ warning: makethin selection list empty, slicing all to one thin lens.
 makethin: slicing sequence : lhcb2
 
 
@@ -144,9 +142,9 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 stop;
 
 
-  Number of warnings: 4
-4 in C and 0 in Fortran
+  Number of warnings: 2
+2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
