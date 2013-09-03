@@ -167,8 +167,6 @@ endif
 
 ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
-ifeq ($(origin FC),file)
-
 FCVER  := $(shell $(FC) -dumpversion)
 ifeq ($(findstring GNU Fortran (GCC),$(FCVER)),GNU Fortran (GCC))
 FCVER  := $(word 4,$(FCVER)) # gfortran -dumpversion bug
@@ -182,10 +180,7 @@ FCVER2 := 0
   endif
 ifeq ($(and $(FCVER1),$(FCVER2)),)
 $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
-endif # lxplus
 endif # version
-
-endif # origin
 endif # gfortran
 endif # cmdgoal
 
