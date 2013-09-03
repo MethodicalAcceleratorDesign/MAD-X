@@ -163,7 +163,6 @@ endif
 
 #######################
 # check for gfortran version >= 4.4
-# set to gfortran44 on lxplus
 #
 
 ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
@@ -182,11 +181,6 @@ FCVER2 := 0
   FCVER2 := $(findstring $(word 2,$(FCVERL)),"456789")
   endif
 ifeq ($(and $(FCVER1),$(FCVER2)),)
-ifeq ($(findstring lxplus,$(HOSTNAME)),lxplus)
-$(warning MAD-X requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
-FC     := gfortran44
-FCNAME := gfortran
-else
 $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
 endif # lxplus
 endif # version
