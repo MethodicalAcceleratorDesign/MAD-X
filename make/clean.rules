@@ -32,6 +32,7 @@ cleantest:
 	$E "** Cleaning tests files"
 	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
 	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
+	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
 
 cleanc:
 	$E "** Cleaning C generated files"
