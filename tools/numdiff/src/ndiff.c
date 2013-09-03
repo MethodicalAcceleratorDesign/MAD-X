@@ -64,7 +64,7 @@ struct ndiff {
 
 // ----- private (parser helpers)
 
-static inline int
+static int
 is_separator (int c)
 {
   return !c || isblank(c) || (ispunct(c) && !strchr(option.pchr, c));
@@ -168,7 +168,7 @@ parse_number (char *buf, int *d_, int *n_, int *e_, int *f_)
   return i;
 }
 
-static inline void
+static void
 skip_identifier(char *restrict *lhs, char *restrict *rhs, int strict)
 {
   if (strict) {

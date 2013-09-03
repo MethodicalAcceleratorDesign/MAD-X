@@ -101,7 +101,7 @@ context_setup (T *cxt)
   cxt->sorted = true;  
 }
 
-static inline void
+static void
 context_teardown (T *cxt)
 {
   free(cxt->fut);
