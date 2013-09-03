@@ -174,7 +174,7 @@ FCVER  := $(shell $(FC) -dumpversion)
 ifeq ($(findstring GNU Fortran (GCC),$(FCVER)),GNU Fortran (GCC))
 FCVER  := $(word 4,$(FCVER)) # gfortran -dumpversion bug
 endif
-
+FCVER  := $(strip $(FCVER))
 FCVERL := $(subst ., ,$(FCVER))
 FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
 FCVER2 := 0
@@ -182,11 +182,13 @@ FCVER2 := 0
   FCVER2 := $(findstring $(word 2,$(FCVERL)),"456789")
   endif
 ifeq ($(and $(FCVER1),$(FCVER2)),)
+ifeq ($(findstring lxplus,$(HOSTNAME)),lxplus)
 $(warning MAD-X requires gfortran >= 4.4 ($(FCVER) detected), FC set to gfortran44)
 FC     := gfortran44
 FCNAME := gfortran
 else
 $(error MAD-X requires gfortran >= 4.4 ($(if $(FCVER),$(FCVER),none) detected))
+endif # lxplus
 endif # version
 
 endif # origin
