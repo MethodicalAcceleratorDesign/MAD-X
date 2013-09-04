@@ -24,7 +24,7 @@ LDFLAGS = -m$(ARCH) -O3
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
+LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind -L$(GNULIBDIR)
 endif
 
 ifneq ($(CXXNAME),)

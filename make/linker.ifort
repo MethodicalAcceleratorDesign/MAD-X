@@ -34,9 +34,9 @@ LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
 endif
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5
+LDFLAGS += -mmacosx-version-min=10.5 -L$(GNULIBDIR)
 ifeq ($(ARCH),32)
-LDLIBS += -L$(GNULIBDIR) -lgcc_eh
+LDLIBS += -lgcc_eh
 endif
 endif
 
