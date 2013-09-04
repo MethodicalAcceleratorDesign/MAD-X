@@ -53,7 +53,7 @@ FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 matchlib2.o:        NOPT := 0
 l_complex_taylor.o: NOPT := 2
 
-ifeq ($(OSTYPE),Windows)
+ifeq ($(ARCH),32)
 c_dabnew_berz.o:    NOPT := 1
 endif
 

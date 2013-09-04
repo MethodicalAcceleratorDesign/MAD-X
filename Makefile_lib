@@ -40,7 +40,7 @@ endif
 
 ifeq ($(USEGC),yes)
 ifneq ($(OSTYPE),Windows)
-LIBS += -Llibs$/gc -lgc$(ARCH)
+LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
 endif
 endif
 
