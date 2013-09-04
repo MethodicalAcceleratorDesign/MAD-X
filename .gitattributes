@@ -1243,6 +1243,7 @@ tests/test-jacobian-knobs/test-jacobian-knobs.ref -text
 tests/test-jacobian/test-jacobian.cfg -text
 tests/test-jacobian/test-jacobian.madx -text
 tests/test-jacobian/test-jacobian.ref -text
+tests/test-makethin-2/V6.5.thin.b1.seq.ref -text svneol=unset#unset
 tests/test-makethin-2/lhc_twiss_b1.dat.cfg -text
 tests/test-makethin-2/lhc_twiss_b1.dat.ref -text
 tests/test-makethin-2/test-makethin-2.cfg -text
