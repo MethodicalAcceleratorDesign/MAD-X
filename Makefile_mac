@@ -16,16 +16,6 @@
 # | $Id$
 # |
 
-# use macport GCC suite
-ifeq ($(USER),ldeniau)
-%-gnu: GNUMAC := CC=gcc-mp-4.8 CXX=g++-mp-4.8 FC=gfortran-mp-4.8 LD=gfortran-mp-4.8 \
-                 CCNAME=gcc    CXXNAME=g++    FCNAME=gfortran    LDNAME=gfortran
-numdiff%-gnu: GNUMAC := CC=gcc-mp-4.8 LD=gcc-mp-4.8 \
-                        CCNAME=gcc    LDNAME=gcc
-else
-%-gnu: GNUMAC := GNU=yes
-endif
-
 #
 # all
 #
@@ -57,11 +47,11 @@ madx-macosx64: libs/gc/libgc-macosx64.a
 
 madx-macosx32-gnu: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK) madx32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32
 
 madx-macosx64-gnu: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK) madx64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64
 
 #
 # libgc
@@ -109,11 +99,11 @@ libmadx-macosx64:
 
 libmadx-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
 
 libmadx-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
 #
 # libptc
@@ -140,11 +130,11 @@ libptc-macosx64:
 
 libptc-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
 
 libptc-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
 #
 # numdiff
@@ -170,10 +160,10 @@ numdiff-macosx64:
 
 numdiff-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 $(GNUMAC) && $(MAKE_LINK) numdiff32
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32
 
 numdiff-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 $(GNUMAC) && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK) numdiff64
 
 # end of makefile
