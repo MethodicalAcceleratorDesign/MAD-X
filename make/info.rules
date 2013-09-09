@@ -45,7 +45,7 @@ infoprj: infoinc
 	@ echo "Cpp       project settings file  = " $(FILE_CPP)  $(if $(wildcard $(FILE_CPP)),," (not defined)")
 	@ echo "C         project settings file  = " $(FILE_C)    $(if $(wildcard $(FILE_C)),,"   (not defined)")
 	@ echo "C++       project settings file  = " $(FILE_CXX)  $(if $(wildcard $(FILE_CXX)),," (not defined)")
-	@ echo "F90       project settings file  = " $(FILE_F90)  $(if $(wildcard $(FILE_C90)),," (not defined)")
+	@ echo "F90       project settings file  = " $(FILE_F90)  $(if $(wildcard $(FILE_F90)),," (not defined)")
 	@ echo "Libraries project settings file  = " $(FILE_LIB)  $(if $(wildcard $(FILE_LIB)),," (not defined)")
 	@ echo "System    project settings file  = " $(FILE_SYS)  $(if $(wildcard $(FILE_SYS)),," (not defined)")
 	@ echo "Tests     project settings file  = " $(FILE_TEST) $(if $(wildcard $(FILE_TEST)),,"(not defined)")
