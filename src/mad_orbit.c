@@ -555,9 +555,8 @@ static void correct_correct2(struct in_cmd* cmd)
 	 struct id_mic2   *m;
 	 */
 
-	int debug;
-
-	debug = get_option("debug");
+	// int debug; // not used
+  // debug = get_option("debug");
 
 
 	/* If only Twiss summary is required prepare and write it */
@@ -1559,7 +1558,6 @@ static void correct_correct1(struct in_cmd* cmd)
 	int niter;
 
 	int twism;
-	int dbg;
 	int ifail, sflag; // , svdflg; // not used
 	float rms;
 	double sngcut, sngval;
@@ -1574,10 +1572,7 @@ static void correct_correct1(struct in_cmd* cmd)
 	static int *nm, *nx, *nc;
 	struct id_mic *corl;
 
-	int debug;
-
-	debug = get_option("debug");
-
+	int debug = get_option("debug");
 
 	/* If only Twiss summary is required prepare and write it */
 	// Jun 26, 2013 8:06:33 PM ghislain : moved up from **twiss summary**
@@ -1690,9 +1685,8 @@ static void correct_correct1(struct in_cmd* cmd)
 	    
 	    for (ix = 0; ix < sflag; ix++) {
 	      corl[nx[sing[2 * ix + 0]]].enable = 0;
-	      if (dbg == 1)
-		printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
-		       corl[nx[sing[2 * ix + 0]]].p_node->name);
+	      if (debug == 1)
+          printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]], corl[nx[sing[2 * ix + 0]]].p_node->name);
 	    }
 	    
 	    ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
@@ -1729,10 +1723,8 @@ static void correct_correct1(struct in_cmd* cmd)
 	    /* printf("sflag: %d\n",sflag); */
 	    for (ix = 0; ix < sflag; ix++) {
 	      corl[nx[sing[2 * ix + 0]]].enable = 0;
-	      if (dbg == 1)
-		printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]],
-		       corl[nx[sing[2 * ix + 0]]].p_node->name);
-	      
+	      if (debug == 1)
+		      printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]], corl[nx[sing[2 * ix + 0]]].p_node->name);
 	    }
 	    ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
 	    icor = ix % 10000;
@@ -2340,7 +2332,6 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 
 static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 	struct name_list* nl;
-	int i;
 	int j;
 
 	int pos;
@@ -2452,7 +2443,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 
 		// 2013-Jun-24  13:42:16  ghislain: ????
 		// for (j=1; j < (ttb->curr)+1; j++) {
-		//  i = string_from_table_row(ttb->name, "name", &j, name);
+		//   string_from_table_row(ttb->name, "name", &j, name);
 		// }
 
 	}
@@ -2474,7 +2465,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 		yok = 0;
 
 		for (j = 1; j < (ttb->curr) + 1; j++) {
-			i = string_from_table_row(ttb->name, "name", &j, name);
+			string_from_table_row(ttb->name, "name", &j, name);
 			strcpy(l3name, name);
 			stolower(l3name);
 			strcpy(l4name, strip(l3name));
