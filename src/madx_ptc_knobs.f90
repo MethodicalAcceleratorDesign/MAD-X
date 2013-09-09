@@ -327,7 +327,8 @@ contains
     integer, parameter   :: n = 6 !counts
     integer, parameter   :: fillntwisses  = disp4 - beta11 + 1
     integer, parameter   :: ntwissesde = gama33 - beta11 + 1
-    real(kind(1d0))      :: opt_fun(fundim)
+    real(kind(1d0))      :: opt_fun(ntwisses) ! opt_fun(fundim) does not allocate enough space
+                                              ! -> invoke undefined behavior in few places below.
     type(universal_taylor), pointer :: t
 
     if (.not. ALLOCATED(results)) then
