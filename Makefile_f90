@@ -167,11 +167,10 @@ endif
 
 ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
 ifeq ($(FC),gfortran)
-FCVER  := $(shell $(FC) -dumpversion)
+FCVER  := $(strip $(shell $(FC) -dumpversion))
 ifeq ($(findstring GNU Fortran (GCC),$(FCVER)),GNU Fortran (GCC))
 FCVER  := $(word 4,$(FCVER)) # gfortran -dumpversion bug
 endif
-FCVER  := $(strip $(FCVER))
 FCVERL := $(subst ., ,$(FCVER))
 FCVER1 := $(findstring $(word 1,$(FCVERL)),"456789")
 FCVER2 := 0
