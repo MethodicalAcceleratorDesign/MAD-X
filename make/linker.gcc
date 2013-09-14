@@ -27,10 +27,6 @@ ifeq ($(OSTYPE),Darwin)
 LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
 endif
 
-ifneq ($(CXXNAME),)
-LDLIBS += -lstdc++
-endif
-
 #
 # options flags
 #

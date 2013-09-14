@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgcc 
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgcc -static-libg++
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)

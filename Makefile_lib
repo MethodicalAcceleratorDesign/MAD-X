@@ -22,7 +22,7 @@ ifeq ($(ONLINE),yes)
 LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
 endif
 
-# X11 on Unix
+# X11 on Unixes
 
 ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
@@ -43,5 +43,8 @@ ifneq ($(OSTYPE),Windows)
 LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
 endif
 endif
+
+# C/C++ linked with fortran
+LIBS += -static-libgcc -lstdc++
 
 # end of makefile

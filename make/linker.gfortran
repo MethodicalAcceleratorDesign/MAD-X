@@ -27,11 +27,6 @@ ifeq ($(OSTYPE),Darwin)
 LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind -L$(GNULIBDIR)
 endif
 
-ifneq ($(CXXNAME),)
-LDLIBS += -lstdc++
-#LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
-endif
-
 #
 # options flags
 #
