@@ -422,16 +422,21 @@ constraint_print(const T* cst, FILE *out)
       rn = reg_decode(cst->eps.abs_reg, op);
       fprintf(out, "abs=%sR%d ", op, rn);
     }
-    else fprintf(out, cst->eps.abs == DBL_MIN ? "abs=eps " : "%sabs=%g ",
-                      cst->eps.abs > 1        ? "large " : "", cst->eps.abs);
+    else {
+      if (cst->eps.abs == DBL_MIN)
+           fprintf(out, "abs=eps ");
+      else fprintf(out, "%sabs=%g ", cst->eps.abs > 1 ? "large " : "", cst->eps.abs);
+    }
 
     if (cst->eps._abs_reg && cst->eps._abs_reg != cst->eps.abs_reg) {
       rn = reg_decode(cst->eps._abs_reg, op);
       fprintf(out, "-abs=%sR%d ", op, rn);
     }
-    else if (cst->eps._abs != -cst->eps.abs)
-        fprintf(out, cst->eps._abs == -DBL_MIN ? "-abs=-eps " : "%s-abs=%g ",
-                     cst->eps._abs < -1        ? "large " : "", cst->eps._abs);
+    else if (cst->eps._abs != -cst->eps.abs) {
+      if (cst->eps._abs == -DBL_MIN)
+           fprintf(out, "-abs=-eps ");
+      else fprintf(out, "%s-abs=%g ", cst->eps._abs < -1 ? "large " : "", cst->eps._abs);
+    }
   }
 
   if (cst->eps.cmd & eps_rel) {
