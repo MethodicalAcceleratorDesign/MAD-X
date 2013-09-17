@@ -3,6 +3,7 @@
 %  Changed by: Ivar Waarum, 24-Feb-2005 
  
 \chapter{Defining aperture in MAD-X}
+\label{chap:aperture}
 
 A new feature of MAD-X is the ability to set an aperture for a
 particular  element, or parent of a set of elements. This removes the
@@ -187,7 +188,9 @@ where the parameters have the following meaning:
      magnet. See below for example. Default = none.  
    \item offsetelem: A file containing a reference point in the machine,
      and a list of magnets with their offsets from this point described
-     as a parabola. See below for example. Default = none.  
+     as a parabola. See below for example. Default = none. \\
+     {\bf Note that the reference point should be within the range of
+       elements given for the offsets to be taken into account.}
 \end{itemize}
 
 
