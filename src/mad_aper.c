@@ -1595,7 +1595,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     else on_elem=1;
 
     if ( (offs_tab != NULL) && (strcmp(refnode, name) == 0)) do_survey=1;
-    /* printf("\nname: %s, ref: %s, do_survey:: %d\n",name,refnode, do_survey);*/
+    if (get_option("debug")) printf("\nname: %s, ref: %s, do_survey: %d\n",name,refnode,do_survey);
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);
@@ -1658,7 +1658,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         if (true_node) nint=true_tab[truepos].curr;
         else nint=length/interval;
       }
-      /* printf("\nname: %s, nint: %d",name,nint); */
+      if (get_option("debug")) {
+	printf("name: %s, nint: %d\n",name,nint);}
 
       if (!nint) nint=1;
 
@@ -1677,13 +1678,15 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
         offs_node = aper_tab_search_tfs(offs_tab, name, offs_row);
         if (offs_node) {
-          /* printf("\nusing offset");*/
           xa=offs_row[4];
           xb=offs_row[3];
           xc=offs_row[2];
           ya=offs_row[7];
           yb=offs_row[6];
           yc=offs_row[5];
+	  if (get_option("debug")) {
+	    printf("\nusing offset:");
+	    printf("\n xa: %f, xb: %f , xc: %f \n ya: %f, yb: %f, yc: %f\n", xa, xb, xc, ya, yb, yc);}
         }
       }
 
@@ -1813,6 +1816,16 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (!strcmp(current_node->name,use_range[1]->name)) stop=1;
     if (!advance_node()) stop=1;
   } // while !stop
+
+  // 2013-Sep-17  16:45:34  ghislain: 
+  // if an offset table was provided and the do_survey flag is still not set, 
+  // the reference node was certainly not found within the range given; hence no offset could be treated.
+  if ( (offs_tab != NULL) && (do_survey == 0)) {
+    printf("\nWarning: Offset reference node %s was not found in the active range %s to %s.",
+	    refnode,use_range[0]->name,use_range[1]->name); 
+    printf("\nOffsets were not used.");
+    printf("\nThe active range must contain the reference node for offsets to be taken into account.\n"); 
+  }  
 
   myfree("Aperture",true_tab);
   if (offs_tab != NULL) myfree("Aperture",offs_tab);
