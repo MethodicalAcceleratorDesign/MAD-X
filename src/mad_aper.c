@@ -1426,7 +1426,8 @@ pro_aperture(struct in_cmd* cmd)
 
   if (limit_pt->n1 != -1) 
     {
-//      printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
+      // 2013-Sep-18  13:12:57  ghislain: printout reactivated; it had been commented out after version 5.00.00 
+      printf("\n\nAPERTURE LIMIT: %s, n1: %g, at: %g\n\n", limit_pt->name, limit_pt->n1, limit_pt->s);
 
       aper_header(aperture_table, limit_pt);
     
