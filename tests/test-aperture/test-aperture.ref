@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 04.02.13 12.08.26 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 18.09.13 14.19.38 +
   +++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE exemple, BJ Aug2009';
 
@@ -158,8 +158,12 @@ Processing apertures from lhccell$start:1 to lhccell$end:1...
 
 reference node: lhccell$start:1
 
+
+APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
+
+
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
