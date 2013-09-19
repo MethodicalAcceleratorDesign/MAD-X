@@ -1704,6 +1704,25 @@ table_column_exists(const char* table, const char *name)
 }
 
 int
+table_cell_exists(const char* table, const char* name, const int* row)
+{
+  char tbl_s[NAME_L], col_s[NAME_L];
+  struct table *tbl;
+  int pos;
+
+  mycpy(tbl_s, table);
+  if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
+     !(tbl = table_register->tables[pos]))
+    return 0;
+
+  mycpy(col_s, name);
+  if (name_list_pos(col_s, tbl->columns) < 0)
+    return 0;
+
+  return *row >= 1 && *row <= tbl->curr;
+}
+
+int
 table_header_exists(const char* table, const char *name)
 {
   char tbl_s[NAME_L], hdr_s[NAME_L], buf[256];

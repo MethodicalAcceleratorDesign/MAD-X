@@ -122,6 +122,7 @@
 #define augmentcountonly augmentcountonly_
 #define table_length table_length_
 #define table_exists table_exists_
+#define table_cell_exists table_cell_exists_
 #define table_column_exists table_column_exists_
 #define table_header_exists table_header_exists_
 #define double_from_table_header double_from_table_header_

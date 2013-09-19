@@ -91,6 +91,7 @@ void    augmentcountonly(char* table);
 int     table_length(const char* table);
 int     table_exists(const char* table);
 int     table_column_exists(const char* table, const char* name);
+int     table_cell_exists(const char* table, const char* name, const int* row);
 int     table_header_exists(const char* table, const char *name);
 
 int     double_from_table_header(const char* table, const char* name, double* val);
