@@ -26,10 +26,9 @@ endif
 
 ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
-LIBS += -Llib$(ARCH) -lX11 -lpthread -lm
-else
-LIBS += -lX11 -lm
+LIBS += -Llib$(ARCH) 
 endif
+LDLIBS += -lX11 -lpthread -lstdc++ -lm
 endif
 
 ifeq ($(OSTYPE),Darwin)
