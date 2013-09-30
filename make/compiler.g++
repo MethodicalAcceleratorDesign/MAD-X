@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - g++ compiler settings
+# | MAD makefile - g++ 4.8+ compiler settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -32,8 +32,12 @@ CPPFLAGS += -D_GXX
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -W -Wextra -pedantic -c
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++11 -Wall -W -Wextra -pedantic -c
 
+ifeq ($(OSTYPE),Darwin)
+CXXFLAGS += -mmacosx-version-min=10.5
+endif
+ 
 #
 # options flags
 #
@@ -56,10 +60,6 @@ endif
 
 CXXFLAGS += -pipe $(addprefix -I,$(CXX_DIR))
 
-ifeq ($(OSTYPE),Darwin)
-CXXFLAGS += -mmacosx-version-min=10.5
-endif
- 
 #
 # diagnostics (g++ is the reference)
 #

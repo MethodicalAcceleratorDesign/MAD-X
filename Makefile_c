@@ -30,7 +30,8 @@ CC_SRC +=
 mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
                         -D_VERSION_DATE=$(VERSION_DATE) \
                         -D_VERSION_OSTYPE=$(OSTYPE)
-mad_gxx11c.o: CFLAGS += -I/usr/X11/include -I/opt/X11/include
+mad_gxx11c.o: CFLAGS += -I/usr/X11/include -I/opt/X11/include \
+                        $(if $(call eq,$(CCNAME),icc),-diag-disable 161,)
 
 # special dependency
 mad_gcst.o: VERSION

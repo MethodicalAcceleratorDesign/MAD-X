@@ -16,10 +16,6 @@
 # | $Id$
 # |
 
-# NOTE:
-# Use gfortran 4.4 or higher to compile...
-# Use gfortran 4.6 or higher to compile with -O3
-
 #
 # makedep
 #
@@ -37,10 +33,15 @@ CPPFLAGS += -D_GFORTRAN
 # compiler flags
 #
 
-# gfortran 4.1 to 4.5 craches on l_complex_taylor.f90 with -O3, 4.6 is ok
 FFLAGS = -m$(ARCH) -O$(NOPT) -c
 
+# most of fortran codes do not follow the standard F95
+# so the line below generates to many warnings or errors
 #FFLAGS = -m$(ARCH) -std=f95 -Wall -W -pedantic -c
+
+ifeq ($(OSTYPE),Darwin)
+FFLAGS += -mmacosx-version-min=10.5
+endif
 
 #
 # options flags
@@ -64,9 +65,5 @@ endif
 
 FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check \
           -J$(OBJDIR) $(addprefix -I,$(FC_DIR))
-
-ifeq ($(OSTYPE),Darwin)
-FFLAGS += -mmacosx-version-min=10.5
-endif
 
 # end of makefile

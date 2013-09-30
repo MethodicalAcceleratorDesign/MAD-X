@@ -20,11 +20,11 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O3
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgfortran -static-libgcc -static-libstdc++ -Wl,-no_compact_unwind
 LDLIBS  =
 
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind -L$(GNULIBDIR)
+LDFLAGS += -mmacosx-version-min=10.5
 endif
 
 #

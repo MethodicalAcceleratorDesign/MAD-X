@@ -44,6 +44,10 @@ ifneq ($(OSTYPE),Windows)
 
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c
 
+ifeq ($(OSTYPE),Darwin)
+FFLAGS += -mmacosx-version-min=10.5
+endif
+
 #
 # options flags
 #
@@ -65,15 +69,8 @@ endif
 #
 
 FFLAGS += -mp1 -fp-model strict -assume noold_unit_star \
-          -module $(OBJDIR) $(addprefix -I,$(FC_DIR))
-
-ifneq ($(CXXNAME),)
-FFLAGS += -fexceptions
-endif
-
-ifeq ($(OSTYPE),Darwin)
-FFLAGS += -mmacosx-version-min=10.5
-endif
+          -module $(OBJDIR) $(addprefix -I,$(FC_DIR)) \
+          $(if $(call use_cxx),,-fexceptions)
 
 endif # Unix Settings
 

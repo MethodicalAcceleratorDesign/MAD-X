@@ -22,7 +22,7 @@ ifeq ($(ONLINE),yes)
 LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
 endif
 
-# X11 on Unixes
+# Libraries on Unixes
 
 ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
@@ -33,7 +33,11 @@ endif
 endif
 
 ifeq ($(OSTYPE),Darwin)
-LIBS += -L/usr/X11R6/lib -lX11
+LIBS += -L/usr/X11/lib -lX11.6
+ifeq ($(LD),ifort)
+LDLIBS += $(call GNULIB,libgfortran.a) $(call GNULIB,libquadmath.a)
+endif
+LDLIBS += -lstdc++
 endif
 
 # Garbage Collector
@@ -43,8 +47,5 @@ ifneq ($(OSTYPE),Windows)
 LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
 endif
 endif
-
-# C/C++ linked with fortran
-LIBS += -static-libgcc -lstdc++
 
 # end of makefile

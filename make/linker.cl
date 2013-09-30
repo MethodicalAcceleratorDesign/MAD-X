@@ -20,7 +20,8 @@
 # linker flags
 #
 
-LDFLAGS = /nologo /extlnk:.o
+LDFLAGS = /nologo /extlnk:.o /O$(NOPT)
+LDLIBS  =
 
 #
 # options flags
@@ -31,7 +32,7 @@ LDFLAGS += /Zi /Yd
 endif
 
 ifeq ($(PROFILE),yes)
-LDFLAGS +=
+LDFLAGS += # TODO
 endif
 
 ifeq ($(STATIC),yes)

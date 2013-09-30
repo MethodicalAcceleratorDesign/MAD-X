@@ -28,6 +28,10 @@ ifeq ($(NTPSA),yes)
 CPPFLAGS += -D_NTPSA
 endif
 
+ifeq ($(OSTYPE),Darwin)
+CPPFLAGS += -I/opt/local/include
+endif
+
 ifeq ($(USEGC),yes)
 CPPFLAGS += -D_USEGC -Ilibs$/gc$/gc$/include
 

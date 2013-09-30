@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - ifort linker settings
+# | MAD makefile - ifort 14.0+ linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -25,19 +25,11 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel -static-libgcc
+LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel -static-libgcc -static-libstdc++
 LDLIBS  =
 
-ifneq ($(CXXNAME),)
-LDFLAG += -cxxlib
-LDLIBS += -lstdc++$(if $(call eq,$(OSTYPE),Darwin),-static,)
-endif
-
 ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5 -L$(GNULIBDIR)
-ifeq ($(ARCH),32)
-LDLIBS += -lgcc_eh
-endif
+LDFLAGS += -mmacosx-version-min=10.5
 endif
 
 #

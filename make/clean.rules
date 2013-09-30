@@ -54,6 +54,10 @@ cleandep:
 	$E "** Removing DEP generated files"
 	$_ $(RM) $(OBJDIR)$/*.d
 
+cleanbin:
+	$E "** Removing binaries"
+	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec $(RM) {} \;
+
 cleanbuild:
 	$E "** Removing $(PRJNAME)"
 	$_ $(RM) $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)

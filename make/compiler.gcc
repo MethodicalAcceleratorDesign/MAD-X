@@ -32,7 +32,11 @@ CPPFLAGS += -D_GCC
 # compiler flags
 #
 
-CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -Wextra -pedantic -c
+CFLAGS = -m$(ARCH) -O$(NOPT) -std=c11 -Wall -W -Wextra -pedantic -c
+
+ifeq ($(OSTYPE),Darwin)
+CFLAGS += -mmacosx-version-min=10.5
+endif
 
 #
 # options flags
@@ -56,10 +60,6 @@ endif
 
 CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
  
-ifeq ($(OSTYPE),Darwin)
-CFLAGS += -mmacosx-version-min=10.5
-endif
-
 #
 # diagnostics (gcc is the reference)
 #
