@@ -47,6 +47,6 @@ libgc-gnu32 libgc-gnu64:
     env CC="gcc -m$(ARCH)" ./configure --enable-static --disable-shared --disable-threads ; \
     make clean ; make ; make check ; cd - ; \
     cp -f gc/.libs/libgc.a libgc-linux$(ARCH)-gnu.a ; \
-    ln -sf libgc-linux$(ARCH)-gnu.a libgc$(ARCH).a
+    ln -sf libgc-linux$(ARCH)-gnu.a libgc$(ARCH)-gnu.a
 
 # end of makefile
