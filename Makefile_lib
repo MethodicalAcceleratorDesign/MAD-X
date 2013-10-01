@@ -36,7 +36,12 @@ ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
 LIBS += -Llib$(ARCH) 
 endif
-LDLIBS += -lX11 -lpthread -lstdc++ -lm
+LIBS += -lX11 
+
+ifeq ($(ARCH),32)
+LDLIBS += -L/usr/lib
+endif
+LDLIBS += -lstdc++ -lpthread -lm
 endif
 
 ifeq ($(OSTYPE),Darwin)
