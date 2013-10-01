@@ -73,11 +73,11 @@ eigenvector number, the second integer defines the coordinate
 \{\textit{x}, \textit{p$_x$}, \textit{y}, \textit{p$_y$},
 \textit{t},\textit{p$_t$}\}.
 
-The Generating Function can be specified by \{ \textit{n}, 0, 0\}. The
-positive and negative values of \textit{n} define the order of upright
-or skew resonances, respectively. The integers \textit{n}$_2$ and
-\textit{n}$_3$ are reserved for a future upgrade. For example, "gnfu=-5,
-0, 0" will calculate all Generating Function terms for skew
+The {\bf Generating Function} can be specified by \{ \textit{n}, 0,
+0\}. The positive and negative values of \textit{n} define the order of
+upright or skew resonances, respectively. The integers \textit{n}$_2$
+and \textit{n}$_3$ are reserved for a future upgrade. For example,
+"gnfu=-5, 0, 0" will calculate all Generating Function terms for skew 
 decapoles. In the output table, one finds the cosine, sine and amplitude
 coefficients as denoted by "GNFC", "GNFS", and "GNFA", respectively.
 
@@ -87,6 +87,9 @@ upright or skew resonances, respectively. For example, "haml=3, 0, 0"
 will calculate all Hamiltonian terms for upright sextupoles. In the
 output table, one finds the cosine, sine and amplitude coefficients as
 denoted by "HAMC", "HAMS", and "HAMA", respectively. 
+
+{\bf Caution:} if more than one order of terms is selected only the lower one is correct 
+because higher orders contain "cross terms" from the lower ones.
 
 
 {\bf Parameters} \\
