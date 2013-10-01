@@ -22,6 +22,14 @@ ifeq ($(ONLINE),yes)
 LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
 endif
 
+# Garbage Collector
+
+ifeq ($(USEGC),yes)
+ifneq ($(OSTYPE),Windows)
+LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
+endif
+endif
+
 # Libraries on Unixes
 
 ifeq ($(OSTYPE),Linux)
@@ -37,14 +45,6 @@ ifeq ($(LD),ifort)
 LDLIBS += $(call GNULIB,libgfortran.a) $(call GNULIB,libquadmath.a)
 endif
 LDLIBS += -lstdc++
-endif
-
-# Garbage Collector
-
-ifeq ($(USEGC),yes)
-ifneq ($(OSTYPE),Windows)
-LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
-endif
 endif
 
 # end of makefile

@@ -41,41 +41,62 @@ madx-linux-gnu:     madx-linux32-gnu    madx-linux64-gnu
 madx-linux-lahey:   madx-linux32-lahey  madx-linux64-lahey
 madx-linux-nagfor:  madx-linux32-nagfor madx-linux64-nagfor
 
-madx-linux%: MAKE_OPTS = -j5
+madx-linux%: MAKE_OPTS = -j9
 madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
 madx-linux%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
-madx-linux32:
+madx-linux32: libs/gc/libgc-macosx32.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
 
-madx-linux64:
+madx-linux64: libs/gc/libgc-macosx64.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
 
-madx-linux32-gnu:
+madx-linux32-gnu: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32
 
-madx-linux64-gnu:
+madx-linux64-gnu: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64
 
-madx-linux32-nagfor:
+madx-linux32-nagfor: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 FC=nagfor && $(MAKE_LINK) madx32
 
-madx-linux64-nagfor:
+madx-linux64-nagfor: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 FC=nagfor && $(MAKE_LINK) madx64
 
-madx-linux32-lahey:
+madx-linux32-lahey: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 FC=lf95 && $(MAKE_LINK) madx32
 
-madx-linux64-lahey:
+madx-linux64-lahey: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 FC=lf95 && $(MAKE_LINK) madx64
+
+#
+# libgc
+#
+libs/gc/libgc-macosx%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
+
+libs/gc/libgc-macosx32.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
+
+libs/gc/libgc-macosx64.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
+
+libs/gc/libgc-macosx32-gnu.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
+
+libs/gc/libgc-macosx64-gnu.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
 
 #
 # libmadx
@@ -87,7 +108,7 @@ libmadx-linux:      libmadx-linux32      libmadx-linux64
 libmadx-linux-gnu:  libmadx-linux32-gnu  libmadx-linux64-gnu
 
 libmadx-linux%: DESTDIR   := $(DESTDIR)libs/madx
-libmadx-linux%: MAKE_OPTS  = -j5 --no-print-directory -C libs/madx
+libmadx-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx
 libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=no APPENDLD=yes
 libmadx-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
@@ -102,11 +123,11 @@ libmadx-linux64:
 
 libmadx-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes   && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes   && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
 #
 # libptc
@@ -118,7 +139,7 @@ libptc-linux:       libptc-linux32      libptc-linux64
 libptc-linux-gnu:   libptc-linux32-gnu  libptc-linux64-gnu
 
 libptc-linux%: DESTDIR   := $(DESTDIR)libs/ptc
-libptc-linux%: MAKE_OPTS  = -j5 --no-print-directory -C libs/ptc
+libptc-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc
 libptc-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
 libptc-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libptc-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
@@ -149,7 +170,7 @@ numdiff-linux:      numdiff-linux32       numdiff-linux64
 numdiff-linux-gnu:  numdiff-linux32-gnu   numdiff-linux64-gnu
 
 numdiff-linux%: DESTDIR  := $(DESTDIR)tools/numdiff
-numdiff-linux%: MAKE_OPTS = -j5 --no-print-directory -C tools/numdiff
+numdiff-linux%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff
 numdiff-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
 numdiff-linux%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
