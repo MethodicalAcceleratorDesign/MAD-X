@@ -45,56 +45,56 @@ madx-linux%: MAKE_OPTS = -j9
 madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
 madx-linux%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
-madx-linux32: libs/gc/libgc-macosx32.a
+madx-linux32: libs/gc/libgc-linux32.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
 
-madx-linux64: libs/gc/libgc-macosx64.a
+madx-linux64: libs/gc/libgc-linux64.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
 
-madx-linux32-gnu: libs/gc/libgc-macosx32-gnu.a
+madx-linux32-gnu: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32
 
-madx-linux64-gnu: libs/gc/libgc-macosx64-gnu.a
+madx-linux64-gnu: libs/gc/libgc-linux64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64
 
-madx-linux32-nagfor: libs/gc/libgc-macosx32-gnu.a
+madx-linux32-nagfor: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 FC=nagfor && $(MAKE_LINK) madx32
 
-madx-linux64-nagfor: libs/gc/libgc-macosx64-gnu.a
+madx-linux64-nagfor: libs/gc/libgc-linux64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 FC=nagfor && $(MAKE_LINK) madx64
 
-madx-linux32-lahey: libs/gc/libgc-macosx32-gnu.a
+madx-linux32-lahey: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 FC=lf95 && $(MAKE_LINK) madx32
 
-madx-linux64-lahey: libs/gc/libgc-macosx64-gnu.a
+madx-linux64-lahey: libs/gc/libgc-linux64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 FC=lf95 && $(MAKE_LINK) madx64
 
 #
 # libgc
 #
-libs/gc/libgc-macosx%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
+libs/gc/libgc-linux%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
 
-libs/gc/libgc-macosx32.a:
+libs/gc/libgc-linux32.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
 
-libs/gc/libgc-macosx64.a:
+libs/gc/libgc-linux64.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
 
-libs/gc/libgc-macosx32-gnu.a:
+libs/gc/libgc-linux32-gnu.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
 
-libs/gc/libgc-macosx64-gnu.a:
+libs/gc/libgc-linux64-gnu.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
 
