@@ -1,7 +1,7 @@
 # This is a script for testing the source and submitting
 # your results to a common server (cdash).
 # You can find the server at:
-# http://cern.ch/yngve/cdash/index.php?project=Mad-X
+# http://cern.ch/abp-cdash/index.php?project=Mad-X
 # 
 # How to:
 #  - check out the source from svn in a temporary directory, from the url 
