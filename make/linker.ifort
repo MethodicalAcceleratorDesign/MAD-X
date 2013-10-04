@@ -25,12 +25,8 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel -static-libgcc -static-libstdc++
+LDFLAGS = -m$(ARCH) -O$(NOPT) -nofor-main -static-intel
 LDLIBS  =
-
-ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5
-endif
 
 #
 # options flags

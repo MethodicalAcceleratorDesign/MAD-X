@@ -20,12 +20,8 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgcc 
+LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgcc
 LDLIBS  =
-
-ifeq ($(OSTYPE),Darwin)
-LDFLAGS += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
-endif
 
 #
 # options flags
@@ -44,7 +40,7 @@ LDFLAGS += -static
 endif
 
 ifeq ($(SHARED),yes)
-LDFLAGS += -shared
+LDFLAGS += -shared -fPIC
 endif
 
 ifeq ($(PLUGIN),yes)

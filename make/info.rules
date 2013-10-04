@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: info infoinc infoprj infoall
+.PHONY: info infoinc infoprj infoall infodep
 
 info:
 	@ echo "Operating system                 = " $(OSTYPE) $(OSARCH)
@@ -55,5 +55,16 @@ infoall: infoprj
 	@ echo "Sources files                    = " $(SOURCES)
 	@ echo "Objects files                    = " $(OBJECTS)
 	@ echo "Depends files                    = " $(DEPENDS)
+
+# platform dependent rule
+
+infodep:
+	$E "** Computing binaries dependencies"
+ifeq ($(OSTYPE),Linux)
+	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec ldd {} \;
+endif
+ifeq ($(OSTYPE),Darwin)
+	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec otool -L {} \;
+endif
 
 # end of makefile

@@ -44,10 +44,6 @@ ifneq ($(OSTYPE),Windows)
 
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c
 
-ifeq ($(OSTYPE),Darwin)
-FFLAGS += -mmacosx-version-min=10.5
-endif
-
 #
 # options flags
 #

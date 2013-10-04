@@ -34,12 +34,6 @@ include $(makedir)/make.cfg
 # actions
 include $(makedir)/make.act
 
-# system
-$(call exists, $(makedir)/system.$(OSTYPE), \
-unable to include settings for system OSTYPE=$(OSTYPE) (make [options] infoinc); \
-operating system not supported)
-include $(makedir)/system.$(OSTYPE)
-
 # C compiler
 ifneq ($(CCNAME),)
 $(call exists, $(makedir)/compiler.$(CCNAME), \
@@ -87,6 +81,12 @@ unable to include settings for tester ND=$(NDNAME) (make [options] infoinc); \
 check ND or NDNAME for correct tester configuration file)
 include $(makedir)/tester.$(NDNAME)
 endif
+
+# system
+$(call exists, $(makedir)/system.$(OSTYPE), \
+unable to include settings for system OSTYPE=$(OSTYPE) (make [options] infoinc); \
+operating system not supported)
+include $(makedir)/system.$(OSTYPE)
 
 # project files
 -include $(FILE_VER)

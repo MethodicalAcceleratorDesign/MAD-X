@@ -39,10 +39,6 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -c
 # so the line below generates to many warnings or errors
 #FFLAGS = -m$(ARCH) -std=f95 -Wall -W -pedantic -c
 
-ifeq ($(OSTYPE),Darwin)
-FFLAGS += -mmacosx-version-min=10.5
-endif
-
 #
 # options flags
 #

@@ -17,6 +17,10 @@
 # |
 
 CPPFLAGS += -D_DARWIN
+CFLAGS   += -mmacosx-version-min=10.5
+FFLAGS   += -mmacosx-version-min=10.5
+CXXFLAGS += -mmacosx-version-min=10.5
+LDFLAGS  += -mmacosx-version-min=10.5 -Wl,-no_compact_unwind
 
 BINARY_EXT := 
 SHARED_EXT := .dylib

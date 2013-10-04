@@ -72,10 +72,6 @@ endif
 
 CFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CC_DIR))
 
-ifeq ($(OSTYPE),Darwin)
-CFLAGS += -mmacosx-version-min=10.5
-endif
-
 endif
 
 ###############
@@ -94,7 +90,7 @@ CXXDEP = $(CXX) -MM $(addprefix -I,$(CXX_DIR))
 # compiler
 #
 
-CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++11 -Wall -Wcheck -Wp64 -c
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -Wcheck -Wp64 -c
 
 #
 # diagnostics
@@ -123,10 +119,6 @@ endif
 #
  
 CXXFLAGS += -mp1 -fp-model strict $(addprefix -I,$(CXX_DIR))
-
-ifeq ($(OSTYPE),Darwin)
-CXXFLAGS += -mmacosx-version-min=10.5
-endif
 
 endif
 

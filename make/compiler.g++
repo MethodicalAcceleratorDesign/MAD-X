@@ -34,10 +34,6 @@ CPPFLAGS += -D_GXX
 
 CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -W -Wextra -pedantic -c
 
-ifeq ($(OSTYPE),Darwin)
-CXXFLAGS += -mmacosx-version-min=10.5
-endif
- 
 #
 # options flags
 #
