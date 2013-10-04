@@ -118,7 +118,7 @@ libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
 libmadx-linux32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes ONLINE=yes STATIC=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 Intel=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64:
 	$E "*** Building $@"

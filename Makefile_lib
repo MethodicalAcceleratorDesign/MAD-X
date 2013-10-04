@@ -30,19 +30,21 @@ LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
 endif
 endif
 
-# Libraries on Unixes
+# Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
 ifeq ($(STATIC),yes)
-LIBS += -Llib$(ARCH) 
+LIBS += -Llib$(ARCH)
 endif
-LIBS += -lX11 
+LIBS += -lX11
 
 ifeq ($(ARCH),32)
 LDLIBS += -L/usr/lib
 endif
 LDLIBS += -lstdc++ -lpthread -lm
 endif
+
+# Libraries on MacOSX
 
 ifeq ($(OSTYPE),Darwin)
 LIBS += -L/usr/X11/lib -lX11.6

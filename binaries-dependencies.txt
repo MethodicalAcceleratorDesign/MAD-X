@@ -1,4 +1,4 @@
-macserv15865:
+macserv15865: OS X 10.8.5, Gnu 4.8 (macport), Intel 14.0
 
 otool -L build/madx*
 build/madx-macosx32:
