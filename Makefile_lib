@@ -41,7 +41,7 @@ LIBS += -lX11
 ifeq ($(ARCH),32)
 LDLIBS += -L/usr/lib
 endif
-LDLIBS += -lstdc++ -lpthread -lm
+LDLIBS += -lstdc++
 endif
 
 # Libraries on MacOSX
