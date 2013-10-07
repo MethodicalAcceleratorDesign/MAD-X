@@ -35,6 +35,9 @@ DEBUG   := no
 # profiling mode: yes/no (default is no)
 PROFILE := no
 
+# link with static libs: yes/no (default is no)
+STATIC  := no
+
 # make shared lib: yes/no (default is yes)
 SHARED  := yes
 

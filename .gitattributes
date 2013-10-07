@@ -750,6 +750,7 @@ libs/madx/Makefile -text
 libs/ptc/CMakeLists.txt -text
 libs/ptc/Makefile -text
 libs/ptc/Makefile_f90 -text
+libs/ptc/Makefile_lib -text
 libs/ptc/src/CMakeLists.txt -text
 libs/ptc/src/Sa_extend_poly.f90 -text
 libs/ptc/src/Sb_sagan_pol_arbitrary.f90 -text
