@@ -112,7 +112,7 @@ libmadx-linux-gnu:  libmadx-linux32-gnu  libmadx-linux64-gnu
 
 libmadx-linux%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx
-libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=no APPENDLD=yes
+libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=yes USEGC=no APPENDLD=yes
 libmadx-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
@@ -129,8 +129,8 @@ libmadx-linux32-gnu:
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-gnu:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+	$E "*** Building $@"                               # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
 #
 # libptc
@@ -143,7 +143,7 @@ libptc-linux-gnu:   libptc-linux32-gnu  libptc-linux64-gnu
 
 libptc-linux%: DESTDIR   := $(DESTDIR)libs/ptc
 libptc-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc
-libptc-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
+libptc-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
 libptc-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libptc-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
@@ -174,7 +174,7 @@ numdiff-linux-gnu:  numdiff-linux32-gnu   numdiff-linux64-gnu
 
 numdiff-linux%: DESTDIR  := $(DESTDIR)tools/numdiff
 numdiff-linux%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff
-numdiff-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
+numdiff-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
 numdiff-linux%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-linux32:
