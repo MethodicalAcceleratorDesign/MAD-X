@@ -86,8 +86,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
       double precision   Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
-      integer N_macr_prt_ini !VK20121003 -----------------------!
-
   !hbu
   double precision spos
   !hbu
@@ -109,7 +107,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        dy_start,    dpy_start,                             &
        N_ions_in_beam, Npart_gain, t_rms, pt_rms,          &
        N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,    &
-       N_ions_for_bb,N_macr_prt_ini,z_keep,part_id_keep,   &
+       N_ions_for_bb,z_keep,part_id_keep,                  &
        last_turn_keep,jmax,segment,                        &
        ex_rms0,ey_rms0,sigma_p0,sigma_z0
 
@@ -285,21 +283,20 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         time_var_m_cnt=0
         time_var_p_cnt=0
         time_var_c_cnt=0
-        N_macr_prt_ini = get_value('run ', 'n_macr_prt_ini ')
         !      <<N_macro_part_ini=N_macro_surv+N_macro_lost>>
         N_ions_in_beam=get_value('probe ', 'npart ') !BEAM->NPART
         if(N_ions_in_beam .LT. 0d0) call aafail('TRRUN: ','N_ions_in_beam .LE. 0.0')
         Npart_gain = get_value('run ', 'n_part_gain ')
         N_ions_ini=Npart_gain*N_ions_in_beam
-        n_ions_macro=N_ions_ini/N_macr_prt_ini
-
         N_macro_surv=jmax    ! = number of START lines submitted
+        n_ions_macro=N_ions_ini/N_macro_surv
+
         N_for_I=N_macro_surv ! at start (to be redefined in Ixy)
-        if(N_macr_prt_ini .GT. N_macro_max) call aafail('TRRUN: ',&
-             'Number N_macr_prt_ini exceeds N_macro_max (array size)')
-        if(N_macro_surv .GT. N_macr_prt_ini) call aafail('TRRUN: ',&
-             'Number START-lines exceeds the initial number of macroparticles N_macr_prt_in')
-        t_rms = get_value('run ', 'half_bunch_length_rms ')*beti
+        if(N_macro_surv .GT. N_macro_max) call aafail('TRRUN: ',&
+             'Number N_macro_surv exceeds N_macro_max (array size)')
+        if(N_macro_surv .GT. N_macro_surv) call aafail('TRRUN: ',&
+             'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
+        t_rms = get_value('run ', 'sigma_z ')*beti
         pt_rms = get_value('run ', 'deltap_rms ')
         pt_rms=(sqrt((betas*(pt_rms+1d0))**2+1d0/gammas**2)-1d0)*beti
         sigma_z_ini=t_rms !betas: BEAM->BETA
