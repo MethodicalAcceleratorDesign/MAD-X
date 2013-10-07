@@ -160,8 +160,8 @@ libptc-linux32-gnu:
 	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=32 GNU=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
 
 libptc-linux64-gnu:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
+	$E "*** Building $@"                               # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_OPTS) $(MAKE_ARGS) ARCH=64 GNU=yes STATIC=no && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
 
 #
 # numdiff
