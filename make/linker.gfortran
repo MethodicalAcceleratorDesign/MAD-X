@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -static-libgfortran -static-libstdc++ -static-libgcc
+LDFLAGS = -m$(ARCH) -O$(NOPT)
 LDLIBS  =
 
 #
@@ -36,7 +36,7 @@ LDFLAGS += -pg
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += -static
+LDFLAGS += -static-libgfortran -static-libstdc++ -static-libgcc
 endif
 
 ifeq ($(SHARED),yes)

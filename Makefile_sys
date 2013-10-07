@@ -22,12 +22,6 @@ $(error madx ONLINE is not supported on $(OSTYPE))
 endif
 endif
 
-ifeq ($(OSTYPE),Darwin)
-ifeq ($(STATIC),yes)
-$(error madx STATIC is not supported on $(OSTYPE))
-endif
-endif
-
 ifeq ($(OSTYPE),Windows)
 ifeq ($(PLUGIN),yes)
 $(error madx PLUGIN is not supported on $(OSTYPE))

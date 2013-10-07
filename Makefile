@@ -57,8 +57,11 @@ ONLINE   := no
 # alternative DA package: yes/no (default is yes)
 NTPSA    := yes
 
-# use garbage collector: yes/no (default is no)
-USEGC    := no
+# use garbage collector: yes/no (default is yes)
+USEGC    := yes
+
+# use MAD static libraries (linux only)
+MADLIBS   = $(if $(call eq,$(OSTYPE),Linux),yes,no) 
 
 #################
 # Build settings
@@ -68,7 +71,7 @@ USEGC    := no
 ARCH    := detect
 
 # debugging mode: yes/no (default is no)
-DEBUG   := NO
+DEBUG   := no
 
 # profiling mode: yes/no (default is no)
 PROFILE := no

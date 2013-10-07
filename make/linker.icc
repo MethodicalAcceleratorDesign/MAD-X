@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -static-intel
+LDFLAGS = -m$(ARCH) -O$(NOPT)
 LDLIBS  =
 
 #
@@ -35,18 +35,18 @@ ifeq ($(PROFILE),yes)
 LDFLAGS += -p
 endif
 
-ifeq ($(STATIC),yes) # build static library
-LDFLAGS += -static$(if $(call eq,$(OSTYPE),Darwin),lib,)
+ifeq ($(STATIC),yes)
+LDFLAGS += -static-intel
 endif
 
-ifeq ($(SHARED),yes) # build shared library
+ifeq ($(SHARED),yes)
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared) -fPIC
 ifeq ($(OSTYPE),Linux)
 LDLIBS  += -lifcore_pic -lifcoremt_pic
 endif
 endif
 
-ifeq ($(PLUGIN),yes) # allow to load dynamically shared library (plugin)
+ifeq ($(PLUGIN),yes)
 LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
 endif

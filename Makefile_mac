@@ -40,7 +40,7 @@ madx-macosx:        madx-macosx32         madx-macosx64
 madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
 
 madx-macosx%: MAKE_OPTS = -j9
-madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
+madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
 madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-macosx32: libs/gc/libgc-macosx32.a
@@ -122,7 +122,7 @@ libptc-macosx-gnu:  libptc-macosx32-gnu  libptc-macosx64-gnu
 
 libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc
 libptc-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc
-libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
+libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=no APPENDLD=yes
 libptc-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
 libptc-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
@@ -153,7 +153,7 @@ numdiff-macosx-gnu: numdiff-macosx32-gnu  numdiff-macosx64-gnu
 
 numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff
 numdiff-macosx%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff
-numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) APPENDLD=yes
+numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
 numdiff-macosx%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-macosx32:
