@@ -58,8 +58,13 @@ infoall: infoprj
 
 # platform dependent rule
 
+infobin:
+	$E "** Listing binaries and archives in $(DESTDIR)"
+	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
+	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
+
 infodep:
-	$E "** Computing binaries dependencies"
+	$E "** Computing binaries dependencies in $(DESTDIR)"
 ifeq ($(OSTYPE),Linux)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec ldd {} \;
 endif
