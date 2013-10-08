@@ -234,11 +234,11 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      do  i = 1,j_tot
         if(abs(z(5,i)).gt.t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger then' // text)
+           call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger than' // text)
         endif
         if(abs(z(6,i)).gt.pt_max) then
            write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger then' // text)
+           call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
         endif
         tmp_d = i
         call double_to_table_curr('tracksumm ', 'number ', tmp_d)
@@ -458,7 +458,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      endif
      !-------- Track through element  // suppress dxt 13.12.04
      call ttmap(code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
+          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass,switch)
      !--------  Misalignment at end of element (from twissfs.f)
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
@@ -592,7 +592,7 @@ end subroutine trrun
 
 subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,    &
-     onepass)
+     onepass,switch)
 
   use twtrrfi
   use twiss0fi
@@ -612,7 +612,7 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !----------------------------------------------------------------------*
   logical aperflag,fmap,onepass
   integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
-       get_option, optiondebug
+       get_option, optiondebug, switch
   double precision apx,apy,apr,el,sum,node_value,track(6,*),        &
        last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
        aperture(maxnaper),one,maxaper(6),al_errors(align_max),st,  &
@@ -930,8 +930,10 @@ subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !---- RF cavity.
 100 continue
   call ttrf(track,ktrack)
-  call ttrfloss(turn, sum, part_id, last_turn, &
+  if (switch .eq. 1) then
+     call ttrfloss(turn, sum, part_id, last_turn, &
        last_pos,last_orbit,track,ktrack)
+  endif
   go to 500
   !---- Electrostatic separator.
 110 continue
@@ -3743,7 +3745,7 @@ subroutine trclor(orbit0)
 
      !-------- Track through element
      call ttmap(code,el,z,pmax,dxt,dyt,sum,turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
+          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass,0)
 
      !--------  Misalignment at end of element (from twissfs.f)
      if (code .ne. 1)  then
