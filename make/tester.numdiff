@@ -62,29 +62,39 @@ endef
 # run-test macro
 #
 # $@ = test name & directory
+NDFILES_ZEXT = gz z Z zip tgz taz taZ bz bz2 tbz tbz2
 NDFILES_TTST = $(wildcard tests/$@/$@.ref)
-NDFILES_ZTST = $(wildcard tests/$@/$@.ref.*)
+NDFILES_ZTST = $(wildcard $(addsuffix $(NDFILES_ZEXT),tests/$@/$@.ref.))
 NDFILES_TREF = $(filter-out $(NDFILES_TTST),$(sort $(wildcard tests/$@/*.ref)))
-NDFILES_ZREF = $(filter-out $(NDFILES_ZTST),$(sort $(wildcard tests/$@/*.ref.*)))
+NDFILES_ZREF = $(filter-out $(NDFILES_ZTST),$(sort $(wildcard $(addsuffix $(NDFILES_ZEXT),tests/$@/*.ref.))))
 NDFILES_REF  = $(NDFILES_TTST) $(NDFILES_ZTST) $(NDFILES_TREF) $(NDFILES_ZREF)
 NDFILES_BAS  = $(basename $(NDFILES_TTST) $(basename $(NDFILES_ZTST)) $(NDFILES_TREF) $(basename $(NDFILES_ZREF)))
 NDFILES_OUT  = $(addsuffix .out,$(NDFILES_BAS)) $(NDFILES_BAS)
 
+#
+# debug selected files
+#
+ifeq ($(NDDEBUG),yes)
+define trace-test
+@echo NDFILES_TTST = $(NDFILES_TTST)
+@echo NDFILES_ZTST = $(NDFILES_ZTST)
+@echo NDFILES_TREF = $(NDFILES_TREF)
+@echo NDFILES_ZREF = $(NDFILES_ZREF)
+@echo NDFILES_REF  = $(NDFILES_REF)
+@echo NDFILES_BAS  = $(NDFILES_BAS)
+@echo NDFILES_OUT  = $(NDFILES_OUT)
+endef
+endif
+
 # Remarks line-by-line
+# trace selected files if NDDEBUG=yes and SHOW=yes
 # check for .ref files unless NREF=yes
 # check for testsuite name ; go to test directory
 # delete generated files + cleanup output on Windows (case file not found)
 # run the test command (generate outputs)
 # for each reference file, diff with the generated file + constraints
-# @echo NDFILES_TTST = $(NDFILES_TTST)
-# @echo NDFILES_ZTST = $(NDFILES_ZTST)
-# @echo NDFILES_TREF = $(NDFILES_TREF)
-# @echo NDFILES_ZREF = $(NDFILES_ZREF)
-# @echo NDFILES_REF  = $(NDFILES_REF)
-# @echo NDFILES_BAS  = $(NDFILES_BAS)
-# @echo NDFILES_OUT  = $(NDFILES_OUT)
-
 define run-test
+$(if $(call eq,$(SHOW),yes),$(trace-test),)
 $(if $(call eq,$(NREF),yes),,$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found))
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) \
     cd tests$/$@ && $(RM) $(notdir $(NDFILES_OUT)) \
