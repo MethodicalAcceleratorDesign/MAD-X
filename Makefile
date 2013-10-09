@@ -57,11 +57,8 @@ ONLINE   := no
 # alternative DA package: yes/no (default is yes)
 NTPSA    := yes
 
-# use garbage collector: yes/no (default is yes)
-USEGC    := yes
-
-# use MAD static libraries (linux only)
-MADLIBS   = $(if $(call eq,$(OSTYPE),Linux),yes,no) 
+# use garbage collector: yes/no (default is no)
+USEGC    := no
 
 #################
 # Build settings

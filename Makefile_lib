@@ -33,9 +33,6 @@ endif
 # Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
-ifeq ($(MADLIBS),yes)
-LIBS += -Llib$(ARCH)
-endif
 LIBS += -lX11
 
 ifeq ($(ARCH),32)
