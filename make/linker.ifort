@@ -41,14 +41,12 @@ LDFLAGS += -p
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += -static-intel
+LDFLAGS += $(if $(call eq,$(OSTYPE),Linux),-static,-static-intel)
 endif
 
 ifeq ($(SHARED),yes)
-LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-dynamiclib,-shared) -fPIC
-ifeq ($(OSTYPE),Linux)
-LDLIBS  += -lifcore_pic -lifcoremt_pic
-endif
+LDFLAGS += $(if $(call eq,$(OSTYPE),Linux),-shared,-dynamiclib) -fPIC
+LDLIBS  += $(if $(call eq,$(OSTYPE),Linux),-lifcore_pic -lifcoremt_pic,)
 endif
 
 ifeq ($(PLUGIN),yes)

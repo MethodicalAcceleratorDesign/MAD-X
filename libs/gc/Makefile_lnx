@@ -38,8 +38,8 @@ libgc-intel32 libgc-intel64:
 	$_ cd gc ; \
 	env CC="icc -m$(ARCH)" ./configure --enable-static --disable-shared --disable-threads ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f gc/.libs/libgc.a libgc-linux$(ARCH).a ; \
-	ln -sf libgc-linux$(ARCH).a libgc$(ARCH).a
+	cp -f gc/.libs/libgc.a libgc-linux$(ARCH)-intel.a ; \
+	ln -sf libgc-linux$(ARCH)-intel.a libgc$(ARCH)-intel.a
 
 libgc-gnu32 libgc-gnu64:
 	$E "*** Building $@"

@@ -21,10 +21,6 @@ ifneq ($(OSTYPE),Darwin)
 $(error *** garbage collector not supported on $(OSTYPE))
 endif
 
-.PHONY: libgc-intel    libgc-gnu
-.PHONY: libgc-intel32  libgc-gnu32
-.PHONY: libgc-intel64  libgc-gnu64
-
 $(PROJECT):     libgc-intel
 
 libgc-intel:    libgc-intel32 libgc-intel64
@@ -38,8 +34,8 @@ libgc-intel32 libgc-intel64:
 	$_ cd gc ; \
 	env CC="icc -m$(ARCH)" ./configure --enable-static --disable-shared --disable-threads ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f gc/.libs/libgc.a libgc-macosx$(ARCH).a ; \
-	ln -sf libgc-macosx$(ARCH).a libgc$(ARCH).a
+	cp -f gc/.libs/libgc.a libgc-macosx$(ARCH)-intel.a ; \
+	ln -sf libgc-macosx$(ARCH)-intel.a libgc$(ARCH)-intel.a
 
 libgc-gnu32 libgc-gnu64:
 	$E "*** Building $@"

@@ -26,7 +26,7 @@ endif
 
 ifeq ($(USEGC),yes)
 ifneq ($(OSTYPE),Windows)
-LIBS += -Llibs$/gc -lgc$(ARCH)$(findstring -gnu,$@)
+LIBS += -Llibs$/gc -lgc$(ARCH)$(if $(findstring -gnu,$@),-gnu,-intel)
 endif
 endif
 
@@ -44,7 +44,7 @@ endif
 # Libraries on MacOSX
 
 ifeq ($(OSTYPE),Darwin)
-LIBS += -L/usr/X11/lib -lX11.6
+LIBS += -L/usr/X11/lib -lX11
 LDLIBS += -lstdc++
 endif
 

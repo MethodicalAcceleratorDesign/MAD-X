@@ -36,7 +36,7 @@ LDFLAGS += -pg
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += -static-libgfortran -static-libstdc++ -static-libgcc
+LDFLAGS += $(if $(call eq,$(OSTYPE),Linux),-static,-static-libgfortran -static-libstdc++ -static-libgcc) -pthread
 endif
 
 ifeq ($(SHARED),yes)
