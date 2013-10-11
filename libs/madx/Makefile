@@ -25,8 +25,8 @@
 
 # debug
 ifeq ($(DEBUG_MAKE),yes)
-$(warning MAKEFLAGS = $(MAKEFLAGS))
-$(warning MAKEOVERRIDES = $(MAKEOVERRIDES))
+$(info MAKEFLAGS = $(MAKEFLAGS))
+$(info MAKEOVERRIDES = $(MAKEOVERRIDES))
 endif
 
 ###################
