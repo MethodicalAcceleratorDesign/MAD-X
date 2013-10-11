@@ -19,14 +19,20 @@
 #
 # all
 #
-all-win:    madx-win    numdiff-win
+all-win:          all-win32        all-win64
+all-win-intel:    all-win32-intel  all-win64-intel
+
 all-win32:  madx-win32  numdiff-win32
 all-win64:  madx-win64  numdiff-win64
+
+all-win32-intel:  madx-win32-intel  numdiff-win32-intel
+all-win64-intel:  madx-win64-intel  numdiff-win64-intel
 
 #
 # madx
 #
-madx-win:   madx-win32  madx-win64
+madx-win:        madx-win32        madx-win64
+madx-win-intel:  madx-win32-intel  madx-win64-intel
 
 madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
 madx-win%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)
@@ -43,7 +49,8 @@ madx-win64-intel madx-win64:
 #
 # numdiff
 #
-numdiff-win:  numdiff-win32  numdiff-win64
+numdiff-win:        numdiff-win32        numdiff-win64
+numdiff-win-intel:  numdiff-win32-intel  numdiff-win64-intel
 
 numdiff-win%: DESTDIR  := $(DESTDIR)tools$/numdiff
 numdiff-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) APPENDLD=yes

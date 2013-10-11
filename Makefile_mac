@@ -19,9 +19,9 @@
 #
 # all
 #
-all-macosx:        madx-macosx        libmadx-macosx        libptc-macosx        numdiff-macosx
-all-macosx-gnu:    madx-macosx-gnu    libmadx-macosx-gnu    libptc-macosx-gnu    numdiff-macosx-gnu
-all-macosx-intel:  madx-macosx-intel  libmadx-macosx-intel  libptc-macosx-intel  numdiff-macosx-intel
+all-macosx:        all-macosx32        all-macosx64
+all-macosx-gnu:    all-macosx32-gnu    all-macosx64-gnu
+all-macosx-intel:  all-macosx32-intel  all-macosx64-intel
 
 all-macosx32: madx-macosx32 libmadx-macosx32 libptc-macosx32 numdiff-macosx32
 all-macosx64: madx-macosx64 libmadx-macosx64 libptc-macosx64 numdiff-macosx64
@@ -38,6 +38,10 @@ all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-i
 madx-macosx:        madx-macosx32         madx-macosx64
 madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
 madx-macosx-intel:  madx-macosx32-intel   madx-macosx64-intel
+
+.PHONY: madx-macosx32       madx-macosx64
+.PHONY: madx-macosx32-gnu   madx-macosx64-gnu
+.PHONY: madx-macosx32-intel madx-macosx64-intel
 
 madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
 madx-macosx%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)

@@ -19,9 +19,9 @@
 #
 # all
 #
-all-linux:        madx-linux       libmadx-linux       libptc-linux       numdiff-linux
-all-linux-gnu:    madx-linux-gnu   libmadx-linux-gnu   libptc-linux-gnu   numdiff-linux-gnu
-all-linux-intel:  madx-linux-intel libmadx-linux-intel libptc-linux-intel numdiff-linux-intel
+all-linux:        all-linux32       all-linux64
+all-linux-gnu:    all-linux32-gnu   all-linux64-gnu
+all-linux-intel:  all-linux32-intel all-linux64-intel
 
 all-linux32:  madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
 all-linux64:  madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64
@@ -35,11 +35,17 @@ all-linux64-intel:  madx-linux64-intel libmadx-linux64-intel libptc-linux64-inte
 #
 # madx
 #
-madx-linux:         madx-linux32        madx-linux64
-madx-linux-gnu:     madx-linux32-gnu    madx-linux64-gnu
-madx-linux-intel:   madx-linux32-intel  madx-linux64-intel
-madx-linux-lahey:   madx-linux32-lahey  madx-linux64-lahey
-madx-linux-nagfor:  madx-linux32-nagfor madx-linux64-nagfor
+madx-linux:         madx-linux32         madx-linux64
+madx-linux-gnu:     madx-linux32-gnu     madx-linux64-gnu
+madx-linux-intel:   madx-linux32-intel   madx-linux64-intel
+madx-linux-lahey:   madx-linux32-lahey   madx-linux64-lahey
+madx-linux-nagfor:  madx-linux32-nagfor  madx-linux64-nagfor
+
+.PHONY:  madx-linux32         madx-linux64
+.PHONY:  madx-linux32-gnu     madx-linux64-gnu
+.PHONY:  madx-linux32-intel   madx-linux64-intel
+.PHONY:  madx-linux32-lahey   madx-linux64-lahey
+.PHONY:  madx-linux32-nagfor  madx-linux64-nagfor
 
 madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
 madx-linux%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)
