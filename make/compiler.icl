@@ -58,7 +58,7 @@ CFLAGS = /Qstd=c99 /Wall /Wcheck /Wp64 /O$(NOPT) /c
 # diagnostics
 #
 
-CFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
+CFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:3280,2259,1572,981 # /Qdiag-enable:sc2
 
 #
 # options flags
@@ -111,7 +111,7 @@ CXXFLAGS = /Qstd=c++0x /Wall /Wcheck /Wp64 /O$(NOPT) /c
 # diagnostics
 #
 
-CXXFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:2259,1572,981 # /Qdiag-enable:sc2
+CXXFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:3280,2259,1572,981 # /Qdiag-enable:sc2
 
 #
 # options flags
