@@ -13,8 +13,8 @@
 #          ctest -S cdash_madx.cmake
 
 # Necessary edits:
-SET(CTEST_SITE "myname.maymachine")
-set(CTEST_BUILD_NAME "SLC5-64bit-gfortran")
+set(CTEST_SITE "myname@maymachine")
+set(CTEST_BUILD_NAME "SLC6-64bit-GCC")
 # Your source should be checked out from svn into this directory:
 set(CTEST_SOURCE_DIRECTORY "/path/to/source/madX/")
 # and compilation will be done in this directory (no need to edit, must be unique for every configuration):
@@ -26,6 +26,13 @@ set(cfg_options
  -DCMAKE_BUILD_TYPE=Release
  -DMADX_STATIC=ON
  )
+# some popular options:
+# -DUSE_GC=ON
+# -DMADX_NTPSA=ON
+# -DMADX_FORCE_32=ON
+# -DCMAKE_C_COMPILER=icc
+# -DCMAKE_CXX_COMPILER=icpc
+# -DCMAKE_Fortran_COMPILER=ifort
 
 # Do not edit (unless you know cmake/ctest):
 
