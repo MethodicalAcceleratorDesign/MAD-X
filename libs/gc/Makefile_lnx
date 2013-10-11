@@ -21,10 +21,6 @@ ifneq ($(OSTYPE),Linux)
 $(error *** garbage collector not supported on $(OSTYPE))
 endif
 
-.PHONY: libgc-intel    libgc-gnu
-.PHONY: libgc-intel32  libgc-gnu32
-.PHONY: libgc-intel64  libgc-gnu64
-
 $(PROJECT):     libgc-intel
 
 libgc-intel:    libgc-intel32 libgc-intel64
