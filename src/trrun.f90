@@ -127,14 +127,18 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      onepass = get_option('onepass ') .ne. 0
      if(onepass)   then
      else
-        call trclor(orbit0)
+        call trclor(switch,orbit0)
      endif
   else
   endif
 
-  emittance_update = get_option('emittance_update ') .ne. 0
-  bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  if(switch.eq.1) then
+     bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  else
+     bb_sxy_update = .false.
+  endif
   if(bb_sxy_update) then
+     emittance_update = get_option('emittance_update ') .ne. 0
      virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
      if(virgin_state) first=.true.
 
@@ -228,9 +232,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   if(first) then
      !--- enter start coordinates in summary table
-     t_max=get_value('probe ','circ ')/get_value('run ', 'track_harmon ')/betas
-     pt_max = get_value('run ', 'deltap_max ')
-     pt_max=(sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0)*beti
+     if (switch .eq. 1)  then
+        t_max=get_value('probe ','circ ')/get_value('run ', 'track_harmon ')/betas
+        pt_max = get_value('run ', 'deltap_max ')
+        pt_max=(sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0)*beti
+     else
+        t_max=1d20 
+        pt_max=1d20 
+     endif
      do  i = 1,j_tot
         if(abs(z(5,i)).gt.t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
@@ -457,8 +466,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         endif
      endif
      !-------- Track through element  // suppress dxt 13.12.04
-     call ttmap(code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass,switch)
+     call ttmap(switch,code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id,             &
+          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
      !--------  Misalignment at end of element (from twissfs.f)
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
@@ -590,9 +599,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 end subroutine trrun
 
 
-subroutine ttmap(code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,    &
-     onepass,switch)
+subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors, onepass)
 
   use twtrrfi
   use twiss0fi
@@ -3577,7 +3585,7 @@ subroutine trupdate(turn)
   call pro_input(cmd)
 end subroutine trupdate
 
-subroutine trclor(orbit0)
+subroutine trclor(switch,orbit0)
 
   use twiss0fi
   use name_lenfi
@@ -3595,7 +3603,7 @@ subroutine trclor(orbit0)
   !----------------------------------------------------------------------*
   double precision orbit0(6),z(6,7),zz(6),z0(6,7),z00(6,7),a(6,7),deltap,ddd(6)
   integer itra, itmax, j, bbd_pos, j_tot
-  integer code
+  integer code,switch
   double precision el,dxt(200),dyt(200)
   integer restart_sequ
   integer advance_node, get_option, node_al_errors
@@ -3744,8 +3752,8 @@ subroutine trclor(orbit0)
      endif
 
      !-------- Track through element
-     call ttmap(code,el,z,pmax,dxt,dyt,sum,turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass,0)
+     call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id,             &
+          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
 
      !--------  Misalignment at end of element (from twissfs.f)
      if (code .ne. 1)  then
