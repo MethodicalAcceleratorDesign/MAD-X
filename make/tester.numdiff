@@ -20,10 +20,12 @@
 # numdiff paths
 #
 ifndef NDIFF
-NDIFFCMD := $(firstword $(wildcard $(ND)$(ARCH)$(BINARY_EXT) $(ND)$(BINARY_EXT) ))
+NDIFFGET := detect
+NDIFFCMD := $(firstword $(wildcard $(ND)$(ARCH)$(BINARY_EXT) $(ND)$(BINARY_EXT)))
 NDIFF_R  := $(if $(NDIFFCMD),..$/..$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
 NDIFF_I  := $(if $(NDIFFCMD),.$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
 else
+NDIFFGET := provided
 NDIFF_R  := $(NDIFF)
 NDIFF_I  := $(NDIFF)
 endif
