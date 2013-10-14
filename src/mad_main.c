@@ -70,7 +70,7 @@ mad_init(int argc, char *argv[])
   // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
   if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
 #ifdef _WIN32
-    int putenv(char *string);
+    int putenv(const char *string);
     putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
 #else
     setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
