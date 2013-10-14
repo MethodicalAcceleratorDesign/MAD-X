@@ -1,5 +1,6 @@
 # run:
 # sh build-test-macosx.sh 1>| build-test-macosx.out 2>&1
+# tail -f build-test-macosx.out
 
 echo "===== SVN update ====="
 svn update
