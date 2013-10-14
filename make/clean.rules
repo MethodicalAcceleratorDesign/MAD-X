@@ -33,6 +33,7 @@ cleantest:
 	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
 	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
 	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
+	$_ $(FIND) tests \( -name Maxwellian_bend_for_ptc.txt -o -name '*.ps' \) -exec $(RM) {} \;
 
 cleanc:
 	$E "** Cleaning C generated files"

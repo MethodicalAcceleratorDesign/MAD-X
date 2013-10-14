@@ -19,7 +19,6 @@
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text
-/binaries-dependencies.txt -text
 /build-test-lxplus.sh -text
 /build-test-macosx.sh -text
 cmake/Copyright.txt -text
