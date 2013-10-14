@@ -18,13 +18,12 @@ if (CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     # for file l_complex_taylor.f90
     if(APPLE OR IS32BIT)
         if (${CMAKE_Fortran_COMPILER_VERSION} VERSION_LESS 4.6)
-          set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O1 ")
-        else()
-          set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O2 ")
+          set(CMAKE_Fortran_FLAGS_RELEASE "-O1")
         endif()
     else()
-        set(CMAKE_Fortran_FLAGS_RELEASE " -funroll-loops -O4 ")
+        set(CMAKE_Fortran_FLAGS_RELEASE "-O4")
     endif()
+    set(CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops ${CMAKE_Fortran_FLAGS_RELEASE}")
 
     # Additional option dependent flags:
     if ( MADX_STATIC )
