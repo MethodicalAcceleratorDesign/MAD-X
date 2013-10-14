@@ -21,13 +21,13 @@ echo "\n===== Dependencies ====="
 make infodep
 
 echo "\n===== Gnu tests (32 bit) ====="
-make madx-macosx32-gnu ; ls -l madx32 ; make tests-all ARCH=32
+make madx-macosx32-gnu && ls -l madx32 && make tests-all ARCH=32
 
 echo "\n===== Gnu tests (64 bit) ====="
-make madx-macosx64-gnu ; ls -l madx64 ; make tests-all ARCH=64
+make madx-macosx64-gnu && ls -l madx64 && make tests-all ARCH=64
 
 echo "\n===== Intel tests (32 bit) ====="
-make madx-macosx32-intel ; ls -l madx32 ; make tests-all ARCH=32
+make madx-macosx32-intel && ls -l madx32 && make tests-all ARCH=32
 
 echo "\n===== Intel tests (64 bit) ====="
-make madx-macosx64-intel ; ls -l madx64 ; make tests-all ARCH=64
+make madx-macosx64-intel && ls -l madx64 && make tests-all ARCH=64
