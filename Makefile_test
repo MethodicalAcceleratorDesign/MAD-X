@@ -113,6 +113,6 @@ MADXCMD := $(firstword $(wildcard $(PROJECT)$(ARCH)$(BINARY_EXT) $(PROJECT)$(BIN
 MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH)$(BINARY_EXT))
 endif
 
-TESTCMD = $(TIMER) $(MADX) < $(@F).madx
+TESTCMD = $(TIMER) $(MADX) $(@F).madx
 
 # end of makefile
