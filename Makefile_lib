@@ -48,4 +48,10 @@ LIBS += -L/usr/X11/lib -lX11
 LDLIBS += -lstdc++
 endif
 
+# Libraries on Windows (Gnu)
+
+ifeq ($(OSTYPE),Windows)
+LDLIBS += -lstdc++
+endif
+
 # end of makefile
