@@ -53,11 +53,11 @@ madx-win64-intel madx-win64:
 
 madx-win32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Gnu=yes && $(MAKE_LINK) madx32.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32.exe
 
 madx-win64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Gnu=yes && $(MAKE_LINK) madx64.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64.exe
 
 #
 # numdiff
@@ -81,10 +81,10 @@ numdiff-win64-intel numdiff-win64:
 
 numdiff-win32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Gnu=yes && $(MAKE_LINK) numdiff32.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32.exe
 
 numdiff-win64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Gnu=yes && $(MAKE_LINK) numdiff64.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) numdiff64.exe
 
 # end of makefile
