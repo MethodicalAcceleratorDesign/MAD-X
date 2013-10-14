@@ -1,5 +1,5 @@
 # run:
-# sh build-test-linux.sh 1>| build-test-linux.out 2>&1
+# sh build-test-lxplus.sh 1>| build-test-lxplus.out 2>&1
 
 echo "===== SVN update ====="
 svn update
