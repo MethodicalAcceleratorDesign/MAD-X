@@ -22,10 +22,13 @@
 ifndef NDIFF
 NDIFFGET := detect
 NDIFFCMD := $(firstword $(wildcard $(ND)$(ARCH)$(BINARY_EXT) $(ND)$(BINARY_EXT)))
+ifeq ($(OSTYPE),Windows) # bug of gmake (32 bit) on Windows 7 (64 bit)
+NDIFFCMD := $(if $(NDIFFCMD),$(NDIFFCMD),$(ND)$(ARCH)$(BINARY_EXT))
+endif
 NDIFF_R  := $(if $(NDIFFCMD),..$/..$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
 NDIFF_I  := $(if $(NDIFFCMD),.$/$(NDIFFCMD),$(ND)$(BINARY_EXT))
 else
-NDIFFGET := provided
+NDIFFGET := defined
 NDIFF_R  := $(NDIFF)
 NDIFF_I  := $(NDIFF)
 endif
@@ -78,7 +81,7 @@ NDFILES_OUT  = $(addsuffix .out,$(NDFILES_BAS)) $(NDFILES_BAS)
 #
 ifeq ($(NDDEBUG),yes)
 define trace-test
-@echo NDIFFGET     = $(NDIFFGET)
+@echo NDIFFINFO    = $(NDIFFGET) [from "$(ND)$(ARCH)$(BINARY_EXT)" "$(ND)$(BINARY_EXT)" in $(shell pwd)]
 @echo NDIFFCMD     = $(NDIFFCMD)
 @echo NDIFF_R      = $(NDIFF_R)
 @echo NDIFF_I      = $(NDIFF_I)
