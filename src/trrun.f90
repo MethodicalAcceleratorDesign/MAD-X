@@ -613,6 +613,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !   -  Track through thin lenses ONLY.                                 *
   !                                                                      *
   ! Input/output:                                                        *
+  !   switch    (integer)   1: RUN, 2: DYNAP fastune                     *
   !   SUM       (double)    Accumulated length.                          *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   NUMBER(*) (integer) Number of current track.                       *
@@ -3598,6 +3599,7 @@ subroutine trclor(switch,orbit0)
   !   -  Use Newton approximation                                        *
   !                                                                      *
   ! Input/output:                                                        *
+  !   switch  (int)         1: RUN, 2: DYNAP fastune                     *
   !   ORBIT0(6) (double)  Closed Orbit Coordinates @ sequence start      *
   !                       (X, PX, Y, PY, T, PT)                          *
   !----------------------------------------------------------------------*
