@@ -78,6 +78,7 @@ NDFILES_OUT  = $(addsuffix .out,$(NDFILES_BAS)) $(NDFILES_BAS)
 #
 ifeq ($(NDDEBUG),yes)
 define trace-test
+@echo NDIFFGET     = $(NDIFFGET)
 @echo NDIFFCMD     = $(NDIFFCMD)
 @echo NDIFF_R      = $(NDIFF_R)
 @echo NDIFF_I      = $(NDIFF_I)
