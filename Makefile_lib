@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-# Online madx
+# Online MAD-X
 
 ifeq ($(ONLINE),yes)
 LIBS += -Llib$(ARCH) -lSDDS1c -lSDDS1 -lrpnlib -lmdbmth -lmdblib -lgsl -lz
