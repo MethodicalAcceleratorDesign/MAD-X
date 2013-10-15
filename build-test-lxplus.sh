@@ -7,10 +7,13 @@ svn update
 cat VERSION
 
 echo -e "\n===== Gnu build ====="
+#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/i686-slc6-gcc48-opt/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
-make all-linux-gnu
+make all-linux32-gnu
+#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
+make all-linux64-gnu
 
 echo -e "\n===== Intel build ====="
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
