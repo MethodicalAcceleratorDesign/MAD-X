@@ -33,21 +33,21 @@ endif
 # Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
-LIBS   += -L/usr/lib -lX11
-LDLIBS += -lstdc++
+LIBS += $(if $(call eq,$(ARCH),32),-L/usr/lib,) -lX11
 endif
 
 # Libraries on MacOSX
 
 ifeq ($(OSTYPE),Darwin)
-LIBS   += -L/usr/X11/lib -lX11
-LDLIBS += -lstdc++
+LIBS += -L/usr/X11/lib -lX11
 endif
 
 # Libraries on Windows
 
 ifeq ($(OSTYPE),Windows)
-LDLIBS += -lstdc++
 endif
+
+# madx requires C++ and math
+LDLIBS += -lstdc++ -lm
 
 # end of makefile

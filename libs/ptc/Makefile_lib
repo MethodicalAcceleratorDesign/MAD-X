@@ -16,11 +16,13 @@
 # | $Id$
 # |
 
+# Libraries on Linux
+
 ifeq ($(OSTYPE),Linux)
-ifeq ($(ARCH),32)
-LDLIBS += -L/usr/lib
+LIBS += $(if $(call eq,$(ARCH),32),-L/usr/lib,)
 endif
+
+# PTC math
 LDLIBS += -lm
-endif
 
 # end of makefile
