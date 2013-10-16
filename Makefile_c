@@ -32,7 +32,7 @@ mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
                         -D_VERSION_OSTYPE=$(OSTYPE)
 mad_gxx11c.o: CFLAGS += -I/usr/X11/include -I/opt/X11/include \
                         $(if $(call eq,$(CCNAME),icc),-diag-disable 161, \
-                        $(if $(call eq,$(CCNAME),gcc),-Wno-variadic-macros,)
+                        $(if $(call eq,$(CCNAME),gcc),-Wno-variadic-macros,))
 mad_dict.o:   CFLAGS += $(if $(call eq,$(CCNAME),gcc),-Wno-overlength-strings,)
 
 # special dependency
