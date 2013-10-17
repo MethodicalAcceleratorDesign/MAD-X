@@ -3,6 +3,7 @@
 %  Changed by: Hans Grote, 25-Sep-2002 
 
 \section{\href{expression}{Real Expressions}}
+\label{sec:expression}
 
 To facilitate the definition of interdependent quantities, any real
 value and integer value can be entered as an arithmetic expression. When
@@ -30,6 +31,7 @@ An expression can be formed using the following operators:
 \end{itemize}
 
 \subsubsection{\href{function}{Ordinary Functions}}
+\label{subsubsec:function}
 \begin{itemize}
 	\item sqrt(x) square root, 
 	\item log(x) natural logarithm, 
@@ -48,6 +50,7 @@ An expression can be formed using the following operators:
 \end{itemize}
 
 \subsubsection{\href{random}{Random Number Generators}}
+\label{subsubsec:random}
 \begin{itemize}
 	\item ranf() random number, uniformly distributed in [0,1], 
 	\item gauss() random number, gaussian distribution with unit standard deviation, 
@@ -60,6 +63,7 @@ random generator use the
 \href{../error/error_option.html#EOPTION}{Eoption command}.  
 
 \subsubsection{\href{table}{Table Access Functions}}
+\label{subsubsec:table}
 
 \begin{itemize}
 	\item table(x,z): accesses value of the named table column "z"
@@ -160,6 +164,7 @@ useful when creating a table from existing ones. See an example at:
 
 
 \subsection{\href{operand}{Operands in Arithmetic Expressions}} 
+\label{subsec:operand}
 An expression may contain the following operands:  
 
 \subsubsection{Literal Constants} 
@@ -173,6 +178,7 @@ Examples:
 \end{verbatim}
 
 \subsubsection{\href{constant}{Symbolic constants}} 
+\label{subsubsec:symbolic_const}
 MAD recognizes some \hyperlink{constant}{mathematical and physical
   constants}. Their names must not be used for user-defined labels.  
 
@@ -276,6 +282,7 @@ D2: DRIFT, L=2.0-D1->L;
 D1-\textgreater L refers to the length L of the drift space D1.  
 
 \subsection{\href{defer}{Expressions and Random Values}} 
+\label{subsec:expr_rnd}
 The definition of random machine imperfections requires evaluation of
 expressions containing random functions. These are evaluated like any
 other expression when the expression is used, i.e. only once if a "="

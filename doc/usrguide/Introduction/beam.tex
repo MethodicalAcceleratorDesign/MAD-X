@@ -2,6 +2,7 @@
 %  Changed by: Hans Grote, 30-Sep-2002 
 
 \section{BEAM: Set Beam Parameters}
+\label{sec:beam}
 
 Many commands in MAD-X require the setting of various quantities related
 to the beam in the machine. Therefore, MAD-X will stop with a fatal
@@ -23,7 +24,7 @@ mentioned, but does not return to default values for others! To reset to
 \href{resbeam.html#defaults}{beam value defaults},  use
 \href{resbeam.html}{RESBEAM}.
 
-The particle restmass and \href{charge}{charge} are defined by:
+The particle restmass and charge \label{beam_charge} are defined by:
 \begin{itemize}
    \item \href{particle}{PARTICLE}: The name of particles in the
      machine. MAD knows the restmass and the charge for the
@@ -47,7 +48,7 @@ By default the total particle energy is 1 GeV. A different value can be
 defined by one of the following: 
  
 \begin{itemize}
-   \item \href{energy}{ENERGY}: The total energy per particle in
+   \item ENERGY \label{beam_energy}: The total energy per particle in
      GeV. If given, it must be greater then the particle restmass.  
    \item \href{pc}{PC}: The momentum per particle in GeV/c. If
      given, it must be greater than zero.  
@@ -115,11 +116,11 @@ Finally, the BEAM command accepts
 \begin{itemize}
    \item \href{kbunch}{KBUNCH}: The number of particle bunches in the
      machine (default: 1).  
-   \item \href{npart}{NPART}: The number of particles per bunch (default: 0). 
+   \item \href{npart}{NPART} \label{beam_npart}: The number of particles per bunch (default: 0). 
    \item \href{bcurrent}{BCURRENT}: The bunch current (default: 0 A). 
    \item \href{bunched}{BUNCHED}: A logical flag. If set, the beam is
      treated as bunched whenever this makes sense.  
-   \item \href{radiate}{RADIATE}: A logical flag. If set, synchrotron
+   \item \href{radiate}{RADIATE} \label{beam_radiate}: A logical flag. If set, synchrotron
      radiation is considered in all bipolar magnets.  
    \item \href{bv}{BV}: an integer specifying the direction of the
      particle movement in a beam line; either +1 (default), or -1. For a

@@ -26,6 +26,7 @@ number of calls itself, and so on to any depth.
 %% 2013-Jul-11  17:23:00  ghislain: I propose to move COGUESS to the
 %% orbit correction part of the manual
 \subsection{COGUESS}
+\label{subsec:general_coguess}
 \begin{verbatim}
 coguess, tolerance = double, 
          x = double, px = double, 
@@ -106,6 +107,7 @@ then \hyperlink{write}{write} in TFS format.  See as well the
 \href{../Introduction/select.html#ucreate}{user table} example.  
 
 \subsection{OPTION}
+\label{subsec:general_option}
 \begin{verbatim}
 option, flag { = true | = false };
 option, flag | -flag;
@@ -130,21 +132,23 @@ The available options are:
 \begin{verbatim}
   name           default meaning if true
   ====           ======= ===============
-  bborbit         false  the closed orbit is modified by beam-beam kicks
-  sympl           false  all element matrices are symplectified in Twiss
   echo            true   echoes the input on the standard output file
-  trace           false  prints the system time after each command
-  verify          false  issues a warning if an undefined variable is used
   warn            true   issues warnings
   info            true   issues informations
+  debug           false  issues debugging information
+  trace           false  prints the system time after each command
+  verify          false  issues a warning if an undefined variable is used
   tell            false  prints the current value of all options
   reset           false  resets all options to their defaults
+  no_fatal_stop   false  Prevents madx from stopping in case of a fatal error. 
+                         Use at your own risk.
+
   rbarc           true   converts the RBEND straight length into the arc 
                          length
   thin_foc        true   if false suppresses the 1(rho**2) focusing of thin 
                          dipoles
-  no_fatal_stop   false  Prevents madx from stopping in case of a fatal error. 
-                         Use at your own risk.
+  bborbit         false  the closed orbit is modified by beam-beam kicks
+  sympl           false  all element matrices are symplectified in Twiss
 \end{verbatim} 
 
 The option "rbarc" is implemented for backwards compatibility with MAD-8
@@ -179,6 +183,7 @@ accessed, it can be plotted, written out again etc.
 
 
 \subsection{READMYTABLE}
+\label{subsec:general_readmy}
 \begin{verbatim}
 readmytable, file = "file_name", table = internalname;
 \end{verbatim} 
@@ -232,6 +237,7 @@ file, it ends the program execution.
 
 
 \subsection{SAVE}
+\label{subsec:general_save}
 \begin{verbatim}
 save, sequence = sequ1, sequ2, ..., file = "file_name", beam, bare;
 \end{verbatim} 
@@ -306,6 +312,7 @@ twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
 
 
 \subsection{SAVEBETA}
+\label{subsec:general_savebeta}
 \begin{verbatim}
 savebeta, label = label, place = place, sequence = sequence_name;
 \end{verbatim} 
@@ -424,6 +431,7 @@ inserts the string in quotes as title in various tables and plots.
 
 
 \subsection{USE}
+\label{subsec:general_use}
 \begin{verbatim}
 use, period = sequence_name, range = range, survey;
 \end{verbatim} 
@@ -453,6 +461,7 @@ exp(sqrt(2)) = 4.113250379        ;
 
 
 \subsection{WRITE}
+\label{subsec:general_write}
 \begin{verbatim}
 write, table = table, file = "file_name";
 \end{verbatim} 

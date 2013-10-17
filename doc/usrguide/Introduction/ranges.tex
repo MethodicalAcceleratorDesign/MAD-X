@@ -5,13 +5,14 @@
 \chapter{Range and Class Selection Format}
 
 \section{RANGE}
+\label{sec:range}
 
  \href{range}{RANGE}: \\
 A range can be defined starting at  a given element and ending at
 another element, both elements included. Two forms exist:  
 
 \begin{verbatim}
-range=\href{position}{position};
+range=position;
 range=position1/position2;
 \end{verbatim} 
 
@@ -20,6 +21,7 @@ or several elements are selected. NOTE: position1 must not be behind
 position2 in the sequence.  
 
 "position" is composed of the element name and an optional occurrence count in the sequence: 
+\label{range_position}
 \begin{verbatim}
 mq.ir5.l6..1          ! no occurrence count given
 mb[17]                ! occurrence count given
@@ -46,6 +48,7 @@ then "\#s" and "\#e" refer to the start and end of the expanded range, of course
 \end{verbatim}
 
 \section{CLASS}
+\label{sec:range_class}
 \href{class}{CLASS}:\\ 
 The single name of a class (no occurrence counts). A class is the name
 of an element (or basic type) from which other elements have been

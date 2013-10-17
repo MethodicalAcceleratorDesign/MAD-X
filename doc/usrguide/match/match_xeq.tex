@@ -3,10 +3,12 @@
 %  Changed by: Oliver Bruning, 20-Jun-2002 
 
 \section{Matching Methods}
+\label{sec:match_methods}
 
 MADX currently supports four different matching algorithms: 
 
 \subsection{\href{lmdif}{LMDIF: Fast Gradient Minimisation}} 	
+\label{subsec:match_lmdif}
 The LMDIF command minimises the sum of squares of the constraint
 functions using their numerical derivatives:  
  
@@ -27,6 +29,7 @@ LMDIF,CALLS=2000,TOLERANCE=1.0E-8;
 \end{verbatim}
 
 \subsection{\href{migrad}{MIGRAD: Gradient Minimisation}}
+\label{subsec:match_migrad}
 The MIGRAD command minimises the penalty function using the numerical derivatives of the sum of squares: 
 
 \begin{verbatim}
@@ -47,6 +50,7 @@ MIGRAD,CALLS=2000,TOLERANCE=1.0E-8;
 \end{verbatim}
 
 \subsection{\href{simplex}{SIMPLEX: Simplex Minimisation}}
+\label{subsec:match_simplex}
 The SIMPLEX command minimises the penalty function by the simplex method: 
 
 \begin{verbatim}
@@ -65,6 +69,7 @@ SIMPLEX,CALLS=2000,TOLERANCE=1.0E-8;
 \end{verbatim}
 
 \subsection{\href{jacobian}{JACOBIAN: Newton Minimisation}}
+\label{subsec:match_jacobian}
 The JACOBIAN command minimises the penalty function calculating the
 Jacobian and solving the linear problem. A QR or LQ  decomposition is
 performed when the system is over or under-determined. Before starting

@@ -6,6 +6,7 @@
 \section{Constraints}
 
 \subsection{CONSTRAINT: Simple Constraint}
+\label{subsec:match_con}
 
 Simple constraints are imposed by the CONSTRAINT command. The CONSTRAINT
 command has three attributes:   
@@ -84,6 +85,7 @@ Normally ``RANGE'' refers to a single
 \href{../Introduction/ranges.html#position}{position}.
 
 \subsection{User Defined Matching Constraints}
+\label{subsec:match_con_user}
 
 In addition to the nominal TWISS variables the user can define a limited
 set of 'user-defined' variables in the constrint statement. This allows,
@@ -126,6 +128,7 @@ constraint, sequence='sequence-name',range='location',mvar1='target-value';
 \end{verbatim}
 
 \subsection{Matching Weights}
+\label{subsec:match_con_weight}
 
 The matching procedures try to fulfil the constraints
 in a least square sense.
@@ -170,6 +173,7 @@ MVAR1    & 10.0  & MVAR2    & 10.0  & MVAR3    & 10.0  & MVAR4    & 10.0  & -
 }
 
 \subsection{GLOBAL: Global Matching Constraints}
+\label{subsec:match_con_global}
 
 In addition to conventional matching constraints that specify the optics 
 functions at a certain position in the sequence the user can also constrain 

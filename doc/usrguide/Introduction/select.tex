@@ -2,6 +2,7 @@
 %  Changed by: Hans Grote, 16-Jan-2003 
 
 \subsection{Selection Statements}
+\label{subsec:selection}
 
 The elements, or a range of elements, in a sequence can be selected for
 various purposes. Such selections remain valid until cleared (in
@@ -32,7 +33,9 @@ selects all positions in the sequence for this flag. This is the default
 for all tables and makethin, whereas for ERROR and SEQEDIT the default
 is "nothing selected".  
 
-\href{save_select}{}SAVE: A SELECT,FLAG=SAVE statement causes the
+%\href{save_select}{}
+\label{save_select}
+SAVE: A SELECT,FLAG=SAVE statement causes the
 selected sequences, elements, and variables to be written into the save
 file. A class (only used for element selection), and a pattern can be
 specified. Example:  
@@ -74,7 +77,7 @@ stop;
 \end{verbatim} 
 
 This produces a file \href{sectormap.html}{sectormap}, and a
-\href{tfs}{}twiss output file (name = optics):  
+twiss output file \label{tfs} (name = optics):  
 \begin{verbatim}
 @ TYPE             %05s "TWISS"
 @ PARTICLE         %08s "POSITRON"
@@ -173,7 +176,7 @@ new variables.
 
 Remark: this replaces the "string" variables of MAD-8. 
 
- This example demonstrates as well the usage of a \href{ucreate}{user defined table}. 
+ This example demonstrates as well the usage of a user defined table \label{ucreate}. 
 \begin{verbatim}
 beam,ex=1.e-6,ey=1.e-3;
 // element definitions

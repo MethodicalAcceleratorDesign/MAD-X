@@ -2,6 +2,7 @@
 <title>Monitors</title>
 <!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
 <!-- Changed by: Hans Grote, 30-Sep-2002 -->
+<!-- Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -29,12 +30,18 @@ Optically it behaves like a drift space;
 it returns <em>no beam observation</em>.
 It represent a class of elements
 which is completely independent from drifts and monitors.
+<li><a name=plac>PLACEHOLDER</a>
+A place holder for any type of element. 
+Internally it is equivalent to an INSTRUMENT: optically it behaves as a drift space, 
+it returns <em>no beam observation</em>. It represent a class of elements 
+which is completely independent from drifts and monitors.
 </ul>
 <pre>
 label: HMONITOR,    L=real;
 label: VMONITOR,    L=real;
 label: MONITOR,     L=real;
 label: INSTRUMENT,  L=real;
+label: PLACEHOLDER, L=real;
 </pre>
 A beam position monitor has one real attribute:
 <ul>

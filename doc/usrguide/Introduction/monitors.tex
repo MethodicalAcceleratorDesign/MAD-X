@@ -1,8 +1,10 @@
 %%\title{Monitors}
 %  Changed by: Chris ISELIN, 27-Jan-1997 
 %  Changed by: Hans Grote, 30-Sep-2002 
+%  Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER
 
 \section{Beam Position Monitors}
+\label{sec:monitors}
 
 A beam monitor acts on the beam like a drift space. In addition it
 serves to record the beam position for closed orbit corrections. Four
@@ -16,6 +18,11 @@ different types of beam position monitors are recognised:
      instrumentation. Optically it behaves like a drift space; it
      returns \emph{no beam observation}. It represent a class of
      elements which is completely independent from drifts and monitors.  
+   \item \href{plac}{PLACEHOLDER}. A place holder for any type of
+     element. Internally it is equivalent to an INSTRUMENT: optically it
+     behaves as a drift space, it returns \emph{no beam observation}. It
+     represent a class of elements which is completely independent from
+     drifts and monitors. 
 \end{itemize}
 
 \begin{verbatim}
@@ -23,6 +30,7 @@ label: HMONITOR,    L = real;
 label: VMONITOR,    L = real;
 label: MONITOR,     L = real;
 label: INSTRUMENT,  L = real;
+label: PLACEHOLDER,  L = real;
 \end{verbatim} 
 
 A beam position monitor has one real attribute: 
