@@ -1,6 +1,8 @@
 # run:
 # sh scripts/build-test-report.sh
 
+export LC_CTYPE="C"
+
 filelist="lxplus-failed.tmp macosx-failed.tmp win-failed.tmp tests-failed.tmp build-test-failed.tmp"
 
 rm -f $filelist

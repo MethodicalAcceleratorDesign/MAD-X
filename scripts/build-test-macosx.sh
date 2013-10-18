@@ -2,6 +2,8 @@
 # sh scripts/build-test-macosx.sh 1> build-test-macosx.out 2>&1
 # tail -f build-test-macosx.out
 
+export LC_CTYPE="C"
+
 echo "\n===== Start build and tests ====="
 date
 
