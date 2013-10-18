@@ -23,21 +23,16 @@
 
 #include "args.h"
 
-// macros
-
-#if defined(_WIN32) || defined(NOCOLORS)
-#define CSTR_RED(s) s
-#define CSTR_GREEN(s) s
-#else
-#define CSTR_RED(s)   "\033[31m" s "\033[0m"
-#define CSTR_GREEN(s) "\033[32m" s "\033[0m"
-#endif
-
 #define MkString(a) MkString_(a)
 #define MkString_(a) #a
 
 #define MkConcat(a,b) MkConcat_(a,b)
 #define MkConcat_(a,b) a ## b
+
+// extern constants
+
+extern const char* pass_str;
+extern const char* fail_str;
 
 // extern functions
 

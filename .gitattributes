@@ -19,8 +19,6 @@
 /SDDS_COPYRIGHT.TXT -text
 /SDDS_LICENSE -text
 /VERSION -text
-/build-test-lxplus.sh -text
-/build-test-macosx.sh -text
 cmake/Copyright.txt -text
 cmake/ExternalProject-pymad.cmake -text
 cmake/FindCYTHON.cmake -text
@@ -835,6 +833,8 @@ make/system.Linux -text
 make/system.Windows -text
 make/tester.numdiff -text
 make/tester.rules -text
+scripts/build-test-lxplus.sh -text
+scripts/build-test-macosx.sh -text
 src/.htaccess -text
 src/CMakeLists.txt -text
 src/SDDS.h -text

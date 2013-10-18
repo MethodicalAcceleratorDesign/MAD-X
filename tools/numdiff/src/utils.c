@@ -31,6 +31,21 @@
 #define pclose(fp)        _pclose(fp)
 #endif
 
+// macros
+
+#if defined(_WIN32) || defined(NOCOLORS)
+#define CSTR_RED(s) s
+#define CSTR_GREEN(s) s
+#else
+#define CSTR_RED(s)   "\033[31m" s "\033[0m"
+#define CSTR_GREEN(s) "\033[32m" s "\033[0m"
+#endif
+
+// constants
+
+const char* fail_str = CSTR_RED  ("FAIL");
+const char* pass_str = CSTR_GREEN("PASS");
+
 static struct {
   const char *ext;
   int         cmd;
@@ -51,6 +66,8 @@ const zipext[] = {
   { ""        ,  0 },     // no compression, for clean error reporting
   {  NULL     ,  0 }      // end marker
 };
+
+// functions 
 
 static bool
 is_zipext(const char *str)

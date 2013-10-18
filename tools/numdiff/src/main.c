@@ -56,7 +56,7 @@ test_summary(int total, int failed)
 {
   double t = (option.clk_t1 - option.clk_t0) / CLOCKS_PER_SEC;
   printf(" + %-50s (%.2f s) - %2d/%2d : %s\n", option.test, t, total-failed, total,
-          failed ? CSTR_RED("FAIL") : CSTR_GREEN("PASS"));
+          failed ? fail_str : pass_str);
 }
 
 static void

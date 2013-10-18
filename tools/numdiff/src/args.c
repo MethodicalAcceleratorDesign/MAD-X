@@ -182,6 +182,7 @@ usage(void)
   inform("\t    --lhsres        echo valid lines of next left file to its result file");
   inform("\t-l  --list          enable list mode (list of filenames)");
   inform("\t    --long          disable short options");
+  inform("\t    --nocolor       disable color output for PASS/FAIL");
   inform("\t    --noloc         disable C file location during trace");
   inform("\t    --nowarn        disable warnings");
   inform("\t    --nregs num     specify the number of registers to allocate");
@@ -395,6 +396,15 @@ parse_args(int argc, const char *argv[])
     if (!strcmp(argv[option.argi], "--long")) {
       debug("short options disabled");
       option.lgopt = 1;
+      continue;
+    }
+
+
+    // disable color [setup]
+    if (!strcmp(argv[option.argi], "--nocolor")) {
+      debug("color output disabled");
+      fail_str = "FAIL";
+      pass_str = "PASS";
       continue;
     }
 

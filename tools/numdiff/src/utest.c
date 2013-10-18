@@ -33,9 +33,6 @@
 
 enum { UTEST_KEEP = MAXUTESTKEEP };
 
-static const char *const fail_str = CSTR_RED  ("FAIL");
-static const char *const pass_str = CSTR_GREEN("PASS");
-
 // ----- types
 
 struct utest {
