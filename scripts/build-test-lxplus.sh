@@ -1,5 +1,5 @@
 # run:
-# sh build-test-lxplus.sh 1>| build-test-lxplus.out 2>&1
+# sh scripts/build-test-lxplus.sh 1>| build-test-lxplus.out 2>&1
 # tail -f build-test-lxplus.out
 
 echo -e "\n===== SVN update ====="

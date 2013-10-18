@@ -835,6 +835,7 @@ make/tester.numdiff -text
 make/tester.rules -text
 scripts/build-test-lxplus.sh -text
 scripts/build-test-macosx.sh -text
+scripts/build-test-report.sh -text
 src/.htaccess -text
 src/CMakeLists.txt -text
 src/SDDS.h -text
