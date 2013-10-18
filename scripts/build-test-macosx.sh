@@ -3,7 +3,10 @@
 # tail -f build-test-macosx.out
 
 echo "\n===== SVN update ====="
-svn update && cat VERSION && date
+date && svn update && cat VERSION
+
+echo "\n===== Clean build ====="
+make cleanall ; make cleanall ARCH=32
 
 echo "\n===== Gnu build ====="
 gcc      --version
