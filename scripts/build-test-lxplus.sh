@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-lxplus.sh 1>| build-test-lxplus.out 2>&1
+# sh scripts/build-test-lxplus.sh 1> build-test-lxplus.out 2>&1
 # tail -f build-test-lxplus.out
 
 echo -e "\n===== SVN update ====="
@@ -26,13 +26,13 @@ echo -e "\n===== Dependencies ====="
 make infodep
 
 echo -e "\n===== Gnu tests (32 bit) ====="
-make madx-linux32-gnu && ls -l madx32 && make tests-all ARCH=32
+make madx-linux32-gnu && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
 
 echo -e "\n===== Gnu tests (64 bit) ====="
-make madx-linux64-gnu && ls -l madx64 && make tests-all ARCH=64
+make madx-linux64-gnu && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
 
 echo -e "\n===== Intel tests (32 bit) ====="
-make madx-linux32-intel && ls -l madx32 && make tests-all ARCH=32
+make madx-linux32-intel && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
 
 echo -e "\n===== Intel tests (64 bit) ====="
-make madx-linux64-intel && ls -l madx64 && make tests-all ARCH=64
+make madx-linux64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes

@@ -45,6 +45,7 @@ NDSUM = tests-summary.txt
 NDFLAGS = --quiet \
           $(if $(call eq,$(NDDEBUG),yes),--debug,) \
           $(if $(call eq,$(NDTRACE),yes),--trace,) \
+          $(if $(call eq,$(NOCOLOR),yes),--nocolor,) \
           --blank --xcheck --list --serie --accum ..$/$(NDSUM) --test $@
 
 #
