@@ -25,7 +25,7 @@ fi
 if [ -s tests-failed.tmp ] ; then
 	echo "===== Tests Failed =====" >> build-test-failed.tmp
 	cat tests-failed.tmp            >> build-test-failed.tmp
-	cat build-test-failed.tmp | mail -s "MAD-X build and tests report" laurent.deniau@cern.ch
+	mail -s "MAD-X build and tests report" laurent.deniau@cern.ch < build-test-failed.tmp
 fi
 
 # cat build-test-failed.tmp
