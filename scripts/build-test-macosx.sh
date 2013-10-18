@@ -2,8 +2,11 @@
 # sh scripts/build-test-macosx.sh 1> build-test-macosx.out 2>&1
 # tail -f build-test-macosx.out
 
+echo "\n===== Start build and tests ====="
+date
+
 echo "\n===== SVN update ====="
-date && svn update && cat VERSION
+svn update && cat VERSION
 
 echo "\n===== Clean build ====="
 make cleanall ; make cleanall ARCH=32
