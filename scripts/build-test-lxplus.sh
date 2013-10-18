@@ -3,8 +3,7 @@
 # tail -f build-test-lxplus.out
 
 echo -e "\n===== SVN update ====="
-svn update
-cat VERSION
+svn update && cat VERSION && date
 
 echo -e "\n===== Gnu build ====="
 #source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/i686-slc6-gcc48-opt/setup.sh

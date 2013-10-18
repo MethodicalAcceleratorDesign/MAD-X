@@ -1,10 +1,9 @@
 # run:
-# sh build-test-macosx.sh 1>| build-test-macosx.out 2>&1
+# sh scripts/build-test-macosx.sh 1>| build-test-macosx.out 2>&1
 # tail -f build-test-macosx.out
 
 echo "\n===== SVN update ====="
-svn update
-cat VERSION
+svn update && cat VERSION && date
 
 echo "\n===== Gnu build ====="
 gcc      --version

@@ -1,8 +1,9 @@
 # run:
 # sh scripts/build-test-report.sh
 
-# cleaning
-rm -f lxplus-failed.tmp macosx-failed.tmp win-failed.tmp tests-failed.tmp build-test-failed.out
+list="lxplus-failed.tmp macosx-failed.tmp win-failed.tmp tests-failed.tmp build-test-failed.tmp"
+
+rm -f $list
 
 # look for failed tests on lxplus
 if [ -s build-test-lxplus.out ] ; then
@@ -22,13 +23,13 @@ if [ -s build-test-macosx.out ] ; then
 fi
 
 if [ -s tests-failed.tmp ] ; then
-	echo "===== Tests Failed =====" >> build-test-failed.out
-	cat tests-failed.tmp            >> build-test-failed.out
-	cat build-test-failed.out | mail -s "MAD-X build and tests report" laurent.deniau@cern.ch
+	echo "===== Tests Failed =====" >> build-test-failed.tmp
+	cat tests-failed.tmp            >> build-test-failed.tmp
+	cat build-test-failed.tmp | mail -s "MAD-X build and tests report" laurent.deniau@cern.ch
 fi
 
-# cat build-test-failed.out
+# cat build-test-failed.tmp
 
 # cleaning
-rm -f lxplus-failed.tmp macosx-failed.tmp win-failed.tmp tests-failed.tmp build-test-failed.out
+rm -f $list
 
