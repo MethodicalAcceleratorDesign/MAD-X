@@ -3,6 +3,7 @@
 # tail -f build-test-macosx.out
 
 export LC_CTYPE="C"
+export PATH=/opt/local/bin:$PATH
 
 echo "\n===== Start build and tests ====="
 date
