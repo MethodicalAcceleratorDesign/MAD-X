@@ -31,6 +31,7 @@ build_test_report macosx
 # report by email if needed
 if [ -s tests-failed.tmp ] ; then
 	echo "===== Tests Failed =====" >  build-test-report.out
+	date                            >> build-test-report.out
 	cat tests-failed.tmp            >> build-test-report.out
 	if [ "$1" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
