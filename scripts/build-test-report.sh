@@ -1,8 +1,13 @@
 # run:
-# sh scripts/build-test-report.sh
+# sh scripts/build-test-report.sh [nomail]
+
+# I/O redirection
+exec 1> build-test-report.log 2>&1
+
+# env settings
+export LC_CTYPE="C"
 
 # setup
-export LC_CTYPE="C"
 thedate=`date "+%Y-%m-%d"`
 
 # look for failed tests on [lxplus | macosx | windows]
@@ -36,7 +41,7 @@ if [ ! -s tests-failed.tmp ] ; then
 else
 	echo "===== Tests Failed =====" >  build-test-report.out
 	date                            >> build-test-report.out
-	echo "see files mad@lxplus.cern.ch:madx/madX/tests/reports/${thedate}_build-test-*.out for details"
+	echo "see files ${thedate}_build-test-*.out at http://cern.ch/madx/madX/tests/reports for details" >> build-test-report.out
 	cat tests-failed.tmp            >> build-test-report.out
 	if [ "$1" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
