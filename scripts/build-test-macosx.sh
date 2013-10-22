@@ -8,7 +8,7 @@ exec 1> build-test-macosx.out 2>&1
 
 # env settings
 export LC_CTYPE="C"
-export PATH=/opt/local/bin:$PATH
+export PATH=/opt/local/bin:/Users/mad/Projects/madX:$PATH
 
 echo "\n===== Start of build and tests ====="
 date
@@ -24,6 +24,8 @@ cat VERSION
 echo "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
 	make cleanall ; make cleanall ARCH=32
+else
+	echo "not requested, skipped"
 fi 
 
 echo "\n===== Gnu build ====="

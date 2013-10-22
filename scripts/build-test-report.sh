@@ -7,6 +7,7 @@ exec 1> build-test-report.log 2>&1
 
 # env settings
 export LC_CTYPE="C"
+export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # setup
 thedate=`date "+%Y-%m-%d"`
