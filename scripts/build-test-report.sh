@@ -18,7 +18,7 @@ build_test_report ()
 		echo "ERROR: report build-test-$1.out not found (or empty) for platform $1"
 	else
 		cp -f build-test-$1.out tests/reports/${thedate}_build-test-$1.out
-		perl -ne '/: FAIL/ && print' build-test-$1.out > $1-failed.tmp
+		perl -ne '/: FAIL|ERROR:/ && print' build-test-$1.out > $1-failed.tmp
 		if [ -s $1-failed.tmp ] ; then
 			perl -ne '/: FAIL/ && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$1.out >> tests-failed.tmp
 		fi
@@ -33,7 +33,7 @@ rm -f tests-failed.tmp
 build_test_report lxplus
 
 # macosx check
-scp -q -B mad@macserv15865.cern.ch:/Users/mad/Projects/madX/build-test-macosx.out .
+scp -q -B mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.out .
 build_test_report macosx
 
 # report by email if needed
@@ -52,3 +52,8 @@ fi
 
 # cleaning
 rm -f tests-failed.tmp
+
+# report errors if any
+if [ -s build-test-report.log ] ; then
+	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" laurent.deniau@cern.ch # mad@cern.ch
+fi

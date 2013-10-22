@@ -313,6 +313,153 @@ seq_end_ex(void)
 }
 
 static void
+expand_line(struct char_p_array* l_buff)
+  /* expands a beam line, applies rep. count and inversion */
+{
+  /* first get all bracket pairs with their level; keep max. level */
+  int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
+  int level = 0, l_max = 0, b_cnt = 0;
+  char* p;
+  struct int_array* lbpos = new_int_array(l_buff->curr);
+  struct int_array* rbpos = new_int_array(l_buff->curr);
+  struct int_array* b_level = new_int_array(l_buff->curr);
+
+  for (i = 0; i < l_buff->curr; i++)
+  {
+    if (*l_buff->p[i] == '(')
+    {
+      lbpos->i[b_cnt] = i;
+      b_level->i[b_cnt++] = level++;
+      if (level > l_max) l_max = level;
+    }
+    else if (*l_buff->p[i] == ')')  level--;
+  }
+  l_max--;
+  for (i = 0; i < b_cnt; i++)
+    get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
+                        l_buff->curr-1, &dummy, &rbpos->i[i]);
+  lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+  /* now loop over level from highest down to zero, expand '*' in each pair */
+  for (level = l_max; level >=0; level--)
+  {
+    for (i = 0; i < b_cnt; i++)
+    {
+      if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1)
+      {
+        if (*l_buff->p[pos-1] == '*')
+        {
+          sscanf(l_buff->p[pos-2], "%d", &rep);
+          add = rep - 1;
+          number = rbpos->i[i] - pos - 1; /* inside bracket */
+          n = number * add; /* extra tokens */
+          while (l_buff->curr + n >= l_buff->max)
+            grow_char_p_array(l_buff);
+          for (j = l_buff->curr; j > pos + number; j--) /* shift upwards */
+            l_buff->p[j+n] = l_buff->p[j];
+          l_buff->curr += n;
+          for (k = 1; k <= add; k++)
+          {
+            for (j = pos+1; j <= pos+number; j++)
+              l_buff->p[j+k*number] = tmpbuff(l_buff->p[j]);
+          }
+          for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
+          {
+            if (lbpos->i[j] > pos + number) lbpos->i[j] += n;
+            if (rbpos->i[j] > pos + number) rbpos->i[j] += n;
+          }
+          l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+        }
+      }
+    }
+  }
+  /* loop over buffer, expand simple element repetition */
+  for (pos = 2; pos < l_buff->curr; pos++)
+  {
+    if (*l_buff->p[pos] == '*')
+    {
+      rep = -1;
+      sscanf(l_buff->p[pos-1], "%d", &rep);
+      if (rep < 0)
+      {
+        fatal_error("expand_line","Problem with reading number of copies");
+      }
+      n = add = rep - 1;
+      while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
+      for (j = l_buff->curr; j > pos + 1; j--) /* shift upwards */
+        l_buff->p[j+n] = l_buff->p[j];
+      l_buff->curr += n;
+      for (k = 1; k <= add; k++)
+      {
+        j = pos+1;
+        l_buff->p[j+k] = l_buff->p[j];
+      }
+      for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
+      {
+        if (lbpos->i[j] > pos + 1) lbpos->i[j] += n;
+        if (rbpos->i[j] > pos + 1) rbpos->i[j] += n;
+      }
+      l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+    }
+  }
+  /* get bracket pointers including new ones */
+  while (b_level->max < l_buff->curr) grow_int_array(b_level);
+  while (lbpos->max < l_buff->curr) grow_int_array(lbpos);
+  while (rbpos->max < l_buff->curr) grow_int_array(rbpos);
+  level = b_cnt = 0;
+  for (i = 0; i < l_buff->curr; i++)
+  {
+    if (*l_buff->p[i] == '(')
+    {
+      lbpos->i[b_cnt] = i;
+      b_level->i[b_cnt++] = level++;
+    }
+    else if (*l_buff->p[i] == ')')  level--;
+  }
+  for (i = 0; i < b_cnt; i++)
+    get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
+                        l_buff->curr-1, &dummy, &rbpos->i[i]);
+  lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+  /* now loop over level from highest down to zero, invert if '-' */
+  for (level = l_max; level >= 0; level--)
+  {
+    for (i = 0; i < b_cnt; i++)
+    {
+      pos = lbpos->i[i];
+      if (b_level->i[i] == level)
+      {
+        p = blank;
+        for (j = pos - 1; j > 0; j--)
+        {
+          p = l_buff->p[j];
+          if (*p != ' ')  break;
+        }
+        if (*p == '-')
+        {
+          number = rbpos->i[i] - pos - 1;
+          n = number / 2;
+          for (j = 0; j < n; j++)
+          {
+            p = l_buff->p[pos+j+1];
+            l_buff->p[pos+j+1] = l_buff->p[pos+number-j];
+            l_buff->p[pos+number-j] = p;
+          }
+        }
+      }
+    }
+  }
+  /* finally remove all non-alpha tokens */
+  n = 0;
+  for (i = 0; i < l_buff->curr; i++)
+  {
+    if (isalpha(*l_buff->p[i])) l_buff->p[n++] = l_buff->p[i];
+  }
+  l_buff->curr = n;
+  lbpos = delete_int_array(lbpos);
+  rbpos = delete_int_array(rbpos);
+  b_level = delete_int_array(b_level);
+}
+
+static void
 expand_sequence(struct sequence* sequ, int flag)
   /* expands a sequence into nodes, expands sequence nodes */
 {
