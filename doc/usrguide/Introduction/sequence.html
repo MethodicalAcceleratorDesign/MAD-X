@@ -62,6 +62,10 @@ When the sequence is expanded in a
 MAD generates the missing drift spaces. At this moment, overlapping elements
 will cause "negative drift length" errors.
 <p>
+<b>Note that a bug in the expansion of sub-sequences within a sequence was reported 
+in July 2013 and fixed from version 5.01.03 onwards. 
+Details are explained <a href="./sequence_bug.html">here.</a></b>
+<p>
 For efficiency reasons MAD-X imposes an <b>important restriction</b>
 on element lengths and positions: once a sequence is expanded, the element
 positions and lengths are considered as fixed; in order to vary a position
@@ -92,8 +96,8 @@ endsequence;
 </pre>
 
 <address>
-<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
-June 17, 2002
+<a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, June 17, 2002 <p>
+Last updated: Ghislain Roy, 22 October 2013
 </address>
 
 </body>
