@@ -3,6 +3,7 @@
 # tail -f build-test-lxplus.out
 
 # I/O redirection
+rm -f build-test-lxplus.out
 exec 1> build-test-lxplus.out 2>&1
 
 # env settings

@@ -3,6 +3,7 @@
 # tail -f build-test-macosx.out
 
 # I/O redirection
+rm -f build-test-macosx.out
 exec 1> build-test-macosx.out 2>&1
 
 # env settings

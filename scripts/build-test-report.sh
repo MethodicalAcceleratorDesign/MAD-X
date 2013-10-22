@@ -2,6 +2,7 @@
 # sh scripts/build-test-report.sh [nomail]
 
 # I/O redirection
+rm -f build-test-report.log
 exec 1> build-test-report.log 2>&1
 
 # env settings
