@@ -9,7 +9,7 @@ thedate=`date "+%Y-%m-%d"`
 build_test_report ()
 {
 	if [ -s build-test-$1.out ] ; then
-		cp -f build-test-$1.out tests/reports/${thedate}_build-test.out.bak
+		cp -f build-test-$1.out tests/reports/${thedate}_build-test.out
 		perl -ne '/: FAIL/ && print' build-test-$1.out > $1-failed.tmp
 		if [ -s $1-failed.tmp ] ; then
 			perl -ne '/: FAIL/ && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$1.out >> tests-failed.tmp
