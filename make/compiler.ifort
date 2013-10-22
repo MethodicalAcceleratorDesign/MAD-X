@@ -119,8 +119,8 @@ FFLAGS += /nologo /Qprec /fp:source /fpp \
 # command translator
 #
 
-IFORT_FC1 := -D%  -I%  /O0
-IFORT_FC2 := /D%  /I%  /Od
+IFORT_FC1 := -D%  -I%  -O0  /O0
+IFORT_FC2 := /D%  /I%  /Od  /Od
 
 FC_tr = $(strip $(subst $(SPACE)-o , /Fo,$(call trans,$(IFORT_FC1),$(IFORT_FC2),$1)))
 

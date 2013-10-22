@@ -5,8 +5,9 @@
 export LC_CTYPE="C"
 export PATH=/opt/local/bin:$PATH
 
-echo "\n===== Start build and tests ====="
+echo "\n===== Start of build and tests ====="
 date
+uname -n -r -s -m
 
 echo "\n===== SVN update ====="
 svn update && cat VERSION
@@ -39,3 +40,6 @@ make madx-macosx32-intel && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
 
 echo "\n===== Intel tests (64 bit) ====="
 make madx-macosx64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
+
+echo "\n===== End of build and tests ====="
+date

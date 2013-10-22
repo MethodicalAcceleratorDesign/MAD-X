@@ -4,8 +4,9 @@
 
 export LC_CTYPE="C"
 
-echo -e "\n===== Start build and tests ====="
+echo -e "\n===== Start of build and tests ====="
 date
+uname -m -n -r -s
 
 echo -e "\n===== SVN update ====="
 svn update && cat VERSION
@@ -44,3 +45,6 @@ make madx-linux32-intel && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
 
 echo -e "\n===== Intel tests (64 bit) ====="
 make madx-linux64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
+
+echo -e "\n===== End of build and tests ====="
+date
