@@ -8,8 +8,10 @@ thedate=`date "+%Y-%m-%d"`
 # look for failed tests on [lxplus | macosx | windows]
 build_test_report ()
 {
-	if [ -s build-test-$1.out ] ; then
-		cp -f build-test-$1.out tests/reports/${thedate}_build-test.out
+	if [ ! -s build-test-$1.out ] ; then
+		echo "ERROR: report build-test-$1.out not found (or empty) for platform $1"
+	else
+		cp -f build-test-$1.out tests/reports/${thedate}_build-test-$1.out
 		perl -ne '/: FAIL/ && print' build-test-$1.out > $1-failed.tmp
 		if [ -s $1-failed.tmp ] ; then
 			perl -ne '/: FAIL/ && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$1.out >> tests-failed.tmp
@@ -29,9 +31,12 @@ scp -q -B mad@macserv15865.cern.ch:/Users/mad/Projects/madX/build-test-macosx.ou
 build_test_report macosx
 
 # report by email if needed
-if [ -s tests-failed.tmp ] ; then
+if [ ! -s tests-failed.tmp ] ; then
+	echo "ERROR: cannot make build-test-report.out, no input found"
+else
 	echo "===== Tests Failed =====" >  build-test-report.out
 	date                            >> build-test-report.out
+	echo "see files mad@lxplus.cern.ch:madx/madX/tests/reports/${thedate}_build-test-*.out for details"
 	cat tests-failed.tmp            >> build-test-report.out
 	if [ "$1" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
