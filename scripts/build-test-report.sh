@@ -45,7 +45,7 @@ else
 	echo "see files ${thedate}_build-test-*.out at http://cern.ch/madx/madX/tests/reports for details" >> build-test-report.out
 	cat tests-failed.tmp            >> build-test-report.out
 	if [ "$1" != "nomail" ] ; then
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" laurent.deniau@cern.ch # mad-src@cern.ch
 		rm -f build-test-report.out
 	fi
 fi

@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-macosx.sh [noclean]
+# sh scripts/build-test-macosx.sh [cleanall]
 # tail -f build-test-macosx.out
 
 # I/O redirection
@@ -22,7 +22,7 @@ echo "\n===== Release number ====="
 cat VERSION
 
 echo "\n===== Clean build ====="
-if [ "$1" != "noclean" ] ; then
+if [ "$1" = "cleanall" ] ; then
 	make cleanall ; make cleanall ARCH=32
 fi 
 

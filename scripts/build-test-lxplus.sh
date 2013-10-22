@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-lxplus.sh [noclean]
+# sh scripts/build-test-lxplus.sh [cleanall]
 # tail -f build-test-lxplus.out
 
 # I/O redirection
@@ -21,7 +21,7 @@ echo -e "\n===== Release number ====="
 cat VERSION
 
 echo -e "\n===== Clean build ====="
-if [ "$1" != "noclean" ] ; then
+if [ "$1" = "cleanall" ] ; then
 	make cleanall ; make cleanall ARCH=32
 fi 
 
