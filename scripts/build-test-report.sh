@@ -50,7 +50,7 @@ build_test_report lxplus
 # macosx check
 scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
 build_test_report macosx
-scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX" .
+scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX/" .
 
 # report by email if needed
 if [ ! -s tests-failed.tmp ] ; then
