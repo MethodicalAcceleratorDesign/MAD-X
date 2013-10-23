@@ -63,13 +63,22 @@ infobin:
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
 	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
 
-infodep:
+infobindep:
 	$E "** Computing binaries dependencies in $(DESTDIR)"
 ifeq ($(OSTYPE),Linux)
-	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -print -exec ldd {} \;
+	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -print -exec ldd {} \;
 endif
 ifeq ($(OSTYPE),Darwin)
-	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec otool -L {} \;
+	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -exec otool -L {} \;
+endif
+
+infolibdep:
+	$E "** Computing libraries dependencies in $(DESTDIR)"
+ifeq ($(OSTYPE),Linux)
+	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} \;
+endif
+ifeq ($(OSTYPE),Darwin)
+	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -exec otool -L {} \;
 endif
 
 # end of makefile
