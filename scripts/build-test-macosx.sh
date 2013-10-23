@@ -25,7 +25,7 @@ echo "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
 	make cleanall ; make cleanall ARCH=32
 else
-	echo "not requested, skipped"
+	echo "Skipped (no explicit request)."
 fi 
 
 echo "\n===== Gnu build ====="
