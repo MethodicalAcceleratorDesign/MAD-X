@@ -50,7 +50,7 @@ make all-linux64-intel all-linux64 SHOW=yes
 [ "$?" != "0" ] && echo "ERROR: make all-linux64-intel failed"
 
 echo -e "\n===== Dependencies ====="
-make infodep SHOW=yes
+make infobindep SHOW=yes
 
 echo -e "\n===== Gnu tests (32 bit) ====="
 make madx-linux32-gnu SHOW=yes && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes

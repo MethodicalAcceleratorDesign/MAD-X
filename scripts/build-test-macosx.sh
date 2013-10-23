@@ -42,7 +42,7 @@ make all-macosx-intel all-macosx
 [ "$?" != "0" ] && echo "ERROR: make all-macosx-intel failed"
 
 echo "\n===== Dependencies ====="
-make infodep
+make infobindep
 
 echo "\n===== Gnu tests (32 bit) ====="
 make madx-macosx32-gnu && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
