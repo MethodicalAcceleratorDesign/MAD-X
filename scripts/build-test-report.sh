@@ -11,6 +11,7 @@ export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # setup
 thedate=`date "+%Y-%m-%d"`
+olddate=`date -d "-50 days" "+%Y-%m-%d"`
 
 # look for failed tests on [lxplus | macosx | windows]
 build_test_report ()
@@ -19,6 +20,7 @@ build_test_report ()
 		echo "ERROR: report build-test-$1.out not found (or empty) for platform $1"
 	else
 		cp -f build-test-$1.out tests/reports/${thedate}_build-test-$1.out
+		rm -f tests/reports/${olddate}_build-test-$1.out
 		perl -ne '/: FAIL|ERROR: / && print' build-test-$1.out > $1-failed.tmp
 		if [ -s $1-failed.tmp ] ; then
 			perl -ne '/: FAIL|ERROR: / && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$1.out >> tests-failed.tmp
