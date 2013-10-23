@@ -9,7 +9,7 @@ uname -n > build-test-macosx.run
 
 # env settings
 export LC_CTYPE="C"
-export PATH=/opt/local/bin:/Users/mad/Projects/madX:$PATH
+export PATH=/Users/mad/Projects/madX:/opt/local/bin:$PATH
 
 echo "\n===== Start of build and tests ====="
 date
@@ -63,4 +63,5 @@ make madx-macosx64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
 
 echo "\n===== End of build and tests ====="
 date
+
 echo "finished" > build-test-macosx.run
