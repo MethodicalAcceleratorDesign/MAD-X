@@ -25,7 +25,7 @@ build_test_report ()
 	if [ ! -s build-test-$1.run ] || [ "`cat build-test-$1.run`" != "finished" ] ; then
 		clean_exit
 	else
-		rm -f build-test-$1.run
+		echo "processed `date`" > build-test-$1.run
 	fi
 
 	if [ ! -s build-test-$1.out ] ; then
@@ -50,6 +50,7 @@ build_test_report lxplus
 # macosx check
 scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
 build_test_report macosx
+scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX" .
 
 # report by email if needed
 if [ ! -s tests-failed.tmp ] ; then
