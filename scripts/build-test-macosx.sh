@@ -5,6 +5,7 @@
 # I/O redirection
 rm -f build-test-macosx.out
 exec 1> build-test-macosx.out 2>&1
+uname -n > build-test-macosx.run
 
 # env settings
 export LC_CTYPE="C"
@@ -62,3 +63,4 @@ make madx-macosx64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
 
 echo "\n===== End of build and tests ====="
 date
+echo "finished" > build-test-macosx.run

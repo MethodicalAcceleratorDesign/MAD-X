@@ -11,11 +11,23 @@ export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # setup
 thedate=`date "+%Y-%m-%d"`
-olddate=`date -d "-50 days" "+%Y-%m-%d"`
+#olddate=`date -d "-50 days" "+%Y-%m-%d"`
+
+clean_exit ()
+{
+	rm -f *.tmp
+	exit
+}
 
 # look for failed tests on [lxplus | macosx | windows]
 build_test_report ()
 {
+	if [ ! -s build-test-$1.run ] || [ "`cat build-test-$1.run`" != "finished" ] ; then
+		clean_exit
+	else
+		rm -f build-test-$1.run
+	fi
+
 	if [ ! -s build-test-$1.out ] ; then
 		echo "ERROR: report build-test-$1.out not found (or empty) for platform $1"
 	else
@@ -36,7 +48,7 @@ rm -f tests-failed.tmp
 build_test_report lxplus
 
 # macosx check
-scp -q mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.out .
+scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
 build_test_report macosx
 
 # report by email if needed

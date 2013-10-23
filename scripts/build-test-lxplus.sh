@@ -5,6 +5,7 @@
 # I/O redirection
 rm -f build-test-lxplus.out
 exec 1> build-test-lxplus.out 2>&1
+uname -n > build-test-lxplus.run
 
 # env settings
 export LC_CTYPE="C"
@@ -54,7 +55,7 @@ make infobindep
 
 echo -e "\n===== Gnu tests (32 bit) ====="
 make madx-linux32-gnu && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
-[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-gnu failed"
+[ "$?" != "0" ] && echo "ERROR: make tests for madx-linux32-gnu failed"
 
 echo -e "\n===== Gnu tests (64 bit) ====="
 make madx-linux64-gnu && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
@@ -70,3 +71,5 @@ make madx-linux64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
 
 echo -e "\n===== End of build and tests ====="
 date
+
+echo "finished" > build-test-lxplus.run
