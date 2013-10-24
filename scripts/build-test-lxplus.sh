@@ -24,7 +24,8 @@ cat VERSION
 
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
-	make cleanall ; make cleanall ARCH=32
+	make cleanall && make cleanall ARCH=32
+	[ "$?" != "0" ] && echo "ERROR: make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
 fi 
@@ -52,6 +53,7 @@ make all-linux64-intel all-linux64
 
 echo -e "\n===== Dependencies ====="
 make infobindep
+[ "$?" != "0" ] && echo "ERROR: make infobindep failed"
 
 echo -e "\n===== Gnu tests (32 bit) ====="
 make madx-linux32-gnu && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
