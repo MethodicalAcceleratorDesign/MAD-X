@@ -67,7 +67,8 @@ build_test_send ()
 		done
 		echo "http://cern.ch/madx/madX/tests/reports" >> build-test-report.out
 		cat tests-failed.tmp                          >> build-test-report.out
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" "mad-src@cern.ch,laurent.deniau@cern.ch"
+		sync
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
 	fi
 }
@@ -102,9 +103,12 @@ build_test_proc   lxplus macosx
 scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX"
 [ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
 
+# synchronize files
+sync
+
 # report errors if any
 if [ -s build-test-report.log ] ; then
-	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" "mad@cern.ch,laurent.deniau@cern.ch"
+	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" mad@cern.ch
 	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
 fi
 
