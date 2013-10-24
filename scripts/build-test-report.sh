@@ -42,9 +42,14 @@ build_test_report ()
 		else
 			rm -f tests/reports/${olddate}_build-test-$arch.out
 			cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
+			[ "$?" != "0" ] && echo "ERROR: backup of build-test-$arch.out failed (check cp)"
+
 			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out > $arch-failed.tmp
+			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (check perl)"
+
 			if [ -s $arch-failed.tmp ] ; then
 				perl -ne '/: FAIL|ERROR: / && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$arch.out >> tests-failed.tmp
+				[ "$?" != "0" ] && echo "ERROR: unable to build report summary (check perl)"
 			fi
 		fi
 	done
@@ -62,7 +67,8 @@ build_test_send ()
 		done
 		echo "http://cern.ch/madx/madX/tests/reports" >> build-test-report.out
 		cat tests-failed.tmp                          >> build-test-report.out
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" "mad-src@cern.ch,laurent.deniau@cern.ch"
+		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
 	fi
 }
 
@@ -78,6 +84,7 @@ clean_tmp
 
 # retrieve remote reports
 scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
+[ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (check scp)"
 
 # check if all reports are finished
 build_test_check  lxplus macosx
@@ -93,10 +100,12 @@ build_test_proc   lxplus macosx
 
 # update status of remote reports
 scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX"
+[ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
 
 # report errors if any
 if [ -s build-test-report.log ] ; then
-	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" mad@cern.ch
+	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" "mad@cern.ch,laurent.deniau@cern.ch"
+	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
 fi
 
 clean_exit
