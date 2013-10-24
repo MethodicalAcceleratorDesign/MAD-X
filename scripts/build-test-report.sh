@@ -76,3 +76,6 @@ rm -f tests-failed.tmp
 if [ -s build-test-report.log ] ; then
 	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" mad@cern.ch
 fi
+
+exit
+
