@@ -11,7 +11,10 @@ export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # setup
 thedate=`date "+%Y-%m-%d"`
-#olddate=`date -d "-50 days" "+%Y-%m-%d"`
+olddate=`date -d "-50 days" "+%Y-%m-%d"`
+
+# cleaning
+rm -f tests-failed.tmp
 
 clean_exit ()
 {
@@ -40,9 +43,6 @@ build_test_report ()
 		rm -f $1-failed.tmp
 	fi
 }
-
-# cleaning
-rm -f tests-failed.tmp
 
 # lxplus check
 build_test_report lxplus
