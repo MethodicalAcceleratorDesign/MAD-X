@@ -24,6 +24,7 @@ clean_exit ()
 	exit
 }
 
+# check for finished jobs [lxplus | macosx | windows]
 build_test_check ()
 {
 	for arch in "$@" ; do
@@ -33,7 +34,7 @@ build_test_check ()
 	done
 }
 
-# look for failed tests on [lxplus | macosx | windows]
+# look for failed tests [lxplus | macosx | windows]
 build_test_report ()
 {
 	for arch in "$@" ; do
@@ -55,9 +56,9 @@ build_test_report ()
 	done
 }
 
+# send reports summary by email if needed [lxplus | macosx | windows]
 build_test_send ()
 {
-	# report by email if needed
 	if [ -s tests-failed.tmp ] ; then
 		echo "===== Tests Failed ====="                > build-test-report.out
 		date                                          >> build-test-report.out
@@ -73,6 +74,7 @@ build_test_send ()
 	fi
 }
 
+# tag reports as processed [lxplus | macosx | windows]
 build_test_proc ()
 {
 	for arch in "$@" ; do
