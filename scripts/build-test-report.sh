@@ -71,6 +71,7 @@ build_test_send ()
 		sync
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
+		cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
 	fi
 }
 
