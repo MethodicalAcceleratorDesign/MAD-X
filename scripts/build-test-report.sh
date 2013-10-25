@@ -60,14 +60,15 @@ build_test_report ()
 build_test_send ()
 {
 	if [ -s tests-failed.tmp ] ; then
-		echo "===== Tests Failed ====="                > build-test-report.out
-		date                                          >> build-test-report.out
-		echo "For details, see report files:"         >> build-test-report.out
+		echo "===== Tests Failed ====="                 > build-test-report.out
+		date                                           >> build-test-report.out
+		echo "For details, see report files:"          >> build-test-report.out
+		echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
 		for arch in "$@" ; do
 			echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
 		done
-		echo "http://cern.ch/madx/madX/tests/reports" >> build-test-report.out
-		cat tests-failed.tmp                          >> build-test-report.out
+		echo "http://cern.ch/madx/madX/tests/reports/" >> build-test-report.out
+		cat tests-failed.tmp                           >> build-test-report.out
 		sync
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
@@ -86,12 +87,15 @@ build_test_proc ()
 # cleaning
 clean_tmp
 
+# check if local reports are finished
+build_test_check  lxplus
+
 # retrieve remote reports
 scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
 [ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (check scp)"
 
-# check if all reports are finished
-build_test_check  lxplus macosx
+# check if non-local reports are finished
+build_test_check         macosx
 
 # build the final report
 build_test_report lxplus macosx
@@ -111,7 +115,7 @@ sync
 
 # report errors if any
 if [ -s build-test-report.log ] ; then
-	cat -v build-test-report.log | mail -s "MAD-X builds and tests errors" mad@cern.ch
+	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors" mad@cern.ch
 	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
 fi
 
