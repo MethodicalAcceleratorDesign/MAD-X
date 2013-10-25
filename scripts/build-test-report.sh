@@ -12,6 +12,7 @@ export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 # setup
 thedate=`date "+%Y-%m-%d"`
 olddate=`date -d "-50 days" "+%Y-%m-%d"`
+nomail="$1"
 
 clean_tmp ()
 {
@@ -70,8 +71,10 @@ build_test_send ()
 		echo "http://cern.ch/madx/madX/tests/reports/" >> build-test-report.out
 		cat tests-failed.tmp                           >> build-test-report.out
 		sync
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
-		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
+		if [ "$nomail" != "nomail" ] ; then
+			cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
+			[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
+		fi
 		cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
 	fi
 }
