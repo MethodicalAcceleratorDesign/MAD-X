@@ -723,8 +723,8 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      offy = offset(2)
      if (optiondebug .ne. 0) then
         print *, " aperture type ",aptype
-        print *, "          aperture ",aperture(1),aperture(2),aperture(3),aperture(4)
-        print *, "          offsets ", offx, offy 
+        print *, "          aperture ", aperture(1),aperture(2),aperture(3),aperture(4)
+        print *, "          offsets  ", offx, offy 
         print *, " " 
      endif
 
@@ -732,6 +732,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      if(aptype.eq.'ellipse') then
         apx = aperture(1)
         apy = aperture(2)
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "ellipse: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -746,6 +747,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
            apx = maxaper(1)
         endif
         apy = apx
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "circle: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -755,6 +757,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      else if(aptype.eq.'rectangle') then
         apx = aperture(1)
         apy = aperture(2)
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "rectangle: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -776,6 +779,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !       aperture(1),"  Yrect= ",aperture(2),"  Rcirc= ",aperture(3)
         apx = aperture(3)
         apy = aperture(3)
+        apr = 0.0d0
         !JMJ!     Making essential changes in AV's absence, 16/7/2003
         !JMJ!     this tests whether the particle is outside the circumscribing
         !JMJ!     circle.
@@ -809,6 +813,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      else if(aptype.eq.'marguerite') then
         apx = aperture(1)
         apy = aperture(2)
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "marguerite: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(3, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -819,6 +824,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !*****         test ellipse
         apx = aperture(3)
         apy = aperture(4)
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "rectellipse 1/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(1, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -826,6 +832,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
         !*****         test rectangle
         apx = aperture(1)
         apy = aperture(2)
+        apr = 0.0d0
         if (optiondebug .ne. 0) print *, "rectellipse 2/2: apx, apy, apr, offx, offy ", &
              apx, apy, apr, offx, offy
         call trcoll(2, apx, apy, apr, turn, sum, part_id, last_turn,  &
@@ -3044,59 +3051,139 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
 
   optiondebug = get_option('debug ')
 
+
+  if (optiondebug .ne. 0) then 
+     print *, "trcoll called with parameters: flag, apx, apy, apr : ", flag, apx, apy, apr 
+  endif
+  
+
   n = 1
 10 continue
   do i = n, ntrk
 
-     !---- Is particle outside aperture?
-
-        !*** case of ellipse
      if(ISNAN(z(1,i)).or.ISNAN(z(3,i))) goto 99
-     if (flag .eq. 1 .and. &
-        ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
-        ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0) then
-        if (optiondebug .ne. 0) then 
-          print *, "trcoll ellipse: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
-          print *, "                y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
-        endif
-        go to 99
-          !*** case of rectangle
-     else if(flag .eq. 2 .and. &
-          (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
-           abs(z(3,i)-al_errors(12)-offy) .gt. apy)) then
-          if (optiondebug .ne. 0) then 
-             print *, "trcoll rectangle: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
-             print *, "                  y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
-          endif
-          go to 99
-          !***  case of marguerite: two ellipses
-     else if(flag .eq. 3 .and. &
-        ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
-        ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0 .and. &
-        ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
-        ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. 1d0) then
-        if (optiondebug .ne. 0) then 
-          print *, "trcoll marguerite: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
-          print *, "                   y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
-        endif
-        go to 99
-          !*** case of racetrack
-     else if (flag .eq. 4 .and. &
-          abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
-          abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) .or. &
-          ( abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
-            abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
-            (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
-            (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
-          if (optiondebug .ne. 0) then 
-             print *, "trcoll racetrack: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
-             print *, "                  y, al_err_y, offy, apy, apr : ", z(3,i), al_errors(12), offy, apy, apr 
-          endif
-          go to 99
-     endif
-     ! break if particle is inside aperture and continue the loop
-     go to 98
 
+
+     ! 2013-Oct-28  14:02:03  ghislain: commented this section out and replaced with another one with 
+     ! cascading tests for flag and particle positions instead of combined tests. 
+     ! With Intel compilers on 32 bit architectures the combined test for the racetrack case 
+     ! always evaluated to true...  
+     !---- Is particle outside aperture?
+     
+     !    !*** case of ellipse
+     ! if (flag .eq. 1 .and. &
+     !    ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+     !    ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0) then
+     !    if (optiondebug .ne. 0) then 
+     !      print *, "trcoll ellipse: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+     !      print *, "                y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+     !    endif
+     !    go to 99
+     !      !*** case of rectangle
+     ! else if(flag .eq. 2 .and. &
+     !      (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
+     !       abs(z(3,i)-al_errors(12)-offy) .gt. apy)) then
+     !      if (optiondebug .ne. 0) then 
+     !         print *, "trcoll rectangle: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+     !         print *, "                  y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+     !      endif
+     !      go to 99
+     !      !***  case of marguerite: two ellipses
+     ! else if(flag .eq. 3 .and. &
+     !    ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+     !    ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0 .and. &
+     !    ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
+     !    ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. 1d0) then
+     !    if (optiondebug .ne. 0) then 
+     !      print *, "trcoll marguerite: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+     !      print *, "                   y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+     !    endif
+     !    go to 99
+     !      !*** case of racetrack
+     ! else if (flag .eq. 4 .and. &
+     !      abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
+     !      abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) .or. &
+     !      ( abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
+     !        abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
+     !        (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
+     !        (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
+     !      if (optiondebug .ne. 0) then 
+     !         print *, "trcoll racetrack: flag is", flag, "and should be 4"
+     !         print *, "trcoll racetrack: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+     !         print *, "                  y, al_err_y, offy, apy, apr : ", z(3,i), al_errors(12), offy, apy, apr 
+     !      endif
+     !      go to 99
+     ! else if (flag .ne. 1 .and. flag .ne. 2 .and. flag .ne. 3 .and. flag .ne. 4) then
+     !     call aawarn('trcoll:','called with unknown flag option. exit from trcoll')
+     !     return
+     ! endif
+     !
+     ! break if particle is inside aperture and continue the loop
+     ! go to 98
+
+
+     ! 2013-Oct-28  14:04:03  ghislain: this section with cascading tests
+     !*** case of ellipse
+     if (flag .eq. 1) then
+        if ( ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+             ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0 ) then
+           if (optiondebug .ne. 0) then 
+              print *, "trcoll ellipse: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+              print *, "                y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+           endif
+           go to 99
+        endif
+        go to 98
+
+     !*** case of rectangle
+     else if(flag .eq. 2) then
+        if ( (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
+             abs(z(3,i)-al_errors(12)-offy) .gt. apy) ) then
+           if (optiondebug .ne. 0) then 
+              print *, "trcoll rectangle: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+              print *, "                  y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+           endif
+           go to 99
+        endif
+        go to 98
+
+     !***  case of marguerite: two ellipses
+     else if(flag .eq. 3) then
+        if ( ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
+             ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0 .and. &
+             ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
+             ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. 1d0 ) then
+           if (optiondebug .ne. 0) then 
+              print *, "trcoll marguerite: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx 
+              print *, "                   y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy 
+           endif
+           go to 99
+        endif
+        go to 98
+
+     !*** case of racetrack: test outer rectangle (apx+apr,apy+apr) then test radius for rounded corners.
+     else if (flag .eq. 4) then
+        if ( abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
+             abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) .or. &
+             ( abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
+             abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
+             (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
+             (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
+           if (optiondebug .ne. 0) then 
+              print *, "trcoll racetrack: flag is", flag, "and should be 4"
+              print *, "trcoll racetrack: x, al_err_x, offx, apx      : ", z(1,i), al_errors(11), offx, apx 
+              print *, "                  y, al_err_y, offy, apy, apr : ", z(3,i), al_errors(12), offy, apy, apr 
+           endif
+           go to 99
+        endif
+        go to 98
+
+     ! add error case when option is not in range 1..4 tested above; we should never get there.
+     else 
+        call aawarn('trcoll:','called with unknown flag option. exit from trcoll')
+        return
+     endif
+     
      ! lose particle if it is outside aperture
 99   n = i
      nn=name_len
@@ -3108,6 +3195,7 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
              'Particle Number equals zero: exit from trcoll')
         return
      endif
+     ! particle numbering has been reset by trkill, restart the loop with new paramaters.
      goto 10
 
 98   continue
