@@ -30,8 +30,8 @@ number of calls itself, and so on to any depth.
 <p>
 <li><h4><a name=coguess>COGUESS</a></h4>
 <pre>
-coguess,tolerance=double,x=double,
-       px=double,y=double,py=double,t=double,pt=double;
+coguess,tolerance=double,
+        x=double,px=double,y=double,py=double,t=double,pt=double;
 </pre>
 sets the required convergence precision in the closed orbit search
 ("tolerance", see as well Twiss command
@@ -151,6 +151,7 @@ The available options are:
   thin_foc        true   if false suppresses the 1(rho**2) focusing of thin dipoles
   bborbit         false  the closed orbit is modified by beam-beam kicks
   sympl           false  all element matrices are symplectified in Twiss
+  twiss_print     true   controls whether the twiss command produces output. 
 </pre>
 The option "rbarc" is implemented for backwards compatibility with MAD-8
 up to version 8.23.06 included; in this version, the RBEND length was just
