@@ -211,7 +211,8 @@ madx_finish(void)
     if (plots_made)
     {
       gxterm_();
-#if 0
+      /* 2013-Nov-04  11:34:41  ghislain: this section is obsolete 
+      and was causing some tests to fail after a make cleantest
 #ifndef _WIN32
       if(system("which ps2ps > tmp_plot.ps") == 0)
 	    {
@@ -220,7 +221,7 @@ madx_finish(void)
 	    }
       system("rm tmp_plot.ps");
 #endif
-#endif
+      */
     }
     mad_err_getwarn(&warn_numb, &warn_numbf);
     nwarnings = warn_numb + warn_numbf;
