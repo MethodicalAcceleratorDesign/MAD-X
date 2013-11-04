@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: info infoinc infoprj infoall infodep
+.PHONY: info infoinc infoprj infoall infobin infobindep infolibdep infotestdep
 
 info:
 	@ echo "Operating system                 = " $(OSTYPE) $(OSARCH)
@@ -56,12 +56,20 @@ infoall: infoprj
 	@ echo "Objects files                    = " $(OBJECTS)
 	@ echo "Depends files                    = " $(DEPENDS)
 
-# platform dependent rule
 
 infobin:
 	$E "** Listing binaries and archives in $(DESTDIR)"
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
 	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
+
+infotestdep:
+	$E "** Computing tests pointless files"
+	$_ $(MAKE) cleantest > /dev/null && \
+		$(foreach f, \
+	    	$(patsubst %.out,%,$(filter-out %/README %.madx %.cfg %.ref %.ref.gz,$(wildcard tests/test-*/*))), \
+			$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) echo -e "\c"
+
+# platform dependent rule
 
 infobindep:
 	$E "** Computing binaries dependencies in $(DESTDIR)"
