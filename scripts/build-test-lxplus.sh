@@ -31,13 +31,16 @@ else
 fi 
 
 echo -e "\n===== Gnu build ====="
-#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/i686-slc6-gcc48-opt/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/i686-slc6-gcc48-opt/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
 make all-linux32-gnu
 [ "$?" != "0" ] && echo "ERROR: make all-linux32-gnu failed"
-#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
+gcc      --version
+g++      --version
+gfortran --version
 make all-linux64-gnu
 [ "$?" != "0" ] && echo "ERROR: make all-linux64-gnu failed"
 
@@ -48,27 +51,33 @@ ifort    --version
 make all-linux32-intel all-linux32
 [ "$?" != "0" ] && echo "ERROR: make all-linux32-intel failed"
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
+icc      --version
+ifort    --version
 make all-linux64-intel all-linux64
 [ "$?" != "0" ] && echo "ERROR: make all-linux64-intel failed"
 
-echo -e "\n===== Dependencies ====="
+echo -e "\n===== Binaries dependencies ====="
 make infobindep
 [ "$?" != "0" ] && echo "ERROR: make infobindep failed"
 
+echo -e "\n===== Tests pointless files ====="
+make infotestdep
+[ "$?" != "0" ] && echo "ERROR: make infotestdep failed"
+
 echo -e "\n===== Gnu tests (32 bit) ====="
-make madx-linux32-gnu && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
+make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-gnu failed"
 
 echo -e "\n===== Gnu tests (64 bit) ====="
-make madx-linux64-gnu && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
+make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-gnu failed"
 
 echo -e "\n===== Intel tests (32 bit) ====="
-make madx-linux32-intel && ls -l madx32 && make tests-all ARCH=32 NOCOLOR=yes
+make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-intel failed"
 
 echo -e "\n===== Intel tests (64 bit) ====="
-make madx-linux64-intel && ls -l madx64 && make tests-all ARCH=64 NOCOLOR=yes
+make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-intel failed"
 
 echo -e "\n===== End of build and tests ====="
