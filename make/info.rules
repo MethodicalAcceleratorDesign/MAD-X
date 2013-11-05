@@ -64,10 +64,9 @@ infobin:
 
 infotestdep:
 	$E "** Computing tests pointless files"
-	$_ $(MAKE) cleantest > /dev/null && \
-		$(foreach f, \
-	    	$(patsubst %.out,%,$(filter-out %/README %.madx %.cfg %.ref %.ref.gz,$(wildcard tests/test-*/*))), \
-			$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) echo -e "\c"
+	$_ $(foreach f, \
+	   	$(patsubst %.out,%,$(filter-out %/README %.madx %.cfg %.ref %.ref.gz,$(wildcard tests/test-*/*))), \
+		$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) echo -e "\c"
 
 # platform dependent rule
 

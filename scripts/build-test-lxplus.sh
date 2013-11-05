@@ -61,7 +61,7 @@ make infobindep
 [ "$?" != "0" ] && echo "ERROR: make infobindep failed"
 
 echo -e "\n===== Tests pointless files ====="
-make infotestdep
+make cleantest && make infotestdep
 [ "$?" != "0" ] && echo "ERROR: make infotestdep failed"
 
 echo -e "\n===== Gnu tests (32 bit) ====="
