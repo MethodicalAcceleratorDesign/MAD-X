@@ -513,6 +513,8 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
               !hbu
               spos=sum
               !hbu spos added
+              !2013-Nov-05  15:05:33  ghislain: get current node name
+              call element_name(el_name,len(el_name))
               call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,    &
                    z, orbit0,spos,nlm,el_name)
            else
