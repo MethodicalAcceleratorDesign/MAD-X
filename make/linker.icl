@@ -36,15 +36,15 @@ LDFLAGS += /Qprof-use
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += /static
+LDFLAGS += /MT
 endif
 
 ifeq ($(SHARED),yes)
-LDFLAGS += /shared
+LDFLAGS += /MD
 endif
 
 ifeq ($(PLUGIN),yes)
-LDFLAGS += /MD # TODO
+LDFLAGS += /MD # todo
 endif
 
 #

@@ -85,11 +85,11 @@ LDFLAGS += /Qprof-use
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += /static
+LDFLAGS += /MT
 endif
 
 ifeq ($(SHARED),yes)
-LDFLAGS += /shared
+LDFLAGS += /MD
 endif
 
 #
