@@ -10,9 +10,9 @@ export LC_CTYPE="C"
 export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # setup
-thedate=`date "+%Y-%m-%d"`
-olddate=`date -d "-50 days" "+%Y-%m-%d"`
-nomail="$1"
+readonly thedate=`date "+%Y-%m-%d"`
+readonly olddate=`date -d "-50 days" "+%Y-%m-%d"`
+readonly nomail="$1"
 
 clean_tmp ()
 {
@@ -57,26 +57,35 @@ build_test_report ()
 	done
 }
 
-# send reports summary by email if needed [lxplus | macosx | windows]
+# send daily reports summary by email [lxplus | macosx | windows]
 build_test_send ()
 {
+	local status
+
 	if [ -s tests-failed.tmp ] ; then
-		echo "===== Tests Failed ====="                 > build-test-report.out
-		date                                           >> build-test-report.out
-		echo "For details, see report files:"          >> build-test-report.out
-		echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
-		for arch in "$@" ; do
-			echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
-		done
-		echo "http://cern.ch/madx/madX/tests/reports/" >> build-test-report.out
-		cat tests-failed.tmp                           >> build-test-report.out
-		sync
-		if [ "$nomail" != "nomail" ] ; then
-			cat -v build-test-report.out | mail -s "MAD-X builds and tests report" mad-src@cern.ch
-			[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
-		fi
-		cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
+		status="failed"
+	else
+		status="passed"
 	fi
+
+	echo "===== Tests $status ====="                > build-test-report.out
+	date                                           >> build-test-report.out
+	echo "For details, see report files:"          >> build-test-report.out
+	echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
+	for arch in "$@" ; do
+		echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
+	done
+	echo "http://cern.ch/madx/madX/tests/reports/" >> build-test-report.out
+
+	if [ -s tests-failed.tmp ] ; then
+		cat tests-failed.tmp                       >> build-test-report.out
+	fi
+
+	if [ "$nomail" != "nomail" ] ; then
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ($status)" mad-src@cern.ch
+		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
+	fi
+	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
 }
 
 # tag reports as processed [lxplus | macosx | windows]
@@ -112,9 +121,6 @@ build_test_proc   lxplus macosx
 # update status of remote reports
 scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX"
 [ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
-
-# synchronize files
-sync
 
 # report errors if any
 if [ -s build-test-report.log ] ; then
