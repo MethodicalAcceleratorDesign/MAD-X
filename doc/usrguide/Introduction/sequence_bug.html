@@ -63,7 +63,8 @@ and the marker at the start of SEC1.
 The bug made that sequence expandable with no negative drift produced, 
 i.e. with the marker at the start of SEC1 at position 0.0 in the MACH sequence. 
 <p>
-With the bugfix implemented, the expansion of the MACH sequence as written above will fail. 
+With the bugfix implemented, the expansion of the MACH sequence as written above will fail with the following error message:
+<pre> +=+=+= fatal: negative drift between elements  mach$start:1 and sec1$start:1, length -5.00e+00 </pre>
 
 <h3>Fix to "adapted" sequences</h3>
 In order to be conforming to the sequence expansion rules, 
