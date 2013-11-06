@@ -19,18 +19,18 @@
 #
 # all
 #
-all-linux:        all-linux32       all-linux64
-all-linux-gnu:    all-linux32-gnu   all-linux64-gnu
-all-linux-intel:  all-linux32-intel all-linux64-intel
+all-linux:         all-linux32        all-linux64
+all-linux-gnu:     all-linux32-gnu    all-linux64-gnu
+all-linux-intel:   all-linux32-intel  all-linux64-intel
 
-all-linux32:  madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
-all-linux64:  madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64
+all-linux32:       madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
+all-linux64:       madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64
 
-all-linux32-gnu:  madx-linux32-gnu libmadx-linux32-gnu libptc-linux32-gnu numdiff-linux32-gnu
-all-linux64-gnu:  madx-linux64-gnu libmadx-linux64-gnu libptc-linux64-gnu numdiff-linux64-gnu
+all-linux32-gnu:   madx-linux32-gnu libmadx-linux32-gnu libptc-linux32-gnu numdiff-linux32-gnu
+all-linux64-gnu:   madx-linux64-gnu libmadx-linux64-gnu libptc-linux64-gnu numdiff-linux64-gnu
 
-all-linux32-intel:  madx-linux32-intel libmadx-linux32-intel libptc-linux32-intel numdiff-linux32-intel
-all-linux64-intel:  madx-linux64-intel libmadx-linux64-intel libptc-linux64-intel numdiff-linux64-intel
+all-linux32-intel: madx-linux32-intel libmadx-linux32-intel libptc-linux32-intel numdiff-linux32-intel
+all-linux64-intel: madx-linux64-intel libmadx-linux64-intel libptc-linux64-intel numdiff-linux64-intel
 
 #
 # madx

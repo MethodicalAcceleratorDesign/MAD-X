@@ -56,7 +56,6 @@ infoall: infoprj
 	@ echo "Objects files                    = " $(OBJECTS)
 	@ echo "Depends files                    = " $(DEPENDS)
 
-
 infobin:
 	$E "** Listing binaries and archives in $(DESTDIR)"
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
@@ -66,7 +65,8 @@ infotestdep:
 	$E "** Computing tests pointless files"
 	$_ $(foreach f, \
 	   	$(patsubst %.out,%,$(filter-out %/README %.madx %.cfg %.ref %.ref.gz,$(wildcard tests/test-*/*))), \
-		$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) echo -e "\c"
+		$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) \
+		echo $(if $(call eq,$(OSTYPE),Linux),-e,) "\c"
 
 # platform dependent rule
 

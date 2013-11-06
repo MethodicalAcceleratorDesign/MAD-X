@@ -19,15 +19,15 @@
 #
 # all
 #
-all-macosx:        all-macosx32        all-macosx64
-all-macosx-gnu:    all-macosx32-gnu    all-macosx64-gnu
-all-macosx-intel:  all-macosx32-intel  all-macosx64-intel
+all-macosx:         all-macosx32        all-macosx64
+all-macosx-gnu:     all-macosx32-gnu    all-macosx64-gnu
+all-macosx-intel:   all-macosx32-intel  all-macosx64-intel
 
-all-macosx32: madx-macosx32 libmadx-macosx32 libptc-macosx32 numdiff-macosx32
-all-macosx64: madx-macosx64 libmadx-macosx64 libptc-macosx64 numdiff-macosx64
+all-macosx32:       madx-macosx32 libmadx-macosx32 libptc-macosx32 numdiff-macosx32
+all-macosx64:       madx-macosx64 libmadx-macosx64 libptc-macosx64 numdiff-macosx64
 
-all-macosx32-gnu: madx-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu numdiff-macosx32-gnu
-all-macosx64-gnu: madx-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu numdiff-macosx64-gnu
+all-macosx32-gnu:   madx-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu numdiff-macosx32-gnu
+all-macosx64-gnu:   madx-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu numdiff-macosx64-gnu
 
 all-macosx32-intel: madx-macosx32-intel libmadx-macosx32-intel libptc-macosx32-intel numdiff-macosx32-intel
 all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel numdiff-macosx64-intel
