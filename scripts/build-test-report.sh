@@ -13,6 +13,8 @@ export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 readonly thedate=`date "+%Y-%m-%d"`
 readonly olddate=`date -d "-50 days" "+%Y-%m-%d"`
 readonly nomail="$1"
+readonly macdir="mad@macserv15865.cern.ch:Projects/madX"
+readonly lxpdir="http://cern.ch/madx/madX"
 
 clean_tmp ()
 {
@@ -46,13 +48,11 @@ build_test_report ()
 			cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
 			[ "$?" != "0" ] && echo "ERROR: backup of build-test-$arch.out failed (check cp)"
 
-			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out > $arch-failed.tmp
+			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out >> tests-failed.tmp
 			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (check perl)"
 
-			if [ -s $arch-failed.tmp ] ; then
-				perl -ne '/: FAIL|ERROR: / && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$arch.out >> tests-failed.tmp
-				[ "$?" != "0" ] && echo "ERROR: unable to build report summary (check perl)"
-			fi
+			perl -ne '/: FAIL|ERROR: / && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$arch.out >> tests-result.tmp
+			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (check perl)"
 		fi
 	done
 }
@@ -68,18 +68,15 @@ build_test_send ()
 		status="passed"
 	fi
 
-	echo "===== Tests $status ====="                > build-test-report.out
-	date                                           >> build-test-report.out
-	echo "For details, see report files:"          >> build-test-report.out
-	echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
+	echo "===== Tests $status ====="                                  > build-test-report.out
+	date                                                             >> build-test-report.out
+	echo "For details, see report files:"                            >> build-test-report.out
+	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out"    >> build-test-report.out
 	for arch in "$@" ; do
-		echo "http://cern.ch/madx/madX/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
+		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
 	done
-	echo "http://cern.ch/madx/madX/tests/reports/" >> build-test-report.out
-
-	if [ -s tests-failed.tmp ] ; then
-		cat tests-failed.tmp                       >> build-test-report.out
-	fi
+	echo "$lxpdir/tests/reports/"                                    >> build-test-report.out
+	cat tests-result.tmp                                             >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ($status)" mad-src@cern.ch
@@ -103,7 +100,7 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-scp -q "mad@macserv15865.cern.ch:Projects/madX/build-test-macosx.*" .
+scp -q "$macdir/build-test-macosx.*" .
 [ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (check scp)"
 
 # check if non-local reports are finished
@@ -119,7 +116,7 @@ build_test_send   lxplus macosx
 build_test_proc   lxplus macosx
 
 # update status of remote reports
-scp -q build-test-macosx.run "mad@macserv15865.cern.ch:Projects/madX"
+scp -q build-test-macosx.run "$macdir"
 [ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
 
 # report errors if any
