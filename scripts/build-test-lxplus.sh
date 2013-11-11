@@ -64,21 +64,25 @@ echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 [ "$?" != "0" ] && echo "ERROR: make infotestdep failed"
 
-echo -e "\n===== Gnu tests (32 bit) ====="
-make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-gnu failed"
-
-echo -e "\n===== Gnu tests (64 bit) ====="
-make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-gnu failed"
+echo -e "\n===== Intel tests (64 bit) ====="
+make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-intel failed"
 
 echo -e "\n===== Intel tests (32 bit) ====="
 make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-intel failed"
 
-echo -e "\n===== Intel tests (64 bit) ====="
-make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-intel failed"
+echo -e "\n===== Gnu tests (64 bit) ====="
+make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux64-gnu failed"
+
+echo -e "\n===== Gnu tests (32 bit) ====="
+make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+[ "$?" != "0" ] && echo "ERROR: make tests-all for madx-linux32-gnu failed"
+
+# restore the default version
+make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
+[ "$?" != "0" ] && echo "ERROR: error restoring the default version"
 
 echo -e "\n===== End of build and tests ====="
 date
