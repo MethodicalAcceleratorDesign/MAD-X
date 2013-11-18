@@ -106,47 +106,47 @@ The minimum n1 for each element is written to the last Twiss table, to allow for
 
 <ul>
 <li><h4>Aperture,</h4>
-<pre>file=filename,
-halofile=filename,
-pipefile=filename,
+<pre>
 range=range,
 exn=real,
 eyn=real,
 dqf=real,
-betaqfx=real,
-dp=real,
 dparx=real,
 dpary=real,
-cor=r,
+betaqfx=real,
 bbeat=real,
+dp=real,
+cor=real,
 nco=integer,
 halo={real,real,real,real},
+halofile=filename,
 interval=real
 spec=real,
 notsimple=logical,
 trueprofile=filename,
-offsetelem=filename;
+offsetelem=filename,
+pipefile=filename,
+file=filename;
 </pre>
 where the parameters have the following meaning:
 <ul>
-<li>file: Output file with aperture table. Default = none
-<li>halofile: Input file with halo polygon coordinates. Will suppress 
-an eventual halo parameter. Default = none
 <li>range: <a href="../Introduction/ranges.html">Range</a> given by 
 elements. Default = #s/#e
 <li>exn: Normalised horizontal emittance. Default = 3.75*e-6
 <li>eyn: Normalised vertical emittance. Default = 3.75*e-6
 <li>dqf: Peak linear dispersion [m]. Default = 2.086
-<li>betaqfx: Beta x in standard qf [m]. Default = 170.25
-<li>dp: Bucket edge at the current beam energy. Default = 0.0015
 <li>dparx: Fractional horizontal parasitic dispersion. Default = 0.273
 <li>dpary: Fractional vertical parasitic dispersion. Default = 0.273
-<li>cor: Maximum radial closed orbit uncertainty [m]. Default = 0.004
+<li>betaqfx: Beta x in standard qf [m]. Default = 170.25
 <li>bbeat: Beta beating coefficient applying to beam size. Default = 1.1
+<li>dp: Bucket edge at the current beam energy. Default = 0.0015
+<li>cor: Maximum radial closed orbit uncertainty [m]. Default = 0.004
 <li>nco: Number of azimuth for radial scan. Default = 5
 <li>halo: Halo parameters: {n, r, h, v}. n is the radius of the primary halo, 
 r is the radial part of the secondary halo, h and v is the horizontal and 
 vertical cuts in the secondary halo. Default = {6, 8.4, 7.3, 7.3}
+<li>halofile: Input file with halo polygon coordinates. Will suppress 
+an eventual halo parameter. Default = none
 <li>interval: Approximate length in meters between measurements. Actual value: 
 nslice = nodelength/interval, nslice is rounded down to closest integer, 
 interval = nodelength/nslice. Default = 1.0
@@ -157,6 +157,7 @@ if an input file with beam screen coordinates are given. See below for a graphic
 <li>trueprofile: A file containing a list of magnets, and for each magnet a list of horizontal and vertical deviations from the ideal magnet axis. These values may come from measurements done on the magnet. See below for example. Default = none.
 <li>offsetelem: A file containing a reference point in the machine, and a list of magnets with their offsets from this point described as a parabola. See below for example. Default = none.<br>
 <b>Note that the reference point should be within the range of elements given for the offsets to be taken into account.</b>
+<li>file: Output file with aperture table. Default = none
 </ul>
 <p>
 

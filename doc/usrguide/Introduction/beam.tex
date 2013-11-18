@@ -12,7 +12,7 @@ command has been issued before.
 The quantities are entered by a BEAM command: 
 \begin{verbatim}
 BEAM, PARTICLE=name,MASS=real,CHARGE=real,
-      ENERGY=real,PC=real,GAMMA=real,
+      ENERGY=real,PC=real,GAMMA=real, BETA=real,
       EX=real,EXN=real,EY=real,EYN=real,
       ET=real,SIGT=real,SIGE=real,
       KBUNCH=integer,NPART=real,BCURRENT=real,
@@ -58,6 +58,9 @@ defined by one of the following:
      a new value for the energy should be entered. Otherwise the
      energy remains unchanged, and the momentum PC and the quantity
      GAMMA are recalculated . 
+   \item \href{beta}{BETA}: The ratio between the speed of the particles
+     and the speed of light: BETA = \textit{v / c}. If
+     given, it must be strictly less than one.
 \end{itemize}  
 
 The emittances are defined by: 

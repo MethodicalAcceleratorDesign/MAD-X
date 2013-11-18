@@ -144,33 +144,35 @@ allow for \href{../match/match.html}{matching} by aperture.
 	
 \begin{verbatim}
 Aperture,
-    file=filename, halofile=filename, pipefile=filename, range=range,
-    exn=real, eyn=real, dqf=real, betaqfx=real, dp=real, dparx=real, dpary=real,
-    cor=real, bbeat=real, nco=integer, halo={real,real,real,real},
+    range=range,
+    exn=real, eyn=real, dqf=real, dparx=real, dpary=real, 
+    betaqfx=real, bbeat=real, dp=real, 
+    cor=real,  nco=integer, 
+    halo={real,real,real,real}, halofile=filename,
     interval=real, spec=real, notsimple=logical, trueprofile=filename,
-    offsetelem=filename;
+    offsetelem=filename, pipefile=filename, 
+    file=filename;  
 \end{verbatim} 
 where the parameters have the following meaning: 
 \begin{itemize}
-   \item file: Output file with aperture table. Default = none 
-   \item halofile: Input file with halo polygon coordinates. Will
-     suppress  an eventual halo parameter. Default = none  
    \item range: \href{../Introduction/ranges.html}{Range} given by
      elements. Default = \#s/\#e  
    \item exn: Normalised horizontal emittance. Default = 3.75*e-6  
    \item eyn: Normalised vertical emittance. Default = 3.75*e-6 
    \item dqf: Peak linear dispersion [m]. Default = 2.086 
-   \item betaqfx: Beta x in standard qf [m]. Default = 170.25 
-   \item dp: Bucket edge at the current beam energy. Default = 0.0015 
    \item dparx: Fractional horizontal parasitic dispersion. Default = 0.273 
    \item dpary: Fractional vertical parasitic dispersion. Default = 0.273 
-   \item cor: Maximum radial closed orbit uncertainty [m]. Default = 0.004 
+   \item betaqfx: Beta x in standard qf [m]. Default = 170.25 
    \item bbeat: Beta beating coefficient applying to beam size. Default = 1.1 
+   \item dp: Bucket edge at the current beam energy. Default = 0.0015 
+   \item cor: Maximum radial closed orbit uncertainty [m]. Default = 0.004 
    \item nco: Number of azimuth for radial scan. Default = 5 
    \item halo: Halo parameters: \{n, r, h, v\}. n is the radius of the
      primary halo,  r is the radial part of the secondary halo, h and v
      is the horizontal and  vertical cuts in the secondary halo. Default
      = \{6, 8.4, 7.3, 7.3\}  
+   \item halofile: Input file with halo polygon coordinates. Will
+     suppress  an eventual halo parameter. Default = none  
    \item interval: Approximate length in meters between
      measurements. Actual value:  nslice = nodelength/interval, nslice
      is rounded down to closest integer,  interval =
@@ -191,6 +193,7 @@ where the parameters have the following meaning:
      as a parabola. See below for example. Default = none. \\
      {\bf Note that the reference point should be within the range of
        elements given for the offsets to be taken into account.}
+   \item file: Output file with aperture table. Default = none 
 \end{itemize}
 
 

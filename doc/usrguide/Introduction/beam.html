@@ -19,12 +19,29 @@ command has been issued before.
 The quantities are entered by a BEAM command:
 <pre>
 BEAM, PARTICLE=name,MASS=real,CHARGE=real,
-      ENERGY=real,PC=real,GAMMA=real,
+      ENERGY=real,PC=real,GAMMA=real,BETA=real,
       EX=real,EXN=real,EY=real,EYN=real,
       ET=real,SIGT=real,SIGE=real,
       KBUNCH=integer,NPART=real,BCURRENT=real,
       BUNCHED=logical,RADIATE=logical,BV=integer,SEQUENCE=name;
 </pre>
+
+command: beam  module: control
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: beta   double value:       0.9999978263
+parameter: alfa   double value:    4.347429295e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698269e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+
 Warning: BEAM updates, i. e. it replaces attributes explicitely
 mentioned, but does not return to default values for others!
 To reset to <a href="resbeam.html#defaults">beam value defaults</a>, 
@@ -68,6 +85,10 @@ If given, it must be greater than one.
 If the restmass is changed a new value for the energy should be entered.
 Otherwise the energy remains unchanged,
 and the momentum PC and the quantity GAMMA are recalculated.
+<li><a name=beta>BETA</a>:
+The ratio between the speed of the particles and the speed of ligt:
+BETA = <i>v / c</i>.
+If given, it must be strictly less than one.
 </ul>
 
 The emittances are defined by:
