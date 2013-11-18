@@ -1,15 +1,15 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 02.11.12 10.03.57 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 10.10.13 12.22.00 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
 option, -debug, -echo;
 
-rfm1->l =                    0 ;
+rfm1->l =                  0 ;
 rfm1->freq =                 12 ;
 rfm1->knl =                  0 ;
 rfm1->pnl =                  0 ;
@@ -41,18 +41,18 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %09s "TEST_LINE"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le       0.00051099891
+@ MASS             %le      0.000510998928
 @ CHARGE           %le                   1
 @ ENERGY           %le                   5
 @ PC               %le         4.999999974
-@ GAMMA            %le         9784.756684
+@ GAMMA            %le         9784.756339
 @ KBUNCH           %le                   1
-@ BCURRENT         %le        0.9606408494
+@ BCURRENT         %le        0.9606408961
 @ SIGE             %le              0.0015
 @ SIGT             %le               0.006
 @ NPART            %le               2e+10
-@ EX               %le      8.17598256e-10
-@ EY               %le      2.04399564e-12
+@ EX               %le     8.175982848e-10
+@ EY               %le     2.043995712e-12
 @ ET               %le                   1
 @ LENGTH           %le                   0
 @ ALFA             %le                   0
@@ -79,9 +79,9 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %22s "MAD-X 5.00.18 Linux 32"
-@ DATE             %08s "02/11/12"
-@ TIME             %08s "10.03.57"
+@ ORIGIN           %23s "MAD-X 5.01.02 Darwin 64"
+@ DATE             %08s "10/10/13"
+@ TIME             %08s "12.22.00"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0
@@ -131,5 +131,5 @@ c6t terminated - total number of elements: 2
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

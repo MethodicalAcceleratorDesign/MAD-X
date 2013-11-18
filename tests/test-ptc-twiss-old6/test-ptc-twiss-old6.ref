@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 18.02.13 17.44.13 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 16.10.13 09.06.02 +
   +++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -6297,19 +6297,19 @@ START LMDIF:
 Initial Penalty Function =   0.80418022E+02
 
 
-call:       4   Penalty function =   0.65063259E-13
+call:       4   Penalty function =   0.65060933E-13
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.65063259E-13
+call:       4   Penalty function =   0.65060933E-13
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000025E+00     6.31338933E-14
-Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.92936535E-15
+Global constraint:         dq1          4     2.00000000E+00     2.00000025E+00     6.31323302E-14
+Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.92860290E-15
 
 
-Final Penalty Function =   6.50632587e-14
+Final Penalty Function =   6.50609332e-14
 
 
 
@@ -6322,7 +6322,7 @@ ksd.b1                   -1.09468e-01 -1.07933e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.50632587e-14
+VARIABLE "TAR" SET TO   6.50609332e-14
 ksf.b1 =      0.06179867339 ;
 ksd.b1 =      -0.1094680414 ;
 START MATCHING
@@ -6335,23 +6335,23 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.10397771E-10
+Initial Penalty Function =   0.10397775E-10
 
 
-call:       4   Penalty function =   0.27221030E-18
-call:       7   Penalty function =   0.21002633E-23
+call:       4   Penalty function =   0.27303476E-18
+call:       7   Penalty function =   0.53516324E-23
  ++++++++++ LMDIF ended: converged successfully
-call:       7   Penalty function =   0.21002633E-23
+call:       7   Penalty function =   0.53516324E-23
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     8.07793567E-26
-lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     2.01948392E-24
+lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     2.90805684E-24
+lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     2.44357554E-24
 
 
-Final Penalty Function =   2.10026327e-24
+Final Penalty Function =   5.35163238e-24
 
 
 
@@ -6364,9 +6364,9 @@ kqtd.b1                   1.18989e-09  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   2.10026327e-24
-kqtf.b1 =   -4.410632751e-10 ;
-kqtd.b1 =    1.189889855e-09 ;
+VARIABLE "TAR" SET TO   5.35163238e-24
+kqtf.b1 =   -4.410631986e-10 ;
+kqtd.b1 =    1.189891366e-09 ;
 enter Twiss module
   
 iteration:   1 error:   3.028328E-03 deltap:   0.000000E+00
@@ -6403,10 +6403,10 @@ enter EMIT module
 
  C                 26658.8832 m          f0             0.01124547507 MHz
  T0               88.92465583 musecs     alfa         0.0003167666893 
- eta          0.0003124192603            gamma(tr)        56.18627587 
- Bcurrent     0.0001891809752 A/bunch    Kbunch             1 
+ eta            0.00031241926            gamma(tr)        56.18627587 
+ Bcurrent     0.0001891809845 A/bunch    Kbunch             1 
  Npart               1.05e+11 /bunch     Energy                   450 GeV 
- gamma            479.6050546            beta            0.9999978263
+ gamma            479.6050377            beta            0.9999978263
 guess:          0                  0                  0
  
                                                   M o d e   1         M o d e   2         M o d e   3
@@ -6449,19 +6449,20 @@ guess:          0                  0                  0
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.449999E+03
  Setting MADx with 
-     energy           450.00000000000000     
+     energy           450.000000000000     
      method                   6
      Num. of steps            1
-     charge           1.0000000000000000     
-  Length of machine:    26658.883200000120     
+     charge           1.00000000000000     
+  Length of machine:    26658.8832000001     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        26658.883200000266     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   26658.8832000003     
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
+ F
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -6483,22 +6484,22 @@ guess:          0                  0                  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.5000151695351519E-003  -3.5677288604498319E-009  -7.6491167579007877E-008   1.6000664229192150E-004   1.1414386477420272E-005   8.8048128900653621E-007
-Deviation from symplecticity  0.9968589509330154E-12 %
+ Closed orbit:  -2.500015169544834E-003 -3.567728759086228E-009 -7.649116527325494E-008  1.600066422913087E-004  1.141438750163590E-005  8.804816691219992E-007
+Deviation from symplecticity  0.7449039155010472E-12 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :       12683
   NUMBER OF THIN OBJECTS :       63415
-  TOTAL IDEAL LENGTH OF STRUCTURE :   26658.883200000120     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   26658.883200000120     
-Deviation from symplecticity  0.9968589509330154E-12 %
+  TOTAL IDEAL LENGTH OF STRUCTURE :   26658.8832000001     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   26658.8832000001     
+Deviation from symplecticity  0.7449039155010472E-12 %
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-        26658.8832    0.0003167640266           -1000000           -1000000 
+        26658.8832    0.0003167640269           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003124165976        56.18651202       0.2800017601 
+          -1000000    0.0003124165976        56.18651199       0.2800017601 
 
                 q2                dq1                dq2                 qs 
       0.3100017602                  0                  0     0.007940998712 
@@ -6507,10 +6508,10 @@ Deviation from symplecticity  0.9968589509330154E-12 %
        9.999895859        623.4138936        9.819037801        639.6105799 
 
             deltap            orbit_x           orbit_px            orbit_y 
-                 0     -0.00250001517    -3.56772886e-09   -7.649116758e-08 
+                 0     -0.00250001517   -3.567728759e-09   -7.649116527e-08 
 
           orbit_py           orbit_pt          orbit_-cT             xcorms 
-   0.0001600066423     8.80481289e-07   -1.141438648e-05    0.0009316851209 
+   0.0001600066423    8.804816691e-07    -1.14143875e-05    0.0009316851209 
 
             ycorms            pxcorms            pycorms             xcomax 
    0.0009604958264    3.079876774e-05    3.139702411e-05     0.007226400175 
@@ -6538,12 +6539,12 @@ Deviation from symplecticity  0.9968589509330154E-12 %
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.4999927550739451E-003  -3.8031141645510733E-009  -8.1822967026252718E-008   1.6000806167849714E-004   0.0000000000000000     
+ Closed orbit:  -2.499992755073935E-003 -3.803114164291462E-009 -8.182296701982507E-008  1.600080616784970E-004  0.000000000000000E+000
  Normal Form Type 1
-Deviation from symplecticity  0.3747089935959858E-12 %
+Deviation from symplecticity  0.3136771797304172E-12 %
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

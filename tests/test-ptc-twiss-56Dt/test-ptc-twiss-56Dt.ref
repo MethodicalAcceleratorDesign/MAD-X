@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.01.02  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 08.02.13 16.14.36 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 09.10.13 16.06.28 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -817,13 +817,13 @@ ptc_create_universe;
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
-  Length of machine:    78.543702661677671     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -3.1641356201816961E-015   0.0000000000000000        1.5543122344752192E-014
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
   Bullshitting in MADX with Cavities            2
 
 
@@ -839,21 +839,21 @@ ptc_create_universe;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
-Deviation from symplecticity  0.1290120216526990E-10 %
+Deviation from symplecticity  0.6898185726337640E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         266
   NUMBER OF THIN OBJECTS :        1678
-  TOTAL IDEAL LENGTH OF STRUCTURE :   78.543702661677656     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.543702661677656     
-Deviation from symplecticity  0.1290120216526990E-10 %
+  TOTAL IDEAL LENGTH OF STRUCTURE :   78.543702661677713     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.543702661677713     
+Deviation from symplecticity  0.6898185726337640E-11 %
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.1241077847       -41.13731262           -1000000 
+       78.54370266       0.1241079695       -41.13731262           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258929355         2.83857575       0.8200596224 
+          -1000000      -0.6258928034        2.838573636       0.8200596224 
 
                 q2                dq1                dq2                 qs 
       0.7198292883       -4.353246537       -9.482228978                  0 
@@ -914,5 +914,5 @@ Plot - default table plotted: twiss
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

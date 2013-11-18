@@ -1135,6 +1135,8 @@ SUBROUTINE twcpgo(rt)
   use twiss_elpfi
   use twissotmfi
   use spch_bbfi
+
+  use name_lenfi
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1155,6 +1157,9 @@ SUBROUTINE twcpgo(rt)
   integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0)
   character(130) msg
+  !--- 2013-Nov-14  10:36:35  ghislain: adding name of element for output of name
+  character*(name_len) el_name, bxmax_name, bymax_name, dxmax_name, dymax_name, xcomax_name, ycomax_name
+
   !---- Initialization
   pos0=zero
   amux=zero
@@ -1209,6 +1214,14 @@ SUBROUTINE twcpgo(rt)
   sigdx =zero
   sigdy =zero
 
+  !--- 2013-Nov-14  10:42:16  ghislain: need to initialize names of elements where maxima occur
+  bxmax_name = 'nil '
+  bymax_name = 'nil ' 
+  dxmax_name = 'nil '
+  dymax_name = 'nil ' 
+  xcomax_name = 'nil '
+  ycomax_name = 'nil '
+
   !---- Loop over positions.
   cplxy = .false.
   cplxt = .false.
@@ -1218,6 +1231,7 @@ SUBROUTINE twcpgo(rt)
   centre_cptk=.false.
   i = restart_sequ()
   i_spch=0
+
 10 continue
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
@@ -1226,6 +1240,10 @@ SUBROUTINE twcpgo(rt)
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
+
+  !--- 2013-Nov-14  10:34:00  ghislain: add acquistion of name of element here.  
+  call element_name(el_name,len(el_name))
+
   opt_fun(70) = g_elpar(g_kmax)
   opt_fun(71) = g_elpar(g_kmin)
   opt_fun(72) = g_elpar(g_calib)
@@ -1294,16 +1312,56 @@ SUBROUTINE twcpgo(rt)
      currpos=currpos+el
   endif
   iecnt=iecnt+1
-  bxmax =max(betx         ,bxmax)
-  bymax =max(bety         ,bymax)
-  dxmax =max(abs(disp(1)) ,dxmax)
-  dymax =max(abs(disp(3)) ,dymax)
-  xcomax=max(abs(orbit(1)),xcomax)
-  ycomax=max(abs(orbit(3)),ycomax)
-  sigxco=sigxco+orbit(1)**2
-  sigyco=sigyco+orbit(3)**2
-  sigdx =sigdx + disp(1)**2
-  sigdy =sigdy + disp(3)**2
+
+  !--- 2013-Nov-14  10:41:42  ghislain: change to save name of element where max is happening
+  ! bxmax =max(betx         ,bxmax)
+  ! bymax =max(bety         ,bymax)
+  ! dxmax =max(abs(disp(1)) ,dxmax)
+  ! dymax =max(abs(disp(3)) ,dymax)
+  ! xcomax=max(abs(orbit(1)),xcomax)
+  ! ycomax=max(abs(orbit(3)),ycomax)
+  !
+  if (betx .gt. bxmax) then
+     bxmax = betx
+     bxmax_name = el_name
+  endif
+  if (bety .gt. bymax) then
+     bymax = bety
+     bymax_name = el_name
+  endif
+  if (abs(disp(1)) .gt. dxmax) then
+     dxmax = abs(disp(1))
+     dxmax_name = el_name
+  endif
+  if (abs(disp(3)) .gt. dymax) then
+     dymax = abs(disp(3))
+     dymax_name = el_name
+  endif
+  if (abs(orbit(1)) .gt. xcomax) then
+     xcomax = abs(orbit(1))
+     xcomax_name = el_name
+  endif
+  if (abs(orbit(3)) .gt. ycomax) then
+     ycomax = abs(orbit(3))
+     ycomax_name = el_name
+  endif
+  !--- 2013-Nov-14  10:41:42  ghislain: end of change
+
+  !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements, 
+  !                           skipping markers(25), beambeam(22), changeref(35), translation(36),
+  !                           srotation(12), yrotation(13) etc...
+  !                           But leave drifts(1) in for now. They are the most numerous elements in machines
+  ! if ( & ! code .ne. 1 .and. & 
+  !      code .ne. 22 .and. & 
+  !      code .ne. 25 .and. & 
+  !      code .ne. 35 .and. code .ne. 36 .and. &
+  !      code .ne. 12 .and. code .ne. 13) then
+     sigxco=sigxco+orbit(1)**2
+     sigyco=sigyco+orbit(3)**2
+     sigdx =sigdx + disp(1)**2
+     sigdy =sigdy + disp(3)**2
+  !endif
+
   if(.not.centre) call twprep(save,1,opt_fun,currpos,1)
   if(centre) then
      currpos=pos0+el
@@ -1349,6 +1407,14 @@ SUBROUTINE twcpgo(rt)
 910 format('TWISS uses the RF system or synchrotron radiation ',      &
        'only to find the closed orbit, for optical calculations it ',    &
        'ignores both.')
+
+  ! write (6,*) bxmax, bxmax_name
+  ! write (6,*) bymax, bymax_name
+  ! write (6,*) dxmax, dxmax_name
+  ! write (6,*) dymax, dymax_name
+  ! write (6,*) xcomax, xcomax_name
+  ! write (6,*) ycomax, ycomax_name
+
 
 end SUBROUTINE twcpgo
 SUBROUTINE twcptk(re,orbit)

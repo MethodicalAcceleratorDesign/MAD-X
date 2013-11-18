@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le         0.938272013
+@ MASS             %le         0.938272046
 @ CHARGE           %le                   1
 @ ENERGY           %le         450.0009782
 @ PC               %le                 450
-@ GAMMA            %le         479.6060971
+@ GAMMA            %le         479.6060802
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le                   0
@@ -17,12 +17,12 @@
 @ ET               %le                   1
 @ DELTAP           %le                   0
 @ LENGTH           %le          26658.8832
-@ ALPHA_C          %le     0.0003216320505
+@ ALPHA_C          %le     0.0003216320508
 @ ALPHA_C_P        %le            -1000000
 @ ALPHA_C_P2       %le            -1000000
 @ ALPHA_C_P3       %le            -1000000
 @ ETA_C            %le     0.0003172846404
-@ GAMMA_TR         %le         55.75968867
+@ GAMMA_TR         %le         55.75968864
 @ Q1               %le        0.2800010241
 @ Q2               %le        0.3100006055
 @ DQ1              %le                   0
@@ -47,9 +47,9 @@
 @ YCOMAX           %le      0.008056958782
 @ PYCOMAX          %le     0.0004558719032
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %23s "MAD-X 5.00.19 Darwin 64"
-@ DATE             %08s "14/02/13"
-@ TIME             %08s "16.22.43"
+@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
+@ DATE             %08s "15/10/13"
+@ TIME             %08s "19.41.45"
 * NAME                                S             BETA11             BETA21             BETA12             BETA22              DISP1              DISP3                  X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0        10.99998536    2.041999724e-11    1.714782706e-11        11.00000807      -0.0131489131     0.009206403876    -0.001999999044   -4.836986048e-12   -6.470088644e-10    0.0001700000459

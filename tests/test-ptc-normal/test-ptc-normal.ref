@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.01.02  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 16.01.13 13.51.45 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 09.10.13 16.06.37 +
   +++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -88,15 +88,15 @@ parameter: particle   string: proton
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:        0.938272013
+parameter: mass   double value:        0.938272046
 parameter: charge   double value:                  1
 parameter: energy   double value:               5000
 parameter: pc   double value:        4999.999912
-parameter: gamma   double value:        5328.945051
+parameter: gamma   double value:        5328.944863
 parameter: ex   double value:                  1
-parameter: exn   double value:        21315.77983
+parameter: exn   double value:        21315.77908
 parameter: ey   double value:                  1
-parameter: eyn   double value:        21315.77983
+parameter: eyn   double value:        21315.77908
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
 parameter: sige   double value:                  0
@@ -108,10 +108,10 @@ parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999999824
-parameter: alfa   double value:    3.521417482e-08
+parameter: alfa   double value:    3.521417729e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698248e-18
+parameter: arad   double value:    1.534698269e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -315,5 +315,5 @@ Deviation from symplecticity  0.6217248937900877E-12 %
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

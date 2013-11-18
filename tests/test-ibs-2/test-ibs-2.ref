@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 13.02.13 15.39.16 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 17.45.58 +
   +++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -107,8 +107,8 @@ twiss,sequence=TME,file=tme-twiss.tfs;
 
 enter Twiss module
   
-iteration:   1 error:   6.253860E-07 deltap:   0.000000E+00
-orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
+orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
  ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
@@ -120,7 +120,7 @@ orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697       0.3322876002 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.170021688e-06    9.749735582e-07       0.1764705882 
+      0.2845484323    1.170021581e-06    9.749734683e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -150,8 +150,8 @@ twiss,centre;
 
 enter Twiss module
   
-iteration:   1 error:   6.253860E-07 deltap:   0.000000E+00
-orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
+orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
  ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
@@ -163,7 +163,7 @@ orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697        0.335514865 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.178865175e-06    9.749735582e-07       0.1764705882 
+      0.2845484323    1.178865066e-06    9.749734683e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -175,7 +175,7 @@ orbit:  -8.359840E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige   1.500000047884963E-002
+ sige   1.500000047884966E-002
  Twiss was calculated at the center of the elements. No interpolation is used
  
  Global parameters for the machine: 
@@ -185,7 +185,7 @@ radiate = T:
      C               5.314466 m              f0             56.410642 MHz            T0              0.017727 microseconds
      alfa            0.786651E-02            eta             0.786648E-02            gamma(tr)      11.274802
      Bcurrent        4.067091 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
-     E               2.860000 GeV            gamma        5596.880823                beta            1.000000
+     E               2.860000 GeV            gamma        5596.880626                beta            1.000000
  
  Emittances:
  
@@ -194,7 +194,7 @@ radiate = T:
      Et            0.750000E+02 pi*mm*mrad     sigt            9.000000 mm             sigE         15.000000 1/1000
  sequence name: tme
  
-     CONST               =   5.177147E-12
+     CONST               =   5.177148E-12
  
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
@@ -218,14 +218,14 @@ radiate = T:
      1/betx =   3.47774E-01    1/bety =   2.08759E-01
  
      (Weighted) average rates (1/sec):
-     Longitudinal=    4.676897E-09
+     Longitudinal=    4.676898E-09
      Horizontal  =    2.776352E-08
      Vertical    =   -1.937972E-16
  
      (Weighted) average lifetimes (sec):
-     Longitudinal=    2.138170E+08
+     Longitudinal=    2.138169E+08
      Horizontal  =    3.601849E+07
-     Vertical    =   -5.160034E+15
+     Vertical    =   -5.160033E+15
  
 
 
@@ -234,5 +234,5 @@ radiate = T:
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

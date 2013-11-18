@@ -23,6 +23,8 @@ use,sequence=lep;
 use,sequence=lep;
 twiss,file=twiss_lep_thin;
 
+eoption, seed=123456;
+
 use, period=lep;
 track, damp, dump;
   start;

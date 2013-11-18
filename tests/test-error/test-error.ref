@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 15.02.13 18.48.18 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 10.10.13 12.16.51 +
   +++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -68,14 +68,14 @@ parameter: particle   string: electron
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:      0.00051099891
+parameter: mass   double value:     0.000510998928
 parameter: charge   double value:                 -1
 parameter: energy   double value:                 10
 parameter: pc   double value:        9.999999987
-parameter: gamma   double value:        19569.51337
-parameter: ex   double value:    3.515672505e-10
+parameter: gamma   double value:        19569.51268
+parameter: ex   double value:    3.515672629e-10
 parameter: exn   double value:          2.752e-05
-parameter: ey   double value:    1.916245915e-10
+parameter: ey   double value:    1.916245983e-10
 parameter: eyn   double value:            1.5e-05
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -88,10 +88,10 @@ parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999999987
-parameter: alfa   double value:     2.61119886e-09
+parameter: alfa   double value:    2.611199044e-09
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    2.817940287e-15
+parameter: arad   double value:    2.817940325e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
@@ -112,5 +112,5 @@ Added field errors to 24 elements
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

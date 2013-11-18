@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Linux)       +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 21.08.13 15.10.19 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 19.40.28 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -20,7 +20,7 @@ one pass is on
 
                  y                 py                  t                 pt 
                  0                  0                  0              0.001 
-                 0                  0   -1.431911951e-07              0.001 
+                 0                  0   -1.431911945e-07              0.001 
 
                  s                  e 
                  0                  0 
@@ -33,5 +33,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

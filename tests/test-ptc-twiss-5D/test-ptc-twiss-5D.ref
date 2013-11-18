@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
+  +    MAD-X 5.01.02  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 07.02.13 18.11.45 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 09.10.13 16.06.21 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -800,11 +800,11 @@ twiss, rmatrix, chrom, save;
 
 enter Twiss module
   
-iteration:   1 error:   1.178158E-04 deltap:   1.000000E-06
+iteration:   1 error:   1.178159E-04 deltap:   1.000000E-06
 orbit:  -7.037258E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016100E-07
   
-iteration:   2 error:   5.695677E-10 deltap:   1.000000E-06
-orbit:  -7.037391E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016137E-07
+iteration:   2 error:   5.695678E-10 deltap:   1.000000E-06
+orbit:  -7.037392E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016137E-07
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -815,19 +815,19 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -3.734960577        15.12421277        20.60419342 
+       1.820059621       -3.734960651        15.12421277         20.6041956 
 
              dxrms             xcomax             xcorms                 q2 
-       9.639961088                  0                  0         2.71982919 
+       9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573740182        20.07025727                  0                  0 
+      -7.573740341        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0        19.69937451 
+                 0                  0                  0        19.69937659 
 
            synch_2            synch_3            synch_4            synch_5 
-       1.526297364       0.3728165258                  0        16.84840389 
+       1.526297364       0.3728165258                  0        16.84840744 
 
 
 write, table=summ, file="leir.summ.twiss";
@@ -890,13 +890,13 @@ ptc_create_universe;
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
-  Length of machine:    78.543702661677671     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -3.1641356201816961E-015   0.0000000000000000        1.5543122344752192E-014
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
 
 
 
@@ -907,13 +907,13 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
           38 BA1HO.1                 All three reference frames are inline. DRAWING AS RBEND
           41 BA1HI.1                 All three reference frames are inline. DRAWING AS RBEND
           43 BI1PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          45 BI1PM.1                 All three reference frames are inline. DRAWING AS RBEND
+          45 BI1PM.1                 SBEND curvature is almost null. DRAWING AS RBEND
           47 BI1PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          51 BI2PI.1                 SBEND curvature is almost null. DRAWING AS RBEND
+          51 BI2PI.1                 All three reference frames are inline. DRAWING AS RBEND
           53 BI2PM.1                 All three reference frames are inline. DRAWING AS RBEND
           55 BI2PO.1                 All three reference frames are inline. DRAWING AS RBEND
           57 BA2HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          60 BA2HO.1                 SBEND curvature is almost null. DRAWING AS RBEND
+          60 BA2HO.1                 All three reference frames are inline. DRAWING AS RBEND
          114 BA1HO.2                 All three reference frames are inline. DRAWING AS RBEND
          117 BA1HI.2                 All three reference frames are inline. DRAWING AS RBEND
          119 BI1PO.2                 All three reference frames are inline. DRAWING AS RBEND
@@ -957,13 +957,13 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
   ptc_twiss, table=twiss, icase=5, no=2, closed_orbit;
 
  Closed orbit:    1.0688861274587036E-008   2.5461397864805191E-009   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.3463895836830488E-11 %
+Deviation from symplecticity  0.2686739719592879E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         266
   NUMBER OF THIN OBJECTS :        1678
-  TOTAL IDEAL LENGTH OF STRUCTURE :   78.543702661677656     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.543702661677656     
-Deviation from symplecticity  0.3463895836830488E-11 %
+  TOTAL IDEAL LENGTH OF STRUCTURE :   78.543702661677713     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.543702661677713     
+Deviation from symplecticity  0.2686739719592879E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -971,7 +971,7 @@ Deviation from symplecticity  0.3463895836830488E-11 %
        78.54370266       0.1241077849           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258929353        2.838575748       0.8200596224 
+          -1000000      -0.6258929881        2.838575748       0.8200596224 
 
                 q2                dq1                dq2                 qs 
       0.7198292883       -2.176620133        -4.74110766                  0 
@@ -1023,5 +1023,5 @@ Plot - default table plotted: twiss
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

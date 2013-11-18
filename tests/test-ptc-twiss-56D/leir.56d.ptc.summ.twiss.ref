@@ -1,9 +1,9 @@
 @ NAME             %17s "PTC_TWISS_SUMMARY"
 @ TYPE             %13s "TWISS SUMMARY"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %22s "MAD-X 5.00.19 Linux 64"
-@ DATE             %08s "07/02/13"
-@ TIME             %08s "17.56.00"
+@ ORIGIN           %23s "MAD-X 5.01.02 Darwin 32"
+@ DATE             %08s "09/10/13"
+@ TIME             %08s "16.06.27"
 *             LENGTH            ALPHA_C          ALPHA_C_P         ALPHA_C_P2         ALPHA_C_P3              ETA_C           GAMMA_TR                 Q1                 Q2                DQ1                DQ2                 QS         BETA_X_MIN         BETA_X_MAX         BETA_Y_MIN         BETA_Y_MAX             DELTAP            ORBIT_X           ORBIT_PX            ORBIT_Y           ORBIT_PY           ORBIT_PT          ORBIT_-CT             XCORMS             YCORMS            PXCORMS            PYCORMS             XCOMAX             YCOMAX            PXCOMAX            PYCOMAX 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
-        78.54370266       0.1241077849        3.171382482           -1000000           -1000000      -0.6258929353        2.838575748       0.8200596224       0.7198292883       -2.176620133        -4.74110766                  0        3.282153615        15.12420817        1.633285387        20.07025827                  0    1.068886127e-08    2.546139786e-09                  0                  0                  0                  0    1.168573345e-08                  0    3.059593723e-09                  0    2.508645927e-08                  0    1.106286922e-08                  0
+        78.54370266       0.1241077849        3.171382482           -1000000           -1000000      -0.6258929881        2.838575748       0.8200596224       0.7198292883       -2.176620133        -4.74110766                  0        3.282153615        15.12420817        1.633285387        20.07025827                  0    1.068886127e-08    2.546139786e-09                  0                  0                  0                  0    1.168573345e-08                  0    3.059593723e-09                  0    2.508645927e-08                  0    1.106286922e-08                  0

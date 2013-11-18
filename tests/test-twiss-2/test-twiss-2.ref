@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 15.11.12 17.38.27 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 10.34.04 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for MAD-X';
 
@@ -37,8 +37,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx =    3.518520049e-08 ;
-epsy =    3.518520049e-08 ;
+epsx =    3.518520172e-08 ;
+epsy =    3.518520172e-08 ;
 option,-echo;
 
 
@@ -167,5 +167,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

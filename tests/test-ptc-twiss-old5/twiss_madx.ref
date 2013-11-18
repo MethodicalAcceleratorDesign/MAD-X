@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %07s "DIAMOND"
 @ PARTICLE         %08s "ELECTRON"
-@ MASS             %le       0.00051099891
+@ MASS             %le      0.000510998928
 @ CHARGE           %le                  -1
 @ ENERGY           %le                   3
 @ PC               %le         2.999999956
-@ GAMMA            %le          5870.85401
+@ GAMMA            %le         5870.853803
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le                   0
@@ -24,7 +24,7 @@
 @ DQ1              %le        -78.98623213
 @ DQ2              %le        -35.28688982
 @ DXMAX            %le        0.3117371246
-@ DYMAX            %le                  -0
+@ DYMAX            %le                   0
 @ XCOMAX           %le                   0
 @ YCOMAX           %le                   0
 @ BETXMAX          %le         22.59035178
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
-@ ORIGIN           %19s "MAD-X 4.01.41 Linux"
-@ DATE             %08s "04/02/11"
-@ TIME             %08s "17.23.00"
+@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
+@ DATE             %08s "16/10/13"
+@ TIME             %08s "09.03.49"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "DIAMOND$START"                      0        9.978688586        5.831556551

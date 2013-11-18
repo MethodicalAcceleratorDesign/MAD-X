@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.02  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 12.02.13 17.17.45 +
+  + Code Modification Date: 2013.05.24      +
+  + Execution Time Stamp: 09.10.13 16.06.57 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -55,7 +55,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.396821985                  0                  0        59.31000012 
 
                dq2            betymax              dymax              dyrms 
-       2.000047274        609.5259281                  0                  0 
+       2.000047367        609.5259281                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        8.612620901 
@@ -99,36 +99,42 @@ NO centre off
  TOUSCHEK MODULE 
  particle proton
  Charge    1.0000000000000000     
- gammas    479.60505457387023     
- gamma    479.60505457387023     
+ gammas    479.60503770566345     
+ gamma    479.60503770566345     
  Energy    450.00000000000000     
- Mass   0.93827201299999996     
+ Mass   0.93827204600000003     
  Ex    7.8199999999999999E-009
  Ey    7.8199999999999999E-009
  Et    5.3019999999999997E-005
- sigt   0.11233228341738011     
- sige    4.7199254201038266E-004
+ sigt   0.11233228339030503     
+ sige    4.7199254212414551E-004
  parnum    115000000000.00000     
  circ    26658.883200000000     
- currnt    2.0719821097868208E-004
- betas   0.99999782628314271     
- beta   0.99999782628314271     
+ currnt    2.0719822106584157E-004
+ betas   0.99999782628298983     
+ beta   0.99999782628298983     
  clight    299792458.00000000     
- arad    1.5346982484722282E-018
- alfa    3.2163416900925630E-004
- freq0    1.1245475066865532E-002
+ arad    1.5346982692102026E-018
+ alfa    3.2163416900926226E-004
+ freq0    1.1245475066863811E-002
  kbunch            1
  deltap    0.0000000000000000     
 
+ ***** CERN LIBRARY ERROR CONDITION D103.1
+    FUNCTION DGAUSS ... TOO HIGH ACCURACY REQUIRED
+
+ ***** CERN LIBRARY ERROR CONDITION D103.1
+    FUNCTION DGAUSS ... TOO HIGH ACCURACY REQUIRED
+   
  Energy radiated per turn [MeV]
-   1.1402144471328228E-007
+   1.1402143422321500E-007
  Touschek Lifetime [seconds/hours]
-   19213793.518128220        5337.1648661467279     
+   19213042.070399325        5336.9561306664791     
 
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.02 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

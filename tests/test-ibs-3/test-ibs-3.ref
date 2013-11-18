@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 05.02.13 15.45.25 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 17.45.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -2559,29 +2559,29 @@ twiss,sequence=PDR,file=pdr-twiss.tfs;
 
 enter Twiss module
   
-iteration:   1 error:   9.381693E-04 deltap:   0.000000E+00
-orbit:   5.003564E-06  2.670365E-07  0.000000E+00  0.000000E+00  1.292994E-02  1.758789E-04
+iteration:   1 error:   9.381692E-04 deltap:   0.000000E+00
+orbit:   5.003563E-06  2.670364E-07  0.000000E+00  0.000000E+00  1.292994E-02  1.758789E-04
   
 iteration:   2 error:   1.322422E-05 deltap:   0.000000E+00
-orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758099E-04
+orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758098E-04
   
-iteration:   3 error:   1.998539E-08 deltap:   0.000000E+00
-orbit:   2.224309E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
+iteration:   3 error:   1.998538E-08 deltap:   0.000000E+00
+orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
  ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311766256     0.003609771222        16.64409404 
+       389.1501964     -0.01311766132     0.003609771221        16.64409404 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588229    4.111901374e-05        26.59603802       0.4543718252 
+       16.38588229    4.111908664e-05        26.59603802       0.4543718252 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892005    0.0001340827656    3.582791418e-05        12.26536813 
+      0.1473892005    0.0001340827533    3.582791087e-05        12.26536813 
 
                dq2            betymax              dymax              dyrms 
-   -0.002894684377        25.38936533                  0                  0 
+   -0.002894683952        25.38936533                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -2608,29 +2608,29 @@ twiss,centre;
 
 enter Twiss module
   
-iteration:   1 error:   9.381693E-04 deltap:   0.000000E+00
-orbit:   5.003564E-06  2.670365E-07  0.000000E+00  0.000000E+00  1.292994E-02  1.758789E-04
+iteration:   1 error:   9.381692E-04 deltap:   0.000000E+00
+orbit:   5.003563E-06  2.670364E-07  0.000000E+00  0.000000E+00  1.292994E-02  1.758789E-04
   
 iteration:   2 error:   1.322422E-05 deltap:   0.000000E+00
-orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758099E-04
+orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1.758098E-04
   
-iteration:   3 error:   1.998539E-08 deltap:   0.000000E+00
-orbit:   2.224309E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
+iteration:   3 error:   1.998538E-08 deltap:   0.000000E+00
+orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
  ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       389.1501964     -0.01311766256     0.003609771222        16.64409404 
+       389.1501964     -0.01311766132     0.003609771221        16.64409404 
 
                 q1                dq1            betxmax              dxmax 
-       16.38588229    4.111901374e-05        26.59603802       0.4610523253 
+       16.38588229    4.111908664e-05        26.59603802       0.4610523253 
 
              dxrms             xcomax             xcorms                 q2 
-      0.1473892005    0.0001361357363    3.582791418e-05        12.26536813 
+      0.1473892005    0.0001361357237    3.582791087e-05        12.26536813 
 
                dq2            betymax              dymax              dyrms 
-   -0.002894684377        25.78242616                  0                  0 
+   -0.002894683952        25.78242615                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -2639,7 +2639,7 @@ orbit:   2.224309E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1
                  0                  0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige    4.1388071832717368E-003
+ sige   4.138807183474348E-003
  Twiss was calculated at the center of the elements. No interpolation is used
  
  Global parameters for the machine: 
@@ -2649,7 +2649,7 @@ radiate = T:
      C             389.150196 m              f0              0.770377 MHz            T0              1.298065 microseconds
      alfa            0.360977E-02            eta             0.360974E-02            gamma(tr)      16.644094
      Bcurrent        0.055543 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
-     E               2.860000 GeV            gamma        5596.880823                beta            1.000000
+     E               2.860000 GeV            gamma        5596.880626                beta            1.000000
  
  Emittances:
  
@@ -2659,7 +2659,7 @@ radiate = T:
  sequence name: pdr
 rf  0.100000E-04   10.0000       999.950      0.500000       0.00000    
  
-     CONST               =   9.010813E-12
+     CONST               =   9.010815E-12
  
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
@@ -2673,7 +2673,7 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
      Bunch length        =       0.018121 m
  
      Particles per bunch =   4.500000E+11
-     Bunch current       =   5.554261E-02 A
+     Bunch current       =   5.554262E-02 A
  
  Ring average values (m)
  
@@ -2683,14 +2683,14 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
      1/betx =   2.64019E-01    1/bety =   1.96289E-01
  
      (Weighted) average rates (1/sec):
-     Longitudinal=    5.660209E-08
+     Longitudinal=    5.660210E-08
      Horizontal  =    1.373508E-08
      Vertical    =   -2.133606E-16
  
      (Weighted) average lifetimes (sec):
      Longitudinal=    1.766719E+07
-     Horizontal  =    7.280630E+07
-     Vertical    =   -4.686901E+15
+     Horizontal  =    7.280629E+07
+     Vertical    =   -4.686900E+15
  
 
 
@@ -2699,5 +2699,5 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

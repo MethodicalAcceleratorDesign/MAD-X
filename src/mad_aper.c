@@ -1023,6 +1023,10 @@ aper_header(struct table* aper_t, struct aper_node *lim)
 
   /* aperture command properties */
 
+  /* 2013-Nov-14  15:45:23  ghislain: The global parameters that have a default in the 
+     dictionary or can be input from other commands like BEAM, should be obtained adequately, not 
+     from the cmd input.
+ */
   dtmp = command_par_value("exn", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ EXN              %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
@@ -1089,11 +1093,12 @@ aper_header(struct table* aper_t, struct aper_node *lim)
     aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   }
 
-  sprintf(c_dum->c, v_format("@ n1min            %%le   %g"), lim->n1);
+  /* 2013-Nov-18  13:49:45  ghislain: changed n1min and at_element strings to uppercase in output to TFS */
+  sprintf(c_dum->c, v_format("@ N1MIN            %%le   %g"), lim->n1);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   set_value("beam","n1min",&lim->n1);
 
-  sprintf(c_dum->c, v_format("@ at_element       %%%02ds  \"%s\""), strlen(name), stoupper(name) );
+  sprintf(c_dum->c, v_format("@ AT_ELEMENT       %%%02ds  \"%s\""), strlen(name), stoupper(name) );
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 }
 
@@ -1515,6 +1520,21 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   mass = get_value("beam", "mass");
   energy = get_value("beam", "energy");
 
+  /* 2013-Nov-13  16:20:29  ghislain: attempt to extract relevant parameters 
+     from BEAM command instead of internal parameters. 
+     This works but needs a bit more thoughts, in conjuction with fetching other parameters 
+     from Twiss table
+
+  // exn = get_value("beam", "exn");
+  // eyn = get_value("beam", "eyn");
+
+  // and attempt to extract maximum parameters from twiss summary table
+  // double_from_table_row("summ","dxmax",&nint,&dqf);
+  // printf ("+++++++ dqf from TWISS %12.6g\n",dqf);
+  // TODO:  add some error checking.
+
+   end of ghislain: attempt... */
+
   /* fetch deltap as set by user in the former TWISS command */
   /* will be used below for displacement associated to parasitic dipersion */
 
@@ -1522,6 +1542,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   printf ("+++++++ deltap from TWISS %12.6g\n",lim_pt->deltap_twiss);
 
   /* calculate emittance and delta angle */
+  /* mad_beam.c says :     ex = exn / (4 * beta * gamma); */
+  /* Warning: 1- MAD uses a different definition for emittance
+              2- This assumes beta = 1, explicitely ultra-relativistic particles */
   ex=mass*exn/energy; ey=mass*eyn/energy;
   dangle=twopi/(nco*4);
 

@@ -5,7 +5,7 @@
 @ MASS             %le    0.93827
 @ ENERGY           %le  450.00000
 @ PC               %le  449.99902
-@ GAMMA            %le  479.60505
+@ GAMMA            %le  479.60504
 @ EXN              %le    0.00000
 @ EYN              %le    0.00000
 @ DQF              %le    2.08600
@@ -21,12 +21,12 @@
 @ HALO_R           %le       8.4
 @ HALO_H           %le       7.3
 @ HALO_V           %le       7.3
-@ n1min            %le   4.85602
-@ at_element       %05s  "MQ1:1"
+@ N1MIN            %le   4.85602
+@ AT_ELEMENT       %05s  "MQ1:1"
 @ TITLE            %37s "LHC Cell APERTURE exemple, BJ Aug2009"
-@ ORIGIN           %23s "MAD-X 5.01.01 Darwin 64"
-@ DATE             %08s "14/05/13"
-@ TIME             %08s "12.16.13"
+@ ORIGIN           %23s "MAD-X 5.01.02 Darwin 64"
+@ DATE             %08s "10/10/13"
+@ TIME             %08s "12.19.04"
 * NAME                       S      BETX      BETY        DX         X         Y        N1 APERTYPE              APER_1    APER_2    APER_3    APER_4      XTOL      YTOL      RTOL 
 $ %s                       %le       %le       %le       %le       %le       %le       %le %s                       %le       %le       %le       %le       %le       %le       %le 
  "LHCCELL$START"       0.00000 177.45326  32.26597   2.18636   0.00000   0.00000 999999.00000 "CIRCLE"              0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000

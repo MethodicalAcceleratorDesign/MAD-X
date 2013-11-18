@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 08.02.13 16.49.17 +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 17.45.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -55,7 +55,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
- sige   4.680020346056124E-004
+ sige   4.680020346057555E-004
  Twiss was calculated at the exit of the elements. Twiss functions at the center  of the elements are calculated through linear interpolation
  
  Global parameters for the machine: 
@@ -65,7 +65,7 @@ radiate = F:
      C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
      alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
-     E             450.000000 GeV            gamma         479.605055                beta            0.999998
+     E             450.000000 GeV            gamma         479.605038                beta            0.999998
  
  Emittances:
  
@@ -110,9 +110,9 @@ acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
      1/betx =   1.44932E-02    1/bety =   1.34416E-02
  
      (Weighted) average rates (1/sec):
-     Longitudinal=    8.208515E-06
-     Horizontal  =    5.074060E-06
-     Vertical    =   -3.693278E-08
+     Longitudinal=    8.208516E-06
+     Horizontal  =    5.074061E-06
+     Vertical    =   -3.693279E-08
  
      (Weighted) average lifetimes (sec):
      Longitudinal=    1.218247E+05
@@ -123,5 +123,5 @@ acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

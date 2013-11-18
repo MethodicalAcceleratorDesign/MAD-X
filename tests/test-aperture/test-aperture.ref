@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 18.09.13 14.19.38 +
+  + Code Modification Date: 2013.11.05      +
+  + Execution Time Stamp: 18.11.13 14.03.13 +
   +++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE exemple, BJ Aug2009';
 
@@ -100,7 +100,7 @@ endsequence;
 
 
 
-beam,particle=proton,energy=450.0;
+beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
 
 
 
@@ -148,7 +148,13 @@ select, flag=aperture, clear;
 
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
 
-aperture,offsetelem="offset.tfs",file="ap.tfs";
+aperture,offsetelem="offset.tfs", file="ap.tfs", 
+
+         dqf=2.086, betaqfx=170.25, dp=0.0015, 
+
+         dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+
+         nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
 
 
 Processing apertures from lhccell$start:1 to lhccell$end:1...
@@ -165,5 +171,5 @@ APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

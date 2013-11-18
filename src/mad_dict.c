@@ -2,7 +2,7 @@
 
 /* constants (pre-defined variables)  PDG 2010 
    nmass is the unified atomic mass unit [GeV/(c**2)] */
-char constant_def[] =
+/*char constant_def[] =
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
 "const degrad = 180 / pi; "
@@ -17,11 +17,11 @@ char constant_def[] =
 "const qelect = 1.602176487e-19; " 
 "const hbar = 6.58211899e-25; "    
 "const erad = 2.8179402894e-15; "  
-"const prad = erad*emass/pmass; ";
+"const prad = erad*emass/pmass; "; */
 
 
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
-/* char constant_def[] =
+char constant_def[] =
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
 "const degrad = 180 / pi; "
@@ -36,7 +36,7 @@ char constant_def[] =
 "const qelect = 1.602176565e-19; "
 "const hbar = 6.58211928e-25; "
 "const erad = 2.8179403267e-15; " 
-"const prad = erad*emass/pmass; "; */
+"const prad = erad*emass/pmass; ";
 
 
 
@@ -137,6 +137,29 @@ char command_def[] =
 "offsetelem = [s, none, none], "     /* read off-axis data from this file */
 "refnode = [s, none, none]; "     /* read reference element for the offset file */
 " "
+/* "aperture: aperture none 0 0 " */
+/* "range    = [s, #s/#e, none], " /\* range *\/ */
+/* "exn      = [r, 0.], "          /\* norm. emit *\/ */
+/* "eyn      = [r, 0.], "          /\* norm. emit *\/ */
+/* "dqf      = [r, 0.], "          /\* peak linear dispersion *\/ */
+/* "dparx    = [r, 0.], "          /\* fractional parasitic dispersion - horizontal *\/ */
+/* "dpary    = [r, 0.], "          /\* fractional parasitic dispersion - vertical *\/ */
+/* "betaqfx  = [r, 1.], "          /\* beta x in standard qf *\/ */
+/* "bbeat    = [r, 1.], "          /\* beta beating coefficient applying to beam size*\/ */
+/* "dp       = [r, 0.], "          /\* bucket edge at injection *\/ */
+/* "cor      = [r, 0.], "          /\* maximum radial closed orbit *\/ */
+/* "nco      = [i, 5], "           /\* number of azimuth for radial scan *\/ */
+/* "halo     = [r, {0., 0., 0., 0.}], "  /\* halo parameters: n, r, h, v *\/ */
+/* "halofile = [s, none, none], "  /\* input file w/halo polygon coordinates *\/ */
+/* "interval = [r, 1.], "          /\* length in meters between measurements *\/ */
+/* "spec     = [r, 0.], "          /\* aperture spec, for plotting only *\/ */
+/* "notsimple = [l, false, true], "      /\* use if beam pipe is not a simply connex *\/ */
+/* "trueprofile = [s, none, none], "     /\* read discrete displacements from this file *\/ */
+/* "offsetelem = [s, none, none], "      /\* read off-axis data from this file *\/ */
+/* "refnode = [s, none, none], "   /\* read reference element for the offset file *\/ */
+/* /\* "pipefile = [s, none, none], " *\/     /\* input file w/pipe polygon coordinates *\/ */
+/* "file     = [s, none, none]; "   /\* output file with aperture table *\/ */
+/* " " */
 "assign: control none 0 0 "
 "echo     = [s, terminal, none], "
 "truncate = [l, false, true]; "
