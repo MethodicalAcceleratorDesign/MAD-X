@@ -2,14 +2,14 @@
 # sh scripts/build-test-macosx.sh [cleanall]
 # tail -f build-test-macosx.out
 
+# env settings
+export LC_CTYPE="C"
+export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
+
 # I/O redirection
 rm -f build-test-macosx.out
 exec 1> build-test-macosx.out 2>&1
 uname -n > build-test-macosx.run
-
-# env settings
-export LC_CTYPE="C"
-export PATH=/Users/mad/Projects/madX:/opt/local/bin:$PATH
 
 echo "\n===== Start of build and tests ====="
 date
@@ -35,6 +35,8 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-macosx-gnu
+# to handle bad fortran compiler, restart from scratch (only once)
+[ "$?" != "0" ] && make cleanall && make cleanall ARCH=32 && make all-macosx-gnu
 [ "$?" != "0" ] && echo "ERROR: make all-macosx-gnu failed"
 
 echo "\n===== Intel build ====="

@@ -2,14 +2,14 @@
 # sh scripts/build-test-lxplus.sh [cleanall]
 # tail -f build-test-lxplus.out
 
+# env settings
+export LC_CTYPE="C"
+export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
+
 # I/O redirection
 rm -f build-test-lxplus.out
 exec 1> build-test-lxplus.out 2>&1
 uname -n > build-test-lxplus.run
-
-# env settings
-export LC_CTYPE="C"
-export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 echo -e "\n===== Start of build and tests ====="
 date
@@ -36,7 +36,10 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-linux32-gnu
+# to handle bad fortran compiler, restart from scratch (only once)
+[ "$?" != "0" ] && make cleanall && make cleanall ARCH=32 && make all-linux32-gnu
 [ "$?" != "0" ] && echo "ERROR: make all-linux32-gnu failed"
+
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
 gcc      --version
 g++      --version
@@ -50,6 +53,7 @@ icc      --version
 ifort    --version
 make all-linux32-intel all-linux32
 [ "$?" != "0" ] && echo "ERROR: make all-linux32-intel failed"
+
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
 icc      --version
 ifort    --version
