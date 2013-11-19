@@ -4609,7 +4609,6 @@ subroutine ttrfmult(track, ktrack, turn)
   
   !---- Read-in the parameters
   freq = node_value('freq ');
-  volt = node_value('volt ');
   lag = node_value('lag ');
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
@@ -4629,6 +4628,7 @@ subroutine ttrfmult(track, ktrack, turn)
   rfac = 0d0
   
   !---- Set-up some parameters
+  volt = bvk * node_value('volt ');
   krf = 2*pi*freq*1d6/clight;
   
   if (n_ferr.gt.0) then
@@ -4674,9 +4674,9 @@ subroutine ttrfmult(track, ktrack, turn)
     Cp1 = Cp1 * (x+ii*y);
 
     !---- The kick
-    dpx = -REAL(Cp0) / (1d0 + track(6,jtrk));
-    dpy = AIMAG(Cp0) / (1d0 + track(6,jtrk));
-    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * REAL(Sp1)) / (1d0 + track(6,jtrk));
+    dpx = -REAL(Cp0);
+    dpy = AIMAG(Cp0);
+    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * REAL(Sp1));
 
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. 0d0) then
