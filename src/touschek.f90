@@ -117,7 +117,7 @@ subroutine touschek
        dels,s1,s2,dx1,dx2,dpx1,dpx2,ax1,                                 &
        ax2,bx1,bx2,beta2,gamma2,tol,fa0,fa1,fa2,                         &
        dy1,dy2,dpy1,dpy2,ay1,ay2,by1,by2,sdum, half,                     &
-       tltouschek, tltouschekhr,pi2,km,ftousch,uloss
+       tltouschek,pi2,km,ftousch,uloss
 
 
   external ftousch,dgauss
@@ -159,27 +159,28 @@ subroutine touschek
   print *, '  '
   print *, 'TOUSCHEK MODULE '
   print *, 'particle ', sequ_name(:lp)
-  print *, 'Charge ', charge
-  print *, 'gammas ', gammas
-  print *, 'gamma ', gamma
-  print *, 'Energy ', en0
-  print *, 'Mass ', amass
-  print *, 'Ex ', ex
-  print *, 'Ey ', ey
-  print *, 'Et ', et
-  print *, 'sigt ', sigt
-  print *, 'sige ', sige
-  print *, 'parnum ', parnum
-  print *, 'circ ', circ
-  print *, 'currnt ', currnt
-  print *, 'betas ', betas
-  print *, 'beta ', beta
-  print *, 'clight ', clight
-  print *, 'arad ', arad
-  print *, 'alfa ', alfa
-  print *, 'freq0 ', freq0
-  print *, 'kbunch ', bunch
-  print *, 'deltap ', deltap
+  print *, 'charge   ', charge
+  print *, 'gammas   ', gammas
+  print *, 'gamma    ', gamma
+  print *, 'energy   ', en0
+  print *, 'mass     ', amass
+  print *, 'Ex       ', ex
+  print *, 'Ey       ', ey
+  print *, 'Et       ', et
+  print *, 'sigt     ', sigt
+  print *, 'sige     ', sige
+  print *, 'parnum   ', parnum
+  print *, 'circ     ', circ
+  print *, 'currnt   ', currnt
+  print *, 'betas    ', betas
+  print *, 'beta     ', beta
+  print *, 'clight   ', clight
+  print *, 'arad     ', arad
+  print *, 'alfa     ', alfa
+  print *, 'freq0    ', freq0
+  print *, 'kbunch   ', bunch
+  print *, 'deltap   ', deltap
+  print *, ''
   ! ***************************************
 
   rr = arad*arad
@@ -262,7 +263,7 @@ subroutine touschek
      fa2 = (by**2/sigy2)*(1d0-sigh2*ddy2/sigy2)
      fb1 = (fa1 + fa2)/fa0
      fb2 = sqrt(fb1**2-( bx**2*by**2*sigh2/(beta2*beta2*gamma2       &
-          *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)                 &
+          *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)          &
           +(dy**2/sigy2))))
 
      call cavtouschek(um,uloss,iflag)
@@ -283,7 +284,7 @@ subroutine touschek
 
      pi2 = pi/2.d0
 
-     piwint = DGAUSS(ftousch,km,pi2,tol)
+     piwint = DGAUSS(ftousch,km,pi2,tol)          
      litousch = ccost*fact*piwint
      litouschw = litousch*dels/circ
 
@@ -293,12 +294,20 @@ subroutine touschek
      ! *************** Fill "touschek_table"  *********************
 
      if(n.ne.0) then
-        call string_to_table_curr('touschek ', 'name ', name )
+        call string_to_table_curr('touschek ','name ', name )
         call double_to_table_curr('touschek ','s ', sdum)
         call double_to_table_curr('touschek ','tli ', litousch)
         call double_to_table_curr('touschek ','tliw ', litouschw)
         call double_to_table_curr('touschek ','tlitot ', tlitouschek)
         call augment_count('touschek ')
+     endif
+
+     !--- Abort condition if the DGAUSS function raised an error and returned 0.
+     if ( piwint .eq. 0.d0 ) then
+        print *, ' '
+        print *, ' DGAUSS returned an integral of 0.d0 for element at position ', sdum
+        print *, ' Calculation of Touschek lifetime is not reliable; abort calculation.'
+        return
      endif
 
      s1   = s2
@@ -316,12 +325,11 @@ subroutine touschek
 101 continue
 
   tltouschek=1d0/tlitouschek
-  tltouschekhr=1d0/tlitouschek/60d0/60d0
-  print *, '  '
-  print *, 'Energy radiated per turn [MeV]'
-  print *, uloss
-  print *, 'Touschek Lifetime [seconds/hours]'
-  print *, tltouschek, tltouschekhr
+
+  print *, ' '
+  print *, 'Energy radiated per turn  ', uloss,       '[MeV]'
+  print *, 'Inverse Touschek Lifetime ', tlitouschek, '[seconds-1]'
+  print *, 'Touschek Lifetime         ', tltouschek,  '[seconds]   ', tltouschek/3600.,'[hours]'
 
   RETURN
 end subroutine touschek

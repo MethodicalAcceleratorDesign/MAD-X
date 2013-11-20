@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (32 bit, Darwin)      +
+  +    MAD-X 5.01.03  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 09.10.13 16.06.40 +
+  + Code Modification Date: 2013.11.05      +
+  + Execution Time Stamp: 20.11.13 10.14.16 +
   +++++++++++++++++++++++++++++++++++++++++++
 option,-info,warn,-echo;
 
@@ -38,35 +38,35 @@ NO centre off
    
  TOUSCHEK MODULE 
  particle positron
- Charge    1.0000000000000000     
- gammas    4743.6498731754673     
- gamma    4743.6498731754673     
- Energy    2.4239999999999999     
- Mass    5.1099892800000001E-004
- Ex    1.2000000000000000E-010
- Ey    6.7499999999999995E-013
- Et    1.5999999999999999E-006
- sigt    1.1463607962467358E-003
- sige    1.3957211422778151E-003
- parnum    3100000000.0000000     
- circ    357.45742721005882     
- currnt    4.1655124508314831E-004
- betas   0.99999997777996408     
- beta   0.99999997777996408     
- clight    299792458.00000000     
- arad    2.8179403246116313E-015
- alfa    7.3943296536604306E-005
- freq0   0.83868015746230029     
- kbunch         1386
- deltap    0.0000000000000000     
-   
- Energy radiated per turn [MeV]
-   2.1912083614567508     
- Touschek Lifetime [seconds/hours]
-   183.51272459662729        5.0975756832396475E-002
+ charge      1.0000000000000000     
+ gammas      4743.6498731754673     
+ gamma       4743.6498731754673     
+ energy      2.4239999999999999     
+ mass        5.1099892800000001E-004
+ Ex          1.2000000000000000E-010
+ Ey          6.7499999999999995E-013
+ Et          1.5999999999999999E-006
+ sigt        1.1463607962467358E-003
+ sige        1.3957211422778151E-003
+ parnum      3100000000.0000000     
+ circ        357.45742721005882     
+ currnt      4.1655124508314831E-004
+ betas      0.99999997777996408     
+ beta       0.99999997777996408     
+ clight      299792458.00000000     
+ arad        2.8179403246116313E-015
+ alfa        7.3943296536604306E-005
+ freq0      0.83868015746230029     
+ kbunch           1386
+ deltap      0.0000000000000000     
+ 
+  
+ Energy radiated per turn     2.1912083614567508      [MeV]
+ Inverse Touschek Lifetime    5.4492134112120233E-003 [seconds-1]
+ Touschek Lifetime            183.51272459662729      [seconds]      5.0975756832396468E-002 [hours]
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (32 bit) finished normally +
+  + MAD-X 5.01.03 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
