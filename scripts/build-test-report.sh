@@ -27,7 +27,7 @@ clean_exit ()
 	exit
 }
 
-# check for finished jobs [lxplus | macosx | windows]
+# check for finished jobs [lxplus | macosx | win]
 build_test_check ()
 {
 	for arch in "$@" ; do
@@ -37,7 +37,7 @@ build_test_check ()
 	done
 }
 
-# look for failed tests [lxplus | macosx | windows]
+# look for failed tests [lxplus | macosx | win]
 build_test_report ()
 {
 	for arch in "$@" ; do
@@ -57,7 +57,7 @@ build_test_report ()
 	done
 }
 
-# send daily reports summary by email [lxplus | macosx | windows]
+# send daily reports summary by email [lxplus | macosx | win]
 build_test_send ()
 {
 	local status
@@ -85,7 +85,7 @@ build_test_send ()
 	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
 }
 
-# tag reports as processed [lxplus | macosx | windows]
+# tag reports as processed [lxplus | macosx | win]
 build_test_proc ()
 {
 	for arch in "$@" ; do
@@ -100,23 +100,23 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-scp -q "$macdir/build-test-macosx.*" .
+scp -q "$macdir/build-test-macosx.*" "$macdir/build-test-win.*" .
 [ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (check scp)"
 
 # check if non-local reports are finished
-build_test_check         macosx
+build_test_check         macosx win
 
 # build the final report
-build_test_report lxplus macosx
+build_test_report lxplus macosx win
 
 # send the final report
-build_test_send   lxplus macosx
+build_test_send   lxplus macosx win
 
 # mark all reports as processed
-build_test_proc   lxplus macosx
+build_test_proc   lxplus macosx win
 
 # update status of remote reports
-scp -q build-test-macosx.run "$macdir"
+scp -q build-test-macosx.run build-test-win.run "$macdir"
 [ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
 
 # report errors if any
