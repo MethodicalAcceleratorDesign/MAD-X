@@ -26,7 +26,5 @@ twiss,chrom,table;
 
 vrf400:= 8.;
 
-! reduce size of output table:
-select,flag=touschek,pattern="MCB",column=S, TLI, TLIW, TLITOT;
-touschek,tolerance=1e-7,file="touschek.dat";
+touschek,tolerance=1e-7; 
 

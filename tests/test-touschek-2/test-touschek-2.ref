@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (32 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 09.10.13 16.06.57 +
+  + Code Modification Date: 2013.11.05      +
+  + Execution Time Stamp: 20.11.13 09.58.39 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -55,7 +55,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.396821985                  0                  0        59.31000012 
 
                dq2            betymax              dymax              dyrms 
-       2.000047367        609.5259281                  0                  0 
+       2.000047274        609.5259281                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        8.612620901 
@@ -88,53 +88,45 @@ vrf400:= 8.;
 
 
 
-! reduce size of output table:
-
-select,flag=touschek,pattern="MCB",column=S, TLI, TLIW, TLITOT;
-
-touschek,tolerance=1e-7,file="touschek.dat";
+touschek,tolerance=1e-7; 
 
 NO centre off 
    
  TOUSCHEK MODULE 
  particle proton
- Charge    1.0000000000000000     
- gammas    479.60503770566345     
- gamma    479.60503770566345     
- Energy    450.00000000000000     
- Mass   0.93827204600000003     
- Ex    7.8199999999999999E-009
- Ey    7.8199999999999999E-009
- Et    5.3019999999999997E-005
- sigt   0.11233228339030503     
- sige    4.7199254212414551E-004
- parnum    115000000000.00000     
- circ    26658.883200000000     
- currnt    2.0719822106584157E-004
- betas   0.99999782628298983     
- beta   0.99999782628298983     
- clight    299792458.00000000     
- arad    1.5346982692102026E-018
- alfa    3.2163416900926226E-004
- freq0    1.1245475066863811E-002
- kbunch            1
- deltap    0.0000000000000000     
+ charge      1.00000000000000     
+ gammas      479.605037705663     
+ gamma       479.605037705663     
+ energy      450.000000000000     
+ mass       0.938272046000000     
+ Ex         7.820000000000000E-009
+ Ey         7.820000000000000E-009
+ Et         5.302000000000000E-005
+ sigt       0.112332283390305     
+ sige       4.719925421241455E-004
+ parnum      115000000000.000     
+ circ        26658.8832000000     
+ currnt     2.071982210658416E-004
+ betas      0.999997826282990     
+ beta       0.999997826282990     
+ clight      299792458.000000     
+ arad       1.534698269210203E-018
+ alfa       3.216341690092623E-004
+ freq0      1.124547506686381E-002
+ kbunch              1
+ deltap     0.000000000000000E+000
+ 
 
  ***** CERN LIBRARY ERROR CONDITION D103.1
     FUNCTION DGAUSS ... TOO HIGH ACCURACY REQUIRED
-
- ***** CERN LIBRARY ERROR CONDITION D103.1
-    FUNCTION DGAUSS ... TOO HIGH ACCURACY REQUIRED
-   
- Energy radiated per turn [MeV]
-   1.1402143422321500E-007
- Touschek Lifetime [seconds/hours]
-   19213042.070399325        5336.9561306664791     
+  
+  DGAUSS returned an integral of 0.d0 for element at position    13350.4842327565     
+  Calculation of Touschek lifetime is not reliable; abort calculation.
 
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (32 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
