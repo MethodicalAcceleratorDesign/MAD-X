@@ -78,6 +78,9 @@ endif
 ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -exec otool -L {} \;
 endif
+ifeq ($(OSTYPE),Windows)
+	$E "not supported on Windows platforms"
+endif
 
 infolibdep:
 	$E "** Computing libraries dependencies in $(DESTDIR)"
@@ -86,6 +89,9 @@ ifeq ($(OSTYPE),Linux)
 endif
 ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -exec otool -L {} \;
+endif
+ifeq ($(OSTYPE),Windows)
+	$E "not supported on Windows platforms"
 endif
 
 # end of makefile
