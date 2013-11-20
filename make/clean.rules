@@ -19,6 +19,8 @@
 .PHONY: clean cleandir cleantest
 .PHONY: cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
 
+override RM = rm -f
+
 clean:
 	$E "** Cleaning local files"
 	$_ $(RM) core
