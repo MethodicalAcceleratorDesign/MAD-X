@@ -66,7 +66,7 @@ infotestdep:
 	$_ $(foreach f, \
 	   	$(patsubst %.out,%,$(filter-out %/README %.madx %.cfg %.ref %.ref.gz,$(wildcard tests/test-*/*))), \
 		$(if $(wildcard $f.ref $f.ref.gz $f.out.ref $f.out.ref.gz),,echo $f &&)) \
-		echo $(if $(call eq,$(OSTYPE),Linux),-e,) "\c"
+		echo "** End of pointless files"
 
 # platform dependent rule
 
