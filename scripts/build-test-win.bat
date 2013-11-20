@@ -60,11 +60,11 @@ if ERRORLEVEL 1 %echo% "ERROR: make infobindep failed"
 %make% cleantest && %make% infotestdep
 if ERRORLEVEL 1 %echo% "ERROR: make infotestdep failed"
 
-%echo% -e "\n===== Intel tests (64 bit) ====="
+%echo% -e "\n===== Testing madx-win64-intel ====="
 %make% madx-win64-intel && %ls% -l madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
 if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed"
 
-%echo% -e "\n===== Intel tests (32 bit) ====="
+%echo% -e "\n===== Testing madx-win32-intel ====="
 %make% madx-win32-intel && %ls% -l madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
 if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed"
 

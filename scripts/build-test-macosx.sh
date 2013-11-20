@@ -57,19 +57,19 @@ echo "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 [ "$?" != "0" ] && echo "ERROR: make infotestdep failed"
 
-echo "\n===== Intel tests (64 bit) ====="
+echo "\n===== Testing madx-macosx64-intel ====="
 make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-macosx64-intel failed"
 
-echo "\n===== Intel tests (32 bit) ====="
+echo "\n===== Testing madx-macosx32-intel ====="
 make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-macosx32-intel failed"
 
-echo "\n===== Gnu tests (64 bit) ====="
+echo "\n===== Testing madx-macosx64-gnu ====="
 make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-macosx64-gnu failed"
 
-echo "\n===== Gnu tests (32 bit) ====="
+echo "\n===== Testing madx-macosx32-gnu ====="
 make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 [ "$?" != "0" ] && echo "ERROR: make tests-all for madx-macosx32-gnu failed"
 

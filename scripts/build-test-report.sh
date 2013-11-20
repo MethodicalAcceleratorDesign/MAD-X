@@ -51,7 +51,7 @@ build_test_report ()
 			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out >> tests-failed.tmp
 			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (check perl)"
 
-			perl -ne '/: FAIL|ERROR: / && print ; /-> (madx-\S+)/ && print "\n$1:\n"' build-test-$arch.out >> tests-result.tmp
+			perl -ne '/: FAIL|ERROR: / && print ; /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> tests-result.tmp
 			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (check perl)"
 		fi
 	done
