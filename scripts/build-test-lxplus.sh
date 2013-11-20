@@ -37,8 +37,12 @@ g++      --version
 gfortran --version
 make all-linux32-gnu
 # to handle bad fortran compiler, restart from scratch (only once)
-[ "$?" != "0" ] && make cleanall && make cleanall ARCH=32 && make all-linux32-gnu
-[ "$?" != "0" ] && echo "ERROR: make all-linux32-gnu failed"
+if [ "$?" != "0" ] ; then 
+	make cleanall && make cleanall ARCH=32
+	[ "$?" != "0" ] && echo "ERROR: make cleanall failed"
+	make all-linux32-gnu
+	[ "$?" != "0" ] && echo "ERROR: make all-linux32-gnu failed"
+fi
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
 gcc      --version
