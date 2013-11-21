@@ -44,7 +44,7 @@ ifeq ($(OSTYPE),Windows)
 vpath %.h libs/gc/gc/include
 vpath %.c libs/gc/gc
 
-CFLAGS += -Ilibs/gc/gc/include \
+CFLAGS += -Ilibs/gc/gc/include -DSTATIC=static \
           $(if $(call neq,$(CCNAME),icl),,/Qdiag-disable:344,869,1684,2312)
 CC_HDR += $(notdir $(wildcard libs/gc/gc/include/*.h))
 CC_SRC += alloc.c reclaim.c allchblk.c misc.c mach_dep.c os_dep.c mark_rts.c \
