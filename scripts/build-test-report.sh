@@ -75,7 +75,8 @@ build_test_send ()
 	for arch in "$@" ; do
 		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
 	done
-	echo "$lxpdir/tests/reports/"                                    >> build-test-report.out
+	echo "$lxpdir/tests/reports"                                     >> build-test-report.out
+	echo "$lxpdir/tests"                                             >> build-test-report.out
 	cat tests-result.tmp                                             >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
