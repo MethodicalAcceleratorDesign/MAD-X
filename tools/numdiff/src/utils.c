@@ -27,8 +27,12 @@
 #include "args.h"
 
 #ifdef _WIN32
+#ifndef popen
 #define popen(cmd, mode)  _popen(cmd, mode)
+#endif
+#ifndef pclose
 #define pclose(fp)        _pclose(fp)
+#endif
 #endif
 
 // macros
