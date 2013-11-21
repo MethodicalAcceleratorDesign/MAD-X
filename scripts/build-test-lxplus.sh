@@ -95,4 +95,4 @@ make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
 echo -e "\n===== End of build and tests ====="
 date
 
-echo "finished" > build-test-lxplus.run
+echo -n "finished" > build-test-lxplus.run

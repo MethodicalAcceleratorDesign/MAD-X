@@ -71,4 +71,4 @@ if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed"
 %echo% -e "\n===== End of build and tests ====="
 %date%
 
-%echo% "finished" > build-test-win.run
+%echo% -n "finished" > build-test-win.run
