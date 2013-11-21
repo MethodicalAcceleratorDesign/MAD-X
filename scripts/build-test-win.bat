@@ -40,8 +40,7 @@ if ERRORLEVEL 1 %echo% "ERROR: svn update failed"
 
 %echo% -e "\n===== Clean build ====="
 if "%1"=="cleanall" (
-   %make% cleanall && %make% cleanall ARCH=32
-   if ERRORLEVEL 1 %echo% "ERROR: make cleanall failed"
+   if EXIST build ( %make% cleanbuild && %rm% -f *.exe )
 ) else (
    %echo% "Skipped (no explicit request)."
 )
@@ -83,10 +82,11 @@ if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed"
 if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed"
 
 REM restore the default version
-%make% madx-win32 > tmp.out && make madx-win64 > tmp.out && rm -f tmp.out
+%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
 if ERRORLEVEL 1 %echo% "ERROR: error restoring the default version"
 
 %echo% -e "\n===== End of build and tests ====="
 %date%
 
 %echo% -n "finished" > build-test-win.run
+
