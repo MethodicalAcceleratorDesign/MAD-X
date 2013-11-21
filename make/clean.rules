@@ -17,7 +17,7 @@
 # |
 
 .PHONY: clean cleandir cleantest
-.PHONY: cleanc cleancxx cleanf90 cleandep cleanbuild cleanall
+.PHONY: cleanc cleancxx cleanf90 cleandep cleanprj cleanbuild cleanall
 
 override RM = rm -f
 
@@ -28,7 +28,11 @@ clean:
 
 cleandir: clean
 	$E "** Cleaning files in depth"
+ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
+else
+	$_ $(RM) $(wildcard *~ */*~ */*/*~ */*/*/*~ */*/*/*/*~ */*/*/*/*/*~ */*/*/*/*/*/*~ */*/*/*/*/*/*/*~) 
+endif
 
 cleantest:
 	$E "** Cleaning tests files"
@@ -59,14 +63,20 @@ cleandep:
 
 cleanbin:
 	$E "** Removing binaries"
+ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec $(RM) {} \;
+else
+	$E "not supported on Windows platforms"
+endif
 
-cleanbuild:
+cleanprj:
 	$E "** Removing $(PRJNAME)"
 	$_ $(RM) $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 
-cleanall: cleandir cleanbuild cleantest
+cleanbuild:
 	$E "** Removing" $(DESTDIR)
 	$_ $(RMDIR) $(DESTDIR)
+
+cleanall: cleandir cleanbuild cleantest
   
 # end of makefile

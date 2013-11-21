@@ -58,8 +58,12 @@ infoall: infoprj
 
 infobin:
 	$E "** Listing binaries and archives in $(DESTDIR)"
+ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
 	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
+else
+	$E "not supported on Windows platforms"
+endif
 
 infotestdep:
 	$E "** Computing tests pointless files"
