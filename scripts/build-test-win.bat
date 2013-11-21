@@ -77,9 +77,9 @@ if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed"
 %make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
 if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed"
 
-%echo% -e "\n===== Testing madx-win64-gnu ====="
-%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed"
+REM %echo% -e "\n===== Testing madx-win64-gnu ====="
+REM %make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+REM if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed"
 
 REM restore the default version
 %make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
