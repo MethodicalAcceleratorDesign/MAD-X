@@ -1950,7 +1950,7 @@ element* SeqElList::create_thin_elseparator(element* thick_elem, int slice_no) /
 	slice_no=slices=1; /* do not slice this one */
   }
   
-  // set up new solenoid command
+  // set up new elseparator command
   struct command* cmd = new_command(buffer(const_cast<char*>("thin_elseparator")), 20, 20, // max num names, max num param
 									buffer(const_cast<char*>("element")), buffer(const_cast<char*>("none")), 0, 11); // 0 is link, elseparator is 11
   add_cmd_parameter_new(cmd,1.,const_cast<char*>("magnet"),0); // parameter magnet with value of 1 and inf=0
@@ -2162,7 +2162,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 	}
 	else if (strstr(thick_node->base_name,"solenoid"))    sliced_elem = create_thin_solenoid(thick_elem,1);    // create the first thin solenoid slice
 	else if (strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,1); // create the first thin elseparator slice
-	else
+	else // magnet which can be sliced to multipole
 	{
 	  sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // get info from first slice
 	  if(ThickQuad)
@@ -2193,12 +2193,18 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 	
 	for (int i=0; i<nslices; i++) // place the sliced elements in the sequence
 	{
-	  if(ThickQuad) // fill space between multipoles with thick quad pieces
+	  if (strstr(thick_node->base_name,"collimator")) sliced_elem = create_thin_obj(thick_elem,i+1);
+	  else if (strstr(thick_node->base_name,"solenoid")) sliced_elem = create_thin_solenoid(thick_elem,i+1);
+	  else if (strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,i+1);
+	  else // magnet which can be sliced to multipole
 	  {
-		if(i==0) place_thick_slice(thick_elem,thick_node,thin_sequ,sq,0,thin_style); // place initial quad
-		else     place_thick_slice(thick_elem,thick_node,thin_sequ,bq,i,thin_style); // place middle quad
+		sliced_elem = create_sliced_magnet(thick_elem,i+1,ThickSLice); // create and place the multipole pieces
+	    if(ThickQuad) // fill space between multipoles with thick quad pieces
+	    {
+		  if(i==0) place_thick_slice(thick_elem,thick_node,thin_sequ,sq,0,thin_style); // place initial quad
+		  else     place_thick_slice(thick_elem,thick_node,thin_sequ,bq,i,thin_style); // place middle quad
+	    }
 	  }
-	  sliced_elem = create_sliced_magnet(thick_elem,i+1,ThickSLice); // create and place the multipole pieces
 	  node* thin_node = new_elem_node(sliced_elem, thick_node->occ_cnt);
 	  thin_node->length   = 0.0;
 	  thin_node->from_name = buffer(thick_node->from_name);
