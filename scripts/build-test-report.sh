@@ -9,32 +9,50 @@ exec 1> build-test-report.log 2>&1
 export LC_CTYPE="C"
 export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
-# setup
+# exclusive settings
+readonly nomail="$1"
+readonly force="$1"
+
+# general settings
 readonly thedate=`date "+%Y-%m-%d"`
 readonly olddate=`date -d "-50 days" "+%Y-%m-%d"`
-readonly nomail="$1"
 readonly macdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly lxpdir="http://cern.ch/madx/madX"
 
 clean_tmp ()
 {
-	rm -f *.tmp
+	rm -f build-test-*.tmp
 }
 
-clean_exit ()
+clean_all ()
 {
-	clean_tmp
-	exit
+	rm -f build-test-*.tmp build-test-*.out
 }
 
-# check for finished jobs [lxplus | macosx | win]
-build_test_check ()
+# check for completed jobs [lxplus | macosx | win]
+build_test_completed ()
 {
+	local marker
+
 	for arch in "$@" ; do
-		if [ ! -s build-test-$arch.run ] || [ "`cat build-test-$arch.run`" != "finished" ] ; then
-			clean_exit
+		if [ -s build-test-$arch.out ] ; then
+			marker=`perl -ne '/===== End of build and tests =====/ && print "found"' build-test-$arch.out`
+			[ "$?" != "0" ] && echo "ERROR: unable to search for end marker (perl)"
+			[ "$marker" != "found" ] && return 1
 		fi
 	done
+	return 0
+}
+
+build_test_check ()
+{
+	if [ "$force" != "force" ] ; then
+		if ! build_test_completed "$@" ; then
+			echo "Reports not yet completed, retrying later..."
+			echo `date`
+			clean_tmp && exit
+		fi
+	fi
 }
 
 # look for failed tests [lxplus | macosx | win]
@@ -46,13 +64,14 @@ build_test_report ()
 		else
 			rm -f tests/reports/${olddate}_build-test-$arch.out
 			cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
-			[ "$?" != "0" ] && echo "ERROR: backup of build-test-$arch.out failed (check cp)"
+			[ "$?" != "0" ] && echo "ERROR: backup of build-test-$arch.out failed (cp)"
 
-			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out >> tests-failed.tmp
-			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (check perl)"
+			perl -ne '/: FAIL|ERROR: / && print' build-test-$arch.out >> build-test-failed.tmp
+			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (perl)"
 
-			perl -ne '/: FAIL|ERROR: / && print ; /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> tests-result.tmp
-			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (check perl)"
+			perl -ne '/: FAIL|ERROR: /                 && print ;
+			          /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> build-test-result.tmp
+			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (perl)"
 		fi
 	done
 }
@@ -61,38 +80,34 @@ build_test_report ()
 build_test_send ()
 {
 	local status
+	local completed
 
-	if [ -s tests-failed.tmp ] ; then
-		status="failed"
-	else
-		status="passed"
-	fi
+	[ -s build-test-failed.tmp ] && status="failed" || status="passed"
 
-	echo "===== Tests $status ====="                                  > build-test-report.out
-	date                                                             >> build-test-report.out
-	echo "For details, see report files:"                            >> build-test-report.out
-	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out"    >> build-test-report.out
+	echo "===== Tests $status ====="                               > build-test-report.out
+	date                                                          >> build-test-report.out
+	echo "For details, see report files:"                         >> build-test-report.out
+	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
 	for arch in "$@" ; do
-		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out" >> build-test-report.out
+		build_test_completed $arch && completed="" || completed=" (incomplete)"
+		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-report.out
 	done
-	echo "$lxpdir/tests/reports"                                     >> build-test-report.out
-	echo "$lxpdir/tests"                                             >> build-test-report.out
-	cat tests-result.tmp                                             >> build-test-report.out
+	echo "$lxpdir/tests/reports"                                  >> build-test-report.out
+	echo "$lxpdir/tests"                                          >> build-test-report.out
+	cat build-test-result.tmp                                     >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ($status)" mad-src@cern.ch
-		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (check mail)"
+		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (mail)"
 	fi
 	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
 }
 
-# tag reports as processed [lxplus | macosx | win]
-build_test_proc ()
-{
-	for arch in "$@" ; do
-		echo "processed `date`" > build-test-$arch.run
-	done
-}
+# clean all and quit
+[ "$1" == "clean" -o "$1" == "cleanall" ] && clean_all && exit
+
+# report already done
+[ -s "build-test-report.out" ] && exit
 
 # cleaning
 clean_tmp
@@ -101,8 +116,8 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-scp -q "$macdir/build-test-macosx.*" "$macdir/build-test-win.*" .
-[ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (check scp)"
+scp -q "$macdir/build-test-macosx.out" "$macdir/build-test-win.out" .
+[ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (scp)"
 
 # check if non-local reports are finished
 build_test_check         macosx win
@@ -113,17 +128,10 @@ build_test_report lxplus macosx win
 # send the final report
 build_test_send   lxplus macosx win
 
-# mark all reports as processed
-build_test_proc   lxplus macosx win
-
-# update status of remote reports
-scp -q build-test-macosx.run build-test-win.run "$macdir"
-[ "$?" != "0" ] && echo "ERROR: unable to update macosx report (check scp)"
-
 # report errors if any
-if [ -s build-test-report.log ] ; then
+if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
 	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors" mad@cern.ch
 	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
 fi
 
-clean_exit
+clean_tmp

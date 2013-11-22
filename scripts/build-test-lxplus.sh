@@ -92,7 +92,9 @@ make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=3
 make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
 [ "$?" != "0" ] && echo "ERROR: error restoring the default version"
 
-echo -e "\n===== End of build and tests ====="
-date
+# cleanup lxplus node
+rm -f build-test-lxplus.run
 
-echo "finished" > build-test-lxplus.run
+# date & end marker
+date
+echo -e "\n===== End of build and tests ====="

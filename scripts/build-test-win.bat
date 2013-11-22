@@ -19,13 +19,10 @@ set GFC=c:\mingw64\bin\gfortran
 if "%1"=="dont-redirect" shift & goto next
 %rm% -f build-test-win.out
 call scripts\build-test-win.bat dont-redirect %* > build-test-win.out 2>&1
-%scp% -q -i c:/users/ldeniau/.ssh/id_rsa *-win32.exe *-win64.exe build-test-win.* "mad@macserv15865:Projects/madX"
+%scp% -q -i c:/users/ldeniau/.ssh/id_rsa build-test-win.out *-win32.exe *-win64.exe "mad@macserv15865:Projects/madX"
 exit /B 
 
 :next
-
-%uname% -n > build-test-win.run
-%scp% -q -i c:/users/ldeniau/.ssh/id_rsa build-test-win.run "mad@macserv15865:Projects/madX"
 
 %echo% -e "\n===== Start of build and tests ====="
 %date%
@@ -85,7 +82,6 @@ REM restore the default version
 %make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
 if ERRORLEVEL 1 %echo% "ERROR: error restoring the default version"
 
-%echo% -e "\n===== End of build and tests ====="
+REM date & end marker
 %date%
-
-%echo% -n "finished" > build-test-win.run
+%echo% -e "\n===== End of build and tests ====="

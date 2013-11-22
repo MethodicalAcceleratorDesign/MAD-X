@@ -9,7 +9,6 @@ export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 # I/O redirection
 rm -f build-test-macosx.out
 exec 1> build-test-macosx.out 2>&1
-uname -n > build-test-macosx.run
 
 echo "\n===== Start of build and tests ====="
 date
@@ -77,7 +76,6 @@ make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=
 make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null
 [ "$?" != "0" ] && echo "ERROR: error restoring the default version"
 
-echo "\n===== End of build and tests ====="
+# date & end marker
 date
-
-echo "finished" > build-test-macosx.run
+echo "\n===== End of build and tests ====="
