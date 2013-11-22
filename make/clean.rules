@@ -19,8 +19,6 @@
 .PHONY: clean cleandir cleantest
 .PHONY: cleanc cleancxx cleanf90 cleandep cleanprj cleanbuild cleanall
 
-override RM = rm -f
-
 clean:
 	$E "** Cleaning local files"
 	$_ $(RM) core
@@ -31,15 +29,12 @@ cleandir: clean
 ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
 else
-	$_ $(RM) $(wildcard *~ */*~ */*/*~ */*/*/*~ */*/*/*/*~ */*/*/*/*/*~ */*/*/*/*/*/*~ */*/*/*/*/*/*/*~) 
+	$E "not supported on Windows platforms"
 endif
 
-cleantest:
-	$E "** Cleaning tests files"
-	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
-	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
-	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
-	$_ $(RM) $(wildcard tests/test-*/*.ps tests/test-*/Maxwellian_bend_for_ptc.txt) # MADX specific
+cleandep:
+	$E "** Removing DEP generated files"
+	$_ $(RM) $(OBJDIR)$/*.d
 
 cleanc:
 	$E "** Cleaning C generated files"
@@ -57,9 +52,12 @@ cleanf90:
 	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 	$_ $(RM) $(OBJDIR)$/*.mod
 
-cleandep:
-	$E "** Removing DEP generated files"
-	$_ $(RM) $(OBJDIR)$/*.d
+cleantest:
+	$E "** Cleaning tests files"
+	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
+	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
+	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
+	$_ $(RM) $(wildcard tests/test-*/*.ps tests/test-*/Maxwellian_bend_for_ptc.txt) # MADX specific
 
 cleanbin:
 	$E "** Removing binaries"
