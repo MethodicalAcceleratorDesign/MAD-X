@@ -73,7 +73,7 @@ subroutine cavtouschek (um,uloss,iflag)
      else
         umt = umt+2d0/(harmonl*eta*pi)*c0
      endif
-
+     
   endif
 11 continue
 
@@ -88,7 +88,7 @@ subroutine cavtouschek (um,uloss,iflag)
   endif
 
   um=abs(um)*beta**2
-
+  
   RETURN
 END subroutine cavtouschek
 
@@ -190,53 +190,57 @@ subroutine touschek
   tol  = get_value('touschek ', 'tolerance ')
   n    = get_option('touschek_table ')
 
+
+  !--- 2013-Nov-22  09:01:12  ghislain: moved the search for proper RF cavities 
+  !    and setup of bucket boundaries from within the loop over elements below.
+     call cavtouschek(um,uloss,iflag)
+     um1 = um
+
+     if (um1.eq.0) then
+        call aawarn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
+        return
+     endif
+        
+     if (iflag .eq.1) then
+        call aawarn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
+        return
+     endif
+
+     km = ATAN(sqrt(um1))
+     pi2 = pi/2.d0
+  !--- end code movement on 2013-Nov-22  09:04:45  ghislain
+
   ! ****** Start new Twiss Table reading *****************
   !
   call table_range('twiss ', '#s/#e ', range)
   !      print *, 'Range for Table ', range(1), range(2)
-  flag = double_from_table_row('twiss ', 's ', range(1), s1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'betx ', range(1), bx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'bety ', range(1), by1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'alfx ', range(1), ax1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'alfy ', range(1), ay1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dx ', range(1), dx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dpx ', range(1), dpx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dy ', range(1), dy1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dpy ', range(1), dpy1)
-  if (flag .ne. 0)  goto 102
+  
+  if (double_from_table_row('twiss ', 's ',    range(1), s1)   .ne. 0) goto 102 
+  if (double_from_table_row('twiss ', 'betx ', range(1), bx1)  .ne. 0) goto 102 
+  if (double_from_table_row('twiss ', 'bety ', range(1), by1)  .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'alfx ', range(1), ax1)  .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'alfy ', range(1), ay1)  .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'dx ',   range(1), dx1)  .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'dpx ',  range(1), dpx1) .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'dy ',   range(1), dy1)  .ne. 0) goto 102
+  if (double_from_table_row('twiss ', 'dpy ',  range(1), dpy1) .ne. 0) goto 102
 
   ! ********** Start Do loop ***************
   !
   j = restart_sequ()
   do i = range(1)+1, range(2)
      j = advance_to_pos('twiss ', i)
-     flag = string_from_table_row('twiss ', 'name ', i, name)
-     flag = double_from_table_row('twiss ', 's ', i, s2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'betx ', i, bx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'bety ', i, by2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'alfx ', i, ax2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'alfy ', i, ay2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dx ', i, dx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dpx ', i, dpx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dy ', i, dy2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dpy ', i, dpy2)
-     if (flag .ne. 0)  goto 102
+
+     if (string_from_table_row('twiss ', 'name ', i, name) .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 's ',    i, s2)   .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'betx ', i, bx2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'bety ', i, by2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'alfx ', i, ax2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'alfy ', i, ay2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dx ',   i, dx2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dpx ',  i, dpx2) .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dy ',   i, dy2)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dpy ',  i, dpy2) .ne. 0) goto 102
 
      dels = s2-s1
      sdum = half * (s2 + s1)
@@ -265,24 +269,6 @@ subroutine touschek
      fb2 = sqrt(fb1**2-( bx**2*by**2*sigh2/(beta2*beta2*gamma2       &
           *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)          &
           +(dy**2/sigy2))))
-
-     call cavtouschek(um,uloss,iflag)
-     um1 = um
-
-     if (um1.eq.0) then
-        call aawarn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
-        goto 101
-     endif
-
-     if (iflag .eq.1) then
-        call aawarn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
-     endif
-
-     !---- calculates the Piwinski integral
-
-     km = ATAN(sqrt(um1))
-
-     pi2 = pi/2.d0
 
      piwint = DGAUSS(ftousch,km,pi2,tol)          
      litousch = ccost*fact*piwint
@@ -319,10 +305,6 @@ subroutine touschek
      dpx1 = dpx2
 
   enddo
-  goto 101
-102 continue
-  call aawarn('TOUSCHEK ', 'table value not found, rest skipped ')
-101 continue
 
   tltouschek=1d0/tlitouschek
 
@@ -332,6 +314,11 @@ subroutine touschek
   print *, 'Touschek Lifetime         ', tltouschek,  '[seconds]   ', tltouschek/3600.,'[hours]'
 
   RETURN
+
+102 continue
+  call aawarn('TOUSCHEK ', 'table value not found, rest skipped ')
+  return
+  
 end subroutine touschek
 ! ***************************************************************
 double precision function ftousch(k)
