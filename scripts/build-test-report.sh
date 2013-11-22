@@ -97,7 +97,7 @@ build_test_send ()
 	cat build-test-result.tmp                                     >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ($status)" mad-src@cern.ch
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report (${thedate}, $status)" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (mail)"
 	fi
 	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
@@ -106,7 +106,7 @@ build_test_send ()
 # clean all and quit
 [ "$1" == "clean" -o "$1" == "cleanall" ] && clean_all && exit
 
-# report already done
+# report already exists, prevent erasing it even with "force"
 [ -s "build-test-report.out" ] && exit
 
 # cleaning
@@ -116,7 +116,7 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-scp -q "$macdir/build-test-macosx.out" "$macdir/build-test-win.out" .
+scp -q -p "$macdir/build-test-macosx.out" "$macdir/build-test-win.out" .
 [ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (scp)"
 
 # check if non-local reports are finished
@@ -130,7 +130,7 @@ build_test_send   lxplus macosx win
 
 # report errors if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
-	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors" mad@cern.ch
+	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
 	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
 fi
 
