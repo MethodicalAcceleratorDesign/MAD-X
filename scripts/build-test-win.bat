@@ -89,4 +89,3 @@ if ERRORLEVEL 1 %echo% "ERROR: error restoring the default version"
 %date%
 
 %echo% -n "finished" > build-test-win.run
-

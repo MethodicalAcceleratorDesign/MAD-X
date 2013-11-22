@@ -80,4 +80,4 @@ make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null
 echo "\n===== End of build and tests ====="
 date
 
-echo -n "finished" > build-test-macosx.run
+echo "finished" > build-test-macosx.run
