@@ -4,6 +4,7 @@ setlocal
 REM run:
 REM scripts/build-test-win.bat [cleanall]
 
+REM commands
 set CAT=c:\gnuwin32\bin\cat
 set DATE=c:\gnuwin32\bin\date
 set ECHO=c:\gnuwin32\bin\echo
@@ -16,10 +17,14 @@ set GCC=c:\mingw64\bin\gcc
 set GCXX=c:\mingw64\bin\g++
 set GFC=c:\mingw64\bin\gfortran
 
+REM settings
+set SSHRSA="c:/users/ldeniau/.ssh/id_rsa"
+set MACDIR="mad@macserv15865.cern.ch:Projects/madX"
+
 if "%1"=="dont-redirect" shift & goto next
 %rm% -f build-test-win.out
 call scripts\build-test-win.bat dont-redirect %* > build-test-win.out 2>&1
-%scp% -q -i c:/users/ldeniau/.ssh/id_rsa build-test-win.out *-win32.exe *-win64.exe "mad@macserv15865:Projects/madX"
+%scp% -q -i %sshrsa% build-test-win.out *-win32.exe *-win64.exe %macdir%
 exit /B 
 
 :next
