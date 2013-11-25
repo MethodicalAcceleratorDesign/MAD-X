@@ -112,10 +112,10 @@ subroutine touschek
        restart_sequ,string_from_table_row,advance_to_pos,get_string,iflag
   double precision get_value,get_variable,                          &
        ccost,rr,bx,by,ax,ay,dx,dpx,dy,dpy,pi,                            &
-       sigx2,sigy2,ddx2,ddy2,disigh2,sigh2,fact,                         &
+       sigx2,sigy2,ddx2,ddy2,sigh2,fact,                                 &
        um,DGAUSS,piwint,litousch,tlitouschek,litouschw,                  &
        dels,s1,s2,dx1,dx2,dpx1,dpx2,ax1,                                 &
-       ax2,bx1,bx2,beta2,gamma2,tol,fa0,fa1,fa2,                         &
+       ax2,bx1,bx2,beta2,gamma2,tol,fb0,                                 &
        dy1,dy2,dpy1,dpy2,ay1,ay2,by1,by2,sdum, half,                     &
        tltouschek,pi2,km,ftousch,uloss
 
@@ -191,8 +191,8 @@ subroutine touschek
   n    = get_option('touschek_table ')
 
 
-  !--- 2013-Nov-22  09:01:12  ghislain: moved the search for proper RF cavities 
-  !    and setup of bucket boundaries from within the loop over elements below.
+  !--- 2013-Nov-22  09:01:12  ghislain: moved the search for RF cavities 
+  !    and setup of bucket boundaries outside of the loop over elements below
      call cavtouschek(um,uloss,iflag)
      um1 = um
 
@@ -225,7 +225,7 @@ subroutine touschek
   if (double_from_table_row('twiss ', 'dy ',   range(1), dy1)  .ne. 0) goto 102
   if (double_from_table_row('twiss ', 'dpy ',  range(1), dpy1) .ne. 0) goto 102
 
-  ! ********** Start Do loop ***************
+  ! ********** Start loop over elements in range ***************
   !
   j = restart_sequ()
   do i = range(1)+1, range(2)
@@ -243,15 +243,15 @@ subroutine touschek
      if (double_from_table_row('twiss ', 'dpy ',  i, dpy2) .ne. 0) goto 102
 
      dels = s2-s1
-     sdum = half * (s2 + s1)
-     bx  = half * (bx2 + bx1)
-     by  = half * (by2 + by1)
-     ax    = half * (ax2 + ax1)
-     ay    = half * (ay2 + ay1)
-     dx     = half * (dx2 + dx1)
-     dpx    = half * (dpx2 + dpx1)
-     dy     = half * (dy2 + dy1)
-     dpy    = half * (dpy2 + dpy1)
+     sdum = half * (s2   + s1)
+     bx   = half * (bx2  + bx1)
+     by   = half * (by2  + by1)
+     ax   = half * (ax2  + ax1)
+     ay   = half * (ay2  + ay1)
+     dx   = half * (dx2  + dx1)
+     dpx  = half * (dpx2 + dpx1)
+     dy   = half * (dy2  + dy1)
+     dpy  = half * (dpy2 + dpy1)
 
      sigx2 = ex*bx
      sigy2 = ey*by
@@ -259,16 +259,39 @@ subroutine touschek
      ddx2 = (dpx*bx+dx*ax)**2
      ddy2 = (dpy*by+dy*ay)**2
 
-     disigh2 = (1d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2)
-     sigh2 = (1d0/disigh2)
+     sigh2 = 1.d0 / ((1d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2))
+
      fact = sqrt(sigh2)*bx*by/(sigt*sige*sigx2*sigy2)
-     fa0 = 2d0*beta2*gamma2
-     fa1 = (bx**2/sigx2)*(1d0-sigh2*ddx2/sigx2)
-     fa2 = (by**2/sigy2)*(1d0-sigh2*ddy2/sigy2)
-     fb1 = (fa1 + fa2)/fa0
-     fb2 = sqrt(fb1**2-( bx**2*by**2*sigh2/(beta2*beta2*gamma2       &
-          *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)          &
-          +(dy**2/sigy2))))
+
+     fb1 = ( bx**2/sigx2 * (1d0-sigh2*ddx2/sigx2) +   &
+             by**2/sigy2 * (1d0-sigh2*ddy2/sigy2) ) /  &
+           (2d0*beta2*gamma2)
+
+     !--- 2013-Nov-25  19:04:21  ghislain: this is prone to numerical instability in some cases
+     !                                     where the two terms fb1 and fb0 (below) are equal.
+     ! fb2 = sqrt(fb1**2-( bx**2*by**2*sigh2/(beta2*beta2*gamma2       &
+     !      *gamma2*sigx2*sigy2)*((1d0/sige**2)+(dx**2/sigx2)          &
+     !      +(dy**2/sigy2))))
+
+     fb0  = sqrt( bx*by*sigh2/(beta2**2*gamma2**2*ex*ey) * &
+                  (1.d0/sige**2 + (dx**2/sigx2) + (dy**2/sigy2)) ) 
+
+     if ( 1.d0 - fb0/fb1 .lt. 0.d0 ) then ! numerical instability
+        if ( 1.d0 - fb0/fb1 .gt. -1.e-15) then ! apply some reasonable tolerance
+           fb2 = 0.d0
+        else
+           print *, ' '
+           print *, ' TOUSCHEK: numerical instability in input parameter B2 to Bessel function'
+           print *, ' B2**2 is equal to         ', fb1**2-fb0**2
+           print *, ' (1 - FB0/FB1) is equal to ', 1.d0 - fb0/fb1
+           print *, ' Abort calculation.'
+           return
+        endif
+     else
+        fb2 = sqrt(fb1 * (fb1 + fb0) * (1 - fb0/fb1))           
+     endif
+
+     ! print *, fb1, fb0, (1.d0 - fb0/fb1), fb2
 
      piwint = DGAUSS(ftousch,km,pi2,tol)          
      litousch = ccost*fact*piwint
@@ -303,6 +326,9 @@ subroutine touschek
      ay1  = ay2
      dx1  = dx2
      dpx1 = dpx2
+     !--- 2013-Nov-25  17:45:56  ghislain: added the following missing two lines
+     dy1  = dy2
+     dpy1 = dpy2
 
   enddo
 
@@ -334,7 +360,8 @@ double precision function ftousch(k)
   integer  iflag
 
   z = TAN(k)**2
-  pi=get_variable('pi ')
+  !-- 2013-Nov-25  18:25:55  ghislain: commented since not used
+  ! pi=get_variable('pi ')
 
   ZI = fb2*z
   ZR = 0.
@@ -352,7 +379,7 @@ double precision function ftousch(k)
      ftousch = aftoush*BJOR*(exp(-(fb1-fb2)*z)+                      &
           exp(-(fb1+fb2)*z))/2.d0
   end if
-
+  
   return
 end function ftousch
 
@@ -465,6 +492,7 @@ DOUBLE PRECISION FUNCTION DGAUSS(F,A,B,EPS)
   S16=C2*S16
   IF( ABS(S16-S8) .LE. EPS*(1.+ABS(S16)) ) GO TO 5
   BB=C1
+  !print *, const, c2
   IF( 1.D0+ABS(CONST*C2) .NE. 1.D0) GO TO 2
   DGAUSS=0.0D0
   CALL KERMTR('D103.1',LGFILE,MFLAG,RFLAG)

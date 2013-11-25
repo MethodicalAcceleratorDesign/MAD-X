@@ -26,5 +26,5 @@ twiss,chrom,table;
 
 vrf400:= 8.;
 
-touschek,tolerance=1e-7; 
+touschek,tolerance=1e-7,file="touschek.dat";
 
