@@ -105,8 +105,8 @@ include $(makedir)/tester.rules
 include $(makedir)/depend.rules
 
 # cleaning & debugging
-include $(makedir)/clean.rules
 include $(makedir)/info.rules
+include $(makedir)/clean.rules
 
 # user's postprocessing extra stuff
 -include $(FILE_POST)

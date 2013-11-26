@@ -52,13 +52,6 @@ cleanf90:
 	$_ $(RM) $(addprefix $(OBJDIR)$/,$(patsubst %.F90,%.d,$(patsubst %.f90,%.d,$(FC_SRC))))
 	$_ $(RM) $(OBJDIR)$/*.mod
 
-cleantest:
-	$E "** Cleaning tests files"
-	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
-	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
-	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
-	$_ $(RM) $(wildcard tests/test-*/*.ps tests/test-*/Maxwellian_bend_for_ptc.txt) # MADX specific
-
 cleanbin:
 	$E "** Removing binaries"
 ifneq ($(OSTYPE),Windows)
@@ -77,4 +70,16 @@ cleanbuild:
 
 cleanall: cleandir cleanbuild cleantest
   
+ifeq ($(OSTYPE),Windows)
+# assume that GnuWin32 rm is installed
+override RM := rm -f
+endif
+
+cleantest:
+	$E "** Cleaning tests files"
+	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
+	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
+	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
+	$_ $(RM) $(wildcard tests/test-*/*.ps tests/test-*/Maxwellian_bend_for_ptc.txt) # MADX specific
+
 # end of makefile
