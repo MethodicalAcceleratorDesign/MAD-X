@@ -40,7 +40,7 @@ madx-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@ $@ &&,) $(CP) $@
 
 madx-win32-intel madx-win32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) madx32.exe
 
 #
 # numdiff
@@ -55,5 +55,5 @@ numdiff-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@ $@ &&,) $(CP) $@
 
 numdiff-win32-intel numdiff-win32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32.exe
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) numdiff32.exe
 

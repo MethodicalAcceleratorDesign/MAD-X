@@ -27,7 +27,7 @@
 # preprocessor flags
 #
 
-CPPFLAGS += -D_LF95
+CPPFLAGS = -D_LF95
 
 #
 # compiler flags
@@ -51,7 +51,7 @@ endif
 # extra flags
 #
 
-FFLAGS += --mod $(OBJDIR) $(addprefix -I,$(FC_DIR))
+FFLAGS += --mod $(OBJDIR)
 
 # end of makefile
 

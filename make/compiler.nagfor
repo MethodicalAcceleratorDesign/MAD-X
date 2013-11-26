@@ -20,7 +20,7 @@
 # makedep
 #
 
-# FDEP = fpp -M $(addprefix -I,$(FC_DIR))
+# FDEP = fpp -M
 
 #
 # preprocessor flags
@@ -54,7 +54,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR) \
-          -I$(OBJDIR) $(addprefix -I,$(FC_DIR))
+FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR) -I$(OBJDIR)
 
 # end of makefile

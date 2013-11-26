@@ -43,7 +43,9 @@ trunc  = $(if $(and $1,$2),$(if $(findstring $1,$(lastword $2)),$2,\
 assert = $(if $1,,$(error $2))
 exists = $(if $(wildcard $1),,$(error $2))
 mkdir  = $(if $(wildcard $1),,$(shell mkdir $(if $(windir),,-p) $1))
-optdir = $(addprefix $1,$(strip $(wildcard $2)))
+pfxdir = $(addprefix $1,$(strip $(wildcard $2)))
+incdir = $(call pfxdir,-I,$1)
+libdir = $(call pfxdir,-L,$1)
 
 # debugging macros: make target print-the_macro_in_target
 print-%: ; @$(error $* is $($*) ($(value $*)) (from $(origin $*)))

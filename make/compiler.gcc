@@ -20,7 +20,7 @@
 # makedep
 #
 
-CDEP = $(CC) -MM $(addprefix -I,$(CC_DIR))
+CDEP = $(CC) -MM
 
 #
 # preprocessor flags
@@ -54,7 +54,7 @@ endif
 # extra flags
 #
 
-CFLAGS += -pipe $(addprefix -I,$(CC_DIR))
+CFLAGS += -pipe
  
 #
 # diagnostics (gcc is the reference)

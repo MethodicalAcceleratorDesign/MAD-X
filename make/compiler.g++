@@ -20,7 +20,7 @@
 # makedep
 #
 
-CXXDEP = $(CXX) -MM $(addprefix -I,$(CXX_DIR))
+CXXDEP = $(CXX) -MM
 
 #
 # preprocessor flags
@@ -54,7 +54,7 @@ endif
 # extra flags
 #
 
-CXXFLAGS += -pipe $(addprefix -I,$(CXX_DIR))
+CXXFLAGS += -pipe
 
 #
 # diagnostics (g++ is the reference)

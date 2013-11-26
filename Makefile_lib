@@ -33,14 +33,14 @@ endif
 # Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
-LIBS   += $(if $(call eq,$(ARCH),32),-L/usr/lib,) -lX11
+LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lX11
 LDLIBS += -lstdc++ -lm
 endif
 
 # Libraries on MacOSX
 
 ifeq ($(OSTYPE),Darwin)
-LIBS   += -L/usr/X11/lib -lX11
+LIBS   += $(call libdir,/usr/X11/lib) -lX11
 LDLIBS += -lstdc++ -lm
 endif
 

@@ -49,19 +49,19 @@ madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@
 
 madx-macosx32-intel madx-macosx32: libs/gc/libgc-macosx32-intel.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) madx32
 
 madx-macosx64-intel madx-macosx64: libs/gc/libgc-macosx64-intel.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) madx64
 
 madx-macosx32-gnu: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) madx32
 
 madx-macosx64-gnu: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) madx64
 
 #
 # libgc
@@ -99,19 +99,19 @@ libmadx-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
 libmadx-macosx32-intel libmadx-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
 
 libmadx-macosx64-intel libmadx-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
 libmadx-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
 
 libmadx-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
 #
 # libptc
@@ -128,19 +128,19 @@ libptc-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
 libptc-macosx32-intel libptc-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
 
 libptc-macosx64-intel libptc-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
 libptc-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
 
 libptc-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
 #
 # numdiff
@@ -156,18 +156,18 @@ numdiff-macosx%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-macosx32-intel numdiff-macosx32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK) numdiff32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) numdiff32
 
 numdiff-macosx64-intel numdiff-macosx64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) numdiff64
 
 numdiff-macosx32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) numdiff32
 
 numdiff-macosx64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) numdiff64
 
 # end of makefile

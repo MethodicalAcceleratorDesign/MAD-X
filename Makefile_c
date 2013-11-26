@@ -19,7 +19,6 @@
 vpath %.h src
 vpath %.c src
 
-CC_DIR := src
 CC_HDR := $(notdir $(wildcard src/mad_*.h))
 CC_SRC := $(notdir $(wildcard src/mad_*.c))
 
@@ -30,7 +29,7 @@ CC_SRC +=
 mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
                         -D_VERSION_DATE=$(VERSION_DATE) \
                         -D_VERSION_OSTYPE=$(OSTYPE)
-mad_gxx11c.o: CFLAGS += -I/usr/X11/include -I/opt/X11/include \
+mad_gxx11c.o: CFLAGS += $(call incdir,/usr/X11/include /opt/X11/include) \
                         $(if $(call neq,$(CCNAME),icc),,-diag-disable 161) \
                         $(if $(call neq,$(CCNAME),gcc),,-Wno-variadic-macros)
 mad_dict.o:   CFLAGS += $(if $(call neq,$(CCNAME),gcc),,-Wno-overlength-strings)
@@ -44,7 +43,7 @@ ifeq ($(OSTYPE),Windows)
 vpath %.h libs/gc/gc/include
 vpath %.c libs/gc/gc
 
-CFLAGS += -Ilibs/gc/gc/include -DSTATIC=static \
+CFLAGS += $(call incdir,libs/gc/gc/include) -DSTATIC=static \
           $(if $(call neq,$(CCNAME),icl),,/Qdiag-disable:344,869,1684,2312)
 CC_HDR += $(notdir $(wildcard libs/gc/gc/include/*.h))
 CC_SRC += alloc.c reclaim.c allchblk.c misc.c mach_dep.c os_dep.c mark_rts.c \

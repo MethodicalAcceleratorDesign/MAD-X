@@ -24,14 +24,14 @@ LDFLAGS = -m$(ARCH) -O$(NOPT)
 LDLIBS  =
 
 # attemp to find the gnu libs directory for g95 (GCC only)
-LDLIBS += -L$(GNULIBDIR)
+LDLIBS += $(call libdir,$(GNULIBDIR))
 
 ifneq ($(CXXNAME),)
-  LDLIBS += -lstdc++
+LDLIBS += -lstdc++
 endif
 
 ifeq ($(STATIC),yes)
-  LDLIBS += -lc -lgcc_eh -lgcc
+LDLIBS += -lc -lgcc_eh -lgcc
 endif
 
 ifeq ($(OSTYPE),Darwin)

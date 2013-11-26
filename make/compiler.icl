@@ -44,7 +44,7 @@ ifeq ($(CCNAME),icl)
 #
 
 ifneq ($(SED),)
-CDEP = $(CC) /nologo /Zs /QMM $(addprefix /I,$(CC_DIR))
+CDEP = $(CC) /nologo /Zs /QMM
 CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
 endif
 
@@ -76,7 +76,7 @@ endif
 # extra flags
 #
 
-CFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CC_DIR))
+CFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict
 
 #
 # command translator
@@ -97,7 +97,7 @@ ifeq ($(CXXNAME),icl)
 #
 
 ifneq ($(SED),)
-CXXDEP = $(CXX) /nologo /Zs /QMM $(addprefix /I,$(CXX_DIR))
+CXXDEP = $(CXX) /nologo /Zs /QMM
 CXXDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
 endif
 
@@ -129,7 +129,7 @@ endif
 # extra flags
 #
 
-CXXFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict $(addprefix /I,$(CXX_DIR))
+CXXFLAGS += /nologo /Qprec /fp:strict /EHc /Qrestrict
 
 #
 # command translator

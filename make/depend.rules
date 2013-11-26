@@ -38,7 +38,7 @@ $(OBJDIR)/%.d: %.cpp
 #
 $(OBJDIR)/%.d: %.f90
 	$E "*** Computing $(@F)"
-	$_ $(call FC_tr,$(FDEP) $<) $(FDEP_tr) > $@
+	$_ $(call FC_tr,$(FDEP) $(CPPFLAGS) $<) $(FDEP_tr) > $@
 
 $(OBJDIR)/%.d: %.F90
 	$E "*** Computing $(@F)"

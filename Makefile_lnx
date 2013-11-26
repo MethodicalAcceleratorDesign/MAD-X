@@ -53,19 +53,19 @@ madx-linux%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@
 
 madx-linux32-intel madx-linux32: libs/gc/libgc-linux32-intel.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK) madx32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) madx32
 
 madx-linux64-intel madx-linux64: libs/gc/libgc-linux64-intel.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK) madx64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) madx64
 
 madx-linux32-gnu: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) madx32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) madx32
 
 madx-linux64-gnu: libs/gc/libgc-linux64-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) madx64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) madx64
 
 madx-linux32-nagfor: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
@@ -119,19 +119,19 @@ libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
 libmadx-linux32-intel libmadx-linux32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-intel libmadx-linux64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
 libmadx-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-gnu:
-	$E "*** Building $@"                               # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
 #
 # libptc
@@ -148,19 +148,19 @@ libptc-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
 libptc-linux32-intel libptc-linux32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
 
 libptc-linux64-intel libptc-linux64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
 
 libptc-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
 
 libptc-linux64-gnu:
-	$E "*** Building $@"                               # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes STATIC=no && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
+	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu STATIC=no && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
 
 #
 # numdiff
@@ -176,18 +176,18 @@ numdiff-linux%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-linux32-intel numdiff-linux32:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 Intel=yes && $(MAKE_LINK) numdiff32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) numdiff32
 
 numdiff-linux64-intel numdiff-linux64:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 Intel=yes && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) numdiff64
 
 numdiff-linux32-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 GNU=yes && $(MAKE_LINK) numdiff32
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK) numdiff32
 
 numdiff-linux64-gnu:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 GNU=yes && $(MAKE_LINK) numdiff64
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) numdiff64
 
 # end of makefile
