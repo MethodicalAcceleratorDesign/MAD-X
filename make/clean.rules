@@ -77,9 +77,9 @@ endif
 
 cleantest:
 	$E "** Cleaning tests files"
-	$_ $(RM) $(wildcard tests/test-*/*.out tests/$(NDSUM))
-	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests/test-*/*.ref)))
-	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*/*.ref.gz)))
-	$_ $(RM) $(wildcard tests/test-*/*.ps tests/test-*/Maxwellian_bend_for_ptc.txt) # MADX specific
+	$_ $(RM) $(wildcard tests$/test-*$/*.out tests$/$(NDSUM))
+	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests$/test-*$/*.ref)))
+	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests/test-*$/*.ref.gz)))
+	$_ $(RM) $(wildcard tests$/test-*/*.ps tests$/test-*$/Maxwellian_bend_for_ptc.txt) # MADX specific
 
 # end of makefile
