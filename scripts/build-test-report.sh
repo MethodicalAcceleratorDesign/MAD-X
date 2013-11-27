@@ -62,7 +62,7 @@ build_test_report ()
 
 	for arch in "$@" ; do
 		build_test_completed $arch && completed="" || completed=" (incomplete)"
-		echo -e "\n=====\n$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed\n" >> build-test-result.tmp
+		echo -e "\n=====\n$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
 
 
 		if [ ! -s build-test-$arch.out ] ; then
