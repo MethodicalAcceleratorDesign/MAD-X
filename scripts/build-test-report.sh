@@ -64,7 +64,6 @@ build_test_report ()
 		build_test_completed $arch && completed="" || completed=" (incomplete)"
 		echo -e "\n=====\n$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
 
-
 		if [ ! -s build-test-$arch.out ] ; then
 			echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
 		else
