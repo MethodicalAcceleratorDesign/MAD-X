@@ -16,8 +16,8 @@ readonly force="$1"
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
 readonly olddate=`date -d "-50 days" "+%Y-%m-%d"`
-readonly macdir="mad@macserv15865.cern.ch:Projects/madX"
-readonly lxpdir="http://cern.ch/madx/madX"
+readonly remdir="mad@macserv15865.cern.ch:Projects/madX"
+readonly webdir="http://cern.ch/madx/madX"
 
 clean_tmp ()
 {
@@ -27,6 +27,18 @@ clean_tmp ()
 clean_all ()
 {
 	rm -f build-test-*.tmp build-test-*.out
+}
+
+# retrieve remote report [lxplus | macosx | win]
+build_test_remote ()
+{
+	for arch in "$@" ; do
+		scp -q -p "$remdir/build-test-$arch.out" build-test-$arch.out
+		[ "$?" != "0" ] && echo "ERROR: unable to retrieve $arch remote report (scp)"
+		cat build-test-$arch.out | tr -d '\r' > build-test-$arch.out.tr
+		mv -f build-test-$arch.out.tr build-test-$arch.out
+	done
+	return 0
 }
 
 # check for completed jobs [lxplus | macosx | win]
@@ -53,6 +65,7 @@ build_test_check ()
 			clean_tmp && exit
 		fi
 	fi
+	return 0
 }
 
 # look for failed tests [lxplus | macosx | win]
@@ -62,7 +75,7 @@ build_test_report ()
 
 	for arch in "$@" ; do
 		build_test_completed $arch && completed="" || completed=" (incomplete)"
-		echo -e "\n=====\n$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
+		echo -e "\n=====\n$webdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
 
 		if [ ! -s build-test-$arch.out ] ; then
 			echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
@@ -79,6 +92,7 @@ build_test_report ()
 			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (perl)"
 		fi
 	done
+	return 0
 }
 
 # send daily reports summary by email [lxplus | macosx | win]
@@ -91,16 +105,19 @@ build_test_send ()
 	echo "===== Tests $status ====="                                           > build-test-report.out
 	date                                                                      >> build-test-report.out
 	echo "For details, see report files:"                                     >> build-test-report.out
-	echo "$lxpdir/tests"                                                      >> build-test-report.out
-	echo "$lxpdir/tests/reports"                                              >> build-test-report.out
-	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out (this file)" >> build-test-report.out
+	echo "$webdir/tests"                                                      >> build-test-report.out
+	echo "$webdir/tests/reports"                                              >> build-test-report.out
+	echo "$webdir/tests/reports/${thedate}_build-test-report.out (this file)" >> build-test-report.out
 	cat build-test-result.tmp                                                 >> build-test-report.out
+
+	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
+	[ "$?" != "0" ] && echo "ERROR: backup of build-test-report.out failed (cp)"
 
 	if [ "$nomail" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (mail)"
 	fi
-	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
+	return 0
 }
 
 # clean all and quit
@@ -116,8 +133,7 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-scp -q -p "$macdir/build-test-macosx.out" "$macdir/build-test-win.out" .
-[ "$?" != "0" ] && echo "ERROR: unable to retrieve macosx report (scp)"
+build_test_remote 		 macosx win
 
 # check if non-local reports are finished
 build_test_check         macosx win
