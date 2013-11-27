@@ -1456,6 +1456,7 @@ tests/test-ptc-twiss-old5/normal_results.cfg -text
 tests/test-ptc-twiss-old5/normal_results.ref -text
 tests/test-ptc-twiss-old5/test-ptc-twiss-old5.cfg -text
 tests/test-ptc-twiss-old5/test-ptc-twiss-old5.madx -text
+tests/test-ptc-twiss-old5/test-ptc-twiss-old5.ref -text
 tests/test-ptc-twiss-old5/twiss_diamond.cfg -text
 tests/test-ptc-twiss-old5/twiss_diamond.ref -text
 tests/test-ptc-twiss-old5/twiss_madx.cfg -text
