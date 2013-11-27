@@ -69,14 +69,9 @@ endef
 # run-test macro
 #
 # $@ = test name & directory
-NDFILES_ZEXT = gz z Z zip tgz taz taZ bz bz2 tbz tbz2
-NDFILES_TTST = $(wildcard tests/$@/$@.ref)
-NDFILES_ZTST = $(wildcard $(addsuffix $(NDFILES_ZEXT),tests/$@/$@.ref.))
-NDFILES_TREF = $(filter-out $(NDFILES_TTST),$(sort $(wildcard tests/$@/*.ref)))
-NDFILES_ZREF = $(filter-out $(NDFILES_ZTST),$(sort $(wildcard $(addsuffix $(NDFILES_ZEXT),tests/$@/*.ref.))))
-NDFILES_REF  = $(NDFILES_TTST) $(NDFILES_ZTST) $(NDFILES_TREF) $(NDFILES_ZREF)
-NDFILES_BAS  = $(basename $(NDFILES_TTST) $(basename $(NDFILES_ZTST)) $(NDFILES_TREF) $(basename $(NDFILES_ZREF)))
-NDFILES_OUT  = $(addsuffix .out,$(NDFILES_BAS)) $(NDFILES_BAS)
+NDFILES_RGET = $(sort $(notdir $(basename $(wildcard tests/$@/*.ref) $(basename $(wildcard tests/$@/*.ref.*)))))
+NDFILES_REF  = $@ $(filter-out $@,$(NDFILE_RGET))
+NDFILES_OUT  = $(addsuffix .out,$(NDFILES_REF)) $(NDFILES_REF)
 
 #
 # debug selected files
@@ -87,12 +82,7 @@ define trace-test
 @echo NDIFFCMD     = $(NDIFFCMD)
 @echo NDIFF_R      = $(NDIFF_R)
 @echo NDIFF_I      = $(NDIFF_I)
-@echo NDFILES_TTST = $(NDFILES_TTST)
-@echo NDFILES_ZTST = $(NDFILES_ZTST)
-@echo NDFILES_TREF = $(NDFILES_TREF)
-@echo NDFILES_ZREF = $(NDFILES_ZREF)
 @echo NDFILES_REF  = $(NDFILES_REF)
-@echo NDFILES_BAS  = $(NDFILES_BAS)
 @echo NDFILES_OUT  = $(NDFILES_OUT)
 endef
 endif
@@ -106,13 +96,13 @@ endif
 # for each reference file, diff with the generated file + constraints
 define run-test
 $(if $(call eq,$(SHOW),yes),$(trace-test),)
-$(if $(call eq,$(NREF),yes),,$(call exists,$(NDFILES_REF),invalid test $@ -- no reference file found))
+$(if $(call eq,$(NREF),yes),,$(if $(NDFILES_REF),,invalid test $@ -- no reference file found))
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ] &&,) \
-    cd tests$/$@ && $(RM) $(notdir $(NDFILES_OUT)) \
+    cd tests$/$@ && $(RM) $(NDFILES_OUT) \
     $(if $(call eq,$(OSTYPE),Windows),2> _err.txt && $(RM) _err.txt,)
 -$_ cd tests$/$@ && ( $(TESTCMD) 1> $@.out 2>&1 || [ "1" ] )
 -$_ cd tests$/$@ && \
-    $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(notdir $(NDFILES_BAS)) || \
+    $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(NDFILES_REF) || \
     echo "error: $@ failed, check tests$/$@ for details"
 endef
 
