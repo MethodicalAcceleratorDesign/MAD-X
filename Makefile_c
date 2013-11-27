@@ -18,6 +18,7 @@
 
 vpath %.h src
 vpath %.c src
+vpath %.d $(OBJDIR)
 
 CC_HDR := $(notdir $(wildcard src/mad_*.h))
 CC_SRC := $(notdir $(wildcard src/mad_*.c))
@@ -25,14 +26,17 @@ CC_SRC := $(notdir $(wildcard src/mad_*.c))
 CC_HDR += madx.h SDDS.h
 CC_SRC +=
 
+# files specific dependency flags
+$(OBJDIR)/mad_gxx11c.d: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include)
+
 # files specific compiler flag
-mad_gcst.o: CPPFLAGS += -D_VERSION=$(VERSION) \
-                        -D_VERSION_DATE=$(VERSION_DATE) \
-                        -D_VERSION_OSTYPE=$(OSTYPE)
-mad_gxx11c.o: CFLAGS += $(call incdir,/usr/X11/include /opt/X11/include) \
-                        $(if $(call neq,$(CCNAME),icc),,-diag-disable 161) \
-                        $(if $(call neq,$(CCNAME),gcc),,-Wno-variadic-macros)
-mad_dict.o:   CFLAGS += $(if $(call neq,$(CCNAME),gcc),,-Wno-overlength-strings)
+mad_gcst.o: CPPFLAGS   += -D_VERSION=$(VERSION) \
+                          -D_VERSION_DATE=$(VERSION_DATE) \
+                          -D_VERSION_OSTYPE=$(OSTYPE)
+mad_gxx11c.o: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include)
+mad_gxx11c.o: CFLAGS   += $(if $(call neq,$(CCNAME),icc),,-diag-disable 161) \
+                          $(if $(call neq,$(CCNAME),gcc),,-Wno-variadic-macros)
+mad_dict.o:   CFLAGS   += $(if $(call neq,$(CCNAME),gcc),,-Wno-overlength-strings)
 
 # special dependency
 mad_gcst.o: VERSION
@@ -43,8 +47,7 @@ ifeq ($(OSTYPE),Windows)
 vpath %.h libs/gc/gc/include
 vpath %.c libs/gc/gc
 
-CFLAGS += $(call incdir,libs/gc/gc/include) -DSTATIC=static \
-          $(if $(call neq,$(CCNAME),icl),,/Qdiag-disable:344,869,1684,2312)
+CFLAGS += $(if $(call neq,$(CCNAME),icl),,/Qdiag-disable:344,869,1684,2312)
 CC_HDR += $(notdir $(wildcard libs/gc/gc/include/*.h))
 CC_SRC += alloc.c reclaim.c allchblk.c misc.c mach_dep.c os_dep.c mark_rts.c \
           headers.c mark.c obj_map.c blacklst.c finalize.c new_hblk.c dbg_mlc.c \

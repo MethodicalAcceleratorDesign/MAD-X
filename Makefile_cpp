@@ -29,7 +29,7 @@ CPPFLAGS += -D_NTPSA
 endif
 
 ifeq ($(USEGC),yes)
-CPPFLAGS += -D_USEGC $(call incdir,libs/gc/gc/include)
+CPPFLAGS += -D_USEGC -DSTATIC=static $(call incdir,libs/gc/gc/include)
 
 ifeq ($(OSTYPE),Windows)
 CPPFLAGS += -DALL_INTERIOR_POINTERS -DGC_NOT_DLL -DDONT_USE_USER32_DLL
