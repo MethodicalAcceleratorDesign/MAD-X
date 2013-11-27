@@ -166,7 +166,8 @@ retry:
   // allow failure on first non-numbered file for serie
   if (!fp) {
     if (option.serie && idx && *idx == 0) { ++*idx; goto retry; }
-    ensure(!required, "failed to open '%s'", buf);
+    ensure(!required, "unable to find file '%s.ref' or any %scompressed variants", str,
+            idx && *idx ? "numbered/" : "");
   }
 
   // debug information
@@ -180,7 +181,7 @@ retry:
     char zbuf[2*(FILENAME_MAX+100)];
     fclose(fp);
     sprintf(zbuf, "%s %s", option.unzip[zid-1], buf);
-    debug("trying to open compressed file '%s' for reading", zbuf);
+    debug("trying to reopen compressed file '%s' for reading", zbuf);
     fp = popen(zbuf, "r");
     ensure(fp, "failed to execute '%s'", zbuf);
   }

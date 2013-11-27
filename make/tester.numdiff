@@ -100,7 +100,7 @@ $(if $(call eq,$(SHOW),yes),$(trace-test),)
 $(if $(call eq,$(NREF),yes),,$(if $(NDFILES_REF),,invalid test $@ -- no reference file found))
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ],)
 -$_ $(if $(NDFILES_OUT),$(RM) $(NDFILES_OUT),)
--$_ cd tests$/$@ && ( $(TESTCMD) 1> $@.out 2>&1 || [ "1" ] )
+-$_ cd tests$/$@ && ( $(TESTCMD) > $@.out 2>&1 || [ "1" ] )
 -$_ cd tests$/$@ && \
     $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(NDFILES_REF) || \
     echo "error: $@ failed, check tests$/$@ for details"
