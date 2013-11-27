@@ -58,7 +58,13 @@ build_test_check ()
 # look for failed tests [lxplus | macosx | win]
 build_test_report ()
 {
+	local completed
+
 	for arch in "$@" ; do
+		build_test_completed $arch && completed="" || completed=" (incomplete)"
+		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
+
+
 		if [ ! -s build-test-$arch.out ] ; then
 			echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
 		else
@@ -80,7 +86,6 @@ build_test_report ()
 build_test_send ()
 {
 	local status
-	local completed
 
 	[ -s build-test-failed.tmp ] && status="failed" || status="passed"
 
@@ -88,16 +93,12 @@ build_test_send ()
 	date                                                          >> build-test-report.out
 	echo "For details, see report files:"                         >> build-test-report.out
 	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
-	for arch in "$@" ; do
-		build_test_completed $arch && completed="" || completed=" (incomplete)"
-		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-report.out
-	done
 	echo "$lxpdir/tests/reports"                                  >> build-test-report.out
 	echo "$lxpdir/tests"                                          >> build-test-report.out
 	cat build-test-result.tmp                                     >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
-		cat -v build-test-report.out | mail -s "MAD-X builds and tests report (${thedate}, $status)" mad-src@cern.ch
+		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
 		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (mail)"
 	fi
 	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
