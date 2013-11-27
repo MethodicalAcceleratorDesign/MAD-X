@@ -103,7 +103,7 @@ $(if $(call eq,$(NREF),yes),,$(if $(NDFILES_REF),,invalid test $@ -- no referenc
 -$_ cd tests$/$@ && ( $(TESTCMD) > $@.out 2>&1 || [ "1" ] )
 -$_ cd tests$/$@ && \
     $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(NDFILES_REF) || \
-    echo "error: $@ failed, check tests$/$@ for details"
+    echo "error: $@ failed, check output files in tests$/$@ for details"
 endef
 
 # end of makefile
