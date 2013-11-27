@@ -62,7 +62,7 @@ build_test_report ()
 
 	for arch in "$@" ; do
 		build_test_completed $arch && completed="" || completed=" (incomplete)"
-		echo "$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
+		echo -e "\n=====\n$lxpdir/tests/reports/${thedate}_build-test-$arch.out$completed\n" >> build-test-result.tmp
 
 
 		if [ ! -s build-test-$arch.out ] ; then
@@ -89,13 +89,13 @@ build_test_send ()
 
 	[ -s build-test-failed.tmp ] && status="failed" || status="passed"
 
-	echo "===== Tests $status ====="                               > build-test-report.out
-	date                                                          >> build-test-report.out
-	echo "For details, see report files:"                         >> build-test-report.out
-	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out" >> build-test-report.out
-	echo "$lxpdir/tests/reports"                                  >> build-test-report.out
-	echo "$lxpdir/tests"                                          >> build-test-report.out
-	cat build-test-result.tmp                                     >> build-test-report.out
+	echo "===== Tests $status ====="                                           > build-test-report.out
+	date                                                                      >> build-test-report.out
+	echo "For details, see report files:"                                     >> build-test-report.out
+	echo "$lxpdir/tests"                                                      >> build-test-report.out
+	echo "$lxpdir/tests/reports"                                              >> build-test-report.out
+	echo "$lxpdir/tests/reports/${thedate}_build-test-report.out (this file)" >> build-test-report.out
+	cat build-test-result.tmp                                                 >> build-test-report.out
 
 	if [ "$nomail" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
