@@ -2,8 +2,8 @@
   +++++++++++++++++++++++++++++++++++++++++++
   +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.10.14      +
-  + Execution Time Stamp: 15.10.13 19.41.17 +
+  + Code Modification Date: 2013.11.05      +
+  + Execution Time Stamp: 28.11.13 14.16.11 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -65,7 +65,6 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
  After    end:   1.217034119481913E-004  2.933730797772849E-014 -7.969069843483112E-005
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- F
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -121,7 +120,6 @@ Deviation from symplecticity  0.2850940646692440E-09 %
 
             ycomax            pxcomax            pycomax 
     0.008056958782    0.0004263339863    0.0004558719032 
- F
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
