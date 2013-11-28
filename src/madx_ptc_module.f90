@@ -2078,35 +2078,32 @@ CONTAINS
        if (getdebug()>1) then
            print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
        endif
-       default=default-delta0
-       default=default+only_4d0+NOCAVITY0
+       default = default - delta0 + only_4d0 + NOCAVITY0
        i=4
     CASE(5)
        if (getdebug()>1) then
            print*, "my_state: Enforcing DELTA"
        endif
-       default=default+delta0
-       deltap=deltap0
+       default = default + delta0
+       deltap = deltap0
        i=5
     CASE(56)
        if (getdebug()>1) then
            print*, "my_state: Enforcing coasting beam"
        endif
-       default = default - delta0 - only_4d0
-       default = default + NOCAVITY0
-       deltap=deltap0
+       default = default - delta0 - only_4d0 + NOCAVITY0
+       deltap = deltap0
        i=56
     CASE(6)
        i=6
     CASE DEFAULT
-       default=default+only_4d0+NOCAVITY0
+       default = default + only_4d0 + NOCAVITY0
        i=4
     END SELECT
 
     if (i==6) then
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
-          default = default - delta0 - only_4d0
-          default=default +  NOCAVITY0
+          default = default - delta0 - only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
           i=56
        else

@@ -371,7 +371,7 @@ contains
 
     if (getdebug() > 1) then
        print*,"ptc_twiss: Table name is ",table_name
-       print*,"ptc_twiss: Summary table name is", summary_table_name
+       print*,"ptc_twiss: Summary table name is ", summary_table_name
     endif
 
     call cleartables() !defined in madx_ptc_knobs

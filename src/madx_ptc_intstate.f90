@@ -141,7 +141,7 @@ contains
     implicit none
 
     getenforce6D = enforce6D
-    print *, getenforce6D
+!    print *, getenforce6D
 
   end function getenforce6D
 
