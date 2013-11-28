@@ -69,15 +69,16 @@ mad_init(int argc, char *argv[])
 
   // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
   if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
-#ifdef _WIN32
-    int putenv(const char *string);
-    putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
-#else
+#ifndef _WIN32
     setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
-#endif
     execvp(argv[0], argv);
     // should never be reached...
     fprintf(stderr, "fatal error: unable to synchronize Fortran versus C I/O\n");
+#else
+    // int putenv(const char *string);
+    // putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
+    fprintf(stderr, "fatal error: set GFORTRAN_UNBUFFERED_PRECONNECTED=y to synchronize Fortran versus C I/O\n");
+#endif
     exit(EXIT_FAILURE);
   }
 #endif
