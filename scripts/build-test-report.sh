@@ -5,6 +5,12 @@
 rm -f build-test-report.log
 exec 1> build-test-report.log 2>&1
 
+# clean all and quit
+[ "$1" == "clean" -o "$1" == "cleanall" ] && rm -f build-test-*.tmp build-test-*.out && exit
+
+# report already exists, prevent erasing it even with "force"
+[ -s "build-test-report.out" ] && exit
+
 # env settings
 export LC_CTYPE="C"
 export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
@@ -15,18 +21,14 @@ readonly force="$1"
 
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
-readonly olddate=`date -d "-50 days" "+%Y-%m-%d"`
+readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
+# readonly olddate=`date -v-50d "+%Y-%m-%d"` 			# macosx
 readonly remdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
 
 clean_tmp ()
 {
 	rm -f build-test-*.tmp
-}
-
-clean_all ()
-{
-	rm -f build-test-*.tmp build-test-*.out
 }
 
 # retrieve remote report [lxplus | macosx | win]
@@ -119,12 +121,6 @@ build_test_send ()
 	fi
 	return 0
 }
-
-# clean all and quit
-[ "$1" == "clean" -o "$1" == "cleanall" ] && clean_all && exit
-
-# report already exists, prevent erasing it even with "force"
-[ -s "build-test-report.out" ] && exit
 
 # cleaning
 clean_tmp
