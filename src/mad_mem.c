@@ -15,3 +15,11 @@ mad_mem_handler(int sig)
   exit(EXIT_FAILURE);
 }
 
+void*
+myptrchk(const char *caller, void *ptr)
+{
+  if (!ptr)
+    fatal_error("memory overflow, called from routine:", caller);
+
+  return ptr;
+}

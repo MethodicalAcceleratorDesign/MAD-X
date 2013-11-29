@@ -32,15 +32,7 @@
 // SIGSEGV handler
 void  mad_mem_handler(int sig);
 
-// --- inliners ---------------------------------------------------------------
-
-static inline void*
-myptrchk(const char *caller, void *ptr)
-{
-  if (!ptr)
-    fatal_error("memory overflow, called from routine:", caller);
-
-  return ptr;
-}
+// Pointer check for null
+void* myptrchk(const char *caller, void *ptr);
 
 #endif // MAD_MEM_H

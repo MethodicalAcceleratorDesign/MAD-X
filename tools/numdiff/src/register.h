@@ -28,6 +28,13 @@
 #define REG_UNARY_OP  "-/\\^|[]"
 #define REG_BINARY_OP "+-*/%^<>~"
 
+// ----- attributes
+
+#ifdef __GNUC__
+static inline short reg_encode(short rn, char  op) __attribute__((always_inline));
+static inline short reg_decode(short rn, char *op) __attribute__((always_inline));
+#endif
+
 // ----- interface
 
 static inline bool
