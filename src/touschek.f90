@@ -57,7 +57,7 @@ subroutine cavtouschek (um,uloss,iflag)
      harmonl = 1.E+06*rff*circ/clight
 
      pc = get_value('probe ','pc ')
-     !        print *, ' pc ', pc
+
      omega = rff * ten6p * twopi / clight
      vrf   = rfv * ten3m / (pc * (one + deltap))
 
@@ -93,7 +93,7 @@ subroutine cavtouschek (um,uloss,iflag)
 END subroutine cavtouschek
 
 ! *********************************************************************
-subroutine touschek
+subroutine touschekold
 
   use name_lenfi
   use physconsfi
@@ -276,26 +276,29 @@ subroutine touschek
      fb0  = sqrt( bx*by*sigh2/(beta2**2*gamma2**2*ex*ey) * &
                   (1.d0/sige**2 + (dx**2/sigx2) + (dy**2/sigy2)) ) 
 
-     if ( 1.d0 - fb0/fb1 .lt. 0.d0 ) then ! numerical instability
-        if ( 1.d0 - fb0/fb1 .gt. -1.e-15) then ! apply some reasonable tolerance
+
+     fb2 = sqrt( (fb1 + fb0) * (fb1 - fb0) )           
+
+     if ( fb1 - fb0 .lt. 0.d0 ) then ! numerical instability; fb2 is now NaN
+        if ( fb1 - fb0 .gt. -5.e-12) then ! apply some reasonable tolerance
            fb2 = 0.d0
+           call aawarn('TOUSCHEK ',' Numerical instability in evaluating arguments; fb2 set to 0.d0')
         else
            print *, ' '
            print *, ' TOUSCHEK: numerical instability in input parameter B2 to Bessel function'
-           print *, ' B2**2 is equal to         ', fb1**2-fb0**2
-           print *, ' (1 - FB0/FB1) is equal to ', 1.d0 - fb0/fb1
-           print *, ' Abort calculation.'
+           print *, ' B2**2 is equal to       ', fb1**2-fb0**2
+           print *, ' (FB1 - FB0) is equal to ', fb1 - fb0
+           print *, ' '
+           call aawarn('TOUSCHEK ',' Numerical instability in evaluating arguments; abort calculation')
            return
         endif
-     else
-        fb2 = sqrt(fb1 * (fb1 + fb0) * (1 - fb0/fb1))           
      endif
-
-     ! print *, fb1, fb0, (1.d0 - fb0/fb1), fb2
 
      piwint = DGAUSS(ftousch,km,pi2,tol)          
      litousch = ccost*fact*piwint
      litouschw = litousch*dels/circ
+
+     write (7,*)  s2, litousch, s1, 0.0d0, litouschw * circ
 
      !---- Accumulate contributions.
      tlitouschek = tlitouschek + litousch*dels/circ
@@ -345,8 +348,255 @@ subroutine touschek
   call aawarn('TOUSCHEK ', 'table value not found, rest skipped ')
   return
   
+end subroutine touschekold
+! ***************************************************************
+
+! *********************************************************************
+subroutine touschek
+  !--- 2013-Nov-26  15:41:21  ghislain: 
+  !    rewrite of the touschek routine (F.Zimmermann, C. Milardi) with different logic:
+  !    instead of calculating an exact inverse lifetime based on the average of
+  !    beam parameters (beta,alfa,dispersion,derivative of dispersion) across the element, 
+  !    we either (w/o centre flag in twiss) calculate the exact inverse lifetime 
+  !      at entrance and exit of element, based on exact beam parameters at both locations , 
+  !      and then only take the average inverse lifetime between entrance and exit, 
+  !    or (w centre flag in twiss) calculate the exact inverse lifetime 
+  !      at the center of the element, based on exact beam parameters at the center.
+  !      
+  !    The integration of the inverse lifetime along the elememt is then performed 
+  !      considering a constant inverse lifetime along the element (see above) 
+  !      and the length of the element
+
+  use name_lenfi
+  use physconsfi
+  use touschekfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   TOUSCHEK SCATTERING, TOUSCHEK Command                              *
+  !   These routines implement the formalism from Piwinski               *
+  !   (DESY 98-179 & A. Chao/M. Tigner, Handbook of Acc. Physics)        *
+  ! Attribute:                                                           *
+  !   TABLE     (name)    Name of Twiss table.                           *
+  !----------------------------------------------------------------------*
+  integer i, j, flag, iflag, range(2), table_output, lp, centre 
+  integer get_option, double_from_table_row, restart_sequ, &
+          string_from_table_row, advance_to_pos, get_string
+  double precision get_value, get_variable, DGAUSS, ftousch
+  double precision ccost, fact, rr, beta2, gamma2, tolerance, pi, pi2, &
+       uloss, km, um, &
+       bx, by, ax, ay, dx, dpx, dy, dpy, l, s, &
+       sigx2, sigy2, ddx2, ddy2, sigh2
+  double precision litousch, litouschp, tlitouschek, litouschw, tltouschek
+
+  external ftousch,dgauss
+
+  character(name_len) name,sequ_name
+
+  pi=get_variable('pi ')
+
+  ! ************* Get the parameters for the common blocks *************
+  ! *************         /machin/ and /beamdb/            *************
+
+  lp = get_string('beam ', 'particle ', sequ_name)
+
+  clight   = get_variable('clight ')
+
+  charge   = get_value('probe ', 'charge ')
+  gammas   = get_value('probe ', 'gamma ')
+  gamma    = get_value('probe ', 'gamma ')
+  en0      = get_value('probe ', 'energy ')
+  amass    = get_value('probe ', 'mass ')
+  ex       = get_value('probe ', 'ex ')
+  ey       = get_value('probe ', 'ey ')
+  et       = get_value('probe ', 'et ')
+  sigt     = get_value('probe ', 'sigt ')
+  sige     = get_value('probe ', 'sige ')
+  parnum   = get_value('probe ', 'npart ')
+  circ     = get_value('probe ', 'circ ')
+  currnt   = get_value('probe ', 'bcurrent ')
+  betas    = get_value('probe ', 'beta ')
+  beta     = get_value('probe ', 'beta ')
+  arad     = get_value('probe ', 'arad ')
+  alfa     = get_value('probe ', 'alfa ')
+  freq0    = get_value('probe ', 'freq0 ')
+  bunch    = get_value('probe ', 'kbunch ')
+  deltap   = get_value('probe ','deltap ')
+
+  print *, ''
+  print *, 'TOUSCHEK MODULE PARAMETERS'
+  print *, ''
+  print *, 'particle ', sequ_name(:lp)
+  print *, 'charge   ', charge
+  print *, 'gammas   ', gammas
+  print *, 'gamma    ', gamma
+  print *, 'energy   ', en0
+  print *, 'mass     ', amass
+  print *, 'Ex       ', ex
+  print *, 'Ey       ', ey
+  print *, 'Et       ', et
+  print *, 'sigt     ', sigt
+  print *, 'sige     ', sige
+  print *, 'parnum   ', parnum
+  print *, 'circ     ', circ
+  print *, 'currnt   ', currnt
+  print *, 'betas    ', betas
+  print *, 'beta     ', beta
+  print *, 'clight   ', clight
+  print *, 'arad     ', arad
+  print *, 'alfa     ', alfa
+  print *, 'freq0    ', freq0
+  print *, 'kbunch   ', bunch
+  print *, 'deltap   ', deltap
+  print *, ''
+  
+  beta2  = beta*beta
+  gamma2 = gamma*gamma
+  ccost  = arad*arad * clight * parnum / (8d0*sqrt(pi) * gamma2*gamma2 * beta2)
+
+  tolerance    = get_value('touschek ', 'tolerance ')
+  table_output = get_option('touschek_table ')
+  centre       = get_option('centre ')
+
+  if (centre .ne. 0) then
+     print *, ' TOUSCHEK will use optical functions at center of elements.'
+  else
+     print *, ' TOUSCHEK will use optical functions at entrance and end of element'
+  endif
+  
+  !--- Look for RF cavities and setup RF-bucket boundaries 
+  call cavtouschek(um,uloss,iflag)
+  um1 = um
+  !--- setup boundaries for numerical integration
+  km = ATAN(sqrt(um1))
+  pi2 = pi/2.d0
+
+  if (um1.eq.0) then
+     call aawarn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
+     return
+  endif
+        
+  if (iflag .eq.1) then
+     call aawarn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
+     return
+  endif  
+
+  !--- Start new Twiss Table reading
+  call table_range('twiss ', '#s/#e ', range)
+  if (get_option('debug ') .ne. 0) then
+     print *, 'Range for Table ', range(1), range(2)
+  endif
+
+  j = restart_sequ()
+
+  !--- Initialization (p indices stands for previous element)
+  !    A zero value for previous inverse lifetime here does not matter because 
+  !    first element in sequence is always a marker of zero length whose 
+  !    contribution will be zero by integration over the length.
+  tlitouschek = 0.d0
+  litousch  = 0.d0
+  litouschp = 0.d0
+  litouschw = 0.d0
+  
+  !--- Start loop over elements in range
+  do i = range(1), range(2)
+     j = advance_to_pos('twiss ', i)
+     
+     if (string_from_table_row('twiss ', 'name ', i, name) .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 's ',    i, s)   .ne. 0) goto 102 
+     if (double_from_table_row('twiss ', 'betx ', i, bx)  .ne. 0) goto 102 
+     if (double_from_table_row('twiss ', 'bety ', i, by)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'alfx ', i, ax)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'alfy ', i, ay)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dx ',   i, dx)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dpx ',  i, dpx) .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dy ',   i, dy)  .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'dpy ',  i, dpy) .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'l ',    i, l)   .ne. 0) goto 102 
+
+     !--- Calculate factors and arguments to numerical integrator
+     sigx2 = ex*bx
+     sigy2 = ey*by
+
+     ddx2 = (dpx*bx+dx*ax)**2
+     ddy2 = (dpy*by+dy*ay)**2
+
+     sigh2 = 1.d0 / ((1.d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2))
+
+     fact = sqrt(sigh2)/(sigt*sige*ex*ey)
+     
+     !--- Setup the parameters B1 and B2. 
+     !    They will be used inside the ftousch routine that will be integrated numerically
+
+     fb1 = ( (sigx2-sigh2*ddx2) / ex**2 + (sigy2-sigh2*ddy2) / ey**2 )  &
+            / (2d0*beta2*gamma2)
+
+     fb2 = sqrt( & 
+          ( ( (sigx2-sigh2*ddx2) / ex**2 - (sigy2-sigh2*ddy2) / ey**2 )**2 &
+            + (4.d0 * sigh2**2 * ddx2 * ddy2) / (ex**2 * ey**2) ) &
+            / (4.d0 * beta2**2 * gamma2**2) )
+
+     if ( get_option('debug ') .ne. 0 ) &
+          write (10,*) s, sigx2, sigy2, ddx2, ddy2, sigh2, fact, fb1, fb2
+
+     !--- Calculate Inverse Touschek Lifetime at current location by numerical integration
+     litousch = ccost * fact * DGAUSS(ftousch,km,pi2,tolerance)
+
+     if (centre .ne. 0) then
+        !--- Calculate contribution of current element by taking Loss Rate 
+        !    calculated at centre of element, and normalising by element length
+        !    over total length of beamline
+        litouschw = litousch * l / circ        
+        if ( get_option('debug ') .ne. 0 ) &
+             write (7,*)  s, litousch, 0.d0, l, litouschw * circ, fb1, fb2
+     else
+        !--- Calculate contribution of current element by averaging Loss Rate 
+        !    between exit of current element and entrance of current element, 
+        !    or end of previous element, and normalising by element length
+        !    over total length of beamline
+        litouschw = 0.5d0*(litousch + litouschp) * l / circ        
+        if ( get_option('debug ') .ne. 0 ) &
+             write (8,*)  s, litousch, litouschp, l, litouschw * circ, fb1, fb2
+     endif
+
+     !---- Accumulate contributions.
+     tlitouschek = tlitouschek + litouschw
+        
+     ! *************** Fill "touschek_table"  *********************
+
+     if(table_output.ne.0) then
+        call string_to_table_curr('touschek ','name ', name )
+        call double_to_table_curr('touschek ','s ', s)               ! position of calculation (end or centre)
+        call double_to_table_curr('touschek ','tli ', litousch)      ! Loss rate at current location
+        call double_to_table_curr('touschek ','tliw ', litouschw)    ! Weighted Loss Rate contribution of element
+        call double_to_table_curr('touschek ','tlitot ', tlitouschek)! Accumulated Loss Rate to present element 
+        call augment_count('touschek ')
+     endif
+
+     !--- Prepare for next element (for calculation at end of element)
+     litouschp = litousch
+
+  enddo
+
+  tltouschek = 1d0/tlitouschek
+
+  print *, ' '
+  print *, 'Energy radiated per turn  ', uloss,       '[MeV]'
+  print *, 'Touschek Inverse Lifetime ', tlitouschek, '[seconds-1]'
+  print *, 'Touschek Lifetime         ', tltouschek,  '[seconds]   '
+  print *, '                          ', tltouschek/3600.,'[hours]'
+
+  RETURN
+
+102 continue
+  call aawarn('TOUSCHEK ', 'table value not found, rest skipped ')
+  return
+  
 end subroutine touschek
 ! ***************************************************************
+
+
 double precision function ftousch(k)
 
   use physconsfi
@@ -492,7 +742,6 @@ DOUBLE PRECISION FUNCTION DGAUSS(F,A,B,EPS)
   S16=C2*S16
   IF( ABS(S16-S8) .LE. EPS*(1.+ABS(S16)) ) GO TO 5
   BB=C1
-  !print *, const, c2
   IF( 1.D0+ABS(CONST*C2) .NE. 1.D0) GO TO 2
   DGAUSS=0.0D0
   CALL KERMTR('D103.1',LGFILE,MFLAG,RFLAG)

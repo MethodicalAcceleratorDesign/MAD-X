@@ -3,9 +3,9 @@
   +    MAD-X 5.01.03  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 20.11.13 10.14.16 +
+  + Execution Time Stamp: 29.11.13 10.45.11 +
   +++++++++++++++++++++++++++++++++++++++++++
-option,-info,warn,-echo;
+option, -info, warn, -echo;
 
 enter Twiss module
   
@@ -34,9 +34,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
        4.507883438       0.9276843614                  0    0.0001051189251 
-NO centre off 
-   
- TOUSCHEK MODULE 
+ 
+ TOUSCHEK MODULE PARAMETERS
+ 
  particle positron
  charge      1.0000000000000000     
  gammas      4743.6498731754673     
@@ -60,10 +60,71 @@ NO centre off
  kbunch           1386
  deltap      0.0000000000000000     
  
+  TOUSCHEK will use optical functions at entrance and end of element
   
  Energy radiated per turn     2.1912083614567508      [MeV]
- Inverse Touschek Lifetime    5.4492134112120233E-003 [seconds-1]
- Touschek Lifetime            183.51272459662729      [seconds]      5.0975756832396468E-002 [hours]
+ Touschek Inverse Lifetime    7.1942759742711828E-003 [seconds-1]
+ Touschek Lifetime            138.99939390374931      [seconds]   
+                              3.8610942751041474E-002 [hours]
+enter Twiss module
+  
+iteration:   1 error:   2.781148E-08 deltap:   1.000000E-06
+orbit:   3.343261E-09  1.007116E-11  0.000000E+00  0.000000E+00  7.743633E-09 -6.140246E-10
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       357.4574272                 -0    7.394308645e-05        116.2923677 
+
+                q1                dq1            betxmax              dxmax 
+       72.69004215       0.4282184705        30.68877756      0.01253122876 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.005493743187                  0                  0        35.41801892 
+
+               dq2            betymax              dymax              dyrms 
+       1.615599579        9.354203391                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0      0.03167054981 
+
+           synch_2            synch_3            synch_4            synch_5 
+       4.507883438       0.9276843614                  0    0.0001051189251 
+ 
+ TOUSCHEK MODULE PARAMETERS
+ 
+ particle positron
+ charge      1.0000000000000000     
+ gammas      4743.6498731754673     
+ gamma       4743.6498731754673     
+ energy      2.4239999999999999     
+ mass        5.1099892800000001E-004
+ Ex          1.2000000000000000E-010
+ Ey          6.7499999999999995E-013
+ Et          1.5999999999999999E-006
+ sigt        1.1463607962467358E-003
+ sige        1.3957211422778151E-003
+ parnum      3100000000.0000000     
+ circ        357.45742721005882     
+ currnt      4.1655124508314831E-004
+ betas      0.99999997777996408     
+ beta       0.99999997777996408     
+ clight      299792458.00000000     
+ arad        2.8179403246116313E-015
+ alfa        7.3943296536604306E-005
+ freq0      0.83868015746230029     
+ kbunch           1386
+ deltap      0.0000000000000000     
+ 
+  TOUSCHEK will use optical functions at center of elements.
+  
+ Energy radiated per turn     2.1912083614567508      [MeV]
+ Touschek Inverse Lifetime    6.7227256554815819E-003 [seconds-1]
+ Touschek Lifetime            148.74919061803737      [seconds]   
+                              4.1319219616121491E-002 [hours]
 
   Number of warnings: 0
 

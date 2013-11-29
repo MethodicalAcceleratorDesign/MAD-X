@@ -1,4 +1,4 @@
-option,-info,warn,-echo;
+option, -info, warn, -echo;
 ! DATE AND TIME:    06/12/04  03.01.00
 ! touschek/CLIC_damping_ring/touschek.clicdr.madx
 ! FILE:             clicdrnew.mad                                                                   
@@ -273,15 +273,26 @@ DQ1DE2 := -2.715209971574E5;
 
 
 beam, particle=positron, energy=2.424,bunched,npart=3.1E+09, 
-      kbunch=1386, EX = 1.20E-10, EY = 6.75E-13 ,
-      ET=1.6e-6,SIGT=0.00162, SIGE=0.00128; !,radiate ;
+      kbunch=1386, EX = 1.20E-10, EY = 6.75E-13 , ET=1.6e-6; 
+
+!--- first calculation with Twiss functions calculated at end of elements 
 
 use,period=ring;
 
 twiss,chrom,table;
 
 ! reduce size of output table:
-select,flag=touschek,pattern="HKR",column=S, TLI, TLIW, TLITOT;
-touschek,file="touschek.dat";
+select,flag=touschek,column=name, S, TLI, TLIW, TLITOT;
+touschek,file="touschek_e.dat";
+
+!--- repeat calculation with Twiss functions calculated at centre of elements 
+
+use,period=ring;
+
+twiss,chrom,table,centre;
+
+! reduce size of output table:
+select,flag=touschek,column=name, S, TLI, TLIW, TLITOT;
+touschek,file="touschek_c.dat";
 
 stop
