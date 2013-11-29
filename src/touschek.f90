@@ -94,7 +94,10 @@ END subroutine cavtouschek
 
 ! *********************************************************************
 subroutine touschekold
-
+  !-----
+  !--- 2013-Nov-29  12:22:05  ghislain: 
+  ! TO BE DELETED BEFORE PRO RELEASE
+  !-----
   use name_lenfi
   use physconsfi
   use touschekfi
@@ -354,7 +357,7 @@ end subroutine touschekold
 ! *********************************************************************
 subroutine touschek
   !--- 2013-Nov-26  15:41:21  ghislain: 
-  !    rewrite of the touschek routine (F.Zimmermann, C. Milardi) with different logic:
+  !    rewrite of the oruiginal touschek routine (F.Zimmermann, C. Milardi) with different logic:
   !    instead of calculating an exact inverse lifetime based on the average of
   !    beam parameters (beta,alfa,dispersion,derivative of dispersion) across the element, 
   !    we either (w/o centre flag in twiss) calculate the exact inverse lifetime 
