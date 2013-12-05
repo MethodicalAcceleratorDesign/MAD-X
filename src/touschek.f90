@@ -357,7 +357,7 @@ end subroutine touschekold
 ! *********************************************************************
 subroutine touschek
   !--- 2013-Nov-26  15:41:21  ghislain: 
-  !    rewrite of the oruiginal touschek routine (F.Zimmermann, C. Milardi) with different logic:
+  !    rewrite of the original touschek routine (F.Zimmermann, C. Milardi) with different logic:
   !    instead of calculating an exact inverse lifetime based on the average of
   !    beam parameters (beta,alfa,dispersion,derivative of dispersion) across the element, 
   !    we either (w/o centre flag in twiss) calculate the exact inverse lifetime 
