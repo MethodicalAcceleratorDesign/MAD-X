@@ -97,6 +97,13 @@ select, flag=twiss, clear;
 select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
+beam, particle=proton, gamma=479.6050377, exn=3.75e-6, eyn=3.75e-6, freq0=400.;
+show, beam;
+
+use,period=LHCCELL;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
+twiss, sequence=LHCCELL;
 
 
 ! failure case
