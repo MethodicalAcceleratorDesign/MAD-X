@@ -373,14 +373,14 @@ dksr={0,2e-1*a2r,2e-1*a3r,2e-1*a4r,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 eoption,add=true;
 Select, flag=error, clear = true;
 select, flag=error, pattern="q.*";
-efcomp, 
+efcomp, order:=1,
 dkn={0,0,0,0,0,0,0,0.30,0,0,0,0,0,0,0,0,0},
 dks={0,0,0,0,0,0,0,0,0,.45,0,0,0,0,0,0,0,0,0};
 
 // Assign ABSOLUTE field errors to quadrupoles Q4, added to relative errors              
 Select, flag=error, clear = true;
 select, flag=error, pattern="q4.*";
-efcomp, 
+efcomp, order:=1,
 dkn={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19},
 dks={-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13,-14,-15,-16,-17,-18,-19};
 
