@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 15.02.13 18.08.14 +
+  + Code Modification Date: 2013.11.05      +
+  + Execution Time Stamp: 10.12.13 21.38.24 +
   +++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -17,5 +17,9 @@ Option,  -warn,-info,-echo;
 Want to make named table: newerr
 Want to use named table: newerr
 The table ==> newerr <=== was found 
-+++ memory access outside program range, fatal +++
-good bye
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.03 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
