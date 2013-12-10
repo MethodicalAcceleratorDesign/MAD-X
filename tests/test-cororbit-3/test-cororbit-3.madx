@@ -16,7 +16,7 @@ TWISS,table=my_model,sequence=fivecell;
 readmytable,file="input/orbps.in",table=orbint;
 
 coption,print=2,debug=1;
-option, debug;
+// option, debug;
 correct,flag=ring,model=my_model,orbit=orbint,extern,mode=micado,
         cond=0,error=1.0e-7,ncorr=5,plane=x,clist="c.tab",mlist="m.tab";
 
