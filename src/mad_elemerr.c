@@ -16,10 +16,9 @@ pro_error_make_efield_table(void)
   struct table *ttb = efield_table;
   struct node *nanf;
   struct node *nend;
-  int         j;
+  int    j;
   struct sequence* mysequ = current_sequ;
 
-  setbuf(stdout,(char *)0);
   nanf = mysequ->ex_start;
   nend = mysequ->ex_end;
 
@@ -808,47 +807,27 @@ node_rf_errors(double* errors, double *freq, double *harmon, double *lag )
 void
 pro_error(struct in_cmd* cmd)
 {
+  if (strcmp(cmd->tok_list->p[0], "eoption") == 0) {
+    error_eoption(cmd);
+    cmd->clone_flag = 1; /* do not drop */
+    current_eopt = cmd->clone;
+    return;
+  }
 
- if (strcmp(cmd->tok_list->p[0], "eoption") == 0)
-     {
-      error_eoption(cmd);
-      cmd->clone_flag = 1; /* do not drop */
-      current_eopt = cmd->clone;
-      return;
-     }
   if (get_option("debug")) fprintf(prt_file, "enter ERROR module\n");
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-    {
-     warning("ERROR, but no active sequence:", "ignored");
-     return;
-    }
-        setbuf(stdout,(char *)0);
 
- if (error_select->curr > 0) set_selected_errors();
+  if (current_sequ == NULL || current_sequ->ex_start == NULL) {
+    warning("ERROR, but no active sequence:", "ignored");
+    return;
+  }
 
- if (strcmp(cmd->tok_list->p[0], "ealign") == 0)
-          {
-           error_ealign(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "efield") == 0)
-          {
-           error_efield(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "efcomp") == 0)
-          {
-           error_efcomp(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "eprint") == 0)
-          {
-           error_eprint(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "seterr") == 0)
-          {
-           error_seterr(cmd);
-          }
- else if (strcmp(cmd->tok_list->p[0], "esave") == 0)
-          {
-           error_esave(cmd);
-          }
+  if (error_select->curr > 0) set_selected_errors();
+
+       if (strcmp(cmd->tok_list->p[0], "ealign") == 0) error_ealign(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "efield") == 0) error_efield(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "efcomp") == 0) error_efcomp(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "eprint") == 0) error_eprint(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "seterr") == 0) error_seterr(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "esave" ) == 0) error_esave(cmd);
 }
 

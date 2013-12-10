@@ -680,9 +680,6 @@ static void correct_correct2(struct in_cmd* cmd)
     return;
   }
 
-  /* For debugging set output buffer to zero */
-  if (get_option("debug")) setbuf(stdout, NULL );
-
   /* Prepare file descriptors for the output */
   if (command_par_value("resout", cmd->clone) > 0) {
     if (fddata == NULL ) {
@@ -1332,8 +1329,6 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
   
   int debug = get_option("debug");
 
-  setbuf(stdout, (char *) 0);
-  
   ic = 0;
   im = 0;
   i_zero = 0;
@@ -1666,19 +1661,10 @@ static void correct_correct1(struct in_cmd* cmd)
     return;
   }
 
-  /* For debugging set output buffer to zero */
-  if (debug) setbuf(stdout, NULL );
-
   /* Prepare file descriptors for the output */
   if (command_par_value("resout", cmd->clone) > 0) {
-    if (fddata == NULL ) {
-      if ((fddata = fopen("corr.out", "w")) == NULL )
-	exit(99);
-    }
-    if (fcdata == NULL ) {
-      if ((fcdata = fopen("stren.out", "w")) == NULL )
-	exit(99);
-    }
+    if (!fddata && !(fddata = fopen("corr.out" , "w"))) exit(99);
+    if (!fcdata && !(fcdata = fopen("stren.out", "w"))) exit(99);
   }
 
   // Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
