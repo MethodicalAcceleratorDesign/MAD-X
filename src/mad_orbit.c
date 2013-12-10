@@ -2449,10 +2449,10 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     
     if (debug) {
       if ((tospx = name_list_pos("px", tar->columns)) < 0) 
-	warning("target orbit px not found in table", ", MAD-X continues ");
+	     warning("target orbit px not found in table", ", MAD-X continues ");
 			
       if ((tospy = name_list_pos("py", tar->columns)) < 0) 
-	warning("target orbit px not found in table", ", MAD-X continues ");
+	     warning("target orbit px not found in table", ", MAD-X continues ");
 			
       printf("====c1===>  %d %d %d %d \n", tosx, tosy, tospx, tospy);
     }
@@ -2489,13 +2489,13 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       strcpy(l4name, strip(l3name));
       supp_tb(l4name);
       if (strlen(l4name) == strlen(l2name)) {
-	if (strncmp(l4name, l2name, strlen(l2name)) == 0) {
-	  jjx = j - 1;
-	  jjy = jj - 1;
-	  yok = 1;
-	  if (debug)
-	    printf("monitor names found: %s %s %d\n", l2name, l4name, yok);
-	}
+      	if (strncmp(l4name, l2name, strlen(l2name)) == 0) {
+      	  jjx = j - 1;
+      	  jjy = jj - 1;
+      	  yok = 1;
+      	  if (debug)
+      	    printf("monitor names found: %s %s %d\n", l2name, l4name, yok);
+      	}
       }
     }
 
@@ -2505,98 +2505,98 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     if ((jjy >= 0) && (yok == 1)) { // the monitor was found
 
       if (command_par_string("target", cmd->clone) != NULL ) { // target exists
-	// If correction to target orbit, subtract the target orbit, then correct to zero ...
+	     // If correction to target orbit, subtract the target orbit, then correct to zero ...
 
-	if (debug) {
-	  printf("x ==> %d %d %e %e\n", jjx, m->id_ttb, da1[posx][jjx], da2[tosx][jjy]);
-	  printf("y ==> %e %e\n",                       da1[posy][jjx], da2[tosy][jjy]);
-	}
+      	if (debug) {
+      	  printf("x ==> %d %d %e %e\n", jjx, m->id_ttb, da1[posx][jjx], da2[tosx][jjy]);
+      	  printf("y ==> %e %e\n",                       da1[posy][jjx], da2[tosy][jjy]);
+      	}
 
-	// m->val.before[0] = da1[posx][jjx] - da2[tosx][jjy];
-	// m->val.before[1] = da1[posy][jjx] - da2[tosy][jjy];
-	m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjy]) * 1000. * correct_orbit->units;
-	m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjy]) * 1000. * correct_orbit->units;
+      	// m->val.before[0] = da1[posx][jjx] - da2[tosx][jjy];
+      	// m->val.before[1] = da1[posy][jjx] - da2[tosy][jjy];
+      	m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjy]) * 1000. * correct_orbit->units;
+      	m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjy]) * 1000. * correct_orbit->units;
 	
-	if (debug) 
-	  printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);
+      	if (debug) 
+      	  printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);
 	
       } else { // no target was given
 
-	if (debug) {
-	  //  2013-Dec-10  11:02:18  ghislain: da2 is unknown if no target is present.
-	  //  printf("x ==> %e %e\n", da1[posx][jjx], da2[tosx][jjx]);
-	  //  printf("y ==> %e %e\n", da1[posy][jjx], da2[tosy][jjx]);
-	  printf("x ==> %e \n", da1[posx][jjx]);
-	  printf("y ==> %e \n", da1[posy][jjx]);
-	}
+      	if (debug) {
+      	  //  2013-Dec-10  11:02:18  ghislain: da2 is unknown if no target is present.
+      	  //  printf("x ==> %e %e\n", da1[posx][jjx], da2[tosx][jjx]);
+      	  //  printf("y ==> %e %e\n", da1[posy][jjx], da2[tosy][jjx]);
+      	  printf("x ==> %e \n", da1[posx][jjx]);
+      	  printf("y ==> %e \n", da1[posy][jjx]);
+      	}
 
-	// m->val.before[0] = da1[posx][jjx];
-	// m->val.before[1] = da1[posy][jjx];
-	m->val.before[0] = da1[posx][jjx] * 1000. * correct_orbit->units;
-	m->val.before[1] = da1[posy][jjx] * 1000. * correct_orbit->units;
+      	// m->val.before[0] = da1[posx][jjx];
+      	// m->val.before[1] = da1[posy][jjx];
+      	m->val.before[0] = da1[posx][jjx] * 1000. * correct_orbit->units;
+      	m->val.before[1] = da1[posy][jjx] * 1000. * correct_orbit->units;
 
-	if (debug) 
-	  printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);	
+      	if (debug) 
+      	  printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);	
       }
 
       /* monon=xlimit determines the fraction of available monitors */
       pos = name_list_pos("monon", nl);
       if (nl->inform[pos] > 0) {
-	xlimit = command_par_value("monon", cmd->clone);
-	if (frndm() > xlimit) {
-	  m->enable = 0;
-	  printf("Monitor %s disabled\n", m->p_node->name);
-	}
+      	xlimit = command_par_value("monon", cmd->clone);
+      	if (frndm() > xlimit) {
+      	  m->enable = 0;
+      	  printf("Monitor %s disabled\n", m->p_node->name);
+      	}
       }
 
       /* scaling error should come first, monitor alignment not scaled ... */
       pos = name_list_pos("monscale", nl);
       if (nl->inform[pos] > 0) {
-	if ((command_par_value("monscale", cmd->clone)) == 1) {
-	  if (m->p_node->p_al_err != NULL ) {
+      	if ((command_par_value("monscale", cmd->clone)) == 1) {
+      	  if (m->p_node->p_al_err != NULL ) {
 
-	    if (debug) {
-	      printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
-	      printf("scales: %e %e\n", m->p_node->p_al_err->a[12], m->p_node->p_al_err->a[13]);
-	    }
+      	    if (debug) {
+      	      printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
+      	      printf("scales: %e %e\n", m->p_node->p_al_err->a[12], m->p_node->p_al_err->a[13]);
+      	    }
 
-	    m->val.before[0] = m->val.before[0] * (1.0 + m->p_node->p_al_err->a[12]);
-	    m->val.before[1] = m->val.before[1] * (1.0 + m->p_node->p_al_err->a[13]);
-	  }
-	}
+      	    m->val.before[0] = m->val.before[0] * (1.0 + m->p_node->p_al_err->a[12]);
+      	    m->val.before[1] = m->val.before[1] * (1.0 + m->p_node->p_al_err->a[13]);
+      	  }
+      	}
       }
 
       /* monitor misalignment after all other reading manipulations ! */
       pos = name_list_pos("monerror", nl);
       if (nl->inform[pos] > 0) {
-	if ((command_par_value("monerror", cmd->clone)) == 1) {
-	  if (m->p_node->p_al_err != NULL ) {
+      	if ((command_par_value("monerror", cmd->clone)) == 1) {
+      	  if (m->p_node->p_al_err != NULL ) {
 
-	    if (debug) {
-	      printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
-	      printf("errors: %e %e \n", m->p_node->p_al_err->a[6], m->p_node->p_al_err->a[7]);
-	    }
+      	    if (debug) {
+      	      printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
+      	      printf("errors: %e %e \n", m->p_node->p_al_err->a[6], m->p_node->p_al_err->a[7]);
+      	    }
 
-	    dpsi = m->p_node->p_al_err->a[5];
-	    rx = m->val.before[0];
-	    ry = m->val.before[1];
+      	    dpsi = m->p_node->p_al_err->a[5];
+      	    rx = m->val.before[0];
+      	    ry = m->val.before[1];
 
-	    if (debug)
-	      printf("\nA: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+      	    if (debug)
+      	      printf("\nA: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
 
-	    m->val.before[0] = rx * cos(dpsi) + ry * sin(dpsi);
-	    m->val.before[1] = -rx * sin(dpsi) + ry * cos(dpsi);
+      	    m->val.before[0] = rx * cos(dpsi) + ry * sin(dpsi);
+      	    m->val.before[1] = -rx * sin(dpsi) + ry * cos(dpsi);
 
-	    if (debug)
-	      printf("B: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+      	    if (debug)
+      	      printf("B: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
 
-	    m->val.before[0] += m->p_node->p_al_err->a[6] * 1000.;
-	    m->val.before[1] += m->p_node->p_al_err->a[7] * 1000.;
+      	    m->val.before[0] += m->p_node->p_al_err->a[6] * 1000.;
+      	    m->val.before[1] += m->p_node->p_al_err->a[7] * 1000.;
 
-	    if (debug)
-	      printf("C: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
-	  }
-	}
+      	    if (debug)
+      	      printf("C: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+      	  }
+      	}
       }
     } // end of treatment of the monitor that was found to exist
     else {

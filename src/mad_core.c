@@ -104,6 +104,7 @@ mad_init_c(void)
   set_option("twiss_print", &ione);
 }
 
+#ifndef _DEBUG
 static void
 set_sigterm(void)
 {
@@ -111,6 +112,7 @@ set_sigterm(void)
   if (signal(SIGSEGV, mad_mem_handler) == SIG_IGN)
     signal(SIGSEGV, SIG_IGN);
 }
+#endif
 
 // public functions
 
@@ -126,7 +128,9 @@ madx_start(void)
 #endif
 
   // set signal handlers (temporary)
+#ifndef _DEBUG
   set_sigterm();
+#endif
 
   // init C and Fortran
   mad_init_c();
