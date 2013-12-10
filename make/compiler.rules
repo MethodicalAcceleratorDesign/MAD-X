@@ -47,6 +47,13 @@ vpath %.o $(OBJDIR)
 	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $(OBJDIR)$/$(@F))
 
 #
+# rule f77 compilation
+#
+%.o: %.f
+	$E "*** Compiling $(<F)"
+	$_ $(call FC_tr,$(FC) $(FFLAGS) $(CPPFLAGS) $< -o $(OBJDIR)$/$(@F))
+
+#
 # compute object files
 #
 CC_OBJ  := $(patsubst %.c,%.o,$(CC_SRC))

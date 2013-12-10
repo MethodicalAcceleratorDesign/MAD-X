@@ -161,28 +161,28 @@ error_seterr(struct in_cmd* cmd)
       from_col = find_index_in_table(efield_table_cols, "k0l");
       to_col   = find_index_in_table(efield_table_cols, "k20sl");
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col; col++, i++)
+        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
           node->p_fd_err->a[i] = err->d_cols[col][row-1];
 
       from_col = find_index_in_table(efield_table_cols, "dx");
       to_col   = find_index_in_table(efield_table_cols, "mscaly");
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col; col++, i++)
+        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
           node->p_al_err->a[i] = err->d_cols[col][row-1];
 
       col = find_index_in_table(efield_table_cols, "rfm_freq");
-      node->rfm_freq   = col < 0 ? 0 : err->d_cols[col][row-1];
+      node->rfm_freq   = col < 0 || col >= err->num_cols ? 0 : err->d_cols[col][row-1];
 
       col = find_index_in_table(efield_table_cols, "rfm_harmon");
-      node->rfm_harmon = col < 0 ? 0 : err->d_cols[col][row-1];
+      node->rfm_harmon = col < 0 || col >= err->num_cols ? 0 : err->d_cols[col][row-1];
 
       col = find_index_in_table(efield_table_cols, "rfm_lag");
-      node->rfm_lag    = col < 0 ? 0 : err->d_cols[col][row-1];
+      node->rfm_lag    = col < 0 || col >= err->num_cols ? 0 : err->d_cols[col][row-1];
 
       from_col = find_index_in_table(efield_table_cols, "p0l");
       to_col   = find_index_in_table(efield_table_cols, "p20sl");
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col; col++, i++)
+        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
           node->p_ph_err->a[i] = err->d_cols[col][row-1];
     }
   }

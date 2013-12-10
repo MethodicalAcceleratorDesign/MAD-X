@@ -42,6 +42,4 @@ Select, flag=ERROR, clear;
 
 readmytable,file="input/err.file.in",table=newerr;
 seterr,table=newerr;
-
 esave,file=err.file.out;
-

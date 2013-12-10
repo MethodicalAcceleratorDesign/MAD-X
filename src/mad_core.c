@@ -127,8 +127,9 @@ madx_start(void)
   GC_INIT();
 #endif
 
-  // set signal handlers (temporary)
+// let's gdb find the place of segmentation fault when debugging
 #ifndef _DEBUG
+  // set signal handlers (temporary)
   set_sigterm();
 #endif
 
