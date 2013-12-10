@@ -341,7 +341,7 @@ error_efcomp(struct in_cmd* cmd)
   //  struct node *ndexe;
   //  struct node *nextnode;
   //  int    lvec;
-  int    hyst = 0;
+  int hyst = 0;
   //  int    flgmgt = 0;
   int chcount[3] = {0,0,0};
   const char *rout_name = "error_efcomp";
@@ -422,47 +422,47 @@ error_efcomp(struct in_cmd* cmd)
       }
       
       if (opt_debug)
-	      fprintf(prt_file, "field for %s %s %d\n",
-		  nextnode->name,nextnode->base_name,nextnode->sel_err);
+        fprintf(prt_file, "field for %s %s %d\n", nextnode->name, nextnode->base_name, nextnode->sel_err);
       
       /* now get order (n), radius (rr) and hyster flag (hyst) from command, if any */
       /* AL: added 'freq' option for RF-Multipoles */
-      for(unsigned int i=0;i<atts_len;i++) {
+      for(unsigned int i=0; i<atts_len; i++) {
         double val = command_par_value(atts[i],cmd->clone);
-        if(i==0) {
-          n = val;
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "order  is %d\n",n);
-        } else if (i==1) {
-          rrr = val;
-          rr  = fabs(rrr);
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "radius is %f\n",val);
-        } else if (i==2) {
-          hyst = val;
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "hyster flag is %d\n",(int)val);
-        } else if (i==3) {
-          freq = val;
-                nextnode->rfm_freq = freq;
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "freq flag is %d\n",(int)val);
-        } else if (i==4) {
-          harmon = (int)val;
-                nextnode->rfm_harmon = harmon;
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "harmon flag is %d\n",(int)val);
-        } else if (i==5) {
-          lag = lag;
-                nextnode->rfm_lag = lag;
-          /* debug printout */
-          if (opt_debug)
-            fprintf(prt_file, "lag flag is %d\n",(int)val);
+
+        switch (i) {
+          case 0:
+            n = val;
+            if (opt_debug) fprintf(prt_file, "order  is %d\n",n);
+            break;
+
+          case 1:
+            rrr = val;
+            rr  = fabs(rrr);
+            if (opt_debug) fprintf(prt_file, "radius is %f\n",val);
+            break;
+
+          case 2:
+            hyst = val;
+            if (opt_debug) fprintf(prt_file, "hyster flag is %d\n",(int)val);
+            break;
+
+          case 3:
+            freq = val;
+            nextnode->rfm_freq = freq;
+            if (opt_debug) fprintf(prt_file, "freq flag is %d\n",(int)val);
+            break;
+
+          case 4:
+            harmon = (int)val;
+            nextnode->rfm_harmon = harmon;
+            if (opt_debug) fprintf(prt_file, "harmon flag is %d\n",(int)val);
+            break;
+
+          case 5:
+            lag = lag;
+            nextnode->rfm_lag = lag;
+            if (opt_debug) fprintf(prt_file, "lag flag is %d\n",(int)val);
+            break;
         }
       }
       
@@ -519,8 +519,8 @@ error_efcomp(struct in_cmd* cmd)
 	            fprintf(prt_file, "original field = %d is %f\n",i,nvec[i]);
 	          }
 	        }
-	        if (opt_debug)
-	          fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
+          if (n<0) fatal_error("missing or invalid negative order","");
+	        if (opt_debug) fprintf(prt_file, "====n====>>> %d %f %f \n\n",n,nvec[n],nlength);
 	        ref_str = nvec[n];
 	        ref_strn = fabs(ref_str);
 	        myfree(rout_name,nvec);
