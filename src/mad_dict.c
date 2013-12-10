@@ -789,6 +789,10 @@ char command_def[] =
 "table = [s, none], "
 "file = [s, orbit, orbit]; "
 " "
+  // 2013-Dec-10  11:22:38  ghislain: en attente
+  // "prtcorr: correct correct 0 0 "
+  // "file = [s, orbit, orbit]; "
+  // " "
 "putorbit: correct correct 0 0 "
 "file = [s, orbit, orbit]; "
 " "
