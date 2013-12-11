@@ -154,15 +154,12 @@ error_seterr(struct in_cmd* cmd)
 
       node->p_fd_err = new_double_array(FIELD_MAX); // zero initialized
       node->p_fd_err->curr = FIELD_MAX;
-      for (int i=0; i<FIELD_MAX; i++) node->p_fd_err->a[i] = 0;
 
       node->p_al_err = new_double_array(ALIGN_MAX); // zero initialized
       node->p_al_err->curr = ALIGN_MAX;
-      for (int i=0; i<ALIGN_MAX; i++) node->p_al_err->a[i] = 0;
 
       node->p_ph_err = new_double_array(RFPHASE_MAX); // zero initialized
       node->p_ph_err->curr = RFPHASE_MAX;
-      for (int i=0; i<RFPHASE_MAX; i++) node->p_ph_err->a[i] = 0;
 
       from_col = find_index_in_table(efield_table_cols, "k0l");
       to_col   = find_index_in_table(efield_table_cols, "k20sl");
