@@ -103,6 +103,9 @@ FCMAIN 	:= no
 # Tester (default is numdiff)
 ND  	:= numdiff
 
+# the program 'main' in not in fortran
+FCMAIN 	:= no
+
 ####################
 # Includes settings
 

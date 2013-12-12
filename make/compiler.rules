@@ -57,8 +57,8 @@ vpath %.o $(OBJDIR)
 # compute object files
 #
 CC_OBJ  := $(patsubst %.c,%.o,$(CC_SRC))
-CXX_OBJ := $(patsubst %.cpp,%.o,$(CXX_SRC))
-FC_OBJ  := $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(FC_SRC)))
+FC_OBJ  := $(patsubst %.F90,%.o,$(patsubst %.f90,%.o,$(patsubst %.f,%.o,$(FC_SRC))))
+CXX_OBJ := $(patsubst %.cpp,%.o,$(patsubst %.cxx,%.o,$(patsubst %.cc,%.o,$(CXX_SRC))))
 
 HEADERS := $(CC_HDR) $(CXX_HDR)
 SOURCES := $(CC_SRC) $(CXX_SRC) $(FC_SRC)
