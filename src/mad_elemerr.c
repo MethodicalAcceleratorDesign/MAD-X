@@ -466,6 +466,9 @@ error_efcomp(struct in_cmd* cmd)
             nextnode->rfm_lag = lag;
             if (opt_debug) fprintf(prt_file, "lag flag is %g\n",lag);
             break;
+
+          default:
+            fatal_error("invalid attribute", atts[i]);
         }
       }
       
