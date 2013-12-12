@@ -86,19 +86,22 @@ PLUGIN  := no
 # COMP=intel sets CC=icc/icl, CXX=icc/icl, FC=ifort    (use icl on Windows)
 
 # C compiler (default is gcc)
-CC  := gcc
+CC  	:= gcc
 
 # C++ compiler (default is g++)
-CXX := g++
+CXX 	:= g++
 
 # Fortran compiler (default is gfortran)
-FC  := gfortran
+FC  	:= gfortran
 
 # Linker (default is Fortran compiler, deferred)
-LD   = $(FC)
+LD   	 = $(FC)
+
+# Main is in fortran (default is no)
+FCMAIN 	:= no
 
 # Tester (default is numdiff)
-ND  := numdiff
+ND  	:= numdiff
 
 ####################
 # Includes settings
