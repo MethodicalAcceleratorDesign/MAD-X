@@ -9,7 +9,7 @@ exec 1> build-test-report.log 2>&1
 [ "$1" == "clean" -o "$1" == "cleanall" ] && rm -f build-test-*.tmp build-test-*.out && exit
 
 # report already exists, prevent erasing it even with "force"
-[ -s "build-test-report.out" ] && exit
+[ "$1" != "force" -o -s "build-test-report.out" ] && exit
 
 # env settings
 export LC_CTYPE="C"
