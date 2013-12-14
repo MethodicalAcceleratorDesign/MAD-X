@@ -20,6 +20,7 @@
 EMPTY :=
 SPACE := 
 SPACE +=
+COMMA := ,
 
 # some useful functions
 eq     = $(if $(patsubst $1,,$2),,t)
