@@ -285,7 +285,7 @@ STATIC void GC_clear_a_few_frames(void)
 #     define CLEAR_NWORDS 64
 #   endif
     volatile word frames[CLEAR_NWORDS];
-    BZERO((word *)frames, CLEAR_NWORDS * sizeof(word));
+    BZERO(frames, CLEAR_NWORDS * sizeof(word));
 }
 
 /* Heap size at which we need a collection to avoid expanding past      */
@@ -973,6 +973,8 @@ STATIC GC_bool GC_try_to_collect_general(GC_stop_func stop_func,
       if (force_unmap ||
           (GC_force_unmap_on_gcollect && old_unmap_threshold > 0))
         GC_unmap_threshold = 1; /* unmap as much as possible */
+#   else
+      (void)force_unmap; // LD: avoid unused warning
 #   endif
     ENTER_GC();
     /* Minimize junk left in my registers */
@@ -1178,17 +1180,13 @@ GC_INNER GC_bool GC_expand_hp_inner(word n)
         /* Assume the heap is growing up */
         word new_limit = (word)space + bytes + expansion_slop;
         if (new_limit > (word)space) {
-          GC_greatest_plausible_heap_addr =
-            (void *)GC_max((word)GC_greatest_plausible_heap_addr,
-                           (word)new_limit);
+          GC_greatest_plausible_heap_addr = (void*)GC_max((word)GC_greatest_plausible_heap_addr, new_limit);
         }
     } else {
         /* Heap is growing down */
         word new_limit = (word)space - expansion_slop;
         if (new_limit < (word)space) {
-          GC_least_plausible_heap_addr =
-            (void *)GC_min((word)GC_least_plausible_heap_addr,
-                           (word)space - expansion_slop);
+          GC_least_plausible_heap_addr = (void*)GC_min((word)GC_least_plausible_heap_addr, (word)space - expansion_slop);
         }
     }
     GC_prev_heap_addr = GC_last_heap_addr;
@@ -1225,9 +1223,9 @@ GC_INNER unsigned GC_fail_count = 0;
 /* free blocks available.  Should be called until the blocks are        */
 /* available (seting retry value to TRUE unless this is the first call  */
 /* in a loop) or until it fails by returning FALSE.                     */
-GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
-                                      GC_bool ignore_off_page,
-                                      GC_bool retry)
+STATIC GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
+                                             GC_bool ignore_off_page,
+                                             GC_bool retry)
 {
     GC_bool gc_not_stopped = TRUE;
     word blocks_to_get;

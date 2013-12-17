@@ -387,7 +387,7 @@ static int set_bits(word n)
     return(result);
 }
 
-int GC_n_set_marks(hdr *hhdr)
+STATIC int GC_n_set_marks(hdr *hhdr)
 {
     int result = 0;
     int i;
@@ -451,7 +451,7 @@ void GC_print_block_list(void)
 }
 
 /* Currently for debugger use only: */
-void GC_print_free_list(int kind, size_t sz_in_granules)
+STATIC void GC_print_free_list(int kind, size_t sz_in_granules)
 {
     struct obj_kind * ok = &GC_obj_kinds[kind];
     ptr_t flh = ok -> ok_freelist[sz_in_granules];
@@ -461,7 +461,7 @@ void GC_print_free_list(int kind, size_t sz_in_granules)
     for (n = 1; flh; n++) {
         struct hblk *block = HBLKPTR(flh);
         if (block != lastBlock) {
-          GC_printf("\nIn heap block at %p:\n\t", block);
+          GC_printf("\nIn heap block at %p:\n\t", (void*)block);
           lastBlock = block;
         }
         GC_printf("%d: %p;", n, flh);

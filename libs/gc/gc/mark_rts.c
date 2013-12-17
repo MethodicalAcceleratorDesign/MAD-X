@@ -335,7 +335,7 @@ STATIC void GC_remove_tmp_roots(void)
   /* Not used at present (except for, may be, debugging purpose).       */
   /* Workaround for the OS mapping and unmapping behind our back:       */
   /* Is the address p in one of the temporary static root sections?     */
-  GC_bool GC_is_tmp_root(ptr_t p)
+  STATIC GC_bool GC_is_tmp_root(ptr_t p)
   {
     static int last_root_set = MAX_ROOT_SETS;
     register int i;
@@ -627,6 +627,7 @@ STATIC void GC_push_all_stack_part_eager_sections(ptr_t lo, ptr_t hi,
 /*ARGSUSED*/
 STATIC void GC_push_current_stack(ptr_t cold_gc_frame, void * context)
 {
+  (void)context; // LD: avoid compiler unused warning
 #   if defined(THREADS)
         if (0 == cold_gc_frame) return;
 #       ifdef STACK_GROWS_DOWN

@@ -426,7 +426,7 @@ GC_API void * GC_CALL GC_base(void * /* displaced_pointer */);
 /* Given a pointer to the base of an object, return its size in bytes.  */
 /* The returned size may be slightly larger than what was originally    */
 /* requested.                                                           */
-GC_API size_t GC_CALL GC_size(const void * /* object_addr */);
+GC_API size_t GC_CALL GC_size(void * /* object_addr */);
 
 /* For compatibility with C library.  This is occasionally faster than  */
 /* a malloc followed by a bcopy.  But if you rely on that, either here  */

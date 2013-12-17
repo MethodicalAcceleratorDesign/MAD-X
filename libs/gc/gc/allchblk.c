@@ -134,7 +134,7 @@ void GC_print_hblkfreelist(void)
         hhdr = HDR(h);
         sz = hhdr -> hb_sz;
         total_free += sz;
-        GC_printf("\t%p size %lu %s black listed\n", h, (unsigned long)sz,
+        GC_printf("\t%p size %lu %s black listed\n", (void*)h, (unsigned long)sz,
                 GC_is_black_listed(h, HBLKSIZE) != 0 ? "start" :
                 GC_is_black_listed(h, hhdr -> hb_sz) != 0 ? "partially" :
                                                         "not");
@@ -189,7 +189,7 @@ void GC_dump_regions(void)
         for (p = start; p < end;) {
             hhdr = HDR(p);
             if (IS_FORWARDING_ADDR_OR_NIL(hhdr)) {
-                GC_printf("\t%p Missing header!!(%p)\n", p, hhdr);
+                GC_printf("\t%p Missing header!!(%p)\n", (void*)p, hhdr);
                 p += HBLKSIZE;
                 continue;
             }
@@ -198,7 +198,7 @@ void GC_dump_regions(void)
                                         divHBLKSZ(hhdr -> hb_sz));
                 int actual_index;
 
-                GC_printf("\t%p\tfree block of size 0x%lx bytes%s\n", p,
+                GC_printf("\t%p\tfree block of size 0x%lx bytes%s\n", (void*)p,
                           (unsigned long)(hhdr -> hb_sz),
                           IS_MAPPED(hhdr) ? "" : " (unmapped)");
                 actual_index = free_list_index_of(hhdr);
@@ -211,7 +211,7 @@ void GC_dump_regions(void)
                 }
                 p += hhdr -> hb_sz;
             } else {
-                GC_printf("\t%p\tused for blocks of size 0x%lx bytes\n", p,
+                GC_printf("\t%p\tused for blocks of size 0x%lx bytes\n", (void*)p,
                           (unsigned long)(hhdr -> hb_sz));
                 p += HBLKSIZE * OBJ_SZ_TO_BLOCKS(hhdr -> hb_sz);
             }

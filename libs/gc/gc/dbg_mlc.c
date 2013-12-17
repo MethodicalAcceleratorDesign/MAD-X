@@ -611,10 +611,10 @@ GC_API void * GC_CALL GC_debug_malloc_atomic_ignore_off_page(size_t lb,
   }
 
   /*ARGSUSED*/
-  GC_API void GC_CALL GC_debug_change_stubborn(void *p) {}
+  GC_API void GC_CALL GC_debug_change_stubborn(void *p) { (void)p; }
 
   /*ARGSUSED*/
-  GC_API void GC_CALL GC_debug_end_stubborn_change(void *p) {}
+  GC_API void GC_CALL GC_debug_end_stubborn_change(void *p) { (void)p; }
 #endif /* !STUBBORN_ALLOC */
 
 GC_API void * GC_CALL GC_debug_malloc_atomic(size_t lb, GC_EXTRA_PARAMS)
@@ -931,6 +931,7 @@ STATIC void GC_check_heap_block(struct hblk *hbp, word dummy)
     size_t sz = hhdr -> hb_sz;
     size_t bit_no;
     char *p, *plim;
+    (void)dummy; // LD: avoid compiler unused warning
 
     p = hbp->hb_body;
     if (sz > MAXOBJBYTES) {

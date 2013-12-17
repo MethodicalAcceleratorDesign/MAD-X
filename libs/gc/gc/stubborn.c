@@ -37,6 +37,7 @@
   /*ARGSUSED*/
   GC_API void GC_CALL GC_change_stubborn(void *p)
   {
+    (void)p; // LD: avoid compiler unused warning
   }
 
 #else /* !MANUAL_VDB */
@@ -49,11 +50,13 @@
   /*ARGSUSED*/
   GC_API void GC_CALL GC_end_stubborn_change(void *p)
   {
+    (void)p; // LD: avoid compiler unused warning
   }
 
   /*ARGSUSED*/
   GC_API void GC_CALL GC_change_stubborn(void *p)
   {
+    (void)p; // LD: avoid compiler unused warning
   }
 
 #endif /* !MANUAL_VDB */

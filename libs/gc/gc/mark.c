@@ -26,7 +26,7 @@
 /*VARARGS*/
 #if defined(__GNUC__) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__CC_ARM)
   /*ARGSUSED*/
-  void GC_noop(void *p, ...) {}
+  void GC_noop(void *p, ...) { (void)p; }
 #else
 # ifdef __DMC__
     void GC_noop(...) {}

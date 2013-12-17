@@ -174,6 +174,7 @@ GC_API void GC_CALL GC_set_handle_fork(int value)
       ABORT("fork() handling disabled");
 # else
     /* No at-fork handler is needed in the single-threaded mode.        */
+    (void)value; // LD: nop avoiding unused warning
 # endif
 }
 
@@ -283,11 +284,12 @@ GC_INNER void GC_extend_size_map(size_t i)
   /* not static because it could also be errorneously defined in .S     */
   /* file, so this error would be caught by the linker.                 */
   /*ARGSUSED*/
-  void * GC_clear_stack_inner(void *arg, ptr_t limit)
+ void * GC_clear_stack_inner(void *arg, ptr_t limit); // LD: avoid compiler warning
+ void * GC_clear_stack_inner(void *arg, ptr_t limit)
   {
     volatile word dummy[CLEAR_SIZE];
 
-    BZERO((/* no volatile */ void *)dummy, sizeof(dummy));
+    BZERO(dummy, sizeof(dummy));
     if ((word)GC_approx_sp() COOLER_THAN (word)limit) {
         (void) GC_clear_stack_inner(arg, limit);
     }
@@ -419,7 +421,7 @@ GC_API void * GC_CALL GC_base(void * p)
 /* Return the size of an object, given a pointer to its base.           */
 /* (For small objects this also happens to work from interior pointers, */
 /* but that shouldn't be relied upon.)                                  */
-GC_API size_t GC_CALL GC_size(const void * p)
+GC_API size_t GC_CALL GC_size(void * p)
 {
     hdr * hhdr = HDR(p);
 
@@ -1619,6 +1621,7 @@ STATIC void GC_do_blocking_inner(ptr_t data, void * context)
     struct blocking_data * d = (struct blocking_data *) data;
     GC_ASSERT(GC_is_initialized);
     GC_ASSERT(GC_blocked_sp == NULL);
+    (void)context; // LD: avoid compiler warnings
 #   ifdef SPARC
         GC_blocked_sp = GC_save_regs_in_stack();
 #   else

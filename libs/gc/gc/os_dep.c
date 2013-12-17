@@ -2675,7 +2675,9 @@ STATIC void GC_default_push_other_roots(void)
     /* Ignore write hints.  They don't help us here.    */
     /*ARGSUSED*/
     GC_INNER void GC_remove_protection(struct hblk *h, word nblocks,
-                                       GC_bool is_ptrfree) {}
+                                       GC_bool is_ptrfree) {
+      (void)h, (void)nblocks, (void)is_ptrfree;
+    }
 # endif
 
 #endif /* PROC_VDB || GWW_VDB */
