@@ -179,6 +179,7 @@ static void clear_marks_for_block(struct hblk *h, word dummy)
 {
     register hdr * hhdr = HDR(h);
 
+    (void)dummy; // LD: avoid compiler unused warning
     if (IS_UNCOLLECTABLE(hhdr -> hb_obj_kind)) return;
         /* Mark bit for these is cleared only once the object is        */
         /* explicitly deallocated.  This either frees the block, or     */
@@ -1367,6 +1368,7 @@ GC_API struct GC_ms_entry * GC_CALL GC_mark_and_push(void *obj,
 {
     hdr * hhdr;
 
+    (void)src; // LD: avoid compiler unused warning
     PREFETCH(obj);
     GET_HDR(obj, hhdr);
     if (EXPECT(IS_FORWARDING_ADDR_OR_NIL(hhdr), FALSE)) {

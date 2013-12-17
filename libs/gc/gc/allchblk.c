@@ -169,6 +169,7 @@ static int free_list_index_of(hdr *wanted)
     return -1;
 }
 
+void GC_dump_regions(void); // LD: avoid compiler warning
 void GC_dump_regions(void)
 {
     unsigned i;
@@ -189,7 +190,7 @@ void GC_dump_regions(void)
         for (p = start; p < end;) {
             hhdr = HDR(p);
             if (IS_FORWARDING_ADDR_OR_NIL(hhdr)) {
-                GC_printf("\t%p Missing header!!(%p)\n", (void*)p, hhdr);
+                GC_printf("\t%p Missing header!!(%p)\n", (void*)p, (void*)hhdr);
                 p += HBLKSIZE;
                 continue;
             }
@@ -855,7 +856,7 @@ GC_INNER void GC_freehblk(struct hblk *hbp)
     /* Check for duplicate deallocation in the easy case */
       if (HBLK_IS_FREE(hhdr)) {
         if (GC_print_stats)
-          GC_log_printf("Duplicate large block deallocation of %p\n", hbp);
+          GC_log_printf("Duplicate large block deallocation of %p\n", (void*)hbp);
         ABORT("Duplicate large block deallocation");
       }
 

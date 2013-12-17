@@ -1223,9 +1223,10 @@ GC_INNER unsigned GC_fail_count = 0;
 /* free blocks available.  Should be called until the blocks are        */
 /* available (seting retry value to TRUE unless this is the first call  */
 /* in a loop) or until it fails by returning FALSE.                     */
-STATIC GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
-                                             GC_bool ignore_off_page,
-                                             GC_bool retry)
+GC_INNER GC_bool GC_collect_or_expand(word, GC_bool, GC_bool); // LD: avoid compiler warning
+GC_INNER GC_bool GC_collect_or_expand(word needed_blocks,
+                                      GC_bool ignore_off_page,
+                                      GC_bool retry)
 {
     GC_bool gc_not_stopped = TRUE;
     word blocks_to_get;

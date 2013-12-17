@@ -504,6 +504,8 @@ STATIC mse * GC_array_mark_proc(word * addr, mse * mark_stack_ptr,
     mse * orig_mark_stack_ptr = mark_stack_ptr;
     mse * new_mark_stack_ptr;
 
+    (void)env; // LD: avoid compiler unused warning
+
     if (descr == 0) {
         /* Found a reference to a free list entry.  Ignore it. */
         return(orig_mark_stack_ptr);

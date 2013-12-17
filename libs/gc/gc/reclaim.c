@@ -451,7 +451,8 @@ void GC_print_block_list(void)
 }
 
 /* Currently for debugger use only: */
-STATIC void GC_print_free_list(int kind, size_t sz_in_granules)
+void GC_print_free_list(int kind, size_t sz_in_granules); // LD: avoid compiler warning
+void GC_print_free_list(int kind, size_t sz_in_granules)
 {
     struct obj_kind * ok = &GC_obj_kinds[kind];
     ptr_t flh = ok -> ok_freelist[sz_in_granules];

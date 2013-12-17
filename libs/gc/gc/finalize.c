@@ -279,7 +279,7 @@ STATIC void GC_ignore_self_finalize_mark_proc(ptr_t p)
 }
 
 /*ARGSUSED*/
-STATIC void GC_null_finalize_mark_proc(ptr_t p) {}
+STATIC void GC_null_finalize_mark_proc(ptr_t p) { (void)p; }
 
 /* Possible finalization_marker procedures.  Note that mark stack       */
 /* overflow is handled by the caller, and is not a disaster.            */
@@ -460,6 +460,7 @@ GC_API void GC_CALL GC_register_finalizer_unreachable(void * obj,
 }
 
 #ifndef NO_DEBUGGING
+  void GC_dump_finalization(void); // LD: avoid compiler warning
   void GC_dump_finalization(void)
   {
     struct disappearing_link * curr_dl;
@@ -757,6 +758,7 @@ GC_INNER void GC_finalize(void)
    * This routine is externally callable, so is called without
    * the allocation lock.
    */
+  GC_API void GC_CALL GC_finalize_all(void); // LD: avoid compiler warning
   GC_API void GC_CALL GC_finalize_all(void)
   {
     DCL_LOCK_STATE;
