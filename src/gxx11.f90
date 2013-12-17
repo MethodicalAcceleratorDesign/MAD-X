@@ -4183,17 +4183,14 @@ subroutine gxsdef(sitem,item)
   save spldef, sxtdef, sxfdef, vp, ixadef, iyadef, icvdef,          &
        rxdef, rydef, rgb, col
   data rgb /3*0., 1.,0.,0., 0.,1.,0., 1.,0.,1., 0.,1.,1., 1.,1.,0./
-  data col / 'black', 'red', 'green', 'blue', 'cyan',               &
-       'magenta' /
+  data col / 'black', 'red', 'green', 'blue', 'cyan', 'magenta' /
   data spldef/'********************'/
   data sxtdef/' '/, sytdef/' '/
   data sxfdef/' '/, syfdef/' '/
   data vp / 0., 1., 0., 1. /
   data  vpdef/ 0.05, 0.95 ,0.05, 0.95 /
-  data ixadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0,                   &
-       -99,0,0/
-  data iyadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0,                   &
-       -99,0,0/
+  data ixadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0, -99,0,0/
+  data iyadef/0,-1,1,-99,-99,-99,10,10,2,2,1,9*0, -99,0,0/
   data icvdef/1,1,1,1,0,1,0,0,0,10/
   data rxdef/0.,0./, rydef/0.,0./
 

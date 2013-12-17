@@ -2343,43 +2343,30 @@ subroutine pesopt(ierr)
   !--- Routine body
 
   !--- ptc flag setting
-
-  call comm_para('ptc ', nint, ndble, k, int_arr, d_arr,            &
-       char_a, char_l)
+  call comm_para('ptc ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0 .and. int_arr(1) .eq. 1) ptc_flag = .true.
 
-  !--- Get notitle
-
-  call comm_para('notitle ', nint, ndble, k, int_arr, d_arr,        &
-       char_a, char_l)
+  !--- get notitle
+  call comm_para('notitle ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0) notitle = int_arr(1)
 
-  !--- get noversi
-
-  call comm_para('noversion ', nint, ndble, k, int_arr, d_arr,      &
-       char_a, char_l)
+  !--- get noversion
+  call comm_para('noversion ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0) noversi = int_arr(1)
 
   !--- if ptc flag is on look for the ptc_table
-
   if(ptc_flag) then
-     call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr,    &
-          char_a, char_l)
+     call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) tabname = char_a
   else
-
      !--- else normal twiss treatment : any table - for hor = s plot machine
-
-     call comm_para('table ', nint, ndble, k, int_arr, d_arr,        &
-          char_a, char_l)
+     call comm_para('table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) tabname = char_a
   endif
 
   !--- Horizontal variable
-
   char_a = ' '
-  call comm_para( 'haxis ', nint, ndble, k, int_arr, d_arr,         &
-       char_a, char_l)
+  call comm_para( 'haxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (k .eq. 0)  then
      print *, 'no horizontal variable'
      ierr = 1
@@ -2391,11 +2378,9 @@ subroutine pesopt(ierr)
   if (horname .eq. 's')  itbv = 1
 
   !--- Prepare title
-
   if (notitle .eq. 0)  then
      char_a = ' '
-     call comm_para('title ', nint, ndble, k, int_arr, d_arr,        &
-          char_a, char_l)
+     call comm_para('title ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .eq. 0) then
         call get_title(char_a, k)
      else
@@ -2429,38 +2414,28 @@ subroutine pesopt(ierr)
 
   char_a = ' '
 
-  call comm_para('noline ', nint, ndble, k, int_arr, d_arr,         &
-       char_a, char_l)
+  call comm_para('noline ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0) noline = int_arr(1)
 
-  call comm_para('hmin ', nint, ndble, k, int_arr, d_arr,           &
-       char_a, char_l)
+  call comm_para('hmin ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (ndble .gt. 0) hrange(1) = d_arr(1)
 
-  call comm_para('hmax ', nint, ndble, k, int_arr, d_arr,           &
-       char_a, char_l)
+  call comm_para('hmax ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (ndble .gt. 0) hrange(2) = d_arr(1)
 
-  call comm_para('vmin ', nint, ndble, k, int_arr, d_arr,           &
-       char_a, char_l)
-
+  call comm_para('vmin ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   do i = 1, ndble
      vrange(1,i) = d_arr(i)
   enddo
 
-  call comm_para('vmax ', nint, ndble, k, int_arr, d_arr,           &
-       char_a, char_l)
-
+  call comm_para('vmax ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   do i = 1, ndble
      vrange(2,i) = d_arr(i)
   enddo
 
   !--- Check that STYLE & SYMBOL are both non zero
-
-  call comm_para('style ', nint, ndble, k, plot_style, d_arr,       &
-       char_a, char_l)
-  call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr,     &
-       char_a, char_l)
+  call comm_para('style ', nint, ndble, k, plot_style, d_arr, char_a, char_l)
+  call comm_para('symbol ', nint, ndble, k, plot_symbol, char_a, char_l)
   if (plot_style(1) + plot_symbol(1) .eq. 0) then
      print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
@@ -2469,11 +2444,9 @@ subroutine pesopt(ierr)
   ipparm(4,1) = plot_symbol(1)
 
   char_a = ' '
-  call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr,       &
-       char_a, char_l)
+  call comm_para('bars ', nint, ndble, k, ipparm(3,1), d_arr, char_a, char_l)
 
-  call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr,     &
-       char_a, char_l)
+  call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr, char_a, char_l)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
 
@@ -2482,15 +2455,13 @@ subroutine pesopt(ierr)
   !--- Interpolation is not possible for ptc twiss variables
 
   if (.not. ptc_flag) then
-     call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr,       &
-          char_a,char_l)
+     call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr, char_a,char_l)
      if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
 
      ipparm(2,1) = 0
      inter_setplot = plot_option('interpolate ')
      if (inter_setplot .eq. 0) then
-        call comm_para('interpolate ', nint, ndble, k, ipparm(2,1),   &
-             d_arr,char_a, char_l)
+        call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
      else
         ipparm(2,1) = inter_setplot
      endif
@@ -2501,8 +2472,7 @@ subroutine pesopt(ierr)
   interf = ipparm(2,1)
 
   char_a = ' '
-  call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr,          &
-       char_a, char_l)
+  call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (k .gt. 0)  then
      nivaxs = 1
      nivvar = min(k, mxcurv)
@@ -2512,12 +2482,10 @@ subroutine pesopt(ierr)
      enddo
   else
      char_a = ' '
-     call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr,       &
-          char_a, char_l)
+     call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
-
            goto 110
         endif
         nivaxs = nivaxs + 1
@@ -2528,8 +2496,7 @@ subroutine pesopt(ierr)
         enddo
      endif
      char_a = ' '
-     call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr,       &
-          char_a, char_l)
+     call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2543,8 +2510,7 @@ subroutine pesopt(ierr)
         enddo
      endif
      char_a = ' '
-     call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr,       &
-          char_a, char_l)
+     call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2558,8 +2524,7 @@ subroutine pesopt(ierr)
         enddo
      endif
      char_a = ' '
-     call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr,       &
-          char_a, char_l)
+     call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
            print *, 'Warning: # vertical variables cut at = ', nivvar
@@ -2588,8 +2553,7 @@ subroutine pesopt(ierr)
 110 continue
 
   do j = 1, nivvar
-     call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j),       &
-          sdum(1))
+     call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j), sdum(1))
      if (slabl(j) .eq. 'rbetx')  then
         sname(j) = 'betx'
         proc_flag(1,j) = 1
