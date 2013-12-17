@@ -289,7 +289,7 @@ GC_INNER void GC_extend_size_map(size_t i)
   {
     volatile word dummy[CLEAR_SIZE];
 
-    BZERO(dummy, sizeof(dummy));
+    BZERO((/* no volatile */ word*)dummy, sizeof(dummy));
     if ((word)GC_approx_sp() COOLER_THAN (word)limit) {
         (void) GC_clear_stack_inner(arg, limit);
     }

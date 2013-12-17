@@ -230,13 +230,13 @@ GC_API void * GC_CALL GC_malloc_atomic_ignore_off_page(size_t lb)
 
 /* Increment GC_bytes_allocd from code that doesn't have direct access  */
 /* to GC_arrays.                                                        */
-STATIC GC_API void GC_CALL GC_incr_bytes_allocd(size_t n)
+GC_API void GC_CALL GC_incr_bytes_allocd(size_t n)
 {
     GC_bytes_allocd += n;
 }
 
 /* The same for GC_bytes_freed.                         */
-STATIC GC_API void GC_CALL GC_incr_bytes_freed(size_t n)
+GC_API void GC_CALL GC_incr_bytes_freed(size_t n)
 {
     GC_bytes_freed += n;
 }
@@ -268,7 +268,7 @@ STATIC GC_API void GC_CALL GC_incr_bytes_freed(size_t n)
 /* since the collector would not retain the entire list if it were      */
 /* invoked just as we were returning.                                   */
 /* Note that the client should usually clear the link field.            */
-STATIC GC_API void GC_CALL GC_generic_malloc_many(size_t lb, int k, void **result)
+GC_API void GC_CALL GC_generic_malloc_many(size_t lb, int k, void **result)
 {
     void *op;
     void *p;
