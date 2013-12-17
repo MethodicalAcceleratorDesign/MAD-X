@@ -1939,7 +1939,7 @@ void GC_print_static_roots(void);
 #endif
 
 /* Make arguments appear live to compiler */
-#if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__CC_ARM)
+#if defined(__GNUC__) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__CC_ARM)
   void GC_noop(void*, ...);
 #else
 # ifdef __DMC__
