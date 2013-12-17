@@ -355,7 +355,7 @@ exec_plot(struct in_cmd* cmd)
 #endif
 
     /* gnuplot command file ready. it produces the file "tmpplot.ps"*/
-    if (system("gnuplot -d gnu_plot.gp") == -1)
+    if (system("gnuplot gnu_plot.gp") == -1)
       warning("Plot - system cannot run the command: ", "gnuplot gnu_plot.gp");
       // and we leave the .gp file behind...
     else { // Copy or append the gnuplot ps file in the target ps_file */
