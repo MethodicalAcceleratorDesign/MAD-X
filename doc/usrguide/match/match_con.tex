@@ -2,7 +2,7 @@
 %  Changed by: Chris ISELIN, 27-Jan-1997 
 %  Changed by: Oliver Bruning, 20-Jun-2002 
 %  Changed by: Hans Grote, 25-Sep-2002 
- 
+% Changed by: Ghislain Roy, 11 Dec 2013: removed duplicate paragraph in user defined matching constraint 
 \section{Constraints}
 
 \subsection{CONSTRAINT: Simple Constraint}
@@ -37,16 +37,19 @@ specify the target beta  function for one element that lies inside this
 range. In this case one must first specify the constraint that affects
 the whole range and then the constraint for the single element. This way
 the constraint of the target value overrides the previous constraint on
-the upper limit for the selected element. For example, the following
+the upper limit for the selected element. 
+
+For example, the following
 constraint statements limit the maximum horizontal beta function between
 'marker1' and 'marker2' to 200 meter and require a horizontal beta
-function of 180 meter at element 'name1':  
+function of 100 meter at element 'name1':  
 \begin{verbatim}
 CONSTRAINT,SEQUENCE=sequence-name,RANGE='marker1'/'marker2',BETX<200.0;
 CONSTRAINT,SEQUENCE=sequence-name,RANGE='name1'/'marker2',BETX=100.0;
 \end{verbatim}
 
-When the two constraint statements are interchanged the horizontal beta
+When the two constraint statements are interchanged, and supposing that
+name1 is an element in the range marker1/marker2, the horizontal beta 
 function at element 'name1' will only be limited to less than 200 meter
 and NOT constrained to 100 meter! 
 
@@ -86,15 +89,6 @@ Normally ``RANGE'' refers to a single
 
 \subsection{User Defined Matching Constraints}
 \label{subsec:match_con_user}
-
-In addition to the nominal TWISS variables the user can define a limited
-set of 'user-defined' variables in the constrint statement. This allows,
-for example, the matching of the normalized dispersion or the mechanical
-aperture. The MATCH module allows four user defined variables called:
-mvar1, mvar2, mvar3 and mvar4. The variables can be defined according to
-the general variable declaration rules of deferred exressions. For
-example, in order to match the normalized dispersion at a certain
-location in the sequence one would first define a variable:  
 
 In addition to the nominal TWISS variables the user can define a limited
 set of 'user-defined' variables in the constraint statement. This

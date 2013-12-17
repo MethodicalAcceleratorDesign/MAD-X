@@ -3,6 +3,7 @@
 <!-- Changed by: Chris ISELIN, 27-Jan-1997 -->
 <!-- Changed by: Oliver Bruning, 20-Jun-2002 -->
 <!-- Changed by: Hans Grote, 25-Sep-2002 -->
+<!-- Changed by: Ghislain Roy, 11 Dec 2013: removed duplicate paragraph in user defined matching constraint -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -37,20 +38,24 @@ The optic functions can be constraint in four different ways:
 <li>target value: BETX=value -> type 4
 </ul>
 In case one element is affected my more than one constraint command the last 
-CONSTRAINT will be chosen. For example, one can specify the maximum acceptable
+CONSTRAINT will be chosen. 
+<p>
+For example, one can specify the maximum acceptable
 beta function over a range of the sequence and specify the target beta 
 function for one element that lies inside this range. In this case one must
 first specify the constraint that affects the whole range and then the
 constraint for the single element. This way the constraint of the target value
 overrides the previous constraint on the upper limit for the selected element.
+<p>
 For example, the following constraint statements limit the maximum
 horizontal beta function between 'marker1' and 'marker2' to 200 meter and
-require a horizontal beta function of 180 meter at element 'name1':
+require a horizontal beta function of 100 meter at element 'name1':
 <pre>
 CONSTRAINT,SEQUENCE=sequence-name,RANGE='marker1'/'marker2',BETX<200.0;
-CONSTRAINT,SEQUENCE=sequence-name,RANGE='name1'/'marker2',BETX=100.0;
+CONSTRAINT,SEQUENCE=sequence-name,RANGE='name1',BETX=100.0;
 </pre>
-When the two constraint statements are interchanged the 
+When the two constraint statements are interchanged, 
+and supposing that name1 is an element in the range marker1/marker2, the 
 horizontal beta function at element 'name1' will only be limited to less than
 200 meter and NOT constrained to 100 meter!
 <p>
@@ -61,11 +66,11 @@ the optic functions or via a pre-calculated
 <a href="../control/general.html#savebeta">SAVEBETA</a> module.
 The first options has the form:
 <pre>
-CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETX=real,ALFX=real,MUX=real,
-                                                 BETY=real,ALFY=real,MUY=real,
-                                                 X=real,PX=real,Y=real,PY=real,
-                                                 DX=real,DY=real,DPX=real,DPY=real;
-
+CONSTRAINT, SEQUENCE=sequence-name, RANGE=position,
+            BETX=real, ALFX=real, MUX=real,
+            BETY=real, ALFY=real, MUY=real,
+            X=real, PX=real, Y=real, PY=real,
+            DX=real, DY=real, DPX=real, DPY=real;
 </pre>
 Here all <a href="../Introduction/tables.html#linear">linear lattice functions</a>
 (BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
@@ -75,7 +80,8 @@ are constrained at the selected range to the corresponding values.
 <P>
 The second form of the CONSTRAINT command has the form
 <pre>
-CONSTRAINT,SEQUENCE=sequence-name,RANGE=position,BETA0=beta0-name,MUX=real,MUY=real
+CONSTRAINT, SEQUENCE=sequence-name, RANGE=position,
+            BETA0=beta0-name, MUX=real, MUY=real
 </pre>
 Here all of (BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
 are constrained in the selected points to the corresponding values
@@ -83,18 +89,18 @@ of a pre-calculated <a href="../control/general.html#savebeta">SAVEBETA</a> modu
 In the above example
 the phases (MUX, MUY) are overridden by the numerical values specified via
 'MUX=real' and 'MUY=real'.
+<p>
 Normally ``RANGE'' refers to a single
 <a href="../Introduction/ranges.html#position">position</a>.
 <P>
 
 <H2><a name=user-var>User Defined Matching Constraints</a></H2>
-In addition to the nominal TWISS variables the user can define a limited set of 'user-defined' variables in the constrint statement. This allows, for example, the matching of the normalized dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4. The variables can be defined according to the general variable declaration rules of deferred exressions. For example, in order to match the normalized dispersion at a certain location in the sequence one would first define a variable: 
-
-
-
 In addition to the nominal TWISS variables the user can define a 
-limited set of 'user-defined' variables in the constraint statement. This allows, for example, the matching of the normalized
-dispersion or the mechanical aperture. The MATCH module allows four user defined variables called: mvar1, mvar2, mvar3 and mvar4.
+limited set of 'user-defined' variables in the constraint statement. 
+This allows, for example, the matching of the normalized
+dispersion or the mechanical aperture. 
+The MATCH module allows four user defined variables called: 
+mvar1, mvar2, mvar3 and mvar4.
 The variables can be defined according to the general variable declaration rules of 
 <a href="../Introduction/expression.html#defer">deferred expressions</a>.
 For example, in order to match the normalized dispersion at a certain
