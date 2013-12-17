@@ -145,7 +145,8 @@ GC_INNER long GC_large_alloc_warn_interval = GC_LARGE_ALLOC_WARN_INTERVAL;
 /*ARGSUSED*/
 STATIC void * GC_CALLBACK GC_default_oom_fn(size_t bytes_requested)
 {
-    return(0);
+  (void)bytes_requested;
+  return(0);
 }
 
 /* All accesses to it should be synchronized to avoid data races.       */
@@ -289,7 +290,7 @@ GC_INNER void GC_extend_size_map(size_t i)
   {
     volatile word dummy[CLEAR_SIZE];
 
-    BZERO((/* no volatile */ word*)dummy, sizeof(dummy));
+    memset((/* no volatile */ word*)dummy, 0, sizeof(dummy));
     if ((word)GC_approx_sp() COOLER_THAN (word)limit) {
         (void) GC_clear_stack_inner(arg, limit);
     }
@@ -1428,8 +1429,8 @@ GC_API GC_warn_proc GC_CALL GC_get_warn_proc(void)
       /* Avoid calling GC_err_printf() here, as GC_abort() could be     */
       /* called from it.  Note 1: this is not an atomic output.         */
       /* Note 2: possible write errors are ignored.                     */
-      if (WRITE(GC_stderr, (void *)msg, strlen(msg)) >= 0)
-        (void)WRITE(GC_stderr, (void *)("\n"), 1);
+      if (WRITE(GC_stderr, msg, strlen(msg)) >= 0)
+        (void)WRITE(GC_stderr, "\n", 1);
 
     if (GETENV("GC_LOOP_ON_ABORT") != NULL) {
             /* In many cases it's easier to debug a running process.    */
