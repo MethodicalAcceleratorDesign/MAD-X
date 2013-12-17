@@ -1,0 +1,308 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.04  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.12.12      +
+  + Execution Time Stamp: 17.12.13 17.13.03 +
+  +++++++++++++++++++++++++++++++++++++++++++
+Option, warn, info, echo;
+
+Title, "Test for PLOT command on the LHC 6.5 lattice with MADX";
+
+
+
+!---------------------------------------------------------------;
+
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+
+!---------------------------------------------------------------;
+
+
+
+option, -echo, -warn;
+
+
+
+Beam, particle=proton, sequence=lhcb1, energy=450.0,
+
+      npart=1.15e11, ex=7.82e-9, ey=7.82e-9, et=5.302e-5;
+
+
+
+!--- first calculation with Twiss functions calculated at end of elements 
+
+
+
+use, period=lhcb1;
+
+
+
+twiss, chrom, table;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   3.148198E-12 deltap:   1.000000E-06
+orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003171305985        56.15402958 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000118        1.985440946        595.2900593        2.860758575 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.347846458                  0                  0        59.31000027 
+
+               dq2            betymax              dymax              dyrms 
+       2.000224377         611.782944                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+// track particles
+
+track, file=plot1, dump, onetable;
+
+enter TRACK module
+ start, x= 2e-3, px=0, y= 2e-3, py=0;
+
+ start, x= 4e-3, px=0, y= 4e-3, py=0;
+
+ start, x= 6e-3, px=0, y= 6e-3, py=0;
+
+ start, x= 8e-3, px=0, y= 8e-3, py=0;
+
+ run,turns=10;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  Singular matrix occurred during closed orbit search.
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.002                  0 
+         2          0              0.004                  0 
+         3          0              0.006                  0 
+         4          0              0.008                  0 
+         1         10     0.000496683377    0.0001768656644 
+         2         10     0.000521979565     0.000370037976 
+         3         10   -0.0004347673648    0.0005773062087 
+         4         10    -0.003511413133    0.0006967226964 
+
+                 y                 py                  t                 pt 
+             0.002                  0                  0                  0 
+             0.004                  0                  0                  0 
+             0.006                  0                  0                  0 
+             0.008                  0                  0                  0 
+    0.001656694564   -0.0001070486622    4.985050917e-05                  0 
+    0.003561277739   -0.0002036661797    0.0002060000276                  0 
+    0.006041308382   -0.0002725010231     0.000490482976                  0 
+    0.009317391597   -0.0002631563906    0.0009622578946                  0 
+
+                 s                  e 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+
+*****  end of trrun  *****
+endtrack;
+
+exit TRACK module
+
+
+
+// plot trajectories
+
+setplot, post=1; 
+
+title, "Plot test for MAD-X"
+
+plot, file=plot1, table=trackone, trackfile=plot1, noversion, multiple, 
+
+      haxis=x, vaxis=px, particle=1,2,3,4; 
+
+plot, file=plot1, table=trackone, trackfile=plot1, noversion, multiple, 
+
+      haxis=y, vaxis=py, particle=1,2,3,4;
+
+trackfile is: plot1
+looking for file plot1one 
+
+
+// repeat with onetable
+
+
+
+delete,table=tracksumm;
+
+use, period=lhcb1;
+
+
+
+twiss, chrom, table;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   3.148198E-12 deltap:   1.000000E-06
+orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003171305985        56.15402958 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000118        1.985440946        595.2900593        2.860758575 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.347846458                  0                  0        59.31000027 
+
+               dq2            betymax              dymax              dyrms 
+       2.000224377         611.782944                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+// track particles
+
+track, file=plot2, dump;
+
+enter TRACK module
+ start, x= 2e-3, px=0, y= 2e-3, py=0;
+
+ start, x= 4e-3, px=0, y= 4e-3, py=0;
+
+ start, x= 6e-3, px=0, y= 6e-3, py=0;
+
+ start, x= 8e-3, px=0, y= 8e-3, py=0;
+
+ run,turns=10;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+  Full 6D closed orbit search.
+  Initial value of 6-D closed orbit from Twiss: 
+  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+  Singular matrix occurred during closed orbit search.
+  
+ 6D closed orbit found by subroutine trclor 
+iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.002                  0 
+         2          0              0.004                  0 
+         3          0              0.006                  0 
+         4          0              0.008                  0 
+         1         10     0.000496683377    0.0001768656644 
+         2         10     0.000521979565     0.000370037976 
+         3         10   -0.0004347673648    0.0005773062087 
+         4         10    -0.003511413133    0.0006967226964 
+
+                 y                 py                  t                 pt 
+             0.002                  0                  0                  0 
+             0.004                  0                  0                  0 
+             0.006                  0                  0                  0 
+             0.008                  0                  0                  0 
+    0.001656694564   -0.0001070486622    4.985050917e-05                  0 
+    0.003561277739   -0.0002036661797    0.0002060000276                  0 
+    0.006041308382   -0.0002725010231     0.000490482976                  0 
+    0.009317391597   -0.0002631563906    0.0009622578946                  0 
+
+                 s                  e 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+        26658.8832                  0 
+
+*****  end of trrun  *****
+endtrack;
+
+exit TRACK module
+
+
+
+// plot trajectories
+
+setplot, post=1; 
+
+title, "Plot test for MAD-X"
+
+plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple, 
+
+      haxis=x, vaxis=px, particle=1,2,3,4; 
+
+plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple, 
+
+      haxis=y, vaxis=py, particle=1,2,3,4;
+
+trackfile is: plot2
+looking for file plot2.obs0001.p0001 
+looking for file plot2.obs0001.p0002 
+looking for file plot2.obs0001.p0003 
+looking for file plot2.obs0001.p0004 
+
+
+removefile,file=plot2one;
+
+
+
+exit;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.04 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

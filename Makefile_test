@@ -58,7 +58,8 @@ test-ptc-twiss-5D test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl tes
 test-ptc-normal \
 test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3
+test-sequence test-sequence-2 test-sequence-3 \
+test-plot
 
 # same order as tests-all, tests that take +10s
 # to know the timing: make tests-all TIMER=time (on Unixes)
@@ -94,6 +95,7 @@ test-jacobian:       TESTSUITE := Jacobian testsuite
 test-makethin:       TESTSUITE := Makethin testsuite
 test-match:          TESTSUITE := Matching testsuite
 test-memory:         TESTSUITE := Memory Management testsuite
+test-plot:	     TESTSUITE := Plot Package testsuite
 test-ptc-normal:     TESTSUITE := PTC Normal testsuite
 test-ptc-trackline:  TESTSUITE := PTC Trackline testsuite
 test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite

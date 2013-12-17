@@ -5,83 +5,97 @@
 
 \chapter{PLOT}
 
-
 Values contained in MAD-X tables can be plotted in the form column
 versus column, with up to four differently scaled vertical axes;
 furthermore, if the horizontal axis is the position "s" of the elements
 in a sequence, then the symbolic machine can be plotted above the curves
 as well. In certain conditions True interpolation inside the element is
-available (through calls to the Twiss module for each slice) .  The
-"environment" (interpolation, line thickness, annotation size,
+available (through calls to the Twiss module for each slice) .  
+
+The "environment" (interpolation, line thickness, annotation size,
 PostScript format) can be set with the \hyperlink{setplot}{setplot}
 command.   
 
 
 \section{PLOT}	
 \begin{verbatim}
-plot, vaxis=vname1,vname2,..,vnamen,
-      vaxis1=vname1,vname2,..,vnamen, vaxis2=vname1,vname2,..,vnamen,
-      vaxis3=vname1,vname2,..,vnamen, vaxis4=vname1,vname2,..,vnamen,
-      haxis=vname, hmin=real, hmax=real, vmin=reals, vmax=reals, 
-      bars=integer, style=integer, colour=integer, symbol=integer, 
-      noversion=logical, interpolate=logical, noline=logical,
-      notitle=logical, marker_plot=logical, range_plot=logical, 
-      table=table_name, particle=particle1,particle2,...,particlen,
-      multiple=logical, title=string, range=range, file=file_name_start, 
-      ptc=logical, ptc_table=table_name, trackfile=table_name; 
+plot, vaxis=  vname1,vname2,..,vnamen,
+      vaxis1= vname1,vname2,..,vnamen, 
+      vaxis2= vname1,vname2,..,vnamen,
+      vaxis3= vname1,vname2,..,vnamen, 
+      vaxis4= vname1,vname2,..,vnamen,
+      haxis=  vname, hmin=real, hmax=real, 
+      vmin= reals, vmax= reals, 
+      bars= integer, style= integer, colour= integer, symbol= integer, 
+      noversion= logical, interpolate= logical, noline= logical, notitle= logical, 
+      marker_plot= logical, range_plot= logical, 
+      table= table_name, particle= particle1,particle2,...,particlen,
+      multiple= logical, title= string, range= range, 
+      file= file_name_start, trackfile= table_name,
+      ptc= logical, ptc_table= table_name; 
 \end{verbatim} 
+
 where the parameters have the following meaning: 
 
 \begin{itemize}
    \item vaxis: one or several variables from the table to be plotted
-     against the (only) vertical axis.   
+     against a single vertical axis.   
    \item vaxis1: one or several variables from the table to be plotted
-     against the vertical axis number 1 (out of 4 possible ones).  
+     against vertical axis number 1 (out of 4 possible vertical axes).  
    \item vaxis2: one or several variables from the table to be plotted
-     against the vertical axis number 2 (out of 4 possible ones).  
+     against vertical axis number 2 (out of 4 possible vertical axes).  
    \item vaxis3: one or several variables from the table to be plotted
-     against the vertical axis number 3 (out of 4 possible ones).  
+     against vertical axis number 3 (out of 4 possible vertical axes).  
    \item vaxis4: one or several variables from the table to be plotted
-     against the vertical axis number 4 (out of 4 possible ones).  
-   \item \textit{Important: vaxis and vaxisI are exclusive in their
+     against vertical axis number 4 (out of 4 possible vertical axes). \\ 
+   \textit{Important: vaxis and vaxisI are exclusive in their
      application!} 
    \item haxis: name of the horizontal variable 
-   \item hmin: lower horizontal edge 
-   \item hmax: upper horizontal edge; to be used, both hmin and hmax
+   \item hmin: lower edge for horizontal axis 
+   \item hmax: upper edge for horizontal axis; to be used, both hmin and hmax
      must be given.   
-   \item vmin:lower edges of vertical axes, up to four numbers 
-   \item vmax:upper edges of vertical axes, up to four numbers; both
-     vmin and vmax must be given for an axis to be effective.   
-   \item bars: 0 (default) or 1 - in the latter case, all curve points
-     coming from the table are connected with the horizontal axis by
-     vertical bars.   
-   \item style: 1 (default), 2, 3, or 4: curve style, being solid,
-     dashed, dotted, and dot-dashed; a value of 100 makes MAD-X use
-     these four styles in turn for successive curves in the same
-     plot. If style is 0 no curve is printed between points.  N.B. If
-     symbol and style are null at the same time, style is forced to its
-     default value (= 1).   
-   \item colour: 1 (default), 2, 3, , or 5: colour, being black, red,
-     green, blue, and magenta; a value of 100 makes MAD-X use these five
-     colours in turn for successive curves.  
-   \item symbol: 0 (default), 1, 2, 3, 4, or 5: none, dot, "+", "*",
-     circle, and "x". These symbols are potted at all curve points;
-     there size may have to be adapted (see below).   
-   \item noversion: logical, default=false. If set true, the information
-     concerning the madx version and the date are suppressed from the
-     title. This option frees more space for the user's title.   
-   \item interpolate: logical, default=false. Normally the curve points
-     from the table are connected by straight lines; if "interpolate" is
-     requested, then on-momentum Twiss parameters such as beta, alfa,
-     and dispersion are interpolated with calls to the Twiss module
-     inside each element, for all other variables splines are used to
-     smooth the curves.   
+   \item vmin: lower edge(s) for vertical axis or axes, up to four
+     numbers separated by commas.
+   \item vmax: upper edge(s) of vertical axis or axes, up to four
+     numbers separated by commas; 
+     Note that both vmin and vmax must be given for an axis to be effective.   
+   \item bars: 0 (default) or 1 - with bars=1, all data points
+     are connected to the horizontal axis with vertical bars.   
+   \item style: 1 (default), 2, 3, or 4: line style for connecting the
+     successive data points, respectively solid, dashed, dotted, and dot-dashed; 
+     the special value style=100 uses the four styles in turn for
+     successive curves in the same plot. 
+     With style=0 successive data points are not connected. 
+     N.B. If symbol and style are both zero at the same time, style is
+     forced to its default value (style=1).
+   \item colour: 1 (default), 2, 3, 4 or 5: colour for the symbols and lines, 
+     respectively black, red, green, blue, and magenta; 
+     The special value colour=100  uses the five colours in turn for
+     successive symbols and lines.
+   \item symbol: 0 (default), 1, 2, 3, 4, or 5: The symbols to be
+     plotted at data points, respectively none, dot ("."), plus ("+"),
+     star ("*"), circle ("o"), and cross ("x").  
+     The symbol size may have to be adapted through the SETPLOT command
+     (see below).   
+   \item noversion: logical, default=false. If noversion=true, the
+     information concerning the version of MAD-X and the date of the run
+     are suppressed from the title.  
+     This option frees additional space available for the user specified
+     title of the plot.  
+   \item interpolate: logical, default=false. The data points are
+     normally connected by straight lines; if "interpolate" is
+     specified, the on-momentum Twiss parameters such as beta, alfa, and
+     dispersion are interpolated with calls to the Twiss module inside
+     each element; for all other variables splines are used to smooth
+     the curves.  
    \item noline: logical, default=false. If s is the horizontal
-     variable, then the machine will be plotted in symbolic form above
-     the curve plot (except for tables having been read back into
-     MAD-X). This may result in a thick black block if the horizontal
-     scale is too large. "noline" allows the user to suppress the
-     machine plotting.    
+     variable, then a symbolic representation of the beamline is plotted
+     above the plot, except for tables that have been read back into MAD-X. 
+     In case the horizontal scale is too large and the density of
+     beamline elements is too high, this may result in hardly legible
+     representation and a thick black block in teh worst case. 
+     The "noline" option suppresses this symbolic representation of the
+     beamline. 
    \item notitle: logical, default=false. If true, suppresses the title
      line, including the information on the version and date.  
    \item marker\_plot: logical, default=false. If true, plotting is done
@@ -89,31 +103,60 @@ where the parameters have the following meaning:
      the plotting of non-continuous functions like the "N1" from the
      aperture module. Beware that the PS file might became very large if
      this flag is invoked.  
-   \item range\_plot: logical, default=false. Needed to allow to specify
-     a plotting range also for user defined horizontal axis.   
-   \item table: name of the table to be plotted from (default:
-     twiss). If it is \textit{track}, the data to be plotted are taken
-     from the tracking files generated for each required particle as
-     defined by the attribute \textit{particle}. The name of this file
-     has the following format: file name as defined by the attribute
-     \textit{trackfile}, the observation point fixed to 1 and the
-     particle number, e.g. \textit{testtrack.obs0001.p0003}.  If the
-     required file has not been generated by the previous MAD-X command
-     track, no plot is done for that particle.  The plot is obtained
-     through the \textit{gnuplot} package.  N.B. the previous track
-     command should contain the attribute \textit{dump}. The tracking
-     plots appends the plots to an existing file specified via
-     \textit{filename} appended by \textit{.ps}. The user should make
-     sure that this file does not exist before starting a MAD-X run! 
+   \item range\_plot: logical, default=false. Allows the specification
+     of a plotting range for the user defined horizontal axis.   
+
+
+   \item table: name of the table from which data is plotted (default:
+     twiss).  
+
+     If the first part of the name of the table is "track", the
+     data to be plotted are taken from the tracking file(s) generated by
+     a previous TRACK command for each requested particle as defined by
+     the \textit{particle} attribute. If the required file has not been
+     generated by a preceding TRACK command, no plot is done for that
+     particle.   
+
+     The plot is generated through the GNUPLOT program and is available
+     in the format specified by the SETPLOT command. 
+
+     The preceding TRACK command should contain the attribute \textit{DUMP}
+     and may contain the attribute \textit{ONETABLE}. The tracking plots
+     are appended to the file file\_name.ps where file\_name can be
+     specified via the attribute \textit{filename=file\_name}. Note that
+     the plots are appended to this file and the file is not
+     overwritten. 
+
+     The PLOT command uses the following tracking output files depending on
+     the name of the table.  
+     With the attribute \textit{table=trackone}, the data file is assumed
+     to have been generated with the \textit{ONETABLE=true} attribute of
+     the TRACK command, and the file name has the following format: 
+     \textit{basisone} where the basis for the file name is defined by the
+     attribute \textit{trackfile=basis} (default=track).
+
+     With the attribute \textit{table=trackxxx} where xxx is any string
+     other than "one", the data files are assumed to have been generated
+     with the \textit{ONETABLE=false} attribute of the TRACK command, and
+     the file names have the following format: \textit{basis.obs0001.p00i}
+     where the basis for the file name is defined by the attribute
+     \textit{trackfile=basis} (default=track), the observation point fixed
+     is to 1 and the particle number \textit{i} is given by the attribute
+     \textit{particle=i}. 
+ 
    \item particle: one or several numbers associated to the tracked
      particles for which the specified plot has to be displayed.  
+
    \item multiple: logical, default=false. If true all the curves
      generated for each tracked particle are put on one plot. Otherwise
      there will be one plot for each particle.   
+
    \item title: plot title string; if absent, the last overall title is
      used; if no such overall title as well, the sequence name is used.   
+
    \item range: horizontal plot
      \href{../Introduction/ranges.html}{range} given by elements.  
+
    \item file\_name: start of the file name for the Postscript
      file(s). Only the first occurrence of such a name will be
      used. Default is "madx" or "madx\_track" if the \textit{table}
@@ -121,6 +164,7 @@ where the parameters have the following meaning:
      below) the plots will either all be written into one file
      file\_name.ps, or one per plot into file\_name01.eps,
      file\_name02.eps, etc.   
+
    \item ptc: logical, default=false. If set true, the data to be
      plotted are taken from the table defined by the attribute
      \textit{ptc\_table} which is expected to be generated previously by
@@ -128,8 +172,10 @@ where the parameters have the following meaning:
      the names set in the definition of the ptc twiss
      table. Interpolation is not available and the attribute
      \textit{interpolate} has no effect.   
+
    \item ptc\_table: name of the ptc twiss table to be plotted from
      (default: ptc\_twiss)  
+
    \item trackfile: first part of the name of the files containing
      tracking data for each particle (default: track)  
 \end{itemize}
@@ -137,8 +183,8 @@ where the parameters have the following meaning:
 
 \section{SETPLOT}
 \begin{verbatim}
-setplot, post=integer, font=integer, lwidth=real, xsize=real, ysize=real,
-         ascale=real, lscale=real, sscale=real, rscale=real;
+setplot, post= integer, font= integer, lwidth= real, xsize= real, ysize= real,
+         ascale= real, lscale= real, sscale= real, rscale= real;
 \end{verbatim} 
 
 where the parameters have the following meaning: 
@@ -166,9 +212,134 @@ where the parameters have the following meaning:
 
 \section{RESPLOT}
 \begin{verbatim}
- resplot; 
+resplot; 
 \end{verbatim} 
 resets all defaults for the setplot command.  
+
+
+\section{First example for plots of tracking data}
+
+The following MAD-X code sample defines the tracking of four particles 
+with the generation of a single file with name \textit{basisone} 
+holding the tracking data for all four particles.  
+
+\begin{verbatim}
+// track particles
+track, file=basis, dump, onetable;
+ start, x= 2e-3, px=0, y= 2e-3, py=0;
+ start, x= 4e-3, px=0, y= 4e-3, py=0;
+ start, x= 6e-3, px=0, y= 6e-3, py=0;
+ start, x= 8e-3, px=0, y= 8e-3, py=0;
+ run,turns=1024;
+endtrack;
+\end{verbatim}
+
+The following sample code defines the plotting of the x-px and y-py
+phase space coordinates for all four particles. 
+It takes into account the fact that all coordinates are in a single file 
+with \textit{table=trackone} and defines the filename where tracking data 
+is to be found (\textit{basisone}) with \textit{trackfile=basis}. 
+
+\begin{verbatim}
+// plot trajectories
+setplot, post=1; 
+title, "FODO phase-space test";
+plot, file=plot, table=trackone, trackfile=basis, noversion, multiple, 
+      haxis=x, vaxis=px, particle=1,2,3,4; 
+plot, file=plot, table=trackone, trackfile=basis, noversion, multiple, 
+      haxis=y, vaxis=py, particle=1,2,3,4;
+\end{verbatim}
+
+With each plot command a temporary file \textit{gnu\_plot.gp} containing
+GNUPLOT instructions is generated.  
+The file generated by the first plot command reads: 
+
+\begin{verbatim}  
+set terminal postscript color
+set pointsize 0.48
+set output 'tmpplot.ps'
+set title "FODO phase-space test"
+set xlabel 'x'
+set ylabel 'px'
+plot 'basisone' using 3:($1==1 ? $4 : NaN) title 'particle 1' with points pointtype 1 , \
+     'basisone' using 3:($1==2 ? $4 : NaN) title 'particle 2' with points pointtype 2 , \
+     'basisone' using 3:($1==3 ? $4 : NaN) title 'particle 3' with points pointtype 3 , \
+     'basisone' using 3:($1==4 ? $4 : NaN) title 'particle 4' with points pointtype 4 
+\end{verbatim}
+
+MAD-X then calls GNUPLOT as a subprocess to execute this file, which
+generates the file \textit{tmpplot.ps}.  
+The file \textit{tmpplot.ps} is then {\bf appended} to the file 
+{\textit plot.ps} determined by the attribute \textit{file=plot}.  
+The files \textit{gnu\_plot.gp} and \textit{tmpplot.ps} are then
+discarded. 
+
+The same process is repeated for the second plot command, resulting in a
+growing file \textit{plot.ps}.
+
+
+\section{Second example for plots of tracking data}
+
+The following MAD-X code sample defines the tracking of four particles 
+with the generation of individual files with name
+\textit{basis.obs0001.p000i} with \textit{i=1..4}  
+holding the tracking data for each of the four particles.  
+
+\begin{verbatim}
+// track particles
+track, file=basis, dump;
+ start, x= 2e-3, px=0, y= 2e-3, py=0;
+ start, x= 4e-3, px=0, y= 4e-3, py=0;
+ start, x= 6e-3, px=0, y= 6e-3, py=0;
+ start, x= 8e-3, px=0, y= 8e-3, py=0;
+ run,turns=1024;
+endtrack;
+\end{verbatim}
+
+The following sample code defines the plotting of the x-px and y-py
+phase space coordinates for all four particles with the data of all four
+particles on a single plot.  
+It takes into account the fact that coordinates for all four particles
+are in separate files with 
+\textit{table={\underline track}fodo} and defines the filename where tracking
+data is to be found (\textit{basis.obs0001.p000i}) with
+\textit{trackfile=basis}.  
+
+\begin{verbatim}
+// plot trajectories
+setplot, post=1; 
+title, "FODO phase-space test";
+plot, file=plot, table=trackfodo, trackfile=basis, noversion, multiple, 
+      haxis=x, vaxis=px, particle=1,2,3,4; 
+plot, file=plot, table=trackfodo, trackfile=basis, noversion, multiple, 
+      haxis=y, vaxis=py, particle=1,2,3,4;  
+\end{verbatim}
+
+With each plot command a temporary file gnu\_plot.gp containing GNUPLOT instruction is generated. 
+The file generated by the first plot command reads: 
+
+\begin{verbatim}
+set terminal postscript color
+set pointsize 0.48
+set output 'tmpplot.ps'
+set title "FODO phase-space test"
+set xlabel 'x'
+set ylabel 'px'
+plot 'basis.obs0001.p0001' using 3:4 title 'particle 1' with points pointtype 1 , \
+     'basis.obs0001.p0002' using 3:4 title 'particle 2' with points pointtype 2 , \
+     'basis.obs0001.p0003' using 3:4 title 'particle 3' with points pointtype 3 , \
+     'basis.obs0001.p0004' using 5:4 title 'particle 4' with points pointtype 4 
+\end{verbatim}
+
+MAD-X then calls GNUPLOT as a subprocess to execute this file, which
+generates the file \textit{tmpplot.ps}.  
+The file \textit{tmpplot.ps} is then {\bf appended} to the file
+\textit{plot.ps} determined by the attribute \textit{file=plot}.  
+The files \textit{gnu\_plot.gp} and \textit{tmpplot.ps} are then
+discarded. 
+
+The same process is repeated for the second plot command, resulting in a
+growing file \textit{plot.ps}.
 
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002, 
