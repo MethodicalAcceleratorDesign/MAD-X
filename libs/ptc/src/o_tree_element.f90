@@ -1818,10 +1818,17 @@ CONTAINS
     TYPE(res_spinor_8), INTENT(INOUT) :: s
     INTEGER MF,I
 
-    do i=1,3
-       write(mf,*) ' Spin Variable ',i
-       call print(s%x(i),mf)
-    enddo
+  !  do i=1,3
+       write(mf,*) ' ' 
+        write(mf,*) ' Spin Variable 1/2(L_x + i L_z)' 
+       call print(s%x(1),mf)
+       write(mf,*) ' ' 
+       write(mf,*) ' Spin Variable 1/2(L_x - i L_z)' 
+       call print(s%x(2),mf)
+       write(mf,*) ' ' 
+       write(mf,*) ' Spin Variable L_y  (Usual Kernel of the Normal Form)' 
+       call print(s%x(3),mf)
+  !  enddo
 
   END subroutine print_res_spinor_8
 
@@ -1834,6 +1841,7 @@ CONTAINS
     call alloc(t)
 
     do i=1,3
+       read(mf,'(a255)') line
        read(mf,'(a255)') line
        call read(t,mf)
        s%x(i)=morph(t)
@@ -1881,16 +1889,24 @@ CONTAINS
        DO J=1,3
           READ(MF1,*) LINE
           CALL READ(T,MF1)
-          DS%S%s(I,J)=T     !MORPH(T)
+          DS%S%s(I,J)=MORPH(T)
        ENDDO
     ENDDO
     READ(MF1,*) LINE
-    DO I=1,3
-       DO J=1,3
-          READ(MF1,*) LINE
-          read(mf,*) ds%e_ij(i,j)
+    if(index(line,"NO")/=0) then
+       DO I=1,3
+          DO J=1,3 
+           ds%e_ij(i,j)=0.0_dp
+          ENDDO
        ENDDO
-    ENDDO
+    else
+       DO I=1,3
+          DO J=1,3
+             READ(MF1,*) LINE
+             read(mf,*) ds%e_ij(i,j)
+          ENDDO
+       ENDDO
+    endif
     if(present(file)) close(mf1)
 
     CALL KILL(T)
@@ -2525,7 +2541,7 @@ CONTAINS
     call alloc(dhn)
     call alloc(dr)
 
-    !  this only works with a da-map
+    !  this  works with a non da-map
     ds=1
     dh%m=1
     dh%s%s(2,1)=h_axis%x(3)
@@ -5018,7 +5034,7 @@ CONTAINS
   end subroutine eval_spin_matrix
 
 
-  subroutine factor_as(a_t,a_f,a_s,a_l,a_nl,DR,R_TE,CS_TE,COSLIKE,s0,s_nl)
+  subroutine factor_as(a_t,a_s,a_f,a_l,a_nl,DR,R_TE,CS_TE,COSLIKE,s0,s_nl)
     implicit none
     TYPE(damapspin), INTENT(INout) :: a_t,a_f,a_s,a_l,a_nl
     logical(lp) lagrange0,factor_spin0
@@ -5075,7 +5091,8 @@ CONTAINS
 
 
 
-    a_s=a_f**(-1)*a_t
+   ! a_s=a_f**(-1)*a_t
+     a_s=a_t
     a_s%m=1
     a_s=a_s*a_t%m**(-1)
 
@@ -5084,7 +5101,7 @@ CONTAINS
 
 !!! this creates
 
-    !! (a_t%m,a_t%s) = (a_f%m, I ) o (I ,a_s%s) o (a_l%m,I) o (a_nl%m,I)
+    !! (a_t%m,a_t%s) = (I ,a_s%s) o (a_f%m, I ) o (a_l%m,I) o (a_nl%m,I)
 
     !
     !if(present(a_s0)) then
@@ -6176,7 +6193,6 @@ CONTAINS
 
   end subroutine normal_thetaH
 
-
 !!! Some useful routines
 
   subroutine AVERAGE(F,A,F_floquet,F_xp,use_J)
@@ -6189,7 +6205,7 @@ CONTAINS
     TYPE(taylorresonance) fq
     real(dp) value,valuexp
     integer, allocatable :: jc(:)
-    logical, optional :: use_J
+    logical(lp), optional :: use_J
     logical usej
     integer i,n,j,it,nd,iu
     logical doflip,uj
@@ -6232,16 +6248,20 @@ CONTAINS
        if(it==0) then
           iu=iu/2
           valuexp=value
+          tt_xp=(valuexp.mono.jc)+tt_xp
           if(uj) then
              value=valuexp*2.0_dp**iu
+               do j=1,nd
+                  jc(j*2)=0
+               enddo           
           endif
           tt=(value.mono.jc)+tt
-          tt_xp=(valuexp.mono.jc)+tt_xp
+
        endif
 
     enddo
 
-    fq%cos=tt
+  !  fq%cos=tt
     F_floquet=tt
 
     if(present(F_xp)) then

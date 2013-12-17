@@ -308,26 +308,7 @@ contains
 
 !!!!! some da stuff
 
-  real(dp) function bran(xran)
-    implicit none
-    !     ************************************
-    !
-    !     VERY SIMPLE RANDOM NUMBER GENERATOR
-    !
-    !-----------------------------------------------------------------------------
-    !
-    real(dp) xran
-    !
-    xran = xran + 10.0_dp
-    if(xran.gt.1e4_dp) xran = xran - 9999.12345e0_dp
-    bran = abs(sin(xran))
-    bran = 10*bran
-    bran = bran - int(bran)
-    !      IF(BRAN.LT. c_0_1) BRAN = BRAN + c_0_1
-    !
-    return
-  end function bran
-
+ 
   subroutine matinv(a,ai,n,nmx,ier)
 
     implicit none

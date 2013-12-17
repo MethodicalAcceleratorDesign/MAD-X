@@ -26,8 +26,8 @@ MODULE madx_ptc_module
   integer ipause
   integer,external :: mypause
   real(kind(1d0)) get_value,node_value
-  type(layout),pointer :: MY_RING
-  type(mad_universe),target ::  m_u
+  type(layout),pointer :: my_ring, bmadl
+  type(mad_universe),target ::  m_u,m_t
   integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3

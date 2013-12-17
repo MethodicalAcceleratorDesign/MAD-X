@@ -737,7 +737,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (damap),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
     INTEGER I
 
     DO I=1,ND2
@@ -749,7 +749,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (gmap),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
     INTEGER I
 
     DO I=1,s1%n
@@ -761,7 +761,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1(:)
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
     INTEGER I
 
     DO I=1,size(S1)
@@ -776,7 +776,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (VECFIELD),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
     INTEGER I
 
     write(mfile,*) s1%ifac,' Factorization represented'
@@ -791,7 +791,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (PBFIELD),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
 
     write(mfile,*) s1%ifac,' Factorization represented'
     CALL PRI(s1%H,MFILE,DEPS)
@@ -802,7 +802,7 @@ contains
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
 
     CALL PRI(s1,MFILE,DEPS)
 
@@ -976,20 +976,7 @@ contains
           s2(i,j)=m(i,j)
        enddo
     enddo
-    !    else
-    !       do i=1,nd2
-    !          do j=1,nd2
-    !             jL(j)=1
-    !             call NEWdapek(S1%v(i)%J,jL,m(i,j))
-    !             jL(j)=0
-    !          enddo
-    !       enddo
-    !       do i=1,nd2
-    !          do j=1,nd2
-    !             s2(i,j)=m(i,j)
-    !          enddo
-    !       enddo
-    !    endif
+ 
   END SUBROUTINE matrixMAPr
 
   SUBROUTINE  MAPmatrixr(S1,S2)
@@ -1012,15 +999,8 @@ contains
           JL(j)=0
        enddo
     enddo
-    !    else
-    !       do i=1,nd2
-    !          do j=1,nd2
-    !             jL(j)=1
-    !             call NEWdapok(S1%v(i)%J,jL,s2(i,j))
-    !             jL(j)=0
-    !         enddo
-    !       enddo
-    !    endif
+
+
   END SUBROUTINE MAPmatrixr
 
 
@@ -1774,8 +1754,8 @@ contains
     s22=s2
     s22=zero_
     ! if(old) then
-    call trx(s1%i,temp,s22%v%i)
-    call dacop(temp,trxtaylor%i)
+    call trx(s1%i,temp%i,s22%v%i)
+    call dacop(temp%i,trxtaylor%i)
     !    else
     !       call NEWtrx(s1%J,tempL,s22%v%J)
     !       call NEWdacop(tempL,trxtaylor%J)
@@ -1814,8 +1794,8 @@ contains
     s22=s2
     s22=zero_
     ! if(old) then
-    call gtrx(s1%i,temp,s22%v%i,s2%n)
-    call dacop(temp,trxgtaylor%i)
+    call gtrx(s1%i,temp%i,s22%v%i,s2%n)
+    call dacop(temp%i,trxgtaylor%i)
     !    else
     !       call NEWgtrx(s1%J,tempL,s22%v%J,s2%n)
     !       call NEWdacop(tempL,trxgtaylor%J)
@@ -1842,11 +1822,11 @@ contains
     call assdamap(trxtaylorc)
 
     ! if(old) then
-    call trx(s1%i,temp,s2%v%i)
-    call dacop(temp,trxtaylorc%i)
+    call trx(s1%i,temp%i,s2%v%i)
+    call dacop(temp%i,trxtaylorc%i)
     !    else
-    !       call NEWtrx(s1%J,tempL,s2%v%J)
-    !       call NEWdacop(tempL,trxtaylorc%J)
+    !       call NEWtrx(s1%J,temp%iL,s2%v%J)
+    !       call NEWdacop(temp%iL,trxtaylorc%J)
     !   endif
 
     master=localmaster
@@ -1866,11 +1846,11 @@ contains
     call assdamap(trxgtaylorc)
 
     ! if(old) then
-    call gtrx(s1%i,temp,s2%v%i,s2%n)
-    call dacop(temp,trxgtaylorc%i)
+    call gtrx(s1%i,temp%i,s2%v%i,s2%n)
+    call dacop(temp%i,trxgtaylorc%i)
     !    else
-    !       call NEWgtrx(s1%J,tempL,s2%v%J,s2%n)
-    !       call NEWdacop(tempL,trxgtaylorc%J)
+    !       call NEWgtrx(s1%J,temp%iL,s2%v%J,s2%n)
+    !       call NEWdacop(temp%iL,trxgtaylorc%J)
     !   endif
 
     master=localmaster
@@ -1928,11 +1908,11 @@ contains
 
     ! if(old) then
     !write(6,*) NRMIN,NRMAX,SCA,IFAC
-    call  FACFLO(s1%v%i,s2%i,temp,NRMIN,NRMAX,SCA,IFAC )
-    call dacop(temp,texpdft%i)
+    call  FACFLO(s1%v%i,s2%i,temp%i,NRMIN,NRMAX,SCA,IFAC )
+    call dacop(temp%i,texpdft%i)
     !    else
-    !       call newFACFLO(s1%v%j,s2%j,tempL,NRMIN,NRMAX,SCA,IFAC )
-    !       call NEWdacop(tempL,texpdft%J)
+    !       call newFACFLO(s1%v%j,s2%j,temp%iL,NRMIN,NRMAX,SCA,IFAC )
+    !       call NEWdacop(temp%iL,texpdft%J)
     !   endif
     master=localmaster
 
@@ -1999,8 +1979,8 @@ contains
        !     write(6,*) "Use a Dragt-Finn or Reverse-Dragt-Finn scratch variable "
     else
        ! if(old) then
-       call EXPFLO(s1%v%i,s2%i,temp,eps_tpsalie,nrmax)
-       call dacop(temp,expflot%i)
+       call EXPFLO(s1%v%i,s2%i,temp%i,eps_tpsalie,nrmax)
+       call dacop(temp%i,expflot%i)
        !      else
        !         call NEWEXPFLO(s1%v%J,s2%J,tempL,eps_tpsalie,nrmax)
        !         call NEWdacop(tempL,expflot%J)

@@ -11,6 +11,7 @@ module S_fitting
   real(dp) :: fuzzy_split=1.0_dp
   real(dp) :: max_ds=0.0_dp
   integer :: resplit_cutting = 0    ! 0 just magnets , 1 magnets as before / drifts separately
+  logical :: sagan_even=my_true
   ! 2  space charge algorithm
   logical(lp) :: radiation_bend_split=my_false
 
@@ -2492,6 +2493,10 @@ eta2=0.0_dp
        else
           parity=1
        endIf
+    endif
+    if(sagan_even.and.parity==1) then
+     inc=0
+     parity=0
     endif
     parityold=parity
     incold=inc

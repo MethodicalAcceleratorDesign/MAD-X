@@ -1748,7 +1748,9 @@ CONTAINS
     real(dp) LM1,ANG1,ANGI1,e11,e22
     integer tempkind
     type (EL_LIST),optional, INTENT(IN)::list
+    integer exactitude
 
+    exactitude=0
 
 
 
@@ -1805,7 +1807,7 @@ CONTAINS
        rectaETILT=0
        ANGE=ANG1-ANGI1
        SPE=ANG1/2.0_dp-ANGI1
-
+        exactitude=exactitude+1
        IF(MADLENGTH) THEN
           rectaETILT%L=LM1
           rectaETILT%LC=rectaETILT%L/COS(SPE)
@@ -1848,6 +1850,7 @@ CONTAINS
           rectaETILT%L=rectaETILT%LD
           rectaETILT%T1=ANGI1 ; rectaETILT%T2=ANGE;
           rectaETILT%nmul=2   ! 0 before
+        exactitude=exactitude+1
        ENDIF
 
        IF(LEN(NAME)>nlp) THEN
@@ -1873,7 +1876,7 @@ CONTAINS
 
     ENDIF !1
     madkind2=TEMPKIND
-
+    if(rectaETILT%KIND==kind7)        exactitude=exactitude+1
     if(present(list)) then
        rectaETILT%k=rectaETILT%k+list%k
        rectaETILT%ks=rectaETILT%ks+list%ks
@@ -1883,6 +1886,7 @@ CONTAINS
        rectaETILT%h1=list%h1
        rectaETILT%h2=list%h2
        rectaETILT%nmul=list%nmul
+       if(exactitude==3.and.list%nmul<2) rectaETILT%nmul=2
        rectaETILT%nst=list%nst
        rectaETILT%APERTURE_ON=list%APERTURE_ON
        rectaETILT%APERTURE_KIND=list%APERTURE_KIND

@@ -176,7 +176,7 @@ TYPE ELEMENT
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,LAG       ! Cavity information
    real(dp), POINTER :: DC_ac,A_ac,theta_ac,D_AC      ! slow RF: amplitude and phase
    real(dp),   DIMENSION(:), POINTER:: D_AN,D_BN,D0_AN,D0_BN         !Multipole component
-   logical(lp), POINTER :: THIN,slow_ac
+   logical(lp), POINTER :: THIN,slow_ac,slow_ac2
    real(dp), POINTER ::  B_SOL                                          ! Solenoidal field
    !  misalignements and rotation
    logical(lp), POINTER ::  MIS
@@ -238,7 +238,7 @@ TYPE ELEMENTP
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN,D_BN,D0_AN,D0_BN         !Multipole component
    !
    TYPE(REAL_8), POINTER :: B_SOL
-   logical(lp), POINTER :: THIN,slow_ac
+   logical(lp), POINTER :: THIN,slow_ac,slow_ac2
 
    !  MISALIGNEMENTS AND ROTATION
    logical(lp), POINTER ::  MIS

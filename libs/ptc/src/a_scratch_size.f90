@@ -184,6 +184,7 @@ module precision_constants
   logical  :: default_tpsa=.false.
   logical, target :: lingyun_yang=.false.
   integer, target :: last_tpsa=0
+  integer, target :: c_last_tpsa=0
   integer :: mf_herd=0
   character*255 :: print_herd="PRINT_HERD.TXT"
   character*255 :: initial_setting="FINAL_SETTINGS.TXT"
@@ -340,6 +341,26 @@ module precision_constants
   END INTERFACE
 
 contains
+
+ real(dp) function bran(xran)
+    implicit none
+    !     ************************************
+    !
+    !     VERY SIMPLE RANDOM NUMBER GENERATOR
+    !
+    !-----------------------------------------------------------------------------
+    !
+    real(dp) xran
+    !
+    xran = xran + 10.0_dp
+    if(xran.gt.1e4_dp) xran = xran - 9999.12345e0_dp
+    bran = abs(sin(xran))
+    bran = 10*bran
+    bran = bran - int(bran)
+    !      IF(BRAN.LT. c_0_1) BRAN = BRAN + c_0_1
+    !
+    return
+  end function bran
 
   function mat_norm(m)
     implicit none
@@ -611,7 +632,8 @@ end module precision_constants
 module scratch_size
   implicit none
   public
-  integer,parameter::ndumt=10                   !  Number of scratch level
+  integer,parameter::ndumt=10 
+  integer,parameter::c_ndumt=10                   !  Number of scratch level
 end module scratch_size
 
 module file_handler

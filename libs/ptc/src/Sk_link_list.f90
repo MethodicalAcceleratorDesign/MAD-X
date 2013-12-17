@@ -14,16 +14,16 @@ MODULE S_FIBRE_BUNDLE
   !  private null_it0
   private move_to_p,move_to_name_old,move_to_nameS,move_to_name_FIRSTNAME 
   PRIVATE append_EMPTY_FIBRE
-  PRIVATE FIND_PATCH_0
+  PRIVATE FIND_PATCH_0,FIND_PATCH_bmad_0
   PRIVATE FIND_PATCH_p_new
-  PRIVATE INDEX_0
+  PRIVATE INDEX_0,index_1
   private FIND_POS_in_universe,FIND_POS_in_layout,super_dealloc_fibre
   TYPE(LAYOUT), PRIVATE, POINTER:: LC
   logical :: superkill=.false.
   logical(lp),TARGET :: use_info=.false.
   integer, target :: nsize_info = 70
   private zero_fibre
-  INTEGER :: INDEX_0=0
+  INTEGER :: INDEX_0=0, INDEX_1=0
   INTEGER :: INDEX_node=0
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   real(dp),target :: eps_pos=1e-10_dp
@@ -71,6 +71,11 @@ MODULE S_FIBRE_BUNDLE
   INTERFACE FIND_PATCH
      MODULE PROCEDURE FIND_PATCH_0
   END INTERFACE
+
+  INTERFACE FIND_PATCH_bmad
+     MODULE PROCEDURE FIND_PATCH_bmad_0
+  END INTERFACE
+
 
 
   INTERFACE FIND_pos
@@ -247,7 +252,12 @@ CONTAINS
     current%mag%PARENT_FIBRE=>current
     current%magP%PARENT_FIBRE=>current
     !    current%magp%PARENT_FIBRE=>current
-    if(L%N==1) current%next=> L%start
+    if(L%N==1) then
+     current%next=> L%start
+      index_0=index_0+1
+      L%index=index_0    
+    endif
+
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
        L % end % next => current      !
@@ -352,6 +362,27 @@ CONTAINS
     L%LASTPOS=I; L%LAST => Current;
     !    CALL RING_L(L,doneit) ! TGV
   END SUBROUTINE move_to_p
+
+ SUBROUTINE move_to_p_safe( L,current,POS ) ! Moves current to the i^th position
+    implicit none
+    TYPE (fibre), POINTER :: Current
+    TYPE (layout), TARGET, intent(inout):: L
+    integer i,k,POS
+
+    !    CALL LINE_L(L,doneit)  !TGV
+    I=mod_n(POS,L%N)
+ 
+
+    nullify(current);
+    Current => L%start
+
+ 
+ 
+       DO K=1,I-1
+          Current => Current % next
+       END DO
+  
+  END SUBROUTINE move_to_p_safe
 
 
   SUBROUTINE move_to_name_old( L,current,name,pos,reset) ! moves to next one in list called name
@@ -588,8 +619,8 @@ CONTAINS
     L%NTHIN=0;L%THIN=0.0_dp;
     L%N=0;
     L%lastpos=0;L%NAME='No name assigned';
-    INDEX_0=INDEX_0+1
-    L%INDEX=INDEX_0
+!    INDEX_0=INDEX_0+1
+!    L%INDEX=INDEX_0
     L%HARMONIC_NUMBER=0
   END SUBROUTINE Set_Up
 
@@ -731,7 +762,11 @@ CONTAINS
     current%pos=l%n
     !    current%P0C=el%P0C
     !    current%BETA0=el%BETA0
-    if(L%N==1) current%next=> L%start
+    if(L%N==1) then 
+      current%next=> L%start
+      index_1=index_1+1
+      L%index=index_1
+    endif
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
        L % end % next => current      !
@@ -772,7 +807,9 @@ CONTAINS
     TYPE (layout), TARGET, intent(inout):: L
     L%N=L%N+1
     CALL ALLOCATE_FIBRE(Current)
-    if(L%N==1) current%next=> L%start
+    if(L%N==1) then
+     current%next=> L%start
+    endif
     Current % previous => L % end  ! point it to next fibre
     if(L%N>1)  THEN
        L%end%next => current      !
@@ -1072,9 +1109,9 @@ CONTAINS
           call kill(c%i);
           deallocate(c%i);
        ENDIF
-       !      IF(ASSOCIATED(c%pos)) THEN
+             IF(ASSOCIATED(c%pos)) THEN
        deallocate(c%pos);
-       !      ENDIF
+             ENDIF
        IF(ASSOCIATED(c%loc)) deallocate(c%loc);
 
     else
@@ -1524,17 +1561,21 @@ CONTAINS
     NEX=.FALSE.
     ENE=.FALSE.
     IF(PRESENT(NEXT)) NEX=NEXT
-    
-    if(associated(el1,el1%parent_layout%start)) then
-     if(.not.nex) then
-      nex=my_true
-     endif
+! changed 2012.12.04 fixing for bmad patch element
+!    if(associated(el1,el1%parent_layout%start)) then
+!     if(.not.nex) then
+!      nex=my_true
+!     endif
+!    endif
+!    if(associated(el1%next,el1%parent_layout%start)) then
+! Test assoc el2%parent_layout for dummy_fibre used in Bmad
+    if (associated(el2%parent_layout)) then
+      if(associated(el2, el2%parent_layout%start)) then
+        nex=my_false
+      endif
     endif
-    if(associated(el1%next,el1%parent_layout%start)) then
-     if(nex) then
-      nex=my_false
-     endif
-    endif
+
+
     
     el1%PATCH%B_X1=1
     el1%PATCH%B_X2=1
@@ -1598,6 +1639,33 @@ CONTAINS
 
   END SUBROUTINE FIND_PATCH_0
 
+  SUBROUTINE FIND_PATCH_bmad_0(EL1,EL2,D,ANG) ! COMPUTES PATCHES
+    IMPLICIT NONE
+    TYPE (FIBRE),TARGET, INTENT(INOUT) :: EL1
+    TYPE (FIBRE),TARGET, INTENT(INOUT) :: EL2
+    REAL(DP)  D(3),ANG(3),ent(3,3),exi(3,3),a(3),b(3)
+
+
+    if(el1%dir==1) then
+     ent=el1%chart%f%exi
+     a=el1%chart%f%b
+    else
+     ent=el1%chart%f%ent
+     a=el1%chart%f%a
+    endif
+
+    if(el2%dir==1) then
+     exi=el2%chart%f%ent
+     b=el2%chart%f%a
+    else
+     exi=el2%chart%f%exi
+     b=el2%chart%f%b
+    endif
+
+
+    call FIND_PATCH_BMAD(A,ENT,B,EXI,D,ANG)
+
+  END SUBROUTINE FIND_PATCH_bmad_0
 
   ! UNIVERSE STUFF
 

@@ -122,7 +122,7 @@ MODULE S_DEF_KIND
   real(dp), target :: wedge_coeff(2)
   logical(lp), target :: MAD8_WEDGE=.TRUE.
   logical(lp) :: bug_intentional=.false.
-  logical(lp) :: almost_exact=.false.
+ 
   !  logical(lp) :: old_solenoid=.true.
   INTEGER :: N_CAV4_F=1
   ! stochastic radiation in straigth
@@ -3487,6 +3487,9 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     TYPE(INTERNAL_STATE) k
 
+!    L. Deniau: moved down to avoid memory leaks, reported to Etienne.
+!    CALL ALLOC(PZ,TIME_FAC,B)
+
     IF(K1==1.AND.EL%KILL_ENT_FRINGE) RETURN
     IF(K1==2.AND.EL%KILL_EXI_FRINGE) RETURN
 
@@ -3638,16 +3641,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE
           IF(I==1) then
            CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
-            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
-            x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-           if(k%time) then
-           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
-           endif
-            
-           endif
+
           ENDIF
        ENDIF
 
@@ -3671,20 +3665,10 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
           IF(I==2) THEN 
-           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
-           if(k%time) then
-           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
-           endif
-           
-            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
-            x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-           endif
+         endif
            CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
           ENDIF
 
-        ENDIF
     ENDIF
 
   END SUBROUTINE EDGER
@@ -3729,16 +3713,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ELSE
           IF(I==1) then
            CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
-           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
-            x(1)=x(1)+EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
-            x(4)=x(4)-EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-    !       if(k%time) then
-    !       else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-    !        x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-    !        x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
-    !       endif
-            
-           endif
+
           ENDIF
        ENDIF
 
@@ -3762,16 +3737,6 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           IF(I==1) CALL FACE(EL%DIR*EL%CHARGE,BN,H1,EL%EDGE(1),X,k)
        ELSE
           IF(I==2) THEN 
-           if(almost_exact.and.i==1.AND.el%b0/=0.0_dp) then
-           if(k%time) then
-           else  !  px_0=-sin(EL%EDGE(I)) at exit -sign cancels
-            x(4)=x(4)+EL%CHARGE*BN(1)*X(5)*X(3)*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3
-            x(6)=x(6)+EL%CHARGE*BN(1)*X(3)**2*sin(EL%EDGE(I))/cos(EL%EDGE(I))**3           
-           endif
-           
-            x(1)=x(1)-EL%CHARGE*BN(1)*X(3)**2/cos(EL%EDGE(I))**3/2.0_dp
-            x(4)=x(4)+EL%CHARGE*BN(1)*X(2)*X(3)/cos(EL%EDGE(I))**3
-           endif
            CALL FACE(EL%DIR*EL%CHARGE,BN,H2,EL%EDGE(2),X,k)
           ENDIF
        ENDIF
@@ -6379,13 +6344,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
           X(6)=X(6)+X1*YL*( 1.0_dp + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
-!! temporary shit almost true   
-         if(almost_exact) then       
-          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
-          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
-         endif 
-!!
+
        ENDIF
     else
        if(EL%P%EXACT) THEN
@@ -6397,13 +6356,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(1)=X(1)-X(5)*YL*X(2)/(1.0_dp+X(5))
           X(3)=X(3)-X(5)*YL*X(4)/(1.0_dp+X(5))
           X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X(5))**2 )
-!! temporary shit almost true   
-         if(almost_exact) then       
-          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
-          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
-         endif 
-!!
+
        endif
     endif
 
@@ -6434,13 +6387,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           ! BUG FOUND BY SCHMIDT
           !       X(6)=X(6)+X1*YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/two/(one+X5)**2 )
           X(6)=X(6)+X1*YL*( 1.0_dp + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X5)**2 )-YL*(1-k%TOTALPATH)/EL%P%beta0
-!! temporary shit almost true   
-         if(almost_exact) then       
-          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
-          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
-         endif 
-!!
+
           CALL KILL(X1,X5)
        ENDIF
     else
@@ -6456,13 +6403,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
           X(3)=X(3)-X(5)*YL*X(4)/(1.0_dp+X(5))
           X(6)=X(6)+YL*( k%TOTALPATH + (X(2)**2+X(4)**2)/2.0_dp/(1.0_dp+X(5))**2 )
        endif
-!! temporary shit almost true   
-         if(almost_exact) then       
-          x(1)=x(1)/(1.0_dp-yl*EL%P%b0*x(2))
-          x(3)=x(3)+yl*EL%P%b0*x(4)*x(1)
-          x(2)=x(2)-yl*EL%P%b0*0.5_dp*(x(2)**2+x(4)**2)
-         endif 
-!!
+
     endif
 
   END SUBROUTINE KICKPATHD

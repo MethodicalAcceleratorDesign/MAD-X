@@ -5,7 +5,7 @@ module S_FRAME
   IMPLICIT NONE
   public
   PRIVATE ZERO_CHART,COPY_CHART,COPY_CHART1   !,GEO_ROTA,GEO_ROTB
-  PRIVATE COPY_PATCH,COPY_PATCH1,ZERO_PATCH,FIND_PATCH_b
+  PRIVATE COPY_PATCH,COPY_PATCH1,ZERO_PATCH,FIND_PATCH_b,FIND_PATCH_bmad0
   Private alloc_f,dealloc_f,equal_f
   private make_rot_x,make_rot_y,make_rot_z   !,GEO_ROTAB_no_vec,GEO_ROTA_no_vec
   REAL(DP), public :: GLOBAL_FRAME(3,3)= RESHAPE((/1,0,0  ,0,1,0  ,0,0,1/),(/3,3/))
@@ -39,6 +39,11 @@ module S_FRAME
 
   INTERFACE FIND_PATCH
      MODULE PROCEDURE FIND_PATCH_b
+  end  INTERFACE
+
+
+  INTERFACE FIND_PATCH_bmad
+     MODULE PROCEDURE FIND_PATCH_bmad0
   end  INTERFACE
 
   INTERFACE alloc
@@ -178,8 +183,10 @@ CONTAINS
 
        B%A_T=A%A_T
        B%B_T=A%B_T
-       B%A_X2=A%A_X2
+       B%A_X1=A%A_X1
        B%B_X1=A%B_X1
+       B%A_X2=A%A_X2
+       B%B_X2=A%B_X2
 
        DO I=1,3
           B%A_D(I)=A%A_D(I)
@@ -765,13 +772,13 @@ CONTAINS
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: ENTL(3,3), ENTB(3,3)
     REAL(DP), INTENT(OUT) :: A(3)
-    REAL(DP) D(3),T1(3,3),T10(3,3),T2(3,3),S_IJ,S_JJ
+    REAL(DP) T1(3,3),T10(3,3),T2(3,3),S_IJ,S_JJ
     REAL(DP) AT(3)
 
     T1=ENTL
     T10=ENTL
     T2=ENTL
-    D=0.0_dp
+
 
     CALL COMPUTE_SCALAR(T1,2,ENTB,3,S_IJ)
     CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
@@ -823,6 +830,73 @@ CONTAINS
 
   END SUBROUTINE COMPUTE_ENTRANCE_ANGLE
 
+  SUBROUTINE COMPUTE_ENTRANCE_ANGLE_bmad(ENTL,ENTB,A)
+    ! COMPUTES BMAD'S ANGLES IN FRAME OF ENTL
+    IMPLICIT NONE
+    REAL(DP),INTENT(IN):: ENTL(3,3), ENTB(3,3)
+    REAL(DP), INTENT(OUT) :: A(3)
+    REAL(DP) T1(3,3),T10(3,3),T2(3,3),S_IJ,S_JJ
+    REAL(DP) AT(3)
+
+    T1=ENTL
+    T10=ENTL
+    T2=ENTL
+
+    CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
+    CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
+
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(3)=0.0_dp
+    else
+       A(3)=ATAN2(S_IJ,S_JJ)
+    endif
+    !    A(3)=ATAN2(S_IJ,S_JJ)
+    AT=0.0_dp;AT(3)=A(3);
+
+    CALL GEO_ROT(T10,T1,AT,T2)
+    T2=T1
+    T10=T1
+
+
+    CALL COMPUTE_SCALAR(T1,2,ENTB,3,S_IJ)
+    CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
+
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(1)=0.0_dp
+    else
+       A(1)=ATAN2(-S_IJ,S_JJ)
+    endif
+
+    !   A(1)=ATAN2(-S_IJ,S_JJ)
+    AT=0.0_dp;AT(1)=A(1);
+
+    CALL GEO_ROT(T10,T1,AT,T2)
+    T2=T1
+    T10=T1
+
+    CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
+    CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
+
+    if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
+       A(2)=0.0_dp
+    else
+       A(2)=ATAN2(-S_IJ,S_JJ)
+    endif
+
+    !    A(2)=ATAN2(-S_IJ,S_JJ)
+    AT=0.0_dp;AT(2)=A(2);
+
+    CALL GEO_ROT(T10,T1,AT,T2)
+    T2=T1
+    T10=T1
+    a(1:2)=-a(1:2)
+
+    !   T2=T1
+    !   write(16,*) t2-entb
+
+
+  END SUBROUTINE COMPUTE_ENTRANCE_ANGLE_bmad
+
   SUBROUTINE  COMPUTE_SCALAR(ENTL,I,ENTB,J,S_IJ) ! Adjusts frames of magnet_chart on the basis of the misalignments
     IMPLICIT NONE
     real(dp),INTENT(in):: ENTL(3,3), ENTB(3,3)
@@ -838,6 +912,23 @@ CONTAINS
   END SUBROUTINE  COMPUTE_SCALAR
 
 
+  SUBROUTINE FIND_PATCH_BMAD0(A,ENT,B,EXI,D,ANG)
+    ! FINDS PATCH BETWEEN ENT AND EXI : INTERFACED LATER FOR FIBRES
+    IMPLICIT NONE
+    REAL(DP), INTENT(INOUT):: ENT(3,3),EXI(3,3)
+    REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)
+    REAL(DP) dd(3)
+
+    D=B-A
+    dd=d
+    CALL CHANGE_BASIS(Dd,GLOBAL_FRAME,D,ENT)
+
+    CALL COMPUTE_ENTRANCE_ANGLE_bmad(ENT,EXI,ANG)
+
+
+
+  END SUBROUTINE FIND_PATCH_BMAD0
+
 
   SUBROUTINE FIND_PATCH_B(A,ENT,B,EXI,D,ANG)
     ! FINDS PATCH BETWEEN ENT AND EXI : INTERFACED LATER FOR FIBRES
@@ -848,13 +939,16 @@ CONTAINS
 
     CALL COMPUTE_ENTRANCE_ANGLE(ENT,EXI,ANG)
 
-
+    
     D=B-A
     dd=d
     CALL CHANGE_BASIS(Dd,GLOBAL_FRAME,D,EXI)
 
 
   END SUBROUTINE FIND_PATCH_B
+
+
+
 
   SUBROUTINE INVERSE_FIND_PATCH(A,ENT,D,ANG,B,EXI) !  used in misalignments of siamese
     IMPLICIT NONE
@@ -870,5 +964,33 @@ CONTAINS
 
   END SUBROUTINE INVERSE_FIND_PATCH
 
+
+  SUBROUTINE INVERSE_FIND_PATCH_bmad(A,ENT,D,ANG,B,EXI) !  used in misalignments of siamese
+    IMPLICIT NONE
+    REAL(DP), INTENT(INOUT):: ENT(3,3),EXI(3,3)
+    REAL(DP), INTENT(INOUT):: A(3),B(3),D(3),ANG(3)
+    REAL(DP) DD(3),an(3)
+
+
+    CALL CHANGE_BASIS(D,ent,DD,GLOBAL_FRAME)
+    B=A+DD
+    EXI=ENT
+    an=0
+    an(3)=ang(3)
+    CALL GEO_ROT(EXI,AN,1,basis=ENT)
+    
+    ENT=EXI
+    an=0
+    an(1)=-ang(1)
+    CALL GEO_ROT(EXI,AN,1,basis=ENT)
+
+    ENT=EXI
+    an=0
+    an(2)=-ang(2)
+    CALL GEO_ROT(EXI,AN,1,basis=ENT)
+
+
+
+  END SUBROUTINE INVERSE_FIND_PATCH_bmad
 
 end module S_FRAME

@@ -8,6 +8,7 @@ module definition
   !  use DABNEW
   !  use my_own_1D_TPSA
   use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
+ !use c_dabnew
   !  use newda
   !  USE LIELIB_ETIENNE
   implicit none
@@ -22,12 +23,15 @@ module definition
   !  complex(dp), parameter :: i_ = = cmplx(zero,one,kind=dp)
   !  complex(dp)  :: i_ = (zero,one)    ! cmplx(zero,one,kind=dp)
   complex(dp), parameter :: i_ = ( 0.0_dp,1.0_dp )    ! cmplx(zero,one,kind=dp)
-  integer master
+  integer master,c_master
   !  integer,parameter::lnv=100
   !  scratch variables
   INTEGER iassdoluser(ndumt)
-  integer DUMMY,temp
+  integer DUMMY  !,temp
   integer iass0user(ndumt)
+  integer c_DUMMY !,c_temp
+  integer c_iass0user(ndumt)
+  INTEGER c_iassdoluser(ndumt)
   integer,parameter::ndim2=2*ndim
   integer,parameter::mmmmmm1=1,mmmmmm2=2,mmmmmm3=3,mmmmmm4=4
   !  type (taylorlow) DUMMYl,templ             !,DUMl(ndum)
@@ -45,6 +49,7 @@ module definition
   INTEGER,PARAMETER  :: ISPIN0R=1,ISPIN1R=3
   logical(lp) :: doing_ac_modulation_in_ptc=.false.
   integer, target :: nb_ =0   ! global group index
+  integer, parameter :: ndim2t=10   ! maximum complex size
   !
   TYPE sub_taylor
      INTEGER j(lnv)
@@ -56,8 +61,12 @@ module definition
      INTEGER I !@1  integer I is a pointer in old da-package of Berz
      !     type (taylorlow) j !@1   Taylorlow is an experimental type not supported
   END TYPE taylor
+  type(taylor) temp
   !@2  UNIVERSAL_TAYLOR is used by Sagan in BMAD Code at Cornell
   !@2  Also used by MAD-XP
+
+
+
   TYPE UNIVERSAL_TAYLOR
      INTEGER, POINTER:: N,NV    !  Number of coeeficients and number of variables
      REAL(DP), POINTER,dimension(:)::C  ! Coefficients C(N)
@@ -266,8 +275,7 @@ module definition
   type damapspin
      type(damap) M
      type(spinmatrix) s
-     !     type(real_8) s(3,3)
-     real(dp) e_ij(6,6)
+     real(dp) e_ij(6,6) ! stochastic envelope
   end type damapspin
 
   type normal_spin
@@ -275,20 +283,21 @@ module definition
      type(damapspin) a1   ! brings to fixed point
      type(damapspin) ar   ! normalises around the fixed point
      type(damapspin) as   ! pure spin map
-     type(damapspin) a_t  ! !! (a_t%m,a_t%s) = (a1%m, I ) o (I ,as%s) o (ar%m,I)
+     type(damapspin) a_t  ! !! (a_t%m,a_t%s) 
 !!!  extra spin info
      integer M(NDIM,NRESO),MS(NRESO),NRES  ! orbital and spin resonances to be left in the map
      type(real_8) n0(3)     ! n0 vector
      type(real_8) theta0    !  angle for the matrix around the orbit (analogous to linear tunes)
      real(dp) nu    !  spin tune
-!!!Envelope radiation stuff
+!!!Envelope radiation stuff to normalise radiation (Sands's like theory)
      real(dp) s_ij0(6,6)  !  equilibrium beam sizes
      complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
-     real(dp) emittance(3),tune(3),damping(3)   ! equilibrium emittances (partially well defined only for infinitesimal damping)
+! equilibrium emittances (partially well defined only for infinitesimal damping)
+     real(dp) emittance(3),tune(3),damping(3)   
      logical(lp) AUTO,STOCHASTIC
      real(dp)  KICK(3)   ! fake kicks for tracking stochastically
-     real(dp)  STOCH(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
-     real(dp)  STOCH_inv(6,6)  ! Diagonalized of stochastic part of map for tracking stochastically
+     real(dp)  STOCH(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
+     real(dp)  STOCH_inv(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
   end type normal_spin
 
   include "a_def_frame_patch_chart.inc"
@@ -321,9 +330,9 @@ module definition
 
   type probe_8
      type(real_8) x(6)     ! Polymorphic orbital ray
-     type(spinor_8) s(ISPIN0R:ISPIN1R)   ! Polymorphic spin
-     type(rf_phasor_8) AC  ! Modulation
-     real(dp) E_ij(6,6)   !  Envelope
+     type(spinor_8) s(ISPIN0R:ISPIN1R)   ! Polymorphic spin s(1:3)
+     type(rf_phasor_8) AC  ! Modulation of magnet
+     real(dp) E_ij(6,6)   !  Envelope for stochastic radiation
      !   stuff for exception
      logical u
      type(integration_node),pointer :: lost_node
@@ -343,6 +352,79 @@ module definition
      type(internal_state)  state
   END type TEMPORAL_BEAM
 
+  TYPE C_taylor
+     INTEGER I !@1  integer I is a pointer to the complexified Berz package
+  END TYPE C_taylor
+
+  type c_dascratch
+     type(c_taylor), pointer :: t
+     TYPE (c_dascratch),POINTER :: PREVIOUS
+     TYPE (c_dascratch),POINTER :: NEXT
+  end type c_dascratch
+
+  TYPE c_dalevel
+     INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
+     !
+     logical(lp),POINTER ::CLOSED
+     TYPE (c_dascratch), POINTER :: PRESENT
+     TYPE (c_dascratch), POINTER :: END
+     TYPE (c_dascratch), POINTER :: START
+     TYPE (c_dascratch), POINTER :: START_GROUND ! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
+     TYPE (c_dascratch), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
+  END TYPE c_dalevel
+
+  type c_spinmatrix
+     type(c_taylor) s(3,3)
+  end type c_spinmatrix
+
+  type c_spinor
+     type(c_taylor) v(3)
+  end type c_spinor
+
+
+
+
+  TYPE c_DAMAP
+     TYPE (c_TAYLOR) V(LNV) 
+     type(c_spinmatrix) s
+     complex(dp) e_ij(6,6)
+     integer :: N=0
+  END TYPE c_DAMAP
+
+  TYPE c_vector_field
+      integer :: n=0,nrmax
+      real(dp) eps    
+      type (c_taylor) v(lnv)                        
+  END TYPE c_vector_field
+
+  TYPE c_factored_lie
+      integer :: n= 0   
+      integer :: dir= 0     
+       type (c_vector_field), allocatable :: f(:)                   
+  END TYPE c_factored_lie
+
+  TYPE c_normal_form
+      type(c_damap) a1
+      type(c_damap) a2
+      type(c_factored_lie) g   ! nonlinear part of a in phasors
+      type(c_factored_lie) ker !  kernel i.e. normal form in phasors
+      type(c_damap) a_t ! transformation a (m=a n a^-1) 
+      type(c_damap) n   ! transformation n (m=a n a^-1)      
+      type(c_damap) As  !  For Spin   (m = As a n a^-1 As^-1)  
+      integer NRES,M(NDIM2t/2,NRESO),ms(NDIM2t/2)
+      real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune
+!!!Envelope radiation stuff to normalise radiation (Sand's like theory)
+     complex(dp) s_ij0(6,6)  !  equilibrium beam sizes
+     complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
+     real(dp) emittance(3)
+  END TYPE c_normal_form
+
+ TYPE C_GMAP
+     TYPE (C_TAYLOR) V(lnv)    !
+     integer N
+  END TYPE C_GMAP
+
+type(c_taylor) c_temp
 contains
 
   SUBROUTINE RESET_APERTURE_FLAG(complete)

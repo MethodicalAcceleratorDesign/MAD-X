@@ -55,6 +55,9 @@ contains
     read77 =.true.
 
     my_ering => m_u%start
+if(m_t%n>0) then
+    my_ering => m_t%end
+endif
     if(associated(my_estate)) then
     !  my_estate=>my_old_state
       etat=my_estate
@@ -599,12 +602,7 @@ contains
           !       else
           !        write(6,*) " Default TPSA is Germanic "
           !       endif
-       case('ALMOSTEXACT')
-          almost_exact=.true.
-          write(6,*) " Almost Exact = ",almost_exact
-       case('TRUELYEXACT','EXACT')
-          almost_exact=.false.
-          write(6,*) " Almost Exact = ",almost_exact
+
        case('BERZ','GERMANIC','MARTIN')
           CALL change_package(2)
        case('YANG','CHINESE','LINGYUN')
@@ -638,9 +636,11 @@ contains
        case('THINLENS=1')
           call THIN_LENS_restart(my_ering)
        case('MANUALTHINLENS')
+          sagan_even=my_true
           THIN=-1
           CALL THIN_LENS_resplit(my_ering,THIN,lim=limit_int)
        case('THINLENS')
+         sagan_even=my_true
           READ(MF,*) THIN
           xbend=-1.0_dp
           if(thin<0) then
@@ -668,6 +668,7 @@ contains
           WRITE(6,*) "THIN LENS FACTOR =",THIN
           CALL THIN_LENS_resplit(my_ering,THIN,EVEN=my_TRUE,lim=limit_int,lmax0=lmax,sexr=sexr0,xbend=xbend)
        case('ODDTHINLENS')
+          sagan_even=my_false
           READ(MF,*) THIN
           xbend=-1.0_dp
           if(thin<0) then
@@ -1968,6 +1969,24 @@ contains
              write(6,*) name," Not found "
              stop 555
           endif
+       case('SETALWAYSON')
+         READ(MF,*)name,bend_like
+          call move_to(my_ering,p,name,POS)
+          if(pos/=0) then
+            if(p%mag%kind==kind4) then
+              p%mag%c4%always_on=bend_like
+              p%magp%c4%always_on=bend_like
+            else
+             write(6,*) name," is not a cavity "
+             stop 555
+            endif
+          else
+             write(6,*) name," Not found "
+             stop 555
+          endif
+         
+           
+
        case('POWERHELICALDIPOLE','POWERHELICAL')
 
           !SRM DEBUG ... typo

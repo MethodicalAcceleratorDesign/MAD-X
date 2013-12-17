@@ -36,9 +36,9 @@ module madx_keywords
   include "a_namelists.inc"
 
 
-  INTERFACE read_lattice_append
-     MODULE PROCEDURE read_universe_database 
-  END  INTERFACE
+ ! INTERFACE read_lattice_append
+!     MODULE PROCEDURE read_universe_database 
+ ! END  INTERFACE
 
 
 contains
@@ -2374,6 +2374,28 @@ call read_universe_girders(un,mf,ns)
 close(mf)
 end subroutine  read_universe_database
 
+subroutine  read_lattice_append(un,filename,arpent)
+! the universes should be empty
+!call read_universe_database(m_u,'junk2.txt',arpent=my_false)
+!call read_universe_pointed(M_u,M_t,'junk3.txt')
+!call create_dna(M_u,m_t)
+!arpent= false => the databaseshould not be surveyed.
+! DNA is automatically created in create_dna
+implicit none
+type(mad_universe),target :: un
+logical(lp), optional :: arpent
+character(*) filename
+integer mf
+ELE0%NAME_VORNAME(1)=' '
+
+ call kanalnummer(mf,filename(1:len_trim(filename)))
+
+           call append_empty_layout(un)  
+           call set_up(un%end)
+           call read_lattice(un%end,filename,mf,arpent)
+close(mf)
+end subroutine  read_lattice_append
+
 
 
 subroutine  read_lattice(r,filename,mfile,arpent)
@@ -2424,6 +2446,8 @@ n=0
 do while(.true.) 
    read(mf,NML=ELEname,end=999)
 
+! L. Deniau: commented to avoid spurious output
+! write(6,*) ELE0%name_vorname
 
    if(ELE0%NAME_VORNAME(1)== "endhere".or.ELE0%NAME_VORNAME(1)=="alldone") goto 99
  !write(6,NML=ELEname)
@@ -2807,6 +2831,7 @@ else
     endif   
  F%KIND=ELE0%KIND  
  f%name=ELE0%name_vorname(1)
+
  f%vorname=ELE0%name_vorname(2)
  f%an(1:f%p%nmul)=ele0%an(1:f%p%nmul)
  f%bn(1:f%p%nmul)=ele0%bn(1:f%p%nmul)
@@ -3192,7 +3217,7 @@ j1=j0
 
 
   call Print_initial_chart(p,mf)
-  write(mf,*) i0,p%dir*j0,p%patch%patch,p%mag%name
+  write(mf,'(1x,i4,1x,i8,1x,i2,1x,a24)') i0,p%dir*j0,p%patch%patch,p%mag%name
   call fib_fib0(p,my_true,mf)
   before=my_false
   just=my_false
@@ -3236,7 +3261,7 @@ type(layout),pointer :: r,rd
 type(fibre),pointer :: p,p0,ps
 type(element),pointer :: m,m0
 character(*) filename
-integer i,j,i0,MF,n,n_u,k(3)
+integer i,j,i0,MF,n,n_u,k(3),mypause,ipause
 integer pos
 character(120) line
 logical(lp) doneit
@@ -3263,12 +3288,14 @@ do i=1,n_u
   read(mf,'(a120)') line
 
 call append_empty_layout(un) 
-call set_up(un%end)  !
+!call set_up(un%end)  !
 
        R => un%end
 
  do j=1,n 
-       read(mf,*) k    ,name
+       read(mf,'(1x,i4,1x,i8,1x,i2,1x,a24)' ) k    ,name
+        write(6,*)  k ,name
+!pause 234
 if(j==1.or.k(3)>0) then
  read(mf,NML=FIBRENAME)
 else
@@ -3277,12 +3304,13 @@ endif
 
        call MOVE_TO_LAYOUT_I( ud,rd,k(1) )
        pos=iabs(k(2))   
-       call move_to( rd,p,POS)
+       call move_to_p_safe( rd,p,POS)
        call append_point(r, p)  
        if( p%mag%name/=name) then
-         write(6,*) " serious error in read_universe_pointed "
-         write(6,*) i,p%mag%name,name,k 
-!         pause 666
+         write(6,*) j," serious error in read_universe_pointed "
+         write(6,*)  k ,name
+         write(6,*) i,p%mag%name ,pos
+          ipause=mypause(666)
          stop 666   
        endif
 !       write(6,*) p%mag%name,name,pos,k(2)
@@ -3302,7 +3330,8 @@ endif
        endif
  enddo
 
-
+! L. Deniau: commented to avoid spurious output
+!    write(6,*) r%index,ud%n,un%n
     r%closed=my_true
     doneit=my_true
     call ring_l(r,doneit)

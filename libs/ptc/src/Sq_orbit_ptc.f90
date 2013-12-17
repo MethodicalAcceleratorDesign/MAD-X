@@ -495,7 +495,8 @@ contains
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
-          x(1)=XBIG
+ !         x(1)=XBIG
+          x(1:4) =x(1:4)*XBIG
           if(wherelost==1) then
              t%lost=t%lost+1
           endif

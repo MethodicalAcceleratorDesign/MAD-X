@@ -787,18 +787,11 @@ CONTAINS
     IF(.NOT.C_%STABLE_DA) RETURN
     localmaster=master
 
-    !    call check(s1)
     call ass(unarySUB)
 
-    ! unarySUB=(-one)*s1
-    !    if(old) then
-    call dacmu(s1%i,-1.0_dp,temp)
-    call dacop(temp,unarySUB%i)
-    !   else
-    !      call newdacmu(s1%j,-one,unarySUB%j)
-    !      !  call newdacmu(s1%j,-one,templ)
-    !      !  call newdacop(templ,unarySUB%j)
-    !   endif
+    call dacmu(s1%i,-1.0_dp,temp%i)
+    call dacop(temp%i,unarySUB%i)
+
     master=localmaster
 
   END FUNCTION unarySUB
@@ -1041,8 +1034,8 @@ CONTAINS
     call ass(dexpt)
 
     ! if(old) then
-    call dafun('EXP ',s1%i,temp)
-    call dacop(temp,dexpt%i)
+    call dafun('EXP ',s1%i,temp%i)
+    call dacop(temp%i,dexpt%i)
     !    else
     !       call newdafun('EXP ',s1%j,dexpt%j)
     !    endif
@@ -1082,15 +1075,15 @@ CONTAINS
     call ass(dtant)
 
     ! if(old) then
-    call dafun('SIN ',s1%i,temp)
-    call dacop(temp,dtant%i)
-    call dafun('COS ',s1%i,temp)
-    call dadiv(dtant%i,temp,dtant%i)
+    call dafun('SIN ',s1%i,temp%i)
+    call dacop(temp%i,dtant%i)
+    call dafun('COS ',s1%i,temp%i)
+    call dadiv(dtant%i,temp%i,dtant%i)
     !    else
-    !       call newdafun('SIN ',s1%j,templ)
-    !       call newdacop(templ,dtant%j)
-    !       call newdafun('COS ',s1%j,templ)
-    !       call newdadiv(dtant%j,templ,dtant%j)
+    !       call newdafun('SIN ',s1%j,temp%il)
+    !       call newdacop(temp%il,dtant%j)
+    !       call newdafun('COS ',s1%j,temp%il)
+    !       call newdadiv(dtant%j,temp%il,dtant%j)
     !    endif
 
     master=localmaster
@@ -1128,8 +1121,8 @@ CONTAINS
     call ass(dcost)
 
     ! if(old) then
-    call dafun('COS ',s1%i,temp)
-    call dacop(temp,dcost%i)
+    call dafun('COS ',s1%i,temp%i)
+    call dacop(temp%i,dcost%i)
     !    else
     !       call newdafun('COS ',s1%j,dcost%j)
     !    endif
@@ -1150,8 +1143,8 @@ CONTAINS
     !    call check(s1)
     call ass(dsint)
     ! if(old) then
-    call dafun('SIN ',s1%i,temp)
-    call dacop(temp,dsint%i)
+    call dafun('SIN ',s1%i,temp%i)
+    call dacop(temp%i,dsint%i)
     !    else
     !       call newdafun('SIN ',s1%j,dsint%j)
     !    endif
@@ -1172,8 +1165,8 @@ CONTAINS
     !    call check(s1)
     call ass(dsinHt)
     ! if(old) then
-    call dafun('SINH',s1%i,temp)
-    call dacop(temp,dsinHt%i)
+    call dafun('SINH',s1%i,temp%i)
+    call dacop(temp%i,dsinHt%i)
     !    else
     !       call newdafun('SINH',s1%j,dsinHt%j)
     !    endif
@@ -1193,8 +1186,8 @@ CONTAINS
     !    call check(s1)
     call ass(DCOSHT)
     ! if(old) then
-    call dafun('COSH',s1%i,temp)
-    call dacop(temp,DCOSHT%i)
+    call dafun('COSH',s1%i,temp%i)
+    call dacop(temp%i,DCOSHT%i)
     !    else
     !       call newdafun('COSH',s1%j,DCOSHT%j)
     !    endif
@@ -1237,8 +1230,8 @@ CONTAINS
     !    call check(s1)
     call ass(dlogt)
     ! if(old) then
-    call dafun('LOG ',s1%i,temp)
-    call dacop(temp,dlogt%i)
+    call dafun('LOG ',s1%i,temp%i)
+    call dacop(temp%i,dlogt%i)
     !    else
     !       call newdafun('LOG ',s1%j,dlogt%j)
     !    endif
@@ -1260,8 +1253,8 @@ CONTAINS
     call ass(dsqrtt)
 
     ! if(old) then
-    call dafun('SQRT',s1%i,temp)
-    call dacop(temp,dsqrtt%i)
+    call dafun('SQRT',s1%i,temp%i)
+    call dacop(temp%i,dsqrtt%i)
     !    else
     !       call newdafun('SQRT',s1%j,dsqrtt%j)
     !    endif
@@ -1284,8 +1277,8 @@ CONTAINS
     call ass(mul)
 
     ! if(old) then
-    call damul(s1%i,s2%i,temp)
-    call dacop(temp,mul%i)
+    call damul(s1%i,s2%i,temp%i)
+    call dacop(temp%i,mul%i)
     !    else
     !       call newdamul(s1%j,s2%j,mul%j)
     !    endif
@@ -1313,11 +1306,11 @@ CONTAINS
     do i=1,nd
        pbbra=(s1.d.(2*i-1))*(s2.d.(2*i))-(s2.d.(2*i-1))*(s1.d.(2*i))+pbbra
     enddo
-    !    call DAPOI(s1%i,s2%i,temp,nd)
-    !    call dacop(temp,pbbra%i)
+    !    call DAPOI(s1%i,s2%i,temp%i,nd)
+    !    call dacop(temp%i,pbbra%i)
     !    else
-    !       call newDAPOI(s1%j,s2%j,templ,nd)
-    !       call newdacop(templ,pbbra%j)
+    !       call newDAPOI(s1%j,s2%j,temp%il,nd)
+    !       call newdacop(temp%il,pbbra%j)
     !    endif
 
     master=localmaster
@@ -1338,11 +1331,11 @@ CONTAINS
     call ass(GETORDER)
 
     ! if(old) then
-    CALL TAKE(S1%I,S2,TEMP)
-    call dacop(temp,GETORDER%i)
+    CALL TAKE(S1%I,S2,temp%i)
+    call dacop(temp%i,GETORDER%i)
     !    else
-    !       CALL NEWTAKE(S1%J,S2,TEMPL)
-    !       call NEWdacop(tempL,GETORDER%J)
+    !       CALL NEWTAKE(S1%J,S2,temp%iL)
+    !       call NEWdacop(temp%iL,GETORDER%J)
     !    endif
     master=localmaster
 
@@ -1671,11 +1664,11 @@ endif
     call ass(GETdiff)
 
     ! if(old) then
-    CALL dader(S2,S1%I,TEMP)
-    call dacop(temp,GETdiff%i)
+    CALL dader(S2,S1%I,temp%i)
+    call dacop(temp%i,GETdiff%i)
     !    else
-    !       CALL NEWdader(S2,S1%J,TEMPL)
-    !       call NEWdacop(tempL,GETdiff%J)
+    !       CALL NEWdader(S2,S1%J,temp%iL)
+    !       call NEWdacop(temp%iL,GETdiff%J)
     !    endif
     master=localmaster
 
@@ -1732,11 +1725,11 @@ endif
     call ass(GETdatra)
 
     ! if(old) then
-    CALL datra(S2,S1%I,TEMP)
-    call dacop(temp,GETdatra%i)
+    CALL datra(S2,S1%I,temp%i)
+    call dacop(temp%i,GETdatra%i)
     !    else
-    !       CALL NEWdatra(S2,S1%J,TEMPL)
-    !       call NEWdacop(tempL,GETdatra%J)
+    !       CALL NEWdatra(S2,S1%J,temp%iL)
+    !       call NEWdacop(temp%iL,GETdatra%J)
     !    endif
     master=localmaster
 
@@ -1757,29 +1750,17 @@ endif
     call ass(POW)
 
     ! if(old) then
-    CALL DACON(TEMP,1.0_dp)
+    CALL DACON(temp%i,1.0_dp)
 
     R22=IABS(R2)
     DO I=1,R22
-       CALL DAMUL(TEMP,S1%I,TEMP)
+       CALL DAMUL(temp%i,S1%I,temp%i)
     ENDDO
     IF(R2.LT.0) THEN
-       CALL DADIC(TEMP,1.0_dp,TEMP)
+       CALL DADIC(temp%i,1.0_dp,temp%i)
     ENDIF
-    call dacop(temp,POW%i)
-    !    ELSE
-    !
-    !       CALL newDACON(TEMPl,one)
-    !
-    !       R22=IABS(R2)
-    !       DO I=1,R22
-    !          CALL newDAMUL(TEMPl,S1%j,TEMPl)
-    !       ENDDO
-    !       IF(R2.LT.0) THEN
-    !          CALL newDADIC(TEMPl,one,TEMPl)
-    !       ENDIF
-    !       call newdacop(templ,POW%j)
-    !    endif
+    call dacop(temp%i,POW%i)
+ 
     master=localmaster
   END FUNCTION POW
 
@@ -1797,10 +1778,10 @@ endif
     call ass(POWR8)
 
     ! if(old) then
-    CALL DAFUN('LOG ',S1%I,TEMP)
-    CALL DACMU(TEMP,R2,TEMP)
-    CALL DAFUN('EXP ',TEMP,TEMP)
-    call dacop(temp,POWR8%i)
+    CALL DAFUN('LOG ',S1%I,temp%i)
+    CALL DACMU(temp%i,R2,temp%i)
+    CALL DAFUN('EXP ',temp%i,temp%i)
+    call dacop(temp%i,POWR8%i)
     !    ELSE
     !       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
     !       CALL NEWDACMU(TEMPL,R2,TEMPL)
@@ -1824,10 +1805,10 @@ endif
     call ass(POWR)
 
     ! if(old) then
-    CALL DAFUN('LOG ',S1%I,TEMP)
-    CALL DACMU(TEMP,REAL(R2,kind=DP),TEMP)
-    CALL DAFUN('EXP ',TEMP,TEMP)
-    call dacop(temp,POWR%i)
+    CALL DAFUN('LOG ',S1%I,temp%i)
+    CALL DACMU(temp%i,REAL(R2,kind=DP),temp%i)
+    CALL DAFUN('EXP ',temp%i,temp%i)
+    call dacop(temp%i,POWR%i)
     !    ELSE
     !       CALL NEWDAFUN('LOG ',S1%J,TEMPL)
     !       CALL NEWDACMU(TEMPL,REAL(R2,kind=DP),TEMPL)
@@ -1852,8 +1833,8 @@ endif
     call ass(dmulsc)
 
     ! if(old) then
-    call dacmu(s1%i,sc,temp)
-    call dacop(temp,dmulsc%i)
+    call dacmu(s1%i,sc,temp%i)
+    call dacop(temp%i,dmulsc%i)
     !    else
     !       call newdacmu(s1%j,sc,dmulsc%j)
     !    endif
@@ -1876,8 +1857,8 @@ endif
     call ass(mulsc)
 
     ! if(old) then
-    call dacmu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,mulsc%i)
+    call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,mulsc%i)
     !    else
     !       call newdacmu(s1%j,REAL(sc,kind=DP),mulsc%j)
     !    endif
@@ -1899,8 +1880,8 @@ endif
 
 
     ! if(old) then
-    call dacmu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,imulsc%i)
+    call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,imulsc%i)
     !    else
     !       call newdacmu(s1%j,REAL(sc,kind=DP),imulsc%j)
     !    endif
@@ -1922,8 +1903,8 @@ endif
     call ass(dscmul)
 
     ! if(old) then
-    call dacmu(s1%i,sc,temp)
-    call dacop(temp,dscmul%i)
+    call dacmu(s1%i,sc,temp%i)
+    call dacop(temp%i,dscmul%i)
     !    else
     !       call newdacmu(s1%j,sc,dscmul%j)
     !    endif
@@ -1948,8 +1929,8 @@ endif
 
 
     ! if(old) then
-    call dacmu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,scmul%i)
+    call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,scmul%i)
     !    else
     !       call newdacmu(s1%j,REAL(sc,kind=DP),scmul%j)
     !    endif
@@ -1972,8 +1953,8 @@ endif
     call ass(iscmul)
 
     ! if(old) then
-    call dacmu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,iscmul%i)
+    call dacmu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,iscmul%i)
     !    else
     !       call newdacmu(s1%j,REAL(sc,kind=DP),iscmul%j)
     !    endif
@@ -1996,8 +1977,8 @@ endif
     call ass(div)
 
     ! if(old) then
-    call dadiv(s1%i,s2%i,temp)
-    call dacop(temp,div%i)
+    call dadiv(s1%i,s2%i,temp%i)
+    call dacop(temp%i,div%i)
     !    else
     !       call newdadiv(s1%j,s2%j,templ)
     !       call newdacop(templ,div%j)
@@ -2020,8 +2001,8 @@ endif
     call ass(dscdiv)
 
     ! if(old) then
-    call dadic(s1%i,sc,temp)
-    call dacop(temp,dscdiv%i)
+    call dadic(s1%i,sc,temp%i)
+    call dacop(temp%i,dscdiv%i)
     !    else
     !       call newdadic(s1%j,sc,dscdiv%j)
     !    endif
@@ -2046,8 +2027,8 @@ endif
 
 
     ! if(old) then
-    call dadic(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,scdiv%i)
+    call dadic(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,scdiv%i)
     !    else
     !       call newdadic(s1%j,REAL(sc,kind=DP),scdiv%j)
     !    endif
@@ -2069,8 +2050,8 @@ endif
     call ass(iscdiv)
 
     ! if(old) then
-    call dadic(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,iscdiv%i)
+    call dadic(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,iscdiv%i)
     !    else
     !       call newdadic(s1%j,REAL(sc,kind=DP),iscdiv%j)
     !    endif
@@ -2094,8 +2075,8 @@ endif
 
 
     ! if(old) then
-    call dacdi(s1%i,sc,temp)
-    call dacop(temp,ddivsc%i)
+    call dacdi(s1%i,sc,temp%i)
+    call dacop(temp%i,ddivsc%i)
     !    else
     !       call newdacdi(s1%j,sc,ddivsc%j)
     !    endif
@@ -2118,8 +2099,8 @@ endif
     call ass(divsc)
 
     ! if(old) then
-    call dacdi(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,divsc%i)
+    call dacdi(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,divsc%i)
     !    else
     !       call newdacdi(s1%j,REAL(sc,kind=DP),divsc%j)
     !    endif
@@ -2143,8 +2124,8 @@ endif
 
 
     ! if(old) then
-    call dacdi(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,idivsc%i)
+    call dacdi(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,idivsc%i)
     !    else
     !       call newdacdi(s1%j,REAL(sc,kind=DP),idivsc%j)
     !    endif
@@ -2194,8 +2175,8 @@ endif
     call ass(daddsc)
 
     ! if(old) then
-    call dacad(s1%i,sc,temp)
-    call dacop(temp,daddsc%i)
+    call dacad(s1%i,sc,temp%i)
+    call dacop(temp%i,daddsc%i)
     !    else
     !       call newdacad(s1%j,sc,daddsc%j)
     !    endif
@@ -2219,8 +2200,8 @@ endif
 
 
     ! if(old) then
-    call dacad(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,addsc%i)
+    call dacad(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,addsc%i)
     !    else
     !       call newdacad(s1%j,REAL(sc,kind=DP),addsc%j)
     !    endif
@@ -2242,8 +2223,8 @@ endif
     call ass(iaddsc)
 
     ! if(old) then
-    call dacad(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,iaddsc%i)
+    call dacad(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,iaddsc%i)
     !    else
     !       call newdacad(s1%j,REAL(sc,kind=DP),iaddsc%j)
     !    endif
@@ -2265,8 +2246,8 @@ endif
     call ass(dscadd)
 
     ! if(old) then
-    call dacad(s1%i,sc,temp)
-    call dacop(temp,dscadd%i)
+    call dacad(s1%i,sc,temp%i)
+    call dacop(temp%i,dscadd%i)
     !    else
     !       call newdacad(s1%j,sc,dscadd%j)
     !    endif
@@ -2289,8 +2270,8 @@ endif
     call ass(scadd)
 
     ! if(old) then
-    call dacad(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,scadd%i)
+    call dacad(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,scadd%i)
     !    else
     !       call newdacad(s1%j,REAL(sc,kind=DP),scadd%j)
     !    endif
@@ -2314,8 +2295,8 @@ endif
 
 
     ! if(old) then
-    call dacad(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,iscadd%i)
+    call dacad(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,iscadd%i)
     !    else
     !       call newdacad(s1%j,REAL(sc,kind=DP),iscadd%j)
     !    endif
@@ -2339,8 +2320,8 @@ endif
 
 
     ! if(old) then
-    call dasub(s1%i,s2%i,temp)
-    call dacop(temp,subs%i)
+    call dasub(s1%i,s2%i,temp%i)
+    call dacop(temp%i,subs%i)
     !    else
     !       call newdasub(s1%j,s2%j,subs%j)
     !    endif
@@ -2362,8 +2343,8 @@ endif
     call ass(dsubsc)
 
     ! if(old) then
-    call dacsu(s1%i,sc,temp)
-    call dacop(temp,dsubsc%i)
+    call dacsu(s1%i,sc,temp%i)
+    call dacop(temp%i,dsubsc%i)
     !    else
     !       call newdacsu(s1%j,sc,dsubsc%j)
     !    endif
@@ -2388,8 +2369,8 @@ endif
     call ass(subsc)
 
     ! if(old) then
-    call dacsu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,subsc%i)
+    call dacsu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,subsc%i)
     !    else
     !       call newdacsu(s1%j,REAL(sc,kind=DP),subsc%j)
     !    endif
@@ -2411,8 +2392,8 @@ endif
     call ass(isubsc)
 
     ! if(old) then
-    call dacsu(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,isubsc%i)
+    call dacsu(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,isubsc%i)
     !    else
     !       call newdacsu(s1%j,REAL(sc,kind=DP),isubsc%j)
     !    endif
@@ -2434,8 +2415,8 @@ endif
     call ass(dscsub)
 
     ! if(old) then
-    call dasuc(s1%i,sc,temp)
-    call dacop(temp,dscsub%i)
+    call dasuc(s1%i,sc,temp%i)
+    call dacop(temp%i,dscsub%i)
     !    else
     !       call newdasuc(s1%j,sc,dscsub%j)
     !    endif
@@ -2458,8 +2439,8 @@ endif
     call ass(scsub)
 
     ! if(old) then
-    call dasuc(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,scsub%i)
+    call dasuc(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,scsub%i)
     !    else
     !       call newdasuc(s1%j,REAL(sc,kind=DP),scsub%j)
     !    endif
@@ -2481,8 +2462,8 @@ endif
     call ass(iscsub)
 
     ! if(old) then
-    call dasuc(s1%i,REAL(sc,kind=DP),temp)
-    call dacop(temp,iscsub%i)
+    call dasuc(s1%i,REAL(sc,kind=DP),temp%i)
+    call dacop(temp%i,iscsub%i)
     !    else
     !       call newdasuc(s1%j,REAL(sc,kind=DP),iscsub%j)
     !    endif
@@ -3066,14 +3047,15 @@ endif
   SUBROUTINE  pri(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
     type (TAYLOR),INTENT(IN)::S1
-    REAL(DP) PREC
+    REAL(DP) PREC,depst
 
     IF(PRESENT(DEPS)) THEN
        PREC=-1.0_dp
+       depst=deps
        CALL taylor_eps(PREC)
-       CALL taylor_eps(DEPS)
+       CALL taylor_eps(depst)
     ENDIF
 
     ! if(old) then
@@ -3559,7 +3541,8 @@ endif
     enddo
     ! if(old) then
     CALL ETALL1(DUMMY)
-    call etall1(temp)
+ !   call etall1(temp)
+    call alloc(temp)
     !    else
     !       CALL allocnewda(DUMMYl)
     !       call allocnewda(templ)
@@ -3576,7 +3559,8 @@ endif
     enddo
     ! if(old) then
     CALL DADAL1(DUMMY)
-    call DADAL1(temp)
+    call kill(temp)
+!    call DADAL1(temp)
     !    else
     !       CALL KILLnewdaS(DUMMYl)
     !       call KILLnewdaS(templ)

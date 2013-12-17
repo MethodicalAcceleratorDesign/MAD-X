@@ -29,7 +29,9 @@ module lielib_yang_berz
   integer,public::no,nv,nd,nd2,ndpt
   integer, private :: ndc,ndc2,ndt,iref,itu,iflow,jtune,nres !,idpr
   integer, private,dimension(ndim)::nplane,idsta,ista
-  real(dp), private,dimension(0:20)::xintex
+!  real(dp), private,dimension(0:20)::xintex
+  real(dp),dimension(0:20)::xintex
+
   real(dp), private,dimension(ndim)::dsta,sta,angle,rad,ps,rads
   real(dp), private,dimension(ndim,nreso)::mx
   !real(dp),private::epsplane
@@ -1896,7 +1898,6 @@ contains
        call datruncd(a1,nord+1,a1)
        call etinv(a1,a1i)
        call datruncd(a1i,nord+1,a1i)
-
     endif
     if(doflip) then
        call flip(xy,xy)
@@ -2887,8 +2888,8 @@ if(check_krein.and.(.not.hyp)) then
         xsu=log(rr(i)**2+ri(i)**2)+xsu
         xd=abs(log(rr(i)**2+ri(i)**2))+xd
        enddo
-       
-       if(xsu<size_krein.and.xd>size_krein) then
+ 
+       if(xsu>=0.and.xd>size_krein) then
          write(6,*) " A Krein collision seemed to have happened "
          write(6,*) " All calculations interrupted "
        do i=1,nd2-ndc
@@ -3028,6 +3029,44 @@ endif
 
     call mulnd2(cm,cr)
 
+    !!!  new in case ac modulation: correcting the time 
+    if(ndpt/=0) then
+     l=ndpt+1
+     if(mod(ndpt,2)==0) l=l-2
+!     write(6,*) "ndpt,l ",ndpt,l
+     vr=0.0_dp
+     vi=0.0_dp
+     do i=1,nd2
+      vr(i,i)=1.0_dp
+      vi(i,i)=1.0_dp
+     enddo
+      ax= cr(l,nd2-3)
+      ap= cr(l,nd2-2)
+      xsu = cr(nd2-3,nd2-2)/(1.0_dp-cr(nd2-3,nd2-3))
+!      write(6,*) ax,ap,xsu
+      vr(l,nd2-3)=-0.5_dp*(ax-xsu*ap)
+      vr(l,nd2-2)=-0.5_dp*(ap+xsu*ax)
+      vi(l,nd2-3)=-vr(l,nd2-3)
+      vi(l,nd2-2)=-vr(l,nd2-2)
+       
+      sa(1:nd2,1:nd2)=matmul(sa(1:nd2,1:nd2),vr(1:nd2,1:nd2))
+      sai(1:nd2,1:nd2)=matmul(vi(1:nd2,1:nd2),sai(1:nd2,1:nd2))
+
+!     do i=1,nd2
+!           write(6,'(8(1x,e14.7))') vr(i,1:nd2) 
+!     enddo
+!     do i=1,nd2
+!           write(6,'(8(1x,e14.7))') cr(i,1:nd2) 
+!     enddo
+     call mulnd2(cr,vr)
+     call mulnd2(vi,vr)
+     cr=vr
+ 
+!     do i=1,nd2
+!           write(6,'(8(1x,e14.7))') cr(i,1:nd2) 
+!     enddo
+    endif
+ 
     return
   end subroutine mapflol
 
