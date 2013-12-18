@@ -18,7 +18,7 @@ set GCXX=c:\mingw64\bin\g++
 set GFC=c:\mingw64\bin\gfortran
 
 REM settings
-set SSHRSA="c:/users/ldeniau/.ssh/id_rsa"
+set SSHRSA="c:/users/mad/.ssh/id_rsa"
 set MACDIR="mad@macserv15865.cern.ch:Projects/madX"
 
 if "%1"=="dont-redirect" shift & goto next
