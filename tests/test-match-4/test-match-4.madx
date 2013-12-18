@@ -2,8 +2,8 @@ TITLE,'CELL matching with MAD-X';
 
 option,-echo,-info,-warn;
 
-call file="fv9.opt";  
-call file="fv9.seq";
+call file="../share/ring_lattice_alt/fv9.opt";  
+call file="../share/ring_lattice_alt/fv9.seq";
 
 option,info,warn;
 

@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 27.11.13 14.39.21 +
+  + Code Modification Date: 2013.12.19      +
+  + Execution Time Stamp: 18.12.13 12.23.52 +
   +++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -234,11 +234,13 @@ Deviation from symplecticity  0.4529709940470639E-11 %
 
 
 
+removefile, file='Maxwellian_bend_for_ptc.txt';
+
 stop;
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.01.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

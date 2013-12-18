@@ -15,8 +15,8 @@ beam, particle = proton, energy =   eg        ,
                          ex=epsx,   ey=epsy;
 value,epsx,epsy;
 option,-echo,-warn;
-call file=fv9.opt;  // string without blanks does not need ".."
-call file="fv9.seq";
+call file="../share/ring_lattice/fv9_rbend.opt";  
+call file="../share/ring_lattice/fv9.seq";
 option,echo,warn;
 
 use,period=fivecell;

@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 17.07.13 20.10.39 +
+  + Code Modification Date: 2013.12.19      +
+  + Execution Time Stamp: 18.12.13 11.38.36 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -503,9 +503,11 @@ orbit:   3.932110E-05 -8.382999E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
 
 
 
+removefile, file='fort.61';
+
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.01.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

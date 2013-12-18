@@ -2,8 +2,8 @@ TITLE,'Global tune matching with MAD-X';
 
 option,info,warn;
 
-call file=fv9.opt;  
-call file=fv9.seq;
+call file="../share/ring_lattice_alt/fv9.opt";  
+call file="../share/ring_lattice_alt/fv9.seq";
 
 kqf = 0.009077570142;
 kqd = -0.01092574987;

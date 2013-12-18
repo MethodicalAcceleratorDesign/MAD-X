@@ -178,3 +178,4 @@ select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb2;
 !plot,title="Orbit ..L2..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
 
+removefile, file='fort.61';

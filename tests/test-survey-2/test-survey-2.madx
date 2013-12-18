@@ -1,7 +1,7 @@
  title, "TI8 test of globaltilt";
 
  option, -echo, -info, -warn;
- call, file ="TI8.seq";
+ call, file ="../share/TransferLines/TI8/TI8.seq";
  option, echo, info, warn;
 
  beam, sequence=ti8, bv=-1;

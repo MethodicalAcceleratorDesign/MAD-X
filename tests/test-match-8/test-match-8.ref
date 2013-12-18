@@ -13,7 +13,7 @@ option,info,warn;
 
 
 
-call file=fv9.opt;  
+call file="../share/ring_lattice_alt/fv9.opt";  
 
 // forces and other constants;
 
@@ -103,7 +103,7 @@ bph: rfcavity,l:=l.bpm,
 
  volt=.070833333333, harmon=432, shunt=26.166, tfill=90.0;
 
-call file=fv9.seq;
+call file="../share/ring_lattice_alt/fv9.seq";
 
 lfive=534.6;
 

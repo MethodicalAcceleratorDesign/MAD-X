@@ -2,7 +2,7 @@
 
 !=========== RING PARAMETERS ===========================================
 call, file = "../share/ring_lattice/ring.seq";
-
+option, echo, warn, info;
 
 ! At the end of the ring the data_block is produced
 
@@ -35,6 +35,7 @@ write,table="map_table",file="ring_matrix_at_end";
 !=========== TRANSFER-LINE PARAMETERS ==================================== 
 
 call, file = "../share/line_lattice/line.seq";
+option, echo, warn, info;
 
 select,flag=ptc_twiss,clear;
 select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
@@ -52,6 +53,8 @@ ptc_twiss,icase=5,no=2,initial_matrix_manual,
     re33=0.44540891438146,re34=32.763919904586,re36=0.23713296091797E-02,
     re41=-.10425674606620E-03,re42=0.18936158169385E-01,re43=-.37799347979450E-01,
     re44=-.53503193709587,re46=-.94686370477940E-03,
-                                                     file=twiss_ptc_line;
+    file=twiss_ptc_line;
 ptc_end;
+
+removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;

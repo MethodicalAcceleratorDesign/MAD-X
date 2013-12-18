@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 02.09.13 11.41.47 +
+  + Code Modification Date: 2013.12.19      +
+  + Execution Time Stamp: 18.12.13 11.33.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -5712,10 +5712,12 @@ orbit:  -5.006891E-04 -7.334105E-06  4.780985E-06  1.383019E-04  0.000000E+00  0
 
 
 
+removefile, file='fort.61';
+
 
   Number of warnings: 2
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.01.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -3,7 +3,7 @@
 title,"Five cell test";
 
 option,-echo,-warn;
-call,file="fivecell.seq";   ! load the sequence
+call,file="../share/fivecell/fivecell.seq";   ! load the sequence
 option,echo,warn,info;
 
 beam;

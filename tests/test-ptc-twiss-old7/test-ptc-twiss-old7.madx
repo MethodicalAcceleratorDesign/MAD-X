@@ -18,7 +18,7 @@ TWISS,centre,file=twiss_madx_ring; ! jluc : centre
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
 
 ! added 20 nov 2008:
-plot vaxis1=betx,vaxis2=dx,haxis=s;
+! plot vaxis1=betx,vaxis2=dx,haxis=s;
 
 ! Initialize PTC
 ptc_create_universe;
@@ -58,4 +58,6 @@ ptc_twiss,icase=5,no=4,
           y=5.216050332314255E-05, py=-6.748041062611770E-07, 
           file=twiss_ptc_line;
 ptc_end;
+
+removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;

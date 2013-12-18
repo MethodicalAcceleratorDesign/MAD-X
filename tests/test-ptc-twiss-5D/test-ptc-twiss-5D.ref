@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (32 bit, Darwin)      +
+  +    MAD-X 5.01.05  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 09.10.13 16.06.21 +
+  + Code Modification Date: 2013.12.19      +
+  + Execution Time Stamp: 18.12.13 11.54.45 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -821,7 +821,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573740341        20.07025727                  0                  0 
+      -7.573740342        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        19.69937659 
@@ -886,17 +886,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
 
@@ -956,14 +956,14 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
 
   ptc_twiss, table=twiss, icase=5, no=2, closed_orbit;
 
- Closed orbit:    1.0688861274587036E-008   2.5461397864805191E-009   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.2686739719592879E-11 %
+ Closed orbit:   1.068886127458704E-008  2.546139786480519E-009  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.3264055692397960E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         266
   NUMBER OF THIN OBJECTS :        1678
-  TOTAL IDEAL LENGTH OF STRUCTURE :   78.543702661677713     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.543702661677713     
-Deviation from symplecticity  0.2686739719592879E-11 %
+  TOTAL IDEAL LENGTH OF STRUCTURE :   78.5437026616777     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.5437026616777     
+Deviation from symplecticity  0.3264055692397960E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -1005,23 +1005,21 @@ ptc_end;
 
 
 
-plot, haxis=s, vaxis=beta11,beta22, colour=100;
+!plot, haxis=s, vaxis=beta11,beta22, colour=100;
 
-Plot - default table plotted: twiss
- plot number =            3
-plot, haxis=s, vaxis=disp1, colour=100;
+!plot, haxis=s, vaxis=disp1, colour=100;
 
-Plot - default table plotted: twiss
- plot number =            4
-plot, haxis=s, vaxis=x, colour=100;
+!plot, haxis=s, vaxis=x, colour=100;
 
-Plot - default table plotted: twiss
- plot number =            5
 
+
+removefile, file='leir.C';
+
+removefile, file='Maxwellian_bend_for_ptc.txt';
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (32 bit) finished normally +
+  + MAD-X 5.01.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

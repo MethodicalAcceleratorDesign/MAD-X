@@ -207,3 +207,4 @@ TWISS,file=result.file,sequence=lhcb1;
 !plot,title="Corrected orbit target 2 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 !plot,title="Corrected orbit target 2 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
 
+removefile, file='fort.61';
