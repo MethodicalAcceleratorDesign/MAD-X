@@ -177,7 +177,7 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     parameter(zero = 0d0)
     parameter(nsing = 5)
 
-    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 for Windows
     if(dbg.eq.1) then
        open(61,file='fort.61')
     endif
@@ -278,6 +278,11 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
             write(66,*) j,sing(1,j),sing(2,j)
         enddo
     endif
+
+    ! 2013-Dec-19  09:46:02  ghislain: explicit closing of fort.61 for Windows
+    if(dbg.eq.1) then
+       close(61)
+    endif
       
     return
 end subroutine svddec_m
@@ -313,7 +318,7 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     parameter(zero = 0d0)
     parameter(nsing = 5)
 
-    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 for Windows.
     if(dbg.eq.1) then
        open(61,file='fort.61')
     endif
@@ -418,6 +423,11 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
             enddo
         endif
     enddo
+
+    ! 2013-Dec-19  09:46:02  ghislain: explicit closing of fort.61 for Windows
+    if(dbg.eq.1) then
+       close(61)
+    endif
 
     return
 end subroutine svddec_c
@@ -829,8 +839,14 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
 
      prtlev = 3
 
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 for Windows
+     open(61,file='fort.61')
+     
      call htls(a,conm,b,m,n,xinc,nx,orbr,rms,prtlev,iter,rho,ptop,rmss,&
          &xrms,xptp,xiter,ifail)
+
+     ! 2013-Dec-19  09:46:02  ghislain: explicit closing of unit 61 for Windows
+     close(61)
 
      ! --- energy shift caused by corrector strength changes
      !     (inhibited)
@@ -864,11 +880,6 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      character*4 units
      character*16 conm(n)
      integer      ifail
-
-    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
-    if (prtlev.ge.2) then
-       open(61,file='fort.61')
-    endif
 
      interm = .true.
      ifail = 0
@@ -922,9 +933,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
 
      do k=1,iter
 
-         !X    WRITE(*,*) ' Start iteration ',K
          if (kpiv.eq.k) go to 8
-         !X    write(*,*) 'change row, KPIV, K: ',KPIV, K
 
          ! --- on echange les K et KPIV si KPIV plus grand que K
          h=rho(k)
@@ -943,9 +952,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
 
      ! --- calcul de beta,sigma et uk dans htul
 8    continue
-     !X    write(*,*) 'call HTUL'
      call htul(a,m,n,k,sig,beta)
-     !X    write(*,*) 'back from HTUL'
 
      ! --- on garde SIGMA dans RHO(N+K)
      j=n+k
@@ -956,15 +963,11 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      if(k.eq.n) go to 13
 
      ! --- transformation de A dans HTAL
-     !X    write(*,*) 'call HTAL'
      call htal(a,m,n,k,beta)
- !X    write(*,*) 'back from HTAL'
 
  ! --- transformation de B dans HTBL
 13 continue
-   !X    write(*,*) 'call HTBL'
    call htbl(a,b,m,n,k,beta)
-   !X    write(*,*) 'back from HTBL'
 
    ! --- recherche du pivot (K+1)
    !=============================
@@ -1064,21 +1067,19 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
    endif
 
    if (prtlev .ge. 2) then
-       write(61,'(/,1x,72("-"),/,                                     &
-                &1x,i4,3x,38(" "),1x,f12.8,f15.8)'       )k,rmss(k),ptop(k)
+      write(61,'(/,1x,72("-"),/,1x,i4,3x,38(" "),1x,f12.8,f15.8)') k,rmss(k),ptop(k)
    endif
 
    do kkk = 1,k
        xxcal=x(kkk)
        if (prtlev .ge. 2) then
-           write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)')                      &
-               &kkk,conm(ipiv(kkk)),x(kkk),xxcal
+           write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)') kkk,conm(ipiv(kkk)),x(kkk),xxcal
        endif
    enddo
 
    if (interm) then
        if (prtlev .ge. 2) then
-           write(61,58)k
+           write(61,58) k
            write(61,'(1x,8f9.3)')(r(kkk),kkk=1,m)
        endif
 58     format(/,' residual orbit after iteration ',i4,':')
