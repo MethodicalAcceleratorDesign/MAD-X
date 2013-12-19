@@ -177,6 +177,11 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     parameter(zero = 0d0)
     parameter(nsing = 5)
 
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
+    if(dbg.eq.1) then
+       open(61,file='fort.61')
+    endif
+
     if(dbg.eq.2) then
         write(*,*) 'SVD parameters: '
         write(*,*) 'SNGCUT:         ',sngcut
@@ -307,6 +312,11 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     integer dbg
     parameter(zero = 0d0)
     parameter(nsing = 5)
+
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
+    if(dbg.eq.1) then
+       open(61,file='fort.61')
+    endif
 
     if(dbg.eq.2) then
         write(*,*) 'SVD parameters: '
@@ -855,6 +865,11 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      character*16 conm(n)
      integer      ifail
 
+    ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 to avoid different name on Windows.
+    if (prtlev.ge.2) then
+       open(61,file='fort.61')
+    endif
+
      interm = .true.
      ifail = 0
      units = 'mrad'
@@ -1066,7 +1081,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
            write(61,58)k
            write(61,'(1x,8f9.3)')(r(kkk),kkk=1,m)
        endif
-58     format(/,' residual orbit after iteration ',i2,':')
+58     format(/,' residual orbit after iteration ',i4,':')
    endif
 
    if(k.eq.iter) then
