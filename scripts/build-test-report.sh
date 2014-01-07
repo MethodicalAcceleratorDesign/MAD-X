@@ -101,8 +101,14 @@ build_test_report ()
 build_test_send ()
 {
 	local status
+	local count
 
-	[ -s build-test-failed.tmp ] && status="failed" || status="passed"
+	if [ -s build-test-failed.tmp ] ; then
+		count=`wc -l build-test-failed.tmp`
+		status="failed ($count)"
+	else
+		status="passed"
+	fi
 
 	echo "===== Tests $status ====="                                           > build-test-report.out
 	date                                                                      >> build-test-report.out
