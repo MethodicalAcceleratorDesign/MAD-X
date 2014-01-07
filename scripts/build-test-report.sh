@@ -104,7 +104,7 @@ build_test_send ()
 	local count
 
 	if [ -s build-test-failed.tmp ] ; then
-		count=`wc -l build-test-failed.tmp`
+		count=`wc -l < build-test-failed.tmp`
 		status="failed ($count)"
 	else
 		status="passed"
