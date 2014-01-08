@@ -7,6 +7,8 @@
 %  Changed by: Werner Herr, 05-April-2004 
 %  Changed by: Werner Herr, 01-Dec-2004 
 %  Changed by: Werner Herr, 22-Oct-2008 
+%  Changed by: Ghislain Roy, 2013-06-26
+%  Changed by: Ghislain Roy, 2014-01-06
 
 \section{CORRECT: Orbit Correction}  
 \label{sec:correct}
@@ -19,11 +21,12 @@ The CORRECT command has the following format (not all possible options
 included, some options are valid only for special algorithms):  
 
 \begin{verbatim}
-CORRECT, ORBIT=myorbit,MODEL=mymodel,TARGET=mytarget,
-         FLAG=ring,MODE=lsq,  
-         MONERROR=integer,MONON=real,MONSCALE=real,
-         PLANE=x,COND=integer,RESOUT=integer,
-         CLIST=file1,MLIST=file2; 
+CORRECT, ORBIT=myorbit, MODEL=mymodel, TARGET=mytarget,
+         FLAG=ring, MODE=lsq,  
+         MONERROR= integer, MONON=real, MONSCALE=real,
+         PLANE=x, COND=integer, RESOUT=integer,
+         CLIST=file1, MLIST=file2,
+         TWORING, UNITS=real, CORZERO=integer;  
 \end{verbatim} 
 
 The command CORRECT is set up with defaults which should allow a
@@ -219,6 +222,16 @@ Example 4: correct orbit in horizontal plane, use alignment and scaling
 errors, 15\% of orbit correctors faulty
 \begin{verbatim}
 CORRECT, PLANE = x, MONERROR = 1, MONSCALE = 1, MONON = 0.85; 
+\end{verbatim}
+
+Example 5: correct orbit in horizontal plane for a two-beam machine,
+using MICADO with no SVD conditioning, zeroing correctors before the
+correction. 
+\begin{verbatim}
+CORRECT, FLAG=ring,
+         TWORING, BEAM1TAB=twb1, BEAM2TAB=twb2,
+         MODE=micado, COND=0, NCORR=4, ERROR=1E-6, PLANE=x,
+         MLIST='mx12.tab', CLIST='cx12.tab', RESOUT=1, CORZERO=1;
 \end{verbatim}
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Last updated:} 22.10.2008 

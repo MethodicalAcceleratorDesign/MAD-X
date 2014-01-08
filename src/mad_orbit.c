@@ -98,9 +98,23 @@ static void fill_orbit_table(struct table* t_out, struct table* t_in);
 
 // private interface
 
-static double crms(double *r, int m) {
-  double xave = { 0.0 };
-  double xrms = { 0.0 };
+static double caverage(double *r, int m) {
+  // 2014-Jan-07  17:33:59  ghislain: added function
+  double xave   = { 0.0 };
+  int i;
+
+  for (i = 0; i < m; i++) {
+    xave = xave + r[i];
+  }
+  xave = xave / m;
+
+  return (xave);
+}
+
+static double cstddev(double *r, int m) {
+  // 2014-Jan-07  17:33:59  ghislain: changed function name from crms to cstddev, and variable names
+  double xave   = { 0.0 };
+  double xstdev = { 0.0 };
   int i;
 
   for (i = 0; i < m; i++) {
@@ -108,14 +122,28 @@ static double crms(double *r, int m) {
   }
   xave = xave / m;
   for (i = 0; i < m; i++) {
-    xrms = xrms + (xave - r[i]) * (xave - r[i]);
+    xstdev = xstdev + (xave - r[i]) * (xave - r[i]);
+  }
+  xstdev = sqrt(xstdev / m);
+
+  return (xstdev);
+}
+
+static double crms(double *r, int m) {
+  // 2014-Jan-07  17:33:59  ghislain: added function
+  double xrms = { 0.0 };
+  int i;
+
+  for (i = 0; i < m; i++) {
+    xrms = xrms +  r[i]*r[i];
   }
   xrms = sqrt(xrms / m);
 
   return (xrms);
 }
 
-static double cprp(double *r, int m) {
+static double cptp(double *r, int m) {
+  // 2014-Jan-07  17:33:59  ghislain: changed function name from cprp (typo ?)
   double xhi = { -9999. };
   double xlo = { 9999. };
   double xptp = { 0.0 };
@@ -1499,17 +1527,29 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
   if (fddata != NULL ) {
     rst = get_variable("n");
     fprintf(fddata, "%d %d %e %e %e %e %e %e\n", ip, rst,
-	    cprp(monvec, imon), cprp(resvec, imon), crms(monvec, imon),
+	    cptp(monvec, imon), cptp(resvec, imon), crms(monvec, imon),
 	    crms(resvec, imon), copk(monvec, imon), copk(resvec, imon));
   }
 
+  /* 2014-Jan-07  17:33:59  ghislain: change of output format to print RMS and STDDEV values
   if (print_correct_opt > 0) {
     printf("CORRECTION SUMMARY:   \n\n");
     printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",
 	   crms(monvec, imon), crms(resvec, imon));
     printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",
-	   cprp(monvec, imon), cprp(resvec, imon));
+	   cptp(monvec, imon), cptp(resvec, imon));
   }
+  */
+
+  // 2014-Jan-07  17:33:59  ghislain: change of output format to print RMS and STDDEV values
+  if (print_correct_opt > 0) {
+    printf("CORRECTION SUMMARY:   \n\n");
+    printf("                   average [mm]  std.dev. [mm]      RMS [mm]        peak-to-peak [mm]\n\n");
+    printf("before correction: %f        %f          %f        %f \n",
+	   caverage(monvec,imon), cstddev(monvec,imon), crms(monvec, imon), cptp(monvec, imon));
+    printf("after correction:  %f        %f          %f        %f \n\n\n",
+	   caverage(resvec,imon), cstddev(resvec,imon), crms(resvec, imon), cptp(resvec, imon));
+  }  
 
   if (print_correct_opt > 1) {
     printf("Monitor:  Before:     After:    Difference:\n");
@@ -1526,9 +1566,13 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
 
   corrm = copk(corvec, icor);
 
-  printf("Max strength: %e should be less than %e\n", corrm, corrl);
-  if (corrm > corrl) 
-    printf( "++++++ warning: maximum corrector strength larger than limit\n");
+  if (corrm > corrl) {
+    printf("Max strength: %e should be less than corrector strength limit: %e\n", corrm, corrl);
+    warning("maximum corrector strength larger than limit.","");
+    // printf("++++++ warning: maximum corrector strength larger than limit\n");
+  } else {
+    printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
+  }
   
   set_variable("corrmax", &corrm);
 
@@ -1921,17 +1965,19 @@ static void correct_correct(struct in_cmd* cmd)
     printf("Want to correct orbit of a single ring\n");
 
     if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
-      warning(" ", " ");
-      warning("Single beam correction requested but beam 1 table supplied:", orbtab1);
-      warning("Specified table ignored:", orbtab1);
-      warning(" ", " ");
+      //warning(" ", " ");
+      //warning("Single beam correction requested but beam 1 table supplied:", orbtab1);
+      //warning("Specified table ignored:", orbtab1);
+      //warning(" ", " ");
+      warning("Single beam correction requested but beam 1 table supplied; specified table ignore:", orbtab1);
     }
 
     if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
-      warning(" ", " ");
-      warning("Single beam correction requested but beam 2 table supplied:", orbtab2);
-      warning("Specified table ignored:", orbtab2);
-      warning(" ", " ");
+      //warning(" ", " ");
+      //warning("Single beam correction requested but beam 2 table supplied:", orbtab2);
+      //warning("Specified table ignored:", orbtab2);
+      //warning(" ", " ");
+      warning("Single beam correction requested but beam 2 table supplied; specified table ignore:", orbtab2);
     }
     
     correct_correct1(cmd);
@@ -2438,7 +2484,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 	     warning("target orbit px not found in table", ", MAD-X continues ");
 			
       if ((tospy = name_list_pos("py", tar->columns)) < 0) 
-	     warning("target orbit px not found in table", ", MAD-X continues ");
+	     warning("target orbit py not found in table", ", MAD-X continues ");
 			
       printf("====c1===>  %d %d %d %d \n", tosx, tosy, tospx, tospy);
     }
@@ -2491,7 +2537,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     if ((jjy >= 0) && (yok == 1)) { // the monitor was found
 
       if (command_par_string("target", cmd->clone) != NULL ) { // target exists
-	     // If correction to target orbit, subtract the target orbit, then correct to zero ...
+	// If correction to target orbit, subtract the target orbit, then correct to zero ...
 
       	if (debug) {
       	  printf("x ==> %d %d %e %e\n", jjx, m->id_ttb, da1[posx][jjx], da2[tosx][jjy]);
@@ -3095,17 +3141,29 @@ static void pro_correct_write_results(double *monvec, double *resvec,
   if (fddata != NULL ) {
     rst = get_variable("n");
     fprintf(fddata, "%d %d %e %e %e %e %e %e\n", ip, rst,
-	    cprp(monvec, imon), cprp(resvec, imon), crms(monvec, imon),
+	    cptp(monvec, imon), cptp(resvec, imon), crms(monvec, imon),
 	    crms(resvec, imon), copk(monvec, imon), copk(resvec, imon));
   }
 
-  if (print_correct_opt > 0) {
+  /* 2014-Jan-07  17:33:59  ghislain: change of output format to print RMS and STDDEV values
+    if (print_correct_opt > 0) {
     printf("CORRECTION SUMMARY:   \n\n");
     printf("rms before correction: %f mm\nrms after correction:  %f mm\n\n",
 	   crms(monvec, imon), crms(resvec, imon));
     printf("ptp before correction: %f mm\nptp after correction:  %f mm\n\n",
-	   cprp(monvec, imon), cprp(resvec, imon));
-  }
+	   cptp(monvec, imon), cptp(resvec, imon));
+    } 
+  */
+
+  // 2014-Jan-07  17:33:59  ghislain: change of output format to print RMS and STDDEV values
+  if (print_correct_opt > 0) {
+    printf("CORRECTION SUMMARY:   \n\n");
+    printf("                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]\n\n");
+    printf("before correction: %f        %f          %f        %f \n",
+	   caverage(monvec,imon), cstddev(monvec,imon), crms(monvec, imon), cptp(monvec, imon));
+    printf("after correction:  %f        %f          %f        %f \n\n\n",
+	   caverage(resvec,imon), cstddev(resvec,imon), crms(resvec, imon), cptp(resvec, imon));
+  }  
 
   if (print_correct_opt > 1) {
     printf("Monitor:  Before:     After:    Difference:\n");
@@ -3125,7 +3183,8 @@ static void pro_correct_write_results(double *monvec, double *resvec,
 
   if (corrm > corrl) {
     printf("Max strength: %e should be less than corrector strength limit: %e\n", corrm, corrl);
-    printf("++++++ warning: maximum corrector strength larger than limit\n");
+    warning("maximum corrector strength larger than limit","");
+    // printf("++++++ warning: maximum corrector strength larger than limit\n");
   } else {
     printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
   }

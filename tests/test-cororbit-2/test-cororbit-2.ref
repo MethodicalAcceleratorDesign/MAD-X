@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 11.38.36 +
+  + Execution Time Stamp: 08.01.14 12.36.06 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -405,8 +405,8 @@ enter MICADO correction ...
   
  start MICADO correction with            4  correctors
   
-RMS before 9.588667e-01
-RMS after  8.998220e-02
+RMS before 9.588756e-01
+RMS after  9.004521e-02
 mcbxh.1r1:1 -1.115765e-03
 mcbxh.2r1:1 0.000000e+00
 mcbxh.3r1:1 0.000000e+00
@@ -420,13 +420,13 @@ mcbxh.1l1:1 2.271659e-03
 
 CORRECTION SUMMARY:   
 
-rms before correction: 0.958867 mm
-rms after correction:  0.089982 mm
+                   average [mm]  std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 10.060801 mm
-ptp after correction:  2.637795 mm
+before correction: 0.004136        0.958867          0.958876        10.060801 
+after correction:  0.003368        0.089982          0.090045        2.637795 
 
-Max strength: 2.271659e-03 should be less than 1.000000e+00
+
+Max strength: 2.271659e-03 is below corrector strength limit: 1.000000e+00
 
 
 select, flag=twiss, clear;
@@ -509,5 +509,5 @@ removefile, file='fort.61';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.01.05 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -9,6 +9,7 @@
 <!-- Changed by: Werner Herr, 01-Dec-2004 -->
 <!-- Changed by: Werner Herr, 22-Oct-2008 -->
 <!-- Changed by: Ghislain Roy, 2013-06-26 -->
+<!-- Changed by: Ghislain Roy, 2014-01-06 -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -23,11 +24,11 @@ from the Twiss table.
 The CORRECT command has the following format (not all possible options included, some options are
 valid only for special algorithms):
 <pre>
-CORRECT, ORBIT=myorbit,MODEL=mymodel,TARGET=mytarget,
-         FLAG=ring,MODE=lsq,  
-         MONERROR=integer,MONON=real,MONSCALE=real,
-         PLANE=x,COND=integer,RESOUT=integer,
-         CLIST=file1,MLIST=file2
+CORRECT, ORBIT=myorbit, MODEL=mymodel, TARGET=mytarget,
+         FLAG=ring, MODE=lsq,  
+         MONERROR=integer, MONON=real, MONSCALE=real,
+         PLANE=x, COND=integer, RESOUT=integer,
+         CLIST=file1, MLIST=file2,
          TWORING, UNITS=real, CORZERO=integer; 
 </pre>
 The command CORRECT is set up with defaults which should allow a
@@ -67,7 +68,7 @@ Default: MICADO.
 <li>PLANE:
 If this attribute is x, or h, only the horizontal correction is made;
 if it is y, or v, only the vertical correction is made.
->br> (This differs from the MAD8 implementation).
+<br> (This differs from the MAD8 implementation).
 <br> Default: horizontal plane correction
 <br><br>
 <li>COND:
@@ -224,9 +225,9 @@ Note that this option is simply ignored if TWORING has been specified.
 <br>
 <br>
 <br>
-<font COLOR="#ff0000">
+<b>
 Obsolete commands or options:                                       
-</font>
+</b>
 <br>
 <pre>
 ITERATE, ITERMAX             /* Done with loop feature in MAD commands */
@@ -240,52 +241,27 @@ GETKICK, PUTKICK             /* Replaced by generic TFS access */
 <b>EXAMPLES (for complete MAD input files see section on examples):</b>
 <br>
 <br>
-<font COLOR="#ff0000">
-Example 1 (correct orbit in horizontal plane, taken from most recent Twiss table, using default algorithm (MICADO)):
-</font>
-<br>
-<font COLOR="#ff00ff">
-CORRECT,PLANE=x;
-</font>
+Example 1 (correct orbit in horizontal plane, taken from most recent Twiss table, using default algorithm (MICADO)):<br>
+CORRECT, PLANE=x;
 <br><br>
-<font COLOR="#ff0000">
-Example 2 (no correction, only output of Twiss summary):
-</font>
-<br>
-<font COLOR="#ff00ff">
-CORRECT,TWISSUM=1;                                                             
-</font>
+Example 2 (no correction, only output of Twiss summary):<br>
+CORRECT, TWISSUM=1;                                                             
 <br><br>
-<font COLOR="#ff0000">
-Example 3 (correct orbit in horizontal plane, corrector and monitor output on table):
-</font>
-<br>
-<font COLOR="#ff00ff">
-CORRECT,PLANE=x,MODE=lsq,CLIST=corr.out,MLIST=mon.out;
-</font>
+Example 3 (correct orbit in horizontal plane, corrector and monitor output on table):<br>
+CORRECT, PLANE=x, MODE=lsq, CLIST=corr.out, MLIST=mon.out;
 <br><br>
-<font COLOR="#ff0000">
-Example 4 (correct orbit in horizontal plane, use alignment and scaling errors, 15% of orbit correctors faulty):
-</font>
-<font COLOR="#ff00ff">
-CORRECT,PLANE=x,MONERROR=1,MONSCALE=1,MONON=0.85;
-</font>
+Example 4 (correct orbit in horizontal plane, use alignment and scaling errors, 15% of orbit correctors faulty):<br>
+CORRECT, PLANE=x, MONERROR=1, MONSCALE=1, MONON=0.85;
 <br><br>
-<font COLOR="#ff0000">
-Example 5: correct orbit in horizontal plane for a two-beam machine, using MICADO with no SVD conditioning, zeroing correctors before the correction.
-</font><br>
-<font COLOR="#ff00ff">
+Example 5: correct orbit in horizontal plane for a two-beam machine, using MICADO with no SVD conditioning, zeroing correctors before the correction.<br>
 CORRECT, FLAG=ring,
          TWORING, BEAM1TAB=twb1, BEAM2TAB=twb2,
          MODE=micado, COND=0, NCORR=4, ERROR=1E-6, PLANE=x,
          MLIST='mx12.tab', CLIST='cx12.tab', RESOUT=1, CORZERO=1;
-</font>
-
-
 <br>
 <br>
 <address>
-Last updated: 2013-06-26
+Last updated: 2014-01-06
 <a href="mailto:ghislain.roy@cern.ch">Ghislain Roy</a>
 </address>
 

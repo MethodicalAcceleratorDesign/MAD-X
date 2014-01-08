@@ -908,203 +908,202 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      piv=rzero
       
      do k=1,n
-         ipiv(k)=k
-         h=rzero
-         g=rzero
-         do i=1,m
-             h=h+a(i,k)*a(i,k)
-             g=g+a(i,k)*b(i)
-         enddo
-         rho(k)=h
-         rho(k2) = g
-         if(h.ne.rzero) then
-             pivt = g*g/h
-         else
-             pivt = rzero
-         endif
-         if(pivt-piv.gt.rzero) then
-             piv = pivt
-             kpiv=k
-         endif
-         k2 = k2 + 1
+        ipiv(k)=k
+        h=rzero
+        g=rzero
+        do i=1,m
+           h=h+a(i,k)*a(i,k)
+           g=g+a(i,k)*b(i)
+        enddo
+        rho(k)=h
+        rho(k2) = g
+        if(h.ne.rzero) then
+           pivt = g*g/h
+        else
+           pivt = rzero
+        endif
+        if(pivt-piv.gt.rzero) then
+           piv = pivt
+           kpiv=k
+        endif
+        k2 = k2 + 1
      enddo
 
      ! --- boucle pour chaque iteration
-
-     do k=1,iter
-
-         if (kpiv.eq.k) go to 8
-
-         ! --- on echange les K et KPIV si KPIV plus grand que K
-         h=rho(k)
-         rho(k)=rho(kpiv)
-         rho(kpiv)=h
-         k2=n+k
-         k3=n+kpiv
-         g = rho(k2)
-         rho(k2) = rho(k3)
-         rho(k3) = g
-         do i=1,m
-             h=a(i,k)
-             a(i,k)=a(i,kpiv)
-             a(i,kpiv)=h
-         enddo
-
-     ! --- calcul de beta,sigma et uk dans htul
-8    continue
-     call htul(a,m,n,k,sig,beta)
-
-     ! --- on garde SIGMA dans RHO(N+K)
-     j=n+k
-     rho(j)=-sig
-     ip=ipiv(kpiv)
-     ipiv(kpiv)=ipiv(k)
-     ipiv(k)=ip
-     if(k.eq.n) go to 13
-
-     ! --- transformation de A dans HTAL
-     call htal(a,m,n,k,beta)
-
- ! --- transformation de B dans HTBL
-13 continue
-   call htbl(a,b,m,n,k,beta)
-
-   ! --- recherche du pivot (K+1)
-   !=============================
-
-   rho(k)=sqrt(piv)
-   if(k.eq.n) go to 11
-   piv=rzero
-   kpiv = k + 1
-   j1 = kpiv
-   k2=n + j1
-   !x    write(*,*) 'loop 18, ',j1,n
-   do j=j1,n
-       h=rho(j)-(a(k,j))*(a(k,j))
-       !X    write(*,*) 'K,J: ',K,J
-       !X    write(*,*) RHO(J),A(K,J)
-       !X    write(*,*) 'H: ',H
-
-       if(abs(h).lt.reps7) then
-           write(*,*) 'Correction process aborted'
-           write(*,*) 'during ',k,'th iteration'
-           write(*,*) 'Last r.m.s.: ',rmss(k-1)
-           write(*,*) 'Last p-t-p.: ',ptop(k-1)
-           write(*,*) 'Division by zero expected'
-           write(*,*) 'Probably two kickers too close: ',h
-           write(*,*) 'SUSPECTED KICKER: ',J,'  '
-           write(*,*) conm(ipiv(j))
-           ifail = -1
-           return
-       !           stop 777
-       endif
-
-       rho(j)=h
-       g=rho(k2)-(a(k,j))*(b(k))
-       rho(k2) = g
-       if(h.ne.rzero) then
-           pivt = g*g/h
-       else
-           pivt = rzero
-       endif
-       !X    write(*,*) 'compare for pivot K,J,PIVT,PIV: ',K,J,PIVT,PIV
-       if(pivt.lt.piv)go to 18
-       !X    write(*,*) 'comparison succeeded, set pivot'
-       kpiv=j
-       piv=pivt
-18 continue
-   k2 = k2 + 1
-   enddo
-
-   ! --- calcul des x
-11 x(k)=b(k)/rho(n+k)
-   if(k.eq.1)go to 27
-   do i=2,k
-       kk=k-i+1
-       x(kk)=b(kk)
-       ki=kk+1
-       do j=ki,k
-           x(kk)=x(kk)-a(kk,j)*x(j)
-       enddo
-       x(kk)=x(kk)/rho(n+kk)
-   enddo
-   !       write(*,*) 'after 15'
-27 continue
-
-   ! --- save residual orbit and inverse sign of corrections (convention!)
-   do iii= 1,m
-       r(iii) = b(iii)
-   enddo
-   do iii= 1,k
-       x(iii) =-x(iii)
-   enddo
-
-   ! --- calcul du vecteur residuel dans htrl
-   !=========================================
-
-   !     transform orbit R back to "normal space"
-   !     write(*,*) 'transform back to normal space'
-   call htrl(a,r,m,n,k,rho)
-   call calrms(r,m,rmss(k),ptop(k))
-   !       WRITE(61,'(I10,2F15.2)')K,RMSS(K),PTOP(K)
-   if(k.lt.n) then
-       xiter(k+1) = k
-       xrms(k+1)  = rmss(k)
-       xptp(k+1)  = ptop(k)
-   endif
-   !       write(*,*) 'orbit back in normal space ',prtlev,k
-
-   ! --- write intermediate results to 61 files
-   if(k.eq.1)then
-       if (prtlev .ge. 2) then
-           write(61,52)
-           write(61,54)units
-           write(61,'(4x,"0",42x,f12.8,f15.8)')rm,pt
-       endif
-52     FORMAT(/' ***********    start MICADO    ***********'/)
-54     FORMAT(' iter',5X,'corrector',13X,A4,6X,'mrad',               &
-           &5X,"  rms",10X," ptop",/)
-   endif
-
-   if (prtlev .ge. 2) then
-      write(61,'(/,1x,72("-"),/,1x,i4,3x,38(" "),1x,f12.8,f15.8)') k,rmss(k),ptop(k)
-   endif
-
-   do kkk = 1,k
-       xxcal=x(kkk)
-       if (prtlev .ge. 2) then
-           write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)') kkk,conm(ipiv(kkk)),x(kkk),xxcal
-       endif
-   enddo
-
-   if (interm) then
-       if (prtlev .ge. 2) then
-           write(61,58) k
-           write(61,'(1x,8f9.3)')(r(kkk),kkk=1,m)
-       endif
-58     format(/,' residual orbit after iteration ',i4,':')
-   endif
-
-   if(k.eq.iter) then
-       if (prtlev .ge. 2) then
-           write(61,53)
-       endif
-   endif
-53 format(/' ***********    end   MICADO    ***********'/)
-
-
-   if(ptop(k).le.ptp)go to 202
-   if(rmss(k).le.rms)go to 202
-   enddo
-   return
      
-   ! --- correction is already good enough:
-   !=======================================
+     do k=1,iter
+        
+        if (kpiv.eq.k) go to 8
 
-202 ptp=ptop(k)
-   rms=rmss(k)
-   iter=k
-   return
+        ! --- on echange les K et KPIV si KPIV plus grand que K
+        h=rho(k)
+        rho(k)=rho(kpiv)
+        rho(kpiv)=h
+        k2=n+k
+        k3=n+kpiv
+        g = rho(k2)
+        rho(k2) = rho(k3)
+        rho(k3) = g
+        do i=1,m
+           h=a(i,k)
+           a(i,k)=a(i,kpiv)
+           a(i,kpiv)=h
+        enddo
+        
+        ! --- calcul de beta,sigma et uk dans htul
+8       continue
+        call htul(a,m,n,k,sig,beta)
+        
+        ! --- on garde SIGMA dans RHO(N+K)
+        j=n+k
+        rho(j)=-sig
+        ip=ipiv(kpiv)
+        ipiv(kpiv)=ipiv(k)
+        ipiv(k)=ip
+        if(k.eq.n) go to 13
+
+        ! --- transformation de A dans HTAL
+        call htal(a,m,n,k,beta)
+        
+        ! --- transformation de B dans HTBL
+13      continue
+        call htbl(a,b,m,n,k,beta)
+
+        ! --- recherche du pivot (K+1)
+        !=============================
+
+        rho(k)=sqrt(piv)
+        if(k.eq.n) go to 11
+        piv=rzero
+        kpiv = k + 1
+        j1 = kpiv
+        k2=n + j1
+        !x    write(*,*) 'loop 18, ',j1,n
+        do j=j1,n
+           h=rho(j)-(a(k,j))*(a(k,j))
+           !X    write(*,*) 'K,J: ',K,J
+           !X    write(*,*) RHO(J),A(K,J)
+           !X    write(*,*) 'H: ',H
+           
+           if(abs(h).lt.reps7) then
+              write(*,*) 'Correction process aborted'
+              write(*,*) 'during ',k,'th iteration'
+              write(*,*) 'Last r.m.s.: ',rmss(k-1)
+              write(*,*) 'Last p-t-p.: ',ptop(k-1)
+              write(*,*) 'Division by zero expected'
+              write(*,*) 'Probably two kickers too close: ',h
+              write(*,*) 'SUSPECTED KICKER: ',J,'  '
+              write(*,*) conm(ipiv(j))
+              ifail = -1
+              return
+              !           stop 777
+           endif
+
+           rho(j)=h
+           g=rho(k2)-(a(k,j))*(b(k))
+           rho(k2) = g
+           if(h.ne.rzero) then
+              pivt = g*g/h
+           else
+              pivt = rzero
+           endif
+           !X    write(*,*) 'compare for pivot K,J,PIVT,PIV: ',K,J,PIVT,PIV
+           if(pivt.lt.piv)go to 18
+           !X    write(*,*) 'comparison succeeded, set pivot'
+           kpiv=j
+           piv=pivt
+18         continue
+           k2 = k2 + 1
+        enddo
+
+        ! --- calcul des x
+11      x(k)=b(k)/rho(n+k)
+        if(k.eq.1)go to 27
+        do i=2,k
+           kk=k-i+1
+           x(kk)=b(kk)
+           ki=kk+1
+           do j=ki,k
+              x(kk)=x(kk)-a(kk,j)*x(j)
+           enddo
+           x(kk)=x(kk)/rho(n+kk)
+        enddo
+        !       write(*,*) 'after 15'
+27      continue
+        
+        ! --- save residual orbit and inverse sign of corrections (convention!)
+        do iii= 1,m
+           r(iii) = b(iii)
+        enddo
+        do iii= 1,k
+           x(iii) =-x(iii)
+        enddo
+        
+        ! --- calcul du vecteur residuel dans htrl
+        !=========================================
+        
+        !     transform orbit R back to "normal space"
+        !     write(*,*) 'transform back to normal space'
+        call htrl(a,r,m,n,k,rho)
+        call calrms(r,m,rmss(k),ptop(k))
+        !       WRITE(61,'(I10,2F15.2)')K,RMSS(K),PTOP(K)
+        if(k.lt.n) then
+           xiter(k+1) = k
+           xrms(k+1)  = rmss(k)
+           xptp(k+1)  = ptop(k)
+        endif
+        !       write(*,*) 'orbit back in normal space ',prtlev,k
+        
+        ! --- write intermediate results to 61 files
+        if(k.eq.1)then
+           if (prtlev .ge. 2) then
+              write(61,52)
+              write(61,54)units
+              write(61,'(4x,"0",42x,f12.8,f15.8)')rm,pt
+           endif
+52         FORMAT(/' ***********    start MICADO    ***********'/)
+54         FORMAT(' iter',5X,'corrector',13X,A4,6X,'mrad', 5X,"  rms",10X," ptop",/)
+        endif
+
+        if (prtlev .ge. 2) then
+           write(61,'(/,1x,72("-"),/,1x,i4,3x,38(" "),1x,f12.8,f15.8)') k,rmss(k),ptop(k)
+        endif
+
+        do kkk = 1,k
+           xxcal=x(kkk)
+           if (prtlev .ge. 2) then
+              write(61,'(I3,1X,A16,9x,f8.4,2x,f8.4)') kkk,conm(ipiv(kkk)),x(kkk),xxcal
+           endif
+        enddo
+        
+        if (interm) then
+           if (prtlev .ge. 2) then
+              write(61,58) k
+              write(61,'(1x,8f9.3)')(r(kkk),kkk=1,m)
+           endif
+58         format(/,' residual orbit after iteration ',i4,':')
+        endif
+        
+        if(k.eq.iter) then
+           if (prtlev .ge. 2) then
+              write(61,53)
+           endif
+        endif
+53      format(/' ***********    end   MICADO    ***********'/)
+
+
+        if(ptop(k).le.ptp)go to 202
+        if(rmss(k).le.rms)go to 202
+     enddo
+     return
+     
+     ! --- correction is already good enough:
+     !=======================================
+     
+202  ptp=ptop(k)
+     rms=rmss(k)
+     iter=k
+     return
    end subroutine htls
 
 
@@ -1267,21 +1266,22 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        real r(m),xave,xrms,rms,ptp,ave,rzero
        parameter(rzero=0e0)
 
-       xave = rzero
+       !xave = rzero
        xrms = rzero
       
        do i=1,m
-           xave = xave + r(i)
+           !xave = xave + r(i)
            xrms = xrms + (r(i)*r(i))
        enddo
       
-       ave = xave / float(m)
+       !ave = xave / float(m)
        rms = xrms / float(m)
-      
+       rms = sqrt(rms)
+
        imax=maxmin(r(1),m,1)
        imin=maxmin(r(1),m,0)
        ptp=r(imax)-r(imin)
-       rms=sqrt(rms)
+       
        return
    end subroutine calrms
 
@@ -1304,11 +1304,11 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        if (n.lt.1) return
        curent=a(1)
        do i=2,n
-           if ((m.eq.0).and.(a(i).ge.curent)) go to 10
-           if ((m.eq.1).and.(a(i).le.curent)) go to 10
-           curent=a(i)
-           maxmin=i
-10     continue
+          if ((m.eq.0).and.(a(i).ge.curent)) go to 10
+          if ((m.eq.1).and.(a(i).le.curent)) go to 10
+          curent=a(i)
+          maxmin=i
+10        continue
        enddo
        return
    end function maxmin

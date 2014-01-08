@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 11.33.59 +
+  + Execution Time Stamp: 08.01.14 12.07.39 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -160,7 +160,7 @@ iteration:   2 error:   2.297756E-05 deltap:   0.000000E+00
 orbit:  -4.999995E-04 -1.984645E-09 -1.734057E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.548596E-09 deltap:   0.000000E+00
-orbit:  -4.999999E-04  1.297340E-10  1.748622E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999999E-04  1.297340E-10  1.748624E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -342,11 +342,11 @@ ncorr reset to 256
   
 CORRECTION SUMMARY:   
 
-rms before correction: 3.398259 mm
-rms after correction:  0.051909 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 20.124258 mm
-ptp after correction:  0.934479 mm
+before correction: 0.055300        3.398259          3.398709        20.124258 
+after correction:  -0.001486        0.051909          0.051931        0.934479 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -896,8 +896,8 @@ bpmwb.4l1.b1:1   -0.901     0.000     0.901
 bpmsy.4l1.b1:1   -1.090     -0.000     1.090
 bpms.2l1.b1:1   -0.438     0.000     0.438
 bpmsw.1l1.b1:1   -0.303     -0.000     0.303
-Max strength: 5.672326e-02 is below corrector strength limit: 1.000000e+00
-Max strength: 5.672326e-02
+Max strength: 5.672327e-02 is below corrector strength limit: 1.000000e+00
+Max strength: 5.672327e-02
 Corrector:  Before:     After:    Difference:
              (mrad)     (mrad)       (mrad)  
 mcbxv.2r1:1 0.000000 -0.000009 -0.000009
@@ -931,11 +931,11 @@ mcbv.12l2.b1:1 0.000000 -0.000405 -0.000405
 mcbcv.10l2.b1:1 0.000000 0.001131 0.001131
 mcbcv.8l2.b1:1 0.000000 -0.000169 -0.000169
 mcbcv.6l2.b1:1 0.000000 0.000026 0.000026
-mcbxv.3l2:1 0.000000 -0.000011 -0.000011
-mcbxv.2l2:1 0.000000 0.000015 0.000015
-mcbxv.1l2:1 0.000000 -0.000012 -0.000012
-mcbxv.1r2:1 0.000000 0.000016 0.000016
-mcbxv.2r2:1 0.000000 -0.000030 -0.000030
+mcbxv.3l2:1 0.000000 -0.000010 -0.000010
+mcbxv.2l2:1 0.000000 0.000012 0.000012
+mcbxv.1l2:1 0.000000 -0.000009 -0.000009
+mcbxv.1r2:1 0.000000 0.000015 0.000015
+mcbxv.2r2:1 0.000000 -0.000029 -0.000029
 mcbxv.3r2:1 0.000000 0.000008 0.000008
 mcbcv.a5r2.b1:1 0.000000 -0.000003 -0.000003
 mcbcv.b5r2.b1:1 0.000000 0.000003 0.000003
@@ -1153,9 +1153,9 @@ mcbv.11l1.b1:1 0.000000 0.001846 0.001846
 mcbcv.9l1.b1:1 0.000000 -0.000052 -0.000052
 mcbcv.7l1.b1:1 0.000000 0.000006 0.000006
 mcbcv.5l1.b1:1 0.000000 -0.000002 -0.000002
-mcbxv.3l1:1 0.000000 0.000022 0.000022
-mcbxv.2l1:1 0.000000 -0.000080 -0.000080
-mcbxv.1l1:1 0.000000 0.000043 0.000043
+mcbxv.3l1:1 0.000000 0.000024 0.000024
+mcbxv.2l1:1 0.000000 -0.000088 -0.000088
+mcbxv.1l1:1 0.000000 0.000047 0.000047
 CORRECT, FLAG=ring,orbit=my_orbit,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=x,
@@ -1182,11 +1182,11 @@ ncorr reset to 256
   
 CORRECTION SUMMARY:   
 
-rms before correction: 2.484899 mm
-rms after correction:  0.049422 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 34.246206 mm
-ptp after correction:  0.829662 mm
+before correction: 0.078716        2.484899          2.486145        34.246206 
+after correction:  -0.000016        0.049422          0.049422        0.829662 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -2042,10 +2042,10 @@ TWISS,file=result.file,sequence=lhcb1;
 enter Twiss module
   
 iteration:   1 error:   1.201955E-05 deltap:   0.000000E+00
-orbit:  -2.157696E-06 -6.091278E-06  1.432794E-06  1.818190E-06  0.000000E+00  0.000000E+00
+orbit:  -2.157696E-06 -6.091278E-06  1.431088E-06  1.818213E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   1.400474E-09 deltap:   0.000000E+00
-orbit:  -2.157452E-06 -6.090561E-06  1.432618E-06  1.817651E-06  0.000000E+00  0.000000E+00
+iteration:   2 error:   1.400437E-09 deltap:   0.000000E+00
+orbit:  -2.157451E-06 -6.090561E-06  1.430912E-06  1.817674E-06  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -2053,16 +2053,16 @@ orbit:  -2.157452E-06 -6.090561E-06  1.432618E-06  1.817651E-06  0.000000E+00  0
         26658.8832                 -0    0.0003213633032        55.78299894 
 
                 q1                dq1            betxmax              dxmax 
-       64.31164086         2.04136789        4399.735601        2.848636419 
+       64.31164086        2.041367887        4399.735603        2.848636418 
 
              dxrms             xcomax             xcorms                 q2 
-       1.393845582    0.0005917110707    6.257577199e-05        59.32201917 
+       1.393845582    0.0005917110725    6.257577253e-05        59.32201917 
 
                dq2            betymax              dymax              dyrms 
-       2.017763567        4406.728402      0.05177638046      0.01078683692 
+       2.017763567        4406.728403         0.05177808      0.01078704276 
 
             ycomax             ycorms             deltap            synch_1 
-   0.0008073204161    6.478140133e-05                  0                  0 
+   0.0008073207744    6.478144458e-05                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -2109,11 +2109,11 @@ ncorr reset to 276
   
 CORRECTION SUMMARY:   
 
-rms before correction: 3.403097 mm
-rms after correction:  0.021439 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 20.124259 mm
-ptp after correction:  0.163149 mm
+before correction: 0.068300        3.403097          3.403782        20.124259 
+after correction:  -0.000136        0.021439          0.021439        0.163149 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -2970,11 +2970,11 @@ ncorr reset to 276
   
 CORRECTION SUMMARY:   
 
-rms before correction: 2.396317 mm
-rms after correction:  0.013678 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 22.788058 mm
-ptp after correction:  0.112591 mm
+before correction: 0.102417        2.396317          2.398504        22.788058 
+after correction:  0.000642        0.013678          0.013693        0.112591 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -3936,11 +3936,11 @@ ncorr reset to 274
   
 CORRECTION SUMMARY:   
 
-rms before correction: 2.216664 mm
-rms after correction:  0.013613 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 22.570025 mm
-ptp after correction:  0.112591 mm
+before correction: 0.091594        2.216664          2.218556        22.570025 
+after correction:  0.000632        0.013613          0.013628        0.112591 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -4795,11 +4795,11 @@ ncorr reset to 276
   
 CORRECTION SUMMARY:   
 
-rms before correction: 3.403573 mm
-rms after correction:  0.021439 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 20.124258 mm
-ptp after correction:  0.163149 mm
+before correction: 0.066565        3.403573          3.404224        20.124258 
+after correction:  -0.000136        0.021439          0.021439        0.163149 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -5719,5 +5719,5 @@ removefile, file='fort.61';
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.01.05 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

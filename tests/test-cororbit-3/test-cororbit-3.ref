@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.01.05  (32 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 18.07.13 11.45.09 +
+  + Code Modification Date: 2013.12.19      +
+  + Execution Time Stamp: 08.01.14 12.37.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE, s='MAD-X test';
 
@@ -357,11 +357,11 @@ enter MICADO correction ...
   
 CORRECTION SUMMARY:   
 
-rms before correction: 3.530367 mm
-rms after correction:  0.230811 mm
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
 
-ptp before correction: 12.131072 mm
-ptp after correction:  0.768439 mm
+before correction: -0.925909        3.530367          3.649767        12.131072 
+after correction:  0.046673        0.230811          0.235483        0.768439 
+
 
 Monitor:  Before:     After:    Difference:
            (mm)        (mm)         (mm)   
@@ -377,7 +377,7 @@ bph5:1   -3.700     -0.179     3.521
 bpv5:1   -0.073     0.314     0.388
 bph1:1   2.491     -0.154     -2.645
 Max strength: 1.050740e+01 should be less than corrector strength limit: 1.000000e+00
-++++++ warning: maximum corrector strength larger than limit
+++++++ warning: maximum corrector strength larger than limit 
 Max strength: 1.050740e+01
 Corrector:  Before:     After:    Difference:
              (mrad)     (mrad)       (mrad)  
@@ -392,8 +392,9 @@ cbh.41:1 0.000000 10.507403 10.507403
 cbh.50:1 0.000000 0.000000 0.000000
 cbh.51:1 0.000000 0.000000 0.000000
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.01.05 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
