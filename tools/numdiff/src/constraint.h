@@ -88,6 +88,7 @@ enum eps_cmd {
   eps_large  = eps_last << 0,  // large tolerance
 
 // unions
+  eps_ra     = eps_abs  | eps_rel,
   eps_dra    = eps_abs  | eps_rel  | eps_dig,
   eps_chk    = eps_dra  | eps_equ  | eps_ign,
   eps_sgg    = eps_skip | eps_goto | eps_gonum,

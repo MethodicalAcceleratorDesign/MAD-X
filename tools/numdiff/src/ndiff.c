@@ -722,8 +722,8 @@ ndiff_testNum (T *dif, const C *c)
   rel_d = abs_d/ min_d;
   dig_d = abs_d/(min_d*pow_d);
 
-//  trace("  lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, abs_d=%.2g, rel_d=%.2g, ndig=%d",
-//           lhs_d, rhs_d, scl_d, off_d, abs_d, rel_d, imax(n1, n2));
+  trace("  values: lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, abs_d=%.2g, rel_d=%.2g, ndig=%d",
+           lhs_d, rhs_d, scl_d, off_d, abs_d, rel_d, imax(n1, n2));
 
   // save R3..R9
   reg_setval(dif->reg, dif->reg_n, 3, dif_d);
@@ -736,8 +736,10 @@ ndiff_testNum (T *dif, const C *c)
 
   // missing numbers
   if (!l1 || !l2) {
-    if ((c->eps.cmd & (eps_ign | eps_istr)) == (eps_ign | eps_istr))
+    if ((c->eps.cmd & (eps_ign | eps_istr)) == (eps_ign | eps_istr)) {
+      trace("  missing numbers (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
       goto quit;
+    }
 
     ret |= eps_ign;
     goto quit_diff;
@@ -745,14 +747,14 @@ ndiff_testNum (T *dif, const C *c)
 
   // ignore difference
   if (c->eps.cmd & eps_ign) {
-    trace("  ignoring numbers (rule #%d, line %d) '%.25s'|'%.25s'", ri, rl, lhs_p, rhs_p);
+    trace("  ignoring numbers (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
     goto quit;
   }
 
   // omit difference
   if (c->eps.cmd & eps_omit) {
     if (is_valid_omit(lhs_p, rhs_p, dif, c->eps.tag)) {
-      trace("  omitting numbers (rule #%d, line %d) '%.25s'|'%.25s'", ri, rl, lhs_p, rhs_p);
+      trace("  omitting numbers (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
       goto quit;
     }
   }
@@ -762,6 +764,7 @@ ndiff_testNum (T *dif, const C *c)
     if (l1 != l2 || memcmp(lhs_p, rhs_p, l1))
       ret |= eps_equ;
 
+    trace("  strict comparison failed (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
     if (ret) goto quit_diff;
     else     goto quit;
   }
@@ -787,7 +790,13 @@ ndiff_testNum (T *dif, const C *c)
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
-  if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) ret = 0;
+  if ((c->eps.cmd & eps_any) && ((f1 || f2) && (ret & eps_dra) != (c->eps.cmd & eps_dra) || (ret & eps_ra) != (c->eps.cmd & eps_ra))) {
+    trace("  any dra success (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
+    trace("  any dra success flags %s [%s|%s|%s] ", (f1 || f2) ? "floating" : "integer",
+             ret & eps_abs ? "-" : "abs", ret & eps_rel ? "-" : "rel", ret & eps_dig ? "-" : "dig");
+    ret = 0;
+  }
+
   if (!ret) goto quit;
 
 quit_diff:
