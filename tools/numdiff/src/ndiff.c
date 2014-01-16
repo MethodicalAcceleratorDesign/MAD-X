@@ -790,7 +790,9 @@ ndiff_testNum (T *dif, const C *c)
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
-  if ((c->eps.cmd & eps_any) && ((f1 || f2) && (ret & eps_dra) != (c->eps.cmd & eps_dra) || (ret & eps_ra) != (c->eps.cmd & eps_ra))) {
+  if ((c->eps.cmd & eps_any) && (
+       (f1 || f2) && (ret & eps_dra) != (c->eps.cmd & eps_dra) ||    // floating case
+      !(f1 || f2) && (ret & eps_ra ) != (c->eps.cmd & eps_ra ) )) {  // integer  case, discard dig constraint
     trace("  any dra success (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
     trace("  any dra success flags %s [%s|%s|%s] ", (f1 || f2) ? "floating" : "integer",
              ret & eps_abs ? "-" : "abs", ret & eps_rel ? "-" : "rel", ret & eps_dig ? "-" : "dig");
