@@ -854,7 +854,7 @@ contains
     if(isRing .eqv. .true.) then
        call oneTurnSummary(isRing, theTransferMap , x, suml)
     else
-       print*, "Reduced SUMM Table (closed orbit not requested)"
+       print*, "Reduced SUMM Table (Inital parameters specified)"
        call onePassSummary(theTransferMap , x, suml)
     endif
 
@@ -959,7 +959,14 @@ contains
             call liepeek(iia,icoast)
             my_nv=int(doublenum)
             nv_min=min(c_%npara,my_nv)
+            if (getdebug() > 2) then
+              print*,"NV from table ", my_nv, " this command defined nv ",c_%npara," Using ", nv_min
+            endif
          else
+            if (getdebug() > 2) then
+              print*,"Can not read NV from map_table setting initial_matrix_table=.false."
+            endif
+           
             initial_matrix_table=.false.
          endif
       endif
@@ -1702,7 +1709,7 @@ contains
 
       enddo
 
-      ! call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
+      !call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
 
       call maptoascript()
 
