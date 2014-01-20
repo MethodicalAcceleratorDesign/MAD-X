@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.01.06  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 14.02.13 15.11.18 +
+  + Code Modification Date: 2014.01.15      +
+  + Execution Time Stamp: 20.01.14 18.51.37 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -80,17 +80,17 @@ parameter: energy   double value:                100
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -112,22 +112,17 @@ parameter: energy   double value:                100
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.5606626274357041E-11 %
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
-  NUMBER OF THIN OBJECTS :        1180
-  TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
-Deviation from symplecticity  0.5606626274357041E-11 %
+ Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004431145119   -0.0001936171878           -1000000 
+             534.6     0.000443114518   -0.0001936171878           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550790748        47.50529435       0.2546195015 
+          -1000000    0.0003550790748        47.50529402       0.2546195015 
 
                 q2                dq1                dq2                 qs 
       0.2546003528        1.051169737        1.046958092                  0 
@@ -135,17 +130,44 @@ Deviation from symplecticity  0.5606626274357041E-11 %
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
         32.0497509        177.6889149        32.05081522        177.7045042 
 
-            deltap            orbit_x           orbit_px            orbit_y 
-                 0    8.892828933e-05    7.277292573e-07                  0 
+         beta11min          beta11max          beta12min          beta12max 
+        32.0497509        177.6889149                  0                  0 
 
-          orbit_py           orbit_pt          orbit_-cT             xcorms 
-                 0                  0                  0    7.160127073e-05 
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
 
-            ycorms            pxcorms            pycorms             xcomax 
-                 0    8.586227449e-07                  0    8.892828933e-05 
+         beta22min          beta22max          beta23min          beta23max 
+       32.05081522        177.7045042                  0                  0 
 
-            ycomax            pxcomax            pycomax 
-                 0    7.281171647e-07                  0 
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0        2.176305716 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.02964638027      0.02964631228                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    8.892828933e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   7.277292573e-07                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    7.160124621e-05                  0    8.586224592e-07 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0     8.89284238e-05 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    7.281201483e-07                  0                  0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0      5.2188044e-05                  0   -1.674875719e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0                  0 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -167,15 +189,14 @@ Deviation from symplecticity  0.5606626274357041E-11 %
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
-Deviation from symplecticity  0.5606626274357041E-11 %
+Deviation from symplecticity  0.5251354906476990E-11 %
  Killing LayoutNo name assigned                                                                                                        
-  NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.01.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
