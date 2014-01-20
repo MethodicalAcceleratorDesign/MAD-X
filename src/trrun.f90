@@ -57,7 +57,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
   logical onepass,onetable,last_out,info,aperflag,doupdate,first,        &
-       bb_sxy_update,virgin_state,emittance_update
+       bb_sxy_update,virgin_state,emittance_update,checkpnt_restart
   integer j,code,restart_sequ,advance_node,                              &
        node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
        ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
@@ -120,6 +120,10 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   logical is_drift, is_thin, is_quad, is_matrix
 
+!FRS open unit 90 filename=checkpoint_restart.dat to prolong run   
+  open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
+  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
+
   !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
 
@@ -180,7 +184,18 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   if (mod(turns, ffile) .ne. 0) tot_segm = tot_segm + 1
 
   if(first) then
-     call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
+     if(checkpnt_restart) then
+        read(90,END=100) jmax 
+        read(90,END=100) Ex_rms0 
+        read(90,END=100) Ey_rms0
+        do i = 1, jmax
+           do j=1,6
+              read(90,END=100) z(j,i)
+           enddo
+        enddo
+     else
+        call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
+     endif
      !--- set particle id
      do k=1,jmax
         part_id(k) = k
@@ -314,12 +329,27 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         z_factor=1d0 !at start sigma_z_ini/sigma_z
         Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
         Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
+        if(checkpnt_restart) then
+           Ex_rms=Ex_rms0
+           Ey_rms=Ey_rms0
+        endif
 !        write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
         first=.false.
      endif
   endif
 
   do turn = 1, turns
+
+!--- Write checkpoint_restart data
+     rewind 90
+     write(90) jmax 
+     write(90) Ex_rms
+     write(90) Ey_rms
+     do i = 1, jmax
+        do j=1,6
+           write(90) z(j,i)
+        enddo
+     enddo
 
      if (doupdate) call trupdate(turn)
 
@@ -582,6 +612,18 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         endif
      endif
   endif
+
+!--- Write checkpoint_restart data
+  rewind 90
+  write(90) jmax 
+  write(90) Ex_rms
+  write(90) Ey_rms
+  do i = 1, jmax
+     do j=1,6
+        write(90) z(j,i)
+     enddo
+  enddo
+
   !--- enter last turn in summary table
   do  i = 1,j_tot
      tmp_d = i
@@ -598,6 +640,9 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
+  goto 101
+100 call aafail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
+101 continue
 end subroutine trrun
 
 
