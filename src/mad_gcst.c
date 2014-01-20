@@ -433,24 +433,54 @@ char* twiss_sector_table_cols[] = {
 
 int ptc_twiss_summary_table_types[] =
   {
-    2, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 2, 2,
-    2, 2, 2, 2,
-    2,
-    2,2,2,
-    2,2,2,
-    2,2,2,2,
-    2,2,2,2
-  };
+    2, 2, 2, 2, 2, 2, 2,/* "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", */
+    2, 2, 2, 2, 2,	    /* "q1", "q2", "dq1", "dq2", "qs", */
+    2, 2, 	    /* "beta_x_min","beta_x_max", */
+    2, 2, 	    /* "beta_y_min","beta_y_max", */
+    2, 2,	    /* "beta11min","beta11max", */
+    2, 2, 	    /* "beta12min","beta12max", */
+    2, 2, 	    /* "beta13min","beta13max", */
+    2, 2, 	    /* "beta21min","beta21max", */
+    2, 2, 	    /* "beta22min","beta22max", */
+    2, 2, 	    /* "beta23min","beta23max", */
+    2, 2, 	    /* "beta31min","beta31max", */
+    2, 2, 	    /* "beta32min","beta32max", */
+    2, 2, 	    /* "beta33min","beta33max", */
+    2, 2, 	    /* "disp1min", "disp1max", */
+    2, 2, 	    /* "disp2min", "disp2max", */
+    2, 2, 	    /* "disp3min", "disp3max", */
+    2, 2, 	    /* "disp4min", "disp4max", */
+    2,	    /* "deltap", */
+    2,2,2,	    /* "orbit_x","orbit_px","orbit_y", */
+    2,2,2,	    /* "orbit_py","orbit_pt","orbit_-cT", */
+    2,2,2,2,2,2,	    /* "xcorms","ycorms","pxcorms","pycorms","tcorms","ptcorms", */
+    2,2,2,2,2,2,	    /* "xcomax","ycomax","pxcomax","pycomax","tcomax","ptcomax", */
+    2,2,2,2,2,2	    /* "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin", */ 
+  }; 
 char* ptc_twiss_summary_table_cols[] = {
   "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", 
   "q1", "q2", "dq1", "dq2", "qs",
-  "beta_x_min","beta_x_max","beta_y_min","beta_y_max",
+  "beta_x_min","beta_x_max",
+  "beta_y_min","beta_y_max",
+  "beta11min","beta11max",
+  "beta12min","beta12max",
+  "beta13min","beta13max",
+  "beta21min","beta21max",
+  "beta22min","beta22max",
+  "beta23min","beta23max",
+  "beta31min","beta31max",
+  "beta32min","beta32max",
+  "beta33min","beta33max",
+  "disp1min","disp1max",
+  "disp2min","disp2max",
+  "disp3min","disp3max",
+  "disp4min","disp4max",
   "deltap",
   "orbit_x","orbit_px","orbit_y",
   "orbit_py","orbit_pt","orbit_-cT",
-  "xcorms","ycorms","pxcorms","pycorms",
-  "xcomax","ycomax","pxcomax","pycomax",
+  "xcorms","ycorms","pxcorms","pycorms","tcorms","ptcorms",
+  "xcomax","ycomax","pxcomax","pycomax","tcomax","ptcomax",
+  "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin",
   " " /* blank terminates */
 };
 

@@ -579,7 +579,7 @@ char command_def[] =
 "table    = [s, none, ptc_twiss], "
 "summary_file  = [s, none, ptc_twiss_summary], "
 "summary_table = [s, none, ptc_twiss_summary], "
-"savemaps = [l, true, true], " /*buffers maps for future usage as universal_taylors */
+"savemaps = [l, false, true], " /*buffers maps for future usage as universal_taylors */
 "writetmap = [l,false, true], " /*writes transfer.map */
 "slice_magnets  = [l,false,true], "
 "center_magnets = [l,false,true], "
@@ -598,9 +598,11 @@ char command_def[] =
 "no = [i, 1], "
 "closed_orbit = [l, false, true], "
 "rmatrix  = [l, false, true], "
-"initial_matrix_table = [l, false, true], "
+"ring_paremeters  = [l, false, true], "   /* forces ring parametersd (skowron on 140120)*/
+"initial_matrix_table = [l, false, true], " /* reads table map_table cooked by ptc_normal */ 
 "initial_matrix_manual = [l, false, true], "
 "initial_map_manual = [l, false, true], "
+"ignore_map_orbit = [l, false, true], "   /* Ignores orbit in the map table and uses the closed or specified x,px,y... (skowron on 140120)*/
 "initial_ascript_manual = [l, false, true], "
 "re11     = [r, 1], re12     = [r, 0], re13     = [r, 0], "
 "re14     = [r, 0], re15     = [r, 0], re16     = [r, 0], "

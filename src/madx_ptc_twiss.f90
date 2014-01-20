@@ -84,11 +84,30 @@ module madx_ptc_twiss_module
 
   logical :: slice_magnets, center_magnets, deltap_dependency, isRing
 
-  logical :: resetBetaExtrema(3,3);
+  logical     :: resetBetaExtrema;
 
-  real(dp)                :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
-  real(dp)                :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
+  real(dp)    :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
+  real(dp)    :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
+  real(dp)    :: minBetX      ! Edwards-Teng betas
+  real(dp)    :: maxBetX      ! Edwards-Teng betas
+  real(dp)    :: minBetY      ! Edwards-Teng betas
+  real(dp)    :: maxBetY      ! Edwards-Teng betas
+  real(dp)    :: minDisp(4)  
+  real(dp)    :: maxDisp(4)  
 
+  logical     :: resetOrbitExtrema
+  real(dp)    :: minOrbit(6)  
+  real(dp)    :: maxOrbit(6)
+  real(dp)    :: sum2Orbit(6) ! sum of squares for rms calculatios
+  integer     :: nobsOrbit    ! counter of observation points for rms calculation
+  
+  ! slice tracking displays many points at the same position
+  ! for rms only the last should be taken 
+  real(dp)    :: prevOrbit(6)
+  real(dp)    :: prevS(6)
+  
+  
+  
   !============================================================================================
   !  PRIVATE
   !    routines
@@ -156,9 +175,9 @@ contains
     endif
 
 
-!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!
     ! phase advance!
-!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!
 
     k = 2
     if(c_%nd2==6.and.c_%ndpt==0) k = 3
@@ -216,10 +235,6 @@ contains
        enddo
     endif
 
-    !--- track the Twiss functions' extremas
-    call trackBetaExtrema(1,1,s1%beta(1,1))
-    call trackBetaExtrema(2,2,s1%beta(2,2))
-    !---
 
     s1%mu=phase
 
@@ -231,8 +246,8 @@ contains
     enddo
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_twiss: ','DA in twiss got unstable')
-       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss ");
+       call fort_warn('ptc_twiss: ','DA got unstable in twiss paremeters computation')
+       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss parameters computation ");
        return
     endif
 
@@ -329,13 +344,14 @@ contains
     real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual, writetmap
-    integer                 :: row, rmatrix
+    logical(lp)             :: ring_paremeters  !! forces isRing variable to true, i.e. calclulation of closed solution
+    integer                 :: rmatrix
     real(dp)                :: emi(3)
     logical(lp)             :: isputdata
     integer                 :: countSkipped
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
-    character(48) charconv !routine
+    character(48)           :: charconv !routine
     
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
@@ -426,8 +442,8 @@ contains
     if(closed_orbit) then
 
        if ( .not. c_%stable_da) then
-          call fort_warn('ptc_twiss: ','DA got unstable even before finding orbit')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding orbit");
+          call fort_warn('ptc_twiss: ','DA got unstable even before finding closed orbit')
+          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding closed orbit");
           stop
           !          return
        endif
@@ -515,12 +531,20 @@ contains
     !  INIT Y that is tracked          !
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     call initmap(dt)
-
+   
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
     endif
-
+    
+    ring_paremeters = get_value('ptc_twiss ','ring_paremeters ') .ne. 0
+    if (ring_paremeters) then
+      if (getdebug() > 1) then
+        write(6,*) "User forces ring parameters calculation"
+      endif
+      isRing = .true.
+    endif
+    
     call alloc(theTransferMap)
     theTransferMap = npara
     theTransferMap = X
@@ -584,10 +608,15 @@ contains
     else
        nullify(maps) !assurance
     endif
-
     
+    resetBetaExtrema = .true.;
+    resetOrbitExtrema = .true.;
     
-    
+   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   !                              !
+   !  T H E   M A I N   L O O P   !
+   !                              !
+   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     do i=1,MY_RING%n
 
@@ -665,8 +694,12 @@ contains
           endif
 
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             call fort_warn('ptc_twiss: ','DA got unstable')
-             call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+             
+             write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
+                             ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
+	         ' step ',nodePtr%pos,' PTC msg: ',why
+             call fort_warn('ptc_twiss: ',whymsg)
+             call seterrorflag(10,"ptc_twiss ",whymsg);
              if (getdebug() > 2) close(mf1)
              return
           endif
@@ -674,8 +707,7 @@ contains
           call PRODUCE_APERTURE_FLAG(flag_index)
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
-             Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-             write(whymsg,*) 'APERTURE error: ',why
+             write(whymsg,*) 'APERTURE error: ',why,' s=',s,'  element: ',i,' name: ',current%MAG%name
              call fort_warn('ptc_twiss: ',whymsg)
              call seterrorflag(10,"ptc_twiss: ",whymsg);
              !          Write(6,*) why ! See produce aperture flag routine in sd_frame
@@ -739,7 +771,7 @@ contains
           !write(6,*) "                                                  END OF ELEMENT Saving data"
 
           if (getdebug() > 2) then
-             write(6,*) "               Saving any way, it is the last node"
+             write(6,*) "               Saving anyway, it is the last node"
           endif
 
           tw = y ! set the twiss parameters, with y being equal to the A_ phase advance
@@ -766,8 +798,12 @@ contains
 
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-           call fort_warn('ptc_twiss: ','DA got unstable')
-           call seterrorflag(10,"ptc_twiss ","DA got unstable ");
+
+           write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
+                           ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
+	       ' PTC msg: ',why
+           call fort_warn('ptc_twiss: ',whymsg)
+           call seterrorflag(10,"ptc_twiss ",whymsg);
            if (getdebug() > 2) close(mf1)
            return
         endif
@@ -775,11 +811,9 @@ contains
         call PRODUCE_APERTURE_FLAG(flag_index)
         if(flag_index/=0) then
            call ANALYSE_APERTURE_FLAG(flag_index,why)
-           Write(6,*) "ptc_twiss unstable (Twiss parameters) element: ",i," name: ",current%MAG%name,"-programs continues "
-           write(whymsg,*) 'APERTURE error: ',why
+           write(whymsg,*) 'APERTURE error: ',why,' s=',s,'  element: ',i,' name: ',current%MAG%name
            call fort_warn('ptc_twiss: ',whymsg)
            call seterrorflag(10,"ptc_twiss: ",whymsg);
-           !          Write(6,*) why ! See produce aperture flag routine in sd_frame
            goto 100
         endif
 
@@ -816,8 +850,6 @@ contains
 100 continue
 
 
-    call orbitRms(summary_table_name) ! this function fills the summary table and header with the closed orbits RMS and extrema
-
     ! relocated the following here to avoid side-effect
     print77=.false.
     read77=.false.
@@ -852,7 +884,7 @@ contains
 
     ! 26 november 2009
     if(isRing .eqv. .true.) then
-       call oneTurnSummary(isRing, theTransferMap , x, suml)
+       call oneTurnSummary(theTransferMap ,y, x, suml)
     else
        print*, "Reduced SUMM Table (Inital parameters specified)"
        call onePassSummary(theTransferMap , x, suml)
@@ -914,11 +946,11 @@ contains
 
     subroutine initmap(dt)
       implicit none
-      integer  :: double_from_table_row
-      integer  :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
-      integer  :: mmap
-      real(dp) :: dt
-
+      integer     :: double_from_table_row
+      integer     :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
+      integer     :: mmap
+      real(dp)    :: dt
+      
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
       mman  = get_value('ptc_twiss ','initial_matrix_manual ')
@@ -964,10 +996,12 @@ contains
             endif
          else
             if (getdebug() > 2) then
-              print*,"Can not read NV from map_table setting initial_matrix_table=.false."
+              print*,"Can not read NV from map_table. Exiting."
             endif
-           
-            initial_matrix_table=.false.
+            
+            call seterrorflag(10,"ptc_twiss initmap","Can not read NV from map_table. Exiting. ");
+            
+            return
          endif
       endif
 
@@ -977,6 +1011,10 @@ contains
             print*,"Initializing map with initial_matrix_table=true"
          endif
          call readmatrixfromtable()
+
+         if (geterrorflag() /= 0) then
+            return
+         endif
 
       elseif(initial_ascript_manual) then
 
@@ -1072,8 +1110,8 @@ contains
 
          call reademittance()
 
-
       endif
+      
     end subroutine initmap
     !____________________________________________________________________________________________
 
@@ -1115,7 +1153,7 @@ contains
       implicit none
       include "madx_ptc_knobs.inc"
       integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(150),myx ! opt_fun(72) -> opt_fun(81)
+      real(kind(1d0))   :: opt_fun(150),myx  ! opt_fun(72) -> opt_fun(81)
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
       real(kind(1d0))   :: deltae
       type(real_8), target :: transfermap(6)
@@ -1151,11 +1189,15 @@ contains
          opt_fun(ii)=y(ii)%T.sub.j
       enddo
 
+      call trackOrbitExtremaAndRms(opt_fun(1:6))
+
+      ! swap 
       myx=opt_fun(6)
       opt_fun(6)=opt_fun(5)
       opt_fun(5)=myx
       deallocate(j)
-
+      
+      
       ioptfun=6
       call vector_to_table_curr(table_name, 'x ', opt_fun(1), ioptfun)
 
@@ -1339,8 +1381,8 @@ contains
          write(6,'(a,1(f10.7,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes   ", beta11,beta22,beta33
          write(6,'(a,3(f9.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
-         write(6,'(a,3(f9.4,1x))')  "betas w/ener ", opt_fun(1),opt_fun(5),opt_fun(9)
-         write(6,'(a,4(f9.4,1x))')  "dispersions  ", opt_fun(57),opt_fun(58),opt_fun(59),opt_fun(60)
+         write(6,'(a,3(f9.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
+         write(6,'(a,4(f9.4,1x))')  "dispersions  ", opt_fun(disp1),opt_fun(disp2),opt_fun(disp3),opt_fun(disp4)
          write(6,'(a,3(f9.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
       endif
 
@@ -1466,6 +1508,11 @@ contains
       call double_to_table_curr(table_name, 'r22 ', r22 )
 
       call augment_count(table_name)
+
+      !
+      !--- track the Twiss functions' extremas
+      call trackBetaExtrema(tw%beta,deltae,betx,bety,tw%disp)
+      !---
 
 
     end subroutine puttwisstable
@@ -1637,12 +1684,14 @@ contains
       implicit none
       integer  :: double_from_table_row, table_length
       ! following added 26 april 2010
-      integer :: order, nrows
+      integer :: order, row, nrows
       integer :: nx, nxp, ny, nyp, ndeltap, nt, index
       real(dp):: coeff
       !character(6) :: selector
       integer, dimension(6) :: jj ! 3 may 2010
-
+      logical(lp) :: ignore_map_orbit
+      
+      
       order = get_value('ptc_twiss ','no ')
 
       row = 1 ! starts at one
@@ -1710,7 +1759,15 @@ contains
       enddo
 
       !call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
-
+      
+      ignore_map_orbit = get_value('ptc_twiss ','ignore_map_orbit ') .ne. 0
+      
+      if ( .not. ignore_map_orbit ) then
+        do row=1,6
+          x(row) = y(row).sub.'0'
+        enddo  
+      endif
+      
       call maptoascript()
 
 
@@ -2035,11 +2092,11 @@ contains
     end subroutine readinitialtwiss
     !____________________________________________________________________________________________
 
-    subroutine onePassSummary(oneTurnMap,state,suml)
+    subroutine onePassSummary(oneTurnMap,startorbit,suml)
 
       implicit none
       type(real_8),target :: oneTurnMap(6)
-      real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      real(dp),    target :: startorbit(6) ! six-dimensional phase-space state (usually referred-to as 'x')
       real(dp) :: suml ! cumulative length along the ring
       real(dp) :: rdp_mmilion ! float with zero (0)
       real(dp) :: deltap ! float with zero (0)
@@ -2047,7 +2104,6 @@ contains
       rdp_mmilion= -1e6;
       
       call double_to_table_curr( summary_table_name, 'length ', suml ) ! total length of the machine
-
 
       call double_to_table_curr( summary_table_name, 'alpha_c ',    rdp_mmilion ) ! momemtum compaction factor
       call double_to_table_curr( summary_table_name, 'alpha_c_p ',  rdp_mmilion) ! derivative w.r.t delta-p/p
@@ -2062,45 +2118,24 @@ contains
       call double_to_table_curr( summary_table_name, 'dq2 ', rdp_mmilion)
 
       call double_to_table_curr( summary_table_name, 'qs ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name, 'beta_x_min ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name, 'beta_x_max ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name, 'beta_y_min ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name, 'beta_y_max ', rdp_mmilion)
 
       deltap = get_value('ptc_twiss ','deltap ')
       call double_to_table_curr( summary_table_name, 'deltap ', deltap)
 
-
-      call double_to_table_curr( summary_table_name,'orbit_x ',  rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'orbit_px ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'orbit_y ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'orbit_py ', rdp_mmilion)
-
-      call double_to_table_curr( summary_table_name,'xcorms ',  rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'ycorms ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'pxcorms ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'pycorms ', rdp_mmilion)
-
-      call double_to_table_curr( summary_table_name,'xcomax ',  rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'ycomax ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'pxcomax ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'pycomax ', rdp_mmilion)
-
-      call double_to_table_curr( summary_table_name,'orbit_pt ', rdp_mmilion)
-      call double_to_table_curr( summary_table_name,'orbit_-cT ', rdp_mmilion)
+      call putMinMaxRmses(summary_table_name,startorbit)
 
       call augment_count( summary_table_name ); ! only one row actually...
+
 
     end subroutine onePassSummary
     ! jluc
     ! compute momemtum-compaction factor in the same fashion it is carried-out in twiss.F
 
-    subroutine oneTurnSummary(isRing,oneTurnMap,state,suml)
+    subroutine oneTurnSummary(oneTurnMap,theAscript,startorbit,suml)
 
       implicit none
-      logical :: isRing ! true for rings, false for lines
-      type(real_8),target :: oneTurnMap(6)
-      real(dp),    target :: state(6) ! six-dimensional phase-space state (usually referred-to as 'x')
+      type(real_8),target :: oneTurnMap(6),theAscript(6)
+      real(dp),    target :: startorbit(6) 
       real(dp) :: suml ! cumulative length along the ring
       type(fibre), pointer :: fibrePtr
       real(dp) :: alpha_c, eta_c ! momentum-compaction factor & phase-slip factor
@@ -2115,7 +2150,6 @@ contains
       real(dp) :: chromaticities(2)
       integer :: i,j
       real(dp) :: sd ! as in twiss.F
-      type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
       type(damap) :: yy ! added on November 6th to retreive momemtum compaction without differentiating the formula
       integer, dimension(6,6) :: coeffSelector = &
            reshape( (/1,0,0,0,0,0, &
@@ -2154,12 +2188,27 @@ contains
             enddo
          enddo
       endif
+     
+      if (getdebug() > 1) then
+        write(6,*) "Doing normal form ... "
+      endif
 
       ! 4. retreive the dispersion coefficients
       ! (may be the coefficient of delta of the map?)
       ! decompose the map via a normal form to get the dispersion...
       call alloc(theNormalForm)
       theNormalForm = oneTurnMap
+
+      if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+         call fort_warn('ptc_twiss oneTurnSummary: ','DA got unstable during normal form calculation')
+         call seterrorflag(10,"ptc_twiss oneTurnSummary","DA got unstable during normal form calculation")
+         call kill(theNormalForm)
+         return
+      endif
+
+      if (getdebug() > 1) then
+        write(6,*) "Doing normal form ... Done"
+      endif
       
       
       if (debugFiles .eq. 1) then
@@ -2292,16 +2341,15 @@ contains
          ! always assume time=true, so that the fifth phase-space variable is deltap instead of pt!
          ! otherwise should issue a warning or an error!
 
-         call alloc(theAscript)
          ! proceed slightly differently to retreive the dispersion's derivatives
          ! (so far only managed to get the dispersion on the normal form, but not its derivatives)
-         theAscript = state + theNormalForm%a_t
-
+         
          ! note: should reuse information computed previously than redo this...
          ! if icase=5, Taylor series expansion disp = disp + delta_p
          do i=1,4
             ! apparently, we are up by a factor two
             dispersion_p(i) = 2.0*(theAscript(i)%t.sub.'000020') ! as usual in this file
+
          enddo
 
          ! compute derivative of the formula for eta_c
@@ -2358,9 +2406,6 @@ contains
 
          alpha_c_p2 = rdp_mmilion
          alpha_c_p3 = rdp_mmilion
-
-
-         call kill(theAscript)
 
 
              
@@ -2441,8 +2486,6 @@ contains
 
       call kill(theNormalForm)
 
-      call kill(oneTurnMap)
-
 
       !write(6,*)
       !write(6,*) "Momentum compaction (momentum compaction factor & phase-slip factor):"
@@ -2468,21 +2511,13 @@ contains
       ! 26 november 2009
       call double_to_table_curr( summary_table_name, 'qs ', fractionalTunes(3))
       ! write the extremas of the Twiss functions
-      ! for the time-being, do not bother about the coupling terms
-      call double_to_table_curr( summary_table_name, 'beta_x_min ', minBeta(1,1))
-      call double_to_table_curr( summary_table_name, 'beta_x_max ', maxBeta(1,1))
-      call double_to_table_curr( summary_table_name, 'beta_y_min ', minBeta(2,2))
-      call double_to_table_curr( summary_table_name, 'beta_y_max ', maxBeta(2,2))
+      
+      
+      
       call double_to_table_curr( summary_table_name, 'deltap ', deltap)
-      ! the 6-d closed orbit
-      call double_to_table_curr( summary_table_name,'orbit_x ',state(1))
-      call double_to_table_curr( summary_table_name,'orbit_px ', state(2))
-      call double_to_table_curr( summary_table_name,'orbit_y ', state(3))
-      call double_to_table_curr( summary_table_name,'orbit_py ', state(4))
-      ! warning: if 'time=false', the last two phase-space state-variables
-      ! should be deltap/p and path-length respectively
-      call double_to_table_curr( summary_table_name,'orbit_pt ', state(5))
-      call double_to_table_curr( summary_table_name,'orbit_-cT ', state(6))
+
+      call putMinMaxRmses(summary_table_name, startorbit)
+
 
       call augment_count( summary_table_name ); ! only one row actually...
 
@@ -2491,6 +2526,91 @@ contains
 
   END subroutine ptc_twiss
   !____________________________________________________________________________________________
+  
+  
+  subroutine putMinMaxRmses(summary_table_name,startorbit)
+    implicit none
+    character(48) :: summary_table_name
+    real(dp) :: startorbit(6)
+    real(dp) :: xrms(6)
+    
+      call double_to_table_curr( summary_table_name, 'beta_x_min ', minBetX)
+      call double_to_table_curr( summary_table_name, 'beta_x_max ', maxBetX)
+      call double_to_table_curr( summary_table_name, 'beta_y_min ', minBetY)
+      call double_to_table_curr( summary_table_name, 'beta_y_max ', maxBetY)
+
+      call double_to_table_curr( summary_table_name, 'beta_x_min ', minBetX)
+      call double_to_table_curr( summary_table_name, 'beta_x_max ', maxBetX)
+      call double_to_table_curr( summary_table_name, 'beta_y_min ', minBetY)
+      call double_to_table_curr( summary_table_name, 'beta_y_max ', maxBetY)
+
+      call double_to_table_curr( summary_table_name, 'beta11min ', minBeta(1,1))
+      call double_to_table_curr( summary_table_name, 'beta12min ', minBeta(1,2))
+      call double_to_table_curr( summary_table_name, 'beta13min ', minBeta(1,3))
+      call double_to_table_curr( summary_table_name, 'beta21min ', minBeta(2,1))
+      call double_to_table_curr( summary_table_name, 'beta22min ', minBeta(2,2))
+      call double_to_table_curr( summary_table_name, 'beta23min ', minBeta(2,3))
+      call double_to_table_curr( summary_table_name, 'beta31min ', minBeta(3,1))
+      call double_to_table_curr( summary_table_name, 'beta32min ', minBeta(3,2))
+      call double_to_table_curr( summary_table_name, 'beta33min ', minBeta(3,3))
+
+      call double_to_table_curr( summary_table_name, 'beta11max ', maxBeta(1,1))
+      call double_to_table_curr( summary_table_name, 'beta12max ', maxBeta(1,2))
+      call double_to_table_curr( summary_table_name, 'beta13max ', maxBeta(1,3))
+      call double_to_table_curr( summary_table_name, 'beta21max ', maxBeta(2,1))
+      call double_to_table_curr( summary_table_name, 'beta22max ', maxBeta(2,2))
+      call double_to_table_curr( summary_table_name, 'beta23max ', maxBeta(2,3))
+      call double_to_table_curr( summary_table_name, 'beta31max ', maxBeta(3,1))
+      call double_to_table_curr( summary_table_name, 'beta32max ', maxBeta(3,2))
+      call double_to_table_curr( summary_table_name, 'beta33max ', maxBeta(3,3))
+
+
+      call double_to_table_curr( summary_table_name, 'disp1min ', minDisp(1))
+      call double_to_table_curr( summary_table_name, 'disp2min ', minDisp(2))
+      call double_to_table_curr( summary_table_name, 'disp3min ', minDisp(3))
+      call double_to_table_curr( summary_table_name, 'disp4min ', minDisp(4))
+
+      call double_to_table_curr( summary_table_name, 'disp1max ', maxDisp(1))
+      call double_to_table_curr( summary_table_name, 'disp2max ', maxDisp(2))
+      call double_to_table_curr( summary_table_name, 'disp3max ', maxDisp(3))
+      call double_to_table_curr( summary_table_name, 'disp4max ', maxDisp(4))
+
+      !!Start orbit
+      call double_to_table_curr( summary_table_name,'orbit_x ',  startorbit(1))
+      call double_to_table_curr( summary_table_name,'orbit_px ', startorbit(2))
+      call double_to_table_curr( summary_table_name,'orbit_y ',  startorbit(3))
+      call double_to_table_curr( summary_table_name,'orbit_py ', startorbit(4))
+      call double_to_table_curr( summary_table_name,'orbit_pt ', startorbit(5))
+      call double_to_table_curr( summary_table_name,'orbit_-cT ',startorbit(6))
+
+      xrms = sqrt(sum2Orbit / nobsOrbit)
+      
+       call double_to_table_curr(summary_table_name,'xcorms ', xrms(1))
+       call double_to_table_curr(summary_table_name,'pxcorms ',xrms(2))
+       call double_to_table_curr(summary_table_name,'ycorms ', xrms(3))
+       call double_to_table_curr(summary_table_name,'pycorms ',xrms(4))
+       call double_to_table_curr(summary_table_name,'ptcorms ',xrms(5))
+       call double_to_table_curr(summary_table_name,'tcorms ', xrms(6))
+
+
+       call double_to_table_curr(summary_table_name,'xcomin ' ,minOrbit(1))
+       call double_to_table_curr(summary_table_name,'pxcomin ',minOrbit(2))
+       call double_to_table_curr(summary_table_name,'ycomin ' ,minOrbit(3))
+       call double_to_table_curr(summary_table_name,'pycomin ',minOrbit(4))
+       call double_to_table_curr(summary_table_name,'ptcomin ',minOrbit(5))
+       call double_to_table_curr(summary_table_name,'tcomin ' ,minOrbit(6))
+
+       call double_to_table_curr(summary_table_name,'xcomax ' ,maxOrbit(1))
+       call double_to_table_curr(summary_table_name,'pxcomax ',maxOrbit(2))
+       call double_to_table_curr(summary_table_name,'ycomax ' ,maxOrbit(3))
+       call double_to_table_curr(summary_table_name,'pycomax ',maxOrbit(4))
+       call double_to_table_curr(summary_table_name,'ptcomax ',maxOrbit(5))
+       call double_to_table_curr(summary_table_name,'tcomax ' ,maxOrbit(6))
+
+     
+      
+
+  end subroutine putMinMaxRmses
 
   subroutine computeDeltapDependency(y,s1)
     implicit none
@@ -2642,105 +2762,99 @@ contains
 
   ! --- a set of routines to track extremas of Twiss functions
   subroutine resetBetaExtremas()
-    integer i,j
-    do i=1,3
-       do j=1,3
-          resetBetaExtrema(i,j) = .true.
-       enddo
-    enddo
+      resetBetaExtrema = .true.
   end subroutine resetBetaExtremas
-  subroutine trackBetaExtrema(i,j,value)
+  
+  subroutine trackBetaExtrema(betas,den, betx, bety, disp)
     implicit none
-    integer :: i,j
-    real(dp) :: value
-    if (resetBetaExtrema(i,j)) then
-       resetBetaExtrema(i,j) = .false.
-       minBeta(i,j) = value
-       maxBeta(i,j) = value
-       !     write(80,*) 'first time in trackBetaExtrema for ',i,j
-    else
-       if (minBeta(i,j) .gt. value) then
-          minBeta(i,j) = value
-       elseif (maxBeta(i,j) .lt. value) then
-          maxBeta(i,j) = value
-       endif
+    real(dp) :: betas(3,3)
+    real(dp) :: den   ! delta energy from acceleration 
+    real(dp) :: betx
+    real(dp) :: bety
+    real(dp) :: disp(4)
+    integer  :: i,j ! iterators
+    real(dp) :: value ! auxiliary variable
+    
+    if (resetBetaExtrema) then
+    
+       resetBetaExtrema = .false.
+       do i=1,3
+         do j=1,3
+           minBeta(i,j) = betas(i,j)*den
+           maxBeta(i,j) = betas(i,j)*den
+         enddo
+       enddo
+       minBetX = betx
+       maxBetX = betx
+       minBetY = bety
+       maxBetY = bety
+       do i=1,4
+         maxDisp(i) = disp(i)
+         maxDisp(i) = disp(i)
+       enddo
+       return
     endif
+    
+
+    do i=1,3
+      do j=1,3
+        value = betas(i,j)*den
+        if (minBeta(i,j) .gt. value) then
+           minBeta(i,j) = value
+        elseif (maxBeta(i,j) .lt. value) then
+           maxBeta(i,j) = value
+        endif
+      enddo
+    enddo
+    
+    if (minBetX .gt. betx) minBetX = betx
+    if (maxBetX .lt. betx) maxBetX = betx
+    if (minBetY .gt. bety) minBetY = bety
+    if (maxBetY .lt. bety) maxBetY = bety
+    
+    do i=1,4
+      if (minDisp(i) .gt. disp(i)) then
+         minDisp(i) = disp(i)
+      elseif (maxDisp(i) .lt. disp(i)) then
+         maxDisp(i) = disp(i)
+      endif
+    enddo
+
   end subroutine trackBetaExtrema
   ! --- end of set of routines
 
-
-  subroutine orbitRms(summary_table_name)
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+  
+  subroutine trackOrbitExtremaAndRms(orbit)
     implicit none
-    character(48) :: summary_table_name
+    real(dp) :: orbit(6)
+    integer  :: i
+    
+    
+    if (resetOrbitExtrema) then
+      
+      resetOrbitExtrema = .false.
+      nobsOrbit = 1
 
-    real(dp)  :: state(6) ! 6 dimensional state space usually referred to as 'x'
-    real(dp) :: x(6) ! the 6 dimensional state space
-    real(kind(1d0)) :: xrms(6)
-    real(kind(1d0)) :: xcomax, pxcomax, ycomax, pycomax
-    integer  :: i, j
-
-    real(kind(1d0))         :: get_value
-
-    if (get_value('ptc_twiss ','closed_orbit ').eq.0) then
-       ! for a line or if we don't mention the closed_orbit, xcorms makes no sense
-       call double_to_table_curr(summary_table_name,'xcorms ',0d0)
-       call double_to_table_curr(summary_table_name,'pxcorms ',0d0)
-       call double_to_table_curr(summary_table_name,'ycorms ',0d0)
-       call double_to_table_curr(summary_table_name,'pycorms ',0d0)
-       call double_to_table_curr(summary_table_name,'xcomax ',0d0)
-       call double_to_table_curr(summary_table_name,'pxcomax ',0d0)
-       call double_to_table_curr(summary_table_name,'ycomax ',0d0)
-       call double_to_table_curr(summary_table_name,'pycomax ',0d0)
-    else
-
-
-       call make_node_layout(my_ring) ! essential: the way to look inside the magnets
-       state = zero
-       call find_orbit(my_ring,state,1,default,c_1d_7) ! 1 for the first element
-
-       xcomax = state(1)
-       pxcomax = state(2)
-       ycomax = state(3)
-       pycomax = state(4)
-
-       x=state
-       xrms = zero
-       do i=1,my_ring%n
-          !call find_orbit(my_ring,state,i,default,1.d-5) ! i for the ith element?
-          call track(my_ring,x,i,i+1,default) ! track x directly!
-          ! write(0,*) "xco(find_orbit)=",state(1),"xco(tracked)=",x(1)
-          do j=1,6
-             xrms(j) = xrms(j) + x(j)*x(j)
-          enddo
-          if (x(1)>xcomax) then
-             xcomax = x(1)
-          endif
-          if (x(2)>pxcomax) then
-             pxcomax = x(2)
-          endif
-          if (x(3)>ycomax) then
-             ycomax = x(3)
-          endif
-          if (x(4)>pycomax) then
-             pycomax = x(4)
-          endif
-       enddo
-
-       xrms = sqrt(xrms / my_ring%n)
-
-       call double_to_table_curr(summary_table_name,'xcorms ',xrms(1))
-       call double_to_table_curr(summary_table_name,'pxcorms ',xrms(2))
-       call double_to_table_curr(summary_table_name,'ycorms ',xrms(3))
-       call double_to_table_curr(summary_table_name,'pycorms ',xrms(4))
-       call double_to_table_curr(summary_table_name,'xcomax ',xcomax)
-       call double_to_table_curr(summary_table_name,'pxcomax ',pxcomax)
-       call double_to_table_curr(summary_table_name,'ycomax ',ycomax)
-       call double_to_table_curr(summary_table_name,'pycomax ',pycomax)
-
-
+      do i=1,6
+        minOrbit(i)  = orbit(i)
+        maxOrbit(i)  = orbit(i)
+        sum2Orbit(i) = orbit(i)*orbit(i)
+      enddo
+      
+      return      
     endif
 
-  end subroutine orbitRms
+    nobsOrbit = nobsOrbit + 1
+
+    do i=1,6
+      if ( orbit(i) .lt. minOrbit(i) ) minOrbit(i)  = orbit(i)
+      if ( orbit(i) .gt. maxOrbit(i) ) maxOrbit(i)  = orbit(i)
+      sum2Orbit(i) = sum2Orbit(i) + orbit(i)*orbit(i)
+    enddo
+
+  end subroutine trackOrbitExtremaAndRms
+
   !____________________________________________________________________________________________
 
 
