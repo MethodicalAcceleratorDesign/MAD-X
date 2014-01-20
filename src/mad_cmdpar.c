@@ -361,6 +361,8 @@ double
 command_par_value(const char* parameter, struct command* cmd)
   /* returns a command parameter value if found, else zero */
 {
+  /*printf("command_par_value par = >>%s<<, c=%p\n",parameter,cmd);*/
+  
   struct command_parameter* cp;
   double val = zero;
   int i;
@@ -1055,13 +1057,25 @@ get_value(char* name, char* par)
      returns parameter value "par" for command or store "name" if present,
      else INVALID */
 {
+  int tmpi;
+  double tmpd;
+  
   struct name_list* nl = NULL;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
+  
   if (strcmp(c_dum->c, "beam") == 0)
     return command_par_value(aux_buff->c, current_beam);
   else if (strcmp(c_dum->c, "probe") == 0)
+   {
+    /*printf("Getting probe beam => %p\n", probe_beam);*/
+    if (probe_beam == 0x0) 
+     {
+       printf("\n\n PROBE IS NULL!!!!!!\n\n\n");
+       return 0.0;
+     }  
     return command_par_value(aux_buff->c, probe_beam);
+   } 
   else if (strcmp(c_dum->c, "survey") == 0)
   {
     if (current_survey != NULL) nl = current_survey->par_names;
@@ -1086,10 +1100,19 @@ get_value(char* name, char* par)
       return ((double)current_sequ->add_pass);
     else return INVALID;
   }
-  else if (current_command != NULL
-           && strcmp(c_dum->c, current_command->name) == 0)
-    return command_par_value(aux_buff->c, current_command);
-  else return INVALID;
+  else 
+   {
+   tmpi =  strcmp(c_dum->c, current_command->name);
+   if (current_command != NULL &&  tmpi == 0)
+     { 
+       tmpd = command_par_value(aux_buff->c, current_command);
+       return tmpd;
+     }
+    else 
+     {
+       return INVALID;
+     }  
+   } 
 }
 
 int
