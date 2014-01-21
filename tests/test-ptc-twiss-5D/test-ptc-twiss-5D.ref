@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
+  +    MAD-X 5.01.06  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 11.54.45 +
+  + Code Modification Date: 2014.01.17      +
+  + Execution Time Stamp: 21.01.14 13.26.25 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -958,11 +958,6 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
 
  Closed orbit:   1.068886127458704E-008  2.546139786480519E-009  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 Deviation from symplecticity  0.3264055692397960E-11 %
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         266
-  NUMBER OF THIN OBJECTS :        1678
-  TOTAL IDEAL LENGTH OF STRUCTURE :   78.5437026616777     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   78.5437026616777     
 Deviation from symplecticity  0.3264055692397960E-11 %
 
 ++++++ table: ptc_twiss_summary
@@ -979,17 +974,44 @@ Deviation from symplecticity  0.3264055692397960E-11 %
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
 
-            deltap            orbit_x           orbit_px            orbit_y 
-                 0    1.068886127e-08    2.546139786e-09                  0 
+         beta11min          beta11max          beta12min          beta12max 
+       3.282153615        15.12420817                  0                  0 
 
-          orbit_py           orbit_pt          orbit_-cT             xcorms 
-                 0                  0                  0    1.168573345e-08 
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
 
-            ycorms            pxcorms            pycorms             xcomax 
-                 0    3.059593723e-09                  0    2.508645927e-08 
+         beta22min          beta22max          beta23min          beta23max 
+       1.633285387        20.07025827                  0                  0 
 
-            ycomax            pxcomax            pycomax 
-                 0    1.106286922e-08                  0 
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0        -10.3020712    0.0005941579859 
+
+          disp2min           disp2max           disp3min           disp3max 
+       -4.54310719         4.54310719                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    1.068886127e-08 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   2.546139786e-09                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    1.168573345e-08                  0    3.059593723e-09 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0    2.508645927e-08 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    1.106286922e-08                  0                  0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0   -1.447485988e-12                  0   -1.106286967e-08 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0                  0 
   write, table=twiss, file="leir.5d.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.5d.ptc.summ.twiss";
@@ -999,7 +1021,6 @@ Deviation from symplecticity  0.3264055692397960E-11 %
 ptc_end;
 
  Killing LayoutNo name assigned                                                                                                        
-  NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
 
 
@@ -1021,5 +1042,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.01.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
