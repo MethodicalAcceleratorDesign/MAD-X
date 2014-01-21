@@ -344,7 +344,7 @@ contains
     real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual, writetmap
-    logical(lp)             :: ring_paremeters  !! forces isRing variable to true, i.e. calclulation of closed solution
+    logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     integer                 :: rmatrix
     real(dp)                :: emi(3)
     logical(lp)             :: isputdata
@@ -537,8 +537,8 @@ contains
        return
     endif
     
-    ring_paremeters = get_value('ptc_twiss ','ring_paremeters ') .ne. 0
-    if (ring_paremeters) then
+    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
+    if (ring_parameters) then
       if (getdebug() > 1) then
         write(6,*) "User forces ring parameters calculation"
       endif
