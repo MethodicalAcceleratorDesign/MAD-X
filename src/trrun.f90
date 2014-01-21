@@ -340,16 +340,16 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   do turn = 1, turns
 
-!--- Write checkpoint_restart data
-     rewind 90
-     write(90) jmax 
-     write(90) Ex_rms
-     write(90) Ey_rms
-     do i = 1, jmax
-        do j=1,6
-           write(90) z(j,i)
-        enddo
-     enddo
+!--- Write checkpoint_restart data - disable for speed reasons
+!     rewind 90
+!     write(90) jmax 
+!     write(90) Ex_rms
+!     write(90) Ey_rms
+!     do i = 1, jmax
+!        do j=1,6
+!           write(90) z(j,i)
+!        enddo
+!     enddo
 
      if (doupdate) call trupdate(turn)
 
