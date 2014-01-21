@@ -120,11 +120,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   logical is_drift, is_thin, is_quad, is_matrix
 
-!FRS open unit 90 filename=checkpoint_restart.dat to prolong run   
-  open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
-  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
-
-  !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
 
   if(deltap.eq.0d0) then
@@ -138,8 +133,12 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   if(switch.eq.1) then
      bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+!FRS open unit 90 filename=checkpoint_restart.dat to prolong run   
+     open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
+     checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
   else
      bb_sxy_update = .false.
+     checkpnt_restart = .false.
   endif
   if(bb_sxy_update) then
      emittance_update = get_option('emittance_update ') .ne. 0
@@ -489,10 +488,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         call dzero(al_errors, align_max)
         n_align = node_al_errors(al_errors)
         if (n_align .ne. 0)  then
+!$OMP PARALLEL PRIVATE(i)
+!$OMP DO
            do i = 1, jmax
               call dcopy(z(1,i),zz,6)
               call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
            enddo
+!$OMP END DO 
+!$OMP END PARALLEL
         endif
      endif
      !-------- Track through element  // suppress dxt 13.12.04
@@ -501,10 +504,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      !--------  Misalignment at end of element (from twissfs.f)
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
+!$OMP PARALLEL PRIVATE(i)
+!$OMP DO
            do i = 1, jmax
               call dcopy(z(1,i),zz,6)
               call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
            enddo
+!$OMP END DO 
+!$OMP END PARALLEL
         endif
      endif
      nlm = nlm+1
@@ -1595,6 +1602,8 @@ subroutine ttdrf(el,track,ktrack)
   double precision el,pt,px,py,track(6,*),ttt
 
   ! picked from trturn in madx.ss
+!$OMP PARALLEL PRIVATE(itrack, px, py, pt, ttt)
+!$OMP DO
   do  itrack = 1, ktrack
      px = track(2,itrack)
      py = track(4,itrack)
@@ -1609,6 +1618,8 @@ subroutine ttdrf(el,track,ktrack)
      track(5,itrack) = track(5,itrack)                               &
           + bet0i*(el - (1d0 + bet0*pt) * ttt)
   enddo
+!$OMP END DO 
+!$OMP END PARALLEL
 end subroutine ttdrf
 subroutine ttrf(track,ktrack)
 
@@ -2407,6 +2418,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
   sy2 = sy*sy
   !---- limit formulae for sigma(x) = sigma(y).
   if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
+!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho2, tk, gauss_factor_t, phix, phiy)
+!$OMP DO
      do itrack = 1, ktrack
         xs = track(1,itrack) - xm
         ys = track(3,itrack) - ym
@@ -2452,6 +2465,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
         track(2,itrack) = track(2,itrack) + phix
         track(4,itrack) = track(4,itrack) + phiy
      enddo
+!$OMP END DO
+!$OMP END PARALLEL
 
      !---- case sigma(x) > sigma(y).
   else if (sx2 .gt. sy2) then
@@ -2459,6 +2474,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
      r  = sqrt(r2)
  !        rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
+!$OMP PARALLEL PRIVATE(itrack, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
+!$OMP DO
      do itrack = 1, ktrack
 
         if(bb_sxy_update) then
@@ -2491,6 +2508,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
         endif
      enddo
+!$OMP END DO
+!$OMP END PARALLEL
 
      !---- case sigma(x) < sigma(y).
   else
@@ -2498,6 +2517,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
      r  = sqrt(r2)
 !        rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
+!$OMP PARALLEL PRIVATE(itrack, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
+!$OMP DO
      do itrack = 1, ktrack
 
         if(bb_sxy_update) then
@@ -2530,6 +2551,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
            track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
         endif
      enddo
+!$OMP END DO
+!$OMP END PARALLEL
   endif
 end subroutine ttbb_gauss
 subroutine ttbb_flattop(track,ktrack,fk)
@@ -2593,6 +2616,8 @@ subroutine ttbb_flattop(track,ktrack,fk)
   endif
   norm = (twelve*r0x**2 + wx**2)/twentyfour
   r1=r0x-wx/2d0
+!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho, rho2, phir, phix, phiy)
+!$OMP DO
   do itrack = 1, ktrack
      xs = track(1,itrack) - xm
      ys = track(3,itrack) - ym
@@ -2616,6 +2641,8 @@ subroutine ttbb_flattop(track,ktrack,fk)
      track(2,itrack) = track(2,itrack)+phix*fk
      track(4,itrack) = track(4,itrack)+phiy*fk
   end do
+!$OMP END DO
+!$OMP END PARALLEL
 
 end subroutine ttbb_flattop
 subroutine ttbb_hollowparabolic(track,ktrack,fk)
@@ -2679,6 +2706,8 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
              'beam is assumed to be circular')
      endif
   endif
+!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho, rho2, phir, phix, phiy)
+!$OMP DO
   do itrack = 1, ktrack
      xs = track(1,itrack) - xm
      ys = track(3,itrack) - ym
@@ -2702,6 +2731,8 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
      track(2,itrack) = track(2,itrack)+phix*fk
      track(4,itrack) = track(4,itrack)+phiy*fk
   end do
+!$OMP END DO
+!$OMP END PARALLEL
 
 end subroutine ttbb_hollowparabolic
 !!$subroutine ttbb_old(track,ktrack,parvec)
@@ -3650,6 +3681,8 @@ subroutine tttrans(track,ktrack)
   !
   !---- Loop over particles
   !
+!$OMP PARALLEL PRIVATE(itrack)
+!$OMP DO
   do  itrack = 1, ktrack
      !
      !     Add vector to particle coordinates
@@ -3661,6 +3694,8 @@ subroutine tttrans(track,ktrack)
      track(6,itrack) = track(6,itrack) + t_psig
      !
   enddo
+!$OMP END DO
+!$OMP END PARALLEL
 end subroutine tttrans
 
 subroutine tttrak(ek,re,track,ktrack)
@@ -4068,11 +4103,15 @@ subroutine ixy_fitting()
   iii_loop: DO iii=1, N_for_I
 
      Ix_min=ce10
+!$OMP PARALLEL PRIVATE(jjj) SHARED(Ix_min)
+!$OMP DO REDUCTION(MIN:Ix_min)
      jjj_loop: DO jjj=1,N_for_I
         if (Ix(jjj) < Ix_min .AND. Ix(jjj) > Ix_min_last) then
            Ix_min=Ix(jjj)
         endif
      ENDDO jjj_loop
+!$OMP END DO
+!$OMP END PARALLEL
      Ix_sorted(iii)=Ix_min
      Ix_min_last=Ix_min
   ENDDO iii_loop
@@ -4081,11 +4120,15 @@ subroutine ixy_fitting()
   iii_loop_y: DO iii=1, N_for_I
 
      Iy_min=ce10
+!$OMP PARALLEL PRIVATE(jjj) SHARED(Iy_min)
+!$OMP DO REDUCTION(MIN:Iy_min)
      jjj_loop_y: DO jjj=1,N_for_I
         if (Iy(jjj) < Iy_min .AND. Iy(jjj) > Iy_min_last) then
            Iy_min=Iy(jjj)
         endif
      ENDDO jjj_loop_y
+!$OMP END DO
+!$OMP END PARALLEL
      Iy_sorted(iii)=Iy_min
      Iy_min_last=Iy_min
   ENDDO iii_loop_y
@@ -4094,10 +4137,14 @@ subroutine ixy_fitting()
   !     Summ of step-function for Ex evaluation
   Summ_x=0d0
   alpha = get_value('run ', 'alpha ')
+!$OMP PARALLEL PRIVATE(iii, Hi) SHARED(Summ_x)
+!$OMP DO REDUCTION(+:Summ_x)
   Summ_x_loop: DO iii=1,N_for_I
      Hi=alpha+dble(iii-1)
      Summ_x=Summ_x+Log(1d0-Hi/N_for_I_dble)/Ix_sorted(iii)
   ENDDO Summ_x_loop
+!$OMP END DO
+!$OMP END PARALLEL
   one_ex=-Summ_x/N_for_I_dble
   ex_dist=1d0/one_ex
   Ex_rms=ex_dist
@@ -4105,10 +4152,14 @@ subroutine ixy_fitting()
 
   !     Summ of step-function for Ey evaluation
   Summ_y=0d0
+!$OMP PARALLEL PRIVATE(iii, Hi) SHARED(Summ_y)
+!$OMP DO REDUCTION(+:Summ_y)
   Summ_y_loop: DO iii=1,N_for_I
      Hi=alpha+dble(iii-1)
      Summ_y=Summ_y+Log(1d0-Hi/N_for_I_dble)/Iy_sorted(iii)
   ENDDO Summ_y_loop
+!$OMP END DO
+!$OMP END PARALLEL
   one_ey=-Summ_y/N_for_I_dble
   ey_dist=1d0/one_ey
   Ey_rms=ey_dist
