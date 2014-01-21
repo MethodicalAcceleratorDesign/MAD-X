@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
+  +    MAD-X 5.01.06  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 14.57.12 +
+  + Code Modification Date: 2014.01.17      +
+  + Execution Time Stamp: 21.01.14 22.10.52 +
   +++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -743,11 +743,6 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
        ACCELERATE  =  FALSE
  Closed orbit:   -2.5000151695448343E-003  -3.5677287590862284E-009  -7.6491165273254943E-008   1.6000664229130873E-004   1.1414387501635900E-005   8.8048166912199919E-007
 Deviation from symplecticity  0.7449039155010472E-12 %
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :       12683
-  NUMBER OF THIN OBJECTS :       63415
-  TOTAL IDEAL LENGTH OF STRUCTURE :   26658.883200000120     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   26658.883200000120     
 Deviation from symplecticity  0.7449039155010472E-12 %
 
 ++++++ table: ptc_twiss_summary
@@ -762,19 +757,46 @@ Deviation from symplecticity  0.7449039155010472E-12 %
       0.3100017602                  0                  0     0.007940998712 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       9.999895859        623.4138936        9.819037801        639.6105799 
+       9.999895864         623.413894        9.819037801        639.6105802 
 
-            deltap            orbit_x           orbit_px            orbit_y 
-                 0     -0.00250001517   -3.567728759e-09   -7.649116527e-08 
+         beta11min          beta11max          beta12min          beta12max 
+       9.999895859        623.4138936    3.584980478e-09    3.803559728e-07 
 
-          orbit_py           orbit_pt          orbit_-cT             xcorms 
-   0.0001600066423    8.804816691e-07    -1.14143875e-05    0.0009316851209 
+         beta13min          beta13max          beta21min          beta21max 
+   3.924820257e-09      0.04761845315    2.791548771e-09    3.686521288e-07 
 
-            ycorms            pxcorms            pycorms             xcomax 
-   0.0009604958264    3.079876774e-05    3.139702411e-05     0.007226400175 
+         beta22min          beta22max          beta23min          beta23max 
+       9.819037801        639.6105799    6.372980569e-10    0.0001425092705 
 
-            ycomax            pxcomax            pycomax 
-    0.007641671572    0.0003940871055    0.0004529212793 
+         beta31min          beta31max          beta32min          beta32max 
+   9.522700627e-09      0.04963269592    3.544334344e-07    6.257019655e-05 
+
+         beta33min          beta33max           disp1min           disp1max 
+       166.9904128        167.0945244       -2.819916294         2.81483998 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.04768141665      0.04963725713      -0.1540980698       0.1071611045 
+
+          disp4min           disp4max             deltap            orbit_x 
+   -0.003876875453     0.002995252182                  0     -0.00250001517 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -3.567728759e-09   -7.649116527e-08    0.0001600066423    8.804816691e-07 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+   -1.14143875e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+   3.139702411e-05    5.315969395e-06    8.804816692e-07     0.007226400175 
+
+            ycomax            pxcomax            pycomax             tcomax 
+    0.007641671572    0.0003940871055    0.0004529212793    2.529664165e-06 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+   8.804816692e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
+
+           pycomin             tcomin            ptcomin 
+  -0.0003835866478   -1.285828187e-05    8.804816623e-07 
 
 
 select_ptc_normal, dq1,dq2;
@@ -821,5 +843,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.01.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
