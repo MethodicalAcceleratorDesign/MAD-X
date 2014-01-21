@@ -23,7 +23,7 @@ module madx_ptc_twiss_module
 
   !============================================================================================
   !  PRIVATE
-  !    data structures
+  !    datta structures
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(real_8)            :: theTransferMap(6)
@@ -1684,12 +1684,15 @@ contains
       implicit none
       integer  :: double_from_table_row, table_length
       ! following added 26 april 2010
-      integer :: order, row, nrows
+      integer :: order, row, nrows,i
       integer :: nx, nxp, ny, nyp, ndeltap, nt, index
       real(dp):: coeff
       !character(6) :: selector
       integer, dimension(6) :: jj ! 3 may 2010
       logical(lp) :: ignore_map_orbit
+      real(dp),dimension(ndim2)::reval,aieval
+      real(dp),dimension(ndim2,ndim2)::revec,aievec
+      real(dp):: checkvalue
       
       
       order = get_value('ptc_twiss ','no ')
@@ -1751,14 +1754,11 @@ contains
             !Y(index) = Y(index) + ((coeff-(Y(index).sub.jj)).mono.jj)
          endif
 
-
-
-
          row = row+1
 
       enddo
 
-      !call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
+!      call daprint(y,28) ! to be compared with fort.18 created by ptc_normal
       
       ignore_map_orbit = get_value('ptc_twiss ','ignore_map_orbit ') .ne. 0
       
@@ -1767,9 +1767,8 @@ contains
           x(row) = y(row).sub.'0'
         enddo  
       endif
-      
-      call maptoascript()
 
+      call maptoascript()
 
     end subroutine readmatrixfromtable
 
@@ -1834,7 +1833,8 @@ contains
       implicit none
       real(dp),dimension(ndim2)::reval,aieval
       real(dp),dimension(ndim2,ndim2)::revec,aievec
-
+      real(dp):: checkvalue
+      
       call liepeek(iia,icoast)
       if (getdebug() > 1) then
          write (6,'(8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
@@ -1854,11 +1854,24 @@ contains
       enddo
       deallocate(j)
 
+!      call daprint(y,29) ! to be compared with fort.18 created by ptc_normal and fort.28
+
       call eig6(re,reval,aieval,revec,aievec)
       do i=1,iia(4)-icoast(2)
-         if(abs(reval(i)**2+aieval(i)**2 -one).gt.c_1d_10) then
-            call fort_warn("ptc_twiss","Fatal Error: Eigenvalues off the unit circle!")
-            stop
+         checkvalue = abs(reval(i)**2+aieval(i)**2 - one)
+         if(checkvalue .gt.c_1d_10) then
+            write(whymsg,*) "Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane = ",i, &
+                            " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
+            call fort_warn("ptc_twiss",whymsg)
+   
+            if(checkvalue .gt.c_1d_8) then
+            
+              write(whymsg,*) "ERROR: Provided matrix has eigenvalue more than 1e-8 off the unit circle ! plane = ",i, &
+                              " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
+              call seterrorflag(10,"ptc_twiss",whymsg);
+              return;
+            endif 
+            
          endif
       enddo
     end subroutine initmapfrommatrix
