@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
+  +    MAD-X 5.01.06  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 12.07.36 +
+  + Code Modification Date: 2014.01.17      +
+  + Execution Time Stamp: 21.01.14 13.29.06 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -304,11 +304,6 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        ACCELERATE  =  FALSE
  Closed orbit:   8.892828933326235E-005  7.277292572735418E-007  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
 Deviation from symplecticity  0.5251354906476990E-11 %
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
-  NUMBER OF THIN OBJECTS :        1180
-  TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
 Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
@@ -325,17 +320,44 @@ Deviation from symplecticity  0.5251354906476990E-11 %
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
         32.0497509        177.6889149        32.05081522        177.7045042 
 
-            deltap            orbit_x           orbit_px            orbit_y 
-                 0    8.892828933e-05    7.277292573e-07                  0 
+         beta11min          beta11max          beta12min          beta12max 
+        32.0497509        177.6889149                  0                  0 
 
-          orbit_py           orbit_pt          orbit_-cT             xcorms 
-                 0                  0                  0    7.160127073e-05 
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
 
-            ycorms            pxcorms            pycorms             xcomax 
-                 0    8.586227449e-07                  0    8.892828933e-05 
+         beta22min          beta22max          beta23min          beta23max 
+       32.05081522        177.7045042                  0                  0 
 
-            ycomax            pxcomax            pycomax 
-                 0    7.281171647e-07                  0 
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0        2.176305716 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.02964638027      0.02964631228                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    8.892828933e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   7.277292573e-07                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    7.160124621e-05                  0    8.586224592e-07 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0     8.89284238e-05 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    7.281201483e-07                  0                  0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0      5.2188044e-05                  0   -1.674875719e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0                  0 
 
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
@@ -367,7 +389,6 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
 ptc_end;
 
  Killing LayoutNo name assigned                                                                                                        
-  NODE LAYOUT HAS BEEN KILLED 
  Layout killed 
 
 
@@ -453,7 +474,7 @@ ptc_twiss,icase=5,no=2,BETA0=TWSSip,file=twiss_ptc_line;
        ACCELERATE  =  FALSE
  Closed orbit specified by the user!
  Closed orbit:   3.260716242083534E-004  2.596346674112830E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Reduced SUMM Table (closed orbit not requested)
+ Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
 
@@ -467,19 +488,46 @@ ptc_twiss,icase=5,no=2,BETA0=TWSSip,file=twiss_ptc_line;
        1.254589818           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-          -1000000           -1000000           -1000000           -1000000 
+       32.03361997        177.7127587        32.03264757        177.7240899 
 
-            deltap            orbit_x           orbit_px            orbit_y 
-                 0           -1000000           -1000000           -1000000 
+         beta11min          beta11max          beta12min          beta12max 
+       32.03361997        177.7127587                  0                  0 
 
-          orbit_py           orbit_pt          orbit_-cT             xcorms 
-          -1000000           -1000000           -1000000           -1000000 
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
 
-            ycorms            pxcorms            pycorms             xcomax 
-          -1000000           -1000000           -1000000           -1000000 
+         beta22min          beta22max          beta23min          beta23max 
+       32.03264757        177.7240899                  0                  0 
 
-            ycomax            pxcomax            pycomax 
-          -1000000           -1000000           -1000000 
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0         2.17847926 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.02967406685      0.02967388901                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    0.0003260716242 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   2.596346674e-06                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+  -1.662096185e-05    0.0001830427635                  0     3.84701909e-06 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0    0.0003354862904 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    5.353118744e-06                  0                  0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0   -0.0001579866947                  0   -6.211029443e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0                  0 
 ptc_end;
 
  Killing LayoutNo name assigned                                                                                                        
@@ -494,5 +542,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.01.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
