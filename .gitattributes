@@ -1434,6 +1434,7 @@ tests/test-ptc-twiss-old3/test-ptc-twiss-old3.ref -text
 tests/test-ptc-twiss-old3/twiss_madx_ring.cfg -text
 tests/test-ptc-twiss-old3/twiss_madx_ring.ref -text
 tests/test-ptc-twiss-old3/twiss_ptc_line.cfg -text
+tests/test-ptc-twiss-old3/twiss_ptc_line.orbit0.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-old3/twiss_ptc_line.ref -text
 tests/test-ptc-twiss-old3/twiss_ptc_ring.cfg -text
 tests/test-ptc-twiss-old3/twiss_ptc_ring.ref -text

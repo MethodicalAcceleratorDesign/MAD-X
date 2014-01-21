@@ -2,6 +2,15 @@
 
 !=========== RING PARAMETERS ===========================================
 call, file = "../share/ring_lattice/ring.seq";
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = 1,
+                         ex=epsx,   ey=epsy;
+
 option, echo, warn, info;
 
 ! At the end of the ring the data_block is produced
@@ -20,7 +29,7 @@ ptc_create_universe;
 ptc_create_layout,model=2,method=6,nst=10,exact;
 ptc_align;
 
-select,flag=ptc_twiss,column=name,s,beta11,beta21,
+select,flag=ptc_twiss,column=name,s,angle,beta11,beta21,
                                   beta12,beta22,disp1,disp3,x,px,y,py;
 
 ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
@@ -35,18 +44,27 @@ write,table="map_table",file="ring_matrix_at_end";
 !=========== TRANSFER-LINE PARAMETERS ==================================== 
 
 call, file = "../share/line_lattice/line.seq";
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = 1,
+                         ex=epsx,   ey=epsy;
 option, echo, warn, info;
 
-select,flag=ptc_twiss,clear;
-select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
 ptc_create_universe;
-ptc_create_layout,model=2,method=6,nst=5,exact;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+ptc_align;
                                     
 ! Example 3: Read transfer matrix from table ============================
 
 !ptc_setswitch, debuglevel=3;
 
 ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
+
+ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_map_orbit;
 
 ptc_end;
 
