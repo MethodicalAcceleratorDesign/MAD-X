@@ -120,6 +120,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   logical is_drift, is_thin, is_quad, is_matrix
 
+  !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
 
   if(deltap.eq.0d0) then
