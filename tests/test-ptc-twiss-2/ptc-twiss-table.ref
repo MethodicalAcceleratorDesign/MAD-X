@@ -32,24 +32,60 @@
 @ BETA_X_MAX       %le         595.1202013
 @ BETA_Y_MIN       %le         9.999993275
 @ BETA_Y_MAX       %le         609.5257296
+@ BETA11MIN        %le         9.999992761
+@ BETA11MAX        %le         595.1202013
+@ BETA21MIN        %le     1.550393875e-11
+@ BETA21MAX        %le     1.201026617e-09
+@ BETA31MIN        %le                   0
+@ BETA31MAX        %le                   0
+@ BETA21MIN        %le     1.550393875e-11
+@ BETA21MAX        %le     1.201026617e-09
+@ BETA22MIN        %le         9.999993275
+@ BETA22MAX        %le         609.5257296
+@ BETA23MIN        %le                   0
+@ BETA23MAX        %le                   0
+@ BETA31MIN        %le                   0
+@ BETA31MAX        %le                   0
+@ BETA32MIN        %le                   0
+@ BETA32MAX        %le                   0
+@ BETA33MIN        %le                   0
+@ BETA33MAX        %le                   0
+@ DISP1MIN         %le        -2.745605263
+@ DISP1MAX         %le         2.816166304
+@ DISP2MIN         %le      -0.04812306249
+@ DISP2MAX         %le       0.05033586136
+@ DISP3MIN         %le       -0.1856652009
+@ DISP3MAX         %le        0.1450797205
+@ DISP4MIN         %le     -0.005458863921
+@ DISP4MAX         %le      0.004780221884
 @ ORBIT_X          %le     -0.001999999044
 @ ORBIT_PX         %le    -4.836986048e-12
 @ ORBIT_Y          %le    -6.470088644e-10
 @ ORBIT_PY         %le     0.0001700000459
 @ ORBIT_PT         %le                   0
 @ ORBIT_-CT        %le                   0
-@ XCORMS           %le     0.0007074564939
-@ PXCORMS          %le     2.376320073e-05
+@ XCORMS           %le      0.000707456493
+@ PXCORMS          %le     2.376320072e-05
 @ YCORMS           %le      0.000713726789
 @ PYCORMS          %le     2.414012503e-05
-@ XCOMAX           %le      0.007390738713
-@ PXCOMAX          %le     0.0004263339863
+@ TCORMS           %le     6.321234555e-06
+@ PTCORMS          %le                   0
+@ XCOMIN           %le     -0.008477889733
+@ XCOMAX           %le      0.007390738668
+@ PXCOMIN          %le    -0.0004558717322
+@ PXCOMAX          %le      0.000426333986
+@ YCOMIN           %le     -0.008499924562
 @ YCOMAX           %le      0.008056958782
+@ PYCOMIN          %le    -0.0003912272041
 @ PYCOMAX          %le     0.0004558719032
+@ TCOMIN           %le    -1.067998075e-05
+@ TCOMAX           %le     1.013617371e-05
+@ PTCOMIN          %le                   0
+@ PTCOMAX          %le                   0
 @ TITLE            %30s "LHC Version 6.503 -  July 2009"
-@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
-@ DATE             %08s "15/10/13"
-@ TIME             %08s "19.41.45"
+@ ORIGIN           %23s "MAD-X 5.01.06 Darwin 64"
+@ DATE             %08s "23/01/14"
+@ TIME             %08s "10.27.11"
 * NAME                                S             BETA11             BETA21             BETA12             BETA22              DISP1              DISP3                  X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0        10.99998536    2.041999724e-11    1.714782706e-11        11.00000807      -0.0131489131     0.009206403876    -0.001999999044   -4.836986048e-12   -6.470088644e-10    0.0001700000459
