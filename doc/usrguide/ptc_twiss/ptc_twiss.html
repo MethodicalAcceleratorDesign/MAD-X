@@ -3,13 +3,15 @@
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="author"      content="Valery Kapin &amp; Frank Schmidt" />
+  <meta name="author"      content="Valery Kapin &amp; Frank Schmidt &amp; Piotr Skowronski &amp; Ghislain Roy" />
   <meta name="description" content="MADX PTC_TWISS Module" />
   <meta name="keywords"    content="MADX MAD-X PTC PTC_TWISS TWISS Twiss-parameters Ripken TWISS3" />
   <link rel="stylesheet" type="text/css" href="madxdoc.css" />
   <title>MAD-X PTC_TWISS Module</title>
   <!-- Created by: Valery KAPIN, 21-Mar-2006 -->
   <!-- Changed by: Frank Schmidt 04-Apr-2006 -->  
+
+  <!-- Changed by: Piotr and Ghislain 24-Jan-2014 --> 
   <style>
 <!--
 div.Section1
@@ -36,11 +38,13 @@ span.SpellE
 <div>
 <p align="left">
 The <b>PTC_TWISS module</b>&nbsp;of MAD-X [<a href="#F._Schmidt">a</a>] is based on
-the PTC code. It
-is a supplementary to the TWISS module. The Twiss parameters are calculated in&nbsp; Ripken's style (invented by G. Ripken in 1970 [31] and most accessible in
+the PTC code. 
+It is a supplementary to the TWISS module. 
+The Twiss parameters are calculated in Ripken's style 
+(invented by G. Ripken in 1970 [31] and most accessible in
 Ref.<font face="Times New Roman"> [<a href="#G.&nbsp;Ripken">b</a>]</font>).
 These parameters were available in MAD8 using the TWISS3 command. This module is
-a typical example of the advantages when using PTC and its Normal Form technique
+a typical example of the advantages of using PTC and its Normal Form technique
 (and of course the object-oriented Fortran90 coding): once the rather modest
 programming has been performed the Twiss calculation will always be
 automatically correct for all machine conditions like closed orbit, coupling or
@@ -49,7 +53,8 @@ like in MAD8 this depends on reprogramming and modifying the code at various
 places which is inherently error-prone.</p>
 <p align="left">
 The PTC_TWISS tracks a special representation of the beam in three degrees of
-freedom. It works on the coupled lattice functions defined in Ref.<font face="Times New Roman">[<a href="#G.&nbsp;Ripken">b</a>]</font>,
+freedom. It works on the coupled lattice functions defined in 
+Ref.<font face="Times New Roman">[<a href="#G.&nbsp;Ripken">b</a>]</font>,
 which are essentially the projections of the lattice functions for the
 eigen-modes on the three planes. The PTC_TWISS lists the projections of the
 ellipses of motion onto the three planes (<i>x</i>, <i>p<sub>x</sub></i>), (<i>y</i>,
@@ -60,16 +65,18 @@ Ripken's parameters <i><font face="Symbol">b</font><sub>k</sub></i><sub>,<i>j</i
 phase advances&nbsp;&nbsp; <i><font face="Symbol">m</font></i><sub><i>j</i></sub>
 in selected positions, where index <font color="#FF0000"> <i>k</i>=1...3</font> refers
 <font color="#FF0000">to the plane (<i>x</i>, <i>y</i>,...)</font>, and
-the index <font color="#FF0000"> <i>j</i>=1...3 denotes the eigen-mode</font>. The PTC_TWISS also calculates the
-dispersion values <i>D</i><sub>1</sub>,...,<i>D</i><sub>4</sub>. In the MAD-X
+the index <font color="#FF0000"> <i>j</i>=1...3 denotes the eigen-mode</font>. 
+The PTC_TWISS also calculates the
+dispersion values <i>D</i><sub>1</sub>,...,<i>D</i><sub>4</sub>. 
+In the MAD-X
 commands and tables, these parameters are denoted as <code>beta11,...,beta33,
 alfa11,...,alfa33, gama11,...,gama33, mu1,...,mu3, disp1,...,disp4</code>,
 respectively.</p>
 
 <p>The Ripken parametrization can be transformed into the Edwards-Teng
 parametrization (used in twiss proper) using the formulae of
-Ref.<font face="Times New Roman"> [<a
-href="#V.A.&nbsp;Lebedev">d</a>]</font>. The parameters are noted as
+Ref.<font face="Times New Roman"> [<a href="#V.A.&nbsp;Lebedev">d</a>]</font>. 
+The parameters are noted as
 <code>betx, bety, alfx, alfy</code> and the coupling matrix: R11, R12,
 R21 and R22. In absence of coupling it holds:
 <code>betx=beta11</code>, <code>bety=beta22</code>,
@@ -87,36 +94,45 @@ order derivatives have respective column names:
 <code>disp1p2,...,disp4p2</code> for the second order, and
 <code>disp1p3,...,disp4p3</code> for the third order.</p>
 
-<p>
-In addition, we compute momentum compaction factor  <font
+<p>In addition, we compute momentum compaction factor  <font
 face="Symbol">a</font><sub>c</sub> up to 1st order (for icase=5) or
 3rd order (for icase=56). The values appear in the header of the
 ptc_twiss output file (zero means the value has not been
 computed). This feature is currently only available in the development
 version.</p>
+
 <p align="left">
 For clarification: <font color="#FF0000">in the 4-D case, there is the
-following correspondence between MAD-X and the Ripken's notations: <code>beta11</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>x</i>I</sub>, <code>beta12</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>x</i>II</sub>, <code>beta21</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>y</i>I</sub>, <code>beta22</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>y</i>II</sub>, </font>
+following correspondence between MAD-X and Ripken's notations: 
+<code>beta11</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>x</i>I</sub>, 
+<code>beta12</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>x</i>II</sub>, 
+<code>beta21</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>y</i>I</sub>, 
+<code>beta22</code><font face="Symbol"><code><font face="Symbol">®</font></code></font><i><font face="Symbol">b</font></i><sub><i>y</i>II</sub>, 
+</font>
 while in the uncoupled 4-D case <code>beta11</code> is the same as
 the classical <i><font face="Symbol">b</font><sub>x </sub></i>(<code>betx</code>)
-and&nbsp; <code>beta22 </code>is <i><font face="Symbol">b</font><sub>y </sub></i>
-(<code>bety</code>), while&nbsp; <code>beta12 </code>and&nbsp; <code>beta21 </code>
-are zero. When there is coupling all <code>betaNN </code>are non-zero and <code>
-beta11</code> , <code>beta22 </code>are distinctively different from&nbsp; <i><font face="Symbol">b</font><sub>x </sub></i>
-, <i><font face="Symbol">b</font><sub>y</sub></i>, respectively.</p>
+and <code>beta22</code> is <i><font face="Symbol">b</font><sub>y </sub></i>
+(<code>bety</code>), while <code>beta12</code> and <code>beta21 </code>
+are zero. 
+When there is coupling all <code>betaNN</code> are non-zero and <code>
+beta11</code>, <code>beta22</code> are distinctively different from 
+<i><font face="Symbol">b</font><sub>x </sub></i>, 
+<i><font face="Symbol">b</font><sub>y</sub></i>, respectively.</p>
+
 <p align="left">
 PTC_TWISS also tracks the eigenvectors and prints them to Twiss table according to the SELECT command
 (flag=ptc_twiss). Either all 36 components or&nbsp;
 particular components of the eigenvectors can be selected with
 <font face="Courier New">eign</font> or <font face="Courier New">eign<i>ij</i></font>,
 respectively&nbsp; (<font color="#FF0000"><i>j</i></font> = number of eigenvector,
-<font color="#FF0000"><i>i</i></font> = number of
-coordinate {<i>x</i>, <i>
-        p<sub>x</sub></i>, <i>y</i>, <i>p<sub>y</sub></i>, <i>t</i>,<i>
-        p<sub>t</sub></i>}).</p>
+<font color="#FF0000"><i>i</i></font> = number of coordinate 
+{<i>x</i>, <i>p<sub>x</sub></i>, <i>y</i>, <i>p<sub>y</sub></i>, <i>t</i>,<i>p<sub>t</sub></i>}).
+</p>
 
 <p>
-For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as well as other one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs) and chromaticities (for no>=2).
+For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as well as other 
+one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs) and chromaticities 
+(for no>=2).
 </p>
 </div>
 
@@ -128,7 +144,7 @@ For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as
     <dd><i><code>PTC_CREATE_UNIVERSE;</code></i></dd>
     <dd><i><code>PTC_CREATE_LAYOUT, model=integer,method=integer,
     nst=integer, [exact];</code></i></dd>
-    <dd><code>..............................<br>
+    <dd><code>...<br>
     SELECT, flag=ptc_twiss, clear;</code></dd>
     <dd><code>SELECT, flag=ptc_twiss, column=name, s,
     <br>
@@ -147,9 +163,9 @@ For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as
                 disp1p3,...,disp4p3,
                 </code></dd>
     <dd><code>[<font color="#FF0000">eign], eign11, ...,eign16,...,eign61,...,eign66;</font></code></dd>
-    <dd><code>..............................</code></dd>
+    <dd><code>...</code></dd>
     <dd><code>PTC_TWISS;</code></dd>
-    <dd><code>..............................</code></dd>
+    <dd><code>...</code></dd>
     <dd><i><code>PTC_END; </code></i></dd>
 </dl>
 </div>
@@ -165,36 +181,33 @@ For ring lattices, PTC_TWISS computes momentum compaction, transition energy, as
     <var class="option">deltap</var>=double, <b>closed_orbit</b>, <b>slice_magnets</b>, <b><br>
 &nbsp;&nbsp;&nbsp; range=</b>string<b>, file[=</b>string<b>], table[=</b>string<b>],<br>
 &nbsp;&nbsp;&nbsp; initial_matrix_table, initial_matrix_manual, initial_map_manual, beta0=</b>string<b>,
-    <br>
-&nbsp;&nbsp;&nbsp; betx=</b>double,<b> alfx=</b>double<b>, mux=</b>double<b>,
-    <br>
-&nbsp;&nbsp;&nbsp; bety=</b>double,<b> alfy=</b>double<b>, muy=</b>double<b>,
-    <br>
+&nbsp;&nbsp;&nbsp; ignore_map_orbit, ring_parameters,    <br>
+&nbsp;&nbsp;&nbsp; betx=</b>double,<b> alfx=</b>double<b>, mux=</b>double<b>,    <br>
+&nbsp;&nbsp;&nbsp; bety=</b>double,<b> alfy=</b>double<b>, muy=</b>double<b>,    <br>
 &nbsp;&nbsp;&nbsp; dx=</b>double,<b> dpx=</b>double,<b> dy=</b>double,<b> dpy=</b>double,<b><br>
 &nbsp;&nbsp;&nbsp; </b><var class="option">x</var>=double, <var class="option">px</var>=double,
     <var class="option">y</var>=double, <var class="option">py</var>=double,
     <var class="option">t</var>=double, <var class="option">pt</var>=double,<br>
 &nbsp;&nbsp;&nbsp; <b>re11</b>=double, <b>re12</b>=double, ... ,<b>re16</b>=double,<br>
-&nbsp;&nbsp;&nbsp;
-    ................................................................<br>
-&nbsp;&nbsp;&nbsp; <b>re61</b>=double, <b>re62</b>=double, ... ,<b>re66</b>=double;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp;&nbsp; <b>re61</b>=double, <b>re62</b>=double, ... ,<b>re66</b>=double;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </strong><var><strong>&nbsp; </strong></var></dt>
     <dd>
     <div>
       <dl>
         <dt>Description</dt>
         <dd>
-            <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
-            <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
-            The <var class="command">PTC_TWISS </var>command causes
-        computation of the Twiss parameters in
-the Ripken's style. It operates on the working beam line defined in the latest
+          <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
+               <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
+        The <var class="command">PTC_TWISS </var>command causes
+        computation of the Twiss parameters in Ripken's style. 
+	It operates on the working beam line defined in the latest
         <a href="../control/general.html#use">
         USE</a> command. Several options can be specified, the most
-            important being <var class="option">icase, deltap</var>,
-        <var class="option">closed_orbit, slice_magnets,</var>&nbsp;<var class="option">no,
-        </var>and
-            <var class="option">file, table</var>. (see the table below).
+        important being <var class="option">icase, deltap</var>,
+        <var class="option">closed_orbit, slice_magnets,</var>&nbsp;<var class="option">no,</var> 
+	and <var class="option">file, table</var>. (see the table below).
         Other options should be specified for particular tasks.
         Applications for the <var class="command">PTC_TWISS </var>
         command are similar to the <var class="command">
@@ -248,18 +261,21 @@ the Ripken's style. It operates on the working beam line defined in the latest
           </tr>
           <tr>
             <td width="143">DELTAP_DEPENDENCY</td>
-            <td colspan="2"><span lang="EN-US">the switch to turn on computation of the Twiss and dispersion derivatives w.r.t. deltap/p. Derivation formula assume that icase=5, so that deltap/p is supplied as a parameter.</span></td>
+            <td colspan="2"><span lang="EN-US">the switch to turn on computation of the Twiss and dispersion derivatives w.r.t. deltap/p. 
+	    Derivation formula assume that icase=5, so that deltap/p is supplied as a parameter.</span></td>
             <td width="84">.FALSE.</td>
             <td width="57">logical</td>
           </tr>
           <tr>
             <td width="143">SLICE_MAGNETS</td>
             <td colspan="2"><span lang="EN-US">Turns on the evaluation of Twiss parameters at each integration step inside magnets, in addition to the end face.
-            Number of slices is determined by the number of steps (nst) that can be defined for each element seperately, or otherwise set by nst parameter
-            when creating the PTC layout. Note that the the orbit extrema and rms may not be exact in this mode. Namely, the first integration node is always 
-            at the entrance of the magnet (after position offset and fringe effects are calculated) what corresponds to the same s position (and usually optical functions) 
-            as the end of the previous element. Hence, the points between magnets are included twice in the rms calculation. 
-            
+            The number of slices is determined by the number of steps (nst) that can be separately defined for each element, 
+	    or otherwise set by nst parameter when creating the PTC layout. <br>
+	    Note that the orbit <!-- extrema and rms may not be exact in this mode. --> rms calculated in this mode 
+	    counts as valid data points both the end of the previous element and the entrance of the current element. 
+            Since the first integration node is always at the entrance of the magnet (after position offset 
+	    and fringe effects are calculated) which corresponds to the same s position (and usually optical functions) 
+            as the end of the previous element, the points at the interface between magnets are included twice in the rms calculation. 
             </span>
             </td>
             <td width="84">.FALSE.</td>
@@ -269,8 +285,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
             <td width="143">CENTER_MAGNETS</td>
             <td colspan="2"><span lang="EN-US">the switch to turn on
             the evaluation of Twiss parameters at the middle of each magnet.
-                                                This relies on internal slicing and
-            'integration nodes' as determined by the number of steps (nst) selected
+            This relies on internal slicing and 'integration nodes' as determined by the number of steps (nst) selected
             when creating the PTC layout. This number is assumed to be even otherwise the program issues a warning. </span>
             </td>
             <td width="84">.FALSE.</td>
@@ -375,8 +390,9 @@ the Ripken's style. It operates on the working beam line defined in the latest
 
           <tr>
             <td width="143">
-            ignore_map_orbit </td>
-            <td colspan="2"><span lang="EN-US">Ignore the orbit in the map and use instead closed orbit, if requested, or otherwise specified with x,px,y,p,t,dt parameters.
+            IGNORE_MAP_ORBIT </td>
+            <td colspan="2"><span lang="EN-US">Ignore the orbit in the map and use instead closed orbit, 
+	    if requested, or otherwise specified with x,px,y,p,t,dt parameters.
             </span></td>
             <td width="84">.FALSE.</td>
             <td width="57">logical</td>
@@ -419,8 +435,8 @@ the Ripken's style. It operates on the working beam line defined in the latest
 
           <tr>
             <td width="143">
-            RING_PAREMETERS </td>
-            <td colspan="2"><span lang="EN-US">Forces computation of ring paramets (gamma_tr, alpha_c, etc.).
+            RING_PARAMETERS </td>
+            <td colspan="2"><span lang="EN-US">Forces computation of ring parameters (gamma_tr, alpha_c, etc.).
             </span></td>
             <td width="84">.FALSE.</td>
             <td width="57">logical</td>
@@ -440,9 +456,8 @@ the Ripken's style. It operates on the working beam line defined in the latest
         <dt>Remarks</dt>
         <dd><b>ICASE</b>:&nbsp;&nbsp; <span lang="EN-US">It can be
         internally corrected by the code. For example, if RF cavity has the voltage set to zero and
-            for <a href="#ICASE">icase</a>=6, the code sets
-            <a href="#ICASE">icase</a>=4.<br>
-        &nbsp;</span></dd>
+        for <a href="#ICASE">icase</a>=6, the code sets <a href="#ICASE">icase</a>=4.<br>
+        </span></dd>
       </dl></div></dd>
   </dl></div>
     </dd>
@@ -459,12 +474,12 @@ the Ripken's style. It operates on the working beam line defined in the latest
       <dl>
         <dt>Description</dt>
         <dd>
-            <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
-            <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
-            This is the simplest form of the <var class="command">PTC_TWISS</var>
-        command, which computes the periodic solution for a specified
-        beam line. It may accept&nbsp; all basic options described in
-        the above table.</dd>
+          <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
+               <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
+          This is the simplest form of the <var class="command">PTC_TWISS</var>
+          command, which computes the periodic solution for a specified
+          beam line. It may accept&nbsp; all basic options described in
+          the above table.</dd>
       </dl></div></dd>
   </dl></div>
     </dd>
@@ -482,20 +497,18 @@ the Ripken's style. It operates on the working beam line defined in the latest
       <dl>
         <dt>Description</dt>
         <dd>
-            <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
-            <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
-            This computes the periodic solution for a specified
-      beam line and evaluates the Twiss parameters at each thin-slice
-      (a.k.a "integration-node") inside magnets. The number of such integration-nodes
-      is given by the number of steps (nst) selected when creating the PTC layout.
-      All other basic options described in the above table may be selected
-      .</dd>
-
-      <dt>Example</dt>
-      <dd>An example is found in the
-      <a href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/madX-examples/REF/ptc_twiss/SliceMagnets/?root=madx-examples">
-      <var class="command">PTC_TWISS</var> Examples'</a> repository.
-      .</dd>
+          <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
+               <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
+          This computes the periodic solution for a specified
+	  beam line and evaluates the Twiss parameters at each thin-slice
+	  (a.k.a "integration-node") inside magnets. The number of such integration-nodes
+	  is given by the number of steps (nst) selected when creating the PTC layout.
+	  All other basic options described in the above table may be selected.</dd>
+	<dt>Example</dt>
+	<dd>An example is found in the
+	  <a href="http://isscvs.cern.ch/cgi-bin/viewcvs-all.cgi/madX-examples/REF/ptc_twiss/SliceMagnets/?root=madx-examples">
+	    <var class="command">PTC_TWISS</var> Examples'</a> repository.
+	</dd>
 
       </dl></div></dd>
   </dl></div>
@@ -510,10 +523,12 @@ the Ripken's style. It operates on the working beam line defined in the latest
       <dl>
         <dt>Description</dt>
         <dd>
-         Initial conditions can be supplied with several ways. Naturally only one of the below can be used at a time and they can not be mixed.
-         In this mode it is assumed that the lattice is a line and and no ring parameters are evaluated (their values are set to -1000000),
-         unless parameter RING_PAREMETERS is set to true. It forces comutation of closed solution for the resulting map. If such solution does not exist, 
-         the routine shall report an error and leave.
+         Initial conditions can be supplied in different ways. 
+	 Naturally only one of the methods below can be used at a time, and they can not be mixed.
+         In this mode it is assumed that the lattice is a line and no ring parameters are evaluated (their values are set to -1000000),
+         unless parameter RING_PARAMETERS is set to true. 
+	 It forces computation of closed solution for the resulting map. 
+	 If such solution does not exist, the routine shall report an error and exit.
 
   <dl>
     <dd>
@@ -536,18 +551,17 @@ the Ripken's style. It operates on the working beam line defined in the latest
           <dl>
             <dt>Description</dt>
             <dd>
-            <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
-            <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
-            <var class="command">PTC_TWISS</var> calculates a solution
-            with initial conditions given by the Twiss parameters,
-            which are explicitly typed&nbsp; on the command line. Note, that this case is also limited to
-            uncoupled motion of the preceding ring or beam-line.</dd>
+              <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
+		   <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
+              <var class="command">PTC_TWISS</var> calculates a solution
+              with initial conditions given by the Twiss parameters,
+              which are explicitly typed&nbsp; on the command line. Note, that this case is also limited to
+              uncoupled motion of the preceding ring or beam-line.</dd>
             <dt>Example</dt>
             <dd>An example is found in the
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
-            <var class="command">PTC_TWISS</var> Examples</a> in the
-            folder
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss/Example2/">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
+            <var class="command">PTC_TWISS</var> Examples</a> in the folder
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example2">
             &quot;Example2&quot;</a>.</dd>
           </dl></div>
           </dd>
@@ -556,7 +570,7 @@ the Ripken's style. It operates on the working beam line defined in the latest
           <font color="#FF0000"><a name="map-table">Map-Table</a></font></i></u></b><var><strong><b><u><i>
           <br>
           (obtainable by a preceding </i></u></b></strong></var> <var class="command">
-        <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var>
+		<a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var>
         
           <var><strong><b><u><i>command)</i></u></b></strong><b><i><strong><u>:<br>
           </u></strong></i><strong>&nbsp;&nbsp;&nbsp; PTC_TWISS,<br> icase=</b>integer,
@@ -572,18 +586,16 @@ the Ripken's style. It operates on the working beam line defined in the latest
             <!-- <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
             <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> -->
             <var class="command">PTC_TWISS</var> calculates a solution
-              with initial conditions given as a map-table of
-        preceding ring or beam-line. It requires the input option
-              <var class="option">initial_matrix_table</var> and an existence of the map-table in
-              memory, which was generated
-              by a&nbsp; preceding <var class="command">
-        <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
+            with initial conditions given as a map-table of
+            preceding ring or beam-line. It requires the input option
+            <var class="option">initial_matrix_table</var> and an existence of the map-table in
+            memory, which was generated by a preceding <var class="command">
+              <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
               <dt>Example</dt>
               <dd>An example is found in the
-              <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
-              <var class="command">PTC_TWISS</var> Examples</a> in
-              the folder
-              <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss/Example3/">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
+              <var class="command">PTC_TWISS</var> Examples</a> in the folder
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example3">
               &quot;Example3&quot;</a>.</dd>
             </dl></div></dd>
         </dl>
@@ -623,10 +635,9 @@ the Ripken's style. It operates on the working beam line defined in the latest
         <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command.</dd>
               <dt>Example</dt>
               <dd>An example is found in the
-              <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
-              <var class="command">PTC_TWISS</var> Examples</a> in
-              the folder
-              <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss/Example3/">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
+              <var class="command">PTC_TWISS</var> Examples</a> in the folder
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example3">
               &quot;Example3&quot;</a>.</dd>
             </dl></div></dd>
         </dl>
@@ -669,10 +680,9 @@ the Ripken's style. It operates on the working beam line defined in the latest
             MAD-X expects a symplectic 6x6 transfer matrix as input.&nbsp; </dd>
             <dt>Example</dt>
             <dd>An example is found in the
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
-            <var class="command">PTC_TWISS</var> Examples</a> in the
-            folder
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss/Example4/">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
+            <var class="command">PTC_TWISS</var> Examples</a> in the folder
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example4">
             &quot;Example4&quot;</a>.</dd>
           </dl></div></dd>
         <dt class="command"><u><i><b>Initial Values from Twiss Parameters via
@@ -707,10 +717,10 @@ the Ripken's style. It operates on the working beam line defined in the latest
         machine.</dd>
             <dt>Example</dt>
             <dd>An example is found in the
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
             <var class="command">PTC_TWISS</var> Examples</a> in the
             folder
-            <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss/Example1/">
+            <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example1">
             &quot;Example1&quot;</a>.</dd>
           </dl></div></dd>
 
@@ -724,27 +734,29 @@ the Ripken's style. It operates on the working beam line defined in the latest
   </dl>
   <ol type="a">
     <li><a name="F._Schmidt">F. Schmidt</a>, &quot;`<a href="http://cern.ch/madx/doc/MPPE012.pdf">MAD-X PTC Integration</a>'',
-    Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
+      Proc. of the 2005 PAC Conference in Knoxville, USA, pp.1272.</li>
     <li><a name="G.&nbsp;Ripken">G.&nbsp;Ripken</a> and F.&nbsp;Willeke, &quot;<a href="http://cern.ch/madx/doc/1988_Ripken.pdf">Methods of
-    Beam Optics</a>&quot;, DESY 88–114, 1988.</li>
+	Beam Optics</a>&quot;, DESY 88–114, 1988.</li>
     <li><a name="K._Zhang">K. Zhang</a>, &quot;PTC twiss with initial TWISS
-    parameters&quot;,
-    <a href="http://cern.ch/frs/MAD-X_minutes/Meeting-13/minutes.html">
-    MAD-X Meeting 13 (04.07.2005)</a>,&nbsp; <font color="#000000">slides in
-    <a href="http://cern.ch/frs/MAD-X_minutes/Meeting-13/Input_of_PTC_TWISS_module.ppt">
-    ppt</a>.</font></li>
-    <li><a name="V.A.&nbsp;Lebedev">V.A.&nbsp;Lebedev</a> and S.A.&nbsp;Bogacsz, &quot;<a href="http://cern.ch/madx/doc/1748-0221_5_10_P10010.pdf">Betatron motion with coupling of horizontal and vertical degrees of motion</a>&quot;, Thomas Jefferson National Accelerator Facility 2010.</li>
-
+      parameters&quot;, <a href="http://cern.ch/frs/MAD-X_minutes/Meeting-13/minutes.html">
+	MAD-X Meeting 13 (04.07.2005)</a>,&nbsp; <font color="#000000">slides in
+	<a href="http://cern.ch/frs/MAD-X_minutes/Meeting-13/Input_of_PTC_TWISS_module.ppt">
+	  ppt</a>.</font></li>
+    <li><a name="V.A.&nbsp;Lebedev">V.A.&nbsp;Lebedev</a> and S.A.&nbsp;Bogacsz, 
+      &quot;<a href="http://cern.ch/madx/doc/1748-0221_5_10_P10010.pdf">
+	Betatron motion with coupling of horizontal and vertical degrees of motion</a>&quot;, 
+      Thomas Jefferson National Accelerator Facility 2010.</li>
   </ol>
 </div>
+
 <div>
   <dl>
     <dt>See Also</dt>
     <dd>
-        <var class="command">
-    <a href="../twiss/twiss.html">TWISS</a></var>,
-    <a href="http://cern.ch/frs/mad-X_examples/ptc_twiss">
-    <var class="command">PTC_TWISS</var> Examples</a>.</dd>
+      <var class="command">
+	<a href="../twiss/twiss.html">TWISS</a></var>,
+      <a href="http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/">
+	<var class="command">PTC_TWISS</var> Examples</a>.</dd>
 </dl>
 </div>
 
@@ -752,12 +764,14 @@ the Ripken's style. It operates on the working beam line defined in the latest
 
 <hr />
 <address>
-<span lang="EN-US">
-<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru">
-V.&nbsp;<span class="SpellE">Kapin<span style="text-decoration: none"> </span></span>
-</a></span>(ITEP) and <span lang="EN-US">
-<a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch">
-F.&nbsp;Schmidt</a>, </span>March  2006</address>
-
+  <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:kapin@itep.ru">
+    V.&nbsp;Kapin </a> (ITEP) and 
+  <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:Frank.Schmidt@cern.ch">
+    F.&nbsp;Schmidt</a>, March  2006 <br>
+  <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:mad@cern.ch">
+    P.&nbsp;Skowronski</a> and 
+  <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:mad@cern.ch">
+    G.&nbsp;Roy</a>, January 2014
+</address>
 </body>
 </html>
