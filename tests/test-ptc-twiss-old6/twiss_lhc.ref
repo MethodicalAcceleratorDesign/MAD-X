@@ -34,10 +34,10 @@
 @ BETA_Y_MAX       %le         639.6105802
 @ BETA11MIN        %le         9.999895859
 @ BETA11MAX        %le         623.4138936
-@ BETA21MIN        %le     2.791548771e-09
-@ BETA21MAX        %le     3.686521288e-07
-@ BETA31MIN        %le     9.522700627e-09
-@ BETA31MAX        %le       0.04963269592
+@ BETA12MIN        %le     3.584980478e-09
+@ BETA12MAX        %le     3.803559728e-07
+@ BETA13MIN        %le     3.924820257e-09
+@ BETA13MAX        %le       0.04761845315
 @ BETA21MIN        %le     2.791548771e-09
 @ BETA21MAX        %le     3.686521288e-07
 @ BETA22MIN        %le         9.819037801
@@ -84,8 +84,8 @@
 @ PTCOMAX          %le     8.804816692e-07
 @ TITLE            %24s " Chromaticity correction"
 @ ORIGIN           %22s "MAD-X 5.01.06 Linux 64"
-@ DATE             %08s "21/01/14"
-@ TIME             %08s "22.11.14"
+@ DATE             %08s "27/01/14"
+@ TIME             %08s "12.07.02"
 * NAME                                S             BETA11                MU1                MU2                MU3 
 $ %s                                %le                %le                %le                %le                %le 
  "LHCB1$START"                        0        17.00013012                  0                  0                  0
