@@ -54,6 +54,9 @@ struct char_p_array*    new_char_p_array(int length);
 struct int_array*       new_int_array(int length);
 struct double_array*    new_double_array(int length);
 struct char_array_list* new_char_array_list(int size);
+
+int    addto_char_p_array(struct char_p_array* ch_p_arr, struct char_array* ch_arr);
+
 struct char_p_array*    clone_char_p_array(struct char_p_array* p);
 struct int_array*       clone_int_array(struct int_array* p);
 struct double_array*    clone_double_array(struct double_array* p);

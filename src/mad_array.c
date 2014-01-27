@@ -45,6 +45,34 @@ new_char_p_array(int length)
   return il;
 }
 
+int 
+addto_char_p_array(struct char_p_array* ch_p_arr, struct char_array* ch_arr)
+{
+
+  if (ch_p_arr == 0x0)
+   {
+     printf("addto_char_p_array: argument ch_p_arr is NULL\n");
+     return 1;
+   }
+
+  if (ch_arr == 0x0)
+   {
+     printf("addto_char_p_array: argument ch_arr is NULL\n");
+     return 2;
+   }
+  
+  if( ch_p_arr->curr >= ch_p_arr->max )
+   {
+     printf("addto_char_p_array: No more space in the array.\n");
+     return 3;
+   }
+  
+  ch_p_arr->p[ch_p_arr->curr++] = tmpbuff(ch_arr->c);
+  
+  return 0;
+   
+}
+
 struct int_array*
 new_int_array(int length)
 {
