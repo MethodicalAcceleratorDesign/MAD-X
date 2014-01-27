@@ -4,366 +4,81 @@ static void
 fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, h_length = 100; /*39+3+1+1+6+4; /* change when adding header lines ! - last 6 for the closed orbit */
+  int i, h_length = 100; /*39+3+1+1+6+4;  change when adding header lines ! - last 6 for the closed orbit */
   double dtmp;
   /*  struct table* s; */
   char tmp[16];
-
-  // int returnStatus; // not used
   int row;
+  
+  static const char * const beampars[] = {"mass", "charge", "energy", "pc",
+                                          "gamma", "kbunch", "bcurrent",
+		  "sige","sigt",
+		  "npart",
+		  "ex","ey","et"};
+		  
+  int Nbeampars = sizeof(beampars)/sizeof(beampars[0]);
 
+  static const char * const ptcpars[] = {"length", "alpha_c", "alpha_c_p", "alpha_c_p2",
+                                         "alpha_c_p3", "eta_c", "gamma_tr",
+		 "q1","q2","dq1","dq2","qs",
+		 "beta_x_min","beta_x_max","beta_y_min","beta_y_max",
+		 "beta11min","beta11max", "beta12min","beta12max", "beta13min","beta13max",
+		 "beta21min","beta21max", "beta22min","beta22max", "beta23min","beta23max",
+		 "beta31min","beta31max", "beta32min","beta32max", "beta33min","beta33max",
+		 "disp1min","disp1max",
+		 "disp2min","disp2max",
+		 "disp3min","disp3max",
+		 "disp4min","disp4max",
+		 "orbit_x", "orbit_px","orbit_y","orbit_py","orbit_pt","orbit_-cT",
+		 "xcorms",  "pxcorms","ycorms","pycorms","tcorms","ptcorms",
+		 "xcomin",  "xcomax",
+		 "pxcomin", "pxcomax",
+		 "ycomin",  "ycomax",
+		 "pycomin", "pycomax",
+		 "tcomin",  "tcomax",
+		 "ptcomin", "ptcomax"};
+		  
+  int Nptcpars = sizeof(ptcpars)/sizeof(ptcpars[0]);
+  
+  /*printf("There is %d beam parameters and %d PTC pars to add\n",Nbeampars,Nptcpars);*/
+  
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
   strcpy(tmp, t->org_sequ->name);
   sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  addto_char_p_array(t->header,c_dum);
+  
   i = get_string("beam", "particle", tmp);
   sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),
           i, stoupper(tmp));
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "mass");
-  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "charge");
-  sprintf(c_dum->c, v_format("@ CHARGE           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "energy");
-  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "pc");
-  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "gamma");
-  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "kbunch");
-  sprintf(c_dum->c, v_format("@ KBUNCH           %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "bcurrent");
-  sprintf(c_dum->c, v_format("@ BCURRENT         %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "sige");
-  sprintf(c_dum->c, v_format("@ SIGE             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "sigt");
-  sprintf(c_dum->c, v_format("@ SIGT             %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "npart");
-  sprintf(c_dum->c, v_format("@ NPART            %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "ex");
-  sprintf(c_dum->c, v_format("@ EX               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "ey");
-  sprintf(c_dum->c, v_format("@ EY               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "et");
-  sprintf(c_dum->c, v_format("@ ET               %%le  %F"), dtmp);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+  addto_char_p_array(t->header,c_dum);
+
+
+  for (i=0; i<Nbeampars;i++)
+   {  
+      strcpy(tmp,beampars[i]);  /*we have to copy for stoupper that can not change a constant string*/
+      dtmp = get_value("beam", tmp);    
+      sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
+      addto_char_p_array(t->header,c_dum);
+   }
+  
   sprintf(c_dum->c, v_format("@ DELTAP           %%le  %F"), ptc_deltap);
-  t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-  /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
+  addto_char_p_array(t->header,c_dum);
+  
   if (get_option("ptc_twiss_summary") != zero){
-
-    /* now retreive all pieces of information from the ptc_twiss*/
-
+    /* one-turn information gets computed iff ptc_twiss_summary set to 1 in madx_ptc_twiss.f90 */
+    /* retreive all pieces of information from the ptc_twiss*/
     row = 1; /* this particular table has only one row filled-in */
-
-    /* length of the machine */
-    double_from_table_row("ptc_twiss_summary","length",&row,&dtmp); // returnStatus = not used
-    /* returnStatus should always be equal to zero */
-    sprintf(c_dum->c, v_format("@ LENGTH           %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-    /* momentum compaction factor, phase-slip factor and energy transition */
-    double_from_table_row("ptc_twiss_summary","alpha_c", &row, &dtmp); // returnStatus = not used
-    /* returnStatus should always be equal to zero */
-    sprintf(c_dum->c, v_format("@ ALPHA_C          %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
     
-    /* momentum compaction factor first order derivative w.r.t delta-p/p */
-    double_from_table_row("ptc_twiss_summary","alpha_c_p", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P        %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    
-    
-     /* WARNING when restoring the following two lines don't forget to replace 39+1  by 39+2 for h_length */
-     /* momentum compaction factor second order derivative w.r.t delta-p/p */
-     /* uncomment the following once computation of alpha_c_p2 is reliable */
-    double_from_table_row("ptc_twiss_summary","alpha_c_p2", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P2       %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c); 
-    
-     /* WARNING when restoring the following two lines don't forget to replace 39+2  by 39+3 for h_length */
-    /* momentum compaction factor third order derivative w.r.t delta-p/p */
-    /* uncomment the following once computation of alpha_c_p3 is reliable */
-    double_from_table_row("ptc_twiss_summary","alpha_c_p3", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ALPHA_C_P3       %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-       
-    double_from_table_row("ptc_twiss_summary","eta_c", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ETA_C            %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","gamma_tr", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ GAMMA_TR         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    
-    /* tunes and chromaticities */
-    double_from_table_row("ptc_twiss_summary","q1", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ Q1               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","q2", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ Q2               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","dq1", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DQ1              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","dq2", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DQ2              %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    /* 26 november 2009 */
-    double_from_table_row("ptc_twiss_summary","qs", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ QS               %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);    
-
-
-    /* extremas of the beta-function Tweng */
-    double_from_table_row("ptc_twiss_summary","beta_x_min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA_X_MIN       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta_x_max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA_X_MAX       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta_y_min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA_Y_MIN       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta_y_max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA_Y_MAX       %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-
-    /* extremas of the beta-function Full couples  */
-    double_from_table_row("ptc_twiss_summary","beta11min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA11MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta11max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA11MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta21min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA21MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta21max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA21MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta31min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA31MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta31max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA31MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-    double_from_table_row("ptc_twiss_summary","beta21min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA21MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta21max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA21MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta22min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA22MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta22max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA22MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta23min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA23MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta23max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA23MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-    double_from_table_row("ptc_twiss_summary","beta31min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA31MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta31max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA31MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta32min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA32MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta32max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA32MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta33min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA33MIN        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","beta33max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ BETA33MAX        %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-
-    /* extremas of the dispersion function  */
-    double_from_table_row("ptc_twiss_summary","disp1min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP1MIN         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp1max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP1MAX         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp2min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP2MIN         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp2max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP2MAX         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp3min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP3MIN         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp3max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP3MAX         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp4min", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP4MIN         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","disp4max", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ DISP4MAX         %%le  %F"), dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-
-    /* now for the 6 closed orbits */
-    double_from_table_row("ptc_twiss_summary","orbit_x", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_X          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","orbit_px", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_PX         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","orbit_y", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_Y          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","orbit_py", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_PY         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","orbit_pt", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_PT         %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","orbit_-cT", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ ORBIT_-CT        %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-/* orbits RMS */
-    double_from_table_row("ptc_twiss_summary","xcorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ XCORMS           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pxcorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PXCORMS          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ycorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ YCORMS           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pycorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PYCORMS          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","tcorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ TCORMS           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ptcorms", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PTCORMS          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-/* orbits MIN MAX */
-    double_from_table_row("ptc_twiss_summary","xcomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ XCOMIN           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","xcomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ XCOMAX           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pxcomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PXCOMIN          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pxcomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PXCOMAX          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ycomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ YCOMIN           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ycomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ YCOMAX           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pycomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PYCOMIN          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","pycomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PYCOMAX          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","tcomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ TCOMIN           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","tcomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ TCOMAX           %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ptcomin", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PTCOMIN          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-
-    double_from_table_row("ptc_twiss_summary","ptcomax", &row, &dtmp); // returnStatus = not used
-    sprintf(c_dum->c, v_format("@ PTCOMAX          %%le  %F"),dtmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    for (i=0; i<Nptcpars;i++)
+     {  
+        strcpy(tmp,ptcpars[i]);
+        double_from_table_row("ptc_twiss_summary",tmp,&row,&dtmp);
+        sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
+        addto_char_p_array(t->header,c_dum);
+     }
 
   }
 }
