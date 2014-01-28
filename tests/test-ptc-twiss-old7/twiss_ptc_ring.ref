@@ -34,10 +34,10 @@
 @ BETA_Y_MAX       %le         177.7231017
 @ BETA11MIN        %le         32.03433146
 @ BETA11MAX        %le         177.7089538
-@ BETA21MIN        %le                   0
-@ BETA21MAX        %le                   0
-@ BETA31MIN        %le                   0
-@ BETA31MAX        %le                   0
+@ BETA12MIN        %le                   0
+@ BETA12MAX        %le                   0
+@ BETA13MIN        %le                   0
+@ BETA13MAX        %le                   0
 @ BETA21MIN        %le                   0
 @ BETA21MAX        %le                   0
 @ BETA22MIN        %le         32.03308004
@@ -84,8 +84,8 @@
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %22s "MAD-X 5.01.06 Linux 64"
-@ DATE             %08s "21/01/14"
-@ TIME             %08s "22.17.52"
+@ DATE             %08s "28/01/14"
+@ TIME             %08s "09.16.38"
 * NAME                                S             BETA11             BETA21             BETA12             BETA22              DISP1              DISP3                  X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0        177.7010915                  0                  0        32.03447595        2.174564202                  0    0.0003260715893    2.596346259e-06                  0                  0
