@@ -1396,6 +1396,17 @@ tests/test-ptc-twiss-5D/leir.twiss.ref -text
 tests/test-ptc-twiss-5D/test-ptc-twiss-5D.cfg -text
 tests/test-ptc-twiss-5D/test-ptc-twiss-5D.madx -text
 tests/test-ptc-twiss-5D/test-ptc-twiss-5D.ref -text
+tests/test-ptc-twiss-maptable/leir.5d.inimap.ptc.twiss.cfg -text
+tests/test-ptc-twiss-maptable/leir.5d.inimap.ptc.twiss.ref -text
+tests/test-ptc-twiss-maptable/leir.5d.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-maptable/leir.5d.ptc.summ.twiss.ref -text
+tests/test-ptc-twiss-maptable/leir.5d.ptc.twiss.cfg -text
+tests/test-ptc-twiss-maptable/leir.5d.ptc.twiss.ref -text
+tests/test-ptc-twiss-maptable/map_table.tfs.cfg -text
+tests/test-ptc-twiss-maptable/map_table.tfs.ref -text
+tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.cfg -text
+tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.madx -text
+tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.ref -text
 tests/test-ptc-twiss-old1/README -text
 tests/test-ptc-twiss-old1/fort.18.cfg -text
 tests/test-ptc-twiss-old1/fort.18.ref -text
