@@ -1,0 +1,202 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.06  (64 bit, Linux)       +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.01.15      +
+  + Execution Time Stamp: 20.01.14 18.51.37 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!TITLE,'Test input for PTC_TWISS ';
+
+
+
+!=========== RING PARAMETERS ===========================================
+
+option, -echo, warn, -info;
+
+Assigned alignment errors to 1 elements
+enter Twiss module
+  
+iteration:   1 error:   6.606181E-04 deltap:   0.000000E+00
+orbit:   3.261640E-04  2.597068E-06  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.896028E-07 deltap:   0.000000E+00
+orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004430990969        47.50612067 
+
+                q1                dq1            betxmax              dxmax 
+       1.254675989        1.051070031        177.7089538        2.177407271 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.658847454    0.0003315825458     0.000213664876        1.254674956 
+
+               dq2            betymax              dymax              dyrms 
+       1.046764172        177.7231016                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+command: beta0  module: control
+parameter: betx   double value:        177.7010914
+parameter: alfx   double value:        -2.41257182
+parameter: mux   double value:        1.254675989
+parameter: bety   double value:         32.0344759
+parameter: alfy   double value:       0.4796139615
+parameter: muy   double value:        1.254674956
+parameter: x   double value:    0.0003260716242
+parameter: px   double value:    2.596346674e-06
+parameter: y   double value:                  0
+parameter: py   double value:                  0
+parameter: t   double value:   -1.662096185e-05
+parameter: pt   double value:                  0
+parameter: dx   double value:        2.174564191
+parameter: dpx   double value:      0.02962824424
+parameter: dy   double value:                  0
+parameter: dpy   double value:                  0
+parameter: wx   double value:                  0
+parameter: phix   double value:                  0
+parameter: dmux   double value:                  0
+parameter: wy   double value:                  0
+parameter: phiy   double value:                  0
+parameter: dmuy   double value:                  0
+parameter: ddx   double value:                  0
+parameter: ddpx   double value:                  0
+parameter: ddy   double value:                  0
+parameter: ddpy   double value:                  0
+parameter: r11   double value:                 -0
+parameter: r12   double value:                  0
+parameter: r21   double value:                 -0
+parameter: r22   double value:                  0
+parameter: energy   double value:                100
+ Now PTC
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+03
+          Kinetic Energy : 0.990617E+02
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.999956E+02
+ Setting MADx with 
+     energy           100.00000000000000     
+     method                   6
+     Num. of steps           10
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     10
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5251354906476990E-11 %
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+             534.6     0.000443114518   -0.0001936171878           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000    0.0003550790748        47.50529402       0.2546195015 
+
+                q2                dq1                dq2                 qs 
+      0.2546003528        1.051169737        1.046958092                  0 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+        32.0497509        177.6889149        32.05081522        177.7045042 
+
+         beta11min          beta11max          beta12min          beta12max 
+        32.0497509        177.6889149                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+       32.05081522        177.7045042                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0                  0        2.176305716 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.02964638027      0.02964631228                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    8.892828933e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   7.277292573e-07                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    7.160124621e-05                  0    8.586224592e-07 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0                  0                  0     8.89284238e-05 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    7.281201483e-07                  0                  0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0      5.2188044e-05                  0   -1.674875719e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0                  0 
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     10
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Normal Form Type 1
+Deviation from symplecticity  0.5251354906476990E-11 %
+ Killing LayoutNo name assigned                                                                                                        
+ Layout killed 
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.01.06 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
