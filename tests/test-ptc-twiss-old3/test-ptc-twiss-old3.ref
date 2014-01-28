@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
+  +    MAD-X 5.01.06  (32 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 14.15.30 +
+  + Execution Time Stamp: 28.01.14 12.07.38 +
   +++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -321,8 +321,8 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.5251354906476990E-11 %
-Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5395683899678261E-11 %
+Deviation from symplecticity  0.5395683899678261E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -402,6 +402,29 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+
+
+x_end  = table(map_table,c1_000000,coef);
+
+px_end = table(map_table,c2_000000,coef);
+
+!y_end  = table(map_table,c3_000000,coef); !zeros are not filled, so the row does not exist 
+
+!py_end = table(map_table,c4_000000,coef); !and it would returen arbitrary small number
+
+!t_end  = table(map_table,c6_000000,coef);
+
+!pt_end = table(map_table,c5_000000,coef);
+
+
+
+print, text="orbit at the end from ptc_normal:";
+
+orbit at the end from ptc_normal:
+value,x_end,px_end;
+
+x_end =    0.0003260715489 ;
+px_end =    2.596345986e-06 ;
 
 
 ptc_end;
@@ -491,7 +514,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit specified by the user!
-Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5395683899678261E-11 %
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -572,7 +595,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit specified by the user!
-Deviation from symplecticity  0.5251354906476990E-11 %
+Deviation from symplecticity  0.5395683899678261E-11 %
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -643,5 +666,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.01.06 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

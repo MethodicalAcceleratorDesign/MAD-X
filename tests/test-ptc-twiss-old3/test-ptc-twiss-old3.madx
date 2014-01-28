@@ -36,6 +36,16 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
 
+x_end  = table(map_table,c1_000000,coef);
+px_end = table(map_table,c2_000000,coef);
+!y_end  = table(map_table,c3_000000,coef); !zeros are not filled, so the row does not exist 
+!py_end = table(map_table,c4_000000,coef); !and it would returen arbitrary small number
+!t_end  = table(map_table,c6_000000,coef);
+!pt_end = table(map_table,c5_000000,coef);
+
+print, text="orbit at the end from ptc_normal:";
+value,x_end,px_end;
+
 ptc_end;
 
 !write,table="map_table",file="map_table";
