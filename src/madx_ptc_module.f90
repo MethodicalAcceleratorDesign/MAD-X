@@ -2072,6 +2072,11 @@ CONTAINS
        print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
 
+    if (getdebug()>3) then
+       print*, "Input State"
+       call print(default,6)
+    endif
+
     deltap = zero
     select case(icase)
     CASE(4)
@@ -2111,11 +2116,15 @@ CONTAINS
        endif
     endif
 
+
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug()>0) call print(default,6)
-
+    if (getdebug()>0) then
+      !print*, "Resulting state"
+      call print(default,6)
+    endif
+    
     icase = i
 
   end subroutine my_state
@@ -2197,16 +2206,20 @@ CONTAINS
   END SUBROUTINE Convert_dp_to_dt
   !=============================================================================
 
-  subroutine makemaptable(y)
+  subroutine makemaptable(y,order)
     implicit none
+    integer           :: order
     type(real_8):: y(6)
     integer,parameter :: i_map_coor=10
     integer           :: map_term, ja(6),i,ii,iii
     integer           :: i1,i2,i3,i4,i5,i6
-    integer           :: order, no
+    integer           :: no
     real(dp)          :: coef
     real(kind(1d0))   :: map_coor(i_map_coor)
     real(kind(1d0))   :: get_value
+    character(len=10)  :: coeffCode="c0_000000"//CHAR(0) ! polynomial no + "_" + monomial code + space(end of line)
+
+    
     !    type(universal_taylor) :: ut
 
     !    write(0,*) "MAP_TABLE"
@@ -2214,71 +2227,11 @@ CONTAINS
     map_term=42
     call  make_map_table(map_term)
 
-    order = get_value("ptc_normal ","no ")
 
     call liepeek(iia,icoast)
     allocate(j(c_%npara))
     ja(:)    = 0
     j(:)     = 0
-
-    goto 100 ! skip the code that was in place until 29 March 2010
-
-    do iii=1,c_%npara
-       coef = y(iii)%T.sub.j
-       ! following works
-       !coef = y(iii)%T.sub.mapSelector5variables(1)
-       map_coor(1)=coef
-       map_coor(2)=iii
-       map_coor(3)=c_%npara
-       map_coor(4)=0
-       map_coor(5)=ja(1)
-       map_coor(6)=ja(2)
-       map_coor(7)=ja(3)
-       map_coor(8)=ja(4)
-       map_coor(9)=ja(5)
-       map_coor(10)=ja(6)
-       call vector_to_table_curr("ptc_normal ", 'coef ', map_coor(1), i_map_coor)
-       call augment_count("ptc_normal ")
-    enddo
-
-    do i = 1,c_%npara
-
-       do ii = 1,c_%npara
-          j(ii) = 1
-          ja(ii) = j(ii)
-          coef = y(i)%T.sub.j
-          map_coor(1)=coef
-          map_coor(2)=i
-          map_coor(3)=c_%npara! 29.06.2006 here was iia(2) - to be verified
-          map_coor(4)=sum(ja(:))
-          map_coor(5)=ja(1)
-          map_coor(6)=ja(2)
-          map_coor(7)=ja(3)
-          map_coor(8)=ja(4)
-          map_coor(9)=ja(5)
-          map_coor(10)=ja(6)
-          call vector_to_table_curr("ptc_normal ", 'coef ', map_coor(1), i_map_coor)
-          call augment_count("ptc_normal ")
-          j(:)  = 0
-          ja(ii) = j(ii)
-       enddo
-
-       !           ut = y(i)
-       !           do ii = 1,ut%n
-       !              map_coor(1)=ut%c(ii) !coef
-       !              map_coor(2)=i !index of taylor
-       !              map_coor(3)=c_%npara
-       !              map_coor(4)=sum(ut%j(i,:)) !order
-       !              map_coor(5)=ut%j(ii,1)
-       !              map_coor(6)=ut%j(ii,2)
-       !              map_coor(7)=ut%j(ii,3)
-       !              map_coor(8)=ut%j(ii,4)
-       !              map_coor(9)=ut%j(ii,5)
-       !              map_coor(10)=ut%j(ii,6)
-       !           enddo
-
-
-    enddo
 
     ! note that the order in which the coefficients appear in the map_table slightly
     ! differ from the order in which they appear in fort.18
@@ -2312,6 +2265,9 @@ CONTAINS
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
                                      call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
+	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
+	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+	                 call string_to_table_curr( 'map_table ', "name ", coeffCode );
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
@@ -2347,6 +2303,9 @@ CONTAINS
                                   map_coor(9)=j(5)
                                   map_coor(10) = 0
                                   call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
+	              write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
+                                  coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+	              call string_to_table_curr( "map_table ", "name ", coeffCode );
                                   call augment_count("map_table ")
                                endif
                             endif
@@ -2378,6 +2337,9 @@ CONTAINS
                                map_coor(9)=0
                                map_coor(10)=0
                                call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
+	           write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
+                               coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+	           call string_to_table_curr( "map_table ", "name ", coeffCode );
                                call augment_count("map_table ")
                             endif
                          endif
@@ -2386,7 +2348,7 @@ CONTAINS
                 enddo
              enddo
           else
-             call fort_warn('ptc_normal ','map output expects 4,5 or 6 variables')
+             call fort_warn('makemaptable ','map output expects 4,5 or 6 variables')
           endif
        enddo
     enddo
@@ -2630,11 +2592,21 @@ CONTAINS
     gamma0 = get_value('probe ','gamma ')
     arad=get_value('probe ', 'arad ')
     totch=node_value('charge ') * get_value('probe ', 'npart ')
+    
+    if (getdebug()>1) then
+      print*, 'charge npart ',node_value('probe ','charge '), get_value('probe ', 'npart ')
+      print*, 'gamma0, arad, totch ',gamma0, arad, totch
+    endif
 
+    
     dpp  = get_variable('track_deltap ')
     q = get_value('probe ','charge ')
     q_prime = node_value('charge ')
-
+    
+    if (getdebug()>1) then
+      print*, 'dpp q q_prime',dpp, q, q_prime
+    endif
+    
     beta0 = sqrt(one-one/gamma0**2)
     ptot = beta0*gamma0*(one+dpp)
     beta_dp = ptot / sqrt(one + ptot**2)
@@ -2651,7 +2623,6 @@ CONTAINS
 
 
   subroutine putbeambeam()
-  !returns FK factor for Beam-Beam effect
     implicit none
     real (dp) :: fk, xma, yma, sigx, sigy,s
     integer :: elno
@@ -2690,8 +2661,36 @@ CONTAINS
     write(6,*) 'node%ent(1,1:3):',node%ent(1,1:3)   ! node entrance e_1 vector
     write(6,*) 'node%ent(2,1:3):',node%ent(2,1:3)   ! node entrance e_2 vector
     write(6,*) 'node%ent(3,1:3):',node%ent(3,1:3)   ! node entrance e_3 vector
-    write(6,*) " s variable of node and following node "
-    write(6,*) node%s(1),node%next%s(1)
+    write(6,*) " s variable of node and following node and "
+    write(6,*) s, node%s(1),node%next%s(1), s - node%s(1), s - node%next%s(1)
+
+
+    
+    if(((node%cas==case0).or.(node%cas==caset))) then !must be 0 or 3
+
+      if(.not.associated(node%BB)) call alloc(node%BB)
+
+      call getfk(fk)
+      node%bb%fk = fk
+      node%bb%xm = xma
+      node%bb%ym = yma
+      node%bb%sx = sigx
+      node%bb%sy = sigy
+      node%bb%PATCH=.true.
+      if (getdebug() > 2 ) then
+        print*, "BB fk=",node%bb%fk
+        print*, "BB sx=",node%bb%sx
+        print*, "BB sy=",node%bb%sy
+        print*, "BB xm=",node%bb%xm
+        print*, "BB ym=",node%bb%ym
+      endif
+
+      do_beam_beam = .true.
+
+    else
+      call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
+    endif 
+  
     
     !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node. 
     !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick 

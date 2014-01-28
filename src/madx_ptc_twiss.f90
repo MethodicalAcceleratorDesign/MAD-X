@@ -344,6 +344,7 @@ contains
     real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual, writetmap
+    logical(lp)             :: maptable
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     integer                 :: rmatrix
     real(dp)                :: emi(3)
@@ -882,7 +883,6 @@ contains
     endif
 
 
-    ! 26 november 2009
     if(isRing .eqv. .true.) then
        call oneTurnSummary(theTransferMap ,y, x, suml)
     else
@@ -890,6 +890,11 @@ contains
        call onePassSummary(theTransferMap , x, suml)
     endif
 
+
+    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
+    if(maptable) then
+       call makemaptable(theTransferMap,no)
+    endif
 
 
     call set_option('ptc_twiss_summary ',1)

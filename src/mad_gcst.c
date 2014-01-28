@@ -508,12 +508,12 @@ char* bb6d_ixy_cols[]=
 
 int map_tab_types[]=
 {
-  2,1,1,1,1,1,1,1,1,1
+  3,2,1,1,1,1,1,1,1,1,1
 };
 
 char* map_tab_cols[]=
 {
-  "coef","n_vector","nv","order","nx","nxp","ny","nyp","ndeltap","nt",
+  "name","coef","n_vector","nv","order","nx","nxp","ny","nyp","ndeltap","nt",
   " "  /* blank terminates */
 };
 

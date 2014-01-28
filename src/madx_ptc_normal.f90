@@ -124,8 +124,9 @@ contains
     call daprint(y,18)
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
+    
     if(maptable) then
-       call makemaptable(y)
+       call makemaptable(y,no)
     endif
 
 
