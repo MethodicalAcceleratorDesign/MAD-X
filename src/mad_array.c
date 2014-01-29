@@ -161,7 +161,10 @@ delete_char_p_array(struct char_p_array* pa, int flag)
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", pa->name);
   if (flag)
     for (int i = 0; i < pa->curr; i++)
-      myfree(rout_name, pa->p[i]);
+     {
+       myfree(rout_name, pa->p[i]);
+     }
+     
   if (pa->p != NULL)  myfree(rout_name, pa->p);
   myfree(rout_name, pa);
   return NULL;
