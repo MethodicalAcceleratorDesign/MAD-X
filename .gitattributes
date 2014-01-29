@@ -1354,9 +1354,9 @@ tests/test-ptc-twiss-1/input/fv9.opt -text
 tests/test-ptc-twiss-1/input/fv9.seq -text
 tests/test-ptc-twiss-1/ptc-twiss-table.cfg -text
 tests/test-ptc-twiss-1/ptc-twiss-table.ref -text
-tests/test-ptc-twiss-1/test-ptc-twiss.cfg -text
-tests/test-ptc-twiss-1/test-ptc-twiss.madx -text
-tests/test-ptc-twiss-1/test-ptc-twiss.ref -text
+tests/test-ptc-twiss-1/test-ptc-twiss-1.cfg -text
+tests/test-ptc-twiss-1/test-ptc-twiss-1.madx -text
+tests/test-ptc-twiss-1/test-ptc-twiss-1.ref -text
 tests/test-ptc-twiss-1/twiss-table.cfg -text
 tests/test-ptc-twiss-1/twiss-table.ref -text
 tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.cfg -text
