@@ -42,9 +42,11 @@ if ERRORLEVEL 1 %echo% "ERROR: svn update failed"
 
 %echo% -e "\n===== Clean build ====="
 if "%1"=="cleanall" (
-   if EXIST build ( %make% cleanbuild && %rm% -f *.exe )
+REM if EXIST build ( %make% cleanbuild && %rm% -f *.exe )
+REM cleanall not supported on windows (relies on find)
+  %make% cleanbuild
 ) else (
-   %echo% "Skipped (no explicit request)."
+  %echo% "Skipped (no explicit request)."
 )
 
 %echo% -e "\n===== Gnu build ====="
