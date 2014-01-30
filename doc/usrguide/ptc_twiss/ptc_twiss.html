@@ -68,10 +68,15 @@ in selected positions, where index <font color="#FF0000"> <i>k</i>=1...3</font> 
 the index <font color="#FF0000"> <i>j</i>=1...3 denotes the eigen-mode</font>. 
 The PTC_TWISS also calculates the
 dispersion values <i>D</i><sub>1</sub>,...,<i>D</i><sub>4</sub>. 
-In the MAD-X
-commands and tables, these parameters are denoted as <code>beta11,...,beta33,
+In the MAD-X commands and tables, these parameters are denoted as <code>beta11,...,beta33,
 alfa11,...,alfa33, gama11,...,gama33, mu1,...,mu3, disp1,...,disp4</code>,
-respectively.</p>
+respectively.
+
+The ring parameters like gamma transition, compaction factor and phase slip factor are calculated 
+when closed solution is requested, or otherwise if RING_PARAMETERS is set to true.
+They are available in the summary table and in the header of twiss table.
+
+</p> 
 
 <p>The Ripken parametrization can be transformed into the Edwards-Teng
 parametrization (used in twiss proper) using the formulae of
@@ -94,12 +99,14 @@ order derivatives have respective column names:
 <code>disp1p2,...,disp4p2</code> for the second order, and
 <code>disp1p3,...,disp4p3</code> for the third order.</p>
 
-<p>In addition, we compute momentum compaction factor  <font
-face="Symbol">a</font><sub>c</sub> up to 1st order (for icase=5) or
-3rd order (for icase=56). The values appear in the header of the
-ptc_twiss output file (zero means the value has not been
-computed). This feature is currently only available in the development
-version.</p>
+
+<p>
+Any component the transfer map at any location can be acessed (e.g. in matching) using 
+<var class="command"> <a href="../ptc_auxiliaries/PTC_Select.html">
+         PTC_SELECT </a> </var> command. 
+If MAPTABLE parameter is set than the complete transfer map at the end of the sequence is saved in table called map_table.
+
+</p>
 
 <p align="left">
 For clarification: <font color="#FF0000">in the 4-D case, there is the
@@ -180,8 +187,9 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
 &nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var><strong>
     <var class="option">deltap</var>=double, <b>closed_orbit</b>, <b>slice_magnets</b>, <b><br>
 &nbsp;&nbsp;&nbsp; range=</b>string<b>, file[=</b>string<b>], table[=</b>string<b>],<br>
-&nbsp;&nbsp;&nbsp; initial_matrix_table, initial_matrix_manual, initial_map_manual, beta0=</b>string<b>,
-&nbsp;&nbsp;&nbsp; ignore_map_orbit, ring_parameters,    <br>
+&nbsp;&nbsp;&nbsp; initial_matrix_table, initial_matrix_manual, initial_map_manual, ignore_map_orbit, <br>
+&nbsp;&nbsp;&nbsp; beta0=</b>string<b>, maptable, <br>
+&nbsp;&nbsp;&nbsp; ring_parameters,    <br>
 &nbsp;&nbsp;&nbsp; betx=</b>double,<b> alfx=</b>double<b>, mux=</b>double<b>,    <br>
 &nbsp;&nbsp;&nbsp; bety=</b>double,<b> alfy=</b>double<b>, muy=</b>double<b>,    <br>
 &nbsp;&nbsp;&nbsp; dx=</b>double,<b> dpx=</b>double,<b> dy=</b>double,<b> dpy=</b>double,<b><br>
@@ -360,11 +368,15 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
           <tr>
             <td width="143">
             INITIAL_MATRIX_TABLE</td>
-            <td colspan="2"><span lang="EN-US">Reading
-                  the transfer matrix from the
-                  map-table in memory (preceding </span> <var class="command">
-        <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> command
-            needed).</td>
+            <td colspan="2"><span lang="EN-US">Reading the transfer map from table called map_table 
+                created by preceding PTC_TWISS or </span> <var class="command">
+                  <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> 
+                  <span lang="EN-US">command.
+                  The table can be also read before hand from files using 
+                  </span> <var class="command">
+                  <a href="../control/general.html#readtable">READTABLE</a></var> 
+                  <span lang="EN-US">command.</span>
+                   </td>
             <td width="84">.FALSE.</td>
             <td width="57">logical</td>
           </tr>
@@ -412,10 +424,25 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
                 <var class="command">BETA0</var><span lang="EN-US">-block,
                 which contains the Twiss parameters for the
                 input. When icase=6, this information must be complemented
-                                                                by supplying a value for 'betz' on the ptc_twiss command line.</span></td>
+                by supplying a value for 'betz' on the ptc_twiss command line.</span></td>
             <td width="84">beta0</td>
             <td width="57">string</td>
           </tr>
+
+          <tr>
+            <td width="143">
+            map_table</td>
+            <td colspan="2">
+                <span lang="EN-US">
+                  If true, the one-turn-map is saved to table called map_table.
+                  The be used as starting condition for a subsequent ptc_twiss, see INITIAL_MATRIX_TABLE
+                  parameter of this command.
+                </span>
+            </td>
+            <td width="84">beta0</td>
+            <td width="57">string</td>
+          </tr>
+
           <tr>
             <td width="143">
             betx, alfx, mux, bety, alfy, muy,
