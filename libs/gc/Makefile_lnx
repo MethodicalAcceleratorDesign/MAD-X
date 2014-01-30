@@ -29,6 +29,10 @@ libgc-gnu:      libgc-gnu32   libgc-gnu64
 libgc-%32:      ARCH := 32
 libgc-%64:      ARCH := 64
 
+cleanarch:
+	$E "** Cleaning binaries and libraries"
+	$_ $(RM) $(wildcard libgc32* libgc64* libgc-linux*)
+
 libgc-intel32 libgc-intel64:
 	$E "*** Building $@"
 	$_ cd gc ; \
