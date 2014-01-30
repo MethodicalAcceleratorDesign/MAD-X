@@ -33,6 +33,14 @@ all-macosx32-intel: madx-macosx32-intel libmadx-macosx32-intel libptc-macosx32-i
 all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel numdiff-macosx64-intel
 
 #
+# cleanbuild platform specific
+#
+cleanarch:
+	$E "** Cleaning binaries and libraries"
+	$_ $(RM) $(wildcard madx32 madx64 numdiff32 numdiff64 libmadx32* libmadx64* libptc32* libptc64*)
+	$_ $(RM) $(wildcard madx-macosx* libmadx-macosx* libptc-macosx* numdiff-macosx* libs/gc/libgc*)
+
+#
 # madx
 #
 madx-macosx:        madx-macosx32         madx-macosx64

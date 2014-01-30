@@ -33,6 +33,14 @@ all-win32-intel:  madx-win32-intel  numdiff-win32-intel
 all-win64-intel:  madx-win64-intel  numdiff-win64-intel
 
 #
+# cleanbuild platform specific
+#
+cleanarch:
+	$E "** Cleaning binaries and libraries"
+	$_ $(RM) $(wildcard madx32.exe madx64.exe numdiff32.exe numdiff64.exe)
+	$_ $(RM) $(wildcard madx-win* numdiff-win*)
+
+#
 # madx
 #
 madx-win:        madx-win32        madx-win64

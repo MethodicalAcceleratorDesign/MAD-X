@@ -16,7 +16,7 @@
 # | $Id$
 # |
 
-.PHONY: clean cleandir cleantest
+.PHONY: clean cleandir cleantest cleanarch
 .PHONY: cleanc cleancxx cleanf90 cleandep cleanprj cleanbuild cleanall
 
 clean:
@@ -64,7 +64,7 @@ cleanprj:
 	$E "** Removing $(PRJNAME)"
 	$_ $(RM) $(if $(LD),$(PRJNAME_LD),) $(if $(AR),$(PRJNAME_AR),)
 
-cleanbuild:
+cleanbuild: cleanarch
 	$E "** Removing" $(DESTDIR)
 	$_ $(RMDIR) $(DESTDIR)
 
