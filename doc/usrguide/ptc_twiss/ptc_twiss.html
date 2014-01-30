@@ -50,7 +50,7 @@ programming has been performed the Twiss calculation will always be
 automatically correct for all machine conditions like closed orbit, coupling or
 after a new element has been introduced into the code. In a traditional coding
 like in MAD8 this depends on reprogramming and modifying the code at various
-places which is inherently error-prone.</p>
+places, which is inherently error-prone.</p>
 <p align="left">
 The PTC_TWISS tracks a special representation of the beam in three degrees of
 freedom. It works on the coupled lattice functions defined in 
@@ -78,8 +78,8 @@ They are available in the summary table and in the header of twiss table.
 
 </p> 
 
-<p>The Ripken parametrization can be transformed into the Edwards-Teng
-parametrization (used in twiss proper) using the formulae of
+<p>The Ripken parameterization can be transformed into the Edwards-Teng
+parameterization (used in twiss proper) using the formulae of
 Ref.<font face="Times New Roman"> [<a href="#V.A.&nbsp;Lebedev">d</a>]</font>. 
 The parameters are noted as
 <code>betx, bety, alfx, alfy</code> and the coupling matrix: R11, R12,
@@ -93,7 +93,7 @@ alfa11p...,alfa33p, gama11p,...,gama33p</code> denote the derivatives
 of the optics parameters w.r.t. deltap/p. <font color="#FF0000">If one
 is interested in evaluating deltap/p-dependency of the Twiss
 parameters, one must ensure that the order (no) of the map is set to 2
-at least.</font>. The derivatives of the dispersion w.r.t. deltap/p
+at least.</font> The derivatives of the dispersion w.r.t. deltap/p
 have column names: <code>disp1p,...,disp4p</code>. Second and third
 order derivatives have respective column names:
 <code>disp1p2,...,disp4p2</code> for the second order, and
@@ -101,7 +101,7 @@ order derivatives have respective column names:
 
 
 <p>
-Any component the transfer map at any location can be acessed (e.g. in matching) using 
+Any component the transfer map at any location can be accessed (e.g. in matching) using 
 <var class="command"> <a href="../ptc_auxiliaries/PTC_Select.html">
          PTC_SELECT </a> </var> command. 
 If MAPTABLE parameter is set than the complete transfer map at the end of the sequence is saved in table called map_table.
@@ -282,7 +282,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
 	    Note that the orbit <!-- extrema and rms may not be exact in this mode. --> rms calculated in this mode 
 	    counts as valid data points both the end of the previous element and the entrance of the current element. 
             Since the first integration node is always at the entrance of the magnet (after position offset 
-	    and fringe effects are calculated) which corresponds to the same s position (and usually optical functions) 
+	    and fringe effects are calculated), which corresponds to the same s position (and usually optical functions) 
             as the end of the previous element, the points at the interface between magnets are included twice in the rms calculation. 
             </span>
             </td>
