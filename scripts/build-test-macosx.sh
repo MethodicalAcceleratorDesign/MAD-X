@@ -23,7 +23,7 @@ cat VERSION
 
 echo "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
-	make cleanall && make cleanall ARCH=32
+	make cleanall
 	[ "$?" != "0" ] && echo "ERROR: make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
