@@ -57,10 +57,31 @@ of the inserted sequence are placed at the position given, UNLESS a "refpos"
 the sequence is inserted such that the refpos element is 
 at the insertion point.</li>
 </ul>
-When the sequence is expanded in a 
-<a href="../control/general.html#use">USE</a> command,
-MAD generates the missing drift spaces. At this moment, overlapping elements
-will cause "negative drift length" errors.
+<!-- When the sequence is expanded in a  -->
+<!-- <a href="../control/general.html#use">USE</a> command, -->
+<!-- MAD generates the missing drift spaces. At this moment, overlapping elements -->
+<!-- will cause "negative drift length" errors. -->
+When the sequence is expanded in a
+<a href="../control/general.html#use">USE</a> command, 
+MAD-X generates the missing drift spaces according to the following rules:
+<ul>
+<li>When the distance between the exit of the previous element and the entrance 
+of the next element is positive and greater than a threshold of one micrometer 
+an explicit drit is generated with its own name, unless an already existing 
+drift space with the same length (within 10**(-12)m tolerance) can be 
+re-used.</li> 
+<li>When the absolute value of the distance between the exit of the previous 
+element and the entrance of the next element is less than a given tolerance 
+of one micrometer, no drift space is created and the elements are considered 
+as contiguous.
+<br><b> Note that in very specific cases this can cause very small errors to 
+accumulate and the actual length of the sequence can vary slightly 
+from the declared length. (see second example below)</b></li> 
+<li>When the distance between the exit of the previous element and the entrance 
+of the next element is negative and less than minus one micrometer, the elements 
+are considered to be overlapping and MAD-X terminates with a ``negative drift 
+length'' fatal error.</li> 
+</ul>
 <p>
 <b>Note that a bug in the expansion of sub-sequences within a sequence was reported 
 in July 2013 and fixed from version 5.01.03 onwards. 
@@ -94,10 +115,26 @@ sequ:  sequence,l=79;
    endm:  marker, at=79.0;
 endsequence;
 </pre>
+<br><br>
+Example of very small drift space being ignored during sequence
+expansion: 
+<pre>
+QTEST: QUADRUPOLE, L=1.000001;
+ 
+TEST: SEQUENCE, REFER=centre, L=2.;
+  QTEST, AT=1.5;	 
+ENDSEQUENCE;	 
+
+USE, SEQUENCE=TEST;
+SURVEY, FILE='test';
+</pre>
+The above sequence will expand to a total length of 2.0000005 m, half
+a micron longer than the claimed length of 2 m, but will not fail.
+<br><br>
 
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, June 17, 2002 <p>
-Last updated: Ghislain Roy, 22 October 2013
+Last updated: Ghislain Roy, 04 February 2014
 </address>
 
 </body>
