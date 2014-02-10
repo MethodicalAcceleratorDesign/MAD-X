@@ -26,34 +26,32 @@ readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
 readonly remdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
 
+# error handler
+check_error ()
+{
+	if [ "$?" != "0" ] ; then
+		echo "ERROR: $1"
+		exit 1
+	fi
+}
+
+# clean tempory files
 clean_tmp ()
 {
 	rm -f build-test-*.tmp
 }
 
-# retrieve remote report [lxplus | macosx | win]
-build_test_remote ()
-{
-	for arch in "$@" ; do
-		scp -q -p "$remdir/build-test-$arch.out" build-test-$arch.out
-		[ "$?" != "0" ] && echo "ERROR: unable to retrieve $arch remote report (scp)"
-		cat build-test-$arch.out | tr -d '\r' > build-test-$arch.out.tr
-		mv -f build-test-$arch.out.tr build-test-$arch.out
-	done
-	return 0
-}
-
 # check for completed jobs [lxplus | macosx | win]
 build_test_completed ()
 {
-	local marker
+	local marker="not found"
 
 	for arch in "$@" ; do
 		if [ -s build-test-$arch.out ] ; then
 			marker=`perl -ne '/===== End of build and tests =====/ && print "found"' build-test-$arch.out`
-			[ "$?" != "0" ] && echo "ERROR: unable to search for end marker (perl)"
-			[ "$marker" != "found" ] && return 1
+			check_error "unable to search for end marker (perl)"
 		fi
+		[ "$marker" != "found" ] && return 1
 	done
 	return 0
 }
@@ -62,11 +60,25 @@ build_test_check ()
 {
 	if [ "$force" != "force" ] ; then
 		if ! build_test_completed "$@" ; then
-			echo "Reports not yet completed, retrying later..."
-			echo `date`
+#			echo "Reports not yet completed, retrying later..."
+#			echo `date`
 			clean_tmp && exit
 		fi
 	fi
+	return 0
+}
+
+# retrieve remote report [lxplus | macosx | win]
+build_test_remote ()
+{
+	for arch in "$@" ; do
+		scp -q -p "$remdir/build-test-$arch.out" build-test-$arch.out
+		check_error "unable to retrieve $arch remote report (scp)"
+		if [ ! -s build-test-$arch.out ] ; then
+			cat build-test-$arch.out | tr -d '\r' > build-test-$arch.out.tr
+			mv -f build-test-$arch.out.tr build-test-$arch.out
+		fi
+	done
 	return 0
 }
 
@@ -76,7 +88,7 @@ build_test_report ()
 	local completed
 
 	for arch in "$@" ; do
-		build_test_completed $arch && completed="" || completed=" (incomplete)"
+		build_test_completed $arch && completed="" || completed=" (not found or incomplete)"
 		echo -e "\n=====\n$webdir/tests/reports/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
 
 		if [ ! -s build-test-$arch.out ] ; then
@@ -84,14 +96,14 @@ build_test_report ()
 		else
 			rm -f tests/reports/${olddate}_build-test-$arch.out
 			cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
-			[ "$?" != "0" ] && echo "ERROR: backup of build-test-$arch.out failed (cp)"
+			check_error "backup of build-test-$arch.out failed (cp)"
 
 			perl -ne '/: FAIL|ERROR:|error: / && print' build-test-$arch.out >> build-test-failed.tmp
-			[ "$?" != "0" ] && echo "ERROR: unable to search for failures or errors (perl)"
+			check_error "unable to search for failures or errors (perl)"
 
 			perl -ne '/: FAIL|ERROR:|error: / && print ;
 			          /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> build-test-result.tmp
-			[ "$?" != "0" ] && echo "ERROR: unable to build report summary (perl)"
+			check_error "unable to build report summary (perl)"
 		fi
 	done
 	return 0
@@ -119,11 +131,11 @@ build_test_send ()
 	cat build-test-result.tmp                                                 >> build-test-report.out
 
 	cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
-	[ "$?" != "0" ] && echo "ERROR: backup of build-test-report.out failed (cp)"
+	check_error "backup of build-test-report.out failed (cp)"
 
 	if [ "$nomail" != "nomail" ] ; then
 		cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
-		[ "$?" != "0" ] && echo "ERROR: unable to email report summary (mail)"
+		check_error "unable to email report summary (mail)"
 	fi
 	return 0
 }
@@ -149,7 +161,7 @@ build_test_send   lxplus macosx win
 # report errors if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
 	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
-	[ "$?" != "0" ] && echo "ERROR: unable to email report errors (check mail)"
+	check_error "unable to email report errors (check mail)"
 fi
 
 clean_tmp
