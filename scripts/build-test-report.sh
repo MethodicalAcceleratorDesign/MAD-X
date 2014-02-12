@@ -1,26 +1,42 @@
 # run:
-# sh scripts/build-test-report.sh [clean] | [forcereport] [force] [nomail]
+# sh scripts/build-test-report.sh [clean] [forcereport] [force] [nomail]
 
 # I/O redirection
 rm -f build-test-report.log
 exec 1> build-test-report.log 2>&1
 
-# clean all and quit
-[ "$1" == "clean" -o "$1" == "cleanall" ] && rm -f build-test-*.tmp build-test-*.out && exit
-
-# prevent erasing existing report even with "force", override with "forcereport" (for debugging)
-[ "$1" != "forcereport" -a -s "build-test-report.out" ] && exit
-shift
-
 # env settings
 export LC_CTYPE="C"
 export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
-# exclusive settings
-readonly force="$1"
-shift
-readonly nomail="$1"
-shift
+# parse arguments
+while [ "$1" != "" ] ; do
+
+# clean tmp files and remote reports, and exit if not 'force'd to continue
+	if [ "$1" == "clean" -o "$1" == "cleanall" ] ; then
+		clean="$1"
+	fi
+
+# force to build the report even if remote processes are not finished or errors occur
+	if [ "$1" == "force"  ] ; then
+		force="$1"
+	fi
+
+# force to (re)build the report even if non empty build-test-report.out exists
+	if [ "$1" == "forcereport"  ] ; then
+		forcereport="$1"
+	fi
+
+# do not send the report by email (for debugging)
+	if [ "$1" == "nomail"  ] ; then
+		nomail="$1"
+	fi
+
+	shift
+done
+
+# prevent erasing existing report even with "force", override with "forcereport" (for debugging)
+[ "$forcereport" != "forcereport" -a -s "build-test-report.out" ] && exit
 
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
@@ -29,27 +45,26 @@ readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
 readonly srvdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
 
-# clean tempory files
-clean_tmp ()
-{
-	rm -f build-test-*.tmp
-}
-
 # quit on error if not forced to continue
 die ()
 {
-	clean_tmp
 	[ "$force" != "force" ] && exit 1
 }
 
 # error handler
 check_error ()
 {
-	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
-		die
-	fi
+	[ "$?" != "0" ] && echo "ERROR: $1" && die
 }
+
+# clean tempory files
+clean_tmp ()
+{
+	rm -f build-test-*.tmp
+}
+
+# clean all and die
+[ "$clean" == "clean" ] && rm -f build-test-*.tmp build-test-*.out && die
 
 # check for completed jobs [lxplus | macosx | win]
 build_test_completed ()
@@ -68,13 +83,7 @@ build_test_completed ()
 
 build_test_check ()
 {
-	if [ "$force" != "force" ] ; then
-		if ! build_test_completed "$@" ; then
-#			echo "Reports not yet completed, retrying later..."
-#			echo `date`
-			die
-		fi
-	fi
+	[ "$force" != "force" -a ! build_test_completed "$@" ] && die
 	return 0
 }
 
