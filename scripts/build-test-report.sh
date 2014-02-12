@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-report.sh
+# sh scripts/build-test-report.sh [clean] | [forcereport] [force] [nomail]
 
 # I/O redirection
 rm -f build-test-report.log
@@ -10,35 +10,45 @@ exec 1> build-test-report.log 2>&1
 
 # prevent erasing existing report even with "force", override with "forcereport" (for debugging)
 [ "$1" != "forcereport" -a -s "build-test-report.out" ] && exit
+shift
 
 # env settings
 export LC_CTYPE="C"
 export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # exclusive settings
-readonly nomail="$1"
 readonly force="$1"
+shift
+readonly nomail="$1"
+shift
 
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
 readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
-# readonly olddate=`date -v-50d "+%Y-%m-%d"` 			# macosx
-readonly remdir="mad@macserv15865.cern.ch:Projects/madX"
+# readonly olddate=`date -v-50d "+%Y-%m-%d"` 		# macosx
+readonly srvdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
+
+# clean tempory files
+clean_tmp ()
+{
+	rm -f build-test-*.tmp
+}
+
+# quit on error if not forced to continue
+die ()
+{
+	clean_tmp
+	[ "$force" != "force" ] && exit 1
+}
 
 # error handler
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
 		echo "ERROR: $1"
-		exit 1
+		die
 	fi
-}
-
-# clean tempory files
-clean_tmp ()
-{
-	rm -f build-test-*.tmp
 }
 
 # check for completed jobs [lxplus | macosx | win]
@@ -62,7 +72,7 @@ build_test_check ()
 		if ! build_test_completed "$@" ; then
 #			echo "Reports not yet completed, retrying later..."
 #			echo `date`
-			clean_tmp && exit
+			die
 		fi
 	fi
 	return 0
@@ -72,7 +82,7 @@ build_test_check ()
 build_test_remote ()
 {
 	for arch in "$@" ; do
-		scp -q -p "$remdir/build-test-$arch.out" build-test-$arch.out
+		scp -q -p "$srvdir/build-test-$arch.out" build-test-$arch.out
 		check_error "unable to retrieve $arch remote report (scp)"
 		if [ ! -s build-test-$arch.out ] ; then
 			cat build-test-$arch.out | tr -d '\r' > build-test-$arch.out.tr
@@ -158,7 +168,7 @@ build_test_report lxplus macosx win
 # send the final report
 build_test_send   lxplus macosx win
 
-# report errors if any
+# report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
 	cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
 	check_error "unable to email report errors (check mail)"
