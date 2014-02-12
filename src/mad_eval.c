@@ -734,4 +734,3 @@ print_value(struct in_cmd* cmd)
     }
   }
 }
-

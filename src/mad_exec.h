@@ -13,6 +13,7 @@ void exec_assign(struct in_cmd*);
 void exec_call(struct in_cmd*);
 void exec_cmd_delete(struct in_cmd*);
 void exec_print(struct in_cmd*);
+void exec_printf(struct in_cmd*);
 void exec_show(struct in_cmd*);
 void exec_dump(struct in_cmd*);
 void exec_fill_table(struct in_cmd*);

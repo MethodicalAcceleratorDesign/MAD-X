@@ -422,7 +422,7 @@ command_par_array(const char* parameter, struct command* cmd)
 
 int
 command_par_vector(const char* parameter, struct command* cmd, double* vector)
-  /* returns the length of, and an updated command parameter vector
+  /* returns the length of, and an updated command parameter vector if not null
      if found, else 0 */
 
 {
@@ -434,7 +434,9 @@ command_par_vector(const char* parameter, struct command* cmd, double* vector)
     {
       if (cp->expr_list != NULL)
         update_vector(cp->expr_list, cp->double_array);
-      copy_double(cp->double_array->a, vector, cp->double_array->curr);
+      if (vector) {
+        copy_double(cp->double_array->a, vector, cp->double_array->curr);
+      }
       return cp->double_array->curr;
     }
   }

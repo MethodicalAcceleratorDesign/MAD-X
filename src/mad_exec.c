@@ -477,7 +477,6 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   return;
 }
 
-
 void
 exec_print(struct in_cmd* cmd)
   /* prints text from "print" command to current output unit */
@@ -486,5 +485,35 @@ exec_print(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   int pos = name_list_pos("text", nl);
   if (nl->inform[pos]) fprintf(prt_file,"%s\n", pl->parameters[pos]->string);
+}
+
+void // this function extend print_value from mad_eval.c
+exec_printf(struct in_cmd* cmd)
+{
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct name_list* nl = cmd->clone->par_names;
+
+  // retrieve output format from text=""
+  int txt_pos = name_list_pos("text", nl);
+  if (!nl->inform[txt_pos]) { warning("missing text=:",""); return; }
+  char *txt_str = v_format(pl->parameters[txt_pos]->string);
+
+  // check for value=...
+  int val_pos = name_list_pos("value", nl);
+  if (!nl->inform[val_pos]) { warning("missing value=:",""); return; }
+
+  // retrieve vector of values from value=...
+  int val_n = command_par_vector("value", cmd->clone, NULL);
+  if (val_n < 50) val_n = 50;
+  double val[val_n]; 
+  command_par_vector("value", cmd->clone, val);
+
+  fprintf(prt_file, txt_str,
+    val[ 0], val[ 1], val[ 2], val[ 3], val[ 4], val[ 5], val[ 6], val[ 7], val[ 8], val[ 9],
+    val[10], val[11], val[12], val[13], val[14], val[15], val[16], val[17], val[18], val[19],
+    val[20], val[21], val[22], val[23], val[24], val[25], val[26], val[27], val[28], val[29],
+    val[30], val[31], val[32], val[33], val[34], val[35], val[36], val[37], val[38], val[39],
+    val[40], val[41], val[42], val[43], val[44], val[45], val[46], val[47], val[48], val[49]);
+  fprintf(prt_file, "\n");
 }
 

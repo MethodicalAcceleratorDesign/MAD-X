@@ -83,6 +83,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "option")      == 0) exec_option();
   else if (strcmp(toks[k], "plot")        == 0) exec_plot(cmd);
   else if (strcmp(toks[k], "print")       == 0) exec_print(cmd);
+  else if (strcmp(toks[k], "printf")      == 0) exec_printf(cmd);
   else if (strcmp(toks[k], "quit")        == 0) ;
   else if (strcmp(toks[k], "readtable")   == 0) read_table(cmd);
   else if (strcmp(toks[k], "removefile")  == 0) exec_removefile(cmd);
