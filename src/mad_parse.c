@@ -49,6 +49,8 @@ v_format(char* string)
      replacing  %S, %I, and %F by the user defined formats;
      %NF and %NI are replaced by the field lengths (!) of the defined formats */
 {
+  static char var_form[1000];
+
   char *p, *q = string, *s = string, *t;
   char c;
   *var_form = '\0';
