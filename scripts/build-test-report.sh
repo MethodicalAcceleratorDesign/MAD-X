@@ -14,22 +14,22 @@ while [ "$1" != "" ] ; do
 
 # clean tmp files and remote reports, and exit if not 'force'd to continue
 	if [ "$1" == "clean" -o "$1" == "cleanall" ] ; then
-		clean="$1"
+		clean="clean"
 	fi
 
 # force to build the report even if remote processes are not finished or errors occur
 	if [ "$1" == "force"  ] ; then
-		force="$1"
+		force="force"
 	fi
 
 # force to (re)build the report even if non empty build-test-report.out exists
 	if [ "$1" == "forcereport"  ] ; then
-		forcereport="$1"
+		forcereport="forcereport"
 	fi
 
 # do not send the report by email (for debugging)
 	if [ "$1" == "nomail"  ] ; then
-		nomail="$1"
+		nomail="nomail"
 	fi
 
 	shift
