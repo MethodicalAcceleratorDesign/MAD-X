@@ -83,7 +83,7 @@ build_test_completed ()
 
 build_test_check ()
 {
-	[ "$force" != "force" -a ! build_test_completed "$@" ] && die
+	[ "$force" != "force" ] && build_test_completed "$@" || die
 	return 0
 }
 
