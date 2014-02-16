@@ -76,7 +76,7 @@ build_test_completed ()
 			marker=`perl -ne '/===== End of build and tests =====/ && print "found"' build-test-$arch.out`
 			check_error "unable to search for end marker (perl)"
 		fi
-		[ "$marker" != "found" ] && return 1
+		[ "$marker" != "found" ] && incomplete="incomplete, " && return 1
 	done
 	return 0
 }
@@ -136,9 +136,9 @@ build_test_send ()
 
 	if [ -s build-test-failed.tmp ] ; then
 		count=`wc -l < build-test-failed.tmp`
-		status="failed ($count)"
+		status="${incomplete}failed ($count)"
 	else
-		status="passed"
+		status="${incomplete}passed"
 	fi
 
 	echo "===== Tests $status ====="                                           > build-test-report.out
