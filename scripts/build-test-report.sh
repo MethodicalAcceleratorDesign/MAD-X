@@ -35,6 +35,15 @@ while [ "$1" != "" ] ; do
 	shift
 done
 
+# quit on error if not forced to continue
+die ()
+{
+	[ "$force" != "force" ] && exit 1
+}
+
+# clean all and die
+[ "$clean" == "clean" ] && rm -f build-test-*.tmp build-test-*.out && die
+
 # prevent erasing existing report even with "force", override with "forcereport" (for debugging)
 [ "$forcereport" != "forcereport" -a -s "build-test-report.out" ] && exit
 
@@ -44,12 +53,6 @@ readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
 # readonly olddate=`date -v-50d "+%Y-%m-%d"` 		# macosx
 readonly srvdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
-
-# quit on error if not forced to continue
-die ()
-{
-	[ "$force" != "force" ] && exit 1
-}
 
 # error handler
 check_error ()
@@ -62,9 +65,6 @@ clean_tmp ()
 {
 	rm -f build-test-*.tmp
 }
-
-# clean all and die
-[ "$clean" == "clean" ] && rm -f build-test-*.tmp build-test-*.out && die
 
 # check for completed jobs [lxplus | macosx | win]
 build_test_completed ()
