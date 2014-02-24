@@ -62,7 +62,7 @@ endif()
 set_target_properties(madx PROPERTIES LINKER_LANGUAGE Fortran)
 
 # set library version:
-set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
+set_target_properties(madx     PROPERTIES VERSION ${MADX_VERSION})
 
 # adding an executable:
 if(MADX_BUNDLE)
