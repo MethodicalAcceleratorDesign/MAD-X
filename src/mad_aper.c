@@ -941,8 +941,8 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
            if (strcmp(tmp,"%s") == 0)  {
-           t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
-           strcat(t->s_cols[i][t->curr], ":1");
+              char buf[strlen(cc)+3];
+              t->s_cols[i][t->curr] = tmpbuff(stolower(strcat(strcpy(buf, cc), ":1")));
          }
            else if (strcmp(tmp,"%d") == 0 )
            {
