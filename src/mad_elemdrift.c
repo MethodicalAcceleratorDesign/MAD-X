@@ -29,8 +29,9 @@ add_drifts(struct node* c_node, struct node* end)
   const double tol = 1e-6;
   int cnt; 
   
-  int debug;
+  char buf[256];
 
+  int debug;
   debug = get_option("debug");
 
   if (!c_node) return 0;
@@ -42,7 +43,6 @@ add_drifts(struct node* c_node, struct node* end)
  
     if (drift_len < -tol) {
       // implicit drift with negative length
-      char buf[256];
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
  
       if (debug) {
@@ -66,6 +66,10 @@ add_drifts(struct node* c_node, struct node* end)
     }
     else 
       // length in [-tol, tol], nothing to do (no drift inserted)
+      // 2014-Feb-04  11:52:07  ghislain: tghought of adding a warning that a very short drift was ignored. 
+      // but the number of warnings explodes VERY quicky so leave it out for now.
+      // sprintf(buf, " Length of drift: %e vs. tolerance: %e", drift_len, tol);
+      // warning("Drift length below tolerance level was ignored.", buf);
       (void)0;
   }
 

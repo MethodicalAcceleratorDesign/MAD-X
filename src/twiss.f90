@@ -8,28 +8,32 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use twissotmfi
   use trackfi
   implicit none
+
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
   integer i,ithr_on
-  integer tab_name(*),chrom,summ,eflag,inval,get_option,izero,ione
-  double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6),   &
+  integer tab_name(*),chrom,eflag,inval,get_option,izero,ione
+  double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6), &
        ddisp0(6),r0mat(2,2),zero,one,two,get_value
   integer sector_tab_name(*) ! holds sectormap data
   character(48) charconv
-  parameter(zero=0d0,one=1d0,two=2d0)
+
+  parameter (zero=0d0, one=1d0, two=2d0)
+
   data izero, ione / 0, 1 /
+
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
   chrom=0
-  summ=0
   eflag=0
   inval=0
   ithr_on=0
   fsecarb=.false.
   i = 6
+
   call dzero(orbit0,6)
   call get_node_vector('orbit0 ', i, orbit0)
   call m66one(rt)
@@ -43,6 +47,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   call dzero(disp,6)
   call dzero(ddisp,6)
   call dzero(rmat,4)
+
   betx=zero
   alfx=zero
   amux=zero
@@ -84,31 +89,27 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   sinmuy=zero
   xix=zero
   xiy =zero
+
   !---- Track chromatic functions
   chrom=get_option('twiss_chrom ')
-
-  !---- Create internal table for summary data.
-  summ=get_option('twiss_summ ')
-
+  
+  !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
 
   !---- flags for writing cumulative or lumped matrices
   rmatrix=get_value('twiss ','rmatrix ').ne.zero
   sectormap=get_option('twiss_sector ').ne.zero
-  !---- flag if called from match process
+
   !---- Get circumference
   circ=get_value('probe ','circ ')
-  if(circ.eq.zero)                                                  &
-       call aafail('TWISS: ',                                            &
-       'Zero length sequence.')
+  if (circ.eq.zero) call aafail('TWISS: ', 'Zero length sequence.')
 
   !---- Initial value flag.
   inval=get_option('twiss_inval ')
 
   !---- Initial values from command attributes.
   if (inval.ne.0) then
-
      !     initialize user values
      call twinifun(opt_fun0, rt)
      !---- Get transfer matrix.
@@ -141,16 +142,24 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call twbtin(rt,tt)
      call twchgo
   endif
+
   !---- Print summary
-  if(summ.ne.0) call tw_summ(rt,tt)
+  if(get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
+
   if (get_option('keeporbit ') .ne. 0)  then
      i = 6
      call store_node_vector('orbit0 ', i, opt_fun0(9))
   endif
+
   call set_option('twiss_success ', ione)
   goto 9999
+
 900 call set_option('twiss_success ', izero)
+
 9999 end SUBROUTINE twiss
+
+
+
 SUBROUTINE tmrefe(rt)
 
   implicit none
@@ -508,6 +517,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
      if (eflag.ne.0)  return
+
      !---- Solve for dynamic case.
      if (.not.m66sta(rt)) then
         err = zero
@@ -582,8 +592,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   eflag = 1
 999 end SUBROUTINE tmclor
 
-SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
-     thr_on)
+SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
   use twiss0fi
   use name_lenfi
@@ -635,35 +644,45 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      rep_cnt(j) = 0
      restsum(j) = zero
   enddo
+
   if (thr_on .gt. 0)  then
      call dzero(vector,10)
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
+ 
   betas = get_value('probe ','beta ')
   gammas= get_value('probe ','gamma ')
+
   call dzero(tt,216)
   call m66one(rt)
+
   eflag = 0
   suml = zero
+
   call dcopy(orbit0,orbit,6)
+  
   parvec(5)=get_value('probe ', 'arad ')
-  parvec(6)=get_value('probe ', 'charge ') *                        &
-       get_value('probe ', 'npart ')
-  parvec(7)=get_value('probe ','gamma ')
+  parvec(6)=get_value('probe ', 'charge ') * get_value('probe ', 'npart ')
+  parvec(7)=get_value('probe ', 'gamma ')
   bbd_cnt=0
   bbd_flag=1
-  !---  start
   i_spch=0
 
+  !---  start
   node = restart_sequ()
+
+  ! loop over nodes
 10 continue
   bbd_pos=node
+
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
+
+  if(code.eq.39) code=15 ! tkicker treated as kicker
+  if(code.eq.38) code=24 ! placeholder treated as instrument
+
   if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-     !---  kicker
+     !---  kicker (code 14 to 16: hkicker, kicker, vkicker)
      if (thr_on .gt. 0)  then
         !---  threader is on - keep position,orbit,matrix,and tensor for restart
         if (code .le. ccode) then
@@ -680,29 +699,36 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
         endif
      endif
   endif
+
   el = node_value('l ')
   nobs = node_value('obs_point ')
+
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
+
   !---- Element matrix and length.
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
+  
   if (fmap) then
      !---- call m66mpy(re,rt,rt)
      call tmcat(.true.,re,te,rt,tt,rt,tt)
      suml = suml + el
   endif
+
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
+
   if (kobs.gt.0.and.kobs.eq.nobs) return
+
   if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-     !---  kicker
+     !---  kicker (code 14 to 16)
      if (thr_on .gt. 0)  then
         !---  threader is on
         !---  keep matrix
@@ -720,7 +746,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
         endif
      endif
   elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then
-     !---  monitor
+     !---  monitor (code 17 to 19: hmonitor, monitor, vmonitor)
      enable = node_value('enable ')
      if (save .gt. 0 .and. enable .gt. 0) then
         j = 6
@@ -792,6 +818,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
      endif
   endif
 20 continue
+
   !---- Test for overflow.
   do j = 1, 6
      if (abs(orbit(j)).ge.orb_limit) then
@@ -799,10 +826,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,   &
         return
      endif
   enddo
+
   if (advance_node().ne.0)  then
      node=node+1
-     goto 10
+     goto 10 ! loop over nodes
   endif
+
   bbd_flag=0
 end SUBROUTINE tmfrst
 
@@ -2032,6 +2061,8 @@ SUBROUTINE twbttk(re,te)
   endif
 
 end SUBROUTINE twbttk
+
+
 SUBROUTINE tw_summ(rt,tt)
 
   use twiss0fi
@@ -2179,6 +2210,8 @@ SUBROUTINE tw_summ(rt,tt)
   call double_to_table_curr('summ ','synch_5 ' ,synch_5)
 
 end SUBROUTINE tw_summ
+
+
 SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use name_lenfi
@@ -3091,21 +3124,19 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
      !---- Original setting.
      code = node_value('mad8_type ')
+
      if(code.eq.39) code=15
      if(code.eq.38) code=24
+
      if(code.eq.14) then
-        xkick=bvk*(node_value('kick ')+node_value('chkick ')+         &
-             field(1)/div)
+        xkick=bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
         ykick=zero
      else if(code.eq.15) then
-        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+        &
-             field(1)/div)
-        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+        &
-             field(2)/div)
+        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
+        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
      else if(code.eq.16) then
         xkick=zero
-        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+         &
-             field(2)/div)
+        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
      else
         xkick=zero
         ykick=zero
