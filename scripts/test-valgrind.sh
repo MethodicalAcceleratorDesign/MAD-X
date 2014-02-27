@@ -1,5 +1,5 @@
 # run:
-# sh scripts/test-valgrind.sh [madx]
+# [select='[p-z]'] sh scripts/test-valgrind.sh [madx]
 
 readonly testdir="tests-valgrind"
 readonly summary="valgrind-summary.txt"
@@ -16,15 +16,19 @@ cd $testdir
 echo "moved to `pwd`"
 
 # clean summary, set the date
-echo "tests started at `date`" > $summary
+if [ "$select" == "" ] ; then
+  echo "tests started at `date`" > $summary
+fi
 
 # run all tests with valgrind
-for i in test-*; do
-  echo "running test $i (produce $i.valgrind): `date`"
-  cd $i
-  valgrind -v --leak-check=full --track-origins=yes ../../$madx $i.madx > $i.valgrind 2>&1
-  grep -E "$pattern" $i.valgrind /dev/null >> ../$summary
-  cd ..
+for i in test-${select}*; do
+  if [ "$i" != "test-memory" ] ; then
+    echo "running test $i (produce $i.valgrind): `date`"
+    cd $i
+    valgrind -v --leak-check=full --track-origins=yes ../../$madx $i.madx > $i.valgrind 2>&1
+    grep -E "$pattern" $i.valgrind /dev/null >> ../$summary
+    cd ..
+  fi
 done
 
 cd ..
