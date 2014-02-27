@@ -15,15 +15,11 @@ cd $testdir
 [ "$?" != "0" ] && echo "error: copy 'tests' tree into '$testdir' before running tests with valgrind" && exit 1
 echo "moved to `pwd`"
 
-# clean summary, set the date
-if [ "$select" == "" ] ; then
-  echo "tests started at `date`" > $summary
-fi
-
 # run all tests with valgrind
 for i in test-${select}*; do
   if [ "$i" != "test-memory" ] ; then
-    echo "running test $i (produce $i.valgrind): `date`"
+    echo "*** running test $i (produce $i.valgrind): `date`"
+    echo "*** running test $i (produce $i.valgrind): `date`" >> ../$summary
     cd $i
     valgrind -v --leak-check=full --track-origins=yes ../../$madx $i.madx > $i.valgrind 2>&1
     grep -E "$pattern" $i.valgrind /dev/null >> ../$summary
