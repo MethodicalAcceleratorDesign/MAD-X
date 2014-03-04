@@ -44,6 +44,8 @@ ifneq ($(OSTYPE),Windows)
 
 FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -c
 
+#FFLAGS += -std95 -diag-disable 7342,7346
+
 #
 # options flags
 #
@@ -88,10 +90,7 @@ ifeq ($(OSTYPE),Windows)
 # compiler flags
 #
 
-FFLAGS = /O$(NOPT) /warn:all /warn:nounused /c
-
-# Trig too many warnings for the moment!
-# FFLAGS  = /stand:f95 /warn all /c
+FFLAGS = /O$(NOPT) /stand:f95 /warn:all /warn:nounused /c
 
 #
 # options flags

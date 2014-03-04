@@ -16,11 +16,11 @@ cd $testdir
 echo "moved to `pwd`"
 
 # run all tests with valgrind
-for i in test-${select}*; do
+for i in test-${select}* ; do
   if [ "$i" != "test-memory" ] ; then
+    cd $i
     echo "*** running test $i (produce $i.valgrind): `date`"
     echo "*** running test $i (produce $i.valgrind): `date`" >> ../$summary
-    cd $i
     valgrind -v --leak-check=full --track-origins=yes ../../$madx $i.madx > $i.valgrind 2>&1
     grep -E "$pattern" $i.valgrind /dev/null >> ../$summary
     cd ..
