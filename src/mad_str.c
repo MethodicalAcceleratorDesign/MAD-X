@@ -363,6 +363,15 @@ noquote(char* string)
   return string;
 }
 
+char*
+slash_to_bkslash(char* string)
+{
+#ifdef _WIN32
+  for(char *s=string; s && (s=strchr(s,'/')); *s='\\') ;
+#endif
+  return string;
+}
+
 int
 quote_level(char* string, char* send)
 {
