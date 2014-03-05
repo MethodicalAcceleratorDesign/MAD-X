@@ -33,7 +33,7 @@ endif
 # Libraries on Linux
 
 ifeq ($(OSTYPE),Linux)
-LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -lX11
+LIBS   += $(if $(call eq,$(ARCH),32),$(call libdir,/usr/lib),) -Llib$(ARCH) -lX11
 LDLIBS += -lstdc++ -lm
 endif
 
