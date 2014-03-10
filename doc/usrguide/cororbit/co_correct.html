@@ -10,6 +10,7 @@
 <!-- Changed by: Werner Herr, 22-Oct-2008 -->
 <!-- Changed by: Ghislain Roy, 2013-06-26 -->
 <!-- Changed by: Ghislain Roy, 2014-01-06 -->
+<!-- Changed by: Ghislain Roy, 2014-03-03 -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -147,11 +148,14 @@ limited, only a warning is printed !
 <br>
 Default: 1.0 mrad.
 <br><br>
-<li>TWORING: When true, the correction will be done on two rings at once using [TO BE COMPLETED]
+<li>TWORING: When true, the correction will be done on two rings at once. The only correction mode available in this case is MICADO. The parameter ORBIT=table is ignored and BEAM1TAB=table and BEAM2TAB=table are used instead.  
 <br>Default: false
 <br><br>
 <li>UNITS: when this parameter is set the value is a multiplier [TO BE COMPLETED] 
-<br>(default unknown)
+<br>(default: 1)
+<br><br>
+<li> ERROR=real: specifies the maximum RMS value of the orbit to be reached by the correction algorithm. The value is specified in meters, e.g. ERROR=1.e-3 for a 1mm RMS target value. <br> Default: 1.e-5 m 
+</ul>
 <br><br>
 Normally the last active table provides the orbit to be 
 corrected and the model for the correction.
@@ -160,27 +164,26 @@ Optionally, these tables can be given names like in:
 TWISS, TABLE=name; (see documentation on TWISS command).
 To use these named tables, one of the following optional parameters must be 
 used:
-
+<ul>
 <li>ORBIT=table: When this parameter is given, the orbit to be corrected
 is taken from the named table given as argument. The default is the last (named or
 unnamed) Twiss table.
-
+<br><br>
 <li>BEAM1TAB=table, BEAM2TAB=table: When TWORING is specified, ORBIT should not be specified and replaced BEAM1TAB and BEAM2TAB 
 giving as arguments the names of tables containing the orbits to be corrected.
-
+<br><br>
 <li>MODEL=table: When this parameter is given, the model for the correction
 is taken from a named Twiss table. The default is the last (named or
 unnamed) Twiss table.
-
+<br><br>
 <li>TARGET=table: When this parameter is given, the correction is made to
 a named target orbit, pre-computed with a TWISS command. Default
 is correction to the zero orbit.
-
+<br><br>
 <li>EXTERN (default: false): When false, the ORBIT and TARGET table are assumed to be computed by MAD with a previous twiss command. 
 When set to true, that option allows to use twiss tables imported from an external file (with the readmytable command), 
 for example to use measured BPM data. In that case, the imported twiss table is allowed to contain coordinate data only at the location 
 of the monitors.
-
 </ul>
 
 Example of use of CORRECT to reproduce a measured orbit:

@@ -167,6 +167,44 @@ can be edited with the help of a
 <a href="special.html#macro">macro statement</a>.
 For more details, see there.
 <p>
+<li><h4><a name=print>PRINTF</a></h4>
+<pre>
+printf, text = "string", value = expr{,expr};
+</pre>
+prints the numerical values specified in the value field, formatted according to
+the string format provided in the text field, to the current output file. <p>
+The string format can take numeric C or MAD format specifiers for double real values; 
+integer and string formats are not supported.<p> 
+The maximum number of values that can be printed in one
+statement is limited to 100. <p>
+If the number of format specifiers given in the string is higher 
+than the number of values in the value field, undefined values are printed 
+where they are not explicitly provided. 
+If the number of format specifiers given in the string is lower 
+than the number of values in the value field, the values that 
+do not correspond to a format specifier are ignored. 
+<p>
+Example:
+<pre>
+a = 1.2; b = 3.4/0.3; c := 0.8*a/b;
+printf, text = "String with floats a=%f, b=%.3g, text and MAD float c=%F;", 
+        value = a, b, c;
+printf, text = "More specifiers than values: %f, %.3g, %F", value = a, b;
+printf, text = "More values than specifiers: %f, %.3g"    , value = a, b, c;
+</pre>
+produces the following output:
+<pre>
+String with floats a=1.200000, b=11.3, text and MAD float c=     0.08470588235;
+More specifiers than values: 1.200000, 11.3,   6.953222976e-310
+More values than specifiers: 1.200000, 11.3
+</pre>
+<p>
+Note that printf, like print, produces output that cannot be read back
+by MAD-X. For output that can be read back by MAD-X, use the command
+VALUE or TFS tables.<p>
+Note also that a percent sign (%) can be printed using the format text="%%".
+
+<p>
 <li><h4><a name=quit>QUIT</a></h4>
 <pre>
 quit;
