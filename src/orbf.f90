@@ -1,3 +1,4 @@
+
 subroutine setup(resp,a,im,ic,nm,nc)
     ! ****************************************************
     !                                                    *
@@ -261,7 +262,9 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
                                 write(*,*) 'dependent pair: ',i,j,jj,rat
                                 write(65,*) 'dependent pair: ',i,j,jj,rat
                             endif
-                            if(iflag.lt.(ic*ic*ic)) then
+                            ! Ghislain : was  "if(iflag.lt.(ic*ic*ic)) then"
+                            ! triggered a bug on MICADO with ncond=1
+                            if(iflag.lt.ic) then
                                 iflag = iflag + 1
                                 sing(1,iflag) =  j - 1
                                 sing(2,iflag) = jj - 1
@@ -411,7 +414,6 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
                                 write(65,*) 'dependent pair: ',j,jj,rat
                             endif
 
-                            ! Ghislain : warning compare this line with equivalent  if(iflag.lt.(ic*ic*ic)) then
                             if(iflag.lt.ic) then
                                 iflag = iflag + 1
                                 sing(1,iflag) =  j - 1
