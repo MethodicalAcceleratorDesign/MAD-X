@@ -43,24 +43,14 @@ select, flag=seqedit, class=MCBYH;
 select, flag=seqedit, class=MCBYV;
 select, flag=seqedit, class=MCBWH;
 select, flag=seqedit, class=MCBWV;
-seqedit, sequence=lhcb1;
-remove, element=selected;
-seqedit, sequence=lhcb2;
-remove, element=selected;
-endedit;
-
-select, flag=seqedit, clear;
 select, flag=seqedit, class=MBXWH;
 select, flag=seqedit, class=MBXWS;
 select, flag=seqedit, class=MBXWT;
 select, flag=seqedit, class=MBAW;
 select, flag=seqedit, class=MBLW;
 select, flag=seqedit, class=MBWMD;
+
 seqedit, sequence=lhcb1;
-remove, element=selected;
-seqedit, sequence=lhcb1;
-remove, element=selected;
-seqedit, sequence=lhcb2;
 remove, element=selected;
 seqedit, sequence=lhcb2;
 remove, element=selected;
@@ -74,6 +64,7 @@ ealign, dy:=0.100e-3, dx:=0.070e-3;
 Select, flag=ERROR, clear;
 Select, flag=ERROR, range=MQXA.1R5;
 ealign, dy:=0.050e-3, dx:=0.035e-3;
+
 Use, period=lhcb1;
 Select, flag=ERROR, clear;
 Select, flag=ERROR, range=MQXA.1L1;
@@ -123,59 +114,27 @@ ealign, dy:=0.050e-3, dx:=0.035e-3;
  USEKICK,RANGE=mcbxh.2l5, status=ON;
  USEKICK,RANGE=mcbxh.1l5, status=ON;
  USEKICK,RANGE=mcbxh.1r5, status=ON;
+ 
+on_x1 = 0.0; on_x2 = 0.0; on_x5 = 0.0; on_x8 = 0.0;
+on_sep1 = 0.0; on_sep2 = 0.0; on_sep5 = 0.0; on_sep8 = 0.0;
+on_alice = 0.0; on_lhcb = 0.0;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 
 // calculate TWISS table for correction, beam 1 
-on_x1 = 0.0;
-on_x2 = 0.0;
-on_x5 = 0.0;
-on_x8 = 0.0;
-on_sep1 = 0.0;
-on_sep2 = 0.0;
-on_sep5 = 0.0;
-on_sep8 = 0.0;
-on_alice = 0.0;
-on_lhcb = 0.0;
-select, flag=twiss, clear;
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 TWISS,table=twb1,sequence=lhcb1;
-!plot,table=twb1,title="Orbit ..L1..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
-
-coption,print=1;
-!CORRECT, FLAG=ring,
-!         MODE=micado,cond=0,NCORR=  1,ERROR=1E-6,PLANE=y,
-!         mlist='my1.tab',clist='cy1.tab', RESOUT=1,corzero=1;
-
-USEKICK,RANGE=mcbxv.1l5, status=ON;
 
 // calculate TWISS table for correction, beam 2 
-on_x1 = 0.0;
-on_x2 = 0.0;
-on_x5 = 0.0;
-on_x8 = 0.0;
-on_sep1 = 0.0;
-on_sep2 = 0.0;
-on_sep5 = 0.0;
-on_sep8 = 0.0;
-on_alice = 0.0;
-on_lhcb = 0.0;
-select, flag=twiss, clear;
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 TWISS,table=twb2,sequence=lhcb2;
-!plot,table=twb2,title="Orbit ..L2..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
 
+Coption,print=1;
 CORRECT, FLAG=ring,
-         tworing,beam1tab=twb1,beam2tab=twb2,
-         MODE=micado,cond=0,NCORR=  4,ERROR=1E-6,PLANE=x,
-         mlist='mx12.tab',clist='cx12.tab', RESOUT=1,corzero=1;
+         tworing, beam1tab=twb1, beam2tab=twb2,
+         MODE=micado, cond=0, NCORR= 4, ERROR=1E-6, PLANE=x,
+         mlist='mx12.tab', clist='cx12.tab', RESOUT=1, CORZERO=1;
 
-select, flag=twiss, clear;
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
-TWISS,sequence=lhcb1;
-!plot,title="Orbit ..L1..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
-
-select, flag=twiss, clear;
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
-TWISS,sequence=lhcb2;
-!plot,title="Orbit ..L2..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
+TWISS, file=resultb1, sequence=lhcb1;
+TWISS, file=resultb2, sequence=lhcb2;
 
 removefile, file='fort.61';
