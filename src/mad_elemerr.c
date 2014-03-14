@@ -253,11 +253,14 @@ error_ealign(struct in_cmd* cmd)
       nextnode = nextnode->next;
   }  /* end of loop over all nodes */
   if(chcount[0] != 0)
-  fprintf(prt_file, "Assigned alignment errors to %d elements\n",chcount[0]);
+    if (get_option("info"))
+      fprintf(prt_file, "Assigned alignment errors to %d elements\n",chcount[0]);
   if(chcount[1] != 0)
-  fprintf(prt_file, "Replaced alignment errors for %d elements\n",chcount[1]);
+    if (get_option("info"))
+      fprintf(prt_file, "Replaced alignment errors for %d elements\n",chcount[1]);
   if(chcount[2] != 0)
-  fprintf(prt_file, "Added alignment errors to %d elements\n",chcount[2]);
+    if (get_option("info"))
+      fprintf(prt_file, "Added alignment errors to %d elements\n",chcount[2]);
 
 }
 
