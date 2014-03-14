@@ -34,7 +34,6 @@ particle #     9 lost turn      1  at pos. s =      1.00 element=qd             
 *****  end of trrun  *****
 exit TRACK module
 
-Assigned alignment errors to 1 elements
 enter TRACK module
 one pass is on
 aperture tracking is on

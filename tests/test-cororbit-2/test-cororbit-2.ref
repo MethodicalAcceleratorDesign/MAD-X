@@ -121,14 +121,12 @@ Select, flag=ERROR, range=MQXA.1L1;
 
 ealign, dy:=0.100e-3, dx:=0.070e-3;
 
-Assigned alignment errors to 1 elements
 Select, flag=ERROR, clear;
 
 Select, flag=ERROR, range=MQXA.1R5;
 
 ealign, dy:=0.050e-3, dx:=0.035e-3;
 
-Assigned alignment errors to 1 elements
 
 
 Use, period=lhcb1;
@@ -139,14 +137,12 @@ Select, flag=ERROR, range=MQXA.1L1;
 
 ealign, dy:=0.100e-3, dx:=0.070e-3;
 
-Assigned alignment errors to 1 elements
 Select, flag=ERROR, clear;
 
 Select, flag=ERROR, range=MQXA.1R5;
 
 ealign, dy:=0.050e-3, dx:=0.035e-3;
 
-Assigned alignment errors to 1 elements
 
 
 // enable only MCBX at Q1
