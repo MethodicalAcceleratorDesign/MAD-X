@@ -2,6 +2,7 @@
 !Option,  warn,info,echo,thin_foc=false;
 Option,  warn,info,echo;
 
+System,"rm -rf temp";
 System,"mkdir temp";
 
 Title, "LHC 6.5 thin lens lattice with errors and correction using MADX";
