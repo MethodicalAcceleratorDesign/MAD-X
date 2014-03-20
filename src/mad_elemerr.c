@@ -679,11 +679,14 @@ error_efcomp(struct in_cmd* cmd)
     nextnode = nextnode->next;
   }      /* end of loop over all nodes */
   if(chcount[0] != 0)
-    fprintf(prt_file, "Assigned field errors to %d elements\n",chcount[0]);
+    if (get_option("info"))
+      fprintf(prt_file, "Assigned field errors to %d elements\n",chcount[0]);
   if(chcount[1] != 0)
-    fprintf(prt_file, "Replaced field errors for %d elements\n",chcount[1]);
+    if (get_option("info"))
+      fprintf(prt_file, "Replaced field errors for %d elements\n",chcount[1]);
   if(chcount[2] != 0)
-    fprintf(prt_file, "Added field errors to %d elements\n",chcount[2]);
+    if (get_option("info"))
+      fprintf(prt_file, "Added field errors to %d elements\n",chcount[2]);
   //  myfree(rout_name, nvec);
 }
 

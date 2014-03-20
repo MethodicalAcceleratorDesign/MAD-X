@@ -206,14 +206,6 @@ option, -echo;
 
 option,-echo,-info;
 
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
-Assigned field errors to 154 elements
 
 
 select, flag=twiss, clear;
