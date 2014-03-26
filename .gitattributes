@@ -1094,6 +1094,11 @@ tests/share/PSBooster/psb.ele -text
 tests/share/PSBooster/psb_extraction.str -text
 tests/share/PSBooster/psb_new.seq -text
 tests/share/RHIC/rhic.madx -text
+tests/share/SPS/SPS_simple.seq -text
+tests/share/SPS/elements.str -text
+tests/share/SPS/lhc_newwp_2010.str -text
+tests/share/SPS/sps2010.ele -text
+tests/share/SPS/sps2010.seq -text
 tests/share/TransferLines/TI8/TI8.seq -text
 tests/share/fivecell/fivecell.seq -text
 tests/share/line_lattice/README -text
