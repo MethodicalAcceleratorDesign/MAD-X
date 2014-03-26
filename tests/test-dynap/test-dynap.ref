@@ -2096,6 +2096,8 @@ removefile, file="temp.bb.install";
 
 seqedit,sequence=lhcb1;
 
+flatten;
+
 cycle,start=ip1;
 
 endedit;

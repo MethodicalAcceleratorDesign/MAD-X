@@ -1,0 +1,113 @@
+Title, "test sequence expansions";
+
+Option, warn, echo, info;
+Beam, particle = proton, energy = 450.0;
+
+OMK : MARKER;
+QF  : QUADRUPOLE, L=1;
+QD  : QUADRUPOLE, L=2;
+INS : INSTRUMENT, L=0;
+
+LS1    = 10;
+refIP1 =  1;
+
+SHARED S1 : SEQUENCE, refer = EXIT, REFPOS = S11, L = LS1, AT=1., FROM=IP1;
+  IP1:OMK,  AT= refIP1;
+  QF,       AT= 2.,    from= IP1;
+  S11:INS,  AT= 4;
+  QD, 	    AT= 5.,    from= QF;
+ENDSEQUENCE;
+
+INT : INSTRUMENT, L=0;
+
+LS2    = 10;
+refIP2 = 10;
+
+SHARED S2 : SEQUENCE, refer = ENTRY, REFPOS = S12, L = LS2;
+  QF,        AT= 1.; 
+  S12:INT,   AT= 4.;
+  QD, 	     AT= 2. , from= S12;
+  IP2:OMK,   AT= refIP2;
+ENDSEQUENCE;
+
+LS3     = 10;
+refIP3  = 5;
+
+SHARED S3 : SEQUENCE, refer = ENTRY, REFPOS = S13, L = LS3;
+  QF,        AT= 1.; 
+  IP3:OMK,   AT= refIP3;
+  S13:INT,   AT= 6.;
+  QD, 	     AT= 2. , from= S13;
+ENDSEQUENCE;
+
+LS4    = 12.;
+refIP4 =  1.;
+
+SHARED S4 : SEQUENCE, refer = CENTRE, REFPOS = S14, L = LS4;
+  IP4:OMK,  AT= refIP4;
+  QF,       AT= 2.,    from= IP4;
+  S14:INS,  AT= 4;
+  QD, 	    AT= 5.,    from= QF;
+ENDSEQUENCE;
+
+FULL : SEQUENCE, refer = ENTRY, L = 150;
+  S1, AT= 10;
+  MK1: OMK, AT=22;
+  S4, AT= 5, FROM=MK1;
+  S2, AT= 50;
+  MK2: OMK, AT=60, FROM=MK1;
+  S3, AT= 6, FROM=MK2;
+  S1, AT= 120;
+ENDSEQUENCE;
+
+select, flag=survey, clear;
+select, flag=survey, column=name,s,l;
+
+Option, debug;
+Use, sequence=S1;
+!Survey, file=s1.survey;
+Use, sequence=S2;
+!Survey, file=s2.survey;
+Use, sequence=S3;
+!Survey, file=s3.survey;
+Use, sequence=S4;
+!Survey, file=s4.survey;
+Use, sequence=FULL;
+Survey, file=full.survey;
+
+LS5 = 20.;
+refIP5 = 2;
+
+SHARED S5 : SEQUENCE, refer = CENTRE, REFPOS = IP5, L = LS5; 
+   IP5: OMK, AT = refIP5;
+   S1, AT = 5., FROM = IP5;
+   QF, AT = 15;   
+ENDSEQUENCE;
+
+LS6 = 30.;
+SHARED S6 : SEQUENCE, refer = CENTRE, REFPOS = IP6, L = LS6;
+   IP6: OMK, AT = 2;
+   S5, AT = 5., FROM = IP6;
+   QD, AT = 29;
+ENDSEQUENCE;
+
+RECURS : SEQUENCE, refer = ENTRY, L = 100;
+  S1, AT= 10;
+  MKR: OMK, AT=22;
+  S5, AT = 5, FROM=MKR;
+  S6, AT = 45, FROM=MKR;
+ENDSEQUENCE;
+
+select, flag=survey, clear;
+select, flag=survey, column=name,s,l;
+
+Option, debug;
+Use, sequence=S5;
+!Survey, file=s5.survey;
+Use, sequence=S6;
+!Survey, file=s6.survey;
+Use, sequence=RECURS;
+Survey, file=recurs.survey;
+
+exit;
+

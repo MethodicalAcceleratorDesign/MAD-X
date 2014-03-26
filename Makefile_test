@@ -58,7 +58,7 @@ test-ptc-twiss-5D test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl tes
 test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
-test-sequence test-sequence-2 test-sequence-3
+test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5
 
 # same order as tests-all, tests that take +10s
 # to know the timing: make tests-all TIMER=time (on Unixes)

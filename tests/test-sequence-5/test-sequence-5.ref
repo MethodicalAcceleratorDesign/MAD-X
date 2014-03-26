@@ -1,0 +1,1149 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.00  (64 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2014.03.05      +
+  + Execution Time Stamp: 26.03.14 13.30.41 +
+  +++++++++++++++++++++++++++++++++++++++++++
+Title, "test sequence expansions";
+
+
+
+Option, warn, echo, info;
+
+Beam, particle = proton, energy = 450.0;
+
+
+
+OMK : MARKER;
+
+QF  : QUADRUPOLE, L=1;
+
+QD  : QUADRUPOLE, L=2;
+
+INS : INSTRUMENT, L=0;
+
+
+
+LS1    = 10;
+
+refIP1 =  1;
+
+
+
+SHARED S1 : SEQUENCE, refer = EXIT, REFPOS = S11, L = LS1, AT=1., FROM=IP1;
+
+  IP1:OMK,  AT= refIP1;
+
+  QF,       AT= 2.,    from= IP1;
+
+  S11:INS,  AT= 4;
+
+  QD, 	    AT= 5.,    from= QF;
+
+ENDSEQUENCE;
+
+
+
+INT : INSTRUMENT, L=0;
+
+
+
+LS2    = 10;
+
+refIP2 = 10;
+
+
+
+SHARED S2 : SEQUENCE, refer = ENTRY, REFPOS = S12, L = LS2;
+
+  QF,        AT= 1.; 
+
+  S12:INT,   AT= 4.;
+
+  QD, 	     AT= 2. , from= S12;
+
+  IP2:OMK,   AT= refIP2;
+
+ENDSEQUENCE;
+
+
+
+LS3     = 10;
+
+refIP3  = 5;
+
+
+
+SHARED S3 : SEQUENCE, refer = ENTRY, REFPOS = S13, L = LS3;
+
+  QF,        AT= 1.; 
+
+  IP3:OMK,   AT= refIP3;
+
+  S13:INT,   AT= 6.;
+
+  QD, 	     AT= 2. , from= S13;
+
+ENDSEQUENCE;
+
+
+
+LS4    = 12.;
+
+refIP4 =  1.;
+
+
+
+SHARED S4 : SEQUENCE, refer = CENTRE, REFPOS = S14, L = LS4;
+
+  IP4:OMK,  AT= refIP4;
+
+  QF,       AT= 2.,    from= IP4;
+
+  S14:INS,  AT= 4;
+
+  QD, 	    AT= 5.,    from= QF;
+
+ENDSEQUENCE;
+
+
+
+FULL : SEQUENCE, refer = ENTRY, L = 150;
+
+  S1, AT= 10;
+
+  MK1: OMK, AT=22;
+
+  S4, AT= 5, FROM=MK1;
+
+  S2, AT= 50;
+
+  MK2: OMK, AT=60, FROM=MK1;
+
+  S3, AT= 6, FROM=MK2;
+
+  S1, AT= 120;
+
+ENDSEQUENCE;
+
+
+
+select, flag=survey, clear;
+
+select, flag=survey, column=name,s,l;
+
+
+
+Option, debug;
+
+Use, sequence=S1;
+
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+
+
+TOP Expand_sequence name s1 with length 1.000000e+01, ref_flag -1
+inserting a drift of length 1.000000e+00 at position 5.000000e-01 
+ 
+inserting a drift of length 1.000000e+00 at position 1.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 3.500000e+00 
+ 
+inserting a drift of length 1.500000e+00 at position 4.750000e+00 
+ 
+inserting a drift of length 2.500000e+00 at position 8.750000e+00 
+ 
+!Survey, file=s1.survey;
+
+Use, sequence=S2;
+
+   in get_node_pos: name: s2$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s2$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qf, pos: 1.000000e+00, fact: 5.000000e-01, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: qd, pos: 2.000000e+00, fact: 5.000000e-01, length: 2.000000e+00, from_name: s12
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+	 in get_node_pos: name: qd, from: 4.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: ip2, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip2, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s2$end, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s2$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+
+
+TOP Expand_sequence name s2 with length 1.000000e+01, ref_flag 1
+inserting a drift of length 1.000000e+00 at position 5.000000e-01 
+ 
+inserting a drift of length 2.000000e+00 at position 3.000000e+00 
+ 
+inserting a drift of length 2.000000e+00 at position 5.000000e+00 
+ 
+inserting a drift of length 2.000000e+00 at position 9.000000e+00 
+ 
+!Survey, file=s2.survey;
+
+Use, sequence=S3;
+
+   in get_node_pos: name: s3$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s3$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qf, pos: 1.000000e+00, fact: 5.000000e-01, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: ip3, pos: 5.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip3, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+   in get_node_pos: name: qd, pos: 2.000000e+00, fact: 5.000000e-01, length: 2.000000e+00, from_name: s13
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+	 in get_node_pos: name: qd, from: 6.000000e+00			  ---> final pos: 9.000000e+00 
+   in get_node_pos: name: s3$end, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s3$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+
+
+TOP Expand_sequence name s3 with length 1.000000e+01, ref_flag 1
+inserting a drift of length 1.000000e+00 at position 5.000000e-01 
+ 
+inserting a drift of length 3.000000e+00 at position 3.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 5.500000e+00 
+ 
+inserting a drift of length 2.000000e+00 at position 7.000000e+00 
+ 
+!Survey, file=s3.survey;
+
+Use, sequence=S4;
+
+   in get_node_pos: name: s4$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s4$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: ip4
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 3.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: ip4
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 3.000000e+00 
+	 in get_node_pos: name: qd, from: 3.000000e+00			  ---> final pos: 8.000000e+00 
+   in get_node_pos: name: s4$end, pos: 1.200000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s4$end, from: 0.000000e+00			  ---> final pos: 1.200000e+01 
+
+
+TOP Expand_sequence name s4 with length 1.200000e+01, ref_flag 0
+inserting a drift of length 1.000000e+00 at position 5.000000e-01 
+ 
+inserting a drift of length 1.500000e+00 at position 1.750000e+00 
+ 
+inserting a drift of length 5.000000e-01 at position 3.750000e+00 
+ 
+inserting a drift of length 3.000000e+00 at position 5.500000e+00 
+ 
+inserting a drift of length 3.000000e+00 at position 1.050000e+01 
+ 
+!Survey, file=s4.survey;
+
+Use, sequence=FULL;
+
+   in get_node_pos: name: full$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: full$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: (null), pos: 1.000000e+01, fact: 5.000000e-01, length: 1.000000e+01, from_name: (null)
+	 in get_node_pos: name: (null), from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: mk1, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mk1, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 5.000000e-01, length: 1.200000e+01, from_name: mk1
+   in get_node_pos: name: mk1, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mk1, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+	 in get_node_pos: name: (null), from: 2.200000e+01			  ---> final pos: 3.300000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+01, fact: 5.000000e-01, length: 1.000000e+01, from_name: (null)
+	 in get_node_pos: name: (null), from: 0.000000e+00			  ---> final pos: 5.500000e+01 
+   in get_node_pos: name: mk2, pos: 6.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: mk1
+   in get_node_pos: name: mk1, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mk1, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+	 in get_node_pos: name: mk2, from: 2.200000e+01			  ---> final pos: 8.200000e+01 
+   in get_node_pos: name: (null), pos: 6.000000e+00, fact: 5.000000e-01, length: 1.000000e+01, from_name: mk2
+   in get_node_pos: name: mk2, pos: 6.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: mk1
+   in get_node_pos: name: mk1, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mk1, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+	 in get_node_pos: name: mk2, from: 2.200000e+01			  ---> final pos: 8.200000e+01 
+	 in get_node_pos: name: (null), from: 8.200000e+01			  ---> final pos: 9.300000e+01 
+   in get_node_pos: name: (null), pos: 1.200000e+02, fact: 5.000000e-01, length: 1.000000e+01, from_name: (null)
+	 in get_node_pos: name: (null), from: 0.000000e+00			  ---> final pos: 1.250000e+02 
+   in get_node_pos: name: full$end, pos: 1.500000e+02, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: full$end, from: 0.000000e+00			  ---> final pos: 1.500000e+02 
+
+
+TOP Expand_sequence name full with length 1.500000e+02, ref_flag 1
+
+
+ Expand sub-sequence s1:1 with initial position 1.500000e+01, final position 1.000000e+01, length 1.000000e+01, ref_flag 1, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 1.000000e+01
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 1.000000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 6.000000e+00 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 1.000000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 7.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 1.000000e+01 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 8.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 1.000000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 1.000000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 1.000000e+01 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 1.250000e+01 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 1.000000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 1.600000e+01 
+
+
+
+
+ Expand sub-sequence s4:1 with initial position 3.300000e+01, final position 2.700000e+01, length 1.200000e+01, ref_flag 1, refpos 's14'
+
+ Entering expand_node with node->name: s4:1 and position 2.700000e+01
+   in get_node_pos: name: s4$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s4$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s4$start at position 2.700000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 2.300000e+01 
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip4 at position 2.700000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 2.400000e+01 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: ip4
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 3.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 2.700000e+01 + get_node_pos 3.000000e+00 - get_refpos 4.000000e+00 = p->position 2.600000e+01 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s14 at position 2.700000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 2.700000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: ip4
+   in get_node_pos: name: ip4, pos: 1.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip4, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 3.000000e+00 
+	 in get_node_pos: name: qd, from: 3.000000e+00			  ---> final pos: 8.000000e+00 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 2.700000e+01 + get_node_pos 8.000000e+00 - get_refpos 4.000000e+00 = p->position 3.100000e+01 
+   in get_node_pos: name: s4$end, pos: 1.200000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s4$end, from: 0.000000e+00			  ---> final pos: 1.200000e+01 
+   in get_node_pos: name: s14, pos: 4.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s14, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s4$end at position 2.700000e+01 + get_node_pos 1.200000e+01 - get_refpos 4.000000e+00 = p->position 3.500000e+01 
+
+
+
+
+ Expand sub-sequence s2:1 with initial position 5.500000e+01, final position 5.000000e+01, length 1.000000e+01, ref_flag 1, refpos 's12'
+
+ Entering expand_node with node->name: s2:1 and position 5.000000e+01
+   in get_node_pos: name: s2$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s2$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s2$start at position 5.000000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 4.600000e+01 
+   in get_node_pos: name: qf, pos: 1.000000e+00, fact: 5.000000e-01, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 5.000000e+01 + get_node_pos 1.500000e+00 - get_refpos 4.000000e+00 = p->position 4.750000e+01 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s12 at position 5.000000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 5.000000e+01 
+   in get_node_pos: name: qd, pos: 2.000000e+00, fact: 5.000000e-01, length: 2.000000e+00, from_name: s12
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+	 in get_node_pos: name: qd, from: 4.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 5.000000e+01 + get_node_pos 7.000000e+00 - get_refpos 4.000000e+00 = p->position 5.300000e+01 
+   in get_node_pos: name: ip2, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip2, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip2 at position 5.000000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 5.600000e+01 
+   in get_node_pos: name: s2$end, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s2$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s12, pos: 4.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s12, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s2$end at position 5.000000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 5.600000e+01 
+
+
+
+
+ Expand sub-sequence s3:1 with initial position 9.300000e+01, final position 8.800000e+01, length 1.000000e+01, ref_flag 1, refpos 's13'
+
+ Entering expand_node with node->name: s3:1 and position 8.800000e+01
+   in get_node_pos: name: s3$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s3$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem_name s3$start at position 8.800000e+01 + get_node_pos 0.000000e+00 - get_refpos 6.000000e+00 = p->position 8.200000e+01 
+   in get_node_pos: name: qf, pos: 1.000000e+00, fact: 5.000000e-01, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem name qf at position 8.800000e+01 + get_node_pos 1.500000e+00 - get_refpos 6.000000e+00 = p->position 8.350000e+01 
+   in get_node_pos: name: ip3, pos: 5.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip3, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem name ip3 at position 8.800000e+01 + get_node_pos 5.000000e+00 - get_refpos 6.000000e+00 = p->position 8.700000e+01 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem name s13 at position 8.800000e+01 + get_node_pos 6.000000e+00 - get_refpos 6.000000e+00 = p->position 8.800000e+01 
+   in get_node_pos: name: qd, pos: 2.000000e+00, fact: 5.000000e-01, length: 2.000000e+00, from_name: s13
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+	 in get_node_pos: name: qd, from: 6.000000e+00			  ---> final pos: 9.000000e+00 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem name qd at position 8.800000e+01 + get_node_pos 9.000000e+00 - get_refpos 6.000000e+00 = p->position 9.100000e+01 
+   in get_node_pos: name: s3$end, pos: 1.000000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s3$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s13, pos: 6.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s13, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+  elem name s3$end at position 8.800000e+01 + get_node_pos 1.000000e+01 - get_refpos 6.000000e+00 = p->position 9.200000e+01 
+
+
+
+
+ Expand sub-sequence s1:2 with initial position 1.250000e+02, final position 1.200000e+02, length 1.000000e+01, ref_flag 1, refpos 's11'
+
+ Entering expand_node with node->name: s1:2 and position 1.200000e+02
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 1.200000e+02 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 1.160000e+02 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 1.200000e+02 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 1.170000e+02 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 1.200000e+02 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 1.185000e+02 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 1.200000e+02 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 1.200000e+02 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 1.200000e+02 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 1.225000e+02 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 1.200000e+02 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 1.260000e+02 
+
+
+inserting a drift of length 6.000000e+00 at position 3.000000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 6.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 7.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 9.500000e+00 
+ 
+inserting a drift of length 1.500000e+00 at position 1.075000e+01 
+ 
+inserting a drift of length 2.500000e+00 at position 1.475000e+01 
+ 
+inserting a drift of length 6.000000e+00 at position 1.900000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 2.250000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 2.350000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 2.475000e+01 
+ 
+inserting a drift of length 5.000000e-01 at position 2.675000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 2.850000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 3.350000e+01 
+ 
+inserting a drift of length 1.100000e+01 at position 4.050000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 4.650000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 4.900000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 5.100000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 5.500000e+01 
+ 
+inserting a drift of length 2.600000e+01 at position 6.900000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 8.250000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 8.550000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 8.750000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 8.900000e+01 
+ 
+inserting a drift of length 2.400000e+01 at position 1.040000e+02 
+ 
+inserting a drift of length 1.000000e+00 at position 1.165000e+02 
+ 
+inserting a drift of length 1.000000e+00 at position 1.175000e+02 
+ 
+inserting a drift of length 1.000000e+00 at position 1.195000e+02 
+ 
+inserting a drift of length 1.500000e+00 at position 1.207500e+02 
+ 
+inserting a drift of length 2.500000e+00 at position 1.247500e+02 
+ 
+inserting a drift of length 2.400000e+01 at position 1.380000e+02 
+ 
+Survey, file=full.survey;
+
+
+
+LS5 = 20.;
+
+refIP5 = 2;
+
+
+
+SHARED S5 : SEQUENCE, refer = CENTRE, REFPOS = IP5, L = LS5; 
+
+   IP5: OMK, AT = refIP5;
+
+   S1, AT = 5., FROM = IP5;
+
+   QF, AT = 15;   
+
+ENDSEQUENCE;
+
+
+
+LS6 = 30.;
+
+SHARED S6 : SEQUENCE, refer = CENTRE, REFPOS = IP6, L = LS6;
+
+   IP6: OMK, AT = 2;
+
+   S5, AT = 5., FROM = IP6;
+
+   QD, AT = 29;
+
+ENDSEQUENCE;
+
+
+
+RECURS : SEQUENCE, refer = ENTRY, L = 100;
+
+  S1, AT= 10;
+
+  MKR: OMK, AT=22;
+
+  S5, AT = 5, FROM=MKR;
+
+  S6, AT = 45, FROM=MKR;
+
+ENDSEQUENCE;
+
+
+
+select, flag=survey, clear;
+
+select, flag=survey, column=name,s,l;
+
+
+
+Option, debug;
+
+Use, sequence=S5;
+
+   in get_node_pos: name: s5$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 1.000000e+01, from_name: ip5
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: qf, pos: 1.500000e+01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: s5$end, pos: 2.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$end, from: 0.000000e+00			  ---> final pos: 2.000000e+01 
+
+
+TOP Expand_sequence name s5 with length 2.000000e+01, ref_flag 0
+
+
+ Expand sub-sequence s1:1 with initial position 7.000000e+00, final position 7.000000e+00, length 1.000000e+01, ref_flag 0, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 7.000000e+00
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 7.000000e+00 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 3.000000e+00 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 7.000000e+00 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 4.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 7.000000e+00 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 5.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 7.000000e+00 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 7.000000e+00 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 7.000000e+00 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 9.500000e+00 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 7.000000e+00 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 1.300000e+01 
+
+
+inserting a drift of length 2.000000e+00 at position 1.000000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 2.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 3.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 4.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 6.500000e+00 
+ 
+inserting a drift of length 1.500000e+00 at position 7.750000e+00 
+ 
+inserting a drift of length 2.500000e+00 at position 1.175000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 1.375000e+01 
+ 
+inserting a drift of length 4.500000e+00 at position 1.775000e+01 
+ 
+!Survey, file=s5.survey;
+
+Use, sequence=S6;
+
+   in get_node_pos: name: s6$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s6$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+01, from_name: ip6
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: qd, pos: 2.900000e+01, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: qd, from: 0.000000e+00			  ---> final pos: 2.900000e+01 
+   in get_node_pos: name: s6$end, pos: 3.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s6$end, from: 0.000000e+00			  ---> final pos: 3.000000e+01 
+
+
+TOP Expand_sequence name s6 with length 3.000000e+01, ref_flag 0
+
+
+ Expand sub-sequence s5:1 with initial position 7.000000e+00, final position 7.000000e+00, length 2.000000e+01, ref_flag 0, refpos 'ip5'
+
+ Entering expand_node with node->name: s5:1 and position 7.000000e+00
+   in get_node_pos: name: s5$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem_name s5$start at position 7.000000e+00 + get_node_pos 0.000000e+00 - get_refpos 2.000000e+00 = p->position 5.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name ip5 at position 7.000000e+00 + get_node_pos 2.000000e+00 - get_refpos 2.000000e+00 = p->position 7.000000e+00 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 1.000000e+01, from_name: ip5
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name (null) at position 7.000000e+00 + get_node_pos 7.000000e+00 - get_refpos 2.000000e+00 = p->position 1.200000e+01 
+
+
+ Recursively expand sub-sequence s1:1 with initial position 1.200000e+01, final position 1.200000e+01, length 1.000000e+01, ref_flag 0, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 1.200000e+01
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 1.200000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 8.000000e+00 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 1.200000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 9.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 1.200000e+01 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 1.050000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 1.200000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 1.200000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 1.200000e+01 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 1.450000e+01 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 1.200000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 1.800000e+01 
+
+
+   in get_node_pos: name: qf, pos: 1.500000e+01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name qf at position 7.000000e+00 + get_node_pos 1.500000e+01 - get_refpos 2.000000e+00 = p->position 2.000000e+01 
+   in get_node_pos: name: s5$end, pos: 2.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$end, from: 0.000000e+00			  ---> final pos: 2.000000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name s5$end at position 7.000000e+00 + get_node_pos 2.000000e+01 - get_refpos 2.000000e+00 = p->position 2.500000e+01 
+
+
+inserting a drift of length 2.000000e+00 at position 1.000000e+00 
+ 
+inserting a drift of length 3.000000e+00 at position 3.500000e+00 
+ 
+inserting a drift of length 2.000000e+00 at position 6.000000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 7.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 8.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 9.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 1.150000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 1.275000e+01 
+ 
+inserting a drift of length 2.500000e+00 at position 1.675000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 1.875000e+01 
+ 
+inserting a drift of length 4.500000e+00 at position 2.275000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 2.650000e+01 
+ 
+!Survey, file=s6.survey;
+
+Use, sequence=RECURS;
+
+   in get_node_pos: name: recurs$start, pos: 0.000000e+00, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: recurs$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: (null), pos: 1.000000e+01, fact: 5.000000e-01, length: 1.000000e+01, from_name: (null)
+	 in get_node_pos: name: (null), from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: mkr, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mkr, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 5.000000e-01, length: 2.000000e+01, from_name: mkr
+   in get_node_pos: name: mkr, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mkr, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+	 in get_node_pos: name: (null), from: 2.200000e+01			  ---> final pos: 3.700000e+01 
+   in get_node_pos: name: (null), pos: 4.500000e+01, fact: 5.000000e-01, length: 3.000000e+01, from_name: mkr
+   in get_node_pos: name: mkr, pos: 2.200000e+01, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mkr, from: 0.000000e+00			  ---> final pos: 2.200000e+01 
+	 in get_node_pos: name: (null), from: 2.200000e+01			  ---> final pos: 8.200000e+01 
+   in get_node_pos: name: recurs$end, pos: 1.000000e+02, fact: 5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: recurs$end, from: 0.000000e+00			  ---> final pos: 1.000000e+02 
+
+
+TOP Expand_sequence name recurs with length 1.000000e+02, ref_flag 1
+
+
+ Expand sub-sequence s1:1 with initial position 1.500000e+01, final position 1.000000e+01, length 1.000000e+01, ref_flag 1, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 1.000000e+01
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 1.000000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 6.000000e+00 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 1.000000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 7.000000e+00 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 1.000000e+01 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 8.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 1.000000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 1.000000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 1.000000e+01 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 1.250000e+01 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 1.000000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 1.600000e+01 
+
+
+
+
+ Expand sub-sequence s5:1 with initial position 3.700000e+01, final position 2.700000e+01, length 2.000000e+01, ref_flag 1, refpos 'ip5'
+
+ Entering expand_node with node->name: s5:1 and position 2.700000e+01
+   in get_node_pos: name: s5$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem_name s5$start at position 2.700000e+01 + get_node_pos 0.000000e+00 - get_refpos 2.000000e+00 = p->position 2.500000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name ip5 at position 2.700000e+01 + get_node_pos 2.000000e+00 - get_refpos 2.000000e+00 = p->position 2.700000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 1.000000e+01, from_name: ip5
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name (null) at position 2.700000e+01 + get_node_pos 7.000000e+00 - get_refpos 2.000000e+00 = p->position 3.200000e+01 
+
+
+ Recursively expand sub-sequence s1:1 with initial position 3.200000e+01, final position 3.200000e+01, length 1.000000e+01, ref_flag 0, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 3.200000e+01
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 3.200000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 2.800000e+01 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 3.200000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 2.900000e+01 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 3.200000e+01 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 3.050000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 3.200000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 3.200000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 3.200000e+01 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 3.450000e+01 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 3.200000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 3.800000e+01 
+
+
+   in get_node_pos: name: qf, pos: 1.500000e+01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name qf at position 2.700000e+01 + get_node_pos 1.500000e+01 - get_refpos 2.000000e+00 = p->position 4.000000e+01 
+   in get_node_pos: name: s5$end, pos: 2.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$end, from: 0.000000e+00			  ---> final pos: 2.000000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name s5$end at position 2.700000e+01 + get_node_pos 2.000000e+01 - get_refpos 2.000000e+00 = p->position 4.500000e+01 
+
+
+
+
+ Expand sub-sequence s6:1 with initial position 8.200000e+01, final position 6.700000e+01, length 3.000000e+01, ref_flag 1, refpos 'ip6'
+
+ Entering expand_node with node->name: s6:1 and position 6.700000e+01
+   in get_node_pos: name: s6$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s6$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem_name s6$start at position 6.700000e+01 + get_node_pos 0.000000e+00 - get_refpos 2.000000e+00 = p->position 6.500000e+01 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name ip6 at position 6.700000e+01 + get_node_pos 2.000000e+00 - get_refpos 2.000000e+00 = p->position 6.700000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+01, from_name: ip6
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name (null) at position 6.700000e+01 + get_node_pos 7.000000e+00 - get_refpos 2.000000e+00 = p->position 7.200000e+01 
+
+
+ Recursively expand sub-sequence s5:1 with initial position 7.200000e+01, final position 7.200000e+01, length 2.000000e+01, ref_flag 0, refpos 'ip5'
+
+ Entering expand_node with node->name: s5:1 and position 7.200000e+01
+   in get_node_pos: name: s5$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem_name s5$start at position 7.200000e+01 + get_node_pos 0.000000e+00 - get_refpos 2.000000e+00 = p->position 7.000000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name ip5 at position 7.200000e+01 + get_node_pos 2.000000e+00 - get_refpos 2.000000e+00 = p->position 7.200000e+01 
+   in get_node_pos: name: (null), pos: 5.000000e+00, fact: 0.000000e+00, length: 1.000000e+01, from_name: ip5
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+	 in get_node_pos: name: (null), from: 2.000000e+00			  ---> final pos: 7.000000e+00 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name (null) at position 7.200000e+01 + get_node_pos 7.000000e+00 - get_refpos 2.000000e+00 = p->position 7.700000e+01 
+
+
+ Recursively expand sub-sequence s1:1 with initial position 7.700000e+01, final position 7.700000e+01, length 1.000000e+01, ref_flag 0, refpos 's11'
+
+ Entering expand_node with node->name: s1:1 and position 7.700000e+01
+   in get_node_pos: name: s1$start, pos: 0.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem_name s1$start at position 7.700000e+01 + get_node_pos 0.000000e+00 - get_refpos 4.000000e+00 = p->position 7.300000e+01 
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name ip1 at position 7.700000e+01 + get_node_pos 1.000000e+00 - get_refpos 4.000000e+00 = p->position 7.400000e+01 
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qf at position 7.700000e+01 + get_node_pos 2.500000e+00 - get_refpos 4.000000e+00 = p->position 7.550000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s11 at position 7.700000e+01 + get_node_pos 4.000000e+00 - get_refpos 4.000000e+00 = p->position 7.700000e+01 
+   in get_node_pos: name: qd, pos: 5.000000e+00, fact: -5.000000e-01, length: 2.000000e+00, from_name: qf
+   in get_node_pos: name: qf, pos: 2.000000e+00, fact: -5.000000e-01, length: 1.000000e+00, from_name: ip1
+   in get_node_pos: name: ip1, pos: 1.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip1, from: 0.000000e+00			  ---> final pos: 1.000000e+00 
+	 in get_node_pos: name: qf, from: 1.000000e+00			  ---> final pos: 2.500000e+00 
+	 in get_node_pos: name: qd, from: 2.500000e+00			  ---> final pos: 6.500000e+00 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name qd at position 7.700000e+01 + get_node_pos 6.500000e+00 - get_refpos 4.000000e+00 = p->position 7.950000e+01 
+   in get_node_pos: name: s1$end, pos: 1.000000e+01, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s1$end, from: 0.000000e+00			  ---> final pos: 1.000000e+01 
+   in get_node_pos: name: s11, pos: 4.000000e+00, fact: -5.000000e-01, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s11, from: 0.000000e+00			  ---> final pos: 4.000000e+00 
+  elem name s1$end at position 7.700000e+01 + get_node_pos 1.000000e+01 - get_refpos 4.000000e+00 = p->position 8.300000e+01 
+
+
+   in get_node_pos: name: qf, pos: 1.500000e+01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf, from: 0.000000e+00			  ---> final pos: 1.500000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name qf at position 7.200000e+01 + get_node_pos 1.500000e+01 - get_refpos 2.000000e+00 = p->position 8.500000e+01 
+   in get_node_pos: name: s5$end, pos: 2.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s5$end, from: 0.000000e+00			  ---> final pos: 2.000000e+01 
+   in get_node_pos: name: ip5, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip5, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name s5$end at position 7.200000e+01 + get_node_pos 2.000000e+01 - get_refpos 2.000000e+00 = p->position 9.000000e+01 
+
+
+   in get_node_pos: name: qd, pos: 2.900000e+01, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: qd, from: 0.000000e+00			  ---> final pos: 2.900000e+01 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name qd at position 6.700000e+01 + get_node_pos 2.900000e+01 - get_refpos 2.000000e+00 = p->position 9.400000e+01 
+   in get_node_pos: name: s6$end, pos: 3.000000e+01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: s6$end, from: 0.000000e+00			  ---> final pos: 3.000000e+01 
+   in get_node_pos: name: ip6, pos: 2.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ip6, from: 0.000000e+00			  ---> final pos: 2.000000e+00 
+  elem name s6$end at position 6.700000e+01 + get_node_pos 3.000000e+01 - get_refpos 2.000000e+00 = p->position 9.500000e+01 
+
+
+inserting a drift of length 6.000000e+00 at position 3.000000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 6.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 7.500000e+00 
+ 
+inserting a drift of length 1.000000e+00 at position 9.500000e+00 
+ 
+inserting a drift of length 1.500000e+00 at position 1.075000e+01 
+ 
+inserting a drift of length 2.500000e+00 at position 1.475000e+01 
+ 
+inserting a drift of length 6.000000e+00 at position 1.900000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 2.350000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 2.600000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 2.750000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 2.850000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 2.950000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 3.150000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 3.275000e+01 
+ 
+inserting a drift of length 2.500000e+00 at position 3.675000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 3.875000e+01 
+ 
+inserting a drift of length 4.500000e+00 at position 4.275000e+01 
+ 
+inserting a drift of length 2.000000e+01 at position 5.500000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 6.600000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 6.850000e+01 
+ 
+inserting a drift of length 2.000000e+00 at position 7.100000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 7.250000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 7.350000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 7.450000e+01 
+ 
+inserting a drift of length 1.000000e+00 at position 7.650000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 7.775000e+01 
+ 
+inserting a drift of length 2.500000e+00 at position 8.175000e+01 
+ 
+inserting a drift of length 1.500000e+00 at position 8.375000e+01 
+ 
+inserting a drift of length 4.500000e+00 at position 8.775000e+01 
+ 
+inserting a drift of length 3.000000e+00 at position 9.150000e+01 
+ 
+inserting a drift of length 5.000000e+00 at position 9.750000e+01 
+ 
+Survey, file=recurs.survey;
+
+
+
+exit;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.00 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

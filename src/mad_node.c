@@ -173,13 +173,15 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   int i;
   (void)sequ;
 
+  double node_pos, refpos;
+
   int debug;
   debug=get_option("debug");
 
   p = clone_node(q, 0);
   
   if (debug) 
-    printf("\n Entering expand_node with p->name: %s and position %e\n",p->name,position); 
+    printf("\n Entering expand_node with node->name: %s and position %e\n",node->name,position); 
 
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
     i = add_to_name_list(p->p_elem->name, 1, occ_list);
@@ -188,12 +190,16 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   add_to_node_list(p, 0, top_sequ->ex_nodes);
   p->previous = node->previous;
   p->previous->next = p;
-  p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
 
-  if (debug) 
-    printf("elem_name at position + get_node_pos - get_refpos = p->position : \n\t %s: %e + %e - %e = %e \n",
-	   p->p_elem->name, position, get_node_pos(p, nodesequ), get_refpos(nodesequ), p->position); 
-  
+  if (debug) {
+    node_pos = get_node_pos(p, nodesequ);
+    refpos = get_refpos(nodesequ);
+    p->position = position + node_pos - refpos;    
+    printf("  elem_name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
+	   p->p_elem->name, position, node_pos, refpos, p->position); 
+  } else
+    p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
+
   while (p != NULL) {
     if (q == nodesequ->end) break;
 
@@ -206,16 +212,37 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
     p = p->next;
     q = q->next;
 
-    p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
+    if (debug) {
+      node_pos = get_node_pos(p, nodesequ);
+      refpos = get_refpos(nodesequ);
+      p->position = position + node_pos - refpos;    
+      printf("  elem name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
+	     p->p_elem->name, position, node_pos, refpos, p->position); 
+    } else
+      p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
+    
 
-    if (debug) printf("in loop elem name at position + get_node_pos - get_refpos = p->position : \n %s: %e + %e - %e = %e\n",
-		      p->p_elem->name, position, get_node_pos(p, nodesequ), get_refpos(nodesequ), p->position); 
-
-    if (p->p_sequ != NULL) 
-      p = expand_node(p, top_sequ, p->p_sequ, p->position);
-    else {
+    if (p->p_sequ == NULL){ // simple element, not a subsequence 
       p->share = top_sequ->share;
       add_to_node_list(p, 0, top_sequ->ex_nodes);
+    } 
+
+    else { // subsequence
+      if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
+	if (debug) 
+	  printf("\n\n Recursively expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
+		 p->name, p->position, p->position - nodesequ->ref_flag*p->p_sequ->length/2., 
+		 p->length, nodesequ->ref_flag, p->p_sequ->refpos);	
+	p = expand_node(p, top_sequ, p->p_sequ, p->position - nodesequ->ref_flag*p->p_sequ->length/2. );
+	if (debug) printf("\n\n");
+      } 
+      else { // no REFPOS given
+	if (debug) 
+	  printf("\n\n Recursively expand sub_sequence  %s with position %e, length %e, ref_flag %d\n",
+		 p->name, p->position, p->length, sequ->ref_flag);
+	p = expand_node(p, top_sequ, p->p_sequ, p->position);
+	if (debug) printf("\n\n");
+      }
     }
   }
 
@@ -253,6 +280,26 @@ get_node_pos(struct node* node, struct sequence* sequ)
 
   return pos;
 }
+
+double
+get_refpos(struct sequence* sequ)
+  /* returns the position of a refpos element of a sequence, or the sequence half-length */
+{
+  int i;
+  if (sequ != NULL && sequ->refpos != NULL) { 
+    sprintf(c_dum->c, "%s:1", sequ->refpos);
+    if ((i = name_list_pos(c_dum->c, sequ->nodes->list)) < 0)
+      fatal_error("'refpos' reference to unknown element:", sequ->refpos);
+    return get_node_pos(sequ->nodes->nodes[i], sequ);
+  }
+
+  /* 2013-Jul-19  20:54:49  ghislain: if no element was specified for the refpos, 
+     the ref position has to be the middle of the sequence and get_refpos should 
+     therefore return half the sequence length. (TRAC ticket #206) */ 
+  // else return zero;
+  else return sequ->length/2.;
+}
+
 
 double
 node_value(char* par)

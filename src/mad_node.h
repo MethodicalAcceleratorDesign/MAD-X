@@ -84,6 +84,7 @@ struct node*      delete_node_ring(struct node*);
 void              add_to_node_list(struct node*, int inf, struct node_list*);
 
 double  get_node_pos(struct node*, struct sequence*); /* recursive */
+double  get_refpos(struct sequence* sequ);
 double  hidden_node_pos(char* name, struct sequence*);
 void    link_in_front(struct node*, struct node* el);
 void    resequence_nodes(struct sequence*);

@@ -129,19 +129,23 @@ all_node_pos(struct sequence* sequ)
   /* calculates all node positions in an expanded sequence */
 {
   struct node* node = sequ->start;
-  while (node != NULL)
-  {
+
+  while (node != NULL) {
     if (node->p_elem != NULL)
       node->length = node->p_elem->length
-        = element_value(node, "l");
+                   = element_value(node, "l");
     else if (node->p_sequ != NULL)
       node->length = sequence_length(node->p_sequ);
     else fatal_error("node is neither element nor sequence:",
                      node->name);
-    // 2014-Mar-19  16:27:15  ghislain: assumes that the sequence is circular!!!!
-    // this conflicts with the insertion of sequences where a refpos is given
-    if ((node->position = get_node_pos(node, sequ)) < zero)
-      node->position += sequence_length(sequ);
+
+    // 2014-Mar-19  16:27:15  ghislain: 
+    // The following assumes that the sequence is circular!!!!
+    // this also conflicts with the insertion of sequences where a refpos is given.
+    //if ((node->position = get_node_pos(node, sequ)) < zero) 
+    //  node->position += sequence_length(sequ);
+    node->position = get_node_pos(node, sequ);
+
     if (node == sequ->end) break;
     node = node->next;
   }
@@ -180,7 +184,11 @@ extract_sequence(char* name, struct sequence* sequ, struct node* from, struct no
   end_value = get_node_pos(to, sequ);
   current_sequ->l_expr = NULL;
   current_sequ->length = end_value - start_value;
+
+  // 2014-Mar-21  20:42:19  ghislain: 
+  // this might be dangerous for non-circular sequences!!!
   if (current_sequ->length < zero) current_sequ->length += sequ->length;
+
   marker_pos = name_list_pos("marker", defined_commands->list);
   clone = clone_command(defined_commands->commands[marker_pos]);
   sprintf(c_dum->c, "%s$start", name);
@@ -469,7 +477,9 @@ expand_sequence(struct sequence* sequ, int flag)
      this is needed for SXF input  */
   struct node *p, *q = sequ->start;
 
-  if (get_option("debug")) 
+  int debug=get_option("debug");
+
+  if (debug) 
     printf("\n\nTOP Expand_sequence name %s with length %e, ref_flag %d\n",
 	   sequ->name, sequ->length, sequ->ref_flag);
 
@@ -486,26 +496,21 @@ expand_sequence(struct sequence* sequ, int flag)
     if (p->p_sequ == NULL) // simple element, not a subsequence
       add_to_node_list(p, 0, sequ->ex_nodes);
 
-    else { // this element is a subsequence
-      if (p->p_sequ->refpos != NULL) { 
-	if (get_option("debug")) 
-	  printf("\n\n Calling expand_node for name %s with position %e, length %e, ref_flag %d, refpos '%s'\n",
-	  	 p->name, p->position, p->length, sequ->ref_flag, p->p_sequ->refpos);	
-	p = expand_node(p, sequ, sequ, p->position);
-	
-	// REFPOS is given, we ignore the REFER directive and expand the sequence with 
-	// position relocated at the start of the sequence.
-	// printf("\n\nExpand_sequence name %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
-	//       p->name, p->position, p->position + sequ->ref_flag*p->p_sequ->length, 
-	//	 p->length, sequ->ref_flag, p->p_sequ->refpos);	
-	// p = expand_node(p, sequ, sequ, p->position + sequ->ref_flag*p->p_sequ->length );
+    else { // subsequence
+      if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
+	if (debug) 
+	  printf("\n\n Expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
+		 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2., 
+		 p->length, sequ->ref_flag, p->p_sequ->refpos);	
+	p = expand_node(p, sequ, sequ, p->position - sequ->ref_flag*p->p_sequ->length/2. );
+	if (debug) printf("\n\n");
       } 
-      else { 
-	// no REFPOS for this subsequence; we expand with reference to the center of the sequence
-	if (get_option("debug")) 
-	  printf("\n\n Calling expand_node for name %s with position %e, length %e, ref_flag %d, no refpos\n",
+      else { // no REFPOS given
+	if (debug) 
+	  printf("\n\n Expand sub-sequence %s with position %e, length %e, ref_flag %d\n",
 		 p->name, p->position, p->length, sequ->ref_flag);
 	p = expand_node(p, sequ, sequ, p->position);
+	if (debug) printf("\n\n");
       }
     }
   }
@@ -1319,7 +1324,8 @@ use_sequ(struct in_cmd* cmd)
 
   if (nl->inform[pos]) {  /* parameter has been read */
     if (current_range != NULL) {
-      myfree(rout_name, current_range); current_range = NULL;
+      myfree(rout_name, current_range); 
+      current_range = NULL;
     }
 
     name = pl->parameters[pos]->string;
@@ -1875,6 +1881,7 @@ expand_curr_sequ(int flag)
   const char *rout_name = "expand_curr_sequ";
   struct node* c_node;
   int j;
+
   current_sequ->end->at_value = current_sequ->end->position = sequence_length(current_sequ);
 
   if (current_sequ->ex_start != NULL) {

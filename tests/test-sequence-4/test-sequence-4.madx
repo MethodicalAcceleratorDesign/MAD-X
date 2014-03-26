@@ -1,0 +1,90 @@
+
+BEAM, PARTICLE = proton, PC = 450;
+
+option, -echo;
+CALL, FILE = "../share/SPS/sps2010.ele";
+CALL, FILE = "../share/SPS/sps2010.seq";
+CALL, FILE = "../share/SPS/lhc_newwp_2010.str" ; 
+CALL, FILE = "../share/SPS/elements.str" ;
+option, echo, info, warn;
+
+QF.60010.E:MARKER;
+QDA.61910.S:MARKER;
+REFPOINT: MARKER;
+
+SEQEDIT, SEQUENCE = SPS; 
+	INSTALL, ELEMENT = QF.60010.E,  AT = 5759.5865,      FROM = BEGI.10010;
+	INSTALL, ELEMENT = QDA.61910.S, AT = QDA.61910->L/2, FROM = QDA.61910;
+	INSTALL, ELEMENT = REFPOINT,    AT = qf.60010->L/2,  FROM = qf.60010;
+	FLATTEN; 
+ENDEDIT;
+
+// ------------- extract LSS6 ---------------------
+
+EXTRACT, SEQUENCE=SPS, FROM=QF.60010.E, TO=QDA.61910.S, NEWNAME=SPS6, REFPOS=REFPOINT; 
+
+sps6length = QDA.61910.S->at - QF.60010.E->at;
+VALUE, sps6length;
+
+refpointpos = REFPOINT->AT - QF.60010.E->AT;
+value, refpointpos;
+
+// ------------- combine with TI 2 -----------------
+
+option, -echo;
+CALL, FILE='../share/TransferLines/TI2/TI2.seq';
+CALL, FILE='../share/TransferLines/TI2/TI2.str'; 
+option, echo, info, warn;
+
+TI2.END: marker;
+TI2.START: marker;
+
+Seqedit, sequence=TI2;
+   Install, element=ti2.start, at=0, from=TI2$START;
+   Install, element=ti2.end, at=0, from=TI2$END;
+   Flatten;
+endedit;
+
+ti2length = TI2.END->AT-TI2.START->at; // reference ti2length =  3188.384281;
+VALUE, ti2length;
+
+LFULL = ti2length + sps6length + 0.00457; //=  3188.384281 + 611.3944 + 0.00457     
+value, lfull;
+
+all: SEQUENCE, refer=entry,  L= LFULL; 
+     sps6,    at= refpointpos;
+     ti2,     at= sps6length+0.00457;       
+ENDSEQUENCE;
+
+!all: SEQUENCE, refer=centre,  L= LFULL; ! should be identical
+!     sps6,    at= refpointpos;
+!     ti2,     at= sps6length+ti2length/2.+0.00457;       
+!ENDSEQUENCE;
+
+!all: SEQUENCE, refer=exit,  L= LFULL; ! should be identical
+!     sps6,    at= refpointpos;
+!     ti2,     at= sps6length+ti2length+0.00457;       
+!ENDSEQUENCE;
+
+SEQEDIT, SEQUENCE=all;
+	FLATTEN; 
+ENDEDIT;
+
+! Now calculate the twiss functions at reference place in SPS
+USE,     SEQUENCE=sps; 
+SAVEBETA, LABEL = QF.60010.BETA, PLACE = QF.60010.E;
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,mux,muy;
+TWISS, SAVE; 
+QF.60010.BETA->mux = 0.0;
+QF.60010.BETA->muy = 0.0;
+
+! Now calculate the twiss functions through extraction and TI2
+OPTION, DEBUG;
+USE,     SEQUENCE=all;
+SURVEY, FILE="all_survey";
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,mux,muy;
+TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
+
+stop;
