@@ -1,8 +1,20 @@
+LOGICAL FUNCTION  is_thin()
+  double precision node_value, el
+  el = node_value('l ')
+  is_thin = el.eq.0d0;
+END FUNCTION is_thin
+
 LOGICAL FUNCTION  is_drift()
   double precision node_value, code
   code = node_value('mad8_type ')
   is_drift = code.eq.1;
 END FUNCTION is_drift
+
+LOGICAL FUNCTION  is_dipole()
+  double precision node_value, code
+  code = node_value('mad8_type ')
+  is_dipole = code.eq.3;
+END FUNCTION is_dipole
 
 LOGICAL FUNCTION  is_matrix()
   double precision node_value, code
@@ -15,12 +27,6 @@ LOGICAL FUNCTION  is_quad()
   code = node_value('mad8_type ')
   is_quad = code.eq.5;
 END FUNCTION is_quad
-
-LOGICAL FUNCTION  is_thin()
-  double precision node_value, el
-  el = node_value('l ')
-  is_thin = el.eq.0d0;
-END FUNCTION is_thin
 
 subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
@@ -118,7 +124,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        dy_start,    dpy_start / 1d0, 1d0, 0d0, 0d0,        &
        0d0, 0d0, 0d0, 0d0, 0d0, 0d0 /
 
-  logical is_drift, is_thin, is_quad, is_matrix
+  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
@@ -460,7 +466,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         l_buf(nlm+1) = el
         !hbu get current node name
         call element_name(el_name,len(el_name))
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            sum = node_value('name ')
@@ -965,9 +971,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !---- Make sure that nothing is executed if element is not known
   go to 500
   !
-  !---- Bending magnet. OBSOLETE, to be kept for go to
+  !---- Bending magnet.
+  !---- AL: use thick-dipole element
 20 continue  ! RBEND
 30 continue  ! SBEND
+  call tttdipole(track,ktrack)
   go to 500
   !---- Arbitrary matrix. OBSOLETE, to be kept for go to
 40 continue
@@ -3797,7 +3805,7 @@ subroutine trclor(switch,orbit0)
 
   double precision cotol, err
 
-  logical is_drift, is_thin, is_quad, is_matrix
+  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   print *," "
   !      print *," AK special version 2007/12/13"
@@ -3897,7 +3905,7 @@ subroutine trclor(switch,orbit0)
      if(code.eq.38) code=24
      el      = node_value('l ')
      if (itra .eq. 1)  then
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            print*," "
