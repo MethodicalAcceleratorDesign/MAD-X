@@ -65,7 +65,9 @@ Further attributes of the TWISS statements are:
    \item FILE: If FILE="file\_name" appears MAD-X writes a full TFS
      Twiss table \href{../Introduction/select.html#tfs}{Example TFS
        Twiss table} on the disk file "file\_name". FILE alone is
-     equivalent to FILE="twiss":  
+     equivalent to FILE="twiss".\\
+     The columns of the table can be selected using the \tt{SELECT}
+     command with the \tt{flag=''twiss''} attribute. 
 
    \item TABLE (overrides SAVE): MAD-X creates a full
      \href{../Introduction/tables.html#linear}{Twiss table} in
@@ -76,7 +78,16 @@ Further attributes of the TWISS statements are:
      functions for all positions. An important new feature of MAD-X
      is the possibility to access entries of tables and in
      particular the twiss table (see
-     \href{../Introduction/expression.html#table}{table access}).    
+     \href{../Introduction/expression.html#table}{table access}).\\
+     If the TABLE option is given the selection of column names via the
+     \tt{SELECT} command is ignored. Hence if both \tt{TABLE} and
+     \tt{FILE} options are given, the table written to file is the full
+     twiss table, containing all elements as rows and all known twiss 
+     parameters as columns. 
+
+   \item NOTABLE: This flag prevents the creation of the internal Twiss
+     table. Consequently no output file can be created either.  \\ 
+     (Default: NOTABLE=false)
 
    \item CENTRE: This flag enforces the calculation of the
      \href{../Introduction/tables.html#linear}{linear lattice
@@ -129,10 +140,10 @@ Further attributes of the TWISS statements are:
      can be calculated with the
      \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command.    
 
-   \item RIPKEN: This flags will calculate the Ripken-Mais TWISS
+   \item RIPKEN: This flag will calculate the Ripken-Mais TWISS
      parameters (beta11, beta12, beta21, beta22, alfa11, alfa12,
      alfa21, alfa22, gama11, gamma12, gamm21 and gamm22) using
-     betx, bety, alfx, alfy, gamax, gamay, R11, r12, R21 and R22 as
+     betx, bety, alfx, alfy, gamax, gamay, R11, R12, R21 and R22 as
      input.  
 
 \end{itemize}
@@ -325,9 +336,193 @@ INITIAL: BETA0, BETX=BX0,ALFX=0.0,MUX=0.0,BETY=BY0,ALFY=0.0,DX=DX0,DPX=0.0;
 TWISS,BETX=INITIAL-$>$BETY,BETY=INITIAL-$>$BETX;
 \end{verbatim}
 
-%\line(1,0){300}
 
-%\href{http://cern.ch/Frank.Schmidt/frs_sign.html}{frs}, 06-Apr-2003. Revised in February 2007. 
 
-\input{Introduction/sectormap}
-\input{threader/threader}
+%\input{Introduction/sectormap}
+\subsection{Sectormap output}
+\label{subsec:sectormap}
+% Begin New version: Jean-Luc Nougaret, 18-Dec-2008 
+
+The flag "sectormap" on the Twiss command (together with an element
+selection via select,flag=sectormap,...) causes a file "sectormap" to be
+written.   
+
+For each user-selected element, it contains the user-selected coefficients of the kick vector 
+\texttt{K} (6 values), of the first-order map 
+\texttt{R} (6 x 6 values) and of the second-order map 
+\texttt{T} (6 x 6 x 6 values)
+
+The sector file is the output of a standard TFS table, which means that
+the set of columns of interest may be selected through a SELECT command
+as in the following example:  
+
+
+\begin{verbatim}
+select, flag=my_sect_table, column=name, pos, k1, r11, r66, t111;
+\end{verbatim}
+
+
+The sectormap file contains for each selected element, one element per line, the
+set of chosen K, R, and T matrix coefficients: 
+\\
+\\
+\begin{tabular}{l|l|l}
+@ NAME &              \%13s &  "MY\_SECT\_TABLE" \\ 
+@ TYPE &              \%09s &  "SECTORMAP" \\ 
+@ TITLE &             \%08s &  "no-title" \\ 
+@ ORIGIN &           \%19s &  "MAD-X 3.04.62 Linux" \\ 
+@ DATE &              \%08s &  "18/12/08" \\ 
+@ TIME &              \%08s &  "10.33.58"
+\end{tabular}
+\\
+\\
+\begin{tabular}{l | l | l | l | l | l }
+* NAME & POS & K1 & R11 & R66 & T111 \\ 
+\$ \%s & \%le & \%le & \%le  & \%le & \%le \\ 
+ "FIVECELL\$START"  & 0 & 0 & 1 & 1 & 0 \\ 
+ "SEQSTART"  & 0 &  0  &  1 &  1  &  0 \\ 
+ "QF.1"  & 3.1 & -1.305314637e-05 & 1.042224745 & 1 & 0 \\ 
+ "DRIFT\_0" & 3.265 & 7.451656548e-21 & 1 & 1 & 0 \\ 
+ "MSCBH" & 4.365 & -1.686090613e-15 & 0.9999972755 & 1 & 0.006004411526 \\ 
+ "CBH.1" & 4.365 & 0 & 1 & 1 & 0 \\ 
+ "DRIFT\_1" & 5.519992305 & -6.675347543e-21 & 1 & 1 & 0 \\ 
+ "MB" & 19.72000769 & 2.566889547e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_2" & 21.17999231 & -1.757758802e-20 & 1 & 1 & 0 \\ 
+ "MB" & 35.38000769 & 2.822705549e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_2" & 36.83999231 & 2.480880093e-20 & 1 & 1 & 0 \\ 
+ "MB" & 51.04000769 & 3.006954115e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_3" & 52.21 & -4.886652187e-20 & 1 & 1 & 0 \\ 
+... & ... & ... & ... & ... & ... \\ 
+... & ... & ... & ... & ... & ... \\ 
+... & ... & ... & ... & ... & ...
+\end{tabular}
+\\
+\\ 
+Of course, the \texttt{select} statement can be combined with additional
+options to filter-out the list of elements, such as in the following
+statement, which for instance only retains drift-type elements:  
+
+\begin{verbatim}
+select, flag=my_sect_table, class=drift, column=name, pos, k1, r11, r66, t111;
+\end{verbatim}
+
+
+
+\texttt{K} coefficients range: 
+\texttt{K1}... 
+\texttt{K6}
+
+
+\texttt{R} coefficients range: 
+\\
+\begin{tabular}{ccc}
+\texttt{R11} & ... & \texttt{R61} \\ 
+\texttt{R12} & ... & \texttt{R62} \\ 
+... & ... & ... \\ 
+\texttt{R61} & ... & \texttt{R66}
+\end{tabular}
+
+
+\texttt{T} coefficients range: 
+\\
+\begin{tabular}{ccc}
+\texttt{T111} & ... &\texttt{T611} \\ 
+\texttt{T121} & ... & \texttt{T621} \\ 
+... & ... & ... \\ 
+\texttt{T161} & ... & \texttt{T661} \\ 
+\texttt{T112} & ... & \texttt{T612} \\ 
+... & ... & ... \\ 
+\texttt{T166} & ... & \texttt{T666}
+\end{tabular}
+
+ In the above notation, 
+\texttt{Rij} stands for "effect on the 
+\texttt{i}-th coordinate of the 
+\texttt{j}-th coordinate in phase-space", whereas 
+\texttt{Tijk} stands for "combined effect on the 
+\texttt{i}-th coordinate of both the 
+\texttt{j}-th and 
+\texttt{k}-th coordinates in phase-space" along the lattice. 
+% End New Version 
+
+%  Commented by jluc, on 18 December 2008
+% The flag "sectormap" on the Twiss command (together with an element
+% selection via select,flag=sectormap,...) causes a file "sectormap" to
+% be written. This is a fixed format file; per selected element it
+% contains:
+% 
+% <pre>
+% end_position   element_name
+% kick vector (6 values)
+% first order map (6 lines with 6 values each), column-wise
+% second order map (36 lines with 6 columns each, column-column-wise)
+% </pre>
+% 
+% Or more explicitly:
+% 
+% <pre>
+% The first line is:
+% K[1] ... K[6]
+% 
+% Then: 
+% R[1,1] ... R[6,1]
+% R[1,2] ... R[6,2]
+% ...
+% R[1,6] ... R[6,6]
+% 
+% 
+% Then:
+% T[1,1,1] ... T[6,1,1]
+% T[1,2,1] ... T[6,2,1]
+% ...
+% T[1,6,1] ... T[6,6,1]
+% T[1,1,2] ... T[6,1,2]
+% ...
+% T[1,6,6] ... T[6,6,6]
+% </pre>
+% 
+   
+The maps are the accumulated maps between the selected elements. They
+contain both the alignment, and field errors present. Together with the
+starting value of the closed orbit (which can be obtained from the
+standard twiss file) this allows the user to track particles over larger
+sectors, rather than element per element. A typical usage therefore lies
+in the interface to other programs, such as TRAIN.  
+
+
+%\input{threader/threader}
+%%\title{Threader}
+
+\section{Beam Threader} 
+The \textbf{threader} simulates beam steering through a machine with
+field and alignment errors in situations where the beam does not
+circulate and the closed orbit cannot be measured.  
+
+If enabled, threading is executed whenever a trajectory or closed orbit
+search is carried out by the \href{../twiss/twiss.html}{TWISS} module.  
+
+The following MAD-X commands control the action of the threader :   
+\begin{verbatim}
+option, threader ;
+\end{verbatim}  
+enables the threader 
+
+When set, the threader checks at all monitors the difference with
+respect to the stored orbit there (from
+\href{../twiss/twiss.html}{keeporbit}) if
+\href{../twiss/twiss.html}{useorbit} is present. The threader then
+provides kicks (if possible) to reduce the orbit difference below the
+maxima specified on the threader command. This procedure allows to
+thread with orbit bumps present.   
+
+\begin{verbatim}
+threader, vector = {xmax, ymax, att} ;
+\end{verbatim}  
+sets the parameters for the threader 
+\begin{verbatim}
+xmax, ymax : orbit excursion (at a monitor) at which threader acts
+att        : attenuation factor for the kicks applied by the threader
+defaults   : {0.005, 0.005, 1.000}
+\end{verbatim}
+
+

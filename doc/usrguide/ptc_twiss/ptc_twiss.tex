@@ -12,26 +12,25 @@
 
 
 The \textbf{PTC\_TWISS module} of MAD-X [\hyperlink{F. Schmidt}{a}] is
-based on the PTC code. It is a supplementary to the TWISS module. 
-The Twiss parameters are calculated in Ripken's style (invented by 
-G. Ripken in 1970 [31] and most accessible in
-Ref. [\hyperlink{G. Ripken}{b}]). 
+based on the PTC code and is supplementary to the TWISS module of MAD-X. 
+In \texttt{PTC\_TWISS} the Twiss parameters are calculated according to
+the formalism of G.~Ripken, developped in 1970 \cite{Ripken1970} and
+most accessible in \cite{Ripken1988} Ref. [\hyperlink{G. Ripken}{b}]. 
 
-These parameters were available in MAD8 using the TWISS3 command. This
-module is a typical example of the advantages when using PTC and its
-Normal Form technique (and of course the object-oriented Fortran90
-coding): once the rather modest programming has been performed the Twiss
-calculation will always be automatically correct for all machine
-conditions like closed orbit, coupling or after a new element has been
-introduced into the code. In a traditional coding like in MAD8 this
-depends on reprogramming and modifying the code at various places which
-is inherently error-prone.  
+%% These parameters were available in MAD8 using the TWISS3 command. This
+%% module is a typical example of the advantages when using PTC and its
+%% Normal Form technique (and of course the object-oriented Fortran90
+%% coding): once the rather modest programming has been performed the Twiss
+%% calculation will always be automatically correct for all machine
+%% conditions like closed orbit, coupling or after a new element has been
+%% introduced into the code. In a traditional coding like in MAD8 this
+%% depends on reprogramming and modifying the code at various places which
+%% is inherently error-prone.  
 
 PTC\_TWISS tracks a special representation of the beam in three degrees
-of freedom. It works on the coupled lattice functions defined in
-Ref.[\hyperlink{G. Ripken}{b}], which are essentially the
-projections of the lattice functions for the eigen-modes on the three
-planes.  
+of freedom. It works on the coupled lattice functions which are
+essentially the projections of the lattice functions for the eigen-modes
+on the three planes.  
 
 PTC\_TWISS lists the projections of the ellipses of motion
 onto the three planes (\textit{x}, \textit{p$_x$}), (\textit{y},
@@ -48,7 +47,7 @@ In MAD-X commands and tables, these parameters are denoted as
   mu1, ..., mu3, disp1, ..., disp4}, respectively. 
 
 The Ripken parametrization can be transformed into the Edwards-Teng
-parametrization (used in twiss proper) using the formulae of
+parametrization (used in the module \texttt{TWISS} of MAD-X) using the formulae of
 Ref. [\hyperlink{V.A. Lebedev}{d}]. 
 The parameters are noted as  
 \texttt{betx, bety, alfx, alfy} and the coupling matrix: R11, R12, R21
@@ -72,7 +71,9 @@ In addition, we compute momentum compaction factor $\alpha_c$ up to 1st
 order (for icase=5) or 3rd order (for icase=56). The values appear in
 the header of the ptc\_twiss output file (zero means the value has not
 been computed). 
-This feature is currently only available in the development version. 
+
+This feature is currently only available in the development version. [To
+  be checked]
 
 For clarification: in the 4-D case, there is the following
 correspondence between MAD-X and the Ripken's notations:  
@@ -127,7 +128,7 @@ PTC_END;
 PTC_TWISS, icase=integer, deltap=double, closed_orbit, slice_magnets, 
            range=string, file[=string], table[=string],
            initial_matrix_table, initial_matrix_manual, 
-           initial_map_manual, beta0=string,   
+           initial_map_manual, beta0=string, map_table[=logical],  
            ignore_map_orbit, ring_parameters,
            betx=double, alfx=double, mux=double,   
            bety=double, alfy=double, muy=double,     
@@ -140,15 +141,13 @@ PTC_TWISS, icase=integer, deltap=double, closed_orbit, slice_magnets,
 
 
 {\bf Description} \\
-%  <strong>TRACK, DELTAP= double, ONEPASS, DUMP, ONETABLE, FILE= string;</strong> (MADX version 1)<br />
-% <strong>TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE= string;</strong> (MADX version 2)<br /> 
 The \texttt{PTC\_TWISS} command causes computation of the Twiss
 parameters in Ripken's style. It operates on the working beam line
 defined in the latest \href{../control/general.html#use}{USE}
 command. Several options can be specified, the most important
-being \texttt{icase, deltap, closed\_orbit, slice\_magnets, no,} and
+being \texttt{icase, deltap, closed\_orbit, slice\_magnets, no} and
 \texttt{file, table}.  
-(see the table below). 
+(see the description of these options below). 
 Other options should be specified  for particular tasks. 
 Applications for the \texttt{PTC\_TWISS} command are similar to the
 \texttt{\href{../twiss/twiss.html}{TWISS}}-command. 
@@ -161,15 +160,15 @@ The PTC\_TWISS can be applied to two basic tasks. It can calculate either a
 
 \begin{itemize}
 \item {\bf ICASE}=integer (Default: 4) \\ 
-the user-defined dimensionality of the phase-space (4, 5 or 6). \\ 
+the dimensionality of the phase-space (4, 5 or 6). \\ 
 Note that the value is internally set to 56 when attempting to set
 icase=6 with no cavity. 
 
 \item {\bf NO}=integer (Default: 1) \\
-the order of the map, which is often supplied as 1 but must be at
-least set to 2 to retrieve chromaticities for instance. For evaluating
-the Twiss parameters derivatives w.r.t. deltap/p, one must pass order 2
-at least. 
+the order of the map. For evaluating
+the derivatives of the Twiss parameter w.r.t. deltap/p, e.g. for
+evaluating the chormaticities, the order must
+be at least equal to 2.
 
 \item {\bf DELTAP}=double (Default: 0.0) \\
 relative momentum offset for reference closed orbit. 
@@ -210,39 +209,45 @@ and 'integration nodes' as determined by the number of steps (nst)
 selected when creating the PTC layout. This number is assumed to be even
 otherwise the program issues a warning. 
 
-\item {\bf FILE}[=string] (Default: ptc\_twiss) \\
-if FILE is omitted, no output is written to file. \\
-If FILE is present, the optional argument is the name of the file for
-printing the PTC\_TWISS output. 
+\item {\bf FILE}[=string] (Default: .false.) \\
+if the FILE option is omitted, no output is written to file. \\
+If the FILE option is present, the optional argument is the name of the
+file for printing the PTC\_TWISS output. The default file name is
+``ptc\_twiss''. 
 
-\item {\bf TABLE}[=string] (Default: ptc\_twiss) \\
-if TABLE is omitted, no output is written to an internal table. \\
-If TABLE is present, the optional argument is the name of the internal
-PTC\_TWISS table. 
+\item {\bf TABLE}[=string] (Default: .false.) \\
+if the TABLE option is omitted, no output is written to an internal
+table. \\ 
+If the TABLE option is present, the optional argument is the name of the
+internal table for PTC\_TWISS variables. The default table name is
+``ptc\_twiss''. 
 
-\item {\bf SUMMARY\_FILE}[=string] (Default: ptc\_twiss\_summary) \\
-if SUMMARY\_FILE is omitted, no output is written to file. \\ 
-If SUMMARY\_FILE is present, the optional argument is the name of the file
-for printing the PTC\_TWISS\_SUMMARY table output.
+\item {\bf SUMMARY\_FILE}[=string] (Default: .false.) \\
+if the SUMMARY\_FILE option is omitted, no summary output is written to
+file. \\  
+If the SUMMARY\_FILE option is present, the optional argument is the
+name of the file for printing the PTC\_TWISS\_SUMMARY table output. The
+default file name is ``ptc\_twiss\_summary'' 
 
-\item {\bf SUMMARY\_TABLE}[=string] (Default: ptc\_twiss\_summary) \\
-if SUMMARY\_TABLE is omitted, no output is written to an internal
-table. \\
-If SUMMARY\_TABLE is present, the optional argument is the name
-of the internal PTC\_TWISS\_SUMMARY table.  
+\item {\bf SUMMARY\_TABLE}[=string] (Default: .false.) \\
+if the option SUMMARY\_TABLE is omitted, no summary output is written to
+an internal table. \\
+If the option SUMMARY\_TABLE is present, the optional argument is the name
+of the internal summary table for PTC\_TWISS\_SUMMARY variables. The
+default table name is ``ptc\_twiss\_summary''.  
 
 \item \href{../Introduction/ranges.html#range}{\bf RANGE}=string (Default:
-  \#s/\#e) \\ 
+  \(\#S/\#E\)) \\ 
 specifies a segment of beam-line for the PTC\_TWISS calculation.
 
 \item {\bf INITIAL\_MATRIX\_TABLE}=logical (Default: .false.) \\
-Reading  the transfer matrix from the map-table in memory (a preceding
-\texttt{\href{../ptc_normal/ptc_normal.html}{PTC\_NORMAL}} command is
-needed). 
+Reading the transfer map from table called map\_table created by
+preceding PTC\_TWISS or PTC\_NORMAL command. The table can be also read
+before hand from files using READTABLE command.
 
 \item {\bf INITIAL\_MATRIX\_MANUAL}=logical (Default: .false.) \\ 
-Using the input variables RE11,...,RE66 (see next entry) as the transfer
-matrix.   
+Using the input variables RE11, \ldots ,RE66 (see next entry) as the
+transfer matrix.
 
 \item {\bf INITIAL\_MAP\_MANUAL}=logical (Default: .false.) \\
 Using the input map stored beforehand in file fort.18 (e.g. by some
@@ -261,13 +266,18 @@ parameters to be used as input. When icase=6, this information must be
 complemented by supplying a value for 'betz' on the ptc\_twiss command
 line.
 
-\item {\bf betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy} = doubles
-  (Default: 0) \\
-\href{../twiss/twiss.html}{Twiss and dispersion parameters} 
+\item {\bf MAP\_TABLE}=logical (Default: .false.)\\
+If true, save the one-turn-map to table "map\_table".
+This one-turn-map can then be used as starting condition for a
+subsequent \texttt{ptc\_twiss}, see \texttt{INITIAL\_MATRIX\_TABLE}
+parameter of this command.  
+
+\item {\bf betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy} =doubles
+  (Default: 0) \\ 
+\href{../Introduction/bibliography.html#edwards}{Edwards and Teng} 
+\href{../twiss/twiss.html}{Twiss and dispersion parameters}:  
 \textit{$\beta_{x,y}$}, \textit{$\alpha_{x,y}$},
-\textit{$\mu_{x,y}$}, \textit{D$_{x,y}$},  \textit{D$_{px,py}$}, 
-\href{../Introduction/bibliography.html#edwards}{(Edwards and
-  Teng)}. 
+\textit{$\mu_{x,y}$}, \textit{D$_{x,y}$},  \textit{D$_{px,py}$}.
 
 \item {\bf RING\_PARAMETERS}=logical (default: .false.) \\
 Forces computation of ring parameters ($\gamma_{tr}$, $\alpha_c$, etc.).

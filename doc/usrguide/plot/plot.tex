@@ -26,6 +26,7 @@ plot, vaxis=  vname1,vname2,..,vnamen,
       vaxis4= vname1,vname2,..,vnamen,
       haxis=  vname, hmin=real, hmax=real, 
       vmin= reals, vmax= reals, 
+      zero_suppr = logical,
       bars= integer, style= integer, colour= integer, symbol= integer, 
       noversion= logical, interpolate= logical, noline= logical, notitle= logical, 
       marker_plot= logical, range_plot= logical, 
@@ -59,6 +60,7 @@ where the parameters have the following meaning:
    \item vmax: upper edge(s) of vertical axis or axes, up to four
      numbers separated by commas; 
      Note that both vmin and vmax must be given for an axis to be effective.   
+   \item zero\_suppr: To be documented (default = false)
    \item bars: 0 (default) or 1 - with bars=1, all data points
      are connected to the horizontal axis with vertical bars.   
    \item style: 1 (default), 2, 3, or 4: line style for connecting the
