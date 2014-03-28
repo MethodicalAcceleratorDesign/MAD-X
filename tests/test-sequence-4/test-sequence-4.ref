@@ -1,0 +1,2672 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.00  (32 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2014.03.05      +
+  + Execution Time Stamp: 26.03.14 13.48.18 +
+  +++++++++++++++++++++++++++++++++++++++++++
+
+
+BEAM, PARTICLE = proton, PC = 450;
+
+
+
+option, -echo;
+
+
+
+QF.60010.E:MARKER;
+
+QDA.61910.S:MARKER;
+
+REFPOINT: MARKER;
+
+
+
+SEQEDIT, SEQUENCE = SPS; 
+
+	INSTALL, ELEMENT = QF.60010.E,  AT = 5759.5865,      FROM = BEGI.10010;
+
+	INSTALL, ELEMENT = QDA.61910.S, AT = QDA.61910->L/2, FROM = QDA.61910;
+
+	INSTALL, ELEMENT = REFPOINT,    AT = qf.60010->L/2,  FROM = qf.60010;
+
+	FLATTEN; 
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  3
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+
+
+// ------------- extract LSS6 ---------------------
+
+
+
+EXTRACT, SEQUENCE=SPS, FROM=QF.60010.E, TO=QDA.61910.S, NEWNAME=SPS6, REFPOS=REFPOINT; 
+
++++ extracting sequence sps from qf.60010.e:1 to qda.61910.s:1
++++ new sequence: sps6  with current length = 611.3944
+
+
+
+sps6length = QDA.61910.S->at - QF.60010.E->at;
+
+VALUE, sps6length;
+
+sps6length =           611.3944 ;
+
+
+refpointpos = REFPOINT->AT - QF.60010.E->AT;
+
+value, refpointpos;
+
+refpointpos =              3.085 ;
+
+
+// ------------- combine with TI 2 -----------------
+
+
+
+option, -echo;
+
+++++++ info: element redefined: btv
+++++++ info: element redefined: vvfa
+++++++ info: element redefined: vvsa
+++++++ info: element redefined: vvsb
+++++++ info: element redefined: mbb
+
+
+TI2.END: marker;
+
+TI2.START: marker;
+
+
+
+Seqedit, sequence=TI2;
+
+   Install, element=ti2.start, at=0, from=TI2$START;
+
+   Install, element=ti2.end, at=0, from=TI2$END;
+
+   Flatten;
+
+endedit;
+
+++++++ info: seqedit - number of elements installed:  2
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+
+
+ti2length = TI2.END->AT-TI2.START->at; // reference ti2length =  3188.384281;
+
+VALUE, ti2length;
+
+ti2length =        3188.384281 ;
+
+
+LFULL = ti2length + sps6length + 0.00457; //=  3188.384281 + 611.3944 + 0.00457     
+
+value, lfull;
+
+lfull =        3799.783251 ;
+
+
+all: SEQUENCE, refer=entry,  L= LFULL; 
+
+     sps6,    at= refpointpos;
+
+     ti2,     at= sps6length+0.00457;       
+
+ENDSEQUENCE;
+
+
+
+!all: SEQUENCE, refer=centre,  L= LFULL; ! should be identical
+
+!     sps6,    at= refpointpos;
+
+!     ti2,     at= sps6length+ti2length/2.+0.00457;       
+
+!ENDSEQUENCE;
+
+
+
+!all: SEQUENCE, refer=exit,  L= LFULL; ! should be identical
+
+!     sps6,    at= refpointpos;
+
+!     ti2,     at= sps6length+ti2length+0.00457;       
+
+!ENDSEQUENCE;
+
+
+
+SEQEDIT, SEQUENCE=all;
+
+	FLATTEN; 
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+
+
+! Now calculate the twiss functions at reference place in SPS
+
+USE,     SEQUENCE=sps; 
+
+SAVEBETA, LABEL = QF.60010.BETA, PLACE = QF.60010.E;
+
+SELECT, FLAG=TWISS, CLEAR;
+
+SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,mux,muy;
+
+TWISS, SAVE; 
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+         6911.5038                 -0     0.001928024863        22.77422909 
+
+                q1                dq1            betxmax              dxmax 
+       26.12999969    -0.001155831315        103.5088351        4.769309974 
+
+             dxrms             xcomax             xcorms                 q2 
+       2.299396138                  0                  0        26.17999991 
+
+               dq2            betymax              dymax              dyrms 
+   -0.002843743098        104.2740908                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+QF.60010.BETA->mux = 0.0;
+
+QF.60010.BETA->muy = 0.0;
+
+
+
+! Now calculate the twiss functions through extraction and TI2
+
+OPTION, DEBUG;
+
+USE,     SEQUENCE=all;
+
+   in get_node_pos: name: all$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: all$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: sps6$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: sps6$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qf.60010.e, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60010.e, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: qf.60010, pos: 1.542500e+00, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60010, from: 0.000000e+00			  ---> final pos: 1.542500e+00 
+   in get_node_pos: name: refpoint, pos: 3.085000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: refpoint, from: 0.000000e+00			  ---> final pos: 3.085000e+00 
+   in get_node_pos: name: mba.60030, pos: 6.575000e+00, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60030, from: 0.000000e+00			  ---> final pos: 6.575000e+00 
+   in get_node_pos: name: mba.60050, pos: 1.323500e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60050, from: 0.000000e+00			  ---> final pos: 1.323500e+01 
+   in get_node_pos: name: mbb.60070, pos: 1.988500e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60070, from: 0.000000e+00			  ---> final pos: 1.988500e+01 
+   in get_node_pos: name: mbb.60090, pos: 2.652500e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60090, from: 0.000000e+00			  ---> final pos: 2.652500e+01 
+   in get_node_pos: name: vvsa.60101, pos: 2.993850e+01, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsa.60101, from: 0.000000e+00			  ---> final pos: 2.993850e+01 
+   in get_node_pos: name: lsd.60105, pos: 3.100070e+01, fact: 0.000000e+00, length: 4.200000e-01, from_name: (null)
+	 in get_node_pos: name: lsd.60105, from: 0.000000e+00			  ---> final pos: 3.100070e+01 
+   in get_node_pos: name: mdv.60107, pos: 3.148770e+01, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.60107, from: 0.000000e+00			  ---> final pos: 3.148770e+01 
+   in get_node_pos: name: bpv.60108, pos: 3.176520e+01, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.60108, from: 0.000000e+00			  ---> final pos: 3.176520e+01 
+   in get_node_pos: name: qd.60110, pos: 3.354020e+01, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.60110, from: 0.000000e+00			  ---> final pos: 3.354020e+01 
+   in get_node_pos: name: mbb.60130, pos: 3.856270e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60130, from: 0.000000e+00			  ---> final pos: 3.856270e+01 
+   in get_node_pos: name: mbb.60150, pos: 4.520270e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60150, from: 0.000000e+00			  ---> final pos: 4.520270e+01 
+   in get_node_pos: name: mba.60170, pos: 5.185270e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60170, from: 0.000000e+00			  ---> final pos: 5.185270e+01 
+   in get_node_pos: name: mba.60190, pos: 5.851270e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60190, from: 0.000000e+00			  ---> final pos: 5.851270e+01 
+   in get_node_pos: name: lsf.60205, pos: 6.299840e+01, fact: 0.000000e+00, length: 4.230000e-01, from_name: (null)
+	 in get_node_pos: name: lsf.60205, from: 0.000000e+00			  ---> final pos: 6.299840e+01 
+   in get_node_pos: name: mdh.60207, pos: 6.347540e+01, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.60207, from: 0.000000e+00			  ---> final pos: 6.347540e+01 
+   in get_node_pos: name: bph.60208, pos: 6.376290e+01, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.60208, from: 0.000000e+00			  ---> final pos: 6.376290e+01 
+   in get_node_pos: name: qf.60210, pos: 6.553790e+01, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60210, from: 0.000000e+00			  ---> final pos: 6.553790e+01 
+   in get_node_pos: name: mba.60230, pos: 7.057040e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60230, from: 0.000000e+00			  ---> final pos: 7.057040e+01 
+   in get_node_pos: name: mba.60250, pos: 7.723040e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60250, from: 0.000000e+00			  ---> final pos: 7.723040e+01 
+   in get_node_pos: name: mbb.60270, pos: 8.388040e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60270, from: 0.000000e+00			  ---> final pos: 8.388040e+01 
+   in get_node_pos: name: mbb.60290, pos: 9.052040e+01, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60290, from: 0.000000e+00			  ---> final pos: 9.052040e+01 
+   in get_node_pos: name: qe.60302, pos: 9.429840e+01, fact: 0.000000e+00, length: 6.980000e-01, from_name: (null)
+	 in get_node_pos: name: qe.60302, from: 0.000000e+00			  ---> final pos: 9.429840e+01 
+   in get_node_pos: name: lsd.60305, pos: 9.499610e+01, fact: 0.000000e+00, length: 4.200000e-01, from_name: (null)
+	 in get_node_pos: name: lsd.60305, from: 0.000000e+00			  ---> final pos: 9.499610e+01 
+   in get_node_pos: name: mdv.60307, pos: 9.548310e+01, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.60307, from: 0.000000e+00			  ---> final pos: 9.548310e+01 
+   in get_node_pos: name: bpv.60308, pos: 9.576060e+01, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.60308, from: 0.000000e+00			  ---> final pos: 9.576060e+01 
+   in get_node_pos: name: qd.60310, pos: 9.753560e+01, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.60310, from: 0.000000e+00			  ---> final pos: 9.753560e+01 
+   in get_node_pos: name: mbb.60330, pos: 1.025581e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60330, from: 0.000000e+00			  ---> final pos: 1.025581e+02 
+   in get_node_pos: name: mbb.60350, pos: 1.091981e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60350, from: 0.000000e+00			  ---> final pos: 1.091981e+02 
+   in get_node_pos: name: mba.60370, pos: 1.158481e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60370, from: 0.000000e+00			  ---> final pos: 1.158481e+02 
+   in get_node_pos: name: mba.60390, pos: 1.225081e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60390, from: 0.000000e+00			  ---> final pos: 1.225081e+02 
+   in get_node_pos: name: qe.60402, pos: 1.262961e+02, fact: 0.000000e+00, length: 6.980000e-01, from_name: (null)
+	 in get_node_pos: name: qe.60402, from: 0.000000e+00			  ---> final pos: 1.262961e+02 
+   in get_node_pos: name: mdh.60407, pos: 1.274708e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.60407, from: 0.000000e+00			  ---> final pos: 1.274708e+02 
+   in get_node_pos: name: bph.60408, pos: 1.277583e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.60408, from: 0.000000e+00			  ---> final pos: 1.277583e+02 
+   in get_node_pos: name: qf.60410, pos: 1.295333e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60410, from: 0.000000e+00			  ---> final pos: 1.295333e+02 
+   in get_node_pos: name: mba.60430, pos: 1.345658e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60430, from: 0.000000e+00			  ---> final pos: 1.345658e+02 
+   in get_node_pos: name: mba.60450, pos: 1.412258e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60450, from: 0.000000e+00			  ---> final pos: 1.412258e+02 
+   in get_node_pos: name: mbb.60470, pos: 1.478758e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60470, from: 0.000000e+00			  ---> final pos: 1.478758e+02 
+   in get_node_pos: name: mbb.60490, pos: 1.545158e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60490, from: 0.000000e+00			  ---> final pos: 1.545158e+02 
+   in get_node_pos: name: qe.60502, pos: 1.582938e+02, fact: 0.000000e+00, length: 6.980000e-01, from_name: (null)
+	 in get_node_pos: name: qe.60502, from: 0.000000e+00			  ---> final pos: 1.582938e+02 
+   in get_node_pos: name: mdv.60507, pos: 1.594785e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.60507, from: 0.000000e+00			  ---> final pos: 1.594785e+02 
+   in get_node_pos: name: bpv.60508, pos: 1.597560e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.60508, from: 0.000000e+00			  ---> final pos: 1.597560e+02 
+   in get_node_pos: name: qd.60510, pos: 1.615310e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.60510, from: 0.000000e+00			  ---> final pos: 1.615310e+02 
+   in get_node_pos: name: mbb.60530, pos: 1.665535e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60530, from: 0.000000e+00			  ---> final pos: 1.665535e+02 
+   in get_node_pos: name: mbb.60550, pos: 1.731935e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60550, from: 0.000000e+00			  ---> final pos: 1.731935e+02 
+   in get_node_pos: name: mba.60570, pos: 1.798435e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60570, from: 0.000000e+00			  ---> final pos: 1.798435e+02 
+   in get_node_pos: name: mba.60590, pos: 1.865035e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60590, from: 0.000000e+00			  ---> final pos: 1.865035e+02 
+   in get_node_pos: name: qe.60602, pos: 1.902915e+02, fact: 0.000000e+00, length: 6.980000e-01, from_name: (null)
+	 in get_node_pos: name: qe.60602, from: 0.000000e+00			  ---> final pos: 1.902915e+02 
+   in get_node_pos: name: mdh.60607, pos: 1.914663e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.60607, from: 0.000000e+00			  ---> final pos: 1.914663e+02 
+   in get_node_pos: name: bph.60608, pos: 1.917538e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.60608, from: 0.000000e+00			  ---> final pos: 1.917538e+02 
+   in get_node_pos: name: qf.60610, pos: 1.935288e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60610, from: 0.000000e+00			  ---> final pos: 1.935288e+02 
+   in get_node_pos: name: mba.60630, pos: 1.985613e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60630, from: 0.000000e+00			  ---> final pos: 1.985613e+02 
+   in get_node_pos: name: mba.60650, pos: 2.052213e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60650, from: 0.000000e+00			  ---> final pos: 2.052213e+02 
+   in get_node_pos: name: mbb.60670, pos: 2.118713e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60670, from: 0.000000e+00			  ---> final pos: 2.118713e+02 
+   in get_node_pos: name: mbb.60690, pos: 2.185113e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60690, from: 0.000000e+00			  ---> final pos: 2.185113e+02 
+   in get_node_pos: name: lod.60702, pos: 2.222783e+02, fact: 0.000000e+00, length: 6.770000e-01, from_name: (null)
+	 in get_node_pos: name: lod.60702, from: 0.000000e+00			  ---> final pos: 2.222783e+02 
+   in get_node_pos: name: mdv.60707, pos: 2.234740e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.60707, from: 0.000000e+00			  ---> final pos: 2.234740e+02 
+   in get_node_pos: name: bpv.60708, pos: 2.237515e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.60708, from: 0.000000e+00			  ---> final pos: 2.237515e+02 
+   in get_node_pos: name: qd.60710, pos: 2.255265e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.60710, from: 0.000000e+00			  ---> final pos: 2.255265e+02 
+   in get_node_pos: name: mbb.60730, pos: 2.305490e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60730, from: 0.000000e+00			  ---> final pos: 2.305490e+02 
+   in get_node_pos: name: mbb.60750, pos: 2.371890e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60750, from: 0.000000e+00			  ---> final pos: 2.371890e+02 
+   in get_node_pos: name: mba.60770, pos: 2.438390e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60770, from: 0.000000e+00			  ---> final pos: 2.438390e+02 
+   in get_node_pos: name: mba.60790, pos: 2.504990e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60790, from: 0.000000e+00			  ---> final pos: 2.504990e+02 
+   in get_node_pos: name: lof.60802, pos: 2.542760e+02, fact: 0.000000e+00, length: 7.050000e-01, from_name: (null)
+	 in get_node_pos: name: lof.60802, from: 0.000000e+00			  ---> final pos: 2.542760e+02 
+   in get_node_pos: name: lsf.60805, pos: 2.549847e+02, fact: 0.000000e+00, length: 4.230000e-01, from_name: (null)
+	 in get_node_pos: name: lsf.60805, from: 0.000000e+00			  ---> final pos: 2.549847e+02 
+   in get_node_pos: name: mdh.60807, pos: 2.554617e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.60807, from: 0.000000e+00			  ---> final pos: 2.554617e+02 
+   in get_node_pos: name: bph.60808, pos: 2.557492e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.60808, from: 0.000000e+00			  ---> final pos: 2.557492e+02 
+   in get_node_pos: name: qf.60810, pos: 2.575242e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.60810, from: 0.000000e+00			  ---> final pos: 2.575242e+02 
+   in get_node_pos: name: mba.60830, pos: 2.625567e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60830, from: 0.000000e+00			  ---> final pos: 2.625567e+02 
+   in get_node_pos: name: mba.60850, pos: 2.692167e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60850, from: 0.000000e+00			  ---> final pos: 2.692167e+02 
+   in get_node_pos: name: mbb.60870, pos: 2.758667e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60870, from: 0.000000e+00			  ---> final pos: 2.758667e+02 
+   in get_node_pos: name: mbb.60890, pos: 2.825067e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60890, from: 0.000000e+00			  ---> final pos: 2.825067e+02 
+   in get_node_pos: name: bctfs.60803, pos: 2.864514e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: bctfs.60803, from: 0.000000e+00			  ---> final pos: 2.864514e+02 
+   in get_node_pos: name: mdv.60907, pos: 2.874694e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.60907, from: 0.000000e+00			  ---> final pos: 2.874694e+02 
+   in get_node_pos: name: bpv.60908, pos: 2.877469e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.60908, from: 0.000000e+00			  ---> final pos: 2.877469e+02 
+   in get_node_pos: name: qd.60910, pos: 2.895219e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.60910, from: 0.000000e+00			  ---> final pos: 2.895219e+02 
+   in get_node_pos: name: mbb.60930, pos: 2.945444e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60930, from: 0.000000e+00			  ---> final pos: 2.945444e+02 
+   in get_node_pos: name: mbb.60950, pos: 3.011844e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.60950, from: 0.000000e+00			  ---> final pos: 3.011844e+02 
+   in get_node_pos: name: mba.60970, pos: 3.078344e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60970, from: 0.000000e+00			  ---> final pos: 3.078344e+02 
+   in get_node_pos: name: mba.60990, pos: 3.144944e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.60990, from: 0.000000e+00			  ---> final pos: 3.144944e+02 
+   in get_node_pos: name: bbsr.61001, pos: 3.180354e+02, fact: 0.000000e+00, length: 4.100000e-01, from_name: (null)
+	 in get_node_pos: name: bbsr.61001, from: 0.000000e+00			  ---> final pos: 3.180354e+02 
+   in get_node_pos: name: btv.61003, pos: 3.184654e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: btv.61003, from: 0.000000e+00			  ---> final pos: 3.184654e+02 
+   in get_node_pos: name: mdh.61007, pos: 3.194571e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.61007, from: 0.000000e+00			  ---> final pos: 3.194571e+02 
+   in get_node_pos: name: bph.61008, pos: 3.197446e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.61008, from: 0.000000e+00			  ---> final pos: 3.197446e+02 
+   in get_node_pos: name: qf.61010, pos: 3.215196e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.61010, from: 0.000000e+00			  ---> final pos: 3.215196e+02 
+   in get_node_pos: name: mba.61030, pos: 3.265521e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61030, from: 0.000000e+00			  ---> final pos: 3.265521e+02 
+   in get_node_pos: name: mba.61050, pos: 3.332121e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61050, from: 0.000000e+00			  ---> final pos: 3.332121e+02 
+   in get_node_pos: name: mbb.61070, pos: 3.398621e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61070, from: 0.000000e+00			  ---> final pos: 3.398621e+02 
+   in get_node_pos: name: mbb.61090, pos: 3.465021e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61090, from: 0.000000e+00			  ---> final pos: 3.465021e+02 
+   in get_node_pos: name: lsd.61105, pos: 3.509778e+02, fact: 0.000000e+00, length: 4.200000e-01, from_name: (null)
+	 in get_node_pos: name: lsd.61105, from: 0.000000e+00			  ---> final pos: 3.509778e+02 
+   in get_node_pos: name: mdv.61107, pos: 3.514648e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.61107, from: 0.000000e+00			  ---> final pos: 3.514648e+02 
+   in get_node_pos: name: bpcn.61108, pos: 3.517398e+02, fact: 0.000000e+00, length: 2.360000e-01, from_name: (null)
+	 in get_node_pos: name: bpcn.61108, from: 0.000000e+00			  ---> final pos: 3.517398e+02 
+   in get_node_pos: name: qd.61110, pos: 3.535173e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.61110, from: 0.000000e+00			  ---> final pos: 3.535173e+02 
+   in get_node_pos: name: mbb.61130, pos: 3.585398e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61130, from: 0.000000e+00			  ---> final pos: 3.585398e+02 
+   in get_node_pos: name: mbb.61150, pos: 3.651798e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61150, from: 0.000000e+00			  ---> final pos: 3.651798e+02 
+   in get_node_pos: name: mba.61170, pos: 3.718298e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61170, from: 0.000000e+00			  ---> final pos: 3.718298e+02 
+   in get_node_pos: name: mba.61190, pos: 3.784898e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61190, from: 0.000000e+00			  ---> final pos: 3.784898e+02 
+   in get_node_pos: name: lsf.61205, pos: 3.829755e+02, fact: 0.000000e+00, length: 4.230000e-01, from_name: (null)
+	 in get_node_pos: name: lsf.61205, from: 0.000000e+00			  ---> final pos: 3.829755e+02 
+   in get_node_pos: name: mdh.61207, pos: 3.834525e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.61207, from: 0.000000e+00			  ---> final pos: 3.834525e+02 
+   in get_node_pos: name: bph.61208, pos: 3.837400e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.61208, from: 0.000000e+00			  ---> final pos: 3.837400e+02 
+   in get_node_pos: name: qf.61210, pos: 3.855150e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.61210, from: 0.000000e+00			  ---> final pos: 3.855150e+02 
+   in get_node_pos: name: mba.61230, pos: 3.905475e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61230, from: 0.000000e+00			  ---> final pos: 3.905475e+02 
+   in get_node_pos: name: mba.61250, pos: 3.972075e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61250, from: 0.000000e+00			  ---> final pos: 3.972075e+02 
+   in get_node_pos: name: mbb.61270, pos: 4.038575e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61270, from: 0.000000e+00			  ---> final pos: 4.038575e+02 
+   in get_node_pos: name: mbb.61290, pos: 4.104975e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61290, from: 0.000000e+00			  ---> final pos: 4.104975e+02 
+   in get_node_pos: name: vvsa.61301, pos: 4.139110e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsa.61301, from: 0.000000e+00			  ---> final pos: 4.139110e+02 
+   in get_node_pos: name: mpsv.61303, pos: 4.143050e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: mpsv.61303, from: 0.000000e+00			  ---> final pos: 4.143050e+02 
+   in get_node_pos: name: lsd.61305, pos: 4.149732e+02, fact: 0.000000e+00, length: 4.200000e-01, from_name: (null)
+	 in get_node_pos: name: lsd.61305, from: 0.000000e+00			  ---> final pos: 4.149732e+02 
+   in get_node_pos: name: mdv.61307, pos: 4.154602e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.61307, from: 0.000000e+00			  ---> final pos: 4.154602e+02 
+   in get_node_pos: name: bpcn.61308, pos: 4.157352e+02, fact: 0.000000e+00, length: 2.360000e-01, from_name: (null)
+	 in get_node_pos: name: bpcn.61308, from: 0.000000e+00			  ---> final pos: 4.157352e+02 
+   in get_node_pos: name: qd.61310, pos: 4.175127e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.61310, from: 0.000000e+00			  ---> final pos: 4.175127e+02 
+   in get_node_pos: name: mbb.61330, pos: 4.225352e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61330, from: 0.000000e+00			  ---> final pos: 4.225352e+02 
+   in get_node_pos: name: mbb.61350, pos: 4.291752e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61350, from: 0.000000e+00			  ---> final pos: 4.291752e+02 
+   in get_node_pos: name: mba.61370, pos: 4.358252e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61370, from: 0.000000e+00			  ---> final pos: 4.358252e+02 
+   in get_node_pos: name: mba.61390, pos: 4.424852e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61390, from: 0.000000e+00			  ---> final pos: 4.424852e+02 
+   in get_node_pos: name: mpsh.61402, pos: 4.462832e+02, fact: 0.000000e+00, length: 7.140000e-01, from_name: (null)
+	 in get_node_pos: name: mpsh.61402, from: 0.000000e+00			  ---> final pos: 4.462832e+02 
+   in get_node_pos: name: lsf.61405, pos: 4.469709e+02, fact: 0.000000e+00, length: 4.230000e-01, from_name: (null)
+	 in get_node_pos: name: lsf.61405, from: 0.000000e+00			  ---> final pos: 4.469709e+02 
+   in get_node_pos: name: mdh.61407, pos: 4.474479e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.61407, from: 0.000000e+00			  ---> final pos: 4.474479e+02 
+   in get_node_pos: name: bph.61408, pos: 4.477354e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.61408, from: 0.000000e+00			  ---> final pos: 4.477354e+02 
+   in get_node_pos: name: qf.61410, pos: 4.495104e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.61410, from: 0.000000e+00			  ---> final pos: 4.495104e+02 
+   in get_node_pos: name: vvfa.61459, pos: 4.642599e+02, fact: 0.000000e+00, length: 3.340000e-01, from_name: (null)
+	 in get_node_pos: name: vvfa.61459, from: 0.000000e+00			  ---> final pos: 4.642599e+02 
+   in get_node_pos: name: mbb.61470, pos: 4.678529e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61470, from: 0.000000e+00			  ---> final pos: 4.678529e+02 
+   in get_node_pos: name: mbb.61490, pos: 4.744929e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61490, from: 0.000000e+00			  ---> final pos: 4.744929e+02 
+   in get_node_pos: name: mpsv.61503, pos: 4.782864e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: mpsv.61503, from: 0.000000e+00			  ---> final pos: 4.782864e+02 
+   in get_node_pos: name: lsd.61505, pos: 4.789706e+02, fact: 0.000000e+00, length: 4.200000e-01, from_name: (null)
+	 in get_node_pos: name: lsd.61505, from: 0.000000e+00			  ---> final pos: 4.789706e+02 
+   in get_node_pos: name: mdv.61507, pos: 4.794556e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdv.61507, from: 0.000000e+00			  ---> final pos: 4.794556e+02 
+   in get_node_pos: name: bpv.61508, pos: 4.797331e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bpv.61508, from: 0.000000e+00			  ---> final pos: 4.797331e+02 
+   in get_node_pos: name: qd.61510, pos: 4.815081e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qd.61510, from: 0.000000e+00			  ---> final pos: 4.815081e+02 
+   in get_node_pos: name: mbb.61530, pos: 4.865306e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61530, from: 0.000000e+00			  ---> final pos: 4.865306e+02 
+   in get_node_pos: name: mbb.61550, pos: 4.931706e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mbb.61550, from: 0.000000e+00			  ---> final pos: 4.931706e+02 
+   in get_node_pos: name: mba.61570, pos: 4.998206e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61570, from: 0.000000e+00			  ---> final pos: 4.998206e+02 
+   in get_node_pos: name: mba.61590, pos: 5.064806e+02, fact: 0.000000e+00, length: 6.260019e+00, from_name: (null)
+	 in get_node_pos: name: mba.61590, from: 0.000000e+00			  ---> final pos: 5.064806e+02 
+   in get_node_pos: name: vvsb.61601, pos: 5.099038e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsb.61601, from: 0.000000e+00			  ---> final pos: 5.099038e+02 
+   in get_node_pos: name: mdh.61607, pos: 5.114433e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: mdh.61607, from: 0.000000e+00			  ---> final pos: 5.114433e+02 
+   in get_node_pos: name: bph.61608, pos: 5.117308e+02, fact: 0.000000e+00, length: 2.750000e-01, from_name: (null)
+	 in get_node_pos: name: bph.61608, from: 0.000000e+00			  ---> final pos: 5.117308e+02 
+   in get_node_pos: name: qf.61610, pos: 5.135058e+02, fact: 0.000000e+00, length: 3.085000e+00, from_name: (null)
+	 in get_node_pos: name: qf.61610, from: 0.000000e+00			  ---> final pos: 5.135058e+02 
+   in get_node_pos: name: mke.61631, pos: 5.165893e+02, fact: 0.000000e+00, length: 2.014000e+00, from_name: (null)
+	 in get_node_pos: name: mke.61631, from: 0.000000e+00			  ---> final pos: 5.165893e+02 
+   in get_node_pos: name: mke.61634, pos: 5.189023e+02, fact: 0.000000e+00, length: 2.014000e+00, from_name: (null)
+	 in get_node_pos: name: mke.61634, from: 0.000000e+00			  ---> final pos: 5.189023e+02 
+   in get_node_pos: name: mke.61637, pos: 5.212153e+02, fact: 0.000000e+00, length: 2.014000e+00, from_name: (null)
+	 in get_node_pos: name: mke.61637, from: 0.000000e+00			  ---> final pos: 5.212153e+02 
+   in get_node_pos: name: vvsb.61654, pos: 5.249778e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsb.61654, from: 0.000000e+00			  ---> final pos: 5.249778e+02 
+   in get_node_pos: name: mplh.61655, pos: 5.262603e+02, fact: 0.000000e+00, length: 2.060000e+00, from_name: (null)
+	 in get_node_pos: name: mplh.61655, from: 0.000000e+00			  ---> final pos: 5.262603e+02 
+   in get_node_pos: name: zs.61676, pos: 5.344135e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: zs.61676, from: 0.000000e+00			  ---> final pos: 5.344135e+02 
+   in get_node_pos: name: mdva.61703, pos: 5.423960e+02, fact: 0.000000e+00, length: 4.240000e-01, from_name: (null)
+	 in get_node_pos: name: mdva.61703, from: 0.000000e+00			  ---> final pos: 5.423960e+02 
+   in get_node_pos: name: bpce.61705, pos: 5.430310e+02, fact: 0.000000e+00, length: 4.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpce.61705, from: 0.000000e+00			  ---> final pos: 5.430310e+02 
+   in get_node_pos: name: qda.61710, pos: 5.455035e+02, fact: 0.000000e+00, length: 3.791000e+00, from_name: (null)
+	 in get_node_pos: name: qda.61710, from: 0.000000e+00			  ---> final pos: 5.455035e+02 
+   in get_node_pos: name: vvsb.61736, pos: 5.513985e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsb.61736, from: 0.000000e+00			  ---> final pos: 5.513985e+02 
+   in get_node_pos: name: vvfa.61737, pos: 5.518330e+02, fact: 0.000000e+00, length: 3.340000e-01, from_name: (null)
+	 in get_node_pos: name: vvfa.61737, from: 0.000000e+00			  ---> final pos: 5.518330e+02 
+   in get_node_pos: name: btve.61772, pos: 5.620370e+02, fact: 0.000000e+00, length: 5.300000e-01, from_name: (null)
+	 in get_node_pos: name: btve.61772, from: 0.000000e+00			  ---> final pos: 5.620370e+02 
+   in get_node_pos: name: tpsg.61773, pos: 5.633387e+02, fact: 0.000000e+00, length: 1.853000e+00, from_name: (null)
+	 in get_node_pos: name: tpsg.61773, from: 0.000000e+00			  ---> final pos: 5.633387e+02 
+   in get_node_pos: name: tpsg.61776, pos: 5.652917e+02, fact: 0.000000e+00, length: 1.853000e+00, from_name: (null)
+	 in get_node_pos: name: tpsg.61776, from: 0.000000e+00			  ---> final pos: 5.652917e+02 
+   in get_node_pos: name: mst.61779, pos: 5.676700e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mst.61779, from: 0.000000e+00			  ---> final pos: 5.676700e+02 
+   in get_node_pos: name: mst.61794, pos: 5.709040e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mst.61794, from: 0.000000e+00			  ---> final pos: 5.709040e+02 
+   in get_node_pos: name: btve.61798, pos: 5.725212e+02, fact: 0.000000e+00, length: 5.300000e-01, from_name: (null)
+	 in get_node_pos: name: btve.61798, from: 0.000000e+00			  ---> final pos: 5.725212e+02 
+   in get_node_pos: name: vvse.61799, pos: 5.733760e+02, fact: 0.000000e+00, length: 1.200000e-01, from_name: (null)
+	 in get_node_pos: name: vvse.61799, from: 0.000000e+00			  ---> final pos: 5.733760e+02 
+   in get_node_pos: name: vvfb.61801, pos: 5.738470e+02, fact: 0.000000e+00, length: 3.700000e-01, from_name: (null)
+	 in get_node_pos: name: vvfb.61801, from: 0.000000e+00			  ---> final pos: 5.738470e+02 
+   in get_node_pos: name: mdhb.61804, pos: 5.745807e+02, fact: 0.000000e+00, length: 4.020000e-01, from_name: (null)
+	 in get_node_pos: name: mdhb.61804, from: 0.000000e+00			  ---> final pos: 5.745807e+02 
+   in get_node_pos: name: bpce.61805, pos: 5.750287e+02, fact: 0.000000e+00, length: 4.000000e-01, from_name: (null)
+	 in get_node_pos: name: bpce.61805, from: 0.000000e+00			  ---> final pos: 5.750287e+02 
+   in get_node_pos: name: qspl.61809, pos: 5.756057e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: qspl.61809, from: 0.000000e+00			  ---> final pos: 5.756057e+02 
+   in get_node_pos: name: qfa.61810, pos: 5.775012e+02, fact: 0.000000e+00, length: 3.791000e+00, from_name: (null)
+	 in get_node_pos: name: qfa.61810, from: 0.000000e+00			  ---> final pos: 5.775012e+02 
+   in get_node_pos: name: btve.61831, pos: 5.802717e+02, fact: 0.000000e+00, length: 5.300000e-01, from_name: (null)
+	 in get_node_pos: name: btve.61831, from: 0.000000e+00			  ---> final pos: 5.802717e+02 
+   in get_node_pos: name: mse.61832, pos: 5.818887e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mse.61832, from: 0.000000e+00			  ---> final pos: 5.818887e+02 
+   in get_node_pos: name: mse.61837, pos: 5.851227e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mse.61837, from: 0.000000e+00			  ---> final pos: 5.851227e+02 
+   in get_node_pos: name: mse.61852, pos: 5.883567e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mse.61852, from: 0.000000e+00			  ---> final pos: 5.883567e+02 
+   in get_node_pos: name: mse.61857, pos: 5.915907e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mse.61857, from: 0.000000e+00			  ---> final pos: 5.915907e+02 
+   in get_node_pos: name: mse.61872, pos: 5.948247e+02, fact: 0.000000e+00, length: 2.380000e+00, from_name: (null)
+	 in get_node_pos: name: mse.61872, from: 0.000000e+00			  ---> final pos: 5.948247e+02 
+   in get_node_pos: name: btve.61876, pos: 5.964417e+02, fact: 0.000000e+00, length: 5.300000e-01, from_name: (null)
+	 in get_node_pos: name: btve.61876, from: 0.000000e+00			  ---> final pos: 5.964417e+02 
+   in get_node_pos: name: vvfb.61877, pos: 5.979514e+02, fact: 0.000000e+00, length: 3.700000e-01, from_name: (null)
+	 in get_node_pos: name: vvfb.61877, from: 0.000000e+00			  ---> final pos: 5.979514e+02 
+   in get_node_pos: name: vvsf.61880, pos: 5.993514e+02, fact: 0.000000e+00, length: 1.800000e-01, from_name: (null)
+	 in get_node_pos: name: vvsf.61880, from: 0.000000e+00			  ---> final pos: 5.993514e+02 
+   in get_node_pos: name: vvsa.61901, pos: 6.058972e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsa.61901, from: 0.000000e+00			  ---> final pos: 6.058972e+02 
+   in get_node_pos: name: vvsb.61903, pos: 6.064062e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsb.61903, from: 0.000000e+00			  ---> final pos: 6.064062e+02 
+   in get_node_pos: name: qda.61910, pos: 6.094989e+02, fact: 0.000000e+00, length: 3.791000e+00, from_name: (null)
+	 in get_node_pos: name: qda.61910, from: 0.000000e+00			  ---> final pos: 6.094989e+02 
+   in get_node_pos: name: qda.61910.s, pos: 6.113944e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: qda.61910.s, from: 0.000000e+00			  ---> final pos: 6.113944e+02 
+   in get_node_pos: name: sps6$end, pos: 6.113944e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: sps6$end, from: 0.000000e+00			  ---> final pos: 6.113944e+02 
+   in get_node_pos: name: ti2$start, pos: 6.113990e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ti2$start, from: 0.000000e+00			  ---> final pos: 6.113990e+02 
+   in get_node_pos: name: ti2.start, pos: 6.113990e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ti2.start, from: 0.000000e+00			  ---> final pos: 6.113990e+02 
+   in get_node_pos: name: mdav.610013, pos: 6.193438e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mdav.610013, from: 0.000000e+00			  ---> final pos: 6.193438e+02 
+   in get_node_pos: name: bpck.610015, pos: 6.207788e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpck.610015, from: 0.000000e+00			  ---> final pos: 6.207788e+02 
+   in get_node_pos: name: btv.610018, pos: 6.226748e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: btv.610018, from: 0.000000e+00			  ---> final pos: 6.226748e+02 
+   in get_node_pos: name: qtld.610100, pos: 6.247048e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtld.610100, from: 0.000000e+00			  ---> final pos: 6.247048e+02 
+   in get_node_pos: name: mdlh.610104, pos: 6.275198e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mdlh.610104, from: 0.000000e+00			  ---> final pos: 6.275198e+02 
+   in get_node_pos: name: qtlf.610200, pos: 6.602106e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtlf.610200, from: 0.000000e+00			  ---> final pos: 6.602106e+02 
+   in get_node_pos: name: mdlh.610206, pos: 6.646211e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mdlh.610206, from: 0.000000e+00			  ---> final pos: 6.646211e+02 
+   in get_node_pos: name: bpck.610211, pos: 6.683441e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpck.610211, from: 0.000000e+00			  ---> final pos: 6.683441e+02 
+   in get_node_pos: name: vvfa.610223, pos: 6.779780e+02, fact: 0.000000e+00, length: 3.340000e-01, from_name: (null)
+	 in get_node_pos: name: vvfa.610223, from: 0.000000e+00			  ---> final pos: 6.779780e+02 
+   in get_node_pos: name: bctfi.610225, pos: 6.797401e+02, fact: 0.000000e+00, length: 4.820000e-01, from_name: (null)
+	 in get_node_pos: name: bctfi.610225, from: 0.000000e+00			  ---> final pos: 6.797401e+02 
+   in get_node_pos: name: bstl.610227, pos: 6.811111e+02, fact: 0.000000e+00, length: 8.600000e-01, from_name: (null)
+	 in get_node_pos: name: bstl.610227, from: 0.000000e+00			  ---> final pos: 6.811111e+02 
+   in get_node_pos: name: btv.610252, pos: 7.005691e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: btv.610252, from: 0.000000e+00			  ---> final pos: 7.005691e+02 
+   in get_node_pos: name: qtld.610300, pos: 7.045721e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtld.610300, from: 0.000000e+00			  ---> final pos: 7.045721e+02 
+   in get_node_pos: name: mdlv.610304, pos: 7.075001e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mdlv.610304, from: 0.000000e+00			  ---> final pos: 7.075001e+02 
+   in get_node_pos: name: bpck.610312, pos: 7.132921e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpck.610312, from: 0.000000e+00			  ---> final pos: 7.132921e+02 
+   in get_node_pos: name: btv.610317, pos: 7.169321e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: btv.610317, from: 0.000000e+00			  ---> final pos: 7.169321e+02 
+   in get_node_pos: name: ted.610321, pos: 7.231526e+02, fact: 0.000000e+00, length: 4.300000e+00, from_name: (null)
+	 in get_node_pos: name: ted.610321, from: 0.000000e+00			  ---> final pos: 7.231526e+02 
+   in get_node_pos: name: mdlh.610337, pos: 7.323091e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mdlh.610337, from: 0.000000e+00			  ---> final pos: 7.323091e+02 
+   in get_node_pos: name: bpck.610340, pos: 7.356341e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpck.610340, from: 0.000000e+00			  ---> final pos: 7.356341e+02 
+   in get_node_pos: name: qtlf.610400, pos: 7.377991e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtlf.610400, from: 0.000000e+00			  ---> final pos: 7.377991e+02 
+   in get_node_pos: name: mbb.610405, pos: 7.438231e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbb.610405, from: 0.000000e+00			  ---> final pos: 7.438231e+02 
+   in get_node_pos: name: mbb.610413, pos: 7.504631e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbb.610413, from: 0.000000e+00			  ---> final pos: 7.504631e+02 
+   in get_node_pos: name: mbe.610422, pos: 7.572401e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbe.610422, from: 0.000000e+00			  ---> final pos: 7.572401e+02 
+   in get_node_pos: name: mbe.610430, pos: 7.638801e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbe.610430, from: 0.000000e+00			  ---> final pos: 7.638801e+02 
+   in get_node_pos: name: mbe.610438, pos: 7.705202e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbe.610438, from: 0.000000e+00			  ---> final pos: 7.705202e+02 
+   in get_node_pos: name: qtld.610500, pos: 7.761602e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtld.610500, from: 0.000000e+00			  ---> final pos: 7.761602e+02 
+   in get_node_pos: name: mbe.610506, pos: 7.830202e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbe.610506, from: 0.000000e+00			  ---> final pos: 7.830202e+02 
+   in get_node_pos: name: mbe.610514, pos: 7.896602e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbe.610514, from: 0.000000e+00			  ---> final pos: 7.896602e+02 
+   in get_node_pos: name: mbb.610523, pos: 7.964372e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbb.610523, from: 0.000000e+00			  ---> final pos: 7.964372e+02 
+   in get_node_pos: name: mbb.610531, pos: 8.030772e+02, fact: 0.000000e+00, length: 6.260018e+00, from_name: (null)
+	 in get_node_pos: name: mbb.610531, from: 0.000000e+00			  ---> final pos: 8.030772e+02 
+   in get_node_pos: name: bpck.610539, pos: 8.066916e+02, fact: 0.000000e+00, length: 4.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpck.610539, from: 0.000000e+00			  ---> final pos: 8.066916e+02 
+   in get_node_pos: name: qtlf.610600, pos: 8.093086e+02, fact: 0.000000e+00, length: 2.990000e+00, from_name: (null)
+	 in get_node_pos: name: qtlf.610600, from: 0.000000e+00			  ---> final pos: 8.093086e+02 
+   in get_node_pos: name: vvsb.660015, pos: 8.223540e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsb.660015, from: 0.000000e+00			  ---> final pos: 8.223540e+02 
+   in get_node_pos: name: startti2, pos: 8.527901e+02, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: startti2, from: 0.000000e+00			  ---> final pos: 8.527901e+02 
+   in get_node_pos: name: mqid.20100, pos: 8.534901e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.20100, from: 0.000000e+00			  ---> final pos: 8.534901e+02 
+   in get_node_pos: name: bpmi.20104, pos: 8.544751e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20104, from: 0.000000e+00			  ---> final pos: 8.544751e+02 
+   in get_node_pos: name: tbse.20136, pos: 8.733365e+02, fact: 0.000000e+00, length: 4.000000e+00, from_name: (null)
+	 in get_node_pos: name: tbse.20136, from: 0.000000e+00			  ---> final pos: 8.733365e+02 
+   in get_node_pos: name: mbidh.20150, pos: 8.807745e+02, fact: 0.000000e+00, length: 6.260009e+00, from_name: (null)
+	 in get_node_pos: name: mbidh.20150, from: 0.000000e+00			  ---> final pos: 8.807745e+02 
+   in get_node_pos: name: mqif.20200, pos: 8.851605e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.20200, from: 0.000000e+00			  ---> final pos: 8.851605e+02 
+   in get_node_pos: name: bpmi.20204, pos: 8.861455e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20204, from: 0.000000e+00			  ---> final pos: 8.861455e+02 
+   in get_node_pos: name: mbidh.20214, pos: 8.942097e+02, fact: 0.000000e+00, length: 6.260009e+00, from_name: (null)
+	 in get_node_pos: name: mbidh.20214, from: 0.000000e+00			  ---> final pos: 8.942097e+02 
+   in get_node_pos: name: mqid.20300, pos: 9.166590e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.20300, from: 0.000000e+00			  ---> final pos: 9.166590e+02 
+   in get_node_pos: name: bpmi.20304, pos: 9.176440e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20304, from: 0.000000e+00			  ---> final pos: 9.176440e+02 
+   in get_node_pos: name: mciav.20304, pos: 9.181429e+02, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.20304, from: 0.000000e+00			  ---> final pos: 9.181429e+02 
+   in get_node_pos: name: mqif.20400, pos: 9.462434e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.20400, from: 0.000000e+00			  ---> final pos: 9.462434e+02 
+   in get_node_pos: name: bpmi.20404, pos: 9.472283e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20404, from: 0.000000e+00			  ---> final pos: 9.472283e+02 
+   in get_node_pos: name: vvsa.20441, pos: 9.662862e+02, fact: 0.000000e+00, length: 1.750000e-01, from_name: (null)
+	 in get_node_pos: name: vvsa.20441, from: 0.000000e+00			  ---> final pos: 9.662862e+02 
+   in get_node_pos: name: mqid.20500, pos: 9.838278e+02, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.20500, from: 0.000000e+00			  ---> final pos: 9.838278e+02 
+   in get_node_pos: name: bpmi.20504, pos: 9.848127e+02, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20504, from: 0.000000e+00			  ---> final pos: 9.848127e+02 
+   in get_node_pos: name: mciav.20504, pos: 9.853117e+02, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.20504, from: 0.000000e+00			  ---> final pos: 9.853117e+02 
+   in get_node_pos: name: btvi.20506, pos: 9.861727e+02, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.20506, from: 0.000000e+00			  ---> final pos: 9.861727e+02 
+   in get_node_pos: name: mqif.20600, pos: 1.011412e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.20600, from: 0.000000e+00			  ---> final pos: 1.011412e+03 
+   in get_node_pos: name: tcdiv.20607, pos: 1.014522e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdiv.20607, from: 0.000000e+00			  ---> final pos: 1.014522e+03 
+   in get_node_pos: name: tcdim.20634, pos: 1.027966e+03, fact: 0.000000e+00, length: 6.000000e-01, from_name: (null)
+	 in get_node_pos: name: tcdim.20634, from: 0.000000e+00			  ---> final pos: 1.027966e+03 
+   in get_node_pos: name: mbiav.20637, pos: 1.030589e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20637, from: 0.000000e+00			  ---> final pos: 1.030589e+03 
+   in get_node_pos: name: mbiav.20646, pos: 1.035116e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20646, from: 0.000000e+00			  ---> final pos: 1.035116e+03 
+   in get_node_pos: name: mbiav.20655, pos: 1.039643e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20655, from: 0.000000e+00			  ---> final pos: 1.039643e+03 
+   in get_node_pos: name: mqid.20700, pos: 1.042901e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.20700, from: 0.000000e+00			  ---> final pos: 1.042901e+03 
+   in get_node_pos: name: begline1, pos: 1.043601e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: begline1, from: 0.000000e+00			  ---> final pos: 1.043601e+03 
+   in get_node_pos: name: bpmi.20704, pos: 1.043886e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.20704, from: 0.000000e+00			  ---> final pos: 1.043886e+03 
+   in get_node_pos: name: mbiav.20707, pos: 1.047308e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20707, from: 0.000000e+00			  ---> final pos: 1.047308e+03 
+   in get_node_pos: name: mbiav.20716, pos: 1.051835e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20716, from: 0.000000e+00			  ---> final pos: 1.051835e+03 
+   in get_node_pos: name: mbiav.20725, pos: 1.056362e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20725, from: 0.000000e+00			  ---> final pos: 1.056362e+03 
+   in get_node_pos: name: mbiav.20734, pos: 1.060889e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20734, from: 0.000000e+00			  ---> final pos: 1.060889e+03 
+   in get_node_pos: name: mbiav.20744, pos: 1.065416e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20744, from: 0.000000e+00			  ---> final pos: 1.065416e+03 
+   in get_node_pos: name: mbiav.20753, pos: 1.069943e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20753, from: 0.000000e+00			  ---> final pos: 1.069943e+03 
+   in get_node_pos: name: mqif.20800, pos: 1.073201e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.20800, from: 0.000000e+00			  ---> final pos: 1.073201e+03 
+   in get_node_pos: name: mciah.20804, pos: 1.074685e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.20804, from: 0.000000e+00			  ---> final pos: 1.074685e+03 
+   in get_node_pos: name: mbiav.20807, pos: 1.077608e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20807, from: 0.000000e+00			  ---> final pos: 1.077608e+03 
+   in get_node_pos: name: mbiav.20816, pos: 1.082135e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20816, from: 0.000000e+00			  ---> final pos: 1.082135e+03 
+   in get_node_pos: name: mbiav.20825, pos: 1.086662e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20825, from: 0.000000e+00			  ---> final pos: 1.086662e+03 
+   in get_node_pos: name: mbiav.20834, pos: 1.091189e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20834, from: 0.000000e+00			  ---> final pos: 1.091189e+03 
+   in get_node_pos: name: mbiav.20844, pos: 1.095716e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20844, from: 0.000000e+00			  ---> final pos: 1.095716e+03 
+   in get_node_pos: name: mbiav.20853, pos: 1.100243e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20853, from: 0.000000e+00			  ---> final pos: 1.100243e+03 
+   in get_node_pos: name: mqid.20900, pos: 1.103501e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.20900, from: 0.000000e+00			  ---> final pos: 1.103501e+03 
+   in get_node_pos: name: mbiav.20907, pos: 1.107908e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20907, from: 0.000000e+00			  ---> final pos: 1.107908e+03 
+   in get_node_pos: name: mbiav.20916, pos: 1.112435e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.20916, from: 0.000000e+00			  ---> final pos: 1.112435e+03 
+   in get_node_pos: name: mqif.21000, pos: 1.133801e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.21000, from: 0.000000e+00			  ---> final pos: 1.133801e+03 
+   in get_node_pos: name: bpmi.21004, pos: 1.134786e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.21004, from: 0.000000e+00			  ---> final pos: 1.134786e+03 
+   in get_node_pos: name: mciah.21004, pos: 1.135285e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.21004, from: 0.000000e+00			  ---> final pos: 1.135285e+03 
+   in get_node_pos: name: mqid.21100, pos: 1.164101e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.21100, from: 0.000000e+00			  ---> final pos: 1.164101e+03 
+   in get_node_pos: name: mciav.21104, pos: 1.165585e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.21104, from: 0.000000e+00			  ---> final pos: 1.165585e+03 
+   in get_node_pos: name: mqif.21200, pos: 1.194401e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.21200, from: 0.000000e+00			  ---> final pos: 1.194401e+03 
+   in get_node_pos: name: bpmi.21204, pos: 1.195386e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.21204, from: 0.000000e+00			  ---> final pos: 1.195386e+03 
+   in get_node_pos: name: mqid.21300, pos: 1.224701e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.21300, from: 0.000000e+00			  ---> final pos: 1.224701e+03 
+   in get_node_pos: name: bpmi.21304, pos: 1.225686e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.21304, from: 0.000000e+00			  ---> final pos: 1.225686e+03 
+   in get_node_pos: name: mciav.21304, pos: 1.226185e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.21304, from: 0.000000e+00			  ---> final pos: 1.226185e+03 
+   in get_node_pos: name: mqif.21400, pos: 1.255001e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.21400, from: 0.000000e+00			  ---> final pos: 1.255001e+03 
+   in get_node_pos: name: mqid.21500, pos: 1.285301e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.21500, from: 0.000000e+00			  ---> final pos: 1.285301e+03 
+   in get_node_pos: name: bpmi.21504, pos: 1.286286e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.21504, from: 0.000000e+00			  ---> final pos: 1.286286e+03 
+   in get_node_pos: name: mqif.21600, pos: 1.315601e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.21600, from: 0.000000e+00			  ---> final pos: 1.315601e+03 
+   in get_node_pos: name: mciah.21604, pos: 1.317085e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.21604, from: 0.000000e+00			  ---> final pos: 1.317085e+03 
+   in get_node_pos: name: mqid.21700, pos: 1.345901e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.21700, from: 0.000000e+00			  ---> final pos: 1.345901e+03 
+   in get_node_pos: name: mqif.21800, pos: 1.376201e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.21800, from: 0.000000e+00			  ---> final pos: 1.376201e+03 
+   in get_node_pos: name: bpmi.21804, pos: 1.377186e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.21804, from: 0.000000e+00			  ---> final pos: 1.377186e+03 
+   in get_node_pos: name: mciah.21804, pos: 1.377685e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.21804, from: 0.000000e+00			  ---> final pos: 1.377685e+03 
+   in get_node_pos: name: mqid.21900, pos: 1.406501e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.21900, from: 0.000000e+00			  ---> final pos: 1.406501e+03 
+   in get_node_pos: name: mciav.21904, pos: 1.407985e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.21904, from: 0.000000e+00			  ---> final pos: 1.407985e+03 
+   in get_node_pos: name: mqif.22000, pos: 1.436801e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.22000, from: 0.000000e+00			  ---> final pos: 1.436801e+03 
+   in get_node_pos: name: bpmi.22004, pos: 1.437786e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22004, from: 0.000000e+00			  ---> final pos: 1.437786e+03 
+   in get_node_pos: name: mqid.22100, pos: 1.467101e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.22100, from: 0.000000e+00			  ---> final pos: 1.467101e+03 
+   in get_node_pos: name: bpmi.22104, pos: 1.468086e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22104, from: 0.000000e+00			  ---> final pos: 1.468086e+03 
+   in get_node_pos: name: mciav.22104, pos: 1.468585e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.22104, from: 0.000000e+00			  ---> final pos: 1.468585e+03 
+   in get_node_pos: name: mbi.22134, pos: 1.486261e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22134, from: 0.000000e+00			  ---> final pos: 1.486261e+03 
+   in get_node_pos: name: mbi.22147, pos: 1.493081e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22147, from: 0.000000e+00			  ---> final pos: 1.493081e+03 
+   in get_node_pos: name: mqif.22200, pos: 1.497401e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.22200, from: 0.000000e+00			  ---> final pos: 1.497401e+03 
+   in get_node_pos: name: mbi.22206, pos: 1.502921e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22206, from: 0.000000e+00			  ---> final pos: 1.502921e+03 
+   in get_node_pos: name: mbi.22220, pos: 1.509741e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22220, from: 0.000000e+00			  ---> final pos: 1.509741e+03 
+   in get_node_pos: name: mqid.22300, pos: 1.527701e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.22300, from: 0.000000e+00			  ---> final pos: 1.527701e+03 
+   in get_node_pos: name: bpmi.22304, pos: 1.528686e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22304, from: 0.000000e+00			  ---> final pos: 1.528686e+03 
+   in get_node_pos: name: mqif.22400, pos: 1.558001e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.22400, from: 0.000000e+00			  ---> final pos: 1.558001e+03 
+   in get_node_pos: name: mciah.22404, pos: 1.559485e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.22404, from: 0.000000e+00			  ---> final pos: 1.559485e+03 
+   in get_node_pos: name: mqid.22500, pos: 1.588301e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.22500, from: 0.000000e+00			  ---> final pos: 1.588301e+03 
+   in get_node_pos: name: mqif.22600, pos: 1.618601e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.22600, from: 0.000000e+00			  ---> final pos: 1.618601e+03 
+   in get_node_pos: name: bpmi.22604, pos: 1.619586e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22604, from: 0.000000e+00			  ---> final pos: 1.619586e+03 
+   in get_node_pos: name: mciah.22604, pos: 1.620085e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.22604, from: 0.000000e+00			  ---> final pos: 1.620085e+03 
+   in get_node_pos: name: mqid.22700, pos: 1.648901e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.22700, from: 0.000000e+00			  ---> final pos: 1.648901e+03 
+   in get_node_pos: name: mciav.22704, pos: 1.650385e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.22704, from: 0.000000e+00			  ---> final pos: 1.650385e+03 
+   in get_node_pos: name: mqif.22800, pos: 1.679201e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.22800, from: 0.000000e+00			  ---> final pos: 1.679201e+03 
+   in get_node_pos: name: arcbegin, pos: 1.679901e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: arcbegin, from: 0.000000e+00			  ---> final pos: 1.679901e+03 
+   in get_node_pos: name: bpmi.22804, pos: 1.680186e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22804, from: 0.000000e+00			  ---> final pos: 1.680186e+03 
+   in get_node_pos: name: mbi.22820, pos: 1.691541e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22820, from: 0.000000e+00			  ---> final pos: 1.691541e+03 
+   in get_node_pos: name: mbi.22834, pos: 1.698361e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22834, from: 0.000000e+00			  ---> final pos: 1.698361e+03 
+   in get_node_pos: name: mqid.22900, pos: 1.709501e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.22900, from: 0.000000e+00			  ---> final pos: 1.709501e+03 
+   in get_node_pos: name: bpmi.22904, pos: 1.710486e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.22904, from: 0.000000e+00			  ---> final pos: 1.710486e+03 
+   in get_node_pos: name: mciav.22904, pos: 1.710985e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.22904, from: 0.000000e+00			  ---> final pos: 1.710985e+03 
+   in get_node_pos: name: mbi.22920, pos: 1.721841e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22920, from: 0.000000e+00			  ---> final pos: 1.721841e+03 
+   in get_node_pos: name: mbi.22934, pos: 1.728661e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.22934, from: 0.000000e+00			  ---> final pos: 1.728661e+03 
+   in get_node_pos: name: mqif.23000, pos: 1.739801e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.23000, from: 0.000000e+00			  ---> final pos: 1.739801e+03 
+   in get_node_pos: name: mbi.23020, pos: 1.752141e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23020, from: 0.000000e+00			  ---> final pos: 1.752141e+03 
+   in get_node_pos: name: mbi.23034, pos: 1.758961e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23034, from: 0.000000e+00			  ---> final pos: 1.758961e+03 
+   in get_node_pos: name: mqid.23100, pos: 1.770101e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.23100, from: 0.000000e+00			  ---> final pos: 1.770101e+03 
+   in get_node_pos: name: bpmi.23104, pos: 1.771086e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.23104, from: 0.000000e+00			  ---> final pos: 1.771086e+03 
+   in get_node_pos: name: mbi.23120, pos: 1.782441e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23120, from: 0.000000e+00			  ---> final pos: 1.782441e+03 
+   in get_node_pos: name: mbi.23134, pos: 1.789261e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23134, from: 0.000000e+00			  ---> final pos: 1.789261e+03 
+   in get_node_pos: name: mqif.23200, pos: 1.800401e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.23200, from: 0.000000e+00			  ---> final pos: 1.800401e+03 
+   in get_node_pos: name: mciah.23204, pos: 1.801885e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.23204, from: 0.000000e+00			  ---> final pos: 1.801885e+03 
+   in get_node_pos: name: mbi.23206, pos: 1.805921e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23206, from: 0.000000e+00			  ---> final pos: 1.805921e+03 
+   in get_node_pos: name: mbi.23220, pos: 1.812741e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23220, from: 0.000000e+00			  ---> final pos: 1.812741e+03 
+   in get_node_pos: name: mbi.23234, pos: 1.819561e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23234, from: 0.000000e+00			  ---> final pos: 1.819561e+03 
+   in get_node_pos: name: mbi.23247, pos: 1.826381e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23247, from: 0.000000e+00			  ---> final pos: 1.826381e+03 
+   in get_node_pos: name: mqid.23300, pos: 1.830701e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.23300, from: 0.000000e+00			  ---> final pos: 1.830701e+03 
+   in get_node_pos: name: mbi.23306, pos: 1.836221e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23306, from: 0.000000e+00			  ---> final pos: 1.836221e+03 
+   in get_node_pos: name: mbi.23320, pos: 1.843041e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23320, from: 0.000000e+00			  ---> final pos: 1.843041e+03 
+   in get_node_pos: name: mbi.23334, pos: 1.849861e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23334, from: 0.000000e+00			  ---> final pos: 1.849861e+03 
+   in get_node_pos: name: mbi.23347, pos: 1.856681e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23347, from: 0.000000e+00			  ---> final pos: 1.856681e+03 
+   in get_node_pos: name: mqif.23400, pos: 1.861001e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.23400, from: 0.000000e+00			  ---> final pos: 1.861001e+03 
+   in get_node_pos: name: bpmi.23404, pos: 1.861986e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.23404, from: 0.000000e+00			  ---> final pos: 1.861986e+03 
+   in get_node_pos: name: mciah.23404, pos: 1.862485e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.23404, from: 0.000000e+00			  ---> final pos: 1.862485e+03 
+   in get_node_pos: name: mbi.23406, pos: 1.866521e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23406, from: 0.000000e+00			  ---> final pos: 1.866521e+03 
+   in get_node_pos: name: mbi.23420, pos: 1.873341e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23420, from: 0.000000e+00			  ---> final pos: 1.873341e+03 
+   in get_node_pos: name: mbi.23434, pos: 1.880161e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23434, from: 0.000000e+00			  ---> final pos: 1.880161e+03 
+   in get_node_pos: name: mbi.23447, pos: 1.886981e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23447, from: 0.000000e+00			  ---> final pos: 1.886981e+03 
+   in get_node_pos: name: mqid.23500, pos: 1.891301e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.23500, from: 0.000000e+00			  ---> final pos: 1.891301e+03 
+   in get_node_pos: name: mciav.23504, pos: 1.892785e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.23504, from: 0.000000e+00			  ---> final pos: 1.892785e+03 
+   in get_node_pos: name: mbi.23506, pos: 1.896821e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23506, from: 0.000000e+00			  ---> final pos: 1.896821e+03 
+   in get_node_pos: name: mbi.23520, pos: 1.903641e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23520, from: 0.000000e+00			  ---> final pos: 1.903641e+03 
+   in get_node_pos: name: mbi.23534, pos: 1.910461e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23534, from: 0.000000e+00			  ---> final pos: 1.910461e+03 
+   in get_node_pos: name: mbi.23547, pos: 1.917281e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23547, from: 0.000000e+00			  ---> final pos: 1.917281e+03 
+   in get_node_pos: name: mqif.23600, pos: 1.921601e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.23600, from: 0.000000e+00			  ---> final pos: 1.921601e+03 
+   in get_node_pos: name: bpmi.23604, pos: 1.922586e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.23604, from: 0.000000e+00			  ---> final pos: 1.922586e+03 
+   in get_node_pos: name: mbi.23606, pos: 1.927121e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23606, from: 0.000000e+00			  ---> final pos: 1.927121e+03 
+   in get_node_pos: name: mbi.23620, pos: 1.933941e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23620, from: 0.000000e+00			  ---> final pos: 1.933941e+03 
+   in get_node_pos: name: mbi.23634, pos: 1.940761e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23634, from: 0.000000e+00			  ---> final pos: 1.940761e+03 
+   in get_node_pos: name: mbi.23647, pos: 1.947581e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23647, from: 0.000000e+00			  ---> final pos: 1.947581e+03 
+   in get_node_pos: name: mqid.23700, pos: 1.951901e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.23700, from: 0.000000e+00			  ---> final pos: 1.951901e+03 
+   in get_node_pos: name: bpmi.23704, pos: 1.952886e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.23704, from: 0.000000e+00			  ---> final pos: 1.952886e+03 
+   in get_node_pos: name: mciav.23704, pos: 1.953385e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.23704, from: 0.000000e+00			  ---> final pos: 1.953385e+03 
+   in get_node_pos: name: mbi.23706, pos: 1.957421e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23706, from: 0.000000e+00			  ---> final pos: 1.957421e+03 
+   in get_node_pos: name: mbi.23720, pos: 1.964241e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23720, from: 0.000000e+00			  ---> final pos: 1.964241e+03 
+   in get_node_pos: name: mbi.23734, pos: 1.971061e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23734, from: 0.000000e+00			  ---> final pos: 1.971061e+03 
+   in get_node_pos: name: mbi.23747, pos: 1.977881e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23747, from: 0.000000e+00			  ---> final pos: 1.977881e+03 
+   in get_node_pos: name: mqif.23800, pos: 1.982201e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.23800, from: 0.000000e+00			  ---> final pos: 1.982201e+03 
+   in get_node_pos: name: mbi.23806, pos: 1.987721e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23806, from: 0.000000e+00			  ---> final pos: 1.987721e+03 
+   in get_node_pos: name: mbi.23820, pos: 1.994541e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23820, from: 0.000000e+00			  ---> final pos: 1.994541e+03 
+   in get_node_pos: name: mbi.23834, pos: 2.001361e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23834, from: 0.000000e+00			  ---> final pos: 2.001361e+03 
+   in get_node_pos: name: mbi.23847, pos: 2.008181e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23847, from: 0.000000e+00			  ---> final pos: 2.008181e+03 
+   in get_node_pos: name: mqid.23900, pos: 2.012501e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.23900, from: 0.000000e+00			  ---> final pos: 2.012501e+03 
+   in get_node_pos: name: bpmi.23904, pos: 2.013486e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.23904, from: 0.000000e+00			  ---> final pos: 2.013486e+03 
+   in get_node_pos: name: mbi.23906, pos: 2.018021e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23906, from: 0.000000e+00			  ---> final pos: 2.018021e+03 
+   in get_node_pos: name: mbi.23920, pos: 2.024841e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23920, from: 0.000000e+00			  ---> final pos: 2.024841e+03 
+   in get_node_pos: name: mbi.23934, pos: 2.031661e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23934, from: 0.000000e+00			  ---> final pos: 2.031661e+03 
+   in get_node_pos: name: mbi.23947, pos: 2.038481e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.23947, from: 0.000000e+00			  ---> final pos: 2.038481e+03 
+   in get_node_pos: name: mqif.24000, pos: 2.042801e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.24000, from: 0.000000e+00			  ---> final pos: 2.042801e+03 
+   in get_node_pos: name: mciah.24004, pos: 2.044285e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.24004, from: 0.000000e+00			  ---> final pos: 2.044285e+03 
+   in get_node_pos: name: mbi.24006, pos: 2.048321e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24006, from: 0.000000e+00			  ---> final pos: 2.048321e+03 
+   in get_node_pos: name: mbi.24020, pos: 2.055141e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24020, from: 0.000000e+00			  ---> final pos: 2.055141e+03 
+   in get_node_pos: name: mbi.24034, pos: 2.061961e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24034, from: 0.000000e+00			  ---> final pos: 2.061961e+03 
+   in get_node_pos: name: mbi.24047, pos: 2.068781e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24047, from: 0.000000e+00			  ---> final pos: 2.068781e+03 
+   in get_node_pos: name: mqid.24100, pos: 2.073101e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.24100, from: 0.000000e+00			  ---> final pos: 2.073101e+03 
+   in get_node_pos: name: mbi.24106, pos: 2.078621e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24106, from: 0.000000e+00			  ---> final pos: 2.078621e+03 
+   in get_node_pos: name: mbi.24120, pos: 2.085441e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24120, from: 0.000000e+00			  ---> final pos: 2.085441e+03 
+   in get_node_pos: name: mbi.24134, pos: 2.092261e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24134, from: 0.000000e+00			  ---> final pos: 2.092261e+03 
+   in get_node_pos: name: mbi.24147, pos: 2.099081e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24147, from: 0.000000e+00			  ---> final pos: 2.099081e+03 
+   in get_node_pos: name: mqif.24200, pos: 2.103401e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.24200, from: 0.000000e+00			  ---> final pos: 2.103401e+03 
+   in get_node_pos: name: bpmi.24204, pos: 2.104386e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.24204, from: 0.000000e+00			  ---> final pos: 2.104386e+03 
+   in get_node_pos: name: mciah.24204, pos: 2.104885e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.24204, from: 0.000000e+00			  ---> final pos: 2.104885e+03 
+   in get_node_pos: name: mbi.24206, pos: 2.108921e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24206, from: 0.000000e+00			  ---> final pos: 2.108921e+03 
+   in get_node_pos: name: mbi.24220, pos: 2.115741e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24220, from: 0.000000e+00			  ---> final pos: 2.115741e+03 
+   in get_node_pos: name: mbi.24234, pos: 2.122561e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24234, from: 0.000000e+00			  ---> final pos: 2.122561e+03 
+   in get_node_pos: name: mbi.24247, pos: 2.129382e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24247, from: 0.000000e+00			  ---> final pos: 2.129382e+03 
+   in get_node_pos: name: mqid.24300, pos: 2.133702e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.24300, from: 0.000000e+00			  ---> final pos: 2.133702e+03 
+   in get_node_pos: name: mciav.24304, pos: 2.135186e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.24304, from: 0.000000e+00			  ---> final pos: 2.135186e+03 
+   in get_node_pos: name: mbi.24306, pos: 2.139222e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24306, from: 0.000000e+00			  ---> final pos: 2.139222e+03 
+   in get_node_pos: name: mbi.24320, pos: 2.146042e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24320, from: 0.000000e+00			  ---> final pos: 2.146042e+03 
+   in get_node_pos: name: mbi.24334, pos: 2.152862e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24334, from: 0.000000e+00			  ---> final pos: 2.152862e+03 
+   in get_node_pos: name: mbi.24347, pos: 2.159682e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24347, from: 0.000000e+00			  ---> final pos: 2.159682e+03 
+   in get_node_pos: name: mqif.24400, pos: 2.164002e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.24400, from: 0.000000e+00			  ---> final pos: 2.164002e+03 
+   in get_node_pos: name: bpmi.24404, pos: 2.164987e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.24404, from: 0.000000e+00			  ---> final pos: 2.164987e+03 
+   in get_node_pos: name: btvi.24404, pos: 2.165407e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.24404, from: 0.000000e+00			  ---> final pos: 2.165407e+03 
+   in get_node_pos: name: mbi.24406, pos: 2.169522e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24406, from: 0.000000e+00			  ---> final pos: 2.169522e+03 
+   in get_node_pos: name: mbi.24420, pos: 2.176342e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24420, from: 0.000000e+00			  ---> final pos: 2.176342e+03 
+   in get_node_pos: name: mbi.24434, pos: 2.183162e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24434, from: 0.000000e+00			  ---> final pos: 2.183162e+03 
+   in get_node_pos: name: mbi.24447, pos: 2.189982e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24447, from: 0.000000e+00			  ---> final pos: 2.189982e+03 
+   in get_node_pos: name: mqid.24500, pos: 2.194302e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.24500, from: 0.000000e+00			  ---> final pos: 2.194302e+03 
+   in get_node_pos: name: bpmi.24504, pos: 2.195287e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.24504, from: 0.000000e+00			  ---> final pos: 2.195287e+03 
+   in get_node_pos: name: mciav.24504, pos: 2.195786e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.24504, from: 0.000000e+00			  ---> final pos: 2.195786e+03 
+   in get_node_pos: name: mbi.24506, pos: 2.199822e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24506, from: 0.000000e+00			  ---> final pos: 2.199822e+03 
+   in get_node_pos: name: mbi.24520, pos: 2.206642e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24520, from: 0.000000e+00			  ---> final pos: 2.206642e+03 
+   in get_node_pos: name: mbi.24534, pos: 2.213462e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24534, from: 0.000000e+00			  ---> final pos: 2.213462e+03 
+   in get_node_pos: name: mbi.24547, pos: 2.220282e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24547, from: 0.000000e+00			  ---> final pos: 2.220282e+03 
+   in get_node_pos: name: mqif.24600, pos: 2.224602e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.24600, from: 0.000000e+00			  ---> final pos: 2.224602e+03 
+   in get_node_pos: name: btvi.24604, pos: 2.226007e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.24604, from: 0.000000e+00			  ---> final pos: 2.226007e+03 
+   in get_node_pos: name: mbi.24606, pos: 2.230122e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24606, from: 0.000000e+00			  ---> final pos: 2.230122e+03 
+   in get_node_pos: name: mbi.24620, pos: 2.236942e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24620, from: 0.000000e+00			  ---> final pos: 2.236942e+03 
+   in get_node_pos: name: mbi.24634, pos: 2.243762e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24634, from: 0.000000e+00			  ---> final pos: 2.243762e+03 
+   in get_node_pos: name: mbi.24647, pos: 2.250582e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24647, from: 0.000000e+00			  ---> final pos: 2.250582e+03 
+   in get_node_pos: name: mqid.24700, pos: 2.254902e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.24700, from: 0.000000e+00			  ---> final pos: 2.254902e+03 
+   in get_node_pos: name: bpmi.24704, pos: 2.255887e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.24704, from: 0.000000e+00			  ---> final pos: 2.255887e+03 
+   in get_node_pos: name: btvi.24704, pos: 2.256307e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.24704, from: 0.000000e+00			  ---> final pos: 2.256307e+03 
+   in get_node_pos: name: mbi.24706, pos: 2.260422e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24706, from: 0.000000e+00			  ---> final pos: 2.260422e+03 
+   in get_node_pos: name: mbi.24720, pos: 2.267242e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24720, from: 0.000000e+00			  ---> final pos: 2.267242e+03 
+   in get_node_pos: name: mbi.24734, pos: 2.274062e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24734, from: 0.000000e+00			  ---> final pos: 2.274062e+03 
+   in get_node_pos: name: mbi.24747, pos: 2.280882e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24747, from: 0.000000e+00			  ---> final pos: 2.280882e+03 
+   in get_node_pos: name: mqif.24800, pos: 2.285202e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.24800, from: 0.000000e+00			  ---> final pos: 2.285202e+03 
+   in get_node_pos: name: mciah.24804, pos: 2.286686e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.24804, from: 0.000000e+00			  ---> final pos: 2.286686e+03 
+   in get_node_pos: name: mbi.24806, pos: 2.290722e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24806, from: 0.000000e+00			  ---> final pos: 2.290722e+03 
+   in get_node_pos: name: mbi.24820, pos: 2.297542e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24820, from: 0.000000e+00			  ---> final pos: 2.297542e+03 
+   in get_node_pos: name: mbi.24834, pos: 2.304362e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24834, from: 0.000000e+00			  ---> final pos: 2.304362e+03 
+   in get_node_pos: name: mbi.24847, pos: 2.311182e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24847, from: 0.000000e+00			  ---> final pos: 2.311182e+03 
+   in get_node_pos: name: mqid.24900, pos: 2.315502e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.24900, from: 0.000000e+00			  ---> final pos: 2.315502e+03 
+   in get_node_pos: name: mbi.24906, pos: 2.321022e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24906, from: 0.000000e+00			  ---> final pos: 2.321022e+03 
+   in get_node_pos: name: mbi.24920, pos: 2.327842e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24920, from: 0.000000e+00			  ---> final pos: 2.327842e+03 
+   in get_node_pos: name: mbi.24934, pos: 2.334662e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24934, from: 0.000000e+00			  ---> final pos: 2.334662e+03 
+   in get_node_pos: name: mbi.24947, pos: 2.341482e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.24947, from: 0.000000e+00			  ---> final pos: 2.341482e+03 
+   in get_node_pos: name: mqif.25000, pos: 2.345802e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.25000, from: 0.000000e+00			  ---> final pos: 2.345802e+03 
+   in get_node_pos: name: bpmi.25004, pos: 2.346787e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.25004, from: 0.000000e+00			  ---> final pos: 2.346787e+03 
+   in get_node_pos: name: mciah.25004, pos: 2.347286e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.25004, from: 0.000000e+00			  ---> final pos: 2.347286e+03 
+   in get_node_pos: name: mbi.25006, pos: 2.351322e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25006, from: 0.000000e+00			  ---> final pos: 2.351322e+03 
+   in get_node_pos: name: mbi.25020, pos: 2.358142e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25020, from: 0.000000e+00			  ---> final pos: 2.358142e+03 
+   in get_node_pos: name: mbi.25034, pos: 2.364962e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25034, from: 0.000000e+00			  ---> final pos: 2.364962e+03 
+   in get_node_pos: name: mbi.25047, pos: 2.371782e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25047, from: 0.000000e+00			  ---> final pos: 2.371782e+03 
+   in get_node_pos: name: mqid.25100, pos: 2.376102e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.25100, from: 0.000000e+00			  ---> final pos: 2.376102e+03 
+   in get_node_pos: name: mciav.25104, pos: 2.377586e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.25104, from: 0.000000e+00			  ---> final pos: 2.377586e+03 
+   in get_node_pos: name: mbi.25106, pos: 2.381622e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25106, from: 0.000000e+00			  ---> final pos: 2.381622e+03 
+   in get_node_pos: name: mbi.25120, pos: 2.388442e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25120, from: 0.000000e+00			  ---> final pos: 2.388442e+03 
+   in get_node_pos: name: mbi.25134, pos: 2.395262e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25134, from: 0.000000e+00			  ---> final pos: 2.395262e+03 
+   in get_node_pos: name: mbi.25147, pos: 2.402082e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25147, from: 0.000000e+00			  ---> final pos: 2.402082e+03 
+   in get_node_pos: name: mqif.25200, pos: 2.406402e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.25200, from: 0.000000e+00			  ---> final pos: 2.406402e+03 
+   in get_node_pos: name: bpmi.25204, pos: 2.407387e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.25204, from: 0.000000e+00			  ---> final pos: 2.407387e+03 
+   in get_node_pos: name: mbi.25206, pos: 2.411922e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25206, from: 0.000000e+00			  ---> final pos: 2.411922e+03 
+   in get_node_pos: name: mbi.25220, pos: 2.418742e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25220, from: 0.000000e+00			  ---> final pos: 2.418742e+03 
+   in get_node_pos: name: mbi.25234, pos: 2.425562e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25234, from: 0.000000e+00			  ---> final pos: 2.425562e+03 
+   in get_node_pos: name: mbi.25247, pos: 2.432382e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25247, from: 0.000000e+00			  ---> final pos: 2.432382e+03 
+   in get_node_pos: name: mqid.25300, pos: 2.436702e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.25300, from: 0.000000e+00			  ---> final pos: 2.436702e+03 
+   in get_node_pos: name: bpmi.25304, pos: 2.437687e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.25304, from: 0.000000e+00			  ---> final pos: 2.437687e+03 
+   in get_node_pos: name: mciav.25304, pos: 2.438186e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.25304, from: 0.000000e+00			  ---> final pos: 2.438186e+03 
+   in get_node_pos: name: mbi.25306, pos: 2.442222e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25306, from: 0.000000e+00			  ---> final pos: 2.442222e+03 
+   in get_node_pos: name: mbi.25320, pos: 2.449042e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25320, from: 0.000000e+00			  ---> final pos: 2.449042e+03 
+   in get_node_pos: name: mbi.25334, pos: 2.455862e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25334, from: 0.000000e+00			  ---> final pos: 2.455862e+03 
+   in get_node_pos: name: mbi.25347, pos: 2.462682e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25347, from: 0.000000e+00			  ---> final pos: 2.462682e+03 
+   in get_node_pos: name: mqif.25400, pos: 2.467002e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.25400, from: 0.000000e+00			  ---> final pos: 2.467002e+03 
+   in get_node_pos: name: mbi.25420, pos: 2.479342e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25420, from: 0.000000e+00			  ---> final pos: 2.479342e+03 
+   in get_node_pos: name: mbi.25434, pos: 2.486162e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25434, from: 0.000000e+00			  ---> final pos: 2.486162e+03 
+   in get_node_pos: name: mqid.25500, pos: 2.497302e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.25500, from: 0.000000e+00			  ---> final pos: 2.497302e+03 
+   in get_node_pos: name: bpmi.25504, pos: 2.498287e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.25504, from: 0.000000e+00			  ---> final pos: 2.498287e+03 
+   in get_node_pos: name: mbi.25520, pos: 2.509642e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25520, from: 0.000000e+00			  ---> final pos: 2.509642e+03 
+   in get_node_pos: name: mbi.25534, pos: 2.516462e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25534, from: 0.000000e+00			  ---> final pos: 2.516462e+03 
+   in get_node_pos: name: mqif.25600, pos: 2.527602e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.25600, from: 0.000000e+00			  ---> final pos: 2.527602e+03 
+   in get_node_pos: name: mciah.25604, pos: 2.529086e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.25604, from: 0.000000e+00			  ---> final pos: 2.529086e+03 
+   in get_node_pos: name: mbi.25620, pos: 2.539942e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25620, from: 0.000000e+00			  ---> final pos: 2.539942e+03 
+   in get_node_pos: name: mbi.25634, pos: 2.546762e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25634, from: 0.000000e+00			  ---> final pos: 2.546762e+03 
+   in get_node_pos: name: mqid.25700, pos: 2.557902e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.25700, from: 0.000000e+00			  ---> final pos: 2.557902e+03 
+   in get_node_pos: name: mbi.25720, pos: 2.570242e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25720, from: 0.000000e+00			  ---> final pos: 2.570242e+03 
+   in get_node_pos: name: mbi.25734, pos: 2.577062e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25734, from: 0.000000e+00			  ---> final pos: 2.577062e+03 
+   in get_node_pos: name: arcend, pos: 2.587502e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: arcend, from: 0.000000e+00			  ---> final pos: 2.587502e+03 
+   in get_node_pos: name: mqif.25800, pos: 2.588202e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.25800, from: 0.000000e+00			  ---> final pos: 2.588202e+03 
+   in get_node_pos: name: bpmi.25804, pos: 2.589187e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.25804, from: 0.000000e+00			  ---> final pos: 2.589187e+03 
+   in get_node_pos: name: mciah.25804, pos: 2.589686e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.25804, from: 0.000000e+00			  ---> final pos: 2.589686e+03 
+   in get_node_pos: name: mqid.25900, pos: 2.618502e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.25900, from: 0.000000e+00			  ---> final pos: 2.618502e+03 
+   in get_node_pos: name: mciav.25904, pos: 2.619986e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.25904, from: 0.000000e+00			  ---> final pos: 2.619986e+03 
+   in get_node_pos: name: mbi.25934, pos: 2.637662e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25934, from: 0.000000e+00			  ---> final pos: 2.637662e+03 
+   in get_node_pos: name: mbi.25947, pos: 2.644482e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.25947, from: 0.000000e+00			  ---> final pos: 2.644482e+03 
+   in get_node_pos: name: mqif.26000, pos: 2.648802e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.26000, from: 0.000000e+00			  ---> final pos: 2.648802e+03 
+   in get_node_pos: name: bpmi.26004, pos: 2.649787e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26004, from: 0.000000e+00			  ---> final pos: 2.649787e+03 
+   in get_node_pos: name: mbi.26006, pos: 2.654322e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.26006, from: 0.000000e+00			  ---> final pos: 2.654322e+03 
+   in get_node_pos: name: mbi.26020, pos: 2.661142e+03, fact: 0.000000e+00, length: 6.300015e+00, from_name: (null)
+	 in get_node_pos: name: mbi.26020, from: 0.000000e+00			  ---> final pos: 2.661142e+03 
+   in get_node_pos: name: mqid.26100, pos: 2.679102e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.26100, from: 0.000000e+00			  ---> final pos: 2.679102e+03 
+   in get_node_pos: name: bpmi.26104, pos: 2.680087e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26104, from: 0.000000e+00			  ---> final pos: 2.680087e+03 
+   in get_node_pos: name: mciav.26104, pos: 2.680586e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.26104, from: 0.000000e+00			  ---> final pos: 2.680586e+03 
+   in get_node_pos: name: mqif.26200, pos: 2.709402e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.26200, from: 0.000000e+00			  ---> final pos: 2.709402e+03 
+   in get_node_pos: name: mqid.26300, pos: 2.739702e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.26300, from: 0.000000e+00			  ---> final pos: 2.739702e+03 
+   in get_node_pos: name: bpmi.26304, pos: 2.740687e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26304, from: 0.000000e+00			  ---> final pos: 2.740687e+03 
+   in get_node_pos: name: mqif.26400, pos: 2.770002e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.26400, from: 0.000000e+00			  ---> final pos: 2.770002e+03 
+   in get_node_pos: name: mciah.26404, pos: 2.771486e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.26404, from: 0.000000e+00			  ---> final pos: 2.771486e+03 
+   in get_node_pos: name: mbiav.26407, pos: 2.774410e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26407, from: 0.000000e+00			  ---> final pos: 2.774410e+03 
+   in get_node_pos: name: mbiav.26416, pos: 2.778937e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26416, from: 0.000000e+00			  ---> final pos: 2.778937e+03 
+   in get_node_pos: name: mbiav.26425, pos: 2.783464e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26425, from: 0.000000e+00			  ---> final pos: 2.783464e+03 
+   in get_node_pos: name: mbiav.26434, pos: 2.787991e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26434, from: 0.000000e+00			  ---> final pos: 2.787991e+03 
+   in get_node_pos: name: mbiav.26443, pos: 2.792518e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26443, from: 0.000000e+00			  ---> final pos: 2.792518e+03 
+   in get_node_pos: name: mbiav.26452, pos: 2.797045e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26452, from: 0.000000e+00			  ---> final pos: 2.797045e+03 
+   in get_node_pos: name: mqid.26500, pos: 2.800302e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.26500, from: 0.000000e+00			  ---> final pos: 2.800302e+03 
+   in get_node_pos: name: btvi.26506, pos: 2.802647e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.26506, from: 0.000000e+00			  ---> final pos: 2.802647e+03 
+   in get_node_pos: name: mqif.26600, pos: 2.830602e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.26600, from: 0.000000e+00			  ---> final pos: 2.830602e+03 
+   in get_node_pos: name: bpmi.26604, pos: 2.831587e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26604, from: 0.000000e+00			  ---> final pos: 2.831587e+03 
+   in get_node_pos: name: mciah.26604, pos: 2.832086e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.26604, from: 0.000000e+00			  ---> final pos: 2.832086e+03 
+   in get_node_pos: name: btvi.26606, pos: 2.832947e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.26606, from: 0.000000e+00			  ---> final pos: 2.832947e+03 
+   in get_node_pos: name: mqid.26700, pos: 2.860902e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.26700, from: 0.000000e+00			  ---> final pos: 2.860902e+03 
+   in get_node_pos: name: mciav.26704, pos: 2.862386e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.26704, from: 0.000000e+00			  ---> final pos: 2.862386e+03 
+   in get_node_pos: name: btvi.26706, pos: 2.863247e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.26706, from: 0.000000e+00			  ---> final pos: 2.863247e+03 
+   in get_node_pos: name: mqif.26800, pos: 2.891202e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.26800, from: 0.000000e+00			  ---> final pos: 2.891202e+03 
+   in get_node_pos: name: bpmi.26804, pos: 2.892187e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26804, from: 0.000000e+00			  ---> final pos: 2.892187e+03 
+   in get_node_pos: name: mbiav.26807, pos: 2.895610e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26807, from: 0.000000e+00			  ---> final pos: 2.895610e+03 
+   in get_node_pos: name: mbiav.26816, pos: 2.900137e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26816, from: 0.000000e+00			  ---> final pos: 2.900137e+03 
+   in get_node_pos: name: mbiav.26825, pos: 2.904664e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26825, from: 0.000000e+00			  ---> final pos: 2.904664e+03 
+   in get_node_pos: name: mbiav.26834, pos: 2.909191e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26834, from: 0.000000e+00			  ---> final pos: 2.909191e+03 
+   in get_node_pos: name: mbiav.26843, pos: 2.913718e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26843, from: 0.000000e+00			  ---> final pos: 2.913718e+03 
+   in get_node_pos: name: mbiav.26852, pos: 2.918245e+03, fact: 0.000000e+00, length: 3.412002e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.26852, from: 0.000000e+00			  ---> final pos: 2.918245e+03 
+   in get_node_pos: name: mqid.26900, pos: 2.921502e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.26900, from: 0.000000e+00			  ---> final pos: 2.921502e+03 
+   in get_node_pos: name: bpmi.26904, pos: 2.922487e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.26904, from: 0.000000e+00			  ---> final pos: 2.922487e+03 
+   in get_node_pos: name: mciav.26904, pos: 2.922986e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.26904, from: 0.000000e+00			  ---> final pos: 2.922986e+03 
+   in get_node_pos: name: mqif.27000, pos: 2.951802e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.27000, from: 0.000000e+00			  ---> final pos: 2.951802e+03 
+   in get_node_pos: name: mqid.27100, pos: 2.982102e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.27100, from: 0.000000e+00			  ---> final pos: 2.982102e+03 
+   in get_node_pos: name: bpmi.27104, pos: 2.983087e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.27104, from: 0.000000e+00			  ---> final pos: 2.983087e+03 
+   in get_node_pos: name: mqif.27200, pos: 3.012402e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.27200, from: 0.000000e+00			  ---> final pos: 3.012402e+03 
+   in get_node_pos: name: mciah.27204, pos: 3.013886e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.27204, from: 0.000000e+00			  ---> final pos: 3.013886e+03 
+   in get_node_pos: name: mqid.27300, pos: 3.042702e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.27300, from: 0.000000e+00			  ---> final pos: 3.042702e+03 
+   in get_node_pos: name: mqif.27400, pos: 3.073002e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.27400, from: 0.000000e+00			  ---> final pos: 3.073002e+03 
+   in get_node_pos: name: bpmi.27404, pos: 3.073987e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.27404, from: 0.000000e+00			  ---> final pos: 3.073987e+03 
+   in get_node_pos: name: mciah.27404, pos: 3.074486e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.27404, from: 0.000000e+00			  ---> final pos: 3.074486e+03 
+   in get_node_pos: name: mqid.27500, pos: 3.103302e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.27500, from: 0.000000e+00			  ---> final pos: 3.103302e+03 
+   in get_node_pos: name: mciav.27504, pos: 3.104786e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.27504, from: 0.000000e+00			  ---> final pos: 3.104786e+03 
+   in get_node_pos: name: mqif.27600, pos: 3.133602e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.27600, from: 0.000000e+00			  ---> final pos: 3.133602e+03 
+   in get_node_pos: name: bpmi.27604, pos: 3.134587e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.27604, from: 0.000000e+00			  ---> final pos: 3.134587e+03 
+   in get_node_pos: name: mqid.27700, pos: 3.163902e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.27700, from: 0.000000e+00			  ---> final pos: 3.163902e+03 
+   in get_node_pos: name: bpmi.27704, pos: 3.164887e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.27704, from: 0.000000e+00			  ---> final pos: 3.164887e+03 
+   in get_node_pos: name: mciav.27704, pos: 3.165386e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.27704, from: 0.000000e+00			  ---> final pos: 3.165386e+03 
+   in get_node_pos: name: mqif.27800, pos: 3.194202e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.27800, from: 0.000000e+00			  ---> final pos: 3.194202e+03 
+   in get_node_pos: name: mqid.27900, pos: 3.224502e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.27900, from: 0.000000e+00			  ---> final pos: 3.224502e+03 
+   in get_node_pos: name: bpmi.27904, pos: 3.225487e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.27904, from: 0.000000e+00			  ---> final pos: 3.225487e+03 
+   in get_node_pos: name: mqif.28000, pos: 3.254802e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.28000, from: 0.000000e+00			  ---> final pos: 3.254802e+03 
+   in get_node_pos: name: mciah.28004, pos: 3.256286e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.28004, from: 0.000000e+00			  ---> final pos: 3.256286e+03 
+   in get_node_pos: name: mqid.28100, pos: 3.285102e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.28100, from: 0.000000e+00			  ---> final pos: 3.285102e+03 
+   in get_node_pos: name: mqif.28200, pos: 3.315402e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.28200, from: 0.000000e+00			  ---> final pos: 3.315402e+03 
+   in get_node_pos: name: bpmi.28204, pos: 3.316387e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28204, from: 0.000000e+00			  ---> final pos: 3.316387e+03 
+   in get_node_pos: name: mciah.28204, pos: 3.316886e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.28204, from: 0.000000e+00			  ---> final pos: 3.316886e+03 
+   in get_node_pos: name: mqid.28300, pos: 3.345702e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.28300, from: 0.000000e+00			  ---> final pos: 3.345702e+03 
+   in get_node_pos: name: mciav.28304, pos: 3.347186e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.28304, from: 0.000000e+00			  ---> final pos: 3.347186e+03 
+   in get_node_pos: name: mqif.28400, pos: 3.376002e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.28400, from: 0.000000e+00			  ---> final pos: 3.376002e+03 
+   in get_node_pos: name: bpmi.28404, pos: 3.376987e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28404, from: 0.000000e+00			  ---> final pos: 3.376987e+03 
+   in get_node_pos: name: mqid.28500, pos: 3.406302e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.28500, from: 0.000000e+00			  ---> final pos: 3.406302e+03 
+   in get_node_pos: name: bpmi.28504, pos: 3.407287e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28504, from: 0.000000e+00			  ---> final pos: 3.407287e+03 
+   in get_node_pos: name: mciav.28504, pos: 3.407786e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.28504, from: 0.000000e+00			  ---> final pos: 3.407786e+03 
+   in get_node_pos: name: begmatchlhc, pos: 3.435902e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: begmatchlhc, from: 0.000000e+00			  ---> final pos: 3.435902e+03 
+   in get_node_pos: name: mqif.28600, pos: 3.436602e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.28600, from: 0.000000e+00			  ---> final pos: 3.436602e+03 
+   in get_node_pos: name: mqid.28700, pos: 3.466902e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.28700, from: 0.000000e+00			  ---> final pos: 3.466902e+03 
+   in get_node_pos: name: bpmi.28704, pos: 3.467887e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28704, from: 0.000000e+00			  ---> final pos: 3.467887e+03 
+   in get_node_pos: name: mbiav.28707, pos: 3.471310e+03, fact: 0.000000e+00, length: 3.412001e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.28707, from: 0.000000e+00			  ---> final pos: 3.471310e+03 
+   in get_node_pos: name: mbiav.28716, pos: 3.475837e+03, fact: 0.000000e+00, length: 3.412001e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.28716, from: 0.000000e+00			  ---> final pos: 3.475837e+03 
+   in get_node_pos: name: mqif.28800, pos: 3.497202e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.28800, from: 0.000000e+00			  ---> final pos: 3.497202e+03 
+   in get_node_pos: name: bpmi.28804, pos: 3.498187e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28804, from: 0.000000e+00			  ---> final pos: 3.498187e+03 
+   in get_node_pos: name: mciah.28804, pos: 3.498686e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.28804, from: 0.000000e+00			  ---> final pos: 3.498686e+03 
+   in get_node_pos: name: mqid.28900, pos: 3.527502e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.28900, from: 0.000000e+00			  ---> final pos: 3.527502e+03 
+   in get_node_pos: name: bpmi.28904, pos: 3.528487e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.28904, from: 0.000000e+00			  ---> final pos: 3.528487e+03 
+   in get_node_pos: name: mciav.28904, pos: 3.528986e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.28904, from: 0.000000e+00			  ---> final pos: 3.528986e+03 
+   in get_node_pos: name: mqif.29000, pos: 3.557802e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.29000, from: 0.000000e+00			  ---> final pos: 3.557802e+03 
+   in get_node_pos: name: bpmi.29004, pos: 3.558787e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29004, from: 0.000000e+00			  ---> final pos: 3.558787e+03 
+   in get_node_pos: name: mciah.29004, pos: 3.559286e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciah.29004, from: 0.000000e+00			  ---> final pos: 3.559286e+03 
+   in get_node_pos: name: tcdiv.29012, pos: 3.563399e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdiv.29012, from: 0.000000e+00			  ---> final pos: 3.563399e+03 
+   in get_node_pos: name: tcdih.29050, pos: 3.582399e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdih.29050, from: 0.000000e+00			  ---> final pos: 3.582399e+03 
+   in get_node_pos: name: tcdim.29059, pos: 3.586832e+03, fact: 0.000000e+00, length: 6.000000e-01, from_name: (null)
+	 in get_node_pos: name: tcdim.29059, from: 0.000000e+00			  ---> final pos: 3.586832e+03 
+   in get_node_pos: name: mqid.29100, pos: 3.588102e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.29100, from: 0.000000e+00			  ---> final pos: 3.588102e+03 
+   in get_node_pos: name: bpmi.29104, pos: 3.589087e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29104, from: 0.000000e+00			  ---> final pos: 3.589087e+03 
+   in get_node_pos: name: mciav.29104, pos: 3.589586e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.29104, from: 0.000000e+00			  ---> final pos: 3.589586e+03 
+   in get_node_pos: name: mbiav.29107, pos: 3.592510e+03, fact: 0.000000e+00, length: 3.412001e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.29107, from: 0.000000e+00			  ---> final pos: 3.592510e+03 
+   in get_node_pos: name: mbiav.29116, pos: 3.597037e+03, fact: 0.000000e+00, length: 3.412001e+00, from_name: (null)
+	 in get_node_pos: name: mbiav.29116, from: 0.000000e+00			  ---> final pos: 3.597037e+03 
+   in get_node_pos: name: btvi.29124, pos: 3.599535e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.29124, from: 0.000000e+00			  ---> final pos: 3.599535e+03 
+   in get_node_pos: name: bctfi.29125, pos: 3.600184e+03, fact: 0.000000e+00, length: 4.820000e-01, from_name: (null)
+	 in get_node_pos: name: bctfi.29125, from: 0.000000e+00			  ---> final pos: 3.600184e+03 
+   in get_node_pos: name: ted.29133, pos: 3.605825e+03, fact: 0.000000e+00, length: 4.300000e+00, from_name: (null)
+	 in get_node_pos: name: ted.29133, from: 0.000000e+00			  ---> final pos: 3.605825e+03 
+   in get_node_pos: name: mqid.29200, pos: 3.623309e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.29200, from: 0.000000e+00			  ---> final pos: 3.623309e+03 
+   in get_node_pos: name: bpmi.29204, pos: 3.624294e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29204, from: 0.000000e+00			  ---> final pos: 3.624294e+03 
+   in get_node_pos: name: tcdih.29205, pos: 3.625399e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdih.29205, from: 0.000000e+00			  ---> final pos: 3.625399e+03 
+   in get_node_pos: name: tcdiv.29234, pos: 3.639899e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdiv.29234, from: 0.000000e+00			  ---> final pos: 3.639899e+03 
+   in get_node_pos: name: tcdim.29241, pos: 3.643270e+03, fact: 0.000000e+00, length: 6.000000e-01, from_name: (null)
+	 in get_node_pos: name: tcdim.29241, from: 0.000000e+00			  ---> final pos: 3.643270e+03 
+   in get_node_pos: name: mqif.29300, pos: 3.644540e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.29300, from: 0.000000e+00			  ---> final pos: 3.644540e+03 
+   in get_node_pos: name: bpmi.29304, pos: 3.645525e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29304, from: 0.000000e+00			  ---> final pos: 3.645525e+03 
+   in get_node_pos: name: mbibh.29314, pos: 3.651968e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29314, from: 0.000000e+00			  ---> final pos: 3.651968e+03 
+   in get_node_pos: name: mbibh.29321, pos: 3.655410e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29321, from: 0.000000e+00			  ---> final pos: 3.655410e+03 
+   in get_node_pos: name: mbibh.29328, pos: 3.658852e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29328, from: 0.000000e+00			  ---> final pos: 3.658852e+03 
+   in get_node_pos: name: mbibh.29334, pos: 3.662294e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29334, from: 0.000000e+00			  ---> final pos: 3.662294e+03 
+   in get_node_pos: name: mbibh.29341, pos: 3.665736e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29341, from: 0.000000e+00			  ---> final pos: 3.665736e+03 
+   in get_node_pos: name: mbibh.29348, pos: 3.669178e+03, fact: 0.000000e+00, length: 2.800001e+00, from_name: (null)
+	 in get_node_pos: name: mbibh.29348, from: 0.000000e+00			  ---> final pos: 3.669178e+03 
+   in get_node_pos: name: mqif.29400, pos: 3.677604e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqif.29400, from: 0.000000e+00			  ---> final pos: 3.677604e+03 
+   in get_node_pos: name: bpmi.29404, pos: 3.678589e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29404, from: 0.000000e+00			  ---> final pos: 3.678589e+03 
+   in get_node_pos: name: tcdih.29465, pos: 3.709899e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdih.29465, from: 0.000000e+00			  ---> final pos: 3.709899e+03 
+   in get_node_pos: name: tcdim.29472, pos: 3.712908e+03, fact: 0.000000e+00, length: 6.000000e-01, from_name: (null)
+	 in get_node_pos: name: tcdim.29472, from: 0.000000e+00			  ---> final pos: 3.712908e+03 
+   in get_node_pos: name: mqid.29500, pos: 3.714178e+03, fact: 0.000000e+00, length: 1.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqid.29500, from: 0.000000e+00			  ---> final pos: 3.714178e+03 
+   in get_node_pos: name: ti2_lhc_rot, pos: 3.714899e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ti2_lhc_rot, from: 0.000000e+00			  ---> final pos: 3.714899e+03 
+   in get_node_pos: name: bpmi.29504, pos: 3.715163e+03, fact: 0.000000e+00, length: 2.500000e-01, from_name: (null)
+	 in get_node_pos: name: bpmi.29504, from: 0.000000e+00			  ---> final pos: 3.715163e+03 
+   in get_node_pos: name: mciav.29504, pos: 3.715662e+03, fact: 0.000000e+00, length: 5.080000e-01, from_name: (null)
+	 in get_node_pos: name: mciav.29504, from: 0.000000e+00			  ---> final pos: 3.715662e+03 
+   in get_node_pos: name: btvi.29506, pos: 3.716646e+03, fact: 0.000000e+00, length: 3.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvi.29506, from: 0.000000e+00			  ---> final pos: 3.716646e+03 
+   in get_node_pos: name: tcdiv.29509, pos: 3.718399e+03, fact: 0.000000e+00, length: 1.340000e+00, from_name: (null)
+	 in get_node_pos: name: tcdiv.29509, from: 0.000000e+00			  ---> final pos: 3.718399e+03 
+   in get_node_pos: name: tcdim.29527, pos: 3.727501e+03, fact: 0.000000e+00, length: 6.000000e-01, from_name: (null)
+	 in get_node_pos: name: tcdim.29527, from: 0.000000e+00			  ---> final pos: 3.727501e+03 
+   in get_node_pos: name: msib.entr, pos: 3.728131e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: msib.entr, from: 0.000000e+00			  ---> final pos: 3.728131e+03 
+   in get_node_pos: name: msib.c6l2, pos: 3.730131e+03, fact: 0.000000e+00, length: 4.000001e+00, from_name: (null)
+	 in get_node_pos: name: msib.c6l2, from: 0.000000e+00			  ---> final pos: 3.730131e+03 
+   in get_node_pos: name: msib.b6l2, pos: 3.734581e+03, fact: 0.000000e+00, length: 4.000001e+00, from_name: (null)
+	 in get_node_pos: name: msib.b6l2, from: 0.000000e+00			  ---> final pos: 3.734581e+03 
+   in get_node_pos: name: msib.a6l2, pos: 3.739031e+03, fact: 0.000000e+00, length: 4.000001e+00, from_name: (null)
+	 in get_node_pos: name: msib.a6l2, from: 0.000000e+00			  ---> final pos: 3.739031e+03 
+   in get_node_pos: name: msia.b6l2, pos: 3.743481e+03, fact: 0.000000e+00, length: 4.000001e+00, from_name: (null)
+	 in get_node_pos: name: msia.b6l2, from: 0.000000e+00			  ---> final pos: 3.743481e+03 
+   in get_node_pos: name: msia.a6l2, pos: 3.747931e+03, fact: 0.000000e+00, length: 4.000001e+00, from_name: (null)
+	 in get_node_pos: name: msia.a6l2, from: 0.000000e+00			  ---> final pos: 3.747931e+03 
+   in get_node_pos: name: btvss.6l2, pos: 3.750606e+03, fact: 0.000000e+00, length: 7.500000e-01, from_name: (null)
+	 in get_node_pos: name: btvss.6l2, from: 0.000000e+00			  ---> final pos: 3.750606e+03 
+   in get_node_pos: name: mqy.b5l2, pos: 3.771744e+03, fact: 0.000000e+00, length: 3.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqy.b5l2, from: 0.000000e+00			  ---> final pos: 3.771744e+03 
+   in get_node_pos: name: mbqy.29512, pos: 3.773635e+03, fact: 0.000000e+00, length: 3.810000e-01, from_name: (null)
+	 in get_node_pos: name: mbqy.29512, from: 0.000000e+00			  ---> final pos: 3.773635e+03 
+   in get_node_pos: name: mqy.a5l2, pos: 3.775525e+03, fact: 0.000000e+00, length: 3.400000e+00, from_name: (null)
+	 in get_node_pos: name: mqy.a5l2, from: 0.000000e+00			  ---> final pos: 3.775525e+03 
+   in get_node_pos: name: btvsi.c5l2.b1, pos: 3.779585e+03, fact: 0.000000e+00, length: 5.000000e-01, from_name: (null)
+	 in get_node_pos: name: btvsi.c5l2.b1, from: 0.000000e+00			  ---> final pos: 3.779585e+03 
+   in get_node_pos: name: mki.d5l2, pos: 3.782558e+03, fact: 0.000000e+00, length: 3.414000e+00, from_name: (null)
+	 in get_node_pos: name: mki.d5l2, from: 0.000000e+00			  ---> final pos: 3.782558e+03 
+   in get_node_pos: name: mki.c5l2, pos: 3.786522e+03, fact: 0.000000e+00, length: 3.414000e+00, from_name: (null)
+	 in get_node_pos: name: mki.c5l2, from: 0.000000e+00			  ---> final pos: 3.786522e+03 
+   in get_node_pos: name: mki.middle, pos: 3.788504e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: mki.middle, from: 0.000000e+00			  ---> final pos: 3.788504e+03 
+   in get_node_pos: name: mki.b5l2, pos: 3.790486e+03, fact: 0.000000e+00, length: 3.414000e+00, from_name: (null)
+	 in get_node_pos: name: mki.b5l2, from: 0.000000e+00			  ---> final pos: 3.790486e+03 
+   in get_node_pos: name: mki.a5l2, pos: 3.794450e+03, fact: 0.000000e+00, length: 3.414000e+00, from_name: (null)
+	 in get_node_pos: name: mki.a5l2, from: 0.000000e+00			  ---> final pos: 3.794450e+03 
+   in get_node_pos: name: bptx.5l2.b1, pos: 3.796693e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: bptx.5l2.b1, from: 0.000000e+00			  ---> final pos: 3.796693e+03 
+   in get_node_pos: name: btvsi.a5l2.b1, pos: 3.797423e+03, fact: 0.000000e+00, length: 5.000000e-01, from_name: (null)
+	 in get_node_pos: name: btvsi.a5l2.b1, from: 0.000000e+00			  ---> final pos: 3.797423e+03 
+   in get_node_pos: name: bpmyb.4l2.b1, pos: 3.798789e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: bpmyb.4l2.b1, from: 0.000000e+00			  ---> final pos: 3.798789e+03 
+   in get_node_pos: name: ti2.end, pos: 3.799783e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ti2.end, from: 0.000000e+00			  ---> final pos: 3.799783e+03 
+   in get_node_pos: name: lhcinj.ti2, pos: 3.799783e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: lhcinj.ti2, from: 0.000000e+00			  ---> final pos: 3.799783e+03 
+   in get_node_pos: name: ti2$end, pos: 3.799783e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: ti2$end, from: 0.000000e+00			  ---> final pos: 3.799783e+03 
+   in get_node_pos: name: all$end, pos: 3.799783e+03, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: all$end, from: 0.000000e+00			  ---> final pos: 3.799783e+03 
+
+
+TOP Expand_sequence name all with length 3.799783e+03, ref_flag 0
+inserting a drift of length 3.599907e-01 at position 3.264995e+00 
+ 
+inserting a drift of length 3.999814e-01 at position 9.905000e+00 
+ 
+inserting a drift of length 3.899814e-01 at position 1.656000e+01 
+ 
+inserting a drift of length 3.799814e-01 at position 2.320500e+01 
+ 
+inserting a drift of length 1.959907e-01 at position 2.975300e+01 
+ 
+inserting a drift of length 7.647000e-01 at position 3.040835e+01 
+ 
+inserting a drift of length 1.520000e-01 at position 3.128670e+01 
+ 
+inserting a drift of length 1.500000e-02 at position 3.162020e+01 
+ 
+inserting a drift of length 9.500000e-02 at position 3.195020e+01 
+ 
+inserting a drift of length 3.499907e-01 at position 3.525770e+01 
+ 
+inserting a drift of length 3.799814e-01 at position 4.188270e+01 
+ 
+inserting a drift of length 3.899814e-01 at position 4.852770e+01 
+ 
+inserting a drift of length 3.999814e-01 at position 5.518270e+01 
+ 
+inserting a drift of length 1.144191e+00 at position 6.221480e+01 
+ 
+inserting a drift of length 1.405000e-01 at position 6.328015e+01 
+ 
+inserting a drift of length 2.500000e-02 at position 6.361290e+01 
+ 
+inserting a drift of length 9.500000e-02 at position 6.394790e+01 
+ 
+inserting a drift of length 3.599907e-01 at position 6.726040e+01 
+ 
+inserting a drift of length 3.999814e-01 at position 7.390040e+01 
+ 
+inserting a drift of length 3.899814e-01 at position 8.055540e+01 
+ 
+inserting a drift of length 3.799814e-01 at position 8.720040e+01 
+ 
+inserting a drift of length 2.989907e-01 at position 9.379990e+01 
+ 
+inserting a drift of length 1.387000e-01 at position 9.471675e+01 
+ 
+inserting a drift of length 1.520000e-01 at position 9.528210e+01 
+ 
+inserting a drift of length 1.500000e-02 at position 9.561560e+01 
+ 
+inserting a drift of length 9.500000e-02 at position 9.594560e+01 
+ 
+inserting a drift of length 3.499907e-01 at position 9.925310e+01 
+ 
+inserting a drift of length 3.799814e-01 at position 1.058781e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 1.125231e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 1.191781e+02 
+ 
+inserting a drift of length 3.089907e-01 at position 1.257926e+02 
+ 
+inserting a drift of length 7.007000e-01 at position 1.269954e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 1.276083e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 1.279433e+02 
+ 
+inserting a drift of length 3.599907e-01 at position 1.312558e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 1.378958e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 1.445508e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 1.511958e+02 
+ 
+inserting a drift of length 2.989907e-01 at position 1.577953e+02 
+ 
+inserting a drift of length 7.107000e-01 at position 1.589981e+02 
+ 
+inserting a drift of length 1.500000e-02 at position 1.596110e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 1.599410e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 1.632485e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 1.698735e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 1.765185e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 1.831735e+02 
+ 
+inserting a drift of length 3.089907e-01 at position 1.897880e+02 
+ 
+inserting a drift of length 7.008000e-01 at position 1.909909e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 1.916038e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 1.919388e+02 
+ 
+inserting a drift of length 3.599907e-01 at position 1.952513e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 2.018913e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 2.085463e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 2.151913e+02 
+ 
+inserting a drift of length 2.984907e-01 at position 2.217906e+02 
+ 
+inserting a drift of length 7.322000e-01 at position 2.229829e+02 
+ 
+inserting a drift of length 1.500000e-02 at position 2.236065e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 2.239365e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 2.272440e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 2.338690e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 2.405140e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 2.471690e+02 
+ 
+inserting a drift of length 2.944907e-01 at position 2.537763e+02 
+ 
+inserting a drift of length 1.447000e-01 at position 2.547008e+02 
+ 
+inserting a drift of length 1.405000e-01 at position 2.552664e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 2.555992e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 2.559342e+02 
+ 
+inserting a drift of length 3.599907e-01 at position 2.592467e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 2.658867e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 2.725417e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 2.791867e+02 
+ 
+inserting a drift of length 8.146907e-01 at position 2.860441e+02 
+ 
+inserting a drift of length 8.930000e-01 at position 2.868979e+02 
+ 
+inserting a drift of length 1.500000e-02 at position 2.876019e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 2.879319e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 2.912394e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 2.978644e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 3.045094e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 3.111644e+02 
+ 
+inserting a drift of length 2.059907e-01 at position 3.177274e+02 
+ 
+inserting a drift of length 6.417000e-01 at position 3.190112e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 3.195946e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 3.199296e+02 
+ 
+inserting a drift of length 3.599907e-01 at position 3.232421e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 3.298821e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 3.365371e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 3.431821e+02 
+ 
+inserting a drift of length 1.135691e+00 at position 3.502000e+02 
+ 
+inserting a drift of length 1.520000e-01 at position 3.512638e+02 
+ 
+inserting a drift of length 3.200000e-02 at position 3.516058e+02 
+ 
+inserting a drift of length 1.170000e-01 at position 3.519163e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 3.552348e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 3.618598e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 3.685048e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 3.751598e+02 
+ 
+inserting a drift of length 1.144191e+00 at position 3.821919e+02 
+ 
+inserting a drift of length 1.405000e-01 at position 3.832572e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 3.835900e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 3.839250e+02 
+ 
+inserting a drift of length 3.599907e-01 at position 3.872375e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 3.938775e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 4.005325e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 4.071775e+02 
+ 
+inserting a drift of length 1.959907e-01 at position 4.137255e+02 
+ 
+inserting a drift of length 1.690000e-01 at position 4.140830e+02 
+ 
+inserting a drift of length 3.207000e-01 at position 4.146028e+02 
+ 
+inserting a drift of length 1.520000e-01 at position 4.152592e+02 
+ 
+inserting a drift of length 3.200000e-02 at position 4.156012e+02 
+ 
+inserting a drift of length 1.170000e-01 at position 4.159117e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 4.192302e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 4.258552e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 4.325002e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 4.391552e+02 
+ 
+inserting a drift of length 3.109907e-01 at position 4.457707e+02 
+ 
+inserting a drift of length 1.192000e-01 at position 4.466998e+02 
+ 
+inserting a drift of length 1.405000e-01 at position 4.472526e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 4.475854e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 4.479204e+02 
+ 
+inserting a drift of length 1.304000e+01 at position 4.575729e+02 
+ 
+inserting a drift of length 2.959907e-01 at position 4.645749e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 4.711729e+02 
+ 
+inserting a drift of length 5.259907e-01 at position 4.778859e+02 
+ 
+inserting a drift of length 3.367000e-01 at position 4.785922e+02 
+ 
+inserting a drift of length 1.500000e-01 at position 4.792556e+02 
+ 
+inserting a drift of length 1.500000e-02 at position 4.795881e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 4.799181e+02 
+ 
+inserting a drift of length 3.499907e-01 at position 4.832256e+02 
+ 
+inserting a drift of length 3.799814e-01 at position 4.898506e+02 
+ 
+inserting a drift of length 3.899814e-01 at position 4.964956e+02 
+ 
+inserting a drift of length 3.999814e-01 at position 5.031506e+02 
+ 
+inserting a drift of length 2.056907e-01 at position 5.097135e+02 
+ 
+inserting a drift of length 1.327000e+00 at position 5.106548e+02 
+ 
+inserting a drift of length 2.500000e-02 at position 5.115808e+02 
+ 
+inserting a drift of length 9.500000e-02 at position 5.119158e+02 
+ 
+inserting a drift of length 5.340000e-01 at position 5.153153e+02 
+ 
+inserting a drift of length 2.990000e-01 at position 5.177458e+02 
+ 
+inserting a drift of length 2.990000e-01 at position 5.200588e+02 
+ 
+inserting a drift of length 2.668000e+00 at position 5.235563e+02 
+ 
+inserting a drift of length 1.650000e-01 at position 5.251478e+02 
+ 
+inserting a drift of length 7.123200e+00 at position 5.308519e+02 
+ 
+inserting a drift of length 7.770500e+00 at position 5.382987e+02 
+ 
+inserting a drift of length 2.230000e-01 at position 5.427195e+02 
+ 
+inserting a drift of length 3.770000e-01 at position 5.434195e+02 
+ 
+inserting a drift of length 3.912000e+00 at position 5.493550e+02 
+ 
+inserting a drift of length 1.800000e-01 at position 5.515760e+02 
+ 
+inserting a drift of length 9.772000e+00 at position 5.568860e+02 
+ 
+inserting a drift of length 1.102000e-01 at position 5.623571e+02 
+ 
+inserting a drift of length 1.000000e-01 at position 5.643152e+02 
+ 
+inserting a drift of length 2.618000e-01 at position 5.663491e+02 
+ 
+inserting a drift of length 8.540000e-01 at position 5.692870e+02 
+ 
+inserting a drift of length 1.622000e-01 at position 5.721751e+02 
+ 
+inserting a drift of length 5.298000e-01 at position 5.730511e+02 
+ 
+inserting a drift of length 2.260000e-01 at position 5.735490e+02 
+ 
+inserting a drift of length 3.477000e-01 at position 5.742058e+02 
+ 
+inserting a drift of length 4.700000e-02 at position 5.748052e+02 
+ 
+inserting a drift of length 3.770000e-01 at position 5.754172e+02 
+ 
+inserting a drift of length 6.100000e-01 at position 5.797017e+02 
+ 
+inserting a drift of length 1.620000e-01 at position 5.806177e+02 
+ 
+inserting a drift of length 8.540000e-01 at position 5.835057e+02 
+ 
+inserting a drift of length 8.540000e-01 at position 5.867397e+02 
+ 
+inserting a drift of length 8.540000e-01 at position 5.899737e+02 
+ 
+inserting a drift of length 8.540000e-01 at position 5.932077e+02 
+ 
+inserting a drift of length 1.620000e-01 at position 5.960957e+02 
+ 
+inserting a drift of length 1.059700e+00 at position 5.972365e+02 
+ 
+inserting a drift of length 1.125000e+00 at position 5.986989e+02 
+ 
+inserting a drift of length 6.368300e+00 at position 6.026255e+02 
+ 
+inserting a drift of length 3.340000e-01 at position 6.061517e+02 
+ 
+inserting a drift of length 1.109700e+00 at position 6.070485e+02 
+ 
+inserting a drift of length 4.570000e-03 at position 6.113967e+02 
+ 
+inserting a drift of length 7.244800e+00 at position 6.150214e+02 
+ 
+inserting a drift of length 5.100000e-01 at position 6.202988e+02 
+ 
+inserting a drift of length 1.446000e+00 at position 6.217268e+02 
+ 
+inserting a drift of length 3.100000e-01 at position 6.230548e+02 
+ 
+inserting a drift of length 6.200000e-01 at position 6.265098e+02 
+ 
+inserting a drift of length 3.049580e+01 at position 6.434677e+02 
+ 
+inserting a drift of length 2.215500e+00 at position 6.628133e+02 
+ 
+inserting a drift of length 2.798000e+00 at position 6.667201e+02 
+ 
+inserting a drift of length 9.241900e+00 at position 6.731900e+02 
+ 
+inserting a drift of length 1.354100e+00 at position 6.788220e+02 
+ 
+inserting a drift of length 7.000000e-01 at position 6.803311e+02 
+ 
+inserting a drift of length 1.880300e+01 at position 6.909426e+02 
+ 
+inserting a drift of length 2.283000e+00 at position 7.019356e+02 
+ 
+inserting a drift of length 7.330000e-01 at position 7.064336e+02 
+ 
+inserting a drift of length 4.867000e+00 at position 7.106336e+02 
+ 
+inserting a drift of length 3.190000e+00 at position 7.151121e+02 
+ 
+inserting a drift of length 3.845500e+00 at position 7.190798e+02 
+ 
+inserting a drift of length 6.306500e+00 at position 7.284558e+02 
+ 
+inserting a drift of length 2.400000e+00 at position 7.342091e+02 
+ 
+inserting a drift of length 4.450000e-01 at position 7.360816e+02 
+ 
+inserting a drift of length 1.399000e+00 at position 7.399936e+02 
+ 
+inserting a drift of length 3.800001e-01 at position 7.471431e+02 
+ 
+inserting a drift of length 5.169999e-01 at position 7.538516e+02 
+ 
+inserting a drift of length 3.799996e-01 at position 7.605601e+02 
+ 
+inserting a drift of length 3.799996e-01 at position 7.672001e+02 
+ 
+inserting a drift of length 1.015000e+00 at position 7.741577e+02 
+ 
+inserting a drift of length 2.235000e+00 at position 7.787727e+02 
+ 
+inserting a drift of length 3.799996e-01 at position 7.863402e+02 
+ 
+inserting a drift of length 5.169999e-01 at position 7.930487e+02 
+ 
+inserting a drift of length 3.800001e-01 at position 7.997572e+02 
+ 
+inserting a drift of length 2.593991e-01 at position 8.063369e+02 
+ 
+inserting a drift of length 8.970010e-01 at position 8.073651e+02 
+ 
+inserting a drift of length 1.146284e+01 at position 8.165351e+02 
+ 
+inserting a drift of length 3.034866e+01 at position 8.376158e+02 
+ 
+inserting a drift of length 1.600000e-01 at position 8.542701e+02 
+ 
+inserting a drift of length 1.673640e+01 at position 8.629683e+02 
+ 
+inserting a drift of length 2.307995e+00 at position 8.764905e+02 
+ 
+inserting a drift of length 5.559993e-01 at position 8.841825e+02 
+ 
+inserting a drift of length 1.600000e-01 at position 8.859405e+02 
+ 
+inserting a drift of length 4.809200e+00 at position 8.886751e+02 
+ 
+inserting a drift of length 1.861920e+01 at position 9.066494e+02 
+ 
+inserting a drift of length 1.600000e-01 at position 9.174390e+02 
+ 
+inserting a drift of length 1.199990e-01 at position 9.178290e+02 
+ 
+inserting a drift of length 2.714640e+01 at position 9.319702e+02 
+ 
+inserting a drift of length 1.599990e-01 at position 9.470234e+02 
+ 
+inserting a drift of length 1.884538e+01 at position 9.567760e+02 
+ 
+inserting a drift of length 1.675402e+01 at position 9.747507e+02 
+ 
+inserting a drift of length 1.599990e-01 at position 9.846078e+02 
+ 
+inserting a drift of length 1.200000e-01 at position 9.849977e+02 
+ 
+inserting a drift of length 4.320000e-01 at position 9.857817e+02 
+ 
+inserting a drift of length 2.436440e+01 at position 9.985300e+02 
+ 
+inserting a drift of length 1.740010e+00 at position 1.012982e+03 
+ 
+inserting a drift of length 1.247350e+01 at position 1.021429e+03 
+ 
+inserting a drift of length 6.174991e-01 at position 1.028574e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.032853e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.037380e+03 
+ 
+inserting a drift of length 8.515001e-01 at position 1.041775e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.043681e+03 
+ 
+inserting a drift of length 1.591510e+00 at position 1.044806e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.049572e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.054099e+03 
+ 
+inserting a drift of length 1.114999e+00 at position 1.058626e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.063153e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.067680e+03 
+ 
+inserting a drift of length 8.515001e-01 at position 1.072075e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 1.074166e+03 
+ 
+inserting a drift of length 9.635101e-01 at position 1.075420e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.079872e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.084399e+03 
+ 
+inserting a drift of length 1.114999e+00 at position 1.088926e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.093453e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.097980e+03 
+ 
+inserting a drift of length 8.515001e-01 at position 1.102375e+03 
+ 
+inserting a drift of length 2.001500e+00 at position 1.105201e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 1.110172e+03 
+ 
+inserting a drift of length 1.895950e+01 at position 1.123621e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.134581e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.134971e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.149470e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 1.165066e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.179770e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.195181e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 1.209756e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.225481e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.225871e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.240370e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 1.270151e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.286081e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 1.300656e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 1.316566e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.331270e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 1.361051e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.376981e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.377371e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.391870e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 1.407466e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.422170e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.437581e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 1.452156e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.467881e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.468271e+03 
+ 
+inserting a drift of length 1.427201e+01 at position 1.475975e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.489671e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.496466e+03 
+ 
+inserting a drift of length 1.670000e+00 at position 1.498936e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.506331e+03 
+ 
+inserting a drift of length 1.411000e+01 at position 1.519946e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.528481e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 1.543056e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 1.558966e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.573670e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 1.603451e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.619381e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.619771e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.634270e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 1.649866e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 1.664570e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.679981e+03 
+ 
+inserting a drift of length 8.080011e+00 at position 1.684351e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.694951e+03 
+ 
+inserting a drift of length 7.290001e+00 at position 1.705156e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.710281e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.710671e+03 
+ 
+inserting a drift of length 7.452011e+00 at position 1.714965e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.725251e+03 
+ 
+inserting a drift of length 7.290000e+00 at position 1.735456e+03 
+ 
+inserting a drift of length 8.490000e+00 at position 1.744746e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.755551e+03 
+ 
+inserting a drift of length 7.290000e+00 at position 1.765756e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.770881e+03 
+ 
+inserting a drift of length 8.080011e+00 at position 1.775251e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.785851e+03 
+ 
+inserting a drift of length 7.290001e+00 at position 1.796056e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 1.801366e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 1.802455e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.809331e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.816151e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.822971e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.829766e+03 
+ 
+inserting a drift of length 1.670001e+00 at position 1.832236e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.839631e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.846451e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.853271e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.860066e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.861781e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.862171e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 1.863055e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.869931e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.876751e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.883571e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.890366e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 1.892266e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 1.893355e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.900231e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.907051e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.913871e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.920666e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 1.922381e+03 
+ 
+inserting a drift of length 1.260010e+00 at position 1.923341e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.930531e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.937351e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.944171e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 1.950966e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 1.952681e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 1.953071e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 1.953955e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.960831e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.967651e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.974471e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 1.981266e+03 
+ 
+inserting a drift of length 1.670001e+00 at position 1.983736e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 1.991131e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 1.997951e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.004771e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.011566e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.013281e+03 
+ 
+inserting a drift of length 1.260011e+00 at position 2.014241e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.021431e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.028251e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.035071e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.041866e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 2.043766e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.044855e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.051731e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.058551e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.065371e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.072166e+03 
+ 
+inserting a drift of length 1.670000e+00 at position 2.074636e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.082031e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.088851e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.095671e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.102466e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.104181e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.104571e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.105455e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.112331e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.119151e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.125971e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.132767e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.134667e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.135756e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.142632e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.149452e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.156272e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.163067e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.164782e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.165172e+03 
+ 
+inserting a drift of length 7.900097e-01 at position 2.165977e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.172932e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.179752e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.186572e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.193367e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.195082e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.195472e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.196356e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.203232e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.210052e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.216872e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.223667e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.225567e+03 
+ 
+inserting a drift of length 7.900107e-01 at position 2.226577e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.233532e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.240352e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.247172e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.253967e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.255682e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.256072e+03 
+ 
+inserting a drift of length 7.900107e-01 at position 2.256877e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.263832e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.270652e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.277472e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.284267e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.286167e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.287256e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.294132e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.300952e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.307772e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.314567e+03 
+ 
+inserting a drift of length 1.670000e+00 at position 2.317037e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.324432e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.331252e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.338072e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.344867e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.346582e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.346972e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.347856e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.354732e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.361552e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.368372e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.375167e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.377067e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.378156e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.385032e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.391852e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.398672e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.405467e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.407182e+03 
+ 
+inserting a drift of length 1.260011e+00 at position 2.408142e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.415332e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.422152e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.428972e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.435767e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.437482e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.437872e+03 
+ 
+inserting a drift of length 6.320107e-01 at position 2.438756e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.445632e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.452452e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.459272e+03 
+ 
+inserting a drift of length 4.699997e-01 at position 2.466067e+03 
+ 
+inserting a drift of length 8.490000e+00 at position 2.471947e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.482752e+03 
+ 
+inserting a drift of length 7.290000e+00 at position 2.492957e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.498082e+03 
+ 
+inserting a drift of length 8.080011e+00 at position 2.502452e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.513052e+03 
+ 
+inserting a drift of length 7.290001e+00 at position 2.523257e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 2.528567e+03 
+ 
+inserting a drift of length 7.452011e+00 at position 2.533066e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.543352e+03 
+ 
+inserting a drift of length 7.290000e+00 at position 2.553557e+03 
+ 
+inserting a drift of length 8.490000e+00 at position 2.562847e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.573652e+03 
+ 
+inserting a drift of length 7.290000e+00 at position 2.583857e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.588982e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.589372e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 2.603871e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.619467e+03 
+ 
+inserting a drift of length 1.427201e+01 at position 2.627376e+03 
+ 
+inserting a drift of length 5.199993e-01 at position 2.641072e+03 
+ 
+inserting a drift of length 4.700007e-01 at position 2.647867e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.649582e+03 
+ 
+inserting a drift of length 1.260011e+00 at position 2.650542e+03 
+ 
+inserting a drift of length 5.200003e-01 at position 2.657732e+03 
+ 
+inserting a drift of length 1.411000e+01 at position 2.671347e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.679882e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.680272e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 2.694771e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 2.724552e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.740482e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 2.755057e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 2.770967e+03 
+ 
+inserting a drift of length 9.635101e-01 at position 2.772222e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.776673e+03 
+ 
+inserting a drift of length 1.114999e+00 at position 2.781200e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.785727e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.790254e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.794781e+03 
+ 
+inserting a drift of length 8.515001e-01 at position 2.799177e+03 
+ 
+inserting a drift of length 1.469989e+00 at position 2.801737e+03 
+ 
+inserting a drift of length 2.708001e+01 at position 2.816362e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.831382e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.831772e+03 
+ 
+inserting a drift of length 4.320000e-01 at position 2.832556e+03 
+ 
+inserting a drift of length 2.708001e+01 at position 2.846662e+03 
+ 
+inserting a drift of length 5.299890e-01 at position 2.861867e+03 
+ 
+inserting a drift of length 4.320000e-01 at position 2.862856e+03 
+ 
+inserting a drift of length 2.708001e+01 at position 2.876962e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 2.891982e+03 
+ 
+inserting a drift of length 1.591510e+00 at position 2.893108e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.897873e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.902400e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.906927e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 2.911454e+03 
+ 
+inserting a drift of length 1.114999e+00 at position 2.915981e+03 
+ 
+inserting a drift of length 8.515001e-01 at position 2.920377e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.922282e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 2.922672e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 2.937171e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 2.966952e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 2.982882e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 2.997457e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 3.013367e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.028071e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 3.057852e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.073782e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.074172e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.088671e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 3.104267e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.118971e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.134382e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 3.148957e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.164682e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.165072e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.179571e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 3.209352e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.225282e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 3.239857e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 3.255767e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.270471e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 3.300252e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.316182e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.316572e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.331071e+03 
+ 
+inserting a drift of length 5.299900e-01 at position 3.346667e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.361371e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.376782e+03 
+ 
+inserting a drift of length 2.849001e+01 at position 3.391357e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.407082e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.407472e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.421971e+03 
+ 
+inserting a drift of length 2.890000e+01 at position 3.451752e+03 
+ 
+inserting a drift of length 1.599900e-01 at position 3.467682e+03 
+ 
+inserting a drift of length 1.591511e+00 at position 3.468808e+03 
+ 
+inserting a drift of length 1.114999e+00 at position 3.473573e+03 
+ 
+inserting a drift of length 1.895950e+01 at position 3.487023e+03 
+ 
+inserting a drift of length 1.600000e-01 at position 3.497982e+03 
+ 
+inserting a drift of length 1.199890e-01 at position 3.498372e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.512871e+03 
+ 
+inserting a drift of length 1.600000e-01 at position 3.528282e+03 
+ 
+inserting a drift of length 1.199890e-01 at position 3.528672e+03 
+ 
+inserting a drift of length 2.786201e+01 at position 3.543171e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 3.558582e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.558972e+03 
+ 
+inserting a drift of length 3.188625e+00 at position 3.561135e+03 
+ 
+inserting a drift of length 1.766000e+01 at position 3.572899e+03 
+ 
+inserting a drift of length 3.463400e+00 at position 3.584801e+03 
+ 
+inserting a drift of length 2.699860e-01 at position 3.587267e+03 
+ 
+inserting a drift of length 1.599890e-01 at position 3.588882e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.589272e+03 
+ 
+inserting a drift of length 9.635106e-01 at position 3.590322e+03 
+ 
+inserting a drift of length 1.115000e+00 at position 3.594773e+03 
+ 
+inserting a drift of length 6.174896e-01 at position 3.599052e+03 
+ 
+inserting a drift of length 2.330000e-01 at position 3.599827e+03 
+ 
+inserting a drift of length 3.250000e+00 at position 3.602050e+03 
+ 
+inserting a drift of length 1.463351e+01 at position 3.615292e+03 
+ 
+inserting a drift of length 1.600000e-01 at position 3.624089e+03 
+ 
+inserting a drift of length 3.101130e-01 at position 3.624574e+03 
+ 
+inserting a drift of length 1.316000e+01 at position 3.632649e+03 
+ 
+inserting a drift of length 2.401200e+00 at position 3.641770e+03 
+ 
+inserting a drift of length 2.699570e-01 at position 3.643705e+03 
+ 
+inserting a drift of length 1.599200e-01 at position 3.645320e+03 
+ 
+inserting a drift of length 4.918080e+00 at position 3.648109e+03 
+ 
+inserting a drift of length 6.420000e-01 at position 3.653689e+03 
+ 
+inserting a drift of length 6.420000e-01 at position 3.657131e+03 
+ 
+inserting a drift of length 6.420000e-01 at position 3.660573e+03 
+ 
+inserting a drift of length 6.420000e-01 at position 3.664015e+03 
+ 
+inserting a drift of length 6.420000e-01 at position 3.667457e+03 
+ 
+inserting a drift of length 6.325999e+00 at position 3.673741e+03 
+ 
+inserting a drift of length 1.600000e-01 at position 3.678384e+03 
+ 
+inserting a drift of length 3.051484e+01 at position 3.693972e+03 
+ 
+inserting a drift of length 2.039200e+00 at position 3.711589e+03 
+ 
+inserting a drift of length 2.699630e-01 at position 3.713343e+03 
+ 
+inserting a drift of length 2.083700e-02 at position 3.714889e+03 
+ 
+inserting a drift of length 1.390830e-01 at position 3.714969e+03 
+ 
+inserting a drift of length 1.200000e-01 at position 3.715348e+03 
+ 
+inserting a drift of length 5.550000e-01 at position 3.716194e+03 
+ 
+inserting a drift of length 9.079000e-01 at position 3.717275e+03 
+ 
+inserting a drift of length 8.132300e+00 at position 3.723135e+03 
+ 
+inserting a drift of length 3.299980e-01 at position 3.727966e+03 
+ 
+inserting a drift of length 4.499997e-01 at position 3.732356e+03 
+ 
+inserting a drift of length 4.500007e-01 at position 3.736806e+03 
+ 
+inserting a drift of length 4.499991e-01 at position 3.741256e+03 
+ 
+inserting a drift of length 4.500004e-01 at position 3.745706e+03 
+ 
+inserting a drift of length 2.999197e-01 at position 3.750081e+03 
+ 
+inserting a drift of length 1.906308e+01 at position 3.760513e+03 
+ 
+inserting a drift of length 2.109996e+00 at position 3.778280e+03 
+ 
+inserting a drift of length 1.016000e+00 at position 3.780343e+03 
+ 
+inserting a drift of length 5.500000e-01 at position 3.784540e+03 
+ 
+inserting a drift of length 2.750000e-01 at position 3.788367e+03 
+ 
+inserting a drift of length 2.750000e-01 at position 3.788642e+03 
+ 
+inserting a drift of length 5.500000e-01 at position 3.792468e+03 
+ 
+inserting a drift of length 5.355000e-01 at position 3.796425e+03 
+ 
+inserting a drift of length 4.805000e-01 at position 3.796933e+03 
+ 
+inserting a drift of length 1.116000e+00 at position 3.798231e+03 
+ 
+inserting a drift of length 9.940000e-01 at position 3.799286e+03 
+ 
+SURVEY, FILE="all_survey";
+
+ SROT
+SELECT, FLAG=TWISS, CLEAR;
+
+SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,mux,muy;
+
+TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       3799.783252                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       14.33500735                  0        626.1579567        4.748542549 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.699602728                  0                  0        14.77912116 
+
+               dq2            betymax              dymax              dyrms 
+                 0        7134.663099        3.952615488       0.5091838334 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.00 (32 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

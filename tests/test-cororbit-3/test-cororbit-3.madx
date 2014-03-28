@@ -1,23 +1,47 @@
 TITLE, s='MAD-X test';
+option, -echo;
 call file="input/coc4.opt";
 call file="input/coc4.seq";
-option,-echo;
-//option,debug,-echo;
+option, echo;
 
 Beam, particle = proton, sequence=fivecell, energy = 450.0;
-//        NPART=1.05E11, sige=      4.5e-4 ;
 
 use, period=fivecell;
 
 select, flag=twiss, clear;
 select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
-TWISS,table=my_model,sequence=fivecell;
 
-readmytable,file="input/orbps.in",table=orbint;
+Twiss,table=my_model;
 
-coption,print=2,debug=1;
-// option, debug;
-correct,flag=ring,model=my_model,orbit=orbint,extern,mode=micado,
-        cond=0,error=1.0e-7,ncorr=5,plane=x,clist="c.tab",mlist="m.tab";
+Readmytable,file="input/orbps.in",table=orbint;
+
+coption, print=2;
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+	 mode=micado, cond=0, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c1.tab, mlist=m1.tab;
+
+Twiss, file=result1;
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+	 mode=micado, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c2.tab, mlist=m2.tab;
+
+Twiss, file=result2;
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+	 mode=svd, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c3.tab, mlist=m3.tab;
+
+Twiss, file=result3;
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+	 mode=lsq, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c4.tab, mlist=m4.tab;
+
+Twiss, file=result4;
+
 
 removefile, file='fort.61';
+removefile, file='fort.65';
+removefile, file='fort.66';

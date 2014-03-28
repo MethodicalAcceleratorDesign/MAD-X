@@ -44,8 +44,7 @@ interpolate_node(int *nint)
 //  bv = node_value("dipole_bv");
   bvk = node_value("other_bv");
 
-  if (bend_flag)
-  {
+  if (bend_flag) {
     angle = command_par_value("angle", el->def);
     e1 = command_par_value("e1", el->def);
     e2 = command_par_value("e2", el->def);
@@ -55,8 +54,7 @@ interpolate_node(int *nint)
     fintx_plot = command_par_value("fintx", el->def);
     hgap = command_par_value("hgap", el->def);
 
-    if (rbend_flag)
-    {
+    if (rbend_flag) {
       backup.e1 = e1;
       backup.e2 = e2;
 
@@ -86,6 +84,7 @@ interpolate_node(int *nint)
     store_node_value("fintx",&zero);
     store_node_value("hgap",&hgap);
   }
+
   backup.length = first_node->length; 
   first_node->length /= numint;
 
@@ -113,9 +112,11 @@ interpolate_node(int *nint)
     link_in_front(clone,current_node);
     current_node = current_node->previous;
     current_node->previous->next = current_node;
+
     store_node_value("angle",&angle);
 /*    store_node_value("dipole_bv",&bv); */
     store_node_value("other_bv",&bvk);
+
     if (bend_flag) {
       if (j == 1) {
         store_node_value("e2",&e2);
@@ -137,6 +138,7 @@ interpolate_node(int *nint)
       store_node_value("e1",&zero);
       store_node_value("h1",&zero);
     }
+
     clone = clone_node(first_node,0);
     if (bend_flag) {
       clone->p_elem = clone_element(first_node->p_elem);

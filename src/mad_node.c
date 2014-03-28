@@ -173,85 +173,133 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   int i;
   (void)sequ;
 
+  double node_pos, refpos;
+
   int debug;
   debug=get_option("debug");
 
   p = clone_node(q, 0);
   
-  if (debug) printf("\np->name: %s\n",p->name); 
+  if (debug) 
+    printf("\n Entering expand_node with node->name: %s and position %e\n",node->name,position); 
 
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
     i = add_to_name_list(p->p_elem->name, 1, occ_list);
   else strcpy(p->name, compound(p->p_elem->name, ++occ_list->inform[i]));
+
   add_to_node_list(p, 0, top_sequ->ex_nodes);
   p->previous = node->previous;
   p->previous->next = p;
-  p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
 
-  if (debug) printf("elem_name at position + get_node_pos - get_refpos = p->position : \n %s: %e + %e - %e = %e \n",
-		     p->p_elem->name, position, get_node_pos(p, nodesequ), get_refpos(nodesequ), p->position); 
-  
-  while (p != NULL)
-  {
+  if (debug) {
+    node_pos = get_node_pos(p, nodesequ);
+    refpos = get_refpos(nodesequ);
+    p->position = position + node_pos - refpos;    
+    printf("  elem_name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
+	   p->p_elem->name, position, node_pos, refpos, p->position); 
+  } else
+    p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
+
+  while (p != NULL) {
     if (q == nodesequ->end) break;
+
     if (strcmp(p->base_name, "rfcavity") == 0 &&
         find_element(p->p_elem->name, top_sequ->cavities) == NULL)
       add_to_el_list(&p->p_elem, 0, top_sequ->cavities, 0);
+
     p->next = clone_node(q->next, 0);
     p->next->previous = p;
     p = p->next;
     q = q->next;
-    p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
 
-    if (debug) printf("elem name at position + get_node_pos - get_refpos = p->position : \n %s: %e + %e - %e = %e\n",
-		      p->p_elem->name, position, get_node_pos(p, nodesequ), get_refpos(nodesequ), p->position); 
+    if (debug) {
+      node_pos = get_node_pos(p, nodesequ);
+      refpos = get_refpos(nodesequ);
+      p->position = position + node_pos - refpos;    
+      printf("  elem name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
+	     p->p_elem->name, position, node_pos, refpos, p->position); 
+    } else
+      p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
+    
 
-    if (p->p_sequ != NULL) 
-      p = expand_node(p, top_sequ, p->p_sequ, p->position);
-    else
-    {
+    if (p->p_sequ == NULL){ // simple element, not a subsequence 
       p->share = top_sequ->share;
       add_to_node_list(p, 0, top_sequ->ex_nodes);
+    } 
+
+    else { // subsequence
+      if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
+	if (debug) 
+	  printf("\n\n Recursively expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
+		 p->name, p->position, p->position - nodesequ->ref_flag*p->p_sequ->length/2., 
+		 p->length, nodesequ->ref_flag, p->p_sequ->refpos);	
+	p = expand_node(p, top_sequ, p->p_sequ, p->position - nodesequ->ref_flag*p->p_sequ->length/2. );
+	if (debug) printf("\n\n");
+      } 
+      else { // no REFPOS given
+	if (debug) 
+	  printf("\n\n Recursively expand sub_sequence  %s with position %e, length %e, ref_flag %d\n",
+		 p->name, p->position, p->length, sequ->ref_flag);
+	p = expand_node(p, top_sequ, p->p_sequ, p->position);
+	if (debug) printf("\n\n");
+      }
     }
   }
+
   delete_node(node);
   return p;
 }
 
 double
-get_node_pos(struct node* node, struct sequence* sequ) /*recursive */
+get_node_pos(struct node* node, struct sequence* sequ) 
+  /* recursive via call of hidden_node_pos */
   /* returns node position from declaration for expansion */
 {
   double fact = 0.5 * sequ->ref_flag; /* element half-length offset */
   double pos, from = 0;
 
-  if (loop_cnt++ == MAX_LOOP)
-  {
-    sprintf(c_dum->c, "%s   occurrence: %d", node->p_elem->name, node->occ_cnt);
-    fatal_error("circular call in position of", c_dum->c);
-  }
-
   if (node->at_expr == NULL) pos = node->at_value;
   else                       pos = expression_value(node->at_expr, 2);
 
-  if (get_option("debug")) printf("in get_node_pos: name: %s, pos: %e, fact: %e, length: %e",
-	 node->p_elem->name, pos, fact, node->length); 
-
+  if (get_option("debug")) 
+    printf("   in get_node_pos: name: %s, pos: %e, fact: %e, length: %e, from_name: %s\n",
+	   node->p_elem->name, pos, fact, node->length, node->from_name); 
+  
   pos += fact * node->length; /* make centre position */
 
-  if (node->from_name != NULL)
-  {
+  if (node->from_name != NULL) {
     if ((from = hidden_node_pos(node->from_name, sequ)) == INVALID)
       fatal_error("'from' reference to unknown element:", node->from_name);
   }
 
-  loop_cnt--;
   pos += from;
 
-  if (get_option("debug")) printf(", from: %e  ---> final pos: %e \n", from, pos);
+  if (get_option("debug")) 
+    printf("\t in get_node_pos: name: %s, from: %e\t\t\t  ---> final pos: %e \n", 
+	   node->p_elem->name, from, pos);
 
   return pos;
 }
+
+double
+get_refpos(struct sequence* sequ)
+  /* returns the position of a refpos element of a sequence, or the sequence half-length */
+{
+  int i;
+  if (sequ != NULL && sequ->refpos != NULL) { 
+    sprintf(c_dum->c, "%s:1", sequ->refpos);
+    if ((i = name_list_pos(c_dum->c, sequ->nodes->list)) < 0)
+      fatal_error("'refpos' reference to unknown element:", sequ->refpos);
+    return get_node_pos(sequ->nodes->nodes[i], sequ);
+  }
+
+  /* 2013-Jul-19  20:54:49  ghislain: if no element was specified for the refpos, 
+     the ref position has to be the middle of the sequence and get_refpos should 
+     therefore return half the sequence length. (TRAC ticket #206) */ 
+  // else return zero;
+  else return sequ->length/2.;
+}
+
 
 double
 node_value(char* par)
@@ -304,15 +352,11 @@ hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
   if ((i = name_list_pos(tmp, sequ->nodes->list)) > -1)
     return get_node_pos(sequ->nodes->nodes[i], sequ);
 
-  else
-  {
+  else {
     c_node = sequ->start;
-    while (c_node != NULL)
-    {
-      if (c_node->p_sequ != NULL)
-      {
-        if ((pos = hidden_node_pos(name, c_node->p_sequ)) != INVALID)
-        {
+    while (c_node != NULL) {
+      if (c_node->p_sequ != NULL) {
+        if ((pos = hidden_node_pos(name, c_node->p_sequ)) != INVALID) {
           pos += get_node_pos(c_node, sequ) - get_refpos(c_node->p_sequ);
           return pos;
         }

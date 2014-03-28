@@ -1,0 +1,114 @@
+Title, "LHC 6.5 with errors and orbit correction using MADX";
+
+Option, -echo,-warn,-info;
+Call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+Call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str"; 
+Option, echo, warn, info; 
+
+Beam, particle=proton, sequence=lhcb1, energy=450.0, NPART=1.05E11, sige=4.5e-4 ;
+
+Use, period=lhcb1;
+
+// First make a clean machine as the model ...
+on_x1 = 0.0; on_x2 = 0.0; on_x5 = 0.0; on_x8 = 0.0;
+on_alice = 0.0; on_lhcb = 0.0;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+Twiss,table=my_model,sequence=lhcb1; 
+
+// Now a machine with the bumps as a target orbit 
+on_x1 = 1.0; on_x2 = 1.0; on_x5 = 1.0; on_x8 = 1.0;
+on_alice = 0.0; on_lhcb = 0.0;
+Twiss,table=my_target1,sequence=lhcb1;
+
+// Now a machine with the modified bumps as another target orbit 
+on_x1 = 1.0; on_x2 = 0.5; on_x5 = 1.0; on_x8 = 0.3;
+on_alice = 0.0; on_lhcb = 0.0;
+Twiss,table=my_target2,sequence=lhcb1; 
+
+// Switch off again the bumps and mis-align the machine
+on_x1 = 0.0; on_x2 = 0.0; on_x5 = 0.0; on_x8 = 0.0;
+on_alice = 0.0; on_lhcb = 0.0;
+
+Eoption, add=false, seed=22021955;
+Select, flag=ERROR, clear;
+Select, flag=ERROR, class=MQ;
+Ealign, dy:=tgauss(2.5)*0.100e-3, dx:=tgauss(2.5)*0.070e-3;
+
+Twiss, table=my_orbit;
+
+// Prepare first correction to zero orbit
+USEKICK,CLASS=MBLW,  status=OFF; ! IR8 spectrometer magnets
+USEKICK,CLASS=MBXWH, status=OFF; ! IR8 spectrometer magnets
+USEKICK,CLASS=MBXWS, status=OFF; ! IR8 spectrometer magnets
+USEKICK,CLASS=MBXWT, status=OFF;
+USEKICK,CLASS=MSDB,  status=OFF; 
+USEKICK,CLASS=MKA,   status=OFF; 
+USEKICK,CLASS=MCBYH, status=OFF; 
+USEKICK,CLASS=MCBYV, status=OFF; 
+! USEKICK,CLASS=MCBX, status=OFF; 
+USEKICK,class=MKI,   status=OFF;
+USEKICK,class=MKI__192, status=OFF;
+USEKICK,class=MKI__193, status=OFF;
+USEKICK,class=MKA,   status=OFF;
+USEKICK,class=MKD,   status=OFF;
+USEKICK,class=MKQ,   status=OFF;
+USEKICK,class=MSDA,  status=OFF;
+USEKICK,class=MSDB,  status=OFF;
+USEKICK,class=MSDB2, status=OFF;
+USEKICK,class=MSDC,  status=OFF;
+USEKICK,class=MSIA,  status=OFF;
+USEKICK,class=MSIB,  status=OFF;
+USEKICK,class=MBXWS, status=OFF;
+USEKICK,RANGE=MBAW.1R2,  status=OFF; ! IP2 spectrometer compensation
+USEKICK,RANGE=MBWMD.1L2, status=OFF; ! IP2 spectrometer compensation
+
+Coption, print=2;
+
+Correct, FLAG=ring, orbit=my_orbit, model=my_model,
+         MODE=LSQ, cond=1, NCORR=300, ERROR=1E-6, PLANE=y,
+         mlist=my1.tab, clist=cy1.tab, RESOUT=1, CORZERO=1;
+
+Correct, FLAG=ring, orbit=my_orbit, model=my_model,
+         MODE=LSQ, cond=1, NCORR=300, ERROR=1E-6, PLANE=x,
+         mlist=mx1.tab, clist=cx1.tab, RESOUT=1, CORZERO=1;
+
+Twiss,file=result1.file;
+
+!******************************************************************
+
+// Prepare first correction to target orbit my_target1
+USEKICK,CLASS=MCBYH, status=ON; ! Mark
+USEKICK,CLASS=MCBYV, status=ON; ! Mark
+USEKICK,CLASS=MCBX,  status=ON; ! Mark
+
+Correct, FLAG=ring, orbit=my_orbit, target=my_target1, model=my_model,
+         MODE=SVD, cond=1, NCORR=300, ERROR=1E-6, PLANE=y,
+         mlist=my2.tab, clist=cy2.tab, RESOUT=1, CORZERO=1;
+
+Correct, FLAG=ring, orbit=my_orbit, target=my_target1, model=my_model,
+         MODE=SVD, cond=1, NCORR=300, ERROR=1E-6, PLANE=x,
+         mlist=mx2.tab, clist=cx2.tab, RESOUT=1, CORZERO=1;
+
+Twiss,file=result2.file;
+
+!******************************************************************
+
+// Prepare second correction to target orbit my_target2
+USEKICK,RANGE=mcbyh.a4l1.b1, status=OFF;
+USEKICK,RANGE=mcbxa.3r2,     status=OFF;
+USEKICK,RANGE=mcbx.2l2,      status=OFF;
+
+Correct, FLAG=ring, orbit=my_orbit, target=my_target2, model=my_model,
+         MODE=micado, cond=0, NCORR=300, ERROR=1E-6, PLANE=x,
+         mlist=mx3.tab, clist=cx3.tab, RESOUT=1, CORZERO=1;
+
+Correct, FLAG=ring, orbit=my_orbit, target=my_target2, model=my_model,
+         MODE=micado, cond=0, NCORR=300, ERROR=1E-6, PLANE=y,
+         mlist=my3.tab, clist=cy3.tab, RESOUT=1, CORZERO=1;
+
+TWISS,file=result3.file;
+
+!******************************************************************
+removefile, file='fort.61';
+removefile, file='fort.69';

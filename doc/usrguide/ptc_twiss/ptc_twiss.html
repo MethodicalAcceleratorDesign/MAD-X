@@ -101,7 +101,7 @@ order derivatives have respective column names:
 
 
 <p>
-Any component the transfer map at any location can be accessed (e.g. in matching) using 
+Any component of the transfer map at any location can be accessed (e.g. in matching) using 
 <var class="command"> <a href="../ptc_auxiliaries/PTC_Select.html">
          PTC_SELECT </a> </var> command. 
 If MAPTABLE parameter is set than the complete transfer map at the end of the sequence is saved in table called map_table.
@@ -188,7 +188,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
     <var class="option">deltap</var>=double, <b>closed_orbit</b>, <b>slice_magnets</b>, <b><br>
 &nbsp;&nbsp;&nbsp; range=</b>string<b>, file[=</b>string<b>], table[=</b>string<b>],<br>
 &nbsp;&nbsp;&nbsp; initial_matrix_table, initial_matrix_manual, initial_map_manual, ignore_map_orbit, <br>
-&nbsp;&nbsp;&nbsp; beta0=</b>string<b>, maptable, <br>
+&nbsp;&nbsp;&nbsp; beta0=</b>string<b>, map_table[=</b>logical<b>], <br>
 &nbsp;&nbsp;&nbsp; ring_parameters,    <br>
 &nbsp;&nbsp;&nbsp; betx=</b>double,<b> alfx=</b>double<b>, mux=</b>double<b>,    <br>
 &nbsp;&nbsp;&nbsp; bety=</b>double,<b> alfy=</b>double<b>, muy=</b>double<b>,    <br>
@@ -368,15 +368,15 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
           <tr>
             <td width="143">
             INITIAL_MATRIX_TABLE</td>
-            <td colspan="2"><span lang="EN-US">Reading the transfer map from table called map_table 
-                created by preceding PTC_TWISS or </span> <var class="command">
-                  <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> 
-                  <span lang="EN-US">command.
-                  The table can be also read before hand from files using 
-                  </span> <var class="command">
-                  <a href="../control/general.html#readtable">READTABLE</a></var> 
-                  <span lang="EN-US">command.</span>
-                   </td>
+            <td colspan="2">
+		Reading the transfer map from table called map_table 
+                created by preceding PTC_TWISS or 
+		<var class="command"> <a href="../ptc_normal/ptc_normal.html">PTC_NORMAL</a></var> 
+                command.
+                The table can be also read before hand from files using 
+		<var class="command"> <a href="../control/general.html#readtable">READTABLE</a></var> 
+                command.
+            </td>
             <td width="84">.FALSE.</td>
             <td width="57">logical</td>
           </tr>
@@ -434,9 +434,9 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
             MAP_TABLE</td>
             <td colspan="2">
                 <span lang="EN-US">
-                  Save the one-turn-map to table "map_table".
-                  The be used as starting condition for a subsequent ptc_twiss, see INITIAL_MATRIX_TABLE
-                  parameter of this command.
+                  If true, save the one-turn-map to table "map_table".
+                  This one-turn-map can then be used as starting condition for a subsequent ptc_twiss, 
+		  see INITIAL_MATRIX_TABLE parameter of this command.
                 </span>
             </td>
             <td width="84">.FALSE.</td>

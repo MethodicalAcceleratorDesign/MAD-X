@@ -1,323 +1,31 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (32 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 08.01.14 12.37.59 +
+  +    MAD-X 5.02.00  (32 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2014.03.05      +
+  + Execution Time Stamp: 12.03.14 15.11.00 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE, s='MAD-X test';
 
-call file="input/coc4.opt";
+option, -echo;
 
-// forces and other constants;
 
 
+Beam, particle = proton, sequence=fivecell, energy = 450.0;
 
-const l.bpm = .3;
 
-// element definitions;
 
+use, period=fivecell;
 
 
-mb: rbend, l=14.2, angle:=bang;
 
-mq: quadrupole, l=3.1;
+select, flag=twiss, clear;
 
-m0: marker;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 
-//mm:multipole,lrad=dummy,knl={0,dummy,bang*3,1},ksl={1.1,3*acbv1+5.,4,0};
 
-qf.1: mq, k1:=kqf;
 
-qf.2: mq, k1:=kqf;
-
-qf.3: mq, k1:=kqf;
-
-qf.4: mq, k1:=kqf;
-
-qf.5: mq, k1:=kqf;
-
-qd.1: mq, k1:=kqd;
-
-qd.2: mq, k1:=kqd;
-
-qd.3: mq, k1:=kqd;
-
-qd.4: mq, k1:=kqd;
-
-qd.5: mq, k1:=kqd;
-
-mull=0;
-
-qtm:marker;
-
-//qtm:multipole,l=mull,knl:={0,0,-0.0001*kqf,0,0.000015},ksl:={0,0,0,0.01*ksf};
-
-//qtm:multipole,l=mull,kn:={0,0,-0.0001*kqf,0,0.000015},ks:={0,0,0,0.01*ksf};
-
-//qt:octupole,l=0.01,k3s:=-ksf;
-
-bph: monitor, l:=l.bpm;
-
-bpv: monitor, l:=l.bpm;
-
-cbh: hkicker;
-
-cbh.1:cbh,kick:=acbh1;
-
-cbh.10:cbh,kick:=acbh10;
-
-cbh.11:cbh,kick:=acbh11;
-
-cbh.2:cbh,kick:=acbh2;
-
-cbh.20:cbh,kick:=acbh20;
-
-cbh.21:cbh,kick:=acbh21;
-
-cbh.3:cbh,kick:=acbh3;
-
-cbh.30:cbh,kick:=acbh30;
-
-cbh.31:cbh,kick:=acbh31;
-
-cbh.4:cbh,kick:=acbh4;
-
-cbh.40:cbh,kick:=acbh40;
-
-cbh.41:cbh,kick:=acbh41;
-
-cbh.5:cbh,kick:=acbh5;
-
-cbh.50:cbh,kick:=acbh50;
-
-cbh.51:cbh,kick:=acbh51;
-
-cb: kicker;
-
-cbx.1:cb,hkick:=acxh1,vkick:=acxv1;
-
-cbx.2:cb,hkick:=acxh2,vkick:=acxv2;
-
-cbv: vkicker;
-
-cbv.1:cbv,kick:=acbv1;
-
-cbv.2:cbv,kick:=acbv2;
-
-cbv.3:cbv,kick:=acbv3;
-
-cbv.30:cbv,kick:=acbv30;
-
-cbv.31:cbv,kick:=acbv31;
-
-cbv.4:cbv,kick:=acbv4;
-
-cbv.5:cbv,kick:=acbv5;
-
-mscbh: sextupole, l=1.1, k2:=ksf;
-
-mscbv: sextupole, l=1.1, k2:=ksd;
-
-// bph: rfcavity,l:=l.bpm,
-
-// volt=.070833333333, harmon=432, shunt=26.166, tfill=90.0;
-
-//bang = .509998807401e-2;
-
-bang = .209;               
-
-kqf = .872651312e-2;
-
-kqd = -.872777242e-2;
-
-ksf = .0;
-
-ksd = .0;
-
-dummy := ksf * ksd;
-
-call file="input/coc4.seq";
-
-lfive=534.6;
-
-dumzero = 0;
-
-// sequence declaration;
-
-
-
-pos = 1.084700e+02-1.550000e+00;
-
-fivecell: sequence, refer=centre, l=lfive;
-
-   startseq: marker, at = 0;
-
-   qf.1: qf.1, at=dumzero+1.550000e+00, from=startseq;
-
-   mscbh: mscbh, at=3.815000e+00;
-
-   cbh.10: cbh.10, at=4.365000e+00;
-
-   cbh.11: cbh.11, at=4.375000e+00;
-
-   mb: mb, at=1.262000e+01;
-
-   mb: mb, at=2.828000e+01;
-
-   mb: mb, at=4.394000e+01;
-
-   bpha: bph, at=5.216000e+01;
-
-   bpv1: bpv, at=5.246000e+01;
-
-   qd.1: qd.1, at=5.501000e+01;
-
-   qtm,at=5.668000e+01;
-
-   mscbv: mscbv, at=5.727500e+01;
-
-   cbv.1: cbv.1, at=5.782500e+01;
-
-   mb: mb, at=6.608000e+01;
-
-   mb: mb, at=8.174000e+01;
-
-   mb: mb, at=9.740000e+01;
-
-   m0, at=105;
-
-   bph2: bph, at=1.059200e+02, from=startseq;
-
-   qf.2: qf.2, at=dumzero+1.084700e+02;
-
-   mscbh: mscbh, at=1.107350e+02;
-
-   cbh.20: cbh.20, at=1.112850e+02;
-
-   cbh.21: cbh.21, at=1.122850e+02;
-
-   mb: mb, at=1.195400e+02;
-
-   mb: mb, at=1.352000e+02;
-
-   mb: mb, at=1.508600e+02;
-
-   bpv2: bpv, at=1.593800e+02;
-
-   qd.2: qd.2, at=1.619300e+02;
-
-   mscbv: mscbv, at=1.641950e+02;
-
-   cbv.2: cbv.2, at=1.647450e+02;
-
-   mb: mb, at=1.730000e+02;
-
-   mb: mb, at=1.886600e+02;
-
-   mb: mb, at=2.043200e+02;
-
-   bph3: bph, at=2.128400e+02;
-
-   partend: marker, at = 213.84;
-
-   qf.3: qf.3, at=2.153900e+02;
-
-   mscbh: mscbh, at=2.176550e+02;
-
-   cbh.30: cbh.30, at=2.182050e+02;
-
-   cbh.31: cbh.31, at=2.192050e+02;
-
-   mb: mb, at=2.264600e+02;
-
-   mb: mb, at=2.421200e+02;
-
-   mb: mb, at=2.577800e+02;
-
-   bpv3: bpv, at=2.663000e+02;
-
-   qd.3: qd.3, at=2.688500e+02;
-
-   mscbv: mscbv, at=2.711150e+02;
-
-   cbv.30: cbv.30, at=2.716650e+02;
-
-   cbv.31: cbv.31, at=2.726650e+02;
-
-   mb: mb, at=2.799200e+02;
-
-   mb: mb, at=2.955800e+02;
-
-   mb: mb, at=3.112400e+02;
-
-   bph4: bph, at=3.197600e+02;
-
-   qf.4: qf.4, at=3.223100e+02;
-
-   mscbh: mscbh, at=3.245750e+02;
-
-   cbh.40: cbh.40, at=3.251250e+02;
-
-   cbh.41: cbh.41, at=3.252250e+02;
-
-   mb: mb, at=3.333800e+02;
-
-   mb: mb, at=3.490400e+02;
-
-   mb: mb, at=3.647000e+02;
-
-   bpv4: bpv, at=3.732200e+02;
-
-   qd.4: qd.4, at=3.757700e+02;
-
-   mscbv: mscbv, at=3.780350e+02;
-
-   cbv.4: cbv.4, at=3.785850e+02;
-
-   mb: mb, at=3.868400e+02;
-
-   mb: mb, at=4.025000e+02;
-
-   mb: mb, at=4.181600e+02;
-
-   bph5: bph, at=4.266800e+02;
-
-   qf.5: qf.5, at=4.292300e+02;
-
-   mscbh: mscbh, at=4.314950e+02;
-
-   cbh.50: cbh.50, at=4.320450e+02;
-
-   cbh.51: cbh.51, at=4.321450e+02;
-
-   mb: mb, at=4.403000e+02;
-
-   mb: mb, at=4.559600e+02;
-
-   mb: mb, at=4.716200e+02;
-
-   bpv5: bpv, at=4.801400e+02;
-
-   qd.5: qd.5, at=4.826900e+02;
-
-   mscbv: mscbv, at=4.849550e+02;
-
-   cbv.5: cbv.5, at=4.855050e+02;
-
-   mb: mb, at=4.937600e+02;
-
-   mb: mb, at=5.094200e+02;
-
-   mb: mb, at=5.250800e+02;
-
-   bph1: bph, at=5.336000e+02;
-
-end_fivecell: marker at=5.346000e+02;
-
-endsequence;
-
-option,-echo;
+Twiss,table=my_model;
 
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
@@ -345,7 +53,23 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+
+Readmytable,file="input/orbps.in",table=orbint;
+
 Want to make named table: orbint
+
+
+coption, print=2;
+
+
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+
+	 mode=micado, cond=0, error=1.0e-7, ncorr=5, plane=x, 
+
+	 clist=c1.tab, mlist=m1.tab;
+
 Want to correct orbit of a single ring
 Want to use orbit from: orbint
 Want to use model orbit from: my_model
@@ -392,9 +116,314 @@ cbh.41:1 0.000000 10.507403 10.507403
 cbh.50:1 0.000000 0.000000 0.000000
 cbh.51:1 0.000000 0.000000 0.000000
 
-  Number of warnings: 1
-1 in C and 0 in Fortran
+
+Twiss, file=result1;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   9.607860E-04 deltap:   0.000000E+00
+orbit:  -2.692913E-03 -5.679609E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   4.555392E-09 deltap:   0.000000E+00
+orbit:  -2.692996E-03 -5.679766E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0       0.7550586757        1.150825957 
+
+                q1                dq1            betxmax              dxmax 
+        1.24474163        1.057560715        176.2721977        89.98629139 
+
+             dxrms             xcomax             xcorms                 q2 
+       70.29096636     0.007949547122     0.003688039623        1.851582283 
+
+               dq2            betymax              dymax              dyrms 
+      0.3300002001        184.9736426                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+
+	 mode=micado, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+
+	 clist=c2.tab, mlist=m2.tab;
+
+Want to correct orbit of a single ring
+Want to use orbit from: orbint
+Want to use model orbit from: my_model
+11 monitors and 10 correctors found in input
+11 monitors and 10 correctors enabled
+SVD conditioning requested ...
+Initially found 10 singular values
+After SVD conditioning:             
+11 monitors and 5 correctors enabled
+
+Finally found 0 singular values
+enter MICADO correction ...
+  
+ start MICADO correction with            5  correctors
+  
+CORRECTION SUMMARY:   
+
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
+
+before correction: -0.925909        3.530367          3.649767        12.131072 
+after correction:  0.022958        0.277952          0.278899        1.011518 
+
+
+Monitor:  Before:     After:    Difference:
+           (mm)        (mm)         (mm)   
+bpha:1   2.427     0.221     -2.206
+bpv1:1   2.426     0.223     -2.203
+bph2:1   4.481     -0.085     -4.566
+bpv2:1   -0.853     -0.136     0.717
+bph3:1   -7.650     0.199     7.850
+bpv3:1   -4.185     -0.476     3.709
+bph4:1   -3.919     -0.041     3.878
+bpv4:1   -1.629     0.536     2.164
+bph5:1   -3.700     -0.234     3.466
+bpv5:1   -0.073     0.269     0.342
+bph1:1   2.491     -0.223     -2.714
+Max strength: 6.612385e-02 is below corrector strength limit: 1.000000e+00
+Max strength: 6.612385e-02
+Corrector:  Before:     After:    Difference:
+             (mrad)     (mrad)       (mrad)  
+cbh.11:1 0.000000 -0.006350 -0.006350
+cbh.21:1 -0.781478 -0.750491 0.030987
+cbh.31:1 0.000000 -0.005797 -0.005797
+cbh.41:1 10.507403 10.573527 0.066124
+cbh.51:1 0.000000 0.004547 0.004547
+
+
+Twiss, file=result2;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   1.774853E-03 deltap:   0.000000E+00
+orbit:  -5.453893E-03 -1.140867E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.982810E-08 deltap:   0.000000E+00
+orbit:  -5.454226E-03 -1.140928E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0       0.7550499222        1.150832628 
+
+                q1                dq1            betxmax              dxmax 
+       1.244783623        1.057511484        176.2934582        90.00729875 
+
+             dxrms             xcomax             xcorms                 q2 
+       70.29023833      0.01599266264      0.00742049109        1.851641147 
+
+               dq2            betymax              dymax              dyrms 
+      0.3299561764        185.1125331                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+
+	 mode=svd, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+
+	 clist=c3.tab, mlist=m3.tab;
+
+Want to correct orbit of a single ring
+Want to use orbit from: orbint
+Want to use model orbit from: my_model
+11 monitors and 10 correctors found in input
+11 monitors and 10 correctors enabled
+SVD conditioning requested ...
+Initially found 10 singular values
+After SVD conditioning:             
+11 monitors and 5 correctors enabled
+
+Finally found 0 singular values
+  
+ start SVD correction using            5  correctors
+  
+CORRECTION SUMMARY:   
+
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
+
+before correction: -0.925909        3.530367          3.649767        12.131072 
+after correction:  0.022958        0.277952          0.278899        1.011518 
+
+
+Monitor:  Before:     After:    Difference:
+           (mm)        (mm)         (mm)   
+bpha:1   2.427     0.221     -2.206
+bpv1:1   2.426     0.223     -2.203
+bph2:1   4.481     -0.085     -4.566
+bpv2:1   -0.853     -0.136     0.717
+bph3:1   -7.650     0.199     7.850
+bpv3:1   -4.185     -0.476     3.709
+bph4:1   -3.919     -0.041     3.878
+bpv4:1   -1.629     0.536     2.164
+bph5:1   -3.700     -0.234     3.466
+bpv5:1   -0.073     0.269     0.342
+bph1:1   2.491     -0.223     -2.714
+Max strength: 6.612385e-02 is below corrector strength limit: 1.000000e+00
+Max strength: 6.612385e-02
+Corrector:  Before:     After:    Difference:
+             (mrad)     (mrad)       (mrad)  
+cbh.11:1 -0.006350 -0.012700 -0.006350
+cbh.21:1 -0.750491 -0.719504 0.030987
+cbh.31:1 -0.005797 -0.011593 -0.005797
+cbh.41:1 10.573527 10.639651 0.066124
+cbh.51:1 0.004547 0.009093 0.004547
+
+
+Twiss, file=result3;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   2.588243E-03 deltap:   0.000000E+00
+orbit:  -8.213492E-03 -1.713771E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.068718E-07 deltap:   0.000000E+00
+orbit:  -8.214239E-03 -1.713907E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0       0.7550411897        1.150839283 
+
+                q1                dq1            betxmax              dxmax 
+       1.244825599        1.057462555        176.3147002        90.02829448 
+
+             dxrms             xcomax             xcorms                 q2 
+       70.28951653      0.02403289536       0.0111547781        1.851700034 
+
+               dq2            betymax              dymax              dyrms 
+      0.3299119599        185.2515875                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+
+	 mode=lsq, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+
+	 clist=c4.tab, mlist=m4.tab;
+
+Want to correct orbit of a single ring
+Want to use orbit from: orbint
+Want to use model orbit from: my_model
+11 monitors and 10 correctors found in input
+11 monitors and 10 correctors enabled
+SVD conditioning requested ...
+Initially found 10 singular values
+After SVD conditioning:             
+11 monitors and 5 correctors enabled
+
+Finally found 0 singular values
+  
+ start LEAST SQUARES correction with all correctors
+  
+ IFAIL from lstsql:            0
+  
+ end LEAST SQUARES correction with all correctors
+  
+CORRECTION SUMMARY:   
+
+                   average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
+
+before correction: -0.925909        3.530367          3.649767        12.131072 
+after correction:  0.022958        0.277952          0.278899        1.011518 
+
+
+Monitor:  Before:     After:    Difference:
+           (mm)        (mm)         (mm)   
+bpha:1   2.427     0.221     -2.206
+bpv1:1   2.426     0.223     -2.203
+bph2:1   4.481     -0.085     -4.566
+bpv2:1   -0.853     -0.136     0.717
+bph3:1   -7.650     0.199     7.850
+bpv3:1   -4.185     -0.476     3.709
+bph4:1   -3.919     -0.041     3.878
+bpv4:1   -1.629     0.536     2.164
+bph5:1   -3.700     -0.234     3.466
+bpv5:1   -0.073     0.269     0.342
+bph1:1   2.491     -0.223     -2.714
+Max strength: 6.612385e-02 is below corrector strength limit: 1.000000e+00
+Max strength: 6.612385e-02
+Corrector:  Before:     After:    Difference:
+             (mrad)     (mrad)       (mrad)  
+cbh.11:1 -0.012700 -0.019051 -0.006350
+cbh.21:1 -0.719504 -0.688517 0.030987
+cbh.31:1 -0.011593 -0.017390 -0.005797
+cbh.41:1 10.639651 10.705775 0.066124
+cbh.51:1 0.009093 0.013640 0.004547
+
+
+Twiss, file=result4;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   3.400956E-03 deltap:   0.000000E+00
+orbit:  -1.097171E-02 -2.286673E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.066290E-07 deltap:   0.000000E+00
+orbit:  -1.097304E-02 -2.286915E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0       0.7550324782        1.150845922 
+
+                q1                dq1            betxmax              dxmax 
+       1.244867557        1.057413929        176.3359237        90.04927864 
+
+             dxrms             xcomax             xcorms                 q2 
+       70.28880093      0.03207024788        0.014889247        1.851758946 
+
+               dq2            betymax              dymax              dyrms 
+      0.3298675501        185.3908065                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+
+
+removefile, file='fort.61';
+
+removefile, file='fort.65';
+
+++++++ warning: unable to remove file:  fort.65
+removefile, file='fort.66';
+
+++++++ warning: unable to remove file:  fort.66
+
+  Number of warnings: 3
+3 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (32 bit) finished normally +
+  + MAD-X 5.02.00 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

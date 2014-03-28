@@ -1,9 +1,9 @@
 @ NAME             %04s "CORR"
 @ TYPE             %04s "CORR"
 @ TITLE            %01s "s"
-@ ORIGIN           %23s "MAD-X 5.00.19 Darwin 64"
-@ DATE             %08s "04/02/13"
-@ TIME             %08s "14.40.55"
+@ ORIGIN           %23s "MAD-X 5.02.00 Darwin 64"
+@ DATE             %08s "12/03/14"
+@ TIME             %08s "15.00.07"
 * NAME                           PX.OLD             PY.OLD      PX.CORRECTION      PY.CORRECTION 
 $ %s                                %le                %le                %le                %le 
  "CBH.10"                             0                  0   -6.158911157e-06                  0

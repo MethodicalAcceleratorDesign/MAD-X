@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (32 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 08.01.14 12.36.06 +
+  +    MAD-X 5.02.00  (64 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2014.03.05      +
+  + Execution Time Stamp: 12.03.14 14.34.35 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -85,20 +85,6 @@ select, flag=seqedit, class=MCBWH;
 
 select, flag=seqedit, class=MCBWV;
 
-seqedit, sequence=lhcb1;
-
-remove, element=selected;
-
-seqedit, sequence=lhcb2;
-
-remove, element=selected;
-
-endedit;
-
-
-
-select, flag=seqedit, clear;
-
 select, flag=seqedit, class=MBXWH;
 
 select, flag=seqedit, class=MBXWS;
@@ -111,15 +97,9 @@ select, flag=seqedit, class=MBLW;
 
 select, flag=seqedit, class=MBWMD;
 
-seqedit, sequence=lhcb1;
 
-remove, element=selected;
 
 seqedit, sequence=lhcb1;
-
-remove, element=selected;
-
-seqedit, sequence=lhcb2;
 
 remove, element=selected;
 
@@ -141,14 +121,14 @@ Select, flag=ERROR, range=MQXA.1L1;
 
 ealign, dy:=0.100e-3, dx:=0.070e-3;
 
-Assigned alignment errors to 1 elements
 Select, flag=ERROR, clear;
 
 Select, flag=ERROR, range=MQXA.1R5;
 
 ealign, dy:=0.050e-3, dx:=0.035e-3;
 
-Assigned alignment errors to 1 elements
+
+
 Use, period=lhcb1;
 
 Select, flag=ERROR, clear;
@@ -157,14 +137,12 @@ Select, flag=ERROR, range=MQXA.1L1;
 
 ealign, dy:=0.100e-3, dx:=0.070e-3;
 
-Assigned alignment errors to 1 elements
 Select, flag=ERROR, clear;
 
 Select, flag=ERROR, range=MQXA.1R5;
 
 ealign, dy:=0.050e-3, dx:=0.035e-3;
 
-Assigned alignment errors to 1 elements
 
 
 // enable only MCBX at Q1
@@ -249,33 +227,23 @@ Assigned alignment errors to 1 elements
 
  USEKICK,RANGE=mcbxh.1r5, status=ON;
 
+ 
+
+on_x1 = 0.0; on_x2 = 0.0; on_x5 = 0.0; on_x8 = 0.0;
+
+on_sep1 = 0.0; on_sep2 = 0.0; on_sep5 = 0.0; on_sep8 = 0.0;
+
+on_alice = 0.0; on_lhcb = 0.0;
 
 
-// calculate TWISS table for correction, beam 1 
-
-on_x1 = 0.0;
-
-on_x2 = 0.0;
-
-on_x5 = 0.0;
-
-on_x8 = 0.0;
-
-on_sep1 = 0.0;
-
-on_sep2 = 0.0;
-
-on_sep5 = 0.0;
-
-on_sep8 = 0.0;
-
-on_alice = 0.0;
-
-on_lhcb = 0.0;
 
 select, flag=twiss, clear;
 
 select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+
+
+
+// calculate TWISS table for correction, beam 1 
 
 TWISS,table=twb1,sequence=lhcb1;
 
@@ -306,49 +274,9 @@ orbit:  -2.814728E-05  8.594499E-05  7.406703E-05  5.662320E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!plot,table=twb1,title="Orbit ..L1..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
-
-
-
-coption,print=1;
-
-!CORRECT, FLAG=ring,
-
-!         MODE=micado,cond=0,NCORR=  1,ERROR=1E-6,PLANE=y,
-
-!         mlist='my1.tab',clist='cy1.tab', RESOUT=1,corzero=1;
-
-
-
-USEKICK,RANGE=mcbxv.1l5, status=ON;
-
 
 
 // calculate TWISS table for correction, beam 2 
-
-on_x1 = 0.0;
-
-on_x2 = 0.0;
-
-on_x5 = 0.0;
-
-on_x8 = 0.0;
-
-on_sep1 = 0.0;
-
-on_sep2 = 0.0;
-
-on_sep5 = 0.0;
-
-on_sep8 = 0.0;
-
-on_alice = 0.0;
-
-on_lhcb = 0.0;
-
-select, flag=twiss, clear;
-
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 
 TWISS,table=twb2,sequence=lhcb2;
 
@@ -379,17 +307,17 @@ orbit:   3.018352E-05 -1.061182E-04 -5.422462E-05  2.539827E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!plot,table=twb2,title="Orbit ..L2..before",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
 
 
+Coption,print=1;
 
 CORRECT, FLAG=ring,
 
-         tworing,beam1tab=twb1,beam2tab=twb2,
+         tworing, beam1tab=twb1, beam2tab=twb2,
 
-         MODE=micado,cond=0,NCORR=  4,ERROR=1E-6,PLANE=x,
+         MODE=micado, cond=0, NCORR= 4, ERROR=1E-6, PLANE=x,
 
-         mlist='mx12.tab',clist='cx12.tab', RESOUT=1,corzero=1;
+         mlist='mx12.tab', clist='cx12.tab', RESOUT=1, CORZERO=1;
 
 Want to correct orbit for two rings
 Want to use orbits from: twb1 and : twb2
@@ -429,11 +357,7 @@ after correction:  0.003368        0.089982          0.090045        2.637795
 Max strength: 2.271659e-03 is below corrector strength limit: 1.000000e+00
 
 
-select, flag=twiss, clear;
-
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
-
-TWISS,sequence=lhcb1;
+TWISS, file=resultb1, sequence=lhcb1;
 
 enter Twiss module
   
@@ -462,15 +386,7 @@ orbit:  -2.742854E-05 -6.552875E-07  7.390359E-05  5.661291E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!plot,title="Orbit ..L1..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
-
-
-
-select, flag=twiss, clear;
-
-select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
-
-TWISS,sequence=lhcb2;
+TWISS, file=resultb2, sequence=lhcb2;
 
 enter Twiss module
   
@@ -499,8 +415,6 @@ orbit:   3.932110E-05 -8.382999E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!plot,title="Orbit ..L2..after",vmin=-0.005,vmax=0.005,noline=true,haxis=s,vaxis=x;
-
 
 
 removefile, file='fort.61';
@@ -509,5 +423,5 @@ removefile, file='fort.61';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (32 bit) finished normally +
+  + MAD-X 5.02.00 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

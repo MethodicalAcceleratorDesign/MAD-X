@@ -1,0 +1,933 @@
+  /**********************************************************************************
+  *
+  * TI2 version STUDY in MAD X SEQUENCE format
+  * Generated the 11-MAR-2013 15:14:38 from LHCLAYOUT@EDMSDB Database
+  *
+  ***********************************************************************************/
+
+
+// Rotation to adapt final PSI to LHC plane  (ON by default)
+ON_TI2_LHC_ROT := 1;
+TI2_LHC_ROT    : SROTATION, ANGLE := (0.004170381943 +0.01578621) * ON_TI2_LHC_ROT;
+
+HCORRECTOR : HKICKER;
+VCORRECTOR : VKICKER;
+
+REAL CONST x0.ti2       = -2083.52788;
+REAL CONST z0.ti2       = 2586.13130;
+REAL CONST y0.ti2       = 2402.17923;
+REAL CONST theta0.ti2   = 2.011786673;
+REAL CONST phi0.ti2     = 0.000045000;
+REAL CONST psi0.ti2     = 0.000;
+
+/************************************************************************************/
+/*                       STRENGTHS                                                  */
+/************************************************************************************/
+
+REAL CONST abiv.610013  =  0.000000000000000 ;
+REAL CONST abih.610104  =  0.000743880000000 ;
+REAL CONST abih.610206  =  0.000755840000000 ;
+REAL CONST abiv.610304  = -0.000504650000000 ;
+REAL CONST abih.610337  =  0.000000000000000 ;
+REAL CONST abib.610405  =  0.008277100000000 ;
+REAL CONST abie.610405  = -0.008396230000000 ;
+REAL CONST abib.610523  =  0.008276900000000 ;
+REAL CONST abih.20150   = -0.006000000000000 ;
+REAL CONST abiv.20637   =  0.003594770000000 ;
+REAL CONST abi.22134    =  0.007471600000000 ;
+REAL CONST abiv.26407   = -0.003524206750000 ;
+REAL CONST abiv.28707   =  0.002290207500000 ;
+REAL CONST abih.29314   = -0.002999255000000 ;
+REAL CONST amsib.l2b1   = -0.002761735044102 ;
+REAL CONST amsia.l2b1   = -0.001856821859847 ;
+
+/************************************************************************************/
+/*                       TYPES DEFINITION                                           */
+/************************************************************************************/
+
+REAL CONST l.BCTFI      = 0.4820;
+REAL CONST l.BPCK       = 0.45;
+REAL CONST l.BPMI       = 0.25;
+REAL CONST l.BPMYB      = 0;
+REAL CONST l.BPTX       = 0;
+REAL CONST l.BSTL       = 0.86;
+REAL CONST l.BTV        = 0.45;
+REAL CONST l.BTVI       = 0.35;
+REAL CONST l.BTVSI088   = 0.50;
+REAL CONST l.BTVSS075   = 0.75;
+REAL CONST l.MBB        = 6.26;
+REAL CONST l.MBE        = 6.26;
+REAL CONST l.MBI        = 6.30;
+REAL CONST l.MBIAV      = 3.4120;
+REAL CONST l.MBIBH      = 2.80;
+REAL CONST l.MBIDH      = 6.26;
+REAL CONST l.MBQY       = 0.3810;
+REAL CONST l.MCIAH      = 0.5080;
+REAL CONST l.MCIAV      = 0.5080;
+REAL CONST l.MDAV       = 1.40;
+REAL CONST l.MDLH       = 1.40;
+REAL CONST l.MDLV       = 1.40;
+REAL CONST l.MKIMA192   = 3.4140;
+REAL CONST l.MQID       = 1.40;
+REAL CONST l.MQIF       = 1.40;
+REAL CONST l.MQY        = 3.40;
+REAL CONST l.MSIA       = 4;
+REAL CONST l.MSIB       = 4;
+REAL CONST l.QTLD       = 2.99;
+REAL CONST l.QTLF       = 2.99;
+REAL CONST l.TBSE       = 4;
+REAL CONST l.TCDIH      = 1.34;
+REAL CONST l.TCDIM      = 0.60;
+REAL CONST l.TCDIV      = 1.34;
+REAL CONST l.TED        = 4.30;
+REAL CONST l.VVFA       = 0.3340;
+REAL CONST l.VVSA       = 0.1750;
+REAL CONST l.VVSB       = 0.1750;
+
+//---------------------- HKICKER        ---------------------------------------------
+MCIAH     : HKICKER     , L := l.MCIAH;      ! Corrector magnet, horizontal
+//---------------------- INSTRUMENT     ---------------------------------------------
+BCTFI     : INSTRUMENT  , L := l.BCTFI;      ! Beam Current Transformer, Fast, Injection line
+BPTX      : INSTRUMENT  , L := l.BPTX;       ! Pick-up for experiment timing in IR1, 2, 5 and 8
+BSTL      : INSTRUMENT  , L := l.BSTL;       ! Test monitor double BTV and QUATRO
+BTV       : INSTRUMENT  , L := l.BTV;        ! Beam Observation TV Monitors based on Screens
+BTVI      : INSTRUMENT  , L := l.BTVI;       ! Beam Observation TV Monitors based on Screens for the Transfer Lines
+BTVSI088  : INSTRUMENT  , L := l.BTVSI088;   ! BTVS for Injection Points 2/7 (combined Injection and Ring)
+BTVSS075  : INSTRUMENT  , L := l.BTVSS075;   ! BTVS close to Injection Septa IR2
+TBSE      : INSTRUMENT  , L := l.TBSE;       ! Beam stopper, SPS Ejection line
+TED       : INSTRUMENT  , L := l.TED;        ! External beam dump
+VVFA      : INSTRUMENT  , L := l.VVFA;       ! Vacuum valve, safety, fast action, diameter 150 mm.
+VVSA      : INSTRUMENT  , L := l.VVSA;       ! Vacuum valve, sector, diameter 100 mm.
+VVSB      : INSTRUMENT  , L := l.VVSB;       ! Vacuum valve, sector, diameter 150 mm.
+//---------------------- MONITOR        ---------------------------------------------
+BPCK      : MONITOR     , L := l.BPCK;       ! beam position, directional coupler, K type
+BPMI      : MONITOR     , L := l.BPMI;       ! Beam Position Monitor in the Transfer Lines and Injection Points Equipped for Dual Plane Measurement
+BPMYB     : MONITOR     , L := l.BPMYB;      ! Beam Position Monitor, Wide Aperture, Tilted Beam Screen
+//---------------------- QUADRUPOLE     ---------------------------------------------
+MQID      : QUADRUPOLE  , L := l.MQID;       ! Quadrupole, injection transfer line, defocussing
+MQIF      : QUADRUPOLE  , L := l.MQIF;       ! Quadrupole, injection transfer line, focussing
+MQY       : QUADRUPOLE  , L := l.MQY;        ! Wide aperture quadrupole in the insertions, twin aperture
+QTLD      : QUADRUPOLE  , L := l.QTLD;       ! Quadrupole, BT line, long, defocussing
+QTLF      : QUADRUPOLE  , L := l.QTLF;       ! Quadrupole, BT line, long, focussing
+//---------------------- RBEND          ---------------------------------------------
+MBB       : RBEND       , L := l.MBB;        ! Bending Magnet, type B2
+MBE       : RBEND       , L := l.MBE;        ! Bending magnet, modified MBB for vertical deflection
+MBI       : RBEND       , L := l.MBI;        ! Dipole magnet
+MBIAV     : RBEND       , L := l.MBIAV;      ! Dipole magnet, vertical
+MBIBH     : RBEND       , L := l.MBIBH;      ! Dipole magnet, horizontal
+MBIDH     : RBEND       , L := l.MBIDH;      ! Dipole for Injection Line,  Horizontal, Existing, SPS type B2
+MBQY      : RBEND       , L := l.MBQY;       ! "Virtual " Bending magnet for Q5L2 (MQY.B5L2 MQY.A5L2) in TI2 line, used in TI2 MAD Sequence
+MDAV      : RBEND       , L := l.MDAV;       ! correcting dipole, BT line, enlarged aperture, vertical deflection
+MDLH      : RBEND       , L := l.MDLH;       ! correcting dipole, BT line, long, horizontal deflection
+MDLV      : RBEND       , L := l.MDLV;       ! Correcting dipole, BT line, long, vertical deflection
+MKIMA192  : RBEND       , L := l.MKIMA192;   ! Injection kicker RA23
+MSIA      : RBEND       , L := l.MSIA;       ! Injection septum, Module A
+MSIB      : RBEND       , L := l.MSIB;       ! Injection septum, Module B
+//---------------------- RCOLLIMATOR    ---------------------------------------------
+TCDIH     : RCOLLIMATOR , L := l.TCDIH;      ! Collimator
+TCDIM     : RCOLLIMATOR , L := l.TCDIM;      ! Collimator
+TCDIV     : RCOLLIMATOR , L := l.TCDIV;      ! Collimator
+//---------------------- VKICKER        ---------------------------------------------
+MCIAV     : VKICKER     , L := l.MCIAV;      ! Corrector magnet, vertical
+
+
+/************************************************************************************/
+/*                       TI2 SEQUENCE                                               */
+/************************************************************************************/
+
+TI2 : SEQUENCE,            L = 3188.384281;
+
+!VVSA.610000         : VVSA         , AT = -5.4757           , SLOT_ID = 5409123;
+ MDAV.610013         : MDAV         , AT = 7.9448            , SLOT_ID = 1619547      , TILT = PI/2 + 0;
+ BPCK.610015         : BPCK         , AT = 9.3798            , SLOT_ID = 1619548;
+ BTV.610018          : BTV          , AT = 11.2758           , SLOT_ID = 1619549;
+ QTLD.610100         : QTLD         , AT = 13.3058           , SLOT_ID = 1619550;
+ MDLH.610104         : MDLH         , AT = 16.1208           , SLOT_ID = 1619551      , TILT = 0.0 - 0.0000000165;
+ QTLF.610200         : QTLF         , AT = 48.8116           , SLOT_ID = 1619553;
+ MDLH.610206         : MDLH         , AT = 53.2221           , SLOT_ID = 1619554      , TILT = 0.0 - 0.0000000500;
+ BPCK.610211         : BPCK         , AT = 56.9451           , SLOT_ID = 1619555;
+ VVFA.610223         : VVFA         , AT = 66.579            , SLOT_ID = 4274239;
+ BCTFI.610225        : BCTFI        , AT = 68.3411           , SLOT_ID = 1619557;
+ BSTL.610227         : BSTL         , AT = 69.7121           , SLOT_ID = 1619558;
+ BTV.610252          : BTV          , AT = 89.1701           , SLOT_ID = 1619559;
+ QTLD.610300         : QTLD         , AT = 93.1731           , SLOT_ID = 1619560;
+ MDLV.610304         : MDLV         , AT = 96.1011           , SLOT_ID = 1619561      , TILT = PI/2 - 0.000000067;
+ BPCK.610312         : BPCK         , AT = 101.8931          , SLOT_ID = 1619562;
+ BTV.610317          : BTV          , AT = 105.5331          , SLOT_ID = 1619563;
+ TED.610321          : TED          , AT = 111.7536          , SLOT_ID = 1619564;
+ MDLH.610337         : MDLH         , AT = 120.9101          , SLOT_ID = 1619565      , TILT = 0.0 - 0.0000000670;
+ BPCK.610340         : BPCK         , AT = 124.2351          , SLOT_ID = 1619566;
+ QTLF.610400         : QTLF         , AT = 126.4001          , SLOT_ID = 1619567;
+ MBB.610405          : MBB          , AT = 132.424109        , SLOT_ID = 1619568      , TILT = 0.0 - 0.0000023420;
+ MBB.610413          : MBB          , AT = 139.064127        , SLOT_ID = 1619569      , TILT = 0.0 - 0.0000068920;
+ MBE.610422          : MBE          , AT = 145.841145        , SLOT_ID = 1619570      , TILT = PI/2 - 0.000009167;
+ MBE.610430          : MBE          , AT = 152.481163        , SLOT_ID = 1619571      , TILT = PI/2 - 0.000009167;
+ MBE.610438          : MBE          , AT = 159.121181        , SLOT_ID = 1619572      , TILT = PI/2 - 0.000009167;
+ QTLD.610500         : QTLD         , AT = 164.76119         , SLOT_ID = 1619573;
+ MBE.610506          : MBE          , AT = 171.621199        , SLOT_ID = 1619574      , TILT = PI/2 - 0.000009167;
+ MBE.610514          : MBE          , AT = 178.261217        , SLOT_ID = 1619575      , TILT = PI/2 - 0.000009167;
+ MBB.610523          : MBB          , AT = 185.038235        , SLOT_ID = 1619576      , TILT = 0.0 - 0.0001852855;
+ MBB.610531          : MBB          , AT = 191.678253        , SLOT_ID = 1619577      , TILT = 0.0 - 0.0005375230;
+ BPCK.610539         : BPCK         , AT = 195.292661        , SLOT_ID = 1619578;
+ QTLF.610600         : QTLF         , AT = 197.909662        , SLOT_ID = 1619579;
+ VVSB.660015         : VVSB         , AT = 210.955           , SLOT_ID = 4337673;
+
+ STARTTI2            : MARKER       , AT = 241.391162;
+
+ MQID.20100          : MQID         , AT = 242.091162        , SLOT_ID = 1411694;
+ BPMI.20104          : BPMI         , AT = 243.076162        , SLOT_ID = 4337639;
+ TBSE.20136          : TBSE         , AT = 261.937567        , SLOT_ID = 4337645;
+ MBIDH.20150         : MBIDH        , AT = 269.375567        , SLOT_ID = 1411738      , TILT = 0.0 - 0.0005859720;
+ MQIF.20200          : MQIF         , AT = 273.761571        , SLOT_ID = 1411739;
+ BPMI.20204          : BPMI         , AT = 274.746571        , SLOT_ID = 1411740;
+ MBIDH.20214         : MBIDH        , AT = 282.810776        , SLOT_ID = 1411741      , TILT = 0.0 - 0.0003306325;
+ MQID.20300          : MQID         , AT = 305.259981        , SLOT_ID = 1411742;
+ BPMI.20304          : BPMI         , AT = 306.244981        , SLOT_ID = 4337640;
+ MCIAV.20304         : MCIAV        , AT = 306.74398         , SLOT_ID = 1411743;
+ MQIF.20400          : MQIF         , AT = 334.844381        , SLOT_ID = 1411744;
+ BPMI.20404          : BPMI         , AT = 335.82938         , SLOT_ID = 1411745;
+ VVSA.20441          : VVSA         , AT = 354.887262        , SLOT_ID = 4281670;
+ MQID.20500          : MQID         , AT = 372.428781        , SLOT_ID = 1411746;
+ BPMI.20504          : BPMI         , AT = 373.41378         , SLOT_ID = 1411747;
+ MCIAV.20504         : MCIAV        , AT = 373.91278         , SLOT_ID = 1411748;
+ BTVI.20506          : BTVI         , AT = 374.77378         , SLOT_ID = 1411749;
+ MQIF.20600          : MQIF         , AT = 400.013181        , SLOT_ID = 1411750;
+ TCDIV.20607         : TCDIV        , AT = 403.123191        , SLOT_ID = 1411751;
+ TCDIM.20634         : TCDIM        , AT = 416.566691        , SLOT_ID = 1411752;
+ MBIAV.20637         : MBIAV        , AT = 419.190191        , SLOT_ID = 1411753      , TILT = PI/2 - 0.000202963;
+ MBIAV.20646         : MBIAV        , AT = 423.717193        , SLOT_ID = 1411754      , TILT = PI/2 - 0.000202963;
+ MBIAV.20655         : MBIAV        , AT = 428.244195        , SLOT_ID = 1411755      , TILT = PI/2 - 0.000202963;
+ MQID.20700          : MQID         , AT = 431.501696        , SLOT_ID = 1411756;
+
+ BEGLINE1            : MARKER       , AT = 432.201696;
+
+ BPMI.20704          : BPMI         , AT = 432.486686        , SLOT_ID = 1411757;
+ MBIAV.20707         : MBIAV        , AT = 435.909197        , SLOT_ID = 1411758      , TILT = PI/2 - 0.000202963;
+ MBIAV.20716         : MBIAV        , AT = 440.436199        , SLOT_ID = 1411759      , TILT = PI/2 - 0.000202963;
+ MBIAV.20725         : MBIAV        , AT = 444.963201        , SLOT_ID = 1411760      , TILT = PI/2 - 0.000202963;
+ MBIAV.20734         : MBIAV        , AT = 449.490202        , SLOT_ID = 1411761      , TILT = PI/2 - 0.000202963;
+ MBIAV.20744         : MBIAV        , AT = 454.017204        , SLOT_ID = 1411762      , TILT = PI/2 - 0.000202963;
+ MBIAV.20753         : MBIAV        , AT = 458.544206        , SLOT_ID = 1411763      , TILT = PI/2 - 0.000202963;
+ MQIF.20800          : MQIF         , AT = 461.801707        , SLOT_ID = 1411764;
+ MCIAH.20804         : MCIAH        , AT = 463.285697        , SLOT_ID = 1411765;
+ MBIAV.20807         : MBIAV        , AT = 466.209208        , SLOT_ID = 1411766      , TILT = PI/2 - 0.000202963;
+ MBIAV.20816         : MBIAV        , AT = 470.73621         , SLOT_ID = 1411767      , TILT = PI/2 - 0.000202963;
+ MBIAV.20825         : MBIAV        , AT = 475.263212        , SLOT_ID = 1411768      , TILT = PI/2 - 0.000202963;
+ MBIAV.20834         : MBIAV        , AT = 479.790213        , SLOT_ID = 1411769      , TILT = PI/2 - 0.000202963;
+ MBIAV.20844         : MBIAV        , AT = 484.317215        , SLOT_ID = 1411770      , TILT = PI/2 - 0.000202963;
+ MBIAV.20853         : MBIAV        , AT = 488.844217        , SLOT_ID = 1411771      , TILT = PI/2 - 0.000202963;
+ MQID.20900          : MQID         , AT = 492.101718        , SLOT_ID = 1411772;
+ MBIAV.20907         : MBIAV        , AT = 496.509219        , SLOT_ID = 1411773      , TILT = PI/2 - 0.000202963;
+ MBIAV.20916         : MBIAV        , AT = 501.036221        , SLOT_ID = 1411774      , TILT = PI/2 - 0.000202963;
+ MQIF.21000          : MQIF         , AT = 522.401722        , SLOT_ID = 1411775;
+ BPMI.21004          : BPMI         , AT = 523.386711        , SLOT_ID = 1411776;
+ MCIAH.21004         : MCIAH        , AT = 523.885711        , SLOT_ID = 1411777;
+ MQID.21100          : MQID         , AT = 552.701722        , SLOT_ID = 1411778;
+ MCIAV.21104         : MCIAV        , AT = 554.185711        , SLOT_ID = 1411779;
+ MQIF.21200          : MQIF         , AT = 583.001722        , SLOT_ID = 1411780;
+ BPMI.21204          : BPMI         , AT = 583.986711        , SLOT_ID = 1411781;
+ MQID.21300          : MQID         , AT = 613.301722        , SLOT_ID = 1411782;
+ BPMI.21304          : BPMI         , AT = 614.286711        , SLOT_ID = 1411783;
+ MCIAV.21304         : MCIAV        , AT = 614.785711        , SLOT_ID = 1411784;
+ MQIF.21400          : MQIF         , AT = 643.601722        , SLOT_ID = 1411785;
+ MQID.21500          : MQID         , AT = 673.901722        , SLOT_ID = 1411786;
+ BPMI.21504          : BPMI         , AT = 674.886711        , SLOT_ID = 1411787;
+ MQIF.21600          : MQIF         , AT = 704.201722        , SLOT_ID = 1411788;
+ MCIAH.21604         : MCIAH        , AT = 705.685711        , SLOT_ID = 1411789;
+ MQID.21700          : MQID         , AT = 734.501722        , SLOT_ID = 1411790;
+ MQIF.21800          : MQIF         , AT = 764.801722        , SLOT_ID = 1411791;
+ BPMI.21804          : BPMI         , AT = 765.786711        , SLOT_ID = 1411792;
+ MCIAH.21804         : MCIAH        , AT = 766.285711        , SLOT_ID = 1411793;
+ MQID.21900          : MQID         , AT = 795.101722        , SLOT_ID = 1411794;
+ MCIAV.21904         : MCIAV        , AT = 796.585711        , SLOT_ID = 1411795;
+ MQIF.22000          : MQIF         , AT = 825.401722        , SLOT_ID = 1411796;
+ BPMI.22004          : BPMI         , AT = 826.386711        , SLOT_ID = 1411797;
+ MQID.22100          : MQID         , AT = 855.701722        , SLOT_ID = 1411798;
+ BPMI.22104          : BPMI         , AT = 856.686711        , SLOT_ID = 1411799;
+ MCIAV.22104         : MCIAV        , AT = 857.185711        , SLOT_ID = 1411800;
+ MBI.22134           : MBI          , AT = 874.861729        , SLOT_ID = 1411801      , TILT = 0.0 - 0.0001335425;
+ MBI.22147           : MBI          , AT = 881.681744        , SLOT_ID = 1411802      , TILT = 0.0 + 0.0000052990;
+ MQIF.22200          : MQIF         , AT = 886.001751        , SLOT_ID = 1411803;
+ MBI.22206           : MBI          , AT = 891.521758        , SLOT_ID = 1411804      , TILT = 0.0 + 0.0001441405;
+ MBI.22220           : MBI          , AT = 898.341773        , SLOT_ID = 1411805      , TILT = 0.0 + 0.0002829815;
+ MQID.22300          : MQID         , AT = 916.30178         , SLOT_ID = 1411806;
+ BPMI.22304          : BPMI         , AT = 917.28677         , SLOT_ID = 1411807;
+ MQIF.22400          : MQIF         , AT = 946.60178         , SLOT_ID = 1411808;
+ MCIAH.22404         : MCIAH        , AT = 948.08577         , SLOT_ID = 1411809;
+ MQID.22500          : MQID         , AT = 976.90178         , SLOT_ID = 1411810;
+ MQIF.22600          : MQIF         , AT = 1007.20178        , SLOT_ID = 1411811;
+ BPMI.22604          : BPMI         , AT = 1008.18677        , SLOT_ID = 1411812;
+ MCIAH.22604         : MCIAH        , AT = 1008.68577        , SLOT_ID = 1411813;
+ MQID.22700          : MQID         , AT = 1037.50178        , SLOT_ID = 1411814;
+ MCIAV.22704         : MCIAV        , AT = 1038.98577        , SLOT_ID = 1411815;
+ MQIF.22800          : MQIF         , AT = 1067.80178        , SLOT_ID = 1411816;
+
+ ARCBEGIN            : MARKER       , AT = 1068.50178;
+
+ BPMI.22804          : BPMI         , AT = 1068.78677        , SLOT_ID = 1411817;
+ MBI.22820           : MBI          , AT = 1080.141788       , SLOT_ID = 1411818      , TILT = 0.0 + 0.0004218225;
+ MBI.22834           : MBI          , AT = 1086.961802       , SLOT_ID = 1411819      , TILT = 0.0 + 0.0005606635;
+ MQID.22900          : MQID         , AT = 1098.10181        , SLOT_ID = 1411820;
+ BPMI.22904          : BPMI         , AT = 1099.086799       , SLOT_ID = 1411821;
+ MCIAV.22904         : MCIAV        , AT = 1099.585799       , SLOT_ID = 1411822;
+ MBI.22920           : MBI          , AT = 1110.441817       , SLOT_ID = 1411823      , TILT = 0.0 + 0.0006995045;
+ MBI.22934           : MBI          , AT = 1117.261832       , SLOT_ID = 1411824      , TILT = 0.0 + 0.0008383455;
+ MQIF.23000          : MQIF         , AT = 1128.401839       , SLOT_ID = 1411825;
+ MBI.23020           : MBI          , AT = 1140.741846       , SLOT_ID = 1411826      , TILT = 0.0 + 0.0009771865;
+ MBI.23034           : MBI          , AT = 1147.561861       , SLOT_ID = 1411827      , TILT = 0.0 + 0.0011160280;
+ MQID.23100          : MQID         , AT = 1158.701868       , SLOT_ID = 1411828;
+ BPMI.23104          : BPMI         , AT = 1159.686858       , SLOT_ID = 1411829;
+ MBI.23120           : MBI          , AT = 1171.041876       , SLOT_ID = 1411830      , TILT = 0.0 + 0.0012548695;
+ MBI.23134           : MBI          , AT = 1177.86189        , SLOT_ID = 1411831      , TILT = 0.0 + 0.0013937105;
+ MQIF.23200          : MQIF         , AT = 1189.001898       , SLOT_ID = 1411832;
+ MCIAH.23204         : MCIAH        , AT = 1190.485887       , SLOT_ID = 1411833;
+ MBI.23206           : MBI          , AT = 1194.521905       , SLOT_ID = 1411834      , TILT = 0.0 + 0.0015325515;
+ MBI.23220           : MBI          , AT = 1201.34192        , SLOT_ID = 1411835      , TILT = 0.0 + 0.0016713925;
+ MBI.23234           : MBI          , AT = 1208.161934       , SLOT_ID = 1411836      , TILT = 0.0 + 0.0018102335;
+ MBI.23247           : MBI          , AT = 1214.981949       , SLOT_ID = 1411837      , TILT = 0.0 + 0.0019490745;
+ MQID.23300          : MQID         , AT = 1219.301956       , SLOT_ID = 1411838;
+ MBI.23306           : MBI          , AT = 1224.821964       , SLOT_ID = 1411839      , TILT = 0.0 + 0.0020879155;
+ MBI.23320           : MBI          , AT = 1231.641978       , SLOT_ID = 1411840      , TILT = 0.0 + 0.0022267565;
+ MBI.23334           : MBI          , AT = 1238.461993       , SLOT_ID = 1411841      , TILT = 0.0 + 0.0023655980;
+ MBI.23347           : MBI          , AT = 1245.282008       , SLOT_ID = 1411842      , TILT = 0.0 + 0.0025044395;
+ MQIF.23400          : MQIF         , AT = 1249.602015       , SLOT_ID = 1411843;
+ BPMI.23404          : BPMI         , AT = 1250.587004       , SLOT_ID = 1411844;
+ MCIAH.23404         : MCIAH        , AT = 1251.086004       , SLOT_ID = 1411845;
+ MBI.23406           : MBI          , AT = 1255.122022       , SLOT_ID = 1411846      , TILT = 0.0 + 0.0026432805;
+ MBI.23420           : MBI          , AT = 1261.942037       , SLOT_ID = 1411847      , TILT = 0.0 + 0.0027821215;
+ MBI.23434           : MBI          , AT = 1268.762051       , SLOT_ID = 1411848      , TILT = 0.0 + 0.0029209625;
+ MBI.23447           : MBI          , AT = 1275.582066       , SLOT_ID = 1411849      , TILT = 0.0 + 0.0030598035;
+ MQID.23500          : MQID         , AT = 1279.902073       , SLOT_ID = 1411850;
+ MCIAV.23504         : MCIAV        , AT = 1281.386063       , SLOT_ID = 1411851;
+ MBI.23506           : MBI          , AT = 1285.422081       , SLOT_ID = 1411852      , TILT = 0.0 + 0.0031986445;
+ MBI.23520           : MBI          , AT = 1292.242095       , SLOT_ID = 1411853      , TILT = 0.0 + 0.0033374855;
+ MBI.23534           : MBI          , AT = 1299.06211        , SLOT_ID = 1411854      , TILT = 0.0 + 0.0034763270;
+ MBI.23547           : MBI          , AT = 1305.882125       , SLOT_ID = 1411855      , TILT = 0.0 + 0.0036151685;
+ MQIF.23600          : MQIF         , AT = 1310.202132       , SLOT_ID = 1411856;
+ BPMI.23604          : BPMI         , AT = 1311.187122       , SLOT_ID = 1411857;
+ MBI.23606           : MBI          , AT = 1315.722139       , SLOT_ID = 1411858      , TILT = 0.0 + 0.0037540095;
+ MBI.23620           : MBI          , AT = 1322.542154       , SLOT_ID = 1411859      , TILT = 0.0 + 0.0038928505;
+ MBI.23634           : MBI          , AT = 1329.362169       , SLOT_ID = 1411860      , TILT = 0.0 + 0.0040316915;
+ MBI.23647           : MBI          , AT = 1336.182183       , SLOT_ID = 1411861      , TILT = 0.0 + 0.0041705325;
+ MQID.23700          : MQID         , AT = 1340.502191       , SLOT_ID = 1411862;
+ BPMI.23704          : BPMI         , AT = 1341.48718        , SLOT_ID = 1411863;
+ MCIAV.23704         : MCIAV        , AT = 1341.98618        , SLOT_ID = 1411864;
+ MBI.23706           : MBI          , AT = 1346.022198       , SLOT_ID = 1411865      , TILT = 0.0 + 0.0043093735;
+ MBI.23720           : MBI          , AT = 1352.842213       , SLOT_ID = 1411866      , TILT = 0.0 + 0.0044482145;
+ MBI.23734           : MBI          , AT = 1359.662227       , SLOT_ID = 1411867      , TILT = 0.0 + 0.0045870555;
+ MBI.23747           : MBI          , AT = 1366.482242       , SLOT_ID = 1411868      , TILT = 0.0 + 0.0047258970;
+ MQIF.23800          : MQIF         , AT = 1370.802249       , SLOT_ID = 1411869;
+ MBI.23806           : MBI          , AT = 1376.322257       , SLOT_ID = 1411870      , TILT = 0.0 + 0.0048647385;
+ MBI.23820           : MBI          , AT = 1383.142271       , SLOT_ID = 1411871      , TILT = 0.0 + 0.0050035795;
+ MBI.23834           : MBI          , AT = 1389.962286       , SLOT_ID = 1411872      , TILT = 0.0 + 0.0051424205;
+ MBI.23847           : MBI          , AT = 1396.782301       , SLOT_ID = 1411873      , TILT = 0.0 + 0.0052812615;
+ MQID.23900          : MQID         , AT = 1401.102308       , SLOT_ID = 1411874;
+ BPMI.23904          : BPMI         , AT = 1402.087297       , SLOT_ID = 1411875;
+ MBI.23906           : MBI          , AT = 1406.622315       , SLOT_ID = 1411876      , TILT = 0.0 + 0.0054201025;
+ MBI.23920           : MBI          , AT = 1413.44233        , SLOT_ID = 1411877      , TILT = 0.0 + 0.0055589435;
+ MBI.23934           : MBI          , AT = 1420.262345       , SLOT_ID = 1411878      , TILT = 0.0 + 0.0056977845;
+ MBI.23947           : MBI          , AT = 1427.082359       , SLOT_ID = 1411879      , TILT = 0.0 + 0.0058366260;
+ MQIF.24000          : MQIF         , AT = 1431.402367       , SLOT_ID = 1411880;
+ MCIAH.24004         : MCIAH        , AT = 1432.886356       , SLOT_ID = 1411881;
+ MBI.24006           : MBI          , AT = 1436.922374       , SLOT_ID = 1411882      , TILT = 0.0 + 0.0059754675;
+ MBI.24020           : MBI          , AT = 1443.742389       , SLOT_ID = 1411883      , TILT = 0.0 + 0.0061143085;
+ MBI.24034           : MBI          , AT = 1450.562403       , SLOT_ID = 1411884      , TILT = 0.0 + 0.0062531495;
+ MBI.24047           : MBI          , AT = 1457.382418       , SLOT_ID = 1411885      , TILT = 0.0 + 0.0063919905;
+ MQID.24100          : MQID         , AT = 1461.702425       , SLOT_ID = 1411886;
+ MBI.24106           : MBI          , AT = 1467.222432       , SLOT_ID = 1411887      , TILT = 0.0 + 0.0065308315;
+ MBI.24120           : MBI          , AT = 1474.042447       , SLOT_ID = 1411888      , TILT = 0.0 + 0.0066696725;
+ MBI.24134           : MBI          , AT = 1480.862462       , SLOT_ID = 1411889      , TILT = 0.0 + 0.0068085135;
+ MBI.24147           : MBI          , AT = 1487.682476       , SLOT_ID = 1411890      , TILT = 0.0 + 0.0069473545;
+ MQIF.24200          : MQIF         , AT = 1492.002484       , SLOT_ID = 1411891;
+ BPMI.24204          : BPMI         , AT = 1492.987473       , SLOT_ID = 1411892;
+ MCIAH.24204         : MCIAH        , AT = 1493.486473       , SLOT_ID = 1411893;
+ MBI.24206           : MBI          , AT = 1497.522491       , SLOT_ID = 1411894      , TILT = 0.0 + 0.0070861960;
+ MBI.24220           : MBI          , AT = 1504.342506       , SLOT_ID = 1411895      , TILT = 0.0 + 0.0072250375;
+ MBI.24234           : MBI          , AT = 1511.16252        , SLOT_ID = 1411896      , TILT = 0.0 + 0.0073638785;
+ MBI.24247           : MBI          , AT = 1517.982535       , SLOT_ID = 1411897      , TILT = 0.0 + 0.0075027195;
+ MQID.24300          : MQID         , AT = 1522.302542       , SLOT_ID = 1411898;
+ MCIAV.24304         : MCIAV        , AT = 1523.786532       , SLOT_ID = 1411899;
+ MBI.24306           : MBI          , AT = 1527.82255        , SLOT_ID = 1411900      , TILT = 0.0 + 0.0076415605;
+ MBI.24320           : MBI          , AT = 1534.642564       , SLOT_ID = 1411901      , TILT = 0.0 + 0.0077804015;
+ MBI.24334           : MBI          , AT = 1541.462579       , SLOT_ID = 1411902      , TILT = 0.0 + 0.0079192425;
+ MBI.24347           : MBI          , AT = 1548.282594       , SLOT_ID = 1411903      , TILT = 0.0 + 0.0080580835;
+ MQIF.24400          : MQIF         , AT = 1552.602601       , SLOT_ID = 1411904;
+ BPMI.24404          : BPMI         , AT = 1553.587591       , SLOT_ID = 1411905;
+ BTVI.24404          : BTVI         , AT = 1554.007591       , SLOT_ID = 1411906;
+ MBI.24406           : MBI          , AT = 1558.122608       , SLOT_ID = 1411907      , TILT = 0.0 + 0.0081969250;
+ MBI.24420           : MBI          , AT = 1564.942623       , SLOT_ID = 1411908      , TILT = 0.0 + 0.0083357665;
+ MBI.24434           : MBI          , AT = 1571.762638       , SLOT_ID = 1411909      , TILT = 0.0 + 0.0084746075;
+ MBI.24447           : MBI          , AT = 1578.582652       , SLOT_ID = 1411910      , TILT = 0.0 + 0.0086134485;
+ MQID.24500          : MQID         , AT = 1582.90266        , SLOT_ID = 1411911;
+ BPMI.24504          : BPMI         , AT = 1583.887649       , SLOT_ID = 1411912;
+ MCIAV.24504         : MCIAV        , AT = 1584.386649       , SLOT_ID = 1411913;
+ MBI.24506           : MBI          , AT = 1588.422667       , SLOT_ID = 1411914      , TILT = 0.0 + 0.0087522895;
+ MBI.24520           : MBI          , AT = 1595.242682       , SLOT_ID = 1411915      , TILT = 0.0 + 0.0088911305;
+ MBI.24534           : MBI          , AT = 1602.062696       , SLOT_ID = 1411916      , TILT = 0.0 + 0.0090299715;
+ MBI.24547           : MBI          , AT = 1608.882711       , SLOT_ID = 1411917      , TILT = 0.0 + 0.0091688125;
+ MQIF.24600          : MQIF         , AT = 1613.202718       , SLOT_ID = 1411918;
+ BTVI.24604          : BTVI         , AT = 1614.607708       , SLOT_ID = 1411919;
+ MBI.24606           : MBI          , AT = 1618.722726       , SLOT_ID = 1411920      , TILT = 0.0 + 0.0093076535;
+ MBI.24620           : MBI          , AT = 1625.54274        , SLOT_ID = 1411921      , TILT = 0.0 + 0.0094464950;
+ MBI.24634           : MBI          , AT = 1632.362755       , SLOT_ID = 1411922      , TILT = 0.0 + 0.0095853365;
+ MBI.24647           : MBI          , AT = 1639.18277        , SLOT_ID = 1411923      , TILT = 0.0 + 0.0097241775;
+ MQID.24700          : MQID         , AT = 1643.502777       , SLOT_ID = 1411924;
+ BPMI.24704          : BPMI         , AT = 1644.487766       , SLOT_ID = 1411925;
+ BTVI.24704          : BTVI         , AT = 1644.907766       , SLOT_ID = 1411926;
+ MBI.24706           : MBI          , AT = 1649.022784       , SLOT_ID = 1411927      , TILT = 0.0 + 0.0098630185;
+ MBI.24720           : MBI          , AT = 1655.842799       , SLOT_ID = 1411928      , TILT = 0.0 + 0.0100018595;
+ MBI.24734           : MBI          , AT = 1662.662813       , SLOT_ID = 1411929      , TILT = 0.0 + 0.0101407005;
+ MBI.24747           : MBI          , AT = 1669.482828       , SLOT_ID = 1411930      , TILT = 0.0 + 0.0102795415;
+ MQIF.24800          : MQIF         , AT = 1673.802835       , SLOT_ID = 1411931;
+ MCIAH.24804         : MCIAH        , AT = 1675.286825       , SLOT_ID = 1411932;
+ MBI.24806           : MBI          , AT = 1679.322843       , SLOT_ID = 1411933      , TILT = 0.0 + 0.0104183825;
+ MBI.24820           : MBI          , AT = 1686.142857       , SLOT_ID = 1411934      , TILT = 0.0 + 0.0105572240;
+ MBI.24834           : MBI          , AT = 1692.962872       , SLOT_ID = 1411935      , TILT = 0.0 + 0.0106960655;
+ MBI.24847           : MBI          , AT = 1699.782887       , SLOT_ID = 1411936      , TILT = 0.0 + 0.0108349065;
+ MQID.24900          : MQID         , AT = 1704.102894       , SLOT_ID = 1411937;
+ MBI.24906           : MBI          , AT = 1709.622901       , SLOT_ID = 1411938      , TILT = 0.0 + 0.0109737475;
+ MBI.24920           : MBI          , AT = 1716.442916       , SLOT_ID = 1411939      , TILT = 0.0 + 0.0111125885;
+ MBI.24934           : MBI          , AT = 1723.262931       , SLOT_ID = 1411940      , TILT = 0.0 + 0.0112514295;
+ MBI.24947           : MBI          , AT = 1730.082945       , SLOT_ID = 1411941      , TILT = 0.0 + 0.0113902705;
+ MQIF.25000          : MQIF         , AT = 1734.402953       , SLOT_ID = 1411942;
+ BPMI.25004          : BPMI         , AT = 1735.387942       , SLOT_ID = 1411943;
+ MCIAH.25004         : MCIAH        , AT = 1735.886942       , SLOT_ID = 1411944;
+ MBI.25006           : MBI          , AT = 1739.92296        , SLOT_ID = 1411945      , TILT = 0.0 + 0.0115291115;
+ MBI.25020           : MBI          , AT = 1746.742975       , SLOT_ID = 1411946      , TILT = 0.0 + 0.0116679530;
+ MBI.25034           : MBI          , AT = 1753.562989       , SLOT_ID = 1411947      , TILT = 0.0 + 0.0118067945;
+ MBI.25047           : MBI          , AT = 1760.383004       , SLOT_ID = 1411948      , TILT = 0.0 + 0.0119456355;
+ MQID.25100          : MQID         , AT = 1764.703011       , SLOT_ID = 1411949;
+ MCIAV.25104         : MCIAV        , AT = 1766.187001       , SLOT_ID = 1411950;
+ MBI.25106           : MBI          , AT = 1770.223019       , SLOT_ID = 1411951      , TILT = 0.0 + 0.0120844765;
+ MBI.25120           : MBI          , AT = 1777.043033       , SLOT_ID = 1411952      , TILT = 0.0 + 0.0122233175;
+ MBI.25134           : MBI          , AT = 1783.863048       , SLOT_ID = 1411953      , TILT = 0.0 + 0.0123621585;
+ MBI.25147           : MBI          , AT = 1790.683063       , SLOT_ID = 1411954      , TILT = 0.0 + 0.0125009995;
+ MQIF.25200          : MQIF         , AT = 1795.00307        , SLOT_ID = 1411955;
+ BPMI.25204          : BPMI         , AT = 1795.988059       , SLOT_ID = 1411956;
+ MBI.25206           : MBI          , AT = 1800.523077       , SLOT_ID = 1411957      , TILT = 0.0 + 0.0126398405;
+ MBI.25220           : MBI          , AT = 1807.343092       , SLOT_ID = 1411958      , TILT = 0.0 + 0.0127786815;
+ MBI.25234           : MBI          , AT = 1814.163107       , SLOT_ID = 1411959      , TILT = 0.0 + 0.0129175230;
+ MBI.25247           : MBI          , AT = 1820.983121       , SLOT_ID = 1411960      , TILT = 0.0 + 0.0130563645;
+ MQID.25300          : MQID         , AT = 1825.303129       , SLOT_ID = 1411961;
+ BPMI.25304          : BPMI         , AT = 1826.288118       , SLOT_ID = 1411962;
+ MCIAV.25304         : MCIAV        , AT = 1826.787118       , SLOT_ID = 1411963;
+ MBI.25306           : MBI          , AT = 1830.823136       , SLOT_ID = 1411964      , TILT = 0.0 + 0.0131952055;
+ MBI.25320           : MBI          , AT = 1837.643151       , SLOT_ID = 1411965      , TILT = 0.0 + 0.0133340465;
+ MBI.25334           : MBI          , AT = 1844.463165       , SLOT_ID = 1411966      , TILT = 0.0 + 0.0134728875;
+ MBI.25347           : MBI          , AT = 1851.28318        , SLOT_ID = 1411967      , TILT = 0.0 + 0.0136117285;
+ MQIF.25400          : MQIF         , AT = 1855.603187       , SLOT_ID = 1411968;
+ MBI.25420           : MBI          , AT = 1867.943194       , SLOT_ID = 1411969      , TILT = 0.0 + 0.0137505695;
+ MBI.25434           : MBI          , AT = 1874.763209       , SLOT_ID = 1411970      , TILT = 0.0 + 0.0138894105;
+ MQID.25500          : MQID         , AT = 1885.903216       , SLOT_ID = 1411971;
+ BPMI.25504          : BPMI         , AT = 1886.888206       , SLOT_ID = 1411972;
+ MBI.25520           : MBI          , AT = 1898.243224       , SLOT_ID = 1411973      , TILT = 0.0 + 0.0140282520;
+ MBI.25534           : MBI          , AT = 1905.063238       , SLOT_ID = 1411974      , TILT = 0.0 + 0.0141670935;
+ MQIF.25600          : MQIF         , AT = 1916.203246       , SLOT_ID = 1411975;
+ MCIAH.25604         : MCIAH        , AT = 1917.687235       , SLOT_ID = 1411976;
+ MBI.25620           : MBI          , AT = 1928.543253       , SLOT_ID = 1411977      , TILT = 0.0 + 0.0143059345;
+ MBI.25634           : MBI          , AT = 1935.363268       , SLOT_ID = 1411978      , TILT = 0.0 + 0.0144447755;
+ MQID.25700          : MQID         , AT = 1946.503275       , SLOT_ID = 1411979;
+ MBI.25720           : MBI          , AT = 1958.843282       , SLOT_ID = 1411980      , TILT = 0.0 + 0.0145836165;
+ MBI.25734           : MBI          , AT = 1965.663297       , SLOT_ID = 1411981      , TILT = 0.0 + 0.0147224575;
+
+ ARCEND              : MARKER       , AT = 1976.103304;
+
+ MQIF.25800          : MQIF         , AT = 1976.803304       , SLOT_ID = 1411982;
+ BPMI.25804          : BPMI         , AT = 1977.788294       , SLOT_ID = 1411983;
+ MCIAH.25804         : MCIAH        , AT = 1978.287294       , SLOT_ID = 1411984;
+ MQID.25900          : MQID         , AT = 2007.103304       , SLOT_ID = 1411985;
+ MCIAV.25904         : MCIAV        , AT = 2008.587294       , SLOT_ID = 1411986;
+ MBI.25934           : MBI          , AT = 2026.263312       , SLOT_ID = 1411987      , TILT = 0.0 + 0.0148612985;
+ MBI.25947           : MBI          , AT = 2033.083326       , SLOT_ID = 1411988      , TILT = 0.0 + 0.0150001395;
+ MQIF.26000          : MQIF         , AT = 2037.403334       , SLOT_ID = 1411989;
+ BPMI.26004          : BPMI         , AT = 2038.388323       , SLOT_ID = 1411990;
+ MBI.26006           : MBI          , AT = 2042.923341       , SLOT_ID = 1411991      , TILT = 0.0 + 0.0151389805;
+ MBI.26020           : MBI          , AT = 2049.743356       , SLOT_ID = 1411992      , TILT = 0.0 + 0.0152778220;
+ MQID.26100          : MQID         , AT = 2067.703363       , SLOT_ID = 1411993;
+ BPMI.26104          : BPMI         , AT = 2068.688353       , SLOT_ID = 1411994;
+ MCIAV.26104         : MCIAV        , AT = 2069.187353       , SLOT_ID = 1411995;
+ MQIF.26200          : MQIF         , AT = 2098.003363       , SLOT_ID = 1411996;
+ MQID.26300          : MQID         , AT = 2128.303363       , SLOT_ID = 1411997;
+ BPMI.26304          : BPMI         , AT = 2129.288353       , SLOT_ID = 1411998;
+ MQIF.26400          : MQIF         , AT = 2158.603363       , SLOT_ID = 1411999;
+ MCIAH.26404         : MCIAH        , AT = 2160.087353       , SLOT_ID = 1412000;
+ MBIAV.26407         : MBIAV        , AT = 2163.010864       , SLOT_ID = 1412001      , TILT = PI/2 + 0.015347243;
+ MBIAV.26416         : MBIAV        , AT = 2167.537866       , SLOT_ID = 1412002      , TILT = PI/2 + 0.015347243;
+ MBIAV.26425         : MBIAV        , AT = 2172.064867       , SLOT_ID = 1412003      , TILT = PI/2 + 0.015347243;
+ MBIAV.26434         : MBIAV        , AT = 2176.591869       , SLOT_ID = 1412004      , TILT = PI/2 + 0.015347243;
+ MBIAV.26443         : MBIAV        , AT = 2181.118871       , SLOT_ID = 1412005      , TILT = PI/2 + 0.015347243;
+ MBIAV.26452         : MBIAV        , AT = 2185.645873       , SLOT_ID = 1412006      , TILT = PI/2 + 0.015347243;
+ MQID.26500          : MQID         , AT = 2188.903374       , SLOT_ID = 1412007;
+ BTVI.26506          : BTVI         , AT = 2191.248363       , SLOT_ID = 1412008;
+ MQIF.26600          : MQIF         , AT = 2219.203374       , SLOT_ID = 1412009;
+ BPMI.26604          : BPMI         , AT = 2220.188363       , SLOT_ID = 1412010;
+ MCIAH.26604         : MCIAH        , AT = 2220.687363       , SLOT_ID = 1412011;
+ BTVI.26606          : BTVI         , AT = 2221.548363       , SLOT_ID = 1412012;
+ MQID.26700          : MQID         , AT = 2249.503374       , SLOT_ID = 1412013;
+ MCIAV.26704         : MCIAV        , AT = 2250.987363       , SLOT_ID = 1412014;
+ BTVI.26706          : BTVI         , AT = 2251.848363       , SLOT_ID = 1412015;
+ MQIF.26800          : MQIF         , AT = 2279.803374       , SLOT_ID = 1412016;
+ BPMI.26804          : BPMI         , AT = 2280.788363       , SLOT_ID = 1412017;
+ MBIAV.26807         : MBIAV        , AT = 2284.210874       , SLOT_ID = 1412018      , TILT = PI/2 + 0.015347243;
+ MBIAV.26816         : MBIAV        , AT = 2288.737876       , SLOT_ID = 1412019      , TILT = PI/2 + 0.015347243;
+ MBIAV.26825         : MBIAV        , AT = 2293.264878       , SLOT_ID = 1412020      , TILT = PI/2 + 0.015347243;
+ MBIAV.26834         : MBIAV        , AT = 2297.79188        , SLOT_ID = 1412021      , TILT = PI/2 + 0.015347243;
+ MBIAV.26843         : MBIAV        , AT = 2302.318882       , SLOT_ID = 1412022      , TILT = PI/2 + 0.015347243;
+ MBIAV.26852         : MBIAV        , AT = 2306.845883       , SLOT_ID = 1412023      , TILT = PI/2 + 0.015347243;
+ MQID.26900          : MQID         , AT = 2310.103384       , SLOT_ID = 1412024;
+ BPMI.26904          : BPMI         , AT = 2311.088374       , SLOT_ID = 1412025;
+ MCIAV.26904         : MCIAV        , AT = 2311.587374       , SLOT_ID = 1412026;
+ MQIF.27000          : MQIF         , AT = 2340.403384       , SLOT_ID = 1412027;
+ MQID.27100          : MQID         , AT = 2370.703384       , SLOT_ID = 1412028;
+ BPMI.27104          : BPMI         , AT = 2371.688374       , SLOT_ID = 1412029;
+ MQIF.27200          : MQIF         , AT = 2401.003384       , SLOT_ID = 1412030;
+ MCIAH.27204         : MCIAH        , AT = 2402.487374       , SLOT_ID = 1412031;
+ MQID.27300          : MQID         , AT = 2431.303384       , SLOT_ID = 1412032;
+ MQIF.27400          : MQIF         , AT = 2461.603384       , SLOT_ID = 1412033;
+ BPMI.27404          : BPMI         , AT = 2462.588374       , SLOT_ID = 1412034;
+ MCIAH.27404         : MCIAH        , AT = 2463.087374       , SLOT_ID = 1412035;
+ MQID.27500          : MQID         , AT = 2491.903384       , SLOT_ID = 1412036;
+ MCIAV.27504         : MCIAV        , AT = 2493.387374       , SLOT_ID = 1412037;
+ MQIF.27600          : MQIF         , AT = 2522.203384       , SLOT_ID = 1412038;
+ BPMI.27604          : BPMI         , AT = 2523.188374       , SLOT_ID = 1412039;
+ MQID.27700          : MQID         , AT = 2552.503384       , SLOT_ID = 1412040;
+ BPMI.27704          : BPMI         , AT = 2553.488374       , SLOT_ID = 1412041;
+ MCIAV.27704         : MCIAV        , AT = 2553.987374       , SLOT_ID = 1412042;
+ MQIF.27800          : MQIF         , AT = 2582.803384       , SLOT_ID = 1412043;
+ MQID.27900          : MQID         , AT = 2613.103384       , SLOT_ID = 1412044;
+ BPMI.27904          : BPMI         , AT = 2614.088374       , SLOT_ID = 1412045;
+ MQIF.28000          : MQIF         , AT = 2643.403384       , SLOT_ID = 1412046;
+ MCIAH.28004         : MCIAH        , AT = 2644.887374       , SLOT_ID = 1412047;
+ MQID.28100          : MQID         , AT = 2673.703384       , SLOT_ID = 1412048;
+ MQIF.28200          : MQIF         , AT = 2704.003384       , SLOT_ID = 1412049;
+ BPMI.28204          : BPMI         , AT = 2704.988374       , SLOT_ID = 1412050;
+ MCIAH.28204         : MCIAH        , AT = 2705.487374       , SLOT_ID = 1412051;
+ MQID.28300          : MQID         , AT = 2734.303384       , SLOT_ID = 1412052;
+ MCIAV.28304         : MCIAV        , AT = 2735.787374       , SLOT_ID = 1412053;
+ MQIF.28400          : MQIF         , AT = 2764.603384       , SLOT_ID = 1412054;
+ BPMI.28404          : BPMI         , AT = 2765.588374       , SLOT_ID = 1412055;
+ MQID.28500          : MQID         , AT = 2794.903384       , SLOT_ID = 1412056;
+ BPMI.28504          : BPMI         , AT = 2795.888374       , SLOT_ID = 1412057;
+ MCIAV.28504         : MCIAV        , AT = 2796.387374       , SLOT_ID = 1412058;
+
+ BEGMATCHLHC         : MARKER       , AT = 2824.503384;
+
+ MQIF.28600          : MQIF         , AT = 2825.203384       , SLOT_ID = 1412059;
+ MQID.28700          : MQID         , AT = 2855.503384       , SLOT_ID = 1412060;
+ BPMI.28704          : BPMI         , AT = 2856.488374       , SLOT_ID = 1412061;
+ MBIAV.28707         : MBIAV        , AT = 2859.910885       , SLOT_ID = 1412062      , TILT = PI/2 + 0.015347243;
+ MBIAV.28716         : MBIAV        , AT = 2864.437885       , SLOT_ID = 1412063      , TILT = PI/2 + 0.015347243;
+ MQIF.28800          : MQIF         , AT = 2885.803386       , SLOT_ID = 1412064;
+ BPMI.28804          : BPMI         , AT = 2886.788386       , SLOT_ID = 4337641;
+ MCIAH.28804         : MCIAH        , AT = 2887.287375       , SLOT_ID = 1412065;
+ MQID.28900          : MQID         , AT = 2916.103386       , SLOT_ID = 1412066;
+ BPMI.28904          : BPMI         , AT = 2917.088386       , SLOT_ID = 4337642;
+ MCIAV.28904         : MCIAV        , AT = 2917.587375       , SLOT_ID = 1412067;
+ MQIF.29000          : MQIF         , AT = 2946.403386       , SLOT_ID = 1412068;
+ BPMI.29004          : BPMI         , AT = 2947.388375       , SLOT_ID = 1412069;
+ MCIAH.29004         : MCIAH        , AT = 2947.887375       , SLOT_ID = 1412070;
+ TCDIV.29012         : TCDIV        , AT = 2952              , SLOT_ID = 1412071;
+ TCDIH.29050         : TCDIH        , AT = 2971              , SLOT_ID = 1412072;
+ TCDIM.29059         : TCDIM        , AT = 2975.4334         , SLOT_ID = 1412073;
+ MQID.29100          : MQID         , AT = 2976.703386       , SLOT_ID = 1412074;
+ BPMI.29104          : BPMI         , AT = 2977.688375       , SLOT_ID = 1412075;
+ MCIAV.29104         : MCIAV        , AT = 2978.187375       , SLOT_ID = 1412076;
+ MBIAV.29107         : MBIAV        , AT = 2981.110886       , SLOT_ID = 1412077      , TILT = PI/2 + 0.015347243;
+ MBIAV.29116         : MBIAV        , AT = 2985.637887       , SLOT_ID = 1412078      , TILT = PI/2 + 0.015347243;
+ BTVI.29124          : BTVI         , AT = 2988.136377       , SLOT_ID = 1412079;
+ BCTFI.29125         : BCTFI        , AT = 2988.785377       , SLOT_ID = 1412080;
+ TED.29133           : TED          , AT = 2994.426377       , SLOT_ID = 1412081;
+
+// hbu 31/5/2005  move a bit to gain space and make more symmetric
+ MQID.29200          : MQID         , AT = 3011.909887       , SLOT_ID = 1412082;
+ BPMI.29204          : BPMI         , AT = 3012.894887       , SLOT_ID = 4337643;
+ TCDIH.29205         : TCDIH        , AT = 3014              , SLOT_ID = 1412083;
+ TCDIV.29234         : TCDIV        , AT = 3028.5            , SLOT_ID = 1412084;
+ TCDIM.29241         : TCDIM        , AT = 3031.8712         , SLOT_ID = 1412085;
+ MQIF.29300          : MQIF         , AT = 3033.141157       , SLOT_ID = 1412086;
+ BPMI.29304          : BPMI         , AT = 3034.126077       , SLOT_ID = 1412087;
+ MBIBH.29314         : MBIBH        , AT = 3040.569158       , SLOT_ID = 1412088      , TILT = 0.0 + 0.0153692430;
+ MBIBH.29321         : MBIBH        , AT = 3044.011159       , SLOT_ID = 1412089      , TILT = 0.0 + 0.0154132435;
+ MBIBH.29328         : MBIBH        , AT = 3047.45316        , SLOT_ID = 1412090      , TILT = 0.0 + 0.0154572440;
+ MBIBH.29334         : MBIBH        , AT = 3050.895161       , SLOT_ID = 1412091      , TILT = 0.0 + 0.0155012445;
+ MBIBH.29341         : MBIBH        , AT = 3054.337162       , SLOT_ID = 1412092      , TILT = 0.0 + 0.0155452450;
+ MBIBH.29348         : MBIBH        , AT = 3057.779163       , SLOT_ID = 1412093      , TILT = 0.0 + 0.0155892455;
+ MQIF.29400          : MQIF         , AT = 3066.205163       , SLOT_ID = 1412094;
+ BPMI.29404          : BPMI         , AT = 3067.190163       , SLOT_ID = 4337644;
+ TCDIH.29465         : TCDIH        , AT = 3098.5            , SLOT_ID = 1412095;
+ TCDIM.29472         : TCDIM        , AT = 3101.5092         , SLOT_ID = 1412096;
+ MQID.29500          : MQID         , AT = 3102.779163       , SLOT_ID = 1412097;
+
+ TI2_LHC_ROT                        , AT = 3103.5;
+
+ BPMI.29504          : BPMI         , AT = 3103.764083       , SLOT_ID = 1412098;
+ MCIAV.29504         : MCIAV        , AT = 3104.263083       , SLOT_ID = 1412099;
+ BTVI.29506          : BTVI         , AT = 3105.247083       , SLOT_ID = 1412100;
+ TCDIV.29509         : TCDIV        , AT = 3106.999983       , SLOT_ID = 1412101;
+ TCDIM.29527         : TCDIM        , AT = 3116.102283       , SLOT_ID = 1856511;
+
+ MSIB.ENTR           : MARKER       , AT = 3116.732281;
+
+ MSIB.C6L2           : MSIB         , AT = 3118.732281       , SLOT_ID = 134506       , TILT = 0.0 + 0.0156314125*0;
+ MSIB.B6L2           : MSIB         , AT = 3123.182282       , SLOT_ID = 134507       , TILT = 0.0 + 0.0156717460*0;
+ MSIB.A6L2           : MSIB         , AT = 3127.632284       , SLOT_ID = 134508       , TILT = 0.0 + 0.0157120800*0;
+ MSIA.B6L2           : MSIA         , AT = 3132.082284       , SLOT_ID = 134509       , TILT = 0.0 + 0.0157458060*0;
+ MSIA.A6L2           : MSIA         , AT = 3136.532285       , SLOT_ID = 134510       , TILT = 0.0 + 0.0157729235*0;
+ BTVSS.6L2           : BTVSS075     , AT = 3139.207205       , SLOT_ID = 181614;
+ MQY.B5L2            : MQY          , AT = 3160.345285       , SLOT_ID = 242814;
+
+// Q5L2 Virtual Bending magnet !!
+ MBQY.29512          : MBQY         , AT = 3162.235785       , SLOT_ID = 1872334      , TILT = PI/2 + 0.0157864820*0;
+ MQY.A5L2            : MQY          , AT = 3164.126285       , SLOT_ID = 242815;
+ BTVSI.C5L2.B1       : BTVSI088     , AT = 3168.186281       , SLOT_ID = 181615;
+ MKI.D5L2            : MKIMA192     , AT = 3171.159281       , SLOT_ID = 378207       , TILT = PI/2 + 0.0157864820*0;
+ MKI.C5L2            : MKIMA192     , AT = 3175.123281       , SLOT_ID = 378208       , TILT = PI/2 + 0.0157864820*0;
+
+ MKI.MIDDLE          : MARKER       , AT = 3177.105281;
+
+ MKI.B5L2            : MKIMA192     , AT = 3179.087281       , SLOT_ID = 378209       , TILT = PI/2 + 0.0157864820*0;
+ MKI.A5L2            : MKIMA192     , AT = 3183.051281       , SLOT_ID = 378210       , TILT = PI/2 + 0.0157864820*0;
+ BPTX.5L2.B1         : BPTX         , AT = 3185.293781       , SLOT_ID = 104665;
+ BTVSI.A5L2.B1       : BTVSI088     , AT = 3186.024281       , SLOT_ID = 181616;
+ BPMYB.4L2.B1        : BPMYB        , AT = 3187.390281       , SLOT_ID = 242818;
+
+// the following marker corresponds to the LHCINJ.B1 marker in the LHC Beam 1 sequence
+ LHCINJ.TI2          : MARKER       , AT = 3188.384281;
+
+ENDSEQUENCE;
+
+/************************************************************************************/
+/*                       STRENGTH VARIABLES                                         */
+/************************************************************************************/
+
+ MBI.22134          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22147          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22206          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22220          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22820          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22834          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22920          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.22934          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23020          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23034          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23120          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23134          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23206          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23220          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23234          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23247          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23306          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23320          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23334          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23347          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23406          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23420          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23434          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23447          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23506          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23520          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23534          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23547          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23606          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23620          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23634          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23647          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23706          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23720          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23734          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23747          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23806          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23820          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23834          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23847          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23906          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23920          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23934          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.23947          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24006          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24020          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24034          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24047          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24106          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24120          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24134          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24147          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24206          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24220          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24234          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24247          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24306          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24320          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24334          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24347          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24406          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24420          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24434          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24447          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24506          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24520          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24534          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24547          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24606          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24620          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24634          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24647          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24706          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24720          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24734          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24747          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24806          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24820          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24834          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24847          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24906          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24920          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24934          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.24947          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25006          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25020          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25034          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25047          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25106          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25120          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25134          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25147          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25206          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25220          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25234          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25247          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25306          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25320          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25334          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25347          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25420          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25434          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25520          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25534          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25620          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25634          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25720          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25734          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25934          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.25947          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.26006          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBI.26020          , ANGLE := abi.22134, K0 := abi.22134 / l.MBI;
+ MBB.610405         , ANGLE := abib.610405, K0 := abib.610405 / l.MBB;
+ MBB.610413         , ANGLE := abib.610405, K0 := abib.610405 / l.MBB;
+ MBB.610523         , ANGLE := abib.610523, K0 := abib.610523 / l.MBB;
+ MBB.610531         , ANGLE := abib.610523, K0 := abib.610523 / l.MBB;
+ MBE.610422         , ANGLE := abie.610405, K0 := abie.610405 / l.MBE;
+ MBE.610430         , ANGLE := abie.610405, K0 := abie.610405 / l.MBE;
+ MBE.610438         , ANGLE := abie.610405, K0 := abie.610405 / l.MBE;
+ MBE.610506         , ANGLE := abie.610405, K0 := abie.610405 / l.MBE;
+ MBE.610514         , ANGLE := abie.610405, K0 := abie.610405 / l.MBE;
+ MBIDH.20150        , ANGLE := abih.20150, K0 := abih.20150 / l.MBIDH;
+ MBIDH.20214        , ANGLE := abih.20150, K0 := abih.20150 / l.MBIDH;
+ MBIBH.29314        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MBIBH.29321        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MBIBH.29328        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MBIBH.29334        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MBIBH.29341        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MBIBH.29348        , ANGLE := abih.29314, K0 := abih.29314 / l.MBIBH;
+ MDLH.610104        , ANGLE := abih.610104, K0 := abih.610104 / l.MDLH;
+ MDLH.610206        , ANGLE := abih.610206, K0 := abih.610206 / l.MDLH;
+ MDLH.610337        , ANGLE := abih.610337, K0 := abih.610337 / l.MDLH;
+ MBIAV.20637        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20646        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20655        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20707        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20716        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20725        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20734        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20744        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20753        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20807        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20816        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20825        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20834        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20844        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20853        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20907        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.20916        , ANGLE := abiv.20637, K0 := abiv.20637 / l.MBIAV;
+ MBIAV.26407        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26416        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26425        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26434        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26443        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26452        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26807        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26816        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26825        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26834        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26843        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.26852        , ANGLE := abiv.26407, K0 := abiv.26407 / l.MBIAV;
+ MBIAV.28707        , ANGLE := abiv.28707, K0 := abiv.28707 / l.MBIAV;
+ MBIAV.28716        , ANGLE := abiv.28707, K0 := abiv.28707 / l.MBIAV;
+ MBIAV.29107        , ANGLE := abiv.28707, K0 := abiv.28707 / l.MBIAV;
+ MBIAV.29116        , ANGLE := abiv.28707, K0 := abiv.28707 / l.MBIAV;
+ MDAV.610013        , ANGLE := abiv.610013, K0 := abiv.610013 / l.MDAV;
+ MDLV.610304        , ANGLE := abiv.610304, K0 := abiv.610304 / l.MDLV;
+ MBQY.29512         , ANGLE := abqy.29512, K0 := abqy.29512 / l.MBQY;
+ MKI.A5L2           , ANGLE := aki.a5l2, K0 := aki.a5l2 / l.MKIMA192;
+ MKI.B5L2           , ANGLE := aki.b5l2, K0 := aki.b5l2 / l.MKIMA192;
+ MKI.C5L2           , ANGLE := aki.c5l2, K0 := aki.c5l2 / l.MKIMA192;
+ MKI.D5L2           , ANGLE := aki.d5l2, K0 := aki.d5l2 / l.MKIMA192;
+ MSIA.B6L2          , ANGLE := amsia.l2b1, K0 := amsia.l2b1 / l.MSIA;
+ MSIA.A6L2          , ANGLE := amsia.l2b1, K0 := amsia.l2b1 / l.MSIA;
+ MSIB.C6L2          , ANGLE := amsib.l2b1, K0 := amsib.l2b1 / l.MSIB;
+ MSIB.B6L2          , ANGLE := amsib.l2b1, K0 := amsib.l2b1 / l.MSIB;
+ MSIB.A6L2          , ANGLE := amsib.l2b1, K0 := amsib.l2b1 / l.MSIB;
+
+ MQY.B5L2           , K1 := kq5.l2;
+ MQY.A5L2           , K1 := kq5.l2;
+ MQID.20100         , K1 := kqid.20100;
+ MQID.20300         , K1 := kqid.20300;
+ MQID.20500         , K1 := kqid.20500;
+ MQID.20700         , K1 := kqid.20700;
+ MQID.20900         , K1 := kqid.20700;
+ MQID.21100         , K1 := kqid.20700;
+ MQID.21300         , K1 := kqid.20700;
+ MQID.21500         , K1 := kqid.20700;
+ MQID.21700         , K1 := kqid.20700;
+ MQID.21900         , K1 := kqid.20700;
+ MQID.22100         , K1 := kqid.20700;
+ MQID.22300         , K1 := kqid.20700;
+ MQID.22500         , K1 := kqid.20700;
+ MQID.22700         , K1 := kqid.20700;
+ MQID.22900         , K1 := kqid.20700;
+ MQID.23100         , K1 := kqid.20700;
+ MQID.23300         , K1 := kqid.20700;
+ MQID.23500         , K1 := kqid.20700;
+ MQID.23700         , K1 := kqid.20700;
+ MQID.23900         , K1 := kqid.20700;
+ MQID.24100         , K1 := kqid.20700;
+ MQID.24300         , K1 := kqid.20700;
+ MQID.24500         , K1 := kqid.20700;
+ MQID.24700         , K1 := kqid.20700;
+ MQID.24900         , K1 := kqid.20700;
+ MQID.25100         , K1 := kqid.20700;
+ MQID.25300         , K1 := kqid.20700;
+ MQID.25500         , K1 := kqid.20700;
+ MQID.25700         , K1 := kqid.20700;
+ MQID.25900         , K1 := kqid.20700;
+ MQID.26100         , K1 := kqid.20700;
+ MQID.26300         , K1 := kqid.20700;
+ MQID.26500         , K1 := kqid.20700;
+ MQID.26700         , K1 := kqid.20700;
+ MQID.26900         , K1 := kqid.20700;
+ MQID.27100         , K1 := kqid.20700;
+ MQID.27300         , K1 := kqid.20700;
+ MQID.27500         , K1 := kqid.20700;
+ MQID.27700         , K1 := kqid.20700;
+ MQID.27900         , K1 := kqid.20700;
+ MQID.28100         , K1 := kqid.20700;
+ MQID.28300         , K1 := kqid.20700;
+ MQID.28500         , K1 := kqid.20700;
+ MQID.28700         , K1 := kqid.28700;
+ MQID.28900         , K1 := kqid.28900;
+ MQID.29100         , K1 := kqid.29100;
+ MQID.29200         , K1 := kqid.29200;
+ MQID.29500         , K1 := kqid.29500;
+ QTLD.610100        , K1 := kqid.610100;
+ QTLD.610300        , K1 := kqid.610300;
+ QTLD.610500        , K1 := kqid.610500;
+ MQIF.20200         , K1 := kqif.20200;
+ MQIF.20400         , K1 := kqif.20400;
+ MQIF.20600         , K1 := kqif.20600;
+ MQIF.20800         , K1 := kqif.20800;
+ MQIF.21000         , K1 := kqif.20800;
+ MQIF.21200         , K1 := kqif.20800;
+ MQIF.21400         , K1 := kqif.20800;
+ MQIF.21600         , K1 := kqif.20800;
+ MQIF.21800         , K1 := kqif.20800;
+ MQIF.22000         , K1 := kqif.20800;
+ MQIF.22200         , K1 := kqif.20800;
+ MQIF.22400         , K1 := kqif.20800;
+ MQIF.22600         , K1 := kqif.20800;
+ MQIF.22800         , K1 := kqif.20800;
+ MQIF.23000         , K1 := kqif.20800;
+ MQIF.23200         , K1 := kqif.20800;
+ MQIF.23400         , K1 := kqif.20800;
+ MQIF.23600         , K1 := kqif.20800;
+ MQIF.23800         , K1 := kqif.20800;
+ MQIF.24000         , K1 := kqif.20800;
+ MQIF.24200         , K1 := kqif.20800;
+ MQIF.24400         , K1 := kqif.20800;
+ MQIF.24600         , K1 := kqif.20800;
+ MQIF.24800         , K1 := kqif.20800;
+ MQIF.25000         , K1 := kqif.20800;
+ MQIF.25200         , K1 := kqif.20800;
+ MQIF.25400         , K1 := kqif.20800;
+ MQIF.25600         , K1 := kqif.20800;
+ MQIF.25800         , K1 := kqif.20800;
+ MQIF.26000         , K1 := kqif.26000;
+ MQIF.26200         , K1 := kqif.26000;
+ MQIF.26400         , K1 := kqif.26000;
+ MQIF.26600         , K1 := kqif.26000;
+ MQIF.26800         , K1 := kqif.26000;
+ MQIF.27000         , K1 := kqif.26000;
+ MQIF.27200         , K1 := kqif.26000;
+ MQIF.27400         , K1 := kqif.26000;
+ MQIF.27600         , K1 := kqif.26000;
+ MQIF.27800         , K1 := kqif.26000;
+ MQIF.28000         , K1 := kqif.26000;
+ MQIF.28200         , K1 := kqif.26000;
+ MQIF.28400         , K1 := kqif.26000;
+ MQIF.28600         , K1 := kqif.28600;
+ MQIF.28800         , K1 := kqif.28800;
+ MQIF.29000         , K1 := kqif.29000;
+ MQIF.29300         , K1 := kqif.29300;
+ MQIF.29400         , K1 := kqif.29400;
+ QTLF.610200        , K1 := kqif.610200;
+ QTLF.610400        , K1 := kqif.610400;
+ QTLF.610600        , K1 := kqif.610600;
+
+ MCIAH.20804        , KICK := acibh.20804;
+ MCIAH.21004        , KICK := acibh.21004;
+ MCIAH.21604        , KICK := acibh.21604;
+ MCIAH.21804        , KICK := acibh.21804;
+ MCIAH.22404        , KICK := acibh.22404;
+ MCIAH.22604        , KICK := acibh.22604;
+ MCIAH.23204        , KICK := acibh.23204;
+ MCIAH.23404        , KICK := acibh.23404;
+ MCIAH.24004        , KICK := acibh.24004;
+ MCIAH.24204        , KICK := acibh.24204;
+ MCIAH.24804        , KICK := acibh.24804;
+ MCIAH.25004        , KICK := acibh.25004;
+ MCIAH.25604        , KICK := acibh.25604;
+ MCIAH.25804        , KICK := acibh.25804;
+ MCIAH.26404        , KICK := acibh.26404;
+ MCIAH.26604        , KICK := acibh.26604;
+ MCIAH.27204        , KICK := acibh.27204;
+ MCIAH.27404        , KICK := acibh.27404;
+ MCIAH.28004        , KICK := acibh.28004;
+ MCIAH.28204        , KICK := acibh.28204;
+ MCIAH.28804        , KICK := acibh.28804;
+ MCIAH.29004        , KICK := acibh.29004;
+ MCIAV.20304        , KICK := acibv.20304;
+ MCIAV.20504        , KICK := acibv.20504;
+ MCIAV.21104        , KICK := acibv.21104;
+ MCIAV.21304        , KICK := acibv.21304;
+ MCIAV.21904        , KICK := acibv.21904;
+ MCIAV.22104        , KICK := acibv.22104;
+ MCIAV.22704        , KICK := acibv.22704;
+ MCIAV.22904        , KICK := acibv.22904;
+ MCIAV.23504        , KICK := acibv.23504;
+ MCIAV.23704        , KICK := acibv.23704;
+ MCIAV.24304        , KICK := acibv.24304;
+ MCIAV.24504        , KICK := acibv.24504;
+ MCIAV.25104        , KICK := acibv.25104;
+ MCIAV.25304        , KICK := acibv.25304;
+ MCIAV.25904        , KICK := acibv.25904;
+ MCIAV.26104        , KICK := acibv.26104;
+ MCIAV.26704        , KICK := acibv.26704;
+ MCIAV.26904        , KICK := acibv.26904;
+ MCIAV.27504        , KICK := acibv.27504;
+ MCIAV.27704        , KICK := acibv.27704;
+ MCIAV.28304        , KICK := acibv.28304;
+ MCIAV.28504        , KICK := acibv.28504;
+ MCIAV.28904        , KICK := acibv.28904;
+ MCIAV.29104        , KICK := acibv.29104;
+ MCIAV.29504        , KICK := acibv.29504;
+
+return;

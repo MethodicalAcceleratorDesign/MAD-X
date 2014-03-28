@@ -129,17 +129,23 @@ all_node_pos(struct sequence* sequ)
   /* calculates all node positions in an expanded sequence */
 {
   struct node* node = sequ->start;
-  while (node != NULL)
-  {
+
+  while (node != NULL) {
     if (node->p_elem != NULL)
       node->length = node->p_elem->length
-        = element_value(node, "l");
+                   = element_value(node, "l");
     else if (node->p_sequ != NULL)
       node->length = sequence_length(node->p_sequ);
     else fatal_error("node is neither element nor sequence:",
                      node->name);
-    if ((node->position = get_node_pos(node, sequ)) < zero)
-      node->position += sequence_length(sequ);
+
+    // 2014-Mar-19  16:27:15  ghislain: 
+    // The following assumes that the sequence is circular!!!!
+    // this also conflicts with the insertion of sequences where a refpos is given.
+    //if ((node->position = get_node_pos(node, sequ)) < zero) 
+    //  node->position += sequence_length(sequ);
+    node->position = get_node_pos(node, sequ);
+
     if (node == sequ->end) break;
     node = node->next;
   }
@@ -178,7 +184,11 @@ extract_sequence(char* name, struct sequence* sequ, struct node* from, struct no
   end_value = get_node_pos(to, sequ);
   current_sequ->l_expr = NULL;
   current_sequ->length = end_value - start_value;
+
+  // 2014-Mar-21  20:42:19  ghislain: 
+  // this might be dangerous for non-circular sequences!!!
   if (current_sequ->length < zero) current_sequ->length += sequ->length;
+
   marker_pos = name_list_pos("marker", defined_commands->list);
   clone = clone_command(defined_commands->commands[marker_pos]);
   sprintf(c_dum->c, "%s$start", name);
@@ -466,21 +476,45 @@ expand_sequence(struct sequence* sequ, int flag)
   /* Transfers errors from original nodes if flag != 0;
      this is needed for SXF input  */
   struct node *p, *q = sequ->start;
+
+  int debug=get_option("debug");
+
+  if (debug) 
+    printf("\n\nTOP Expand_sequence name %s with length %e, ref_flag %d\n",
+	   sequ->name, sequ->length, sequ->ref_flag);
+
   p = sequ->ex_start = clone_node(sequ->start, 0);
   add_to_node_list(p, 0, sequ->ex_nodes);
+
   while (p != NULL) {
     if (q == sequ->end) break;
     p->next = clone_node(q->next, flag);
     p->next->previous = p;
     p = p->next;
     q = q->next;
-    if (p->p_sequ != NULL) { // this element is a sequence
-      if (get_option("debug")) printf("\n\nExpand_sequence name %s at position %e with length %e and ref_flag %d\n",
-				      p->name, p->position, p->length, sequ->ref_flag);
-       p = expand_node(p, sequ, sequ, p->position);
+
+    if (p->p_sequ == NULL) // simple element, not a subsequence
+      add_to_node_list(p, 0, sequ->ex_nodes);
+
+    else { // subsequence
+      if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
+	if (debug) 
+	  printf("\n\n Expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
+		 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2., 
+		 p->length, sequ->ref_flag, p->p_sequ->refpos);	
+	p = expand_node(p, sequ, sequ, p->position - sequ->ref_flag*p->p_sequ->length/2. );
+	if (debug) printf("\n\n");
+      } 
+      else { // no REFPOS given
+	if (debug) 
+	  printf("\n\n Expand sub-sequence %s with position %e, length %e, ref_flag %d\n",
+		 p->name, p->position, p->length, sequ->ref_flag);
+	p = expand_node(p, sequ, sequ, p->position);
+	if (debug) printf("\n\n");
+      }
     }
-    else add_to_node_list(p, 0, sequ->ex_nodes);
   }
+
   sequ->ex_end = p;
   sequ->ex_end->next = sequ->ex_start;
   sequ->ex_start->previous = sequ->ex_end;
@@ -1290,7 +1324,8 @@ use_sequ(struct in_cmd* cmd)
 
   if (nl->inform[pos]) {  /* parameter has been read */
     if (current_range != NULL) {
-      myfree(rout_name, current_range); current_range = NULL;
+      myfree(rout_name, current_range); 
+      current_range = NULL;
     }
 
     name = pl->parameters[pos]->string;
@@ -1465,83 +1500,78 @@ enter_sequence(struct in_cmd* cmd)
 
   aux_pos = strcmp(toks[0], "shared") == 0 ? 1 : 0;
 
-  if (strcmp(toks[0], "endsequence") == 0)
-    {
-      pos = name_list_pos("marker", defined_commands->list);
-      clone = clone_command(defined_commands->commands[pos]);
-      sprintf(c_dum->c, "%s$end", current_sequ->name);
-      el = make_element(c_dum->c, "marker", clone, 0);
-      make_elem_node(el, 1);
-      current_node->at_expr = current_sequ->l_expr;
-      current_node->at_value = current_sequ->length;
-      current_sequ->end = current_node;
-      current_sequ->start->previous = current_sequ->end;
-      current_sequ->end->next = current_sequ->start;
+  if (strcmp(toks[0], "endsequence") == 0) {
+    pos = name_list_pos("marker", defined_commands->list);
+    clone = clone_command(defined_commands->commands[pos]);
+    sprintf(c_dum->c, "%s$end", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
+    make_elem_node(el, 1);
+    current_node->at_expr = current_sequ->l_expr;
+    current_node->at_value = current_sequ->length;
+    current_sequ->end = current_node;
+    current_sequ->start->previous = current_sequ->end;
+    current_sequ->end->next = current_sequ->start;
+  }
+
+  else if (strcmp(toks[aux_pos+2], "sequence") == 0) {
+    for (i = aux_pos+3; i < cmd->tok_list->curr; i++) {
+      if (strcmp(toks[i], "refer") == 0) {
+	if (i+2 < cmd->tok_list->curr) {
+	  if      (strcmp(toks[i+2], "entry") == 0)  k = 1;
+	  else if (strcmp(toks[i+2], "exit")  == 0)  k = -1;
+	}
+	break;
+      }
     }
 
-  else if (strcmp(toks[aux_pos+2], "sequence") == 0)
-    {
-      for (i = aux_pos+3; i < cmd->tok_list->curr; i++)
-	{
-	  if (strcmp(toks[i], "refer") == 0)
-	    {
-	      if (i+2 < cmd->tok_list->curr)
-		{
-		  if (strcmp(toks[i+2], "entry") == 0)  k = 1;
-		  else if (strcmp(toks[i+2], "exit") == 0)  k = -1;
-		}
-	      break;
-	    }
-	}
-
-      if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0)
-	{
-	  /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
-	  remove_from_sequ_list(sequences->sequs[pos], sequences);
-	  sequences->sequs[pos] = delete_sequence(sequences->sequs[pos]);
-	}
-
-      current_sequ = new_sequence(toks[aux_pos], k);
-      add_to_sequ_list(current_sequ, sequences);
-      /* prevent a line with this name from expansion */
-      disable_line(current_sequ->name, line_list);
-
-      cmd->clone = clone_command(cmd->cmd_def);
-      scan_in_cmd(cmd);
-      nl = cmd->clone->par_names;
-      pl = cmd->clone->par;
-      current_sequ->l_expr = command_par_expr("l", cmd->clone);
-      current_sequ->length = command_par_value("l", cmd->clone);
-      current_sequ->add_pass = command_par_value("add_pass", cmd->clone);
-
-      if (current_sequ->l_expr == NULL && sequence_length(current_sequ) == zero)
-	fatal_error("missing length for sequence:", toks[aux_pos]);
-
-      pos = name_list_pos("refpos", nl);
-      if (nl->inform[pos])
-	current_sequ->refpos = permbuff(pl->parameters[pos]->string);
-
-      pos = name_list_pos("next_sequ", nl);
-      if (nl->inform[pos])
-	current_sequ->next_sequ = permbuff(pl->parameters[pos]->string);
-
-      current_node = NULL;
-
-      if (occ_list == NULL)
-	occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
-      else occ_list->curr = 0;
-
-      if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
-      else current_sequ->cavities = new_el_list(100);
-
-      pos = name_list_pos("marker", defined_commands->list);
-      clone = clone_command(defined_commands->commands[pos]);
-      sprintf(c_dum->c, "%s$start", current_sequ->name);
-      el = make_element(c_dum->c, "marker", clone, 0);
-      make_elem_node(el, 1);
-      current_sequ->start = current_node;
-      current_sequ->share = aux_pos;
+    if ((pos = name_list_pos(toks[aux_pos], sequences->list)) >= 0) {
+      // sequence exists already; delete the old one
+      /*printf("enter_sequence: removing %s\n", sequences->sequs[pos]->name);*/
+      remove_from_sequ_list(sequences->sequs[pos], sequences);
+      sequences->sequs[pos] = delete_sequence(sequences->sequs[pos]);
     }
+
+    current_sequ = new_sequence(toks[aux_pos], k);
+    add_to_sequ_list(current_sequ, sequences);
+    /* prevent a line with this name from expansion */
+    disable_line(current_sequ->name, line_list);
+
+    cmd->clone = clone_command(cmd->cmd_def);
+    scan_in_cmd(cmd);
+    nl = cmd->clone->par_names;
+    pl = cmd->clone->par;
+    current_sequ->l_expr = command_par_expr("l", cmd->clone);
+    current_sequ->length = command_par_value("l", cmd->clone);
+    current_sequ->add_pass = command_par_value("add_pass", cmd->clone);
+
+    if (current_sequ->l_expr == NULL && sequence_length(current_sequ) == zero)
+      fatal_error("missing length for sequence:", toks[aux_pos]);
+
+    pos = name_list_pos("refpos", nl);
+    if (nl->inform[pos])
+      current_sequ->refpos = permbuff(pl->parameters[pos]->string);
+
+    pos = name_list_pos("next_sequ", nl);
+    if (nl->inform[pos])
+      current_sequ->next_sequ = permbuff(pl->parameters[pos]->string);
+
+    current_node = NULL;
+
+    if (occ_list == NULL)
+      occ_list = new_name_list("occ_list", 10000);  /* for occurrence count */
+    else occ_list->curr = 0;
+
+    if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
+    else current_sequ->cavities = new_el_list(100);
+
+    pos = name_list_pos("marker", defined_commands->list);
+    clone = clone_command(defined_commands->commands[pos]);
+    sprintf(c_dum->c, "%s$start", current_sequ->name);
+    el = make_element(c_dum->c, "marker", clone, 0);
+    make_elem_node(el, 1);
+    current_sequ->start = current_node;
+    current_sequ->share = aux_pos;
+  }
 }
 
 int
@@ -1851,6 +1881,7 @@ expand_curr_sequ(int flag)
   const char *rout_name = "expand_curr_sequ";
   struct node* c_node;
   int j;
+
   current_sequ->end->at_value = current_sequ->end->position = sequence_length(current_sequ);
 
   if (current_sequ->ex_start != NULL) {

@@ -1,0 +1,48 @@
+! these are the new K values taking into account the b2 and b3 in the MBIs
+!!!!WARNING!!!!!!!
+! Use them TOGETHER WITH this strength file and NEVER call "USE" again after 
+! the call to the field errors. 
+! error on the field of MBI (b3 and b2 as computed by Kajetan)
+!select, flag=error, class=MBI;
+!efcomp, order:=0, radius:=0.025, dknr:={0,-1.35e-4,-4.7e-4};
+!SELECT,FLAG=ERROR, class=mbi;
+!EPRINT;
+! Initial TI 2 beam line conditions to be used:
+! betx= 17.02748544,   alfx= 0.4583574683, bety=123.9323528, alfy=-3.422196857,
+! dx  = -0.3408152943, dpx = 0.01307653962;
+
+kqid.20700 =    -0.033774251802 ;
+kqif.20800 =     0.033930411780 ;
+kqif.26000 =     0.033930411780 ;
+
+kqid.610100 = -0.011748583690 ;
+kqif.610200 = 0.014437230933 ;
+kqid.610300 = -0.009944743836 ;
+kqif.610400 = 0.012495503504 ;
+kqid.610500 = -0.012519269693 ;
+kqif.610600 = 0.009603004237 ;
+kqid.20100 = -0.022907556209 ;
+kqif.20200 = 0.015470817618 ;
+kqid.20300 = -0.016259205870 ;
+kqif.20400 = 0.018261122747 ;
+kqid.20500 = -0.027159373659 ;
+kqif.20600 = 0.029264647026 ;
+
+kqif.28600 = 0.035525790129 ;
+kqid.28700 = -0.034926066026 ;
+kqif.28800 = 0.026018232376 ;
+kqid.28900 = -0.032487495635 ;
+kqif.29000 = 0.026775881805 ;
+kqid.29100 = -0.015742952107 ;
+kqid.29200 = -0.014563374020 ;
+kqif.29300 = 0.013464112175 ;
+kqif.29400 = 0.014221046201 ;
+kqid.29500 = -0.021381601785 ;
+
+abqy.29512           :=  0.000399098000000 ;
+aki.d5l2             :=  0.000198868000000 ;
+aki.c5l2             :=  0.000198868000000 ;
+aki.b5l2             :=  0.000198868000000 ;
+aki.a5l2             :=  0.000198868000000 ;
+kq5.l2               :=  0.004791964748 ;
+

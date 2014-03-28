@@ -577,6 +577,7 @@ removefile, file="temp.bb.install";
 !--- Now the beam-beam element installation is complete
 
 seqedit,sequence=lhcb1;
+flatten;
 cycle,start=ip1;
 endedit;
 

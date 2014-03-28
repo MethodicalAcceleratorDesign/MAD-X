@@ -213,7 +213,6 @@ Select, flag=ERROR, class=MQ;
 
 ealign, dy:=tgauss(2.5)*0.100e-3, dx:=tgauss(2.5)*0.070e-3;
 
-Assigned alignment errors to 392 elements
 !******************************************************************
 
 
@@ -2030,7 +2029,6 @@ Select, flag=ERROR, class=MQ;
 
 ealign, dy:=tgauss(2.5)*0.100e-3, dx:=tgauss(2.5)*0.070e-3;
 
-Replaced alignment errors for 392 elements
 
 
 select, flag=twiss, clear;
@@ -3838,7 +3836,6 @@ Select, flag=ERROR, class=MQ;
 
 ealign, dy:=tgauss(2.5)*0.100e-3, dx:=tgauss(2.5)*0.070e-3;
 
-Replaced alignment errors for 392 elements
 
 
 select, flag=twiss, clear;
@@ -5663,7 +5660,6 @@ Select, flag=ERROR, class=MQ;
 
 ealign, dy:=tgauss(2.5)*0.100e-3, dx:=tgauss(2.5)*0.070e-3;
 
-Replaced alignment errors for 392 elements
 
 
 !******************************************************************

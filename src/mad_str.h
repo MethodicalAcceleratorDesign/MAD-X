@@ -35,6 +35,7 @@ int   next_non_blank_pos(char* string);
 char* noquote(char* string);
 int   quote_level(char* string, char* send);
 int   square_to_colon(char* string);
+char* slash_to_bkslash(char* string);
 
 // inline functions
 

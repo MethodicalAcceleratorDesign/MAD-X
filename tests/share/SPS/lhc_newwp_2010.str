@@ -1,0 +1,27 @@
+! Qh=26.13, QV=26.18 - no qsplit - chromaticity (0.0/0.0)  - SPS units
+! LHC settings 2007
+! lhc_newwp_2010.str is used for the LHC beam:
+! 1) at injection (26 GeV/c, not 14)
+! 2) during the ramp
+! 3) and at extraction (450 GeV/c)
+
+
+kMBA  :=  8.445141542E-03;
+kMBB  :=  8.445141542E-03;
+
+kLSDA  := -0.1496282606;
+kLSDB  := -0.1456131825;
+kLSFA  :=  0.06325645859;
+kLSFB  :=  0.1214166893;
+kLSFC  :=  kLSFA;
+
+kQD   := -0.0144394607;
+kQDA  :=  kQD*9.0/11.0;
+kQF1  :=  0.014436037;
+kQF1A :=  kQF1*9.0/11.0;
+kQF2  :=  kQF1;
+kQF2A :=  kQF2*9.0/11.0;
+
+
+return;
+
