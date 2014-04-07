@@ -473,6 +473,7 @@ SUBROUTINE twfill_ripken(opt_fun)
   call double_to_table_curr('twiss ','gama22 ' ,gama22)
 
 end SUBROUTINE twfill_ripken
+
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   implicit none
@@ -512,14 +513,17 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   call dcopy(guess,orbit0,6)
 
   !---- Iteration for closed orbit.
-  do itra = 1, itmax
+  iterate: do itra = 1, itmax
 
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
      if (eflag.ne.0)  return
 
-     !---- Solve for dynamic case.
-     if (.not.m66sta(rt)) then
+     ! 2014-Mar-28  20:41:21  ghislain: turn off the threader immediately after first iteration, ie first turn
+     thr_on = 0
+
+     if (.not.m66sta(rt)) then 
+        !---- Solve for dynamic case.
         err = zero
         call dcopy(rt,a,36)
         do i = 1, 6
@@ -528,13 +532,17 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
            err = max(abs(a(i,7)), err)
         enddo
         call solver(a,6,1,irank)
-        if (irank.lt.6) go to 820
+        if (irank.lt.6) then
+           print *, 'Singular matrix occurred during closed orbit search.'
+           eflag = 1
+           return
+        endif
         do i = 1, 6
            orbit0(i) = orbit0(i) - a(i,7)
         enddo
-
+        
+     else                      
         !---- Solve for static case.
-     else
         err = zero
         do i = 1, 4
            do k = 1, 4
@@ -545,18 +553,24 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
            err = max(abs(b(i,5)), err)
         enddo
         call solver(b,4,1,irank)
-        if (irank.lt.4) go to 820
+        if (irank.lt.4) then
+           print *, 'Singular matrix occurred during closed orbit search.'
+           eflag = 1
+           return
+        endif
         do i = 1, 4
            orbit0(i) = orbit0(i) - b(i,5)
         enddo
      endif
 
      !---- Message and convergence test.
+
      if (pflag)  then
         print *, ' '
         print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '',1p,e14.6)',itra,err,deltap
         print '(''orbit: '', 1p,6e14.6)', orbit0
      endif
+
      if (err.lt.cotol) then
         save_opt=get_option('keeporbit ')
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
@@ -572,25 +586,22 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
         guess(4)=orbit0(4)
         guess(5)=orbit0(5)
         guess(6)=orbit0(6)
-        go to 999
+        return ! normal exit
      endif
-  enddo
+
+  enddo iterate
 
   !---- No convergence.
-  print                                                             &
-       '(''Closed orbit did not converge in '', i3, '' iterations'')',   &
-       itmax
+  print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
   opt_fun0(9 )=zero
   opt_fun0(10)=zero
   opt_fun0(11)=zero
   opt_fun0(12)=zero
   opt_fun0(13)=zero
   opt_fun0(14)=zero
-  goto 999
-820 continue
-  print *, 'Singular matrix occurred during closed orbit search.'
-  eflag = 1
-999 end SUBROUTINE tmclor
+  return
+
+end SUBROUTINE tmclor
 
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
@@ -624,7 +635,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer eflag,j,code,restart_sequ,advance_node,node_al_errors,    &
        n_align,kobs,nobs,node,save,thr_on,ccode,pcode,get_vector,err,old,&
        kpro,corr_pick(2),enable,coc_cnt(2),lastnb,rep_cnt(2),max_rep,    &
-       poc_cnt
+       poc_cnt,get_option,debug
   double precision orbit0(6),orbit(6),orbit2(6),rt(6,6),tt(6,6,6),el,ek(6),   &
        re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
        get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
@@ -633,6 +644,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   parameter(orb_limit=1d1,zero=0d0,ccode=15,pcode=18)
   parameter(max_rep=100)
   data ptxt / 'x-','y-'/
+
+  debug = get_option('debug ')
 
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
@@ -672,26 +685,27 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   !---  start
   node = restart_sequ()
 
-  ! loop over nodes
+  !---  loop over nodes
 10 continue
-  bbd_pos=node
+
+  bbd_pos=node !--- for space charge 
 
   code = node_value('mad8_type ')
-
+  
   if(code.eq.39) code=15 ! tkicker treated as kicker
   if(code.eq.38) code=24 ! placeholder treated as instrument
-
+  
   if (code .ge. ccode-1 .and. code .le. ccode+1)  then
      !---  kicker (code 14 to 16: hkicker, kicker, vkicker)
      if (thr_on .gt. 0)  then
         !---  threader is on - keep position,orbit,matrix,and tensor for restart
-        if (code .le. ccode) then
+        if (code .le. ccode) then !--- kicker or hkicker
            restsum(1) = suml
            call dcopy(orbit,restorb(1,1),6)
            call dcopy(rt,restm(1,1,1),36)
            call dcopy(tt,restt(1,1,1,1),216)
         endif
-        if (code .ge. ccode) then
+        if (code .ge. ccode) then !--- kicker or vkicker
            restsum(2) = suml
            call dcopy(orbit,restorb(1,2),6)
            call dcopy(rt,restm(1,1,2),36)
@@ -702,18 +716,19 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   el = node_value('l ')
   nobs = node_value('obs_point ')
-
+  
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
-
+  
   !---- Element matrix and length.
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   
-  if (fmap) then
+  !--- if element has a map
+  if (fmap) then 
      !---- call m66mpy(re,rt,rt)
      call tmcat(.true.,re,te,rt,tt,rt,tt)
      suml = suml + el
@@ -724,65 +739,81 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
-
+  
   if (kobs.gt.0.and.kobs.eq.nobs) return
-
-  if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-     !---  kicker (code 14 to 16)
-     if (thr_on .gt. 0)  then
-        !---  threader is on
-        !---  keep matrix
-        if (code .le. ccode) then
+  
+  if (code .ge. ccode-1 .and. code .le. ccode+1)  then !---  kickers (code 14 to 16)
+     
+     if (thr_on .gt. 0)  then !---  threader is on;  keep matrix
+        if (code .le. ccode) then !--- kicker (15) or hkicker (14)
            call dcopy(rt,cmatr(1,1,1),36)
            j = name_len
            call element_name(c_name(1),j)
            coc_cnt(1) = node_value('occ_cnt ')
         endif
-        if (code .ge. ccode) then
+        if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
            call dcopy(rt,cmatr(1,1,2),36)
            j = name_len
            call element_name(c_name(2),j)
            coc_cnt(2) = node_value('occ_cnt ')
         endif
      endif
-  elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then
-     !---  monitor (code 17 to 19: hmonitor, monitor, vmonitor)
+     
+  elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 18 to 19)
+     
      enable = node_value('enable ')
      if (save .gt. 0 .and. enable .gt. 0) then
         j = 6
         call store_node_vector('orbit_ref ', j, orbit)
      endif
-     if (thr_on .gt. 0 .and. enable .gt. 0) then
-        !---  threader is on - test for overflow w.r.t. stored orbit
+
+     if (thr_on .gt. 0 .and. enable .gt. 0) then 
+        !--- threader is on; test for overflow w.r.t. stored orbit
         call dzero(reforb,6)
         j = 6
         call get_node_vector('orbit_ref ', j, reforb)
-        do kpro = 1, 2
-           if (kpro .eq. 1 .and. code .le. pcode                       &
-                .or. kpro .eq. 2 .and. code .ge. pcode)  then
+        
+        do kpro = 1, 2 ! projection plane: x or y
+           if (      kpro .eq. 1 .and. code .le. pcode &        !--- plane is x and monitor or hmonitor 
+                .or. kpro .eq. 2 .and. code .ge. pcode)  then   !--- plane is y and monitor or vmonitor
+              
               j = 2*kpro-1
-              dorb(j) = orbit(j) - reforb(j)
-              if (abs(dorb(j)) .gt. vector(kpro)                        &
-                   .and. node .ge. corr_pick(kpro))  then
+              dorb(j) = orbit(j) - reforb(j) !--- orbit distortion
+              
+              if (abs(dorb(j)) .gt. vector(kpro) .and. node .ge. corr_pick(kpro))  then
+
+                 if (debug .ne. 0) then
+                    print *,' node = ',node,' kpro = ',kpro,' code = ',code,' dorb = ',dorb(j)
+                 endif                    
+
                  !---  reset count if new pickup
                  if (node .gt. corr_pick(kpro)) rep_cnt(kpro) = 0
-                 !---  check for max. repitition
-                 rep_cnt(kpro) = rep_cnt(kpro) + 1
+
+                 !---  check for max. repetition
+                 rep_cnt(kpro) = rep_cnt(kpro) + 1                 
                  if (rep_cnt(kpro) .gt. max_rep)  then
                     write(tmptxt1, '(i6)') max_rep
                     call fort_warn('threader: pickup skipped after',      &
                          tmptxt1(:6)//' correction attempts')
                     goto 20
                  endif
+                 
                  !---  keep matrix
                  call dcopy(rt,pmatr,36)
                  old = node
                  j = name_len
                  call element_name(p_name,j)
                  poc_cnt = node_value('occ_cnt ')
-                 call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,&
-                      cick,err)
-                 if (err .eq. 0)  then
+                 call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,cick,err)
+                 
+                 if (err .eq. 1)  then
+                    write(tmptxt1, '(i6)') old
+                    call fort_warn( 'threader: no corrector before pickup at node ', tmptxt1)
+                    ! no return ? 
+                 elseif (err .eq. 2)  then
+                    call fort_warn('threader: kicker is at start', 'of sequence')
+                    ! no return ? 
+                 elseif (err .eq. 0)  then
                     corr_pick(kpro) = old
                     write(tmptxt1, '(1p,6g14.6)') cick
                     tmptxt2 = c_name(kpro)
@@ -800,25 +831,17 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                     call dcopy(restorb(1,kpro),orbit,6)
                     call dcopy(restm(1,1,kpro),rt,36)
                     call dcopy(restt(1,1,1,kpro),tt,216)
-                    goto 20
-                 else
-                    write(tmptxt1, '(i6)') old
-                    if (err .eq. 1)  then
-                       call fort_warn(                                     &
-                            'threader: no corrector before pickup at node ',                  &
-                            tmptxt1)
-                    elseif (err .eq. 2)  then
-                       call fort_warn('threader: kicker is at start',      &
-                            'of sequence')
-                    endif
+                    goto 20 ! bad! this breaks the loop and kpro=2 might not be treated. 
                  endif
+
               endif
            endif
         enddo
      endif
   endif
+  
 20 continue
-
+  
   !---- Test for overflow.
   do j = 1, 6
      if (abs(orbit(j)).ge.orb_limit) then
@@ -826,12 +849,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         return
      endif
   enddo
-
-  if (advance_node().ne.0)  then
+  
+  if (advance_node().ne.0) then
      node=node+1
      goto 10 ! loop over nodes
   endif
-
+  
   bbd_flag=0
 end SUBROUTINE tmfrst
 
@@ -904,48 +927,57 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   !----------------------------------------------------------------------*
   integer error,node,kpro
   integer i,j,npick,advance_node,ccode
-  integer both,code,icorr,itp,lc,lc1,lc2,retreat_node,ncorr
+  integer both,code,itp,lc,lc1,lc2,retreat_node,ncorr
   double precision thrvec(3),dorb(6),cmatr(6,6),pmatr(6,6)
   double precision cick,tol1min,node_value,atemp(6,6)
-  parameter (tol1min = 1.d-2,ccode=15)
+  parameter (tol1min=1.d-2 , ccode=15)
 
+  error = 0
+  
   !---  keep position of current pickup
   npick = node
-  !---  look for one preceding corrector of correct (MAD-8) type
-  both = ccode
-  itp = both + (-1)**kpro
+
+  both = ccode            ! 15
+  itp = both + (-1)**kpro ! 14 or 16
+ 
   lc = 2 * (kpro - 1)
   lc1 = lc + 1
   lc2 = lc + 2
-  icorr = 0
+
+  !---  look for one preceding corrector of correct (MAD-8) type
 10 continue
-  if (retreat_node() .eq. 0)  then
-     error = 1
+
+  if (retreat_node() .eq. 0)  then !--- we are at start already
      do i = node+1,npick
         j = advance_node()
      enddo
      node = npick
-     goto 999
+     error = 1
+     return
   endif
+
   node = node - 1
   code = node_value('mad8_type ')
+
   if(code.eq.39) code=15
   if(code.eq.38) code=24
-  if (code .eq. itp .or. code .eq. both)  then
-     icorr = icorr + 1
-     ncorr = node
-  endif
-  if (icorr .eq. 0) goto 10
+
+  !-- if wrong corrector or not a corrector, loop
+  if (code .ne. itp .and. code .ne. both) goto 10 
+
+  !--- corrector found for the projection plane
+  ncorr = node
+
   !---  transport matrix from kicker to pickup
   call m66inv(cmatr,atemp)
   call m66mpy(pmatr,atemp,atemp)
-  if (abs(atemp(lc1,lc2)) .lt. tol1min) then
-     !---  kicker does not change orbit at pickup - try again
-     icorr = 0
-     goto 10
-  endif
+
+  !--- if kicker is not efficient enough - loop
+  if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 
+
   !---  now we got one good corrector - get kick with attenuation factor
-  cick = -thrvec(3)*dorb(2*kpro-1)/atemp(lc1,lc2)
+  cick = -thrvec(3) * dorb(2*kpro-1) / atemp(lc1,lc2)
+
   !---  add kick to kicker strengths
   if (kpro .eq. 1)  then
      cick = node_value('other_bv ') * cick + node_value('chkick ')
@@ -954,18 +986,21 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
      cick = node_value('other_bv ') * cick + node_value('cvkick ')
      call store_node_value('cvkick ', cick)
   endif
+
   !---  set node for restart in front of kicker
-  if (retreat_node() .eq. 0)  then
-     error = 2
+  if (retreat_node() .eq. 0)  then !--- we are at start already
      do i = node+1,npick
         j = advance_node()
      enddo
      node = npick
-     goto 999
+     error = 2
+     return
   endif
   node = node -1
-  error = 0
-999 end SUBROUTINE tmthrd
+
+end SUBROUTINE tmthrd
+
+
 SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   use twiss0fi
