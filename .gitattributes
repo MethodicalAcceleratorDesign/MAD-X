@@ -1070,6 +1070,10 @@ tests/share/AD/ad.dbx -text
 tests/share/AD/ad.ele -text
 tests/share/AD/ad_new.seq -text
 tests/share/AD/ad_quads_3837_ffe.str -text
+tests/share/FCCe/madx_elements_v11.in -text
+tests/share/FCCe/madx_sequence_v11_matching.in -text
+tests/share/FCCe/madx_sequence_v11_rb.in -text
+tests/share/FCCe/tlep_v11_rb2.str -text
 tests/share/LEIR/LEIR.seqx -text
 tests/share/LEP/lep.opt9 -text
 tests/share/LEP/lep.seq9 -text
@@ -1866,6 +1870,9 @@ tests/test-twiss-8/twiss_thick.tfs.cfg -text
 tests/test-twiss-8/twiss_thick.tfs.ref -text
 tests/test-twiss-8/twiss_thin.tfs.cfg -text
 tests/test-twiss-8/twiss_thin.tfs.ref -text
+tests/test-twiss-9/test-twiss-9.cfg -text
+tests/test-twiss-9/test-twiss-9.madx -text
+tests/test-twiss-9/test-twiss-9.ref -text
 tests/test-twiss/sample_optics.tfs.cfg -text
 tests/test-twiss/sample_optics.tfs.ref -text
 tests/test-twiss/test-twiss.cfg -text
