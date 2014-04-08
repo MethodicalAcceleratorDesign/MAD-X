@@ -187,7 +187,7 @@ extract_sequence(char* name, struct sequence* sequ, struct node* from, struct no
 
   // 2014-Mar-21  20:42:19  ghislain: 
   // this might be dangerous for non-circular sequences!!!
-  if (current_sequ->length < zero) current_sequ->length += sequ->length;
+  // if (current_sequ->length < zero) current_sequ->length += sequ->length;
 
   marker_pos = name_list_pos("marker", defined_commands->list);
   clone = clone_command(defined_commands->commands[marker_pos]);
@@ -738,24 +738,25 @@ export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
   struct element* el;
   struct sequence* sq;
   struct node* c_node = sequ->start;
+
   seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
+
   if (pass_select_list(sequ->name, cl) == 0)  return;
+
   *c_dum->c = '\0';
   strcat(c_dum->c, sequ->export_name);
   strcat(c_dum->c, ": sequence");
-  if (seqref ==1)  strcat(c_dum->c, ", refer=entry");
+  if (seqref == 1)  strcat(c_dum->c, ", refer=entry");
   write_nice_8(c_dum->c, file);
-  while(c_node != NULL)
-  {
+
+  while(c_node != NULL) {
     exp_par_flag = 0;
     *c_dum->c = '\0';
+
     if (strchr(c_node->name, '$') == NULL
-        && strcmp(c_node->base_name, "drift") != 0)
-    {
-      if ((el = c_node->p_elem) != NULL)
-      {
-        if (c_node->p_elem->def_type)
-        {
+        && strcmp(c_node->base_name, "drift") != 0) {
+      if ((el = c_node->p_elem) != NULL) {
+        if (c_node->p_elem->def_type) {
           strcat(c_dum->c, el->name);
           strcat(c_dum->c, ": ");
           strcat(c_dum->c, el->parent->name);
@@ -765,24 +766,26 @@ export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
       }
       else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
       else fatal_error("save error: node without link:", c_node->name);
+      
       strcat(c_dum->c, ", at = ");
       if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
-      else
-      {
+      else {
         sprintf(num, v_format("%F"), c_node->at_value);
         strcat(c_dum->c, supp_tb(num));
       }
-      if (c_node->from_name != NULL)
-      {
+
+      if (c_node->from_name != NULL) {
         strcat(c_dum->c, ", from = ");
         strcat(c_dum->c, c_node->from_name);
       }
+
       if (exp_par_flag)  export_el_def_8(c_node->p_elem, c_dum->c);
       write_nice_8(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
     c_node = c_node->next;
   }
+
   strcpy(c_dum->c, sequ->name);
   strcat(c_dum->c, "_end: marker, at = ");
   sprintf(num, v_format("%F"), sequence_length(sequ));
@@ -1667,54 +1670,54 @@ exec_save(struct in_cmd* cmd)
   struct command_parameter* clp;
   default_beam_saved = 0;
   i = name_list_pos("file", nl);
-  if (nl->inform[i] == 0)
-  {
+
+  if (nl->inform[i] == 0) {
     warning("save without file:", "ignored");
     return;
   }
+
   filename = pl->parameters[i]->string;
-  if ((out_file = fopen(filename, "w")) == NULL)
-  {
+  if ((out_file = fopen(filename, "w")) == NULL) {
     warning("cannot open output file:", filename);
     return;
   }
+
 /* get export name for sequence (newname in SAVE) HG 15.10.07 */
   i = name_list_pos("newname", nl);
   if (nl->inform[i] != 0) new_name = pl->parameters[i]->string;
 /* end -- export name for sequence (newname in SAVE) HG 15.10.07 */
+
   warning("SAVE makes all previous USE invalid !", " ");
+
   pos = name_list_pos("sequence", nl);
   clp = cmd->clone->par->parameters[pos];
-  if (nl->inform[pos] == 0)  /* no sequence given, all sequences saved */
-  {
+
+  if (nl->inform[pos] == 0) {  /* no sequence given, all sequences saved */
     sqo = sequences; all_sequ = 1;
   }
-  else
-  {
+  else {
     sqo = new_sequence_list(20);
-    for (i = 0; i < clp->m_string->curr; i++)
-    {
+    for (i = 0; i < clp->m_string->curr; i++) {
       name = clp->m_string->p[i];
       if ((pos = name_list_pos(name, sequences->list)) < 0)
         warning("unknown sequence ignored:", name);
       else add_to_sequ_list(sequences->sequs[pos], sqo);
     }
   }
+
   /* now do it */
   sql = new_sequence_list(20);
   ell = new_el_list(10000);
   if (all_sequ == 0)  varl = new_var_list(2000);
   else varl = clone_var_list(variable_list); /* write all variables */
-  for (pos = 0; pos < sqo->curr; pos++)
-  {
+
+  for (pos = 0; pos < sqo->curr; pos++) {
     sequ = sqo->sequs[pos];
     add_to_sequ_list(sequ, sql);
     /* check for inserted sequences, flatten if necessary  - HG 23.3.04 */
     c_node = sequ->start;
-    while(c_node != NULL)
-    {
-      if (c_node->p_sequ != NULL)
-      {
+    while(c_node != NULL) {
+      if (c_node->p_sequ != NULL) {
         warning("structured sequence flattened:", sequ->name);
         seq_edit_ex(sequ);
         seq_flatten(edit_sequ);
@@ -1725,27 +1728,24 @@ exec_save(struct in_cmd* cmd)
       c_node = c_node->next;
     }
     /* end mod - HG 23.3.04 */
-    if (beam_save && bare == 0)
-    {
+
+    if (beam_save && bare == 0) {
       if (mad8 == 0) save_beam(sequ, out_file); /* only mad-X */
       else warning("when mad-8 format requested,","beam not saved");
     }
   }
-  for (i = sql->curr-1; i >= 0; i--) /* loop over sequences, get elements */
-  {
-/* set export name for sequence (newname in SAVE) HG 15.10.07 */
+
+  for (i = sql->curr-1; i >= 0; i--) { /* loop over sequences, get elements */  
+    /* set export name for sequence (newname in SAVE) HG 15.10.07 */
     if (new_name == NULL)
       strcpy(sql->sequs[i]->export_name, sql->sequs[i]->name);
     else strcpy(sql->sequs[i]->export_name, new_name);
-/* end mod HG 15.10.07 */
+    /* end mod HG 15.10.07 */
     c_node = sql->sequs[i]->start;
-    while (c_node != NULL)
-    {
+    while (c_node != NULL) {
       if ((el = c_node->p_elem) != NULL && strchr(el->name, '$') == NULL
-          && strcmp(el->base_type->name, "drift") != 0)
-      {
-        while (el->base_type != el)
-        {
+          && strcmp(el->base_type->name, "drift") != 0) {
+        while (el->base_type != el) {
           add_to_el_list(&el, 0, ell, 0);
           el = el->parent;
         }
@@ -1754,11 +1754,10 @@ exec_save(struct in_cmd* cmd)
       c_node = c_node->next;
     }
   }
-  if (all_sequ == 0)
-  {
-    while (prev < ell->curr) /* loop over elements, get variables -
-                                recursive, since elements may be added */
-    {
+
+  if (all_sequ == 0) {
+    while (prev < ell->curr) { /* loop over elements, get variables -
+                                  recursive, since elements may be added */    
       prev = ell->curr;
       for (i = n; i < ell->curr; i++)
         fill_elem_var_list(ell->elem[i], ell, varl);
@@ -1766,15 +1765,13 @@ exec_save(struct in_cmd* cmd)
     }
     fill_sequ_var_list(sql, ell, varl); /* variables for positions */
   }
-  if (mad8)
-  {
-    if (bare == 0)
-    {
+
+  if (mad8) {
+    if (bare == 0) {
       write_vars_8(varl, save_select, out_file);
       write_elems_8(ell, save_select, out_file);
     }
-    for (pos = 0; pos < sql->curr; pos++)
-    {
+    for (pos = 0; pos < sql->curr; pos++) {
       sequ = sql->sequs[pos];
       all_node_pos(sequ);
       sequ->ex_nodes = new_node_list(2*sequ->nodes->curr);
@@ -1783,15 +1780,14 @@ exec_save(struct in_cmd* cmd)
       sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
     }
   }
-  else
-  {
-    if (bare == 0)
-    {
+  else {
+    if (bare == 0) {
       write_vars(varl, save_select, out_file);
       write_elems(ell, save_select, out_file);
     }
     write_sequs(sql, save_select, out_file);
   }
+
   fclose(out_file);
   if (sqo != sequences) sqo = delete_sequence_list(sqo);
   sql = delete_sequence_list(sql);
