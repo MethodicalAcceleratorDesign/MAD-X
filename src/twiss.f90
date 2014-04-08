@@ -7,12 +7,14 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use twisscfi
   use twissotmfi
   use trackfi
+  use fasterror
   implicit none
 
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
+  logical fast_error_func
   integer i,ithr_on
   integer tab_name(*),chrom,eflag,inval,get_option,izero,ione
   double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6), &
@@ -107,6 +109,15 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- Initial value flag.
   inval=get_option('twiss_inval ')
+
+
+  !---- Set fast_error_func flag to use faster error function
+  !---- including tables. Thanks to late G. Erskine
+  fast_error_func = get_option('fast_error_func ') .ne. 0
+  if(fast_error_func.and..not.fasterror_on) then
+     call wzset
+     fasterror_on = .true.
+  endif
 
   !---- Initial values from command attributes.
   if (inval.ne.0) then
@@ -5531,6 +5542,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
   use spch_bbfi
+  use fasterror
   implicit none
 
   logical fsec,ftrk,fmap,bborbit,bb_sxy_update
@@ -5675,7 +5687,13 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               rk = fk * sqrt(pi) / r
               xr = abs(xs) / r
               yr = abs(ys) / r
-              call ccperrf(xr, yr, crx, cry)
+
+              if(fasterror_on) then
+                 call wzsub(xr, yr, crx, cry)
+              else
+                 call ccperrf(xr, yr, crx, cry)
+              endif
+           
               tk = (xs * xs / sx2 + ys * ys / sy2) / two
               if (tk .gt. explim) then
                  exk = zero
@@ -5685,7 +5703,13 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
                  exk = exp(-tk)
                  xb  = (sy / sx) * xr
                  yb  = (sx / sy) * yr
-                 call ccperrf(xb, yb, cbx, cby)
+
+                 if(fasterror_on) then
+                    call wzsub(xb, yb, cbx, cby)
+                 else
+                    call ccperrf(xb, yb, cbx, cby)
+                 endif
+
               endif
 
               !---- case sigma(x) < sigma(y).
@@ -5694,7 +5718,13 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               rk = fk * sqrt(pi) / r
               xr = abs(xs) / r
               yr = abs(ys) / r
-              call ccperrf(yr, xr, cry, crx)
+
+              if(fasterror_on) then
+                 call wzsub(yr, xr, cry, crx)
+              else
+                 call ccperrf(yr, xr, cry, crx)
+              endif
+           
               tk = (xs * xs / sx2 + ys * ys / sy2) / two
               if (tk .gt. explim) then
                  exk = zero
@@ -5704,7 +5734,13 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
                  exk = exp(-tk)
                  xb  = (sy / sx) * xr
                  yb  = (sx / sy) * yr
-                 call ccperrf(yb, xb, cby, cbx)
+
+                 if(fasterror_on) then
+                    call wzsub(yb, xb, cby, cbx)
+                 else
+                    call ccperrf(yb, xb, cby, cbx)
+                 endif
+
               endif
            endif
 

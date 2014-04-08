@@ -272,6 +272,7 @@ char command_def[] =
 "bb_ultra_relati = [l, false, true], "
 "bb_sxy_update   = [l, false, true], "
 "emittance_update   = [l, true, true], "
+"fast_error_func   = [l, false, true], "
 "echo     = [l, true, true], "
 "info     = [l, true, true], "
 "reset    = [l, false, true], "
