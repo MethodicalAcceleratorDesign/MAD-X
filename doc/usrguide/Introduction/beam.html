@@ -18,31 +18,18 @@ command has been issued before.
 <p>
 The quantities are entered by a BEAM command:
 <pre>
-BEAM, PARTICLE=name,MASS=real,CHARGE=real,
-      ENERGY=real,PC=real,GAMMA=real,BETA=real,
-      EX=real,EXN=real,EY=real,EYN=real,
-      ET=real,SIGT=real,SIGE=real,
-      KBUNCH=integer,NPART=real,BCURRENT=real,
-      BUNCHED=logical,RADIATE=logical,BV=integer,SEQUENCE=name;
+BEAM, PARTICLE=name, MASS=real, CHARGE=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real,
+      EX=real, EXN=real, EY=real, EYN=real,
+      ET=real, SIGT=real, SIGE=real,
+      KBUNCH=integer, NPART=real, BCURRENT=real,
+      BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
+      FREQ0=real, CIRC=real, DTBYDS=real, DELTAP=real, ALFA=real,
+      U0=real, QS=real, ARAD=real, BV=real, PDAMP={real,real,real},
+      N1MIN=real;
 </pre>
 
-command: beam  module: control
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
-parameter: dtbyds   double value:                  0
-parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
-parameter: alfa   double value:    4.347429295e-06
-parameter: u0   double value:                  0
-parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698269e-18
-parameter: bv   double value:                  1
-parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
-parameter: n1min   double value:                 -1
-
-
-
-Warning: BEAM updates, i. e. it replaces attributes explicitely
+Warning: BEAM updates, i.e. it replaces attributes explicitely
 mentioned, but does not return to default values for others!
 To reset to <a href="resbeam.html#defaults">beam value defaults</a>, 
 use <a href="resbeam.html">RESBEAM</a>.
