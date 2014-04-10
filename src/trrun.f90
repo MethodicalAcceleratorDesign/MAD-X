@@ -450,7 +450,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      nlm = 0
      sum=0d0
 
-     if(bb_sxy_update) then
+     if((sigma_t.eq.0d0.or.emittance_update).and.bb_sxy_update) then
 !VVK 20100321 -------- Find RMS-value of t ----------------------
 ! if we do 1-turn tracking, orbit0(5)=0 always
         Summ_t_mean=0d0
