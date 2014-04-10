@@ -469,6 +469,10 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
                 Summ_t_square=Summ_t_square+(z(5,i_part)-mean_t)**2
         enddo
         sigma_t=sqrt(Summ_t_square/dble(jmax))
+        if(abs(sigma_t).eq.0d0) then
+           sigma_t=t_max/2d0
+           call aawarn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
+        endif
 !-----------------------------------------------------------------
      endif
 
@@ -5194,11 +5198,8 @@ subroutine mywwerf(x,y,wr,wi)
   wi=vi
   return
 end subroutine mywwerf
-subroutine wzsubv(napx,vx,vy,vu,vv)
+subroutine wzsubv(n,vx,vy,vu,vv)
   !  *********************************************************************
-  !
-  !  Adapted from SixTrack version 4.5.04 from 12.01.2014
-  !  Authors: Eric McIntosh & Riccardo de Maria
   !
   !  This subroutine sets u=real(w(z)) and v=imag(w(z)), where z=x+i*y and
   !  where w(z) is the complex error function defined by formula 7.1.3 in
@@ -5241,211 +5242,213 @@ subroutine wzsubv(napx,vx,vy,vu,vv)
   !        <1.E-8  for  x>=7.8  or  y>=7.5
   !
   !  *********************************************************************
-  use fasterror
-  integer j,k,napx,vmu,vnu
-  double precision a1,a2,b1,b2,ss,vd12i,vd12r,vd23i,vd23r,                &
+  implicit none
+  dimension vx(*),vy(*),vu(*),vv(*)
+  integer i,j,k,n,vmu,vnu
+  double precision a1,a2,b1,b2,vd12i,vd12r,vd23i,vd23r,             &
        &vd34i,vd34r,vp,vq,vqsq,vr,vsimag,vsreal,vt,vtdd13i,vtdd13r,       &
        &vtdd24i,vtdd24r,vtdddi,vtdddr,vti,vtr,vu,vusum,vusum3,vv,         &
        &vvsum,vvsum3,vw1i,vw1r,vw2i,vw2r,vw3i,vw3r,vw4i,vw4r,vx,          &
        &vxh,vxhrel,vy,vyh,vyhrel
-  double precision half,one,xcut,ycut
+  integer npart
+  parameter(npart = 64)
+  integer idim,kstep,nx,ny
+  double precision h,half,hrecip,one,wtimag,wtreal,xcut,ycut
   parameter ( xcut = 7.77d0, ycut = 7.46d0 )
+  parameter ( h = 1.d0/63.d0 )
+  parameter ( nx = 490, ny = 470 )
+  parameter ( idim = (nx+2)*(ny+2) )
   parameter ( half = 0.5d0, one = 1.d0 )
+  common /wzcom1/ hrecip, kstep
+  common /wzcom2/ wtreal(idim), wtimag(idim)
   parameter ( a1 = 0.5124242248d0, a2 = 0.0517653588d0 )
   parameter ( b1 = 0.2752551286d0, b2 = 2.7247448714d0 )
   !     temporary arrays to facilitate vectorisation
-  dimension vx(napx),vy(napx),vu(napx),vv(napx)
-  dimension vsreal(napx),vsimag(napx),vp(napx),vq(napx)
-  dimension vqsq(napx),vt(napx),vr(napx)
-  dimension vxh(napx),vyh(napx),vmu(napx),vnu(napx)
-  dimension vw4r(napx),vw4i(napx)
-  dimension vw3r(napx),vw3i(napx),vd34r(napx),vd34i(napx)
-  dimension vw2r(napx),vw2i(napx),vd23r(napx),vd23i(napx)
-  dimension vtr(napx),vti(napx),vtdd24r(napx),vtdd24i(napx)
-  dimension vw1r(napx),vw1i(napx)
-  dimension vd12r(napx),vd12i(napx),vtdd13r(napx),vtdd13i(napx)
-  dimension vtdddr(napx),vtdddi(napx),vxhrel(napx),vyhrel(napx)
-  dimension vusum(napx),vvsum(napx),vusum3(napx),vvsum3(napx)
-  save
+  integer in,out,ins,outs
+  dimension ins(npart),outs(npart)
   !-----------------------------------------------------------------------
-  ss=0d0
-  do j=1,napx
-     !     if ( vx.ge.xcut .or. vy.ge.ycut )
-     ss=ss+sign(1.0d0,                                               &
-          &sign(1.0d0,vx(j)-xcut)+sign(1.0d0,vy(j)-ycut))
-  enddo
-  !
-  if (nint(ss).eq.napx) then
-     !     everything outside the rectangle so approximate
-!$OMP PARALLEL PRIVATE(j)
-!$OMP DO
-     do j=1,napx
-
-        vp(j)=vx(j)**2-vy(j)**2
-        !hr05 vq(j)=2.d0*vx(j)*vy(j)
-        vq(j)=(2.d0*vx(j))*vy(j)                                           !hr05
-        vqsq(j)=vq(j)**2
-        !  First term.
-        vt(j)=vp(j)-b1
-        vr(j)=a1/(vt(j)**2+vqsq(j))
-        vsreal(j)=vr(j)*vt(j)
-        !hr05 vsimag(j)=-vr(j)*vq(j)
-        vsimag(j)=(-1d0*vr(j))*vq(j)                                       !hr05
-        !  Second term
-        vt(j)=vp(j)-b2
-        vr(j)=a2/(vt(j)**2+vqsq(j))
-        vsreal(j)=vsreal(j)+vr(j)*vt(j)
-        vsimag(j)=vsimag(j)-vr(j)*vq(j)
-        !  Multiply by i*z.
-        !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
-        vu(j)=-1d0*(vy(j)*vsreal(j)+vx(j)*vsimag(j))                       !hr05
-        vv(j)=vx(j)*vsreal(j)-vy(j)*vsimag(j)
-     enddo
-!$OMP END DO
-!$OMP END PARALLEL
-  elseif (nint(ss).ne.-napx) then
-     !     we have a mixture
-
-!$OMP PARALLEL PRIVATE(j,k)
-!$OMP DO
-     do j=1,napx
-
-        if ( vx(j).ge.xcut .or. vy(j).ge.ycut ) then
-
-           vp(j)=vx(j)**2-vy(j)**2
-           !hr05 vq(j)=2.d0*vx(j)*vy(j)
-           vq(j)=(2.d0*vx(j))*vy(j)                                           !hr05
-           vqsq(j)=vq(j)**2
-           !  First term.
-           vt(j)=vp(j)-b1
-           vr(j)=a1/(vt(j)**2+vqsq(j))
-           vsreal(j)=vr(j)*vt(j)
-           !hr05 vsimag(j)=-vr(j)*vq(j)
-           vsimag(j)=(-1d0*vr(j))*vq(j)                                       !hr05
-           !  Second term
-           vt(j)=vp(j)-b2
-           vr(j)=a2/(vt(j)**2+vqsq(j))
-           vsreal(j)=vsreal(j)+vr(j)*vt(j)
-           vsimag(j)=vsimag(j)-vr(j)*vq(j)
-           !  Multiply by i*z.
-           !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
-           vu(j)=-1d0*(vy(j)*vsreal(j)+vx(j)*vsimag(j))                       !hr05
-           vv(j)=vx(j)*vsreal(j)-vy(j)*vsimag(j)
-
-        else
-
-           vxh(j) = hrecip*vx(j)
-           vyh(j) = hrecip*vy(j)
-           vmu(j) = int(vxh(j))
-           vnu(j) = int(vyh(j))
-           !  Compute divided differences.
-           k = 2 + vmu(j) + vnu(j)*kstep
-           vw4r(j) = wtreal(k)
-           vw4i(j) = wtimag(k)
-           k = k - 1
-           vw3r(j) = wtreal(k)
-           vw3i(j) = wtimag(k)
-           vd34r(j) = vw4r(j) - vw3r(j)
-           vd34i(j) = vw4i(j) - vw3i(j)
-           k = k + kstep
-           vw2r(j) = wtreal(k)
-           vw2i(j) = wtimag(k)
-           vd23r(j) = vw2i(j) - vw3i(j)
-           vd23i(j) = vw3r(j) - vw2r(j)
-           vtr(j) = vd23r(j) - vd34r(j)
-           vti(j) = vd23i(j) - vd34i(j)
-           vtdd24r(j) = vti(j) - vtr(j)
-           !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-           vtdd24i(j) = -1d0* ( vtr(j) + vti(j) )                             !hr05
-           k = k + 1
-           vw1r(j) = wtreal(k)
-           vw1i(j) = wtimag(k)
-           vd12r(j) = vw1r(j) - vw2r(j)
-           vd12i(j) = vw1i(j) - vw2i(j)
-           vtr(j) = vd12r(j) - vd23r(j)
-           vti(j) = vd12i(j) - vd23i(j)
-           vtdd13r(j) = vtr(j) + vti(j)
-           vtdd13i(j) = vti(j) - vtr(j)
-           vtdddr(j) = vtdd13i(j) - vtdd24i(j)
-           vtdddi(j) = vtdd24r(j) - vtdd13r(j)
-           !  Evaluate polynomial.
-           vxhrel(j) = vxh(j) - dble(vmu(j))
-           vyhrel(j) = vyh(j) - dble(vnu(j))
-           vusum3(j)=half*(vtdd13r(j)+                                       &
-                &(vxhrel(j)*vtdddr(j)-vyhrel(j)*vtdddi(j)))
-           vvsum3(j)=half*(vtdd13i(j)+                                       &
-                &(vxhrel(j)*vtdddi(j)+vyhrel(j)*vtdddr(j)))
-           vyhrel(j) = vyhrel(j) - one
-           vusum(j)=vd12r(j)+(vxhrel(j)*vusum3(j)-vyhrel(j)*vvsum3(j))
-           vvsum(j)=vd12i(j)+(vxhrel(j)*vvsum3(j)+vyhrel(j)*vusum3(j))
-           vxhrel(j) = vxhrel(j) - one
-           vu(j)=vw1r(j)+(vxhrel(j)*vusum(j)-vyhrel(j)*vvsum(j))
-           vv(j)=vw1i(j)+(vxhrel(j)*vvsum(j)+vyhrel(j)*vusum(j))
-
+  integer ilo,ihi
+  !$    integer nt,th,s
+  !$    integer omp_get_num_threads,omp_get_thread_num
+  !-----------------------------------------------------------------------
+  ilo=1
+  ihi=n
+  !$OMP PARALLEL DEFAULT(PRIVATE), SHARED(n,vx,vy,vu,vv,hrecip,kstep,wtreal,wtimag)
+  !$    nt=omp_get_num_threads()
+  !$    th=omp_get_thread_num()
+  !$    s=n/nt
+  !$    ilo=1+s*th
+  !$    ihi=ilo+s-1
+  !$    if (th.eq.nt-1) ihi=n
+  !-----------------------------------------------------------------------
+  in=0
+  out=0
+  do i=ilo,ihi
+     if (vx(i).ge.xcut.or.vy(i).ge.ycut) then
+        out=out+1
+        outs(out)=i
+        if (out.eq.npart) then
+           !     everything outside the rectangle so approximate
+           !     write (*,*) 'ALL outside'
+           !     write (*,*) 'i=',i
+           do j=1,out
+              vp=vx(outs(j))**2-vy(outs(j))**2
+              !hr05 vq(j)=2.d0*vx(j)*vy(j)
+              vq=(2.d0*vx(outs(j)))*vy(outs(j))                         
+              vqsq=vq**2
+              !  First term.
+              vt=vp-b1
+              vr=a1/(vt**2+vqsq)
+              vsreal=vr*vt
+              !hr05 vsimag(j)=-vr(j)*vq(j)
+              vsimag=(-1d0*vr)*vq                              
+              !  Second term
+              vt=vp-b2
+              vr=a2/(vt**2+vqsq)
+              vsreal=vsreal+vr*vt
+              vsimag=vsimag-vr*vq
+              !  Multiply by i*z.
+              !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
+              vu(outs(j))=-1d0*(vy(outs(j))*vsreal+vx(outs(j))*vsimag)   
+              vv(outs(j))=vx(outs(j))*vsreal-vy(outs(j))*vsimag
+           enddo
+           out=0
         endif
-
-     enddo
-!$OMP END DO
-!$OMP END PARALLEL
-
-  else
-     !     everything inside the square, so interpolate
-
-!$OMP PARALLEL PRIVATE(j,k)
-!$OMP DO
-     do j=1,napx
-
-        vxh(j) = hrecip*vx(j)
-        vyh(j) = hrecip*vy(j)
-        vmu(j) = int(vxh(j))
-        vnu(j) = int(vyh(j))
-        !  Compute divided differences.
-        k = 2 + vmu(j) + vnu(j)*kstep
-        vw4r(j) = wtreal(k)
-        vw4i(j) = wtimag(k)
-        k = k - 1
-        vw3r(j) = wtreal(k)
-        vw3i(j) = wtimag(k)
-        vd34r(j) = vw4r(j) - vw3r(j)
-        vd34i(j) = vw4i(j) - vw3i(j)
-        k = k + kstep
-        vw2r(j) = wtreal(k)
-        vw2i(j) = wtimag(k)
-        vd23r(j) = vw2i(j) - vw3i(j)
-        vd23i(j) = vw3r(j) - vw2r(j)
-        vtr(j) = vd23r(j) - vd34r(j)
-        vti(j) = vd23i(j) - vd34i(j)
-        vtdd24r(j) = vti(j) - vtr(j)
-        !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-        vtdd24i(j) = -1d0* ( vtr(j) + vti(j) )                             !hr05
-        k = k + 1
-        vw1r(j) = wtreal(k)
-        vw1i(j) = wtimag(k)
-        vd12r(j) = vw1r(j) - vw2r(j)
-        vd12i(j) = vw1i(j) - vw2i(j)
-        vtr(j) = vd12r(j) - vd23r(j)
-        vti(j) = vd12i(j) - vd23i(j)
-        vtdd13r(j) = vtr(j) + vti(j)
-        vtdd13i(j) = vti(j) - vtr(j)
-        vtdddr(j) = vtdd13i(j) - vtdd24i(j)
-        vtdddi(j) = vtdd24r(j) - vtdd13r(j)
-        !  Evaluate polynomial.
-        vxhrel(j) = vxh(j) - dble(vmu(j))
-        vyhrel(j) = vyh(j) - dble(vnu(j))
-        vusum3(j)=half*(vtdd13r(j)+                                       &
-             &(vxhrel(j)*vtdddr(j)-vyhrel(j)*vtdddi(j)))
-        vvsum3(j)=half*(vtdd13i(j)+                                       &
-             &(vxhrel(j)*vtdddi(j)+vyhrel(j)*vtdddr(j)))
-        vyhrel(j) = vyhrel(j) - one
-        vusum(j)=vd12r(j)+(vxhrel(j)*vusum3(j)-vyhrel(j)*vvsum3(j))
-        vvsum(j)=vd12i(j)+(vxhrel(j)*vvsum3(j)+vyhrel(j)*vusum3(j))
-        vxhrel(j) = vxhrel(j) - one
-        vu(j)=vw1r(j)+(vxhrel(j)*vusum(j)-vyhrel(j)*vvsum(j))
-        vv(j)=vw1i(j)+(vxhrel(j)*vvsum(j)+vyhrel(j)*vusum(j))
-     enddo
-!$OMP END DO
-!$OMP END PARALLEL
-  endif
+     else
+        in=in+1
+        ins(in)=i
+        if (in.eq.npart) then
+           !     everything inside the square, so interpolate
+           !     write (*,*) 'ALL inside'
+           do j=1,in
+              vxh = hrecip*vx(ins(j))
+              vyh = hrecip*vy(ins(j))
+              vmu = int(vxh)
+              vnu = int(vyh)
+              !  Compute divided differences.
+              k = 2 + vmu + vnu*kstep
+              vw4r = wtreal(k)
+              vw4i = wtimag(k)
+              k = k - 1
+              vw3r = wtreal(k)
+              vw3i = wtimag(k)
+              vd34r = vw4r - vw3r
+              vd34i = vw4i - vw3i
+              k = k + kstep
+              vw2r = wtreal(k)
+              vw2i = wtimag(k)
+              vd23r = vw2i - vw3i
+              vd23i = vw3r - vw2r
+              vtr = vd23r - vd34r
+              vti = vd23i - vd34i
+              vtdd24r = vti - vtr
+              !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
+              vtdd24i = -1d0* ( vtr + vti )                             !hr05
+              k = k + 1
+              vw1r = wtreal(k)
+              vw1i = wtimag(k)
+              vd12r = vw1r - vw2r
+              vd12i = vw1i - vw2i
+              vtr = vd12r - vd23r
+              vti = vd12i - vd23i
+              vtdd13r = vtr + vti
+              vtdd13i = vti - vtr
+              vtdddr = vtdd13i - vtdd24i
+              vtdddi = vtdd24r - vtdd13r
+              !  Evaluate polynomial.
+              vxhrel = vxh - dble(vmu)
+              vyhrel = vyh - dble(vnu)
+              vusum3=half*(vtdd13r+                                       &
+                   &(vxhrel*vtdddr-vyhrel*vtdddi))
+              vvsum3=half*(vtdd13i+                                       &
+                   &(vxhrel*vtdddi+vyhrel*vtdddr))
+              vyhrel = vyhrel - one
+              vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
+              vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
+              vxhrel = vxhrel - one
+              vu(ins(j))=vw1r+(vxhrel*vusum-vyhrel*vvsum)
+              vv(ins(j))=vw1i+(vxhrel*vvsum+vyhrel*vusum)
+           enddo
+           in=0
+        endif
+     endif
+  enddo
+  !     everything outside the rectangle so approximate
+  !     write (*,*) 'ALL outside'
+  !     write (*,*) 'i=',i
+  do j=1,out
+     vp=vx(outs(j))**2-vy(outs(j))**2
+     !hr05 vq(j)=2.d0*vx(j)*vy(j)
+     vq=(2.d0*vx(outs(j)))*vy(outs(j))
+     vqsq=vq**2
+     !  First term.
+     vt=vp-b1
+     vr=a1/(vt**2+vqsq)
+     vsreal=vr*vt
+     !hr05 vsimag(j)=-vr(j)*vq(j)
+     vsimag=(-1d0*vr)*vq
+     !  Second term
+     vt=vp-b2
+     vr=a2/(vt**2+vqsq)
+     vsreal=vsreal+vr*vt
+     vsimag=vsimag-vr*vq
+     !  Multiply by i*z.
+     !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
+     vu(outs(j))=-1d0*(vy(outs(j))*vsreal+vx(outs(j))*vsimag)
+     vv(outs(j))=vx(outs(j))*vsreal-vy(outs(j))*vsimag
+  enddo
+  !     everything inside the square, so interpolate
+  !     write (*,*) 'ALL inside'
+  do j=1,in
+     vxh = hrecip*vx(ins(j))
+     vyh = hrecip*vy(ins(j))
+     vmu = int(vxh)
+     vnu = int(vyh)
+     !  Compute divided differences.
+     k = 2 + vmu + vnu*kstep
+     vw4r = wtreal(k)
+     vw4i = wtimag(k)
+     k = k - 1
+     vw3r = wtreal(k)
+     vw3i = wtimag(k)
+     vd34r = vw4r - vw3r
+     vd34i = vw4i - vw3i
+     k = k + kstep
+     vw2r = wtreal(k)
+     vw2i = wtimag(k)
+     vd23r = vw2i - vw3i
+     vd23i = vw3r - vw2r
+     vtr = vd23r - vd34r
+     vti = vd23i - vd34i
+     vtdd24r = vti - vtr
+     !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
+     vtdd24i = -1d0* ( vtr + vti )                             !hr05
+     k = k + 1
+     vw1r = wtreal(k)
+     vw1i = wtimag(k)
+     vd12r = vw1r - vw2r
+     vd12i = vw1i - vw2i
+     vtr = vd12r - vd23r
+     vti = vd12i - vd23i
+     vtdd13r = vtr + vti
+     vtdd13i = vti - vtr
+     vtdddr = vtdd13i - vtdd24i
+     vtdddi = vtdd24r - vtdd13r
+     !  Evaluate polynomial.
+     vxhrel = vxh - dble(vmu)
+     vyhrel = vyh - dble(vnu)
+     vusum3=half*(vtdd13r+                                       &
+          &(vxhrel*vtdddr-vyhrel*vtdddi))
+     vvsum3=half*(vtdd13i+                                       &
+          &(vxhrel*vtdddi+vyhrel*vtdddr))
+     vyhrel = vyhrel - one
+     vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
+     vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
+     vxhrel = vxhrel - one
+     vu(ins(j))=vw1r+(vxhrel*vusum-vyhrel*vvsum)
+     vv(ins(j))=vw1i+(vxhrel*vvsum+vyhrel*vusum)
+  enddo
+  !$OMP END PARALLEL
   return
 end subroutine wzsubv
 subroutine wzsub(x,y,u,v)
