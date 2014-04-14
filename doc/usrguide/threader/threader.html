@@ -13,44 +13,57 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 <!H4><!IMG ISMAP SRC="http://cern.ch/Frank.Schmidt/dynap/icons/at_work.gif"height=90><!Under construction and not yet reliable!!!!!><!/A><!/H4>
 <!/P>
 
-The <b>threader</b> simulates beam steering through a machine with field and
-alignment errors in situations where the beam does not circulate and the
-closed orbit cannot be measured.
+In a machine with magnetic and alignment errors it can happen that the beam 
+does not circulate and the closed orbit cannot be established and measured. 
+This can also happen in MAD-X and the closed orbit finder does not converge.
 <p>
-If enabled, threading is executed whenever a trajectory or closed orbit search is
-carried out by the
-<A HREF="../twiss/twiss.html">TWISS</A> module.
+The <b>threader</b> simulates beam steering through such a machine with repeated 
+measurement of trajectory over a certain number of monitors and correction of the 
+trajectory with upstream correctors.  
 <p>
-The following MAD-X commands control the action of the threader :
+When enabled, threading is executed whenever a trajectory or closed orbit search is
+carried out by the <A HREF="../twiss/twiss.html">TWISS</A> module.
+<p>
 
-<p><br><br><pre>
+The threader is controlled as an option. 
+The following MAD-X commands enables the threader :
+<p><pre>
 <b>option, threader ;</b>
 </pre>
-
-enables the threader
-<p>
-when set, the threader checks at all monitors the difference with
-respect to the stored orbit there (from
-<A HREF="../twiss/twiss.html">keeporbit</A>) if
-<A HREF="../twiss/twiss.html">useorbit</A> is
-present. The threader then provides kicks (if possible) to reduce
-the orbit difference below the maxima specified on the threader
-command. This procedure allows to thread with orbit bumps present
-
-<p><br><br><pre>
-<b>threader, vector = {xmax, ymax, att} ;</b>
+and the threader can be disabled with
+<p><pre>
+<b>option, -threader ;</b>
 </pre>
 
-sets the parameters for the threader
-<pre>
-xmax, ymax : orbit excursion (at a monitor) at which threader acts
+<p>
+During the trajectory search in Twiss, or the first turn of the orbit search for a closed machine, 
+the threader calculates at each monitor the difference between the present trajectory reading and a reference value. 
+If the difference exceeds a threshold (see below), the threader searches backwards for the first corrector that 
+will efficiently cancel the difference and calculates the corresponding kick. The trajectory is then recalculated 
+starting again from that corrector and progressing forward. The calculated kicks are added to already existing kicks. 
+If Twiss is searching for a closed orbit which involves tracking this trajectory over many turns, the threader is 
+only active during the first turn. 
+<p>
+The reference value for the trajectory difference is zero by default but can also be obtained from a previous orbit 
+calculation if the current <b>Twiss</b> command has the <b>useorbit</b> flag enabled and a previous <b>Twiss</b> 
+command had the <b>keeporbit</b> flag enabled. 
+<p>
+The threshold values for triggering the threader correction can be set with the command 
+<p><pre>
+<b>threader, vector = {xmax, ymax, att} ;</b>
+</pre>
+where <pre>
+xmax, ymax : threshold orbit excursions beyond which the threader is applied.
 att        : attenuation factor for the kicks applied by the threader
 defaults   : {0.005, 0.005, 1.000}
 </pre>
+The attenuation factor defines the fraction of the calculated kick that is actually applied by the threader. 
+An attenuation factor of 0.5 will apply 50% of the calculated kicks. 
 
-<p><br><br>
+<p>
 <HR><address>
 Hans Grote, 31.10.2008
+Ghislain Roy, 14.04.2014
 </address>
 
 </body>

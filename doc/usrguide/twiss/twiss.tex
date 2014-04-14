@@ -494,35 +494,61 @@ in the interface to other programs, such as TRAIN.
 %%\title{Threader}
 
 \section{Beam Threader} 
-The \textbf{threader} simulates beam steering through a machine with
-field and alignment errors in situations where the beam does not
-circulate and the closed orbit cannot be measured.  
 
-If enabled, threading is executed whenever a trajectory or closed orbit
-search is carried out by the \href{../twiss/twiss.html}{TWISS} module.  
+In a machine with magnetic and alignment errors it can happen that the
+beam does not circulate and the closed orbit cannot be established and
+measured. This can also happen in MAD-X and the closed orbit finder does
+not converge. 
 
-The following MAD-X commands control the action of the threader :   
+The \textbf{threader} simulates beam steering through such a machine
+with repeated measurement of trajectory over a certain number of
+monitors and correction of the trajectory with upstream correctors.   
+
+When enabled, threading is executed whenever a trajectory or closed
+orbit search is carried out by the \href{../twiss/twiss.html}{TWISS}
+module.   
+
+The threader is controlled as an option. 
+The following MAD-X commands enables the threader :
 \begin{verbatim}
 option, threader ;
 \end{verbatim}  
-enables the threader 
+and the threader can be disabled with
+\begin{verbatim}
+option, -threader ;
+\end{verbatim}  
 
-When set, the threader checks at all monitors the difference with
-respect to the stored orbit there (from
-\href{../twiss/twiss.html}{keeporbit}) if
-\href{../twiss/twiss.html}{useorbit} is present. The threader then
-provides kicks (if possible) to reduce the orbit difference below the
-maxima specified on the threader command. This procedure allows to
-thread with orbit bumps present.   
+During the trajectory search in Twiss, or the first turn of the orbit
+search for a closed machine, the threader calculates at each monitor the
+difference between the present trajectory reading and a reference value.  
+If the difference exceeds a threshold (see below), the threader searches
+backwards for the first corrector that will efficiently cancel the
+difference and calculates the corresponding kick. The trajectory is then
+recalculated starting again from that corrector and progressing
+forward. The calculated kicks are added to already existing kicks. If
+Twiss is searching for a closed orbit which involves tracking this
+trajectory over many turns, the threader is only active during the first
+turn.  
 
+The reference value for the trajectory difference is zero by default but
+can also be obtained from a previous orbit calculation if the current
+{\tt Twiss} command has the {\tt useorbit} flag enabled and a previous
+{\tt Twiss} command had the {\tt keeporbit} flag enabled. This allows
+for example to thread the beam into a machine with orbit bumps present.  
+
+The threshold values for triggering the threader correction can be set
+with the command  
 \begin{verbatim}
 threader, vector = {xmax, ymax, att} ;
 \end{verbatim}  
-sets the parameters for the threader 
-\begin{verbatim}
-xmax, ymax : orbit excursion (at a monitor) at which threader acts
-att        : attenuation factor for the kicks applied by the threader
-defaults   : {0.005, 0.005, 1.000}
-\end{verbatim}
+where 
+\begin{madlist}
+\ttitem{xmax, ymax} threshold orbit excursions beyond which the threader
+is applied. \\ Defaults: 0.005, 0.005
+\ttitem{att} attenuation factor for the kicks applied by the threader
+\\ Default: 1.0 
+\end{madlist}
 
-
+The attenuation factor defines the fraction of the calculated kick that
+is actually applied by the threader.  
+An attenuation factor of 0.5 will apply 50\% of the calculated kicks.

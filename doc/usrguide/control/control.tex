@@ -29,6 +29,7 @@ so on.
 %% 	\item \href{special.html#macro}{MACRO}
 %% \end{itemize}
 %\input{control/special}
+
 \section{Program Flow Statements}
 
 \subsection{IF}
@@ -297,6 +298,13 @@ user table \hyperlink{create}{create}d beforehand. This table one can
 then \hyperlink{write}{write} in TFS format.  See as well the
 \href{../Introduction/select.html#ucreate}{user table} example.  
 
+\subsection{HELP}
+\begin{verbatim}
+help, statement_name;
+\end{verbatim}
+prints all parameters, and their defaults values, for the statement given;
+this includes basic element types.
+
 \subsection{OPTION}
 \label{subsec:general_option}
 \begin{verbatim}
@@ -448,7 +456,6 @@ remove the file "file\_name" from disk. It is more portable than
 system("rm filename"); // Unix specific
 \end{verbatim}
 
-
 \subsection{RENAMEFILE}
 \begin{verbatim}
 renamefile, file = "file_name", name = "new_file_name";
@@ -458,6 +465,7 @@ portable than
 \begin{verbatim}
 system("mv file_name new_file_name"); // Unix specific
 \end{verbatim}
+
 
 %% 2013-Jul-11  17:24:21  ghislain: I propose to move RESBEAM to the
 %% beam declaration part of the manual
@@ -575,54 +583,136 @@ will save and show the beta0 block parameters at the end (!) of the
 fifth element of type mb in the sequence.  
 
 
-\subsection{SELECT} %select</a}{SELECT}
+\subsection{SELECT} 
 \begin{verbatim}
 select, flag = flag, range = range, class = class, pattern = pattern,
-        slice = integer, column =s1, s2, s3,..,sn, sequence=sequence_name,
-        full, clear;
+        sequence=sequence_name, full, clear,
+        column = s1, s2, s3,..,sn,  slice = integer, thick=logical;
 \end{verbatim} 
 selects one or several elements for special treatment in a subsequent
-command. All selections for a given command remain valid until "clear"
-is specified; the selection criteria on the same command are logically
-ANDed; the selection criteria on different SELECT statements logically
-ORed.   
+command based on selection criteria.
 
- Example: 
-\begin{verbatim}
-select, flag = error, class = quadrupole, range = mb[1]/mb[5];
-select, flag = error, pattern = "^mqw.*";
-\end{verbatim} 
-selects all quadrupoles in the range mb[1] to mb[5], and all elements
-(in the whole sequence) the name of which starts with "mqw", for
-treatment by the error module.  
+The selection criteria on a single SELECT statement are logically
+ANDed, in other words, selected elements have to fulfill the {\tt RANGE},
+{\tt CLASS}, and {\tt PATTERN} criteria.  
+The selection criteria on different SELECT statements are logically
+ORed, in other words selected elements have to fulfill any of the
+selection criteria accumulated by the different statements.   
+All selections for a given command remain valid until the "clear" argument
+is specified; 
 
-"flag" can be one of the following: 
-\begin{itemize}
-   \item seqedit: selection of elements for the
+The "flag" argument allows a determination of the applicability of the
+SELECT statement and can be one of the following: 
+\begin{madlist}
+   \ttitem{seqedit} selection of elements for the
      \href{seqedit.html}{seqedit} module.  
-   \item error: selection of elements for the
+   \ttitem{error} selection of elements for the
      \href{../error/error.html}{error} assignment module.  
-   \item makethin: selection of elements for the
+   \ttitem{makethin} selection of elements for the
      \href{../makethin/makethin.html}{makethin} module that
      converts the sequence into one with thin elements only.  
-   \item sectormap: selection of elements for the
+   \ttitem{sectormap} selection of elements for the
      \href{../Introduction/sectormap.html}{sectormap} output file
      from the Twiss module.  
-   \item table: here "table" is a table name such as twiss, track
+   \ttitem{save} selection of elements for the {\tt SAVE} command.  
+   \ttitem{table} is a table name such as {\tt twiss}, {\tt track}
      etc., and the rows and columns to be written are selected.  
-\end{itemize} 
+\end{madlist} 
 
-For the RANGE, CLASS, PATTERN, FULL, and CLEAR parameters
-see \href{../Introduction/select.html}{SELECT}.  
+The statement
+\begin{verbatim}
+SELECT, FLAG=name, FULL;
+\end{verbatim} 
+selects ALL positions in the sequence for the flag "name". This is the default
+for flags for all tables and {\tt MAKETHIN}.
+
+The statement 
+\begin{verbatim}
+SELECT, FLAG=name, CLEAR;
+\end{verbatim} 
+deselects ALL positions in the sequence for the flag "name". This is the default
+for flags {\tt ERROR} and {\tt SEQEDIT}.
 
 "slice" is only used by \href{../makethin/makethin.html}{makethin} and
 prescribes the number of slices into which the selected elements have to
 be cut (default = 1).  
 
-"column" is only valid for tables and decides the selection of columns
+"column" is only valid for tables and determines the selection of columns
 to be written into the TFS file. The "name" argument is special in that
 it refers to the actual name of the selected element. For an example,
 see \href{../Introduction/select.html}{SELECT}.  
+
+"thick" is used to determine whether the selected elements will be
+treated as thick elements by the MAKETHIN command. This only applies to
+QUADRUPOLES and BENDS for which thick maps have been explicitely
+derived. (see ...) 
+%%2014-Apr-08  17:43:44  ghislain:  A completer.
+
+Example: 
+\begin{verbatim}
+select, flag = error, class = quadrupole, range = mb[1]/mb[5];
+select, flag = error, pattern = "^mqw.*";
+\end{verbatim} 
+selects all quadrupoles in the range mb[1] to mb[5], as well as all
+elements (in the whole sequence) with name starting with "mqw", for 
+treatment by the error module.  
+
+Example:  
+\begin{verbatim}
+select, flag=save, class=variable, pattern="abc.*";
+save, file=mysave;
+\end{verbatim} 
+will save all variables (and sequences) containing "abc" in their name.
+However note that since the element class "variable" does not exist, any
+element with name containing "abc" will not be saved. 
+
+
+\subsection{Set Statements}
+\begin{verbatim}
+set, format="...", sequence="...";
+\end{verbatim} 
+
+The set command allows 2 actions: 
+
+\subsubsection{1) Format} 
+The first command lets you vary the output precision. 
+\begin{verbatim}
+parameter: format = s1, s2, s3
+\end{verbatim} 
+(up to) three strings defining the integer, floating, and string output
+format for the save, show, value, and table output. The formats can be
+given in any order and stay valid until replaced. The defaults are:  
+\begin{verbatim}
+"10d","18.10g","-18s".
+\end{verbatim} 
+They follow the C convention. The quotes are mandatory. The allowed formats are: 
+\begin{verbatim}
+"nd" for integer with n = field width.
+\end{verbatim}
+\begin{verbatim}
+"m.nf" or "m.ng" or "m.ne" for floating, m field width, n precision.
+\end{verbatim}
+\begin{verbatim}
+"ns" for string output.
+\end{verbatim} 
+The default is "right adjusted", a "-" changes it to "left adjusted".  Example: 
+\begin{verbatim}
+set,format="22.14e";
+\end{verbatim} 
+changes the current floating point format to 22.14e; the other formats remain untouched. 
+\begin{verbatim}
+set,format="s","d","g";
+\end{verbatim} 
+sets all formats to automatic adjustment according to C conventions. 
+
+\subsubsection{2) Sequence} The second command lets you choose the
+current sequence without having to use the "USE" command, which would
+bring you back to a bare lattice without errors. The command only works
+if the chosen sequence had been activated before with the "USE" command,
+otherwise a warning will be issued and MAD-X will continue with the
+unmodified current sequence. This command is particularly useful for
+commands that do not have the sequence as an argument like "EMIT" or
+"IBS". 
 
 
 \subsection{SHOW}
@@ -1114,12 +1204,12 @@ command has been issued before.
 
 The quantities are entered by a BEAM command: 
 \begin{verbatim}
-BEAM, PARTICLE=name,MASS=real,CHARGE=real,
-      ENERGY=real,PC=real,GAMMA=real, BETA=real,
-      EX=real,EXN=real,EY=real,EYN=real,
-      ET=real,SIGT=real,SIGE=real,
-      KBUNCH=integer,NPART=real,BCURRENT=real,
-      BUNCHED=logical,RADIATE=logical,BV=integer,SEQUENCE=name;
+BEAM, PARTICLE=name, MASS=real, CHARGE=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real,
+      EX=real, EXN=real, EY=real, EYN=real,
+      ET=real, SIGT=real, SIGE=real,
+      KBUNCH=integer, NPART=real, BCURRENT=real,
+      BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
 \end{verbatim} 
 
 {\bf Warning:} BEAM updates, i.e. it replaces attributes explicitely
