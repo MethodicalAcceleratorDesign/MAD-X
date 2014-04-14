@@ -50,7 +50,7 @@ FC_DIR := src libs/ptc/src
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 
 # files specific compiler flag (i.e. "internal compiler error" message)
-matchlib2.o:        NOPT := 0
+matchlib2.o:        override NOPT := 0
 l_complex_taylor.o: NOPT := 2
 
 ifeq ($(ARCH),32)
