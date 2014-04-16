@@ -43,6 +43,7 @@ cmake/madX.gif -text svneol=unset#unset
 cmake/madxInit.cmake -text
 cmake/numdiff_macros.cmake -text
 cmake/numdifftests.cmake -text
+cmake/print_missing_tests.py -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
 cmake/setupExternalProjects.cmake -text
