@@ -344,7 +344,7 @@ hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
 {
   double pos;
   struct node* c_node;
-  char tmp[NAME_L];
+  char tmp[2*NAME_L];
   int i;
   strcpy(tmp, name);
   square_to_colon(tmp);

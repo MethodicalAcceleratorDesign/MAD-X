@@ -838,6 +838,10 @@ subroutine pegaxn (nax, vax, sax, ns)
      do  i = 1, nax
         saloc = vax(i)
         call gxpnbl(saloc, k1, k2)
+
+! BUG HERE, saloc='' and k2=0 for i=2, 'bety' disappeared!!!!
+! saloc(k2:k2) should not be evaluated, but it seems to be...
+
         if (k2 .gt. 1 .and. index('XY', saloc(k2:k2)) .ne. 0)  then
            scut = saloc(:k2-1)
            do j = 1, ns
@@ -1637,6 +1641,7 @@ subroutine pemima
   character * (mtitl)  s
   character * (mxlabl) slab
   character * (mcnam) sdum(mxcurv), saxis(mxcurv), vaxis(mxcurv,4)
+  character * 16 vaxx(mxcurv)
 
   !--- Initialisation of variables in common peaddi
 
@@ -1697,16 +1702,25 @@ subroutine pemima
      nvvar(k) = nvvar(k) + 1
      vaxis(nvvar(k),k) = slabl(j)
   enddo
+
   do iv = 1, 4
      if (nvvar(iv) .gt. 0)  then
         if (nvvar(iv) .eq. 1)  then
            call pegetn (1, vaxis(1,iv), itbv, idum, sdum, slab)
            ns = 1
         else
-           call pegaxn (nvvar(iv), vaxis(1,iv), saxis, ns)
+	   ! copy saxis and ns otherswise they are not present in pegaxn (why ?)
+	   saxis(1) = ' '
+	   ns = 0
+	   do j=1,nvvar(iv)
+	     vaxx(j)=vaxis(j,iv)
+           enddo
+           call pegaxn (nvvar(iv), vaxx, saxis, ns) ! WAS pegaxn(nvvar(iv), vaxis(1,iv), saxis, ns)
            call pegetn (1, saxis(1), itbv, idum, sdum, slab)
         endif
+
         call gxpnbl (slab, k1, k2)
+
         s  = '<#>' // slab
         k2 = k2 + 3
         do i = 2, ns
@@ -2565,6 +2579,7 @@ subroutine pesopt(ierr)
         proc_flag(1,j) = 0
      endif
   enddo
+
 999 end subroutine pesopt
   !***********************************************************************
 

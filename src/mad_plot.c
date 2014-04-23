@@ -414,20 +414,18 @@ exec_plot(struct in_cmd* cmd)
       if (p_table->origin) title = p_table->name;
       else if (nt && current_sequ != NULL) title = current_sequ->name;
       pesopt_(&ierr);
-      if (ierr == 0)
-	{
-	  if (p_table->origin == 0)
-	    {
-	      adjust_beam();
-	      probe_beam = clone_command(current_beam);
-	      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-	      adjust_rfc(); /* sets freq in rf-cavities from probe */
-	    }
-	  pefill_(&ierr);
-	  pemima_();
-	  plotit_(&plots_made);
-	  plots_made = 1;
-	}
+      if (ierr == 0) {
+    	  if (p_table->origin == 0) {
+    	      adjust_beam();
+    	      probe_beam = clone_command(current_beam);
+    	      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+    	      adjust_rfc(); /* sets freq in rf-cavities from probe */
+    	  }
+    	  pefill_(&ierr);
+    	  pemima_();
+    	  plotit_(&plots_made);
+    	  plots_made = 1;
+    	}
       /* HG 21.10.09 allow plot from external table, end part 2 */
       if (nt) title = pt;
     }

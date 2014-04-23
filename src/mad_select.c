@@ -224,13 +224,14 @@ int
 get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
   /* returns start and end node (nodes[0] and nodes[1])
      of a range in the full expanded sequence */
+// LD: Same function as get_table_range
 {
   int i, n, pos;
-  char tmp[NAME_L], buf[5*NAME_L], *c[2];
+  char tmp[2*NAME_L], buf[5*NAME_L], *c[2];
 
   if (sequ == NULL) return 0;
 
-  strcpy(buf, range); stolower(buf);
+  stolower(strcpy(buf, range));
   c[0] = strtok(buf, "/");
 
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
@@ -273,12 +274,13 @@ get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 {
   /* returns start and end node (nodes[0] and nodes[1])
      of a range between range_start and range_end of an expanded sequence */
+// LD: Same function as get_table_range
   int i, n;
   struct node* c_node;
-  char tmp[NAME_L], buf[5*NAME_L], *c[2];
+  char tmp[2*NAME_L], buf[5*NAME_L], *c[2];
 
   if (sequ == NULL) return 0;
-  strcpy(buf, range); stolower(buf);
+  stolower(strcpy(buf, range));
 
   c[0] = strtok(buf, "/");
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
@@ -326,12 +328,14 @@ int
 get_range(char* range, struct sequence* sequ, struct node** nodes)
   /* returns start and end node (nodes[0] and nodes[1])
      of a range in the non-expanded sequence */
+// LD: Same function as get_table_range
 {
-  char tmp[NAME_L], buf[5*NAME_L], *c[2];
+  char tmp[2*NAME_L], buf[5*NAME_L], *c[2];
   int i, n, pos;
+
   if (sequ == NULL) return 0;
 
-  strcpy(buf, range); stolower(buf);
+  stolower(strcpy(buf, range));
   c[0] = strtok(buf, "/");
 
   if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
