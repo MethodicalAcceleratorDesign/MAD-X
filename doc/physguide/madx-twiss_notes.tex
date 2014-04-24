@@ -47,6 +47,7 @@
 \setmarginsrb{15mm}{8mm}{15mm}{10mm}{12pt}{10mm}{0pt}{10mm}
 
 % shortcut
+\renewcommand{\L}[1]{\lstinline[firstnumber=last]{#1}}
 \newcommand{\T}[1]{{\tt #1}}
 \newcommand{\madx}{\mbox{MAD-X}\xspace}
 \newcommand{\madeight}{\mbox{MAD8}\xspace}
@@ -90,9 +91,12 @@ The implementation of the Twiss module was inherited from \madeight and adapted 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bending magnets}
 
-\subsection{The routine \lstinline{tmbend}}
+\madx does not support the so called ``true \T{RBEND}'' element. This kind of magnet is internally represented as a sector bend (i.e. \T{SBEND}) with the pole faces made parallel by setting the pole face angles to $\T{e1}=\T{e2}=\alpha/2$, where $\alpha$ is the \T{SBEND} angle.
+
+
+\subsection{The routine \L{tmbend}}
 \subsubsection{Preamble}
-Declaration and preamble:
+Declarations and preamble:
 \begin{lstlisting}[firstnumber=auto]
 SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
@@ -121,56 +125,52 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
        te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
        el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
        st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
-       el0,orbit0(6),zero,one,two,three
+       el0,orbit0(6)
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   integer, external :: el_par_vector ! function from the C core
   integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 \end{lstlisting}
-
-Changes the element code number \lstinline[firstnumber=last]{code}  from 39 (?) to 15 (?), or from 38 (?) to 24 (?); initializes the matrix \lstinline[firstnumber=last]{rw} to the identity, the tensor \lstinline[firstnumber=last]{tw} and the vector \lstinline[firstnumber=last]{ek0} are set to zero.
+The following statements retrieve the \madeight elements \L{code} and change them from \L{tkicker} (39) to \L{kicker} (15), and from \L{placeholder} (38) to \L{instrument} (24), and initializes the matrix \L{rw} to the identity, and the tensor \L{tw} and the vector \L{ek0} to zero.
 \begin{lstlisting}[firstnumber=last]
   !---- Initialize.
-  ct=zero
-  st=zero
-  code = node_value('mad8_type ')
+  ct=0
+  st=0
+  code = node_value('mad8_type ') ! function from the C core
   if(code.eq.39) code=15
   if(code.eq.38) code=24
-  deltap=zero
+  deltap=0
   call dzero(ek0,6)
   call m66one(rw)
   call dzero(tw,216)
 \end{lstlisting}
-
-If the element has nonzero length the logical variable \lstinline[firstnumber=last]{fmap} is set to \lstinline[firstnumber=last]{true}.
-If the element has zero length it simply jumps to the end.
+If the element has nonzero length the logical variable \L{fmap} is set to \L{true}.
+If the element has zero length it simply jumps to the end. [{\em Suggestion: to replace by \L{if (el.eq.0) return}}.]
 
 \begin{lstlisting}[firstnumber=last]
   !---- Test for non-zero length.
-
-  fmap = el .ne. zero
+  fmap = el.ne.0
   if (fmap) then
-  
   \end{lstlisting}
-It reads the bend parameters from the command line and some dynamic variables from \lstinline[firstnumber=last]{probe}:
+TODO
+It reads the bend parameters from the command line and some dynamic variables from \L{probe}:
   \begin{lstlisting}[firstnumber=last]
      call dzero(f_errors,maxferr+1)
      n_ferr = node_fd_errors(f_errors)
      !-- get element parameters
-     elpar_vl = el_par_vector(b_k3s, g_elpar)
+     elpar_vl = el_par_vector(b_k3s, g_elpar) ! get strengths up to k3s
      bvk = node_value('other_bv ')
      arad = get_value('probe ','arad ')
      deltap = get_value('probe ','deltap ')
      gamma = get_value('probe ','gamma ')
-     dorad = get_value('probe ','radiate ') .ne. zero
+     dorad = get_value('probe ','radiate ') .ne. 0
      an = bvk * g_elpar(b_angle)
      tilt = g_elpar(b_tilt)
      e1 = g_elpar(b_e1)
      e2 = g_elpar(b_e2)
 
      if(code.eq.2) then
-        e1 = e1 + an / two
-        e2 = e2 + an / two
+        e1 = e1 + an / 2
+        e2 = e2 + an / 2
      endif
 
      !---  bvk also applied further down
@@ -185,31 +185,31 @@ It reads the bend parameters from the command line and some dynamic variables fr
      sks = g_elpar(b_k1s)
      h = an / el
   \end{lstlisting}
-\lstinline[firstnumber=last]{h} is $h=1/\rho$. I guess the following \lstinline[firstnumber=last]{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \lstinline[firstnumber=last]{deltap} is w.r.t. the nominal value. The first branch of this \lstinline[firstnumber=last]{if} takes into account the field errors, also.
+\L{h} is $h=1/\rho$. I guess the following \L{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
   \begin{lstlisting}[firstnumber=last]
      !---- Apply field errors and change coefficients using DELTAP.
      if (n_ferr .gt. 0) then
         nd = n_ferr
         call dzero(field,nd)
         call dcopy(f_errors,field,n_ferr)
-        dh = (- h * deltap + bvk * field(1,0) / el) / (one + deltap)
-        sk1 = (sk1 + field(1,1) / el) / (one + deltap)
-        sk2 = (sk2 + field(1,2) / el) / (one + deltap)
-        sks = (sks + field(2,1) / el) / (one + deltap)
+        dh = (- h * deltap + bvk * field(1,0) / el) / (1 + deltap)
+        sk1 = (sk1 + field(1,1) / el) / (1 + deltap)
+        sk2 = (sk2 + field(1,2) / el) / (1 + deltap)
+        sks = (sks + field(2,1) / el) / (1 + deltap)
      else
-        dh = - h * deltap / (one + deltap)
-        sk1 = sk1 / (one + deltap)
-        sk2 = sk2 / (one + deltap)
-        sks = sks / (one + deltap)
+        dh = - h * deltap / (1 + deltap)
+        sk1 = sk1 / (1 + deltap)
+        sk2 = sk2 / (1 + deltap)
+        sks = sks / (1 + deltap)
      endif
   \end{lstlisting}
-Applies \lstinline[firstnumber=last]{bvk}-flag.
+Applies \L{bvk}-flag.
  \begin{lstlisting}[firstnumber=last]
      sk1 = bvk * sk1
      sk2 = bvk * sk2
      sks = bvk * sks
   \end{lstlisting}
-  if the flags \lstinline[firstnumber=last]{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
+  if the flags \L{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
  \begin{lstlisting}[firstnumber=last]
      !---- Half radiation effects at entrance.
      if (ftrk .and. dorad) then
@@ -217,22 +217,22 @@ Applies \lstinline[firstnumber=last]{bvk}-flag.
         st = sin(tilt)
         x =   orbit(1) * ct + orbit(3) * st
         y = - orbit(1) * st + orbit(3) * ct
-        hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                  &
-             sk2*(x**2 - y**2)/two
+        hx = h + dh + sk1*(x - h*y**2/2) + sks*y +                  &
+             sk2*(x**2 - y**2)/2
         hy = sks * x - sk1*y - sk2*x*y
-        rfac = (arad * gamma**3 * el / three)                         &
-             * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+        rfac = (arad * gamma**3 * el / 3)                         &
+             * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e1)*x)
         pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+        orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
+        orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
+        orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
      endif
   \end{lstlisting}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Option ``centre''}
-If \lstinline[firstnumber=last]{centre} option
+If \L{centre} option
    \begin{lstlisting}[firstnumber=last]
      !---- Body of the dipole.
      !---- centre option
@@ -244,28 +244,28 @@ If \lstinline[firstnumber=last]{centre} option
   \end{lstlisting}
 It halves the length of the element.
    \begin{lstlisting}[firstnumber=last]
-        el0=el/two
+        el0=el/2
 \end{lstlisting}
-It stores the element's \textit{kick}, \textit{transfer matrix}, and \textit{tensor} for such a halved sector bend in \lstinline[firstnumber=last]{ek,re,te}:
+It stores the element's \textit{kick}, \textit{transfer matrix}, and \textit{tensor} for such a halved sector bend in \L{ek,re,te}:
 \begin{lstlisting}[firstnumber=last]
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
 \end{lstlisting}
-It stores the $R$ and $T$ for the fringing field in \lstinline[firstnumber=last]{rw} and \lstinline[firstnumber=last]{tw} respectively; then it concatenates the transport maps in such that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te}:
+It stores the $R$ and $T$ for the fringing field in \L{rw} and \L{tw} respectively; then it concatenates the transport maps in such that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \L{ek},  \L{re}, and \L{te}:
 \begin{lstlisting}[firstnumber=last]
         !---- Fringe fields.
         corr = (h + h) * hgap * fint
-        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+        call tmfrng(.true.,h,sk1,e1,h1,1,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
 \end{lstlisting}
 It rotates the map:
 \begin{lstlisting}[firstnumber=last]
         !---- Apply tilt.
-        if (tilt .ne. zero) then
+        if (tilt .ne. 0) then
            call tmtilt(.true.,tilt,ek,re,te)
            cplxy = .true.
         endif
 \end{lstlisting}
-If the flag \lstinline[firstnumber=last]{ftrk} is set, tracks the orbit through such a halved bend then zeroes \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te}:
+If the flag \L{ftrk} is set, tracks the orbit through such a halved bend then zeroes \L{ek},  \L{re}, and \L{te}:
 \begin{lstlisting}[firstnumber=last]
         !---- Track orbit.
         call dcopy(orbit,orbit0,6)
@@ -282,13 +282,13 @@ If the flag \lstinline[firstnumber=last]{ftrk} is set, tracks the orbit through 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Body of the dipole}
-  It fills  \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te} with kick, matrix and tensor for the sector bend. Then fills  \lstinline[firstnumber=last]{rw}, and \lstinline[firstnumber=last]{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields. Notice that if the option ``centre'' is selected, the initial fringing field has  already been applied, thing which not seems to be correct.  
+  It fills  \L{ek},  \L{re}, and \L{te} with kick, matrix and tensor for the sector bend. Then fills  \L{rw}, and \L{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields. Notice that if the option ``centre'' is selected, the initial fringing field has  already been applied, thing which not seems to be correct.  
    \begin{lstlisting}[firstnumber=last]
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
      !---- Fringe fields.
      corr = (h + h) * hgap * fint
-     call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+     call tmfrng(.true.,h,sk1,e1,h1,1,corr,rw,tw)
      call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      !---- Tor: use FINTX if set
      if (fintx .ge. 0) then
@@ -296,13 +296,13 @@ If the flag \lstinline[firstnumber=last]{ftrk} is set, tracks the orbit through 
      else
         corr = (h + h) * hgap * fint
      endif
-     call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
+     call tmfrng(.true.,h,sk1,e2,h2,-1,corr,rw,tw)
      call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
 \end{lstlisting}
 It rotates the map:
 \begin{lstlisting}[firstnumber=last]
      !---- Apply tilt.
-     if (tilt .ne. zero) then
+     if (tilt .ne. 0) then
         call tmtilt(.true.,tilt,ek,re,te)
         cplxy = .true.
      endif
@@ -319,20 +319,21 @@ Radiation effects at the exit:
         if (ftrk .and. dorad) then
            x =   orbit(1) * ct + orbit(3) * st
            y = - orbit(1) * st + orbit(3) * ct
-           hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                &
-                sk2*(x**2 - y**2)/two
+           hx = h + dh + sk1*(x - h*y**2/2) + sks*y +                &
+                sk2*(x**2 - y**2)/2
            hy = sks * x - sk1*y - sk2*x*y
-           rfac = (arad * gamma**3 * el / three)                       &
-                * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           rfac = (arad * gamma**3 * el / 3)                       &
+                * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e2)*x)
            pt = orbit(6)
-           orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-           orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-           orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+           orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
+           orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
+           orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
         endif
      endif
-  endif
+  endif ! if (fmap) line 44
 
   !---- Tor: set parameters for sychrotron integral calculations
+  ! LD: useless code?
   rhoinv = h
   blen = el
 
@@ -341,7 +342,7 @@ end SUBROUTINE tmbend
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The routine {tmsect}}
-\lstinline[firstnumber=last]{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \lstinline[firstnumber=last]{ek,re,te} with kick, matrix and tensor for this sector bend.
+\L{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \L{ek,re,te} with kick, matrix and tensor for this sector bend.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -364,8 +365,8 @@ end SUBROUTINE tmbend
 \appendix
 \section{Appendix}
 \begin{itemize}
-\item[-] \lstinline[firstnumber=last]{dcopy(in,out,n)}
-\item[-] \lstinline[firstnumber=last]{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
+\item[-] \L{dcopy(in,out,n)}
+\item[-] \L{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
 e_{d}\\
 R_{d}\\
 T_{d}
@@ -373,7 +374,7 @@ T_{d}
 e_{b}\\
 R_{b}\\
 T_{b}
-\end{array}\right\} \cdot\left\{ \begin{array}{c}
+\end{array}\right\} \circ \left\{ \begin{array}{c}
 e_{a}\\
 R_{a}\\
 T_{a}
