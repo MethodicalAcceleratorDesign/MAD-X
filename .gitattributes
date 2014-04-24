@@ -1866,6 +1866,15 @@ tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
 tools/numdiff/Makefile_lib -text
 tools/numdiff/Makefile_test -text
+tools/numdiff/doc/CERN-ACC-NOTE-2013-0005.pdf -text
+tools/numdiff/doc/cern-art.cls -text
+tools/numdiff/doc/fig/be-logo.pdf -text svneol=unset#unset
+tools/numdiff/doc/fig/be-logo.png -text
+tools/numdiff/doc/fig/cern-logo.pdf -text
+tools/numdiff/doc/fig/cern-logo.png -text
+tools/numdiff/doc/fig/testseq.key -text
+tools/numdiff/doc/fig/testseq.pdf -text svneol=unset#unset
+tools/numdiff/doc/ndiff.tex -text
 tools/numdiff/src/args.c -text
 tools/numdiff/src/args.h -text
 tools/numdiff/src/constraint.c -text
@@ -1886,10 +1895,17 @@ tools/numdiff/src/utest.c -text
 tools/numdiff/src/utest.h -text
 tools/numdiff/src/utils.c -text
 tools/numdiff/src/utils.h -text
+tools/numdiff/tests/test-constraint-2/twiss_madx.ref -text
+tools/numdiff/tests/test-goto-2/test-goto-2.nd.cfg -text
+tools/numdiff/tests/test-goto-2/test-goto-2.nd.lhs -text
+tools/numdiff/tests/test-goto-2/test-goto-2.nd.rhs -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.cfg -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.lhs -text
 tools/numdiff/tests/test-register-2/test-register-2.nd.rhs -text
 tools/numdiff/tests/test-register-2/test-register-2.ref -text
+tools/numdiff/tests/test-register-3/test-register-3.nd.cfg -text
+tools/numdiff/tests/test-register-3/test-register-3.nd.lhs -text
+tools/numdiff/tests/test-register-3/test-register-3.nd.rhs -text
 tools/numdiff/tests/test-register/test-register.nd.cfg -text
 tools/numdiff/tests/test-register/test-register.nd.lhs -text
 tools/numdiff/tests/test-register/test-register.nd.rhs -text
