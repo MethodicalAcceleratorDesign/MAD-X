@@ -1,0 +1,383 @@
+\documentclass{cern-art} % Specifies the document style.
+%
+\usepackage{hyperref}
+\usepackage{xspace}
+
+\usepackage{vmargin,times,graphicx,amsmath,amssymb,color} % ,draftcopy use draftcopy for experiments
+\usepackage{verbatim} % to allow for verbatim and comment
+\usepackage{here}
+\usepackage{wrapfig}
+\usepackage{fancyref}
+\usepackage{listings}
+
+\usepackage{color}
+\definecolor{grey}{rgb}{0.4,0.4,0.4}
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+\definecolor{comment}{rgb}{0.1,0.50,0.56}
+\definecolor{strings}{rgb}{0.25,0.44,0.63}
+
+% programming language
+\lstset{ basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Line numbers..
+         numberstyle=\color{grey}\tiny,          % Numbers style..
+         %stepnumber=2,               % Distance between line numbers
+         %numbersep=5pt,              % Distance from line number to text
+         tabsize=2,                  % Tabs size
+         extendedchars=true,         %
+         breaklines=true,            % Break long lines
+         keywordstyle=\color{darkgreen}\bfseries,
+         stringstyle=\color{strings}\ttfamily, % String color
+         commentstyle=\it\color{comment}\ttfamily,
+%          showspaces=false,           % Show spaces
+%          showtabs=false,             % Show tabs
+         xleftmargin=0pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         showstringspaces=false
+}
+
+\everymath{\displaystyle}
+
+\lstset{language=Fortran}
+\lstset{keywordstyle=\color{blue}\bfseries}
+\lstset{numbers=left,stepnumber=2}
+\lstset{commentstyle=\color{red}\bfseries}
+
+\setmarginsrb{15mm}{8mm}{15mm}{10mm}{12pt}{10mm}{0pt}{10mm}
+
+% shortcut
+\newcommand{\T}[1]{{\tt #1}}
+\newcommand{\madx}{\mbox{MAD-X}\xspace}
+\newcommand{\madeight}{\mbox{MAD8}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\PSLogo{fig/cern-logo.pdf}
+\DocReference{CERN-ACC-NOTE-2014-XXXX}
+
+\Date{April 2014}
+% \RevisionDate{April 15, 2014}
+
+\Author{L. Deniau and A. Latina}
+\Institute{CERN -- BE/ABP}
+\Email{\{laurent.deniau, andrea.latina\}@cern.ch}
+
+\Title{Ndiff Reference Manual}
+\Title{MAD-X Technical Notes on Twiss Module}
+
+\Keywords{\madx, beam dynamics, thick tracking, optical functions.}
+%\Distribution{ABP group}
+
+\Maketitle
+
+\Summary{%
+	This technical note describes in details the transport maps used by the Twiss module of \madx, including the commented code. It also proposes some alternatives formulations for potential future implementations.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\section{Motivation}
+
+The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known bugs.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bending magnets}
+
+\subsection{The routine \lstinline{tmbend}}
+\subsubsection{Preamble}
+Declaration and preamble:
+\begin{lstlisting}[firstnumber=auto]
+SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
+
+  use twtrrfi
+  use twisslfi
+  use twiss_elpfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for sector bending magnets                         *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     el        (double)  element length.                              *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical ftrk,fmap,cplxy,dorad
+  integer nd,n_ferr,node_fd_errors,code
+  double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),           &
+       te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
+       el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
+       st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
+       el0,orbit0(6),zero,one,two,three
+  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer, external :: el_par_vector ! function from the C core
+  integer elpar_vl
+  parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
+\end{lstlisting}
+
+Changes the element code number \lstinline[firstnumber=last]{code}  from 39 (?) to 15 (?), or from 38 (?) to 24 (?); initializes the matrix \lstinline[firstnumber=last]{rw} to the identity, the tensor \lstinline[firstnumber=last]{tw} and the vector \lstinline[firstnumber=last]{ek0} are set to zero.
+\begin{lstlisting}[firstnumber=last]
+  !---- Initialize.
+  ct=zero
+  st=zero
+  code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
+  deltap=zero
+  call dzero(ek0,6)
+  call m66one(rw)
+  call dzero(tw,216)
+\end{lstlisting}
+
+If the element has nonzero length the logical variable \lstinline[firstnumber=last]{fmap} is set to \lstinline[firstnumber=last]{true}.
+If the element has zero length it simply jumps to the end.
+
+\begin{lstlisting}[firstnumber=last]
+  !---- Test for non-zero length.
+
+  fmap = el .ne. zero
+  if (fmap) then
+  
+  \end{lstlisting}
+It reads the bend parameters from the command line and some dynamic variables from \lstinline[firstnumber=last]{probe}:
+  \begin{lstlisting}[firstnumber=last]
+     call dzero(f_errors,maxferr+1)
+     n_ferr = node_fd_errors(f_errors)
+     !-- get element parameters
+     elpar_vl = el_par_vector(b_k3s, g_elpar)
+     bvk = node_value('other_bv ')
+     arad = get_value('probe ','arad ')
+     deltap = get_value('probe ','deltap ')
+     gamma = get_value('probe ','gamma ')
+     dorad = get_value('probe ','radiate ') .ne. zero
+     an = bvk * g_elpar(b_angle)
+     tilt = g_elpar(b_tilt)
+     e1 = g_elpar(b_e1)
+     e2 = g_elpar(b_e2)
+
+     if(code.eq.2) then
+        e1 = e1 + an / two
+        e2 = e2 + an / two
+     endif
+
+     !---  bvk also applied further down
+
+     sk1 = g_elpar(b_k1)
+     sk2 = g_elpar(b_k2)
+     h1 = g_elpar(b_h1)
+     h2 = g_elpar(b_h2)
+     hgap = g_elpar(b_hgap)
+     fint = g_elpar(b_fint)
+     fintx = g_elpar(b_fintx)
+     sks = g_elpar(b_k1s)
+     h = an / el
+  \end{lstlisting}
+\lstinline[firstnumber=last]{h} is $h=1/\rho$. I guess the following \lstinline[firstnumber=last]{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \lstinline[firstnumber=last]{deltap} is w.r.t. the nominal value. The first branch of this \lstinline[firstnumber=last]{if} takes into account the field errors, also.
+  \begin{lstlisting}[firstnumber=last]
+     !---- Apply field errors and change coefficients using DELTAP.
+     if (n_ferr .gt. 0) then
+        nd = n_ferr
+        call dzero(field,nd)
+        call dcopy(f_errors,field,n_ferr)
+        dh = (- h * deltap + bvk * field(1,0) / el) / (one + deltap)
+        sk1 = (sk1 + field(1,1) / el) / (one + deltap)
+        sk2 = (sk2 + field(1,2) / el) / (one + deltap)
+        sks = (sks + field(2,1) / el) / (one + deltap)
+     else
+        dh = - h * deltap / (one + deltap)
+        sk1 = sk1 / (one + deltap)
+        sk2 = sk2 / (one + deltap)
+        sks = sks / (one + deltap)
+     endif
+  \end{lstlisting}
+Applies \lstinline[firstnumber=last]{bvk}-flag.
+ \begin{lstlisting}[firstnumber=last]
+     sk1 = bvk * sk1
+     sk2 = bvk * sk2
+     sks = bvk * sks
+  \end{lstlisting}
+  if the flags \lstinline[firstnumber=last]{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
+ \begin{lstlisting}[firstnumber=last]
+     !---- Half radiation effects at entrance.
+     if (ftrk .and. dorad) then
+        ct = cos(tilt)
+        st = sin(tilt)
+        x =   orbit(1) * ct + orbit(3) * st
+        y = - orbit(1) * st + orbit(3) * ct
+        hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                  &
+             sk2*(x**2 - y**2)/two
+        hy = sks * x - sk1*y - sk2*x*y
+        rfac = (arad * gamma**3 * el / three)                         &
+             * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+        pt = orbit(6)
+        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+     endif
+  \end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Option ``centre''}
+If \lstinline[firstnumber=last]{centre} option
+   \begin{lstlisting}[firstnumber=last]
+     !---- Body of the dipole.
+     !---- centre option
+     if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
+  \end{lstlisting}
+It halves the length of the element.
+   \begin{lstlisting}[firstnumber=last]
+        el0=el/two
+\end{lstlisting}
+It stores the element's \textit{kick}, \textit{transfer matrix}, and \textit{tensor} for such a halved sector bend in \lstinline[firstnumber=last]{ek,re,te}:
+\begin{lstlisting}[firstnumber=last]
+        call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
+\end{lstlisting}
+It stores the $R$ and $T$ for the fringing field in \lstinline[firstnumber=last]{rw} and \lstinline[firstnumber=last]{tw} respectively; then it concatenates the transport maps in such that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te}:
+\begin{lstlisting}[firstnumber=last]
+        !---- Fringe fields.
+        corr = (h + h) * hgap * fint
+        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+\end{lstlisting}
+It rotates the map:
+\begin{lstlisting}[firstnumber=last]
+        !---- Apply tilt.
+        if (tilt .ne. zero) then
+           call tmtilt(.true.,tilt,ek,re,te)
+           cplxy = .true.
+        endif
+\end{lstlisting}
+If the flag \lstinline[firstnumber=last]{ftrk} is set, tracks the orbit through such a halved bend then zeroes \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te}:
+\begin{lstlisting}[firstnumber=last]
+        !---- Track orbit.
+        call dcopy(orbit,orbit0,6)
+        if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
+        if(centre_cptk) call twcptk(re,orbit0)
+        if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
+     endif
+     !---- End
+  \end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Body of the dipole}
+  It fills  \lstinline[firstnumber=last]{ek},  \lstinline[firstnumber=last]{re}, and \lstinline[firstnumber=last]{te} with kick, matrix and tensor for the sector bend. Then fills  \lstinline[firstnumber=last]{rw}, and \lstinline[firstnumber=last]{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields. Notice that if the option ``centre'' is selected, the initial fringing field has  already been applied, thing which not seems to be correct.  
+   \begin{lstlisting}[firstnumber=last]
+     call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
+
+     !---- Fringe fields.
+     corr = (h + h) * hgap * fint
+     call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+     !---- Tor: use FINTX if set
+     if (fintx .ge. 0) then
+        corr = (h + h) * hgap * fintx
+     else
+        corr = (h + h) * hgap * fint
+     endif
+     call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
+     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+\end{lstlisting}
+It rotates the map:
+\begin{lstlisting}[firstnumber=last]
+     !---- Apply tilt.
+     if (tilt .ne. zero) then
+        call tmtilt(.true.,tilt,ek,re,te)
+        cplxy = .true.
+     endif
+\end{lstlisting}
+Tracks the orbit:
+\begin{lstlisting}[firstnumber=last]
+     !---- Track orbit.
+     if (ftrk) then
+        call tmtrak(ek,re,te,orbit,orbit)
+\end{lstlisting}
+Radiation effects at the exit:
+\begin{lstlisting}[firstnumber=last]
+        !---- Half radiation effects at exit.
+        if (ftrk .and. dorad) then
+           x =   orbit(1) * ct + orbit(3) * st
+           y = - orbit(1) * st + orbit(3) * ct
+           hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                &
+                sk2*(x**2 - y**2)/two
+           hy = sks * x - sk1*y - sk2*x*y
+           rfac = (arad * gamma**3 * el / three)                       &
+                * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           pt = orbit(6)
+           orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+           orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+           orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+        endif
+     endif
+  endif
+
+  !---- Tor: set parameters for sychrotron integral calculations
+  rhoinv = h
+  blen = el
+
+end SUBROUTINE tmbend
+\end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The routine {tmsect}}
+\lstinline[firstnumber=last]{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \lstinline[firstnumber=last]{ek,re,te} with kick, matrix and tensor for this sector bend.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrupole magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multipoles magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Solenoide magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{RF cavities}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{Appendix}
+\begin{itemize}
+\item[-] \lstinline[firstnumber=last]{dcopy(in,out,n)}
+\item[-] \lstinline[firstnumber=last]{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
+e_{d}\\
+R_{d}\\
+T_{d}
+\end{array}\right\} =\left\{ \begin{array}{c}
+e_{b}\\
+R_{b}\\
+T_{b}
+\end{array}\right\} \cdot\left\{ \begin{array}{c}
+e_{a}\\
+R_{a}\\
+T_{a}
+\end{array}\right\} $$
+\end{itemize}
+
+\end{document}
