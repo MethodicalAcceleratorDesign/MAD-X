@@ -2421,9 +2421,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !---- End of element calculation;
 500 continue
 end SUBROUTINE tmmap
+
 SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
-
-
   use twtrrfi
   use twisslfi
   use twiss_elpfi
