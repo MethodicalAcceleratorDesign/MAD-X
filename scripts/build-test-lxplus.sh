@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-lxplus.sh [cleanall]
+# sh scripts/build-test-lxplus.sh [noecho] [cleanall]
 # tail -f build-test-lxplus.out
 
 # env settings
@@ -8,7 +8,12 @@ export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
 
 # I/O redirection
 rm -f build-test-lxplus.out
-exec 1> build-test-lxplus.out 2>&1
+if [ "$1" = "noecho" ] ; then
+	exec &> build-test-lxplus.out
+else
+	shift
+	exec 2>&1 | tee build-test-lxplus.out
+fi
 uname -n > build-test-lxplus.run
 
 # error handler
@@ -33,6 +38,7 @@ cat VERSION
 
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
+	shift
 	make cleanall
 	check_error "make cleanall failed"
 else

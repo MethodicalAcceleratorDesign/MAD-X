@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-macosx.sh [cleanall]
+# sh scripts/build-test-macosx.sh [noecho] [cleanall]
 # tail -f build-test-macosx.out
 
 # env settings
@@ -8,7 +8,12 @@ export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 
 # I/O redirection
 rm -f build-test-macosx.out
-exec 1> build-test-macosx.out 2>&1
+if [ "$1" = "noecho" ] ; then
+	exec &> build-test-macosx.out
+else
+	shift
+	exec 2>&1 | tee build-test-macosx.out
+fi
 
 # error handler
 check_error ()
@@ -32,6 +37,7 @@ cat VERSION
 
 echo "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
+	shift
 	make cleanall
 	check_error "make cleanall failed"
 else

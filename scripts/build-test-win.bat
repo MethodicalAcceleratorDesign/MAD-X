@@ -2,7 +2,7 @@
 setlocal
 
 REM run:
-REM scripts/build-test-win.bat [cleanall]
+REM scripts/build-test-win.bat [noecho] [cleanall]
 
 REM commands
 set CAT=c:\gnuwin32\bin\cat
@@ -23,7 +23,12 @@ set MACDIR="mad@macserv15865.cern.ch:Projects/madX"
 
 if "%1"=="dont-redirect" shift & goto next
 %rm% -f build-test-win.out
-call scripts\build-test-win.bat dont-redirect %* > build-test-win.out 2>&1
+if "%1"=="noecho" shift & goto noecho
+call scripts\build-test-win.bat dont-redirect %* 2>&1 | tee build-test-win.out
+goto doscp
+:noecho
+call scripts\build-test-win.bat dont-redirect %* &> build-test-win.out
+:doscp
 %scp% -q -i %sshrsa% build-test-win.out *-win32.exe *-win64.exe %macdir%
 exit /B
 
