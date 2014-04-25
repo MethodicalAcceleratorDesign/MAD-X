@@ -8,6 +8,7 @@ REM commands
 set CAT=c:\gnuwin32\bin\cat
 set DATE=c:\gnuwin32\bin\date
 set ECHO=c:\gnuwin32\bin\echo
+set TEE=c:\gnuwin32\bin\tee
 set LS=c:\gnuwin32\bin\ls
 set MAKE=c:\gnuwin32\bin\make
 set RM=c:\gnuwin32\bin\rm
@@ -24,7 +25,7 @@ set MACDIR="mad@macserv15865.cern.ch:Projects/madX"
 if "%1"=="dont-redirect" shift & goto next
 %rm% -f build-test-win.out
 if "%1"=="noecho" shift & goto noecho
-call scripts\build-test-win.bat dont-redirect %* 2>&1 | tee build-test-win.out
+call scripts\build-test-win.bat dont-redirect %* 2>&1 | %tee% build-test-win.out
 goto doscp
 :noecho
 call scripts\build-test-win.bat dont-redirect %* &> build-test-win.out
