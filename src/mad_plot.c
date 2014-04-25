@@ -1,19 +1,9 @@
 #include "madx.h"
 
-#if 0 // not used...
-static int
-embedded_plot(void)
-  /* returns the embedded_flag */
-{
-  int ret;
-  ret = embedded_flag;
-  return ret;
-}
-#endif
 
-/* Append the gnuplot ps file to the main ps file */
 static void
 gnuplot_append(char *gplfilename, char *psfilename)
+/* Append the gnuplot ps file to the main ps file */
 {
   char line[1000];
   FILE *newpsfile;
@@ -21,14 +11,14 @@ gnuplot_append(char *gplfilename, char *psfilename)
   FILE *gplpsfile;
   int np=0;
   int page=0;
+
   /* if psfilename does not exist rename it as psfilename and exit*/
   newpsfile=fopen(psfilename,"r");
   if( newpsfile==NULL) {
     rename(gplfilename,psfilename);
     return;
   }
-  else
-  {
+  else {
     /* the file has to be closed it is going to change */
     fclose(newpsfile);
   };
@@ -39,6 +29,7 @@ gnuplot_append(char *gplfilename, char *psfilename)
   newpsfile=fopen(psfilename,"w");
   oldpsfile=fopen("tmpoldplot.ps","r");
   gplpsfile=fopen(gplfilename,"r");
+
   /* read old ps file and copy on the new ps file */
   while(fgets(line,1000,oldpsfile)!=NULL){
     /* don't print after %%Trailer */
@@ -48,16 +39,15 @@ gnuplot_append(char *gplfilename, char *psfilename)
       page++;
       fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
     }
-    else
-    {
+    else {
       /* write the lines */
-      if(np==0) {
-        fprintf(newpsfile,"%s",line);
-      }
+      if(np==0) fprintf(newpsfile,"%s",line);
     }
   }
+
   fclose(oldpsfile);
   remove("tmpoldplot.ps");
+
   /* read gnuplot ps file and append on the final file */
   while(fgets(line,1000,gplpsfile)!=NULL){
     /* don't print after %%Trailer */
@@ -67,18 +57,18 @@ gnuplot_append(char *gplfilename, char *psfilename)
       page++;
       fprintf(newpsfile,"%%%%Page: %d %d\n",page,page);
     }
-    else
-    {
-      if(np==0) {
-        /* write the lines */
-        fprintf(newpsfile,"%s",line);
-      }
+    else {
+      /* write the lines */
+      if(np==0) fprintf(newpsfile,"%s",line);
     }
+
     /* Print after prologue */
     if (strncmp("%%EndProlog",line,11)==0) np=0;
   }
+
   fclose(gplpsfile);
   remove("tmpplot.ps");
+
   /* Print the trailer */
   fprintf(newpsfile,"%%%%Trailer\n");
   fprintf(newpsfile,"%%%%DocumentFonts: Times-Roman\n");
@@ -133,7 +123,7 @@ plot_option(char* name)
 void
 exec_plot(struct in_cmd* cmd)
 {
-  int i, j, k, ierr, pos, nt = strcmp(title,"no-title") == 0 ? 1 : 0;
+  int i, j, k, ierr, pos, notitle = strcmp(title,"no-title") == 0 ? 1 : 0;
   int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0;
   int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
@@ -175,63 +165,56 @@ exec_plot(struct in_cmd* cmd)
   
   /* get haxis_name & s_haxis flag */
   pos = name_list_pos("haxis", nl_plot);
-  if(nl_plot->inform[pos])
-    {
-      if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
-        haxis_name = pl_plot->parameters[pos]->call_def->string;
-      s_haxis = strcmp(haxis_name,"s");
-    }
+  if(nl_plot->inform[pos]) {
+    if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
+      haxis_name = pl_plot->parameters[pos]->call_def->string;
+    s_haxis = strcmp(haxis_name,"s");
+  }
   
   /* get table_name & track_flag */
   pos = name_list_pos("table", nl_plot);
-  if(nl_plot->inform[pos]) /* table name specified */
-    {
-      if ((table_name = pl_plot->parameters[pos]->string) == NULL)
-        table_name = pl_plot->parameters[pos]->call_def->string;
+  if(nl_plot->inform[pos]) { /* table name specified */
+    if ((table_name = pl_plot->parameters[pos]->string) == NULL)
+      table_name = pl_plot->parameters[pos]->call_def->string;
       
-      if(strncmp(table_name,"track",5) == 0)
-        track_flag = 1;
+    if(strncmp(table_name,"track",5) == 0)
+      track_flag = 1;
       
-      if (debug) 
-	printf("tablename and trackflag: %s %d\n", table_name, track_flag);
-    }
-  else
-    {
-      printf("Plot - default table plotted: twiss\n");
-      table_name = "twiss";
-    }
+    if (debug) 
+      printf("tablename and trackflag: %s %d\n", table_name, track_flag);
+  }
+  else {
+    printf("Plot - default table plotted: twiss\n");
+    table_name = "twiss";
+  }
   
   /* get file_name */
   pos = name_list_pos("file", nl_plot);
-  if(nl_plot->inform[pos]) /* file name specified */
-    {
-      if ((file_name = pl_plot->parameters[pos]->string) == NULL)
-        file_name = pl_plot->parameters[pos]->call_def->string;
-    }
-  else
-    {
-      if (track_flag) file_name = "madx_track";
-      else file_name = "madx";
-    }
+  if(nl_plot->inform[pos]) { /* file name specified */
+    if ((file_name = pl_plot->parameters[pos]->string) == NULL)
+      file_name = pl_plot->parameters[pos]->call_def->string;
+  }
+  else {
+    if (track_flag) file_name = "madx_track";
+    else file_name = "madx";
+  }
 
 
   /* If table name begins with "track" use the gnuplot package, and access files not tables*/
-  if (track_flag)
-  {
+  if (track_flag) {
     /* get track file name */
     trackfile = command_par_string("trackfile", this_cmd->clone);
     printf("trackfile is: %s\n", trackfile); 
-
+    
     // now trackfile contains the basis name from which we will get the real file names
 
     /* get particle */
     pos = name_list_pos("particle", nl_plot);
     curr = pl_plot->parameters[pos]->m_string->curr;
-    for (i = 0; i < curr; i++)
-      {
-	particle_list = pl_plot->parameters[pos]->m_string->p[i];
-	part_idx[i] = atoi(particle_list);
-      }
+    for (i = 0; i < curr; i++) {
+      particle_list = pl_plot->parameters[pos]->m_string->p[i];
+      part_idx[i] = atoi(particle_list);
+    }
 
     /* get multiple */
     pos = name_list_pos("multiple", nl_plot);
@@ -247,43 +230,37 @@ exec_plot(struct in_cmd* cmd)
 
     /* find the column numbers corresponding to haxis_name & vaxis_name */
     track_cols_length = track_table_cols_len-1;
-    for (j = 0; j < track_cols_length; j++)
-      {
-	if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
-	  haxis_idx = j + 1;
-	if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
-	  vaxis_idx = j + 1;
-      }
+    for (j = 0; j < track_cols_length; j++) {
+      if(strcmp(track_table_cols[j],haxis_name) == 0 && haxis_idx == 0)
+	haxis_idx = j + 1;
+      if(strcmp(track_table_cols[j],vaxis_name) == 0 && vaxis_idx == 0)
+	vaxis_idx = j + 1;
+    }
     
     /* build-up the title */
-    for (j = 0; j < tsm1; j++)
-      {
-	plot_title[j] = ' ';
-	version[j] = ' ';
-      }
+    for (j = 0; j < tsm1; j++) {
+      plot_title[j] = ' ';
+      version[j] = ' ';
+    }
     plot_title[tsm1] = '\0';
     version[tsm1] = '\0';
     get_title(plot_title,title_length);
-    for (k = *title_length + 1; k > 0; k--)
-      {
-	plot_title[k] = plot_title[k - 1];
-      }
+    for (k = *title_length + 1; k > 0; k--) {
+      plot_title[k] = plot_title[k - 1];
+    }
     plot_title[0]= '\"';
-    if (noversion)
-      {
-	plot_title[*title_length+1] =  '\"';
-	plot_title[*title_length+2] =  '\0';
+    if (noversion) {
+      plot_title[*title_length+1] =  '\"';
+      plot_title[*title_length+2] =  '\0';
+    }
+    else {
+      plot_title[tsm2] =  '\"';
+      get_version(version,version_length);
+      k = tsm2 - *version_length;
+      for (j = k; j < tsm2; j +=1) {
+	plot_title[j] = version[j - k];
       }
-    else
-      {
-	plot_title[tsm2] =  '\"';
-	get_version(version,version_length);
-	k = tsm2 - *version_length;
-	for (j = k; j < tsm2; j +=1)
-	  {
-	    plot_title[j] = version[j - k];
-	  }
-      }
+    }
     
     /* build-up the gnuplot command file */
     mycpy(track_plot_filename,file_name);
@@ -304,37 +281,34 @@ exec_plot(struct in_cmd* cmd)
       if (fopen(track_file_name,"r") == NULL)
 	printf("file %s does not exist \n",track_file_name);
       else	
-	for (j = 0; j < curr; j++)
-	  {
-	    if (j == 0) fprintf(gpu,"plot "); // first plot command
-	    else if (multiple == 0) fprintf(gpu,"\nplot "); // one plot per particle
-	    else fprintf(gpu,", \\\n     "); // all particles on one plot	    
- 	    fprintf(gpu,"'%s' using %d:($1==%d ? $%d : NaN) ",track_file_name,haxis_idx,part_idx[j],vaxis_idx);
-	    if (nolegend)
-	      fprintf(gpu,"notitle with points pointtype %d ",part_idx[j]);
-	    else
-	      fprintf(gpu,"title 'particle %d' with points pointtype %d ",part_idx[j],part_idx[j]);
-	  }
+	for (j = 0; j < curr; j++) {
+	  if (j == 0) fprintf(gpu,"plot "); // first plot command
+	  else if (multiple == 0) fprintf(gpu,"\nplot "); // one plot per particle
+	  else fprintf(gpu,", \\\n     "); // all particles on one plot	    
+	  fprintf(gpu,"'%s' using %d:($1==%d ? $%d : NaN) ",track_file_name,haxis_idx,part_idx[j],vaxis_idx);
+	  if (nolegend)
+	    fprintf(gpu,"notitle with points pointtype %d ",part_idx[j]);
+	  else
+	    fprintf(gpu,"title 'particle %d' with points pointtype %d ",part_idx[j],part_idx[j]);
+	}
     }    
     else { // case of multiple files each containing single particle coordinates
-      for (j = 0; j < curr; j++)
-	{
-	  sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
-	  printf("looking for file %s \n", track_file_name);
-	  if (fopen(track_file_name,"r") == NULL)
-	    printf("file %s does not exist \n",track_file_name);
+      for (j = 0; j < curr; j++) {
+	sprintf(track_file_name, "%s.obs%04d.p%04d", trackfile, 1, part_idx[j]);
+	printf("looking for file %s \n", track_file_name);
+	if (fopen(track_file_name,"r") == NULL)
+	  printf("file %s does not exist \n",track_file_name);
+	else {
+	  if (j == 0) fprintf(gpu,"plot ");
+	  else if (multiple == 0) fprintf(gpu,"\nplot ");
+	  else fprintf(gpu,", \\\n     ");	      
+	  fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
+	  if (nolegend)
+	    fprintf(gpu,"notitle with points pointtype %d ",part_idx[j]);
 	  else
-	    {
-	      if (j == 0) fprintf(gpu,"plot ");
-	      else if (multiple == 0) fprintf(gpu,"\nplot ");
-	      else fprintf(gpu,", \\\n     ");	      
-	      fprintf(gpu,"'%s' using %d:%d ",track_file_name,haxis_idx,vaxis_idx);
-	      if (nolegend)
-		fprintf(gpu,"notitle with points pointtype %d ",part_idx[j]);
-	      else
-		fprintf(gpu,"title 'particle %d' with points pointtype %d ",part_idx[j],part_idx[j]);
-	    }
+	    fprintf(gpu,"title 'particle %d' with points pointtype %d ",part_idx[j],part_idx[j]);
 	}
+      }
     }
 
     fclose(gpu);
@@ -365,70 +339,71 @@ exec_plot(struct in_cmd* cmd)
 
   } // end of plotting of tracking data : if (track_flag)...
  
-  else    
-    /* normal plot */
-    {
-      /* if haxis is "s" and no interpolation, check if table name is the same of the last twiss call */
-      if(nointerp == 0 && s_haxis == 0)
-	{
-	  if (!current_sequ->tw_table) {
-	    warning("PLOT - no TWISS table present", "PLOT command ignored");
-	    return;
-	  }
-      
-	  last_twiss_table = current_sequ->tw_table->name;
-	  if (strcmp(table_name,"aperture") != 0 )
-	    {
-	      if(strcmp(table_name,last_twiss_table) != 0)
-		{
-		  printf("Only allowed table attribute in plot command is \"aperture\"."
-			 " Else, table name is automatically changed to %s \n", last_twiss_table);
-		  if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
-		    pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
-		}
-	    }
-	}
+  else { /* normal plot */
 
-      if (debug)
-	printf("name_list_pos(table_name, table_register->names) = %d \n", 
-	       name_list_pos(table_name, table_register->names));
-      
-      /* HG 21.10.09 allow plot from external table, part1 */
-      if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
-	p_table = table_register->tables[pos];
-	if (!p_table) {
-	  warning("Plot - potentially alredy destroyed table:", table_name);
-	  return;
-    }
-      } else {
-	/* fatal_error("Plot - non-existing table:", table_name); return; */
-	warning("Plot - potentially non-existing table:", table_name);
+    /* if haxis is "s" and no interpolation, check if table name is the same of the last twiss call */
+    if (nointerp == 0 && s_haxis == 0) {
+
+      if (!current_sequ->tw_table) {
+	warning("PLOT - no TWISS table present", "PLOT command ignored");
 	return;
-	/*p_table = table_register->tables[pos];*/    
-      }      
-      /* HG 21.10.09 allow plot from external table, end part1 */
+      }
+      
+      last_twiss_table = current_sequ->tw_table->name;
 
-      embedded_twiss_cmd = cmd;
-      /* HG 21.10.09 allow plot from external table, part 2 */
-      //    printf("P_TABLE CHECK %p\n", p_table);
-      if (p_table->origin) title = p_table->name;
-      else if (nt && current_sequ != NULL) title = current_sequ->name;
-      pesopt_(&ierr);
-      if (ierr == 0) {
-    	  if (p_table->origin == 0) {
-    	      adjust_beam();
-    	      probe_beam = clone_command(current_beam);
-    	      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-    	      adjust_rfc(); /* sets freq in rf-cavities from probe */
-    	  }
-    	  pefill_(&ierr);
-    	  pemima_();
-    	  plotit_(&plots_made);
-    	  plots_made = 1;
-    	}
-      /* HG 21.10.09 allow plot from external table, end part 2 */
-      if (nt) title = pt;
+      if (strcmp(table_name,"aperture") != 0 ) {
+	if(strcmp(table_name,last_twiss_table) != 0) {
+	  printf("Only allowed table attribute in plot command is \"aperture\"."
+		 " Else, table name is automatically changed to %s \n", last_twiss_table);
+	  if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
+	    pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
+	}
+      }
     }
+
+    //if (debug)
+    //  printf("name_list_pos(table_name, table_register->names) = %d \n", 
+    //        name_list_pos(table_name, table_register->names));
+      
+    /* HG 21.10.09 allow plot from external table, part1 */
+    if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
+      p_table = table_register->tables[pos];
+      if (!p_table) {
+	warning("Plot - potentially alredy destroyed table:", table_name);
+	return;
+      }
+    } else {
+      /* fatal_error("Plot - non-existing table:", table_name); return; */
+      warning("Plot - potentially non-existing table:", table_name);
+      return;
+      /*p_table = table_register->tables[pos];*/    
+    }      
+    /* HG 21.10.09 allow plot from external table, end part1 */
+
+    embedded_twiss_cmd = cmd;
+    /* HG 21.10.09 allow plot from external table, part 2 */
+    //    printf("P_TABLE CHECK %p\n", p_table);
+    if (p_table->origin) title = p_table->name;
+    else if (notitle && current_sequ != NULL) title = current_sequ->name;
+
+    pesopt_(&ierr);
+
+    if (ierr == 0) {
+      if (p_table->origin == 0) {
+	adjust_beam();
+	probe_beam = clone_command(current_beam);
+	adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+	adjust_rfc(); /* sets freq in rf-cavities from probe */
+      }
+      pefill_(&ierr);
+      pemima_();
+      plotit_(&plots_made);
+      plots_made = 1;
+    }
+
+    /* HG 21.10.09 allow plot from external table, end part 2 */
+    if (notitle) title = pt;
+  }
 
   /* part 2 of HG 031127 */
   current_beam = keep_beam;

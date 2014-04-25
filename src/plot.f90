@@ -1,35 +1,36 @@
-subroutine pecat1(rb, ra, rd)
+! 2014-Apr-25  09:20:22  ghislain: dead code; commented out
+! subroutine pecat1(rb, ra, rd)
 
-  implicit none
+!   implicit none
 
-  !----------------------------------------------------------------------*
-  ! purpose:
-  !   concatenate two transport maps
-  ! input:
-  !   rb(6,6) second map in beam line order.
-  !   ra(6,6) first map in beam line order.
-  ! output:
-  !   rd(6,6) result map.
-  !----------------------------------------------------------------------*
+!   !----------------------------------------------------------------------*
+!   ! purpose:
+!   !   concatenate two transport maps
+!   ! input:
+!   !   rb(6,6) second map in beam line order.
+!   !   ra(6,6) first map in beam line order.
+!   ! output:
+!   !   rd(6,6) result map.
+!   !----------------------------------------------------------------------*
 
-  !--- type definition of the routine arguments
+!   !--- type definition of the routine arguments
 
-  double precision rb(6,6), ra(6,6), rd(6,6)
+!   double precision rb(6,6), ra(6,6), rd(6,6)
 
-  !--- type definitions of local variables
+!   !--- type definitions of local variables
 
-  integer k, j
+!   integer k, j
 
-  !--- Routine body
+!   !--- Routine body
 
-  do k = 1, 6
-     do j = 1, 6
-        rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
-             + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
-             + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
-     enddo
-  enddo
-end subroutine pecat1
+!   do k = 1, 6
+!      do j = 1, 6
+!         rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
+!              + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
+!              + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+!      enddo
+!   enddo
+! end subroutine pecat1
 !***********************************************************************
 
 subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
@@ -378,10 +379,8 @@ subroutine pefill(ierr)
        currk2l, currk2sl, currk3l, currk3sl
   real tval, step, mystep
   logical machp, rselect, marker_plot, range_plot
-  character*120 msg
 
   !--- definitions of function primitives
-
   integer double_from_table_row, restart_sequ,advance_to_pos
   integer lastnb, table_length
   integer advance_node, get_option
@@ -462,48 +461,45 @@ subroutine pefill(ierr)
   !--- Routine body
 
   !--- No interpolation if centre option is set
-
   if (get_option('centre ') .ne. 0) then
      if (interf .eq. 1) then
-        write (msg, 910)
-        call aawarn('PLOT: ',msg)
+        call aawarn('PLOT: ','Interpolation is not compatible with the Twiss centre option')
      endif
      interf = 0
      pos_flag = 2
   endif
+
   k = double_from_table_row(tabname, horname, 1, d_val)
   if (k .lt. 0)  then
      if (k .eq. -1)  then
-        print *, 'Warning: table ', tabname, ' not found'
+        print *, 'Warning: table ',tabname,' not found'
      elseif (k .eq. -2)  then
-        print *, 'Warning: hor. variable ', horname,                  &
-             ' not in table ', tabname
+        print *, 'Warning: hor. variable ',horname,' not in table ',tabname
      else
-        print *, 'Warning: table ', tabname, ' is empty'
+        print *, 'Warning: table ',tabname,' is empty'
      endif
      ierr = 1
-     goto 999
+     return
   endif
+
   if (horname .eq. 'dpp') dpp_flag = .true.
-  !rdemaria 1/6/2005: if the horizzontal name is deltap don't plot
-  !momentum offset.
-  if(horname .eq. 'deltap') dpp_flag=.true.
+  !rdemaria 1/6/2005: if the horizontal name is deltap don't plot momentum offset.
+  if (horname .eq. 'deltap') dpp_flag=.true.
+
   rselect = machp .and. hrange(2) .gt. hrange(1)
+
   do l = 1, nivvar
      k = double_from_table_row(tabname, sname(l), 1, d_val)
      if (k .lt. 0)  then
-        print *, 'Warning: vertical variable: ',                      &
-             sname(l)(:lastnb(sname(l))), ' not in table ',                    &
-             tabname
+        print *, 'Warning: vertical variable: ',sname(l)(:lastnb(sname(l))),' not in table ',tabname
         ierr = 1
-        goto 999
+        return
      endif
      if (sname(l) .eq. 'dpp') dpp_flag = .true.
   enddo
+
   if (rselect .or. range_plot)  then
-
      !-------adjust element range to horizontal range
-
      new1 = nrrang(1)
      new2 = nrrang(2)
      crow = nrrang(1)
@@ -516,10 +512,12 @@ subroutine pefill(ierr)
      nrrang(1) = new1
      if (nrrang(2) .gt. new2+2) nrrang(2) = new2 + 2
   endif
+
   if (itbv .eq. 0 .and. .not. range_plot)  then
      nrrang(1) = 1
      nrrang(2) = table_length(tabname)
   endif
+
   if (nrrang(1) .eq. 0) nrrang(1) = 1
 
   !--- get interpolation interval size
@@ -534,7 +532,7 @@ subroutine pefill(ierr)
   do j = nrrang(1), nrrang(2)
      crow = j
      if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
-          goto 10
+          goto 100
      k = double_from_table_row(tabname, horname, j, currpos)
 
      if (itbv .eq. 1)  then
@@ -543,11 +541,10 @@ subroutine pefill(ierr)
         if(currtyp.eq.38) currtyp=24
         if (currtyp .le. mtype) pltyp = ilist(currtyp)
 
-        !--- get element parameters & build up plytp (to be used by the routine peschm)
+        !--- get element parameters & build up pltyp (to be used by the routine peschm)
 
         currleng = node_value('l ')
-        if (currleng .gt. 0.d0 .and. currtyp .gt. 1                   &
-             .and. currtyp .lt. 8) then
+        if (currleng .gt. 0.d0 .and. currtyp .gt. 1 .and. currtyp .lt. 8) then
            currtilt = node_value('tilt ')
            k = double_from_table_row(tabname, 'k1l ' , j, currk1l)
            currk1l = currk1l/currleng
@@ -607,7 +604,7 @@ subroutine pefill(ierr)
               print *, 'Warning: plot buffer full, plot truncated'
               goto 100
            elseif (ierr .ne. 0)  then
-              goto 999
+              return
            endif
         endif
      endif
@@ -641,14 +638,13 @@ subroutine pefill(ierr)
 
      k = advance_node()
 
-     if (itbv .eq. 1 .and. k .eq. 0) goto 10
+     if (itbv .eq. 1 .and. k .eq. 0) goto 100
   enddo
-10 continue
+
 100 continue
   fpmach = machp .and. nelmach .gt. 0 .and. noline .eq. 0
-999 continue
-910 format('Interpolation is not compatible with the',                &
-       ' Twiss centre option')
+
+
 end subroutine pefill
 !***********************************************************************
 
@@ -799,7 +795,7 @@ end subroutine pegacn
 !***********************************************************************
 
 subroutine pegaxn (nax, vax, sax, ns)
-
+  use plotfi ! 2014-Apr-25  09:21:11  ghislain: added
   implicit none
 
   !----------------------------------------------------------------------*
@@ -819,12 +815,14 @@ subroutine pegaxn (nax, vax, sax, ns)
 
   !--- type definition of the routine arguments
 
-  character * 16 vax(*), sax(*)
+  ! 2014-Apr-25  09:27:55  ghislain: changed from character*16 
+  character *(mcnam) vax(*), sax(*) 
   integer nax, ns
 
   !--- type definitions of local variables
 
-  character * 16 scut, saloc
+  ! 2014-Apr-25  09:27:55  ghislain: changed from character*16 
+  character *(mcnam) scut, saloc
   integer i, k, k1, k2, j, k1f, k2f
 
   !--- Initialisation of local variables
@@ -834,38 +832,35 @@ subroutine pegaxn (nax, vax, sax, ns)
 
   !--- Routine body
 
-  if (nax .gt. 0)  then
-     do  i = 1, nax
-        saloc = vax(i)
-        call gxpnbl(saloc, k1, k2)
+  if (nax .le. 0) return
 
-! BUG HERE, saloc='' and k2=0 for i=2, 'bety' disappeared!!!!
-! saloc(k2:k2) should not be evaluated, but it seems to be...
+  do  i = 1, nax
+     saloc = vax(i)
+     call gxpnbl(saloc, k1, k2)
 
-        if (k2 .gt. 1 .and. index('XY', saloc(k2:k2)) .ne. 0)  then
-           scut = saloc(:k2-1)
-           do j = 1, ns
-              if (scut .eq. sax(j))  goto 10
-           enddo
-           do j = i + 1, nax
-              call gxpnbl(vax(j), k1f, k2f)
-              if (k2 .eq. k2f)  then
-                 if (index('XY', vax(j)(k2:k2)) .ne. 0)  then
-                    if (saloc(:k2-1) .eq. vax(j)(:k2-1))  then
-                       saloc = scut
-                       do k = 1, ns
-                          if (saloc .eq. sax(k))  goto 10
-                       enddo
-                    endif
-                 endif
-              endif
-           enddo
-        endif
-        ns      = ns + 1
-        sax(ns) = saloc
-10      continue
-     enddo
-  endif
+     ! print *, 'in pegaxn: k2, saloc(k2:k2), index("xyXY",saloc(k2:k2)) = ', k2, saloc(k2:k2), index('xyXY', saloc(k2:k2))
+     ! 2014-Apr-24  19:21:24  ghislain: what is this doing again ??? not documented!
+     if (k2 .gt. 1 .and. index('XY', saloc(k2:k2)) .ne. 0)  then
+        scut = saloc(:k2-1)
+        do j = 1, ns
+           if (scut .eq. sax(j))  goto 10
+        enddo
+        do j = i + 1, nax
+           call gxpnbl(vax(j), k1f, k2f)
+           if (k2 .eq. k2f .and. index('XY', vax(j)(k2:k2)) .ne. 0 .and. saloc(:k2-1) .eq. vax(j)(:k2-1))  then
+              saloc = scut
+              do k = 1, ns
+                 if (saloc .eq. sax(k))  goto 10
+              enddo
+           endif
+        enddo
+     endif
+
+     ns      = ns + 1
+     sax(ns) = saloc
+10   continue
+  enddo
+
 end subroutine pegaxn
 !***********************************************************************
 
@@ -1280,27 +1275,34 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
      reqann   = svar
      ipflg(1) = 0
      ipflg(2) = 0
-     goto 999
+     return
   endif
+
   sovar(1) = ' '
   reqann = svar
 
   !--- search in list of known variables
-
   do  iref = 1, mnvar
      if (svar .eq. svname(iref))  goto 9
   enddo
+
   call pupnbl(svar, k1, k2)
   do  iref = 1, mnvar
      call pupnbl(svname(iref), k1f, k2f)
-     if (k2 + 1 .eq. k2f)  then
-        if (index('xy', svname(iref)(k2f:k2f)) .ne. 0)  then
-           if (svar(:k2) .eq. svname(iref)(:k2))  goto 9
-        endif
-     endif
+     ! 2014-Apr-24  11:39:41  ghislain: why do we look for this ? 
+     ! the name of a variable can be given as "bet" and will match "betx" ? 
+     ! not documented and not functional as far as I can see in test cases.
+     if ( k2+1 .eq. k2f .and. svar(:k2) .eq. svname(iref)(:k2) .and. index('xy', svname(iref)(k2f:k2f)) .ne. 0) goto 9
+!     if (k2 + 1 .eq. k2f)  then
+!        if (index('xy', svname(iref)(k2f:k2f)) .ne. 0)  then
+!           if (svar(:k2) .eq. svname(iref)(:k2))  goto 9
+!        endif
+!     endif
   enddo
-  goto 999
-9 continue
+  return
+
+9 continue ! found variable name as svname(iref)
+
   if (iflag .eq. 0)  then
      reqann = svname(iref)
      ipflg(1) = iproc(iref,it)
@@ -1315,10 +1317,8 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
   elseif (iflag .eq. 1) then
      reqann = svlabl(iref)
      if (svar .ne. svname(iref))  then
-
         !--- incomplete match
         !    replace x or y in name by blank
-
         call pupnbl(reqann, k1, k2)
         do  i = 2, k2
            if (index('XYxy', reqann(i:i)) .ne. 0)  then
@@ -1326,9 +1326,9 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
            endif
         enddo
      endif
-  elseif (iflag .eq. 2) then
+  elseif (iflag .eq. 2) then ! curve annotation 
      reqann = svanno(iref)
-  elseif (iflag .eq. 3) then
+  elseif (iflag .eq. 3) then ! truncated name
      if (svar .eq. svname(iref))  then
         reqann = svname(iref)
      else
@@ -1337,6 +1337,7 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
   else
      reqann = svar
   endif
+
 999 end subroutine pegetn
 
   !***********************************************************************
@@ -1502,7 +1503,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
         if (ipc .gt. 0)  then
            if (nqval(j) .eq. maxseql)  then
               ierr = 1
-              goto 999
+              return
            endif
            ipparm(2,j) = 1
            nqval(j) = nqval(j) + 1
@@ -1516,9 +1517,9 @@ subroutine peintp(crow, nint, proc, length, ierr)
            ipparm(2,j) = 0
         endif
      enddo
-     goto 999
+     return
   endif
-  if (length .eq. zero)  goto 999
+  if (length .eq. zero)  return
   k = double_from_table_row(tabname, horname, crow - 1, s_elem)
 
   !---  set flag for correct interpolation
@@ -1529,36 +1530,21 @@ subroutine peintp(crow, nint, proc, length, ierr)
   k = interpolate_node(nint)
   k = embedded_twiss()
   do i = 1, nint
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'x ', i, tw1(11))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'px ', i, tw1(12))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'betx ', i, tw1(1))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'alfx ', i, tw1(2))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'mux ', i, tw1(3))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'dx ', i, tw1(4))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'dpx ', i, tw1(5))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'y ', i, tw1(13))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'py ', i, tw1(14))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'bety ', i, tw1(6))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'alfy ', i, tw1(7))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'muy ', i, tw1(8))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'dy ', i, tw1(9))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          'dpy ', i, tw1(10))
-     k = double_from_table_row('embedded_twiss_table ',                  &
-          's ', i, s_incr)
+     k = double_from_table_row('embedded_twiss_table ', 'x ', i, tw1(11))
+     k = double_from_table_row('embedded_twiss_table ', 'px ', i, tw1(12))
+     k = double_from_table_row('embedded_twiss_table ', 'betx ', i, tw1(1))
+     k = double_from_table_row('embedded_twiss_table ', 'alfx ', i, tw1(2))
+     k = double_from_table_row('embedded_twiss_table ', 'mux ', i, tw1(3))
+     k = double_from_table_row('embedded_twiss_table ', 'dx ', i, tw1(4))
+     k = double_from_table_row('embedded_twiss_table ', 'dpx ', i, tw1(5))
+     k = double_from_table_row('embedded_twiss_table ', 'y ', i, tw1(13))
+     k = double_from_table_row('embedded_twiss_table ', 'py ', i, tw1(14))
+     k = double_from_table_row('embedded_twiss_table ', 'bety ', i, tw1(6))
+     k = double_from_table_row('embedded_twiss_table ', 'alfy ', i, tw1(7))
+     k = double_from_table_row('embedded_twiss_table ', 'muy ', i, tw1(8))
+     k = double_from_table_row('embedded_twiss_table ', 'dy ', i, tw1(9))
+     k = double_from_table_row('embedded_twiss_table ', 'dpy ', i, tw1(10))
+     k = double_from_table_row('embedded_twiss_table ', 's ', i, s_incr)
      s = s_elem + s_incr
      ex = get_value('beam ','ex ')
      ey = get_value('beam ','ey ')
@@ -1599,7 +1585,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
         if (ipc .gt. 0)  then
            if (nqval(j) .eq. maxseql)  then
               ierr = 1
-              goto 999
+              return
            endif
            ipparm(2,j) = 1
            nqval(j) = nqval(j) + 1
@@ -1616,7 +1602,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
   enddo
   k = reset_interpolation(nint)
 
-999 end subroutine peintp
+end subroutine peintp
   !***********************************************************************
 
 subroutine pemima
@@ -1641,20 +1627,16 @@ subroutine pemima
   character * (mtitl)  s
   character * (mxlabl) slab
   character * (mcnam) sdum(mxcurv), saxis(mxcurv), vaxis(mxcurv,4)
-  character * 16 vaxx(mxcurv)
-
+  
   !--- Initialisation of variables in common peaddi
-
   numax = 0
 
   !--- Initialisation of local variables
-
   do i = 1, 4
      it(i) = 0
   enddo
 
   !--- Routine body
-
   do  j = 1, nivvar
      do i = 1, numax
         if (it(i) .eq. naxref(j))  goto 10
@@ -1667,6 +1649,7 @@ subroutine pemima
      endif
 10   continue
   enddo
+
   do i = 1, 4
      do j = 1, numax - 1
         if (it(j) .gt. it(j+1))  then
@@ -1676,6 +1659,7 @@ subroutine pemima
         endif
      enddo
   enddo
+
   do j = 1, nivvar
      do i = 1, numax
         if (naxref(j) .eq. it(i))  then
@@ -1685,6 +1669,7 @@ subroutine pemima
      enddo
 50   continue
   enddo
+
   do j = 1, nivvar
      k = naxref(j)
      do i = 1, nqval(j)
@@ -1696,7 +1681,6 @@ subroutine pemima
   enddo
 
   !--- get axis annotation
-
   do j = 1, nivvar
      k = naxref(j)
      nvvar(k) = nvvar(k) + 1
@@ -1705,25 +1689,20 @@ subroutine pemima
 
   do iv = 1, 4
      if (nvvar(iv) .gt. 0)  then
-        if (nvvar(iv) .eq. 1)  then
+
+        if (nvvar(iv) .eq. 1)  then ! only one variable to be plotted
            call pegetn (1, vaxis(1,iv), itbv, idum, sdum, slab)
            ns = 1
-        else
-	   ! copy saxis and ns otherswise they are not present in pegaxn (why ?)
-	   saxis(1) = ' '
-	   ns = 0
-	   do j=1,nvvar(iv)
-	     vaxx(j)=vaxis(j,iv)
-           enddo
-           call pegaxn (nvvar(iv), vaxx, saxis, ns) ! WAS pegaxn(nvvar(iv), vaxis(1,iv), saxis, ns)
+        else ! several variables to be plotted
+           call pegaxn(nvvar(iv), vaxis(1,iv), saxis, ns)
            call pegetn (1, saxis(1), itbv, idum, sdum, slab)
         endif
 
-        call gxpnbl (slab, k1, k2)
-
+        call gxpnbl (slab, k1, k2) ! extract indices for first and last non-blank characters in string
         s  = '<#>' // slab
         k2 = k2 + 3
-        do i = 2, ns
+
+        do i = 2, ns ! extract the labels for other variables
            call pegetn (1, saxis(i), itbv, idum, sdum, slab)
            call gxpnbl (slab, i1, i2)
            if (index(s(:k2),slab(:i2)) .eq. 0)  then
@@ -2384,7 +2363,7 @@ subroutine pesopt(ierr)
   if (k .eq. 0)  then
      print *, 'no horizontal variable'
      ierr = 1
-     goto 999
+     return
   else
      horname = char_a
   endif
@@ -2423,11 +2402,10 @@ subroutine pesopt(ierr)
   if (nrrang(1) .eq. 0 .and. nrrang(2) .eq. 0)  then
      print *, 'unknown table or illegal range, skipped'
      ierr = 1
-     goto 999
+     return
   endif
 
   char_a = ' '
-
   call comm_para('noline ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0) noline = int_arr(1)
 
@@ -2463,11 +2441,9 @@ subroutine pesopt(ierr)
   call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr, char_a, char_l)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
-
-  if (ptc_flag .and. itbv .eq. 0) goto 999
+  if (ptc_flag .and. itbv .eq. 0) return
 
   !--- Interpolation is not possible for ptc twiss variables
-
   if (.not. ptc_flag) then
      call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr, char_a,char_l)
      if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
@@ -2482,24 +2458,23 @@ subroutine pesopt(ierr)
   endif
 
   !--- Continue fetching variables to be plotted
-
   interf = ipparm(2,1)
 
   char_a = ' '
   call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-  if (k .gt. 0)  then
+  if (k .gt. 0)  then 
      nivaxs = 1
      nivvar = min(k, mxcurv)
      call pesplit(k, char_a, char_l, slabl)
      do j = 1, nivvar
         naxref(j) = 1
-     enddo
+      enddo
   else
      char_a = ' '
      call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at = ', nivvar
+           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
            goto 110
         endif
         nivaxs = nivaxs + 1
@@ -2513,7 +2488,7 @@ subroutine pesopt(ierr)
      call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at = ', nivvar
+           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
            goto 110
         endif
         nivaxs = nivaxs + 1
@@ -2527,7 +2502,7 @@ subroutine pesopt(ierr)
      call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at = ', nivvar
+           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
            goto 110
         endif
         nivaxs = nivaxs + 1
@@ -2541,7 +2516,7 @@ subroutine pesopt(ierr)
      call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0)  then
         if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at = ', nivvar
+           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
            goto 110
         endif
         nivaxs = nivaxs + 1
@@ -2552,11 +2527,13 @@ subroutine pesopt(ierr)
         enddo
      endif
   endif
+
   if (nivvar .eq. 0)  then
      print *, 'Warning: no vertical plot variables, plot skipped'
      ierr = 1
-     goto 999
+     return
   endif
+
   do i = 2, mxcurv
      ipparm(1,i) = ipparm(1,1)
      ipparm(2,i) = ipparm(2,1)
@@ -2564,6 +2541,7 @@ subroutine pesopt(ierr)
      ipparm(4,i) = ipparm(4,1)
      ipparm(5,i) = ipparm(5,1)
   enddo
+
 110 continue
 
   do j = 1, nivvar
@@ -2580,8 +2558,8 @@ subroutine pesopt(ierr)
      endif
   enddo
 
-999 end subroutine pesopt
-  !***********************************************************************
+end subroutine pesopt
+!***********************************************************************
 
 subroutine pesplit(n_str, char_a, char_l, char_buff)
 
@@ -2602,20 +2580,16 @@ subroutine pesplit(n_str, char_a, char_l, char_buff)
   !----------------------------------------------------------------------*
 
   !--- type definition of the routine arguments
-
   integer n_str, char_l(*)
   character*(*) char_a, char_buff(*)
 
   !--- type definitions of local variables
-
   integer i, k, l
 
   !--- Initialisation of local variables
-
   k = 0
 
   !--- Routine body
-
   do i = 1, n_str
      l = char_l(i)
      char_buff(i) = char_a(k+1:k+l)
@@ -2649,7 +2623,6 @@ subroutine plginit
   double precision d_arr(100)
   real tmpval
   character * 40 char_a
-  character * 8 tmp_a
 
   !--- definitions of function primitives
 
@@ -2666,9 +2639,7 @@ subroutine plginit
   call gxsvar ('INUNIT', 5, 0., ' ')
   call gxsvar ('IOUNIT', 6, 0., ' ')
   char_a = ' '
-  tmp_a = 'file '
-  call comm_para(tmp_a, nint, ndble, k, int_arr, d_arr,             &
-       char_a, char_l)
+  call comm_para('file ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (k .gt. 0) then
      plfnam = char_a(:char_l(1))
   else
@@ -2812,15 +2783,18 @@ subroutine pupnbl(string,ifirst,ilast)
         goto 20
      endif
   enddo
-  goto 999
+
+  return
+
 20 continue
   do i=len(string),1,-1
      if(string(i:i).ne.' ') then
         ilast=i
-        goto 999
+        return ! normal exit when ifirst and ilast are found
      endif
   enddo
-999 end subroutine pupnbl
+
+end subroutine pupnbl
   !***********************************************************************
 
 integer function iucomp(comp, arr, n)
