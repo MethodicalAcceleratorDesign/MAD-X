@@ -1,9 +1,14 @@
 # run:
-# sh scripts/build-test-report.sh [clean] [forcereport] [force] [nomail]
+# sh scripts/build-test-report.sh [noecho] [clean] [forcereport] [force] [nomail]
 
 # I/O redirection
 rm -f build-test-report.log
-exec 1> build-test-report.log 2>&1
+if [ "$1" = "noecho" ] ; then
+	exec &> build-test-report.log
+else
+	shift
+	exec 2>&1 | tee build-test-report.log
+fi
 
 # env settings
 export LC_CTYPE="C"
