@@ -1341,7 +1341,7 @@ table_range(char* table, char* range, int* rows)
   /* returns first and last row numbers (start=1) in rows
      or 0 if table or range invalid */
 {
-  int pos, n;
+  int pos;
   struct table* t;
   char buf[5*NAME_L];
 
