@@ -4,9 +4,9 @@
 # I/O redirection
 rm -f build-test-report.log
 if [ "$1" = "noecho" ] ; then
+	shift
 	exec &> build-test-report.log
 else
-	shift
 	exec 2>&1 | tee build-test-report.log
 fi
 

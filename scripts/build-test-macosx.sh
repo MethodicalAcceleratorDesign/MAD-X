@@ -9,9 +9,9 @@ export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 # I/O redirection
 rm -f build-test-macosx.out
 if [ "$1" = "noecho" ] ; then
+	shift
 	exec &> build-test-macosx.out
 else
-	shift
 	exec 2>&1 | tee build-test-macosx.out
 fi
 

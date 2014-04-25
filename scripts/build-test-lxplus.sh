@@ -9,9 +9,9 @@ export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
 # I/O redirection
 rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
+	shift
 	exec &> build-test-lxplus.out
 else
-	shift
 	exec 2>&1 | tee build-test-lxplus.out
 fi
 uname -n > build-test-lxplus.run
