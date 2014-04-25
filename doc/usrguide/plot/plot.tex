@@ -6,25 +6,32 @@
 \chapter{PLOT}
 
 Values contained in MAD-X tables can be plotted in the form column
-versus column, with up to four differently scaled vertical axes;
-furthermore, if the horizontal axis is the position "s" of the elements
-in a sequence, then the symbolic machine can be plotted above the curves
-as well. In certain conditions True interpolation inside the element is
-available (through calls to the Twiss module for each slice) .  
+versus column, with up to four differently scaled vertical axes and up
+to 10 different variables in total for all vertical axes.
+
+If the horizontal axis is the position "s" of the elements
+in a sequence, then a symbolic representation of the beamline can also
+be displayed at the top of the plot. 
+
+In certain conditions true interpolation inside the element is
+available, through internal slicing of the element and a call to the
+Twiss module for each slice. 
 
 The "environment" (interpolation, line thickness, annotation size,
 PostScript format) can be set with the \hyperlink{setplot}{setplot}
 command.   
 
+Note also that for various reasons a sequence must be defined before the 
+PLOT command can be invoked. 
 
 \section{PLOT}	
 \begin{verbatim}
-plot, vaxis=  vname1,vname2,..,vnamen,
+plot, haxis=  vname, hmin=real, hmax=real, 
+      vaxis=  vname1,vname2,..,vnamen,
       vaxis1= vname1,vname2,..,vnamen, 
       vaxis2= vname1,vname2,..,vnamen,
       vaxis3= vname1,vname2,..,vnamen, 
       vaxis4= vname1,vname2,..,vnamen,
-      haxis=  vname, hmin=real, hmax=real, 
       vmin= reals, vmax= reals, 
       zero_suppr = logical,
       bars= integer, style= integer, colour= integer, symbol= integer, 
@@ -39,6 +46,10 @@ plot, vaxis=  vname1,vname2,..,vnamen,
 where the parameters have the following meaning: 
 
 \begin{itemize}
+   \item haxis: name of the horizontal variable 
+   \item hmin: lower edge for horizontal axis 
+   \item hmax: upper edge for horizontal axis; to be used, both hmin and hmax
+     must be given.   
    \item vaxis: one or several variables from the table to be plotted
      against a single vertical axis.   
    \item vaxis1: one or several variables from the table to be plotted
@@ -49,16 +60,12 @@ where the parameters have the following meaning:
      against vertical axis number 3 (out of 4 possible vertical axes).  
    \item vaxis4: one or several variables from the table to be plotted
      against vertical axis number 4 (out of 4 possible vertical axes). \\ 
-   \textit{Important: vaxis and vaxisI are exclusive in their
+   \textit{Important: vaxis and vaxis{1..4} are exclusive in their
      application!} 
-   \item haxis: name of the horizontal variable 
-   \item hmin: lower edge for horizontal axis 
-   \item hmax: upper edge for horizontal axis; to be used, both hmin and hmax
-     must be given.   
    \item vmin: lower edge(s) for vertical axis or axes, up to four
      numbers separated by commas.
    \item vmax: upper edge(s) of vertical axis or axes, up to four
-     numbers separated by commas; 
+     numbers separated by commas; \\
      Note that both vmin and vmax must be given for an axis to be effective.   
    \item zero\_suppr: To be documented (default = false)
    \item bars: 0 (default) or 1 - with bars=1, all data points

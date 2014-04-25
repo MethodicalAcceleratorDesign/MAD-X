@@ -14,26 +14,33 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 
 <p>
 Values contained in MAD-X tables can be plotted in the form column
-versus column, with up to four differently scaled vertical axes;
-furthermore, if the horizontal axis is the position "s" of the
-elements in a sequence, then the symbolic machine can be plotted above
-the curves as well. In certain conditions True interpolation inside
-the element is available (through calls to the Twiss module for each
-slice).  
-
+versus column, with up to four differently scaled vertical axes and 
+up to 10 different variables in total for all vertical axes.
+<p>
+If the horizontal axis is the position "s" of the elements in a 
+sequence, then a symbolic representation of the beamline machine 
+can also be displayed at the top of the plot. 
+<p>
+In certain conditions true interpolation inside the element
+the element is available, through internal slicing of the element 
+and a call to the Twiss module for each slice.  
+<p>
 The "environment" (interpolation, line thickness, annotation
 size, PostScript format) can be set with the <a href="#setplot">setplot</a> 
 command.  
+<p>
+Note also that for various reasons a sequence must be defined before the 
+PLOT command can be invoked. 
 
 <ul> <li><h4><a name=plot>PLOT</a></h4> 
 
 <pre>
-plot, vaxis=  vname1,vname2,..,vnamen,
+plot, haxis=  vname, hmin=real, hmax=real, 
+      vaxis=  vname1,vname2,..,vnamen,
       vaxis1= vname1,vname2,..,vnamen, 
       vaxis2= vname1,vname2,..,vnamen,
       vaxis3= vname1,vname2,..,vnamen, 
       vaxis4= vname1,vname2,..,vnamen,
-      haxis=  vname, hmin=real, hmax=real, 
       vmin= reals, vmax= reals, 
       bars= integer, style= integer, colour= integer, symbol= integer, 
       noversion= logical, interpolate= logical, noline= logical, notitle= logical, 
@@ -47,9 +54,13 @@ plot, vaxis=  vname1,vname2,..,vnamen,
 where the parameters have the following meaning: 
 
 <ul> 
+<li>haxis: name of the horizontal axis variable 
+<li>hmin: lower edge for horizontal axis
+<li>hmax: upper edge for horizontal axis; to be used, both hmin and hmax must be given.  
+<p>
 <li>vaxis: one or several variables from the table to be plotted 
 against a single vertical axis.  
-
+<p>
 <li>vaxis1: one or several variables from the table to be plotted 
 against vertical axis number 1 (out of 4 possible vertical axes).
 
@@ -61,15 +72,9 @@ against vertical axis number 3 (out of 4 possible vertical axes).
 
 <li>vaxis4: one or several variables from the table to be plotted
 against vertical axis number 4 (out of 4 possible vertical axes).
-
-<font color=ff0000><i>Important: vaxis and vaxisI are exclusive in
-their application!</i></font> 
 <p>
-<li>haxis: name of the horizontal variable 
-
-<li>hmin: lower edge for horizontal axis
-
-<li>hmax: upper edge for horizontal axis; to be used, both hmin and hmax must be given.  
+<font color=ff0000><i>Important: vaxis and vaxis{1..4} are exclusive in
+their application!</i></font> 
 <p>
 <li>vmin: lower edge(s) for vertical axis or axes, up to four numbers separated by commas 
 
@@ -356,7 +361,7 @@ The same process is repeated for the second plot command, resulting in a growing
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, June 17, 2002, <p>
 <a href="http://cern.ch/rdemaria">rdemaria</a>, September 2007, <p>
-<a href="mailto:mad.support@cern.ch">Ghislain Roy</a>, December 17th, 2013.
+<a href="mailto:mad.support@cern.ch">Ghislain Roy</a>, April 25th, 2014.
 </address>
 
 </body>
