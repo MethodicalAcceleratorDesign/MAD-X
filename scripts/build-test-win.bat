@@ -24,7 +24,7 @@ set MACDIR="mad@macserv15865.cern.ch:Projects/madX"
 
 if "%1"=="dont-redirect" shift & goto next
 %rm% -f build-test-win.out
-if "%1"=="noecho" & goto noecho
+if "%1"=="noecho" goto noecho
 call scripts\build-test-win.bat dont-redirect %* 2>&1 | %tee% build-test-win.out
 goto doscp
 :noecho
