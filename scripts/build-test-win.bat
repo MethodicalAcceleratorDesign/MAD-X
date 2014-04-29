@@ -28,7 +28,7 @@ if "%1"=="noecho" shift & goto noecho
 call scripts\build-test-win.bat dont-redirect %* 2>&1 | %tee% build-test-win.out
 goto doscp
 :noecho
-call scripts\build-test-win.bat dont-redirect %* &> build-test-win.out
+call scripts\build-test-win.bat dont-redirect %* > build-test-win.out 2>&1
 :doscp
 %scp% -q -i %sshrsa% build-test-win.out *-win32.exe *-win64.exe %macdir%
 exit /B
