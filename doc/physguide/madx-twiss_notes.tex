@@ -3,7 +3,7 @@
 \usepackage{hyperref}
 \usepackage{xspace}
 
-\usepackage{vmargin,times,graphicx,amsmath,amssymb,color} % ,draftcopy use draftcopy for experiments
+\usepackage{vmargin,times,graphicx,amsmath,amssymb,color} % ,draftcopy use draftcopy for experiments
 \usepackage{verbatim} % to allow for verbatim and comment
 \usepackage{here}
 \usepackage{wrapfig}
@@ -119,7 +119,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap,cplxy,dorad
+  logical ftrk,cplxy,dorad
   integer nd,n_ferr,node_fd_errors,code
   double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),           &
        te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
@@ -130,62 +130,57 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   integer, external :: el_par_vector ! function from the C core
   integer elpar_vl
 \end{lstlisting}
-The following statements retrieve the \madeight elements \L{code} and change them from \L{tkicker} (39) to \L{kicker} (15), and from \L{placeholder} (38) to \L{instrument} (24), and initializes the matrix \L{rw} to the identity, and the tensor \L{tw} and the vector \L{ek0} to zero.
+{\em The following piece of code has been moved up and rewritten for clarity}. If the element has zero length it simply jumps to the end (physically correct?).
+\begin{lstlisting}[firstnumber=last]
+  !---- Test for non-zero length.
+  if (el.eq.0) then return
+\end{lstlisting}
+The following statements initializes the matrix \L{rw} to the identity, and the tensor \L{tw} and the vector \L{ek0} to zero.
 \begin{lstlisting}[firstnumber=last]
   !---- Initialize.
   ct=0
   st=0
-  code = node_value('mad8_type ') ! function from the C core
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
   deltap=0
   call dzero(ek0,6)
   call m66one(rw)
   call dzero(tw,216)
+  call dzero(f_errors,maxferr+1)
 \end{lstlisting}
-If the element has nonzero length the logical variable \L{fmap} is set to \L{true}.
-If the element has zero length it simply jumps to the end. [{\em Suggestion: to replace by \L{if (el.eq.0) return}}.]
-
+The next code reads the probe and the magnet parameters from the command line and some dynamic variables. It also converts \L{tkicker} (39) to \L{kicker} (15), and \L{placeholder} (38) to \L{instrument} (24).
 \begin{lstlisting}[firstnumber=last]
-  !---- Test for non-zero length.
-  fmap = el.ne.0
-  if (fmap) then
-  \end{lstlisting}
-TODO
-It reads the bend parameters from the command line and some dynamic variables from \L{probe}:
-  \begin{lstlisting}[firstnumber=last]
-     call dzero(f_errors,maxferr+1)
-     n_ferr = node_fd_errors(f_errors)
-     !-- get element parameters
-     elpar_vl = el_par_vector(b_k3s, g_elpar) ! get strengths up to k3s
-     bvk = node_value('other_bv ')
-     arad = get_value('probe ','arad ')
-     deltap = get_value('probe ','deltap ')
-     gamma = get_value('probe ','gamma ')
-     dorad = get_value('probe ','radiate ') .ne. 0
-     an = bvk * g_elpar(b_angle)
-     tilt = g_elpar(b_tilt)
-     e1 = g_elpar(b_e1)
-     e2 = g_elpar(b_e2)
+    code = node_value('mad8_type ') ! function from the C core
+    if(code.eq.39) code=15
+    if(code.eq.38) code=24
 
+     n_ferr   = node_fd_errors(f_errors)        ! get field errors
+     elpar_vl = el_par_vector(b_k3s, g_elpar) ! get strengths up to k3s
+     bvk      = node_value('other_bv ')
+     arad     = get_value('probe ','arad ')
+     deltap   = get_value('probe ','deltap ')
+     gamma    = get_value('probe ','gamma ')
+     dorad    = get_value('probe ','radiate ') .ne. 0
+     an       = bvk * g_elpar(b_angle)              ! sbend angle
+     tilt     = g_elpar(b_tilt)                   ! sbend tilt
+     e1       = g_elpar(b_e1)                       ! sbend entry pole face angle
+     e2       = g_elpar(b_e2)                       ! sbend exit  pole face angle
+     sk1      = g_elpar(b_k1)
+     sk2      = g_elpar(b_k2)
+     h1       = g_elpar(b_h1)
+     h2       = g_elpar(b_h2)
+     hgap     = g_elpar(b_hgap)
+     fint     = g_elpar(b_fint)
+     fintx    = g_elpar(b_fintx)
+     sks      = g_elpar(b_k1s)
+
+     ! rbend treated as a sbend with parallel pole faces
      if(code.eq.2) then
         e1 = e1 + an / 2
         e2 = e2 + an / 2
      endif
 
-     !---  bvk also applied further down
-
-     sk1 = g_elpar(b_k1)
-     sk2 = g_elpar(b_k2)
-     h1 = g_elpar(b_h1)
-     h2 = g_elpar(b_h2)
-     hgap = g_elpar(b_hgap)
-     fint = g_elpar(b_fint)
-     fintx = g_elpar(b_fintx)
-     sks = g_elpar(b_k1s)
      h = an / el
-  \end{lstlisting}
-\L{h} is $h=1/\rho$. I guess the following \L{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
+\end{lstlisting}
+TODO \L{h} is $h=1/\rho$. I guess the following \L{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
   \begin{lstlisting}[firstnumber=last]
      !---- Apply field errors and change coefficients using DELTAP.
      if (n_ferr .gt. 0) then
@@ -330,7 +325,7 @@ Radiation effects at the exit:
            orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
         endif
      endif
-  endif ! if (fmap) line 44
+  endif ! if (fmap)
 
   !---- Tor: set parameters for sychrotron integral calculations
   ! LD: useless code?
