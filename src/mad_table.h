@@ -112,12 +112,12 @@ void    set_table_value(const char* table_s, const char *row_s, const char *col_
 
 struct column_info{
   void* data;
-  int length;
-  char datatype;
-  char datasize;
+  int   length;
+  char  datatype;
+  char  datasize;
 };
 
-struct column_info  table_get_column(char* table_name,char* column_name);
+struct column_info   table_get_column(char* table_name,char* column_name);
 struct char_p_array *table_get_header(char* table_name);
 
 #endif // MAD_TABLE_H

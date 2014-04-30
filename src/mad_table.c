@@ -703,9 +703,13 @@ table_get_column(char* table_name, char* column_name)
     table = table_register->tables[pos];
     if ((col = name_list_pos(column_name, table->columns)) > -1) {
       //printf("col: n %d type %d\n",col,table->columns->inform[col]);
-      info.length  = table->curr;
-      if (table->columns->inform[col]==2){
-        info.data =  table->d_cols[col];
+      info.length = table->curr;
+      if (table->columns->inform[col]==1) {
+        info.data=table->d_cols[col];
+        info.datatype='i';
+        info.datasize=sizeof(double);
+      } else if (table->columns->inform[col]==2) {
+        info.data=table->d_cols[col];
         info.datatype='d';
         info.datasize=sizeof(double);
       } else if (table->columns->inform[col]==3) {
