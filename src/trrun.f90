@@ -5263,6 +5263,8 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   common /wzcom2/ wtreal(idim), wtimag(idim)
   parameter ( a1 = 0.5124242248d0, a2 = 0.0517653588d0 )
   parameter ( b1 = 0.2752551286d0, b2 = 2.7247448714d0 )
+  double precision xm,xx,yy
+  parameter (xm=1d120)
   !     temporary arrays to facilitate vectorisation
   integer in,out,ins,outs
   dimension ins(npart),outs(npart)
@@ -5292,25 +5294,26 @@ subroutine wzsubv(n,vx,vy,vu,vv)
            !     write (*,*) 'ALL outside'
            !     write (*,*) 'i=',i
            do j=1,out
-              vp=vx(outs(j))**2-vy(outs(j))**2
-              !hr05 vq(j)=2.d0*vx(j)*vy(j)
-              vq=(2.d0*vx(outs(j)))*vy(outs(j))                         
+              xx=vx(outs(j))
+              yy=vy(outs(j))
+              if (xx.ge.xm) xx=xm
+              if (yy.ge.xm) yy=xm
+              vp=xx**2-yy**2
+              vq=(2.d0*xx)*yy
               vqsq=vq**2
               !  First term.
               vt=vp-b1
               vr=a1/(vt**2+vqsq)
               vsreal=vr*vt
-              !hr05 vsimag(j)=-vr(j)*vq(j)
-              vsimag=(-1d0*vr)*vq                              
+              vsimag=-vr*vq
               !  Second term
               vt=vp-b2
               vr=a2/(vt**2+vqsq)
               vsreal=vsreal+vr*vt
               vsimag=vsimag-vr*vq
               !  Multiply by i*z.
-              !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
-              vu(outs(j))=-1d0*(vy(outs(j))*vsreal+vx(outs(j))*vsimag)   
-              vv(outs(j))=vx(outs(j))*vsreal-vy(outs(j))*vsimag
+              vu(outs(j))=-(yy*vsreal+xx*vsimag)
+              vv(outs(j))=xx*vsreal-yy*vsimag
            enddo
            out=0
         endif
@@ -5377,25 +5380,26 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !     write (*,*) 'ALL outside'
   !     write (*,*) 'i=',i
   do j=1,out
-     vp=vx(outs(j))**2-vy(outs(j))**2
-     !hr05 vq(j)=2.d0*vx(j)*vy(j)
-     vq=(2.d0*vx(outs(j)))*vy(outs(j))
+     xx=vx(outs(j))
+     yy=vy(outs(j))
+     if (xx.ge.xm) xx=xm
+     if (yy.ge.xm) yy=xm
+     vp=xx**2-yy**2
+     vq=(2.d0*xx)*yy
      vqsq=vq**2
      !  First term.
      vt=vp-b1
      vr=a1/(vt**2+vqsq)
      vsreal=vr*vt
-     !hr05 vsimag(j)=-vr(j)*vq(j)
-     vsimag=(-1d0*vr)*vq
+     vsimag=-vr*vq
      !  Second term
      vt=vp-b2
      vr=a2/(vt**2+vqsq)
      vsreal=vsreal+vr*vt
      vsimag=vsimag-vr*vq
      !  Multiply by i*z.
-     !hr05 vu(j)=-(vy(j)*vsreal(j)+vx(j)*vsimag(j))
-     vu(outs(j))=-1d0*(vy(outs(j))*vsreal+vx(outs(j))*vsimag)
-     vv(outs(j))=vx(outs(j))*vsreal-vy(outs(j))*vsimag
+     vu(outs(j))=-(yy*vsreal+xx*vsimag)
+     vv(outs(j))=xx*vsreal-yy*vsimag
   enddo
   !     everything inside the square, so interpolate
   !     write (*,*) 'ALL inside'
