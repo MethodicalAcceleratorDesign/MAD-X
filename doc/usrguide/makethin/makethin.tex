@@ -11,17 +11,18 @@ by MAD-X tracking or conversion to SIXTRACK input format.
 The slicing is performed by the command: 
 \begin{verbatim}
 MAKETHIN, SEQUENCE=seq_name,
-          STYLE=slicing_style;
+          STYLE=slicing_style,
+          MINIMIZEPARENTS= ??, MAKECONSISTENT= ??, MAKEDIPEDGE= ??; 
 \end{verbatim} 
 
 The parameters are defined as: 
 \begin{madlist}
-   \ttitem{SEQUENCE}=seq\_name names the sequence to be processed to thin
-     slices. The sequence must be active, i.e. it should have been
-     previously loaded with a USE command. 
+   \ttitem{SEQUENCE} seq\_name is the name of the sequence to be
+   processed to thin slices. The sequence must be active, i.e. it should
+   have been previously loaded with a USE command.  
 
-   \ttitem{STYLE}=slicing\_style is optional and selects the slicing
-     style. The options are:    
+   \ttitem{STYLE} the slicing\_style provided as argument is optional
+   and selects the slicing style. Available slicing styles are:     
 
      \begin{madlist}
      \ttitem{SIMPLE} is a simplified slicing algorithm which produces
@@ -44,13 +45,13 @@ The parameters are defined as:
      of slices is less or equal to 4, and {\tt SIMPLE} otherwise.
      \end{madlist}
      
-     \ttitem{MINIMIZEPARENTS} to be documented
-     \ttitem{MAKECONSISTENT} to be documented
-     \ttitem{MAKEDIPEDGE} to be documented
+   \ttitem{MINIMIZEPARENTS} to be documented
+   \ttitem{MAKECONSISTENT} to be documented
+   \ttitem{MAKEDIPEDGE} to be documented
 \end{madlist}
 
 
-{\textbf Note:} It is strongly recommended to always specify {\tt STYLE=teapot}  
+\textbf{Note:} It is strongly recommended to always specify {\tt STYLE=teapot}  
 to use the improved slicing for any number of slices.
 
 
@@ -83,24 +84,26 @@ element.
 
 {\bf Restrictions:}
 \begin{itemize}
-\item makethin requires default positioning (refer=centre). 
-\item {\tt THICK=true} only applies to bending or quadrupole magnet
+\item makethin requires that the sequence makes use of the default
+  positioning of elements ({\tt REFER=centre}). 
+\item {\tt THICK=true} only applies to dipole or quadrupole magnet
   elements and is ignored otherwise.  
 \end{itemize}
 
 
-The created thin lens sequence has the following properties: 
+The generated thin lens sequence has the following properties: 
 \begin{itemize}
-\item The new sequence has the same name as the original. The original
-  is replaced in memory and has to be reloaded if it is needed again. 
-\item The slicer also slices any inserted sequence used in the main
-  sequence. These are also given the same names as the originals. 
-\item Any component changed into a single thin lens has the same name as
-  the original. 
-\item If a component is sliced into more than one slice, the individual
-  slices have the same name as the original component and a suffix 
-  {\tt ..1}, {\tt ..2}, etc. and a marker will be placed at the center
-  with the original name of the component. 
+\item The new sequence has the same name as the original. The original sequence
+  is replaced by the new one in memory. If the original sequence is
+  needed for further processing in MAD-X, it should be reloaded.
+\item The algorithm also slices any sub-sequence inserted in the main
+  sequence. These sub-sequences are also given the same names as the originals. 
+\item Any element transformed into a single thin lens element has the
+  same name as the original. 
+\item If an element is sliced into more than one slice, the individual
+  slices have the same basename as the original element plus a suffix 
+  {\tt ..1}, {\tt ..2}, etc. and a marker, with the name of the original
+  element, is placed at the location of the center of the original element.
 \end{itemize}
 
 
@@ -131,6 +134,7 @@ select, flag=makethin, class=sextupole, slice=0;
 ! keep elements unchanged with names starting by mbxw
 select, flag=makethin, pattern=mbxw\., slice=0; 
 \end{verbatim}
+
 This option allows to introduce slicing step by step and monitor the
 resulting changes in optics parameters.
 %Note that subsequent tracking generally requires full slicing, with possible exception of quadrupoles and bending magents.

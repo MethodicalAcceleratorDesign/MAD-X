@@ -10,15 +10,15 @@ versus column, with up to four differently scaled vertical axes and up
 to 10 different variables in total for all vertical axes.
 
 If the horizontal axis is the position "s" of the elements
-in a sequence, then a symbolic representation of the beamline can also
+in a sequence, a symbolic representation of the beamline can also
 be displayed at the top of the plot. 
 
-In certain conditions true interpolation inside the element is
-available, through internal slicing of the element and a call to the
-Twiss module for each slice. 
+In certain conditions true interpolation of optical functions and
+parameters inside the element is available through internal slicing of
+the element and a call to the Twiss module for each slice. 
 
-The "environment" (interpolation, line thickness, annotation size,
-PostScript format) can be set with the \hyperlink{setplot}{setplot}
+The basic plot attributes, such as line thickness, annotation size,
+and PostScript format, can be set with the \hyperlink{setplot}{setplot}
 command.   
 
 Note also that for various reasons a sequence must be defined before the 
@@ -33,71 +33,80 @@ plot, haxis=  vname, hmin=real, hmax=real,
       vaxis3= vname1,vname2,..,vnamen, 
       vaxis4= vname1,vname2,..,vnamen,
       vmin= reals, vmax= reals, 
-      zero_suppr = logical,
+      title= string, 
       bars= integer, style= integer, colour= integer, symbol= integer, 
-      noversion= logical, interpolate= logical, noline= logical, notitle= logical, 
-      marker_plot= logical, range_plot= logical, 
-      table= table_name, particle= particle1,particle2,...,particlen,
-      multiple= logical, title= string, range= range, 
-      file= file_name_start, trackfile= table_name,
+      interpolate= logical, zero_suppr= logical,
+      noversion= logical, noline= logical, notitle= logical, 
+      marker_plot= logical, range_plot= logical, range= range, 
+      table= table_name, particle= particle1,particle2,..,particlen,
+      multiple= logical, file= file_name_start, trackfile= table_name, 
       ptc= logical, ptc_table= table_name; 
 \end{verbatim} 
 
 where the parameters have the following meaning: 
 
-\begin{itemize}
-   \item haxis: name of the horizontal variable 
-   \item hmin: lower edge for horizontal axis 
-   \item hmax: upper edge for horizontal axis; to be used, both hmin and hmax
-     must be given.   
-   \item vaxis: one or several variables from the table to be plotted
+\begin{madlist}
+   \ttitem{haxis} name of the horizontal variable 
+
+   \ttitem{hmin, hmax} lower and upper edge for horizontal axis. Both
+   values must be provided. 
+
+   \ttitem{vaxis} one or several variables from the table to be plotted
      against a single vertical axis.   
-   \item vaxis1: one or several variables from the table to be plotted
-     against vertical axis number 1 (out of 4 possible vertical axes).  
-   \item vaxis2: one or several variables from the table to be plotted
-     against vertical axis number 2 (out of 4 possible vertical axes).  
-   \item vaxis3: one or several variables from the table to be plotted
-     against vertical axis number 3 (out of 4 possible vertical axes).  
-   \item vaxis4: one or several variables from the table to be plotted
-     against vertical axis number 4 (out of 4 possible vertical axes). \\ 
+
+   \ttitem{vaxis{\sl i}} one or several variables from the table to be plotted
+     against vertical axis number {\sl i}. There is a maximum of 4
+     vertical axes. 
+
    \textit{Important: vaxis and vaxis{1..4} are exclusive in their
-     application!} 
-   \item vmin: lower edge(s) for vertical axis or axes, up to four
-     numbers separated by commas.
-   \item vmax: upper edge(s) of vertical axis or axes, up to four
-     numbers separated by commas; \\
+     application! if vaxis is given, vaxis{1..4} will be simply ignored.} 
+
+   \ttitem{vmin, vmax} lower and upper edge(s) for vertical axis or axes, up to four
+     numbers separated by commas.\\
      Note that both vmin and vmax must be given for an axis to be effective.   
-   \item zero\_suppr: To be documented (default = false)
-   \item bars: 0 (default) or 1 - with bars=1, all data points
+
+   \ttitem{title} plot title string; if absent, the last overall title is
+     used; if no such overall title as well, the sequence name is used.
+
+   \ttitem{bars} 0 (default) or 1 - with bars=1, all data points
      are connected to the horizontal axis with vertical bars.   
-   \item style: 1 (default), 2, 3, or 4: line style for connecting the
+
+   \ttitem{style} 1 (default), 2, 3, or 4: line style for connecting the
      successive data points, respectively solid, dashed, dotted, and dot-dashed; 
      the special value style=100 uses the four styles in turn for
      successive curves in the same plot. 
      With style=0 successive data points are not connected. 
-     N.B. If symbol and style are both zero at the same time, style is
-     forced to its default value (style=1).
-   \item colour: 1 (default), 2, 3, 4 or 5: colour for the symbols and lines, 
+
+   \ttitem{colour} 1 (default), 2, 3, 4, or 5: colour for the symbols and lines, 
      respectively black, red, green, blue, and magenta; 
      The special value colour=100  uses the five colours in turn for
      successive symbols and lines.
-   \item symbol: 0 (default), 1, 2, 3, 4, or 5: The symbols to be
+
+   \ttitem{symbol} 0 (default), 1, 2, 3, 4, or 5: The symbols to be
      plotted at data points, respectively none, dot ("."), plus ("+"),
      star ("*"), circle ("o"), and cross ("x").  
      The symbol size may have to be adapted through the SETPLOT command
-     (see below).   
-   \item noversion: logical, default=false. If noversion=true, the
-     information concerning the version of MAD-X and the date of the run
-     are suppressed from the title.  
-     This option frees additional space available for the user specified
-     title of the plot.  
-   \item interpolate: logical, default=false. The data points are
+     (see below). \\ 
+     Note that if symbol and style are both zero, style is
+     forced to its default value (style=1) otherwise the plot would be
+     invisible. 
+
+   \ttitem{interpolate} logical, default=false. The data points are
      normally connected by straight lines; if "interpolate" is
      specified, the on-momentum Twiss parameters such as beta, alfa, and
      dispersion are interpolated with calls to the Twiss module inside
      each element; for all other variables splines are used to smooth
      the curves.  
-   \item noline: logical, default=false. If s is the horizontal
+
+   \ttitem{zero\_suppr} To be documented (default = false)
+
+   \ttitem{noversion} logical, default=false. If noversion=true, the
+     information concerning the version of MAD-X and the date of the run
+     are suppressed from the title.  
+     This option frees additional space available for the user specified
+     title of the plot.  
+
+   \ttitem{noline} logical, default=false. If s is the horizontal
      variable, then a symbolic representation of the beamline is plotted
      above the plot, except for tables that have been read back into MAD-X. 
      In case the horizontal scale is too large and the density of
@@ -105,18 +114,24 @@ where the parameters have the following meaning:
      representation and a thick black block in teh worst case. 
      The "noline" option suppresses this symbolic representation of the
      beamline. 
-   \item notitle: logical, default=false. If true, suppresses the title
+
+   \ttitem{notitle} logical, default=false. If true, suppresses the title
      line, including the information on the version and date.  
-   \item marker\_plot: logical, default=false. If true, plotting is done
+
+   \ttitem{marker\_plot} logical, default=false. If true, plotting is done
      also at the location of marker elements. This is only useful for
      the plotting of non-continuous functions like the "N1" from the
      aperture module. Beware that the PS file might became very large if
-     this flag is invoked.  
-   \item range\_plot: logical, default=false. Allows the specification
+     this flag is invoked.
+  
+   \ttitem{range\_plot} logical, default=false. Allows the specification
      of a plotting range for the user defined horizontal axis.   
 
+   \ttitem{range} horizontal plot
+     \href{../Introduction/ranges.html}{range} given by elements.  
 
-   \item table: name of the table from which data is plotted (default:
+
+   \ttitem{table} name of the table from which data is plotted (default:
      twiss).  
 
      If the first part of the name of the table is "track", the
@@ -153,20 +168,14 @@ where the parameters have the following meaning:
      is to 1 and the particle number \textit{i} is given by the attribute
      \textit{particle=i}. 
  
-   \item particle: one or several numbers associated to the tracked
+   \ttitem{particle} one or several numbers associated to the tracked
      particles for which the specified plot has to be displayed.  
 
-   \item multiple: logical, default=false. If true all the curves
+   \ttitem{multiple} logical, default=false. If true all the curves
      generated for each tracked particle are put on one plot. Otherwise
      there will be one plot for each particle.   
 
-   \item title: plot title string; if absent, the last overall title is
-     used; if no such overall title as well, the sequence name is used.   
-
-   \item range: horizontal plot
-     \href{../Introduction/ranges.html}{range} given by elements.  
-
-   \item file\_name: start of the file name for the Postscript
+   \ttitem{file} basename for the Postscript
      file(s). Only the first occurrence of such a name will be
      used. Default is "madx" or "madx\_track" if the \textit{table}
      attribute is track.  Depending on the format (.ps or .eps, see
@@ -174,7 +183,10 @@ where the parameters have the following meaning:
      file\_name.ps, or one per plot into file\_name01.eps,
      file\_name02.eps, etc.   
 
-   \item ptc: logical, default=false. If set true, the data to be
+   \ttitem{trackfile} basename of the files containing
+     tracking data for each particle (default: track)  
+
+   \ttitem{ptc} logical, default=false. If set true, the data to be
      plotted are taken from the table defined by the attribute
      \textit{ptc\_table} which is expected to be generated previously by
      the ptc package. The data belong to the column identified by one of
@@ -182,12 +194,10 @@ where the parameters have the following meaning:
      table. Interpolation is not available and the attribute
      \textit{interpolate} has no effect.   
 
-   \item ptc\_table: name of the ptc twiss table to be plotted from
+   \ttitem{ptc\_table} name of the ptc twiss table to be plotted from
      (default: ptc\_twiss)  
 
-   \item trackfile: first part of the name of the files containing
-     tracking data for each particle (default: track)  
-\end{itemize}
+\end{madlist}
 
 
 \section{SETPLOT}
@@ -197,26 +207,29 @@ setplot, post= integer, font= integer, lwidth= real, xsize= real, ysize= real,
 \end{verbatim} 
 
 where the parameters have the following meaning: 
-\begin{itemize}
-   \item post: default = 1. If =1, makes one PostScript file (.ps) with
+\begin{madlist}
+   \ttitem{post} default = 1. If =1, makes one PostScript file (.ps) with
      all plots; if =2, makes one Encapsulated PostSscript file (.eps)
      per plot.   
-   \item font: there are two defaults: 1 for screen plotting: this uses
+
+   \ttitem{font} there are two defaults: 1 for screen plotting: this uses
      characters made from polygons; -1 for PostScript files; this is
      Times-Italic. There are various fonts available for positive and
      negative integers, best to be tried out, since they will look
      different on different systems anyway. GhostView will show strange
      vertical axis annotations, but the printed versions are normally
      OK.   
-   \item lwidth: default = 1. Allows the user to set the curve line
+
+   \ttitem{lwidth} default = 1. Allows the user to set the curve line
      width.  Depends on the system as well, so to be tried out.   
-   \item xsize: bounding box size for PostScript, default=27 cm.   
-   \item ysize: bounding box size for PostScript, default=19 cm.   
-   \item ascale: annotation character height scale factor, default=1.   
-   \item lscale: axis label character height scale factor, default=1.  
-   \item sscale: curve symbol (see above) scale factor, default=1.  
-   \item rscale: axis text character height scale factor, default=1.  
-\end{itemize}
+
+   \ttitem{xsize} bounding box size for PostScript, default=27 cm.   
+   \ttitem{ysize} bounding box size for PostScript, default=19 cm.   
+   \ttitem{ascale} annotation character height scale factor, default=1.   
+   \ttitem{lscale} axis label character height scale factor, default=1.  
+   \ttitem{sscale} curve symbol (see above) scale factor, default=1.  
+   \ttitem{rscale} axis text character height scale factor, default=1.  
+\end{madlist}
 
 
 \section{RESPLOT}

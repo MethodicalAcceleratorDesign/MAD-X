@@ -18,15 +18,15 @@ versus column, with up to four differently scaled vertical axes and
 up to 10 different variables in total for all vertical axes.
 <p>
 If the horizontal axis is the position "s" of the elements in a 
-sequence, then a symbolic representation of the beamline machine 
+sequence, a symbolic representation of the beamline 
 can also be displayed at the top of the plot. 
 <p>
-In certain conditions true interpolation inside the element
-the element is available, through internal slicing of the element 
-and a call to the Twiss module for each slice.  
+In certain conditions true interpolation of optical functions and 
+parameters inside the element is available through internal slicing 
+of the element and a call to the Twiss module for each slice.  
 <p>
-The "environment" (interpolation, line thickness, annotation
-size, PostScript format) can be set with the <a href="#setplot">setplot</a> 
+The basic plot attributes, such as line thickness, annotation
+size, and PostScript format, can be set with the <a href="#setplot">setplot</a> 
 command.  
 <p>
 Note also that for various reasons a sequence must be defined before the 
@@ -42,12 +42,13 @@ plot, haxis=  vname, hmin=real, hmax=real,
       vaxis3= vname1,vname2,..,vnamen, 
       vaxis4= vname1,vname2,..,vnamen,
       vmin= reals, vmax= reals, 
+      title= string, 
       bars= integer, style= integer, colour= integer, symbol= integer, 
-      noversion= logical, interpolate= logical, noline= logical, notitle= logical, 
-      marker_plot= logical, range_plot= logical, 
+      interpolate= logical, zero_suppr= logical,
+      noversion= logical, noline= logical, notitle= logical, 
+      marker_plot= logical, range_plot= logical, range= range, 
       table= table_name, particle= particle1,particle2,..,particlen,
-      multiple= logical, title= string, range= range, 
-      file= file_name_start, trackfile= table_name, 
+      multiple= logical, file= file_name_start, trackfile= table_name, 
       ptc= logical, ptc_table= table_name; 
 </pre> 
 
@@ -55,31 +56,25 @@ where the parameters have the following meaning:
 
 <ul> 
 <li>haxis: name of the horizontal axis variable 
-<li>hmin: lower edge for horizontal axis
-<li>hmax: upper edge for horizontal axis; to be used, both hmin and hmax must be given.  
+<li>hmin, hmax: lower and upper edge for horizontal axis. Both values must be provided.
 <p>
 <li>vaxis: one or several variables from the table to be plotted 
 against a single vertical axis.  
 <p>
-<li>vaxis1: one or several variables from the table to be plotted 
-against vertical axis number 1 (out of 4 possible vertical axes).
-
-<li>vaxis2: one or several variables from the table to be plotted
-against vertical axis number 2 (out of 4 possible vertical axes).
-
-<li>vaxis3: one or several variables from the table to be plotted
-against vertical axis number 3 (out of 4 possible vertical axes).
-
-<li>vaxis4: one or several variables from the table to be plotted
-against vertical axis number 4 (out of 4 possible vertical axes).
+<li>vaxis<i>i</i>: one or several variables from the table to be plotted 
+against vertical axis number <i>i</i>. There is a maximum of 4 vertical axes. 
 <p>
 <font color=ff0000><i>Important: vaxis and vaxis{1..4} are exclusive in
-their application!</i></font> 
+their application! if vaxis is given, vaxis{1..4} will be simply ignored.}
+</i></font> 
 <p>
-<li>vmin: lower edge(s) for vertical axis or axes, up to four numbers separated by commas 
-
-<li>vmax: upper edge(s) for vertical axis or axes, up to four numbers separated by commas;  
-Note that both vmin and vmax must be given for an axis to be effective.  
+<li>vmin, vmax: lower and upper edge(s) for vertical axis or axes, 
+up to four numbers separated by commas. 
+Note that both vmin and vmax must be given for an axis to be effective.    
+<p>
+<li>title: plot title string; if absent,
+the last overall title is used; if no such overall title as well, the
+sequence name is used.  
 <p>
 <li>bars: 0 (default) or 1. With bars=1 all data points are connected to
 the horizontal axis with vertical bars.  
@@ -89,8 +84,6 @@ the horizontal axis with vertical bars.
      the special value style=100 uses the four styles in turn for
      successive curves in the same plot. 
      With style=0 successive data points are not connected. 
- N.B. If symbol and style are both zero at the same time, style is
-forced to its default value (style=1).  
 <p>
 <li>colour: 1 (default), 2, 3, 4 or 5: colour for the symbols and lines, 
 respectively black, red, green, blue, and magenta; 
@@ -99,16 +92,21 @@ The special value colour=100  uses the five colours in turn for successive symbo
 <li>symbol: 0 (default), 1, 2, 3, 4, or 5: The symbols to be plotted at data points, 
 respectively none, dot ("."), plus ("+"), star ("*"), circle ("o"), and cross ("x"). 
 The symbol size may have to be adapted through the SETPLOT command (see below).  
-<p>
-<li>noversion: logical, default=false. If noversion=true, the information concerning 
-the version of MAD-X and the date of the run are suppressed from the title. 
-This option frees additional space available for the user specified title of the plot.  
+<br>
+Note that if symbol and style are both zero at the same time, style is
+forced to its default value (style=1).  
 <p>
 <li>interpolate: logical, default=false. The data points are normally connected
 by straight lines; if "interpolate" is specified, the on-momentum
 Twiss parameters such as beta, alfa, and dispersion are interpolated
 with calls to the Twiss module inside each element; for all other
 variables splines are used to smooth the curves.  
+<p>
+<li>zero_suppr: To be documented (default = false)
+<p>
+<li>noversion: logical, default=false. If noversion=true, the information concerning 
+the version of MAD-X and the date of the run are suppressed from the title. 
+This option frees additional space available for the user specified title of the plot.  
 <p>
 <li>noline: logical, default=false. If s is the horizontal variable, 
 then a symbolic representation of the beamline is plotted above the plot, 
@@ -129,6 +127,9 @@ is invoked.
 <p>
 <li>range_plot: logical, default=false. Allows the specification of 
   a plotting range for the user defined horizontal axis. 
+<p>
+<li>range: horizontal plot <a href="../Introduction/ranges.html">range</a> 
+given by elements.
 <p>
 <li>table: name of the table from which data is plotted (default: twiss). 
 If the first part of the name of the table is "track", 
@@ -169,19 +170,15 @@ tracked particles for which the specified plot has to be displayed.
 for each tracked particle are put on one plot. Otherwise there will be
 one plot for each particle.  
 <p>
-<li>title: plot title string; if absent,
-the last overall title is used; if no such overall title as well, the
-sequence name is used.  
-<p>
-<li>range: horizontal plot <a href="../Introduction/ranges.html">range</a> 
-given by elements.
-<p>
-<li>file_name: start of the file name for the Postscript file(s). Only
+<li>file: basename for the Postscript file(s). Only
 the first occurrence of such a name will be used. Default is "madx" or
 "madx_track" if the <i>table</i> attribute is track.  Depending on the
 format (.ps or .eps, see below) the plots will either all be written
 into one file file_name.ps, or one per plot into file_name01.eps,
 file_name02.eps, etc.  
+<p>
+<li>trackfile: first part of the name of the files containing tracking data for each
+particle (default: track) 
 <p>
 <li>ptc: logical, default=false. If set true,
 the data to be plotted are taken from the table defined by the
@@ -190,12 +187,7 @@ previously by the ptc package. The data belong to the column
 identified by one of the names set in the definition of the ptc twiss
 table. Interpolation is not available and the attribute
 <i>interpolate</i> has no effect.  
-
 <li>ptc_table: name of the ptc twiss table to be plotted from (default: ptc_twiss) 
-<p>
-<li>trackfile: first part of the name of the files containing tracking data for each
-particle (default: track) 
-
 </ul>
 
 <p>
@@ -361,7 +353,7 @@ The same process is repeated for the second plot command, resulting in a growing
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, June 17, 2002, <p>
 <a href="http://cern.ch/rdemaria">rdemaria</a>, September 2007, <p>
-<a href="mailto:mad.support@cern.ch">Ghislain Roy</a>, April 25th, 2014.
+<a href="mailto:mad.support@cern.ch">Ghislain Roy</a>, May 2nd, 2014.
 </address>
 
 </body>
