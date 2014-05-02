@@ -339,6 +339,234 @@ end SUBROUTINE tmbend
 \subsection{The routine {tmsect}}
 \L{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \L{ek,re,te} with kick, matrix and tensor for this sector bend.
 
+\section{Lattice parameters tracking}
+\subsection{Coupled tracking}
+\subsubsection*{The subroutine \L{twcpin}}
+Following the MAD-8 physics guide (the implementation, and actually also the code, are exactly the same), we understand the initialization of the tracking of the linear coupled parameters. Given a transfer matrix,
+$$M=\left(\begin{array}[t]{cc}
+A & B\\
+C & D
+\end{array}\right),$$
+$M$ is diagonalized via a ``sympletic rotation'' $$\mathcal{R}=\left(\begin{array}[t]{cc}
+I\,\cos\phi & \bar{R}\,\sin\phi\\
+-R\,\sin\phi & I\,\cos\phi
+\end{array}\right)$$
+to
+$$\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}[t]{cc}
+A^{\prime} & 0\\
+0 & D^{\prime}
+\end{array}\right)$$
+with
+$$R=\left(\begin{array}[t]{cc}
+a & b\\
+c & d
+\end{array}\right),\qquad\left|R\right|=\left|\begin{array}[t]{cc}
+a & b\\
+c & d
+\end{array}\right|=1,\qquad\bar{R}=\left(\begin{array}[t]{cc}
+d & -b\\
+-c & a
+\end{array}\right)
+$$
+and
+$$\begin{aligned}A^{\prime} & =A-B\, R,\\
+D^{\prime} & =D+\bar{R}\, C.
+\end{aligned}$$
+Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D$.
+
+\subsubsection*{The subroutine \L{twcptk}}
+\begin{verbatim}
+  !     Purpose:                                                         *
+  !     Track coupled lattice functions.                                 *
+  !     Input:                                                           *
+  !     re(6,6)  (double)   transfer matrix of element.                  *
+  !     rt(6,6)  (double)   one turn transfer matrix.                    *
+  !     orbit(6) (double)   closed orbit                                 *
+  !----------------------------------------------------------------------*
+  integer i,i1,i2,j,inval,get_option
+  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
+       rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
+       alfy0,betx0,bety0,amux0,amuy0,zero,one
+  parameter(zero=0d0,one=1d0)
+
+  !initialize
+  bety0=zero
+  betx0=zero
+  amux0=zero
+  amuy0=zero
+  alfy0=zero
+  alfx0=zero
+\end{verbatim}
+\[
+\begin{aligned}\beta_{x,0} & =0\\
+\beta_{y,0} & =0\\
+\alpha_{x,0} & =0\\
+\alpha_{y,0} & =0\\
+\mu_{x,0} & =0\\
+\mu_{y,0} & =0
+\end{aligned}
+\]
+
+\begin{verbatim}
+  !---- Dispersion.
+  call dzero(dt,6)
+  do i = 1, 6
+     do j = 1, 6
+        dt(i) = dt(i) + re(i,j) * disp(j)
+     enddo
+  enddo
+\end{verbatim}
+\[
+\vec{\text{dt}}=\mathbf{re}\cdot\vec{\text{disp}}
+\]
+
+\begin{verbatim}
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(15)=dt(1)  // disp_x
+     opt_fun(16)=dt(2)  // disp_xp
+     opt_fun(17)=dt(3)  // disp_y
+     opt_fun(18)=dt(4)  // disp_yp
+  endif
+  if(centre_cptk) then
+     alfx0=alfx
+     alfy0=alfy
+     betx0=betx
+     bety0=bety
+     amux0=amux
+     amuy0=amuy
+     call dcopy(rmat,rmat0,4)
+     if(rmatrix) call dcopy(rw,rw0,36)
+\end{verbatim}
+\[
+\begin{aligned}\beta_{x,0} & =\beta_{x}\\
+\beta_{y,0} & =\beta_{y}\\
+\alpha_{x,0} & =\alpha_{x}\\
+\alpha_{y,0} & =\alpha_{y}\\
+\mu_{x,0} & =\mu_{x}\\
+\mu_{y,0} & =\mu_{y}
+\end{aligned}
+\]
+\[
+\text{rmat0}=\text{rmat}
+\]
+
+\begin{verbatim}
+  else
+     call dcopy(dt,disp,6)
+     disp(5) = zero
+     disp(6) = one
+\end{verbatim}
+\[
+\text{disp}=\left(\begin{array}[t]{c}
+\text{dt(1)}\\
+\text{dt(2)}\\
+\text{dt(3)}\\
+\text{dt(4)}\\
+0\\
+1
+\end{array}\right)
+\]
+
+\begin{verbatim}
+  endif
+
+  !---- Auxiliary matrices.
+  a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
+  a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
+  a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
+  a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+\end{verbatim}
+\[
+\text{re}=\left(\begin{array}[t]{cc}
+\text{re}_{a} & \text{re}_{d}\\
+\text{re}_{b} & \text{re}_{c}
+\end{array}\right)\quad\text{rmat}=\left(\begin{array}[t]{cc}
+\text{rmat}_{a} & \text{rmat}_{d}\\
+\text{rmat}_{b} & \text{rmat}_{c}
+\end{array}\right)
+\]
+\[
+\left(\begin{array}[t]{cc}
+a & -\\
+b & \begin{array}[t]{cc}
+c\\
+\\
+\end{array}
+\end{array}\right)=\left(\begin{array}[t]{cc}
+\text{re}_{a}\\
+\text{re}_{b} & \text{re}_{c}
+\end{array}\right)-\left(\begin{array}[t]{cc}
+\text{re}_{d}\cdot\text{rmat}_{a}\\
+\text{re}_{c}\cdot\text{rmat}_{a} & \text{re}_{a}\cdot\text{rmat}_{a}
+\end{array}\right)
+\]
+
+\begin{verbatim}
+  b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
+  b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
+  b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
+  b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+  c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
+  c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
+  c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
+  c(2,2) = re(4,4) - (re(4,1) * rmat(1,2) - re(4,2) * rmat(1,1))
+
+  !---- Track R matrix.
+  adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+  rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
+  rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
+  rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
+  rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
+
+  !---- Cummulative R matrix and one-turn map at element location.
+  if(rmatrix) then
+     inval=get_option('twiss_inval ')
+     call m66mpy(re,rw,rw)
+     if (inval.ne.0) then
+        call dcopy(rw,rc,36)
+     else
+        call m66inv(rw,rwi)
+        call m66mpy(rotm,rwi,rc)
+        call m66mpy(rw,rc,rc)
+     endif
+  endif
+
+  !---- Mode 1.
+  tempb = a(1,1) * betx - a(1,2) * alfx
+  tempa = a(2,1) * betx - a(2,2) * alfx
+  alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
+  betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
+  if(a(1,2).ne.zero.or.tempb.ne.zero) amux=amux+atan2(a(1,2),tempb)
+
+  !---- Mode 2.
+  tempb = c(1,1) * bety - c(1,2) * alfy
+  tempa = c(2,1) * bety - c(2,2) * alfy
+  alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
+  bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+  if(c(1,2).ne.zero.or.tempb.ne.zero) amuy=amuy+atan2(c(1,2),tempb)
+
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(3 )=betx
+     opt_fun(4 )=alfx
+     opt_fun(5 )=amux
+     opt_fun(6 )=bety
+     opt_fun(7 )=alfy
+     opt_fun(8 )=amuy
+     opt_fun(29)=rmat(1,1)
+     opt_fun(30)=rmat(1,2)
+     opt_fun(31)=rmat(2,1)
+     opt_fun(32)=rmat(2,2)
+  endif
+  if(rmatrix) then
+     do i1=1,6
+        do i2=1,6
+           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
+        enddo
+     enddo
+  endif
+\end{verbatim}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Quadrupole magnets}
