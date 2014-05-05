@@ -1509,8 +1509,8 @@ SUBROUTINE twcptk(re,orbit)
   integer i,i1,i2,j,inval,get_option
   double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
        rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
-       alfy0,betx0,bety0,amux0,amuy0,zero,one
-  parameter(zero=0d0,one=1d0)
+       alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
+  parameter(zero=0d0,one=1d0,eps=1d-8)
 
   !initialize
   bety0=zero
@@ -1587,14 +1587,14 @@ SUBROUTINE twcptk(re,orbit)
   tempa = a(2,1) * betx - a(2,2) * alfx
   alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
   betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
-  if(a(1,2).ne.zero.or.tempb.ne.zero) amux=amux+atan2(a(1,2),tempb)
+  if(abs(a(1,2)).gt.eps.or.abs(tempb).gt.eps) amux=amux+atan2(a(1,2),tempb)
 
   !---- Mode 2.
   tempb = c(1,1) * bety - c(1,2) * alfy
   tempa = c(2,1) * bety - c(2,2) * alfy
   alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
   bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
-  if(c(1,2).ne.zero.or.tempb.ne.zero) amuy=amuy+atan2(c(1,2),tempb)
+  if(abs(c(1,2)).gt.eps.or.abs(tempb).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
 
   if(.not.centre.or.centre_cptk) then
      opt_fun(3 )=betx
