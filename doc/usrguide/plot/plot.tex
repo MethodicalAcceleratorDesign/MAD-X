@@ -18,8 +18,8 @@ parameters inside the element is available through internal slicing of
 the element and a call to the Twiss module for each slice. 
 
 The basic plot attributes, such as line thickness, annotation size,
-and PostScript format, can be set with the \hyperlink{setplot}{setplot}
-command.   
+and PostScript format and interpolation can be set with the
+\hyperlink{setplot}{setplot} command.   
 
 Note also that for various reasons a sequence must be defined before the 
 PLOT command can be invoked. 
@@ -52,11 +52,17 @@ where the parameters have the following meaning:
    values must be provided. 
 
    \ttitem{vaxis} one or several variables from the table to be plotted
-     against a single vertical axis.   
+     against a single vertical axis. If more than 10 variables are
+     specified, the plot is not produced.   
 
    \ttitem{vaxis{\sl i}} one or several variables from the table to be plotted
      against vertical axis number {\sl i}. There is a maximum of 4
-     vertical axes. 
+     vertical axes. \\
+     If the number of variables given for a single vaxis{\sl i} would
+     push the total number of variables beyond the maximum of 10, the
+     variables given for this vaxis{\sl i}, as well as those for
+     subsequent vaxes, are ignored but the plot is produced for the
+     variables accumulated so far.  
 
    \textit{Important: vaxis and vaxis{1..4} are exclusive in their
      application! if vaxis is given, vaxis{1..4} will be simply ignored.} 
@@ -93,10 +99,15 @@ where the parameters have the following meaning:
 
    \ttitem{interpolate} logical, default=false. The data points are
      normally connected by straight lines; if "interpolate" is
-     specified, the on-momentum Twiss parameters such as beta, alfa, and
-     dispersion are interpolated with calls to the Twiss module inside
-     each element; for all other variables splines are used to smooth
-     the curves.  
+     specified, the following on-momentum Twiss parameters are
+     interpolated with calls to the Twiss module inside 
+     each element: beta, sqrt(beta), alfa, phase advance, orbit, angle,
+     dispersion and its first derivative, for both planes. \\ 
+     For all other variables splines are used to smooth
+     the curves.  \\ 
+     Note that setting this option is ineffective if the interpolate
+     option of the SETOPT command has been set to true; in this case all
+     plots will be interpolated.  
 
    \ttitem{zero\_suppr} To be documented (default = false)
 
@@ -203,7 +214,8 @@ where the parameters have the following meaning:
 \section{SETPLOT}
 \begin{verbatim}
 setplot, post= integer, font= integer, lwidth= real, xsize= real, ysize= real,
-         ascale= real, lscale= real, sscale= real, rscale= real;
+         ascale= real, lscale= real, sscale= real, rscale= real,
+         interpolate= logical;
 \end{verbatim} 
 
 where the parameters have the following meaning: 
@@ -229,6 +241,20 @@ where the parameters have the following meaning:
    \ttitem{lscale} axis label character height scale factor, default=1.  
    \ttitem{sscale} curve symbol (see above) scale factor, default=1.  
    \ttitem{rscale} axis text character height scale factor, default=1.  
+
+   \ttitem{interpolate} logical, default=false. The data points are
+     normally connected by straight lines; if "interpolate" is
+     specified, the following on-momentum Twiss parameters are
+     interpolated with calls to the Twiss module inside 
+     each element:  beta, sqrt(beta), alfa, phase advance, orbit, angle,
+     dispersion and its first derivative, for both planes. \\ 
+     For all other variables splines are used to smooth the curves. \\  
+     Note that if the interpolate option is set to true by {\tt SETOPT},
+     subsequent plots use interpolation, irrespective of the
+     setting of the option in the {\tt PLOT} commands. If the interpolate
+     option is set to false in {\tt SETOPT} (default), the interpolate
+     option of subsequent {\tt PLOT} command is respected.
+
 \end{madlist}
 
 

@@ -96,8 +96,9 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
 
   iecub = 0
 
-  zero_suppr=get_value('plot ','zero_suppr ').ne.0 !hbu
+  zero_suppr = get_value('plot ','zero_suppr ').ne.0 !hbu
   marker_plot = get_value('plot ','marker_plot ').ne.0 !hg
+
   !--- Output initialisation
 
   ierr = 0
@@ -396,8 +397,8 @@ subroutine pefill(ierr)
 
   ! Initialize marker_plot logical
 
-  marker_plot=get_value('plot ','marker_plot ').ne.zero
-  range_plot=get_value('plot ','range_plot ').ne.zero
+  marker_plot = get_value('plot ','marker_plot ').ne.zero
+  range_plot  = get_value('plot ','range_plot ').ne.zero
 
   !--- Output initialisation
 
@@ -620,17 +621,17 @@ subroutine pefill(ierr)
            k = double_from_table_row(tabname, sname(l), j, d_val)
            k = p(l)
            qvval(nqval(l),l) = d_val
-           if (proc_flag(1,l) .eq. 1) then
+           if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rbety
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
-        elseif (itbv .eq. 0 .or. currpos - qhval(nqval(l),l)          &
-             .gt. mystep .or. (marker_plot .and. currtyp .eq. 25)) then
+        elseif (itbv .eq. 0 .or. currpos - qhval(nqval(l),l) .gt. mystep &
+             .or. (marker_plot .and. currtyp .eq. 25)) then
            nqval(l) = nqval(l) + 1
            qhval(nqval(l),l) = currpos
            k = double_from_table_row(tabname, sname(l), j, d_val)
            k = p(l)
            qvval(nqval(l),l) = d_val
-           if (proc_flag(1,l) .eq. 1) then
+           if (proc_flag(1,l) .eq. 1) then ! case of rbetx or rebty
               qvval(nqval(l),l) = sqrt(abs(qvval(nqval(l),l)))
            endif
         endif
@@ -1083,18 +1084,31 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
        0, 0,                                                             &
        0, 0, 0, 0 /
 
-  data (intpo(j), j = 1, 32) / 32 * 0 /
   !--- in INTPO, n+100 means: take SQRT of var. n
+  ! 2014-May-05  16:04:47  ghislain: added proper interpolation for x (code 11),
+  ! px (12), y (13), py(14)
+  data (intpo(j), j = 1, 32) / &
+       0, 0, 0, &
+       0, 11, 13, 0, 0, &
+       0, 0, 0, 0, 0, &
+       0, 0, 0, &
+       0, 0, 0, &
+       0, 0, 0, &
+       0, 0, 0, 0, 0, &
+       0, 0, 0, &
+       0, &
+       0/ 
+
   data (intpo(j), j = 33, mnvar) /                                  &
        1, 101,                                                           &
        2, 3, 4,                                                          &
-       5, 0, 0, 0,                                                       &
+       5, 0, 12, 0,                                                       &
        0, 0,                                                             &
        0, 0, 0,                                                          &
        0,                                                                &
        6, 106,                                                           &
        7, 8, 9,                                                          &
-       10, 0, 0, 0,                                                      &
+       10, 0, 14, 0,                                                      &
        0, 0,                                                             &
        0, 0, 0,                                                          &
        0, 0, 0, 0,                                                       &
@@ -1293,11 +1307,6 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
      ! the name of a variable can be given as "bet" and will match "betx" ? 
      ! not documented and not functional as far as I can see in test cases.
      if ( k2+1 .eq. k2f .and. svar(:k2) .eq. svname(iref)(:k2) .and. index('xy', svname(iref)(k2f:k2f)) .ne. 0) goto 9
-!     if (k2 + 1 .eq. k2f)  then
-!        if (index('xy', svname(iref)(k2f:k2f)) .ne. 0)  then
-!           if (svar(:k2) .eq. svname(iref)(:k2))  goto 9
-!        endif
-!     endif
   enddo
   return
 
@@ -1599,6 +1608,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
            ipparm(2,j) = 0
         endif
      enddo
+
   enddo
   k = reset_interpolation(nint)
 
@@ -2254,13 +2264,14 @@ subroutine pesopt(ierr)
 
   integer ierr
 
-  integer i, j, k, notitle, noversi, nivaxs,inter_setplot
+  integer i, j, k, notitle, noversi, nivaxs, inter_setplot
   character * (mcnam) sdum(1)
   integer nint, ndble, int_arr(szcompar), char_l(szcompar)
   integer plot_style(szcompar),plot_symbol(szcompar)
   double precision d_arr(szcompar)
   double precision plot_option
   character * (szchara) char_a, version
+  character(8) vaxisi
 
   ierr = 0
 
@@ -2270,24 +2281,16 @@ subroutine pesopt(ierr)
   nivvar = 0
   interf = 0
   noline = 0
-  do i = 1, 4
-     nvvar(i) = 0
-  enddo
-  do i = 1 , 2
-     do j = 1 , mxcurv
-        proc_flag(i,j)= 0
-     enddo
-  enddo
-  do i = 1 , mpparm
-     do j = 1 , mxcurv
-        ipparm(i,j) = 0
-     enddo
-  enddo
-  do i = 1, mxcurv
-     naxref(i) = 0
-  enddo
-  nrrang(1) = 0
-  nrrang(2) = 0
+
+  NVVAR = 0
+
+  PROC_FLAG = 0
+
+  IPPARM = 0
+
+  NAXREF = 0
+
+  NRRANG = 0
 
   !--- Initialisation of variables in common peaddr
 
@@ -2300,10 +2303,10 @@ subroutine pesopt(ierr)
   hmima(1) = 1.e20
   hmima(2) = -1.e20
   do j = 1 , 4
-     vrange(1,j) = 0.0
-     vrange(2,j) = 0.0
-     vmima(1,j) = 1.e20
-     vmima(2,j) = -1.e20
+    vrange(1,j) = 0.0
+    vrange(2,j) = 0.0
+    vmima(1,j) = 1.e20
+    vmima(2,j) = -1.e20
   enddo
 
   !--- Initialisation of variables in common peaddc
@@ -2311,10 +2314,8 @@ subroutine pesopt(ierr)
   horname = ' '
   tabname = ' '
   toptitle = ' '
-  do i = 1 , mxcurv
-     sname(i) = ' '
-  enddo
-
+  SNAME = ' '
+  
   !--- Initialisation of variables in common peotcl
 
   fpmach = .false.
@@ -2325,19 +2326,15 @@ subroutine pesopt(ierr)
   nivaxs = 0
   notitle = 0
   noversi = 0
-  do i = 1, szcompar
-     int_arr(i) = 0
-     char_l(i) = 0
-     d_arr(i)=0.0d0
-  enddo
+
+  INT_ARR = 0
+  CHAR_L = 0
+  D_ARR = 0.0d0
+
   char_a = ' '
   sdum(1) = ' '
 
   !--- Routine body
-
-  !--- ptc flag setting
-  call comm_para('ptc ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-  if (nint .gt. 0 .and. int_arr(1) .eq. 1) ptc_flag = .true.
 
   !--- get notitle
   call comm_para('notitle ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
@@ -2347,17 +2344,21 @@ subroutine pesopt(ierr)
   call comm_para('noversion ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0) noversi = int_arr(1)
 
+  !--- ptc flag setting
+  call comm_para('ptc ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
+  if (nint .gt. 0 .and. int_arr(1) .eq. 1) ptc_flag = .true.
+
   !--- if ptc flag is on look for the ptc_table
   if(ptc_flag) then
      call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) tabname = char_a
   else
-     !--- else normal twiss treatment : any table - for hor = s plot machine
+     !--- else normal twiss treatment : any table
      call comm_para('table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) tabname = char_a
   endif
 
-  !--- Horizontal variable
+  !--- Horizontal variable  - for hor = s plot machine
   char_a = ' '
   call comm_para( 'haxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (k .eq. 0)  then
@@ -2367,7 +2368,7 @@ subroutine pesopt(ierr)
   else
      horname = char_a
   endif
-  itbv = 0
+
   if (horname .eq. 's')  itbv = 1
 
   !--- Prepare title
@@ -2428,7 +2429,8 @@ subroutine pesopt(ierr)
   !--- Check that STYLE & SYMBOL are both non zero
   call comm_para('style ', nint, ndble, k, plot_style, d_arr, char_a, char_l)
   call comm_para('symbol ', nint, ndble, k, plot_symbol, char_a, char_l)
-  if (plot_style(1) + plot_symbol(1) .eq. 0) then
+!  if (plot_style(1) + plot_symbol(1) .eq. 0) then ! 2014-May-05  13:07:59  ghislain: too dangerous, eg for values -1 and +1 
+  if (plot_style(1) .eq. 0 .and. plot_symbol(1) .eq. 0) then
      print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
   endif
@@ -2443,95 +2445,63 @@ subroutine pesopt(ierr)
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
   if (ptc_flag .and. itbv .eq. 0) return
 
+  !--- Spline is obsolete 
+  call comm_para('spline ', nint,ndble,k,i,d_arr, char_a,char_l)
+  if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
+
+  !--- Interpolate: priority is given to the SETOPT option. 
+  !  If False, the option of the PLOT command will be considered.
+  !  If True, the option of the PLOT command is ignored. 
+  ipparm(2,1) = plot_option('interpolate ')
+  if (ipparm(2,1) .eq. 0) call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
+
   !--- Interpolation is not possible for ptc twiss variables
-  if (.not. ptc_flag) then
-     call comm_para('spline ', nint,ndble,k,ipparm(2,1),d_arr, char_a,char_l)
-     if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
+  if (ptc_flag) ipparm(2,1) = 0
 
-     ipparm(2,1) = 0
-     inter_setplot = plot_option('interpolate ')
-     if (inter_setplot .eq. 0) then
-        call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
-     else
-        ipparm(2,1) = inter_setplot
-     endif
-  endif
-
-  !--- Continue fetching variables to be plotted
+  !--- another interpolation flag is used in other subroutines
   interf = ipparm(2,1)
 
+  !--- Continue fetching variables to be plotted
+  !--- First test the variables on vaxis
   char_a = ' '
   call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (k .gt. 0)  then 
      nivaxs = 1
+     !--- 2014-May-05  16:34:59  ghislain: in order to avoid creating spurious ps files 
+     ! with basename equal to the first ignored variable (eg dy.ps), it is better to discard the whole plot
+     ! and let the user fix the problem (for now at least...)
+     if (k .gt. mxcurv) then
+        print '(" Warning: ",i2," variables on vaxis, would overflow max number(",i2,"). all variables ignored.")', &
+             k,mxcurv
+        goto 110
+     endif
      nivvar = min(k, mxcurv)
      call pesplit(k, char_a, char_l, slabl)
      do j = 1, nivvar
         naxref(j) = 1
-      enddo
+     enddo
+     !--- Do not even look further for variables on vaxis_i.
   else
-     char_a = ' '
-     call comm_para('vaxis1 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0)  then
-        if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
-           goto 110
+     !--- Look for variables on vaxis_i 
+     do i = 1, 4
+        write(vaxisi,'("vaxis",i1," ")') i
+        char_a = ' '
+        call comm_para(vaxisi, nint, ndble, k, int_arr, d_arr, char_a, char_l)
+        if (k .gt. 0)  then
+           !-- we need to test for overflow in number of variables before parsing the labels...
+           if (nivvar+k .gt. mxcurv) then
+              print '(" Warning: ",i2," variables on vaxis",i1," would overflow max number(",i2,"). variables ignored.")', &
+                   k,i,mxcurv
+              goto 110
+           endif
+           nivaxs = nivaxs + 1        
+           call pesplit(k, char_a, char_l, slabl(nivvar+1))
+           do j = 1, k
+              nivvar = nivvar + 1
+              naxref(nivvar) = i
+           enddo
         endif
-        nivaxs = nivaxs + 1
-        call pesplit(k, char_a, char_l, slabl(nivvar+1))
-        do j = 1, k
-           nivvar = nivvar + 1
-           naxref(nivvar) = 1
-        enddo
-     endif
-     char_a = ' '
-     call comm_para('vaxis2 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0)  then
-        if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
-           goto 110
-        endif
-        nivaxs = nivaxs + 1
-        call pesplit(k, char_a, char_l, slabl(nivvar+1))
-        do j = 1, k
-           nivvar = nivvar + 1
-           naxref(nivvar) = 2
-        enddo
-     endif
-     char_a = ' '
-     call comm_para('vaxis3 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0)  then
-        if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
-           goto 110
-        endif
-        nivaxs = nivaxs + 1
-        call pesplit(k, char_a, char_l, slabl(nivvar+1))
-        do j = 1, k
-           nivvar = nivvar + 1
-           naxref(nivvar) = 3
-        enddo
-     endif
-     char_a = ' '
-     call comm_para('vaxis4 ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0)  then
-        if (nivvar+k .gt. mxcurv) then
-           print *, 'Warning: # vertical variables cut at ', nivvar, ' with maximum ', mxcurv
-           goto 110
-        endif
-        nivaxs = nivaxs + 1
-        call pesplit(k, char_a, char_l, slabl(nivvar+1))
-        do j = 1, k
-           nivvar = nivvar + 1
-           naxref(nivvar) = 4
-        enddo
-     endif
-  endif
-
-  if (nivvar .eq. 0)  then
-     print *, 'Warning: no vertical plot variables, plot skipped'
-     ierr = 1
-     return
+     enddo
   endif
 
   do i = 2, mxcurv
@@ -2543,6 +2513,14 @@ subroutine pesopt(ierr)
   enddo
 
 110 continue
+
+  if (nivvar .eq. 0) then 
+     !--- nothing to be plotted, probably because of too many variables on a single axis
+     print *, 'Warning: no vertical plot variables, plot skipped'
+     ierr=1
+     return
+  endif
+  
 
   do j = 1, nivvar
      call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j), sdum(1))

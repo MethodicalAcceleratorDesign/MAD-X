@@ -346,6 +346,7 @@ hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
   struct node* c_node;
   char tmp[2*NAME_L];
   int i;
+  
   strcpy(tmp, name);
   square_to_colon(tmp);
 
@@ -374,12 +375,10 @@ resequence_nodes(struct sequence* sequ)
 {
   struct node* c_node = sequ->start;
   int i, cnt;
-  while (c_node != NULL)
-  {
-    if (c_node->p_elem != NULL)
-    {
-      if ((i = name_list_pos(c_node->p_elem->name, occ_list)) < 0)
-      {
+
+  while (c_node != NULL) {
+    if (c_node->p_elem != NULL) {
+      if ((i = name_list_pos(c_node->p_elem->name, occ_list)) < 0) {
         i = add_to_name_list(c_node->p_elem->name, 1, occ_list);
         cnt = 1;
       }
