@@ -1504,7 +1504,6 @@ SUBROUTINE twcptk(re,orbit)
   !     Track coupled lattice functions.                                 *
   !     Input:                                                           *
   !     re(6,6)  (double)   transfer matrix of element.                  *
-  !     rt(6,6)  (double)   one turn transfer matrix.                    *
   !     orbit(6) (double)   closed orbit                                 *
   !----------------------------------------------------------------------*
   integer i,i1,i2,j,inval,get_option

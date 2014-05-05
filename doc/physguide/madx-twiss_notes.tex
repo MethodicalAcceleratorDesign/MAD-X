@@ -335,14 +335,12 @@ Radiation effects at the exit:
 end SUBROUTINE tmbend
 \end{lstlisting}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The routine {tmsect}}
 \L{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \L{ek,re,te} with kick, matrix and tensor for this sector bend.
 
 \section{Lattice parameters tracking}
 \subsection{Coupled tracking}
-\subsubsection*{The subroutine \L{twcpin}}
-Following the MAD-8 physics guide (the implementation, and actually also the code, are exactly the same), we understand the initialization of the tracking of the linear coupled parameters. Given a transfer matrix,
+Following the MAD-8 physics guide (the implementation, and actually also the code, are exactly the same), we understand the initialisation of the tracking of the linear coupled parameters. Given one-turn transfer matrix,
 $$M=\left(\begin{array}[t]{cc}
 A & B\\
 C & D
@@ -372,10 +370,73 @@ and
 $$\begin{aligned}A^{\prime} & =A-B\, R,\\
 D^{\prime} & =D+\bar{R}\, C.
 \end{aligned}$$
-Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D$.
+Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D$. $R$ is defined as
+\begin{eqnarray*}
+\text{aux} & = & C+\bar{B}=\left(\begin{array}[t]{cc}
+M_{31}+M_{24} & M_{32}-M_{14}\\
+M_{41}-M_{23} & M_{42}-M_{13}
+\end{array}\right)\\
+\text{dtr} & = & \frac{1}{2}\left(M_{11}+M_{22}-M_{33}-M_{44}\right)=\frac{1}{2}\left(\mathrm{Tr}\, A-\mathrm{Tr}\, D\right)\\
+R & = & \frac{\text{aux}}{\text{dtr}+\mathrm{sign}\left(\mathrm{det}\,\left(\text{aux}\right)\right)\sqrt{\mathrm{det}\,\left(\text{aux}\right)+\text{dtr}^{2}}}
+\end{eqnarray*}
+\begin{description}
+\item[twcpin] initialises the coupled tracking:
+\\\begin{enumerate}
+\item \L{rmat0} is set to be equal to $R$;
+\item computes $A$ and $D$, and the initial twiss parameters for these matrices:
+\[
+\begin{array}{ccl}
+\text{if} & \left|\frac{1}{2}\mathrm{Tr}\left(A\right)\right|<1\\
+ & \mathrm{sinmux}=\sin\mu_{x} & =\mathrm{sign}\left(A_{12}\right)\sqrt{-A_{12}\cdot A_{21}-\frac{1}{4}\left(A_{11}-A_{22}\right)^{2}}\\
+ & \beta_{0,x} & =\frac{A_{12}}{\sin\mu_{x}}\\
+ & \alpha_{0,x} & =\frac{A_{11}-A_{22}}{2\sin\mu_{x}}\\
+\text{else}\\
+ & \beta_{0,x} & =0\\
+ & \alpha_{0,x} & =0\\
+\text{endif}
+\end{array}
+\]
+and the same for $y$, with $D$ instead of $A$;
+\end{enumerate}
+\item[twcptk] tracks the coupled lattice functions, given the element transfer matrix $M$:
+\begin{enumerate}
+\item tracks the dispersion $$d \leftarrow M\cdot d$$
+\item saying, 
+$$M\equiv\left(\begin{array}[t]{cc}
+A & D\\
+B & C
+\end{array}\right),$$
+creates the auxiliary matrices
+\[
+\begin{aligned}A & =A-D\cdot R\\
+B & =B-C\cdot R\\
+C & =C-\bar{R}\cdot B
+\end{aligned}
+\]
+in order to track $R$ matrix (\L{rmat}):
+\[
+R\leftarrow-\frac{B\cdot\bar{A}}{\left|A\right|}
+\]
+\item given $A$ and $C$, that in this function are such that
+\[\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}[t]{cc}
+A & 0\\
+0 & C
+\end{array} \right) \]
+
+the twiss parameters are tracked:
+\end{enumerate}
+\end{description}
 
 \subsubsection*{The subroutine \L{twcptk}}
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=1]
+SUBROUTINE twcptk(re,orbit)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  implicit none
+
+  !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track coupled lattice functions.                                 *
   !     Input:                                                           *
@@ -396,7 +457,8 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
   amuy0=zero
   alfy0=zero
   alfx0=zero
-\end{verbatim}
+\end{lstlisting}
+
 \[
 \begin{aligned}\beta_{x,0} & =0\\
 \beta_{y,0} & =0\\
@@ -407,7 +469,8 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
 \end{aligned}
 \]
 
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=last]
+
   !---- Dispersion.
   call dzero(dt,6)
   do i = 1, 6
@@ -415,12 +478,14 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
         dt(i) = dt(i) + re(i,j) * disp(j)
      enddo
   enddo
-\end{verbatim}
+\end{lstlisting}
+
 \[
 \vec{\text{dt}}=\mathbf{re}\cdot\vec{\text{disp}}
 \]
 
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=last]
+
   if(.not.centre.or.centre_cptk) then
      opt_fun(15)=dt(1)  // disp_x
      opt_fun(16)=dt(2)  // disp_xp
@@ -436,7 +501,8 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
      amuy0=amuy
      call dcopy(rmat,rmat0,4)
      if(rmatrix) call dcopy(rw,rw0,36)
-\end{verbatim}
+\end{lstlisting}
+
 \[
 \begin{aligned}\beta_{x,0} & =\beta_{x}\\
 \beta_{y,0} & =\beta_{y}\\
@@ -450,12 +516,14 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
 \text{rmat0}=\text{rmat}
 \]
 
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=last]
+
   else
      call dcopy(dt,disp,6)
      disp(5) = zero
      disp(6) = one
-\end{verbatim}
+\end{lstlisting}
+
 \[
 \text{disp}=\left(\begin{array}[t]{c}
 \text{dt(1)}\\
@@ -467,7 +535,8 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
 \end{array}\right)
 \]
 
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=last]
+
   endif
 
   !---- Auxiliary matrices.
@@ -475,7 +544,8 @@ Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D
   a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
   a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
   a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
-\end{verbatim}
+\end{lstlisting}
+
 \[
 \text{re}=\left(\begin{array}[t]{cc}
 \text{re}_{a} & \text{re}_{d}\\
@@ -501,7 +571,8 @@ c\\
 \end{array}\right)
 \]
 
-\begin{verbatim}
+\begin{lstlisting}[firstnumber=last]
+
   b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
   b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
   b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
@@ -564,7 +635,8 @@ c\\
         enddo
      enddo
   endif
-\end{verbatim}
+\end{lstlisting}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -589,6 +661,7 @@ c\\
 \section{Appendix}
 \begin{itemize}
 \item[-] \L{dcopy(in,out,n)}
+\item[-] \L{m66mpy(fact1,fact2,target)}
 \item[-] \L{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
 e_{d}\\
 R_{d}\\
