@@ -176,6 +176,19 @@ exec_macro(struct in_cmd* cmd, int pos)
       mystrcpy(pro->buffers[level]->c_a, l_wrk->c);
     }
   }
+
+  if (get_option("echomacro")) {
+    printf("=== echoing exec %s", macro_list->macros[pos]->name);
+    if (macro_list->macros[pos]->n_formal > 0) {
+      printf("(");
+      for (i=3; i<cmd->tok_list->curr-2; i++) printf("%s,", cmd->tok_list->p[i]);
+      printf("%s)", cmd->tok_list->p[i]);
+    }
+    printf("\n");
+    puts(pro->buffers[level]->c_a->c);
+    printf("=== end of echoing %s\n", macro_list->macros[pos]->name);
+  }
+
   pro_input(pro->buffers[level]->c_a->c);
   pro->curr--;
 }

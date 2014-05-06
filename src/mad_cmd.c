@@ -135,9 +135,9 @@ exec_command(void)
     cmd_name = p->cmd_def->name;
 
     if (strcmp(cmd_name, "stop") == 0 || 
-	strcmp(cmd_name, "quit") == 0 || 
-	strcmp(cmd_name, "exit") == 0) {
-      madx_finish(); stop_flag = 1; return;
+	      strcmp(cmd_name, "quit") == 0 || 
+	      strcmp(cmd_name, "exit") == 0) {
+        madx_finish(); stop_flag = 1; return;
     }
 
     else if (strcmp(cmd_name, "help") == 0)    exec_help(p);
