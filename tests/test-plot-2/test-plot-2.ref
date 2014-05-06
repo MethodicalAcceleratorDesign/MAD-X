@@ -1,0 +1,417 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 06.05.14 14.32.57 +
+  +++++++++++++++++++++++++++++++++++++++++++
+option, -echo;
+
+++++++ info: keddy redefined
+
+
+beam, particle=proton, energy=0.938272*1.1547;
+
+
+
+use, sequence=LEIR;
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
+
+	                  x,px,y,py,deltap,
+
+                          re11,re12,re13,re14,re15,re16,
+
+                          re21,re22,re23,re24,re25,re26,
+
+                          re31,re32,re33,re34,re35,re36,
+
+                          re41,re42,re43,re44,re45,re46,
+
+                          re51,re52,re53,re54,re55,re56,
+
+                          re61,re62,re63,re64,re65,re66;
+
+
+
+twiss, rmatrix, chrom, save;
+
+enter Twiss module
+  
+iteration:   1 error:   1.178159E-04 deltap:   1.000000E-06
+orbit:  -7.037258E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016100E-07
+  
+iteration:   2 error:   5.695678E-10 deltap:   1.000000E-06
+orbit:  -7.037392E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016137E-07
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       78.54370266                 -0       0.1241075638        2.838578276 
+
+                q1                dq1            betxmax              dxmax 
+       1.820059621       -3.734960651        15.12421277         20.6041956 
+
+             dxrms             xcomax             xcorms                 q2 
+       9.639962105                  0                  0         2.71982919 
+
+               dq2            betymax              dymax              dyrms 
+      -7.573740341        20.07025727                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0        19.69937659 
+
+           synch_2            synch_3            synch_4            synch_5 
+       1.526297364       0.3728165258                  0        16.84840744 
+
+
+plot, haxis=s, vaxis=betx;
+
+Plot - default table plotted: twiss
+
+ GXPLOT-X11  1.50 initialized
+
+ plot number =            1
+
+
+plot, haxis=s, vaxis=betx, colour=100, title="sample plot";
+
+Plot - default table plotted: twiss
+ plot number =            2
+
+
+plot, haxis=s, vaxis=betx,bety, colour=100, title="two variables";
+
+Plot - default table plotted: twiss
+ plot number =            3
+
+
+title, "two variables with range";
+
+plot, haxis=s, vaxis=betx,bety, colour=100, range=CtrS10/CtrS20;
+
+Plot - default table plotted: twiss
+ plot number =            4
+
+
+title, "two variables with range and range_plot";
+
+plot, haxis=s, vaxis=betx,bety, colour=100, range_plot, range=CtrS10/CtrS20, noversion;
+
+Plot - default table plotted: twiss
+ plot number =            5
+
+
+title, "two variables on vaxis2";
+
+plot, haxis=s, vaxis2=betx,bety, colour=100; ! test a single vaxis<i> but not in order
+
+Plot - default table plotted: twiss
+ plot number =            6
+
+
+title, "two variables and some more options";
+
+plot, haxis=s, vaxis=betx,bety, colour=100, notitle, noversion, noline, interpolate;
+
+Plot - default table plotted: twiss
+ plot number =            7
+
+
+title, "two axes; interpolate";
+
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, colour=100, interpolate, noversion;
+
+Plot - default table plotted: twiss
+ plot number =            8
+
+
+title, "three axes; noversion";
+
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, colour=100, noversion;
+
+Plot - default table plotted: twiss
+ plot number =            9
+
+
+title, "four axes; interpolate, noline, notitle, noversion ";
+
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, vaxis4=dx, colour=100, interpolate, noline, notitle, noversion;
+
+Plot - default table plotted: twiss
+ plot number =           10
+
+
+title, "non-s horizontal axis";
+
+plot, haxis=mux, vaxis=betx, colour=100;
+
+Plot - default table plotted: twiss
+ plot number =           11
+
+
+title, "should never appaear on plots";
+
+
+
+plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
+
+      vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx;
+
+Plot - default table plotted: twiss
+ plot number =           12
+
+
+plot, haxis=s, colour=100, title="max # of variables on vaxis1", noversion,
+
+      vaxis1= re11,re12,re13,re14,re15,re16,
+
+      vaxis2= re21,re22,re23,re24;
+
+Plot - default table plotted: twiss
+ plot number =           13
+
+
+
+
+plot, haxis=s, colour=100, title="overflow in number of variables to be plotted", noversion
+
+      vaxis1= re11,re12,re13,re14,re15,re16,
+
+      vaxis2= re21,re22,re23,re24,
+
+      vaxis3= re31,re32,re33,re34,re35,re36,
+
+      vaxis4= re41,re42,re43,re44,re45,re46; 
+
+Plot - default table plotted: twiss
+ Warning:  6 variables on vaxis4 would overflow max number(10). variables ignored.
+ plot number =           14
+
+
+twiss, save, deltap=-.015:.02:.005;
+
+enter Twiss module
+  
+iteration:   1 error:   2.626153E+00 deltap:  -1.500000E-02
+orbit:   1.925117E-01  2.036716E-02  0.000000E+00  0.000000E+00  3.123076E-01 -8.462596E-03
+  
+iteration:   2 error:   1.209739E-01 deltap:  -1.500000E-02
+orbit:   1.274148E-01  3.758575E-02  0.000000E+00  0.000000E+00  1.378295E-02 -7.308212E-03
+  
+iteration:   3 error:   7.103475E-03 deltap:  -1.500000E-02
+orbit:   1.324935E-01  3.629267E-02  0.000000E+00  0.000000E+00  3.702786E-02 -7.197328E-03
+  
+iteration:   4 error:   7.053273E-05 deltap:  -1.500000E-02
+orbit:   1.324729E-01  3.629651E-02  0.000000E+00  0.000000E+00  3.713144E-02 -7.197116E-03
+  
+iteration:   5 error:   1.050991E-08 deltap:  -1.500000E-02
+orbit:   1.324729E-01  3.629652E-02  0.000000E+00  0.000000E+00  3.713176E-02 -7.197116E-03
+  
+iteration:   1 error:   2.025006E+00 deltap:  -1.000000E-02
+orbit:   1.306705E-01  1.914187E-02  0.000000E+00  0.000000E+00  1.615163E-01 -7.100066E-03
+  
+iteration:   2 error:   8.773724E-02 deltap:  -1.000000E-02
+orbit:   9.983824E-02  2.717357E-02  0.000000E+00  0.000000E+00  1.906536E-02 -6.348401E-03
+  
+iteration:   3 error:   1.113723E-03 deltap:  -1.000000E-02
+orbit:   1.012398E-01  2.681371E-02  0.000000E+00  0.000000E+00  2.637681E-02 -6.321252E-03
+  
+iteration:   4 error:   4.924529E-06 deltap:  -1.000000E-02
+orbit:   1.012389E-01  2.681383E-02  0.000000E+00  0.000000E+00  2.641738E-02 -6.321236E-03
+  
+iteration:   5 error:   1.009066E-10 deltap:  -1.000000E-02
+orbit:   1.012389E-01  2.681383E-02  0.000000E+00  0.000000E+00  2.641741E-02 -6.321236E-03
+  
+iteration:   1 error:   9.792261E-01 deltap:  -5.000000E-03
+orbit:   5.749654E-02  1.106944E-02  0.000000E+00  0.000000E+00  4.547345E-02 -3.443780E-03
+  
+iteration:   2 error:   2.638199E-02 deltap:  -5.000000E-03
+orbit:   5.077168E-02  1.279168E-02  0.000000E+00  0.000000E+00  1.138494E-02 -3.247522E-03
+  
+iteration:   3 error:   4.841394E-05 deltap:  -5.000000E-03
+orbit:   5.083506E-02  1.277498E-02  0.000000E+00  0.000000E+00  1.197882E-02 -3.246188E-03
+  
+iteration:   4 error:   1.004668E-08 deltap:  -5.000000E-03
+orbit:   5.083506E-02  1.277498E-02  0.000000E+00  0.000000E+00  1.198089E-02 -3.246188E-03
+  
+iteration:   1 error:   3.221781E-16 deltap:   1.734723E-18
+orbit:  -1.746708E-17 -4.160744E-18  0.000000E+00  0.000000E+00 -5.427209E-18  1.122273E-18
+  
+iteration:   1 error:   8.830782E-01 deltap:   5.000000E-03
+orbit:  -4.475209E-02 -1.259717E-02  0.000000E+00  0.000000E+00  8.151100E-03  3.038562E-03
+  
+iteration:   2 error:   2.976350E-02 deltap:   5.000000E-03
+orbit:  -5.005955E-02 -1.129655E-02  0.000000E+00  0.000000E+00 -1.024866E-02  3.226032E-03
+  
+iteration:   3 error:   3.365869E-05 deltap:   5.000000E-03
+orbit:  -5.002850E-02 -1.130517E-02  0.000000E+00  0.000000E+00 -9.820047E-03  3.226900E-03
+  
+iteration:   4 error:   1.863719E-09 deltap:   5.000000E-03
+orbit:  -5.002850E-02 -1.130517E-02  0.000000E+00  0.000000E+00 -9.818780E-03  3.226900E-03
+  
+iteration:   1 error:   1.685214E+00 deltap:   1.000000E-02
+orbit:  -8.080960E-02 -2.593353E-02  0.000000E+00  0.000000E+00  5.394568E-02  5.719568E-03
+  
+iteration:   2 error:   1.202219E-01 deltap:   1.000000E-02
+orbit:  -1.001732E-01 -2.130765E-02  0.000000E+00  0.000000E+00 -2.094729E-02  6.445996E-03
+  
+iteration:   3 error:   4.661456E-04 deltap:   1.000000E-02
+orbit:  -9.981313E-02 -2.141053E-02  0.000000E+00  0.000000E+00 -1.804003E-02  6.457896E-03
+  
+iteration:   4 error:   3.786051E-07 deltap:   1.000000E-02
+orbit:  -9.981316E-02 -2.141053E-02  0.000000E+00  0.000000E+00 -1.802320E-02  6.457898E-03
+  
+iteration:   1 error:   2.417155E+00 deltap:   1.500000E-02
+orbit:  -1.110108E-01 -3.944691E-02  0.000000E+00  0.000000E+00  1.251346E-01  8.082165E-03
+  
+iteration:   2 error:   2.676713E-01 deltap:   1.500000E-02
+orbit:  -1.511353E-01 -3.011842E-02  0.000000E+00  0.000000E+00 -3.450600E-02  9.660869E-03
+  
+iteration:   3 error:   2.057409E-03 deltap:   1.500000E-02
+orbit:  -1.497959E-01 -3.051391E-02  0.000000E+00  0.000000E+00 -2.503935E-02  9.713696E-03
+  
+iteration:   4 error:   6.483819E-06 deltap:   1.500000E-02
+orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496765E-02  9.713727E-03
+  
+iteration:   5 error:   3.823130E-10 deltap:   1.500000E-02
+orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496761E-02  9.713727E-03
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       78.54370266     -0.03713175644     -0.02512050836       -6.309366972 
+       78.54370266     -0.02641740872      0.01215699531        9.069573723 
+       78.54370266     -0.01198088658      0.07128671577        3.745378357 
+       78.54370266     5.42720872e-18       0.1241075638        2.838578276 
+       78.54370266     0.009818779968       0.1705694244        2.421304494 
+       78.54370266      0.01802319856       0.2125083196        2.169262114 
+       78.54370266      0.02496760541       0.2511691676        1.995339669 
+
+                q1                dq1            betxmax              dxmax 
+       1.900385772       -6.461134965        22.48422297        24.96730295 
+       1.878103642       -5.571776098        19.33191162        23.72270584 
+       1.847662982       -4.814339219          16.646602        22.00568379 
+       1.820059621       -4.353246567        15.12421277         20.6041956 
+       1.794961909        -4.03758747        14.20130914        19.48330209 
+       1.771596509       -3.799798769        13.57234157        18.57015835 
+       1.749507512       -3.609123791        13.12236776        17.81548409 
+
+             dxrms             xcomax             xcorms                 q2 
+       11.74357744       0.3306810996       0.1538333354         2.88934687 
+       11.07607783       0.2490204757       0.1158197451        2.841778737 
+        10.2346029       0.1221273413      0.05690098323        2.777347613 
+       9.639962105    4.099474638e-17    1.917999052e-17         2.71982919 
+       9.246191058       0.1148265831      0.05405237463        2.668151635 
+       8.995445551       0.2242492031       0.1063712427        2.620617896 
+        8.84815936       0.3296928814        0.157782419        2.576244685 
+
+               dq2            betymax              dymax              dyrms 
+      -15.59750864        30.46897429                  0                  0 
+      -12.62861053        24.93185269                  0                  0 
+      -10.61756797        21.57878416                  0                  0 
+      -9.482226679        20.07025727                  0                  0 
+      -8.695920729        19.26352284                  0                  0 
+      -8.086998436        18.80006037                  0                  0 
+      -7.585942829        18.54406193                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0             -0.015                  0 
+                 0                  0              -0.01                  0 
+                 0                  0             -0.005                  0 
+                 0                  0    1.734723476e-18                  0 
+                 0                  0              0.005                  0 
+                 0                  0               0.01                  0 
+                 0                  0              0.015                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+                 0                  0                  0                  0 
+
+
+plot, table="summ", haxis=deltap,vaxis1=q1,vaxis2=q2,
+
+      hmin=-.02,hmax=.02,vmin=1.5,2.5,vmax=2,3,
+
+      colour=100,symbol=2,style=1,noversion, title="tunes vs deltap";
+
+ plot number =           15
+
+
+SELECT,FLAG=ERROR,RANGE=QDN11;
+
+EALIGN, DY=100.e-6;
+
+Assigned alignment errors to 1 elements
+twiss, rmatrix, chrom, save;
+
+enter Twiss module
+  
+iteration:   1 error:   9.110727E-04 deltap:   1.000000E-06
+orbit:  -9.721652E-06 -2.126444E-06 -3.527560E-04 -1.117394E-04 -4.498444E-06  5.633231E-07
+  
+iteration:   2 error:   3.168733E-07 deltap:   1.000000E-06
+orbit:  -9.510338E-06 -2.172214E-06 -3.527710E-04 -1.117417E-04 -2.822805E-06  5.673791E-07
+  
+iteration:   1 error:   9.110582E-04 deltap:   0.000000E+00
+orbit:  -3.945560E-07  9.540872E-08 -3.528008E-04 -1.117479E-04 -1.656671E-06  8.757737E-10
+  
+iteration:   2 error:   3.177433E-07 deltap:   0.000000E+00
+orbit:  -1.830396E-07  4.958385E-08 -3.528003E-04 -1.117477E-04 -8.237753E-07  4.924750E-09
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       78.54370266    8.237752513e-07       0.1241073494        2.838580728 
+
+                q1                dq1            betxmax              dxmax 
+       1.820059925         -4.8704987         15.1242288        20.60418541 
+
+             dxrms             xcomax             xcorms                 q2 
+        9.63996548    2.951973839e-07    1.617984962e-07        2.719828845 
+
+               dq2            betymax              dymax              dyrms 
+        -10.047006        20.07026075      0.03370810773      0.01449284256 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0007500437446    0.0003371120552                  0        19.69937657 
+
+           synch_2            synch_3            synch_4            synch_5 
+       1.526297364       0.3728165258                  0        16.84842311 
+
+
+plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, title="interpolate orbit in drifts";
+
+Plot - default table plotted: twiss
+ plot number =           16
+
+
+plot, haxis=s, vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
+
+      colour=100, title="overflow number of variables to be plotted", noversion;	
+
+Plot - default table plotted: twiss
+ Warning: 11 variables on vaxis, would overflow max number(10). all variables ignored.
+ Warning: no vertical plot variables, plot skipped
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.01 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

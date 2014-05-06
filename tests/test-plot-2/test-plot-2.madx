@@ -1,0 +1,82 @@
+option, -echo;
+call, file="../share/LEIR/LEIR.seqx";
+option, echo, warn, info;
+
+beam, particle=proton, energy=0.938272*1.1547;
+
+use, sequence=LEIR;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
+	                  x,px,y,py,deltap,
+                          re11,re12,re13,re14,re15,re16,
+                          re21,re22,re23,re24,re25,re26,
+                          re31,re32,re33,re34,re35,re36,
+                          re41,re42,re43,re44,re45,re46,
+                          re51,re52,re53,re54,re55,re56,
+                          re61,re62,re63,re64,re65,re66;
+
+twiss, rmatrix, chrom, save;
+
+plot, haxis=s, vaxis=betx;
+
+plot, haxis=s, vaxis=betx, colour=100, title="sample plot";
+
+plot, haxis=s, vaxis=betx,bety, colour=100, title="two variables";
+
+title, "two variables with range";
+plot, haxis=s, vaxis=betx,bety, colour=100, range=CtrS10/CtrS20;
+
+title, "two variables with range and range_plot";
+plot, haxis=s, vaxis=betx,bety, colour=100, range_plot, range=CtrS10/CtrS20, noversion;
+
+title, "two variables on vaxis2";
+plot, haxis=s, vaxis2=betx,bety, colour=100; ! test a single vaxis<i> but not in order
+
+title, "two variables and some more options";
+plot, haxis=s, vaxis=betx,bety, colour=100, notitle, noversion, noline, interpolate;
+
+title, "two axes; interpolate";
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, colour=100, interpolate, noversion;
+
+title, "three axes; noversion";
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, colour=100, noversion;
+
+title, "four axes; interpolate, noline, notitle, noversion ";
+plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, vaxis4=dx, colour=100, interpolate, noline, notitle, noversion;
+
+title, "non-s horizontal axis";
+plot, haxis=mux, vaxis=betx, colour=100;
+
+title, "should never appaear on plots";
+
+plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
+      vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx;
+
+plot, haxis=s, colour=100, title="max # of variables on vaxis1", noversion,
+      vaxis1= re11,re12,re13,re14,re15,re16,
+      vaxis2= re21,re22,re23,re24;
+
+
+plot, haxis=s, colour=100, title="overflow in number of variables to be plotted", noversion
+      vaxis1= re11,re12,re13,re14,re15,re16,
+      vaxis2= re21,re22,re23,re24,
+      vaxis3= re31,re32,re33,re34,re35,re36,
+      vaxis4= re41,re42,re43,re44,re45,re46; 
+
+twiss, save, deltap=-.015:.02:.005;
+
+plot, table="summ", haxis=deltap,vaxis1=q1,vaxis2=q2,
+      hmin=-.02,hmax=.02,vmin=1.5,2.5,vmax=2,3,
+      colour=100,symbol=2,style=1,noversion, title="tunes vs deltap";
+
+SELECT,FLAG=ERROR,RANGE=QDN11;
+EALIGN, DY=100.e-6;
+twiss, rmatrix, chrom, save;
+
+plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, title="interpolate orbit in drifts";
+
+plot, haxis=s, vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
+      colour=100, title="overflow number of variables to be plotted", noversion;	
+
+stop;

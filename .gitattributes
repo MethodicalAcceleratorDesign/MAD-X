@@ -1367,6 +1367,11 @@ tests/test-match/test-match.ref -text
 tests/test-memory/test-memory.cfg -text
 tests/test-memory/test-memory.madx -text
 tests/test-memory/test-memory.ref -text
+tests/test-plot-2/madx.ps.cfg -text
+tests/test-plot-2/madx.ps.ref -text
+tests/test-plot-2/test-plot-2.cfg -text
+tests/test-plot-2/test-plot-2.madx -text
+tests/test-plot-2/test-plot-2.ref -text
 tests/test-plot/plot1.ps.cfg -text
 tests/test-plot/plot1.ps.ref -text
 tests/test-plot/plot1one.cfg -text
