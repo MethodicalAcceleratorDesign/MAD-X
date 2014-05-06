@@ -7,7 +7,6 @@ export LC_CTYPE="C"
 export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 
 # I/O redirection
-rm -f build-test-macosx.out
 if [ "$1" = "noecho" ] ; then
 	shift
 	exec &> build-test-macosx.out
