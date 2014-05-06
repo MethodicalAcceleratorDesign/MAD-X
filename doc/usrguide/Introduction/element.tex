@@ -825,17 +825,26 @@ label:  KICKER, L = real, HKICK = real, VKICK = real, TILT = real;
 The attributes have the following meaning: 
 \begin{itemize}
    \item L: The length of the closed orbit corrector (default: 0 m). 
-   \item KICK: The kick angle for either horizontal or vertical correctors. (default: 0 rad). 
-   \item HKICK: The horizontal kick angle for a corrector in both planes (default: 0 rad). 
-   \item VKICK: The vertical kick angle for a corrector in both planes (default: 0 rad). 
+   \item KICK: The momentum change $\delta PX = \delta p_x/p_0$ or 
+     $\delta PY = \delta p_y / p_0$ for respectively horizontal or vertical
+     correctors. (default: 0).  
+   \item HKICK: The horizontal momentum change 
+     $\delta PX = \delta p_x/p_0$ for a corrector acting in both planes
+     (default: 0).  
+   \item VKICK: The vertical momentum change 
+     $\delta PY = \delta p_y/p_0$  for a corrector acting in both planes
+     (default: 0).  
    \item TILT: The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
      kicker.  
 \end{itemize} 
 
-A positive kick increases \textit{p$_x$} or \textit{p$_y$}
-respectively. This means that a positive horizontal kick bends to the
-left,  i.e. to positive x which is opposite of what is true for bends.   
+A positive kick increases $p_x$ or $p_y$ respectively. This
+means that a positive horizontal kick bends to the left,  i.e. to
+positive $x$ which is opposite of what is true for bends.    
+
+The deviation angle $\theta$ of the particle trajectory is related to
+the momentum change through  $\sin \theta = \delta P = \delta p / p_0$.
 
 It should be noted that the kick values assigned to an orbit corrector
 like above are not overwritten by an orbit correction using the CORRECT
