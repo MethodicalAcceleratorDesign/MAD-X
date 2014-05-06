@@ -341,27 +341,27 @@ end SUBROUTINE tmbend
 \section{Lattice parameters tracking}
 \subsection{Coupled tracking}
 Following the MAD-8 physics guide (the implementation, and actually also the code, are exactly the same), we understand the initialisation of the tracking of the linear coupled parameters. Given one-turn transfer matrix,
-$$M=\left(\begin{array}[t]{cc}
+$$M=\left(\begin{array}{cc}
 A & B\\
 C & D
 \end{array}\right),$$
-$M$ is diagonalized via a ``sympletic rotation'' $$\mathcal{R}=\left(\begin{array}[t]{cc}
+$M$ is diagonalized via a ``sympletic rotation'' $$\mathcal{R}=\left(\begin{array}{cc}
 I\,\cos\phi & \bar{R}\,\sin\phi\\
 -R\,\sin\phi & I\,\cos\phi
 \end{array}\right)$$
 to
-$$\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}[t]{cc}
+$$\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}{cc}
 A^{\prime} & 0\\
 0 & D^{\prime}
 \end{array}\right)$$
 with
-$$R=\left(\begin{array}[t]{cc}
+$$R=\left(\begin{array}{cc}
 a & b\\
 c & d
-\end{array}\right),\qquad\left|R\right|=\left|\begin{array}[t]{cc}
+\end{array}\right),\qquad\left|R\right|=\left|\begin{array}{cc}
 a & b\\
 c & d
-\end{array}\right|=1,\qquad\bar{R}=\left(\begin{array}[t]{cc}
+\end{array}\right|=1,\qquad\bar{R}=\left(\begin{array}{cc}
 d & -b\\
 -c & a
 \end{array}\right)
@@ -372,7 +372,7 @@ D^{\prime} & =D+\bar{R}\, C.
 \end{aligned}$$
 Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D$. $R$ is defined as
 \begin{eqnarray*}
-\text{aux} & = & C+\bar{B}=\left(\begin{array}[t]{cc}
+\text{aux} & = & C+\bar{B}=\left(\begin{array}{cc}
 M_{31}+M_{24} & M_{32}-M_{14}\\
 M_{41}-M_{23} & M_{42}-M_{13}
 \end{array}\right)\\
@@ -402,7 +402,7 @@ and the same for $y$, with $D$ instead of $A$;
 \begin{enumerate}
 \item tracks the dispersion $$d \leftarrow M\cdot d$$
 \item saying, 
-$$M\equiv\left(\begin{array}[t]{cc}
+$$M\equiv\left(\begin{array}{cc}
 A & D\\
 B & C
 \end{array}\right),$$
@@ -418,7 +418,7 @@ in order to track $R$ matrix (\L{rmat}):
 R\leftarrow-\frac{B\cdot\bar{A}}{\left|A\right|}
 \]
 \item given $A$ and $C$, that in this function are such that
-\[\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}[t]{cc}
+\[\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}{cc}
 A & 0\\
 0 & C
 \end{array} \right) \]
@@ -525,7 +525,7 @@ SUBROUTINE twcptk(re,orbit)
 \end{lstlisting}
 
 \[
-\text{disp}=\left(\begin{array}[t]{c}
+\text{disp}=\left(\begin{array}{c}
 \text{dt(1)}\\
 \text{dt(2)}\\
 \text{dt(3)}\\
@@ -547,25 +547,25 @@ SUBROUTINE twcptk(re,orbit)
 \end{lstlisting}
 
 \[
-\text{re}=\left(\begin{array}[t]{cc}
+\text{re}=\left(\begin{array}{cc}
 \text{re}_{a} & \text{re}_{d}\\
 \text{re}_{b} & \text{re}_{c}
-\end{array}\right)\quad\text{rmat}=\left(\begin{array}[t]{cc}
+\end{array}\right)\quad\text{rmat}=\left(\begin{array}{cc}
 \text{rmat}_{a} & \text{rmat}_{d}\\
 \text{rmat}_{b} & \text{rmat}_{c}
 \end{array}\right)
 \]
 \[
-\left(\begin{array}[t]{cc}
+\left(\begin{array}{cc}
 a & -\\
-b & \begin{array}[t]{cc}
+b & \begin{array}{cc}
 c\\
 \\
 \end{array}
-\end{array}\right)=\left(\begin{array}[t]{cc}
+\end{array}\right)=\left(\begin{array}{cc}
 \text{re}_{a}\\
 \text{re}_{b} & \text{re}_{c}
-\end{array}\right)-\left(\begin{array}[t]{cc}
+\end{array}\right)-\left(\begin{array}{cc}
 \text{re}_{d}\cdot\text{rmat}_{a}\\
 \text{re}_{c}\cdot\text{rmat}_{a} & \text{re}_{a}\cdot\text{rmat}_{a}
 \end{array}\right)
