@@ -7,7 +7,6 @@ export LC_CTYPE="C"
 export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
 
 # I/O redirection
-rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
 	shift
 	exec &> build-test-lxplus.out
