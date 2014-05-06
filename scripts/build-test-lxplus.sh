@@ -1,19 +1,9 @@
 # run:
-# sh scripts/build-test-lxplus.sh [noecho] [cleanall]
-# tail -f build-test-lxplus.out
+# bash scripts/build-test-lxplus.sh [noecho] [cleanall]
 
 # env settings
 export LC_CTYPE="C"
 export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
-
-# I/O redirection
-if [ "$1" = "noecho" ] ; then
-	shift
-	exec &> build-test-lxplus.out
-else
-	exec 2>&1 | tee build-test-lxplus.out
-fi
-uname -n > build-test-lxplus.run
 
 # error handler
 check_error ()
@@ -24,9 +14,21 @@ check_error ()
 	fi
 }
 
+# I/O redirection
+if [ "$1" = "noecho" ] ; then
+	shift
+	exec &> build-test-lxplus.out
+	check_error "redirection with noecho failed"
+else
+	exec > >(tee build-test-lxplus.out) 2> >(tee build-test-lxplus.out >&2)
+	check_error "redirection with tee failed"
+fi
+uname -n > build-test-lxplus.run
+
 echo -e "\n===== Start of build and tests ====="
-date
-uname -m -n -r -s
+echo "Date  : `date`"
+echo "System: `uname -m -n -r -s`"
+echo "Script: $0 $@"
 
 echo -e "\n===== SVN update ====="
 svn update
@@ -110,5 +112,5 @@ check_error "unable to restore the default version"
 rm -f build-test-lxplus.run
 
 # date & end marker
-date
+echo "Finish: `date`"
 echo -e "\n===== End of build and tests ====="
