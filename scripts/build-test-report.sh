@@ -1,5 +1,5 @@
 # run:
-# sh scripts/build-test-report.sh [noecho] [clean] [forcereport] [force] [nomail]
+# bash scripts/build-test-report.sh [noecho] [clean|cleanall] [forcereport] [force] [nomail]
 
 # I/O redirection
 rm -f build-test-report.log
