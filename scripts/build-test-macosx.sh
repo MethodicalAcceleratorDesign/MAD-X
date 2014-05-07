@@ -15,6 +15,7 @@ check_error ()
 }
 
 # I/O redirection
+rm -f build-test-macosx.out
 if [ "$1" = "noecho" ] ; then
 	shift
 	exec &> build-test-macosx.out
