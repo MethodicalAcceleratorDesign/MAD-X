@@ -74,7 +74,8 @@ SELECT,FLAG=ERROR,RANGE=QDN11;
 EALIGN, DY=100.e-6;
 twiss, rmatrix, chrom, save;
 
-plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, title="interpolate orbit in drifts";
+plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, hmin=10.5,hmax=14.0,
+title="interpolate orbit in drifts";
 
 plot, haxis=s, vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
       colour=100, title="overflow number of variables to be plotted", noversion;	
