@@ -66,8 +66,8 @@
 \Institute{CERN -- BE/ABP}
 \Email{\{laurent.deniau, andrea.latina\}@cern.ch}
 
-\Title{Ndiff Reference Manual}
-\Title{MAD-X Technical Notes on Twiss Module}
+\Title{MAD-X Technical Notes on Twiss Module\\[2mm]
+\Large Part 1, Magnets}
 
 \Keywords{\madx, beam dynamics, thick tracking, optical functions.}
 %\Distribution{ABP group}
@@ -89,7 +89,7 @@
 The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known bugs.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Bending magnets}
+\section{Bending Magnets}
 
 \madx does not support the so called ``true \T{RBEND}'' element. This kind of magnet is internally represented as a sector bend (i.e. \T{SBEND}) with the pole faces made parallel by setting the pole face angles to $\T{e1}=\T{e2}=\alpha/2$, where $\alpha$ is the \T{SBEND} angle.
 
@@ -641,19 +641,15 @@ c\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Quadrupole magnets}
+\section{Quadrupole Magnets}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Multipoles magnets}
+\section{Multipoles Magnets}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Solenoide magnets}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{RF cavities}
+\section{Solenoid Magnets}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -59,6 +59,7 @@ doc/physguide/cern-art.cls -text
 doc/physguide/fig/cern-logo.pdf -text
 doc/physguide/fig/cern-logo.png -text
 doc/physguide/madx-twiss_notes.tex -text
+doc/physguide/ptc-track_notes.tex -text
 doc/usrguide/Introduction/aperexample.jpg -text
 doc/usrguide/Introduction/aperture.html -text
 doc/usrguide/Introduction/aperture.tex -text
