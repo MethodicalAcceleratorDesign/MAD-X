@@ -1,3 +1,4 @@
+#! /bin/bash
 # run:
 # bash scripts/build-test-report.sh [noecho] [clean|cleanall] [forcereport] [force] [nomail]
 

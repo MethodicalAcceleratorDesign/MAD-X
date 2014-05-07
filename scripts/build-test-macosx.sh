@@ -1,3 +1,4 @@
+#! /bin/bash
 # run:
 # bash scripts/build-test-macosx.sh [noecho] [cleanall]
 
