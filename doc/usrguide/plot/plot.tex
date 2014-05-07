@@ -104,7 +104,7 @@ where the parameters have the following meaning:
      each element: beta, sqrt(beta), alfa, phase advance, orbit, angle,
      dispersion and its first derivative, for both planes. \\ 
      For all other variables splines are used to smooth
-     the curves.  \\ 
+     the curves. \\ 
      Note that setting this option is ineffective if the interpolate
      option of the SETOPT command has been set to true; in this case all
      plots will be interpolated.  
@@ -209,6 +209,16 @@ where the parameters have the following meaning:
      (default: ptc\_twiss)  
 
 \end{madlist}
+
+% Note on interpolation to be added :
+% spline use only the data values and not the derivatives, eg in the
+% case of orbit in a drift the orbit values are correctly taken into
+% account account but the PX values, and in particular the fact that
+% PX(END)=PX(START) is not taken as a constraint, This can lead to
+% smooth curves that are pleasing to the eye but where the
+% representation is wrong from a physics point of view. One way out of
+% this is to slice elements with enough slices to constrain the spline
+% mechanism. 
 
 
 \section{SETPLOT}
