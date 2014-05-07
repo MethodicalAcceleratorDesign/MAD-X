@@ -1372,8 +1372,6 @@ tests/test-plot-2/madx.ps.ref -text
 tests/test-plot-2/test-plot-2.cfg -text
 tests/test-plot-2/test-plot-2.madx -text
 tests/test-plot-2/test-plot-2.ref -text
-tests/test-plot/plot1.ps.cfg -text
-tests/test-plot/plot1.ps.ref -text
 tests/test-plot/plot1one.cfg -text
 tests/test-plot/plot1one.ref -text
 tests/test-plot/plot2.obs0001.p0001.cfg -text
@@ -1384,8 +1382,6 @@ tests/test-plot/plot2.obs0001.p0003.cfg -text
 tests/test-plot/plot2.obs0001.p0003.ref -text
 tests/test-plot/plot2.obs0001.p0004.cfg -text
 tests/test-plot/plot2.obs0001.p0004.ref -text
-tests/test-plot/plot2.ps.cfg -text
-tests/test-plot/plot2.ps.ref -text
 tests/test-plot/test-plot.cfg -text
 tests/test-plot/test-plot.madx -text
 tests/test-plot/test-plot.ref -text
