@@ -1564,11 +1564,27 @@ SUBROUTINE twcptk(re,orbit)
 
   !---- Track R matrix.
   adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
-  rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
-  rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
-  rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
-  rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
-
+  if (abs(adet).gt.eps) then
+     rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
+     rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
+     rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
+     rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
+    
+     !---- Mode 1.
+     tempb = a(1,1) * betx - a(1,2) * alfx
+     tempa = a(2,1) * betx - a(2,2) * alfx
+     alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
+     betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
+     if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
+     
+     !---- Mode 2.
+     tempb = c(1,1) * bety - c(1,2) * alfy
+     tempa = c(2,1) * bety - c(2,2) * alfy
+     alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
+     bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+     if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
+  endif
+  
   !---- Cummulative R matrix and one-turn map at element location.
   if(rmatrix) then
      inval=get_option('twiss_inval ')
@@ -1581,21 +1597,7 @@ SUBROUTINE twcptk(re,orbit)
         call m66mpy(rw,rc,rc)
      endif
   endif
-
-  !---- Mode 1.
-  tempb = a(1,1) * betx - a(1,2) * alfx
-  tempa = a(2,1) * betx - a(2,2) * alfx
-  alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
-  betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
-  if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
-
-  !---- Mode 2.
-  tempb = c(1,1) * bety - c(1,2) * alfy
-  tempa = c(2,1) * bety - c(2,2) * alfy
-  alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
-  bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
-  if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
-
+  
   if(.not.centre.or.centre_cptk) then
      opt_fun(3 )=betx
      opt_fun(4 )=alfx
