@@ -67,7 +67,7 @@
 \Email{\{laurent.deniau, andrea.latina\}@cern.ch}
 
 \Title{MAD-X Technical Notes on Twiss Module\\[2mm]
-\Large Part 1, Magnets}
+\Large Part 1, Magnets and Patches}
 
 \Keywords{\madx, beam dynamics, thick tracking, optical functions.}
 %\Distribution{ABP group}
@@ -86,7 +86,7 @@
 \cleardoublepage
 \section{Motivation}
 
-The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known bugs.
+The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known problems.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bending Magnets}
@@ -99,12 +99,10 @@ The implementation of the Twiss module was inherited from \madeight and adapted 
 Declarations and preamble:
 \begin{lstlisting}[firstnumber=auto]
 SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
-
   use twtrrfi
   use twisslfi
   use twiss_elpfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for sector bending magnets                         *
@@ -120,17 +118,16 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical ftrk,cplxy,dorad
-  integer nd,n_ferr,node_fd_errors,code
+  integer nd,n_ferr,code,elpar_vl
   double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),           &
        te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
        el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
-       st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
-       el0,orbit0(6)
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer, external :: el_par_vector ! function from the C core
-  integer elpar_vl
+       st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,bvk,el0,orbit0(6)         &
+       orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer         , external :: el_par_vector, node_fd_errors ! function from C
+  double precision, external :: node_value, get_value         ! function from C
 \end{lstlisting}
-{\em The following piece of code has been moved up and rewritten for clarity}. If the element has zero length it simply jumps to the end (physically correct?).
+{\em [The following piece of code has been moved up and rewritten for clarity]}. If the element has zero length it simply returns from the routine (TBC physically correct? What about wedges and fringe fields?).
 \begin{lstlisting}[firstnumber=last]
   !---- Test for non-zero length.
   if (el.eq.0) then return
@@ -140,47 +137,50 @@ The following statements initializes the matrix \L{rw} to the identity, and the 
   !---- Initialize.
   ct=0
   st=0
-  deltap=0
+  deltap=0                                     ! useless (see next paragraph)
   call dzero(ek0,6)
   call m66one(rw)
   call dzero(tw,216)
   call dzero(f_errors,maxferr+1)
 \end{lstlisting}
-The next code reads the probe and the magnet parameters from the command line and some dynamic variables. It also converts \L{tkicker} (39) to \L{kicker} (15), and \L{placeholder} (38) to \L{instrument} (24).
+The next code reads the probe and the magnet parameters from the \L{twiss} command and some dynamic variables. It also converts the elements \L{tkicker} (code 39) to \L{kicker} (code 15), and \L{placeholder} (code 38) to \L{instrument} (code 24) and computes the local curvature $h=1/\rho=\alpha/l$.
 \begin{lstlisting}[firstnumber=last]
-    code = node_value('mad8_type ') ! function from the C core
-    if(code.eq.39) code=15
-    if(code.eq.38) code=24
+  deltap   = get_value('probe ','deltap ')     ! parameters from current beam
+  gamma    = get_value('probe ','gamma ')
+  arad     = get_value('probe ','arad ')       ! undocumented
+  dorad    = get_value('probe ','radiate ') .ne. 0
+  
+  bvk      = node_value('other_bv ')           ! forward / backward flag
+  code     = node_value('mad8_type ')          ! mad8 element's code
+  if(code.eq.39) code=15                       ! tkicker to kicker
+  if(code.eq.38) code=24                       ! placeholder to instrument
 
-     n_ferr   = node_fd_errors(f_errors)        ! get field errors
-     elpar_vl = el_par_vector(b_k3s, g_elpar) ! get strengths up to k3s
-     bvk      = node_value('other_bv ')
-     arad     = get_value('probe ','arad ')
-     deltap   = get_value('probe ','deltap ')
-     gamma    = get_value('probe ','gamma ')
-     dorad    = get_value('probe ','radiate ') .ne. 0
-     an       = bvk * g_elpar(b_angle)              ! sbend angle
-     tilt     = g_elpar(b_tilt)                   ! sbend tilt
-     e1       = g_elpar(b_e1)                       ! sbend entry pole face angle
-     e2       = g_elpar(b_e2)                       ! sbend exit  pole face angle
-     sk1      = g_elpar(b_k1)
-     sk2      = g_elpar(b_k2)
-     h1       = g_elpar(b_h1)
-     h2       = g_elpar(b_h2)
-     hgap     = g_elpar(b_hgap)
-     fint     = g_elpar(b_fint)
-     fintx    = g_elpar(b_fintx)
-     sks      = g_elpar(b_k1s)
+  elpar_vl = el_par_vector(b_k3s, g_elpar)     ! get strengths up to k3s
+  an       = bvk * g_elpar(b_angle)            ! sbend angle (time bv flag)
+  sk1      = g_elpar(b_k1)                     ! quadrupole term
+  sks      = g_elpar(b_k1s)                    ! skew quadrupole term
+  sk2      = g_elpar(b_k2)                     ! sextupole term
+                                               ! (k2s, k3, k3s are ignored, see dict)
+  n_ferr   = node_fd_errors(f_errors)          ! get multipole field errors
+  tilt     = g_elpar(b_tilt)                   ! sbend tilt (clockwise)
+  e1       = g_elpar(b_e1)                     ! sbend entrance pole face angle
+  e2       = g_elpar(b_e2)                     ! sbend exit     pole face angle
+  h1       = g_elpar(b_h1)                     ! entrance pole face curvature
+  h2       = g_elpar(b_h2)                     ! exit     pole face curvature
+  fint     = g_elpar(b_fint)                   ! field integral of fringe fields
+  fintx    = g_elpar(b_fintx)                  ! asymmetric FINT at exit
+  hgap     = g_elpar(b_hgap)                   ! half of the gap between poles
 
-     ! rbend treated as a sbend with parallel pole faces
-     if(code.eq.2) then
-        e1 = e1 + an / 2
-        e2 = e2 + an / 2
-     endif
-
-     h = an / el
+  h = an / el                                  ! local curvature (angle/length)
 \end{lstlisting}
-TODO \L{h} is $h=1/\rho$. I guess the following \L{dh} is how much does the inverse of the bending radius change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
+The following lines are adjusting the pole faces of a "false" \L{rbend} into a true \L{sbend} with parallel pole faces {\em [Note: $e_1$ and $e_2$ have opposite direction, see \L{sbend} reference frame in the users' guide]}:
+\begin{lstlisting}[firstnumber=last]
+  if(code.eq.2) then
+    e1 = e1 + an / 2
+    e2 = e2 + an / 2
+  endif
+\end{lstlisting}
+{\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
   \begin{lstlisting}[firstnumber=last]
      !---- Apply field errors and change coefficients using DELTAP.
      if (n_ferr .gt. 0) then
@@ -198,11 +198,11 @@ TODO \L{h} is $h=1/\rho$. I guess the following \L{dh} is how much does the inve
         sks = sks / (1 + deltap)
      endif
   \end{lstlisting}
-Applies \L{bvk}-flag.
+Applies \L{bvk}-flag to field components:
  \begin{lstlisting}[firstnumber=last]
      sk1 = bvk * sk1
-     sk2 = bvk * sk2
      sks = bvk * sks
+     sk2 = bvk * sk2
   \end{lstlisting}
   if the flags \L{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
  \begin{lstlisting}[firstnumber=last]
@@ -650,6 +650,19 @@ c\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Solenoid Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dynamical Patches}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{S Rotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Y Rotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{X Rotation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
