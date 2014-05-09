@@ -337,6 +337,41 @@ end SUBROUTINE tmbend
 
 \subsection{The routine {tmsect}}
 \L{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \L{ek,re,te} with kick, matrix and tensor for this sector bend.
+Given:
+\[
+\begin{aligned}
+h & =\frac{1}{\rho}\ \mathrm{[1/m]},\\
+k_{1} & =\text{quadupole strength}\ \mathrm{[1/m^{2}]}.\\
+\end{aligned}
+\]
+The following quantities are defined:
+\[
+\begin{aligned}
+k_{x} & =\sqrt{h^{2}+k_{1}},\\
+k_{y} & =\sqrt{-k_{1}},
+\end{aligned}
+\]
+\[
+\begin{aligned}C_{x} & =\cos(k_{x}L), & \quad & S_{x} & =\frac{\sin(k_{x}L)}{k_{x}},\\
+C_{y} & =\cos(k_{y}L), & \quad & S_{y} & =\frac{\sin(k_{y}L)}{k_{y}}.
+\end{aligned}
+\]
+The following constants are also defined:
+\[
+\begin{aligned}d_{x} & =\frac{1-C_{x}}{k_{x}^{2}}\\
+f_{x} & =\frac{L-S_{x}}{k_{x}^{2}}\\
+g_{x} & =\frac{3\, L-S_{x}\left(4-C_{x}\right)}{2\, k_{x}^{4}}\\
+h_{x} & =\frac{15\, L-S_{x}\left(22-9\, C_{x}+2\, C_{x}^{2}\right)}{6\, k_{x}^{6}}
+\end{aligned}
+\]
+Then, the kick:
+\\where $\Delta h$ is the dipole field error.
+
+
+
+
+
+
 
 \section{Lattice parameters tracking}
 \subsection{Coupled tracking}
@@ -669,7 +704,7 @@ c\\
 \appendix
 \section{Appendix}
 \begin{itemize}
-\item[-] \L{dcopy(in,out,n)}
+\item[-] \L{dcopy(from,to,n)}
 \item[-] \L{m66mpy(fact1,fact2,target)} matrix multiplication $$\text{target} = \text{fact1} \cdot \text{fact2}$$
 \item[-] \L{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
 e_{d}\\
