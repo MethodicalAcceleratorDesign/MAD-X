@@ -145,33 +145,33 @@ The following statements initializes the matrix \L{rw} to the identity, and the 
 \end{lstlisting}
 The next code reads the probe and the magnet parameters from the \L{twiss} command and some dynamic variables. It also converts the elements \L{tkicker} (code 39) to \L{kicker} (code 15), and \L{placeholder} (code 38) to \L{instrument} (code 24) and computes the local curvature $h=1/\rho=\alpha/l$.
 \begin{lstlisting}[firstnumber=last]
-  deltap   = get_value('probe ','deltap ')     ! parameters from current beam
+  deltap   = get_value('probe ','deltap ')  ! parameters from current beam
   gamma    = get_value('probe ','gamma ')
-  arad     = get_value('probe ','arad ')       ! undocumented
+  arad     = get_value('probe ','arad ')    ! undocumented (internal?)
   dorad    = get_value('probe ','radiate ') .ne. 0
   
-  bvk      = node_value('other_bv ')           ! forward / backward flag
-  code     = node_value('mad8_type ')          ! mad8 element's code
-  if(code.eq.39) code=15                       ! tkicker to kicker
-  if(code.eq.38) code=24                       ! placeholder to instrument
+  bvk      = node_value('other_bv ')        ! forward / backward flag
+  code     = node_value('mad8_type ')       ! mad8 element's code
+  if(code.eq.39) code=15                    ! tkicker to kicker
+  if(code.eq.38) code=24                    ! placeholder to instrument
 
-  elpar_vl = el_par_vector(b_k3s, g_elpar)     ! get strengths up to k3s
-  an       = bvk * g_elpar(b_angle)            ! sbend angle (time bv flag)
-  sk1      = g_elpar(b_k1)                     ! quadrupole term
-  sks      = g_elpar(b_k1s)                    ! skew quadrupole term
-  sk2      = g_elpar(b_k2)                     ! sextupole term
-                                               ! (k2s, k3, k3s are ignored, see dict)
-  n_ferr   = node_fd_errors(f_errors)          ! get multipole field errors
-  tilt     = g_elpar(b_tilt)                   ! sbend tilt (clockwise)
-  e1       = g_elpar(b_e1)                     ! sbend entrance pole face angle
-  e2       = g_elpar(b_e2)                     ! sbend exit     pole face angle
-  h1       = g_elpar(b_h1)                     ! entrance pole face curvature
-  h2       = g_elpar(b_h2)                     ! exit     pole face curvature
-  fint     = g_elpar(b_fint)                   ! field integral of fringe fields
-  fintx    = g_elpar(b_fintx)                  ! asymmetric FINT at exit
-  hgap     = g_elpar(b_hgap)                   ! half of the gap between poles
+  elpar_vl = el_par_vector(b_k3s, g_elpar)  ! get strengths up to k3s
+  an       = bvk * g_elpar(b_angle)         ! sbend angle (time bv flag)
+  sk1      = g_elpar(b_k1)                  ! quadrupole term
+  sks      = g_elpar(b_k1s)                 ! skew quadrupole term
+  sk2      = g_elpar(b_k2)                  ! sextupole term
+                                            !  (k2s, k3, k3s are ignored, see dict)
+  n_ferr   = node_fd_errors(f_errors)       ! get multipole field errors
+  tilt     = g_elpar(b_tilt)                ! sbend tilt (clockwise)
+  e1       = g_elpar(b_e1)                  ! sbend entrance/exit pole face angle
+  e2       = g_elpar(b_e2)                  !  (introduce quadrupole terms)
+  h1       = g_elpar(b_h1)                  ! entrance/exit pole face curvature
+  h2       = g_elpar(b_h2)                  !  (introduce sextupole terms)
+  fint     = g_elpar(b_fint)                ! field integral of fringe fields
+  fintx    = g_elpar(b_fintx)               ! asymmetric FINT at exit (if diff)
+  hgap     = g_elpar(b_hgap)                ! half of the gap between poles
 
-  h = an / el                                  ! local curvature (angle/length)
+  h = an / el                               ! local curvature (angle/length)
 \end{lstlisting}
 The following lines are adjusting the pole faces of a "false" \L{rbend} into a true \L{sbend} with parallel pole faces {\em [Note: $e_1$ and $e_2$ have opposite direction, see \L{sbend} reference frame in the users' guide]}:
 \begin{lstlisting}[firstnumber=last]
@@ -181,48 +181,47 @@ The following lines are adjusting the pole faces of a "false" \L{rbend} into a t
   endif
 \end{lstlisting}
 {\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
-  \begin{lstlisting}[firstnumber=last]
-     !---- Apply field errors and change coefficients using DELTAP.
-     if (n_ferr .gt. 0) then
-        nd = n_ferr
-        call dzero(field,nd)
-        call dcopy(f_errors,field,n_ferr)
-        dh = (- h * deltap + bvk * field(1,0) / el) / (1 + deltap)
-        sk1 = (sk1 + field(1,1) / el) / (1 + deltap)
-        sk2 = (sk2 + field(1,2) / el) / (1 + deltap)
-        sks = (sks + field(2,1) / el) / (1 + deltap)
-     else
-        dh = - h * deltap / (1 + deltap)
-        sk1 = sk1 / (1 + deltap)
-        sk2 = sk2 / (1 + deltap)
-        sks = sks / (1 + deltap)
-     endif
-  \end{lstlisting}
+\begin{lstlisting}[firstnumber=last]
+  !---- Apply field errors and change coefficients using DELTAP.
+  if (n_ferr .gt. 0) then
+    nd = n_ferr
+    call dzero(field,nd)
+    call dcopy(f_errors,field,n_ferr)
+    dh = (- h * deltap + bvk * field(1,0) / el) / (1 + deltap)
+    sk1 = (sk1 + field(1,1) / el) / (1 + deltap)
+    sk2 = (sk2 + field(1,2) / el) / (1 + deltap)
+    sks = (sks + field(2,1) / el) / (1 + deltap)
+  else
+    dh = - h * deltap / (1 + deltap)
+    sk1 = sk1 / (1 + deltap)
+    sk2 = sk2 / (1 + deltap)
+    sks = sks / (1 + deltap)
+  endif
+\end{lstlisting}
 Applies \L{bvk}-flag to field components:
- \begin{lstlisting}[firstnumber=last]
-     sk1 = bvk * sk1
-     sks = bvk * sks
-     sk2 = bvk * sk2
-  \end{lstlisting}
+\begin{lstlisting}[firstnumber=last]
+  sk1 = bvk * sk1
+  sks = bvk * sks
+  sk2 = bvk * sk2
+\end{lstlisting}
   if the flags \L{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
- \begin{lstlisting}[firstnumber=last]
-     !---- Half radiation effects at entrance.
-     if (ftrk .and. dorad) then
-        ct = cos(tilt)
-        st = sin(tilt)
-        x =   orbit(1) * ct + orbit(3) * st
-        y = - orbit(1) * st + orbit(3) * ct
-        hx = h + dh + sk1*(x - h*y**2/2) + sks*y +                  &
-             sk2*(x**2 - y**2)/2
-        hy = sks * x - sk1*y - sk2*x*y
-        rfac = (arad * gamma**3 * el / 3)                         &
-             * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e1)*x)
-        pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
-     endif
-  \end{lstlisting}
+\begin{lstlisting}[firstnumber=last]
+  !---- Half radiation effects at entrance.
+  if (ftrk .and. dorad) then
+    ct = cos(tilt)
+    st = sin(tilt)
+    x =   orbit(1) * ct + orbit(3) * st
+    y = - orbit(1) * st + orbit(3) * ct
+    hx = h + dh + sk1*(x - h*y**2/2) + sks*y + sk2*(x**2 - y**2)/2
+    hy = sks * x - sk1*y - sk2*x*y
+    rfac = (arad * gamma**3 * el / 3)          &
+         * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e1)*x)
+    pt = orbit(6)
+    orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
+    orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
+    orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
+  endif
+\end{lstlisting}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
