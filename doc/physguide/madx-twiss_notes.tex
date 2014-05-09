@@ -339,13 +339,16 @@ end SUBROUTINE tmbend
 Given:
 \[
 \begin{aligned}
-h & =\frac{1}{\rho}\ \mathrm{[1/m]},\\
-k_{1} & =\text{quadupole strength}\ \mathrm{[1/m^{2}]}.\\
+h & =\frac{1}{\rho}\quad\text{inverse of the bending radius }\mathrm{[1/m]},\\
+k_{1} & =\quad\text{quadupole strength }\mathrm{[1/m^{2}]},\\
+k_{2} & =\quad\text{sextupole strength }\mathrm{[1/m^{3}]}.\\
 \end{aligned}
 \]
 The following quantities are defined:
 \[
 \begin{aligned}
+k_{x}^2 & ={h^{2}+k_{1}},\\
+k_{y}^2 & =-k_{1},\\
 k_{x} & =\sqrt{h^{2}+k_{1}},\\
 k_{y} & =\sqrt{-k_{1}},
 \end{aligned}
@@ -364,7 +367,184 @@ h_{x} & =\frac{15\, L-S_{x}\left(22-9\, C_{x}+2\, C_{x}^{2}\right)}{6\, k_{x}^{6
 \end{aligned}
 \]
 Then, the kick:
-\\where $\Delta h$ is the dipole field error.
+\[
+K=\left(\begin{array}{cccccc}
+-\Delta h\cdot d_{x}, & -\Delta h\cdot S_{x}, & 0, & 0, &  h{\cdot}{\Delta h}{\cdot}{f_x}{\cdot} {\frac 1 \beta} + L{\cdot}\texttt{dtbyds}, & 0\end{array}\right)^{T}
+\]
+\\where $\Delta h$ is the dipole field error. The nonzero elements of the response matrix $R$ are:
+\[
+\begin{array}{rl}
+  R_{11} &= {C_x}\\
+  R_{12} &= {S_x}\\
+  R_{16} &= h {\cdot} {d_x} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{21} &= - {k_{x}^{2}} {\cdot} {S_x}\\
+  R_{22} &= {C_x}\\
+  R_{26} &= h {\cdot} {S_x} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{33} &= {C_y}\\
+  R_{34} &= {S_y}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{43} &= - {k_{y}^{2}} {\cdot} {S_y}\\
+  R_{44} &= {C_y}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{52} &= - R_{16}\\
+  R_{51} &= - R_{26}\\
+  R_{55} & = R_{66} = 1\\
+  R_{56} &= L{\cdot} \frac 1 {{(\beta\gamma)}^2} - h^2 {f_x}{\cdot} {\frac 1{\beta^2}}\\
+\end{array}
+\]
+Defining:
+\[
+\begin{array}{rl}
+    \texttt{xs6} &= \frac{\left({k_2} + 2 h{\cdot}{k_1}\right)}{6}\\
+     \texttt{ys2} &= \frac{ \left({k_2} +     h{\cdot}{k_1}\right)}{2},\\
+\end{array}
+\]
+and
+\[
+\begin{array}{rl}
+     t_{116} &= \texttt{xs6} {\cdot} \left(3{\cdot}{S_x}{\cdot}{f_x} - {d_x}^2\right) - h {\cdot} {S_x}^2\\
+     t_{126} &= \texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x}^2 - 2 {C_x}{\cdot}{g_x}\right) - h {\cdot} {S_x} {\cdot} {d_x}\\
+     t_{166} &= \texttt{xs6} {\cdot} \left({d_x}^3 - 2 {S_x}{\cdot}{g_x}\right) - \frac{h}{2} {\cdot} {d_x}^2\\
+     t_{216} &= \texttt{xs6} {\cdot} \left(3{\cdot}{C_x}{\cdot}{f_x} + {S_x}{\cdot}{d_x}\right)\\
+     t_{226} &= \texttt{xs6} {\cdot} \left(3{\cdot}{S_x}{\cdot}{f_x} + {d_x}^2\right)\\
+     t_{266} &= \texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x}^2 - 2 {C_x}{\cdot}{g_x}\right)\\
+     t_{516} &= h {\cdot} \texttt{xs6} {\cdot} \left(3{\cdot}{d_x}{\cdot}{f_x} - 4{\cdot}{g_x}\right) + {\frac{k_1}{2}} {\cdot} \left({f_x} + {S_x}{\cdot}{d_x}\right)\\
+     t_{526} &= h {\cdot} \texttt{xs6} {\cdot} \left({d_x}^3 - 2 {S_x}{\cdot}{g_x}\right) + {\frac{k_1}{2}} {\cdot} {d_x}^2\\
+     t_{566} &= h {\cdot} \texttt{xs6} {\cdot} \left(3{\cdot}{h_x} - 2 {d_x}{\cdot}{g_x}\right) +  {\frac{k_1}{2}} {\cdot} {g_x} - {f_x}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     t_1 &= {\frac{k_1}{2}} {\cdot} \left({d_x}^2 - {S_x}{\cdot}{f_x}\right) - {d_x}\\
+     t_2 &= {\frac{k_1}{2}} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right)\\
+     t_5 &= {f_x} - {k_1} {\cdot} \left({g_x} - {f_x}{\cdot}{d_x} / 2\right),\\
+\end{array}
+\]
+the nonzero elements of the tensor $T$ are:
+\[
+\begin{array}{rl}
+     T_{111} &= - \texttt{xs6} {\cdot} \left({S_x}^2 + {d_x}\right) - \frac{h}{2}{\cdot}{k_{x}^{2}}{\cdot}{S_x}^2\\
+     T_{112} &= \left(- \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}{\cdot}{C_x}\right) {\cdot} {S_x}\\
+     T_{122} &= \left(- \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}{\cdot}{C_x}\right) {\cdot} {d_x}\\
+     T_{116} &= \left(- \frac{h}{2}t_{116} + {\frac{k_1}{4}}{\cdot}L{\cdot}{S_x}\right) {\cdot} {\frac 1 \beta}\\
+     T_{126} &= \left(- \frac{h}{2}t_{126} + {\frac{k_1}{4}} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right) - \frac{S_x}{2}\right) {\cdot} {\frac 1 \beta}\\
+     T_{166} &= \left(- h^2  t_{166} + ht_1\right) {\cdot} {\frac 1{\beta^2}} - \frac{h}{2} {\cdot} {d_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     T_{211} &= - \texttt{xs6} {\cdot} \left(1 + 2 {C_x}\right) {\cdot} {S_x}\\
+     T_{212} &= - \texttt{xs6} {\cdot} \left(1 + 2 {C_x}\right) {\cdot} {d_x}\\
+     T_{222} &= - \left(2 \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}\right) {\cdot} {S_x}\\
+     T_{216} &= \left(- \frac{h}{2}t_{216} - {\frac{k_1}{4}} {\cdot} \left({S_x} - L{\cdot}{C_x}\right)\right) {\cdot} {\frac 1 \beta}\\
+     T_{226} &= \left(- \frac{h}{2}t_{226} + {\frac{k_1}{4}} {\cdot} L {\cdot} {S_x}\right) {\cdot} {\frac 1 \beta}\\
+     T_{266} &= \left(- h^2  t_{266} + ht_2\right) {\cdot} {\frac 1{\beta^2}} - \frac{h}{2} {\cdot} {S_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     T_{511} &= \left(\frac{h}{2}{\cdot}\texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x} + 3{\cdot}{f_x}\right) -  {\frac{k_1}{4}} {\cdot} \left(L - {C_x}{\cdot}{S_x}\right)\right) {\cdot} {\frac 1 \beta}\\
+     T_{512} &= \left(\frac{h}{2}{\cdot}\texttt{xs6}{\cdot}{d_x}^2 + {\frac{k_1}{4}}{\cdot}{S_x}^2\right) {\cdot} {\frac 1 \beta}\\
+     T_{522} &= \left(h{\cdot}\texttt{xs6}{\cdot}{g_x} - {k_1} {\cdot} \left({f_x} - {S_x}{\cdot}{d_x}\right) / 4 - \frac{S_x}{2}\right) {\cdot} {\frac 1 \beta}\\
+     T_{516} &= \frac{h}{2} {\cdot} \left(\left(t_{516} - {k_1} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right) / 2\right) {\cdot} {\frac 1{\beta^2}} + {S_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right)\\
+     T_{526} &= \frac{h}{2} {\cdot} \left(\left(t_{526} - {k_1} {\cdot} \left({d_x}^2 - {S_x}{\cdot}{f_x}\right) / 2\right) {\cdot} {\frac 1{\beta^2}} {\cdot} {d_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right)\\
+     T_{566} &= \left(h^2 {\cdot} \left(t_{566} + t_5\right) {\cdot} {\frac 1{\beta^2}} + \frac{3}{2} {\cdot} \left(h^2 {f_x} - L\right) {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right) {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+Mixed terms:
+\begin{lstlisting}[firstnumber=last]
+     y2ksq = 4 {\cdot} {k_{y}^{2}}
+     call tmfoc(L,y2ksq,{C_y}y,{S_y}y,dyy,fyy)
+     y2klsq = y2ksq {\cdot} L^2
+     if ({k_{x}^{2}} .le. 0  .or.  {k_{y}^{2}} .le. 0) then
+        dd = {k_{x}^{2}} - y2ksq
+        zc = ({C_y}y - {C_x}) / dd
+        zs = ({S_y}y - {S_x}) / dd
+        zd = (dyy - {d_x}) / dd
+        zf = (fyy - {f_x}) / dd
+     else
+        sumsq = ({k_x}/2 + {k_y}) ^ 2
+        difsq = ({k_x}/2 - {k_y}) ^ 2
+        call tmfoc(L,sumsq,cp,sp,dp,fp)
+        call tmfoc(L,difsq,cm,sm,dm,fm)
+        zc = sp {\cdot} sm / 2
+        zs = (sp{\cdot}cm - cp{\cdot}sm) / (4{\cdot}{k_x}{\cdot}{k_y})
+        if ({k_{x}^{2}} .gt. y2ksq) then
+           zd = (dyy - zc) / {k_{x}^{2}}
+           zf = (fyy - zs) / {k_{x}^{2}}
+        else
+           zd = ({d_x} - zc) / y2ksq
+           zf = ({f_x} - zs) / y2ksq
+        endif
+     endif
+     \end{lstlisting}
+\[
+\begin{array}{rl}
+     t_{336} &= {k_2} {\cdot} \left({C_y}{\cdot}zd - 2 {k_1}{S_y}{\cdot}zf\right) + h {\cdot} {k_1} {\cdot} {f_x} {\cdot} {S_y}\\
+     t_{346} &= {k_2} {\cdot} \left({S_y}{\cdot}zd - 2 {C_y}{\cdot}zf\right) + h {\cdot} {f_x} {\cdot} {C_y}\\
+     t_{436} &= 2 {\cdot} \texttt{ys2} {\cdot} {f_x} {\cdot} {C_y} - {k_2} {\cdot} {k_1} {\cdot} \left({S_y}{\cdot}zd - 2 {C_y}{\cdot}zf\right)\\
+     t_{446} &= 2 {\cdot} \texttt{ys2} {\cdot} {f_x} {\cdot} {S_y} - {k_2} {\cdot} \left({C_y}{\cdot}zd - 2 {k_1}{S_y}{\cdot}zf\right)\\
+     T_{133} &= {k_2}{\cdot}{k_1}zd + \texttt{ys2}{\cdot}{d_x}\\
+     T_{134} &= {k_2}{\cdot}{\frac{\texttt{zs}}{2}}\\
+     T_{144} &= {k_2}{\cdot}zd - \frac{h}{2}{\cdot}{d_x}\\
+     T_{233} &= {k_2}{\cdot}{k_1}zs + \texttt{ys2}{\cdot}{S_x}\\
+     T_{234} &= {k_2}{\cdot}zc/2\\
+     T_{244} &= {k_2}{\cdot}zs - \frac{h}{2}{\cdot}{S_x}\\
+     T_{313} &= {k_2}{\cdot}\left({C_y}{\cdot} zc/2 - {k_1}{S_y}{\cdot} zs\right) + \frac{h}{2}{\cdot}{k_1}{S_x}{\cdot}{S_y}\\
+     T_{314} &= {k_2}{\cdot}\left({S_y}{\cdot} zc/2 - {C_y}{\cdot}zs\right) + \frac{h}{2}{\cdot}{S_x}{\cdot}{C_y}\\
+     T_{323} &= {k_2}{\cdot}\left({C_y}{\cdot} {\frac{\texttt{zs}}{2}} - {k_1}{S_y}{\cdot}zd\right) + \frac{h}{2}{\cdot}{k_1}{d_x}{\cdot}{S_y}\\
+     T_{324} &= {k_2}{\cdot}\left({S_y}{\cdot} {\frac{\texttt{zs}}{2}} - {C_y}{\cdot}zd\right) + \frac{h}{2}{\cdot}{d_x}{\cdot}{C_y}\\
+     T_{336} &= \left(\frac{h}{2}t_{336} - {k_1}L{\cdot}\frac{S_y}{4}\right) {\cdot} {\frac 1 \beta}\\
+     T_{346} &= \left(\frac{h}{2}t_{346} - \left({S_y} + L{\cdot}{C_y}\right) / 4\right) {\cdot} {\frac 1 \beta}\\
+     T_{413} &= {k_2}{\cdot}{k_1}\left({C_y}{\cdot} zs - {S_y}{\cdot} zc/2\right) + \texttt{ys2}{\cdot}{S_x}{\cdot}{C_y}\\
+     T_{414} &= {k_2}{\cdot}\left({k_1}{S_y}{\cdot} zs - {C_y}{\cdot} zc/2\right) + \texttt{ys2}{\cdot}{S_x}{\cdot}{S_y}\\
+     T_{423} &= {k_2}{\cdot}{k_1}\left({C_y}{\cdot} zd - {S_y}{\cdot} {\frac{\texttt{zs}}{2}}\right) + \texttt{ys2}{\cdot}{d_x}{\cdot}{C_y}\\
+     T_{424} &= {k_2}{\cdot}\left({k_1}{S_y}{\cdot} zd - {C_y}{\cdot} {\frac{\texttt{zs}}{2}}\right) + \texttt{ys2}{\cdot}{d_x}{\cdot}{S_y}\\
+     T_{436} &= \left(\frac{h}{2}t_{436} + {k_1} {\cdot} \left({S_y} - L{\cdot}{C_y}\right) / 4\right) {\cdot} {\frac 1 \beta}\\
+     T_{446} &= \left(\frac{h}{2}t_{446} - {k_1} L{\cdot}\frac{S_y}{4}\right) {\cdot} {\frac 1 \beta}\\
+     T_{533} &= \left(- h{\cdot} {k_2}{\cdot} {k_1}zf - h{\cdot} \texttt{ys2}{\cdot}{f_x} + {k_1}\left(L-{C_y}{\cdot}{S_y}\right)/4\right){\cdot} {\frac 1 \beta}\\
+     T_{534} &= \left(- h{\cdot} {k_2}{\cdot} zd/2 - {k_1}{S_y}^2/4\right) {\cdot} {\frac 1 \beta}\\
+     T_{544} &= \left(- h{\cdot} {k_2}{\cdot} zf + h{\cdot}\frac{h}{2}{\cdot}{f_x} - \left(L + {S_y}{\cdot}{C_y}\right)/4\right) {\cdot} {\frac 1 \beta}\\
+     \end{array}
+\]
+\begin{lstlisting}[firstnumber=last]
+call tmsymm(te)
+\end{lstlisting}
+Effect of dipole error is considered if $\Delta h \neq 0$, then
+\[\begin{array}{rl}
+        R_{11} &= R_{11} + {\Delta h} t_{116}\\
+        R_{12} &= R_{12} + {\Delta h} t_{126}\\
+        R_{16} &= R_{16} + {\Delta h} {\cdot} (2  ht_{166} - t_1) {\cdot} {\frac 1 \beta}\\
+        R_{21} &= R_{21} + {\Delta h} {\cdot} (t_{216} - h{\cdot}{S_x})\\
+        R_{22} &= R_{22} + {\Delta h} t_{226}\\
+        R_{26} &= R_{26} + {\Delta h} {\cdot} (2  ht_{266} - t_2) {\cdot} {\frac 1 \beta}\\
+        R_{51} &= R_{51} - {\Delta h} t_{516} {\cdot} {\frac 1 \beta}\\
+        R_{52} &= R_{52} - {\Delta h} {\cdot} (t_{526} - {d_x}) {\cdot} {\frac 1 \beta}\\
+        R_{56} &= R_{56} - {\Delta h} {\cdot} h {\cdot} ((2  t_{566} + t_5) {\cdot} {\frac 1{\beta^2}} + {f_x} {\cdot} \frac 1 {{(\beta\gamma)}^2})\\
+        R_{33} &= R_{33} - {\Delta h} t_{336}\\
+        R_{34} &= R_{34} - {\Delta h} t_{346}\\
+        R_{43} &= R_{43} - {\Delta h} t_{436}\\
+        R_{44} &= R_{44} - {\Delta h} t_{446}\\
+        K_1 &= K_1 - {\Delta h}^2 t_{166}\\
+        K_2 &= K_2 - {\Delta h}^2 t_{266}\\
+        K_5 &= K_5 + {\Delta h}^2 t_{566} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+
 
 
 
