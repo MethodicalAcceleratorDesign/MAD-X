@@ -1,7 +1,8 @@
 <head>
-<title>DRIFT</title>
+<title>RESBEAM</title>
 <!-- Changed by: Chris ISELIN, 24-Jan-1997 -->
 <!-- Changed by: Hans Grote, 10-Jun-2002 -->
+<!-- Changed by: Ghislain Roy, 09 may 2014 -->
 </head>
 
 <body bgcolor="#ffffff">
@@ -12,12 +13,17 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 <h2>RESBEAM: reset beam defaults</h2>
 </center>
 
+The RESBEAM command resets all beam data to their default values. 
+
 <pre>
-label: RESBEAM,SEQUENCE=name;
+RESBEAM, SEQUENCE=name;
 </pre>
+The only argument to RESBEAM is the sequence name.
 If the sequence name is omitted, the default beam is reset.
-<pre>
+<p>
+
 <a name=defaults>Default BEAM Data:</a>
+<pre>
 PARTICLE        POSITRON
 ENERGY          1 GeV
 EX              1 rad m
@@ -29,10 +35,12 @@ BCURRENT        0 A
 BUNCHED         .TRUE.
 RADIATE         .FALSE.
 </pre>
+
 <p>
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
-January 24, 1997
+January 24, 1997 <br>
+<a mailto="mad@cern.ch">Ghislain Roy</a> May 12th, 2014
 </address>
 
 </body>
