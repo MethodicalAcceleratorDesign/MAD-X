@@ -242,72 +242,112 @@ The length of DR2 will always be equal to the length of DR1. The
 \label{sec:bend}
 Two different type keywords are recognised for bending magnets, they are
 distinguished only by the reference system used:  
-\begin{itemize}
-   \item \href{rbend}{RBEND} \label{bend_rbend} is a rectangular bending magnet. It has
-     parallel pole faces and is based on a curved
-     \href{local_system.html#rbend}{rbend reference system};  \textbf{
-       its length is the straight length as in the Figure but internally
-       the arc length is being used.  - to define an RBEND with the arc
-       length as length (straight line shorter than input - for
-       compatibility with MAD8 version up to version 8.23.06 including),
-       the option RBARC=FALSE has to be set.} 
-   \item \href{sbend}{SBEND} is a sector bending magnet. Its pole faces
-     meet at the centre of curvature of the curved
-     \href{local_system.html#sbend}{sbend reference system}.  
-\end{itemize} 
+\begin{madlist}
+  \ttitem{SBEND}\label{bend_sbend} is a sector bending magnet. \\
+  The planes of the pole faces meet at the centre of curvature of the
+  curved 
+  % Its pole faces meet at the centre of curvature of the curved
+  \href{local_system.html#sbend}{sbend reference system}.  
+  \ttitem{RBEND}\label{bend_rbend} is a rectangular bending magnet. \\ 
+  The pole faces are parallel. The reference system is the curved  
+  % It has parallel pole faces and is based on a curved
+  \href{local_system.html#rbend}{rbend reference system}.
+\end{madlist}
 
-They are defined by the commands: 
+Bendig magnets are defined by the commands: 
 \begin{verbatim}
 SBEND, L = real, ANGLE = real, TILT = real, 
-       K0 = real, K0S = real, K1 = real, K2 = real, 
+       K0 = real, K1 = real, K2 = real, 
        E1 = real, E2 = real, FINT = real, FINTX = real, 
        HGAP = real, H1 = real, H2 = real;
 
 RBEND, L = real, ANGLE = real, TILT = real, 
-       K0 = real, K0S = real, K1 = real, K2 = real, 
+       K0 = real, K1 = real, K2 = real, 
        E1 = real, E2 = real, FINT = real, FINTX = real,
        HGAP = real, H1 = real, H2 = real,
        ADD_ANGLE='array';
 \end{verbatim} 
 
-For both types, the following first-order attributes are permitted: 
-\begin{itemize}
-   \item L: The length of the magnet (default: 0 m). For a rectangular
-     magnet the length is measured along a straight line  as in the
-     Figure (internally the arc length is used), while for a  sector
-     magnet it is the arc length of the reference orbit. \textbf{ To
-       define an RBEND with the arc length (shorter straight length),
-       the option RBARC=FALSE has to be set.} 
-
-   \item ANGLE: The bend angle (default: 0 rad). A positive bend angle
-     represents a bend to the right, i.e. towards negative \texttt{x}
-     values.  
+Bending magnets have the following attributes:
+\begin{madlist}
+   \ttitem{L} The length of the magnet (default: 0 m). \\
+   For sector bends the declared length is the arc length 
+   of the reference orbit. \\
+   For rectangular bends the declared length is normally the length of a
+   straight line joining the entry and exit points, as in the
+   Figure. \\ 
+   Internally MAD-X only uses the arc length of the reference orbit for
+   both bend types.\\ 
+   {\bf In order to define RBEND's with a declared length equal to the
+     arc length of the reference orbit, the option RBARC must be
+     previously set to FALSE in MAD-X with {\tt Option, RBARC= false;}} 
    
-   \item ADD\_ANGLE: An array of (maximum 5) bending angles for multiple
-     passes. See \texttt{add\_pass} option of the
-     \href{sequence.html}{sequence} command.  
+   \ttitem{ANGLE} The bend angle (default: 0 rad). \\ 
+   A positive bend angle represents a bend to the right, i.e. towards
+   negative \texttt{x} values.  
+   
+   \ttitem{ADD\_ANGLE} An array of (maximum 5) bending angles for
+   multiple passes. See \texttt{add\_pass} option of the
+   \href{sequence.html}{sequence} command. This is only allowed for
+   RBEND elements and is ignored for SBEND elements. 
+ 
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
+   rad, i.e. a horizontal bend). \\ 
+   A positive angle represents a clockwise rotation. \\ 
+   An attribute TILT=pi/2 turns a
+   horizontal into a vertical bend, and a positive ANGLE then denotes a
+   downwards deflection.
 
-   \item TILT: The roll angle about the longitudinal axis (default: 0
-     rad, i.e. a horizontal bend). A positive angle represents a
-     clockwise rotation. A TILT=pi/2 turns a horizontal into a vertical
-     bend, i.e. a positive bend ANGLE denotes a deflection
-     down. \textbf{ Please note that contrary to MAD8 one has to specify
-       the desired TILT angle, otherwise it is taken as 0 rad. This was
-       needed to avoid the confusion in MAD8 about the actual meaning of
-       the TILT attribute for various elements. } 
+   %% \textbf{ Please note that contrary to MAD8 one has to specify
+   %%   the desired TILT angle, otherwise it is taken as 0 rad. This was
+   %%   needed to avoid the confusion in MAD8 about the actual meaning of
+   %%   the TILT attribute for various elements. } 
 
-   \item \textbf{Please take note that K$_0$ and K$_0s$ are left in the
-     data base but are no longer used for the MAP of the bends (but see
-     below for what K$_0$ is being used), instead ANGLE and TILT are
-     used exclusively. We believe that this will allow for a clearer and
-     unambiguous definition, in particular in view of the upcoming
-     integration of MAD-X with PTC which will allow a more general
-     definition of bends.  However, it is required to specify k0 to
-     assign RELATIVE field errors to a bending magnet since k0 is used
-     for the normalization and NOT the ANGLE. (see EFCOMP).} 
+   \ttitem{K1} The quadrupole coefficient (Default: $0 mˆ{-2}$)\\
+     \textit{K$_1$ = (1 / B rho) (del B$_y$ / del x)}. \\
+     A positive quadrupole strength implies horizontal focussing of
+     positively charged particles.  
 
+   \ttitem{E1} The rotation angle for the entrance pole face (Default: 0 rad). 
+   \ttitem{E2} The rotation angle for the exit pole face (Default: 0 rad). \\
+   The pole face rotation angles are referred to the magnet model for
+   \href{local_system.html#rbend}{rectangular bend} and
+   \href{local_system.html#sbend}{sector bend} respectively.
 
-% -<PRE>K0: 
+   \ttitem{FINT} The fringe field integral at entrance and exit of the
+   bend. (Default:  0). \\ 
+   \ttitem{FINTX} If defined and positive, the fringe field integral at
+   the exit of the element, overriding FINT for the exit. (Default: =FINT) \\ 
+   This allows to set different fringe field integrals at entrance
+   (FINT) and exit (FINTX) of the element.  
+
+   \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
+
+   \ttitem{K2}\index{K2} The sextupole coefficient. (Default: $0
+   mˆ{-3}$) \\ $K_2 = (1 / B \rho) (\partial^2 B_y / \partial x^2)$.   
+
+   \ttitem{H1}\index{H1} The curvature of the entrance pole
+   face. (Default: $0 m^{-1}$).   
+   \ttitem{H2} The curvature of the exit pole face. (Default: $0
+   m^{-1}$). \\  
+   A positive pole face curvature induces a negative sextupole
+   component; i.e. for positive H1 and H2 the centres of curvature of
+   the pole faces are placed inside the magnet. 
+
+   \ttitem{K0} {\bf OBSOLETE} \\
+   Please take note that K$_0$ and K$_0s$ are left in the
+   data base but are no longer used for the MAP of the bends,
+   instead ANGLE and TILT are used exclusively. \\
+   %% We believe that this will allow for a clearer and
+   %% unambiguous definition, in particular in view of the upcoming
+   %% integration of MAD-X with PTC which will allow a more general
+   %% definition of bends.  
+   However, specifying K0 is required in order to be able to assign RELATIVE 
+   field errors to a bending magnet because K0 is used for the normalization 
+   instead of the ANGLE. (see EFCOMP).\\
+   With $K_0 = (1 / B \rho) B_y$, one gets K0 = ANGLE / arclength.
+
+% -K0: 
 % -The horizontal dipole coefficient 
 % -<i>K<sub>0</sub> = (1 / B rho) B<sub>y</sub> </i>. 
 % -The default is 0 m<sup>-1</sup>. 
@@ -318,31 +358,14 @@ For both types, the following first-order attributes are permitted:
 % -The vertical dipole coefficient 
 % -<i>K<sub>0s</sub> = (1 / B rho) B<sub>x</sub> </i>. 
 % -The default is 0 m<sup>-1</sup>. A positive K0S deflects the closed 
-% -orbit to positive y values.</PRE> 
+% -orbit to positive y values.
 
-   \item K1: The quadrupole coefficient \\
-     \textit{K$_1$ = (1 / B rho) (del B$_y$ / del x)}. \\
-     The default is 0 m$^{-2}$. A positive quadrupole strength implies
-     horizontal focussing of positively charged particles. 
-
-   \item E1: The rotation angle for the entrance pole face (default: 0 rad). 
-   \item E2: The rotation angle for the exit pole face (default: 0 rad). 
-   \item FINT: The field integral whose default value is 0. 
-   \item FINTX: Allows (FINTX \textgreater 0)to set FINT at the element
-     exit different from its entry value. In particular useful to switch
-     it off (FINTX=0). 
-
-   \item HGAP: The half gap of the magnet (default: 0 m). 
-\end{itemize} 
-
-The pole face rotation angles are referred to the magnet model for
-\href{local_system.html#rbend}{rectangular bend} and
-\href{local_system.html#sbend}{sector bend} respectively. The quantities
-FINT and HGAP specify the finite extent of the fringe fields as defined
-in \href{bibliography.html#slac75}{[SLAC-75]} There they are defined as
-follows:  
+\end{madlist}
 
 
+{\bf \underline{Fringe Fields:}}\\
+The quantities FINT and HGAP specify the finite extent of the fringe
+fields as defined in \href{bibliography.html#slac75}{[SLAC-75]}:
 %%\includegraphics{../equations/fint_hgap.gif}
 \[
 FINT=\int_{-\infty}^\infty \frac{B_y(s)(B_0-B_y(s))}{g \cdot
@@ -364,29 +387,30 @@ FINT:
 \end{center}
 
 
-Entering the keyword FINT alone sets the integral to 0.5. This is a
-reasonable average of the above values.  The following second-order
-attributes are permitted:  
-\begin{madlist}
-    \ttitem{K2}\index{K2} The sextupole coefficient 
-    $K_2 = (1 / B \rho) (\partial^2 B_y / \partial x^2)$.   
-    \ttitem{H1}\index{H1} The curvature of the entrance pole face 
-    (default: $0 m^{-1}$).  
-    \ttitem{H2} The curvature of the exit pole face 
-    (default: $0 m^{-1}$). \\ 
-    A positive pole face curvature induces a negative sextupole
-    component; i.e. for positive H1 and H2 the centres of curvature of
-    the pole faces are placed inside the magnet. 
-\end{madlist} 
+Entering the keyword FINT alone sets the integral to 0.5, which is a
+reasonable average of the above values.  
 
-Examples: 
+Note also that the possibility to specify both FINT and FINTX  allows
+one to set different values at entrance and exit of a bend element. \\ 
+This can be particularly useful to set the fringe field integral to zero
+on one side only, e.g. when slicing a dipole.  
+
+
+{\bf \underline {Examples:}}\\
+
 \begin{verbatim}
-BR: RBEND, L = 5.5, ANGLE = +0.001;           // Deflection to the right
-BD: SBEND, L = 5.5, K0S = +0.001/5.5;         // Deflection up
-BL: SBEND, L = 5.5, K0 = -0.001/5.5;          // Deflection to the left
-BU: SBEND, L = 5.5, K0S = -0.001;             // Deflection down
-\end{verbatim}
+// rectangular horizontal dipole deflecting to the right
+BR: RBEND, L=5.5, ANGLE=+0.001;    
 
+// sector vertical dipole deflecting downwards
+BD: SBEND, L=5.5, ANGLE=+0.001, TILT=pi/2; 
+
+// sector horiziontal dipole deflecting to the left
+BL: SBEND, L=5.5, ANGLE=+0.001, TILT=pi;   
+
+// rectangular vertical dipole deflecting upwards
+BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2; 
+\end{verbatim}
 
 %\input{Introduction/dipedge}
 \subsection{Dipedge Element}\index{dipedge}
@@ -400,26 +424,26 @@ lenses leaves dipedge untouched and splits correctly the SBENDS's.
 It does not make sense to use it alone. It can be specified at the
 entrance and the exit of a SBEND. They are defined by the commands:  
 \begin{verbatim}
-label : dipedge, h=real, e1=real, fint=real, hgap=real, tilt=real;
+DIPEDGE, H=real, E1=real, FINT=real, HGAP=real, TILT=real;
 \end{verbatim} 
 
 It has zero length and five attributes. 
-\begin{itemize}
-   \item H: Is angle/length or 1/rho (default: 0 m$^{-1}$ - for the
+\begin{madlist}
+   \ttitem{H} Is angle/length or 1/rho (default: 0 m$^{-1}$ - for the
      default the dipedge element has no effect). (must be equal to that
      of the associated SBEND)  
-   \item E1: The rotation angle for the pole face.The sign convention is
+   \ttitem{E1} The rotation angle for the pole face.The sign convention is
      as for a SBEND \href{bend.html}{Bending Magnet}. Note that it is
      different for an entrance and an exit. (default: 0 rad).  
-   \item FINT: field integral as for SBEND
+   \ttitem{FINT} field integral as for SBEND
      \href{local_system.html#sbend}{sector bend}. Note that each dipedge
      has its own fint, so fintx is no longer necessary.  
-   \item HGAP: half gap height of the associated SBEND
+   \ttitem{HGAP} half gap height of the associated SBEND
      \href{bend.html}{Bending Magnet}.   
-   \item TILT: The roll angle about the longitudinal axis (default: 0
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a horizontal bend). A positive angle represents a
      clockwise rotation.  
-\end{itemize}
+\end{madlist}
 
 
 
