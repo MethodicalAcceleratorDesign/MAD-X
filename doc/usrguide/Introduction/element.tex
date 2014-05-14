@@ -218,13 +218,13 @@ m27: marker;
 \label{sec:drift}
 
 \begin{verbatim}
-label: DRIFT,L=real;
+label: DRIFT, L=real;
 \end{verbatim} 
 
 A drift space has one real attribute: 
-\begin{itemize}
-   \item L: The drift length (default: 0 m) 
-\end{itemize} 
+\begin{madlist}
+   \ttitem{L} The drift length (Default: 0 m) 
+\end{madlist}
 
 Examples: 
 \begin{verbatim}
@@ -256,16 +256,16 @@ distinguished only by the reference system used:
 
 Bendig magnets are defined by the commands: 
 \begin{verbatim}
-SBEND, L = real, ANGLE = real, TILT = real, 
-       K0 = real, K1 = real, K2 = real, 
-       E1 = real, E2 = real, FINT = real, FINTX = real, 
-       HGAP = real, H1 = real, H2 = real;
+label: SBEND, L = real, ANGLE = real, TILT = real, 
+              K0 = real, K1 = real, K2 = real, 
+              E1 = real, E2 = real, FINT = real, FINTX = real, 
+              HGAP = real, H1 = real, H2 = real;
 
-RBEND, L = real, ANGLE = real, TILT = real, 
-       K0 = real, K1 = real, K2 = real, 
-       E1 = real, E2 = real, FINT = real, FINTX = real,
-       HGAP = real, H1 = real, H2 = real,
-       ADD_ANGLE='array';
+label: RBEND, L = real, ANGLE = real, TILT = real, 
+              K0 = real, K1 = real, K2 = real, 
+              E1 = real, E2 = real, FINT = real, FINTX = real,
+              HGAP = real, H1 = real, H2 = real,
+              ADD_ANGLE='array';
 \end{verbatim} 
 
 Bending magnets have the following attributes:
@@ -304,7 +304,7 @@ Bending magnets have the following attributes:
    %%   the TILT attribute for various elements. } 
 
    \ttitem{K1} The quadrupole coefficient (Default: $0 mˆ{-2}$)\\
-     \textit{K$_1$ = (1 / B rho) (del B$_y$ / del x)}. \\
+     $K_1 = (1/B\rho) (\partial B_y / \partial x)$. \\
      A positive quadrupole strength implies horizontal focussing of
      positively charged particles.  
 
@@ -319,10 +319,10 @@ Bending magnets have the following attributes:
    E1 and E2 must be specified as positive to give an SBEND parallel
    faces, ie turning it into an RBEND. E1 and E2 must be negative to
    give an RBEND faces whose planes intersect at the centrer of
-   curvature, ie turning it into an RBEND. 
+   curvature, ie turning it into an SBEND. 
 
    \ttitem{FINT} The fringe field integral at entrance and exit of the
-   bend. (Default:  0). \\ 
+   bend. (Default:  0). 
    \ttitem{FINTX} If defined and positive, the fringe field integral at
    the exit of the element, overriding FINT for the exit. (Default: =FINT) \\ 
    This allows to set different fringe field integrals at entrance
@@ -331,7 +331,7 @@ Bending magnets have the following attributes:
    \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
 
    \ttitem{K2}\index{K2} The sextupole coefficient. (Default: $0
-   mˆ{-3}$) \\ $K_2 = (1 / B \rho) (\partial^2 B_y / \partial x^2)$.   
+   mˆ{-3}$) \\ $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
 
    \ttitem{H1}\index{H1} The curvature of the entrance pole
    face. (Default: $0 m^{-1}$).   
@@ -369,8 +369,9 @@ Bending magnets have the following attributes:
 
 \end{madlist}
 
-
-{\bf \underline{Fringe Fields:}}\\
+\vskip 5mm
+{\bf \underline{Fringe Fields:}}
+\vskip 3mm
 The quantities FINT and HGAP specify the finite extent of the fringe
 fields as defined in \href{bibliography.html#slac75}{[SLAC-75]}:
 %%\includegraphics{../equations/fint_hgap.gif}
@@ -403,8 +404,7 @@ This can be particularly useful to set the fringe field integral to zero
 on one side only, e.g. when slicing a dipole.  
 
 
-{\bf \underline {Examples:}}\\
-
+{\bf \underline {Examples:}}
 \begin{verbatim}
 // rectangular horizontal dipole deflecting to the right
 BR: RBEND, L=5.5, ANGLE=+0.001;    
@@ -431,7 +431,7 @@ lenses leaves dipedge untouched and splits correctly the SBENDS's.
 It does not make sense to use it alone. It can be specified at the
 entrance and the exit of a SBEND. They are defined by the commands:  
 \begin{verbatim}
-DIPEDGE, H=real, E1=real, FINT=real, HGAP=real, TILT=real;
+label: DIPEDGE, H=real, E1=real, FINT=real, HGAP=real, TILT=real;
 \end{verbatim} 
 
 It has zero length and five attributes. 

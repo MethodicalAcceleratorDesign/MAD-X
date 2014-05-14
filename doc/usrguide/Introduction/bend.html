@@ -38,16 +38,16 @@ The pole faces are parallel. The reference system is the curved
 <p><p>
 Bending magnets are defined by the commands:
 <PRE>
-SBEND,   L=real, ANGLE=real, TILT=real,
-         K0=real, K1=real, K2=real,
-         E1=real, E2=real, FINT=real,FINTX=real, 
-         HGAP=real, H1=real, H2=real;
+label: SBEND, L=real, ANGLE=real, TILT=real,
+              K0=real, K1=real, K2=real,
+              E1=real, E2=real, FINT=real,FINTX=real, 
+              HGAP=real, H1=real, H2=real;
 
-RBEND,   L=real, ANGLE=real, TILT=real, 
-         K0=real, K1=real, K2=real,
-         E1=real, E2=real, FINT=real, FINTX=real, 
-         HGAP=real, H1=real, H2=real, 
-         ADD_ANGLE={<i>array_of_max_5_angles</i>};
+label: RBEND, L=real, ANGLE=real, TILT=real, 
+              K0=real, K1=real, K2=real,
+              E1=real, E2=real, FINT=real, FINTX=real, 
+              HGAP=real, H1=real, H2=real, 
+              ADD_ANGLE={<i>array_of_max_5_angles</i>};
 </PRE>
 
 Bending magnets have the following attributes:
@@ -101,7 +101,7 @@ side of the bend that is further away from the centre of curvature. <br>
 E1 and E2 must be specified as positive to give an SBEND parallel
 faces, ie turning it into an RBEND. <br>
 E1 and E2 must be negative to give an RBEND faces whose planes intersect 
-at the centrer of curvature, ie turning it into an RBEND. 
+at the centrer of curvature, ie turning it into an SBEND. 
 
 
 <p>
