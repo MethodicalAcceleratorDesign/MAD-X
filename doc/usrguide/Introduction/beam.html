@@ -27,7 +27,6 @@ BEAM, PARTICLE=name, MASS=real, CHARGE=real,
       BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
 </pre>
 
-The particle name, restmass and  are defined by:
 The attributes of the BEAM command are: 
 <ul>
 <li><a name=particle>PARTICLE</a>:
@@ -59,19 +58,18 @@ combination of name, mass and charge can be entered independently.
 
 <ul>
 <li><a name=energy>ENERGY</a>:
-Total energy per particle in GeV. (Default = 1GeV)<br>
-If given, it must be greater than the particle restmass.
+Total energy per particle in GeV. (Default = 1GeV).
+ENERGY must be greater than the particle restmass.
 <li><a name=pc>PC</a>:
-Momentum per particle in GeV/c.
-If given, it must be greater than zero.
+Momentum per particle in GeV/c. PC must be greater than zero.
 <li><a name=gamma>GAMMA</a>:
 Relativistic factor, ie the ratio between total energy and rest energy of the particles:
 GAMMA = ENERGY/RESTMASS = <i>E / m<sub>0</sub> c<sup>2</sup></i>.
 GAMMA must be greater than one.
 <li><a name=beta>BETA</a>:
 Ratio between the speed of the particles and the speed of light:
-BETA = <i>v / c</i>. <br>
-BETA it must be strictly less than one.
+BETA = <i>v / c</i>.
+BETA must be strictly less than one.
 </ul>
 The order of precedence for arguments is: <tt>energy->pc->gamma->beta</tt>
 <br>
@@ -87,12 +85,12 @@ The vertical emittance <i>E<sub>y</sub></i> (default: 1 m).
 <li><a name=et>ET</a>:
 The longitudinal emittance <i>E<sub>t</sub></i> (default: 1 m).
 <li><a name=exn>EXN</a>:
-The normalised horizontal emittance [m]:
+The normalised horizontal emittance [m].
 <i>E<sub>xn</sub></i> =
 4 (GAMMA<sup>2</sup> - 1)<sup>1/2</sup> <i>E<sub>x</sub></i>
 (ignored if <i>E<sub>x</sub></i> is given).
 <li><a name=eyn>EYN</a>:
-The normalised vertical emittance [m]:
+The normalised vertical emittance [m].
 <i>E<sub>yn</sub></i> =
 4 (GAMMA<sup>2</sup> - 1)<sup>1/2</sup> <i>E<sub>y</sub></i>
 (ignored if <i>E<sub>x</sub></i> is given).
@@ -115,8 +113,7 @@ sigma(<i>E</i>) / <i>p<sub>0</sub> c =
 <i>c</i> sigma(<i>t</i>) =
 </i>(ETA C E<sub>t</sub> / 2 pi Q<sub>s</sub>)<sup>1/2</sup></i>.
 <p>
-<i>C</i> is the machine circumference, and
-<p>
+where <i>C</i> is the machine circumference, and
 <i>ETA</i> = GAMMA<sup>-2</sup> - GAMMA(transition)<sup>-2</sup>.
 <p>
 
@@ -207,7 +204,7 @@ beam->charge=-1;
 Note however that this does NOT trigger an update of dependent variables
 and you are strongly advised against setting BEAM parameters with this method.
 
-
+<p>
 The current values in the BEAM bank can be obtained by the command
 <pre>show,beam;</pre> 
 or to obtain the data for a beam linked to a named sequence:

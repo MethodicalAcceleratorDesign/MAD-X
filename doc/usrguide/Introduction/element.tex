@@ -244,8 +244,8 @@ Two different type keywords are recognised for bending magnets, they are
 distinguished only by the reference system used:  
 \begin{madlist}
   \ttitem{SBEND}\label{bend_sbend} is a sector bending magnet. \\
-  The planes of the pole faces meet at the centre of curvature of the
-  curved 
+  The planes of the pole faces intersect at the centre of curvature of
+  the curved 
   % Its pole faces meet at the centre of curvature of the curved
   \href{local_system.html#sbend}{sbend reference system}.  
   \ttitem{RBEND}\label{bend_rbend} is a rectangular bending magnet. \\ 
@@ -312,7 +312,14 @@ Bending magnets have the following attributes:
    \ttitem{E2} The rotation angle for the exit pole face (Default: 0 rad). \\
    The pole face rotation angles are referred to the magnet model for
    \href{local_system.html#rbend}{rectangular bend} and
-   \href{local_system.html#sbend}{sector bend} respectively.
+   \href{local_system.html#sbend}{sector bend} respectively. \\
+   E1 and E2 are positive if they reduce the length of the
+   side of the bend that is further away from the centre of
+   curvature. \\
+   E1 and E2 must be specified as positive to give an SBEND parallel
+   faces, ie turning it into an RBEND. E1 and E2 must be negative to
+   give an RBEND faces whose planes intersect at the centrer of
+   curvature, ie turning it into an RBEND. 
 
    \ttitem{FINT} The fringe field integral at entrance and exit of the
    bend. (Default:  0). \\ 

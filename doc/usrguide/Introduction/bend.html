@@ -18,7 +18,7 @@ Two different type keywords are recognised for bending magnets,
 they are distinguished by the reference system used:
 <ul>
 <li><a name=sbend>SBEND</a> is a sector bending magnet.
-The planes of the pole faces meet at the centre of curvature of the curved
+The planes of the pole faces intersect at the centre of curvature of the curved
 <a href="local_system.html#sbend">sbend reference system</a>.
 <p>
 <li><a name=rbend>RBEND</a> is a rectangular bending magnet.
@@ -95,7 +95,13 @@ of positively charged particles.
 <br>
 The pole face rotation angles are referred to the magnet model for
 <a href="local_system.html#rbend">rectangular bend</a> and
-<a href="local_system.html#sbend">sector bend</a> respectively.
+<a href="local_system.html#sbend">sector bend</a> respectively.<br>
+E1 and E2 are positive if they reduce the length of the
+side of the bend that is further away from the centre of curvature. <br>
+E1 and E2 must be specified as positive to give an SBEND parallel
+faces, ie turning it into an RBEND. <br>
+E1 and E2 must be negative to give an RBEND faces whose planes intersect 
+at the centrer of curvature, ie turning it into an RBEND. 
 
 
 <p>
@@ -194,6 +200,6 @@ BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2;
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
 <a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
 August 28, 2003 --  
-Ghislain Roy, May 13th, 2014
+Ghislain Roy, May 14th, 2014
 </address>
 </body>
