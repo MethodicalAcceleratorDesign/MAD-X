@@ -398,6 +398,13 @@ contains
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
 
+    no = get_value('ptc_twiss ','no ')
+    if ( no .lt. 1 ) then
+       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
+       print*, "Order is ", no
+       return
+    endif
+
     icase = get_value('ptc_twiss ','icase ')
 
     deltap0 = get_value('ptc_twiss ','deltap ')
@@ -419,11 +426,28 @@ contains
 
     deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
 
-    if (deltap_dependency .and. .not.((icase.eq.5) .or. (icase.eq.56))) then
-       call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume deltap is fixed parameter')
-       call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume icase=5 (formula differentiation) or icase=56 (from map)')
-    endif
+    if (deltap_dependency) then
+    
+      if (.not.((icase.eq.5) .or. (icase.eq.56))) then
+         call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume deltap is fixed parameter')
+         call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume icase=5 (formula differentiation) or icase=56 (from map)')
+      endif
 
+     if (no < 2) then
+       call fort_warn("ptc_twiss ","For dispersion's 1st order derivatives w.r.t delta-p there must be no>=2 ")
+     endif
+
+     if (no < 3) then
+       call fort_warn("ptc_twiss ","For dispersion's 2nd order derivatives w.r.t delta-p there must be no>=3 ")
+     endif
+
+     if (no < 4) then
+       call fort_warn("ptc_twiss ","For dispersion's 3rd order derivatives w.r.t delta-p there must be no>=4 ")
+     endif
+    
+    endif
+    
+    
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -487,12 +511,6 @@ contains
 
     mynd2 = 0
     npara = 0
-    no = get_value('ptc_twiss ','no ')
-    if ( no .lt. 1 ) then
-       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
-       print*, "Order is ", no
-       return
-    endif
     
     writetmap = get_value('ptc_twiss ','writetmap ') .ne. 0
     
@@ -2641,6 +2659,9 @@ contains
     integer :: no ! order must be at equal to 2 to be able to get terms of the form x*deltap
     ! required to evaluate the derivatives of Twiss parameters w.r.t deltap
     integer :: ndel ! as in subroutine 'equaltwiss'...
+    real(dp) :: rdp_mmilion ! float with zero (0)
+
+    rdp_mmilion= -1e6;
 
     ! in order to avoid this message, should prevent entering this subroutine
     ! in case none of the Twiss derivatives is selected...
@@ -2742,17 +2763,23 @@ contains
           ! in 4D+deltap case, coefficients are those of the Taylor series development
           ! of deltap (factorial)
           ! disp = disp0 + sigma (1/n!) disp_pn
-          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
+          if (no.gt.2) then
+             s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
+          else
+             s1%disp_p(i) = rdp_mmilion
+          endif
           if (no.gt.2) then
              s1%disp_p2(i) = 3.0*2.0*(y(i)%t.sub.'000030') ! assume at least order 3 for the map
           else
-             call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+             s1%disp_p2(i) = rdp_mmilion
           endif
+             !call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+          !endif
           if (no.gt.3) then
              s1%disp_p3(i) = 4.0*3.0*2.0*(y(i)%t.sub.'000040')
-             ! assume at least order 4 for the map
           else
-             call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+          !   call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+             s1%disp_p3(i) = rdp_mmilion
           endif
        enddo
     elseif (c_%nd2 ==6) then
