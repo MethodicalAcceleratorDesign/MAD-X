@@ -72,6 +72,12 @@ clean_tmp ()
 	rm -f build-test-*.tmp
 }
 
+# clear reports older than 51 days
+clear_old_reports ()
+{
+	find tests/reports -ctime +51 -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
+}
+
 # check for completed jobs [lxplus | macosx | win]
 build_test_completed ()
 {
@@ -189,4 +195,5 @@ if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
 	check_error "unable to email report errors (check mail)"
 fi
 
+clear_old_reports
 clean_tmp
