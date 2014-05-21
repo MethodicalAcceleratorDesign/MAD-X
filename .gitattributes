@@ -1239,6 +1239,8 @@ tests/test-error-2/input/coc4.seq -text
 tests/test-error-2/test-error-2.cfg -text
 tests/test-error-2/test-error-2.madx -text
 tests/test-error-2/test-error-2.ref -text
+tests/test-error-3/err.file.out.cfg -text
+tests/test-error-3/err.file.out.ref -text
 tests/test-error-3/input/err.file.in -text
 tests/test-error-3/test-error-3.cfg -text
 tests/test-error-3/test-error-3.madx -text

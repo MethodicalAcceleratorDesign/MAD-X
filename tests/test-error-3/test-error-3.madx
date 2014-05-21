@@ -3,9 +3,15 @@ Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 Option,  -warn,-info,-echo;
 
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";
 
-Option, warn,info;
+Option, warn, info, echo;
 
+seqedit,sequence=lhcb1;
+flatten;
+cycle,start=ip3;
+endedit;
+                                                                                                     
 !+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
 ! 	define beam constants
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -19,27 +25,18 @@ Option, warn,info;
  nppb = 1.05E11;
  nb = 2808;
 
-Beam, particle = proton, sequence=lhcb1, energy = eg,
-          sigt=      0.075     , 
-          bv = +1, NPART=nppb, sige=      1.1e-4, 
-          ex=epsx,   ey=epsy;
-
-option,-warn,-echo,-info;
-
-call,file="../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";
-
-Option, warn,info;
+Beam, particle= proton, sequence= lhcb1, energy= eg,
+      sigt= 0.075, sige= 1.1e-4, 
+      bv= +1, NPART=nppb, 
+      ex=epsx,   ey=epsy;
 
 Use, period=lhcb1;
-                                                                                                     
-seqedit,sequence=lhcb1;
-cycle,start=ip3;
-endedit;
-                                                                                                     
-Use, period=lhcb1;
-                                                                                                     
+ 
+Show, beam%lhcb1;
+
 Select, flag=ERROR, clear;
 
-readmytable,file="input/err.file.in",table=newerr;
-seterr,table=newerr;
-esave,file=err.file.out;
+Readmytable, file="input/err.file.in", table=newerr;
+Seterr, table=newerr;
+
+Esave, file=err.file.out;

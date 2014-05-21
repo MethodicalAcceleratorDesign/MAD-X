@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 10.12.13 21.38.24 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 21.05.14 15.22.26 +
   +++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -11,15 +11,115 @@ Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
 Option,  -warn,-info,-echo;
 
+
+
+seqedit,sequence=lhcb1;
+
+flatten;
+
+cycle,start=ip3;
+
+endedit;
+
 ++++++ info: seqedit - number of elements installed:  0
 ++++++ info: seqedit - number of elements moved:      0
 ++++++ info: seqedit - number of elements removed:    0
+                                                                                                     
+
+!+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
+
+! 	define beam constants
+
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+ eg   = 7000;
+
+ bg   = eg/pmass;
+
+ en   = 3.75e-06;
+
+ epsx = en/bg;
+
+ epsy = en/bg;
+
+ prot_radius = 1.551E-18;
+
+ nppb = 1.05E11;
+
+ nb = 2808;
+
+
+
+Beam, particle= proton, sequence= lhcb1, energy= eg,
+
+      sigt= 0.075, sige= 1.1e-4, 
+
+      bv= +1, NPART=nppb, 
+
+      ex=epsx,   ey=epsy;
+
+
+
+Use, period=lhcb1;
+
+ 
+
+Show, beam%lhcb1;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: lhcb1
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:        0.938272046
+parameter: charge   double value:                  1
+parameter: energy   double value:               7000
+parameter: pc   double value:        6999.999937
+parameter: gamma   double value:        7460.522809
+parameter: ex   double value:    5.026457389e-10
+parameter: exn   double value:    1.499999987e-05
+parameter: ey   double value:    5.026457389e-10
+parameter: eyn   double value:    1.499999987e-05
+parameter: et   double value:                  1
+parameter: sigt   double value:              0.075
+parameter: sige   double value:            0.00011
+parameter: kbunch   double value:                  1
+parameter: npart   double value:           1.05e+11
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: beta   double value:        0.999999991
+parameter: alfa   double value:    1.796641699e-08
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698269e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+Select, flag=ERROR, clear;
+
+
+
+Readmytable, file="input/err.file.in", table=newerr;
+
 Want to make named table: newerr
+Seterr, table=newerr;
+
 Want to use named table: newerr
 The table ==> newerr <=== was found 
+
+
+Esave, file=err.file.out;
+
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

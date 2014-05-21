@@ -40,7 +40,7 @@ test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
-test-error test-error-2 \
+test-error test-error-2 test-error-3 \
 test-dynap \
 test-c6t test-c6t-2 \
 test-thick-quad test-thick-quad-2 test-thick-quad-3 \
