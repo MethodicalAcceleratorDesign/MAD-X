@@ -1033,6 +1033,8 @@ tests/share/AD/ad.dbx -text
 tests/share/AD/ad.ele -text
 tests/share/AD/ad_new.seq -text
 tests/share/AD/ad_quads_3837_ffe.str -text
+tests/share/ALBA/ALBA-25.4th.seq -text
+tests/share/ALBA/ALBA-25.4th_v2.seq -text
 tests/share/FCCe/madx_elements_v11.in -text
 tests/share/FCCe/madx_sequence_v11_matching.in -text
 tests/share/FCCe/madx_sequence_v11_rb.in -text
@@ -1224,11 +1226,9 @@ tests/test-dynap/twiss-table-1.cfg -text
 tests/test-dynap/twiss-table-1.ref -text
 tests/test-dynap/twiss-table-2.cfg -text
 tests/test-dynap/twiss-table-2.ref -text
-tests/test-emit-2/ALBA-25.4th.seq -text
 tests/test-emit-2/test-emit-2.cfg -text
 tests/test-emit-2/test-emit-2.madx -text
 tests/test-emit-2/test-emit-2.ref -text
-tests/test-emit/ALBA-25.4th.seq -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
@@ -1818,7 +1818,6 @@ tests/test-twiss-6/twiss.1.cfg -text
 tests/test-twiss-6/twiss.1.ref -text
 tests/test-twiss-6/twiss.2.cfg -text
 tests/test-twiss-6/twiss.2.ref -text
-tests/test-twiss-7/ALBA-25.4th.madx -text
 tests/test-twiss-7/README -text
 tests/test-twiss-7/test-twiss-7.cfg -text
 tests/test-twiss-7/test-twiss-7.madx -text

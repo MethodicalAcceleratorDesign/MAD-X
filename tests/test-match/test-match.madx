@@ -42,107 +42,111 @@ calc_triplet(bxs,bys): macro= {
 };
 
 mk_triplet(bxs,bys,grad,posq4,betxq4,betyq4): macro={
-imbmax=1;
-endseq=posq4;
+  imbmax=1;
+  endseq=posq4;
 
-tbetx:=table(twiss,betx); tbety:=table(twiss,bety);
-talfx:=table(twiss,alfx); talfy:=table(twiss,alfy);
-tk1l :=table(twiss,k1l); tl:=table(twiss,l);
-betxmax:=tbetx+talfx^2/tbetx/abs(tk1l/tl);
-betymax:=tbety+talfy^2/tbety/abs(tk1l/tl);
-select,flag=twiss,clear;
-select,flag=twiss,column=name,s,l,angle,k1l,hkick,vkick,kick,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py,betxmax,betymax;
+  tbetx:=table(twiss,betx); tbety:=table(twiss,bety);
+  talfx:=table(twiss,alfx); talfy:=table(twiss,alfy);
+  tk1l :=table(twiss,k1l); tl:=table(twiss,l);
+  betxmax:=tbetx+talfx^2/tbetx/abs(tk1l/tl);
+  betymax:=tbety+talfy^2/tbety/abs(tk1l/tl);
+  select,flag=twiss,clear;
+  select,flag=twiss,column=name,s,l,angle,k1l,hkick,vkick,kick,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py,betxmax,betymax;
 
-brho=7e12/clight; k=grad/brho;
+  brho=7e12/clight; k=grad/brho;
 
-lstar=23;
+  lstar=23;
 
-l1=7.145; l2=6.735;
-if (grad<120 )  { l1=9.145; l2=7.735; };
-d12:=d23; l3:=l1;
+  l1=7.145; l2=6.735;
+  if (grad<120 )  { l1=9.145; l2=7.735; };
+  d12:=d23; l3:=l1;
 
-k1:=k; k2:=k; k3:=k;
+  k1:=k; k2:=k; k3:=k;
 
-option -info,-echo,-warn; ! too many warnings about division by zero.
+  option -info,-echo,-warn; ! too many warnings about division by zero.
 
-match,use_macro;
-vary,name=l1;
-vary,name=l2;
-vary,name=k3;
-use_macro,name=calc_triplet(bxs,bys);
-constraint, expr= bq3max = imbmax*bq2max;
-constraint, expr= betxend  =betxq4;
-constraint, expr= betyend  =betyq4;
-constraint, expr= 1e5*alfxend    >2e5;
-constraint, expr= 1e5*alfyend    >2e5;
-jacobian,calls=60,tolerance=1e-14,bisec=9;
-endmatch;
+  match,use_macro;
+    vary,name=l1;
+    vary,name=l2;
+    vary,name=k3;
+    use_macro,name=calc_triplet(bxs,bys);
+    constraint, expr= bq3max = imbmax*bq2max;
+    constraint, expr= betxend  =betxq4;
+    constraint, expr= betyend  =betyq4;
+    constraint, expr= 1e5*alfxend    >2e5;
+    constraint, expr= 1e5*alfyend    >2e5;
+    jacobian,calls=60,tolerance=1e-14,bisec=9;
+  endmatch;
 
-if (k3>k) {
-k1:=k; k2=k; k3=k;
-match,use_macro;
-vary,name=l1;
-vary,name=l2;
-vary,name=k1;
-use_macro,name=calc_triplet(bxs,bys);
-constraint, expr= bq3max = imbmax*bq2max;
-constraint, expr= betxend  =betxq4;
-constraint, expr= betyend  =betyq4;
-constraint, expr= 1e5*alfxend    >2e5;
-constraint, expr= 1e5*alfyend    >2e5;
-jacobian,calls=60,tolerance=1e-14,bisec=9;
-endmatch;
-};
+  if (k3>k) {
+     k1:=k; k2=k; k3=k;
 
-if (tar>1e-10){stop;};
+     match,use_macro;
+      vary,name=l1;
+      vary,name=l2;
+      vary,name=k1;
+      use_macro,name=calc_triplet(bxs,bys);
+      constraint, expr= bq3max = imbmax*bq2max;
+      constraint, expr= betxend  =betxq4;
+      constraint, expr= betyend  =betyq4;
+      constraint, expr= 1e5*alfxend    >2e5;	
+      constraint, expr= 1e5*alfyend    >2e5;
+      jacobian,calls=60,tolerance=1e-14,bisec=9;
+    endmatch;
+  };
 
-bq3orig=bq3max;
+  if (tar>1e-10){stop;};
 
-exec,round(l1,1000);
-exec,round(l2,1000);
-exec,round(l3,1000);
-exec,round(d12,1000);
-exec,round(d22,1000);
-exec,round(d23,1000);
+  bq3orig=bq3max;
 
-match,use_macro;
-vary,name=k1;
-vary,name=k2;
-vary,name=k3;
-use_macro,name=calc_triplet(bxs,bys);
-constraint, expr= bq3max = imbmax*bq2max;
-constraint, expr= betxend  =betxq4;
-constraint, expr= betyend  =betyq4;
-constraint, expr= 1e5*alfxend    >2e5;
-constraint, expr= 1e5*alfyend    >2e5;
-jacobian,calls=60,tolerance=1e-14,bisec=9;
-endmatch;
+  exec,round(l1,1000);
+  exec,round(l2,1000);
+  exec,round(l3,1000);
+  exec,round(d12,1000);
+  exec,round(d22,1000);
+  exec,round(d23,1000);
 
-l.mqxl:=l1;l.mqx:=l2;
-dq1q2a:=d12;dq2aq2b:=d22;dq2bq3:=d23;dq1aq1b=d11;
-kqx1.l1 =-k1;  kqx1.r1=k1;  kqx1.l5=-k1;  kqx1.r5=k1;
-kqx2a.l1=-k2; kqx2a.r1=k2; kqx2a.l5=-k2; kqx2a.r5=k2;
-kqx2b.l1=-k2; kqx2b.r1=k2; kqx2b.l5=-k2; kqx2b.r5=k2;
-kqx3.l1 =-k3;  kqx3.r1=k3;  kqx3.l5=-k3;  kqx3.r5=k3;
-exec,calc_triplet(bxs,bys);
-g1=kqx1.r1*brho;g2=kqx2a.r1*brho; g3=kqx3.r5*brho;
-value,g1,g2,g3;
-totlen:=lstar+l1+d12+2*l2+d22+d23+l3+4*lqq;
-show,l.mqxl,l.mqx,totlen;
-value,l.mqxl,l.mqx,dq1q2a,dq2aq2b,dq2bq3,lqq,totlen;
-value,bq3orig,bq3max;
-value,bq2a1,bq2a2,bq2b1,bq2b2,bq31,bq32;
-value,alfxend;
-value,alfyend;
-value,bq3max*bxs;
+  match,use_macro;
+    vary,name=k1;
+    vary,name=k2;
+    vary,name=k3;
+    use_macro,name=calc_triplet(bxs,bys);
+    constraint, expr= bq3max = imbmax*bq2max;
+    constraint, expr= betxend  =betxq4;
+    constraint, expr= betyend  =betyq4;
+    constraint, expr= 1e5*alfxend    >2e5;
+    constraint, expr= 1e5*alfyend    >2e5;
+    jacobian,calls=60,tolerance=1e-14,bisec=9;
+  endmatch;
+
+  l.mqxl:=l1;l.mqx:=l2;
+  dq1q2a:=d12;dq2aq2b:=d22;dq2bq3:=d23;dq1aq1b=d11;
+  kqx1.l1 =-k1;  kqx1.r1=k1;  kqx1.l5=-k1;  kqx1.r5=k1;
+  kqx2a.l1=-k2; kqx2a.r1=k2; kqx2a.l5=-k2; kqx2a.r5=k2;
+  kqx2b.l1=-k2; kqx2b.r1=k2; kqx2b.l5=-k2; kqx2b.r5=k2;
+  kqx3.l1 =-k3;  kqx3.r1=k3;  kqx3.l5=-k3;  kqx3.r5=k3;
+
+  exec,calc_triplet(bxs,bys);
+
+  g1=kqx1.r1*brho;g2=kqx2a.r1*brho; g3=kqx3.r5*brho;	
+  value,g1,g2,g3;
+  totlen:=lstar+l1+d12+2*l2+d22+d23+l3+4*lqq;
+  show,l.mqxl,l.mqx,totlen;
+  value,l.mqxl,l.mqx,dq1q2a,dq2aq2b,dq2bq3,lqq,totlen;
+  value,bq3orig,bq3max;
+  value,bq2a1,bq2a2,bq2b1,bq2b2,bq31,bq32;
+  value,alfxend;
+  value,alfyend;
+  value,bq3max*bxs;
 };
 
 __round(xv,xn): macro={ if ( xv-xn > 0.5) { xv=xn+1; } else { xv=xn; }; };
+
 round(xv,digits): macro={
   xtmp=xv*digits;
   exec,__round(xtmp,$xtmp);
   xv=xtmp/digits;
 };
 
-exec,mk_triplet(0.60,0.60,150,120,1913,1234);
+exec, mk_triplet(0.60,0.60,150,120,1913,1234);
 

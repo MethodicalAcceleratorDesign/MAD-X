@@ -1,35 +1,22 @@
-beam, SEQUENCE=Machine ,PARTICLE=electron, energy=3, RADIATE=True;
-option, RBARC=FALSE;
-call, file= "ALBA-25.4th.seq";
+Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
+Option, RBARC=FALSE;
+Call, file= "../share/ALBA/ALBA-25.4th_v2.seq";
 
-
-! Put the RF cavity
-RFC: RFCAVITY, L=0.5, VOLT=3.6, LAG=0.480,HARMON=448;
-L_IDRF : DRIFT, L=L_ID->L-RFC->L;
-L_ID   : LINE =(RFC, L_IDRF);
-
-
-use, period=Machine;
-twiss;
-EMIT,DELTAP=0.0 ;
+Use, period=Machine;
+Twiss;
+Emit, DELTAP=0.0 ;
 
 !The result of H emittance computed this way is: 0.11212603E-02 [pi micro m] 
 !But it is wrong due to the fact that the variations of the twiss functions inside
 !the bendings  are not taken into account. To solve this the best thing to do
-!is to slice the sbends in thick slices as follows:
+!is to slice the sbends in 28 thick slices:
 
-B1in:  SBEND, L=B1->L/28, ANGLE=B1->ANGLE/28, K1=B1->K1, E1=B1->ANGLE/2, E2=0.0;
-B1i:  SBEND, L=B1->L/28, ANGLE=B1->ANGLE/28, K1=B1->K1, E1=0.0, E2=0.0;
-B1out: SBEND, L=B1->L/28, ANGLE=B1->ANGLE/28, K1=B1->K1, E1=0.0            , E2=B1->ANGLE/2;
-BE: LINE=(B1in,B1i,B1i,B1i,B1i,B1i,B1i,B1i,&
-          B1i, B1i,B1i,B1i,B1i,B1i,B1i,B1i,&
-          B1i,B1i,B1i,B1i,B1i,B1i,B1i,B1i, &
-          B1i,B1i,B1i,B1out);
+Beam, SEQUENCE=Machine2, PARTICLE=electron, energy=3, RADIATE=True;
 
-use, period=Machine;
-twiss;
-EMIT,DELTAP=0.0 ;
+Use, period=Machine2;
+Twiss;
+Emit, DELTAP=0.0 ;
 !
 !Now the emittance is correct: 0.44845315E-02 
 !
-stop;
+Stop;
