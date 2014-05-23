@@ -1226,9 +1226,13 @@ tests/test-dynap/twiss-table-1.cfg -text
 tests/test-dynap/twiss-table-1.ref -text
 tests/test-dynap/twiss-table-2.cfg -text
 tests/test-dynap/twiss-table-2.ref -text
+tests/test-emit-2/README -text
 tests/test-emit-2/test-emit-2.cfg -text
 tests/test-emit-2/test-emit-2.madx -text
 tests/test-emit-2/test-emit-2.ref -text
+tests/test-emit-2/twiss1 -text
+tests/test-emit-2/twiss1.cfg -text
+tests/test-emit-2/twiss1.ref -text
 tests/test-emit/test-emit.cfg -text
 tests/test-emit/test-emit.madx -text
 tests/test-emit/test-emit.ref -text
@@ -1818,12 +1822,6 @@ tests/test-twiss-6/twiss.1.cfg -text
 tests/test-twiss-6/twiss.1.ref -text
 tests/test-twiss-6/twiss.2.cfg -text
 tests/test-twiss-6/twiss.2.ref -text
-tests/test-twiss-7/README -text
-tests/test-twiss-7/test-twiss-7.cfg -text
-tests/test-twiss-7/test-twiss-7.madx -text
-tests/test-twiss-7/test-twiss-7.ref -text
-tests/test-twiss-7/twiss1.cfg -text
-tests/test-twiss-7/twiss1.ref -text
 tests/test-twiss-8/test-twiss-8.cfg -text
 tests/test-twiss-8/test-twiss-8.madx -text
 tests/test-twiss-8/test-twiss-8.ref -text

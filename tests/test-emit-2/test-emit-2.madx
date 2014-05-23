@@ -1,6 +1,9 @@
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 Option, RBARC=FALSE;
+
+OPTION, -ECHO, -WARN, INFO;
 Call, file= "../share/ALBA/ALBA-25.4th_v2.seq";
+OPTION, ECHO, WARN, INFO;
 
 Use, period=Machine;
 Twiss;
@@ -19,4 +22,11 @@ Emit, DELTAP=0.0 ;
 !
 !Now the emittance is correct: 0.44845315E-02 
 !
-Stop;
+
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, CLASS=QUADRUPOLE, COLUMN=NAME,S,BETX,BETY;
+
+USE, SEQUENCE=Machine;
+TWISS, SEQUENCE=Machine, FILE="twiss1";
+
+stop;
