@@ -1230,7 +1230,6 @@ tests/test-emit-2/README -text
 tests/test-emit-2/test-emit-2.cfg -text
 tests/test-emit-2/test-emit-2.madx -text
 tests/test-emit-2/test-emit-2.ref -text
-tests/test-emit-2/twiss1 -text
 tests/test-emit-2/twiss1.cfg -text
 tests/test-emit-2/twiss1.ref -text
 tests/test-emit/test-emit.cfg -text
