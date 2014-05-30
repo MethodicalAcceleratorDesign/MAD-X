@@ -223,7 +223,8 @@ char command_def[] =
 "py       = [r, 0], "
 "t        = [r, 0], "
 "pt       = [r, 0], "
-"tolerance= [r, 1.0e-6]; "
+"tolerance= [r, 1.0e-6], "
+"clear    = [l, false, true];"
 " "
 "create: control none 0 0 "
 "table = [s, none], "
@@ -268,11 +269,11 @@ char command_def[] =
 "dummy    = [s, 0]; "
 " "
 "option: control none 0 0 "
-"bborbit  = [l, false, true], "
-"bb_ultra_relati = [l, false, true], "
-"bb_sxy_update   = [l, false, true], "
-"emittance_update   = [l, true, true], "
-"fast_error_func   = [l, false, true], "
+"bborbit          = [l, false, true], " /* frs */
+"bb_ultra_relati  = [l, false, true], " /* frs */
+"bb_sxy_update    = [l, false, true], " /* frs */
+"emittance_update = [l, true,  true], " /* frs */
+"fast_error_func  = [l, false, true], " /* frs */
 "echo      = [l, true, true], "
 "echomacro = [l, false, true], " /* ld */
 "info      = [l, true, true], "

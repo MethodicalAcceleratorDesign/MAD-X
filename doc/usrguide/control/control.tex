@@ -215,15 +215,14 @@ where "file\_name"  is the name of an input file. This file will be read
 until a "return;" statement, or until end\_of\_file; it may contain any
 number of calls itself, and so on to any depth.  
 
-%% 2013-Jul-11  17:23:00  ghislain: I propose to move COGUESS to the
-%% orbit correction part of the manual
 \subsection{COGUESS}
 \label{subsec:general_coguess}
 \begin{verbatim}
 coguess, tolerance = double, 
          x = double, px = double, 
          y = double, py = double, 
-         t = double, pt = double;
+         t = double, pt = double,
+         clear=logical;
 \end{verbatim} 
 sets the required convergence precision in the closed orbit search
 ("tolerance", see as well Twiss command
@@ -231,6 +230,11 @@ sets the required convergence precision in the closed orbit search
 
 The other parameters define a first guess for all future closed orbit
 searches in case they are different from zero.  
+
+The clear parameter in the argument list resets the tolerance to its default value 
+and cancels the effect of coguess in defining a first guess for subsequent 
+closed orbit searches. \\
+Default = false, {\tt clear} alone is equivalent to {\tt clear=true}
 
 \subsection{CREATE}
 \begin{verbatim}
@@ -351,12 +355,13 @@ The available options are:
   bborbit         false  the closed orbit is modified by beam-beam kicks
   sympl           false  all element matrices are symplectified in Twiss
   twiss_print     true   controls whether the twiss command produces output.
-  threader        false  enables the threader for closed orbit finding in Twiss.
+   threader        false  enables the threader for closed orbit finding in Twiss.
                          (see Twiss module)
 
   bb_ultra_relati false  To be documented
   bb_sxy_update   false  To be documented 
   emittance_update true  To be documented
+  fast_error_func false  To be documented
 \end{verbatim} 
 
 The option "rbarc" is implemented for backwards compatibility with MAD-8
