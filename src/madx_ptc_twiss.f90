@@ -327,7 +327,7 @@ contains
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
-    character(200)          :: whymsg
+    character(2000)          :: whymsg
     integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
@@ -643,7 +643,7 @@ contains
          write(6,*) "##########################################"
          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
-         write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+         write(6,'(a, f15.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
          !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
       endif
       
@@ -817,7 +817,9 @@ contains
 
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-
+           
+           print*,'Error from PTC:>>', why, '<<'
+            
            write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                            ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
 	       ' PTC msg: ',why
@@ -1166,7 +1168,7 @@ contains
       getdeltae = cfen%energy/startfen%energy
 
       if (getdebug() > 2) then
-         write(mf1,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
+         write(mf1,'(3(a, f12.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
       endif
 
     end function getdeltae
@@ -1400,13 +1402,17 @@ contains
 
       if (getdebug() > 2)  then
          ! this part of the code is out of sync with the rest
+         !j(:)=0
          write(6,'(a,1(f9.4,1x))') current%MAG%name,suml
-         write(6,'(a,1(f10.7,1x))') "Delta E ", deltae
+         write(6,'(a,1(f11.7,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes   ", beta11,beta22,beta33
-         write(6,'(a,3(f9.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
-         write(6,'(a,3(f9.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
-         write(6,'(a,4(f9.4,1x))')  "dispersions  ", opt_fun(disp1),opt_fun(disp2),opt_fun(disp3),opt_fun(disp4)
-         write(6,'(a,3(f9.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,3(f11.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
+         write(6,'(a,3(f11.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
+         write(6,'(a,4(f11.4,1x))')  "dispersions  ", opt_fun(disp1),opt_fun(disp2),opt_fun(disp3),opt_fun(disp4)
+         write(6,'(a,3(f11.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,4(f11.4,1x))')  "orbit transv.", y(1)%T.sub.'0',y(2)%T.sub.'0',y(3)%T.sub.'0',y(4)%T.sub.'0'
+         write(6,'(a,2(f11.4,1x))')  "dp/p, T      ", y(5)%T.sub.'0',y(6)%T.sub.'0'
+         
       endif
 
       ! the following works : we see the list of all elements in sequence - what about twiss_ptc_line & twiss_ptc_ring?
