@@ -1,8 +1,20 @@
+LOGICAL FUNCTION  is_thin()
+  double precision node_value, el
+  el = node_value('l ')
+  is_thin = el.eq.0d0;
+END FUNCTION is_thin
+
 LOGICAL FUNCTION  is_drift()
   double precision node_value, code
   code = node_value('mad8_type ')
   is_drift = code.eq.1;
 END FUNCTION is_drift
+
+LOGICAL FUNCTION  is_dipole()
+  double precision node_value, code
+  code = node_value('mad8_type ')
+  is_dipole = code.eq.3;
+END FUNCTION is_dipole
 
 LOGICAL FUNCTION  is_matrix()
   double precision node_value, code
@@ -15,12 +27,6 @@ LOGICAL FUNCTION  is_quad()
   code = node_value('mad8_type ')
   is_quad = code.eq.5;
 END FUNCTION is_quad
-
-LOGICAL FUNCTION  is_thin()
-  double precision node_value, el
-  el = node_value('l ')
-  is_thin = el.eq.0d0;
-END FUNCTION is_thin
 
 subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
@@ -119,7 +125,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
        dy_start,    dpy_start / 1d0, 1d0, 0d0, 0d0,        &
        0d0, 0d0, 0d0, 0d0, 0d0, 0d0 /
 
-  logical is_drift, is_thin, is_quad, is_matrix
+  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
@@ -488,7 +494,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         l_buf(nlm+1) = el
         !hbu get current node name
         call element_name(el_name,len(el_name))
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            sum = node_value('name ')
@@ -995,9 +1001,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !---- Make sure that nothing is executed if element is not known
   go to 500
   !
-  !---- Bending magnet. OBSOLETE, to be kept for go to
+  !---- Bending magnet.
+  !---- AL: use thick-dipole element
 20 continue  ! RBEND
 30 continue  ! SBEND
+  call tttdipole(track,ktrack)
   go to 500
   !---- Arbitrary matrix. OBSOLETE, to be kept for go to
 40 continue
@@ -1005,7 +1013,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   call tttrak(ek,re,track,ktrack)
   go to 500
   !---- Quadrupole. OBSOLETE, to be kept for go to
-  !---- AL: not so fast, if here it's a thick quadrupole
+  !---- AL: not so fast, here is the thick quadrupole
 50 continue
   call tttquad(track,ktrack)
   go to 500
@@ -3890,7 +3898,7 @@ subroutine trclor(switch,orbit0)
 
   double precision cotol, err
 
-  logical is_drift, is_thin, is_quad, is_matrix
+  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   print *," "
   !      print *," AK special version 2007/12/13"
@@ -3990,7 +3998,7 @@ subroutine trclor(switch,orbit0)
      if(code.eq.38) code=24
      el      = node_value('l ')
      if (itra .eq. 1)  then
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_matrix())) then
+        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
            print*," "
            print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
            print*," "
@@ -5056,6 +5064,119 @@ subroutine tttquad(track, ktrack)
   enddo
 
 end subroutine tttquad
+
+subroutine tttdipole(track, ktrack)
+  
+  use twtrrfi
+  use trackfi
+  implicit none
+  
+  !-------------------------*
+  ! Andrea Latina 2013-2014 *
+  !-------------------------*
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !    Track particle through a general thick dipole.                    *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer)   Number of surviving tracks.                  *
+  !----------------------------------------------------------------------*
+  
+  double precision track(6,*)
+  integer ktrack
+  
+  double precision node_value
+  double precision L, angle, rho, h, k0
+  double precision x, px, y, py, z, pt
+  double precision x_, px_, y_, py_, z_, pt_
+  double precision delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
+  double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
+  double precision C, S, C_sqr
+  double precision bet0sqr
+  integer jtrk
+  
+  !---- Read-in the parameters
+  bet0sqr = bet0*bet0;
+  L = node_value('l ');
+  angle = node_value('angle ');
+  rho = abs(L/angle);
+  h = angle/L;
+  k0 = h;
+
+  !---- Prepare to calculate the kick and the matrix elements
+  do jtrk = 1,ktrack
+     !---- The particle position
+     x  = track(1,jtrk);
+     px = track(2,jtrk);
+     y  = track(3,jtrk);
+     py = track(4,jtrk);
+     z  = track(5,jtrk);
+     pt = track(6,jtrk);
+  
+!!$    !---- Radiation effects at entrance.
+!!$    if (dorad  .and.  elrad .ne. 0d0) then
+!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    endif
+
+     delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
+     delta_plus_1 = sqrt(delta_plus_1_sqr);
+     sqrt_delta_plus_1 = sqrt(delta_plus_1);
+     sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
+     sqrt_h_div_sqrt_k0 = sqrt(h/k0);
+     sqrt_k0_div_sqrt_h = sqrt(k0/h);
+     C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+     S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+     C_sqr = C*C;
+     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
+     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
+          sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
+     y_  = y + py * L / delta_plus_1; 
+     py_ = py; 
+     z_  = z + pt*L*(1.0-bet0sqr)/bet0sqr + &
+          (-(0.5)*(bet0*pt+1.0)/bet0/(delta_plus_1**3) * &
+          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
+          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
+          px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
+          x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
+          delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
+          delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
+          x*px*delta_plus_1*(C_sqr-1.0) + &
+          py*py*L + &
+          (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
+          delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
+          (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
+          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
+     !pt_ = pt; ! unchanged
+     
+     x = x_;
+     y = y_;
+     z = z_;
+     px = px_;
+     py = py_;
+     !pt = pt_; ! unchanged
+     
+     !---- Applies the kick
+     track(1,jtrk) = x
+     track(2,jtrk) = px
+     track(3,jtrk) = y
+     track(4,jtrk) = py
+     track(5,jtrk) = z
+     !track(6,jtrk) = pt ! unchanged
+     
+!!$    !---- Radiation effects at exit.
+!!$    if (dorad  .and.  elrad .ne. 0d0) then
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    endif
+     
+  enddo
+  
+end subroutine tttdipole
+
 subroutine wzset
   !  *********************************************************************
   !
