@@ -94,6 +94,7 @@ contains
   end function sisnan
 
   ! Double precision test for NaN
+!DEC$ ATTRIBUTES FORCEINLINE :: disnan 
   elemental function disnan(d) result(res)
     implicit none
     real(dp), intent(in) :: d
@@ -364,7 +365,7 @@ module spch_bbfi
   implicit none
   public
   integer i_turn, N_macro_surv, N_for_I, N_macro_max, N_spch, i_spch 
-  parameter(N_macro_max=10000)
+  parameter(N_macro_max=16000)
   double precision Ex_rms, Ey_rms, sigma_p, sigma_z
   double precision Ix_array(N_macro_max), Iy_array(N_macro_max),    &
        dpi_array(N_macro_max),                          &
@@ -634,6 +635,17 @@ module gxx11_aux
   !     14        marker scale factor
   save    ivals, rvals
 end module gxx11_aux
+module fasterror
+  implicit none
+  logical :: fasterror_on = .false.
+  integer idim,nx,ny,kstep
+  double precision hrecip,wtimag,wtreal
+  parameter ( nx = 490, ny = 470 )
+  parameter ( idim = (nx+2)*(ny+2) )
+  public
+  common /wzcom1/ hrecip, kstep
+  common /wzcom2/ wtreal(idim), wtimag(idim)
+end module fasterror
 subroutine fort_info(t1, t2)
   implicit none
 

@@ -1,9 +1,15 @@
+#! /bin/bash
 # run:
-# sh scripts/build-test-report.sh [clean] [forcereport] [force] [nomail]
+# bash scripts/build-test-report.sh [noecho] [clean|cleanall] [forcereport] [force] [nomail]
 
 # I/O redirection
 rm -f build-test-report.log
-exec 1> build-test-report.log 2>&1
+if [ "$1" = "noecho" ] ; then
+	shift
+	exec &> build-test-report.log
+else
+	exec 2>&1 | tee build-test-report.log
+fi
 
 # env settings
 export LC_CTYPE="C"
@@ -64,6 +70,12 @@ check_error ()
 clean_tmp ()
 {
 	rm -f build-test-*.tmp
+}
+
+# clear reports older than 51 days
+clear_old_reports ()
+{
+	find tests/reports -ctime +51 -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
 }
 
 # check for completed jobs [lxplus | macosx | win]
@@ -183,4 +195,5 @@ if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
 	check_error "unable to email report errors (check mail)"
 fi
 
+clear_old_reports
 clean_tmp

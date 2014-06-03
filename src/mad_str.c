@@ -15,7 +15,7 @@ mystrcpy(struct char_array* target, char* source)
   strcpy(target->c, source);
 }
 
-void
+char*
 mycpy(char* out, const char* in)
   /* copies string, ends at any non-ascii character including 0 */
 {
@@ -25,6 +25,8 @@ mycpy(char* out, const char* in)
     out[i] = in[i];
 
   out[i] = '\0';
+
+  return out;
 }
 
 char*
@@ -409,19 +411,18 @@ remove_colon(char** toks, int number, int start)
 int
 square_to_colon(char* string)
   /* sets occurrence count behind colon, possibly replacing [] */
+  // LD: this function assume that there is enough room to concatenate ':1' at the end!!
 {
   char* t;
-  int k = strlen(string);
+
   if ((t = strchr(string, '[')) == NULL)
-  {
-    string[k++] = ':'; string[k++] = '1'; string[k] = '\0';
-  }
-  else
-  {
+    strcat(string, ":1"); // unsafe!
+  else {
     *t = ':';
-    if ((t = strchr(string, ']')) == NULL)  return 0;
+    if ((t = strchr(t+1, ']')) == NULL) return 0;
     else *t = '\0';
   }
+
   return strlen(string);
 }
 

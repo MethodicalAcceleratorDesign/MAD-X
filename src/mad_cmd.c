@@ -121,12 +121,9 @@ exec_command(void)
   struct in_cmd* pp;
   int izero = 0, pos; // ret, not used
 
-  if (p->cmd_def != NULL)
-  {
-    while (strcmp(p->cmd_def->name, "exec") == 0)
-    {
-      if ((pos = name_list_pos(p->tok_list->p[p->decl_start], macro_list->list)) > -1)
-      {
+  if (p->cmd_def != NULL) {
+    while (strcmp(p->cmd_def->name, "exec") == 0) {
+      if ((pos = name_list_pos(p->tok_list->p[p->decl_start], macro_list->list)) > -1) {
         exec_macro(p, pos);
         return;
       }
@@ -136,37 +133,32 @@ exec_command(void)
     this_cmd = p;
     toks = p->tok_list->p;
     cmd_name = p->cmd_def->name;
-    if (strcmp(cmd_name, "stop") == 0 || strcmp(cmd_name, "quit") == 0 || strcmp(cmd_name, "exit") == 0)
-    {
-      madx_finish(); stop_flag = 1; return;
+
+    if (strcmp(cmd_name, "stop") == 0 || 
+	      strcmp(cmd_name, "quit") == 0 || 
+	      strcmp(cmd_name, "exit") == 0) {
+        madx_finish(); stop_flag = 1; return;
     }
-    else if (strcmp(cmd_name, "help") == 0) exec_help(p);
-    else if (strcmp(cmd_name, "show") == 0) exec_show(p);
+
+    else if (strcmp(cmd_name, "help") == 0)    exec_help(p);
+    else if (strcmp(cmd_name, "show") == 0)    exec_show(p);
     else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
-    else if (strcmp(cmd_name, "value") == 0)
-    {
-      print_value(p);
-    }
-    else if (strcmp(cmd_name, "system") == 0)
-      system(noquote(toks[p->decl_start])); // ret =, not used
-    else if (strcmp(cmd_name, "title") == 0)
-      title = permbuff(noquote(toks[p->decl_start]));
-    else if (strcmp(cmd_name, "resplot") == 0)
-    {
+    else if (strcmp(cmd_name, "value") == 0)   print_value(p);   
+    else if (strcmp(cmd_name, "system") == 0)  system(noquote(toks[p->decl_start])); // ret =, not used
+    else if (strcmp(cmd_name, "title") == 0)   title = permbuff(noquote(toks[p->decl_start]));
+    else if (strcmp(cmd_name, "resplot") == 0) {
       plot_options = delete_command(plot_options);
       set_defaults("setplot");
     }
-    else
-    {
+
+    else {
       if (get_option("trace")) time_stamp(cmd_name);
       /* clones with defaults for most commands */
-      if (strcmp(cmd_name, "option") == 0 && options != NULL)
-      {
+      if (strcmp(cmd_name, "option") == 0 && options != NULL) {
         set_option("tell", &izero); /* reset every time */
         p->clone = options; p->clone_flag = 1;
       }
-      else if (strcmp(cmd_name, "setplot") == 0 && plot_options != NULL)
-      {
+      else if (strcmp(cmd_name, "setplot") == 0 && plot_options != NULL) {
         p->clone = plot_options; p->clone_flag = 1;
       }
       else p->clone = clone_command(p->cmd_def);
@@ -175,249 +167,97 @@ exec_command(void)
       scan_in_cmd(p); /* match input command with clone + fill */
       current_command = p->clone;
 
-      if (strcmp(p->cmd_def->module, "control") == 0) control(p);
-      else if (strcmp(p->cmd_def->module, "c6t") == 0) conv_sixtrack(p);
-      else if (strcmp(p->cmd_def->module, "edit") == 0) seq_edit_main(p);
-      else if (strcmp(p->cmd_def->module, "ibs") == 0)
-      {
-        current_ibs = p->clone;
-        pro_ibs(p);
-      }
-      else if (strcmp(p->cmd_def->module, "aperture") == 0)
-      {
-        pro_aperture(p);
-      }
-      else if (strcmp(p->cmd_def->module, "touschek") == 0)
-      {
-        current_touschek = p->clone;
-        pro_touschek(p);
-      }
-      else if (strcmp(p->cmd_def->module, "makethin") == 0) makethin(p);
-      else if (strcmp(p->cmd_def->module, "match") == 0)
-      {
-        current_match = p->clone; /* OB 23.1.2002 */
-        pro_match(p);
-      }
-      else if (strcmp(p->cmd_def->module, "correct") == 0)
-      {
-        pro_correct(p);
-      }
-      else if (strcmp(p->cmd_def->module, "emit") == 0)
-      {
-        pro_emit(p);
-      }
-      else if (strcmp(p->cmd_def->module, "sdds") == 0)
-      {
+      // main commands
+      if      (strcmp(p->cmd_def->module, "control") == 0)   control(p);
+      else if (strcmp(p->cmd_def->module, "c6t") == 0)       conv_sixtrack(p);
+      else if (strcmp(p->cmd_def->module, "edit") == 0)      seq_edit_main(p);
+      else if (strcmp(p->cmd_def->module, "ibs") == 0)       { current_ibs = p->clone; pro_ibs(p); }
+      else if (strcmp(p->cmd_def->module, "aperture") == 0)  pro_aperture(p);
+      else if (strcmp(p->cmd_def->module, "touschek") == 0)  { current_touschek = p->clone; pro_touschek(p); }
+      else if (strcmp(p->cmd_def->module, "makethin") == 0)  makethin(p);
+      else if (strcmp(p->cmd_def->module, "match") == 0)     { current_match = p->clone; pro_match(p); }
+      else if (strcmp(p->cmd_def->module, "correct") == 0)   pro_correct(p);
+      else if (strcmp(p->cmd_def->module, "emit") == 0)      pro_emit(p);
+      else if (strcmp(p->cmd_def->module, "error") == 0)     { current_error = p->clone; pro_error(p); }
+      else if (strcmp(p->cmd_def->module, "sxf") == 0)       pro_sxf(p);
+      else if (strcmp(p->cmd_def->module, "survey") == 0)    { current_survey = p->clone; pro_survey(p); }
+      else if (strcmp(p->cmd_def->module, "track") == 0)     pro_track(p);
+      else if (strcmp(p->cmd_def->module, "twiss") == 0)     { current_twiss = p->clone; pro_twiss(); }
+
+      else if (strcmp(p->cmd_def->module, "sdds") == 0) {
 #ifdef _ONLINE
         pro_sdds(p);
 #else
         warning("ignored, only available in ONLINE model:", "SDDS conversion");
 #endif
       }
-      else if (strcmp(p->cmd_def->module, "error") == 0)
-      {
-        current_error = p->clone;
-        pro_error(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0)
-      {
-        if (match_is_on == kMatch_PTCknobs)
-        {
-          madx_mpk_setcreateuniverse(p);
-        }
-        else
-        {
+
+      // PTC commands
+      else if (strcmp(p->cmd_def->module, "ptc_create_universe") == 0) {
+        if (match_is_on == kMatch_PTCknobs) madx_mpk_setcreateuniverse(p);
+        else {
           w_ptc_create_universe_();
           curr_obs_points = 1;  /* default: always observe at machine end */
         }
       }
-      /* export XML */
-      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0)
-      {
-	/* command with parameters, decoded by dedicated function in madxn.c */
-	pro_ptc_export_xml(p);
-      }      
-      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0)
-      {
-        if (match_is_on == kMatch_PTCknobs)
-        {
-          madx_mpk_setcreatelayout(p);
-        }
-        else
-        {
+      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0) pro_ptc_export_xml(p); 
+      else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0) {
+        if (match_is_on == kMatch_PTCknobs) madx_mpk_setcreatelayout(p);
+        else {
           pro_ptc_create_layout();
           reset_count("normal_results");
           reset_count("ptc_twiss");
-/*          exec_delete_table("normal_results");
-            exec_delete_table("ptc_twiss");*/
+/*        exec_delete_table("normal_results");
+          exec_delete_table("ptc_twiss");*/
         }
       }
-      else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0)
-      {
-        w_ptc_move_to_layout_();
+      else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0) w_ptc_move_to_layout_();
+      else if (strcmp(p->cmd_def->module, "ptc_read_errors") == 0)    pro_ptc_read_errors();
+      else if (strcmp(p->cmd_def->module, "ptc_refresh_k") == 0)      pro_ptc_refresh_k();      
+      else if (strcmp(p->cmd_def->module, "ptc_align") == 0)          w_ptc_align_();
+      else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0) {
+        if (match_is_on == kMatch_PTCknobs) madx_mpk_setcalc(p);
+        else { current_twiss = p->clone; pro_ptc_twiss(); }
       }
-      else if (strcmp(p->cmd_def->module, "ptc_read_errors") == 0)
-      {
-        pro_ptc_read_errors();
+      else if (strcmp(p->cmd_def->module, "ptc_normal") == 0) {
+        if (match_is_on == kMatch_PTCknobs) madx_mpk_setcalc(p);
+        else w_ptc_normal_();
       }
-      else if (strcmp(p->cmd_def->module, "ptc_refresh_k") == 0)
-      {
-        pro_ptc_refresh_k();
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_align") == 0)
-      {
-        w_ptc_align_();
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0)
-      {
-
-        if (match_is_on == kMatch_PTCknobs)
-        {
-          madx_mpk_setcalc(p);
-        }
-        else
-        {
-          current_twiss = p->clone;
-          pro_ptc_twiss();
-        }
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_normal") == 0)
-      {
-        if (match_is_on == kMatch_PTCknobs)
-        {
-          madx_mpk_setcalc(p);
-        }
-        else
-        {
-          w_ptc_normal_();
-        }
-      }
-      else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)
-      {
-        select_ptc_normal(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)
-      {
-        pro_ptc_trackline(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)
-      {
-        ptc_dumpmaps(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_oneturnmap") == 0)
-      {
-        ptc_oneturnmap(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_track") == 0)
-      {
-        pro_ptc_track(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)
-      {
-        pro_ptc_setswitch(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_select") == 0)
-      {
-        pro_ptc_select(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_moments") == 0)
-      {
-        pro_ptc_moments(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_select_moment") == 0)
-      {
-        pro_ptc_select_moment(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0)
-      {
-        pro_ptc_printparametric(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)
-      {
-        pro_ptc_knob(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_varyknob") == 0)
-      {
-        pro_ptc_varyknob(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)
-      {
-        pro_ptc_setknobvalue(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0)
-      {
-        w_ptc_refreshtables_();
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)
-      {
-        pro_ptc_setfieldcomp(p);
-      }
-      else if (strcmp(p->cmd_def->module, "rviewer") == 0)
-      {
-        w_ptc_rviewer_();
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)
-      {
-        pro_ptc_printframes(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_eplacement") == 0)
-      {
-        pro_ptc_eplacement(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_script") == 0)
-      {
-        pro_ptc_script(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_open_gino") == 0)
-      {
-        pro_ptc_open_gino(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)
-      {
-        pro_ptc_enforce6d(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)
-      {
-        ptc_track_observe(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_putbeambeam") == 0)
-      {
-        ptc_putbeambeam(p);
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_start") == 0)
-      {
+      else if (strcmp(p->cmd_def->module, "select_ptc_normal") == 0)  select_ptc_normal(p);
+      else if (strcmp(p->cmd_def->module, "ptc_trackline") == 0)      pro_ptc_trackline(p);
+      else if (strcmp(p->cmd_def->module, "ptc_dumpmaps") == 0)       ptc_dumpmaps(p);
+      else if (strcmp(p->cmd_def->module, "ptc_oneturnmap") == 0)     ptc_oneturnmap(p);
+      else if (strcmp(p->cmd_def->module, "ptc_track") == 0)          pro_ptc_track(p);
+      else if (strcmp(p->cmd_def->module, "ptc_setswitch") == 0)      pro_ptc_setswitch(p);
+      else if (strcmp(p->cmd_def->module, "ptc_select") == 0)         pro_ptc_select(p);
+      else if (strcmp(p->cmd_def->module, "ptc_moments") == 0)        pro_ptc_moments(p);
+      else if (strcmp(p->cmd_def->module, "ptc_select_moment") == 0)  pro_ptc_select_moment(p);
+      else if (strcmp(p->cmd_def->module, "ptc_printparametric") == 0) pro_ptc_printparametric(p);
+      else if (strcmp(p->cmd_def->module, "ptc_knob") == 0)           pro_ptc_knob(p);
+      else if (strcmp(p->cmd_def->module, "ptc_varyknob") == 0)       pro_ptc_varyknob(p);
+      else if (strcmp(p->cmd_def->module, "ptc_setknobvalue") == 0)   pro_ptc_setknobvalue(p);
+      else if (strcmp(p->cmd_def->module, "ptc_refreshpartables") == 0) w_ptc_refreshtables_();
+      else if (strcmp(p->cmd_def->module, "ptc_setfieldcomp") == 0)   pro_ptc_setfieldcomp(p);
+      else if (strcmp(p->cmd_def->module, "rviewer") == 0)            w_ptc_rviewer_();
+      else if (strcmp(p->cmd_def->module, "ptc_printframes") == 0)    pro_ptc_printframes(p);
+      else if (strcmp(p->cmd_def->module, "ptc_eplacement") == 0)     pro_ptc_eplacement(p);
+      else if (strcmp(p->cmd_def->module, "ptc_script") == 0)         pro_ptc_script(p);
+      else if (strcmp(p->cmd_def->module, "ptc_open_gino") == 0)      pro_ptc_open_gino(p);
+      else if (strcmp(p->cmd_def->module, "ptc_enforce6d") == 0)      pro_ptc_enforce6d(p);
+      else if (strcmp(p->cmd_def->module, "ptc_observe") == 0)        ptc_track_observe(p);
+      else if (strcmp(p->cmd_def->module, "ptc_putbeambeam") == 0)    ptc_putbeambeam(p);
+      else if (strcmp(p->cmd_def->module, "ptc_start") == 0) {
         track_is_on = 1;
         track_start(p->clone);
         p->clone_flag = 1;
         /* w_ptc_start_(); */
       }
-      else if (strcmp(p->cmd_def->module, "ptc_track_end") == 0)
-      {
-        ptc_track_end();
-      }
-      else if (strcmp(p->cmd_def->module, "ptc_end") == 0)
-      {
+      else if (strcmp(p->cmd_def->module, "ptc_track_end") == 0) ptc_track_end();
+      else if (strcmp(p->cmd_def->module, "ptc_end") == 0) {
         if(track_is_on) ptc_track_end();
         w_ptc_end_();
       }
-      else if (strcmp(p->cmd_def->module, "sxf") == 0)
-      {
-        pro_sxf(p);
-      }
-      else if (strcmp(p->cmd_def->module, "survey") == 0)
-      {
-        current_survey = p->clone;
-        pro_survey(p);
-      }
-      else if (strcmp(p->cmd_def->module, "track") == 0)
-      {
-        pro_track(p);
-      }
-      else if (strcmp(p->cmd_def->module, "twiss") == 0)
-      {
-        current_twiss = p->clone;
-        pro_twiss();
-      }
+      // end PTC commands
     }
   }
 }

@@ -17,8 +17,14 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 <pre>
 assign, echo = "file_name", truncate;
 </pre>
-where "file_name" </a> is the name of an output file, or "terminal" and trunctate specifies if the file must be trunctated when opened (ignored for terminal). This allows switching the echo stream to a file or back, but only for
-the commands value, show, and print. Allows easy composition of future MAD-X input files. A real life example (always the same) is to be found under <a href="foot.html">footprint example</a>.
+where "file_name" </a> is the name of an output file, 
+or "terminal" and trunctate specifies if the file must be trunctated when opened 
+(ignored for terminal). 
+This allows switching the echo stream to a file or back, but only for
+the commands value, show, and print. 
+Allows easy composition of future MAD-X input files. 
+A real life example (always the same) is to be found 
+under <a href="foot.html">footprint example</a>.
 <p>
 <li><h4><a name=call>CALL</a></h4>
 <pre>
@@ -31,7 +37,8 @@ number of calls itself, and so on to any depth.
 <li><h4><a name=coguess>COGUESS</a></h4>
 <pre>
 coguess,tolerance=double,
-        x=double,px=double,y=double,py=double,t=double,pt=double;
+        x=double,px=double,y=double,py=double,t=double,pt=double,
+        clear=logical;
 </pre>
 sets the required convergence precision in the closed orbit search
 ("tolerance", see as well Twiss command
@@ -39,6 +46,11 @@ sets the required convergence precision in the closed orbit search
 <p>
 The other parameters define a first guess for all future closed orbit
 searches in case they are different from zero.
+<p>
+The clear parameter in the argument list resets the tolerance to its default value 
+and cancels the effect of coguess in defining a first guess for subsequent 
+closed orbit searches. <br>
+Default = false, <tt>clear</tt> alone is equivalent to <tt>clear=true</tt>
 <p>
 <li><h4><a name=create>CREATE</a></h4>
 <pre>
@@ -141,6 +153,7 @@ The available options are:
   warn            true   issues warnings
   info            true   issues informations
   debug           false  issues debugging information
+  echomacro       false  issues macro expansion printout for debugging
   trace           false  prints the system time after each command
   verify          false  issues a warning if an undefined variable is used
   tell            false  prints the current value of all options
@@ -152,6 +165,13 @@ The available options are:
   bborbit         false  the closed orbit is modified by beam-beam kicks
   sympl           false  all element matrices are symplectified in Twiss
   twiss_print     true   controls whether the twiss command produces output. 
+  threader        false  enables the threader for closed orbit finding in Twiss.
+                         (see Twiss module)
+
+  bb_ultra_relati false  To be documented
+  bb_sxy_update   false  To be documented 
+  emittance_update true  To be documented
+  fast_error_func false  To be documented
 </pre>
 The option "rbarc" is implemented for backwards compatibility with MAD-8
 up to version 8.23.06 included; in this version, the RBEND length was just

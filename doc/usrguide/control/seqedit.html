@@ -41,10 +41,15 @@ editing, one has to re-expand the sequence if necessary.
 <pre>
 extract,sequence=s_name,from=MARKER_1,to=MARKER_2,newname=p;
 </pre>
-From the sequence named "s_name" is extracted a new sequence with name
-"p" starting from MARKER_1 and ending at MARKER_2. The new sequence
-"p" can be USEd as any other sequence. It is declared as "shared" and
-can therefore be combined E.G. into the cycled original sequence.
+A new sequence with name "p" is extracted from the existing sequence named "s_name", 
+starting from MARKER_1 and ending at MARKER_2. 
+The new sequence "p" can be USEd as any other sequence. 
+It is declared as "shared" and can therefore be combined 
+e.g. into the cycled original sequence.<br>
+Note that MARKER_1 must be located before MARKER_2 in the existing sequence "s_name", 
+or MAD-X will fail with a fatal error. 
+In the case of circular sequences, this can be ensured by performing a CYCLE 
+of sequence "s_name" with START=MARKER_1.
 <p>
 <li><h4><a name=flatten>FLATTEN</a></h4>
 <pre>

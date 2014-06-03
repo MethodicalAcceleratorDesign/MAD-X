@@ -585,6 +585,8 @@ rhs_done: ;
   return c1 == EOF || c2 == EOF ? EOF : !EOF;
 }
 
+// this function is overcomplicated and should be rewritten using true parsers
+// or at least a different strategy...
 int
 ndiff_nextNum (T *dif, const C *c)
 {
@@ -649,7 +651,6 @@ retry:
       trace("  strings [%d] '%.25s'|'%.25s'", strict, lhs_p, rhs_p);
       if (!isdigit(*lhs_p) || !isdigit(*rhs_p)) goto retry;
       goto quit_diff;
-//      goto retry;
     }
   }
 
@@ -722,8 +723,8 @@ ndiff_testNum (T *dif, const C *c)
   rel_d = abs_d/ min_d;
   dig_d = abs_d/(min_d*pow_d);
 
-  trace("  values: lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, abs_d=%.2g, rel_d=%.2g, ndig=%d",
-           lhs_d, rhs_d, scl_d, off_d, abs_d, rel_d, imax(n1, n2));
+  trace("  values: lhs_d=%.2g, rhs_d=%.2g, scl_d=%.2g, off_d=%.2g, min_d=%.2g, pow_d=%.2g, abs_d=%.2g, rel_d=%.2g, dig_d=%.2g",
+           lhs_d, rhs_d, scl_d, off_d, min_d, pow_d, abs_d, rel_d, dig_d);
 
   // save R3..R9
   reg_setval(dif->reg, dif->reg_n, 3, dif_d);
@@ -778,21 +779,23 @@ ndiff_testNum (T *dif, const C *c)
 
   // relative comparison 
   if (c->eps.cmd & eps_rel) {
-     rel = c->eps. rel_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg)  : c->eps. rel;
-    _rel = c->eps._rel_reg ? (c->eps._rel_reg == c->eps.rel_reg ? -rel : reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg)) : c->eps._rel;
+    if (f1 || f2) {
+       rel = c->eps. rel_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. rel_reg)  : c->eps. rel;
+      _rel = c->eps._rel_reg ? (c->eps._rel_reg == c->eps.rel_reg ? -rel : reg_getval(dif->reg, dif->reg_n, c->eps._rel_reg)) : c->eps._rel;
+    } else rel = _rel = 0; // integer case
     if (rel_d > rel || rel_d < _rel) ret |= eps_rel;
   }
 
-  // input-specific relative comparison (does not apply to integers)
-  if ((c->eps.cmd & eps_dig) && (f1 || f2)) {
-     dig = c->eps. dig_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg)  : c->eps. dig;
-    _dig = c->eps._dig_reg ? (c->eps._dig_reg == c->eps.dig_reg ? -dig : reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg)) : c->eps._dig;
+  // input-specific relative comparison
+  if (c->eps.cmd & eps_dig) {
+    if (f1 || f2) {
+       dig = c->eps. dig_reg ?                                             reg_getval(dif->reg, dif->reg_n, c->eps. dig_reg)  : c->eps. dig;
+      _dig = c->eps._dig_reg ? (c->eps._dig_reg == c->eps.dig_reg ? -dig : reg_getval(dif->reg, dif->reg_n, c->eps._dig_reg)) : c->eps._dig;
+    } else dig = _dig = 0; // integer case
     if (dig_d > dig || dig_d < _dig) ret |= eps_dig;
   }
 
-  if ((c->eps.cmd & eps_any) &&
-      (( (f1 || f2) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) ||    // floating case
-       (!(f1 || f2) && (ret & eps_ra ) != (c->eps.cmd & eps_ra ))) ) {  // integer  case, discard dig constraint
+  if ((c->eps.cmd & eps_any) && (ret & eps_dra) != (c->eps.cmd & eps_dra)) {
     trace("  any dra success (rule #%d, line %d) '%.25s'|'%.25s' (%d|%d)", ri, rl, lhs_p, rhs_p, l1, l2);
     trace("  any dra success flags %s [%s|%s|%s] ", (f1 || f2) ? "floating" : "integer",
              ret & eps_abs ? "-" : "abs", ret & eps_rel ? "-" : "rel", ret & eps_dig ? "-" : "dig");

@@ -327,7 +327,7 @@ contains
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
-    character(200)          :: whymsg
+    character(2000)          :: whymsg
     integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
@@ -398,6 +398,13 @@ contains
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
 
+    no = get_value('ptc_twiss ','no ')
+    if ( no .lt. 1 ) then
+       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
+       print*, "Order is ", no
+       return
+    endif
+
     icase = get_value('ptc_twiss ','icase ')
 
     deltap0 = get_value('ptc_twiss ','deltap ')
@@ -419,11 +426,28 @@ contains
 
     deltap_dependency = get_value('ptc_twiss ','deltap_dependency ') .ne. 0
 
-    if (deltap_dependency .and. .not.((icase.eq.5) .or. (icase.eq.56))) then
-       call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume deltap is fixed parameter')
-       call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume icase=5 (formula differentiation) or icase=56 (from map)')
-    endif
+    if (deltap_dependency) then
+    
+      if (.not.((icase.eq.5) .or. (icase.eq.56))) then
+         call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume deltap is fixed parameter')
+         call fort_warn('ptc_twiss: ','derivation w.r.t deltap assume icase=5 (formula differentiation) or icase=56 (from map)')
+      endif
 
+     if (no < 2) then
+       call fort_warn("ptc_twiss ","For dispersion's 1st order derivatives w.r.t delta-p there must be no>=2 ")
+     endif
+
+     if (no < 3) then
+       call fort_warn("ptc_twiss ","For dispersion's 2nd order derivatives w.r.t delta-p there must be no>=3 ")
+     endif
+
+     if (no < 4) then
+       call fort_warn("ptc_twiss ","For dispersion's 3rd order derivatives w.r.t delta-p there must be no>=4 ")
+     endif
+    
+    endif
+    
+    
     x(:)=zero
     if(mytime) then
        call Convert_dp_to_dt (deltap, dt)
@@ -487,12 +511,6 @@ contains
 
     mynd2 = 0
     npara = 0
-    no = get_value('ptc_twiss ','no ')
-    if ( no .lt. 1 ) then
-       call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
-       print*, "Order is ", no
-       return
-    endif
     
     writetmap = get_value('ptc_twiss ','writetmap ') .ne. 0
     
@@ -625,7 +643,7 @@ contains
          write(6,*) "##########################################"
          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
-         write(6,'(a, f12.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
+         write(6,'(a, f15.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
          !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
       endif
       
@@ -799,7 +817,9 @@ contains
 
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-
+           
+           print*,'Error from PTC:>>', why, '<<'
+            
            write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                            ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
 	       ' PTC msg: ',why
@@ -1148,7 +1168,7 @@ contains
       getdeltae = cfen%energy/startfen%energy
 
       if (getdebug() > 2) then
-         write(mf1,'(3(a, f10.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
+         write(mf1,'(3(a, f12.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
       endif
 
     end function getdeltae
@@ -1382,13 +1402,17 @@ contains
 
       if (getdebug() > 2)  then
          ! this part of the code is out of sync with the rest
+         !j(:)=0
          write(6,'(a,1(f9.4,1x))') current%MAG%name,suml
-         write(6,'(a,1(f10.7,1x))') "Delta E ", deltae
+         write(6,'(a,1(f11.7,1x))') "Delta E ", deltae
          write(6,'(a,3(i8.0,1x))')  "idxes   ", beta11,beta22,beta33
-         write(6,'(a,3(f9.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
-         write(6,'(a,3(f9.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
-         write(6,'(a,4(f9.4,1x))')  "dispersions  ", opt_fun(disp1),opt_fun(disp2),opt_fun(disp3),opt_fun(disp4)
-         write(6,'(a,3(f9.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,3(f11.4,1x))')  "betas raw    ", tw%beta(1,1),tw%beta(2,2),tw%beta(3,3)
+         write(6,'(a,3(f11.4,1x))')  "betas w/ener ", opt_fun(beta11),opt_fun(beta22),opt_fun(beta33)
+         write(6,'(a,4(f11.4,1x))')  "dispersions  ", opt_fun(disp1),opt_fun(disp2),opt_fun(disp3),opt_fun(disp4)
+         write(6,'(a,3(f11.4,1x))')  "phase adv.   ", tw%mu(1),tw%mu(2),tw%mu(3)
+         write(6,'(a,4(f11.4,1x))')  "orbit transv.", y(1)%T.sub.'0',y(2)%T.sub.'0',y(3)%T.sub.'0',y(4)%T.sub.'0'
+         write(6,'(a,2(f11.4,1x))')  "dp/p, T      ", y(5)%T.sub.'0',y(6)%T.sub.'0'
+         
       endif
 
       ! the following works : we see the list of all elements in sequence - what about twiss_ptc_line & twiss_ptc_ring?
@@ -2641,6 +2665,9 @@ contains
     integer :: no ! order must be at equal to 2 to be able to get terms of the form x*deltap
     ! required to evaluate the derivatives of Twiss parameters w.r.t deltap
     integer :: ndel ! as in subroutine 'equaltwiss'...
+    real(dp) :: rdp_mmilion ! float with zero (0)
+
+    rdp_mmilion= -1e6;
 
     ! in order to avoid this message, should prevent entering this subroutine
     ! in case none of the Twiss derivatives is selected...
@@ -2742,17 +2769,23 @@ contains
           ! in 4D+deltap case, coefficients are those of the Taylor series development
           ! of deltap (factorial)
           ! disp = disp0 + sigma (1/n!) disp_pn
-          s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
+          if (no.gt.2) then
+             s1%disp_p(i) = 2.0*(y(i)%t.sub.'000020')
+          else
+             s1%disp_p(i) = rdp_mmilion
+          endif
           if (no.gt.2) then
              s1%disp_p2(i) = 3.0*2.0*(y(i)%t.sub.'000030') ! assume at least order 3 for the map
           else
-             call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+             s1%disp_p2(i) = rdp_mmilion
           endif
+             !call fort_warn("ptc_twiss ","assume no>=3 for dispersion's 2nd order derivatives w.r.t delta-p")
+          !endif
           if (no.gt.3) then
              s1%disp_p3(i) = 4.0*3.0*2.0*(y(i)%t.sub.'000040')
-             ! assume at least order 4 for the map
           else
-             call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+          !   call fort_warn("ptc_twiss ","assume no>=4 for dispersion's 3rd order derivatives w.r.t delta-p")
+             s1%disp_p3(i) = rdp_mmilion
           endif
        enddo
     elseif (c_%nd2 ==6) then

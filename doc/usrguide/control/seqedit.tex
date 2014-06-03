@@ -4,7 +4,6 @@
 
 \chapter{Sequence Editor}
 \label{chap:seqedit}
-
 With the help of the commands explained below, a sequence may be
 modified in many ways: the starting point can be moved to another place;
 the order of elements can be inverted; elements can be inserted one by
@@ -34,10 +33,14 @@ re-expand the sequence if necessary.
 \begin{verbatim}
 extract, sequence=s_name, from=MARKER_1, to=MARKER_2, newname=p;
 \end{verbatim} 
-From the sequence named "s\_name" is extracted a new sequence with name
-"p" starting from MARKER\_1 and ending at MARKER\_2. The new sequence
+A new sequence with name "p" is extracted from the existing sequence named "s\_name", 
+starting from MARKER\_1 and ending at MARKER\_2. The new sequence
 "p" can be USEd as any other sequence. It is declared as "shared" and
-can therefore be combined E.G. into the cycled original sequence.  
+can therefore be combined e.g. into the cycled original sequence. \\ 
+Note that MARKER\_1 must be located before MARKER\_2 in the existing sequence "s\_name", 
+or MAD-X will fail with a fatal error. 
+In the case of circular sequences, this can be ensured by performing a CYCLE 
+of sequence "s\_name" with {\tt START=MARKER\_1}.
 
 \section{FLATTEN}
 \label{sec:seqedit_flatten}
@@ -146,5 +149,5 @@ terminates the sequence editing process. The nodes in the sequence are
 renumbered according to their occurrence which might have changed during
 editing.  
 
-%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
+
 

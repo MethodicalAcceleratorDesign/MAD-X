@@ -19,7 +19,7 @@ manipulation, statement flow control (e.g. IF, WHILE), MACRO
 declaration, saving sequences onto files in MAD-X or MAD-8 format, and
 so on.  
 
-\input{control/special}
+
 %% \subsection{Program flow control}
 %% \begin{itemize}
 %% 	\item \href{special.html#if}{IF}
@@ -28,8 +28,139 @@ so on.
 %% 	\item \href{special.html#while}{WHILE}
 %% 	\item \href{special.html#macro}{MACRO}
 %% \end{itemize}
+%\input{control/special}
 
-\input{control/general}
+\section{Program Flow Statements}
+
+\subsection{IF}
+\begin{verbatim}
+if (logical_expression) {statement 1; statement 2; ...; statement n; }
+\end{verbatim}
+where \href{logical}{"logical\_expression"} is one of 
+\begin{verbatim}
+expr1  oper expr2
+expr11 oper1 expr12 && expr21 oper2 expr22
+expr11 oper1 expr12 || expr21 oper2 expr22
+\end{verbatim} 
+and \verb+oper+ one of 
+\begin{verbatim}
+==          ! equal
+<>          ! not equal
+<           ! less than
+>           ! greater than
+<=          ! less than or equal
+>=          ! greater than or equal
+\end{verbatim} 
+The expressions are arithmetic expressions of type real. The statements
+in the curly brackets are executed if the logical expression is true.  
+
+
+\subsection{ELSEIF}
+\begin{verbatim}
+elseif (logical_expression) {statement 1; statement 2; ...; statement n; }
+\end{verbatim} 
+Only possible (in any number) behind an IF, or another ELSEIF; is
+executed if  logical\_expression is true, and if none of the preceding
+IF or ELSEIF logical conditions was true.  
+
+
+\subsection{ELSE}
+\begin{verbatim}
+else {statement 1; statement 2; ...; statement n; }
+\end{verbatim} 
+Only possible (once) behind an IF, or an ELSEIF; is executed if
+logical\_expression is true, and if none of the preceding IF or ELSEIF
+logical conditions was true.  
+
+For a real life example, see \href{foot.html}{ELSE example}. 
+
+
+\subsection{WHILE}
+\begin{verbatim}
+while (logical_condition) {statement 1; statement 2; ...; statement n; }
+\end{verbatim}  
+executes the statements in curly brackets while the logical\_expression
+is true. A simple example (in case you have forgotten the first ten
+factorials) would be  
+\begin{verbatim}
+option, -info;   ! avoids redefiniton warnings
+n = 1; m = 1;
+while (n <= 10)
+{
+  m = m * n;  value, m;
+  n = n + 1;
+};
+\end{verbatim}
+
+For a real life example, see \href{foot.html}{WHILE example}.
+
+\subsection{MACRO}
+\label{subsec:special_macro}
+\begin{verbatim}
+label: macro = {statement 1; statement 2; ...; statement n; };
+label(arg1,...,argn): macro = {statement 1; statement 2; ...; statement n; };
+\end{verbatim} 
+The first form allows the execution of a group of statements via a
+single command,  
+\begin{verbatim}
+exec, label;
+\end{verbatim} 
+that executes the statements in curly brackets exactly once. This command
+can be issued any number of times.  
+
+The second form allows to replace strings anywhere inside the statements
+in curly brackets by other strings, or integer numbers prior to
+execution. This is a powerful construct and should be handled with care.  
+
+Simple example: 
+\begin{verbatim}
+option, -echo, -info;  ! for cleaner output
+simple(xx,yy): macro = { xx = yy^2 + xx; value, xx;};
+a = 3;
+b = 5;
+exec, simple(a,b);
+\end{verbatim}
+
+
+{\bf Passing arguments}\\
+In the following example we use the fact that a "\$" in front of an
+argument means that the truncated integer value of this argument is used
+for replacement, rather than the argument string itself.  
+\begin{verbatim}
+tricky(xx,yy,zz): macro = {mzz.yy: xx, l = 1.yy, kzz = k.yy;};
+n=0;
+while (n < 3)
+{
+  n = n+1;
+  exec, tricky(quadrupole, $n, 1);
+  exec, tricky(sextupole, $n, 2);
+};
+\end{verbatim} 
+Whereas the actual use of the preceding example is NOT recommended,
+a real life example, showing the full power (!) of macros is to be
+found under \href{foot.html}{macro usage} for the usage, and
+under \href{foot.html#macro}{macro definition} for the
+definition.
+
+
+{\bf Beware of the following rules:}
+\begin{itemize}
+   \item Generally speaking: \textit{ special constructs } like IF,
+     WHILE, MACRO will only allow one level of inclusion of another
+     \textit{ special construct }.
+   \item  Macros must not be called with numbers, but with strings
+     (i.e. variable names in case of numerical values), i.e. {\bf NOT }
+\begin{verbatim}
+exec, thismacro($99, $129);
+\end{verbatim}
+{\bf BUT}
+\begin{verbatim}
+n1=99; n2=219;
+exec, thismacro($n1, $n2);
+\end{verbatim}
+\end{itemize}
+
+
 %% \subsection{General control}
 %% \begin{itemize}
 %% 	\item \href{general.html#assign}{ASSIGN}
@@ -62,43 +193,1276 @@ so on.
 %% 	\item \href{general.html#write}{WRITE}
 %% \end{itemize}
 
-\input{Introduction/select}
+%\input{control/general}
+\section{General Control Statements}
+
+\subsection{ASSIGN}
+\begin{verbatim}
+assign, echo="file_name", truncate;
+\end{verbatim} 
+where "file\_name" is the name of an output file, or "terminal" and
+truncate specifies if the file must be truncated when opened (ignored
+for terminal). This allows switching the echo stream to a file or back,
+but only for the commands value, show, and print. Allows easy
+composition of future MAD-X input files. A real life example (always the
+same) is to be found under \href{foot.html}{footprint example}.  
+
+\subsection{CALL}
+\begin{verbatim}
+call, file = "file_name";
+\end{verbatim} 
+where "file\_name"  is the name of an input file. This file will be read
+until a "return;" statement, or until end\_of\_file; it may contain any
+number of calls itself, and so on to any depth.  
+
+\subsection{COGUESS}
+\label{subsec:general_coguess}
+\begin{verbatim}
+coguess, tolerance = double, 
+         x = double, px = double, 
+         y = double, py = double, 
+         t = double, pt = double,
+         clear=logical;
+\end{verbatim} 
+sets the required convergence precision in the closed orbit search
+("tolerance", see as well Twiss command
+\href{../twiss/twiss.html#tolerance}{tolerance}).  
+
+The other parameters define a first guess for all future closed orbit
+searches in case they are different from zero.  
+
+The clear parameter in the argument list resets the tolerance to its default value 
+and cancels the effect of coguess in defining a first guess for subsequent 
+closed orbit searches. \\
+Default = false, {\tt clear} alone is equivalent to {\tt clear=true}
+
+\subsection{CREATE}
+\begin{verbatim}
+create, table = table, column = var1, var2,_name,...;
+\end{verbatim} 
+creates a table with the specified variables as columns. This table can
+then be \hyperlink{fill}{fill}ed, and finally one can
+\hyperlink{write}{write} it in TFS format. The attribute "\_name" adds
+the element name to the table at the specified column, this replaces the
+undocumented "withname" attribute that was not always working properly.  
+
+See the \href{../Introduction/select.html#ucreate}{user table I}
+example; 
+or an example of joining 2 tables of different length in one table
+including the element name:
+\href{../Introduction/select.html#screate}{user table II} 
+
+\subsection{DELETE}
+\begin{verbatim}
+delete, sequence = s_name, table = t_name;
+\end{verbatim} 
+deletes a sequence with name "s\_name" or a table with name "t\_name"
+from memory. The sequence deletion is done without influence on other
+sequences that may have elements that were in the deleted sequence.  
+
+%% 2013-Jul-11  17:24:21  ghislain: I propose to move DUMPSEQU to the
+%% sequence edition and manipulation part of the manual
+\subsection{DUMPSEQU}
+\begin{verbatim}
+dumpsequ, sequence = s_name, level = integer;
+\end{verbatim} 
+Actually a debug statement, but it may come handy at certain
+occasions. Here "s\_name" is the name of an expanded (i.e. USEd)
+sequence. The amount of detail is controlled by "level":  
+\begin{verbatim}
+level = 0:    print only the cumulative node length = sequence length
+      > 0:    print all node (element) names except drifts
+      > 2:    print all nodes with their attached parameters
+      > 3:    print all nodes, and their elements with all parameters
+\end{verbatim}
 
 
-\input{Introduction/beam}
-\input{Introduction/resbeam}
-\input{Introduction/bv_flag}
-%% \subsection{Beam specification}
-%% \begin{itemize}
-%% 	\item \href{../Introduction/beam.html}{BEAM}
-%% 	\item \href{../Introduction/resbeam.html}{RESBEAM}
-%% \end{itemize}
+\subsection{EXEC}
+\begin{verbatim}
+exec, label;
+\end{verbatim} 
+Each statement may be preceded by a label; it is then stored and can be
+executed again with "exec, label;" any number of times; the executed
+statement may be another "exec", etc.; however, the major usage of this
+statement is the execution of a \href{special.html#macro}{macro}.  
+
+\subsection{EXIT}
+\begin{verbatim}
+exit;
+\end{verbatim} 
+ends the program execution. 
+
+\subsection{FILL} 
+Every command 
+\begin{verbatim}
+fill, table = table;
+\end{verbatim} 
+adds a new line with the current values of all column variables into the
+user table \hyperlink{create}{create}d beforehand. This table one can
+then \hyperlink{write}{write} in TFS format.  See as well the
+\href{../Introduction/select.html#ucreate}{user table} example.  
+
+\subsection{HELP}
+\begin{verbatim}
+help, statement_name;
+\end{verbatim}
+prints all parameters, and their defaults values, for the statement given;
+this includes basic element types.
+
+\subsection{OPTION}
+\label{subsec:general_option}
+\begin{verbatim}
+option, flag { = true | = false };
+option, flag | -flag;
+\end{verbatim} 
+sets an option as given in "flag"; the part in curly brackets is
+optional: if only the name of the option is given, then the option will
+be set true (see second line); a "-" sign preceding the name sets it to
+"false".  
+
+Example: 
+\begin{verbatim}
+option, echo = true;
+option, echo;
+\end{verbatim} 
+are identical, ditto 
+\begin{verbatim}
+option, echo = false;
+option, -echo;
+\end{verbatim} 
+
+The available options are: 
+\begin{verbatim}
+  name           default meaning if true
+  ====           ======= ===============
+  echo            true   echoes the input on the standard output file
+  warn            true   issues warnings
+  info            true   issues information
+  debug           false  issues debugging information
+  echomacro       false  issues macro expansion printout for debugging
+  verbose         false  issues additional printout in makethin
+  trace           false  prints the system time after each command
+  verify          false  issues a warning if an undefined variable is used
+  tell            false  prints the current value of all options
+  reset           false  resets all options to their defaults
+  no_fatal_stop   false  Prevents madx from stopping in case of a fatal error. 
+                         Use at your own risk.
+
+  rbarc           true   converts the RBEND straight length into the arc 
+                         length
+  thin_foc        true   if false suppresses the 1(rho**2) focusing of thin 
+                         dipoles
+  bborbit         false  the closed orbit is modified by beam-beam kicks
+  sympl           false  all element matrices are symplectified in Twiss
+  twiss_print     true   controls whether the twiss command produces output.
+   threader        false  enables the threader for closed orbit finding in Twiss.
+                         (see Twiss module)
+
+  bb_ultra_relati false  To be documented
+  bb_sxy_update   false  To be documented 
+  emittance_update true  To be documented
+  fast_error_func false  To be documented
+\end{verbatim} 
+
+The option "rbarc" is implemented for backwards compatibility with MAD-8
+up to version 8.23.06 included; in this version, the RBEND length was
+just taken as the arc length of an SBEND with inclined pole faces,
+contrary to the MAD-8 manual.  
+
+
+\subsection{PRINT}
+\begin{verbatim}
+print, text = "...";
+\end{verbatim} 
+prints the text to the current output file (see ASSIGN above). The text
+can be edited with the help of a  \href{special.html#macro}{macro
+  statement}. For more details, see there.  
+
+
+\subsection{PRINTF}
+\begin{verbatim}
+printf, text = "string", value = expr{,expr};
+\end{verbatim}
+prints the numerical values specified in the value field, formatted
+according to the string format provided in the text field, to the
+current output file.  
+The string format can take numeric C or MAD format specifiers for double
+real values; integer and string formats are not supported. 
+The maximum number of values that can be printed in one
+statement is limited to 100. 
+
+If the number of format specifiers given in the string is higher 
+than the number of values in the value field, undefined values are printed 
+where they are not explicitly provided. 
+If the number of format specifiers given in the string is lower 
+than the number of values in the value field, the values that 
+do not correspond to a format specifier are ignored. 
+
+
+Example:
+\begin{verbatim}
+a = 1.2; b = 3.4/0.3; c := 0.8*a/b;
+printf, text = "String with floats a=%f, b=%.3g, text and MAD float c=%F;", 
+        value = a, b, c;
+printf, text = "More specifiers than values: %f, %.3g, %F", value = a, b;
+printf, text = "More values than specifiers: %f, %.3g"    , value = a, b, c;
+\end{verbatim}
+produces the following output:
+\begin{verbatim}
+String with floats a=1.200000, b=11.3, text and MAD float c=     0.08470588235;
+More specifiers than values: 1.200000, 11.3,   6.953222976e-310
+More values than specifiers: 1.200000, 11.3
+\end{verbatim}
+
+Note that printf, like print, produces output that cannot be read back
+by MAD-X. For output that can be read back by MAD-X, use the command
+{\tt VALUE} or TFS tables.
+
+Note also that a percent sign (\%) can be printed using the format
+\verb|text="%%"|. 
+
+\subsection{QUIT}
+\begin{verbatim}
+quit;
+\end{verbatim} 
+ends the program execution. 
+
+
+\subsection{READTABLE}
+\begin{verbatim}
+readtable, file = "file_name";
+\end{verbatim} 
+reads a TFS file containing a MAD-X table back into memory. This table
+can then be manipulated as any other table, i.e. its values can be
+accessed, it can be plotted, written out again etc.  
+
+
+\subsection{READMYTABLE}
+\label{subsec:general_readmy}
+\begin{verbatim}
+readmytable, file = "file_name", table = internalname;
+\end{verbatim} 
+reads a TFS file containing a MAD-X table back into memory. This table
+can then be manipulated as any other table, i.e. its values can be
+accessed, it can be plotted, written out again etc. 
+
+An internal name for
+the table can be freely assigned while for the command READTABLE it is
+taken from the information section of the table itself. This feature
+allows to store multiple tables of the same type in memory without
+overwriting existing ones.   
+
+
+\subsection{REMOVEFILE}
+\begin{verbatim}
+removefile, file = "file_name";
+\end{verbatim} 
+remove the file "file\_name" from disk. It is more portable than  
+\begin{verbatim}
+system("rm filename"); // Unix specific
+\end{verbatim}
+
+\subsection{RENAMEFILE}
+\begin{verbatim}
+renamefile, file = "file_name", name = "new_file_name";
+\end{verbatim} 
+rename the file "file\_name" to "new\_file\_name" on the disk. It is more
+portable than  
+\begin{verbatim}
+system("mv file_name new_file_name"); // Unix specific
+\end{verbatim}
+
+
+%% 2013-Jul-11  17:24:21  ghislain: I propose to move RESBEAM to the
+%% beam declaration part of the manual
+\subsection{RESBEAM}
+\begin{verbatim}
+resbeam, sequence = sequence_name;
+\end{verbatim} 
+resets the default values of the beam belonging to sequence sequence\_name, or
+of the default beam if no sequence is given.  
+
+
+\subsection{RETURN}
+\begin{verbatim}
+return;
+\end{verbatim} 
+ends reading from a "called" file; if encountered in the standard input
+file, it ends the program execution.  
+
+
+\subsection{SAVE}
+\label{subsec:general_save}
+\begin{verbatim}
+save, sequence = sequ1, sequ2, ..., file = "file_name", beam, bare;
+\end{verbatim} 
+saves the sequence(s) specified with all variables and elements needed
+for their expansion, onto the file "file\_name". 
+
+{\bf Warning:} If quotes are used for
+the "file\_name", capital and low characters are kept as specified, if they
+are omitted the "filename" will have lower characters only. 
+
+Example:
+\begin{verbatim}
+save, sequence = lhc, file = "Test_One";
+\end{verbatim}
+saves the lhc sequence to a file name Test\_One on disk, while
+\begin{verbatim}
+save, sequence = lhc, file = Test_One;
+\end{verbatim}
+saves the lhc sequence to a file name test\_one on disk.
+
+The optional
+flag can have the value "mad8" (without the quotes), in which case the
+sequence(s) is/are saved in MAD-8 input format.  
+
+The flag "beam" is optional; when given, all beams belonging to the
+sequences specified are saved at the top of the save file.  
+
+The parameter "sequence" is optional; when omitted, all sequences are
+saved.  
+
+However, it is not advisable to use "save" without the "sequence" option
+unless you know what you are doing. This practice will avoid spurious
+saved entries.    Any number of "select,flag=save" commands may precede
+the SAVE command. In that case, the names of elements, variables, and
+sequences must match the pattern(s) if given, and in addition the
+elements must be of the class(es) specified. See here for a
+\href{../Introduction/select.html#save_select}{SAVE with SELECT}
+example.  
+
+It is important to note that the precision of the output of the save
+command depends on the output precision. Details about default
+precisions and how to adjust those precisions can be found at the
+\href{../Introduction/set.html#Format}{SET Format} instruction page.   
+ 
+The attribute 'bare' allows to save just the sequence without the
+element definitions nor beam information. This allows to re-read in a
+sequence with might otherwise create a stop of the program. This is
+particularly useful to turn a line into a sequence to seqedit
+it. 
+
+Example:  
+\begin{verbatim}
+tl3:line=(ldl6,qtl301,mqn,qtl301,ldl7,qtl302,mqn,qtl302,ldl8,ison);
+DLTL3 : LINE=(delay, tl3);
+use, period=dltl3;
+
+save,sequence=dltl3,file=t1,bare; // new parameter "bare": only sequ. saved
+call,file=t1; // sequence is read in and is now a "real" sequence
+// if the two preceding lines are suppressed, seqedit will print a warning
+// and else do nothing
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+plot, vaxis=betx, bety, haxis=s, colour:=100;
+SEQEDIT, SEQUENCE=dltl3;
+  remove,element=cx.bhe0330;
+  remove,element=cd.bhe0330;
+ENDEDIT;
+
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+\end{verbatim}
+
+
+\subsection{SAVEBETA}
+\label{subsec:general_savebeta}
+\begin{verbatim}
+savebeta, label = label, place = place, sequence = sequence_name;
+\end{verbatim} 
+marks a place named "place" in an expanded sequence "sequence\_name"; 
+at the next TWISS command execution, a
+\href{../twiss/twiss.html#beta0}{beta0} 
+block will be saved at that place with the label "label". This is done
+only once; in order to get a new beta0 block there, one has to re-issue
+the command. The contents of the beta0 block can then be used in other
+commands, e.g. TWISS and MATCH.  
+
+Example (after sequence expansion): 
+\begin{verbatim}
+savebeta, label = sb1, place = mb[5], sequence = fivecell;
+twiss;
+show, sb1;
+\end{verbatim} 
+will save and show the beta0 block parameters at the end (!) of the
+fifth element of type mb in the sequence.  
+
+
+\subsection{SELECT} 
+\begin{verbatim}
+select, flag = flag, range = range, class = class, pattern = pattern,
+        sequence=sequence_name, full, clear,
+        column = s1, s2, s3,..,sn,  slice = integer, thick=logical;
+\end{verbatim} 
+selects one or several elements for special treatment in a subsequent
+command based on selection criteria.
+
+The selection criteria on a single SELECT statement are logically
+ANDed, in other words, selected elements have to fulfill the {\tt RANGE},
+{\tt CLASS}, and {\tt PATTERN} criteria.  
+The selection criteria on different SELECT statements are logically
+ORed, in other words selected elements have to fulfill any of the
+selection criteria accumulated by the different statements.   
+All selections for a given command remain valid until the "clear" argument
+is specified; 
+
+The "flag" argument allows a determination of the applicability of the
+SELECT statement and can be one of the following: 
+\begin{madlist}
+   \ttitem{seqedit} selection of elements for the
+     \href{seqedit.html}{seqedit} module.  
+   \ttitem{error} selection of elements for the
+     \href{../error/error.html}{error} assignment module.  
+   \ttitem{makethin} selection of elements for the
+     \href{../makethin/makethin.html}{makethin} module that
+     converts the sequence into one with thin elements only.  
+   \ttitem{sectormap} selection of elements for the
+     \href{../Introduction/sectormap.html}{sectormap} output file
+     from the Twiss module.  
+   \ttitem{save} selection of elements for the {\tt SAVE} command.  
+   \ttitem{table} is a table name such as {\tt twiss}, {\tt track}
+     etc., and the rows and columns to be written are selected.  
+\end{madlist} 
+
+The statement
+\begin{verbatim}
+SELECT, FLAG=name, FULL;
+\end{verbatim} 
+selects ALL positions in the sequence for the flag "name". This is the default
+for flags for all tables and {\tt MAKETHIN}.
+
+The statement 
+\begin{verbatim}
+SELECT, FLAG=name, CLEAR;
+\end{verbatim} 
+deselects ALL positions in the sequence for the flag "name". This is the default
+for flags {\tt ERROR} and {\tt SEQEDIT}.
+
+"slice" is only used by \href{../makethin/makethin.html}{makethin} and
+prescribes the number of slices into which the selected elements have to
+be cut (default = 1).  
+
+"column" is only valid for tables and determines the selection of columns
+to be written into the TFS file. The "name" argument is special in that
+it refers to the actual name of the selected element. For an example,
+see \href{../Introduction/select.html}{SELECT}.  
+
+"thick" is used to determine whether the selected elements will be
+treated as thick elements by the MAKETHIN command. This only applies to
+QUADRUPOLES and BENDS for which thick maps have been explicitely
+derived. (see ...) 
+%%2014-Apr-08  17:43:44  ghislain:  A completer.
+
+Example: 
+\begin{verbatim}
+select, flag = error, class = quadrupole, range = mb[1]/mb[5];
+select, flag = error, pattern = "^mqw.*";
+\end{verbatim} 
+selects all quadrupoles in the range mb[1] to mb[5], as well as all
+elements (in the whole sequence) with name starting with "mqw", for 
+treatment by the error module.  
+
+Example:  
+\begin{verbatim}
+select, flag=save, class=variable, pattern="abc.*";
+save, file=mysave;
+\end{verbatim} 
+will save all variables (and sequences) containing "abc" in their name.
+However note that since the element class "variable" does not exist, any
+element with name containing "abc" will not be saved. 
+
+
+\subsection{Set Statements}
+\begin{verbatim}
+set, format="...", sequence="...";
+\end{verbatim} 
+
+The set command allows 2 actions: 
+
+\subsubsection{1) Format} 
+The first command lets you vary the output precision. 
+\begin{verbatim}
+parameter: format = s1, s2, s3
+\end{verbatim} 
+(up to) three strings defining the integer, floating, and string output
+format for the save, show, value, and table output. The formats can be
+given in any order and stay valid until replaced. The defaults are:  
+\begin{verbatim}
+"10d","18.10g","-18s".
+\end{verbatim} 
+They follow the C convention. The quotes are mandatory. The allowed formats are: 
+\begin{verbatim}
+"nd" for integer with n = field width.
+\end{verbatim}
+\begin{verbatim}
+"m.nf" or "m.ng" or "m.ne" for floating, m field width, n precision.
+\end{verbatim}
+\begin{verbatim}
+"ns" for string output.
+\end{verbatim} 
+The default is "right adjusted", a "-" changes it to "left adjusted".  Example: 
+\begin{verbatim}
+set,format="22.14e";
+\end{verbatim} 
+changes the current floating point format to 22.14e; the other formats remain untouched. 
+\begin{verbatim}
+set,format="s","d","g";
+\end{verbatim} 
+sets all formats to automatic adjustment according to C conventions. 
+
+\subsubsection{2) Sequence} The second command lets you choose the
+current sequence without having to use the "USE" command, which would
+bring you back to a bare lattice without errors. The command only works
+if the chosen sequence had been activated before with the "USE" command,
+otherwise a warning will be issued and MAD-X will continue with the
+unmodified current sequence. This command is particularly useful for
+commands that do not have the sequence as an argument like "EMIT" or
+"IBS". 
+
+
+\subsection{SHOW}
+\begin{verbatim}
+show, command;
+\end{verbatim} 
+prints the "command" (typically "beam", "beam\%sequ", or an element
+name), with the actual value of all its parameters.  
+
+
+\subsection{STOP}
+\begin{verbatim}
+stop;
+\end{verbatim} 
+ends the program execution. 
+
+
+\subsection{SYSTEM}
+\begin{verbatim}
+system, "string";
+\end{verbatim} 
+transfers the string in quotes to the system for execution.  
+
+Example: 
+\begin{verbatim}
+system,"ln -s /afs/cern.ch/user/u/user/public/some/directory short";
+\end{verbatim}
+
+
+\subsection{TABSTRING}
+Note: this is not a command and should appear in the variables section
+\begin{verbatim}
+tabstring(arg1,arg2,arg3)
+\end{verbatim}  
+The "string function" tabstring(arg1,arg2,arg3) with exactly  three
+arguments; arg1 is a table name (string), arg2 is a column name
+(string), arg3 is a row number (integer), count starts at 0. The
+function can be used in any context where a string appears; in case
+there is no match, it returns \_void\_.  
+
+
+\subsection{TITLE}
+\begin{verbatim}
+title, "title";
+\end{verbatim} 
+inserts the string in quotes as title in various tables and plots.  
+
+
+\subsection{USE}
+\label{subsec:general_use}
+\begin{verbatim}
+use, period = sequence_name, range = range, survey;
+\end{verbatim} 
+expands the sequence with name "sequence\_name", or a part of it as specified
+in the \href{../Introduction/ranges.html#range}{range}. The
+\texttt{survey} option plugs the survey data into the sequence elements
+nodes on the first pass (see \href{../survey/survey.html}{survey}).  
+
+
+\subsection{VALUE}
+\begin{verbatim}
+value, exp1, exp2,...;
+\end{verbatim} 
+prints the actual values of the expressions given. 
+
+Example: 
+\begin{verbatim}
+a = clight/1000.;
+value, a, pmass, exp(sqrt(2));
+\end{verbatim} 
+results in 
+\begin{verbatim}
+a = 299792.458         ;
+pmass = 0.938271998        ;
+exp(sqrt(2)) = 4.113250379        ;
+\end{verbatim}
+
+
+\subsection{WRITE}
+\label{subsec:general_write}
+\begin{verbatim}
+write, table = table, file = "file_name";
+\end{verbatim} 
+writes the table "table" onto the file "file\_name"; only the rows and
+columns of a preceding \verb+select, flag = table,...;+ are written. If no select
+has been issued for this table, the file will only contain the
+header. If the FILE argument is omitted, the table is written to
+standard output.  
+
+
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
+
+
+%\input{Introduction/select}
+\subsection{Selection Statements}
+\label{subsec:selection}
+The elements, or a range of elements, in a sequence can be selected for
+various purposes. Such selections remain valid until cleared (in
+difference to MAD-8); it is therefore recommended to always start with a  
+
+\begin{verbatim}
+select, flag =..., clear;
+\end{verbatim} 
+before setting a new selection. 
+\begin{verbatim}
+SELECT, FLAG=name, RANGE=range, CLASS=class, PATTERN=pattern [,FULL] [,CLEAR];
+\end{verbatim} 
+where the name for FLAG can be one of ERROR, MAKETHIN, SEQEDIT or the
+name of a twiss table which is established for all sequence positions in
+general.  
+
+Selected elements have to fulfill the \href{ranges.html#range}{RANGE},
+\href{ranges.html#class}{CLASS}, and \href{wildcard.html}{PATTERN}
+criteria.  
+
+Any number of SELECT commands can be issued for the same flag and are
+accumulated (logically ORed). In this context note the following:  
+
+\begin{verbatim}
+SELECT, FLAG=name, FULL;
+\end{verbatim} 
+selects all positions in the sequence for this flag. This is the default
+for all tables and makethin, whereas for ERROR and SEQEDIT the default
+is "nothing selected".  
+
+%\href{save_select}{}
+\label{save_select}
+SAVE: A SELECT,FLAG=SAVE statement causes the
+selected sequences, elements, and variables to be written into the save
+file. A class (only used for element selection), and a pattern can be
+specified. Example:  
+\begin{verbatim}
+select, flag=save, class=variable, pattern="abc.*";
+save, file=mysave;
+\end{verbatim} 
+will save all variables (and sequences) containing "abc" in their name,
+but not elements with names containing "abc" since the class "variable"
+does not exist (astucieux, non ?).  
+
+SECTORMAP: A SELECT,FLAG=SECTORMAP statement causes sectormaps to be
+written into the file "sectormap" like in MAD-8. For the file to be
+written, a flag SECTORMAP must be issued on the TWISS command in
+addition.  
+
+TWISS: A SELECT,FLAG=TWISS statement causes the selected rows and
+columns to be written into the Twiss TFS file (former OPTICS command in
+MAD-8). The column selection is done on the same select. See as well
+example 2.  
+
+Example 1:  
+\begin{verbatim}
+TITLE,'Test input for MAD-X';
+
+option,rbarc=false; // use arc length of rbends
+beam; ! sets the default beam for the following sequence
+option,-echo;
+call file=fv9.opt;  ! contains optics parameters
+call file="fv9.seq"; ! contains a small sequence "fivecell"
+OPTION,ECHO;
+SELECT,FLAG=SECTORMAP,clear;
+SELECT,FLAG=SECTORMAP,PATTERN="^m.*";
+SELECT,FLAG=TWISS,clear;
+SELECT,FLAG=TWISS,PATTERN="^m.*",column=name,s,betx,bety;
+USE,PERIOD=FIVECELL;
+twiss,file=optics,sectormap;
+stop;
+\end{verbatim} 
+
+This produces a file \href{sectormap.html}{sectormap}, and a
+twiss output file \label{tfs} (name = optics):  
+\begin{verbatim}
+@ TYPE             %05s "TWISS"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le          0.000510998902
+@ CHARGE           %le                       1
+@ E0               %le                       1
+@ PC               %le           0.99999986944
+@ GAMMA            %le           1956.95136738
+@ KBUNCH           %le                       1
+@ NPART            %le                       0
+@ EX               %le                       1
+@ EY               %le                       1
+@ ET               %le                       0
+@ LENGTH           %le                   534.6
+@ ALFA             %le        0.00044339992938
+@ ORBIT5           %le                      -0
+@ GAMMATR          %le           47.4900022541
+@ Q1               %le           1.25413071556
+@ Q2               %le           1.25485338377
+@ DQ1              %le           1.05329608302
+@ DQ2              %le           1.04837000224
+@ DXMAX            %le           2.17763211131
+@ DYMAX            %le                       0
+@ XCOMAX           %le                       0
+@ YCOMAX           %le                       0
+@ BETXMAX          %le            177.70993499
+@ BETYMAX          %le           177.671582415
+@ XCORMS           %le                       0
+@ YCORMS           %le                       0
+@ DXRMS            %le           1.66004270906
+@ DYRMS            %le                       0
+@ DELTAP           %le                       0
+@ TITLE            %20s "Test input for MAD-X"
+@ ORIGIN           %16s "MAD-X 0.20 Linux"
+@ DATE             %08s "07/06/02"
+@ TIME             %08s "14.25.51"
+* NAME               S                  BETX               BETY               
+$ %s                 %le                %le                %le                
+ "MSCBH"             4.365              171.6688159        33.31817319       
+ "MB"                19.72              108.1309095        58.58680717       
+ "MB"                35.38              61.96499987        102.9962313       
+ "MB"                51.04              34.61640793        166.2227523       
+ "MSCBV.1"           57.825             33.34442808        171.6309057       
+ "MB"                73.18              58.61984637        108.0956006       
+ "MB"                88.84              103.0313887        61.93159422       
+ "MB"                104.5              166.2602486        34.58939635       
+ "MSCBH"             111.285            171.6688159        33.31817319       
+ "MB"                126.64             108.1309095        58.58680717       
+ "MB"                142.3              61.96499987        102.9962313       
+ "MB"                157.96             34.61640793        166.2227523       
+ "MSCBV"             164.745            33.34442808        171.6309057       
+ "MB"                180.1              58.61984637        108.0956006       
+ "MB"                195.76             103.0313887        61.93159422       
+ "MB"                211.42             166.2602486        34.58939635       
+ "MSCBH"             218.205            171.6688159        33.31817319       
+ "MB"                233.56             108.1309095        58.58680717       
+ "MB"                249.22             61.96499987        102.9962313       
+ "MB"                264.88             34.61640793        166.2227523       
+ "MSCBV"             271.665            33.34442808        171.6309057       
+ "MB"                287.02             58.61984637        108.0956006       
+ "MB"                302.68             103.0313887        61.93159422       
+ "MB"                318.34             166.2602486        34.58939635       
+ "MSCBH"             325.125            171.6688159        33.31817319       
+ "MB"                340.48             108.1309095        58.58680717       
+ "MB"                356.14             61.96499987        102.9962313       
+ "MB"                371.8              34.61640793        166.2227523       
+ "MSCBV"             378.585            33.34442808        171.6309057       
+ "MB"                393.94             58.61984637        108.0956006       
+ "MB"                409.6              103.0313887        61.93159422       
+ "MB"                425.26             166.2602486        34.58939635       
+ "MSCBH"             432.045            171.6688159        33.31817319       
+ "MB"                447.4              108.1309095        58.58680717       
+ "MB"                463.06             61.96499987        102.9962313       
+ "MB"                478.72             34.61640793        166.2227523       
+ "MSCBV"             485.505            33.34442808        171.6309057       
+ "MB"                500.86             58.61984637        108.0956006       
+ "MB"                516.52             103.0313887        61.93159422       
+ "MB"                532.18             166.2602486        34.58939635       
+\end{verbatim}
+
+ Example 2: 
+
+ Addition of variables to (any internal) table: 
+\begin{verbatim}
+select, flag=table, column=name, s, betx, ..., var1, var2, ...; ! or
+select, flag=table, full, column=var1, var2, ...; ! default col.s + new
+\end{verbatim} 
+will write the current value of var1 etc. into the table each time a new
+line is added; values from the same (current) line can be accessed by
+these variables, e.g.  
+\begin{verbatim}
+var1 := sqrt(beam->ex*table(twiss,betx));
+\end{verbatim} 
+in the case of table above being "twiss". The plot command accepts the
+new variables.  
+
+Remark: this replaces the "string" variables of MAD-8. 
+
+ This example demonstrates as well the usage of a user defined table \label{ucreate}. 
+\begin{verbatim}
+beam,ex=1.e-6,ey=1.e-3;
+// element definitions
+mb:rbend, l=14.2, angle:=0,k0:=bang/14.2;
+mq:quadrupole, l:=3.1,apertype=ellipse,aperture={1,2};
+qft:mq, l:=0.31, k1:=kqf,tilt=-pi/4;
+qf.1:mq, l:=3.1, k1:=kqf;
+qf.2:mq, l:=3.1, k1:=kqf;
+qf.3:mq, l:=3.1, k1:=kqf;
+qf.4:mq, l:=3.1, k1:=kqf;
+qf.5:mq, l:=3.1, k1:=kqf;
+qd.1:mq, l:=3.1, k1:=kqd;
+qd.2:mq, l:=3.1, k1:=kqd;
+qd.3:mq, l:=3.1, k1:=kqd;
+qd.4:mq, l:=3.1, k1:=kqd;
+qd.5:mq, l:=3.1, k1:=kqd;
+bph:hmonitor, l:=l.bpm;
+bpv:vmonitor, l:=l.bpm;
+cbh:hkicker;
+cbv:vkicker;
+cbh.1:cbh, kick:=acbh1;
+cbh.2:cbh, kick:=acbh2;
+cbh.3:cbh, kick:=acbh3;
+cbh.4:cbh, kick:=acbh4;
+cbh.5:cbh, kick:=acbh5;
+cbv.1:cbv, kick:=acbv1;
+cbv.2:cbv, kick:=acbv2;
+cbv.3:cbv, kick:=acbv3;
+cbv.4:cbv, kick:=acbv4;
+cbv.5:cbv, kick:=acbv5;
+!mscbh:sextupole, l:=1.1, k2:=ksf;
+mscbh:multipole, knl:={0,0,0,ksf},tilt=-pi/8;
+mscbv:sextupole, l:=1.1, k2:=ksd;
+!mscbv:octupole, l:=1.1, k3:=ksd,tilt=-pi/8;
+
+// sequence declaration
+
+fivecell:sequence, refer=centre, l=534.6;
+   qf.1:qf.1, at=1.550000e+00;
+   qft:qft, at=3.815000e+00;
+!   mscbh:mscbh, at=3.815000e+00;
+   cbh.1:cbh.1, at=4.365000e+00;
+   mb:mb, at=1.262000e+01;
+   mb:mb, at=2.828000e+01;
+   mb:mb, at=4.394000e+01;
+   bpv:bpv, at=5.246000e+01;
+   qd.1:qd.1, at=5.501000e+01;
+   mscbv:mscbv, at=5.727500e+01;
+   cbv.1:cbv.1, at=5.782500e+01;
+   mb:mb, at=6.608000e+01;
+   mb:mb, at=8.174000e+01;
+   mb:mb, at=9.740000e+01;
+   bph:bph, at=1.059200e+02;
+   qf.2:qf.2, at=1.084700e+02;
+   mscbh:mscbh, at=1.107350e+02;
+   cbh.2:cbh.2, at=1.112850e+02;
+   mb:mb, at=1.195400e+02;
+   mb:mb, at=1.352000e+02;
+   mb:mb, at=1.508600e+02;
+   bpv:bpv, at=1.593800e+02;
+   qd.2:qd.2, at=1.619300e+02;
+   mscbv:mscbv, at=1.641950e+02;
+   cbv.2:cbv.2, at=1.647450e+02;
+   mb:mb, at=1.730000e+02;
+   mb:mb, at=1.886600e+02;
+   mb:mb, at=2.043200e+02;
+   bph:bph, at=2.128400e+02;
+   qf.3:qf.3, at=2.153900e+02;
+   mscbh:mscbh, at=2.176550e+02;
+   cbh.3:cbh.3, at=2.182050e+02;
+   mb:mb, at=2.264600e+02;
+   mb:mb, at=2.421200e+02;
+   mb:mb, at=2.577800e+02;
+   bpv:bpv, at=2.663000e+02;
+   qd.3:qd.3, at=2.688500e+02;
+   mscbv:mscbv, at=2.711150e+02;
+   cbv.3:cbv.3, at=2.716650e+02;
+   mb:mb, at=2.799200e+02;
+   mb:mb, at=2.955800e+02;
+   mb:mb, at=3.112400e+02;
+   bph:bph, at=3.197600e+02;
+   qf.4:qf.4, at=3.223100e+02;
+   mscbh:mscbh, at=3.245750e+02;
+   cbh.4:cbh.4, at=3.251250e+02;
+   mb:mb, at=3.333800e+02;
+   mb:mb, at=3.490400e+02;
+   mb:mb, at=3.647000e+02;
+   bpv:bpv, at=3.732200e+02;
+   qd.4:qd.4, at=3.757700e+02;
+   mscbv:mscbv, at=3.780350e+02;
+   cbv.4:cbv.4, at=3.785850e+02;
+   mb:mb, at=3.868400e+02;
+   mb:mb, at=4.025000e+02;
+   mb:mb, at=4.181600e+02;
+   bph:bph, at=4.266800e+02;
+   qf.5:qf.5, at=4.292300e+02;
+   mscbh:mscbh, at=4.314950e+02;
+   cbh.5:cbh.5, at=4.320450e+02;
+   mb:mb, at=4.403000e+02;
+   mb:mb, at=4.559600e+02;
+   mb:mb, at=4.716200e+02;
+   bpv:bpv, at=4.801400e+02;
+   qd.5:qd.5, at=4.826900e+02;
+   mscbv:mscbv, at=4.849550e+02;
+   cbv.5:cbv.5, at=4.855050e+02;
+   mb:mb, at=4.937600e+02;
+   mb:mb, at=5.094200e+02;
+   mb:mb, at=5.250800e+02;
+   bph:bph, at=5.336000e+02;
+end:marker, at=5.346000e+02;
+endsequence;
+
+// forces and other constants
+
+l.bpm:=.3;
+bang:=.509998807401e-2;
+kqf:=.872651312e-2;
+kqd:=-.872777242e-2;
+ksf:=.0198492943;
+ksd:=-.039621283;
+acbv1:=1.e-4;
+acbh1:=1.e-4;
+!save,sequence=fivecell,file,mad8;
+
+s := table(twiss,bpv[5],betx);
+myvar := sqrt(beam->ex*table(twiss,betx));
+use, period=fivecell;
+select,flag=twiss,column=name,s,myvar,apertype;
+twiss,file;
+n = 0;
+create,table=mytab,column=dp,mq1,mq2;
+mq1:=table(summ,q1);
+mq2:=table(summ,q2);
+while ( n < 11)
+{
+  n = n + 1;
+  dp = 1.e-4*(n-6);
+  twiss,deltap=dp;
+  fill,table=mytab;
+}
+write,table=mytab;
+plot,haxis=s,vaxis=aper_1,aper_2,colour=100,range=#s/cbv.1,notitle;
+stop;
+\end{verbatim}
+prints the following user table on output:
+
+\begin{verbatim}
+@ NAME             %05s "MYTAB"
+@ TYPE             %04s "USER"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "MAD-X 1.09 Linux"
+@ DATE             %08s "10/12/02"
+@ TIME             %08s "10.45.25"
+* DP                 MQ1                MQ2                
+$ %le                %le                %le                
+ -0.0005            1.242535951        1.270211135       
+ -0.0004            1.242495534        1.270197018       
+ -0.0003            1.242452432        1.270185673       
+ -0.0002            1.242406653        1.270177093       
+ -0.0001            1.242358206        1.270171269       
+ 0                  1.242307102        1.27016819        
+ 0.0001             1.242253353        1.270167843       
+ 0.0002             1.242196974        1.270170214       
+ 0.0003             1.24213798         1.270175288       
+ 0.0004             1.242076387        1.270183048       
+ 0.0005             1.242012214        1.270193477       
+\end{verbatim}
+and produces a twiss file with the additional column myvar, as well as a plot
+file with the aperture values plotted.
+
+
+\href{screate}{}
+
+Example of joining two tables with different length into a third table
+making use of the length of either table as given by
+table("your\_table\_name", tablelength) and adding names by the "\_name"
+attribute.
+
+\begin{verbatim}
+title,   "summing of offset and alignment tables";
+set,    format="13.6f";
+
+readtable, table=align,  file="align.ip2.b1.tfs";   // mesured alignment
+readtable, table=offset, file="offset.ip2.b1.tfs";  // nominal offsets
+
+n_elem  =  table(offset, tablelength);
+
+create,  table=align_offset, column=_name,s_ip,x_off,dx_off,ddx_off,y_off,dy_off,ddy_off;
+
+calcul(elem_name) : macro = {
+    x_off = table(align,  elem_name, x_ali) + x_off;
+    y_off = table(align,  elem_name, y_ali) + y_off;
+}
+
+
+one_elem(j_elem) : macro = {
+    setvars, table=offset, row=j_elem;
+    exec,  calcul(tabstring(offset, name, j_elem));
+    fill,  table=align_offset;
+}
+
+
+i_elem = 0;
+while (i_elem < n_elem) { i_elem = i_elem + 1; exec,  one_elem($i_elem); }
+
+write, table=align_offset, file="align_offset.tfs";
+
+stop;
+\end{verbatim}
 
 
 
-%%% The rest has been relocated in other parts of the manual...
+%\input{Introduction/beam}
+\section{BEAM: Set Beam Parameters}
+\label{sec:beam}
+Many commands in MAD-X require the setting of various quantities related
+to the beam in the machine. Therefore, MAD-X will stop with a fatal
+error if an attempt is made to expand (USE) a sequence for which no BEAM
+command has been issued before.  
 
-%% \subsection{PLOT}
-%% \begin{itemize}
-%% 	\item \href{../plot/plot.html}{PLOT}
-%% 	\item \href{../plot/plot.html#resplot}{RESPLOT}
-%% 	\item \href{../plot/plot.html#setplot}{SETPLOT}
-%% \end{itemize}
+The quantities are entered by a BEAM command: 
+\begin{verbatim}
+BEAM, PARTICLE=name, MASS=real, CHARGE=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real,
+      EX=real, EXN=real, EY=real, EYN=real,
+      ET=real, SIGT=real, SIGE=real,
+      KBUNCH=integer, NPART=real, BCURRENT=real,
+      BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
+\end{verbatim} 
+
+The attributes of the BEAM command are: 
+\begin{madlist}
+  \ttitem{PARTICLE} The name of particles in the beam. Default= {\tt POSITRON}\\
+  MAD knows the restmass and the charge for the following particles:
+  \begin{madlist}
+    \ttitem{POSITRON} The particles are positrons (MASS=$m_e$, CHARGE=1)
+    \ttitem{ELECTRON} The particles are electrons (MASS=$m_e$, CHARGE=-1) 
+    \ttitem{PROTON} The particles are protons (MASS=$m_p$, CHARGE=1)
+    \ttitem{ANTIPROTON} The particles are anti-protons (MASS=$m_p$, CHARGE=-1) 
+    \ttitem{POSMUON} The particles are positive muons (MASS=$m_{\mu}$, CHARGE=1) 
+    \ttitem{NEGMUON} The particles are negative muons (MASS=$m_{\mu}$, CHARGE=-1) 
+  \end{madlist}
+  \ttitem{MASS} the restmass of the particles in the beam in GeV. \\
+  (Default=$m_e \approx 0.511 10^{-3}$ GeV).
+  \ttitem{CHARGE}\label{beam_charge} the electrical charge of the
+  particles in the beam [$q_p$]. (Default=1)
+\end{madlist} 
+The order of precedence for arguments is:  {\tt particle->(mass+charge)}\\ 
+If the particle name given is recognized in the list above, the restmass
+and charge are set by MAD-X, and the MASS and CHARGE arguments are
+simply ignored. For other particles, and in particular for ions, any
+combination of name, mass and charge can be entered independently.
+\\
+
+\begin{madlist}
+  \ttitem{ENERGY} \label{beam_energy} Total energy per particle in
+  GeV.\\ If given, it must be greater than the particle
+  restmass. (Default=1 GeV)
+  \ttitem{PC} Momentum per particle in GeV/c. \\
+  If given, it must be greater than zero. 
+  \ttitem{GAMMA} Relativistic factor, {\sl ie} ratio between total
+  energy and rest energy of the particles: GAMMA = ENERGY/MASS = $E / m_0 c^2$. \\
+  GAMMA must be greater than one.\\ 
+  \ttitem{BETA} Ratio between the speed of the particle
+  and the speed of light: ${\tt BETA} = v / c$.\\
+  BETA must be strictly less than one.
+\end{madlist}  
+The order of precedence for arguments is: {\tt energy->pc->gamma->beta}
+
+Note that if the restmass is changed after the energy has been set, ie
+in separate BEAM commands, the energy is left unchanged and the momentum
+PC and relativistic factor GAMMA are recalculated. 
+\\
+
+\begin{madlist}
+  \ttitem{EX} The horizontal emittance $\epsilon_x$ (default: 1 m). 
+  \ttitem{EY} The vertical emittance $\epsilon_y$ (default: 1 m). 
+  \ttitem{ET} The longitudinal emittance $\epsilon_t$ (default: 1 m). 
+  \ttitem{EXN} The normalised horizontal emittance [m]:
+  $\epsilon_{xn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_x$ \\ 
+  (ignored if EX is given).  
+  \ttitem{EYN} The normalised vertical emittance [m]:
+  $\epsilon_{yn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_y$ \\ 
+  (ignored if EY is given).  
+  \ttitem{SIGT} The bunch length $c\ \sigma_t$ in [m].  
+  \ttitem{SIGE} The \emph{relative} energy spread
+  $\sigma_E / E$ in [1].  
+\end{madlist} 
+
+The order of precedence for arguments is: {\tt ex->exn}, {\tt ey->eyn} and
+{\tt et->sigt->sige}.
+
+%% 2013-Jul-11  11:19:29  ghislain:  DOC
+%% the factor 4 in the normalised
+%% emittance formula is historical. It might be time we move to the
+%% standard definition of exn = beta gamma ex. It could be that we have
+%% to leave the current definition in MAD-X but move to the new one for
+%% the next MAD...
+
+Certain commands compute the synchrotron tune $Q_s$ taking into account
+the settings of RF cavities. 
+If $Q_s$ is non-zero, the relative energy spread and 
+the bunch length are calculated with
+\begin{align*}
+\sigma_E / p_0 c  &=  \sqrt{\epsilon_t\ \frac{2 \pi Q_s}{\eta\ C}} \\
+  c\ \sigma_t &= \sqrt{\epsilon_t\ \frac{\eta\ C}{2 \pi Q_s}}
+\end{align*}
+where $C$ is the machine circumference, and 
+$\eta = 1/\gamma^2 - 1/\gamma_t^2$.  
+\\
+
+\begin{madlist}
+  \ttitem{KBUNCH} The number of particle bunches in the
+  machine (default: 1).  
+  \ttitem{NPART} \label{beam_npart} The number of particles per bunch (default: 0). 
+  \ttitem{BCURRENT} The bunch current (default: 0 A). 
+  \ttitem{BUNCHED} A logical flag. If set, the beam is
+  treated as bunched whenever this makes sense.  
+  \ttitem{RADIATE} \label{beam_radiate} A logical flag. If set, synchrotron
+  radiation is considered in all dipole magnets.  
+  \ttitem{BV} an integer specifying the direction of the
+  particle movement in a beam line; either +1 (default), or -1. For a
+  detailed explanation see the section below on bv flag.  
+  \ttitem{SEQUENCE} attaches the beam command to a named sequence; if
+  the name is omitted, the BEAM command refers to the default beam
+  which is always present. Sequences without attached beam use this
+  default beam. When updating a beam with a corresponding sequence name,
+  tye sequence name must always be mentioned.    
+\end{madlist} 
+
+{\bf \underline{Order and Precedence:}}\\
+Internally the BEAM command processes the parameters in the following
+order and with the following precedence (left to right): 
+\begin{verbatim}
+    particle->(mass+charge)
+    energy->pc->gamma->beta
+    ex->exn
+    ey->eyn
+    current->npart
+    et->sigt->sige
+\end{verbatim} 
 
 
-%% \subsection{\href{seqedit.html}{Sequence editing}}
-%% \begin{itemize}
-%% 	\item \href{seqedit.html#seqedit}{SEQEDIT}
-%% 	\item \href{seqedit.html#flatten}{FLATTEN}
-%% 	\item \href{seqedit.html#install}{INSTALL}
-%% 	\item \href{seqedit.html#move}{MOVE}
-%% 	\item \href{seqedit.html#remove}{REMOVE}
-%% 	\item \href{seqedit.html#cycle}{CYCLE}
-%% 	\item \href{seqedit.html#reflect}{REFLECT}
-%% 	\item \href{seqedit.html#endedit}{ENDEDIT}
-%% \end{itemize}
+{\bf Warning:} BEAM updates, i.e. it replaces attributes explicitely
+mentioned, may calculate other attributes according to the precedence rules
+given, but does NOT return attributes not specified to default values! 
+In order to reset to reset BEAM attributes to their default values, use
+the {\tt RESBEAM} command.
 
-%% \href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
 
+{\bf \underline{Additional variables:}}\\ 
+Some MAD-X modules may also compute and store data into a beam data 
+block. These attributes may NOT be set directly through the BEAM
+command. The corresponding variables are:  
+\begin{madlist}
+  \ttitem{CIRC} total length or circumference of the machine [m]
+  \ttitem{FREQ0} revolution frequency [Hz]
+  \ttitem{DTBYDS} ???
+  \ttitem{DELTAP} momentumn deviation
+  \ttitem{ALFA} momentum compaction factor
+  \ttitem{U0} radiation loss per turn [GeV]
+  \ttitem{QS} synchrotron tune [1]
+  \ttitem{ARAD} classical particle radius [m]
+  \ttitem{PDAMP} damping partition numbers; Default is {1,1,2}
+  \ttitem{N1MIN} minimum available aperture, set by the APERTURE module
+\end{madlist}
+
+
+{\bf \underline{Referring to BEAM data attributes:}}\\ 
+Expressions may refer to data in this beam data block using the
+notation  
+\begin{verbatim}
+BEAM->attribute-name
+\end{verbatim} 
+or 
+\begin{verbatim}
+BEAM%sequence-name->attribute-name.
+\end{verbatim} 
+
+This notation refers to the value of attribute-name found in the default
+BEAM, respectively the beam belonging to the sequence sequence-name. 
+This can be used for receiving or using values, e.g. 
+\begin{verbatim}
+value, beam%lhcb2->bv;
+\end{verbatim} 
+but also for storing values in the beam bank, e.g.  
+\begin{verbatim}
+beam->charge=-1;
+\end{verbatim} 
+Note however that this does NOT trigger an update of dependent variables
+and you are strongly advised against setting BEAM parameters with this method.
+
+The current values in the BEAM bank can be obtained by the command
+\begin{verbatim}
+show,beam;
+\end{verbatim}
+or to obtain the data for a beam linked to a named sequence:
+\begin{verbatim}
+show,beam%sequence-name;
+\end{verbatim}
+
+{\bf \underline{Examples:}}\\ 
+\begin{verbatim}
+! select electrons, set energy and emittances
+BEAM, PARTICLE = ELECTRON, ENERGY = 50, EX = 1.E-6, EY = 1.E-8, SIGE = 1.E-3;
+ ...
+
+! turn on synchrotron radiation
+BEAM, RADIATE;
+ ...
+
+! reset all values to their defaults, 
+! ie positrons, energy = 1GeV, default emittances, no radiation...
+RESBEAM;
+ ...
+
+! select new emittances
+BEAM, EX = 2.E-5, EY = 3.E-7, SIGE = 4.E-3;
+\end{verbatim} 
+
+
+%\input{Introduction/resbeam}
+\section{RESBEAM: reset beam defaults}
+\label{sec:resbeam}
+
+The RESBEAM command resets all beam data to their default values. 
+
+\begin{verbatim}
+RESBEAM, SEQUENCE=name;
+\end{verbatim} 
+
+The only argument to RESBEAM is the sequence name.
+If the sequence name is omitted, the default beam is reset. 
+
+\begin{verbatim}
+Default BEAM Data:
+PARTICLE        POSITRON
+ENERGY          1 GeV
+EX              1 rad m
+EY              1 rad m
+ET              1 rad m
+KBUNCH          1
+NPART           0
+BCURRENT        0 A
+BUNCHED         .TRUE.
+RADIATE         .FALSE.
+\end{verbatim}
+
+
+
+%\input{Introduction/bv_flag}
+\section{BV FLAG}
+When reversing the direction ($\vec V$) of a particle in a magnetic field
+($\vec B$) while keeping its charge constant, the resulting force $\vec
+V \times \vec B$ changes sign. This is equivalent to flipping the field,
+but not the direction.  
+
+For practical reasons the properties of all elements of the LHC are
+defined in the {\tt MAD-X} input as if they apply to a clockwise proton beam
+("LHC beam 1"). This allows a single definition for elements traversed
+by both beams. Their effects on a beam with identical particle charge
+but running in the opposite direction ("LHC beam 2") must then be
+reversed inside the program.  
+
+In {\tt MAD-X} this may be taken into account by setting the value of
+the BV attribute in the {\tt BEAM} commands. In the case of LHC beam 1
+(clockwise) and beam 2 (counter-clockwise), treated in {\tt MAD-X} both
+as clockwise proton beams, the Beam commands must look as follows:  
+
+\begin{verbatim}
+beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;
+
+beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;
+\end{verbatim}
+
+%% EOF
 
 

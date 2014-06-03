@@ -1,0 +1,903 @@
+\documentclass{cern-art} % Specifies the document style.
+%
+\usepackage{hyperref}
+\usepackage{xspace}
+
+\usepackage{vmargin,times,graphicx,amsmath,amssymb,color} % ,draftcopy use draftcopy for experiments
+\usepackage{verbatim} % to allow for verbatim and comment
+\usepackage{here}
+\usepackage{wrapfig}
+\usepackage{fancyref}
+\usepackage{listings}
+
+\usepackage{color}
+\definecolor{grey}{rgb}{0.4,0.4,0.4}
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+\definecolor{comment}{rgb}{0.1,0.50,0.56}
+\definecolor{strings}{rgb}{0.25,0.44,0.63}
+
+% programming language
+\lstset{ basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Line numbers..
+         numberstyle=\color{grey}\tiny,          % Numbers style..
+         %stepnumber=2,               % Distance between line numbers
+         %numbersep=5pt,              % Distance from line number to text
+         tabsize=2,                  % Tabs size
+         extendedchars=true,         %
+         breaklines=true,            % Break long lines
+         keywordstyle=\color{darkgreen}\bfseries,
+         stringstyle=\color{strings}\ttfamily, % String color
+         commentstyle=\it\color{comment}\ttfamily,
+%          showspaces=false,           % Show spaces
+%          showtabs=false,             % Show tabs
+         xleftmargin=0pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         showstringspaces=false
+}
+
+\everymath{\displaystyle}
+
+\lstset{language=Fortran}
+\lstset{keywordstyle=\color{blue}\bfseries}
+\lstset{numbers=left,stepnumber=2}
+\lstset{commentstyle=\color{red}\bfseries}
+
+\setmarginsrb{15mm}{8mm}{15mm}{10mm}{12pt}{10mm}{0pt}{10mm}
+
+% shortcut
+\renewcommand{\L}[1]{\lstinline[firstnumber=last]{#1}}
+\newcommand{\T}[1]{{\tt #1}}
+\newcommand{\madx}{\mbox{MAD-X}\xspace}
+\newcommand{\madeight}{\mbox{MAD8}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\PSLogo{fig/cern-logo.pdf}
+\DocReference{CERN-ACC-NOTE-2014-XXXX}
+
+\Date{April 2014}
+% \RevisionDate{April 15, 2014}
+
+\Author{L. Deniau and A. Latina}
+\Institute{CERN -- BE/ABP}
+\Email{\{laurent.deniau, andrea.latina\}@cern.ch}
+
+\Title{MAD-X Technical Notes on Twiss Module\\[2mm]
+\Large Part 1, Magnets and Patches}
+
+\Keywords{\madx, beam dynamics, thick tracking, optical functions.}
+%\Distribution{ABP group}
+
+\Maketitle
+
+\Summary{%
+	This technical note describes in details the transport maps used by the Twiss module of \madx, including the commented code. It also proposes some alternatives formulations for potential future implementations.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\section{Motivation}
+
+The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bending Magnets}
+
+\madx does not support the so called ``true \T{RBEND}'' element. This kind of magnet is internally represented as a sector bend (i.e. \T{SBEND}) with the pole faces made parallel by setting the pole face angles to $\T{e1}=\T{e2}=\alpha/2$, where $\alpha$ is the \T{SBEND} angle.
+
+
+\subsection{The routine \L{tmbend}}
+\subsubsection{Preamble}
+Declarations and preamble:
+\begin{lstlisting}[firstnumber=auto]
+SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
+  use twtrrfi
+  use twisslfi
+  use twiss_elpfi
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for sector bending magnets                         *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     el        (double)  element length.                              *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical ftrk,cplxy,dorad
+  integer nd,n_ferr,code,elpar_vl
+  double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),           &
+       te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
+       el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
+       st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,bvk,el0,orbit0(6)         &
+       orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  integer         , external :: el_par_vector, node_fd_errors ! function from C
+  double precision, external :: node_value, get_value         ! function from C
+\end{lstlisting}
+{\em [The following piece of code has been moved up and rewritten for clarity]}. If the element has zero length it simply returns from the routine (TBC physically correct? What about wedges and fringe fields?).
+\begin{lstlisting}[firstnumber=last]
+  !---- Test for non-zero length.
+  if (el.eq.0) then return
+\end{lstlisting}
+The following statements initializes the matrix \L{rw} to the identity, and the tensor \L{tw} and the vector \L{ek0} to zero.
+\begin{lstlisting}[firstnumber=last]
+  !---- Initialize.
+  ct=0
+  st=0
+  deltap=0                                     ! useless (see next paragraph)
+  call dzero(ek0,6)
+  call m66one(rw)
+  call dzero(tw,216)
+  call dzero(f_errors,maxferr+1)
+\end{lstlisting}
+The next code reads the probe and the magnet parameters from the \L{twiss} command and some dynamic variables. It also converts the elements \L{tkicker} (code 39) to \L{kicker} (code 15), and \L{placeholder} (code 38) to \L{instrument} (code 24) and computes the local curvature $h=1/\rho=\alpha/l$.
+\begin{lstlisting}[firstnumber=last]
+  deltap   = get_value('probe ','deltap ')  ! parameters from current beam
+  gamma    = get_value('probe ','gamma ')
+  arad     = get_value('probe ','arad ')    ! undocumented (internal?)
+  dorad    = get_value('probe ','radiate ') .ne. 0
+  
+  bvk      = node_value('other_bv ')        ! forward / backward flag
+  code     = node_value('mad8_type ')       ! mad8 element's code
+  if(code.eq.39) code=15                    ! tkicker to kicker
+  if(code.eq.38) code=24                    ! placeholder to instrument
+
+  elpar_vl = el_par_vector(b_k3s, g_elpar)  ! get strengths up to k3s
+  an       = bvk * g_elpar(b_angle)         ! sbend angle (time bv flag)
+  sk1      = g_elpar(b_k1)                  ! quadrupole term
+  sks      = g_elpar(b_k1s)                 ! skew quadrupole term
+  sk2      = g_elpar(b_k2)                  ! sextupole term
+                                            !  (k2s, k3, k3s are ignored, see dict)
+  n_ferr   = node_fd_errors(f_errors)       ! get multipole field errors
+  tilt     = g_elpar(b_tilt)                ! sbend tilt (clockwise)
+  e1       = g_elpar(b_e1)                  ! sbend entrance/exit pole face angle
+  e2       = g_elpar(b_e2)                  !  (introduce quadrupole terms)
+  h1       = g_elpar(b_h1)                  ! entrance/exit pole face curvature
+  h2       = g_elpar(b_h2)                  !  (introduce sextupole terms)
+  fint     = g_elpar(b_fint)                ! field integral of fringe fields
+  fintx    = g_elpar(b_fintx)               ! asymmetric FINT at exit (if diff)
+  hgap     = g_elpar(b_hgap)                ! half of the gap between poles
+
+  h = an / el                               ! local curvature (angle/length)
+\end{lstlisting}
+The following lines are adjusting the pole faces of a "false" \L{rbend} into a true \L{sbend} with parallel pole faces {\em [Note: $e_1$ and $e_2$ have opposite direction, see \L{sbend} reference frame in the users' guide]}:
+\begin{lstlisting}[firstnumber=last]
+  if(code.eq.2) then
+    e1 = e1 + an / 2
+    e2 = e2 + an / 2
+  endif
+\end{lstlisting}
+{\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
+\begin{lstlisting}[firstnumber=last]
+  !---- Apply field errors and change coefficients using DELTAP.
+  if (n_ferr .gt. 0) then
+    nd = n_ferr
+    call dzero(field,nd)
+    call dcopy(f_errors,field,n_ferr)
+    dh = (- h * deltap + bvk * field(1,0) / el) / (1 + deltap)
+    sk1 = (sk1 + field(1,1) / el) / (1 + deltap)
+    sk2 = (sk2 + field(1,2) / el) / (1 + deltap)
+    sks = (sks + field(2,1) / el) / (1 + deltap)
+  else
+    dh = - h * deltap / (1 + deltap)
+    sk1 = sk1 / (1 + deltap)
+    sk2 = sk2 / (1 + deltap)
+    sks = sks / (1 + deltap)
+  endif
+\end{lstlisting}
+Applies \L{bvk}-flag to field components:
+\begin{lstlisting}[firstnumber=last]
+  sk1 = bvk * sk1
+  sks = bvk * sks
+  sk2 = bvk * sk2
+\end{lstlisting}
+  if the flags \L{(ftrk .and. dorad)} are set, then it applies half radiation at the entrance. Also, it applies the tilt rotation.
+\begin{lstlisting}[firstnumber=last]
+  !---- Half radiation effects at entrance.
+  if (ftrk .and. dorad) then
+    ct = cos(tilt)
+    st = sin(tilt)
+    x =   orbit(1) * ct + orbit(3) * st
+    y = - orbit(1) * st + orbit(3) * ct
+    hx = h + dh + sk1*(x - h*y**2/2) + sks*y + sk2*(x**2 - y**2)/2
+    hy = sks * x - sk1*y - sk2*x*y
+    rfac = (arad * gamma**3 * el / 3)          &
+         * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e1)*x)
+    pt = orbit(6)
+    orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
+    orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
+    orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
+  endif
+\end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Option ``centre''}
+If \L{centre} option
+   \begin{lstlisting}[firstnumber=last]
+     !---- Body of the dipole.
+     !---- centre option
+     if(centre_cptk.or.centre_bttk) then
+        call dcopy(orbit,orbit00,6)
+        call dcopy(ek,ek00,6)
+        call dcopy(re,re00,36)
+        call dcopy(te,te00,216)
+  \end{lstlisting}
+It halves the length of the element.
+   \begin{lstlisting}[firstnumber=last]
+        el0=el/2
+\end{lstlisting}
+It stores the element's \textit{kick}, \textit{transfer matrix}, and \textit{tensor} for such a halved sector bend in \L{ek,re,te}:
+\begin{lstlisting}[firstnumber=last]
+        call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
+\end{lstlisting}
+It stores the $R$ and $T$ for the fringing field in \L{rw} and \L{tw} respectively; then it concatenates the transport maps in such that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \L{ek},  \L{re}, and \L{te}:
+\begin{lstlisting}[firstnumber=last]
+        !---- Fringe fields.
+        corr = (h + h) * hgap * fint
+        call tmfrng(.true.,h,sk1,e1,h1,1,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+\end{lstlisting}
+It rotates the map:
+\begin{lstlisting}[firstnumber=last]
+        !---- Apply tilt.
+        if (tilt .ne. 0) then
+           call tmtilt(.true.,tilt,ek,re,te)
+           cplxy = .true.
+        endif
+\end{lstlisting}
+If the flag \L{ftrk} is set, tracks the orbit through such a halved bend then zeroes \L{ek},  \L{re}, and \L{te}:
+\begin{lstlisting}[firstnumber=last]
+        !---- Track orbit.
+        call dcopy(orbit,orbit0,6)
+        if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
+        if(centre_cptk) call twcptk(re,orbit0)
+        if(centre_bttk) call twbttk(re,te)
+        call dcopy(orbit00,orbit,6)
+        call dcopy(ek00,ek,6)
+        call dcopy(re00,re,36)
+        call dcopy(te00,te,216)
+     endif
+     !---- End
+  \end{lstlisting}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Body of the dipole}
+  It fills  \L{ek},  \L{re}, and \L{te} with kick, matrix and tensor for the sector bend. Then fills  \L{rw}, and \L{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields. Notice that if the option ``centre'' is selected, the initial fringing field has  already been applied, thing which not seems to be correct.  
+   \begin{lstlisting}[firstnumber=last]
+     call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
+
+     !---- Fringe fields.
+     corr = (h + h) * hgap * fint
+     call tmfrng(.true.,h,sk1,e1,h1,1,corr,rw,tw)
+     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+     !---- Tor: use FINTX if set
+     if (fintx .ge. 0) then
+        corr = (h + h) * hgap * fintx
+     else
+        corr = (h + h) * hgap * fint
+     endif
+     call tmfrng(.true.,h,sk1,e2,h2,-1,corr,rw,tw)
+     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+\end{lstlisting}
+It rotates the map:
+\begin{lstlisting}[firstnumber=last]
+     !---- Apply tilt.
+     if (tilt .ne. 0) then
+        call tmtilt(.true.,tilt,ek,re,te)
+        cplxy = .true.
+     endif
+\end{lstlisting}
+Tracks the orbit:
+\begin{lstlisting}[firstnumber=last]
+     !---- Track orbit.
+     if (ftrk) then
+        call tmtrak(ek,re,te,orbit,orbit)
+\end{lstlisting}
+Radiation effects at the exit:
+\begin{lstlisting}[firstnumber=last]
+        !---- Half radiation effects at exit.
+        if (ftrk .and. dorad) then
+           x =   orbit(1) * ct + orbit(3) * st
+           y = - orbit(1) * st + orbit(3) * ct
+           hx = h + dh + sk1*(x - h*y**2/2) + sks*y +                &
+                sk2*(x**2 - y**2)/2
+           hy = sks * x - sk1*y - sk2*x*y
+           rfac = (arad * gamma**3 * el / 3)                       &
+                * (hx**2 + hy**2) * (1 + h*x) * (1 - tan(e2)*x)
+           pt = orbit(6)
+           orbit(2) = orbit(2) - rfac * (1 + pt) * orbit(2)
+           orbit(4) = orbit(4) - rfac * (1 + pt) * orbit(4)
+           orbit(6) = orbit(6) - rfac * (1 + pt) ** 2
+        endif
+     endif
+  endif ! if (fmap)
+
+  !---- Tor: set parameters for sychrotron integral calculations
+  ! LD: useless code?
+  rhoinv = h
+  blen = el
+
+end SUBROUTINE tmbend
+\end{lstlisting}
+
+\subsection{The routine {tmsect}}
+\L{tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)} fills \L{ek,re,te} with kick, matrix and tensor for this sector bend.
+Given:
+\[
+\begin{aligned}
+h & =\frac{1}{\rho}\quad\text{inverse of the bending radius }\mathrm{[1/m]},\\
+k_{1} & =\quad\text{quadupole strength }\mathrm{[1/m^{2}]},\\
+k_{2} & =\quad\text{sextupole strength }\mathrm{[1/m^{3}]}.\\
+\end{aligned}
+\]
+The following quantities are defined:
+\[
+\begin{aligned}
+k_{x}^2 & ={h^{2}+k_{1}},\\
+k_{y}^2 & =-k_{1},\\
+k_{x} & =\sqrt{h^{2}+k_{1}},\\
+k_{y} & =\sqrt{-k_{1}},
+\end{aligned}
+\]
+\[
+\begin{aligned}C_{x} & =\cos(k_{x}L), & \quad & S_{x} & =\frac{\sin(k_{x}L)}{k_{x}},\\
+C_{y} & =\cos(k_{y}L), & \quad & S_{y} & =\frac{\sin(k_{y}L)}{k_{y}}.
+\end{aligned}
+\]
+The following constants are also defined:
+\[
+\begin{aligned}d_{x} & =\frac{1-C_{x}}{k_{x}^{2}}\\
+f_{x} & =\frac{L-S_{x}}{k_{x}^{2}}\\
+g_{x} & =\frac{3\, L-S_{x}\left(4-C_{x}\right)}{2\, k_{x}^{4}}\\
+h_{x} & =\frac{15\, L-S_{x}\left(22-9\, C_{x}+2\, C_{x}^{2}\right)}{6\, k_{x}^{6}}
+\end{aligned}
+\]
+Then, the kick:
+\[
+K=\left(\begin{array}{cccccc}
+-\Delta h\cdot d_{x}, & -\Delta h\cdot S_{x}, & 0, & 0, &  h{\cdot}{\Delta h}{\cdot}{f_x}{\cdot} {\frac 1 \beta} + L{\cdot}\texttt{dtbyds}, & 0\end{array}\right)^{T}
+\]
+\\where $\Delta h$ is the dipole field error. The nonzero elements of the response matrix $R$ are:
+\[
+\begin{array}{rl}
+  R_{11} &= {C_x}\\
+  R_{12} &= {S_x}\\
+  R_{16} &= h {\cdot} {d_x} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{21} &= - {k_{x}^{2}} {\cdot} {S_x}\\
+  R_{22} &= {C_x}\\
+  R_{26} &= h {\cdot} {S_x} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{33} &= {C_y}\\
+  R_{34} &= {S_y}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{43} &= - {k_{y}^{2}} {\cdot} {S_y}\\
+  R_{44} &= {C_y}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+  R_{52} &= - R_{16}\\
+  R_{51} &= - R_{26}\\
+  R_{55} & = R_{66} = 1\\
+  R_{56} &= L{\cdot} \frac 1 {{(\beta\gamma)}^2} - h^2 {f_x}{\cdot} {\frac 1{\beta^2}}\\
+\end{array}
+\]
+Defining:
+\[
+\begin{array}{rl}
+    \texttt{xs6} &= \frac{\left({k_2} + 2 h{\cdot}{k_1}\right)}{6}\\
+     \texttt{ys2} &= \frac{ \left({k_2} +     h{\cdot}{k_1}\right)}{2},\\
+\end{array}
+\]
+and
+\[
+\begin{array}{rl}
+     t_{116} &= \texttt{xs6} {\cdot} \left(3{\cdot}{S_x}{\cdot}{f_x} - {d_x}^2\right) - h {\cdot} {S_x}^2\\
+     t_{126} &= \texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x}^2 - 2 {C_x}{\cdot}{g_x}\right) - h {\cdot} {S_x} {\cdot} {d_x}\\
+     t_{166} &= \texttt{xs6} {\cdot} \left({d_x}^3 - 2 {S_x}{\cdot}{g_x}\right) - \frac{h}{2} {\cdot} {d_x}^2\\
+     t_{216} &= \texttt{xs6} {\cdot} \left(3{\cdot}{C_x}{\cdot}{f_x} + {S_x}{\cdot}{d_x}\right)\\
+     t_{226} &= \texttt{xs6} {\cdot} \left(3{\cdot}{S_x}{\cdot}{f_x} + {d_x}^2\right)\\
+     t_{266} &= \texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x}^2 - 2 {C_x}{\cdot}{g_x}\right)\\
+     t_{516} &= h {\cdot} \texttt{xs6} {\cdot} \left(3{\cdot}{d_x}{\cdot}{f_x} - 4{\cdot}{g_x}\right) + {\frac{k_1}{2}} {\cdot} \left({f_x} + {S_x}{\cdot}{d_x}\right)\\
+     t_{526} &= h {\cdot} \texttt{xs6} {\cdot} \left({d_x}^3 - 2 {S_x}{\cdot}{g_x}\right) + {\frac{k_1}{2}} {\cdot} {d_x}^2\\
+     t_{566} &= h {\cdot} \texttt{xs6} {\cdot} \left(3{\cdot}{h_x} - 2 {d_x}{\cdot}{g_x}\right) +  {\frac{k_1}{2}} {\cdot} {g_x} - {f_x}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     t_1 &= {\frac{k_1}{2}} {\cdot} \left({d_x}^2 - {S_x}{\cdot}{f_x}\right) - {d_x}\\
+     t_2 &= {\frac{k_1}{2}} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right)\\
+     t_5 &= {f_x} - {k_1} {\cdot} \left({g_x} - {f_x}{\cdot}{d_x} / 2\right),\\
+\end{array}
+\]
+the nonzero elements of the tensor $T$ are:
+\[
+\begin{array}{rl}
+     T_{111} &= - \texttt{xs6} {\cdot} \left({S_x}^2 + {d_x}\right) - \frac{h}{2}{\cdot}{k_{x}^{2}}{\cdot}{S_x}^2\\
+     T_{112} &= \left(- \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}{\cdot}{C_x}\right) {\cdot} {S_x}\\
+     T_{122} &= \left(- \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}{\cdot}{C_x}\right) {\cdot} {d_x}\\
+     T_{116} &= \left(- \frac{h}{2}t_{116} + {\frac{k_1}{4}}{\cdot}L{\cdot}{S_x}\right) {\cdot} {\frac 1 \beta}\\
+     T_{126} &= \left(- \frac{h}{2}t_{126} + {\frac{k_1}{4}} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right) - \frac{S_x}{2}\right) {\cdot} {\frac 1 \beta}\\
+     T_{166} &= \left(- h^2  t_{166} + ht_1\right) {\cdot} {\frac 1{\beta^2}} - \frac{h}{2} {\cdot} {d_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     T_{211} &= - \texttt{xs6} {\cdot} \left(1 + 2 {C_x}\right) {\cdot} {S_x}\\
+     T_{212} &= - \texttt{xs6} {\cdot} \left(1 + 2 {C_x}\right) {\cdot} {d_x}\\
+     T_{222} &= - \left(2 \texttt{xs6}{\cdot}{d_x} + \frac{h}{2}\right) {\cdot} {S_x}\\
+     T_{216} &= \left(- \frac{h}{2}t_{216} - {\frac{k_1}{4}} {\cdot} \left({S_x} - L{\cdot}{C_x}\right)\right) {\cdot} {\frac 1 \beta}\\
+     T_{226} &= \left(- \frac{h}{2}t_{226} + {\frac{k_1}{4}} {\cdot} L {\cdot} {S_x}\right) {\cdot} {\frac 1 \beta}\\
+     T_{266} &= \left(- h^2  t_{266} + ht_2\right) {\cdot} {\frac 1{\beta^2}} - \frac{h}{2} {\cdot} {S_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\\
+\end{array}
+\]
+\[
+\begin{array}{rl}
+     T_{511} &= \left(\frac{h}{2}{\cdot}\texttt{xs6} {\cdot} \left({S_x}{\cdot}{d_x} + 3{\cdot}{f_x}\right) -  {\frac{k_1}{4}} {\cdot} \left(L - {C_x}{\cdot}{S_x}\right)\right) {\cdot} {\frac 1 \beta}\\
+     T_{512} &= \left(\frac{h}{2}{\cdot}\texttt{xs6}{\cdot}{d_x}^2 + {\frac{k_1}{4}}{\cdot}{S_x}^2\right) {\cdot} {\frac 1 \beta}\\
+     T_{522} &= \left(h{\cdot}\texttt{xs6}{\cdot}{g_x} - {k_1} {\cdot} \left({f_x} - {S_x}{\cdot}{d_x}\right) / 4 - \frac{S_x}{2}\right) {\cdot} {\frac 1 \beta}\\
+     T_{516} &= \frac{h}{2} {\cdot} \left(\left(t_{516} - {k_1} {\cdot} \left(L{\cdot}{d_x} - {f_x}\right) / 2\right) {\cdot} {\frac 1{\beta^2}} + {S_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right)\\
+     T_{526} &= \frac{h}{2} {\cdot} \left(\left(t_{526} - {k_1} {\cdot} \left({d_x}^2 - {S_x}{\cdot}{f_x}\right) / 2\right) {\cdot} {\frac 1{\beta^2}} {\cdot} {d_x} {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right)\\
+     T_{566} &= \left(h^2 {\cdot} \left(t_{566} + t_5\right) {\cdot} {\frac 1{\beta^2}} + \frac{3}{2} {\cdot} \left(h^2 {f_x} - L\right) {\cdot} \frac 1 {{\left(\beta\gamma\right)}^2}\right) {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+Mixed terms:
+\begin{lstlisting}[firstnumber=last]
+     y2ksq = 4 {\cdot} {k_{y}^{2}}
+     call tmfoc(L,y2ksq,{C_y}y,{S_y}y,dyy,fyy)
+     y2klsq = y2ksq {\cdot} L^2
+     if ({k_{x}^{2}} .le. 0  .or.  {k_{y}^{2}} .le. 0) then
+        dd = {k_{x}^{2}} - y2ksq
+        zc = ({C_y}y - {C_x}) / dd
+        zs = ({S_y}y - {S_x}) / dd
+        zd = (dyy - {d_x}) / dd
+        zf = (fyy - {f_x}) / dd
+     else
+        sumsq = ({k_x}/2 + {k_y}) ^ 2
+        difsq = ({k_x}/2 - {k_y}) ^ 2
+        call tmfoc(L,sumsq,cp,sp,dp,fp)
+        call tmfoc(L,difsq,cm,sm,dm,fm)
+        zc = sp {\cdot} sm / 2
+        zs = (sp{\cdot}cm - cp{\cdot}sm) / (4{\cdot}{k_x}{\cdot}{k_y})
+        if ({k_{x}^{2}} .gt. y2ksq) then
+           zd = (dyy - zc) / {k_{x}^{2}}
+           zf = (fyy - zs) / {k_{x}^{2}}
+        else
+           zd = ({d_x} - zc) / y2ksq
+           zf = ({f_x} - zs) / y2ksq
+        endif
+     endif
+     \end{lstlisting}
+\[
+\begin{array}{rl}
+     t_{336} &= {k_2} {\cdot} \left({C_y}{\cdot}zd - 2 {k_1}{S_y}{\cdot}zf\right) + h {\cdot} {k_1} {\cdot} {f_x} {\cdot} {S_y}\\
+     t_{346} &= {k_2} {\cdot} \left({S_y}{\cdot}zd - 2 {C_y}{\cdot}zf\right) + h {\cdot} {f_x} {\cdot} {C_y}\\
+     t_{436} &= 2 {\cdot} \texttt{ys2} {\cdot} {f_x} {\cdot} {C_y} - {k_2} {\cdot} {k_1} {\cdot} \left({S_y}{\cdot}zd - 2 {C_y}{\cdot}zf\right)\\
+     t_{446} &= 2 {\cdot} \texttt{ys2} {\cdot} {f_x} {\cdot} {S_y} - {k_2} {\cdot} \left({C_y}{\cdot}zd - 2 {k_1}{S_y}{\cdot}zf\right)\\
+     T_{133} &= {k_2}{\cdot}{k_1}zd + \texttt{ys2}{\cdot}{d_x}\\
+     T_{134} &= {k_2}{\cdot}{\frac{\texttt{zs}}{2}}\\
+     T_{144} &= {k_2}{\cdot}zd - \frac{h}{2}{\cdot}{d_x}\\
+     T_{233} &= {k_2}{\cdot}{k_1}zs + \texttt{ys2}{\cdot}{S_x}\\
+     T_{234} &= {k_2}{\cdot}zc/2\\
+     T_{244} &= {k_2}{\cdot}zs - \frac{h}{2}{\cdot}{S_x}\\
+     T_{313} &= {k_2}{\cdot}\left({C_y}{\cdot} zc/2 - {k_1}{S_y}{\cdot} zs\right) + \frac{h}{2}{\cdot}{k_1}{S_x}{\cdot}{S_y}\\
+     T_{314} &= {k_2}{\cdot}\left({S_y}{\cdot} zc/2 - {C_y}{\cdot}zs\right) + \frac{h}{2}{\cdot}{S_x}{\cdot}{C_y}\\
+     T_{323} &= {k_2}{\cdot}\left({C_y}{\cdot} {\frac{\texttt{zs}}{2}} - {k_1}{S_y}{\cdot}zd\right) + \frac{h}{2}{\cdot}{k_1}{d_x}{\cdot}{S_y}\\
+     T_{324} &= {k_2}{\cdot}\left({S_y}{\cdot} {\frac{\texttt{zs}}{2}} - {C_y}{\cdot}zd\right) + \frac{h}{2}{\cdot}{d_x}{\cdot}{C_y}\\
+     T_{336} &= \left(\frac{h}{2}t_{336} - {k_1}L{\cdot}\frac{S_y}{4}\right) {\cdot} {\frac 1 \beta}\\
+     T_{346} &= \left(\frac{h}{2}t_{346} - \left({S_y} + L{\cdot}{C_y}\right) / 4\right) {\cdot} {\frac 1 \beta}\\
+     T_{413} &= {k_2}{\cdot}{k_1}\left({C_y}{\cdot} zs - {S_y}{\cdot} zc/2\right) + \texttt{ys2}{\cdot}{S_x}{\cdot}{C_y}\\
+     T_{414} &= {k_2}{\cdot}\left({k_1}{S_y}{\cdot} zs - {C_y}{\cdot} zc/2\right) + \texttt{ys2}{\cdot}{S_x}{\cdot}{S_y}\\
+     T_{423} &= {k_2}{\cdot}{k_1}\left({C_y}{\cdot} zd - {S_y}{\cdot} {\frac{\texttt{zs}}{2}}\right) + \texttt{ys2}{\cdot}{d_x}{\cdot}{C_y}\\
+     T_{424} &= {k_2}{\cdot}\left({k_1}{S_y}{\cdot} zd - {C_y}{\cdot} {\frac{\texttt{zs}}{2}}\right) + \texttt{ys2}{\cdot}{d_x}{\cdot}{S_y}\\
+     T_{436} &= \left(\frac{h}{2}t_{436} + {k_1} {\cdot} \left({S_y} - L{\cdot}{C_y}\right) / 4\right) {\cdot} {\frac 1 \beta}\\
+     T_{446} &= \left(\frac{h}{2}t_{446} - {k_1} L{\cdot}\frac{S_y}{4}\right) {\cdot} {\frac 1 \beta}\\
+     T_{533} &= \left(- h{\cdot} {k_2}{\cdot} {k_1}zf - h{\cdot} \texttt{ys2}{\cdot}{f_x} + {k_1}\left(L-{C_y}{\cdot}{S_y}\right)/4\right){\cdot} {\frac 1 \beta}\\
+     T_{534} &= \left(- h{\cdot} {k_2}{\cdot} zd/2 - {k_1}{S_y}^2/4\right) {\cdot} {\frac 1 \beta}\\
+     T_{544} &= \left(- h{\cdot} {k_2}{\cdot} zf + h{\cdot}\frac{h}{2}{\cdot}{f_x} - \left(L + {S_y}{\cdot}{C_y}\right)/4\right) {\cdot} {\frac 1 \beta}\\
+     \end{array}
+\]
+\begin{lstlisting}[firstnumber=last]
+call tmsymm(te)
+\end{lstlisting}
+Effect of dipole error is considered if $\Delta h \neq 0$, then
+\[\begin{array}{rl}
+        R_{11} &= R_{11} + {\Delta h} t_{116}\\
+        R_{12} &= R_{12} + {\Delta h} t_{126}\\
+        R_{16} &= R_{16} + {\Delta h} {\cdot} (2  ht_{166} - t_1) {\cdot} {\frac 1 \beta}\\
+        R_{21} &= R_{21} + {\Delta h} {\cdot} (t_{216} - h{\cdot}{S_x})\\
+        R_{22} &= R_{22} + {\Delta h} t_{226}\\
+        R_{26} &= R_{26} + {\Delta h} {\cdot} (2  ht_{266} - t_2) {\cdot} {\frac 1 \beta}\\
+        R_{51} &= R_{51} - {\Delta h} t_{516} {\cdot} {\frac 1 \beta}\\
+        R_{52} &= R_{52} - {\Delta h} {\cdot} (t_{526} - {d_x}) {\cdot} {\frac 1 \beta}\\
+        R_{56} &= R_{56} - {\Delta h} {\cdot} h {\cdot} ((2  t_{566} + t_5) {\cdot} {\frac 1{\beta^2}} + {f_x} {\cdot} \frac 1 {{(\beta\gamma)}^2})\\
+        R_{33} &= R_{33} - {\Delta h} t_{336}\\
+        R_{34} &= R_{34} - {\Delta h} t_{346}\\
+        R_{43} &= R_{43} - {\Delta h} t_{436}\\
+        R_{44} &= R_{44} - {\Delta h} t_{446}\\
+        K_1 &= K_1 - {\Delta h}^2 t_{166}\\
+        K_2 &= K_2 - {\Delta h}^2 t_{266}\\
+        K_5 &= K_5 + {\Delta h}^2 t_{566} {\cdot} {\frac 1 \beta}\\
+\end{array}
+\]
+
+
+
+
+
+
+
+
+\section{Lattice parameters tracking}
+\subsection{Coupled tracking}
+Following the MAD-8 physics guide (the implementation, and actually also the code, are exactly the same), we understand the initialisation of the tracking of the linear coupled parameters. Given one-turn transfer matrix,
+$$M=\left(\begin{array}{cc}
+A & B\\
+C & D
+\end{array}\right),$$
+$M$ is diagonalized via a ``sympletic rotation'' $$\mathcal{R}=\left(\begin{array}{cc}
+I\,\cos\phi & \bar{R}\,\sin\phi\\
+-R\,\sin\phi & I\,\cos\phi
+\end{array}\right)$$
+to
+$$\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}{cc}
+A^{\prime} & 0\\
+0 & D^{\prime}
+\end{array}\right)$$
+with
+$$R=\left(\begin{array}{cc}
+a & b\\
+c & d
+\end{array}\right),\qquad\left|R\right|=\left|\begin{array}{cc}
+a & b\\
+c & d
+\end{array}\right|=1,\qquad\bar{R}=\left(\begin{array}{cc}
+d & -b\\
+-c & a
+\end{array}\right)
+$$
+and
+$$\begin{aligned}A^{\prime} & =A-B\, R,\\
+D^{\prime} & =D+\bar{R}\, C.
+\end{aligned}$$
+Like in the code, $A^{\prime}$ and $D^{\prime}$ will simply be called $A$ and $D$. $R$ is defined as
+\begin{eqnarray*}
+\text{aux} & = & C+\bar{B}=\left(\begin{array}{cc}
+M_{31}+M_{24} & M_{32}-M_{14}\\
+M_{41}-M_{23} & M_{42}-M_{13}
+\end{array}\right)\\
+\text{dtr} & = & \frac{1}{2}\left(M_{11}+M_{22}-M_{33}-M_{44}\right)=\frac{1}{2}\left(\mathrm{Tr}\, A-\mathrm{Tr}\, D\right)\\
+R & = & \frac{\text{aux}}{\text{dtr}+\mathrm{sign}\left(\mathrm{det}\,\left(\text{aux}\right)\right)\sqrt{\mathrm{det}\,\left(\text{aux}\right)+\text{dtr}^{2}}}
+\end{eqnarray*}
+\begin{description}
+\item[twcpin] initialises the coupled tracking:
+\\\begin{enumerate}
+\item \L{rmat0} is set to be equal to $R$;
+\item computes $A$ and $D$, and the initial twiss parameters for these matrices:
+\[
+\begin{array}{ccl}
+\text{if} & \left|\frac{1}{2}\mathrm{Tr}\left(A\right)\right|<1\\
+ & \mathrm{sinmux}=\sin\mu_{x} & =\mathrm{sign}\left(A_{12}\right)\sqrt{-A_{12}\cdot A_{21}-\frac{1}{4}\left(A_{11}-A_{22}\right)^{2}}\\
+ & \beta_{0,x} & =\frac{A_{12}}{\sin\mu_{x}}\\
+ & \alpha_{0,x} & =\frac{A_{11}-A_{22}}{2\sin\mu_{x}}\\
+\text{else}\\
+ & \beta_{0,x} & =0\\
+ & \alpha_{0,x} & =0\\
+\text{endif}
+\end{array}
+\]
+and the same for $y$, with $D$ instead of $A$;
+\end{enumerate}
+\item[twcptk] tracks the coupled lattice functions, given the element transfer matrix $M$:
+\begin{enumerate}
+\item tracks the dispersion $$d \leftarrow M\cdot d$$
+\item saying, 
+$$M\equiv\left(\begin{array}{cc}
+A & D\\
+B & C
+\end{array}\right),$$
+creates the auxiliary matrices
+\[
+\begin{aligned}A & =A-D\cdot R\\
+B & =B-C\cdot R\\
+C & =C-\bar{R}\cdot B
+\end{aligned}
+\]
+in order to track $R$ matrix (\L{rmat}):
+\[
+R\leftarrow-\frac{B\cdot\bar{A}}{\left|A\right|}
+\]
+\item given $A$ and $C$, that in this function are such that
+\[\mathcal{R}M\mathcal{R}^{-1}=\left(\begin{array}{cc}
+A & 0\\
+0 & C
+\end{array} \right) \]
+
+the twiss parameters are tracked:
+\end{enumerate}
+\end{description}
+
+\subsubsection*{The subroutine \L{twcptk}}
+\begin{lstlisting}[firstnumber=1]
+SUBROUTINE twcptk(re,orbit)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Track coupled lattice functions.                                 *
+  !     Input:                                                           *
+  !     re(6,6)  (double)   transfer matrix of element.                  *
+  !     rt(6,6)  (double)   one turn transfer matrix.                    *
+  !     orbit(6) (double)   closed orbit                                 *
+  !----------------------------------------------------------------------*
+  integer i,i1,i2,j,inval,get_option
+  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
+       rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
+       alfy0,betx0,bety0,amux0,amuy0,zero,one
+  parameter(zero=0d0,one=1d0)
+
+  !initialize
+  bety0=zero
+  betx0=zero
+  amux0=zero
+  amuy0=zero
+  alfy0=zero
+  alfx0=zero
+\end{lstlisting}
+
+\[
+\begin{aligned}\beta_{x,0} & =0\\
+\beta_{y,0} & =0\\
+\alpha_{x,0} & =0\\
+\alpha_{y,0} & =0\\
+\mu_{x,0} & =0\\
+\mu_{y,0} & =0
+\end{aligned}
+\]
+
+\begin{lstlisting}[firstnumber=last]
+
+  !---- Dispersion.
+  call dzero(dt,6)
+  do i = 1, 6
+     do j = 1, 6
+        dt(i) = dt(i) + re(i,j) * disp(j)
+     enddo
+  enddo
+\end{lstlisting}
+
+\[
+\vec{\text{dt}}=\mathbf{re}\cdot\vec{\text{disp}}
+\]
+
+\begin{lstlisting}[firstnumber=last]
+
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(15)=dt(1)  // disp_x
+     opt_fun(16)=dt(2)  // disp_xp
+     opt_fun(17)=dt(3)  // disp_y
+     opt_fun(18)=dt(4)  // disp_yp
+  endif
+  if(centre_cptk) then
+     alfx0=alfx
+     alfy0=alfy
+     betx0=betx
+     bety0=bety
+     amux0=amux
+     amuy0=amuy
+     call dcopy(rmat,rmat0,4)
+     if(rmatrix) call dcopy(rw,rw0,36)
+\end{lstlisting}
+
+\[
+\begin{aligned}\beta_{x,0} & =\beta_{x}\\
+\beta_{y,0} & =\beta_{y}\\
+\alpha_{x,0} & =\alpha_{x}\\
+\alpha_{y,0} & =\alpha_{y}\\
+\mu_{x,0} & =\mu_{x}\\
+\mu_{y,0} & =\mu_{y}
+\end{aligned}
+\]
+\[
+\text{rmat0}=\text{rmat}
+\]
+
+\begin{lstlisting}[firstnumber=last]
+
+  else
+     call dcopy(dt,disp,6)
+     disp(5) = zero
+     disp(6) = one
+\end{lstlisting}
+
+\[
+\text{disp}=\left(\begin{array}{c}
+\text{dt(1)}\\
+\text{dt(2)}\\
+\text{dt(3)}\\
+\text{dt(4)}\\
+0\\
+1
+\end{array}\right)
+\]
+
+\begin{lstlisting}[firstnumber=last]
+
+  endif
+
+  !---- Auxiliary matrices.
+  a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
+  a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
+  a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
+  a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+\end{lstlisting}
+
+\[
+\text{re}=\left(\begin{array}{cc}
+\text{re}_{a} & \text{re}_{d}\\
+\text{re}_{b} & \text{re}_{c}
+\end{array}\right)\quad\text{rmat}=\left(\begin{array}{cc}
+\text{rmat}_{a} & \text{rmat}_{d}\\
+\text{rmat}_{b} & \text{rmat}_{c}
+\end{array}\right)
+\]
+\[
+\left(\begin{array}{cc}
+a & -\\
+b & \begin{array}{cc}
+c\\
+\\
+\end{array}
+\end{array}\right)=\left(\begin{array}{cc}
+\text{re}_{a}\\
+\text{re}_{b} & \text{re}_{c}
+\end{array}\right)-\left(\begin{array}{cc}
+\text{re}_{d}\cdot\text{rmat}_{a}\\
+\text{re}_{c}\cdot\text{rmat}_{a} & \text{re}_{a}\cdot\text{rmat}_{a}
+\end{array}\right)
+\]
+
+\begin{lstlisting}[firstnumber=last]
+
+  b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
+  b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
+  b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
+  b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+  c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
+  c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
+  c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
+  c(2,2) = re(4,4) - (re(4,1) * rmat(1,2) - re(4,2) * rmat(1,1))
+
+  !---- Track R matrix.
+  adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+  rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
+  rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
+  rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
+  rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
+
+  !---- Cummulative R matrix and one-turn map at element location.
+  if(rmatrix) then
+     inval=get_option('twiss_inval ')
+     call m66mpy(re,rw,rw)
+     if (inval.ne.0) then
+        call dcopy(rw,rc,36)
+     else
+        call m66inv(rw,rwi)
+        call m66mpy(rotm,rwi,rc)
+        call m66mpy(rw,rc,rc)
+     endif
+  endif
+
+  !---- Mode 1.
+  tempb = a(1,1) * betx - a(1,2) * alfx
+  tempa = a(2,1) * betx - a(2,2) * alfx
+  alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
+  betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
+  if(a(1,2).ne.zero.or.tempb.ne.zero) amux=amux+atan2(a(1,2),tempb)
+
+  !---- Mode 2.
+  tempb = c(1,1) * bety - c(1,2) * alfy
+  tempa = c(2,1) * bety - c(2,2) * alfy
+  alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
+  bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+  if(c(1,2).ne.zero.or.tempb.ne.zero) amuy=amuy+atan2(c(1,2),tempb)
+
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(3 )=betx
+     opt_fun(4 )=alfx
+     opt_fun(5 )=amux
+     opt_fun(6 )=bety
+     opt_fun(7 )=alfy
+     opt_fun(8 )=amuy
+     opt_fun(29)=rmat(1,1)
+     opt_fun(30)=rmat(1,2)
+     opt_fun(31)=rmat(2,1)
+     opt_fun(32)=rmat(2,2)
+  endif
+  if(rmatrix) then
+     do i1=1,6
+        do i2=1,6
+           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
+        enddo
+     enddo
+  endif
+\end{lstlisting}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrupole Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multipoles Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Solenoid Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Dynamical Patches}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{S Rotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Y Rotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{X Rotation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{Appendix}
+\begin{itemize}
+\item[-] \L{dcopy(from,to,n)}
+\item[-] \L{m66mpy(fact1,fact2,target)} matrix multiplication $$\text{target} = \text{fact1} \cdot \text{fact2}$$
+\item[-] \L{tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)}$$\left\{ \begin{array}{c}
+e_{d}\\
+R_{d}\\
+T_{d}
+\end{array}\right\} =\left\{ \begin{array}{c}
+e_{b}\\
+R_{b}\\
+T_{b}
+\end{array}\right\} \circ \left\{ \begin{array}{c}
+e_{a}\\
+R_{a}\\
+T_{a}
+\end{array}\right\} $$
+\end{itemize}
+
+\end{document}

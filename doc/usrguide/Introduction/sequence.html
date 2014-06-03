@@ -20,47 +20,102 @@ by MAD-X.
 <p>
 The corresponding sequence of statements defining a sequence is
 <pre>
-name: SEQUENCE,REFER=keyword,REFPOS=name,LENGTH=real,ADD_PASS=integer,NEXT_SEQU='seq_name'
-label: class,AT=real{,attributes} | class,AT=real | sequ_name, AT=real
-    ...
-ENDSEQUENCE
+name: SEQUENCE, L=real, REFER=keyword, REFPOS=name, 
+      ADD_PASS=integer, NEXT_SEQU='seq_name';
+  ...
+  label: class, AT=real, FROM=name {,attributes};
+  class, AT=real, FROM=name;  
+  sequ_name, AT=real, FROM=name;
+  ...
+ENDSEQUENCE;
 </pre>
 where "real" means a real number, variable, or expression.
 <p>
-The first line gives the sequence name, a REFER flag (entry, centre,
-or exit) which specifies at which part of the element its position along
-the beam line will be given (default: centre), a REFPOS argument used
-for sequence insertion, and the total length.
-The ADD_PASS=integer option specifies a number of additionnal passes (max. 5)
-through the structure; in case of an RBEND the angle will be overwritten in
- survey using the i-th component (1 <= i <= <tt>add_pass</tt> <= 5) of its <i>array_of_angles</i>
-(see <a href="bend.html">RBEND<a>).
-The NEXT_SEQU='seq_name' concatenates the sequence with name 'seq_name'
- to the end of the specified sequence.
-<p>
-Inside the sequence ... endsequence bracket three types of commands
-may be placed:
+The first line declares a sequence with the given name and provides key parameters: 
 <ul>
-<li>an element declaration as usual, with an additional "at" attribute
+<li> L=real: specifies the total length of the sequence in meters. <br> (Default: 0 m) 
+</li> <br>
+<li> REFER=keyword from {ENTRY,CENTRE,EXIT}:
+specifies which part of the element is taken as the reference point 
+at which the position along the beamline is given.
+<br> (default: CENTRE)
+</li> <br>
+<li> REFPOS=name: specifies the name of an element in this sequence 
+to be used as the reference point for the insertion of this sequence 
+in another sequence.
+</li> <br>
+<li> ADD_PASS=integer: specifies a number of additionnal passes (maximum 5)
+through the structure; in case of an RBEND the angle will be overwritten in
+SURVEY using the i-th component ( where 1 <= i <= <tt>add_pass</tt> <= 5) 
+of its <i>array_of_angles</i> (see <a href="bend.html">RBEND<a>).
+</li> <br>
+<li> NEXT_SEQU=name: specifies the name of a sequence to be concatenated 
+to the end of this sequence. 
+</li> <br>
+</ul>
+
+<!-- The first line gives the sequence name, a REFER flag (entry, centre, -->
+<!-- or exit) which specifies at which part of the element its position along -->
+<!-- the beam line will be given (default: centre), a REFPOS argument used -->
+<!-- for sequence insertion, and the total length. -->
+<!-- The ADD_PASS=integer option specifies a number of additionnal passes (max. 5) -->
+<!-- through the structure; in case of an RBEND the angle will be overwritten in -->
+<!--  survey using the i-th component (1 <= i <= <tt>add_pass</tt> <= 5) of its <i>array_of_angles</i> -->
+<!-- (see <a href="bend.html">RBEND<a>). -->
+<!-- The NEXT_SEQU='seq_name' concatenates the sequence with name 'seq_name' -->
+<!--  to the end of the specified sequence. -->
+<p><br>
+Inside the SEQUENCE ... ENDSEQUENCE bracketing keywords, three types of commands
+may appear:
+<ul>
+<li>an element declaration as usual, with an additional "AT" attribute
 giving the element position relative to the start of the sequence;
+<br>
 CAUTION: an existing definition for an element with the same name will
 be replaced, however, defining the same element twice inside the same
 sequence results in a fatal error, since a unique object (this element)
-would be placed at two different positions.</li>
+would be placed at two different positions.</li><br>
+
 <li>a class name with a position; this causes an instance of the class
-to be placed at the position given. For uses inside ranges, instances
-of the same class can be accessed with an occurrence count.</li>
+to be placed at the position given. For use in ranges, instances
+of the same class can be accessed with an occurrence count.</li><br>
+
 <li>a sequence name with a position; this causes the sequence with that
-name to be placed at the position indicated. The entry, centre, or exit
-of the inserted sequence are placed at the position given, UNLESS a "refpos"
-(the name of an element in the inserted sequence) is given, in which case
-the sequence is inserted such that the refpos element is 
-at the insertion point.</li>
+name (inserted sequence) to be placed at the position indicated relative 
+to the start of the current containing sequence. <br>
+Depending upon the REFER= attribute of the current (containing) sequence, 
+the entry, centre, or exit of the inserted sequence is placed at the 
+position specified.<br>
+HOWEVER, if the inserted sequence has a "REFPOS" attribute containing the 
+name of an element in the inserted sequence, the inserted sequence is placed
+such that the element pointed to by REFPOS is at the location specified in the 
+current sequence. </li><br>
+</ul><p>
+
+The additional arguments that can be given in the declaration of sequence 
+elements or sub-sequences are: 
+<ul>
+<li> AT=real: specifies the location at which the reference point 
+(entry, centre or exit) of the element is to be placed on the beamline. <br>
+The value is absolute with reference to the start of the sequence, unless 
+a FROM= argument is specified.
+</li> <br>
+<li> FROM=name: specifies the name of an element of the same sequence. <br>
+The location given for the current element or sequence in the AT= argument 
+is then taken as RELATVE to the position of the center of the element given 
+by the FROM= argument. <br>
+Only simple elements should be used in FROM; specifying a sequence 
+as the FROM reference can lead to erroneous sequence expansion at best.  
+</li> <br>
 </ul>
+
+
+
 <!-- When the sequence is expanded in a  -->
 <!-- <a href="../control/general.html#use">USE</a> command, -->
 <!-- MAD generates the missing drift spaces. At this moment, overlapping elements -->
 <!-- will cause "negative drift length" errors. -->
+<br><br>
 When the sequence is expanded in a
 <a href="../control/general.html#use">USE</a> command, 
 MAD-X generates the missing drift spaces according to the following rules:
@@ -134,7 +189,7 @@ a micron longer than the claimed length of 2 m, but will not fail.
 
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>, June 17, 2002 <p>
-Last updated: Ghislain Roy, 04 February 2014
+Last updated: Ghislain Roy, 18 March 2014
 </address>
 
 </body>

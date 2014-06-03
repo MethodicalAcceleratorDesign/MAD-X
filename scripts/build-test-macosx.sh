@@ -1,14 +1,10 @@
+#! /bin/bash
 # run:
-# sh scripts/build-test-macosx.sh [cleanall]
-# tail -f build-test-macosx.out
+# bash scripts/build-test-macosx.sh [noecho] [cleanall]
 
 # env settings
 export LC_CTYPE="C"
 export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
-
-# I/O redirection
-rm -f build-test-macosx.out
-exec 1> build-test-macosx.out 2>&1
 
 # error handler
 check_error ()
@@ -19,26 +15,39 @@ check_error ()
 	fi
 }
 
-echo "\n===== Start of build and tests ====="
-date
-uname -m -n -r -s
+# I/O redirection
+rm -f build-test-macosx.out
+if [ "$1" = "noecho" ] ; then
+	shift
+	exec &> build-test-macosx.out
+	check_error "redirection with noecho failed"
+else
+	exec > >(tee build-test-macosx.out) 2> >(tee build-test-macosx.out >&2)
+	check_error "redirection with tee failed"
+fi
 
-echo "\n===== SVN update ====="
+echo -e "\n===== Start of build and tests ====="
+echo "Date  : `date`"
+echo "System: `uname -m -n -r -s`"
+echo "Script: $0 $@"
+
+echo -e "\n===== SVN update ====="
 svn update
 check_error "svn update failed"
 
-echo "\n===== Release number ====="
+echo -e "\n===== Release number ====="
 cat VERSION
 
-echo "\n===== Clean build ====="
+echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
+	shift
 	make cleanall
 	check_error "make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
 fi 
 
-echo "\n===== Gnu build ====="
+echo -e "\n===== Gnu build ====="
 gcc      --version
 g++      --version
 gfortran --version
@@ -51,33 +60,33 @@ if [ "$?" != "0" ] ; then
 	check_error "make all-macosx-gnu failed"
 fi
 
-echo "\n===== Intel build ====="
+echo -e "\n===== Intel build ====="
 icc      --version
 ifort    --version
 make all-macosx-intel all-macosx
 check_error "make all-macosx-intel failed"
 
-echo "\n===== Binaries dependencies ====="
+echo -e "\n===== Binaries dependencies ====="
 make infobindep
 check_error "make infobindep failed"
 
-echo "\n===== Tests pointless files ====="
+echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 check_error "make infotestdep failed"
 
-echo "\n===== Testing madx-macosx64-intel ====="
+echo -e "\n===== Testing madx-macosx64-intel ====="
 make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 check_error "make tests-all for madx-macosx64-intel failed"
 
-echo "\n===== Testing madx-macosx32-intel ====="
+echo -e "\n===== Testing madx-macosx32-intel ====="
 make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 check_error "make tests-all for madx-macosx32-intel failed"
 
-echo "\n===== Testing madx-macosx64-gnu ====="
+echo -e "\n===== Testing madx-macosx64-gnu ====="
 make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 check_error "make tests-all for madx-macosx64-gnu failed"
 
-echo "\n===== Testing madx-macosx32-gnu ====="
+echo -e "\n===== Testing madx-macosx32-gnu ====="
 make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
 check_error "make tests-all for madx-macosx32-gnu failed"
 
@@ -86,5 +95,5 @@ make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null
 check_error "unable to restore the default version"
 
 # date & end marker
-date
-echo "\n===== End of build and tests ====="
+echo "Finish: `date`"
+echo -e "\n===== End of build and tests ====="

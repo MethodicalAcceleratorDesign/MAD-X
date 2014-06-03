@@ -1,0 +1,117 @@
+\documentclass{cern-art} % Specifies the document style.
+%
+\usepackage{hyperref}
+\usepackage{xspace}
+
+\usepackage{vmargin,times,graphicx,amsmath,amssymb,color} % ,draftcopy use draftcopy for experiments
+\usepackage{verbatim} % to allow for verbatim and comment
+\usepackage{here}
+\usepackage{wrapfig}
+\usepackage{fancyref}
+\usepackage{listings}
+
+\usepackage{color}
+\definecolor{grey}{rgb}{0.4,0.4,0.4}
+\definecolor{darkgreen}{rgb}{0,0.4,0}
+\definecolor{comment}{rgb}{0.1,0.50,0.56}
+\definecolor{strings}{rgb}{0.25,0.44,0.63}
+
+% programming language
+\lstset{ basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Line numbers..
+         numberstyle=\color{grey}\tiny,          % Numbers style..
+         %stepnumber=2,               % Distance between line numbers
+         %numbersep=5pt,              % Distance from line number to text
+         tabsize=2,                  % Tabs size
+         extendedchars=true,         %
+         breaklines=true,            % Break long lines
+         keywordstyle=\color{darkgreen}\bfseries,
+         stringstyle=\color{strings}\ttfamily, % String color
+         commentstyle=\it\color{comment}\ttfamily,
+%          showspaces=false,           % Show spaces
+%          showtabs=false,             % Show tabs
+         xleftmargin=0pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         showstringspaces=false
+}
+
+\everymath{\displaystyle}
+
+\lstset{language=Fortran}
+\lstset{keywordstyle=\color{blue}\bfseries}
+\lstset{numbers=left,stepnumber=2}
+\lstset{commentstyle=\color{red}\bfseries}
+
+\setmarginsrb{15mm}{8mm}{15mm}{10mm}{12pt}{10mm}{0pt}{10mm}
+
+% shortcut
+\renewcommand{\L}[1]{\lstinline[firstnumber=last]{#1}}
+\newcommand{\T}[1]{{\tt #1}}
+\newcommand{\madx}{\mbox{MAD-X}\xspace}
+\newcommand{\madeight}{\mbox{MAD8}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\PSLogo{fig/cern-logo.pdf}
+\DocReference{CERN-ACC-NOTE-2014-XXXX}
+
+\Date{April 2014}
+% \RevisionDate{April 15, 2014}
+
+\Author{L. Deniau}
+\Institute{CERN -- BE/ABP}
+\Email{laurent.deniau@cern.ch}
+
+\Title{MAD-X Technical Notes on PTC tracking code\\[2mm]
+{\Large Part 1, Magnets and Patches}}
+
+\Keywords{\madx, PTC, beam dynamics, tracking code.}
+%\Distribution{ABP group}
+
+\Maketitle
+
+\Summary{%
+	This technical note describes in details the transport maps of the elements supported by the Fortran library PTC and used internally by \madx. This note is of first importance for the design and implementation of the future tracking code of the MAD next generation.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cleardoublepage
+\section{Motivation}
+
+The implementation of PTC has grown over the last 20 years and it is now a significant piece of code difficult to understand. The purpose of this work is to extract the maps of the elements and the logic  (context-dependent) of the integrator using reverse engineer. For each maps, proper documentation of the equations used by the code should as well as references in the litterature should be provided. It will be also the opportunity to clarify some features supported by PTC that remain unknown to the MAD-X users.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Tracking Context}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Curved Bending Magnets (\T{SBEND})}
+
+% GG:  Check the rights
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Straight Bending Magnets (\T{RBEND})}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quadrupole Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multipoles Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Solenoid Magnets}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Patches}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Functions \& Parameters}
+
+\end{document}

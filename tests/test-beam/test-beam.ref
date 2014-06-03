@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 04.12.13 12.32.20 +
+  +    MAD-X 5.02.00  (64 bit, Darwin)      +
+  +           Production Version            +
+  + Code Modification Date: 2014.03.05      +
+  + Execution Time Stamp: 09.04.14 16.20.53 +
   +++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -112,8 +112,8 @@ parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263
@@ -186,8 +186,8 @@ parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263
@@ -260,8 +260,8 @@ parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263
@@ -334,8 +334,8 @@ parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263
@@ -408,8 +408,8 @@ parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
-parameter: freq0   double value:                  0
-parameter: circ   double value:                  0
+parameter: freq0   double value:         2.80441353
+parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263

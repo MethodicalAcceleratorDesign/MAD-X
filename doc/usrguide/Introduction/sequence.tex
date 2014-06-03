@@ -4,7 +4,6 @@
 
 \chapter{Beam Line Sequences}
 \label{chap:sequence}
- 
 MAD-X accepts two forms of an accelerator definition: sequences and
 \href{line.html}{lines}. However, the sequence definition is the only
 one used internally; lines are converted into sequences when they are
@@ -13,71 +12,115 @@ by MAD-X.
 
 The corresponding sequence of statements defining a sequence is 
 \begin{verbatim}
-name: SEQUENCE, REFER=keyword, REFPOS=name, L=real, AT=real, FROM=string
-                ADD_PASS=integer,
-                NEXT_SEQU='seq_name';
-...
-label: class, AT=real{,attributes}; 
-class, AT=real;
-sequ_name, AT=real;
-...
+name: SEQUENCE, L=real, AT=real, FROM=string, REFER=string, REFPOS=string, 
+                ADD_PASS=integer, NEXT_SEQU=string;
+   ...
+   label: class, AT=real{, additonal attributes}; 
+   class, AT=real;
+   sequ_name, AT=real;
+   ...
 ENDSEQUENCE;
 \end{verbatim} 
 where "real" means a real number, variable, or expression. 
 
-The first line declares a sequence with the given name and has several
-optional arguments:
-\begin{itemize}
-   \item {\bf REFER}=flag in \{entry, centre, exit\} (Default: centre) \\
-     The flag specifies at which part of the element its position along
-     the beam line will be given
-   \item {\bf REFPOS}=string (Default: none)\\
-     argument used for sequence insertion
-   \item {\bf L}=real (Default: 0.)\\
+The first line declares a sequence with the given name and provides key 
+parameters:
+\begin{madlist}
+   \ttitem{L}{\tt = real} (Default: {\tt 0.})\\
      the total length of the sequence in meters. 
-   \item {\bf AT}=real (Default: 0)\\
+   \ttitem{AT}{\tt = real} (Default: 0)\\
      ???
-   \item {\bf FROM=}string (Default: none)\\
+   \ttitem{FROM}{\tt = string} (Default: {\tt none})\\
      ???
-   \item {\bf ADD\_PASS}=integer (Default: 0)\\ 
+   \ttitem{REFER}{\tt = keyword} in {\tt \{entry, centre, exit\}} (Default:
+          {\tt centre}) \\
+     specifies which part of the element is taken as the reference point 
+     at which the position along the beamline is given.
+   \ttitem{REFPOS}{\tt = string} (Default: {\tt none})\\
+   specifies the name of an element in this sequence to be used as the
+   reference point for the insertion of this sequence in another
+   sequence.  
+   \ttitem{ADD\_PASS}{\tt = integer} (Default: 0)\\ 
      specifies a number of additionnal passes (max. 5) through the
      structure; in case of an RBEND the angle will be overwritten in  survey
-     using the i-th component (1 \textless = i \textless = add\_pass
-     \textless= 5) of its array\_of\_angles (see \href{bend.html}{RBEND}.
-   \item {\bf NEXT\_SEQU}=string (Deafult: none)\\
-     concatenates the sequence with the name given to the end of the
-     specified sequence. 
-\end{itemize}
+     using the i-th component ($1 \le i \le {\tt add\_pass} \le 5$) of
+     its array\_of\_angles (see \href{bend.html}{RBEND}). 
+   \ttitem{NEXT\_SEQU}{\tt = string} (Deafult: {\tt none})\\
+     specifies the name of a sequence to be concatenated 
+     to the end of this sequence. 
+\end{madlist}
  
-Inside the ``sequence ... endsequence'' bracket three types of commands may
-be placed:  
+Inside the {\tt sequence} \ldots {\tt endsequence} bracketing keywords,
+three types of commands may appear:  
 \begin{itemize}
-   \item \verb( label: class, AT=real{,attributes}; (\\
-     an element declaration as usual, with an additional "at"
-     attribute giving the element position relative to the start of the
-     sequence; CAUTION: an existing definition for an element with the
-     same name will be replaced, however, defining the same element
-     twice inside the same sequence results in a fatal error, since a
-     unique object (this element) would be placed at two different
-     positions. 
-   \item \verb( class, AT=real; (\\
-     a class name with a position; this causes an instance of the
-     class to be placed at the position given. For uses inside ranges,
-     instances of the same class can be accessed with an occurrence
-     count. 
-   \item \verb( sequ_name, AT=real; (\\
-     a sequence name with a position; this causes the sequence with
-     that name to be placed at the position indicated. The entry,
-     centre, or exit of the inserted sequence are placed at the position
-     given, UNLESS a "refpos" (the name of an element in the inserted
-     sequence) is given, in which case the sequence is inserted such
-     that the refpos element is at the insertion point. 
+  \item label: class, AT=real, FROM=string \{, attributes\} ;\\
+    an element declaration as usual, with additional {\tt AT}
+    attribute giving the element position relative to the start of the
+    sequence, and an optional {\tt FROM} attribute; \\
+    CAUTION: an existing definition for an element with the
+    same name will be replaced, however, defining the same element
+    twice inside the same sequence results in a fatal error, since a
+    unique object (this element) would be placed at two different
+    positions. 
+  \item class, AT=real, FROM=string ;\\
+    a class name with a position and optionally a reference position; 
+    this causes an instance of the class to be placed at the position
+    given. For uses inside ranges, instances of the same class can be
+    accessed with an occurrence count.  
+  \item sequ\_name, AT=real, FROM=string ;\\
+    a sequence name with a position and optionally a reference position; 
+    this causes the sequence with that name (inserted sequence) to be
+    placed at the position relative to the start of the current
+    containing sequence. \\ 
+    Depending upon the {\tt REFER} attribute of the current (containing)
+    sequence, the entry, centre, or exit of the inserted sequence is
+    placed at the position specified. \\
+    HOWEVER, if the inserted sequence has a {\tt REFPOS} attribute containing
+    the name of an element in the inserted sequence, the inserted sequence
+    is placed such that the element pointed to by REFPOS is at the location
+    specified in the current sequence.
 \end{itemize} 
 
+
+The additional arguments that can be given in the declaration of sequence 
+elements or sub-sequences are: 
+\begin{madlist}
+  \ttitem{AT}{\tt = real} mandatory argument giving the location at
+  which the reference point (entry, centre or exit) of the element is to
+  be placed on the beamline. \\  
+  The value is absolute with the zero reference at the start of the
+  sequence, unless a {\tt FROM} argument is specified. 
+  \ttitem{FROM}{\tt = name}: optional argument giving the name of an
+  element of the same sequence. \\  
+  The location given for the current element or sequence in the {\tt AT}
+  argument is then taken as {\bf relative}  to the position of the
+  center of the element given by the {\tt FROM} argument. \\
+  Only simple elements should be used in FROM; specifying a sequence 
+  as the FROM reference can lead to erroneous sequence expansion at best.  
+\end{madlist}
+
+
 When the sequence is expanded in a
-\href{../control/general.html#use}{USE} command, MAD generates the
-missing drift spaces. At this moment, overlapping elements will cause
-"negative drift length" errors.  
+\href{../control/general.html#use}{USE}\index{USE} command, MAD-X
+generates the missing drift spaces according to the following rules:
+\begin{itemize}
+\item When the distance between the exit of the previous element and the
+  entrance of the next element is positive and greater than a threshold
+  of $1 \mu m$ an explicit drit is generated with its own name, unless
+  an already existing drift space with the same length (within $10^{-12}
+  m$ tolerance) can be re-used.
+\item When the absolute value of the distance between the exit of the 
+  previous element and the entrance of the next element is less than a
+  given tolerance of $1\mu m$, no drift space is created and the
+  elements are considered as contiguous. \\
+  {\bf Note that in very specific cases this can cause very small errors
+    to accumulate and the actual length of the sequence can vary
+    slightly from the declared length. (see second example below)} 
+\item When the distance between the exit of the previous element and the 
+  entrance of the next element is negative and less than $-1\mu m$,
+  the elements are considered to be overlapping and MAD-X terminates
+  with a ``{\tt negative drift length}'' fatal error. 
+\end{itemize} 
 
 For efficiency reasons MAD-X imposes an \textbf{important restriction}
 on element lengths and positions: once a sequence is expanded, the
@@ -88,9 +131,6 @@ necessary. The MATCH command contains a special flag "vlength" to
 
 \href{example}{Example:}
 \begin{verbatim}
-! define a default beam (otherwise fatal error)
-beam;
-
 ! Define element classes for a simple cell:
 b:   sbend, l = 35.09, angle = 0.011306116;
 qf:  quadrupole, l = 1.6,  k1 = -0.02268553;
@@ -110,4 +150,22 @@ sequ:  sequence, l = 79;
 endsequence;
 \end{verbatim}
 
-%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
+
+
+
+Example of very small drift space being ignored during sequence
+expansion: 
+\begin{verbatim}
+
+QTEST: QUADRUPOLE, L=1.000001;
+ 
+TEST: SEQUENCE, REFER=centre, L=2.;
+  QTEST, AT=1.5;	 
+ENDSEQUENCE;	 
+
+USE, SEQUENCE=TEST;
+SURVEY, FILE='test';
+
+\end{verbatim}
+The above sequence will expand to a total length of $2.0000005 m$, half
+a micron longer than the claimed length of $2 m$, but will not fail.

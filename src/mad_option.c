@@ -26,8 +26,7 @@ set_option(char* str, int* opt)
     add_to_name_list(bc, 0, options->par_names); // j = not used
     if ((k = options->par->curr) == options->par->max)
       grow_command_parameter_list(options->par);
-    options->par->parameters[options->par->curr++]
-      = new_command_parameter(bc, 0);
+    options->par->parameters[options->par->curr++] = new_command_parameter(bc, 0);
     options->par->parameters[k]->double_value = *opt;
   }
   else options->par->parameters[i]->double_value = *opt;

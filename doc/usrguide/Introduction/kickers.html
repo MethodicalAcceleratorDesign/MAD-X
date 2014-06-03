@@ -35,23 +35,32 @@ in one plane.
 The attributes have the following meaning:
 <ul>
 <li>L:
-The length of the closed orbit corrector (default: 0 m).
-<li>KICK:
-The kick angle for either horizontal or vertical correctors.
-(default: 0 rad).
-<li>HKICK:
-The horizontal kick angle for a corrector in both planes (default: 0 rad).
-<li>VKICK:
-The vertical kick angle for a corrector in both planes (default: 0 rad).
+  The length of the closed orbit corrector (default: 0 m).
+<li>KICK: 
+  The momentum change 
+  delta(PX)=delta(<i>p<sub>x</sub></i>)/<i>p<sub>0</sub></i> 
+  or delta(PY)=delta(<i>p<sub>y</sub></i>)/<i>p<sub>0</sub></i>
+  for respectively horizontal or vertical correctors. (default: 0).
+<li>HKICK: 
+  The horizontal momentum change 
+  delta(PX)=delta(<i>p<sub>x</sub></i>)/<i>p<sub>0</sub></i> 
+  for a corrector acting in both planes (default: 0). 
+<li>VKICK: 
+  The vertical momentum change 
+  delta(PY)=delta(<i>p<sub>y</sub></i>)/<i>p<sub>0</sub></i> 
+  for a corrector acting in both planes (default: 0).
 <LI>TILT:
-The roll angle about the longitudinal axis (default: 0 rad). A
-positive angle represents a clockwise rotation of the kicker.
+  The roll angle about the longitudinal axis (default: 0 rad). A
+  positive angle represents a clockwise rotation of the kicker.
 </ul>
 A positive kick increases <i>p<sub>x</sub></i> or <i>p<sub>y</sub></i>
 respectively. This means that a positive horizontal kick bends to the left, 
 i.e. to positive x which is opposite of what is true for bends. 
-<BR>
-It should be noted that the kick values assigned to an orbit corrector
+<br>
+The deviation angle (theta) of the particle trajectory is related to the momentum change through 
+sin(theta) = delta(P)=delta(<i>p</i>)/<i>p<sub>0</sub></i>.
+<br>
+It should be noted that the kick values values assigned to an orbit corrector
 like above are not overwritten by an orbit correction using the CORRECT command.
 Instead the kicks computed by an orbit correction and the assigned
 values are added when the correctors are used.
@@ -111,7 +120,8 @@ From S.Sorge@gsi.de
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
 <a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
-August 28, 2003 
+August 28, 2003 <br>
+Ghislain Roy - May 5th, 2014 
 </address>
 
 </body>

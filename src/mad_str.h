@@ -9,7 +9,7 @@ struct char_p_array;
 
 // interface
 
-void  mycpy(char* sout, const char* sin);
+char* mycpy(char* sout, const char* sin);
 char* mystrchr(char* string, char c);
 void  mystrcpy(struct char_array* target, char* source);
 char* mystrstr(char* string, char* s);

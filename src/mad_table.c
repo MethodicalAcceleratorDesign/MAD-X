@@ -703,9 +703,13 @@ table_get_column(char* table_name, char* column_name)
     table = table_register->tables[pos];
     if ((col = name_list_pos(column_name, table->columns)) > -1) {
       //printf("col: n %d type %d\n",col,table->columns->inform[col]);
-      info.length  = table->curr;
-      if (table->columns->inform[col]==2){
-        info.data =  table->d_cols[col];
+      info.length = table->curr;
+      if (table->columns->inform[col]==1) {
+        info.data=table->d_cols[col];
+        info.datatype='i';
+        info.datasize=sizeof(double);
+      } else if (table->columns->inform[col]==2) {
+        info.data=table->d_cols[col];
         info.datatype='d';
         info.datasize=sizeof(double);
       } else if (table->columns->inform[col]==3) {
@@ -1288,39 +1292,51 @@ read_table(struct in_cmd* cmd)
 int
 get_table_range(char* range, struct table* table, int* rows)
   /* returns start and end row (rows[0] and rows[1])
-     of a range in a table; 0 if not found, 1 (1 row) or 2 ( > 1) */
+     of a range in a table; 0 if not found, 1 (1 row) or 2 (> 1) */
 {
+  char tmp[2*NAME_L], buf[5*NAME_L], *c[2], *p;
   int i, n;
-  char* c[2];
-  char tmp[NAME_L], dumtex[3*NAME_L];;
-  rows[0] = rows[1] = 0;
-  mycpy(c_dum->c, range); stolower(c_dum->c); strcpy(dumtex, c_dum->c);
-  c[0] = strtok(c_dum->c, "/");
-  if ((c[1] = strtok(NULL,"/")) == NULL) /* only one element given */
-    n = 1;
-  else n = 2;
+
+  if (table == NULL) return 0;
+
+  n = 1;
+  rows[1] = rows[0] = 0;
+
+  stolower(strcpy(buf, range));
+
+  c[0] = buf;
+  if ((p = strchr(buf, '/')) != NULL) {
+    *p = 0; // cut the string in two pieces (i.e. the ranges)
+    c[1] = p+1;
+    n = 2;
+  }
+
+//  fprintf(stderr, "get_table_range: range='%s', c[0]='%s', c[1]='%s'\n", range, c[0], c[1]);
+
   for (i = 0; i < n; i++) {
     if (*c[i] == '#') {
       if (strncmp(c[i], "#s", 2) == 0) rows[i] = 0;
       else if (strncmp(c[i], "#e", 2) == 0) rows[i] = table->curr - 1;
       else {
-        warning("illegal table range ignored:", dumtex);
+        warning("illegal table range ignored:", range);
         return 0;
       }
     }
     else {
       strcpy(tmp, c[i]);
       if (square_to_colon(tmp) == 0) {
-        warning("illegal table range ignored:", dumtex);
+        warning("illegal table range ignored:", range);
         return 0;
       }
       if ((rows[i] = char_p_pos(tmp, table->node_nm)) < 0) {
-        warning("illegal table range ignored:", dumtex);
+        warning("illegal table range ignored:", range);
         return 0;
       }
     }
   }
+
   if (n == 1) rows[1] = rows[0];
+
   return n;
 }
 
@@ -1331,14 +1347,23 @@ table_range(char* table, char* range, int* rows)
 {
   int pos;
   struct table* t;
+  char buf[5*NAME_L];
 
   rows[0] = rows[1] = 0;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1) {
+  stolower(mycpy(buf, table));
+
+//  fprintf(stderr, "table_range: table='%s'\n", buf);
+
+  if ((pos = name_list_pos(buf, table_register->names)) > -1) {
     t = table_register->tables[pos];
-    get_table_range(range, t, rows);
-    rows[0]++; rows[1]++;
+    mycpy(buf, range);
+    get_table_range(buf, t, rows);
+    rows[0]++, rows[1]++;
+  } else {
+    warning("invalid table name, range ignored (invalid results may occur!) for table", table);
   }
+
+//  fprintf(stderr, "table_range: row[0]='%d', row[1]='%d', table->curr=%d\n", rows[0], rows[1], t->curr);
 }
 
 struct table*

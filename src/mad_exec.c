@@ -281,15 +281,22 @@ exec_store_coguess(struct in_cmd* cmd)
   /* stores the initial orbit guess of the user */
 {
   struct name_list* nl = cmd->clone->par_names;
+  double tol, toldefault=1.e-6;
+
   int pos = name_list_pos("tolerance", nl);
-  double tol;
-  if (nl->inform[pos])
-  {
+  if (nl->inform[pos])  {
     tol = command_par_value("tolerance", cmd->clone);
     set_variable("twiss_tol", &tol);
   }
   store_orbit(cmd->clone, guess_orbit);
   guess_flag = 1;
+
+  /* 2014-May-30  13:55:50  ghislain: clear option added to cancel coguess */
+  if (log_val("clear", cmd->clone)) {
+    set_variable("twiss_tol",&toldefault);
+    zero_double(guess_orbit, 6);
+    guess_flag=0;
+  }
 }
 
 void

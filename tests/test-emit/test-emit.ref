@@ -1,15 +1,15 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 10.10.13 12.45.42 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 23.05.14 10.09.53 +
   +++++++++++++++++++++++++++++++++++++++++++
-beam, SEQUENCE=Machine ,PARTICLE=electron, energy=3, RADIATE=True;
+Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
-option, RBARC=FALSE;
+Option, RBARC=FALSE;
 
-call, file= "ALBA-25.4th.seq";
+Call, file= "../share/ALBA/ALBA-25.4th.seq";
 
 TITLE "ALBA-24                          ";
 
@@ -133,7 +133,20 @@ RFC: MARKER;
 
 
 
+! Put the RF cavity
+
+RFC: RFCAVITY, L=0.5, VOLT=3.6, LAG=0.480,HARMON=448;
+
+++++++ info: element redefined: rfc
+L_IDRF : DRIFT, L=L_ID->L - RFC->L;
+
+L_ID   : LINE =(RFC, L_IDRF);
+
+
+
 BE: LINE=(B0);
+
+
 
 BLOCK1: LINE=(L_ID,QD1,D11,QF1,D12,SF1,D13,QF2,D14,SD1,D15);
 
@@ -145,29 +158,21 @@ BLOCK32: LINE=(M_ID,QD3,D34,SF3,D33,QF7,D32,SD4,D31);
 
 BLOCK4: LINE=(D41,SD5,D42,QF8,D43,SF4,S_ID);
 
+
+
 CELDA: LINE=(BLOCK1,BE,BLOCK2,BE,BLOCK31,M1,BLOCK32,BE,BLOCK4,M2,-BLOCK4,BE,-BLOCK32,M3,BLOCK32,BE,BLOCK4,-BLOCK4,BE,-BLOCK32,-BLOCK31,BE,-BLOCK2,BE,-BLOCK1);
+
+
 
 MACHINE: LINE=(CELDA);
 
 
 
 
-! Put the RF cavity
 
-RFC: RFCAVITY, L=0.5, VOLT=3.6, LAG=0.480,HARMON=448;
+Use, period=Machine;
 
-++++++ info: element redefined: rfc
-L_IDRF : DRIFT, L=L_ID->L-RFC->L;
-
-L_ID   : LINE =(RFC, L_IDRF);
-
-
-
-
-
-use, period=Machine;
-
-twiss;
+Twiss;
 
 enter Twiss module
   
@@ -190,14 +195,14 @@ orbit:   7.784384E-10 -1.536909E-07  0.000000E+00  0.000000E+00 -2.156959E-03  3
       0.1455152745    1.388447576e-05    5.588626089e-06        2.093002374 
 
                dq2            betymax              dymax              dyrms 
-      0.1526852467         19.3658027                  0                  0 
+      0.1526852467         19.3658027                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-EMIT,DELTAP=0.0 ;
+Emit, DELTAP=0.0 ;
 
 enter EMIT module
  
@@ -242,12 +247,12 @@ guess:          0                  0                  0
  rfc                               0.5                3.6               0.48        1998.614157                448
 
 
-
+Stop;
 
 
   Number of warnings: 1
 0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

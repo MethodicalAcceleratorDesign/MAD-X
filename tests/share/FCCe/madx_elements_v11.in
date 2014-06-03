@@ -1,0 +1,131 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! TITLE: "madx_elements_v11.in";
+! author: Bastian Harer, CERN ABP-BE-LAT
+! date:   Thu Feb 27 10:20:54 2014
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! This file contains the definition of the elements used in TLEP (FCC-ee) Version 11.
+! It has to be used as an input file for the main TLEP MADX programme.
+! - The definiton of the elements corresponds to TLEP Version 10.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+! Definiton of basic lengths
+! --------------------------
+LB    = 10.5;
+LQ    = 1.5;
+LQIR1 = 0.75;
+LQIR2 = 0.1;
+LS    = 0.5;
+
+LCAV = 1;
+
+LCOR = 0;
+LBPM = 0.2;
+!---------------------------
+
+
+! Arc fodo cell
+! -------------
+! Cell length: 50 m
+
+NBends = 5856;		! = # in arcs + 0.5 * # in disp. surp.
+THB    = 2*pi/NBends;
+
+k1qf =  0.04;
+k1qd = -0.02666;
+
+k2sf =  2.972865036608;
+k2sd = -4.346773138754;
+
+!----------------------------------
+MB    :  SBEND,      L:=LB,   ANGLE:=THB;
+
+MQF   :  QUADRUPOLE, L:=LQ/2, K1:=k1qf;
+MQD   :  QUADRUPOLE, L:=LQ,   K1:=k1qd;
+
+MSF   :  SEXTUPOLE,  L:=LS,   K2:=k2sf;
+MSD   :  SEXTUPOLE,  L:=LS,   K2:=k2sd;
+
+BBPMH :  HMONITOR,   L:=LBPM;
+BBPMV :  VMONITOR,   L:=LBPM;
+
+MCH   :  HKICKER,     L:=LCOR;
+MCV   :  VKICKER,     L:=LCOR;
+!----------------------------------
+
+
+! Dispersion Surpressor
+! ---------------------
+! (2 cells)
+
+K1QFDS1 =  0.04;
+K1QFDS2 =  0.04;
+K1QDDS1 = -0.02666;
+K1QDDS2 = -0.02666;
+
+!----------------------------------
+MBDS    :  SBEND,      L:=LB,   ANGLE:=THB/2;
+
+MQDDS1  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDS1;
+MQFDS1  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDS1;
+MQDDS2  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDS2;
+MQFDS2  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDS2;
+!----------------------------------
+
+
+! Straight fodo cell
+! ------------------
+
+K1QFSC :=  0.04;
+K1QDSC :=  -0.02666;
+
+VRF  :=  70;
+LGRF :=  0.5;
+
+!----------------------------------
+MQFSC  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFSC;
+MQDSC  :  QUADRUPOLE, L:=LQ,   K1:=K1QDSC;
+
+CAV  :  RFCAVITY, L=LCAV, VOLT:=VRF, HARMON=201000, LAG:=LGRF;
+!----------------------------------
+
+
+! Straight matching section
+! -------------------------
+! (4 cells)
+
+K1QDMS1 := -0.0279951479305;
+K1QDMS2 := -0.028592245231;
+K1QDMS3 := -0.0283935619625;
+K1QFMS1 :=  0.0351120066685;
+K1QFMS2 :=  0.036733764765;
+K1QFMS3 :=  0.0366890321725;
+
+!----------------------------------
+MQDMS1  :  QUADRUPOLE, L=LQ,   K1:=K1QDMS1;
+MQDMS2  :  QUADRUPOLE, L=LQ,   K1:=K1QDMS2;
+MQDMS3  :  QUADRUPOLE, L=LQ,   K1:=K1QDMS3;
+MQFMS1  :  QUADRUPOLE, L=LQ/2, K1:=K1QFMS1;
+MQFMS2  :  QUADRUPOLE, L=LQ/2, K1:=K1QFMS2;
+MQFMS3  :  QUADRUPOLE, L=LQ/2, K1:=K1QFMS3;
+!----------------------------------
+
+
+! Minibeta
+! --------
+! Length: 174.1 m
+
+K1QFIR1 := 0.055;
+K1QFIR2 := 0.2;
+K1QDIR1 := -0.395;
+K1QDIR2 := -0.07;
+K1QDIR3 := -0.08;
+
+!----------------------------------
+MQDIR1  :  QUADRUPOLE, L=LQIR1, K1:=K1QDIR1;
+MQDIR2  :  QUADRUPOLE, L=LQIR2, K1:=K1QDIR2;
+MQDIR3  :  QUADRUPOLE, L=LQIR2, K1:=K1QDIR3;
+MQFIR1  :  QUADRUPOLE, L=LQIR1, K1:=K1QFIR1;
+MQFIR2  :  QUADRUPOLE, L=LQIR2, K1:=K1QFIR2;
+!----------------------------------
+

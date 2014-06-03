@@ -1,0 +1,44 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! TITLE,"TLEP Version 11, 80km";       !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! author: Bastian Harer
+! - Individual nomenclature 
+! - New position of cavities
+! - All focusing quadrupoles have half length
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+option -echo;
+
+call, file = "../share/FCCe/madx_elements_v11.in";
+call, file = "../share/FCCe/madx_sequence_v11_matching.in";
+call, file = "../share/FCCe/madx_sequence_v11_rb.in";
+call, file = "../share/FCCe/tlep_v11_rb2.str";
+
+option, echo, warn, info;
+
+beam, particle = electron, energy=175.0, npart=9e12, radiate=false;
+
+!switch off sextupoles
+k2sf = 0;
+k2sd = 0;
+
+! switch off RF
+VRF = 0;
+
+use, sequence = TLEPminibeta;
+
+eoption, add=true;
+
+select, flag=error, clear;
+select, flag=error, pattern="qf";
+select, flag=error, pattern="qd";
+
+parameter = 1;
+ealign, dx:=tgauss(3)*0.150e-3*parameter, dy:=tgauss(3)*0.150e-3*parameter;
+
+option, threader, debug;
+threader, vector = .0001, .0001, 1. ;
+twiss, save, centre; 
+
+stop;
+

@@ -693,59 +693,54 @@ comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, 
   struct command_parameter* cp;
   struct double_array* arr = NULL;
   *n_int = *n_double = *n_string = 0;
+
   mycpy(buf, name);
-  if (this_cmd != NULL && this_cmd->clone != NULL)
-  {
-    if ((pos = name_list_pos(buf, this_cmd->clone->par_names)) > -1)
-    {
+
+  if (this_cmd != NULL && this_cmd->clone != NULL) {
+    if ((pos = name_list_pos(buf, this_cmd->clone->par_names)) > -1) {
       cp = this_cmd->clone->par->parameters[pos];
-      switch (cp->type)
-      {
-        case 0:
-          *n_int = 1;
-          *int_array = cp->double_value;
-          break;
-        case 1:
-          *n_int = 1;
-          if (cp->expr == NULL) *int_array = cp->double_value;
-          else *int_array = expression_value(cp->expr, 2);
-          break;
-        case 2:
-          *n_double = 1;
-          if (cp->expr == NULL) *double_array = cp->double_value;
-          else *double_array = expression_value(cp->expr, 2);
-          break;
-        case 3:
-          if (cp->string != NULL)
-          {
-            *n_string = 1;
-            l = *string_lengths = strlen(cp->string);
-            strncpy(strings, cp->string, l);
-          }
-          break;
-        case 11:
-        case 12:
-          arr = cp->double_array;
-          if (cp->expr_list != NULL) update_vector(cp->expr_list, arr);
-          if (cp->type == 11)
-          {
+
+      switch (cp->type) {
+      case 0:
+	*n_int = 1;
+	*int_array = cp->double_value;
+	break;
+      case 1:
+	*n_int = 1;
+	if (cp->expr == NULL) *int_array = cp->double_value;
+	else *int_array = expression_value(cp->expr, 2);
+	break;
+      case 2:
+	*n_double = 1;
+	if (cp->expr == NULL) *double_array = cp->double_value;
+	else *double_array = expression_value(cp->expr, 2);
+	break;
+      case 3:
+	if (cp->string != NULL) {
+	  *n_string = 1;
+	  l = *string_lengths = strlen(cp->string);
+	  strncpy(strings, cp->string, l);
+	}
+	break;
+      case 11:
+      case 12:
+	arr = cp->double_array;
+	if (cp->expr_list != NULL) update_vector(cp->expr_list, arr);
+	if (cp->type == 11) {
             for (i = 0; i < arr->curr; i++) int_array[i] = arr->a[i];
             *n_int = arr->curr;
-          }
-          else
-          {
-            for (i = 0; i < arr->curr; i++) double_array[i] = arr->a[i];
-            *n_double = arr->curr;
-          }
-          break;
-        case 13:
-          for (i = 0; i < cp->m_string->curr; i++)
-          {
-            string_lengths[i] = l = strlen(cp->m_string->p[i]);
-            strncpy(strings, cp->m_string->p[i], l);
-            strings += l;
-          }
-          *n_string = cp->m_string->curr;
+	} else {
+	  for (i = 0; i < arr->curr; i++) double_array[i] = arr->a[i];
+	  *n_double = arr->curr;
+	}
+	break;
+      case 13:
+	for (i = 0; i < cp->m_string->curr; i++) {
+	  string_lengths[i] = l = strlen(cp->m_string->p[i]);
+	  strncpy(strings, cp->m_string->p[i], l);
+	  strings += l;
+	}
+	*n_string = cp->m_string->curr;
       }
     }
   }
@@ -1262,8 +1257,7 @@ set_value(char* name, char* par, double* value)
     set_command_par_value(aux_buff->c, current_survey, *value);
   else if (strcmp(c_dum->c, "twiss") == 0)
     set_command_par_value(aux_buff->c, current_twiss, *value);
-  else if (current_command != NULL
-           && strcmp(c_dum->c, current_command->name) == 0)
+  else if (current_command && strcmp(c_dum->c, current_command->name) == 0)
     set_command_par_value(aux_buff->c, current_command, *value);
 }
 
