@@ -1257,8 +1257,7 @@ set_value(char* name, char* par, double* value)
     set_command_par_value(aux_buff->c, current_survey, *value);
   else if (strcmp(c_dum->c, "twiss") == 0)
     set_command_par_value(aux_buff->c, current_twiss, *value);
-  else if (current_command != NULL
-           && strcmp(c_dum->c, current_command->name) == 0)
+  else if (current_command && strcmp(c_dum->c, current_command->name) == 0)
     set_command_par_value(aux_buff->c, current_command, *value);
 }
 
