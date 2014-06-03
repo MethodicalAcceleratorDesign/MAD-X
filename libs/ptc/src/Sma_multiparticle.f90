@@ -826,11 +826,12 @@ CONTAINS
     !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then
-       messageLOST="exceed absolute_aperture in TRACKV_NODE_SINGLE"
+       messageLOST="Sma_multiparticle.f90 TRACKV_NODE_SINGLE : exceed absolute_aperture in TRACKV_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
+      
     endif
 
     x=V%X
@@ -892,11 +893,12 @@ CONTAINS
     !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       messageLOST="exceed absolute_aperture in TRACKR_NODE_SINGLE"
+       messageLOST="Sma_multiparticle.f90 TRACKR_NODE_SINGLE : exceed absolute_aperture in TRACKR_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
+       
     endif
 
 
@@ -1070,11 +1072,12 @@ CONTAINS
     !    endif
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then
-       messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
+       messageLOST="Sma_multiparticle.f90 TRACKP_NODE_SINGLE : exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
+       
     endif
 
     !   T%PARENT_FIBRE%MAGP=K

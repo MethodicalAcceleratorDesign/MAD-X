@@ -521,35 +521,40 @@ CONTAINS
           IF((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>1.0_dp) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
+             
              xlost=0.0_dp
              xlost=x
-             messagelost="Lost in real kind=1 elliptic Aperture"
+             
+             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic Aperture"
           ENDIF
        CASE(2)  ! rectangle
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
+             
              xlost=0.0_dp
              xlost=x
-             messagelost="Lost in real kind=2 rectangular Aperture"
+             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular Aperture"
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>1.0_dp)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
+             
              xlost=0.0_dp
              xlost=x
-             messagelost="Lost in real kind=3 rect-ellipse Aperture"
+             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=3 rect-ellipse Aperture"
           ENDIF
        CASE(4) ! MARGUERITE
           IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>1.0_dp).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>1.0_dp)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
+             
              xlost=0.0_dp
              xlost=x
-             messagelost="Lost in real kind=4 marguerite Aperture"
+             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite Aperture"
           ENDIF
        CASE(5) ! RACETRACK
           IF( (abs(x(1)-e%dx)) > (e%r(1)+e%x)                  &
@@ -560,9 +565,11 @@ CONTAINS
                .and. abs(x(3)-e%dy) .gt. e%y)) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
+             
              xlost=0.0_dp
              xlost=x
-             messagelost="Lost in real kind=5 racetrack Aperture"
+             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=5 racetrack Aperture"
+             
           ENDIF
 
        CASE(6) ! PILES OF POINTS

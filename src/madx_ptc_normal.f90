@@ -10,9 +10,10 @@ module madx_ptc_normal_module
   public
 
   
-
   private double_from_normal_t1,display_table_results
-
+  
+  character(1000), private  :: whymsg
+  
 contains
   !____________________________________________________________________________________________
 
@@ -103,15 +104,18 @@ contains
     c_%watch_user=.true.
     call track(my_ring,y,1,default)
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_normal: ','DA got unstable')
-       call seterrorflag(10,"ptc_normal ","DA got unstable ");
+       write(whymsg,*) 'DA got unstable in tracking: PTC msg: ',messagelost
+       call fort_warn('ptc_normal: ',whymsg)
+       call seterrorflag(10,"ptc_normal ",whymsg)
        return
     endif
     call PRODUCE_APERTURE_FLAG(flag_index)
     if(flag_index/=0) then
        call ANALYSE_APERTURE_FLAG(flag_index,why)
-       Write(6,*) "ptc_normal unstable (map production)-programs continues "
-       Write(6,*) why ! See produce aperture flag routine in sd_frame
+       write(whymsg,*) "out of aperture ",why
+       call fort_warn('ptc_normal: ',whymsg)
+       call seterrorflag(10,"ptc_normal ",whymsg)
+       
        CALL kill(y)
        c_%watch_user=.false.
        return
@@ -145,8 +149,10 @@ contains
        n=y
 
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_normal: ','Fatal Error: DA in NormalForm got unstable')
-          stop
+          write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
+          call fort_warn('ptc_normal: ',whymsg)
+          call seterrorflag(10,"ptc_normal ",whymsg);
+          return
        endif
 
        if (getdebug() > 1) then
@@ -257,8 +263,10 @@ contains
            n_t2=y
 
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              call fort_warn('ptc_normal: ','Fatal Error: DA in NormalForm got unstable')
-              stop
+              write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
+              call fort_warn('ptc_normal: ',whymsg)
+              call seterrorflag(10,"ptc_normal ",whymsg)
+              return
            endif
 
            

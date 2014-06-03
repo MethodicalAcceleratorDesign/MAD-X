@@ -2858,6 +2858,7 @@ contains
              hyp=.true.
              c_%stable_da=.false.
              c_%check_stable=.false.
+             messagelost="d_lielib.f90 mapflol : one of ri components is 0"
           endif
        enddo       
 
@@ -2901,9 +2902,10 @@ if(check_krein.and.(.not.hyp)) then
        do i=1,nd2
         write(6,*)"eigenvalues ",  rr(i),ri(i)
        enddo
-          c_%stable_da=.false.
-          c_%check_stable=.false.
        
+       c_%stable_da=.false.
+       c_%check_stable=.false.
+       messagelost="d_lielib.f90 mapflol : check_krein failed"    
        endif
        
      endif  

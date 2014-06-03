@@ -13,8 +13,9 @@ module madx_ptc_twiss_module
   implicit none
 
   save
-  private
-
+  
+  
+    
   !============================================================================================
   !  PUBLIC INTERFACE
   public                         :: twiss,ptc_twiss
@@ -106,6 +107,7 @@ module madx_ptc_twiss_module
   real(dp)    :: prevOrbit(6)
   real(dp)    :: prevS(6)
   
+  character(1000), private  :: whymsg
   
   
   !============================================================================================
@@ -246,8 +248,9 @@ contains
     enddo
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       call fort_warn('ptc_twiss: ','DA got unstable in twiss paremeters computation')
-       call seterrorflag(10,"ptc_twiss ","DA got unstable in twiss parameters computation ");
+       write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+       call fort_warn('ptc_twiss: ',whymsg)
+       call seterrorflag(10,"ptc_twiss ",whymsg);
        return
     endif
 
@@ -327,7 +330,6 @@ contains
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
     integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
-    character(2000)          :: whymsg
     integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
@@ -488,8 +490,9 @@ contains
        call find_orbit(my_ring,x,1,default,c_1d_7)
        
        if ( .not. check_stable) then
-          call fort_warn('ptc_twiss: ','Can not find closed orbit')
-          call seterrorflag(10,"ptc_twiss ","Can not find closed orbit");
+          write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost
+          call fort_warn('ptc_twiss: ',whymsg)
+          call seterrorflag(10,"ptc_twiss ",whymsg);
           return
           !          return
        endif
@@ -716,9 +719,10 @@ contains
              
              write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                              ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
-	         ' step ',nodePtr%pos,' PTC msg: ',why
+	         ' step ',nodePtr%pos,' PTC msg: ',messagelost
              call fort_warn('ptc_twiss: ',whymsg)
              call seterrorflag(10,"ptc_twiss ",whymsg);
+             
              if (getdebug() > 2) close(mf1)
              return
           endif
@@ -818,11 +822,9 @@ contains
 
         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
            
-           print*,'Error from PTC:>>', why, '<<'
-            
            write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                            ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
-	       ' PTC msg: ',why
+	       ' PTC msg: ',messagelost
            call fort_warn('ptc_twiss: ',whymsg)
            call seterrorflag(10,"ptc_twiss ",whymsg);
            if (getdebug() > 2) close(mf1)
@@ -1107,8 +1109,9 @@ contains
 
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-            call fort_warn('ptc_twiss: ','DA got unstable (one turn map production)')
-            call seterrorflag(10,"ptc_twiss ","DA got unstable (one turn map production)");
+            write(whymsg,*) 'DA got unstable (one turn map production): PTC msg: ',messagelost
+            call fort_warn('ptc_twiss: ',whymsg)
+            call seterrorflag(10,"ptc_twiss ",whymsg);
             return
          endif
 
@@ -1914,8 +1917,9 @@ contains
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         call fort_warn('ptc_twiss: ','Error: DA in twiss got unstable during Normal Form')
-         call seterrorflag(10,"ptc_twiss ","DA in twiss got unstable during Normal Form");
+         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost
+         call fort_warn('ptc_twiss: ',whymsg)
+         call seterrorflag(10,"ptc_twiss ",whymsg);
          return
       endif
 
@@ -2242,8 +2246,9 @@ contains
       theNormalForm = oneTurnMap
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         call fort_warn('ptc_twiss oneTurnSummary: ','DA got unstable during normal form calculation')
-         call seterrorflag(10,"ptc_twiss oneTurnSummary","DA got unstable during normal form calculation")
+         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost
+         call fort_warn('ptc_twiss oneTurnSummary: ',whymsg)
+         call seterrorflag(10,"ptc_twiss oneTurnSummary",whymsg)
          call kill(theNormalForm)
          return
       endif

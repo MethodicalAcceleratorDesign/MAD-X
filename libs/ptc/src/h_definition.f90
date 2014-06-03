@@ -486,12 +486,13 @@ contains
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Root undefined "
+       messagelost="h_definition.f90 root : negative argument "
     ELSEIF(X>=0.0_dp) THEN
        ROOT=SQRT(X)
     ELSE      !  IF X IS NOT A NUMBER
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 root : negative arument "
     ENDIF
 
   END FUNCTION ROOT
@@ -506,12 +507,14 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arcsin undefined "
+       
+       messagelost="h_definition.f90 arcsin : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCSIN=ASIN(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arcsin : abs(x)>1 "
     ENDIF
 
   END FUNCTION ARCSIN
@@ -526,12 +529,14 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arccos undefined "
+       
+       messagelost="h_definition.f90 arccos : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arccos : abs(x)>1 "
     ENDIF
 
   END FUNCTION ARCCOS
@@ -547,7 +552,8 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Log undefined "
+       
+       messagelost="h_definition.f90 loge : x < 0 "
     ELSE
        LOGE=LOG(X)
     ENDIF
@@ -567,12 +573,14 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Coseh undefined "
+       
+       messagelost="h_definition.f90 coseh : abs(x)>1 "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        COSEH=COSH(X)
     ELSE      !  IF X IS NOT A NUMBER
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 coseh : abs(x)>1 "
     ENDIF
 
   END FUNCTION COSEH
@@ -588,12 +596,14 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Sineh undefined "
+    
+       messagelost="h_definition.f90 sineh : abs(x)>1 "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        SINEH=SINH(X)
     ELSE      !  IF X IS NOT A NUMBER
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 sineh : abs(x)>1 "
     ENDIF
 
   END FUNCTION SINEH
@@ -609,12 +619,14 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arctan undefined "
+       
+       messagelost="h_definition.f90 arctan : abs(x)>1 "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        arctan=atan(X)
     ELSE      !  IF X IS NOT A NUMBER
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arctan : abs(x)>1 "
     ENDIF
 
   END FUNCTION arctan

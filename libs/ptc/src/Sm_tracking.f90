@@ -593,7 +593,7 @@ contains
     !    endif ! new 2010
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       messageLOST="exceed absolute_aperture in TRACK_FIBRE_R"
+       messageLOST="Sm_tracking.f90 TRACK_FIBRE_R : exceed absolute_aperture in TRACK_FIBRE_R"
        xlost=x
        CHECK_STABLE=.false.
     endif
@@ -744,9 +744,10 @@ contains
 
     ! new 2010
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       messageLOST="exceed absolute_aperture in TRACK_FIBRE_P"
+       messageLOST="Sm_tracking.f90 TRACK_FIBRE_P : exceed absolute_aperture in TRACK_FIBRE_P"
        xlost=x
        CHECK_STABLE=.false.
+      
     endif
     if(.not.check_stable ) lost_fibre=>c
 

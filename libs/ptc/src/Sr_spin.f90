@@ -3772,8 +3772,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C=>C%NEXT
           enddo
           
-          messagelost= " No Cavity in the Line "
+          messagelost= "Sr_spin.f90: Sr_spin.f90: No Cavity in the Line "
           check_stable=.false.
+          
           return
  
        ENDIF
@@ -3783,8 +3784,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           STAT=STATE+only_4d0
           if(state%radiation) then
              check_stable=.false.
-
-             messagelost= " Cavity needed when radiation present "
+             messagelost="Sr_spin.f90 FIND_ORBIT_LAYOUT_noda : Cavity needed when radiation present" !CERN
              return
           endif
        ELSE
@@ -3796,7 +3796,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C=>C%NEXT
           enddo
           check_stable=.false.
-          messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+          messagelost= "Sr_spin.f90: State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
          return
 
        ENDIF
@@ -3828,7 +3828,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           i=i+1
        enddo
        if(freq==0.0_dp) then
-          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+          messagelost= "Sr_spin.f90: No Cavity in the Line or Frequency = 0 (totalpath==1)"
          check_stable=.false.
          return
        endif
@@ -3933,7 +3933,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     CALL matinv(SX,SXI,ND2,6,ier)
     IF(IER==132)  then
-       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+       messagelost= "Sr_spin.f90: Inversion failed in FIND_ORBIT_LAYOUT_noda"
         check_stable=.false.
        return
     endif
@@ -3971,7 +3971,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !   C_%stable_da=.FALSE.
        !      IF(iteM==MAX_FIND_ITER+100) THEN
        !        write(6,*) " Unstable in find_orbit without TPSA"
-       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       messagelost= "Sr_spin.f90: Maximum number of iterations in find_orbit without TPSA"
        xlost=fix
        check_stable=my_false
        !     ENDIF
@@ -4059,7 +4059,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C=>C%NEXT
           enddo
           
-          messagelost= " No Cavity in the Line "
+          messagelost= "Sr_spin.f90: No Cavity in the Line "
           check_stable=.false.
           return
  
@@ -4071,7 +4071,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           if(state%radiation) then
              check_stable=.false.
 
-             messagelost= " Cavity needed when radiation present "
+             messagelost= "Sr_spin.f90: Cavity needed when radiation present "
              return
           endif
        ELSE
@@ -4083,7 +4083,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C=>C%NEXT
           enddo
           check_stable=.false.
-          messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+          messagelost= "Sr_spin.f90: State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
          return
 
        ENDIF
@@ -4115,7 +4115,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           i=i+1
        enddo
        if(freq==0.0_dp) then
-          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+          messagelost= "Sr_spin.f90: No Cavity in the Line or Frequency = 0 (totalpath==1)"
          check_stable=.false.
          return
        endif
@@ -4220,7 +4220,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     CALL matinv(SX,SXI,ND2,6,ier)
     IF(IER==132)  then
-       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+       messagelost= "Sr_spin.f90: Inversion failed in FIND_ORBIT_LAYOUT_noda"
         check_stable=.false.
        return
     endif
@@ -4258,7 +4258,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !   C_%stable_da=.FALSE.
        !      IF(iteM==MAX_FIND_ITER+100) THEN
        !        write(6,*) " Unstable in find_orbit without TPSA"
-       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       messagelost= "Sr_spin.f90: Maximum number of iterations in find_orbit without TPSA"
        xlost=fix
        check_stable=my_false
        !     ENDIF

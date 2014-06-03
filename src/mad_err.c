@@ -23,9 +23,9 @@ seterrorflagfort(int* errcode, const char* from, int *lf, const char* descr, int
   Mainly between c and fortran parts
   This one is called from Fortran
 */
-  static const int maxlength = 200;
-  char f[200];
-  char d[200];
+  static const int maxlength = 400;
+  char f[maxlength];
+  char d[maxlength];
   int n = *lf , m = *ld;
   if (n >= maxlength ) n = maxlength - 1;
   if (m >= maxlength ) m = maxlength - 1;

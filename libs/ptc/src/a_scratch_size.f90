@@ -202,6 +202,7 @@ module precision_constants
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=0.0_dp
   character(255) :: messagelost
+  
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
@@ -386,6 +387,7 @@ contains
        IF(ABS(S1(I))>C_%ABSOLUTE_APERTURE) THEN
           S1=PUNY
           C_%CHECK_STABLE=.FALSE.
+          messagelost="a_scratch_size.f90 check_stability: aperture"
           EXIT
        ENDIF
     ENDDO
@@ -600,11 +602,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ENDIF
 
   END FUNCTION ARCCOS_lielib
@@ -620,6 +624,7 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 LOGE_lielib: x<0"
     ELSE
        LOGE_lielib=LOG(X)
     ENDIF

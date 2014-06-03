@@ -19,6 +19,7 @@ MODULE madx_ptc_module
 
   implicit none
   public
+
   logical(lp) mytime
   integer icav
 
@@ -45,7 +46,10 @@ MODULE madx_ptc_module
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
-
+   
+  
+  character(1000), private  :: whymsg
+     
 CONTAINS
 
   subroutine ptc_create_universe()
@@ -1495,7 +1499,6 @@ CONTAINS
     character(200)       :: filename='ptcmaps.txt'
     character(200)       :: filenamefull='ptcmaps'
     integer              :: flag_index,why(9)
-    character(200)       :: whymsg
     real(kind(1d0))      :: suml=zero
     integer  geterrorflag !C function that returns errorflag value
 
@@ -1543,8 +1546,9 @@ CONTAINS
           call track(my_ring,y2,i,i+1,getintstate())
 
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             call fort_warn('ptc_dumpmaps: ','DA got unstable')
-             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps ",whymsg);
              close(mf1)
              close(mf2)
              return
@@ -1566,8 +1570,9 @@ CONTAINS
 
           call track(my_ring,xt,i,i+1,getintstate())
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             call fort_warn('ptc_dumpmaps: ','DA got unstable')
-             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps ",whymsg);
              close(mf1)
              close(mf2)
              return
@@ -1592,8 +1597,9 @@ CONTAINS
 
           call track(my_ring,y2,i,i+2,getintstate())
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             call fort_warn('ptc_dumpmaps: ','DA got unstable')
-             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps ",whymsg);
              close(mf1)
              close(mf2)
              return
@@ -1614,8 +1620,9 @@ CONTAINS
 
           call track(my_ring,xt,i,i+2,getintstate())
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-             call fort_warn('ptc_dumpmaps: ','DA got unstable')
-             call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+             write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+             call fort_warn('ptc_dumpmaps: ',whymsg)
+             call seterrorflag(10,"ptc_dumpmaps ",whymsg);
              close(mf1)
              close(mf2)
              return
@@ -1639,8 +1646,9 @@ CONTAINS
        call track(my_ring,yfull,i,i+1,getintstate())
 
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_dumpmaps: ','DA got unstable')
-          call seterrorflag(10,"ptc_dumpmaps ","DA got unstable ");
+          write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+          call fort_warn('ptc_dumpmaps: ',whymsg)
+          call seterrorflag(10,"ptc_dumpmaps ",whymsg);
           close(mf1)
           close(mf2)
           return
@@ -1850,8 +1858,9 @@ CONTAINS
     do i=1,turns
        call track(my_ring,x,1,default)
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-          call fort_warn('ptc_track: ','DA got unstable')
-          call seterrorflag(10,"ptc_track ","DA got unstable ");
+          write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+          call fort_warn('ptc_track: ',whymsg)
+          call seterrorflag(10,"ptc_track ",whymsg);
           return
        endif
        call PRODUCE_APERTURE_FLAG(flag_index)

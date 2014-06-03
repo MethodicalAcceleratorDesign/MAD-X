@@ -1892,6 +1892,7 @@ eta2=0.0_dp
     if(.not.ring%closed) then
        write(6,*) " This line is not ring : FIND_ORBIT_LAYOUT_noda "
         check_stable=.false.
+        messagelost="So_fitting.f90 FIND_ORBIT_LAYOUT_noda : it is not a ring" !CERN
        ! call !write_e(100)
     endif
     dix(:)=0.0_dp
@@ -1910,8 +1911,9 @@ eta2=0.0_dp
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          messagelost= " FIND_ORBIT_LAYOUT will crash : exiting"
+          messagelost= "So_fitting.f90 FIND_ORBIT_LAYOUT :  FIND_ORBIT_LAYOUT will crash : exiting"
          check_stable=.false.
+        
           return
        ENDIF
     else
@@ -1926,9 +1928,9 @@ eta2=0.0_dp
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          messagelost=" State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
-         check_stable=.false.
-         return
+          messagelost="So_fitting.f90: State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
+          check_stable=.false.
+          return
        ENDIF
     endif
 101 continue
@@ -1953,8 +1955,9 @@ eta2=0.0_dp
        enddo
        if(freq==0.0_dp) then
        
-          messagelost= " No Cavity in the Line or Frequency = 0 (totalpath==1)"
+          messagelost= "So_fitting.f90 FIND_ORBIT_LAYOUT No Cavity in the Line or Frequency = 0 (totalpath==1)"
          check_stable=.false.
+        
          return
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
@@ -2028,8 +2031,9 @@ eta2=0.0_dp
 
     CALL matinv(SX,SXI,ND2,6,ier)
     IF(IER==132)  then
-       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
+       messagelost= "So_fitting.f90 FIND_ORBIT_LAYOUT_noda : Inversion failed in FIND_ORBIT_LAYOUT_noda"
         check_stable=.false.
+       
        return
     endif
 
@@ -2068,9 +2072,10 @@ eta2=0.0_dp
        !   C_%stable_da=.FALSE.
        !      IF(iteM==MAX_FIND_ITER+100) THEN
        !        write(6,*) " Unstable in find_orbit without TPSA"
-       messagelost= "Maximum number of iterations in find_orbit without TPSA"
+       messagelost= "So_fitting.f90 FIND_ORBIT_LAYOUT_noda: Maximum number of iterations in find_orbit without TPSA"
        xlost=fix
        check_stable=my_false
+       
        !     ENDIF
        ITE=0
     endif
