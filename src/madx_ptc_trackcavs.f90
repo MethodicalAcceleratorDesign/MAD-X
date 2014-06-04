@@ -13,6 +13,9 @@ module madx_ptc_trackline_module
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
   logical(lp)          :: onetable
 
+  character(1000),private   :: whymsg
+  
+
   !********************************************************************************************
   !********************************************************************************************
   !********************************************************************************************
@@ -516,7 +519,6 @@ contains
     real (dp)            :: gposx, gposy, gposz
     integer              :: e
     integer              :: apertflag
-    character(200)       :: whymsg
     integer              :: why(9)
     !    integer              :: rplotno
     integer              :: obspointnumber ! observation point number in c-code
@@ -660,8 +662,9 @@ contains
 
              call track(my_ring,x,e,e+1,getintstate())
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-                call fort_warn('ptc_trackline: ','DA got unstable')
-                call seterrorflag(10,"ptc_trackline ","DA got unstable ");
+                write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+                call fort_warn('ptc_trackline: ',whymsg)
+                call seterrorflag(10,"ptc_trackline ",whymsg);
                 goto 100 !for the time being lets try next particle, 
                          !but most probably we will need to stop tracking and reinit 
 	     !goto 101
