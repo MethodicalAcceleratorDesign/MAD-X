@@ -662,7 +662,11 @@ contains
 
              call track(my_ring,x,e,e+1,getintstate())
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-                write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
+                write(whymsg,*) 'DA got unstable. ', &
+                                'track no. ',n,      &
+                                ', turn no',t,         &
+	            ', element no.', e,    & 
+	            ', PTC msg: ',messagelost
                 call fort_warn('ptc_trackline: ',whymsg)
                 call seterrorflag(10,"ptc_trackline ",whymsg);
                 goto 100 !for the time being lets try next particle, 
