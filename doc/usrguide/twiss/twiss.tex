@@ -46,9 +46,9 @@ DELTAP=0.001:0.007:0.002        ! four values
 If DELTAP is missing, MAD-X uses the value 0.0. 
 
 Further attributes of the TWISS statements are: 
-\begin{itemize}
+\begin{madlist}
 
-   \item CHROM: A logical flag. If set, MAD-X also computes the
+   \ttitem{CHROM} A logical flag. If set, MAD-X also computes the
      \href{../Introduction/tables.html#chrom}{chromatic
        functions}.  \\
      \textit{Please note that this option is needed for a proper
@@ -62,14 +62,14 @@ Further attributes of the TWISS statements are:
        to DELTAP+1.e-6. The tune differences divided by 1.e-6 yield the
        chromaticities.}
 
-   \item FILE: If FILE="file\_name" appears MAD-X writes a full TFS
+   \ttitem{FILE} If FILE="file\_name" appears MAD-X writes a full TFS
      Twiss table \href{../Introduction/select.html#tfs}{Example TFS
        Twiss table} on the disk file "file\_name". FILE alone is
      equivalent to FILE="twiss".\\
-     The columns of the table can be selected using the \tt{SELECT}
-     command with the \tt{flag=''twiss''} attribute. 
+     The columns of the table can be selected using the {\tt SELECT}
+     command with the {\tt flag= twiss} attribute. 
 
-   \item TABLE (overrides SAVE): MAD-X creates a full
+   \ttitem{TABLE} (overrides SAVE): MAD-X creates a full
      \href{../Introduction/tables.html#linear}{Twiss table} in
      memory and gives it the name TWISS, unless TABLE="table\_name"
      appears on the command, then it is called
@@ -80,22 +80,22 @@ Further attributes of the TWISS statements are:
      particular the twiss table (see
      \href{../Introduction/expression.html#table}{table access}).\\
      If the TABLE option is given the selection of column names via the
-     \tt{SELECT} command is ignored. Hence if both \tt{TABLE} and
-     \tt{FILE} options are given, the table written to file is the full
+     {\tt SELECT} command is ignored. Hence if both {\tt TABLE} and
+     {\tt FILE} options are given, the table written to file is the full
      twiss table, containing all elements as rows and all known twiss 
      parameters as columns. 
 
-   \item NOTABLE: This flag prevents the creation of the internal Twiss
+   \ttitem{NOTABLE} This flag prevents the creation of the internal Twiss
      table. Consequently no output file can be created either.  \\ 
      (Default: NOTABLE=false)
 
-   \item CENTRE: This flag enforces the calculation of the
+   \ttitem{CENTRE} This flag enforces the calculation of the
      \href{../Introduction/tables.html#linear}{linear lattice
        functions} at the center of the element instead of the end
      of it. \textit{ Mind you that since this is inside the element
        the closed orbit includes the misalignment of the element.} 
 
-   \item RMATRIX: If this flag is used the the one-turn map at the
+   \ttitem{RMATRIX} If this flag is used the the one-turn map at the
      location of every element is calculated and prepared for
      storage in the TWISS table. Using the
      \href{../Introduction/select.html}{SELECT} command and using
@@ -104,25 +104,25 @@ Further attributes of the TWISS statements are:
      "column, REij" one gets all or the component "ij"
      respectively.    
 
-   \item SECTORMAP: This flag initiates the calculation of a sector
+   \ttitem{SECTORMAP} This flag initiates the calculation of a sector
      map as described at:
      \href{../Introduction/sectormap.html}{SECTORMAP}.    
 
-   \item SECTORFILE: Used to write SECTORMAPs to the file
+   \ttitem{SECTORFILE} Used to write SECTORMAPs to the file
      SECTORFILE="file\_name", if missing the output of SECTORMAP
      will go to the file "sectormap" with the format as found in
      \href{../Introduction/sectormap.html}{SECTORMAP}.    
 
-   \item KEEPORBIT: The keeporbit attribute (with an optional name,
+   \ttitem{KEEPORBIT} The keeporbit attribute (with an optional name,
      keeporbit="name") stores the orbit under this name at the
      start, and at all monitors.    
 
-   \item USEORBIT: The useorbit attribute (with an optional name,
+   \ttitem{USEORBIT} The useorbit attribute (with an optional name,
      useorbit="name") uses the start value provided for the closed
      orbit search; the values at the monitors are used by the
      threader.    
 
-   \item \textit{COUPLE (obsolete)} : This MAD8 option can no
+   \ttitem{COUPLE} (obsolete) This MAD8 option can no
      longer be set since TWISS in MAD-X is always calculated in
      coupled mode. MAD-X computes the coupled functions in the
      sense of
@@ -130,7 +130,7 @@ Further attributes of the TWISS statements are:
          Teng]}. For the uncoupled cases they reduce to the C and S
      functions.    
 
-   \item \textit{ Twiss calculation is 4D only!} : The Twiss
+     \textit{ Twiss calculation is 4D only!} : The Twiss
      command will calculate an approximate 6D closed orbit when the
      accelerator structure includes an active
      \href{../Introduction/cavity.html}{cavity}. However, the
@@ -140,13 +140,13 @@ Further attributes of the TWISS statements are:
      can be calculated with the
      \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command.    
 
-   \item RIPKEN: This flag will calculate the Ripken-Mais TWISS
+   \ttitem{RIPKEN} This flag will calculate the Ripken-Mais TWISS
      parameters (beta11, beta12, beta21, beta22, alfa11, alfa12,
      alfa21, alfa22, gama11, gamma12, gamm21 and gamm22) using
      betx, bety, alfx, alfy, gamax, gamay, R11, R12, R21 and R22 as
      input.  
 
-\end{itemize}
+\end{madlist}
 
 The tables are suitable for \href{../plot/plot.html}{plot}.   After a
 successful TWISS run MAD-X creates an implicit
@@ -279,7 +279,7 @@ sequence.
 %\textit{ It should be mentioned that parameters can be also accessed
 %from tables using the
 %\href{../Introduction/expression.html#table}{table access} function.} 
-It should be mentioned that parameters can be also accessed from tables
+Parameters in tables can also be accessed 
 using the \href{../Introduction/expression.html#table}{table access}
 function. 
 \begin{verbatim}

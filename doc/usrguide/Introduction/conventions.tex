@@ -484,10 +484,6 @@ The field coefficients have the following meaning:
 
 Using this expansion and the curvature \textit{h} of the reference
 orbit, the longitudinal component of the vector potential to order 4 is:  
-%%\includegraphics{null}
-%Taylor_A_s
-% this is problematic, {align}, {eqnarray} do not work 
-% EDIT : Laurent fixed that.
 \[
 \begin{aligned}
 A_s =  
@@ -501,23 +497,20 @@ Taking \(\vec{B} = \nabla \times \vec{A}\) in curvilinear coordinates,
 the field components can be computed as  
 \[
 \begin{aligned}
-B_x(x,y) =
-&+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big)&  &  \\
-&+ B_2\,\Big(xy - \frac{h^3}{6}y^3+\cdots \Big)&+B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
-B_y(x,y)=
-&+ B_0 & + B_1\,\Big(x-\frac{h}{2}y^2+\frac{h^2}{2}xy^2+\cdots \Big)\\
-&+ B_2\,\Big(\frac{1}{2}(x^2-y^2)-\frac{h}{2}xy^2+\cdots \Big) & + B_3\,\Big(\frac{1}{6}(x^3-3xy^2)+ \cdots \Big)+\cdots
+B_x(x,y) = &+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big)  &  \\
+           &+ B_2\,\Big(xy - \frac{h^3}{6}y^3+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
+B_y(x,y)=  &+ B_0   &+ B_1\,\Big(x-\frac{h}{2}y^2+\frac{h^2}{2}xy^2+\cdots \Big)\\
+           &+ B_2\,\Big(\frac{1}{2}(x^2-y^2)-\frac{h}{2}xy^2+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(x^3-3xy^2)+ \cdots \Big)+\cdots
 \end{aligned}
 \]
-It can be easily verified that both \(\nabla \times \vec{\textit{B}}\)
-and \(\nabla . \vec{\textit{B}}\) are zero to the order of the
-\(\textit{B}_3\) term.  
+It can be easily verified that both \(\nabla \times \vec{B}\)
+and \(\nabla . \vec{B}\) are zero to the order of the
+\(B_3\) term.  
 
-Introducing the magnetic rigidity \(\textit{B}\rho = p_s / q\) as the
+Introducing the magnetic rigidity \(B \rho = p_s / q\) as the
 momentum of the particle divided by its charge, the multipole
 coefficients are computed as
-\[ \textit{K}_n = \textit{q B}_n / \textit{p}_s  =  \textit{B}_n / \textit{B} \rho \] 
-
+\[ K_n = q B_n / p_s  =  B_n / B \rho \] 
 
 
 
@@ -738,6 +731,11 @@ contains the following variables:
   \ttitem{YCORMS} The r.m.s. of the vertical closed orbit deviation [m].     
   \ttitem{DELTAP} Energy difference, divided by the reference
   momentum times the velocity of light: DELTAP = $\Delta E / p_s c$, [1].
+  \ttitem{SYNCH\_1} First synchrotron radiation integral  
+  \ttitem{SYNCH\_2} Second synchrotron radiation integral  
+  \ttitem{SYNCH\_3} Third synchrotron radiation integral  
+  \ttitem{SYNCH\_4} Fourth synchrotron radiation integral  
+  \ttitem{SYNCH\_5} Fifth synchrotron radiation integral  
 \end{madlist} 
 
 Notice that in MAD-X PT substitutes DELTAP as longitudinal

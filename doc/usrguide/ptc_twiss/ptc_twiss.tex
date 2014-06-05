@@ -158,31 +158,32 @@ The PTC\_TWISS can be applied to two basic tasks. It can calculate either a
 
 {\bf Options}
 
-\begin{itemize}
-\item {\bf ICASE}=integer (Default: 4) \\ 
-the dimensionality of the phase-space (4, 5 or 6). \\ 
-Note that the value is internally set to 56 when attempting to set
-icase=6 with no cavity. 
+\begin{madlist}
+  \ttitem{ICASE} = integer (Default: 4) \\ 
+  the dimensionality of the phase-space (4, 5 or 6). \\ 
+  Note that {\tt icase} is internally set to 56 when attempting to set
+  icase=6 with no cavity, and {\tt icase} is internally set to 4 when
+  attempting to set icase=6 with an RF cavity with zero voltage.  
 
-\item {\bf NO}=integer (Default: 1) \\
-the order of the map. For evaluating
-the derivatives of the Twiss parameter w.r.t. deltap/p, e.g. for
-evaluating the chormaticities, the order must
-be at least equal to 2.
+  \ttitem{NO}=integer (Default: 1) \\
+  the order of the map. For evaluating
+  the derivatives of the Twiss parameter w.r.t. deltap/p, e.g. for
+  evaluating the chromaticities, the order must
+  be at least equal to 2.
 
-\item {\bf DELTAP}=double (Default: 0.0) \\
+\ttitem{DELTAP}=double (Default: 0.0) \\
 relative momentum offset for reference closed orbit. 
 
-\item {\bf CLOSED\_ORBIT}=logical (Default: .false.) \\
+\ttitem{CLOSED\_ORBIT}=logical (Default: .false.) \\
 the switch to turn on the closed orbit calculation
 (\hyperlink{Periodic_Solution}{periodic solution} ONLY).  
 
-\item {\bf DELTAP\_DEPENDENCY}=logical (Default: .false.) \\
+\ttitem{DELTAP\_DEPENDENCY}=logical (Default: .false.) \\
 the switch to turn on computation of the Twiss and
 dispersion derivatives w.r.t. deltap/p. Derivation formula assume that
 icase=5, so that deltap/p is supplied as a parameter. 
 
-\item {\bf SLICE\_MAGNETS}=logical (Default: .false.) \\
+\ttitem{SLICE\_MAGNETS}=logical (Default: .false.) \\
 %% the switch to turn on the evaluation of Twiss
 %% parameters at each thin slice inside successive magnets, instead of at
 %% the middle of each magnet. Slices are located at the so-called
@@ -202,91 +203,91 @@ calculated) which corresponds to the same s position (and usually
 optical functions) as the end of the previous element, the points at the
 interface between magnets are included twice in the rms calculation. 
 
-\item {\bf CENTER\_MAGNETS}=logical (Default: .false.) \\
+\ttitem{CENTER\_MAGNETS}=logical (Default: .false.) \\
 the switch to turn on the evaluation of Twiss
 parameters at the middle of each magnet. This relies on internal slicing
 and 'integration nodes' as determined by the number of steps (nst)
 selected when creating the PTC layout. This number is assumed to be even
 otherwise the program issues a warning. 
 
-\item {\bf FILE}[=string] (Default: .false.) \\
+\ttitem{FILE}[=string] (Default: .false.) \\
 if the FILE option is omitted, no output is written to file. \\
 If the FILE option is present, the optional argument is the name of the
 file for printing the PTC\_TWISS output. The default file name is
 ``ptc\_twiss''. 
 
-\item {\bf TABLE}[=string] (Default: .false.) \\
+\ttitem{TABLE}[=string] (Default: .false.) \\
 if the TABLE option is omitted, no output is written to an internal
 table. \\ 
 If the TABLE option is present, the optional argument is the name of the
 internal table for PTC\_TWISS variables. The default table name is
 ``ptc\_twiss''. 
 
-\item {\bf SUMMARY\_FILE}[=string] (Default: .false.) \\
+\ttitem{SUMMARY\_FILE}[=string] (Default: .false.) \\
 if the SUMMARY\_FILE option is omitted, no summary output is written to
 file. \\  
 If the SUMMARY\_FILE option is present, the optional argument is the
 name of the file for printing the PTC\_TWISS\_SUMMARY table output. The
 default file name is ``ptc\_twiss\_summary'' 
 
-\item {\bf SUMMARY\_TABLE}[=string] (Default: .false.) \\
+\ttitem{SUMMARY\_TABLE}[=string] (Default: .false.) \\
 if the option SUMMARY\_TABLE is omitted, no summary output is written to
 an internal table. \\
 If the option SUMMARY\_TABLE is present, the optional argument is the name
 of the internal summary table for PTC\_TWISS\_SUMMARY variables. The
 default table name is ``ptc\_twiss\_summary''.  
 
-\item \href{../Introduction/ranges.html#range}{\bf RANGE}=string (Default:
+\ttitem{RANGE}=string\href{../Introduction/ranges.html#range} (Default:
   \(\#S/\#E\)) \\ 
 specifies a segment of beam-line for the PTC\_TWISS calculation.
 
-\item {\bf INITIAL\_MATRIX\_TABLE}=logical (Default: .false.) \\
+\ttitem{INITIAL\_MATRIX\_TABLE}=logical (Default: .false.) \\
 Reading the transfer map from table called map\_table created by
 preceding PTC\_TWISS or PTC\_NORMAL command. The table can be also read
 before hand from files using READTABLE command.
 
-\item {\bf INITIAL\_MATRIX\_MANUAL}=logical (Default: .false.) \\ 
+\ttitem{INITIAL\_MATRIX\_MANUAL}=logical (Default: .false.) \\ 
 Using the input variables RE11, \ldots ,RE66 (see next entry) as the
 transfer matrix.
 
-\item {\bf INITIAL\_MAP\_MANUAL}=logical (Default: .false.) \\
+\ttitem{INITIAL\_MAP\_MANUAL}=logical (Default: .false.) \\
 Using the input map stored beforehand in file fort.18 (e.g. by some
 initial run of \href{../ptc_normal/ptc_normal.html}{PTC\_NORMAL}). 
 
-\item {\bf IGNORE\_MAP\_ORBIT}=logical (default: .false.) \\
+\ttitem{IGNORE\_MAP\_ORBIT}=logical (default: .false.) \\
 Ignore the orbit in the map and use instead closed orbit, if requested,
 or otherwise specified with x,px,y,p,t,dt parameters. 
 
-\item {\bf RE11,..., RE66} = doubles (Default: Unit Matrix) \\ 
+\ttitem{RE11,..., RE66} = doubles (Default: Unit Matrix) \\ 
 Values of the \(6\times 6\) transfer matrix.  
 
-\item {\bf BETA0}=string (Default: beta0) \\
+\ttitem{BETA0}=string (Default: beta0) \\
 The name of the \texttt{BETA0}-block containing the Twiss
 parameters to be used as input. When icase=6, this information must be
 complemented by supplying a value for 'betz' on the ptc\_twiss command
 line.
 
-\item {\bf MAP\_TABLE}=logical (Default: .false.)\\
+\ttitem{MAP\_TABLE}=logical (Default: .false.)\\
 If true, save the one-turn-map to table "map\_table".
 This one-turn-map can then be used as starting condition for a
 subsequent \texttt{ptc\_twiss}, see \texttt{INITIAL\_MATRIX\_TABLE}
 parameter of this command.  
 
-\item {\bf betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy} =doubles
+\ttitem{betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy} =doubles
   (Default: 0) \\ 
 \href{../Introduction/bibliography.html#edwards}{Edwards and Teng} 
 \href{../twiss/twiss.html}{Twiss and dispersion parameters}:  
 \textit{$\beta_{x,y}$}, \textit{$\alpha_{x,y}$},
 \textit{$\mu_{x,y}$}, \textit{D$_{x,y}$},  \textit{D$_{px,py}$}.
 
-\item {\bf RING\_PARAMETERS}=logical (default: .false.) \\
+\ttitem{RING\_PARAMETERS}=logical (default: .false.) \\
 Forces computation of ring parameters ($\gamma_{tr}$, $\alpha_c$, etc.).
 
-\item {\bf x, px, y, py, t, pt} = doubles (Default: 0.0) \\
+\ttitem{x, px, y, py, t, pt} = doubles (Default: 0.0) \\
 The \href{../Introduction/tables.html#canon}{\textbf{canonical}} coordinates
 of the initial orbit. 
 
-\end{itemize}
+\end{madlist}
 
 
 {\bf Remarks} \\
