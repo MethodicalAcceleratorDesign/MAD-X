@@ -33,7 +33,7 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g -gdwarf-2 -check all
+LDFLAGS += -g -traceback -gdwarf-2 -check all
 endif
 
 ifeq ($(PROFILE),yes)
@@ -77,7 +77,7 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += /debug:full /check:all
+LDFLAGS += /debug:full /traceback /check:all
 endif
 
 ifeq ($(PROFILE),yes)
