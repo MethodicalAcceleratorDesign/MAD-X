@@ -288,6 +288,22 @@ contains
 
           !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
           call track_beam(my_ring,TheBeam,getintstate(), node1=ni, node2=ni+1)
+          
+          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+                write(whymsg,*) 'DA got unstable. ', &
+                                'track no.: ',n,      &
+                                ', turn no.:',t,         &
+	            ', element no.:', e,    & 
+	            ', int. step: ',ni, &
+	            ', el. name:', p%MAG%name, &
+	            ', PTC msg: ',messagelost
+                call fort_warn('ptc_trackline: ',whymsg)
+                call seterrorflag(10,"ptc_trackline ",whymsg);
+                goto 101 !one of the tracks has problem, we can not contine
+                
+             endif
+          
+          
           pathlegth = curr_slice%s(3)
 
           if (getdebug() > 2 ) then
@@ -303,7 +319,14 @@ contains
           doloop = dosave .or. rplot
           if (doloop) then
             do n=1, npart
-
+               
+               if (TheBeam%U(n)) then
+                 if (getdebug() > 2 ) then
+                   print*, "Particle ", n , " alread lost at point ", ni
+                 endif
+                 cycle
+               endif
+               
                x = TheBeam%X(n,1:6)
 
                p0 = p%mag%p%p0c
@@ -337,9 +360,10 @@ contains
                endif
 
                if ( dosave ) then
-                  if ( associated(CURR_SLICE, p%t2 ) ) then
+                  !if ( associated(CURR_SLICE, p%t2 ) ) then
+                  if (CURR_SLICE%cas==case0) then
 	 !print*, "Sending to table", n, e, pathlegth
-	 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0)
+	 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0, intstate%TOTALPATH)
                   endif
                endif
                !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
@@ -359,6 +383,7 @@ contains
 
     enddo !loop over turns
 
+101 continue 
     
     if (getdebug() > 1 ) then
       close(mf)
@@ -425,7 +450,7 @@ contains
 
   !_________________________________________________________________________________
 
-  subroutine putintracktable (npart,turn,nobs,x,px,y,py,t,pt,spos,e)
+  subroutine putintracktable (npart,turn,nobs,x,px,y,py,t,pt,spos,e,totpath)
     implicit none
     !--- purpose: enter particle coordinates in table                      *
     !    input:                                                            *
@@ -443,6 +468,7 @@ contains
     !hbu
     real(dp) :: x,px,y,py,t,pt
     real(dp) :: spos,e
+    integer  :: totpath
     !hbu
     data table_puttab / 'track.obs$$$$.p$$$$' /
     data table        / 'trackone           ' /
@@ -477,8 +503,13 @@ contains
 
     doublenum = py
     call double_to_table_curr(table, 'py ', doublenum)
-
-    doublenum = -t
+    
+    if (totpath==1) then
+      doublenum =  t
+    else        
+      doublenum = -t
+    endif
+    
     call double_to_table_curr(table, 't ' , doublenum)
 
     doublenum = pt
@@ -663,9 +694,10 @@ contains
              call track(my_ring,x,e,e+1,getintstate())
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
                 write(whymsg,*) 'DA got unstable. ', &
-                                'track no. ',n,      &
-                                ', turn no',t,         &
-	            ', element no.', e,    & 
+                                'track no.: ',n,      &
+                                ', turn no.:',t,         &
+	            ', element no.:', e,    & 
+	            ', el. name:', p%MAG%name, &
 	            ', PTC msg: ',messagelost
                 call fort_warn('ptc_trackline: ',whymsg)
                 call seterrorflag(10,"ptc_trackline ",whymsg);
@@ -704,7 +736,7 @@ contains
              endif
 
              if ( observedelements(e) .gt. 0) then
-                call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, p0)
+                call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, p0,intstate%TOTALPATH)
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
 
