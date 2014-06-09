@@ -874,9 +874,19 @@ c\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Y Rotation}
+The rotation about the $Y$ axis has no effect on the beam, but it causes the beam to be referred to a new coordinate system:
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{X Rotation}
+
+It is implemented through the transfer matrix:
+$$\left(\begin{array}{cccccc}
+\frac{1}{\cos\theta}\\
+ & \cos\theta &  &  &  & -\frac{\sin\theta}{\beta}\\
+ &  & 1\\
+ &  &  & 1\\
+\frac{\tan\theta}{\beta} &  &  &  & 1\\
+ &  &  &  &  & 1
+\end{array}\right)$$
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
