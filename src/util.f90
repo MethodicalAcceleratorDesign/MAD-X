@@ -364,6 +364,7 @@ module spch_bbfi
   use bbfi
   implicit none
   public
+  logical :: lost_in_turn = .false., is_lost = .false.
   integer i_turn, N_macro_surv, N_for_I, N_macro_max, N_spch, i_spch 
   parameter(N_macro_max=16000)
   double precision Ex_rms, Ey_rms, sigma_p, sigma_z

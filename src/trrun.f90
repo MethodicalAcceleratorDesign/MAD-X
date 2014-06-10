@@ -65,7 +65,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !----------------------------------------------------------------------*
   logical onepass,onetable,last_out,info,aperflag,doupdate,first,        &
        bb_sxy_update,virgin_state,emittance_update,checkpnt_restart,     &
-       fast_error_func
+       fast_error_func,exit_loss_turn
   integer j,code,restart_sequ,advance_node,                              &
        node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
        ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
@@ -169,6 +169,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
           dy_start,    dpy_start)
 
      if(first) call make_bb6d_ixy(turns)
+     exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
   endif
 
   if(fsecarb) then
@@ -535,6 +536,16 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      call ttmap(switch,code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id,             &
           last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
      !--------  Misalignment at end of element (from twissfs.f)
+     if (bb_sxy_update .and. emittance_update .and. is_lost) then
+        call ixy_calcs(betas, orbit0, z,                                &
+             betx_start, bety_start,                      &
+             alfx_start, alfy_start,                      &
+             gamx_start, gamy_start,                      &
+             dx_start,    dpx_start,                      &
+             dy_start,    dpy_start)
+        call ixy_fitting()
+        is_lost = .false.
+     endif
      if (code .ne. 1)  then
         if (n_align .ne. 0)  then
            do i = 1, jmax
@@ -571,6 +582,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
         j=j+1
         go to 10
      endif
+
      !--- end of loop over nodes
      if (switch .eq. 1)  then
         if (mod(turn, ffile) .eq. 0)  then
@@ -606,6 +618,15 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      if (switch .eq. 2 .and. info) then
         if (mod(turn,100) .eq. 0) print *, 'turn :', turn
      endif
+
+     if(exit_loss_turn .and. lost_in_turn) then
+        lost_in_turn = .false.
+        write(text, '(i6)') turn
+        call aawarn('TRRUN Frozen SC: ',&
+             'Stop in Loss Turn: '//text)
+        goto 20
+     endif
+
   enddo
   !--- end of loop over turns
 20 continue
@@ -2973,10 +2994,11 @@ subroutine trkill(n, turn, sum, jmax, part_id,                    &
      last_turn, last_pos, last_orbit, z, aptype)
 
   use name_lenfi
+  use spch_bbfi
   implicit none
 
   !hbu--- kill particle:  print, modify part_id list
-  logical recloss
+  logical recloss, exit_loss_turn
   integer i,j,n,turn,part_id(*),jmax,last_turn(*),get_option
   double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
        torb(6) !, theta, node_value, st, ct, tmp
@@ -2985,6 +3007,7 @@ subroutine trkill(n, turn, sum, jmax, part_id,                    &
   character(name_len) el_name
 
   recloss = get_option('recloss ') .ne. 0
+  exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
 
   !!--- As elements might have a tilt we have to transform back
   !!--- into the original coordinate system!
@@ -3015,6 +3038,11 @@ subroutine trkill(n, turn, sum, jmax, part_id,                    &
        part_id(n),turn,sum,el_name,aptype
   print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
+  if(exit_loss_turn) then
+     lost_in_turn = .true.
+     is_lost = .true.
+  endif
+ 
   if(recloss) then
      call tt_ploss(part_id(n),turn,sum,torb,el_name)
   endif

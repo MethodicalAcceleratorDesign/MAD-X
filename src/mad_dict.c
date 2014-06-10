@@ -274,6 +274,7 @@ char command_def[] =
 "bb_sxy_update    = [l, false, true], " /* frs */
 "emittance_update = [l, true,  true], " /* frs */
 "fast_error_func  = [l, false, true], " /* frs */
+"exit_loss_turn   = [l, false, true], " /* frs */
 "echo      = [l, true, true], "
 "echomacro = [l, false, true], " /* ld */
 "info      = [l, true, true], "
