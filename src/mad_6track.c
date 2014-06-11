@@ -458,7 +458,6 @@ static int
   field_cnt = 0,       /* element with field errors count */
   f3_cnt = 0,          /* f3 write flag */
   f3aux_cnt = 0,       /* f3aux write flag */
-  f3_matrix_cnt = 0,   /* f3_matrix write flag */
   f8_cnt = 0,          /* f8 write count */
   f16_cnt = 0,         /* f16 write count */
   f34_cnt = 0,         /* f34 write count */
@@ -3343,7 +3342,6 @@ c6t_init(void)
   field_cnt = 0;       /* element with field errors count */
   f3_cnt = 0;          /* f3 write flag */
   f3aux_cnt = 0;       /* f3aux write flag */
-  f3_matrix_cnt = 0;   /* f3_matrix write flag */
   f8_cnt = 0;          /* f8 write count */
   f16_cnt = 0;         /* f16 write count */
   f34_cnt = 0;         /* f34 write count */
