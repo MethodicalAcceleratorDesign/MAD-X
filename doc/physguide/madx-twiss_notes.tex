@@ -89,6 +89,9 @@
 The implementation of the Twiss module was inherited from \madeight and adapted to the LHC studies during the crash program for the development of its successor \madx. The root of this code goes back into the 80's and some approximations and adaptations were never documented. Hence, the purpose of this work is to recover the physics of this module using reverse engineer, and to document the approximations and assumptions made by the code. It will be also the opportunity to clarify some features and inconsistencies, and potentially correct some known problems.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conventions, Frames and Canonical Variables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bending Magnets}
 
 \madx does not support the so called ``true \T{RBEND}'' element. This kind of magnet is internally represented as a sector bend (i.e. \T{SBEND}) with the pole faces made parallel by setting the pole face angles to $\T{e1}=\T{e2}=\alpha/2$, where $\alpha$ is the \T{SBEND} angle.
@@ -147,7 +150,7 @@ The next code reads the probe and the magnet parameters from the \L{twiss} comma
 \begin{lstlisting}[firstnumber=last]
   deltap   = get_value('probe ','deltap ')  ! parameters from current beam
   gamma    = get_value('probe ','gamma ')
-  arad     = get_value('probe ','arad ')    ! undocumented (internal?)
+  arad     = get_value('probe ','arad ')
   dorad    = get_value('probe ','radiate ') .ne. 0
   
   bvk      = node_value('other_bv ')        ! forward / backward flag
@@ -155,15 +158,15 @@ The next code reads the probe and the magnet parameters from the \L{twiss} comma
   if(code.eq.39) code=15                    ! tkicker to kicker
   if(code.eq.38) code=24                    ! placeholder to instrument
 
-  elpar_vl = el_par_vector(b_k3s, g_elpar)  ! get strengths up to k3s
+  elpar_vl = el_par_vector(b_k3s, g_elpar)  ! strengths up to k3s
   an       = bvk * g_elpar(b_angle)         ! sbend angle (time bv flag)
   sk1      = g_elpar(b_k1)                  ! quadrupole term
   sks      = g_elpar(b_k1s)                 ! skew quadrupole term
   sk2      = g_elpar(b_k2)                  ! sextupole term
                                             !  (k2s, k3, k3s are ignored, see dict)
-  n_ferr   = node_fd_errors(f_errors)       ! get multipole field errors
+  n_ferr   = node_fd_errors(f_errors)       ! multipole field errors
   tilt     = g_elpar(b_tilt)                ! sbend tilt (clockwise)
-  e1       = g_elpar(b_e1)                  ! sbend entrance/exit pole face angle
+  e1       = g_elpar(b_e1)                  ! entrance/exit pole face angle
   e2       = g_elpar(b_e2)                  !  (introduce quadrupole terms)
   h1       = g_elpar(b_h1)                  ! entrance/exit pole face curvature
   h2       = g_elpar(b_h2)                  !  (introduce sextupole terms)
@@ -173,20 +176,20 @@ The next code reads the probe and the magnet parameters from the \L{twiss} comma
 
   h = an / el                               ! local curvature (angle/length)
 \end{lstlisting}
-The following lines are adjusting the pole faces of a "false" \L{rbend} into a true \L{sbend} with parallel pole faces {\em [Note: $e_1$ and $e_2$ have opposite direction, see \L{sbend} reference frame in the users' guide]}:
+The following lines are adjusting the pole faces of a "false" \L{rbend} into a true \L{sbend} with parallel pole faces: {\em [Note: $e_1$ and $e_2$ have opposite sign directions, see \L{sbend} reference frame in the users' guide.]}
 \begin{lstlisting}[firstnumber=last]
   if(code.eq.2) then
     e1 = e1 + an / 2
     e2 = e2 + an / 2
   endif
 \end{lstlisting}
-{\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors, also.
+{\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors too.
 \begin{lstlisting}[firstnumber=last]
   !---- Apply field errors and change coefficients using DELTAP.
   if (n_ferr .gt. 0) then
-    nd = n_ferr
-    call dzero(field,nd)
-    call dcopy(f_errors,field,n_ferr)
+    nd = n_ferr                             ! useless copy
+    call dzero(field,nd)                    ! useless clear
+    call dcopy(f_errors,field,n_ferr)       ! useless copy
     dh = (- h * deltap + bvk * field(1,0) / el) / (1 + deltap)
     sk1 = (sk1 + field(1,1) / el) / (1 + deltap)
     sk2 = (sk2 + field(1,2) / el) / (1 + deltap)
@@ -198,6 +201,9 @@ The following lines are adjusting the pole faces of a "false" \L{rbend} into a t
     sks = sks / (1 + deltap)
   endif
 \end{lstlisting}
+\[
+dh = -h\; \frac{\delta_p}{1+\delta_p}
+\]
 Applies \L{bvk}-flag to field components:
 \begin{lstlisting}[firstnumber=last]
   sk1 = bvk * sk1

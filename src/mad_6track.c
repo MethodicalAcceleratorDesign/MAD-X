@@ -371,7 +371,7 @@ static void write_c6t_element(struct c6t_element*);
 static void write_f16_errors(void);
 static void write_f8_errors(void);
 static void write_f3_aper(void);
-static void write_f3aux(void);
+static void write_f3_aux(void);
 static void write_f3_matrix(void);
 static void write_f3_entry(char*, struct c6t_element*);
 static void write_f3_mult(struct c6t_element*);
@@ -491,7 +491,7 @@ static const double eps_9 = 1.e-9;
 static const double eps_12 = 1.e-12;
 static double ref_def = 0.017;
 
-static FILE *f2, *f3, *f3aux, *f3matrix, *f3aper, *f8, *f16, *f34;
+static FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
 
 // private functions
 
@@ -3002,9 +3002,10 @@ write_f3_aper(void)
 {
   int f3aper_cnt = 0;
   current_element = first_in_sequ;
+
   while (current_element != NULL)
   {
-    if (strstr(current_element->name,"_AP")!=NULL
+    if (strstr(current_element->name,"_AP") != NULL
         && (current_element->equiv == current_element))
     {
       if (f3aper_cnt++ == 0)
@@ -3029,7 +3030,7 @@ write_f3_aper(void)
 }
 
 static void
-write_f3aux(void)
+write_f3_aux(void)
 {
   double aux_val[4] = {-1.e20, -1.e20, -1.e20, -1.e20};
   double tw_alfa;
@@ -3043,7 +3044,7 @@ write_f3aux(void)
   }
   if (current_beam != NULL)
   {
-    if (f3aux_cnt++ == 0)     f3aux  = fopen("fc.3.aux", "w");
+    if (f3aux_cnt++ == 0) f3aux  = fopen("fc.3.aux", "w");
     if (double_from_table_row("summ","alfa", &row, &tw_alfa) !=0)
       printf("c6t warning: alfa not found in twiss\n");
     fprintf(f3aux, "SYNC\n");
@@ -3082,22 +3083,21 @@ write_f3_matrix(void)
 {
   int i, i_max = 43;
   current_element = first_in_sequ;
+  if (!f3) f3 = fopen("fc.3", "w");
+
   while (current_element != NULL)
   {
     if (strcmp(current_element->base_name, "matrix") == 0)
     {
-      if (f3_matrix_cnt++ == 0)
-      {
-        f3matrix = fopen("fc.3", "w");
-        fprintf(f3matrix,"TROM\n");
-        fprintf(f3matrix,"%-16s\n",current_element->name);
+      fprintf(f3,"TROM\n");
+      fprintf(f3,"%-16s\n",current_element->name);
+
+      for (i = 1; i < i_max; i++) {
+        fprintf(f3,"%23.15e", current_element->value[i]);
+        if (i%3 == 0) fprintf(f3,"\n");
       }
-      for (i = 1; i < i_max; i++)
-      {
-        fprintf(f3matrix,"%23.15e", current_element->value[i]);
-        if (i%3 == 0) fprintf(f3matrix,"\n");
-      }
-      fprintf(f3matrix,"NEXT\n");
+
+      fprintf(f3,"NEXT\n");
     }
     current_element = current_element->next;
   }
@@ -3305,7 +3305,6 @@ c6t_finish(void)
   if (f2) { fclose(f2); f2 = 0; }
   if (f3) { fclose(f3); f3 = 0; }
   if (f3aux) { fclose(f3aux); f3aux = 0; }
-  if (f3matrix) { fclose(f3matrix); f3matrix = 0; }
   if (f3aper) { fclose(f3aper); f3aper = 0; }
   if (f8) { fclose(f8); f8 = 0; }
   if (f16) { fclose(f16); f16 = 0; }
@@ -3363,7 +3362,6 @@ c6t_init(void)
   f2 = 0;
   f3 = 0;
   f3aux = 0;
-  f3matrix = 0;
   f3aper = 0;
   f8 = 0;
   f16 = 0;
@@ -3393,7 +3391,7 @@ process_c6t(void)  /* steering routine */
   write_struct();
   write_f16_errors();
   write_f34_special();
-  write_f3aux();
+  write_f3_aux();
   write_f3_matrix();
   write_f3_aper();
   write_f8_errors();
