@@ -182,7 +182,8 @@ VARIABLE "TAR" SET TO   3.23474635e-17
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 

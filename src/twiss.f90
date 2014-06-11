@@ -16,7 +16,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !----------------------------------------------------------------------*
   logical fast_error_func
   integer i,ithr_on
-  integer tab_name(*),chrom,eflag,inval,get_option,izero,ione
+  integer tab_name(*),chrom,eflag,get_option,izero,ione
   double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6), &
        ddisp0(6),r0mat(2,2),zero,one,two,get_value
   integer sector_tab_name(*) ! holds sectormap data
@@ -31,7 +31,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   sectorTableName = charconv(sector_tab_name)
   chrom=0
   eflag=0
-  inval=0
   ithr_on=0
   fsecarb=.false.
   i = 6
@@ -107,10 +106,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   circ=get_value('probe ','circ ')
   if (circ.eq.zero) call aafail('TWISS: ', 'Zero length sequence.')
 
-  !---- Initial value flag.
-  inval=get_option('twiss_inval ')
-
-
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
   fast_error_func = get_option('fast_error_func ') .ne. 0
@@ -119,26 +114,31 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      fasterror_on = .true.
   endif
 
-  !---- Initial values from command attributes.
-  if (inval.ne.0) then
-     !     initialize user values
+  if (get_option('twiss_inval ') .ne. 0) then   
+     !---- Initial values from command attributes.
      call twinifun(opt_fun0, rt)
-     !---- Get transfer matrix.
-     call tmpart(orbit0,.true.,.true.,rt,tt,eflag)
-     if(eflag.ne.0) go to 900
-     !---- Initial values from periodic solution.
-  else
-     if (inval.eq.0) then
-        call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-        if(eflag.ne.0) go to 900
-        call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
-        if(eflag.ne.0) go to 900
-        call twcpin(rt,disp0,r0mat,eflag)
-        if(eflag.ne.0) go to 900
+     if (get_option('twiss_print ') .ne. 0)  then
+        print *, ' '
+        print '(''open line - error with deltap: '',1p,e14.6)', get_value('probe ','deltap ')
+        print '(''initial orbit vector: '', 1p,6e14.6)', orbit0
      endif
+     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
+     if(eflag.ne.0) go to 900
+     if (get_option('twiss_print ') .ne. 0)  then
+        print '(''final orbit vector:   '', 1p,6e14.6)', orbit
+     endif
+  else 
+     !---- Initial values from periodic solution.
+     call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
+     if(eflag.ne.0) go to 900
+     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
+     if(eflag.ne.0) go to 900
+     call twcpin(rt,disp0,r0mat,eflag)
+     if(eflag.ne.0) go to 900
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
   endif
+
   if (sectormap)  then
      call dcopy(orbit0, sorb, 6)
      call m66one(srmat)
@@ -146,10 +146,10 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   endif
 
   !---- Build table of lattice functions, coupled.
-  call twcpgo(rt)
+  call twcpgo(rt,orbit0)
 
   !---- List chromatic functions.
-  if(chrom.ne.0) then
+  if (chrom.ne.0) then
      call twbtin(rt,tt)
      call twchgo
   endif
@@ -163,11 +163,11 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   endif
 
   call set_option('twiss_success ', ione)
-  goto 9999
+  return
 
 900 call set_option('twiss_success ', izero)
 
-9999 end SUBROUTINE twiss
+ end SUBROUTINE twiss
 
 
 
@@ -241,12 +241,12 @@ SUBROUTINE twinifun(opt_fun0,rt)
   twopi=get_variable('twopi ')
   betx=get_value('twiss ','betx ')
   bety=get_value('twiss ','bety ')
+
   if(betx.gt.zero) opt_fun0(3)=betx
   if(bety.gt.zero) opt_fun0(6)=bety
 
-  if(opt_fun0(3).le.zero.or.opt_fun0(6).le.zero)                    &
-       call aafail('TWINIFUN: ',                                         &
-       'BETX and BETY must be both larger than zero.')
+  if(opt_fun0(3).le.zero .or. opt_fun0(6).le.zero) &
+       call aafail('TWINIFUN: ', 'BETX and BETY must be both larger than zero.')
 
   alfx=  get_value('twiss ','alfx ')
   mux=   get_value('twiss ','mux ')
@@ -316,7 +316,7 @@ SUBROUTINE twinifun(opt_fun0,rt)
   endif
 
 end SUBROUTINE twinifun
-SUBROUTINE twprep(save,case,opt_fun,position,flag)
+SUBROUTINE twprep(save,case,opt_fun,position)
 
   use twissafi
   use twisslfi
@@ -330,48 +330,54 @@ SUBROUTINE twprep(save,case,opt_fun,position,flag)
   !     Input:                                                           *
   !     case        (integer) =1 fill from twcpgo; =2 fill from twchgo   *
   !     position    (double)  end position of element                    *
-  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
   !     Input/output:                                                    *
   !     opt_fun(fundim) (double) optical values:                         *
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
-  integer save,case,i,flag
+
+  ! 2014-May-15  15:40:41  ghislain: suppressed flag
+  !     that was always set to 1 in calling functions and never modified.
+  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
+
+
+  integer save,case,i
   double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21, &
        opt23,opt24,get_variable,zero
   parameter(zero=0d0)
 
   !---- Initialize
   twopi=get_variable('twopi ')
-  if (flag .ne. 0)  then
-     if(case.eq.1) then
-        opt_fun(2)=position
-        opt5 = opt_fun(5)
-        opt_fun(5)= opt_fun(5) / twopi
-        opt8 = opt_fun(8)
-        opt_fun(8)= opt_fun(8) / twopi
-        if(save.ne.0) call twfill(case,opt_fun,position, flag)
-        if (match_is_on)  call copy_twiss_data(opt_fun)
-        opt_fun(5)= opt5
-        opt_fun(8)= opt8
-     elseif(case.eq.2) then
-        opt20 = opt_fun(20)
-        opt_fun(20)= opt_fun(20) / twopi
-        opt21 = opt_fun(21)
-        opt_fun(21)= opt_fun(21) / twopi
-        opt23 = opt_fun(23)
-        opt_fun(23)= opt_fun(23) / twopi
-        opt24 = opt_fun(24)
-        opt_fun(24)= opt_fun(24) / twopi
-        if(save.ne.0) call twfill(case,opt_fun,position, flag)
-        if (match_is_on)  call copy_twiss_data(opt_fun)
-        opt_fun(20)= opt20
-        opt_fun(21)= opt21
-        opt_fun(23)= opt23
-        opt_fun(24)= opt24
-     endif
+
+  if(case.eq.1) then
+     !--- fill with data from twcpgo (Twiss Couple)
+     opt_fun(2)=position
+     opt5 = opt_fun(5)
+     opt_fun(5)= opt_fun(5) / twopi
+     opt8 = opt_fun(8)
+     opt_fun(8)= opt_fun(8) / twopi
+     if(save.ne.0) call twfill(case,opt_fun,position)
+     if (match_is_on)  call copy_twiss_data(opt_fun)
+     opt_fun(5)= opt5
+     opt_fun(8)= opt8
+  elseif(case.eq.2) then
+     !--- fill with data from twchgo (Twiss Chrom)
+     opt20 = opt_fun(20)
+     opt_fun(20)= opt_fun(20) / twopi
+     opt21 = opt_fun(21)
+     opt_fun(21)= opt_fun(21) / twopi
+     opt23 = opt_fun(23)
+     opt_fun(23)= opt_fun(23) / twopi
+     opt24 = opt_fun(24)
+     opt_fun(24)= opt_fun(24) / twopi
+     if(save.ne.0) call twfill(case,opt_fun,position)
+     if (match_is_on)  call copy_twiss_data(opt_fun)
+     opt_fun(20)= opt20
+     opt_fun(21)= opt21
+     opt_fun(23)= opt23
+     opt_fun(24)= opt24
   endif
 end SUBROUTINE twprep
-SUBROUTINE twfill(case,opt_fun,position,flag)
+SUBROUTINE twfill(case,opt_fun,position)
 
   use twissafi
   use twisslfi
@@ -384,53 +390,51 @@ SUBROUTINE twfill(case,opt_fun,position,flag)
   !     Input:                                                           *
   !     case        (integer) =1 fill from twcpgo; =2 fill from twchgo   *
   !     position    (double)  end position of element                    *
-  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
   !     Input/output:                                                    *
   !     opt_fun(fundim) (double) optical values:                         *
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
-  integer case,i,flag
+
+  ! 2014-May-15  15:40:41  ghislain: suppressed flag
+  !     that was always set to 1 in calling functions and never modified.
+  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
+
+  integer case,i
   double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21,opt23,opt24,zero,get_value
   parameter(zero=0d0)
 
   ripken=get_value('twiss ','ripken ').ne.zero
 
-  if (flag .ne. 0)  then
-     if(case.eq.1) then
-        i = 17
-        call vector_to_table_curr(table_name, 's ', opt_fun(2), i)
-        i = 5
-        call vector_to_table_curr(table_name, 'r11 ', opt_fun(29), i)
-        i = 5
-        call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), i)
-        if(rmatrix) then
-           i = 36
-           call vector_to_table_curr(table_name, 're11 ', opt_fun(34), i)
-        endif
-        if(ripken) call twfill_ripken(opt_fun)
-     elseif(case.eq.2) then
-        i = 10
-        call vector_to_table_curr(table_name, 'wx ', opt_fun(19), i)
+  if(case.eq.1) then
+     i = 17
+     call vector_to_table_curr(table_name, 's ', opt_fun(2), i)
+     i = 5
+     call vector_to_table_curr(table_name, 'r11 ', opt_fun(29), i)
+     i = 5
+     call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), i)
+     if(rmatrix) then
+        i = 36
+        call vector_to_table_curr(table_name, 're11 ', opt_fun(34), i)
      endif
-
-     !---- Augment table twiss
-     call augment_count(table_name)
+     if(ripken) call twfill_ripken(opt_fun)
+  elseif(case.eq.2) then
+     i = 10
+     call vector_to_table_curr(table_name, 'wx ', opt_fun(19), i)
   endif
+
+  !---- Augment table twiss
+  call augment_count(table_name)
+
 end SUBROUTINE twfill
 SUBROUTINE twfill_ripken(opt_fun)
 
   implicit none
 
-  !------------------------------------------------------------------
-  !----*
-  !     Purpose:
-  !         *
-  !     Fill twiss table with Ripken-Mais twiss parameters.
-  !         *
-  !     beta11, beta12, beta21, beta22, alfa11, alfa12, alfa21, alfa22 
-  !         *
-  !------------------------------------------------------------------
-  !----*
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Fill twiss table with Ripken-Mais twiss parameters.              *
+  !     beta11, beta12, beta21, beta22, alfa11, alfa12, alfa21, alfa22   *
+  !----------------------------------------------------------------------*
   double precision opt_fun(*),kappa,gamx,gamy,beta11,beta12,beta21,beta22,alfa11,alfa12,alfa21,alfa22,&
        gama11,gama12,gama21,gama22,zero,one
   parameter(zero=0d0,one=1d0)
@@ -860,7 +864,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         return
      endif
   enddo
-  
+
   if (advance_node().ne.0) then
      node=node+1
      goto 10 ! loop over nodes
@@ -868,54 +872,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   bbd_flag=0
 end SUBROUTINE tmfrst
-
-SUBROUTINE tmpart(guess,fsec,ftrk,rt,tt,eflag)
-
-
-  implicit none
-
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     Find transfer matrix (+ tensor) for an open line                 *
-  !     Input:                                                           *
-  !     guess(6)     (double)  first guess for orbit start               *
-  !     fsec         (logical) if true, return second order terms.       *
-  !     ftrk         (logical) if true, track orbit.                     *
-  !     Output:                                                          *
-  !     guess(6)     (double)  final orbit                               *
-  !     rt(6,6)      (double)  transfer matrix.                          *
-  !     tt(6,6,6)    (double)  second order terms.                       *
-  !     eflag        (integer) error flag (0: OK, else != 0)             *
-  !----------------------------------------------------------------------*
-  logical fsec,ftrk,pflag
-  integer eflag,itmax,get_option,thr_on
-  parameter(itmax=20)
-  double precision guess(6),rt(6,6),tt(6,6,6),cotol,    &
-       orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
-       zero,one,get_variable
-  parameter(zero=0d0,one=1d0)
-  equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
-
-  !---- Initialize.
-  thr_on = get_option('threader ')
-  pflag = get_option('twiss_print ') .ne. 0
-  deltap = get_value('probe ','deltap ')
-  cotol = get_variable('twiss_tol ')
-  eflag = 0
-  !---- Initialize guess.
-  call dcopy(guess,orbit0,6)
-  !---- Track orbit and transfer matrix.
-  call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
-  if (eflag.ne.0)  return
-
-  !---- Message and convergence test.
-  if (pflag)  then
-     print *, ' '
-     print '(''open line - error with deltap: '',1p,e14.6)',deltap
-     print '(''end values: '', 1p,6e14.6)', orbit
-  endif
-
-end SUBROUTINE tmpart
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
 
@@ -1028,7 +984,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   !     r0mat(2,2)   (double)  coupling matrix                           *
   !     eflag        (integer) error flag.                               *
   !----------------------------------------------------------------------*
-  integer eflag,stabx,staby,inval,get_option
+  integer eflag,stabx,staby,get_option
   double precision rt(6,6),disp0(6),r0mat(2,2),a(2,2),arg,aux(2,2), &
        d(2,2),den,det,dtr,sinmu2,betx0,alfx0,amux0,bety0,alfy0,amuy0,    &
        deltap,get_value,eps,zero,one,two,fourth
@@ -1043,8 +999,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   deltap = get_value('probe ','deltap ')
 
   !---- Initial dispersion.
-  inval=get_option('twiss_inval ')
-  if (inval .eq. 0) then
+  if (get_option('twiss_inval ') .eq. 0) then
      call twdisp(rt,rt(1,6),disp0)
   else
      call dcopy(opt_fun0(15), disp0, 4)
@@ -1202,7 +1157,7 @@ SUBROUTINE twdisp(rt,vect,disp)
   endif
 
 end SUBROUTINE twdisp
-SUBROUTINE twcpgo(rt)
+SUBROUTINE twcpgo(rt,orbit0)
 
   use twiss0fi
   use twisslfi
@@ -1220,6 +1175,8 @@ SUBROUTINE twcpgo(rt)
   !     coupling.                                                        *
   !     Input:                                                           *
   !     rt(6,6)   (double)  one turn transfer matrix.                    *
+  ! 2014-Jun-11  11:10:37  ghislain: added:                              *
+  !     orbit0(6) (double)  initial orbit vector                         *
   !----------------------------------------------------------------------*
   logical fmap,cplxy,cplxt,dorad,sector_sel,mycentre_cptk
   integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
@@ -1232,9 +1189,12 @@ SUBROUTINE twcpgo(rt)
   integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0)
   character(130) msg
+
   !--- 2013-Nov-14  10:36:35  ghislain: adding name of element for output of name
   character*(name_len) el_name, bxmax_name, bymax_name, dxmax_name, dymax_name, xcomax_name, ycomax_name
 
+  double precision orbit0(6)
+  
   !---- Initialization
   pos0=zero
   amux=zero
@@ -1276,6 +1236,11 @@ SUBROUTINE twcpgo(rt)
   rmat(1,2)=opt_fun(30)
   rmat(2,1)=opt_fun(31)
   rmat(2,2)=opt_fun(32)
+
+  !--- 2014-May-30  15:19:52  ghislain: if initial values are provided, copy the initial orbit
+  !                 because opt_fun contains only the values given on the twiss command itself
+  !                 but does not know the values coming from COGUESS or USEORBIT
+  if (get_option('twiss_inval ') .ne. 0) orbit=orbit0
 
   !---- Maximum and r.m.s. values.
   bxmax =betx
@@ -1323,6 +1288,7 @@ SUBROUTINE twcpgo(rt)
   opt_fun(71) = g_elpar(g_kmin)
   opt_fun(72) = g_elpar(g_calib)
   opt_fun(73) = g_elpar(g_polarity)
+
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
@@ -1345,7 +1311,7 @@ SUBROUTINE twcpgo(rt)
      eta = - sd * betas**2 / circ
      alfa = one / gammas**2 + eta
      opt_fun(74)=alfa
-     call twprep(save,1,opt_fun,currpos, 1)
+     call twprep(save,1,opt_fun,currpos)
   endif
   centre_cptk=.false.
   if (fmap) then
@@ -1437,7 +1403,7 @@ SUBROUTINE twcpgo(rt)
      sigdy =sigdy + disp(3)**2
   !endif
 
-  if(.not.centre) call twprep(save,1,opt_fun,currpos,1)
+  if(.not.centre) call twprep(save,1,opt_fun,currpos)
   if(centre) then
      currpos=pos0+el
      opt_fun(2 )=currpos
@@ -1506,7 +1472,7 @@ SUBROUTINE twcptk(re,orbit)
   !     re(6,6)  (double)   transfer matrix of element.                  *
   !     orbit(6) (double)   closed orbit                                 *
   !----------------------------------------------------------------------*
-  integer i,i1,i2,j,inval,get_option
+  integer i,i1,i2,j,get_option
   double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
        rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
        alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
@@ -1587,9 +1553,8 @@ SUBROUTINE twcptk(re,orbit)
   
   !---- Cummulative R matrix and one-turn map at element location.
   if(rmatrix) then
-     inval=get_option('twiss_inval ')
      call m66mpy(re,rw,rw)
-     if (inval.ne.0) then
+     if (get_option('twiss_inval ') .ne. 0) then
         call dcopy(rw,rc,36)
      else
         call m66inv(rw,rwi)
@@ -1649,7 +1614,7 @@ SUBROUTINE twbtin(rt,tt)
   !     tt(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
   logical stabx,staby
-  integer i,k,j,inval,get_option
+  integer i,k,j,get_option
   double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
        sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth,           &
        get_variable,twopi
@@ -1669,9 +1634,9 @@ SUBROUTINE twbtin(rt,tt)
   wy     =opt_fun0(22)
   phiy   =opt_fun0(23)
   dmuy   =opt_fun0(24)
+
   !---- Initial value flag.
-  inval=get_option('twiss_inval ')
-  if (inval .ne. 0) then
+  if (get_option('twiss_inval ') .ne. 0) then
      call dcopy(opt_fun0(15),disp,4)
      call dcopy(opt_fun0(25),ddisp,4)
      disp(5) = zero
@@ -1826,6 +1791,7 @@ SUBROUTINE twchgo
   i = restart_sequ()
   if(centre) currpos = zero
   i_spch=0
+
 10 continue
   el = node_value('l ')
   code = node_value('mad8_type ')
@@ -1847,7 +1813,7 @@ SUBROUTINE twchgo
   if(centre) then
      pos0=currpos
      currpos=currpos+el/two
-     call twprep(save,2,opt_fun,currpos, 1)
+     call twprep(save,2,opt_fun,currpos)
   endif
   centre_bttk=.false.
   if (fmap) then
@@ -1861,7 +1827,7 @@ SUBROUTINE twchgo
      call twbttk(re,te)
      centre_bttk = mycentre_bttk
   endif
-  if(.not.centre) call twprep(save,2,opt_fun,zero,1)
+  if(.not.centre) call twprep(save,2,opt_fun,zero)
   if(centre) then
      currpos=pos0+el
      opt_fun(2 )=currpos
@@ -1934,9 +1900,12 @@ SUBROUTINE twbttk(re,te)
        bx1,bx2,by1,by2,proxim,rep(6,6),t2,ta,tb,temp,tg,fre(6,6),        &
        frep(6,6),curlyh,detl,f,rhoinv,blen,alfx0,alfy0,betx0,bety0,amux0,&
        amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),phix0,phiy0,node_value,eps,  &
-       zero,one,two
+       zero,one,two,sk1
   parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
 
+  double precision ka,kl,dispaverage,curlyhaverage,e1,e2
+  double precision an,sax,sbx,sgx,sdx,sdpx,sbx2,sdx2
+  
   !initialize
   wx0=zero
   wy0=zero
@@ -1956,16 +1925,155 @@ SUBROUTINE twbttk(re,te)
   !---- Tor: needed for synchrotron integrals
   blen=node_value('blen ')
   rhoinv=node_value('rhoinv ')
+  ! 2014-May-15  16:50:36  ghislain: added 
+  sk1 = node_value('k1 ')
+  e1 = node_value('e1 ')
+  e2 = node_value('e2 ')
+  
+  an = node_value('angle ')
+  if(node_value('mad8_type ').eq.2) then
+     e1 = e1 + an / two
+     e2 = e2 + an / two
+  endif
 
   !---- Synchrotron integrals before element.
   if(.not.centre_bttk) then
-     curlyh = disp(1)**2 * (one + alfx**2) / betx                    &
+     curlyh = disp(1)**2 * (one + alfx**2) / betx  &
           + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
      synch_1 = synch_1 + disp(1) * rhoinv * blen/two
      synch_2 = synch_2 + rhoinv**2 * blen/two
      synch_3 = synch_3 + abs(rhoinv**3) * blen/two
+     ! 2014-May-15  16:50:36  ghislain: added 
+     !synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
      synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
   endif
+
+
+  ! 2014-May-30  18:02:09  ghislain: work in progress
+
+  ! ! alternate take from SLAC-Pub-1193 where integration is done explicitly
+  ! !---- Synchrotron integrals through element.    
+  ! if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
+  !    sax = alfx
+  !    sbx = betx
+  !    sgx = (1+sax**2)/sbx
+  !    sdx = disp(1)
+  !    sdpx = disp(2)
+    
+  !    if ((rhoinv*rhoinv + 2*sk1) .ge. 0.0d0) then       
+  !       ka = sqrt(rhoinv*rhoinv + 2*sk1)
+  !       kl = ka*blen
+     
+  !       dispaverage = sdx * sin(kl)/kl & 
+  !            + sdpx * (1 - cos(kl))/(ka*kl) & 
+  !            + rhoinv * (kl - sin(kl))/(ka*ka*kl)
+          
+  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
+  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(kl-sin(kl))/(kl*kl*ka) &
+  !                                      + (sax*sdx + sbx*sdpx)*(1-cos(kl))/(kl*kl)) & 
+  !                     + blen*blen*rhoinv*rhoinv*( & 
+  !                           sgx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*ka*ka*kl**3) &
+  !                         - sax*(1-cos(kl))**2/(ka*kl**3) & 
+  !                         + sbx*(kl-cos(kl)*sin(kl))/(2*kl**3))
+  !    else
+  !       ka = sqrt(-rhoinv*rhoinv - 2*sk1) ! * i ; it is an imaginary number really so use sinh and cosh below
+  !       kl = ka*blen
+     
+  !       dispaverage = -sdx * sinh(kl)/kl & 
+  !            - sdpx * (1 - cosh(kl))/(ka*kl) & 
+  !            + rhoinv * (-kl - sinh(kl))/(ka*ka*kl)
+          
+  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
+  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(-kl-sinh(kl))/(kl*kl*ka) &
+  !                                      - (sax*sdx + sbx*sdpx)*(1-cosh(kl))/(kl*kl)) & 
+  !                     + blen*blen*rhoinv*rhoinv*( & 
+  !                           sgx*(-3*kl - 4*sinh(kl) + sinh(kl)*cosh(kl))/(-2*ka*ka*kl**3) &
+  !                         - sax*(1-cosh(kl))**2/(ka*kl**3) & 
+  !                         + sbx*(-kl-cosh(kl)*sinh(kl))/(2*kl**3))        
+  !    endif
+
+  !    ! print *, 'kl = ',kl
+  !    ! print *, 'dispx = ', sdx, 'dispaverage = ', dispaverage
+  !    ! print *, 'curlyh = ', curlyh, 'curlyhaverage = ', curlyhaverage
+     
+  !    synch_1 = synch_1 + dispaverage * rhoinv * blen
+  !    synch_2 = synch_2 + rhoinv**2 * blen
+  !    synch_3 = synch_3 + abs(rhoinv**3) * blen
+  !    synch_4 = synch_4 + dispaverage*rhoinv*(rhoinv**2 + 2*sk1) * blen
+  !    synch_5 = synch_5 + curlyhaverage * abs(rhoinv**3) * blen
+  ! endif
+
+
+  ! ! alternate take from SLAC-Pub-1193 where integration is done explicitly + poleface rotations
+  ! !---- Synchrotron integrals through element.    
+  ! if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
+
+  !    sax = alfx
+  !    sbx = betx
+
+  !    ! effect of poleface rotation
+  !    sax = sax - sbx*rhoinv*tan(e1) 
+  !    sgx = (1+sax**2)/sbx
+  !    sdx = disp(1) 
+  !    sdpx = disp(2) + sdx*rhoinv*tan(e1)
+
+  !    if ((rhoinv*rhoinv + 2*sk1) .ge. 0.0d0) then       
+  !       ka = sqrt(rhoinv*rhoinv + 2*sk1)
+  !       kl = ka*blen
+
+  !       ! propagation of dispersion and beta at exit
+  !       sdx2 = sdx*cos(kl) + sdpx*sin(kl)/ka + rhoinv*(1-cos(kl))/(ka*ka)
+
+  !       sbx2 = sbx*cos(kl) - 2*blen*sax*sin(kl)*cos(kl)/kl + sgx*sin(kl)*sin(kl)/(ka*ka)
+          
+  !       dispaverage = sdx * sin(kl)/kl & 
+  !            + sdpx * (1 - cos(kl))/(ka*kl) & 
+  !            + rhoinv * (kl - sin(kl))/(ka*ka*kl)
+          
+  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
+  !                       + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(kl-sin(kl))/(kl*kl*ka) &
+  !                                        + (sax*sdx + sbx*sdpx)*(1-cos(kl))/(kl*kl)) & 
+  !                       + blen*blen*rhoinv*rhoinv*( & 
+  !                            sgx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*ka*ka*kl**3) &
+  !                          - sax*(1-cos(kl))**2/(kl**3*ka) & 
+  !                          + sbx*(kl-cos(kl)*sin(kl))/(2*kl**3))
+  !    else
+  !       ka = sqrt(-rhoinv*rhoinv - 2*sk1) ! * i ; it is an imaginary number really so use sinh and cosh below
+  !       kl = ka*blen 
+        
+  !       ! propagation of dispersion and beta at exit
+  !       sdx2 = sdx*cosh(kl) - sdpx*sinh(kl)/ka + rhoinv*(1-cosh(kl))/(ka*ka)
+
+  !       sbx2 = sbx*cosh(kl) + 2*blen*sax*sinh(kl)*cosh(kl)/kl + sgx*sinh(kl)*sinh(kl)/(ka*ka)
+        
+  !       dispaverage = -sdx * sinh(kl)/kl & 
+  !            - sdpx * (1 - cosh(kl))/(ka*kl) & 
+  !            + rhoinv * (-1/(ka*ka) - sinh(kl)/(ka*ka*kl))
+        
+  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
+  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(-1/(ka*kl) - sinh(kl)/(kl*kl*ka)) &
+  !                                      - (sax*sdx + sbx*sdpx)*(1-cosh(kl))/(kl*kl)) & 
+  !                     + blen*blen*rhoinv*rhoinv*( &   
+  !                        sgx*(-3*kl - 4*sinh(kl) + sinh(kl)*cosh(kl))/(-2*ka**2*kl**3) &
+  !                      - sax*(1-cosh(kl))**2/(kl**3*ka) & 
+  !                      + sbx*(-kl-cosh(kl)*sinh(kl))/(2*kl**3))
+  !    endif
+
+  !    ! print *, "|k| = ", ka, "k*l = ", kl, 'blen = ', blen, 'rhoinv = ', rhoinv, 'sk1 = ', sk1, 'e1 =', e1, 'e2 = ', e2
+  !    ! print *, 'sdx = ', sdx, 'sdx2 = ', sdx2, 'sdpx = ', sdpx, & 
+  !    !     'sbx = ', sbx, 'sbx2 = ', sbx2, 'sax = ', sax, 'sgx = ', sgx
+  !    ! print *, 'dispaverage = ', dispaverage, 'curlyh = ', curlyh, 'curlyhaverage = ', curlyhaverage
+     
+
+  !    synch_1 = synch_1 + dispaverage * rhoinv * blen
+  !    synch_2 = synch_2 + rhoinv*rhoinv * blen
+  !    synch_3 = synch_3 + abs(rhoinv**3) * blen
+  !    synch_4 = synch_4 + dispaverage*rhoinv*(rhoinv**2 + 2*sk1) * blen & 
+  !                      - rhoinv*rhoinv*(sdx*tan(e1) + sdx2*tan(e2))/2 
+  !    synch_5 = synch_5 + curlyhaverage * abs(rhoinv**3) * blen
+  ! endif
+
+
 
   call dzero(aux,6)
   call dzero(auxp,6)
@@ -2104,6 +2212,8 @@ SUBROUTINE twbttk(re,te)
      synch_1 = synch_1 + disp(1) * rhoinv * blen/two
      synch_2 = synch_2 + rhoinv**2 * blen/two
      synch_3 = synch_3 + abs(rhoinv**3) * blen/two
+     ! 2014-May-15  16:50:36  ghislain: added 
+     !synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
      synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
   endif
 
@@ -2123,7 +2233,7 @@ SUBROUTINE tw_summ(rt,tt)
   !     rt(6,6)   (double)  one turn transfer matrix.                    *
   !     tt(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  integer i,inval,get_option
+  integer i,get_option
   double precision rt(6,6),tt(6,6,6),deltap,sd,betas,gammas,        &
        disp0(6),detl,f,tb,frt(6,6),frtp(6,6),rtp(6,6),t2,bx0,ax0,by0,ay0,&
        sx,sy,orbit5,twopi,get_variable,get_value,zero,one,two
@@ -2137,7 +2247,6 @@ SUBROUTINE tw_summ(rt,tt)
   deltap = get_value('probe ','deltap ')
   betas = get_value('probe ','beta ')
   gammas= get_value('probe ','gamma ')
-  inval = get_option('twiss_inval ')
   disp0(1)=opt_fun0(15)
   disp0(2)=opt_fun0(16)
   disp0(3)=opt_fun0(17)
@@ -2154,7 +2263,7 @@ SUBROUTINE tw_summ(rt,tt)
   ddisp(4)=opt_fun(28)
 
   !---- Summary data for non-periodic case.
-  if(inval.ne.0) then
+  if(get_option('twiss_inval ') .ne. 0) then
      detl = rt(5,5) * rt(6,6) - rt(5,6) * rt(6,5)
      f = one / sqrt(detl)
      call m66scl(f,rt,frt)
@@ -2501,7 +2610,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      sks = g_elpar(b_k1s)
      h = an / el
 
-     !---- Apply field errors and change coefficients using DELTAP.
+      !---- Apply field errors and change coefficients using DELTAP.
      if (n_ferr .gt. 0) then
         nd = n_ferr
         call dzero(field,nd)
@@ -2610,8 +2719,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- Tor: set parameters for sychrotron integral calculations
-  rhoinv = h
-  blen = el
+!  rhoinv = h
+!  blen = el
 
 end SUBROUTINE tmbend
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)

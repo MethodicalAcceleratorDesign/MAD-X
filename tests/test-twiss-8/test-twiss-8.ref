@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.10.14      +
-  + Execution Time Stamp: 15.10.13 10.34.11 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 14.03.02 +
   +++++++++++++++++++++++++++++++++++++++++++
 ang:=-PI/2;             !     0.000974144    -0.00864182        before bug fix was   0.000974144       -1.41323
 
@@ -31,11 +31,13 @@ use, sequence=SingleBend;
 twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thick.tfs";
 
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  1.000000E-02  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     1.799465E-19  1.693624E-19  7.061250E-03 -2.776802E-03 -8.006862E-03  0.000000E+00
 
 ++++++ table: summ
 
@@ -75,11 +77,13 @@ use, sequence=SingleBend;
 twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thin.tfs";
 
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  1.000000E-02  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  7.071038E-03 -2.773820E-03  7.995109E-03  0.000000E+00
 
 ++++++ table: summ
 
@@ -113,5 +117,5 @@ stop;
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

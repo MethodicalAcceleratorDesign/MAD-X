@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 10.10.13 12.22.00 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 17.44.14 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -14,9 +14,11 @@ rfm1->freq =                 12 ;
 rfm1->knl =                  0 ;
 rfm1->pnl =                  0 ;
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   1.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  1.000000E+00  0.000000E+00
+final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00 -4.139309E-02  1.000000E+00  1.322645E-02
 
 ++++++ table: summ
 
@@ -79,9 +81,9 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %23s "MAD-X 5.01.02 Darwin 64"
-@ DATE             %08s "10/10/13"
-@ TIME             %08s "12.22.00"
+@ ORIGIN           %23s "MAD-X 5.02.01 Darwin 64"
+@ DATE             %08s "11/06/14"
+@ TIME             %08s "17.44.14"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0
@@ -131,5 +133,5 @@ c6t terminated - total number of elements: 2
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

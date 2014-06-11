@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.00  (32 bit, Darwin)      +
-  +           Production Version            +
-  + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 26.03.14 13.48.18 +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 12.35.44 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -1845,7 +1845,7 @@ inserting a drift of length 3.034866e+01 at position 8.376158e+02
  
 inserting a drift of length 1.600000e-01 at position 8.542701e+02 
  
-inserting a drift of length 1.673640e+01 at position 8.629683e+02 
+inserting a drift of length 1.673641e+01 at position 8.629683e+02 
  
 inserting a drift of length 2.307995e+00 at position 8.764905e+02 
  
@@ -2635,11 +2635,14 @@ SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,
 TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
 
 enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -2668,5 +2671,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.00 (32 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

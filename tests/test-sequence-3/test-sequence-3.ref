@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 26.07.13 16.53.15 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 12.35.43 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -5549,11 +5549,13 @@ INITBETA0: BETA0,
  twiss, centre, beta0=initbeta0, file="optics_2010-1.out";
 
 enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -5643,11 +5645,13 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
  exec, maketwiss;
 
 enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -5679,5 +5683,5 @@ stop;
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

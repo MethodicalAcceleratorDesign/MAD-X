@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 13.02.13 21.52.09 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 10.06.14 21.16.59 +
   +++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Transferline matching with MAD-X';
 
@@ -305,7 +305,7 @@ use,period=fivecell;
 
 savebeta,label=abc,place=#s;
 
-select,flag=twiss,range=full,column=name,s,betx,bety;
+select,flag=twiss,range=#s/#e,column=name,s,betx,bety;
 
 twiss, sequence=fivecell;
 
@@ -323,13 +323,13 @@ orbit:  -2.556193E-05 -3.552790E-07  2.948751E-03 -1.098197E-04 -2.419989E-07 -1
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6    2.419989205e-07    0.0004498974988        47.14582183 
+             534.6    2.419989214e-07    0.0004498974988        47.14582183 
 
                 q1                dq1            betxmax              dxmax 
        1.256622886       -1.709613092        186.0593755        2.235741425 
 
              dxrms             xcomax             xcorms                 q2 
-       1.711709766     2.55811844e-05    1.957039145e-05        1.468423245 
+       1.711709766    2.558118442e-05    1.957039146e-05        1.468423245 
 
                dq2            betymax              dymax              dyrms 
       -1.988647234        185.2849056      0.05539960915      0.02099810508 
@@ -341,7 +341,7 @@ orbit:  -2.556193E-05 -3.552790E-07  2.948751E-03 -1.098197E-04 -2.419989E-07 -1
                  0                  0                  0                  0 
 
 
-match,sequence=fivecell,beta0=abc;
+match,sequence=fivecell,beta0=abc,x=0,px=0,y=0,py=0,t=0,pt=0;
 
 START MATCHING
 
@@ -349,6 +349,24 @@ number of sequences: 1
 sequence name: fivecell
 number of beta0s: 1
 BETA0 name: abc
+entry name: x
+number of entries: 1
+entry value: 0.000000
+entry name: px
+number of entries: 1
+entry value: 0.000000
+entry name: y
+number of entries: 1
+entry value: 0.000000
+entry name: py
+number of entries: 1
+entry value: 0.000000
+entry name: t
+number of entries: 1
+entry value: 0.000000
+entry name: pt
+number of entries: 1
+entry value: 0.000000
 constraint,sequence=fivecell,range=#e,betx=180.0,bety=30.0;
 
 vary,name=kqf,step=1.0e-6;
@@ -363,24 +381,24 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.69516383E+02
+Initial Penalty Function =   0.69441922E+02
 
 
-call:       7   Penalty function =   0.68759290E+02
-call:      10   Penalty function =   0.67426945E+02
-call:      13   Penalty function =   0.65332869E+02
-call:      16   Penalty function =   0.61722731E+02
-call:      19   Penalty function =   0.55331866E+02
-call:      22   Penalty function =   0.43829835E+02
-call:      25   Penalty function =   0.33718015E+02
-call:      28   Penalty function =   0.12560706E+02
-call:      31   Penalty function =   0.26435430E+00
-call:      34   Penalty function =   0.73332041E-04
-call:      37   Penalty function =   0.84935053E-09
-call:      40   Penalty function =   0.38717782E-14
-call:      43   Penalty function =   0.56083230E-19
+call:       7   Penalty function =   0.68704537E+02
+call:      10   Penalty function =   0.67371508E+02
+call:      13   Penalty function =   0.65273154E+02
+call:      16   Penalty function =   0.61669946E+02
+call:      19   Penalty function =   0.55296900E+02
+call:      22   Penalty function =   0.43794196E+02
+call:      25   Penalty function =   0.33085625E+02
+call:      28   Penalty function =   0.12655064E+02
+call:      31   Penalty function =   0.33603728E+00
+call:      34   Penalty function =   0.15458514E-03
+call:      37   Penalty function =   0.16536767E-08
+call:      40   Penalty function =   0.64177073E-14
+call:      43   Penalty function =   0.96815184E-19
  ++++++++++ LMDIF ended: converged successfully
-call:      43   Penalty function =   0.56083230E-19
+call:      43   Penalty function =   0.96815184E-19
 endmatch;
 
 
@@ -388,11 +406,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     5.60249946E-20
-fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     5.82356558E-23
+fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     9.66796421E-20
+fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     1.35541816E-22
 
 
-Final Penalty Function =   5.60832302e-20
+Final Penalty Function =   9.68151840e-20
 
 
 
@@ -400,23 +418,23 @@ Final Penalty Function =   5.60832302e-20
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqf                       8.72106e-03  8.90000e-03 -1.00000e+20  1.00000e+20
-kqd                      -9.19078e-03 -9.70000e-03 -1.00000e+20  1.00000e+20
+kqf                       8.72103e-03  8.90000e-03 -1.00000e+20  1.00000e+20
+kqd                      -9.19086e-03 -9.70000e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.60832302e-20
+VARIABLE "TAR" SET TO   9.68151840e-20
 
 
 value, kqf;
 
-kqf =     0.008721063916 ;
+kqf =     0.008721034577 ;
 value, kqd;
 
-kqd =    -0.009190778403 ;
+kqd =    -0.009190855083 ;
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

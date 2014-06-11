@@ -1,18 +1,20 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.17  (32 bit, Linux)       +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.06.28      +
-  + Execution Time Stamp: 28.06.12 12.22.59 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 19.17.28 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
 option, -debug, -echo;
 
 enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   1.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  1.000000E+00  0.000000E+00
+final orbit vector:     1.000000E+00 -7.417277E+00  0.000000E+00 -3.074450E+00  1.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -37,5 +39,5 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.17 32 finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -241,6 +241,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
   int i, jt=0, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
   int w_file, beta_def, inval = 1, chrom_flg; // ks, err not used
   int keep_info;
+  int orbit_input = 0; // counter of number of elements of initial orbit given on command line
 
   /* Set embedded_flag */
 
@@ -467,13 +468,49 @@ pro_embedded_twiss(struct command* current_global_twiss)
       set_sector();
     }
 
-    if (get_option("useorbit"))
-      copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
-    else if (guess_flag) {
-      for (i = 0; i < 6; i++) {
-        if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
-      }
+    // 2014-May-30  12:33:48  ghislain: suppressed
+    /* if (get_option("useorbit")) */
+    /*   copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6); */
+    /* else if (guess_flag) { */
+    /*   for (i = 0; i < 6; i++) { */
+    /*     if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i]; */
+    /*   } */
+    /* } */
+
+    // 2014-May-30  12:33:48  ghislain: modified order of priority
+    //              and added input for values given on command line
+    if (guess_flag) {
+      if (get_option("info"))
+	printf(" Found initial orbit vector from coguess values. \n");
+      copy_double(guess_orbit,orbit0,6);    
     }
+    // if given, useorbit overrides coguess
+    if (get_option("useorbit")) {
+      if (get_option("info"))
+	printf(" Found initial orbit vector from twiss useorbit values. \n");
+      copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
+    }
+    // if given, orbit0 values from twiss command line modify individual values
+    pos = name_list_pos("x", nl);
+    if (nl->inform[pos]) { orbit0[0] = command_par_value("x",  current_twiss); orbit_input++;}
+    pos = name_list_pos("px", nl);
+    if (nl->inform[pos]) { orbit0[1] = command_par_value("px", current_twiss); orbit_input++;}
+    pos = name_list_pos("y", nl);
+    if (nl->inform[pos]) { orbit0[2] = command_par_value("y",  current_twiss); orbit_input++;}
+    pos = name_list_pos("py", nl);
+    if (nl->inform[pos]) { orbit0[3] = command_par_value("py", current_twiss); orbit_input++;}
+    pos = name_list_pos("t", nl);
+    if (nl->inform[pos]) { orbit0[4] = command_par_value("t",  current_twiss); orbit_input++;}
+    pos = name_list_pos("pt", nl);
+    if (nl->inform[pos]) { orbit0[5] = command_par_value("pt", current_twiss); orbit_input++;}
+    
+    if (orbit_input > 0 && get_option("info"))
+      printf(" Found %d initial orbit vector values from twiss command. \n", orbit_input);
+    
+    if (get_option("debug"))
+      printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
+    // 2014-May-30  12:33:48  ghislain: end of modifications
+    
 
     if(twiss_deltas->curr <= 0)
       fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
@@ -710,26 +747,25 @@ pro_twiss(void)
   int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
       w_file, beta_def;
   int chrom_flg;
+  int orbit_input = 0; // counter of number of elements of initial orbit given on command line
+
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
 
-  if (current_twiss == NULL)
-  {
+  if (current_twiss == NULL) {
     seterrorflag(2,"pro_twiss","No twiss command seen yet");
     warning("pro_twiss","No twiss command seen yet!");
     return;
   }
 
-  if (current_twiss->par_names == NULL)
-  {
+  if (current_twiss->par_names == NULL) {
     seterrorflag(3,"pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
     warning("pro_twiss","Last twiss has NULL par_names pointer. Cannot proceed further.");
     return;
   }
 
-  if (current_twiss->par == NULL)
-  {
+  if (current_twiss->par == NULL) {
     seterrorflag(4,"pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
     warning("pro_twiss","Last twiss has NULL par pointer. Cannot proceed further.");
     return;
@@ -810,7 +846,7 @@ pro_twiss(void)
     if (current_sequ->all_nodes[j] == current_sequ->range_start) break;
   }
 
-  if((pos = name_list_pos("useorbit", nl)) > -1 &&nl->inform[pos]) {
+  if((pos = name_list_pos("useorbit", nl)) > -1 && nl->inform[pos]) {
     /* orbit specified */
     if (current_sequ->orbits == NULL)
       warning("orbit not found, ignored: ", pl->parameters[pos]->string);
@@ -916,13 +952,50 @@ pro_twiss(void)
     add_to_table_list(twiss_sector_table, table_register);
   }
 
-  if (get_option("useorbit"))
-    copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
-  else if (guess_flag) {
-    for (i = 0; i < 6; i++) {
-      if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i];
-    }
+
+  // 2014-May-30  12:33:48  ghislain: suppressed
+  /* if (get_option("useorbit")) */
+  /*   copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6); */
+  /* else if (guess_flag) { */
+  /*   for (i = 0; i < 6; i++) { */
+  /*     if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i]; */
+  /*   } */
+  /* } */
+
+  
+  // 2014-May-30  12:33:48  ghislain: modified order of priority
+  //              and added input for values given on command line
+  if (guess_flag) {
+    if (get_option("info"))
+      printf(" Found initial orbit vector from coguess values. \n");
+    copy_double(guess_orbit,orbit0,6);    
   }
+  // if given, useorbit overrides coguess
+  if (get_option("useorbit")) {
+    if (get_option("info"))
+      printf(" Found initial orbit vector from twiss useorbit values. \n");
+    copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
+  }
+  // if given, orbit0 values from twiss command line modify individual values
+  pos = name_list_pos("x", nl);
+  if (nl->inform[pos]) { orbit0[0] = command_par_value("x",  current_twiss); orbit_input++;}
+  pos = name_list_pos("px", nl);
+  if (nl->inform[pos]) { orbit0[1] = command_par_value("px", current_twiss); orbit_input++;}
+  pos = name_list_pos("y", nl);
+  if (nl->inform[pos]) { orbit0[2] = command_par_value("y",  current_twiss); orbit_input++;}
+  pos = name_list_pos("py", nl);
+  if (nl->inform[pos]) { orbit0[3] = command_par_value("py", current_twiss); orbit_input++;}
+  pos = name_list_pos("t", nl);
+  if (nl->inform[pos]) { orbit0[4] = command_par_value("t",  current_twiss); orbit_input++;}
+  pos = name_list_pos("pt", nl);
+  if (nl->inform[pos]) { orbit0[5] = command_par_value("pt", current_twiss); orbit_input++;}
+
+  if (orbit_input > 0 && get_option("info"))
+    printf(" Found %d initial orbit vector values from twiss command. \n", orbit_input);
+
+  if (get_option("debug"))
+    printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
+  // 2014-May-30  12:33:48  ghislain: end of modifications
 
   for (i = 0; i < twiss_deltas->curr; i++) {
     if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
@@ -1131,8 +1204,7 @@ store_beta0(struct in_cmd* cmd)
 {
   int k = cmd->decl_start - 1;
   if (k == 0) warning("beta0 without label:", "ignored");
-  else
-  {
+  else {
     cmd->clone_flag = 1; /* do not delete */
     add_to_command_list(cmd->tok_list->p[0], cmd->clone, beta0_list, 0);
   }

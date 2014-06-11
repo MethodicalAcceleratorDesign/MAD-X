@@ -1,5 +1,5 @@
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
-Option,  warn,info;
+Option,  -warn,info;
 
 Title, "Matching an insertion of the LHC 6.5 lattice with MADX";
 
@@ -9,7 +9,7 @@ Title, "Matching an insertion of the LHC 6.5 lattice with MADX";
 option, -echo;
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.coll.str";
-option, echo;
+option, echo, warn;
 
 Beam, particle = proton, sequence=lhcb1, energy = 7000.0;
 Beam, particle = proton, sequence=lhcb2, energy = 7000.0;

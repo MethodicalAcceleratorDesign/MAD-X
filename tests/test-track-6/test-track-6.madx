@@ -88,7 +88,7 @@ MATSUP1,at= 45.0;
 endmk,  at= 50.0;
 endsequence;
 
-
+option, echo;
 ! ********** Define beam and use the sequence with it 
 beam,  sequence= smach2, particle= proton, energy= 450;
 use,   sequence= smach2;
@@ -97,13 +97,6 @@ use,   sequence= smach2;
 ! ********** TWISS
 ! This will give twice the tune as before
 twiss; ! using the current sequence
-
-! ********** Plot optics
-!PLOT, TABLE= TWISS, noversion, COLOUR= 100, HAXIS= S, VAXIS1= BETX,BETY, VAXIS2= DX,DY;
-!PLOT, TABLE= TWISS, noversion, COLOUR= 100, HAXIS= S, VAXIS1= ALFX,ALFY, VAXIS2= DPX,DPY;
-!PLOT, TABLE= TWISS, noversion, COLOUR= 100, HAXIS= S, VAXIS1= MUX,MUY;
-!PLOT, TABLE= TWISS, noversion, COLOUR= 100, HAXIS= S, VAXIS1= X,Y,VAXIS2= PX,PY;
-
 
 ! ********** Create user defined table
 create, table= mytab, column= method, particle, x, px, y, py, t, pt;
@@ -116,7 +109,7 @@ track, onepass, dump; ! onepass = no closed orbit computed before tracking!
   run,   turns= 10;
 endtrack;
 
-method = "TRACK";
+method = 1; ! 1 for "TRACK";
 particle = 1;
 x  = table(track.obs0002.p0001,x,1);
 px = table(track.obs0002.p0001,px,1);
@@ -126,7 +119,7 @@ t  = table(track.obs0002.p0001,t,1);
 pt = table(track.obs0002.p0001,pt,1);
 fill, table= mytab;
 
-method = "TRACK";
+method = 1; ! 1 for "TRACK";
 particle = 2;
 x  = table(track.obs0002.p0002,x,1);
 px = table(track.obs0002.p0002,px,1);
@@ -148,7 +141,7 @@ select, flag= twiss, class= endmk, column= name,s,x,px,y,py,t,pt,l;
 TWISS,  betx= 110, bety= 110,
   x= 0.001, px= 4.492437849e-06, file= "twiss1.tfs";
 
-method = "TWISS";
+method = 2; ! 2 for "TWISS";
 particle = 1;
 x  = table(twiss,endmk,x);
 px = table(twiss,endmk,px);
@@ -166,7 +159,7 @@ select, flag= twiss, class= endmk, column= name,s,x,px,y,py,t,pt,l;
 TWISS,  betx= 110, bety= 110,
   x= 0.1, px= 4.492437849e-04, file= "twiss2.tfs";
 
-method = "TWISS";
+method = 2; ! 2 for "TWISS";
 particle = 2;
 x  = table(twiss,endmk,x);
 px = table(twiss,endmk,px);

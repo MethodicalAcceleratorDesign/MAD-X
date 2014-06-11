@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 20.12.12 16.55.05 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 14.00.37 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Threader example
 
@@ -74,6 +74,7 @@ coguess,x=0;
 twiss, file = twiss.1;!,keeporbit;
 
 enter Twiss module
+ Found initial orbit vector from coguess values. 
   
 iteration:   1 error:   1.300217E-01 deltap:   0.000000E+00
 orbit:   1.742856E-01  2.538799E-03  4.625988E-02  1.065936E-03  0.000000E+00  0.000000E+00
@@ -123,6 +124,7 @@ option,threader;
 
 twiss, file = twiss.2;
 enter Twiss module
+ Found initial orbit vector from coguess values. 
 ++++++ info: -threader- pickup: bph[ 1]  kicker: cbh[ 1] total x-kick:  -9.813651E-04              
 ++++++ info: -threader- pickup: bpv[ 1]  kicker: cbv[ 1] total y-kick:  -1.000000E-03              
 ++++++ info: -threader- pickup: bph[ 2]  kicker: cbh.2[ 1] total x-kick:  -9.816179E-04              
@@ -157,5 +159,5 @@ orbit:   2.578233E-03  3.848899E-05 -2.257435E-08 -3.834450E-10  0.000000E+00  0
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -101,6 +101,7 @@ parameter: vector   double array: 1.000000e-04 1.000000e-04 1.000000e+00
 twiss, save, centre; 
 
 enter Twiss module
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   node =           26  kpro =            2  code =           19  dorb =    2.2610362372366041E-004

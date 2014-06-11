@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 30.11.12 16.09.51 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 16.56.45 +
   +++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test of tracking with a matrix.
 
@@ -45,6 +45,22 @@ r116 =      1.9894578e-05 ;
 r121 =   -2.888981102e-06 ;
 r122 =        1.000292412 ;
 r126 =     0.000681045193 ;
+! ********** Define beam and use the sequence with it 
+
+beam,  sequence= smach2, particle= proton, energy= 450;
+
+use,   sequence= smach2;
+
+!show, beam%smach2;
+
+
+
+! ********** TWISS
+
+! This will give twice the tune as before
+
+twiss; ! using the current sequence
+
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -69,18 +85,103 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+
+! ********** Create user defined table
+
+create, table= mytab, column= method, particle, x, px, y, py, t, pt;
+
+
+
+! ********** Track 2 particles
+
+track, onepass, dump; ! onepass = no closed orbit computed before tracking!
+
 enter TRACK module
 one pass is on
+  start, x= 0.001,px= 4.492437849e-06;
+
+  start, x= 0.1,  px= 4.492437849e-04;
+
+  observe, place= endmk;
+
+  run,   turns= 10;
+
 
 *****  end of trrun  *****
+endtrack;
+
 exit TRACK module
 
-++++++ warning: illegal expression set to 0 in: method = "TRACK" 
-++++++ warning: illegal expression set to 0 in: method = "TRACK" 
+
+
+method = 1; ! 1 for "TRACK";
+
+particle = 1;
+
+x  = table(track.obs0002.p0001,x,1);
+
+px = table(track.obs0002.p0001,px,1);
+
+y  = table(track.obs0002.p0001,y,1);
+
+py = table(track.obs0002.p0001,py,1);
+
+t  = table(track.obs0002.p0001,t,1);
+
+pt = table(track.obs0002.p0001,pt,1);
+
+fill, table= mytab;
+
+
+
+method = 1; ! 1 for "TRACK";
+
+particle = 2;
+
+x  = table(track.obs0002.p0002,x,1);
+
+px = table(track.obs0002.p0002,px,1);
+
+y  = table(track.obs0002.p0002,y,1);
+
+py = table(track.obs0002.p0002,py,1);
+
+t  = table(track.obs0002.p0002,t,1);
+
+pt = table(track.obs0002.p0002,pt,1);
+
+fill, table= mytab;
+
+
+
+!write, table= mytab, file= "out_tstTrack_matrix.tfs";
+
+!system, "cat out_tstTrack_matrix.tfs";
+
+!system, "rm track.obs*";
+
+
+
+
+
+! ********** Check trajectory computation with twiss, Particle 1
+
+select, flag= twiss, clear;
+
+!select, flag= twiss, class= MATSUP1;
+
+select, flag= twiss, class= endmk, column= name,s,x,px,y,py,t,pt,l;
+
+TWISS,  betx= 110, bety= 110,
+
+  x= 0.001, px= 4.492437849e-06, file= "twiss1.tfs";
+
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   1.000000E-03  4.492438E-06  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     9.569931E-04  3.268034E-06  0.000000E+00  0.000000E+00 -4.821456E-04  0.000000E+00
 
 ++++++ table: summ
 
@@ -101,11 +202,47 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-++++++ warning: illegal expression set to 0 in: method = "TWISS" 
+
+
+method = 2; ! 2 for "TWISS";
+
+particle = 1;
+
+x  = table(twiss,endmk,x);
+
+px = table(twiss,endmk,px);
+
+y  = table(twiss,endmk,y);
+
+py = table(twiss,endmk,py);
+
+t  = table(twiss,endmk,t);
+
+pt = table(twiss,endmk,pt);
+
+fill, table= mytab;
+
+  
+
+  
+
+! ********** Check trajectory computation with twiss, Particle 2
+
+select, flag= twiss, clear;
+
+!select, flag= twiss, class= MATSUP1;
+
+select, flag= twiss, class= endmk, column= name,s,x,px,y,py,t,pt,l;
+
+TWISS,  betx= 110, bety= 110,
+
+  x= 0.1, px= 4.492437849e-04, file= "twiss2.tfs";
+
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   1.000000E-01  4.492438E-04  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     9.569931E-02  3.268034E-04  0.000000E+00  0.000000E+00 -4.821911E-02  0.000000E+00
 
 ++++++ table: summ
 
@@ -126,11 +263,45 @@ end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-++++++ warning: illegal expression set to 0 in: method = "TWISS" 
 
-  Number of warnings: 4
-4 in C and 0 in Fortran
+
+method = 2; ! 2 for "TWISS";
+
+particle = 2;
+
+x  = table(twiss,endmk,x);
+
+px = table(twiss,endmk,px);
+
+y  = table(twiss,endmk,y);
+
+py = table(twiss,endmk,py);
+
+t  = table(twiss,endmk,t);
+
+pt = table(twiss,endmk,pt);
+
+fill, table= mytab;
+
+
+
+
+
+!*******************************************************************
+
+!***  test traj computation with twiss particle(TRACK) ******
+
+
+
+write, table= mytab, file= "mytab.tfs";
+
+
+
+return;
+
+
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

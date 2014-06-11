@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.00  (64 bit, Darwin)      +
-  +           Production Version            +
-  + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 28.03.14 16.53.38 +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 12.32.09 +
   +++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
@@ -16,7 +16,8 @@ enter Twiss module
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -47,7 +48,8 @@ mb1.edge_l not found
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
-end values:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -157,5 +159,5 @@ exit TRACK module
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.00 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
