@@ -1944,7 +1944,7 @@ SUBROUTINE twbttk(re,te)
      synch_2 = synch_2 + rhoinv**2 * blen/two
      synch_3 = synch_3 + abs(rhoinv**3) * blen/two
      ! 2014-May-15  16:50:36  ghislain: added 
-     !synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
+     synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
      synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
   endif
 
@@ -2213,7 +2213,7 @@ SUBROUTINE twbttk(re,te)
      synch_2 = synch_2 + rhoinv**2 * blen/two
      synch_3 = synch_3 + abs(rhoinv**3) * blen/two
      ! 2014-May-15  16:50:36  ghislain: added 
-     !synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
+     synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
      synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
   endif
 

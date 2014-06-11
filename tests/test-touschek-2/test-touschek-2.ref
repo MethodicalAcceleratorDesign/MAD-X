@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 29.11.13 10.03.25 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 21.30.38 +
   +++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -97,7 +97,7 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
     0.008499886944    0.0006743412007                  0        8.612640897 
 
            synch_2            synch_3            synch_4            synch_5 
-    0.002244883795     7.99769003e-07                  0    2.119978713e-08 
+    0.002244883795     7.99769003e-07    1.095476628e-06    2.119978713e-08 
 
 
 ! reduce size of output table:
@@ -209,7 +209,7 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
     0.008499886944    0.0006743412007                  0        8.612640897 
 
            synch_2            synch_3            synch_4            synch_5 
-    0.002244883795     7.99769003e-07                  0    2.119978713e-08 
+    0.002244883795     7.99769003e-07    1.095476628e-06    2.119978713e-08 
 
 
 select, flag=touschek, column= name, S, TLI, TLIW, TLITOT;
@@ -252,5 +252,5 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
