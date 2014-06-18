@@ -6897,7 +6897,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !--- AL: RF-multipole
   integer dummyi
   double precision pc, krf, vrf
-  double precision pi, clight, ten3m
+  double precision twopi, clight, ten3m, get_variable
   double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision field_cos(2,0:maxmul)
@@ -6905,11 +6905,12 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision pnl(0:maxmul), psl(0:maxmul)
   complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
     
-  parameter ( pi = 3.14159265358979d0 )
-  parameter ( clight = 299792458d0 )
   parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
   parameter ( ii=(0d0,1d0) )
-  
+
+  twopi=get_variable('twopi ')  
+  clight=get_variable('clight ')
+
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
   call dzero(skew,maxmul+1)
@@ -6942,7 +6943,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  krf = 2*pi*freq*1d6/clight;
+  krf = twopi*freq*1d6/clight;
   vrf = bvk*volt*ten3m/(pc*(one+deltap));
   
   if (n_ferr.gt.0) then
@@ -6963,10 +6964,10 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   
   !---- Vector with strengths + field errors
   do iord = 0, nord;
-     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord)) / (one + deltap);
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z))                 / (one + deltap);
-     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord)) / (one + deltap);
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z))                 / (one + deltap);
+     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord)) / (one + deltap);
+     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z))                 / (one + deltap);
+     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord)) / (one + deltap);
+     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))                 / (one + deltap);
      if (tilt.ne.zero)  then
         angle = (iord+1) * (-tilt);
         cangle = cos(angle);
@@ -7011,7 +7012,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      !---- The kick
      dpx = -REAL(Cp0);
      dpy = AIMAG(Cp0);
-     dpt =  vrf * sin(lag * 2 * pi - krf * z) - krf * REAL(Sp1);
+     dpt =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
      
      !---- Radiation effects at entrance.
      if (dorad  .and.  elrad .ne. zero) then
@@ -7037,7 +7038,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !---- Element Kick
   ek(2) = -REAL(Cp0);
   ek(4) = AIMAG(Cp0);
-  ek(6) =  vrf * sin(lag * 2 * pi - krf * z) - krf * REAL(Sp1);
+  ek(6) =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
 
   !---- First-order terms
   re(2,1) = -REAL(Cm1);
@@ -7048,7 +7049,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   re(4,5) =  krf * AIMAG(Sp0);
   re(6,1) =  re(2,5);
   re(6,3) =  re(4,5);
-  re(6,5) = -krf * vrf * cos(lag * 2 * pi - krf * z) + krf * krf * REAL(Cp1);
+  re(6,5) = -krf * vrf * cos(lag * twopi - krf * z) + krf * krf * REAL(Cp1);
   
   !---- Second-order terms (use X,Y from orbit tracking).
   if (fsec) then
@@ -7078,7 +7079,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,3,5) =  te(4,5,5);
      te(6,5,1) =  te(6,1,5);
      te(6,5,3) =  te(6,3,5);
-     te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * 2 * pi - krf * z) + krf * krf * krf * REAL(Sp1));
+     te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * twopi - krf * z) + krf * krf * krf * REAL(Sp1));
   endif
   
   !---- centre option

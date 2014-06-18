@@ -4809,16 +4809,17 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision field_cos(2,0:maxmul)
   double precision field_sin(2,0:maxmul)
   double precision pc, krf, rfac
-  double precision pi, clight, ten3m
+  double precision twopi, clight, ten3m, get_variable
   double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision pnl(0:maxmul), psl(0:maxmul)
   complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
-  parameter ( pi = 3.14159265358979d0 )
-  parameter ( clight = 299792458d0 )
   parameter ( ten3m=1d-3)
   parameter ( ii=(0d0,1d0) )
+
+  twopi=get_variable('twopi ')  
+  clight=get_variable('clight ')
 
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
@@ -4850,7 +4851,7 @@ subroutine ttrfmult(track, ktrack, turn)
 
   !---- Set-up some parameters
   volt = bvk * node_value('volt ');
-  krf = 2*pi*freq*1d6/clight;
+  krf = twopi*freq*1d6/clight;
 
   if (n_ferr.gt.0) then
      call dcopy(f_errors,field,n_ferr)
@@ -4864,10 +4865,10 @@ subroutine ttrfmult(track, ktrack, turn)
     z = track(5,jtrk);
     !---- Vector with strengths + field errors
     do iord = 0, nord;
-      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * 2 * pi - krf * z) + field(1,iord));
-      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * 2 * pi - krf * z));
-      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * 2 * pi - krf * z) + field(2,iord));
-      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * 2 * pi - krf * z));
+      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord));
+      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z));
+      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord));
+      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z));
     enddo
     Cm2 = 0d0;
     Sm2 = 0d0;
@@ -4897,7 +4898,7 @@ subroutine ttrfmult(track, ktrack, turn)
     !---- The kick
     dpx = -REAL(Cp0);
     dpy = AIMAG(Cp0);
-    dpt = (volt * ten3m * sin(lag * 2 * pi - krf * z) / pc - krf * REAL(Sp1));
+    dpt = (volt * ten3m * sin(lag * twopi - krf * z) / pc - krf * REAL(Sp1));
 
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. 0d0) then
