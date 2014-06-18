@@ -709,12 +709,12 @@ and count.
 A SOLENOID has two or three real attributes: 
 \begin{itemize}
    \item L: The length of the solenoid (default: 0 m) 
-   \item KS: The solenoid strength \textit{K$_s$} (default: 0
+   \item KS: The solenoid strength $K_s = B_0 / B\rho$ (default: 0
      rad/m). For positive KS and positive particle charge, the solenoid
-     field points in the direction of increasing \textit{s}.  
-   \item KSI: The solenoid integrated strength \textit{K$_s$*L}
+     field points in the direction of increasing $s$.  
+   \item KSI: The solenoid integrated strength $K_s L$
      (default: 0 rad).  This additional attribute is needed only when
-     using the thin solenoid,  where \textit{L=0}!     
+     using the thin solenoid,  where $L=0$!     
    \item \textit{ KNL \& KSL:  Take note that one can specify multipole
      coefficients but they have no effect in MAD-X proper but are used
      for solenoids with multipoles in PTC.} 
