@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (32 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 09.10.13 16.06.37 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 18.06.14 16.22.12 +
   +++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -93,6 +93,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:               5000
 parameter: pc   double value:        4999.999912
 parameter: gamma   double value:        5328.944863
+parameter: brho   double value:        16678.20447
 parameter: ex   double value:                  1
 parameter: exn   double value:        21315.77908
 parameter: ey   double value:                  1
@@ -315,5 +316,5 @@ Deviation from symplecticity  0.6217248937900877E-12 %
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (32 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

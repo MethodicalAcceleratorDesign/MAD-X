@@ -174,6 +174,7 @@ char command_def[] =
 "energy   = [r, 1], "
 "pc       = [r, 0], "
 "gamma    = [r, 0], "
+"brho     = [r, 0], "
 "ex       = [r, 1], "
 "exn      = [r, 0], "
 "ey       = [r, 1], "

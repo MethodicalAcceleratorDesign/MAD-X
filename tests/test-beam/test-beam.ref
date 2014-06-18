@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.00  (64 bit, Darwin)      +
-  +           Production Version            +
-  + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 09.04.14 16.20.53 +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 18.06.14 15.49.48 +
   +++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -28,6 +28,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035166
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -102,6 +103,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035166
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -176,6 +178,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:        450.0017607
 parameter: pc   double value:        450.0007826
 parameter: gamma   double value:        479.6069143
+parameter: brho   double value:        1501.041039
 parameter: ex   double value:     1.95473003e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:     1.95473003e-09
@@ -250,6 +253,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035165
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -324,6 +328,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035166
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -398,6 +403,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035166
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -472,6 +478,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: brho   double value:        1501.035166
 parameter: ex   double value:    1.954737678e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    1.954737678e-09
@@ -488,6 +495,81 @@ parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
 parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    1.534698269e-18
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
+
+
+use,period=LHCCELL;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
+
+twiss, sequence=LHCCELL;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             106.9                 -0    0.0004452321861         47.3921841 
+
+                q1                dq1            betxmax              dxmax 
+              0.25      -0.3179054665        177.4532595        2.187225241 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.698552358                  0                  0               0.25 
+
+               dq2            betymax              dymax              dyrms 
+     -0.3180354423         177.468158                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+beam, particle=proton, brho=1501.035166, exn=3.75e-6, eyn=3.75e-6, freq0=400.;
+
+show, beam;
+
+command: beam  module: control
+parameter: particle   string: proton
+parameter: sequence   string: default_beam
+parameter: bunched   logical: true
+parameter: radiate   logical: false
+parameter: mass   double value:        0.938272046
+parameter: charge   double value:                  1
+parameter: energy   double value:        450.0000001
+parameter: pc   double value:         449.999022
+parameter: gamma   double value:        479.6050378
+parameter: brho   double value:        1501.035166
+parameter: ex   double value:    1.954737678e-09
+parameter: exn   double value:           3.75e-06
+parameter: ey   double value:    1.954737678e-09
+parameter: eyn   double value:           3.75e-06
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:                  0
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                400
+parameter: circ   double value:       0.7494795158
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: beta   double value:       0.9999978263
+parameter: alfa   double value:    4.347429293e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
 parameter: arad   double value:    1.534698269e-18

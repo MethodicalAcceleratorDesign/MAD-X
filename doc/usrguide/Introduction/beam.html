@@ -19,7 +19,7 @@ command has been issued before.
 The quantities are entered by a BEAM command:
 <pre>
 BEAM, PARTICLE=name, MASS=real, CHARGE=real,
-      ENERGY=real, PC=real, GAMMA=real, BETA=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real, BRHO=real,
       EX=real, EXN=real, EY=real, EYN=real,
       ET=real, SIGT=real, SIGE=real,
       FREQ0=real, CIRC=real,
@@ -46,9 +46,12 @@ The particles are positive muons (MASS=<i>m<sub>mu</sub></i>, CHARGE=1),
 The particles are negative muons (MASS=<i>m<sub>mu</sub></i>, CHARGE=-1).
 </ul>
 <li>MASS: the restmass of the particles in the beam in GeV. <br>
- (Default=<i>m<sub>e</sub></i> =  0.511 E-3  GeV).
+ (Default=<i>m<sub>e</sub></i> =  0.511 E-3  GeV). <br>
+  Note that a zero mass particle is not allowed in MAD-X.
 <li><a name=charge>CHARGE</a>: the electrical charge of the
-  particles in the beam [<i>q<sub>p</sub></i>]. (Default=1)
+  particles in the beam in units of the proton charge [<i>q<sub>p</sub></i>]. 
+  (Default=1, one proton charge) <br>
+  Note that a zero charge particle is not allowed in MAD-X.
 </ul>
 The order of precedence for arguments is:  <tt>particle->(mass+charge)</tt><br> 
 If the particle name given is recognized in the list above, the restmass
@@ -70,8 +73,12 @@ GAMMA must be greater than one.
 Ratio between the speed of the particles and the speed of light:
 BETA = <i>v / c</i>.
 BETA must be strictly less than one.
+<li><a name=brho>BRHO</a>:
+Magnetic rigidity of the particles: 
+BRHO = <i>P / abs(q)</i> = PC [GeV] / ( abs(CHARGE) [q_p] * c * 1.e-9).
 </ul>
-The order of precedence for arguments is: <tt>energy->pc->gamma->beta</tt>
+The order of precedence for arguments is: <tt>energy->pc->gamma->beta->brho</tt>
+
 <br>
 Note that if the restmass is changed after the energy has been set, ie
 in separate BEAM commands, the energy is left unchanged and the momentum

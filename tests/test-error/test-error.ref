@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 10.10.13 12.16.51 +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 18.06.14 16.55.08 +
   +++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -73,6 +73,7 @@ parameter: charge   double value:                 -1
 parameter: energy   double value:                 10
 parameter: pc   double value:        9.999999987
 parameter: gamma   double value:        19569.51268
+parameter: brho   double value:        33.35640948
 parameter: ex   double value:    3.515672629e-10
 parameter: exn   double value:          2.752e-05
 parameter: ey   double value:    1.916245983e-10
@@ -112,5 +113,5 @@ Added field errors to 24 elements
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

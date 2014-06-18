@@ -102,7 +102,7 @@ update_beam(struct command* comm)
   /* calculates consistent values for modified beam data set.
      beam command values are evaluated in the order:
      particle->(mass+charge)
-     energy->pc->gamma->beta
+     energy->pc->gamma->beta->brho
      ex->exn
      ey->eyn
      current->npart
@@ -116,7 +116,7 @@ update_beam(struct command* comm)
   struct command_parameter_list* pl = current_beam->par;
   int pos, lp;
   char* name = blank;
-  double energy = 0, beta = 0, gamma = 0, charge = 0, freq0 = 0, bcurrent = 0,
+  double energy = 0, beta = 0, gamma = 0, brho = 0, charge = 0, freq0 = 0, bcurrent = 0,
     npart = 0, mass = 0, pc = 0, circ = 0, arad = 0,
     ex, exn, ey, eyn, alfa;
 
@@ -175,24 +175,35 @@ update_beam(struct command* comm)
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
+    brho = pc / ( abs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos]) {
     pc = command_par_value("pc", comm);
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
+    brho = pc / ( abs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("gamma", nlc)) > -1 && nlc->inform[pos]) {
     if ((gamma = command_par_value("gamma", comm)) <= one) fatal_error("gamma must be","> 1");
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     beta = pc / energy;
+    brho = pc / ( abs(charge) * clight * 1.e-9); 
   }
   else if((pos = name_list_pos("beta", nlc)) > -1 && nlc->inform[pos]) {
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
     gamma = one / sqrt(one - beta*beta);
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
+    brho = pc / ( abs(charge) * clight * 1.e-9);
+  }
+  else if((pos = name_list_pos("brho", nlc)) > -1 && nlc->inform[pos]) {
+    if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");    
+    pc = brho * abs(charge) * clight * 1.e-9;
+    energy = sqrt(pc*pc + mass*mass);
+    gamma = energy / mass;
+    beta = pc / energy;
   }
   else {
     energy = command_par_value("energy", current_beam);
@@ -200,6 +211,7 @@ update_beam(struct command* comm)
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
+    brho = pc / ( abs(charge) * clight * 1.e-9);
   }
 
   // emittance related
@@ -305,6 +317,7 @@ update_beam(struct command* comm)
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
+  store_comm_par_value("brho", brho, current_beam);
   store_comm_par_value("ex", ex, current_beam);
   store_comm_par_value("exn", exn, current_beam);
   store_comm_par_value("ey", ey, current_beam);

@@ -1211,7 +1211,7 @@ command has been issued before.
 The quantities are entered by a BEAM command: 
 \begin{verbatim}
 BEAM, PARTICLE=name, MASS=real, CHARGE=real,
-      ENERGY=real, PC=real, GAMMA=real, BETA=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real, BRHO=real,
       EX=real, EXN=real, EY=real, EYN=real,
       ET=real, SIGT=real, SIGE=real,
       KBUNCH=integer, NPART=real, BCURRENT=real,
@@ -1231,9 +1231,11 @@ The attributes of the BEAM command are:
     \ttitem{NEGMUON} The particles are negative muons (MASS=$m_{\mu}$, CHARGE=-1) 
   \end{madlist}
   \ttitem{MASS} the restmass of the particles in the beam in GeV. \\
-  (Default=$m_e \approx 0.511 10^{-3}$ GeV).
+  (Default=$m_e \approx 0.511 10^{-3}$ GeV).\\
+  Note that a zero mass particle is not allowed in MAD-X.
   \ttitem{CHARGE}\label{beam_charge} the electrical charge of the
-  particles in the beam [$q_p$]. (Default=1)
+  particles in the beam [$q_p$]. (Default=1) \\
+  Note that a zero charge particle is not allowed in MAD-X.
 \end{madlist} 
 The order of precedence for arguments is:  {\tt particle->(mass+charge)}\\ 
 If the particle name given is recognized in the list above, the restmass
@@ -1246,7 +1248,7 @@ combination of name, mass and charge can be entered independently.
   \ttitem{ENERGY} \label{beam_energy} Total energy per particle in
   GeV.\\ If given, it must be greater than the particle
   restmass. (Default=1 GeV)
-  \ttitem{PC} Momentum per particle in GeV/c. \\
+  \ttitem{PC} Particle momentum times the speed of light, in GeV. \\
   If given, it must be greater than zero. 
   \ttitem{GAMMA} Relativistic factor, {\sl ie} ratio between total
   energy and rest energy of the particles: GAMMA = ENERGY/MASS = $E / m_0 c^2$. \\
@@ -1254,8 +1256,10 @@ combination of name, mass and charge can be entered independently.
   \ttitem{BETA} Ratio between the speed of the particle
   and the speed of light: ${\tt BETA} = v / c$.\\
   BETA must be strictly less than one.
+  \ttitem{BRHO} Magnetic rigidity of the particles in T.m. \\ 
+  BRHO = $P / abs(q)$ = PC / ( abs(CHARGE) * c * 1.e-9). 
 \end{madlist}  
-The order of precedence for arguments is: {\tt energy->pc->gamma->beta}
+The order of precedence for arguments is: {\tt energy->pc->gamma->beta->brho}
 
 Note that if the restmass is changed after the energy has been set, ie
 in separate BEAM commands, the energy is left unchanged and the momentum

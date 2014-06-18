@@ -3,7 +3,7 @@
   +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 21.05.14 15.22.26 +
+  + Execution Time Stamp: 18.06.14 16.16.57 +
   +++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -78,6 +78,7 @@ parameter: charge   double value:                  1
 parameter: energy   double value:               7000
 parameter: pc   double value:        6999.999937
 parameter: gamma   double value:        7460.522809
+parameter: brho   double value:        23349.48645
 parameter: ex   double value:    5.026457389e-10
 parameter: exn   double value:    1.499999987e-05
 parameter: ey   double value:    5.026457389e-10
